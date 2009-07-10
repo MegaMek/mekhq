@@ -1,0 +1,382 @@
+<?xml version="1.0"?>
+
+<unit>
+
+   <entity chassis="Black Knight" model="BL-9-KNT" type="Biped">
+      <pilot name="Unnamed" gunnery="3" piloting="4" hits="1" autoeject="true"/>
+      <location index="0"> Head
+         <armor points="7"/>
+      </location>
+      <location index="1"> Center Torso
+         <armor points="21"/>
+      </location>
+      <location index="2"> Right Torso
+         <armor points="Destroyed"/>
+         <armor points="15" type="Internal"/>
+      </location>
+      <location index="3"> Left Torso
+         <armor points="6"/>
+      </location>
+      <location index="4"> Right Arm
+         <armor points="Destroyed"/>
+         <armor points="6" type="Internal"/>
+      </location>
+      <location index="5"> Left Arm
+         <armor points="Destroyed"/>
+         <armor points="7" type="Internal"/>
+      </location>
+      <location index="6"> Right Leg
+         <armor points="13"/>
+      </location>
+      <location index="7"> Left Leg
+         <armor points="19"/>
+      </location>
+   </entity>
+
+   <entity chassis="Exterminator" model="EXT-4D" type="Biped">
+      <pilot name="Unnamed" gunnery="3" piloting="4" hits="1" autoeject="true"/>
+      The first slot in a location is at index="1".
+      <location index="0"> Head
+         <armor points="2"/>
+      </location>
+      <location index="1"> Center Torso
+         <armor points="Destroyed"/>
+         <armor points="8" type="Internal"/>
+         <slot index="11" type="IS Ammo LRM-10" shots="8"/>
+      </location>
+      <location index="2"> Right Torso
+         <armor points="12"/>
+         <slot index="8" type="ISAMS Ammo" shots="11"/>
+      </location>
+      <location index="3"> Left Torso
+         <armor points="13"/>
+      </location>
+      <location index="4"> Right Arm
+         <armor points="16"/>
+      </location>
+      <location index="5"> Left Arm
+         <armor points="11"/>
+      </location>
+      <location index="6"> Right Leg
+         <armor points="14"/>
+      </location>
+      <location index="7"> Left Leg
+         <armor points="8"/>
+      </location>
+   </entity>
+
+   <entity chassis="Guillotine" model="GLT-5M" type="Biped">
+      <pilot name="Unnamed" gunnery="3" piloting="4" autoeject="false"/>
+      The first slot in a location is at index="1".
+      <location index="1"> Center Torso
+         <armor points="5" type="Rear"/>
+      </location>
+      <location index="2"> Right Torso
+         <armor points="3"/>
+         <armor points="5" type="Rear"/>
+         <slot index="9" type="IS Ammo SRM-6" shots="13"/>
+      </location>
+      <location index="3"> Left Torso
+         <armor points="12"/>
+         <armor points="Destroyed" type="Rear"/>
+      </location>
+      <location index="4"> Right Arm
+         <armor points="18"/>
+      </location>
+      <location index="6" isDestroyed="true" /> Right Leg
+      <location index="7"> Left Leg
+         <armor points="14"/>
+      </location>
+   </entity>
+
+   <entity chassis="Guillotine" model="GLT-5M" type="Biped">
+      <pilot name="Unnamed" gunnery="3" piloting="4" autoeject="false"/>
+      The first slot in a location is at index="1".
+      <location index="2"> Right Torso
+         <slot index="9" type="IS Ammo SRM-6" shots="13"/>
+      </location>
+      <location index="4"> Right Arm
+         <armor points="13"/>
+      </location>
+      <location index="7"> Left Leg
+         <armor points="2"/>
+      </location>
+   </entity>
+
+   <entity chassis="Bombardier" model="BMB-14D" type="Biped">
+      <pilot name="Unnamed" gunnery="3" piloting="4" autoeject="true"/>
+      The first slot in a location is at index="1".
+      <location index="1"> Center Torso
+         <armor points="Destroyed"/>
+         <armor points="16" type="Internal"/>
+         <slot index="11" type="Medium Laser" isHit="true" isDestroyed="true"/>
+      </location>
+      <location index="2"> Right Torso
+         <armor points="13"/>
+         <slot index="10" type="IS Ammo LRM-20" shots="6"/>
+         <slot index="11" type="IS Ammo LRM-20 Swarm" shots="6"/>
+         <slot index="12" type="IS Ammo LRM-20 Swarm" shots="6"/>
+      </location>
+      <location index="3"> Left Torso
+         <armor points="10"/>
+         <slot index="10" type="IS Ammo LRM-20" shots="0"/>
+         <slot index="11" type="IS Ammo LRM-20" shots="0"/>
+         <slot index="12" type="IS Ammo LRM-20" shots="4"/>
+      </location>
+      <location index="4"> Right Arm
+         <armor points="7"/>
+      </location>
+      <location index="5"> Left Arm
+         <armor points="10"/>
+      </location>
+      <location index="7"> Left Leg
+         <armor points="24"/>
+      </location>
+   </entity>
+
+   <entity chassis="Blackjack" model="BJ-2" type="Biped">
+      <pilot name="Unnamed" gunnery="3" piloting="4" autoeject="true"/>
+      The first slot in a location is at index="1".
+      <location index="3"> Left Torso
+         <slot index="9" type="IS Streak SRM 2 Ammo" shots="50"/>
+      </location>
+   </entity>
+
+   <entity chassis="Blackjack" model="BJ-2" type="Biped">
+      <pilot name="Unnamed" gunnery="3" piloting="4" autoeject="true"/>
+      The first slot in a location is at index="1".
+      <location index="3"> Left Torso
+         <slot index="9" type="IS Streak SRM 2 Ammo" shots="50"/>
+      </location>
+   </entity>
+
+   <entity chassis="Crab" model="CRB-27" type="Biped">
+      <pilot name="Unnamed" gunnery="3" piloting="4" autoeject="true"/>
+      The first slot in a location is at index="1".
+      <location index="1"> Center Torso
+         <armor points="15"/>
+      </location>
+      <location index="2"> Right Torso
+         <armor points="Destroyed"/>
+         <armor points="1" type="Internal"/>
+         <slot index="1" type="Heat Sink" isHit="true" isDestroyed="true"/>
+      </location>
+      <location index="3"> Left Torso
+         <armor points="9"/>
+      </location>
+      <location index="4"> Right Arm
+         <armor points="Destroyed"/>
+         <armor points="3" type="Internal"/>
+      </location>
+      <location index="6"> Right Leg
+         <armor points="17"/>
+      </location>
+      <location index="7"> Left Leg
+         <armor points="14"/>
+      </location>
+   </entity>
+
+   <entity chassis="Raijin" model="RJN101-UK" type="Biped">
+      <pilot name="Unnamed" gunnery="3" piloting="4" hits="1" autoeject="false"/>
+      The first slot in a location is at index="1".
+      <location index="1"> Center Torso
+         <armor points="3" type="Rear"/>
+         <slot index="11" type="ISSRM6OS" munition="IS Ammo SRM-6" isDestroyed="false"/>
+         <slot index="12" type="ISSRM6OS" munition="IS Ammo SRM-6" isDestroyed="false"/>
+      </location>
+      <location index="2"> Right Torso
+         <armor points="12"/>
+         <armor points="1" type="Rear"/>
+      </location>
+      <location index="3"> Left Torso
+         <armor points="9"/>
+         <slot index="6" type="IS Streak SRM 2 Ammo" shots="50"/>
+      </location>
+      <location index="6"> Right Leg
+         <armor points="8"/>
+      </location>
+   </entity>
+
+   <entity chassis="Burke" model="" type="Tracked">
+      <pilot name="Unnamed" gunnery="3" piloting="4"/>
+      <movement speed="2"/>
+      Tanks have special needs, so don't delete any ammo slots.
+      The first slot in a location is at index="1".
+      <location index="0"> Body
+         <slot index="1" type="IS Ammo LRM-10" shots="8"/>
+         <slot index="N/A" type="IS Ammo LRM-10" shots="8" isDestroyed="false"/>
+      </location>
+      <location index="3"> Left
+         <armor points="14"/>
+      </location>
+      <location index="5"> Turret
+         <armor points="4"/>
+      </location>
+   </entity>
+
+   <entity chassis="Burke" model="" type="Tracked">
+      <pilot name="Unnamed" gunnery="3" piloting="4"/>
+      <movement speed="2"/>
+      Tanks have special needs, so don't delete any ammo slots.
+      The first slot in a location is at index="1".
+      <location index="0"> Body
+         <slot index="1" type="IS Ammo LRM-10" shots="9"/>
+         <slot index="N/A" type="IS Ammo LRM-10" shots="9" isDestroyed="false"/>
+      </location>
+      <location index="1"> Front
+         <armor points="16"/>
+      </location>
+      <location index="5"> Turret
+         <armor points="15"/>
+      </location>
+   </entity>
+
+   <entity chassis="Fury" model="" type="Tracked">
+      <pilot name="Unnamed" gunnery="3" piloting="4"/>
+      <movement speed="4"/>
+      Tanks have special needs, so don't delete any ammo slots.
+      The first slot in a location is at index="1".
+      <location index="0"> Body
+         <slot index="1" type="IS Gauss Ammo" shots="8"/>
+         <slot index="2" type="IS Gauss Ammo" shots="1"/>
+         <slot index="N/A" type="IS Gauss Ammo" shots="8" isDestroyed="false"/>
+         <slot index="N/A" type="IS Gauss Ammo" shots="1" isDestroyed="false"/>
+      </location>
+      <location index="1"> Front
+         <armor points="49"/>
+      </location>
+      <location index="5"> Turret
+         <armor points="55"/>
+      </location>
+   </entity>
+
+   <entity chassis="Fury" model="" type="Tracked">
+      <pilot name="Unnamed" gunnery="3" piloting="4"/>
+      <movement speed="4"/>
+      Tanks have special needs, so don't delete any ammo slots.
+      The first slot in a location is at index="1".
+      <location index="0"> Body
+         <slot index="1" type="IS Gauss Ammo" shots="8"/>
+         <slot index="2" type="IS Gauss Ammo" shots="2"/>
+         <slot index="N/A" type="IS Gauss Ammo" shots="8" isDestroyed="false"/>
+         <slot index="N/A" type="IS Gauss Ammo" shots="2" isDestroyed="false"/>
+      </location>
+   </entity>
+
+   <entity chassis="Rhino" model="" type="Tracked">
+      <pilot name="Unnamed" gunnery="3" piloting="4"/>
+      <movement speed="3"/>
+      Tanks have special needs, so don't delete any ammo slots.
+      The first slot in a location is at index="1".
+      <location index="0"> Body
+         <slot index="1" type="IS Ammo LRM-20" shots="6"/>
+         <slot index="2" type="IS Ammo LRM-20" shots="1"/>
+         <slot index="3" type="IS Ammo LRM-20" shots="0"/>
+         <slot index="4" type="IS Ammo LRM-10" shots="6"/>
+         <slot index="N/A" type="IS Ammo LRM-20" shots="6" isDestroyed="false"/>
+         <slot index="N/A" type="IS Ammo LRM-20" shots="1" isDestroyed="false"/>
+         <slot index="N/A" type="IS Ammo LRM-20" shots="0" isDestroyed="false"/>
+         <slot index="N/A" type="IS Ammo LRM-10" shots="6" isDestroyed="false"/>
+      </location>
+   </entity>
+
+   <entity chassis="Rhino" model="" type="Tracked">
+      <pilot name="Unnamed" gunnery="3" piloting="4"/>
+      <movement speed="3"/>
+      Tanks have special needs, so don't delete any ammo slots.
+      The first slot in a location is at index="1".
+      <location index="0"> Body
+         <slot index="1" type="IS Ammo LRM-20" shots="6"/>
+         <slot index="2" type="IS Ammo LRM-20" shots="4"/>
+         <slot index="3" type="IS Ammo LRM-20" shots="0"/>
+         <slot index="4" type="IS Ammo LRM-10" shots="8"/>
+         <slot index="N/A" type="IS Ammo LRM-20" shots="6" isDestroyed="false"/>
+         <slot index="N/A" type="IS Ammo LRM-20" shots="4" isDestroyed="false"/>
+         <slot index="N/A" type="IS Ammo LRM-20" shots="0" isDestroyed="false"/>
+         <slot index="N/A" type="IS Ammo LRM-10" shots="8" isDestroyed="false"/>
+      </location>
+   </entity>
+
+   <entity chassis="Regulator Hovertank" model="" type="Hover">
+      <pilot name="Unnamed" gunnery="3" piloting="4"/>
+      <movement speed="9"/>
+      Tanks have special needs, so don't delete any ammo slots.
+      The first slot in a location is at index="1".
+      <location index="0"> Body
+         <slot index="1" type="IS Gauss Ammo" shots="8"/>
+         <slot index="2" type="IS Gauss Ammo" shots="2"/>
+         <slot index="N/A" type="IS Gauss Ammo" shots="8" isDestroyed="false"/>
+         <slot index="N/A" type="IS Gauss Ammo" shots="2" isDestroyed="false"/>
+      </location>
+   </entity>
+
+   <entity chassis="Saladin Assault Hover Tank" model="" type="Hover">
+      <pilot name="Unnamed" gunnery="3" piloting="4"/>
+      <movement speed="8"/>
+      Tanks have special needs, so don't delete any ammo slots.
+      The first slot in a location is at index="1".
+      <location index="0"> Body
+         <slot index="1" type="IS Ammo AC/20" shots="5"/>
+         <slot index="2" type="IS Ammo AC/20" shots="5"/>
+         <slot index="3" type="IS Ammo AC/20" shots="5"/>
+         <slot index="N/A" type="IS Ammo AC/20" shots="5" isDestroyed="false"/>
+         <slot index="N/A" type="IS Ammo AC/20" shots="5" isDestroyed="false"/>
+         <slot index="N/A" type="IS Ammo AC/20" shots="5" isDestroyed="false"/>
+      </location>
+      <location index="3"> Left
+         <armor points="Destroyed"/>
+         <armor points="3" type="Internal"/>
+      </location>
+   </entity>
+
+   <entity chassis="Zephyr" model="" type="Hover">
+      <pilot name="Unnamed" gunnery="3" piloting="4"/>
+      <movement speed="9"/>
+      Tanks have special needs, so don't delete any ammo slots.
+      The first slot in a location is at index="1".
+      <location index="0"> Body
+         <slot index="1" type="IS Ammo SRM-6 Inferno" shots="15"/>
+         <slot index="2" type="IS Ammo SRM-6 Inferno" shots="15"/>
+         <slot index="N/A" type="IS Ammo SRM-6 Inferno" shots="15" isDestroyed="false"/>
+         <slot index="N/A" type="IS Ammo SRM-6 Inferno" shots="15" isDestroyed="false"/>
+      </location>
+   </entity>
+
+   <entity chassis="Zephyr" model="" type="Hover">
+      <pilot name="Unnamed" gunnery="3" piloting="4"/>
+      <movement speed="9"/>
+      Tanks have special needs, so don't delete any ammo slots.
+      The first slot in a location is at index="1".
+      <location index="0"> Body
+         <slot index="1" type="IS Ammo SRM-6 Inferno" shots="15"/>
+         <slot index="2" type="IS Ammo SRM-6 Inferno" shots="15"/>
+         <slot index="N/A" type="IS Ammo SRM-6 Inferno" shots="15" isDestroyed="false"/>
+         <slot index="N/A" type="IS Ammo SRM-6 Inferno" shots="15" isDestroyed="false"/>
+      </location>
+   </entity>
+
+   <entity chassis="Mad Dog" model="Prime" type="Biped">
+      <pilot name="Star Commander Lucien" gunnery="2" piloting="3" hits="1" advantages="clan_pilot_training" autoeject="false"/>
+      The first slot in a location is at index="1".
+      <location index="0"> Head
+         <armor points="4"/>
+      </location>
+      <location index="1"> Center Torso
+         <armor points="Destroyed"/>
+         <armor points="15" type="Internal"/>
+         <slot index="9" type="System" isHit="true" isDestroyed="true"/>
+      </location>
+      <location index="2"> Right Torso
+         <armor points="10"/>
+         <slot index="3" type="Clan Ammo LRM-20" shots="6"/>
+      </location>
+      <location index="3"> Left Torso
+         <slot index="7" type="Clan Ammo LRM-20" shots="3"/>
+      </location>
+      <location index="4" isDestroyed="true" /> Right Arm
+      <location index="5"> Left Arm
+         <armor points="14"/>
+      </location>
+   </entity>
+
+</unit>
