@@ -41,6 +41,7 @@ import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.AbstractTableModel;
 import megamek.common.Entity;
 import megamek.common.EntityListFile;
 import mekhq.work.WorkItem;
@@ -274,22 +275,24 @@ public class MekHQView extends FrameView {
                                 .add(UnitsScroll, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 343, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                 .add(mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                    .add(btnDeployUnits, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 138, Short.MAX_VALUE)
-                                    .add(loadListBtn, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 138, Short.MAX_VALUE)))
+                                    .add(btnDeployUnits, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 146, Short.MAX_VALUE)
+                                    .add(loadListBtn, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 146, Short.MAX_VALUE)))
                             .add(lblUnits, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 156, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                         .add(24, 24, 24)
                         .add(mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 371, Short.MAX_VALUE)
+                            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 379, Short.MAX_VALUE)
                             .add(lblTasks, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 197, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                             .add(mainPanelLayout.createSequentialGroup()
                                 .add(lblTeams)
                                 .add(66, 66, 66)
                                 .add(assignBtn))
-                            .add(taskScroll, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 371, Short.MAX_VALUE)))
-                    .add(btnAdvanceDay))
+                            .add(taskScroll, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 379, Short.MAX_VALUE)))
+                    .add(mainPanelLayout.createSequentialGroup()
+                        .add(btnAdvanceDay)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 776, Short.MAX_VALUE)))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(btnNewTeam)
-                .add(30, 30, 30))
+                .add(703, 703, 703))
         );
         mainPanelLayout.setVerticalGroup(
             mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -321,9 +324,9 @@ public class MekHQView extends FrameView {
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(btnNewTeam)
-                            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 373, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 299, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
                     .add(UnitsScroll))
-                .add(679, 679, 679))
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         menuBar.setName("menuBar"); // NOI18N
@@ -362,11 +365,11 @@ public class MekHQView extends FrameView {
         statusPanel.setLayout(statusPanelLayout);
         statusPanelLayout.setHorizontalGroup(
             statusPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(statusPanelSeparator, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1053, Short.MAX_VALUE)
+            .add(statusPanelSeparator, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1078, Short.MAX_VALUE)
             .add(statusPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .add(statusMessageLabel)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 857, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 882, Short.MAX_VALUE)
                 .add(progressBar, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(statusAnimationLabel)
@@ -413,8 +416,10 @@ private void UnitListValueChanged(javax.swing.event.ListSelectionEvent evt) {//G
 private void assignBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_assignBtnActionPerformed
     //assign the task to the team here
     campaign.assignTask(currentTeamId, currentTaskId);
+    int next = TaskList.getSelectedIndex() + 1;
     refreshUnitList();
     refreshTaskList();
+    TaskList.setSelectedIndex(next);
     refreshTeamsList();
 }//GEN-LAST:event_assignBtnActionPerformed
 
@@ -511,10 +516,16 @@ protected void saveListFile() {
 }
     
 protected void refreshUnitList() {
+    int selected = UnitList.getSelectedIndex();
     unitsModel.removeAllElements();
+    int len = 0;
     for(Entity en: campaign.getEntities()) {
         campaign.getTasksForEntity(en.getId());
         unitsModel.addElement(en.getDisplayName() + campaign.getEntityTaskDesc(en.getId()));
+        len++;
+    }
+    if(selected < len) {
+        UnitList.setSelectedIndex(selected);
     }
 }
 
@@ -548,6 +559,8 @@ protected void updateAssignEnabled() {
         assignBtn.setEnabled(false);
     }    
 }
+
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JList TaskList;
