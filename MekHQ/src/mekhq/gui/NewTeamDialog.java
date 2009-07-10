@@ -19,8 +19,11 @@
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq;
+package mekhq.gui;
 
+import mekhq.campaign.Campaign;
+import mekhq.campaign.SupportTeam;
+import mekhq.*;
 import javax.swing.DefaultComboBoxModel;
 
 /**

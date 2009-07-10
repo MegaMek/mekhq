@@ -19,19 +19,20 @@
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq;
+package mekhq.campaign;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import megamek.common.Compute;
 import megamek.common.TargetRoll;
-import mekhq.work.WorkItem;
+import mekhq.campaign.work.WorkItem;
 
 /**
  *
  * @author Taharqa
  * This is the code for a team (medical, technical, etc.)
  */
-public class SupportTeam {
+public class SupportTeam implements Serializable {
 
     public static final int EXP_GREEN = 0;
     public static final int EXP_REGULAR = 1;

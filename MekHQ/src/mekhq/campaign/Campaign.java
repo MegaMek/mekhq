@@ -19,7 +19,7 @@
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq;
+package mekhq.campaign;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -28,16 +28,16 @@ import megamek.common.Entity;
 
 import megamek.common.Game;
 import megamek.common.Mech;
-import mekhq.work.ArmorReplacement;
-import mekhq.work.MekGyroReplacement;
-import mekhq.work.WorkItem;
+import mekhq.campaign.work.ArmorReplacement;
+import mekhq.campaign.work.MekGyroReplacement;
+import mekhq.campaign.work.WorkItem;
 
 /**
  *
  * @author Taharqa
  * The main campaign class, keeps track of teams and units
  */
-public class Campaign {
+public class Campaign implements Serializable {
 
     //we have three things to track: (1) teams, (2) units, (3) repair tasks
     //we will use the same basic system (borrowed from MegaMek) for tracking all three
@@ -59,7 +59,6 @@ public class Campaign {
     //asssign it to the entities, otherwise some entity methods may get NPE
     //if they try to call up game options
     Game game = new Game();
-    
     
     public Campaign() {
         

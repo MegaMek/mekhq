@@ -1,5 +1,5 @@
 /*
- * ArmorReplacement.java
+ * MekGyroReplacement.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -19,34 +19,27 @@
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq.work;
+package mekhq.campaign.work;
 
 import megamek.common.Entity;
+import mekhq.campaign.Campaign;
 
 /**
  *
- * @author Aaron
+ * @author Taharqa
  */
-public class ArmorReplacement extends WorkItem {
-
-    private int loc;
-    private int amount;
-    private boolean rear;
+public class MekGyroReplacement extends WorkItem {
     
-    public ArmorReplacement(Entity entity, int loc, int amount, boolean rear) {
+    public MekGyroReplacement(Entity entity) {
         super(entity);
-        this.loc = loc;
-        this.amount = amount;
-        this.rear = rear;
-        this.difficulty = -2;
-        this.time = 5 * amount; 
-        this.name = entity.getLocationName(loc) + " armor replacement " + "(" + amount + " points)";
-    } 
-    
-    @Override
-    public void fix() {
-        entity.setArmor(entity.getOArmor(loc, rear), loc, rear);
+        this.name = "Gyro Replacement";
+        this.time = 200;
+        this.difficulty = 0;
     }
 
-    
+    @Override
+    public void fix() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
 }
