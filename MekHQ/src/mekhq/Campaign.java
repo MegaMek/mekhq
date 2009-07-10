@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import megamek.common.Entity;
 
+import megamek.common.Game;
 import megamek.common.Mech;
 import mekhq.work.ArmorReplacement;
 import mekhq.work.MekGyroReplacement;
@@ -54,6 +55,12 @@ public class Campaign {
     
     private ArrayList<String> currentReport = new ArrayList<String>();
     
+    //I need to put a basic game object in campaign so that I can
+    //asssign it to the entities, otherwise some entity methods may get NPE
+    //if they try to call up game options
+    Game game = new Game();
+    
+    
     public Campaign() {
         
     }
@@ -79,6 +86,7 @@ public class Campaign {
         //TODO: check for duplicate display names
         int id = lastEntityId + 1;
         en.setId(id);
+        en.setGame(game);
         entities.add(en);
         entityIds.put(new Integer(id), en);
         lastEntityId = id;
