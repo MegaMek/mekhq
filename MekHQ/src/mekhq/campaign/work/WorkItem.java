@@ -21,6 +21,7 @@
 
 package mekhq.campaign.work;
 
+import java.io.Serializable;
 import megamek.common.Entity;
 import megamek.common.TargetRoll;
 import mekhq.campaign.SupportTeam;
@@ -30,7 +31,7 @@ import mekhq.campaign.SupportTeam;
  * will be extended for repairs, replacement, reloading, etc.
  * @author Taharqa
  */
-public abstract class WorkItem {
+public abstract class WorkItem implements Serializable {
 
     public static final int TEAM_NONE = -1;
 

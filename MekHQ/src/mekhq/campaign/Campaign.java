@@ -21,7 +21,6 @@
 
 package mekhq.campaign;
 
-import mekhq.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -29,16 +28,14 @@ import megamek.common.Entity;
 
 import megamek.common.Game;
 import megamek.common.Mech;
-import mekhq.campaign.work.ArmorReplacement;
-import mekhq.campaign.work.MekGyroReplacement;
-import mekhq.campaign.work.WorkItem;
+import mekhq.campaign.work.*;
 
 /**
  *
  * @author Taharqa
  * The main campaign class, keeps track of teams and units
  */
-public class Campaign {
+public class Campaign implements Serializable {
 
     //we have three things to track: (1) teams, (2) units, (3) repair tasks
     //we will use the same basic system (borrowed from MegaMek) for tracking all three

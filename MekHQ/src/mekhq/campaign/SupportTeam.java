@@ -21,7 +21,7 @@
 
 package mekhq.campaign;
 
-import mekhq.campaign.Campaign;
+import java.io.Serializable;
 import java.util.ArrayList;
 import megamek.common.Compute;
 import megamek.common.TargetRoll;
@@ -32,7 +32,7 @@ import mekhq.campaign.work.WorkItem;
  * @author Taharqa
  * This is the code for a team (medical, technical, etc.)
  */
-public class SupportTeam {
+public class SupportTeam implements Serializable {
 
     public static final int EXP_GREEN = 0;
     public static final int EXP_REGULAR = 1;
