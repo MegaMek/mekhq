@@ -22,6 +22,7 @@
 package mekhq.campaign.work;
 
 import megamek.common.Entity;
+import mekhq.campaign.Unit;
 
 /**
  *
@@ -29,8 +30,8 @@ import megamek.common.Entity;
  */
 public class MekGyroReplacement extends ReplacementItem {
     
-    public MekGyroReplacement(Entity entity) {
-        super(entity);
+    public MekGyroReplacement(Unit unit) {
+        super(unit);
         this.name = "Gyro Replacement";
         this.time = 200;
         this.difficulty = 0;

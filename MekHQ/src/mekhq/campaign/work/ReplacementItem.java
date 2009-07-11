@@ -22,6 +22,7 @@
 package mekhq.campaign.work;
 
 import megamek.common.Entity;
+import mekhq.campaign.Unit;
 
 /**
  *
@@ -29,8 +30,8 @@ import megamek.common.Entity;
  */
 public abstract class ReplacementItem extends WorkItem {
 
-    public ReplacementItem(Entity entity) {
-        super(entity);
+    public ReplacementItem(Unit unit) {
+        super(unit);
     }
     
 }

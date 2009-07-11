@@ -22,6 +22,7 @@
 package mekhq.campaign.work;
 
 import megamek.common.Entity;
+import mekhq.campaign.Unit;
 
 /**
  *
@@ -33,19 +34,19 @@ public class ArmorReplacement extends ReplacementItem {
     private int amount;
     private boolean rear;
     
-    public ArmorReplacement(Entity entity, int loc, int amount, boolean rear) {
-        super(entity);
+    public ArmorReplacement(Unit unit, int loc, int amount, boolean rear) {
+        super(unit);
         this.loc = loc;
         this.amount = amount;
         this.rear = rear;
         this.difficulty = -2;
         this.time = 5 * amount; 
-        this.name = entity.getLocationName(loc) + " armor replacement " + "(" + amount + " points)";
+        this.name = unit.getEntity().getLocationName(loc) + " armor replacement " + "(" + amount + " points)";
     } 
     
     @Override
     public void fix() {
-        entity.setArmor(entity.getOArmor(loc, rear), loc, rear);
+        unit.getEntity().setArmor(unit.getEntity().getOArmor(loc, rear), loc, rear);
     }
 
     

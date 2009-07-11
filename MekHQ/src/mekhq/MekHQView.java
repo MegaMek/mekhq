@@ -46,6 +46,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import megamek.common.Entity;
 import megamek.common.EntityListFile;
+import mekhq.campaign.Unit;
 import mekhq.campaign.work.WorkItem;
 
 /**
@@ -58,7 +59,7 @@ public class MekHQView extends FrameView {
     private DefaultListModel unitsModel = new DefaultListModel();
     private DefaultListModel taskModel = new DefaultListModel();
     private DefaultListModel teamsModel = new DefaultListModel();
-    private int currentEntityId;
+    private int currentUnitId;
     private int currentTaskId;
     private int currentTeamId;
     
@@ -416,11 +417,11 @@ private void loadListBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
 
 private void UnitListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_UnitListValueChanged
     int selected = UnitList.getSelectedIndex();
-    if(selected > -1 && selected < campaign.getEntities().size()) {
-        currentEntityId = campaign.getEntities().get(selected).getId();
+    if(selected > -1 && selected < campaign.getUnits().size()) {
+        currentUnitId = campaign.getUnits().get(selected).getId();
     }
     else if(selected < 0) {
-        currentEntityId = -1;
+        currentUnitId = -1;
     }
     refreshTaskList();
 }//GEN-LAST:event_UnitListValueChanged
@@ -437,8 +438,8 @@ private void assignBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
 
 private void TaskListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_TaskListValueChanged
     int selected = TaskList.getSelectedIndex();
-    if(selected > -1 && selected < campaign.getTasksForEntity(currentEntityId).size()) {
-        currentTaskId = campaign.getTasksForEntity(currentEntityId).get(selected).getId(); 
+    if(selected > -1 && selected < campaign.getTasksForUnit(currentUnitId).size()) {
+        currentTaskId = campaign.getTasksForUnit(currentUnitId).get(selected).getId(); 
     }
     else if(selected < 0) {
         currentTaskId = -1;
@@ -485,7 +486,7 @@ protected void loadListFile() {
            Vector<Entity> loadedUnits = EntityListFile.loadFrom(unitFile);
            // Add the units from the file.
            for (Entity entity : loadedUnits) {
-              campaign.addEntity(entity);
+              campaign.addUnit(entity);
            }
         } catch (IOException excep) {
             excep.printStackTrace(System.err);
@@ -518,7 +519,7 @@ protected void saveListFile() {
                 //FIXME: this is not working
                 EntityListFile.saveTo(unitFile, campaign.getEntities());
                 //clear the entities, so that if the user wants to read them back you wont get duplicates
-                campaign.clearEntities();
+                campaign.clearUnits();
                 
             } catch (IOException excep) {
                 excep.printStackTrace(System.err);
@@ -531,9 +532,9 @@ protected void refreshUnitList() {
     int selected = UnitList.getSelectedIndex();
     unitsModel.removeAllElements();
     int len = 0;
-    for(Entity en: campaign.getEntities()) {
-        campaign.getTasksForEntity(en.getId());
-        unitsModel.addElement(en.getDisplayName() + campaign.getEntityTaskDesc(en.getId()));
+    for(Unit unit: campaign.getUnits()) {
+        campaign.getTasksForUnit(unit.getId());
+        unitsModel.addElement(unit.getEntity().getDisplayName() + campaign.getUnitTaskDesc(unit.getId()));
         len++;
     }
     if(selected < len) {
@@ -543,7 +544,7 @@ protected void refreshUnitList() {
 
 protected void refreshTaskList() {
         taskModel.removeAllElements();
-        for(WorkItem task: campaign.getTasksForEntity(currentEntityId)) {
+        for(WorkItem task: campaign.getTasksForUnit(currentUnitId)) {
             taskModel.addElement(task.getDesc());
         }
 }

@@ -1,6 +1,8 @@
 VERSION HISTORY
 ----------------------------------
 v0.01 (SVN)
++ refactored Campaign#runDiagnostic into Unit#runDiagnostic
++ added Unit class as wrapper for Entity
 + added doc folder and version history
 + abstract classes RepairItem, Replacment Item, ReloadItem
 + Gyro repair and replacement

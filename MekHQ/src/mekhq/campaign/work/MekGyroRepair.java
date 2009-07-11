@@ -22,6 +22,7 @@
 package mekhq.campaign.work;
 
 import megamek.common.Entity;
+import mekhq.campaign.Unit;
 
 /**
  *
@@ -29,8 +30,8 @@ import megamek.common.Entity;
  */
 public class MekGyroRepair extends RepairItem {
 
-    public MekGyroRepair(Entity entity, int crits) {
-        super(entity);
+    public MekGyroRepair(Unit unit, int crits) {
+        super(unit);
         this.name = "Gyro Repair";
         this.time = 120;
         this.difficulty = 1;

@@ -22,6 +22,7 @@
 package mekhq.campaign.work;
 
 import megamek.common.Entity;
+import mekhq.campaign.Unit;
 
 /**
  *
@@ -29,7 +30,7 @@ import megamek.common.Entity;
  */
 public abstract class ReloadItem extends WorkItem {
 
-    public ReloadItem(Entity entity) {
-        super(entity);
+    public ReloadItem(Unit unit) {
+        super(unit);
     }
 }

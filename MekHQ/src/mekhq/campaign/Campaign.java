@@ -24,12 +24,10 @@ package mekhq.campaign;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Hashtable;
-import megamek.common.CriticalSlot;
 import megamek.common.Entity;
 
 import megamek.common.Game;
-import megamek.common.Mech;
-import mekhq.campaign.work.*;
+import mekhq.campaign.work.WorkItem;
 
 /**
  *
@@ -43,13 +41,13 @@ public class Campaign implements Serializable {
     
     private ArrayList<SupportTeam> teams = new ArrayList<SupportTeam>();
     private Hashtable<Integer, SupportTeam> teamIds = new Hashtable<Integer, SupportTeam>();
-    private ArrayList<Entity> entities = new ArrayList<Entity>();
-    private Hashtable<Integer, Entity> entityIds = new Hashtable<Integer, Entity>();
+    private ArrayList<Unit> units = new ArrayList<Unit>();
+    private Hashtable<Integer, Unit> unitIds = new Hashtable<Integer, Unit>();
     private ArrayList<WorkItem> tasks = new ArrayList<WorkItem>();
     private Hashtable<Integer, WorkItem> taskIds = new Hashtable<Integer, WorkItem>();
     
     private int lastTeamId;
-    private int lastEntityId;
+    private int lastUnitId;
     private int lastTaskId;
     
     private ArrayList<String> currentReport = new ArrayList<String>();
@@ -81,25 +79,33 @@ public class Campaign implements Serializable {
     }
     
      
-    public void addEntity(Entity en) {
+    public void addUnit(Entity en) {
         //TODO: check for duplicate display names
-        int id = lastEntityId + 1;
+        int id = lastUnitId + 1;
         en.setId(id);
         en.setGame(game);
-        entities.add(en);
-        entityIds.put(new Integer(id), en);
-        lastEntityId = id;
-        //TODO: collect all the work items outstanding on this unit
-        //and add them to the workitem vector
-        runDiagnostic(en);
+        Unit unit = new Unit(en);
+        units.add(unit);
+        unitIds.put(new Integer(id), unit);
+        lastUnitId = id;
+        //collect all the work items outstanding on this unit and add them to the workitem vector
+        unit.runDiagnostic(this);
+    }
+    
+    public ArrayList<Unit> getUnits() {
+        return units;
     }
     
     public ArrayList<Entity> getEntities() {
+        ArrayList<Entity> entities = new ArrayList<Entity>();
+        for(Unit unit : getUnits()) {
+            entities.add(unit.getEntity());
+        }
         return entities;
     }
     
-    public Entity getEntity(int id) {
-        return entityIds.get(new Integer(id));
+    public Unit getUnit(int id) {
+        return unitIds.get(new Integer(id));
     }
     
     public void addWork(WorkItem task) {
@@ -123,22 +129,22 @@ public class Campaign implements Serializable {
         return currentReport;
     }
     
-    public ArrayList<WorkItem> getTasksForEntity(int entId) {
+    public ArrayList<WorkItem> getTasksForUnit(int unitId) {
         ArrayList<WorkItem> newTasks = new ArrayList<WorkItem>();
         for(WorkItem task : getTasks()) {
-            if(task.getEntityId() == entId) {
+            if(task.getUnitId() == unitId) {
                 newTasks.add(task);
             }
         }
         return newTasks;
     }
     
-    public String getEntityTaskDesc(int entId) {
-        ArrayList<WorkItem> entTasks = getTasksForEntity(entId);
+    public String getUnitTaskDesc(int unitId) {
+        ArrayList<WorkItem> unitTasks = getTasksForUnit(unitId);
         int minutes = 0;
         int total = 0;
         int assigned = 0;
-        for(WorkItem task : entTasks) {
+        for(WorkItem task : unitTasks) {
             total++;
             minutes += task.getTime();
             if(!task.isUnassigned()) {
@@ -165,39 +171,6 @@ public class Campaign implements Serializable {
          taskIds.get(new Integer(taskId)).assignTeam(teamId);
      }
     
-    //definitely need to refactor this but I can put it here now
-    /**
-     * Run a diagnostic on the given entity and add its work items to the 
-     * list
-     * TODO: this should really be a function in Entity, I should create a wrapper function
-     *       for entity
-     */
-    public void runDiagnostic(Entity entity) {
-        
-        //check armor replacement
-        for(int i = 0; i < entity.locations(); i++) {
-            //TODO: get rear locations as well
-            int diff = entity.getOArmor(i) - entity.getArmor(i);
-            if(diff > 0) {
-                addWork(new ArmorReplacement(entity, i, diff, false));
-            }
-        }
-        
-        if(entity instanceof Mech) {
-            Mech mech = (Mech)entity;
-            
-            //is the gyro destroyed?
-            int gyroHits = entity.getBadCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_GYRO, Mech.LOC_CT);
-            if((gyroHits > 1 && entity.getGyroType() != Mech.GYRO_HEAVY_DUTY) 
-                    || (gyroHits > 2 && entity.getGyroType() == Mech.GYRO_HEAVY_DUTY)) {
-                addWork(new MekGyroReplacement(entity));
-            }  else if(gyroHits > 0) {
-                addWork(new MekGyroRepair(entity, gyroHits));
-            }
-        }
-        
-    }
-    
     public void processDay() {
         currentReport = new ArrayList<String>();
         //cycle through teams and tell them to get to work
@@ -216,10 +189,10 @@ public class Campaign implements Serializable {
         this.tasks = newTasks;
     }
     
-    public void clearEntities() {
-        this.entities = new ArrayList<Entity>();
-        this.entityIds = new Hashtable<Integer, Entity>();
-        this.lastEntityId = 0;
+    public void clearUnits() {
+        this.units = new ArrayList<Unit>();
+        this.unitIds = new Hashtable<Integer, Unit>();
+        this.lastUnitId = 0;
         //also clear tasks, because you can't have tasks without entities
         this.tasks = new ArrayList<WorkItem>();
         this.taskIds = new Hashtable<Integer, WorkItem>();

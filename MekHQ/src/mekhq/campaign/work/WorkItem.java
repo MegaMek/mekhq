@@ -25,6 +25,7 @@ import java.io.Serializable;
 import megamek.common.Entity;
 import megamek.common.TargetRoll;
 import mekhq.campaign.SupportTeam;
+import mekhq.campaign.Unit;
 
 /**
  * An abstract class representing some item that needs work
@@ -38,8 +39,8 @@ public abstract class WorkItem implements Serializable {
     protected String name;
     //the id of this work item
     protected int id;
-    //the entity for whom the work is being performed
-    protected Entity entity;
+    //the unit for whom the work is being performed
+    protected Unit unit;
     //the id of the team assigned to this item
     protected int teamId;
     //the skill modifier for difficulty
@@ -51,9 +52,9 @@ public abstract class WorkItem implements Serializable {
     //has this task been successfully completed?
     protected boolean completed;
     
-    public WorkItem(Entity entity) {
+    public WorkItem(Unit unit) {
         this.name = "Unknown";
-        this.entity = entity;
+        this.unit = unit;
         this.skillMin = SupportTeam.EXP_GREEN;
         this.teamId = TEAM_NONE;
         this.completed = false;
@@ -75,8 +76,8 @@ public abstract class WorkItem implements Serializable {
         this.id = i;
     }
     
-    public int getEntityId() {
-        return entity.getId();
+    public int getUnitId() {
+        return unit.getId();
     }
     
     public int getTeamId() {
