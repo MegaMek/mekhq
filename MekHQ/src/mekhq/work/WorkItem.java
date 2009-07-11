@@ -19,19 +19,18 @@
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq.campaign.work;
+package mekhq.work;
 
-import java.io.Serializable;
 import megamek.common.Entity;
 import megamek.common.TargetRoll;
-import mekhq.campaign.SupportTeam;
+import mekhq.SupportTeam;
 
 /**
  * An abstract class representing some item that needs work
  * will be extended for repairs, replacement, reloading, etc.
  * @author Taharqa
  */
-public abstract class WorkItem implements Serializable {
+public abstract class WorkItem {
 
     public static final int TEAM_NONE = -1;
 

@@ -19,11 +19,8 @@
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq.gui;
+package mekhq;
 
-import mekhq.campaign.Campaign;
-import mekhq.campaign.SupportTeam;
-import mekhq.*;
 import javax.swing.ListModel;
 import javax.swing.event.ListSelectionEvent;
 import org.jdesktop.application.Action;
@@ -47,7 +44,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import megamek.common.Entity;
 import megamek.common.EntityListFile;
-import mekhq.campaign.work.WorkItem;
+import mekhq.work.WorkItem;
 
 /**
  * The application's main frame.

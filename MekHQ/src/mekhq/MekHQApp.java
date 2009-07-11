@@ -21,7 +21,6 @@
 
 package mekhq;
 
-import mekhq.gui.MekHQView;
 import megamek.common.MechSummaryCache;
 import org.jdesktop.application.Application;
 import org.jdesktop.application.SingleFrameApplication;

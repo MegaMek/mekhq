@@ -19,7 +19,7 @@
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq.gui;
+package mekhq;
 
 import org.jdesktop.application.Action;
 
