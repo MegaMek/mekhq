@@ -24,6 +24,7 @@ package mekhq.campaign;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import megamek.common.CriticalSlot;
 import megamek.common.Entity;
 
 import megamek.common.Game;
@@ -168,6 +169,8 @@ public class Campaign implements Serializable {
     /**
      * Run a diagnostic on the given entity and add its work items to the 
      * list
+     * TODO: this should really be a function in Entity, I should create a wrapper function
+     *       for entity
      */
     public void runDiagnostic(Entity entity) {
         
@@ -182,6 +185,15 @@ public class Campaign implements Serializable {
         
         if(entity instanceof Mech) {
             Mech mech = (Mech)entity;
+            
+            //is the gyro destroyed?
+            int gyroHits = entity.getBadCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_GYRO, Mech.LOC_CT);
+            if((gyroHits > 1 && entity.getGyroType() != Mech.GYRO_HEAVY_DUTY) 
+                    || (gyroHits > 2 && entity.getGyroType() == Mech.GYRO_HEAVY_DUTY)) {
+                addWork(new MekGyroReplacement(entity));
+            }  else if(gyroHits > 0) {
+                addWork(new MekGyroRepair(entity, gyroHits));
+            }
         }
         
     }

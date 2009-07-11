@@ -27,7 +27,7 @@ import megamek.common.Entity;
  *
  * @author Taharqa
  */
-public class MekGyroReplacement extends WorkItem {
+public class MekGyroReplacement extends ReplacementItem {
     
     public MekGyroReplacement(Entity entity) {
         super(entity);

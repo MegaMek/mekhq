@@ -1,5 +1,5 @@
 /*
- * ArmorReplacement.java
+ * ReloadItem.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -25,28 +25,11 @@ import megamek.common.Entity;
 
 /**
  *
- * @author Aaron
+ * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class ArmorReplacement extends ReplacementItem {
+public abstract class ReloadItem extends WorkItem {
 
-    private int loc;
-    private int amount;
-    private boolean rear;
-    
-    public ArmorReplacement(Entity entity, int loc, int amount, boolean rear) {
+    public ReloadItem(Entity entity) {
         super(entity);
-        this.loc = loc;
-        this.amount = amount;
-        this.rear = rear;
-        this.difficulty = -2;
-        this.time = 5 * amount; 
-        this.name = entity.getLocationName(loc) + " armor replacement " + "(" + amount + " points)";
-    } 
-    
-    @Override
-    public void fix() {
-        entity.setArmor(entity.getOArmor(loc, rear), loc, rear);
     }
-
-    
 }

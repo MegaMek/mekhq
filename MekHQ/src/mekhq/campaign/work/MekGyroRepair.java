@@ -1,5 +1,5 @@
 /*
- * ArmorReplacement.java
+ * MekGyroRepair.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -25,28 +25,24 @@ import megamek.common.Entity;
 
 /**
  *
- * @author Aaron
+ * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class ArmorReplacement extends ReplacementItem {
+public class MekGyroRepair extends RepairItem {
 
-    private int loc;
-    private int amount;
-    private boolean rear;
-    
-    public ArmorReplacement(Entity entity, int loc, int amount, boolean rear) {
+    public MekGyroRepair(Entity entity, int crits) {
         super(entity);
-        this.loc = loc;
-        this.amount = amount;
-        this.rear = rear;
-        this.difficulty = -2;
-        this.time = 5 * amount; 
-        this.name = entity.getLocationName(loc) + " armor replacement " + "(" + amount + " points)";
-    } 
+        this.name = "Gyro Repair";
+        this.time = 120;
+        this.difficulty = 1;
+        if(crits > 1) {
+            this.time = 240;
+            this.difficulty = 4;
+        }
+    }
     
     @Override
     public void fix() {
-        entity.setArmor(entity.getOArmor(loc, rear), loc, rear);
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    
 }
