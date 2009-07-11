@@ -1,0 +1,16 @@
+VERSION HISTORY
+----------------------------------
+v0.01 (SVN)
++ added doc folder and version history
++ abstract classes RepairItem, Replacment Item, ReloadItem
++ Gyro repair and replacement
++ serialized classes
++ changed package structure
++ Fixed list selection indexing
++ mul example
++ new MegaMek.jar
++ added Game() to Entities to avoid NPEs
++ titles corrected
++ TinyXML.jar
++ lib folder
++ Initial SVN
