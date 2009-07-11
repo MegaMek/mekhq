@@ -70,7 +70,7 @@ public class Unit implements Serializable {
             Mech mech = (Mech)entity;
             
             //is the gyro destroyed?
-            int gyroHits = entity.getBadCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_GYRO, Mech.LOC_CT);
+            int gyroHits = entity.getHitCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_GYRO, Mech.LOC_CT);
             if((gyroHits > 1 && entity.getGyroType() != Mech.GYRO_HEAVY_DUTY) 
                     || (gyroHits > 2 && entity.getGyroType() == Mech.GYRO_HEAVY_DUTY)) {
                 campaign.addWork(new MekGyroReplacement(this));

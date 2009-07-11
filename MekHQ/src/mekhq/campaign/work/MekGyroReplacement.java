@@ -21,7 +21,9 @@
 
 package mekhq.campaign.work;
 
+import megamek.common.CriticalSlot;
 import megamek.common.Entity;
+import megamek.common.Mech;
 import mekhq.campaign.Unit;
 
 /**
@@ -39,7 +41,7 @@ public class MekGyroReplacement extends ReplacementItem {
 
     @Override
     public void fix() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        unit.getEntity().removeCriticals(Mech.LOC_CT, new CriticalSlot(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_GYRO));
     }
 
 }
