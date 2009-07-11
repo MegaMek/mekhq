@@ -21,6 +21,8 @@
 
 package mekhq;
 
+import mekhq.campaign.SupportTeam;
+import mekhq.campaign.Campaign;
 import javax.swing.DefaultComboBoxModel;
 
 /**

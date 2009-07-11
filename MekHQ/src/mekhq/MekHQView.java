@@ -21,6 +21,8 @@
 
 package mekhq;
 
+import mekhq.campaign.SupportTeam;
+import mekhq.campaign.Campaign;
 import javax.swing.ListModel;
 import javax.swing.event.ListSelectionEvent;
 import org.jdesktop.application.Action;
@@ -44,7 +46,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import megamek.common.Entity;
 import megamek.common.EntityListFile;
-import mekhq.work.WorkItem;
+import mekhq.campaign.work.WorkItem;
 
 /**
  * The application's main frame.

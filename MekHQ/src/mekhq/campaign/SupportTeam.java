@@ -19,12 +19,13 @@
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq;
+package mekhq.campaign;
 
+import mekhq.campaign.Campaign;
 import java.util.ArrayList;
 import megamek.common.Compute;
 import megamek.common.TargetRoll;
-import mekhq.work.WorkItem;
+import mekhq.campaign.work.WorkItem;
 
 /**
  *

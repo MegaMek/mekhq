@@ -19,8 +19,9 @@
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq;
+package mekhq.campaign;
 
+import mekhq.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -28,9 +29,9 @@ import megamek.common.Entity;
 
 import megamek.common.Game;
 import megamek.common.Mech;
-import mekhq.work.ArmorReplacement;
-import mekhq.work.MekGyroReplacement;
-import mekhq.work.WorkItem;
+import mekhq.campaign.work.ArmorReplacement;
+import mekhq.campaign.work.MekGyroReplacement;
+import mekhq.campaign.work.WorkItem;
 
 /**
  *

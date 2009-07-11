@@ -21,6 +21,8 @@
 
 package mekhq;
 
+import mekhq.campaign.Campaign;
+
 /**
  *
  * @author  Taharqa
