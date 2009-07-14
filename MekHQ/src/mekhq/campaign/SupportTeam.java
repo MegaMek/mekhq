@@ -237,8 +237,10 @@ public class SupportTeam implements Serializable {
                    if(task instanceof RepairItem) {
                        //turn it into a replacement item
                        campaign.mutateTask(task, ((RepairItem)task).replace());
+                       report = report + " Item cannot be repaired, it must be replaced instead.";
                    } else if(task instanceof ReplacementItem) {
                        //TODO: destroy component, but parts no implemented yet
+                       report = report + " Component destroyed!";
                    }
                }
            }

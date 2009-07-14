@@ -1,6 +1,9 @@
 VERSION HISTORY
 ----------------------------------
 v0.01 (SVN)
++ messages about replacement/repair failure of Elite techs
++ Engine replacement item
++ Engine repair item
 + repair items failed by elite tech become replacement items
 + Heat sink replacement item
 + Heat sink repair item

@@ -66,6 +66,8 @@ public class Unit implements Serializable {
             
         //cycle through the locations and assign repairs and replacements
         //don't do weapons and equipment here because some are spreadable
+        int engineHits = 0;
+        int engineCrits = 0;
         for(int i = 0; i < entity.locations(); i++) {
             boolean locDestroyed = entity.isLocationBad(i);
             //TODO: on mechs, hip and shoulder criticals also make the location effectively destroyed
@@ -93,6 +95,8 @@ public class Unit implements Serializable {
             
             //check for various component damage
             if(entity instanceof Mech) {
+                engineHits += entity.getHitCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE, i);
+                engineCrits += entity.getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE, i);
                 int sensorHits = entity.getHitCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS, i);
                 if(sensorHits > 0) {
                     campaign.addWork(new MekSensorRepair(this, sensorHits));
@@ -127,6 +131,14 @@ public class Unit implements Serializable {
                 }                
             }//end mech check
         }//end location checks
+        
+        if(entity instanceof Mech && engineHits > 0) {
+            if(engineHits >= engineCrits) {
+                campaign.addWork(new MekEngineReplacement(this));
+            } else {
+                campaign.addWork(new MekEngineRepair(this, engineHits));
+            }
+        }
         
         //now lets cycle through equipment
         for(Mounted m : entity.getEquipment()) {
