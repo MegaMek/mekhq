@@ -1,5 +1,5 @@
 /*
- * ArmorReplacement.java
+ * LocationReplacement.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -21,31 +21,34 @@
 
 package mekhq.campaign.work;
 
-import megamek.common.Entity;
+import megamek.common.CriticalSlot;
+import megamek.common.Mech;
 import mekhq.campaign.Unit;
 
 /**
  *
- * @author Aaron
+ * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class ArmorReplacement extends ReplacementItem {
+public class LocationReplacement extends ReplacementItem {
 
-    private int loc;
-    private int amount;
+    int loc;
     
-    public ArmorReplacement(Unit unit, int loc, int amount) {
+    public LocationReplacement(Unit unit, int i) {
         super(unit);
-        this.loc = loc;
-        this.amount = amount;
-        this.difficulty = -2;
-        this.time = 5 * amount; 
-        this.name = "Replace armor (" + unit.getEntity().getLocationName(loc) + ", " + amount + ")";
-    } 
+        this.name = "Replace " + unit.getEntity().getLocationName(i);
+        this.time = 240;
+        this.difficulty = 3;
+        this.loc = i;
+    }
     
     @Override
     public void fix() {
-        unit.getEntity().setArmor(unit.getEntity().getOArmor(loc, false), loc, false);
-        unit.getEntity().setArmor(unit.getEntity().getOArmor(loc, true), loc, true);
+        unit.getEntity().setInternal(unit.getEntity().getOInternal(loc), loc);
+        //repair any hips or shoulders
+        if(unit.getEntity() instanceof Mech) {
+            unit.getEntity().removeCriticals(loc, new CriticalSlot(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_HIP));
+            unit.getEntity().removeCriticals(loc, new CriticalSlot(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_SHOULDER));
+        }
     }
 
     

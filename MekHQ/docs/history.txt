@@ -1,6 +1,13 @@
 VERSION HISTORY
 ----------------------------------
 v0.01 (SVN)
++ rear armor included in armor replacement diagnostic
++ Internal structure replacement items
++ Internal structure repair items
++ Actuator repair items
++ Gyro repair items
++ Life support repair items
++ Sensor repair items
 + added fix methods for GyroReplacement and GyroRepair
 + refactored Campaign#runDiagnostic into Unit#runDiagnostic
 + added Unit class as wrapper for Entity

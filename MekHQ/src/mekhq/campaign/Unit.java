@@ -57,26 +57,74 @@ public class Unit implements Serializable {
      */
     public void runDiagnostic(Campaign campaign) {
         
-        //check armor replacement
-        for(int i = 0; i < entity.locations(); i++) {
-            //TODO: get rear locations as well
-            int diff = entity.getOArmor(i) - entity.getArmor(i);
-            if(diff > 0) {
-                campaign.addWork(new ArmorReplacement(this, i, diff, false));
-            }
-        }
-        
-        if(entity instanceof Mech) {
-            Mech mech = (Mech)entity;
+        //It is somewhat unclear but the language of StratOps implies that even equipment that
+        //is "combat destroyed" can be repaired.  For example, a gyro with 2 hits can still be repaired
+        //although with a +4 mod.  Weapons and other equipment must pass a roll to be repairable
             
-            //is the gyro destroyed?
-            int gyroHits = entity.getHitCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_GYRO, Mech.LOC_CT);
-            if((gyroHits > 1 && entity.getGyroType() != Mech.GYRO_HEAVY_DUTY) 
-                    || (gyroHits > 2 && entity.getGyroType() == Mech.GYRO_HEAVY_DUTY)) {
-                campaign.addWork(new MekGyroReplacement(this));
-            }  else if(gyroHits > 0) {
-                campaign.addWork(new MekGyroRepair(this, gyroHits));
+        //cycle through the locations and assign repairs and replacements
+        //don't do weapons and equipment here because some are spreadable
+        for(int i = 0; i < entity.locations(); i++) {
+            boolean locDestroyed = entity.isLocationBad(i);
+            //TODO: on mechs, hip and shoulder criticals also make the location effectively destroyed
+            
+            //replace location?
+            if(locDestroyed) {
+                campaign.addWork(new LocationReplacement(this, i));
+            } else {
+                //repair internal
+                double pctInternal = entity.getInternal(i)/entity.getOInternal(i);
+                if(pctInternal < 1.00) {
+                    campaign.addWork(new InternalRepair(this, i, pctInternal));
+                }
             }
+            
+            //replace armor?
+            //TODO: get rear locations as well
+            int diff = entity.getOArmor(i, false) - entity.getArmor(i, false);
+            diff +=  entity.getOArmor(i, true) - entity.getArmor(i, true);
+            if(diff > 0) {
+                campaign.addWork(new ArmorReplacement(this, i, diff));
+            }
+            
+            
+            
+            //check for various component damage
+            if(entity instanceof Mech) {
+                int sensorHits = entity.getHitCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS, i);
+                if(sensorHits > 0) {
+                    campaign.addWork(new MekSensorRepair(this, sensorHits));
+                }
+                int lifeHits = entity.getHitCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_LIFE_SUPPORT, i);
+                if(lifeHits > 0) {
+                    campaign.addWork(new MekLifeSupportRepair(this, lifeHits));
+                }
+                int gyroHits = entity.getHitCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_GYRO, i);
+                if(gyroHits > 0) {
+                    campaign.addWork(new MekGyroRepair(this, gyroHits));
+                }
+                //check actuators
+                //don't check hips and shoulders because that should be accounted for in location replacement
+                if(entity.getHitCriticals(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_UPPER_ARM, i) > 0) {
+                    campaign.addWork(new MekUpArmActuatorRepair(this, 1, i));
+                }
+                if(entity.getHitCriticals(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_LOWER_ARM, i) > 0) {
+                    campaign.addWork(new MekLowArmActuatorRepair(this, 1, i));
+                }
+                if(entity.getHitCriticals(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_HAND, i) > 0) {
+                    campaign.addWork(new MekHandActuatorRepair(this, 1, i));
+                }
+                if(entity.getHitCriticals(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_UPPER_LEG, i) > 0) {
+                    campaign.addWork(new MekUpLegActuatorRepair(this, 1, i));
+                }
+                if(entity.getHitCriticals(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_LOWER_LEG, i) > 0) {
+                    campaign.addWork(new MekLowLegActuatorRepair(this, 1, i));
+                }
+                if(entity.getHitCriticals(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_FOOT, i) > 0) {
+                    campaign.addWork(new MekFootActuatorRepair(this, 1, i));
+                }             
+                
+            }
+            
         }
     }
     

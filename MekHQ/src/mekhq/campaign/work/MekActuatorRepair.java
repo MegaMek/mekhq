@@ -1,5 +1,5 @@
 /*
- * ArmorReplacement.java
+ * MekActuatorRepair.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -21,32 +21,21 @@
 
 package mekhq.campaign.work;
 
-import megamek.common.Entity;
 import mekhq.campaign.Unit;
 
 /**
  *
- * @author Aaron
+ * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class ArmorReplacement extends ReplacementItem {
-
-    private int loc;
-    private int amount;
+public abstract class MekActuatorRepair extends RepairItem {
     
-    public ArmorReplacement(Unit unit, int loc, int amount) {
-        super(unit);
-        this.loc = loc;
-        this.amount = amount;
-        this.difficulty = -2;
-        this.time = 5 * amount; 
-        this.name = "Replace armor (" + unit.getEntity().getLocationName(loc) + ", " + amount + ")";
-    } 
+    int loc;
     
-    @Override
-    public void fix() {
-        unit.getEntity().setArmor(unit.getEntity().getOArmor(loc, false), loc, false);
-        unit.getEntity().setArmor(unit.getEntity().getOArmor(loc, true), loc, true);
+    MekActuatorRepair(Unit unit, int h, int i) {
+        super(unit, h);
+        this.loc = i;
+        this.name = "Repair actuator (" + unit.getEntity().getLocationName(loc) + ")";
+        this.time = 120;
+        this.difficulty = 0;
     }
-
-    
 }

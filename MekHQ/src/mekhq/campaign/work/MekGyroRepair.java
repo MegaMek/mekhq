@@ -33,8 +33,8 @@ import mekhq.campaign.Unit;
 public class MekGyroRepair extends RepairItem {
 
     public MekGyroRepair(Unit unit, int crits) {
-        super(unit);
-        this.name = "Gyro Repair";
+        super(unit, crits);
+        this.name = "Repair gyro";
         this.time = 120;
         this.difficulty = 1;
         if(crits > 1) {

@@ -1,5 +1,5 @@
 /*
- * ArmorReplacement.java
+ * MekLowArmActuatorRepair.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -21,32 +21,24 @@
 
 package mekhq.campaign.work;
 
-import megamek.common.Entity;
+import megamek.common.CriticalSlot;
+import megamek.common.Mech;
 import mekhq.campaign.Unit;
 
 /**
  *
- * @author Aaron
+ * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class ArmorReplacement extends ReplacementItem {
+public class MekLowArmActuatorRepair extends MekActuatorRepair {
 
-    private int loc;
-    private int amount;
-    
-    public ArmorReplacement(Unit unit, int loc, int amount) {
-        super(unit);
-        this.loc = loc;
-        this.amount = amount;
-        this.difficulty = -2;
-        this.time = 5 * amount; 
-        this.name = "Replace armor (" + unit.getEntity().getLocationName(loc) + ", " + amount + ")";
-    } 
+    public MekLowArmActuatorRepair(Unit unit, int h, int i) {
+        super(unit, h, i);
+        this.name = "Repair lower arm actuator (" + unit.getEntity().getLocationName(loc) + ")";
+    }
     
     @Override
     public void fix() {
-        unit.getEntity().setArmor(unit.getEntity().getOArmor(loc, false), loc, false);
-        unit.getEntity().setArmor(unit.getEntity().getOArmor(loc, true), loc, true);
+        unit.getEntity().removeCriticals(loc, new CriticalSlot(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_LOWER_ARM));
     }
 
-    
 }

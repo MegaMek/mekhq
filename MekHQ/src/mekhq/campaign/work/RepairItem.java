@@ -21,7 +21,6 @@
 
 package mekhq.campaign.work;
 
-import megamek.common.Entity;
 import mekhq.campaign.Unit;
 
 /**
@@ -30,8 +29,11 @@ import mekhq.campaign.Unit;
  */
 public abstract class RepairItem extends WorkItem {
 
-    public RepairItem(Unit unit) {
+    int hits;
+    
+    public RepairItem(Unit unit, int h) {
         super(unit);
+        this.hits = h;
     }
     
 }

@@ -34,7 +34,7 @@ public class MekGyroReplacement extends ReplacementItem {
     
     public MekGyroReplacement(Unit unit) {
         super(unit);
-        this.name = "Gyro Replacement";
+        this.name = "Replace gyro";
         this.time = 200;
         this.difficulty = 0;
     }

@@ -1,5 +1,5 @@
 /*
- * ArmorReplacement.java
+ * InternalRepair.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -21,32 +21,40 @@
 
 package mekhq.campaign.work;
 
-import megamek.common.Entity;
 import mekhq.campaign.Unit;
 
 /**
  *
- * @author Aaron
+ * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class ArmorReplacement extends ReplacementItem {
+public class InternalRepair extends RepairItem {
 
-    private int loc;
-    private int amount;
+    int loc;
+    double percent;
     
-    public ArmorReplacement(Unit unit, int loc, int amount) {
-        super(unit);
-        this.loc = loc;
-        this.amount = amount;
-        this.difficulty = -2;
-        this.time = 5 * amount; 
-        this.name = "Replace armor (" + unit.getEntity().getLocationName(loc) + ", " + amount + ")";
-    } 
-    
+    public InternalRepair(Unit unit, int i, double pct) {
+        super(unit, 0);
+        this.loc = i;
+        this.percent = pct;
+        this.name = "Repair internal structure (" + unit.getEntity().getLocationName(loc) + ")";
+        this.time = 90;
+        this.difficulty = -1;
+        if(percent > 0.75) {
+            this.time = 270;
+            this.difficulty = 2;
+        } else if(percent > 0.5) {
+            this.time = 180;
+            this.difficulty = 1;
+        } else if (percent > 0.25) {
+            this.time = 135;
+            this.difficulty = 0;
+        }
+    }
+        
+        
     @Override
     public void fix() {
-        unit.getEntity().setArmor(unit.getEntity().getOArmor(loc, false), loc, false);
-        unit.getEntity().setArmor(unit.getEntity().getOArmor(loc, true), loc, true);
+        unit.getEntity().setInternal(unit.getEntity().getOInternal(loc), loc);
     }
 
-    
 }
