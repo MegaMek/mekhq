@@ -44,8 +44,11 @@
                       </Group>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="btnNewTeam" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace min="-2" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                      <Component id="replaceBtn" max="32767" attributes="1"/>
+                      <Component id="btnNewTeam" alignment="0" max="32767" attributes="1"/>
+                  </Group>
+                  <EmptySpace max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -82,6 +85,7 @@
                                   <EmptySpace type="separate" max="-2" attributes="0"/>
                                   <Component id="btnDeployUnits" min="-2" max="-2" attributes="0"/>
                               </Group>
+                              <Component id="replaceBtn" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
@@ -231,6 +235,16 @@
             <Property name="text" type="java.lang.String" resourceKey="lblTeams.text"/>
             <Property name="name" type="java.lang.String" value="lblTeams" noResource="true"/>
           </Properties>
+        </Component>
+        <Component class="javax.swing.JButton" name="replaceBtn">
+          <Properties>
+            <Property name="text" type="java.lang.String" resourceKey="replaceBtn.text"/>
+            <Property name="enabled" type="boolean" value="false"/>
+            <Property name="name" type="java.lang.String" value="replaceBtn" noResource="true"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="replaceBtnActionPerformed"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>

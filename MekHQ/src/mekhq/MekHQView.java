@@ -47,6 +47,7 @@ import javax.swing.table.AbstractTableModel;
 import megamek.common.Entity;
 import megamek.common.EntityListFile;
 import mekhq.campaign.Unit;
+import mekhq.campaign.work.RepairItem;
 import mekhq.campaign.work.WorkItem;
 
 /**
@@ -162,6 +163,7 @@ public class MekHQView extends FrameView {
         lblUnits = new javax.swing.JLabel();
         lblTasks = new javax.swing.JLabel();
         lblTeams = new javax.swing.JLabel();
+        replaceBtn = new javax.swing.JButton();
         menuBar = new javax.swing.JMenuBar();
         javax.swing.JMenu fileMenu = new javax.swing.JMenu();
         menuLoad = new javax.swing.JMenuItem();
@@ -266,6 +268,15 @@ public class MekHQView extends FrameView {
         lblTeams.setText(resourceMap.getString("lblTeams.text")); // NOI18N
         lblTeams.setName("lblTeams"); // NOI18N
 
+        replaceBtn.setText(resourceMap.getString("replaceBtn.text")); // NOI18N
+        replaceBtn.setEnabled(false);
+        replaceBtn.setName("replaceBtn"); // NOI18N
+        replaceBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                replaceBtnActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout mainPanelLayout = new org.jdesktop.layout.GroupLayout(mainPanel);
         mainPanel.setLayout(mainPanelLayout);
         mainPanelLayout.setHorizontalGroup(
@@ -296,7 +307,9 @@ public class MekHQView extends FrameView {
                         .add(btnAdvanceDay)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 807, Short.MAX_VALUE)))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(btnNewTeam)
+                .add(mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
+                    .add(replaceBtn, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .add(btnNewTeam, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         mainPanelLayout.setVerticalGroup(
@@ -325,7 +338,8 @@ public class MekHQView extends FrameView {
                             .add(mainPanelLayout.createSequentialGroup()
                                 .add(loadListBtn)
                                 .add(18, 18, 18)
-                                .add(btnDeployUnits)))
+                                .add(btnDeployUnits))
+                            .add(replaceBtn))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(btnNewTeam)
@@ -445,6 +459,7 @@ private void TaskListValueChanged(javax.swing.event.ListSelectionEvent evt) {//G
         currentTaskId = -1;
     }
     updateAssignEnabled();
+    updateReplaceEnabled();
 }//GEN-LAST:event_TaskListValueChanged
 
 private void TeamsListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_TeamsListValueChanged
@@ -456,6 +471,7 @@ private void TeamsListValueChanged(javax.swing.event.ListSelectionEvent evt) {//
         currentTeamId = -1;
     }
     updateAssignEnabled();
+    updateReplaceEnabled();
 }//GEN-LAST:event_TeamsListValueChanged
 
 private void btnAdvanceDayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAdvanceDayActionPerformed
@@ -470,6 +486,14 @@ private void btnAdvanceDayActionPerformed(java.awt.event.ActionEvent evt) {//GEN
 private void btnDeployUnitsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeployUnitsActionPerformed
     saveListFile();
 }//GEN-LAST:event_btnDeployUnitsActionPerformed
+
+private void replaceBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_replaceBtnActionPerformed
+    WorkItem task = campaign.getTask(currentTaskId);
+    if(task instanceof RepairItem) {
+        campaign.mutateTask(task, ((RepairItem)task).replace());
+        refreshTaskList();
+    }
+}//GEN-LAST:event_replaceBtnActionPerformed
 
 protected void loadListFile() {
     JFileChooser loadList = new JFileChooser(".");
@@ -573,6 +597,16 @@ protected void updateAssignEnabled() {
     }    
 }
 
+protected void updateReplaceEnabled() {
+    //must have a valid team and an unassigned task
+    WorkItem curTask = campaign.getTask(currentTaskId);
+    if(null != curTask && curTask instanceof RepairItem) {
+        replaceBtn.setEnabled(true);
+    } else {
+        replaceBtn.setEnabled(false);
+    }    
+}
+
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -594,6 +628,7 @@ protected void updateAssignEnabled() {
     private javax.swing.JMenuItem menuLoad;
     private javax.swing.JMenuItem menuSave;
     private javax.swing.JProgressBar progressBar;
+    private javax.swing.JButton replaceBtn;
     private javax.swing.JLabel statusAnimationLabel;
     private javax.swing.JLabel statusMessageLabel;
     private javax.swing.JPanel statusPanel;
