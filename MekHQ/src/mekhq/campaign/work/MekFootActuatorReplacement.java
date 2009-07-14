@@ -1,5 +1,5 @@
 /*
- * MekSensorRepair.java
+ * MekFootActuatorReplacement.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -21,37 +21,24 @@
 
 package mekhq.campaign.work;
 
+import mekhq.campaign.Unit;
 import megamek.common.CriticalSlot;
 import megamek.common.Mech;
-import mekhq.campaign.Unit;
 
 /**
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class MekSensorRepair extends RepairItem {
+public class MekFootActuatorReplacement extends MekActuatorReplacement {
 
-    public MekSensorRepair(Unit unit, int h) {
-        super(unit, h);
-        this.name = "Repair sensor";
-        this.time = 75;
-        this.difficulty = 0;
-        if(hits > 1) {
-            this.time = 150;
-            this.difficulty = 3;
-        }
+    public MekFootActuatorReplacement(Unit unit, int i) {
+        super(unit, i);
+        this.name = "Replace foot actuator (" + unit.getEntity().getLocationName(loc) + ")";
     }
     
     @Override
     public void fix() {
-        for(int i = 0; i < unit.getEntity().locations(); i++) {
-            unit.getEntity().removeCriticals(i, new CriticalSlot(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS));
-        }
-    }
-    
-    @Override
-    public WorkItem replace() {
-        return new MekSensorReplacement(unit);
+        unit.getEntity().removeCriticals(loc, new CriticalSlot(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_FOOT));
     }
 
 }

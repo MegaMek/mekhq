@@ -24,6 +24,7 @@ package mekhq.campaign.work;
 import java.io.Serializable;
 import megamek.common.Entity;
 import megamek.common.TargetRoll;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.SupportTeam;
 import mekhq.campaign.Unit;
 
@@ -147,9 +148,10 @@ public abstract class WorkItem implements Serializable {
         return mods;
     }
     
-    public void failed() {
+    public void fail(int rating) {
         //increment the minimum skill level required
-        setSkillMin(getSkillMin() + 1);
+        //FIXME: this is not quite right, should be the skill level of the current team + 1
+        setSkillMin(rating + 1);
         //TODO: need to check if we moved past elite and suffer the consequences
         unassignTeam();
     }

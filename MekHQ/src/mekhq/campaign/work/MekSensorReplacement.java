@@ -1,5 +1,5 @@
 /*
- * MekSensorRepair.java
+ * MekSensorReplacement.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -29,17 +29,13 @@ import mekhq.campaign.Unit;
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class MekSensorRepair extends RepairItem {
+public class MekSensorReplacement extends ReplacementItem {
 
-    public MekSensorRepair(Unit unit, int h) {
-        super(unit, h);
-        this.name = "Repair sensor";
-        this.time = 75;
+    public MekSensorReplacement(Unit unit) {
+        super(unit);
+        this.name = "Replace sensors";
+        this.time = 260;
         this.difficulty = 0;
-        if(hits > 1) {
-            this.time = 150;
-            this.difficulty = 3;
-        }
     }
     
     @Override
@@ -48,10 +44,4 @@ public class MekSensorRepair extends RepairItem {
             unit.getEntity().removeCriticals(i, new CriticalSlot(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS));
         }
     }
-    
-    @Override
-    public WorkItem replace() {
-        return new MekSensorReplacement(unit);
-    }
-
 }

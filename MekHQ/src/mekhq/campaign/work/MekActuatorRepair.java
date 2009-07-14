@@ -29,7 +29,7 @@ import mekhq.campaign.Unit;
  */
 public abstract class MekActuatorRepair extends RepairItem {
     
-    int loc;
+    protected int loc;
     
     MekActuatorRepair(Unit unit, int h, int i) {
         super(unit, h);

@@ -23,9 +23,12 @@ package mekhq.campaign;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import megamek.common.Compute;
 import megamek.common.CriticalSlot;
 import megamek.common.Entity;
 import megamek.common.Mech;
+import megamek.common.MiscType;
+import megamek.common.Mounted;
 import mekhq.campaign.work.*;
 
 /**
@@ -121,11 +124,57 @@ public class Unit implements Serializable {
                 }
                 if(entity.getHitCriticals(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_FOOT, i) > 0) {
                     campaign.addWork(new MekFootActuatorRepair(this, 1, i));
+                }                
+            }//end mech check
+        }//end location checks
+        
+        //now lets cycle through equipment
+        for(Mounted m : entity.getEquipment()) {
+            if(m.isHit() || m.isDestroyed()) {
+                //TODO: check flags for jump jets and heat sinks because those are handled differently
+                if(m.getType().hasFlag(MiscType.F_JUMP_JET)) {
+                    campaign.addWork(new JumpJetRepair(this, 1, m));
+                    continue;
+                } else if(m.getType().hasFlag(MiscType.F_HEAT_SINK)) {
+                    campaign.addWork(new HeatSinkRepair(this, 1, m));
+                    continue;
                 }             
+                //TODO: some slots need to be skipped (like armor, endo-steel, etc.)
                 
+                //combat destroyed is not the same as really destroyed
+                //you get a roll to see if it can be repaired
+                //TODO: I think this check should probably be made from within MM when a crit is received
+                //and added to the MUL file.             
+                if(Compute.d6(2) >= 10) {
+                    campaign.addWork(new EquipmentRepair(this, getCrits(m), m));
+                } else {
+                    campaign.addWork(new EquipmentReplacement(this, m));
+                }
             }
-            
         }
+    }
+    
+    /**
+     * @param m - A Mounted class to find crits for
+     * @return the number of crits exising for this Mounted
+     */
+    public int getCrits(Mounted m) {
+        //TODO: I should probably just add this method to Entity in MM
+        int hits = 0;
+        for(int loc = 0; loc < entity.locations(); loc++) {
+            for (int i = 0; i < entity.getNumberOfCriticals(loc); i++) {
+                CriticalSlot slot = entity.getCritical(loc, i);
+                // ignore empty & system slots
+                if ((slot == null) || (slot.getType() != CriticalSlot.TYPE_EQUIPMENT)) {
+                    continue;
+                }
+                if (entity.getEquipmentNum(m) == slot.getIndex() 
+                        && (slot.isHit() || slot.isDestroyed())) {
+                    hits++;
+                }
+            }
+        }
+        return hits;
     }
     
 }

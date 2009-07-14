@@ -1,5 +1,5 @@
 /*
- * MekSensorRepair.java
+ * HeatSinkReplacement.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -21,37 +21,19 @@
 
 package mekhq.campaign.work;
 
-import megamek.common.CriticalSlot;
-import megamek.common.Mech;
+import megamek.common.Mounted;
 import mekhq.campaign.Unit;
 
 /**
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class MekSensorRepair extends RepairItem {
-
-    public MekSensorRepair(Unit unit, int h) {
-        super(unit, h);
-        this.name = "Repair sensor";
-        this.time = 75;
-        this.difficulty = 0;
-        if(hits > 1) {
-            this.time = 150;
-            this.difficulty = 3;
-        }
-    }
+public class HeatSinkReplacement extends EquipmentReplacement {
     
-    @Override
-    public void fix() {
-        for(int i = 0; i < unit.getEntity().locations(); i++) {
-            unit.getEntity().removeCriticals(i, new CriticalSlot(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS));
-        }
+    public HeatSinkReplacement(Unit unit, Mounted m) {
+        super(unit, m);
+        this.time = 90;
+        this.difficulty = -2;
+        
     }
-    
-    @Override
-    public WorkItem replace() {
-        return new MekSensorReplacement(unit);
-    }
-
 }

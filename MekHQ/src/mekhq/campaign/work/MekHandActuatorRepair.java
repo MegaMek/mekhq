@@ -40,4 +40,9 @@ public class MekHandActuatorRepair extends MekActuatorRepair {
     public void fix() {
         unit.getEntity().removeCriticals(loc, new CriticalSlot(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_HAND));
     }
+
+    @Override
+    public WorkItem replace() {
+        return new MekHandActuatorReplacement(unit, loc);
+    }
 }

@@ -1,6 +1,16 @@
 VERSION HISTORY
 ----------------------------------
 v0.01 (SVN)
++ repair items failed by elite tech become replacement items
++ Heat sink replacement item
++ Heat sink repair item
++ Jump jet replacement item
++ Jump jet repair item
++ Life support repair item
++ Sensor replacement item
++ Actuator replacement items
++ Equipment replacement item
++ Equipment repair item
 + rear armor included in armor replacement diagnostic
 + Internal structure replacement items
 + Internal structure repair items

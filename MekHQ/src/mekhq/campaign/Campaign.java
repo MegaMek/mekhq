@@ -170,7 +170,25 @@ public class Campaign implements Serializable {
      public void assignTask(int teamId, int taskId) {
          taskIds.get(new Integer(taskId)).assignTeam(teamId);
      }
-    
+     
+     /**
+      * repair tasks can mutate into replacement tasks so we need to allow for this
+      * via a method
+      */
+     public void mutateTask(WorkItem oldTask, WorkItem newTask) {
+         newTask.setId(oldTask.getId());
+         taskIds.put(oldTask.getId(), newTask);
+         int index = -1;
+         for(WorkItem task : getTasks()) {
+             index++;
+            if(oldTask.getId() == task.getId()) {
+                break;
+            }
+         }
+         getTasks().remove(index);
+         getTasks().add(index, newTask);
+     }
+     
     public void processDay() {
         currentReport = new ArrayList<String>();
         //cycle through teams and tell them to get to work

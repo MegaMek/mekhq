@@ -57,4 +57,8 @@ public class InternalRepair extends RepairItem {
         unit.getEntity().setInternal(unit.getEntity().getOInternal(loc), loc);
     }
 
+    @Override
+    public WorkItem replace() {
+        return new LocationReplacement(unit, loc);
+    }
 }

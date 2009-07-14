@@ -41,6 +41,9 @@ public class MekLowLegActuatorRepair extends MekActuatorRepair {
          unit.getEntity().removeCriticals(loc, new CriticalSlot(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_LOWER_LEG));
     }
 
-    
+    @Override
+    public WorkItem replace() {
+        return new MekLowLegActuatorReplacement(unit, loc);
+    }
     
 }

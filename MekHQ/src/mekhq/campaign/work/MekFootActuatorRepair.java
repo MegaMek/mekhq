@@ -41,4 +41,9 @@ public class MekFootActuatorRepair extends MekActuatorRepair {
         unit.getEntity().removeCriticals(loc, new CriticalSlot(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_FOOT));
     }
 
+    @Override
+    public WorkItem replace() {
+        return new MekFootActuatorReplacement(unit, loc);
+    }
+
 }

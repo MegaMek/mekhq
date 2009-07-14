@@ -25,6 +25,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import megamek.common.Compute;
 import megamek.common.TargetRoll;
+import mekhq.campaign.work.RepairItem;
+import mekhq.campaign.work.ReplacementItem;
 import mekhq.campaign.work.WorkItem;
 
 /**
@@ -229,7 +231,16 @@ public class SupportTeam implements Serializable {
                task.complete();
            } else {
                report = report + " task failed.";
-               task.failed();
+               task.fail(getRating());
+               //have we run out of options?
+               if(task.getSkillMin() > EXP_ELITE) {
+                   if(task instanceof RepairItem) {
+                       //turn it into a replacement item
+                       campaign.mutateTask(task, ((RepairItem)task).replace());
+                   } else if(task instanceof ReplacementItem) {
+                       //TODO: destroy component, but parts no implemented yet
+                   }
+               }
            }
            reports.add(report);
        }

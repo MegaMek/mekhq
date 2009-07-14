@@ -21,6 +21,8 @@
 
 package mekhq.campaign.work;
 
+import mekhq.campaign.Campaign;
+import mekhq.campaign.SupportTeam;
 import mekhq.campaign.Unit;
 
 /**
@@ -35,5 +37,7 @@ public abstract class RepairItem extends WorkItem {
         super(unit);
         this.hits = h;
     }
+    
+    public abstract WorkItem replace();
     
 }

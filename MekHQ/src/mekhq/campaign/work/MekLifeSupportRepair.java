@@ -49,6 +49,9 @@ public class MekLifeSupportRepair extends RepairItem {
         }
     }
 
-    
+    @Override
+    public WorkItem replace() {
+        return new MekLifeSupportReplacement(unit);
+    }
     
 }

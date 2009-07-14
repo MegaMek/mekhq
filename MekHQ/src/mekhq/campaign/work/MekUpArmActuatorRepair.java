@@ -40,4 +40,9 @@ public class MekUpArmActuatorRepair extends MekActuatorRepair {
     public void fix() {
         unit.getEntity().removeCriticals(loc, new CriticalSlot(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_UPPER_ARM));
     }
+    
+    @Override
+    public WorkItem replace() {
+        return new MekUpArmActuatorReplacement(unit, loc);
+    }
 }
