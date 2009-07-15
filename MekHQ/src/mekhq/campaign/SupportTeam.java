@@ -217,6 +217,7 @@ public class SupportTeam implements Serializable {
            if(null != task.checkFixable()) {
                report = report + ", but the task is impossible because " + task.checkFixable();
                reports.add(report);
+               task.unassignTeam();
                continue;
            }        
            minutesWorked += task.getTime();

@@ -53,6 +53,10 @@ public class ReloadItem extends WorkItem {
     
     @Override
     public String checkFixable() {
+        //if this is not a swap and we are already topped off, then no need to waste time
+        if(mounted.getShotsLeft() >= atype.getShots() && !swap) {
+            return "The ammo bin is full.";
+        }
         if(unit.isLocationDestroyed(mounted.getLocation())) {
             return unit.getEntity().getLocationName(mounted.getLocation()) + " is destroyed.";
         }
@@ -66,6 +70,11 @@ public class ReloadItem extends WorkItem {
     public void fix() {
         mounted.changeAmmoType(atype);
         mounted.setShotsLeft(atype.getShots());
+        if(swap) {
+            this.name = "Swap " + mounted.getDesc() + " with " + atype.getDesc();
+        } else {
+            this.name = "Reload " + mounted.getDesc() + " with " + atype.getDesc();
+        }
     }
     
     @Override
@@ -101,5 +110,11 @@ public class ReloadItem extends WorkItem {
         }
         this.swap = true;
         this.name = "Swap " + mounted.getDesc() + " with " + atype.getDesc();     
+    }
+    
+    @Override
+    public void complete() {
+        //reload items are never completed because the user may want to swap
+        unassignTeam();
     }
 }

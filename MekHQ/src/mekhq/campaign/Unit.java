@@ -188,9 +188,8 @@ public class Unit implements Serializable {
                 //shouldn't happen, but you never know
                 continue;
             }
-            if(m.getShotsLeft() < ((AmmoType)m.getType()).getShots()) {
-                campaign.addWork(new ReloadItem(this, m));
-            }
+            //put a reload item in for all ammo types, because user may want to swap
+            campaign.addWork(new ReloadItem(this, m));
         }
     }
     

@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
-v0.01 (SVN)
+v0.0.1 (SVN)
++ Include ReloadItems for all ammo bins because user may wish to swap ammo in full bins
 + Ammo Swapping
 + ReloadItem
 + AmmoBinReplacement item
