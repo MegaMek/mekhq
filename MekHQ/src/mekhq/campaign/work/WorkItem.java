@@ -134,12 +134,6 @@ public abstract class WorkItem implements Serializable {
         return "[" + getTime() + "m/" +   SupportTeam.getRatingName(getSkillMin()) + "/" + getAllMods().getValueAsString() + "]";
     }
     
-    /**
-     * Resolve this work item (i.e. repair it, replace it, reload it, etc)
-     * @param c - the campaign in use
-     * TODO: should I do this more like a separate handler?
-     */
-    public abstract void fix();
     
     public TargetRoll getAllMods() {
         TargetRoll mods = new TargetRoll(getDifficulty(), "difficulty");
@@ -148,11 +142,28 @@ public abstract class WorkItem implements Serializable {
         return mods;
     }
     
+    /**
+     * check whether this work item is currently fixable
+     * some conditions will make a work item impossible to fix
+     * @return a <code>String</code> indicating the reason for non-fixability, null if fixable
+     */
+    public String checkFixable() {
+        return null;
+    }
+    
+    /**
+     * Resolve this work item (i.e. repair it, replace it, reload it, etc)
+     */
+    public abstract void fix();
+    
+    /**
+     * fail this work item
+     * @param rating - an <code>int</code> of the skill rating of the currently assigned team
+     */
     public void fail(int rating) {
         //increment the minimum skill level required
-        //FIXME: this is not quite right, should be the skill level of the current team + 1
         setSkillMin(rating + 1);
-        //TODO: need to check if we moved past elite and suffer the consequences
+        //unassign the current team
         unassignTeam();
     }
     

@@ -212,17 +212,23 @@ public class SupportTeam implements Serializable {
        //you run out of time
        int minutesWorked = 0;
        for(WorkItem task : getTasksAssigned()) {
-           String report = "  ";
+           String report = "  " + task.getName();
+           //check whether the task is currently possible
+           if(null != task.checkFixable()) {
+               report = report + ", but the task is impossible because " + task.checkFixable();
+               reports.add(report);
+               continue;
+           }        
            minutesWorked += task.getTime();
            if(minutesWorked > 480) {
-               report = report + getName() + " ran out of time for the day, see you tommorrow!";
+               report = report  + ", but ran out of time for the day, see you tommorrow!";
                reports.add(report);
                break;
-           }          
+           }                 
            TargetRoll target = getTarget();
            target.append(task.getAllMods()); 
            int roll = Compute.d6(2);
-           report = report + task.getName() + ", needs " + target.getValueAsString() + " and rolls " + roll + ":";
+           report = report + ", needs " + target.getValueAsString() + " and rolls " + roll + ":";
            if(roll >= target.getValue()) {
                report = report + " task completed.";
                //need to do some rolls here

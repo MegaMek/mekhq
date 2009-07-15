@@ -22,7 +22,6 @@
 package mekhq.campaign;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import megamek.common.Compute;
 import megamek.common.CriticalSlot;
 import megamek.common.Entity;
@@ -52,11 +51,25 @@ public class Unit implements Serializable {
         return getEntity().getId();
     }
     
-    //definitely need to refactor this but I can put it here now
     /**
-     * Run a diagnostic on the given entity and build and ArrayList of WorkItems to return
-     * TODO: this should really be a function in Entity, I should create a wrapper function
-     *       for entity
+     * Is the given location on the entity destroyed?
+     * @param loc - an <code>int</code> for the location
+     * @return <code>true</code> if the location is destroyed
+     */
+    public boolean isLocationDestroyed(int loc) {
+        if(loc > entity.locations()) {
+            return false;
+        }
+        //on mechs, hip and shoulder criticals also make the location effectively destroyed
+        if(entity instanceof Mech && (entity.getHitCriticals(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_HIP, loc) > 0
+                || entity.getHitCriticals(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_SHOULDER, loc) > 0)) {
+                return true;
+        }        
+        return entity.isLocationBad(loc);
+    }
+    
+    /**
+     * Run a diagnostic on this unit and add WorkItems to the campaign
      */
     public void runDiagnostic(Campaign campaign) {
         
@@ -69,11 +82,9 @@ public class Unit implements Serializable {
         int engineHits = 0;
         int engineCrits = 0;
         for(int i = 0; i < entity.locations(); i++) {
-            boolean locDestroyed = entity.isLocationBad(i);
-            //TODO: on mechs, hip and shoulder criticals also make the location effectively destroyed
             
             //replace location?
-            if(locDestroyed) {
+            if(isLocationDestroyed(i)) {
                 campaign.addWork(new LocationReplacement(this, i));
             } else {
                 //repair internal
@@ -84,14 +95,11 @@ public class Unit implements Serializable {
             }
             
             //replace armor?
-            //TODO: get rear locations as well
             int diff = entity.getOArmor(i, false) - entity.getArmor(i, false);
             diff +=  entity.getOArmor(i, true) - entity.getArmor(i, true);
             if(diff > 0) {
                 campaign.addWork(new ArmorReplacement(this, i, diff));
-            }
-            
-            
+            }         
             
             //check for various component damage
             if(entity instanceof Mech) {
@@ -132,6 +140,7 @@ public class Unit implements Serializable {
             }//end mech check
         }//end location checks
         
+        //check engine
         if(entity instanceof Mech && engineHits > 0) {
             if(engineHits >= engineCrits) {
                 campaign.addWork(new MekEngineReplacement(this));
@@ -143,7 +152,8 @@ public class Unit implements Serializable {
         //now lets cycle through equipment
         for(Mounted m : entity.getEquipment()) {
             if(m.isHit() || m.isDestroyed()) {
-                //TODO: check flags for jump jets and heat sinks because those are handled differently
+                
+                //check flags for jump jets and heat sinks because those are handled by their own classes
                 if(m.getType().hasFlag(MiscType.F_JUMP_JET)) {
                     campaign.addWork(new JumpJetRepair(this, 1, m));
                     continue;

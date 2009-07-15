@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.01 (SVN)
++ added check for impossible tasks
 + Replace button
 + messages about replacement/repair failure of Elite techs
 + Engine replacement item
