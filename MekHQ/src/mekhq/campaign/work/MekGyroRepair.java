@@ -52,5 +52,4 @@ public class MekGyroRepair extends RepairItem {
     public WorkItem replace() {
         return new MekGyroReplacement(unit);
     }
-
 }

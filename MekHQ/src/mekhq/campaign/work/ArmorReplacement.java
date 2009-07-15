@@ -47,6 +47,12 @@ public class ArmorReplacement extends ReplacementItem {
         unit.getEntity().setArmor(unit.getEntity().getOArmor(loc, false), loc, false);
         unit.getEntity().setArmor(unit.getEntity().getOArmor(loc, true), loc, true);
     }
-
     
+    @Override
+    public String checkFixable() {
+        if(unit.isLocationDestroyed(loc)) {
+            return unit.getEntity().getLocationName(loc) + " is destroyed.";
+        }
+        return super.checkFixable();
+    }
 }

@@ -38,4 +38,12 @@ public abstract class MekActuatorRepair extends RepairItem {
         this.time = 120;
         this.difficulty = 0;
     }
+    
+    @Override
+    public String checkFixable() {
+        if(unit.isLocationDestroyed(loc)) {
+            return unit.getEntity().getLocationName(loc) + " is destroyed.";
+        }
+        return super.checkFixable();
+    }
 }

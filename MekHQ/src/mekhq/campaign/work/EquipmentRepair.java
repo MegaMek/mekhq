@@ -96,6 +96,6 @@ public class EquipmentRepair extends RepairItem {
                 }
             }
         }
-        return null;
+        return super.checkFixable();
     }
 }

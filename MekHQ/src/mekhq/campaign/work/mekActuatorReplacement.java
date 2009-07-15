@@ -38,4 +38,12 @@ public abstract class MekActuatorReplacement extends ReplacementItem {
         this.time = 90;
         this.difficulty = -3;
     }
+    
+    @Override
+    public String checkFixable() {
+        if(unit.isLocationDestroyed(loc)) {
+            return unit.getEntity().getLocationName(loc) + " is destroyed.";
+        }
+        return super.checkFixable();
+    }
 }

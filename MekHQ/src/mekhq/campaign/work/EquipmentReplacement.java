@@ -62,4 +62,25 @@ public class EquipmentReplacement extends ReplacementItem {
             }
         }
     }
+    
+    @Override
+    public String checkFixable() {
+        //only fixable if location is not destroyed
+        //we have to cycle through all locations because some equipment is spreadable
+        for(int loc = 0; loc < unit.getEntity().locations(); loc++) {
+            for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
+                CriticalSlot slot = unit.getEntity().getCritical(loc, i);
+                // ignore empty & system slots
+                if ((slot == null) || (slot.getType() != CriticalSlot.TYPE_EQUIPMENT)) {
+                    continue;
+                }
+                if (unit.getEntity().getEquipmentNum(mounted) == slot.getIndex()) {
+                    if(unit.isLocationDestroyed(loc)) {
+                        return unit.getEntity().getLocationName(loc) + " is destroyed.";
+                    }
+                }
+            }
+        }
+        return super.checkFixable();
+    }
 }
