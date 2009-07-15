@@ -247,6 +247,8 @@ public class SupportTeam implements Serializable {
                    } else if(task instanceof ReplacementItem) {
                        //TODO: destroy component, but parts no implemented yet
                        report = report + " Component destroyed!";
+                       //reset the skill min counter back to green
+                       task.setSkillMin(EXP_GREEN);
                    }
                }
            }
