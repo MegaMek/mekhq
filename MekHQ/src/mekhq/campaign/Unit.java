@@ -22,6 +22,7 @@
 package mekhq.campaign;
 
 import java.io.Serializable;
+import megamek.common.AmmoType;
 import megamek.common.Compute;
 import megamek.common.CriticalSlot;
 import megamek.common.Entity;
@@ -161,6 +162,12 @@ public class Unit implements Serializable {
                     campaign.addWork(new HeatSinkRepair(this, 1, m));
                     continue;
                 }             
+                //ammo is also handled its own way
+                if(m.getType() instanceof AmmoType) {
+                    campaign.addWork(new AmmoBinReplacement(this, m));
+                    //don't do reloads here because I want them all grouped at the bottom of the queue
+                }
+                
                 //TODO: some slots need to be skipped (like armor, endo-steel, etc.)
                 
                 //combat destroyed is not the same as really destroyed
@@ -172,6 +179,17 @@ public class Unit implements Serializable {
                 } else {
                     campaign.addWork(new EquipmentReplacement(this, m));
                 }
+            }
+        }
+        
+        //now check for reloads
+        for(Mounted m : entity.getAmmo()) {
+            if(!(m.getType() instanceof AmmoType)) {
+                //shouldn't happen, but you never know
+                continue;
+            }
+            if(m.getShotsLeft() < ((AmmoType)m.getType()).getShots()) {
+                campaign.addWork(new ReloadItem(this, m));
             }
         }
     }

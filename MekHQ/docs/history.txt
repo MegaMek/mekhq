@@ -1,6 +1,8 @@
 VERSION HISTORY
 ----------------------------------
 v0.01 (SVN)
++ ReloadItem
++ AmmoBinReplacement item
 + failed Elite replacement checks reset level to Green
 + added impossibilty checks for tasks in destroyed locations
 + added check for impossible tasks

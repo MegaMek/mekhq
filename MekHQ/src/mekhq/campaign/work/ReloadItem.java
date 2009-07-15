@@ -21,16 +21,69 @@
 
 package mekhq.campaign.work;
 
-import megamek.common.Entity;
+import megamek.common.AmmoType;
+import megamek.common.Mounted;
+import megamek.common.TargetRoll;
+import mekhq.campaign.SupportTeam;
 import mekhq.campaign.Unit;
 
 /**
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public abstract class ReloadItem extends WorkItem {
+public class ReloadItem extends WorkItem {
 
-    public ReloadItem(Unit unit) {
+    protected Mounted mounted;
+    protected AmmoType atype;
+    protected boolean swap;
+    
+    public ReloadItem(Unit unit, Mounted m) {
         super(unit);
+        this.swap = false;
+        this.mounted = m;
+        if(mounted.getType() instanceof AmmoType) {
+            this.atype = (AmmoType)mounted.getType();
+        }
+        this.name = "Reload " + mounted.getDesc() + " with " + atype.getDesc();       
+        //TODO: crap, time varies by skill level
+        //TODO: also need to allow it to double if changing ammo type
+        this.time = 15;
+        this.difficulty = TargetRoll.AUTOMATIC_SUCCESS;
+    }
+    
+    @Override
+    public String checkFixable() {
+        if(unit.isLocationDestroyed(mounted.getLocation())) {
+            return unit.getEntity().getLocationName(mounted.getLocation()) + " is destroyed.";
+        }
+        if(mounted.isHit() || mounted.isDestroyed()) {
+            return "the ammo bin is damaged and must be replaced first.";
+        }
+        return super.checkFixable();
+    }
+    
+    @Override
+    public void fix() {
+        mounted.changeAmmoType(atype);
+        mounted.setShotsLeft(atype.getShots());
+    }
+    
+    @Override
+    public void assignTeam(SupportTeam  team) {
+        switch(team.getRating()) {
+           case SupportTeam.EXP_GREEN:
+               this.time = 15;
+               break;
+           case SupportTeam.EXP_REGULAR:
+               this.time = 10;
+               break;
+           case SupportTeam.EXP_VETERAN:
+               this.time = 8;
+               break;
+           case SupportTeam.EXP_ELITE:
+               this.time = 6;
+               break;
+       }
+       super.assignTeam(team);
     }
 }

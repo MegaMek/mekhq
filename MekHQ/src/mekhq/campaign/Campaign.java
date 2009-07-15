@@ -168,7 +168,7 @@ public class Campaign implements Serializable {
     }
      
      public void assignTask(int teamId, int taskId) {
-         taskIds.get(new Integer(taskId)).assignTeam(teamId);
+         taskIds.get(new Integer(taskId)).assignTeam(getTeam(teamId));
      }
      
      /**

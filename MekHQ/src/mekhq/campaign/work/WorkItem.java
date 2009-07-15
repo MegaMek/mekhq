@@ -85,8 +85,8 @@ public abstract class WorkItem implements Serializable {
         return teamId;
     }
     
-    public void assignTeam(int i) {
-        this.teamId = i;
+    public void assignTeam(SupportTeam team) {
+        this.teamId = team.getId();
     }
     
     public void unassignTeam() {
