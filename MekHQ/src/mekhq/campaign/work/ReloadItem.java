@@ -84,6 +84,22 @@ public class ReloadItem extends WorkItem {
                this.time = 6;
                break;
        }
+       if(swap) {
+           time *= 2;
+       }
        super.assignTeam(team);
+    }
+    
+    public AmmoType getAmmoType() {
+        return atype;
+    }
+    
+    public void swapAmmo(AmmoType at) {
+        this.atype = at;
+        if(!swap) {
+            this.time *= 2;
+        }
+        this.swap = true;
+        this.name = "Swap " + mounted.getDesc() + " with " + atype.getDesc();     
     }
 }

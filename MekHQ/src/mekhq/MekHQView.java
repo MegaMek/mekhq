@@ -47,6 +47,7 @@ import javax.swing.table.AbstractTableModel;
 import megamek.common.Entity;
 import megamek.common.EntityListFile;
 import mekhq.campaign.Unit;
+import mekhq.campaign.work.ReloadItem;
 import mekhq.campaign.work.RepairItem;
 import mekhq.campaign.work.WorkItem;
 
@@ -164,6 +165,7 @@ public class MekHQView extends FrameView {
         lblTasks = new javax.swing.JLabel();
         lblTeams = new javax.swing.JLabel();
         replaceBtn = new javax.swing.JButton();
+        ammoBtn = new javax.swing.JButton();
         menuBar = new javax.swing.JMenuBar();
         javax.swing.JMenu fileMenu = new javax.swing.JMenu();
         menuLoad = new javax.swing.JMenuItem();
@@ -277,6 +279,15 @@ public class MekHQView extends FrameView {
             }
         });
 
+        ammoBtn.setText(resourceMap.getString("ammoBtn.text")); // NOI18N
+        ammoBtn.setEnabled(false);
+        ammoBtn.setName("ammoBtn"); // NOI18N
+        ammoBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ammoBtnActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout mainPanelLayout = new org.jdesktop.layout.GroupLayout(mainPanel);
         mainPanel.setLayout(mainPanelLayout);
         mainPanelLayout.setHorizontalGroup(
@@ -296,20 +307,19 @@ public class MekHQView extends FrameView {
                             .add(lblUnits, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 156, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                         .add(24, 24, 24)
                         .add(mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 431, Short.MAX_VALUE)
+                            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 395, Short.MAX_VALUE)
                             .add(lblTasks, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 197, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                             .add(mainPanelLayout.createSequentialGroup()
                                 .add(lblTeams)
                                 .add(66, 66, 66)
                                 .add(assignBtn))
-                            .add(taskScroll, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 431, Short.MAX_VALUE)))
-                    .add(mainPanelLayout.createSequentialGroup()
-                        .add(btnAdvanceDay)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 807, Short.MAX_VALUE)))
+                            .add(taskScroll, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 395, Short.MAX_VALUE)))
+                    .add(btnAdvanceDay))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
-                    .add(replaceBtn, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(btnNewTeam, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .add(mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                    .add(ammoBtn, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 136, Short.MAX_VALUE)
+                    .add(replaceBtn, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 136, Short.MAX_VALUE)
+                    .add(btnNewTeam, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 136, Short.MAX_VALUE))
                 .addContainerGap())
         );
         mainPanelLayout.setVerticalGroup(
@@ -339,7 +349,10 @@ public class MekHQView extends FrameView {
                                 .add(loadListBtn)
                                 .add(18, 18, 18)
                                 .add(btnDeployUnits))
-                            .add(replaceBtn))
+                            .add(mainPanelLayout.createSequentialGroup()
+                                .add(replaceBtn)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                                .add(ammoBtn)))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(btnNewTeam)
@@ -460,6 +473,7 @@ private void TaskListValueChanged(javax.swing.event.ListSelectionEvent evt) {//G
     }
     updateAssignEnabled();
     updateReplaceEnabled();
+    updateAmmoSwapEnabled();
 }//GEN-LAST:event_TaskListValueChanged
 
 private void TeamsListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_TeamsListValueChanged
@@ -472,6 +486,7 @@ private void TeamsListValueChanged(javax.swing.event.ListSelectionEvent evt) {//
     }
     updateAssignEnabled();
     updateReplaceEnabled();
+    updateAmmoSwapEnabled();
 }//GEN-LAST:event_TeamsListValueChanged
 
 private void btnAdvanceDayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAdvanceDayActionPerformed
@@ -494,6 +509,18 @@ private void replaceBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
         refreshTaskList();
     }
 }//GEN-LAST:event_replaceBtnActionPerformed
+
+private void ammoBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ammoBtnActionPerformed
+
+    WorkItem task = campaign.getTask(currentTaskId);
+    if(task instanceof ReloadItem) {
+        AmmoDialog ammod = new AmmoDialog(this.getFrame(), true, (ReloadItem)task);
+        ammod.setVisible(true);
+        refreshUnitList();
+        refreshTaskList();
+        refreshTeamsList();
+    }
+}//GEN-LAST:event_ammoBtnActionPerformed
 
 protected void loadListFile() {
     JFileChooser loadList = new JFileChooser(".");
@@ -607,6 +634,15 @@ protected void updateReplaceEnabled() {
     }    
 }
 
+protected void updateAmmoSwapEnabled() {
+    WorkItem curTask = campaign.getTask(currentTaskId);
+    if(null != curTask && curTask instanceof ReloadItem) {
+        ammoBtn.setEnabled(true);
+    } else {
+        ammoBtn.setEnabled(false);
+    }    
+}
+
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -614,6 +650,7 @@ protected void updateReplaceEnabled() {
     private javax.swing.JList TeamsList;
     private javax.swing.JList UnitList;
     private javax.swing.JScrollPane UnitsScroll;
+    private javax.swing.JButton ammoBtn;
     private javax.swing.JButton assignBtn;
     private javax.swing.JButton btnAdvanceDay;
     private javax.swing.JButton btnDeployUnits;

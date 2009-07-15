@@ -94,6 +94,11 @@ public class NewTeamDialog extends javax.swing.JDialog {
 
         btnCancel.setText(resourceMap.getString("btnCancel.text")); // NOI18N
         btnCancel.setName("btnCancel"); // NOI18N
+        btnCancel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCancelActionPerformed(evt);
+            }
+        });
 
         lblTeamType.setText(resourceMap.getString("lblTeamType.text")); // NOI18N
         lblTeamType.setName("lblTeamType"); // NOI18N
@@ -169,6 +174,10 @@ private void btnDoneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
 private void txtTeamNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtTeamNameActionPerformed
 // TODO add your handling code here:
 }//GEN-LAST:event_txtTeamNameActionPerformed
+
+private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
+    this.setVisible(false);
+}//GEN-LAST:event_btnCancelActionPerformed
 
     /**
     * @param args the command line arguments

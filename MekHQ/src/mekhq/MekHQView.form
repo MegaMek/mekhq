@@ -28,25 +28,23 @@
                           </Group>
                           <EmptySpace min="-2" pref="24" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="jScrollPane1" pref="431" max="32767" attributes="1"/>
+                              <Component id="jScrollPane1" pref="395" max="32767" attributes="1"/>
                               <Component id="lblTasks" min="-2" pref="197" max="-2" attributes="0"/>
                               <Group type="102" alignment="0" attributes="0">
                                   <Component id="lblTeams" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace min="-2" pref="66" max="-2" attributes="0"/>
                                   <Component id="assignBtn" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <Component id="taskScroll" alignment="0" pref="431" max="32767" attributes="1"/>
+                              <Component id="taskScroll" alignment="0" pref="395" max="32767" attributes="1"/>
                           </Group>
                       </Group>
-                      <Group type="102" alignment="0" attributes="0">
-                          <Component id="btnAdvanceDay" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="807" max="32767" attributes="0"/>
-                      </Group>
+                      <Component id="btnAdvanceDay" alignment="0" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                      <Component id="replaceBtn" max="32767" attributes="1"/>
-                      <Component id="btnNewTeam" alignment="0" max="32767" attributes="1"/>
+                  <Group type="103" groupAlignment="1" attributes="0">
+                      <Component id="ammoBtn" alignment="1" pref="136" max="32767" attributes="1"/>
+                      <Component id="replaceBtn" alignment="1" pref="136" max="32767" attributes="1"/>
+                      <Component id="btnNewTeam" alignment="1" pref="136" max="32767" attributes="1"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -85,12 +83,16 @@
                                   <EmptySpace type="separate" max="-2" attributes="0"/>
                                   <Component id="btnDeployUnits" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <Component id="replaceBtn" min="-2" max="-2" attributes="0"/>
+                              <Group type="102" attributes="0">
+                                  <Component id="replaceBtn" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                  <Component id="ammoBtn" min="-2" max="-2" attributes="0"/>
+                              </Group>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="btnNewTeam" min="-2" max="-2" attributes="0"/>
-                              <Component id="jScrollPane1" min="-2" pref="299" max="-2" attributes="1"/>
+                              <Component id="jScrollPane1" alignment="0" min="-2" pref="299" max="-2" attributes="1"/>
                           </Group>
                       </Group>
                       <Component id="UnitsScroll" max="32767" attributes="1"/>
@@ -244,6 +246,16 @@
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="replaceBtnActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JButton" name="ammoBtn">
+          <Properties>
+            <Property name="text" type="java.lang.String" resourceKey="ammoBtn.text"/>
+            <Property name="enabled" type="boolean" value="false"/>
+            <Property name="name" type="java.lang.String" value="ammoBtn" noResource="true"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="ammoBtnActionPerformed"/>
           </Events>
         </Component>
       </SubComponents>

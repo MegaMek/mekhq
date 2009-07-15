@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.01 (SVN)
++ Ammo Swapping
 + ReloadItem
 + AmmoBinReplacement item
 + failed Elite replacement checks reset level to Green
