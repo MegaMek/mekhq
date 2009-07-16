@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.0.1 (SVN)
++ Show entity name in task report
 + Bug: NPE on single-shot ammo
 + time multipliers for reloading
 + View Unit button now working

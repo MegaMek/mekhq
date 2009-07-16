@@ -240,7 +240,7 @@ public class SupportTeam implements Serializable {
        //you run out of time
        int minutesWorked = 0;
        for(WorkItem task : getTasksAssigned()) {
-           String report = "  " + task.getName();
+           String report = "  " + task.getUnit().getEntity().getDisplayName() + ": " + task.getName();
            //check whether the task is currently possible
            if(null != task.checkFixable()) {
                report = report + ", but the task is impossible because " + task.checkFixable();
