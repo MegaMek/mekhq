@@ -146,6 +146,10 @@ public abstract class WorkItem implements Serializable {
         return mods;
     }
     
+    public boolean isNeeded() {
+        return true;
+    }
+    
     /**
      * check whether this work item is currently fixable
      * some conditions will make a work item impossible to fix

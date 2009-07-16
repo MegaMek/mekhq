@@ -210,7 +210,7 @@ public class SupportTeam implements Serializable {
            //TODO: need to update this when I add medical tasks
            return false;
        }
-       return task.getSkillMin() <= getRating();
+       return task.isNeeded() && task.getSkillMin() <= getRating();
    } 
    
    public int makeRoll(WorkItem task) {

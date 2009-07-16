@@ -145,11 +145,13 @@ public class Campaign implements Serializable {
         int total = 0;
         int assigned = 0;
         for(WorkItem task : unitTasks) {
-            total++;
-            minutes += task.getTime();
-            if(!task.isUnassigned()) {
-                assigned++;
-            } 
+            if(task.isNeeded()) {
+                total++;
+                minutes += task.getTime();
+                if(!task.isUnassigned()) {
+                    assigned++;
+                } 
+            }
         }
         if(total == 0) {
             return "";

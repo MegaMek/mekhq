@@ -35,6 +35,7 @@ public class ReloadItem extends WorkItem {
 
     protected Mounted mounted;
     protected AmmoType atype;
+    protected AmmoType orig_atype;
     protected boolean swap;
     
     public ReloadItem(Unit unit, Mounted m) {
@@ -43,6 +44,7 @@ public class ReloadItem extends WorkItem {
         this.mounted = m;
         if(mounted.getType() instanceof AmmoType) {
             this.atype = (AmmoType)mounted.getType();
+            this.orig_atype = (AmmoType)mounted.getType();
         }
         this.name = "Reload " + mounted.getDesc() + " with " + atype.getDesc();       
         //TODO: crap, time varies by skill level
@@ -105,17 +107,25 @@ public class ReloadItem extends WorkItem {
     }
     
     public void swapAmmo(AmmoType at) {
-        this.atype = at;
-        if(!swap) {
-            this.time *= 2;
+        if(at.getMunitionType() != orig_atype.getMunitionType()) {
+            this.atype = at;
+            if(!swap) {
+                this.time *= 2;
+            }
+            this.swap = true;
+            this.name = "Swap " + mounted.getDesc() + " with " + atype.getDesc();
         }
-        this.swap = true;
-        this.name = "Swap " + mounted.getDesc() + " with " + atype.getDesc();     
     }
     
     @Override
     public void complete() {
-        //reload items are never completed because the user may want to swap
+        //reload items are never truly completed because the user may want to swap
+        if(swap) {
+            //the swap was successfull so reset the orig_atype
+            this.orig_atype = atype;
+            this.name = "Reload " + mounted.getDesc() + " with " + atype.getDesc();           
+        }
+        this.swap = false;
         unassignTeam();
     }
     
@@ -128,5 +138,23 @@ public class ReloadItem extends WorkItem {
             factor *= 2.0;
         }
         return factor;
+    }
+    
+    public boolean isFull() {
+        return !swap && mounted.getShotsLeft() >= atype.getShots();
+    }
+    
+    @Override
+    public boolean isNeeded() {
+        //if not swapping and topped off, then this reload is not needed
+        return !isFull();
+    }
+    
+    @Override
+    public String getDesc() {
+        if(isFull()) {
+            return "(FULL) " + getName() + " " + getStats();
+        }
+        return super.getDesc(); 
     }
 }
