@@ -48,6 +48,9 @@ public class ReloadItem extends WorkItem {
         //TODO: crap, time varies by skill level
         //TODO: also need to allow it to double if changing ammo type
         this.time = 15;
+        if(unit.getEntity().isOmni()) {
+            this.time = 8;
+        }
         this.difficulty = TargetRoll.AUTOMATIC_SUCCESS;
     }
     
@@ -93,9 +96,7 @@ public class ReloadItem extends WorkItem {
                this.time = 6;
                break;
        }
-       if(swap) {
-           time *= 2;
-       }
+       this.time = (int)Math.ceil(this.time * getTimeMultiplier());
        super.assignTeam(team);
     }
     
@@ -116,5 +117,16 @@ public class ReloadItem extends WorkItem {
     public void complete() {
         //reload items are never completed because the user may want to swap
         unassignTeam();
+    }
+    
+    public double getTimeMultiplier() {
+        double factor = 1.0;
+        if(unit.getEntity().isOmni()) {
+            factor *= 0.5;
+        }
+        if(swap) {
+            factor *= 2.0;
+        }
+        return factor;
     }
 }
