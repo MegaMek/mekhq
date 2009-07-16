@@ -8,7 +8,10 @@ package mekhq;
 
 import java.util.Vector;
 import javax.swing.DefaultComboBoxModel;
+import megamek.common.Aero;
 import megamek.common.AmmoType;
+import megamek.common.Entity;
+import megamek.common.Protomech;
 import mekhq.campaign.work.ReloadItem;
 
 /**
@@ -20,11 +23,13 @@ public class AmmoDialog extends javax.swing.JDialog {
     private Vector<AmmoType> atypes;
     private ReloadItem reload;
     private DefaultComboBoxModel ammoChoiceModel;
+    private Entity entity;
     
     /** Creates new form AmmoDialog */
-    public AmmoDialog(java.awt.Frame parent, boolean modal, ReloadItem r) {
+    public AmmoDialog(java.awt.Frame parent, boolean modal, ReloadItem r, Entity en) {
         super(parent, modal);
         this.reload = r;
+        this.entity = en;
         initComponents();
     }
 
@@ -108,8 +113,40 @@ private void okBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:e
 private void setupMunitions() {
     ammoChoiceModel = new DefaultComboBoxModel();
     atypes = new Vector<AmmoType>();
+    AmmoType cur_atype = reload.getAmmoType();
     for(AmmoType atype : AmmoType.getMunitionsFor(reload.getAmmoType().getAmmoType())) {
-        if(atype.getRackSize() == reload.getAmmoType().getRackSize()) {
+        //this is an abbreviated version of setupMunitions in the CustomMechDialog
+        
+        //TODO: clan/IS limitations?
+        
+        if ((entity instanceof Aero)
+                    && !((atype.getAmmoType() == AmmoType.T_MML)
+                            || (atype.getAmmoType() == AmmoType.T_ATM)
+                            || (atype.getAmmoType() == AmmoType.T_NARC) 
+                            || (atype.getAmmoType() == AmmoType.T_AC_LBX))) {
+            continue;
+        }
+        
+        // Only Protos can use Proto-specific ammo
+        if (atype.hasFlag(AmmoType.F_PROTOMECH)
+                        && !(entity instanceof Protomech)) {
+            continue;
+        }
+
+        // When dealing with machine guns, Protos can only
+        // use proto-specific machine gun ammo
+        if ((entity instanceof Protomech)
+                        && atype.hasFlag(AmmoType.F_MG)
+                        && !atype.hasFlag(AmmoType.F_PROTOMECH)) {
+            continue;
+        }
+
+        // Battle Armor ammo can't be selected at all.
+        // All other ammo types need to match on rack size and tech.
+        if ((atype.getRackSize() == cur_atype.getRackSize())
+                        && (atype.hasFlag(AmmoType.F_BATTLEARMOR) == cur_atype.hasFlag(AmmoType.F_BATTLEARMOR))
+                        && (atype.hasFlag(AmmoType.F_ENCUMBERING) == cur_atype.hasFlag(AmmoType.F_ENCUMBERING))
+                        && (atype.getTonnage(entity) == cur_atype.getTonnage(entity))) {
             atypes.add(atype);
             ammoChoiceModel.addElement(atype.getDesc());
         }
@@ -122,7 +159,7 @@ private void setupMunitions() {
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                AmmoDialog dialog = new AmmoDialog(new javax.swing.JFrame(), true, null);
+                AmmoDialog dialog = new AmmoDialog(new javax.swing.JFrame(), true, null, null);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     public void windowClosing(java.awt.event.WindowEvent e) {
                         System.exit(0);

@@ -513,8 +513,9 @@ private void replaceBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
 private void ammoBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ammoBtnActionPerformed
 
     WorkItem task = campaign.getTask(currentTaskId);
-    if(task instanceof ReloadItem) {
-        AmmoDialog ammod = new AmmoDialog(this.getFrame(), true, (ReloadItem)task);
+    Unit unit = campaign.getUnit(currentUnitId);
+    if(null != task && null != unit && task instanceof ReloadItem) {
+        AmmoDialog ammod = new AmmoDialog(this.getFrame(), true, (ReloadItem)task, unit.getEntity());
         ammod.setVisible(true);
         refreshUnitList();
         refreshTaskList();
