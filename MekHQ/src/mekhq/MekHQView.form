@@ -20,6 +20,7 @@
                                   <Component id="UnitsScroll" min="-2" pref="343" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="btnViewUnit" pref="125" max="32767" attributes="0"/>
                                       <Component id="btnDeployUnits" max="32767" attributes="1"/>
                                       <Component id="loadListBtn" alignment="0" pref="125" max="32767" attributes="1"/>
                                   </Group>
@@ -80,8 +81,10 @@
                               </Group>
                               <Group type="102" alignment="0" attributes="0">
                                   <Component id="loadListBtn" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                   <Component id="btnDeployUnits" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                                  <Component id="btnViewUnit" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <Group type="102" attributes="0">
                                   <Component id="replaceBtn" min="-2" max="-2" attributes="0"/>
@@ -256,6 +259,15 @@
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="ammoBtnActionPerformed"/>
+          </Events>
+        </Component>
+        <Component class="javax.swing.JButton" name="btnViewUnit">
+          <Properties>
+            <Property name="text" type="java.lang.String" resourceKey="btnViewUnit.text"/>
+            <Property name="name" type="java.lang.String" value="btnViewUnit" noResource="true"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnViewUnitActionPerformed"/>
           </Events>
         </Component>
       </SubComponents>

@@ -21,6 +21,7 @@
 
 package mekhq;
 
+import java.awt.Font;
 import mekhq.campaign.SupportTeam;
 import mekhq.campaign.Campaign;
 import javax.swing.ListModel;
@@ -32,6 +33,8 @@ import org.jdesktop.application.FrameView;
 import org.jdesktop.application.TaskMonitor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -39,11 +42,16 @@ import java.util.Vector;
 import javax.swing.DefaultListModel;
 import javax.swing.Timer;
 import javax.swing.Icon;
+import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
+import megamek.client.ui.MechView;
 import megamek.common.Entity;
 import megamek.common.EntityListFile;
 import mekhq.campaign.Unit;
@@ -166,6 +174,7 @@ public class MekHQView extends FrameView {
         lblTeams = new javax.swing.JLabel();
         replaceBtn = new javax.swing.JButton();
         ammoBtn = new javax.swing.JButton();
+        btnViewUnit = new javax.swing.JButton();
         menuBar = new javax.swing.JMenuBar();
         javax.swing.JMenu fileMenu = new javax.swing.JMenu();
         menuLoad = new javax.swing.JMenuItem();
@@ -288,6 +297,14 @@ public class MekHQView extends FrameView {
             }
         });
 
+        btnViewUnit.setText(resourceMap.getString("btnViewUnit.text")); // NOI18N
+        btnViewUnit.setName("btnViewUnit"); // NOI18N
+        btnViewUnit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnViewUnitActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout mainPanelLayout = new org.jdesktop.layout.GroupLayout(mainPanel);
         mainPanel.setLayout(mainPanelLayout);
         mainPanelLayout.setHorizontalGroup(
@@ -302,6 +319,7 @@ public class MekHQView extends FrameView {
                                 .add(UnitsScroll, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 343, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                 .add(mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                    .add(btnViewUnit, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 125, Short.MAX_VALUE)
                                     .add(btnDeployUnits, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .add(loadListBtn, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 125, Short.MAX_VALUE)))
                             .add(lblUnits, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 156, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
@@ -347,8 +365,10 @@ public class MekHQView extends FrameView {
                                         .add(assignBtn))))
                             .add(mainPanelLayout.createSequentialGroup()
                                 .add(loadListBtn)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                                .add(btnDeployUnits)
                                 .add(18, 18, 18)
-                                .add(btnDeployUnits))
+                                .add(btnViewUnit))
                             .add(mainPanelLayout.createSequentialGroup()
                                 .add(replaceBtn)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
@@ -511,7 +531,6 @@ private void replaceBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
 }//GEN-LAST:event_replaceBtnActionPerformed
 
 private void ammoBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ammoBtnActionPerformed
-
     WorkItem task = campaign.getTask(currentTaskId);
     Unit unit = campaign.getUnit(currentUnitId);
     if(null != task && null != unit && task instanceof ReloadItem) {
@@ -522,6 +541,15 @@ private void ammoBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
         refreshTeamsList();
     }
 }//GEN-LAST:event_ammoBtnActionPerformed
+
+private void btnViewUnitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnViewUnitActionPerformed
+    if (currentUnitId == -1) {
+        return;
+    }
+    MechView mv = new MechView(campaign.getUnit(currentUnitId).getEntity(), false);
+    MekViewDialog mvd = new MekViewDialog(this.getFrame(), true, mv);
+    mvd.setVisible(true);
+}//GEN-LAST:event_btnViewUnitActionPerformed
 
 protected void loadListFile() {
     JFileChooser loadList = new JFileChooser(".");
@@ -656,6 +684,7 @@ protected void updateAmmoSwapEnabled() {
     private javax.swing.JButton btnAdvanceDay;
     private javax.swing.JButton btnDeployUnits;
     private javax.swing.JButton btnNewTeam;
+    private javax.swing.JButton btnViewUnit;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblTasks;
     private javax.swing.JLabel lblTeams;
