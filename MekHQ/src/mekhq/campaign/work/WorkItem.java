@@ -77,6 +77,10 @@ public abstract class WorkItem implements Serializable {
         this.id = i;
     }
     
+    public Unit getUnit() {
+        return unit;
+    }
+    
     public int getUnitId() {
         return unit.getId();
     }

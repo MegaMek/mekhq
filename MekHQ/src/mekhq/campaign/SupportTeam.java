@@ -23,7 +23,12 @@ package mekhq.campaign;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import megamek.common.Aero;
+import megamek.common.BattleArmor;
 import megamek.common.Compute;
+import megamek.common.Entity;
+import megamek.common.Mech;
+import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import mekhq.campaign.work.RepairItem;
 import mekhq.campaign.work.ReplacementItem;
@@ -201,8 +206,31 @@ public class SupportTeam implements Serializable {
    }
    
    public boolean canDo(WorkItem task) {
+       if(type == T_DOCTOR) {
+           //TODO: need to update this when I add medical tasks
+           return false;
+       }
        return task.getSkillMin() <= getRating();
    } 
+   
+   public int makeRoll(WorkItem task) {
+       if(isRightType(task.getUnit().getEntity())) {
+           return Compute.d6(2);
+       } else {
+           return Utilities.roll3d6();
+       }
+   }
+   
+   public boolean isRightType(Entity en) {
+       if((type == T_MECH && !(en instanceof Mech)) 
+               || (type == T_MECHANIC && !(en instanceof Tank))
+               || (type == T_AERO && !(en instanceof Aero))
+               || (type == T_BA && !(en instanceof BattleArmor))) {
+           return false;
+       }
+               
+       return true;
+   }
    
    public ArrayList<String> doAssignments() {
        ArrayList<String> reports = new ArrayList<String>();
@@ -228,7 +256,7 @@ public class SupportTeam implements Serializable {
            }                 
            TargetRoll target = getTarget();
            target.append(task.getAllMods()); 
-           int roll = Compute.d6(2);
+           int roll = makeRoll(task);
            report = report + ", needs " + target.getValueAsString() + " and rolls " + roll + ":";
            if(roll >= target.getValue()) {
                report = report + " task completed.";
