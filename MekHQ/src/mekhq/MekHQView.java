@@ -308,6 +308,11 @@ public class MekHQView extends FrameView {
         btnViewUnit.setText(resourceMap.getString("btnViewUnit.text")); // NOI18N
         btnViewUnit.setToolTipText(resourceMap.getString("btnViewUnit.toolTipText")); // NOI18N
         btnViewUnit.setName("btnViewUnit"); // NOI18N
+        btnViewUnit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnViewUnitActionPerformed(evt);
+            }
+        });
 
         org.jdesktop.layout.GroupLayout mainPanelLayout = new org.jdesktop.layout.GroupLayout(mainPanel);
         mainPanel.setLayout(mainPanelLayout);
@@ -547,6 +552,15 @@ private void ammoBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
         refreshTeamsList();
     }
 }//GEN-LAST:event_ammoBtnActionPerformed
+
+private void btnViewUnitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnViewUnitActionPerformed
+  if(currentUnitId == -1) {
+      return;
+  }
+  MechView mv = new MechView(campaign.getUnit(currentUnitId).getEntity(), false);
+  MekViewDialog mvd = new MekViewDialog(this.getFrame(), true, mv);
+  mvd.setVisible(true);
+}//GEN-LAST:event_btnViewUnitActionPerformed
 
 protected void loadListFile() {
     JFileChooser loadList = new JFileChooser(".");
