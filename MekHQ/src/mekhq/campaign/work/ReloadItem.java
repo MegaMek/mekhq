@@ -58,7 +58,7 @@ public class ReloadItem extends WorkItem {
     public String checkFixable() {
         //if this is not a swap and we are already topped off, then no need to waste time
         if(mounted.getShotsLeft() >= atype.getShots() && !swap) {
-            return "The ammo bin is full.";
+            return "the ammo bin is full.";
         }
         if(unit.isLocationDestroyed(mounted.getLocation())) {
             return unit.getEntity().getLocationName(mounted.getLocation()) + " is destroyed.";

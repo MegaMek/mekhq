@@ -58,7 +58,7 @@ public class Unit implements Serializable {
      * @return <code>true</code> if the location is destroyed
      */
     public boolean isLocationDestroyed(int loc) {
-        if(loc > entity.locations()) {
+        if(loc > entity.locations() || loc < 0) {
             return false;
         }
         //on mechs, hip and shoulder criticals also make the location effectively destroyed
