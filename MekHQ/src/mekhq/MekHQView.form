@@ -4,6 +4,7 @@
   <NonVisualComponents>
     <Container class="javax.swing.JPanel" name="mainPanel">
       <Properties>
+        <Property name="autoscrolls" type="boolean" value="true"/>
         <Property name="name" type="java.lang.String" value="mainPanel" noResource="true"/>
       </Properties>
 
@@ -29,23 +30,23 @@
                           </Group>
                           <EmptySpace min="-2" pref="24" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="jScrollPane1" pref="395" max="32767" attributes="1"/>
+                              <Component id="jScrollPane1" pref="340" max="32767" attributes="1"/>
                               <Component id="lblTasks" min="-2" pref="197" max="-2" attributes="0"/>
                               <Group type="102" alignment="0" attributes="0">
                                   <Component id="lblTeams" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace min="-2" pref="66" max="-2" attributes="0"/>
                                   <Component id="assignBtn" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <Component id="taskScroll" alignment="0" pref="395" max="32767" attributes="1"/>
+                              <Component id="taskScroll" alignment="0" pref="340" max="32767" attributes="1"/>
                           </Group>
                       </Group>
                       <Component id="btnAdvanceDay" alignment="0" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="1" attributes="0">
-                      <Component id="ammoBtn" alignment="1" pref="136" max="32767" attributes="1"/>
-                      <Component id="replaceBtn" alignment="1" pref="136" max="32767" attributes="1"/>
-                      <Component id="btnNewTeam" alignment="1" pref="136" max="32767" attributes="1"/>
+                      <Component id="ammoBtn" alignment="1" pref="191" max="32767" attributes="1"/>
+                      <Component id="replaceBtn" alignment="1" pref="191" max="32767" attributes="1"/>
+                      <Component id="btnNewTeam" alignment="1" pref="191" max="32767" attributes="1"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -109,6 +110,7 @@
         <Component class="javax.swing.JButton" name="btnNewTeam">
           <Properties>
             <Property name="text" type="java.lang.String" resourceKey="btnNewTeam.text"/>
+            <Property name="toolTipText" type="java.lang.String" resourceKey="btnNewTeam.toolTipText"/>
             <Property name="name" type="java.lang.String" value="btnNewTeam" noResource="true"/>
           </Properties>
           <Events>
@@ -118,6 +120,7 @@
         <Component class="javax.swing.JButton" name="loadListBtn">
           <Properties>
             <Property name="text" type="java.lang.String" resourceKey="loadListBtn.text"/>
+            <Property name="toolTipText" type="java.lang.String" resourceKey="loadListBtn.toolTipText"/>
             <Property name="name" type="java.lang.String" value="loadListBtn" noResource="true"/>
           </Properties>
           <Events>
@@ -162,7 +165,6 @@
                   <Connection code="taskModel" type="code"/>
                 </Property>
                 <Property name="selectionMode" type="int" value="0"/>
-                <Property name="dragEnabled" type="boolean" value="true"/>
                 <Property name="name" type="java.lang.String" value="TaskList" noResource="true"/>
               </Properties>
               <Events>
@@ -198,6 +200,7 @@
         <Component class="javax.swing.JButton" name="assignBtn">
           <Properties>
             <Property name="text" type="java.lang.String" resourceKey="assignBtn.text"/>
+            <Property name="toolTipText" type="java.lang.String" resourceKey="assignBtn.toolTipText"/>
             <Property name="enabled" type="boolean" value="false"/>
             <Property name="name" type="java.lang.String" value="assignBtn" noResource="true"/>
           </Properties>
@@ -208,6 +211,7 @@
         <Component class="javax.swing.JButton" name="btnAdvanceDay">
           <Properties>
             <Property name="text" type="java.lang.String" resourceKey="btnAdvanceDay.text"/>
+            <Property name="toolTipText" type="java.lang.String" resourceKey="btnAdvanceDay.toolTipText"/>
             <Property name="name" type="java.lang.String" value="btnAdvanceDay" noResource="true"/>
           </Properties>
           <Events>
@@ -217,6 +221,7 @@
         <Component class="javax.swing.JButton" name="btnDeployUnits">
           <Properties>
             <Property name="text" type="java.lang.String" resourceKey="btnDeployUnits.text"/>
+            <Property name="toolTipText" type="java.lang.String" resourceKey="btnDeployUnits.toolTipText"/>
             <Property name="name" type="java.lang.String" value="btnDeployUnits" noResource="true"/>
           </Properties>
           <Events>
@@ -243,7 +248,9 @@
         </Component>
         <Component class="javax.swing.JButton" name="replaceBtn">
           <Properties>
+            <Property name="font" type="java.awt.Font" resourceKey="replaceBtn.font"/>
             <Property name="text" type="java.lang.String" resourceKey="replaceBtn.text"/>
+            <Property name="toolTipText" type="java.lang.String" resourceKey="replaceBtn.toolTipText"/>
             <Property name="enabled" type="boolean" value="false"/>
             <Property name="name" type="java.lang.String" value="replaceBtn" noResource="true"/>
           </Properties>
@@ -254,6 +261,7 @@
         <Component class="javax.swing.JButton" name="ammoBtn">
           <Properties>
             <Property name="text" type="java.lang.String" resourceKey="ammoBtn.text"/>
+            <Property name="toolTipText" type="java.lang.String" resourceKey="ammoBtn.toolTipText"/>
             <Property name="enabled" type="boolean" value="false"/>
             <Property name="name" type="java.lang.String" value="ammoBtn" noResource="true"/>
           </Properties>
@@ -264,11 +272,9 @@
         <Component class="javax.swing.JButton" name="btnViewUnit">
           <Properties>
             <Property name="text" type="java.lang.String" resourceKey="btnViewUnit.text"/>
+            <Property name="toolTipText" type="java.lang.String" resourceKey="btnViewUnit.toolTipText"/>
             <Property name="name" type="java.lang.String" value="btnViewUnit" noResource="true"/>
           </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnViewUnitActionPerformed"/>
-          </Events>
         </Component>
       </SubComponents>
     </Container>
@@ -294,12 +300,14 @@
             <MenuItem class="javax.swing.JMenuItem" name="menuLoad">
               <Properties>
                 <Property name="text" type="java.lang.String" resourceKey="menuLoad.text"/>
+                <Property name="enabled" type="boolean" value="false"/>
                 <Property name="name" type="java.lang.String" value="menuLoad" noResource="true"/>
               </Properties>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="menuSave">
               <Properties>
                 <Property name="text" type="java.lang.String" resourceKey="menuSave.text"/>
+                <Property name="enabled" type="boolean" value="false"/>
                 <Property name="name" type="java.lang.String" value="menuSave" noResource="true"/>
               </Properties>
             </MenuItem>

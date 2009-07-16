@@ -188,10 +188,12 @@ public class MekHQView extends FrameView {
         statusAnimationLabel = new javax.swing.JLabel();
         progressBar = new javax.swing.JProgressBar();
 
+        mainPanel.setAutoscrolls(true);
         mainPanel.setName("mainPanel"); // NOI18N
 
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(MekHQView.class);
         btnNewTeam.setText(resourceMap.getString("btnNewTeam.text")); // NOI18N
+        btnNewTeam.setToolTipText(resourceMap.getString("btnNewTeam.toolTipText")); // NOI18N
         btnNewTeam.setName("btnNewTeam"); // NOI18N
         btnNewTeam.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -200,6 +202,7 @@ public class MekHQView extends FrameView {
         });
 
         loadListBtn.setText(resourceMap.getString("loadListBtn.text")); // NOI18N
+        loadListBtn.setToolTipText(resourceMap.getString("loadListBtn.toolTipText")); // NOI18N
         loadListBtn.setName("loadListBtn"); // NOI18N
         loadListBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -224,7 +227,6 @@ public class MekHQView extends FrameView {
 
         TaskList.setModel(taskModel);
         TaskList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        TaskList.setDragEnabled(true);
         TaskList.setName("TaskList"); // NOI18N
         TaskList.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
             public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
@@ -246,6 +248,7 @@ public class MekHQView extends FrameView {
         jScrollPane1.setViewportView(TeamsList);
 
         assignBtn.setText(resourceMap.getString("assignBtn.text")); // NOI18N
+        assignBtn.setToolTipText(resourceMap.getString("assignBtn.toolTipText")); // NOI18N
         assignBtn.setEnabled(false);
         assignBtn.setName("assignBtn"); // NOI18N
         assignBtn.addActionListener(new java.awt.event.ActionListener() {
@@ -255,6 +258,7 @@ public class MekHQView extends FrameView {
         });
 
         btnAdvanceDay.setText(resourceMap.getString("btnAdvanceDay.text")); // NOI18N
+        btnAdvanceDay.setToolTipText(resourceMap.getString("btnAdvanceDay.toolTipText")); // NOI18N
         btnAdvanceDay.setName("btnAdvanceDay"); // NOI18N
         btnAdvanceDay.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -263,6 +267,7 @@ public class MekHQView extends FrameView {
         });
 
         btnDeployUnits.setText(resourceMap.getString("btnDeployUnits.text")); // NOI18N
+        btnDeployUnits.setToolTipText(resourceMap.getString("btnDeployUnits.toolTipText")); // NOI18N
         btnDeployUnits.setName("btnDeployUnits"); // NOI18N
         btnDeployUnits.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -279,7 +284,9 @@ public class MekHQView extends FrameView {
         lblTeams.setText(resourceMap.getString("lblTeams.text")); // NOI18N
         lblTeams.setName("lblTeams"); // NOI18N
 
+        replaceBtn.setFont(resourceMap.getFont("replaceBtn.font")); // NOI18N
         replaceBtn.setText(resourceMap.getString("replaceBtn.text")); // NOI18N
+        replaceBtn.setToolTipText(resourceMap.getString("replaceBtn.toolTipText")); // NOI18N
         replaceBtn.setEnabled(false);
         replaceBtn.setName("replaceBtn"); // NOI18N
         replaceBtn.addActionListener(new java.awt.event.ActionListener() {
@@ -289,6 +296,7 @@ public class MekHQView extends FrameView {
         });
 
         ammoBtn.setText(resourceMap.getString("ammoBtn.text")); // NOI18N
+        ammoBtn.setToolTipText(resourceMap.getString("ammoBtn.toolTipText")); // NOI18N
         ammoBtn.setEnabled(false);
         ammoBtn.setName("ammoBtn"); // NOI18N
         ammoBtn.addActionListener(new java.awt.event.ActionListener() {
@@ -298,12 +306,8 @@ public class MekHQView extends FrameView {
         });
 
         btnViewUnit.setText(resourceMap.getString("btnViewUnit.text")); // NOI18N
+        btnViewUnit.setToolTipText(resourceMap.getString("btnViewUnit.toolTipText")); // NOI18N
         btnViewUnit.setName("btnViewUnit"); // NOI18N
-        btnViewUnit.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnViewUnitActionPerformed(evt);
-            }
-        });
 
         org.jdesktop.layout.GroupLayout mainPanelLayout = new org.jdesktop.layout.GroupLayout(mainPanel);
         mainPanel.setLayout(mainPanelLayout);
@@ -325,19 +329,19 @@ public class MekHQView extends FrameView {
                             .add(lblUnits, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 156, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                         .add(24, 24, 24)
                         .add(mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 395, Short.MAX_VALUE)
+                            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 340, Short.MAX_VALUE)
                             .add(lblTasks, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 197, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                             .add(mainPanelLayout.createSequentialGroup()
                                 .add(lblTeams)
                                 .add(66, 66, 66)
                                 .add(assignBtn))
-                            .add(taskScroll, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 395, Short.MAX_VALUE)))
+                            .add(taskScroll, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 340, Short.MAX_VALUE)))
                     .add(btnAdvanceDay))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(ammoBtn, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 136, Short.MAX_VALUE)
-                    .add(replaceBtn, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 136, Short.MAX_VALUE)
-                    .add(btnNewTeam, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 136, Short.MAX_VALUE))
+                    .add(ammoBtn, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 191, Short.MAX_VALUE)
+                    .add(replaceBtn, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 191, Short.MAX_VALUE)
+                    .add(btnNewTeam, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 191, Short.MAX_VALUE))
                 .addContainerGap())
         );
         mainPanelLayout.setVerticalGroup(
@@ -387,10 +391,12 @@ public class MekHQView extends FrameView {
         fileMenu.setName("fileMenu"); // NOI18N
 
         menuLoad.setText(resourceMap.getString("menuLoad.text")); // NOI18N
+        menuLoad.setEnabled(false);
         menuLoad.setName("menuLoad"); // NOI18N
         fileMenu.add(menuLoad);
 
         menuSave.setText(resourceMap.getString("menuSave.text")); // NOI18N
+        menuSave.setEnabled(false);
         menuSave.setName("menuSave"); // NOI18N
         fileMenu.add(menuSave);
 
@@ -541,15 +547,6 @@ private void ammoBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
         refreshTeamsList();
     }
 }//GEN-LAST:event_ammoBtnActionPerformed
-
-private void btnViewUnitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnViewUnitActionPerformed
-    if (currentUnitId == -1) {
-        return;
-    }
-    MechView mv = new MechView(campaign.getUnit(currentUnitId).getEntity(), false);
-    MekViewDialog mvd = new MekViewDialog(this.getFrame(), true, mv);
-    mvd.setVisible(true);
-}//GEN-LAST:event_btnViewUnitActionPerformed
 
 protected void loadListFile() {
     JFileChooser loadList = new JFileChooser(".");
