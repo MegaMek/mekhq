@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.0.1 (SVN)
++ added log file
 + roll 3d6 taking two lowest on mismatched tech
 + dissallow doctors from making repairs
 + more ammo limitations

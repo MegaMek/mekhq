@@ -21,6 +21,10 @@
 
 package mekhq;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 import megamek.common.MechSummaryCache;
 import org.jdesktop.application.Application;
 import org.jdesktop.application.SingleFrameApplication;
@@ -34,6 +38,9 @@ public class MekHQApp extends SingleFrameApplication {
      * At startup create and show the main frame of the application.
      */
     @Override protected void startup() {
+        
+        //redirect output to log file
+        redirectOutput();
         
         //init the summary cache
         MechSummaryCache.getInstance();
@@ -62,5 +69,27 @@ public class MekHQApp extends SingleFrameApplication {
      */
     public static void main(String[] args) {
         launch(MekHQApp.class, args);
+    }
+    
+    /**
+     * This function redirects the standard error and output streams to the
+     * given File name.
+     *
+     * @param logFileName The file name to redirect to.
+     */
+    private static void redirectOutput() {
+        try {
+            System.out.println("Redirecting output to mekhqlog.txt"); //$NON-NLS-1$
+            File logDir = new File("logs");
+            if (!logDir.exists()) {
+                logDir.mkdir();
+            }
+            PrintStream ps = new PrintStream(new BufferedOutputStream(new FileOutputStream("logs" + File.separator + "mekhqlog.txt"), 64));
+            System.setOut(ps);
+            System.setErr(ps);
+        } catch (Exception e) {
+            System.err.println("Unable to redirect output to mekhqlog.txt"); //$NON-NLS-1$
+            e.printStackTrace();
+        }
     }
 }
