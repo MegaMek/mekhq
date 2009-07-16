@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.0.1 (SVN)
++ embedded main panel in tabbed pane
 + improve reporting of full ammo reloads
 + Show entity name in task report
 + Bug: NPE on single-shot ammo
