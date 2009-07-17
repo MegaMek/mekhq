@@ -31,7 +31,7 @@ import mekhq.campaign.Unit;
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class ReloadItem extends WorkItem {
+public class ReloadItem extends UnitWorkItem {
 
     protected Mounted mounted;
     protected AmmoType atype;

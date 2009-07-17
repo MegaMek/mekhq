@@ -40,8 +40,6 @@ public abstract class WorkItem implements Serializable {
     protected String name;
     //the id of this work item
     protected int id;
-    //the unit for whom the work is being performed
-    protected Unit unit;
     //the id of the team assigned to this item
     protected int teamId;
     //the skill modifier for difficulty
@@ -53,9 +51,8 @@ public abstract class WorkItem implements Serializable {
     //has this task been successfully completed?
     protected boolean completed;
     
-    public WorkItem(Unit unit) {
+    public WorkItem() {
         this.name = "Unknown";
-        this.unit = unit;
         this.skillMin = SupportTeam.EXP_GREEN;
         this.teamId = TEAM_NONE;
         this.completed = false;
@@ -64,10 +61,12 @@ public abstract class WorkItem implements Serializable {
     public String getName() {
         return name;
     }
-    
+ 
     public void setName(String s) {
         this.name = s;
     }
+    
+    public abstract String getDisplayName();
     
     public int getId() {
         return id;
@@ -75,14 +74,6 @@ public abstract class WorkItem implements Serializable {
     
     public void setId(int i) {
         this.id = i;
-    }
-    
-    public Unit getUnit() {
-        return unit;
-    }
-    
-    public int getUnitId() {
-        return unit.getId();
     }
     
     public int getTeamId() {

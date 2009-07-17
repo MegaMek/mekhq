@@ -29,7 +29,7 @@ import mekhq.campaign.Unit;
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public abstract class RepairItem extends WorkItem {
+public abstract class RepairItem extends UnitWorkItem {
 
     int hits;
     

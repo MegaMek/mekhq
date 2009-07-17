@@ -32,6 +32,7 @@ import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import mekhq.campaign.work.RepairItem;
 import mekhq.campaign.work.ReplacementItem;
+import mekhq.campaign.work.UnitWorkItem;
 import mekhq.campaign.work.WorkItem;
 
 /**
@@ -214,7 +215,7 @@ public class SupportTeam implements Serializable {
    } 
    
    public int makeRoll(WorkItem task) {
-       if(isRightType(task.getUnit().getEntity())) {
+       if(task instanceof UnitWorkItem && isRightType(((UnitWorkItem)task).getUnit().getEntity())) {
            return Compute.d6(2);
        } else {
            return Utilities.roll3d6();
@@ -240,7 +241,7 @@ public class SupportTeam implements Serializable {
        //you run out of time
        int minutesWorked = 0;
        for(WorkItem task : getTasksAssigned()) {
-           String report = "  " + task.getUnit().getEntity().getDisplayName() + ": " + task.getName();
+           String report = "  " + task.getDisplayName();
            //check whether the task is currently possible
            if(null != task.checkFixable()) {
                report = report + ", but the task is impossible because " + task.checkFixable();

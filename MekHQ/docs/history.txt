@@ -1,6 +1,8 @@
 VERSION HISTORY
 ----------------------------------
 v0.0.1 (SVN)
++ HealPilot work item
++ refactor WorkItem into UnitWorkItem extending new abstract class WorkItem
 + label for ChoosePilotDialog
 + allow user to select a subset of units for deployment
 + allow pilot switching among units

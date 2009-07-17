@@ -1,5 +1,5 @@
 /*
- * ReplacementItem.java
+ * MedicalWorkItem.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -21,17 +21,24 @@
 
 package mekhq.campaign.work;
 
-import megamek.common.Entity;
-import mekhq.campaign.Unit;
+import mekhq.campaign.personnel.Person;
 
 /**
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public abstract class ReplacementItem extends UnitWorkItem {
+public abstract class PersonnelWorkItem extends WorkItem {
 
-    public ReplacementItem(Unit unit) {
-        super(unit);
+    //the person for whom the work is being done
+    protected Person person;
+    
+    public PersonnelWorkItem(Person p) {
+        super();
+        this.person = p;
     }
     
+    @Override
+    public String getDisplayName() {
+        return person.getDesc() + ": " + getName();
+    }
 }

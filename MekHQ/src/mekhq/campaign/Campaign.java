@@ -30,6 +30,7 @@ import megamek.common.Game;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PilotPerson;
 import mekhq.campaign.personnel.SupportPerson;
+import mekhq.campaign.work.UnitWorkItem;
 import mekhq.campaign.work.WorkItem;
 
 /**
@@ -158,7 +159,8 @@ public class Campaign implements Serializable {
     public ArrayList<WorkItem> getTasksForUnit(int unitId) {
         ArrayList<WorkItem> newTasks = new ArrayList<WorkItem>();
         for(WorkItem task : getTasks()) {
-            if(task.getUnitId() == unitId) {
+            if(task instanceof UnitWorkItem 
+                    && ((UnitWorkItem)task).getUnitId() == unitId) {
                 newTasks.add(task);
             }
         }

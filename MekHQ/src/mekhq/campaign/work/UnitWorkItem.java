@@ -1,5 +1,5 @@
 /*
- * ReplacementItem.java
+ * WorkItem.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -21,17 +21,37 @@
 
 package mekhq.campaign.work;
 
+import java.io.Serializable;
 import megamek.common.Entity;
+import megamek.common.TargetRoll;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.SupportTeam;
 import mekhq.campaign.Unit;
 
 /**
- *
- * @author Jay Lawson <jaylawson39 at yahoo.com>
+ * Abstract extension of WorkItem for all work on units
+ * @author Taharqa
  */
-public abstract class ReplacementItem extends UnitWorkItem {
+public abstract class UnitWorkItem extends WorkItem {
 
-    public ReplacementItem(Unit unit) {
-        super(unit);
+    //the unit for whom the work is being performed
+    protected Unit unit;
+    
+    public UnitWorkItem(Unit unit) {
+        super();
+        this.unit = unit;
     }
     
+    public Unit getUnit() {
+        return unit;
+    }
+    
+    public int getUnitId() {
+        return unit.getId();
+    }
+    
+    @Override
+    public String getDisplayName() {
+        return unit.getEntity().getDisplayName() + ": " + getName();
+    }
 }
