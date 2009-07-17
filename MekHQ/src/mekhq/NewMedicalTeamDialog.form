@@ -27,14 +27,25 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" attributes="0">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="lblTeamName" min="-2" max="-2" attributes="0"/>
-                          <Component id="lblTeamRating" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="1" attributes="0">
+                              <Group type="102" attributes="0">
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="lblTeamName" min="-2" max="-2" attributes="0"/>
+                                      <Component id="lblTeamRating" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <EmptySpace min="-2" pref="50" max="-2" attributes="0"/>
+                              </Group>
+                              <Group type="102" alignment="1" attributes="0">
+                                  <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                              </Group>
+                          </Group>
+                          <Component id="jLabel2" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace min="-2" pref="50" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="chTeamRating" alignment="0" pref="258" max="32767" attributes="1"/>
-                          <Component id="txtTeamName" alignment="0" pref="258" max="32767" attributes="1"/>
-                          <Component id="chTeamType" alignment="0" pref="258" max="32767" attributes="0"/>
+                          <Component id="chTeamRating" alignment="0" pref="242" max="32767" attributes="1"/>
+                          <Component id="txtTeamName" alignment="0" pref="242" max="32767" attributes="1"/>
                       </Group>
                       <EmptySpace min="-2" max="-2" attributes="0"/>
                   </Group>
@@ -58,18 +69,19 @@
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="lblTeamName" min="-2" max="-2" attributes="0"/>
-                  <Component id="txtTeamName" min="-2" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="txtTeamName" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
+                  </Group>
               </Group>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="chTeamRating" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="lblTeamRating" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="lblTeamType" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="chTeamType" alignment="3" min="-2" max="-2" attributes="0"/>
-              </Group>
+              <Component id="lblTeamType" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="separate" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="btnCancel" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -104,13 +116,11 @@
     </Component>
     <Component class="javax.swing.JLabel" name="lblTeamName">
       <Properties>
-        <Property name="text" type="java.lang.String" resourceKey="lblTeamName.text"/>
         <Property name="name" type="java.lang.String" value="lblTeamName" noResource="true"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="lblTeamRating">
       <Properties>
-        <Property name="text" type="java.lang.String" resourceKey="lblTeamRating.text"/>
         <Property name="name" type="java.lang.String" value="lblTeamRating" noResource="true"/>
       </Properties>
     </Component>
@@ -134,21 +144,20 @@
     </Component>
     <Component class="javax.swing.JLabel" name="lblTeamType">
       <Properties>
-        <Property name="text" type="java.lang.String" resourceKey="lblTeamType.text"/>
         <Property name="name" type="java.lang.String" value="lblTeamType" noResource="true"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JComboBox" name="chTeamType">
+    <Component class="javax.swing.JLabel" name="jLabel1">
       <Properties>
-        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection code="teamTypeModel" type="code"/>
-        </Property>
-        <Property name="name" type="java.lang.String" value="chTeamType" noResource="true"/>
+        <Property name="text" type="java.lang.String" resourceKey="jLabel1.text"/>
+        <Property name="name" type="java.lang.String" value="jLabel1" noResource="true"/>
       </Properties>
-      <AuxValues>
-        <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="chTeamType.setSelectedIndex(SupportTeam.T_MECH);"/>
-        <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="DefaultComboBoxModel teamTypeModel = new DefaultComboBoxModel(); &#xa;for(int i = 0; i &lt; SupportTeam.T_NUM; i++) {&#xa;    teamTypeModel.addElement(SupportTeam.getTypeDesc(i));&#xa;}"/>
-      </AuxValues>
+    </Component>
+    <Component class="javax.swing.JLabel" name="jLabel2">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="jLabel2.text"/>
+        <Property name="name" type="java.lang.String" value="jLabel2" noResource="true"/>
+      </Properties>
     </Component>
   </SubComponents>
 </Form>

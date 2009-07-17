@@ -21,20 +21,21 @@
 
 package mekhq;
 
-import mekhq.campaign.SupportTeam;
+import mekhq.campaign.team.SupportTeam;
 import mekhq.campaign.Campaign;
 import javax.swing.DefaultComboBoxModel;
+import mekhq.campaign.team.MedicalTeam;
 
 /**
  *
  * @author  Taharqa
  */
-public class NewTeamDialog extends javax.swing.JDialog {
+public class NewMedicalTeamDialog extends javax.swing.JDialog {
 
     private Campaign campaign;
     
     /** Creates new form NewTeamDialog */
-    public NewTeamDialog(java.awt.Frame parent, boolean modal, Campaign c) {
+    public NewMedicalTeamDialog(java.awt.Frame parent, boolean modal, Campaign c) {
         super(parent, modal);
         this.campaign = c;
         initComponents();
@@ -56,12 +57,13 @@ public class NewTeamDialog extends javax.swing.JDialog {
         btnDone = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
         lblTeamType = new javax.swing.JLabel();
-        chTeamType = new javax.swing.JComboBox();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
 
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(NewTeamDialog.class);
+        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(NewMedicalTeamDialog.class);
         txtTeamName.setText(resourceMap.getString("txtTeamName.text")); // NOI18N
         txtTeamName.setName("txtTeamName"); // NOI18N
         txtTeamName.addActionListener(new java.awt.event.ActionListener() {
@@ -78,10 +80,8 @@ public class NewTeamDialog extends javax.swing.JDialog {
         chTeamRating.setName("chTeamRating"); // NOI18N
         chTeamRating.setSelectedIndex(SupportTeam.EXP_REGULAR);
 
-        lblTeamName.setText(resourceMap.getString("lblTeamName.text")); // NOI18N
         lblTeamName.setName("lblTeamName"); // NOI18N
 
-        lblTeamRating.setText(resourceMap.getString("lblTeamRating.text")); // NOI18N
         lblTeamRating.setName("lblTeamRating"); // NOI18N
 
         btnDone.setText(resourceMap.getString("btnDone.text")); // NOI18N
@@ -100,16 +100,13 @@ public class NewTeamDialog extends javax.swing.JDialog {
             }
         });
 
-        lblTeamType.setText(resourceMap.getString("lblTeamType.text")); // NOI18N
         lblTeamType.setName("lblTeamType"); // NOI18N
 
-        DefaultComboBoxModel teamTypeModel = new DefaultComboBoxModel();
-        for(int i = 0; i < SupportTeam.T_NUM; i++) {
-            teamTypeModel.addElement(SupportTeam.getTypeDesc(i));
-        }
-        chTeamType.setModel(teamTypeModel);
-        chTeamType.setName("chTeamType"); // NOI18N
-        chTeamType.setSelectedIndex(SupportTeam.T_MECH);
+        jLabel1.setText(resourceMap.getString("jLabel1.text")); // NOI18N
+        jLabel1.setName("jLabel1"); // NOI18N
+
+        jLabel2.setText(resourceMap.getString("jLabel2.text")); // NOI18N
+        jLabel2.setName("jLabel2"); // NOI18N
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -120,13 +117,20 @@ public class NewTeamDialog extends javax.swing.JDialog {
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(layout.createSequentialGroup()
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(lblTeamName)
-                            .add(lblTeamRating))
-                        .add(50, 50, 50)
+                            .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                                .add(layout.createSequentialGroup()
+                                    .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                        .add(lblTeamName)
+                                        .add(lblTeamRating))
+                                    .add(50, 50, 50))
+                                .add(layout.createSequentialGroup()
+                                    .add(jLabel1)
+                                    .add(18, 18, 18)))
+                            .add(jLabel2))
+                        .add(18, 18, 18)
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(chTeamRating, 0, 258, Short.MAX_VALUE)
-                            .add(txtTeamName, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 258, Short.MAX_VALUE)
-                            .add(chTeamType, 0, 258, Short.MAX_VALUE))
+                            .add(chTeamRating, 0, 242, Short.MAX_VALUE)
+                            .add(txtTeamName, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 242, Short.MAX_VALUE))
                         .addContainerGap())
                     .add(layout.createSequentialGroup()
                         .add(lblTeamType)
@@ -143,15 +147,16 @@ public class NewTeamDialog extends javax.swing.JDialog {
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(lblTeamName)
-                    .add(txtTeamName, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                        .add(txtTeamName, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(jLabel1)))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(chTeamRating, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(lblTeamRating))
+                    .add(lblTeamRating)
+                    .add(jLabel2))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(lblTeamType)
-                    .add(chTeamType, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .add(lblTeamType)
                 .add(18, 18, 18)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(btnCancel)
@@ -164,9 +169,8 @@ public class NewTeamDialog extends javax.swing.JDialog {
 
 private void btnDoneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDoneActionPerformed
     int rating = chTeamRating.getSelectedIndex();
-    int type = chTeamType.getSelectedIndex();
     String name = txtTeamName.getText();
-    SupportTeam t = new SupportTeam(campaign, name, rating, type);
+    MedicalTeam t = new MedicalTeam(campaign, name, rating);
     campaign.addTeam(t);
     this.setVisible(false);
 }//GEN-LAST:event_btnDoneActionPerformed
@@ -185,7 +189,7 @@ private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                NewTeamDialog dialog = new NewTeamDialog(new javax.swing.JFrame(), true, null);
+                NewMedicalTeamDialog dialog = new NewMedicalTeamDialog(new javax.swing.JFrame(), true, null);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     public void windowClosing(java.awt.event.WindowEvent e) {
                         System.exit(0);
@@ -200,7 +204,8 @@ private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnDone;
     private javax.swing.JComboBox chTeamRating;
-    private javax.swing.JComboBox chTeamType;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel lblTeamName;
     private javax.swing.JLabel lblTeamRating;
     private javax.swing.JLabel lblTeamType;

@@ -31,14 +31,25 @@ public abstract class PersonnelWorkItem extends WorkItem {
 
     //the person for whom the work is being done
     protected Person person;
+    //how many patients this person counts for
+    protected int patients;
     
     public PersonnelWorkItem(Person p) {
         super();
         this.person = p;
+        this.patients = 1;
     }
     
     @Override
     public String getDisplayName() {
         return person.getDesc() + ": " + getName();
+    }
+    
+    public int getPatients() {
+        return patients;
+    }
+    
+    public void setPatients(int i) {
+        this.patients = i;
     }
 }

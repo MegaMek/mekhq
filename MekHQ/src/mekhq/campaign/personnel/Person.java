@@ -21,6 +21,7 @@
 
 package mekhq.campaign.personnel;
 
+import java.io.Serializable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.work.PersonnelWorkItem;
 
@@ -34,7 +35,7 @@ import mekhq.campaign.work.PersonnelWorkItem;
  * 5) Administrators/other staff?
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public abstract class Person {
+public abstract class Person implements Serializable {
     
     protected int id;
     //any existing work item for this person

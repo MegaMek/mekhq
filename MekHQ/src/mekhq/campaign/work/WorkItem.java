@@ -25,7 +25,7 @@ import java.io.Serializable;
 import megamek.common.Entity;
 import megamek.common.TargetRoll;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.SupportTeam;
+import mekhq.campaign.team.SupportTeam;
 import mekhq.campaign.Unit;
 
 /**

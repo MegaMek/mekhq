@@ -22,7 +22,7 @@
 package mekhq.campaign.personnel;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.SupportTeam;
+import mekhq.campaign.team.SupportTeam;
 
 /**
  * A person wrapper for support teams

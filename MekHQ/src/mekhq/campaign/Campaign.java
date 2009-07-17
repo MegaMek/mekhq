@@ -21,6 +21,7 @@
 
 package mekhq.campaign;
 
+import mekhq.campaign.team.SupportTeam;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -30,6 +31,7 @@ import megamek.common.Game;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PilotPerson;
 import mekhq.campaign.personnel.SupportPerson;
+import mekhq.campaign.team.MedicalTeam;
 import mekhq.campaign.work.UnitWorkItem;
 import mekhq.campaign.work.WorkItem;
 
@@ -161,7 +163,7 @@ public class Campaign implements Serializable {
     public ArrayList<SupportTeam> getDoctors() {
         ArrayList<SupportTeam> docs = new ArrayList<SupportTeam>();
         for(SupportTeam team : getTeams()) {
-            if(team.isDoctor()) {
+            if(team instanceof MedicalTeam) {
                   docs.add(team);
             }
         }

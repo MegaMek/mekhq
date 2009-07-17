@@ -22,7 +22,7 @@
 package mekhq;
 
 import java.awt.Font;
-import mekhq.campaign.SupportTeam;
+import mekhq.campaign.team.SupportTeam;
 import mekhq.campaign.Campaign;
 import javax.swing.ListModel;
 import javax.swing.event.ListSelectionEvent;
@@ -197,12 +197,13 @@ public class MekHQView extends FrameView {
         personnelList = new javax.swing.JList();
         jLabel3 = new javax.swing.JLabel();
         btnHirePilot = new javax.swing.JButton();
-        btnHireSupport = new javax.swing.JButton();
+        btnHireTech = new javax.swing.JButton();
         btnCustomizePerson = new javax.swing.JButton();
         jScrollPane3 = new javax.swing.JScrollPane();
         DoctorsList = new javax.swing.JList();
         btnAssignDoc = new javax.swing.JButton();
         jLabel4 = new javax.swing.JLabel();
+        btnHireDoctor = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         menuBar = new javax.swing.JMenuBar();
@@ -517,11 +518,11 @@ public class MekHQView extends FrameView {
             }
         });
 
-        btnHireSupport.setText(resourceMap.getString("btnHireSupport.text")); // NOI18N
-        btnHireSupport.setName("btnHireSupport"); // NOI18N
-        btnHireSupport.addActionListener(new java.awt.event.ActionListener() {
+        btnHireTech.setText(resourceMap.getString("btnHireTech.text")); // NOI18N
+        btnHireTech.setName("btnHireTech"); // NOI18N
+        btnHireTech.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnHireSupportActionPerformed(evt);
+                btnHireTechActionPerformed(evt);
             }
         });
 
@@ -552,6 +553,14 @@ public class MekHQView extends FrameView {
         jLabel4.setText(resourceMap.getString("jLabel4.text")); // NOI18N
         jLabel4.setName("jLabel4"); // NOI18N
 
+        btnHireDoctor.setText(resourceMap.getString("btnHireDoctor.text")); // NOI18N
+        btnHireDoctor.setName("btnHireDoctor"); // NOI18N
+        btnHireDoctor.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnHireDoctorActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout panPersonnelLayout = new org.jdesktop.layout.GroupLayout(panPersonnel);
         panPersonnel.setLayout(panPersonnelLayout);
         panPersonnelLayout.setHorizontalGroup(
@@ -562,17 +571,19 @@ public class MekHQView extends FrameView {
                     .add(panPersonnelLayout.createSequentialGroup()
                         .add(jScrollPane2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 384, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(panPersonnelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
-                            .add(btnAssignDoc, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .add(btnCustomizePerson, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .add(btnHirePilot, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .add(btnHireSupport, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .add(18, 18, 18)
+                        .add(panPersonnelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(btnAssignDoc, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 156, Short.MAX_VALUE)
+                            .add(btnCustomizePerson, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 156, Short.MAX_VALUE)
+                            .add(btnHirePilot, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 156, Short.MAX_VALUE)
+                            .add(btnHireDoctor, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 156, Short.MAX_VALUE)
+                            .add(org.jdesktop.layout.GroupLayout.TRAILING, btnHireTech, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 156, Short.MAX_VALUE))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(panPersonnelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(jScrollPane3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 390, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(jLabel4)))
+                            .add(jLabel4))
+                        .add(101, 101, 101))
                     .add(jLabel3))
-                .addContainerGap(220, Short.MAX_VALUE))
+                .add(128, 128, 128))
         );
         panPersonnelLayout.setVerticalGroup(
             panPersonnelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -583,17 +594,22 @@ public class MekHQView extends FrameView {
                 .add(panPersonnelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 650, Short.MAX_VALUE)
                     .add(panPersonnelLayout.createSequentialGroup()
-                        .add(btnHirePilot)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                        .add(btnHireSupport)
-                        .add(18, 18, 18)
-                        .add(btnCustomizePerson)
-                        .add(18, 18, 18)
-                        .add(panPersonnelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                        .add(panPersonnelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(panPersonnelLayout.createSequentialGroup()
+                                .add(btnHirePilot)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(btnHireTech)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(btnHireDoctor)
+                                .add(27, 27, 27)
+                                .add(btnCustomizePerson)
+                                .add(18, 18, 18))
+                            .add(org.jdesktop.layout.GroupLayout.TRAILING, panPersonnelLayout.createSequentialGroup()
+                                .add(jLabel4)
+                                .add(3, 3, 3)))
+                        .add(panPersonnelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(btnAssignDoc)
-                            .add(jLabel4))
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jScrollPane3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                            .add(jScrollPane3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap())
         );
 
@@ -718,7 +734,7 @@ public class MekHQView extends FrameView {
     }// </editor-fold>//GEN-END:initComponents
 
 private void btnNewTeamActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewTeamActionPerformed
-    NewTeamDialog ntd = new NewTeamDialog(this.getFrame(), true, campaign);
+    NewTechTeamDialog ntd = new NewTechTeamDialog(this.getFrame(), true, campaign);
     ntd.setVisible(true);
     refreshTeamsList();
     refreshDoctorsList();
@@ -821,13 +837,12 @@ private void btnViewUnitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
   mvd.setVisible(true);
 }//GEN-LAST:event_btnViewUnitActionPerformed
 
-private void btnHireSupportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHireSupportActionPerformed
-    NewTeamDialog ntd = new NewTeamDialog(this.getFrame(), true, campaign);
+private void btnHireTechActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHireTechActionPerformed
+    NewTechTeamDialog ntd = new NewTechTeamDialog(this.getFrame(), true, campaign);
     ntd.setVisible(true);
     refreshTeamsList();
-    refreshDoctorsList();
     refreshPersonnelList();
-}//GEN-LAST:event_btnHireSupportActionPerformed
+}//GEN-LAST:event_btnHireTechActionPerformed
 
 private void btnHirePilotActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHirePilotActionPerformed
     NewPilotDialog npd = new NewPilotDialog(this.getFrame(), true, campaign);
@@ -897,6 +912,14 @@ private void personnelListValueChanged(javax.swing.event.ListSelectionEvent evt)
     }
     updateAssignDoctorEnabled();
 }//GEN-LAST:event_personnelListValueChanged
+
+private void btnHireDoctorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHireDoctorActionPerformed
+    NewMedicalTeamDialog nmd = new NewMedicalTeamDialog(this.getFrame(), true, campaign);
+    nmd.setVisible(true);
+    refreshTeamsList();
+    refreshPersonnelList();
+    refreshDoctorsList();
+}//GEN-LAST:event_btnHireDoctorActionPerformed
 
 protected void loadListFile() {
     JFileChooser loadList = new JFileChooser(".");
@@ -1092,8 +1115,9 @@ protected void updateAmmoSwapEnabled() {
     private javax.swing.JButton btnChangePilot;
     private javax.swing.JButton btnCustomizePerson;
     private javax.swing.JButton btnDeployUnits;
+    private javax.swing.JButton btnHireDoctor;
     private javax.swing.JButton btnHirePilot;
-    private javax.swing.JButton btnHireSupport;
+    private javax.swing.JButton btnHireTech;
     private javax.swing.JButton btnNewTeam;
     private javax.swing.JButton btnPurchaseUnit;
     private javax.swing.JButton btnRemovePilot;
