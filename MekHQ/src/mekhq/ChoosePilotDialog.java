@@ -40,13 +40,14 @@ public class ChoosePilotDialog extends javax.swing.JDialog {
         choicePilot = new javax.swing.JComboBox();
         btnOkay = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
+        lblUnitName = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
 
         DefaultComboBoxModel pilotChoicesModel = new DefaultComboBoxModel();
         for(PilotPerson pp : pilots) {
-            pilotChoicesModel.addElement(pp.getPilot().getDesc());
+            pilotChoicesModel.addElement(pp.getDesc());
         }
         choicePilot.setModel(pilotChoicesModel);
         choicePilot.setName("choicePilot"); // NOI18N
@@ -68,28 +69,36 @@ public class ChoosePilotDialog extends javax.swing.JDialog {
             }
         });
 
+        lblUnitName.setText("Choose pilot for " + unit.getEntity().getDisplayName());
+        lblUnitName.setName("lblUnitName"); // NOI18N
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(layout.createSequentialGroup()
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
                         .addContainerGap()
-                        .add(choicePilot, 0, 366, Short.MAX_VALUE))
-                    .add(layout.createSequentialGroup()
+                        .add(lblUnitName, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 360, Short.MAX_VALUE))
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, layout.createSequentialGroup()
                         .add(108, 108, 108)
                         .add(btnOkay)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(btnCancel)))
                 .addContainerGap())
+            .add(layout.createSequentialGroup()
+                .addContainerGap()
+                .add(choicePilot, 0, 363, Short.MAX_VALUE)
+                .add(20, 20, 20))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
-                .addContainerGap()
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+                .add(lblUnitName, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 25, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(choicePilot, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 32, Short.MAX_VALUE)
+                .add(15, 15, 15)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(btnOkay)
                     .add(btnCancel))
@@ -132,6 +141,7 @@ private void btnOkayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnOkay;
     private javax.swing.JComboBox choicePilot;
+    private javax.swing.JLabel lblUnitName;
     // End of variables declaration//GEN-END:variables
 
 }
