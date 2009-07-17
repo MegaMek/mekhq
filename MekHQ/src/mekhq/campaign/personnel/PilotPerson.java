@@ -27,7 +27,9 @@ import megamek.common.Mech;
 import megamek.common.Pilot;
 import megamek.common.Protomech;
 import megamek.common.Tank;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.Unit;
+import mekhq.campaign.work.HealPilot;
 
 /**
  * A Person wrapper for pilots and vee crews
@@ -118,11 +120,15 @@ public class PilotPerson extends Person {
 
     @Override
     public String getDesc() {
+        String care = "";
+        if(null != getTask() && getTask().isUnassigned()) {
+            care = "*";
+        }
         String status = "";
         if(pilot.getHits() > 0) {
             status = " (" + pilot.getStatusDesc() + ")";
         }
-        return pilot.getName() + " [" + pilot.getGunnery() + "/" + pilot.getPiloting() + " " + getTypeDesc() + "]" + status; 
+        return care + pilot.getName() + " [" + pilot.getGunnery() + "/" + pilot.getPiloting() + " " + getTypeDesc() + "]" + status; 
     }
     
     public boolean isAssigned() {
@@ -135,5 +141,14 @@ public class PilotPerson extends Person {
     
     public void setAssignedUnit(Unit u) {
         this.unit = u;
+    }
+    
+    @Override
+    public void runDiagnostic(Campaign campaign) {
+        if(pilot.getHits() > 0) {
+            setTask(new HealPilot(this));
+            campaign.addWork(getTask());
+            
+        }
     }
 }

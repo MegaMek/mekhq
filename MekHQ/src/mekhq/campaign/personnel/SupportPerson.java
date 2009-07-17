@@ -21,6 +21,7 @@
 
 package mekhq.campaign.personnel;
 
+import mekhq.campaign.Campaign;
 import mekhq.campaign.SupportTeam;
 
 /**
@@ -47,6 +48,11 @@ public class SupportPerson extends Person {
             casualties = " (" + team.getCasualties() + " casualties) ";
         }
         return team.getName() + " [" + team.getRatingName() + " " + team.getTypeDesc() + "]"  + casualties ;
+    }
+
+    @Override
+    public void runDiagnostic(Campaign campaign) {
+        //TODO: implement
     }
 
     

@@ -21,6 +21,9 @@
 
 package mekhq.campaign.personnel;
 
+import mekhq.campaign.Campaign;
+import mekhq.campaign.work.PersonnelWorkItem;
+
 /**
  * This is an abstract class for verious types of personnel
  * The personnel types themselves will be various wrappers for 
@@ -34,6 +37,8 @@ package mekhq.campaign.personnel;
 public abstract class Person {
     
     protected int id;
+    //any existing work item for this person
+    protected PersonnelWorkItem task;
     
     //default constructor
     public Person() {
@@ -49,4 +54,14 @@ public abstract class Person {
     public int getId() {
         return id;
     }
+    
+    public void setTask(PersonnelWorkItem task) {
+        this.task = task;
+    }
+    
+    public PersonnelWorkItem getTask() {
+        return task;
+    }
+    
+    public abstract void runDiagnostic(Campaign campaign);
 }

@@ -30,6 +30,7 @@ import megamek.common.Entity;
 import megamek.common.Mech;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
+import mekhq.campaign.work.PersonnelWorkItem;
 import mekhq.campaign.work.RepairItem;
 import mekhq.campaign.work.ReplacementItem;
 import mekhq.campaign.work.UnitWorkItem;
@@ -208,14 +209,15 @@ public class SupportTeam implements Serializable {
    
    public boolean canDo(WorkItem task) {
        if(type == T_DOCTOR) {
-           //TODO: need to update this when I add medical tasks
-           return false;
+           return (task instanceof PersonnelWorkItem);
        }
        return task.isNeeded() && task.getSkillMin() <= getRating();
    } 
    
    public int makeRoll(WorkItem task) {
-       if(task instanceof UnitWorkItem && isRightType(((UnitWorkItem)task).getUnit().getEntity())) {
+       if(task instanceof PersonnelWorkItem) {
+           return Compute.d6(2);
+       } else if(task instanceof UnitWorkItem && isRightType(((UnitWorkItem)task).getUnit().getEntity())) {
            return Compute.d6(2);
        } else {
            return Utilities.roll3d6();

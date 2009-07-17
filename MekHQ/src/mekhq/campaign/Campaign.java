@@ -142,6 +142,8 @@ public class Campaign implements Serializable {
         personnel.add(p);
         personnelIds.put(new Integer(id), p);
         lastPersonId = id;
+        //check for any work items on this person
+        p.runDiagnostic(this);
     }
     
     public ArrayList<Person> getPersonnel() {
@@ -154,6 +156,16 @@ public class Campaign implements Serializable {
     
     public ArrayList<String> getCurrentReport() {
         return currentReport;
+    }
+    
+    public ArrayList<SupportTeam> getDoctors() {
+        ArrayList<SupportTeam> docs = new ArrayList<SupportTeam>();
+        for(SupportTeam team : getTeams()) {
+            if(team.isDoctor()) {
+                  docs.add(team);
+            }
+        }
+        return docs;
     }
     
     public ArrayList<WorkItem> getTasksForUnit(int unitId) {
