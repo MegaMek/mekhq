@@ -85,7 +85,6 @@ public class Campaign implements Serializable {
         return teamIds.get(new Integer(id));
     }
     
-     
     public void addUnit(Entity en) {
         //TODO: check for duplicate display names
         int id = lastUnitId + 1;
@@ -236,7 +235,7 @@ public class Campaign implements Serializable {
         this.tasks = newTasks;
     }
     
-    public void clearUnits() {
+    public void clearAllUnits() {
         this.units = new ArrayList<Unit>();
         this.unitIds = new Hashtable<Integer, Unit>();
         this.lastUnitId = 0;
@@ -245,6 +244,33 @@ public class Campaign implements Serializable {
         this.taskIds = new Hashtable<Integer, WorkItem>();
         this.lastTaskId = 0;
         
+    }
+    
+    public void removeUnit(int id) {
+        //remove any tasks associated with this unit
+
+        for(WorkItem task : getTasksForUnit(id)) {
+            tasks.remove(task);
+            tasks.remove(new Integer(task.getId()));
+        }
+        
+        //also remove any pilot assigned to this unit
+        Person pilot = null;
+        for(Person p : getPersonnel()) {
+            if(p instanceof PilotPerson && ((PilotPerson)p).getAssignedUnit().getId() == id) {
+                pilot = p;
+                break;
+            }
+        }
+        if(null != pilot) {
+            personnel.remove(pilot);
+            personnelIds.remove(pilot.getId());
+        }
+        
+        Unit unit = getUnit(id);
+        //finally remove the unit
+        units.remove(unit);
+        unitIds.remove(new Integer(unit.getId()));      
     }
     
 }

@@ -38,6 +38,7 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Vector;
 import javax.swing.DefaultListModel;
 import javax.swing.Timer;
@@ -234,7 +235,6 @@ public class MekHQView extends FrameView {
 
         UnitList.setBackground(resourceMap.getColor("UnitList.background")); // NOI18N
         UnitList.setModel(unitsModel);
-        UnitList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         UnitList.setName("UnitList"); // NOI18N
         UnitList.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
             public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
@@ -840,13 +840,27 @@ protected void loadListFile() {
 }
 
 protected void saveListFile() {
+    if(UnitList.getSelectedIndex() == -1) {
+        return;
+    }
+    
+    ArrayList<Entity> chosen = new ArrayList<Entity>();
+    ArrayList<Integer> toRemove = new ArrayList<Integer>();
+    for(int i : UnitList.getSelectedIndices()) {
+        Unit u = campaign.getUnits().get(i);
+        if(u.hasPilot() && null != u.getEntity()) {
+            chosen.add(u.getEntity());
+            toRemove.add(u.getId());
+        }
+    }
+    
     JFileChooser saveList = new JFileChooser(".");
     int returnVal = saveList.showSaveDialog(mainPanel);
     if ((returnVal != JFileChooser.APPROVE_OPTION) || (saveList.getSelectedFile() == null)) {
        // I want a file, y'know!
        return;
     }
-    
+ 
     File unitFile = saveList.getSelectedFile();
     if (unitFile != null) {
             if (!(unitFile.getName().toLowerCase().endsWith(".mul") //$NON-NLS-1$
@@ -861,15 +875,19 @@ protected void saveListFile() {
             try {
                 // Save the player's entities to the file.
                 //FIXME: this is not working
-                EntityListFile.saveTo(unitFile, campaign.getEntities());
+                EntityListFile.saveTo(unitFile, chosen);
                 //clear the entities, so that if the user wants to read them back you wont get duplicates
-                campaign.clearUnits();
+                //The removeUnit method will also remove tasks and pilots associated with this unit
+                for(int id: toRemove) {
+                    campaign.removeUnit(id);
+                }
                 
             } catch (IOException excep) {
                 excep.printStackTrace(System.err);
             }
     }
     refreshUnitList();
+    refreshPersonnelList();
 }
     
 protected void refreshUnitList() {
