@@ -32,6 +32,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PilotPerson;
 import mekhq.campaign.personnel.SupportPerson;
 import mekhq.campaign.team.MedicalTeam;
+import mekhq.campaign.team.TechTeam;
 import mekhq.campaign.work.UnitWorkItem;
 import mekhq.campaign.work.WorkItem;
 
@@ -168,6 +169,16 @@ public class Campaign implements Serializable {
             }
         }
         return docs;
+    }
+    
+    public ArrayList<SupportTeam> getTechTeams() {
+        ArrayList<SupportTeam> techs = new ArrayList<SupportTeam>();
+        for(SupportTeam team : getTeams()) {
+            if(team instanceof TechTeam) {
+                  techs.add(team);
+            }
+        }
+        return techs;
     }
     
     public ArrayList<WorkItem> getTasksForUnit(int unitId) {

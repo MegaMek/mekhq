@@ -72,12 +72,12 @@ public class MekHQView extends FrameView {
     private Campaign campaign = new Campaign();
     private DefaultListModel unitsModel = new DefaultListModel();
     private DefaultListModel taskModel = new DefaultListModel();
-    private DefaultListModel teamsModel = new DefaultListModel();
+    private DefaultListModel techsModel = new DefaultListModel();
     private DefaultListModel personnelModel = new DefaultListModel();
     private DefaultListModel doctorsModel = new DefaultListModel();
     private int currentUnitId;
     private int currentTaskId;
-    private int currentTeamId;
+    private int currentTechId;
     private int currentPersonId;
     private int currentDoctorId;
     
@@ -232,6 +232,7 @@ public class MekHQView extends FrameView {
             }
         });
 
+        panFinances.setToolTipText(resourceMap.getString("panFinances.toolTipText")); // NOI18N
         panFinances.setName("panFinances"); // NOI18N
 
         panHangar.setName("panHangar"); // NOI18N
@@ -318,7 +319,7 @@ public class MekHQView extends FrameView {
 
         jScrollPane1.setName("jScrollPane1"); // NOI18N
 
-        TeamsList.setModel(teamsModel);
+        TeamsList.setModel(techsModel);
         TeamsList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         TeamsList.setName("TeamsList"); // NOI18N
         TeamsList.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
@@ -758,7 +759,7 @@ private void UnitListValueChanged(javax.swing.event.ListSelectionEvent evt) {//G
 
 private void assignBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_assignBtnActionPerformed
     //assign the task to the team here
-    campaign.assignTask(currentTeamId, currentTaskId);
+    campaign.assignTask(currentTechId, currentTaskId);
     int next = TaskList.getSelectedIndex() + 1;
     refreshUnitList();
     refreshTaskList();
@@ -783,10 +784,10 @@ private void TaskListValueChanged(javax.swing.event.ListSelectionEvent evt) {//G
 private void TeamsListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_TeamsListValueChanged
     int selected = TeamsList.getSelectedIndex();
     if(selected > -1 && selected < campaign.getTeams().size()) {
-        currentTeamId = campaign.getTeams().get(selected).getId();
+        currentTechId = campaign.getTechTeams().get(selected).getId();
     }
     else if(selected < 0) {
-        currentTeamId = -1;
+        currentTechId = -1;
     }
     updateAssignEnabled();
     updateReplaceEnabled();
@@ -1020,10 +1021,10 @@ protected void refreshTaskList() {
 
 protected void refreshTeamsList() {
     int selected = TeamsList.getSelectedIndex();
-    teamsModel.removeAllElements();
+    techsModel.removeAllElements();
     int len = 0;
-    for(SupportTeam team : campaign.getTeams()) {
-        teamsModel.addElement(team.getDesc());
+    for(SupportTeam team : campaign.getTechTeams()) {
+        techsModel.addElement(team.getDesc());
         len++;
     }
     if(selected < len) {
@@ -1060,7 +1061,7 @@ protected void refreshPersonnelList() {
 protected void updateAssignEnabled() {
     //must have a valid team and an unassigned task
     WorkItem curTask = campaign.getTask(currentTaskId);
-    SupportTeam team = campaign.getTeam(currentTeamId);
+    SupportTeam team = campaign.getTeam(currentTechId);
     if(null != curTask && curTask.getTeamId() == WorkItem.TEAM_NONE && null != team && team.canDo(curTask)) {
         assignBtn.setEnabled(true);
     } else {
