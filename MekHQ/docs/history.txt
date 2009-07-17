@@ -1,6 +1,11 @@
 VERSION HISTORY
 ----------------------------------
 v0.0.1 (SVN)
++ list of personnel
++ SupportPerson class
++ PilotPerson class
++ Person class
++ Personnel tab
 + embedded main panel in tabbed pane
 + improve reporting of full ammo reloads
 + Show entity name in task report

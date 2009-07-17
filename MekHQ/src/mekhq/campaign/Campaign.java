@@ -27,6 +27,9 @@ import java.util.Hashtable;
 import megamek.common.Entity;
 
 import megamek.common.Game;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PilotPerson;
+import mekhq.campaign.personnel.SupportPerson;
 import mekhq.campaign.work.WorkItem;
 
 /**
@@ -45,10 +48,13 @@ public class Campaign implements Serializable {
     private Hashtable<Integer, Unit> unitIds = new Hashtable<Integer, Unit>();
     private ArrayList<WorkItem> tasks = new ArrayList<WorkItem>();
     private Hashtable<Integer, WorkItem> taskIds = new Hashtable<Integer, WorkItem>();
+    private ArrayList<Person> personnel = new ArrayList<Person>();
+    private Hashtable<Integer, Person> personnelIds = new Hashtable<Integer, Person>();
     
     private int lastTeamId;
     private int lastUnitId;
     private int lastTaskId;
+    private int lastPersonId;
     
     private ArrayList<String> currentReport = new ArrayList<String>();
     
@@ -68,6 +74,7 @@ public class Campaign implements Serializable {
         teams.add(t);
         teamIds.put(new Integer(id), t);
         lastTeamId = id;
+        addPerson(new SupportPerson(t));
     }
     
     public ArrayList<SupportTeam> getTeams() {
@@ -88,6 +95,10 @@ public class Campaign implements Serializable {
         units.add(unit);
         unitIds.put(new Integer(id), unit);
         lastUnitId = id;
+        //check for pilot
+        if(null != en.getCrew()) {
+            addPerson(new PilotPerson(en.getCrew(), PilotPerson.getType(en)));
+        }
         //collect all the work items outstanding on this unit and add them to the workitem vector
         unit.runDiagnostic(this);
     }
@@ -123,6 +134,22 @@ public class Campaign implements Serializable {
     
     public WorkItem getTask(int id) {
         return taskIds.get(new Integer(id));
+    }
+    
+    public void addPerson(Person p) {
+        int id = lastPersonId + 1;
+        p.setId(id);
+        personnel.add(p);
+        personnelIds.put(new Integer(id), p);
+        lastPersonId = id;
+    }
+    
+    public ArrayList<Person> getPersonnel() {
+        return personnel;
+    }
+    
+    public Person getPerson(int id) {
+        return personnelIds.get(new Integer(id));
     }
     
     public ArrayList<String> getCurrentReport() {
