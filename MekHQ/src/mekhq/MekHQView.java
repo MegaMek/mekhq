@@ -38,7 +38,10 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Vector;
 import javax.swing.DefaultListModel;
 import javax.swing.Timer;
@@ -83,12 +86,15 @@ public class MekHQView extends FrameView {
     
     private TaskReportDialog trd;
     
+    SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE, MMMM d yyyy");
     
     public MekHQView(SingleFrameApplication app) {
         super(app);
-
+      
         initComponents();
 
+        refreshCalendar();
+        
         trd = new TaskReportDialog(this.getFrame(), false);
         
         // status bar initialization - message timeout, idle icon and busy animation, etc
@@ -206,6 +212,7 @@ public class MekHQView extends FrameView {
         btnHireDoctor = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
+        lblDate = new javax.swing.JLabel();
         menuBar = new javax.swing.JMenuBar();
         javax.swing.JMenu fileMenu = new javax.swing.JMenu();
         menuLoad = new javax.swing.JMenuItem();
@@ -640,6 +647,9 @@ public class MekHQView extends FrameView {
 
         panFinances.addTab(resourceMap.getString("jPanel4.TabConstraints.tabTitle"), jPanel4); // NOI18N
 
+        lblDate.setText(resourceMap.getString("lblDate.text")); // NOI18N
+        lblDate.setName("lblDate"); // NOI18N
+
         org.jdesktop.layout.GroupLayout mainPanelLayout = new org.jdesktop.layout.GroupLayout(mainPanel);
         mainPanel.setLayout(mainPanelLayout);
         mainPanelLayout.setHorizontalGroup(
@@ -648,15 +658,20 @@ public class MekHQView extends FrameView {
                 .addContainerGap()
                 .add(mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(panFinances, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 1218, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(btnAdvanceDay))
-                .addContainerGap(21, Short.MAX_VALUE))
+                    .add(btnAdvanceDay)
+                    .add(mainPanelLayout.createSequentialGroup()
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(lblDate, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 284, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(18, Short.MAX_VALUE))
         );
         mainPanelLayout.setVerticalGroup(
             mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(mainPanelLayout.createSequentialGroup()
-                .add(18, 18, 18)
+                .addContainerGap()
+                .add(lblDate)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(btnAdvanceDay)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(panFinances, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -803,6 +818,7 @@ private void btnAdvanceDayActionPerformed(java.awt.event.ActionEvent evt) {//GEN
     refreshTeamsList();
     refreshPersonnelList();
     refreshDoctorsList();
+    refreshCalendar();
 }//GEN-LAST:event_btnAdvanceDayActionPerformed
 
 private void btnDeployUnitsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeployUnitsActionPerformed
@@ -1058,6 +1074,11 @@ protected void refreshPersonnelList() {
     }
 }
 
+protected void refreshCalendar() {
+    lblDate.setText(dateFormat.format(campaign.calendar.getTime()));
+    
+}
+
 protected void updateAssignEnabled() {
     //must have a valid team and an unassigned task
     WorkItem curTask = campaign.getTask(currentTaskId);
@@ -1133,6 +1154,7 @@ protected void updateAmmoSwapEnabled() {
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JLabel lblDate;
     private javax.swing.JLabel lblTasks;
     private javax.swing.JLabel lblTeams;
     private javax.swing.JLabel lblUnits;

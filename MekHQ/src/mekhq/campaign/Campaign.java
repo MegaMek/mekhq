@@ -23,7 +23,10 @@ package mekhq.campaign;
 
 import mekhq.campaign.team.SupportTeam;
 import java.io.Serializable;
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import megamek.common.Entity;
 
@@ -65,11 +68,16 @@ public class Campaign implements Serializable {
     //I need to put a basic game object in campaign so that I can
     //asssign it to the entities, otherwise some entity methods may get NPE
     //if they try to call up game options
-    Game game = new Game();
+    Game game;
     
+    //calendar stuff
+    public Calendar calendar;
     
     public Campaign() {
-        
+    
+        game = new Game();
+        calendar = new GregorianCalendar(3067, Calendar.JANUARY, 1);
+    
     }
     
     public void addTeam(SupportTeam t) {
@@ -260,6 +268,9 @@ public class Campaign implements Serializable {
             }
         }
         this.tasks = newTasks;
+        
+        //advance the calendar
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
     }
     
     public void clearAllUnits() {

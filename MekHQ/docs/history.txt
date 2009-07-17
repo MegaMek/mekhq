@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.0.1 (SVN)
++ Calendar
 + Campaign#getTechTeams and remove medical teams from hangar team list
 + refactor SupportTeam into TechTeam and MedicalTeam
 + assignment and processing of HealPilot work items
