@@ -97,7 +97,7 @@ public class Campaign implements Serializable {
         lastUnitId = id;
         //check for pilot
         if(null != en.getCrew()) {
-            addPerson(new PilotPerson(en.getCrew(), PilotPerson.getType(en)));
+            addPerson(new PilotPerson(en.getCrew(), PilotPerson.getType(en), unit));
         }
         //collect all the work items outstanding on this unit and add them to the workitem vector
         unit.runDiagnostic(this);

@@ -73,6 +73,10 @@
                                   <Component id="UnitsScroll" min="-2" pref="343" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="btnChangePilot" pref="202" max="32767" attributes="0"/>
+                                      <Component id="btnRemovePilot" pref="202" max="32767" attributes="0"/>
+                                      <Component id="btnSellUnit" pref="202" max="32767" attributes="0"/>
+                                      <Component id="btnPurchaseUnit" pref="202" max="32767" attributes="0"/>
                                       <Component id="btnViewUnit" pref="202" max="32767" attributes="1"/>
                                       <Component id="btnDeployUnits" alignment="0" pref="202" max="32767" attributes="1"/>
                                       <Component id="loadListBtn" alignment="1" pref="202" max="32767" attributes="1"/>
@@ -148,6 +152,14 @@
                                                   <Component id="btnDeployUnits" min="-2" max="-2" attributes="0"/>
                                                   <EmptySpace type="separate" max="-2" attributes="0"/>
                                                   <Component id="btnViewUnit" min="-2" max="-2" attributes="0"/>
+                                                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                                                  <Component id="btnPurchaseUnit" min="-2" max="-2" attributes="0"/>
+                                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                                  <Component id="btnSellUnit" min="-2" max="-2" attributes="0"/>
+                                                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                                                  <Component id="btnRemovePilot" min="-2" max="-2" attributes="0"/>
+                                                  <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                                  <Component id="btnChangePilot" min="-2" max="-2" attributes="0"/>
                                               </Group>
                                           </Group>
                                           <EmptySpace min="-2" pref="0" max="-2" attributes="0"/>
@@ -340,6 +352,38 @@
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnNewTeamActionPerformed"/>
                   </Events>
                 </Component>
+                <Component class="javax.swing.JButton" name="btnPurchaseUnit">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" resourceKey="btnPurchaseUnit.text"/>
+                    <Property name="enabled" type="boolean" value="false"/>
+                    <Property name="name" type="java.lang.String" value="btnPurchaseUnit" noResource="true"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JButton" name="btnSellUnit">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" resourceKey="btnSellUnit.text"/>
+                    <Property name="enabled" type="boolean" value="false"/>
+                    <Property name="name" type="java.lang.String" value="btnSellUnit" noResource="true"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JButton" name="btnRemovePilot">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" resourceKey="btnRemovePilot.text"/>
+                    <Property name="name" type="java.lang.String" value="btnRemovePilot" noResource="true"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnRemovePilotActionPerformed"/>
+                  </Events>
+                </Component>
+                <Component class="javax.swing.JButton" name="btnChangePilot">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" resourceKey="btnChangePilot.text"/>
+                    <Property name="name" type="java.lang.String" value="btnChangePilot" noResource="true"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnChangePilotActionPerformed"/>
+                  </Events>
+                </Component>
               </SubComponents>
             </Container>
             <Container class="javax.swing.JPanel" name="panSupplies">
@@ -469,6 +513,9 @@
                     <Property name="text" type="java.lang.String" resourceKey="btnHirePilot.text"/>
                     <Property name="name" type="java.lang.String" value="btnHirePilot" noResource="true"/>
                   </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnHirePilotActionPerformed"/>
+                  </Events>
                 </Component>
                 <Component class="javax.swing.JButton" name="btnHireSupport">
                   <Properties>
@@ -482,6 +529,7 @@
                 <Component class="javax.swing.JButton" name="btnCustomizePerson">
                   <Properties>
                     <Property name="text" type="java.lang.String" resourceKey="btnCustomizePerson.text"/>
+                    <Property name="enabled" type="boolean" value="false"/>
                     <Property name="name" type="java.lang.String" value="btnCustomizePerson" noResource="true"/>
                   </Properties>
                 </Component>

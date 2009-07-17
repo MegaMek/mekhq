@@ -29,6 +29,8 @@ import megamek.common.Entity;
 import megamek.common.Mech;
 import megamek.common.MiscType;
 import megamek.common.Mounted;
+import megamek.common.Pilot;
+import mekhq.campaign.personnel.PilotPerson;
 import mekhq.campaign.work.*;
 
 /**
@@ -214,6 +216,29 @@ public class Unit implements Serializable {
             }
         }
         return hits;
+    }
+    
+    public boolean hasPilot() {
+        return null != entity.getCrew();
+    }
+    
+    public void removePilot() {
+        entity.setCrew(null);
+    }
+    
+    public void changePilot(PilotPerson pp) {
+        if(pp.isAssigned()) {
+            pp.getAssignedUnit().removePilot();
+            pp.setAssignedUnit(this);
+        }
+        entity.setCrew(pp.getPilot());
+    }
+    
+    public String getPilotDesc() {
+        if(hasPilot()) {
+            return entity.getCrew().getName() + " " + entity.getCrew().getGunnery() + "/" + entity.getCrew().getPiloting();
+        }
+        return "NO PILOT";
     }
     
 }

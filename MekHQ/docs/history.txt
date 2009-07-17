@@ -1,6 +1,8 @@
 VERSION HISTORY
 ----------------------------------
 v0.0.1 (SVN)
++ allow pilot switching among units
++ hire new pilot dialog
 + list of personnel
 + SupportPerson class
 + PilotPerson class

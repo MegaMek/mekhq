@@ -54,8 +54,10 @@ import javax.swing.table.AbstractTableModel;
 import megamek.client.ui.MechView;
 import megamek.common.Entity;
 import megamek.common.EntityListFile;
+import megamek.common.Pilot;
 import mekhq.campaign.Unit;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PilotPerson;
 import mekhq.campaign.work.ReloadItem;
 import mekhq.campaign.work.RepairItem;
 import mekhq.campaign.work.WorkItem;
@@ -180,6 +182,10 @@ public class MekHQView extends FrameView {
         assignBtn = new javax.swing.JButton();
         lblTeams = new javax.swing.JLabel();
         btnNewTeam = new javax.swing.JButton();
+        btnPurchaseUnit = new javax.swing.JButton();
+        btnSellUnit = new javax.swing.JButton();
+        btnRemovePilot = new javax.swing.JButton();
+        btnChangePilot = new javax.swing.JButton();
         panSupplies = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         panPersonnel = new javax.swing.JPanel();
@@ -336,6 +342,30 @@ public class MekHQView extends FrameView {
             }
         });
 
+        btnPurchaseUnit.setText(resourceMap.getString("btnPurchaseUnit.text")); // NOI18N
+        btnPurchaseUnit.setEnabled(false);
+        btnPurchaseUnit.setName("btnPurchaseUnit"); // NOI18N
+
+        btnSellUnit.setText(resourceMap.getString("btnSellUnit.text")); // NOI18N
+        btnSellUnit.setEnabled(false);
+        btnSellUnit.setName("btnSellUnit"); // NOI18N
+
+        btnRemovePilot.setText(resourceMap.getString("btnRemovePilot.text")); // NOI18N
+        btnRemovePilot.setName("btnRemovePilot"); // NOI18N
+        btnRemovePilot.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRemovePilotActionPerformed(evt);
+            }
+        });
+
+        btnChangePilot.setText(resourceMap.getString("btnChangePilot.text")); // NOI18N
+        btnChangePilot.setName("btnChangePilot"); // NOI18N
+        btnChangePilot.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnChangePilotActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout panHangarLayout = new org.jdesktop.layout.GroupLayout(panHangar);
         panHangar.setLayout(panHangarLayout);
         panHangarLayout.setHorizontalGroup(
@@ -347,6 +377,10 @@ public class MekHQView extends FrameView {
                         .add(UnitsScroll, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 343, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(panHangarLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(btnChangePilot, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 202, Short.MAX_VALUE)
+                            .add(btnRemovePilot, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 202, Short.MAX_VALUE)
+                            .add(btnSellUnit, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 202, Short.MAX_VALUE)
+                            .add(btnPurchaseUnit, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 202, Short.MAX_VALUE)
                             .add(btnViewUnit, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 202, Short.MAX_VALUE)
                             .add(btnDeployUnits, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 202, Short.MAX_VALUE)
                             .add(org.jdesktop.layout.GroupLayout.TRAILING, loadListBtn, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 202, Short.MAX_VALUE))
@@ -405,7 +439,15 @@ public class MekHQView extends FrameView {
                                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                         .add(btnDeployUnits)
                                         .add(18, 18, 18)
-                                        .add(btnViewUnit)))
+                                        .add(btnViewUnit)
+                                        .add(18, 18, 18)
+                                        .add(btnPurchaseUnit)
+                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                                        .add(btnSellUnit)
+                                        .add(18, 18, 18)
+                                        .add(btnRemovePilot)
+                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                                        .add(btnChangePilot)))
                                 .add(0, 0, 0))
                             .add(org.jdesktop.layout.GroupLayout.LEADING, panHangarLayout.createSequentialGroup()
                                 .add(replaceBtn)
@@ -457,6 +499,11 @@ public class MekHQView extends FrameView {
 
         btnHirePilot.setText(resourceMap.getString("btnHirePilot.text")); // NOI18N
         btnHirePilot.setName("btnHirePilot"); // NOI18N
+        btnHirePilot.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnHirePilotActionPerformed(evt);
+            }
+        });
 
         btnHireSupport.setText(resourceMap.getString("btnHireSupport.text")); // NOI18N
         btnHireSupport.setName("btnHireSupport"); // NOI18N
@@ -467,6 +514,7 @@ public class MekHQView extends FrameView {
         });
 
         btnCustomizePerson.setText(resourceMap.getString("btnCustomizePerson.text")); // NOI18N
+        btnCustomizePerson.setEnabled(false);
         btnCustomizePerson.setName("btnCustomizePerson"); // NOI18N
 
         org.jdesktop.layout.GroupLayout panPersonnelLayout = new org.jdesktop.layout.GroupLayout(panPersonnel);
@@ -730,6 +778,42 @@ private void btnHireSupportActionPerformed(java.awt.event.ActionEvent evt) {//GE
     refreshPersonnelList();
 }//GEN-LAST:event_btnHireSupportActionPerformed
 
+private void btnHirePilotActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHirePilotActionPerformed
+    NewPilotDialog npd = new NewPilotDialog(this.getFrame(), true, campaign);
+    npd.setVisible(true);
+    refreshPersonnelList();
+}//GEN-LAST:event_btnHirePilotActionPerformed
+
+private void btnRemovePilotActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemovePilotActionPerformed
+   if(currentUnitId == -1) {
+      return;
+   }
+   campaign.getUnit(currentUnitId).removePilot();
+   refreshUnitList();
+}//GEN-LAST:event_btnRemovePilotActionPerformed
+
+private void btnChangePilotActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChangePilotActionPerformed
+    if(currentUnitId == -1) {
+      return;
+   }
+    Unit u = campaign.getUnit(currentUnitId);
+    Vector<PilotPerson> pilots = new Vector<PilotPerson>();
+    for(Person p : campaign.getPersonnel()) {
+        if(!(p instanceof PilotPerson)) {
+            continue;
+        }
+        PilotPerson pp = (PilotPerson)p;
+        if(pp.canPilot(u.getEntity())) {
+            pilots.add(pp);
+        }
+    }
+    if(pilots.size() > 0) {
+        ChoosePilotDialog cpd = new ChoosePilotDialog(this.getFrame(), true, u, pilots);
+        cpd.setVisible(true);
+        refreshUnitList();
+    }
+}//GEN-LAST:event_btnChangePilotActionPerformed
+
 protected void loadListFile() {
     JFileChooser loadList = new JFileChooser(".");
     int returnVal = loadList.showOpenDialog(mainPanel);
@@ -794,7 +878,7 @@ protected void refreshUnitList() {
     int len = 0;
     for(Unit unit: campaign.getUnits()) {
         campaign.getTasksForUnit(unit.getId());
-        unitsModel.addElement(unit.getEntity().getDisplayName() + campaign.getUnitTaskDesc(unit.getId()));
+        unitsModel.addElement(unit.getEntity().getDisplayName() + " [" + unit.getPilotDesc() + "] " + campaign.getUnitTaskDesc(unit.getId()));
         len++;
     }
     if(selected < len) {
@@ -875,11 +959,15 @@ protected void updateAmmoSwapEnabled() {
     private javax.swing.JButton ammoBtn;
     private javax.swing.JButton assignBtn;
     private javax.swing.JButton btnAdvanceDay;
+    private javax.swing.JButton btnChangePilot;
     private javax.swing.JButton btnCustomizePerson;
     private javax.swing.JButton btnDeployUnits;
     private javax.swing.JButton btnHirePilot;
     private javax.swing.JButton btnHireSupport;
     private javax.swing.JButton btnNewTeam;
+    private javax.swing.JButton btnPurchaseUnit;
+    private javax.swing.JButton btnRemovePilot;
+    private javax.swing.JButton btnSellUnit;
     private javax.swing.JButton btnViewUnit;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;

@@ -27,6 +27,7 @@ import megamek.common.Mech;
 import megamek.common.Pilot;
 import megamek.common.Protomech;
 import megamek.common.Tank;
+import mekhq.campaign.Unit;
 
 /**
  * A Person wrapper for pilots and vee crews
@@ -34,14 +35,15 @@ import megamek.common.Tank;
  */
 public class PilotPerson extends Person {
 
-    private static final int T_MECH = 0;
-    private static final int T_VEE = 1;
-    private static final int T_AERO = 2;
-    private static final int T_PROTO = 3;
-    private static final int T_NUM = 4;
+    public static final int T_MECH = 0;
+    public static final int T_VEE = 1;
+    public static final int T_AERO = 2;
+    public static final int T_PROTO = 3;
+    public static final int T_NUM = 4;
     
     private Pilot pilot;
     private int type;
+    private Unit unit;
     
     public PilotPerson(Pilot p, int t) {
         super();
@@ -49,11 +51,18 @@ public class PilotPerson extends Person {
         this.type = t;
     }
     
+    public PilotPerson(Pilot p, int t, Unit u) {
+        super();
+        this.pilot = p;
+        this.type = t;
+        this.unit = u;
+    }
+    
     public int getType() {
         return type;
     }
     
-    public String getTypeDesc() {
+    public static String getTypeDesc(int type) {
         switch(type) {
             case(T_MECH):
                 return "Mechwarrior";
@@ -68,6 +77,9 @@ public class PilotPerson extends Person {
         }
     }
     
+    public String getTypeDesc() {
+        return getTypeDesc(type);
+    }
     public static int getType(Entity en) {
         if(en instanceof Mech) {
             return T_MECH;
@@ -84,6 +96,22 @@ public class PilotPerson extends Person {
         return -1;
     }
     
+    public boolean canPilot(Entity en) {
+        if(en instanceof Mech && type == T_MECH) {
+            return true;
+        }
+        else if(en instanceof Protomech && type == T_PROTO) {
+            return true;
+        } 
+        else if(en instanceof Aero && type == T_AERO) {
+            return true;
+        }
+        else if(en instanceof Tank && type == T_VEE) {
+            return true;
+        }
+        return false;
+    }
+    
     public Pilot getPilot() {
         return pilot;
     }
@@ -97,5 +125,15 @@ public class PilotPerson extends Person {
         return pilot.getName() + " [" + pilot.getGunnery() + "/" + pilot.getPiloting() + " " + getTypeDesc() + "]" + status; 
     }
     
+    public boolean isAssigned() {
+        return null != unit;
+    }
     
+    public Unit getAssignedUnit() {
+        return unit;
+    }
+    
+    public void setAssignedUnit(Unit u) {
+        this.unit = u;
+    }
 }

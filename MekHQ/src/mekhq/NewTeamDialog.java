@@ -31,7 +31,7 @@ import javax.swing.DefaultComboBoxModel;
  */
 public class NewTeamDialog extends javax.swing.JDialog {
 
-    Campaign campaign;
+    private Campaign campaign;
     
     /** Creates new form NewTeamDialog */
     public NewTeamDialog(java.awt.Frame parent, boolean modal, Campaign c) {
