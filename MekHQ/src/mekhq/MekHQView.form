@@ -14,7 +14,7 @@
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="panFinances" alignment="0" pref="1220" max="32767" attributes="0"/>
+                      <Component id="panFinances" alignment="0" pref="1159" max="32767" attributes="0"/>
                       <Component id="btnAdvanceDay" alignment="0" min="-2" max="-2" attributes="0"/>
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
@@ -90,26 +90,28 @@
                                   </Group>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="assignBtn" alignment="0" min="-2" max="-2" attributes="0"/>
-                                      <Component id="jScrollPane1" pref="532" max="32767" attributes="1"/>
-                                      <Component id="lblTeams" min="-2" max="-2" attributes="0"/>
                                       <Component id="lblTasks" min="-2" pref="197" max="-2" attributes="0"/>
-                                      <Component id="jScrollPane4" alignment="0" pref="532" max="32767" attributes="1"/>
+                                      <Component id="assignBtn" min="-2" max="-2" attributes="0"/>
+                                      <Group type="102" alignment="0" attributes="0">
+                                          <Group type="103" groupAlignment="0" attributes="0">
+                                              <Component id="jScrollPane1" pref="475" max="32767" attributes="1"/>
+                                              <Component id="jScrollPane4" alignment="0" min="-2" pref="475" max="-2" attributes="1"/>
+                                              <Component id="lblTeams" min="-2" max="-2" attributes="0"/>
+                                          </Group>
+                                          <EmptySpace max="-2" attributes="0"/>
+                                          <Group type="103" groupAlignment="0" attributes="0">
+                                              <Component id="replaceBtn" min="-2" pref="121" max="-2" attributes="1"/>
+                                              <Component id="btnNewTeam" min="-2" pref="121" max="-2" attributes="1"/>
+                                              <Component id="ammoBtn" min="-2" max="-2" attributes="1"/>
+                                          </Group>
+                                      </Group>
                                   </Group>
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="jTabbedPane1" min="-2" max="-2" attributes="0"/>
-                                      <Component id="ammoBtn" alignment="0" min="-2" max="-2" attributes="1"/>
-                                      <Component id="replaceBtn" min="-2" pref="121" max="-2" attributes="1"/>
-                                      <Component id="btnNewTeam" min="-2" pref="121" max="-2" attributes="1"/>
-                                  </Group>
+                                  <EmptySpace min="-2" pref="139" max="-2" attributes="0"/>
+                                  <Component id="jTabbedPane1" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <Group type="102" alignment="0" attributes="0">
-                                  <Component id="lblUnits" min="-2" pref="156" max="-2" attributes="0"/>
-                                  <EmptySpace min="-2" pref="347" max="-2" attributes="0"/>
-                              </Group>
+                              <Component id="lblUnits" alignment="0" min="-2" pref="156" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace min="-2" pref="26" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" pref="126" max="-2" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -120,7 +122,8 @@
                           <Component id="lblUnits" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                              <Group type="102" attributes="0">
+                              <Component id="UnitsScroll" max="32767" attributes="1"/>
+                              <Group type="102" alignment="0" attributes="0">
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Group type="102" alignment="0" attributes="0">
                                           <Component id="loadListBtn" min="-2" max="-2" attributes="0"/>
@@ -137,32 +140,36 @@
                                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                           <Component id="btnChangePilot" min="-2" max="-2" attributes="0"/>
                                       </Group>
-                                      <Group type="102" alignment="0" attributes="0">
-                                          <Component id="jTabbedPane1" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace max="-2" attributes="0"/>
-                                          <Component id="ammoBtn" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace max="-2" attributes="0"/>
-                                          <Component id="replaceBtn" min="-2" max="-2" attributes="0"/>
-                                      </Group>
-                                      <Group type="102" alignment="0" attributes="0">
-                                          <Component id="lblTasks" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace min="-2" pref="5" max="-2" attributes="0"/>
-                                          <Component id="jScrollPane4" min="-2" pref="252" max="-2" attributes="0"/>
-                                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                      <Group type="102" attributes="0">
+                                          <Group type="103" groupAlignment="0" attributes="0">
+                                              <Component id="jTabbedPane1" min="-2" max="-2" attributes="0"/>
+                                              <Group type="102" alignment="0" attributes="0">
+                                                  <Component id="lblTasks" min="-2" max="-2" attributes="0"/>
+                                                  <EmptySpace max="-2" attributes="0"/>
+                                                  <Group type="103" groupAlignment="0" attributes="0">
+                                                      <Group type="102" alignment="0" attributes="0">
+                                                          <Component id="ammoBtn" min="-2" max="-2" attributes="0"/>
+                                                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                                          <Component id="replaceBtn" min="-2" max="-2" attributes="0"/>
+                                                      </Group>
+                                                      <Component id="jScrollPane4" alignment="0" min="-2" pref="224" max="-2" attributes="0"/>
+                                                  </Group>
+                                              </Group>
+                                          </Group>
+                                          <EmptySpace min="-2" pref="7" max="-2" attributes="0"/>
                                           <Component id="assignBtn" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                   </Group>
-                                  <EmptySpace min="-2" pref="9" max="-2" attributes="0"/>
+                                  <EmptySpace min="-2" pref="11" max="-2" attributes="0"/>
                                   <Component id="lblTeams" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Component id="btnNewTeam" min="-2" max="-2" attributes="0"/>
-                                      <Component id="jScrollPane1" alignment="0" min="-2" pref="258" max="-2" attributes="1"/>
+                                      <Component id="jScrollPane1" alignment="0" min="-2" pref="232" max="-2" attributes="1"/>
                                   </Group>
                               </Group>
-                              <Component id="UnitsScroll" max="32767" attributes="1"/>
                           </Group>
-                          <EmptySpace pref="37" max="32767" attributes="0"/>
+                          <EmptySpace pref="86" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -357,21 +364,12 @@
                     <Component class="javax.swing.JTable" name="TaskTable">
                       <Properties>
                         <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                          <Connection code="workModel" type="code"/>
-                        </Property>
-                        <Property name="autoResizeMode" type="int" value="1"/>
-                        <Property name="columnModel" type="javax.swing.table.TableColumnModel" editor="org.netbeans.modules.form.editors2.TableColumnModelEditor">
-                          <TableColumnModel selectionModel="0"/>
+                          <Connection code="taskModel" type="code"/>
                         </Property>
                         <Property name="name" type="java.lang.String" value="TaskTable" noResource="true"/>
-                        <Property name="tableHeader" type="javax.swing.table.JTableHeader" editor="org.netbeans.modules.form.editors2.JTableHeaderEditor">
-                          <TableHeader reorderingAllowed="true" resizingAllowed="true"/>
-                        </Property>
                       </Properties>
                       <AuxValues>
-                        <AuxValue name="JavaCodeGenerator_AddingCodePre" type="java.lang.String" value="TaskTable.getSelectionModel().addListSelectionListener(new javax.swing.event.ListSelectionListener() {&#xa;            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {&#xa;                TaskTableValueChanged(evt);&#xa;            }&#xa;        });&#xa;TaskTable.getColumnModel().getColumn(WorkTableModel.NAME_INDEX).setPreferredWidth(250);&#xa;TaskTable.getColumnModel().getColumn(WorkTableModel.TIME_INDEX).setPreferredWidth(10);&#xa;TaskTable.getColumnModel().getColumn(WorkTableModel.SKILL_INDEX).setPreferredWidth(40);&#xa;TaskTable.getColumnModel().getColumn(WorkTableModel.MOD_INDEX).setPreferredWidth(10);&#xa;TaskTable.getColumnModel().getColumn(WorkTableModel.ASSIGN_INDEX).setPreferredWidth(150);&#xa;&#xa;&#xa;&#xa;"/>
-                        <AuxValue name="JavaCodeGenerator_VariableLocal" type="java.lang.Boolean" value="true"/>
-                        <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="0"/>
+                        <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="TaskTable.getSelectionModel().addListSelectionListener(new javax.swing.event.ListSelectionListener() {&#xa;            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {&#xa;                TaskTableValueChanged(evt);&#xa;            }&#xa;        });"/>
                       </AuxValues>
                     </Component>
                   </SubComponents>
@@ -396,7 +394,7 @@
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="1014" max="32767" attributes="0"/>
+                          <EmptySpace pref="953" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -452,11 +450,10 @@
                                       <Component id="jScrollPane3" min="-2" pref="390" max="-2" attributes="0"/>
                                       <Component id="jLabel4" alignment="0" min="-2" max="-2" attributes="0"/>
                                   </Group>
-                                  <EmptySpace min="-2" pref="101" max="-2" attributes="0"/>
                               </Group>
                               <Component id="jLabel3" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace min="-2" pref="130" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" pref="434" max="-2" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -619,7 +616,7 @@
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="1014" max="32767" attributes="0"/>
+                          <EmptySpace pref="953" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -733,11 +730,11 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Component id="statusPanelSeparator" alignment="0" pref="1253" max="32767" attributes="0"/>
+              <Component id="statusPanelSeparator" alignment="0" pref="1192" max="32767" attributes="0"/>
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="statusMessageLabel" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="1057" max="32767" attributes="0"/>
+                  <EmptySpace pref="996" max="32767" attributes="0"/>
                   <Component id="progressBar" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="statusAnimationLabel" min="-2" max="-2" attributes="0"/>
@@ -809,6 +806,6 @@
     <AuxValue name="FormSettings_listenerGenerationStyle" type="java.lang.Integer" value="0"/>
     <AuxValue name="FormSettings_variablesLocal" type="java.lang.Boolean" value="false"/>
     <AuxValue name="FormSettings_variablesModifier" type="java.lang.Integer" value="2"/>
-    <AuxValue name="designerSize" type="java.awt.Dimension" value="-84,-19,0,5,115,114,0,18,106,97,118,97,46,97,119,116,46,68,105,109,101,110,115,105,111,110,65,-114,-39,-41,-84,95,68,20,2,0,2,73,0,6,104,101,105,103,104,116,73,0,5,119,105,100,116,104,120,112,0,0,3,108,0,0,4,-27"/>
+    <AuxValue name="designerSize" type="java.awt.Dimension" value="-84,-19,0,5,115,114,0,18,106,97,118,97,46,97,119,116,46,68,105,109,101,110,115,105,111,110,65,-114,-39,-41,-84,95,68,20,2,0,2,73,0,6,104,101,105,103,104,116,73,0,5,119,105,100,116,104,120,112,0,0,3,108,0,0,4,-88"/>
   </AuxValues>
 </Form>

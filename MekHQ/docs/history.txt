@@ -1,6 +1,8 @@
 VERSION HISTORY
 ----------------------------------
 v0.0.1 (SVN)
++ Bug: TaskTable not being declared
++ Bug: front armor being added twice when rear armor doesn't exist
 + replaced TaskList with TaskTable
 + Calendar
 + Campaign#getTechTeams and remove medical teams from hangar team list
