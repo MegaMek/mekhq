@@ -94,8 +94,6 @@ public class MekHQView extends FrameView {
     private int currentPersonId;
     private int currentDoctorId;
     
-    private TaskReportDialog trd;
-    
     SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE, MMMM d yyyy");
     
     public MekHQView(SingleFrameApplication app) {
@@ -104,8 +102,6 @@ public class MekHQView extends FrameView {
         initComponents();
 
         refreshCalendar();
-        
-        trd = new TaskReportDialog(this.getFrame(), false);
         
         // status bar initialization - message timeout, idle icon and busy animation, etc
         ResourceMap resourceMap = getResourceMap();
@@ -826,6 +822,7 @@ private void TaskTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
 
 private void btnAdvanceDayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAdvanceDayActionPerformed
     campaign.processDay();
+    TaskReportDialog trd = new TaskReportDialog(this.getFrame(), true);
     trd.report(campaign);
     trd.setVisible(true);
     refreshUnitList();
@@ -957,7 +954,7 @@ private void btnOrganizeTaskActionPerformed(java.awt.event.ActionEvent evt) {//G
     if(currentTechId == -1) {
         return;
     }   
-    OrganizeTasksDialog otd = new OrganizeTasksDialog(this.getFrame(), true, campaign.getTasksForTeam(currentTechId));
+    OrganizeTasksDialog otd = new OrganizeTasksDialog(this.getFrame(), true, campaign.getTeam(currentTechId).getTasksAssigned());
     otd.setVisible(true);
 }//GEN-LAST:event_btnOrganizeTaskActionPerformed
 
@@ -1129,7 +1126,7 @@ protected void updateAssignEnabled() {
     //must have a valid team and an unassigned task
     WorkItem curTask = campaign.getTask(currentTaskId);
     SupportTeam team = campaign.getTeam(currentTechId);
-    if(null != curTask && curTask.getTeamId() == WorkItem.TEAM_NONE && null != team && team.canDo(curTask)) {
+    if(null != curTask && curTask.isUnassigned() && null != team && team.canDo(curTask)) {
         assignBtn.setEnabled(true);
     } else {
         assignBtn.setEnabled(false);
@@ -1141,7 +1138,7 @@ protected void updateAssignDoctorEnabled() {
     Person curPerson = campaign.getPerson(currentPersonId);
     SupportTeam team = campaign.getTeam(currentDoctorId);
     if(null != curPerson && null != curPerson.getTask() 
-            && curPerson.getTask().getTeamId() == WorkItem.TEAM_NONE 
+            && curPerson.getTask().isUnassigned()
             && null != team && team.canDo(curPerson.getTask())) {     
         btnAssignDoc.setEnabled(true);
     } else {
@@ -1187,14 +1184,17 @@ public class TaskTableModel extends AbstractTableModel {
             tasks = new ArrayList<WorkItem>();
         }
         
+        @Override
         public int getRowCount() {
             return tasks.size();
         }
 
+        @Override
         public int getColumnCount() {
             return columnNames.length;
         }
 
+        @Override
         public Object getValueAt(int row, int col) {
             WorkItem task = tasks.get(row);
             switch (col) {
@@ -1210,7 +1210,7 @@ public class TaskTableModel extends AbstractTableModel {
                  if(task.isUnassigned()) {
                      return "none";
                  } else {
-                    return campaign.getTeam(task.getTeamId()).getName();
+                    return task.getTeam().getName();
                  }
              default:
                 return new Object();

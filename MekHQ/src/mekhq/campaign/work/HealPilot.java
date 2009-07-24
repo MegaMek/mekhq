@@ -58,7 +58,7 @@ public class HealPilot extends PersonnelWorkItem {
     }
     
     @Override
-    public void fail(int rating) {
+    public void fail() {
         //failing heal checks has no adverse affect except failing to heal
         return;
     }

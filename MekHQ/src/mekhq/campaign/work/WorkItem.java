@@ -22,11 +22,8 @@
 package mekhq.campaign.work;
 
 import java.io.Serializable;
-import megamek.common.Entity;
 import megamek.common.TargetRoll;
-import mekhq.campaign.Campaign;
 import mekhq.campaign.team.SupportTeam;
-import mekhq.campaign.Unit;
 
 /**
  * An abstract class representing some item that needs work
@@ -35,13 +32,11 @@ import mekhq.campaign.Unit;
  */
 public abstract class WorkItem implements Serializable {
 
-    public static final int TEAM_NONE = -1;
-
     protected String name;
     //the id of this work item
     protected int id;
     //the id of the team assigned to this item
-    protected int teamId;
+    protected SupportTeam team;
     //the skill modifier for difficulty
     protected int difficulty;
     //the amount of time for the repair
@@ -54,7 +49,7 @@ public abstract class WorkItem implements Serializable {
     public WorkItem() {
         this.name = "Unknown";
         this.skillMin = SupportTeam.EXP_GREEN;
-        this.teamId = TEAM_NONE;
+        this.team = null;
         this.completed = false;
     }
     
@@ -76,16 +71,17 @@ public abstract class WorkItem implements Serializable {
         this.id = i;
     }
     
-    public int getTeamId() {
-        return teamId;
+    public SupportTeam getTeam() {
+        return team;
     }
     
     public void assignTeam(SupportTeam team) {
-        this.teamId = team.getId();
+        this.team = team;
     }
     
     public void unassignTeam() {
-        this.teamId = TEAM_NONE;
+        team.removeTask(this);
+        team = null;    
     }
     
     public int getDifficulty() {
@@ -114,10 +110,11 @@ public abstract class WorkItem implements Serializable {
     
     public void complete() {
         this.completed = true;
+        unassignTeam();
     }
     
     public boolean isUnassigned() {
-        return getTeamId() == TEAM_NONE;
+        return null == team;
     }
     
     public String getDesc() {
@@ -159,9 +156,9 @@ public abstract class WorkItem implements Serializable {
      * fail this work item
      * @param rating - an <code>int</code> of the skill rating of the currently assigned team
      */
-    public void fail(int rating) {
+    public void fail() {
         //increment the minimum skill level required
-        setSkillMin(rating + 1);
+        setSkillMin(team.getRating() + 1);
         //unassign the current team
         unassignTeam();
     }

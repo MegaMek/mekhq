@@ -24,17 +24,9 @@ package mekhq.campaign.team;
 import mekhq.campaign.*;
 import java.io.Serializable;
 import java.util.ArrayList;
-import megamek.common.Aero;
-import megamek.common.BattleArmor;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.Mech;
-import megamek.common.Tank;
 import megamek.common.TargetRoll;
-import mekhq.campaign.work.PersonnelWorkItem;
 import mekhq.campaign.work.RepairItem;
 import mekhq.campaign.work.ReplacementItem;
-import mekhq.campaign.work.UnitWorkItem;
 import mekhq.campaign.work.WorkItem;
 
 /**
@@ -56,6 +48,8 @@ public abstract class SupportTeam implements Serializable {
     protected int fullSize;
     protected int currentSize;
     protected int hours;
+    
+    protected ArrayList<WorkItem> assignedTasks;
     
     protected Campaign campaign;
     
@@ -80,6 +74,7 @@ public abstract class SupportTeam implements Serializable {
         this.name = name;
         this.rating = rating;
         this.hours = 8;
+        this.assignedTasks = new ArrayList<WorkItem>();
     }
     
     public int getRating() {
@@ -137,8 +132,16 @@ public abstract class SupportTeam implements Serializable {
    
    public abstract String getTypeDesc();
     
-   protected ArrayList<WorkItem> getTasksAssigned() {
-        return campaign.getTasksForTeam(getId());
+   public ArrayList<WorkItem> getTasksAssigned() {
+        return assignedTasks;
+   }
+   
+   public void addTask(WorkItem task) {
+       assignedTasks.add(task);
+   }
+   
+   public void removeTask(WorkItem task) {
+       assignedTasks.remove(task);
    }
    
    public abstract boolean canDo(WorkItem task);
@@ -147,12 +150,18 @@ public abstract class SupportTeam implements Serializable {
    
    public ArrayList<String> doAssignments() {
        ArrayList<String> reports = new ArrayList<String>();
+      
+       //need to clone the assigned tasks array list to avoid concommitant errors
+       ArrayList<WorkItem> schedule = new ArrayList<WorkItem>();
+       for(WorkItem task : getTasksAssigned()) {
+           schedule.add(task);
+       }
        
        reports.add(getName() + " Assignments:");
        //do all of the assignments in the assignment vector until 
        //you run out of time
        int minutesWorked = 0;
-       for(WorkItem task : getTasksAssigned()) {
+       for(WorkItem task : schedule) {
            String report = "  " + task.getDisplayName();
            //check whether the task is currently possible
            if(null != task.checkFixable()) {
@@ -162,7 +171,7 @@ public abstract class SupportTeam implements Serializable {
                continue;
            }        
            minutesWorked += task.getTime();
-           if(minutesWorked > 480) {
+           if(minutesWorked > (getHours() * 60)) {
                report = report  + ", but ran out of time for the day, see you tommorrow!";
                reports.add(report);
                break;
@@ -173,13 +182,11 @@ public abstract class SupportTeam implements Serializable {
            report = report + ", needs " + target.getValueAsString() + " and rolls " + roll + ":";
            if(roll >= target.getValue()) {
                report = report + " task completed.";
-               //need to do some rolls here
                task.fix();
-               //set this task for removal
                task.complete();
            } else {
                report = report + " task failed.";
-               task.fail(getRating());
+               task.fail();
                //have we run out of options?
                if(task.getSkillMin() > EXP_ELITE) {
                    if(task instanceof RepairItem) {

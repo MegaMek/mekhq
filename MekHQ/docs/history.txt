@@ -1,6 +1,8 @@
 VERSION HISTORY
 ----------------------------------
 v0.0.1 (SVN)
++ added work queue to SupportTeam.java to support user re-ordering of tasks
++ pass Team rather than TeamId into WorkItem
 + single selection of OrganizeTaskDialog table
 + fileFilters for saving and loading MULs
 + Start of OrganizeTasksDialog

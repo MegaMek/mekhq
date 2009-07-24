@@ -47,6 +47,11 @@ public class OrganizeTasksDialog extends javax.swing.JDialog {
 
         jScrollPane1 = new javax.swing.JScrollPane();
         assignedTasksTable = new javax.swing.JTable();
+        btnMoveUp = new javax.swing.JButton();
+        btnMoveDown = new javax.swing.JButton();
+        btnRush = new javax.swing.JButton();
+        btnCareful = new javax.swing.JButton();
+        btnClose = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
@@ -60,25 +65,84 @@ public class OrganizeTasksDialog extends javax.swing.JDialog {
         assignedTasksTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         jScrollPane1.setViewportView(assignedTasksTable);
 
+        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(OrganizeTasksDialog.class);
+        btnMoveUp.setText(resourceMap.getString("btnMoveUp.text")); // NOI18N
+        btnMoveUp.setEnabled(false);
+        btnMoveUp.setName("btnMoveUp"); // NOI18N
+        btnMoveUp.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnMoveUpActionPerformed(evt);
+            }
+        });
+
+        btnMoveDown.setText(resourceMap.getString("btnMoveDown.text")); // NOI18N
+        btnMoveDown.setEnabled(false);
+        btnMoveDown.setName("btnMoveDown"); // NOI18N
+
+        btnRush.setText(resourceMap.getString("btnRush.text")); // NOI18N
+        btnRush.setEnabled(false);
+        btnRush.setName("btnRush"); // NOI18N
+
+        btnCareful.setText(resourceMap.getString("btnCareful.text")); // NOI18N
+        btnCareful.setEnabled(false);
+        btnCareful.setName("btnCareful"); // NOI18N
+
+        btnClose.setText(resourceMap.getString("btnClose.text")); // NOI18N
+        btnClose.setName("btnClose"); // NOI18N
+        btnClose.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCloseActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(154, Short.MAX_VALUE))
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(layout.createSequentialGroup()
+                        .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 20, Short.MAX_VALUE)
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
+                            .add(btnCareful, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .add(btnRush, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .add(org.jdesktop.layout.GroupLayout.TRAILING, btnMoveUp, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .add(org.jdesktop.layout.GroupLayout.TRAILING, btnMoveDown, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addContainerGap())
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
+                        .add(btnClose)
+                        .add(262, 262, 262))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(49, Short.MAX_VALUE))
+                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(layout.createSequentialGroup()
+                        .add(btnMoveUp)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(btnMoveDown)
+                        .add(18, 18, 18)
+                        .add(btnRush)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                        .add(btnCareful))
+                    .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 20, Short.MAX_VALUE)
+                .add(btnClose))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
+    this.setVisible(false);
+}//GEN-LAST:event_btnCloseActionPerformed
+
+private void btnMoveUpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMoveUpActionPerformed
+    
+}//GEN-LAST:event_btnMoveUpActionPerformed
 
     /**
     * @param args the command line arguments
@@ -320,6 +384,11 @@ class TableTransferHandler extends TransferHandler {
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTable assignedTasksTable;
+    private javax.swing.JButton btnCareful;
+    private javax.swing.JButton btnClose;
+    private javax.swing.JButton btnMoveDown;
+    private javax.swing.JButton btnMoveUp;
+    private javax.swing.JButton btnRush;
     private javax.swing.JScrollPane jScrollPane1;
     // End of variables declaration//GEN-END:variables
 

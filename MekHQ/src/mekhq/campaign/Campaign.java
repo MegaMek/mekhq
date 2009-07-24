@@ -219,7 +219,7 @@ public class Campaign implements Serializable {
         }
         return " (" + assigned + "/" + total + "; " + minutes + " minutes)";
     }
-    
+    /*
      public ArrayList<WorkItem> getTasksForTeam(int teamId) {
         ArrayList<WorkItem> newTasks = new ArrayList<WorkItem>();
         for(WorkItem task : getTasks()) {
@@ -229,9 +229,12 @@ public class Campaign implements Serializable {
         }
         return newTasks;
     }
+     * */
      
      public void assignTask(int teamId, int taskId) {
-         taskIds.get(new Integer(taskId)).assignTeam(getTeam(teamId));
+         WorkItem task = taskIds.get(new Integer(taskId));
+         task.assignTeam(getTeam(teamId));
+         teamIds.get(new Integer(teamId)).addTask(task);
      }
      
      /**
@@ -289,7 +292,7 @@ public class Campaign implements Serializable {
 
         for(WorkItem task : getTasksForUnit(id)) {
             tasks.remove(task);
-            tasks.remove(new Integer(task.getId()));
+            taskIds.remove(new Integer(task.getId()));
         }
         
         //also remove any pilot assigned to this unit
