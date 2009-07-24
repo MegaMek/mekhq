@@ -37,7 +37,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -59,6 +58,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.filechooser.FileFilter;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
@@ -963,6 +963,19 @@ private void btnOrganizeTaskActionPerformed(java.awt.event.ActionEvent evt) {//G
 
 protected void loadListFile() {
     JFileChooser loadList = new JFileChooser(".");
+    loadList.setDialogTitle("Load Units");
+    loadList.setFileFilter(new FileFilter() {
+        @Override
+        public boolean accept(File dir) {
+            return ((dir.getName() != null) && dir.getName().endsWith(".mul"));
+        }
+
+        @Override
+        public String getDescription() {
+            return "MUL file";
+        }
+    });
+    
     int returnVal = loadList.showOpenDialog(mainPanel);
     if ((returnVal != JFileChooser.APPROVE_OPTION) || (loadList.getSelectedFile() == null)) {
        // I want a file, y'know!
@@ -1002,6 +1015,19 @@ protected void saveListFile() {
     }
     
     JFileChooser saveList = new JFileChooser(".");
+    saveList.setDialogTitle("Deploy Units");
+    saveList.setFileFilter(new FileFilter() {
+        @Override
+        public boolean accept(File dir) {
+            return ((dir.getName() != null) && dir.getName().endsWith(".mul"));
+        }
+
+        @Override
+        public String getDescription() {
+            return "MUL file";
+        }
+    });
+    saveList.setSelectedFile(new File("myunits.mul")); //$NON-NLS-1$
     int returnVal = saveList.showSaveDialog(mainPanel);
     if ((returnVal != JFileChooser.APPROVE_OPTION) || (saveList.getSelectedFile() == null)) {
        // I want a file, y'know!

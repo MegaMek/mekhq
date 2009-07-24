@@ -214,7 +214,7 @@ class TableTransferHandler extends TransferHandler {
   }
   
   @Override
-  public boolean canImport(TransferSupport sup) {
+  public boolean canImport(TransferHandler.TransferSupport sup) {
     /*
       for (int i = 0; i < flavors.length; i++) {
       if (DataFlavor.stringFlavor.equals(flavors[i])) {
