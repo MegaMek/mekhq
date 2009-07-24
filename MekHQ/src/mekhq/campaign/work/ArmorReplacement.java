@@ -18,10 +18,8 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.work;
 
-import megamek.common.Entity;
 import mekhq.campaign.Unit;
 
 /**
@@ -32,25 +30,25 @@ public class ArmorReplacement extends ReplacementItem {
 
     private int loc;
     private int amount;
-    
+
     public ArmorReplacement(Unit unit, int loc, int amount) {
         super(unit);
         this.loc = loc;
         this.amount = amount;
         this.difficulty = -2;
-        this.time = 5 * amount; 
+        this.time = 5 * amount;
         this.name = "Replace armor (" + unit.getEntity().getLocationName(loc) + ", " + amount + ")";
-    } 
-    
+    }
+
     @Override
     public void fix() {
         unit.getEntity().setArmor(unit.getEntity().getOArmor(loc, false), loc, false);
         unit.getEntity().setArmor(unit.getEntity().getOArmor(loc, true), loc, true);
     }
-    
+
     @Override
     public String checkFixable() {
-        if(unit.isLocationDestroyed(loc)) {
+        if (unit.isLocationDestroyed(loc)) {
             return unit.getEntity().getLocationName(loc) + " is destroyed.";
         }
         return super.checkFixable();

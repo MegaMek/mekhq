@@ -22,11 +22,8 @@
 package mekhq;
 
 import java.awt.Component;
-import java.awt.Font;
 import mekhq.campaign.team.SupportTeam;
 import mekhq.campaign.Campaign;
-import javax.swing.ListModel;
-import javax.swing.event.ListSelectionEvent;
 import org.jdesktop.application.Action;
 import org.jdesktop.application.ResourceMap;
 import org.jdesktop.application.SingleFrameApplication;
@@ -34,41 +31,27 @@ import org.jdesktop.application.FrameView;
 import org.jdesktop.application.TaskMonitor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Vector;
-import javax.swing.AbstractCellEditor;
 import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultListModel;
 import javax.swing.Timer;
 import javax.swing.Icon;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextArea;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumn;
 import megamek.client.ui.MechView;
 import megamek.common.Entity;
 import megamek.common.EntityListFile;
-import megamek.common.Pilot;
 import mekhq.campaign.Unit;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PilotPerson;
@@ -1244,65 +1227,6 @@ public class TaskTableModel extends AbstractTableModel {
         }
         
 }
-
-/**
- * An extension of the JTable to allow for different comboboxes in 
- * each row
- * http://stackoverflow.com/questions/457463/putting-jcombobox-into-jtable
- */
-public class ComboTable extends JTable {
-    
-    @Override
-    public TableCellEditor getCellEditor(int row, int column) {
-        Object value = super.getValueAt(row, column);
-        if(value != null) {
-            if(value instanceof JComboBox) {
-                return new DefaultCellEditor((JComboBox)value);
-            }
-            return getDefaultEditor(value.getClass());
-        }
-        return super.getCellEditor(row, column);
-    }
-  
-    @Override
-    public TableCellRenderer getCellRenderer(int row, int column) {
-        Object value = super.getValueAt(row, column);
-        if(value != null) {
-            if(value instanceof JComboBox) {
-              //  return new DefaultTableCellRenderer((JComboBox)value);
-            }
-            return getDefaultRenderer(value.getClass());
-        }
-        return super.getCellRenderer(row, column);
-    }
-}
-
-public class MyComboBoxRenderer extends JComboBox implements TableCellRenderer {
-        public MyComboBoxRenderer(String[] items) {
-            super(items);
-        }
-        
-        public Component getTableCellRendererComponent(JTable table, Object value,
-                boolean isSelected, boolean hasFocus, int row, int column) {
-            if (isSelected) {
-                setForeground(table.getSelectionForeground());
-                super.setBackground(table.getSelectionBackground());
-            } else {
-                setForeground(table.getForeground());
-                setBackground(table.getBackground());
-            }
-    
-            // Select the current value
-            setSelectedItem(value);
-            return this;
-        }
-    }
-    
-    public class MyComboBoxEditor extends DefaultCellEditor {
-        public MyComboBoxEditor(String[] items) {
-            super(new JComboBox(items));
-        }
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JList DoctorsList;

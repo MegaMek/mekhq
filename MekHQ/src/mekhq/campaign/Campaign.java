@@ -219,17 +219,6 @@ public class Campaign implements Serializable {
         }
         return " (" + assigned + "/" + total + "; " + minutes + " minutes)";
     }
-    /*
-     public ArrayList<WorkItem> getTasksForTeam(int teamId) {
-        ArrayList<WorkItem> newTasks = new ArrayList<WorkItem>();
-        for(WorkItem task : getTasks()) {
-            if(task.getTeamId() == teamId) {
-                newTasks.add(task);
-            }
-        }
-        return newTasks;
-    }
-     * */
      
      public void assignTask(int teamId, int taskId) {
          WorkItem task = taskIds.get(new Integer(taskId));
