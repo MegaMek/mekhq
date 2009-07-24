@@ -436,7 +436,7 @@ public class MekHQView extends FrameView {
                         .add(139, 139, 139)
                         .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                     .add(lblUnits, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 156, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .add(126, 126, 126))
+                .add(0, 0, 0))
         );
         panHangarLayout.setVerticalGroup(
             panHangarLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)

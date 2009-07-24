@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import javax.swing.JComponent;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import javax.swing.TransferHandler;
 import javax.swing.table.AbstractTableModel;
 import mekhq.campaign.work.WorkItem;
@@ -56,6 +57,7 @@ public class OrganizeTasksDialog extends javax.swing.JDialog {
         assignedTasksTable.setDragEnabled(true);
         assignedTasksTable.setName("assignedTasksTable"); // NOI18N
         //assignedTasksTable.setTransferHandler(new TableTransferHandler());
+        assignedTasksTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         jScrollPane1.setViewportView(assignedTasksTable);
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());

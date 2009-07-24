@@ -74,11 +74,11 @@
                 <DimensionLayout dim="0">
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" attributes="0">
-                          <EmptySpace max="-2" attributes="0"/>
+                          <EmptySpace min="-2" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="102" alignment="0" attributes="0">
                                   <Component id="UnitsScroll" min="-2" pref="343" max="-2" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
+                                  <EmptySpace min="-2" max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Component id="btnChangePilot" min="-2" pref="130" max="-2" attributes="0"/>
                                       <Component id="btnRemovePilot" min="-2" pref="130" max="-2" attributes="0"/>
@@ -88,17 +88,17 @@
                                       <Component id="btnDeployUnits" alignment="0" min="-2" pref="130" max="-2" attributes="1"/>
                                       <Component id="loadListBtn" alignment="1" min="-2" pref="130" max="-2" attributes="1"/>
                                   </Group>
-                                  <EmptySpace max="-2" attributes="0"/>
+                                  <EmptySpace min="-2" max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Component id="lblTasks" min="-2" pref="197" max="-2" attributes="0"/>
                                       <Component id="assignBtn" min="-2" max="-2" attributes="0"/>
                                       <Group type="102" alignment="0" attributes="0">
                                           <Group type="103" groupAlignment="0" attributes="0">
-                                              <Component id="jScrollPane1" pref="475" max="32767" attributes="1"/>
-                                              <Component id="jScrollPane4" alignment="0" min="-2" pref="475" max="-2" attributes="1"/>
+                                              <Component id="jScrollPane1" pref="475" max="32767" attributes="2"/>
+                                              <Component id="jScrollPane4" alignment="0" min="-2" pref="475" max="-2" attributes="2"/>
                                               <Component id="lblTeams" min="-2" max="-2" attributes="0"/>
                                           </Group>
-                                          <EmptySpace max="-2" attributes="0"/>
+                                          <EmptySpace min="-2" max="-2" attributes="0"/>
                                           <Group type="103" groupAlignment="0" max="-2" attributes="0">
                                               <Component id="btnOrganizeTask" max="32767" attributes="1"/>
                                               <Component id="btnNewTeam" alignment="0" pref="121" max="32767" attributes="1"/>
@@ -112,7 +112,7 @@
                               </Group>
                               <Component id="lblUnits" alignment="0" min="-2" pref="156" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace min="-2" pref="126" max="-2" attributes="0"/>
+                          <EmptySpace min="0" pref="0" max="0" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>

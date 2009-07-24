@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.0.1 (SVN)
++ single selection of OrganizeTaskDialog table
 + fileFilters for saving and loading MULs
 + Start of OrganizeTasksDialog
 + switched to JDK6.0

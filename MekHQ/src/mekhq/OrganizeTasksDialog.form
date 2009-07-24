@@ -65,7 +65,7 @@
             </Property>
           </Properties>
           <AuxValues>
-            <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="//assignedTasksTable.setTransferHandler(new TableTransferHandler());"/>
+            <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="//assignedTasksTable.setTransferHandler(new TableTransferHandler());&#xa;assignedTasksTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);"/>
           </AuxValues>
         </Component>
       </SubComponents>
