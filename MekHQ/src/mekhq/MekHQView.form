@@ -75,43 +75,38 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" attributes="0">
                           <EmptySpace min="-2" max="-2" attributes="0"/>
+                          <Component id="jScrollPane5" min="-2" pref="393" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" pref="70" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="btnChangePilot" min="-2" pref="130" max="-2" attributes="0"/>
+                              <Component id="btnRemovePilot" min="-2" pref="130" max="-2" attributes="0"/>
+                              <Component id="btnSellUnit" min="-2" pref="130" max="-2" attributes="0"/>
+                              <Component id="btnPurchaseUnit" min="-2" max="-2" attributes="0"/>
+                              <Component id="btnViewUnit" min="-2" pref="130" max="-2" attributes="1"/>
+                              <Component id="btnDeployUnits" alignment="0" min="-2" pref="130" max="-2" attributes="1"/>
+                              <Component id="loadListBtn" alignment="1" min="-2" pref="130" max="-2" attributes="1"/>
+                          </Group>
+                          <EmptySpace min="-2" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Component id="lblTasks" min="-2" pref="197" max="-2" attributes="0"/>
+                              <Component id="assignBtn" min="-2" max="-2" attributes="0"/>
                               <Group type="102" alignment="0" attributes="0">
-                                  <Component id="jScrollPane5" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="btnChangePilot" min="-2" pref="130" max="-2" attributes="0"/>
-                                      <Component id="btnRemovePilot" min="-2" pref="130" max="-2" attributes="0"/>
-                                      <Component id="btnSellUnit" min="-2" pref="130" max="-2" attributes="0"/>
-                                      <Component id="btnPurchaseUnit" min="-2" max="-2" attributes="0"/>
-                                      <Component id="btnViewUnit" min="-2" pref="130" max="-2" attributes="1"/>
-                                      <Component id="btnDeployUnits" alignment="0" min="-2" pref="130" max="-2" attributes="1"/>
-                                      <Component id="loadListBtn" alignment="1" min="-2" pref="130" max="-2" attributes="1"/>
+                                      <Component id="jScrollPane1" pref="475" max="32767" attributes="2"/>
+                                      <Component id="jScrollPane4" alignment="0" min="-2" pref="475" max="-2" attributes="2"/>
+                                      <Component id="lblTeams" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <EmptySpace min="-2" max="-2" attributes="0"/>
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="lblTasks" min="-2" pref="197" max="-2" attributes="0"/>
-                                      <Component id="assignBtn" min="-2" max="-2" attributes="0"/>
-                                      <Group type="102" alignment="0" attributes="0">
-                                          <Group type="103" groupAlignment="0" attributes="0">
-                                              <Component id="jScrollPane1" pref="475" max="32767" attributes="2"/>
-                                              <Component id="jScrollPane4" alignment="0" min="-2" pref="475" max="-2" attributes="2"/>
-                                              <Component id="lblTeams" min="-2" max="-2" attributes="0"/>
-                                          </Group>
-                                          <EmptySpace min="-2" max="-2" attributes="0"/>
-                                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                              <Component id="btnOrganizeTask" max="32767" attributes="1"/>
-                                              <Component id="btnNewTeam" alignment="0" pref="121" max="32767" attributes="1"/>
-                                              <Component id="ammoBtn" alignment="0" max="32767" attributes="1"/>
-                                              <Component id="replaceBtn" alignment="0" max="32767" attributes="1"/>
-                                          </Group>
-                                      </Group>
+                                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                                      <Component id="btnOrganizeTask" max="32767" attributes="1"/>
+                                      <Component id="btnNewTeam" alignment="0" pref="121" max="32767" attributes="1"/>
+                                      <Component id="ammoBtn" alignment="0" max="32767" attributes="1"/>
+                                      <Component id="replaceBtn" alignment="0" max="32767" attributes="1"/>
                                   </Group>
-                                  <EmptySpace min="-2" pref="139" max="-2" attributes="0"/>
-                                  <Component id="jTabbedPane1" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <Component id="lblUnits" alignment="0" min="-2" pref="156" max="-2" attributes="0"/>
                           </Group>
+                          <EmptySpace min="-2" pref="139" max="-2" attributes="0"/>
+                          <Component id="jTabbedPane1" min="-2" max="-2" attributes="0"/>
                           <EmptySpace min="0" pref="0" max="0" attributes="0"/>
                       </Group>
                   </Group>
@@ -119,10 +114,8 @@
                 <DimensionLayout dim="1">
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" attributes="0">
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="lblUnits" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                          <EmptySpace min="-2" pref="44" max="-2" attributes="0"/>
+                          <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="102" attributes="0">
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Group type="102" alignment="0" attributes="0">
@@ -172,7 +165,7 @@
                                       <Component id="jScrollPane1" alignment="0" min="-2" pref="232" max="-2" attributes="1"/>
                                   </Group>
                               </Group>
-                              <Component id="jScrollPane5" max="32767" attributes="1"/>
+                              <Component id="jScrollPane5" pref="551" max="32767" attributes="1"/>
                           </Group>
                           <EmptySpace pref="86" max="32767" attributes="0"/>
                       </Group>
@@ -180,12 +173,6 @@
                 </DimensionLayout>
               </Layout>
               <SubComponents>
-                <Component class="javax.swing.JLabel" name="lblUnits">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" resourceKey="lblUnits.text"/>
-                    <Property name="name" type="java.lang.String" value="lblUnits" noResource="true"/>
-                  </Properties>
-                </Component>
                 <Component class="javax.swing.JLabel" name="lblTasks">
                   <Properties>
                     <Property name="text" type="java.lang.String" resourceKey="lblTasks.text"/>

@@ -208,23 +208,24 @@ public class Campaign implements Serializable {
     public String getUnitDesc(int unitId) {
         String toReturn = "<html>" + getUnit(unitId).getDescHTML();
         ArrayList<WorkItem> unitTasks = getTasksForUnit(unitId);
-        int minutes = 0;
+        int totalMin = 0;
+        int assignMin = 0;
         int total = 0;
         int assigned = 0;
         for(WorkItem task : unitTasks) {
             if(task.isNeeded()) {
                 total++;
-                minutes += task.getTime();
+                totalMin += task.getTime();
                 if(!task.isUnassigned()) {
                     assigned++;
+                    assignMin += task.getTime();
                 } 
             }
         }
-        String assign = "";
         if(total > 0) {
-            assign += "Total tasks: " + total + " Assigned: " + assigned;
+            toReturn += "Total tasks: " + total + " (" + totalMin + " minutes)<br>";
+            toReturn += "Assigned tasks: " + assigned  + " (" + assignMin + " minutes)<br>";
         }
-        toReturn += assign;
         toReturn += "</html>";
         return toReturn;
     }
