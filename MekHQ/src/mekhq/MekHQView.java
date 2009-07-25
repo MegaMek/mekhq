@@ -21,6 +21,7 @@
 
 package mekhq;
 
+import java.awt.Color;
 import java.awt.Component;
 import mekhq.campaign.team.SupportTeam;
 import mekhq.campaign.Campaign;
@@ -50,6 +51,7 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import megamek.client.ui.MechView;
+import megamek.client.ui.swing.MechTileset;
 import megamek.common.Entity;
 import megamek.common.EntityListFile;
 import mekhq.campaign.Unit;
@@ -1226,6 +1228,63 @@ public class TaskTableModel extends AbstractTableModel {
             fireTableDataChanged();
         }
         
+}
+
+public class MekTableModel extends AbstractTableModel {
+
+    private ArrayList<Unit> units;
+    
+    @Override
+    public int getRowCount() {
+        return units.size();
+    }
+
+    @Override
+    public int getColumnCount() {
+        return 1;
+    }
+
+    @Override
+    public Object getValueAt(int row, int col) {
+        return units.get(row).getEntity().getModel();
+    }
+
+    @Override
+    public boolean isCellEditable(int row, int col) {
+        return false;
+    }
+    
+    public void refreshModel() {
+        fireTableDataChanged();
+    }
+
+    public MekTableModel.Renderer getRenderer() {
+        return new MekTableModel.Renderer();
+    }
+    
+    public class Renderer extends MekInfo implements TableCellRenderer {
+        MechTileset mt = new MechTileset("data/images/units/");
+        Color dcolor = new Color(220, 220, 220);
+        
+        public Renderer() {
+            try {
+                mt.loadFromFile("mechset.txt");
+            } catch (IOException ex) {
+                //TODO: throw something here?
+            }
+        }
+        
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            Component c = this;
+            setOpaque(true);
+            //setText(getValueAt(row, column).toString());
+            setToolTipText(null);
+            c.setBackground(dcolor);
+            return c;
+        }
+        
+    }
 }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
