@@ -6,13 +6,21 @@
 
 package mekhq;
 
+import java.awt.Component;
+import java.awt.Image;
+import java.io.IOException;
+import javax.swing.ImageIcon;
 import javax.swing.JPanel;
+import megamek.client.ui.swing.MechTileset;
+import megamek.common.Entity;
 
 /**
  * This JPanel borrows extensively from the MechInfo in MekWars
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MekInfo extends JPanel {
+    
+    protected static MechTileset mt;
     
     /** Creates new form MekInfo */
     public MekInfo() {
@@ -42,6 +50,32 @@ public class MekInfo extends JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
 
+    public void setText(String text) {
+        lblImage.setText(text);
+    }
+    
+    public void setImage(Image img) {
+        lblImage.setIcon(new ImageIcon(img));
+    }
+    
+    public void setUnit(Entity m) {
+        Image unit = getImageFor(m, lblImage);     
+        setImage(unit);
+    }
+    
+    public static Image getImageFor(Entity m, Component c) {
+
+        if (mt == null) {
+            mt = new MechTileset("data/images/units/");
+            try {
+                mt.loadFromFile("mechset.txt");
+            } catch (IOException ex) {
+                //TODO: do something here
+            }
+        }// end if(null tileset)
+        return mt.imageFor(m, c);
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel lblImage;
     // End of variables declaration//GEN-END:variables

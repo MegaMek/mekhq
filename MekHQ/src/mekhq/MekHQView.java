@@ -73,6 +73,7 @@ public class MekHQView extends FrameView {
     private DefaultListModel personnelModel = new DefaultListModel();
     private DefaultListModel doctorsModel = new DefaultListModel();
     private TaskTableModel taskModel = new TaskTableModel();
+    private MekTableModel unitModel = new MekTableModel();
     private int currentUnitId;
     private int currentTaskId;
     private int currentTechId;
@@ -167,8 +168,6 @@ public class MekHQView extends FrameView {
         panFinances = new javax.swing.JTabbedPane();
         panHangar = new javax.swing.JPanel();
         lblUnits = new javax.swing.JLabel();
-        UnitsScroll = new javax.swing.JScrollPane();
-        UnitList = new javax.swing.JList();
         lblTasks = new javax.swing.JLabel();
         btnViewUnit = new javax.swing.JButton();
         btnDeployUnits = new javax.swing.JButton();
@@ -188,6 +187,8 @@ public class MekHQView extends FrameView {
         jScrollPane4 = new javax.swing.JScrollPane();
         TaskTable = new javax.swing.JTable();
         btnOrganizeTask = new javax.swing.JButton();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        UnitTable = new javax.swing.JTable();
         panSupplies = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         panPersonnel = new javax.swing.JPanel();
@@ -238,18 +239,6 @@ public class MekHQView extends FrameView {
 
         lblUnits.setText(resourceMap.getString("lblUnits.text")); // NOI18N
         lblUnits.setName("lblUnits"); // NOI18N
-
-        UnitsScroll.setName("UnitsScroll"); // NOI18N
-
-        UnitList.setBackground(resourceMap.getColor("UnitList.background")); // NOI18N
-        UnitList.setModel(unitsModel);
-        UnitList.setName("UnitList"); // NOI18N
-        UnitList.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
-            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
-                UnitListValueChanged(evt);
-            }
-        });
-        UnitsScroll.setViewportView(UnitList);
 
         lblTasks.setText(resourceMap.getString("lblTasks.text")); // NOI18N
         lblTasks.setName("lblTasks"); // NOI18N
@@ -381,6 +370,19 @@ public class MekHQView extends FrameView {
             }
         });
 
+        jScrollPane5.setName("jScrollPane5"); // NOI18N
+
+        UnitTable.setModel(unitModel);
+        UnitTable.setName("UnitTable"); // NOI18N
+        UnitTable.setRowHeight(80);
+        UnitTable.getColumnModel().getColumn(0).setCellRenderer(unitModel.getRenderer());
+        UnitTable.getSelectionModel().addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                UnitTableValueChanged(evt);
+            }
+        });
+        jScrollPane5.setViewportView(UnitTable);
+
         org.jdesktop.layout.GroupLayout panHangarLayout = new org.jdesktop.layout.GroupLayout(panHangar);
         panHangar.setLayout(panHangarLayout);
         panHangarLayout.setHorizontalGroup(
@@ -389,7 +391,7 @@ public class MekHQView extends FrameView {
                 .addContainerGap()
                 .add(panHangarLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(panHangarLayout.createSequentialGroup()
-                        .add(UnitsScroll, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 343, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(jScrollPane5, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(panHangarLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(btnChangePilot, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 130, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
@@ -426,7 +428,6 @@ public class MekHQView extends FrameView {
                 .add(lblUnits)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(panHangarLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
-                    .add(UnitsScroll)
                     .add(panHangarLayout.createSequentialGroup()
                         .add(panHangarLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(panHangarLayout.createSequentialGroup()
@@ -465,7 +466,8 @@ public class MekHQView extends FrameView {
                                 .add(btnNewTeam)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
                                 .add(btnOrganizeTask))
-                            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 232, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))))
+                            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 232, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                    .add(jScrollPane5))
                 .addContainerGap(86, Short.MAX_VALUE))
         );
 
@@ -753,17 +755,6 @@ private void loadListBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     loadListFile();
 }//GEN-LAST:event_loadListBtnActionPerformed
 
-private void UnitListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_UnitListValueChanged
-    int selected = UnitList.getSelectedIndex();
-    if(selected > -1 && selected < campaign.getUnits().size()) {
-        currentUnitId = campaign.getUnits().get(selected).getId();
-    }
-    else if(selected < 0) {
-        currentUnitId = -1;
-    }
-    refreshTaskList();
-}//GEN-LAST:event_UnitListValueChanged
-
 private void assignBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_assignBtnActionPerformed
     //assign the task to the team here
     campaign.assignTask(currentTechId, currentTaskId);
@@ -803,6 +794,17 @@ private void TaskTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
     updateAssignEnabled();
     updateReplaceEnabled();
     updateAmmoSwapEnabled();
+}
+
+private void UnitTableValueChanged(javax.swing.event.ListSelectionEvent evt) {                                       
+    int selected = UnitTable.getSelectedRow();
+    if(selected > -1 && selected < campaign.getUnits().size()) {
+        currentUnitId = campaign.getUnits().get(selected).getId();
+    }
+    else if(selected < 0) {
+        currentUnitId = -1;
+    }
+    refreshTaskList();
 }
 
 private void btnAdvanceDayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAdvanceDayActionPerformed
@@ -982,6 +984,8 @@ protected void loadListFile() {
 }
 
 protected void saveListFile() {
+    //FIXME
+    /*
     if(UnitList.getSelectedIndex() == -1) {
         return;
     }
@@ -995,6 +999,7 @@ protected void saveListFile() {
             toRemove.add(u.getId());
         }
     }
+    
     
     JFileChooser saveList = new JFileChooser(".");
     saveList.setDialogTitle("Deploy Units");
@@ -1043,9 +1048,13 @@ protected void saveListFile() {
     }
     refreshUnitList();
     refreshPersonnelList();
+     * */
 }
     
 protected void refreshUnitList() {
+    unitModel.setUnits(campaign.getUnits());
+    unitModel.refreshModel();
+    /*
     int selected = UnitList.getSelectedIndex();
     unitsModel.removeAllElements();
     int len = 0;
@@ -1057,6 +1066,7 @@ protected void refreshUnitList() {
     if(selected < len) {
         UnitList.setSelectedIndex(selected);
     }
+     * */
 }
 
 protected void refreshTaskList() {
@@ -1232,7 +1242,11 @@ public class TaskTableModel extends AbstractTableModel {
 
 public class MekTableModel extends AbstractTableModel {
 
-    private ArrayList<Unit> units;
+    private ArrayList<Unit> units = new ArrayList<Unit>();
+    
+    public void setUnits(ArrayList<Unit> u) {
+        this.units = u;
+    }
     
     @Override
     public int getRowCount() {
@@ -1246,7 +1260,11 @@ public class MekTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int row, int col) {
-        return units.get(row).getEntity().getModel();
+        return campaign.getUnitDesc(units.get(row).getId());
+    }
+    
+    public Unit getUnitAt(int row) {
+        return units.get(row);
     }
 
     @Override
@@ -1257,30 +1275,27 @@ public class MekTableModel extends AbstractTableModel {
     public void refreshModel() {
         fireTableDataChanged();
     }
-
+    
     public MekTableModel.Renderer getRenderer() {
         return new MekTableModel.Renderer();
     }
     
+    
     public class Renderer extends MekInfo implements TableCellRenderer {
-        MechTileset mt = new MechTileset("data/images/units/");
-        Color dcolor = new Color(220, 220, 220);
-        
-        public Renderer() {
-            try {
-                mt.loadFromFile("mechset.txt");
-            } catch (IOException ex) {
-                //TODO: throw something here?
-            }
-        }
         
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             Component c = this;
+            Unit u = getUnitAt(row);
             setOpaque(true);
-            //setText(getValueAt(row, column).toString());
+            setUnit(u.getEntity());
+            setText(getValueAt(row, column).toString());
             setToolTipText(null);
-            c.setBackground(dcolor);
+            if(isSelected) {
+                c.setBackground(Color.BLUE);
+            } else {
+                c.setBackground(Color.GRAY);
+            }
             return c;
         }
         
@@ -1291,8 +1306,7 @@ public class MekTableModel extends AbstractTableModel {
     private javax.swing.JList DoctorsList;
     private javax.swing.JTable TaskTable;
     private javax.swing.JList TeamsList;
-    private javax.swing.JList UnitList;
-    private javax.swing.JScrollPane UnitsScroll;
+    private javax.swing.JTable UnitTable;
     private javax.swing.JButton ammoBtn;
     private javax.swing.JButton assignBtn;
     private javax.swing.JButton btnAdvanceDay;
@@ -1318,6 +1332,7 @@ public class MekTableModel extends AbstractTableModel {
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JLabel lblDate;
     private javax.swing.JLabel lblTasks;

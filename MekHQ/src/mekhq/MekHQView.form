@@ -77,8 +77,8 @@
                           <EmptySpace min="-2" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Group type="102" alignment="0" attributes="0">
-                                  <Component id="UnitsScroll" min="-2" pref="343" max="-2" attributes="0"/>
-                                  <EmptySpace min="-2" max="-2" attributes="0"/>
+                                  <Component id="jScrollPane5" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Component id="btnChangePilot" min="-2" pref="130" max="-2" attributes="0"/>
                                       <Component id="btnRemovePilot" min="-2" pref="130" max="-2" attributes="0"/>
@@ -123,8 +123,7 @@
                           <Component id="lblUnits" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                              <Component id="UnitsScroll" max="32767" attributes="1"/>
-                              <Group type="102" alignment="0" attributes="0">
+                              <Group type="102" attributes="0">
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Group type="102" alignment="0" attributes="0">
                                           <Component id="loadListBtn" min="-2" max="-2" attributes="0"/>
@@ -173,6 +172,7 @@
                                       <Component id="jScrollPane1" alignment="0" min="-2" pref="232" max="-2" attributes="1"/>
                                   </Group>
                               </Group>
+                              <Component id="jScrollPane5" max="32767" attributes="1"/>
                           </Group>
                           <EmptySpace pref="86" max="32767" attributes="0"/>
                       </Group>
@@ -186,27 +186,6 @@
                     <Property name="name" type="java.lang.String" value="lblUnits" noResource="true"/>
                   </Properties>
                 </Component>
-                <Container class="javax.swing.JScrollPane" name="UnitsScroll">
-                  <Properties>
-                    <Property name="name" type="java.lang.String" value="UnitsScroll" noResource="true"/>
-                  </Properties>
-
-                  <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
-                  <SubComponents>
-                    <Component class="javax.swing.JList" name="UnitList">
-                      <Properties>
-                        <Property name="background" type="java.awt.Color" resourceKey="UnitList.background"/>
-                        <Property name="model" type="javax.swing.ListModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                          <Connection code="unitsModel" type="code"/>
-                        </Property>
-                        <Property name="name" type="java.lang.String" value="UnitList" noResource="true"/>
-                      </Properties>
-                      <Events>
-                        <EventHandler event="valueChanged" listener="javax.swing.event.ListSelectionListener" parameters="javax.swing.event.ListSelectionEvent" handler="UnitListValueChanged"/>
-                      </Events>
-                    </Component>
-                  </SubComponents>
-                </Container>
                 <Component class="javax.swing.JLabel" name="lblTasks">
                   <Properties>
                     <Property name="text" type="java.lang.String" resourceKey="lblTasks.text"/>
@@ -388,6 +367,29 @@
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnOrganizeTaskActionPerformed"/>
                   </Events>
                 </Component>
+                <Container class="javax.swing.JScrollPane" name="jScrollPane5">
+                  <Properties>
+                    <Property name="name" type="java.lang.String" value="jScrollPane5" noResource="true"/>
+                  </Properties>
+                  <AuxValues>
+                    <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
+                  </AuxValues>
+
+                  <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
+                  <SubComponents>
+                    <Component class="javax.swing.JTable" name="UnitTable">
+                      <Properties>
+                        <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+                          <Connection code="unitModel" type="code"/>
+                        </Property>
+                        <Property name="name" type="java.lang.String" value="UnitTable" noResource="true"/>
+                      </Properties>
+                      <AuxValues>
+                        <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="UnitTable.setRowHeight(80);&#xa;UnitTable.getColumnModel().getColumn(0).setCellRenderer(unitModel.getRenderer());&#xa;UnitTable.getSelectionModel().addListSelectionListener(new javax.swing.event.ListSelectionListener() {&#xa;            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {&#xa;                UnitTableValueChanged(evt);&#xa;            }&#xa;        });"/>
+                      </AuxValues>
+                    </Component>
+                  </SubComponents>
+                </Container>
               </SubComponents>
             </Container>
             <Container class="javax.swing.JPanel" name="panSupplies">

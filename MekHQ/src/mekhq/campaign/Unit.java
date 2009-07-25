@@ -243,4 +243,13 @@ public class Unit implements Serializable {
         return "NO PILOT";
     }
     
+    /**
+     * produce a string in HTML that can be embedded in larger reports
+     */
+    public String getDescHTML() {
+        String toReturn = "<b>" + entity.getDisplayName() + "</b><br>";
+        toReturn += getPilotDesc() + "<br>";
+        return toReturn;
+    }
+    
 }

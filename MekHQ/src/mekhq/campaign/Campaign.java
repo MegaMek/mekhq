@@ -200,7 +200,13 @@ public class Campaign implements Serializable {
         return newTasks;
     }
     
-    public String getUnitTaskDesc(int unitId) {
+    /**
+     * return an html report on this unit. This will go in MekInfo
+     * @param unitId
+     * @return
+     */
+    public String getUnitDesc(int unitId) {
+        String toReturn = "<html>" + getUnit(unitId).getDescHTML();
         ArrayList<WorkItem> unitTasks = getTasksForUnit(unitId);
         int minutes = 0;
         int total = 0;
@@ -214,10 +220,13 @@ public class Campaign implements Serializable {
                 } 
             }
         }
-        if(total == 0) {
-            return "";
+        String assign = "";
+        if(total > 0) {
+            assign += "Total tasks: " + total + " Assigned: " + assigned;
         }
-        return " (" + assigned + "/" + total + "; " + minutes + " minutes)";
+        toReturn += assign;
+        toReturn += "</html>";
+        return toReturn;
     }
      
      public void assignTask(int teamId, int taskId) {
