@@ -80,7 +80,6 @@
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="btnChangePilot" min="-2" pref="130" max="-2" attributes="0"/>
                               <Component id="btnSellUnit" min="-2" pref="130" max="-2" attributes="0"/>
-                              <Component id="btnPurchaseUnit" min="-2" max="-2" attributes="0"/>
                               <Component id="btnDeployUnits" alignment="0" min="-2" pref="130" max="-2" attributes="1"/>
                               <Component id="loadListBtn" alignment="1" min="-2" pref="130" max="-2" attributes="1"/>
                           </Group>
@@ -97,7 +96,6 @@
                                   <EmptySpace min="-2" max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" max="-2" attributes="0">
                                       <Component id="btnOrganizeTask" max="32767" attributes="1"/>
-                                      <Component id="btnNewTeam" alignment="0" pref="121" max="32767" attributes="1"/>
                                       <Component id="ammoBtn" alignment="0" max="32767" attributes="1"/>
                                       <Component id="replaceBtn" alignment="0" max="32767" attributes="1"/>
                                   </Group>
@@ -120,9 +118,7 @@
                                           <Component id="loadListBtn" min="-2" max="-2" attributes="0"/>
                                           <EmptySpace max="-2" attributes="0"/>
                                           <Component id="btnDeployUnits" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace min="-2" pref="65" max="-2" attributes="0"/>
-                                          <Component id="btnPurchaseUnit" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                          <EmptySpace min="-2" pref="94" max="-2" attributes="0"/>
                                           <Component id="btnSellUnit" min="-2" max="-2" attributes="0"/>
                                           <EmptySpace min="-2" pref="47" max="-2" attributes="0"/>
                                           <Component id="btnChangePilot" min="-2" max="-2" attributes="0"/>
@@ -152,8 +148,7 @@
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Group type="102" attributes="0">
-                                          <Component id="btnNewTeam" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                          <EmptySpace min="-2" pref="29" max="-2" attributes="0"/>
                                           <Component id="btnOrganizeTask" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                       <Component id="jScrollPane1" alignment="0" min="-2" pref="232" max="-2" attributes="1"/>
@@ -262,23 +257,6 @@
                   <Properties>
                     <Property name="text" type="java.lang.String" resourceKey="lblTeams.text"/>
                     <Property name="name" type="java.lang.String" value="lblTeams" noResource="true"/>
-                  </Properties>
-                </Component>
-                <Component class="javax.swing.JButton" name="btnNewTeam">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" resourceKey="btnNewTeam.text"/>
-                    <Property name="toolTipText" type="java.lang.String" resourceKey="btnNewTeam.toolTipText"/>
-                    <Property name="name" type="java.lang.String" value="btnNewTeam" noResource="true"/>
-                  </Properties>
-                  <Events>
-                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnNewTeamActionPerformed"/>
-                  </Events>
-                </Component>
-                <Component class="javax.swing.JButton" name="btnPurchaseUnit">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" resourceKey="btnPurchaseUnit.text"/>
-                    <Property name="enabled" type="boolean" value="false"/>
-                    <Property name="name" type="java.lang.String" value="btnPurchaseUnit" noResource="true"/>
                   </Properties>
                 </Component>
                 <Component class="javax.swing.JButton" name="btnSellUnit">
@@ -416,13 +394,7 @@
                               <Group type="102" alignment="0" attributes="0">
                                   <Component id="jScrollPane2" min="-2" pref="384" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Component id="btnAssignDoc" min="-2" pref="156" max="-2" attributes="1"/>
-                                      <Component id="btnCustomizePerson" alignment="0" min="-2" pref="156" max="-2" attributes="1"/>
-                                      <Component id="btnHirePilot" alignment="0" min="-2" pref="156" max="-2" attributes="1"/>
-                                      <Component id="btnHireDoctor" alignment="0" min="-2" pref="156" max="-2" attributes="0"/>
-                                      <Component id="btnHireTech" alignment="1" min="-2" pref="156" max="-2" attributes="1"/>
-                                  </Group>
+                                  <Component id="btnAssignDoc" min="-2" pref="156" max="-2" attributes="1"/>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Component id="jScrollPane3" min="-2" pref="390" max="-2" attributes="0"/>
@@ -444,22 +416,8 @@
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="jScrollPane2" alignment="0" pref="617" max="32767" attributes="0"/>
                               <Group type="102" alignment="0" attributes="0">
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Group type="102" attributes="0">
-                                          <Component id="btnHirePilot" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace max="-2" attributes="0"/>
-                                          <Component id="btnHireTech" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace max="-2" attributes="0"/>
-                                          <Component id="btnHireDoctor" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace min="-2" pref="27" max="-2" attributes="0"/>
-                                          <Component id="btnCustomizePerson" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace type="separate" max="-2" attributes="0"/>
-                                      </Group>
-                                      <Group type="102" alignment="1" attributes="0">
-                                          <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace min="-2" pref="3" max="-2" attributes="0"/>
-                                      </Group>
-                                  </Group>
+                                  <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace min="-2" pref="3" max="-2" attributes="0"/>
                                   <Group type="103" groupAlignment="0" attributes="0">
                                       <Component id="btnAssignDoc" min="-2" max="-2" attributes="0"/>
                                       <Component id="jScrollPane3" min="-2" max="-2" attributes="0"/>
@@ -501,31 +459,6 @@
                     <Property name="name" type="java.lang.String" value="jLabel3" noResource="true"/>
                   </Properties>
                 </Component>
-                <Component class="javax.swing.JButton" name="btnHirePilot">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" resourceKey="btnHirePilot.text"/>
-                    <Property name="name" type="java.lang.String" value="btnHirePilot" noResource="true"/>
-                  </Properties>
-                  <Events>
-                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnHirePilotActionPerformed"/>
-                  </Events>
-                </Component>
-                <Component class="javax.swing.JButton" name="btnHireTech">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" resourceKey="btnHireTech.text"/>
-                    <Property name="name" type="java.lang.String" value="btnHireTech" noResource="true"/>
-                  </Properties>
-                  <Events>
-                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnHireTechActionPerformed"/>
-                  </Events>
-                </Component>
-                <Component class="javax.swing.JButton" name="btnCustomizePerson">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" resourceKey="btnCustomizePerson.text"/>
-                    <Property name="enabled" type="boolean" value="false"/>
-                    <Property name="name" type="java.lang.String" value="btnCustomizePerson" noResource="true"/>
-                  </Properties>
-                </Component>
                 <Container class="javax.swing.JScrollPane" name="jScrollPane3">
                   <Properties>
                     <Property name="name" type="java.lang.String" value="jScrollPane3" noResource="true"/>
@@ -564,15 +497,6 @@
                     <Property name="text" type="java.lang.String" resourceKey="jLabel4.text"/>
                     <Property name="name" type="java.lang.String" value="jLabel4" noResource="true"/>
                   </Properties>
-                </Component>
-                <Component class="javax.swing.JButton" name="btnHireDoctor">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" resourceKey="btnHireDoctor.text"/>
-                    <Property name="name" type="java.lang.String" value="btnHireDoctor" noResource="true"/>
-                  </Properties>
-                  <Events>
-                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnHireDoctorActionPerformed"/>
-                  </Events>
                 </Component>
               </SubComponents>
             </Container>
@@ -672,6 +596,56 @@
                 <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="0"/>
               </AuxValues>
             </MenuItem>
+          </SubComponents>
+        </Menu>
+        <Menu class="javax.swing.JMenu" name="menuMarket">
+          <Properties>
+            <Property name="text" type="java.lang.String" resourceKey="menuMarket.text"/>
+            <Property name="name" type="java.lang.String" value="menuMarket" noResource="true"/>
+          </Properties>
+          <SubComponents>
+            <MenuItem class="javax.swing.JMenuItem" name="miPurchaseUnit">
+              <Properties>
+                <Property name="text" type="java.lang.String" resourceKey="miPurchaseUnit.text"/>
+                <Property name="enabled" type="boolean" value="false"/>
+                <Property name="name" type="java.lang.String" value="miPurchaseUnit" noResource="true"/>
+              </Properties>
+            </MenuItem>
+            <Menu class="javax.swing.JMenu" name="menuHire">
+              <Properties>
+                <Property name="text" type="java.lang.String" resourceKey="menuHire.text"/>
+                <Property name="name" type="java.lang.String" value="menuHire" noResource="true"/>
+              </Properties>
+              <SubComponents>
+                <MenuItem class="javax.swing.JMenuItem" name="miHirePilot">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" resourceKey="miHirePilot.text"/>
+                    <Property name="name" type="java.lang.String" value="miHirePilot" noResource="true"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="miHirePilotActionPerformed"/>
+                  </Events>
+                </MenuItem>
+                <MenuItem class="javax.swing.JMenuItem" name="miHireTech">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" resourceKey="miHireTech.text"/>
+                    <Property name="name" type="java.lang.String" value="miHireTech" noResource="true"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="miHireTechActionPerformed"/>
+                  </Events>
+                </MenuItem>
+                <MenuItem class="javax.swing.JMenuItem" name="miHireDoctor">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" resourceKey="miHireDoctor.text"/>
+                    <Property name="name" type="java.lang.String" value="miHireDoctor" noResource="true"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="miHireDoctorActionPerformed"/>
+                  </Events>
+                </MenuItem>
+              </SubComponents>
+            </Menu>
           </SubComponents>
         </Menu>
         <Menu class="javax.swing.JMenu" name="helpMenu">
