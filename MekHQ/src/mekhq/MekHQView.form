@@ -79,10 +79,8 @@
                           <EmptySpace min="-2" pref="70" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="btnChangePilot" min="-2" pref="130" max="-2" attributes="0"/>
-                              <Component id="btnRemovePilot" min="-2" pref="130" max="-2" attributes="0"/>
                               <Component id="btnSellUnit" min="-2" pref="130" max="-2" attributes="0"/>
                               <Component id="btnPurchaseUnit" min="-2" max="-2" attributes="0"/>
-                              <Component id="btnViewUnit" min="-2" pref="130" max="-2" attributes="1"/>
                               <Component id="btnDeployUnits" alignment="0" min="-2" pref="130" max="-2" attributes="1"/>
                               <Component id="loadListBtn" alignment="1" min="-2" pref="130" max="-2" attributes="1"/>
                           </Group>
@@ -122,15 +120,11 @@
                                           <Component id="loadListBtn" min="-2" max="-2" attributes="0"/>
                                           <EmptySpace max="-2" attributes="0"/>
                                           <Component id="btnDeployUnits" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace type="separate" max="-2" attributes="0"/>
-                                          <Component id="btnViewUnit" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace type="separate" max="-2" attributes="0"/>
+                                          <EmptySpace min="-2" pref="65" max="-2" attributes="0"/>
                                           <Component id="btnPurchaseUnit" min="-2" max="-2" attributes="0"/>
                                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                                           <Component id="btnSellUnit" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace type="separate" max="-2" attributes="0"/>
-                                          <Component id="btnRemovePilot" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                          <EmptySpace min="-2" pref="47" max="-2" attributes="0"/>
                                           <Component id="btnChangePilot" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                       <Group type="102" attributes="0">
@@ -178,16 +172,6 @@
                     <Property name="text" type="java.lang.String" resourceKey="lblTasks.text"/>
                     <Property name="name" type="java.lang.String" value="lblTasks" noResource="true"/>
                   </Properties>
-                </Component>
-                <Component class="javax.swing.JButton" name="btnViewUnit">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" resourceKey="btnViewUnit.text"/>
-                    <Property name="toolTipText" type="java.lang.String" resourceKey="btnViewUnit.toolTipText"/>
-                    <Property name="name" type="java.lang.String" value="btnViewUnit" noResource="true"/>
-                  </Properties>
-                  <Events>
-                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnViewUnitActionPerformed"/>
-                  </Events>
                 </Component>
                 <Component class="javax.swing.JButton" name="btnDeployUnits">
                   <Properties>
@@ -304,15 +288,6 @@
                     <Property name="name" type="java.lang.String" value="btnSellUnit" noResource="true"/>
                   </Properties>
                 </Component>
-                <Component class="javax.swing.JButton" name="btnRemovePilot">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" resourceKey="btnRemovePilot.text"/>
-                    <Property name="name" type="java.lang.String" value="btnRemovePilot" noResource="true"/>
-                  </Properties>
-                  <Events>
-                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnRemovePilotActionPerformed"/>
-                  </Events>
-                </Component>
                 <Component class="javax.swing.JButton" name="btnChangePilot">
                   <Properties>
                     <Property name="text" type="java.lang.String" resourceKey="btnChangePilot.text"/>
@@ -372,7 +347,7 @@
                         <Property name="name" type="java.lang.String" value="UnitTable" noResource="true"/>
                       </Properties>
                       <AuxValues>
-                        <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="UnitTable.setRowHeight(80);&#xa;UnitTable.getColumnModel().getColumn(0).setCellRenderer(unitModel.getRenderer());&#xa;UnitTable.getSelectionModel().addListSelectionListener(new javax.swing.event.ListSelectionListener() {&#xa;            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {&#xa;                UnitTableValueChanged(evt);&#xa;            }&#xa;        });"/>
+                        <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="UnitTable.setRowHeight(80);&#xa;UnitTable.getColumnModel().getColumn(0).setCellRenderer(unitModel.getRenderer());&#xa;UnitTable.getSelectionModel().addListSelectionListener(new javax.swing.event.ListSelectionListener() {&#xa;            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {&#xa;                UnitTableValueChanged(evt);&#xa;            }&#xa;        });&#xa;UnitTable.addMouseListener(unitMouseAdapter);"/>
                       </AuxValues>
                     </Component>
                   </SubComponents>

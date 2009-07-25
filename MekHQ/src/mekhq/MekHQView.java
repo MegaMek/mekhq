@@ -32,6 +32,7 @@ import org.jdesktop.application.FrameView;
 import org.jdesktop.application.TaskMonitor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -45,7 +46,10 @@ import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import javax.swing.JTable;
+import javax.swing.event.MouseInputAdapter;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellEditor;
@@ -74,6 +78,7 @@ public class MekHQView extends FrameView {
     private DefaultListModel doctorsModel = new DefaultListModel();
     private TaskTableModel taskModel = new TaskTableModel();
     private MekTableModel unitModel = new MekTableModel();
+    private MekTableMouseAdapter unitMouseAdapter;
     private int currentUnitId;
     private int currentTaskId;
     private int currentTechId;
@@ -85,6 +90,7 @@ public class MekHQView extends FrameView {
     public MekHQView(SingleFrameApplication app) {
         super(app);
       
+        unitMouseAdapter = new MekTableMouseAdapter();
         initComponents();
 
         refreshCalendar();
@@ -168,7 +174,6 @@ public class MekHQView extends FrameView {
         panFinances = new javax.swing.JTabbedPane();
         panHangar = new javax.swing.JPanel();
         lblTasks = new javax.swing.JLabel();
-        btnViewUnit = new javax.swing.JButton();
         btnDeployUnits = new javax.swing.JButton();
         loadListBtn = new javax.swing.JButton();
         ammoBtn = new javax.swing.JButton();
@@ -181,7 +186,6 @@ public class MekHQView extends FrameView {
         btnNewTeam = new javax.swing.JButton();
         btnPurchaseUnit = new javax.swing.JButton();
         btnSellUnit = new javax.swing.JButton();
-        btnRemovePilot = new javax.swing.JButton();
         btnChangePilot = new javax.swing.JButton();
         jScrollPane4 = new javax.swing.JScrollPane();
         TaskTable = new javax.swing.JTable();
@@ -238,15 +242,6 @@ public class MekHQView extends FrameView {
 
         lblTasks.setText(resourceMap.getString("lblTasks.text")); // NOI18N
         lblTasks.setName("lblTasks"); // NOI18N
-
-        btnViewUnit.setText(resourceMap.getString("btnViewUnit.text")); // NOI18N
-        btnViewUnit.setToolTipText(resourceMap.getString("btnViewUnit.toolTipText")); // NOI18N
-        btnViewUnit.setName("btnViewUnit"); // NOI18N
-        btnViewUnit.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnViewUnitActionPerformed(evt);
-            }
-        });
 
         btnDeployUnits.setText(resourceMap.getString("btnDeployUnits.text")); // NOI18N
         btnDeployUnits.setToolTipText(resourceMap.getString("btnDeployUnits.toolTipText")); // NOI18N
@@ -331,14 +326,6 @@ public class MekHQView extends FrameView {
         btnSellUnit.setEnabled(false);
         btnSellUnit.setName("btnSellUnit"); // NOI18N
 
-        btnRemovePilot.setText(resourceMap.getString("btnRemovePilot.text")); // NOI18N
-        btnRemovePilot.setName("btnRemovePilot"); // NOI18N
-        btnRemovePilot.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnRemovePilotActionPerformed(evt);
-            }
-        });
-
         btnChangePilot.setText(resourceMap.getString("btnChangePilot.text")); // NOI18N
         btnChangePilot.setName("btnChangePilot"); // NOI18N
         btnChangePilot.addActionListener(new java.awt.event.ActionListener() {
@@ -377,6 +364,7 @@ public class MekHQView extends FrameView {
                 UnitTableValueChanged(evt);
             }
         });
+        UnitTable.addMouseListener(unitMouseAdapter);
         jScrollPane5.setViewportView(UnitTable);
 
         org.jdesktop.layout.GroupLayout panHangarLayout = new org.jdesktop.layout.GroupLayout(panHangar);
@@ -389,10 +377,8 @@ public class MekHQView extends FrameView {
                 .add(70, 70, 70)
                 .add(panHangarLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(btnChangePilot, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 130, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(btnRemovePilot, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 130, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(btnSellUnit, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 130, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(btnPurchaseUnit)
-                    .add(btnViewUnit, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 130, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(btnDeployUnits, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 130, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, loadListBtn, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 130, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -425,15 +411,11 @@ public class MekHQView extends FrameView {
                                 .add(loadListBtn)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                 .add(btnDeployUnits)
-                                .add(18, 18, 18)
-                                .add(btnViewUnit)
-                                .add(18, 18, 18)
+                                .add(65, 65, 65)
                                 .add(btnPurchaseUnit)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
                                 .add(btnSellUnit)
-                                .add(18, 18, 18)
-                                .add(btnRemovePilot)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                                .add(47, 47, 47)
                                 .add(btnChangePilot))
                             .add(panHangarLayout.createSequentialGroup()
                                 .add(panHangarLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -835,15 +817,6 @@ private void ammoBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
     }
 }//GEN-LAST:event_ammoBtnActionPerformed
 
-private void btnViewUnitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnViewUnitActionPerformed
-  if(currentUnitId == -1) {
-      return;
-  }
-  MechView mv = new MechView(campaign.getUnit(currentUnitId).getEntity(), false);
-  MekViewDialog mvd = new MekViewDialog(this.getFrame(), true, mv);
-  mvd.setVisible(true);
-}//GEN-LAST:event_btnViewUnitActionPerformed
-
 private void btnHireTechActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHireTechActionPerformed
     NewTechTeamDialog ntd = new NewTechTeamDialog(this.getFrame(), true, campaign);
     ntd.setVisible(true);
@@ -856,14 +829,6 @@ private void btnHirePilotActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
     npd.setVisible(true);
     refreshPersonnelList();
 }//GEN-LAST:event_btnHirePilotActionPerformed
-
-private void btnRemovePilotActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemovePilotActionPerformed
-   if(currentUnitId == -1) {
-      return;
-   }
-   campaign.getUnit(currentUnitId).removePilot();
-   refreshUnitList();
-}//GEN-LAST:event_btnRemovePilotActionPerformed
 
 private void btnChangePilotActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChangePilotActionPerformed
     if(currentUnitId == -1) {
@@ -1289,6 +1254,74 @@ public class MekTableModel extends AbstractTableModel {
     }
 }
 
+public class MekTableMouseAdapter extends MouseInputAdapter implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent action) {
+            String command = action.getActionCommand();
+            Unit unit = unitModel.getUnitAt(UnitTable.getSelectedRow());
+            if (command.equalsIgnoreCase("REMOVE_PILOT")) {
+                unit.removePilot();
+            } else if (command.equalsIgnoreCase("UNASSIGN_ALL")) {
+                for(WorkItem task : campaign.getTasksForUnit(unit.getId())) {
+                    task.unassignTeam();
+                }
+                refreshTaskList();
+            }        
+        }
+        
+        @Override
+        public void mouseClicked(MouseEvent e) {
+
+            if (e.getClickCount() == 2) {
+                int row = UnitTable.rowAtPoint(e.getPoint());
+                Unit unit = unitModel.getUnitAt(row);
+                if(null != unit) {
+                    MechView mv = new MechView(unit.getEntity(), false);
+                    MekViewDialog mvd = new MekViewDialog(null, true, mv);
+                    mvd.setVisible(true);
+                }
+            }
+        }
+        
+        @Override
+        public void mousePressed(MouseEvent e) {
+            maybeShowPopup(e);
+        }
+        
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            maybeShowPopup(e);
+        }
+        
+        private void maybeShowPopup(MouseEvent e) {
+            JPopupMenu popup = new JPopupMenu();
+            if (e.isPopupTrigger()) {
+                int row = UnitTable.rowAtPoint(e.getPoint());
+                Unit unit  = unitModel.getUnitAt(row);
+                JMenuItem menuItem = null;
+                //**lets fill the pop up menu**//
+                //clear all assigned tasks
+                menuItem = new JMenuItem("Unassign all tasks");
+                menuItem.setActionCommand("UNASSIGN_ALL");
+                menuItem.addActionListener(this);
+                popup.add(menuItem);
+                //TODO: assign all tasks to a certain tech
+                //remove pilot
+                menuItem = new JMenuItem("Remove pilot");
+                menuItem.setActionCommand("REMOVE_PILOT");
+                menuItem.addActionListener(this);
+                menuItem.setEnabled(unit.hasPilot());
+                popup.add(menuItem);
+                //TODO: switch pilot (should be its own menu)
+                //TODO: scrap unit
+                //TODO: sell unit
+                //TODO: add quirks?
+                popup.show(e.getComponent(), e.getX(), e.getY());
+            }
+        }
+}
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JList DoctorsList;
     private javax.swing.JTable TaskTable;
@@ -1307,9 +1340,7 @@ public class MekTableModel extends AbstractTableModel {
     private javax.swing.JButton btnNewTeam;
     private javax.swing.JButton btnOrganizeTask;
     private javax.swing.JButton btnPurchaseUnit;
-    private javax.swing.JButton btnRemovePilot;
     private javax.swing.JButton btnSellUnit;
-    private javax.swing.JButton btnViewUnit;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
