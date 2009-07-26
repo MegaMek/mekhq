@@ -162,6 +162,12 @@ public abstract class SupportTeam implements Serializable {
    
    public abstract int makeRoll(WorkItem task);
    
+   public TargetRoll getTargetFor(WorkItem task) {
+       TargetRoll target = getTarget();
+       target.append(task.getAllMods());
+       return target;
+   }
+   
    public String doAssigned(WorkItem task) {
        String report = "  " + task.getDisplayName();
        //check whether the task is currently possible
@@ -176,8 +182,7 @@ public abstract class SupportTeam implements Serializable {
        } else {
            setMinutesLeft(getMinutesLeft() - minutes);
        }
-       TargetRoll target = getTarget();
-       target.append(task.getAllMods()); 
+       TargetRoll target = getTargetFor(task);
        int roll = makeRoll(task);
        report = report + ", needs " + target.getValueAsString() + " and rolls " + roll + ":";
        if(roll >= target.getValue()) {

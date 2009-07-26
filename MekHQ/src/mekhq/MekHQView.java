@@ -185,9 +185,10 @@ public class MekHQView extends FrameView {
         btnChangePilot = new javax.swing.JButton();
         jScrollPane4 = new javax.swing.JScrollPane();
         TaskTable = new javax.swing.JTable();
-        btnOrganizeTask = new javax.swing.JButton();
         jScrollPane5 = new javax.swing.JScrollPane();
         UnitTable = new javax.swing.JTable();
+        jScrollPane6 = new javax.swing.JScrollPane();
+        textTarget = new javax.swing.JTextArea();
         panSupplies = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         panPersonnel = new javax.swing.JPanel();
@@ -323,14 +324,6 @@ public class MekHQView extends FrameView {
         });
         jScrollPane4.setViewportView(TaskTable);
 
-        btnOrganizeTask.setText(resourceMap.getString("btnOrganizeTask.text")); // NOI18N
-        btnOrganizeTask.setName("btnOrganizeTask"); // NOI18N
-        btnOrganizeTask.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnOrganizeTaskActionPerformed(evt);
-            }
-        });
-
         jScrollPane5.setName("jScrollPane5"); // NOI18N
 
         UnitTable.setModel(unitModel);
@@ -344,6 +337,17 @@ public class MekHQView extends FrameView {
         });
         UnitTable.addMouseListener(unitMouseAdapter);
         jScrollPane5.setViewportView(UnitTable);
+
+        jScrollPane6.setName("jScrollPane6"); // NOI18N
+
+        textTarget.setBackground(resourceMap.getColor("textTarget.background")); // NOI18N
+        textTarget.setColumns(20);
+        textTarget.setEditable(false);
+        textTarget.setRows(5);
+        textTarget.setText(resourceMap.getString("textTarget.text")); // NOI18N
+        textTarget.setBorder(null);
+        textTarget.setName("textTarget"); // NOI18N
+        jScrollPane6.setViewportView(textTarget);
 
         org.jdesktop.layout.GroupLayout panHangarLayout = new org.jdesktop.layout.GroupLayout(panHangar);
         panHangar.setLayout(panHangarLayout);
@@ -365,18 +369,19 @@ public class MekHQView extends FrameView {
                                 .add(485, 485, 485))
                             .add(panHangarLayout.createSequentialGroup()
                                 .add(panHangarLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                    .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 532, Short.MAX_VALUE)
-                                    .add(jScrollPane4, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 532, Short.MAX_VALUE))
+                                    .add(jScrollPane4, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 532, Short.MAX_VALUE)
+                                    .add(org.jdesktop.layout.GroupLayout.TRAILING, jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 532, Short.MAX_VALUE))
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                 .add(panHangarLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                                     .add(replaceBtn, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 141, Short.MAX_VALUE)
-                                    .add(ammoBtn, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 141, Short.MAX_VALUE)
-                                    .add(btnOrganizeTask))))
+                                    .add(ammoBtn, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 141, Short.MAX_VALUE))))
                         .add(286, 286, 286)
                         .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .add(0, 0, 0))
                     .add(panHangarLayout.createSequentialGroup()
                         .add(btnDoTask)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(jScrollPane6, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addContainerGap())))
         );
         panHangarLayout.setVerticalGroup(
@@ -384,7 +389,7 @@ public class MekHQView extends FrameView {
             .add(panHangarLayout.createSequentialGroup()
                 .add(20, 20, 20)
                 .add(panHangarLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jScrollPane5, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 641, Short.MAX_VALUE)
+                    .add(jScrollPane5, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 660, Short.MAX_VALUE)
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, panHangarLayout.createSequentialGroup()
                         .add(panHangarLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(panHangarLayout.createSequentialGroup()
@@ -396,20 +401,19 @@ public class MekHQView extends FrameView {
                                         .add(ammoBtn)
                                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
                                         .add(replaceBtn))
-                                    .add(jScrollPane4, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 340, Short.MAX_VALUE))
+                                    .add(jScrollPane4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 289, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(btnDoTask)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED))
+                                .add(panHangarLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                    .add(jScrollPane6, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                                    .add(btnDoTask)))
                             .add(panHangarLayout.createSequentialGroup()
                                 .add(loadListBtn)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                 .add(btnDeployUnits)
                                 .add(18, 18, 18)
-                                .add(btnChangePilot)
-                                .add(300, 300, 300)))
-                        .add(panHangarLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(btnOrganizeTask)
-                            .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 232, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))))
+                                .add(btnChangePilot)))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 232, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
 
@@ -735,6 +739,7 @@ private void TaskTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
     updateAssignEnabled();
     updateReplaceEnabled();
     updateAmmoSwapEnabled();
+    updateTargetText();
 }
 
 private void UnitTableValueChanged(javax.swing.event.ListSelectionEvent evt) {                                       
@@ -839,14 +844,6 @@ private void personnelListValueChanged(javax.swing.event.ListSelectionEvent evt)
     }
     updateAssignDoctorEnabled();
 }//GEN-LAST:event_personnelListValueChanged
-
-private void btnOrganizeTaskActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOrganizeTaskActionPerformed
-    if(currentTechId == -1) {
-        return;
-    }   
-    OrganizeTasksDialog otd = new OrganizeTasksDialog(this.getFrame(), true, campaign.getTeam(currentTechId).getTasksAssigned());
-    otd.setVisible(true);
-}//GEN-LAST:event_btnOrganizeTaskActionPerformed
 
 private void miHirePilotActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miHirePilotActionPerformed
     NewPilotDialog npd = new NewPilotDialog(this.getFrame(), true, campaign);
@@ -1060,6 +1057,17 @@ protected void updateReplaceEnabled() {
     } else {
         replaceBtn.setEnabled(false);
     }    
+}
+
+protected void updateTargetText() {
+    //must have a valid team and an unassigned task
+    WorkItem task = campaign.getTask(currentTaskId);
+    SupportTeam team = campaign.getTeam(currentTechId);
+    if(null != task && null != team) {
+        textTarget.setText(team.getTargetFor(task).getDesc());
+    } else {
+        textTarget.setText("");
+    }
 }
 
 protected void updateAmmoSwapEnabled() {
@@ -1278,7 +1286,6 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
     private javax.swing.JButton btnChangePilot;
     private javax.swing.JButton btnDeployUnits;
     private javax.swing.JButton btnDoTask;
-    private javax.swing.JButton btnOrganizeTask;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -1289,6 +1296,7 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane5;
+    private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JLabel lblDate;
     private javax.swing.JLabel lblTasks;
@@ -1313,6 +1321,7 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
     private javax.swing.JLabel statusAnimationLabel;
     private javax.swing.JLabel statusMessageLabel;
     private javax.swing.JPanel statusPanel;
+    private javax.swing.JTextArea textTarget;
     // End of variables declaration//GEN-END:variables
 
     private final Timer messageTimer;
