@@ -1204,7 +1204,7 @@ public class MekTableModel extends AbstractTableModel {
             setOpaque(true);
             setUnit(u.getEntity());
             setText(getValueAt(row, column).toString());
-            setToolTipText(null);
+            setToolTipText(campaign.getToolTipFor(u));
             if(isSelected) {
                 //TODO: how do I set this to the user's default selection color?
                 c.setBackground(new Color(253, 117, 28));

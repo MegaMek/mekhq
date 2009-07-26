@@ -313,4 +313,19 @@ public class Campaign implements Serializable {
         unitIds.remove(new Integer(unit.getId()));      
     }
     
+    /**
+     * return a string (HTML formatted) of tasks for this unit
+     * @param unit
+     * @return
+     */
+    public String getToolTipFor(Unit unit) {
+        
+        String toReturn = "<html>Double-click for unit view<br>Right-click for further actions<br><b>Tasks:</b><br>";
+        for(WorkItem task : getTasksForUnit(unit.getId())) {
+            toReturn += task.getDesc() + "<br>";
+        }
+        toReturn += "</html>";
+        return toReturn;
+    }
+    
 }
