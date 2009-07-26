@@ -114,7 +114,7 @@
                                   <EmptySpace min="0" pref="0" max="0" attributes="0"/>
                               </Group>
                               <Group type="102" alignment="0" attributes="0">
-                                  <Component id="assignBtn" min="-2" max="-2" attributes="0"/>
+                                  <Component id="btnDoTask" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="-2" attributes="0"/>
                               </Group>
                           </Group>
@@ -142,7 +142,7 @@
                                               <Component id="jScrollPane4" pref="340" max="32767" attributes="0"/>
                                           </Group>
                                           <EmptySpace max="-2" attributes="0"/>
-                                          <Component id="assignBtn" min="-2" max="-2" attributes="0"/>
+                                          <Component id="btnDoTask" min="-2" max="-2" attributes="0"/>
                                           <EmptySpace max="-2" attributes="0"/>
                                       </Group>
                                       <Group type="102" alignment="0" attributes="0">
@@ -246,15 +246,15 @@
                     </Component>
                   </SubComponents>
                 </Container>
-                <Component class="javax.swing.JButton" name="assignBtn">
+                <Component class="javax.swing.JButton" name="btnDoTask">
                   <Properties>
-                    <Property name="text" type="java.lang.String" resourceKey="assignBtn.text"/>
-                    <Property name="toolTipText" type="java.lang.String" resourceKey="assignBtn.toolTipText"/>
+                    <Property name="text" type="java.lang.String" resourceKey="btnDoTask.text"/>
+                    <Property name="toolTipText" type="java.lang.String" resourceKey="btnDoTask.toolTipText"/>
                     <Property name="enabled" type="boolean" value="false"/>
-                    <Property name="name" type="java.lang.String" value="assignBtn" noResource="true"/>
+                    <Property name="name" type="java.lang.String" value="btnDoTask" noResource="true"/>
                   </Properties>
                   <Events>
-                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="assignBtnActionPerformed"/>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnDoTaskActionPerformed"/>
                   </Events>
                 </Component>
                 <Component class="javax.swing.JButton" name="btnChangePilot">

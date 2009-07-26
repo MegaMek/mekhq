@@ -181,7 +181,7 @@ public class MekHQView extends FrameView {
         replaceBtn = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         TeamsList = new javax.swing.JList();
-        assignBtn = new javax.swing.JButton();
+        btnDoTask = new javax.swing.JButton();
         btnChangePilot = new javax.swing.JButton();
         jScrollPane4 = new javax.swing.JScrollPane();
         TaskTable = new javax.swing.JTable();
@@ -294,13 +294,13 @@ public class MekHQView extends FrameView {
         });
         jScrollPane1.setViewportView(TeamsList);
 
-        assignBtn.setText(resourceMap.getString("assignBtn.text")); // NOI18N
-        assignBtn.setToolTipText(resourceMap.getString("assignBtn.toolTipText")); // NOI18N
-        assignBtn.setEnabled(false);
-        assignBtn.setName("assignBtn"); // NOI18N
-        assignBtn.addActionListener(new java.awt.event.ActionListener() {
+        btnDoTask.setText(resourceMap.getString("btnDoTask.text")); // NOI18N
+        btnDoTask.setToolTipText(resourceMap.getString("btnDoTask.toolTipText")); // NOI18N
+        btnDoTask.setEnabled(false);
+        btnDoTask.setName("btnDoTask"); // NOI18N
+        btnDoTask.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                assignBtnActionPerformed(evt);
+                btnDoTaskActionPerformed(evt);
             }
         });
 
@@ -376,7 +376,7 @@ public class MekHQView extends FrameView {
                         .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .add(0, 0, 0))
                     .add(panHangarLayout.createSequentialGroup()
-                        .add(assignBtn)
+                        .add(btnDoTask)
                         .addContainerGap())))
         );
         panHangarLayout.setVerticalGroup(
@@ -398,7 +398,7 @@ public class MekHQView extends FrameView {
                                         .add(replaceBtn))
                                     .add(jScrollPane4, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 340, Short.MAX_VALUE))
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(assignBtn)
+                                .add(btnDoTask)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED))
                             .add(panHangarLayout.createSequentialGroup()
                                 .add(loadListBtn)
@@ -691,20 +691,25 @@ private void loadListBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     loadListFile();
 }//GEN-LAST:event_loadListBtnActionPerformed
 
-private void assignBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_assignBtnActionPerformed
+private void btnDoTaskActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDoTaskActionPerformed
     //assign the task to the team here
-    campaign.assignTask(currentTechId, currentTaskId);
-    int next = TaskTable.getSelectedRow() + 1;
-    refreshUnitList();
-    refreshTaskList();
-    if(next < TaskTable.getRowCount()) {
-        TaskTable.setRowSelectionInterval(next, next);
-    } else {
-        TaskTable.setRowSelectionInterval(0,0);
+    WorkItem task = campaign.getTask(currentTaskId);
+    SupportTeam team = campaign.getTeam(currentTechId);
+    int row = TaskTable.getSelectedRow();
+    if(null != task && null != team) {
+        boolean completed = campaign.processTask(task, team);
+        refreshUnitList();
+        refreshTaskList();
+        refreshTeamsList();
+        if(!completed) {
+            row++;
+        }
+        if(row >= TaskTable.getRowCount()) {
+            row = 0;
+        }
+        TaskTable.setRowSelectionInterval(row, row); 
     }
-    refreshTeamsList();
-    refreshDoctorsList();
-}//GEN-LAST:event_assignBtnActionPerformed
+}//GEN-LAST:event_btnDoTaskActionPerformed
 
 private void TeamsListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_TeamsListValueChanged
     int selected = TeamsList.getSelectedIndex();
@@ -1028,10 +1033,10 @@ protected void updateAssignEnabled() {
     //must have a valid team and an unassigned task
     WorkItem curTask = campaign.getTask(currentTaskId);
     SupportTeam team = campaign.getTeam(currentTechId);
-    if(null != curTask && curTask.isUnassigned() && null != team && team.canDo(curTask)) {
-        assignBtn.setEnabled(true);
+    if(null != curTask && null != team && team.canDo(curTask)) {
+        btnDoTask.setEnabled(true);
     } else {
-        assignBtn.setEnabled(false);
+        btnDoTask.setEnabled(false);
     }    
 }
 
@@ -1040,7 +1045,6 @@ protected void updateAssignDoctorEnabled() {
     Person curPerson = campaign.getPerson(currentPersonId);
     SupportTeam team = campaign.getTeam(currentDoctorId);
     if(null != curPerson && null != curPerson.getTask() 
-            && curPerson.getTask().isUnassigned()
             && null != team && team.canDo(curPerson.getTask())) {     
         btnAssignDoc.setEnabled(true);
     } else {
@@ -1076,10 +1080,9 @@ public class TaskTableModel extends AbstractTableModel {
         public static final int TIME_INDEX = 1;
         public static final int SKILL_INDEX = 2;
         public static final int MOD_INDEX = 3;
-        public static final int ASSIGN_INDEX = 4;
-        public static final int NUM_COLS = 5;
+        public static final int NUM_COLS = 4;
     
-        private String[] columnNames = {"Name", "Time Left", "Skill", "Mod", "Assigned"};
+        private String[] columnNames = {"Name", "Time Left", "Skill", "Mod"};
         private ArrayList<WorkItem> tasks;
  
         public TaskTableModel() {
@@ -1108,12 +1111,6 @@ public class TaskTableModel extends AbstractTableModel {
                 return SupportTeam.getRatingName(task.getSkillMin());
              case MOD_INDEX:
                 return task.getAllMods().getValueAsString();
-             case ASSIGN_INDEX:
-                 if(task.isUnassigned()) {
-                     return "none";
-                 } else {
-                    return task.getTeam().getName();
-                 }
              default:
                 return new Object();
          }
@@ -1131,12 +1128,7 @@ public class TaskTableModel extends AbstractTableModel {
         
         @Override
         public boolean isCellEditable(int row, int col) {
-            //allow editing of assignment column only
-            if(col == ASSIGN_INDEX) {
-                return true;
-            } else {
-                return false;
-            }
+            return false;
         }
      
         //fill table with values
@@ -1225,12 +1217,7 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
             Unit unit = unitModel.getUnitAt(UnitTable.getSelectedRow());
             if (command.equalsIgnoreCase("REMOVE_PILOT")) {
                 unit.removePilot();
-            } else if (command.equalsIgnoreCase("UNASSIGN_ALL")) {
-                for(WorkItem task : campaign.getTasksForUnit(unit.getId())) {
-                    task.unassignTeam();
-                }
-                refreshTaskList();
-            }        
+            }      
         }
         
         @Override
@@ -1263,12 +1250,7 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
                 int row = UnitTable.rowAtPoint(e.getPoint());
                 Unit unit  = unitModel.getUnitAt(row);
                 JMenuItem menuItem = null;
-                //**lets fill the pop up menu**//
-                //clear all assigned tasks
-                menuItem = new JMenuItem("Unassign all tasks");
-                menuItem.setActionCommand("UNASSIGN_ALL");
-                menuItem.addActionListener(this);
-                popup.add(menuItem);
+                //**lets fill the pop up menu**//               
                 //TODO: assign all tasks to a certain tech
                 //remove pilot
                 menuItem = new JMenuItem("Remove pilot");
@@ -1291,11 +1273,11 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
     private javax.swing.JList TeamsList;
     private javax.swing.JTable UnitTable;
     private javax.swing.JButton ammoBtn;
-    private javax.swing.JButton assignBtn;
     private javax.swing.JButton btnAdvanceDay;
     private javax.swing.JButton btnAssignDoc;
     private javax.swing.JButton btnChangePilot;
     private javax.swing.JButton btnDeployUnits;
+    private javax.swing.JButton btnDoTask;
     private javax.swing.JButton btnOrganizeTask;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;

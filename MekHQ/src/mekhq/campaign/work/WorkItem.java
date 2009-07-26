@@ -35,8 +35,6 @@ public abstract class WorkItem implements Serializable {
     protected String name;
     //the id of this work item
     protected int id;
-    //the id of the team assigned to this item
-    protected SupportTeam team;
     //the skill modifier for difficulty
     protected int difficulty;
     //the amount of time for the repair
@@ -49,7 +47,6 @@ public abstract class WorkItem implements Serializable {
     public WorkItem() {
         this.name = "Unknown";
         this.skillMin = SupportTeam.EXP_GREEN;
-        this.team = null;
         this.completed = false;
     }
     
@@ -69,19 +66,6 @@ public abstract class WorkItem implements Serializable {
     
     public void setId(int i) {
         this.id = i;
-    }
-    
-    public SupportTeam getTeam() {
-        return team;
-    }
-    
-    public void assignTeam(SupportTeam team) {
-        this.team = team;
-    }
-    
-    public void unassignTeam() {
-        team.removeTask(this);
-        team = null;    
     }
     
     public int getDifficulty() {
@@ -110,16 +94,10 @@ public abstract class WorkItem implements Serializable {
     
     public void complete() {
         this.completed = true;
-        unassignTeam();
-    }
-    
-    public boolean isUnassigned() {
-        return null == team;
     }
     
     public String getDesc() {
-        String assign = isUnassigned() ? "*":"";
-        return  assign + getName() + " " + getStats();  
+        return  getName() + " " + getStats();  
     }
     
     public String getStats() {
@@ -156,11 +134,9 @@ public abstract class WorkItem implements Serializable {
      * fail this work item
      * @param rating - an <code>int</code> of the skill rating of the currently assigned team
      */
-    public void fail() {
+    public void fail(int rating) {
         //increment the minimum skill level required
-        setSkillMin(team.getRating() + 1);
-        //unassign the current team
-        unassignTeam();
+        setSkillMin(rating + 1);
     }
     
 }

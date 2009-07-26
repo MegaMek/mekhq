@@ -48,6 +48,7 @@ public abstract class SupportTeam implements Serializable {
     protected int fullSize;
     protected int currentSize;
     protected int hours;
+    protected int minutesLeft;
     
     protected ArrayList<WorkItem> assignedTasks;
     
@@ -75,6 +76,7 @@ public abstract class SupportTeam implements Serializable {
         this.rating = rating;
         this.hours = 8;
         this.assignedTasks = new ArrayList<WorkItem>();
+        resetMinutesLeft();
     }
     
     public int getRating() {
@@ -107,6 +109,18 @@ public abstract class SupportTeam implements Serializable {
     
     public void setHours(int i) {
         this.hours = i;
+    }
+    
+    public int getMinutesLeft() {
+        return minutesLeft;
+    }
+    
+    public void setMinutesLeft(int m) {
+        this.minutesLeft = m;
+    }
+    
+    public void resetMinutesLeft() {
+        this.minutesLeft = 60 * getHours();
     }
     
     public int getCasualties() {
@@ -148,7 +162,54 @@ public abstract class SupportTeam implements Serializable {
    
    public abstract int makeRoll(WorkItem task);
    
+   public String doAssigned(WorkItem task) {
+       String report = "  " + task.getDisplayName();
+       //check whether the task is currently possible
+       if(null != task.checkFixable()) {
+           report = report + ", but the task is impossible because " + task.checkFixable();
+           return report;
+       }        
+       int minutes = task.getTime();
+       if(minutes > getMinutesLeft()) {
+           report = report  + ", but ran out of time for the day, see you tommorrow!";
+           return report;
+       } else {
+           setMinutesLeft(getMinutesLeft() - minutes);
+       }
+       TargetRoll target = getTarget();
+       target.append(task.getAllMods()); 
+       int roll = makeRoll(task);
+       report = report + ", needs " + target.getValueAsString() + " and rolls " + roll + ":";
+       if(roll >= target.getValue()) {
+           report = report + " task completed.";
+           task.fix();
+           task.complete();
+       } else {
+           report = report + " task failed.";
+           task.fail(getRating());
+           //have we run out of options?
+           if(task.getSkillMin() > EXP_ELITE) {
+               if(task instanceof RepairItem) {
+                   //turn it into a replacement item
+                   campaign.mutateTask(task, ((RepairItem)task).replace());
+                   report = report + " Item cannot be repaired, it must be replaced instead.";
+               } else if(task instanceof ReplacementItem) {
+                   //TODO: destroy component, but parts no implemented yet
+                   report = report + " Component destroyed!";
+                   //reset the skill min counter back to green
+                   task.setSkillMin(EXP_GREEN);
+               }
+           }
+       }
+       return report;
+    }
+   
+   /** 
+    * I think my logic here is flawed. Assignments should be processed
+    * immediately not as part of a queue. Otherwise, it becomes too difficult
+    * to deal with failures and dependencies.
    public ArrayList<String> doAssignments() {
+        
        ArrayList<String> reports = new ArrayList<String>();
       
        //need to clone the assigned tasks array list to avoid concommitant errors
@@ -205,4 +266,5 @@ public abstract class SupportTeam implements Serializable {
        }
        return reports;
    }
+    * */
 }

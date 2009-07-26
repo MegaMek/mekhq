@@ -121,9 +121,6 @@ public class PilotPerson extends Person {
     @Override
     public String getDesc() {
         String care = "";
-        if(null != getTask() && getTask().isUnassigned()) {
-            care = "*";
-        }
         String status = "";
         if(pilot.getHits() > 0) {
             status = " (" + pilot.getStatusDesc() + ")";

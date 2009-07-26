@@ -209,30 +209,24 @@ public class Campaign implements Serializable {
         String toReturn = "<html>" + getUnit(unitId).getDescHTML();
         ArrayList<WorkItem> unitTasks = getTasksForUnit(unitId);
         int totalMin = 0;
-        int assignMin = 0;
         int total = 0;
-        int assigned = 0;
         for(WorkItem task : unitTasks) {
             if(task.isNeeded()) {
                 total++;
                 totalMin += task.getTime();
-                if(!task.isUnassigned()) {
-                    assigned++;
-                    assignMin += task.getTime();
-                } 
             }
         }
         if(total > 0) {
             toReturn += "Total tasks: " + total + " (" + totalMin + " minutes)<br>";
-            toReturn += "Assigned tasks: " + assigned  + " (" + assignMin + " minutes)<br>";
         }
         toReturn += "</html>";
         return toReturn;
     }
      
      public void assignTask(int teamId, int taskId) {
+         //TODO: now should only apply to doctors
          WorkItem task = taskIds.get(new Integer(taskId));
-         task.assignTeam(getTeam(teamId));
+         //task.assignTeam(getTeam(teamId));
          teamIds.get(new Integer(teamId)).addTask(task);
      }
      
@@ -253,12 +247,23 @@ public class Campaign implements Serializable {
          getTasks().remove(index);
          getTasks().add(index, newTask);
      }
+    
+     public boolean processTask(WorkItem task, SupportTeam team) {
+         currentReport.add(team.doAssigned(task));
+         if(task.isCompleted()) {
+             tasks.remove(task);
+             return true;
+         }
+         return false;
+     }
      
     public void processDay() {
         currentReport = new ArrayList<String>();
         //cycle through teams and tell them to get to work
+        //TODO: not doing it this way, but still need to cycle through docs
         for(SupportTeam team : getTeams()) {
-            currentReport.addAll(team.doAssignments());
+            team.resetMinutesLeft();
+            //currentReport.addAll(team.doAssignments());
         }
         
         //ok now cycle through all tasks and only keep the ones that 

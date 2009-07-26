@@ -82,26 +82,6 @@ public class ReloadItem extends UnitWorkItem {
         }
     }
     
-    @Override
-    public void assignTeam(SupportTeam  team) {
-        switch(team.getRating()) {
-           case SupportTeam.EXP_GREEN:
-               this.time = 15;
-               break;
-           case SupportTeam.EXP_REGULAR:
-               this.time = 10;
-               break;
-           case SupportTeam.EXP_VETERAN:
-               this.time = 8;
-               break;
-           case SupportTeam.EXP_ELITE:
-               this.time = 6;
-               break;
-       }
-       this.time = (int)Math.ceil(this.time * getTimeMultiplier());
-       super.assignTeam(team);
-    }
-    
     public AmmoType getAmmoType() {
         return atype;
     }
@@ -126,7 +106,6 @@ public class ReloadItem extends UnitWorkItem {
             this.name = "Reload " + mounted.getDesc() + " with " + atype.getDesc();           
         }
         this.swap = false;
-        unassignTeam();
     }
     
     public double getTimeMultiplier() {
