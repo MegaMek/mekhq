@@ -83,10 +83,6 @@ public class MedicalTeam extends SupportTeam {
         if(!(task instanceof PersonnelWorkItem)) {
             return false;
         }
-        PersonnelWorkItem pw = (PersonnelWorkItem)task;
-        if((pw.getPatients() + getPatients()) > 25) {
-            return false;
-        }
         return true; 
     }
 

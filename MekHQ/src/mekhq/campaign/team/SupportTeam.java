@@ -25,6 +25,7 @@ import mekhq.campaign.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import megamek.common.TargetRoll;
+import mekhq.campaign.work.PersonnelWorkItem;
 import mekhq.campaign.work.RepairItem;
 import mekhq.campaign.work.ReplacementItem;
 import mekhq.campaign.work.WorkItem;
@@ -165,6 +166,28 @@ public abstract class SupportTeam implements Serializable {
    public abstract int makeRoll(WorkItem task);
    
    public TargetRoll getTargetFor(WorkItem task) {
+       if(null == task) {
+           return new TargetRoll(TargetRoll.IMPOSSIBLE, "no task?");
+       }
+       if(task.getTime() > getMinutesLeft()) {
+           return new TargetRoll(TargetRoll.IMPOSSIBLE, "Not enough time");
+       }
+       if(task.getSkillMin() > getRating()) {
+           return new TargetRoll(TargetRoll.IMPOSSIBLE, "Task is beyond this team's skill level");
+       }
+       if(this instanceof MedicalTeam && task instanceof PersonnelWorkItem) {
+           PersonnelWorkItem pw = (PersonnelWorkItem)task;
+           MedicalTeam doc = (MedicalTeam)this;
+           if((pw.getPatients() + doc.getPatients()) > 25) {
+               return new TargetRoll(TargetRoll.IMPOSSIBLE, "The doctor already has 25 patients");
+           }
+       }
+       if(!task.isNeeded()) {
+           return new TargetRoll(TargetRoll.IMPOSSIBLE, "Task is not needed.");
+       }
+       if(!canDo(task)) {
+           return new TargetRoll(TargetRoll.IMPOSSIBLE, "Support team cannot do this kind of task.");
+       }
        TargetRoll target = getTarget();
        target.append(task.getAllMods());
        return target;

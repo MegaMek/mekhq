@@ -58,6 +58,7 @@ import megamek.client.ui.MechView;
 import megamek.client.ui.swing.MechTileset;
 import megamek.common.Entity;
 import megamek.common.EntityListFile;
+import megamek.common.TargetRoll;
 import mekhq.campaign.Unit;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PilotPerson;
@@ -905,7 +906,7 @@ protected void updateAssignEnabled() {
     //must have a valid team and an unassigned task
     WorkItem curTask = campaign.getTask(currentTaskId);
     SupportTeam team = campaign.getTeam(currentTechId);
-    if(null != curTask && null != team && team.canDo(curTask)) {
+    if(null != curTask && null != team && team.getTargetFor(curTask).getValue() != TargetRoll.IMPOSSIBLE) {
         btnDoTask.setEnabled(true);
     } else {
         btnDoTask.setEnabled(false);
