@@ -317,6 +317,8 @@ public class MekHQView extends FrameView {
 
         TaskTable.setModel(taskModel);
         TaskTable.setName("TaskTable"); // NOI18N
+        TaskTable.setRowHeight(60);
+        TaskTable.getColumnModel().getColumn(0).setCellRenderer(taskModel.getRenderer());
         TaskTable.getSelectionModel().addListSelectionListener(new javax.swing.event.ListSelectionListener() {
             public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
                 TaskTableValueChanged(evt);
@@ -389,7 +391,7 @@ public class MekHQView extends FrameView {
             .add(panHangarLayout.createSequentialGroup()
                 .add(20, 20, 20)
                 .add(panHangarLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jScrollPane5, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 660, Short.MAX_VALUE)
+                    .add(jScrollPane5, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 645, Short.MAX_VALUE)
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, panHangarLayout.createSequentialGroup()
                         .add(panHangarLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(panHangarLayout.createSequentialGroup()
@@ -1132,7 +1134,31 @@ public class TaskTableModel extends ArrayTableModel {
         @Override
         public Object getValueAt(int row, int col) {
             return ((WorkItem)data.get(row)).getDesc();
-        }       
+        }  
+        
+        public TaskTableModel.Renderer getRenderer() {
+        return new TaskTableModel.Renderer();
+    }
+    
+    
+    public class Renderer extends TaskInfo implements TableCellRenderer {
+        
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            Component c = this;
+            setOpaque(true);          
+            setText(getValueAt(row, column).toString());
+            //setToolTipText(campaign.getToolTipFor(u));
+            if(isSelected) {
+                //TODO: how do I set this to the user's default selection color?
+                c.setBackground(new Color(253, 117, 28));
+            } else {
+                c.setBackground(new Color(220, 220, 220));
+            }
+            return c;
+        }
+        
+    }
 }
 
 /**
