@@ -181,7 +181,6 @@ public class MekHQView extends FrameView {
         jScrollPane1 = new javax.swing.JScrollPane();
         TeamsList = new javax.swing.JList();
         btnDoTask = new javax.swing.JButton();
-        btnChangePilot = new javax.swing.JButton();
         jScrollPane4 = new javax.swing.JScrollPane();
         TaskTable = new javax.swing.JTable();
         jScrollPane5 = new javax.swing.JScrollPane();
@@ -301,14 +300,6 @@ public class MekHQView extends FrameView {
             }
         });
 
-        btnChangePilot.setText(resourceMap.getString("btnChangePilot.text")); // NOI18N
-        btnChangePilot.setName("btnChangePilot"); // NOI18N
-        btnChangePilot.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnChangePilotActionPerformed(evt);
-            }
-        });
-
         jScrollPane4.setName("jScrollPane4"); // NOI18N
 
         TaskTable.setModel(taskModel);
@@ -351,62 +342,57 @@ public class MekHQView extends FrameView {
         panHangar.setLayout(panHangarLayout);
         panHangarLayout.setHorizontalGroup(
             panHangarLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, panHangarLayout.createSequentialGroup()
+            .add(panHangarLayout.createSequentialGroup()
                 .add(panHangarLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(btnDeployUnits, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 130, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(btnChangePilot, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 130, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(loadListBtn, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 130, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jScrollPane5, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 393, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(panHangarLayout.createSequentialGroup()
+                        .add(loadListBtn, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 130, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(btnDeployUnits, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 130, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(jScrollPane5, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 393, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(panHangarLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(panHangarLayout.createSequentialGroup()
+                        .add(replaceBtn, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                        .add(ammoBtn, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
+                        .add(705, 705, 705))
+                    .add(panHangarLayout.createSequentialGroup()
                         .add(panHangarLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(jScrollPane4, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 279, Short.MAX_VALUE)
-                            .add(org.jdesktop.layout.GroupLayout.TRAILING, jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 279, Short.MAX_VALUE))
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(panHangarLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(replaceBtn, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 121, Short.MAX_VALUE)
-                            .add(ammoBtn, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .add(286, 286, 286)
+                            .add(panHangarLayout.createSequentialGroup()
+                                .add(btnDoTask)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                                .add(jScrollPane6, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                            .add(jScrollPane4, 0, 0, Short.MAX_VALUE))
+                        .add(18, 18, 18)
+                        .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 326, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 276, Short.MAX_VALUE)
                         .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .add(0, 0, 0))
-                    .add(panHangarLayout.createSequentialGroup()
-                        .add(btnDoTask)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jScrollPane6, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap())))
+                        .add(13, 13, 13))))
         );
         panHangarLayout.setVerticalGroup(
             panHangarLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(panHangarLayout.createSequentialGroup()
-                .add(20, 20, 20)
                 .add(panHangarLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jScrollPane5, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 641, Short.MAX_VALUE)
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, panHangarLayout.createSequentialGroup()
+                    .add(panHangarLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                        .add(loadListBtn)
+                        .add(btnDeployUnits))
+                    .add(panHangarLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .add(panHangarLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                            .add(replaceBtn)
+                            .add(ammoBtn))))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(panHangarLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
+                    .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 524, Short.MAX_VALUE)
+                    .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(panHangarLayout.createSequentialGroup()
                         .add(panHangarLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(panHangarLayout.createSequentialGroup()
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(panHangarLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                    .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                    .add(panHangarLayout.createSequentialGroup()
-                                        .add(ammoBtn)
-                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                                        .add(replaceBtn))
-                                    .add(jScrollPane4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 287, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                                .add(30, 30, 30)
-                                .add(panHangarLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                    .add(jScrollPane6, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                    .add(btnDoTask)))
-                            .add(panHangarLayout.createSequentialGroup()
-                                .add(loadListBtn)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(btnDeployUnits)
-                                .add(18, 18, 18)
-                                .add(btnChangePilot)))
+                            .add(btnDoTask)
+                            .add(jScrollPane6, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 232, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap())
+                        .add(jScrollPane4))
+                    .add(jScrollPane5))
+                .add(383, 383, 383))
         );
 
         panFinances.addTab(resourceMap.getString("panHangar.TabConstraints.tabTitle"), panHangar); // NOI18N
@@ -423,14 +409,14 @@ public class MekHQView extends FrameView {
             .add(panSuppliesLayout.createSequentialGroup()
                 .addContainerGap()
                 .add(jLabel1)
-                .addContainerGap(1073, Short.MAX_VALUE))
+                .addContainerGap(940, Short.MAX_VALUE))
         );
         panSuppliesLayout.setVerticalGroup(
             panSuppliesLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(panSuppliesLayout.createSequentialGroup()
                 .addContainerGap()
                 .add(jLabel1)
-                .addContainerGap(645, Short.MAX_VALUE))
+                .addContainerGap(561, Short.MAX_VALUE))
         );
 
         panFinances.addTab(resourceMap.getString("panSupplies.TabConstraints.tabTitle"), panSupplies); // NOI18N
@@ -490,7 +476,7 @@ public class MekHQView extends FrameView {
                             .add(jScrollPane3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 390, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                             .add(jLabel4)))
                     .add(jLabel3))
-                .add(434, 434, 434))
+                .add(440, 440, 440))
         );
         panPersonnelLayout.setVerticalGroup(
             panPersonnelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -499,7 +485,7 @@ public class MekHQView extends FrameView {
                 .add(jLabel3)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(panPersonnelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 617, Short.MAX_VALUE)
+                    .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 533, Short.MAX_VALUE)
                     .add(panPersonnelLayout.createSequentialGroup()
                         .add(jLabel4)
                         .add(3, 3, 3)
@@ -523,14 +509,14 @@ public class MekHQView extends FrameView {
             .add(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
                 .add(jLabel2)
-                .addContainerGap(1073, Short.MAX_VALUE))
+                .addContainerGap(940, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
                 .add(jLabel2)
-                .addContainerGap(645, Short.MAX_VALUE))
+                .addContainerGap(561, Short.MAX_VALUE))
         );
 
         panFinances.addTab(resourceMap.getString("jPanel4.TabConstraints.tabTitle"), jPanel4); // NOI18N
@@ -545,16 +531,12 @@ public class MekHQView extends FrameView {
             .add(mainPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .add(mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(panFinances, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 1146, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(btnAdvanceDay)
                     .add(mainPanelLayout.createSequentialGroup()
-                        .add(mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(btnAdvanceDay)
-                            .add(mainPanelLayout.createSequentialGroup()
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(lblDate, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 284, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                        .addContainerGap(1008, Short.MAX_VALUE))
-                    .add(mainPanelLayout.createSequentialGroup()
-                        .add(panFinances, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1279, Short.MAX_VALUE)
-                        .add(20, 20, 20))))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(lblDate, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 284, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         mainPanelLayout.setVerticalGroup(
             mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -564,8 +546,8 @@ public class MekHQView extends FrameView {
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(btnAdvanceDay)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(panFinances, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 727, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(16, Short.MAX_VALUE))
+                .add(panFinances, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 643, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(62, Short.MAX_VALUE))
         );
 
         menuBar.setName("menuBar"); // NOI18N
@@ -656,11 +638,11 @@ public class MekHQView extends FrameView {
         statusPanel.setLayout(statusPanelLayout);
         statusPanelLayout.setHorizontalGroup(
             statusPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(statusPanelSeparator, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1312, Short.MAX_VALUE)
+            .add(statusPanelSeparator, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1179, Short.MAX_VALUE)
             .add(statusPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .add(statusMessageLabel)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 1116, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 983, Short.MAX_VALUE)
                 .add(progressBar, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(statusAnimationLabel)
@@ -781,28 +763,6 @@ private void ammoBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
         refreshTeamsList();
     }
 }//GEN-LAST:event_ammoBtnActionPerformed
-
-private void btnChangePilotActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChangePilotActionPerformed
-    if(currentUnitId == -1) {
-      return;
-   }
-    Unit u = campaign.getUnit(currentUnitId);
-    Vector<PilotPerson> pilots = new Vector<PilotPerson>();
-    for(Person p : campaign.getPersonnel()) {
-        if(!(p instanceof PilotPerson)) {
-            continue;
-        }
-        PilotPerson pp = (PilotPerson)p;
-        if(pp.canPilot(u.getEntity())) {
-            pilots.add(pp);
-        }
-    }
-    if(pilots.size() > 0) {
-        ChoosePilotDialog cpd = new ChoosePilotDialog(this.getFrame(), true, u, pilots);
-        cpd.setVisible(true);
-        refreshUnitList();
-    }
-}//GEN-LAST:event_btnChangePilotActionPerformed
 
 private void btnAssignDocActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAssignDocActionPerformed
     //assign the task to the team here
@@ -1263,7 +1223,6 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
     private javax.swing.JButton ammoBtn;
     private javax.swing.JButton btnAdvanceDay;
     private javax.swing.JButton btnAssignDoc;
-    private javax.swing.JButton btnChangePilot;
     private javax.swing.JButton btnDeployUnits;
     private javax.swing.JButton btnDoTask;
     private javax.swing.JLabel jLabel1;
