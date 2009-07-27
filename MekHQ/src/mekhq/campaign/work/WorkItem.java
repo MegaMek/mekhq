@@ -104,6 +104,15 @@ public abstract class WorkItem implements Serializable {
         return "[" + getTime() + "m/" +   SupportTeam.getRatingName(getSkillMin()) + "/" + getAllMods().getValueAsString() + "]";
     }
     
+    public String getDescHTML() {
+        String toReturn = "<html><b>" + getName() + "</b><br>";
+        toReturn += getAllMods().getDesc() + "<br>";
+        toReturn += "<table><tr><td>Minutes required:" + getTime() + "</td>";
+        toReturn += "<td>Skill required:" + SupportTeam.getRatingName(getSkillMin()) + "</td>";
+        toReturn += "</tr></table></html>";
+        return toReturn;
+    }
+    
     
     public TargetRoll getAllMods() {
         TargetRoll mods = new TargetRoll(getDifficulty(), "difficulty");
