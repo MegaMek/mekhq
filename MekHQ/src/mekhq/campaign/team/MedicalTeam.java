@@ -94,4 +94,13 @@ public class MedicalTeam extends SupportTeam {
     public int makeRoll(WorkItem task) {
         return Compute.d6(2);
     }
+   
+    @Override
+   public String getDescHTML() {
+        String toReturn = "<html><b>" + getName() + "</b><br>";
+        toReturn += getRatingName() + " " + getTypeDesc() + "<br>";
+        toReturn += getPatients() + " patient(s)";
+        toReturn += "</html>";
+        return toReturn;
+   }
 }

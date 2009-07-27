@@ -128,6 +128,15 @@ public class PilotPerson extends Person {
         return care + pilot.getName() + " [" + pilot.getGunnery() + "/" + pilot.getPiloting() + " " + getTypeDesc() + "]" + status; 
     }
     
+    @Override
+    public String getDescHTML() {
+        String toReturn = "<html><b>" + pilot.getName() + "</b><br>";
+        toReturn += getTypeDesc() + " (" + pilot.getGunnery() + "/" + pilot.getPiloting() + ")<br>";
+        toReturn += pilot.getStatusDesc();
+        toReturn += "</html>";
+        return toReturn;
+    }
+    
     public boolean isAssigned() {
         return null != unit;
     }

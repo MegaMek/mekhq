@@ -142,6 +142,8 @@ public abstract class SupportTeam implements Serializable {
        return getName() + " (" + getRatingName() + " " + getTypeDesc() + ") " + getTasksDesc();
    }
    
+   public abstract String getDescHTML();
+   
    public abstract String getTasksDesc();
    
    public abstract String getTypeDesc();
@@ -208,68 +210,4 @@ public abstract class SupportTeam implements Serializable {
        }
        return report;
     }
-   
-   /** 
-    * I think my logic here is flawed. Assignments should be processed
-    * immediately not as part of a queue. Otherwise, it becomes too difficult
-    * to deal with failures and dependencies.
-   public ArrayList<String> doAssignments() {
-        
-       ArrayList<String> reports = new ArrayList<String>();
-      
-       //need to clone the assigned tasks array list to avoid concommitant errors
-       ArrayList<WorkItem> schedule = new ArrayList<WorkItem>();
-       for(WorkItem task : getTasksAssigned()) {
-           schedule.add(task);
-       }
-       
-       reports.add(getName() + " Assignments:");
-       //do all of the assignments in the assignment vector until 
-       //you run out of time
-       int minutesWorked = 0;
-       for(WorkItem task : schedule) {
-           String report = "  " + task.getDisplayName();
-           //check whether the task is currently possible
-           if(null != task.checkFixable()) {
-               report = report + ", but the task is impossible because " + task.checkFixable();
-               reports.add(report);
-               task.unassignTeam();
-               continue;
-           }        
-           minutesWorked += task.getTime();
-           if(minutesWorked > (getHours() * 60)) {
-               report = report  + ", but ran out of time for the day, see you tommorrow!";
-               reports.add(report);
-               break;
-           }                 
-           TargetRoll target = getTarget();
-           target.append(task.getAllMods()); 
-           int roll = makeRoll(task);
-           report = report + ", needs " + target.getValueAsString() + " and rolls " + roll + ":";
-           if(roll >= target.getValue()) {
-               report = report + " task completed.";
-               task.fix();
-               task.complete();
-           } else {
-               report = report + " task failed.";
-               task.fail();
-               //have we run out of options?
-               if(task.getSkillMin() > EXP_ELITE) {
-                   if(task instanceof RepairItem) {
-                       //turn it into a replacement item
-                       campaign.mutateTask(task, ((RepairItem)task).replace());
-                       report = report + " Item cannot be repaired, it must be replaced instead.";
-                   } else if(task instanceof ReplacementItem) {
-                       //TODO: destroy component, but parts no implemented yet
-                       report = report + " Component destroyed!";
-                       //reset the skill min counter back to green
-                       task.setSkillMin(EXP_GREEN);
-                   }
-               }
-           }
-           reports.add(report);
-       }
-       return reports;
-   }
-    * */
 }

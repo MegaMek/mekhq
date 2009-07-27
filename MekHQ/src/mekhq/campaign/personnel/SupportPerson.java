@@ -49,6 +49,17 @@ public class SupportPerson extends Person {
         }
         return team.getName() + " [" + team.getRatingName() + " " + team.getTypeDesc() + "]"  + casualties ;
     }
+    
+    @Override
+    public String getDescHTML() {
+        String toReturn = "<html><b>" + team.getName() + "</b><br>";
+        toReturn += team.getRatingName() + " " + team.getTypeDesc() + "<br>";
+        if(team.getCasualties() > 0) {
+            toReturn = team.getCasualties() + " casualties";
+        }
+        toReturn += "</html>";
+        return toReturn;
+    }
 
     @Override
     public void runDiagnostic(Campaign campaign) {

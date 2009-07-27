@@ -127,4 +127,13 @@ public class TechTeam extends SupportTeam {
        }               
        return true;
    }
+   
+   @Override
+   public String getDescHTML() {
+        String toReturn = "<html><b>" + getName() + "</b><br>";
+        toReturn += getRatingName() + " " + getTypeDesc() + "<br>";
+        toReturn += getMinutesLeft() + " minutes left";
+        toReturn += "</html>";
+        return toReturn;
+   }
 }

@@ -105,11 +105,16 @@ public abstract class WorkItem implements Serializable {
     }
     
     public String getDescHTML() {
+        String bonus = getAllMods().getValueAsString();
+        if(getAllMods().getValue() > -1) {
+            bonus = "+" + bonus;
+        }
+        bonus = "(" + bonus + ")";
         String toReturn = "<html><b>" + getName() + "</b><br>";
-        toReturn += getAllMods().getValueAsString() + "<br>";
-        toReturn += "<table><tr><td>Minutes required:" + getTime() + "</td>";
-        toReturn += "<td>Skill required:" + SupportTeam.getRatingName(getSkillMin()) + "</td>";
-        toReturn += "</tr></table></html>";
+        toReturn += "" + getTime() + " minutes";
+        toReturn += ", " + SupportTeam.getRatingName(getSkillMin());
+        toReturn += " " + bonus;
+        toReturn += "</html>";
         return toReturn;
     }
     

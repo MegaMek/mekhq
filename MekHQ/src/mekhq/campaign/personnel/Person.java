@@ -47,6 +47,8 @@ public abstract class Person implements Serializable {
     }
     
     public abstract String getDesc();
+    
+    public abstract String getDescHTML();
 
     public void setId(int id) {
         this.id = id;

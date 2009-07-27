@@ -1187,7 +1187,7 @@ public class TechTableModel extends ArrayTableModel {
 
         @Override
         public Object getValueAt(int row, int col) {
-            return ((TechTeam)data.get(row)).getDesc();
+            return ((TechTeam)data.get(row)).getDescHTML();
         }  
         
         public TechTeam getTechAt(int row) {
@@ -1231,7 +1231,7 @@ public class PersonTableModel extends ArrayTableModel {
 
         @Override
         public Object getValueAt(int row, int col) {
-            return ((Person)data.get(row)).getDesc();
+            return ((Person)data.get(row)).getDescHTML();
         }  
         
         public Person getPersonAt(int row) {
@@ -1275,7 +1275,7 @@ public class DocTableModel extends ArrayTableModel {
 
         @Override
         public Object getValueAt(int row, int col) {
-            return ((MedicalTeam)data.get(row)).getDesc();
+            return ((MedicalTeam)data.get(row)).getDescHTML();
         }  
         
         public MedicalTeam getPersonAt(int row) {
