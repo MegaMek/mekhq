@@ -1,6 +1,8 @@
 VERSION HISTORY
 ----------------------------------
 v0.0.1 (SVN)
++ Renderer for TaskTable
++ abstract class ArrayTableModel
 + right-click menu for UnitTable
 + switched UnitList to UnitTable
 + MekTableModel and renderer
