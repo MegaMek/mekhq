@@ -84,46 +84,27 @@
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="102" alignment="0" attributes="0">
-                                  <Component id="replaceBtn" pref="150" max="32767" attributes="1"/>
+                              <Group type="102" attributes="0">
+                                  <Component id="btnDoTask" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                  <Component id="ammoBtn" pref="150" max="32767" attributes="1"/>
-                                  <EmptySpace min="-2" pref="705" max="-2" attributes="0"/>
+                                  <Component id="jScrollPane6" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <Group type="102" alignment="0" attributes="0">
-                                  <Group type="103" groupAlignment="0" attributes="0">
-                                      <Group type="102" attributes="0">
-                                          <Component id="btnDoTask" min="-2" max="-2" attributes="0"/>
-                                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                          <Component id="jScrollPane6" min="-2" max="-2" attributes="0"/>
-                                      </Group>
-                                      <Component id="jScrollPane4" min="0" pref="0" max="32767" attributes="3"/>
-                                  </Group>
-                                  <EmptySpace type="separate" max="-2" attributes="0"/>
-                                  <Component id="jScrollPane1" min="-2" pref="326" max="-2" attributes="3"/>
-                                  <EmptySpace pref="276" max="32767" attributes="0"/>
-                                  <Component id="jTabbedPane1" min="-2" max="-2" attributes="0"/>
-                                  <EmptySpace min="13" pref="13" max="13" attributes="0"/>
-                              </Group>
+                              <Component id="jScrollPane4" min="0" pref="0" max="32767" attributes="3"/>
                           </Group>
+                          <EmptySpace type="separate" max="-2" attributes="0"/>
+                          <Component id="jScrollPane1" min="-2" pref="326" max="-2" attributes="3"/>
+                          <EmptySpace max="32767" attributes="0"/>
+                          <Component id="jTabbedPane1" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace min="13" pref="13" max="13" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
                 <DimensionLayout dim="1">
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Group type="103" groupAlignment="3" attributes="0">
-                                  <Component id="loadListBtn" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  <Component id="btnDeployUnits" alignment="3" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <Group type="102" alignment="0" attributes="0">
-                                  <EmptySpace max="-2" attributes="0"/>
-                                  <Group type="103" groupAlignment="3" attributes="0">
-                                      <Component id="replaceBtn" alignment="3" min="-2" max="-2" attributes="0"/>
-                                      <Component id="ammoBtn" alignment="3" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                              </Group>
+                          <Group type="103" groupAlignment="3" attributes="0">
+                              <Component id="loadListBtn" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="btnDeployUnits" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" max="-2" attributes="0">
@@ -165,17 +146,6 @@
                     <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="loadListBtnActionPerformed"/>
                   </Events>
                 </Component>
-                <Component class="javax.swing.JButton" name="ammoBtn">
-                  <Properties>
-                    <Property name="text" type="java.lang.String" resourceKey="ammoBtn.text"/>
-                    <Property name="toolTipText" type="java.lang.String" resourceKey="ammoBtn.toolTipText"/>
-                    <Property name="enabled" type="boolean" value="false"/>
-                    <Property name="name" type="java.lang.String" value="ammoBtn" noResource="true"/>
-                  </Properties>
-                  <Events>
-                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="ammoBtnActionPerformed"/>
-                  </Events>
-                </Component>
                 <Container class="javax.swing.JTabbedPane" name="jTabbedPane1">
                   <Properties>
                     <Property name="name" type="java.lang.String" value="jTabbedPane1" noResource="true"/>
@@ -183,18 +153,6 @@
 
                   <Layout class="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout"/>
                 </Container>
-                <Component class="javax.swing.JButton" name="replaceBtn">
-                  <Properties>
-                    <Property name="font" type="java.awt.Font" resourceKey="replaceBtn.font"/>
-                    <Property name="text" type="java.lang.String" resourceKey="replaceBtn.text"/>
-                    <Property name="toolTipText" type="java.lang.String" resourceKey="replaceBtn.toolTipText"/>
-                    <Property name="enabled" type="boolean" value="false"/>
-                    <Property name="name" type="java.lang.String" value="replaceBtn" noResource="true"/>
-                  </Properties>
-                  <Events>
-                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="replaceBtnActionPerformed"/>
-                  </Events>
-                </Component>
                 <Container class="javax.swing.JScrollPane" name="jScrollPane1">
                   <Properties>
                     <Property name="name" type="java.lang.String" value="jScrollPane1" noResource="true"/>
