@@ -971,15 +971,14 @@ protected void saveListFile() {
     
 protected void refreshUnitList() {
     int selected = UnitTable.getSelectedRow();
-    unitModel.setUnits(campaign.getUnits());
-    unitModel.refreshModel();
+    unitModel.setData(campaign.getUnits());
     if(selected > -1 && selected < campaign.getUnits().size()) {
         UnitTable.setRowSelectionInterval(selected, selected);
     }
 }
 
 protected void refreshTaskList() {
-        taskModel.fillTable(campaign.getTasksForUnit(currentUnitId));
+        taskModel.setData(campaign.getTasksForUnit(currentUnitId));
 }
 
 protected void refreshTeamsList() {
@@ -1082,46 +1081,19 @@ protected void updateAmmoSwapEnabled() {
 /**
  * A table model for displaying work items
  */
-public class TaskTableModel extends AbstractTableModel {
-
-        public static final int NAME_INDEX = 0;
-        public static final int TIME_INDEX = 1;
-        public static final int SKILL_INDEX = 2;
-        public static final int MOD_INDEX = 3;
-        public static final int NUM_COLS = 4;
+public abstract class ArrayTableModel extends AbstractTableModel {
     
-        private String[] columnNames = {"Name", "Time Left", "Skill", "Mod"};
-        private ArrayList<WorkItem> tasks;
- 
-        public TaskTableModel() {
-            tasks = new ArrayList<WorkItem>();
-        }
+        protected String[] columnNames;
+        protected ArrayList data;
         
         @Override
         public int getRowCount() {
-            return tasks.size();
+            return data.size();
         }
 
         @Override
         public int getColumnCount() {
-            return columnNames.length;
-        }
-
-        @Override
-        public Object getValueAt(int row, int col) {
-            WorkItem task = tasks.get(row);
-            switch (col) {
-             case NAME_INDEX:
-                return task.getName();
-             case TIME_INDEX:
-                return task.getTime();
-             case SKILL_INDEX:
-                return SupportTeam.getRatingName(task.getSkillMin());
-             case MOD_INDEX:
-                return task.getAllMods().getValueAsString();
-             default:
-                return new Object();
-         }
+            return 1;
         }
         
         @Override
@@ -1140,56 +1112,48 @@ public class TaskTableModel extends AbstractTableModel {
         }
      
         //fill table with values
-        public void fillTable(ArrayList<WorkItem> tasks) {
-            this.tasks = tasks;
+        public void setData(ArrayList array) {
+            this.data = array;
             fireTableDataChanged();
         }
         
 }
 
-public class MekTableModel extends AbstractTableModel {
+/**
+ * A table model for displaying work items
+ */
+public class TaskTableModel extends ArrayTableModel {
 
-    private String[] columnNames = {"Units"};
-    private ArrayList<Unit> units = new ArrayList<Unit>();
-    
-    public void setUnits(ArrayList<Unit> u) {
-        this.units = u;
-    }
-    
-    
-    @Override
-    public String getColumnName(int column) {
-        return columnNames[column];
-    }
-    
-    @Override
-    public int getRowCount() {
-        return units.size();
-    }
+        public TaskTableModel() {
+            this.columnNames = new String[] {"Tasks"};
+            this.data = new ArrayList<WorkItem>();
+        }
 
-    @Override
-    public int getColumnCount() {
-        return 1;
-    }
+        @Override
+        public Object getValueAt(int row, int col) {
+            return ((WorkItem)data.get(row)).getDesc();
+        }       
+}
 
+/**
+ * A table model for displaying units
+ */
+public class MekTableModel extends ArrayTableModel {
+
+    public MekTableModel() {
+        this.columnNames = new String[] {"Units"};
+        this.data = new ArrayList<Unit>();
+    }
+  
     @Override
     public Object getValueAt(int row, int col) {
-        return campaign.getUnitDesc(units.get(row).getId());
+        return campaign.getUnitDesc(((Unit)data.get(row)).getId());
     }
     
     public Unit getUnitAt(int row) {
-        return units.get(row);
+        return (Unit)data.get(row);
     }
 
-    @Override
-    public boolean isCellEditable(int row, int col) {
-        return false;
-    }
-    
-    public void refreshModel() {
-        fireTableDataChanged();
-    }
-    
     public MekTableModel.Renderer getRenderer() {
         return new MekTableModel.Renderer();
     }
