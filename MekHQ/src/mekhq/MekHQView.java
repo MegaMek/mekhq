@@ -61,6 +61,7 @@ import megamek.common.EntityListFile;
 import mekhq.campaign.Unit;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PilotPerson;
+import mekhq.campaign.team.TechTeam;
 import mekhq.campaign.work.ReloadItem;
 import mekhq.campaign.work.RepairItem;
 import mekhq.campaign.work.WorkItem;
@@ -72,12 +73,11 @@ public class MekHQView extends FrameView {
 
     
     private Campaign campaign = new Campaign();
-    private DefaultListModel unitsModel = new DefaultListModel();
-    private DefaultListModel techsModel = new DefaultListModel();
     private DefaultListModel personnelModel = new DefaultListModel();
     private DefaultListModel doctorsModel = new DefaultListModel();
     private TaskTableModel taskModel = new TaskTableModel();
     private MekTableModel unitModel = new MekTableModel();
+    private TechTableModel techsModel = new TechTableModel();
     private MekTableMouseAdapter unitMouseAdapter;
     private TaskTableMouseAdapter taskMouseAdapter;
     private int currentUnitId;
@@ -178,8 +178,6 @@ public class MekHQView extends FrameView {
         btnDeployUnits = new javax.swing.JButton();
         loadListBtn = new javax.swing.JButton();
         jTabbedPane1 = new javax.swing.JTabbedPane();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        TeamsList = new javax.swing.JList();
         btnDoTask = new javax.swing.JButton();
         jScrollPane4 = new javax.swing.JScrollPane();
         TaskTable = new javax.swing.JTable();
@@ -187,6 +185,8 @@ public class MekHQView extends FrameView {
         UnitTable = new javax.swing.JTable();
         jScrollPane6 = new javax.swing.JScrollPane();
         textTarget = new javax.swing.JTextArea();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        TechTable = new javax.swing.JTable();
         panSupplies = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         panPersonnel = new javax.swing.JPanel();
@@ -257,18 +257,6 @@ public class MekHQView extends FrameView {
 
         jTabbedPane1.setName("jTabbedPane1"); // NOI18N
 
-        jScrollPane1.setName("jScrollPane1"); // NOI18N
-
-        TeamsList.setModel(techsModel);
-        TeamsList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        TeamsList.setName("TeamsList"); // NOI18N
-        TeamsList.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
-            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
-                TeamsListValueChanged(evt);
-            }
-        });
-        jScrollPane1.setViewportView(TeamsList);
-
         btnDoTask.setText(resourceMap.getString("btnDoTask.text")); // NOI18N
         btnDoTask.setToolTipText(resourceMap.getString("btnDoTask.toolTipText")); // NOI18N
         btnDoTask.setEnabled(false);
@@ -318,6 +306,19 @@ public class MekHQView extends FrameView {
         textTarget.setName("textTarget"); // NOI18N
         jScrollPane6.setViewportView(textTarget);
 
+        jScrollPane1.setName("jScrollPane1"); // NOI18N
+
+        TechTable.setModel(techsModel);
+        TechTable.setName("TechTable"); // NOI18N
+        TechTable.setRowHeight(60);
+        TechTable.getColumnModel().getColumn(0).setCellRenderer(techsModel.getRenderer());
+        TechTable.getSelectionModel().addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                TechTableValueChanged(evt);
+            }
+        });
+        jScrollPane1.setViewportView(TechTable);
+
         org.jdesktop.layout.GroupLayout panHangarLayout = new org.jdesktop.layout.GroupLayout(panHangar);
         panHangar.setLayout(panHangarLayout);
         panHangarLayout.setHorizontalGroup(
@@ -334,9 +335,9 @@ public class MekHQView extends FrameView {
                     .add(panHangarLayout.createSequentialGroup()
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
                         .add(jScrollPane4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 380, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 326, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 99, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 342, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 115, Short.MAX_VALUE)
                 .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .add(13, 13, 13))
             .add(panHangarLayout.createSequentialGroup()
@@ -353,6 +354,7 @@ public class MekHQView extends FrameView {
                     .add(btnDeployUnits))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(panHangarLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 559, Short.MAX_VALUE)
                     .add(panHangarLayout.createSequentialGroup()
                         .add(btnDoTask)
                         .addContainerGap())
@@ -363,7 +365,6 @@ public class MekHQView extends FrameView {
                                 .add(jScrollPane6, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                 .add(jScrollPane4, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 467, Short.MAX_VALUE))
-                            .add(org.jdesktop.layout.GroupLayout.TRAILING, jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 559, Short.MAX_VALUE)
                             .add(panHangarLayout.createSequentialGroup()
                                 .add(jScrollPane5, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 559, Short.MAX_VALUE)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)))
@@ -511,7 +512,7 @@ public class MekHQView extends FrameView {
                     .add(mainPanelLayout.createSequentialGroup()
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(lblDate, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 284, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(94, Short.MAX_VALUE))
         );
         mainPanelLayout.setVerticalGroup(
             mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -613,11 +614,11 @@ public class MekHQView extends FrameView {
         statusPanel.setLayout(statusPanelLayout);
         statusPanelLayout.setHorizontalGroup(
             statusPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(statusPanelSeparator, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1179, Short.MAX_VALUE)
+            .add(statusPanelSeparator, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 1260, Short.MAX_VALUE)
             .add(statusPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .add(statusMessageLabel)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 983, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 1064, Short.MAX_VALUE)
                 .add(progressBar, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(statusAnimationLabel)
@@ -653,7 +654,7 @@ private void btnDoTaskActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
         boolean completed = campaign.processTask(task, team);
         refreshUnitList();
         refreshTaskList();
-        refreshTeamsList();
+        refreshTechsList();
         if(!completed) {
             row++;
         }
@@ -664,16 +665,16 @@ private void btnDoTaskActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
     }
 }//GEN-LAST:event_btnDoTaskActionPerformed
 
-private void TeamsListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_TeamsListValueChanged
-    int selected = TeamsList.getSelectedIndex();
-    if(selected > -1 && selected < campaign.getTeams().size()) {
+private void TechTableValueChanged(javax.swing.event.ListSelectionEvent evt) {                                       
+    int selected = TechTable.getSelectedRow();
+    if(selected > -1 && selected < campaign.getTechTeams().size()) {
         currentTechId = campaign.getTechTeams().get(selected).getId();
     }
     else if(selected < 0) {
         currentTechId = -1;
     }
     updateAssignEnabled();
-}//GEN-LAST:event_TeamsListValueChanged
+}   
 
 private void TaskTableValueChanged(javax.swing.event.ListSelectionEvent evt) {                                       
     int selected = TaskTable.getSelectedRow();
@@ -705,7 +706,7 @@ private void btnAdvanceDayActionPerformed(java.awt.event.ActionEvent evt) {//GEN
     trd.setVisible(true);
     refreshUnitList();
     refreshTaskList();
-    refreshTeamsList();
+    refreshTechsList();
     refreshPersonnelList();
     refreshDoctorsList();
     refreshCalendar();
@@ -721,7 +722,7 @@ private void btnAssignDocActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
     if(null != p.getTask()) {
         campaign.assignTask(currentDoctorId, p.getTask().getId());
     }
-    refreshTeamsList();
+    refreshTechsList();
     refreshDoctorsList();
     refreshPersonnelList();
 }//GEN-LAST:event_btnAssignDocActionPerformed
@@ -757,14 +758,14 @@ private void miHirePilotActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
 private void miHireTechActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miHireTechActionPerformed
     NewTechTeamDialog ntd = new NewTechTeamDialog(this.getFrame(), true, campaign);
     ntd.setVisible(true);
-    refreshTeamsList();
+    refreshTechsList();
     refreshPersonnelList();
 }//GEN-LAST:event_miHireTechActionPerformed
 
 private void miHireDoctorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miHireDoctorActionPerformed
     NewMedicalTeamDialog nmd = new NewMedicalTeamDialog(this.getFrame(), true, campaign);
     nmd.setVisible(true);
-    refreshTeamsList();
+    refreshTechsList();
     refreshPersonnelList();
     refreshDoctorsList();
 }//GEN-LAST:event_miHireDoctorActionPerformed
@@ -884,16 +885,11 @@ protected void refreshTaskList() {
         taskModel.setData(campaign.getTasksForUnit(currentUnitId));
 }
 
-protected void refreshTeamsList() {
-    int selected = TeamsList.getSelectedIndex();
-    techsModel.removeAllElements();
-    int len = 0;
-    for(SupportTeam team : campaign.getTechTeams()) {
-        techsModel.addElement(team.getDesc());
-        len++;
-    }
-    if(selected < len) {
-        TeamsList.setSelectedIndex(selected);
+protected void refreshTechsList() {
+    int selected = TechTable.getSelectedRow();
+    techsModel.setData(campaign.getTechTeams());
+    if(selected > -1 && selected < campaign.getTechTeams().size()) {
+        TechTable.setRowSelectionInterval(selected, selected);
     }
 }
 
@@ -1062,7 +1058,7 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
                 ammod.setVisible(true);
                 refreshUnitList();
                 refreshTaskList();
-                refreshTeamsList();
+                refreshTechsList();
             }
         }
         
@@ -1202,10 +1198,54 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
         }
 }
 
+/**
+ * A table model for displaying work items
+ */
+public class TechTableModel extends ArrayTableModel {
+
+        public TechTableModel() {
+            this.columnNames = new String[] {"Techs"};
+            this.data = new ArrayList<TechTeam>();
+        }
+
+        @Override
+        public Object getValueAt(int row, int col) {
+            return ((TechTeam)data.get(row)).getDesc();
+        }  
+        
+        public TechTeam getTechAt(int row) {
+        return (TechTeam)data.get(row);
+    }
+        
+        public TechTableModel.Renderer getRenderer() {
+        return new TechTableModel.Renderer();
+    }
+    
+    
+    public class Renderer extends TaskInfo implements TableCellRenderer {
+        
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            Component c = this;
+            setOpaque(true);          
+            setText(getValueAt(row, column).toString());
+            //setToolTipText(campaign.getToolTipFor(u));
+            if(isSelected) {
+                //TODO: how do I set this to the user's default selection color?
+                c.setBackground(new Color(253, 117, 28));
+            } else {
+                c.setBackground(new Color(220, 220, 220));
+            }
+            return c;
+        }
+        
+    }
+}
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JList DoctorsList;
     private javax.swing.JTable TaskTable;
-    private javax.swing.JList TeamsList;
+    private javax.swing.JTable TechTable;
     private javax.swing.JTable UnitTable;
     private javax.swing.JButton btnAdvanceDay;
     private javax.swing.JButton btnAssignDoc;
