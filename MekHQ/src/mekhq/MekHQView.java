@@ -79,6 +79,7 @@ public class MekHQView extends FrameView {
     private TaskTableModel taskModel = new TaskTableModel();
     private MekTableModel unitModel = new MekTableModel();
     private MekTableMouseAdapter unitMouseAdapter;
+    private TaskTableMouseAdapter taskMouseAdapter;
     private int currentUnitId;
     private int currentTaskId;
     private int currentTechId;
@@ -91,6 +92,7 @@ public class MekHQView extends FrameView {
         super(app);
       
         unitMouseAdapter = new MekTableMouseAdapter();
+        taskMouseAdapter = new TaskTableMouseAdapter();
         initComponents();
 
         refreshCalendar();
@@ -311,6 +313,7 @@ public class MekHQView extends FrameView {
                 TaskTableValueChanged(evt);
             }
         });
+        TaskTable.addMouseListener(taskMouseAdapter);
         jScrollPane4.setViewportView(TaskTable);
 
         jScrollPane5.setName("jScrollPane5"); // NOI18N
@@ -1086,6 +1089,10 @@ public class TaskTableModel extends ArrayTableModel {
             return ((WorkItem)data.get(row)).getDescHTML();
         }  
         
+        public WorkItem getTaskAt(int row) {
+        return (WorkItem)data.get(row);
+    }
+        
         public TaskTableModel.Renderer getRenderer() {
         return new TaskTableModel.Renderer();
     }
@@ -1109,6 +1116,57 @@ public class TaskTableModel extends ArrayTableModel {
         }
         
     }
+}
+
+public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent action) {
+            String command = action.getActionCommand();
+            WorkItem task = taskModel.getTaskAt(TaskTable.getSelectedRow());
+            if (command.equalsIgnoreCase("REPLACE")) {
+                campaign.mutateTask(task, ((RepairItem)task).replace());
+                refreshTaskList();
+            } else if (command.equalsIgnoreCase("SWAP_AMMO")) {
+                Unit unit = campaign.getUnit(currentUnitId);
+                AmmoDialog ammod = new AmmoDialog(null, true, (ReloadItem)task, unit.getEntity());
+                ammod.setVisible(true);
+                refreshUnitList();
+                refreshTaskList();
+                refreshTeamsList();
+            }
+        }
+        
+        @Override
+        public void mousePressed(MouseEvent e) {
+            maybeShowPopup(e);
+        }
+        
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            maybeShowPopup(e);
+        }
+        
+        private void maybeShowPopup(MouseEvent e) {
+            JPopupMenu popup = new JPopupMenu();
+            if (e.isPopupTrigger()) {
+                int row = TaskTable.rowAtPoint(e.getPoint());
+                WorkItem task  = taskModel.getTaskAt(row);
+                JMenuItem menuItem = null;
+                //**lets fill the pop up menu**//               
+                menuItem = new JMenuItem("Replace");
+                menuItem.setActionCommand("REPLACE");
+                menuItem.addActionListener(this);
+                menuItem.setEnabled(task instanceof RepairItem);              
+                popup.add(menuItem);
+                menuItem = new JMenuItem("Swap Ammo");
+                menuItem.setActionCommand("SWAP_AMMO");
+                menuItem.addActionListener(this);
+                menuItem.setEnabled(task instanceof ReloadItem);
+                popup.add(menuItem);
+                popup.show(e.getComponent(), e.getX(), e.getY());
+            }
+        }
 }
 
 /**

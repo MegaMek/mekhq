@@ -248,7 +248,7 @@
                         <Property name="name" type="java.lang.String" value="TaskTable" noResource="true"/>
                       </Properties>
                       <AuxValues>
-                        <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="TaskTable.setRowHeight(60);&#xa;TaskTable.getColumnModel().getColumn(0).setCellRenderer(taskModel.getRenderer());&#xa;TaskTable.getSelectionModel().addListSelectionListener(new javax.swing.event.ListSelectionListener() {&#xa;            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {&#xa;                TaskTableValueChanged(evt);&#xa;            }&#xa;        });"/>
+                        <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="TaskTable.setRowHeight(60);&#xa;TaskTable.getColumnModel().getColumn(0).setCellRenderer(taskModel.getRenderer());&#xa;TaskTable.getSelectionModel().addListSelectionListener(new javax.swing.event.ListSelectionListener() {&#xa;            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {&#xa;                TaskTableValueChanged(evt);&#xa;            }&#xa;        });&#xa;TaskTable.addMouseListener(taskMouseAdapter);"/>
                       </AuxValues>
                     </Component>
                   </SubComponents>
