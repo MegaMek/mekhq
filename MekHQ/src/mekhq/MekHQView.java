@@ -61,6 +61,7 @@ import megamek.common.EntityListFile;
 import mekhq.campaign.Unit;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PilotPerson;
+import mekhq.campaign.team.MedicalTeam;
 import mekhq.campaign.team.TechTeam;
 import mekhq.campaign.work.ReloadItem;
 import mekhq.campaign.work.RepairItem;
@@ -73,11 +74,11 @@ public class MekHQView extends FrameView {
 
     
     private Campaign campaign = new Campaign();
-    private DefaultListModel personnelModel = new DefaultListModel();
-    private DefaultListModel doctorsModel = new DefaultListModel();
     private TaskTableModel taskModel = new TaskTableModel();
     private MekTableModel unitModel = new MekTableModel();
     private TechTableModel techsModel = new TechTableModel();
+    private PersonTableModel personnelModel = new PersonTableModel();
+    private DocTableModel doctorsModel = new DocTableModel();
     private MekTableMouseAdapter unitMouseAdapter;
     private TaskTableMouseAdapter taskMouseAdapter;
     private int currentUnitId;
@@ -190,13 +191,11 @@ public class MekHQView extends FrameView {
         panSupplies = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         panPersonnel = new javax.swing.JPanel();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        personnelList = new javax.swing.JList();
-        jLabel3 = new javax.swing.JLabel();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        DoctorsList = new javax.swing.JList();
         btnAssignDoc = new javax.swing.JButton();
-        jLabel4 = new javax.swing.JLabel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        PersonTable = new javax.swing.JTable();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        DocTable = new javax.swing.JTable();
         jPanel4 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         lblDate = new javax.swing.JLabel();
@@ -337,7 +336,7 @@ public class MekHQView extends FrameView {
                         .add(jScrollPane4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 380, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 342, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 115, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .add(13, 13, 13))
             .add(panHangarLayout.createSequentialGroup()
@@ -399,31 +398,6 @@ public class MekHQView extends FrameView {
 
         panPersonnel.setName("panPersonnel"); // NOI18N
 
-        jScrollPane2.setName("jScrollPane2"); // NOI18N
-
-        personnelList.setModel(personnelModel);
-        personnelList.setName("personnelList"); // NOI18N
-        personnelList.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
-            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
-                personnelListValueChanged(evt);
-            }
-        });
-        jScrollPane2.setViewportView(personnelList);
-
-        jLabel3.setText(resourceMap.getString("jLabel3.text")); // NOI18N
-        jLabel3.setName("jLabel3"); // NOI18N
-
-        jScrollPane3.setName("jScrollPane3"); // NOI18N
-
-        DoctorsList.setModel(doctorsModel);
-        DoctorsList.setName("DoctorsList"); // NOI18N
-        DoctorsList.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
-            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
-                DoctorsListValueChanged(evt);
-            }
-        });
-        jScrollPane3.setViewportView(DoctorsList);
-
         btnAssignDoc.setText(resourceMap.getString("btnAssignDoc.text")); // NOI18N
         btnAssignDoc.setEnabled(false);
         btnAssignDoc.setName("btnAssignDoc"); // NOI18N
@@ -433,8 +407,31 @@ public class MekHQView extends FrameView {
             }
         });
 
-        jLabel4.setText(resourceMap.getString("jLabel4.text")); // NOI18N
-        jLabel4.setName("jLabel4"); // NOI18N
+        jScrollPane2.setName("jScrollPane2"); // NOI18N
+
+        PersonTable.setModel(personnelModel);
+        PersonTable.setName("PersonTable"); // NOI18N
+        PersonTable.setRowHeight(60);
+        PersonTable.getColumnModel().getColumn(0).setCellRenderer(personnelModel.getRenderer());
+        PersonTable.getSelectionModel().addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                PersonTableValueChanged(evt);
+            }
+        });
+        jScrollPane2.setViewportView(PersonTable);
+
+        jScrollPane3.setName("jScrollPane3"); // NOI18N
+
+        DocTable.setModel(doctorsModel);
+        DocTable.setName("DocTable"); // NOI18N
+        DocTable.setRowHeight(60);
+        DocTable.getColumnModel().getColumn(0).setCellRenderer(doctorsModel.getRenderer());
+        DocTable.getSelectionModel().addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                DocTableValueChanged(evt);
+            }
+        });
+        jScrollPane3.setViewportView(DocTable);
 
         org.jdesktop.layout.GroupLayout panPersonnelLayout = new org.jdesktop.layout.GroupLayout(panPersonnel);
         panPersonnel.setLayout(panPersonnelLayout);
@@ -442,33 +439,22 @@ public class MekHQView extends FrameView {
             panPersonnelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(panPersonnelLayout.createSequentialGroup()
                 .addContainerGap()
-                .add(panPersonnelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(panPersonnelLayout.createSequentialGroup()
-                        .add(jScrollPane2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 384, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(btnAssignDoc, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 156, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(panPersonnelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(jScrollPane3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 390, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(jLabel4)))
-                    .add(jLabel3))
-                .add(440, 440, 440))
+                .add(jScrollPane2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 356, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(btnAssignDoc, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 156, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(jScrollPane3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 403, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .add(172, 172, 172))
         );
         panPersonnelLayout.setVerticalGroup(
             panPersonnelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(panPersonnelLayout.createSequentialGroup()
                 .addContainerGap()
-                .add(jLabel3)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(panPersonnelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 533, Short.MAX_VALUE)
-                    .add(panPersonnelLayout.createSequentialGroup()
-                        .add(jLabel4)
-                        .add(3, 3, 3)
-                        .add(panPersonnelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(btnAssignDoc)
-                            .add(jScrollPane3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap())
+                    .add(jScrollPane3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 498, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(btnAssignDoc)
+                    .add(jScrollPane2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 545, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(32, Short.MAX_VALUE))
         );
 
         panFinances.addTab(resourceMap.getString("panPersonnel.TabConstraints.tabTitle"), panPersonnel); // NOI18N
@@ -699,6 +685,29 @@ private void UnitTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
     refreshTaskList();
 }
 
+private void PersonTableValueChanged(javax.swing.event.ListSelectionEvent evt) {                                       
+    int selected = PersonTable.getSelectedRow();
+    if(selected > -1 && selected < campaign.getPersonnel().size()) {
+        currentPersonId = campaign.getPersonnel().get(selected).getId();
+    }
+    else if(selected < 0) {
+        currentPersonId = -1;
+    }
+    updateAssignDoctorEnabled();
+}
+
+private void DocTableValueChanged(javax.swing.event.ListSelectionEvent evt) {                                       
+    int selected = DocTable.getSelectedRow();
+    if(selected > -1 && selected < campaign.getDoctors().size()) {
+        currentDoctorId = campaign.getDoctors().get(selected).getId();
+    }
+    else if(selected < 0) {
+        currentDoctorId = -1;
+    }
+    updateAssignDoctorEnabled();
+}
+
+
 private void btnAdvanceDayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAdvanceDayActionPerformed
     campaign.processDay();
     TaskReportDialog trd = new TaskReportDialog(this.getFrame(), true);
@@ -726,28 +735,6 @@ private void btnAssignDocActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
     refreshDoctorsList();
     refreshPersonnelList();
 }//GEN-LAST:event_btnAssignDocActionPerformed
-
-private void DoctorsListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_DoctorsListValueChanged
-    int selected = DoctorsList.getSelectedIndex();
-    if(selected > -1 && selected < campaign.getDoctors().size()) {
-        currentDoctorId = campaign.getDoctors().get(selected).getId();
-    }
-    else if(selected < 0) {
-        currentDoctorId = -1;
-    }
-    updateAssignDoctorEnabled();  
-}//GEN-LAST:event_DoctorsListValueChanged
-
-private void personnelListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_personnelListValueChanged
-    int selected = personnelList.getSelectedIndex();
-    if(selected > -1 && selected < campaign.getPersonnel().size()) {
-        currentPersonId = campaign.getPersonnel().get(selected).getId();
-    }
-    else if(selected < 0) {
-        currentPersonId = -1;
-    }
-    updateAssignDoctorEnabled();
-}//GEN-LAST:event_personnelListValueChanged
 
 private void miHirePilotActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miHirePilotActionPerformed
     NewPilotDialog npd = new NewPilotDialog(this.getFrame(), true, campaign);
@@ -894,28 +881,18 @@ protected void refreshTechsList() {
 }
 
 protected void refreshDoctorsList() {
-    int selected = DoctorsList.getSelectedIndex();
-    doctorsModel.removeAllElements();
-    int len = 0;
-    for(SupportTeam team : campaign.getDoctors()) {
-        doctorsModel.addElement(team.getDesc());
-        len++;
-    }
-    if(selected < len) {
-        DoctorsList.setSelectedIndex(selected);
+    int selected = DocTable.getSelectedRow();
+    doctorsModel.setData(campaign.getDoctors());
+    if(selected > -1 && selected < campaign.getDoctors().size()) {
+        DocTable.setRowSelectionInterval(selected, selected);
     }
 }
 
 protected void refreshPersonnelList() {
-    int selected = personnelList.getSelectedIndex();
-    personnelModel.removeAllElements();
-    int len = 0;
-    for(Person person : campaign.getPersonnel()) {
-        personnelModel.addElement(person.getDesc());
-        len++;
-    }
-    if(selected < len) {
-        personnelList.setSelectedIndex(selected);
+    int selected = PersonTable.getSelectedRow();
+    personnelModel.setData(campaign.getPersonnel());
+    if(selected > -1 && selected < campaign.getPersonnel().size()) {
+        PersonTable.setRowSelectionInterval(selected, selected);
     }
 }
 
@@ -1222,7 +1199,95 @@ public class TechTableModel extends ArrayTableModel {
     }
     
     
-    public class Renderer extends TaskInfo implements TableCellRenderer {
+    public class Renderer extends TechInfo implements TableCellRenderer {
+        
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            Component c = this;
+            setOpaque(true);          
+            setText(getValueAt(row, column).toString());
+            //setToolTipText(campaign.getToolTipFor(u));
+            if(isSelected) {
+                //TODO: how do I set this to the user's default selection color?
+                c.setBackground(new Color(253, 117, 28));
+            } else {
+                c.setBackground(new Color(220, 220, 220));
+            }
+            return c;
+        }
+        
+    }
+}
+
+/**
+ * A table model for displaying personnel
+ */
+public class PersonTableModel extends ArrayTableModel {
+
+        public PersonTableModel() {
+            this.columnNames = new String[] {"Personnel"};
+            this.data = new ArrayList<Person>();
+        }
+
+        @Override
+        public Object getValueAt(int row, int col) {
+            return ((Person)data.get(row)).getDesc();
+        }  
+        
+        public Person getPersonAt(int row) {
+        return (Person)data.get(row);
+    }
+        
+        public PersonTableModel.Renderer getRenderer() {
+        return new PersonTableModel.Renderer();
+    }
+    
+    
+    public class Renderer extends PersonInfo implements TableCellRenderer {
+        
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            Component c = this;
+            setOpaque(true);          
+            setText(getValueAt(row, column).toString());
+            //setToolTipText(campaign.getToolTipFor(u));
+            if(isSelected) {
+                //TODO: how do I set this to the user's default selection color?
+                c.setBackground(new Color(253, 117, 28));
+            } else {
+                c.setBackground(new Color(220, 220, 220));
+            }
+            return c;
+        }
+        
+    }
+}
+
+/**
+ * A table model for displaying personnel
+ */
+public class DocTableModel extends ArrayTableModel {
+
+        public DocTableModel() {
+            this.columnNames = new String[] {"Doctors"};
+            this.data = new ArrayList<MedicalTeam>();
+        }
+
+        @Override
+        public Object getValueAt(int row, int col) {
+            return ((MedicalTeam)data.get(row)).getDesc();
+        }  
+        
+        public MedicalTeam getPersonAt(int row) {
+        return (MedicalTeam)data.get(row);
+    }
+        
+        public DocTableModel.Renderer getRenderer() {
+        return new DocTableModel.Renderer();
+    }
+    
+    
+    public class Renderer extends DoctorInfo implements TableCellRenderer {
         
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
@@ -1243,7 +1308,8 @@ public class TechTableModel extends ArrayTableModel {
 }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JList DoctorsList;
+    private javax.swing.JTable DocTable;
+    private javax.swing.JTable PersonTable;
     private javax.swing.JTable TaskTable;
     private javax.swing.JTable TechTable;
     private javax.swing.JTable UnitTable;
@@ -1253,8 +1319,6 @@ public class TechTableModel extends ArrayTableModel {
     private javax.swing.JButton btnDoTask;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
@@ -1279,7 +1343,6 @@ public class TechTableModel extends ArrayTableModel {
     private javax.swing.JPanel panHangar;
     private javax.swing.JPanel panPersonnel;
     private javax.swing.JPanel panSupplies;
-    private javax.swing.JList personnelList;
     private javax.swing.JProgressBar progressBar;
     private javax.swing.JLabel statusAnimationLabel;
     private javax.swing.JLabel statusMessageLabel;
