@@ -1,6 +1,12 @@
 VERSION HISTORY
 ----------------------------------
 v0.0.1 (SVN)
++ added TextPane for reports
++ changed all icons to icons from the Open Clip Art Library
++ centralized impossible tasks checks in SupportTeam#getTargetFor
++ improvements to reporting on row labels
++ replaced DoctorList with DoctorTable
++ replaced PersonList with PersonTable
 + Renderer for TaskTable
 + abstract class ArrayTableModel
 + right-click menu for UnitTable

@@ -31,7 +31,7 @@ public class HealPilot extends PersonnelWorkItem {
     
     public HealPilot(PilotPerson pp) {
         super(pp);
-        this.name = "Heal pilot";
+        this.name = "Heal";
     }
 
     @Override

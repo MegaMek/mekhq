@@ -169,6 +169,9 @@ public abstract class SupportTeam implements Serializable {
        if(null == task) {
            return new TargetRoll(TargetRoll.IMPOSSIBLE, "no task?");
        }
+       if(null != task.checkFixable()) {
+           return new TargetRoll(TargetRoll.IMPOSSIBLE, task.checkFixable());
+       } 
        if(task.getTime() > getMinutesLeft()) {
            return new TargetRoll(TargetRoll.IMPOSSIBLE, "Not enough time");
        }
@@ -194,38 +197,34 @@ public abstract class SupportTeam implements Serializable {
    }
    
    public String doAssigned(WorkItem task) {
-       String report = "  " + task.getDisplayName();
-       //check whether the task is currently possible
-       if(null != task.checkFixable()) {
-           report = report + ", but the task is impossible because " + task.checkFixable();
-           return report;
-       }        
+       String report = getName() + " attempts to " + task.getDisplayName();     
        int minutes = task.getTime();
        if(minutes > getMinutesLeft()) {
-           report = report  + ", but ran out of time for the day, see you tommorrow!";
+           //we shouldn't get here, but never hurts to check
+           report = report  + "<emph>Ran out of time for the day, see you tommorrow!</emph>";
            return report;
        } else {
            setMinutesLeft(getMinutesLeft() - minutes);
        }
        TargetRoll target = getTargetFor(task);
        int roll = makeRoll(task);
-       report = report + ", needs " + target.getValueAsString() + " and rolls " + roll + ":";
+       report = report + "  needs " + target.getValueAsString() + " and rolls " + roll + ":";
        if(roll >= target.getValue()) {
-           report = report + " task completed.";
+           report = report + " <font color='green'><b>task completed.</b></font>";
            task.fix();
            task.complete();
        } else {
-           report = report + " task failed.";
+           report = report + " <font color='red'><b>task failed.</b></font>";
            task.fail(getRating());
            //have we run out of options?
            if(task.getSkillMin() > EXP_ELITE) {
                if(task instanceof RepairItem) {
                    //turn it into a replacement item
                    campaign.mutateTask(task, ((RepairItem)task).replace());
-                   report = report + " Item cannot be repaired, it must be replaced instead.";
+                   report = report + "<br><emph><b>Item cannot be repaired, it must be replaced instead.</b></emph>";
                } else if(task instanceof ReplacementItem) {
                    //TODO: destroy component, but parts no implemented yet
-                   report = report + " Component destroyed!";
+                   report = report + "<br><emph><b>Component destroyed!</b></emph>";
                    //reset the skill min counter back to green
                    task.setSkillMin(EXP_GREEN);
                }

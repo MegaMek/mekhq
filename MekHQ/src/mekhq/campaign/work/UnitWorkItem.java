@@ -21,11 +21,6 @@
 
 package mekhq.campaign.work;
 
-import java.io.Serializable;
-import megamek.common.Entity;
-import megamek.common.TargetRoll;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.team.SupportTeam;
 import mekhq.campaign.Unit;
 
 /**
@@ -52,6 +47,6 @@ public abstract class UnitWorkItem extends WorkItem {
     
     @Override
     public String getDisplayName() {
-        return unit.getEntity().getDisplayName() + ": " + getName();
+        return  getName() + " for " + unit.getEntity().getDisplayName();
     }
 }

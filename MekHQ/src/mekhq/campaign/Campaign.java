@@ -23,7 +23,7 @@ package mekhq.campaign;
 
 import mekhq.campaign.team.SupportTeam;
 import java.io.Serializable;
-import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -72,11 +72,14 @@ public class Campaign implements Serializable {
     
     //calendar stuff
     public Calendar calendar;
+    SimpleDateFormat dateFormat;
     
     public Campaign() {
     
         game = new Game();
         calendar = new GregorianCalendar(3067, Calendar.JANUARY, 1);
+        dateFormat = new SimpleDateFormat("EEEE, MMMM d yyyy");
+        newDay();
     
     }
     
@@ -169,6 +172,14 @@ public class Campaign implements Serializable {
         return currentReport;
     }
     
+    public String getCurrentReportHTML() {
+        String toReturn = "";
+        for(String s: currentReport) {
+            toReturn += s + "<br>";
+        }
+        return toReturn;
+    }
+    
     public ArrayList<SupportTeam> getDoctors() {
         ArrayList<SupportTeam> docs = new ArrayList<SupportTeam>();
         for(SupportTeam team : getTeams()) {
@@ -256,28 +267,17 @@ public class Campaign implements Serializable {
          }
          return false;
      }
-     
-    public void processDay() {
-        currentReport = new ArrayList<String>();
-        //cycle through teams and tell them to get to work
-        //TODO: not doing it this way, but still need to cycle through docs
-        for(SupportTeam team : getTeams()) {
-            team.resetMinutesLeft();
-            //currentReport.addAll(team.doAssignments());
-        }
-        
-        //ok now cycle through all tasks and only keep the ones that 
-        //have not been completed
-        ArrayList<WorkItem> newTasks = new ArrayList<WorkItem>();
-        for(WorkItem task : getTasks()) {
-            if(!task.isCompleted()) {
-                newTasks.add(task);
+    
+    public void newDay() {
+         for(SupportTeam team : getTeams()) {
+            for(WorkItem task : team.getTasksAssigned()) {
+                processTask(task, team);
             }
+            team.resetMinutesLeft();
+            //if there are any assigned tasks then do them now
         }
-        this.tasks = newTasks;
-        
-        //advance the calendar
         calendar.add(Calendar.DAY_OF_MONTH, 1);
+        currentReport.add("<p><b>" + getDateAsString() + "</b>");
     }
     
     public void clearAllUnits() {
@@ -331,6 +331,10 @@ public class Campaign implements Serializable {
         }
         toReturn += "</html>";
         return toReturn;
+    }
+    
+    public String getDateAsString() {
+        return dateFormat.format(calendar.getTime());
     }
     
 }

@@ -21,7 +21,6 @@
 
 package mekhq.campaign.work;
 
-import megamek.common.Entity;
 import mekhq.campaign.Unit;
 
 /**
