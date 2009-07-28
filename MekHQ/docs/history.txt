@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.0.1 (SVN)
++ assign all tasks menu option in Unit popup menu
 + sell unit menu option in Unit popup menu
 + change pilot menu option in Unit popup menu
 + yellow color for units with tasks

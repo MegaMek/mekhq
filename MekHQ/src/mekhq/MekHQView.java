@@ -1202,7 +1202,24 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
                 if(0 == JOptionPane.showConfirmDialog(null, "Do you really want to sell " + unit.getEntity().getDisplayName(), "Sell Unit?", JOptionPane.YES_NO_OPTION)) {
                     campaign.removeUnit(unit.getId(), false);
                 }
-            }    
+            } else if(command.contains("ASSIGN_TECH")) {
+                String sel = command.split(":")[1];
+                int selected = Integer.parseInt(sel);
+                if(selected > -1 && selected < campaign.getTechTeams().size()) {
+                    SupportTeam team = campaign.getTechTeams().get(selected);
+                    if(null != team) {
+                        for(WorkItem task : campaign.getTasksForUnit(unit.getId())) {
+                            if(team.getTargetFor(task).getValue() != TargetRoll.IMPOSSIBLE) {
+                                campaign.processTask(task, team);
+                            }
+                        }
+                    }
+                }
+                refreshUnitList();
+                refreshTaskList();
+                refreshTechsList();
+                refreshReport();
+            } 
         }
         
         @Override
@@ -1236,18 +1253,31 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
                 Unit unit  = unitModel.getUnitAt(row);
                 pilots = campaign.getEligiblePilotsFor(unit);
                 JMenuItem menuItem = null;
+                JMenu menu = null;
                 //**lets fill the pop up menu**//               
                 //TODO: assign all tasks to a certain tech
+                menu = new JMenu("Assign all tasks");
+                int i = 0;
+                for(SupportTeam tech : campaign.getTechTeams()) {
+                    menuItem = new JMenuItem(tech.getDesc());
+                    menuItem.setActionCommand("ASSIGN_TECH:" + i);
+                    menuItem.addActionListener(this);
+                    menuItem.setEnabled(tech.getMinutesLeft() > 0);
+                    menu.add(menuItem);
+                    i++;
+                }
+                popup.add(menu);
                 //remove pilot
+                popup.addSeparator();
                 menuItem = new JMenuItem("Remove pilot");
                 menuItem.setActionCommand("REMOVE_PILOT");
                 menuItem.addActionListener(this);
                 menuItem.setEnabled(unit.hasPilot());
                 popup.add(menuItem);
                 //switch pilot
-                JMenu menu = new JMenu("Change pilot");
+                menu = new JMenu("Change pilot");
                 JCheckBoxMenuItem cbMenuItem = null;
-                int i = 0;
+                i = 0;
                 for(PilotPerson pp : pilots) {
                     cbMenuItem = new JCheckBoxMenuItem(pp.getDesc());
                     if(null != unit.getEntity().getCrew()
