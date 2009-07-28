@@ -32,7 +32,7 @@ public class TaskInfo extends javax.swing.JPanel {
         lblImage = new javax.swing.JLabel();
 
         setName("Form"); // NOI18N
-        setLayout(new java.awt.GridLayout());
+        setLayout(new java.awt.GridLayout(1, 0));
 
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(TaskInfo.class);
         lblImage.setIcon(resourceMap.getIcon("lblImage.icon")); // NOI18N
