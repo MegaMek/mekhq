@@ -1,6 +1,8 @@
 VERSION HISTORY
 ----------------------------------
 v0.0.1 (SVN)
++ populate a menu for swap ammo option in Task popup menu
++ scrap component option in Task popup menu
 + made corrections to RepairItem
 + swap ammo menu option in Unit popup menu
 + assign all tasks menu option in Unit popup menu

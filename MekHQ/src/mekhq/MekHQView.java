@@ -73,6 +73,7 @@ import mekhq.campaign.team.TechTeam;
 import mekhq.campaign.work.PersonnelWorkItem;
 import mekhq.campaign.work.ReloadItem;
 import mekhq.campaign.work.RepairItem;
+import mekhq.campaign.work.ReplacementItem;
 import mekhq.campaign.work.WorkItem;
 
 /**
@@ -1091,15 +1092,28 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
             String command = action.getActionCommand();
             WorkItem task = taskModel.getTaskAt(TaskTable.getSelectedRow());
             if (command.equalsIgnoreCase("REPLACE")) {
-                campaign.mutateTask(task, ((RepairItem)task).replace());
+                if(task instanceof RepairItem) {
+                    campaign.mutateTask(task, ((RepairItem)task).replace());
+                } else if (task instanceof ReplacementItem) {
+                    //TODO: destroy part once parts are implemented
+                    task.setSkillMin(SupportTeam.EXP_GREEN);
+                }
                 refreshTaskList();
-            } else if (command.equalsIgnoreCase("SWAP_AMMO")) {
-                Unit unit = campaign.getUnit(currentUnitId);
-                AmmoDialog ammod = new AmmoDialog(null, true, (ReloadItem)task, unit.getEntity());
-                ammod.setVisible(true);
-                refreshUnitList();
-                refreshTaskList();
-                refreshTechsList();
+            } else if (command.contains("SWAP_AMMO")) {
+                if(task instanceof ReloadItem) {
+                    ReloadItem reload = (ReloadItem)task;
+                    Entity en = reload.getUnit().getEntity();
+                    Mounted m = reload.getMounted();
+                    if(null == m) {
+                        return;
+                    }
+                    AmmoType curType = (AmmoType)m.getType();
+                    String sel = command.split(":")[1];
+                    int selType = Integer.parseInt(sel);
+                    AmmoType newType = Utilities.getMunitionsFor(en, curType).get(selType);
+                    reload.swapAmmo(newType);
+                    refreshTaskList();
+                }
             }
         }
         
@@ -1119,17 +1133,34 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
                 int row = TaskTable.rowAtPoint(e.getPoint());
                 WorkItem task  = taskModel.getTaskAt(row);
                 JMenuItem menuItem = null;
+                JMenu menu = null;
+                JCheckBoxMenuItem cbMenuItem = null;
                 //**lets fill the pop up menu**//               
-                menuItem = new JMenuItem("Replace");
+                menuItem = new JMenuItem("Scrap Component/Equipment");
                 menuItem.setActionCommand("REPLACE");
                 menuItem.addActionListener(this);
-                menuItem.setEnabled(task instanceof RepairItem);              
+                menuItem.setEnabled(task instanceof RepairItem || task instanceof ReplacementItem);              
                 popup.add(menuItem);
-                menuItem = new JMenuItem("Swap Ammo");
-                menuItem.setActionCommand("SWAP_AMMO");
-                menuItem.addActionListener(this);
-                menuItem.setEnabled(task instanceof ReloadItem);
-                popup.add(menuItem);
+                if(task instanceof ReloadItem) {
+                    ReloadItem reload = (ReloadItem)task;
+                    Entity en = reload.getUnit().getEntity();
+                    Mounted m = reload.getMounted();
+                    menu = new JMenu("Swap Ammo");
+                    int i = 0;
+                    AmmoType curType = (AmmoType)m.getType();
+                    for(AmmoType atype : Utilities.getMunitionsFor(en, curType)) {
+                        cbMenuItem = new JCheckBoxMenuItem(atype.getDesc());
+                        if(atype.equals(curType)) {
+                            cbMenuItem.setSelected(true);
+                        } else {
+                            cbMenuItem.setActionCommand("SWAP_AMMO:" + i);
+                            cbMenuItem.addActionListener(this);
+                        }
+                        menu.add(cbMenuItem);
+                        i++;
+                    }
+                    popup.add(menu);
+                }
                 popup.show(e.getComponent(), e.getX(), e.getY());
             }
         }
@@ -1244,6 +1275,7 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
                     campaign.addWork(reload);
                 }
                 refreshTaskList();
+                refreshUnitList();
             }
         }
         
@@ -1293,7 +1325,7 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
                     i++;
                 }
                 popup.add(menu);
-                //TODO: swap ammo
+                //swap ammo
                 menu = new JMenu("Swap Ammo");
                 JMenu ammoMenu = null;
                 for(Mounted m : unit.getEntity().getAmmo()) {
