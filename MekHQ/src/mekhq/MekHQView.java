@@ -1167,7 +1167,11 @@ public class MekTableModel extends ArrayTableModel {
                 //TODO: how do I set this to the user's default selection color?
                 c.setBackground(new Color(253, 117, 28));
             } else {
-                c.setBackground(new Color(220, 220, 220));
+                if(null != u && campaign.countTasksFor(u.getId()) > 0) {
+                    c.setBackground(Color.YELLOW);
+                } else {
+                    c.setBackground(new Color(220, 220, 220));
+                }
             }
             return c;
         }

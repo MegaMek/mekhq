@@ -211,6 +211,16 @@ public class Campaign implements Serializable {
         return newTasks;
     }
     
+    public int countTasksFor(int unitId) {
+        int total = 0;
+        for(WorkItem task : getTasksForUnit(unitId)) {
+            if(task.isNeeded()) {
+                total++;
+            }
+        }
+        return total;
+    }
+    
     /**
      * return an html report on this unit. This will go in MekInfo
      * @param unitId
