@@ -187,6 +187,8 @@ public class MekHQView extends FrameView {
         textTarget = new javax.swing.JTextArea();
         jScrollPane1 = new javax.swing.JScrollPane();
         TechTable = new javax.swing.JTable();
+        lblTarget = new javax.swing.JLabel();
+        lblTargetNum = new javax.swing.JLabel();
         panSupplies = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         panPersonnel = new javax.swing.JPanel();
@@ -235,6 +237,7 @@ public class MekHQView extends FrameView {
         tabMain.setToolTipText(resourceMap.getString("tabMain.toolTipText")); // NOI18N
         tabMain.setName("tabMain"); // NOI18N
 
+        panHangar.setFont(resourceMap.getFont("panHangar.font")); // NOI18N
         panHangar.setName("panHangar"); // NOI18N
 
         btnDeployUnits.setText(resourceMap.getString("btnDeployUnits.text")); // NOI18N
@@ -319,6 +322,14 @@ public class MekHQView extends FrameView {
         });
         jScrollPane1.setViewportView(TechTable);
 
+        lblTarget.setText(resourceMap.getString("lblTarget.text")); // NOI18N
+        lblTarget.setName("lblTarget"); // NOI18N
+
+        lblTargetNum.setFont(resourceMap.getFont("lblTargetNum.font")); // NOI18N
+        lblTargetNum.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblTargetNum.setText(resourceMap.getString("lblTargetNum.text")); // NOI18N
+        lblTargetNum.setName("lblTargetNum"); // NOI18N
+
         org.jdesktop.layout.GroupLayout panHangarLayout = new org.jdesktop.layout.GroupLayout(panHangar);
         panHangar.setLayout(panHangarLayout);
         panHangarLayout.setHorizontalGroup(
@@ -328,7 +339,14 @@ public class MekHQView extends FrameView {
                 .add(panHangarLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
                     .add(panHangarLayout.createSequentialGroup()
                         .add(19, 19, 19)
-                        .add(btnDoTask)
+                        .add(panHangarLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(btnDoTask)
+                            .add(panHangarLayout.createSequentialGroup()
+                                .add(24, 24, 24)
+                                .add(lblTarget))
+                            .add(panHangarLayout.createSequentialGroup()
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(lblTargetNum, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 95, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(jScrollPane6, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                     .add(panHangarLayout.createSequentialGroup()
@@ -362,7 +380,12 @@ public class MekHQView extends FrameView {
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED))
                             .add(panHangarLayout.createSequentialGroup()
                                 .add(panHangarLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                    .add(btnDoTask)
+                                    .add(panHangarLayout.createSequentialGroup()
+                                        .add(btnDoTask)
+                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                        .add(lblTarget)
+                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                        .add(lblTargetNum))
                                     .add(jScrollPane6, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                 .add(jScrollPane4, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 396, Short.MAX_VALUE)))
@@ -489,6 +512,7 @@ public class MekHQView extends FrameView {
 
         txtPaneReport.setContentType(resourceMap.getString("txtPaneReport.contentType")); // NOI18N
         txtPaneReport.setEditable(false);
+        txtPaneReport.setFont(resourceMap.getFont("txtPaneReport.font")); // NOI18N
         txtPaneReport.setText(campaign.getCurrentReportHTML());
         txtPaneReport.setName("txtPaneReport"); // NOI18N
         jScrollPane7.setViewportView(txtPaneReport);
@@ -675,6 +699,7 @@ private void TechTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
         currentTechId = -1;
     }
     updateAssignEnabled();
+    updateTargetText();
 }   
 
 private void TaskTableValueChanged(javax.swing.event.ListSelectionEvent evt) {                                       
@@ -945,10 +970,13 @@ protected void updateTargetText() {
     //must have a valid team and an unassigned task
     WorkItem task = campaign.getTask(currentTaskId);
     SupportTeam team = campaign.getTeam(currentTechId);
+    TargetRoll target = team.getTargetFor(task);
     if(null != task && null != team) {
-        textTarget.setText(team.getTargetFor(task).getDesc());
+        textTarget.setText(target.getDesc());
+        lblTargetNum.setText(target.getValueAsString());
     } else {
         textTarget.setText("");
+        lblTargetNum.setText("-");
     }
 }
 
@@ -1345,6 +1373,8 @@ public class DocTableModel extends ArrayTableModel {
     private javax.swing.JScrollPane jScrollPane7;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JLabel lblDate;
+    private javax.swing.JLabel lblTarget;
+    private javax.swing.JLabel lblTargetNum;
     private javax.swing.JButton loadListBtn;
     private javax.swing.JPanel mainPanel;
     private javax.swing.JMenuBar menuBar;

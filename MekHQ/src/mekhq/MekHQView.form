@@ -68,6 +68,7 @@
           <SubComponents>
             <Container class="javax.swing.JPanel" name="panHangar">
               <Properties>
+                <Property name="font" type="java.awt.Font" resourceKey="panHangar.font"/>
                 <Property name="name" type="java.lang.String" value="panHangar" noResource="true"/>
               </Properties>
               <Constraints>
@@ -86,7 +87,17 @@
                           <Group type="103" groupAlignment="0" max="-2" attributes="0">
                               <Group type="102" attributes="0">
                                   <EmptySpace min="-2" pref="19" max="-2" attributes="0"/>
-                                  <Component id="btnDoTask" min="-2" max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="0" attributes="0">
+                                      <Component id="btnDoTask" min="-2" max="-2" attributes="0"/>
+                                      <Group type="102" alignment="0" attributes="0">
+                                          <EmptySpace min="-2" pref="24" max="-2" attributes="0"/>
+                                          <Component id="lblTarget" min="-2" max="-2" attributes="1"/>
+                                      </Group>
+                                      <Group type="102" alignment="0" attributes="0">
+                                          <EmptySpace max="-2" attributes="0"/>
+                                          <Component id="lblTargetNum" min="-2" pref="95" max="-2" attributes="1"/>
+                                      </Group>
+                                  </Group>
                                   <EmptySpace max="-2" attributes="0"/>
                                   <Component id="jScrollPane6" min="-2" max="-2" attributes="0"/>
                               </Group>
@@ -128,7 +139,13 @@
                                       </Group>
                                       <Group type="102" attributes="0">
                                           <Group type="103" groupAlignment="0" attributes="0">
-                                              <Component id="btnDoTask" alignment="0" min="-2" max="-2" attributes="0"/>
+                                              <Group type="102" alignment="0" attributes="0">
+                                                  <Component id="btnDoTask" min="-2" max="-2" attributes="0"/>
+                                                  <EmptySpace max="-2" attributes="0"/>
+                                                  <Component id="lblTarget" min="-2" max="-2" attributes="0"/>
+                                                  <EmptySpace max="-2" attributes="0"/>
+                                                  <Component id="lblTargetNum" min="-2" max="-2" attributes="0"/>
+                                              </Group>
                                               <Component id="jScrollPane6" alignment="0" min="-2" max="-2" attributes="0"/>
                                           </Group>
                                           <EmptySpace max="-2" attributes="0"/>
@@ -281,6 +298,20 @@
                     </Component>
                   </SubComponents>
                 </Container>
+                <Component class="javax.swing.JLabel" name="lblTarget">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" resourceKey="lblTarget.text"/>
+                    <Property name="name" type="java.lang.String" value="lblTarget" noResource="true"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JLabel" name="lblTargetNum">
+                  <Properties>
+                    <Property name="font" type="java.awt.Font" resourceKey="lblTargetNum.font"/>
+                    <Property name="horizontalAlignment" type="int" value="0"/>
+                    <Property name="text" type="java.lang.String" resourceKey="lblTargetNum.text"/>
+                    <Property name="name" type="java.lang.String" value="lblTargetNum" noResource="true"/>
+                  </Properties>
+                </Component>
               </SubComponents>
             </Container>
             <Container class="javax.swing.JPanel" name="panSupplies">
@@ -498,6 +529,7 @@
               <Properties>
                 <Property name="contentType" type="java.lang.String" resourceKey="txtPaneReport.contentType"/>
                 <Property name="editable" type="boolean" value="false"/>
+                <Property name="font" type="java.awt.Font" resourceKey="txtPaneReport.font"/>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
                   <Connection code="campaign.getCurrentReportHTML()" type="code"/>
                 </Property>
