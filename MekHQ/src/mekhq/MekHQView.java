@@ -64,6 +64,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PilotPerson;
 import mekhq.campaign.team.MedicalTeam;
 import mekhq.campaign.team.TechTeam;
+import mekhq.campaign.work.PersonnelWorkItem;
 import mekhq.campaign.work.ReloadItem;
 import mekhq.campaign.work.RepairItem;
 import mekhq.campaign.work.WorkItem;
@@ -531,7 +532,7 @@ public class MekHQView extends FrameView {
                             .add(btnAdvanceDay))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(jScrollPane7, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 836, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(15, Short.MAX_VALUE))
         );
         mainPanelLayout.setVerticalGroup(
             mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -768,6 +769,7 @@ private void btnAssignDocActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
     Person p = campaign.getPerson(currentPersonId);
     if(null != p.getTask()) {
         campaign.assignTask(currentDoctorId, p.getTask().getId());
+        p.getTask().assign();
     }
     refreshTechsList();
     refreshDoctorsList();
@@ -958,8 +960,12 @@ protected void updateAssignDoctorEnabled() {
     //must have a valid doctor and an unassigned task
     Person curPerson = campaign.getPerson(currentPersonId);
     SupportTeam team = campaign.getTeam(currentDoctorId);
-    if(null != curPerson && null != curPerson.getTask() 
-            && null != team && team.canDo(curPerson.getTask())) {     
+    PersonnelWorkItem pw = null;
+    if(null != curPerson) {
+        pw = curPerson.getTask();
+    }
+    if(null != pw && null != team && !pw.isAssigned()
+            && team.getTargetFor(pw).getValue() != TargetRoll.IMPOSSIBLE) {     
         btnAssignDoc.setEnabled(true);
     } else {
         btnAssignDoc.setEnabled(false);

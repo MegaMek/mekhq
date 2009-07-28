@@ -161,6 +161,19 @@ public abstract class SupportTeam implements Serializable {
        assignedTasks.remove(task);
    }
    
+   /**
+    * cycle through tasks and clean out any completed ones
+    */
+   public void cleanTasks() {
+       ArrayList<WorkItem> newTasks = new ArrayList<WorkItem>();
+       for(WorkItem task : getTasksAssigned()) {
+           if(!task.isCompleted()) {
+               newTasks.add(task);
+           }
+       }
+       assignedTasks = newTasks;
+   }
+   
    public abstract boolean canDo(WorkItem task);
    
    public abstract int makeRoll(WorkItem task);

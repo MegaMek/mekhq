@@ -53,6 +53,8 @@ public class HealPilot extends PersonnelWorkItem {
             PilotPerson pp = (PilotPerson)person;
             if(null != pp.getPilot() && pp.getPilot().getHits() < 1) {
                 super.complete();
+                unassign();
+                pp.setTask(null);
             }
         }
     }

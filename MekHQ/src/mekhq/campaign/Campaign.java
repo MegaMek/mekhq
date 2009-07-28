@@ -273,6 +273,7 @@ public class Campaign implements Serializable {
             for(WorkItem task : team.getTasksAssigned()) {
                 processTask(task, team);
             }
+            team.cleanTasks();
             team.resetMinutesLeft();
             //if there are any assigned tasks then do them now
         }
