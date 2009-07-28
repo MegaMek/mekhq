@@ -306,28 +306,27 @@ public class Campaign implements Serializable {
         
     }
     
-    public void removeUnit(int id) {
+    public void removeUnit(int id, boolean deploy) {
+        Unit unit = getUnit(id);
         //remove any tasks associated with this unit
 
         for(WorkItem task : getTasksForUnit(id)) {
             tasks.remove(task);
             taskIds.remove(new Integer(task.getId()));
         }
-        
-        //also remove any pilot assigned to this unit
-        Person pilot = null;
-        for(Person p : getPersonnel()) {
-            if(p instanceof PilotPerson && ((PilotPerson)p).getAssignedUnit().getId() == id) {
-                pilot = p;
-                break;
+          
+        //if deploying remove pilot person as well
+        if(deploy) {
+            PilotPerson pilot = getPilotFor(unit);
+            if(null != pilot) {
+                personnel.remove(pilot);
+                personnelIds.remove(pilot.getId());
             }
-        }
-        if(null != pilot) {
-            personnel.remove(pilot);
-            personnelIds.remove(pilot.getId());
+        } else {
+            //otherwise just remove the pilot from this unit
+            removePilotFrom(unit);
         }
         
-        Unit unit = getUnit(id);
         //finally remove the unit
         units.remove(unit);
         unitIds.remove(new Integer(unit.getId()));      
@@ -366,22 +365,27 @@ public class Campaign implements Serializable {
         return pilots;
     }
     
-    public void removePilotFrom(Unit unit) {
-        if(unit.hasPilot()) {
-            for(Person p : getPersonnel()) {
-                if(!(p instanceof PilotPerson)) {
-                    continue;
-                }
-                PilotPerson pilot = (PilotPerson)p;
-                if(null == pilot.getAssignedUnit()) {
-                    continue;
-                }
-                if(pilot.getAssignedUnit().getId() == unit.getId()) {
-                    pilot.getAssignedUnit().removePilot();
-                    pilot.setAssignedUnit(null);
-                    break;
-                }
+    public PilotPerson getPilotFor(Unit unit) {
+        for(Person p : getPersonnel()) {
+            if(!(p instanceof PilotPerson)) {
+                continue;
             }
+            PilotPerson pilot = (PilotPerson)p;
+            if(null == pilot.getAssignedUnit()) {
+                continue;
+            }
+            if(pilot.getAssignedUnit().getId() == unit.getId()) {
+                return pilot;
+            }
+        }
+        return null;
+    }
+    
+    public void removePilotFrom(Unit unit) {
+        PilotPerson pilot = getPilotFor(unit);
+        if(null != pilot) {
+            pilot.getAssignedUnit().removePilot();
+            pilot.setAssignedUnit(null);
         }
     }
     

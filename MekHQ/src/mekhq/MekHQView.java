@@ -49,6 +49,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.event.MouseInputAdapter;
@@ -898,7 +899,7 @@ protected void saveListFile() {
                 //clear the entities, so that if the user wants to read them back you wont get duplicates
                 //The removeUnit method will also remove tasks and pilots associated with this unit
                 for(int id: toRemove) {
-                    campaign.removeUnit(id);
+                    campaign.removeUnit(id, true);
                 }
                 
             } catch (IOException excep) {
@@ -1197,7 +1198,11 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
                 if(null != pilots && selected > -1 && selected < pilots.size()) {
                     campaign.changePilot(pilots.get(selected), unit);
                 }
-            }     
+            } else if(command.equalsIgnoreCase("SELL")) {
+                if(0 == JOptionPane.showConfirmDialog(null, "Do you really want to sell " + unit.getEntity().getDisplayName(), "Sell Unit?", JOptionPane.YES_NO_OPTION)) {
+                    campaign.removeUnit(unit.getId(), false);
+                }
+            }    
         }
         
         @Override
@@ -1239,7 +1244,7 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
                 menuItem.addActionListener(this);
                 menuItem.setEnabled(unit.hasPilot());
                 popup.add(menuItem);
-                //TODO: switch pilot (should be its own menu)
+                //switch pilot
                 JMenu menu = new JMenu("Change pilot");
                 JCheckBoxMenuItem cbMenuItem = null;
                 int i = 0;
@@ -1256,7 +1261,12 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
                 }
                 popup.add(menu);
                 //TODO: scrap unit
+                popup.addSeparator();
                 //TODO: sell unit
+                menuItem = new JMenuItem("Sell Unit");
+                menuItem.setActionCommand("SELL");
+                menuItem.addActionListener(this);
+                popup.add(menuItem);
                 //TODO: add quirks?
                 popup.show(e.getComponent(), e.getX(), e.getY());
             }
