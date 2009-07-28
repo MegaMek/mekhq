@@ -352,4 +352,48 @@ public class Campaign implements Serializable {
         return dateFormat.format(calendar.getTime());
     }
     
+    public ArrayList<PilotPerson> getEligiblePilotsFor(Unit unit) {
+        ArrayList<PilotPerson> pilots = new ArrayList<PilotPerson>();
+        for(Person p : getPersonnel()) {
+            if(!(p instanceof PilotPerson)) {
+                continue;
+            }
+            PilotPerson pp = (PilotPerson)p;
+            if(pp.canPilot(unit.getEntity())) {
+                pilots.add(pp);
+            }
+        }
+        return pilots;
+    }
+    
+    public void removePilotFrom(Unit unit) {
+        if(unit.hasPilot()) {
+            for(Person p : getPersonnel()) {
+                if(!(p instanceof PilotPerson)) {
+                    continue;
+                }
+                PilotPerson pilot = (PilotPerson)p;
+                if(null == pilot.getAssignedUnit()) {
+                    continue;
+                }
+                if(pilot.getAssignedUnit().getId() == unit.getId()) {
+                    pilot.getAssignedUnit().removePilot();
+                    pilot.setAssignedUnit(null);
+                    break;
+                }
+            }
+        }
+    }
+    
+    public void changePilot(PilotPerson pp, Unit unit) {
+        //remove any existing PilotPerson assigned to this unit
+        removePilotFrom(unit);
+        //now re-assign the new pilot
+        if(pp.isAssigned()) {
+            pp.getAssignedUnit().removePilot();
+        }
+        pp.setAssignedUnit(unit);
+        unit.getEntity().setCrew(pp.getPilot());
+    }
+    
 }

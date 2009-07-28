@@ -42,10 +42,12 @@ import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultListModel;
 import javax.swing.Timer;
 import javax.swing.Icon;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
@@ -1181,13 +1183,21 @@ public class MekTableModel extends ArrayTableModel {
 
 public class MekTableMouseAdapter extends MouseInputAdapter implements ActionListener {
 
+        private ArrayList<PilotPerson> pilots;
+    
         @Override
         public void actionPerformed(ActionEvent action) {
             String command = action.getActionCommand();
             Unit unit = unitModel.getUnitAt(UnitTable.getSelectedRow());
             if (command.equalsIgnoreCase("REMOVE_PILOT")) {
-                unit.removePilot();
-            }      
+                campaign.removePilotFrom(unit);
+            } else if(command.contains("CHANGE_PILOT")) {
+                String sel = command.split(":")[1];
+                int selected = Integer.parseInt(sel);
+                if(null != pilots && selected > -1 && selected < pilots.size()) {
+                    campaign.changePilot(pilots.get(selected), unit);
+                }
+            }     
         }
         
         @Override
@@ -1219,6 +1229,7 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
             if (e.isPopupTrigger()) {
                 int row = UnitTable.rowAtPoint(e.getPoint());
                 Unit unit  = unitModel.getUnitAt(row);
+                pilots = campaign.getEligiblePilotsFor(unit);
                 JMenuItem menuItem = null;
                 //**lets fill the pop up menu**//               
                 //TODO: assign all tasks to a certain tech
@@ -1229,6 +1240,21 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
                 menuItem.setEnabled(unit.hasPilot());
                 popup.add(menuItem);
                 //TODO: switch pilot (should be its own menu)
+                JMenu menu = new JMenu("Change pilot");
+                JCheckBoxMenuItem cbMenuItem = null;
+                int i = 0;
+                for(PilotPerson pp : pilots) {
+                    cbMenuItem = new JCheckBoxMenuItem(pp.getDesc());
+                    if(null != unit.getEntity().getCrew()
+                            && unit.getEntity().getCrew().equals(pp.getPilot())) {
+                        cbMenuItem.setSelected(true);
+                    }
+                    cbMenuItem.setActionCommand("CHANGE_PILOT:" + i);
+                    cbMenuItem.addActionListener(this);
+                    menu.add(cbMenuItem);
+                    i++;
+                }
+                popup.add(menu);
                 //TODO: scrap unit
                 //TODO: sell unit
                 //TODO: add quirks?
