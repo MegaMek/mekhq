@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.0.1 (SVN)
++ Bug: NPE on UpdateTargetText
 + target number label
 + added TextPane for reports
 + changed all icons to icons from the Open Clip Art Library

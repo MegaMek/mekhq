@@ -970,8 +970,8 @@ protected void updateTargetText() {
     //must have a valid team and an unassigned task
     WorkItem task = campaign.getTask(currentTaskId);
     SupportTeam team = campaign.getTeam(currentTechId);
-    TargetRoll target = team.getTargetFor(task);
     if(null != task && null != team) {
+        TargetRoll target = team.getTargetFor(task);
         textTarget.setText(target.getDesc());
         lblTargetNum.setText(target.getValueAsString());
     } else {
