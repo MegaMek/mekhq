@@ -192,7 +192,9 @@ public class Unit implements Serializable {
                 continue;
             }
             //put a reload item in for all ammo types, because user may want to swap
-            campaign.addWork(new ReloadItem(this, m));
+            if(m.getShotsLeft() < ((AmmoType)m.getType()).getShots()) {
+                campaign.addWork(new ReloadItem(this, m));
+            }
         }
     }
     

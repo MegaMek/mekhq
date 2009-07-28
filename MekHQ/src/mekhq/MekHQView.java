@@ -59,10 +59,13 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import megamek.client.ui.MechView;
 import megamek.client.ui.swing.MechTileset;
+import megamek.common.AmmoType;
 import megamek.common.Entity;
 import megamek.common.EntityListFile;
+import megamek.common.Mounted;
 import megamek.common.TargetRoll;
 import mekhq.campaign.Unit;
+import mekhq.campaign.Utilities;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PilotPerson;
 import mekhq.campaign.team.MedicalTeam;
@@ -1219,7 +1222,29 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
                 refreshTaskList();
                 refreshTechsList();
                 refreshReport();
-            } 
+            } else if(command.contains("SWAP_AMMO")) {
+                String sel = command.split(":")[1];
+                int selMount = Integer.parseInt(sel);
+                Mounted m = unit.getEntity().getEquipment(selMount);
+                if(null == m) {
+                    return;
+                }
+                AmmoType curType = (AmmoType)m.getType();
+                ReloadItem reload = campaign.getReloadWorkFor(m, unit);
+                boolean newWork = false;
+                if(null == reload) {
+                    newWork = true;
+                    reload = new ReloadItem(unit, m);
+                }
+                sel = command.split(":")[2];
+                int selType = Integer.parseInt(sel);
+                AmmoType newType = Utilities.getMunitionsFor(unit.getEntity(), curType).get(selType);
+                reload.swapAmmo(newType);
+                if(newWork) {
+                    campaign.addWork(reload);
+                }
+                refreshTaskList();
+            }
         }
         
         @Override
@@ -1254,8 +1279,9 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
                 pilots = campaign.getEligiblePilotsFor(unit);
                 JMenuItem menuItem = null;
                 JMenu menu = null;
+                JCheckBoxMenuItem cbMenuItem = null;
                 //**lets fill the pop up menu**//               
-                //TODO: assign all tasks to a certain tech
+                //assign all tasks to a certain tech
                 menu = new JMenu("Assign all tasks");
                 int i = 0;
                 for(SupportTeam tech : campaign.getTechTeams()) {
@@ -1267,6 +1293,27 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
                     i++;
                 }
                 popup.add(menu);
+                //TODO: swap ammo
+                menu = new JMenu("Swap Ammo");
+                JMenu ammoMenu = null;
+                for(Mounted m : unit.getEntity().getAmmo()) {
+                    ammoMenu = new JMenu(m.getDesc());
+                    i = 0;
+                    AmmoType curType = (AmmoType)m.getType();
+                    for(AmmoType atype : Utilities.getMunitionsFor(unit.getEntity(), curType)) {
+                        cbMenuItem = new JCheckBoxMenuItem(atype.getDesc());
+                        if(atype.equals(curType)) {
+                            cbMenuItem.setSelected(true);
+                        } else {
+                            cbMenuItem.setActionCommand("SWAP_AMMO:" + unit.getEntity().getEquipmentNum(m) + ":" + i);
+                            cbMenuItem.addActionListener(this);
+                        }
+                        ammoMenu.add(cbMenuItem);
+                        i++;
+                    }
+                    menu.add(ammoMenu);
+                }
+                popup.add(menu);
                 //remove pilot
                 popup.addSeparator();
                 menuItem = new JMenuItem("Remove pilot");
@@ -1275,8 +1322,7 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
                 menuItem.setEnabled(unit.hasPilot());
                 popup.add(menuItem);
                 //switch pilot
-                menu = new JMenu("Change pilot");
-                JCheckBoxMenuItem cbMenuItem = null;
+                menu = new JMenu("Change pilot");              
                 i = 0;
                 for(PilotPerson pp : pilots) {
                     cbMenuItem = new JCheckBoxMenuItem(pp.getDesc());
@@ -1290,13 +1336,13 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
                     i++;
                 }
                 popup.add(menu);
-                //TODO: scrap unit
                 popup.addSeparator();
-                //TODO: sell unit
+                //sell unit
                 menuItem = new JMenuItem("Sell Unit");
                 menuItem.setActionCommand("SELL");
                 menuItem.addActionListener(this);
                 popup.add(menuItem);
+                //TODO: scrap unit
                 //TODO: add quirks?
                 popup.show(e.getComponent(), e.getX(), e.getY());
             }

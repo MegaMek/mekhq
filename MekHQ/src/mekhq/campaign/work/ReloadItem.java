@@ -89,23 +89,13 @@ public class ReloadItem extends UnitWorkItem {
     public void swapAmmo(AmmoType at) {
         if(at.getMunitionType() != orig_atype.getMunitionType()) {
             this.atype = at;
+            mounted.setShotsLeft(at.getShots());
             if(!swap) {
                 this.time *= 2;
             }
             this.swap = true;
             this.name = "Swap " + mounted.getDesc() + " with " + atype.getDesc();
         }
-    }
-    
-    @Override
-    public void complete() {
-        //reload items are never truly completed because the user may want to swap
-        if(swap) {
-            //the swap was successfull so reset the orig_atype
-            this.orig_atype = atype;
-            this.name = "Reload " + mounted.getDesc() + " with " + atype.getDesc();           
-        }
-        this.swap = false;
     }
     
     public double getTimeMultiplier() {
@@ -135,5 +125,9 @@ public class ReloadItem extends UnitWorkItem {
             return "(FULL) " + getName() + " " + getStats();
         }
         return super.getDesc(); 
+    }
+    
+    public Mounted getMounted() {
+        return mounted;
     }
 }

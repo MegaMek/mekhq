@@ -21,9 +21,14 @@
 
 package mekhq.campaign;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Vector;
+import megamek.common.Aero;
+import megamek.common.AmmoType;
 import megamek.common.Compute;
+import megamek.common.Entity;
+import megamek.common.Protomech;
 
 /**
  *
@@ -38,6 +43,45 @@ public class Utilities {
         rolls.add(Compute.d6());
         Collections.sort(rolls);
         return (rolls.elementAt(0) + rolls.elementAt(1));       
+    }
+    
+    public static ArrayList<AmmoType> getMunitionsFor(Entity entity, AmmoType cur_atype) {
+        ArrayList<AmmoType> atypes = new ArrayList<AmmoType>();
+        for(AmmoType atype : AmmoType.getMunitionsFor(cur_atype.getAmmoType())) {
+            //this is an abbreviated version of setupMunitions in the CustomMechDialog
+            //TODO: clan/IS limitations?
+            if ((entity instanceof Aero)
+                        && !((atype.getAmmoType() == AmmoType.T_MML)
+                                || (atype.getAmmoType() == AmmoType.T_ATM)
+                                || (atype.getAmmoType() == AmmoType.T_NARC) 
+                                || (atype.getAmmoType() == AmmoType.T_AC_LBX))) {
+                continue;
+            }
+
+            // Only Protos can use Proto-specific ammo
+            if (atype.hasFlag(AmmoType.F_PROTOMECH)
+                            && !(entity instanceof Protomech)) {
+                continue;
+            }
+
+            // When dealing with machine guns, Protos can only
+            // use proto-specific machine gun ammo
+            if ((entity instanceof Protomech)
+                            && atype.hasFlag(AmmoType.F_MG)
+                            && !atype.hasFlag(AmmoType.F_PROTOMECH)) {
+                continue;
+            }
+
+            // Battle Armor ammo can't be selected at all.
+            // All other ammo types need to match on rack size and tech.
+            if ((atype.getRackSize() == cur_atype.getRackSize())
+                            && (atype.hasFlag(AmmoType.F_BATTLEARMOR) == cur_atype.hasFlag(AmmoType.F_BATTLEARMOR))
+                            && (atype.hasFlag(AmmoType.F_ENCUMBERING) == cur_atype.hasFlag(AmmoType.F_ENCUMBERING))
+                            && (atype.getTonnage(entity) == cur_atype.getTonnage(entity))) {
+                atypes.add(atype);
+            }
+        }
+        return atypes;
     }
     
 }

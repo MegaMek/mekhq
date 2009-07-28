@@ -1,6 +1,8 @@
 VERSION HISTORY
 ----------------------------------
 v0.0.1 (SVN)
++ made corrections to RepairItem
++ swap ammo menu option in Unit popup menu
 + assign all tasks menu option in Unit popup menu
 + sell unit menu option in Unit popup menu
 + change pilot menu option in Unit popup menu

@@ -31,11 +31,14 @@ import java.util.Hashtable;
 import megamek.common.Entity;
 
 import megamek.common.Game;
+import megamek.common.Mounted;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PilotPerson;
 import mekhq.campaign.personnel.SupportPerson;
 import mekhq.campaign.team.MedicalTeam;
 import mekhq.campaign.team.TechTeam;
+import mekhq.campaign.work.ReloadItem;
+import mekhq.campaign.work.RepairItem;
 import mekhq.campaign.work.UnitWorkItem;
 import mekhq.campaign.work.WorkItem;
 
@@ -398,6 +401,18 @@ public class Campaign implements Serializable {
         }
         pp.setAssignedUnit(unit);
         unit.getEntity().setCrew(pp.getPilot());
+    }
+    
+    public ReloadItem getReloadWorkFor(Mounted m, Unit unit) {
+        for(WorkItem task : getTasks()) {
+            if(task instanceof ReloadItem) {
+                ReloadItem reload = (ReloadItem)task;
+                if(unit.getEntity().getEquipmentNum(m) == unit.getEntity().getEquipmentNum(reload.getMounted())) {
+                    return reload;
+                }
+            }
+        }
+        return null;
     }
     
 }
