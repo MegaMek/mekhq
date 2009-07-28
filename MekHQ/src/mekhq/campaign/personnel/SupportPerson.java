@@ -55,7 +55,7 @@ public class SupportPerson extends Person {
         String toReturn = "<html><b>" + team.getName() + "</b><br>";
         toReturn += team.getRatingName() + " " + team.getTypeDesc() + "<br>";
         if(team.getCasualties() > 0) {
-            toReturn = team.getCasualties() + " casualties";
+            toReturn = team.getCasualties() + " casualties" + getAssignedDoctorString();
         }
         toReturn += "</html>";
         return toReturn;

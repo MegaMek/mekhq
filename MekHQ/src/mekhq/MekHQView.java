@@ -765,15 +765,22 @@ private void btnDeployUnitsActionPerformed(java.awt.event.ActionEvent evt) {//GE
 }//GEN-LAST:event_btnDeployUnitsActionPerformed
 
 private void btnAssignDocActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAssignDocActionPerformed
-    //assign the task to the team here
+    if(currentPersonId == -1) {
+        return;
+    }
+    int row = PersonTable.getSelectedRow();
     Person p = campaign.getPerson(currentPersonId);
-    if(null != p.getTask()) {
+    if(null != p && null != p.getTask()) {
         campaign.assignTask(currentDoctorId, p.getTask().getId());
-        p.getTask().assign();
+        row++;
     }
     refreshTechsList();
     refreshDoctorsList();
     refreshPersonnelList();
+    if(row >= PersonTable.getRowCount()) {
+            row = 0;
+    }
+    PersonTable.setRowSelectionInterval(row, row); 
 }//GEN-LAST:event_btnAssignDocActionPerformed
 
 private void miHirePilotActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miHirePilotActionPerformed
@@ -1301,12 +1308,17 @@ public class PersonTableModel extends ArrayTableModel {
             Component c = this;
             setOpaque(true);          
             setText(getValueAt(row, column).toString());
+            Person p = getPersonAt(row);
             //setToolTipText(campaign.getToolTipFor(u));
             if(isSelected) {
                 //TODO: how do I set this to the user's default selection color?
                 c.setBackground(new Color(253, 117, 28));
             } else {
-                c.setBackground(new Color(220, 220, 220));
+                if(null != p && null != p.getTask() && !p.getTask().isAssigned()) {
+                    c.setBackground(Color.RED);
+                } else {
+                    c.setBackground(new Color(220, 220, 220));
+                }
             }
             return c;
         }

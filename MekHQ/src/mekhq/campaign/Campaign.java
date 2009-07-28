@@ -236,9 +236,13 @@ public class Campaign implements Serializable {
      
      public void assignTask(int teamId, int taskId) {
          //TODO: now should only apply to doctors
-         WorkItem task = taskIds.get(new Integer(taskId));
-         //task.assignTeam(getTeam(teamId));
-         teamIds.get(new Integer(teamId)).addTask(task);
+         WorkItem task = getTask(taskId);
+         SupportTeam team = getTeam(teamId);
+         if(null == team || null == task) {
+             return;
+         }
+         task.setTeam(team);
+         team.addTask(task);
      }
      
      /**

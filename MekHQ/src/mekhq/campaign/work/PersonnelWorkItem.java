@@ -33,14 +33,11 @@ public abstract class PersonnelWorkItem extends WorkItem {
     protected Person person;
     //how many patients this person counts for
     protected int patients;
-    //is this work item assigned?
-    protected boolean assigned;
     
     public PersonnelWorkItem(Person p) {
         super();
         this.person = p;
         this.patients = 1;
-        this.assigned = false;
     }
     
     @Override
@@ -55,17 +52,4 @@ public abstract class PersonnelWorkItem extends WorkItem {
     public void setPatients(int i) {
         this.patients = i;
     }
-    
-    public boolean isAssigned() {
-        return assigned;
-    }
-    
-    public void assign() {
-        this.assigned = true;
-    }
-    
-    public void unassign() {
-        this.assigned = false;
-    }
-    
 }

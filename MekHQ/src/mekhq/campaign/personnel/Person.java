@@ -23,6 +23,7 @@ package mekhq.campaign.personnel;
 
 import java.io.Serializable;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.team.SupportTeam;
 import mekhq.campaign.work.PersonnelWorkItem;
 
 /**
@@ -64,6 +65,20 @@ public abstract class Person implements Serializable {
     
     public PersonnelWorkItem getTask() {
         return task;
+    }
+    
+    public SupportTeam getTeamAssigned() {
+        if(null == task) {
+            return null;
+        }
+        return task.getTeam();
+    }
+    
+    public String getAssignedDoctorString() {
+        if(null == getTeamAssigned()) {
+            return "";
+        }
+        return " (assigned to " + getTeamAssigned().getName() + ")";
     }
     
     public abstract void runDiagnostic(Campaign campaign);

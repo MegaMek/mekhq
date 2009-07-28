@@ -43,6 +43,8 @@ public abstract class WorkItem implements Serializable {
     protected int skillMin;
     //has this task been successfully completed?
     protected boolean completed;
+    //the team assigned to this task (will be null except for PersonnelWorkItems
+    protected SupportTeam team;
     
     public WorkItem() {
         this.name = "Unknown";
@@ -151,6 +153,18 @@ public abstract class WorkItem implements Serializable {
     public void fail(int rating) {
         //increment the minimum skill level required
         setSkillMin(rating + 1);
+    }
+    
+    public SupportTeam getTeam() {
+        return team;
+    }
+    
+    public void setTeam(SupportTeam t) {
+        this.team = t;
+    }
+    
+    public boolean isAssigned() {
+        return (null != team);
     }
     
 }

@@ -132,7 +132,7 @@ public class PilotPerson extends Person {
     public String getDescHTML() {
         String toReturn = "<html><b>" + pilot.getName() + "</b><br>";
         toReturn += getTypeDesc() + " (" + pilot.getGunnery() + "/" + pilot.getPiloting() + ")<br>";
-        toReturn += pilot.getStatusDesc();
+        toReturn += pilot.getStatusDesc() + getAssignedDoctorString();
         toReturn += "</html>";
         return toReturn;
     }
