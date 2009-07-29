@@ -1,5 +1,5 @@
 /*
- * InternalRepair.java
+ * VeeInternalRepair.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -21,31 +21,31 @@
 
 package mekhq.campaign.work;
 
+import megamek.common.Tank;
+import megamek.common.VTOL;
 import mekhq.campaign.Unit;
 
 /**
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public abstract class InternalRepair extends RepairItem {
+public class VeeInternalRepair extends InternalRepair {
 
-    int loc;
+    public VeeInternalRepair(Unit unit, int i) {
+        super(unit, i);
+        this.time = 60;
+        this.difficulty = 0;
+    }
     
-    public InternalRepair(Unit unit, int i) {
-        super(unit, 0);
-        this.loc = i;
-        this.name = "Repair internal structure (" + unit.getEntity().getLocationName(loc) + ")";
-    }
-        
-        
-    @Override
-    public void fix() {
-        unit.getEntity().setInternal(unit.getEntity().getOInternal(loc), loc);
-    }
-
     @Override
     public WorkItem replace() {
-        return new LocationReplacement(unit, loc);
+        //you can only replace turrets and rotors
+        if(unit.getEntity() instanceof VTOL && loc == VTOL.LOC_ROTOR) {
+            return new RotorReplacement(unit, loc);
+        }
+        if(unit.getEntity() instanceof Tank && loc == VTOL.LOC_TURRET) {
+            return new TurretReplacement(unit, loc);
+        }
+        return(this);
     }
-    
 }

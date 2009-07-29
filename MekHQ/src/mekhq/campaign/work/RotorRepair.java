@@ -1,5 +1,5 @@
 /*
- * InternalRepair.java
+ * RotorRepair.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -21,31 +21,32 @@
 
 package mekhq.campaign.work;
 
+import megamek.common.VTOL;
 import mekhq.campaign.Unit;
 
 /**
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public abstract class InternalRepair extends RepairItem {
-
-    int loc;
+public class RotorRepair extends RepairItem {
     
-    public InternalRepair(Unit unit, int i) {
-        super(unit, 0);
-        this.loc = i;
-        this.name = "Repair internal structure (" + unit.getEntity().getLocationName(loc) + ")";
-    }
-        
-        
-    @Override
-    public void fix() {
-        unit.getEntity().setInternal(unit.getEntity().getOInternal(loc), loc);
+    public RotorRepair(Unit unit) {
+        super(unit, 1);
+        this.name = "Repair rotor damage";
+        this.time = 120;
+        this.difficulty = 2;
     }
 
     @Override
     public WorkItem replace() {
-        return new LocationReplacement(unit, loc);
+        return new RotorReplacement(unit, VTOL.LOC_ROTOR);
     }
-    
+
+    @Override
+    public void fix() {
+        if(unit.getEntity() instanceof VTOL) {
+            unit.getEntity().setInternal(unit.getEntity().getInternal(VTOL.LOC_ROTOR)+1, VTOL.LOC_ROTOR);
+        }
+    }
+
 }

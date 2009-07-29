@@ -1,5 +1,5 @@
 /*
- * InternalRepair.java
+ * MekInternalRepair.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -27,25 +27,23 @@ import mekhq.campaign.Unit;
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public abstract class InternalRepair extends RepairItem {
+public class MekInternalRepair extends InternalRepair {
 
-    int loc;
+    double percent;
     
-    public InternalRepair(Unit unit, int i) {
-        super(unit, 0);
-        this.loc = i;
-        this.name = "Repair internal structure (" + unit.getEntity().getLocationName(loc) + ")";
+    public MekInternalRepair(Unit unit, int i, double pct) {
+        super(unit, i);
+        this.time = 90;
+        this.difficulty = -1;
+        if(percent > 0.75) {
+            this.time = 270;
+            this.difficulty = 2;
+        } else if(percent > 0.5) {
+            this.time = 180;
+            this.difficulty = 1;
+        } else if (percent > 0.25) {
+            this.time = 135;
+            this.difficulty = 0;
+        }
     }
-        
-        
-    @Override
-    public void fix() {
-        unit.getEntity().setInternal(unit.getEntity().getOInternal(loc), loc);
-    }
-
-    @Override
-    public WorkItem replace() {
-        return new LocationReplacement(unit, loc);
-    }
-    
 }

@@ -29,7 +29,9 @@ import megamek.common.Entity;
 import megamek.common.Mech;
 import megamek.common.MiscType;
 import megamek.common.Mounted;
-import mekhq.campaign.personnel.PilotPerson;
+import megamek.common.Protomech;
+import megamek.common.Tank;
+import megamek.common.VTOL;
 import mekhq.campaign.work.*;
 
 /**
@@ -87,12 +89,31 @@ public class Unit implements Serializable {
             
             //replace location?
             if(isLocationDestroyed(i)) {
-                campaign.addWork(new LocationReplacement(this, i));
+                if(entity instanceof Mech || entity instanceof Protomech) {
+                    campaign.addWork(new LocationReplacement(this, i));
+                }
+                else if(entity instanceof VTOL && i == VTOL.LOC_ROTOR) {
+                    campaign.addWork(new RotorReplacement(this, i));
+                }
+                else if(entity instanceof Tank && i == Tank.LOC_TURRET) {
+                    campaign.addWork(new TurretReplacement(this, i));
+                }
             } else {
                 //repair internal
                 double pctInternal = entity.getInternal(i)/entity.getOInternal(i);
                 if(pctInternal < 1.00) {
-                    campaign.addWork(new InternalRepair(this, i, pctInternal));
+                    if(entity instanceof Mech || entity instanceof Protomech) {
+                        campaign.addWork(new MekInternalRepair(this, i, pctInternal));
+                    } else if (entity instanceof Tank) {
+                        if(entity instanceof VTOL && i == VTOL.LOC_ROTOR) {
+                            int hits = entity.getOInternal(i)- entity.getInternal(i);
+                            while(hits > 0) {
+                                campaign.addWork(new RotorRepair(this));
+                                hits--;
+                            }
+                        }
+                        campaign.addWork(new VeeInternalRepair(this, i));
+                    }
                 }
             }
             
@@ -177,7 +198,7 @@ public class Unit implements Serializable {
                 //you get a roll to see if it can be repaired
                 //TODO: I think this check should probably be made from within MM when a crit is received
                 //and added to the MUL file.             
-                if(Compute.d6(2) >= 10) {
+                if(Compute.d6(2) > 9) {
                     campaign.addWork(new EquipmentRepair(this, getCrits(m), m));
                 } else {
                     campaign.addWork(new EquipmentReplacement(this, m));

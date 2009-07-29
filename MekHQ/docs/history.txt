@@ -1,6 +1,10 @@
 VERSION HISTORY
 ----------------------------------
 v0.1.0 (SVN)
++ refactored InternalRepair into MekInternalRepair and VeeInternalRepair
++ Rotor Replacement item
++ Rotor Repair item
++ Turret Replacement item
 + corrected labels
 + changed versioning
 + Bug: getting impossible rolls where they should be possible

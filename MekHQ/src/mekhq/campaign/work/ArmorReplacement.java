@@ -20,6 +20,8 @@
  */
 package mekhq.campaign.work;
 
+import megamek.common.Aero;
+import megamek.common.Tank;
 import mekhq.campaign.Unit;
 
 /**
@@ -37,6 +39,15 @@ public class ArmorReplacement extends ReplacementItem {
         this.amount = amount;
         this.difficulty = -2;
         this.time = 5 * amount;
+        if(unit.getEntity() instanceof Tank) {
+            this.time = 3 * amount;
+        } else if (unit.getEntity() instanceof Aero) {
+            if(((Aero)unit.getEntity()).isCapitalScale()) {
+                this.time = 120 * amount;
+            } else {
+                this.time = 15 * amount;
+            }
+        }
         this.name = "Replace armor (" + unit.getEntity().getLocationName(loc) + ", " + amount + ")";
     }
 

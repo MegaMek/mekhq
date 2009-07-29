@@ -1,5 +1,5 @@
 /*
- * InternalRepair.java
+ * RotorReplacement.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -27,25 +27,12 @@ import mekhq.campaign.Unit;
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public abstract class InternalRepair extends RepairItem {
+public class RotorReplacement extends LocationReplacement {
 
-    int loc;
-    
-    public InternalRepair(Unit unit, int i) {
-        super(unit, 0);
-        this.loc = i;
-        this.name = "Repair internal structure (" + unit.getEntity().getLocationName(loc) + ")";
-    }
-        
-        
-    @Override
-    public void fix() {
-        unit.getEntity().setInternal(unit.getEntity().getOInternal(loc), loc);
-    }
-
-    @Override
-    public WorkItem replace() {
-        return new LocationReplacement(unit, loc);
+    public RotorReplacement(Unit unit, int i) {
+        super(unit, i);
+        this.time = 300;
+        this.difficulty = 0;
     }
     
 }
