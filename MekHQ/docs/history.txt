@@ -1,6 +1,9 @@
 VERSION HISTORY
 ----------------------------------
-v0.0.1 (SVN)
+v0.1.0 (SVN)
++ corrected labels
++ changed versioning
++ Bug: getting impossible rolls where they should be possible
 + populate a menu for swap ammo option in Task popup menu
 + scrap component option in Task popup menu
 + made corrections to RepairItem

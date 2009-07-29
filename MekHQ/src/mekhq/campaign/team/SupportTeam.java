@@ -210,7 +210,8 @@ public abstract class SupportTeam implements Serializable {
    }
    
    public String doAssigned(WorkItem task) {
-       String report = getName() + " attempts to " + task.getDisplayName();     
+       String report = getName() + " attempts to " + task.getDisplayName();    
+       TargetRoll target = getTargetFor(task);
        int minutes = task.getTime();
        if(minutes > getMinutesLeft()) {
            //we shouldn't get here, but never hurts to check
@@ -219,7 +220,6 @@ public abstract class SupportTeam implements Serializable {
        } else {
            setMinutesLeft(getMinutesLeft() - minutes);
        }
-       TargetRoll target = getTargetFor(task);
        int roll = makeRoll(task);
        report = report + "  needs " + target.getValueAsString() + " and rolls " + roll + ":";
        if(roll >= target.getValue()) {
