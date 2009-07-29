@@ -350,6 +350,21 @@ public class Campaign implements Serializable {
         return toReturn;
     }
     
+    /**
+     * return a string (HTML formatted) of tasks for this doctor
+     * @param unit
+     * @return
+     */
+    public String getToolTipFor(MedicalTeam doctor) {
+        
+        String toReturn = "<html><b>Tasks:</b><br>";
+        for(WorkItem task : doctor.getTasksAssigned()) {
+            toReturn += task.getDesc() + "<br>";
+        }
+        toReturn += "</html>";
+        return toReturn;
+    }
+    
     public String getDateAsString() {
         return dateFormat.format(calendar.getTime());
     }

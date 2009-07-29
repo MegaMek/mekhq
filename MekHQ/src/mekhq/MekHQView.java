@@ -1489,7 +1489,7 @@ public class DocTableModel extends ArrayTableModel {
             return ((MedicalTeam)data.get(row)).getDescHTML();
         }  
         
-        public MedicalTeam getPersonAt(int row) {
+        public MedicalTeam getDoctorAt(int row) {
         return (MedicalTeam)data.get(row);
     }
         
@@ -1505,7 +1505,7 @@ public class DocTableModel extends ArrayTableModel {
             Component c = this;
             setOpaque(true);          
             setText(getValueAt(row, column).toString());
-            //setToolTipText(campaign.getToolTipFor(u));
+            setToolTipText(campaign.getToolTipFor(getDoctorAt(row)));
             if(isSelected) {
                 //TODO: how do I set this to the user's default selection color?
                 c.setBackground(new Color(253, 117, 28));

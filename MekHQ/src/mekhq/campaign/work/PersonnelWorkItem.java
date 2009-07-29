@@ -45,6 +45,12 @@ public abstract class PersonnelWorkItem extends WorkItem {
         return getName() + " " + person.getDesc();
     }
     
+    
+    @Override
+    public String getDesc() {
+        return getDisplayName();
+    }
+    
     public int getPatients() {
         return patients;
     }
