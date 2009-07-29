@@ -1,6 +1,10 @@
 VERSION HISTORY
 ----------------------------------
 v0.1.0 (SVN)
++ Vee Sensor replacment item
++ Stabilizer replacement item (partial, no method in MM reset)
++ Stabilizer repair item (partial, no method in MM to rest)
++ TurreLock repair item (partial, no method in MM to reset)
 + refactored InternalRepair into MekInternalRepair and VeeInternalRepair
 + Rotor Replacement item
 + Rotor Repair item

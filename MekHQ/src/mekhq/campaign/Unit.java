@@ -163,6 +163,13 @@ public class Unit implements Serializable {
                     campaign.addWork(new MekFootActuatorRepair(this, 1, i));
                 }                
             }//end mech check
+            
+            if(entity instanceof Tank) {
+                Tank tank = (Tank)entity;
+                if(tank.isStabiliserHit(i)) {
+                    campaign.addWork(new StabiliserRepair(this, i));
+                }
+            }
         }//end location checks
         
         //check engine
@@ -172,6 +179,21 @@ public class Unit implements Serializable {
             } else {
                 campaign.addWork(new MekEngineRepair(this, engineHits));
             }
+        }
+        
+        //check vee components
+        if(entity instanceof Tank) {
+            Tank tank = (Tank)entity;
+            if(tank.isTurretLocked()) {
+                campaign.addWork(new TurretLockRepair(this));
+            }
+            if(tank.isTurretJammed()) {
+                tank.unjamTurret();
+            }
+            if(tank.getSensorHits() > 0) {
+                campaign.addWork(new VeeSensorReplacement(this));
+            }
+            //TODO: cant do motive damage because Tank doesn't have public methods          
         }
         
         //now lets cycle through equipment
