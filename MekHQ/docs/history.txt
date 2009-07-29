@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.1.0 (SVN)
++ updated Example.mul
 + Vee Sensor replacment item
 + Stabilizer replacement item (partial, no method in MM reset)
 + Stabilizer repair item (partial, no method in MM to rest)
