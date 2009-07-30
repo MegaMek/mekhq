@@ -134,10 +134,30 @@ public abstract class SupportTeam implements Serializable {
     
     public TargetRoll getTarget() {    
         TargetRoll target = new TargetRoll(getSkillBase(), getRatingName());
+        if(getCasualtyMods() > 0) {
+            target.addModifier(getCasualtyMods(), "understaffed");
+        }
         return target;
     }
-
+    
    public abstract int getSkillBase();   
+   
+   public int getCasualtyMods() {
+       int casualties = getCasualties();
+       if(casualties > 0 && casualties < 3) {
+           return 1;
+       } 
+       else if(casualties > 2 && casualties < 5) {
+           return 2;
+       }
+       else if(casualties == 5) {
+           return 3;
+       }
+       else if(casualties == 6) {
+           return 4;
+       }
+       return 0;
+   }
    
    public String getRatingName() {
        return getRatingName(rating);

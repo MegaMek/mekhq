@@ -21,6 +21,7 @@
 
 package mekhq.campaign.work;
 
+import megamek.common.TargetRoll;
 import mekhq.campaign.Unit;
 
 /**
@@ -48,5 +49,12 @@ public abstract class UnitWorkItem extends WorkItem {
     @Override
     public String getDisplayName() {
         return  getName() + " for " + unit.getEntity().getDisplayName();
+    }
+    
+    @Override
+    public TargetRoll getAllMods() {
+        TargetRoll mods = super.getAllMods();
+        mods.append(unit.getLocationMod());
+        return mods;
     }
 }

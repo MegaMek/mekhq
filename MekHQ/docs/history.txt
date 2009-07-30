@@ -1,6 +1,9 @@
 VERSION HISTORY
 ----------------------------------
 v0.1.1 (SVN)
++ location switcher added to Unit right-click menu
++ location mods
++ support team casualty mods
 + widened TaskTable
 + removed AmmoType variables from ReloadItem (because they are not serialized)
 + enabled loading of campaigns

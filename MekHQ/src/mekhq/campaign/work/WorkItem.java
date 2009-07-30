@@ -123,8 +123,6 @@ public abstract class WorkItem implements Serializable {
     
     public TargetRoll getAllMods() {
         TargetRoll mods = new TargetRoll(getDifficulty(), "difficulty");
-        
-        
         return mods;
     }
     

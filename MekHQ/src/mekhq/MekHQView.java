@@ -1363,6 +1363,14 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
                 }
                 refreshTaskList();
                 refreshUnitList();
+            } else if(command.contains("CHANGE_LOCATION")) {
+                String sel = command.split(":")[1];
+                int selected = Integer.parseInt(sel);
+                if(selected > -1 && selected < Unit.LOC_N) {
+                    unit.setLocation(selected);
+                    refreshUnitList();
+                    refreshTaskList();
+                }
             }
         }
         
@@ -1399,10 +1407,24 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
                 JMenuItem menuItem = null;
                 JMenu menu = null;
                 JCheckBoxMenuItem cbMenuItem = null;
-                //**lets fill the pop up menu**//               
+                //**lets fill the pop up menu**//    
+                //change the location
+                menu = new JMenu("Change location");
+                int i = 0;
+                for(i = 0; i < Unit.LOC_N; i++) {
+                    cbMenuItem = new JCheckBoxMenuItem(Unit.getLocationName(i));
+                    if(unit.getLocation() == i) {
+                            cbMenuItem.setSelected(true);
+                    } else {
+                        cbMenuItem.setActionCommand("CHANGE_LOCATION:" + i);
+                        cbMenuItem.addActionListener(this);
+                    }
+                    menu.add(cbMenuItem);
+                }
+                popup.add(menu);
                 //assign all tasks to a certain tech
                 menu = new JMenu("Assign all tasks");
-                int i = 0;
+                i = 0;
                 for(SupportTeam tech : campaign.getTechTeams()) {
                     menuItem = new JMenuItem(tech.getDesc());
                     menuItem.setActionCommand("ASSIGN_TECH:" + i);
@@ -1413,7 +1435,7 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
                 }
                 popup.add(menu);
                 //swap ammo
-                menu = new JMenu("Swap Ammo");
+                menu = new JMenu("Swap ammo");
                 JMenu ammoMenu = null;
                 for(Mounted m : unit.getEntity().getAmmo()) {
                     ammoMenu = new JMenu(m.getDesc());
