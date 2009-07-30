@@ -132,15 +132,28 @@ public abstract class SupportTeam implements Serializable {
         return getFullStrength() - getCurrentStrength();
     }
     
-    public TargetRoll getTarget() {    
-        TargetRoll target = new TargetRoll(getSkillBase(), getRatingName());
+    public TargetRoll getTarget(int mode) {    
+        int effRating = getRating();
+        switch(mode) {
+            case WorkItem.MODE_RUSH_THREE:
+                effRating--;
+            case WorkItem.MODE_RUSH_TWO:
+                effRating--;
+            case WorkItem.MODE_RUSH_ONE:
+                effRating--;
+                break;
+        }
+        if(effRating < EXP_GREEN) {
+            return new TargetRoll(TargetRoll.IMPOSSIBLE, "the current team cannot perform this level of rush job");
+        }
+        TargetRoll target = new TargetRoll(getSkillBase(effRating), getRatingName(effRating));
         if(getCasualtyMods() > 0) {
             target.addModifier(getCasualtyMods(), "understaffed");
         }
         return target;
     }
     
-   public abstract int getSkillBase();   
+   public abstract int getSkillBase(int effectiveRating);   
    
    public int getCasualtyMods() {
        int casualties = getCasualties();
@@ -228,7 +241,10 @@ public abstract class SupportTeam implements Serializable {
        if(!canDo(task)) {
            return new TargetRoll(TargetRoll.IMPOSSIBLE, "Support team cannot do this kind of task.");
        }
-       TargetRoll target = getTarget();
+       TargetRoll target = getTarget(task.getMode());
+       if(target.getValue() == TargetRoll.IMPOSSIBLE) {
+           return target;
+       }
        target.append(task.getAllMods());
        return target;
    }

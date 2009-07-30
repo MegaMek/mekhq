@@ -39,9 +39,9 @@ public class MedicalTeam extends SupportTeam {
     }
     
     @Override
-    public int getSkillBase() {
+    public int getSkillBase(int effectiveRating) {
         int base = 11;
-         switch(rating) {
+         switch(effectiveRating) {
            case SupportTeam.EXP_GREEN:
                base = 10;
                break;

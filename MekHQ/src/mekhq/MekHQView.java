@@ -1201,6 +1201,12 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
                     reload.swapAmmo(newType);
                     refreshTaskList();
                 }
+            } else if (command.contains("CHANGE_MODE")) {
+                String sel = command.split(":")[1];
+                int selected = Integer.parseInt(sel);
+                task.setMode(selected);
+                refreshUnitList();
+                refreshTaskList();
             }
         }
         
@@ -1222,8 +1228,22 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
                 JMenuItem menuItem = null;
                 JMenu menu = null;
                 JCheckBoxMenuItem cbMenuItem = null;
-                //**lets fill the pop up menu**//               
-                menuItem = new JMenuItem("Scrap Component/Equipment");
+                //**lets fill the pop up menu**//   
+                if(task instanceof RepairItem || task instanceof ReplacementItem) {
+                    menu = new JMenu("Mode");
+                    for(int i = 0; i < WorkItem.MODE_N; i++) {
+                        cbMenuItem = new JCheckBoxMenuItem(WorkItem.getModeName(i));
+                        if(task.getMode() == i) {
+                            cbMenuItem.setSelected(true);
+                        } else {
+                            cbMenuItem.setActionCommand("CHANGE_MODE:" + i);
+                            cbMenuItem.addActionListener(this);
+                        }
+                        menu.add(cbMenuItem);
+                    }
+                    popup.add(menu);
+                }            
+                menuItem = new JMenuItem("Scrap component");
                 menuItem.setActionCommand("REPLACE");
                 menuItem.addActionListener(this);
                 menuItem.setEnabled(task instanceof RepairItem || task instanceof ReplacementItem);              

@@ -1,6 +1,8 @@
 VERSION HISTORY
 ----------------------------------
 v0.1.1 (SVN)
++ extra time
++ rush jobs
 + location switcher added to Unit right-click menu
 + location mods
 + support team casualty mods

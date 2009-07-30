@@ -32,6 +32,14 @@ import mekhq.campaign.team.SupportTeam;
  */
 public abstract class WorkItem implements Serializable {
 
+    public static final int MODE_NORMAL = 0;
+    public static final int MODE_EXTRA_ONE = 1;
+    public static final int MODE_EXTRA_TWO = 2;
+    public static final int MODE_RUSH_ONE = 3;
+    public static final int MODE_RUSH_TWO = 4;
+    public static final int MODE_RUSH_THREE = 5;
+    public static final int MODE_N = 6;
+    
     protected String name;
     //the id of this work item
     protected int id;
@@ -45,11 +53,13 @@ public abstract class WorkItem implements Serializable {
     protected boolean completed;
     //the team assigned to this task (will be null except for PersonnelWorkItems
     protected SupportTeam team;
+    protected int mode;
     
     public WorkItem() {
         this.name = "Unknown";
         this.skillMin = SupportTeam.EXP_GREEN;
         this.completed = false;
+        this.mode = MODE_NORMAL;
     }
     
     public String getName() {
@@ -75,11 +85,20 @@ public abstract class WorkItem implements Serializable {
     }
     
     public int getTime() {
-        return time;
-    }
-    
-    public void setTime(int i) {
-        this.time = i;
+        switch(mode) {
+            case MODE_EXTRA_ONE:
+                return 2*time;
+            case MODE_EXTRA_TWO:
+                return 4*time;
+            case MODE_RUSH_ONE:
+                return (int)Math.ceil(time / 2.0);
+            case MODE_RUSH_TWO:
+                return (int)Math.ceil(time / 4.0);
+            case MODE_RUSH_THREE:
+                return (int)Math.ceil(time / 8.0);
+            default:
+                return time;
+        }
     }
     
     public int getSkillMin() {
@@ -116,6 +135,9 @@ public abstract class WorkItem implements Serializable {
         toReturn += "" + getTime() + " minutes";
         toReturn += ", " + SupportTeam.getRatingName(getSkillMin());
         toReturn += " " + bonus;
+        if(getMode() != MODE_NORMAL) {
+            toReturn += "<br><i>" + getCurrentModeName() + "</i>";
+        }
         toReturn += "</html>";
         return toReturn;
     }
@@ -123,6 +145,9 @@ public abstract class WorkItem implements Serializable {
     
     public TargetRoll getAllMods() {
         TargetRoll mods = new TargetRoll(getDifficulty(), "difficulty");
+        if(getModeMod() != 0) {
+            mods.addModifier(getModeMod(), getCurrentModeName());
+        }
         return mods;
     }
     
@@ -163,6 +188,46 @@ public abstract class WorkItem implements Serializable {
     
     public boolean isAssigned() {
         return (null != team);
+    }
+    
+    public int getModeMod() {
+        switch(mode) {
+            case MODE_EXTRA_ONE:
+                return -1;
+            case MODE_EXTRA_TWO:
+                return -2;
+            default:
+                return 0;
+        }
+    }
+    
+    public static String getModeName(int mode) {
+        switch(mode) {
+            case MODE_EXTRA_ONE:
+                return "Extra time";
+            case MODE_EXTRA_TWO:
+                return "Extra time (x2)";
+            case MODE_RUSH_ONE:
+                return "Rush Job (1/2)";
+            case MODE_RUSH_TWO:
+                return "Rush Job (1/4)";
+            case MODE_RUSH_THREE:
+                return "Rush Job (1/8)";
+            default:
+                return "Normal";
+        }
+    }
+    
+    public String getCurrentModeName() {
+        return getModeName(mode);
+    }
+    
+    public int getMode() {
+        return mode;
+    }
+    
+    public void setMode(int i) {
+        this.mode = i;
     }
     
 }
