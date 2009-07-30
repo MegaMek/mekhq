@@ -25,6 +25,7 @@ import megamek.common.AmmoType;
 import megamek.common.Mounted;
 import megamek.common.TargetRoll;
 import mekhq.campaign.Unit;
+import mekhq.campaign.Utilities;
 
 /**
  *
@@ -33,19 +34,19 @@ import mekhq.campaign.Unit;
 public class ReloadItem extends UnitWorkItem {
 
     protected Mounted mounted;
-    protected AmmoType atype;
-    protected AmmoType orig_atype;
+    //protected AmmoType atype;
+    //protected AmmoType orig_atype;
     protected boolean swap;
+    protected long munition;
     
     public ReloadItem(Unit unit, Mounted m) {
         super(unit);
         this.swap = false;
         this.mounted = m;
         if(mounted.getType() instanceof AmmoType) {
-            this.atype = (AmmoType)mounted.getType();
-            this.orig_atype = (AmmoType)mounted.getType();
+            this.munition = ((AmmoType)mounted.getType()).getMunitionType();
         }
-        this.name = "Reload " + mounted.getDesc() + " with " + atype.getDesc();       
+        this.name = "Reload " + mounted.getDesc();// + " with " + atype.getDesc();       
         //TODO: crap, time varies by skill level
         //TODO: also need to allow it to double if changing ammo type
         this.time = 15;
@@ -58,7 +59,7 @@ public class ReloadItem extends UnitWorkItem {
     @Override
     public String checkFixable() {
         //if this is not a swap and we are already topped off, then no need to waste time
-        if(mounted.getShotsLeft() >= atype.getShots() && !swap) {
+        if(mounted.getShotsLeft() >= ((AmmoType)mounted.getType()).getShots() && !swap) {
             return "the ammo bin is full.";
         }
         if(unit.isLocationDestroyed(mounted.getLocation())) {
@@ -72,28 +73,23 @@ public class ReloadItem extends UnitWorkItem {
     
     @Override
     public void fix() {
-        mounted.changeAmmoType(atype);
-        mounted.setShotsLeft(atype.getShots());
-        if(swap) {
-            this.name = "Swap " + mounted.getDesc() + " with " + atype.getDesc();
-        } else {
-            this.name = "Reload " + mounted.getDesc() + " with " + atype.getDesc();
+        for(AmmoType atype : Utilities.getMunitionsFor(unit.getEntity(), (AmmoType)mounted.getType())) {
+            if(atype.getMunitionType() == munition) {
+                mounted.changeAmmoType(atype);
+                break;
+            }
         }
-    }
-    
-    public AmmoType getAmmoType() {
-        return atype;
+        mounted.setShotsLeft(((AmmoType)mounted.getType()).getShots());
     }
     
     public void swapAmmo(AmmoType at) {
-        if(at.getMunitionType() != orig_atype.getMunitionType()) {
-            this.atype = at;
-            mounted.setShotsLeft(at.getShots());
+        if(at.getMunitionType() != ((AmmoType)mounted.getType()).getMunitionType()) {
+            this.munition = at.getMunitionType();
             if(!swap) {
                 this.time *= 2;
             }
             this.swap = true;
-            this.name = "Swap " + mounted.getDesc() + " with " + atype.getDesc();
+            this.name = "Swap " + mounted.getDesc() + " with " + at.getDesc();
         }
     }
     
@@ -106,24 +102,6 @@ public class ReloadItem extends UnitWorkItem {
             factor *= 2.0;
         }
         return factor;
-    }
-    
-    public boolean isFull() {
-        return !swap && mounted.getShotsLeft() >= atype.getShots();
-    }
-    
-    @Override
-    public boolean isNeeded() {
-        //if not swapping and topped off, then this reload is not needed
-        return !isFull();
-    }
-    
-    @Override
-    public String getDesc() {
-        if(isFull()) {
-            return "(FULL) " + getName() + " " + getStats();
-        }
-        return super.getDesc(); 
     }
     
     public Mounted getMounted() {

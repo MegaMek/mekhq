@@ -34,7 +34,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Vector;
 import javax.swing.Timer;
@@ -558,13 +562,21 @@ public class MekHQView extends FrameView {
         fileMenu.setName("fileMenu"); // NOI18N
 
         menuLoad.setText(resourceMap.getString("menuLoad.text")); // NOI18N
-        menuLoad.setEnabled(false);
         menuLoad.setName("menuLoad"); // NOI18N
+        menuLoad.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuLoadActionPerformed(evt);
+            }
+        });
         fileMenu.add(menuLoad);
 
         menuSave.setText(resourceMap.getString("menuSave.text")); // NOI18N
-        menuSave.setEnabled(false);
         menuSave.setName("menuSave"); // NOI18N
+        menuSave.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuSaveActionPerformed(evt);
+            }
+        });
         fileMenu.add(menuSave);
 
         javax.swing.ActionMap actionMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getActionMap(MekHQView.class, this);
@@ -806,6 +818,83 @@ private void miHireDoctorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
     refreshPersonnelList();
     refreshDoctorsList();
 }//GEN-LAST:event_miHireDoctorActionPerformed
+
+private void menuSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuSaveActionPerformed
+    JFileChooser saveCpgn = new JFileChooser(".");
+    saveCpgn.setDialogTitle("Save Campaign");
+    saveCpgn.setFileFilter(new FileFilter() {
+        @Override
+        public boolean accept(File dir) {
+            return ((dir.getName() != null) && dir.getName().endsWith(".cpn"));
+        }
+
+        @Override
+        public String getDescription() {
+            return "campaign file (*cpn)";
+        }
+    });
+    saveCpgn.setSelectedFile(new File("mycampaign.cpn")); //$NON-NLS-1$
+    int returnVal = saveCpgn.showSaveDialog(mainPanel);
+    if ((returnVal != JFileChooser.APPROVE_OPTION) || (saveCpgn.getSelectedFile() == null)) {
+       // I want a file, y'know!
+       return;
+    }
+    File file = saveCpgn.getSelectedFile();   
+    FileOutputStream fos = null;
+    ObjectOutputStream out = null;
+    try {
+        fos = new FileOutputStream(file);
+        out = new ObjectOutputStream(fos);
+        out.writeObject(campaign);
+        out.close();
+    } catch(IOException ex) {
+        ex.printStackTrace();
+    }
+}//GEN-LAST:event_menuSaveActionPerformed
+
+private void menuLoadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuLoadActionPerformed
+    JFileChooser loadCpgn = new JFileChooser(".");
+    loadCpgn.setDialogTitle("Load Campaign");
+    loadCpgn.setFileFilter(new FileFilter() {
+        @Override
+        public boolean accept(File dir) {
+            return ((dir.getName() != null) && dir.getName().endsWith(".cpn"));
+        }
+
+        @Override
+        public String getDescription() {
+            return "campaign file (*cpn)";
+        }
+    }); 
+    int returnVal = loadCpgn.showOpenDialog(mainPanel);
+    if ((returnVal != JFileChooser.APPROVE_OPTION) || (loadCpgn.getSelectedFile() == null)) {
+       // I want a file, y'know!
+       return;
+    }      
+    File file = loadCpgn.getSelectedFile();
+    FileInputStream fis = null;
+    ObjectInputStream in = null;
+    try {
+        fis = new FileInputStream(file);
+        in = new ObjectInputStream(fis);
+        campaign = (Campaign)in.readObject();
+        in.close();
+    }
+    catch(IOException ex) {
+        ex.printStackTrace();
+    }
+    catch(ClassNotFoundException ex)
+    {
+        ex.printStackTrace();
+    }
+    refreshUnitList();
+    refreshTaskList();
+    refreshTechsList();
+    refreshPersonnelList();
+    refreshDoctorsList();
+    refreshCalendar();
+    refreshReport();
+}//GEN-LAST:event_menuLoadActionPerformed
 
 protected void loadListFile() {
     JFileChooser loadList = new JFileChooser(".");

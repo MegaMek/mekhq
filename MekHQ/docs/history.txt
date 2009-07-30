@@ -1,6 +1,9 @@
 VERSION HISTORY
 ----------------------------------
 v0.1.1 (SVN)
++ removed AmmoType variables from ReloadItem (because they are not serialized)
++ enabled loading of campaigns
++ enabled saving of campaigns
 + changed font and added wrapping to textTarget
 + removed unused imports
 + added some javadoc to Campaign.java
