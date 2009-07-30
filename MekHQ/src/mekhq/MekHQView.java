@@ -313,6 +313,7 @@ public class MekHQView extends FrameView {
         textTarget.setLineWrap(true);
         textTarget.setRows(5);
         textTarget.setText(resourceMap.getString("textTarget.text")); // NOI18N
+        textTarget.setWrapStyleWord(true);
         textTarget.setBorder(null);
         textTarget.setName("textTarget"); // NOI18N
         jScrollPane6.setViewportView(textTarget);
