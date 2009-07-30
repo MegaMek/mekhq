@@ -1383,11 +1383,11 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
                 }
                 refreshTaskList();
                 refreshUnitList();
-            } else if(command.contains("CHANGE_LOCATION")) {
+            } else if(command.contains("CHANGE_SITE")) {
                 String sel = command.split(":")[1];
                 int selected = Integer.parseInt(sel);
-                if(selected > -1 && selected < Unit.LOC_N) {
-                    unit.setLocation(selected);
+                if(selected > -1 && selected < Unit.SITE_N) {
+                    unit.setSite(selected);
                     refreshUnitList();
                     refreshTaskList();
                 }
@@ -1429,14 +1429,14 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
                 JCheckBoxMenuItem cbMenuItem = null;
                 //**lets fill the pop up menu**//    
                 //change the location
-                menu = new JMenu("Change location");
+                menu = new JMenu("Change site");
                 int i = 0;
-                for(i = 0; i < Unit.LOC_N; i++) {
-                    cbMenuItem = new JCheckBoxMenuItem(Unit.getLocationName(i));
-                    if(unit.getLocation() == i) {
+                for(i = 0; i < Unit.SITE_N; i++) {
+                    cbMenuItem = new JCheckBoxMenuItem(Unit.getSiteName(i));
+                    if(unit.getSite() == i) {
                             cbMenuItem.setSelected(true);
                     } else {
-                        cbMenuItem.setActionCommand("CHANGE_LOCATION:" + i);
+                        cbMenuItem.setActionCommand("CHANGE_SITE:" + i);
                         cbMenuItem.addActionListener(this);
                     }
                     menu.add(cbMenuItem);

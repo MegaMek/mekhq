@@ -54,7 +54,7 @@ public abstract class UnitWorkItem extends WorkItem {
     @Override
     public TargetRoll getAllMods() {
         TargetRoll mods = super.getAllMods();
-        mods.append(unit.getLocationMod());
+        mods.append(unit.getSiteMod());
         return mods;
     }
 }

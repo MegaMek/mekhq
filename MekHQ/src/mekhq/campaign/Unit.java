@@ -42,19 +42,19 @@ import mekhq.campaign.work.*;
  */
 public class Unit implements Serializable {
 
-    public static final int LOC_FIELD = 0;
-    public static final int LOC_MOBILE_BASE = 1;
-    public static final int LOC_BAY = 2;
-    public static final int LOC_FACILITY = 3;
-    public static final int LOC_FACTORY = 4;
-    public static final int LOC_N = 5;
+    public static final int SITE_FIELD = 0;
+    public static final int SITE_MOBILE_BASE = 1;
+    public static final int SITE_BAY = 2;
+    public static final int SITE_FACILITY = 3;
+    public static final int SITE_FACTORY = 4;
+    public static final int SITE_N = 5;
     
     private Entity entity;
-    private int loc;
+    private int site;
     
     public Unit(Entity en) {
         this.entity = en;
-        this.loc = LOC_BAY;
+        this.site = SITE_BAY;
     }
     
     public Entity getEntity() {
@@ -65,12 +65,12 @@ public class Unit implements Serializable {
         return getEntity().getId();
     }
     
-    public int getLocation() {
-        return loc;
+    public int getSite() {
+        return site;
     }
     
-    public void setLocation(int i) {
-        this.loc = i;
+    public void setSite(int i) {
+        this.site = i;
     }
     
     /**
@@ -322,46 +322,46 @@ public class Unit implements Serializable {
     public String getDescHTML() {
         String toReturn = "<b>" + entity.getDisplayName() + "</b><br>";
         toReturn += getPilotDesc() + "<br>";
-        toReturn += "Location: " + getCurrentLocationName() + "<br>";
+        toReturn += "Site: " + getCurrentSiteName() + "<br>";
         return toReturn;
     }
     
-    public TargetRoll getLocationMod() {
-        switch(loc) {
-            case LOC_FIELD:
+    public TargetRoll getSiteMod() {
+        switch(site) {
+            case SITE_FIELD:
                 return new TargetRoll(2, "in the field");
-            case LOC_MOBILE_BASE:
+            case SITE_MOBILE_BASE:
                 return new TargetRoll(1, "mobile base");
-            case LOC_BAY:
+            case SITE_BAY:
                 return new TargetRoll(0, "transport bay");
-            case LOC_FACILITY:
+            case SITE_FACILITY:
                 return new TargetRoll(-2, "maintenance facility");
-            case LOC_FACTORY:
+            case SITE_FACTORY:
                 return new TargetRoll(-4, "factory");
             default:
                 return new TargetRoll(0, "unknown location");
         }
     }
     
-    public static String getLocationName(int loc) {
+    public static String getSiteName(int loc) {
         switch(loc) {
-            case LOC_FIELD:
+            case SITE_FIELD:
                 return "In the Field";
-            case LOC_MOBILE_BASE:
+            case SITE_MOBILE_BASE:
                 return "Mobile Base";
-            case LOC_BAY:
+            case SITE_BAY:
                 return "Transport Bay";
-            case LOC_FACILITY:
+            case SITE_FACILITY:
                 return "Maintenance Facility";
-            case LOC_FACTORY:
+            case SITE_FACTORY:
                 return "Factory";
             default:
                 return "Unknown";
         }
     }
     
-    public String getCurrentLocationName() {
-        return getLocationName(loc);
+    public String getCurrentSiteName() {
+        return getSiteName(site);
     }
     
 }
