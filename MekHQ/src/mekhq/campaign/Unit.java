@@ -214,13 +214,19 @@ public class Unit implements Serializable {
                     //don't do reloads here because I want them all grouped at the bottom of the queue
                 }
                 
-                //TODO: some slots need to be skipped (like armor, endo-steel, etc.)
-                
+                //some slots need to be skipped (like armor, endo-steel, etc.)
+                if(!m.getType().isHittable()) {
+                    m.setHit(false);
+                    m.setDestroyed(false);
+                    continue;
+                }
+                               
                 //combat destroyed is not the same as really destroyed
                 //you get a roll to see if it can be repaired
                 //TODO: I think this check should probably be made from within MM when a crit is received
-                //and added to the MUL file.             
-                if(Compute.d6(2) > 9) {
+                //and added to the MUL file.      
+                int roll = Compute.d6(2);
+                if(roll > 9) {
                     campaign.addWork(new EquipmentRepair(this, getCrits(m), m));
                 } else {
                     campaign.addWork(new EquipmentReplacement(this, m));

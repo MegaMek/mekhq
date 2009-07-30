@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.1.0 (SVN)
++ uncrittable equipment should be skipped in diagnostic
 + updated Example.mul
 + Vee Sensor replacment item
 + Stabilizer replacement item (partial, no method in MM reset)
