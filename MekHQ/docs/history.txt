@@ -1,6 +1,6 @@
 VERSION HISTORY
 ----------------------------------
-v0.1.0 (SVN)
+v0.1.0 (2009-07-29)
 + Bug: some weapon repair/replacements not being diagnosed
 + no CASE repairs
 + Bug: double heat sinks not being picked up in diagnostic
