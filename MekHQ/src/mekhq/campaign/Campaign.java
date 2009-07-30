@@ -312,9 +312,14 @@ public class Campaign implements Serializable {
             }
             team.cleanTasks();
             team.resetMinutesLeft();
-        }
-        calendar.add(Calendar.DAY_OF_MONTH, 1);
-        currentReport.add("<p><b>" + getDateAsString() + "</b>");
+         }
+         for(Person p : getPersonnel()) {
+            if(p.checkNaturalHealing()) {
+                currentReport.add(p.getDesc() + " heals naturally!");
+            }
+         }
+         calendar.add(Calendar.DAY_OF_MONTH, 1);
+         currentReport.add("<p><b>" + getDateAsString() + "</b>");
     }
     
     public void clearAllUnits() {

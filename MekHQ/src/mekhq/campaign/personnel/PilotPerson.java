@@ -157,4 +157,22 @@ public class PilotPerson extends Person {
             
         }
     }
+    
+    /**
+     * heal one hit on the pilot/crew
+     */
+    @Override
+    public void heal() {
+        if(needsHealing()) {
+            getPilot().setHits(getPilot().getHits() - 1);
+        }
+        if(!needsHealing() && null != task) {
+            task.complete();
+        }
+    }
+
+    @Override
+    public boolean needsHealing() {
+        return (getPilot().getHits() > 0);
+    }
 }

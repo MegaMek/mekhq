@@ -104,6 +104,10 @@ public abstract class SupportTeam implements Serializable {
         return currentSize;
     }
     
+    public void setCurrentStrength(int i) {
+        this.currentSize = i;
+    }
+    
     public int getHours() {
         return hours;
     }

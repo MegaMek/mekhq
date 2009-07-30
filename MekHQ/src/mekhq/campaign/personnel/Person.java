@@ -41,10 +41,12 @@ public abstract class Person implements Serializable {
     protected int id;
     //any existing work item for this person
     protected PersonnelWorkItem task;
+    //days of rest
+    int daysRest;
     
     //default constructor
     public Person() {
-        
+        daysRest = 0;
     }
     
     public abstract String getDesc();
@@ -82,4 +84,20 @@ public abstract class Person implements Serializable {
     }
     
     public abstract void runDiagnostic(Campaign campaign);
+    
+    public abstract void heal();
+    
+    public abstract boolean needsHealing();
+    
+    public boolean checkNaturalHealing() {
+        if(needsHealing() && null == task) {
+            daysRest++;
+            if(daysRest >= 15) {
+                heal();
+                daysRest = 0;
+                return true;
+            }
+        }
+        return false;
+    }
 }

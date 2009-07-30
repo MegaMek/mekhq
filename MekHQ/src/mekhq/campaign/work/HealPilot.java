@@ -36,13 +36,7 @@ public class HealPilot extends PersonnelWorkItem {
 
     @Override
     public void fix() {
-        if(person instanceof PilotPerson) {
-            //should be here, but just to be safe
-            PilotPerson pp = (PilotPerson)person;
-            if(null != pp.getPilot() && pp.getPilot().getHits() > 0) {
-                pp.getPilot().setHits(pp.getPilot().getHits() - 1);
-            }
-        }
+        person.heal();
     }
     
     @Override

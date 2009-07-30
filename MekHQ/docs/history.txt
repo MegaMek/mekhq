@@ -8,6 +8,7 @@ v0.1.1 (SVN)
 + removed unused imports
 + added some javadoc to Campaign.java
 + removed unused dialogs
++ wounded personnel will heal on their own in 15 cycles
 
 v0.1.0 (2009-07-29)
 + Bug: some weapon repair/replacements not being diagnosed

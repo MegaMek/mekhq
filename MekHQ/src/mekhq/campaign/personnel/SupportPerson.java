@@ -66,5 +66,20 @@ public class SupportPerson extends Person {
         //TODO: implement
     }
 
+    @Override
+    public void heal() {
+        if(needsHealing()) {
+            team.setCurrentStrength(team.getCurrentStrength() + 1);
+        }
+        if(!needsHealing() && null != task) {
+            task.complete();
+        }
+    }
+
+    @Override
+    public boolean needsHealing() {
+       return (team.getCasualties() > 0);
+    }
+
     
 }
