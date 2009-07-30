@@ -38,7 +38,6 @@ import mekhq.campaign.personnel.SupportPerson;
 import mekhq.campaign.team.MedicalTeam;
 import mekhq.campaign.team.TechTeam;
 import mekhq.campaign.work.ReloadItem;
-import mekhq.campaign.work.RepairItem;
 import mekhq.campaign.work.UnitWorkItem;
 import mekhq.campaign.work.WorkItem;
 
@@ -66,26 +65,32 @@ public class Campaign implements Serializable {
     private int lastTaskId;
     private int lastPersonId;
     
-    private ArrayList<String> currentReport = new ArrayList<String>();
-    
     //I need to put a basic game object in campaign so that I can
     //asssign it to the entities, otherwise some entity methods may get NPE
     //if they try to call up game options
-    Game game;
+    private Game game;
     
     //calendar stuff
     public Calendar calendar;
-    SimpleDateFormat dateFormat;
+    private SimpleDateFormat dateFormat;
+    
+    private ArrayList<String> currentReport;
     
     public Campaign() {
     
         game = new Game();
+        currentReport = new ArrayList<String>();
         calendar = new GregorianCalendar(3067, Calendar.JANUARY, 1);
         dateFormat = new SimpleDateFormat("EEEE, MMMM d yyyy");
         newDay();
     
     }
     
+    /**
+     * Add a support team to the campaign
+     * @param t 
+     *      The support team to be added
+     */
     public void addTeam(SupportTeam t) {
         int id = lastTeamId + 1;
         t.setId(id);
@@ -95,14 +100,27 @@ public class Campaign implements Serializable {
         addPerson(new SupportPerson(t));
     }
     
+    /**
+     * @return an <code>ArrayList</code> of SupportTeams in the campaign
+     */
     public ArrayList<SupportTeam> getTeams() {
         return teams;
     }
     
+    /**
+     * @param id
+     *      the <code>int</code> id of the team
+     * @return a <code>SupportTeam</code> object
+     */
     public SupportTeam getTeam(int id) {
         return teamIds.get(new Integer(id));
     }
     
+    /**
+     * Add a unit to the campaign
+     * @param en
+     *      An <code>Entity</code> object that the new unit will be wrapped around
+     */
     public void addUnit(Entity en) {
         //TODO: check for duplicate display names
         int id = lastUnitId + 1;
@@ -248,7 +266,6 @@ public class Campaign implements Serializable {
     }
      
      public void assignTask(int teamId, int taskId) {
-         //TODO: now should only apply to doctors
          WorkItem task = getTask(taskId);
          SupportTeam team = getTeam(teamId);
          if(null == team || null == task) {
@@ -258,10 +275,13 @@ public class Campaign implements Serializable {
          team.addTask(task);
      }
      
-     /**
-      * repair tasks can mutate into replacement tasks so we need to allow for this
-      * via a method
-      */
+    /**
+     * Transform one task into another
+     * @param oldTask
+     *      The <code>WorkItem</code> to be transformed
+     * @param newTask
+     *      The new <code>WorkItem</code> to be transformed into
+     */
      public void mutateTask(WorkItem oldTask, WorkItem newTask) {
          newTask.setId(oldTask.getId());
          taskIds.put(oldTask.getId(), newTask);
@@ -292,7 +312,6 @@ public class Campaign implements Serializable {
             }
             team.cleanTasks();
             team.resetMinutesLeft();
-            //if there are any assigned tasks then do them now
         }
         calendar.add(Calendar.DAY_OF_MONTH, 1);
         currentReport.add("<p><b>" + getDateAsString() + "</b>");

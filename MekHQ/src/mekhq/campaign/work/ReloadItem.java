@@ -24,7 +24,6 @@ package mekhq.campaign.work;
 import megamek.common.AmmoType;
 import megamek.common.Mounted;
 import megamek.common.TargetRoll;
-import mekhq.campaign.team.SupportTeam;
 import mekhq.campaign.Unit;
 
 /**

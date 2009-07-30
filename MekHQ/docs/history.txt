@@ -2,6 +2,9 @@ VERSION HISTORY
 ----------------------------------
 v0.1.1 (SVN)
 + changed font and added wrapping to textTarget
++ removed unused imports
++ added some javadoc to Campaign.java
++ removed unused dialogs
 
 v0.1.0 (2009-07-29)
 + Bug: some weapon repair/replacements not being diagnosed
