@@ -1,6 +1,9 @@
 VERSION HISTORY
 ----------------------------------
 v0.1.0 (SVN)
++ Bug: some weapon repair/replacements not being diagnosed
++ no CASE repairs
++ Bug: double heat sinks not being picked up in diagnostic
 + uncrittable equipment should be skipped in diagnostic
 + updated Example.mul
 + Vee Sensor replacment item

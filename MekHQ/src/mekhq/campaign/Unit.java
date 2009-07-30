@@ -200,25 +200,38 @@ public class Unit implements Serializable {
         for(Mounted m : entity.getEquipment()) {
             if(m.isHit() || m.isDestroyed()) {
                 
-                //check flags for jump jets and heat sinks because those are handled by their own classes
-                if(m.getType().hasFlag(MiscType.F_JUMP_JET)) {
-                    campaign.addWork(new JumpJetRepair(this, 1, m));
-                    continue;
-                } else if(m.getType().hasFlag(MiscType.F_HEAT_SINK)) {
-                    campaign.addWork(new HeatSinkRepair(this, 1, m));
-                    continue;
-                }             
-                //ammo is also handled its own way
-                if(m.getType() instanceof AmmoType) {
-                    campaign.addWork(new AmmoBinReplacement(this, m));
-                    //don't do reloads here because I want them all grouped at the bottom of the queue
-                }
-                
                 //some slots need to be skipped (like armor, endo-steel, etc.)
                 if(!m.getType().isHittable()) {
                     m.setHit(false);
                     m.setDestroyed(false);
                     continue;
+                }
+                
+                //check flags for jump jets and heat sinks because those are handled by their own classes
+                if(m.getType() instanceof MiscType) {
+                    if(m.getType().hasFlag(MiscType.F_JUMP_JET)) {
+                        campaign.addWork(new JumpJetRepair(this, 1, m));
+                        continue;
+                    } 
+                    else if(m.getType().hasFlag(MiscType.F_HEAT_SINK) 
+                                || m.getType().hasFlag(MiscType.F_DOUBLE_HEAT_SINK)) {
+                        campaign.addWork(new HeatSinkRepair(this, 1, m));
+                        continue;
+                    } 
+                    //leave CASE out for now
+                    //http://www.classicbattletech.com/forums/index.php/topic,49940.0.html
+                    else if(m.getType().hasFlag(MiscType.F_CASE) || m.getType().hasFlag(MiscType.F_CASEII)) {
+                        m.setHit(false);
+                        m.setDestroyed(false);
+                        continue;
+                    }
+                }
+                
+                //ammo is also handled its own way
+                if(m.getType() instanceof AmmoType) {
+                    campaign.addWork(new AmmoBinReplacement(this, m));
+                    continue;
+                    //don't do reloads here because I want them all grouped at the bottom of the queue
                 }
                                
                 //combat destroyed is not the same as really destroyed
