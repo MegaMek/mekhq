@@ -58,4 +58,8 @@ public abstract class PersonnelWorkItem extends WorkItem {
     public void setPatients(int i) {
         this.patients = i;
     }
+    
+    public Person getPerson() {
+        return person;
+    }
 }

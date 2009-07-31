@@ -33,6 +33,7 @@ import megamek.common.Protomech;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.VTOL;
+import mekhq.campaign.personnel.PilotPerson;
 import mekhq.campaign.work.*;
 
 /**
@@ -51,10 +52,13 @@ public class Unit implements Serializable {
     
     private Entity entity;
     private int site;
+    private boolean deployed;
+    private PilotPerson pilot;
     
     public Unit(Entity en) {
         this.entity = en;
         this.site = SITE_BAY;
+        this.deployed = false;
     }
     
     public Entity getEntity() {
@@ -71,6 +75,23 @@ public class Unit implements Serializable {
     
     public void setSite(int i) {
         this.site = i;
+    }
+    
+    public PilotPerson getPilot() {
+        return pilot;
+    }
+    
+    public void setPilot(PilotPerson pp) {
+        if(hasPilot()) {
+            pilot.setAssignedUnit(null);
+        }
+        this.pilot = pp;
+        if(null == pp) {
+            entity.setCrew(null);
+        } else {
+            pp.setAssignedUnit(this);
+            entity.setCrew(pp.getPilot());
+        }
     }
     
     /**
@@ -302,11 +323,14 @@ public class Unit implements Serializable {
     }
     
     public boolean hasPilot() {
-        return null != entity.getCrew();
+        return null != pilot;
     }
     
     public void removePilot() {
-        entity.setCrew(null);
+        if(hasPilot()) {
+            getPilot().setAssignedUnit(null);
+            setPilot(null);
+        }     
     }
     
     public String getPilotDesc() {
@@ -322,7 +346,11 @@ public class Unit implements Serializable {
     public String getDescHTML() {
         String toReturn = "<b>" + entity.getDisplayName() + "</b><br>";
         toReturn += getPilotDesc() + "<br>";
-        toReturn += "Site: " + getCurrentSiteName() + "<br>";
+        if(isDeployed()) {
+            toReturn  += "DEPLOYED!<br>";
+        } else {
+            toReturn += "Site: " + getCurrentSiteName() + "<br>";
+        }
         return toReturn;
     }
     
@@ -362,6 +390,17 @@ public class Unit implements Serializable {
     
     public String getCurrentSiteName() {
         return getSiteName(site);
+    }
+    
+    public boolean isDeployed() {
+        return deployed;
+    }
+    
+    public void setDeployed(boolean b) {
+        this.deployed = b;
+        if(null != pilot && deployed) {
+            pilot.setDeployed(true);
+        }
     }
     
 }

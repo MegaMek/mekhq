@@ -113,8 +113,12 @@ public abstract class WorkItem implements Serializable {
         return completed;
     }
     
+    public void setCompleted(boolean b) {
+        this.completed = b;
+    }
+    
     public void complete() {
-        this.completed = true;
+        setCompleted(true);
     }
     
     public String getDesc() {

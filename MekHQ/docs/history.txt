@@ -1,6 +1,8 @@
 VERSION HISTORY
 ----------------------------------
 v0.1.1 (SVN)
++ added PilotPerson variable to unit
++ deployed units and personnel are not removed but rather set to a deployed status
 + set ExternalId of entities to be the same as unit id
 + updated MegaMek.jar
 + changed font size and enabled word wrapping on textTarget display

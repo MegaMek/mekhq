@@ -943,12 +943,12 @@ protected void saveListFile() {
     }
     
     ArrayList<Entity> chosen = new ArrayList<Entity>();
-    ArrayList<Integer> toRemove = new ArrayList<Integer>();
+    ArrayList<Unit> toDeploy = new ArrayList<Unit>();
     for(int i : UnitTable.getSelectedRows()) {
         Unit u = campaign.getUnits().get(i);
         if(u.hasPilot() && null != u.getEntity()) {
             chosen.add(u.getEntity());
-            toRemove.add(u.getId());
+            toDeploy.add(u);
         }
     }
     
@@ -988,10 +988,9 @@ protected void saveListFile() {
                 // Save the player's entities to the file.
                 //FIXME: this is not working
                 EntityListFile.saveTo(unitFile, chosen);
-                //clear the entities, so that if the user wants to read them back you wont get duplicates
-                //The removeUnit method will also remove tasks and pilots associated with this unit
-                for(int id: toRemove) {
-                    campaign.removeUnit(id, true);
+                //set the unit and pilot as deployed
+                for(Unit u: toDeploy) {
+                    u.setDeployed(true);  
                 }
                 
             } catch (IOException excep) {
@@ -1312,7 +1311,10 @@ public class MekTableModel extends ArrayTableModel {
                 //TODO: how do I set this to the user's default selection color?
                 c.setBackground(new Color(253, 117, 28));
             } else {
-                if(null != u && campaign.countTasksFor(u.getId()) > 0) {
+                if (null != u && u.isDeployed()) {
+                    c.setBackground(Color.WHITE);
+                } 
+                else if(null != u && campaign.countTasksFor(u.getId()) > 0) {
                     c.setBackground(Color.YELLOW);
                 } else {
                     c.setBackground(new Color(220, 220, 220));
@@ -1333,16 +1335,16 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
             String command = action.getActionCommand();
             Unit unit = unitModel.getUnitAt(UnitTable.getSelectedRow());
             if (command.equalsIgnoreCase("REMOVE_PILOT")) {
-                campaign.removePilotFrom(unit);
+                unit.removePilot();
             } else if(command.contains("CHANGE_PILOT")) {
                 String sel = command.split(":")[1];
                 int selected = Integer.parseInt(sel);
                 if(null != pilots && selected > -1 && selected < pilots.size()) {
-                    campaign.changePilot(pilots.get(selected), unit);
+                    campaign.changePilot(unit, pilots.get(selected));
                 }
             } else if(command.equalsIgnoreCase("SELL")) {
                 if(0 == JOptionPane.showConfirmDialog(null, "Do you really want to sell " + unit.getEntity().getDisplayName(), "Sell Unit?", JOptionPane.YES_NO_OPTION)) {
-                    campaign.removeUnit(unit.getId(), false);
+                    campaign.removeUnit(unit.getId());
                 }
             } else if(command.contains("ASSIGN_TECH")) {
                 String sel = command.split(":")[1];
@@ -1442,6 +1444,7 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
                     }
                     menu.add(cbMenuItem);
                 }
+                menu.setEnabled(!unit.isDeployed());
                 popup.add(menu);
                 //assign all tasks to a certain tech
                 menu = new JMenu("Assign all tasks");
@@ -1454,6 +1457,7 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
                     menu.add(menuItem);
                     i++;
                 }
+                menu.setEnabled(!unit.isDeployed());
                 popup.add(menu);
                 //swap ammo
                 menu = new JMenu("Swap ammo");
@@ -1475,13 +1479,14 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
                     }
                     menu.add(ammoMenu);
                 }
+                menu.setEnabled(!unit.isDeployed());
                 popup.add(menu);
                 //remove pilot
                 popup.addSeparator();
                 menuItem = new JMenuItem("Remove pilot");
                 menuItem.setActionCommand("REMOVE_PILOT");
                 menuItem.addActionListener(this);
-                menuItem.setEnabled(unit.hasPilot());
+                menuItem.setEnabled(unit.hasPilot() && !unit.isDeployed());
                 popup.add(menuItem);
                 //switch pilot
                 menu = new JMenu("Change pilot");              
@@ -1497,12 +1502,14 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
                     menu.add(cbMenuItem);
                     i++;
                 }
+                menu.setEnabled(!unit.isDeployed());
                 popup.add(menu);
                 popup.addSeparator();
                 //sell unit
                 menuItem = new JMenuItem("Sell Unit");
                 menuItem.setActionCommand("SELL");
                 menuItem.addActionListener(this);
+                menuItem.setEnabled(!unit.isDeployed());
                 popup.add(menuItem);
                 //TODO: scrap unit
                 //TODO: add quirks?
@@ -1592,7 +1599,10 @@ public class PersonTableModel extends ArrayTableModel {
                 //TODO: how do I set this to the user's default selection color?
                 c.setBackground(new Color(253, 117, 28));
             } else {
-                if(null != p && null != p.getTask() && !p.getTask().isAssigned()) {
+                if (null != p && p.isDeployed()) {
+                    c.setBackground(Color.WHITE);
+                } 
+                else if(null != p && null != p.getTask() && !p.getTask().isAssigned()) {
                     c.setBackground(Color.RED);
                 } else {
                     c.setBackground(new Color(220, 220, 220));

@@ -42,7 +42,8 @@ public abstract class Person implements Serializable {
     //any existing work item for this person
     protected PersonnelWorkItem task;
     //days of rest
-    int daysRest;
+    protected int daysRest;
+    protected boolean deployed;
     
     //default constructor
     public Person() {
@@ -99,5 +100,21 @@ public abstract class Person implements Serializable {
             }
         }
         return false;
+    }
+    
+    public boolean isDeployed() {
+        return deployed;
+    }
+    
+    public void setDeployed(boolean b) {
+        this.deployed = b;
+        if(deployed) {
+            SupportTeam team = task.getTeam();
+            task.setCompleted(true);
+            task.setTeam(null);
+            if(null != team) {
+                team.cleanTasks();
+            }
+        }
     }
 }

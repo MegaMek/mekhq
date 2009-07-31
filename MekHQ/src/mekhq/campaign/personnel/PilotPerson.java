@@ -133,6 +133,9 @@ public class PilotPerson extends Person {
         String toReturn = "<html><b>" + pilot.getName() + "</b><br>";
         toReturn += getTypeDesc() + " (" + pilot.getGunnery() + "/" + pilot.getPiloting() + ")<br>";
         toReturn += pilot.getStatusDesc() + getAssignedDoctorString();
+        if(isDeployed()) {
+            toReturn += " (DEPLOYED)";
+        }
         toReturn += "</html>";
         return toReturn;
     }

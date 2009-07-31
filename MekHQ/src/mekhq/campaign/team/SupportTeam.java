@@ -28,6 +28,7 @@ import megamek.common.TargetRoll;
 import mekhq.campaign.work.PersonnelWorkItem;
 import mekhq.campaign.work.RepairItem;
 import mekhq.campaign.work.ReplacementItem;
+import mekhq.campaign.work.UnitWorkItem;
 import mekhq.campaign.work.WorkItem;
 
 /**
@@ -218,6 +219,12 @@ public abstract class SupportTeam implements Serializable {
    public TargetRoll getTargetFor(WorkItem task) {
        if(null == task) {
            return new TargetRoll(TargetRoll.IMPOSSIBLE, "no task?");
+       }
+       if(task instanceof UnitWorkItem && ((UnitWorkItem)task).getUnit().isDeployed()) {
+           return new TargetRoll(TargetRoll.IMPOSSIBLE, "This unit is currently deployed!");
+       }
+       if(task instanceof PersonnelWorkItem && ((PersonnelWorkItem)task).getPerson().isDeployed()) {
+           return new TargetRoll(TargetRoll.IMPOSSIBLE, "This person is currently deployed!");
        }
        if(null != task.checkFixable()) {
            return new TargetRoll(TargetRoll.IMPOSSIBLE, task.checkFixable());

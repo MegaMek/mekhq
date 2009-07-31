@@ -133,7 +133,9 @@ public class Campaign implements Serializable {
         lastUnitId = id;
         //check for pilot
         if(null != en.getCrew()) {
-            addPerson(new PilotPerson(en.getCrew(), PilotPerson.getType(en), unit));
+            PilotPerson pilot = new PilotPerson(en.getCrew(), PilotPerson.getType(en), unit);
+            unit.setPilot(pilot);
+            addPerson(pilot);
         }
         //collect all the work items outstanding on this unit and add them to the workitem vector
         unit.runDiagnostic(this);
@@ -334,7 +336,7 @@ public class Campaign implements Serializable {
         
     }
     
-    public void removeUnit(int id, boolean deploy) {
+    public void removeUnit(int id) {
         Unit unit = getUnit(id);
         //remove any tasks associated with this unit
 
@@ -343,17 +345,8 @@ public class Campaign implements Serializable {
             taskIds.remove(new Integer(task.getId()));
         }
           
-        //if deploying remove pilot person as well
-        if(deploy) {
-            PilotPerson pilot = getPilotFor(unit);
-            if(null != pilot) {
-                personnel.remove(pilot);
-                personnelIds.remove(pilot.getId());
-            }
-        } else {
-            //otherwise just remove the pilot from this unit
-            removePilotFrom(unit);
-        }
+        //remove the pilot from this unit
+        unit.removePilot();
         
         //finally remove the unit
         units.remove(unit);
@@ -408,39 +401,11 @@ public class Campaign implements Serializable {
         return pilots;
     }
     
-    public PilotPerson getPilotFor(Unit unit) {
-        for(Person p : getPersonnel()) {
-            if(!(p instanceof PilotPerson)) {
-                continue;
-            }
-            PilotPerson pilot = (PilotPerson)p;
-            if(null == pilot.getAssignedUnit()) {
-                continue;
-            }
-            if(pilot.getAssignedUnit().getId() == unit.getId()) {
-                return pilot;
-            }
-        }
-        return null;
-    }
-    
-    public void removePilotFrom(Unit unit) {
-        PilotPerson pilot = getPilotFor(unit);
-        if(null != pilot) {
+    public void changePilot(Unit unit, PilotPerson pilot) {
+        if(null != pilot.getAssignedUnit()) {
             pilot.getAssignedUnit().removePilot();
-            pilot.setAssignedUnit(null);
         }
-    }
-    
-    public void changePilot(PilotPerson pp, Unit unit) {
-        //remove any existing PilotPerson assigned to this unit
-        removePilotFrom(unit);
-        //now re-assign the new pilot
-        if(pp.isAssigned()) {
-            pp.getAssignedUnit().removePilot();
-        }
-        pp.setAssignedUnit(unit);
-        unit.getEntity().setCrew(pp.getPilot());
+        unit.setPilot(pilot);
     }
     
     public ReloadItem getReloadWorkFor(Mounted m, Unit unit) {

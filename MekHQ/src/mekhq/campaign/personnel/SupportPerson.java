@@ -57,6 +57,9 @@ public class SupportPerson extends Person {
         if(team.getCasualties() > 0) {
             toReturn = team.getCasualties() + " casualties" + getAssignedDoctorString();
         }
+        if(isDeployed()) {
+            toReturn += "DEPLOYED!";
+        }
         toReturn += "</html>";
         return toReturn;
     }
