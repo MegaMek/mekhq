@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.1.1 (SVN)
++ refresh pilot when reloading units
 + load unit method now will reload entities for existing units rather than making duplicates (partial)
 + removed assignedTasks arrayList from SupportTeam (all Team assignment information is held by WorkItem)
 + added PilotPerson variable to unit

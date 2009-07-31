@@ -130,7 +130,11 @@ public class Campaign implements Serializable {
             en.setId(priorUnit.getId());
             priorUnit.setEntity(en);
             priorUnit.setDeployed(false);
-            //TODO: refresh pilot too
+            PilotPerson priorPilot = priorUnit.getPilot();
+            if(null != priorPilot) {
+                priorPilot.setPilot(en.getCrew());
+                priorPilot.setDeployed(false);
+            }
             //TODO: rerun diagnostics 
             //this last one is tricky because I want to keep information about skill level required from the old
             //tasks, otherwise reloading a unit will allow user to reset the skill required to green (i.e. cheat)

@@ -117,6 +117,10 @@ public class PilotPerson extends Person {
     public Pilot getPilot() {
         return pilot;
     }
+    
+    public void setPilot(Pilot p) {
+        this.pilot = p;
+    }
 
     @Override
     public String getDesc() {
