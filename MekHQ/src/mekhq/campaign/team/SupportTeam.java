@@ -23,7 +23,6 @@ package mekhq.campaign.team;
 
 import mekhq.campaign.*;
 import java.io.Serializable;
-import java.util.ArrayList;
 import megamek.common.TargetRoll;
 import mekhq.campaign.work.PersonnelWorkItem;
 import mekhq.campaign.work.RepairItem;
@@ -52,7 +51,7 @@ public abstract class SupportTeam implements Serializable {
     protected int hours;
     protected int minutesLeft;
     
-    protected ArrayList<WorkItem> assignedTasks;
+//    protected ArrayList<WorkItem> assignedTasks;
     
     protected Campaign campaign;
     
@@ -77,7 +76,7 @@ public abstract class SupportTeam implements Serializable {
         this.name = name;
         this.rating = rating;
         this.hours = 8;
-        this.assignedTasks = new ArrayList<WorkItem>();
+    //    this.assignedTasks = new ArrayList<WorkItem>();
         resetMinutesLeft();
     }
     
@@ -186,31 +185,6 @@ public abstract class SupportTeam implements Serializable {
    public abstract String getTasksDesc();
    
    public abstract String getTypeDesc();
-    
-   public ArrayList<WorkItem> getTasksAssigned() {
-        return assignedTasks;
-   }
-   
-   public void addTask(WorkItem task) {
-       assignedTasks.add(task);
-   }
-   
-   public void removeTask(WorkItem task) {
-       assignedTasks.remove(task);
-   }
-   
-   /**
-    * cycle through tasks and clean out any completed ones
-    */
-   public void cleanTasks() {
-       ArrayList<WorkItem> newTasks = new ArrayList<WorkItem>();
-       for(WorkItem task : getTasksAssigned()) {
-           if(!task.isCompleted()) {
-               newTasks.add(task);
-           }
-       }
-       assignedTasks = newTasks;
-   }
    
    public abstract boolean canDo(WorkItem task);
    

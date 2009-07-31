@@ -789,7 +789,7 @@ private void btnAssignDocActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
     int row = PersonTable.getSelectedRow();
     Person p = campaign.getPerson(currentPersonId);
     if(null != p && null != p.getTask()) {
-        campaign.assignTask(currentDoctorId, p.getTask().getId());
+        p.getTask().setTeam(campaign.getTeam(currentDoctorId));
         row++;
     }
     refreshTechsList();

@@ -109,12 +109,7 @@ public abstract class Person implements Serializable {
     public void setDeployed(boolean b) {
         this.deployed = b;
         if(deployed) {
-            SupportTeam team = task.getTeam();
-            task.setCompleted(true);
             task.setTeam(null);
-            if(null != team) {
-                team.cleanTasks();
-            }
         }
     }
 }

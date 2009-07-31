@@ -60,8 +60,8 @@ public class MedicalTeam extends SupportTeam {
 
     protected int getPatients() {
        int patients = 0;
-       for(WorkItem task : getTasksAssigned()) {
-           if(task instanceof PersonnelWorkItem) {
+        for(WorkItem task : campaign.getTasks()) {
+           if(task instanceof PersonnelWorkItem && task.isAssigned() && task.getTeam().getId() == getId()) {
                patients += ((PersonnelWorkItem)task).getPatients();
            }
        }

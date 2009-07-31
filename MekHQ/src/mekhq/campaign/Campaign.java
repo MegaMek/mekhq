@@ -123,22 +123,37 @@ public class Campaign implements Serializable {
      */
     public void addUnit(Entity en) {
         //TODO: check for duplicate display names
-        int id = lastUnitId + 1;
-        en.setId(id);
-        en.setExternalId(id);
-        en.setGame(game);
-        Unit unit = new Unit(en);
-        units.add(unit);
-        unitIds.put(new Integer(id), unit);
-        lastUnitId = id;
-        //check for pilot
-        if(null != en.getCrew()) {
-            PilotPerson pilot = new PilotPerson(en.getCrew(), PilotPerson.getType(en), unit);
-            unit.setPilot(pilot);
-            addPerson(pilot);
+        //first check to see if the externalId of this entity matches any units we already have
+        Unit priorUnit = unitIds.get(new Integer(en.getExternalId()));
+        if(null != priorUnit) {
+            //this is an existing unit so we need to update it
+            en.setId(priorUnit.getId());
+            priorUnit.setEntity(en);
+            priorUnit.setDeployed(false);
+            //TODO: refresh pilot too
+            //TODO: rerun diagnostics 
+            //this last one is tricky because I want to keep information about skill level required from the old
+            //tasks, otherwise reloading a unit will allow user to reset the skill required to green (i.e. cheat)
+            //I might be able to check for this in addWork
+        } else {
+            //this is a new unit so add it
+            int id = lastUnitId + 1;
+            en.setId(id);
+            en.setExternalId(id);
+            en.setGame(game);
+            Unit unit = new Unit(en);
+            units.add(unit);
+            unitIds.put(new Integer(id), unit);
+            lastUnitId = id;
+            //check for pilot
+            if(null != en.getCrew()) {
+                PilotPerson pilot = new PilotPerson(en.getCrew(), PilotPerson.getType(en), unit);
+                unit.setPilot(pilot);
+                addPerson(pilot);
+            }
+            //collect all the work items outstanding on this unit and add them to the workitem vector
+            unit.runDiagnostic(this);
         }
-        //collect all the work items outstanding on this unit and add them to the workitem vector
-        unit.runDiagnostic(this);
     }
     
     public ArrayList<Unit> getUnits() {
@@ -268,16 +283,6 @@ public class Campaign implements Serializable {
         return toReturn;
     }
      
-     public void assignTask(int teamId, int taskId) {
-         WorkItem task = getTask(taskId);
-         SupportTeam team = getTeam(teamId);
-         if(null == team || null == task) {
-             return;
-         }
-         task.setTeam(team);
-         team.addTask(task);
-     }
-     
     /**
      * Transform one task into another
      * @param oldTask
@@ -310,11 +315,17 @@ public class Campaign implements Serializable {
     
     public void newDay() {
          for(SupportTeam team : getTeams()) {
-            for(WorkItem task : team.getTasksAssigned()) {
-                processTask(task, team);
-            }
-            team.cleanTasks();
             team.resetMinutesLeft();
+         }
+         //check for any assigned tasks
+         ArrayList<WorkItem> assigned = new ArrayList<WorkItem>();
+         for(WorkItem task : getTasks()) {
+             if(task.isAssigned()) {
+                 assigned.add(task);
+             }
+         }
+         for(WorkItem task : assigned) {
+            processTask(task, task.getTeam());
          }
          for(Person p : getPersonnel()) {
             if(p.checkNaturalHealing()) {
@@ -374,10 +385,11 @@ public class Campaign implements Serializable {
      * @return
      */
     public String getToolTipFor(MedicalTeam doctor) {
-        
         String toReturn = "<html><b>Tasks:</b><br>";
-        for(WorkItem task : doctor.getTasksAssigned()) {
-            toReturn += task.getDesc() + "<br>";
+        for(WorkItem task : getTasks()) {
+            if(task.isAssigned() && task.getTeam().getId() == doctor.getId()) {
+                toReturn += task.getDesc() + "<br>";
+            }
         }
         toReturn += "</html>";
         return toReturn;

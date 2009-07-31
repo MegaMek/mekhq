@@ -61,6 +61,10 @@ public class Unit implements Serializable {
         this.deployed = false;
     }
     
+    public void setEntity(Entity en) {
+        this.entity = en;
+    }
+    
     public Entity getEntity() {
         return entity;
     }
