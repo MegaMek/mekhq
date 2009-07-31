@@ -125,6 +125,7 @@ public class Campaign implements Serializable {
         //TODO: check for duplicate display names
         int id = lastUnitId + 1;
         en.setId(id);
+        en.setExternalId(id);
         en.setGame(game);
         Unit unit = new Unit(en);
         units.add(unit);
