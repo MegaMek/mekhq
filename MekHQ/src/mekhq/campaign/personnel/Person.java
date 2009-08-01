@@ -108,7 +108,7 @@ public abstract class Person implements Serializable {
     
     public void setDeployed(boolean b) {
         this.deployed = b;
-        if(deployed) {
+        if(null != task && deployed) {
             task.setTeam(null);
         }
     }

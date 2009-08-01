@@ -84,7 +84,7 @@ public class Campaign implements Serializable {
         currentReport = new ArrayList<String>();
         calendar = new GregorianCalendar(3067, Calendar.JANUARY, 1);
         dateFormat = new SimpleDateFormat("EEEE, MMMM d yyyy");
-        newDay();
+        currentReport.add("<b>" + getDateAsString() + "</b>");
     
     }
     

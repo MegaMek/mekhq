@@ -1,6 +1,8 @@
 VERSION HISTORY
 ----------------------------------
 v0.1.1 (SVN)
++ Bug: NPE on deploying units because of null tasks in Person
++ corrected initial date formatting (extra line)
 + WorkItem#sameAs method for determining whether a work item refers to the same component (and tons of overrides)
 + transfer skill min requirements from old tasks to new tasks when reloading units
 + reassign tasks when reloading units
