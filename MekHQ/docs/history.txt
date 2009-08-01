@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.1.1 (SVN)
++ experimental component modifier
 + overtime work
 + Combat Loss menu item in Unit popup menu for deployed units
 + Deployed unit label text white

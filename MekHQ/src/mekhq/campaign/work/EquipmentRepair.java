@@ -23,6 +23,8 @@ package mekhq.campaign.work;
 
 import megamek.common.CriticalSlot;
 import megamek.common.Mounted;
+import megamek.common.TargetRoll;
+import megamek.common.TechConstants;
 import mekhq.campaign.Unit;
 
 /**
@@ -108,5 +110,15 @@ public class EquipmentRepair extends RepairItem {
         return (task instanceof EquipmentRepair 
                 && ((EquipmentRepair)task).getUnitId() == this.getUnitId()
                 && ((EquipmentRepair)task).getUnit().getEntity().getEquipmentNum(((EquipmentRepair)task).getMounted()) == unit.getEntity().getEquipmentNum(mounted));
+    }
+    
+    @Override
+    public TargetRoll getAllMods() {
+        TargetRoll target = super.getAllMods();
+        if(mounted.getType().getTechLevel() == TechConstants.T_IS_EXPERIMENTAL
+                || mounted.getType().getTechLevel() == TechConstants.T_CLAN_EXPERIMENTAL) {
+            target.addModifier(2,"experimental");
+        }
+        return target;
     }
 }

@@ -22,6 +22,8 @@ package mekhq.campaign.work;
 
 import megamek.common.Aero;
 import megamek.common.Tank;
+import megamek.common.TargetRoll;
+import megamek.common.TechConstants;
 import mekhq.campaign.Unit;
 
 /**
@@ -74,5 +76,15 @@ public class ArmorReplacement extends ReplacementItem {
         return (task instanceof ArmorReplacement 
                 && ((ArmorReplacement)task).getUnitId() == this.getUnitId()
                 && ((ArmorReplacement)task).getLoc() == this.getLoc());
+    }
+    
+    @Override
+    public TargetRoll getAllMods() {
+        TargetRoll target = super.getAllMods();
+        if(unit.getEntity().getArmorTechLevel() == TechConstants.T_IS_EXPERIMENTAL
+                || unit.getEntity().getArmorTechLevel() == TechConstants.T_CLAN_EXPERIMENTAL) {
+            target.addModifier(2,"experimental");
+        }
+        return target;
     }
 }
