@@ -298,7 +298,12 @@ public class Campaign implements Serializable {
      * @return
      */
     public String getUnitDesc(int unitId) {
-        String toReturn = "<html>" + getUnit(unitId).getDescHTML();
+        Unit unit = getUnit(unitId);
+        String toReturn = "<html>";
+        if(unit.isDeployed()) {
+            toReturn += "<font color='white'>";
+        }
+        toReturn += unit.getDescHTML();
         ArrayList<WorkItem> unitTasks = getTasksForUnit(unitId);
         int totalMin = 0;
         int total = 0;
@@ -310,6 +315,9 @@ public class Campaign implements Serializable {
         }
         if(total > 0) {
             toReturn += "Total tasks: " + total + " (" + totalMin + " minutes)<br>";
+        }
+        if(unit.isDeployed()) {
+            toReturn += "</font>";
         }
         toReturn += "</html>";
         return toReturn;

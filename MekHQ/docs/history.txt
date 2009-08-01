@@ -1,6 +1,8 @@
 VERSION HISTORY
 ----------------------------------
 v0.1.1 (SVN)
++ Combat Loss menu item in Unit popup menu for deployed units
++ Deployed unit label text white
 + Bug 2830562: Arm Can Be Replaced, Even When Torso Is Missing
 + removed equipment destruction check from runDiagnostic (should be done from within MegaMek)
 + changed deployed unit background to dark gray

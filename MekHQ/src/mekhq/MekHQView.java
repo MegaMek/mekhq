@@ -1346,6 +1346,10 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
                 if(0 == JOptionPane.showConfirmDialog(null, "Do you really want to sell " + unit.getEntity().getDisplayName(), "Sell Unit?", JOptionPane.YES_NO_OPTION)) {
                     campaign.removeUnit(unit.getId());
                 }
+            } else if(command.equalsIgnoreCase("LOSS")) {
+                if(0 == JOptionPane.showConfirmDialog(null, "Do you really want to consider " + unit.getEntity().getDisplayName() + " a combat loss?", "Remove Unit?", JOptionPane.YES_NO_OPTION)) {
+                    campaign.removeUnit(unit.getId());
+                }
             } else if(command.contains("ASSIGN_TECH")) {
                 String sel = command.split(":")[1];
                 int selected = Integer.parseInt(sel);
@@ -1512,6 +1516,12 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
                 menuItem.setEnabled(!unit.isDeployed());
                 popup.add(menuItem);
                 //TODO: scrap unit
+                //combat loss
+                menuItem = new JMenuItem("Combat Loss");
+                menuItem.setActionCommand("LOSS");
+                menuItem.addActionListener(this);
+                menuItem.setEnabled(unit.isDeployed());
+                popup.add(menuItem);
                 //TODO: add quirks?
                 popup.show(e.getComponent(), e.getX(), e.getY());
             }
