@@ -54,6 +54,20 @@ public class LocationReplacement extends ReplacementItem {
     public int getLoc() {
         return loc;
     }
+    
+    @Override
+    public String checkFixable() {
+        if(unit.getEntity() instanceof Mech) {
+            //cant replace appendages when corresponding torso is gone
+            if((loc == Mech.LOC_LARM || loc == Mech.LOC_LLEG) && unit.getEntity().isLocationBad(Mech.LOC_LT)) {
+                return "must replace left torso first";
+            } 
+            else if((loc == Mech.LOC_RARM || loc == Mech.LOC_RLEG) && unit.getEntity().isLocationBad(Mech.LOC_RT)) {
+                return "must replace right torso first";
+            } 
+        }
+        return super.checkFixable();
+    }
 
     @Override
     public boolean sameAs(WorkItem task) {
