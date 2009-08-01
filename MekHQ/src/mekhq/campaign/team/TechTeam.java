@@ -93,17 +93,6 @@ public class TechTeam extends SupportTeam {
        }
        return base;
     }
-    
-   @Override
-   public String getTasksDesc() {
-       int total = 0;
-       int minutes = 0;
-       for(WorkItem task : getTasksAssigned()) {
-           total++;
-           minutes += task.getTime();
-       }
-       return "" + total + " task(s), " + minutes + "/" + getHours()*60 + " minutes";
-   }
    
    @Override
    public boolean canDo(WorkItem task) {
@@ -137,7 +126,7 @@ public class TechTeam extends SupportTeam {
    public String getDescHTML() {
         String toReturn = "<html><b>" + getName() + "</b><br>";
         toReturn += getRatingName() + " " + getTypeDesc() + "<br>";
-        toReturn += getMinutesLeft() + " minutes left";
+        toReturn += getMinutesLeft() + " minutes left + (" + getOvertimeLeft() + " overtime)";
         toReturn += "</html>";
         return toReturn;
    }

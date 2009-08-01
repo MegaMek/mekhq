@@ -50,6 +50,7 @@ public abstract class SupportTeam implements Serializable {
     protected int currentSize;
     protected int hours;
     protected int minutesLeft;
+    protected int overtimeLeft;
     
 //    protected ArrayList<WorkItem> assignedTasks;
     
@@ -124,8 +125,17 @@ public abstract class SupportTeam implements Serializable {
         this.minutesLeft = m;
     }
     
+    public int getOvertimeLeft() {
+        return overtimeLeft;
+    }
+    
+    public void setOvertimeLeft(int m) {
+        this.overtimeLeft = m;
+    }
+    
     public void resetMinutesLeft() {
         this.minutesLeft = 60 * getHours();
+        this.overtimeLeft = 60 * 4;
     }
     
     public int getCasualties() {
@@ -177,12 +187,12 @@ public abstract class SupportTeam implements Serializable {
    }
    
    public String getDesc() {
-       return getName() + " (" + getRatingName() + " " + getTypeDesc() + ") " + getTasksDesc();
+       return getName() + " (" + getRatingName() + " " + getTypeDesc() + ") ";
    }
    
    public abstract String getDescHTML();
    
-   public abstract String getTasksDesc();
+  // public abstract String getTasksDesc();
    
    public abstract String getTypeDesc();
    
@@ -203,9 +213,6 @@ public abstract class SupportTeam implements Serializable {
        if(null != task.checkFixable()) {
            return new TargetRoll(TargetRoll.IMPOSSIBLE, task.checkFixable());
        } 
-       if(task.getTime() > getMinutesLeft()) {
-           return new TargetRoll(TargetRoll.IMPOSSIBLE, "Not enough time");
-       }
        if(task.getSkillMin() > getRating()) {
            return new TargetRoll(TargetRoll.IMPOSSIBLE, "Task is beyond this team's skill level");
        }
@@ -226,6 +233,13 @@ public abstract class SupportTeam implements Serializable {
        if(target.getValue() == TargetRoll.IMPOSSIBLE) {
            return target;
        }
+       //check time
+       if(task.getTime() > getMinutesLeft()) {
+           if((task.getTime() - getMinutesLeft()) > getOvertimeLeft()) {
+               return new TargetRoll(TargetRoll.IMPOSSIBLE, "Not enough time");
+           }
+           target.addModifier(3, "overtime");
+       }
        target.append(task.getAllMods());
        return target;
    }
@@ -235,9 +249,10 @@ public abstract class SupportTeam implements Serializable {
        TargetRoll target = getTargetFor(task);
        int minutes = task.getTime();
        if(minutes > getMinutesLeft()) {
-           //we shouldn't get here, but never hurts to check
-           report = report  + "<emph>Ran out of time for the day, see you tommorrow!</emph>";
-           return report;
+           //we ar working overtime
+           minutes -= getMinutesLeft();
+           setMinutesLeft(0);
+           setOvertimeLeft(getOvertimeLeft() - minutes);
        } else {
            setMinutesLeft(getMinutesLeft() - minutes);
        }

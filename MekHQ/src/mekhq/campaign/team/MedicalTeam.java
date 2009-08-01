@@ -67,11 +67,6 @@ public class MedicalTeam extends SupportTeam {
        }
        return patients;
     }
-    
-    @Override
-    public String getTasksDesc() {
-       return "" + getPatients() + " patient(s)";
-    }
 
     @Override
     public String getTypeDesc() {
