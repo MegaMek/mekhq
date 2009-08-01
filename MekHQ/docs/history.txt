@@ -1,6 +1,8 @@
 VERSION HISTORY
 ----------------------------------
 v0.1.1 (SVN)
++ removed equipment destruction check from runDiagnostic (should be done from within MegaMek)
++ changed deployed unit background to dark gray
 + Bug: NPE on deploying units because of null tasks in Person
 + corrected initial date formatting (extra line)
 + WorkItem#sameAs method for determining whether a work item refers to the same component (and tons of overrides)

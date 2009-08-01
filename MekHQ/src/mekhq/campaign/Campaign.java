@@ -157,13 +157,8 @@ public class Campaign implements Serializable {
                 taskIds.remove(new Integer(task.getId()));
             }
             priorUnit.runDiagnostic(this);
-            //TODO: reassign skill minimum 
             //this last one is tricky because I want to keep information about skill level required from the old
             //tasks, otherwise reloading a unit will allow user to reset the skill required to green (i.e. cheat)
-            //I might be able to check for this in addWork
-            //The easiest way to do this would probably be to collect all of the current tasks for this unit in a
-            //new arraylist, then remove them from the global tasklist. Then rerun the diagnostic. Then go through each
-            //of the new tasks and see if they match the old ones. If they do, then update the skill min.
             for(WorkItem task : getTasksForUnit(priorUnit.getId())) {
                 for(WorkItem oldTask : oldTasks) {
                     if(task.sameAs(oldTask)) {

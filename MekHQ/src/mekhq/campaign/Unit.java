@@ -278,11 +278,11 @@ public class Unit implements Serializable {
                 }
                                
                 //combat destroyed is not the same as really destroyed
-                //you get a roll to see if it can be repaired
-                //TODO: I think this check should probably be made from within MM when a crit is received
+                //TODO: I am no longer making the check here. Any randomness in this method can lead to 
+                //weird results when units are deployed and then reloaded. This should really be done in MegaMek
+                //with the proper use of setHit and setDestroyed
                 //and added to the MUL file.      
-                int roll = Compute.d6(2);
-                if(roll > 9) {
+                if(!m.isDestroyed()) {
                     campaign.addWork(new EquipmentRepair(this, getCrits(m), m));
                 } else {
                     campaign.addWork(new EquipmentReplacement(this, m));

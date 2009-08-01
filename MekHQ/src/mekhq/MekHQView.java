@@ -1312,7 +1312,7 @@ public class MekTableModel extends ArrayTableModel {
                 c.setBackground(new Color(253, 117, 28));
             } else {
                 if (null != u && u.isDeployed()) {
-                    c.setBackground(Color.WHITE);
+                    c.setBackground(Color.GRAY);
                 } 
                 else if(null != u && campaign.countTasksFor(u.getId()) > 0) {
                     c.setBackground(Color.YELLOW);
@@ -1600,7 +1600,7 @@ public class PersonTableModel extends ArrayTableModel {
                 c.setBackground(new Color(253, 117, 28));
             } else {
                 if (null != p && p.isDeployed()) {
-                    c.setBackground(Color.WHITE);
+                    c.setBackground(Color.GRAY);
                 } 
                 else if(null != p && null != p.getTask() && !p.getTask().isAssigned()) {
                     c.setBackground(Color.RED);
