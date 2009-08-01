@@ -46,4 +46,11 @@ public class MekInternalRepair extends InternalRepair {
             this.difficulty = 0;
         }
     }
+
+    @Override
+    public boolean sameAs(WorkItem task) {
+        return (task instanceof MekInternalRepair
+                && ((MekInternalRepair)task).getUnitId() == this.getUnitId()
+                && ((MekInternalRepair)task).getLoc() == this.getLoc());
+    }
 }

@@ -48,4 +48,8 @@ public abstract class InternalRepair extends RepairItem {
         return new LocationReplacement(unit, loc);
     }
     
+    public int getLoc() {
+        return loc;
+    }
+    
 }

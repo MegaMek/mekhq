@@ -22,7 +22,6 @@
 package mekhq.campaign.work;
 
 import megamek.common.CriticalSlot;
-import megamek.common.Entity;
 import megamek.common.Mech;
 import mekhq.campaign.Unit;
 
@@ -51,5 +50,11 @@ public class MekGyroRepair extends RepairItem {
     @Override
     public WorkItem replace() {
         return new MekGyroReplacement(unit);
+    }
+
+    @Override
+    public boolean sameAs(WorkItem task) {
+        return (task instanceof MekGyroRepair
+                && ((MekGyroRepair)task).getUnitId() == this.getUnitId());
     }
 }

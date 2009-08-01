@@ -98,4 +98,15 @@ public class EquipmentRepair extends RepairItem {
         }
         return super.checkFixable();
     }
+    
+    public Mounted getMounted() {
+        return mounted;
+    }
+
+    @Override
+    public boolean sameAs(WorkItem task) {
+        return (task instanceof EquipmentRepair 
+                && ((EquipmentRepair)task).getUnitId() == this.getUnitId()
+                && ((EquipmentRepair)task).getUnit().getEntity().getEquipmentNum(((EquipmentRepair)task).getMounted()) == unit.getEntity().getEquipmentNum(mounted));
+    }
 }

@@ -46,4 +46,8 @@ public abstract class MekActuatorRepair extends RepairItem {
         }
         return super.checkFixable();
     }
+    
+    public int getLoc() {
+        return loc;
+    }
 }

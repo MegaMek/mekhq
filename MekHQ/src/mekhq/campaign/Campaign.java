@@ -40,6 +40,8 @@ import mekhq.campaign.team.TechTeam;
 import mekhq.campaign.work.ReloadItem;
 import mekhq.campaign.work.UnitWorkItem;
 import mekhq.campaign.work.WorkItem;
+import mekhq.campaign.work.RepairItem;
+import mekhq.campaign.work.ReplacementItem;
 
 /**
  *
@@ -131,14 +133,45 @@ public class Campaign implements Serializable {
             priorUnit.setEntity(en);
             priorUnit.setDeployed(false);
             PilotPerson priorPilot = priorUnit.getPilot();
-            if(null != priorPilot) {
+            if(null == en.getCrew()) {
+                priorUnit.removePilot();
+            }
+            else if(null != priorPilot) { 
                 priorPilot.setPilot(en.getCrew());
                 priorPilot.setDeployed(false);
+                //remove any existing tasks for pilot so we can diagnose new ones
+                if(null != priorPilot.getTask()) {
+                    WorkItem task = priorPilot.getTask();
+                    tasks.remove(task);
+                    taskIds.remove(new Integer(task.getId()));
+                }
+                priorPilot.runDiagnostic(this);
             }
-            //TODO: rerun diagnostics 
+            //remove old tasks
+            ArrayList<WorkItem> oldTasks = new ArrayList<WorkItem>();
+            for(WorkItem task : getTasksForUnit(priorUnit.getId())) {
+                if(task instanceof RepairItem || task instanceof ReplacementItem) {
+                    oldTasks.add(task);
+                }
+                tasks.remove(task);
+                taskIds.remove(new Integer(task.getId()));
+            }
+            priorUnit.runDiagnostic(this);
+            //TODO: reassign skill minimum 
             //this last one is tricky because I want to keep information about skill level required from the old
             //tasks, otherwise reloading a unit will allow user to reset the skill required to green (i.e. cheat)
             //I might be able to check for this in addWork
+            //The easiest way to do this would probably be to collect all of the current tasks for this unit in a
+            //new arraylist, then remove them from the global tasklist. Then rerun the diagnostic. Then go through each
+            //of the new tasks and see if they match the old ones. If they do, then update the skill min.
+            for(WorkItem task : getTasksForUnit(priorUnit.getId())) {
+                for(WorkItem oldTask : oldTasks) {
+                    if(task.sameAs(oldTask)) {
+                        task.setSkillMin(oldTask.getSkillMin());
+                    }
+                }
+            }
+            
         } else {
             //this is a new unit so add it
             int id = lastUnitId + 1;

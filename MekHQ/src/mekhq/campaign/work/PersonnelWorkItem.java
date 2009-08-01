@@ -62,4 +62,10 @@ public abstract class PersonnelWorkItem extends WorkItem {
     public Person getPerson() {
         return person;
     }
+    
+    @Override
+    public boolean sameAs(WorkItem task) {
+        return (task instanceof PersonnelWorkItem 
+                    && ((PersonnelWorkItem)task).getPerson().getId() == this.getPerson().getId());
+    }
 }

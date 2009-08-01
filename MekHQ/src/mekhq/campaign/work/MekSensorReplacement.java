@@ -55,4 +55,10 @@ public class MekSensorReplacement extends ReplacementItem {
         }
         return super.checkFixable();
     }
+
+    @Override
+    public boolean sameAs(WorkItem task) {
+        return (task instanceof MekSensorReplacement
+                && ((MekSensorReplacement)task).getUnitId() == this.getUnitId());
+    }
 }

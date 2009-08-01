@@ -234,4 +234,12 @@ public abstract class WorkItem implements Serializable {
         this.mode = i;
     }
     
+    /**
+     * checks whether the passed WorkItem is the same. This is used to check whether a reloaded unit's 
+     * WorkItems should inherit some conditions from prior WorkItems
+     * @param task
+     * @return
+     */
+    public abstract boolean sameAs(WorkItem task);
+    
 }

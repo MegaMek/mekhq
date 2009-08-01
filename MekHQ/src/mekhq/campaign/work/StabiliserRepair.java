@@ -51,5 +51,16 @@ public class StabiliserRepair extends RepairItem {
             //TODO: no method in Tank to remove stabilizer hit
         }
     }
+    
+    public int getLoc() {
+        return loc;
+    }
+
+    @Override
+    public boolean sameAs(WorkItem task) {
+        return (task instanceof StabiliserRepair
+                && ((StabiliserRepair)task).getUnitId() == this.getUnitId()
+                && ((StabiliserRepair)task).getLoc() == this.getLoc());
+    }
 
 }

@@ -43,5 +43,16 @@ class StabiliserReplacement extends ReplacementItem {
     public void fix() {
         //TODO: no method for setting the stabilizerhits to zero in Tank
     }
+    
+    public int getLoc() {
+        return loc;
+    }
+
+    @Override
+    public boolean sameAs(WorkItem task) {
+        return (task instanceof StabiliserReplacement
+                && ((StabiliserReplacement)task).getUnitId() == this.getUnitId()
+                && ((StabiliserReplacement)task).getLoc() == this.getLoc());
+    }
 
 }

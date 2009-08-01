@@ -56,4 +56,11 @@ public class MekEngineReplacement extends ReplacementItem {
         return super.checkFixable();
     }
 
+    @Override
+    public boolean sameAs(WorkItem task) {
+        return (task instanceof MekEngineReplacement
+                && ((MekEngineReplacement)task).getUnitId() == this.getUnitId());
+        
+    }
+
 }

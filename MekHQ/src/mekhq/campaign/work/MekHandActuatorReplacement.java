@@ -40,4 +40,11 @@ public class MekHandActuatorReplacement extends MekActuatorReplacement {
     public void fix() {
         unit.getEntity().removeCriticals(loc, new CriticalSlot(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_HAND));
     }
+
+    @Override
+    public boolean sameAs(WorkItem task) {
+        return (task instanceof MekHandActuatorReplacement
+                && ((MekHandActuatorReplacement)task).getUnitId() == this.getUnitId()
+                && ((MekHandActuatorReplacement)task).getLoc() == this.getLoc());
+    }
 }

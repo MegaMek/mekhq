@@ -46,4 +46,8 @@ public abstract class MekActuatorReplacement extends ReplacementItem {
         }
         return super.checkFixable();
     }
+    
+    public int getLoc() {
+        return loc;
+    }
 }

@@ -45,4 +45,11 @@ public class MekHandActuatorRepair extends MekActuatorRepair {
     public WorkItem replace() {
         return new MekHandActuatorReplacement(unit, loc);
     }
+
+    @Override
+    public boolean sameAs(WorkItem task) {
+        return (task instanceof MekHandActuatorRepair
+                && ((MekHandActuatorRepair)task).getUnitId() == this.getUnitId()
+                && ((MekHandActuatorRepair)task).getLoc() == this.getLoc());
+    }
 }

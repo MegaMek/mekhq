@@ -56,4 +56,10 @@ public class MekLifeSupportReplacement extends ReplacementItem {
         return super.checkFixable();
     }
 
+    @Override
+    public boolean sameAs(WorkItem task) {
+        return (task instanceof MekLifeSupportReplacement
+                && ((MekLifeSupportReplacement)task).getUnitId() == this.getUnitId());
+    }
+
 }

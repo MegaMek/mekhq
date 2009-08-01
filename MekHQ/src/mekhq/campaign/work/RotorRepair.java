@@ -49,4 +49,10 @@ public class RotorRepair extends RepairItem {
         }
     }
 
+    @Override
+    public boolean sameAs(WorkItem task) {
+        return (task instanceof RotorRepair
+                && ((RotorRepair)task).getUnitId() == this.getUnitId());
+    }
+
 }

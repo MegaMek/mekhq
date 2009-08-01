@@ -83,4 +83,15 @@ public class EquipmentReplacement extends ReplacementItem {
         }
         return super.checkFixable();
     }
+    
+    public Mounted getMounted() {
+        return mounted;
+    }
+
+    @Override
+    public boolean sameAs(WorkItem task) {
+        return (task instanceof EquipmentReplacement
+                && ((EquipmentReplacement)task).getUnitId() == this.getUnitId()
+                && ((EquipmentReplacement)task).getUnit().getEntity().getEquipmentNum(((EquipmentReplacement)task).getMounted()) == unit.getEntity().getEquipmentNum(mounted));
+    }
 }

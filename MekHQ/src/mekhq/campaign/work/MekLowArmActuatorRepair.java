@@ -46,4 +46,11 @@ public class MekLowArmActuatorRepair extends MekActuatorRepair {
         return new MekLowArmActuatorReplacement(unit, loc);
     }
 
+    @Override
+    public boolean sameAs(WorkItem task) {
+        return (task instanceof MekLowArmActuatorRepair
+                && ((MekLowArmActuatorRepair)task).getUnitId() == this.getUnitId()
+                && ((MekLowArmActuatorRepair)task).getLoc() == this.getLoc());
+    }
+
 }

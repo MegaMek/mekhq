@@ -35,7 +35,4 @@ public class AmmoBinReplacement extends EquipmentReplacement {
         this.time = 120;
         this.difficulty = -2;
     }
-    
-    
-    
 }

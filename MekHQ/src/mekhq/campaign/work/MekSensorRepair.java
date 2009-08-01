@@ -65,4 +65,10 @@ public class MekSensorRepair extends RepairItem {
         return super.checkFixable();
     }
 
+    @Override
+    public boolean sameAs(WorkItem task) {
+        return (task instanceof MekSensorRepair
+                && ((MekSensorRepair)task).getUnitId() == this.getUnitId());
+    }
+
 }

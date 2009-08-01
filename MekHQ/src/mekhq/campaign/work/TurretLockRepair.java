@@ -50,4 +50,10 @@ public class TurretLockRepair extends RepairItem {
         }
     }
 
+    @Override
+    public boolean sameAs(WorkItem task) {
+        return (task instanceof TurretLockRepair
+                && ((TurretLockRepair)task).getUnitId() == this.getUnitId());
+    }
+
 }

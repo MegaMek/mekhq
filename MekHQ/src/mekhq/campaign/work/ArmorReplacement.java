@@ -64,4 +64,15 @@ public class ArmorReplacement extends ReplacementItem {
         }
         return super.checkFixable();
     }
+    
+    public int getLoc() {
+        return loc;
+    }
+
+    @Override
+    public boolean sameAs(WorkItem task) {
+        return (task instanceof ArmorReplacement 
+                && ((ArmorReplacement)task).getUnitId() == this.getUnitId()
+                && ((ArmorReplacement)task).getLoc() == this.getLoc());
+    }
 }

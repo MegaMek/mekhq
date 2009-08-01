@@ -48,4 +48,11 @@ public class VeeInternalRepair extends InternalRepair {
         }
         return(this);
     }
+
+    @Override
+    public boolean sameAs(WorkItem task) {
+        return (task instanceof VeeInternalRepair
+                && ((VeeInternalRepair)task).getUnitId() == this.getUnitId()
+                && ((VeeInternalRepair)task).getLoc() == this.getLoc());
+    }
 }

@@ -1,6 +1,9 @@
 VERSION HISTORY
 ----------------------------------
 v0.1.1 (SVN)
++ WorkItem#sameAs method for determining whether a work item refers to the same component (and tons of overrides)
++ transfer skill min requirements from old tasks to new tasks when reloading units
++ reassign tasks when reloading units
 + refresh pilot when reloading units
 + load unit method now will reload entities for existing units rather than making duplicates (partial)
 + removed assignedTasks arrayList from SupportTeam (all Team assignment information is held by WorkItem)

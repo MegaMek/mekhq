@@ -21,8 +21,6 @@
 
 package mekhq.campaign.work;
 
-import mekhq.campaign.Campaign;
-import mekhq.campaign.team.SupportTeam;
 import mekhq.campaign.Unit;
 
 /**

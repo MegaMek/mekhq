@@ -40,5 +40,12 @@ public class MekUpLegActuatorReplacement extends MekActuatorReplacement {
     public void fix() {
         unit.getEntity().removeCriticals(loc, new CriticalSlot(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_UPPER_LEG));
     }
+
+    @Override
+    public boolean sameAs(WorkItem task) {
+        return (task instanceof MekUpLegActuatorReplacement
+                && ((MekUpLegActuatorReplacement)task).getUnitId() == this.getUnitId()
+                && ((MekUpLegActuatorReplacement)task).getLoc() == this.getLoc());
+    }
     
 }

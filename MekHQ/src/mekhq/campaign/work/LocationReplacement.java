@@ -50,6 +50,17 @@ public class LocationReplacement extends ReplacementItem {
             unit.getEntity().removeCriticals(loc, new CriticalSlot(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_SHOULDER));
         }
     }
+    
+    public int getLoc() {
+        return loc;
+    }
+
+    @Override
+    public boolean sameAs(WorkItem task) {
+        return (task instanceof LocationReplacement
+                && ((LocationReplacement)task).getUnitId() == this.getUnitId()
+                && ((LocationReplacement)task).getLoc() == this.getLoc());
+    }
 
     
 }

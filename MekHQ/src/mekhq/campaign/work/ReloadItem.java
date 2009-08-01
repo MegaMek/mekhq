@@ -107,4 +107,11 @@ public class ReloadItem extends UnitWorkItem {
     public Mounted getMounted() {
         return mounted;
     }
+
+    @Override
+    public boolean sameAs(WorkItem task) {
+        return (task instanceof ReloadItem
+                && ((ReloadItem)task).getUnitId() == this.getUnitId()
+                && ((ReloadItem)task).getUnit().getEntity().getEquipmentNum(((ReloadItem)task).getMounted()) == unit.getEntity().getEquipmentNum(mounted));
+    }
 }

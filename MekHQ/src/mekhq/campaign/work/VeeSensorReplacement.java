@@ -43,4 +43,10 @@ public class VeeSensorReplacement extends ReplacementItem {
             ((Tank)unit.getEntity()).setSensorHits(0);
         }
     }
+
+    @Override
+    public boolean sameAs(WorkItem task) {
+        return (task instanceof VeeSensorReplacement
+                && ((VeeSensorReplacement)task).getUnitId() == this.getUnitId());
+    }
 }
