@@ -1,5 +1,5 @@
 /*
- * ReplacementItem.java
+ * Part.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -19,21 +19,33 @@
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq.campaign.work;
+package mekhq.campaign.parts;
 
-import mekhq.campaign.Unit;
-import mekhq.campaign.parts.Part;
+import java.io.Serializable;
+import mekhq.campaign.work.ReplacementItem;
 
 /**
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public abstract class ReplacementItem extends UnitWorkItem {
-
-    protected Part part;
+public abstract class Part implements Serializable {
     
-    public ReplacementItem(Unit unit) {
-        super(unit);
+    protected String name;
+    protected int id;
+    protected boolean salvage;
+    
+    public Part(boolean salvage) {
+        this.name = "Unknown";
+        this.salvage = salvage;      
     }
     
+    public void setId(int id) {
+        this.id = id;
+    }
+    
+    public int getId() {
+        return id;
+    }
+    
+    public abstract boolean canBeUsedBy(ReplacementItem task);
 }

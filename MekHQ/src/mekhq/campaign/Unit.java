@@ -410,4 +410,16 @@ public class Unit implements Serializable {
         }
     }
     
+    public boolean canDeploy() {
+        //can't deploy if you are already deployed
+        if(isDeployed()) {
+            return false;
+        }
+        //cant deploy with no pilot
+        if(!hasPilot()) {
+            return false;
+        }
+        return true;
+    }
+    
 }

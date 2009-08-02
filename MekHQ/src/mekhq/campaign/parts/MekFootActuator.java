@@ -1,5 +1,5 @@
 /*
- * ReplacementItem.java
+ * MekFootActuator.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -19,21 +19,25 @@
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq.campaign.work;
+package mekhq.campaign.parts;
 
-import mekhq.campaign.Unit;
-import mekhq.campaign.parts.Part;
+import mekhq.campaign.work.MekFootActuatorReplacement;
+import mekhq.campaign.work.ReplacementItem;
 
 /**
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public abstract class ReplacementItem extends UnitWorkItem {
+public class MekFootActuator extends MekActuator {
 
-    protected Part part;
-    
-    public ReplacementItem(Unit unit) {
-        super(unit);
+    public MekFootActuator(boolean salvage, float ton) {
+        super(salvage, ton);
+        this.name = "Foot Actuator";
     }
     
+    @Override
+    public boolean canBeUsedBy(ReplacementItem task) {
+        return task instanceof MekFootActuatorReplacement && tonnage == ((MekFootActuatorReplacement)task).getUnit().getEntity().getWeight();
+    }
+
 }

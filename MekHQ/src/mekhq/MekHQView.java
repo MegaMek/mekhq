@@ -946,7 +946,7 @@ protected void saveListFile() {
     ArrayList<Unit> toDeploy = new ArrayList<Unit>();
     for(int i : UnitTable.getSelectedRows()) {
         Unit u = campaign.getUnits().get(i);
-        if(u.hasPilot() && null != u.getEntity()) {
+        if(null != u.getEntity() && u.canDeploy()) {
             chosen.add(u.getEntity());
             toDeploy.add(u);
         }

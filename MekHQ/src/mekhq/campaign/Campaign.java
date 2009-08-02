@@ -32,6 +32,7 @@ import megamek.common.Entity;
 
 import megamek.common.Game;
 import megamek.common.Mounted;
+import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PilotPerson;
 import mekhq.campaign.personnel.SupportPerson;
@@ -61,11 +62,14 @@ public class Campaign implements Serializable {
     private Hashtable<Integer, WorkItem> taskIds = new Hashtable<Integer, WorkItem>();
     private ArrayList<Person> personnel = new ArrayList<Person>();
     private Hashtable<Integer, Person> personnelIds = new Hashtable<Integer, Person>();
+    private ArrayList<Part> parts = new ArrayList<Part>();
+    private Hashtable<Integer, Part> partIds = new Hashtable<Integer, Part>();
     
     private int lastTeamId;
     private int lastUnitId;
     private int lastTaskId;
     private int lastPersonId;
+    private int lastPartId;
     
     //I need to put a basic game object in campaign so that I can
     //asssign it to the entities, otherwise some entity methods may get NPE
@@ -238,6 +242,26 @@ public class Campaign implements Serializable {
     public Person getPerson(int id) {
         return personnelIds.get(new Integer(id));
     }
+    
+    public void addPart(Part p) {
+        int id = lastPartId + 1;
+        p.setId(id);
+        parts.add(p);
+        partIds.put(new Integer(id), p);
+        lastPartId = id;
+    }
+    
+    /**
+     * @return an <code>ArrayList</code> of SupportTeams in the campaign
+     */
+    public ArrayList<Part> getParts() {
+        return parts;
+    }
+    
+    public Part getPart(int id) {
+        return partIds.get(new Integer(id));
+    }
+    
     
     public ArrayList<String> getCurrentReport() {
         return currentReport;

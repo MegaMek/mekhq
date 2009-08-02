@@ -1,5 +1,5 @@
 /*
- * ReplacementItem.java
+ * MekActuator.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -19,21 +19,19 @@
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq.campaign.work;
-
-import mekhq.campaign.Unit;
-import mekhq.campaign.parts.Part;
+package mekhq.campaign.parts;
 
 /**
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public abstract class ReplacementItem extends UnitWorkItem {
+public abstract class MekActuator extends Part {
 
-    protected Part part;
+    protected float tonnage;
     
-    public ReplacementItem(Unit unit) {
-        super(unit);
+    public MekActuator(boolean salvage, float ton) {
+        super(salvage);
+        this.tonnage = ton;
     }
     
 }
