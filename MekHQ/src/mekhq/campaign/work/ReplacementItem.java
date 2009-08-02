@@ -49,6 +49,18 @@ public abstract class ReplacementItem extends UnitWorkItem {
         return null != part;
     }
     
+    /**
+     * uses the part and if this depletes the part, returns true
+     * @return
+     */
+    public boolean useUpPart() {
+        if(!hasPart()) {
+            return false;
+        }
+        this.part = null;
+        return true;
+    }
+    
     @Override
     public TargetRoll getAllMods() {
         TargetRoll target = super.getAllMods();

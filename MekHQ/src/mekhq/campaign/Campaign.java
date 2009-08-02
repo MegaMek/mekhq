@@ -382,9 +382,10 @@ public class Campaign implements Serializable {
          if(task.isCompleted()) {
              if(task instanceof ReplacementItem) {
                  ReplacementItem replacement = (ReplacementItem)task;
+                 Part part = replacement.getPart();
                 //remove parts
-                 if(replacement.hasPart()) {
-                     removePart(replacement.getPart());
+                 if(replacement.useUpPart()) {
+                     removePart(part);
                  }
              }
              removeTask(task);

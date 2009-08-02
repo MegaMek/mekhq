@@ -24,6 +24,7 @@ package mekhq.campaign.team;
 import mekhq.campaign.*;
 import java.io.Serializable;
 import megamek.common.TargetRoll;
+import mekhq.campaign.parts.Part;
 import mekhq.campaign.work.PersonnelWorkItem;
 import mekhq.campaign.work.RepairItem;
 import mekhq.campaign.work.ReplacementItem;
@@ -275,10 +276,14 @@ public abstract class SupportTeam implements Serializable {
                    campaign.mutateTask(task, ((RepairItem)task).replace());
                    report = report + "<br><emph><b>Item cannot be repaired, it must be replaced instead.</b></emph>";
                } else if(task instanceof ReplacementItem) {
-                   //TODO: destroy component, but parts no implemented yet
-                   report = report + "<br><emph><b>Component destroyed!</b></emph>";
-                   //reset the skill min counter back to green
-                   task.setSkillMin(EXP_GREEN);
+                   ReplacementItem replacement = (ReplacementItem)task;
+                   Part part = replacement.getPart();
+                   if(replacement.useUpPart()) {
+                       campaign.removePart(part);
+                       report = report + "<br><emph><b>Component destroyed!</b></emph>";
+                       //reset the skill min counter back to green
+                       task.setSkillMin(EXP_GREEN);
+                   }
                }
            }
        }
