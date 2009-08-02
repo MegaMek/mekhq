@@ -402,8 +402,11 @@ public class Unit implements Serializable {
     
     public void setDeployed(boolean b) {
         this.deployed = b;
-        if(null != pilot && deployed) {
-            pilot.setDeployed(true);
+        if(deployed) {
+            setSite(SITE_FIELD);
+            if(null != pilot) {
+                pilot.setDeployed(true);
+            }
         }
     }
     

@@ -25,6 +25,7 @@ import megamek.common.CriticalSlot;
 import megamek.common.Mounted;
 import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
+import megamek.common.WeaponType;
 import mekhq.campaign.Unit;
 
 /**
@@ -40,6 +41,9 @@ public class EquipmentReplacement extends ReplacementItem {
         this.mounted = m;
         this.name = "Replace " + m.getType().getName() + " (" + unit.getEntity().getLocationName(m.getLocation()) + ")";
         this.time = 120;
+        if(m.getType() instanceof WeaponType && unit.getEntity().getQuirks().booleanOption("mod_weapons")) {
+            this.time = 60;
+        }
         this.difficulty = 0;
     }
     

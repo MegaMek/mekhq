@@ -34,8 +34,6 @@ import mekhq.campaign.Utilities;
 public class ReloadItem extends UnitWorkItem {
 
     protected Mounted mounted;
-    //protected AmmoType atype;
-    //protected AmmoType orig_atype;
     protected boolean swap;
     protected long munition;
     
@@ -52,6 +50,9 @@ public class ReloadItem extends UnitWorkItem {
         this.time = 15;
         if(unit.getEntity().isOmni()) {
             this.time = 8;
+        }
+        if(unit.getEntity().getQuirks().booleanOption("fast_reload")) {
+            time = (int)Math.round(time / 2.0);
         }
         this.difficulty = TargetRoll.AUTOMATIC_SUCCESS;
     }
@@ -100,6 +101,9 @@ public class ReloadItem extends UnitWorkItem {
         }
         if(swap) {
             factor *= 2.0;
+        }
+        if(unit.getEntity().getQuirks().booleanOption("fast_reload")) {
+            factor = factor / 2.0;
         }
         return factor;
     }

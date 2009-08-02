@@ -55,6 +55,12 @@ public abstract class UnitWorkItem extends WorkItem {
     public TargetRoll getAllMods() {
         TargetRoll mods = super.getAllMods();
         mods.append(unit.getSiteMod());
+        if(unit.getEntity().getQuirks().booleanOption("easy_maintain")) {
+            mods.addModifier(-1, "easy to maintain");
+        }
+        else if(unit.getEntity().getQuirks().booleanOption("difficult_maintain")) {
+            mods.addModifier(1, "difficult to maintain");
+        }
         return mods;
     }
 }

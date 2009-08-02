@@ -1,6 +1,10 @@
 VERSION HISTORY
 ----------------------------------
 v0.1.1 (SVN)
++ modular weapons quirk
++ fast reload quirk
++ difficult to maintain quirk mod
++ easy to maintain quirk mod
 + experimental component modifier
 + overtime work
 + Combat Loss menu item in Unit popup menu for deployed units

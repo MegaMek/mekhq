@@ -21,6 +21,7 @@
 
 package mekhq.campaign.work;
 
+import megamek.common.TargetRoll;
 import mekhq.campaign.Unit;
 
 /**
