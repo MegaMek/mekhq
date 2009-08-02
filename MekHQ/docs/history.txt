@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.1.1 (SVN)
++ more parts and check for parts in ReplacementItem
 + Unit#canDeploy
 + start of Parts package
 + modular weapons quirk

@@ -1,5 +1,5 @@
 /*
- * Part.java
+ * MekUpLegActuator.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -21,35 +21,23 @@
 
 package mekhq.campaign.parts;
 
-import java.io.Serializable;
+import mekhq.campaign.work.MekUpLegActuatorReplacement;
 import mekhq.campaign.work.ReplacementItem;
 
 /**
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public abstract class Part implements Serializable {
-    
-    protected String name;
-    protected int id;
-    protected boolean salvage;
-    
-    public Part(boolean salvage) {
-        this.name = "Unknown";
-        this.salvage = salvage;      
+public class MekUpLegActuator extends MekActuator {
+
+    public MekUpLegActuator(boolean salvage, float ton) {
+        super(salvage, ton);
+        this.name = "Upper Leg Actuator";
     }
     
-    public void setId(int id) {
-        this.id = id;
+    @Override
+    public boolean canBeUsedBy(ReplacementItem task) {
+        return task instanceof MekUpLegActuatorReplacement && tonnage == ((MekUpLegActuatorReplacement)task).getUnit().getEntity().getWeight();
     }
     
-    public int getId() {
-        return id;
-    }
-    
-    public boolean isSalvage() {
-        return salvage;
-    }
-    
-    public abstract boolean canBeUsedBy(ReplacementItem task);
 }

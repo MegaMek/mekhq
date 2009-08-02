@@ -21,6 +21,7 @@
 
 package mekhq.campaign.work;
 
+import megamek.common.TargetRoll;
 import mekhq.campaign.Unit;
 import mekhq.campaign.parts.Part;
 
@@ -36,4 +37,24 @@ public abstract class ReplacementItem extends UnitWorkItem {
         super(unit);
     }
     
+    public Part getPart() {
+        return part;
+    }
+    
+    public void setPart(Part part) {
+        this.part = part;
+    }
+    
+    public boolean hasPart() {
+        return null != part;
+    }
+    
+    @Override
+    public TargetRoll getAllMods() {
+        TargetRoll target = super.getAllMods();
+        if(null != part && part.isSalvage()) {
+            target.addModifier(1, "salvaged part");
+        }
+        return target;
+    }
 }

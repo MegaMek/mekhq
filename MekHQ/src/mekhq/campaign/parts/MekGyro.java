@@ -1,5 +1,5 @@
 /*
- * Part.java
+ * MekGyro.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -21,35 +21,31 @@
 
 package mekhq.campaign.parts;
 
-import java.io.Serializable;
+import megamek.common.Mech;
+import mekhq.campaign.work.MekGyroReplacement;
 import mekhq.campaign.work.ReplacementItem;
 
 /**
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public abstract class Part implements Serializable {
+public class MekGyro extends Part {
+
+    protected int type;
+    protected float tonnage;
     
-    protected String name;
-    protected int id;
-    protected boolean salvage;
-    
-    public Part(boolean salvage) {
-        this.name = "Unknown";
-        this.salvage = salvage;      
+    public MekGyro(boolean salvage, int type, float ton) {
+        super(salvage);
+        this.type = type;
+        this.tonnage = ton;
+        this.name = Mech.getGyroTypeString(type);
     }
     
-    public void setId(int id) {
-        this.id = id;
+    @Override
+    public boolean canBeUsedBy(ReplacementItem task) {
+        return (task instanceof MekGyroReplacement 
+                && ((MekGyroReplacement)task).getUnit().getEntity().getGyroType() == type
+                && tonnage == ((MekGyroReplacement)task).getUnit().getEntity().getWeight());
     }
-    
-    public int getId() {
-        return id;
-    }
-    
-    public boolean isSalvage() {
-        return salvage;
-    }
-    
-    public abstract boolean canBeUsedBy(ReplacementItem task);
+
 }

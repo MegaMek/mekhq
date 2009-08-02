@@ -31,13 +31,17 @@ import java.util.Hashtable;
 import megamek.common.Entity;
 
 import megamek.common.Game;
+import megamek.common.Mech;
 import megamek.common.Mounted;
+import mekhq.campaign.parts.MekGyro;
+import mekhq.campaign.parts.MekUpArmActuator;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PilotPerson;
 import mekhq.campaign.personnel.SupportPerson;
 import mekhq.campaign.team.MedicalTeam;
 import mekhq.campaign.team.TechTeam;
+import mekhq.campaign.work.MekGyroReplacement;
 import mekhq.campaign.work.ReloadItem;
 import mekhq.campaign.work.UnitWorkItem;
 import mekhq.campaign.work.WorkItem;
@@ -89,6 +93,7 @@ public class Campaign implements Serializable {
         calendar = new GregorianCalendar(3067, Calendar.JANUARY, 1);
         dateFormat = new SimpleDateFormat("EEEE, MMMM d yyyy");
         currentReport.add("<b>" + getDateAsString() + "</b>");
+        addPart(new MekGyro(true, Mech.GYRO_STANDARD, 40));
     
     }
     
@@ -215,6 +220,7 @@ public class Campaign implements Serializable {
         tasks.add(task);
         taskIds.put(new Integer(id), task);
         lastTaskId = id;
+        assignPart(task);
     }
     
     public ArrayList<WorkItem> getTasks() {
@@ -357,6 +363,9 @@ public class Campaign implements Serializable {
      public void mutateTask(WorkItem oldTask, WorkItem newTask) {
          newTask.setId(oldTask.getId());
          taskIds.put(oldTask.getId(), newTask);
+         if(newTask instanceof ReplacementItem) {
+             assignPart(newTask);
+         }
          int index = -1;
          for(WorkItem task : getTasks()) {
              index++;
@@ -371,12 +380,42 @@ public class Campaign implements Serializable {
      public boolean processTask(WorkItem task, SupportTeam team) {
          currentReport.add(team.doAssigned(task));
          if(task.isCompleted()) {
-             tasks.remove(task);
+             if(task instanceof ReplacementItem) {
+                 ReplacementItem replacement = (ReplacementItem)task;
+                //remove parts
+                 if(replacement.hasPart()) {
+                     removePart(replacement.getPart());
+                 }
+             }
+             removeTask(task);
              return true;
          }
          return false;
      }
     
+     /**
+      * loop through all replacement items and assign the best available part if possible
+      * The same part may be assigned to multiple tasks, so rerun this method after each task
+      * is processed
+      */
+     public void assignParts() {
+         for(WorkItem task : getTasks()) {
+             assignPart(task);
+         }
+     }
+     
+     public void assignPart(WorkItem task) {
+         if(task instanceof ReplacementItem) {
+             ReplacementItem replacement = (ReplacementItem)task;
+             for(Part part : getParts()) {
+                 if(part.canBeUsedBy(replacement)) {
+                     replacement.setPart(part);
+                     break;
+                 }
+             }
+         }
+     }
+     
     public void newDay() {
          for(SupportTeam team : getTeams()) {
             team.resetMinutesLeft();
@@ -416,8 +455,7 @@ public class Campaign implements Serializable {
         //remove any tasks associated with this unit
 
         for(WorkItem task : getTasksForUnit(id)) {
-            tasks.remove(task);
-            taskIds.remove(new Integer(task.getId()));
+            removeTask(task);
         }
           
         //remove the pilot from this unit
@@ -426,6 +464,17 @@ public class Campaign implements Serializable {
         //finally remove the unit
         units.remove(unit);
         unitIds.remove(new Integer(unit.getId()));      
+    }
+    
+    public void removePart(Part part) {
+        parts.remove(part);
+        partIds.remove(new Integer(part.getId()));
+        assignParts();
+    }
+    
+    public void removeTask(WorkItem task) {
+        tasks.remove(task);
+        taskIds.remove(new Integer(task.getId()));
     }
     
     /**
