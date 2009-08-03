@@ -64,6 +64,7 @@ import megamek.common.Mounted;
 import megamek.common.TargetRoll;
 import mekhq.campaign.Unit;
 import mekhq.campaign.Utilities;
+import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PilotPerson;
 import mekhq.campaign.team.MedicalTeam;
@@ -86,6 +87,7 @@ public class MekHQView extends FrameView {
     private TechTableModel techsModel = new TechTableModel();
     private PersonTableModel personnelModel = new PersonTableModel();
     private DocTableModel doctorsModel = new DocTableModel();
+    private PartsTableModel partsModel = new PartsTableModel();
     private MekTableMouseAdapter unitMouseAdapter;
     private TaskTableMouseAdapter taskMouseAdapter;
     private int currentUnitId;
@@ -93,6 +95,7 @@ public class MekHQView extends FrameView {
     private int currentTechId;
     private int currentPersonId;
     private int currentDoctorId;
+    private int currentPartsId;
     
     public MekHQView(SingleFrameApplication app) {
         super(app);
@@ -196,7 +199,8 @@ public class MekHQView extends FrameView {
         lblTarget = new javax.swing.JLabel();
         lblTargetNum = new javax.swing.JLabel();
         panSupplies = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
+        jScrollPane8 = new javax.swing.JScrollPane();
+        PartsTable = new javax.swing.JTable();
         panPersonnel = new javax.swing.JPanel();
         btnAssignDoc = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
@@ -407,24 +411,33 @@ public class MekHQView extends FrameView {
 
         panSupplies.setName("panSupplies"); // NOI18N
 
-        jLabel1.setText(resourceMap.getString("jLabel1.text")); // NOI18N
-        jLabel1.setName("jLabel1"); // NOI18N
+        jScrollPane8.setName("jScrollPane8"); // NOI18N
+
+        PartsTable.setModel(partsModel);
+        PartsTable.setName("PartsTable"); // NOI18N
+        PartsTable.setRowHeight(60);
+        PartsTable.getColumnModel().getColumn(0).setCellRenderer(partsModel.getRenderer());
+        PartsTable.getSelectionModel().addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                PartsTableValueChanged(evt);
+            }
+        });
+        jScrollPane8.setViewportView(PartsTable);
 
         org.jdesktop.layout.GroupLayout panSuppliesLayout = new org.jdesktop.layout.GroupLayout(panSupplies);
         panSupplies.setLayout(panSuppliesLayout);
         panSuppliesLayout.setHorizontalGroup(
             panSuppliesLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(panSuppliesLayout.createSequentialGroup()
-                .addContainerGap()
-                .add(jLabel1)
-                .addContainerGap(852, Short.MAX_VALUE))
+                .add(jScrollPane8, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 428, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(609, Short.MAX_VALUE))
         );
         panSuppliesLayout.setVerticalGroup(
             panSuppliesLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(panSuppliesLayout.createSequentialGroup()
                 .addContainerGap()
-                .add(jLabel1)
-                .addContainerGap(490, Short.MAX_VALUE))
+                .add(jScrollPane8, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 486, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         tabMain.addTab(resourceMap.getString("panSupplies.TabConstraints.tabTitle"), panSupplies); // NOI18N
@@ -698,6 +711,7 @@ private void btnDoTaskActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
         refreshUnitList();
         refreshTaskList();
         refreshTechsList();
+        refreshPartsList();
         refreshReport();
         if(!completed) {
             row++;
@@ -764,6 +778,16 @@ private void DocTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
         currentDoctorId = -1;
     }
     updateAssignDoctorEnabled();
+}
+
+private void PartsTableValueChanged(javax.swing.event.ListSelectionEvent evt) {                                       
+    int selected = PartsTable.getSelectedRow();
+    if(selected > -1 && selected < campaign.getParts().size()) {
+        currentPartsId = campaign.getParts().get(selected).getId();
+    }
+    else if(selected < 0) {
+        currentPartsId = -1;
+    }
 }
 
 
@@ -895,6 +919,7 @@ private void menuLoadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
     refreshTechsList();
     refreshPersonnelList();
     refreshDoctorsList();
+    refreshPartsList();
     refreshCalendar();
     refreshReport();
 }//GEN-LAST:event_menuLoadActionPerformed
@@ -1034,6 +1059,14 @@ protected void refreshPersonnelList() {
     personnelModel.setData(campaign.getPersonnel());
     if(selected > -1 && selected < campaign.getPersonnel().size()) {
         PersonTable.setRowSelectionInterval(selected, selected);
+    }
+}
+
+protected void refreshPartsList() {
+    int selected = PartsTable.getSelectedRow();
+    partsModel.setData(campaign.getParts());
+    if(selected > -1 && selected < campaign.getParts().size()) {
+        PartsTable.setRowSelectionInterval(selected, selected);
     }
 }
 
@@ -1673,8 +1706,54 @@ public class DocTableModel extends ArrayTableModel {
     }
 }
 
+/**
+ * A table model for displaying parts
+ */
+public class PartsTableModel extends ArrayTableModel {
+
+        public PartsTableModel() {
+            this.columnNames = new String[] {"Parts"};
+            this.data = new ArrayList<Part>();
+        }
+
+        @Override
+        public Object getValueAt(int row, int col) {
+            return ((Part)data.get(row)).getDescHTML();
+        }  
+        
+        public Part getPersonAt(int row) {
+        return (Part)data.get(row);
+    }
+        
+        public PartsTableModel.Renderer getRenderer() {
+        return new PartsTableModel.Renderer();
+    }
+    
+    
+    public class Renderer extends PartInfo implements TableCellRenderer {
+        
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            Component c = this;
+            setOpaque(true);          
+            setText(getValueAt(row, column).toString());
+            //setToolTipText(campaign.getToolTipFor(u));
+            if(isSelected) {
+                //TODO: how do I set this to the user's default selection color?
+                c.setBackground(new Color(253, 117, 28));
+            } else {
+                c.setBackground(new Color(220, 220, 220));
+            }
+            return c;
+        }
+        
+    }
+}
+
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTable DocTable;
+    private javax.swing.JTable PartsTable;
     private javax.swing.JTable PersonTable;
     private javax.swing.JTable TaskTable;
     private javax.swing.JTable TechTable;
@@ -1683,7 +1762,6 @@ public class DocTableModel extends ArrayTableModel {
     private javax.swing.JButton btnAssignDoc;
     private javax.swing.JButton btnDeployUnits;
     private javax.swing.JButton btnDoTask;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
@@ -1692,6 +1770,7 @@ public class DocTableModel extends ArrayTableModel {
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JScrollPane jScrollPane7;
+    private javax.swing.JScrollPane jScrollPane8;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JLabel lblDate;
     private javax.swing.JLabel lblTarget;

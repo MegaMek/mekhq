@@ -51,5 +51,16 @@ public abstract class Part implements Serializable {
         return salvage;
     }
     
+    public String getName() {
+        return name;
+    }
+    
+    public String getDescHTML() {
+        String toReturn = "<html>";
+        toReturn += "<b>" + getName() + "</b><br>";
+        toReturn += "</html>";
+        return toReturn;
+    }
+    
     public abstract boolean canBeUsedBy(ReplacementItem task);
 }
