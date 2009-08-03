@@ -1157,6 +1157,7 @@ public class TaskTableModel extends ArrayTableModel {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             Component c = this;
+            WorkItem task = getTaskAt(row);
             setOpaque(true);          
             setText(getValueAt(row, column).toString());
             //setToolTipText(campaign.getToolTipFor(u));
@@ -1164,7 +1165,11 @@ public class TaskTableModel extends ArrayTableModel {
                 //TODO: how do I set this to the user's default selection color?
                 c.setBackground(new Color(253, 117, 28));
             } else {
-                c.setBackground(new Color(220, 220, 220));
+                if (null != task && task instanceof ReplacementItem && !((ReplacementItem)task).hasPart()) {
+                    c.setBackground(Color.GRAY);
+                } else {
+                    c.setBackground(new Color(220, 220, 220));
+                }
             }
             return c;
         }

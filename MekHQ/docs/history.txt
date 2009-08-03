@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.1.1 (SVN)
++ different color for replacement renderers without parts
 + elite tech failure on replacement destroys part
 + more parts and check for parts in ReplacementItem
 + Unit#canDeploy
