@@ -23,7 +23,6 @@ package mekhq.campaign;
 
 import java.io.Serializable;
 import megamek.common.AmmoType;
-import megamek.common.Compute;
 import megamek.common.CriticalSlot;
 import megamek.common.Entity;
 import megamek.common.Mech;
@@ -54,11 +53,13 @@ public class Unit implements Serializable {
     private int site;
     private boolean deployed;
     private PilotPerson pilot;
+    private boolean salvage;
     
     public Unit(Entity en) {
         this.entity = en;
         this.site = SITE_BAY;
         this.deployed = false;
+        this.salvage = false;
     }
     
     public void setEntity(Entity en) {
@@ -98,6 +99,14 @@ public class Unit implements Serializable {
         }
     }
     
+    public boolean isSalvage() {
+        return salvage;
+    }
+    
+    public void setSalvage(boolean b) {
+        this.salvage = b;
+    }
+    
     /**
      * Is the given location on the entity destroyed?
      * @param loc - an <code>int</code> for the location
@@ -119,6 +128,16 @@ public class Unit implements Serializable {
      * Run a diagnostic on this unit and add WorkItems to the campaign
      */
     public void runDiagnostic(Campaign campaign) {
+        //TODO: I think I may want to switch this all to a more parts-oriented structure
+        //basically each unit would have some hashList of all parts and the parts object would
+        //contain the methods for repair/replacement/salvage, skill min, and so forth. Then the various
+        //work items could be attached to these parts. 
+        
+        
+        if(isSalvage()) {
+            getSalvageableParts(campaign);
+            return;
+        }
         
         //It is somewhat unclear but the language of StratOps implies that even equipment that
         //is "combat destroyed" can be repaired.  For example, a gyro with 2 hits can still be repaired
@@ -299,6 +318,15 @@ public class Unit implements Serializable {
             //put a reload item in for all ammo types, because user may want to swap
             if(m.getShotsLeft() < ((AmmoType)m.getType()).getShots()) {
                 campaign.addWork(new ReloadItem(this, m));
+            }
+        }
+    }
+    
+    public void getSalvageableParts(Campaign campaign) {
+        for(Mounted m : entity.getEquipment()) {
+            //some slots need to be skipped (like armor, endo-steel, etc.)
+            if(m.getType().isHittable()) {
+                campaign.addWork(new EquipmentSalvage(this, m, campaign));
             }
         }
     }

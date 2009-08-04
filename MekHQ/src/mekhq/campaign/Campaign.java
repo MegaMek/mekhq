@@ -34,7 +34,6 @@ import megamek.common.Game;
 import megamek.common.Mech;
 import megamek.common.Mounted;
 import mekhq.campaign.parts.MekGyro;
-import mekhq.campaign.parts.MekUpArmActuator;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PilotPerson;

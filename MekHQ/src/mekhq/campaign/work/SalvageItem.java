@@ -1,5 +1,5 @@
 /*
- * EquipmentPart.java
+ * SalvageItem.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -19,33 +19,30 @@
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq.campaign.parts;
+package mekhq.campaign.work;
 
-import megamek.common.EquipmentType;
-import mekhq.campaign.work.EquipmentReplacement;
-import mekhq.campaign.work.ReplacementItem;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.Unit;
+import mekhq.campaign.parts.Part;
 
 /**
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class EquipmentPart extends Part {
+public abstract class SalvageItem extends UnitWorkItem {
 
-    //crap equipmenttype is not serialized!
-    protected transient EquipmentType type;
+    protected Campaign campaign;
     
-    public EquipmentPart(boolean salvage, EquipmentType et) {
-        super(salvage);
-        this.type = et;
-        this.name = type.getName();
+    public SalvageItem(Unit u, Campaign c) {
+        super(u);
+        this.campaign = c;
     }
     
     @Override
-    public boolean canBeUsedBy(ReplacementItem task) {
-        if(task instanceof EquipmentReplacement) {
-            EquipmentType et = ((EquipmentReplacement)task).getMounted().getType();
-            return type.equals(et);
-        }
-        return false;
+    public void fix() {
+        campaign.addPart(getPart());
     }
+    
+    public abstract Part getPart();
+
 }
