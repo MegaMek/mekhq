@@ -1436,6 +1436,16 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
                     refreshUnitList();
                     refreshTaskList();
                 }
+            } else if (command.equalsIgnoreCase("SALVAGE")) {
+                unit.setSalvage(true);
+                campaign.removeAllTasksFor(unit);
+                unit.runDiagnostic(campaign);
+                refreshUnitList();
+            } else if (command.equalsIgnoreCase("REPAIR")) {
+                unit.setSalvage(false);
+                campaign.removeAllTasksFor(unit);
+                unit.runDiagnostic(campaign);
+                refreshUnitList();
             }
         }
         
@@ -1523,6 +1533,19 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
                 }
                 menu.setEnabled(!unit.isDeployed());
                 popup.add(menu);
+                if(unit.isSalvage()) {
+                    menuItem = new JMenuItem("Repair");
+                    menuItem.setActionCommand("REPAIR");
+                    menuItem.addActionListener(this);
+                    menuItem.setEnabled(!unit.isDeployed());
+                    popup.add(menuItem);
+                } else {
+                    menuItem = new JMenuItem("Salvage");
+                    menuItem.setActionCommand("SALVAGE");
+                    menuItem.addActionListener(this);
+                    menuItem.setEnabled(!unit.isDeployed());
+                    popup.add(menuItem);
+                }
                 //remove pilot
                 popup.addSeparator();
                 menuItem = new JMenuItem("Remove pilot");

@@ -31,16 +31,13 @@ import java.util.Hashtable;
 import megamek.common.Entity;
 
 import megamek.common.Game;
-import megamek.common.Mech;
 import megamek.common.Mounted;
-import mekhq.campaign.parts.MekGyro;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PilotPerson;
 import mekhq.campaign.personnel.SupportPerson;
 import mekhq.campaign.team.MedicalTeam;
 import mekhq.campaign.team.TechTeam;
-import mekhq.campaign.work.MekGyroReplacement;
 import mekhq.campaign.work.ReloadItem;
 import mekhq.campaign.work.UnitWorkItem;
 import mekhq.campaign.work.WorkItem;
@@ -92,8 +89,6 @@ public class Campaign implements Serializable {
         calendar = new GregorianCalendar(3067, Calendar.JANUARY, 1);
         dateFormat = new SimpleDateFormat("EEEE, MMMM d yyyy");
         currentReport.add("<b>" + getDateAsString() + "</b>");
-        addPart(new MekGyro(true, Mech.GYRO_STANDARD, 40));
-    
     }
     
     /**
@@ -450,13 +445,17 @@ public class Campaign implements Serializable {
         
     }
     
+    public void removeAllTasksFor(Unit unit) {
+        for(WorkItem task : getTasksForUnit(unit.getId())) {
+            removeTask(task);
+        }
+    }
+    
     public void removeUnit(int id) {
         Unit unit = getUnit(id);
         //remove any tasks associated with this unit
 
-        for(WorkItem task : getTasksForUnit(id)) {
-            removeTask(task);
-        }
+        removeAllTasksFor(unit);
           
         //remove the pilot from this unit
         unit.removePilot();

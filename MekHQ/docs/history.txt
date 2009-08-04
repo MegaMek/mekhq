@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.1.1 (SVN)
++ salvage/repair switch in Unit context menu
 + isRepairable checks to Unit#runDiagnostic
 + updated MegaMek.jar
 + abstract salvage item

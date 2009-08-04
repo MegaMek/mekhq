@@ -502,6 +502,9 @@ public class Unit implements Serializable {
         if(!hasPilot()) {
             return false;
         }
+        if(isSalvage()) {
+            return false;
+        }
         return true;
     }
     

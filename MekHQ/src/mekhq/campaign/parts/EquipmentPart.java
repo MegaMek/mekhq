@@ -37,7 +37,7 @@ public class EquipmentPart extends Part {
     public EquipmentPart(boolean salvage, EquipmentType et) {
         super(salvage);
         this.type = et;
-        this.name = type.getName();
+        this.name = type.getDesc();
     }
     
     @Override
