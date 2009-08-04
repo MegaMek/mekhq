@@ -24,6 +24,8 @@ package mekhq.campaign.work;
 import mekhq.campaign.Unit;
 import megamek.common.CriticalSlot;
 import megamek.common.Mech;
+import mekhq.campaign.parts.MekFootActuator;
+import mekhq.campaign.parts.Part;
 
 /**
  *
@@ -46,6 +48,11 @@ public class MekFootActuatorReplacement extends MekActuatorReplacement {
         return (task instanceof MekFootActuatorReplacement
                 && ((MekFootActuatorReplacement)task).getUnitId() == this.getUnitId()
                 && ((MekFootActuatorReplacement)task).getLoc() == this.getLoc());
+    }
+
+    @Override
+    public Part partNeeded() {
+        return new MekFootActuator(false, unit.getEntity().getWeight());
     }
 
 }

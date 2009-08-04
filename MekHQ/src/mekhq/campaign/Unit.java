@@ -210,7 +210,7 @@ public class Unit implements Serializable {
             if(entity instanceof Tank) {
                 Tank tank = (Tank)entity;
                 if(tank.isStabiliserHit(i)) {
-                    campaign.addWork(new StabiliserRepair(this, i));
+                    campaign.addWork(new VeeStabiliserRepair(this, i));
                 }
             }
         }//end location checks
@@ -422,4 +422,27 @@ public class Unit implements Serializable {
         return true;
     }
     
+    public boolean hasEndosteel() {
+        for (Mounted mEquip : entity.getMisc()) {
+            MiscType mtype = (MiscType) mEquip.getType();
+            if (mtype.hasFlag(MiscType.F_ENDO_STEEL)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * Have to make one here because the one in MegaMek only returns true if operable
+     * @return
+     */
+    public boolean hasTSM() {
+        for (Mounted mEquip : entity.getMisc()) {
+            MiscType mtype = (MiscType) mEquip.getType();
+            if (mtype.hasFlag(MiscType.F_TSM)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

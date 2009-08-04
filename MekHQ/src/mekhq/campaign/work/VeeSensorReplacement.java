@@ -23,6 +23,8 @@ package mekhq.campaign.work;
 
 import megamek.common.Tank;
 import mekhq.campaign.Unit;
+import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.VeeSensor;
 
 /**
  *
@@ -48,5 +50,10 @@ public class VeeSensorReplacement extends ReplacementItem {
     public boolean sameAs(WorkItem task) {
         return (task instanceof VeeSensorReplacement
                 && ((VeeSensorReplacement)task).getUnitId() == this.getUnitId());
+    }
+
+    @Override
+    public Part partNeeded() {
+        return new VeeSensor(false);
     }
 }

@@ -24,6 +24,8 @@ package mekhq.campaign.work;
 import megamek.common.CriticalSlot;
 import megamek.common.Mech;
 import mekhq.campaign.Unit;
+import mekhq.campaign.parts.MekLocation;
+import mekhq.campaign.parts.Part;
 
 /**
  *
@@ -74,6 +76,11 @@ public class LocationReplacement extends ReplacementItem {
         return (task instanceof LocationReplacement
                 && ((LocationReplacement)task).getUnitId() == this.getUnitId()
                 && ((LocationReplacement)task).getLoc() == this.getLoc());
+    }
+
+    @Override
+    public Part partNeeded() {
+        return new MekLocation(false, loc, unit.getEntity().getWeight(), unit.hasEndosteel(), unit.hasTSM());
     }
 
     

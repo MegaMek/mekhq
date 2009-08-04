@@ -24,6 +24,8 @@ package mekhq.campaign.work;
 import megamek.common.CriticalSlot;
 import megamek.common.Mech;
 import mekhq.campaign.Unit;
+import mekhq.campaign.parts.MekUpLegActuator;
+import mekhq.campaign.parts.Part;
 
 /**
  *
@@ -48,4 +50,8 @@ public class MekUpLegActuatorReplacement extends MekActuatorReplacement {
                 && ((MekUpLegActuatorReplacement)task).getLoc() == this.getLoc());
     }
     
+    @Override
+    public Part partNeeded() {
+        return new MekUpLegActuator(false, unit.getEntity().getWeight());
+    }
 }

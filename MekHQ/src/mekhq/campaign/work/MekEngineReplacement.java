@@ -26,6 +26,8 @@ import megamek.common.Mech;
 import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
 import mekhq.campaign.Unit;
+import mekhq.campaign.parts.MekEngine;
+import mekhq.campaign.parts.Part;
 
 /**
  *
@@ -72,6 +74,11 @@ public class MekEngineReplacement extends ReplacementItem {
             target.addModifier(2,"experimental");
         }
         return target;
+    }
+
+    @Override
+    public Part partNeeded() {
+        return new MekEngine(false, unit.getEntity().getEngine());
     }
     
 }

@@ -1,5 +1,5 @@
 /*
- * StabiliserRepair.java
+ * VeeStabiliserReplacement.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -21,35 +21,29 @@
 
 package mekhq.campaign.work;
 
-import megamek.common.Tank;
 import mekhq.campaign.Unit;
+import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.VeeStabiliser;
 
 /**
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class StabiliserRepair extends RepairItem {
+class VeeStabiliserReplacement extends ReplacementItem {
 
     private int loc;
     
-    public StabiliserRepair(Unit unit, int i) {
-        super(unit, 1);
+    public VeeStabiliserReplacement(Unit unit, int i) {
+        super(unit);
         this.loc = i;
-        this.name = "Repair stabilizer (" + unit.getEntity().getLocationName(loc) + ")";
+        this.name =  " Replace stabilizer (" + unit.getEntity().getLocationName(loc) + ")";
         this.time = 60;
-        this.difficulty = 1;
-    }
-    
-    @Override
-    public WorkItem replace() {
-        return new StabiliserReplacement(unit, loc);
+        this.difficulty = 0;
     }
 
     @Override
     public void fix() {
-        if(unit.getEntity() instanceof Tank) {
-            //TODO: no method in Tank to remove stabilizer hit
-        }
+        //TODO: no method for setting the stabilizerhits to zero in Tank
     }
     
     public int getLoc() {
@@ -58,9 +52,14 @@ public class StabiliserRepair extends RepairItem {
 
     @Override
     public boolean sameAs(WorkItem task) {
-        return (task instanceof StabiliserRepair
-                && ((StabiliserRepair)task).getUnitId() == this.getUnitId()
-                && ((StabiliserRepair)task).getLoc() == this.getLoc());
+        return (task instanceof VeeStabiliserReplacement
+                && ((VeeStabiliserReplacement)task).getUnitId() == this.getUnitId()
+                && ((VeeStabiliserReplacement)task).getLoc() == this.getLoc());
+    }
+
+    @Override
+    public Part partNeeded() {
+        return new VeeStabiliser(false);
     }
 
 }

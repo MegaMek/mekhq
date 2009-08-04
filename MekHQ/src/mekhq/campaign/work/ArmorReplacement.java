@@ -25,6 +25,8 @@ import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
 import mekhq.campaign.Unit;
+import mekhq.campaign.parts.Armor;
+import mekhq.campaign.parts.Part;
 
 /**
  *
@@ -86,5 +88,25 @@ public class ArmorReplacement extends ReplacementItem {
             target.addModifier(2,"experimental");
         }
         return target;
+    }
+    
+    @Override
+    public boolean useUpPart() {
+        if(!hasPart()) {
+            return false;
+        }
+        Armor armor = (Armor)part;
+        armor.setAmount(armor.getAmount() - amount);
+        if(armor.getAmount() > 0) {
+            return false;
+        } else {
+            this.part = null;
+            return true;
+        }
+    }
+
+    @Override
+    public Part partNeeded() {
+        return new Armor(false, unit.getEntity().getArmorType(), amount);
     }
 }

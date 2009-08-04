@@ -1,5 +1,5 @@
 /*
- * StabiliserReplacement.java
+ * Turret.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -19,40 +19,30 @@
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq.campaign.work;
+package mekhq.campaign.parts;
 
-import mekhq.campaign.Unit;
+import megamek.common.Tank;
+import mekhq.campaign.work.ReplacementItem;
+import mekhq.campaign.work.TurretReplacement;
 
 /**
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-class StabiliserReplacement extends ReplacementItem {
+public class Turret extends Part {
 
-    private int loc;
+    protected float tonnage;
     
-    public StabiliserReplacement(Unit unit, int i) {
-        super(unit);
-        this.loc = i;
-        this.name =  " Replace stabilizer (" + unit.getEntity().getLocationName(loc) + ")";
-        this.time = 60;
-        this.difficulty = 0;
-    }
-
-    @Override
-    public void fix() {
-        //TODO: no method for setting the stabilizerhits to zero in Tank
+    public Turret(boolean salvage, float ton) {
+        super(salvage);
+        this.tonnage = ton;
+        this.name = "Vehicle Turret";
     }
     
-    public int getLoc() {
-        return loc;
-    }
-
     @Override
-    public boolean sameAs(WorkItem task) {
-        return (task instanceof StabiliserReplacement
-                && ((StabiliserReplacement)task).getUnitId() == this.getUnitId()
-                && ((StabiliserReplacement)task).getLoc() == this.getLoc());
-    }
-
+    public boolean canBeUsedBy(ReplacementItem task) {
+        return task instanceof TurretReplacement 
+                && ((TurretReplacement)task).getUnit().getEntity() instanceof Tank
+                && ((TurretReplacement)task).getUnit().getEntity().getWeight() == tonnage;
+    }  
 }

@@ -1,5 +1,5 @@
 /*
- * ReplacementItem.java
+ * VeeStabiliserRepair.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -21,54 +21,46 @@
 
 package mekhq.campaign.work;
 
-import megamek.common.TargetRoll;
+import megamek.common.Tank;
 import mekhq.campaign.Unit;
-import mekhq.campaign.parts.Part;
 
 /**
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public abstract class ReplacementItem extends UnitWorkItem {
+public class VeeStabiliserRepair extends RepairItem {
 
-    protected Part part;
+    private int loc;
     
-    public ReplacementItem(Unit unit) {
-        super(unit);
-    }
-    
-    public Part getPart() {
-        return part;
-    }
-    
-    public void setPart(Part part) {
-        this.part = part;
-    }
-    
-    public boolean hasPart() {
-        return null != part;
-    }
-    
-    /**
-     * uses the part and if this depletes the part, returns true
-     * @return
-     */
-    public boolean useUpPart() {
-        if(!hasPart()) {
-            return false;
-        }
-        this.part = null;
-        return true;
+    public VeeStabiliserRepair(Unit unit, int i) {
+        super(unit, 1);
+        this.loc = i;
+        this.name = "Repair stabilizer (" + unit.getEntity().getLocationName(loc) + ")";
+        this.time = 60;
+        this.difficulty = 1;
     }
     
     @Override
-    public TargetRoll getAllMods() {
-        TargetRoll target = super.getAllMods();
-        if(null != part && part.isSalvage()) {
-            target.addModifier(1, "salvaged part");
+    public WorkItem replace() {
+        return new VeeStabiliserReplacement(unit, loc);
+    }
+
+    @Override
+    public void fix() {
+        if(unit.getEntity() instanceof Tank) {
+            //TODO: no method in Tank to remove stabilizer hit
         }
-        return target;
     }
     
-    public abstract Part partNeeded();
+    public int getLoc() {
+        return loc;
+    }
+
+    @Override
+    public boolean sameAs(WorkItem task) {
+        return (task instanceof VeeStabiliserRepair
+                && ((VeeStabiliserRepair)task).getUnitId() == this.getUnitId()
+                && ((VeeStabiliserRepair)task).getLoc() == this.getLoc());
+    }
+
 }

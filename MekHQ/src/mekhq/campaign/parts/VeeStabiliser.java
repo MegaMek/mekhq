@@ -1,5 +1,5 @@
 /*
- * TurretReplacement.java
+ * VeeStabiliser.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -19,26 +19,26 @@
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq.campaign.work;
+package mekhq.campaign.parts;
 
-import mekhq.campaign.Unit;
-import mekhq.campaign.parts.Part;
-import mekhq.campaign.parts.Turret;
+import mekhq.campaign.work.ReplacementItem;
 
 /**
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class TurretReplacement extends LocationReplacement {
-    
-    public TurretReplacement(Unit unit, int i) {
-        super(unit, i);
-        this.time = 160;
-        this.difficulty = -1;
+public class VeeStabiliser extends Part {
+
+    public VeeStabiliser(boolean salvage) {
+        super(salvage);
+        this.name = "Vehicle Stabiliser";
     }
     
     @Override
-    public Part partNeeded() {
-        return new Turret(false, unit.getEntity().getWeight());
+    public boolean canBeUsedBy(ReplacementItem task) {
+        //What the hell is going on here?
+        //return task instanceof VeeStabiliserReplacement;
+        return false;
     }
+    
 }

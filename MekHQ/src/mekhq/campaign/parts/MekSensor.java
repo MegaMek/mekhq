@@ -1,5 +1,5 @@
 /*
- * TurretReplacement.java
+ * MekSensor.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -19,26 +19,25 @@
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq.campaign.work;
+package mekhq.campaign.parts;
 
-import mekhq.campaign.Unit;
-import mekhq.campaign.parts.Part;
-import mekhq.campaign.parts.Turret;
+import mekhq.campaign.work.MekSensorReplacement;
+import mekhq.campaign.work.ReplacementItem;
 
 /**
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class TurretReplacement extends LocationReplacement {
-    
-    public TurretReplacement(Unit unit, int i) {
-        super(unit, i);
-        this.time = 160;
-        this.difficulty = -1;
+public class MekSensor extends Part {
+
+     public MekSensor(boolean salvage) {
+        super(salvage);
+        this.name = "Mech Sensors";
     }
     
     @Override
-    public Part partNeeded() {
-        return new Turret(false, unit.getEntity().getWeight());
+    public boolean canBeUsedBy(ReplacementItem task) {
+        return task instanceof MekSensorReplacement;
     }
+
 }

@@ -22,6 +22,8 @@
 package mekhq.campaign.work;
 
 import mekhq.campaign.Unit;
+import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.Rotor;
 
 /**
  *
@@ -33,6 +35,11 @@ public class RotorReplacement extends LocationReplacement {
         super(unit, i);
         this.time = 300;
         this.difficulty = 0;
+    }
+      
+    @Override
+    public Part partNeeded() {
+        return new Rotor(false, unit.getEntity().getWeight());
     }
     
 }

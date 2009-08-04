@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.1.1 (SVN)
++ more parts
 + PartsTable
 + different color for replacement renderers without parts
 + elite tech failure on replacement destroys part

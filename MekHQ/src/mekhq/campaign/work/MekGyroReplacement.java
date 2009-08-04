@@ -24,6 +24,8 @@ package mekhq.campaign.work;
 import megamek.common.CriticalSlot;
 import megamek.common.Mech;
 import mekhq.campaign.Unit;
+import mekhq.campaign.parts.MekGyro;
+import mekhq.campaign.parts.Part;
 
 /**
  *
@@ -47,6 +49,11 @@ public class MekGyroReplacement extends ReplacementItem {
     public boolean sameAs(WorkItem task) {
         return (task instanceof MekGyroReplacement
                 && ((MekGyroReplacement)task).getUnitId() == this.getUnitId());
+    }
+
+    @Override
+    public Part partNeeded() {
+        return new MekGyro(false, unit.getEntity().getGyroType(), unit.getEntity().getWeight());
     }
 
 }

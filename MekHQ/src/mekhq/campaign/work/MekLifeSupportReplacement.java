@@ -24,6 +24,8 @@ package mekhq.campaign.work;
 import megamek.common.CriticalSlot;
 import megamek.common.Mech;
 import mekhq.campaign.Unit;
+import mekhq.campaign.parts.MekLifeSupport;
+import mekhq.campaign.parts.Part;
 
 /**
  *
@@ -60,6 +62,11 @@ public class MekLifeSupportReplacement extends ReplacementItem {
     public boolean sameAs(WorkItem task) {
         return (task instanceof MekLifeSupportReplacement
                 && ((MekLifeSupportReplacement)task).getUnitId() == this.getUnitId());
+    }
+
+    @Override
+    public Part partNeeded() {
+        return new MekLifeSupport(false);
     }
 
 }

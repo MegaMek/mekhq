@@ -1,5 +1,5 @@
 /*
- * TurretReplacement.java
+ * Armor.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -19,26 +19,44 @@
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq.campaign.work;
+package mekhq.campaign.parts;
 
-import mekhq.campaign.Unit;
-import mekhq.campaign.parts.Part;
-import mekhq.campaign.parts.Turret;
+import megamek.common.EquipmentType;
+import mekhq.campaign.work.ArmorReplacement;
+import mekhq.campaign.work.ReplacementItem;
 
 /**
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class TurretReplacement extends LocationReplacement {
+public class Armor extends Part {
+
+    protected int type;
+    protected int amount;
     
-    public TurretReplacement(Unit unit, int i) {
-        super(unit, i);
-        this.time = 160;
-        this.difficulty = -1;
+    public Armor(boolean salvage, int t, int points) {
+        super(false);
+        this.type = t;
+        this.amount = points;
+        this.name = EquipmentType.getArmorTypeName(type);
+    }
+    
+    public int getType() {
+        return type;
+    }
+    
+    public int getAmount() {
+        return amount;
+    }
+    
+    public void setAmount(int a) {
+        this.amount = a;
     }
     
     @Override
-    public Part partNeeded() {
-        return new Turret(false, unit.getEntity().getWeight());
+    public boolean canBeUsedBy(ReplacementItem task) {
+        return task instanceof ArmorReplacement 
+                && ((ArmorReplacement)task).getUnit().getEntity().getArmorType() == type;
     }
+
 }

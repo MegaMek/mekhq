@@ -27,6 +27,8 @@ import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
 import megamek.common.WeaponType;
 import mekhq.campaign.Unit;
+import mekhq.campaign.parts.EquipmentPart;
+import mekhq.campaign.parts.Part;
 
 /**
  *
@@ -109,5 +111,10 @@ public class EquipmentReplacement extends ReplacementItem {
             target.addModifier(2,"experimental");
         }
         return target;
+    }
+
+    @Override
+    public Part partNeeded() {
+        return new EquipmentPart(false, mounted.getType());
     }
 }

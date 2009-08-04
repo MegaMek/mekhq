@@ -24,6 +24,8 @@ package mekhq.campaign.work;
 import megamek.common.CriticalSlot;
 import megamek.common.Mech;
 import mekhq.campaign.Unit;
+import mekhq.campaign.parts.MekSensor;
+import mekhq.campaign.parts.Part;
 
 /**
  *
@@ -60,5 +62,10 @@ public class MekSensorReplacement extends ReplacementItem {
     public boolean sameAs(WorkItem task) {
         return (task instanceof MekSensorReplacement
                 && ((MekSensorReplacement)task).getUnitId() == this.getUnitId());
+    }
+    
+    @Override
+    public Part partNeeded() {
+        return new MekSensor(false);
     }
 }

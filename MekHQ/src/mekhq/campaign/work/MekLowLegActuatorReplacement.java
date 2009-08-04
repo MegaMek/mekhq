@@ -24,6 +24,8 @@ package mekhq.campaign.work;
 import megamek.common.CriticalSlot;
 import megamek.common.Mech;
 import mekhq.campaign.Unit;
+import mekhq.campaign.parts.MekLowLegActuator;
+import mekhq.campaign.parts.Part;
 /**
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
@@ -45,6 +47,11 @@ public class MekLowLegActuatorReplacement extends MekActuatorReplacement {
         return (task instanceof MekLowLegActuatorReplacement
                 && ((MekLowLegActuatorReplacement)task).getUnitId() == this.getUnitId()
                 && ((MekLowLegActuatorReplacement)task).getLoc() == this.getLoc());
+    }
+    
+    @Override
+    public Part partNeeded() {
+        return new MekLowLegActuator(false, unit.getEntity().getWeight());
     }
     
 }
