@@ -55,6 +55,8 @@ public class Unit implements Serializable {
     private PilotPerson pilot;
     private boolean salvage;
     
+    //TODO: need to keep track of what components have been removed from this unit
+    
     public Unit(Entity en) {
         this.entity = en;
         this.site = SITE_BAY;
@@ -128,12 +130,7 @@ public class Unit implements Serializable {
      * Run a diagnostic on this unit and add WorkItems to the campaign
      */
     public void runDiagnostic(Campaign campaign) {
-        //TODO: I think I may want to switch this all to a more parts-oriented structure
-        //basically each unit would have some hashList of all parts and the parts object would
-        //contain the methods for repair/replacement/salvage, skill min, and so forth. Then the various
-        //work items could be attached to these parts. 
-        
-        
+       
         if(isSalvage()) {
             getSalvageableParts(campaign);
             return;
@@ -194,35 +191,71 @@ public class Unit implements Serializable {
                 engineCrits += entity.getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE, i);
                 int sensorHits = entity.getHitCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS, i);
                 if(sensorHits > 0) {
-                    campaign.addWork(new MekSensorRepair(this, sensorHits));
+                    if(entity.isSystemRepairable(Mech.SYSTEM_SENSORS, i)) {
+                        campaign.addWork(new MekSensorRepair(this, sensorHits));
+                    } else {
+                        campaign.addWork(new MekSensorReplacement(this));
+                    } 
                 }
                 int lifeHits = entity.getHitCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_LIFE_SUPPORT, i);
                 if(lifeHits > 0) {
-                    campaign.addWork(new MekLifeSupportRepair(this, lifeHits));
+                    if(entity.isSystemRepairable(Mech.SYSTEM_LIFE_SUPPORT, i)) {
+                        campaign.addWork(new MekLifeSupportRepair(this, lifeHits));
+                    } else {
+                        campaign.addWork(new MekLifeSupportReplacement(this));
+                    }
                 }
                 int gyroHits = entity.getHitCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_GYRO, i);
                 if(gyroHits > 0) {
-                    campaign.addWork(new MekGyroRepair(this, gyroHits));
+                    if(entity.isSystemRepairable(Mech.SYSTEM_GYRO, i)) {
+                        campaign.addWork(new MekGyroRepair(this, gyroHits));
+                    } else {
+                        campaign.addWork(new MekGyroReplacement(this));
+                    }
                 }
                 //check actuators
                 //don't check hips and shoulders because that should be accounted for in location replacement
                 if(entity.getHitCriticals(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_UPPER_ARM, i) > 0) {
-                    campaign.addWork(new MekUpArmActuatorRepair(this, 1, i));
+                    if(entity.isSystemRepairable(Mech.ACTUATOR_UPPER_ARM, i)) {
+                        campaign.addWork(new MekUpArmActuatorRepair(this, 1, i));
+                    } else {
+                        campaign.addWork(new MekUpArmActuatorReplacement(this, i));
+                    }
                 }
                 if(entity.getHitCriticals(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_LOWER_ARM, i) > 0) {
-                    campaign.addWork(new MekLowArmActuatorRepair(this, 1, i));
+                    if(entity.isSystemRepairable(Mech.ACTUATOR_LOWER_ARM, i)) {
+                        campaign.addWork(new MekLowArmActuatorRepair(this, 1, i));
+                    } else {
+                        campaign.addWork(new MekLowArmActuatorReplacement(this, i));
+                    }
                 }
                 if(entity.getHitCriticals(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_HAND, i) > 0) {
-                    campaign.addWork(new MekHandActuatorRepair(this, 1, i));
+                    if(entity.isSystemRepairable(Mech.ACTUATOR_HAND, i)) {
+                        campaign.addWork(new MekHandActuatorRepair(this, 1, i));
+                    } else {
+                        campaign.addWork(new MekHandActuatorReplacement(this, i));
+                    }
                 }
                 if(entity.getHitCriticals(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_UPPER_LEG, i) > 0) {
-                    campaign.addWork(new MekUpLegActuatorRepair(this, 1, i));
+                    if(entity.isSystemRepairable(Mech.ACTUATOR_UPPER_LEG, i)) {
+                        campaign.addWork(new MekUpLegActuatorRepair(this, 1, i));
+                    } else {
+                        campaign.addWork(new MekUpLegActuatorReplacement(this, i));
+                    }
                 }
                 if(entity.getHitCriticals(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_LOWER_LEG, i) > 0) {
-                    campaign.addWork(new MekLowLegActuatorRepair(this, 1, i));
+                    if(entity.isSystemRepairable(Mech.ACTUATOR_LOWER_LEG, i)) {
+                        campaign.addWork(new MekLowLegActuatorRepair(this, 1, i));
+                    } else {
+                        campaign.addWork(new MekLowLegActuatorReplacement(this, i));
+                    }
                 }
                 if(entity.getHitCriticals(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_FOOT, i) > 0) {
-                    campaign.addWork(new MekFootActuatorRepair(this, 1, i));
+                    if(entity.isSystemRepairable(Mech.ACTUATOR_FOOT, i)) {
+                        campaign.addWork(new MekFootActuatorRepair(this, 1, i));
+                    } else {
+                        campaign.addWork(new MekFootActuatorReplacement(this, i));
+                    }
                 }                
             }//end mech check
             
@@ -266,18 +299,39 @@ public class Unit implements Serializable {
                 if(!m.getType().isHittable()) {
                     m.setHit(false);
                     m.setDestroyed(false);
+                    for(int loc = 0; loc < getEntity().locations(); loc++) {
+                        for (int i = 0; i < getEntity().getNumberOfCriticals(loc); i++) {
+                            CriticalSlot slot = getEntity().getCritical(loc, i);
+                            // ignore empty & system slots
+                            if ((slot == null) || (slot.getType() != CriticalSlot.TYPE_EQUIPMENT)) {
+                                continue;
+                            }
+                            if (getEntity().getEquipmentNum(m) == slot.getIndex()) {
+                                slot.setHit(false);
+                                slot.setDestroyed(false);
+                            }
+                        } 
+                    }
                     continue;
                 }
                 
                 //check flags for jump jets and heat sinks because those are handled by their own classes
                 if(m.getType() instanceof MiscType) {
                     if(m.getType().hasFlag(MiscType.F_JUMP_JET)) {
-                        campaign.addWork(new JumpJetRepair(this, 1, m));
+                        if(m.isRepairable()) {
+                            campaign.addWork(new JumpJetRepair(this, 1, m));
+                        } else {
+                            campaign.addWork(new JumpJetReplacement(this, m));
+                        }
                         continue;
                     } 
                     else if(m.getType().hasFlag(MiscType.F_HEAT_SINK) 
                                 || m.getType().hasFlag(MiscType.F_DOUBLE_HEAT_SINK)) {
-                        campaign.addWork(new HeatSinkRepair(this, 1, m));
+                        if(m.isRepairable()) {
+                            campaign.addWork(new HeatSinkRepair(this, 1, m));
+                        } else {
+                            campaign.addWork(new HeatSinkReplacement(this, m));
+                        }
                         continue;
                     } 
                     //leave CASE out for now
@@ -301,7 +355,7 @@ public class Unit implements Serializable {
                 //weird results when units are deployed and then reloaded. This should really be done in MegaMek
                 //with the proper use of setHit and setDestroyed
                 //and added to the MUL file.      
-                if(!m.isDestroyed()) {
+                if(m.isRepairable()) {
                     campaign.addWork(new EquipmentRepair(this, getCrits(m), m));
                 } else {
                     campaign.addWork(new EquipmentReplacement(this, m));
@@ -323,9 +377,10 @@ public class Unit implements Serializable {
     }
     
     public void getSalvageableParts(Campaign campaign) {
+        
         for(Mounted m : entity.getEquipment()) {
             //some slots need to be skipped (like armor, endo-steel, etc.)
-            if(m.getType().isHittable()) {
+            if(m.getType().isHittable() && !m.isDestroyed()) {
                 campaign.addWork(new EquipmentSalvage(this, m, campaign));
             }
         }

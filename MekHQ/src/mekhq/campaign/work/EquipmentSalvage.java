@@ -61,6 +61,7 @@ public class EquipmentSalvage extends SalvageItem {
         campaign.addPart(getPart());
         mounted.setHit(true);
         mounted.setDestroyed(true);
+        mounted.setRepairable(false);
         //I also need to clear the critical slot
         //I think the only way to do this is to loop through all crits and find any that are associated
         //with this equipment
@@ -74,6 +75,7 @@ public class EquipmentSalvage extends SalvageItem {
                 if (unit.getEntity().getEquipmentNum(mounted) == slot.getIndex()) {
                     slot.setHit(true);
                     slot.setDestroyed(true);
+                    slot.setRepairable(false);
                 }
             }
         }

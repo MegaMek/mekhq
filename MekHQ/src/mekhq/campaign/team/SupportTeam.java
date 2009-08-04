@@ -231,7 +231,7 @@ public abstract class SupportTeam implements Serializable {
            return new TargetRoll(TargetRoll.IMPOSSIBLE, "Support team cannot do this kind of task.");
        }
        if(task instanceof ReplacementItem && !((ReplacementItem)task).hasPart()) {
-           return new TargetRoll(TargetRoll.IMPOSSIBLE, "part not available");
+           //return new TargetRoll(TargetRoll.IMPOSSIBLE, "part not available");
        }
        TargetRoll target = getTarget(task.getMode());
        if(target.getValue() == TargetRoll.IMPOSSIBLE) {
