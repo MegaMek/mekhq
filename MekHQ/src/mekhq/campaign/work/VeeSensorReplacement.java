@@ -41,6 +41,7 @@ public class VeeSensorReplacement extends ReplacementItem {
     
     @Override
     public void fix() {
+        super.fix();
         if(unit.getEntity() instanceof Tank) {
             ((Tank)unit.getEntity()).setSensorHits(0);
         }
@@ -55,5 +56,10 @@ public class VeeSensorReplacement extends ReplacementItem {
     @Override
     public Part partNeeded() {
         return new VeeSensor(false);
+    }
+
+    @Override
+    public SalvageItem getSalvage() {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

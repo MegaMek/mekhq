@@ -21,19 +21,22 @@
 
 package mekhq.campaign.work;
 
+import megamek.common.CriticalSlot;
 import mekhq.campaign.Unit;
 
 /**
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public abstract class MekActuatorRepair extends RepairItem {
+public class MekActuatorRepair extends RepairItem {
     
     protected int loc;
+    protected int type;
     
-    MekActuatorRepair(Unit unit, int h, int i) {
+    public MekActuatorRepair(Unit unit, int h, int i, int t) {
         super(unit, h);
         this.loc = i;
+        this.type = t;
         this.name = "Repair actuator (" + unit.getEntity().getLocationName(loc) + ")";
         this.time = 120;
         this.difficulty = 0;
@@ -50,4 +53,27 @@ public abstract class MekActuatorRepair extends RepairItem {
     public int getLoc() {
         return loc;
     }
+    
+    public int getType() {
+        return type;
+    }
+    
+    @Override
+    public void fix() {
+        unit.getEntity().removeCriticals(loc, new CriticalSlot(CriticalSlot.TYPE_SYSTEM, type));
+    }
+
+    @Override
+    public WorkItem replace() {
+        return new MekActuatorReplacement(unit, loc, type);
+    }
+
+    @Override
+    public boolean sameAs(WorkItem task) {
+        return (task instanceof MekActuatorRepair
+                && ((MekActuatorRepair)task).getUnitId() == this.getUnitId()
+                && ((MekActuatorRepair)task).getLoc() == this.getLoc()
+                && ((MekActuatorRepair)task).getType() == this.getType());
+    }
+
 }

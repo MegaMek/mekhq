@@ -1,5 +1,5 @@
 /*
- * MekLowArmActuatorRepair.java
+ * MekSensorSalvage.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -24,33 +24,43 @@ package mekhq.campaign.work;
 import megamek.common.CriticalSlot;
 import megamek.common.Mech;
 import mekhq.campaign.Unit;
+import mekhq.campaign.parts.MekSensor;
+import mekhq.campaign.parts.Part;
 
 /**
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class MekLowArmActuatorRepair extends MekActuatorRepair {
+public class MekSensorSalvage extends SalvageItem {
 
-    public MekLowArmActuatorRepair(Unit unit, int h, int i) {
-        super(unit, h, i);
-        this.name = "Repair lower arm actuator (" + unit.getEntity().getLocationName(loc) + ")";
+    public MekSensorSalvage(Unit unit) {
+                super(unit);
+        this.name = "Salvage Sensors";
+        this.time = 180;
+        this.difficulty = -1;
     }
-    
+
     @Override
-    public void fix() {
-        unit.getEntity().removeCriticals(loc, new CriticalSlot(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_LOWER_ARM));
+    public ReplacementItem getReplacement() {
+        return new MekSensorReplacement(unit);
     }
-    
+
     @Override
-    public WorkItem replace() {
-        return new MekLowArmActuatorReplacement(unit, loc);
+    public Part getPart() {
+        return new MekSensor(true);
     }
 
     @Override
     public boolean sameAs(WorkItem task) {
-        return (task instanceof MekLowArmActuatorRepair
-                && ((MekLowArmActuatorRepair)task).getUnitId() == this.getUnitId()
-                && ((MekLowArmActuatorRepair)task).getLoc() == this.getLoc());
+        return (task instanceof MekLifeSupportSalvage
+                && ((MekLifeSupportSalvage)task).getUnitId() == this.getUnitId());
     }
-
+    
+    @Override
+    public void fix() {
+        super.fix();
+        for(int i = 0; i < unit.getEntity().locations(); i++) {
+            unit.getEntity().addCritical(i, new CriticalSlot(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS));
+        }
+    }
 }

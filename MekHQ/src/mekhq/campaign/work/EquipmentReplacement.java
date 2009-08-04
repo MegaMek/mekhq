@@ -51,6 +51,7 @@ public class EquipmentReplacement extends ReplacementItem {
     
     @Override
     public void fix() {
+        super.fix();
         mounted.setHit(false);
         mounted.setDestroyed(false);
         //I also need to clear the critical slot
@@ -116,5 +117,10 @@ public class EquipmentReplacement extends ReplacementItem {
     @Override
     public Part partNeeded() {
         return new EquipmentPart(false, mounted.getType());
+    }
+
+    @Override
+    public SalvageItem getSalvage() {
+        return new EquipmentSalvage(unit, mounted);
     }
 }

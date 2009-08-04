@@ -1,6 +1,8 @@
 VERSION HISTORY
 ----------------------------------
 v0.1.1 (SVN)
++ refactored actuator repairs and replacement into single repair and replace items with a type variable
++ more work on salvage/replacement compatability and diagnosis
 + salvage/repair switch in Unit context menu
 + isRepairable checks to Unit#runDiagnostic
 + updated MegaMek.jar

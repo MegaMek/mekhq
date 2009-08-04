@@ -33,7 +33,7 @@ import mekhq.campaign.parts.Part;
  */
 public class LocationReplacement extends ReplacementItem {
 
-    int loc;
+    protected int loc;
     
     public LocationReplacement(Unit unit, int i) {
         super(unit);
@@ -45,6 +45,7 @@ public class LocationReplacement extends ReplacementItem {
     
     @Override
     public void fix() {
+        super.fix();
         unit.getEntity().setInternal(unit.getEntity().getOInternal(loc), loc);
         //repair any hips or shoulders
         if(unit.getEntity() instanceof Mech) {
@@ -81,6 +82,11 @@ public class LocationReplacement extends ReplacementItem {
     @Override
     public Part partNeeded() {
         return new MekLocation(false, loc, unit.getEntity().getWeight(), unit.hasEndosteel(), unit.hasTSM());
+    }
+
+    @Override
+    public SalvageItem getSalvage() {
+        return new LocationSalvage(unit, loc);
     }
 
     

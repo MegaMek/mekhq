@@ -1,5 +1,5 @@
 /*
- * MekLowLegActuator.java
+ * HeatSinkSalvage.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -19,24 +19,25 @@
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq.campaign.parts;
+package mekhq.campaign.work;
 
-import mekhq.campaign.work.MekLowLegActuatorReplacement;
-import mekhq.campaign.work.ReplacementItem;
+import megamek.common.Mounted;
+import mekhq.campaign.Unit;
 
 /**
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class MekLowLegActuator extends MekActuator {
+public class HeatSinkSalvage extends EquipmentSalvage {
 
-    public MekLowLegActuator(boolean salvage, float ton) {
-        super(salvage, ton);
-        this.name = "Lower Leg Actuator";
-    }
+    public HeatSinkSalvage(Unit u, Mounted m) {
+        super(u, m);
+        this.time = 90;
+        this.difficulty = -2;
+    } 
     
     @Override
-    public boolean canBeUsedBy(ReplacementItem task) {
-        return task instanceof MekLowLegActuatorReplacement && tonnage == ((MekLowLegActuatorReplacement)task).getUnit().getEntity().getWeight();
+    public ReplacementItem getReplacement() {
+        return new HeatSinkReplacement(unit, mounted);
     }
 }

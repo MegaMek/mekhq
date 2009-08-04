@@ -42,6 +42,7 @@ public class MekGyroReplacement extends ReplacementItem {
 
     @Override
     public void fix() {
+        super.fix();
         unit.getEntity().removeCriticals(Mech.LOC_CT, new CriticalSlot(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_GYRO));
     }
 
@@ -54,6 +55,11 @@ public class MekGyroReplacement extends ReplacementItem {
     @Override
     public Part partNeeded() {
         return new MekGyro(false, unit.getEntity().getGyroType(), unit.getEntity().getWeight());
+    }
+
+    @Override
+    public SalvageItem getSalvage() {
+        return new MekGyroSalvage(unit);
     }
 
 }

@@ -1,5 +1,5 @@
 /*
- * MekUpLegActuatorReplacement.java
+ * LocationSalvage.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -21,37 +21,51 @@
 
 package mekhq.campaign.work;
 
-import megamek.common.CriticalSlot;
-import megamek.common.Mech;
 import mekhq.campaign.Unit;
-import mekhq.campaign.parts.MekUpLegActuator;
+import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.Part;
 
 /**
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class MekUpLegActuatorReplacement extends MekActuatorReplacement {
+public class LocationSalvage extends SalvageItem {
 
-    public MekUpLegActuatorReplacement(Unit unit, int i) {
-        super(unit, i);
-        this.name = "Replace upper leg actuator (" + unit.getEntity().getLocationName(loc) + ")";
+    protected int loc;
+    
+    public LocationSalvage(Unit unit, int i) {
+        super(unit);
+        this.name = "Salvage " + unit.getEntity().getLocationName(i);
+        this.time = 240;
+        this.difficulty = 3;
+        this.loc = i;
     }
     
     @Override
     public void fix() {
-        unit.getEntity().removeCriticals(loc, new CriticalSlot(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_UPPER_LEG));
+        super.fix();
+        unit.getEntity().setInternal(0, loc);
+    }
+    
+    public int getLoc() {
+        return loc;
     }
 
     @Override
     public boolean sameAs(WorkItem task) {
-        return (task instanceof MekUpLegActuatorReplacement
-                && ((MekUpLegActuatorReplacement)task).getUnitId() == this.getUnitId()
-                && ((MekUpLegActuatorReplacement)task).getLoc() == this.getLoc());
+        return (task instanceof LocationSalvage
+                && ((LocationSalvage)task).getUnitId() == this.getUnitId()
+                && ((LocationSalvage)task).getLoc() == this.getLoc());
     }
-    
+
     @Override
-    public Part partNeeded() {
-        return new MekUpLegActuator(false, unit.getEntity().getWeight());
+    public ReplacementItem getReplacement() {
+        return new LocationReplacement(unit, loc);
     }
+
+    @Override
+    public Part getPart() {
+        return new MekLocation(true, loc, unit.getEntity().getWeight(), unit.hasEndosteel(), unit.hasTSM());
+    }
+
 }

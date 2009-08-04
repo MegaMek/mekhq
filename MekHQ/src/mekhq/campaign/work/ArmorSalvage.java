@@ -1,5 +1,5 @@
 /*
- * MekHandActuator.java
+ * ArmorSalvage.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -21,35 +21,42 @@
 
 package mekhq.campaign.work;
 
-import megamek.common.CriticalSlot;
-import megamek.common.Mech;
 import mekhq.campaign.Unit;
+import mekhq.campaign.parts.Armor;
+import mekhq.campaign.parts.Part;
 
 /**
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class MekHandActuatorRepair extends MekActuatorRepair {
+class ArmorSalvage extends SalvageItem {
 
-    public MekHandActuatorRepair(Unit unit, int h, int i) {
-        super(unit, h, i);
-        this.name = "Repair hand actuator (" + unit.getEntity().getLocationName(loc) + ")";
+    protected int loc;
+    
+    public ArmorSalvage(Unit unit, int loc) {
+        super(unit);
+        this.loc = loc;
+    }
+
+    @Override
+    public ReplacementItem getReplacement() {
+        return new ArmorReplacement(unit, loc, unit.getEntity().getArmor(loc));
+    }
+
+    @Override
+    public Part getPart() {
+        return new Armor(true, unit.getEntity().getArmorType(), unit.getEntity().getArmor(loc));
     }
     
-    @Override
-    public void fix() {
-        unit.getEntity().removeCriticals(loc, new CriticalSlot(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_HAND));
-    }
-
-    @Override
-    public WorkItem replace() {
-        return new MekHandActuatorReplacement(unit, loc);
+    public int getLoc() {
+        return loc;
     }
 
     @Override
     public boolean sameAs(WorkItem task) {
-        return (task instanceof MekHandActuatorRepair
-                && ((MekHandActuatorRepair)task).getUnitId() == this.getUnitId()
-                && ((MekHandActuatorRepair)task).getLoc() == this.getLoc());
+        return (task instanceof ArmorSalvage
+                && ((ArmorSalvage)task).getUnitId() == this.getUnitId()
+                && ((ArmorSalvage)task).getLoc() == this.getLoc());
     }
+
 }

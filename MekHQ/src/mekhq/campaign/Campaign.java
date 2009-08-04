@@ -43,6 +43,7 @@ import mekhq.campaign.work.UnitWorkItem;
 import mekhq.campaign.work.WorkItem;
 import mekhq.campaign.work.RepairItem;
 import mekhq.campaign.work.ReplacementItem;
+import mekhq.campaign.work.SalvageItem;
 
 /**
  *
@@ -176,7 +177,7 @@ public class Campaign implements Serializable {
             en.setId(id);
             en.setExternalId(id);
             en.setGame(game);
-            Unit unit = new Unit(en);
+            Unit unit = new Unit(en, this);
             units.add(unit);
             unitIds.put(new Integer(id), unit);
             lastUnitId = id;
@@ -296,11 +297,14 @@ public class Campaign implements Serializable {
     }
     
     public ArrayList<WorkItem> getTasksForUnit(int unitId) {
+        Unit unit = getUnit(unitId);
         ArrayList<WorkItem> newTasks = new ArrayList<WorkItem>();
         for(WorkItem task : getTasks()) {
             if(task instanceof UnitWorkItem 
-                    && ((UnitWorkItem)task).getUnitId() == unitId) {
-                newTasks.add(task);
+                    && ((UnitWorkItem)task).getUnitId() == unitId
+                    && ((task instanceof SalvageItem && unit.isSalvage())
+                        || (!(task instanceof SalvageItem) && !unit.isSalvage()))) {
+                    newTasks.add(task);
             }
         }
         return newTasks;

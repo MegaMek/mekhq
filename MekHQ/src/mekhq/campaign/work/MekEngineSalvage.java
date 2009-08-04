@@ -1,5 +1,5 @@
 /*
- * MekUpArmActuatorReplacement.java
+ * MekEngineSalvage.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -24,34 +24,45 @@ package mekhq.campaign.work;
 import megamek.common.CriticalSlot;
 import megamek.common.Mech;
 import mekhq.campaign.Unit;
-import mekhq.campaign.parts.MekUpArmActuator;
+import mekhq.campaign.parts.MekEngine;
 import mekhq.campaign.parts.Part;
 
 /**
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class MekUpArmActuatorReplacement extends MekActuatorReplacement {
+class MekEngineSalvage extends SalvageItem {
 
-    public MekUpArmActuatorReplacement(Unit unit, int i) {
-        super(unit, i);
-        this.name = "Replace upper arm actuator (" + unit.getEntity().getLocationName(loc) + ")";
+    public MekEngineSalvage(Unit unit) {
+        super(unit);
+        this.name = "Salvage Engine";
+        this.time = 360;
+        this.difficulty = -1;
     }
-    
+
     @Override
-    public void fix() {
-        unit.getEntity().removeCriticals(loc, new CriticalSlot(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_UPPER_ARM));
+    public ReplacementItem getReplacement() {
+        return new MekEngineReplacement(unit);
+    }
+
+    @Override
+    public Part getPart() {
+        return new MekEngine(true, unit.getEntity().getEngine());
     }
 
     @Override
     public boolean sameAs(WorkItem task) {
-        return (task instanceof MekUpArmActuatorReplacement
-                && ((MekUpArmActuatorReplacement)task).getUnitId() == this.getUnitId()
-                && ((MekUpArmActuatorReplacement)task).getLoc() == this.getLoc());
+        return (task instanceof MekEngineSalvage
+                && ((MekEngineSalvage)task).getUnitId() == this.getUnitId());
     }
     
     @Override
-    public Part partNeeded() {
-        return new MekUpArmActuator(false, unit.getEntity().getWeight());
+    public void fix() {
+        super.fix();
+        //FIXME: I dont think this will do the right thing
+        for(int i = 0; i < unit.getEntity().locations(); i++) {
+            unit.getEntity().addCritical(i, new CriticalSlot(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE));
+        }
     }
+
 }

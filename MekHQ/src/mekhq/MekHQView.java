@@ -1438,13 +1438,13 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
                 }
             } else if (command.equalsIgnoreCase("SALVAGE")) {
                 unit.setSalvage(true);
-                campaign.removeAllTasksFor(unit);
-                unit.runDiagnostic(campaign);
+                //campaign.removeAllTasksFor(unit);
+                //unit.runDiagnostic(campaign);
                 refreshUnitList();
             } else if (command.equalsIgnoreCase("REPAIR")) {
                 unit.setSalvage(false);
-                campaign.removeAllTasksFor(unit);
-                unit.runDiagnostic(campaign);
+                //campaign.removeAllTasksFor(unit);
+                //unit.runDiagnostic(campaign);
                 refreshUnitList();
             }
         }

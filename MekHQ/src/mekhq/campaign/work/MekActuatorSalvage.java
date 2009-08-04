@@ -1,5 +1,5 @@
 /*
- * ActuatorReplacement.java
+ * MekActuatorSalvage.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -30,12 +30,12 @@ import mekhq.campaign.parts.Part;
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class MekActuatorReplacement extends ReplacementItem {
-    
+class MekActuatorSalvage extends SalvageItem {
+
     protected int loc;
     protected int type;
     
-    public MekActuatorReplacement(Unit unit, int i, int t) {
+    public MekActuatorSalvage(Unit unit, int i, int t) {
         super(unit);
         this.loc = i;
         this.type = t;
@@ -43,13 +43,10 @@ public class MekActuatorReplacement extends ReplacementItem {
         this.time = 90;
         this.difficulty = -3;
     }
-    
+
     @Override
-    public String checkFixable() {
-        if(unit.isLocationDestroyed(loc)) {
-            return unit.getEntity().getLocationName(loc) + " is destroyed.";
-        }
-        return super.checkFixable();
+    public ReplacementItem getReplacement() {
+        return new MekActuatorReplacement(unit, loc, type);
     }
     
     public int getLoc() {
@@ -59,28 +56,25 @@ public class MekActuatorReplacement extends ReplacementItem {
     public int getType() {
         return type;
     }
+
+    @Override
+    public Part getPart() {
+        return new MekActuator(true, unit.getEntity().getWeight(), type);
+    }
     
     @Override
     public void fix() {
         super.fix();
-        unit.getEntity().removeCriticals(loc, new CriticalSlot(CriticalSlot.TYPE_SYSTEM, type));
+        //FIXME: I dont think this will do the right thing
+        unit.getEntity().addCritical(loc, new CriticalSlot(CriticalSlot.TYPE_SYSTEM, type));
     }
 
     @Override
     public boolean sameAs(WorkItem task) {
-        return (task instanceof MekActuatorReplacement
-                && ((MekActuatorReplacement)task).getUnitId() == this.getUnitId()
-                && ((MekActuatorReplacement)task).getLoc() == this.getLoc()
-                && ((MekActuatorReplacement)task).getType() == this.getType());
+        return (task instanceof MekActuatorSalvage
+                && ((MekActuatorSalvage)task).getUnitId() == this.getUnitId()
+                && ((MekActuatorSalvage)task).getLoc() == this.getLoc()
+                && ((MekActuatorSalvage)task).getType() == this.getType());
     }
 
-    @Override
-    public Part partNeeded() {
-        return new MekActuator(false, unit.getEntity().getWeight(), type);
-    }
-
-    @Override
-    public SalvageItem getSalvage() {
-        return new MekActuatorSalvage(unit, loc, type);
-    }
 }

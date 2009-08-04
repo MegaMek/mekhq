@@ -62,6 +62,11 @@ public abstract class ReplacementItem extends UnitWorkItem {
     }
     
     @Override
+    public void fix() {
+        unit.campaign.addWork(getSalvage());
+    }
+    
+    @Override
     public TargetRoll getAllMods() {
         TargetRoll target = super.getAllMods();
         if(null != part && part.isSalvage()) {
@@ -71,4 +76,6 @@ public abstract class ReplacementItem extends UnitWorkItem {
     }
     
     public abstract Part partNeeded();
+    
+    public abstract SalvageItem getSalvage();
 }

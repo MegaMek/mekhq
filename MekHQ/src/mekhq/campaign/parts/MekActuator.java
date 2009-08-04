@@ -21,17 +21,30 @@
 
 package mekhq.campaign.parts;
 
+import mekhq.campaign.work.MekActuatorReplacement;
+import mekhq.campaign.work.ReplacementItem;
+
 /**
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public abstract class MekActuator extends Part {
+public class MekActuator extends Part {
 
     protected float tonnage;
+    protected int type;
     
-    public MekActuator(boolean salvage, float ton) {
+    public MekActuator(boolean salvage, float ton, int type) {
         super(salvage);
         this.tonnage = ton;
+        this.type = type;
+        this.name = "Actuator";
+    }
+
+    @Override
+    public boolean canBeUsedBy(ReplacementItem task) {
+        return task instanceof MekActuatorReplacement 
+                && tonnage == ((MekActuatorReplacement)task).getUnit().getEntity().getWeight()
+                && type == ((MekActuatorReplacement)task).getType();
     }
     
 }

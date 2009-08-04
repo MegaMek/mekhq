@@ -1,5 +1,5 @@
 /*
- * MekLowLegActuatorReplacement.java
+ * MekLifeSupportSalvage.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -24,34 +24,44 @@ package mekhq.campaign.work;
 import megamek.common.CriticalSlot;
 import megamek.common.Mech;
 import mekhq.campaign.Unit;
-import mekhq.campaign.parts.MekLowLegActuator;
+import mekhq.campaign.parts.MekLifeSupport;
 import mekhq.campaign.parts.Part;
+
 /**
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class MekLowLegActuatorReplacement extends MekActuatorReplacement {
+class MekLifeSupportSalvage extends SalvageItem {
 
-    public MekLowLegActuatorReplacement(Unit unit, int i) {
-        super(unit, i);
-        this.name = "Replace lower leg actuator (" + unit.getEntity().getLocationName(loc) + ")";
+    public MekLifeSupportSalvage(Unit unit) {
+                super(unit);
+        this.name = "Salvage life support";
+        this.time = 180;
+        this.difficulty = -1;
     }
-    
+
     @Override
-    public void fix() {
-        unit.getEntity().removeCriticals(loc, new CriticalSlot(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_LOWER_LEG));
+    public ReplacementItem getReplacement() {
+        return new MekLifeSupportReplacement(unit);
+    }
+
+    @Override
+    public Part getPart() {
+        return new MekLifeSupport(true);
     }
 
     @Override
     public boolean sameAs(WorkItem task) {
-        return (task instanceof MekLowLegActuatorReplacement
-                && ((MekLowLegActuatorReplacement)task).getUnitId() == this.getUnitId()
-                && ((MekLowLegActuatorReplacement)task).getLoc() == this.getLoc());
+        return (task instanceof MekLifeSupportSalvage
+                && ((MekLifeSupportSalvage)task).getUnitId() == this.getUnitId());
     }
     
     @Override
-    public Part partNeeded() {
-        return new MekLowLegActuator(false, unit.getEntity().getWeight());
+    public void fix() {
+        super.fix();
+        for(int i = 0; i < unit.getEntity().locations(); i++) {
+            unit.getEntity().addCritical(i, new CriticalSlot(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_LIFE_SUPPORT));
+        }
     }
-    
+
 }

@@ -37,8 +37,8 @@ public class EquipmentSalvage extends SalvageItem {
 
     protected Mounted mounted;
     
-    public EquipmentSalvage(Unit unit, Mounted m, Campaign c) {
-        super(unit, c);
+    public EquipmentSalvage(Unit unit, Mounted m) {
+        super(unit);
         this.mounted = m;
         String loc = "";
         if(m.getLocation() > -1 && m.getLocation() < unit.getEntity().locations()) {
@@ -58,7 +58,7 @@ public class EquipmentSalvage extends SalvageItem {
     
     @Override
     public void fix() {
-        campaign.addPart(getPart());
+        super.fix();
         mounted.setHit(true);
         mounted.setDestroyed(true);
         mounted.setRepairable(false);
@@ -91,6 +91,11 @@ public class EquipmentSalvage extends SalvageItem {
         return (task instanceof EquipmentSalvage
                 && ((EquipmentSalvage)task).getUnitId() == this.getUnitId()
                 && ((EquipmentSalvage)task).getUnit().getEntity().getEquipmentNum(((EquipmentSalvage)task).getMounted()) == unit.getEntity().getEquipmentNum(mounted));
+    }
+
+    @Override
+    public ReplacementItem getReplacement() {
+        return new EquipmentReplacement(unit, mounted);
     }
 
 }

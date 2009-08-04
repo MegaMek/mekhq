@@ -30,18 +30,18 @@ import mekhq.campaign.parts.Part;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public abstract class SalvageItem extends UnitWorkItem {
-
-    protected Campaign campaign;
     
-    public SalvageItem(Unit u, Campaign c) {
+    public SalvageItem(Unit u) {
         super(u);
-        this.campaign = c;
     }
     
     @Override
     public void fix() {
-        campaign.addPart(getPart());
+        unit.campaign.addPart(getPart());
+        unit.campaign.addWork(getReplacement());
     }
+    
+    public abstract ReplacementItem getReplacement();
     
     public abstract Part getPart();
 

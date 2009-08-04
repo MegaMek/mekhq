@@ -43,6 +43,7 @@ class VeeStabiliserReplacement extends ReplacementItem {
 
     @Override
     public void fix() {
+        super.fix();
         //TODO: no method for setting the stabilizerhits to zero in Tank
     }
     
@@ -60,6 +61,11 @@ class VeeStabiliserReplacement extends ReplacementItem {
     @Override
     public Part partNeeded() {
         return new VeeStabiliser(false);
+    }
+
+    @Override
+    public SalvageItem getSalvage() {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
 }

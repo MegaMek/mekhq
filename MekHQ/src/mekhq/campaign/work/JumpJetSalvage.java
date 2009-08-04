@@ -1,5 +1,5 @@
 /*
- * MekLowArmActuator.java
+ * JumpJetSalvage.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -19,25 +19,25 @@
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq.campaign.parts;
+package mekhq.campaign.work;
 
-import mekhq.campaign.work.MekLowArmActuatorReplacement;
-import mekhq.campaign.work.ReplacementItem;
+import megamek.common.Mounted;
+import mekhq.campaign.Unit;
 
 /**
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class MekLowArmActuator extends MekActuator {
+public class JumpJetSalvage extends EquipmentSalvage {
 
-    public MekLowArmActuator(boolean salvage, float ton) {
-        super(salvage, ton);
-        this.name = "Lower Arm Actuator";
-    }
+    public JumpJetSalvage(Unit u, Mounted m) {
+        super(u, m);
+        this.time = 60;
+        this.difficulty = 0;
+    } 
     
     @Override
-    public boolean canBeUsedBy(ReplacementItem task) {
-        return task instanceof MekLowArmActuatorReplacement && tonnage == ((MekLowArmActuatorReplacement)task).getUnit().getEntity().getWeight();
+    public ReplacementItem getReplacement() {
+        return new JumpJetReplacement(unit, mounted);
     }
-    
 }

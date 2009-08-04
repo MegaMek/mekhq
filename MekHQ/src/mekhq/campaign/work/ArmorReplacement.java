@@ -57,6 +57,7 @@ public class ArmorReplacement extends ReplacementItem {
 
     @Override
     public void fix() {
+        super.fix();
         unit.getEntity().setArmor(unit.getEntity().getOArmor(loc, false), loc, false);
         unit.getEntity().setArmor(unit.getEntity().getOArmor(loc, true), loc, true);
     }
@@ -108,5 +109,10 @@ public class ArmorReplacement extends ReplacementItem {
     @Override
     public Part partNeeded() {
         return new Armor(false, unit.getEntity().getArmorType(), amount);
+    }
+
+    @Override
+    public SalvageItem getSalvage() {
+        return new ArmorSalvage(unit, loc);
     }
 }
