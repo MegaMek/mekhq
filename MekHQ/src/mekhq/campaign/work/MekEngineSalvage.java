@@ -35,7 +35,7 @@ public class MekEngineSalvage extends SalvageItem {
 
     public MekEngineSalvage(Unit unit) {
         super(unit);
-        this.name = "Salvage Engine";
+        this.name = "Salvage " + unit.getEntity().getEngine().getEngineName() + " Engine";
         this.time = 360;
         this.difficulty = -1;
     }

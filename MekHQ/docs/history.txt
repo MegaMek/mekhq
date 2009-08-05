@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.1.1 (SVN)
++ improved naming of various salvage, repair, and replacement items and parts
 + remove salvage work item from within repairItem#replace method
 + Bug: all ammo bins showing as needing to be replaced
 + when scrapping repairs, the component should be set to unrepairable status

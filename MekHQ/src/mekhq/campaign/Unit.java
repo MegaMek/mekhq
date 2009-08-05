@@ -196,10 +196,10 @@ public class Unit implements Serializable {
                 diff +=  entity.getOArmor(i, true) - entity.getArmor(i, true);
             }
             if(diff > 0) {
-                campaign.addWork(new ArmorReplacement(this, i, diff));
+                campaign.addWork(new ArmorReplacement(this, i, entity.getArmorType()));
             }
             if(entity.getArmor(i) > 0) {
-                campaign.addWork(new ArmorSalvage(this, i));
+                campaign.addWork(new ArmorSalvage(this, i, entity.getArmorType()));
             }
             
             //check for various component damage

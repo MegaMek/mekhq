@@ -38,7 +38,7 @@ public class Armor extends Part {
         super(false);
         this.type = t;
         this.amount = points;
-        this.name = EquipmentType.getArmorTypeName(type);
+        this.name = EquipmentType.getArmorTypeName(type) + " Armor (" + amount + ")";
     }
     
     public int getType() {

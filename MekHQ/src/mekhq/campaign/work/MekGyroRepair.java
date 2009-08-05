@@ -33,7 +33,7 @@ public class MekGyroRepair extends RepairItem {
 
     public MekGyroRepair(Unit unit, int crits) {
         super(unit, crits);
-        this.name = "Repair gyro";
+        this.name = "Repair " + ((Mech)unit.getEntity()).getSystemName(Mech.SYSTEM_GYRO);
         this.time = 120;
         this.difficulty = 1;
         if(crits > 1) {

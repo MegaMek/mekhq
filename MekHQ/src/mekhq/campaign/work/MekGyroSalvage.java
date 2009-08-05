@@ -35,7 +35,7 @@ public class MekGyroSalvage extends SalvageItem {
 
     public MekGyroSalvage(Unit unit) {
         super(unit);
-        this.name = "Salvage gyro";
+        this.name = "Salvage " + ((Mech)unit.getEntity()).getSystemName(Mech.SYSTEM_GYRO);
         this.time = 200;
         this.difficulty = 0;
     }

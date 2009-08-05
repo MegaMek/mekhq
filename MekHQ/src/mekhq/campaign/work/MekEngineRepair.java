@@ -35,7 +35,7 @@ public class MekEngineRepair extends RepairItem {
 
     public MekEngineRepair(Unit unit, int h) {
         super(unit, h);
-        this.name = "Repair engine";
+        this.name = "Repair " + unit.getEntity().getEngine().getEngineName() + " Engine";
         this.time = 100;
         this.difficulty = -1;
         if(hits == 2) {

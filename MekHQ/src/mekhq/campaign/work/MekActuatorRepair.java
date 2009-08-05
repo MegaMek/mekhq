@@ -22,6 +22,7 @@
 package mekhq.campaign.work;
 
 import megamek.common.CriticalSlot;
+import megamek.common.Mech;
 import mekhq.campaign.Unit;
 
 /**
@@ -37,7 +38,7 @@ public class MekActuatorRepair extends RepairItem {
         super(unit, h);
         this.loc = i;
         this.type = t;
-        this.name = "Repair actuator (" + unit.getEntity().getLocationName(loc) + ")";
+        this.name = "Repair " + ((Mech)unit.getEntity()).getSystemName(type) + " Actuator (" + unit.getEntity().getLocationName(loc) + ")";
         this.time = 120;
         this.difficulty = 0;
     }

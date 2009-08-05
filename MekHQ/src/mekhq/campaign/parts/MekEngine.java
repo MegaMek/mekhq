@@ -36,7 +36,7 @@ public class MekEngine extends Part {
     
     public MekEngine(boolean salvage, Engine e) {
         super(salvage);
-        this.name = engine.getEngineName();
+        this.name = engine.getEngineName() + " Engine";
         this.engine = e;
     }
 

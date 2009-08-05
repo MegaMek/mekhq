@@ -21,6 +21,8 @@
 
 package mekhq.campaign.parts;
 
+import megamek.common.BipedMech;
+import megamek.common.Mech;
 import mekhq.campaign.work.MekActuatorReplacement;
 import mekhq.campaign.work.ReplacementItem;
 
@@ -37,7 +39,8 @@ public class MekActuator extends Part {
         super(salvage);
         this.tonnage = ton;
         this.type = type;
-        this.name = "Actuator";
+        Mech m = new BipedMech();
+        this.name = m.getSystemName(type) + " Actuator (" + tonnage + " tons)" ;
     }
 
     @Override

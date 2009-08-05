@@ -35,7 +35,7 @@ public class MekGyroReplacement extends ReplacementItem {
     
     public MekGyroReplacement(Unit unit) {
         super(unit);
-        this.name = "Replace gyro";
+        this.name = "Replace " + ((Mech)unit.getEntity()).getSystemName(Mech.SYSTEM_GYRO);
         this.time = 200;
         this.difficulty = 0;
     }

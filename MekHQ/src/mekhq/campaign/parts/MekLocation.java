@@ -77,6 +77,7 @@ public class MekLocation extends Part {
         if(tsm) {
             this.name += " (TSM)";
         }
+        this.name += " (" + tonnage + ")";
     }
     
     @Override

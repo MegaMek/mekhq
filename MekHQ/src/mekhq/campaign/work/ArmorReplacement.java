@@ -21,6 +21,7 @@
 package mekhq.campaign.work;
 
 import megamek.common.Aero;
+import megamek.common.EquipmentType;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
@@ -36,11 +37,13 @@ public class ArmorReplacement extends ReplacementItem {
 
     private int loc;
     private int amount;
+    private int type;
 
-    public ArmorReplacement(Unit unit, int loc, int amount) {
+    public ArmorReplacement(Unit unit, int loc, int t) {
         super(unit);
         this.loc = loc;
-        this.amount = amount;
+        this.amount = unit.getEntity().getOArmor(loc) - unit.getEntity().getArmor(loc);
+        this.type = t;
         this.difficulty = -2;
         this.time = 5 * amount;
         if(unit.getEntity() instanceof Tank) {
@@ -52,7 +55,7 @@ public class ArmorReplacement extends ReplacementItem {
                 this.time = 15 * amount;
             }
         }
-        this.name = "Replace armor (" + unit.getEntity().getLocationName(loc) + ", " + amount + ")";
+        this.name = "Replace " + EquipmentType.getArmorTypeName(type) + " Armor (" + unit.getEntity().getLocationName(loc) + ", " + amount + ")";
     }
 
     @Override
@@ -73,12 +76,17 @@ public class ArmorReplacement extends ReplacementItem {
     public int getLoc() {
         return loc;
     }
+    
+    public int getType() {
+        return type;
+    }
 
     @Override
     public boolean sameAs(WorkItem task) {
         return (task instanceof ArmorReplacement 
                 && ((ArmorReplacement)task).getUnitId() == this.getUnitId()
-                && ((ArmorReplacement)task).getLoc() == this.getLoc());
+                && ((ArmorReplacement)task).getLoc() == this.getLoc()
+                && ((ArmorReplacement)task).getType() == this.getType());
     }
     
     @Override
@@ -113,6 +121,6 @@ public class ArmorReplacement extends ReplacementItem {
 
     @Override
     public SalvageItem getSalvage() {
-        return new ArmorSalvage(unit, loc);
+        return new ArmorSalvage(unit, loc, type);
     }
 }

@@ -38,7 +38,7 @@ public class MekGyro extends Part {
         super(salvage);
         this.type = type;
         this.tonnage = ton;
-        this.name = Mech.getGyroTypeString(type);
+        this.name = Mech.getGyroTypeString(type) + " (" + tonnage + ")";
     }
     
     @Override

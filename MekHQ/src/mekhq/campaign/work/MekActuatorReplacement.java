@@ -22,6 +22,7 @@
 package mekhq.campaign.work;
 
 import megamek.common.CriticalSlot;
+import megamek.common.Mech;
 import mekhq.campaign.Unit;
 import mekhq.campaign.parts.MekActuator;
 import mekhq.campaign.parts.Part;
@@ -39,7 +40,7 @@ public class MekActuatorReplacement extends ReplacementItem {
         super(unit);
         this.loc = i;
         this.type = t;
-        this.name = "Replace actuator (" + unit.getEntity().getLocationName(loc) + ")";
+        this.name = "Replace " + ((Mech)unit.getEntity()).getSystemName(type) + " Actuator (" + unit.getEntity().getLocationName(loc) + ")";
         this.time = 90;
         this.difficulty = -3;
     }
