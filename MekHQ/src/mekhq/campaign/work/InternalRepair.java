@@ -45,6 +45,7 @@ public abstract class InternalRepair extends RepairItem {
 
     @Override
     public WorkItem replace() {
+        unit.getEntity().setInternal(0, loc);
         return new LocationReplacement(unit, loc);
     }
     

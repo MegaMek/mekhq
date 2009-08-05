@@ -62,6 +62,9 @@ public class EquipmentRepair extends RepairItem {
     
     @Override
     public WorkItem replace() {
+        mounted.setHit(true);
+        mounted.setDestroyed(true);
+        unit.destroySystem(CriticalSlot.TYPE_EQUIPMENT, unit.getEntity().getEquipmentNum(mounted));
         return new EquipmentReplacement(unit, mounted);
     }
     
