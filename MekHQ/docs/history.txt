@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.1.1 (SVN)
++ Bug: all ammo bins showing as needing to be replaced
 + when scrapping repairs, the component should be set to unrepairable status
 + helper functions in Unit for damaging, destroying, and repairing critical slots and associated uses
 + bug: duplicating salvage items on reload

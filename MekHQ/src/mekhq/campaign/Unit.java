@@ -378,30 +378,30 @@ public class Unit implements Serializable {
                 }
            }
                 
-                //ammo is also handled its own way
-                if(m.getType() instanceof AmmoType) {
-                    campaign.addWork(new AmmoBinReplacement(this, m));
-                    continue;
-                    //don't do reloads here because I want them all grouped at the bottom of the queue
-                }
+           //ammo is also handled its own way
+           if(m.getType() instanceof AmmoType && isHit) {
+               campaign.addWork(new AmmoBinReplacement(this, m));
+               continue;
+               //don't do reloads here because I want them all grouped at the bottom of the queue
+           }
                                
-                //combat destroyed is not the same as really destroyed
-                //TODO: I am no longer making the check here. Any randomness in this method can lead to 
-                //weird results when units are deployed and then reloaded. This should really be done in MegaMek
-                //with the proper use of setHit and setDestroyed
-                //and added to the MUL file.      
-                if(m.isRepairable()) {
-                    salvage = new EquipmentSalvage(this, m);
-                    campaign.addWork(salvage);
-                    if(isHit) {
-                        repair = new EquipmentRepair(this, getCrits(m), m);
-                        campaign.addWork(repair);
-                        salvage.setRepairId(repair.getId());
-                        repair.setSalvageId(salvage.getId());
-                    }
-                } else {
-                    campaign.addWork(new EquipmentReplacement(this, m));
-                }
+           //combat destroyed is not the same as really destroyed
+           //TODO: I am no longer making the check here. Any randomness in this method can lead to 
+           //weird results when units are deployed and then reloaded. This should really be done in MegaMek
+           //with the proper use of setHit and setDestroyed
+           //and added to the MUL file.      
+           if(m.isRepairable()) {
+               salvage = new EquipmentSalvage(this, m);
+               campaign.addWork(salvage);
+               if(isHit) {
+                   repair = new EquipmentRepair(this, getCrits(m), m);
+                   campaign.addWork(repair);
+                   salvage.setRepairId(repair.getId());
+                   repair.setSalvageId(salvage.getId());
+               }
+           } else {
+               campaign.addWork(new EquipmentReplacement(this, m));
+           }
         }
         
         //now check for reloads
