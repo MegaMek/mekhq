@@ -41,6 +41,13 @@ public abstract class RepairItem extends UnitWorkItem {
     
     public abstract WorkItem replace();
     
+    protected void removeSalvage() {
+        WorkItem salvage = unit.campaign.getTask(salvageId);
+        if(null != salvage) {
+            unit.campaign.removeTask(salvage);
+        }
+    }
+    
     public int getSalvageId() {
         return salvageId;
     }

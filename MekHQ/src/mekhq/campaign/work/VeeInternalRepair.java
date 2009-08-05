@@ -39,6 +39,7 @@ public class VeeInternalRepair extends InternalRepair {
     
     @Override
     public WorkItem replace() {
+        removeSalvage();
         //you can only replace turrets and rotors
         if(unit.getEntity() instanceof VTOL && loc == VTOL.LOC_ROTOR) {
             unit.getEntity().setInternal(0, VTOL.LOC_ROTOR);

@@ -49,6 +49,7 @@ public class MekLifeSupportRepair extends RepairItem {
 
     @Override
     public WorkItem replace() {
+        removeSalvage();
         unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_LIFE_SUPPORT);
         return new MekLifeSupportReplacement(unit);
     }

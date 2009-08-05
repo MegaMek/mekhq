@@ -40,6 +40,7 @@ public class TurretLockRepair extends RepairItem {
     
     @Override
     public WorkItem replace() {
+        removeSalvage();
         unit.getEntity().setInternal(0, Tank.LOC_TURRET);
         return new TurretReplacement(unit, Tank.LOC_TURRET);
     }

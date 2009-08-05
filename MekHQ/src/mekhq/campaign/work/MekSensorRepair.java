@@ -49,6 +49,7 @@ public class MekSensorRepair extends RepairItem {
     
     @Override
     public WorkItem replace() {
+        removeSalvage();
         unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS);
         return new MekSensorReplacement(unit);
     }
