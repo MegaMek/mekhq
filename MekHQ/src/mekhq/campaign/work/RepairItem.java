@@ -21,7 +21,6 @@
 
 package mekhq.campaign.work;
 
-import megamek.common.TargetRoll;
 import mekhq.campaign.Unit;
 
 /**
@@ -31,6 +30,9 @@ import mekhq.campaign.Unit;
 public abstract class RepairItem extends UnitWorkItem {
 
     int hits;
+    //the id of a corresponding salvage item that must be removed if this repair is mutated
+    //into a replacement
+    int salvageId = NONE;
     
     public RepairItem(Unit unit, int h) {
         super(unit);
@@ -38,5 +40,13 @@ public abstract class RepairItem extends UnitWorkItem {
     }
     
     public abstract WorkItem replace();
+    
+    public int getSalvageId() {
+        return salvageId;
+    }
+    
+    public void setSalvageId(int id) {
+        this.salvageId = id;
+    }
     
 }

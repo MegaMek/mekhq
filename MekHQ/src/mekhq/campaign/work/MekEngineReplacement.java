@@ -45,9 +45,7 @@ public class MekEngineReplacement extends ReplacementItem {
     @Override
     public void fix() {
         super.fix();
-        for(int i = 0; i < unit.getEntity().locations(); i++) {
-            unit.getEntity().removeCriticals(i, new CriticalSlot(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE));
-        }
+        unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE);
     }
     
     @Override

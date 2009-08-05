@@ -62,23 +62,7 @@ public class EquipmentSalvage extends SalvageItem {
         mounted.setHit(true);
         mounted.setDestroyed(true);
         mounted.setRepairable(false);
-        //I also need to clear the critical slot
-        //I think the only way to do this is to loop through all crits and find any that are associated
-        //with this equipment
-        for(int loc = 0; loc < unit.getEntity().locations(); loc++) {
-            for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
-                CriticalSlot slot = unit.getEntity().getCritical(loc, i);
-                // ignore empty & system slots
-                if ((slot == null) || (slot.getType() != CriticalSlot.TYPE_EQUIPMENT)) {
-                    continue;
-                }
-                if (unit.getEntity().getEquipmentNum(mounted) == slot.getIndex()) {
-                    slot.setHit(true);
-                    slot.setDestroyed(true);
-                    slot.setRepairable(false);
-                }
-            }
-        }
+        unit.destroySystem(CriticalSlot.TYPE_EQUIPMENT, unit.getEntity().getEquipmentNum(mounted));
     }
     
     @Override

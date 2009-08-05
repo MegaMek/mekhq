@@ -63,7 +63,7 @@ public class MekActuatorReplacement extends ReplacementItem {
     @Override
     public void fix() {
         super.fix();
-        unit.getEntity().removeCriticals(loc, new CriticalSlot(CriticalSlot.TYPE_SYSTEM, type));
+        unit.repairSystem(CriticalSlot.TYPE_SYSTEM, type, loc);
     }
 
     @Override

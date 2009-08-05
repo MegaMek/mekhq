@@ -74,5 +74,11 @@ public class ArmorSalvage extends SalvageItem {
                 && ((ArmorSalvage)task).getUnitId() == this.getUnitId()
                 && ((ArmorSalvage)task).getLoc() == this.getLoc());
     }
+    
+    @Override
+    public void fix() {
+        super.fix();
+        unit.getEntity().setArmor(0, loc);
+    }
 
 }

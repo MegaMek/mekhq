@@ -59,10 +59,7 @@ public class MekEngineSalvage extends SalvageItem {
     @Override
     public void fix() {
         super.fix();
-        //FIXME: I dont think this will do the right thing
-        for(int i = 0; i < unit.getEntity().locations(); i++) {
-            unit.getEntity().addCritical(i, new CriticalSlot(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE));
-        }
+        unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE);
     }
 
 }

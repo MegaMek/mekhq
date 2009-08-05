@@ -65,8 +65,7 @@ public class MekActuatorSalvage extends SalvageItem {
     @Override
     public void fix() {
         super.fix();
-        //FIXME: I dont think this will do the right thing
-        unit.getEntity().addCritical(loc, new CriticalSlot(CriticalSlot.TYPE_SYSTEM, type));
+        unit.destroySystem(CriticalSlot.TYPE_SYSTEM, type, loc);
     }
 
     @Override

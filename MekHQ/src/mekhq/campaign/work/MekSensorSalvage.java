@@ -59,8 +59,6 @@ public class MekSensorSalvage extends SalvageItem {
     @Override
     public void fix() {
         super.fix();
-        for(int i = 0; i < unit.getEntity().locations(); i++) {
-            unit.getEntity().addCritical(i, new CriticalSlot(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS));
-        }
+        unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS);
     }
 }

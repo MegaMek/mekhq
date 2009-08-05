@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.1.1 (SVN)
++ helper functions in Unit for damaging, destroying, and repairing critical slots and associated uses
 + bug: duplicating salvage items on reload
 + added name and time to armor salvage
 + refactored actuator repairs and replacement into single repair and replace items with a type variable

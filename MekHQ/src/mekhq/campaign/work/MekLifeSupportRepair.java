@@ -44,9 +44,7 @@ public class MekLifeSupportRepair extends RepairItem {
     
     @Override
     public void fix() {
-        for(int i = 0; i < unit.getEntity().locations(); i++) {
-            unit.getEntity().removeCriticals(i, new CriticalSlot(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_LIFE_SUPPORT));
-        }
+        unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_LIFE_SUPPORT);
     }
 
     @Override

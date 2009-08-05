@@ -43,9 +43,7 @@ public class MekSensorReplacement extends ReplacementItem {
     @Override
     public void fix() {
         super.fix();
-        for(int i = 0; i < unit.getEntity().locations(); i++) {
-            unit.getEntity().removeCriticals(i, new CriticalSlot(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS));
-        }
+        unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS);
     }
     
     @Override

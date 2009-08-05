@@ -375,6 +375,17 @@ public class Campaign implements Serializable {
          if(newTask instanceof ReplacementItem) {
              assignPart(newTask);
          }
+         if(newTask instanceof ReplacementItem && oldTask instanceof RepairItem) {
+             //then remove any corresponding salvage items
+             //TODO: if we turn a repair item into a replacement item 
+             //we need to set the related part as non-repairable
+             //really need a specific "scrap component" method
+             RepairItem repair = (RepairItem)oldTask;
+             WorkItem salvage = getTask(repair.getSalvageId());
+             if(null != salvage) {
+                removeTask(salvage);
+             }
+         }
          int index = -1;
          for(WorkItem task : getTasks()) {
              index++;

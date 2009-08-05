@@ -40,6 +40,8 @@ public abstract class WorkItem implements Serializable {
     public static final int MODE_RUSH_THREE = 5;
     public static final int MODE_N = 6;
     
+    public static final int NONE = -1;
+    
     protected String name;
     //the id of this work item
     protected int id;

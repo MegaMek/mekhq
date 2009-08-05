@@ -53,7 +53,7 @@ public class Unit implements Serializable {
     private int site;
     private boolean deployed;
     private PilotPerson pilot;
-    private boolean salvage;
+    private boolean salvaged;
     
     public Campaign campaign;
     //TODO: need to keep track of what components have been removed from this unit
@@ -62,7 +62,7 @@ public class Unit implements Serializable {
         this.entity = en;
         this.site = SITE_BAY;
         this.deployed = false;
-        this.salvage = false;
+        this.salvaged = false;
         this.campaign = c;
     }
     
@@ -104,11 +104,11 @@ public class Unit implements Serializable {
     }
     
     public boolean isSalvage() {
-        return salvage;
+        return salvaged;
     }
     
     public void setSalvage(boolean b) {
-        this.salvage = b;
+        this.salvaged = b;
     }
     
     /**
@@ -136,7 +136,10 @@ public class Unit implements Serializable {
         //It is somewhat unclear but the language of StratOps implies that even equipment that
         //is "combat destroyed" can be repaired.  For example, a gyro with 2 hits can still be repaired
         //although with a +4 mod.  Weapons and other equipment must pass a roll to be repairable
-            
+        
+        SalvageItem salvage = null;
+        RepairItem repair = null;
+        
         //cycle through the locations and assign tasks
         //don't do weapons and equipment here because some are spreadable
         int engineHits = 0;
@@ -156,10 +159,18 @@ public class Unit implements Serializable {
                 }
             } else {
                 //repair internal
+                repair = null;
+                salvage = null;
+                if(entity instanceof Mech && i != Mech.LOC_CT) {
+                    salvage = new LocationSalvage(this, i);
+                    campaign.addWork(salvage);
+                    //TODO: rotor and turret salvage for vees
+                }
                 double pctInternal = entity.getInternal(i)/entity.getOInternal(i);
                 if(pctInternal < 1.00) {
                     if(entity instanceof Mech || entity instanceof Protomech) {
-                        campaign.addWork(new MekInternalRepair(this, i, pctInternal));
+                        repair = new MekInternalRepair(this, i, pctInternal);
+                        campaign.addWork(repair);
                     } else if (entity instanceof Tank) {
                         if(entity instanceof VTOL && i == VTOL.LOC_ROTOR) {
                             int hits = entity.getOInternal(i)- entity.getInternal(i);
@@ -167,13 +178,15 @@ public class Unit implements Serializable {
                                 campaign.addWork(new RotorRepair(this));
                                 hits--;
                             }
+                        } else {
+                            repair = new VeeInternalRepair(this, i);
+                            campaign.addWork(repair);
                         }
-                        campaign.addWork(new VeeInternalRepair(this, i));
                     }
                 } 
-                if(entity instanceof Mech && i != Mech.LOC_CT) {
-                    campaign.addWork(new LocationSalvage(this, i));
-                    //TODO: rotor and turret salvage for vees
+                if(null != salvage && null != repair) {
+                    salvage.setRepairId(repair.getId());
+                    repair.setSalvageId(salvage.getId());
                 }
             }
             
@@ -195,10 +208,14 @@ public class Unit implements Serializable {
                 engineCrits += entity.getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE, i);
                 int sensorHits = entity.getHitCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS, i);
                 if(entity.getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS, i) > 0) {
-                    if(entity.isSystemRepairable(Mech.SYSTEM_SENSORS, i)) {  
-                        campaign.addWork(new MekSensorSalvage(this));
+                    if(entity.isSystemRepairable(Mech.SYSTEM_SENSORS, i)) { 
+                        salvage = new MekSensorSalvage(this);
+                        campaign.addWork(salvage);
                         if(sensorHits > 0) {
-                            campaign.addWork(new MekSensorRepair(this, sensorHits));
+                            repair = new MekSensorRepair(this, sensorHits);
+                            campaign.addWork(repair);
+                            salvage.setRepairId(repair.getId());
+                            repair.setSalvageId(salvage.getId());
                         } 
                     } else {
                         campaign.addWork(new MekSensorReplacement(this));
@@ -207,9 +224,13 @@ public class Unit implements Serializable {
                 int lifeHits = entity.getHitCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_LIFE_SUPPORT, i);
                 if(entity.getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_LIFE_SUPPORT, i) > 0) {
                     if(entity.isSystemRepairable(Mech.SYSTEM_LIFE_SUPPORT, i)) {
-                        campaign.addWork(new MekLifeSupportSalvage(this));
+                        salvage = new MekLifeSupportSalvage(this);
+                        campaign.addWork(salvage);
                         if(lifeHits > 0) {
-                            campaign.addWork(new MekLifeSupportRepair(this, sensorHits));
+                            repair = new MekLifeSupportRepair(this, lifeHits);
+                            campaign.addWork(repair);
+                            salvage.setRepairId(repair.getId());
+                            repair.setSalvageId(salvage.getId());
                         } 
                     } else {
                         campaign.addWork(new MekLifeSupportReplacement(this));
@@ -218,9 +239,13 @@ public class Unit implements Serializable {
                 int gyroHits = entity.getHitCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_GYRO, i);
                 if(entity.getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_GYRO, i) > 0) {
                     if(entity.isSystemRepairable(Mech.SYSTEM_GYRO, i)) {
-                        campaign.addWork(new MekGyroSalvage(this));
+                        salvage = new MekGyroSalvage(this);
+                        campaign.addWork(salvage);
                         if(gyroHits > 0) {
-                            campaign.addWork(new MekGyroRepair(this, gyroHits));
+                            repair = new MekGyroRepair(this, gyroHits);
+                            campaign.addWork(repair);
+                            salvage.setRepairId(repair.getId());
+                            repair.setSalvageId(salvage.getId());
                         } 
                     } else {
                         campaign.addWork(new MekGyroReplacement(this));
@@ -234,9 +259,13 @@ public class Unit implements Serializable {
                     }
                     if(entity.getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, act, i) > 0) {
                         if(entity.isSystemRepairable(act, i)) {
-                            campaign.addWork(new MekActuatorSalvage(this, i, act));
+                            salvage = new MekActuatorSalvage(this, i, act);
+                            campaign.addWork(salvage);
                             if(entity.getHitCriticals(CriticalSlot.TYPE_SYSTEM, act, i) > 0) {
-                                campaign.addWork(new MekActuatorRepair(this, 1, i, act));
+                                repair = new MekActuatorRepair(this, 1, i, act);
+                                campaign.addWork(repair);
+                                salvage.setRepairId(repair.getId());
+                                repair.setSalvageId(salvage.getId());
                             } 
                         } else {
                             campaign.addWork(new MekActuatorReplacement(this, i, act));
@@ -258,8 +287,12 @@ public class Unit implements Serializable {
             if(engineHits >= engineCrits) {
                 campaign.addWork(new MekEngineReplacement(this));
             } else {
-                campaign.addWork(new MekEngineRepair(this, engineHits));
-                campaign.addWork(new MekEngineSalvage(this));
+                salvage = new MekEngineSalvage(this);
+                repair = new MekEngineRepair(this, engineHits);
+                campaign.addWork(salvage);
+                campaign.addWork(repair);
+                salvage.setRepairId(repair.getId());
+                repair.setSalvageId(salvage.getId());
             }
         }
         
@@ -280,10 +313,9 @@ public class Unit implements Serializable {
         
         //now lets cycle through equipment
         for(Mounted m : entity.getEquipment()) {
-            if(m.isHit() || m.isDestroyed()) {
-                
-                //some slots need to be skipped (like armor, endo-steel, etc.)
-                if(!m.getType().isHittable()) {
+            
+            //some slots need to be skipped (like armor, endo-steel, etc.)
+            if(!m.getType().isHittable()) {
                     m.setHit(false);
                     m.setDestroyed(false);
                     for(int loc = 0; loc < getEntity().locations(); loc++) {
@@ -300,37 +332,51 @@ public class Unit implements Serializable {
                         } 
                     }
                     continue;
-                }
-                
-                //check flags for jump jets and heat sinks because those are handled by their own classes
-                if(m.getType() instanceof MiscType) {
-                    if(m.getType().hasFlag(MiscType.F_JUMP_JET)) {
-                        if(m.isRepairable()) {
-                            campaign.addWork(new JumpJetRepair(this, 1, m));
-                            campaign.addWork(new JumpJetSalvage(this, m));
-                        } else {
-                            campaign.addWork(new JumpJetReplacement(this, m));
-                        }
-                        continue;
-                    } 
-                    else if(m.getType().hasFlag(MiscType.F_HEAT_SINK) 
-                                || m.getType().hasFlag(MiscType.F_DOUBLE_HEAT_SINK)) {
-                        if(m.isRepairable()) {
-                            campaign.addWork(new HeatSinkRepair(this, 1, m));
-                            campaign.addWork(new HeatSinkSalvage(this, m));
-                        } else {
-                            campaign.addWork(new HeatSinkReplacement(this, m));
-                        }
-                        continue;
-                    } 
-                    //leave CASE out for now
-                    //http://www.classicbattletech.com/forums/index.php/topic,49940.0.html
-                    else if(m.getType().hasFlag(MiscType.F_CASE) || m.getType().hasFlag(MiscType.F_CASEII)) {
-                        m.setHit(false);
-                        m.setDestroyed(false);
-                        continue;
+            }
+            
+            boolean isHit = m.isHit() || m.isDestroyed();
+            
+            //check flags for jump jets and heat sinks because those are handled by their own classes
+            if(m.getType() instanceof MiscType) {
+                if(m.getType().hasFlag(MiscType.F_JUMP_JET)) {
+                    if(m.isRepairable()) {
+                        salvage = new JumpJetSalvage(this, m);
+                        campaign.addWork(salvage);
+                        if(isHit) {
+                            repair = new JumpJetRepair(this, 1, m);
+                            campaign.addWork(repair);
+                            salvage.setRepairId(repair.getId());
+                            repair.setSalvageId(salvage.getId());
+                        }   
+                    } else {
+                        campaign.addWork(new JumpJetReplacement(this, m));
                     }
+                    continue;
+                } 
+                else if(m.getType().hasFlag(MiscType.F_HEAT_SINK) 
+                         || m.getType().hasFlag(MiscType.F_DOUBLE_HEAT_SINK)) {
+                    if(m.isRepairable()) {
+                        salvage = new HeatSinkSalvage(this, m);
+                        campaign.addWork(salvage);
+                        if(isHit) {
+                            repair = new HeatSinkRepair(this, 1, m);
+                            campaign.addWork(repair);
+                            salvage.setRepairId(repair.getId());
+                            repair.setSalvageId(salvage.getId());
+                        }   
+                    } else {
+                        campaign.addWork(new HeatSinkReplacement(this, m));
+                    }
+                    continue;
+                } 
+                //leave CASE out for now
+                //http://www.classicbattletech.com/forums/index.php/topic,49940.0.html
+                else if(m.getType().hasFlag(MiscType.F_CASE) || m.getType().hasFlag(MiscType.F_CASEII)) {
+                    m.setHit(false);
+                    m.setDestroyed(false);
+                    continue;
                 }
+           }
                 
                 //ammo is also handled its own way
                 if(m.getType() instanceof AmmoType) {
@@ -345,12 +391,17 @@ public class Unit implements Serializable {
                 //with the proper use of setHit and setDestroyed
                 //and added to the MUL file.      
                 if(m.isRepairable()) {
-                    campaign.addWork(new EquipmentRepair(this, getCrits(m), m));
-                    campaign.addWork(new EquipmentSalvage(this, m));
+                    salvage = new EquipmentSalvage(this, m);
+                    campaign.addWork(salvage);
+                    if(isHit) {
+                        repair = new EquipmentRepair(this, getCrits(m), m);
+                        campaign.addWork(repair);
+                        salvage.setRepairId(repair.getId());
+                        repair.setSalvageId(salvage.getId());
+                    }
                 } else {
                     campaign.addWork(new EquipmentReplacement(this, m));
                 }
-            }
         }
         
         //now check for reloads
@@ -511,4 +562,102 @@ public class Unit implements Serializable {
         }
         return false;
     }
+    
+    public void damageSystem(int type, int slot) {
+        for(int loc = 0; loc < getEntity().locations(); loc++) {
+            for (int i = 0; i < getEntity().getNumberOfCriticals(loc); i++) {
+                CriticalSlot cs = getEntity().getCritical(loc, i);
+                // ignore empty & system slots
+                if ((cs == null) || (cs.getType() !=type)) {
+                    continue;
+                }
+                if (cs.getIndex() == slot) {
+                    cs.setHit(true);
+                    cs.setDestroyed(true);
+                    cs.setRepairable(true);
+                }
+            }
+        }
+    }
+    
+    public void destroySystem(int type, int slot) {
+        for(int loc = 0; loc < getEntity().locations(); loc++) {
+            for (int i = 0; i < getEntity().getNumberOfCriticals(loc); i++) {
+                CriticalSlot cs = getEntity().getCritical(loc, i);
+                // ignore empty & system slots
+                if ((cs == null) || (cs.getType() !=type)) {
+                    continue;
+                }
+                if (cs.getIndex() == slot) {
+                    cs.setHit(true);
+                    cs.setDestroyed(true);
+                    cs.setRepairable(false);
+                }
+            }
+        }
+    }
+    
+    public void repairSystem(int type, int slot) {
+        for(int loc = 0; loc < getEntity().locations(); loc++) {
+            for (int i = 0; i < getEntity().getNumberOfCriticals(loc); i++) {
+                CriticalSlot cs = getEntity().getCritical(loc, i);
+                // ignore empty & system slots
+                if ((cs == null) || (cs.getType() !=type)) {
+                    continue;
+                }
+                if (cs.getIndex() == slot) {
+                    cs.setHit(false);
+                    cs.setDestroyed(false);
+                    cs.setRepairable(true);
+                }
+            }
+        }
+    }
+    
+    public void damageSystem(int type, int slot, int loc) {
+        for (int i = 0; i < getEntity().getNumberOfCriticals(loc); i++) {
+            CriticalSlot cs = getEntity().getCritical(loc, i);
+            // ignore empty & system slots
+            if ((cs == null) || (cs.getType() !=type)) {
+                continue;
+            }
+            if (cs.getIndex() == slot) {
+                cs.setHit(true);
+                cs.setDestroyed(true);
+                cs.setRepairable(true);
+            }
+        }
+    }
+    
+    public void destroySystem(int type, int slot, int loc) {
+        for (int i = 0; i < getEntity().getNumberOfCriticals(loc); i++) {
+            CriticalSlot cs = getEntity().getCritical(loc, i);
+            // ignore empty & system slots
+            if ((cs == null) || (cs.getType() !=type)) {
+                continue;
+            }
+            if (cs.getIndex() == slot) {
+                cs.setHit(true);
+                cs.setDestroyed(true);
+                cs.setRepairable(false);
+            }
+        }
+    }
+    
+    public void repairSystem(int type, int slot, int loc) {
+        for (int i = 0; i < getEntity().getNumberOfCriticals(loc); i++) {
+            CriticalSlot cs = getEntity().getCritical(loc, i);
+            // ignore empty & system slots
+            if ((cs == null) || (cs.getType() !=type)) {
+                continue;
+            }
+            if (cs.getIndex() == slot) {
+                cs.setHit(false);
+                cs.setDestroyed(false);
+                cs.setRepairable(true);
+            }
+        }
+    }
+    
+    
 }

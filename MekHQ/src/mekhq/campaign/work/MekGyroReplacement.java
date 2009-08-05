@@ -43,7 +43,7 @@ public class MekGyroReplacement extends ReplacementItem {
     @Override
     public void fix() {
         super.fix();
-        unit.getEntity().removeCriticals(Mech.LOC_CT, new CriticalSlot(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_GYRO));
+        unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_GYRO, Mech.LOC_CT);
     }
 
     @Override

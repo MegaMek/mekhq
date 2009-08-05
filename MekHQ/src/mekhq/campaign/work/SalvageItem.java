@@ -21,7 +21,6 @@
 
 package mekhq.campaign.work;
 
-import mekhq.campaign.Campaign;
 import mekhq.campaign.Unit;
 import mekhq.campaign.parts.Part;
 
@@ -31,6 +30,9 @@ import mekhq.campaign.parts.Part;
  */
 public abstract class SalvageItem extends UnitWorkItem {
     
+    //the id of a corresponding repair item that must be dealt with when this item is processed
+    protected int repairId = NONE;
+    
     public SalvageItem(Unit u) {
         super(u);
     }
@@ -39,10 +41,23 @@ public abstract class SalvageItem extends UnitWorkItem {
     public void fix() {
         unit.campaign.addPart(getPart());
         unit.campaign.addWork(getReplacement());
+        RepairItem repair = (RepairItem)unit.campaign.getTask(repairId);
+        if(null != repair) {
+            //remove the repair item
+            unit.campaign.removeTask(repair);
+        }
     }
     
     public abstract ReplacementItem getReplacement();
     
     public abstract Part getPart();
+    
+    public int getRepairId() {
+        return repairId;
+    }
+    
+    public void setRepairId(int id) {
+        this.repairId = id;
+    }
 
 }
