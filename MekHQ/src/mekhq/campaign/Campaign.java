@@ -153,7 +153,7 @@ public class Campaign implements Serializable {
             }
             //remove old tasks
             ArrayList<WorkItem> oldTasks = new ArrayList<WorkItem>();
-            for(WorkItem task : getTasksForUnit(priorUnit.getId())) {
+            for(WorkItem task : getAllTasksForUnit(priorUnit.getId())) {
                 if(task instanceof RepairItem || task instanceof ReplacementItem) {
                     oldTasks.add(task);
                 }
@@ -304,6 +304,17 @@ public class Campaign implements Serializable {
                     && ((UnitWorkItem)task).getUnitId() == unitId
                     && ((task instanceof SalvageItem && unit.isSalvage())
                         || (!(task instanceof SalvageItem) && !unit.isSalvage()))) {
+                    newTasks.add(task);
+            }
+        }
+        return newTasks;
+    }
+    
+    public ArrayList<WorkItem> getAllTasksForUnit(int unitId) {
+        ArrayList<WorkItem> newTasks = new ArrayList<WorkItem>();
+        for(WorkItem task : getTasks()) {
+            if(task instanceof UnitWorkItem 
+                    && ((UnitWorkItem)task).getUnitId() == unitId) {
                     newTasks.add(task);
             }
         }

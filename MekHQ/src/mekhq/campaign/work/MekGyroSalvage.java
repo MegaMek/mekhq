@@ -31,7 +31,7 @@ import mekhq.campaign.parts.Part;
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-class MekGyroSalvage extends SalvageItem {
+public class MekGyroSalvage extends SalvageItem {
 
     public MekGyroSalvage(Unit unit) {
         super(unit);

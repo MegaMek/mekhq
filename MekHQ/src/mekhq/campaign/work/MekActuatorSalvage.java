@@ -30,7 +30,7 @@ import mekhq.campaign.parts.Part;
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-class MekActuatorSalvage extends SalvageItem {
+public class MekActuatorSalvage extends SalvageItem {
 
     protected int loc;
     protected int type;
@@ -39,7 +39,7 @@ class MekActuatorSalvage extends SalvageItem {
         super(unit);
         this.loc = i;
         this.type = t;
-        this.name = "Replace actuator (" + unit.getEntity().getLocationName(loc) + ")";
+        this.name = "Salvage actuator (" + unit.getEntity().getLocationName(loc) + ")";
         this.time = 90;
         this.difficulty = -3;
     }

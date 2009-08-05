@@ -21,6 +21,8 @@
 
 package mekhq.campaign.work;
 
+import megamek.common.Aero;
+import megamek.common.Tank;
 import mekhq.campaign.Unit;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
@@ -29,13 +31,27 @@ import mekhq.campaign.parts.Part;
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-class ArmorSalvage extends SalvageItem {
+public class ArmorSalvage extends SalvageItem {
 
     protected int loc;
+    protected int amount;
     
     public ArmorSalvage(Unit unit, int loc) {
         super(unit);
         this.loc = loc;
+        this.amount = unit.getEntity().getArmor(loc);
+        this.difficulty = -2;
+        this.time = 5 * amount;
+        if(unit.getEntity() instanceof Tank) {
+            this.time = 3 * amount;
+        } else if (unit.getEntity() instanceof Aero) {
+            if(((Aero)unit.getEntity()).isCapitalScale()) {
+                this.time = 120 * amount;
+            } else {
+                this.time = 15 * amount;
+            }
+        }
+        this.name = "Salvage armor (" + unit.getEntity().getLocationName(loc) + ", " + amount + ")";
     }
 
     @Override

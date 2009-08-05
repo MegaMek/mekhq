@@ -31,7 +31,7 @@ import mekhq.campaign.parts.Part;
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-class MekLifeSupportSalvage extends SalvageItem {
+public class MekLifeSupportSalvage extends SalvageItem {
 
     public MekLifeSupportSalvage(Unit unit) {
                 super(unit);
