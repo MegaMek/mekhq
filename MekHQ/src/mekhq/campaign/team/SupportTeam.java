@@ -24,9 +24,7 @@ package mekhq.campaign.team;
 import mekhq.campaign.*;
 import java.io.Serializable;
 import megamek.common.TargetRoll;
-import mekhq.campaign.parts.Part;
 import mekhq.campaign.work.PersonnelWorkItem;
-import mekhq.campaign.work.RepairItem;
 import mekhq.campaign.work.ReplacementItem;
 import mekhq.campaign.work.UnitWorkItem;
 import mekhq.campaign.work.WorkItem;
@@ -69,6 +67,8 @@ public abstract class SupportTeam implements Serializable {
                return "Veteran";
            case SupportTeam.EXP_ELITE:
                return "Elite";
+            case SupportTeam.EXP_NUM:
+                return "Impossible";
        }
        return "Unknown";
     }

@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.1.1 (SVN)
++ Elite failure of repair item does not automatically mutate to replacement item in case player still wants to use damaged part
 + Bug: salvaged locations not set to IArmorState.ARMOR_DESTROYED
 + smaller fonts on Info
 + scrapping component destroys part

@@ -58,7 +58,11 @@ public abstract class RepairItem extends UnitWorkItem {
     
     @Override
     protected String maxSkillReached() {
-        unit.campaign.mutateTask(this, replace());
+        //I don't want to automatically mutate the repair into a replacement
+        //because the part may still be functional (like a gyro with one hit) and 
+        //the player may prefer to leave it in its damaged state rather than rip it out
+        //the player can decide to scrap the component by using the context manu
+        //unit.campaign.mutateTask(this, replace());
         return "<br><emph><b>Item cannot be repaired, it must be replaced instead.</b></emph>";
     }
     
