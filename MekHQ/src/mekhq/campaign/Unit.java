@@ -209,7 +209,7 @@ public class Unit implements Serializable {
             }
             
             //check for various component damage
-            if(entity instanceof Mech) {
+            if(entity instanceof Mech) {              
                 engineHits += entity.getHitCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE, i);
                 engineCrits += entity.getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE, i);
                 int sensorHits = entity.getHitCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS, i);
@@ -289,17 +289,21 @@ public class Unit implements Serializable {
         }//end location checks
         
         //check engine
-        if(entity instanceof Mech && engineHits > 0) {
+        if(entity instanceof Mech) {
+            //no repairing of cockpit, so instafix
+            this.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_COCKPIT);
             if(engineHits >= engineCrits) {
                 campaign.addWork(new MekEngineReplacement(this));
             } else {
                 salvage = new MekEngineSalvage(this);
-                repair = new MekEngineRepair(this, engineHits);
                 campaign.addWork(salvage);
-                campaign.addWork(repair);
-                salvage.setRepairId(repair.getId());
-                repair.setSalvageId(salvage.getId());
-            }
+                if(engineHits > 0) {
+                    repair = new MekEngineRepair(this, engineHits);
+                    campaign.addWork(repair);
+                    salvage.setRepairId(repair.getId());
+                    repair.setSalvageId(salvage.getId());
+                }
+            } 
         }
         
         //check vee components
@@ -321,7 +325,9 @@ public class Unit implements Serializable {
         for(Mounted m : entity.getEquipment()) {
             
             //some slots need to be skipped (like armor, endo-steel, etc.)
-            if(!m.getType().isHittable()) {
+            //leave CASE out for now
+            //http://www.classicbattletech.com/forums/index.php/topic,49940.0.html
+            if(!m.getType().isHittable() || m.getType().hasFlag(MiscType.F_CASE) || m.getType().hasFlag(MiscType.F_CASEII)) {
                     m.setHit(false);
                     m.setDestroyed(false);
                     for(int loc = 0; loc < getEntity().locations(); loc++) {
@@ -334,6 +340,7 @@ public class Unit implements Serializable {
                             if (getEntity().getEquipmentNum(m) == slot.getIndex()) {
                                 slot.setHit(false);
                                 slot.setDestroyed(false);
+                                slot.setRepairable(true);
                             }
                         } 
                     }
@@ -373,13 +380,6 @@ public class Unit implements Serializable {
                     } else {
                         campaign.addWork(new HeatSinkReplacement(this, m));
                     }
-                    continue;
-                } 
-                //leave CASE out for now
-                //http://www.classicbattletech.com/forums/index.php/topic,49940.0.html
-                else if(m.getType().hasFlag(MiscType.F_CASE) || m.getType().hasFlag(MiscType.F_CASEII)) {
-                    m.setHit(false);
-                    m.setDestroyed(false);
                     continue;
                 }
            }
@@ -624,7 +624,7 @@ public class Unit implements Serializable {
         for (int i = 0; i < getEntity().getNumberOfCriticals(loc); i++) {
             CriticalSlot cs = getEntity().getCritical(loc, i);
             // ignore empty & system slots
-            if ((cs == null) || (cs.getType() !=type)) {
+            if ((cs == null) || (cs.getType() != type)) {
                 continue;
             }
             if (cs.getIndex() == slot) {
