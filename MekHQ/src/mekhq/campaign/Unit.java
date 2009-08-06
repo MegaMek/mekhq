@@ -32,6 +32,8 @@ import megamek.common.Protomech;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.VTOL;
+import megamek.common.weapons.ISERPPC;
+import megamek.common.weapons.ISERPPC;
 import mekhq.campaign.personnel.PilotPerson;
 import mekhq.campaign.work.*;
 
@@ -327,7 +329,7 @@ public class Unit implements Serializable {
             //some slots need to be skipped (like armor, endo-steel, etc.)
             //leave CASE out for now
             //http://www.classicbattletech.com/forums/index.php/topic,49940.0.html
-            if(!m.getType().isHittable() || m.getType().hasFlag(MiscType.F_CASE) || m.getType().hasFlag(MiscType.F_CASEII)) {
+            if(!m.getType().isHittable()) {
                     m.setHit(false);
                     m.setDestroyed(false);
                     for(int loc = 0; loc < getEntity().locations(); loc++) {
@@ -368,6 +370,10 @@ public class Unit implements Serializable {
                 } 
                 else if(m.getType().hasFlag(MiscType.F_HEAT_SINK) 
                          || m.getType().hasFlag(MiscType.F_DOUBLE_HEAT_SINK)) {
+                    //if location is -1, then this is a heat sink internal to the engine
+                    if(m.getLocation() == -1) {
+                        continue;
+                    }
                     if(m.isRepairable()) {
                         salvage = new HeatSinkSalvage(this, m);
                         campaign.addWork(salvage);
@@ -395,7 +401,7 @@ public class Unit implements Serializable {
            //TODO: I am no longer making the check here. Any randomness in this method can lead to 
            //weird results when units are deployed and then reloaded. This should really be done in MegaMek
            //with the proper use of setHit and setDestroyed
-           //and added to the MUL file.      
+           //and added to the MUL file.    
            if(m.isRepairable()) {
                salvage = new EquipmentSalvage(this, m);
                campaign.addWork(salvage);
