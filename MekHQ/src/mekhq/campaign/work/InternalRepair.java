@@ -21,6 +21,7 @@
 
 package mekhq.campaign.work;
 
+import megamek.common.IArmorState;
 import mekhq.campaign.Unit;
 
 /**
@@ -46,7 +47,7 @@ public abstract class InternalRepair extends RepairItem {
     @Override
     public WorkItem replace() {
         removeSalvage();
-        unit.getEntity().setInternal(0, loc);
+        unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, loc);
         return new LocationReplacement(unit, loc);
     }
     

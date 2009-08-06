@@ -36,7 +36,6 @@ public class PartInfo extends javax.swing.JPanel {
 
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(PartInfo.class);
         lblImage.setIcon(resourceMap.getIcon("lblImage.icon")); // NOI18N
-        lblImage.setText(resourceMap.getString("lblImage.text")); // NOI18N
         lblImage.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         lblImage.setName("lblImage"); // NOI18N
         add(lblImage);

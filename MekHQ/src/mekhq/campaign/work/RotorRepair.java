@@ -21,6 +21,7 @@
 
 package mekhq.campaign.work;
 
+import megamek.common.IArmorState;
 import megamek.common.VTOL;
 import mekhq.campaign.Unit;
 
@@ -40,7 +41,7 @@ public class RotorRepair extends RepairItem {
     @Override
     public WorkItem replace() {
         removeSalvage();
-        unit.getEntity().setInternal(0, VTOL.LOC_ROTOR);
+        unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, VTOL.LOC_ROTOR);
         return new RotorReplacement(unit, VTOL.LOC_ROTOR);
     }
 

@@ -21,6 +21,7 @@
 
 package mekhq.campaign.work;
 
+import megamek.common.IArmorState;
 import mekhq.campaign.Unit;
 import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.Part;
@@ -44,7 +45,7 @@ public class LocationSalvage extends SalvageItem {
     @Override
     public void fix() {
         super.fix();
-        unit.getEntity().setInternal(0, loc);
+        unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, loc);
     }
     
     public int getLoc() {

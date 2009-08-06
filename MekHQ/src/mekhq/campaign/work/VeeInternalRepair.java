@@ -21,6 +21,7 @@
 
 package mekhq.campaign.work;
 
+import megamek.common.IArmorState;
 import megamek.common.Tank;
 import megamek.common.VTOL;
 import mekhq.campaign.Unit;
@@ -42,11 +43,11 @@ public class VeeInternalRepair extends InternalRepair {
         removeSalvage();
         //you can only replace turrets and rotors
         if(unit.getEntity() instanceof VTOL && loc == VTOL.LOC_ROTOR) {
-            unit.getEntity().setInternal(0, VTOL.LOC_ROTOR);
+            unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, VTOL.LOC_ROTOR);
             return new RotorReplacement(unit, loc);
         }
         if(unit.getEntity() instanceof Tank && loc == VTOL.LOC_TURRET) {
-            unit.getEntity().setInternal(0, Tank.LOC_TURRET);
+            unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, Tank.LOC_TURRET);
             return new TurretReplacement(unit, loc);
         }
         return super.replace();

@@ -21,6 +21,7 @@
 
 package mekhq.campaign.work;
 
+import megamek.common.IArmorState;
 import megamek.common.Tank;
 import mekhq.campaign.Unit;
 
@@ -41,7 +42,7 @@ public class TurretLockRepair extends RepairItem {
     @Override
     public WorkItem replace() {
         removeSalvage();
-        unit.getEntity().setInternal(0, Tank.LOC_TURRET);
+        unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, Tank.LOC_TURRET);
         return new TurretReplacement(unit, Tank.LOC_TURRET);
     }
 
