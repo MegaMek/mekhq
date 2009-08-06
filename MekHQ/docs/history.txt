@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.1.1 (SVN)
++ smaller fonts on Info
 + scrapping component destroys part
 + refactored success and failure of tasks out of SupportTeam
 + Bug: removed comment out on parts check for target roll

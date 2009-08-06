@@ -134,13 +134,13 @@ public class PilotPerson extends Person {
     
     @Override
     public String getDescHTML() {
-        String toReturn = "<html><b>" + pilot.getName() + "</b><br>";
+        String toReturn = "<html><font size='2'><b>" + pilot.getName() + "</b><br>";
         toReturn += getTypeDesc() + " (" + pilot.getGunnery() + "/" + pilot.getPiloting() + ")<br>";
         toReturn += pilot.getStatusDesc() + getAssignedDoctorString();
         if(isDeployed()) {
             toReturn += " (DEPLOYED)";
         }
-        toReturn += "</html>";
+        toReturn += "</font></html>";
         return toReturn;
     }
     

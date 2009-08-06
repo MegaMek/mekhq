@@ -143,10 +143,12 @@ public abstract class WorkItem implements Serializable {
             bonus = "+" + bonus;
         }
         bonus = "(" + bonus + ")";
-        String toReturn = "<html>";
+        String toReturn = "<html><font size='2'";
+        
         if(this instanceof ReplacementItem && !((ReplacementItem)this).hasPart()) {
-            toReturn +="<font color='white'>";
+            toReturn +=" color='white'";
         }
+        toReturn += ">";
         toReturn += "<b>" + getDesc() + "</b><br>";
         toReturn += "" + getTime() + " minutes";
         toReturn += ", " + SupportTeam.getRatingName(getSkillMin());
@@ -154,10 +156,7 @@ public abstract class WorkItem implements Serializable {
         if(getMode() != MODE_NORMAL) {
             toReturn += "<br><i>" + getCurrentModeName() + "</i>";
         }
-         if(this instanceof ReplacementItem && !((ReplacementItem)this).hasPart()) {
-            toReturn +="</font>";
-        }
-        toReturn += "</html>";
+        toReturn += "</font></html>";
         return toReturn;
     }
     

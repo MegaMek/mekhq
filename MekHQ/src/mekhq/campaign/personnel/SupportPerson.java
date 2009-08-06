@@ -52,7 +52,7 @@ public class SupportPerson extends Person {
     
     @Override
     public String getDescHTML() {
-        String toReturn = "<html><b>" + team.getName() + "</b><br>";
+        String toReturn = "<html><font size='2'><b>" + team.getName() + "</b><br>";
         toReturn += team.getRatingName() + " " + team.getTypeDesc() + "<br>";
         if(team.getCasualties() > 0) {
             toReturn = team.getCasualties() + " casualties" + getAssignedDoctorString();
@@ -60,7 +60,7 @@ public class SupportPerson extends Person {
         if(isDeployed()) {
             toReturn += "DEPLOYED!";
         }
-        toReturn += "</html>";
+        toReturn += "</font></html>";
         return toReturn;
     }
 
