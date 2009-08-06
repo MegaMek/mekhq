@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.1.1 (SVN)
++ scrapping component destroys part
 + refactored success and failure of tasks out of SupportTeam
 + Bug: removed comment out on parts check for target roll
 + Bug: parts re-assignment not resetting to null when no useable parts are available

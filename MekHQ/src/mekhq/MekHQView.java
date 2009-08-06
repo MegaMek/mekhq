@@ -1220,7 +1220,7 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
                 if(task instanceof RepairItem) {
                     campaign.mutateTask(task, ((RepairItem)task).replace());
                 } else if (task instanceof ReplacementItem) {
-                    //TODO: destroy part once parts are implemented
+                    ((ReplacementItem)task).useUpPart();
                     task.setSkillMin(SupportTeam.EXP_GREEN);
                 }
                 refreshTaskList();
