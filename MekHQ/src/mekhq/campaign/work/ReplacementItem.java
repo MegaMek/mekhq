@@ -24,6 +24,7 @@ package mekhq.campaign.work;
 import megamek.common.TargetRoll;
 import mekhq.campaign.Unit;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.team.SupportTeam;
 
 /**
  *
@@ -73,6 +74,14 @@ public abstract class ReplacementItem extends UnitWorkItem {
             target.addModifier(1, "salvaged part");
         }
         return target;
+    }
+    
+    @Override
+    protected String maxSkillReached() {
+        useUpPart();
+        //reset the skill min counter back to green
+        setSkillMin(SupportTeam.EXP_GREEN);
+        return "<br><emph><b>Component destroyed!</b></emph>";
     }
     
     public abstract Part partNeeded();

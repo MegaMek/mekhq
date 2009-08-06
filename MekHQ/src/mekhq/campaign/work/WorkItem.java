@@ -188,13 +188,20 @@ public abstract class WorkItem implements Serializable {
      */
     public abstract void fix();
     
+    
+    public String succeed() {
+        fix();
+        complete();
+        return " <font color='green'><b>task completed.</b></font>";
+    }
     /**
      * fail this work item
      * @param rating - an <code>int</code> of the skill rating of the currently assigned team
      */
-    public void fail(int rating) {
+    public String fail(int rating) {
         //increment the minimum skill level required
         setSkillMin(rating + 1);
+        return " <font color='red'><b>task failed.</b></font>";
     }
     
     public SupportTeam getTeam() {

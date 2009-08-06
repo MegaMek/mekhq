@@ -231,7 +231,7 @@ public abstract class SupportTeam implements Serializable {
            return new TargetRoll(TargetRoll.IMPOSSIBLE, "Support team cannot do this kind of task.");
        }
        if(task instanceof ReplacementItem && !((ReplacementItem)task).hasPart()) {
-           //return new TargetRoll(TargetRoll.IMPOSSIBLE, "part not available");
+           return new TargetRoll(TargetRoll.IMPOSSIBLE, "part not available");
        }
        TargetRoll target = getTarget(task.getMode());
        if(target.getValue() == TargetRoll.IMPOSSIBLE) {
@@ -263,26 +263,9 @@ public abstract class SupportTeam implements Serializable {
        int roll = makeRoll(task);
        report = report + "  needs " + target.getValueAsString() + " and rolls " + roll + ":";
        if(roll >= target.getValue()) {
-           report = report + " <font color='green'><b>task completed.</b></font>";
-           task.fix();
-           task.complete();
+           report = report + task.succeed();
        } else {
-           report = report + " <font color='red'><b>task failed.</b></font>";
-           task.fail(getRating());
-           //have we run out of options?
-           if(task.getSkillMin() > EXP_ELITE) {
-               if(task instanceof RepairItem) {
-                   //turn it into a replacement item
-                   campaign.mutateTask(task, ((RepairItem)task).replace());
-                   report = report + "<br><emph><b>Item cannot be repaired, it must be replaced instead.</b></emph>";
-               } else if(task instanceof ReplacementItem) {
-                   ReplacementItem replacement = (ReplacementItem)task;
-                   replacement.useUpPart();
-                   report = report + "<br><emph><b>Component destroyed!</b></emph>";
-                   //reset the skill min counter back to green
-                   task.setSkillMin(EXP_GREEN);
-               }
-           }
+           report = report + task.fail(getRating());
        }
        return report;
     }

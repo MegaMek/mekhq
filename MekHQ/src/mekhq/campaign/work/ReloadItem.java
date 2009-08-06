@@ -118,4 +118,10 @@ public class ReloadItem extends UnitWorkItem {
                 && ((ReloadItem)task).getUnitId() == this.getUnitId()
                 && ((ReloadItem)task).getUnit().getEntity().getEquipmentNum(((ReloadItem)task).getMounted()) == unit.getEntity().getEquipmentNum(mounted));
     }
+
+    @Override
+    protected String maxSkillReached() {
+        //this should never happen because it is automatic success so failure should never be called
+        return "";
+    }
 }

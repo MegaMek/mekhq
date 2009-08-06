@@ -59,5 +59,11 @@ public abstract class SalvageItem extends UnitWorkItem {
     public void setRepairId(int id) {
         this.repairId = id;
     }
+    
+    @Override
+    public String maxSkillReached() {
+        //TODO: what happens?
+        return "";
+    }
 
 }

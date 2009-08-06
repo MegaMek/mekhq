@@ -56,4 +56,10 @@ public abstract class RepairItem extends UnitWorkItem {
         this.salvageId = id;
     }
     
+    @Override
+    protected String maxSkillReached() {
+        unit.campaign.mutateTask(this, replace());
+        return "<br><emph><b>Item cannot be repaired, it must be replaced instead.</b></emph>";
+    }
+    
 }

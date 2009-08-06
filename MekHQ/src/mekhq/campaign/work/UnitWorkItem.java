@@ -23,6 +23,7 @@ package mekhq.campaign.work;
 
 import megamek.common.TargetRoll;
 import mekhq.campaign.Unit;
+import mekhq.campaign.team.SupportTeam;
 
 /**
  * Abstract extension of WorkItem for all work on units
@@ -62,5 +63,18 @@ public abstract class UnitWorkItem extends WorkItem {
             mods.addModifier(1, "difficult to maintain");
         }
         return mods;
+    }
+    
+    protected abstract String maxSkillReached();
+    
+    @Override
+    public String fail(int rating) {
+         //increment the minimum skill level required
+        setSkillMin(rating + 1);
+        String toReturn = super.fail(rating);
+        if(getSkillMin() > SupportTeam.EXP_ELITE) {
+            toReturn += maxSkillReached();
+        }
+        return toReturn;
     }
 }
