@@ -53,17 +53,17 @@ public abstract class ReplacementItem extends UnitWorkItem {
      * uses the part and if this depletes the part, returns true
      * @return
      */
-    public boolean useUpPart() {
-        if(!hasPart()) {
-            return false;
+    public void useUpPart() {
+        if(hasPart()) {
+            unit.campaign.removePart(part);
+            this.part = null;
         }
-        this.part = null;
-        return true;
     }
     
     @Override
     public void fix() {
         unit.campaign.addWork(getSalvage());
+        useUpPart();
     }
     
     @Override

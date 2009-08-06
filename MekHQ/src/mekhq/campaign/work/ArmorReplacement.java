@@ -38,12 +38,14 @@ public class ArmorReplacement extends ReplacementItem {
     private int loc;
     private int amount;
     private int type;
+    private boolean rear;
 
-    public ArmorReplacement(Unit unit, int loc, int t) {
+    public ArmorReplacement(Unit unit, int l, int t, boolean r) {
         super(unit);
-        this.loc = loc;
-        this.amount = unit.getEntity().getOArmor(loc) - unit.getEntity().getArmor(loc);
+        this.loc = l;
         this.type = t;
+        this.rear = r;
+        this.amount = unit.getEntity().getOArmor(loc, rear) - unit.getEntity().getArmor(loc, rear);        
         this.difficulty = -2;
         this.time = 5 * amount;
         if(unit.getEntity() instanceof Tank) {
@@ -55,16 +57,59 @@ public class ArmorReplacement extends ReplacementItem {
                 this.time = 15 * amount;
             }
         }
-        this.name = "Replace " + EquipmentType.getArmorTypeName(type) + " Armor (" + unit.getEntity().getLocationName(loc) + ", " + amount + ")";
+        String locName = unit.getEntity().getLocationName(loc);
+        if(rear) {
+            locName += " Rear";
+        }
+        this.name = "Replace " + EquipmentType.getArmorTypeName(type) + " Armor (" + locName + ", " + amount + ")";
     }
+    
+    
+    
 
     @Override
     public void fix() {
-        super.fix();
-        unit.getEntity().setArmor(unit.getEntity().getOArmor(loc, false), loc, false);
-        unit.getEntity().setArmor(unit.getEntity().getOArmor(loc, true), loc, true);
+        if(null != part) {
+            int points = Math.min(amount, ((Armor)part).getAmount());
+            unit.getEntity().setArmor(unit.getEntity().getArmor(loc, rear) + points, loc, rear);
+            boolean taskFound = false;
+            //need to check the salvage task for mutation
+            for(WorkItem task : unit.campaign.getAllTasksForUnit(unit.getId())) {
+                if(task instanceof ArmorSalvage 
+                    && ((ArmorSalvage)task).getLoc() == loc
+                    && ((ArmorSalvage)task).isRear() == rear) {
+                    unit.campaign.mutateTask(task, getSalvage());
+                    taskFound = true;
+                }
+            }
+            if(!taskFound) {
+                unit.campaign.addWork(getSalvage());
+            }
+        }
+        useUpPart();
     }
 
+    @Override
+    public void complete() {
+        if(unit.getEntity().getArmor(loc, rear) == unit.getEntity().getOArmor(loc, rear)) {
+            setCompleted(true);
+        } else {
+            //we did not fully repair the armor, probably because of supply shortage
+            this.amount = unit.getEntity().getOArmor(loc, rear) - unit.getEntity().getArmor(loc, rear);  
+            this.time = 5 * amount;
+            if(unit.getEntity() instanceof Tank) {
+                this.time = 3 * amount;
+            } else if (unit.getEntity() instanceof Aero) {
+                if(((Aero)unit.getEntity()).isCapitalScale()) {
+                    this.time = 120 * amount;
+                } else {
+                    this.time = 15 * amount;
+                }
+            }
+        }
+        unit.campaign.assignParts();
+    }
+    
     @Override
     public String checkFixable() {
         if (unit.isLocationDestroyed(loc)) {
@@ -80,13 +125,18 @@ public class ArmorReplacement extends ReplacementItem {
     public int getType() {
         return type;
     }
+    
+    public boolean isRear() {
+        return rear;
+    }
 
     @Override
     public boolean sameAs(WorkItem task) {
         return (task instanceof ArmorReplacement 
                 && ((ArmorReplacement)task).getUnitId() == this.getUnitId()
                 && ((ArmorReplacement)task).getLoc() == this.getLoc()
-                && ((ArmorReplacement)task).getType() == this.getType());
+                && ((ArmorReplacement)task).getType() == this.getType()
+                && ((ArmorReplacement)task).isRear() == this.isRear());
     }
     
     @Override
@@ -100,17 +150,13 @@ public class ArmorReplacement extends ReplacementItem {
     }
     
     @Override
-    public boolean useUpPart() {
-        if(!hasPart()) {
-            return false;
-        }
-        Armor armor = (Armor)part;
-        armor.setAmount(armor.getAmount() - amount);
-        if(armor.getAmount() > 0) {
-            return false;
-        } else {
-            this.part = null;
-            return true;
+    public void useUpPart() {
+        if(hasPart()) {
+            Armor armor = (Armor)part;
+            armor.setAmount(armor.getAmount() - amount);
+            if(armor.getAmount() < 1) {
+                super.useUpPart();
+            }
         }
     }
 
@@ -121,6 +167,6 @@ public class ArmorReplacement extends ReplacementItem {
 
     @Override
     public SalvageItem getSalvage() {
-        return new ArmorSalvage(unit, loc, type);
+        return new ArmorSalvage(unit, loc, type, rear);
     }
 }

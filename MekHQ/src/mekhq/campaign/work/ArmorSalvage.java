@@ -37,12 +37,14 @@ public class ArmorSalvage extends SalvageItem {
     protected int loc;
     protected int amount;
     protected int type;
+    protected boolean rear;
     
-    public ArmorSalvage(Unit unit, int loc, int t) {
+    public ArmorSalvage(Unit unit, int l, int t, boolean r) {
         super(unit);
-        this.loc = loc;
+        this.loc = l;
         this.type = t;
-        this.amount = unit.getEntity().getArmor(loc);
+        this.rear = r;
+        this.amount = unit.getEntity().getArmor(loc, rear);
         this.difficulty = -2;
         this.time = 5 * amount;
         if(unit.getEntity() instanceof Tank) {
@@ -54,34 +56,65 @@ public class ArmorSalvage extends SalvageItem {
                 this.time = 15 * amount;
             }
         }
-        this.name = "Salvage " + EquipmentType.getArmorTypeName(type) + " Armor (" + unit.getEntity().getLocationName(loc) + ", " + amount + ")";
+        String locName = unit.getEntity().getLocationName(loc);
+        if(rear) {
+            locName += " Rear";
+        }
+        this.name = "Salvage " + EquipmentType.getArmorTypeName(type) + " Armor (" + locName + ", " + amount + ")";
     }
 
     @Override
     public ReplacementItem getReplacement() {
-        return new ArmorReplacement(unit, loc, type);
+        return new ArmorReplacement(unit, loc, type, rear);
     }
 
     @Override
     public Part getPart() {
-        return new Armor(true, unit.getEntity().getArmorType(), unit.getEntity().getArmor(loc));
+        return new Armor(true, type, amount);
     }
     
     public int getLoc() {
         return loc;
     }
 
+    public boolean isRear() {
+        return rear;
+    }
+    
     @Override
     public boolean sameAs(WorkItem task) {
         return (task instanceof ArmorSalvage
                 && ((ArmorSalvage)task).getUnitId() == this.getUnitId()
-                && ((ArmorSalvage)task).getLoc() == this.getLoc());
+                && ((ArmorSalvage)task).getLoc() == this.getLoc()
+                && ((ArmorSalvage)task).isRear() == this.isRear());
     }
     
     @Override
     public void fix() {
-        super.fix();
-        unit.getEntity().setArmor(0, loc);
+        unit.getEntity().setArmor(0, loc, rear);
+        //need to find old armor replacement and mutate it
+        boolean taskFound = false;
+        for(WorkItem task : unit.campaign.getAllTasksForUnit(unit.getId())) {
+            if(task instanceof ArmorReplacement 
+                    && ((ArmorReplacement)task).getLoc() == loc
+                    && ((ArmorReplacement)task).isRear() == rear) {
+                unit.campaign.mutateTask(task, getReplacement());
+                taskFound = true;
+            }
+        }
+        if(!taskFound) {
+            unit.campaign.addWork(getReplacement());
+        }
+        boolean partFound = false;
+        for(Part part : unit.campaign.getParts()) {
+            if(part instanceof Armor && ((Armor)part).getType() == type) {
+                Armor armor = (Armor)part;
+                armor.setAmount(armor.getAmount() + amount);
+                partFound = true;
+            }
+        }
+        if(!partFound) {
+            unit.campaign.addPart(getPart());
+        }
     }
-
 }

@@ -250,6 +250,7 @@ public class Campaign implements Serializable {
         parts.add(p);
         partIds.put(new Integer(id), p);
         lastPartId = id;
+        assignParts();
     }
     
     /**
@@ -389,14 +390,6 @@ public class Campaign implements Serializable {
      public boolean processTask(WorkItem task, SupportTeam team) {
          currentReport.add(team.doAssigned(task));
          if(task.isCompleted()) {
-             if(task instanceof ReplacementItem) {
-                 ReplacementItem replacement = (ReplacementItem)task;
-                 Part part = replacement.getPart();
-                //remove parts
-                 if(replacement.useUpPart()) {
-                     removePart(part);
-                 }
-             }
              removeTask(task);
              return true;
          }

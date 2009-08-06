@@ -38,7 +38,7 @@ public class Armor extends Part {
         super(false);
         this.type = t;
         this.amount = points;
-        this.name = EquipmentType.getArmorTypeName(type) + " Armor (" + amount + ")";
+        this.name = EquipmentType.getArmorTypeName(type) + " Armor";
     }
     
     public int getType() {
@@ -51,6 +51,11 @@ public class Armor extends Part {
     
     public void setAmount(int a) {
         this.amount = a;
+    }
+    
+    @Override
+    public String getDesc() {
+        return name + " (" + amount + ")";
     }
     
     @Override

@@ -55,9 +55,13 @@ public abstract class Part implements Serializable {
         return name;
     }
     
+    public String getDesc() {
+        return name;
+    }
+    
     public String getDescHTML() {
         String toReturn = "<html>";
-        toReturn += "<b>" + getName() + "</b><br>";
+        toReturn += "<b>" + getDesc() + "</b><br>";
         toReturn += "</html>";
         return toReturn;
     }
