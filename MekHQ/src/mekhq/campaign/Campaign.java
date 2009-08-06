@@ -410,6 +410,7 @@ public class Campaign implements Serializable {
      public void assignPart(WorkItem task) {
          if(task instanceof ReplacementItem) {
              ReplacementItem replacement = (ReplacementItem)task;
+             replacement.setPart(null);
              for(Part part : getParts()) {
                  if(part.canBeUsedBy(replacement)) {
                      replacement.setPart(part);

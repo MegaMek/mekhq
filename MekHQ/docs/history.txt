@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.1.1 (SVN)
++ Bug: parts re-assignment not resetting to null when no useable parts are available
 + Bug: destroying components on Elite team replacement failure
 + improvements to armor replacement and salvage
 + improved naming of various salvage, repair, and replacement items and parts
