@@ -61,9 +61,13 @@ public class ArmorReplacement extends ReplacementItem {
         if(rear) {
             locName += " Rear";
         }
-        this.name = "Replace " + EquipmentType.getArmorTypeName(type) + " Armor (" + locName + ", " + amount + ")";
+        this.name = "Replace " + EquipmentType.getArmorTypeName(type) + " Armor (" + locName + ", ";
     }
     
+    @Override
+    public String getDesc() {
+        return getName() + amount + ")";
+    }
     
     
 

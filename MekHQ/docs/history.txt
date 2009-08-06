@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.1.1 (SVN)
++ Bug: destroying components on Elite team replacement failure
 + improvements to armor replacement and salvage
 + improved naming of various salvage, repair, and replacement items and parts
 + remove salvage work item from within repairItem#replace method

@@ -123,8 +123,14 @@ public abstract class WorkItem implements Serializable {
         setCompleted(true);
     }
     
+    /*
     public String getDesc() {
         return  getName() + " " + getStats();  
+    }
+     * */
+    
+    public String getDesc() {
+        return getName();
     }
     
     public String getStats() {
@@ -141,7 +147,7 @@ public abstract class WorkItem implements Serializable {
         if(this instanceof ReplacementItem && !((ReplacementItem)this).hasPart()) {
             toReturn +="<font color='white'>";
         }
-        toReturn += "<b>" + getName() + "</b><br>";
+        toReturn += "<b>" + getDesc() + "</b><br>";
         toReturn += "" + getTime() + " minutes";
         toReturn += ", " + SupportTeam.getRatingName(getSkillMin());
         toReturn += " " + bonus;

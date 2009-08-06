@@ -277,13 +277,10 @@ public abstract class SupportTeam implements Serializable {
                    report = report + "<br><emph><b>Item cannot be repaired, it must be replaced instead.</b></emph>";
                } else if(task instanceof ReplacementItem) {
                    ReplacementItem replacement = (ReplacementItem)task;
-                   Part part = replacement.getPart();
-                   if(replacement.useUpPart()) {
-                       campaign.removePart(part);
-                       report = report + "<br><emph><b>Component destroyed!</b></emph>";
-                       //reset the skill min counter back to green
-                       task.setSkillMin(EXP_GREEN);
-                   }
+                   replacement.useUpPart();
+                   report = report + "<br><emph><b>Component destroyed!</b></emph>";
+                   //reset the skill min counter back to green
+                   task.setSkillMin(EXP_GREEN);
                }
            }
        }
