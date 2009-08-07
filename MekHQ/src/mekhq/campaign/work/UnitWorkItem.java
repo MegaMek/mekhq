@@ -49,7 +49,7 @@ public abstract class UnitWorkItem extends WorkItem {
     
     @Override
     public String getDisplayName() {
-        return  getName() + " for " + unit.getEntity().getDisplayName();
+        return  getDesc() + " for " + unit.getEntity().getDisplayName();
     }
     
     @Override

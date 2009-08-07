@@ -42,13 +42,7 @@ public abstract class PersonnelWorkItem extends WorkItem {
     
     @Override
     public String getDisplayName() {
-        return getName() + " " + person.getDesc();
-    }
-    
-    
-    @Override
-    public String getDesc() {
-        return getDisplayName();
+        return getDesc() + " " + person.getDesc();
     }
     
     public int getPatients() {
