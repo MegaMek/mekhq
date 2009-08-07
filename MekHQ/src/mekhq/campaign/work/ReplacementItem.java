@@ -87,4 +87,25 @@ public abstract class ReplacementItem extends UnitWorkItem {
     public abstract Part partNeeded();
     
     public abstract SalvageItem getSalvage();
+    
+    @Override
+    public String getDetails() {
+        if(hasPart()) {
+            return "Using " + part.getDesc();
+        } else {
+            return "Needs " + partNeeded().getDesc();
+        }
+    }
+    
+    @Override
+    public String getToolTip() {
+        String toReturn = "<html>" + getStats() + "<br>";
+        if(hasPart()) {
+            toReturn += "Using " + part.getDesc() + "<br>";
+        } else {
+            toReturn += "Needs " + partNeeded().getDesc() + "<br>";
+        }
+        toReturn += "</html>";
+        return toReturn;
+    }
 }

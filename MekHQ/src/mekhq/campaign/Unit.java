@@ -168,8 +168,8 @@ public class Unit implements Serializable {
                     campaign.addWork(salvage);
                     //TODO: rotor and turret salvage for vees
                 }
-                double pctInternal = entity.getInternal(i)/entity.getOInternal(i);
-                if(pctInternal < 1.00) {
+                double pctInternal = 1.00 - (((double)entity.getInternal(i))/((double)entity.getOInternal(i)));
+                if(pctInternal > 0.00) {
                     if(entity instanceof Mech || entity instanceof Protomech) {
                         repair = new MekInternalRepair(this, i, pctInternal);
                         campaign.addWork(repair);

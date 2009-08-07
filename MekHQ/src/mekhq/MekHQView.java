@@ -1195,7 +1195,7 @@ public class TaskTableModel extends ArrayTableModel {
             WorkItem task = getTaskAt(row);
             setOpaque(true);          
             setText(getValueAt(row, column).toString());
-            //setToolTipText(campaign.getToolTipFor(u));
+            setToolTipText(task.getToolTip());
             if(isSelected) {
                 //TODO: how do I set this to the user's default selection color?
                 c.setBackground(new Color(253, 117, 28));
@@ -1290,6 +1290,9 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
                     menuItem = new JMenuItem("Scrap component");
                     menuItem.setActionCommand("REPLACE");
                     menuItem.addActionListener(this);
+                    if(task instanceof SalvageItem && null != task.checkFixable()) {
+                        menuItem.setEnabled(false);
+                    }
                     popup.add(menuItem);
                 }            
                 if(task instanceof ReloadItem) {

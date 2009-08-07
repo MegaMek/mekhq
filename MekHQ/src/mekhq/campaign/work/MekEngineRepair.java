@@ -35,7 +35,7 @@ public class MekEngineRepair extends RepairItem {
 
     public MekEngineRepair(Unit unit, int h) {
         super(unit, h);
-        this.name = "Repair " + unit.getEntity().getEngine().getEngineName() + " Engine";
+        this.name = "Repair Engine";
         this.time = 100;
         this.difficulty = -1;
         if(hits == 2) {
@@ -45,6 +45,11 @@ public class MekEngineRepair extends RepairItem {
             this.time = 300;
             this.difficulty = 1;
         }
+    }
+    
+    @Override
+    public String getDetails() {
+        return unit.getEntity().getEngine().getEngineName() + ", " + super.getDetails();
     }
     
     @Override

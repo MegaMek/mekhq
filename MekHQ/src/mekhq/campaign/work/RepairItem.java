@@ -22,6 +22,7 @@
 package mekhq.campaign.work;
 
 import mekhq.campaign.Unit;
+import mekhq.campaign.team.SupportTeam;
 
 /**
  *
@@ -37,6 +38,11 @@ public abstract class RepairItem extends UnitWorkItem {
     public RepairItem(Unit unit, int h) {
         super(unit);
         this.hits = h;
+    }
+    
+    @Override
+    public String getDetails() {
+        return hits + " hit(s)";
     }
     
     public abstract WorkItem replace();
@@ -64,6 +70,14 @@ public abstract class RepairItem extends UnitWorkItem {
         //the player can decide to scrap the component by using the context manu
         //unit.campaign.mutateTask(this, replace());
         return "<br><emph><b>Item cannot be repaired, it must be replaced instead.</b></emph>";
+    }
+    
+    @Override
+    public String getToolTip() {
+        if(getSkillMin() > SupportTeam.EXP_ELITE) {
+            return "<html> This task is impossible.<br>You can use the right-click menu to scrap this component.</html>";
+        } 
+        return super.getToolTip();
     }
     
 }

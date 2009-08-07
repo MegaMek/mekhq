@@ -37,7 +37,7 @@ public class MekEngineReplacement extends ReplacementItem {
 
     public MekEngineReplacement(Unit unit) {
         super(unit);
-        this.name = "Replace " + unit.getEntity().getEngine().getEngineName() + " Engine";
+        this.name = "Replace Engine";
         this.time = 360;
         this.difficulty = -1;
     }

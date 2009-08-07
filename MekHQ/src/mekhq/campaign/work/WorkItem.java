@@ -130,7 +130,11 @@ public abstract class WorkItem implements Serializable {
      * */
     
     public String getDesc() {
-        return getName();
+        return getName() + " (" + getDetails() + ")";
+    }
+    
+    public String getDetails() {
+        return "";
     }
     
     public String getStats() {
@@ -149,7 +153,8 @@ public abstract class WorkItem implements Serializable {
             toReturn +=" color='white'";
         }
         toReturn += ">";
-        toReturn += "<b>" + getDesc() + "</b><br>";
+        toReturn += "<b>" + getName() + "</b><br>";
+        toReturn += getDetails() + "<br>";
         toReturn += "" + getTime() + " minutes";
         toReturn += ", " + SupportTeam.getRatingName(getSkillMin());
         toReturn += " " + bonus;
@@ -262,5 +267,9 @@ public abstract class WorkItem implements Serializable {
      * @return
      */
     public abstract boolean sameAs(WorkItem task);
+ 
+    public String getToolTip() {
+        return "<html>" + getStats() + "</html>";
+    }
     
 }

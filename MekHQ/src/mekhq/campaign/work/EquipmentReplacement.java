@@ -41,12 +41,17 @@ public class EquipmentReplacement extends ReplacementItem {
     public EquipmentReplacement(Unit unit, Mounted m) {
         super(unit);
         this.mounted = m;
-        this.name = "Replace " + m.getType().getName() + " (" + unit.getEntity().getLocationName(m.getLocation()) + ")";
+        this.name = "Replace " + m.getType().getName();
         this.time = 120;
         if(m.getType() instanceof WeaponType && unit.getEntity().getQuirks().booleanOption("mod_weapons")) {
             this.time = 60;
         }
         this.difficulty = 0;
+    }
+    
+    @Override
+    public String getDetails() {
+        return unit.getEntity().getLocationName(mounted.getLocation()) + ", " + super.getDetails();
     }
     
     @Override

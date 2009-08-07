@@ -40,9 +40,14 @@ public class MekActuatorReplacement extends ReplacementItem {
         super(unit);
         this.loc = i;
         this.type = t;
-        this.name = "Replace " + ((Mech)unit.getEntity()).getSystemName(type) + " Actuator (" + unit.getEntity().getLocationName(loc) + ")";
+        this.name = "Replace " + ((Mech)unit.getEntity()).getSystemName(type) + " Actuator";
         this.time = 90;
         this.difficulty = -3;
+    }
+    
+    @Override
+    public String getDetails() {
+        return unit.getEntity().getLocationName(loc) + ", " + super.getDetails();
     }
     
     @Override

@@ -23,6 +23,7 @@ package mekhq.campaign.work;
 
 import mekhq.campaign.Unit;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.team.SupportTeam;
 
 /**
  *
@@ -35,6 +36,16 @@ public abstract class SalvageItem extends UnitWorkItem {
     
     public SalvageItem(Unit u) {
         super(u);
+    }
+    
+    @Override
+    public String getDetails() {
+        if(NONE != repairId) {
+            return "Damaged";
+        } else {
+            return "Functional";
+        }
+        
     }
     
     @Override
@@ -81,6 +92,14 @@ public abstract class SalvageItem extends UnitWorkItem {
     public String maxSkillReached() {
         //See notes in RepairItem#MaxSkillReached
         return "<br><emph><b>Item cannot be salvaged, it must be scapped instead.</b></emph>";
+    }
+    
+    @Override
+    public String getToolTip() {
+        if(getSkillMin() > SupportTeam.EXP_ELITE) {
+            return "<html> This task is impossible.<br>You can use the right-click menu to scrap this component.</html>";
+        } 
+        return super.getToolTip();
     }
 
 }

@@ -38,7 +38,7 @@ public class EquipmentRepair extends RepairItem {
     public EquipmentRepair(Unit unit, int h, Mounted m) {
         super(unit, h);
         this.mounted = m;
-        this.name = "Repair " + m.getType().getName() + " (" + unit.getEntity().getLocationName(m.getLocation()) + ")";
+        this.name = "Repair " + m.getType().getName();
         this.time = 100;
         this.difficulty = -3;
         if(hits == 2) {
@@ -51,6 +51,11 @@ public class EquipmentRepair extends RepairItem {
             this.time = 250;
             this.difficulty = 2;
         }
+    }
+    
+    @Override
+    public String getDetails() {
+        return unit.getEntity().getLocationName(mounted.getLocation()) + ", " + super.getDetails();
     }
 
     @Override

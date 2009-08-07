@@ -36,6 +36,9 @@ public class ReloadItem extends UnitWorkItem {
     protected Mounted mounted;
     protected boolean swap;
     protected long munition;
+    protected String ammoDesc;
+    
+    //TODO: I can put ammo type back in here, I just need a restore function
     
     public ReloadItem(Unit unit, Mounted m) {
         super(unit);
@@ -43,8 +46,9 @@ public class ReloadItem extends UnitWorkItem {
         this.mounted = m;
         if(mounted.getType() instanceof AmmoType) {
             this.munition = ((AmmoType)mounted.getType()).getMunitionType();
+            this.ammoDesc = ((AmmoType)mounted.getType()).getDesc();
         }
-        this.name = "Reload " + mounted.getDesc();// + " with " + atype.getDesc();       
+        this.name = "Reload " + mounted.getDesc();       
         //TODO: crap, time varies by skill level
         //TODO: also need to allow it to double if changing ammo type
         this.time = 15;
@@ -55,6 +59,11 @@ public class ReloadItem extends UnitWorkItem {
             time = (int)Math.round(time / 2.0);
         }
         this.difficulty = TargetRoll.AUTOMATIC_SUCCESS;
+    }
+    
+    @Override
+    public String getDetails() {
+        return ammoDesc;
     }
     
     @Override
@@ -90,7 +99,7 @@ public class ReloadItem extends UnitWorkItem {
                 this.time *= 2;
             }
             this.swap = true;
-            this.name = "Swap " + mounted.getDesc() + " with " + at.getDesc();
+            this.ammoDesc = at.getDesc();
         }
     }
     

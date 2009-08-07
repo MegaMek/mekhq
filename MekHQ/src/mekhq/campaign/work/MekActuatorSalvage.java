@@ -40,11 +40,16 @@ public class MekActuatorSalvage extends SalvageItem {
         super(unit);
         this.loc = i;
         this.type = t;
-        this.name = "Salvage " + ((Mech)unit.getEntity()).getSystemName(type) + " Actuator (" + unit.getEntity().getLocationName(loc) + ")";
+        this.name = "Salvage " + ((Mech)unit.getEntity()).getSystemName(type) + " Actuator";
         this.time = 90;
         this.difficulty = -3;
     }
 
+    @Override
+    public String getDetails() {
+        return unit.getEntity().getLocationName(loc) + ", " + super.getDetails();
+    }
+    
     @Override
     public ReplacementItem getReplacement() {
         return new MekActuatorReplacement(unit, loc, type);

@@ -38,17 +38,22 @@ public class EquipmentSalvage extends SalvageItem {
     
     public EquipmentSalvage(Unit unit, Mounted m) {
         super(unit);
-        this.mounted = m;
-        String loc = "";
-        if(m.getLocation() > -1 && m.getLocation() < unit.getEntity().locations()) {
-            loc = " (" + unit.getEntity().getLocationName(m.getLocation()) + ")";
-        }
-        this.name = "Salvage " + m.getType().getName() + loc;
+        this.mounted = m;    
+        this.name = "Salvage " + m.getType().getName();
         this.time = 120;
         if(m.getType() instanceof WeaponType && unit.getEntity().getQuirks().booleanOption("mod_weapons")) {
             this.time = 60;
         }
         this.difficulty = 0;
+    }
+    
+    @Override
+    public String getDetails() {
+        String loc = "Unknown";
+        if(mounted.getLocation() > -1 && mounted.getLocation() < unit.getEntity().locations()) {
+            loc = unit.getEntity().getLocationName(mounted.getLocation());
+        }
+        return loc + ", " + super.getDetails();
     }
     
     public Mounted getMounted() {

@@ -35,6 +35,7 @@ public class MekInternalRepair extends InternalRepair {
         super(unit, i);
         this.time = 90;
         this.difficulty = -1;
+        this.percent = pct;
         if(percent > 0.75) {
             this.time = 270;
             this.difficulty = 2;
@@ -45,6 +46,12 @@ public class MekInternalRepair extends InternalRepair {
             this.time = 135;
             this.difficulty = 0;
         }
+    }
+    
+    @Override
+    public String getDetails() {
+        String perString = Integer.toString((int)Math.floor(percent * 100)) + "% damage";
+        return unit.getEntity().getLocationName(loc) + ", " + perString;
     }
 
     @Override

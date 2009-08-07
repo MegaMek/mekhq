@@ -38,9 +38,14 @@ public class MekActuatorRepair extends RepairItem {
         super(unit, h);
         this.loc = i;
         this.type = t;
-        this.name = "Repair " + ((Mech)unit.getEntity()).getSystemName(type) + " Actuator (" + unit.getEntity().getLocationName(loc) + ")";
+        this.name = "Repair " + ((Mech)unit.getEntity()).getSystemName(type) + " Actuator";
         this.time = 120;
         this.difficulty = 0;
+    }
+    
+    @Override
+    public String getDetails() {
+        return unit.getEntity().getLocationName(loc);
     }
     
     @Override

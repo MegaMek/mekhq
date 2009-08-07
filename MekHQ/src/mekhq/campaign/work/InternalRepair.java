@@ -35,9 +35,13 @@ public abstract class InternalRepair extends RepairItem {
     public InternalRepair(Unit unit, int i) {
         super(unit, 0);
         this.loc = i;
-        this.name = "Repair internal structure (" + unit.getEntity().getLocationName(loc) + ")";
+        this.name = "Repair Internal Structure";
     }
-        
+    
+    @Override
+    public String getDetails() {
+        return unit.getEntity().getLocationName(loc);
+    }
         
     @Override
     public void fix() {

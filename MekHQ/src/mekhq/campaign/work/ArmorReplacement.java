@@ -57,18 +57,17 @@ public class ArmorReplacement extends ReplacementItem {
                 this.time = 15 * amount;
             }
         }
+        this.name = "Replace " + EquipmentType.getArmorTypeName(type) + " Armor";
+    }
+    
+    @Override
+    public String getDetails() {
         String locName = unit.getEntity().getLocationName(loc);
         if(rear) {
             locName += " Rear";
         }
-        this.name = "Replace " + EquipmentType.getArmorTypeName(type) + " Armor (" + locName + ", ";
+        return locName + ", " + amount + " points";
     }
-    
-    @Override
-    public String getDesc() {
-        return getName() + amount + ")";
-    }
-    
     
 
     @Override
