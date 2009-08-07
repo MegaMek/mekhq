@@ -113,6 +113,55 @@ public class Unit implements Serializable {
         this.salvaged = b;
     }
     
+    public boolean isFunctional() {
+        //got pilot?
+        if(!hasPilot()) {
+            return false;
+        }
+        if(entity instanceof Mech) {         
+            //center torso bad?? head bad?
+            if(entity.isLocationBad(Mech.LOC_CT) || entity.isLocationBad(Mech.LOC_HEAD)) {
+                return false;
+            }
+            //engine destruction?
+            int engineHits = 0;
+            for(int i = 0; i < entity.locations(); i++) {
+                engineHits += entity.getHitCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE, i);
+            }
+            if(engineHits > 2) {
+                return false;
+            }
+        }
+        if(entity instanceof Tank) {
+            for(int i = 0; i < entity.locations(); i++) {
+                if(entity.isLocationBad(i)) {
+                    return false;
+                }
+            }
+            Tank t = (Tank)entity;
+            //TODO: we need an isEngineHit() function in Tank
+        }
+        return true;
+    }
+    
+    public boolean isRepairable() {
+        if(entity instanceof Mech) {
+            //you can repair anything so long as one point of CT is left
+            if(entity.isLocationBad(Mech.LOC_CT)) {
+                return false;
+            }
+        }
+        if(entity instanceof Tank) {
+            //can't repair a tank with a destroyed location
+            for(int i = 0; i < entity.locations(); i++) {
+                if(entity.isLocationBad(i)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    
     /**
      * Is the given location on the entity destroyed?
      * @param loc - an <code>int</code> for the location
@@ -134,7 +183,10 @@ public class Unit implements Serializable {
      * Run a diagnostic on this unit and add WorkItems to the campaign
      */
     public void runDiagnostic(Campaign campaign) {
-
+        
+        if(!isRepairable()) {
+            setSalvage(true);
+        }
         //It is somewhat unclear but the language of StratOps implies that even equipment that
         //is "combat destroyed" can be repaired.  For example, a gyro with 2 hits can still be repaired
         //although with a +4 mod.  Weapons and other equipment must pass a roll to be repairable
@@ -537,18 +589,7 @@ public class Unit implements Serializable {
     }
     
     public boolean canDeploy() {
-        //can't deploy if you are already deployed
-        if(isDeployed()) {
-            return false;
-        }
-        //cant deploy with no pilot
-        if(!hasPilot()) {
-            return false;
-        }
-        if(isSalvage()) {
-            return false;
-        }
-        return true;
+        return !isDeployed() && isFunctional();
     }
     
     public boolean hasEndosteel() {

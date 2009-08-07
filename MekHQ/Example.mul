@@ -92,9 +92,7 @@
    <entity chassis="Guillotine" model="GLT-5M" type="Biped">
       <pilot name="Lightning McQueen" gunnery="3" piloting="4" autoeject="false"/>
       The first slot in a location is at index="1".
-      <location index="1"> Center Torso
-         <armor points="5" type="Rear"/>
-      </location>
+      <location index="1" isDestroyed="true"/> Center Torso
       <location index="2"> Right Torso
          <armor points="3"/>
          <armor points="5" type="Rear"/>

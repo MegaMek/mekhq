@@ -1542,7 +1542,7 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
                     menuItem = new JMenuItem("Repair");
                     menuItem.setActionCommand("REPAIR");
                     menuItem.addActionListener(this);
-                    menuItem.setEnabled(!unit.isDeployed());
+                    menuItem.setEnabled(!unit.isDeployed() && unit.isRepairable());
                     popup.add(menuItem);
                 } else {
                     menuItem = new JMenuItem("Salvage");

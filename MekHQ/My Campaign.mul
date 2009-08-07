@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<unit>
+
+   <entity chassis="Dart" model="DRT-4S" type="Biped" commander="false" externalId="1">
+      <pilot name="Unnamed" nick="" gunnery="4" piloting="5" initB="0" commandB="0" hits="3" autoeject="true"/>
+      The first slot in a location is at index="1".
+      <location index="1"> Center Torso
+         <armor points="2"/>
+         <armor points="6" type="Internal"/>
+         <armor points="Destroyed" type="Rear"/>
+         <slot index="4" type="System" isHit="true" isRepairable="true" isDestroyed="true"/>
+         <slot index="7" type="System" isHit="true" isRepairable="true" isDestroyed="true"/>
+         <slot index="10" type="System" isHit="true" isRepairable="true" isDestroyed="true"/>
+      </location>
+      <location index="2"> Right Torso
+         <armor points="5" type="Internal"/>
+         <armor points="Destroyed" type="Rear"/>
+      </location>
+      <location index="3"> Left Torso
+         <armor points="6"/>
+      </location>
+      <location index="5" isDestroyed="true" /> Left Arm
+      <location index="6" isDestroyed="true" /> Right Leg
+      <location index="7"> Left Leg
+         <armor points="2"/>
+      </location>
+   </entity>
+
+</unit>

@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.1.1 (SVN)
++ check for unit repairability and functionality on deployment and diagnosis
 + obtain replacement check
 + added detail line to TaskInfo and WorkItems
 + Bug: internal damage percentage not being set in MekLocationRepair
