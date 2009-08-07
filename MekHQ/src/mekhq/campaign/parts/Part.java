@@ -33,6 +33,8 @@ public abstract class Part implements Serializable {
     protected String name;
     protected int id;
     protected boolean salvage;
+    //TODO: how to track clan vs. inner sphere
+    //TODO: keep cost and weight here
     
     public Part(boolean salvage) {
         this.name = "Unknown";
@@ -59,10 +61,19 @@ public abstract class Part implements Serializable {
         return name;
     }
     
+    public String getStatus() {
+        String toReturn = "Mint";
+        if(isSalvage()) {
+            toReturn = "Salvage";
+        }
+        return toReturn;
+    }
+    
     public String getDescHTML() {
-        String toReturn = "<html>";
+        String toReturn = "<html><font size='2'>";
         toReturn += "<b>" + getDesc() + "</b><br>";
-        toReturn += "</html>";
+        toReturn += getStatus() + "<br>";
+        toReturn += "</font></html>";
         return toReturn;
     }
     

@@ -55,7 +55,7 @@ public class Armor extends Part {
     
     @Override
     public String getDesc() {
-        return name + " (" + amount + ")";
+        return super.getDesc() + " (" + amount + ")";
     }
     
     @Override
@@ -63,5 +63,4 @@ public class Armor extends Part {
         return task instanceof ArmorReplacement 
                 && ((ArmorReplacement)task).getUnit().getEntity().getArmorType() == type;
     }
-
 }

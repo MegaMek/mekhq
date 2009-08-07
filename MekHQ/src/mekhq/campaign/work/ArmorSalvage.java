@@ -91,7 +91,7 @@ public class ArmorSalvage extends SalvageItem {
     
     @Override
     public void fix() {
-        unit.getEntity().setArmor(0, loc, rear);
+        removePart();
         //need to find old armor replacement and mutate it
         boolean taskFound = false;
         for(WorkItem task : unit.campaign.getAllTasksForUnit(unit.getId())) {
@@ -117,4 +117,30 @@ public class ArmorSalvage extends SalvageItem {
             unit.campaign.addPart(getPart());
         }
     }
+    
+    @Override
+    public void scrap() {
+        removePart();
+        //need to find old armor replacement and mutate it
+        boolean taskFound = false;
+        for(WorkItem task : unit.campaign.getAllTasksForUnit(unit.getId())) {
+            if(task instanceof ArmorReplacement 
+                    && ((ArmorReplacement)task).getLoc() == loc
+                    && ((ArmorReplacement)task).isRear() == rear) {
+                unit.campaign.mutateTask(task, getReplacement());
+                taskFound = true;
+            }
+        }
+        if(!taskFound) {
+            unit.campaign.addWork(getReplacement());
+        }
+        unit.campaign.removeTask(this);
+    }
+
+    @Override
+    public void removePart() {
+        unit.getEntity().setArmor(0, loc, rear);
+    }
+    
+    
 }

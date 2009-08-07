@@ -39,6 +39,7 @@ public abstract class SalvageItem extends UnitWorkItem {
     
     @Override
     public void fix() {
+        removePart();
         unit.campaign.addPart(getPart());
         unit.campaign.addWork(getReplacement());
         RepairItem repair = (RepairItem)unit.campaign.getTask(repairId);
@@ -47,6 +48,22 @@ public abstract class SalvageItem extends UnitWorkItem {
             unit.campaign.removeTask(repair);
         }
     }
+    
+    public void scrap() {
+        removePart();
+        unit.campaign.addWork(getReplacement());
+        RepairItem repair = (RepairItem)unit.campaign.getTask(repairId);
+        if(null != repair) {
+            //remove the repair item
+            unit.campaign.removeTask(repair);
+        }
+        unit.campaign.removeTask(this);
+    }
+    
+    /**
+     * sets the given part as destroyed and unrepairable on the entity
+     */
+    public abstract void removePart();
     
     public abstract ReplacementItem getReplacement();
     
@@ -62,8 +79,8 @@ public abstract class SalvageItem extends UnitWorkItem {
     
     @Override
     public String maxSkillReached() {
-        //TODO: what happens?
-        return "";
+        //See notes in RepairItem#MaxSkillReached
+        return "<br><emph><b>Item cannot be salvaged, it must be scapped instead.</b></emph>";
     }
 
 }

@@ -44,12 +44,6 @@ public class LocationSalvage extends SalvageItem {
         this.loc = i;
     }
     
-    @Override
-    public void fix() {
-        super.fix();
-        unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, loc);
-    }
-    
     public int getLoc() {
         return loc;
     }
@@ -105,6 +99,11 @@ public class LocationSalvage extends SalvageItem {
             } 
         }
         return super.checkFixable();
+    }
+
+    @Override
+    public void removePart() {
+       unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, loc);
     }
 
 }

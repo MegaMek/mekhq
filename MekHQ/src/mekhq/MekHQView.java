@@ -73,6 +73,7 @@ import mekhq.campaign.work.PersonnelWorkItem;
 import mekhq.campaign.work.ReloadItem;
 import mekhq.campaign.work.RepairItem;
 import mekhq.campaign.work.ReplacementItem;
+import mekhq.campaign.work.SalvageItem;
 import mekhq.campaign.work.WorkItem;
 
 /**
@@ -1223,6 +1224,9 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
                 } else if (task instanceof ReplacementItem) {
                     ((ReplacementItem)task).useUpPart();
                     task.setSkillMin(SupportTeam.EXP_GREEN);
+                } else if (task instanceof SalvageItem) {
+                    SalvageItem salvage = (SalvageItem)task;
+                    salvage.scrap();
                 }
                 refreshTaskList();
             } else if (command.contains("SWAP_AMMO")) {
@@ -1268,7 +1272,9 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
                 JMenu menu = null;
                 JCheckBoxMenuItem cbMenuItem = null;
                 //**lets fill the pop up menu**//   
-                if(task instanceof RepairItem || task instanceof ReplacementItem) {
+                if(task instanceof RepairItem 
+                        || task instanceof ReplacementItem
+                        || task instanceof SalvageItem) {
                     menu = new JMenu("Mode");
                     for(int i = 0; i < WorkItem.MODE_N; i++) {
                         cbMenuItem = new JCheckBoxMenuItem(WorkItem.getModeName(i));
@@ -1281,12 +1287,11 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
                         menu.add(cbMenuItem);
                     }
                     popup.add(menu);
+                    menuItem = new JMenuItem("Scrap component");
+                    menuItem.setActionCommand("REPLACE");
+                    menuItem.addActionListener(this);
+                    popup.add(menuItem);
                 }            
-                menuItem = new JMenuItem("Scrap component");
-                menuItem.setActionCommand("REPLACE");
-                menuItem.addActionListener(this);
-                menuItem.setEnabled(task instanceof RepairItem || task instanceof ReplacementItem);              
-                popup.add(menuItem);
                 if(task instanceof ReloadItem) {
                     ReloadItem reload = (ReloadItem)task;
                     Entity en = reload.getUnit().getEntity();

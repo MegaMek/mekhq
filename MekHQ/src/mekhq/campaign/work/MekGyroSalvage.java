@@ -55,10 +55,9 @@ public class MekGyroSalvage extends SalvageItem {
         return (task instanceof MekGyroSalvage
                 && ((MekGyroSalvage)task).getUnitId() == this.getUnitId());
     }
-    
+
     @Override
-    public void fix() {
-        super.fix();
+    public void removePart() {
         unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_GYRO, Mech.LOC_CT);
     }
 

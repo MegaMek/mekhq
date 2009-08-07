@@ -24,7 +24,6 @@ package mekhq.campaign.work;
 import megamek.common.CriticalSlot;
 import megamek.common.Mounted;
 import megamek.common.WeaponType;
-import mekhq.campaign.Campaign;
 import mekhq.campaign.Unit;
 import mekhq.campaign.parts.EquipmentPart;
 import mekhq.campaign.parts.Part;
@@ -57,15 +56,6 @@ public class EquipmentSalvage extends SalvageItem {
     }
     
     @Override
-    public void fix() {
-        super.fix();
-        mounted.setHit(true);
-        mounted.setDestroyed(true);
-        mounted.setRepairable(false);
-        unit.destroySystem(CriticalSlot.TYPE_EQUIPMENT, unit.getEntity().getEquipmentNum(mounted));
-    }
-    
-    @Override
     public Part getPart() {
         return new EquipmentPart(true, mounted.getType());
     }
@@ -80,6 +70,14 @@ public class EquipmentSalvage extends SalvageItem {
     @Override
     public ReplacementItem getReplacement() {
         return new EquipmentReplacement(unit, mounted);
+    }
+
+    @Override
+    public void removePart() {
+        mounted.setHit(true);
+        mounted.setDestroyed(true);
+        mounted.setRepairable(false);
+        unit.destroySystem(CriticalSlot.TYPE_EQUIPMENT, unit.getEntity().getEquipmentNum(mounted));
     }
 
 }

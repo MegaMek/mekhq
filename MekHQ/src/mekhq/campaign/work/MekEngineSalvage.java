@@ -55,10 +55,9 @@ public class MekEngineSalvage extends SalvageItem {
         return (task instanceof MekEngineSalvage
                 && ((MekEngineSalvage)task).getUnitId() == this.getUnitId());
     }
-    
+
     @Override
-    public void fix() {
-        super.fix();
+    public void removePart() {
         unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE);
     }
 

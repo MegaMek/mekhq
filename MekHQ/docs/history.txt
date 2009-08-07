@@ -1,6 +1,8 @@
 VERSION HISTORY
 ----------------------------------
 v0.1.1 (SVN)
++ Scrap Component option enabled in Task context menu
++ improvements to Parts display
 + added restore methods for transient equipmentType field in EquipmentPart
 + campaign name
 + window name issues

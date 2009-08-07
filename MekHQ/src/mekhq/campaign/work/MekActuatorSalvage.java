@@ -62,12 +62,6 @@ public class MekActuatorSalvage extends SalvageItem {
     public Part getPart() {
         return new MekActuator(true, unit.getEntity().getWeight(), type);
     }
-    
-    @Override
-    public void fix() {
-        super.fix();
-        unit.destroySystem(CriticalSlot.TYPE_SYSTEM, type, loc);
-    }
 
     @Override
     public boolean sameAs(WorkItem task) {
@@ -75,6 +69,11 @@ public class MekActuatorSalvage extends SalvageItem {
                 && ((MekActuatorSalvage)task).getUnitId() == this.getUnitId()
                 && ((MekActuatorSalvage)task).getLoc() == this.getLoc()
                 && ((MekActuatorSalvage)task).getType() == this.getType());
+    }
+
+    @Override
+    public void removePart() {
+        unit.destroySystem(CriticalSlot.TYPE_SYSTEM, type, loc);
     }
 
 }

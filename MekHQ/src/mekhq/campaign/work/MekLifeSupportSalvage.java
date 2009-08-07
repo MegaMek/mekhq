@@ -55,11 +55,10 @@ public class MekLifeSupportSalvage extends SalvageItem {
         return (task instanceof MekLifeSupportSalvage
                 && ((MekLifeSupportSalvage)task).getUnitId() == this.getUnitId());
     }
-    
+
     @Override
-    public void fix() {
-        super.fix();
-        unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_LIFE_SUPPORT);
+    public void removePart() {
+         unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_LIFE_SUPPORT);
     }
 
 }
