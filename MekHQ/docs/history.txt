@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.1.1 (SVN)
++ obtain replacement check
 + added detail line to TaskInfo and WorkItems
 + Bug: internal damage percentage not being set in MekLocationRepair
 + Scrap Component option enabled in Task context menu

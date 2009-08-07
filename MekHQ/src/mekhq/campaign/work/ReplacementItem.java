@@ -33,9 +33,12 @@ import mekhq.campaign.team.SupportTeam;
 public abstract class ReplacementItem extends UnitWorkItem {
 
     protected Part part;
+    protected boolean partCheck;
+    
     
     public ReplacementItem(Unit unit) {
         super(unit);
+        this.partCheck = false;
     }
     
     public Part getPart() {
@@ -59,6 +62,14 @@ public abstract class ReplacementItem extends UnitWorkItem {
             unit.campaign.removePart(part);
             this.part = null;
         }
+    }
+    
+    public boolean hasCheckedForPart() {
+        return partCheck;
+    }
+    
+    public void setPartCheck(boolean b) {
+        this.partCheck = b;
     }
     
     @Override

@@ -23,7 +23,9 @@ package mekhq.campaign.team;
 
 import mekhq.campaign.*;
 import java.io.Serializable;
+import megamek.common.Compute;
 import megamek.common.TargetRoll;
+import mekhq.campaign.parts.Part;
 import mekhq.campaign.work.PersonnelWorkItem;
 import mekhq.campaign.work.ReplacementItem;
 import mekhq.campaign.work.UnitWorkItem;
@@ -230,8 +232,8 @@ public abstract class SupportTeam implements Serializable {
        if(!canDo(task)) {
            return new TargetRoll(TargetRoll.IMPOSSIBLE, "Support team cannot do this kind of task.");
        }
-       if(task instanceof ReplacementItem && !((ReplacementItem)task).hasPart()) {
-           return new TargetRoll(TargetRoll.IMPOSSIBLE, "part not available");
+       if(task instanceof ReplacementItem && !((ReplacementItem)task).hasPart() && ((ReplacementItem)task).hasCheckedForPart()) {
+           return new TargetRoll(TargetRoll.IMPOSSIBLE, "part not available and already checked for this cycle");
        }
        TargetRoll target = getTarget(task.getMode());
        if(target.getValue() == TargetRoll.IMPOSSIBLE) {
@@ -249,7 +251,27 @@ public abstract class SupportTeam implements Serializable {
    }
    
    public String doAssigned(WorkItem task) {
-       String report = getName() + " attempts to " + task.getDisplayName();    
+       String report = "";
+       if(task instanceof ReplacementItem && !((ReplacementItem)task).hasPart()) {
+           //first we need to source the part
+           ReplacementItem replace = (ReplacementItem)task;
+           Part part = replace.partNeeded();    
+           report += getName() + " must first obtain " + part.getDesc();
+           TargetRoll target = getTarget(WorkItem.MODE_NORMAL);
+           replace.setPartCheck(true);
+           //TODO: availability mods
+           int roll = Compute.d6(2);
+           report += "  needs " + target.getValueAsString() + " and rolls " + roll + ":";
+           if(roll >= target.getValue()) {
+              report += " <font color='green'><b>part found.</b></font><br>";
+              replace.setPart(part);
+              campaign.addPart(part);
+           } else {
+              report += " <font color='red'><b>part not available.</b></font>";
+              return report;
+           }
+       }
+       report += getName() + " attempts to " + task.getDisplayName();    
        TargetRoll target = getTargetFor(task);
        int minutes = task.getTime();
        if(minutes > getMinutesLeft()) {

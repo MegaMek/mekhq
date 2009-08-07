@@ -165,7 +165,14 @@ public class ArmorReplacement extends ReplacementItem {
 
     @Override
     public Part partNeeded() {
-        return new Armor(false, unit.getEntity().getArmorType(), amount);
+        //armor is checked for in 5-ton increments
+        int armorType = unit.getEntity().getArmorType();
+        double armorPerTon = 16.0 * EquipmentType.getArmorPointMultiplier(armorType, unit.getEntity().getTechLevel());
+        if (armorType == EquipmentType.T_ARMOR_HARDENED) {
+            armorPerTon = 8.0;
+        }
+        int points = (int)Math.floor(armorPerTon * 5);
+        return new Armor(false, armorType, points);
     }
 
     @Override

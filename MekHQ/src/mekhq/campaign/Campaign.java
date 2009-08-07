@@ -435,9 +435,11 @@ public class Campaign implements Serializable {
          for(SupportTeam team : getTeams()) {
             team.resetMinutesLeft();
          }
-         //check for any assigned tasks
          ArrayList<WorkItem> assigned = new ArrayList<WorkItem>();
          for(WorkItem task : getTasks()) {
+             if(task instanceof ReplacementItem) {
+                 ((ReplacementItem)task).setPartCheck(false);
+             }
              if(task.isAssigned()) {
                  assigned.add(task);
              }
