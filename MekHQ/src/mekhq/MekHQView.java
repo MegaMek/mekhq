@@ -905,6 +905,7 @@ private void menuLoadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
         fis = new FileInputStream(file);
         in = new ObjectInputStream(fis);
         campaign = (Campaign)in.readObject();
+        campaign.restore();
         in.close();
     }
     catch(IOException ex) {

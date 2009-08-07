@@ -33,11 +33,13 @@ public class EquipmentPart extends Part {
 
     //crap equipmenttype is not serialized!
     protected transient EquipmentType type;
+    protected String typeName;
     
     public EquipmentPart(boolean salvage, EquipmentType et) {
         super(salvage);
         this.type = et;
         this.name = type.getDesc();
+        this.typeName = type.getInternalName();
     }
     
     @Override
@@ -47,5 +49,22 @@ public class EquipmentPart extends Part {
             return type.equals(et);
         }
         return false;
+    }
+    
+    /**
+     * Restores the equipment from the name
+     */
+    public void restore() {
+        if (typeName == null) {
+            typeName = type.getName();
+        } else {
+            type = EquipmentType.get(typeName);
+        }
+
+        if (type == null) {
+            System.err
+            .println("Mounted.restore: could not restore equipment type \""
+                    + typeName + "\"");
+        }
     }
 }

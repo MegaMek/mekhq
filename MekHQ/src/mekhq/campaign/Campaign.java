@@ -32,6 +32,7 @@ import megamek.common.Entity;
 
 import megamek.common.Game;
 import megamek.common.Mounted;
+import mekhq.campaign.parts.EquipmentPart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PilotPerson;
@@ -561,6 +562,14 @@ public class Campaign implements Serializable {
             }
         }
         return null;
+    }
+    
+    public void restore() {
+        for(Part part : getParts()) {
+            if(part instanceof EquipmentPart) {
+                ((EquipmentPart)part).restore();
+            }
+        }
     }
     
 }

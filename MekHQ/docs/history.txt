@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.1.1 (SVN)
++ added restore methods for transient equipmentType field in EquipmentPart
 + campaign name
 + window name issues
 + improved task reporting
