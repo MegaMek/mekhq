@@ -991,7 +991,7 @@ protected void saveListFile() {
             return "MUL file";
         }
     });
-    saveList.setSelectedFile(new File("myunits.mul")); //$NON-NLS-1$
+    saveList.setSelectedFile(new File(campaign.getName() + ".mul")); //$NON-NLS-1$
     int returnVal = saveList.showSaveDialog(mainPanel);
     if ((returnVal != JFileChooser.APPROVE_OPTION) || (saveList.getSelectedFile() == null)) {
        // I want a file, y'know!

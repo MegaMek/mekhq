@@ -54,7 +54,7 @@ public class Campaign implements Serializable {
 
     //we have three things to track: (1) teams, (2) units, (3) repair tasks
     //we will use the same basic system (borrowed from MegaMek) for tracking all three
-    
+    //OK now we have more, parts and personnel.
     private ArrayList<SupportTeam> teams = new ArrayList<SupportTeam>();
     private Hashtable<Integer, SupportTeam> teamIds = new Hashtable<Integer, SupportTeam>();
     private ArrayList<Unit> units = new ArrayList<Unit>();
@@ -77,6 +77,8 @@ public class Campaign implements Serializable {
     //if they try to call up game options
     private Game game;
     
+    private String name;
+    
     //calendar stuff
     public Calendar calendar;
     private SimpleDateFormat dateFormat;
@@ -90,6 +92,15 @@ public class Campaign implements Serializable {
         calendar = new GregorianCalendar(3067, Calendar.JANUARY, 1);
         dateFormat = new SimpleDateFormat("EEEE, MMMM d yyyy");
         currentReport.add("<b>" + getDateAsString() + "</b>");
+        name = "My Campaign";
+    }
+    
+    public String getName() {
+        return name;
+    }
+    
+    public void setName(String s) {
+        this.name = s;
     }
     
     /**

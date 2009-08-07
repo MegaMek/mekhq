@@ -1,6 +1,8 @@
 VERSION HISTORY
 ----------------------------------
 v0.1.1 (SVN)
++ campaign name
++ window name issues
 + improved task reporting
 + disallow salvaging of heat sinks integral to the engine
 + location salvage allowed only after all items salvaged or scapped; torso salvage only possible after limb salvage
