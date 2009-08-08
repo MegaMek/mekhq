@@ -6,6 +6,7 @@
 
 package mekhq;
 
+import java.awt.Color;
 import java.awt.Image;
 import javax.swing.ImageIcon;
 
@@ -47,6 +48,14 @@ public class PartInfo extends javax.swing.JPanel {
     
     public void setImage(Image img) {
         lblImage.setIcon(new ImageIcon(img));
+    }
+    
+    public void select() {
+        lblImage.setBorder(new javax.swing.border.LineBorder(Color.BLACK, 5, true));
+    }
+    
+    public void unselect() {
+        lblImage.setBorder(javax.swing.BorderFactory.createEtchedBorder());
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

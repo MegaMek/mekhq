@@ -1197,14 +1197,15 @@ public class TaskTableModel extends ArrayTableModel {
             setText(getValueAt(row, column).toString());
             setToolTipText(task.getToolTip());
             if(isSelected) {
-                //TODO: how do I set this to the user's default selection color?
-                c.setBackground(new Color(253, 117, 28));
+                select();
             } else {
-                if (null != task && task instanceof ReplacementItem && !((ReplacementItem)task).hasPart()) {
+                unselect();
+            }
+            
+            if (null != task && task instanceof ReplacementItem && !((ReplacementItem)task).hasPart()) {
                     c.setBackground(Color.GRAY);
-                } else {
+            } else {
                     c.setBackground(new Color(220, 220, 220));
-                }
             }
             return c;
         }
@@ -1355,17 +1356,25 @@ public class MekTableModel extends ArrayTableModel {
             setText(getValueAt(row, column).toString());
             setToolTipText(campaign.getToolTipFor(u));
             if(isSelected) {
-                //TODO: how do I set this to the user's default selection color?
-                c.setBackground(new Color(253, 117, 28));
+                select();
             } else {
-                if (null != u && u.isDeployed()) {
-                    c.setBackground(Color.GRAY);
-                } 
-                else if(null != u && campaign.countTasksFor(u.getId()) > 0) {
-                    c.setBackground(Color.YELLOW);
-                } else {
+                unselect();
+            }
+            
+            if (null != u && u.isDeployed()) {
+                c.setBackground(Color.GRAY);
+            }
+            else if(null != u && !u.isRepairable()) {
+                    c.setBackground(new Color(190, 150, 55));
+            }
+            else if(null != u && !u.isFunctional()) {
+                    c.setBackground(new Color(205,92,92));
+            }
+            else if(null != u && campaign.countTasksFor(u.getId()) > 0) {
+                    c.setBackground(new Color(238, 238, 0));
+            } 
+            else {
                     c.setBackground(new Color(220, 220, 220));
-                }
             }
             return c;
         }
@@ -1627,11 +1636,11 @@ public class TechTableModel extends ArrayTableModel {
             setText(getValueAt(row, column).toString());
             //setToolTipText(campaign.getToolTipFor(u));
             if(isSelected) {
-                //TODO: how do I set this to the user's default selection color?
-                c.setBackground(new Color(253, 117, 28));
+                select();
             } else {
-                c.setBackground(new Color(220, 220, 220));
+                unselect();
             }
+            c.setBackground(new Color(220, 220, 220));
             return c;
         }
         
@@ -1672,17 +1681,17 @@ public class PersonTableModel extends ArrayTableModel {
             Person p = getPersonAt(row);
             //setToolTipText(campaign.getToolTipFor(u));
             if(isSelected) {
-                //TODO: how do I set this to the user's default selection color?
-                c.setBackground(new Color(253, 117, 28));
+               select();
             } else {
-                if (null != p && p.isDeployed()) {
+               unselect();
+            }
+            if (null != p && p.isDeployed()) {
                     c.setBackground(Color.GRAY);
-                } 
-                else if(null != p && null != p.getTask() && !p.getTask().isAssigned()) {
-                    c.setBackground(Color.RED);
-                } else {
+            } 
+            else if(null != p && null != p.getTask()) {
+                    c.setBackground(new Color(205,92,92));
+            } else {
                     c.setBackground(new Color(220, 220, 220));
-                }
             }
             return c;
         }
@@ -1723,11 +1732,11 @@ public class DocTableModel extends ArrayTableModel {
             setText(getValueAt(row, column).toString());
             setToolTipText(campaign.getToolTipFor(getDoctorAt(row)));
             if(isSelected) {
-                //TODO: how do I set this to the user's default selection color?
-                c.setBackground(new Color(253, 117, 28));
+                select();
             } else {
-                c.setBackground(new Color(220, 220, 220));
+                unselect();
             }
+            c.setBackground(new Color(220, 220, 220));
             return c;
         }
         
@@ -1767,11 +1776,11 @@ public class PartsTableModel extends ArrayTableModel {
             setText(getValueAt(row, column).toString());
             //setToolTipText(campaign.getToolTipFor(u));
             if(isSelected) {
-                //TODO: how do I set this to the user's default selection color?
-                c.setBackground(new Color(253, 117, 28));
+                select();
             } else {
-                c.setBackground(new Color(220, 220, 220));
+                unselect();
             }
+            c.setBackground(new Color(220, 220, 220));
             return c;
         }
         

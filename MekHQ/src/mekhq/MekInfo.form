@@ -26,8 +26,8 @@
         <Property name="icon" type="javax.swing.Icon" resourceKey="lblImage.icon"/>
         <Property name="text" type="java.lang.String" resourceKey="lblImage.text"/>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
-          <Border info="org.netbeans.modules.form.compat2.border.BevelBorderInfo">
-            <BevelBorder/>
+          <Border info="org.netbeans.modules.form.compat2.border.EtchedBorderInfo">
+            <EtchetBorder/>
           </Border>
         </Property>
         <Property name="name" type="java.lang.String" value="lblImage" noResource="true"/>

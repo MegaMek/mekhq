@@ -6,6 +6,7 @@
 
 package mekhq;
 
+import java.awt.Color;
 import java.awt.Image;
 import javax.swing.ImageIcon;
 
@@ -50,6 +51,14 @@ public class DoctorInfo extends javax.swing.JPanel {
         lblImage.setIcon(new ImageIcon(img));
     }
 
+    public void select() {
+        lblImage.setBorder(new javax.swing.border.LineBorder(Color.BLACK, 5, true));
+    }
+    
+    public void unselect() {
+        lblImage.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel lblImage;
     // End of variables declaration//GEN-END:variables

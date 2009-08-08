@@ -6,6 +6,7 @@
 
 package mekhq;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Image;
 import java.io.IOException;
@@ -39,12 +40,12 @@ public class MekInfo extends JPanel {
         lblImage = new javax.swing.JLabel();
 
         setName("Form"); // NOI18N
-        setLayout(new java.awt.GridLayout());
+        setLayout(new java.awt.GridLayout(1, 0));
 
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(MekInfo.class);
         lblImage.setIcon(resourceMap.getIcon("lblImage.icon")); // NOI18N
         lblImage.setText(resourceMap.getString("lblImage.text")); // NOI18N
-        lblImage.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        lblImage.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         lblImage.setName("lblImage"); // NOI18N
         add(lblImage);
     }// </editor-fold>//GEN-END:initComponents
@@ -61,6 +62,14 @@ public class MekInfo extends JPanel {
     public void setUnit(Entity m) {
         Image unit = getImageFor(m, lblImage);     
         setImage(unit);
+    }
+    
+    public void select() {
+        lblImage.setBorder(new javax.swing.border.LineBorder(Color.BLACK, 5, true));
+    }
+    
+    public void unselect() {
+        lblImage.setBorder(javax.swing.BorderFactory.createEtchedBorder());
     }
     
     public static Image getImageFor(Entity m, Component c) {
