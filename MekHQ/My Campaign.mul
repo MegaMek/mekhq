@@ -33,4 +33,28 @@
       </location>
    </entity>
 
+   <entity chassis="Mad Dog" model="Prime" type="Biped" commander="false" externalId="2">
+      <pilot name="Star Commander Lucien" nick="" gunnery="2" piloting="3" initB="0" commandB="0" hits="1" advantages="clan_pilot_training" autoeject="false"/>
+      The first slot in a location is at index="1".
+      <location index="0"> Head
+         <armor points="4"/>
+      </location>
+      <location index="1"> Center Torso
+         <armor points="Destroyed"/>
+         <armor points="15" type="Internal"/>
+         <slot index="9" type="System" isHit="true" isRepairable="true" isDestroyed="true"/>
+      </location>
+      <location index="2"> Right Torso
+         <armor points="10"/>
+         <slot index="3" type="Clan Ammo LRM-20" shots="6"/>
+      </location>
+      <location index="3"> Left Torso
+         <slot index="7" type="Clan Ammo LRM-20" shots="3"/>
+      </location>
+      <location index="4" isDestroyed="true" /> Right Arm
+      <location index="5"> Left Arm
+         <armor points="14"/>
+      </location>
+   </entity>
+
 </unit>

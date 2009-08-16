@@ -71,15 +71,9 @@ public class LocationSalvage extends SalvageItem {
         if(unit.getEntity() instanceof Mech && loc == Mech.LOC_RT && unit.getEntity().isLocationBad(Mech.LOC_RARM)) {
             return "must salvage/scarp right arm first";
         }
-        if(unit.getEntity() instanceof Mech && loc == Mech.LOC_RT && unit.getEntity().isLocationBad(Mech.LOC_RLEG)) {
-            return "must salvage/scarp right leg first";
-        }
         if(unit.getEntity() instanceof Mech && loc == Mech.LOC_LT && unit.getEntity().isLocationBad(Mech.LOC_LARM)) {
             return "must salvage/scarp left arm first";
-        }
-        if(unit.getEntity() instanceof Mech && loc == Mech.LOC_LT && unit.getEntity().isLocationBad(Mech.LOC_LLEG)) {
-            return "must salvage/scarp left leg first";
-        }  
+        } 
         //you can only salvage a location that has nothing left on it
         for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
             CriticalSlot slot = unit.getEntity().getCritical(loc, i);
