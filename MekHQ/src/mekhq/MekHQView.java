@@ -21,8 +21,11 @@
 
 package mekhq;
 
+import gd.xml.ParseException;
 import java.awt.Color;
 import java.awt.Component;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import mekhq.campaign.team.SupportTeam;
 import mekhq.campaign.Campaign;
 import org.jdesktop.application.Action;
@@ -37,10 +40,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-import java.util.Vector;
 import javax.swing.Timer;
 import javax.swing.Icon;
 import javax.swing.JCheckBoxMenuItem;
@@ -61,7 +64,9 @@ import megamek.common.AmmoType;
 import megamek.common.Entity;
 import megamek.common.EntityListFile;
 import megamek.common.Mounted;
+import megamek.common.Pilot;
 import megamek.common.TargetRoll;
+import megamek.common.XMLStreamParser;
 import mekhq.campaign.Unit;
 import mekhq.campaign.Utilities;
 import mekhq.campaign.parts.Part;
@@ -699,8 +704,12 @@ public class MekHQView extends FrameView {
     }// </editor-fold>//GEN-END:initComponents
 
 private void loadListBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadListBtnActionPerformed
-    loadListFile();
-}//GEN-LAST:event_loadListBtnActionPerformed
+        try {
+            loadListFile();//GEN-LAST:event_loadListBtnActionPerformed
+        } catch (IOException ex) {
+            Logger.getLogger(MekHQView.class.getName()).log(Level.SEVERE, null, ex);
+        }
+}                                           
 
 private void btnDoTaskActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDoTaskActionPerformed
     //assign the task to the team here
@@ -926,7 +935,7 @@ private void menuLoadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
     refreshReport();
 }//GEN-LAST:event_menuLoadActionPerformed
 
-protected void loadListFile() {
+protected void loadListFile() throws IOException {
     JFileChooser loadList = new JFileChooser(".");
     loadList.setDialogTitle("Load Units");
     loadList.setFileFilter(new FileFilter() {
@@ -949,15 +958,38 @@ protected void loadListFile() {
         
     File unitFile = loadList.getSelectedFile();
     if (unitFile != null) {
-       try {
-           // Read the units from the file.
-           Vector<Entity> loadedUnits = EntityListFile.loadFrom(unitFile);
-           // Add the units from the file.
-           for (Entity entity : loadedUnits) {
-              campaign.addUnit(entity);
-           }
-        } catch (IOException excep) {
+        //I need to get the parser myself, because I want to pull both
+        //entities and pilots from it
+        // Create an empty parser.
+        XMLStreamParser parser = new XMLStreamParser();
+
+        // Open up the file.
+        InputStream listStream = new FileInputStream(unitFile);
+
+        // Read a Vector from the file.
+        try {
+        
+            parser.parse(listStream);
+            listStream.close();
+        } catch (ParseException excep) {
             excep.printStackTrace(System.err);
+            //throw new IOException("Unable to read from: " + unitFile.getName());
+        }
+
+        // Was there any error in parsing?
+        if (parser.hasWarningMessage()) {
+            System.out.println(parser.getWarningMessage());
+        }
+           
+        // Add the units from the file.
+        for (Entity entity : parser.getEntities()) {
+            campaign.addUnit(entity);
+        }
+        //add any ejected pilots
+        for(Pilot pilot : parser.getPilots()) {
+            if(pilot.isEjected()) {
+                campaign.returnPilot(pilot);
+            }
         }
     }
     refreshUnitList();
@@ -1572,8 +1604,8 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
                 i = 0;
                 for(PilotPerson pp : pilots) {
                     cbMenuItem = new JCheckBoxMenuItem(pp.getDesc());
-                    if(null != unit.getEntity().getCrew()
-                            && unit.getEntity().getCrew().equals(pp.getPilot())) {
+                    if(unit.hasPilot()
+                            && unit.getPilot().getId() == pp.getId()) {
                         cbMenuItem.setSelected(true);
                     }
                     cbMenuItem.setActionCommand("CHANGE_PILOT:" + i);

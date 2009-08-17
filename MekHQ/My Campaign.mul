@@ -3,7 +3,7 @@
 <unit>
 
    <entity chassis="Black Knight" model="BL-9-KNT" type="Biped" commander="false" externalId="1">
-      <pilot name="Precentor Bob Jones" nick="" gunnery="3" piloting="4" initB="0" commandB="0" hits="1" autoeject="true"/>
+      <pilot name="Bob Smith" nick="Meathead" gunnery="4" piloting="5" initB="0" commandB="0" ejected="false" autoeject="true" externalId="1"/>
       <location index="0"> Head
          <armor points="7"/>
       </location>
@@ -34,7 +34,7 @@
    </entity>
 
    <entity chassis="Mad Dog" model="Prime" type="Biped" commander="false" externalId="2">
-      <pilot name="Star Commander Lucien" nick="" gunnery="2" piloting="3" initB="0" commandB="0" hits="1" advantages="clan_pilot_training" autoeject="false"/>
+      <pilot name="Davie Jones" nick="Psycho" gunnery="4" piloting="5" initB="0" commandB="0" ejected="false" autoeject="false" externalId="2"/>
       The first slot in a location is at index="1".
       <location index="0"> Head
          <armor points="4"/>

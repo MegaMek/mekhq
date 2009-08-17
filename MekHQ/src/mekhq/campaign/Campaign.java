@@ -32,6 +32,7 @@ import megamek.common.Entity;
 
 import megamek.common.Game;
 import megamek.common.Mounted;
+import megamek.common.Pilot;
 import mekhq.campaign.parts.EquipmentPart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
@@ -148,20 +149,12 @@ public class Campaign implements Serializable {
             en.setId(priorUnit.getId());
             priorUnit.setEntity(en);
             priorUnit.setDeployed(false);
-            PilotPerson priorPilot = priorUnit.getPilot();
-            if(null == en.getCrew()) {
+            if(null == en.getCrew() 
+                    || en.getCrew().isDead()
+                    || en.getCrew().isEjected()) {
                 priorUnit.removePilot();
-            }
-            else if(null != priorPilot) { 
-                priorPilot.setPilot(en.getCrew());
-                priorPilot.setDeployed(false);
-                //remove any existing tasks for pilot so we can diagnose new ones
-                if(null != priorPilot.getTask()) {
-                    WorkItem task = priorPilot.getTask();
-                    tasks.remove(task);
-                    taskIds.remove(new Integer(task.getId()));
-                }
-                priorPilot.runDiagnostic(this);
+            } else {
+                returnPilot(en.getCrew());
             }
             //remove old tasks
             ArrayList<WorkItem> oldTasks = new ArrayList<WorkItem>();
@@ -181,8 +174,7 @@ public class Campaign implements Serializable {
                         task.setSkillMin(oldTask.getSkillMin());
                     }
                 }
-            }
-            
+            }            
         } else {
             //this is a new unit so add it
             int id = lastUnitId + 1;
@@ -193,15 +185,37 @@ public class Campaign implements Serializable {
             units.add(unit);
             unitIds.put(new Integer(id), unit);
             lastUnitId = id;
-            //check for pilot
-            if(null != en.getCrew()) {
-                PilotPerson pilot = new PilotPerson(en.getCrew(), PilotPerson.getType(en), unit);
-                unit.setPilot(pilot);
-                addPerson(pilot);
-            }
             //collect all the work items outstanding on this unit and add them to the workitem vector
             unit.runDiagnostic(this);
         }
+    }
+    
+    /**
+     * Add a pilot to the campaign
+     * @param en
+     *      An <code>Entity</code> object that the new unit will be wrapped around
+     */
+    public void returnPilot(Pilot pilot) {    
+        //check to see if the externalId of this pilot matches any personnel we already have
+        Person priorPilot = personnelIds.get(new Integer(pilot.getExternalId()));
+        if(null != priorPilot && priorPilot instanceof PilotPerson) {
+            if(pilot.isEjected()) {
+                ((PilotPerson)priorPilot).getAssignedUnit().removePilot();
+            }
+            pilot.setEjected(false);
+            ((PilotPerson)priorPilot).setPilot(pilot);
+            priorPilot.setDeployed(false);        
+            //remove any existing tasks for pilot so we can diagnose new ones
+            if(null != priorPilot.getTask()) {
+                WorkItem task = priorPilot.getTask();
+                tasks.remove(task);
+                taskIds.remove(new Integer(task.getId()));
+            }
+            priorPilot.runDiagnostic(this);
+        }
+        //we do not add new pilots here, because we will end up 
+        //with "captured" enemy pilots, new pilots should be added
+        //via the hire dialog
     }
     
     public ArrayList<Unit> getUnits() {
@@ -241,6 +255,9 @@ public class Campaign implements Serializable {
     public void addPerson(Person p) {
         int id = lastPersonId + 1;
         p.setId(id);
+        if(p instanceof PilotPerson) {
+            ((PilotPerson)p).getPilot().setExternalId(id);
+        }
         personnel.add(p);
         personnelIds.put(new Integer(id), p);
         lastPersonId = id;
