@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.1.1 (SVN)
++ updated MegaMek.jar
 + Bug: mech CT cannot be scrapped
 + Ejected pilots read in
 + Only existing pilots are read from Load Unit dialog (use Hire Pilot to get new ones)
