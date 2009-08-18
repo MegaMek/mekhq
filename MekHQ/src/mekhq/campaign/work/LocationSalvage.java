@@ -68,11 +68,11 @@ public class LocationSalvage extends SalvageItem {
     @Override
     public String checkFixable() {
          //cant salvage torsos until arms and legs are gone
-        if(unit.getEntity() instanceof Mech && loc == Mech.LOC_RT && unit.getEntity().isLocationBad(Mech.LOC_RARM)) {
-            return "must salvage/scarp right arm first";
+        if(unit.getEntity() instanceof Mech && loc == Mech.LOC_RT && !unit.getEntity().isLocationBad(Mech.LOC_RARM)) {
+            return "must salvage/scrap right arm first";
         }
-        if(unit.getEntity() instanceof Mech && loc == Mech.LOC_LT && unit.getEntity().isLocationBad(Mech.LOC_LARM)) {
-            return "must salvage/scarp left arm first";
+        if(unit.getEntity() instanceof Mech && loc == Mech.LOC_LT && !unit.getEntity().isLocationBad(Mech.LOC_LARM)) {
+            return "must salvage/scrap left arm first";
         } 
         //you can only salvage a location that has nothing left on it
         for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
