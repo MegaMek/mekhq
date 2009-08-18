@@ -191,20 +191,21 @@ public class MekHQView extends FrameView {
         mainPanel = new javax.swing.JPanel();
         tabMain = new javax.swing.JTabbedPane();
         panHangar = new javax.swing.JPanel();
+        scrollTaskTable = new javax.swing.JScrollPane();
+        TaskTable = new javax.swing.JTable();
+        scrollUnitTable = new javax.swing.JScrollPane();
+        UnitTable = new javax.swing.JTable();
+        scrollTechTable = new javax.swing.JScrollPane();
+        TechTable = new javax.swing.JTable();
+        btnUnitPanel = new javax.swing.JPanel();
         btnDeployUnits = new javax.swing.JButton();
         loadListBtn = new javax.swing.JButton();
-        jTabbedPane1 = new javax.swing.JTabbedPane();
+        panelDoTask = new javax.swing.JPanel();
         btnDoTask = new javax.swing.JButton();
-        jScrollPane4 = new javax.swing.JScrollPane();
-        TaskTable = new javax.swing.JTable();
-        jScrollPane5 = new javax.swing.JScrollPane();
-        UnitTable = new javax.swing.JTable();
-        jScrollPane6 = new javax.swing.JScrollPane();
-        textTarget = new javax.swing.JTextArea();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        TechTable = new javax.swing.JTable();
         lblTarget = new javax.swing.JLabel();
         lblTargetNum = new javax.swing.JLabel();
+        jScrollPane6 = new javax.swing.JScrollPane();
+        textTarget = new javax.swing.JTextArea();
         panSupplies = new javax.swing.JPanel();
         jScrollPane8 = new javax.swing.JScrollPane();
         PartsTable = new javax.swing.JTable();
@@ -248,42 +249,15 @@ public class MekHQView extends FrameView {
         tabMain.setToolTipText(resourceMap.getString("tabMain.toolTipText")); // NOI18N
         tabMain.setMinimumSize(new java.awt.Dimension(600, 200));
         tabMain.setName("tabMain"); // NOI18N
-        tabMain.setPreferredSize(new java.awt.Dimension(1000, 300));
+        tabMain.setPreferredSize(new java.awt.Dimension(900, 300));
 
         panHangar.setFont(resourceMap.getFont("panHangar.font")); // NOI18N
         panHangar.setName("panHangar"); // NOI18N
+        panHangar.setLayout(new java.awt.GridBagLayout());
 
-        btnDeployUnits.setText(resourceMap.getString("btnDeployUnits.text")); // NOI18N
-        btnDeployUnits.setToolTipText(resourceMap.getString("btnDeployUnits.toolTipText")); // NOI18N
-        btnDeployUnits.setName("btnDeployUnits"); // NOI18N
-        btnDeployUnits.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnDeployUnitsActionPerformed(evt);
-            }
-        });
-
-        loadListBtn.setText(resourceMap.getString("loadListBtn.text")); // NOI18N
-        loadListBtn.setToolTipText(resourceMap.getString("loadListBtn.toolTipText")); // NOI18N
-        loadListBtn.setName("loadListBtn"); // NOI18N
-        loadListBtn.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                loadListBtnActionPerformed(evt);
-            }
-        });
-
-        jTabbedPane1.setName("jTabbedPane1"); // NOI18N
-
-        btnDoTask.setText(resourceMap.getString("btnDoTask.text")); // NOI18N
-        btnDoTask.setToolTipText(resourceMap.getString("btnDoTask.toolTipText")); // NOI18N
-        btnDoTask.setEnabled(false);
-        btnDoTask.setName("btnDoTask"); // NOI18N
-        btnDoTask.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnDoTaskActionPerformed(evt);
-            }
-        });
-
-        jScrollPane4.setName("jScrollPane4"); // NOI18N
+        scrollTaskTable.setMinimumSize(new java.awt.Dimension(200, 200));
+        scrollTaskTable.setName("scrollTaskTable"); // NOI18N
+        scrollTaskTable.setPreferredSize(new java.awt.Dimension(300, 300));
 
         TaskTable.setModel(taskModel);
         TaskTable.setName("TaskTable"); // NOI18N
@@ -295,9 +269,19 @@ public class MekHQView extends FrameView {
             }
         });
         TaskTable.addMouseListener(taskMouseAdapter);
-        jScrollPane4.setViewportView(TaskTable);
+        scrollTaskTable.setViewportView(TaskTable);
 
-        jScrollPane5.setName("jScrollPane5"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.weighty = 1.0;
+        panHangar.add(scrollTaskTable, gridBagConstraints);
+
+        scrollUnitTable.setMinimumSize(new java.awt.Dimension(300, 200));
+        scrollUnitTable.setName("scrollUnitTable"); // NOI18N
+        scrollUnitTable.setPreferredSize(new java.awt.Dimension(300, 300));
 
         UnitTable.setModel(unitModel);
         UnitTable.setName("UnitTable"); // NOI18N
@@ -309,7 +293,115 @@ public class MekHQView extends FrameView {
             }
         });
         UnitTable.addMouseListener(unitMouseAdapter);
-        jScrollPane5.setViewportView(UnitTable);
+        scrollUnitTable.setViewportView(UnitTable);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridheight = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.weighty = 1.0;
+        panHangar.add(scrollUnitTable, gridBagConstraints);
+
+        scrollTechTable.setMinimumSize(new java.awt.Dimension(200, 200));
+        scrollTechTable.setName("scrollTechTable"); // NOI18N
+        scrollTechTable.setPreferredSize(new java.awt.Dimension(300, 300));
+
+        TechTable.setModel(techsModel);
+        TechTable.setName("TechTable"); // NOI18N
+        TechTable.setRowHeight(60);
+        TechTable.getColumnModel().getColumn(0).setCellRenderer(techsModel.getRenderer());
+        TechTable.getSelectionModel().addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                TechTableValueChanged(evt);
+            }
+        });
+        scrollTechTable.setViewportView(TechTable);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridheight = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.weighty = 1.0;
+        panHangar.add(scrollTechTable, gridBagConstraints);
+
+        btnUnitPanel.setMinimumSize(new java.awt.Dimension(300, 50));
+        btnUnitPanel.setName("btnUnitPanel"); // NOI18N
+        btnUnitPanel.setPreferredSize(new java.awt.Dimension(300, 50));
+        btnUnitPanel.setLayout(new java.awt.GridBagLayout());
+
+        btnDeployUnits.setText(resourceMap.getString("btnDeployUnits.text")); // NOI18N
+        btnDeployUnits.setToolTipText(resourceMap.getString("btnDeployUnits.toolTipText")); // NOI18N
+        btnDeployUnits.setName("btnDeployUnits"); // NOI18N
+        btnDeployUnits.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDeployUnitsActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        btnUnitPanel.add(btnDeployUnits, gridBagConstraints);
+
+        loadListBtn.setText(resourceMap.getString("loadListBtn.text")); // NOI18N
+        loadListBtn.setToolTipText(resourceMap.getString("loadListBtn.toolTipText")); // NOI18N
+        loadListBtn.setName("loadListBtn"); // NOI18N
+        loadListBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                loadListBtnActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        btnUnitPanel.add(loadListBtn, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.5;
+        panHangar.add(btnUnitPanel, gridBagConstraints);
+
+        panelDoTask.setMinimumSize(new java.awt.Dimension(300, 100));
+        panelDoTask.setName("panelDoTask"); // NOI18N
+        panelDoTask.setPreferredSize(new java.awt.Dimension(300, 100));
+        panelDoTask.setLayout(new java.awt.GridBagLayout());
+
+        btnDoTask.setText(resourceMap.getString("btnDoTask.text")); // NOI18N
+        btnDoTask.setToolTipText(resourceMap.getString("btnDoTask.toolTipText")); // NOI18N
+        btnDoTask.setEnabled(false);
+        btnDoTask.setName("btnDoTask"); // NOI18N
+        btnDoTask.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDoTaskActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        panelDoTask.add(btnDoTask, gridBagConstraints);
+
+        lblTarget.setText(resourceMap.getString("lblTarget.text")); // NOI18N
+        lblTarget.setName("lblTarget"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.SOUTH;
+        panelDoTask.add(lblTarget, gridBagConstraints);
+
+        lblTargetNum.setFont(resourceMap.getFont("lblTargetNum.font")); // NOI18N
+        lblTargetNum.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblTargetNum.setText(resourceMap.getString("lblTargetNum.text")); // NOI18N
+        lblTargetNum.setName("lblTargetNum"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
+        panelDoTask.add(lblTargetNum, gridBagConstraints);
 
         jScrollPane6.setName("jScrollPane6"); // NOI18N
 
@@ -325,90 +417,24 @@ public class MekHQView extends FrameView {
         textTarget.setName("textTarget"); // NOI18N
         jScrollPane6.setViewportView(textTarget);
 
-        jScrollPane1.setName("jScrollPane1"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridheight = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        panelDoTask.add(jScrollPane6, gridBagConstraints);
 
-        TechTable.setModel(techsModel);
-        TechTable.setName("TechTable"); // NOI18N
-        TechTable.setRowHeight(60);
-        TechTable.getColumnModel().getColumn(0).setCellRenderer(techsModel.getRenderer());
-        TechTable.getSelectionModel().addListSelectionListener(new javax.swing.event.ListSelectionListener() {
-            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
-                TechTableValueChanged(evt);
-            }
-        });
-        jScrollPane1.setViewportView(TechTable);
-
-        lblTarget.setText(resourceMap.getString("lblTarget.text")); // NOI18N
-        lblTarget.setName("lblTarget"); // NOI18N
-
-        lblTargetNum.setFont(resourceMap.getFont("lblTargetNum.font")); // NOI18N
-        lblTargetNum.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblTargetNum.setText(resourceMap.getString("lblTargetNum.text")); // NOI18N
-        lblTargetNum.setName("lblTargetNum"); // NOI18N
-
-        org.jdesktop.layout.GroupLayout panHangarLayout = new org.jdesktop.layout.GroupLayout(panHangar);
-        panHangar.setLayout(panHangarLayout);
-        panHangarLayout.setHorizontalGroup(
-            panHangarLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(panHangarLayout.createSequentialGroup()
-                .add(panHangarLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(panHangarLayout.createSequentialGroup()
-                        .add(jScrollPane5, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 364, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .add(panHangarLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(panHangarLayout.createSequentialGroup()
-                                .add(19, 19, 19)
-                                .add(panHangarLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                    .add(btnDoTask)
-                                    .add(panHangarLayout.createSequentialGroup()
-                                        .add(24, 24, 24)
-                                        .add(lblTarget))
-                                    .add(panHangarLayout.createSequentialGroup()
-                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                        .add(lblTargetNum, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 95, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(jScrollPane6, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 229, Short.MAX_VALUE)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                            .add(panHangarLayout.createSequentialGroup()
-                                .add(10, 10, 10)
-                                .add(jScrollPane4, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 367, Short.MAX_VALUE)))
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 299, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                    .add(panHangarLayout.createSequentialGroup()
-                        .add(loadListBtn, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 130, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(btnDeployUnits, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 130, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap())
-        );
-        panHangarLayout.setVerticalGroup(
-            panHangarLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, panHangarLayout.createSequentialGroup()
-                .add(panHangarLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(panHangarLayout.createSequentialGroup()
-                        .add(47, 47, 47)
-                        .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 407, Short.MAX_VALUE))
-                    .add(panHangarLayout.createSequentialGroup()
-                        .add(panHangarLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                            .add(loadListBtn)
-                            .add(btnDeployUnits))
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(panHangarLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(panHangarLayout.createSequentialGroup()
-                                .add(panHangarLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                                    .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                    .add(panHangarLayout.createSequentialGroup()
-                                        .add(btnDoTask)
-                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                        .add(lblTarget)
-                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                        .add(lblTargetNum))
-                                    .add(jScrollPane6, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(jScrollPane4, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 333, Short.MAX_VALUE))
-                            .add(org.jdesktop.layout.GroupLayout.TRAILING, jScrollPane5, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 416, Short.MAX_VALUE))
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)))
-                .addContainerGap())
-        );
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridheight = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 0.5;
+        panHangar.add(panelDoTask, gridBagConstraints);
 
         tabMain.addTab(resourceMap.getString("panHangar.TabConstraints.tabTitle"), panHangar); // NOI18N
 
@@ -439,7 +465,7 @@ public class MekHQView extends FrameView {
             panSuppliesLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(panSuppliesLayout.createSequentialGroup()
                 .addContainerGap()
-                .add(jScrollPane8, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 414, Short.MAX_VALUE)
+                .add(jScrollPane8, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 542, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -493,16 +519,16 @@ public class MekHQView extends FrameView {
                 .add(btnAssignDoc, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 156, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jScrollPane3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 322, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .add(190, 190, 190))
+                .add(527, 527, 527))
         );
         panPersonnelLayout.setVerticalGroup(
             panPersonnelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(panPersonnelLayout.createSequentialGroup()
                 .addContainerGap()
                 .add(panPersonnelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, jScrollPane3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 414, Short.MAX_VALUE)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, jScrollPane3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 542, Short.MAX_VALUE)
                     .add(org.jdesktop.layout.GroupLayout.LEADING, btnAssignDoc)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 414, Short.MAX_VALUE))
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 542, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -527,7 +553,7 @@ public class MekHQView extends FrameView {
             .add(panFinancesLayout.createSequentialGroup()
                 .addContainerGap()
                 .add(jLabel2)
-                .addContainerGap(418, Short.MAX_VALUE))
+                .addContainerGap(546, Short.MAX_VALUE))
         );
 
         tabMain.addTab(resourceMap.getString("panFinances.TabConstraints.tabTitle"), panFinances); // NOI18N
@@ -1859,17 +1885,14 @@ public class PartsTableModel extends ArrayTableModel {
     private javax.swing.JButton btnAssignDoc;
     private javax.swing.JButton btnDeployUnits;
     private javax.swing.JButton btnDoTask;
+    private javax.swing.JPanel btnUnitPanel;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JScrollPane jScrollPane4;
-    private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JScrollPane jScrollPane7;
     private javax.swing.JScrollPane jScrollPane8;
-    private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JLabel lblDate;
     private javax.swing.JLabel lblTarget;
     private javax.swing.JLabel lblTargetNum;
@@ -1888,7 +1911,11 @@ public class PartsTableModel extends ArrayTableModel {
     private javax.swing.JPanel panHangar;
     private javax.swing.JPanel panPersonnel;
     private javax.swing.JPanel panSupplies;
+    private javax.swing.JPanel panelDoTask;
     private javax.swing.JProgressBar progressBar;
+    private javax.swing.JScrollPane scrollTaskTable;
+    private javax.swing.JScrollPane scrollTechTable;
+    private javax.swing.JScrollPane scrollUnitTable;
     private javax.swing.JLabel statusAnimationLabel;
     private javax.swing.JLabel statusMessageLabel;
     private javax.swing.JPanel statusPanel;
