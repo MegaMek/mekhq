@@ -186,9 +186,9 @@ public class MekHQView extends FrameView {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
 
         mainPanel = new javax.swing.JPanel();
-        btnAdvanceDay = new javax.swing.JButton();
         tabMain = new javax.swing.JTabbedPane();
         panHangar = new javax.swing.JPanel();
         btnDeployUnits = new javax.swing.JButton();
@@ -216,9 +216,11 @@ public class MekHQView extends FrameView {
         DocTable = new javax.swing.JTable();
         panFinances = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
-        lblDate = new javax.swing.JLabel();
         jScrollPane7 = new javax.swing.JScrollPane();
         txtPaneReport = new javax.swing.JTextPane();
+        jPanel1 = new javax.swing.JPanel();
+        btnAdvanceDay = new javax.swing.JButton();
+        lblDate = new javax.swing.JLabel();
         menuBar = new javax.swing.JMenuBar();
         javax.swing.JMenu fileMenu = new javax.swing.JMenu();
         menuLoad = new javax.swing.JMenuItem();
@@ -240,19 +242,13 @@ public class MekHQView extends FrameView {
 
         mainPanel.setAutoscrolls(true);
         mainPanel.setName("mainPanel"); // NOI18N
+        mainPanel.setLayout(new java.awt.GridBagLayout());
 
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(MekHQView.class);
-        btnAdvanceDay.setText(resourceMap.getString("btnAdvanceDay.text")); // NOI18N
-        btnAdvanceDay.setToolTipText(resourceMap.getString("btnAdvanceDay.toolTipText")); // NOI18N
-        btnAdvanceDay.setName("btnAdvanceDay"); // NOI18N
-        btnAdvanceDay.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnAdvanceDayActionPerformed(evt);
-            }
-        });
-
         tabMain.setToolTipText(resourceMap.getString("tabMain.toolTipText")); // NOI18N
+        tabMain.setMinimumSize(new java.awt.Dimension(600, 200));
         tabMain.setName("tabMain"); // NOI18N
+        tabMain.setPreferredSize(new java.awt.Dimension(1000, 300));
 
         panHangar.setFont(resourceMap.getFont("panHangar.font")); // NOI18N
         panHangar.setName("panHangar"); // NOI18N
@@ -370,12 +366,12 @@ public class MekHQView extends FrameView {
                                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                         .add(lblTargetNum, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 95, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(jScrollPane6, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 204, Short.MAX_VALUE)
+                                .add(jScrollPane6, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 229, Short.MAX_VALUE)
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                                 .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                             .add(panHangarLayout.createSequentialGroup()
                                 .add(10, 10, 10)
-                                .add(jScrollPane4, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 342, Short.MAX_VALUE)))
+                                .add(jScrollPane4, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 367, Short.MAX_VALUE)))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 299, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                     .add(panHangarLayout.createSequentialGroup()
@@ -390,7 +386,7 @@ public class MekHQView extends FrameView {
                 .add(panHangarLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                     .add(panHangarLayout.createSequentialGroup()
                         .add(47, 47, 47)
-                        .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 479, Short.MAX_VALUE))
+                        .add(jScrollPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 373, Short.MAX_VALUE))
                     .add(panHangarLayout.createSequentialGroup()
                         .add(panHangarLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                             .add(loadListBtn)
@@ -408,8 +404,8 @@ public class MekHQView extends FrameView {
                                         .add(lblTargetNum))
                                     .add(jScrollPane6, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(jScrollPane4, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 405, Short.MAX_VALUE))
-                            .add(org.jdesktop.layout.GroupLayout.TRAILING, jScrollPane5, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 488, Short.MAX_VALUE))
+                                .add(jScrollPane4, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 299, Short.MAX_VALUE))
+                            .add(org.jdesktop.layout.GroupLayout.TRAILING, jScrollPane5, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 382, Short.MAX_VALUE))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)))
                 .addContainerGap())
         );
@@ -437,13 +433,13 @@ public class MekHQView extends FrameView {
             panSuppliesLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(panSuppliesLayout.createSequentialGroup()
                 .add(jScrollPane8, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 428, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(609, Short.MAX_VALUE))
+                .addContainerGap(634, Short.MAX_VALUE))
         );
         panSuppliesLayout.setVerticalGroup(
             panSuppliesLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(panSuppliesLayout.createSequentialGroup()
                 .addContainerGap()
-                .add(jScrollPane8, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 486, Short.MAX_VALUE)
+                .add(jScrollPane8, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 380, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -497,16 +493,16 @@ public class MekHQView extends FrameView {
                 .add(btnAssignDoc, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 156, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jScrollPane3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 322, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .add(165, 165, 165))
+                .add(190, 190, 190))
         );
         panPersonnelLayout.setVerticalGroup(
             panPersonnelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(panPersonnelLayout.createSequentialGroup()
                 .addContainerGap()
                 .add(panPersonnelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, jScrollPane3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 486, Short.MAX_VALUE)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, jScrollPane3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 380, Short.MAX_VALUE)
                     .add(org.jdesktop.layout.GroupLayout.LEADING, btnAssignDoc)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 486, Short.MAX_VALUE))
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 380, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -524,60 +520,94 @@ public class MekHQView extends FrameView {
             .add(panFinancesLayout.createSequentialGroup()
                 .addContainerGap()
                 .add(jLabel2)
-                .addContainerGap(852, Short.MAX_VALUE))
+                .addContainerGap(877, Short.MAX_VALUE))
         );
         panFinancesLayout.setVerticalGroup(
             panFinancesLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(panFinancesLayout.createSequentialGroup()
                 .addContainerGap()
                 .add(jLabel2)
-                .addContainerGap(490, Short.MAX_VALUE))
+                .addContainerGap(384, Short.MAX_VALUE))
         );
 
         tabMain.addTab(resourceMap.getString("panFinances.TabConstraints.tabTitle"), panFinances); // NOI18N
 
-        lblDate.setText(resourceMap.getString("lblDate.text")); // NOI18N
-        lblDate.setName("lblDate"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHEAST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        mainPanel.add(tabMain, gridBagConstraints);
 
+        jScrollPane7.setMinimumSize(new java.awt.Dimension(800, 200));
         jScrollPane7.setName("jScrollPane7"); // NOI18N
+        jScrollPane7.setPreferredSize(new java.awt.Dimension(800, 200));
 
         txtPaneReport.setContentType(resourceMap.getString("txtPaneReport.contentType")); // NOI18N
         txtPaneReport.setEditable(false);
         txtPaneReport.setFont(resourceMap.getFont("txtPaneReport.font")); // NOI18N
         txtPaneReport.setText(campaign.getCurrentReportHTML());
+        txtPaneReport.setMinimumSize(new java.awt.Dimension(800, 200));
         txtPaneReport.setName("txtPaneReport"); // NOI18N
+        txtPaneReport.setPreferredSize(new java.awt.Dimension(800, 200));
         jScrollPane7.setViewportView(txtPaneReport);
 
-        org.jdesktop.layout.GroupLayout mainPanelLayout = new org.jdesktop.layout.GroupLayout(mainPanel);
-        mainPanel.setLayout(mainPanelLayout);
-        mainPanelLayout.setHorizontalGroup(
-            mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(mainPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .add(mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(tabMain, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 1058, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(mainPanelLayout.createSequentialGroup()
-                        .add(mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(lblDate, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 192, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(btnAdvanceDay))
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jScrollPane7, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 836, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHEAST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
+        mainPanel.add(jScrollPane7, gridBagConstraints);
+
+        jPanel1.setMinimumSize(new java.awt.Dimension(200, 200));
+        jPanel1.setName("jPanel1"); // NOI18N
+        jPanel1.setPreferredSize(new java.awt.Dimension(200, 220));
+
+        btnAdvanceDay.setText(resourceMap.getString("btnAdvanceDay.text")); // NOI18N
+        btnAdvanceDay.setToolTipText(resourceMap.getString("btnAdvanceDay.toolTipText")); // NOI18N
+        btnAdvanceDay.setName("btnAdvanceDay"); // NOI18N
+        btnAdvanceDay.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAdvanceDayActionPerformed(evt);
+            }
+        });
+
+        lblDate.setText(resourceMap.getString("lblDate.text")); // NOI18N
+        lblDate.setName("lblDate"); // NOI18N
+
+        org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel1Layout.createSequentialGroup()
+                .add(btnAdvanceDay)
+                .addContainerGap(75, Short.MAX_VALUE))
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .add(lblDate, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 192, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
-        mainPanelLayout.setVerticalGroup(
-            mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(mainPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .add(mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(mainPanelLayout.createSequentialGroup()
-                        .add(lblDate)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(btnAdvanceDay))
-                    .add(jScrollPane7, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 172, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .add(13, 13, 13)
-                .add(tabMain, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 572, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(jPanel1Layout.createSequentialGroup()
+                .add(lblDate)
+                .add(6, 6, 6)
+                .add(btnAdvanceDay)
+                .addContainerGap(169, Short.MAX_VALUE))
         );
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHEAST;
+        gridBagConstraints.weighty = 0.2;
+        mainPanel.add(jPanel1, gridBagConstraints);
 
         menuBar.setName("menuBar"); // NOI18N
 
@@ -676,7 +706,7 @@ public class MekHQView extends FrameView {
         statusPanelLayout.setHorizontalGroup(
             statusPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(statusPanelLayout.createSequentialGroup()
-                .add(1076, 1076, 1076)
+                .add(1104, 1104, 1104)
                 .add(statusPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(statusPanelSeparator, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 186, Short.MAX_VALUE)
                     .add(statusPanelLayout.createSequentialGroup()
@@ -1831,6 +1861,7 @@ public class PartsTableModel extends ArrayTableModel {
     private javax.swing.JButton btnDeployUnits;
     private javax.swing.JButton btnDoTask;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
