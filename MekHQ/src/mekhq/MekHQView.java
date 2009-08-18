@@ -211,9 +211,9 @@ public class MekHQView extends FrameView {
         PartsTable = new javax.swing.JTable();
         panPersonnel = new javax.swing.JPanel();
         btnAssignDoc = new javax.swing.JButton();
-        jScrollPane2 = new javax.swing.JScrollPane();
+        scrollPersonTable = new javax.swing.JScrollPane();
         PersonTable = new javax.swing.JTable();
-        jScrollPane3 = new javax.swing.JScrollPane();
+        scrollDocTable = new javax.swing.JScrollPane();
         DocTable = new javax.swing.JTable();
         panFinances = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
@@ -472,6 +472,7 @@ public class MekHQView extends FrameView {
         tabMain.addTab(resourceMap.getString("panSupplies.TabConstraints.tabTitle"), panSupplies); // NOI18N
 
         panPersonnel.setName("panPersonnel"); // NOI18N
+        panPersonnel.setLayout(new java.awt.GridBagLayout());
 
         btnAssignDoc.setText(resourceMap.getString("btnAssignDoc.text")); // NOI18N
         btnAssignDoc.setEnabled(false);
@@ -481,8 +482,15 @@ public class MekHQView extends FrameView {
                 btnAssignDocActionPerformed(evt);
             }
         });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
+        panPersonnel.add(btnAssignDoc, gridBagConstraints);
 
-        jScrollPane2.setName("jScrollPane2"); // NOI18N
+        scrollPersonTable.setMinimumSize(new java.awt.Dimension(300, 200));
+        scrollPersonTable.setName("scrollPersonTable"); // NOI18N
+        scrollPersonTable.setPreferredSize(new java.awt.Dimension(300, 300));
 
         PersonTable.setModel(personnelModel);
         PersonTable.setName("PersonTable"); // NOI18N
@@ -493,9 +501,20 @@ public class MekHQView extends FrameView {
                 PersonTableValueChanged(evt);
             }
         });
-        jScrollPane2.setViewportView(PersonTable);
+        scrollPersonTable.setViewportView(PersonTable);
 
-        jScrollPane3.setName("jScrollPane3"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.weighty = 1.0;
+        panPersonnel.add(scrollPersonTable, gridBagConstraints);
+
+        scrollDocTable.setMinimumSize(new java.awt.Dimension(300, 300));
+        scrollDocTable.setName("scrollDocTable"); // NOI18N
+        scrollDocTable.setPreferredSize(new java.awt.Dimension(300, 300));
 
         DocTable.setModel(doctorsModel);
         DocTable.setName("DocTable"); // NOI18N
@@ -506,31 +525,16 @@ public class MekHQView extends FrameView {
                 DocTableValueChanged(evt);
             }
         });
-        jScrollPane3.setViewportView(DocTable);
+        scrollDocTable.setViewportView(DocTable);
 
-        org.jdesktop.layout.GroupLayout panPersonnelLayout = new org.jdesktop.layout.GroupLayout(panPersonnel);
-        panPersonnel.setLayout(panPersonnelLayout);
-        panPersonnelLayout.setHorizontalGroup(
-            panPersonnelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(panPersonnelLayout.createSequentialGroup()
-                .addContainerGap()
-                .add(jScrollPane2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 356, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(btnAssignDoc, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 156, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jScrollPane3, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 322, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .add(527, 527, 527))
-        );
-        panPersonnelLayout.setVerticalGroup(
-            panPersonnelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(panPersonnelLayout.createSequentialGroup()
-                .addContainerGap()
-                .add(panPersonnelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, jScrollPane3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 542, Short.MAX_VALUE)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, btnAssignDoc)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 542, Short.MAX_VALUE))
-                .addContainerGap())
-        );
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.weighty = 1.0;
+        panPersonnel.add(scrollDocTable, gridBagConstraints);
 
         tabMain.addTab(resourceMap.getString("panPersonnel.TabConstraints.tabTitle"), panPersonnel); // NOI18N
 
@@ -1888,8 +1892,6 @@ public class PartsTableModel extends ArrayTableModel {
     private javax.swing.JPanel btnUnitPanel;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JScrollPane jScrollPane7;
     private javax.swing.JScrollPane jScrollPane8;
@@ -1913,6 +1915,8 @@ public class PartsTableModel extends ArrayTableModel {
     private javax.swing.JPanel panSupplies;
     private javax.swing.JPanel panelDoTask;
     private javax.swing.JProgressBar progressBar;
+    private javax.swing.JScrollPane scrollDocTable;
+    private javax.swing.JScrollPane scrollPersonTable;
     private javax.swing.JScrollPane scrollTaskTable;
     private javax.swing.JScrollPane scrollTechTable;
     private javax.swing.JScrollPane scrollUnitTable;
