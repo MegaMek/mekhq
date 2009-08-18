@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.1.1 (SVN)
++ Bug 2834266: automatic recovery for wounded personnel
 + Bug: torso can be salvaged before arm
 + updated MegaMek.jar
 + Bug: mech CT cannot be scrapped
