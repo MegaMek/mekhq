@@ -1,6 +1,9 @@
 VERSION HISTORY
 ----------------------------------
 v0.1.1 (SVN)
++ GM Mode toggle button
++ Overtime toggle button
++ changed layout of master buttons panel
 + changed Personnel tab to GridBagLayout
 + changed hangar tab to GridBagLayout
 + changed layout of main panel to GridBagLayout

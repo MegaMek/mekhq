@@ -126,7 +126,10 @@ public class TechTeam extends SupportTeam {
    public String getDescHTML() {
         String toReturn = "<html><font size='2'><b>" + getName() + "</b><br>";
         toReturn += getRatingName() + " " + getTypeDesc() + "<br>";
-        toReturn += getMinutesLeft() + " minutes left + (" + getOvertimeLeft() + " overtime)";
+        toReturn += getMinutesLeft() + " minutes left";
+        if(campaign.isOvertimeAllowed()) {
+            toReturn += " + (" + getOvertimeLeft() + " overtime)";
+        }
         toReturn += "</font></html>";
         return toReturn;
    }

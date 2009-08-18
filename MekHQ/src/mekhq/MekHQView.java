@@ -219,9 +219,10 @@ public class MekHQView extends FrameView {
         jLabel2 = new javax.swing.JLabel();
         jScrollPane7 = new javax.swing.JScrollPane();
         txtPaneReport = new javax.swing.JTextPane();
-        jPanel1 = new javax.swing.JPanel();
+        panelMasterButtons = new javax.swing.JPanel();
         btnAdvanceDay = new javax.swing.JButton();
-        lblDate = new javax.swing.JLabel();
+        btnOvertime = new javax.swing.JToggleButton();
+        btnGMMode = new javax.swing.JToggleButton();
         menuBar = new javax.swing.JMenuBar();
         javax.swing.JMenu fileMenu = new javax.swing.JMenu();
         menuLoad = new javax.swing.JMenuItem();
@@ -594,9 +595,10 @@ public class MekHQView extends FrameView {
         gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
         mainPanel.add(jScrollPane7, gridBagConstraints);
 
-        jPanel1.setMinimumSize(new java.awt.Dimension(200, 200));
-        jPanel1.setName("jPanel1"); // NOI18N
-        jPanel1.setPreferredSize(new java.awt.Dimension(200, 220));
+        panelMasterButtons.setMinimumSize(new java.awt.Dimension(200, 200));
+        panelMasterButtons.setName("panelMasterButtons"); // NOI18N
+        panelMasterButtons.setPreferredSize(new java.awt.Dimension(200, 220));
+        panelMasterButtons.setLayout(new java.awt.GridBagLayout());
 
         btnAdvanceDay.setText(resourceMap.getString("btnAdvanceDay.text")); // NOI18N
         btnAdvanceDay.setToolTipText(resourceMap.getString("btnAdvanceDay.toolTipText")); // NOI18N
@@ -606,37 +608,48 @@ public class MekHQView extends FrameView {
                 btnAdvanceDayActionPerformed(evt);
             }
         });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 20, 0);
+        panelMasterButtons.add(btnAdvanceDay, gridBagConstraints);
 
-        lblDate.setText(resourceMap.getString("lblDate.text")); // NOI18N
-        lblDate.setName("lblDate"); // NOI18N
+        btnOvertime.setText(resourceMap.getString("btnOvertime.text")); // NOI18N
+        btnOvertime.setName("btnOvertime"); // NOI18N
+        btnOvertime.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnOvertimeActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panelMasterButtons.add(btnOvertime, gridBagConstraints);
 
-        org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel1Layout.createSequentialGroup()
-                .add(btnAdvanceDay)
-                .addContainerGap(75, Short.MAX_VALUE))
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .add(lblDate, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 192, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanel1Layout.createSequentialGroup()
-                .add(lblDate)
-                .add(6, 6, 6)
-                .add(btnAdvanceDay)
-                .addContainerGap(169, Short.MAX_VALUE))
-        );
+        btnGMMode.setText(resourceMap.getString("btnGMMode.text")); // NOI18N
+        btnGMMode.setName("btnGMMode"); // NOI18N
+        btnGMMode.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnGMModeActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panelMasterButtons.add(btnGMMode, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHEAST;
-        mainPanel.add(jPanel1, gridBagConstraints);
+        mainPanel.add(panelMasterButtons, gridBagConstraints);
 
         menuBar.setName("menuBar"); // NOI18N
 
@@ -995,6 +1008,16 @@ private void menuLoadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
     refreshReport();
 }//GEN-LAST:event_menuLoadActionPerformed
 
+private void btnOvertimeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOvertimeActionPerformed
+    campaign.setOvertime(btnOvertime.isSelected());
+    refreshTechsList();
+    refreshTaskList();
+}//GEN-LAST:event_btnOvertimeActionPerformed
+
+private void btnGMModeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGMModeActionPerformed
+    campaign.setGMMode(btnGMMode.isSelected());
+}//GEN-LAST:event_btnGMModeActionPerformed
+
 protected void loadListFile() throws IOException {
     JFileChooser loadList = new JFileChooser(".");
     loadList.setDialogTitle("Load Units");
@@ -1165,7 +1188,6 @@ protected void refreshPartsList() {
 }
 
 protected void refreshCalendar() {
-    lblDate.setText(campaign.getDateAsString());
     
 }
 
@@ -1889,13 +1911,13 @@ public class PartsTableModel extends ArrayTableModel {
     private javax.swing.JButton btnAssignDoc;
     private javax.swing.JButton btnDeployUnits;
     private javax.swing.JButton btnDoTask;
+    private javax.swing.JToggleButton btnGMMode;
+    private javax.swing.JToggleButton btnOvertime;
     private javax.swing.JPanel btnUnitPanel;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JScrollPane jScrollPane7;
     private javax.swing.JScrollPane jScrollPane8;
-    private javax.swing.JLabel lblDate;
     private javax.swing.JLabel lblTarget;
     private javax.swing.JLabel lblTargetNum;
     private javax.swing.JButton loadListBtn;
@@ -1914,6 +1936,7 @@ public class PartsTableModel extends ArrayTableModel {
     private javax.swing.JPanel panPersonnel;
     private javax.swing.JPanel panSupplies;
     private javax.swing.JPanel panelDoTask;
+    private javax.swing.JPanel panelMasterButtons;
     private javax.swing.JProgressBar progressBar;
     private javax.swing.JScrollPane scrollDocTable;
     private javax.swing.JScrollPane scrollPersonTable;

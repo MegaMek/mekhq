@@ -241,10 +241,14 @@ public abstract class SupportTeam implements Serializable {
        }
        //check time
        if(task.getTime() > getMinutesLeft()) {
-           if((task.getTime() - getMinutesLeft()) > getOvertimeLeft()) {
+           if(campaign.isOvertimeAllowed()) {
+               if((task.getTime() - getMinutesLeft()) > getOvertimeLeft()) {
+                   return new TargetRoll(TargetRoll.IMPOSSIBLE, "Not enough time");
+               }
+               target.addModifier(3, "overtime");
+           } else {
                return new TargetRoll(TargetRoll.IMPOSSIBLE, "Not enough time");
            }
-           target.addModifier(3, "overtime");
        }
        target.append(task.getAllMods());
        return target;

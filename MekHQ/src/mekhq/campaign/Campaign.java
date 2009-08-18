@@ -87,6 +87,9 @@ public class Campaign implements Serializable {
     
     private ArrayList<String> currentReport;
     
+    private boolean overtime;
+    private boolean gmMode;
+    
     public Campaign() {
     
         game = new Game();
@@ -95,6 +98,8 @@ public class Campaign implements Serializable {
         dateFormat = new SimpleDateFormat("EEEE, MMMM d yyyy");
         currentReport.add("<b>" + getDateAsString() + "</b>");
         name = "My Campaign";
+        overtime = false;
+        gmMode = false;
     }
     
     public String getName() {
@@ -589,6 +594,22 @@ public class Campaign implements Serializable {
                 ((EquipmentPart)part).restore();
             }
         }
+    }
+    
+    public boolean isOvertimeAllowed() {
+        return overtime;
+    }
+    
+    public void setOvertime(boolean b) {
+        this.overtime = b;
+    } 
+    
+    public boolean isGM() {
+        return gmMode;
+    }
+    
+    public void setGMMode(boolean b) {
+        this.gmMode = b;
     }
     
 }
