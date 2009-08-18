@@ -91,7 +91,7 @@ public abstract class Person implements Serializable {
     public abstract boolean needsHealing();
     
     public boolean checkNaturalHealing() {
-        if(needsHealing() && null == task) {
+        if(needsHealing() && null == task.getTeam()) {
             daysRest++;
             if(daysRest >= 15) {
                 heal();
