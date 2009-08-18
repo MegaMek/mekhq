@@ -65,6 +65,10 @@ public abstract class UnitWorkItem extends WorkItem {
         return mods;
     }
     
+    public boolean canScrap() {
+        return true;
+    }
+    
     protected abstract String maxSkillReached();
     
     @Override

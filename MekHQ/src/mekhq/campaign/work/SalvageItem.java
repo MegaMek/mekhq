@@ -71,6 +71,12 @@ public abstract class SalvageItem extends UnitWorkItem {
         unit.campaign.removeTask(this);
     }
     
+    @Override
+    public boolean canScrap() {
+        //can only scrap an item if it is legal to salvage it
+        return null == checkFixable();
+    }
+    
     /**
      * sets the given part as destroyed and unrepairable on the entity
      */

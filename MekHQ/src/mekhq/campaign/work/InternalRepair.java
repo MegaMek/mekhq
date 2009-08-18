@@ -22,6 +22,7 @@
 package mekhq.campaign.work;
 
 import megamek.common.IArmorState;
+import megamek.common.Mech;
 import mekhq.campaign.Unit;
 
 /**
@@ -57,6 +58,11 @@ public abstract class InternalRepair extends RepairItem {
     
     public int getLoc() {
         return loc;
+    }
+    
+    @Override
+    public boolean canScrap() {
+        return false;
     }
     
 }

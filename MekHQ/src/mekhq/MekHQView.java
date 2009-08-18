@@ -79,6 +79,7 @@ import mekhq.campaign.work.ReloadItem;
 import mekhq.campaign.work.RepairItem;
 import mekhq.campaign.work.ReplacementItem;
 import mekhq.campaign.work.SalvageItem;
+import mekhq.campaign.work.UnitWorkItem;
 import mekhq.campaign.work.WorkItem;
 
 /**
@@ -1323,9 +1324,7 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
                     menuItem = new JMenuItem("Scrap component");
                     menuItem.setActionCommand("REPLACE");
                     menuItem.addActionListener(this);
-                    if(task instanceof SalvageItem && null != task.checkFixable()) {
-                        menuItem.setEnabled(false);
-                    }
+                    menuItem.setEnabled(((UnitWorkItem)task).canScrap());
                     popup.add(menuItem);
                 }            
                 if(task instanceof ReloadItem) {

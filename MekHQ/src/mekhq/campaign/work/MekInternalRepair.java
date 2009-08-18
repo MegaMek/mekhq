@@ -21,6 +21,7 @@
 
 package mekhq.campaign.work;
 
+import megamek.common.Mech;
 import mekhq.campaign.Unit;
 
 /**
@@ -60,4 +61,11 @@ public class MekInternalRepair extends InternalRepair {
                 && ((MekInternalRepair)task).getUnitId() == this.getUnitId()
                 && ((MekInternalRepair)task).getLoc() == this.getLoc());
     }
+    
+    
+    @Override
+    public boolean canScrap() {
+        return loc != Mech.LOC_CT;
+    }
 }
+
