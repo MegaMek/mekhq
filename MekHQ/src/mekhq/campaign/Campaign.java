@@ -113,8 +113,16 @@ public class Campaign implements Serializable {
         this.name = s;
     }
     
+    public String getEraName() {
+       return Era.getEraNameFromYear(calendar.get(Calendar.YEAR)); 
+    }
+    
+    public int getEraMod() {
+        return Era.getEraMod(Era.getEra(calendar.get(Calendar.YEAR)), getFaction());
+    }
+    
     public String getTitle() {
-        return getName() + " (" + getFactionName() + ")" + " - " + getDateAsString();
+        return getName() + " (" + getFactionName() + ")" + " - " + getDateAsString() + " (" + getEraName() + ")";
     }
     
     /**

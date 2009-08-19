@@ -163,6 +163,12 @@ public abstract class SupportTeam implements Serializable {
         if(getCasualtyMods() > 0) {
             target.addModifier(getCasualtyMods(), "understaffed");
         }
+        /*
+         * TODO: need an option for era mods
+        if(this instanceof TechTeam) {
+            target.addModifier(campaign.getEraMod(), "era mod");
+        }
+         * */
         return target;
     }
     
