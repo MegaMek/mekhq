@@ -82,8 +82,10 @@ public class Campaign implements Serializable {
     private String name;
     
     //calendar stuff
-    public Calendar calendar;
+    public GregorianCalendar calendar;
     private SimpleDateFormat dateFormat;
+    
+    private int faction; 
     
     private ArrayList<String> currentReport;
     
@@ -100,6 +102,7 @@ public class Campaign implements Serializable {
         name = "My Campaign";
         overtime = false;
         gmMode = false;
+        faction = Faction.F_MERC;
     }
     
     public String getName() {
@@ -111,7 +114,7 @@ public class Campaign implements Serializable {
     }
     
     public String getTitle() {
-        return getName() + " - " + getDateAsString();
+        return getName() + " (" + getFactionName() + ")" + " - " + getDateAsString();
     }
     
     /**
@@ -614,6 +617,18 @@ public class Campaign implements Serializable {
     
     public void setGMMode(boolean b) {
         this.gmMode = b;
+    }
+    
+    public int getFaction() {
+        return faction;
+    }
+    
+    public void setFaction(int i) {
+        this.faction = i;
+    }
+    
+    public String getFactionName() {
+        return Faction.getFactionName(faction);
     }
     
 }

@@ -44,6 +44,7 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.GregorianCalendar;
 import javax.swing.Timer;
 import javax.swing.Icon;
 import javax.swing.JCheckBoxMenuItem;
@@ -227,6 +228,7 @@ public class MekHQView extends FrameView {
         javax.swing.JMenu fileMenu = new javax.swing.JMenu();
         menuLoad = new javax.swing.JMenuItem();
         menuSave = new javax.swing.JMenuItem();
+        menuOptions = new javax.swing.JMenuItem();
         javax.swing.JMenuItem exitMenuItem = new javax.swing.JMenuItem();
         menuMarket = new javax.swing.JMenu();
         miPurchaseUnit = new javax.swing.JMenuItem();
@@ -674,6 +676,15 @@ public class MekHQView extends FrameView {
         });
         fileMenu.add(menuSave);
 
+        menuOptions.setText(resourceMap.getString("menuOptions.text")); // NOI18N
+        menuOptions.setName("menuOptions"); // NOI18N
+        menuOptions.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuOptionsActionPerformed(evt);
+            }
+        });
+        fileMenu.add(menuOptions);
+
         javax.swing.ActionMap actionMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getActionMap(MekHQView.class, this);
         exitMenuItem.setAction(actionMap.get("quit")); // NOI18N
         exitMenuItem.setName("exitMenuItem"); // NOI18N
@@ -1017,6 +1028,13 @@ private void btnOvertimeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
 private void btnGMModeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGMModeActionPerformed
     campaign.setGMMode(btnGMMode.isSelected());
 }//GEN-LAST:event_btnGMModeActionPerformed
+
+private void menuOptionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuOptionsActionPerformed
+    CampaignOptionsDialog cod = new CampaignOptionsDialog(this.getFrame(), true, campaign);
+    cod.setVisible(true);
+    refreshCalendar();
+    
+}//GEN-LAST:event_menuOptionsActionPerformed
 
 protected void loadListFile() throws IOException {
     JFileChooser loadList = new JFileChooser(".");
@@ -1926,6 +1944,7 @@ public class PartsTableModel extends ArrayTableModel {
     private javax.swing.JMenu menuHire;
     private javax.swing.JMenuItem menuLoad;
     private javax.swing.JMenu menuMarket;
+    private javax.swing.JMenuItem menuOptions;
     private javax.swing.JMenuItem menuSave;
     private javax.swing.JMenuItem miHireDoctor;
     private javax.swing.JMenuItem miHirePilot;

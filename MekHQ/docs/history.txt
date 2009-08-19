@@ -1,6 +1,10 @@
 VERSION HISTORY
 ----------------------------------
 v0.1.1 (SVN)
++ campaign faction option
++ campaign date option
++ campaign name option
++ Campaign Options Dialog
 + Main window title shows campaign name and date
 + GM Mode toggle button
 + Overtime toggle button
