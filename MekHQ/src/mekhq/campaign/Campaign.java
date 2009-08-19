@@ -110,6 +110,10 @@ public class Campaign implements Serializable {
         this.name = s;
     }
     
+    public String getTitle() {
+        return getName() + " - " + getDateAsString();
+    }
+    
     /**
      * Add a support team to the campaign
      * @param t 

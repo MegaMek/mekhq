@@ -106,7 +106,7 @@ public class MekHQView extends FrameView {
     
     public MekHQView(SingleFrameApplication app) {
         super(app);
-      
+        
         unitMouseAdapter = new MekTableMouseAdapter();
         taskMouseAdapter = new TaskTableMouseAdapter();
         initComponents();
@@ -1188,7 +1188,7 @@ protected void refreshPartsList() {
 }
 
 protected void refreshCalendar() {
-    
+    getFrame().setTitle(campaign.getTitle());
 }
 
 protected void refreshReport() {
