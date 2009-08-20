@@ -349,6 +349,9 @@ public class Campaign implements Serializable {
     public ArrayList<WorkItem> getTasksForUnit(int unitId) {
         Unit unit = getUnit(unitId);
         ArrayList<WorkItem> newTasks = new ArrayList<WorkItem>();
+        if(null == unit) {
+            return newTasks;
+        }
         for(WorkItem task : getTasks()) {
             if(task instanceof UnitWorkItem 
                     && ((UnitWorkItem)task).getUnitId() == unitId

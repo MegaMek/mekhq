@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.1.1 (SVN)
++ Bug: NPE when getTasksForUnit called and no units selected
 + Era
 + campaign faction option
 + campaign date option
