@@ -29,6 +29,7 @@ import megamek.common.AmmoType;
 import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.Protomech;
+import megamek.common.TechConstants;
 
 /**
  *
@@ -50,12 +51,62 @@ public class Utilities {
         for(AmmoType atype : AmmoType.getMunitionsFor(cur_atype.getAmmoType())) {
             //this is an abbreviated version of setupMunitions in the CustomMechDialog
             //TODO: clan/IS limitations?
+            
             if ((entity instanceof Aero)
                         && !((atype.getAmmoType() == AmmoType.T_MML)
                                 || (atype.getAmmoType() == AmmoType.T_ATM)
                                 || (atype.getAmmoType() == AmmoType.T_NARC) 
                                 || (atype.getAmmoType() == AmmoType.T_AC_LBX))) {
                 continue;
+            }
+            
+            boolean bTechMatch = TechConstants.isLegal(entity.getTechLevel(), atype.getTechLevel());
+
+            //TODO: a lot of the level 2 v. level 1 stuff should get replaced by actual
+            //year of introduction, and extinction and so forth
+            
+            //TODO: a lot of these checks should really just be made based on what ammo is available
+            //once that is implemented
+            
+            // allow all lvl2 IS units to use level 1 ammo
+            // lvl1 IS units don't need to be allowed to use lvl1 ammo,
+            // because there is no special lvl1 ammo, therefore it doesn't
+            // need to show up in this display.
+            if (!bTechMatch
+                    && (entity.getTechLevel() == TechConstants.T_IS_TW_NON_BOX)
+                    && (atype.getTechLevel() == TechConstants.T_INTRO_BOXSET)) {
+                bTechMatch = true;
+            }
+
+            //also allow l1 guys to use l2 stuff
+            if (!bTechMatch && entity.getTechLevel() == TechConstants.T_INTRO_BOXSET
+                        && (atype.getTechLevel() == TechConstants.T_IS_TW_NON_BOX)) {
+                bTechMatch = true;
+            }
+
+            //allow experimental ammo
+            if ((entity.getTechLevel() == TechConstants.T_CLAN_TW)
+                    && ((atype.getTechLevel() == TechConstants.T_CLAN_ADVANCED)
+                            || (atype.getTechLevel() == TechConstants.T_CLAN_EXPERIMENTAL) 
+                            || (atype.getTechLevel() == TechConstants.T_CLAN_UNOFFICIAL))) {
+                            bTechMatch = true;
+            }
+            if (((entity.getTechLevel() == TechConstants.T_INTRO_BOXSET) 
+                    || (entity.getTechLevel() == TechConstants.T_IS_TW_NON_BOX))
+                    && ((atype.getTechLevel() == TechConstants.T_IS_ADVANCED)
+                    || (atype.getTechLevel() == TechConstants.T_IS_EXPERIMENTAL) 
+                    || (atype.getTechLevel() == TechConstants.T_IS_UNOFFICIAL))) {
+                            bTechMatch = true;
+            }
+            if ((atype.getTechLevel() == TechConstants.T_IS_ADVANCED)
+                        || (atype.getTechLevel() == TechConstants.T_CLAN_ADVANCED)) {
+                    bTechMatch = false;
+            }
+
+            // allow mixed Tech Mechs to use both IS and Clan ammo of any
+            // level (since mixed tech is always level 3)
+            if (entity.isMixedTech()) {
+                bTechMatch = true;
             }
 
             // Only Protos can use Proto-specific ammo
@@ -74,7 +125,7 @@ public class Utilities {
 
             // Battle Armor ammo can't be selected at all.
             // All other ammo types need to match on rack size and tech.
-            if ((atype.getRackSize() == cur_atype.getRackSize())
+            if (bTechMatch && (atype.getRackSize() == cur_atype.getRackSize())
                             && (atype.hasFlag(AmmoType.F_BATTLEARMOR) == cur_atype.hasFlag(AmmoType.F_BATTLEARMOR))
                             && (atype.hasFlag(AmmoType.F_ENCUMBERING) == cur_atype.hasFlag(AmmoType.F_ENCUMBERING))
                             && (atype.getTonnage(entity) == cur_atype.getTonnage(entity))) {
