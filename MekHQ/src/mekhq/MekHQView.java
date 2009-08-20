@@ -834,7 +834,7 @@ private void TaskTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
     if(selected > -1 && selected < campaign.getTasksForUnit(currentUnitId).size()) {
         currentTaskId = campaign.getTasksForUnit(currentUnitId).get(selected).getId();
     }
-    else if(selected < 0) {
+    else {
         currentTaskId = -1;
     }
     updateAssignEnabled();
