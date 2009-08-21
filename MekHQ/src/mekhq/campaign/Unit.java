@@ -32,8 +32,6 @@ import megamek.common.Protomech;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.VTOL;
-import megamek.common.weapons.ISERPPC;
-import megamek.common.weapons.ISERPPC;
 import mekhq.campaign.personnel.PilotPerson;
 import mekhq.campaign.work.*;
 

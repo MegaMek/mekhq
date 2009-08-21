@@ -200,7 +200,7 @@ public class MekHQView extends FrameView {
         TechTable = new javax.swing.JTable();
         btnUnitPanel = new javax.swing.JPanel();
         btnDeployUnits = new javax.swing.JButton();
-        loadListBtn = new javax.swing.JButton();
+        btnRetrieveUnits = new javax.swing.JButton();
         panelDoTask = new javax.swing.JPanel();
         btnDoTask = new javax.swing.JButton();
         lblTarget = new javax.swing.JLabel();
@@ -230,6 +230,8 @@ public class MekHQView extends FrameView {
         menuSave = new javax.swing.JMenuItem();
         menuOptions = new javax.swing.JMenuItem();
         javax.swing.JMenuItem exitMenuItem = new javax.swing.JMenuItem();
+        miLoadForces = new javax.swing.JMenu();
+        jMenuItem1 = new javax.swing.JMenuItem();
         menuMarket = new javax.swing.JMenu();
         miPurchaseUnit = new javax.swing.JMenuItem();
         menuHire = new javax.swing.JMenu();
@@ -345,22 +347,22 @@ public class MekHQView extends FrameView {
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         btnUnitPanel.add(btnDeployUnits, gridBagConstraints);
 
-        loadListBtn.setText(resourceMap.getString("loadListBtn.text")); // NOI18N
-        loadListBtn.setToolTipText(resourceMap.getString("loadListBtn.toolTipText")); // NOI18N
-        loadListBtn.setName("loadListBtn"); // NOI18N
-        loadListBtn.addActionListener(new java.awt.event.ActionListener() {
+        btnRetrieveUnits.setText(resourceMap.getString("btnRetrieveUnits.text")); // NOI18N
+        btnRetrieveUnits.setToolTipText(resourceMap.getString("btnRetrieveUnits.toolTipText")); // NOI18N
+        btnRetrieveUnits.setName("btnRetrieveUnits"); // NOI18N
+        btnRetrieveUnits.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                loadListBtnActionPerformed(evt);
+                btnRetrieveUnitsActionPerformed(evt);
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
-        btnUnitPanel.add(loadListBtn, gridBagConstraints);
+        btnUnitPanel.add(btnRetrieveUnits, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -692,6 +694,20 @@ public class MekHQView extends FrameView {
 
         menuBar.add(fileMenu);
 
+        miLoadForces.setText(resourceMap.getString("miLoadForces.text")); // NOI18N
+        miLoadForces.setName("miLoadForces"); // NOI18N
+
+        jMenuItem1.setText(resourceMap.getString("jMenuItem1.text")); // NOI18N
+        jMenuItem1.setName("jMenuItem1"); // NOI18N
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
+        miLoadForces.add(jMenuItem1);
+
+        menuBar.add(miLoadForces);
+
         menuMarket.setText(resourceMap.getString("menuMarket.text")); // NOI18N
         menuMarket.setName("menuMarket"); // NOI18N
 
@@ -787,10 +803,12 @@ public class MekHQView extends FrameView {
         setStatusBar(statusPanel);
     }// </editor-fold>//GEN-END:initComponents
 
-private void loadListBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadListBtnActionPerformed
-        try {
-            loadListFile();//GEN-LAST:event_loadListBtnActionPerformed
-        } catch (IOException ex) {
+private void btnRetrieveUnitsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRetrieveUnitsActionPerformed
+
+    try {
+        loadListFile(false);
+}//GEN-LAST:event_btnRetrieveUnitsActionPerformed
+ catch (IOException ex) {
             Logger.getLogger(MekHQView.class.getName()).log(Level.SEVERE, null, ex);
         }
 }                                           
@@ -1036,7 +1054,15 @@ private void menuOptionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     
 }//GEN-LAST:event_menuOptionsActionPerformed
 
-protected void loadListFile() throws IOException {
+private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+        try {
+            loadListFile(true);//GEN-LAST:event_jMenuItem1ActionPerformed
+        } catch (IOException ex) {
+            Logger.getLogger(MekHQView.class.getName()).log(Level.SEVERE, null, ex);
+        }
+}
+
+protected void loadListFile(boolean allowNewPilots) throws IOException {
     JFileChooser loadList = new JFileChooser(".");
     loadList.setDialogTitle("Load Units");
     loadList.setFileFilter(new FileFilter() {
@@ -1084,12 +1110,12 @@ protected void loadListFile() throws IOException {
            
         // Add the units from the file.
         for (Entity entity : parser.getEntities()) {
-            campaign.addUnit(entity);
+            campaign.addUnit(entity, allowNewPilots);
         }
         //add any ejected pilots
         for(Pilot pilot : parser.getPilots()) {
             if(pilot.isEjected()) {
-                campaign.returnPilot(pilot);
+                campaign.addPilot(pilot, PilotPerson.T_MECH, false);
             }
         }
     }
@@ -1942,14 +1968,15 @@ public class PartsTableModel extends ArrayTableModel {
     private javax.swing.JButton btnDoTask;
     private javax.swing.JToggleButton btnGMMode;
     private javax.swing.JToggleButton btnOvertime;
+    private javax.swing.JButton btnRetrieveUnits;
     private javax.swing.JPanel btnUnitPanel;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JScrollPane jScrollPane7;
     private javax.swing.JScrollPane jScrollPane8;
     private javax.swing.JLabel lblTarget;
     private javax.swing.JLabel lblTargetNum;
-    private javax.swing.JButton loadListBtn;
     private javax.swing.JPanel mainPanel;
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JMenu menuHire;
@@ -1960,6 +1987,7 @@ public class PartsTableModel extends ArrayTableModel {
     private javax.swing.JMenuItem miHireDoctor;
     private javax.swing.JMenuItem miHirePilot;
     private javax.swing.JMenuItem miHireTech;
+    private javax.swing.JMenu miLoadForces;
     private javax.swing.JMenuItem miPurchaseUnit;
     private javax.swing.JPanel panFinances;
     private javax.swing.JPanel panHangar;

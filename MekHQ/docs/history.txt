@@ -1,6 +1,8 @@
 VERSION HISTORY
 ----------------------------------
 v0.1.1 (SVN)
++ tooltip text and button labels for Deploy Units and Retrieve Units updated
++ load forces from MUL menu item (for loading initial forces including pilots)
 + RFE 2841678: Dialogue on unsuccessful deploy 
 + Clan/IS ammo limits
 + Bug: NPE when getTasksForUnit called and no units selected
