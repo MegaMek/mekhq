@@ -114,10 +114,6 @@ public class Unit implements Serializable {
     }
     
     public boolean isFunctional() {
-        //got pilot?
-        if(!hasPilot()) {
-            return false;
-        }
         if(entity instanceof Mech) {         
             //center torso bad?? head bad?
             if(entity.isLocationBad(Mech.LOC_CT) || entity.isLocationBad(Mech.LOC_HEAD)) {
@@ -588,8 +584,17 @@ public class Unit implements Serializable {
         }
     }
     
-    public boolean canDeploy() {
-        return !isDeployed() && isFunctional();
+    public String checkDeployment() {
+        if(isDeployed()) {
+            return "unit is already deployed";
+        }
+        if(!isFunctional()) {
+            return "unit is not functional";
+        }
+        if(!hasPilot()) {
+            return "unit has no pilot";
+        }
+        return null;
     }
     
     public boolean hasEndosteel() {

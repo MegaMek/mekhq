@@ -897,7 +897,7 @@ private void btnAdvanceDayActionPerformed(java.awt.event.ActionEvent evt) {//GEN
 }//GEN-LAST:event_btnAdvanceDayActionPerformed
 
 private void btnDeployUnitsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeployUnitsActionPerformed
-    saveListFile();
+    deployListFile();
 }//GEN-LAST:event_btnDeployUnitsActionPerformed
 
 private void btnAssignDocActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAssignDocActionPerformed
@@ -1097,20 +1097,27 @@ protected void loadListFile() throws IOException {
     refreshPersonnelList();
 }
 
-protected void saveListFile() {
+protected void deployListFile() {
     if(UnitTable.getSelectedRow() == -1) {
         return;
     }
     
     ArrayList<Entity> chosen = new ArrayList<Entity>();
     ArrayList<Unit> toDeploy = new ArrayList<Unit>();
+    StringBuffer undeployed = new StringBuffer();
     for(int i : UnitTable.getSelectedRows()) {
         Unit u = campaign.getUnits().get(i);
-        if(null != u.getEntity() && u.canDeploy()) {
-            chosen.add(u.getEntity());
-            toDeploy.add(u);
+        if(null != u.getEntity()) {
+            if(null == u.checkDeployment()) {
+                chosen.add(u.getEntity());
+                toDeploy.add(u);
+            } else {
+                undeployed.append("\n").append(u.getEntity().getDisplayName()).append(" (").append(u.checkDeployment()).append(")");
+            }
         }
     }
+    
+    
     
     
     JFileChooser saveList = new JFileChooser(".");
@@ -1159,6 +1166,10 @@ protected void saveListFile() {
     }
     refreshUnitList();
     refreshPersonnelList();
+    
+    if(undeployed.length() > 0) {
+        JOptionPane.showMessageDialog(this.getFrame(),"The following units could not be deployed:" + undeployed.toString(),"Could not deploy some units", JOptionPane.WARNING_MESSAGE);
+    }
 }
     
 protected void refreshUnitList() {
