@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.1.1 (SVN)
++ Bug: entities not being restored on load game
 + UnitSelectorDialog (for hiring new units)
 + tooltip text and button labels for Deploy Units and Retrieve Units updated
 + load forces from MUL menu item (for loading initial forces including pilots)
