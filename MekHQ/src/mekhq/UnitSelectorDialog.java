@@ -6,7 +6,10 @@
 
 package mekhq;
 
+import java.awt.Image;
+import java.io.IOException;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.RowFilter;
 import javax.swing.event.DocumentEvent;
@@ -15,6 +18,7 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 import megamek.client.ui.MechView;
+import megamek.client.ui.swing.MechTileset;
 import megamek.common.Entity;
 import megamek.common.EntityWeightClass;
 import megamek.common.MechFileParser;
@@ -35,6 +39,7 @@ public class UnitSelectorDialog extends JDialog {
 
     private MechTableModel unitModel;
    
+    private static MechTileset mt;
 
     Entity selectedUnit = null;
     
@@ -80,6 +85,8 @@ public class UnitSelectorDialog extends JDialog {
         comboUnitType = new javax.swing.JComboBox();
         txtFilter = new javax.swing.JTextField();
         lblFilter = new javax.swing.JLabel();
+        lblImage = new javax.swing.JLabel();
+        checkCanon = new javax.swing.JCheckBox();
         panelOKBtns = new javax.swing.JPanel();
         btnBuyClose = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
@@ -152,9 +159,9 @@ public class UnitSelectorDialog extends JDialog {
         gridBagConstraints.weighty = 1.0;
         getContentPane().add(scrTxtUnitView, gridBagConstraints);
 
-        panelFilterBtns.setMinimumSize(new java.awt.Dimension(300, 100));
+        panelFilterBtns.setMinimumSize(new java.awt.Dimension(300, 120));
         panelFilterBtns.setName("panelFilterBtns"); // NOI18N
-        panelFilterBtns.setPreferredSize(new java.awt.Dimension(300, 100));
+        panelFilterBtns.setPreferredSize(new java.awt.Dimension(300, 120));
         panelFilterBtns.setLayout(new java.awt.GridBagLayout());
 
         lblType.setText(resourceMap.getString("lblType.text")); // NOI18N
@@ -272,9 +279,36 @@ public class UnitSelectorDialog extends JDialog {
             gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
             panelFilterBtns.add(lblFilter, gridBagConstraints);
 
+            lblImage.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+            lblImage.setText(resourceMap.getString("lblImage.text")); // NOI18N
+            lblImage.setName("lblImage"); // NOI18N
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 3;
+            gridBagConstraints.gridy = 0;
+            gridBagConstraints.gridheight = 4;
+            gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.weighty = 1.0;
+            panelFilterBtns.add(lblImage, gridBagConstraints);
+
+            checkCanon.setSelected(true);
+            checkCanon.setText(resourceMap.getString("checkCanon.text")); // NOI18N
+            checkCanon.setName("checkCanon"); // NOI18N
+            checkCanon.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    checkCanonActionPerformed(evt);
+                }
+            });
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 2;
+            gridBagConstraints.gridy = 0;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+            panelFilterBtns.add(checkCanon, gridBagConstraints);
+
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = 0;
+            gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
             gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 0);
@@ -332,6 +366,10 @@ private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
     this.setVisible(false);
 }//GEN-LAST:event_btnCancelActionPerformed
 
+private void checkCanonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkCanonActionPerformed
+    filterUnits();
+}//GEN-LAST:event_checkCanonActionPerformed
+
     /**
     * @param args the command line arguments
     */
@@ -363,6 +401,7 @@ private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
                     MechSummary mech = mechModel.getMechSummary(entry.getIdentifier());
                 if (/* Weight */
                     (mech.getWeightClass() == nClass) &&
+                            mech.isCanon() == checkCanon.isSelected() && 
                 /*
                  * Technology Level
                  */
@@ -450,6 +489,8 @@ private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
 
         // null entity, so load a default unit.
         if (selectedUnit == null) {
+            txtUnitView.setText("");
+            lblImage.setIcon(null);
             return;
         }
 
@@ -468,13 +509,18 @@ private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
         }
         txtUnitView.setCaretPosition(0);
      
-        // Preview image of the unit...
-        try {
-            // ((MechInfo) pPreview).setUnit(currEntity);
-            // ((MechInfo) pPreview).setImageVisible(true);
-            // pPreview.paint(pPreview.getGraphics());
-        } catch (Exception ex) {
-            // shouldnt ever get here ...
+        if (mt == null) {
+            mt = new MechTileset("data/images/units/");
+            try {
+                mt.loadFromFile("mechset.txt");
+            } catch (IOException ex) {
+                //TODO: do something here
+                return;
+            }
+        }// end if(null tileset)
+        Image unitImage = mt.imageFor(selectedUnit, lblImage);
+        if(null != unitImage) {
+            lblImage.setIcon(new ImageIcon(unitImage));
         }
     }
      
@@ -584,10 +630,12 @@ public class MechTableModel extends AbstractTableModel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBuyClose;
     private javax.swing.JButton btnCancel;
+    private javax.swing.JCheckBox checkCanon;
     private javax.swing.JComboBox comboType;
     private javax.swing.JComboBox comboUnitType;
     private javax.swing.JComboBox comboWeight;
     private javax.swing.JLabel lblFilter;
+    private javax.swing.JLabel lblImage;
     private javax.swing.JLabel lblType;
     private javax.swing.JLabel lblUnitType;
     private javax.swing.JLabel lblWeight;
