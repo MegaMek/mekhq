@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.1.1 (SVN)
++ RFE 2843210: Save campaign with campaign name
 + canon only button in UnitSelectorDialog
 + added unit picture to UnitSelectorDialog
 + Bug: entities not being restored on load game
