@@ -712,8 +712,12 @@ public class MekHQView extends FrameView {
         menuMarket.setName("menuMarket"); // NOI18N
 
         miPurchaseUnit.setText(resourceMap.getString("miPurchaseUnit.text")); // NOI18N
-        miPurchaseUnit.setEnabled(false);
         miPurchaseUnit.setName("miPurchaseUnit"); // NOI18N
+        miPurchaseUnit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                miPurchaseUnitActionPerformed(evt);
+            }
+        });
         menuMarket.add(miPurchaseUnit);
 
         menuHire.setText(resourceMap.getString("menuHire.text")); // NOI18N
@@ -1061,6 +1065,16 @@ private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
             Logger.getLogger(MekHQView.class.getName()).log(Level.SEVERE, null, ex);
         }
 }
+
+private void miPurchaseUnitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miPurchaseUnitActionPerformed
+    UnitSelectorDialog usd = new UnitSelectorDialog(this.getFrame(), true);
+    usd.setVisible(true);
+    Entity en = usd.getSelectedEntity();
+    if(null != en) {
+        campaign.addUnit(en, false);
+    }
+    refreshUnitList();
+}//GEN-LAST:event_miPurchaseUnitActionPerformed
 
 protected void loadListFile(boolean allowNewPilots) throws IOException {
     JFileChooser loadList = new JFileChooser(".");

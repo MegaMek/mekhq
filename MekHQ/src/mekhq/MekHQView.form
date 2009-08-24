@@ -699,9 +699,11 @@
             <MenuItem class="javax.swing.JMenuItem" name="miPurchaseUnit">
               <Properties>
                 <Property name="text" type="java.lang.String" resourceKey="miPurchaseUnit.text"/>
-                <Property name="enabled" type="boolean" value="false"/>
                 <Property name="name" type="java.lang.String" value="miPurchaseUnit" noResource="true"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="miPurchaseUnitActionPerformed"/>
+              </Events>
             </MenuItem>
             <Menu class="javax.swing.JMenu" name="menuHire">
               <Properties>
