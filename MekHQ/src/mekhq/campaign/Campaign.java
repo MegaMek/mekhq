@@ -87,6 +87,7 @@ public class Campaign implements Serializable {
     //calendar stuff
     public GregorianCalendar calendar;
     private SimpleDateFormat dateFormat;
+    private SimpleDateFormat shortDateFormat;
     
     private int faction; 
     
@@ -100,7 +101,8 @@ public class Campaign implements Serializable {
         game = new Game();
         currentReport = new ArrayList<String>();
         calendar = new GregorianCalendar(3067, Calendar.JANUARY, 1);
-        dateFormat = new SimpleDateFormat("EEEE, MMMM d yyyy");
+        dateFormat = new SimpleDateFormat("EEEE, MMMM d yyyy");  
+        shortDateFormat = new SimpleDateFormat("MMddyyyy");
         currentReport.add("<b>" + getDateAsString() + "</b>");
         name = "My Campaign";
         overtime = false;
@@ -596,6 +598,10 @@ public class Campaign implements Serializable {
     
     public String getDateAsString() {
         return dateFormat.format(calendar.getTime());
+    }
+    
+    public String getShortDateAsString() {
+        return shortDateFormat.format(calendar.getTime());
     }
     
     public ArrayList<PilotPerson> getEligiblePilotsFor(Unit unit) {

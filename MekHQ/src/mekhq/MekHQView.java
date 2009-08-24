@@ -976,7 +976,7 @@ private void menuSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
             return "campaign file (*cpn)";
         }
     });
-    saveCpgn.setSelectedFile(new File("mycampaign.cpn")); //$NON-NLS-1$
+    saveCpgn.setSelectedFile(new File(campaign.getName() + campaign.getShortDateAsString() + ".cpn")); //$NON-NLS-1$
     int returnVal = saveCpgn.showSaveDialog(mainPanel);
     if ((returnVal != JFileChooser.APPROVE_OPTION) || (saveCpgn.getSelectedFile() == null)) {
        // I want a file, y'know!
