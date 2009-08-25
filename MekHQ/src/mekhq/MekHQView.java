@@ -942,24 +942,36 @@ private void btnAssignDocActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
 }//GEN-LAST:event_btnAssignDocActionPerformed
 
 private void miHirePilotActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miHirePilotActionPerformed
-    NewPilotDialog npd = new NewPilotDialog(this.getFrame(), true, campaign);
+    NewPilotDialog npd = new NewPilotDialog(this.getFrame(), true);
     npd.setVisible(true);
-    refreshPersonnelList();
+    if(null != npd.getPilotPerson()) {
+        campaign.addPerson(npd.getPilotPerson());
+        refreshPersonnelList();
+        refreshReport();
+    }
 }//GEN-LAST:event_miHirePilotActionPerformed
 
 private void miHireTechActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miHireTechActionPerformed
-    NewTechTeamDialog ntd = new NewTechTeamDialog(this.getFrame(), true, campaign);
+    NewTechTeamDialog ntd = new NewTechTeamDialog(this.getFrame(), true);
     ntd.setVisible(true);
-    refreshTechsList();
-    refreshPersonnelList();
+    if(null != ntd.getTechTeam()) {
+        campaign.addTeam(ntd.getTechTeam());
+        refreshTechsList();
+        refreshPersonnelList();
+        refreshReport();
+    }
 }//GEN-LAST:event_miHireTechActionPerformed
 
 private void miHireDoctorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miHireDoctorActionPerformed
-    NewMedicalTeamDialog nmd = new NewMedicalTeamDialog(this.getFrame(), true, campaign);
+    NewMedicalTeamDialog nmd = new NewMedicalTeamDialog(this.getFrame(), true);
     nmd.setVisible(true);
-    refreshTechsList();
-    refreshPersonnelList();
-    refreshDoctorsList();
+    if(null != nmd.getMedicalTeam()) {
+        campaign.addTeam(nmd.getMedicalTeam());
+        refreshTechsList();
+        refreshPersonnelList();
+        refreshDoctorsList();
+        refreshReport();
+    }
 }//GEN-LAST:event_miHireDoctorActionPerformed
 
 private void menuSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuSaveActionPerformed
@@ -1072,8 +1084,9 @@ private void miPurchaseUnitActionPerformed(java.awt.event.ActionEvent evt) {//GE
     Entity en = usd.getSelectedEntity();
     if(null != en) {
         campaign.addUnit(en, false);
+        refreshUnitList();
+        refreshReport();
     }
-    refreshUnitList();
 }//GEN-LAST:event_miPurchaseUnitActionPerformed
 
 protected void loadListFile(boolean allowNewPilots) throws IOException {
@@ -1135,6 +1148,7 @@ protected void loadListFile(boolean allowNewPilots) throws IOException {
     }
     refreshUnitList();
     refreshPersonnelList();
+    refreshReport();
 }
 
 protected void deployListFile() {

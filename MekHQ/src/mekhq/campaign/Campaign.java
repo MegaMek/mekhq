@@ -136,6 +136,7 @@ public class Campaign implements Serializable {
      *      The support team to be added
      */
     public void addTeam(SupportTeam t) {
+        t.setCampaign(this);
         int id = lastTeamId + 1;
         t.setId(id);
         teams.add(t);
@@ -230,6 +231,7 @@ public class Campaign implements Serializable {
             }
             //collect all the work items outstanding on this unit and add them to the workitem vector
             unit.runDiagnostic(this);
+            currentReport.add(unit.getEntity().getDisplayName() + " has been added to the unit roster.");
         }
     }
     
@@ -310,6 +312,7 @@ public class Campaign implements Serializable {
         lastPersonId = id;
         //check for any work items on this person
         p.runDiagnostic(this);
+        currentReport.add(p.getDesc() + " has been added to the personnel roster.");
     }
     
     public ArrayList<Person> getPersonnel() {

@@ -75,13 +75,16 @@ public abstract class SupportTeam implements Serializable {
        return "Unknown";
     }
     
-    public SupportTeam(Campaign c, String name, int rating) {
-        this.campaign = c;
+    public SupportTeam(String name, int rating) {
         this.name = name;
         this.rating = rating;
         this.hours = 8;
     //    this.assignedTasks = new ArrayList<WorkItem>();
         resetMinutesLeft();
+    }
+    
+    public void setCampaign(Campaign c) {
+        this.campaign = c;
     }
     
     public int getRating() {

@@ -22,7 +22,6 @@
 package mekhq;
 
 import mekhq.campaign.team.SupportTeam;
-import mekhq.campaign.Campaign;
 import javax.swing.DefaultComboBoxModel;
 import mekhq.campaign.team.TechTeam;
 
@@ -32,12 +31,12 @@ import mekhq.campaign.team.TechTeam;
  */
 public class NewTechTeamDialog extends javax.swing.JDialog {
 
-    private Campaign campaign;
+    private TechTeam tech;
     
     /** Creates new form NewTeamDialog */
-    public NewTechTeamDialog(java.awt.Frame parent, boolean modal, Campaign c) {
+    public NewTechTeamDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
-        this.campaign = c;
+        this.tech = null;
         initComponents();
     }
 
@@ -167,8 +166,7 @@ private void btnDoneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
     int rating = chTeamRating.getSelectedIndex();
     int type = chTeamType.getSelectedIndex();
     String name = txtTeamName.getText();
-    TechTeam t = new TechTeam(campaign, name, rating, type);
-    campaign.addTeam(t);
+    tech = new TechTeam(name, rating, type);
     this.setVisible(false);
 }//GEN-LAST:event_btnDoneActionPerformed
 
@@ -186,7 +184,7 @@ private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                NewTechTeamDialog dialog = new NewTechTeamDialog(new javax.swing.JFrame(), true, null);
+                NewTechTeamDialog dialog = new NewTechTeamDialog(new javax.swing.JFrame(), true);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     public void windowClosing(java.awt.event.WindowEvent e) {
                         System.exit(0);
@@ -195,6 +193,10 @@ private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
                 dialog.setVisible(true);
             }
         });
+    }
+    
+    public TechTeam getTechTeam() {
+        return tech;
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

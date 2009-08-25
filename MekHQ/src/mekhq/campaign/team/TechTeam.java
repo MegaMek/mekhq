@@ -61,8 +61,8 @@ public class TechTeam extends SupportTeam {
         return "?? Tech";
     }
     
-    public TechTeam(Campaign c, String name, int rating, int type) {
-        super(c, name, rating);
+    public TechTeam(String name, int rating, int type) {
+        super(name, rating);
         this.type = type;
         this.fullSize = 7;
         this.currentSize = 7;

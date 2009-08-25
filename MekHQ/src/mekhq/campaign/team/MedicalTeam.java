@@ -32,8 +32,8 @@ import mekhq.campaign.work.WorkItem;
  */
 public class MedicalTeam extends SupportTeam {
 
-    public MedicalTeam(Campaign c, String name, int rating) {
-        super(c, name, rating);
+    public MedicalTeam(String name, int rating) {
+        super(name, rating);
         this.fullSize = 5;
         this.currentSize = 5;
     }

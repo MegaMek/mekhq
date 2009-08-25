@@ -22,7 +22,6 @@
 package mekhq;
 
 import mekhq.campaign.team.SupportTeam;
-import mekhq.campaign.Campaign;
 import javax.swing.DefaultComboBoxModel;
 import mekhq.campaign.team.MedicalTeam;
 
@@ -32,12 +31,12 @@ import mekhq.campaign.team.MedicalTeam;
  */
 public class NewMedicalTeamDialog extends javax.swing.JDialog {
 
-    private Campaign campaign;
+    private MedicalTeam doc;
     
     /** Creates new form NewTeamDialog */
-    public NewMedicalTeamDialog(java.awt.Frame parent, boolean modal, Campaign c) {
+    public NewMedicalTeamDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
-        this.campaign = c;
+        this.doc = null;
         initComponents();
     }
 
@@ -170,8 +169,7 @@ public class NewMedicalTeamDialog extends javax.swing.JDialog {
 private void btnDoneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDoneActionPerformed
     int rating = chTeamRating.getSelectedIndex();
     String name = txtTeamName.getText();
-    MedicalTeam t = new MedicalTeam(campaign, name, rating);
-    campaign.addTeam(t);
+    doc = new MedicalTeam(name, rating);
     this.setVisible(false);
 }//GEN-LAST:event_btnDoneActionPerformed
 
@@ -189,7 +187,7 @@ private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                NewMedicalTeamDialog dialog = new NewMedicalTeamDialog(new javax.swing.JFrame(), true, null);
+                NewMedicalTeamDialog dialog = new NewMedicalTeamDialog(new javax.swing.JFrame(), true);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     public void windowClosing(java.awt.event.WindowEvent e) {
                         System.exit(0);
@@ -198,6 +196,10 @@ private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
                 dialog.setVisible(true);
             }
         });
+    }
+    
+    public MedicalTeam getMedicalTeam() {
+        return doc;
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

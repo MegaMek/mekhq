@@ -1,6 +1,8 @@
 VERSION HISTORY
 ----------------------------------
 v0.1.1 (SVN)
++ report notifications for new units and personnel
++ pilot advantages and implants in NewPilotDialog
 + RFE 2843210: Save campaign with campaign name
 + canon only button in UnitSelectorDialog
 + added unit picture to UnitSelectorDialog
