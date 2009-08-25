@@ -210,7 +210,8 @@ public class Campaign implements Serializable {
                         task.setSkillMin(oldTask.getSkillMin());
                     }
                 }
-            }            
+            }
+            currentReport.add(priorUnit.getEntity().getDisplayName() + " has been recovered.");
         } else {
             //this is a new unit so add it
             int id = lastUnitId + 1;
@@ -257,6 +258,7 @@ public class Campaign implements Serializable {
                 taskIds.remove(new Integer(task.getId()));
             }
             priorPilot.runDiagnostic(this);
+            currentReport.add(priorPilot.getDesc() + " has been recovered");
             return (PilotPerson)priorPilot;
         }
         else if (allowNewPilots) {
