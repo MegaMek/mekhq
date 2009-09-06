@@ -1,20 +1,20 @@
 /*
  * MekBayView.java
- * 
+ *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
- * 
+ *
  * This file is part of MekHQ.
- * 
+ *
  * MekHQ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -22,17 +22,9 @@
 package mekhq;
 
 import gd.xml.ParseException;
+
 import java.awt.Color;
 import java.awt.Component;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import mekhq.campaign.team.SupportTeam;
-import mekhq.campaign.Campaign;
-import org.jdesktop.application.Action;
-import org.jdesktop.application.ResourceMap;
-import org.jdesktop.application.SingleFrameApplication;
-import org.jdesktop.application.FrameView;
-import org.jdesktop.application.TaskMonitor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -44,8 +36,9 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-import java.util.GregorianCalendar;
-import javax.swing.Timer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.swing.Icon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JDialog;
@@ -56,10 +49,12 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
+import javax.swing.Timer;
 import javax.swing.event.MouseInputAdapter;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
+
 import megamek.client.ui.MechView;
 import megamek.common.AmmoType;
 import megamek.common.Entity;
@@ -68,12 +63,14 @@ import megamek.common.Mounted;
 import megamek.common.Pilot;
 import megamek.common.TargetRoll;
 import megamek.common.XMLStreamParser;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.Unit;
 import mekhq.campaign.Utilities;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PilotPerson;
 import mekhq.campaign.team.MedicalTeam;
+import mekhq.campaign.team.SupportTeam;
 import mekhq.campaign.team.TechTeam;
 import mekhq.campaign.work.PersonnelWorkItem;
 import mekhq.campaign.work.ReloadItem;
@@ -83,12 +80,18 @@ import mekhq.campaign.work.SalvageItem;
 import mekhq.campaign.work.UnitWorkItem;
 import mekhq.campaign.work.WorkItem;
 
+import org.jdesktop.application.Action;
+import org.jdesktop.application.FrameView;
+import org.jdesktop.application.ResourceMap;
+import org.jdesktop.application.SingleFrameApplication;
+import org.jdesktop.application.TaskMonitor;
+
 /**
  * The application's main frame.
  */
 public class MekHQView extends FrameView {
 
-    
+
     private Campaign campaign = new Campaign();
     private TaskTableModel taskModel = new TaskTableModel();
     private MekTableModel unitModel = new MekTableModel();
@@ -104,16 +107,16 @@ public class MekHQView extends FrameView {
     private int currentPersonId;
     private int currentDoctorId;
     private int currentPartsId;
-    
+
     public MekHQView(SingleFrameApplication app) {
         super(app);
-        
+
         unitMouseAdapter = new MekTableMouseAdapter();
         taskMouseAdapter = new TaskTableMouseAdapter();
         initComponents();
 
         refreshCalendar();
-        
+
         // status bar initialization - message timeout, idle icon and busy animation, etc
         ResourceMap resourceMap = getResourceMap();
         int messageTimeout = resourceMap.getInteger("StatusBar.messageTimeout");
@@ -815,14 +818,14 @@ private void btnRetrieveUnitsActionPerformed(java.awt.event.ActionEvent evt) {//
  catch (IOException ex) {
             Logger.getLogger(MekHQView.class.getName()).log(Level.SEVERE, null, ex);
         }
-}                                           
+}
 
 private void btnDoTaskActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDoTaskActionPerformed
     //assign the task to the team here
     WorkItem task = campaign.getTask(currentTaskId);
     SupportTeam team = campaign.getTeam(currentTechId);
     int row = TaskTable.getSelectedRow();
-    if(null != task && null != team) {
+    if((null != task) && (null != team)) {
         boolean completed = campaign.processTask(task, team);
         refreshUnitList();
         refreshTaskList();
@@ -835,13 +838,13 @@ private void btnDoTaskActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
         if(row >= TaskTable.getRowCount()) {
             row = 0;
         }
-        TaskTable.setRowSelectionInterval(row, row); 
+        TaskTable.setRowSelectionInterval(row, row);
     }
 }//GEN-LAST:event_btnDoTaskActionPerformed
 
-private void TechTableValueChanged(javax.swing.event.ListSelectionEvent evt) {                                       
+private void TechTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
     int selected = TechTable.getSelectedRow();
-    if(selected > -1 && selected < campaign.getTechTeams().size()) {
+    if((selected > -1) && (selected < campaign.getTechTeams().size())) {
         currentTechId = campaign.getTechTeams().get(selected).getId();
     }
     else if(selected < 0) {
@@ -849,11 +852,11 @@ private void TechTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
     }
     updateAssignEnabled();
     updateTargetText();
-}   
+}
 
-private void TaskTableValueChanged(javax.swing.event.ListSelectionEvent evt) {                                       
+private void TaskTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
     int selected = TaskTable.getSelectedRow();
-    if(selected > -1 && selected < campaign.getTasksForUnit(currentUnitId).size()) {
+    if((selected > -1) && (selected < campaign.getTasksForUnit(currentUnitId).size())) {
         currentTaskId = campaign.getTasksForUnit(currentUnitId).get(selected).getId();
     }
     else {
@@ -863,9 +866,9 @@ private void TaskTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
     updateTargetText();
 }
 
-private void UnitTableValueChanged(javax.swing.event.ListSelectionEvent evt) {                                       
+private void UnitTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
     int selected = UnitTable.getSelectedRow();
-    if(selected > -1 && selected < campaign.getUnits().size()) {
+    if((selected > -1) && (selected < campaign.getUnits().size())) {
         currentUnitId = campaign.getUnits().get(selected).getId();
     }
     else if(selected < 0) {
@@ -874,9 +877,9 @@ private void UnitTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
     refreshTaskList();
 }
 
-private void PersonTableValueChanged(javax.swing.event.ListSelectionEvent evt) {                                       
+private void PersonTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
     int selected = PersonTable.getSelectedRow();
-    if(selected > -1 && selected < campaign.getPersonnel().size()) {
+    if((selected > -1) && (selected < campaign.getPersonnel().size())) {
         currentPersonId = campaign.getPersonnel().get(selected).getId();
     }
     else if(selected < 0) {
@@ -885,9 +888,9 @@ private void PersonTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
     updateAssignDoctorEnabled();
 }
 
-private void DocTableValueChanged(javax.swing.event.ListSelectionEvent evt) {                                       
+private void DocTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
     int selected = DocTable.getSelectedRow();
-    if(selected > -1 && selected < campaign.getDoctors().size()) {
+    if((selected > -1) && (selected < campaign.getDoctors().size())) {
         currentDoctorId = campaign.getDoctors().get(selected).getId();
     }
     else if(selected < 0) {
@@ -896,9 +899,9 @@ private void DocTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
     updateAssignDoctorEnabled();
 }
 
-private void PartsTableValueChanged(javax.swing.event.ListSelectionEvent evt) {                                       
+private void PartsTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
     int selected = PartsTable.getSelectedRow();
-    if(selected > -1 && selected < campaign.getParts().size()) {
+    if((selected > -1) && (selected < campaign.getParts().size())) {
         currentPartsId = campaign.getParts().get(selected).getId();
     }
     else if(selected < 0) {
@@ -928,7 +931,7 @@ private void btnAssignDocActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
     }
     int row = PersonTable.getSelectedRow();
     Person p = campaign.getPerson(currentPersonId);
-    if(null != p && null != p.getTask()) {
+    if((null != p) && (null != p.getTask())) {
         p.getTask().setTeam(campaign.getTeam(currentDoctorId));
         row++;
     }
@@ -938,11 +941,11 @@ private void btnAssignDocActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
     if(row >= PersonTable.getRowCount()) {
             row = 0;
     }
-    PersonTable.setRowSelectionInterval(row, row); 
+    PersonTable.setRowSelectionInterval(row, row);
 }//GEN-LAST:event_btnAssignDocActionPerformed
 
 private void miHirePilotActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miHirePilotActionPerformed
-    NewPilotDialog npd = new NewPilotDialog(this.getFrame(), true);
+    NewPilotDialog npd = new NewPilotDialog(getFrame(), true);
     npd.setVisible(true);
     if(null != npd.getPilotPerson()) {
         campaign.addPerson(npd.getPilotPerson());
@@ -952,7 +955,7 @@ private void miHirePilotActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
 }//GEN-LAST:event_miHirePilotActionPerformed
 
 private void miHireTechActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miHireTechActionPerformed
-    NewTechTeamDialog ntd = new NewTechTeamDialog(this.getFrame(), true);
+    NewTechTeamDialog ntd = new NewTechTeamDialog(getFrame(), true);
     ntd.setVisible(true);
     if(null != ntd.getTechTeam()) {
         campaign.addTeam(ntd.getTechTeam());
@@ -963,7 +966,7 @@ private void miHireTechActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
 }//GEN-LAST:event_miHireTechActionPerformed
 
 private void miHireDoctorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miHireDoctorActionPerformed
-    NewMedicalTeamDialog nmd = new NewMedicalTeamDialog(this.getFrame(), true);
+    NewMedicalTeamDialog nmd = new NewMedicalTeamDialog(getFrame(), true);
     nmd.setVisible(true);
     if(null != nmd.getMedicalTeam()) {
         campaign.addTeam(nmd.getMedicalTeam());
@@ -994,7 +997,7 @@ private void menuSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
        // I want a file, y'know!
        return;
     }
-    File file = saveCpgn.getSelectedFile();   
+    File file = saveCpgn.getSelectedFile();
     FileOutputStream fos = null;
     ObjectOutputStream out = null;
     try {
@@ -1020,12 +1023,12 @@ private void menuLoadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
         public String getDescription() {
             return "campaign file (*cpn)";
         }
-    }); 
+    });
     int returnVal = loadCpgn.showOpenDialog(mainPanel);
     if ((returnVal != JFileChooser.APPROVE_OPTION) || (loadCpgn.getSelectedFile() == null)) {
        // I want a file, y'know!
        return;
-    }      
+    }
     File file = loadCpgn.getSelectedFile();
     FileInputStream fis = null;
     ObjectInputStream in = null;
@@ -1064,10 +1067,10 @@ private void btnGMModeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
 }//GEN-LAST:event_btnGMModeActionPerformed
 
 private void menuOptionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuOptionsActionPerformed
-    CampaignOptionsDialog cod = new CampaignOptionsDialog(this.getFrame(), true, campaign);
+    CampaignOptionsDialog cod = new CampaignOptionsDialog(getFrame(), true, campaign);
     cod.setVisible(true);
     refreshCalendar();
-    
+
 }//GEN-LAST:event_menuOptionsActionPerformed
 
 private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
@@ -1079,7 +1082,7 @@ private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
 }
 
 private void miPurchaseUnitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miPurchaseUnitActionPerformed
-    UnitSelectorDialog usd = new UnitSelectorDialog(this.getFrame(), true);
+    UnitSelectorDialog usd = new UnitSelectorDialog(getFrame(), true);
     usd.setVisible(true);
     Entity en = usd.getSelectedEntity();
     if(null != en) {
@@ -1103,13 +1106,13 @@ protected void loadListFile(boolean allowNewPilots) throws IOException {
             return "MUL file";
         }
     });
-    
+
     int returnVal = loadList.showOpenDialog(mainPanel);
     if ((returnVal != JFileChooser.APPROVE_OPTION) || (loadList.getSelectedFile() == null)) {
        // I want a file, y'know!
        return;
     }
-        
+
     File unitFile = loadList.getSelectedFile();
     if (unitFile != null) {
         //I need to get the parser myself, because I want to pull both
@@ -1122,7 +1125,7 @@ protected void loadListFile(boolean allowNewPilots) throws IOException {
 
         // Read a Vector from the file.
         try {
-        
+
             parser.parse(listStream);
             listStream.close();
         } catch (ParseException excep) {
@@ -1134,7 +1137,7 @@ protected void loadListFile(boolean allowNewPilots) throws IOException {
         if (parser.hasWarningMessage()) {
             System.out.println(parser.getWarningMessage());
         }
-           
+
         // Add the units from the file.
         for (Entity entity : parser.getEntities()) {
             campaign.addUnit(entity, allowNewPilots);
@@ -1155,7 +1158,7 @@ protected void deployListFile() {
     if(UnitTable.getSelectedRow() == -1) {
         return;
     }
-    
+
     ArrayList<Entity> chosen = new ArrayList<Entity>();
     ArrayList<Unit> toDeploy = new ArrayList<Unit>();
     StringBuffer undeployed = new StringBuffer();
@@ -1170,10 +1173,10 @@ protected void deployListFile() {
             }
         }
     }
-    
-    
-    
-    
+
+
+
+
     JFileChooser saveList = new JFileChooser(".");
     saveList.setDialogTitle("Deploy Units");
     saveList.setFileFilter(new FileFilter() {
@@ -1193,7 +1196,7 @@ protected void deployListFile() {
        // I want a file, y'know!
        return;
     }
- 
+
     File unitFile = saveList.getSelectedFile();
     if (unitFile != null) {
             if (!(unitFile.getName().toLowerCase().endsWith(".mul") //$NON-NLS-1$
@@ -1211,25 +1214,25 @@ protected void deployListFile() {
                 EntityListFile.saveTo(unitFile, chosen);
                 //set the unit and pilot as deployed
                 for(Unit u: toDeploy) {
-                    u.setDeployed(true);  
+                    u.setDeployed(true);
                 }
-                
+
             } catch (IOException excep) {
                 excep.printStackTrace(System.err);
             }
     }
     refreshUnitList();
     refreshPersonnelList();
-    
+
     if(undeployed.length() > 0) {
-        JOptionPane.showMessageDialog(this.getFrame(),"The following units could not be deployed:" + undeployed.toString(),"Could not deploy some units", JOptionPane.WARNING_MESSAGE);
+        JOptionPane.showMessageDialog(getFrame(),"The following units could not be deployed:" + undeployed.toString(),"Could not deploy some units", JOptionPane.WARNING_MESSAGE);
     }
 }
-    
+
 protected void refreshUnitList() {
     int selected = UnitTable.getSelectedRow();
     unitModel.setData(campaign.getUnits());
-    if(selected > -1 && selected < campaign.getUnits().size()) {
+    if((selected > -1) && (selected < campaign.getUnits().size())) {
         UnitTable.setRowSelectionInterval(selected, selected);
     }
 }
@@ -1241,7 +1244,7 @@ protected void refreshTaskList() {
 protected void refreshTechsList() {
     int selected = TechTable.getSelectedRow();
     techsModel.setData(campaign.getTechTeams());
-    if(selected > -1 && selected < campaign.getTechTeams().size()) {
+    if((selected > -1) && (selected < campaign.getTechTeams().size())) {
         TechTable.setRowSelectionInterval(selected, selected);
     }
 }
@@ -1249,7 +1252,7 @@ protected void refreshTechsList() {
 protected void refreshDoctorsList() {
     int selected = DocTable.getSelectedRow();
     doctorsModel.setData(campaign.getDoctors());
-    if(selected > -1 && selected < campaign.getDoctors().size()) {
+    if((selected > -1) && (selected < campaign.getDoctors().size())) {
         DocTable.setRowSelectionInterval(selected, selected);
     }
 }
@@ -1257,7 +1260,7 @@ protected void refreshDoctorsList() {
 protected void refreshPersonnelList() {
     int selected = PersonTable.getSelectedRow();
     personnelModel.setData(campaign.getPersonnel());
-    if(selected > -1 && selected < campaign.getPersonnel().size()) {
+    if((selected > -1) && (selected < campaign.getPersonnel().size())) {
         PersonTable.setRowSelectionInterval(selected, selected);
     }
 }
@@ -1265,7 +1268,7 @@ protected void refreshPersonnelList() {
 protected void refreshPartsList() {
     int selected = PartsTable.getSelectedRow();
     partsModel.setData(campaign.getParts());
-    if(selected > -1 && selected < campaign.getParts().size()) {
+    if((selected > -1) && (selected < campaign.getParts().size())) {
         PartsTable.setRowSelectionInterval(selected, selected);
     }
 }
@@ -1282,11 +1285,11 @@ protected void updateAssignEnabled() {
     //must have a valid team and an unassigned task
     WorkItem curTask = campaign.getTask(currentTaskId);
     SupportTeam team = campaign.getTeam(currentTechId);
-    if(null != curTask && null != team && team.getTargetFor(curTask).getValue() != TargetRoll.IMPOSSIBLE) {
+    if((null != curTask) && (null != team) && (team.getTargetFor(curTask).getValue() != TargetRoll.IMPOSSIBLE)) {
         btnDoTask.setEnabled(true);
     } else {
         btnDoTask.setEnabled(false);
-    }    
+    }
 }
 
 protected void updateAssignDoctorEnabled() {
@@ -1297,19 +1300,19 @@ protected void updateAssignDoctorEnabled() {
     if(null != curPerson) {
         pw = curPerson.getTask();
     }
-    if(null != pw && null != team && !pw.isAssigned()
-            && team.getTargetFor(pw).getValue() != TargetRoll.IMPOSSIBLE) {     
+    if((null != pw) && (null != team) && !pw.isAssigned()
+            && (team.getTargetFor(pw).getValue() != TargetRoll.IMPOSSIBLE)) {
         btnAssignDoc.setEnabled(true);
     } else {
         btnAssignDoc.setEnabled(false);
-    }    
+    }
 }
 
 protected void updateTargetText() {
     //must have a valid team and an unassigned task
     WorkItem task = campaign.getTask(currentTaskId);
     SupportTeam team = campaign.getTeam(currentTechId);
-    if(null != task && null != team) {
+    if((null != task) && (null != team)) {
         TargetRoll target = team.getTargetFor(task);
         textTarget.setText(target.getDesc());
         lblTargetNum.setText(target.getValueAsString());
@@ -1323,41 +1326,39 @@ protected void updateTargetText() {
  * A table model for displaying work items
  */
 public abstract class ArrayTableModel extends AbstractTableModel {
-    
+
         protected String[] columnNames;
         protected ArrayList data;
-        
-        @Override
+
         public int getRowCount() {
             return data.size();
         }
 
-        @Override
         public int getColumnCount() {
             return 1;
         }
-        
+
         @Override
         public String getColumnName(int column) {
             return columnNames[column];
         }
-    
+
         @Override
         public Class getColumnClass(int c) {
             return getValueAt(0, c).getClass();
         }
-        
+
         @Override
         public boolean isCellEditable(int row, int col) {
             return false;
         }
-     
+
         //fill table with values
         public void setData(ArrayList array) {
-            this.data = array;
+            data = array;
             fireTableDataChanged();
         }
-        
+
 }
 
 /**
@@ -1366,31 +1367,29 @@ public abstract class ArrayTableModel extends AbstractTableModel {
 public class TaskTableModel extends ArrayTableModel {
 
         public TaskTableModel() {
-            this.columnNames = new String[] {"Tasks"};
-            this.data = new ArrayList<WorkItem>();
+            columnNames = new String[] {"Tasks"};
+            data = new ArrayList<WorkItem>();
         }
 
-        @Override
         public Object getValueAt(int row, int col) {
             return ((WorkItem)data.get(row)).getDescHTML();
-        }  
-        
+        }
+
         public WorkItem getTaskAt(int row) {
         return (WorkItem)data.get(row);
     }
-        
+
         public TaskTableModel.Renderer getRenderer() {
         return new TaskTableModel.Renderer();
     }
-    
-    
+
+
     public class Renderer extends TaskInfo implements TableCellRenderer {
-        
-        @Override
+
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             Component c = this;
             WorkItem task = getTaskAt(row);
-            setOpaque(true);          
+            setOpaque(true);
             setText(getValueAt(row, column).toString());
             setToolTipText(task.getToolTip());
             if(isSelected) {
@@ -1398,21 +1397,20 @@ public class TaskTableModel extends ArrayTableModel {
             } else {
                 unselect();
             }
-            
-            if (null != task && task instanceof ReplacementItem && !((ReplacementItem)task).hasPart()) {
+
+            if ((null != task) && (task instanceof ReplacementItem) && !((ReplacementItem)task).hasPart()) {
                     c.setBackground(Color.GRAY);
             } else {
                     c.setBackground(new Color(220, 220, 220));
             }
             return c;
         }
-        
+
     }
 }
 
 public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionListener {
 
-        @Override
         public void actionPerformed(ActionEvent action) {
             String command = action.getActionCommand();
             WorkItem task = taskModel.getTaskAt(TaskTable.getSelectedRow());
@@ -1450,17 +1448,17 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
                 refreshTaskList();
             }
         }
-        
+
         @Override
         public void mousePressed(MouseEvent e) {
             maybeShowPopup(e);
         }
-        
+
         @Override
         public void mouseReleased(MouseEvent e) {
             maybeShowPopup(e);
         }
-        
+
         private void maybeShowPopup(MouseEvent e) {
             JPopupMenu popup = new JPopupMenu();
             if (e.isPopupTrigger()) {
@@ -1469,10 +1467,10 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
                 JMenuItem menuItem = null;
                 JMenu menu = null;
                 JCheckBoxMenuItem cbMenuItem = null;
-                //**lets fill the pop up menu**//   
-                if(task instanceof RepairItem 
-                        || task instanceof ReplacementItem
-                        || task instanceof SalvageItem) {
+                //**lets fill the pop up menu**//
+                if((task instanceof RepairItem)
+                        || (task instanceof ReplacementItem)
+                        || (task instanceof SalvageItem)) {
                     menu = new JMenu("Mode");
                     for(int i = 0; i < WorkItem.MODE_N; i++) {
                         cbMenuItem = new JCheckBoxMenuItem(WorkItem.getModeName(i));
@@ -1490,7 +1488,7 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
                     menuItem.addActionListener(this);
                     menuItem.setEnabled(((UnitWorkItem)task).canScrap());
                     popup.add(menuItem);
-                }            
+                }
                 if(task instanceof ReloadItem) {
                     ReloadItem reload = (ReloadItem)task;
                     Entity en = reload.getUnit().getEntity();
@@ -1522,15 +1520,14 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
 public class MekTableModel extends ArrayTableModel {
 
     public MekTableModel() {
-        this.columnNames = new String[] {"Units"};
-        this.data = new ArrayList<Unit>();
+        columnNames = new String[] {"Units"};
+        data = new ArrayList<Unit>();
     }
-  
-    @Override
+
     public Object getValueAt(int row, int col) {
         return campaign.getUnitDesc(((Unit)data.get(row)).getId());
     }
-    
+
     public Unit getUnitAt(int row) {
         return (Unit)data.get(row);
     }
@@ -1538,11 +1535,10 @@ public class MekTableModel extends ArrayTableModel {
     public MekTableModel.Renderer getRenderer() {
         return new MekTableModel.Renderer();
     }
-    
-    
+
+
     public class Renderer extends MekInfo implements TableCellRenderer {
-        
-        @Override
+
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             Component c = this;
             Unit u = getUnitAt(row);
@@ -1555,33 +1551,32 @@ public class MekTableModel extends ArrayTableModel {
             } else {
                 unselect();
             }
-            
-            if (null != u && u.isDeployed()) {
+
+            if ((null != u) && u.isDeployed()) {
                 c.setBackground(Color.GRAY);
             }
-            else if(null != u && !u.isRepairable()) {
+            else if((null != u) && !u.isRepairable()) {
                     c.setBackground(new Color(190, 150, 55));
             }
-            else if(null != u && !u.isFunctional()) {
+            else if((null != u) && !u.isFunctional()) {
                     c.setBackground(new Color(205,92,92));
             }
-            else if(null != u && campaign.countTasksFor(u.getId()) > 0) {
+            else if((null != u) && (campaign.countTasksFor(u.getId()) > 0)) {
                     c.setBackground(new Color(238, 238, 0));
-            } 
+            }
             else {
                     c.setBackground(new Color(220, 220, 220));
             }
             return c;
         }
-        
+
     }
 }
 
 public class MekTableMouseAdapter extends MouseInputAdapter implements ActionListener {
 
         private ArrayList<PilotPerson> pilots;
-    
-        @Override
+
         public void actionPerformed(ActionEvent action) {
             String command = action.getActionCommand();
             Unit unit = unitModel.getUnitAt(UnitTable.getSelectedRow());
@@ -1590,7 +1585,7 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
             } else if(command.contains("CHANGE_PILOT")) {
                 String sel = command.split(":")[1];
                 int selected = Integer.parseInt(sel);
-                if(null != pilots && selected > -1 && selected < pilots.size()) {
+                if((null != pilots) && (selected > -1) && (selected < pilots.size())) {
                     campaign.changePilot(unit, pilots.get(selected));
                 }
             } else if(command.equalsIgnoreCase("SELL")) {
@@ -1604,7 +1599,7 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
             } else if(command.contains("ASSIGN_TECH")) {
                 String sel = command.split(":")[1];
                 int selected = Integer.parseInt(sel);
-                if(selected > -1 && selected < campaign.getTechTeams().size()) {
+                if((selected > -1) && (selected < campaign.getTechTeams().size())) {
                     SupportTeam team = campaign.getTechTeams().get(selected);
                     if(null != team) {
                         for(WorkItem task : campaign.getTasksForUnit(unit.getId())) {
@@ -1644,7 +1639,7 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
             } else if(command.contains("CHANGE_SITE")) {
                 String sel = command.split(":")[1];
                 int selected = Integer.parseInt(sel);
-                if(selected > -1 && selected < Unit.SITE_N) {
+                if((selected > -1) && (selected < Unit.SITE_N)) {
                     unit.setSite(selected);
                     refreshUnitList();
                     refreshTaskList();
@@ -1657,7 +1652,7 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
                 refreshUnitList();
             }
         }
-        
+
         @Override
         public void mouseClicked(MouseEvent e) {
 
@@ -1671,17 +1666,17 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
                 }
             }
         }
-        
+
         @Override
         public void mousePressed(MouseEvent e) {
             maybeShowPopup(e);
         }
-        
+
         @Override
         public void mouseReleased(MouseEvent e) {
             maybeShowPopup(e);
         }
-        
+
         private void maybeShowPopup(MouseEvent e) {
             JPopupMenu popup = new JPopupMenu();
             if (e.isPopupTrigger()) {
@@ -1691,7 +1686,7 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
                 JMenuItem menuItem = null;
                 JMenu menu = null;
                 JCheckBoxMenuItem cbMenuItem = null;
-                //**lets fill the pop up menu**//    
+                //**lets fill the pop up menu**//
                 //change the location
                 menu = new JMenu("Change site");
                 int i = 0;
@@ -1763,12 +1758,12 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
                 menuItem.setEnabled(unit.hasPilot() && !unit.isDeployed());
                 popup.add(menuItem);
                 //switch pilot
-                menu = new JMenu("Change pilot");              
+                menu = new JMenu("Change pilot");
                 i = 0;
                 for(PilotPerson pp : pilots) {
                     cbMenuItem = new JCheckBoxMenuItem(pp.getDesc());
                     if(unit.hasPilot()
-                            && unit.getPilot().getId() == pp.getId()) {
+                            && (unit.getPilot().getId() == pp.getId())) {
                         cbMenuItem.setSelected(true);
                     }
                     cbMenuItem.setActionCommand("CHANGE_PILOT:" + i);
@@ -1804,30 +1799,28 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
 public class TechTableModel extends ArrayTableModel {
 
         public TechTableModel() {
-            this.columnNames = new String[] {"Techs"};
-            this.data = new ArrayList<TechTeam>();
+            columnNames = new String[] {"Techs"};
+            data = new ArrayList<TechTeam>();
         }
 
-        @Override
         public Object getValueAt(int row, int col) {
             return ((TechTeam)data.get(row)).getDescHTML();
-        }  
-        
+        }
+
         public TechTeam getTechAt(int row) {
         return (TechTeam)data.get(row);
     }
-        
+
         public TechTableModel.Renderer getRenderer() {
         return new TechTableModel.Renderer();
     }
-    
-    
+
+
     public class Renderer extends TechInfo implements TableCellRenderer {
-        
-        @Override
+
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             Component c = this;
-            setOpaque(true);          
+            setOpaque(true);
             setText(getValueAt(row, column).toString());
             //setToolTipText(campaign.getToolTipFor(u));
             if(isSelected) {
@@ -1838,7 +1831,7 @@ public class TechTableModel extends ArrayTableModel {
             c.setBackground(new Color(220, 220, 220));
             return c;
         }
-        
+
     }
 }
 
@@ -1848,30 +1841,28 @@ public class TechTableModel extends ArrayTableModel {
 public class PersonTableModel extends ArrayTableModel {
 
         public PersonTableModel() {
-            this.columnNames = new String[] {"Personnel"};
-            this.data = new ArrayList<Person>();
+            columnNames = new String[] {"Personnel"};
+            data = new ArrayList<Person>();
         }
 
-        @Override
         public Object getValueAt(int row, int col) {
             return ((Person)data.get(row)).getDescHTML();
-        }  
-        
+        }
+
         public Person getPersonAt(int row) {
         return (Person)data.get(row);
     }
-        
+
         public PersonTableModel.Renderer getRenderer() {
         return new PersonTableModel.Renderer();
     }
-    
-    
+
+
     public class Renderer extends PersonInfo implements TableCellRenderer {
-        
-        @Override
+
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             Component c = this;
-            setOpaque(true);          
+            setOpaque(true);
             setText(getValueAt(row, column).toString());
             Person p = getPersonAt(row);
             //setToolTipText(campaign.getToolTipFor(u));
@@ -1880,17 +1871,17 @@ public class PersonTableModel extends ArrayTableModel {
             } else {
                unselect();
             }
-            if (null != p && p.isDeployed()) {
+            if ((null != p) && p.isDeployed()) {
                     c.setBackground(Color.GRAY);
-            } 
-            else if(null != p && null != p.getTask()) {
+            }
+            else if((null != p) && (null != p.getTask())) {
                     c.setBackground(new Color(205,92,92));
             } else {
                     c.setBackground(new Color(220, 220, 220));
             }
             return c;
         }
-        
+
     }
 }
 
@@ -1900,30 +1891,28 @@ public class PersonTableModel extends ArrayTableModel {
 public class DocTableModel extends ArrayTableModel {
 
         public DocTableModel() {
-            this.columnNames = new String[] {"Doctors"};
-            this.data = new ArrayList<MedicalTeam>();
+            columnNames = new String[] {"Doctors"};
+            data = new ArrayList<MedicalTeam>();
         }
 
-        @Override
         public Object getValueAt(int row, int col) {
             return ((MedicalTeam)data.get(row)).getDescHTML();
-        }  
-        
+        }
+
         public MedicalTeam getDoctorAt(int row) {
         return (MedicalTeam)data.get(row);
     }
-        
+
         public DocTableModel.Renderer getRenderer() {
         return new DocTableModel.Renderer();
     }
-    
-    
+
+
     public class Renderer extends DoctorInfo implements TableCellRenderer {
-        
-        @Override
+
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             Component c = this;
-            setOpaque(true);          
+            setOpaque(true);
             setText(getValueAt(row, column).toString());
             setToolTipText(campaign.getToolTipFor(getDoctorAt(row)));
             if(isSelected) {
@@ -1934,7 +1923,7 @@ public class DocTableModel extends ArrayTableModel {
             c.setBackground(new Color(220, 220, 220));
             return c;
         }
-        
+
     }
 }
 
@@ -1944,30 +1933,28 @@ public class DocTableModel extends ArrayTableModel {
 public class PartsTableModel extends ArrayTableModel {
 
         public PartsTableModel() {
-            this.columnNames = new String[] {"Parts"};
-            this.data = new ArrayList<Part>();
+            columnNames = new String[] {"Parts"};
+            data = new ArrayList<Part>();
         }
 
-        @Override
         public Object getValueAt(int row, int col) {
             return ((Part)data.get(row)).getDescHTML();
-        }  
-        
+        }
+
         public Part getPersonAt(int row) {
         return (Part)data.get(row);
     }
-        
+
         public PartsTableModel.Renderer getRenderer() {
         return new PartsTableModel.Renderer();
     }
-    
-    
+
+
     public class Renderer extends PartInfo implements TableCellRenderer {
-        
-        @Override
+
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             Component c = this;
-            setOpaque(true);          
+            setOpaque(true);
             setText(getValueAt(row, column).toString());
             //setToolTipText(campaign.getToolTipFor(u));
             if(isSelected) {
@@ -1978,7 +1965,7 @@ public class PartsTableModel extends ArrayTableModel {
             c.setBackground(new Color(220, 220, 220));
             return c;
         }
-        
+
     }
 }
 

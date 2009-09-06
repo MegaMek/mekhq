@@ -8,6 +8,7 @@ package mekhq;
 
 import java.awt.Image;
 import java.io.IOException;
+
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
@@ -17,6 +18,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
+
 import megamek.client.ui.MechView;
 import megamek.client.ui.swing.MechTileset;
 import megamek.common.Entity;
@@ -38,17 +40,17 @@ public class UnitSelectorDialog extends JDialog {
     private MechSummary[] mechs;
 
     private MechTableModel unitModel;
-   
+
     private static MechTileset mt;
 
     Entity selectedUnit = null;
-    
+
     private TableRowSorter<MechTableModel> sorter;
-    
+
     /** Creates new form UnitSelectorDialog */
     public UnitSelectorDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
-        unitModel = new MechTableModel();       
+        unitModel = new MechTableModel();
         initComponents();
         mechs = MechSummaryCache.getInstance().getAllMechs();
 
@@ -118,12 +120,12 @@ public class UnitSelectorDialog extends JDialog {
             if (i == MechTableModel.COL_CHASSIS) {
                 column.setPreferredWidth(125);
             }
-            else if(i == MechTableModel.COL_MODEL
-                || i == MechTableModel.COL_COST) {
+            else if((i == MechTableModel.COL_MODEL)
+                || (i == MechTableModel.COL_COST)) {
                 column.setPreferredWidth(75);
             }
-            else if(i == MechTableModel.COL_WEIGHT
-                || i == MechTableModel.COL_BV) {
+            else if((i == MechTableModel.COL_WEIGHT)
+                || (i == MechTableModel.COL_BV)) {
                 column.setPreferredWidth(50);
             }
             else {
@@ -358,12 +360,12 @@ private void comboTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
 }//GEN-LAST:event_comboTypeActionPerformed
 
 private void btnBuyCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuyCloseActionPerformed
-    this.setVisible(false);
+    setVisible(false);
 }//GEN-LAST:event_btnBuyCloseActionPerformed
 
 private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
-    this.selectedUnit = null;
-    this.setVisible(false);
+    selectedUnit = null;
+    setVisible(false);
 }//GEN-LAST:event_btnCancelActionPerformed
 
 private void checkCanonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkCanonActionPerformed
@@ -378,6 +380,7 @@ private void checkCanonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
             public void run() {
                 UnitSelectorDialog dialog = new UnitSelectorDialog(new javax.swing.JFrame(), true);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+                    @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {
                         System.exit(0);
                     }
@@ -386,7 +389,7 @@ private void checkCanonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
             }
         });
     }
-   
+
     private void filterUnits() {
         RowFilter<MechTableModel, Integer> unitTypeFilter = null;
         final int nType = comboType.getSelectedIndex();
@@ -401,27 +404,27 @@ private void checkCanonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
                     MechSummary mech = mechModel.getMechSummary(entry.getIdentifier());
                 if (/* Weight */
                     (mech.getWeightClass() == nClass) &&
-                            mech.isCanon() == checkCanon.isSelected() && 
+                            (mech.isCanon() == checkCanon.isSelected()) &&
                 /*
                  * Technology Level
                  */
-                ((nType == TechConstants.T_ALL) 
-                            || (nType == mech.getType()) 
-                            || ((nType == TechConstants.T_IS_TW_ALL) 
-                                && (mech.getType() <= TechConstants.T_IS_TW_NON_BOX || mech.getType() == TechConstants.T_INTRO_BOXSET)) 
-                            || (nType == TechConstants.T_TW_ALL && (mech.getType() <= TechConstants.T_IS_TW_NON_BOX 
-                                || mech.getType() <= TechConstants.T_INTRO_BOXSET || mech.getType() <= TechConstants.T_CLAN_TW))) 
-                                && (nUnit == UnitType.SIZE || mech.getUnitType().equals(UnitType.getTypeName(nUnit)))) {       
+                ((nType == TechConstants.T_ALL)
+                            || (nType == mech.getType())
+                            || ((nType == TechConstants.T_IS_TW_ALL)
+                                && ((mech.getType() <= TechConstants.T_IS_TW_NON_BOX) || (mech.getType() == TechConstants.T_INTRO_BOXSET)))
+                            || ((nType == TechConstants.T_TW_ALL) && ((mech.getType() <= TechConstants.T_IS_TW_NON_BOX)
+                                || (mech.getType() <= TechConstants.T_INTRO_BOXSET) || (mech.getType() <= TechConstants.T_CLAN_TW))))
+                                && ((nUnit == UnitType.SIZE) || mech.getUnitType().equals(UnitType.getTypeName(nUnit)))) {
                     //yuck, I have to pull up a full Entity to get MechView to search in
                     //TODO: why not put mechview into the mech summary itself?
                     if(txtFilter.getText().length() > 0) {
                         //TODO: this search routine is too slow
-                        //I think putting a copy of the mechreadout in 
+                        //I think putting a copy of the mechreadout in
                         //the mechsummary would speed things up enormously
                         //NOTE: now getting weirdness on txtFilter when I do this
-                        
+
                         String text = txtFilter.getText();
-                        //String [] ind_words = text.split(" "); //split with regex as space 
+                        //String [] ind_words = text.split(" "); //split with regex as space
                         /*
                         MechView mv = null;
                         try {
@@ -461,7 +464,7 @@ private void checkCanonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
         int view = tableUnits.getSelectedRow();
         if(view < 0) {
             //selection got filtered away
-            this.selectedUnit = null;
+            selectedUnit = null;
             refreshUnitView();
             return;
         }
@@ -472,17 +475,17 @@ private void checkCanonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
              // For some unknown reason the base path gets screwed up after you
              // print so this sets the source file to the full path.
              Entity entity = new MechFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
-             this.selectedUnit = entity;
+             selectedUnit = entity;
              refreshUnitView();
         } catch (EntityLoadingException ex) {
-            this.selectedUnit = null;
+            selectedUnit = null;
             System.out.println("Unable to load mech: " + ms.getSourceFile() + ": " + ms.getEntryName() + ": " + ex.getMessage());
             ex.printStackTrace();
             refreshUnitView();
             return;
        }
     }
-    
+
      void refreshUnitView() {
 
         boolean populateTextFields = true;
@@ -502,13 +505,13 @@ private void checkCanonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
             populateTextFields = false;
         }
         txtUnitView.setEditable(false);
-        if (populateTextFields && mechView != null) {
+        if (populateTextFields && (mechView != null)) {
             txtUnitView.setText(mechView.getMechReadout());
         } else {
             txtUnitView.setText("No Unit Selected");
         }
         txtUnitView.setCaretPosition(0);
-     
+
         if (mt == null) {
             mt = new MechTileset("data/images/units/");
             try {
@@ -523,18 +526,18 @@ private void checkCanonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
             lblImage.setIcon(new ImageIcon(unitImage));
         }
     }
-     
+
      public Entity getSelectedEntity() {
         return selectedUnit;
 
     }
-    
-    
+
+
     /**
  * A table model for displaying work items
  */
 public class MechTableModel extends AbstractTableModel {
-    
+
         private final static int COL_MODEL = 0;
         private final static int COL_CHASSIS = 1;
         private final static int COL_WEIGHT = 2;
@@ -542,24 +545,22 @@ public class MechTableModel extends AbstractTableModel {
         private final static int COL_YEAR = 4;
         private final static int COL_COST = 5;
         private final static int N_COL = 6;
-    
+
         private MechSummary[] data = new MechSummary[0];
-        
+
         public void MechTableModel() {
             //this.columnNames = new String[] {"Model", "Chassis"};
             //this.data = new MechSummary[0];
         }
-        
-        @Override
+
         public int getRowCount() {
             return data.length;
         }
 
-        @Override
         public int getColumnCount() {
             return N_COL;
         }
-        
+
         @Override
         public String getColumnName(int column) {
             switch(column) {
@@ -579,12 +580,12 @@ public class MechTableModel extends AbstractTableModel {
                     return "?";
             }
         }
-    
+
         @Override
         public Class getColumnClass(int c) {
             return getValueAt(0, c).getClass();
         }
-        
+
         @Override
         public boolean isCellEditable(int row, int col) {
             return false;
@@ -593,14 +594,13 @@ public class MechTableModel extends AbstractTableModel {
         public MechSummary getMechSummary(int i) {
             return data[i];
         }
-     
+
         //fill table with values
         public void setData(MechSummary[] ms) {
-            this.data = ms;
+            data = ms;
             fireTableDataChanged();
         }
 
-        @Override
         public Object getValueAt(int row, int col) {
             MechSummary ms = data[row];
             if(col == COL_MODEL) {
@@ -624,9 +624,9 @@ public class MechTableModel extends AbstractTableModel {
             }
             return "?";
         }
-        
+
 }
-    
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBuyClose;
     private javax.swing.JButton btnCancel;

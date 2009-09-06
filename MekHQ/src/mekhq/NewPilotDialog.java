@@ -11,19 +11,18 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.ArrayList;
 import java.util.Enumeration;
+
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JLabel;
+
 import megamek.client.ui.swing.DialogOptionComponent;
 import megamek.client.ui.swing.DialogOptionListener;
 import megamek.common.EquipmentType;
-import megamek.common.EquipmentType;
-import megamek.common.Messages;
 import megamek.common.Pilot;
 import megamek.common.WeaponType;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
-import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.PilotPerson;
 
 /**
@@ -36,14 +35,14 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
     private PilotPerson person;
     private ArrayList<DialogOptionComponent> optionComps = new ArrayList<DialogOptionComponent>();
     private PilotOptions options;
-    
+
     /** Creates new form NewPilotDialog */
     public NewPilotDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         pilot = new Pilot("Roy Fokker", 4, 5);
         pilot.setNickname("Big Brother");
-        this.options = pilot.getOptions();
-        this.person = null;
+        options = pilot.getOptions();
+        person = null;
         initComponents();
         refreshOptions();
     }
@@ -225,12 +224,12 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         org.jdesktop.layout.GroupLayout panOptionsLayout = new org.jdesktop.layout.GroupLayout(panOptions);
         panOptions.setLayout(panOptionsLayout);
         panOptionsLayout.setHorizontalGroup(
-            panOptionsLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 516, Short.MAX_VALUE)
+                panOptionsLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                .add(0, 516, Short.MAX_VALUE)
         );
         panOptionsLayout.setVerticalGroup(
-            panOptionsLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 510, Short.MAX_VALUE)
+                panOptionsLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                .add(0, 510, Short.MAX_VALUE)
         );
 
         jScrollPane1.setViewportView(panOptions);
@@ -298,34 +297,35 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
-    this.setVisible(false);
-}//GEN-LAST:event_btnCancelActionPerformed
+    private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
+        setVisible(false);
+    }//GEN-LAST:event_btnCancelActionPerformed
 
-private void btnOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOkActionPerformed
-    int piloting = Integer.parseInt(textPiloting.getText());
-    int gunnery = Integer.parseInt(textGunnery.getText());
-    int initb = Integer.parseInt(textInitB.getText());
-    int commandb = Integer.parseInt(textCommandB.getText());
-    String name = textName.getText();
-    String nick = textNickname.getText();
-    pilot = new Pilot(name, gunnery, piloting);
-    pilot.setInitBonus(initb);
-    pilot.setCommandBonus(commandb);
-    pilot.setNickname(nick);
-    setOptions();
-    person = new PilotPerson(pilot, choiceType.getSelectedIndex());
-    this.setVisible(false);
-}//GEN-LAST:event_btnOkActionPerformed
+    private void btnOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOkActionPerformed
+        int piloting = Integer.parseInt(textPiloting.getText());
+        int gunnery = Integer.parseInt(textGunnery.getText());
+        int initb = Integer.parseInt(textInitB.getText());
+        int commandb = Integer.parseInt(textCommandB.getText());
+        String name = textName.getText();
+        String nick = textNickname.getText();
+        pilot = new Pilot(name, gunnery, piloting);
+        pilot.setInitBonus(initb);
+        pilot.setCommandBonus(commandb);
+        pilot.setNickname(nick);
+        setOptions();
+        person = new PilotPerson(pilot, choiceType.getSelectedIndex());
+        setVisible(false);
+    }//GEN-LAST:event_btnOkActionPerformed
 
     /**
-    * @param args the command line arguments
-    */
+     * @param args the command line arguments
+     */
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 NewPilotDialog dialog = new NewPilotDialog(new javax.swing.JFrame(), true);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+                    @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {
                         System.exit(0);
                     }
@@ -334,7 +334,7 @@ private void btnOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:e
             }
         });
     }
-    
+
     public void refreshOptions() {
         panOptions.removeAll();
         optionComps = new ArrayList<DialogOptionComponent>();
@@ -350,20 +350,20 @@ private void btnOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:e
         c.ipady = 0;
 
         for (Enumeration<IOptionGroup> i = options.getGroups(); i
-                .hasMoreElements();) {
+        .hasMoreElements();) {
             IOptionGroup group = i.nextElement();
 
             addGroup(group, gridbag, c);
 
             for (Enumeration<IOption> j = group.getOptions(); j
-                    .hasMoreElements();) {
+            .hasMoreElements();) {
                 IOption option = j.nextElement();
 
                 addOption(option, gridbag, c, true);
             }
         }
     }
-    
+
     private void addGroup(IOptionGroup group, GridBagLayout gridbag,
             GridBagConstraints c) {
         JLabel groupLabel = new JLabel(group.getDisplayableName());
@@ -393,7 +393,7 @@ private void btnOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:e
 
         optionComps.add(optionComp);
     }
-    
+
     private void setOptions() {
         IOption option;
         for (final Object newVar : optionComps) {
@@ -401,14 +401,14 @@ private void btnOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:e
             option = comp.getOption();
             if ((comp.getValue().equals("None"))) { // NON-NLS-$1
                 pilot.getOptions().getOption(option.getName())
-                        .setValue("None"); // NON-NLS-$1
+                .setValue("None"); // NON-NLS-$1
             } else {
                 pilot.getOptions().getOption(option.getName())
-                        .setValue(comp.getValue());
+                .setValue(comp.getValue());
             }
         }
     }
-    
+
     public PilotPerson getPilotPerson() {
         return person;
     }
@@ -437,7 +437,6 @@ private void btnOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:e
     private javax.swing.JTextField textPiloting;
     // End of variables declaration//GEN-END:variables
 
-    @Override
     public void optionClicked(DialogOptionComponent arg0, IOption arg1, boolean arg2) {
         //IMplement me!!
     }
