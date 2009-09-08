@@ -404,7 +404,7 @@ private void checkCanonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
                     MechSummary mech = mechModel.getMechSummary(entry.getIdentifier());
                 if (/* Weight */
                     (mech.getWeightClass() == nClass) &&
-                            (mech.isCanon() == checkCanon.isSelected()) &&
+                            (mech.isCanon() || !checkCanon.isSelected()) &&
                 /*
                  * Technology Level
                  */

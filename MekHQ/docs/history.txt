@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.1.1 (SVN)
++ Bug: canon only button not filtering properly
 + report notifications for recovered units and personnel
 + report notifications for new units and personnel
 + pilot advantages and implants in NewPilotDialog
