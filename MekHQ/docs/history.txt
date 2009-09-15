@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.1.1 (SVN)
++ declare pilots KIA and retired
 + Bug: canon only button not filtering properly
 + report notifications for recovered units and personnel
 + report notifications for new units and personnel

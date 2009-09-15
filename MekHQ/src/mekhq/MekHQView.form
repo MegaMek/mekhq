@@ -322,7 +322,7 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="jScrollPane8" pref="542" max="32767" attributes="0"/>
+                          <Component id="jScrollPane8" pref="576" max="32767" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
                   </Group>
@@ -418,7 +418,7 @@
                         </Property>
                       </Properties>
                       <AuxValues>
-                        <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="PersonTable.setRowHeight(60);&#xa;PersonTable.getColumnModel().getColumn(0).setCellRenderer(personnelModel.getRenderer());&#xa;PersonTable.getSelectionModel().addListSelectionListener(new javax.swing.event.ListSelectionListener() {&#xa;            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {&#xa;                PersonTableValueChanged(evt);&#xa;            }&#xa;        });"/>
+                        <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="PersonTable.setRowHeight(60);&#xa;PersonTable.getColumnModel().getColumn(0).setCellRenderer(personnelModel.getRenderer());&#xa;PersonTable.getSelectionModel().addListSelectionListener(new javax.swing.event.ListSelectionListener() {&#xa;            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {&#xa;                PersonTableValueChanged(evt);&#xa;            }&#xa;        });&#xa;PersonTable.addMouseListener(personMouseAdapter);"/>
                       </AuxValues>
                     </Component>
                   </SubComponents>
@@ -483,7 +483,7 @@
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="877" max="32767" attributes="0"/>
+                          <EmptySpace pref="891" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -492,7 +492,7 @@
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="546" max="32767" attributes="0"/>
+                          <EmptySpace pref="566" max="32767" attributes="0"/>
                       </Group>
                   </Group>
                 </DimensionLayout>
@@ -673,19 +673,19 @@
             </MenuItem>
           </SubComponents>
         </Menu>
-        <Menu class="javax.swing.JMenu" name="miLoadForces">
+        <Menu class="javax.swing.JMenu" name="menuManage">
           <Properties>
-            <Property name="text" type="java.lang.String" resourceKey="miLoadForces.text"/>
-            <Property name="name" type="java.lang.String" value="miLoadForces" noResource="true"/>
+            <Property name="text" type="java.lang.String" resourceKey="menuManage.text"/>
+            <Property name="name" type="java.lang.String" value="menuManage" noResource="true"/>
           </Properties>
           <SubComponents>
-            <MenuItem class="javax.swing.JMenuItem" name="jMenuItem1">
+            <MenuItem class="javax.swing.JMenuItem" name="miLoadForces">
               <Properties>
-                <Property name="text" type="java.lang.String" resourceKey="jMenuItem1.text"/>
-                <Property name="name" type="java.lang.String" value="jMenuItem1" noResource="true"/>
+                <Property name="text" type="java.lang.String" resourceKey="miLoadForces.text"/>
+                <Property name="name" type="java.lang.String" value="miLoadForces" noResource="true"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuItem1ActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="miLoadForcesActionPerformed"/>
               </Events>
             </MenuItem>
           </SubComponents>
@@ -779,7 +779,7 @@
               <Group type="102" attributes="0">
                   <EmptySpace min="-2" pref="1104" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="statusPanelSeparator" alignment="0" pref="186" max="32767" attributes="0"/>
+                      <Component id="statusPanelSeparator" alignment="0" pref="164" max="32767" attributes="0"/>
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="statusMessageLabel" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="32767" attributes="0"/>

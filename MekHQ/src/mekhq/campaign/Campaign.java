@@ -36,6 +36,7 @@ import megamek.common.Mounted;
 import megamek.common.Pilot;
 import megamek.common.Protomech;
 import megamek.common.Tank;
+import megamek.common.Team;
 import mekhq.campaign.parts.EquipmentPart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
@@ -556,7 +557,35 @@ public class Campaign implements Serializable {
         
         //finally remove the unit
         units.remove(unit);
-        unitIds.remove(new Integer(unit.getId()));      
+        unitIds.remove(new Integer(unit.getId()));   
+        currentReport.add(unit.getEntity().getDisplayName() + " has been removed from the unit roster.");
+    }
+    
+    public void removePerson(int id) {
+        Person person = getPerson(id);
+        
+        if(person instanceof PilotPerson && ((PilotPerson)person).isAssigned()) {
+            ((PilotPerson)person).getAssignedUnit().removePilot();
+        } else if(person instanceof SupportPerson && null != ((SupportPerson)person).getTeam()) {
+            removeTeam(((SupportPerson)person).getTeam().getId());
+        }
+        
+        currentReport.add(person.getDesc() + " has been removed from the personnel roster.");
+        personnel.remove(person);
+        personnelIds.remove(new Integer(id));
+    }
+    
+    public void removeTeam(int id) {
+        SupportTeam team = getTeam(id);
+        
+        for(WorkItem task : getTasks()) {
+            if(task.isAssigned() && task.getTeam().getId() == id) {
+                task.setTeam(null);
+            }
+        }
+        
+        teams.remove(team);
+        teamIds.remove(new Integer(id));
     }
     
     public void removePart(Part part) {
@@ -681,6 +710,10 @@ public class Campaign implements Serializable {
     
     public String getFactionName() {
         return Faction.getFactionName(faction);
+    }
+    
+    public void addReport(String r) {
+        currentReport.add(r);
     }
     
 }

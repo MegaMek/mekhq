@@ -101,6 +101,7 @@ public class MekHQView extends FrameView {
     private PartsTableModel partsModel = new PartsTableModel();
     private MekTableMouseAdapter unitMouseAdapter;
     private TaskTableMouseAdapter taskMouseAdapter;
+    private PersonTableMouseAdapter personMouseAdapter;
     private int currentUnitId;
     private int currentTaskId;
     private int currentTechId;
@@ -113,6 +114,7 @@ public class MekHQView extends FrameView {
 
         unitMouseAdapter = new MekTableMouseAdapter();
         taskMouseAdapter = new TaskTableMouseAdapter();
+        personMouseAdapter = new PersonTableMouseAdapter();
         initComponents();
 
         refreshCalendar();
@@ -233,8 +235,8 @@ public class MekHQView extends FrameView {
         menuSave = new javax.swing.JMenuItem();
         menuOptions = new javax.swing.JMenuItem();
         javax.swing.JMenuItem exitMenuItem = new javax.swing.JMenuItem();
-        miLoadForces = new javax.swing.JMenu();
-        jMenuItem1 = new javax.swing.JMenuItem();
+        menuManage = new javax.swing.JMenu();
+        miLoadForces = new javax.swing.JMenuItem();
         menuMarket = new javax.swing.JMenu();
         miPurchaseUnit = new javax.swing.JMenuItem();
         menuHire = new javax.swing.JMenu();
@@ -473,7 +475,7 @@ public class MekHQView extends FrameView {
             panSuppliesLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(panSuppliesLayout.createSequentialGroup()
                 .addContainerGap()
-                .add(jScrollPane8, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 542, Short.MAX_VALUE)
+                .add(jScrollPane8, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 576, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -509,6 +511,7 @@ public class MekHQView extends FrameView {
                 PersonTableValueChanged(evt);
             }
         });
+        PersonTable.addMouseListener(personMouseAdapter);
         scrollPersonTable.setViewportView(PersonTable);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -558,14 +561,14 @@ public class MekHQView extends FrameView {
             .add(panFinancesLayout.createSequentialGroup()
                 .addContainerGap()
                 .add(jLabel2)
-                .addContainerGap(877, Short.MAX_VALUE))
+                .addContainerGap(891, Short.MAX_VALUE))
         );
         panFinancesLayout.setVerticalGroup(
             panFinancesLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(panFinancesLayout.createSequentialGroup()
                 .addContainerGap()
                 .add(jLabel2)
-                .addContainerGap(546, Short.MAX_VALUE))
+                .addContainerGap(566, Short.MAX_VALUE))
         );
 
         tabMain.addTab(resourceMap.getString("panFinances.TabConstraints.tabTitle"), panFinances); // NOI18N
@@ -697,19 +700,19 @@ public class MekHQView extends FrameView {
 
         menuBar.add(fileMenu);
 
+        menuManage.setText(resourceMap.getString("menuManage.text")); // NOI18N
+        menuManage.setName("menuManage"); // NOI18N
+
         miLoadForces.setText(resourceMap.getString("miLoadForces.text")); // NOI18N
         miLoadForces.setName("miLoadForces"); // NOI18N
-
-        jMenuItem1.setText(resourceMap.getString("jMenuItem1.text")); // NOI18N
-        jMenuItem1.setName("jMenuItem1"); // NOI18N
-        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+        miLoadForces.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem1ActionPerformed(evt);
+                miLoadForcesActionPerformed(evt);
             }
         });
-        miLoadForces.add(jMenuItem1);
+        menuManage.add(miLoadForces);
 
-        menuBar.add(miLoadForces);
+        menuBar.add(menuManage);
 
         menuMarket.setText(resourceMap.getString("menuMarket.text")); // NOI18N
         menuMarket.setName("menuMarket"); // NOI18N
@@ -784,7 +787,7 @@ public class MekHQView extends FrameView {
             .add(statusPanelLayout.createSequentialGroup()
                 .add(1104, 1104, 1104)
                 .add(statusPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(statusPanelSeparator, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 186, Short.MAX_VALUE)
+                    .add(statusPanelSeparator, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 164, Short.MAX_VALUE)
                     .add(statusPanelLayout.createSequentialGroup()
                         .add(statusMessageLabel)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -1073,13 +1076,14 @@ private void menuOptionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
 
 }//GEN-LAST:event_menuOptionsActionPerformed
 
-private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+private void miLoadForcesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miLoadForcesActionPerformed
         try {
-            loadListFile(true);//GEN-LAST:event_jMenuItem1ActionPerformed
+           loadListFile(true); 
         } catch (IOException ex) {
             Logger.getLogger(MekHQView.class.getName()).log(Level.SEVERE, null, ex);
-        }
-}
+        }   
+}//GEN-LAST:event_miLoadForcesActionPerformed
+
 
 private void miPurchaseUnitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miPurchaseUnitActionPerformed
     UnitSelectorDialog usd = new UnitSelectorDialog(getFrame(), true);
@@ -1591,10 +1595,14 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
             } else if(command.equalsIgnoreCase("SELL")) {
                 if(0 == JOptionPane.showConfirmDialog(null, "Do you really want to sell " + unit.getEntity().getDisplayName(), "Sell Unit?", JOptionPane.YES_NO_OPTION)) {
                     campaign.removeUnit(unit.getId());
+                    refreshUnitList();
+                    refreshReport();
                 }
             } else if(command.equalsIgnoreCase("LOSS")) {
                 if(0 == JOptionPane.showConfirmDialog(null, "Do you really want to consider " + unit.getEntity().getDisplayName() + " a combat loss?", "Remove Unit?", JOptionPane.YES_NO_OPTION)) {
                     campaign.removeUnit(unit.getId());
+                    refreshUnitList();
+                    refreshReport();
                 }
             } else if(command.contains("ASSIGN_TECH")) {
                 String sel = command.split(":")[1];
@@ -1885,8 +1893,85 @@ public class PersonTableModel extends ArrayTableModel {
     }
 }
 
+public class PersonTableMouseAdapter extends MouseInputAdapter implements ActionListener {
+
+        public void actionPerformed(ActionEvent action) {
+            String command = action.getActionCommand();
+            Person person = personnelModel.getPersonAt(PersonTable.getSelectedRow());
+            if (command.equalsIgnoreCase("KIA")) {
+                if(0 == JOptionPane.showConfirmDialog(null, "Do you really want to declare " + person.getDesc() + " killed in action?", "KIA?", JOptionPane.YES_NO_OPTION)) {
+                    campaign.removePerson(person.getId());
+                    refreshUnitList();
+                    refreshPersonnelList();
+                    refreshTechsList();
+                    refreshDoctorsList();
+                    refreshReport();
+                    //TODO: Add to an honor roll
+                }
+            } else if (command.equalsIgnoreCase("RETIRE")) {
+                if(0 == JOptionPane.showConfirmDialog(null, "Do you really want to retire " + person.getDesc() + "?", "Retire?", JOptionPane.YES_NO_OPTION)) {
+                    campaign.removePerson(person.getId());
+                    refreshUnitList();
+                    refreshPersonnelList();
+                    refreshTechsList();
+                    refreshDoctorsList();
+                    refreshReport();
+                    //TODO: add to retiree list
+                }
+            } 
+        }
+
+        @Override
+        public void mouseClicked(MouseEvent e) {
+
+            if (e.getClickCount() == 2) {
+                int row = PersonTable.rowAtPoint(e.getPoint());
+                Person person = personnelModel.getPersonAt(row);
+                if(null != person) {
+                    //I need to create a person display (or three actually for the different types)
+                }
+            }
+        }
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+            maybeShowPopup(e);
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            maybeShowPopup(e);
+        }
+
+        private void maybeShowPopup(MouseEvent e) {
+            JPopupMenu popup = new JPopupMenu();
+            if (e.isPopupTrigger()) {
+                int row = PersonTable.rowAtPoint(e.getPoint());
+                Person person  = personnelModel.getPersonAt(row);
+                JMenuItem menuItem = null;
+                JMenu menu = null;
+                JCheckBoxMenuItem cbMenuItem = null;
+                //**lets fill the pop up menu**//
+                //retire
+                menuItem = new JMenuItem("Retire");
+                menuItem.setActionCommand("RETIRE");
+                menuItem.addActionListener(this);
+                menuItem.setEnabled(!person.isDeployed());
+                popup.add(menuItem);
+                //report KIA
+                menuItem = new JMenuItem("KIA");
+                menuItem.setActionCommand("KIA");
+                menuItem.addActionListener(this);
+                menuItem.setEnabled(person.isDeployed());
+                popup.add(menuItem);
+                //TODO: add quirks?
+                popup.show(e.getComponent(), e.getX(), e.getY());
+            }
+        }
+}
+
 /**
- * A table model for displaying personnel
+ * A table model for displaying doctors
  */
 public class DocTableModel extends ArrayTableModel {
 
@@ -1986,7 +2071,6 @@ public class PartsTableModel extends ArrayTableModel {
     private javax.swing.JButton btnRetrieveUnits;
     private javax.swing.JPanel btnUnitPanel;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JScrollPane jScrollPane7;
     private javax.swing.JScrollPane jScrollPane8;
@@ -1996,13 +2080,14 @@ public class PartsTableModel extends ArrayTableModel {
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JMenu menuHire;
     private javax.swing.JMenuItem menuLoad;
+    private javax.swing.JMenu menuManage;
     private javax.swing.JMenu menuMarket;
     private javax.swing.JMenuItem menuOptions;
     private javax.swing.JMenuItem menuSave;
     private javax.swing.JMenuItem miHireDoctor;
     private javax.swing.JMenuItem miHirePilot;
     private javax.swing.JMenuItem miHireTech;
-    private javax.swing.JMenu miLoadForces;
+    private javax.swing.JMenuItem miLoadForces;
     private javax.swing.JMenuItem miPurchaseUnit;
     private javax.swing.JPanel panFinances;
     private javax.swing.JPanel panHangar;
