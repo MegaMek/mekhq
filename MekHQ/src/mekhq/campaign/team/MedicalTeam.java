@@ -22,7 +22,6 @@
 package mekhq.campaign.team;
 
 import megamek.common.Compute;
-import mekhq.campaign.Campaign;
 import mekhq.campaign.work.PersonnelWorkItem;
 import mekhq.campaign.work.WorkItem;
 

@@ -58,6 +58,11 @@ public abstract class PersonnelWorkItem extends WorkItem {
     }
     
     @Override
+    public String fail(int rating) {
+        return " <font color='red'><b>task failed.</b></font>";
+    }
+    
+    @Override
     public boolean sameAs(WorkItem task) {
         return (task instanceof PersonnelWorkItem 
                     && ((PersonnelWorkItem)task).getPerson().getId() == this.getPerson().getId());
