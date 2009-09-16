@@ -44,6 +44,8 @@ public class MekHQApp extends SingleFrameApplication {
         
         //init the summary cache
         MechSummaryCache.getInstance();
+              
+        System.setProperty("apple.laf.useScreenMenuBar", "true");
         
         show(new MekHQView(this));
     }
@@ -69,6 +71,7 @@ public class MekHQApp extends SingleFrameApplication {
      */
     public static void main(String[] args) {
         launch(MekHQApp.class, args);
+        
     }
     
     /**
