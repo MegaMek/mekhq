@@ -1,6 +1,10 @@
 MekHQ
 9/21/2009
 
+IMPORTANT NOTE: as of v0.1.1, you must use MegaMek version 0.35.7 or higher in order
+for MekHQ and MegaMek to interact well. Earlier versions of MegaMek lack an eternal ID
+to identify pilots and so will not be able to detect pilots retrieved from MUL files.
+
 INTRODUCTION
 --------------
 MekHQ is a desktop program for managing units for play in the game of MegaMek. 
