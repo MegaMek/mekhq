@@ -487,6 +487,7 @@ public class MekHQView extends FrameView {
         panPersonnel.setLayout(new java.awt.GridBagLayout());
 
         btnAssignDoc.setText(resourceMap.getString("btnAssignDoc.text")); // NOI18N
+        btnAssignDoc.setToolTipText(resourceMap.getString("btnAssignDoc.toolTipText")); // NOI18N
         btnAssignDoc.setEnabled(false);
         btnAssignDoc.setName("btnAssignDoc"); // NOI18N
         btnAssignDoc.addActionListener(new java.awt.event.ActionListener() {
@@ -629,6 +630,7 @@ public class MekHQView extends FrameView {
         panelMasterButtons.add(btnAdvanceDay, gridBagConstraints);
 
         btnOvertime.setText(resourceMap.getString("btnOvertime.text")); // NOI18N
+        btnOvertime.setToolTipText(resourceMap.getString("btnOvertime.toolTipText")); // NOI18N
         btnOvertime.setName("btnOvertime"); // NOI18N
         btnOvertime.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -643,6 +645,7 @@ public class MekHQView extends FrameView {
         panelMasterButtons.add(btnOvertime, gridBagConstraints);
 
         btnGMMode.setText(resourceMap.getString("btnGMMode.text")); // NOI18N
+        btnGMMode.setToolTipText(resourceMap.getString("btnGMMode.toolTipText")); // NOI18N
         btnGMMode.setName("btnGMMode"); // NOI18N
         btnGMMode.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {

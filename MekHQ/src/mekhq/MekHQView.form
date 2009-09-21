@@ -371,6 +371,7 @@
                 <Component class="javax.swing.JButton" name="btnAssignDoc">
                   <Properties>
                     <Property name="text" type="java.lang.String" resourceKey="btnAssignDoc.text"/>
+                    <Property name="toolTipText" type="java.lang.String" resourceKey="btnAssignDoc.toolTipText"/>
                     <Property name="enabled" type="boolean" value="false"/>
                     <Property name="name" type="java.lang.String" value="btnAssignDoc" noResource="true"/>
                   </Properties>
@@ -584,6 +585,7 @@
             <Component class="javax.swing.JToggleButton" name="btnOvertime">
               <Properties>
                 <Property name="text" type="java.lang.String" resourceKey="btnOvertime.text"/>
+                <Property name="toolTipText" type="java.lang.String" resourceKey="btnOvertime.toolTipText"/>
                 <Property name="name" type="java.lang.String" value="btnOvertime" noResource="true"/>
               </Properties>
               <Events>
@@ -598,6 +600,7 @@
             <Component class="javax.swing.JToggleButton" name="btnGMMode">
               <Properties>
                 <Property name="text" type="java.lang.String" resourceKey="btnGMMode.text"/>
+                <Property name="toolTipText" type="java.lang.String" resourceKey="btnGMMode.toolTipText"/>
                 <Property name="name" type="java.lang.String" value="btnGMMode" noResource="true"/>
               </Properties>
               <Events>
