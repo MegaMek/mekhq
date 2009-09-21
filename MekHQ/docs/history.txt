@@ -122,6 +122,7 @@ v0.1.1 (SVN)
 + Bug 2854866: Mechwarrior with 1 hit unable to be healed by medic team
 + double-click for view of pilot personnel
 + updated mechfiles
++ GM mode options
 
 v0.1.0 (2009-07-29)
 + Bug: some weapon repair/replacements not being diagnosed

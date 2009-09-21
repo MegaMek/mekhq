@@ -91,6 +91,10 @@ public abstract class SupportTeam implements Serializable {
         return rating;
     }
     
+    public void setRating(int i) {
+        this.rating = i;
+    }
+    
     public String getName() {
         return name;
     }

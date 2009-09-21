@@ -63,12 +63,14 @@ import megamek.common.Mounted;
 import megamek.common.Pilot;
 import megamek.common.TargetRoll;
 import megamek.common.XMLStreamParser;
+import megamek.common.options.PilotOptions;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Unit;
 import mekhq.campaign.Utilities;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PilotPerson;
+import mekhq.campaign.personnel.SupportPerson;
 import mekhq.campaign.team.MedicalTeam;
 import mekhq.campaign.team.SupportTeam;
 import mekhq.campaign.team.TechTeam;
@@ -1451,6 +1453,21 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
                 refreshUnitList();
                 refreshTaskList();
             }
+            else if (command.contains("FIX")) {
+                if(task instanceof ReplacementItem && !((ReplacementItem)task).hasPart()) {
+                    ReplacementItem replace = (ReplacementItem)task;
+                    Part part = replace.partNeeded();
+                    replace.setPart(part);
+                    campaign.addPart(part);
+                }
+                task.succeed();
+                if(task.isCompleted()) {
+                    campaign.removeTask(task);
+                }
+                refreshUnitList();
+                refreshTaskList();
+                refreshPartsList();
+            }
         }
 
         @Override
@@ -1513,6 +1530,13 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
                     }
                     popup.add(menu);
                 }
+                menu = new JMenu("GM Mode");
+                popup.add(menu);
+                menuItem = new JMenuItem("Complete Task");
+                menuItem.setActionCommand("FIX");
+                menuItem.addActionListener(this);
+                menuItem.setEnabled(campaign.isGM() && null == task.checkFixable());
+                menu.add(menuItem);
                 popup.show(e.getComponent(), e.getX(), e.getY());
             }
         }
@@ -1658,7 +1682,20 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
             } else if (command.equalsIgnoreCase("REPAIR")) {
                 unit.setSalvage(false);
                 refreshUnitList();
-            }
+            } else if(command.equalsIgnoreCase("REMOVE")) {
+                if(0 == JOptionPane.showConfirmDialog(null, "Do you really want to remove " + unit.getEntity().getDisplayName() + "?", "Remove Unit?", JOptionPane.YES_NO_OPTION)) {
+                    campaign.removeUnit(unit.getId());
+                    refreshUnitList();
+                    refreshReport();
+                }
+            } else if (command.equalsIgnoreCase("UNDEPLOY")) {
+                unit.setDeployed(false);
+                if(null != unit.getPilot()) {
+                    unit.getPilot().setDeployed(false);
+                }
+                refreshUnitList();
+                refreshPersonnelList();
+            } 
         }
 
         @Override
@@ -1796,6 +1833,20 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
                 menuItem.setEnabled(unit.isDeployed());
                 popup.add(menuItem);
                 //TODO: add quirks?
+                //GM mode
+                menu = new JMenu("GM Mode");
+                menuItem = new JMenuItem("Remove Unit");
+                menuItem.setActionCommand("REMOVE");
+                menuItem.addActionListener(this);
+                menuItem.setEnabled(campaign.isGM());
+                menu.add(menuItem);
+                menuItem = new JMenuItem("Undeploy Unit");
+                menuItem.setActionCommand("UNDEPLOY");
+                menuItem.addActionListener(this);
+                menuItem.setEnabled(campaign.isGM() && unit.isDeployed());            
+                menu.add(menuItem);
+                popup.addSeparator();
+                popup.add(menu);
                 popup.show(e.getComponent(), e.getX(), e.getY());
             }
         }
@@ -1919,6 +1970,79 @@ public class PersonTableMouseAdapter extends MouseInputAdapter implements Action
                     //TODO: add to retiree list
                 }
             } 
+            else if (command.equalsIgnoreCase("REMOVE")) {
+                if(0 == JOptionPane.showConfirmDialog(null, "Do you really want to remove " + person.getDesc() + "?", "Remove?", JOptionPane.YES_NO_OPTION)) {
+                    campaign.removePerson(person.getId());
+                    refreshUnitList();
+                    refreshPersonnelList();
+                    refreshTechsList();
+                    refreshDoctorsList();
+                    refreshReport();
+                }
+            } 
+            else if (command.equalsIgnoreCase("UNDEPLOY")) {
+                person.setDeployed(false);
+                refreshPersonnelList();
+            } 
+            else if (command.equalsIgnoreCase("IMP_PILOTING")) {
+                if(person instanceof PilotPerson) {
+                    Pilot pilot = ((PilotPerson)person).getPilot();
+                    pilot.setPiloting(pilot.getPiloting() - 1);
+                    refreshPersonnelList();
+                }
+            }
+            else if (command.equalsIgnoreCase("IMP_GUNNERY")) {
+                if(person instanceof PilotPerson) {
+                    Pilot pilot = ((PilotPerson)person).getPilot();
+                    pilot.setGunnery(pilot.getGunnery() - 1);
+                    refreshPersonnelList();
+                    refreshUnitList();
+                }
+            }
+            else if (command.equalsIgnoreCase("DEC_PILOTING")) {
+                if(person instanceof PilotPerson) {
+                    Pilot pilot = ((PilotPerson)person).getPilot();
+                    pilot.setPiloting(pilot.getPiloting() + 1);
+                    refreshPersonnelList();
+                }
+            }
+            else if (command.equalsIgnoreCase("DEC_GUNNERY")) {
+                if(person instanceof PilotPerson) {
+                    Pilot pilot = ((PilotPerson)person).getPilot();
+                    pilot.setGunnery(pilot.getGunnery() + 1);
+                    refreshPersonnelList();
+                    refreshUnitList();
+                }
+            }
+            else if (command.equalsIgnoreCase("IMP_SUPPORT")) {
+                if(person instanceof SupportPerson) {
+                    SupportTeam team = ((SupportPerson)person).getTeam();
+                    team.setRating(team.getRating() + 1);
+                    refreshPersonnelList();
+                    refreshDoctorsList();
+                    refreshTechsList();
+                }
+            }
+            else if (command.equalsIgnoreCase("DEC_SUPPORT")) {
+                if(person instanceof SupportPerson) {
+                    SupportTeam team = ((SupportPerson)person).getTeam();
+                    team.setRating(team.getRating() - 1);
+                    refreshPersonnelList();
+                    refreshDoctorsList();
+                    refreshTechsList();
+                }
+            }
+            else if (command.equalsIgnoreCase("HEAL")) {
+                if(person instanceof PilotPerson) {
+                    Pilot pilot = ((PilotPerson)person).getPilot();
+                    pilot.setHits(0);
+                    person.getTask().setTeam(null);
+                    person.setTask(null);
+                    refreshPersonnelList();
+                    refreshDoctorsList();
+                    refreshUnitList();
+                }
+            }
         }
 
         @Override
@@ -1951,6 +2075,7 @@ public class PersonTableMouseAdapter extends MouseInputAdapter implements Action
                 Person person  = personnelModel.getPersonAt(row);
                 JMenuItem menuItem = null;
                 JMenu menu = null;
+                JMenu impMenu = null;
                 JCheckBoxMenuItem cbMenuItem = null;
                 //**lets fill the pop up menu**//
                 //retire
@@ -1966,6 +2091,64 @@ public class PersonTableMouseAdapter extends MouseInputAdapter implements Action
                 menuItem.setEnabled(person.isDeployed());
                 popup.add(menuItem);
                 //TODO: add quirks?
+                menu = new JMenu("GM Mode");
+                menuItem = new JMenuItem("Remove Person");
+                menuItem.setActionCommand("REMOVE");
+                menuItem.addActionListener(this);
+                menuItem.setEnabled(campaign.isGM());
+                menu.add(menuItem);
+                menuItem = new JMenuItem("Heal Person");
+                menuItem.setActionCommand("HEAL");
+                menuItem.addActionListener(this);
+                menuItem.setEnabled(campaign.isGM());
+                menu.add(menuItem);
+                if(person instanceof PilotPerson) {
+                    menuItem = new JMenuItem("Undeploy Pilot");
+                    menuItem.setActionCommand("UNDEPLOY");
+                    menuItem.addActionListener(this);
+                    menuItem.setEnabled(campaign.isGM() && person.isDeployed());            
+                    menu.add(menuItem);
+                }
+                impMenu = new JMenu("Skills");
+                menu.add(impMenu);
+                if(person instanceof PilotPerson) {
+                    PilotPerson pp = (PilotPerson)person;
+                    menuItem = new JMenuItem("Improve Piloting");
+                    menuItem.setActionCommand("IMP_PILOTING");
+                    menuItem.addActionListener(this);
+                    menuItem.setEnabled(campaign.isGM() && pp.getPilot().getPiloting() > 0);
+                    impMenu.add(menuItem);
+                    menuItem = new JMenuItem("Improve Gunnery");
+                    menuItem.setActionCommand("IMP_GUNNERY");
+                    menuItem.addActionListener(this);
+                    menuItem.setEnabled(campaign.isGM() && pp.getPilot().getGunnery() > 0);
+                    impMenu.add(menuItem);
+                    menuItem = new JMenuItem("Decrease Piloting");
+                    menuItem.setActionCommand("DEC_PILOTING");
+                    menuItem.addActionListener(this);
+                    menuItem.setEnabled(campaign.isGM() && pp.getPilot().getPiloting() < 7);
+                    impMenu.add(menuItem);
+                    menuItem = new JMenuItem("Decrease Gunnery");
+                    menuItem.setActionCommand("DEC_GUNNERY");
+                    menuItem.addActionListener(this);
+                    menuItem.setEnabled(campaign.isGM() && pp.getPilot().getGunnery() < 7);
+                    impMenu.add(menuItem);
+                }
+                else if(person instanceof SupportPerson) {
+                    SupportPerson sp = (SupportPerson)person;
+                    menuItem = new JMenuItem("Improve Skill");
+                    menuItem.setActionCommand("IMP_SUPPORT");
+                    menuItem.addActionListener(this);
+                    menuItem.setEnabled(campaign.isGM() && sp.getTeam().getRating() < SupportTeam.EXP_ELITE);
+                    impMenu.add(menuItem);
+                    menuItem = new JMenuItem("Decrease Skill");
+                    menuItem.setActionCommand("DEC_SUPPORT");
+                    menuItem.addActionListener(this);
+                    menuItem.setEnabled(campaign.isGM() && sp.getTeam().getRating() > SupportTeam.EXP_REGULAR);
+                    impMenu.add(menuItem);
+                }
+                popup.addSeparator();
+                popup.add(menu);
                 popup.show(e.getComponent(), e.getX(), e.getY());
             }
         }
