@@ -21,12 +21,15 @@
 
 package mekhq.campaign.personnel;
 
+import java.util.Enumeration;
 import megamek.common.Aero;
 import megamek.common.Entity;
 import megamek.common.Mech;
 import megamek.common.Pilot;
 import megamek.common.Protomech;
 import megamek.common.Tank;
+import megamek.common.options.IOption;
+import megamek.common.options.IOptionGroup;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Unit;
 import mekhq.campaign.work.HealPilot;
@@ -181,5 +184,39 @@ public class PilotPerson extends Person {
     @Override
     public boolean needsHealing() {
         return (getPilot().getHits() > 0);
+    }
+
+    @Override
+    public String getDossier() {
+        String toReturn = "<b>" + pilot.getName() + "</b><br>";
+        toReturn += "<i>" + pilot.getNickname() + "</i><br><br>";
+        
+        toReturn += "<table>";
+        toReturn += "<tr><td><b>Gunnery:</b></td><td>" + pilot.getGunnery() + "</td></tr>";
+        toReturn += "<tr><td><b>Piloting:</b></td><td>" + pilot.getPiloting() + "</td></tr>";
+        toReturn += "<tr><td><b>Iniative Bonus:</b></td><td>" + pilot.getInitBonus() + "</td></tr>";
+        toReturn += "<tr><td><b>Commander Bonus:</b></td><td>" + pilot.getCommandBonus() + "</td></tr>";
+        toReturn += "</table>";
+     
+        for (Enumeration<IOptionGroup> advGroups = pilot.getOptions().getGroups(); advGroups.hasMoreElements();) {
+            IOptionGroup advGroup = advGroups.nextElement();
+            if(pilot.countOptions(advGroup.getKey()) > 0) {
+                toReturn += "<p><b><u>" + advGroup.getDisplayableName() + "</u></b><br>";    
+                for (Enumeration<IOption> advs = advGroup.getOptions(); advs.hasMoreElements();) {
+                    IOption adv = advs.nextElement();
+                    if(adv.booleanValue()) {
+                        toReturn += "  " + adv.getDisplayableNameWithValue() + "<br>";
+                    }
+                }
+            }
+        }
+        
+        if(null != getBiography() && getBiography().length() > 0) {
+            toReturn += "<br><br><b>Biography</b><br>";
+            toReturn += getBiography();
+        }
+        
+        
+        return toReturn;
     }
 }

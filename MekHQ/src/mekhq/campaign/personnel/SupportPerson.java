@@ -83,6 +83,12 @@ public class SupportPerson extends Person {
     public boolean needsHealing() {
        return (team.getCasualties() > 0);
     }
-
+  
+    @Override
+    public String getDossier() {
+        String toReturn = "<b>" + team.getName() + "</b><br>";
+        
+        return toReturn;
+    }
     
 }

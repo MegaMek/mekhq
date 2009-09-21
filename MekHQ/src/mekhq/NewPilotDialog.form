@@ -278,9 +278,9 @@
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
       <SubComponents>
-        <Component class="javax.swing.JTextPane" name="jTextPane1">
+        <Component class="javax.swing.JTextPane" name="txtBio">
           <Properties>
-            <Property name="name" type="java.lang.String" value="jTextPane1" noResource="true"/>
+            <Property name="name" type="java.lang.String" value="txtBio" noResource="true"/>
           </Properties>
         </Component>
       </SubComponents>

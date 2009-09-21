@@ -1928,7 +1928,8 @@ public class PersonTableMouseAdapter extends MouseInputAdapter implements Action
                 int row = PersonTable.rowAtPoint(e.getPoint());
                 Person person = personnelModel.getPersonAt(row);
                 if(null != person) {
-                    //I need to create a person display (or three actually for the different types)
+                    PersonViewDialog pvd = new PersonViewDialog(null, true, person.getDossier());
+                    pvd.setVisible(true);
                 }
             }
         }

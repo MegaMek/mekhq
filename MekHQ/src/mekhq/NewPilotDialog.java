@@ -73,7 +73,7 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         jScrollPane1 = new javax.swing.JScrollPane();
         panOptions = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jTextPane1 = new javax.swing.JTextPane();
+        txtBio = new javax.swing.JTextPane();
         panButtons = new javax.swing.JPanel();
         btnOk = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
@@ -224,12 +224,12 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         org.jdesktop.layout.GroupLayout panOptionsLayout = new org.jdesktop.layout.GroupLayout(panOptions);
         panOptions.setLayout(panOptionsLayout);
         panOptionsLayout.setHorizontalGroup(
-                panOptionsLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                .add(0, 516, Short.MAX_VALUE)
+            panOptionsLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(0, 516, Short.MAX_VALUE)
         );
         panOptionsLayout.setVerticalGroup(
-                panOptionsLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                .add(0, 510, Short.MAX_VALUE)
+            panOptionsLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(0, 510, Short.MAX_VALUE)
         );
 
         jScrollPane1.setViewportView(panOptions);
@@ -247,8 +247,8 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
 
         jScrollPane2.setName("jScrollPane2"); // NOI18N
 
-        jTextPane1.setName("jTextPane1"); // NOI18N
-        jScrollPane2.setViewportView(jTextPane1);
+        txtBio.setName("txtBio"); // NOI18N
+        jScrollPane2.setViewportView(txtBio);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -314,6 +314,7 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         pilot.setNickname(nick);
         setOptions();
         person = new PilotPerson(pilot, choiceType.getSelectedIndex());
+        person.setBiography(txtBio.getText());
         setVisible(false);
     }//GEN-LAST:event_btnOkActionPerformed
 
@@ -420,7 +421,6 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
     private javax.swing.JComboBox choiceType;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTextPane jTextPane1;
     private javax.swing.JLabel lblCommandB;
     private javax.swing.JLabel lblGunnery;
     private javax.swing.JLabel lblInitB;
@@ -435,6 +435,7 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
     private javax.swing.JTextField textName;
     private javax.swing.JTextField textNickname;
     private javax.swing.JTextField textPiloting;
+    private javax.swing.JTextPane txtBio;
     // End of variables declaration//GEN-END:variables
 
     public void optionClicked(DialogOptionComponent arg0, IOption arg1, boolean arg2) {

@@ -44,6 +44,7 @@ public abstract class Person implements Serializable {
     //days of rest
     protected int daysRest;
     protected boolean deployed;
+    protected String biography;
     
     //default constructor
     public Person() {
@@ -111,5 +112,19 @@ public abstract class Person implements Serializable {
         if(null != task && deployed) {
             task.setTeam(null);
         }
+    }
+    
+    /**
+     * 
+     * @return an html String report for the person
+     */
+    public abstract String getDossier();
+    
+    public String getBiography() {
+        return biography;
+    }
+    
+    public void setBiography(String s) {
+        this.biography = s;
     }
 }
