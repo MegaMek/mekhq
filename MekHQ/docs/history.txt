@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.1.2 (SVN)
++ updated MegaMek.jar
 
 v0.1.1 (2009-09-29)
 + declare pilots KIA and retired
