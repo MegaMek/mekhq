@@ -3,6 +3,7 @@ VERSION HISTORY
 v0.1.2 (SVN)
 + updated MegaMek.jar
 + pilot portraits
++ unit camo
 
 v0.1.1 (2009-09-29)
 + declare pilots KIA and retired

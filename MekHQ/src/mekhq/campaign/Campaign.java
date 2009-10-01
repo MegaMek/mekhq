@@ -34,9 +34,9 @@ import megamek.common.Entity;
 import megamek.common.Game;
 import megamek.common.Mounted;
 import megamek.common.Pilot;
+import megamek.common.Player;
 import megamek.common.Protomech;
 import megamek.common.Tank;
-import megamek.common.Team;
 import mekhq.campaign.parts.EquipmentPart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
@@ -96,6 +96,9 @@ public class Campaign implements Serializable {
     
     private boolean overtime;
     private boolean gmMode;
+    
+    private String camoCategory = Player.NO_CAMO;
+    private String camoFileName = null;
     
     public Campaign() {
     
@@ -714,6 +717,22 @@ public class Campaign implements Serializable {
     
     public void addReport(String r) {
         currentReport.add(r);
+    }
+    
+    public void setCamoCategory(String name) {
+        camoCategory = name;
+    }
+
+    public String getCamoCategory() {
+        return camoCategory;
+    }
+
+    public void setCamoFileName(String name) {
+        camoFileName = name;
+    }
+
+    public String getCamoFileName() {
+        return camoFileName;
     }
     
 }

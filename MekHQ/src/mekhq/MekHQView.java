@@ -1574,7 +1574,7 @@ public class MekTableModel extends ArrayTableModel {
             Component c = this;
             Unit u = getUnitAt(row);
             setOpaque(true);
-            setUnit(u.getEntity());
+            setUnit(u);
             setText(getValueAt(row, column).toString());
             setToolTipText(campaign.getToolTipFor(u));
             if(isSelected) {
