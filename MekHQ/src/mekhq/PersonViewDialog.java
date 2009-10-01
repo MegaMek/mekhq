@@ -6,6 +6,8 @@
 
 package mekhq;
 
+import mekhq.campaign.personnel.Person;
+
 /**
  *
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
@@ -13,10 +15,11 @@ package mekhq;
 public class PersonViewDialog extends javax.swing.JDialog {
 
     /** Creates new form PersonViewDialog */
-    public PersonViewDialog(java.awt.Frame parent, boolean modal, String text) {
+    public PersonViewDialog(java.awt.Frame parent, boolean modal, Person person) {
         super(parent, modal);
         initComponents();
-        txtDesc.setText(text);
+        txtDesc.setText(person.getDossier());
+        
     }
 
     /** This method is called from within the constructor to
@@ -42,6 +45,7 @@ public class PersonViewDialog extends javax.swing.JDialog {
 
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(PersonViewDialog.class);
         txtDesc.setContentType(resourceMap.getString("txtDesc.contentType")); // NOI18N
+        txtDesc.setEditable(false);
         txtDesc.setFont(resourceMap.getFont("txtDesc.font")); // NOI18N
         txtDesc.setName("txtDesc"); // NOI18N
         jScrollPane1.setViewportView(txtDesc);
@@ -63,7 +67,7 @@ public class PersonViewDialog extends javax.swing.JDialog {
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                PersonViewDialog dialog = new PersonViewDialog(new javax.swing.JFrame(), true, "");
+                PersonViewDialog dialog = new PersonViewDialog(new javax.swing.JFrame(), true, null);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     public void windowClosing(java.awt.event.WindowEvent e) {
                         System.exit(0);

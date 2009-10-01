@@ -507,7 +507,7 @@ public class MekHQView extends FrameView {
 
         PersonTable.setModel(personnelModel);
         PersonTable.setName("PersonTable"); // NOI18N
-        PersonTable.setRowHeight(60);
+        PersonTable.setRowHeight(80);
         PersonTable.getColumnModel().getColumn(0).setCellRenderer(personnelModel.getRenderer());
         PersonTable.getSelectionModel().addListSelectionListener(new javax.swing.event.ListSelectionListener() {
             public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
@@ -1927,6 +1927,7 @@ public class PersonTableModel extends ArrayTableModel {
             setOpaque(true);
             setText(getValueAt(row, column).toString());
             Person p = getPersonAt(row);
+            setPortrait(p);
             //setToolTipText(campaign.getToolTipFor(u));
             if(isSelected) {
                select();
@@ -2055,7 +2056,7 @@ public class PersonTableMouseAdapter extends MouseInputAdapter implements Action
                 int row = PersonTable.rowAtPoint(e.getPoint());
                 Person person = personnelModel.getPersonAt(row);
                 if(null != person) {
-                    PersonViewDialog pvd = new PersonViewDialog(null, true, person.getDossier());
+                    PersonViewDialog pvd = new PersonViewDialog(null, true, person);
                     pvd.setVisible(true);
                 }
             }

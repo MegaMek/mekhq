@@ -419,7 +419,7 @@
                         </Property>
                       </Properties>
                       <AuxValues>
-                        <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="PersonTable.setRowHeight(60);&#xa;PersonTable.getColumnModel().getColumn(0).setCellRenderer(personnelModel.getRenderer());&#xa;PersonTable.getSelectionModel().addListSelectionListener(new javax.swing.event.ListSelectionListener() {&#xa;            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {&#xa;                PersonTableValueChanged(evt);&#xa;            }&#xa;        });&#xa;PersonTable.addMouseListener(personMouseAdapter);"/>
+                        <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="PersonTable.setRowHeight(80);&#xa;PersonTable.getColumnModel().getColumn(0).setCellRenderer(personnelModel.getRenderer());&#xa;PersonTable.getSelectionModel().addListSelectionListener(new javax.swing.event.ListSelectionListener() {&#xa;            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {&#xa;                PersonTableValueChanged(evt);&#xa;            }&#xa;        });&#xa;PersonTable.addMouseListener(personMouseAdapter);"/>
                       </AuxValues>
                     </Component>
                   </SubComponents>

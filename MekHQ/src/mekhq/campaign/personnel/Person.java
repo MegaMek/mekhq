@@ -22,6 +22,7 @@
 package mekhq.campaign.personnel;
 
 import java.io.Serializable;
+import megamek.common.Pilot;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.team.SupportTeam;
 import mekhq.campaign.work.PersonnelWorkItem;
@@ -45,15 +46,27 @@ public abstract class Person implements Serializable {
     protected int daysRest;
     protected boolean deployed;
     protected String biography;
+    protected String portraitCategory;
+    protected String portraitFile;
     
     //default constructor
     public Person() {
         daysRest = 0;
+        portraitCategory = Pilot.ROOT_PORTRAIT;
+        portraitFile = Pilot.PORTRAIT_NONE;
     }
     
     public abstract String getDesc();
     
     public abstract String getDescHTML();
+
+    public String getPortraitCategory() {
+        return portraitCategory;
+    }
+
+    public String getPortraitFileName() {
+        return portraitFile;
+    }
 
     public void setId(int id) {
         this.id = id;

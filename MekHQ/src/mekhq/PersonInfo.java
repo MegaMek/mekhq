@@ -8,7 +8,12 @@ package mekhq;
 
 import java.awt.Color;
 import java.awt.Image;
+import java.io.File;
 import javax.swing.ImageIcon;
+import megamek.client.ui.swing.util.ImageFileFactory;
+import megamek.common.Pilot;
+import megamek.common.util.DirectoryItems;
+import mekhq.campaign.personnel.Person;
 
 /**
  *
@@ -16,8 +21,17 @@ import javax.swing.ImageIcon;
  */
 public class PersonInfo extends javax.swing.JPanel {
 
+    // keep track of portrait images
+    private DirectoryItems portraits;
+    
     /** Creates new form TaskInfo */
-    public PersonInfo() {
+    public PersonInfo() {     
+        try {
+            portraits = new DirectoryItems(new File("data/images/portraits"), "", //$NON-NLS-1$ //$NON-NLS-2$
+                    ImageFileFactory.getInstance());
+        } catch (Exception e) {
+            portraits = null;
+        }
         initComponents();
     }
 
@@ -57,6 +71,41 @@ public class PersonInfo extends javax.swing.JPanel {
     
     public void unselect() {
         lblImage.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+    }
+    
+    /**
+     * set the portrait for the given person.
+     *
+     * @return The <code>Image</code> of the pilot's portrait. This value
+     *         will be <code>null</code> if no portrait was selected
+     *          or if there was an error loading it.
+     */
+    public void setPortrait(Person person) {
+
+        String category = person.getPortraitCategory();
+        String file = person.getPortraitFileName();
+
+        if(Pilot.ROOT_PORTRAIT.equals(category)) {
+            category = "";
+        }
+
+        // Return a null if the player has selected no portrait file.
+        if ((null == category) || (null == file) || Pilot.PORTRAIT_NONE.equals(file)) {
+            return;
+        }
+
+        // Try to get the player's portrait file.
+        Image portrait = null;
+        try {
+            portrait = (Image) portraits.getItem(category, file);
+            //make sure no images are longer than 72 pixels
+            if(null != portrait) {
+                portrait = portrait.getScaledInstance(-1, 65, Image.SCALE_DEFAULT);
+                this.setImage(portrait);
+            }
+        } catch (Exception err) {
+            err.printStackTrace();
+        }
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

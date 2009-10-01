@@ -21,6 +21,7 @@
 
 package mekhq.campaign.personnel;
 
+import java.io.File;
 import java.util.Enumeration;
 import megamek.common.Aero;
 import megamek.common.Entity;
@@ -54,12 +55,12 @@ public class PilotPerson extends Person {
         super();
         this.pilot = p;
         this.type = t;
+        this.portraitCategory = pilot.getPortraitCategory();
+        this.portraitFile = pilot.getPortraitFileName();
     }
     
     public PilotPerson(Pilot p, int t, Unit u) {
-        super();
-        this.pilot = p;
-        this.type = t;
+        this(p,t);
         this.unit = u;
     }
     
@@ -188,9 +189,20 @@ public class PilotPerson extends Person {
 
     @Override
     public String getDossier() {
-        String toReturn = "<b>" + pilot.getName() + "</b><br>";
-        toReturn += "<i>" + pilot.getNickname() + "</i><br><br>";
+        File file = new File(".");
+        String path = file.getAbsolutePath();
         
+        path = path.replace(".", "");
+        String category = getPortraitCategory();
+        String image = getPortraitFileName();
+        if(category.equals(Pilot.ROOT_PORTRAIT)) {
+            category = "";
+        }
+        String toReturn = "<html><b>" + pilot.getName() + "</b><br>";
+        toReturn += "<i>" + pilot.getNickname() + "</i><br><br>";
+        if(!image.equals(Pilot.PORTRAIT_NONE)) {
+            toReturn += "<img src=\"file://" + path + "data/images/portraits/" + category + image + "\"/>";
+        }
         toReturn += "<table>";
         toReturn += "<tr><td><b>Gunnery:</b></td><td>" + pilot.getGunnery() + "</td></tr>";
         toReturn += "<tr><td><b>Piloting:</b></td><td>" + pilot.getPiloting() + "</td></tr>";
@@ -215,6 +227,7 @@ public class PilotPerson extends Person {
             toReturn += "<br><br><b>Biography</b><br>";
             toReturn += getBiography();
         }
+        toReturn += "</html>";
         
         
         return toReturn;
