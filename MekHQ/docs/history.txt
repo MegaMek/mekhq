@@ -5,6 +5,7 @@ v0.1.2 (SVN)
 + pilot portraits
 + unit camo
 + CamoChoiceDialog
++ close button for PersonViewDialog
 
 v0.1.1 (2009-09-29)
 + declare pilots KIA and retired
