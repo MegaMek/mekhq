@@ -99,6 +99,7 @@ public class Campaign implements Serializable {
     
     private String camoCategory = Player.NO_CAMO;
     private String camoFileName = null;
+    private int colorIndex = 0;  
     
     public Campaign() {
     
@@ -733,6 +734,14 @@ public class Campaign implements Serializable {
 
     public String getCamoFileName() {
         return camoFileName;
+    }
+    
+    public int getColorIndex() {
+        return colorIndex;
+    }
+
+    public void setColorIndex(int index) {
+        colorIndex = index;
     }
     
 }

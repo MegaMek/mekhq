@@ -18,7 +18,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import megamek.client.ui.swing.MechTileset;
 import megamek.client.ui.swing.util.ImageFileFactory;
-import megamek.common.Entity;
+import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Player;
 import megamek.common.util.DirectoryItems;
 import mekhq.campaign.Campaign;
@@ -99,7 +99,8 @@ public class MekInfo extends JPanel {
             }
         }// end if(null tileset)
         Image base = mt.imageFor(u.getEntity(), c);
-        EntityImage entityImage = new EntityImage(base, 0x8686BF, getCamo(u.campaign), c);
+        int tint = PlayerColors.getColorRGB(u.campaign.getColorIndex());
+        EntityImage entityImage = new EntityImage(base, tint, getCamo(u.campaign), c);
         return entityImage.loadPreviewImage();
     }
     
