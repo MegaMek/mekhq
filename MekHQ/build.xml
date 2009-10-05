@@ -66,4 +66,69 @@
     nbproject/build-impl.xml file. 
 
     -->
+    <property name="data.dir" value="data" />
+    <property name="doc.dir" value="docs" />
+    <property name="log.dir" value="logs" />
+    <property name="timestampfile" value="${log.dir}/timestamp" />
+    
+    <target name="-post-jar">
+        <!-- Copy over data files and documentation-->
+        <copy todir="${dist.dir}/${data.dir}">
+            <fileset dir="${data.dir}" />
+        </copy>
+        <copy todir="${dist.dir}/${doc.dir}">
+            <fileset dir="${doc.dir}"/>
+        </copy>
+        <copy todir="${dist.dir}/${log.dir}">
+            <fileset dir="${log.dir}"/>
+        </copy>
+        <!--I cant figure out how to stop the default README.txt from being 
+            auto generated so I will just delete and replace with my own.-->
+        <delete>
+            <fileset dir="${dist.dir}">
+                <include name="README.TXT" />
+            </fileset>
+        </delete>
+        <copy todir="${dist.dir}">
+            <fileset dir="${basedir}">
+                <include name="README.txt" />
+            </fileset>
+        </copy>
+        <copy todir="${dist.dir}">
+            <fileset dir="${basedir}">
+                <include name="Example.mul" />
+            </fileset>
+        </copy>
+        <copy todir="${dist.dir}">
+            <fileset dir="${basedir}">
+                <include name="license.txt" />
+            </fileset>
+        </copy>
+    </target>
+    
+    <target name="-pre-compile">
+        <mkdir dir="${log.dir}" />
+        <touch file="${timestampfile}" />
+	<!-- Create the time stamp -->
+	<tstamp />
+    </target>
+    
+    <target name="-post-clean">
+        <delete dir="${log.dir}" />
+        <delete>
+            <fileset dir="${basedir}">
+                <include name="**/mekhq*.zip" />
+            </fileset>
+        </delete>
+        <delete>
+            <fileset dir="${data.dir}/mechfiles">
+                <include name="units.cache" />
+            </fileset>
+	</delete>
+    </target>
+    
+    <target name="package" depends="clean,jar">
+	<zip zipfile="${basedir}/mekhq-dev-svn-${DSTAMP}.zip" basedir="${dist.dir}" />
+    </target>
+    
 </project>
