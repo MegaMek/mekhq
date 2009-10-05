@@ -7,6 +7,7 @@ v0.1.2 (SVN)
 + CamoChoiceDialog
 + close button for PersonViewDialog
 + updated build.xml
++ PortraitChoiceDialog (not fully working)
 
 v0.1.1 (2009-09-29)
 + declare pilots KIA and retired

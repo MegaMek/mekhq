@@ -2047,6 +2047,13 @@ public class PersonTableMouseAdapter extends MouseInputAdapter implements Action
                     refreshUnitList();
                 }
             }
+            else if (command.equalsIgnoreCase("PORTRAIT")) {
+                PortraitChoiceDialog pcd = new PortraitChoiceDialog(null, true, person.getPortraitCategory(), person.getPortraitFileName());
+                pcd.setVisible(true);
+                person.setPortraitCategory(pcd.getCategory());
+                person.setPortraitFileName(pcd.getFileName());
+                refreshPersonnelList();
+            }
         }
 
         @Override
@@ -2093,6 +2100,12 @@ public class PersonTableMouseAdapter extends MouseInputAdapter implements Action
                 menuItem.setActionCommand("KIA");
                 menuItem.addActionListener(this);
                 menuItem.setEnabled(person.isDeployed());
+                popup.add(menuItem);
+                //change portrait
+                menuItem = new JMenuItem("Change Portrait...");
+                menuItem.setActionCommand("PORTRAIT");
+                menuItem.addActionListener(this);
+                menuItem.setEnabled(true);
                 popup.add(menuItem);
                 //TODO: add quirks?
                 menu = new JMenu("GM Mode");

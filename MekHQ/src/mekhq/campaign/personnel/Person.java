@@ -67,6 +67,14 @@ public abstract class Person implements Serializable {
     public String getPortraitFileName() {
         return portraitFile;
     }
+    
+    public void setPortraitCategory(String s) {
+        this.portraitCategory = s;
+    }
+
+    public void setPortraitFileName(String s) {
+        this.portraitFile = s;
+    }
 
     public void setId(int id) {
         this.id = id;

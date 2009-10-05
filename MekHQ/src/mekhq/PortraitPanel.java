@@ -13,6 +13,7 @@ import java.io.File;
 import javax.swing.ImageIcon;
 import megamek.client.ui.AWT.util.PlayerColors;
 import megamek.client.ui.swing.util.ImageFileFactory;
+import megamek.common.Pilot;
 import megamek.common.Player;
 import megamek.common.util.DirectoryItems;
 
@@ -20,17 +21,17 @@ import megamek.common.util.DirectoryItems;
  *
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class CamoPanel extends javax.swing.JPanel {
+public class PortraitPanel extends javax.swing.JPanel {
 
-    private DirectoryItems camos;
+    private DirectoryItems portraits;
     
     /** Creates new form CamoPanel */
-    public CamoPanel() {
+    public PortraitPanel() {
          try {
-            camos = new DirectoryItems(new File("data/images/camo"), "", //$NON-NLS-1$ //$NON-NLS-2$
+            portraits = new DirectoryItems(new File("data/images/portraits"), "", //$NON-NLS-1$ //$NON-NLS-2$
                     ImageFileFactory.getInstance());
         } catch (Exception e) {
-            camos = null;
+            portraits = null;
         }
         initComponents();
     }
@@ -50,7 +51,7 @@ public class CamoPanel extends javax.swing.JPanel {
         setName("Form"); // NOI18N
         setLayout(new java.awt.GridBagLayout());
 
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(CamoPanel.class);
+        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(PortraitPanel.class);
         lblImage.setText(resourceMap.getString("lblImage.text")); // NOI18N
         lblImage.setName("lblImage"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -70,33 +71,21 @@ public class CamoPanel extends javax.swing.JPanel {
       //  lblImage.setIcon(new ImageIcon(image));
     //}
     
-    public void setImage(String category, String name, int colorInd) {
+    public void setImage(String category, String name) {
 
-        if (null == category) {
-            return;
-        }
-        
-        if(Player.NO_CAMO.equals(category)) {
-            if (colorInd == -1) {
-                colorInd = 0;
-            }
-            BufferedImage tempImage = new BufferedImage(84, 72,
-                    BufferedImage.TYPE_INT_RGB);
-            Graphics2D graphics = tempImage.createGraphics();
-            graphics.setColor(PlayerColors.getColor(colorInd));
-            graphics.fillRect(0, 0, 84, 72);
-            lblImage.setIcon(new ImageIcon(tempImage));
+        if (null == category
+                || name.equals(Pilot.PORTRAIT_NONE)) {
             return;
         }
 
-        // Try to get the camo file.
+        // Try to get the portrait file.
         try {
 
-            // Translate the root camo directory name.
-            if (Player.ROOT_CAMO.equals(category))
+            // Translate the root portrait directory name.
+            if (Pilot.ROOT_PORTRAIT.equals(category))
                 category = ""; //$NON-NLS-1$
-            Image camo = (Image) camos.getItem(category, name);
-            lblImage.setIcon(new ImageIcon(camo));
+            Image portrait = (Image) portraits.getItem(category, name);
+            lblImage.setIcon(new ImageIcon(portrait));
         } catch (Exception err) {
             err.printStackTrace();
         }

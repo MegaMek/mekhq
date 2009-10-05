@@ -20,50 +20,48 @@ import javax.swing.event.MouseInputAdapter;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
 import megamek.client.ui.AWT.util.ImageFileFactory;
-import megamek.common.Player;
+import megamek.common.Pilot;
 import megamek.common.util.DirectoryItems;
 
 /**
  *
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class CamoChoiceDialog extends javax.swing.JDialog {
+public class PortraitChoiceDialog extends javax.swing.JDialog {
 
      /**
      * The categorized camo patterns.
      */
-    private DirectoryItems camos;
-    private CamoTableModel camoModel = new CamoTableModel();
+    private DirectoryItems portraits;
+    private PortraitTableModel portraitModel = new PortraitTableModel();
     private String category;
     private String filename;
-    private int colorIndex = -1;
-    private CamoTableMouseAdapter camoMouseAdapter;
+    private PortraitTableMouseAdapter portraitMouseAdapter;
     
     
     /** Creates new form CamoChoiceDialog */
-    public CamoChoiceDialog(java.awt.Frame parent, boolean modal, String category, String file, int color) {
+    public PortraitChoiceDialog(java.awt.Frame parent, boolean modal, String category, String file) {
         super(parent, modal);
         this.category = category;
         this.filename = file;
-        this.colorIndex = color;
-        camoMouseAdapter = new CamoTableMouseAdapter();
+        portraitMouseAdapter = new PortraitTableMouseAdapter();
         // Parse the camo directory.
         try {
-            camos = new DirectoryItems(new File("data/images/camo"), "", //$NON-NLS-1$ //$NON-NLS-2$
+            portraits = new DirectoryItems(new File("data/images/portraits"), "", //$NON-NLS-1$ //$NON-NLS-2$
                     ImageFileFactory.getInstance());
         } catch (Exception e) {
-            camos = null;
+            portraits = null;
         }
         initComponents();
         fillTable((String) comboCategories.getSelectedItem());
         int rowIndex = 0;
-        for(int i = 0; i < camoModel.getRowCount(); i++) {
-            if(((String) camoModel.getValueAt(i, 0)).equals(filename)) {
+        for(int i = 0; i < portraitModel.getRowCount(); i++) {
+            if(((String) portraitModel.getValueAt(i, 0)).equals(filename)) {
                 rowIndex = i;
                 break;
             }
         }
-        tableCamo.setRowSelectionInterval(rowIndex, rowIndex);
+        tablePortrait.setRowSelectionInterval(rowIndex, rowIndex);
     }
 
     /** This method is called from within the constructor to
@@ -77,7 +75,7 @@ public class CamoChoiceDialog extends javax.swing.JDialog {
         java.awt.GridBagConstraints gridBagConstraints;
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        tableCamo = new javax.swing.JTable();
+        tablePortrait = new javax.swing.JTable();
         comboCategories = new javax.swing.JComboBox();
         btnSelect = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
@@ -88,13 +86,13 @@ public class CamoChoiceDialog extends javax.swing.JDialog {
 
         jScrollPane1.setName("jScrollPane1"); // NOI18N
 
-        tableCamo.setModel(camoModel);
-        tableCamo.setName("tableCamo"); // NOI18N
-        tableCamo.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        tableCamo.setRowHeight(76);
-        tableCamo.getColumnModel().getColumn(0).setCellRenderer(camoModel.getRenderer());
-        tableCamo.addMouseListener(camoMouseAdapter);
-        jScrollPane1.setViewportView(tableCamo);
+        tablePortrait.setModel(portraitModel);
+        tablePortrait.setName("tablePortrait"); // NOI18N
+        tablePortrait.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        tablePortrait.setRowHeight(76);
+        tablePortrait.getColumnModel().getColumn(0).setCellRenderer(portraitModel.getRenderer());
+        tablePortrait.addMouseListener(portraitMouseAdapter);
+        jScrollPane1.setViewportView(tablePortrait);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -107,16 +105,10 @@ public class CamoChoiceDialog extends javax.swing.JDialog {
         getContentPane().add(jScrollPane1, gridBagConstraints);
 
         DefaultComboBoxModel categoryModel = new DefaultComboBoxModel();
-        categoryModel.addElement(Player.NO_CAMO);
         String match = null;
-        if (camos != null) {
-            if (camos.getItemNames("").hasNext()) { //$NON-NLS-1$
-                categoryModel.addElement(Player.ROOT_CAMO);
-                if(category.equals(Player.ROOT_CAMO)) {
-                    match = Player.ROOT_CAMO;
-                }
-            }
-            Iterator<String> names = camos.getCategoryNames();
+        categoryModel.addElement(Pilot.ROOT_PORTRAIT);
+        if (portraits != null) {
+            Iterator<String> names = portraits.getCategoryNames();
             while (names.hasNext()) {
                 String name = names.next();
                 if (!"".equals(name)) { //$NON-NLS-1$
@@ -130,7 +122,7 @@ public class CamoChoiceDialog extends javax.swing.JDialog {
         if(null != match) {
             categoryModel.setSelectedItem(match);
         } else {
-            categoryModel.setSelectedItem(Player.NO_CAMO);
+            categoryModel.setSelectedItem(Pilot.ROOT_PORTRAIT);
         }
         comboCategories.setModel(categoryModel);
         comboCategories.setName("comboCategories"); // NOI18N
@@ -147,7 +139,7 @@ public class CamoChoiceDialog extends javax.swing.JDialog {
         gridBagConstraints.weightx = 1.0;
         getContentPane().add(comboCategories, gridBagConstraints);
 
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(CamoChoiceDialog.class);
+        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(PortraitChoiceDialog.class);
         btnSelect.setText(resourceMap.getString("btnSelect.text")); // NOI18N
         btnSelect.setName("btnSelect"); // NOI18N
         btnSelect.addActionListener(new java.awt.event.ActionListener() {
@@ -182,13 +174,11 @@ private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
 }//GEN-LAST:event_btnCancelActionPerformed
 
 private void btnSelectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectActionPerformed
-    category = camoModel.getCategory();
-    if(category.equals(Player.NO_CAMO)) {
-        colorIndex = tableCamo.getSelectedRow();
-        filename = null;
-    }
-    else if(tableCamo.getSelectedRow() != -1) {
-        filename = (String) camoModel.getValueAt(tableCamo.getSelectedRow(), 0);
+    category = portraitModel.getCategory();
+    if(tablePortrait.getSelectedRow() != -1) {
+        filename = (String) portraitModel.getValueAt(tablePortrait.getSelectedRow(), 0);
+    } else {
+        filename = Pilot.PORTRAIT_NONE;
     }
     setVisible(false);
 }//GEN-LAST:event_btnSelectActionPerformed
@@ -206,34 +196,25 @@ private void comboCategoriesItemStateChanged(java.awt.event.ItemEvent evt) {//GE
     public String getFileName() {
         return filename;
     }
-    
-    public int getColorIndex() {
-        return colorIndex;
-    }
 
      private void fillTable(String category) {
-        camoModel.reset();
-        camoModel.setCategory(category);
-        if(Player.NO_CAMO.equals(category)) {
-            for (String color : Player.colorNames) {
-                camoModel.addCamo(color);
-            }
+        portraitModel.reset();
+        portraitModel.setCategory(category);
+        // Translate the "root camo" category name.
+        Iterator<String> portraitNames;
+        if (Pilot.ROOT_PORTRAIT.equals(category)) {
+            portraitModel.addPortrait(Pilot.PORTRAIT_NONE);
+            portraitNames = portraits.getItemNames(""); //$NON-NLS-1$
         } else {
-            // Translate the "root camo" category name.
-            Iterator<String> camoNames;
-            if (Player.ROOT_CAMO.equals(category)) {
-                camoNames = camos.getItemNames(""); //$NON-NLS-1$
-            } else {
-                camoNames = camos.getItemNames(category);
-            }
-
-            // Get the camo names for this category.
-            while (camoNames.hasNext()) {
-                camoModel.addCamo(camoNames.next());
-            }
+            portraitNames = portraits.getItemNames(category);
         }
-        if(camoModel.getRowCount() > 0) {
-            tableCamo.setRowSelectionInterval(0, 0);
+
+        // Get the camo names for this category.
+        while (portraitNames.hasNext()) {
+                portraitModel.addPortrait(portraitNames.next());
+        }
+        if(portraitModel.getRowCount() > 0) {
+            tablePortrait.setRowSelectionInterval(0, 0);
         }
     }
 
@@ -243,7 +224,7 @@ private void comboCategoriesItemStateChanged(java.awt.event.ItemEvent evt) {//GE
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                CamoChoiceDialog dialog = new CamoChoiceDialog(new javax.swing.JFrame(), true, Player.NO_CAMO, null, -1);
+                PortraitChoiceDialog dialog = new PortraitChoiceDialog(new javax.swing.JFrame(), true, Pilot.ROOT_PORTRAIT, Pilot.PORTRAIT_NONE);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     public void windowClosing(java.awt.event.WindowEvent e) {
                         System.exit(0);
@@ -257,16 +238,16 @@ private void comboCategoriesItemStateChanged(java.awt.event.ItemEvent evt) {//GE
      /**
         * A table model for displaying camos
      */
-    public class CamoTableModel extends AbstractTableModel {
+    public class PortraitTableModel extends AbstractTableModel {
 
         private String[] columnNames;
         private String category;
         private ArrayList<String> names;
         private ArrayList<Image> images;
      
-        public CamoTableModel() {
-            columnNames = new String[] {"Camos"};
-            category = Player.NO_CAMO;
+        public PortraitTableModel() {
+            columnNames = new String[] {"Portraits"};
+            category = Pilot.ROOT_PORTRAIT;
             names = new ArrayList<String>();
             images = new ArrayList<Image>();
         }
@@ -282,7 +263,7 @@ private void comboCategoriesItemStateChanged(java.awt.event.ItemEvent evt) {//GE
         }
         
         public void reset() {
-            category = Player.NO_CAMO;
+            category = Pilot.ROOT_PORTRAIT;
             names = new ArrayList<String>();
             images = new ArrayList<Image>();
         }
@@ -309,7 +290,7 @@ private void comboCategoriesItemStateChanged(java.awt.event.ItemEvent evt) {//GE
             return category;
         }
         
-        public void addCamo(String name) {
+        public void addPortrait(String name) {
             names.add(name);
             fireTableDataChanged();
         }
@@ -324,12 +305,12 @@ private void comboCategoriesItemStateChanged(java.awt.event.ItemEvent evt) {//GE
             return false;
         }
 
-        public CamoTableModel.Renderer getRenderer() {
-            return new CamoTableModel.Renderer();
+        public PortraitTableModel.Renderer getRenderer() {
+            return new PortraitTableModel.Renderer();
         }
 
 
-        public class Renderer extends CamoPanel implements TableCellRenderer {
+        public class Renderer extends PortraitPanel implements TableCellRenderer {
             
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
@@ -337,7 +318,7 @@ private void comboCategoriesItemStateChanged(java.awt.event.ItemEvent evt) {//GE
                 setOpaque(true);
                 String name = getValueAt(row, column).toString();
                 setText(getValueAt(row, column).toString());
-                setImage(category, name, row);
+                setImage(category, name);
                 if(isSelected) {
                     setBackground(new Color(220,220,220));
                 } else {
@@ -349,22 +330,18 @@ private void comboCategoriesItemStateChanged(java.awt.event.ItemEvent evt) {//GE
        }
     }
     
-    public class CamoTableMouseAdapter extends MouseInputAdapter {
+    public class PortraitTableMouseAdapter extends MouseInputAdapter {
 
         @Override
         public void mouseClicked(MouseEvent e) {
 
             if (e.getClickCount() == 2) {
-                int row = tableCamo.rowAtPoint(e.getPoint());
-                category = camoModel.getCategory();
-                if(category.equals(Player.NO_CAMO)) {
-                    colorIndex = tableCamo.getSelectedRow();
-                    filename = null;
+                int row = tablePortrait.rowAtPoint(e.getPoint());
+                if(row < portraitModel.getRowCount()) {
+                    category = portraitModel.getCategory();
+                    filename = (String) portraitModel.getValueAt(row, 0);
+                    setVisible(false);
                 }
-                else {
-                    filename = (String) camoModel.getValueAt(row, 0);
-                }
-                setVisible(false);
             }
         }
     }
@@ -375,7 +352,7 @@ private void comboCategoriesItemStateChanged(java.awt.event.ItemEvent evt) {//GE
     private javax.swing.JButton btnSelect;
     private javax.swing.JComboBox comboCategories;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable tableCamo;
+    private javax.swing.JTable tablePortrait;
     // End of variables declaration//GEN-END:variables
 
 }

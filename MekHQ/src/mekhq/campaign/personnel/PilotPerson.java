@@ -232,4 +232,17 @@ public class PilotPerson extends Person {
         
         return toReturn;
     }
+    
+    @Override
+    public void setPortraitCategory(String s) {
+        super.setPortraitCategory(s);
+        pilot.setPortraitCategory(s);
+        
+    }
+
+    @Override
+    public void setPortraitFileName(String s) {
+        super.setPortraitFileName(s);
+        pilot.setPortraitFileName(s);
+    }
 }
