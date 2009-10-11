@@ -14,11 +14,13 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
+
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JTable;
 import javax.swing.event.MouseInputAdapter;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
+
 import megamek.client.ui.AWT.util.ImageFileFactory;
 import megamek.common.Player;
 import megamek.common.util.DirectoryItems;
@@ -38,14 +40,14 @@ public class CamoChoiceDialog extends javax.swing.JDialog {
     private String filename;
     private int colorIndex = -1;
     private CamoTableMouseAdapter camoMouseAdapter;
-    
-    
+
+
     /** Creates new form CamoChoiceDialog */
     public CamoChoiceDialog(java.awt.Frame parent, boolean modal, String category, String file, int color) {
         super(parent, modal);
         this.category = category;
-        this.filename = file;
-        this.colorIndex = color;
+        filename = file;
+        colorIndex = color;
         camoMouseAdapter = new CamoTableMouseAdapter();
         // Parse the camo directory.
         try {
@@ -202,11 +204,11 @@ private void comboCategoriesItemStateChanged(java.awt.event.ItemEvent evt) {//GE
     public String getCategory() {
         return category;
     }
-    
+
     public String getFileName() {
         return filename;
     }
-    
+
     public int getColorIndex() {
         return colorIndex;
     }
@@ -245,6 +247,7 @@ private void comboCategoriesItemStateChanged(java.awt.event.ItemEvent evt) {//GE
             public void run() {
                 CamoChoiceDialog dialog = new CamoChoiceDialog(new javax.swing.JFrame(), true, Player.NO_CAMO, null, -1);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+                    @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {
                         System.exit(0);
                     }
@@ -263,24 +266,22 @@ private void comboCategoriesItemStateChanged(java.awt.event.ItemEvent evt) {//GE
         private String category;
         private ArrayList<String> names;
         private ArrayList<Image> images;
-     
+
         public CamoTableModel() {
             columnNames = new String[] {"Camos"};
             category = Player.NO_CAMO;
             names = new ArrayList<String>();
             images = new ArrayList<Image>();
         }
-        
-        @Override
+
         public int getRowCount() {
             return names.size();
         }
 
-        @Override
         public int getColumnCount() {
             return 1;
         }
-        
+
         public void reset() {
             category = Player.NO_CAMO;
             names = new ArrayList<String>();
@@ -291,29 +292,28 @@ private void comboCategoriesItemStateChanged(java.awt.event.ItemEvent evt) {//GE
         public String getColumnName(int column) {
             return columnNames[column];
         }
-        
-        @Override
+
         public Object getValueAt(int row, int col) {
             return names.get(row);
         }
-        
+
         public Object getImageAt(int row) {
             return images.get(row);
         }
-        
+
         public void setCategory(String c) {
             category = c;
         }
-        
+
         public String getCategory() {
             return category;
         }
-        
+
         public void addCamo(String name) {
             names.add(name);
             fireTableDataChanged();
         }
-        
+
         @Override
         public Class getColumnClass(int c) {
             return getValueAt(0, c).getClass();
@@ -330,8 +330,7 @@ private void comboCategoriesItemStateChanged(java.awt.event.ItemEvent evt) {//GE
 
 
         public class Renderer extends CamoPanel implements TableCellRenderer {
-            
-            @Override
+
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 Component c = this;
                 setOpaque(true);
@@ -348,7 +347,7 @@ private void comboCategoriesItemStateChanged(java.awt.event.ItemEvent evt) {//GE
             }
        }
     }
-    
+
     public class CamoTableMouseAdapter extends MouseInputAdapter {
 
         @Override
@@ -369,7 +368,7 @@ private void comboCategoriesItemStateChanged(java.awt.event.ItemEvent evt) {//GE
         }
     }
 
-    
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnSelect;

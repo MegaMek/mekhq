@@ -14,11 +14,13 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
+
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JTable;
 import javax.swing.event.MouseInputAdapter;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
+
 import megamek.client.ui.AWT.util.ImageFileFactory;
 import megamek.common.Pilot;
 import megamek.common.util.DirectoryItems;
@@ -37,13 +39,13 @@ public class PortraitChoiceDialog extends javax.swing.JDialog {
     private String category;
     private String filename;
     private PortraitTableMouseAdapter portraitMouseAdapter;
-    
-    
+
+
     /** Creates new form CamoChoiceDialog */
     public PortraitChoiceDialog(java.awt.Frame parent, boolean modal, String category, String file) {
         super(parent, modal);
         this.category = category;
-        this.filename = file;
+        filename = file;
         portraitMouseAdapter = new PortraitTableMouseAdapter();
         // Parse the camo directory.
         try {
@@ -192,7 +194,7 @@ private void comboCategoriesItemStateChanged(java.awt.event.ItemEvent evt) {//GE
     public String getCategory() {
         return category;
     }
-    
+
     public String getFileName() {
         return filename;
     }
@@ -226,6 +228,7 @@ private void comboCategoriesItemStateChanged(java.awt.event.ItemEvent evt) {//GE
             public void run() {
                 PortraitChoiceDialog dialog = new PortraitChoiceDialog(new javax.swing.JFrame(), true, Pilot.ROOT_PORTRAIT, Pilot.PORTRAIT_NONE);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+                    @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {
                         System.exit(0);
                     }
@@ -244,24 +247,22 @@ private void comboCategoriesItemStateChanged(java.awt.event.ItemEvent evt) {//GE
         private String category;
         private ArrayList<String> names;
         private ArrayList<Image> images;
-     
+
         public PortraitTableModel() {
             columnNames = new String[] {"Portraits"};
             category = Pilot.ROOT_PORTRAIT;
             names = new ArrayList<String>();
             images = new ArrayList<Image>();
         }
-        
-        @Override
+
         public int getRowCount() {
             return names.size();
         }
 
-        @Override
         public int getColumnCount() {
             return 1;
         }
-        
+
         public void reset() {
             category = Pilot.ROOT_PORTRAIT;
             names = new ArrayList<String>();
@@ -272,29 +273,28 @@ private void comboCategoriesItemStateChanged(java.awt.event.ItemEvent evt) {//GE
         public String getColumnName(int column) {
             return columnNames[column];
         }
-        
-        @Override
+
         public Object getValueAt(int row, int col) {
             return names.get(row);
         }
-        
+
         public Object getImageAt(int row) {
             return images.get(row);
         }
-        
+
         public void setCategory(String c) {
             category = c;
         }
-        
+
         public String getCategory() {
             return category;
         }
-        
+
         public void addPortrait(String name) {
             names.add(name);
             fireTableDataChanged();
         }
-        
+
         @Override
         public Class getColumnClass(int c) {
             return getValueAt(0, c).getClass();
@@ -311,8 +311,7 @@ private void comboCategoriesItemStateChanged(java.awt.event.ItemEvent evt) {//GE
 
 
         public class Renderer extends PortraitPanel implements TableCellRenderer {
-            
-            @Override
+
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 Component c = this;
                 setOpaque(true);
@@ -329,7 +328,7 @@ private void comboCategoriesItemStateChanged(java.awt.event.ItemEvent evt) {//GE
             }
        }
     }
-    
+
     public class PortraitTableMouseAdapter extends MouseInputAdapter {
 
         @Override
@@ -346,7 +345,7 @@ private void comboCategoriesItemStateChanged(java.awt.event.ItemEvent evt) {//GE
         }
     }
 
-    
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnSelect;
