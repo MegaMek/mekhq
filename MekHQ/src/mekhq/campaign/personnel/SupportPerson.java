@@ -47,7 +47,7 @@ public class SupportPerson extends Person {
         if(team.getCasualties() > 0) {
             casualties = " (" + team.getCasualties() + " casualties) ";
         }
-        return team.getName() + " [" + team.getRatingName() + " " + team.getTypeDesc() + "]"  + casualties ;
+        return team.getName() + " [" + team.getRatingName() + " " + team.getTypeDesc() + "]"  + casualties;
     }
     
     @Override
@@ -87,6 +87,7 @@ public class SupportPerson extends Person {
     @Override
     public String getDossier() {
         String toReturn = "<b>" + team.getName() + "</b><br>";
+        toReturn += "<b>XP:" + getXp() + "</b><br>";
         
         return toReturn;
     }

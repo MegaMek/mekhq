@@ -24,6 +24,7 @@ package mekhq.campaign.personnel;
 import java.io.File;
 import java.util.Enumeration;
 import megamek.common.Aero;
+import megamek.common.BattleArmor;
 import megamek.common.Entity;
 import megamek.common.Mech;
 import megamek.common.Pilot;
@@ -45,7 +46,8 @@ public class PilotPerson extends Person {
     public static final int T_VEE = 1;
     public static final int T_AERO = 2;
     public static final int T_PROTO = 3;
-    public static final int T_NUM = 4;
+    public static final int T_BA = 4;
+    public static final int T_NUM = 5;
     
     private Pilot pilot;
     private int type;
@@ -78,6 +80,8 @@ public class PilotPerson extends Person {
                 return "Aero Pilot";
             case(T_PROTO):
                 return "Proto Pilot";
+            case(T_BA):
+                return "Battle armor Pilot";
             default:
                 return "??";
         }
@@ -99,6 +103,9 @@ public class PilotPerson extends Person {
         else if(en instanceof Tank) {
             return T_VEE;
         }
+        else if(en instanceof BattleArmor) {
+            return T_BA;
+        }
         return -1;
     }
     
@@ -113,6 +120,9 @@ public class PilotPerson extends Person {
             return true;
         }
         else if(en instanceof Tank && type == T_VEE) {
+            return true;
+        }
+        else if(en instanceof BattleArmor && type == T_BA) {
             return true;
         }
         return false;
@@ -133,7 +143,7 @@ public class PilotPerson extends Person {
         if(pilot.getHits() > 0) {
             status = " (" + pilot.getStatusDesc() + ")";
         }
-        return care + pilot.getName() + " [" + pilot.getGunnery() + "/" + pilot.getPiloting() + " " + getTypeDesc() + "]" + status; 
+        return care + pilot.getName() + " [" + pilot.getGunnery() + "/" + pilot.getPiloting() + " " + getTypeDesc() + "]" + status;
     }
     
     @Override
@@ -208,6 +218,7 @@ public class PilotPerson extends Person {
         toReturn += "<tr><td><b>Piloting:</b></td><td>" + pilot.getPiloting() + "</td></tr>";
         toReturn += "<tr><td><b>Iniative Bonus:</b></td><td>" + pilot.getInitBonus() + "</td></tr>";
         toReturn += "<tr><td><b>Commander Bonus:</b></td><td>" + pilot.getCommandBonus() + "</td></tr>";
+        toReturn += "<tr><td><b>XP:</b></td><td>" + getXp() + "</td></tr>";
         toReturn += "</table>";
      
         for (Enumeration<IOptionGroup> advGroups = pilot.getOptions().getGroups(); advGroups.hasMoreElements();) {

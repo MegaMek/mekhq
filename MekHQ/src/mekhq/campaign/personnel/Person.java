@@ -48,12 +48,15 @@ public abstract class Person implements Serializable {
     protected String biography;
     protected String portraitCategory;
     protected String portraitFile;
+
+    protected int xp;
     
     //default constructor
     public Person() {
         daysRest = 0;
         portraitCategory = Pilot.ROOT_PORTRAIT;
         portraitFile = Pilot.PORTRAIT_NONE;
+        xp = 0;
     }
     
     public abstract String getDesc();
@@ -90,6 +93,14 @@ public abstract class Person implements Serializable {
     
     public PersonnelWorkItem getTask() {
         return task;
+    }
+
+    public int getXp() {
+        return xp;
+    }
+
+    public void setXp(int xp) {
+        this.xp = xp;
     }
     
     public SupportTeam getTeamAssigned() {
