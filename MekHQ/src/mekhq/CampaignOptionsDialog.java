@@ -11,15 +11,24 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
+import javax.swing.JFormattedTextField;
+import javax.swing.JFormattedTextField.AbstractFormatter;
+import javax.swing.JFormattedTextField.AbstractFormatterFactory;
+import javax.swing.text.DefaultFormatter;
+import javax.swing.text.DefaultFormatterFactory;
+import javax.swing.text.NumberFormatter;
 import megamek.client.ui.swing.util.ImageFileFactory;
 import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Player;
 import megamek.common.util.DirectoryItems;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.Faction;
 
 /**
@@ -57,6 +66,11 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         }
         initComponents();
         setCamoIcon();
+        
+        // Rules panel
+        this.useFactionModifiersCheckBox.setSelected(CampaignOptions.useFactionModifiers);
+        this.clanPriceModifierJFormattedTextField.setValue(new Double(CampaignOptions.clanPriceModifier));
+        this.useEasierRefitCheckBox.setSelected(CampaignOptions.useEasierRefit);
     }
 
     /** This method is called from within the constructor to
@@ -79,6 +93,19 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         comboFaction = new javax.swing.JComboBox();
         btnCamo = new javax.swing.JButton();
         lblCamo = new javax.swing.JLabel();
+        panRules = new javax.swing.JPanel();
+        useFactionModifiersCheckBox = new javax.swing.JCheckBox();
+        javax.swing.JLabel clanPriceModifierLabel = new javax.swing.JLabel();
+        DecimalFormat numberFormat = (DecimalFormat) DecimalFormat.getInstance();
+        numberFormat.setMaximumFractionDigits(2);
+        DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols();
+        decimalFormatSymbols.setGroupingSeparator(' ');
+        decimalFormatSymbols.setDecimalSeparator('.');
+        numberFormat.setDecimalFormatSymbols(decimalFormatSymbols);
+        clanPriceModifierJFormattedTextField = clanPriceModifierJFormattedTextField = new JFormattedTextField(numberFormat);
+        useEasierRefitCheckBox = new javax.swing.JCheckBox();
+        repairSystemComboBox = new javax.swing.JComboBox();
+        javax.swing.JLabel repairSystemComboBoxLabel = new javax.swing.JLabel();
         btnOkay = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
 
@@ -186,6 +213,59 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         tabOptions.addTab(resourceMap.getString("panGeneral.TabConstraints.tabTitle"), panGeneral); // NOI18N
 
+        panRules.setName("panRules"); // NOI18N
+        panRules.setLayout(new java.awt.GridBagLayout());
+
+        useFactionModifiersCheckBox.setText(resourceMap.getString("useFactionModifiersCheckBox.text")); // NOI18N
+        useFactionModifiersCheckBox.setToolTipText(resourceMap.getString("useFactionModifiersCheckBox.toolTipText")); // NOI18N
+        useFactionModifiersCheckBox.setName("useFactionModifiersCheckBox"); // NOI18N
+        panRules.add(useFactionModifiersCheckBox, new java.awt.GridBagConstraints());
+
+        clanPriceModifierLabel.setText(resourceMap.getString("clanPriceModifierLabel.text")); // NOI18N
+        clanPriceModifierLabel.setName("clanPriceModifierLabel"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        panRules.add(clanPriceModifierLabel, gridBagConstraints);
+
+        clanPriceModifierJFormattedTextField.setColumns(4);
+        clanPriceModifierJFormattedTextField.setToolTipText(resourceMap.getString("clanPriceModifierJFormattedTextField.toolTipText")); // NOI18N
+        clanPriceModifierJFormattedTextField.setName("clanPriceModifierJFormattedTextField"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        panRules.add(clanPriceModifierJFormattedTextField, gridBagConstraints);
+
+        useEasierRefitCheckBox.setText(resourceMap.getString("useEasierRefitCheckBox.text")); // NOI18N
+        useEasierRefitCheckBox.setToolTipText(resourceMap.getString("useEasierRefitCheckBox.toolTipText")); // NOI18N
+        useEasierRefitCheckBox.setName("useEasierRefitCheckBox"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        panRules.add(useEasierRefitCheckBox, gridBagConstraints);
+
+        DefaultComboBoxModel repairSystemComboBoxModel = new DefaultComboBoxModel();
+        for (int i=0;i<CampaignOptions.REPAIR_SYSTEM_NAMES.length; i++) {
+            repairSystemComboBoxModel.addElement(CampaignOptions.getRepairSystemName(i));
+        }
+        repairSystemComboBox.setModel(repairSystemComboBoxModel);
+        repairSystemComboBox.setToolTipText(resourceMap.getString("repairSystemComboBox.toolTipText")); // NOI18N
+        repairSystemComboBox.setName("repairSystemComboBox"); // NOI18N
+        repairSystemComboBox.setSelectedIndex(CampaignOptions.repairSystem);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 4;
+        panRules.add(repairSystemComboBox, gridBagConstraints);
+
+        repairSystemComboBoxLabel.setText(resourceMap.getString("repairSystemComboBoxLabel.text")); // NOI18N
+        repairSystemComboBoxLabel.setName("repairSystemComboBoxLabel"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        panRules.add(repairSystemComboBoxLabel, gridBagConstraints);
+
+        tabOptions.addTab(resourceMap.getString("panRules.TabConstraints.tabTitle"), panRules); // NOI18N
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -241,6 +321,15 @@ private void btnOkayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
     campaign.setCamoCategory(camoCategory);
     campaign.setCamoFileName(camoFileName);
     campaign.setColorIndex(colorIndex);
+    
+    // Rules panel
+    CampaignOptions.useFactionModifiers = useFactionModifiersCheckBox.isSelected();
+    String clanPriceModifierString = clanPriceModifierJFormattedTextField.getText();
+    CampaignOptions.clanPriceModifier = (new Double(clanPriceModifierString)).floatValue();
+    CampaignOptions.useEasierRefit = useEasierRefitCheckBox.isSelected();
+    CampaignOptions.repairSystem = repairSystemComboBox.getSelectedIndex();
+
+    campaign.refreshAllUnitDiagnostics();
 }//GEN-LAST:event_btnOkayActionPerformed
 
 private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
@@ -326,14 +415,19 @@ public String getDateAsString() {
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnDate;
     private javax.swing.JButton btnOkay;
+    private javax.swing.JFormattedTextField clanPriceModifierJFormattedTextField;
     private javax.swing.JComboBox comboFaction;
     private javax.swing.JLabel lblCamo;
     private javax.swing.JLabel lblDate;
     private javax.swing.JLabel lblFaction;
     private javax.swing.JLabel lblName;
     private javax.swing.JPanel panGeneral;
+    private javax.swing.JPanel panRules;
+    private javax.swing.JComboBox repairSystemComboBox;
     private javax.swing.JTabbedPane tabOptions;
     private javax.swing.JTextField txtName;
+    private javax.swing.JCheckBox useEasierRefitCheckBox;
+    private javax.swing.JCheckBox useFactionModifiersCheckBox;
     // End of variables declaration//GEN-END:variables
 
 }

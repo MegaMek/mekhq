@@ -98,7 +98,7 @@ public class MekInfo extends JPanel {
                 //TODO: do something here
             }
         }// end if(null tileset)
-        Image base = mt.imageFor(u.getEntity(), c);
+        Image base = mt.imageFor(u.getEntity(), c, -1);
         int tint = PlayerColors.getColorRGB(u.campaign.getColorIndex());
         EntityImage entityImage = new EntityImage(base, tint, getCamo(u.campaign), c);
         return entityImage.loadPreviewImage();

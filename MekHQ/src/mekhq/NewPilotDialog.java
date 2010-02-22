@@ -23,6 +23,7 @@ import megamek.common.WeaponType;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.PilotPerson;
 
 /**
@@ -32,17 +33,28 @@ import mekhq.campaign.personnel.PilotPerson;
 public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionListener {
 
     private Pilot pilot;
-    private PilotPerson person;
     private ArrayList<DialogOptionComponent> optionComps = new ArrayList<DialogOptionComponent>();
     private PilotOptions options;
 
+    private Campaign campaign;
+
     /** Creates new form NewPilotDialog */
-    public NewPilotDialog(java.awt.Frame parent, boolean modal) {
+    public NewPilotDialog(java.awt.Frame parent, boolean modal, Campaign campaign) {
         super(parent, modal);
+        this.campaign = campaign;
+        initializePilotAndOptions();
+    }
+
+    private void initializePilotAndOptions () {
+        refreshPilotAndOptions();
+    }
+
+    private void refreshPilotAndOptions () {
         pilot = new Pilot("Roy Fokker", 4, 5);
         pilot.setNickname("Big Brother");
         options = pilot.getOptions();
-        person = null;
+
+        getContentPane().removeAll();
         initComponents();
         refreshOptions();
     }
@@ -76,7 +88,7 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         txtBio = new javax.swing.JTextPane();
         panButtons = new javax.swing.JPanel();
         btnOk = new javax.swing.JButton();
-        btnCancel = new javax.swing.JButton();
+        btnClose = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(NewPilotDialog.class);
@@ -275,17 +287,17 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panButtons.add(btnOk, gridBagConstraints);
 
-        btnCancel.setText(resourceMap.getString("btnCancel.text")); // NOI18N
-        btnCancel.setName("btnCancel"); // NOI18N
-        btnCancel.addActionListener(new java.awt.event.ActionListener() {
+        btnClose.setText(resourceMap.getString("btnClose.text")); // NOI18N
+        btnClose.setName("btnClose"); // NOI18N
+        btnClose.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCancelActionPerformed(evt);
+                btnCloseActionPerformed(evt);
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 7;
-        panButtons.add(btnCancel, gridBagConstraints);
+        panButtons.add(btnClose, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -297,11 +309,12 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
+    private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
         setVisible(false);
-    }//GEN-LAST:event_btnCancelActionPerformed
+    }//GEN-LAST:event_btnCloseActionPerformed
 
     private void btnOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOkActionPerformed
+        PilotPerson person = null;
         int piloting = Integer.parseInt(textPiloting.getText());
         int gunnery = Integer.parseInt(textGunnery.getText());
         int initb = Integer.parseInt(textInitB.getText());
@@ -315,7 +328,9 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         setOptions();
         person = new PilotPerson(pilot, choiceType.getSelectedIndex());
         person.setBiography(txtBio.getText());
-        setVisible(false);
+
+        campaign.addPerson(person);
+        refreshPilotAndOptions();
     }//GEN-LAST:event_btnOkActionPerformed
 
     /**
@@ -324,7 +339,7 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                NewPilotDialog dialog = new NewPilotDialog(new javax.swing.JFrame(), true);
+                NewPilotDialog dialog = new NewPilotDialog(new javax.swing.JFrame(), true, null);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {
@@ -410,13 +425,8 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         }
     }
 
-    public PilotPerson getPilotPerson() {
-        return person;
-    }
-
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnCancel;
+    private javax.swing.JButton btnClose;
     private javax.swing.JButton btnOk;
     private javax.swing.JComboBox choiceType;
     private javax.swing.JScrollPane jScrollPane1;

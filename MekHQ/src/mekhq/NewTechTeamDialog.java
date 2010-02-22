@@ -23,6 +23,7 @@ package mekhq;
 
 import mekhq.campaign.team.SupportTeam;
 import javax.swing.DefaultComboBoxModel;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.team.TechTeam;
 
 /**
@@ -30,13 +31,14 @@ import mekhq.campaign.team.TechTeam;
  * @author  Taharqa
  */
 public class NewTechTeamDialog extends javax.swing.JDialog {
-
-    private TechTeam tech;
+    
+    private Campaign campaign;
     
     /** Creates new form NewTeamDialog */
-    public NewTechTeamDialog(java.awt.Frame parent, boolean modal) {
+    public NewTechTeamDialog(java.awt.Frame parent, boolean modal, Campaign campaign) {
         super(parent, modal);
-        this.tech = null;
+        this.campaign = campaign;
+        
         initComponents();
     }
 
@@ -53,8 +55,8 @@ public class NewTechTeamDialog extends javax.swing.JDialog {
         chTeamRating = new javax.swing.JComboBox();
         lblTeamName = new javax.swing.JLabel();
         lblTeamRating = new javax.swing.JLabel();
-        btnDone = new javax.swing.JButton();
-        btnCancel = new javax.swing.JButton();
+        btnHire = new javax.swing.JButton();
+        btnClose = new javax.swing.JButton();
         lblTeamType = new javax.swing.JLabel();
         chTeamType = new javax.swing.JComboBox();
 
@@ -84,19 +86,19 @@ public class NewTechTeamDialog extends javax.swing.JDialog {
         lblTeamRating.setText(resourceMap.getString("lblTeamRating.text")); // NOI18N
         lblTeamRating.setName("lblTeamRating"); // NOI18N
 
-        btnDone.setText(resourceMap.getString("btnDone.text")); // NOI18N
-        btnDone.setName("btnDone"); // NOI18N
-        btnDone.addActionListener(new java.awt.event.ActionListener() {
+        btnHire.setText(resourceMap.getString("btnHire.text")); // NOI18N
+        btnHire.setName("btnHire"); // NOI18N
+        btnHire.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnDoneActionPerformed(evt);
+                btnHireActionPerformed(evt);
             }
         });
 
-        btnCancel.setText(resourceMap.getString("btnCancel.text")); // NOI18N
-        btnCancel.setName("btnCancel"); // NOI18N
-        btnCancel.addActionListener(new java.awt.event.ActionListener() {
+        btnClose.setText(resourceMap.getString("btnClose.text")); // NOI18N
+        btnClose.setName("btnClose"); // NOI18N
+        btnClose.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCancelActionPerformed(evt);
+                btnCloseActionPerformed(evt);
             }
         });
 
@@ -132,9 +134,9 @@ public class NewTechTeamDialog extends javax.swing.JDialog {
                         .add(lblTeamType)
                         .addContainerGap(338, Short.MAX_VALUE))
                     .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                        .add(btnDone)
+                        .add(btnHire)
                         .add(18, 18, 18)
-                        .add(btnCancel)
+                        .add(btnClose)
                         .add(100, 100, 100))))
         );
         layout.setVerticalGroup(
@@ -154,29 +156,29 @@ public class NewTechTeamDialog extends javax.swing.JDialog {
                     .add(chTeamType, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .add(18, 18, 18)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(btnCancel)
-                    .add(btnDone))
+                    .add(btnClose)
+                    .add(btnHire))
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-private void btnDoneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDoneActionPerformed
+private void btnHireActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
     int rating = chTeamRating.getSelectedIndex();
     int type = chTeamType.getSelectedIndex();
     String name = txtTeamName.getText();
-    tech = new TechTeam(name, rating, type);
-    this.setVisible(false);
-}//GEN-LAST:event_btnDoneActionPerformed
+    TechTeam tech = new TechTeam(name, rating, type);
+    campaign.addTeam(tech);
+}//GEN-LAST:event_btnHireActionPerformed
 
 private void txtTeamNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtTeamNameActionPerformed
 // TODO add your handling code here:
 }//GEN-LAST:event_txtTeamNameActionPerformed
 
-private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
+private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
     this.setVisible(false);
-}//GEN-LAST:event_btnCancelActionPerformed
+}//GEN-LAST:event_btnCloseActionPerformed
 
     /**
     * @param args the command line arguments
@@ -184,7 +186,7 @@ private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                NewTechTeamDialog dialog = new NewTechTeamDialog(new javax.swing.JFrame(), true);
+                NewTechTeamDialog dialog = new NewTechTeamDialog(new javax.swing.JFrame(), true, null);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     public void windowClosing(java.awt.event.WindowEvent e) {
                         System.exit(0);
@@ -194,14 +196,10 @@ private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
             }
         });
     }
-    
-    public TechTeam getTechTeam() {
-        return tech;
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnCancel;
-    private javax.swing.JButton btnDone;
+    private javax.swing.JButton btnClose;
+    private javax.swing.JButton btnHire;
     private javax.swing.JComboBox chTeamRating;
     private javax.swing.JComboBox chTeamType;
     private javax.swing.JLabel lblTeamName;

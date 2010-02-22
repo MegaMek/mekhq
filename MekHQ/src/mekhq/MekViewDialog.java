@@ -6,7 +6,7 @@
 
 package mekhq;
 
-import megamek.client.ui.MechView;
+import megamek.client.ui.swing.MechView;
 
 /**
  *
@@ -33,7 +33,7 @@ public class MekViewDialog extends javax.swing.JDialog {
     private void initComponents() {
 
         jScrollPane2 = new javax.swing.JScrollPane();
-        txtMek = new javax.swing.JTextArea();
+        txtMek = new javax.swing.JTextPane();
         btnOkay = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -41,13 +41,12 @@ public class MekViewDialog extends javax.swing.JDialog {
 
         jScrollPane2.setName("jScrollPane2"); // NOI18N
 
-        txtMek.setText(mview.getMechReadout());
-        txtMek.setColumns(20);
-        txtMek.setEditable(false);
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(MekViewDialog.class);
+        txtMek.setContentType(resourceMap.getString("txtMek.contentType")); // NOI18N
+        txtMek.setEditable(false);
         txtMek.setFont(resourceMap.getFont("txtMek.font")); // NOI18N
-        txtMek.setRows(5);
         txtMek.setName("txtMek"); // NOI18N
+        txtMek.setText(mview.getMechReadout());
         jScrollPane2.setViewportView(txtMek);
 
         btnOkay.setText(resourceMap.getString("btnOkay.text")); // NOI18N
@@ -62,11 +61,11 @@ public class MekViewDialog extends javax.swing.JDialog {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 360, Short.MAX_VALUE)
             .add(layout.createSequentialGroup()
                 .add(131, 131, 131)
                 .add(btnOkay)
                 .addContainerGap(153, Short.MAX_VALUE))
+            .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 360, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -102,9 +101,8 @@ private void btnOkayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnOkay;
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTextArea txtMek;
+    private javax.swing.JTextPane txtMek;
     // End of variables declaration//GEN-END:variables
 
 }

@@ -25,19 +25,30 @@ import gd.xml.ParseException;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowListener;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.DefaultComboBoxModel;
 
 import javax.swing.Icon;
 import javax.swing.JCheckBoxMenuItem;
@@ -55,18 +66,26 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
 
-import megamek.client.ui.MechView;
+import megamek.client.ui.swing.MechView;
 import megamek.common.AmmoType;
 import megamek.common.Entity;
 import megamek.common.EntityListFile;
+import megamek.common.EntityWeightClass;
+import megamek.common.MechFileParser;
+import megamek.common.MechSummary;
+import megamek.common.MechSummaryCache;
 import megamek.common.Mounted;
 import megamek.common.Pilot;
 import megamek.common.TargetRoll;
+import megamek.common.TechConstants;
+import megamek.common.UnitType;
 import megamek.common.XMLStreamParser;
-import megamek.common.options.PilotOptions;
+import megamek.common.loaders.EntityLoadingException;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.PartInventory;
 import mekhq.campaign.Unit;
 import mekhq.campaign.Utilities;
+import mekhq.campaign.parts.GenericSparePart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PilotPerson;
@@ -79,7 +98,6 @@ import mekhq.campaign.work.ReloadItem;
 import mekhq.campaign.work.RepairItem;
 import mekhq.campaign.work.ReplacementItem;
 import mekhq.campaign.work.SalvageItem;
-import mekhq.campaign.work.UnitWorkItem;
 import mekhq.campaign.work.WorkItem;
 
 import org.jdesktop.application.Action;
@@ -102,6 +120,7 @@ public class MekHQView extends FrameView {
     private DocTableModel doctorsModel = new DocTableModel();
     private PartsTableModel partsModel = new PartsTableModel();
     private MekTableMouseAdapter unitMouseAdapter;
+    private PartsTableMouseAdapter partsMouseAdapter;
     private TaskTableMouseAdapter taskMouseAdapter;
     private PersonTableMouseAdapter personMouseAdapter;
     private int currentUnitId;
@@ -110,11 +129,13 @@ public class MekHQView extends FrameView {
     private int currentPersonId;
     private int currentDoctorId;
     private int currentPartsId;
+    private int [] selectedTasksIds;
 
     public MekHQView(SingleFrameApplication app) {
         super(app);
 
         unitMouseAdapter = new MekTableMouseAdapter();
+        partsMouseAdapter = new PartsTableMouseAdapter();
         taskMouseAdapter = new TaskTableMouseAdapter();
         personMouseAdapter = new PersonTableMouseAdapter();
         initComponents();
@@ -217,6 +238,10 @@ public class MekHQView extends FrameView {
         panSupplies = new javax.swing.JPanel();
         jScrollPane8 = new javax.swing.JScrollPane();
         PartsTable = new javax.swing.JTable();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        PartsFilter = new javax.swing.JComboBox();
+        btnSaveParts = new javax.swing.JButton();
+        btnLoadParts = new javax.swing.JButton();
         panPersonnel = new javax.swing.JPanel();
         btnAssignDoc = new javax.swing.JButton();
         scrollPersonTable = new javax.swing.JScrollPane();
@@ -225,12 +250,14 @@ public class MekHQView extends FrameView {
         DocTable = new javax.swing.JTable();
         panFinances = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
-        jScrollPane7 = new javax.swing.JScrollPane();
+        txtPaneReportScrollPane = new javax.swing.JScrollPane();
         txtPaneReport = new javax.swing.JTextPane();
         panelMasterButtons = new javax.swing.JPanel();
         btnAdvanceDay = new javax.swing.JButton();
         btnOvertime = new javax.swing.JToggleButton();
         btnGMMode = new javax.swing.JToggleButton();
+        btnStoreTime = new javax.swing.JToggleButton();
+        fundsLabel = new javax.swing.JLabel();
         menuBar = new javax.swing.JMenuBar();
         javax.swing.JMenu fileMenu = new javax.swing.JMenu();
         menuLoad = new javax.swing.JMenuItem();
@@ -239,6 +266,7 @@ public class MekHQView extends FrameView {
         javax.swing.JMenuItem exitMenuItem = new javax.swing.JMenuItem();
         menuManage = new javax.swing.JMenu();
         miLoadForces = new javax.swing.JMenuItem();
+        addFunds = new javax.swing.JMenuItem();
         menuMarket = new javax.swing.JMenu();
         miPurchaseUnit = new javax.swing.JMenuItem();
         menuHire = new javax.swing.JMenu();
@@ -463,22 +491,77 @@ public class MekHQView extends FrameView {
                 PartsTableValueChanged(evt);
             }
         });
+        PartsTable.addMouseListener(partsMouseAdapter);
         jScrollPane8.setViewportView(PartsTable);
+
+        jScrollPane1.setName("jScrollPane1"); // NOI18N
+
+        DefaultComboBoxModel partTypesModel = new DefaultComboBoxModel();
+        String [] partTypeLabels = Part.getPartTypeLabels();
+        partTypesModel.addElement("All");
+        for (int i=0;i<partTypeLabels.length;i++) {
+            partTypesModel.addElement(partTypeLabels[i]);
+        }
+        PartsFilter.setModel(partTypesModel);
+        PartsFilter.setName("PartsFilter"); // NOI18N
+        PartsFilter.setSelectedIndex(0);
+        PartsFilter.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                PartsFilterActionPerformed(evt);
+            }
+        });
+
+        btnSaveParts.setText(resourceMap.getString("btnSaveParts.text")); // NOI18N
+        btnSaveParts.setToolTipText(resourceMap.getString("btnSaveParts.toolTipText")); // NOI18N
+        btnSaveParts.setName("btnSaveParts"); // NOI18N
+        btnSaveParts.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSavePartsActionPerformed(evt);
+            }
+        });
+
+        btnLoadParts.setText(resourceMap.getString("btnLoadParts.text")); // NOI18N
+        btnLoadParts.setToolTipText(resourceMap.getString("btnLoadParts.toolTipText")); // NOI18N
+        btnLoadParts.setName("btnLoadParts"); // NOI18N
+        btnLoadParts.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLoadPartsActionPerformed(evt);
+            }
+        });
 
         org.jdesktop.layout.GroupLayout panSuppliesLayout = new org.jdesktop.layout.GroupLayout(panSupplies);
         panSupplies.setLayout(panSuppliesLayout);
         panSuppliesLayout.setHorizontalGroup(
             panSuppliesLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(panSuppliesLayout.createSequentialGroup()
-                .add(jScrollPane8, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 428, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(634, Short.MAX_VALUE))
+                .add(panSuppliesLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(panSuppliesLayout.createSequentialGroup()
+                        .add(jScrollPane8, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 428, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(132, 132, 132)
+                        .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(panSuppliesLayout.createSequentialGroup()
+                        .add(PartsFilter, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 162, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(btnSaveParts)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(btnLoadParts)))
+                .addContainerGap(516, Short.MAX_VALUE))
         );
         panSuppliesLayout.setVerticalGroup(
             panSuppliesLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(panSuppliesLayout.createSequentialGroup()
-                .addContainerGap()
-                .add(jScrollPane8, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 576, Short.MAX_VALUE)
-                .addContainerGap())
+                .add(panSuppliesLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(panSuppliesLayout.createSequentialGroup()
+                        .add(panSuppliesLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
+                            .add(PartsFilter, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 20, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(btnSaveParts)
+                            .add(btnLoadParts))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(jScrollPane8, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 573, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(panSuppliesLayout.createSequentialGroup()
+                        .add(192, 192, 192)
+                        .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         tabMain.addTab(resourceMap.getString("panSupplies.TabConstraints.tabTitle"), panSupplies); // NOI18N
@@ -564,14 +647,14 @@ public class MekHQView extends FrameView {
             .add(panFinancesLayout.createSequentialGroup()
                 .addContainerGap()
                 .add(jLabel2)
-                .addContainerGap(891, Short.MAX_VALUE))
+                .addContainerGap(943, Short.MAX_VALUE))
         );
         panFinancesLayout.setVerticalGroup(
             panFinancesLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(panFinancesLayout.createSequentialGroup()
                 .addContainerGap()
                 .add(jLabel2)
-                .addContainerGap(566, Short.MAX_VALUE))
+                .addContainerGap(583, Short.MAX_VALUE))
         );
 
         tabMain.addTab(resourceMap.getString("panFinances.TabConstraints.tabTitle"), panFinances); // NOI18N
@@ -586,9 +669,9 @@ public class MekHQView extends FrameView {
         gridBagConstraints.weighty = 1.0;
         mainPanel.add(tabMain, gridBagConstraints);
 
-        jScrollPane7.setMinimumSize(new java.awt.Dimension(800, 200));
-        jScrollPane7.setName("jScrollPane7"); // NOI18N
-        jScrollPane7.setPreferredSize(new java.awt.Dimension(800, 200));
+        txtPaneReportScrollPane.setMinimumSize(new java.awt.Dimension(800, 200));
+        txtPaneReportScrollPane.setName("txtPaneReportScrollPane"); // NOI18N
+        txtPaneReportScrollPane.setPreferredSize(new java.awt.Dimension(800, 200));
 
         txtPaneReport.setContentType(resourceMap.getString("txtPaneReport.contentType")); // NOI18N
         txtPaneReport.setEditable(false);
@@ -597,7 +680,7 @@ public class MekHQView extends FrameView {
         txtPaneReport.setMinimumSize(new java.awt.Dimension(800, 200));
         txtPaneReport.setName("txtPaneReport"); // NOI18N
         txtPaneReport.setPreferredSize(new java.awt.Dimension(800, 200));
-        jScrollPane7.setViewportView(txtPaneReport);
+        txtPaneReportScrollPane.setViewportView(txtPaneReport);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -606,7 +689,7 @@ public class MekHQView extends FrameView {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHEAST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
-        mainPanel.add(jScrollPane7, gridBagConstraints);
+        mainPanel.add(txtPaneReportScrollPane, gridBagConstraints);
 
         panelMasterButtons.setMinimumSize(new java.awt.Dimension(200, 200));
         panelMasterButtons.setName("panelMasterButtons"); // NOI18N
@@ -623,10 +706,11 @@ public class MekHQView extends FrameView {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.ipadx = 15;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 20, 0);
+        gridBagConstraints.insets = new java.awt.Insets(12, 30, 0, 0);
         panelMasterButtons.add(btnAdvanceDay, gridBagConstraints);
 
         btnOvertime.setText(resourceMap.getString("btnOvertime.text")); // NOI18N
@@ -639,9 +723,11 @@ public class MekHQView extends FrameView {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.ipadx = 15;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(20, 30, 0, 0);
         panelMasterButtons.add(btnOvertime, gridBagConstraints);
 
         btnGMMode.setText(resourceMap.getString("btnGMMode.text")); // NOI18N
@@ -654,10 +740,38 @@ public class MekHQView extends FrameView {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.ipadx = 15;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 30, 42, 0);
         panelMasterButtons.add(btnGMMode, gridBagConstraints);
+
+        btnStoreTime.setText(resourceMap.getString("btnStoreTime.text")); // NOI18N
+        btnStoreTime.setToolTipText(resourceMap.getString("btnStoreTime.toolTipText")); // NOI18N
+        btnStoreTime.setName("btnStoreTime"); // NOI18N
+        btnStoreTime.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnStoreTimeActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.ipadx = 15;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 30, 0, 0);
+        panelMasterButtons.add(btnStoreTime, gridBagConstraints);
+
+        fundsLabel.setFont(resourceMap.getFont("fundsLabel.font")); // NOI18N
+        fundsLabel.setText(resourceMap.getString("fundsLabel.text")); // NOI18N
+        fundsLabel.setName("fundsLabel"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        panelMasterButtons.add(fundsLabel, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -716,6 +830,15 @@ public class MekHQView extends FrameView {
             }
         });
         menuManage.add(miLoadForces);
+
+        addFunds.setText(resourceMap.getString("addFunds.text")); // NOI18N
+        addFunds.setName("addFunds"); // NOI18N
+        addFunds.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addFundsActionPerformed(evt);
+            }
+        });
+        menuManage.add(addFunds);
 
         menuBar.add(menuManage);
 
@@ -830,24 +953,19 @@ private void btnRetrieveUnitsActionPerformed(java.awt.event.ActionEvent evt) {//
 
 private void btnDoTaskActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDoTaskActionPerformed
     //assign the task to the team here
-    WorkItem task = campaign.getTask(currentTaskId);
-    SupportTeam team = campaign.getTeam(currentTechId);
-    int row = TaskTable.getSelectedRow();
-    if((null != task) && (null != team)) {
-        boolean completed = campaign.processTask(task, team);
-        refreshUnitList();
-        refreshTaskList();
-        refreshTechsList();
-        refreshPartsList();
-        refreshReport();
-        if(!completed) {
-            row++;
+    for (int i=0;i<selectedTasksIds.length;i++) {
+        WorkItem task = campaign.getTask(selectedTasksIds[i]);
+        SupportTeam team = campaign.getTeam(currentTechId);
+        if((null != task) && (null != team) && (team.getTargetFor(task).getValue() != TargetRoll.IMPOSSIBLE)) {
+            campaign.processTask(task, team);
         }
-        if(row >= TaskTable.getRowCount()) {
-            row = 0;
-        }
-        TaskTable.setRowSelectionInterval(row, row);
     }
+    refreshUnitList();
+    refreshTaskList();
+    refreshTechsList();
+    refreshPartsList();
+    refreshReport();
+    refreshFunds();
 }//GEN-LAST:event_btnDoTaskActionPerformed
 
 private void TechTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
@@ -870,6 +988,18 @@ private void TaskTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
     else {
         currentTaskId = -1;
     }
+
+    selectedTasksIds = new int[TaskTable.getSelectedRowCount()];
+    for (int i=0;i<TaskTable.getSelectedRowCount();i++) {
+        int sel = TaskTable.getSelectedRows()[i];
+        if((sel > -1) && (sel < campaign.getTasksForUnit(currentUnitId).size())) {
+            selectedTasksIds[i] = campaign.getTasksForUnit(currentUnitId).get(sel).getId();
+        }
+        else {
+            selectedTasksIds[i] = -1;
+        }
+    }
+
     updateAssignEnabled();
     updateTargetText();
 }
@@ -919,7 +1049,9 @@ private void PartsTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
 
 
 private void btnAdvanceDayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAdvanceDayActionPerformed
+
     campaign.newDay();
+    
     refreshUnitList();
     refreshTaskList();
     refreshTechsList();
@@ -953,24 +1085,20 @@ private void btnAssignDocActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
 }//GEN-LAST:event_btnAssignDocActionPerformed
 
 private void miHirePilotActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miHirePilotActionPerformed
-    NewPilotDialog npd = new NewPilotDialog(getFrame(), true);
+    NewPilotDialog npd = new NewPilotDialog(getFrame(), true, campaign);
     npd.setVisible(true);
-    if(null != npd.getPilotPerson()) {
-        campaign.addPerson(npd.getPilotPerson());
-        refreshPersonnelList();
-        refreshReport();
-    }
+    
+    refreshPersonnelList();
+    refreshReport();
 }//GEN-LAST:event_miHirePilotActionPerformed
 
 private void miHireTechActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miHireTechActionPerformed
-    NewTechTeamDialog ntd = new NewTechTeamDialog(getFrame(), true);
+    NewTechTeamDialog ntd = new NewTechTeamDialog(getFrame(), true, campaign);
     ntd.setVisible(true);
-    if(null != ntd.getTechTeam()) {
-        campaign.addTeam(ntd.getTechTeam());
-        refreshTechsList();
-        refreshPersonnelList();
-        refreshReport();
-    }
+    
+    refreshTechsList();
+    refreshPersonnelList();
+    refreshReport();
 }//GEN-LAST:event_miHireTechActionPerformed
 
 private void miHireDoctorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miHireDoctorActionPerformed
@@ -1011,6 +1139,7 @@ private void menuSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
     try {
         fos = new FileOutputStream(file);
         out = new ObjectOutputStream(fos);
+        campaign.save();
         out.writeObject(campaign);
         out.close();
     } catch(IOException ex) {
@@ -1044,6 +1173,8 @@ private void menuLoadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
         fis = new FileInputStream(file);
         in = new ObjectInputStream(fis);
         campaign = (Campaign)in.readObject();
+
+        // Restores all traansient attributes from serialized objects
         campaign.restore();
         in.close();
     }
@@ -1062,6 +1193,12 @@ private void menuLoadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
     refreshPartsList();
     refreshCalendar();
     refreshReport();
+    refreshFunds();
+
+    // Without this, the report scrollbar doesn't seem to load properly after loading a campaign
+    Dimension size = getFrame().getSize();
+    getFrame().pack();
+    getFrame().setSize(size);
 }//GEN-LAST:event_menuLoadActionPerformed
 
 private void btnOvertimeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOvertimeActionPerformed
@@ -1091,15 +1228,86 @@ private void miLoadForcesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
 
 
 private void miPurchaseUnitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miPurchaseUnitActionPerformed
-    UnitSelectorDialog usd = new UnitSelectorDialog(getFrame(), true);
+    UnitSelectorDialog usd = new UnitSelectorDialog(getFrame(), true, campaign);
+
+    if (!campaign.isGM())
+        usd.restrictToYear(campaign.getCalendar().get(Calendar.YEAR));
+
     usd.setVisible(true);
-    Entity en = usd.getSelectedEntity();
-    if(null != en) {
-        campaign.addUnit(en, false);
-        refreshUnitList();
-        refreshReport();
-    }
+    
+    refreshUnitList();
+    refreshReport();
+    refreshFunds();
 }//GEN-LAST:event_miPurchaseUnitActionPerformed
+
+private void PartsFilterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_PartsFilterActionPerformed
+    refreshPartsList();
+}//GEN-LAST:event_PartsFilterActionPerformed
+
+private void btnStoreTimeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStoreTimeActionPerformed
+    campaign.setStoreTime(btnStoreTime.isSelected());
+}//GEN-LAST:event_btnStoreTimeActionPerformed
+
+private void addFundsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addFundsActionPerformed
+    AddFundsDialog addFundsDialog = new AddFundsDialog(null, true);
+    addFundsDialog.setVisible(true);
+    int funds = addFundsDialog.getFundsQuantity();
+    campaign.addFunds(funds);
+    refreshReport();
+    refreshFunds();
+}//GEN-LAST:event_addFundsActionPerformed
+
+private void btnSavePartsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSavePartsActionPerformed
+    Iterator<Part> itParts = campaign.getParts().iterator();
+    StringBuffer stringBuffer = new StringBuffer();
+    String newLine = System.getProperty("line.separator");
+    while (itParts.hasNext()) {
+        Part part = itParts.next();
+        stringBuffer.append(part.getSaveString() + newLine);
+    }
+    JFileChooser jFileChooser = new JFileChooser(new File(System.getProperty("user.dir")));
+    jFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+    jFileChooser.setApproveButtonText("Save file");
+    int retVal = jFileChooser.showSaveDialog(null);
+    if (retVal == JFileChooser.APPROVE_OPTION) {
+        File selectedFile = jFileChooser.getSelectedFile();
+        try {
+            FileWriter fileWriter = new FileWriter(selectedFile);
+            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+            bufferedWriter.write(stringBuffer.toString());
+            bufferedWriter.close();
+        } catch (IOException ex) {
+            Logger.getLogger(MekHQView.class.getName()).log(Level.SEVERE, "Could not write to file " + selectedFile.getAbsolutePath(), ex);
+            AlertPopup alertPopup = new AlertPopup(null, true, "Could not write to file " + selectedFile.getAbsolutePath());
+            alertPopup.setVisible(true);
+        }
+    }
+}//GEN-LAST:event_btnSavePartsActionPerformed
+
+private void btnLoadPartsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoadPartsActionPerformed
+    JFileChooser jFileChooser = new JFileChooser(new File(System.getProperty("user.dir")));
+    jFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+    jFileChooser.setApproveButtonText("Load file");
+    int retVal = jFileChooser.showOpenDialog(null);
+    if (retVal == JFileChooser.APPROVE_OPTION) {
+        File selectedFile = jFileChooser.getSelectedFile();
+        try {
+            FileReader fileReader = new FileReader(selectedFile);
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            String line = null;
+            while ((line = bufferedReader.readLine()) != null) {
+                Part part = Part.getPartByName(line);
+                if (part != null)
+                    campaign.addPart(part);
+            }
+            refreshPartsList();
+        } catch (IOException ex) {
+            Logger.getLogger(MekHQView.class.getName()).log(Level.SEVERE, "Could not read file " + selectedFile.getAbsolutePath(), ex);
+            AlertPopup alertPopup = new AlertPopup(null, true, "Could not read file " + selectedFile.getAbsolutePath());
+            alertPopup.setVisible(true);
+        }
+    }
+}//GEN-LAST:event_btnLoadPartsActionPerformed
 
 protected void loadListFile(boolean allowNewPilots) throws IOException {
     JFileChooser loadList = new JFileChooser(".");
@@ -1275,9 +1483,18 @@ protected void refreshPersonnelList() {
 }
 
 protected void refreshPartsList() {
+
+    int partTypeFilter = PartsFilter.getSelectedIndex();
+    ArrayList<PartInventory> partsInventory = null;
+    if (partTypeFilter == 0)
+        partsInventory = campaign.getPartsInventory();
+    else
+        // -1 because "All" is appended at the begining of the list of part types
+        partsInventory = campaign.getPartsInventory(partTypeFilter-1);
+    partsModel.setData(partsInventory);
+
     int selected = PartsTable.getSelectedRow();
-    partsModel.setData(campaign.getParts());
-    if((selected > -1) && (selected < campaign.getParts().size())) {
+    if((selected > -1) && (selected < partsInventory.size())) {
         PartsTable.setRowSelectionInterval(selected, selected);
     }
 }
@@ -1288,6 +1505,13 @@ protected void refreshCalendar() {
 
 protected void refreshReport() {
     txtPaneReport.setText(campaign.getCurrentReportHTML());
+}
+
+protected void refreshFunds() {
+    int funds = campaign.getFunds();
+    NumberFormat numberFormat = DecimalFormat.getIntegerInstance();
+    String text = numberFormat.format(funds) + " " + (funds!=0?"CBills":"CBill");
+    fundsLabel.setText(text);
 }
 
 protected void updateAssignEnabled() {
@@ -1385,12 +1609,21 @@ public class TaskTableModel extends ArrayTableModel {
         }
 
         public WorkItem getTaskAt(int row) {
-        return (WorkItem)data.get(row);
-    }
+            return (WorkItem)data.get(row);
+        }
+
+        public WorkItem [] getTasksAt(int [] rows) {
+            WorkItem [] tasks = new WorkItem[rows.length];
+            for (int i=0;i<rows.length;i++) {
+                int row = rows[i];
+                tasks[i] = (WorkItem) data.get(row);
+            }
+            return tasks;
+        }
 
         public TaskTableModel.Renderer getRenderer() {
-        return new TaskTableModel.Renderer();
-    }
+            return new TaskTableModel.Renderer();
+        }
 
 
     public class Renderer extends TaskInfo implements TableCellRenderer {
@@ -1408,7 +1641,11 @@ public class TaskTableModel extends ArrayTableModel {
             }
 
             if ((null != task) && (task instanceof ReplacementItem) && !((ReplacementItem)task).hasPart()) {
-                    c.setBackground(Color.GRAY);
+                c.setBackground(Color.GRAY);
+            } else if ((task != null) && (task instanceof ReplacementItem) && ((ReplacementItem) task).hasPart()
+                    && (((ReplacementItem) task).partNeeded() instanceof GenericSparePart)
+                    && (!((ReplacementItem) task).hasEnoughGenericSpareParts())) {
+                c.setBackground(Color.GRAY);
             } else {
                     c.setBackground(new Color(220, 220, 220));
             }
@@ -1422,19 +1659,24 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
 
         public void actionPerformed(ActionEvent action) {
             String command = action.getActionCommand();
-            WorkItem task = taskModel.getTaskAt(TaskTable.getSelectedRow());
+            WorkItem [] tasks = taskModel.getTasksAt(TaskTable.getSelectedRows());
             if (command.equalsIgnoreCase("REPLACE")) {
-                if(task instanceof RepairItem) {
-                    campaign.mutateTask(task, ((RepairItem)task).replace());
-                } else if (task instanceof ReplacementItem) {
-                    ((ReplacementItem)task).useUpPart();
-                    task.setSkillMin(SupportTeam.EXP_GREEN);
-                } else if (task instanceof SalvageItem) {
-                    SalvageItem salvage = (SalvageItem)task;
-                    salvage.scrap();
+                for (WorkItem task : tasks) {
+                    if(task instanceof RepairItem) {
+                        if (((RepairItem) task).canScrap())
+                            campaign.mutateTask(task, ((RepairItem)task).replace());
+                    } else if (task instanceof ReplacementItem) {
+                        ((ReplacementItem)task).useUpPart();
+                        task.setSkillMin(SupportTeam.EXP_GREEN);
+                    } else if (task instanceof SalvageItem) {
+                        SalvageItem salvage = (SalvageItem) task;
+                        salvage.scrap();
+                    }
                 }
+                refreshUnitList();
                 refreshTaskList();
             } else if (command.contains("SWAP_AMMO")) {
+                WorkItem task = taskModel.getTaskAt(TaskTable.getSelectedRow());
                 if(task instanceof ReloadItem) {
                     ReloadItem reload = (ReloadItem)task;
                     Entity en = reload.getUnit().getEntity();
@@ -1450,26 +1692,32 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
                     refreshTaskList();
                 }
             } else if (command.contains("CHANGE_MODE")) {
-                String sel = command.split(":")[1];
-                int selected = Integer.parseInt(sel);
-                task.setMode(selected);
-                refreshUnitList();
-                refreshTaskList();
+                for (WorkItem task : tasks) {
+                    String sel = command.split(":")[1];
+                    int selected = Integer.parseInt(sel);
+                    task.setMode(selected);
+                    refreshUnitList();
+                    refreshTaskList();
+                }
             }
             else if (command.contains("FIX")) {
-                if(task instanceof ReplacementItem && !((ReplacementItem)task).hasPart()) {
-                    ReplacementItem replace = (ReplacementItem)task;
-                    Part part = replace.partNeeded();
-                    replace.setPart(part);
-                    campaign.addPart(part);
+                for (WorkItem task : tasks) {
+                    if (task.checkFixable()==null) {
+                        if(task instanceof ReplacementItem && !((ReplacementItem)task).hasPart()) {
+                            ReplacementItem replace = (ReplacementItem)task;
+                            Part part = replace.partNeeded();
+                            replace.setPart(part);
+                            campaign.addPart(part);
+                        }
+                        task.succeed();
+                        if(task.isCompleted()) {
+                            campaign.removeTask(task);
+                        }
+                    }
+                    refreshUnitList();
+                    refreshTaskList();
+                    refreshPartsList();
                 }
-                task.succeed();
-                if(task.isCompleted()) {
-                    campaign.removeTask(task);
-                }
-                refreshUnitList();
-                refreshTaskList();
-                refreshPartsList();
             }
         }
 
@@ -1495,6 +1743,7 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
                 if((task instanceof RepairItem)
                         || (task instanceof ReplacementItem)
                         || (task instanceof SalvageItem)) {
+                    // Mode (extra time, rush job, ...
                     menu = new JMenu("Mode");
                     for(int i = 0; i < WorkItem.MODE_N; i++) {
                         cbMenuItem = new JCheckBoxMenuItem(WorkItem.getModeName(i));
@@ -1507,16 +1756,22 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
                         menu.add(cbMenuItem);
                     }
                     popup.add(menu);
+                    // Scrap component
                     menuItem = new JMenuItem("Scrap component");
                     menuItem.setActionCommand("REPLACE");
                     menuItem.addActionListener(this);
-                    menuItem.setEnabled(((UnitWorkItem)task).canScrap());
+
+                    // Everything needs to be scrapable
+                    // menuItem.setEnabled(((UnitWorkItem)task).canScrap());
+                    menuItem.setEnabled(true);
+
                     popup.add(menuItem);
                 }
                 if(task instanceof ReloadItem) {
                     ReloadItem reload = (ReloadItem)task;
                     Entity en = reload.getUnit().getEntity();
                     Mounted m = reload.getMounted();
+                    // Swap ammo
                     menu = new JMenu("Swap Ammo");
                     int i = 0;
                     AmmoType curType = (AmmoType)m.getType();
@@ -1535,6 +1790,7 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
                 }
                 menu = new JMenu("GM Mode");
                 popup.add(menu);
+                // Auto complete task
                 menuItem = new JMenuItem("Complete Task");
                 menuItem.setActionCommand("FIX");
                 menuItem.addActionListener(this);
@@ -1561,6 +1817,15 @@ public class MekTableModel extends ArrayTableModel {
 
     public Unit getUnitAt(int row) {
         return (Unit)data.get(row);
+    }
+
+    public Unit [] getUnitsAt(int [] rows) {
+        Unit [] units = new Unit[rows.length];
+        for (int i=0;i<rows.length;i++) {
+            int row = rows[i];
+            units[i] = (Unit) data.get(row);
+        }
+        return units;
     }
 
     public MekTableModel.Renderer getRenderer() {
@@ -1610,36 +1875,51 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
 
         public void actionPerformed(ActionEvent action) {
             String command = action.getActionCommand();
-            Unit unit = unitModel.getUnitAt(UnitTable.getSelectedRow());
+            Unit selectedUnit = unitModel.getUnitAt(UnitTable.getSelectedRow());
+            Unit [] units = unitModel.getUnitsAt(UnitTable.getSelectedRows());
             if (command.equalsIgnoreCase("REMOVE_PILOT")) {
-                unit.removePilot();
+                for (Unit unit : units) {
+                    unit.removePilot();
+                }
+                refreshUnitList();
             } else if(command.contains("CHANGE_PILOT")) {
                 String sel = command.split(":")[1];
                 int selected = Integer.parseInt(sel);
                 if((null != pilots) && (selected > -1) && (selected < pilots.size())) {
-                    campaign.changePilot(unit, pilots.get(selected));
+                    campaign.changePilot(selectedUnit, pilots.get(selected));
                 }
+                refreshUnitList();
             } else if(command.equalsIgnoreCase("SELL")) {
-                if(0 == JOptionPane.showConfirmDialog(null, "Do you really want to sell " + unit.getEntity().getDisplayName(), "Sell Unit?", JOptionPane.YES_NO_OPTION)) {
-                    campaign.removeUnit(unit.getId());
-                    refreshUnitList();
-                    refreshReport();
+                for (Unit unit : units) {
+                    if (!unit.isDeployed()) {
+                        int sellValue = unit.getSellValue();
+                        NumberFormat numberFormat = DecimalFormat.getIntegerInstance();
+                        String text = numberFormat.format(sellValue) + " " + (sellValue!=0?"CBills":"CBill");
+                        if(0 == JOptionPane.showConfirmDialog(null, "Do you really want to sell " + unit.getEntity().getDisplayName() + " for " + text, "Sell Unit?", JOptionPane.YES_NO_OPTION)) {
+                            campaign.sellUnit(unit.getId());
+                        }
+                    }
                 }
+                refreshUnitList();
+                refreshReport();
+                refreshFunds();
             } else if(command.equalsIgnoreCase("LOSS")) {
-                if(0 == JOptionPane.showConfirmDialog(null, "Do you really want to consider " + unit.getEntity().getDisplayName() + " a combat loss?", "Remove Unit?", JOptionPane.YES_NO_OPTION)) {
-                    campaign.removeUnit(unit.getId());
-                    refreshUnitList();
-                    refreshReport();
+                for (Unit unit : units) {
+                    if(0 == JOptionPane.showConfirmDialog(null, "Do you really want to consider " + unit.getEntity().getDisplayName() + " a combat loss?", "Remove Unit?", JOptionPane.YES_NO_OPTION)) {
+                        campaign.removeUnit(unit.getId());
+                    }
                 }
+                refreshUnitList();
+                refreshReport();
             } else if(command.contains("ASSIGN_TECH")) {
                 String sel = command.split(":")[1];
                 int selected = Integer.parseInt(sel);
                 if((selected > -1) && (selected < campaign.getTechTeams().size())) {
                     SupportTeam team = campaign.getTechTeams().get(selected);
                     if(null != team) {
-                        for(WorkItem task : campaign.getTasksForUnit(unit.getId())) {
+                        for(WorkItem task : campaign.getTasksForUnit(selectedUnit.getId())) {
                             if(team.getTargetFor(task).getValue() != TargetRoll.IMPOSSIBLE) {
-                                campaign.processTask(task, team);
+                               campaign.processTask(task, team);
                             }
                         }
                     }
@@ -1648,23 +1928,24 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
                 refreshTaskList();
                 refreshTechsList();
                 refreshReport();
+                refreshPartsList();
             } else if(command.contains("SWAP_AMMO")) {
                 String sel = command.split(":")[1];
                 int selMount = Integer.parseInt(sel);
-                Mounted m = unit.getEntity().getEquipment(selMount);
+                Mounted m = selectedUnit.getEntity().getEquipment(selMount);
                 if(null == m) {
                     return;
                 }
                 AmmoType curType = (AmmoType)m.getType();
-                ReloadItem reload = campaign.getReloadWorkFor(m, unit);
+                ReloadItem reload = campaign.getReloadWorkFor(m, selectedUnit);
                 boolean newWork = false;
                 if(null == reload) {
                     newWork = true;
-                    reload = new ReloadItem(unit, m);
+                    reload = new ReloadItem(selectedUnit, m);
                 }
                 sel = command.split(":")[2];
                 int selType = Integer.parseInt(sel);
-                AmmoType newType = Utilities.getMunitionsFor(unit.getEntity(), curType).get(selType);
+                AmmoType newType = Utilities.getMunitionsFor(selectedUnit.getEntity(), curType).get(selType);
                 reload.swapAmmo(newType);
                 if(newWork) {
                     campaign.addWork(reload);
@@ -1672,33 +1953,139 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
                 refreshTaskList();
                 refreshUnitList();
             } else if(command.contains("CHANGE_SITE")) {
-                String sel = command.split(":")[1];
-                int selected = Integer.parseInt(sel);
-                if((selected > -1) && (selected < Unit.SITE_N)) {
-                    unit.setSite(selected);
-                    refreshUnitList();
-                    refreshTaskList();
+                for (Unit unit : units) {
+                    if (!unit.isDeployed()) {
+                        String sel = command.split(":")[1];
+                        int selected = Integer.parseInt(sel);
+                        if((selected > -1) && (selected < Unit.SITE_N)) {
+                            unit.setSite(selected);
+                        }
+                    }
                 }
+                refreshUnitList();
+                refreshTaskList();
             } else if (command.equalsIgnoreCase("SALVAGE")) {
-                unit.setSalvage(true);
+                for (Unit unit : units) {
+                    if (!unit.isDeployed())
+                        unit.setSalvage(true);
+                }
                 refreshUnitList();
             } else if (command.equalsIgnoreCase("REPAIR")) {
-                unit.setSalvage(false);
+                for (Unit unit : units) {
+                    if (!unit.isDeployed() && unit.isRepairable())
+                        unit.setSalvage(false);
+                }
                 refreshUnitList();
             } else if(command.equalsIgnoreCase("REMOVE")) {
-                if(0 == JOptionPane.showConfirmDialog(null, "Do you really want to remove " + unit.getEntity().getDisplayName() + "?", "Remove Unit?", JOptionPane.YES_NO_OPTION)) {
-                    campaign.removeUnit(unit.getId());
-                    refreshUnitList();
-                    refreshReport();
+                for (Unit unit : units) {
+                    if (!unit.isDeployed()) {
+                        if(0 == JOptionPane.showConfirmDialog(null, "Do you really want to remove " + unit.getEntity().getDisplayName() + "?", "Remove Unit?", JOptionPane.YES_NO_OPTION)) {
+                            campaign.removeUnit(unit.getId());
+                        }
+                    }
                 }
+                refreshUnitList();
+                refreshReport();
             } else if (command.equalsIgnoreCase("UNDEPLOY")) {
-                unit.setDeployed(false);
-                if(null != unit.getPilot()) {
-                    unit.getPilot().setDeployed(false);
+                for (Unit unit : units) {
+                    if (unit.isDeployed()) {
+                        unit.setDeployed(false);
+                        if(null != unit.getPilot()) {
+                            unit.getPilot().setDeployed(false);
+                        }
+                    }
                 }
                 refreshUnitList();
                 refreshPersonnelList();
-            } 
+            } else if (command.contains("CUSTOMIZE") && !command.contains("CANCEL")) {
+                if (!selectedUnit.isDeployed() && !selectedUnit.isDamaged()) {
+                    Entity targetEntity = null;
+                    String targetMechName = command.split(":")[1];
+                    if (targetMechName.equals("MML")) {
+                        if (selectedUnit.getEntity() instanceof megamek.common.Mech) {
+                            MechSummary mechSummary = MechSummaryCache.getInstance().getMech(selectedUnit.getEntity().getShortName());
+                            megamek.common.Mech selectedMech = null;
+
+                            try {
+                                Entity e = (new MechFileParser(mechSummary.getSourceFile())).getEntity();
+                                if (e instanceof megamek.common.Mech)
+                                    selectedMech = (megamek.common.Mech) e;
+                            } catch (EntityLoadingException ex) {
+                                Logger.getLogger(MekHQView.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                            
+                            if (selectedMech == null)
+                                return;
+
+                            String modelTmp = "CST01";
+                            selectedMech.setModel(modelTmp);
+                            
+                            MMLMekUICustom megamekLabMekUI = new MMLMekUICustom();
+                            megamekLabMekUI.setVisible(false);
+                            megamekLabMekUI.setModal(true);
+                            
+                            megamekLabMekUI.loadUnit(selectedMech);
+                            megamekLabMekUI.setVisible(true);
+
+                            megamek.common.Mech mmlEntity = megamekLabMekUI.getEntity();
+                            if (MMLMekUICustom.isEntityValid(mmlEntity)
+                                    && mmlEntity.getChassis().equals(selectedMech.getChassis())
+                                    && mmlEntity.getWeight() == selectedMech.getWeight())
+                                targetEntity = mmlEntity;
+                        }
+
+                    } else if (targetMechName.equals("CHOOSE_VARIANT")) {
+                        UnitSelectorDialog usd = new UnitSelectorDialog(null, true, campaign);
+                        usd.restrictToChassis(selectedUnit.getEntity().getChassis());
+                        usd.getComboUnitType().setSelectedIndex(UnitType.MEK);
+                        usd.getComboType().setSelectedIndex(TechConstants.T_ALL);
+                        usd.getComboWeight().setSelectedIndex(selectedUnit.getEntity().getWeightClass());
+                        usd.changeBuyBtnToSelectBtn();
+
+                        if (!campaign.isGM())
+                            usd.restrictToYear(campaign.getCalendar().get(Calendar.YEAR));
+
+                        usd.setVisible(true);
+
+                        megamek.common.Mech selectedMech = null;
+
+                        MechSummary mechSummary = MechSummaryCache.getInstance().getMech(selectedUnit.getEntity().getShortName());
+                        try {
+                            Entity e = (new MechFileParser(mechSummary.getSourceFile())).getEntity();
+                            if (e instanceof megamek.common.Mech)
+                                selectedMech = (megamek.common.Mech) e;
+                        } catch (EntityLoadingException ex) {
+                            Logger.getLogger(MekHQView.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+
+                        if (selectedMech == null)
+                            return;
+
+                        Entity chosenTarget = usd.getSelectedEntity();
+                        if (chosenTarget instanceof megamek.common.Mech
+                                && chosenTarget.getChassis().equals(selectedMech.getChassis())
+                                && chosenTarget.getWeight() == selectedMech.getWeight())
+                            targetEntity = chosenTarget;
+
+                    }
+
+                    if (targetEntity != null) {
+                        selectedUnit.setCustomized(true);
+                        selectedUnit.customize(targetEntity, campaign);
+                    }
+
+                    refreshUnitList();
+                    refreshTaskList();
+                }
+            } else if (command.contains("CANCEL_CUSTOMIZE")) {
+                if (selectedUnit.isCustomized()) {
+                    selectedUnit.setCustomized(false);
+                    selectedUnit.cancelCustomize(campaign);
+
+                    refreshUnitList();
+                    refreshTaskList();
+                }
+            }
         }
 
         @Override
@@ -1785,17 +2172,43 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
                 }
                 menu.setEnabled(!unit.isDeployed());
                 popup.add(menu);
+                // Salvage / Repair
                 if(unit.isSalvage()) {
                     menuItem = new JMenuItem("Repair");
                     menuItem.setActionCommand("REPAIR");
                     menuItem.addActionListener(this);
-                    menuItem.setEnabled(!unit.isDeployed() && unit.isRepairable());
+                    menuItem.setEnabled(!unit.isDeployed() && unit.isRepairable() && !unit.isCustomized());
                     popup.add(menuItem);
-                } else {
+                } else if (!unit.isSalvage()) {
                     menuItem = new JMenuItem("Salvage");
                     menuItem.setActionCommand("SALVAGE");
                     menuItem.addActionListener(this);
-                    menuItem.setEnabled(!unit.isDeployed());
+                    menuItem.setEnabled(!unit.isDeployed() && !unit.isCustomized());
+                    popup.add(menuItem);
+                }
+                // Customize
+                if (!unit.isCustomized()) {
+                    menu = new JMenu("Customize");
+
+                    menuItem = new JMenuItem("To existing variant");
+                    menuItem.setActionCommand("CUSTOMIZE:"+"CHOOSE_VARIANT");
+                    menuItem.addActionListener(this);
+                    menu.add(menuItem);
+
+                    menuItem = new JMenuItem("MegaMekLab");
+                    menuItem.setActionCommand("CUSTOMIZE:"+"MML");
+                    menuItem.addActionListener(this);
+                    menu.add(menuItem);
+                    
+                    menu.setEnabled(!unit.isDeployed() 
+                            && !unit.isDamaged()
+                            && unit.getEntity() instanceof megamek.common.Mech);
+                    popup.add(menu);
+                } else if (unit.isCustomized()) {
+                    menuItem = new JMenuItem("Cancel Customize");
+                    menuItem.setActionCommand("CANCEL_CUSTOMIZE");
+                    menuItem.addActionListener(this);
+                    menuItem.setEnabled(unit.isCustomized());
                     popup.add(menuItem);
                 }
                 //remove pilot
@@ -1912,12 +2325,20 @@ public class PersonTableModel extends ArrayTableModel {
         }
 
         public Person getPersonAt(int row) {
-        return (Person)data.get(row);
-    }
+            return (Person)data.get(row);
+        }
+
+        public Person [] getPersonsAt (int [] rows) {
+            Person [] persons = new Person[rows.length];
+            for (int i=0;i<rows.length;i++) {
+                persons[i] = getPersonAt(rows[i]);
+            }
+            return persons;
+        }
 
         public PersonTableModel.Renderer getRenderer() {
-        return new PersonTableModel.Renderer();
-    }
+            return new PersonTableModel.Renderer();
+        }
 
 
     public class Renderer extends PersonInfo implements TableCellRenderer {
@@ -1952,75 +2373,87 @@ public class PersonTableMouseAdapter extends MouseInputAdapter implements Action
 
         public void actionPerformed(ActionEvent action) {
             String command = action.getActionCommand();
-            Person person = personnelModel.getPersonAt(PersonTable.getSelectedRow());
+            Person selectedPerson = personnelModel.getPersonAt(PersonTable.getSelectedRow());
+            Person [] persons = personnelModel.getPersonsAt(PersonTable.getSelectedRows());
             if (command.equalsIgnoreCase("KIA")) {
-                if(0 == JOptionPane.showConfirmDialog(null, "Do you really want to declare " + person.getDesc() + " killed in action?", "KIA?", JOptionPane.YES_NO_OPTION)) {
-                    campaign.removePerson(person.getId());
-                    refreshUnitList();
-                    refreshPersonnelList();
-                    refreshTechsList();
-                    refreshDoctorsList();
-                    refreshReport();
-                    //TODO: Add to an honor roll
+                for (Person person : persons) {
+                    if(person.isDeployed()
+                            && 0 == JOptionPane.showConfirmDialog(null, "Do you really want to declare " + person.getDesc() + " killed in action?", "KIA?", JOptionPane.YES_NO_OPTION)) {
+                        campaign.removePerson(person.getId());
+                    }
                 }
+                refreshUnitList();
+                refreshPersonnelList();
+                refreshTechsList();
+                refreshDoctorsList();
+                refreshReport();
+                //TODO: Add to an honor roll
             } else if (command.equalsIgnoreCase("RETIRE")) {
-                if(0 == JOptionPane.showConfirmDialog(null, "Do you really want to retire " + person.getDesc() + "?", "Retire?", JOptionPane.YES_NO_OPTION)) {
-                    campaign.removePerson(person.getId());
-                    refreshUnitList();
-                    refreshPersonnelList();
-                    refreshTechsList();
-                    refreshDoctorsList();
-                    refreshReport();
-                    //TODO: add to retiree list
+                for (Person person : persons) {
+                    if(!person.isDeployed()
+                            && 0 == JOptionPane.showConfirmDialog(null, "Do you really want to retire " + person.getDesc() + "?", "Retire?", JOptionPane.YES_NO_OPTION)) {
+                        campaign.removePerson(person.getId());
+                    }
                 }
+                refreshUnitList();
+                refreshPersonnelList();
+                refreshTechsList();
+                refreshDoctorsList();
+                refreshReport();
+                //TODO: add to retiree list
             } 
             else if (command.equalsIgnoreCase("REMOVE")) {
-                if(0 == JOptionPane.showConfirmDialog(null, "Do you really want to remove " + person.getDesc() + "?", "Remove?", JOptionPane.YES_NO_OPTION)) {
-                    campaign.removePerson(person.getId());
-                    refreshUnitList();
-                    refreshPersonnelList();
-                    refreshTechsList();
-                    refreshDoctorsList();
-                    refreshReport();
+                for (Person person : persons) {
+                    if(0 == JOptionPane.showConfirmDialog(null, "Do you really want to remove " + person.getDesc() + "?", "Remove?", JOptionPane.YES_NO_OPTION)) {
+                        campaign.removePerson(person.getId());
+                    }
                 }
+                refreshUnitList();
+                refreshPersonnelList();
+                refreshTechsList();
+                refreshDoctorsList();
+                refreshReport();
             } 
             else if (command.equalsIgnoreCase("UNDEPLOY")) {
-                person.setDeployed(false);
+                for (Person person : persons) {
+                    if (person.isDeployed())
+                        person.setDeployed(false);
+                }
                 refreshPersonnelList();
             } 
             else if (command.equalsIgnoreCase("IMP_PILOTING")) {
-                if(person instanceof PilotPerson) {
-                    Pilot pilot = ((PilotPerson)person).getPilot();
+                if(selectedPerson instanceof PilotPerson) {
+                    Pilot pilot = ((PilotPerson)selectedPerson).getPilot();
                     pilot.setPiloting(pilot.getPiloting() - 1);
                     refreshPersonnelList();
                 }
             }
             else if (command.equalsIgnoreCase("IMP_GUNNERY")) {
-                if(person instanceof PilotPerson) {
-                    Pilot pilot = ((PilotPerson)person).getPilot();
+                if(selectedPerson instanceof PilotPerson) {
+                    Pilot pilot = ((PilotPerson)selectedPerson).getPilot();
                     pilot.setGunnery(pilot.getGunnery() - 1);
                     refreshPersonnelList();
                     refreshUnitList();
                 }
             }
             else if (command.equalsIgnoreCase("DEC_PILOTING")) {
-                if(person instanceof PilotPerson) {
-                    Pilot pilot = ((PilotPerson)person).getPilot();
+                if(selectedPerson instanceof PilotPerson) {
+                    Pilot pilot = ((PilotPerson)selectedPerson).getPilot();
                     pilot.setPiloting(pilot.getPiloting() + 1);
                     refreshPersonnelList();
                 }
             }
             else if (command.equalsIgnoreCase("DEC_GUNNERY")) {
-                if(person instanceof PilotPerson) {
-                    Pilot pilot = ((PilotPerson)person).getPilot();
+                if(selectedPerson instanceof PilotPerson) {
+                    Pilot pilot = ((PilotPerson)selectedPerson).getPilot();
                     pilot.setGunnery(pilot.getGunnery() + 1);
                     refreshPersonnelList();
                     refreshUnitList();
                 }
             }
             else if (command.equalsIgnoreCase("IMP_SUPPORT")) {
-                if(person instanceof SupportPerson) {
-                    SupportTeam team = ((SupportPerson)person).getTeam();
+                if(selectedPerson instanceof SupportPerson) {
+                    SupportTeam team = ((SupportPerson)selectedPerson).getTeam();
                     team.setRating(team.getRating() + 1);
                     refreshPersonnelList();
                     refreshDoctorsList();
@@ -2028,8 +2461,8 @@ public class PersonTableMouseAdapter extends MouseInputAdapter implements Action
                 }
             }
             else if (command.equalsIgnoreCase("DEC_SUPPORT")) {
-                if(person instanceof SupportPerson) {
-                    SupportTeam team = ((SupportPerson)person).getTeam();
+                if(selectedPerson instanceof SupportPerson) {
+                    SupportTeam team = ((SupportPerson)selectedPerson).getTeam();
                     team.setRating(team.getRating() - 1);
                     refreshPersonnelList();
                     refreshDoctorsList();
@@ -2037,21 +2470,41 @@ public class PersonTableMouseAdapter extends MouseInputAdapter implements Action
                 }
             }
             else if (command.equalsIgnoreCase("HEAL")) {
-                if(person instanceof PilotPerson) {
-                    Pilot pilot = ((PilotPerson)person).getPilot();
-                    pilot.setHits(0);
-                    person.getTask().setTeam(null);
-                    person.setTask(null);
-                    refreshPersonnelList();
-                    refreshDoctorsList();
-                    refreshUnitList();
+                for (Person person : persons) {
+                    if(person instanceof PilotPerson) {
+                        Pilot pilot = ((PilotPerson)person).getPilot();
+                        pilot.setHits(0);
+                        person.getTask().setTeam(null);
+                        person.setTask(null);
+                    }
                 }
+                refreshPersonnelList();
+                refreshDoctorsList();
+                refreshUnitList();
             }
             else if (command.equalsIgnoreCase("PORTRAIT")) {
-                PortraitChoiceDialog pcd = new PortraitChoiceDialog(null, true, person.getPortraitCategory(), person.getPortraitFileName());
+                PortraitChoiceDialog pcd = new PortraitChoiceDialog(null, true, selectedPerson.getPortraitCategory(), selectedPerson.getPortraitFileName());
                 pcd.setVisible(true);
-                person.setPortraitCategory(pcd.getCategory());
-                person.setPortraitFileName(pcd.getFileName());
+                selectedPerson.setPortraitCategory(pcd.getCategory());
+                selectedPerson.setPortraitFileName(pcd.getFileName());
+                refreshPersonnelList();
+            }
+            else if (command.equalsIgnoreCase("XP_ADD")) {
+                for (Person person : persons) {
+                    if(person instanceof PilotPerson) {
+                        person.setXp(person.getXp()+1);
+                    }
+                }
+                refreshPersonnelList();
+            }
+            else if (command.equalsIgnoreCase("XP_SET")) {
+                PopupTextChoiceDialog popupTextChoiceDialog = new PopupTextChoiceDialog(null, true, "Xp");
+                popupTextChoiceDialog.setText(String.valueOf(selectedPerson.getXp()));
+                popupTextChoiceDialog.setVisible(true);
+
+                int i = Integer.parseInt(popupTextChoiceDialog.getText());
+                selectedPerson.setXp(i);
+
                 refreshPersonnelList();
             }
         }
@@ -2164,6 +2617,20 @@ public class PersonTableMouseAdapter extends MouseInputAdapter implements Action
                     menuItem.setEnabled(campaign.isGM() && sp.getTeam().getRating() > SupportTeam.EXP_REGULAR);
                     impMenu.add(menuItem);
                 }
+
+                impMenu = new JMenu("Xp");
+                menu.add(impMenu);
+                menuItem = new JMenuItem("Add xp");
+                menuItem.setActionCommand("XP_ADD");
+                menuItem.addActionListener(this);
+                menuItem.setEnabled(campaign.isGM());
+                impMenu.add(menuItem);
+                menuItem = new JMenuItem("Set xp");
+                menuItem.setActionCommand("XP_SET");
+                menuItem.addActionListener(this);
+                menuItem.setEnabled(campaign.isGM());
+                impMenu.add(menuItem);
+
                 popup.addSeparator();
                 popup.add(menu);
                 popup.show(e.getComponent(), e.getX(), e.getY());
@@ -2220,20 +2687,32 @@ public class PartsTableModel extends ArrayTableModel {
 
         public PartsTableModel() {
             columnNames = new String[] {"Parts"};
-            data = new ArrayList<Part>();
+            data = new ArrayList<PartInventory>();
         }
 
+        @Override
         public Object getValueAt(int row, int col) {
-            return ((Part)data.get(row)).getDescHTML();
+            PartInventory partInventory = (PartInventory) data.get(row);
+            StringBuffer descHTML = new StringBuffer(partInventory.getDescHTML());
+            return descHTML.toString();
         }
 
-        public Part getPersonAt(int row) {
-        return (Part)data.get(row);
-    }
+        public Part getPartAt(int row) {
+            return ((PartInventory) data.get(row)).getPart();
+        }
+
+        public Part [] getPartstAt(int [] rows) {
+            Part [] parts = new Part[rows.length];
+            for (int i=0;i<rows.length;i++) {
+                int row = rows[i];
+                parts[i] = ((PartInventory) data.get(row)).getPart();
+            }
+            return parts;
+        }
 
         public PartsTableModel.Renderer getRenderer() {
-        return new PartsTableModel.Renderer();
-    }
+            return new PartsTableModel.Renderer();
+        }
 
 
     public class Renderer extends PartInfo implements TableCellRenderer {
@@ -2255,25 +2734,92 @@ public class PartsTableModel extends ArrayTableModel {
     }
 }
 
+public class PartsTableMouseAdapter extends MouseInputAdapter implements ActionListener {
+
+        public void actionPerformed(ActionEvent action) {
+            String command = action.getActionCommand();
+            Part [] parts = partsModel.getPartstAt(PartsTable.getSelectedRows());
+            if(command.equalsIgnoreCase("SELL")) {
+                for (Part part : parts) {
+                    campaign.sellPart(part);
+                }
+                refreshPartsList();
+                refreshReport();
+                refreshFunds();
+            } else if(command.equalsIgnoreCase("REMOVE")) {
+                for (Part part : parts) {
+                    campaign.removePart(part);
+                }
+                refreshPartsList();
+                refreshReport();
+            }
+        }
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+            maybeShowPopup(e);
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            maybeShowPopup(e);
+        }
+
+        private void maybeShowPopup(MouseEvent e) {
+            JPopupMenu popup = new JPopupMenu();
+            if (e.isPopupTrigger()) {
+                int row = PartsTable.rowAtPoint(e.getPoint());
+                Part part  = partsModel.getPartAt(row);
+                JMenuItem menuItem = null;
+                JMenu menu = null;
+                JCheckBoxMenuItem cbMenuItem = null;
+                //**lets fill the pop up menu**//
+                //sell part
+                menuItem = new JMenuItem("Sell Part");
+                menuItem.setActionCommand("SELL");
+                menuItem.addActionListener(this);
+                popup.add(menuItem);
+                //GM mode
+                menu = new JMenu("GM Mode");
+                //remove part
+                menuItem = new JMenuItem("Remove Part");
+                menuItem.setActionCommand("REMOVE");
+                menuItem.addActionListener(this);
+                menuItem.setEnabled(campaign.isGM());
+                menu.add(menuItem);
+                //end
+                popup.addSeparator();
+                popup.add(menu);
+                popup.show(e.getComponent(), e.getX(), e.getY());
+            }
+        }
+}
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTable DocTable;
+    private javax.swing.JComboBox PartsFilter;
     private javax.swing.JTable PartsTable;
     private javax.swing.JTable PersonTable;
     private javax.swing.JTable TaskTable;
     private javax.swing.JTable TechTable;
     private javax.swing.JTable UnitTable;
+    private javax.swing.JMenuItem addFunds;
     private javax.swing.JButton btnAdvanceDay;
     private javax.swing.JButton btnAssignDoc;
     private javax.swing.JButton btnDeployUnits;
     private javax.swing.JButton btnDoTask;
     private javax.swing.JToggleButton btnGMMode;
+    private javax.swing.JButton btnLoadParts;
     private javax.swing.JToggleButton btnOvertime;
     private javax.swing.JButton btnRetrieveUnits;
+    private javax.swing.JButton btnSaveParts;
+    private javax.swing.JToggleButton btnStoreTime;
     private javax.swing.JPanel btnUnitPanel;
+    private javax.swing.JLabel fundsLabel;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane6;
-    private javax.swing.JScrollPane jScrollPane7;
     private javax.swing.JScrollPane jScrollPane8;
     private javax.swing.JLabel lblTarget;
     private javax.swing.JLabel lblTargetNum;
@@ -2308,6 +2854,7 @@ public class PartsTableModel extends ArrayTableModel {
     private javax.swing.JTabbedPane tabMain;
     private javax.swing.JTextArea textTarget;
     private javax.swing.JTextPane txtPaneReport;
+    private javax.swing.JScrollPane txtPaneReportScrollPane;
     // End of variables declaration//GEN-END:variables
 
     private final Timer messageTimer;
