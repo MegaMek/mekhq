@@ -21,29 +21,48 @@
 
 package mekhq.campaign;
 
+import common.DataFactory;
+import common.EquipmentFactory;
+import java.io.IOException;
+import java.text.NumberFormat;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import megamek.common.loaders.EntityLoadingException;
 import mekhq.campaign.team.SupportTeam;
 import java.io.Serializable;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Locale;
 import megamek.common.Aero;
+import megamek.common.CriticalSlot;
 import megamek.common.Entity;
 
 import megamek.common.Game;
+import megamek.common.MechFileParser;
+import megamek.common.MechSummary;
+import megamek.common.MechSummaryCache;
+import megamek.common.MiscType;
 import megamek.common.Mounted;
 import megamek.common.Pilot;
 import megamek.common.Player;
 import megamek.common.Protomech;
 import megamek.common.Tank;
 import mekhq.campaign.parts.EquipmentPart;
+import mekhq.campaign.parts.GenericSparePart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PilotPerson;
 import mekhq.campaign.personnel.SupportPerson;
 import mekhq.campaign.team.MedicalTeam;
 import mekhq.campaign.team.TechTeam;
+import mekhq.campaign.work.Customization;
+import mekhq.campaign.work.FullRepairWarchest;
+import mekhq.campaign.work.Refit;
 import mekhq.campaign.work.ReloadItem;
 import mekhq.campaign.work.UnitWorkItem;
 import mekhq.campaign.work.WorkItem;
@@ -96,10 +115,18 @@ public class Campaign implements Serializable {
     
     private boolean overtime;
     private boolean gmMode;
+    private boolean storeTime;
     
     private String camoCategory = Player.NO_CAMO;
     private String camoFileName = null;
-    private int colorIndex = 0;  
+    private int colorIndex = 0;
+
+    private static components.Mech sswMech;
+    private static EquipmentFactory sswEquipmentFactory;
+
+    private int funds;
+
+    private CampaignOptions campaignOptions = new CampaignOptions();
     
     public Campaign() {
     
@@ -108,7 +135,7 @@ public class Campaign implements Serializable {
         calendar = new GregorianCalendar(3067, Calendar.JANUARY, 1);
         dateFormat = new SimpleDateFormat("EEEE, MMMM d yyyy");  
         shortDateFormat = new SimpleDateFormat("MMddyyyy");
-        currentReport.add("<b>" + getDateAsString() + "</b>");
+        addReport("<b>" + getDateAsString() + "</b>");
         name = "My Campaign";
         overtime = false;
         gmMode = false;
@@ -133,6 +160,46 @@ public class Campaign implements Serializable {
     
     public String getTitle() {
         return getName() + " (" + getFactionName() + ")" + " - " + getDateAsString() + " (" + getEraName() + ")";
+    }
+
+    public GregorianCalendar getCalendar() {
+        return calendar;
+    }
+
+    public static EquipmentFactory getSswEquipmentFactory() {
+        if (sswEquipmentFactory==null)
+            sswEquipmentFactory = getNewSswEquipmentFactory();
+        return sswEquipmentFactory;
+    }
+
+    public static components.Mech getSswMech() {
+        if (sswMech==null)
+            sswMech = getNewSswMech();
+        return sswMech;
+    }
+
+    public int getFunds() {
+        return funds;
+    }
+
+    public void setFunds(int funds) {
+        this.funds = funds;
+    }
+
+    public static EquipmentFactory getNewSswEquipmentFactory() {
+        try {
+            DataFactory sswDataFactory = new DataFactory(getSswMech());
+            EquipmentFactory sswEquipmentFactory = sswDataFactory.GetEquipment();
+            return sswEquipmentFactory;
+        } catch (Exception ex) {
+            Logger.getLogger(Campaign.class.getName()).log(Level.SEVERE, "SSW Lib initialization problem", ex);
+            System.exit(1);
+        }
+        return null;
+    }
+
+    public static components.Mech getNewSswMech() {
+        return new components.Mech();
     }
     
     /**
@@ -183,7 +250,7 @@ public class Campaign implements Serializable {
         }
         else if(en instanceof Aero) {
             type = PilotPerson.T_AERO;
-        } 
+        }
         Unit priorUnit = unitIds.get(new Integer(en.getExternalId()));
         if(null != priorUnit) {
             //this is an existing unit so we need to update it
@@ -216,7 +283,7 @@ public class Campaign implements Serializable {
                     }
                 }
             }
-            currentReport.add(priorUnit.getEntity().getDisplayName() + " has been recovered.");
+            addReport(priorUnit.getEntity().getDisplayName() + " has been recovered.");
         } else {
             //this is a new unit so add it
             int id = lastUnitId + 1;
@@ -237,7 +304,7 @@ public class Campaign implements Serializable {
             }
             //collect all the work items outstanding on this unit and add them to the workitem vector
             unit.runDiagnostic(this);
-            currentReport.add(unit.getEntity().getDisplayName() + " has been added to the unit roster.");
+            addReport(unit.getEntity().getDisplayName() + " has been added to the unit roster.");
         }
     }
     
@@ -263,7 +330,7 @@ public class Campaign implements Serializable {
                 taskIds.remove(new Integer(task.getId()));
             }
             priorPilot.runDiagnostic(this);
-            currentReport.add(priorPilot.getDesc() + " has been recovered");
+            addReport(priorPilot.getDesc() + " has been recovered");
             return (PilotPerson)priorPilot;
         }
         else if (allowNewPilots) {
@@ -319,7 +386,7 @@ public class Campaign implements Serializable {
         lastPersonId = id;
         //check for any work items on this person
         p.runDiagnostic(this);
-        currentReport.add(p.getDesc() + " has been added to the personnel roster.");
+        addReport(p.getDesc() + " has been added to the personnel roster.");
     }
     
     public ArrayList<Person> getPersonnel() {
@@ -331,6 +398,18 @@ public class Campaign implements Serializable {
     }
     
     public void addPart(Part p) {
+
+        if (p instanceof GenericSparePart) {
+            for (Part part : getParts()) {
+                if (part instanceof GenericSparePart
+                        && p.isSamePartTypeAndStatus(part)) {
+                    ((GenericSparePart) part).setAmount(((GenericSparePart) part).getAmount() + ((GenericSparePart) p).getAmount());
+                    assignParts();
+                    return;
+                }
+            }
+        }
+
         int id = lastPartId + 1;
         p.setId(id);
         parts.add(p);
@@ -390,11 +469,48 @@ public class Campaign implements Serializable {
             return newTasks;
         }
         for(WorkItem task : getTasks()) {
-            if(task instanceof UnitWorkItem 
+            if(task instanceof UnitWorkItem && ((UnitWorkItem)task).getUnitId() == unitId) {
+                if (task instanceof SalvageItem) {
+                    if (unit.isSalvage() || unit.isCustomized())
+                        newTasks.add(task);
+                } else if (task instanceof Refit || task instanceof Customization) {
+                    if (unit.isCustomized())
+                        newTasks.add(task);
+                } else if (task instanceof RepairItem || task instanceof ReplacementItem) {
+                    if ((CampaignOptions.repairSystem == CampaignOptions.REPAIR_SYSTEM_STRATOPS
+                            || CampaignOptions.repairSystem == CampaignOptions.REPAIR_SYSTEM_GENERIC_PARTS)
+                            && !unit.isSalvage() && !unit.isCustomized())
+                        newTasks.add(task);
+                } else if (task instanceof ReloadItem) {
+                    if ((CampaignOptions.repairSystem == CampaignOptions.REPAIR_SYSTEM_STRATOPS
+                            || CampaignOptions.repairSystem == CampaignOptions.REPAIR_SYSTEM_GENERIC_PARTS)
+                            && !unit.isSalvage() && !unit.isCustomized()) {
+                        newTasks.add(task);
+                    } else if (CampaignOptions.repairSystem == CampaignOptions.REPAIR_SYSTEM_WARCHEST_CUSTOM
+                            && !unit.isSalvage() && !unit.isCustomized()) {
+                        newTasks.add(task);
+                    }
+                } else if (task instanceof FullRepairWarchest) {
+                    if (CampaignOptions.repairSystem == CampaignOptions.REPAIR_SYSTEM_WARCHEST_CUSTOM
+                            && !unit.isSalvage() && !unit.isCustomized())
+                        newTasks.add(task);
+                }
+            }
+        }
+        return newTasks;
+    }
+
+    public ArrayList<WorkItem> getSalvageTasksForUnit(int unitId) {
+        Unit unit = getUnit(unitId);
+        ArrayList<WorkItem> newTasks = new ArrayList<WorkItem>();
+        if(null == unit) {
+            return newTasks;
+        }
+        for(WorkItem task : getTasks()) {
+            if(task instanceof UnitWorkItem
                     && ((UnitWorkItem)task).getUnitId() == unitId
-                    && ((task instanceof SalvageItem && unit.isSalvage())
-                        || (!(task instanceof SalvageItem) && !unit.isSalvage()))) {
-                    newTasks.add(task);
+                    && task instanceof SalvageItem) {
+                newTasks.add(task);
             }
         }
         return newTasks;
@@ -437,15 +553,23 @@ public class Campaign implements Serializable {
         ArrayList<WorkItem> unitTasks = getTasksForUnit(unitId);
         int totalMin = 0;
         int total = 0;
+        int cost = unit.getRepairCost();
         for(WorkItem task : unitTasks) {
             if(task.isNeeded()) {
                 total++;
                 totalMin += task.getTime();
             }
         }
+
         if(total > 0) {
             toReturn += "Total tasks: " + total + " (" + totalMin + " minutes)<br>";
         }
+        if (cost > 0) {
+            NumberFormat numberFormat = DecimalFormat.getIntegerInstance();
+            String text = numberFormat.format(cost) + " " + (cost!=0?"CBills":"CBill");
+            toReturn += "Repair cost : " + text + "<br>";
+        }
+
         toReturn += "</font>";
         toReturn += "</html>";
         return toReturn;
@@ -476,7 +600,7 @@ public class Campaign implements Serializable {
      }
     
      public boolean processTask(WorkItem task, SupportTeam team) {
-         currentReport.add(team.doAssigned(task));
+         addReport(team.doAssigned(task));
          if(task.isCompleted()) {
              removeTask(task);
              return true;
@@ -510,7 +634,15 @@ public class Campaign implements Serializable {
      
     public void newDay() {
          for(SupportTeam team : getTeams()) {
-            team.resetMinutesLeft();
+             if (isStoreTime()) {
+                 int minutesLeft = team.getMinutesLeft();
+                 int overtimeMinutesLeft = team.getOvertimeLeft();
+                 team.resetMinutesLeft();
+                 team.setMinutesLeft(team.getMinutesLeft()+minutesLeft);
+                 team.setOvertimeLeft(team.getMinutesLeft()+overtimeMinutesLeft);
+             } else {
+                 team.resetMinutesLeft();
+             }
          }
          ArrayList<WorkItem> assigned = new ArrayList<WorkItem>();
          for(WorkItem task : getTasks()) {
@@ -526,11 +658,11 @@ public class Campaign implements Serializable {
          }
          for(Person p : getPersonnel()) {
             if(p.checkNaturalHealing()) {
-                currentReport.add(p.getDesc() + " heals naturally!");
+                addReport(p.getDesc() + " heals naturally!");
             }
          }
          calendar.add(Calendar.DAY_OF_MONTH, 1);
-         currentReport.add("<p><b>" + getDateAsString() + "</b>");
+         addReport("<p><b>" + getDateAsString() + "</b>");
     }
     
     public void clearAllUnits() {
@@ -545,7 +677,18 @@ public class Campaign implements Serializable {
     }
     
     public void removeAllTasksFor(Unit unit) {
-        for(WorkItem task : getTasksForUnit(unit.getId())) {
+        for(WorkItem task : getAllTasksForUnit(unit.getId())) {
+            removeTask(task);
+        }
+    }
+
+    public void removeAllUnitWorkItems () {
+        ArrayList<WorkItem> tasksToRemove = new ArrayList<WorkItem>();
+        for(WorkItem task : getTasks()) {
+            if (task instanceof UnitWorkItem)
+                tasksToRemove.add(task);
+        }
+        for (WorkItem task : tasksToRemove) {
             removeTask(task);
         }
     }
@@ -562,7 +705,7 @@ public class Campaign implements Serializable {
         //finally remove the unit
         units.remove(unit);
         unitIds.remove(new Integer(unit.getId()));   
-        currentReport.add(unit.getEntity().getDisplayName() + " has been removed from the unit roster.");
+        addReport(unit.getEntity().getDisplayName() + " has been removed from the unit roster.");
     }
     
     public void removePerson(int id) {
@@ -574,7 +717,7 @@ public class Campaign implements Serializable {
             removeTeam(((SupportPerson)person).getTeam().getId());
         }
         
-        currentReport.add(person.getDesc() + " has been removed from the personnel roster.");
+        addReport(person.getDesc() + " has been removed from the personnel roster.");
         personnel.remove(person);
         personnelIds.remove(new Integer(id));
     }
@@ -676,6 +819,7 @@ public class Campaign implements Serializable {
     }
     
     public void restore() {
+        campaignOptions.restore();
         for(Part part : getParts()) {
             if(part instanceof EquipmentPart) {
                 ((EquipmentPart)part).restore();
@@ -686,6 +830,10 @@ public class Campaign implements Serializable {
                 unit.getEntity().restore();
             }
         }
+    }
+
+    public void save () {
+        campaignOptions.save();
     }
     
     public boolean isOvertimeAllowed() {
@@ -703,6 +851,14 @@ public class Campaign implements Serializable {
     public void setGMMode(boolean b) {
         this.gmMode = b;
     }
+
+    public void setStoreTime(boolean storeTime) {
+        this.storeTime = storeTime;
+    }
+
+    public boolean isStoreTime() {
+        return storeTime;
+    }
     
     public int getFaction() {
         return faction;
@@ -717,6 +873,10 @@ public class Campaign implements Serializable {
     }
     
     public void addReport(String r) {
+        int maxLine = 150;
+        while (currentReport.size()>maxLine) {
+            currentReport.remove(0);
+        }
         currentReport.add(r);
     }
     
@@ -743,5 +903,104 @@ public class Campaign implements Serializable {
     public void setColorIndex(int index) {
         colorIndex = index;
     }
-    
+
+    /**
+     * Creates an {@link ArrayList} containing a {@link PartInventory} for each part owned ({@link parts})
+     * 
+     */
+    // TODO : Add some kind of caching method to speed things up when lots of parts
+    public ArrayList<PartInventory> getPartsInventory () {
+        ArrayList<PartInventory> partsInventory = new ArrayList<PartInventory>();
+
+        Iterator<Part> itParts = getParts().iterator();
+        while (itParts.hasNext()) {
+            Part part = itParts.next();
+            if (!partsInventory.contains(new PartInventory(part, 0))) {
+                partsInventory.add(new PartInventory(part, 1));
+            } else {
+                partsInventory.get(partsInventory.indexOf(new PartInventory(part, 0))).addOnePart();
+            }
+        }
+
+        return partsInventory;
+    }
+
+    /**
+     * Creates an {@link ArrayList} containing a {@link PartInventory} for each part returned by {@link getPartsInventory()} which is of the type {@link partType}
+     *
+     * @param partType The type of the part as defined in {@link Part}
+     */
+    public ArrayList<PartInventory> getPartsInventory (int partType) {
+        ArrayList<PartInventory> partsInventory = new ArrayList<PartInventory>();
+        Iterator<PartInventory> itParts = getPartsInventory().iterator();
+        while (itParts.hasNext()) {
+            PartInventory partInventory = itParts.next();
+            Part part = partInventory.getPart();
+            if (part.getPartType()==partType)
+                partsInventory.add(partInventory);
+        }
+        return partsInventory;
+    }
+
+    public void addFunds (int quantity) {
+        setFunds(getFunds()+quantity);
+        NumberFormat numberFormat = DecimalFormat.getIntegerInstance();
+        String quantityString = numberFormat.format(quantity);
+        addReport("Funds added : " + quantityString);
+    }
+
+    public boolean buyUnit(Entity en, boolean allowNewPilots) {
+        int cost = new Unit(en, this).getBuyCost();
+        
+        if (getFunds()>=cost) {
+            addUnit(en, allowNewPilots);
+            addFunds(-cost);
+            return true;
+        } else
+            return false;
+    }
+
+    public void sellUnit (int id) {
+        Unit unit = getUnit(id);
+        int sellValue = unit.getSellValue();
+        
+        addFunds(sellValue);
+        removeUnit(id);
+    }
+
+    public void sellPart (Part part) {
+        int cost = part.getCost();
+        addFunds(cost / 2);
+        removePart(part);
+    }
+
+    public void buyPart (Part part) {
+        int cost = part.getCost();
+        addFunds(-cost);
+        addPart(part);
+    }
+
+    public void refreshAllUnitDiagnostics() {
+        removeAllUnitWorkItems();
+        for (Unit unit : getUnits()) {
+            unit.runDiagnostic(this);
+        }
+    }
+
+    public static Entity getBrandNewUndamagedEntity (String entityShortName) {
+        MechSummary mechSummary = MechSummaryCache.getInstance().getMech(entityShortName);
+        if (mechSummary==null)
+            return null;
+
+        MechFileParser mechFileParser = null;
+        try {
+            mechFileParser = new MechFileParser(mechSummary.getSourceFile());
+        } catch (EntityLoadingException ex) {
+            Logger.getLogger(Campaign.class.getName()).log(Level.SEVERE, "MechFileParse exception : " + entityShortName, ex);
+        }
+        if (mechFileParser==null)
+            return null;
+
+        return mechFileParser.getEntity();
+    }
 }

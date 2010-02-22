@@ -86,5 +86,12 @@ public class Faction {
                 return "Unknown";
         }
     }
+
+    public static boolean isPeripheryFaction (int faction) {
+        return (faction==F_CANOPUS || faction==F_OA || faction==F_PERIPHERY || faction==F_RWR || faction==F_TC);
+    }
+    public static boolean isClanFaction (int faction) {
+        return (faction==F_CLAN);
+    }
     
 }
