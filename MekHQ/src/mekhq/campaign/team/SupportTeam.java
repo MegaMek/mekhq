@@ -21,12 +21,20 @@
 
 package mekhq.campaign.team;
 
+import components.AvailableCode;
+import components.abPlaceable;
 import mekhq.campaign.*;
 import java.io.Serializable;
+import java.util.Calendar;
 import megamek.common.Compute;
 import megamek.common.TargetRoll;
+import mekhq.campaign.SSWLibHelper.AvailableCodeHelper;
+import mekhq.campaign.parts.GenericSparePart;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.work.FullRepairWarchest;
 import mekhq.campaign.work.PersonnelWorkItem;
+import mekhq.campaign.work.Refit;
+import mekhq.campaign.work.ReloadItem;
 import mekhq.campaign.work.ReplacementItem;
 import mekhq.campaign.work.UnitWorkItem;
 import mekhq.campaign.work.WorkItem;
@@ -263,31 +271,130 @@ public abstract class SupportTeam implements Serializable {
                return new TargetRoll(TargetRoll.IMPOSSIBLE, "Not enough time");
            }
        }
+       // Generic spare parts
+       if (task instanceof ReplacementItem
+               && ((ReplacementItem) task).partNeeded() instanceof GenericSparePart
+               && !((ReplacementItem) task).hasPart()) {
+           return new TargetRoll(TargetRoll.IMPOSSIBLE, "Not enough spare parts");
+       } else if (task instanceof ReplacementItem
+               && ((ReplacementItem) task).hasPart()
+               && ((ReplacementItem) task).partNeeded() instanceof GenericSparePart
+               && !((ReplacementItem) task).hasEnoughGenericSpareParts()) {
+           /*
+           GenericSparePart partNeeded = (GenericSparePart) ((ReplacementItem) task).partNeeded();
+           GenericSparePart part = (GenericSparePart) ((ReplacementItem) task).getPart();
+           if (campaign.getFunds() < new GenericSparePart(part.getTech(), partNeeded.getAmount()-part.getAmount()).getCost()) {
+               return new TargetRoll(TargetRoll.IMPOSSIBLE, "Not enough funds");
+           }
+           */
+           return new TargetRoll(TargetRoll.IMPOSSIBLE, "Not enough spare parts");
+       }
+       // check funds
+       if (task instanceof ReplacementItem
+               && !((ReplacementItem) task).hasPart()
+               && campaign.getFunds() < ((ReplacementItem) task).partNeeded().getCost()) {
+           return new TargetRoll(TargetRoll.IMPOSSIBLE, "Not enough funds");
+       } else if (task instanceof ReloadItem
+               && campaign.getFunds() < ((ReloadItem) task).getCost()) {
+           return new TargetRoll(TargetRoll.IMPOSSIBLE, "Not enough funds");
+       } else if (task instanceof FullRepairWarchest
+               && campaign.getFunds() < ((FullRepairWarchest) task).getCost()) {
+           return new TargetRoll(TargetRoll.IMPOSSIBLE, "Not enough funds");
+       }
+
        target.append(task.getAllMods());
        return target;
    }
    
    public String doAssigned(WorkItem task) {
+       // Called by btnDoTaskActionPerformed
+       // if team.getTargetFor(task).getValue() == TargetRoll.IMPOSSIBLE, doAssigned is not called
+       // Not called if not enough funds as long as getTargetFor checks for funds
        String report = "";
        if(task instanceof ReplacementItem && !((ReplacementItem)task).hasPart()) {
            //first we need to source the part
            ReplacementItem replace = (ReplacementItem)task;
-           Part part = replace.partNeeded();    
+           Part part = replace.partNeeded();
            report += getName() + " must first obtain " + part.getDesc();
            TargetRoll target = getTarget(WorkItem.MODE_NORMAL);
            replace.setPartCheck(true);
-           //TODO: availability mods
+
+           char availability = 'Z';
+           int factionMod = 0;
+           
+           if (task instanceof Refit) {
+               Refit refit = (Refit) task;
+               availability = refit.getRefitKitAvailability();
+               factionMod = refit.getRefitKitAvailabilityMod();
+           } else {
+               // Part availability mod
+               AvailableCodeHelper availableCodeHelper = SSWLibHelper.getPartAvailableCodeHelper(part, campaign);
+               availability = availableCodeHelper.getAvailability(campaign.getCalendar());
+
+               // Faction and Tech mod
+               if (CampaignOptions.useFactionModifiers)
+                   factionMod = SSWLibHelper.getFactionAndTechMod(part, availableCodeHelper, campaign);
+           }
+
+           int availabilityMod = SSWLibHelper.getModifierFromAvailability(availability);
+           target.addModifier(availabilityMod, "availability (" + availability + ")");
+           target.addModifier(factionMod, "faction");
+
            int roll = Compute.d6(2);
-           report += "  needs " + target.getValueAsString() + " and rolls " + roll + ":";
+           report += "  needs " + target.getValueAsString();
+           report += "<font color='blue' size='-2'> [" + target.getDesc() + "] </font>";
+           report += " and rolls " + roll + ":";
+
            if(roll >= target.getValue()) {
               report += " <font color='green'><b>part found.</b></font><br>";
               replace.setPart(part);
-              campaign.addPart(part);
+              campaign.buyPart(part);
            } else {
               report += " <font color='red'><b>part not available.</b></font>";
               return report;
            }
        }
+       
+       /*
+       else if (task instanceof ReplacementItem
+                    && ((ReplacementItem)task).hasPart()
+                    && ((ReplacementItem) task).partNeeded() instanceof GenericSparePart
+                    && !((ReplacementItem) task).hasEnoughGenericSpareParts()){
+           GenericSparePart partNeeded = (GenericSparePart) ((ReplacementItem) task).partNeeded();
+           GenericSparePart currentPart = (GenericSparePart) ((ReplacementItem) task).getPart();
+           
+           //first we need to source the amount missing
+           ReplacementItem replace = (ReplacementItem)task;
+           GenericSparePart partMissing = (GenericSparePart) replace.partNeeded();
+           partMissing.setAmount(partNeeded.getAmount()-currentPart.getAmount());
+           
+           report += getName() + " must first obtain " + partMissing.getDesc();
+           TargetRoll target = getTarget(WorkItem.MODE_NORMAL);
+           replace.setPartCheck(true);
+
+           char availability = GenericSparePart.getAvailability();
+           int factionMod = 0;
+
+           int availabilityMod = SSWLibHelper.getModifierFromAvailability(availability);
+           target.addModifier(availabilityMod, "availability (" + availability + ")");
+           target.addModifier(factionMod, "faction");
+
+           int roll = Compute.d6(2);
+           report += "  needs " + target.getValueAsString();
+           report += "<font color='blue' size='-2'> [" + target.getDesc() + "] </font>";
+           report += " and rolls " + roll + ":";
+
+           if(roll >= target.getValue()) {
+              report += " <font color='green'><b>part found.</b></font><br>";
+              currentPart.setAmount(partNeeded.getAmount());
+              campaign.buyPart(partMissing);
+           } else {
+              report += " <font color='red'><b>part not available.</b></font>";
+              return report;
+           }
+       }
+       */
+       
        report += getName() + " attempts to " + task.getDisplayName();    
        TargetRoll target = getTargetFor(task);
        int minutes = task.getTime();
@@ -303,9 +410,17 @@ public abstract class SupportTeam implements Serializable {
        report = report + "  needs " + target.getValueAsString() + " and rolls " + roll + ":";
        if(roll >= target.getValue()) {
            report = report + task.succeed();
+
+           // Substract cost
+           if (task instanceof FullRepairWarchest) {
+               campaign.addFunds(-((FullRepairWarchest) task).getCost());
+           } else if (task instanceof ReloadItem) {
+               campaign.addFunds(-((ReloadItem) task).getCost());
+           }
        } else {
            report = report + task.fail(getRating());
        }
        return report;
-    }
+   }
+   
 }

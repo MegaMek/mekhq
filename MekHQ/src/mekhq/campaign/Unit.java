@@ -22,18 +22,40 @@
 package mekhq.campaign;
 
 import java.io.Serializable;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import megamek.common.AmmoType;
 import megamek.common.CriticalSlot;
 import megamek.common.Entity;
+import megamek.common.EquipmentType;
+import megamek.common.IArmorState;
 import megamek.common.Mech;
+import megamek.common.MechFileParser;
+import megamek.common.MechSummary;
+import megamek.common.MechSummaryCache;
 import megamek.common.MiscType;
 import megamek.common.Mounted;
 import megamek.common.Protomech;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
+import megamek.common.TechConstants;
 import megamek.common.VTOL;
+import megamek.common.WeaponType;
+import megamek.common.loaders.EntityLoadingException;
+import mekhq.MekHQApp;
+import mekhq.campaign.SSWLibHelper.AvailableCodeHelper;
+import mekhq.campaign.parts.GenericSparePart;
+import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.PilotPerson;
+import mekhq.campaign.team.SupportTeam;
 import mekhq.campaign.work.*;
+import org.jdesktop.application.Application;
+import org.jdesktop.application.ResourceMap;
 
 /**
  * This is a wrapper class for entity, so that we can add some 
@@ -48,12 +70,18 @@ public class Unit implements Serializable {
     public static final int SITE_FACILITY = 3;
     public static final int SITE_FACTORY = 4;
     public static final int SITE_N = 5;
+
+    public static final int STATE_UNDAMAGED = 0;
+    public static final int STATE_LIGHT_DAMAGE = 1;
+    public static final int STATE_HEAVY_DAMAGE = 2;
+    public static final int STATE_CRIPPLED = 3;
     
     private Entity entity;
     private int site;
     private boolean deployed;
     private PilotPerson pilot;
     private boolean salvaged;
+    private boolean customized;
     
     public Campaign campaign;
     //TODO: need to keep track of what components have been removed from this unit
@@ -64,6 +92,7 @@ public class Unit implements Serializable {
         this.deployed = false;
         this.salvaged = false;
         this.campaign = c;
+        this.customized = false;
     }
     
     public void setEntity(Entity en) {
@@ -109,6 +138,14 @@ public class Unit implements Serializable {
     
     public void setSalvage(boolean b) {
         this.salvaged = b;
+    }
+
+    public void setCustomized(boolean customized) {
+        this.customized = customized;
+    }
+
+    public boolean isCustomized() {
+        return customized;
     }
     
     public boolean isFunctional() {
@@ -175,8 +212,9 @@ public class Unit implements Serializable {
     
     /**
      * Run a diagnostic on this unit and add WorkItems to the campaign
+     * Uses Strat Ops rules
      */
-    public void runDiagnostic(Campaign campaign) {
+    public void runDiagnosticStratOps(Campaign campaign) {
         
         if(!isRepairable()) {
             setSalvage(true);
@@ -476,6 +514,44 @@ public class Unit implements Serializable {
     }
     
     /**
+     * Run a diagnostic on this unit and add WorkItems to the campaign
+     * Uses Warchest rules
+     */
+    public void runDiagnosticWarchest (Campaign campaign) {
+        if (getDamageState()!=Unit.STATE_UNDAMAGED) {
+            FullRepairWarchest fullRepair = new FullRepairWarchest(this);
+            campaign.addWork(fullRepair);
+        }
+    }
+
+    /**
+     * Run a diagnostic on this unit and add WorkItems to the campaign
+     * Uses Generic spare parts rules
+     */
+    public void runDiagnosticGenericSpareParts (Campaign campaign) {
+        runDiagnosticStratOps(campaign);
+        // Change all repair items into replacement items
+        for (WorkItem task : campaign.getTasksForUnit(getId())) {
+            if (task instanceof RepairItem) {
+                campaign.mutateTask(task, ((RepairItem)task).getReplacementTask());
+            }
+        }
+    }
+
+    /**
+     * Run a diagnostic on this unit
+     */
+    public void runDiagnostic (Campaign campaign) {
+        if (CampaignOptions.repairSystem == CampaignOptions.REPAIR_SYSTEM_STRATOPS) {
+            runDiagnosticStratOps(campaign);
+        } else if (CampaignOptions.repairSystem == CampaignOptions.REPAIR_SYSTEM_WARCHEST_CUSTOM) {
+            runDiagnosticWarchest(campaign);
+        } else if (CampaignOptions.repairSystem == CampaignOptions.REPAIR_SYSTEM_GENERIC_PARTS) {
+            runDiagnosticGenericSpareParts(campaign);
+        }
+    }
+    
+    /**
      * @param m - A Mounted class to find crits for
      * @return the number of crits exising for this Mounted
      */
@@ -595,16 +671,6 @@ public class Unit implements Serializable {
         return null;
     }
     
-    public boolean hasEndosteel() {
-        for (Mounted mEquip : entity.getMisc()) {
-            MiscType mtype = (MiscType) mEquip.getType();
-            if (mtype.hasFlag(MiscType.F_ENDO_STEEL)) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
     /**
      * Have to make one here because the one in MegaMek only returns true if operable
      * @return
@@ -715,5 +781,816 @@ public class Unit implements Serializable {
         }
     }
     
-    
+    public boolean isDamaged () {
+        return getDamageState() != Unit.STATE_UNDAMAGED;
+    }
+
+    public String getHeatSinkTypeString () {
+        BigInteger heatSinkType = MiscType.F_HEAT_SINK;
+        boolean heatSinkIsClanTechBase = false;
+
+        for (Mounted mounted : getEntity().getEquipment()) {
+            // Also goes through heat sinks inside the engine
+            EquipmentType etype = mounted.getType();
+            boolean isHeatSink = false;
+
+            if (etype instanceof MiscType) {
+                if (etype.hasFlag(MiscType.F_LASER_HEAT_SINK)) {
+                    heatSinkType = MiscType.F_LASER_HEAT_SINK;
+                    isHeatSink = true;
+                } else if (etype.hasFlag(MiscType.F_DOUBLE_HEAT_SINK)) {
+                    heatSinkType = MiscType.F_DOUBLE_HEAT_SINK;
+                    isHeatSink = true;
+                } else if (etype.hasFlag(MiscType.F_HEAT_SINK)) {
+                    heatSinkType = MiscType.F_HEAT_SINK;
+                    isHeatSink = true;
+                }
+            }
+
+            if (isHeatSink) {
+                if (TechConstants.getTechName(etype.getTechLevel()).equals("Inner Sphere"))
+                    heatSinkIsClanTechBase = false;
+                else if (TechConstants.getTechName(etype.getTechLevel()).equals("Clan"))
+                    heatSinkIsClanTechBase = true;
+                break;
+            }
+        }
+
+        String heatSinkTypeString = heatSinkIsClanTechBase?"(CL) ": "(IS) ";
+        if (heatSinkType==MiscType.F_LASER_HEAT_SINK)
+            heatSinkTypeString += "Laser Heat Sink";
+        else if (heatSinkType==MiscType.F_DOUBLE_HEAT_SINK)
+            heatSinkTypeString += "Double Heat Sink";
+        else if (heatSinkType==MiscType.F_HEAT_SINK)
+            heatSinkTypeString += "Heat Sink";
+
+        return heatSinkTypeString;
+    }
+
+    public void customize (Entity targetEntity, Campaign campaign) {
+        Unit sourceUnit = this;
+        Entity currentEntity = sourceUnit.getEntity();
+
+        ArrayList <SalvageItem> salvageItems = new ArrayList<SalvageItem>();
+
+        ArrayList <WorkItem> salvage = campaign.getSalvageTasksForUnit(sourceUnit.getId());
+
+        campaign.addUnit(targetEntity, false);
+        
+        Unit targetUnit = campaign.getUnits().get(campaign.getUnits().size()-1);
+        targetEntity = targetUnit.getEntity();
+
+        ArrayList <Mounted> targetMountedToDestroy = new ArrayList<Mounted>();
+
+        int refitClass = Refit.REFIT_CLASS_A;
+
+        int refitCost = 0;
+
+        boolean hasWeaponRemoval = false; // A
+        boolean hasWeaponReplacementClassA = false; // A
+        boolean hasWeaponReplacementClassB = false; // B
+        boolean hasWeaponReplacementClassC = false; // C
+        boolean hasOtherEquipmentReplacement = false; // C
+        boolean hasOtherEquipmentRemoval = false; // C
+        boolean hasHeatSinkAddition = false; // C
+        boolean hasAmmunitionAddition = false; // C
+        boolean hasCaseInstall = false; // E
+        boolean hasOtherEquipmentAddition = false; // D
+
+        // Add to salvageTasks all salvage from current unit which needs to be removed
+        for (int currentLocation=0;currentLocation<currentEntity.locations(); currentLocation++) {
+            // If current structure type != target structure type, get salvage for location and armor
+            if (currentEntity.getStructureType() != targetEntity.getStructureType()) {
+                for (WorkItem task : salvage) {
+                    if (task instanceof LocationSalvage
+                            && ((LocationSalvage) task).getLoc()==currentLocation)
+                        salvageItems.add((SalvageItem) task);
+                    else if (task instanceof ArmorSalvage
+                            && ((ArmorSalvage) task).getLoc()==currentLocation)
+                        salvageItems.add((SalvageItem) task);
+                }
+                
+                if (currentLocation!=Mech.LOC_CT)
+                    targetEntity.setInternal(IArmorState.ARMOR_DESTROYED, currentLocation);
+                else
+                    targetEntity.setInternal(1, currentLocation);
+                targetEntity.setArmor(0, currentLocation, false);
+                if (targetEntity.hasRearArmor(currentLocation))
+                    targetEntity.setArmor(0, currentLocation, true);
+
+                if (Refit.REFIT_CLASS_F > refitClass)
+                    refitClass = Refit.REFIT_CLASS_F;
+                
+            // If current armor  type != target armor type or if current max armor != target max armor, get salvage for armor
+            } else if (currentEntity.getArmorType() != targetEntity.getArmorType()
+                    || currentEntity.getOArmor(currentLocation, false) != targetEntity.getOArmor(currentLocation, false)
+                    || (currentEntity.hasRearArmor(currentLocation) && (currentEntity.getOArmor(currentLocation, true) != targetEntity.getOArmor(currentLocation, true)))
+                    ) {
+                for (WorkItem task : salvage) {
+                    if (task instanceof ArmorSalvage
+                            && ((ArmorSalvage) task).getLoc()==currentLocation)
+                        salvageItems.add((SalvageItem) task);
+                }
+
+                targetEntity.setArmor(0, currentLocation, false);
+                if (targetEntity.hasRearArmor(currentLocation))
+                    targetEntity.setArmor(0, currentLocation, true);
+
+                if (Refit.REFIT_CLASS_C > refitClass)
+                    refitClass = Refit.REFIT_CLASS_C;
+            }
+        }
+
+        // If current engine type != target engine type, get salvage for engine
+        if (!currentEntity.getEngine().getEngineName().equals(targetEntity.getEngine().getEngineName())) {
+            for (WorkItem task : salvage) {
+                if (task instanceof MekEngineSalvage)
+                    salvageItems.add((SalvageItem) task);
+            }
+            targetUnit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE);
+
+            if (currentEntity.getEngine().getEngineType() != targetEntity.getEngine().getEngineType()) {
+                // Change engine type
+                if (Refit.REFIT_CLASS_F > refitClass)
+                    refitClass = Refit.REFIT_CLASS_F;
+            }
+            else {
+                // Change engine rating
+                if (Refit.REFIT_CLASS_D > refitClass)
+                    refitClass = Refit.REFIT_CLASS_D;
+            }
+        }
+
+        // If current gyro type != target gyro type, get salvage for gyro
+        if (currentEntity.getGyroType() != targetEntity.getGyroType()) {
+            for (WorkItem task : salvage) {
+                if (task instanceof MekGyroSalvage)
+                    salvageItems.add((SalvageItem) task);
+            }
+            targetUnit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_GYRO);
+            if (Refit.REFIT_CLASS_F > refitClass)
+                refitClass = Refit.REFIT_CLASS_F;
+        }
+
+        if(!sourceUnit.getHeatSinkTypeString().equals(new Unit(targetEntity, null).getHeatSinkTypeString())) {
+            // Heat sink type change
+            if (Refit.REFIT_CLASS_D > refitClass)
+                refitClass = Refit.REFIT_CLASS_D;
+        }
+
+        ArrayList<Mounted> salvageMountedList = new ArrayList<Mounted>();
+
+        // List of all mounted, one per pair Mounted type / Mounted location for current mech
+        ArrayList<Mounted> listAllUniqueMounted = new ArrayList<Mounted>();
+        // Quantity of mounted of a given type in a given location for current mech
+        ArrayList<Integer> listAllUniqueMountedNumber = new ArrayList<Integer>();
+        for (Mounted currentMounted : currentEntity.getEquipment()) {
+            int uniqueIndex = -1;
+            for (int i=0;i<listAllUniqueMounted.size();i++) {
+                Mounted uniqueMounted = listAllUniqueMounted.get(i);
+                if (Utilities.compareMounted(uniqueMounted, currentMounted)) {
+                    uniqueIndex = i;
+                    break;
+                }
+            }
+            if (uniqueIndex>-1)
+                listAllUniqueMountedNumber.set(uniqueIndex, listAllUniqueMountedNumber.get(uniqueIndex).intValue()+1);
+            else {
+                listAllUniqueMounted.add(currentMounted);
+                listAllUniqueMountedNumber.add(1);
+            }
+        }
+
+        // List of all mounted, one per pair Mounted type / Mounted location for target mech
+        ArrayList<Mounted> listAllUniqueMountedTarget = new ArrayList<Mounted>();
+        // Quantity of mounted of a given type in a given location for target mech
+        ArrayList<Integer> listAllUniqueMountedTargetNumber = new ArrayList<Integer>();
+        for (Mounted currentMountedTarget : targetEntity.getEquipment()) {
+            int uniqueIndex = -1;
+            for (int i=0;i<listAllUniqueMountedTarget.size();i++) {
+                Mounted uniqueMountedTarget = listAllUniqueMountedTarget.get(i);
+                if (Utilities.compareMounted(uniqueMountedTarget, currentMountedTarget)) {
+                    uniqueIndex = i;
+                    break;
+                }
+            }
+            if (uniqueIndex>-1)
+                listAllUniqueMountedTargetNumber.set(uniqueIndex, listAllUniqueMountedTargetNumber.get(uniqueIndex).intValue()+1);
+            else {
+                listAllUniqueMountedTarget.add(currentMountedTarget);
+                listAllUniqueMountedTargetNumber.add(1);
+            }
+        }
+
+        ArrayList<Mounted> listAllUniqueMountedOrig = new ArrayList(listAllUniqueMounted);
+        ArrayList<Mounted> listAllUniqueMountedTargetOrig = new ArrayList(listAllUniqueMountedTarget);
+
+        for (Mounted currentMounted : currentEntity.getEquipment()) {
+            
+            // Skip non hitable components
+            if (!currentMounted.getType().isHittable())
+                continue;
+
+            // Nb of mounted of this type (currentMounted.getType()) in this location (currentMounted.getLocation()) for target
+            int nbEquipmentInLocationTarget = 0;
+            // Nb of mounted of any type in this location (currentMounted.getLocation()) for target
+            int targetIndex = -1;
+            for (int i=0;i<listAllUniqueMountedTarget.size();i++) {
+                Mounted uniqueMounted = listAllUniqueMountedTarget.get(i);
+                if (Utilities.compareMounted(currentMounted, uniqueMounted)) {
+                    nbEquipmentInLocationTarget = listAllUniqueMountedTargetNumber.get(i);
+                    targetIndex = i;
+                    break;
+                }
+            }
+
+            // Nb of mounted of this type (currentMounted.getType()) in this location (currentMounted.getLocation()) for current
+            int nbEquipmentInLocation = 0;
+            // Nb of mounted of any type in this location (currentMounted.getLocation()) for current
+            int currentIndex = -1;
+            for (int i=0;i<listAllUniqueMounted.size();i++) {
+                Mounted uniqueMounted = listAllUniqueMounted.get(i);
+                if (Utilities.compareMounted(currentMounted, uniqueMounted)) {
+                    nbEquipmentInLocation = listAllUniqueMountedNumber.get(i);
+                    currentIndex = i;
+                    break;
+                }
+            }
+
+            if (nbEquipmentInLocation > nbEquipmentInLocationTarget) {
+                // Current has more of this component in this location than target
+                salvageMountedList.add(currentMounted);
+                listAllUniqueMountedNumber.set(currentIndex, listAllUniqueMountedNumber.get(currentIndex).intValue()-1);
+            }
+        }
+
+        for (Mounted targetMounted : targetEntity.getEquipment()) {
+            
+            // Skip non hitable components
+            if (!targetMounted.getType().isHittable())
+                continue;
+            
+            // Nb of mounted of this type (currentMounted.getType()) in this location (currentMounted.getLocation()) for target
+            int nbEquipmentInLocationTarget = 0;
+            // Nb of mounted of any type in this location (currentMounted.getLocation()) for target
+            int targetIndex = -1;
+            for (int i=0;i<listAllUniqueMountedTarget.size();i++) {
+                Mounted uniqueMounted = listAllUniqueMountedTarget.get(i);
+                if (Utilities.compareMounted(targetMounted, uniqueMounted)) {
+                    nbEquipmentInLocationTarget = listAllUniqueMountedTargetNumber.get(i);
+                    targetIndex = i;
+                    break;
+                }
+            }
+
+            // Nb of mounted of this type (currentMounted.getType()) in this location (currentMounted.getLocation()) for current
+            int nbEquipmentInLocation = 0;
+            // Nb of mounted of any type in this location (currentMounted.getLocation()) for current
+            int currentIndex = -1;
+            for (int i=0;i<listAllUniqueMounted.size();i++) {
+                Mounted uniqueMounted = listAllUniqueMounted.get(i);
+                if (Utilities.compareMounted(targetMounted, uniqueMounted)) {
+                    nbEquipmentInLocation = listAllUniqueMountedNumber.get(i);
+                    currentIndex = i;
+                    break;
+                }
+            }
+            
+            if (nbEquipmentInLocationTarget > nbEquipmentInLocation) {
+                // Target has more of this component in this location than target
+                targetMountedToDestroy.add(targetMounted);
+                listAllUniqueMountedTargetNumber.set(targetIndex, listAllUniqueMountedTargetNumber.get(targetIndex).intValue()-1);
+            }
+        }
+
+        for (Mounted salvageMounted : salvageMountedList) {
+            for (WorkItem task : salvage) {
+                if (task instanceof EquipmentSalvage
+                        && ((EquipmentSalvage) task).getMounted().equals(salvageMounted)
+                        && ((EquipmentSalvage) task).getMounted().getLocation() == salvageMounted.getLocation())
+                    salvageItems.add((SalvageItem) task);
+            }
+
+            // For every piece of equipment removed, see if it is a weapon removal, an other removal, a wepon replacement or another replacement
+            int location = salvageMounted.getLocation();
+
+            /*
+            int numberOfCritInLocationForCurrent = 0;
+            int numberOfCritInLocationForTarget = 0;
+            for (int currentSlot=0;currentSlot<currentEntity.getNumberOfCriticals(location);currentSlot++) {
+                CriticalSlot currentCriticalSlot = currentEntity.getCritical(location, currentSlot);
+                if (currentCriticalSlot!=null && currentCriticalSlot.getMount()!=null)
+                    numberOfCritInLocationForCurrent++;
+
+                CriticalSlot targetCriticalSlot = targetEntity.getCritical(location, currentSlot);
+                if (targetCriticalSlot!=null && targetCriticalSlot.getMount()!=null)
+                    numberOfCritInLocationForTarget++;
+            }
+            */
+
+            int nbItemsInLocation = 0;
+            for (int i=0;i<listAllUniqueMountedOrig.size();i++) {
+                 Mounted uniqueMounted = listAllUniqueMountedOrig.get(i);
+                 if (uniqueMounted.getLocation()==location)
+                     nbItemsInLocation++;
+            }
+            int nbItemsInLocationTarget = 0;
+            for (int i=0;i<listAllUniqueMountedTargetOrig.size();i++) {
+                 Mounted uniqueMounted = listAllUniqueMountedTargetOrig.get(i);
+                 if (uniqueMounted.getLocation()==location)
+                     nbItemsInLocationTarget++;
+            }
+
+            if (salvageMounted.getName().contains("Heat Sink")) {
+                 continue;
+             } else if (salvageMounted.getType() instanceof AmmoType) {
+                 continue;
+             } else if (salvageMounted.getName().contains("CASE")
+                     || salvageMounted.getName().contains("Case")) {
+                 continue;
+             }
+
+            /*
+            if (numberOfCritInLocationForCurrent > numberOfCritInLocationForTarget) {
+                 // More crits in current location than in target location : removal
+            */
+            if (nbItemsInLocation>nbItemsInLocationTarget) {
+                // More items in current location than in target : removal
+                 if (salvageMounted.getType() instanceof WeaponType) {
+                     hasWeaponRemoval = true;
+                 } else {
+                     hasOtherEquipmentRemoval = true;
+                 }
+             } else {
+                 // Less or same items in current location than in target : replacement
+                 if (salvageMounted.getType() instanceof WeaponType) {
+                     // Weapon replacement class A, B or C
+                     // Done below
+                     hasWeaponRemoval = true;
+                 } else {
+                     hasOtherEquipmentReplacement = true;
+                 }
+             }
+        }
+
+        campaign.removeAllTasksFor(sourceUnit);
+        for (SalvageItem salvageItem : salvageItems) {
+            campaign.addWork(salvageItem);
+        }
+
+        for (Mounted mountedToDestroy : targetMountedToDestroy) {
+             // Go through locations
+             for (int currentLocation=0;currentLocation<currentEntity.locations(); currentLocation++) {
+                 // Go through critical slots
+                 for (int currentSlot=0;currentSlot<currentEntity.getNumberOfCriticals(currentLocation);currentSlot++) {
+                     CriticalSlot targetCriticalSlot = targetEntity.getCritical(currentLocation, currentSlot);
+
+                     if (targetCriticalSlot==null)
+                         continue;
+
+                     Mounted targetMounted = targetCriticalSlot.getMount();
+
+                     if (targetMounted==null)
+                         continue;
+
+                     if (targetMounted.equals(mountedToDestroy)) {
+                         // New mounted
+                         targetCriticalSlot.setHit(true);
+                         targetCriticalSlot.setDestroyed(true);
+                         targetCriticalSlot.setRepairable(false);
+                         targetMounted.setHit(true);
+                         targetMounted.setDestroyed(true);
+                         targetMounted.setRepairable(false);
+                     }
+                 }
+             }
+
+             // For every piece of equipment added, see if it is a heat sink addition, a case addition or an other addition, a wepon replacement or another replacement
+             int location = mountedToDestroy.getLocation();
+
+             /*
+             int numberOfCritInLocationForCurrent = 0;
+             int numberOfCritInLocationForTarget = 0;
+             for (int currentSlot=0;currentSlot<currentEntity.getNumberOfCriticals(location);currentSlot++) {
+                 CriticalSlot currentCriticalSlot = currentEntity.getCritical(location, currentSlot);
+                 if (currentCriticalSlot!=null && currentCriticalSlot.getMount()!=null)
+                     numberOfCritInLocationForCurrent++;
+
+                 CriticalSlot targetCriticalSlot = targetEntity.getCritical(location, currentSlot);
+                 if (targetCriticalSlot!=null && targetCriticalSlot.getMount()!=null)
+                     numberOfCritInLocationForTarget++;
+             }
+             */
+
+             int nbItemsInLocation = 0;
+             for (int i=0;i<listAllUniqueMountedOrig.size();i++) {
+                 Mounted uniqueMounted = listAllUniqueMountedOrig.get(i);
+                 if (uniqueMounted.getLocation()==location)
+                     nbItemsInLocation++;
+             }
+             int nbItemsInLocationTarget = 0;
+             for (int i=0;i<listAllUniqueMountedTargetOrig.size();i++) {
+                 Mounted uniqueMounted = listAllUniqueMountedTargetOrig.get(i);
+                 if (uniqueMounted.getLocation()==location)
+                     nbItemsInLocationTarget++;
+             }
+
+             if (mountedToDestroy.getName().contains("Heat Sink")) {
+                 hasHeatSinkAddition = true;
+                 continue;
+             } else if (mountedToDestroy.getType() instanceof AmmoType) {
+                 hasAmmunitionAddition = true;
+                 continue;
+             } else if (mountedToDestroy.getName().contains("CASE")
+                     || mountedToDestroy.getName().contains("Case")) {
+                 hasCaseInstall = true;
+                 continue;
+             }
+
+             /*
+             if (numberOfCritInLocationForTarget > numberOfCritInLocationForCurrent) {
+                 // More crits in target location than in current location : addition
+             */
+             if (nbItemsInLocationTarget > nbItemsInLocation) {
+                 // More items in target location than in current location : addition
+                 // Strictly speaking, they're not all additions but one is enough to increase refit class to D
+                 hasOtherEquipmentAddition = true;
+             } else {
+                 // Less or same number of items in target location than in current location : replacement
+                 if (mountedToDestroy.getType() instanceof WeaponType) {
+                     // Weapon replacement class A, B or C
+                     // Find out the class
+                     boolean hasLargerWeaponOfSameClass = false;
+                     boolean hasLargerWeaponOfOtherClass = false;
+                     for (Mounted mountedSalvage : salvageMountedList) {
+                         int mountedSalvageNbCrits = mountedSalvage.getType().getCriticals(currentEntity);
+                         int mountedToDestroyNbCrits = mountedToDestroy.getType().getCriticals(targetEntity);
+                         if (mountedSalvage.getLocation() == location
+                                 && mountedSalvageNbCrits >= mountedToDestroyNbCrits) {
+                             if (mountedSalvage.getType() instanceof WeaponType
+                                     && ((WeaponType) mountedSalvage.getType()).getAtClass() == ((WeaponType) mountedToDestroy.getType()).getAtClass())
+                                 hasLargerWeaponOfSameClass = true;
+                             else
+                                 hasLargerWeaponOfOtherClass = true;
+                         }
+                     }
+                     if (hasLargerWeaponOfSameClass)
+                         hasWeaponReplacementClassA = true;
+                     else if (hasLargerWeaponOfOtherClass)
+                         hasWeaponReplacementClassB = true;
+                     else
+                         hasWeaponReplacementClassC = true;
+                     
+                 } else {
+                     hasOtherEquipmentReplacement = true;
+                 }
+             }
+
+        }
+
+        
+        campaign.removeAllTasksFor(targetUnit);
+        targetUnit.runDiagnostic(campaign);
+
+        ArrayList<WorkItem> unitTasks = campaign.getTasksForUnit(targetUnit.getId());
+        int totalRepairTime = 0;
+        char refitKitAvailability = 'A';
+        int refitKitAvailabilityMod = 0;
+        for (WorkItem unitTask : unitTasks) {
+            if (unitTask instanceof RepairItem
+                    || unitTask instanceof ReplacementItem
+                    || unitTask instanceof ReloadItem) {
+                totalRepairTime += unitTask.getTime();
+                if (unitTask instanceof ReplacementItem) {
+                    Part part = ((ReplacementItem) unitTask).partNeeded();
+                    // Part availability
+                    AvailableCodeHelper availableCodeHelper = SSWLibHelper.getPartAvailableCodeHelper(part, campaign);
+                    char availability = availableCodeHelper.getAvailability(campaign.getCalendar());
+
+                    // Faction and Tech mod
+                    int factionMod = 0;
+                    if (CampaignOptions.useFactionModifiers) {
+                        factionMod = SSWLibHelper.getFactionAndTechMod(part, availableCodeHelper, campaign);
+                    }
+
+                    if (SSWLibHelper.getModifierFromAvailability(availability) + factionMod > SSWLibHelper.getModifierFromAvailability(refitKitAvailability) + refitKitAvailabilityMod) {
+                        refitKitAvailability = availability;
+                        refitKitAvailabilityMod = factionMod;
+                    }
+
+                    refitCost += ((ReplacementItem) unitTask).partNeeded().getCost();
+                } else if (unitTask instanceof ReloadItem) {
+                    refitCost += ((ReloadItem) unitTask).getCost();
+                }
+            }
+        }
+
+        // Refit class
+        if (hasCaseInstall && Refit.REFIT_CLASS_E > refitClass)
+            refitClass = Refit.REFIT_CLASS_E;
+        if (hasOtherEquipmentAddition && Refit.REFIT_CLASS_D > refitClass)
+            refitClass = Refit.REFIT_CLASS_D;
+        if ((hasAmmunitionAddition
+                || hasHeatSinkAddition
+                || hasOtherEquipmentRemoval
+                || hasOtherEquipmentReplacement
+                || hasWeaponReplacementClassC)
+                && Refit.REFIT_CLASS_C > refitClass)
+            refitClass = Refit.REFIT_CLASS_C;
+        if (hasWeaponReplacementClassB && Refit.REFIT_CLASS_B > refitClass)
+            refitClass = Refit.REFIT_CLASS_B;
+        if ((hasWeaponReplacementClassA || hasWeaponRemoval)
+                && Refit.REFIT_CLASS_A > refitClass)
+            refitClass = Refit.REFIT_CLASS_A;
+
+        campaign.removeUnit(targetUnit.getId());
+
+        refitCost = (int) Math.round(refitCost * 1.1);
+        
+        MechRefit mechRefit = new MechRefit(sourceUnit, targetEntity, totalRepairTime, refitClass, refitKitAvailability, refitKitAvailabilityMod, refitCost);
+        MechCustomization mechCustomization = new MechCustomization(sourceUnit, targetEntity, totalRepairTime, refitClass);
+
+        if (CampaignOptions.repairSystem == CampaignOptions.REPAIR_SYSTEM_STRATOPS) {
+            campaign.addWork(mechRefit);
+            campaign.addWork(mechCustomization);
+        } else if (CampaignOptions.repairSystem == CampaignOptions.REPAIR_SYSTEM_WARCHEST_CUSTOM) {
+            
+        } else if (CampaignOptions.repairSystem == CampaignOptions.REPAIR_SYSTEM_GENERIC_PARTS) {
+            campaign.addWork(mechCustomization);
+        }
+    }
+
+    public void cancelCustomize (Campaign campaign) {
+        Unit sourceUnit = this;
+
+        campaign.removeAllTasksFor(sourceUnit);
+        sourceUnit.runDiagnostic(campaign);
+    }
+
+    public int getRepairCost () {
+        int cost = 0;
+        for (WorkItem task : campaign.getAllTasksForUnit(getId())) {
+            if (CampaignOptions.repairSystem == CampaignOptions.REPAIR_SYSTEM_STRATOPS) {
+                if (task instanceof ReplacementItem) {
+                    cost += ((ReplacementItem) task).partNeeded().getCost();
+                } else if (task instanceof ReloadItem) {
+                    cost += ((ReloadItem) task).getCost();
+                }
+            } else if (CampaignOptions.repairSystem == CampaignOptions.REPAIR_SYSTEM_WARCHEST_CUSTOM) {
+                if (task instanceof FullRepairWarchest) {
+                    cost += ((FullRepairWarchest) task).getCost();
+                }
+            } else if (CampaignOptions.repairSystem == CampaignOptions.REPAIR_SYSTEM_GENERIC_PARTS) {
+                if (task instanceof ReplacementItem
+                        && ((ReplacementItem) task).partNeeded() instanceof GenericSparePart) {
+                    cost += ((ReplacementItem) task).partNeeded().getCost();
+                }
+            }
+        }
+
+        return cost;
+    }
+
+    public int getSellValue () {
+        int residualValue = 0;
+
+        int valueOfSalvage = 0;
+        for (WorkItem task : campaign.getAllTasksForUnit(getId())) {
+            if (task instanceof SalvageItem) {
+                valueOfSalvage += ((SalvageItem) task).getPart().getCost();
+            }
+        }
+
+        if (!isRepairable()) {
+            // The value of a truly destroyed entity is equals to the value of its parts
+            residualValue = valueOfSalvage;
+        } else {
+            // The value of a repairable entity is equals to its cost minus its repair cost
+            int cost = (int) Math.round(getEntity().getCost(false));
+            
+            // Increase cost for IS players buying Clan mechs
+            if (TechConstants.getTechName(getEntity().getTechLevel()).equals("Clan")
+                    && !Faction.isClanFaction(campaign.getFaction()))
+                cost *= CampaignOptions.clanPriceModifier;
+
+            residualValue = cost - getRepairCost();
+
+            if (valueOfSalvage > residualValue)
+                residualValue = valueOfSalvage;
+        }
+
+        if (residualValue < 0)
+            residualValue = 0;
+
+        // Sell unit => divide price by 2
+        return residualValue / 2;
+    }
+
+    public int getBuyCost () {
+        int cost = (int) Math.round(getEntity().getCost(false));
+
+        // Increase cost for IS players buying Clan mechs
+        if (TechConstants.getTechName(getEntity().getTechLevel()).equals("Clan")
+                && !Faction.isClanFaction(campaign.getFaction()))
+            cost *= CampaignOptions.clanPriceModifier;
+
+        return cost;
+    }
+
+    public int getDamageState () {
+
+        if (getEntity() instanceof Mech) {
+            Mech mech = (Mech) getEntity();
+
+            int nbEngineCrits = 0;
+            int nbGyroHit = 0;
+            int nbSensorHits = 0;
+            int nbLimbsWithInternalDamage = 0;
+            int nbTorsoWithInternalDamage = 0;
+            boolean hasDestroyedTorso = false;
+            int nbWeaponsUnusable = 0;
+            int nbCrits = 0;
+            int nbLimbsWithArmorDamage = 0;
+
+            if (mech.isLocationBad(Mech.LOC_LT) || mech.isLocationBad(Mech.LOC_RT) || mech.isLocationBad(Mech.LOC_CT))
+                hasDestroyedTorso = true;
+
+            for (int i=0;i<mech.locations();i++) {
+                nbEngineCrits += mech.getHitCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE, i);
+                nbGyroHit += mech.getHitCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_GYRO, i);
+                nbSensorHits += mech.getHitCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS, i);
+                if (mech.getInternal(i)<mech.getOInternal(i)) {
+                    nbLimbsWithInternalDamage++;
+                    if (i==Mech.LOC_LT || i==Mech.LOC_LT || i==Mech.LOC_RT)
+                        nbTorsoWithInternalDamage++;
+                }
+                if (mech.getArmor(i)<mech.getOArmor(i))
+                    nbLimbsWithArmorDamage++;
+                if (mech.hasRearArmor(i)) {
+                    if (mech.getArmor(i, true)<mech.getOArmor(i, true))
+                        nbLimbsWithArmorDamage++;
+                }
+            }
+
+            Iterator <Mounted> itWeapons = mech.getWeapons();
+            while (itWeapons.hasNext()) {
+                Mounted weapon = itWeapons.next();
+                if (weapon.isInoperable())
+                    nbWeaponsUnusable++;
+            }
+
+            for (int loc=0; loc<mech.locations(); loc++) {
+                int nbCriticalSlots = mech.getNumberOfCriticals(loc);
+                for (int crit=0;crit<nbCriticalSlots;crit++) {
+                    CriticalSlot criticalSlot = mech.getCritical(loc, crit);
+                    if (criticalSlot != null) {
+                        if (criticalSlot.isDamaged() || criticalSlot.isHit() || criticalSlot.isDestroyed())
+                            nbCrits++;
+                    }
+                }
+            }
+
+            if ( hasDestroyedTorso
+                 || (nbEngineCrits>=2)
+                 || (nbEngineCrits==1 && nbGyroHit>=1)
+                 || (nbSensorHits>=2)
+                 || (nbLimbsWithInternalDamage>=3)
+                 || (nbTorsoWithInternalDamage>=2)
+                 || (nbWeaponsUnusable >= mech.getWeaponList().size())) {
+                return Unit.STATE_CRIPPLED;
+            } else if (nbLimbsWithInternalDamage>=1 || nbCrits>=1) {
+                return Unit.STATE_HEAVY_DAMAGE;
+            } else if (nbLimbsWithArmorDamage>=1) {
+                return Unit.STATE_LIGHT_DAMAGE;
+            } else {
+                return Unit.STATE_UNDAMAGED;
+            }
+        } else if (getEntity() instanceof Tank) {
+            Tank tank = (Tank) getEntity();
+
+            int nbWeaponsDestroyed = 0;
+            int nbLimbsWithArmorDamage = 0;
+            int nbLimbsWithInternalDamage = 0;
+            int nbLimbsWithAllArmorDestroyed = 0;
+            int nbCrits = 0;
+
+            for (int i=0;i<tank.locations();i++) {
+                if (tank.getInternal(i)<tank.getOInternal(i)) {
+                    nbLimbsWithInternalDamage++;
+                }
+
+                if (tank.getArmor(i)<tank.getOArmor(i))
+                    nbLimbsWithArmorDamage++;
+
+                if (tank.hasRearArmor(i)) {
+                    if (tank.getArmor(i, true)<tank.getOArmor(i, true))
+                        nbLimbsWithArmorDamage++;
+
+                    if (tank.getArmor(i, true) == 0 && tank.getOArmor(i, true)>0)
+                        nbLimbsWithAllArmorDestroyed++;
+                }
+                
+                if (tank.getArmor(i) == 0 && tank.getOArmor(i)>0)
+                    nbLimbsWithAllArmorDestroyed++;
+            }
+
+            Iterator <Mounted> itWeapons = tank.getWeapons();
+            while (itWeapons.hasNext()) {
+                Mounted weapon = itWeapons.next();
+                if (weapon.isInoperable())
+                    nbWeaponsDestroyed++;
+            }
+
+            for (int loc=0; loc<tank.locations(); loc++) {
+                int nbCriticalSlots = tank.getNumberOfCriticals(loc);
+                for (int crit=0;crit<nbCriticalSlots;crit++) {
+                    CriticalSlot criticalSlot = tank.getCritical(loc, crit);
+                    if (criticalSlot != null) {
+                        if (criticalSlot.isDamaged() || criticalSlot.isHit() || criticalSlot.isDestroyed())
+                            nbCrits++;
+                    }
+                }
+            }
+
+            if (nbLimbsWithAllArmorDestroyed>=1
+                    || nbWeaponsDestroyed >= tank.getWeaponList().size()) {
+                return Unit.STATE_CRIPPLED;
+            } else if (nbLimbsWithInternalDamage>=1 || nbCrits>=1) {
+                return Unit.STATE_HEAVY_DAMAGE;
+            } else if (nbLimbsWithArmorDamage>=1) {
+                return Unit.STATE_LIGHT_DAMAGE;
+            } else {
+                return Unit.STATE_UNDAMAGED;
+            }
+        } else {
+            Entity entity = (Tank) getEntity();
+
+            int nbDestroyedLocations = 0;
+            int nbWeaponsDestroyed = 0;
+            int nbLimbsWithArmorDamage = 0;
+            int nbLimbsWithInternalDamage = 0;
+            int nbCrits = 0;
+
+            for (int i=0;i<entity.locations();i++) {
+                if (entity.getInternal(i)<entity.getOInternal(i)) {
+                    nbLimbsWithInternalDamage++;
+                }
+                if (entity.getArmor(i)<entity.getOArmor(i))
+                    nbLimbsWithArmorDamage++;
+                if (entity.hasRearArmor(i)) {
+                    if (entity.getArmor(i, true)<entity.getOArmor(i, true))
+                        nbLimbsWithArmorDamage++;
+                }
+            }
+
+            Iterator <Mounted> itWeapons = entity.getWeapons();
+            while (itWeapons.hasNext()) {
+                Mounted weapon = itWeapons.next();
+                if (weapon.isInoperable())
+                    nbWeaponsDestroyed++;
+            }
+
+            for (int loc=0; loc<entity.locations(); loc++) {
+                int nbCriticalSlots = entity.getNumberOfCriticals(loc);
+                for (int crit=0;crit<nbCriticalSlots;crit++) {
+                    CriticalSlot criticalSlot = entity.getCritical(loc, crit);
+                    if (criticalSlot != null) {
+                        if (criticalSlot.isDamaged() || criticalSlot.isHit() || criticalSlot.isDestroyed())
+                            nbCrits++;
+                    }
+                }
+            }
+
+            if (nbDestroyedLocations>=1
+                    || nbWeaponsDestroyed >= entity.getWeaponList().size()) {
+                return Unit.STATE_CRIPPLED;
+            } else if (nbLimbsWithInternalDamage>=1 || nbCrits>=1) {
+                return Unit.STATE_HEAVY_DAMAGE;
+            } else if (nbLimbsWithArmorDamage>=1) {
+                return Unit.STATE_LIGHT_DAMAGE;
+            } else {
+                return Unit.STATE_UNDAMAGED;
+            }
+        }
+    }
+
+    public int getFullBaseValueOfParts () {
+        Entity undamagedEntity = Campaign.getBrandNewUndamagedEntity(getEntity().getShortName());
+
+        if (undamagedEntity == null)
+            return -1;
+
+        Campaign campaign = new Campaign();
+        Unit undamagedUnit = new Unit(undamagedEntity, campaign);
+        undamagedUnit.runDiagnosticStratOps(campaign);
+
+        int cost = 0;
+        for (WorkItem task : campaign.getAllTasksForUnit(undamagedUnit.getId())) {
+            if (task instanceof SalvageItem) {
+                cost +=((SalvageItem) task).getPart().getCost();
+            }
+        }
+
+        return cost;
+    }
 }

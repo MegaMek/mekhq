@@ -28,6 +28,7 @@ import megamek.common.Aero;
 import megamek.common.AmmoType;
 import megamek.common.Compute;
 import megamek.common.Entity;
+import megamek.common.Mounted;
 import megamek.common.Protomech;
 import megamek.common.TechConstants;
 
@@ -134,5 +135,16 @@ public class Utilities {
         }
         return atypes;
     }
-    
+
+    public static boolean compareMounted (Mounted a, Mounted b) {
+        if (!a.getType().equals(b.getType()))
+            return false;
+        if (!a.getClass().equals(b.getClass()))
+            return false;
+        if (!a.getName().equals(b.getName()))
+            return false;
+        if (a.getLocation()!=b.getLocation())
+            return false;
+        return true;
+    }
 }
