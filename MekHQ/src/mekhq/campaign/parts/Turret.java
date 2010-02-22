@@ -30,13 +30,10 @@ import mekhq.campaign.work.TurretReplacement;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class Turret extends Part {
-
-    protected float tonnage;
     
-    public Turret(boolean salvage, float ton) {
-        super(salvage);
-        this.tonnage = ton;
-        this.name = "Vehicle Turret";
+    public Turret(boolean salvage, int tonnage) {
+        super(salvage, tonnage);
+        this.name = "Vehicle Turret" + " (" + getTonnage() + ")";
     }
     
     @Override
@@ -44,5 +41,14 @@ public class Turret extends Part {
         return task instanceof TurretReplacement 
                 && ((TurretReplacement)task).getUnit().getEntity() instanceof Tank
                 && ((TurretReplacement)task).getUnit().getEntity().getWeight() == tonnage;
-    }  
+    }
+
+    @Override
+    public boolean isSamePartTypeAndStatus (Part part) {
+        return part instanceof Turret
+                && getName().equals(part.getName())
+                && getStatus().equals(part.getStatus())
+                && getTonnage() == ((Turret)part).getTonnage();
+    }
+    
 }

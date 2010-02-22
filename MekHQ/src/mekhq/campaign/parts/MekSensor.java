@@ -30,9 +30,10 @@ import mekhq.campaign.work.ReplacementItem;
  */
 public class MekSensor extends Part {
 
-     public MekSensor(boolean salvage) {
-        super(salvage);
+     public MekSensor(boolean salvage, int tonnage) {
+        super(salvage, tonnage);
         this.name = "Mech Sensors";
+        this.cost = getTonnage() * 2000;
     }
     
     @Override
@@ -40,4 +41,16 @@ public class MekSensor extends Part {
         return task instanceof MekSensorReplacement;
     }
 
+    @Override
+    public boolean isSamePartTypeAndStatus (Part part) {
+        return part instanceof MekSensor
+                && getName().equals(part.getName())
+                && getStatus().equals(part.getStatus());
+    }
+
+    @Override
+    public int getPartType() {
+        return PART_TYPE_MEK_SENSOR;
+    }
+    
 }

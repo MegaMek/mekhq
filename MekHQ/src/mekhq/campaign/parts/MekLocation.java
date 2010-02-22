@@ -21,7 +21,10 @@
 
 package mekhq.campaign.parts;
 
+import java.util.ArrayList;
+import megamek.common.EquipmentType;
 import megamek.common.Mech;
+import mekhq.campaign.Faction;
 import mekhq.campaign.work.LocationReplacement;
 import mekhq.campaign.work.ReplacementItem;
 
@@ -32,20 +35,30 @@ import mekhq.campaign.work.ReplacementItem;
 public class MekLocation extends Part {
 
     protected int loc;
-    protected float tonnage;
-    protected boolean endo;
+    protected int structureType;
     protected boolean tsm;
+
+    public int getLoc() {
+        return loc;
+    }
+
+    public boolean isTsm() {
+        return tsm;
+    }
+
+    public int getStructureType() {
+        return structureType;
+    }
     
-    public MekLocation(boolean salvage, int i, float ton, boolean e, boolean t) {
-        super(salvage);
-        this.loc = i;
-        this.tonnage = ton;
-        this.endo = e;
-        this.tsm = t;
+    public MekLocation(boolean salvage, int loc, int tonnage, int structureType, boolean hasTSM) {
+        super(salvage, tonnage);
+        this.loc = loc;
+        this.structureType = structureType;
+        this.tsm = hasTSM;
         //TODO: need to account for internal structure and myomer types
         //crap, no static report for location names?
         this.name = "Mech Location";
-        switch(i) {
+        switch(loc) {
             case(Mech.LOC_HEAD):
                 this.name = "Mech Head";
                 break;
@@ -71,13 +84,29 @@ public class MekLocation extends Part {
                 this.name = "Mech Right Leg";
                 break;
         }
-        if(endo) {
-            this.name += " (Endosteel)";
+        if(structureType != EquipmentType.T_STRUCTURE_STANDARD) {
+            this.name += " (" + EquipmentType.getStructureTypeName(structureType) + ")";
         }
         if(tsm) {
             this.name += " (TSM)";
         }
         this.name += " (" + tonnage + ")";
+        computeCost();
+    }
+    
+    private void computeCost () {
+        double totalStructureCost = EquipmentType.getStructureCost(getStructureType()) * getTonnage();
+        int muscCost = isTsm() ? 16000 : 2000;
+        double totalMuscleCost = muscCost * getTonnage();
+        double cost = 0.1 * (totalStructureCost + totalMuscleCost);
+
+        if (loc == Mech.LOC_HEAD) {
+            // Add cockpit cost
+            // TODO create a class for cockpit or memorize cockpit type
+            cost += 200000;
+        }
+
+        this.cost = (int) Math.round(cost);
     }
     
     @Override
@@ -87,7 +116,43 @@ public class MekLocation extends Part {
                 && ((LocationReplacement)task).getLoc() == loc
                 && ((LocationReplacement)task).getUnit().getEntity().getWeight() == tonnage
                 && ((LocationReplacement)task).getUnit().hasTSM() == tsm
-                && ((LocationReplacement)task).getUnit().hasEndosteel() == endo;
+                && ((LocationReplacement)task).getUnit().getEntity().getStructureType() == structureType;
     }
 
+    @Override
+    public boolean isSamePartTypeAndStatus (Part part) {
+        return part instanceof MekLocation
+                && getName().equals(part.getName())
+                && getStatus().equals(part.getStatus())
+                && getLoc() == ((MekLocation)part).getLoc()
+                && getTonnage() == ((MekLocation)part).getTonnage()
+                && isTsm() == ((MekLocation)part).isTsm()
+                && getStructureType() == ((MekLocation) part).getStructureType();
+    }
+
+    @Override
+    public int getPartType() {
+        return PART_TYPE_MEK_BODY_PART;
+    }
+
+    @Override
+    public ArrayList<String> getPotentialSSWNames(int faction) {
+        ArrayList<String> sswNames = new ArrayList<String>();
+
+        // The tech base of the part doesn't matter (Clan and IS can use each other's Endo Steel parts)
+        // However the tech base of the faction is important : Clans get Endo Steel parts before IS
+        String techBase = (Faction.isClanFaction(faction) ? "(CL)" : "(IS)");
+
+        String sswName = getName();
+
+        sswNames.add(techBase + " " + sswName);
+        sswNames.add(sswName);
+
+        return sswNames;
+    }
+
+    @Override
+    public String getSaveString () {
+        return getName() + ";" + getTonnage() + ";" + getLoc() + ";" + getStructureType() + ";" + (isTsm()?"true":"false");
+    }
 }

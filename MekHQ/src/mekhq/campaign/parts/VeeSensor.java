@@ -30,8 +30,8 @@ import mekhq.campaign.work.VeeSensorReplacement;
  */
 public class VeeSensor extends Part {
 
-    public VeeSensor(boolean salvage) {
-        super(salvage);
+    public VeeSensor(boolean salvage, int tonnage) {
+        super(salvage, tonnage);
         this.name = "Vehicle Sensors";
     }
     
@@ -40,4 +40,11 @@ public class VeeSensor extends Part {
         return task instanceof VeeSensorReplacement;
     }
 
+    @Override
+    public boolean isSamePartTypeAndStatus (Part part) {
+        return part instanceof VeeSensor
+                && getName().equals(part.getName())
+                && getStatus().equals(part.getStatus());
+    }
+    
 }

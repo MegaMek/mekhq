@@ -31,16 +31,60 @@ import mekhq.campaign.work.ReplacementItem;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MekActuator extends Part {
-
-    protected float tonnage;
-    protected int type;
     
-    public MekActuator(boolean salvage, float ton, int type) {
-        super(salvage);
-        this.tonnage = ton;
+    protected int type;
+
+    public int getType() {
+        return type;
+    }
+    
+    public MekActuator(boolean salvage, int tonnage, int type) {
+        super(salvage, tonnage);
         this.type = type;
         Mech m = new BipedMech();
         this.name = m.getSystemName(type) + " Actuator (" + tonnage + " tons)" ;
+        computeCost();
+    }
+
+    private void computeCost () {
+        int unitCost = 0;
+        switch (getType()) {
+            case (Mech.ACTUATOR_UPPER_ARM) : {
+                unitCost = 100;
+                break;
+            }
+            case (Mech.ACTUATOR_LOWER_ARM) : {
+                unitCost = 50;
+                break;
+            }
+            case (Mech.ACTUATOR_HAND) : {
+                unitCost = 80;
+                break;
+            }
+            case (Mech.ACTUATOR_UPPER_LEG) : {
+                unitCost = 150;
+                break;
+            }
+            case (Mech.ACTUATOR_LOWER_LEG) : {
+                unitCost = 80;
+                break;
+            }
+            case (Mech.ACTUATOR_FOOT) : {
+                unitCost = 120;
+                break;
+            }
+            case (Mech.ACTUATOR_HIP) : {
+                // not used
+                unitCost = 0;
+                break;
+            }
+            case (Mech.ACTUATOR_SHOULDER) : {
+                // not used
+                unitCost = 0;
+                break;
+            }
+        }
+        this.cost = getTonnage() * unitCost;
     }
 
     @Override
@@ -49,5 +93,23 @@ public class MekActuator extends Part {
                 && tonnage == ((MekActuatorReplacement)task).getUnit().getEntity().getWeight()
                 && type == ((MekActuatorReplacement)task).getType();
     }
-    
+
+    @Override
+    public boolean isSamePartTypeAndStatus (Part part) {
+        return part instanceof MekActuator
+                && getName().equals(part.getName())
+                && getStatus().equals(part.getStatus())
+                && getType() == ((MekActuator)part).getType()
+                && getTonnage() == ((MekActuator)part).getTonnage();
+    }
+
+    @Override
+    public int getPartType() {
+        return PART_TYPE_MEK_ACTUATOR;
+    }
+
+    @Override
+    public String getSaveString () {
+        return getName() + ";" + getTonnage() + ";" + getType();
+    }
 }

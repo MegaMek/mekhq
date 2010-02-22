@@ -32,20 +32,63 @@ import mekhq.campaign.work.ReplacementItem;
 public class MekGyro extends Part {
 
     protected int type;
-    protected float tonnage;
+    protected int walkMP;
+
+    public int getType() {
+        return type;
+    }
+
+    public int getWalkMP() {
+        return walkMP;
+    }
     
-    public MekGyro(boolean salvage, int type, float ton) {
-        super(salvage);
+    public MekGyro(boolean salvage, int tonnage, int type, int walkMP) {
+        super(salvage, tonnage);
         this.type = type;
-        this.tonnage = ton;
         this.name = Mech.getGyroTypeString(type) + " (" + tonnage + ")";
+        this.walkMP = walkMP;
+        computeCost();
+    }
+
+    private void computeCost () {
+        double c = 0;
+        if (getType() == Mech.GYRO_XL) {
+            c = 750000 * (int) Math.ceil(getWalkMP() * getTonnage() / 100f) * 0.5;
+        } else if (getType() == Mech.GYRO_COMPACT) {
+            c = 400000 * (int) Math.ceil(getWalkMP() * getTonnage() / 100f) * 1.5;
+        } else if (getType() == Mech.GYRO_HEAVY_DUTY) {
+            c = 500000 * (int) Math.ceil(getWalkMP() * getTonnage() / 100f) * 2;
+        } else {
+            c = 300000 * (int) Math.ceil(getWalkMP() * getTonnage() / 100f);
+        }
+        this.cost = (int) Math.round(c);
     }
     
     @Override
     public boolean canBeUsedBy(ReplacementItem task) {
+        // TODO Is walk mp important for gyro compatibility ?
+        // walk mp is used in cost calculation
         return (task instanceof MekGyroReplacement 
                 && ((MekGyroReplacement)task).getUnit().getEntity().getGyroType() == type
                 && tonnage == ((MekGyroReplacement)task).getUnit().getEntity().getWeight());
     }
 
+    @Override
+    public boolean isSamePartTypeAndStatus (Part part) {
+        return part instanceof MekGyro
+                && getName().equals(part.getName())
+                && getStatus().equals(part.getStatus())
+                && getType() == ((MekGyro) part).getType()
+                && getTonnage() == ((MekGyro) part).getTonnage();
+    }
+
+    @Override
+    public int getPartType() {
+        return PART_TYPE_MEK_GYRO;
+    }
+
+    @Override
+    public String getSaveString () {
+        return getName() + ";" + getTonnage() + ";" + getType() + ";" + getWalkMP();
+    }
 }

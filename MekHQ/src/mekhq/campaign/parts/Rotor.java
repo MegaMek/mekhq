@@ -30,13 +30,10 @@ import mekhq.campaign.work.RotorReplacement;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class Rotor extends Part {
-
-    protected float tonnage;
     
-    public Rotor(boolean salvage, float ton) {
-        super(salvage);
-        this.tonnage = ton;
-        this.name = "VTOL Rotor";
+    public Rotor(boolean salvage, int tonnage) {
+        super(salvage, tonnage);
+        this.name = "VTOL Rotor" + " (" + getTonnage() + ")";
     }
     
     @Override
@@ -44,6 +41,14 @@ public class Rotor extends Part {
         return task instanceof RotorReplacement 
                 && ((RotorReplacement)task).getUnit().getEntity() instanceof VTOL
                 && ((RotorReplacement)task).getUnit().getEntity().getWeight() == tonnage;
+    }
+
+    @Override
+    public boolean isSamePartTypeAndStatus (Part part) {
+        return part instanceof Rotor
+                && getName().equals(part.getName())
+                && getStatus().equals(part.getStatus())
+                && getTonnage() == ((Rotor)part).getTonnage();
     }
     
 }

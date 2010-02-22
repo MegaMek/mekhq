@@ -29,8 +29,8 @@ import mekhq.campaign.work.ReplacementItem;
  */
 public class VeeStabiliser extends Part {
 
-    public VeeStabiliser(boolean salvage) {
-        super(salvage);
+    public VeeStabiliser(boolean salvage, int tonnage) {
+        super(salvage, tonnage);
         this.name = "Vehicle Stabiliser";
     }
     
@@ -39,6 +39,14 @@ public class VeeStabiliser extends Part {
         //What the hell is going on here?
         //return task instanceof VeeStabiliserReplacement;
         return false;
+    }
+
+    @Override
+    public boolean isSamePartTypeAndStatus (Part part) {
+        return part instanceof VeeStabiliser
+                && getName().equals(part.getName())
+                && getStatus().equals(part.getStatus())
+                && false;
     }
     
 }

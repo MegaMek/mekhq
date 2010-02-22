@@ -30,9 +30,10 @@ import mekhq.campaign.work.ReplacementItem;
  */
 public class MekLifeSupport extends Part {
 
-    public MekLifeSupport(boolean salvage) {
-        super(salvage);
+    public MekLifeSupport(boolean salvage, int tonnage) {
+        super(salvage, tonnage);
         this.name = "Mech Life Support System";
+        this.cost = 50000;
     }
     
     @Override
@@ -40,4 +41,16 @@ public class MekLifeSupport extends Part {
         return task instanceof MekLifeSupportReplacement;
     }
 
+    @Override
+    public boolean isSamePartTypeAndStatus (Part part) {
+        return part instanceof MekLifeSupport
+                && getName().equals(part.getName())
+                && getStatus().equals(part.getStatus());
+    }
+
+    @Override
+    public int getPartType() {
+        return PART_TYPE_MEK_LIFE_SUPPORT;
+    }
+    
 }
