@@ -21,6 +21,8 @@
 
 package mekhq.campaign.work;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import megamek.common.AmmoType;
 import megamek.common.Mounted;
 import megamek.common.TargetRoll;
@@ -63,7 +65,13 @@ public class ReloadItem extends UnitWorkItem {
     
     @Override
     public String getDetails() {
-        return ammoDesc;
+        String desc = ammoDesc;
+        if (getCost() > 0) {
+            NumberFormat numberFormat = DecimalFormat.getIntegerInstance();
+            String text = numberFormat.format(getCost()) + " " + (getCost()!=0?"CBills":"CBill");
+            desc += " (" + text + ")";
+        }
+        return desc;
     }
     
     @Override
@@ -132,5 +140,10 @@ public class ReloadItem extends UnitWorkItem {
     protected String maxSkillReached() {
         //this should never happen because it is automatic success so failure should never be called
         return "";
+    }
+
+    public int getCost () {
+        // TODO Ammo cost
+        return 0;
     }
 }

@@ -64,8 +64,8 @@ public class MekSensorReplacement extends ReplacementItem {
     }
     
     @Override
-    public Part partNeeded() {
-        return new MekSensor(false);
+    public Part stratopsPartNeeded() {
+        return new MekSensor(false, (int) unit.getEntity().getWeight());
     }
 
     @Override

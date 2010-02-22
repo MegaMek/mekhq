@@ -54,8 +54,8 @@ public class VeeSensorReplacement extends ReplacementItem {
     }
 
     @Override
-    public Part partNeeded() {
-        return new VeeSensor(false);
+    public Part stratopsPartNeeded() {
+        return new VeeSensor(false, (int) unit.getEntity().getWeight());
     }
 
     @Override

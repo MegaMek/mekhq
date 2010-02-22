@@ -75,7 +75,7 @@ public class ArmorSalvage extends SalvageItem {
 
     @Override
     public Part getPart() {
-        return new Armor(true, type, amount);
+        return new Armor(true, (int) unit.getEntity().getWeight(), type, amount);
     }
     
     public int getLoc() {

@@ -41,8 +41,12 @@ public class VeeStabiliserRepair extends RepairItem {
     }
     
     @Override
-    public WorkItem replace() {
+    public void doReplaceChanges() {
         removeSalvage();
+    }
+
+    @Override
+    public WorkItem getReplacementTask () {
         return new VeeStabiliserReplacement(unit, loc);
     }
 

@@ -50,9 +50,13 @@ public abstract class InternalRepair extends RepairItem {
     }
 
     @Override
-    public WorkItem replace() {
+    public void doReplaceChanges() {
         removeSalvage();
         unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, loc);
+    }
+
+    @Override
+    public WorkItem getReplacementTask() {
         return new LocationReplacement(unit, loc);
     }
     

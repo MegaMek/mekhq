@@ -64,13 +64,17 @@ public class EquipmentRepair extends RepairItem {
         mounted.setDestroyed(false);
         unit.repairSystem(CriticalSlot.TYPE_EQUIPMENT, unit.getEntity().getEquipmentNum(mounted));
     }
-    
+
     @Override
-    public WorkItem replace() {
+    public void doReplaceChanges() {
         removeSalvage();
         mounted.setHit(true);
         mounted.setDestroyed(true);
         unit.destroySystem(CriticalSlot.TYPE_EQUIPMENT, unit.getEntity().getEquipmentNum(mounted));
+    }
+
+    @Override
+    public WorkItem getReplacementTask () {
         return new EquipmentReplacement(unit, mounted);
     }
     

@@ -38,7 +38,7 @@ public class TurretReplacement extends LocationReplacement {
     }
     
     @Override
-    public Part partNeeded() {
-        return new Turret(false, unit.getEntity().getWeight());
+    public Part stratopsPartNeeded() {
+        return new Turret(false, (int) unit.getEntity().getWeight());
     }
 }

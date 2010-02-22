@@ -59,8 +59,8 @@ class VeeStabiliserReplacement extends ReplacementItem {
     }
 
     @Override
-    public Part partNeeded() {
-        return new VeeStabiliser(false);
+    public Part stratopsPartNeeded() {
+        return new VeeStabiliser(false, (int) unit.getEntity().getWeight());
     }
 
     @Override

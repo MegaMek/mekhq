@@ -59,6 +59,7 @@ public class EquipmentReplacement extends ReplacementItem {
         super.fix();
         mounted.setHit(false);
         mounted.setDestroyed(false);
+        mounted.setRepairable(true);
         unit.repairSystem(CriticalSlot.TYPE_EQUIPMENT, unit.getEntity().getEquipmentNum(mounted));
     }
     
@@ -105,8 +106,16 @@ public class EquipmentReplacement extends ReplacementItem {
     }
 
     @Override
-    public Part partNeeded() {
-        return new EquipmentPart(false, mounted.getType());
+    public Part stratopsPartNeeded() {
+        /*
+        boolean salvage = false;
+        int weight = (int) getUnit().getEntity().getWeight();
+        int faction = getUnit().campaign.getFaction();
+        EquipmentType equipmentType = mounted.getType();
+        Entity entity = getUnit().getEntity();
+        return new EquipmentPart(salvage, weight, faction, equipmentType, entity);
+        */
+        return new EquipmentPart(false, (int) getUnit().getEntity().getWeight(), getUnit().campaign.getFaction(), mounted.getType(), getUnit().getEntity());
     }
 
     @Override

@@ -39,9 +39,13 @@ public class RotorRepair extends RepairItem {
     }
 
     @Override
-    public WorkItem replace() {
+    public void doReplaceChanges() {
         removeSalvage();
         unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, VTOL.LOC_ROTOR);
+    }
+
+    @Override
+    public WorkItem getReplacementTask () {
         return new RotorReplacement(unit, VTOL.LOC_ROTOR);
     }
 

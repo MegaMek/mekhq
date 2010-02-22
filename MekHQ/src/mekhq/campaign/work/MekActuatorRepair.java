@@ -70,9 +70,13 @@ public class MekActuatorRepair extends RepairItem {
     }
 
     @Override
-    public WorkItem replace() {
+    public void doReplaceChanges() {
         removeSalvage();
         unit.destroySystem(CriticalSlot.TYPE_SYSTEM, type, loc);
+    }
+
+    @Override
+    public WorkItem getReplacementTask () {
         return new MekActuatorReplacement(unit, loc, type);
     }
 

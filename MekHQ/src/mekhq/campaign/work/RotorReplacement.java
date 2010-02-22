@@ -38,8 +38,8 @@ public class RotorReplacement extends LocationReplacement {
     }
       
     @Override
-    public Part partNeeded() {
-        return new Rotor(false, unit.getEntity().getWeight());
+    public Part stratopsPartNeeded() {
+        return new Rotor(false, (int) unit.getEntity().getWeight());
     }
     
 }

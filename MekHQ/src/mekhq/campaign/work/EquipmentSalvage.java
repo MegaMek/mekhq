@@ -62,7 +62,7 @@ public class EquipmentSalvage extends SalvageItem {
     
     @Override
     public Part getPart() {
-        return new EquipmentPart(true, mounted.getType());
+        return new EquipmentPart(true, (int) getUnit().getEntity().getWeight(), getUnit().campaign.getFaction(), mounted.getType(), getUnit().getEntity());
     }
 
     @Override

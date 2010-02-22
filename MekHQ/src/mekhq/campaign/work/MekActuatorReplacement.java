@@ -81,8 +81,8 @@ public class MekActuatorReplacement extends ReplacementItem {
     }
 
     @Override
-    public Part partNeeded() {
-        return new MekActuator(false, unit.getEntity().getWeight(), type);
+    public Part stratopsPartNeeded() {
+        return new MekActuator(false, (int) unit.getEntity().getWeight(), type);
     }
 
     @Override

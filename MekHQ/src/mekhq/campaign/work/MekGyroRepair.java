@@ -48,9 +48,13 @@ public class MekGyroRepair extends RepairItem {
     }
 
     @Override
-    public WorkItem replace() {
+    public void doReplaceChanges() {
         removeSalvage();
         unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_GYRO, Mech.LOC_CT);
+    }
+
+    @Override
+    public WorkItem getReplacementTask () {
         return new MekGyroReplacement(unit);
     }
 

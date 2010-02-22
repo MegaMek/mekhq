@@ -47,7 +47,7 @@ public class MekGyroSalvage extends SalvageItem {
 
     @Override
     public Part getPart() {
-        return new MekGyro(true, unit.getEntity().getGyroType(), unit.getEntity().getWeight());
+        return new MekGyro(true, (int) unit.getEntity().getWeight(), unit.getEntity().getGyroType(), unit.getEntity().getOriginalWalkMP());
     }
 
     @Override

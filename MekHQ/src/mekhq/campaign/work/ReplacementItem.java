@@ -22,7 +22,9 @@
 package mekhq.campaign.work;
 
 import megamek.common.TargetRoll;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.Unit;
+import mekhq.campaign.parts.GenericSparePart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.team.SupportTeam;
 
@@ -34,7 +36,6 @@ public abstract class ReplacementItem extends UnitWorkItem {
 
     protected Part part;
     protected boolean partCheck;
-    
     
     public ReplacementItem(Unit unit) {
         super(unit);
@@ -59,8 +60,17 @@ public abstract class ReplacementItem extends UnitWorkItem {
      */
     public void useUpPart() {
         if(hasPart()) {
-            unit.campaign.removePart(part);
-            this.part = null;
+            if (getPart() instanceof GenericSparePart) {
+                GenericSparePart genericSparePart = (GenericSparePart) getPart();
+                GenericSparePart partNeeded = (GenericSparePart) partNeeded();
+                genericSparePart.setAmount(genericSparePart.getAmount() - partNeeded.getAmount());
+                if (genericSparePart.getAmount() < 1) {
+                    ((GenericSparePart) getPart()).setAmount(0);
+                }
+            } else {
+                unit.campaign.removePart(part);
+                this.part = null;
+            }
         }
     }
     
@@ -74,8 +84,15 @@ public abstract class ReplacementItem extends UnitWorkItem {
     
     @Override
     public void fix() {
-        unit.campaign.addWork(getSalvage());
-        useUpPart();
+        if (hasPart() && getPart() instanceof GenericSparePart) {
+            GenericSparePart genericSparePart = (GenericSparePart) getPart();
+            GenericSparePart partNeeded = (GenericSparePart) partNeeded();
+            unit.campaign.addWork(getSalvage());
+            useUpPart();
+        } else {
+            unit.campaign.addWork(getSalvage());
+            useUpPart();
+        }
     }
     
     @Override
@@ -95,28 +112,93 @@ public abstract class ReplacementItem extends UnitWorkItem {
         return "<br><emph><b>Component destroyed!</b></emph>";
     }
     
-    public abstract Part partNeeded();
+    public abstract Part stratopsPartNeeded();
     
     public abstract SalvageItem getSalvage();
     
     @Override
     public String getDetails() {
-        if(hasPart()) {
-            return "Using " + part.getDesc();
+        if (partNeeded() instanceof GenericSparePart) {
+            // The correct amount is in partNeeded
+            if (hasPart()) {
+                return "Using " + partNeeded().getDesc();
+            } else {
+                return "Needs " + partNeeded().getDesc();
+            }
         } else {
-            return "Needs " + partNeeded().getDesc();
+            if(hasPart()) {
+                return "Using " + part.getDesc();
+            } else {
+                return "Needs " + partNeeded().getDesc();
+            }
         }
     }
     
     @Override
     public String getToolTip() {
         String toReturn = "<html>" + getStats() + "<br>";
-        if(hasPart()) {
-            toReturn += "Using " + part.getDesc() + "<br>";
+        if (partNeeded() instanceof GenericSparePart) {
+            if(hasPart()) {
+                toReturn += "Using " + partNeeded().getDesc() + "<br>";
+            } else {
+                toReturn += "Needs " + partNeeded().getDesc() + "<br>";
+            }
         } else {
-            toReturn += "Needs " + partNeeded().getDesc() + "<br>";
+            if(hasPart()) {
+                toReturn += "Using " + part.getDesc() + "<br>";
+            } else {
+                toReturn += "Needs " + partNeeded().getDesc() + "<br>";
+            }
         }
         toReturn += "</html>";
         return toReturn;
+    }
+
+    public Part partNeeded () {
+        Part stratopsPartNeeded = stratopsPartNeeded();
+        if (stratopsPartNeeded == null)
+            return null;
+
+        if (CampaignOptions.repairSystem == CampaignOptions.REPAIR_SYSTEM_STRATOPS) {
+            return stratopsPartNeeded;
+        } else if (CampaignOptions.repairSystem == CampaignOptions.REPAIR_SYSTEM_GENERIC_PARTS) {
+            int amount = 1;
+            // Proportion of the total base value (undamaged) of all parts represented by this part
+            double costProportion = ((double) stratopsPartNeeded.getCost()) / ((double) unit.getFullBaseValueOfParts());
+            amount = (int) Math.round(costProportion * unit.getBuyCost());
+
+            return new GenericSparePart(stratopsPartNeeded.getTech(), amount);
+        } else if (CampaignOptions.repairSystem == CampaignOptions.REPAIR_SYSTEM_WARCHEST_CUSTOM) {
+            return stratopsPartNeeded;
+        } else {
+            return null;
+        }
+    }
+
+    public boolean hasEnoughGenericSpareParts () {
+        if (!hasPart()) {
+            return false;
+        } else if (partNeeded() instanceof GenericSparePart) {
+            GenericSparePart partNeeded = (GenericSparePart) partNeeded();
+            GenericSparePart currentPart = (GenericSparePart) getPart();
+            if (currentPart.getAmount() < partNeeded.getAmount())
+                return false;
+            else
+                return true;
+        } else {
+            return true;
+        }
+    }
+
+    @Override
+    public String checkFixable() {
+        // Checked through SupportTeam::getTargetFor
+        /*
+        if (partNeeded() instanceof GenericSparePart
+                && !hasEnoughGenericSpareParts()) {
+            return "Not enough spare parts";
+        }
+        */
+        return super.checkFixable();
     }
 }

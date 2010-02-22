@@ -52,7 +52,7 @@ public class MekEngineSalvage extends SalvageItem {
 
     @Override
     public Part getPart() {
-        return new MekEngine(true, unit.getEntity().getEngine());
+        return new MekEngine(true, (int) unit.getEntity().getWeight(), getUnit().campaign.getFaction(), unit.getEntity().getEngine());
     }
 
     @Override

@@ -47,7 +47,7 @@ public class MekLifeSupportSalvage extends SalvageItem {
 
     @Override
     public Part getPart() {
-        return new MekLifeSupport(true);
+        return new MekLifeSupport(true, (int) unit.getEntity().getWeight());
     }
 
     @Override

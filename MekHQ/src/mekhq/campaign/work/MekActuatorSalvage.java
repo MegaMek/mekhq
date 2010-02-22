@@ -65,7 +65,7 @@ public class MekActuatorSalvage extends SalvageItem {
 
     @Override
     public Part getPart() {
-        return new MekActuator(true, unit.getEntity().getWeight(), type);
+        return new MekActuator(true, (int) unit.getEntity().getWeight(), type);
     }
 
     @Override

@@ -80,8 +80,8 @@ public class LocationReplacement extends ReplacementItem {
     }
 
     @Override
-    public Part partNeeded() {
-        return new MekLocation(false, loc, unit.getEntity().getWeight(), unit.hasEndosteel(), unit.hasTSM());
+    public Part stratopsPartNeeded() {
+        return new MekLocation(false, loc, (int) unit.getEntity().getWeight(), unit.getEntity().getStructureType(), unit.hasTSM());
     }
 
     @Override

@@ -64,8 +64,8 @@ public class MekLifeSupportReplacement extends ReplacementItem {
     }
 
     @Override
-    public Part partNeeded() {
-        return new MekLifeSupport(false);
+    public Part stratopsPartNeeded() {
+        return new MekLifeSupport(false, (int) unit.getEntity().getWeight());
     }
 
     @Override

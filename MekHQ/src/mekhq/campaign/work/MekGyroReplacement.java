@@ -53,8 +53,8 @@ public class MekGyroReplacement extends ReplacementItem {
     }
 
     @Override
-    public Part partNeeded() {
-        return new MekGyro(false, unit.getEntity().getGyroType(), unit.getEntity().getWeight());
+    public Part stratopsPartNeeded() {
+        return new MekGyro(false, (int) unit.getEntity().getWeight(), unit.getEntity().getGyroType(), unit.getEntity().getOriginalWalkMP());
     }
 
     @Override

@@ -47,7 +47,7 @@ public class MekSensorSalvage extends SalvageItem {
 
     @Override
     public Part getPart() {
-        return new MekSensor(true);
+        return new MekSensor(true, (int) unit.getEntity().getWeight());
     }
 
     @Override

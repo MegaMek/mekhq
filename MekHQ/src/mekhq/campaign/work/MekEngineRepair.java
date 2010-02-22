@@ -53,9 +53,13 @@ public class MekEngineRepair extends RepairItem {
     }
     
     @Override
-    public WorkItem replace() {
+    public void doReplaceChanges() {
         removeSalvage();
         unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE);
+    }
+
+    @Override
+    public WorkItem getReplacementTask () {
         return new MekEngineReplacement(unit);
     }
 

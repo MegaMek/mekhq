@@ -37,7 +37,7 @@ public class HeatSinkRepair extends EquipmentRepair {
     }
     
     @Override
-    public WorkItem replace() {
+    public WorkItem getReplacementTask() {
         return new HeatSinkReplacement(unit, mounted);
     }
 }

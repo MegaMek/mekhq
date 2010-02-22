@@ -25,6 +25,7 @@ import megamek.common.EquipmentType;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.Unit;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
@@ -66,13 +67,14 @@ public class ArmorReplacement extends ReplacementItem {
         if(rear) {
             locName += " Rear";
         }
-        return locName + ", " + amount + " points";
+        return locName + ", " + amount + " points" + " (" + partNeeded().getCostString()+ ")";
     }
     
 
     @Override
     public void fix() {
-        if(null != part) {
+        if(null != part
+                && part instanceof Armor) {
             int points = Math.min(amount, ((Armor)part).getAmount());
             unit.getEntity().setArmor(unit.getEntity().getArmor(loc, rear) + points, loc, rear);
             boolean taskFound = false;
@@ -88,8 +90,11 @@ public class ArmorReplacement extends ReplacementItem {
             if(!taskFound) {
                 unit.campaign.addWork(getSalvage());
             }
+            useUpPart();
+        } else {
+            super.fix();
+            unit.getEntity().setArmor(unit.getEntity().getOArmor(loc, rear), loc, rear);
         }
-        useUpPart();
     }
 
     @Override
@@ -98,12 +103,12 @@ public class ArmorReplacement extends ReplacementItem {
             setCompleted(true);
         } else {
             //we did not fully repair the armor, probably because of supply shortage
-            this.amount = unit.getEntity().getOArmor(loc, rear) - unit.getEntity().getArmor(loc, rear);  
+            this.amount = unit.getEntity().getOArmor(loc, rear) - unit.getEntity().getArmor(loc, rear);
             this.time = 5 * amount;
-            if(unit.getEntity() instanceof Tank) {
+            if (unit.getEntity() instanceof Tank) {
                 this.time = 3 * amount;
             } else if (unit.getEntity() instanceof Aero) {
-                if(((Aero)unit.getEntity()).isCapitalScale()) {
+                if (((Aero) unit.getEntity()).isCapitalScale()) {
                     this.time = 120 * amount;
                 } else {
                     this.time = 15 * amount;
@@ -154,17 +159,19 @@ public class ArmorReplacement extends ReplacementItem {
     
     @Override
     public void useUpPart() {
-        if(hasPart()) {
+        if(hasPart() && part instanceof Armor) {
             Armor armor = (Armor)part;
             armor.setAmount(armor.getAmount() - amount);
             if(armor.getAmount() < 1) {
                 super.useUpPart();
             }
+        } else {
+            super.useUpPart();
         }
     }
 
     @Override
-    public Part partNeeded() {
+    public Part stratopsPartNeeded() {
         //armor is checked for in 5-ton increments
         int armorType = unit.getEntity().getArmorType();
         double armorPerTon = 16.0 * EquipmentType.getArmorPointMultiplier(armorType, unit.getEntity().getTechLevel());
@@ -172,7 +179,7 @@ public class ArmorReplacement extends ReplacementItem {
             armorPerTon = 8.0;
         }
         int points = (int)Math.floor(armorPerTon * 5);
-        return new Armor(false, armorType, points);
+        return new Armor(false, (int) unit.getEntity().getWeight(), armorType, points);
     }
 
     @Override

@@ -45,7 +45,13 @@ public abstract class RepairItem extends UnitWorkItem {
         return hits + " hit(s)";
     }
     
-    public abstract WorkItem replace();
+    public abstract WorkItem getReplacementTask();
+    public abstract void doReplaceChanges();
+
+    public final WorkItem replace () {
+        doReplaceChanges();
+        return getReplacementTask();
+    }
     
     protected void removeSalvage() {
         WorkItem salvage = unit.campaign.getTask(salvageId);

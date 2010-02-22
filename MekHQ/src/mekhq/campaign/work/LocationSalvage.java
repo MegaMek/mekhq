@@ -62,7 +62,7 @@ public class LocationSalvage extends SalvageItem {
 
     @Override
     public Part getPart() {
-        return new MekLocation(true, loc, unit.getEntity().getWeight(), unit.hasEndosteel(), unit.hasTSM());
+        return new MekLocation(true, loc, (int) unit.getEntity().getWeight(), unit.getEntity().getStructureType(), unit.hasTSM());
     }
     
     @Override
