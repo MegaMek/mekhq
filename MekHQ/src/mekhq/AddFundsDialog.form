@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Form version="1.5" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JDialogFormInfo">
+  <Properties>
+    <Property name="defaultCloseOperation" type="int" value="2"/>
+    <Property name="name" type="java.lang.String" value="Form" noResource="true"/>
+  </Properties>
+  <SyntheticProperties>
+    <SyntheticProperty name="formSizePolicy" type="int" value="1"/>
+  </SyntheticProperties>
+  <AuxValues>
+    <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="2"/>
+    <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="true"/>
+    <AuxValue name="FormSettings_generateFQN" type="java.lang.Boolean" value="true"/>
+    <AuxValue name="FormSettings_generateMnemonicsCode" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_i18nAutoMode" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_layoutCodeTarget" type="java.lang.Integer" value="2"/>
+    <AuxValue name="FormSettings_listenerGenerationStyle" type="java.lang.Integer" value="0"/>
+    <AuxValue name="FormSettings_variablesLocal" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_variablesModifier" type="java.lang.Integer" value="2"/>
+  </AuxValues>
+
+  <Layout>
+    <DimensionLayout dim="0">
+      <Group type="103" groupAlignment="0" attributes="0">
+          <Group type="102" attributes="0">
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace min="-2" pref="120" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="label" alignment="0" min="-2" pref="114" max="-2" attributes="0"/>
+                          <Component id="btnAddFunds" alignment="0" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                  </Group>
+                  <Group type="102" alignment="1" attributes="0">
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="jFormattedTextFieldFundsQuantity" min="-2" pref="234" max="-2" attributes="0"/>
+                      <EmptySpace pref="31" max="32767" attributes="0"/>
+                      <Component id="labelUnit" min="-2" pref="47" max="-2" attributes="0"/>
+                  </Group>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+          </Group>
+      </Group>
+    </DimensionLayout>
+    <DimensionLayout dim="1">
+      <Group type="103" groupAlignment="0" attributes="0">
+          <Group type="102" alignment="1" attributes="0">
+              <EmptySpace pref="20" max="32767" attributes="0"/>
+              <Component id="label" min="-2" pref="26" max="-2" attributes="0"/>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="jFormattedTextFieldFundsQuantity" alignment="3" min="-2" pref="27" max="-2" attributes="0"/>
+                  <Component id="labelUnit" alignment="3" min="-2" pref="26" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace min="-2" pref="70" max="-2" attributes="0"/>
+              <Component id="btnAddFunds" min="-2" max="-2" attributes="0"/>
+          </Group>
+      </Group>
+    </DimensionLayout>
+  </Layout>
+  <SubComponents>
+    <Component class="javax.swing.JLabel" name="label">
+      <Properties>
+        <Property name="font" type="java.awt.Font" noResource="true" editor="org.netbeans.modules.form.editors2.FontEditor">
+          <FontInfo relative="true">
+            <Font bold="true" component="label" property="font" relativeSize="true" size="0"/>
+          </FontInfo>
+        </Property>
+        <Property name="text" type="java.lang.String" resourceKey="label.text"/>
+        <Property name="name" type="java.lang.String" value="label" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="btnAddFunds">
+      <Properties>
+        <Property name="text" type="java.lang.String" resourceKey="btnAddFunds.text"/>
+        <Property name="actionCommand" type="java.lang.String" resourceKey="btnAddFunds.actionCommand"/>
+        <Property name="name" type="java.lang.String" value="btnAddFunds" noResource="true"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnAddFundsActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JFormattedTextField" name="jFormattedTextFieldFundsQuantity">
+      <Properties>
+        <Property name="formatterFactory" type="javax.swing.JFormattedTextField$AbstractFormatterFactory" editor="org.netbeans.modules.form.editors.AbstractFormatterFactoryEditor">
+          <Format subtype="1" type="0"/>
+        </Property>
+        <Property name="text" type="java.lang.String" resourceKey="jFormattedTextFieldFundsQuantity.text"/>
+        <Property name="toolTipText" type="java.lang.String" resourceKey="jFormattedTextFieldFundsQuantity.toolTipText"/>
+        <Property name="name" type="java.lang.String" value="jFormattedTextFieldFundsQuantity" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="labelUnit">
+      <Properties>
+        <Property name="font" type="java.awt.Font" noResource="true" editor="org.netbeans.modules.form.editors2.FontEditor">
+          <FontInfo relative="true">
+            <Font bold="false" component="labelUnit" property="font" relativeSize="true" size="0"/>
+          </FontInfo>
+        </Property>
+        <Property name="text" type="java.lang.String" resourceKey="labelUnit.text"/>
+        <Property name="name" type="java.lang.String" value="labelUnit" noResource="true"/>
+      </Properties>
+    </Component>
+  </SubComponents>
+</Form>
