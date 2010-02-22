@@ -7,10 +7,15 @@
 package mekhq;
 
 import java.awt.Image;
+import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.ArrayList;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.RowFilter;
 import javax.swing.event.DocumentEvent;
@@ -19,8 +24,8 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
-import megamek.client.ui.MechView;
 import megamek.client.ui.swing.MechTileset;
+import megamek.client.ui.swing.MechView;
 import megamek.common.Entity;
 import megamek.common.EntityWeightClass;
 import megamek.common.MechFileParser;
@@ -29,6 +34,9 @@ import megamek.common.MechSummaryCache;
 import megamek.common.TechConstants;
 import megamek.common.UnitType;
 import megamek.common.loaders.EntityLoadingException;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.Unit;
+import org.jdesktop.application.ResourceMap;
 
 /**
  *
@@ -47,21 +55,18 @@ public class UnitSelectorDialog extends JDialog {
 
     private TableRowSorter<MechTableModel> sorter;
 
+    private Campaign campaign;
+
     /** Creates new form UnitSelectorDialog */
-    public UnitSelectorDialog(java.awt.Frame parent, boolean modal) {
+    public UnitSelectorDialog(java.awt.Frame parent, boolean modal, Campaign campaign) {
         super(parent, modal);
         unitModel = new MechTableModel();
         initComponents();
-        mechs = MechSummaryCache.getInstance().getAllMechs();
 
-        // break out if there are no units to filter
-        if (mechs == null) {
-            System.err.println("No units to filter!");
-        } else {
-            unitModel.setData(mechs);
-        }
-        filterUnits();
-        //filterMechs(false);
+        this.campaign = campaign;
+
+        MechSummary [] allMechs = MechSummaryCache.getInstance().getAllMechs();
+        setMechs(allMechs);
     }
 
     /** This method is called from within the constructor to
@@ -90,8 +95,8 @@ public class UnitSelectorDialog extends JDialog {
         lblImage = new javax.swing.JLabel();
         checkCanon = new javax.swing.JCheckBox();
         panelOKBtns = new javax.swing.JPanel();
-        btnBuyClose = new javax.swing.JButton();
-        btnCancel = new javax.swing.JButton();
+        btnBuy = new javax.swing.JButton();
+        btnClose = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(UnitSelectorDialog.class);
@@ -120,12 +125,12 @@ public class UnitSelectorDialog extends JDialog {
             if (i == MechTableModel.COL_CHASSIS) {
                 column.setPreferredWidth(125);
             }
-            else if((i == MechTableModel.COL_MODEL)
-                || (i == MechTableModel.COL_COST)) {
+            else if(i == MechTableModel.COL_MODEL
+                || i == MechTableModel.COL_COST) {
                 column.setPreferredWidth(75);
             }
-            else if((i == MechTableModel.COL_WEIGHT)
-                || (i == MechTableModel.COL_BV)) {
+            else if(i == MechTableModel.COL_WEIGHT
+                || i == MechTableModel.COL_BV) {
                 column.setPreferredWidth(50);
             }
             else {
@@ -146,6 +151,7 @@ public class UnitSelectorDialog extends JDialog {
         scrTxtUnitView.setName("scrTxtUnitView"); // NOI18N
 
         txtUnitView.setBorder(null);
+        txtUnitView.setContentType(resourceMap.getString("txtUnitView.contentType")); // NOI18N
         txtUnitView.setEditable(false);
         txtUnitView.setFont(resourceMap.getFont("txtUnitView.font")); // NOI18N
         txtUnitView.setMinimumSize(new java.awt.Dimension(300, 500));
@@ -178,7 +184,7 @@ public class UnitSelectorDialog extends JDialog {
         for (int i = 0; i < TechConstants.SIZE; i++) {
             techModel.addElement(TechConstants.getLevelDisplayableName(i));
         }
-        techModel.setSelectedItem(TechConstants.getLevelDisplayableName(0));
+        techModel.setSelectedItem(TechConstants.getLevelDisplayableName(TechConstants.T_INTRO_BOXSET));
         comboType.setModel(techModel);
         comboType.setMinimumSize(new java.awt.Dimension(200, 27));
         comboType.setName("comboType"); // NOI18N
@@ -206,7 +212,7 @@ public class UnitSelectorDialog extends JDialog {
         for (int i = 0; i < EntityWeightClass.SIZE; i++) {
             weightModel.addElement(EntityWeightClass.getClassName(i));
         }
-        weightModel.setSelectedItem(EntityWeightClass.getClassName(0));
+        weightModel.setSelectedItem(EntityWeightClass.getClassName(EntityWeightClass.WEIGHT_LIGHT));
         comboWeight.setModel(weightModel);
         comboWeight.setMinimumSize(new java.awt.Dimension(200, 27));
         comboWeight.setName("comboWeight"); // NOI18N
@@ -235,7 +241,7 @@ public class UnitSelectorDialog extends JDialog {
         for (int i = 0; i < UnitType.SIZE; i++) {
             unitTypeModel.addElement(UnitType.getTypeDisplayableName(i));
         }
-        unitTypeModel.setSelectedItem(UnitType.getTypeDisplayableName(0));
+        unitTypeModel.setSelectedItem(UnitType.getTypeName(UnitType.MEK));
         comboUnitType.setModel(unitTypeModel);
         comboUnitType.setMinimumSize(new java.awt.Dimension(200, 27));
         comboUnitType.setName("comboUnitType"); // NOI18N
@@ -319,23 +325,23 @@ public class UnitSelectorDialog extends JDialog {
             panelOKBtns.setName("panelOKBtns"); // NOI18N
             panelOKBtns.setLayout(new java.awt.GridBagLayout());
 
-            btnBuyClose.setText(resourceMap.getString("btnBuyClose.text")); // NOI18N
-            btnBuyClose.setName("btnBuyClose"); // NOI18N
-            btnBuyClose.addActionListener(new java.awt.event.ActionListener() {
+            btnBuy.setText(resourceMap.getString("btnBuy.text")); // NOI18N
+            btnBuy.setName("btnBuy"); // NOI18N
+            btnBuy.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    btnBuyCloseActionPerformed(evt);
+                    btnBuyActionPerformed(evt);
                 }
             });
-            panelOKBtns.add(btnBuyClose, new java.awt.GridBagConstraints());
+            panelOKBtns.add(btnBuy, new java.awt.GridBagConstraints());
 
-            btnCancel.setText(resourceMap.getString("btnCancel.text")); // NOI18N
-            btnCancel.setName("btnCancel"); // NOI18N
-            btnCancel.addActionListener(new java.awt.event.ActionListener() {
+            btnClose.setText(resourceMap.getString("btnClose.text")); // NOI18N
+            btnClose.setName("btnClose"); // NOI18N
+            btnClose.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    btnCancelActionPerformed(evt);
+                    btnCloseActionPerformed(evt);
                 }
             });
-            panelOKBtns.add(btnCancel, new java.awt.GridBagConstraints());
+            panelOKBtns.add(btnClose, new java.awt.GridBagConstraints());
 
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -359,14 +365,39 @@ private void comboTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
     filterUnits();
 }//GEN-LAST:event_comboTypeActionPerformed
 
-private void btnBuyCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuyCloseActionPerformed
-    setVisible(false);
-}//GEN-LAST:event_btnBuyCloseActionPerformed
+private void btnBuyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuyActionPerformed
+    Entity en = getSelectedEntity();
+    if(null != en) {
+        if (campaign.isGM()) {
+            campaign.addUnit(en, false);
+        } else if (!campaign.buyUnit(en, false)) {
+            ResourceMap resourceMap = MekHQApp.getApplication().getContext().getResourceMap(UnitSelectorDialog.class);
+            String text = resourceMap.getString("NotEnoughMoneyText.text");
 
-private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
+            NumberFormat numberFormat = DecimalFormat.getIntegerInstance();
+            int unitCost = (new Unit(en, campaign)).getBuyCost();
+            String unitCostString = numberFormat.format(unitCost) + " " + (unitCost!=0?"CBills":"CBill");
+            String fundsString = numberFormat.format(campaign.getFunds()) + " " + (campaign.getFunds()!=0?"CBills":"CBill");
+            
+            text += System.getProperty("line.separator");
+            text += "(Cost : " + unitCostString + ", Funds : " + fundsString + ")";
+            AlertPopup popup = new AlertPopup(null, true, text);
+            popup.setVisible(true);
+        }
+    }
+
+    // Necessary if the used wants to buy the same unit twice without reselecting it
+    UnitChanged(null);
+}//GEN-LAST:event_btnBuyActionPerformed
+
+private void btnBuySelectActionPerformed(java.awt.event.ActionEvent evt) {                                       
+    setVisible(false);
+}
+
+private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
     selectedUnit = null;
     setVisible(false);
-}//GEN-LAST:event_btnCancelActionPerformed
+}//GEN-LAST:event_btnCloseActionPerformed
 
 private void checkCanonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkCanonActionPerformed
     filterUnits();
@@ -378,7 +409,7 @@ private void checkCanonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                UnitSelectorDialog dialog = new UnitSelectorDialog(new javax.swing.JFrame(), true);
+                UnitSelectorDialog dialog = new UnitSelectorDialog(new javax.swing.JFrame(), true, null);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {
@@ -521,7 +552,7 @@ private void checkCanonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
                 return;
             }
         }// end if(null tileset)
-        Image unitImage = mt.imageFor(selectedUnit, lblImage);
+        Image unitImage = mt.imageFor(selectedUnit, lblImage, -1);
         if(null != unitImage) {
             lblImage.setIcon(new ImageIcon(unitImage));
         }
@@ -530,6 +561,63 @@ private void checkCanonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
      public Entity getSelectedEntity() {
         return selectedUnit;
 
+    }
+
+     public void setMechs (MechSummary [] m) {
+         this.mechs = m;
+
+         // break out if there are no units to filter
+         if (mechs == null) {
+             System.err.println("No units to filter!");
+         } else {
+             unitModel.setData(mechs);
+         }
+         filterUnits();
+     }
+
+     public void restrictToChassis (String chassis) {
+         ArrayList<MechSummary> allowedMechs = new ArrayList<MechSummary>();
+         for (MechSummary mechSummary : mechs) {
+             if (mechSummary.getChassis().equals(chassis))
+                 allowedMechs.add(mechSummary);
+         }
+         setMechs(allowedMechs.toArray(new MechSummary[0]));
+     }
+
+     public void restrictToYear (int year) {
+         ArrayList<MechSummary> allowedMechs = new ArrayList<MechSummary>();
+         for (MechSummary mechSummary : mechs) {
+             if (mechSummary.getYear()<=year)
+                 allowedMechs.add(mechSummary);
+         }
+         setMechs(allowedMechs.toArray(new MechSummary[0]));
+     }
+
+    public void changeBuyBtnToSelectBtn () {
+        for (ActionListener actionListener : btnBuy.getActionListeners()) {
+            btnBuy.removeActionListener(actionListener);
+        }
+
+        ResourceMap resourceMap = MekHQApp.getInstance().getContext().getResourceMap(UnitSelectorDialog.class);
+        btnBuy.setText(resourceMap.getString("btnBuy.textSelect")); // NOI18N
+
+        btnBuy.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBuySelectActionPerformed(evt);
+            }
+        });
+    }
+
+    public JComboBox getComboType() {
+        return comboType;
+    }
+
+    public JComboBox getComboUnitType() {
+        return comboUnitType;
+    }
+
+    public JComboBox getComboWeight() {
+        return comboWeight;
     }
 
 
@@ -628,8 +716,8 @@ public class MechTableModel extends AbstractTableModel {
 }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnBuyClose;
-    private javax.swing.JButton btnCancel;
+    private javax.swing.JButton btnBuy;
+    private javax.swing.JButton btnClose;
     private javax.swing.JCheckBox checkCanon;
     private javax.swing.JComboBox comboType;
     private javax.swing.JComboBox comboUnitType;

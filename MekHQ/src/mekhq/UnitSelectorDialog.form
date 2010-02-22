@@ -12,6 +12,7 @@
   <AuxValues>
     <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="2"/>
     <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="true"/>
+    <AuxValue name="FormSettings_generateFQN" type="java.lang.Boolean" value="true"/>
     <AuxValue name="FormSettings_generateMnemonicsCode" type="java.lang.Boolean" value="false"/>
     <AuxValue name="FormSettings_i18nAutoMode" type="java.lang.Boolean" value="false"/>
     <AuxValue name="FormSettings_layoutCodeTarget" type="java.lang.Integer" value="1"/>
@@ -81,6 +82,7 @@
             <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
               <Border info="null"/>
             </Property>
+            <Property name="contentType" type="java.lang.String" resourceKey="txtUnitView.contentType"/>
             <Property name="editable" type="boolean" value="false"/>
             <Property name="font" type="java.awt.Font" resourceKey="txtUnitView.font"/>
             <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
@@ -140,7 +142,7 @@
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="comboTypeActionPerformed"/>
           </Events>
           <AuxValues>
-            <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="DefaultComboBoxModel techModel = new DefaultComboBoxModel();&#xa;for (int i = 0; i &lt; TechConstants.SIZE; i++) {&#xa;    techModel.addElement(TechConstants.getLevelDisplayableName(i));&#xa;}&#xa;techModel.setSelectedItem(TechConstants.getLevelDisplayableName(0));"/>
+            <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="DefaultComboBoxModel techModel = new DefaultComboBoxModel();&#xa;for (int i = 0; i &lt; TechConstants.SIZE; i++) {&#xa;    techModel.addElement(TechConstants.getLevelDisplayableName(i));&#xa;}&#xa;techModel.setSelectedItem(TechConstants.getLevelDisplayableName(TechConstants.T_INTRO_BOXSET));"/>
           </AuxValues>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
@@ -176,7 +178,7 @@
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="comboWeightActionPerformed"/>
           </Events>
           <AuxValues>
-            <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="DefaultComboBoxModel weightModel = new DefaultComboBoxModel();&#xa;for (int i = 0; i &lt; EntityWeightClass.SIZE; i++) {&#xa;    weightModel.addElement(EntityWeightClass.getClassName(i));&#xa;}&#xa;weightModel.setSelectedItem(EntityWeightClass.getClassName(0));"/>
+            <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="DefaultComboBoxModel weightModel = new DefaultComboBoxModel();&#xa;for (int i = 0; i &lt; EntityWeightClass.SIZE; i++) {&#xa;    weightModel.addElement(EntityWeightClass.getClassName(i));&#xa;}&#xa;weightModel.setSelectedItem(EntityWeightClass.getClassName(EntityWeightClass.WEIGHT_LIGHT));"/>
           </AuxValues>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
@@ -212,7 +214,7 @@
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="comboUnitTypeActionPerformed"/>
           </Events>
           <AuxValues>
-            <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="DefaultComboBoxModel unitTypeModel = new DefaultComboBoxModel();&#xa;for (int i = 0; i &lt; UnitType.SIZE; i++) {&#xa;    unitTypeModel.addElement(UnitType.getTypeDisplayableName(i));&#xa;}&#xa;unitTypeModel.setSelectedItem(UnitType.getTypeDisplayableName(0));"/>
+            <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="DefaultComboBoxModel unitTypeModel = new DefaultComboBoxModel();&#xa;for (int i = 0; i &lt; UnitType.SIZE; i++) {&#xa;    unitTypeModel.addElement(UnitType.getTypeDisplayableName(i));&#xa;}&#xa;unitTypeModel.setSelectedItem(UnitType.getTypeName(UnitType.MEK));"/>
           </AuxValues>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
@@ -292,13 +294,13 @@
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout"/>
       <SubComponents>
-        <Component class="javax.swing.JButton" name="btnBuyClose">
+        <Component class="javax.swing.JButton" name="btnBuy">
           <Properties>
-            <Property name="text" type="java.lang.String" resourceKey="btnBuyClose.text"/>
-            <Property name="name" type="java.lang.String" value="btnBuyClose" noResource="true"/>
+            <Property name="text" type="java.lang.String" resourceKey="btnBuy.text"/>
+            <Property name="name" type="java.lang.String" value="btnBuy" noResource="true"/>
           </Properties>
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnBuyCloseActionPerformed"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnBuyActionPerformed"/>
           </Events>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
@@ -306,13 +308,13 @@
             </Constraint>
           </Constraints>
         </Component>
-        <Component class="javax.swing.JButton" name="btnCancel">
+        <Component class="javax.swing.JButton" name="btnClose">
           <Properties>
-            <Property name="text" type="java.lang.String" resourceKey="btnCancel.text"/>
-            <Property name="name" type="java.lang.String" value="btnCancel" noResource="true"/>
+            <Property name="text" type="java.lang.String" resourceKey="btnClose.text"/>
+            <Property name="name" type="java.lang.String" value="btnClose" noResource="true"/>
           </Properties>
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnCancelActionPerformed"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnCloseActionPerformed"/>
           </Events>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
