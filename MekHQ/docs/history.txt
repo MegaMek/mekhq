@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.1.2 (SVN)
++ updated nbproject properties
 + updated MegaMek.jar
 + pilot portraits
 + unit camo
