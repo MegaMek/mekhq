@@ -38,6 +38,7 @@ import mekhq.campaign.Faction;
 public class CampaignOptionsDialog extends javax.swing.JDialog {
 
     private Campaign campaign;
+    private CampaignOptions options;
     private GregorianCalendar date;
     private SimpleDateFormat dateFormat;
     private Frame frame;
@@ -50,6 +51,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     public CampaignOptionsDialog(java.awt.Frame parent, boolean modal, Campaign c) {
         super(parent, modal);
         this.campaign = c;
+        this.options = c.getCampaignOptions();
         //this is a hack but I have no idea what is going on here
         this.frame = parent;
         this.date = campaign.calendar;
@@ -68,9 +70,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         setCamoIcon();
         
         // Rules panel
-        this.useFactionModifiersCheckBox.setSelected(CampaignOptions.useFactionModifiers);
-        this.clanPriceModifierJFormattedTextField.setValue(new Double(CampaignOptions.clanPriceModifier));
-        this.useEasierRefitCheckBox.setSelected(CampaignOptions.useEasierRefit);
+        useFactionModifiersCheckBox.setSelected(options.useFactionModifiers());
+        clanPriceModifierJFormattedTextField.setValue(options.getClanPriceModifier());
+        useEasierRefitCheckBox.setSelected(options.useEasierRefit());
     }
 
     /** This method is called from within the constructor to
@@ -251,7 +253,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         repairSystemComboBox.setModel(repairSystemComboBoxModel);
         repairSystemComboBox.setToolTipText(resourceMap.getString("repairSystemComboBox.toolTipText")); // NOI18N
         repairSystemComboBox.setName("repairSystemComboBox"); // NOI18N
-        repairSystemComboBox.setSelectedIndex(CampaignOptions.repairSystem);
+        repairSystemComboBox.setSelectedIndex(options.getRepairSystem());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 4;
@@ -323,11 +325,11 @@ private void btnOkayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
     campaign.setColorIndex(colorIndex);
     
     // Rules panel
-    CampaignOptions.useFactionModifiers = useFactionModifiersCheckBox.isSelected();
+    options.setFactionModifiers(useFactionModifiersCheckBox.isSelected());
     String clanPriceModifierString = clanPriceModifierJFormattedTextField.getText();
-    CampaignOptions.clanPriceModifier = (new Double(clanPriceModifierString)).floatValue();
-    CampaignOptions.useEasierRefit = useEasierRefitCheckBox.isSelected();
-    CampaignOptions.repairSystem = repairSystemComboBox.getSelectedIndex();
+    options.setClanPriceModifier(new Double(clanPriceModifierString));
+    options.setEasierRefit(useEasierRefitCheckBox.isSelected());
+    options.setRepairSystem(repairSystemComboBox.getSelectedIndex());
 
     campaign.refreshAllUnitDiagnostics();
 }//GEN-LAST:event_btnOkayActionPerformed

@@ -235,7 +235,7 @@ public abstract class Part implements Serializable {
             int faction = (clanEngine?Faction.F_CLAN:Faction.F_FEDSUN);
 
             Engine engine = new Engine(rating, type, flags);
-            MekEngine mekEngine = new MekEngine(false, tonnage, faction, engine);
+            MekEngine mekEngine = new MekEngine(false, tonnage, faction, engine, 1.0);
             return mekEngine;
         } else if (name.contains("EquipmentPart")) {
             String typeName = saveString.split(";")[2];

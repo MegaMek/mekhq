@@ -96,7 +96,7 @@ public abstract class Customization extends UnitWorkItem {
             }
         }
 
-        if (CampaignOptions.useEasierRefit) {
+        if (unit.campaign.getCampaignOptions().useEasierRefit()) {
             timeMultiplier = (timeMultiplier - 1) / 4 + 1;
             difficultyModifier = Math.min(difficultyModifier-1, 2);
         }

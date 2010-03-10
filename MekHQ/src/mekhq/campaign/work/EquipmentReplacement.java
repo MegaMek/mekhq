@@ -115,7 +115,7 @@ public class EquipmentReplacement extends ReplacementItem {
         Entity entity = getUnit().getEntity();
         return new EquipmentPart(salvage, weight, faction, equipmentType, entity);
         */
-        return new EquipmentPart(false, (int) getUnit().getEntity().getWeight(), getUnit().campaign.getFaction(), mounted.getType(), getUnit().getEntity());
+        return new EquipmentPart(false, (int) getUnit().getEntity().getWeight(), getUnit().campaign.getFaction(), mounted.getType(), getUnit());
     }
 
     @Override

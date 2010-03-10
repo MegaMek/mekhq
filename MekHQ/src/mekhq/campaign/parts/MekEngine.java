@@ -42,7 +42,7 @@ public class MekEngine extends Part {
         return engine;
     }
     
-    public MekEngine(boolean salvage, int tonnage, int faction, Engine e) {
+    public MekEngine(boolean salvage, int tonnage, int faction, Engine e, double clanMultiplier) {
         super(salvage, tonnage);
         this.engine = e;
         this.name = engine.getEngineName() + " Engine" + " (" + getTonnage() + " tons)";
@@ -54,7 +54,7 @@ public class MekEngine extends Part {
         // Increase cost for Clan parts when player is IS faction
         // Increase cost for Clan parts when player is IS faction
         if (isClanTechBase() && !Faction.isClanFaction(faction))
-            this.cost *= CampaignOptions.clanPriceModifier;
+            this.cost *= clanMultiplier;
     }
 
     @Override

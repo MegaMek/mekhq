@@ -29,41 +29,57 @@ import java.io.Serializable;
  */
 public class CampaignOptions implements Serializable {
 
-    public static int REPAIR_SYSTEM_STRATOPS = 0;
-    public static int REPAIR_SYSTEM_WARCHEST_CUSTOM = 1;
-    public static int REPAIR_SYSTEM_GENERIC_PARTS = 2;
-    public static String [] REPAIR_SYSTEM_NAMES = {"Strat Ops", "Warchest Custom", "Generic Spare Parts"};
+    public final static int REPAIR_SYSTEM_STRATOPS = 0;
+    public final static int REPAIR_SYSTEM_WARCHEST_CUSTOM = 1;
+    public final static int REPAIR_SYSTEM_GENERIC_PARTS = 2;
+    //FIXME: This needs to be localized
+    public final static String [] REPAIR_SYSTEM_NAMES = {"Strat Ops", "Warchest Custom", "Generic Spare Parts"};
 
-    public static boolean useFactionModifiers = true;
-    protected boolean useFactionModifiers_saver;
-
-    public static float clanPriceModifier = 2;
-    protected float clanPriceModifier_saver;
-
-    public static boolean useEasierRefit = true;
-    protected boolean useEasierRefit_saver;
-
-    public static int repairSystem = REPAIR_SYSTEM_STRATOPS;
-    protected int repairSystem_saver;
+    private boolean useFactionModifiers = true;
+    private double clanPriceModifier = 1.0;
+    private boolean useEasierRefit = false;
+    private int repairSystem = REPAIR_SYSTEM_STRATOPS;
 
     public CampaignOptions () {
-    }
-
-    public void save () {
-        useFactionModifiers_saver = useFactionModifiers;
-        clanPriceModifier_saver = clanPriceModifier;
-        useEasierRefit_saver = useEasierRefit;
-        repairSystem_saver = repairSystem;
-    }
-
-    public void restore () {
-        useFactionModifiers = useFactionModifiers_saver;
-        clanPriceModifier = clanPriceModifier_saver;
-        useEasierRefit = useEasierRefit_saver;
-        repairSystem = repairSystem_saver;
+        useFactionModifiers = true;
+        clanPriceModifier = 1.0;
+        useEasierRefit = false;
+        repairSystem = REPAIR_SYSTEM_STRATOPS;    
     }
 
     public static String getRepairSystemName (int repairSystem) {
         return REPAIR_SYSTEM_NAMES[repairSystem];
+    }
+    
+    public boolean useFactionModifiers() {
+        return useFactionModifiers;
+    }
+    
+    public void setFactionModifiers(boolean b) {
+        this.useFactionModifiers = b;
+    }
+    
+    public boolean useEasierRefit() {
+        return useEasierRefit;
+    }
+    
+    public void setEasierRefit(boolean b) {
+        this.useEasierRefit = b;
+    }
+    
+    public double getClanPriceModifier() {
+        return clanPriceModifier;
+    }
+    
+    public void setClanPriceModifier(double d) {
+        this.clanPriceModifier = d;
+    }
+    
+    public int getRepairSystem() {
+        return repairSystem;
+    }
+    
+    public void setRepairSystem(int i) {
+        this.repairSystem = i;
     }
 }

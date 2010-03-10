@@ -102,7 +102,7 @@ public abstract class Refit extends ReplacementItem {
             }
         }
 
-        if (CampaignOptions.useEasierRefit) {
+        if (unit.campaign.getCampaignOptions().useEasierRefit()) {
             timeMultiplier = (timeMultiplier - 1) / 4 + 1;
             difficultyModifier = Math.min(difficultyModifier-1, 2);
         }

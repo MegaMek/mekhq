@@ -77,7 +77,7 @@ public class MekEngineReplacement extends ReplacementItem {
 
     @Override
     public Part stratopsPartNeeded() {
-        return new MekEngine(false, (int) unit.getEntity().getWeight(), getUnit().campaign.getFaction(), unit.getEntity().getEngine());
+        return new MekEngine(false, (int) unit.getEntity().getWeight(), getUnit().campaign.getFaction(), unit.getEntity().getEngine(), unit.campaign.getCampaignOptions().getClanPriceModifier());
     }
 
     @Override

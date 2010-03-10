@@ -1139,7 +1139,6 @@ private void menuSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
     try {
         fos = new FileOutputStream(file);
         out = new ObjectOutputStream(fos);
-        campaign.save();
         out.writeObject(campaign);
         out.close();
     } catch(IOException ex) {

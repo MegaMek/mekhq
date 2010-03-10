@@ -273,7 +273,7 @@ public class Campaign implements Serializable {
                 tasks.remove(task);
                 taskIds.remove(new Integer(task.getId()));
             }
-            priorUnit.runDiagnostic(this);
+            priorUnit.runDiagnostic();
             //this last one is tricky because I want to keep information about skill level required from the old
             //tasks, otherwise reloading a unit will allow user to reset the skill required to green (i.e. cheat)
             for(WorkItem task : getTasksForUnit(priorUnit.getId())) {
@@ -303,7 +303,7 @@ public class Campaign implements Serializable {
                 }
             }
             //collect all the work items outstanding on this unit and add them to the workitem vector
-            unit.runDiagnostic(this);
+            unit.runDiagnostic();
             addReport(unit.getEntity().getDisplayName() + " has been added to the unit roster.");
         }
     }
@@ -468,6 +468,7 @@ public class Campaign implements Serializable {
         if(null == unit) {
             return newTasks;
         }
+        int repairSystem = getCampaignOptions().getRepairSystem();
         for(WorkItem task : getTasks()) {
             if(task instanceof UnitWorkItem && ((UnitWorkItem)task).getUnitId() == unitId) {
                 if (task instanceof SalvageItem) {
@@ -477,21 +478,21 @@ public class Campaign implements Serializable {
                     if (unit.isCustomized())
                         newTasks.add(task);
                 } else if (task instanceof RepairItem || task instanceof ReplacementItem) {
-                    if ((CampaignOptions.repairSystem == CampaignOptions.REPAIR_SYSTEM_STRATOPS
-                            || CampaignOptions.repairSystem == CampaignOptions.REPAIR_SYSTEM_GENERIC_PARTS)
+                    if ((repairSystem == CampaignOptions.REPAIR_SYSTEM_STRATOPS
+                            || repairSystem == CampaignOptions.REPAIR_SYSTEM_GENERIC_PARTS)
                             && !unit.isSalvage() && !unit.isCustomized())
                         newTasks.add(task);
                 } else if (task instanceof ReloadItem) {
-                    if ((CampaignOptions.repairSystem == CampaignOptions.REPAIR_SYSTEM_STRATOPS
-                            || CampaignOptions.repairSystem == CampaignOptions.REPAIR_SYSTEM_GENERIC_PARTS)
+                    if ((repairSystem == CampaignOptions.REPAIR_SYSTEM_STRATOPS
+                            || repairSystem == CampaignOptions.REPAIR_SYSTEM_GENERIC_PARTS)
                             && !unit.isSalvage() && !unit.isCustomized()) {
                         newTasks.add(task);
-                    } else if (CampaignOptions.repairSystem == CampaignOptions.REPAIR_SYSTEM_WARCHEST_CUSTOM
+                    } else if (repairSystem == CampaignOptions.REPAIR_SYSTEM_WARCHEST_CUSTOM
                             && !unit.isSalvage() && !unit.isCustomized()) {
                         newTasks.add(task);
                     }
                 } else if (task instanceof FullRepairWarchest) {
-                    if (CampaignOptions.repairSystem == CampaignOptions.REPAIR_SYSTEM_WARCHEST_CUSTOM
+                    if (repairSystem == CampaignOptions.REPAIR_SYSTEM_WARCHEST_CUSTOM
                             && !unit.isSalvage() && !unit.isCustomized())
                         newTasks.add(task);
                 }
@@ -819,7 +820,6 @@ public class Campaign implements Serializable {
     }
     
     public void restore() {
-        campaignOptions.restore();
         for(Part part : getParts()) {
             if(part instanceof EquipmentPart) {
                 ((EquipmentPart)part).restore();
@@ -830,10 +830,6 @@ public class Campaign implements Serializable {
                 unit.getEntity().restore();
             }
         }
-    }
-
-    public void save () {
-        campaignOptions.save();
     }
     
     public boolean isOvertimeAllowed() {
@@ -983,7 +979,7 @@ public class Campaign implements Serializable {
     public void refreshAllUnitDiagnostics() {
         removeAllUnitWorkItems();
         for (Unit unit : getUnits()) {
-            unit.runDiagnostic(this);
+            unit.runDiagnostic();
         }
     }
 
@@ -1002,5 +998,9 @@ public class Campaign implements Serializable {
             return null;
 
         return mechFileParser.getEntity();
+    }
+    
+    public CampaignOptions getCampaignOptions() {
+        return campaignOptions;
     }
 }

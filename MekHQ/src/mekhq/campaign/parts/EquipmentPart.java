@@ -33,6 +33,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.Faction;
 import mekhq.campaign.SSWLibHelper;
+import mekhq.campaign.Unit;
 import mekhq.campaign.work.EquipmentReplacement;
 import mekhq.campaign.work.ReplacementItem;
 
@@ -59,7 +60,7 @@ public class EquipmentPart extends Part {
         this.cost = cost;
     }
     
-    public EquipmentPart(boolean salvage, int tonnage, int faction, EquipmentType et, Entity entity) {
+    public EquipmentPart(boolean salvage, int tonnage, int faction, EquipmentType et, Unit unit) {
         // TODO Memorize all entity attributes needed to calculate cost
         // As it is a part bought with one entity can be used on another entity
         // on which it would have a different price (only tonnage is taken into
@@ -69,14 +70,14 @@ public class EquipmentPart extends Part {
         this.name = type.getDesc();
         this.typeName = type.getInternalName();
         
-        computeCost(entity);
+        computeCost(unit.getEntity());
 
         if (et.getCost(null, false) == EquipmentType.COST_VARIABLE)
             this.name += " (" + getTonnage() + ")";
 
         // Increase cost for Clan parts when player is IS faction
         if (isClanTechBase() && !Faction.isClanFaction(faction))
-            this.cost *= CampaignOptions.clanPriceModifier;
+            this.cost *= unit.campaign.getCampaignOptions().getClanPriceModifier();
     }
 
     /**

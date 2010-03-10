@@ -214,7 +214,7 @@ public class Unit implements Serializable {
      * Run a diagnostic on this unit and add WorkItems to the campaign
      * Uses Strat Ops rules
      */
-    public void runDiagnosticStratOps(Campaign campaign) {
+    public void runDiagnosticStratOps() {
         
         if(!isRepairable()) {
             setSalvage(true);
@@ -517,7 +517,7 @@ public class Unit implements Serializable {
      * Run a diagnostic on this unit and add WorkItems to the campaign
      * Uses Warchest rules
      */
-    public void runDiagnosticWarchest (Campaign campaign) {
+    public void runDiagnosticWarchest () {
         if (getDamageState()!=Unit.STATE_UNDAMAGED) {
             FullRepairWarchest fullRepair = new FullRepairWarchest(this);
             campaign.addWork(fullRepair);
@@ -528,8 +528,8 @@ public class Unit implements Serializable {
      * Run a diagnostic on this unit and add WorkItems to the campaign
      * Uses Generic spare parts rules
      */
-    public void runDiagnosticGenericSpareParts (Campaign campaign) {
-        runDiagnosticStratOps(campaign);
+    public void runDiagnosticGenericSpareParts () {
+        runDiagnosticStratOps();
         // Change all repair items into replacement items
         for (WorkItem task : campaign.getTasksForUnit(getId())) {
             if (task instanceof RepairItem) {
@@ -541,13 +541,14 @@ public class Unit implements Serializable {
     /**
      * Run a diagnostic on this unit
      */
-    public void runDiagnostic (Campaign campaign) {
-        if (CampaignOptions.repairSystem == CampaignOptions.REPAIR_SYSTEM_STRATOPS) {
-            runDiagnosticStratOps(campaign);
-        } else if (CampaignOptions.repairSystem == CampaignOptions.REPAIR_SYSTEM_WARCHEST_CUSTOM) {
-            runDiagnosticWarchest(campaign);
-        } else if (CampaignOptions.repairSystem == CampaignOptions.REPAIR_SYSTEM_GENERIC_PARTS) {
-            runDiagnosticGenericSpareParts(campaign);
+    public void runDiagnostic () {
+        int repairSystem = campaign.getCampaignOptions().getRepairSystem();
+        if (repairSystem == CampaignOptions.REPAIR_SYSTEM_STRATOPS) {
+            runDiagnosticStratOps();
+        } else if (repairSystem == CampaignOptions.REPAIR_SYSTEM_WARCHEST_CUSTOM) {
+            runDiagnosticWarchest();
+        } else if (repairSystem == CampaignOptions.REPAIR_SYSTEM_GENERIC_PARTS) {
+            runDiagnosticGenericSpareParts();
         }
     }
     
@@ -1250,7 +1251,7 @@ public class Unit implements Serializable {
 
         
         campaign.removeAllTasksFor(targetUnit);
-        targetUnit.runDiagnostic(campaign);
+        targetUnit.runDiagnostic();
 
         ArrayList<WorkItem> unitTasks = campaign.getTasksForUnit(targetUnit.getId());
         int totalRepairTime = 0;
@@ -1269,7 +1270,7 @@ public class Unit implements Serializable {
 
                     // Faction and Tech mod
                     int factionMod = 0;
-                    if (CampaignOptions.useFactionModifiers) {
+                    if (campaign.getCampaignOptions().useFactionModifiers()) {
                         factionMod = SSWLibHelper.getFactionAndTechMod(part, availableCodeHelper, campaign);
                     }
 
@@ -1310,12 +1311,13 @@ public class Unit implements Serializable {
         MechRefit mechRefit = new MechRefit(sourceUnit, targetEntity, totalRepairTime, refitClass, refitKitAvailability, refitKitAvailabilityMod, refitCost);
         MechCustomization mechCustomization = new MechCustomization(sourceUnit, targetEntity, totalRepairTime, refitClass);
 
-        if (CampaignOptions.repairSystem == CampaignOptions.REPAIR_SYSTEM_STRATOPS) {
+        int repairSystem = campaign.getCampaignOptions().getRepairSystem();
+        if (repairSystem == CampaignOptions.REPAIR_SYSTEM_STRATOPS) {
             campaign.addWork(mechRefit);
             campaign.addWork(mechCustomization);
-        } else if (CampaignOptions.repairSystem == CampaignOptions.REPAIR_SYSTEM_WARCHEST_CUSTOM) {
+        } else if (repairSystem == CampaignOptions.REPAIR_SYSTEM_WARCHEST_CUSTOM) {
             
-        } else if (CampaignOptions.repairSystem == CampaignOptions.REPAIR_SYSTEM_GENERIC_PARTS) {
+        } else if (repairSystem == CampaignOptions.REPAIR_SYSTEM_GENERIC_PARTS) {
             campaign.addWork(mechCustomization);
         }
     }
@@ -1324,23 +1326,24 @@ public class Unit implements Serializable {
         Unit sourceUnit = this;
 
         campaign.removeAllTasksFor(sourceUnit);
-        sourceUnit.runDiagnostic(campaign);
+        sourceUnit.runDiagnostic();
     }
 
     public int getRepairCost () {
         int cost = 0;
+        int repairSystem = campaign.getCampaignOptions().getRepairSystem();
         for (WorkItem task : campaign.getAllTasksForUnit(getId())) {
-            if (CampaignOptions.repairSystem == CampaignOptions.REPAIR_SYSTEM_STRATOPS) {
+            if (repairSystem == CampaignOptions.REPAIR_SYSTEM_STRATOPS) {
                 if (task instanceof ReplacementItem) {
                     cost += ((ReplacementItem) task).partNeeded().getCost();
                 } else if (task instanceof ReloadItem) {
                     cost += ((ReloadItem) task).getCost();
                 }
-            } else if (CampaignOptions.repairSystem == CampaignOptions.REPAIR_SYSTEM_WARCHEST_CUSTOM) {
+            } else if (repairSystem == CampaignOptions.REPAIR_SYSTEM_WARCHEST_CUSTOM) {
                 if (task instanceof FullRepairWarchest) {
                     cost += ((FullRepairWarchest) task).getCost();
                 }
-            } else if (CampaignOptions.repairSystem == CampaignOptions.REPAIR_SYSTEM_GENERIC_PARTS) {
+            } else if (repairSystem == CampaignOptions.REPAIR_SYSTEM_GENERIC_PARTS) {
                 if (task instanceof ReplacementItem
                         && ((ReplacementItem) task).partNeeded() instanceof GenericSparePart) {
                     cost += ((ReplacementItem) task).partNeeded().getCost();
@@ -1371,7 +1374,7 @@ public class Unit implements Serializable {
             // Increase cost for IS players buying Clan mechs
             if (TechConstants.getTechName(getEntity().getTechLevel()).equals("Clan")
                     && !Faction.isClanFaction(campaign.getFaction()))
-                cost *= CampaignOptions.clanPriceModifier;
+                cost *= campaign.getCampaignOptions().getClanPriceModifier();
 
             residualValue = cost - getRepairCost();
 
@@ -1392,7 +1395,7 @@ public class Unit implements Serializable {
         // Increase cost for IS players buying Clan mechs
         if (TechConstants.getTechName(getEntity().getTechLevel()).equals("Clan")
                 && !Faction.isClanFaction(campaign.getFaction()))
-            cost *= CampaignOptions.clanPriceModifier;
+            cost *= campaign.getCampaignOptions().getClanPriceModifier();
 
         return cost;
     }
@@ -1580,9 +1583,8 @@ public class Unit implements Serializable {
         if (undamagedEntity == null)
             return -1;
 
-        Campaign campaign = new Campaign();
         Unit undamagedUnit = new Unit(undamagedEntity, campaign);
-        undamagedUnit.runDiagnosticStratOps(campaign);
+        undamagedUnit.runDiagnosticStratOps();
 
         int cost = 0;
         for (WorkItem task : campaign.getAllTasksForUnit(undamagedUnit.getId())) {

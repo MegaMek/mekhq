@@ -156,19 +156,21 @@ public abstract class ReplacementItem extends UnitWorkItem {
 
     public Part partNeeded () {
         Part stratopsPartNeeded = stratopsPartNeeded();
-        if (stratopsPartNeeded == null)
+        if (stratopsPartNeeded == null) {
             return null;
-
-        if (CampaignOptions.repairSystem == CampaignOptions.REPAIR_SYSTEM_STRATOPS) {
+        }
+        
+        int repairSystem = unit.campaign.getCampaignOptions().getRepairSystem();
+        if (repairSystem == CampaignOptions.REPAIR_SYSTEM_STRATOPS) {
             return stratopsPartNeeded;
-        } else if (CampaignOptions.repairSystem == CampaignOptions.REPAIR_SYSTEM_GENERIC_PARTS) {
+        } else if (repairSystem == CampaignOptions.REPAIR_SYSTEM_GENERIC_PARTS) {
             int amount = 1;
             // Proportion of the total base value (undamaged) of all parts represented by this part
             double costProportion = ((double) stratopsPartNeeded.getCost()) / ((double) unit.getFullBaseValueOfParts());
             amount = (int) Math.round(costProportion * unit.getBuyCost());
 
             return new GenericSparePart(stratopsPartNeeded.getTech(), amount);
-        } else if (CampaignOptions.repairSystem == CampaignOptions.REPAIR_SYSTEM_WARCHEST_CUSTOM) {
+        } else if (repairSystem == CampaignOptions.REPAIR_SYSTEM_WARCHEST_CUSTOM) {
             return stratopsPartNeeded;
         } else {
             return null;

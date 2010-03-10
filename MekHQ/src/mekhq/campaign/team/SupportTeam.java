@@ -332,7 +332,7 @@ public abstract class SupportTeam implements Serializable {
                availability = availableCodeHelper.getAvailability(campaign.getCalendar());
 
                // Faction and Tech mod
-               if (CampaignOptions.useFactionModifiers)
+               if (campaign.getCampaignOptions().useFactionModifiers())
                    factionMod = SSWLibHelper.getFactionAndTechMod(part, availableCodeHelper, campaign);
            }
 
