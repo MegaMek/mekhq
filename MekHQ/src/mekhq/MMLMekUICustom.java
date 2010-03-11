@@ -24,7 +24,6 @@ package mekhq;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FileDialog;
-import java.awt.Frame;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -40,7 +39,6 @@ import javax.swing.BoxLayout;
 import javax.swing.JDialog;
 import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -89,7 +87,7 @@ import megameklab.com.util.UnitPrintManager;
 import megameklab.com.util.UnitUtil;
 
 public class MMLMekUICustom extends JDialog implements RefreshListener {
-    
+
     private static final long serialVersionUID = -5836932822468918198L;
 
     Mech entity = null;
@@ -295,7 +293,7 @@ public class MMLMekUICustom extends JDialog implements RefreshListener {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent evt) {
-                
+
             }
         });
 
@@ -328,8 +326,6 @@ public class MMLMekUICustom extends JDialog implements RefreshListener {
         UnitLoadingDialog unitLoadingDialog = new UnitLoadingDialog(null);
         unitLoadingDialog.setVisible(true);
         UnitViewerDialog viewer = new UnitViewerDialog(null, unitLoadingDialog, UnitType.MEK);
-
-        viewer.run();
 
         if (!(viewer.getSelectedEntity() instanceof Mech)) {
             return;
@@ -851,7 +847,7 @@ public class MMLMekUICustom extends JDialog implements RefreshListener {
             // Create the Custom directory
             new File(filePathName).mkdir();
         }
-        
+
         filePathName += "/" + entity.getChassis() + " " + entity.getModel() + ".mtf";
 
         try {

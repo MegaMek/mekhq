@@ -29,7 +29,6 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
-import java.awt.event.WindowListener;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -41,15 +40,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.DefaultComboBoxModel;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.Icon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JDialog;
@@ -70,7 +68,6 @@ import megamek.client.ui.swing.MechView;
 import megamek.common.AmmoType;
 import megamek.common.Entity;
 import megamek.common.EntityListFile;
-import megamek.common.EntityWeightClass;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
@@ -1051,7 +1048,7 @@ private void PartsTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
 private void btnAdvanceDayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAdvanceDayActionPerformed
 
     campaign.newDay();
-    
+
     refreshUnitList();
     refreshTaskList();
     refreshTechsList();
@@ -1087,7 +1084,7 @@ private void btnAssignDocActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
 private void miHirePilotActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miHirePilotActionPerformed
     NewPilotDialog npd = new NewPilotDialog(getFrame(), true, campaign);
     npd.setVisible(true);
-    
+
     refreshPersonnelList();
     refreshReport();
 }//GEN-LAST:event_miHirePilotActionPerformed
@@ -1095,7 +1092,7 @@ private void miHirePilotActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
 private void miHireTechActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miHireTechActionPerformed
     NewTechTeamDialog ntd = new NewTechTeamDialog(getFrame(), true, campaign);
     ntd.setVisible(true);
-    
+
     refreshTechsList();
     refreshPersonnelList();
     refreshReport();
@@ -1219,21 +1216,22 @@ private void menuOptionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
 
 private void miLoadForcesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miLoadForcesActionPerformed
         try {
-           loadListFile(true); 
+           loadListFile(true);
         } catch (IOException ex) {
             Logger.getLogger(MekHQView.class.getName()).log(Level.SEVERE, null, ex);
-        }   
+        }
 }//GEN-LAST:event_miLoadForcesActionPerformed
 
 
 private void miPurchaseUnitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miPurchaseUnitActionPerformed
     UnitSelectorDialog usd = new UnitSelectorDialog(getFrame(), true, campaign);
 
-    if (!campaign.isGM())
+    if (!campaign.isGM()) {
         usd.restrictToYear(campaign.getCalendar().get(Calendar.YEAR));
+    }
 
     usd.setVisible(true);
-    
+
     refreshUnitList();
     refreshReport();
     refreshFunds();
@@ -1296,8 +1294,9 @@ private void btnLoadPartsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
             String line = null;
             while ((line = bufferedReader.readLine()) != null) {
                 Part part = Part.getPartByName(line);
-                if (part != null)
+                if (part != null) {
                     campaign.addPart(part);
+                }
             }
             refreshPartsList();
         } catch (IOException ex) {
@@ -1485,11 +1484,12 @@ protected void refreshPartsList() {
 
     int partTypeFilter = PartsFilter.getSelectedIndex();
     ArrayList<PartInventory> partsInventory = null;
-    if (partTypeFilter == 0)
+    if (partTypeFilter == 0) {
         partsInventory = campaign.getPartsInventory();
-    else
+    } else {
         // -1 because "All" is appended at the begining of the list of part types
         partsInventory = campaign.getPartsInventory(partTypeFilter-1);
+    }
     partsModel.setData(partsInventory);
 
     int selected = PartsTable.getSelectedRow();
@@ -1508,7 +1508,7 @@ protected void refreshReport() {
 
 protected void refreshFunds() {
     int funds = campaign.getFunds();
-    NumberFormat numberFormat = DecimalFormat.getIntegerInstance();
+    NumberFormat numberFormat = NumberFormat.getIntegerInstance();
     String text = numberFormat.format(funds) + " " + (funds!=0?"CBills":"CBill");
     fundsLabel.setText(text);
 }
@@ -1662,8 +1662,9 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
             if (command.equalsIgnoreCase("REPLACE")) {
                 for (WorkItem task : tasks) {
                     if(task instanceof RepairItem) {
-                        if (((RepairItem) task).canScrap())
+                        if (((RepairItem) task).canScrap()) {
                             campaign.mutateTask(task, ((RepairItem)task).replace());
+                        }
                     } else if (task instanceof ReplacementItem) {
                         ((ReplacementItem)task).useUpPart();
                         task.setSkillMin(SupportTeam.EXP_GREEN);
@@ -1702,7 +1703,7 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
             else if (command.contains("FIX")) {
                 for (WorkItem task : tasks) {
                     if (task.checkFixable()==null) {
-                        if(task instanceof ReplacementItem && !((ReplacementItem)task).hasPart()) {
+                        if((task instanceof ReplacementItem) && !((ReplacementItem)task).hasPart()) {
                             ReplacementItem replace = (ReplacementItem)task;
                             Part part = replace.partNeeded();
                             replace.setPart(part);
@@ -1793,7 +1794,7 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
                 menuItem = new JMenuItem("Complete Task");
                 menuItem.setActionCommand("FIX");
                 menuItem.addActionListener(this);
-                menuItem.setEnabled(campaign.isGM() && null == task.checkFixable());
+                menuItem.setEnabled(campaign.isGM() && (null == task.checkFixable()));
                 menu.add(menuItem);
                 popup.show(e.getComponent(), e.getX(), e.getY());
             }
@@ -1892,7 +1893,7 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
                 for (Unit unit : units) {
                     if (!unit.isDeployed()) {
                         int sellValue = unit.getSellValue();
-                        NumberFormat numberFormat = DecimalFormat.getIntegerInstance();
+                        NumberFormat numberFormat = NumberFormat.getIntegerInstance();
                         String text = numberFormat.format(sellValue) + " " + (sellValue!=0?"CBills":"CBill");
                         if(0 == JOptionPane.showConfirmDialog(null, "Do you really want to sell " + unit.getEntity().getDisplayName() + " for " + text, "Sell Unit?", JOptionPane.YES_NO_OPTION)) {
                             campaign.sellUnit(unit.getId());
@@ -1965,14 +1966,16 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
                 refreshTaskList();
             } else if (command.equalsIgnoreCase("SALVAGE")) {
                 for (Unit unit : units) {
-                    if (!unit.isDeployed())
+                    if (!unit.isDeployed()) {
                         unit.setSalvage(true);
+                    }
                 }
                 refreshUnitList();
             } else if (command.equalsIgnoreCase("REPAIR")) {
                 for (Unit unit : units) {
-                    if (!unit.isDeployed() && unit.isRepairable())
+                    if (!unit.isDeployed() && unit.isRepairable()) {
                         unit.setSalvage(false);
+                    }
                 }
                 refreshUnitList();
             } else if(command.equalsIgnoreCase("REMOVE")) {
@@ -2007,30 +2010,33 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
 
                             try {
                                 Entity e = (new MechFileParser(mechSummary.getSourceFile())).getEntity();
-                                if (e instanceof megamek.common.Mech)
+                                if (e instanceof megamek.common.Mech) {
                                     selectedMech = (megamek.common.Mech) e;
+                                }
                             } catch (EntityLoadingException ex) {
                                 Logger.getLogger(MekHQView.class.getName()).log(Level.SEVERE, null, ex);
                             }
-                            
-                            if (selectedMech == null)
+
+                            if (selectedMech == null) {
                                 return;
+                            }
 
                             String modelTmp = "CST01";
                             selectedMech.setModel(modelTmp);
-                            
+
                             MMLMekUICustom megamekLabMekUI = new MMLMekUICustom();
                             megamekLabMekUI.setVisible(false);
                             megamekLabMekUI.setModal(true);
-                            
+
                             megamekLabMekUI.loadUnit(selectedMech);
                             megamekLabMekUI.setVisible(true);
 
                             megamek.common.Mech mmlEntity = megamekLabMekUI.getEntity();
                             if (MMLMekUICustom.isEntityValid(mmlEntity)
                                     && mmlEntity.getChassis().equals(selectedMech.getChassis())
-                                    && mmlEntity.getWeight() == selectedMech.getWeight())
+                                    && (mmlEntity.getWeight() == selectedMech.getWeight())) {
                                 targetEntity = mmlEntity;
+                            }
                         }
 
                     } else if (targetMechName.equals("CHOOSE_VARIANT")) {
@@ -2041,8 +2047,9 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
                         usd.getComboWeight().setSelectedIndex(selectedUnit.getEntity().getWeightClass());
                         usd.changeBuyBtnToSelectBtn();
 
-                        if (!campaign.isGM())
+                        if (!campaign.isGM()) {
                             usd.restrictToYear(campaign.getCalendar().get(Calendar.YEAR));
+                        }
 
                         usd.setVisible(true);
 
@@ -2051,20 +2058,23 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
                         MechSummary mechSummary = MechSummaryCache.getInstance().getMech(selectedUnit.getEntity().getShortName());
                         try {
                             Entity e = (new MechFileParser(mechSummary.getSourceFile())).getEntity();
-                            if (e instanceof megamek.common.Mech)
+                            if (e instanceof megamek.common.Mech) {
                                 selectedMech = (megamek.common.Mech) e;
+                            }
                         } catch (EntityLoadingException ex) {
                             Logger.getLogger(MekHQView.class.getName()).log(Level.SEVERE, null, ex);
                         }
 
-                        if (selectedMech == null)
+                        if (selectedMech == null) {
                             return;
+                        }
 
                         Entity chosenTarget = usd.getSelectedEntity();
-                        if (chosenTarget instanceof megamek.common.Mech
+                        if ((chosenTarget instanceof megamek.common.Mech)
                                 && chosenTarget.getChassis().equals(selectedMech.getChassis())
-                                && chosenTarget.getWeight() == selectedMech.getWeight())
+                                && (chosenTarget.getWeight() == selectedMech.getWeight())) {
                             targetEntity = chosenTarget;
+                        }
 
                     }
 
@@ -2198,10 +2208,10 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
                     menuItem.setActionCommand("CUSTOMIZE:"+"MML");
                     menuItem.addActionListener(this);
                     menu.add(menuItem);
-                    
-                    menu.setEnabled(!unit.isDeployed() 
+
+                    menu.setEnabled(!unit.isDeployed()
                             && !unit.isDamaged()
-                            && unit.getEntity() instanceof megamek.common.Mech);
+                            && (unit.getEntity() instanceof megamek.common.Mech));
                     popup.add(menu);
                 } else if (unit.isCustomized()) {
                     menuItem = new JMenuItem("Cancel Customize");
@@ -2258,7 +2268,7 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
                 menuItem = new JMenuItem("Undeploy Unit");
                 menuItem.setActionCommand("UNDEPLOY");
                 menuItem.addActionListener(this);
-                menuItem.setEnabled(campaign.isGM() && unit.isDeployed());            
+                menuItem.setEnabled(campaign.isGM() && unit.isDeployed());
                 menu.add(menuItem);
                 popup.addSeparator();
                 popup.add(menu);
@@ -2377,7 +2387,7 @@ public class PersonTableMouseAdapter extends MouseInputAdapter implements Action
             if (command.equalsIgnoreCase("KIA")) {
                 for (Person person : persons) {
                     if(person.isDeployed()
-                            && 0 == JOptionPane.showConfirmDialog(null, "Do you really want to declare " + person.getDesc() + " killed in action?", "KIA?", JOptionPane.YES_NO_OPTION)) {
+                            && (0 == JOptionPane.showConfirmDialog(null, "Do you really want to declare " + person.getDesc() + " killed in action?", "KIA?", JOptionPane.YES_NO_OPTION))) {
                         campaign.removePerson(person.getId());
                     }
                 }
@@ -2390,7 +2400,7 @@ public class PersonTableMouseAdapter extends MouseInputAdapter implements Action
             } else if (command.equalsIgnoreCase("RETIRE")) {
                 for (Person person : persons) {
                     if(!person.isDeployed()
-                            && 0 == JOptionPane.showConfirmDialog(null, "Do you really want to retire " + person.getDesc() + "?", "Retire?", JOptionPane.YES_NO_OPTION)) {
+                            && (0 == JOptionPane.showConfirmDialog(null, "Do you really want to retire " + person.getDesc() + "?", "Retire?", JOptionPane.YES_NO_OPTION))) {
                         campaign.removePerson(person.getId());
                     }
                 }
@@ -2400,7 +2410,7 @@ public class PersonTableMouseAdapter extends MouseInputAdapter implements Action
                 refreshDoctorsList();
                 refreshReport();
                 //TODO: add to retiree list
-            } 
+            }
             else if (command.equalsIgnoreCase("REMOVE")) {
                 for (Person person : persons) {
                     if(0 == JOptionPane.showConfirmDialog(null, "Do you really want to remove " + person.getDesc() + "?", "Remove?", JOptionPane.YES_NO_OPTION)) {
@@ -2412,14 +2422,15 @@ public class PersonTableMouseAdapter extends MouseInputAdapter implements Action
                 refreshTechsList();
                 refreshDoctorsList();
                 refreshReport();
-            } 
+            }
             else if (command.equalsIgnoreCase("UNDEPLOY")) {
                 for (Person person : persons) {
-                    if (person.isDeployed())
+                    if (person.isDeployed()) {
                         person.setDeployed(false);
+                    }
                 }
                 refreshPersonnelList();
-            } 
+            }
             else if (command.equalsIgnoreCase("IMP_PILOTING")) {
                 if(selectedPerson instanceof PilotPerson) {
                     Pilot pilot = ((PilotPerson)selectedPerson).getPilot();
@@ -2575,7 +2586,7 @@ public class PersonTableMouseAdapter extends MouseInputAdapter implements Action
                     menuItem = new JMenuItem("Undeploy Pilot");
                     menuItem.setActionCommand("UNDEPLOY");
                     menuItem.addActionListener(this);
-                    menuItem.setEnabled(campaign.isGM() && person.isDeployed());            
+                    menuItem.setEnabled(campaign.isGM() && person.isDeployed());
                     menu.add(menuItem);
                 }
                 impMenu = new JMenu("Skills");
@@ -2585,22 +2596,22 @@ public class PersonTableMouseAdapter extends MouseInputAdapter implements Action
                     menuItem = new JMenuItem("Improve Piloting");
                     menuItem.setActionCommand("IMP_PILOTING");
                     menuItem.addActionListener(this);
-                    menuItem.setEnabled(campaign.isGM() && pp.getPilot().getPiloting() > 0);
+                    menuItem.setEnabled(campaign.isGM() && (pp.getPilot().getPiloting() > 0));
                     impMenu.add(menuItem);
                     menuItem = new JMenuItem("Improve Gunnery");
                     menuItem.setActionCommand("IMP_GUNNERY");
                     menuItem.addActionListener(this);
-                    menuItem.setEnabled(campaign.isGM() && pp.getPilot().getGunnery() > 0);
+                    menuItem.setEnabled(campaign.isGM() && (pp.getPilot().getGunnery() > 0));
                     impMenu.add(menuItem);
                     menuItem = new JMenuItem("Decrease Piloting");
                     menuItem.setActionCommand("DEC_PILOTING");
                     menuItem.addActionListener(this);
-                    menuItem.setEnabled(campaign.isGM() && pp.getPilot().getPiloting() < 7);
+                    menuItem.setEnabled(campaign.isGM() && (pp.getPilot().getPiloting() < 7));
                     impMenu.add(menuItem);
                     menuItem = new JMenuItem("Decrease Gunnery");
                     menuItem.setActionCommand("DEC_GUNNERY");
                     menuItem.addActionListener(this);
-                    menuItem.setEnabled(campaign.isGM() && pp.getPilot().getGunnery() < 7);
+                    menuItem.setEnabled(campaign.isGM() && (pp.getPilot().getGunnery() < 7));
                     impMenu.add(menuItem);
                 }
                 else if(person instanceof SupportPerson) {
@@ -2608,12 +2619,12 @@ public class PersonTableMouseAdapter extends MouseInputAdapter implements Action
                     menuItem = new JMenuItem("Improve Skill");
                     menuItem.setActionCommand("IMP_SUPPORT");
                     menuItem.addActionListener(this);
-                    menuItem.setEnabled(campaign.isGM() && sp.getTeam().getRating() < SupportTeam.EXP_ELITE);
+                    menuItem.setEnabled(campaign.isGM() && (sp.getTeam().getRating() < SupportTeam.EXP_ELITE));
                     impMenu.add(menuItem);
                     menuItem = new JMenuItem("Decrease Skill");
                     menuItem.setActionCommand("DEC_SUPPORT");
                     menuItem.addActionListener(this);
-                    menuItem.setEnabled(campaign.isGM() && sp.getTeam().getRating() > SupportTeam.EXP_REGULAR);
+                    menuItem.setEnabled(campaign.isGM() && (sp.getTeam().getRating() > SupportTeam.EXP_REGULAR));
                     impMenu.add(menuItem);
                 }
 
@@ -2689,7 +2700,6 @@ public class PartsTableModel extends ArrayTableModel {
             data = new ArrayList<PartInventory>();
         }
 
-        @Override
         public Object getValueAt(int row, int col) {
             PartInventory partInventory = (PartInventory) data.get(row);
             StringBuffer descHTML = new StringBuffer(partInventory.getDescHTML());
