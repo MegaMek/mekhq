@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.1.2 (SVN)
++ finances are disabled by default
 + Bug: campaign does not need to be passed into unit diagnostics because it is a variable in Unit.java
 + campaign options reset to private variables accessed by normal methods
 + set default campaign options to vanilla StratOps

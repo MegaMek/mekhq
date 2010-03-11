@@ -939,16 +939,23 @@ public class Campaign implements Serializable {
     }
 
     public void addFunds (int quantity) {
+        if(!getCampaignOptions().useFinances()) {
+            return;
+        }
         setFunds(getFunds()+quantity);
         NumberFormat numberFormat = DecimalFormat.getIntegerInstance();
         String quantityString = numberFormat.format(quantity);
         addReport("Funds added : " + quantityString);
     }
+    
+    public boolean hasEnoughFunds(int cost) {
+        return getFunds()>=cost || !getCampaignOptions().useFinances();
+    }
 
     public boolean buyUnit(Entity en, boolean allowNewPilots) {
         int cost = new Unit(en, this).getBuyCost();
         
-        if (getFunds()>=cost) {
+        if (hasEnoughFunds(cost)) {
             addUnit(en, allowNewPilots);
             addFunds(-cost);
             return true;

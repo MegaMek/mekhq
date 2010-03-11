@@ -70,6 +70,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         setCamoIcon();
         
         // Rules panel
+        chkUseFinances.setSelected(options.useFinances());
         useFactionModifiersCheckBox.setSelected(options.useFactionModifiers());
         clanPriceModifierJFormattedTextField.setValue(options.getClanPriceModifier());
         useEasierRefitCheckBox.setSelected(options.useEasierRefit());
@@ -108,6 +109,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         useEasierRefitCheckBox = new javax.swing.JCheckBox();
         repairSystemComboBox = new javax.swing.JComboBox();
         javax.swing.JLabel repairSystemComboBoxLabel = new javax.swing.JLabel();
+        chkUseFinances = new javax.swing.JCheckBox();
         btnOkay = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
 
@@ -221,21 +223,31 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         useFactionModifiersCheckBox.setText(resourceMap.getString("useFactionModifiersCheckBox.text")); // NOI18N
         useFactionModifiersCheckBox.setToolTipText(resourceMap.getString("useFactionModifiersCheckBox.toolTipText")); // NOI18N
         useFactionModifiersCheckBox.setName("useFactionModifiersCheckBox"); // NOI18N
-        panRules.add(useFactionModifiersCheckBox, new java.awt.GridBagConstraints());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panRules.add(useFactionModifiersCheckBox, gridBagConstraints);
 
         clanPriceModifierLabel.setText(resourceMap.getString("clanPriceModifierLabel.text")); // NOI18N
         clanPriceModifierLabel.setName("clanPriceModifierLabel"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panRules.add(clanPriceModifierLabel, gridBagConstraints);
 
         clanPriceModifierJFormattedTextField.setColumns(4);
         clanPriceModifierJFormattedTextField.setToolTipText(resourceMap.getString("clanPriceModifierJFormattedTextField.toolTipText")); // NOI18N
         clanPriceModifierJFormattedTextField.setName("clanPriceModifierJFormattedTextField"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panRules.add(clanPriceModifierJFormattedTextField, gridBagConstraints);
 
         useEasierRefitCheckBox.setText(resourceMap.getString("useEasierRefitCheckBox.text")); // NOI18N
@@ -244,6 +256,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panRules.add(useEasierRefitCheckBox, gridBagConstraints);
 
         DefaultComboBoxModel repairSystemComboBoxModel = new DefaultComboBoxModel();
@@ -257,6 +272,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 4;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panRules.add(repairSystemComboBox, gridBagConstraints);
 
         repairSystemComboBoxLabel.setText(resourceMap.getString("repairSystemComboBoxLabel.text")); // NOI18N
@@ -264,7 +281,19 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panRules.add(repairSystemComboBoxLabel, gridBagConstraints);
+
+        chkUseFinances.setText(resourceMap.getString("chkUseFinances.text")); // NOI18N
+        chkUseFinances.setName("chkUseFinances"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panRules.add(chkUseFinances, gridBagConstraints);
 
         tabOptions.addTab(resourceMap.getString("panRules.TabConstraints.tabTitle"), panRules); // NOI18N
 
@@ -325,6 +354,7 @@ private void btnOkayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
     campaign.setColorIndex(colorIndex);
     
     // Rules panel
+    options.setFinances(chkUseFinances.isSelected());
     options.setFactionModifiers(useFactionModifiersCheckBox.isSelected());
     String clanPriceModifierString = clanPriceModifierJFormattedTextField.getText();
     options.setClanPriceModifier(new Double(clanPriceModifierString));
@@ -417,6 +447,7 @@ public String getDateAsString() {
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnDate;
     private javax.swing.JButton btnOkay;
+    private javax.swing.JCheckBox chkUseFinances;
     private javax.swing.JFormattedTextField clanPriceModifierJFormattedTextField;
     private javax.swing.JComboBox comboFaction;
     private javax.swing.JLabel lblCamo;

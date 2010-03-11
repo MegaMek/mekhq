@@ -35,15 +35,17 @@ public class CampaignOptions implements Serializable {
     //FIXME: This needs to be localized
     public final static String [] REPAIR_SYSTEM_NAMES = {"Strat Ops", "Warchest Custom", "Generic Spare Parts"};
 
-    private boolean useFactionModifiers = true;
-    private double clanPriceModifier = 1.0;
-    private boolean useEasierRefit = false;
-    private int repairSystem = REPAIR_SYSTEM_STRATOPS;
+    private boolean useFactionModifiers;
+    private double clanPriceModifier;
+    private boolean useEasierRefit;
+    private boolean useFinances;
+    private int repairSystem;
 
     public CampaignOptions () {
         useFactionModifiers = true;
         clanPriceModifier = 1.0;
         useEasierRefit = false;
+        useFinances = false;
         repairSystem = REPAIR_SYSTEM_STRATOPS;    
     }
 
@@ -81,5 +83,13 @@ public class CampaignOptions implements Serializable {
     
     public void setRepairSystem(int i) {
         this.repairSystem = i;
+    }
+    
+    public boolean useFinances() {
+        return useFinances;
+    }
+    
+    public void setFinances(boolean b) {
+        this.useFinances = b;
     }
 }
