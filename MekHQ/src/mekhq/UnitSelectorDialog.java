@@ -56,15 +56,19 @@ public class UnitSelectorDialog extends JDialog {
     private TableRowSorter<MechTableModel> sorter;
 
     private Campaign campaign;
+    
+    private MekHQView hqView;
 
     /** Creates new form UnitSelectorDialog */
-    public UnitSelectorDialog(java.awt.Frame parent, boolean modal, Campaign campaign) {
+    public UnitSelectorDialog(java.awt.Frame parent, boolean modal, Campaign campaign, MekHQView view) {
         super(parent, modal);
         unitModel = new MechTableModel();
         initComponents();
 
         this.campaign = campaign;
 
+        this.hqView = view;
+        
         MechSummary [] allMechs = MechSummaryCache.getInstance().getAllMechs();
         setMechs(allMechs);
     }
@@ -369,8 +373,13 @@ private void btnBuyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:
     Entity en = getSelectedEntity();
     if(null != en) {
         if (campaign.isGM()) {
+            //FIXME: we should not do this here or players will accidently
+            //buy units for free with GM mode turned on. It should be a
+            //separate button
             campaign.addUnit(en, false);
-        } else if (!campaign.buyUnit(en, false)) {
+        } else if (campaign.buyUnit(en, false)) {
+            hqView.refreshUnitList();
+        } else {
             ResourceMap resourceMap = MekHQApp.getApplication().getContext().getResourceMap(UnitSelectorDialog.class);
             String text = resourceMap.getString("NotEnoughMoneyText.text");
 
@@ -409,7 +418,7 @@ private void checkCanonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                UnitSelectorDialog dialog = new UnitSelectorDialog(new javax.swing.JFrame(), true, null);
+                UnitSelectorDialog dialog = new UnitSelectorDialog(new javax.swing.JFrame(), true, null, null);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {

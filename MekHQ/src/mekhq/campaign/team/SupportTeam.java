@@ -292,13 +292,13 @@ public abstract class SupportTeam implements Serializable {
        // check funds
        if (task instanceof ReplacementItem
                && !((ReplacementItem) task).hasPart()
-               && campaign.hasEnoughFunds(((ReplacementItem) task).partNeeded().getCost())) {
+               && !campaign.hasEnoughFunds(((ReplacementItem) task).partNeeded().getCost())) {
            return new TargetRoll(TargetRoll.IMPOSSIBLE, "Not enough funds");
        } else if (task instanceof ReloadItem
-               && campaign.hasEnoughFunds(((ReloadItem) task).getCost())) {
+               && !campaign.hasEnoughFunds(((ReloadItem) task).getCost())) {
            return new TargetRoll(TargetRoll.IMPOSSIBLE, "Not enough funds");
        } else if (task instanceof FullRepairWarchest
-               && campaign.hasEnoughFunds(((FullRepairWarchest) task).getCost())) {
+               && !campaign.hasEnoughFunds(((FullRepairWarchest) task).getCost())) {
            return new TargetRoll(TargetRoll.IMPOSSIBLE, "Not enough funds");
        }
 

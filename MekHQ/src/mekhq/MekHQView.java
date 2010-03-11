@@ -1224,7 +1224,7 @@ private void miLoadForcesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
 
 
 private void miPurchaseUnitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miPurchaseUnitActionPerformed
-    UnitSelectorDialog usd = new UnitSelectorDialog(getFrame(), true, campaign);
+    UnitSelectorDialog usd = new UnitSelectorDialog(getFrame(), true, campaign, this);
 
     if (!campaign.isGM()) {
         usd.restrictToYear(campaign.getCalendar().get(Calendar.YEAR));
@@ -2040,7 +2040,7 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
                         }
 
                     } else if (targetMechName.equals("CHOOSE_VARIANT")) {
-                        UnitSelectorDialog usd = new UnitSelectorDialog(null, true, campaign);
+                        UnitSelectorDialog usd = new UnitSelectorDialog(null, true, campaign, null);
                         usd.restrictToChassis(selectedUnit.getEntity().getChassis());
                         usd.getComboUnitType().setSelectedIndex(UnitType.MEK);
                         usd.getComboType().setSelectedIndex(TechConstants.T_ALL);
