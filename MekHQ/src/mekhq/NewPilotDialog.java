@@ -37,11 +37,14 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
     private PilotOptions options;
 
     private Campaign campaign;
+    
+    private MekHQView hqView;
 
     /** Creates new form NewPilotDialog */
-    public NewPilotDialog(java.awt.Frame parent, boolean modal, Campaign campaign) {
+    public NewPilotDialog(java.awt.Frame parent, boolean modal, Campaign campaign, MekHQView view) {
         super(parent, modal);
         this.campaign = campaign;
+        this.hqView = view;
         initializePilotAndOptions();
     }
 
@@ -330,6 +333,7 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         person.setBiography(txtBio.getText());
 
         campaign.addPerson(person);
+        hqView.refreshPersonnelList();
         refreshPilotAndOptions();
     }//GEN-LAST:event_btnOkActionPerformed
 
@@ -339,7 +343,7 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                NewPilotDialog dialog = new NewPilotDialog(new javax.swing.JFrame(), true, null);
+                NewPilotDialog dialog = new NewPilotDialog(new javax.swing.JFrame(), true, null, null);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {

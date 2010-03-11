@@ -1082,7 +1082,7 @@ private void btnAssignDocActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
 }//GEN-LAST:event_btnAssignDocActionPerformed
 
 private void miHirePilotActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miHirePilotActionPerformed
-    NewPilotDialog npd = new NewPilotDialog(getFrame(), true, campaign);
+    NewPilotDialog npd = new NewPilotDialog(getFrame(), true, campaign, this);
     npd.setVisible(true);
 
     refreshPersonnelList();
@@ -1090,7 +1090,7 @@ private void miHirePilotActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
 }//GEN-LAST:event_miHirePilotActionPerformed
 
 private void miHireTechActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miHireTechActionPerformed
-    NewTechTeamDialog ntd = new NewTechTeamDialog(getFrame(), true, campaign);
+    NewTechTeamDialog ntd = new NewTechTeamDialog(getFrame(), true, campaign, this);
     ntd.setVisible(true);
 
     refreshTechsList();

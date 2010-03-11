@@ -1,13 +1,6 @@
 VERSION HISTORY
 ----------------------------------
 v0.1.2 (SVN)
-+ refresh unit view when buying units
-+ bug: finances disabled, replacement not possible due to lack of finances
-+ finances are disabled by default
-+ Bug: campaign does not need to be passed into unit diagnostics because it is a variable in Unit.java
-+ campaign options reset to private variables accessed by normal methods
-+ set default campaign options to vanilla StratOps
-+ updated nbproject properties
 + updated MegaMek.jar
 + pilot portraits
 + unit camo
@@ -15,6 +8,14 @@ v0.1.2 (SVN)
 + close button for PersonViewDialog
 + updated build.xml
 + PortraitChoiceDialog (not fully working)
++ updated nbproject properties
++ set default campaign options to vanilla StratOps
++ campaign options reset to private variables accessed by normal methods
++ Bug: campaign does not need to be passed into unit diagnostics because it is a variable in Unit.java
++ finances are disabled by default
++ bug: finances disabled, replacement not possible due to lack of finances
++ refresh unit view when buying units
++ refresh respective views when hiring pilots and techs
 
 v0.1.1 (2009-09-29)
 + declare pilots KIA and retired

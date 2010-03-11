@@ -33,11 +33,13 @@ import mekhq.campaign.team.TechTeam;
 public class NewTechTeamDialog extends javax.swing.JDialog {
     
     private Campaign campaign;
+    private MekHQView hqView;
     
     /** Creates new form NewTeamDialog */
-    public NewTechTeamDialog(java.awt.Frame parent, boolean modal, Campaign campaign) {
+    public NewTechTeamDialog(java.awt.Frame parent, boolean modal, Campaign campaign, MekHQView view) {
         super(parent, modal);
         this.campaign = campaign;
+        this.hqView = view;
         
         initComponents();
     }
@@ -170,6 +172,8 @@ private void btnHireActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
     String name = txtTeamName.getText();
     TechTeam tech = new TechTeam(name, rating, type);
     campaign.addTeam(tech);
+    hqView.refreshPersonnelList();
+    hqView.refreshTechsList();
 }//GEN-LAST:event_btnHireActionPerformed
 
 private void txtTeamNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtTeamNameActionPerformed
@@ -186,7 +190,7 @@ private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                NewTechTeamDialog dialog = new NewTechTeamDialog(new javax.swing.JFrame(), true, null);
+                NewTechTeamDialog dialog = new NewTechTeamDialog(new javax.swing.JFrame(), true, null, null);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     public void windowClosing(java.awt.event.WindowEvent e) {
                         System.exit(0);
