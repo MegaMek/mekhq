@@ -1261,7 +1261,7 @@ public class Unit implements Serializable {
             if (unitTask instanceof RepairItem
                     || unitTask instanceof ReplacementItem
                     || unitTask instanceof ReloadItem) {
-                totalRepairTime += unitTask.getTime();
+                totalRepairTime += unitTask.getTimeLeft();
                 if (unitTask instanceof ReplacementItem) {
                     Part part = ((ReplacementItem) unitTask).partNeeded();
                     // Part availability

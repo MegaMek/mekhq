@@ -253,7 +253,6 @@ public class MekHQView extends FrameView {
         btnAdvanceDay = new javax.swing.JButton();
         btnOvertime = new javax.swing.JToggleButton();
         btnGMMode = new javax.swing.JToggleButton();
-        btnStoreTime = new javax.swing.JToggleButton();
         fundsLabel = new javax.swing.JLabel();
         menuBar = new javax.swing.JMenuBar();
         javax.swing.JMenu fileMenu = new javax.swing.JMenu();
@@ -542,7 +541,7 @@ public class MekHQView extends FrameView {
                         .add(btnSaveParts)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(btnLoadParts)))
-                .addContainerGap(516, Short.MAX_VALUE))
+                .addContainerGap(498, Short.MAX_VALUE))
         );
         panSuppliesLayout.setVerticalGroup(
             panSuppliesLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -644,14 +643,14 @@ public class MekHQView extends FrameView {
             .add(panFinancesLayout.createSequentialGroup()
                 .addContainerGap()
                 .add(jLabel2)
-                .addContainerGap(943, Short.MAX_VALUE))
+                .addContainerGap(891, Short.MAX_VALUE))
         );
         panFinancesLayout.setVerticalGroup(
             panFinancesLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(panFinancesLayout.createSequentialGroup()
                 .addContainerGap()
                 .add(jLabel2)
-                .addContainerGap(583, Short.MAX_VALUE))
+                .addContainerGap(566, Short.MAX_VALUE))
         );
 
         tabMain.addTab(resourceMap.getString("panFinances.TabConstraints.tabTitle"), panFinances); // NOI18N
@@ -743,23 +742,6 @@ public class MekHQView extends FrameView {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(0, 30, 42, 0);
         panelMasterButtons.add(btnGMMode, gridBagConstraints);
-
-        btnStoreTime.setText(resourceMap.getString("btnStoreTime.text")); // NOI18N
-        btnStoreTime.setToolTipText(resourceMap.getString("btnStoreTime.toolTipText")); // NOI18N
-        btnStoreTime.setName("btnStoreTime"); // NOI18N
-        btnStoreTime.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnStoreTimeActionPerformed(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.ipadx = 15;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 30, 0, 0);
-        panelMasterButtons.add(btnStoreTime, gridBagConstraints);
 
         fundsLabel.setFont(resourceMap.getFont("fundsLabel.font")); // NOI18N
         fundsLabel.setText(resourceMap.getString("fundsLabel.text")); // NOI18N
@@ -1241,10 +1223,6 @@ private void PartsFilterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     refreshPartsList();
 }//GEN-LAST:event_PartsFilterActionPerformed
 
-private void btnStoreTimeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStoreTimeActionPerformed
-    campaign.setStoreTime(btnStoreTime.isSelected());
-}//GEN-LAST:event_btnStoreTimeActionPerformed
-
 private void addFundsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addFundsActionPerformed
     AddFundsDialog addFundsDialog = new AddFundsDialog(null, true);
     addFundsDialog.setVisible(true);
@@ -1699,6 +1677,13 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
                     refreshUnitList();
                     refreshTaskList();
                 }
+            } else if (command.contains("UNASSIGN")) {
+                for (WorkItem task : tasks) {
+                    task.resetTimeSpent();
+                    task.setTeam(null);
+                    refreshUnitList();
+                    refreshTaskList();
+                }
             }
             else if (command.contains("FIX")) {
                 for (WorkItem task : tasks) {
@@ -1764,7 +1749,12 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
                     // Everything needs to be scrapable
                     // menuItem.setEnabled(((UnitWorkItem)task).canScrap());
                     menuItem.setEnabled(true);
-
+                    popup.add(menuItem);
+                    //Remove assigned team for scheduled tasks
+                    menuItem = new JMenuItem("Remove Assigned Team");
+                    menuItem.setActionCommand("UNASSIGN");
+                    menuItem.addActionListener(this);
+                    menuItem.setEnabled(task.isAssigned());
                     popup.add(menuItem);
                 }
                 if(task instanceof ReloadItem) {
@@ -2823,7 +2813,6 @@ public class PartsTableMouseAdapter extends MouseInputAdapter implements ActionL
     private javax.swing.JToggleButton btnOvertime;
     private javax.swing.JButton btnRetrieveUnits;
     private javax.swing.JButton btnSaveParts;
-    private javax.swing.JToggleButton btnStoreTime;
     private javax.swing.JPanel btnUnitPanel;
     private javax.swing.JLabel fundsLabel;
     private javax.swing.JLabel jLabel2;

@@ -16,6 +16,8 @@ v0.1.2 (SVN)
 + bug: finances disabled, replacement not possible due to lack of finances
 + refresh unit view when buying units
 + refresh respective views when hiring pilots and techs
++ removed "Store Time" option (no time machines!)
++ Techs can now begin a task on one day and finish it the next if they run out of time
 
 v0.1.1 (2009-09-29)
 + declare pilots KIA and retired

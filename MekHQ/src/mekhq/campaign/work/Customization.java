@@ -203,7 +203,7 @@ public abstract class Customization extends UnitWorkItem {
             if (unitTask instanceof RepairItem
                     || unitTask instanceof ReplacementItem
                     || unitTask instanceof ReloadItem) {
-                totalRepairTime += unitTask.getTime();
+                totalRepairTime += unitTask.getTimeLeft();
             }
         }
 

@@ -224,9 +224,27 @@ public abstract class SupportTeam implements Serializable {
    
    public abstract int makeRoll(WorkItem task);
    
+   public boolean isTaskOvertime(WorkItem task) {
+       return task.getTimeLeft() > getMinutesLeft()
+                && (campaign.isOvertimeAllowed()  
+                    && (task.getTimeLeft() - getMinutesLeft()) <= getOvertimeLeft());
+   }
+   
+   public boolean isNotEnoughTime(WorkItem task) {
+       if(!campaign.isOvertimeAllowed()) {
+           return (task.getTimeLeft() > getMinutesLeft());
+       }
+       else {
+           return (task.getTimeLeft() - getMinutesLeft()) > getOvertimeLeft();
+       }
+   }
+   
    public TargetRoll getTargetFor(WorkItem task) {
        if(null == task) {
            return new TargetRoll(TargetRoll.IMPOSSIBLE, "no task?");
+       }
+       if(task.isAssigned() && task.getTeam().getId() != getId() ) {
+           return new TargetRoll(TargetRoll.IMPOSSIBLE, "This task is already being worked on by another team");
        }
        if(task instanceof UnitWorkItem && ((UnitWorkItem)task).getUnit().isDeployed()) {
            return new TargetRoll(TargetRoll.IMPOSSIBLE, "This unit is currently deployed!");
@@ -260,17 +278,17 @@ public abstract class SupportTeam implements Serializable {
        if(target.getValue() == TargetRoll.IMPOSSIBLE) {
            return target;
        }
+       
        //check time
-       if(task.getTime() > getMinutesLeft()) {
-           if(campaign.isOvertimeAllowed()) {
-               if((task.getTime() - getMinutesLeft()) > getOvertimeLeft()) {
-                   return new TargetRoll(TargetRoll.IMPOSSIBLE, "Not enough time");
-               }
-               target.addModifier(3, "overtime");
-           } else {
-               return new TargetRoll(TargetRoll.IMPOSSIBLE, "Not enough time");
-           }
+       //if you have zero total minutes left, you can't do a thing
+       if(getMinutesLeft() <= 0 && (!campaign.isOvertimeAllowed() || getOvertimeLeft() <= 0)) {
+           return new TargetRoll(TargetRoll.IMPOSSIBLE, "team has no time left");
        }
+       
+       if(isTaskOvertime(task)) {
+           target.addModifier(3, "overtime");
+       }
+       
        // Generic spare parts
        if (task instanceof ReplacementItem
                && ((ReplacementItem) task).partNeeded() instanceof GenericSparePart
@@ -397,15 +415,34 @@ public abstract class SupportTeam implements Serializable {
        
        report += getName() + " attempts to " + task.getDisplayName();    
        TargetRoll target = getTargetFor(task);
-       int minutes = task.getTime();
+       
+       //check and use time
+       int minutes = task.getTimeLeft();
        if(minutes > getMinutesLeft()) {
-           //we ar working overtime
            minutes -= getMinutesLeft();
-           setMinutesLeft(0);
-           setOvertimeLeft(getOvertimeLeft() - minutes);
+           //check for overtime first
+           if(campaign.isOvertimeAllowed() && minutes <= getOvertimeLeft()) {
+               //we ar working overtime
+               setMinutesLeft(0);
+               setOvertimeLeft(getOvertimeLeft() - minutes);
+           } else {
+               //we need to finish the task tomorrow
+               int minutesUsed = getMinutesLeft();
+               if(campaign.isOvertimeAllowed()) {
+                   minutesUsed += getOvertimeLeft();
+               }
+               task.addTimeSpent(minutesUsed);
+               setMinutesLeft(0);
+               setOvertimeLeft(0);
+               task.setTeam(this);
+               report += " - <b>Not enough time, the remainder of the task will be finished tomorrow.</b>";
+               return report;
+           }     
        } else {
            setMinutesLeft(getMinutesLeft() - minutes);
        }
+       
+       //make the roll
        int roll = makeRoll(task);
        report = report + "  needs " + target.getValueAsString() + " and rolls " + roll + ":";
        if(roll >= target.getValue()) {

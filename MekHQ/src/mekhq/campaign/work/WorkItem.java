@@ -47,8 +47,10 @@ public abstract class WorkItem implements Serializable {
     protected int id;
     //the skill modifier for difficulty
     protected int difficulty;
-    //the amount of time for the repair
+    //the amount of time for the repair (this is the base time)
     protected int time;
+    //time spent on the task so far for tasks that span days
+    protected int timeSpent;
     //the minimum skill level in order to attempt
     protected int skillMin;
     //has this task been successfully completed?
@@ -62,6 +64,7 @@ public abstract class WorkItem implements Serializable {
         this.skillMin = SupportTeam.EXP_GREEN;
         this.completed = false;
         this.mode = MODE_NORMAL;
+        this.timeSpent = 0;
     }
     
     public String getName() {
@@ -86,7 +89,11 @@ public abstract class WorkItem implements Serializable {
         return difficulty;
     }
     
-    public int getTime() {
+    public int getBaseTime() {
+        return time;
+    }
+    
+    public int getActualTime() {
         switch(mode) {
             case MODE_EXTRA_ONE:
                 return 2*time;
@@ -101,6 +108,22 @@ public abstract class WorkItem implements Serializable {
             default:
                 return time;
         }
+    }
+    
+    public int getTimeLeft() {
+        return getActualTime() - getTimeSpent();
+    }
+    
+    public int getTimeSpent() {
+        return timeSpent;
+    }
+    
+    public void addTimeSpent(int m) {
+        this.timeSpent += m;
+    }
+    
+    public void resetTimeSpent() {
+        this.timeSpent = 0;
     }
     
     public int getSkillMin() {
@@ -138,7 +161,11 @@ public abstract class WorkItem implements Serializable {
     }
     
     public String getStats() {
-        return "[" + getTime() + "m/" +   SupportTeam.getRatingName(getSkillMin()) + "/" + getAllMods().getValueAsString() + "]";
+        String scheduled = "";
+        if(isAssigned()) {
+            scheduled = " (scheduled) ";
+        }
+        return "[" + getTimeLeft() + "m/" +   SupportTeam.getRatingName(getSkillMin()) + "/" + getAllMods().getValueAsString() + "]" + scheduled;
     }
     
     public String getDescHTML() {
@@ -149,13 +176,18 @@ public abstract class WorkItem implements Serializable {
         bonus = "(" + bonus + ")";
         String toReturn = "<html><font size='2'";
         
+        String scheduled = "";
+        if(isAssigned()) {
+            scheduled = " (scheduled) ";
+        }
+        
         if(this instanceof ReplacementItem && !((ReplacementItem)this).hasPart()) {
             toReturn +=" color='white'";
         }
         toReturn += ">";
         toReturn += "<b>" + getName() + "</b><br>";
         toReturn += getDetails() + "<br>";
-        toReturn += "" + getTime() + " minutes";
+        toReturn += "" + getTimeLeft() + " minutes" + scheduled;
         toReturn += ", " + SupportTeam.getRatingName(getSkillMin());
         toReturn += " " + bonus;
         if(getMode() != MODE_NORMAL) {
@@ -205,6 +237,8 @@ public abstract class WorkItem implements Serializable {
     public String fail(int rating) {
         //increment the minimum skill level required
         setSkillMin(rating + 1);
+        resetTimeSpent();
+        setTeam(null);
         return " <font color='red'><b>task failed.</b></font>";
     }
     

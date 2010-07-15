@@ -115,7 +115,6 @@ public class Campaign implements Serializable {
     
     private boolean overtime;
     private boolean gmMode;
-    private boolean storeTime;
     
     private String camoCategory = Player.NO_CAMO;
     private String camoFileName = null;
@@ -558,7 +557,7 @@ public class Campaign implements Serializable {
         for(WorkItem task : unitTasks) {
             if(task.isNeeded()) {
                 total++;
-                totalMin += task.getTime();
+                totalMin += task.getTimeLeft();
             }
         }
 
@@ -634,16 +633,11 @@ public class Campaign implements Serializable {
      }
      
     public void newDay() {
+         calendar.add(Calendar.DAY_OF_MONTH, 1);
+         addReport("<p><b>" + getDateAsString() + "</b>");
+         
          for(SupportTeam team : getTeams()) {
-             if (isStoreTime()) {
-                 int minutesLeft = team.getMinutesLeft();
-                 int overtimeMinutesLeft = team.getOvertimeLeft();
-                 team.resetMinutesLeft();
-                 team.setMinutesLeft(team.getMinutesLeft()+minutesLeft);
-                 team.setOvertimeLeft(team.getMinutesLeft()+overtimeMinutesLeft);
-             } else {
-                 team.resetMinutesLeft();
-             }
+             team.resetMinutesLeft();
          }
          ArrayList<WorkItem> assigned = new ArrayList<WorkItem>();
          for(WorkItem task : getTasks()) {
@@ -662,8 +656,6 @@ public class Campaign implements Serializable {
                 addReport(p.getDesc() + " heals naturally!");
             }
          }
-         calendar.add(Calendar.DAY_OF_MONTH, 1);
-         addReport("<p><b>" + getDateAsString() + "</b>");
     }
     
     public void clearAllUnits() {
@@ -846,14 +838,6 @@ public class Campaign implements Serializable {
     
     public void setGMMode(boolean b) {
         this.gmMode = b;
-    }
-
-    public void setStoreTime(boolean storeTime) {
-        this.storeTime = storeTime;
-    }
-
-    public boolean isStoreTime() {
-        return storeTime;
     }
     
     public int getFaction() {
