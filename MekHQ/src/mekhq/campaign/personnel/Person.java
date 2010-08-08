@@ -21,9 +21,15 @@
 
 package mekhq.campaign.personnel;
 
+import java.io.PrintWriter;
 import java.io.Serializable;
+
+import org.w3c.dom.Node;
+
 import megamek.common.Pilot;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.MekHqXmlSerializable;
+import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.team.SupportTeam;
 import mekhq.campaign.work.PersonnelWorkItem;
 
@@ -37,11 +43,12 @@ import mekhq.campaign.work.PersonnelWorkItem;
  * 5) Administrators/other staff?
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public abstract class Person implements Serializable {
-    
-    protected int id;
+public abstract class Person implements Serializable, MekHqXmlSerializable {
+	private static final long serialVersionUID = -847642980395311152L;
+	protected int id;
     //any existing work item for this person
     protected PersonnelWorkItem task;
+    protected int taskId;
     //days of rest
     protected int daysRest;
     protected boolean deployed;
@@ -93,6 +100,10 @@ public abstract class Person implements Serializable {
     
     public PersonnelWorkItem getTask() {
         return task;
+    }
+    
+    public int getTaskId() {
+    	return taskId;
     }
 
     public int getXp() {
@@ -159,4 +170,60 @@ public abstract class Person implements Serializable {
     public void setBiography(String s) {
         this.biography = s;
     }
+
+	public abstract void writeToXml(PrintWriter pw1, int indent, int id);
+	
+	protected void writeToXmlBegin(PrintWriter pw1, int indent, int id) {
+		pw1.println(MekHqXmlUtil.indentStr(indent) + "<person id=\""
+				+id
+				+"\" type=\""
+				+this.getClass().getName()
+				+"\">");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<biography>"
+				+biography
+				+"</biography>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<daysRest>"
+				+daysRest
+				+"</daysRest>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<deployed>"
+				+deployed
+				+"</deployed>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<id>"
+				+this.id
+				+"</id>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<portraitCategory>"
+				+portraitCategory
+				+"</portraitCategory>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<portraitFile>"
+				+portraitFile
+				+"</portraitFile>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<xp>"
+				+xp
+				+"</xp>");
+
+		// The task reference can be loaded through its ID.
+		// But...  If the task is null, we just bypass it.
+		if (task != null) {
+			pw1.println(MekHqXmlUtil.indentStr(indent+1)
+					+"<taskId>"
+					+task.getId()
+					+"</taskId>");
+		}
+	}
+	
+	protected void writeToXmlEnd(PrintWriter pw1, int indent, int id) {
+		pw1.println(MekHqXmlUtil.indentStr(indent) + "</person>");
+	}
+
+	public static Person generateInstanceFromXML(Node wn2) {
+		// TODO: Implement for XML Serialization
+		return null;
+	}
 }

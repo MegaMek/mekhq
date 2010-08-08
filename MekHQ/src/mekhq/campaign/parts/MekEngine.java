@@ -21,124 +21,156 @@
 
 package mekhq.campaign.parts;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import megamek.common.Engine;
 import megamek.common.Mech;
 import megamek.common.TechConstants;
-import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.Faction;
+import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.work.MekEngineReplacement;
 import mekhq.campaign.work.ReplacementItem;
 
 /**
- *
+ * 
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MekEngine extends Part {
-    
-    protected Engine engine;
+	private static final long serialVersionUID = -6961398614705924172L;
+	protected Engine engine;
 
-    public Engine getEngine() {
-        return engine;
-    }
-    
-    public MekEngine(boolean salvage, int tonnage, int faction, Engine e, double clanMultiplier) {
-        super(salvage, tonnage);
-        this.engine = e;
-        this.name = engine.getEngineName() + " Engine" + " (" + getTonnage() + " tons)";
-        this.engine = e;
+	public Engine getEngine() {
+		return engine;
+	}
 
-        double c = getEngine().getBaseCost() * getEngine().getRating() * getTonnage() / 75.0;
-        this.cost = (int) Math.round(c);
+	public MekEngine(boolean salvage, int tonnage, int faction, Engine e,
+			double clanMultiplier) {
+		super(salvage, tonnage);
+		this.engine = e;
+		this.name = engine.getEngineName() + " Engine" + " (" + getTonnage()
+				+ " tons)";
+		this.engine = e;
 
-        // Increase cost for Clan parts when player is IS faction
-        // Increase cost for Clan parts when player is IS faction
-        if (isClanTechBase() && !Faction.isClanFaction(faction))
-            this.cost *= clanMultiplier;
-    }
+		double c = getEngine().getBaseCost() * getEngine().getRating()
+				* getTonnage() / 75.0;
+		this.cost = (int) Math.round(c);
 
-    @Override
-    public boolean canBeUsedBy(ReplacementItem task) {
-        if(task instanceof MekEngineReplacement && task.getUnit().getEntity() instanceof Mech) {
-            Engine eng = task.getUnit().getEntity().getEngine();
-            if(null != eng) {
-                return getEngine().getEngineType() == eng.getEngineType()
-                        && getEngine().getRating() == eng.getRating()
-                        && getEngine().getTechType() == eng.getTechType()
-                        && getTonnage() == task.getUnit().getEntity().getWeight();
-            }
-        }
-        return false;
-    }
+		// Increase cost for Clan parts when player is IS faction
+		// Increase cost for Clan parts when player is IS faction
+		if (isClanTechBase() && !Faction.isClanFaction(faction))
+			this.cost *= clanMultiplier;
+	}
 
-    @Override
-    public boolean isSamePartTypeAndStatus (Part part) {
-        return part instanceof MekEngine
-                && getName().equals(part.getName())
-                && getStatus().equals(part.getStatus())
-                && getEngine().getEngineType() == ((MekEngine) part).getEngine().getEngineType()
-                && getEngine().getRating() == ((MekEngine) part).getEngine().getRating()
-                && getEngine().getTechType() == ((MekEngine) part).getEngine().getTechType()
-                && getTonnage() == ((MekEngine) part).getTonnage();
-    }
+	@Override
+	public boolean canBeUsedBy(ReplacementItem task) {
+		if (task instanceof MekEngineReplacement
+				&& task.getUnit().getEntity() instanceof Mech) {
+			Engine eng = task.getUnit().getEntity().getEngine();
+			if (null != eng) {
+				return getEngine().getEngineType() == eng.getEngineType()
+						&& getEngine().getRating() == eng.getRating()
+						&& getEngine().getTechType() == eng.getTechType()
+						&& getTonnage() == task.getUnit().getEntity()
+								.getWeight();
+			}
+		}
+		return false;
+	}
 
-    @Override
-    public int getPartType() {
-        return PART_TYPE_MEK_ENGINE;
-    }
+	@Override
+	public boolean isSamePartTypeAndStatus(Part part) {
+		return part instanceof MekEngine
+				&& getName().equals(part.getName())
+				&& getStatus().equals(part.getStatus())
+				&& getEngine().getEngineType() == ((MekEngine) part)
+						.getEngine().getEngineType()
+				&& getEngine().getRating() == ((MekEngine) part).getEngine()
+						.getRating()
+				&& getEngine().getTechType() == ((MekEngine) part).getEngine()
+						.getTechType()
+				&& getTonnage() == ((MekEngine) part).getTonnage();
+	}
 
-    @Override
-    public boolean isClanTechBase() {
-        String techBase = TechConstants.getTechName(getEngine().getTechType());
+	@Override
+	public int getPartType() {
+		return PART_TYPE_MEK_ENGINE;
+	}
 
-        if (techBase.equals("Clan"))
-            return true;
-        else if (techBase.equals("Inner Sphere"))
-            return false;
-        else
-            return false;
-    }
+	@Override
+	public boolean isClanTechBase() {
+		String techBase = TechConstants.getTechName(getEngine().getTechType());
 
-    @Override
-    public int getTech () {
-        if (getEngine().getTechType() < 0 || getEngine().getTechType() >= TechConstants.SIZE)
-            return TechConstants.T_IS_TW_NON_BOX;
-        else
-            return getEngine().getTechType();
-    }
+		if (techBase.equals("Clan"))
+			return true;
+		else if (techBase.equals("Inner Sphere"))
+			return false;
+		else
+			return false;
+	}
 
-    @Override
-    public ArrayList<String> getPotentialSSWNames(int faction) {
-        ArrayList<String> sswNames = new ArrayList<String>();
+	@Override
+	public int getTech() {
+		if (getEngine().getTechType() < 0
+				|| getEngine().getTechType() >= TechConstants.SIZE)
+			return TechConstants.T_IS_TW_NON_BOX;
+		else
+			return getEngine().getTechType();
+	}
 
-        // The tech base matters for engines (ie. you can't use a IS XL engine to replace a Clan XL engine
-        String techBase = (isClanTechBase() ? "(CL)" : "(IS)");
+	@Override
+	public ArrayList<String> getPotentialSSWNames(int faction) {
+		ArrayList<String> sswNames = new ArrayList<String>();
 
-        String sswName = getName();
+		// The tech base matters for engines (ie. you can't use a IS XL engine
+		// to replace a Clan XL engine
+		String techBase = (isClanTechBase() ? "(CL)" : "(IS)");
 
-        sswNames.add(techBase + " " + sswName);
-        sswNames.add(sswName);
+		String sswName = getName();
 
-        return sswNames;
-    }
+		sswNames.add(techBase + " " + sswName);
+		sswNames.add(sswName);
 
-    @Override
-    public String getDesc() {
+		return sswNames;
+	}
 
-        // "Clan" already included in super.getDesc()
-        // return (getTechBase()==Part.TECH_BASE_CLAN ? "Clan " : "") + super.getDesc();
-        
-        return super.getDesc();
-    }
+	@Override
+	public String getDesc() {
 
-    @Override
-    public String getSaveString () {
-        return getName() + ";" + getTonnage()
-                + ";" + getEngine().getRating()
-                + ";" + getEngine().getEngineType()
-                + ";" + (getEngine().hasFlag(Engine.CLAN_ENGINE)?"true":"false")
-                + ";" + (getEngine().hasFlag(Engine.TANK_ENGINE)?"true":"false")
-                + ";" + (getEngine().hasFlag(Engine.LARGE_ENGINE)?"true":"false");
-    }
-    
+		// "Clan" already included in super.getDesc()
+		// return (getTechBase()==Part.TECH_BASE_CLAN ? "Clan " : "") +
+		// super.getDesc();
+
+		return super.getDesc();
+	}
+
+	@Override
+	public String getSaveString() {
+		return getName() + ";" + getTonnage() + ";" + getEngine().getRating()
+				+ ";" + getEngine().getEngineType() + ";"
+				+ (getEngine().hasFlag(Engine.CLAN_ENGINE) ? "true" : "false")
+				+ ";"
+				+ (getEngine().hasFlag(Engine.TANK_ENGINE) ? "true" : "false")
+				+ ";"
+				+ (getEngine().hasFlag(Engine.LARGE_ENGINE) ? "true" : "false");
+	}
+
+	@Override
+	public void writeToXml(PrintWriter pw1, int indent, int id) {
+		writeToXmlBegin(pw1, indent, id);
+		// The engine is a MM object...
+		// And doesn't support XML serialization...
+		// But it's defined by 3 ints. So we'll save those here.
+		pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<engineType>"
+				+ engine.getEngineType() + "</engineType>");
+		pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<engineRating>"
+				+ engine.getRating() + "</engineRating>");
+		// TODO: Modify MM to get access to engine flags.
+		/*
+		 * pw1.println(MekHqXmlUtil.indentStr(indent+1)
+		 * +"<engineFlags>"
+		 * +engine.
+		 * +"</engineFlags>");
+		 */
+		writeToXmlEnd(pw1, indent, id);
+	}
 }

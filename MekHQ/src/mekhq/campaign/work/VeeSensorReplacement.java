@@ -21,45 +21,55 @@
 
 package mekhq.campaign.work;
 
+import java.io.PrintWriter;
+
 import megamek.common.Tank;
+import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.VeeSensor;
 
 /**
- *
+ * 
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class VeeSensorReplacement extends ReplacementItem {
+	private static final long serialVersionUID = 2196730442088755437L;
 
-    public VeeSensorReplacement(Unit unit) {
-        super(unit);
-        this.name = "Replace sensors";
-        this.time = 260;
-        this.difficulty = 0;
-    }
-    
-    @Override
-    public void fix() {
-        super.fix();
-        if(unit.getEntity() instanceof Tank) {
-            ((Tank)unit.getEntity()).setSensorHits(0);
-        }
-    }
+	public VeeSensorReplacement(Unit unit) {
+		super(unit);
+		this.name = "Replace sensors";
+		this.time = 260;
+		this.difficulty = 0;
+	}
 
-    @Override
-    public boolean sameAs(WorkItem task) {
-        return (task instanceof VeeSensorReplacement
-                && ((VeeSensorReplacement)task).getUnitId() == this.getUnitId());
-    }
+	@Override
+	public void fix() {
+		super.fix();
+		if (unit.getEntity() instanceof Tank) {
+			((Tank) unit.getEntity()).setSensorHits(0);
+		}
+	}
 
-    @Override
-    public Part stratopsPartNeeded() {
-        return new VeeSensor(false, (int) unit.getEntity().getWeight());
-    }
+	@Override
+	public boolean sameAs(WorkItem task) {
+		return (task instanceof VeeSensorReplacement && ((VeeSensorReplacement) task)
+				.getUnitId() == this.getUnitId());
+	}
 
-    @Override
-    public SalvageItem getSalvage() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
+	@Override
+	public Part stratopsPartNeeded() {
+		return new VeeSensor(false, (int) unit.getEntity().getWeight());
+	}
+
+	@Override
+	public SalvageItem getSalvage() {
+		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	@Override
+	public void writeToXml(PrintWriter pw1, int indent, int id) {
+		writeToXmlBegin(pw1, indent, id);
+		writeToXmlEnd(pw1, indent, id);
+	}
 }

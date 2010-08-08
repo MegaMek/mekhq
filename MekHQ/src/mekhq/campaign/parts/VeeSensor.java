@@ -21,6 +21,8 @@
 
 package mekhq.campaign.parts;
 
+import java.io.PrintWriter;
+
 import mekhq.campaign.work.ReplacementItem;
 import mekhq.campaign.work.VeeSensorReplacement;
 
@@ -29,8 +31,9 @@ import mekhq.campaign.work.VeeSensorReplacement;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class VeeSensor extends Part {
+	private static final long serialVersionUID = 4101969895094531892L;
 
-    public VeeSensor(boolean salvage, int tonnage) {
+	public VeeSensor(boolean salvage, int tonnage) {
         super(salvage, tonnage);
         this.name = "Vehicle Sensors";
     }
@@ -46,5 +49,10 @@ public class VeeSensor extends Part {
                 && getName().equals(part.getName())
                 && getStatus().equals(part.getStatus());
     }
-    
+
+	@Override
+	public void writeToXml(PrintWriter pw1, int indent, int id) {
+		writeToXmlBegin(pw1, indent, id);
+		writeToXmlEnd(pw1, indent, id);
+	}
 }

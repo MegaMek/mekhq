@@ -21,7 +21,10 @@
 
 package mekhq.campaign.work;
 
+import java.io.PrintWriter;
+
 import megamek.common.Mech;
+import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
 
 /**
@@ -29,8 +32,8 @@ import mekhq.campaign.Unit;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MekInternalRepair extends InternalRepair {
-
-    double percent;
+	private static final long serialVersionUID = -4275717871512159638L;
+	double percent;
     
     public MekInternalRepair(Unit unit, int i, double pct) {
         super(unit, i);
@@ -67,5 +70,11 @@ public class MekInternalRepair extends InternalRepair {
     public boolean canScrap() {
         return loc != Mech.LOC_CT;
     }
+
+	@Override
+	public void writeToXml(PrintWriter pw1, int indent, int id) {
+		writeToXmlBegin(pw1, indent, id);
+		writeToXmlEnd(pw1, indent, id);
+	}
 }
 

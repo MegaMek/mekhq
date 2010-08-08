@@ -6,15 +6,11 @@
 
 package mekhq;
 
-import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import javax.swing.ImageIcon;
-import megamek.client.ui.AWT.util.PlayerColors;
 import megamek.client.ui.swing.util.ImageFileFactory;
 import megamek.common.Pilot;
-import megamek.common.Player;
 import megamek.common.util.DirectoryItems;
 
 /**
@@ -23,7 +19,11 @@ import megamek.common.util.DirectoryItems;
  */
 public class PortraitPanel extends javax.swing.JPanel {
 
-    private DirectoryItems portraits;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -3724175393116586310L;
+	private DirectoryItems portraits;
     
     /** Creates new form CamoPanel */
     public PortraitPanel() {

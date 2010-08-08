@@ -21,8 +21,10 @@
 
 package mekhq.campaign.work;
 
+import java.io.PrintWriter;
+
 import megamek.common.IArmorState;
-import megamek.common.Mech;
+import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
 
 /**
@@ -30,8 +32,8 @@ import mekhq.campaign.Unit;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public abstract class InternalRepair extends RepairItem {
-
-    int loc;
+	private static final long serialVersionUID = 5772050322556439372L;
+	int loc;
     
     public InternalRepair(Unit unit, int i) {
         super(unit, 0);
@@ -68,5 +70,12 @@ public abstract class InternalRepair extends RepairItem {
     public boolean canScrap() {
         return false;
     }
-    
+
+	protected void writeToXmlBegin(PrintWriter pw1, int indent, int id) {
+		super.writeToXmlBegin(pw1, indent, id);
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<loc>"
+				+loc
+				+"</loc>");
+	}
 }

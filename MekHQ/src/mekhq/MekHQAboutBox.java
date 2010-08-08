@@ -24,8 +24,9 @@ package mekhq;
 import org.jdesktop.application.Action;
 
 public class MekHQAboutBox extends javax.swing.JDialog {
+	private static final long serialVersionUID = -8514528257894201641L;
 
-    public MekHQAboutBox(java.awt.Frame parent) {
+	public MekHQAboutBox(java.awt.Frame parent) {
         super(parent);
         initComponents();
         getRootPane().setDefaultButton(closeButton);

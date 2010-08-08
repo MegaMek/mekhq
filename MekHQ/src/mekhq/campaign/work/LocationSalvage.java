@@ -21,9 +21,12 @@
 
 package mekhq.campaign.work;
 
+import java.io.PrintWriter;
+
 import megamek.common.CriticalSlot;
 import megamek.common.IArmorState;
 import megamek.common.Mech;
+import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
 import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.Part;
@@ -33,8 +36,8 @@ import mekhq.campaign.parts.Part;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class LocationSalvage extends SalvageItem {
-
-    protected int loc;
+	private static final long serialVersionUID = 168319348571646202L;
+	protected int loc;
     
     public LocationSalvage(Unit unit, int i) {
         super(unit);
@@ -100,4 +103,13 @@ public class LocationSalvage extends SalvageItem {
        unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, loc);
     }
 
+	@Override
+	public void writeToXml(PrintWriter pw1, int indent, int id) {
+		writeToXmlBegin(pw1, indent, id);
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<loc>"
+				+loc
+				+"</loc>");
+		writeToXmlEnd(pw1, indent, id);
+	}
 }

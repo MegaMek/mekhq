@@ -44,8 +44,9 @@ import org.jdesktop.application.ResourceMap;
  * (code borrowed heavily from MegaMekLab UnitSelectorDialog
  */
 public class UnitSelectorDialog extends JDialog {
+	private static final long serialVersionUID = 304389003995743004L;
 
-    private MechSummary[] mechs;
+	private MechSummary[] mechs;
 
     private MechTableModel unitModel;
 
@@ -519,8 +520,8 @@ private void checkCanonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
              refreshUnitView();
         } catch (EntityLoadingException ex) {
             selectedUnit = null;
-            System.out.println("Unable to load mech: " + ms.getSourceFile() + ": " + ms.getEntryName() + ": " + ex.getMessage());
-            ex.printStackTrace();
+            MekHQApp.logError("Unable to load mech: " + ms.getSourceFile() + ": " + ms.getEntryName() + ": " + ex.getMessage());
+            MekHQApp.logError(ex);
             refreshUnitView();
             return;
        }
@@ -557,6 +558,7 @@ private void checkCanonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
             try {
                 mt.loadFromFile("mechset.txt");
             } catch (IOException ex) {
+            	MekHQApp.logError(ex);
                 //TODO: do something here
                 return;
             }
@@ -634,8 +636,8 @@ private void checkCanonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
  * A table model for displaying work items
  */
 public class MechTableModel extends AbstractTableModel {
-
-        private final static int COL_MODEL = 0;
+		private static final long serialVersionUID = 8472587304279640434L;
+		private final static int COL_MODEL = 0;
         private final static int COL_CHASSIS = 1;
         private final static int COL_WEIGHT = 2;
         private final static int COL_BV = 3;

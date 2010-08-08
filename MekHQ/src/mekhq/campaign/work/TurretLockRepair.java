@@ -21,8 +21,11 @@
 
 package mekhq.campaign.work;
 
+import java.io.PrintWriter;
+
 import megamek.common.IArmorState;
 import megamek.common.Tank;
+import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
 
 /**
@@ -31,7 +34,12 @@ import mekhq.campaign.Unit;
  */
 public class TurretLockRepair extends RepairItem {
 
-    public TurretLockRepair(Unit unit) {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -2304515395547113540L;
+
+	public TurretLockRepair(Unit unit) {
         super(unit, 1);
         this.name = "Unlock turret";
         this.time = 90;
@@ -63,4 +71,9 @@ public class TurretLockRepair extends RepairItem {
                 && ((TurretLockRepair)task).getUnitId() == this.getUnitId());
     }
 
+	@Override
+	public void writeToXml(PrintWriter pw1, int indent, int id) {
+		writeToXmlBegin(pw1, indent, id);
+		writeToXmlEnd(pw1, indent, id);
+	}
 }

@@ -6,18 +6,13 @@
 
 package mekhq;
 
-import java.text.DecimalFormat;
-import javax.swing.JFormattedTextField.AbstractFormatter;
-import javax.swing.text.DefaultFormatterFactory;
-import javax.swing.text.NumberFormatter;
-
 /**
  *
  * @author natit
  */
 public class AddFundsDialog extends javax.swing.JDialog {
-
-    /** Creates new form AlertPopup */
+	private static final long serialVersionUID = -6946480787293179307L;
+	/** Creates new form AlertPopup */
     public AddFundsDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
@@ -99,7 +94,7 @@ public class AddFundsDialog extends javax.swing.JDialog {
 
     private void btnAddFundsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddFundsActionPerformed
         this.setVisible(false);
-}//GEN-LAST:event_btnAddFundsActionPerformed
+    }//GEN-LAST:event_btnAddFundsActionPerformed
 
     /**
     * @param args the command line arguments

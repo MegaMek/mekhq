@@ -21,50 +21,72 @@
 
 package mekhq.campaign.work;
 
+import java.io.PrintWriter;
+
+import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.personnel.Person;
 
 /**
- *
+ * 
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public abstract class PersonnelWorkItem extends WorkItem {
+	private static final long serialVersionUID = 1830844719681238733L;
+	// the person for whom the work is being done
+	protected Person person;
+	// how many patients this person counts for
+	protected int patients;
+	protected int personId = -1; // Used for XML Serialization.
 
-    //the person for whom the work is being done
-    protected Person person;
-    //how many patients this person counts for
-    protected int patients;
-    
-    public PersonnelWorkItem(Person p) {
-        super();
-        this.person = p;
-        this.patients = 1;
-    }
-    
-    @Override
-    public String getDisplayName() {
-        return getDesc() + " " + person.getDesc();
-    }
-    
-    public int getPatients() {
-        return patients;
-    }
-    
-    public void setPatients(int i) {
-        this.patients = i;
-    }
-    
-    public Person getPerson() {
-        return person;
-    }
-    
-    @Override
-    public String fail(int rating) {
-        return " <font color='red'><b>task failed.</b></font>";
-    }
-    
-    @Override
-    public boolean sameAs(WorkItem task) {
-        return (task instanceof PersonnelWorkItem 
-                    && ((PersonnelWorkItem)task).getPerson().getId() == this.getPerson().getId());
-    }
+	public PersonnelWorkItem(Person p) {
+		super();
+		this.person = p;
+		this.patients = 1;
+	}
+
+	@Override
+	public String getDisplayName() {
+		return getDesc() + " " + person.getDesc();
+	}
+
+	public int getPatients() {
+		return patients;
+	}
+
+	public void setPatients(int i) {
+		this.patients = i;
+	}
+
+	public Person getPerson() {
+		return person;
+	}
+
+	@Override
+	public String fail(int rating) {
+		return " <font color='red'><b>task failed.</b></font>";
+	}
+
+	@Override
+	public boolean sameAs(WorkItem task) {
+		return (task instanceof PersonnelWorkItem && ((PersonnelWorkItem) task)
+				.getPerson().getId() == this.getPerson().getId());
+	}
+
+	protected void writeToXmlBegin(PrintWriter pw1, int indent, int id) {
+		super.writeToXmlBegin(pw1, indent, id);
+		// Person reference will be corrected in post-load in the campaign
+		// object.
+		pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<personId>"
+				+ person.getId() + "</personId>");
+		pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<patients>"
+				+ patients + "</patients>");
+	}
+
+	public int getPersonId() {
+		return personId;
+	}
+	
+	public void setPerson(Person prsn) {
+		person = prsn;
+	}
 }

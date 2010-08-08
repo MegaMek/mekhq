@@ -21,11 +21,14 @@
 
 package mekhq.campaign.work;
 
+import java.io.PrintWriter;
+
 import megamek.common.CriticalSlot;
 import megamek.common.Mounted;
 import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
 import megamek.common.WeaponType;
+import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
 import mekhq.campaign.parts.EquipmentPart;
 import mekhq.campaign.parts.Part;
@@ -35,8 +38,8 @@ import mekhq.campaign.parts.Part;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class EquipmentReplacement extends ReplacementItem {
-
-    protected Mounted mounted;
+	private static final long serialVersionUID = 3877979698620681630L;
+	protected Mounted mounted;
     
     public EquipmentReplacement(Unit unit, Mounted m) {
         super(unit);
@@ -122,4 +125,11 @@ public class EquipmentReplacement extends ReplacementItem {
     public SalvageItem getSalvage() {
         return new EquipmentSalvage(unit, mounted);
     }
+
+	@Override
+	public void writeToXml(PrintWriter pw1, int indent, int id) {
+		writeToXmlBegin(pw1, indent, id);
+		//TODO: Handle writing Mounted to XML
+		writeToXmlEnd(pw1, indent, id);
+	}
 }

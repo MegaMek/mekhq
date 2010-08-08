@@ -21,13 +21,15 @@
 
 package mekhq.campaign.team;
 
+import java.io.PrintWriter;
+
 import megamek.common.Aero;
 import megamek.common.BattleArmor;
 import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.Mech;
 import megamek.common.Tank;
-import mekhq.campaign.Campaign;
+import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Utilities;
 import mekhq.campaign.work.PersonnelWorkItem;
 import mekhq.campaign.work.UnitWorkItem;
@@ -38,8 +40,8 @@ import mekhq.campaign.work.WorkItem;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class TechTeam extends SupportTeam {
-
-    public static final int T_MECH = 0;
+	private static final long serialVersionUID = -4446125046165470664L;
+	public static final int T_MECH = 0;
     public static final int T_MECHANIC = 1;
     public static final int T_AERO = 2;
     public static final int T_BA = 3;
@@ -133,4 +135,14 @@ public class TechTeam extends SupportTeam {
         toReturn += "</font></html>";
         return toReturn;
    }
+
+	@Override
+	public void writeToXml(PrintWriter pw1, int indent, int id) {
+		writeToXmlBegin(pw1, indent, id);
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<type>"
+				+type
+				+"</type>");
+		writeToXmlEnd(pw1, indent, id);
+	}
 }

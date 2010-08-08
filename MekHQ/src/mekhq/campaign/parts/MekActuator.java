@@ -21,8 +21,11 @@
 
 package mekhq.campaign.parts;
 
+import java.io.PrintWriter;
+
 import megamek.common.BipedMech;
 import megamek.common.Mech;
+import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.work.MekActuatorReplacement;
 import mekhq.campaign.work.ReplacementItem;
 
@@ -31,8 +34,8 @@ import mekhq.campaign.work.ReplacementItem;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MekActuator extends Part {
-    
-    protected int type;
+	private static final long serialVersionUID = 719878556021696393L;
+	protected int type;
 
     public int getType() {
         return type;
@@ -112,4 +115,14 @@ public class MekActuator extends Part {
     public String getSaveString () {
         return getName() + ";" + getTonnage() + ";" + getType();
     }
+
+	@Override
+	public void writeToXml(PrintWriter pw1, int indent, int id) {
+		writeToXmlBegin(pw1, indent, id);
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<type>"
+				+type
+				+"</type>");
+		writeToXmlEnd(pw1, indent, id);
+	}
 }

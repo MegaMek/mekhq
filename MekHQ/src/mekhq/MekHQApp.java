@@ -33,6 +33,41 @@ import org.jdesktop.application.SingleFrameApplication;
  * The main class of the application.
  */
 public class MekHQApp extends SingleFrameApplication {
+	//TODO: This is intended as a debug/production type thing.
+	// So it should be backed down to 1 for releases...
+	// It's intended for 1 to be critical, 3 to be typical, and 5 to be debug/informational.
+	public static int VERBOSITY_LEVEL = 5;
+	
+	/**
+	 * Designed to centralize output and logging.
+	 * Purely a pass-through to the version with a log level.
+	 * Default to log level 3.
+	 * 
+	 * @param msg The message you want to log.
+	 */
+	public static void logMessage(String msg) {
+		logMessage(msg, 3);
+	}
+	
+	/**
+	 * Designed to centralize output and logging.
+	 * 
+	 * @param msg The message you want to log.
+	 * @param logLevel The log level of the message.
+	 */
+	public static void logMessage(String msg, int logLevel) {
+		if (logLevel <= VERBOSITY_LEVEL)
+			System.out.println(msg);
+	}
+
+	public static void logError(String err) {
+		System.err.println(err);
+	}
+	
+	public static void logError(Exception ex) {
+		System.err.println(ex);
+		ex.printStackTrace();
+	}
     
     /**
      * At startup create and show the main frame of the application.

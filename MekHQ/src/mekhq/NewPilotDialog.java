@@ -24,6 +24,7 @@ import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.NameGen;
 import mekhq.campaign.personnel.PilotPerson;
 
 /**
@@ -32,9 +33,14 @@ import mekhq.campaign.personnel.PilotPerson;
  */
 public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionListener {
 
-    private Pilot pilot;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -6265589976779860566L;
+	private Pilot pilot;
     private ArrayList<DialogOptionComponent> optionComps = new ArrayList<DialogOptionComponent>();
     private PilotOptions options;
+    private static NameGen nameGen;
 
     private Campaign campaign;
     
@@ -117,7 +123,16 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
         getContentPane().add(lblNickname, gridBagConstraints);
 
-        textName.setText(pilot.getName());
+        if (nameGen == null)
+        {
+        	nameGen = new NameGen();
+        	nameGen.populateNames("/mekhq/resources/firstNames.txt",
+        			"/mekhq/resources/lastNames.txt",
+        			"/mekhq/resources/namePatterns.txt");
+        }
+
+        //textName.setText(pilot.getName());
+        textName.setText(nameGen.generate());
         textName.setMinimumSize(new java.awt.Dimension(250, 28));
         textName.setName("textName"); // NOI18N
         textName.setPreferredSize(new java.awt.Dimension(250, 28));

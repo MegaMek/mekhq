@@ -21,7 +21,10 @@
 
 package mekhq.campaign.work;
 
+import java.io.PrintWriter;
+
 import megamek.common.Mounted;
+import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
 
 /**
@@ -29,8 +32,9 @@ import mekhq.campaign.Unit;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class AmmoBinReplacement extends EquipmentReplacement {
+	private static final long serialVersionUID = -6062593211429559619L;
 
-    public AmmoBinReplacement(Unit unit, Mounted m) {
+	public AmmoBinReplacement(Unit unit, Mounted m) {
         super(unit, m);
         this.time = 120;
         this.difficulty = -2;

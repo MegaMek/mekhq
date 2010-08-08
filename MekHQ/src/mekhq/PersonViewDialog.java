@@ -14,7 +14,11 @@ import mekhq.campaign.personnel.Person;
  */
 public class PersonViewDialog extends javax.swing.JDialog {
 
-    /** Creates new form PersonViewDialog */
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -4031039763694327414L;
+	/** Creates new form PersonViewDialog */
     public PersonViewDialog(java.awt.Frame parent, boolean modal, Person person) {
         super(parent, modal);
         initComponents();

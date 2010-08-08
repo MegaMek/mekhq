@@ -21,6 +21,8 @@
 
 package mekhq.campaign.parts;
 
+import java.io.PrintWriter;
+
 import mekhq.campaign.work.MekLifeSupportReplacement;
 import mekhq.campaign.work.ReplacementItem;
 
@@ -29,8 +31,9 @@ import mekhq.campaign.work.ReplacementItem;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MekLifeSupport extends Part {
+	private static final long serialVersionUID = -1989526319692474127L;
 
-    public MekLifeSupport(boolean salvage, int tonnage) {
+	public MekLifeSupport(boolean salvage, int tonnage) {
         super(salvage, tonnage);
         this.name = "Mech Life Support System";
         this.cost = 50000;
@@ -52,5 +55,10 @@ public class MekLifeSupport extends Part {
     public int getPartType() {
         return PART_TYPE_MEK_LIFE_SUPPORT;
     }
-    
+
+	@Override
+	public void writeToXml(PrintWriter pw1, int indent, int id) {
+		writeToXmlBegin(pw1, indent, id);
+		writeToXmlEnd(pw1, indent, id);
+	}
 }

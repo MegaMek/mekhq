@@ -21,6 +21,9 @@
 
 package mekhq.campaign.work;
 
+import java.io.PrintWriter;
+
+import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.team.SupportTeam;
@@ -30,8 +33,8 @@ import mekhq.campaign.team.SupportTeam;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public abstract class SalvageItem extends UnitWorkItem {
-    
-    //the id of a corresponding repair item that must be dealt with when this item is processed
+	private static final long serialVersionUID = -309078315443493468L;
+	//the id of a corresponding repair item that must be dealt with when this item is processed
     protected int repairId = NONE;
     
     public SalvageItem(Unit u) {
@@ -108,4 +111,11 @@ public abstract class SalvageItem extends UnitWorkItem {
         return super.getToolTip();
     }
 
+	protected void writeToXmlBegin(PrintWriter pw1, int indent, int id) {
+		super.writeToXmlBegin(pw1, indent, id);
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<repairId>"
+				+repairId
+				+"</repairId>");
+	}
 }

@@ -21,13 +21,12 @@
 
 package mekhq.campaign.work;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import megamek.common.Entity;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
-import mekhq.campaign.parts.Part;
-import mekhq.campaign.parts.RefitKit;
 import mekhq.campaign.personnel.PilotPerson;
 
 /**
@@ -35,8 +34,9 @@ import mekhq.campaign.personnel.PilotPerson;
  * @author natit
  */
 public abstract class Customization extends UnitWorkItem {
+	private static final long serialVersionUID = -2016091299829485469L;
 
-    Entity targetEntity;
+	Entity targetEntity;
 
     public static final int REFIT_CLASS_A = 1;
     public static final int REFIT_CLASS_B = 2;
@@ -222,4 +222,17 @@ public abstract class Customization extends UnitWorkItem {
         // Impossible
         return "Max skill reached";
     }
+
+	protected void writeToXmlBegin(PrintWriter pw1, int indent, int id) {
+		super.writeToXmlBegin(pw1, indent, id);
+		//TODO: Handle writing Entity to XML
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<minimumSite>"
+				+minimumSite
+				+"</minimumSite>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<refitClass>"
+				+refitClass
+				+"</refitClass>");
+	}
 }

@@ -21,6 +21,8 @@
 
 package mekhq.campaign.parts;
 
+import java.io.PrintWriter;
+
 import mekhq.campaign.work.ReplacementItem;
 
 /**
@@ -28,8 +30,9 @@ import mekhq.campaign.work.ReplacementItem;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class VeeStabiliser extends Part {
+	private static final long serialVersionUID = 6708245721569856817L;
 
-    public VeeStabiliser(boolean salvage, int tonnage) {
+	public VeeStabiliser(boolean salvage, int tonnage) {
         super(salvage, tonnage);
         this.name = "Vehicle Stabiliser";
     }
@@ -48,5 +51,10 @@ public class VeeStabiliser extends Part {
                 && getStatus().equals(part.getStatus())
                 && false;
     }
-    
+
+	@Override
+	public void writeToXml(PrintWriter pw1, int indent, int id) {
+		writeToXmlBegin(pw1, indent, id);
+		writeToXmlEnd(pw1, indent, id);
+	}
 }

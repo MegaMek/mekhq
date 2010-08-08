@@ -21,8 +21,11 @@
 
 package mekhq.campaign.work;
 
+import java.io.PrintWriter;
+
 import megamek.common.CriticalSlot;
 import megamek.common.Mech;
+import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
 
 /**
@@ -30,8 +33,9 @@ import mekhq.campaign.Unit;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MekGyroRepair extends RepairItem {
+	private static final long serialVersionUID = -4885044444425124132L;
 
-    public MekGyroRepair(Unit unit, int crits) {
+	public MekGyroRepair(Unit unit, int crits) {
         super(unit, crits);
         this.name = "Repair " + ((Mech)unit.getEntity()).getSystemName(Mech.SYSTEM_GYRO);
         this.time = 120;
@@ -63,4 +67,10 @@ public class MekGyroRepair extends RepairItem {
         return (task instanceof MekGyroRepair
                 && ((MekGyroRepair)task).getUnitId() == this.getUnitId());
     }
+
+	@Override
+	public void writeToXml(PrintWriter pw1, int indent, int id) {
+		writeToXmlBegin(pw1, indent, id);
+		writeToXmlEnd(pw1, indent, id);
+	}
 }

@@ -11,8 +11,8 @@ package mekhq;
  * @author natit
  */
 public class AlertPopup extends javax.swing.JDialog {
-
-    /** Creates new form AlertPopup */
+	private static final long serialVersionUID = -8513864929992744817L;
+	/** Creates new form AlertPopup */
     public AlertPopup(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();

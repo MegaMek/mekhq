@@ -21,6 +21,9 @@
 
 package mekhq.campaign.work;
 
+import java.io.PrintWriter;
+
+import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.personnel.PilotPerson;
 
 /**
@@ -28,8 +31,9 @@ import mekhq.campaign.personnel.PilotPerson;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class HealPilot extends PersonnelWorkItem {
-    
-    public HealPilot(PilotPerson pp) {
+  	private static final long serialVersionUID = -1794603488838449595L;
+
+	public HealPilot(PilotPerson pp) {
         super(pp);
         this.name = "Heal";
     }
@@ -52,4 +56,10 @@ public class HealPilot extends PersonnelWorkItem {
             }
         }
     }
+
+	@Override
+	public void writeToXml(PrintWriter pw1, int indent, int id) {
+		writeToXmlBegin(pw1, indent, id);
+		writeToXmlEnd(pw1, indent, id);
+	}
 }

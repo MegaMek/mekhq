@@ -21,7 +21,10 @@
 
 package mekhq.campaign.personnel;
 
+import java.io.PrintWriter;
+
 import mekhq.campaign.Campaign;
+import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.team.SupportTeam;
 
 /**
@@ -29,8 +32,9 @@ import mekhq.campaign.team.SupportTeam;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class SupportPerson extends Person {
-
-    private SupportTeam team;
+	private static final long serialVersionUID = 8476806535893310057L;
+	private SupportTeam team;
+	private int teamId;
     
     public SupportPerson(SupportTeam t) {
         super();
@@ -39,6 +43,14 @@ public class SupportPerson extends Person {
     
     public SupportTeam getTeam() {
         return team;
+    }
+    
+    public void setTeam(SupportTeam t) {
+    	team = t;
+    }
+    
+    public int getTeamId() {
+    	return teamId;
     }
     
     @Override
@@ -91,5 +103,14 @@ public class SupportPerson extends Person {
         
         return toReturn;
     }
-    
+
+	@Override
+	public void writeToXml(PrintWriter pw1, int indent, int id) {
+		writeToXmlBegin(pw1, indent, id);
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<teamId>"
+				+team.getId()
+				+"</teamId>");
+		writeToXmlEnd(pw1, indent, id);
+	}
 }

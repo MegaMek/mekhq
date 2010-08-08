@@ -21,6 +21,8 @@
 
 package mekhq.campaign.parts;
 
+import java.io.PrintWriter;
+
 import megamek.common.Tank;
 import mekhq.campaign.work.ReplacementItem;
 import mekhq.campaign.work.TurretReplacement;
@@ -31,7 +33,12 @@ import mekhq.campaign.work.TurretReplacement;
  */
 public class Turret extends Part {
     
-    public Turret(boolean salvage, int tonnage) {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 719267861685599789L;
+
+	public Turret(boolean salvage, int tonnage) {
         super(salvage, tonnage);
         this.name = "Vehicle Turret" + " (" + getTonnage() + ")";
     }
@@ -50,5 +57,10 @@ public class Turret extends Part {
                 && getStatus().equals(part.getStatus())
                 && getTonnage() == ((Turret)part).getTonnage();
     }
-    
+
+	@Override
+	public void writeToXml(PrintWriter pw1, int indent, int id) {
+		writeToXmlBegin(pw1, indent, id);
+		writeToXmlEnd(pw1, indent, id);
+	}
 }

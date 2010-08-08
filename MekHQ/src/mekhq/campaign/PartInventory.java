@@ -23,7 +23,6 @@ package mekhq.campaign;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.ArrayList;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.GenericSparePart;
 import mekhq.campaign.parts.Part;

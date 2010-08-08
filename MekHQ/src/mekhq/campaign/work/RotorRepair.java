@@ -21,8 +21,11 @@
 
 package mekhq.campaign.work;
 
+import java.io.PrintWriter;
+
 import megamek.common.IArmorState;
 import megamek.common.VTOL;
+import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
 
 /**
@@ -30,8 +33,9 @@ import mekhq.campaign.Unit;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class RotorRepair extends RepairItem {
-    
-    public RotorRepair(Unit unit) {
+	private static final long serialVersionUID = -5745788544296044177L;
+
+	public RotorRepair(Unit unit) {
         super(unit, 1);
         this.name = "Repair rotor damage";
         this.time = 120;
@@ -62,4 +66,9 @@ public class RotorRepair extends RepairItem {
                 && ((RotorRepair)task).getUnitId() == this.getUnitId());
     }
 
+	@Override
+	public void writeToXml(PrintWriter pw1, int indent, int id) {
+		writeToXmlBegin(pw1, indent, id);
+		writeToXmlEnd(pw1, indent, id);
+	}
 }

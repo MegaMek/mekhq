@@ -21,10 +21,12 @@
 
 package mekhq.campaign.parts;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import megamek.common.EquipmentType;
 import megamek.common.TechConstants;
 import mekhq.campaign.Faction;
+import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.work.ArmorReplacement;
 import mekhq.campaign.work.ReplacementItem;
 
@@ -33,8 +35,8 @@ import mekhq.campaign.work.ReplacementItem;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class Armor extends Part {
-
-    protected int type;
+	private static final long serialVersionUID = 5275226057484468868L;
+	protected int type;
     protected int amount;
     
     public Armor(boolean salvage, int tonnage, int t, int points) {
@@ -150,4 +152,18 @@ public class Armor extends Part {
     public String getSaveString () {
         return getName() + ";" + getTonnage() + ";" + getType() + ";" + getAmount();
     }
+
+	@Override
+	public void writeToXml(PrintWriter pw1, int indent, int id) {
+		writeToXmlBegin(pw1, indent, id);
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<amount>"
+				+amount
+				+"</amount>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<type>"
+				+type
+				+"</type>");
+		writeToXmlEnd(pw1, indent, id);
+	}
 }

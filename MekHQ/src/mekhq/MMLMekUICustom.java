@@ -109,16 +109,17 @@ public class MMLMekUICustom extends JDialog implements RefreshListener {
     JScrollPane scroll = new JScrollPane();
 
     public MMLMekUICustom() {
-
         UnitUtil.loadFonts();
         new CConfig();
-        System.out.println("Staring MegaMekLab version: " + MegaMekLab.VERSION);
+        MekHQApp.logMessage("Staring MegaMekLab version: " + MegaMekLab.VERSION);
+
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
-            System.out.println("Setting look and feel failed: ");
-            e.printStackTrace();
+        	MekHQApp.logError("Setting look and feel failed: ");
+        	MekHQApp.logError(e);
         }
+
         file.setMnemonic('F');
         JMenuItem item = new JMenuItem();
 

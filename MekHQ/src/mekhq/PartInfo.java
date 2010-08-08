@@ -16,7 +16,12 @@ import javax.swing.ImageIcon;
  */
 public class PartInfo extends javax.swing.JPanel {
 
-    /** Creates new form TaskInfo */
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 6516861643700586658L;
+
+	/** Creates new form TaskInfo */
     public PartInfo() {
         initComponents();
     }

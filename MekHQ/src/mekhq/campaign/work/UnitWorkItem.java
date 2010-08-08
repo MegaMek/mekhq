@@ -21,7 +21,10 @@
 
 package mekhq.campaign.work;
 
+import java.io.PrintWriter;
+
 import megamek.common.TargetRoll;
+import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
 import mekhq.campaign.team.SupportTeam;
 
@@ -30,9 +33,10 @@ import mekhq.campaign.team.SupportTeam;
  * @author Taharqa
  */
 public abstract class UnitWorkItem extends WorkItem {
-
-    //the unit for whom the work is being performed
+	private static final long serialVersionUID = 8133426984234337677L;
+	//the unit for whom the work is being performed
     protected Unit unit;
+    protected int unitId = -1; // For XML serialization.
     
     public UnitWorkItem(Unit unit) {
         super();
@@ -81,4 +85,20 @@ public abstract class UnitWorkItem extends WorkItem {
         }
         return toReturn;
     }
+
+	protected void writeToXmlBegin(PrintWriter pw1, int indent, int id) {
+		super.writeToXmlBegin(pw1, indent, id);
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+ "<unitId>"
+				+ getUnitId()
+				+ "</unitId>");
+	}
+
+	public int getUnitStoredId() {
+		return unitId;
+	}
+	
+	public void setUnit(Unit nt) {
+		unit = nt;
+	}
 }

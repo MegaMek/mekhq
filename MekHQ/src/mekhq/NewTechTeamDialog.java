@@ -21,6 +21,7 @@
 
 package mekhq;
 
+import mekhq.campaign.personnel.NameGen;
 import mekhq.campaign.team.SupportTeam;
 import javax.swing.DefaultComboBoxModel;
 import mekhq.campaign.Campaign;
@@ -32,8 +33,13 @@ import mekhq.campaign.team.TechTeam;
  */
 public class NewTechTeamDialog extends javax.swing.JDialog {
     
-    private Campaign campaign;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -8038099101234445018L;
+	private Campaign campaign;
     private MekHQView hqView;
+    private static NameGen nameGen;
     
     /** Creates new form NewTeamDialog */
     public NewTechTeamDialog(java.awt.Frame parent, boolean modal, Campaign campaign, MekHQView view) {
@@ -66,7 +72,17 @@ public class NewTechTeamDialog extends javax.swing.JDialog {
         setName("Form"); // NOI18N
 
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(NewTechTeamDialog.class);
-        txtTeamName.setText(resourceMap.getString("txtTeamName.text")); // NOI18N
+
+        if (nameGen == null)
+        {
+        	nameGen = new NameGen();
+        	nameGen.populateNames("/mekhq/resources/firstNames.txt",
+        			"/mekhq/resources/lastNames.txt",
+        			"/mekhq/resources/namePatterns.txt");
+        }
+
+        txtTeamName.setText(nameGen.generate());
+        //txtTeamName.setText(resourceMap.getString("txtTeamName.text")); // NOI18N
         txtTeamName.setName("txtTeamName"); // NOI18N
         txtTeamName.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {

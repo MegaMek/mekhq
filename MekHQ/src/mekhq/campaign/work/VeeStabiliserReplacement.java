@@ -21,6 +21,9 @@
 
 package mekhq.campaign.work;
 
+import java.io.PrintWriter;
+
+import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.VeeStabiliser;
@@ -30,8 +33,8 @@ import mekhq.campaign.parts.VeeStabiliser;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 class VeeStabiliserReplacement extends ReplacementItem {
-
-    private int loc;
+	private static final long serialVersionUID = 5283920941593252555L;
+	private int loc;
     
     public VeeStabiliserReplacement(Unit unit, int i) {
         super(unit);
@@ -68,4 +71,13 @@ class VeeStabiliserReplacement extends ReplacementItem {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+	@Override
+	public void writeToXml(PrintWriter pw1, int indent, int id) {
+		writeToXmlBegin(pw1, indent, id);
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<loc>"
+				+loc
+				+"</loc>");
+		writeToXmlEnd(pw1, indent, id);
+	}
 }

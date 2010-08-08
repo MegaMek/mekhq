@@ -21,10 +21,12 @@
 
 package mekhq.campaign.parts;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import megamek.common.EquipmentType;
 import megamek.common.Mech;
 import mekhq.campaign.Faction;
+import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.work.LocationReplacement;
 import mekhq.campaign.work.ReplacementItem;
 
@@ -33,8 +35,8 @@ import mekhq.campaign.work.ReplacementItem;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MekLocation extends Part {
-
-    protected int loc;
+	private static final long serialVersionUID = -122291037522319765L;
+	protected int loc;
     protected int structureType;
     protected boolean tsm;
 
@@ -155,4 +157,22 @@ public class MekLocation extends Part {
     public String getSaveString () {
         return getName() + ";" + getTonnage() + ";" + getLoc() + ";" + getStructureType() + ";" + (isTsm()?"true":"false");
     }
+
+	@Override
+	public void writeToXml(PrintWriter pw1, int indent, int id) {
+		writeToXmlBegin(pw1, indent, id);
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<loc>"
+				+loc
+				+"</loc>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<structureType>"
+				+structureType
+				+"</structureType>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<tsm>"
+				+tsm
+				+"</tsm>");
+		writeToXmlEnd(pw1, indent, id);
+	}
 }

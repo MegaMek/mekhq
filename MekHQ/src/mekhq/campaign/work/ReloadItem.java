@@ -21,11 +21,13 @@
 
 package mekhq.campaign.work;
 
+import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import megamek.common.AmmoType;
 import megamek.common.Mounted;
 import megamek.common.TargetRoll;
+import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
 import mekhq.campaign.Utilities;
 
@@ -34,8 +36,8 @@ import mekhq.campaign.Utilities;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class ReloadItem extends UnitWorkItem {
-
-    protected Mounted mounted;
+	private static final long serialVersionUID = 4011208324466306626L;
+	protected Mounted mounted;
     protected boolean swap;
     protected long munition;
     protected String ammoDesc;
@@ -146,4 +148,23 @@ public class ReloadItem extends UnitWorkItem {
         // TODO Ammo cost
         return 0;
     }
+
+	@Override
+	public void writeToXml(PrintWriter pw1, int indent, int id) {
+		writeToXmlBegin(pw1, indent, id);
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<ammoDesc>"
+				+ammoDesc
+				+"</ammoDesc>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<munition>"
+				+munition
+				+"</munition>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<swap>"
+				+swap
+				+"</swap>");
+		//TODO: Handle writing Mounted to XML
+		writeToXmlEnd(pw1, indent, id);
+	}
 }

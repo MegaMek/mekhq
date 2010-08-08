@@ -12,7 +12,11 @@ package mekhq;
  */
 public class PopupTextChoiceDialog extends javax.swing.JDialog {
 
-    /** Creates new form */
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 8376874926997734492L;
+	/** Creates new form */
     public PopupTextChoiceDialog(java.awt.Frame parent, boolean modal, String text) {
         super(parent, modal);
         initComponents();

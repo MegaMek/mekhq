@@ -21,9 +21,12 @@
 
 package mekhq.campaign.work;
 
+import java.io.PrintWriter;
+
 import megamek.common.IArmorState;
 import megamek.common.Tank;
 import megamek.common.VTOL;
+import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
 
 /**
@@ -31,8 +34,9 @@ import mekhq.campaign.Unit;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class VeeInternalRepair extends InternalRepair {
+	private static final long serialVersionUID = 3219123865702598798L;
 
-    public VeeInternalRepair(Unit unit, int i) {
+	public VeeInternalRepair(Unit unit, int i) {
         super(unit, i);
         this.time = 60;
         this.difficulty = 0;
@@ -69,4 +73,10 @@ public class VeeInternalRepair extends InternalRepair {
                 && ((VeeInternalRepair)task).getUnitId() == this.getUnitId()
                 && ((VeeInternalRepair)task).getLoc() == this.getLoc());
     }
+
+	@Override
+	public void writeToXml(PrintWriter pw1, int indent, int id) {
+		writeToXmlBegin(pw1, indent, id);
+		writeToXmlEnd(pw1, indent, id);
+	}
 }

@@ -21,8 +21,11 @@
 
 package mekhq.campaign.work;
 
+import java.io.PrintWriter;
+
 import megamek.common.CriticalSlot;
 import megamek.common.Mech;
+import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
 import mekhq.campaign.parts.MekLifeSupport;
 import mekhq.campaign.parts.Part;
@@ -32,8 +35,9 @@ import mekhq.campaign.parts.Part;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MekLifeSupportReplacement extends ReplacementItem {
+	private static final long serialVersionUID = 2868956239838192108L;
 
-    public MekLifeSupportReplacement(Unit unit) {
+	public MekLifeSupportReplacement(Unit unit) {
         super(unit);
         this.name = "Replace life support";
         this.time = 180;
@@ -73,4 +77,9 @@ public class MekLifeSupportReplacement extends ReplacementItem {
         return new MekLifeSupportSalvage(unit);
     }
 
+	@Override
+	public void writeToXml(PrintWriter pw1, int indent, int id) {
+		writeToXmlBegin(pw1, indent, id);
+		writeToXmlEnd(pw1, indent, id);
+	}
 }

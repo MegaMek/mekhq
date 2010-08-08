@@ -18,11 +18,6 @@ import java.util.GregorianCalendar;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JFormattedTextField;
-import javax.swing.JFormattedTextField.AbstractFormatter;
-import javax.swing.JFormattedTextField.AbstractFormatterFactory;
-import javax.swing.text.DefaultFormatter;
-import javax.swing.text.DefaultFormatterFactory;
-import javax.swing.text.NumberFormatter;
 import megamek.client.ui.swing.util.ImageFileFactory;
 import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Player;
@@ -36,8 +31,8 @@ import mekhq.campaign.Faction;
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class CampaignOptionsDialog extends javax.swing.JDialog {
-
-    private Campaign campaign;
+	private static final long serialVersionUID = 1935043247792962964L;
+	private Campaign campaign;
     private CampaignOptions options;
     private GregorianCalendar date;
     private SimpleDateFormat dateFormat;

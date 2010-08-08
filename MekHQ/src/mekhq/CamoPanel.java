@@ -21,8 +21,8 @@ import megamek.common.util.DirectoryItems;
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class CamoPanel extends javax.swing.JPanel {
-
-    private DirectoryItems camos;
+	private static final long serialVersionUID = -4106360800407452822L;
+	private DirectoryItems camos;
     
     /** Creates new form CamoPanel */
     public CamoPanel() {

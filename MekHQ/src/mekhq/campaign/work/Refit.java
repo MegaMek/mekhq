@@ -21,10 +21,11 @@
 
 package mekhq.campaign.work;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import megamek.common.Entity;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.RefitKit;
@@ -36,7 +37,12 @@ import mekhq.campaign.personnel.PilotPerson;
  */
 public abstract class Refit extends ReplacementItem {
 
-    Entity targetEntity;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 3378050549702162857L;
+
+	Entity targetEntity;
 
     public static final int REFIT_CLASS_A = 1;
     public static final int REFIT_CLASS_B = 2;
@@ -225,5 +231,30 @@ public abstract class Refit extends ReplacementItem {
         }
         return super.checkFixable();
     }
-    
+
+	protected void writeToXmlBegin(PrintWriter pw1, int indent, int id) {
+		super.writeToXmlBegin(pw1, indent, id);
+		//TODO: Handle writing Entity to XML
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<cost>"
+				+cost
+				+"</cost>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<minimumSite>"
+				+minimumSite
+				+"</minimumSite>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<refitClass>"
+				+refitClass
+				+"</refitClass>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<refitKitAvailability>"
+				+refitKitAvailability
+				+"</refitKitAvailability>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<refitKitAvailabilityMod>"
+				+refitKitAvailabilityMod
+				+"</refitKitAvailabilityMod>");
+	}
 }
+

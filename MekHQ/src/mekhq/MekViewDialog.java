@@ -14,7 +14,11 @@ import megamek.client.ui.swing.MechView;
  */
 public class MekViewDialog extends javax.swing.JDialog {
 
-    private MechView mview;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 5894364756899721545L;
+	private MechView mview;
     
     /** Creates new form MekViewDialog */
     public MekViewDialog(java.awt.Frame parent, boolean modal, MechView mv) {

@@ -21,7 +21,10 @@
 
 package mekhq.campaign.parts;
 
+import java.io.PrintWriter;
+
 import megamek.common.Mech;
+import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.work.MekGyroReplacement;
 import mekhq.campaign.work.ReplacementItem;
 
@@ -30,8 +33,8 @@ import mekhq.campaign.work.ReplacementItem;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MekGyro extends Part {
-
-    protected int type;
+	private static final long serialVersionUID = 3420475726506139139L;
+	protected int type;
     protected int walkMP;
 
     public int getType() {
@@ -91,4 +94,18 @@ public class MekGyro extends Part {
     public String getSaveString () {
         return getName() + ";" + getTonnage() + ";" + getType() + ";" + getWalkMP();
     }
+
+	@Override
+	public void writeToXml(PrintWriter pw1, int indent, int id) {
+		writeToXmlBegin(pw1, indent, id);
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<type>"
+				+type
+				+"</type>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<walkMP>"
+				+walkMP
+				+"</walkMP>");
+		writeToXmlEnd(pw1, indent, id);
+	}
 }

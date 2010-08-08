@@ -21,9 +21,12 @@
 
 package mekhq.campaign.work;
 
+import java.io.PrintWriter;
+
 import megamek.common.Aero;
 import megamek.common.EquipmentType;
 import megamek.common.Tank;
+import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
@@ -33,8 +36,8 @@ import mekhq.campaign.parts.Part;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class ArmorSalvage extends SalvageItem {
-
-    protected int loc;
+	private static final long serialVersionUID = -4501879446504072488L;
+	protected int loc;
     protected int amount;
     protected int type;
     protected boolean rear;
@@ -147,5 +150,26 @@ public class ArmorSalvage extends SalvageItem {
         unit.getEntity().setArmor(0, loc, rear);
     }
     
-    
+
+	@Override
+	public void writeToXml(PrintWriter pw1, int indent, int id) {
+		writeToXmlBegin(pw1, indent, id);
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<amount>"
+				+amount
+				+"</amount>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<loc>"
+				+loc
+				+"</loc>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<rear>"
+				+rear
+				+"</rear>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<type>"
+				+type
+				+"</type>");
+		writeToXmlEnd(pw1, indent, id);
+	}
 }

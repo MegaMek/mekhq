@@ -21,7 +21,11 @@ import mekhq.campaign.personnel.Person;
  */
 public class PersonInfo extends javax.swing.JPanel {
 
-    // keep track of portrait images
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 4433136616647946125L;
+	// keep track of portrait images
     private DirectoryItems portraits;
     
     /** Creates new form TaskInfo */

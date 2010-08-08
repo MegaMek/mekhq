@@ -21,6 +21,8 @@
 
 package mekhq.campaign.parts;
 
+import java.io.PrintWriter;
+
 import megamek.common.VTOL;
 import mekhq.campaign.work.ReplacementItem;
 import mekhq.campaign.work.RotorReplacement;
@@ -30,8 +32,9 @@ import mekhq.campaign.work.RotorReplacement;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class Rotor extends Part {
-    
-    public Rotor(boolean salvage, int tonnage) {
+	private static final long serialVersionUID = -3277611762625095964L;
+
+	public Rotor(boolean salvage, int tonnage) {
         super(salvage, tonnage);
         this.name = "VTOL Rotor" + " (" + getTonnage() + ")";
     }
@@ -50,5 +53,10 @@ public class Rotor extends Part {
                 && getStatus().equals(part.getStatus())
                 && getTonnage() == ((Rotor)part).getTonnage();
     }
-    
+
+	@Override
+	public void writeToXml(PrintWriter pw1, int indent, int id) {
+		writeToXmlBegin(pw1, indent, id);
+		writeToXmlEnd(pw1, indent, id);
+	}
 }

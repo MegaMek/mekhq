@@ -32,6 +32,10 @@ import megamek.common.util.DirectoryItems;
 public class PortraitChoiceDialog extends javax.swing.JDialog {
 
      /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
      * The categorized camo patterns.
      */
     private DirectoryItems portraits;
@@ -243,7 +247,11 @@ private void comboCategoriesItemStateChanged(java.awt.event.ItemEvent evt) {//GE
      */
     public class PortraitTableModel extends AbstractTableModel {
 
-        private String[] columnNames;
+        /**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+		private String[] columnNames;
         private String category;
         private ArrayList<String> names;
         private ArrayList<Image> images;
@@ -311,8 +319,9 @@ private void comboCategoriesItemStateChanged(java.awt.event.ItemEvent evt) {//GE
 
 
         public class Renderer extends PortraitPanel implements TableCellRenderer {
+			private static final long serialVersionUID = -6025788865509594987L;
 
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 Component c = this;
                 setOpaque(true);
                 String name = getValueAt(row, column).toString();

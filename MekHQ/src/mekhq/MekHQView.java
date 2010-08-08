@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -108,6 +109,24 @@ import org.jdesktop.application.TaskMonitor;
  */
 public class MekHQView extends FrameView {
 
+
+	class ExtFileFilter extends FileFilter {
+		private String useExt = null;
+		
+		public ExtFileFilter(String ext) {
+			useExt = ext;    	
+		}
+		
+	    @Override
+	    public boolean accept(File dir) {
+	        return ((dir.getName() != null) && dir.getName().endsWith(useExt));
+	    }
+
+	    @Override
+	    public String getDescription() {
+	        return "campaign file ("+useExt+")";
+	    }
+	}
 
     private Campaign campaign = new Campaign();
     private TaskTableModel taskModel = new TaskTableModel();
@@ -258,6 +277,8 @@ public class MekHQView extends FrameView {
         javax.swing.JMenu fileMenu = new javax.swing.JMenu();
         menuLoad = new javax.swing.JMenuItem();
         menuSave = new javax.swing.JMenuItem();
+        menuLoadXml = new javax.swing.JMenuItem();
+        menuSaveXml = new javax.swing.JMenuItem();
         menuOptions = new javax.swing.JMenuItem();
         javax.swing.JMenuItem exitMenuItem = new javax.swing.JMenuItem();
         menuManage = new javax.swing.JMenu();
@@ -782,6 +803,24 @@ public class MekHQView extends FrameView {
         });
         fileMenu.add(menuSave);
 
+        menuLoadXml.setText(resourceMap.getString("menuLoadXml.text")); // NOI18N
+        menuLoadXml.setName("menuLoadXml"); // NOI18N
+        menuLoadXml.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuLoadXmlActionPerformed(evt);
+            }
+        });
+        fileMenu.add(menuLoadXml);
+
+        menuSaveXml.setText(resourceMap.getString("menuSaveXml.text")); // NOI18N
+        menuSaveXml.setName("menuSaveXml"); // NOI18N
+        menuSaveXml.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuSaveXmlActionPerformed(evt);
+            }
+        });
+        fileMenu.add(menuSaveXml);
+
         menuOptions.setText(resourceMap.getString("menuOptions.text")); // NOI18N
         menuOptions.setName("menuOptions"); // NOI18N
         menuOptions.addActionListener(new java.awt.event.ActionListener() {
@@ -1093,76 +1132,102 @@ private void miHireDoctorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-
 }//GEN-LAST:event_miHireDoctorActionPerformed
 
 private void menuSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuSaveActionPerformed
-    JFileChooser saveCpgn = new JFileChooser(".");
-    saveCpgn.setDialogTitle("Save Campaign");
-    saveCpgn.setFileFilter(new FileFilter() {
-        @Override
-        public boolean accept(File dir) {
-            return ((dir.getName() != null) && dir.getName().endsWith(".cpn"));
-        }
+	MekHQApp.logMessage("Saving campaign...");
+    File file = selectSaveCampaignFile(".cpn");
 
-        @Override
-        public String getDescription() {
-            return "campaign file (*cpn)";
-        }
-    });
-    saveCpgn.setSelectedFile(new File(campaign.getName() + campaign.getShortDateAsString() + ".cpn")); //$NON-NLS-1$
-    int returnVal = saveCpgn.showSaveDialog(mainPanel);
-    if ((returnVal != JFileChooser.APPROVE_OPTION) || (saveCpgn.getSelectedFile() == null)) {
-       // I want a file, y'know!
-       return;
+    if (file == null) {
+        // I want a file, y'know!
+        return;
     }
-    File file = saveCpgn.getSelectedFile();
+
     FileOutputStream fos = null;
     ObjectOutputStream out = null;
+    
     try {
         fos = new FileOutputStream(file);
         out = new ObjectOutputStream(fos);
         out.writeObject(campaign);
         out.close();
+    	MekHQApp.logMessage("Campaign saved to "+file);
     } catch(IOException ex) {
-        ex.printStackTrace();
+    	MekHQApp.logError(ex);
     }
 }//GEN-LAST:event_menuSaveActionPerformed
 
-private void menuLoadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuLoadActionPerformed
-    JFileChooser loadCpgn = new JFileChooser(".");
-    loadCpgn.setDialogTitle("Load Campaign");
-    loadCpgn.setFileFilter(new FileFilter() {
-        @Override
-        public boolean accept(File dir) {
-            return ((dir.getName() != null) && dir.getName().endsWith(".cpn"));
-        }
+private void menuSaveXmlActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuSaveActionPerformed
+	MekHQApp.logMessage("Saving campaign...");
+	// Choose a file...
+    File file = selectSaveCampaignFile(".xml");
 
-        @Override
-        public String getDescription() {
-            return "campaign file (*cpn)";
-        }
-    });
-    int returnVal = loadCpgn.showOpenDialog(mainPanel);
-    if ((returnVal != JFileChooser.APPROVE_OPTION) || (loadCpgn.getSelectedFile() == null)) {
-       // I want a file, y'know!
-       return;
+    if (file == null) {
+        // I want a file, y'know!
+        return;
     }
-    File file = loadCpgn.getSelectedFile();
+
+	// Then save it out to that file.
+    FileOutputStream fos = null;
+    PrintWriter pw = null;
+    
+    try {
+    	fos = new FileOutputStream(file);
+    	pw = new PrintWriter(fos);
+    	campaign.writeToXml(pw);
+    	pw.flush();
+    	pw.close();
+    	fos.close();
+    	MekHQApp.logMessage("Campaign saved to "+file);
+    } catch (IOException ex) {
+    	MekHQApp.logError(ex);
+    }
+}
+
+private File selectSaveCampaignFile(String fileExt) {
+	JFileChooser saveCpgn = new JFileChooser(".");
+    saveCpgn.setDialogTitle("Save Campaign");
+    saveCpgn.setFileFilter(new ExtFileFilter(fileExt));
+    saveCpgn.setSelectedFile(new File(campaign.getName() + campaign.getShortDateAsString() + fileExt)); //$NON-NLS-1$
+    int returnVal = saveCpgn.showSaveDialog(mainPanel);
+    
+    if ((returnVal != JFileChooser.APPROVE_OPTION) || (saveCpgn.getSelectedFile() == null)) {
+       // I want a file, y'know!
+       return null;
+    }
+
+    File file = saveCpgn.getSelectedFile();
+
+    return file;
+}
+
+private void menuLoadXmlActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuLoadActionPerformed
+	MekHQApp.logMessage("Loading campaign file from XML...");
+	
+	// First select the file...
+    File file = selectLoadCampaignFile(".xml");
+    
+    // And then load the campaign object from it.
     FileInputStream fis = null;
-    ObjectInputStream in = null;
+
     try {
         fis = new FileInputStream(file);
-        in = new ObjectInputStream(fis);
-        campaign = (Campaign)in.readObject();
+        Campaign tmpCampaign = Campaign.createCampaignFromFileInputStream(fis);
+        
+        if (tmpCampaign == null)
+        {
+        	// We're really expecting something here.
+        	// If we don't get it, fail out and do *not* replace the existing one.
+        	return;
+        }
+        
+        campaign = tmpCampaign;
 
-        // Restores all traansient attributes from serialized objects
+        // Restores all transient attributes from serialized objects
         campaign.restore();
-        in.close();
+        fis.close();
     }
-    catch(IOException ex) {
+    catch (Exception ex) {
         ex.printStackTrace();
     }
-    catch(ClassNotFoundException ex)
-    {
-        ex.printStackTrace();
-    }
+
     refreshUnitList();
     refreshTaskList();
     refreshTechsList();
@@ -1177,7 +1242,67 @@ private void menuLoadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
     Dimension size = getFrame().getSize();
     getFrame().pack();
     getFrame().setSize(size);
+    
+    MekHQApp.logMessage("Finished loading campaign!");
+}
+
+private void menuLoadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuLoadActionPerformed
+	MekHQApp.logMessage("Loading Campaign from binary...");
+	
+    File file = selectLoadCampaignFile(".cpn");
+    FileInputStream fis = null;
+    ObjectInputStream in = null;
+    
+    try {
+        fis = new FileInputStream(file);
+        in = new ObjectInputStream(fis);
+        campaign = (Campaign)in.readObject();
+
+        // Restores all transient attributes from serialized objects
+        campaign.restore();
+        in.close();
+    }
+    catch(IOException ex) {
+        ex.printStackTrace();
+    }
+    catch(ClassNotFoundException ex)
+    {
+        ex.printStackTrace();
+    }
+    
+    refreshUnitList();
+    refreshTaskList();
+    refreshTechsList();
+    refreshPersonnelList();
+    refreshDoctorsList();
+    refreshPartsList();
+    refreshCalendar();
+    refreshReport();
+    refreshFunds();
+
+    // Without this, the report scrollbar doesn't seem to load properly after loading a campaign
+    Dimension size = getFrame().getSize();
+    getFrame().pack();
+    getFrame().setSize(size);
+    
+    MekHQApp.logMessage("Finished loading campaign!");
 }//GEN-LAST:event_menuLoadActionPerformed
+
+private File selectLoadCampaignFile(String fileExt) {
+	JFileChooser loadCpgn = new JFileChooser(".");
+    loadCpgn.setDialogTitle("Load Campaign");
+    loadCpgn.setFileFilter(new ExtFileFilter(fileExt));
+    
+    int returnVal = loadCpgn.showOpenDialog(mainPanel);
+    
+    if ((returnVal != JFileChooser.APPROVE_OPTION) || (loadCpgn.getSelectedFile() == null)) {
+       // I want a file, y'know!
+       return null;
+    }
+    File file = loadCpgn.getSelectedFile();
+    
+	return file;
+}
 
 private void btnOvertimeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOvertimeActionPerformed
     campaign.setOvertime(btnOvertime.isSelected());
@@ -1328,7 +1453,7 @@ protected void loadListFile(boolean allowNewPilots) throws IOException {
 
         // Was there any error in parsing?
         if (parser.hasWarningMessage()) {
-            System.out.println(parser.getWarningMessage());
+            MekHQApp.logMessage(parser.getWarningMessage());
         }
 
         // Add the units from the file.
@@ -1485,7 +1610,7 @@ protected void refreshReport() {
 }
 
 protected void refreshFunds() {
-    int funds = campaign.getFunds();
+    long funds = campaign.getFunds();
     NumberFormat numberFormat = NumberFormat.getIntegerInstance();
     String text = numberFormat.format(funds) + " " + (funds!=0?"CBills":"CBill");
     fundsLabel.setText(text);
@@ -1536,8 +1661,8 @@ protected void updateTargetText() {
  * A table model for displaying work items
  */
 public abstract class ArrayTableModel extends AbstractTableModel {
-
-        protected String[] columnNames;
+	private static final long serialVersionUID = 9081706049165214129L;
+		protected String[] columnNames;
         protected ArrayList data;
 
         public int getRowCount() {
@@ -1575,8 +1700,10 @@ public abstract class ArrayTableModel extends AbstractTableModel {
  * A table model for displaying work items
  */
 public class TaskTableModel extends ArrayTableModel {
+	private static final long serialVersionUID = -6256038046416893994L;
 
-        public TaskTableModel() {
+
+		public TaskTableModel() {
             columnNames = new String[] {"Tasks"};
             data = new ArrayList<WorkItem>();
         }
@@ -1604,8 +1731,9 @@ public class TaskTableModel extends ArrayTableModel {
 
 
     public class Renderer extends TaskInfo implements TableCellRenderer {
+		private static final long serialVersionUID = -3052618135259621130L;
 
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             Component c = this;
             WorkItem task = getTaskAt(row);
             setOpaque(true);
@@ -1795,8 +1923,10 @@ public class TaskTableMouseAdapter extends MouseInputAdapter implements ActionLi
  * A table model for displaying units
  */
 public class MekTableModel extends ArrayTableModel {
+	private static final long serialVersionUID = 3314061779690077204L;
 
-    public MekTableModel() {
+
+	public MekTableModel() {
         columnNames = new String[] {"Units"};
         data = new ArrayList<Unit>();
     }
@@ -1824,8 +1954,9 @@ public class MekTableModel extends ArrayTableModel {
 
 
     public class Renderer extends MekInfo implements TableCellRenderer {
+		private static final long serialVersionUID = 6767431355690868748L;
 
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             Component c = this;
             Unit u = getUnitAt(row);
             setOpaque(true);
@@ -2271,8 +2402,9 @@ public class MekTableMouseAdapter extends MouseInputAdapter implements ActionLis
  * A table model for displaying work items
  */
 public class TechTableModel extends ArrayTableModel {
+	private static final long serialVersionUID = 2738333372316332962L;
 
-        public TechTableModel() {
+		public TechTableModel() {
             columnNames = new String[] {"Techs"};
             data = new ArrayList<TechTeam>();
         }
@@ -2291,8 +2423,9 @@ public class TechTableModel extends ArrayTableModel {
 
 
     public class Renderer extends TechInfo implements TableCellRenderer {
+		private static final long serialVersionUID = -4951696376098422679L;
 
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             Component c = this;
             setOpaque(true);
             setText(getValueAt(row, column).toString());
@@ -2313,8 +2446,10 @@ public class TechTableModel extends ArrayTableModel {
  * A table model for displaying personnel
  */
 public class PersonTableModel extends ArrayTableModel {
+	private static final long serialVersionUID = -1615929049408417297L;
 
-        public PersonTableModel() {
+
+		public PersonTableModel() {
             columnNames = new String[] {"Personnel"};
             data = new ArrayList<Person>();
         }
@@ -2341,8 +2476,9 @@ public class PersonTableModel extends ArrayTableModel {
 
 
     public class Renderer extends PersonInfo implements TableCellRenderer {
+		private static final long serialVersionUID = -406535109900807837L;
 
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             Component c = this;
             setOpaque(true);
             setText(getValueAt(row, column).toString());
@@ -2642,8 +2778,10 @@ public class PersonTableMouseAdapter extends MouseInputAdapter implements Action
  * A table model for displaying doctors
  */
 public class DocTableModel extends ArrayTableModel {
+	private static final long serialVersionUID = -6934834363013004894L;
 
-        public DocTableModel() {
+
+		public DocTableModel() {
             columnNames = new String[] {"Doctors"};
             data = new ArrayList<MedicalTeam>();
         }
@@ -2662,8 +2800,9 @@ public class DocTableModel extends ArrayTableModel {
 
 
     public class Renderer extends DoctorInfo implements TableCellRenderer {
+		private static final long serialVersionUID = -818080358678474607L;
 
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             Component c = this;
             setOpaque(true);
             setText(getValueAt(row, column).toString());
@@ -2684,8 +2823,10 @@ public class DocTableModel extends ArrayTableModel {
  * A table model for displaying parts
  */
 public class PartsTableModel extends ArrayTableModel {
+	private static final long serialVersionUID = 534443424190075264L;
 
-        public PartsTableModel() {
+
+		public PartsTableModel() {
             columnNames = new String[] {"Parts"};
             data = new ArrayList<PartInventory>();
         }
@@ -2715,8 +2856,9 @@ public class PartsTableModel extends ArrayTableModel {
 
 
     public class Renderer extends PartInfo implements TableCellRenderer {
+		private static final long serialVersionUID = -167722442590291248L;
 
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             Component c = this;
             setOpaque(true);
             setText(getValueAt(row, column).toString());
@@ -2825,10 +2967,12 @@ public class PartsTableMouseAdapter extends MouseInputAdapter implements ActionL
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JMenu menuHire;
     private javax.swing.JMenuItem menuLoad;
+    private javax.swing.JMenuItem menuLoadXml;
     private javax.swing.JMenu menuManage;
     private javax.swing.JMenu menuMarket;
     private javax.swing.JMenuItem menuOptions;
     private javax.swing.JMenuItem menuSave;
+    private javax.swing.JMenuItem menuSaveXml;
     private javax.swing.JMenuItem miHireDoctor;
     private javax.swing.JMenuItem miHirePilot;
     private javax.swing.JMenuItem miHireTech;

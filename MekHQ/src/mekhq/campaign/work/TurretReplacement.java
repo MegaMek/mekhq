@@ -30,8 +30,9 @@ import mekhq.campaign.parts.Turret;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class TurretReplacement extends LocationReplacement {
-    
-    public TurretReplacement(Unit unit, int i) {
+	private static final long serialVersionUID = -1023243731780275935L;
+
+	public TurretReplacement(Unit unit, int i) {
         super(unit, i);
         this.time = 160;
         this.difficulty = -1;

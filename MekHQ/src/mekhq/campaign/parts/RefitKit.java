@@ -21,6 +21,9 @@
 
 package mekhq.campaign.parts;
 
+import java.io.PrintWriter;
+
+import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.work.Refit;
 import mekhq.campaign.work.ReplacementItem;
 
@@ -29,7 +32,11 @@ import mekhq.campaign.work.ReplacementItem;
  * @author natit
  */
 public class RefitKit extends Part {
-    protected String sourceName;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 5712293563267818853L;
+	protected String sourceName;
     protected String targetName;
     
     public RefitKit (boolean salvage, int tonnage, String sourceName, String targetName, int cost) {
@@ -63,4 +70,18 @@ public class RefitKit extends Part {
             return false;
         }
     }
+
+	@Override
+	public void writeToXml(PrintWriter pw1, int indent, int id) {
+		writeToXmlBegin(pw1, indent, id);
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<sourceName>"
+				+sourceName
+				+"</sourceName>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<targetName>"
+				+targetName
+				+"</targetName>");
+		writeToXmlEnd(pw1, indent, id);
+	}
 }

@@ -21,6 +21,8 @@
 
 package mekhq.campaign.work;
 
+import java.io.PrintWriter;
+
 import megamek.common.CriticalSlot;
 import megamek.common.Mounted;
 import megamek.common.TargetRoll;
@@ -32,8 +34,8 @@ import mekhq.campaign.Unit;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class EquipmentRepair extends RepairItem {
-    
-    protected Mounted mounted;
+    private static final long serialVersionUID = -2354604328101928006L;
+	protected Mounted mounted;
     
     public EquipmentRepair(Unit unit, int h, Mounted m) {
         super(unit, h);
@@ -119,4 +121,11 @@ public class EquipmentRepair extends RepairItem {
         }
         return target;
     }
+
+	@Override
+	public void writeToXml(PrintWriter pw1, int indent, int id) {
+		writeToXmlBegin(pw1, indent, id);
+		//TODO: Handle writing Mounted to XML
+		writeToXmlEnd(pw1, indent, id);
+	}
 }

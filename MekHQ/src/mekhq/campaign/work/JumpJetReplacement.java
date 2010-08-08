@@ -29,8 +29,9 @@ import mekhq.campaign.Unit;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class JumpJetReplacement extends EquipmentReplacement {
+	private static final long serialVersionUID = -9019618835120187896L;
 
-    public JumpJetReplacement(Unit unit, Mounted m) {
+	public JumpJetReplacement(Unit unit, Mounted m) {
         super(unit, m);
         this.time = 60;
         this.difficulty = 0;

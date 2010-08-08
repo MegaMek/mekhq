@@ -21,16 +21,16 @@
 
 package mekhq.campaign.work;
 
+import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import megamek.common.AmmoType;
 import megamek.common.CriticalSlot;
-import megamek.common.Mech;
 import megamek.common.Mounted;
 import megamek.common.TargetRoll;
 import mekhq.CampaignOptionsDialog;
 import mekhq.MekHQApp;
-import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
 import org.jdesktop.application.Application;
 import org.jdesktop.application.ResourceMap;
@@ -40,8 +40,8 @@ import org.jdesktop.application.ResourceMap;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class FullRepairWarchest extends UnitWorkItem {
-
-    protected int cost;
+	private static final long serialVersionUID = -5105362085931672916L;
+	protected int cost;
 
     public int getCost() {
         return cost;
@@ -158,5 +158,14 @@ public class FullRepairWarchest extends UnitWorkItem {
         //this should never happen because it is automatic success so failure should never be called
         return "";
     }
-    
+
+	@Override
+	public void writeToXml(PrintWriter pw1, int indent, int id) {
+		writeToXmlBegin(pw1, indent, id);
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+ "<cost>"
+				+ cost
+				+ "</cost>");
+		writeToXmlEnd(pw1, indent, id);
+	}
 }

@@ -21,6 +21,8 @@
 
 package mekhq.campaign.work;
 
+import java.io.PrintWriter;
+
 import megamek.common.Entity;
 import mekhq.campaign.Unit;
 
@@ -29,8 +31,9 @@ import mekhq.campaign.Unit;
  * @author natit
  */
 public class MechRefit extends Refit {
+	private static final long serialVersionUID = -4232639020883684004L;
 
-    public MechRefit(Unit unit, Entity target, int baseTime, int refitClass, char refitKitAvailability, int refitKitAvailabilityMod, int cost) {
+	public MechRefit(Unit unit, Entity target, int baseTime, int refitClass, char refitKitAvailability, int refitKitAvailabilityMod, int cost) {
         super(unit, target, baseTime, refitClass, refitKitAvailability, refitKitAvailabilityMod, cost);
     }
 
@@ -40,5 +43,10 @@ public class MechRefit extends Refit {
                 && ((MechRefit) task).getUnitId() == this.getUnitId()
                 && ((MechRefit) task).getTargetEntity().getModel().equals(this.getTargetEntity().getModel()));
     }
-    
+
+	@Override
+	public void writeToXml(PrintWriter pw1, int indent, int id) {
+		writeToXmlBegin(pw1, indent, id);
+		writeToXmlEnd(pw1, indent, id);
+	}
 }

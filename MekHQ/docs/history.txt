@@ -18,6 +18,16 @@ v0.1.2 (SVN)
 + refresh respective views when hiring pilots and techs
 + removed "Store Time" option (no time machines!)
 + Techs can now begin a task on one day and finish it the next if they run out of time
++ Added one version of a random name generator
+	+ Name Gen class
+	+ Random names on "hire personnel" dialogs
+	+ First-pass resource files for first names, last names, and name patterns.
++ Added menu items and partial implementation of Save/Load to/from XML for campaign, in parallel to binary serialization.
+	+ Menu entries for save to/load from XML
+	+ Functions for saving Campaigns and most sub-objects to XML (Entity and Mounted currently outstanding)
+	+ Functions for loading Campaign and most sub-objects from XML (units, personnel, tasks, teams, parts, campaign options outstanding)
++ Added beginnings of a more flexible log framework handled through MekHQApp object.
++ Change "funds" var from int to long.  MAX_INT is only 4.3 billion or so, and there are DropShips that cost 1.6 billion...
 
 v0.1.1 (2009-09-29)
 + declare pilots KIA and retired

@@ -29,8 +29,9 @@ import mekhq.campaign.Unit;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class HeatSinkRepair extends EquipmentRepair {
-    
-    public HeatSinkRepair(Unit unit, int h, Mounted m) {
+	private static final long serialVersionUID = 7249524088844221097L;
+
+	public HeatSinkRepair(Unit unit, int h, Mounted m) {
         super(unit, h, m);
         this.time = 120;
         this.difficulty = -1;

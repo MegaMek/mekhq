@@ -21,7 +21,10 @@
 
 package mekhq.campaign.work;
 
+import java.io.PrintWriter;
+
 import megamek.common.Tank;
+import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
 
 /**
@@ -29,8 +32,8 @@ import mekhq.campaign.Unit;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class VeeStabiliserRepair extends RepairItem {
-
-    private int loc;
+	private static final long serialVersionUID = 8525489484301403718L;
+	private int loc;
     
     public VeeStabiliserRepair(Unit unit, int i) {
         super(unit, 1);
@@ -68,4 +71,13 @@ public class VeeStabiliserRepair extends RepairItem {
                 && ((VeeStabiliserRepair)task).getLoc() == this.getLoc());
     }
 
+	@Override
+	public void writeToXml(PrintWriter pw1, int indent, int id) {
+		writeToXmlBegin(pw1, indent, id);
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+ "<loc>"
+				+ loc
+				+ "</loc>");
+		writeToXmlEnd(pw1, indent, id);
+	}
 }

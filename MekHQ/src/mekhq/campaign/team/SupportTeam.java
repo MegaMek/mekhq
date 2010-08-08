@@ -21,11 +21,13 @@
 
 package mekhq.campaign.team;
 
-import components.AvailableCode;
-import components.abPlaceable;
 import mekhq.campaign.*;
+
+import java.io.PrintWriter;
 import java.io.Serializable;
-import java.util.Calendar;
+
+import org.w3c.dom.Node;
+
 import megamek.common.Compute;
 import megamek.common.TargetRoll;
 import mekhq.campaign.SSWLibHelper.AvailableCodeHelper;
@@ -44,9 +46,9 @@ import mekhq.campaign.work.WorkItem;
  * @author Taharqa
  * This is the code for a team (medical, technical, etc.)
  */
-public abstract class SupportTeam implements Serializable {
-
-    public static final int EXP_GREEN = 0;
+public abstract class SupportTeam implements Serializable, MekHqXmlSerializable {
+	private static final long serialVersionUID = 2842840638600274021L;
+	public static final int EXP_GREEN = 0;
     public static final int EXP_REGULAR = 1;
     public static final int EXP_VETERAN = 2;
     public static final int EXP_ELITE = 3;
@@ -459,5 +461,60 @@ public abstract class SupportTeam implements Serializable {
        }
        return report;
    }
-   
+
+	public abstract void writeToXml(PrintWriter pw1, int indent, int id);
+	
+	protected void writeToXmlBegin(PrintWriter pw1, int indent, int id) {
+		pw1.println(MekHqXmlUtil.indentStr(indent) + "<supportTeam id=\""
+				+id
+				+"\" type=\""
+				+this.getClass().getName()
+				+"\">");
+
+		// There is a campaign object on here...
+		// But instead of even trying to write it out, we'll deal with it in post-process on load.
+		// Recursive saves to what's effectively a parent object in the architecture isn't worth the trouble.  :)
+		
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<currentSize>"
+				+currentSize
+				+"</currentSize>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<fullSize>"
+				+fullSize
+				+"</fullSize>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<hours>"
+				+hours
+				+"</hours>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<id>"
+				+this.id
+				+"</id>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<minutesLeft>"
+				+minutesLeft
+				+"</minutesLeft>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<name>"
+				+name
+				+"</name>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<overtimeLeft>"
+				+overtimeLeft
+				+"</overtimeLeft>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<rating>"
+				+rating
+				+"</rating>");
+	}
+	
+	protected void writeToXmlEnd(PrintWriter pw1, int indent, int id) {
+		pw1.println(MekHqXmlUtil.indentStr(indent) + "</supportTeam>");
+	}
+
+	public static SupportTeam generateInstanceFromXML(Node wn2) {
+		// TODO: Implement for XML Serialization
+		return null;
+	}
 }

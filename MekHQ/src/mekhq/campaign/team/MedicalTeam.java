@@ -21,6 +21,8 @@
 
 package mekhq.campaign.team;
 
+import java.io.PrintWriter;
+
 import megamek.common.Compute;
 import mekhq.campaign.work.PersonnelWorkItem;
 import mekhq.campaign.work.WorkItem;
@@ -30,8 +32,9 @@ import mekhq.campaign.work.WorkItem;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MedicalTeam extends SupportTeam {
+	private static final long serialVersionUID = -1809295642059806908L;
 
-    public MedicalTeam(String name, int rating) {
+	public MedicalTeam(String name, int rating) {
         super(name, rating);
         this.fullSize = 5;
         this.currentSize = 5;
@@ -93,4 +96,10 @@ public class MedicalTeam extends SupportTeam {
         toReturn += "</font></html>";
         return toReturn;
    }
+
+	@Override
+	public void writeToXml(PrintWriter pw1, int indent, int id) {
+		writeToXmlBegin(pw1, indent, id);
+		writeToXmlEnd(pw1, indent, id);
+	}
 }

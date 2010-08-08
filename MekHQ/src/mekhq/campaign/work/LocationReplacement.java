@@ -21,73 +21,90 @@
 
 package mekhq.campaign.work;
 
+import java.io.PrintWriter;
+
 import megamek.common.CriticalSlot;
 import megamek.common.Mech;
+import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
 import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.Part;
 
 /**
- *
+ * 
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class LocationReplacement extends ReplacementItem {
+	private static final long serialVersionUID = -7220042668917924970L;
+	protected int loc;
 
-    protected int loc;
-    
-    public LocationReplacement(Unit unit, int i) {
-        super(unit);
-        this.name = "Replace " + unit.getEntity().getLocationName(i);
-        this.time = 240;
-        this.difficulty = 3;
-        this.loc = i;
-    }
-    
-    @Override
-    public void fix() {
-        super.fix();
-        unit.getEntity().setInternal(unit.getEntity().getOInternal(loc), loc);
-        //repair any hips or shoulders
-        if(unit.getEntity() instanceof Mech) {
-            unit.getEntity().removeCriticals(loc, new CriticalSlot(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_HIP));
-            unit.getEntity().removeCriticals(loc, new CriticalSlot(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_SHOULDER));
-        }
-    }
-    
-    public int getLoc() {
-        return loc;
-    }
-    
-    @Override
-    public String checkFixable() {
-        if(unit.getEntity() instanceof Mech) {
-            //cant replace appendages when corresponding torso is gone
-            if(loc == Mech.LOC_LARM && unit.getEntity().isLocationBad(Mech.LOC_LT)) {
-                return "must replace left torso first";
-            } 
-            else if(loc == Mech.LOC_RARM && unit.getEntity().isLocationBad(Mech.LOC_RT)) {
-                return "must replace right torso first";
-            } 
-        }
-        return super.checkFixable();
-    }
+	public LocationReplacement(Unit unit, int i) {
+		super(unit);
+		this.name = "Replace " + unit.getEntity().getLocationName(i);
+		this.time = 240;
+		this.difficulty = 3;
+		this.loc = i;
+	}
 
-    @Override
-    public boolean sameAs(WorkItem task) {
-        return (task instanceof LocationReplacement
-                && ((LocationReplacement)task).getUnitId() == this.getUnitId()
-                && ((LocationReplacement)task).getLoc() == this.getLoc());
-    }
+	@Override
+	public void fix() {
+		super.fix();
+		unit.getEntity().setInternal(unit.getEntity().getOInternal(loc), loc);
+		// repair any hips or shoulders
+		if (unit.getEntity() instanceof Mech) {
+			unit.getEntity().removeCriticals(
+					loc,
+					new CriticalSlot(CriticalSlot.TYPE_SYSTEM,
+							Mech.ACTUATOR_HIP));
+			unit.getEntity().removeCriticals(
+					loc,
+					new CriticalSlot(CriticalSlot.TYPE_SYSTEM,
+							Mech.ACTUATOR_SHOULDER));
+		}
+	}
 
-    @Override
-    public Part stratopsPartNeeded() {
-        return new MekLocation(false, loc, (int) unit.getEntity().getWeight(), unit.getEntity().getStructureType(), unit.hasTSM());
-    }
+	public int getLoc() {
+		return loc;
+	}
 
-    @Override
-    public SalvageItem getSalvage() {
-        return new LocationSalvage(unit, loc);
-    }
+	@Override
+	public String checkFixable() {
+		if (unit.getEntity() instanceof Mech) {
+			// cant replace appendages when corresponding torso is gone
+			if (loc == Mech.LOC_LARM
+					&& unit.getEntity().isLocationBad(Mech.LOC_LT)) {
+				return "must replace left torso first";
+			} else if (loc == Mech.LOC_RARM
+					&& unit.getEntity().isLocationBad(Mech.LOC_RT)) {
+				return "must replace right torso first";
+			}
+		}
+		return super.checkFixable();
+	}
 
-    
+	@Override
+	public boolean sameAs(WorkItem task) {
+		return (task instanceof LocationReplacement
+				&& ((LocationReplacement) task).getUnitId() == this.getUnitId() && ((LocationReplacement) task)
+				.getLoc() == this.getLoc());
+	}
+
+	@Override
+	public Part stratopsPartNeeded() {
+		return new MekLocation(false, loc, (int) unit.getEntity().getWeight(),
+				unit.getEntity().getStructureType(), unit.hasTSM());
+	}
+
+	@Override
+	public SalvageItem getSalvage() {
+		return new LocationSalvage(unit, loc);
+	}
+
+	@Override
+	public void writeToXml(PrintWriter pw1, int indent, int id) {
+		writeToXmlBegin(pw1, indent, id);
+		pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<loc>" + loc
+				+ "</loc>");
+		writeToXmlEnd(pw1, indent, id);
+	}
 }

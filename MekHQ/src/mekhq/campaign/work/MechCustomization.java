@@ -21,7 +21,10 @@
 
 package mekhq.campaign.work;
 
+import java.io.PrintWriter;
+
 import megamek.common.Entity;
+import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
 
 /**
@@ -29,8 +32,9 @@ import mekhq.campaign.Unit;
  * @author natit
  */
 public class MechCustomization extends Customization {
+	private static final long serialVersionUID = 6874258058034113524L;
 
-    public MechCustomization(Unit unit, Entity target, int baseTime, int refitClass) {
+	public MechCustomization(Unit unit, Entity target, int baseTime, int refitClass) {
         super(unit, target, baseTime, refitClass);
     }    
 
@@ -40,5 +44,10 @@ public class MechCustomization extends Customization {
                 && ((Customization) task).getUnitId() == this.getUnitId()
                 && ((Customization) task).getTargetEntity().getModel().equals(this.getTargetEntity().getModel()));
     }
-    
+
+	@Override
+	public void writeToXml(PrintWriter pw1, int indent, int id) {
+		writeToXmlBegin(pw1, indent, id);
+		writeToXmlEnd(pw1, indent, id);
+	}
 }

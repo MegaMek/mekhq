@@ -15,8 +15,9 @@ import javax.swing.ImageIcon;
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class TechInfo extends javax.swing.JPanel {
+	private static final long serialVersionUID = 1476934068426009147L;
 
-    /** Creates new form TaskInfo */
+	/** Creates new form TaskInfo */
     public TechInfo() {
         initComponents();
     }

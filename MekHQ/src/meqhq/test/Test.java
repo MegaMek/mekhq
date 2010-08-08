@@ -159,8 +159,8 @@ public class Test {
                     if (testPart) {
                         ArrayList<String> sswNames = part.getPotentialSSWNames(Faction.F_COMSTAR);
 
-                        EquipmentFactory sswEquipmentFactory = campaign.getSswEquipmentFactory();
-                        components.Mech sswMech = campaign.getSswMech();
+                        EquipmentFactory sswEquipmentFactory = Campaign.getSswEquipmentFactory();
+                        components.Mech sswMech = Campaign.getSswMech();
 
                         abPlaceable placeable = null;
                         for (String sswName : sswNames) {

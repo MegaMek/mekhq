@@ -21,15 +21,21 @@
 
 package mekhq.campaign;
 
+import java.io.PrintWriter;
 import java.io.Serializable;
+
+import mekhq.MekHQApp;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  *
  * @author natit
  */
 public class CampaignOptions implements Serializable {
-
-    public final static int REPAIR_SYSTEM_STRATOPS = 0;
+	private static final long serialVersionUID = 5698008431749303602L;
+	public final static int REPAIR_SYSTEM_STRATOPS = 0;
     public final static int REPAIR_SYSTEM_WARCHEST_CUSTOM = 1;
     public final static int REPAIR_SYSTEM_GENERIC_PARTS = 2;
     //FIXME: This needs to be localized
@@ -92,4 +98,60 @@ public class CampaignOptions implements Serializable {
     public void setFinances(boolean b) {
         this.useFinances = b;
     }
+
+	public void writeToXml(PrintWriter pw1, int indent) {
+		pw1.println(MekHqXmlUtil.indentStr(indent) + "<campaignOptions>");
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useFactionModifiers", useFactionModifiers); //private boolean useFactionModifiers;
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "clanPriceModifier", clanPriceModifier); //private double clanPriceModifier;
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useEasierRefit", useEasierRefit); //private boolean useEasierRefit;
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useFinances", useFinances); //private boolean useFinances;
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "repairSystem", repairSystem); //private int repairSystem;
+		pw1.println(MekHqXmlUtil.indentStr(indent) + "</campaignOptions>");
+	}
+
+	public static CampaignOptions generateCampaignOptionsFromXml(Node wn) {
+		MekHQApp.logMessage("Loading Campaign Options from XML...", 4);
+
+		wn.normalize();
+		CampaignOptions retVal = new CampaignOptions();
+		NodeList wList = wn.getChildNodes();
+
+		// Okay, lets iterate through the children, eh?
+		for (int x = 0; x < wList.getLength(); x++) {
+			Node wn2 = wList.item(x);
+
+			// If it's not an element node, we ignore it.
+			if (wn2.getNodeType() != Node.ELEMENT_NODE)
+				continue;
+			
+			MekHQApp.logMessage("---",5);
+			MekHQApp.logMessage(wn2.getNodeName(),5);
+			MekHQApp.logMessage("\t"+wn2.getTextContent(),5);
+
+			if (wn2.getNodeName().equalsIgnoreCase("useFactionModifiers")) {
+				if (wn2.getTextContent().equalsIgnoreCase("true"))
+					retVal.useFactionModifiers = true;
+				else
+					retVal.useFactionModifiers = false;
+			} else if (wn2.getNodeName().equalsIgnoreCase("clanPriceModifier")) {
+				retVal.clanPriceModifier = Double.parseDouble(wn2.getTextContent());
+			} else if (wn2.getNodeName().equalsIgnoreCase("useEasierRefit")) {
+				if (wn2.getTextContent().equalsIgnoreCase("true"))
+					retVal.useEasierRefit = true;
+				else
+					retVal.useEasierRefit = false;
+			} else if (wn2.getNodeName().equalsIgnoreCase("useFinances")) {
+				if (wn2.getTextContent().equalsIgnoreCase("true"))
+					retVal.useFinances = true;
+				else
+					retVal.useFinances = false;
+			} else if (wn2.getNodeName().equalsIgnoreCase("repairSystem")) {
+				retVal.repairSystem = Integer.parseInt(wn2.getTextContent());
+			}
+		}
+
+		MekHQApp.logMessage("Load Campaign Options Complete!", 4);
+
+		return retVal;
+	}
 }

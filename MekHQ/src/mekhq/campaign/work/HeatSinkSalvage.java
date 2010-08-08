@@ -29,8 +29,9 @@ import mekhq.campaign.Unit;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class HeatSinkSalvage extends EquipmentSalvage {
+	private static final long serialVersionUID = 6038368573767322304L;
 
-    public HeatSinkSalvage(Unit u, Mounted m) {
+	public HeatSinkSalvage(Unit u, Mounted m) {
         super(u, m);
         this.time = 90;
         this.difficulty = -2;

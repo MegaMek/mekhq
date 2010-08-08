@@ -22,6 +22,8 @@
 package mekhq.campaign.parts;
 
 import components.abPlaceable;
+
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import megamek.common.AmmoType;
 import megamek.common.Entity;
@@ -30,8 +32,8 @@ import megamek.common.MiscType;
 import megamek.common.TechConstants;
 import megamek.common.weapons.Weapon;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.Faction;
+import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.SSWLibHelper;
 import mekhq.campaign.Unit;
 import mekhq.campaign.work.EquipmentReplacement;
@@ -42,8 +44,9 @@ import mekhq.campaign.work.ReplacementItem;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class EquipmentPart extends Part {
+	private static final long serialVersionUID = 2892728320891712304L;
 
-    //crap equipmenttype is not serialized!
+	//crap equipmenttype is not serialized!
     protected transient EquipmentType type;
 
     protected String typeName;
@@ -340,5 +343,16 @@ public class EquipmentPart extends Part {
                     + ";" + getTypeName()
                     + ";" + getCost();
     }
-    
+
+	@Override
+	public void writeToXml(PrintWriter pw1, int indent, int id) {
+		writeToXmlBegin(pw1, indent, id);
+		// We should be able to regenerate the EquipmentType from its name,
+		// using the "restore()" function.
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<typeName>"
+				+(typeName==null?type.getName():typeName)
+				+"</typeName>");
+		writeToXmlEnd(pw1, indent, id);
+	}
 }

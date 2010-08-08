@@ -30,8 +30,8 @@ import megamek.common.util.DirectoryItems;
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class CamoChoiceDialog extends javax.swing.JDialog {
-
-     /**
+	private static final long serialVersionUID = -6482869865801093811L;
+	/**
      * The categorized camo patterns.
      */
     private DirectoryItems camos;
@@ -261,8 +261,8 @@ private void comboCategoriesItemStateChanged(java.awt.event.ItemEvent evt) {//GE
         * A table model for displaying camos
      */
     public class CamoTableModel extends AbstractTableModel {
-
-        private String[] columnNames;
+		private static final long serialVersionUID = 6335604397167681830L;
+		private String[] columnNames;
         private String category;
         private ArrayList<String> names;
         private ArrayList<Image> images;
@@ -330,8 +330,9 @@ private void comboCategoriesItemStateChanged(java.awt.event.ItemEvent evt) {//GE
 
 
         public class Renderer extends CamoPanel implements TableCellRenderer {
+			private static final long serialVersionUID = -7106605749246434963L;
 
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 Component c = this;
                 setOpaque(true);
                 String name = getValueAt(row, column).toString();

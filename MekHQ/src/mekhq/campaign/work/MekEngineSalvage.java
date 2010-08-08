@@ -21,6 +21,8 @@
 
 package mekhq.campaign.work;
 
+import java.io.PrintWriter;
+
 import megamek.common.CriticalSlot;
 import megamek.common.Mech;
 import mekhq.campaign.Unit;
@@ -32,8 +34,9 @@ import mekhq.campaign.parts.Part;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MekEngineSalvage extends SalvageItem {
+	private static final long serialVersionUID = 6602934418836574088L;
 
-    public MekEngineSalvage(Unit unit) {
+	public MekEngineSalvage(Unit unit) {
         super(unit);
         this.name = "Salvage Engine";
         this.time = 360;
@@ -67,4 +70,9 @@ public class MekEngineSalvage extends SalvageItem {
         unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE);
     }
 
+	@Override
+	public void writeToXml(PrintWriter pw1, int indent, int id) {
+		writeToXmlBegin(pw1, indent, id);
+		writeToXmlEnd(pw1, indent, id);
+	}
 }

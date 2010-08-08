@@ -21,6 +21,8 @@
 
 package mekhq.campaign.work;
 
+import java.io.PrintWriter;
+
 import megamek.common.CriticalSlot;
 import megamek.common.Mech;
 import mekhq.campaign.Unit;
@@ -32,8 +34,9 @@ import mekhq.campaign.parts.Part;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MekSensorSalvage extends SalvageItem {
+	private static final long serialVersionUID = 4153384193348852187L;
 
-    public MekSensorSalvage(Unit unit) {
+	public MekSensorSalvage(Unit unit) {
                 super(unit);
         this.name = "Salvage Sensors";
         this.time = 180;
@@ -60,4 +63,10 @@ public class MekSensorSalvage extends SalvageItem {
     public void removePart() {
         unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS);
     }
+
+	@Override
+	public void writeToXml(PrintWriter pw1, int indent, int id) {
+		writeToXmlBegin(pw1, indent, id);
+		writeToXmlEnd(pw1, indent, id);
+	}
 }

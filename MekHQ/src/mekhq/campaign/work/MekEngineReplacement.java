@@ -21,10 +21,13 @@
 
 package mekhq.campaign.work;
 
+import java.io.PrintWriter;
+
 import megamek.common.CriticalSlot;
 import megamek.common.Mech;
 import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
+import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
 import mekhq.campaign.parts.MekEngine;
 import mekhq.campaign.parts.Part;
@@ -34,8 +37,9 @@ import mekhq.campaign.parts.Part;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MekEngineReplacement extends ReplacementItem {
+	private static final long serialVersionUID = 7428367513325099208L;
 
-    public MekEngineReplacement(Unit unit) {
+	public MekEngineReplacement(Unit unit) {
         super(unit);
         this.name = "Replace Engine";
         this.time = 360;
@@ -84,5 +88,10 @@ public class MekEngineReplacement extends ReplacementItem {
     public SalvageItem getSalvage() {
         return new MekEngineSalvage(unit);
     }
-    
+
+	@Override
+	public void writeToXml(PrintWriter pw1, int indent, int id) {
+		writeToXmlBegin(pw1, indent, id);
+		writeToXmlEnd(pw1, indent, id);
+	}
 }

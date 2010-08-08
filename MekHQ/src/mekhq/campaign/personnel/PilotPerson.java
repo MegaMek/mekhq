@@ -22,6 +22,7 @@
 package mekhq.campaign.personnel;
 
 import java.io.File;
+import java.io.PrintWriter;
 import java.util.Enumeration;
 import megamek.common.Aero;
 import megamek.common.BattleArmor;
@@ -33,6 +34,7 @@ import megamek.common.Tank;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
 import mekhq.campaign.work.HealPilot;
 
@@ -42,7 +44,11 @@ import mekhq.campaign.work.HealPilot;
  */
 public class PilotPerson extends Person {
 
-    public static final int T_MECH = 0;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -4758195062070601267L;
+	public static final int T_MECH = 0;
     public static final int T_VEE = 1;
     public static final int T_AERO = 2;
     public static final int T_PROTO = 3;
@@ -52,6 +58,7 @@ public class PilotPerson extends Person {
     private Pilot pilot;
     private int type;
     private Unit unit;
+    private int unitId;
     
     public PilotPerson(Pilot p, int t) {
         super();
@@ -256,4 +263,59 @@ public class PilotPerson extends Person {
         super.setPortraitFileName(s);
         pilot.setPortraitFileName(s);
     }
+
+	@Override
+	public void writeToXml(PrintWriter pw1, int indent, int id) {
+		writeToXmlBegin(pw1, indent, id);
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<type>"
+				+type
+				+"</type>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<unitId>"
+				+unit.getId()
+				+"</unitId>");
+		
+		// Pilot is a megamek class with no XML serialization support.
+		// But there's a constructor for building them...
+		// Plus a bunch of "set" functions...
+		//TODO: Are any other items on Pilot important for XML serialization?
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<pilotName>"
+				+pilot.getName()
+				+"</pilotName>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<pilotGunnery>"
+				+pilot.getGunnery()
+				+"</pilotGunnery>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<pilotPiloting>"
+				+pilot.getPiloting()
+				+"</pilotPiloting>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<pilotHits>"
+				+pilot.getHits()
+				+"</pilotHits>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<pilotCommandBonus>"
+				+pilot.getCommandBonus()
+				+"</pilotCommandBonus>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<pilotInitBonus>"
+				+pilot.getInitBonus()
+				+"</pilotInitBonus>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<pilotNickname>"
+				+pilot.getNickname()
+				+"</pilotNickname>");
+		writeToXmlEnd(pw1, indent, id);
+	}
+
+	public int getUnitIt() {
+		return unitId;
+	}
+	
+	public void setUnit(Unit nt) {
+		unit = nt;
+	}
 }

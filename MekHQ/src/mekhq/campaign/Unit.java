@@ -21,23 +21,20 @@
 
 package mekhq.campaign;
 
+import java.io.PrintWriter;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.w3c.dom.Node;
+
 import megamek.common.AmmoType;
 import megamek.common.CriticalSlot;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
 import megamek.common.Mech;
-import megamek.common.MechFileParser;
-import megamek.common.MechSummary;
-import megamek.common.MechSummaryCache;
 import megamek.common.MiscType;
 import megamek.common.Mounted;
 import megamek.common.Protomech;
@@ -46,25 +43,20 @@ import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
 import megamek.common.VTOL;
 import megamek.common.WeaponType;
-import megamek.common.loaders.EntityLoadingException;
-import mekhq.MekHQApp;
 import mekhq.campaign.SSWLibHelper.AvailableCodeHelper;
 import mekhq.campaign.parts.GenericSparePart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.PilotPerson;
-import mekhq.campaign.team.SupportTeam;
 import mekhq.campaign.work.*;
-import org.jdesktop.application.Application;
-import org.jdesktop.application.ResourceMap;
 
 /**
  * This is a wrapper class for entity, so that we can add some 
  * functionality to it
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class Unit implements Serializable {
-
-    public static final int SITE_FIELD = 0;
+public class Unit implements Serializable, MekHqXmlSerializable {
+	private static final long serialVersionUID = 4079817548868582600L;
+	public static final int SITE_FIELD = 0;
     public static final int SITE_MOBILE_BASE = 1;
     public static final int SITE_BAY = 2;
     public static final int SITE_FACILITY = 3;
@@ -80,6 +72,7 @@ public class Unit implements Serializable {
     private int site;
     private boolean deployed;
     private PilotPerson pilot;
+    private int pilotId = -1;
     private boolean salvaged;
     private boolean customized;
     
@@ -105,6 +98,14 @@ public class Unit implements Serializable {
     
     public int getId() {
         return getEntity().getId();
+    }
+    
+    public void setPilotId(int inId) {
+    	pilotId = inId;
+    }
+    
+    public int getPilotId() {
+    	return pilotId;
     }
     
     public int getSite() {
@@ -1595,4 +1596,24 @@ public class Unit implements Serializable {
 
         return cost;
     }
+
+	public void writeToXml(PrintWriter pw1, int indent, int id) {
+		pw1.println(MekHqXmlUtil.indentStr(indent) + "<unit id=\""+id+"\">");
+
+		//TODO: Handle writing Entity to XML
+		//pw1.println(MekHqXmlUtil.indentStr(indent+1) + "<entity>"+"</entity>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1) + "<entity>"+(entity == null? "null": "notNull")+"</entity>");
+		
+		pw1.println(MekHqXmlUtil.indentStr(indent+1) + "<customized>"+deployed+"</customized>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1) + "<deployed>"+deployed+"</deployed>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1) + "<pilotId>"+pilot.getId()+"</pilotId>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1) + "<salvaged>"+salvaged+"</salvaged>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1) + "<site>"+site+"</site>");
+		pw1.println(MekHqXmlUtil.indentStr(indent) + "</unit>");
+	}
+
+	public static Unit generateInstanceFromXML(Node wn2) {
+		// TODO: Implement for XML Serialization
+		return null;
+	}
 }

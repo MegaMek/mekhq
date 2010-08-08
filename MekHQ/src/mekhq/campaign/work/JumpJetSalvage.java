@@ -29,8 +29,9 @@ import mekhq.campaign.Unit;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class JumpJetSalvage extends EquipmentSalvage {
+	private static final long serialVersionUID = -1141310703281562285L;
 
-    public JumpJetSalvage(Unit u, Mounted m) {
+	public JumpJetSalvage(Unit u, Mounted m) {
         super(u, m);
         this.time = 60;
         this.difficulty = 0;

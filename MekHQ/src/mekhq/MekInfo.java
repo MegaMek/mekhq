@@ -29,8 +29,8 @@ import mekhq.campaign.Unit;
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MekInfo extends JPanel {
-    
-    protected static MechTileset mt;
+	private static final long serialVersionUID = -2466749732550191489L;
+	protected static MechTileset mt;
     private DirectoryItems camos;
     
     /** Creates new form MekInfo */
@@ -95,6 +95,7 @@ public class MekInfo extends JPanel {
             try {
                 mt.loadFromFile("mechset.txt");
             } catch (IOException ex) {
+            	MekHQApp.logError(ex);
                 //TODO: do something here
             }
         }// end if(null tileset)

@@ -21,9 +21,11 @@
 
 package mekhq.campaign.parts;
 
+import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import megamek.common.TechConstants;
+import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.work.ReplacementItem;
 
 /**
@@ -31,8 +33,9 @@ import mekhq.campaign.work.ReplacementItem;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class GenericSparePart extends Part {
+	private static final long serialVersionUID = 1835336863342932900L;
 
-    public static int UNITARY_COST = 1;
+	public static int UNITARY_COST = 1;
 
     protected int tech;
     protected int amount;
@@ -103,5 +106,18 @@ public class GenericSparePart extends Part {
         String text = numberFormat.format(getAmount()) + " " + (getAmount()!=0?"Parts":"Part");
         return text;
     }
-    
+
+	@Override
+	public void writeToXml(PrintWriter pw1, int indent, int id) {
+		writeToXmlBegin(pw1, indent, id);
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<amount>"
+				+amount
+				+"</amount>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<tech>"
+				+tech
+				+"</tech>");
+		writeToXmlEnd(pw1, indent, id);
+	}
 }

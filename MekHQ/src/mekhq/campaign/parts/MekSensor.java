@@ -21,6 +21,8 @@
 
 package mekhq.campaign.parts;
 
+import java.io.PrintWriter;
+
 import mekhq.campaign.work.MekSensorReplacement;
 import mekhq.campaign.work.ReplacementItem;
 
@@ -29,8 +31,9 @@ import mekhq.campaign.work.ReplacementItem;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MekSensor extends Part {
+	private static final long serialVersionUID = 931907976883324097L;
 
-     public MekSensor(boolean salvage, int tonnage) {
+	public MekSensor(boolean salvage, int tonnage) {
         super(salvage, tonnage);
         this.name = "Mech Sensors";
         this.cost = getTonnage() * 2000;
@@ -52,5 +55,10 @@ public class MekSensor extends Part {
     public int getPartType() {
         return PART_TYPE_MEK_SENSOR;
     }
-    
+
+	@Override
+	public void writeToXml(PrintWriter pw1, int indent, int id) {
+		writeToXmlBegin(pw1, indent, id);
+		writeToXmlEnd(pw1, indent, id);
+	}
 }

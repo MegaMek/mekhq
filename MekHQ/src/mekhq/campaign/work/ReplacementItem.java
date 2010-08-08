@@ -21,8 +21,11 @@
 
 package mekhq.campaign.work;
 
+import java.io.PrintWriter;
+
 import megamek.common.TargetRoll;
 import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
 import mekhq.campaign.parts.GenericSparePart;
 import mekhq.campaign.parts.Part;
@@ -33,9 +36,10 @@ import mekhq.campaign.team.SupportTeam;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public abstract class ReplacementItem extends UnitWorkItem {
-
-    protected Part part;
+	private static final long serialVersionUID = -3241463995328584963L;
+	protected Part part;
     protected boolean partCheck;
+    protected int partId = -1; // Used for XML Serialization.
     
     public ReplacementItem(Unit unit) {
         super(unit);
@@ -203,4 +207,26 @@ public abstract class ReplacementItem extends UnitWorkItem {
         */
         return super.checkFixable();
     }
+
+	protected void writeToXmlBegin(PrintWriter pw1, int indent, int id) {
+		super.writeToXmlBegin(pw1, indent, id);
+		
+		// The part may not be defined.
+		// If it isn't, well, we can't save it.
+		if (part != null) {
+			pw1.println(MekHqXmlUtil.indentStr(indent+1)
+					+"<partId>"
+					+part.getId()
+					+"</partId>");
+		}
+		
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<partCheck>"
+				+partCheck
+				+"</partCheck>");
+	}
+
+	public int getPartId() {
+		return partId;
+	}
 }

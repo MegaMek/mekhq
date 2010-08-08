@@ -21,8 +21,11 @@
 
 package mekhq.campaign.work;
 
+import java.io.PrintWriter;
+
 import megamek.common.CriticalSlot;
 import megamek.common.Mech;
+import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
 
 /**
@@ -30,8 +33,8 @@ import mekhq.campaign.Unit;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class MekActuatorRepair extends RepairItem {
-    
-    protected int loc;
+	private static final long serialVersionUID = -3060594760170107991L;
+	protected int loc;
     protected int type;
     
     public MekActuatorRepair(Unit unit, int h, int i, int t) {
@@ -88,4 +91,17 @@ public class MekActuatorRepair extends RepairItem {
                 && ((MekActuatorRepair)task).getType() == this.getType());
     }
 
+	@Override
+	public void writeToXml(PrintWriter pw1, int indent, int id) {
+		writeToXmlBegin(pw1, indent, id);
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+ "<loc>"
+				+ loc
+				+ "</loc>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+ "<type>"
+				+ type
+				+ "</type>");
+		writeToXmlEnd(pw1, indent, id);
+	}
 }

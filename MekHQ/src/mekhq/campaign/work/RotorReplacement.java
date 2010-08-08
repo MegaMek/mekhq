@@ -30,8 +30,9 @@ import mekhq.campaign.parts.Rotor;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class RotorReplacement extends LocationReplacement {
+	private static final long serialVersionUID = -5128493044282234821L;
 
-    public RotorReplacement(Unit unit, int i) {
+	public RotorReplacement(Unit unit, int i) {
         super(unit, i);
         this.time = 300;
         this.difficulty = 0;
