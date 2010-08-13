@@ -23,6 +23,8 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import org.w3c.dom.Node;
+
 import mekhq.campaign.work.ReplacementItem;
 
 /**
@@ -32,10 +34,20 @@ import mekhq.campaign.work.ReplacementItem;
 public class VeeStabiliser extends Part {
 	private static final long serialVersionUID = 6708245721569856817L;
 
+	public VeeStabiliser() {
+		this(false, 0);
+	}
+	
 	public VeeStabiliser(boolean salvage, int tonnage) {
         super(salvage, tonnage);
         this.name = "Vehicle Stabiliser";
+        reCalc();
     }
+	
+	@Override
+	public void reCalc() {
+		// Do nothing.
+	}
     
     @Override
     public boolean canBeUsedBy(ReplacementItem task) {
@@ -56,5 +68,10 @@ public class VeeStabiliser extends Part {
 	public void writeToXml(PrintWriter pw1, int indent, int id) {
 		writeToXmlBegin(pw1, indent, id);
 		writeToXmlEnd(pw1, indent, id);
+	}
+
+	@Override
+	protected void loadFieldsFromXmlNode(Node wn) {
+		// Do nothing.  There are no class-specific fields here.
 	}
 }

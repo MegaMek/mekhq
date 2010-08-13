@@ -23,6 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import org.w3c.dom.Node;
 import mekhq.campaign.work.MekLifeSupportReplacement;
 import mekhq.campaign.work.ReplacementItem;
 
@@ -33,6 +34,16 @@ import mekhq.campaign.work.ReplacementItem;
 public class MekLifeSupport extends Part {
 	private static final long serialVersionUID = -1989526319692474127L;
 
+	public MekLifeSupport() {
+		this(false, 0);
+		reCalc();
+	}
+	
+	@Override
+	public void reCalc() {
+		// Do nothing.
+	}
+	
 	public MekLifeSupport(boolean salvage, int tonnage) {
         super(salvage, tonnage);
         this.name = "Mech Life Support System";
@@ -60,5 +71,10 @@ public class MekLifeSupport extends Part {
 	public void writeToXml(PrintWriter pw1, int indent, int id) {
 		writeToXmlBegin(pw1, indent, id);
 		writeToXmlEnd(pw1, indent, id);
+	}
+
+	@Override
+	protected void loadFieldsFromXmlNode(Node wn) {
+		// Do nothing - no fields to load.
 	}
 }

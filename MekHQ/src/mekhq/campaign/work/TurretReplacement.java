@@ -32,12 +32,23 @@ import mekhq.campaign.parts.Turret;
 public class TurretReplacement extends LocationReplacement {
 	private static final long serialVersionUID = -1023243731780275935L;
 
+	public TurretReplacement() {
+		this(null, 0);
+	}
+
 	public TurretReplacement(Unit unit, int i) {
         super(unit, i);
         this.time = 160;
         this.difficulty = -1;
+        reCalc();
     }
     
+    @Override
+    public void reCalc() {
+    	// Do nothing.
+    	super.reCalc();
+    }
+
     @Override
     public Part stratopsPartNeeded() {
         return new Turret(false, (int) unit.getEntity().getWeight());

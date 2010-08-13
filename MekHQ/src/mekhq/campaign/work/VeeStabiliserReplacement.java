@@ -23,6 +23,9 @@ package mekhq.campaign.work;
 
 import java.io.PrintWriter;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
 import mekhq.campaign.parts.Part;
@@ -35,13 +38,27 @@ import mekhq.campaign.parts.VeeStabiliser;
 class VeeStabiliserReplacement extends ReplacementItem {
 	private static final long serialVersionUID = 5283920941593252555L;
 	private int loc;
+
+	public VeeStabiliserReplacement() {
+		this(null, 0);
+	}
     
     public VeeStabiliserReplacement(Unit unit, int i) {
         super(unit);
         this.loc = i;
-        this.name =  " Replace stabilizer (" + unit.getEntity().getLocationName(loc) + ")";
         this.time = 60;
         this.difficulty = 0;
+        reCalc();
+    }
+    
+    @Override
+    public void reCalc() {
+        if (unit == null)
+        	return;
+        
+        this.name =  " Replace stabilizer (" + unit.getEntity().getLocationName(loc) + ")";
+
+        super.reCalc();
     }
 
     @Override
@@ -79,5 +96,20 @@ class VeeStabiliserReplacement extends ReplacementItem {
 				+loc
 				+"</loc>");
 		writeToXmlEnd(pw1, indent, id);
+	}
+	
+	@Override
+	protected void loadFieldsFromXmlNode(Node wn) {
+		NodeList nl = wn.getChildNodes();
+		
+		for (int x=0; x<nl.getLength(); x++) {
+			Node wn2 = nl.item(x);
+			
+			if (wn2.getNodeName().equalsIgnoreCase("loc")) {
+				loc = Integer.parseInt(wn2.getTextContent());
+			}
+		}
+		
+		super.loadFieldsFromXmlNode(wn);
 	}
 }

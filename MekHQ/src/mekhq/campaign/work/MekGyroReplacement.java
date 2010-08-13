@@ -25,7 +25,6 @@ import java.io.PrintWriter;
 
 import megamek.common.CriticalSlot;
 import megamek.common.Mech;
-import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
 import mekhq.campaign.parts.MekGyro;
 import mekhq.campaign.parts.Part;
@@ -37,11 +36,25 @@ import mekhq.campaign.parts.Part;
 public class MekGyroReplacement extends ReplacementItem {
 	private static final long serialVersionUID = 8057335533301434517L;
 
+	public MekGyroReplacement() {
+		this(null);
+	}
+
 	public MekGyroReplacement(Unit unit) {
         super(unit);
-        this.name = "Replace " + ((Mech)unit.getEntity()).getSystemName(Mech.SYSTEM_GYRO);
         this.time = 200;
         this.difficulty = 0;
+        reCalc();
+    }
+    
+    @Override
+    public void reCalc() {
+        if (unit == null)
+        	return;
+        
+        this.name = "Replace " + ((Mech)unit.getEntity()).getSystemName(Mech.SYSTEM_GYRO);
+
+        super.reCalc();
     }
 
     @Override

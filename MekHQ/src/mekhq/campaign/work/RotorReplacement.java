@@ -32,12 +32,23 @@ import mekhq.campaign.parts.Rotor;
 public class RotorReplacement extends LocationReplacement {
 	private static final long serialVersionUID = -5128493044282234821L;
 
+	public RotorReplacement() {
+		this(null, 0);
+	}
+
 	public RotorReplacement(Unit unit, int i) {
         super(unit, i);
         this.time = 300;
         this.difficulty = 0;
+        reCalc();
     }
-      
+    
+    @Override
+    public void reCalc() {
+    	// Do nothing.
+    	super.reCalc();
+    }
+
     @Override
     public Part stratopsPartNeeded() {
         return new Rotor(false, (int) unit.getEntity().getWeight());

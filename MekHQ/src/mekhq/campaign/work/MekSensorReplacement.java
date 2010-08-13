@@ -25,7 +25,6 @@ import java.io.PrintWriter;
 
 import megamek.common.CriticalSlot;
 import megamek.common.Mech;
-import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
 import mekhq.campaign.parts.MekSensor;
 import mekhq.campaign.parts.Part;
@@ -37,6 +36,10 @@ import mekhq.campaign.parts.Part;
 public class MekSensorReplacement extends ReplacementItem {
 	private static final long serialVersionUID = -660103425268706233L;
 
+	public MekSensorReplacement() {
+		this(null);
+	}
+
 	public MekSensorReplacement(Unit unit) {
         super(unit);
         this.name = "Replace sensors";
@@ -44,6 +47,11 @@ public class MekSensorReplacement extends ReplacementItem {
         this.difficulty = 0;
     }
     
+    @Override
+    public void reCalc() {
+    	super.reCalc();
+    }
+
     @Override
     public void fix() {
         super.fix();

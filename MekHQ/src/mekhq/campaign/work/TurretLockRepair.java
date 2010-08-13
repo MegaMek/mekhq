@@ -25,7 +25,6 @@ import java.io.PrintWriter;
 
 import megamek.common.IArmorState;
 import megamek.common.Tank;
-import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
 
 /**
@@ -33,20 +32,26 @@ import mekhq.campaign.Unit;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class TurretLockRepair extends RepairItem {
-
-    /**
-	 * 
-	 */
 	private static final long serialVersionUID = -2304515395547113540L;
+
+	public TurretLockRepair() {
+		this(null);
+	}
 
 	public TurretLockRepair(Unit unit) {
         super(unit, 1);
         this.name = "Unlock turret";
         this.time = 90;
         this.difficulty = -1;
-        
+        reCalc();
     }
     
+    @Override
+    public void reCalc() {
+    	// Do nothing.
+    	super.reCalc();
+    }
+
     @Override
     public void doReplaceChanges() {
         removeSalvage();

@@ -36,12 +36,22 @@ import mekhq.campaign.parts.Part;
 public class MekEngineSalvage extends SalvageItem {
 	private static final long serialVersionUID = 6602934418836574088L;
 
+	public MekEngineSalvage() {
+		this(null);
+	}
+
 	public MekEngineSalvage(Unit unit) {
         super(unit);
         this.name = "Salvage Engine";
         this.time = 360;
         this.difficulty = -1;
     }
+	
+	@Override
+	public void reCalc() {
+		// Do nothing.
+		super.reCalc();
+	}
     
     @Override
     public String getDetails() {

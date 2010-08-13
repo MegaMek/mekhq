@@ -33,8 +33,19 @@ import mekhq.campaign.Unit;
 public class MechRefit extends Refit {
 	private static final long serialVersionUID = -4232639020883684004L;
 
+	public MechRefit() {
+		this(null, null, 0, 0, ' ', 0, 0);
+	}
+
 	public MechRefit(Unit unit, Entity target, int baseTime, int refitClass, char refitKitAvailability, int refitKitAvailabilityMod, int cost) {
         super(unit, target, baseTime, refitClass, refitKitAvailability, refitKitAvailabilityMod, cost);
+        reCalc();
+    }
+    
+    @Override
+    public void reCalc() {
+    	// Do nothing.
+    	super.reCalc();
     }
 
     @Override

@@ -36,12 +36,26 @@ import mekhq.campaign.parts.Part;
 public class MekGyroSalvage extends SalvageItem {
 	private static final long serialVersionUID = 4673047297958088858L;
 
+	public MekGyroSalvage() {
+		this(null);
+	}
+
 	public MekGyroSalvage(Unit unit) {
         super(unit);
-        this.name = "Salvage " + ((Mech)unit.getEntity()).getSystemName(Mech.SYSTEM_GYRO);
         this.time = 200;
         this.difficulty = 0;
+        reCalc();
     }
+	
+	@Override
+	public void reCalc() {
+        if (unit == null)
+        	return;
+        
+        this.name = "Salvage " + ((Mech)unit.getEntity()).getSystemName(Mech.SYSTEM_GYRO);
+        
+        super.reCalc();
+	}
 
     @Override
     public ReplacementItem getReplacement() {

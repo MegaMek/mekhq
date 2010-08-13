@@ -23,6 +23,9 @@ package mekhq.campaign.work;
 
 import java.io.PrintWriter;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.Aero;
 import megamek.common.EquipmentType;
 import megamek.common.Tank;
@@ -41,16 +44,31 @@ public class ArmorSalvage extends SalvageItem {
     protected int amount;
     protected int type;
     protected boolean rear;
-    
+
+	public ArmorSalvage() {
+		this(null, 0, 0, false);
+	}
+     
     public ArmorSalvage(Unit unit, int l, int t, boolean r) {
         super(unit);
         this.loc = l;
         this.type = t;
         this.rear = r;
-        this.amount = unit.getEntity().getArmor(loc, rear);
         this.difficulty = -2;
+        this.name = "Salvage " + EquipmentType.getArmorTypeName(type) + " Armor";
+
+        reCalc();
+    }
+    
+    @Override
+    public void reCalc() {
+        if (unit == null)
+        	return;
+
+        this.amount = unit.getEntity().getArmor(loc, rear);
         this.time = 5 * amount;
-        if(unit.getEntity() instanceof Tank) {
+        
+        if (unit.getEntity() instanceof Tank) {
             this.time = 3 * amount;
         } else if (unit.getEntity() instanceof Aero) {
             if(((Aero)unit.getEntity()).isCapitalScale()) {
@@ -59,7 +77,8 @@ public class ArmorSalvage extends SalvageItem {
                 this.time = 15 * amount;
             }
         }
-        this.name = "Salvage " + EquipmentType.getArmorTypeName(type) + " Armor";
+        
+        super.reCalc();
     }
     
     @Override
@@ -171,5 +190,29 @@ public class ArmorSalvage extends SalvageItem {
 				+type
 				+"</type>");
 		writeToXmlEnd(pw1, indent, id);
+	}
+	
+	@Override
+	protected void loadFieldsFromXmlNode(Node wn) {
+		NodeList nl = wn.getChildNodes();
+		
+		for (int x=0; x<nl.getLength(); x++) {
+			Node wn2 = nl.item(x);
+			
+			if (wn2.getNodeName().equalsIgnoreCase("amount")) {
+				amount = Integer.parseInt(wn2.getTextContent());
+			} else if (wn2.getNodeName().equalsIgnoreCase("loc")) {
+				loc = Integer.parseInt(wn2.getTextContent());
+			} else if (wn2.getNodeName().equalsIgnoreCase("rear")) {
+				if (wn2.getTextContent().equalsIgnoreCase("true"))
+					rear = true;
+				else
+					rear = false;
+			} else if (wn2.getNodeName().equalsIgnoreCase("type")) {
+				type = Integer.parseInt(wn2.getTextContent());
+			}
+		}
+		
+		super.loadFieldsFromXmlNode(wn);
 	}
 }

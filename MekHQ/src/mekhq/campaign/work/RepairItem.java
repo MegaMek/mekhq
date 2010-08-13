@@ -23,6 +23,9 @@ package mekhq.campaign.work;
 
 import java.io.PrintWriter;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
 import mekhq.campaign.team.SupportTeam;
@@ -41,8 +44,14 @@ public abstract class RepairItem extends UnitWorkItem {
     public RepairItem(Unit unit, int h) {
         super(unit);
         this.hits = h;
+        reCalc();
     }
     
+    @Override
+    public void reCalc() {
+    	super.reCalc();
+    }
+
     @Override
     public String getDetails() {
         return hits + " hit(s)";
@@ -78,13 +87,13 @@ public abstract class RepairItem extends UnitWorkItem {
         //the player may prefer to leave it in its damaged state rather than rip it out
         //the player can decide to scrap the component by using the context manu
         //unit.campaign.mutateTask(this, replace());
-        return "<br><emph><b>Item cannot be repaired, it must be replaced instead.</b></emph>";
+        return "<br/><emph><b>Item cannot be repaired, it must be replaced instead.</b></emph>";
     }
     
     @Override
     public String getToolTip() {
         if(getSkillMin() > SupportTeam.EXP_ELITE) {
-            return "<html> This task is impossible.<br>You can use the right-click menu to scrap this component.</html>";
+            return "<html> This task is impossible.<br/>You can use the right-click menu to scrap this component.</html>";
         } 
         return super.getToolTip();
     }
@@ -99,5 +108,22 @@ public abstract class RepairItem extends UnitWorkItem {
 				+"<salvageId>"
 				+salvageId
 				+"</salvageId>");
+	}
+	
+	@Override
+	protected void loadFieldsFromXmlNode(Node wn) {
+		NodeList nl = wn.getChildNodes();
+		
+		for (int x=0; x<nl.getLength(); x++) {
+			Node wn2 = nl.item(x);
+			
+			if (wn2.getNodeName().equalsIgnoreCase("hits")) {
+				hits = Integer.parseInt(wn2.getTextContent());
+			} else if (wn2.getNodeName().equalsIgnoreCase("salvageId")) {
+				salvageId = Integer.parseInt(wn2.getTextContent());
+			}
+		}
+		
+		super.loadFieldsFromXmlNode(wn);
 	}
 }

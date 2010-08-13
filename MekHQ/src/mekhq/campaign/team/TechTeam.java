@@ -23,6 +23,9 @@ package mekhq.campaign.team;
 
 import java.io.PrintWriter;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.Aero;
 import megamek.common.BattleArmor;
 import megamek.common.Compute;
@@ -49,6 +52,28 @@ public class TechTeam extends SupportTeam {
     
     private int type;
     
+    public TechTeam() {
+    	this(null, EXP_GREEN, T_MECH);
+    }
+    
+    public TechTeam(String name, int rating, int type) {
+        super(name, rating);
+        this.type = type;
+        this.fullSize = 7;
+        this.currentSize = 7;
+        reCalc();
+    }
+    
+    @Override
+    public void reCalc() {
+    	// Do nothing.
+    }
+    
+    @Override
+    public String getTypeDesc() {
+        return getTypeDesc(type);
+    }
+    
     public static String getTypeDesc(int type) {
         switch(type) {
             case T_MECH:
@@ -60,20 +85,12 @@ public class TechTeam extends SupportTeam {
             case T_BA:
                 return "BA Tech";
         }
+        
         return "?? Tech";
     }
     
-    public TechTeam(String name, int rating, int type) {
-        super(name, rating);
-        this.type = type;
-        this.fullSize = 7;
-        this.currentSize = 7;
-    }
-    
-    
-    @Override
-    public String getTypeDesc() {
-        return getTypeDesc(type);
+    public int getType() {
+    	return type;
     }
     
     @Override
@@ -126,8 +143,8 @@ public class TechTeam extends SupportTeam {
    
    @Override
    public String getDescHTML() {
-        String toReturn = "<html><font size='2'><b>" + getName() + "</b><br>";
-        toReturn += getRatingName() + " " + getTypeDesc() + "<br>";
+        String toReturn = "<html><font size='2'><b>" + getName() + "</b><br/>";
+        toReturn += getRatingName() + " " + getTypeDesc() + "<br/>";
         toReturn += getMinutesLeft() + " minutes left";
         if(campaign.isOvertimeAllowed()) {
             toReturn += " + (" + getOvertimeLeft() + " overtime)";
@@ -144,5 +161,23 @@ public class TechTeam extends SupportTeam {
 				+type
 				+"</type>");
 		writeToXmlEnd(pw1, indent, id);
+	}
+	
+	@Override
+	protected void loadFieldsFromXmlNode(Node wn) {
+		NodeList nl = wn.getChildNodes();
+		
+		for (int x=0; x<nl.getLength(); x++) {
+			Node wn2 = nl.item(x);
+			
+			if (wn2.getNodeName().equalsIgnoreCase("type")) {
+				type = Integer.parseInt(wn2.getTextContent());
+			}
+		}
+	}
+
+	@Override
+	public int getTeamType() {
+		return TYPE_TECH;
 	}
 }

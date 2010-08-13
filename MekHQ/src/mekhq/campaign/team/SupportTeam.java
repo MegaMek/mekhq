@@ -21,12 +21,15 @@
 
 package mekhq.campaign.team;
 
+import mekhq.MekHQApp;
 import mekhq.campaign.*;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
 
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import megamek.common.Compute;
 import megamek.common.TargetRoll;
@@ -53,7 +56,11 @@ public abstract class SupportTeam implements Serializable, MekHqXmlSerializable 
     public static final int EXP_VETERAN = 2;
     public static final int EXP_ELITE = 3;
     public static final int EXP_NUM = 4;
-   
+    
+    //TODO: Properly differentiate different tech types.
+    public static final int TYPE_MEDICAL = 0;
+    public static final int TYPE_TECH = 1;
+
     protected String name;
     protected int rating; 
     protected int id;
@@ -92,6 +99,8 @@ public abstract class SupportTeam implements Serializable, MekHqXmlSerializable 
     //    this.assignedTasks = new ArrayList<WorkItem>();
         resetMinutesLeft();
     }
+    
+    public abstract void reCalc();
     
     public void setCampaign(Campaign c) {
         this.campaign = c;
@@ -366,7 +375,7 @@ public abstract class SupportTeam implements Serializable, MekHqXmlSerializable 
            report += " and rolls " + roll + ":";
 
            if(roll >= target.getValue()) {
-              report += " <font color='green'><b>part found.</b></font><br>";
+              report += " <font color='green'><b>part found.</b></font><br/>";
               replace.setPart(part);
               campaign.buyPart(part);
            } else {
@@ -405,7 +414,7 @@ public abstract class SupportTeam implements Serializable, MekHqXmlSerializable 
            report += " and rolls " + roll + ":";
 
            if(roll >= target.getValue()) {
-              report += " <font color='green'><b>part found.</b></font><br>";
+              report += " <font color='green'><b>part found.</b></font><br/>";
               currentPart.setAmount(partNeeded.getAmount());
               campaign.buyPart(partMissing);
            } else {
@@ -513,8 +522,51 @@ public abstract class SupportTeam implements Serializable, MekHqXmlSerializable 
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "</supportTeam>");
 	}
 
-	public static SupportTeam generateInstanceFromXML(Node wn2) {
-		// TODO: Implement for XML Serialization
-		return null;
+	public static SupportTeam generateInstanceFromXML(Node wn) {
+		SupportTeam retVal = null;
+		NamedNodeMap attrs = wn.getAttributes();
+		Node classNameNode = attrs.getNamedItem("type");
+		String className = classNameNode.getTextContent();
+		
+		try {
+			// Instantiate the correct child class, and call its parsing function.
+			retVal = (SupportTeam) Class.forName(className).newInstance();
+			retVal.loadFieldsFromXmlNode(wn);
+			
+			// Okay, now load Part-specific fields!
+			NodeList nl = wn.getChildNodes();
+			
+			for (int x=0; x<nl.getLength(); x++) {
+				Node wn2 = nl.item(x);
+				
+				if (wn2.getNodeName().equalsIgnoreCase("currentSize")) {
+					retVal.currentSize = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("fullSize")) {
+					retVal.fullSize = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("hours")) {
+					retVal.hours = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("id")) {
+					retVal.id = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("minutesLeft")) {
+					retVal.minutesLeft = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("name")) {
+					retVal.name = wn2.getTextContent();
+				} else if (wn2.getNodeName().equalsIgnoreCase("overtimeLeft")) {
+					retVal.overtimeLeft = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("rating")) {
+					retVal.rating = Integer.parseInt(wn2.getTextContent());
+				}
+			}
+		} catch (Exception ex) {
+			// Errrr, apparently either the class name was invalid...
+			// Or the listed name doesn't exist.
+			// Doh!
+			MekHQApp.logError(ex);
+		}
+		
+		return retVal;
 	}
+
+	public abstract int getTeamType();
+	protected abstract void loadFieldsFromXmlNode(Node wn);
 }

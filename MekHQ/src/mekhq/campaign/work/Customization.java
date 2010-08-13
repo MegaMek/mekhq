@@ -23,6 +23,10 @@ package mekhq.campaign.work;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
@@ -47,16 +51,24 @@ public abstract class Customization extends UnitWorkItem {
 
     protected int minimumSite;
     protected int refitClass;
+    
+    private int tmpBaseTime = -1;
+    private Entity tmpTarget = null;
 
     public Customization(Unit unit, Entity target, int baseTime, int refitClass) {
         super(unit);
         this.targetEntity = target;
-
         this.refitClass = refitClass;
-
+        tmpBaseTime = -1;
+        reCalc();
+    }
+    
+    @Override
+    public void reCalc() {
         double timeMultiplier = 999;
         int difficultyModifier = 999;
         int site = Unit.SITE_FACTORY;
+
         switch (refitClass) {
             case (REFIT_CLASS_A) : {
                 timeMultiplier = 1;
@@ -104,15 +116,20 @@ public abstract class Customization extends UnitWorkItem {
         // No refit kit customization
         timeMultiplier *= 2;
         difficultyModifier += 2;
-
-        this.time = (int) Math.round(baseTime * timeMultiplier);
+        
+        if (tmpBaseTime >= 0)
+        	this.time = (int) Math.round(tmpBaseTime * timeMultiplier);
+        
         this.difficulty = difficultyModifier;
         this.minimumSite = site;
 
         // Repairs must still be performed after the customization is done
         this.time -= getTotalRepairTime();
+        
+        if (tmpTarget != null)
+        	this.name = "Customize to " + tmpTarget.getModel() + " (Class " + getRefitClassName() + ")";
 
-        this.name = "Customize to " + target.getModel() + " (Class " + getRefitClassName() + ")";
+        super.reCalc();
     }
 
     public Entity getTargetEntity() {
@@ -129,6 +146,7 @@ public abstract class Customization extends UnitWorkItem {
 
     public char getRefitClassName () {
         char name = 'Z';
+
         switch (getRefitClass()) {
             case (REFIT_CLASS_A) : {
                 name = 'A';
@@ -162,11 +180,9 @@ public abstract class Customization extends UnitWorkItem {
     @Override
     public void fix() {
         Campaign campaign = getUnit().campaign;
-
         campaign.addUnit(targetEntity, false);
         Unit targetUnit = campaign.getUnits().get(campaign.getUnits().size()-1);
         this.targetEntity = targetUnit.getEntity();
-
         PilotPerson pilotPerson = null;
 
         if (getUnit().hasPilot()) {
@@ -175,30 +191,30 @@ public abstract class Customization extends UnitWorkItem {
         }
 
         targetUnit.setPilot(pilotPerson);
-
         campaign.removeUnit(getUnitId());
     }
 
     @Override
     public String checkFixable() {
         ArrayList<WorkItem> tasks = getUnit().campaign.getAllTasksForUnit(getUnitId());
+ 
         for (WorkItem task : tasks) {
             if (task instanceof SalvageItem) {
                 return "Some items must be salvaged/scrapped";
             }
         }
+
         return super.checkFixable();
     }
 
     private int getTotalRepairTime () {
         Campaign campaign = getUnit().campaign;
-
         campaign.addUnit(targetEntity, false);
         Unit targetUnit = campaign.getUnits().get(campaign.getUnits().size()-1);
         this.targetEntity = targetUnit.getEntity();
-        
         ArrayList<WorkItem> unitTasks = campaign.getTasksForUnit(targetUnit.getId());
         int totalRepairTime = 0;
+        
         for (WorkItem unitTask : unitTasks) {
             if (unitTask instanceof RepairItem
                     || unitTask instanceof ReplacementItem
@@ -223,16 +239,33 @@ public abstract class Customization extends UnitWorkItem {
         return "Max skill reached";
     }
 
-	protected void writeToXmlBegin(PrintWriter pw1, int indent, int id) {
-		super.writeToXmlBegin(pw1, indent, id);
-		//TODO: Handle writing Entity to XML
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+	protected void writeToXmlBegin(PrintWriter pw1, int indentLvl, int id) {
+		super.writeToXmlBegin(pw1, indentLvl, id);
+		pw1.println(MekHqXmlUtil.writeEntityToXmlString(targetEntity, indentLvl+1));
+		pw1.println(MekHqXmlUtil.indentStr(indentLvl+1)
 				+"<minimumSite>"
 				+minimumSite
 				+"</minimumSite>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+		pw1.println(MekHqXmlUtil.indentStr(indentLvl+1)
 				+"<refitClass>"
 				+refitClass
 				+"</refitClass>");
+	}
+	
+	@Override
+	protected void loadFieldsFromXmlNode(Node wn) {
+		NodeList nl = wn.getChildNodes();
+		
+		for (int x=0; x<nl.getLength(); x++) {
+			Node wn2 = nl.item(x);
+			
+			if (wn2.getNodeName().equalsIgnoreCase("minimumSite")) {
+				minimumSite = Integer.parseInt(wn2.getTextContent());
+			} else if (wn2.getNodeName().equalsIgnoreCase("refitClass")) {
+				refitClass = Integer.parseInt(wn2.getTextContent());
+			}
+		}
+		
+		super.loadFieldsFromXmlNode(wn);
 	}
 }

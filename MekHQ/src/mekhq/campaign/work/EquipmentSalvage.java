@@ -23,9 +23,13 @@ package mekhq.campaign.work;
 
 import java.io.PrintWriter;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.CriticalSlot;
 import megamek.common.Mounted;
 import megamek.common.WeaponType;
+import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
 import mekhq.campaign.parts.EquipmentPart;
 import mekhq.campaign.parts.Part;
@@ -37,16 +41,32 @@ import mekhq.campaign.parts.Part;
 public class EquipmentSalvage extends SalvageItem {
 	private static final long serialVersionUID = 7982460672148462859L;
 	protected Mounted mounted;
+	private int equipmentNum = -1;
+
+	public EquipmentSalvage() {
+		this(null, null);
+	}
     
     public EquipmentSalvage(Unit unit, Mounted m) {
         super(unit);
         this.mounted = m;    
-        this.name = "Salvage " + m.getType().getName();
         this.time = 120;
-        if(m.getType() instanceof WeaponType && unit.getEntity().getQuirks().booleanOption("mod_weapons")) {
+        this.difficulty = 0;
+        reCalc();
+    }
+    
+    @Override
+    public void reCalc() {
+        if (mounted == null)
+        	return;
+        
+        this.name = "Salvage " + mounted.getType().getName();
+
+        if (mounted.getType() instanceof WeaponType && unit.getEntity().getQuirks().booleanOption("mod_weapons")) {
             this.time = 60;
         }
-        this.difficulty = 0;
+        
+        super.reCalc();
     }
     
     @Override
@@ -91,7 +111,37 @@ public class EquipmentSalvage extends SalvageItem {
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent, int id) {
 		writeToXmlBegin(pw1, indent, id);
-		//TODO: Handle writing Mounted to XML
+		
+		// I hate to do this, on some level, but...
+		// We know in all EquipmentRepair types that a Unit should be defined...
+		// So we should be able to make this assumption.
+		// If we ever hit an EquipmentRepair with a Mounted but no Unit, this'll break.
+		pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<mountedEqNum>"
+				+ unit.getEntity().getEquipmentNum(mounted) + "</mountedEqNum>");
+
 		writeToXmlEnd(pw1, indent, id);
+	}
+
+	public int getEquipmentNum() {
+		return equipmentNum;
+	}
+
+	public void setMounted(Mounted m) {
+		mounted = m;
+	}
+	
+	@Override
+	protected void loadFieldsFromXmlNode(Node wn) {
+		NodeList nl = wn.getChildNodes();
+		
+		for (int x=0; x<nl.getLength(); x++) {
+			Node wn2 = nl.item(x);
+			
+			if (wn2.getNodeName().equalsIgnoreCase("mountedEqNum")) {
+				equipmentNum = Integer.parseInt(wn2.getTextContent());
+			}
+		}
+		
+		super.loadFieldsFromXmlNode(wn);
 	}
 }

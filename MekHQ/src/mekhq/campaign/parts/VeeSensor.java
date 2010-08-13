@@ -23,6 +23,8 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import org.w3c.dom.Node;
+
 import mekhq.campaign.work.ReplacementItem;
 import mekhq.campaign.work.VeeSensorReplacement;
 
@@ -33,10 +35,20 @@ import mekhq.campaign.work.VeeSensorReplacement;
 public class VeeSensor extends Part {
 	private static final long serialVersionUID = 4101969895094531892L;
 
+	public VeeSensor() {
+		this(false, 0);
+	}
+	
 	public VeeSensor(boolean salvage, int tonnage) {
         super(salvage, tonnage);
         this.name = "Vehicle Sensors";
+        reCalc();
     }
+	
+	@Override
+	public void reCalc() {
+		// Do nothing.
+	}
     
     @Override
     public boolean canBeUsedBy(ReplacementItem task) {
@@ -54,5 +66,10 @@ public class VeeSensor extends Part {
 	public void writeToXml(PrintWriter pw1, int indent, int id) {
 		writeToXmlBegin(pw1, indent, id);
 		writeToXmlEnd(pw1, indent, id);
+	}
+
+	@Override
+	protected void loadFieldsFromXmlNode(Node wn) {
+		// Do nothing.
 	}
 }

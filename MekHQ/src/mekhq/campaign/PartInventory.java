@@ -56,14 +56,14 @@ public class PartInventory {
         toReturn += "<font size='2'>";
 
         if (part instanceof Armor)
-            toReturn += "Quantity : " +  ((Armor)getPart()).getAmount() + "<br>";
+            toReturn += "Quantity : " +  ((Armor)getPart()).getAmount() + "<br/>";
         else if (part instanceof GenericSparePart) {
             NumberFormat numberFormat = DecimalFormat.getIntegerInstance();
             String text = numberFormat.format(((GenericSparePart)getPart()).getAmount());
-            toReturn += "Quantity : " +  text + "<br>";
+            toReturn += "Quantity : " +  text + "<br/>";
         }
         else
-            toReturn += "Quantity : " +  getQuantity() + "<br>";
+            toReturn += "Quantity : " +  getQuantity() + "<br/>";
 
         toReturn += "</font>";
         toReturn += "</html>";

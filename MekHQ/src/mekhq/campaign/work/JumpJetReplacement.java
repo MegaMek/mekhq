@@ -31,9 +31,18 @@ import mekhq.campaign.Unit;
 public class JumpJetReplacement extends EquipmentReplacement {
 	private static final long serialVersionUID = -9019618835120187896L;
 
+	public JumpJetReplacement() {
+		this(null, null);
+	}
+
 	public JumpJetReplacement(Unit unit, Mounted m) {
         super(unit, m);
         this.time = 60;
         this.difficulty = 0;
+    }
+    
+    @Override
+    public void reCalc() {
+    	super.reCalc();
     }
 }

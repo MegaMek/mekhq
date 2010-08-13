@@ -27,7 +27,6 @@ import megamek.common.CriticalSlot;
 import megamek.common.Mech;
 import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
-import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
 import mekhq.campaign.parts.MekEngine;
 import mekhq.campaign.parts.Part;
@@ -39,11 +38,22 @@ import mekhq.campaign.parts.Part;
 public class MekEngineReplacement extends ReplacementItem {
 	private static final long serialVersionUID = 7428367513325099208L;
 
+	public MekEngineReplacement() {
+		this(null);
+	}
+
 	public MekEngineReplacement(Unit unit) {
         super(unit);
         this.name = "Replace Engine";
         this.time = 360;
         this.difficulty = -1;
+        reCalc();
+    }
+    
+    @Override
+    public void reCalc() {
+    	// Do nothing.
+    	super.reCalc();
     }
 
     @Override

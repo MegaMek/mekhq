@@ -25,7 +25,6 @@ import java.io.PrintWriter;
 
 import megamek.common.CriticalSlot;
 import megamek.common.Mech;
-import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
 
 /**
@@ -35,17 +34,28 @@ import mekhq.campaign.Unit;
 public class MekLifeSupportRepair extends RepairItem {
 	private static final long serialVersionUID = -6581484177103703138L;
 
+	public MekLifeSupportRepair() {
+		this(null, 0);
+	}
+
 	public MekLifeSupportRepair(Unit unit, int h) {
         super(unit, h);
         this.name = "Repair life support";
         this.time = 60;
         this.difficulty = -1;
-        if(hits > 1) {
+        reCalc();
+    }
+    
+    @Override
+    public void reCalc() {
+        if (hits > 1) {
             this.time = 120;
             this.difficulty = 1;
         }
+
+        super.reCalc();
     }
-    
+
     @Override
     public void fix() {
         unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_LIFE_SUPPORT);

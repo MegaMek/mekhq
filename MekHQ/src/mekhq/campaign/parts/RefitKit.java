@@ -23,6 +23,9 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.work.Refit;
 import mekhq.campaign.work.ReplacementItem;
@@ -32,19 +35,25 @@ import mekhq.campaign.work.ReplacementItem;
  * @author natit
  */
 public class RefitKit extends Part {
-    /**
-	 * 
-	 */
 	private static final long serialVersionUID = 5712293563267818853L;
 	protected String sourceName;
     protected String targetName;
     
-    public RefitKit (boolean salvage, int tonnage, String sourceName, String targetName, int cost) {
+    public RefitKit() {
+    	this(false, 0, null, null, 0);
+    }
+    
+    public RefitKit (boolean salvage, int tonnage, String sourceName, String targetName, long cost) {
         super(salvage, tonnage);
         this.sourceName = sourceName;
         this.targetName = targetName;
-        this.name ="Refit Kit [" + sourceName + " -> " + targetName + "]";
         this.cost = cost;
+        reCalc();
+    }
+
+    @Override
+    public void reCalc() {
+        this.name ="Refit Kit [" + sourceName + " -> " + targetName + "]";
     }
     
     @Override
@@ -83,5 +92,20 @@ public class RefitKit extends Part {
 				+targetName
 				+"</targetName>");
 		writeToXmlEnd(pw1, indent, id);
+	}
+
+	@Override
+	protected void loadFieldsFromXmlNode(Node wn) {
+		NodeList nl = wn.getChildNodes();
+		
+		for (int x=0; x<nl.getLength(); x++) {
+			Node wn2 = nl.item(x);
+			
+			if (wn2.getNodeName().equalsIgnoreCase("sourceName")) {
+				sourceName = wn2.getTextContent();
+			} else if (wn2.getNodeName().equalsIgnoreCase("targetName")) {
+				targetName = wn2.getTextContent();
+			} 
+		}
 	}
 }

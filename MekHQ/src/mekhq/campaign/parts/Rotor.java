@@ -23,6 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import org.w3c.dom.Node;
 import megamek.common.VTOL;
 import mekhq.campaign.work.ReplacementItem;
 import mekhq.campaign.work.RotorReplacement;
@@ -34,10 +35,19 @@ import mekhq.campaign.work.RotorReplacement;
 public class Rotor extends Part {
 	private static final long serialVersionUID = -3277611762625095964L;
 
+	public Rotor() {
+		this(false, 0);
+	}
+	
 	public Rotor(boolean salvage, int tonnage) {
         super(salvage, tonnage);
-        this.name = "VTOL Rotor" + " (" + getTonnage() + ")";
+        reCalc();
     }
+	
+	@Override
+	public void reCalc() {
+        this.name = "VTOL Rotor" + " (" + getTonnage() + ")";
+	}
     
     @Override
     public boolean canBeUsedBy(ReplacementItem task) {
@@ -58,5 +68,10 @@ public class Rotor extends Part {
 	public void writeToXml(PrintWriter pw1, int indent, int id) {
 		writeToXmlBegin(pw1, indent, id);
 		writeToXmlEnd(pw1, indent, id);
+	}
+
+	@Override
+	protected void loadFieldsFromXmlNode(Node wn) {
+		// Do nothing - no fields to load.
 	}
 }

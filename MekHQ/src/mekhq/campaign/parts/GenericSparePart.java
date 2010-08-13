@@ -24,6 +24,10 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.TechConstants;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.work.ReplacementItem;
@@ -40,13 +44,21 @@ public class GenericSparePart extends Part {
     protected int tech;
     protected int amount;
 
+    public GenericSparePart() {
+    	this(0, 0);
+    }
+    
     public GenericSparePart(int tech, int amount) {
         super(false, 0);
         this.tech = tech;
         this.amount = amount;
-        
+        reCalc();
+    }
+    
+    @Override
+    public void reCalc() {
         this.name = "Spare Part " + TechConstants.getLevelName(tech);
-        computeCost();
+        this.cost = GenericSparePart.UNITARY_COST * getAmount();
     }
 
     public int getAmount() {
@@ -55,18 +67,14 @@ public class GenericSparePart extends Part {
 
     public void setAmount(int amount) {
         this.amount = amount;
-        computeCost();
+        reCalc();
     }
 
     @Override
     public int getTech () {
         return this.tech;
     }
-
-    protected void computeCost () {
-        this.cost = GenericSparePart.UNITARY_COST * getAmount();
-    }
-    
+  
     @Override
     public boolean canBeUsedBy(ReplacementItem task) {
         return (task instanceof ReplacementItem
@@ -119,5 +127,20 @@ public class GenericSparePart extends Part {
 				+tech
 				+"</tech>");
 		writeToXmlEnd(pw1, indent, id);
+	}
+
+	@Override
+	protected void loadFieldsFromXmlNode(Node wn) {
+		NodeList nl = wn.getChildNodes();
+		
+		for (int x=0; x<nl.getLength(); x++) {
+			Node wn2 = nl.item(x);
+			
+			if (wn2.getNodeName().equalsIgnoreCase("amount")) {
+				amount = Integer.parseInt(wn2.getTextContent());
+			} else if (wn2.getNodeName().equalsIgnoreCase("tech")) {
+				tech = Integer.parseInt(wn2.getTextContent());
+			} 
+		}
 	}
 }

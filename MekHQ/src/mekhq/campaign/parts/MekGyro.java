@@ -23,6 +23,9 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.Mech;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.work.MekGyroReplacement;
@@ -37,6 +40,16 @@ public class MekGyro extends Part {
 	protected int type;
     protected int walkMP;
 
+    public MekGyro() {
+    	this(false, 0, 0, 0);
+    	reCalc();
+    }
+    
+	@Override
+   public void reCalc() {
+    	// Do nothing.
+    }
+    
     public int getType() {
         return type;
     }
@@ -53,27 +66,61 @@ public class MekGyro extends Part {
         computeCost();
     }
 
-    private void computeCost () {
-        double c = 0;
-        if (getType() == Mech.GYRO_XL) {
-            c = 750000 * (int) Math.ceil(getWalkMP() * getTonnage() / 100f) * 0.5;
-        } else if (getType() == Mech.GYRO_COMPACT) {
-            c = 400000 * (int) Math.ceil(getWalkMP() * getTonnage() / 100f) * 1.5;
-        } else if (getType() == Mech.GYRO_HEAVY_DUTY) {
-            c = 500000 * (int) Math.ceil(getWalkMP() * getTonnage() / 100f) * 2;
-        } else {
-            c = 300000 * (int) Math.ceil(getWalkMP() * getTonnage() / 100f);
+    public static int getGyroBaseTonnage(int walkMP, int unitTonnage) {
+    	return (int) Math.ceil(walkMP * unitTonnage / 100f);
+    }
+    
+    private int getGyroBaseTonnage() {
+    	return MekGyro.getGyroBaseTonnage(getWalkMP(), getTonnage());
+    }
+    
+    public static double getGyroTonnage(double gyroBaseTonnage, int gyroType) {
+        if (gyroType == Mech.GYRO_XL) {
+            return gyroBaseTonnage * 0.5;
+        } else if (gyroType == Mech.GYRO_COMPACT) {
+        	return gyroBaseTonnage * 1.5;
+        } else if (gyroType == Mech.GYRO_HEAVY_DUTY) {
+        	return gyroBaseTonnage * 2;
         }
-        this.cost = (int) Math.round(c);
+    	
+        return gyroBaseTonnage;
+    }
+    
+    public static double getGyroTonnage(int walkMP, int unitTonnage, int gyroType) {
+    	return MekGyro.getGyroTonnage(MekGyro.getGyroBaseTonnage(walkMP, unitTonnage), gyroType);
+    }
+    
+    public double getGyroTonnage() {
+    	return MekGyro.getGyroTonnage(getGyroBaseTonnage(), getType());
+    }
+    
+    private void computeCost() {
+        double c = 0;
+        
+        if (getType() == Mech.GYRO_XL) {
+            c = 750000 * getGyroTonnage();
+        } else if (getType() == Mech.GYRO_COMPACT) {
+            c = 400000 * getGyroTonnage();
+        } else if (getType() == Mech.GYRO_HEAVY_DUTY) {
+            c = 500000 * getGyroTonnage();
+        } else {
+            c = 300000 * getGyroTonnage();
+        }
+        
+        this.cost = (long) Math.round(c);
     }
     
     @Override
     public boolean canBeUsedBy(ReplacementItem task) {
-        // TODO Is walk mp important for gyro compatibility ?
-        // walk mp is used in cost calculation
+    	// Gyro compatibility is based on type and gyro tonnage, not unit tonnage...
+    	// But gyro tonnage isn't story, only unit tonnage and unit MP.
+    	// Unit tonnage and unit walk MP are only relevant in calculating Gyro tonnage...
+    	// But with type it's enough to calculate it from.
+    	double unitGyroTonnage = MekGyro.getGyroTonnage((int) Math.ceil(((MekGyroReplacement)task).getUnit().getEntity().getEngine().getRating() / 100f), ((MekGyroReplacement)task).getUnit().getEntity().getGyroType());
+    	
         return (task instanceof MekGyroReplacement 
                 && ((MekGyroReplacement)task).getUnit().getEntity().getGyroType() == type
-                && tonnage == ((MekGyroReplacement)task).getUnit().getEntity().getWeight());
+                && getGyroTonnage() == unitGyroTonnage);
     }
 
     @Override
@@ -91,7 +138,7 @@ public class MekGyro extends Part {
     }
 
     @Override
-    public String getSaveString () {
+    public String getSaveString() {
         return getName() + ";" + getTonnage() + ";" + getType() + ";" + getWalkMP();
     }
 
@@ -107,5 +154,20 @@ public class MekGyro extends Part {
 				+walkMP
 				+"</walkMP>");
 		writeToXmlEnd(pw1, indent, id);
+	}
+
+	@Override
+	protected void loadFieldsFromXmlNode(Node wn) {
+		NodeList nl = wn.getChildNodes();
+		
+		for (int x=0; x<nl.getLength(); x++) {
+			Node wn2 = nl.item(x);
+			
+			if (wn2.getNodeName().equalsIgnoreCase("type")) {
+				type = Integer.parseInt(wn2.getTextContent());
+			} else if (wn2.getNodeName().equalsIgnoreCase("walkMP")) {
+				walkMP = Integer.parseInt(wn2.getTextContent());
+			} 
+		}
 	}
 }

@@ -34,6 +34,8 @@ import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
 import org.jdesktop.application.Application;
 import org.jdesktop.application.ResourceMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  *
@@ -41,17 +43,31 @@ import org.jdesktop.application.ResourceMap;
  */
 public class FullRepairWarchest extends UnitWorkItem {
 	private static final long serialVersionUID = -5105362085931672916L;
-	protected int cost;
+	protected long cost;
 
-    public int getCost() {
+    public long getCost() {
         return cost;
     }
-    
+
+	public FullRepairWarchest() {
+		this(null);
+	}
+   
     public FullRepairWarchest(Unit unit) {
         super(unit);
-        computeCostAndName();
         this.time = 0;
         this.difficulty = TargetRoll.AUTOMATIC_SUCCESS;
+        reCalc();
+    }
+    
+    @Override
+    public void reCalc() {
+        if (unit == null)
+        	return;
+        
+        computeCostAndName();
+
+        super.reCalc();
     }
 
     private void computeCostAndName () {
@@ -87,7 +103,7 @@ public class FullRepairWarchest extends UnitWorkItem {
 
         this.name = n;
         int buyCost = unit.getBuyCost();
-        this.cost = (int) Math.round(buyCost*repairCostProportionOfEntityPrice);
+        this.cost = (long) Math.round(buyCost*repairCostProportionOfEntityPrice);
     }
     
     @Override
@@ -167,5 +183,20 @@ public class FullRepairWarchest extends UnitWorkItem {
 				+ cost
 				+ "</cost>");
 		writeToXmlEnd(pw1, indent, id);
+	}
+
+	@Override
+	protected void loadFieldsFromXmlNode(Node wn) {
+		NodeList nl = wn.getChildNodes();
+		
+		for (int x=0; x<nl.getLength(); x++) {
+			Node wn2 = nl.item(x);
+			
+			if (wn2.getNodeName().equalsIgnoreCase("cost")) {
+				cost = Long.parseLong(wn2.getTextContent());
+			}
+		}
+		
+		super.loadFieldsFromXmlNode(wn);
 	}
 }

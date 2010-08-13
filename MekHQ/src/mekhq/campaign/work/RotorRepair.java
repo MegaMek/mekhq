@@ -25,7 +25,6 @@ import java.io.PrintWriter;
 
 import megamek.common.IArmorState;
 import megamek.common.VTOL;
-import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
 
 /**
@@ -35,11 +34,22 @@ import mekhq.campaign.Unit;
 public class RotorRepair extends RepairItem {
 	private static final long serialVersionUID = -5745788544296044177L;
 
+	public RotorRepair() {
+		this(null);
+	}
+
 	public RotorRepair(Unit unit) {
         super(unit, 1);
         this.name = "Repair rotor damage";
         this.time = 120;
         this.difficulty = 2;
+        reCalc();
+    }
+    
+    @Override
+    public void reCalc() {
+    	// Do nothing.
+    	super.reCalc();
     }
 
     @Override

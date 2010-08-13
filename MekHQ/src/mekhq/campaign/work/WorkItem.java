@@ -26,6 +26,7 @@ import java.io.Serializable;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import megamek.common.TargetRoll;
 import mekhq.MekHQApp;
@@ -77,6 +78,8 @@ public abstract class WorkItem implements Serializable, MekHqXmlSerializable {
 		this.mode = MODE_NORMAL;
 		this.timeSpent = 0;
 	}
+	
+	public abstract void reCalc();
 
 	public String getName() {
 		return name;
@@ -197,13 +200,13 @@ public abstract class WorkItem implements Serializable, MekHqXmlSerializable {
 			toReturn += " color='white'";
 		}
 		toReturn += ">";
-		toReturn += "<b>" + getName() + "</b><br>";
-		toReturn += getDetails() + "<br>";
+		toReturn += "<b>" + getName() + "</b><br/>";
+		toReturn += getDetails() + "<br/>";
 		toReturn += "" + getTimeLeft() + " minutes" + scheduled;
 		toReturn += ", " + SupportTeam.getRatingName(getSkillMin());
 		toReturn += " " + bonus;
 		if (getMode() != MODE_NORMAL) {
-			toReturn += "<br><i>" + getCurrentModeName() + "</i>";
+			toReturn += "<br/><i>" + getCurrentModeName() + "</i>";
 		}
 		toReturn += "</font></html>";
 		return toReturn;
@@ -365,14 +368,46 @@ public abstract class WorkItem implements Serializable, MekHqXmlSerializable {
 		team = supportTeam;
 	}
 
-	public static WorkItem generateInstanceFromXML(Node wn2) {
+	public static WorkItem generateInstanceFromXML(Node wn) {
 		WorkItem retVal = null;
-		NamedNodeMap attrs = wn2.getAttributes();
+		NamedNodeMap attrs = wn.getAttributes();
 		Node classNameNode = attrs.getNamedItem("type");
 		String className = classNameNode.getTextContent();
 		
 		try {
+			// Instantiate the correct child class, and call its parsing function.
 			retVal = (WorkItem) Class.forName(className).newInstance();
+			retVal.loadFieldsFromXmlNode(wn);
+			
+			// Okay, now load Part-specific fields!
+			NodeList nl = wn.getChildNodes();
+			
+			for (int x=0; x<nl.getLength(); x++) {
+				Node wn2 = nl.item(x);
+				
+				if (wn2.getNodeName().equalsIgnoreCase("name")) {
+					retVal.name = wn2.getTextContent();
+				} else if (wn2.getNodeName().equalsIgnoreCase("difficulty")) {
+					retVal.difficulty = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("id")) {
+					retVal.id = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("mode")) {
+					retVal.mode = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("skillMin")) {
+					retVal.skillMin = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("teamId")) {
+					retVal.teamId = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("time")) {
+					retVal.time = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("timeSpent")) {
+					retVal.timeSpent = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("completed")) {
+					if (wn2.getTextContent().equalsIgnoreCase("true"))
+						retVal.completed = true;
+					else
+						retVal.completed = false;
+				}
+			}
 		} catch (Exception ex) {
 			// Errrr, apparently either the class name was invalid...
 			// Or the listed name doesn't exist.
@@ -382,4 +417,6 @@ public abstract class WorkItem implements Serializable, MekHqXmlSerializable {
 		
 		return retVal;
 	}
+	
+	protected abstract void loadFieldsFromXmlNode(Node wn);
 }

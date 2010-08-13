@@ -23,6 +23,10 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.EquipmentType;
 import megamek.common.TechConstants;
 import mekhq.campaign.Faction;
@@ -39,19 +43,25 @@ public class Armor extends Part {
 	protected int type;
     protected int amount;
     
+    public Armor() {
+    	this(false, 0, 0, 0);
+    }
+    
     public Armor(boolean salvage, int tonnage, int t, int points) {
         // Amount is used for armor quantity, not tonnage
         super(false, tonnage);
         this.type = t;
-        this.name = EquipmentType.getArmorTypeName(type) + " Armor";
         this.amount = points;
 
-        // TechBase needs to be set to calculate cost more precisely
-        computeCost();
+        reCalc();
     }
+    
+    @Override
+    public void reCalc() {
+        this.name = EquipmentType.getArmorTypeName(type) + " Armor";
 
-    private void computeCost () {
-        this.cost = (int) Math.round(getArmorWeight(getAmount()) * EquipmentType.getArmorCost(getType()));
+        // TechBase needs to be set to calculate cost more precisely
+        this.cost = (long) Math.round(getArmorWeight(getAmount()) * EquipmentType.getArmorCost(getType()));
     }
     
     public int getType() {
@@ -64,7 +74,7 @@ public class Armor extends Part {
 
     public void setAmount(int amount) {
         this.amount = amount;
-        computeCost();
+        reCalc();
     }
     
     @Override
@@ -165,5 +175,20 @@ public class Armor extends Part {
 				+type
 				+"</type>");
 		writeToXmlEnd(pw1, indent, id);
+	}
+
+	@Override
+	protected void loadFieldsFromXmlNode(Node wn) {
+		NodeList nl = wn.getChildNodes();
+		
+		for (int x=0; x<nl.getLength(); x++) {
+			Node wn2 = nl.item(x);
+			
+			if (wn2.getNodeName().equalsIgnoreCase("amount")) {
+				amount = Integer.parseInt(wn2.getTextContent());
+			} else if (wn2.getNodeName().equalsIgnoreCase("type")) {
+				type = Integer.parseInt(wn2.getTextContent());
+			} 
+		}
 	}
 }

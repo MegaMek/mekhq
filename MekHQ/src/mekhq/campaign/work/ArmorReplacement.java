@@ -22,6 +22,9 @@ package mekhq.campaign.work;
 
 import java.io.PrintWriter;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.Aero;
 import megamek.common.EquipmentType;
 import megamek.common.Tank;
@@ -43,15 +46,35 @@ public class ArmorReplacement extends ReplacementItem {
 	private int type;
 	private boolean rear;
 
+	public ArmorReplacement() {
+		this(null, 0, 0, false);
+	}
+
 	public ArmorReplacement(Unit unit, int l, int t, boolean r) {
 		super(unit);
 		this.loc = l;
 		this.type = t;
 		this.rear = r;
-		this.amount = unit.getEntity().getOArmor(loc, rear)
-				- unit.getEntity().getArmor(loc, rear);
 		this.difficulty = -2;
+		reCalc();
+	}
+    
+    @Override
+    public void reCalc() {
+		if (unit == null)
+			return;
+
+		int oArmor = unit.getEntity().getOArmor(loc, rear);
+		int cArmor = unit.getEntity().getArmor(loc, rear);
+		
+		//TODO: Figure out better way to handle code hack.
+		// Loading from XML sometimes ends up with negative armor on destroyed locations?
+		if (cArmor < 0)
+			cArmor = 0;
+		
+		this.amount = oArmor - cArmor;
 		this.time = 5 * amount;
+		
 		if (unit.getEntity() instanceof Tank) {
 			this.time = 3 * amount;
 		} else if (unit.getEntity() instanceof Aero) {
@@ -61,9 +84,12 @@ public class ArmorReplacement extends ReplacementItem {
 				this.time = 15 * amount;
 			}
 		}
+		
 		this.name = "Replace " + EquipmentType.getArmorTypeName(type)
 				+ " Armor";
-	}
+
+		super.reCalc();
+    }
 
 	@Override
 	public String getDetails() {
@@ -200,22 +226,38 @@ public class ArmorReplacement extends ReplacementItem {
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent, int id) {
 		writeToXmlBegin(pw1, indent, id);
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<amount>"
-				+amount
-				+"</amount>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<loc>"
-				+loc
-				+"</loc>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<rear>"
-				+rear
-				+"</rear>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<type>"
-				+type
-				+"</type>");
+		pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<amount>" + amount
+				+ "</amount>");
+		pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<loc>" + loc
+				+ "</loc>");
+		pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<rear>" + rear
+				+ "</rear>");
+		pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<type>" + type
+				+ "</type>");
 		writeToXmlEnd(pw1, indent, id);
+	}
+
+	@Override
+	protected void loadFieldsFromXmlNode(Node wn) {
+		NodeList nl = wn.getChildNodes();
+
+		for (int x = 0; x < nl.getLength(); x++) {
+			Node wn2 = nl.item(x);
+
+			if (wn2.getNodeName().equalsIgnoreCase("amount")) {
+				amount = Integer.parseInt(wn2.getTextContent());
+			} else if (wn2.getNodeName().equalsIgnoreCase("loc")) {
+				loc = Integer.parseInt(wn2.getTextContent());
+			} else if (wn2.getNodeName().equalsIgnoreCase("rear")) {
+				if (wn2.getTextContent().equalsIgnoreCase("true"))
+					rear = true;
+				else
+					rear = false;
+			} else if (wn2.getNodeName().equalsIgnoreCase("type")) {
+				type = Integer.parseInt(wn2.getTextContent());
+			}
+		}
+
+		super.loadFieldsFromXmlNode(wn);
 	}
 }

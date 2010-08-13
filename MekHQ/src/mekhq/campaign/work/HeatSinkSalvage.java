@@ -31,12 +31,21 @@ import mekhq.campaign.Unit;
 public class HeatSinkSalvage extends EquipmentSalvage {
 	private static final long serialVersionUID = 6038368573767322304L;
 
+	public HeatSinkSalvage() {
+		this(null, null);
+	}
+
 	public HeatSinkSalvage(Unit u, Mounted m) {
         super(u, m);
         this.time = 90;
         this.difficulty = -2;
     } 
     
+    @Override
+    public void reCalc() {
+    	super.reCalc();
+    }
+
     @Override
     public ReplacementItem getReplacement() {
         return new HeatSinkReplacement(unit, mounted);

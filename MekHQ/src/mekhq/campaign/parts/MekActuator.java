@@ -23,6 +23,9 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.BipedMech;
 import megamek.common.Mech;
 import mekhq.campaign.MekHqXmlUtil;
@@ -37,6 +40,16 @@ public class MekActuator extends Part {
 	private static final long serialVersionUID = 719878556021696393L;
 	protected int type;
 
+	public MekActuator() {
+		this(false, 0, 0);
+		reCalc();
+	}
+	
+	@Override
+	public void reCalc() {
+		// Do nothing.
+	}
+	
     public int getType() {
         return type;
     }
@@ -50,7 +63,7 @@ public class MekActuator extends Part {
     }
 
     private void computeCost () {
-        int unitCost = 0;
+        long unitCost = 0;
         switch (getType()) {
             case (Mech.ACTUATOR_UPPER_ARM) : {
                 unitCost = 100;
@@ -124,5 +137,18 @@ public class MekActuator extends Part {
 				+type
 				+"</type>");
 		writeToXmlEnd(pw1, indent, id);
+	}
+
+	@Override
+	protected void loadFieldsFromXmlNode(Node wn) {
+		NodeList nl = wn.getChildNodes();
+		
+		for (int x=0; x<nl.getLength(); x++) {
+			Node wn2 = nl.item(x);
+			
+			if (wn2.getNodeName().equalsIgnoreCase("type")) {
+				type = Integer.parseInt(wn2.getTextContent());
+			} 
+		}
 	}
 }

@@ -25,6 +25,10 @@ import components.abPlaceable;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.AmmoType;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
@@ -46,6 +50,9 @@ import mekhq.campaign.work.ReplacementItem;
 public class EquipmentPart extends Part {
 	private static final long serialVersionUID = 2892728320891712304L;
 
+	private Unit tmpUnit = null; // This is *not* serialized in XML.  Should only be necessary for calculations.
+	private int tmpFaction = -1; // This is *not* serialized in XML.  Should only be necessary for calculations.
+	
 	//crap equipmenttype is not serialized!
     protected transient EquipmentType type;
 
@@ -59,8 +66,12 @@ public class EquipmentPart extends Part {
         return typeName;
     }
 
-    public void setCost(int cost) {
+    public void setCost(long cost) {
         this.cost = cost;
+    }
+    
+    public EquipmentPart() {
+    	this(false, 0, 0, null, null);
     }
     
     public EquipmentPart(boolean salvage, int tonnage, int faction, EquipmentType et, Unit unit) {
@@ -70,17 +81,36 @@ public class EquipmentPart extends Part {
         // account for compatibility)
         super(salvage, tonnage);
         this.type = et;
-        this.name = type.getDesc();
-        this.typeName = type.getInternalName();
+        this.tmpUnit = unit;
+        this.tmpFaction = faction;
+        reCalc();
+    }
+    
+    @Override
+    public void reCalc() {
+        if (type != null) {
+        	this.name = type.getDesc();
+        	this.typeName = type.getInternalName();
+
+            if (type.getCost(null, false) == EquipmentType.COST_VARIABLE)
+                this.name += " (" + getTonnage() + ")";
+        }
+
+        // The cost is calculated here.
+        // Upon initial construction, a temporary unit and faction are passed in.
+        // They are *only* used to calculate the cost, and therefore correctly are not necessarily here.
+        //TODO: Convert to static cost calc function for construction?
+        if (tmpUnit == null)
+        	return;
         
-        computeCost(unit.getEntity());
+        computeCost(tmpUnit.getEntity());
 
-        if (et.getCost(null, false) == EquipmentType.COST_VARIABLE)
-            this.name += " (" + getTonnage() + ")";
-
+        if (tmpFaction < 0)
+        	return;
+        
         // Increase cost for Clan parts when player is IS faction
-        if (isClanTechBase() && !Faction.isClanFaction(faction))
-            this.cost *= unit.campaign.getCampaignOptions().getClanPriceModifier();
+        if (isClanTechBase() && !Faction.isClanFaction(tmpFaction))
+            this.cost *= tmpUnit.campaign.getCampaignOptions().getClanPriceModifier();
     }
 
     /**
@@ -89,28 +119,23 @@ public class EquipmentPart extends Part {
      * @param entity The entity the Equipment comes from / is added to
      */
     private void computeCost (Entity entity) {
-
         if (entity == null)
             return;
 
         EquipmentType type = getType();
         float weight = entity.getWeight();
-
-        int cost =0;
+        int cost = 0;
 
         if (type instanceof MiscType
                 && type.hasFlag(MiscType.F_LASER_HEAT_SINK)) {
             // TODO Laser heat sink cost ?
             cost = 6000;
-        
         } else if (type instanceof MiscType
                 && type.hasFlag(MiscType.F_DOUBLE_HEAT_SINK)) {
             cost = 6000;
-
         } else if (type instanceof MiscType
                 && type.hasFlag(MiscType.F_HEAT_SINK)) {
             cost = 2000;
-        
         } else if (entity instanceof megamek.common.Mech
                 && type instanceof MiscType
                 && type.hasFlag(MiscType.F_JUMP_JET)) {
@@ -119,6 +144,7 @@ public class EquipmentPart extends Part {
             double jumpBaseCost = 200;
             // You cannot have JJ's and UMU's on the same unit.
             double c = 0;
+            
             if (mech.hasUMU()) {
                 c = Math.pow(mech.getAllUMUCount(), 2.0) * weight * jumpBaseCost;
             } else {
@@ -131,7 +157,6 @@ public class EquipmentPart extends Part {
             }
 
             cost = (int) c;
-
         } else {
             // TODO take isArmored into account
             boolean isArmored = false;
@@ -160,11 +185,13 @@ public class EquipmentPart extends Part {
             // Some equipments do not have a price set in megamek
             // Check if ssw has the price
             abPlaceable placeable = null;
+            
             for (String sswName : getPotentialSSWNames(Faction.F_FEDSUN)) {
                 placeable = SSWLibHelper.getAbPlaceableByName(Campaign.getSswEquipmentFactory(), Campaign.getSswMech(), sswName);
                 if (placeable != null)
                     break;
             }
+            
             if (placeable != null)
                 cost = (int) placeable.GetCost();
         }
@@ -354,5 +381,18 @@ public class EquipmentPart extends Part {
 				+(typeName==null?type.getName():typeName)
 				+"</typeName>");
 		writeToXmlEnd(pw1, indent, id);
+	}
+
+	@Override
+	protected void loadFieldsFromXmlNode(Node wn) {
+		NodeList nl = wn.getChildNodes();
+		
+		for (int x=0; x<nl.getLength(); x++) {
+			Node wn2 = nl.item(x);
+			
+			if (wn2.getNodeName().equalsIgnoreCase("typeName")) {
+				typeName = wn2.getTextContent();
+			} 
+		}
 	}
 }

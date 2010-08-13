@@ -23,6 +23,10 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.EquipmentType;
 import megamek.common.Mech;
 import mekhq.campaign.Faction;
@@ -40,6 +44,16 @@ public class MekLocation extends Part {
     protected int structureType;
     protected boolean tsm;
 
+    public MekLocation() {
+    	this(false, 0, 0, 0, false);
+    	reCalc();
+    }
+    
+	@Override
+    public void reCalc() {
+    	// Do nothing.
+    }
+    
     public int getLoc() {
         return loc;
     }
@@ -108,7 +122,7 @@ public class MekLocation extends Part {
             cost += 200000;
         }
 
-        this.cost = (int) Math.round(cost);
+        this.cost = (long) Math.round(cost);
     }
     
     @Override
@@ -174,5 +188,25 @@ public class MekLocation extends Part {
 				+tsm
 				+"</tsm>");
 		writeToXmlEnd(pw1, indent, id);
+	}
+
+	@Override
+	protected void loadFieldsFromXmlNode(Node wn) {
+		NodeList nl = wn.getChildNodes();
+		
+		for (int x=0; x<nl.getLength(); x++) {
+			Node wn2 = nl.item(x);
+			
+			if (wn2.getNodeName().equalsIgnoreCase("loc")) {
+				loc = Integer.parseInt(wn2.getTextContent());
+			} else if (wn2.getNodeName().equalsIgnoreCase("structureType")) {
+				structureType = Integer.parseInt(wn2.getTextContent());
+			} else if (wn2.getNodeName().equalsIgnoreCase("tsm")) {
+				if (wn2.getTextContent().equalsIgnoreCase("true"))
+					tsm = true;
+				else
+					tsm = false;
+			} 
+		}
 	}
 }

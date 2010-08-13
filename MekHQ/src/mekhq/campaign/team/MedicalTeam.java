@@ -23,6 +23,8 @@ package mekhq.campaign.team;
 
 import java.io.PrintWriter;
 
+import org.w3c.dom.Node;
+
 import megamek.common.Compute;
 import mekhq.campaign.work.PersonnelWorkItem;
 import mekhq.campaign.work.WorkItem;
@@ -34,11 +36,21 @@ import mekhq.campaign.work.WorkItem;
 public class MedicalTeam extends SupportTeam {
 	private static final long serialVersionUID = -1809295642059806908L;
 
+    public MedicalTeam() {
+    	this(null, EXP_GREEN);
+    }
+    
 	public MedicalTeam(String name, int rating) {
         super(name, rating);
         this.fullSize = 5;
         this.currentSize = 5;
+        reCalc();
     }
+	
+	@Override
+	public void reCalc() {
+		// Do nothing.
+	}
     
     @Override
     public int getSkillBase(int effectiveRating) {
@@ -90,8 +102,8 @@ public class MedicalTeam extends SupportTeam {
    
     @Override
    public String getDescHTML() {
-        String toReturn = "<html><font size='2'><b>" + getName() + "</b><br>";
-        toReturn += getRatingName() + " " + getTypeDesc() + "<br>";
+        String toReturn = "<html><font size='2'><b>" + getName() + "</b><br/>";
+        toReturn += getRatingName() + " " + getTypeDesc() + "<br/>";
         toReturn += getPatients() + " patient(s)";
         toReturn += "</font></html>";
         return toReturn;
@@ -101,5 +113,15 @@ public class MedicalTeam extends SupportTeam {
 	public void writeToXml(PrintWriter pw1, int indent, int id) {
 		writeToXmlBegin(pw1, indent, id);
 		writeToXmlEnd(pw1, indent, id);
+	}
+	
+	@Override
+	protected void loadFieldsFromXmlNode(Node wn) {
+		// Do nothing.
+	}
+
+	@Override
+	public int getTeamType() {
+		return TYPE_MEDICAL;
 	}
 }

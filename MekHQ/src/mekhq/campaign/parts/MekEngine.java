@@ -23,6 +23,10 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.Engine;
 import megamek.common.Mech;
 import megamek.common.TechConstants;
@@ -39,6 +43,16 @@ public class MekEngine extends Part {
 	private static final long serialVersionUID = -6961398614705924172L;
 	protected Engine engine;
 
+	public MekEngine() {
+		this(false, 0, 0, null, 0);
+		reCalc();
+	}
+	
+	@Override
+	public void reCalc() {
+		// Do nothing.
+	}
+	
 	public Engine getEngine() {
 		return engine;
 	}
@@ -53,7 +67,7 @@ public class MekEngine extends Part {
 
 		double c = getEngine().getBaseCost() * getEngine().getRating()
 				* getTonnage() / 75.0;
-		this.cost = (int) Math.round(c);
+		this.cost = (long) Math.round(c);
 
 		// Increase cost for Clan parts when player is IS faction
 		// Increase cost for Clan parts when player is IS faction
@@ -165,12 +179,35 @@ public class MekEngine extends Part {
 		pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<engineRating>"
 				+ engine.getRating() + "</engineRating>");
 		// TODO: Modify MM to get access to engine flags.
+		// Without those flags, the engine has a good chance of being loaded wrong!
 		/*
 		 * pw1.println(MekHqXmlUtil.indentStr(indent+1)
 		 * +"<engineFlags>"
-		 * +engine.
+		 * +engine.getFlags()
 		 * +"</engineFlags>");
 		 */
 		writeToXmlEnd(pw1, indent, id);
+	}
+
+	@Override
+	protected void loadFieldsFromXmlNode(Node wn) {
+		NodeList nl = wn.getChildNodes();
+		int engineType = -1;
+		int engineRating = -1;
+		int engineFlags = 0;
+		
+		for (int x=0; x<nl.getLength(); x++) {
+			Node wn2 = nl.item(x);
+			
+			if (wn2.getNodeName().equalsIgnoreCase("engineType")) {
+				engineType = Integer.parseInt(wn2.getTextContent());
+			} else if (wn2.getNodeName().equalsIgnoreCase("engineRating")) {
+				engineRating = Integer.parseInt(wn2.getTextContent());
+			} else if (wn2.getNodeName().equalsIgnoreCase("engineFlags")) {
+				engineFlags = Integer.parseInt(wn2.getTextContent());
+			} 
+		}
+		
+		engine = new Engine(engineType, engineRating, engineFlags);
 	}
 }

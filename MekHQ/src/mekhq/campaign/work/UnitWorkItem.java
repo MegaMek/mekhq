@@ -23,6 +23,9 @@ package mekhq.campaign.work;
 
 import java.io.PrintWriter;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.TargetRoll;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
@@ -41,6 +44,11 @@ public abstract class UnitWorkItem extends WorkItem {
     public UnitWorkItem(Unit unit) {
         super();
         this.unit = unit;
+    }
+    
+    @Override
+    public void reCalc() {
+    	// Do nothing.
     }
     
     public Unit getUnit() {
@@ -92,6 +100,19 @@ public abstract class UnitWorkItem extends WorkItem {
 				+ "<unitId>"
 				+ getUnitId()
 				+ "</unitId>");
+	}
+
+	@Override
+	protected void loadFieldsFromXmlNode(Node wn) {
+		NodeList nl = wn.getChildNodes();
+		
+		for (int x=0; x<nl.getLength(); x++) {
+			Node wn2 = nl.item(x);
+			
+			if (wn2.getNodeName().equalsIgnoreCase("unitId")) {
+				unitId = Integer.parseInt(wn2.getTextContent());
+			}
+		}
 	}
 
 	public int getUnitStoredId() {

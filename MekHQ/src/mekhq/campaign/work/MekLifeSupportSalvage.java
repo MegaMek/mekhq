@@ -36,13 +36,23 @@ import mekhq.campaign.parts.Part;
 public class MekLifeSupportSalvage extends SalvageItem {
 	private static final long serialVersionUID = 5434594112352400189L;
 
+	public MekLifeSupportSalvage() {
+		this(null);
+	}
+	
 	public MekLifeSupportSalvage(Unit unit) {
-                super(unit);
+        super(unit);
         this.name = "Salvage life support";
         this.time = 180;
         this.difficulty = -1;
     }
 
+    @Override
+    public void reCalc() {
+    	// Do nothing.
+    	super.reCalc();
+    }
+    
     @Override
     public ReplacementItem getReplacement() {
         return new MekLifeSupportReplacement(unit);

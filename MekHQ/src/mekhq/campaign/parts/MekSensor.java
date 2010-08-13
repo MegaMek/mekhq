@@ -23,6 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import org.w3c.dom.Node;
 import mekhq.campaign.work.MekSensorReplacement;
 import mekhq.campaign.work.ReplacementItem;
 
@@ -33,11 +34,20 @@ import mekhq.campaign.work.ReplacementItem;
 public class MekSensor extends Part {
 	private static final long serialVersionUID = 931907976883324097L;
 
+	public MekSensor() {
+		this(false, 0);
+	}
+	
 	public MekSensor(boolean salvage, int tonnage) {
         super(salvage, tonnage);
         this.name = "Mech Sensors";
-        this.cost = getTonnage() * 2000;
+        reCalc();
     }
+
+	@Override
+	public void reCalc() {
+        this.cost = getTonnage() * 2000;
+	}
     
     @Override
     public boolean canBeUsedBy(ReplacementItem task) {
@@ -60,5 +70,10 @@ public class MekSensor extends Part {
 	public void writeToXml(PrintWriter pw1, int indent, int id) {
 		writeToXmlBegin(pw1, indent, id);
 		writeToXmlEnd(pw1, indent, id);
+	}
+
+	@Override
+	protected void loadFieldsFromXmlNode(Node wn) {
+		// Do nothing - no fields to load.
 	}
 }

@@ -24,7 +24,6 @@ package mekhq.campaign.work;
 import java.io.PrintWriter;
 
 import megamek.common.Tank;
-import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.VeeSensor;
@@ -36,12 +35,23 @@ import mekhq.campaign.parts.VeeSensor;
 public class VeeSensorReplacement extends ReplacementItem {
 	private static final long serialVersionUID = 2196730442088755437L;
 
+	public VeeSensorReplacement() {
+		this(null);
+	}
+
 	public VeeSensorReplacement(Unit unit) {
 		super(unit);
 		this.name = "Replace sensors";
 		this.time = 260;
 		this.difficulty = 0;
+		reCalc();
 	}
+    
+    @Override
+    public void reCalc() {
+    	// Do nothing.
+    	super.reCalc();
+    }
 
 	@Override
 	public void fix() {

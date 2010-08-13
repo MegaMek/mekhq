@@ -23,6 +23,9 @@ package mekhq.campaign.work;
 
 import java.io.PrintWriter;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.CriticalSlot;
 import megamek.common.Mech;
 import mekhq.campaign.MekHqXmlUtil;
@@ -36,16 +39,30 @@ public class MekActuatorRepair extends RepairItem {
 	private static final long serialVersionUID = -3060594760170107991L;
 	protected int loc;
     protected int type;
-    
+
+	public MekActuatorRepair() {
+		this(null, 0, 0, 0);
+	}
+   
     public MekActuatorRepair(Unit unit, int h, int i, int t) {
         super(unit, h);
         this.loc = i;
         this.type = t;
-        this.name = "Repair " + ((Mech)unit.getEntity()).getSystemName(type) + " Actuator";
         this.time = 120;
         this.difficulty = 0;
+        reCalc();
     }
     
+    @Override
+    public void reCalc() {
+        if (unit == null)
+        	return;
+        
+        this.name = "Repair " + ((Mech)unit.getEntity()).getSystemName(type) + " Actuator";
+
+        super.reCalc();
+    }
+
     @Override
     public String getDetails() {
         return unit.getEntity().getLocationName(loc);
@@ -103,5 +120,23 @@ public class MekActuatorRepair extends RepairItem {
 				+ type
 				+ "</type>");
 		writeToXmlEnd(pw1, indent, id);
+	}
+	
+	@Override
+	protected void loadFieldsFromXmlNode(Node wn) {
+		NodeList nl = wn.getChildNodes();
+		
+		for (int x=0; x<nl.getLength(); x++) {
+			Node wn2 = nl.item(x);
+			
+			if (wn2.getNodeName().equalsIgnoreCase("loc")) {
+				loc = Integer.parseInt(wn2.getTextContent());
+			} else if (wn2.getNodeName().equalsIgnoreCase("type")) {
+				type = Integer.parseInt(wn2.getTextContent());
+			}
+
+		}
+		
+		super.loadFieldsFromXmlNode(wn);
 	}
 }

@@ -36,12 +36,22 @@ import mekhq.campaign.parts.Part;
 public class MekSensorSalvage extends SalvageItem {
 	private static final long serialVersionUID = 4153384193348852187L;
 
+	public MekSensorSalvage() {
+		this(null);
+	}
+	
 	public MekSensorSalvage(Unit unit) {
                 super(unit);
         this.name = "Salvage Sensors";
         this.time = 180;
         this.difficulty = -1;
     }
+	
+	@Override
+	public void reCalc() {
+		// Do nothing.
+		super.reCalc();
+	}
 
     @Override
     public ReplacementItem getReplacement() {

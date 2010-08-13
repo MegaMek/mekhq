@@ -24,9 +24,12 @@ package mekhq.campaign.personnel;
 import java.io.PrintWriter;
 import java.io.Serializable;
 
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import megamek.common.Pilot;
+import mekhq.MekHQApp;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlSerializable;
 import mekhq.campaign.MekHqXmlUtil;
@@ -66,8 +69,8 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
         xp = 0;
     }
     
+    public abstract void reCalc();
     public abstract String getDesc();
-    
     public abstract String getDescHTML();
 
     public String getPortraitCategory() {
@@ -222,8 +225,54 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "</person>");
 	}
 
-	public static Person generateInstanceFromXML(Node wn2) {
-		// TODO: Implement for XML Serialization
-		return null;
+	public static Person generateInstanceFromXML(Node wn) {
+		Person retVal = null;
+		NamedNodeMap attrs = wn.getAttributes();
+		Node classNameNode = attrs.getNamedItem("type");
+		String className = classNameNode.getTextContent();
+
+		try {
+			// Instantiate the correct child class, and call its parsing function.
+			retVal = (Person) Class.forName(className).newInstance();
+			retVal.loadFieldsFromXmlNode(wn);
+			
+			// Okay, now load Part-specific fields!
+			NodeList nl = wn.getChildNodes();
+			
+			for (int x=0; x<nl.getLength(); x++) {
+				Node wn2 = nl.item(x);
+				
+				if (wn2.getNodeName().equalsIgnoreCase("biography")) {
+					retVal.biography = wn2.getTextContent();
+				} else if (wn2.getNodeName().equalsIgnoreCase("daysRest")) {
+					retVal.daysRest = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("deployed")) {
+					if (wn2.getTextContent().equalsIgnoreCase("true"))
+						retVal.deployed = true;
+					else
+						retVal.deployed = false;
+				} else if (wn2.getNodeName().equalsIgnoreCase("id")) {
+					retVal.id = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("portraitCategory")) {
+					retVal.portraitCategory = wn2.getTextContent();
+				} else if (wn2.getNodeName().equalsIgnoreCase("portraitFile")) {
+					retVal.portraitFile = wn2.getTextContent();
+				} else if (wn2.getNodeName().equalsIgnoreCase("taskId")) {
+					retVal.taskId = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("xp")) {
+					retVal.xp = Integer.parseInt(wn2.getTextContent());
+				}
+			}
+		} catch (Exception ex) {
+			// Errrr, apparently either the class name was invalid...
+			// Or the listed name doesn't exist.
+			// Doh!
+			MekHQApp.logError(ex);
+		}
+		
+		return retVal;
 	}
+	
+	public abstract int getMonthlySalary();
+	protected abstract void loadFieldsFromXmlNode(Node wn);
 }

@@ -23,7 +23,8 @@ package mekhq.campaign.work;
 
 import java.io.PrintWriter;
 
-import mekhq.campaign.MekHqXmlUtil;
+import org.w3c.dom.Node;
+
 import mekhq.campaign.personnel.PilotPerson;
 
 /**
@@ -33,11 +34,21 @@ import mekhq.campaign.personnel.PilotPerson;
 public class HealPilot extends PersonnelWorkItem {
   	private static final long serialVersionUID = -1794603488838449595L;
 
+  	public HealPilot() {
+  		this(null);
+  	}
+  	
 	public HealPilot(PilotPerson pp) {
         super(pp);
         this.name = "Heal";
     }
 
+	@Override
+	public void reCalc() {
+		// Do nothing.
+		super.reCalc();
+	}
+	
     @Override
     public void fix() {
         person.heal();
@@ -61,5 +72,10 @@ public class HealPilot extends PersonnelWorkItem {
 	public void writeToXml(PrintWriter pw1, int indent, int id) {
 		writeToXmlBegin(pw1, indent, id);
 		writeToXmlEnd(pw1, indent, id);
+	}
+
+	@Override
+	protected void loadFieldsFromXmlNode(Node wn) {
+		super.loadFieldsFromXmlNode(wn);
 	}
 }

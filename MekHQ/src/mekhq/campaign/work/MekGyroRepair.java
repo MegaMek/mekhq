@@ -25,7 +25,6 @@ import java.io.PrintWriter;
 
 import megamek.common.CriticalSlot;
 import megamek.common.Mech;
-import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
 
 /**
@@ -35,17 +34,32 @@ import mekhq.campaign.Unit;
 public class MekGyroRepair extends RepairItem {
 	private static final long serialVersionUID = -4885044444425124132L;
 
+	public MekGyroRepair() {
+		this(null, 0);
+	}
+
 	public MekGyroRepair(Unit unit, int crits) {
         super(unit, crits);
-        this.name = "Repair " + ((Mech)unit.getEntity()).getSystemName(Mech.SYSTEM_GYRO);
         this.time = 120;
         this.difficulty = 1;
-        if(crits > 1) {
+        reCalc();
+    }
+    
+    @Override
+    public void reCalc() {
+        if (hits > 1) {
             this.time = 240;
             this.difficulty = 4;
         }
+
+        if (unit == null)
+        	return;
+        
+        this.name = "Repair " + ((Mech)unit.getEntity()).getSystemName(Mech.SYSTEM_GYRO);
+
+        super.reCalc();
     }
-    
+
     @Override
     public void fix() {
         unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_GYRO, Mech.LOC_CT);

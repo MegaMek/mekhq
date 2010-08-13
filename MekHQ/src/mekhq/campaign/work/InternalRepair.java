@@ -23,6 +23,9 @@ package mekhq.campaign.work;
 
 import java.io.PrintWriter;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.IArmorState;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
@@ -39,8 +42,15 @@ public abstract class InternalRepair extends RepairItem {
         super(unit, 0);
         this.loc = i;
         this.name = "Repair Internal Structure";
+        reCalc();
     }
     
+    @Override
+    public void reCalc() {
+    	// Do nothing.
+    	super.reCalc();
+    }
+
     @Override
     public String getDetails() {
         return unit.getEntity().getLocationName(loc);
@@ -77,5 +87,20 @@ public abstract class InternalRepair extends RepairItem {
 				+"<loc>"
 				+loc
 				+"</loc>");
+	}
+	
+	@Override
+	protected void loadFieldsFromXmlNode(Node wn) {
+		NodeList nl = wn.getChildNodes();
+		
+		for (int x=0; x<nl.getLength(); x++) {
+			Node wn2 = nl.item(x);
+			
+			if (wn2.getNodeName().equalsIgnoreCase("loc")) {
+				loc = Integer.parseInt(wn2.getTextContent());
+			}
+		}
+		
+		super.loadFieldsFromXmlNode(wn);
 	}
 }

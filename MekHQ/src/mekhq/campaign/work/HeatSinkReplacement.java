@@ -21,10 +21,7 @@
 
 package mekhq.campaign.work;
 
-import java.io.PrintWriter;
-
 import megamek.common.Mounted;
-import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
 
 /**
@@ -34,10 +31,18 @@ import mekhq.campaign.Unit;
 public class HeatSinkReplacement extends EquipmentReplacement {
     private static final long serialVersionUID = -1716171286122656057L;
 
+	public HeatSinkReplacement() {
+		this(null, null);
+	}
+
 	public HeatSinkReplacement(Unit unit, Mounted m) {
         super(unit, m);
         this.time = 90;
         this.difficulty = -2;
-        
+    }
+    
+    @Override
+    public void reCalc() {
+    	super.reCalc();
     }
 }

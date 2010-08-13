@@ -24,6 +24,10 @@ package mekhq.campaign.personnel;
 import java.io.File;
 import java.io.PrintWriter;
 import java.util.Enumeration;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.Aero;
 import megamek.common.BattleArmor;
 import megamek.common.Entity;
@@ -43,10 +47,6 @@ import mekhq.campaign.work.HealPilot;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class PilotPerson extends Person {
-
-    /**
-	 * 
-	 */
 	private static final long serialVersionUID = -4758195062070601267L;
 	public static final int T_MECH = 0;
     public static final int T_VEE = 1;
@@ -60,17 +60,29 @@ public class PilotPerson extends Person {
     private Unit unit;
     private int unitId;
     
+    public PilotPerson() {
+    	this(null, 0);
+    }
+    
     public PilotPerson(Pilot p, int t) {
         super();
         this.pilot = p;
         this.type = t;
-        this.portraitCategory = pilot.getPortraitCategory();
-        this.portraitFile = pilot.getPortraitFileName();
+        reCalc();
     }
     
     public PilotPerson(Pilot p, int t, Unit u) {
         this(p,t);
         this.unit = u;
+    }
+
+    @Override
+    public void reCalc() {
+        if (pilot == null)
+        	return;
+        
+        this.portraitCategory = pilot.getPortraitCategory();
+        this.portraitFile = pilot.getPortraitFileName();
     }
     
     public int getType() {
@@ -155,8 +167,8 @@ public class PilotPerson extends Person {
     
     @Override
     public String getDescHTML() {
-        String toReturn = "<html><font size='2'><b>" + pilot.getName() + "</b><br>";
-        toReturn += getTypeDesc() + " (" + pilot.getGunnery() + "/" + pilot.getPiloting() + ")<br>";
+        String toReturn = "<html><font size='2'><b>" + pilot.getName() + "</b><br/>";
+        toReturn += getTypeDesc() + " (" + pilot.getGunnery() + "/" + pilot.getPiloting() + ")<br/>";
         toReturn += pilot.getStatusDesc() + getAssignedDoctorString();
         if(isDeployed()) {
             toReturn += " (DEPLOYED)";
@@ -215,8 +227,8 @@ public class PilotPerson extends Person {
         if(category.equals(Pilot.ROOT_PORTRAIT)) {
             category = "";
         }
-        String toReturn = "<html><b>" + pilot.getName() + "</b><br>";
-        toReturn += "<i>" + pilot.getNickname() + "</i><br><br>";
+        String toReturn = "<html><b>" + pilot.getName() + "</b><br/>";
+        toReturn += "<i>" + pilot.getNickname() + "</i><br/><br/>";
         if(!image.equals(Pilot.PORTRAIT_NONE)) {
             toReturn += "<img src=\"file://" + path + "data/images/portraits/" + category + image + "\"/>";
         }
@@ -231,18 +243,18 @@ public class PilotPerson extends Person {
         for (Enumeration<IOptionGroup> advGroups = pilot.getOptions().getGroups(); advGroups.hasMoreElements();) {
             IOptionGroup advGroup = advGroups.nextElement();
             if(pilot.countOptions(advGroup.getKey()) > 0) {
-                toReturn += "<p><b><u>" + advGroup.getDisplayableName() + "</u></b><br>";    
+                toReturn += "<p/><b><u>" + advGroup.getDisplayableName() + "</u></b><br/>";    
                 for (Enumeration<IOption> advs = advGroup.getOptions(); advs.hasMoreElements();) {
                     IOption adv = advs.nextElement();
                     if(adv.booleanValue()) {
-                        toReturn += "  " + adv.getDisplayableNameWithValue() + "<br>";
+                        toReturn += "  " + adv.getDisplayableNameWithValue() + "<br/>";
                     }
                 }
             }
         }
         
         if(null != getBiography() && getBiography().length() > 0) {
-            toReturn += "<br><br><b>Biography</b><br>";
+            toReturn += "<br/><br/><b>Biography</b><br/>";
             toReturn += getBiography();
         }
         toReturn += "</html>";
@@ -271,44 +283,104 @@ public class PilotPerson extends Person {
 				+"<type>"
 				+type
 				+"</type>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<unitId>"
-				+unit.getId()
-				+"</unitId>");
 		
+		// If a pilot doesn't have a unit, well...
+		// This should be null.
+		if (unit != null) {
+			pw1.println(MekHqXmlUtil.indentStr(indent+1)
+					+"<unitId>"
+					+unit.getId()
+					+"</unitId>");
+		}
+
 		// Pilot is a megamek class with no XML serialization support.
 		// But there's a constructor for building them...
 		// Plus a bunch of "set" functions...
 		//TODO: Are any other items on Pilot important for XML serialization?
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<pilotName>"
-				+pilot.getName()
-				+"</pilotName>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<pilotGunnery>"
-				+pilot.getGunnery()
-				+"</pilotGunnery>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<pilotPiloting>"
-				+pilot.getPiloting()
-				+"</pilotPiloting>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<pilotHits>"
-				+pilot.getHits()
-				+"</pilotHits>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<pilotCommandBonus>"
-				+pilot.getCommandBonus()
-				+"</pilotCommandBonus>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<pilotInitBonus>"
-				+pilot.getInitBonus()
-				+"</pilotInitBonus>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<pilotNickname>"
-				+pilot.getNickname()
-				+"</pilotNickname>");
+		//TODO: Handle separate ballistic/missile/energy gunneries
+		//TODO: Handle pilot special abilities
+		if (pilot != null) {
+			pw1.println(MekHqXmlUtil.indentStr(indent+1)
+					+"<pilotName>"
+					+pilot.getName()
+					+"</pilotName>");
+			pw1.println(MekHqXmlUtil.indentStr(indent+1)
+					+"<pilotGunnery>"
+					+pilot.getGunnery()
+					+"</pilotGunnery>");
+			pw1.println(MekHqXmlUtil.indentStr(indent+1)
+					+"<pilotPiloting>"
+					+pilot.getPiloting()
+					+"</pilotPiloting>");
+			pw1.println(MekHqXmlUtil.indentStr(indent+1)
+					+"<pilotHits>"
+					+pilot.getHits()
+					+"</pilotHits>");
+			pw1.println(MekHqXmlUtil.indentStr(indent+1)
+					+"<pilotCommandBonus>"
+					+pilot.getCommandBonus()
+					+"</pilotCommandBonus>");
+			pw1.println(MekHqXmlUtil.indentStr(indent+1)
+					+"<pilotInitBonus>"
+					+pilot.getInitBonus()
+					+"</pilotInitBonus>");
+			pw1.println(MekHqXmlUtil.indentStr(indent+1)
+					+"<pilotNickname>"
+					+pilot.getNickname()
+					+"</pilotNickname>");
+		}
+		
 		writeToXmlEnd(pw1, indent, id);
+	}
+	
+	@Override
+	protected void loadFieldsFromXmlNode(Node wn) {
+		NodeList nl = wn.getChildNodes();
+		String pilotName = null;
+		int pilotGunnery = -1;
+		int pilotPiloting = -1;
+		int pilotHits = -1;
+		int pilotCommandBonus = -1;
+		int pilotInitBonus = -1;
+		String pilotNickname = null;
+		
+		for (int x=0; x<nl.getLength(); x++) {
+			Node wn2 = nl.item(x);
+			
+			if (wn2.getNodeName().equalsIgnoreCase("pilotNickname")) {
+				pilotNickname = wn2.getTextContent();
+			} else if (wn2.getNodeName().equalsIgnoreCase("pilotName")) {
+				pilotName = wn2.getTextContent();
+			} else if (wn2.getNodeName().equalsIgnoreCase("pilotGunnery")) {
+				pilotGunnery = Integer.parseInt(wn2.getTextContent());
+			} else if (wn2.getNodeName().equalsIgnoreCase("pilotPiloting")) {
+				pilotPiloting = Integer.parseInt(wn2.getTextContent());
+			} else if (wn2.getNodeName().equalsIgnoreCase("pilotHits")) {
+				pilotHits = Integer.parseInt(wn2.getTextContent());
+			} else if (wn2.getNodeName().equalsIgnoreCase("pilotCommandBonus")) {
+				pilotCommandBonus = Integer.parseInt(wn2.getTextContent());
+			} else if (wn2.getNodeName().equalsIgnoreCase("pilotInitBonus")) {
+				pilotInitBonus = Integer.parseInt(wn2.getTextContent());
+			} else if (wn2.getNodeName().equalsIgnoreCase("type")) {
+				type = Integer.parseInt(wn2.getTextContent());
+			} else if (wn2.getNodeName().equalsIgnoreCase("unitId")) {
+				unitId = Integer.parseInt(wn2.getTextContent());
+			}
+		}
+		
+		pilot = new Pilot(pilotName, pilotGunnery, pilotPiloting);
+		
+		if (pilotHits >= 0)
+			pilot.setHits(pilotHits);
+		
+		if (pilotNickname != null)
+			pilot.setNickname(pilotNickname);
+		
+		if (pilotInitBonus >= 0)
+			pilot.setInitBonus(pilotInitBonus);
+
+		if (pilotCommandBonus >= 0)
+			pilot.setCommandBonus(pilotCommandBonus);
 	}
 
 	public int getUnitIt() {
@@ -318,4 +390,46 @@ public class PilotPerson extends Person {
 	public void setUnit(Unit nt) {
 		unit = nt;
 	}
+    
+    @Override
+    public int getMonthlySalary() {
+    	int retVal = 0;
+
+    	switch (type) {
+		case T_MECH:
+			retVal = 1500;
+			break;
+		case T_VEE:
+			retVal = 900;
+			break;
+		case T_AERO:
+			retVal = 1500;
+			break;
+		case T_PROTO:
+			//TODO: Confirm ProtoMech pilots should be paid as BA pilots?
+			retVal = 960;
+			break;
+		case T_BA:
+			retVal = 960;
+			break;
+		case T_NUM:
+			// Not a real pilot type. If someone has this, they don't get paid!
+			break;
+    	}
+
+    	//TODO: Add conventional aircraft pilots.
+    	//TODO: Add regular infantry.
+    	//TODO: Add specialist/Anti-Mech infantry.
+    	//TODO: Add vessel crewmen (DropShip).
+    	//TODO: Add vessel crewmen (JumpShip).
+    	//TODO: Add vessel crewmen (WarShip).
+    	
+    	//TODO: Properly pay vehicle crews for actual size.
+    	//TODO: Properly pay large ship crews for actual size.
+
+    	//TODO: Add quality mod to salary calc..
+    	//TODO: Add era mod to salary calc..
+    	
+    	return retVal;
+    }
 }

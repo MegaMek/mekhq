@@ -66,7 +66,8 @@ public class Test {
     /**
      * Tests the SSWLibHelper.getAbPlaceableByName method
      */
-    private static final void testGetName () {
+    @SuppressWarnings("rawtypes")
+	private static final void testGetName () {
         ArrayList<Integer> partTypes = new ArrayList<Integer>();
         ArrayList<Class> classes = new ArrayList<Class>();
         int nbMaxMechsToLoad = 1000;
@@ -112,7 +113,8 @@ public class Test {
      * Tests the SSWLibHelper.getAbPlaceableByName method.
      * Called by testGetName()
      */
-    private static final void testGetName (int nbMaxMechsToLoad, ArrayList<Class> classes, ArrayList<Integer> partTypes) {
+    @SuppressWarnings("rawtypes")
+	private static final void testGetName (int nbMaxMechsToLoad, ArrayList<Class> classes, ArrayList<Integer> partTypes) {
 
         Logger.getLogger(Test.class.getName()).log(Level.OFF, null, "Logging off");
 

@@ -31,12 +31,21 @@ import mekhq.campaign.Unit;
 public class JumpJetSalvage extends EquipmentSalvage {
 	private static final long serialVersionUID = -1141310703281562285L;
 
+	public JumpJetSalvage() {
+		this(null, null);
+	}
+
 	public JumpJetSalvage(Unit u, Mounted m) {
         super(u, m);
         this.time = 60;
         this.difficulty = 0;
     } 
     
+    @Override
+    public void reCalc() {
+    	super.reCalc();
+    }
+
     @Override
     public ReplacementItem getReplacement() {
         return new JumpJetReplacement(unit, mounted);

@@ -26,7 +26,6 @@ import java.io.PrintWriter;
 import megamek.common.IArmorState;
 import megamek.common.Tank;
 import megamek.common.VTOL;
-import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
 
 /**
@@ -36,12 +35,23 @@ import mekhq.campaign.Unit;
 public class VeeInternalRepair extends InternalRepair {
 	private static final long serialVersionUID = 3219123865702598798L;
 
+	public VeeInternalRepair() {
+		this(null, 0);
+	}
+
 	public VeeInternalRepair(Unit unit, int i) {
         super(unit, i);
         this.time = 60;
         this.difficulty = 0;
+        reCalc();
     }
     
+    @Override
+    public void reCalc() {
+    	// Do nothing.
+    	super.reCalc();
+    }
+
     @Override
     public void doReplaceChanges() {
         removeSalvage();

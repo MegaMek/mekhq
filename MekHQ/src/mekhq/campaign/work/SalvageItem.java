@@ -23,6 +23,9 @@ package mekhq.campaign.work;
 
 import java.io.PrintWriter;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
 import mekhq.campaign.parts.Part;
@@ -41,6 +44,11 @@ public abstract class SalvageItem extends UnitWorkItem {
         super(u);
     }
     
+    @Override
+    public void reCalc() {
+    	super.reCalc();
+    }
+  
     @Override
     public String getDetails() {
         if(NONE != repairId) {
@@ -100,13 +108,13 @@ public abstract class SalvageItem extends UnitWorkItem {
     @Override
     public String maxSkillReached() {
         //See notes in RepairItem#MaxSkillReached
-        return "<br><emph><b>Item cannot be salvaged, it must be scapped instead.</b></emph>";
+        return "<br/><emph><b>Item cannot be salvaged, it must be scapped instead.</b></emph>";
     }
     
     @Override
     public String getToolTip() {
         if(getSkillMin() > SupportTeam.EXP_ELITE) {
-            return "<html> This task is impossible.<br>You can use the right-click menu to scrap this component.</html>";
+            return "<html> This task is impossible.<br/>You can use the right-click menu to scrap this component.</html>";
         } 
         return super.getToolTip();
     }
@@ -117,5 +125,20 @@ public abstract class SalvageItem extends UnitWorkItem {
 				+"<repairId>"
 				+repairId
 				+"</repairId>");
+	}
+	
+	@Override
+	protected void loadFieldsFromXmlNode(Node wn) {
+		NodeList nl = wn.getChildNodes();
+		
+		for (int x=0; x<nl.getLength(); x++) {
+			Node wn2 = nl.item(x);
+			
+			if (wn2.getNodeName().equalsIgnoreCase("repairId")) {
+				repairId = Integer.parseInt(wn2.getTextContent());
+			}
+		}
+		
+		super.loadFieldsFromXmlNode(wn);
 	}
 }

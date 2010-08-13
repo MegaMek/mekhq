@@ -23,6 +23,9 @@ package mekhq.campaign.work;
 
 import java.io.PrintWriter;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.TargetRoll;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.MekHqXmlUtil;
@@ -44,8 +47,15 @@ public abstract class ReplacementItem extends UnitWorkItem {
     public ReplacementItem(Unit unit) {
         super(unit);
         this.partCheck = false;
+        reCalc();
     }
     
+    @Override
+    public void reCalc() {
+    	// Do nothing.
+    	super.reCalc();
+    }
+
     public Part getPart() {
         return part;
     }
@@ -113,7 +123,7 @@ public abstract class ReplacementItem extends UnitWorkItem {
         useUpPart();
         //reset the skill min counter back to green
         setSkillMin(SupportTeam.EXP_GREEN);
-        return "<br><emph><b>Component destroyed!</b></emph>";
+        return "<br/><emph><b>Component destroyed!</b></emph>";
     }
     
     public abstract Part stratopsPartNeeded();
@@ -140,18 +150,18 @@ public abstract class ReplacementItem extends UnitWorkItem {
     
     @Override
     public String getToolTip() {
-        String toReturn = "<html>" + getStats() + "<br>";
+        String toReturn = "<html>" + getStats() + "<br/>";
         if (partNeeded() instanceof GenericSparePart) {
             if(hasPart()) {
-                toReturn += "Using " + partNeeded().getDesc() + "<br>";
+                toReturn += "Using " + partNeeded().getDesc() + "<br/>";
             } else {
-                toReturn += "Needs " + partNeeded().getDesc() + "<br>";
+                toReturn += "Needs " + partNeeded().getDesc() + "<br/>";
             }
         } else {
             if(hasPart()) {
-                toReturn += "Using " + part.getDesc() + "<br>";
+                toReturn += "Using " + part.getDesc() + "<br/>";
             } else {
-                toReturn += "Needs " + partNeeded().getDesc() + "<br>";
+                toReturn += "Needs " + partNeeded().getDesc() + "<br/>";
             }
         }
         toReturn += "</html>";
@@ -228,5 +238,25 @@ public abstract class ReplacementItem extends UnitWorkItem {
 
 	public int getPartId() {
 		return partId;
+	}
+	
+	@Override
+	protected void loadFieldsFromXmlNode(Node wn) {
+		NodeList nl = wn.getChildNodes();
+		
+		for (int x=0; x<nl.getLength(); x++) {
+			Node wn2 = nl.item(x);
+			
+			if (wn2.getNodeName().equalsIgnoreCase("partId")) {
+				partId = Integer.parseInt(wn2.getTextContent());
+			} else if (wn2.getNodeName().equalsIgnoreCase("partCheck")) {
+				if (wn2.getTextContent().equalsIgnoreCase("true"))
+					partCheck = true;
+				else
+					partCheck = false;
+			}
+		}
+		
+		super.loadFieldsFromXmlNode(wn);
 	}
 }

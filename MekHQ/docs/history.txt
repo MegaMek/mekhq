@@ -13,7 +13,7 @@ v0.1.2 (SVN)
 + campaign options reset to private variables accessed by normal methods
 + Bug: campaign does not need to be passed into unit diagnostics because it is a variable in Unit.java
 + finances are disabled by default
-+ bug: finances disabled, replacement not possible due to lack of finances
++ Bug: finances disabled, replacement not possible due to lack of finances
 + refresh unit view when buying units
 + refresh respective views when hiring pilots and techs
 + removed "Store Time" option (no time machines!)
@@ -28,6 +28,19 @@ v0.1.2 (SVN)
 	+ Functions for loading Campaign and most sub-objects from XML (units, personnel, tasks, teams, parts, campaign options outstanding)
 + Added beginnings of a more flexible log framework handled through MekHQApp object.
 + Change "funds" var from int to long.  MAX_INT is only 4.3 billion or so, and there are DropShips that cost 1.6 billion...
++ Changed cost of parts from int to long, plus a couple of supporting functions that used it.
++ Changed instances of "<br>" to "<br/>" for XML parser compatibility on comments and text window.
++ Changed instances of "<p>" to "<p/>" for XML parser compatibility on comments and text window.
++ Added "reCalc" function to all Units, Parts, Persons, WorkItems, and Teams.
+	+ Moved all calculated values in constructors into reCalc and called in constructors.
+	+ Added "reCalc" to XML de-serialization to catch up on missing values.
++ XML Serialization/de-serialization completed. 
++ Altered NewTechTeamDialog so that it generates a new name once a tech is hired.
++ Put partial implementation of "getMonthlySalary()" on Person, as a step towards finances (using FM:Mercs(R) rules).
++ Added "Team Type" to SupportTeam for differentiation without class type comparison.
++ Re-factored MekGyro to more closely reflect actual calculations (based on gyro tonnage, not unit tonnage/walk MP).
++ Cleaned up numerous unnecessary imports.
++ Cleaned up some hanging references/unreferenced locals in code.
 
 v0.1.1 (2009-09-29)
 + declare pilots KIA and retired

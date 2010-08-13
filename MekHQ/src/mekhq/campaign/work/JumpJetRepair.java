@@ -31,10 +31,21 @@ import mekhq.campaign.Unit;
 public class JumpJetRepair extends EquipmentRepair {
 	private static final long serialVersionUID = 125943032552444821L;
 
+	public JumpJetRepair() {
+		this(null, 0, null);
+	}
+
 	public JumpJetRepair(Unit unit, int h, Mounted m) { 
         super(unit, h, m);
         this.time = 90;
         this.difficulty = 0;
+        reCalc();
+    }
+    
+    @Override
+    public void reCalc() {
+    	// Do nothing.
+    	super.reCalc();
     }
 
     @Override

@@ -31,12 +31,23 @@ import mekhq.campaign.Unit;
 public class HeatSinkRepair extends EquipmentRepair {
 	private static final long serialVersionUID = 7249524088844221097L;
 
+	public HeatSinkRepair() {
+		this(null, 0, null);
+	}
+
 	public HeatSinkRepair(Unit unit, int h, Mounted m) {
         super(unit, h, m);
         this.time = 120;
         this.difficulty = -1;
+        reCalc();
     }
     
+    @Override
+    public void reCalc() {
+    	// Do nothing.
+    	super.reCalc();
+    }
+
     @Override
     public WorkItem getReplacementTask() {
         return new HeatSinkReplacement(unit, mounted);

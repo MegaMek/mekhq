@@ -23,61 +23,92 @@ package mekhq.campaign.work;
 
 import java.io.PrintWriter;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.Tank;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
 
 /**
- *
+ * 
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class VeeStabiliserRepair extends RepairItem {
 	private static final long serialVersionUID = 8525489484301403718L;
 	private int loc;
-    
-    public VeeStabiliserRepair(Unit unit, int i) {
-        super(unit, 1);
-        this.loc = i;
-        this.name = "Repair stabilizer (" + unit.getEntity().getLocationName(loc) + ")";
-        this.time = 60;
-        this.difficulty = 1;
-    }
-    
-    @Override
-    public void doReplaceChanges() {
-        removeSalvage();
-    }
 
-    @Override
-    public WorkItem getReplacementTask () {
-        return new VeeStabiliserReplacement(unit, loc);
-    }
+	public VeeStabiliserRepair() {
+		this(null, 0);
+	}
 
-    @Override
-    public void fix() {
-        if(unit.getEntity() instanceof Tank) {
-            //TODO: no method in Tank to remove stabilizer hit
-        }
-    }
-    
-    public int getLoc() {
-        return loc;
-    }
+	public VeeStabiliserRepair(Unit unit, int i) {
+		super(unit, 1);
+		this.loc = i;
+		this.time = 60;
+		this.difficulty = 1;
+		reCalc();
+	}
 
-    @Override
-    public boolean sameAs(WorkItem task) {
-        return (task instanceof VeeStabiliserRepair
-                && ((VeeStabiliserRepair)task).getUnitId() == this.getUnitId()
-                && ((VeeStabiliserRepair)task).getLoc() == this.getLoc());
-    }
+	@Override
+	public void reCalc() {
+		if (unit == null)
+			return;
+
+		this.name = "Repair stabilizer ("
+				+ unit.getEntity().getLocationName(loc) + ")";
+
+		super.reCalc();
+	}
+
+	@Override
+	public void doReplaceChanges() {
+		removeSalvage();
+	}
+
+	@Override
+	public WorkItem getReplacementTask() {
+		return new VeeStabiliserReplacement(unit, loc);
+	}
+
+	@Override
+	public void fix() {
+		if (unit.getEntity() instanceof Tank) {
+			// TODO: no method in Tank to remove stabilizer hit
+		}
+	}
+
+	public int getLoc() {
+		return loc;
+	}
+
+	@Override
+	public boolean sameAs(WorkItem task) {
+		return (task instanceof VeeStabiliserRepair
+				&& ((VeeStabiliserRepair) task).getUnitId() == this.getUnitId() && ((VeeStabiliserRepair) task)
+				.getLoc() == this.getLoc());
+	}
 
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent, int id) {
 		writeToXmlBegin(pw1, indent, id);
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+ "<loc>"
-				+ loc
+		pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<loc>" + loc
 				+ "</loc>");
 		writeToXmlEnd(pw1, indent, id);
+	}
+
+	@Override
+	protected void loadFieldsFromXmlNode(Node wn) {
+		NodeList nl = wn.getChildNodes();
+
+		for (int x = 0; x < nl.getLength(); x++) {
+			Node wn2 = nl.item(x);
+
+			if (wn2.getNodeName().equalsIgnoreCase("loc")) {
+				loc = Integer.parseInt(wn2.getTextContent());
+			}
+		}
+
+		super.loadFieldsFromXmlNode(wn);
 	}
 }

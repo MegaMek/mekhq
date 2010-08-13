@@ -23,6 +23,9 @@ package mekhq.campaign.work;
 
 import java.io.PrintWriter;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.personnel.Person;
 
@@ -42,7 +45,13 @@ public abstract class PersonnelWorkItem extends WorkItem {
 		super();
 		this.person = p;
 		this.patients = 1;
+		reCalc();
 	}
+    
+    @Override
+    public void reCalc() {
+    	// Do nothing.
+    }
 
 	@Override
 	public String getDisplayName() {
@@ -80,6 +89,21 @@ public abstract class PersonnelWorkItem extends WorkItem {
 				+ person.getId() + "</personId>");
 		pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<patients>"
 				+ patients + "</patients>");
+	}
+
+	@Override
+	protected void loadFieldsFromXmlNode(Node wn) {
+		NodeList nl = wn.getChildNodes();
+		
+		for (int x=0; x<nl.getLength(); x++) {
+			Node wn2 = nl.item(x);
+			
+			if (wn2.getNodeName().equalsIgnoreCase("patients")) {
+				patients = Integer.parseInt(wn2.getTextContent());
+			} else if (wn2.getNodeName().equalsIgnoreCase("personId")) {
+				personId = Integer.parseInt(wn2.getTextContent());
+			}
+		}
 	}
 
 	public int getPersonId() {

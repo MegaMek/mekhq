@@ -27,7 +27,6 @@ import megamek.common.CriticalSlot;
 import megamek.common.Mech;
 import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
-import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
 
 /**
@@ -37,20 +36,30 @@ import mekhq.campaign.Unit;
 public class MekEngineRepair extends RepairItem {
 	private static final long serialVersionUID = 9138521953604391431L;
 
+	public MekEngineRepair() {
+		this(null, 0);
+	}
+
 	public MekEngineRepair(Unit unit, int h) {
         super(unit, h);
         this.name = "Repair Engine";
         this.time = 100;
         this.difficulty = -1;
-        if(hits == 2) {
+        reCalc();
+    }
+    
+    @Override
+    public void reCalc() {
+        if (hits == 2) {
             this.time = 200;
             this.difficulty = 0;
         } else if (hits > 2) {
             this.time = 300;
             this.difficulty = 1;
         }
+    	super.reCalc();
     }
-    
+
     @Override
     public String getDetails() {
         return unit.getEntity().getEngine().getEngineName() + ", " + super.getDetails();

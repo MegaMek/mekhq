@@ -23,6 +23,9 @@ package mekhq.campaign.work;
 
 import java.io.PrintWriter;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.CriticalSlot;
 import megamek.common.IArmorState;
 import megamek.common.Mech;
@@ -38,13 +41,27 @@ import mekhq.campaign.parts.Part;
 public class LocationSalvage extends SalvageItem {
 	private static final long serialVersionUID = 168319348571646202L;
 	protected int loc;
-    
+
+	public LocationSalvage() {
+		this(null, 0);
+	}
+   
     public LocationSalvage(Unit unit, int i) {
         super(unit);
-        this.name = "Salvage " + unit.getEntity().getLocationName(i);
         this.time = 240;
         this.difficulty = 3;
         this.loc = i;
+  
+        reCalc();
+    }
+  
+    @Override
+    public void reCalc() {
+        if (unit == null)
+        	return;
+        
+        this.name = "Salvage " + unit.getEntity().getLocationName(loc);
+        super.reCalc();
     }
     
     public int getLoc() {
@@ -111,5 +128,20 @@ public class LocationSalvage extends SalvageItem {
 				+loc
 				+"</loc>");
 		writeToXmlEnd(pw1, indent, id);
+	}
+	
+	@Override
+	protected void loadFieldsFromXmlNode(Node wn) {
+		NodeList nl = wn.getChildNodes();
+		
+		for (int x=0; x<nl.getLength(); x++) {
+			Node wn2 = nl.item(x);
+			
+			if (wn2.getNodeName().equalsIgnoreCase("loc")) {
+				loc = Integer.parseInt(wn2.getTextContent());
+			}
+		}
+		
+		super.loadFieldsFromXmlNode(wn);
 	}
 }

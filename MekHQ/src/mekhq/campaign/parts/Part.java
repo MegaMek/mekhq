@@ -27,11 +27,14 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import megamek.common.Engine;
 import megamek.common.EquipmentType;
 import megamek.common.TechConstants;
+import mekhq.MekHQApp;
 import mekhq.campaign.Faction;
 import mekhq.campaign.MekHqXmlSerializable;
 import mekhq.campaign.MekHqXmlUtil;
@@ -69,9 +72,13 @@ public abstract class Part implements Serializable, MekHqXmlSerializable {
 	protected String name;
 	protected int id;
 	protected boolean salvage;
-	protected int cost;
+	protected long cost;
 	protected int tonnage;
 
+	public Part() {
+		this(false, 0);
+	}
+	
 	public Part(boolean salvage, int tonnage) {
 		this.name = "Unknown";
 		this.salvage = salvage;
@@ -79,6 +86,8 @@ public abstract class Part implements Serializable, MekHqXmlSerializable {
 		this.cost = 0;
 	}
 
+	public abstract void reCalc();
+	
 	public void setId(int id) {
 		this.id = id;
 	}
@@ -99,7 +108,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable {
 		return name + " (" + getCostString() + ")";
 	}
 
-	public int getCost() {
+	public long getCost() {
 		return cost;
 	}
 
@@ -117,8 +126,8 @@ public abstract class Part implements Serializable, MekHqXmlSerializable {
 
 	public String getDescHTML() {
 		String toReturn = "<font size='2'>";
-		toReturn += "<b>" + getDesc() + "</b><br>";
-		toReturn += getStatus() + "<br>";
+		toReturn += "<b>" + getDesc() + "</b><br/>";
+		toReturn += getStatus() + "<br/>";
 		toReturn += "</font>";
 		return toReturn;
 	}
@@ -312,8 +321,48 @@ public abstract class Part implements Serializable, MekHqXmlSerializable {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "</part>");
 	}
 
-	public static Part generateInstanceFromXML(Node wn2) {
-		// TODO: Implement for XML Serialization
-		return null;
+	public static Part generateInstanceFromXML(Node wn) {
+		Part retVal = null;
+		NamedNodeMap attrs = wn.getAttributes();
+		Node classNameNode = attrs.getNamedItem("type");
+		String className = classNameNode.getTextContent();
+		
+		try {
+			// Instantiate the correct child class, and call its parsing function.
+			retVal = (Part) Class.forName(className).newInstance();
+			retVal.loadFieldsFromXmlNode(wn);
+			
+			// Okay, now load Part-specific fields!
+			NodeList nl = wn.getChildNodes();
+			
+			for (int x=0; x<nl.getLength(); x++) {
+				Node wn2 = nl.item(x);
+				
+				if (wn2.getNodeName().equalsIgnoreCase("cost")) {
+					retVal.cost = Long.parseLong(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("id")) {
+					retVal.id = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("name")) {
+					retVal.name = wn2.getTextContent();
+				} else if (wn2.getNodeName().equalsIgnoreCase("salvage")) {
+					if (wn2.getTextContent().equalsIgnoreCase("true"))
+						retVal.salvage = true;
+					else
+						retVal.salvage = false;
+				} else if (wn2.getNodeName().equalsIgnoreCase("tonnage")) {
+					retVal.tonnage = Integer.parseInt(wn2.getTextContent());
+				}
+			}
+		} catch (Exception ex) {
+			// Errrr, apparently either the class name was invalid...
+			// Or the listed name doesn't exist.
+			// Doh!
+			MekHQApp.logError(ex);
+		}
+		
+		return retVal;
 	}
+	
+	protected abstract void loadFieldsFromXmlNode(Node wn);
 }
+

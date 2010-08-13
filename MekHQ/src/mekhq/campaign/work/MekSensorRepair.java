@@ -25,7 +25,6 @@ import java.io.PrintWriter;
 
 import megamek.common.CriticalSlot;
 import megamek.common.Mech;
-import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
 
 /**
@@ -35,17 +34,28 @@ import mekhq.campaign.Unit;
 public class MekSensorRepair extends RepairItem {
 	private static final long serialVersionUID = -8704465505325481427L;
 
+	public MekSensorRepair() {
+		this(null, 0);
+	}
+
 	public MekSensorRepair(Unit unit, int h) {
         super(unit, h);
         this.name = "Repair sensor";
         this.time = 75;
         this.difficulty = 0;
-        if(hits > 1) {
+        reCalc();
+    }
+    
+    @Override
+    public void reCalc() {
+        if (hits > 1) {
             this.time = 150;
             this.difficulty = 3;
         }
+
+    	super.reCalc();
     }
-    
+
     @Override
     public void fix() {
         unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS);

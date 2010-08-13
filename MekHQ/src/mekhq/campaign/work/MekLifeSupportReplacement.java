@@ -25,7 +25,6 @@ import java.io.PrintWriter;
 
 import megamek.common.CriticalSlot;
 import megamek.common.Mech;
-import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
 import mekhq.campaign.parts.MekLifeSupport;
 import mekhq.campaign.parts.Part;
@@ -37,6 +36,10 @@ import mekhq.campaign.parts.Part;
 public class MekLifeSupportReplacement extends ReplacementItem {
 	private static final long serialVersionUID = 2868956239838192108L;
 
+	public MekLifeSupportReplacement() {
+		this(null);
+	}
+
 	public MekLifeSupportReplacement(Unit unit) {
         super(unit);
         this.name = "Replace life support";
@@ -44,6 +47,11 @@ public class MekLifeSupportReplacement extends ReplacementItem {
         this.difficulty = -1;
     }
     
+    @Override
+    public void reCalc() {
+    	super.reCalc();
+    }
+  
     @Override
     public void fix() {
         super.fix();

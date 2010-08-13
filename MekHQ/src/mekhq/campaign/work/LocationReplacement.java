@@ -23,6 +23,9 @@ package mekhq.campaign.work;
 
 import java.io.PrintWriter;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.CriticalSlot;
 import megamek.common.Mech;
 import mekhq.campaign.MekHqXmlUtil;
@@ -38,13 +41,27 @@ public class LocationReplacement extends ReplacementItem {
 	private static final long serialVersionUID = -7220042668917924970L;
 	protected int loc;
 
+	public LocationReplacement() {
+		this(null, 0);
+	}
+
 	public LocationReplacement(Unit unit, int i) {
 		super(unit);
-		this.name = "Replace " + unit.getEntity().getLocationName(i);
 		this.time = 240;
 		this.difficulty = 3;
 		this.loc = i;
+		reCalc();
 	}
+    
+    @Override
+    public void reCalc() {
+		if (unit == null)
+			return;
+		
+		this.name = "Replace " + unit.getEntity().getLocationName(loc);
+
+		super.reCalc();
+    }
 
 	@Override
 	public void fix() {
@@ -106,5 +123,20 @@ public class LocationReplacement extends ReplacementItem {
 		pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<loc>" + loc
 				+ "</loc>");
 		writeToXmlEnd(pw1, indent, id);
+	}
+	
+	@Override
+	protected void loadFieldsFromXmlNode(Node wn) {
+		NodeList nl = wn.getChildNodes();
+		
+		for (int x=0; x<nl.getLength(); x++) {
+			Node wn2 = nl.item(x);
+			
+			if (wn2.getNodeName().equalsIgnoreCase("loc")) {
+				loc = Integer.parseInt(wn2.getTextContent());
+			}
+		}
+		
+		super.loadFieldsFromXmlNode(wn);
 	}
 }

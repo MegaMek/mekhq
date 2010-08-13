@@ -23,6 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import org.w3c.dom.Node;
 import megamek.common.Tank;
 import mekhq.campaign.work.ReplacementItem;
 import mekhq.campaign.work.TurretReplacement;
@@ -32,16 +33,21 @@ import mekhq.campaign.work.TurretReplacement;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class Turret extends Part {
-    
-    /**
-	 * 
-	 */
 	private static final long serialVersionUID = 719267861685599789L;
 
+	public Turret() {
+		this(false, 0);
+	}
+	
 	public Turret(boolean salvage, int tonnage) {
         super(salvage, tonnage);
-        this.name = "Vehicle Turret" + " (" + getTonnage() + ")";
+        reCalc();
     }
+	
+	@Override
+	public void reCalc() {
+        this.name = "Vehicle Turret" + " (" + getTonnage() + ")";
+	}
     
     @Override
     public boolean canBeUsedBy(ReplacementItem task) {
@@ -62,5 +68,10 @@ public class Turret extends Part {
 	public void writeToXml(PrintWriter pw1, int indent, int id) {
 		writeToXmlBegin(pw1, indent, id);
 		writeToXmlEnd(pw1, indent, id);
+	}
+
+	@Override
+	protected void loadFieldsFromXmlNode(Node wn) {
+		// Do nothing - no fields to load.
 	}
 }

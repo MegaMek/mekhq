@@ -39,9 +39,9 @@ public class DateChooser extends JDialog implements ActionListener {
 	public static final int OK_OPTION = 1;
 	public static final int CANCEL_OPTION = 2;
 
-	private static final ArrayList monthNames;
+	private static final ArrayList<String> monthNames;
 	static {
-		monthNames = new ArrayList(12);
+		monthNames = new ArrayList<String>(12);
 		monthNames.add("January");
 		monthNames.add("February");
 		monthNames.add("March");

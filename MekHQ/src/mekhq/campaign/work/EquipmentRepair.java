@@ -23,10 +23,14 @@ package mekhq.campaign.work;
 
 import java.io.PrintWriter;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.CriticalSlot;
 import megamek.common.Mounted;
 import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
+import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
 
 /**
@@ -36,14 +40,23 @@ import mekhq.campaign.Unit;
 public class EquipmentRepair extends RepairItem {
     private static final long serialVersionUID = -2354604328101928006L;
 	protected Mounted mounted;
+	private int equipmentNum = -1;
+
+	public EquipmentRepair() {
+		this(null, 0, null);
+	}
     
     public EquipmentRepair(Unit unit, int h, Mounted m) {
         super(unit, h);
         this.mounted = m;
-        this.name = "Repair " + m.getType().getName();
         this.time = 100;
         this.difficulty = -3;
-        if(hits == 2) {
+        reCalc();
+    }
+    
+    @Override
+    public void reCalc() {
+        if (hits == 2) {
             this.time = 150;
             this.difficulty = -2;
         } else if (hits == 3) {
@@ -53,8 +66,15 @@ public class EquipmentRepair extends RepairItem {
             this.time = 250;
             this.difficulty = 2;
         }
+
+        if (mounted == null)
+        	return;
+        
+        this.name = "Repair " + mounted.getType().getName();
+
+        super.reCalc();
     }
-    
+
     @Override
     public String getDetails() {
         return unit.getEntity().getLocationName(mounted.getLocation()) + ", " + super.getDetails();
@@ -82,22 +102,25 @@ public class EquipmentRepair extends RepairItem {
     
     @Override
     public String checkFixable() {
-        //only fixable if location is not destroyed
-        //we have to cycle through all locations because some equipment is spreadable
+        // The part is only fixable if the location is not destroyed.
+        // We have to cycle through all locations because some equipment is spreadable.
         for(int loc = 0; loc < unit.getEntity().locations(); loc++) {
             for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
                 CriticalSlot slot = unit.getEntity().getCritical(loc, i);
+                
                 // ignore empty & system slots
                 if ((slot == null) || (slot.getType() != CriticalSlot.TYPE_EQUIPMENT)) {
                     continue;
                 }
+                
                 if (unit.getEntity().getEquipmentNum(mounted) == slot.getIndex()) {
-                    if(unit.isLocationDestroyed(loc)) {
+                    if (unit.isLocationDestroyed(loc)) {
                         return unit.getEntity().getLocationName(loc) + " is destroyed.";
                     }
                 }
             }
         }
+        
         return super.checkFixable();
     }
     
@@ -115,17 +138,49 @@ public class EquipmentRepair extends RepairItem {
     @Override
     public TargetRoll getAllMods() {
         TargetRoll target = super.getAllMods();
-        if(mounted.getType().getTechLevel() == TechConstants.T_IS_EXPERIMENTAL
+        
+        if (mounted.getType().getTechLevel() == TechConstants.T_IS_EXPERIMENTAL
                 || mounted.getType().getTechLevel() == TechConstants.T_CLAN_EXPERIMENTAL) {
             target.addModifier(2,"experimental");
         }
+        
         return target;
     }
 
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent, int id) {
 		writeToXmlBegin(pw1, indent, id);
-		//TODO: Handle writing Mounted to XML
+		
+		// I hate to do this, on some level, but...
+		// We know in all EquipmentRepair types that a Unit should be defined...
+		// So we should be able to make this assumption.
+		// If we ever hit an EquipmentRepair with a Mounted but no Unit, this'll break.
+		pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<mountedEqNum>"
+				+ unit.getEntity().getEquipmentNum(mounted) + "</mountedEqNum>");
+		
 		writeToXmlEnd(pw1, indent, id);
+	}
+	
+	@Override
+	protected void loadFieldsFromXmlNode(Node wn) {
+		NodeList nl = wn.getChildNodes();
+		
+		for (int x=0; x<nl.getLength(); x++) {
+			Node wn2 = nl.item(x);
+			
+			if (wn2.getNodeName().equalsIgnoreCase("mountedEqNum")) {
+				equipmentNum = Integer.parseInt(wn2.getTextContent());
+			}
+		}
+		
+		super.loadFieldsFromXmlNode(wn);
+	}
+
+	public int getEquipmentNum() {
+		return equipmentNum;
+	}
+
+	public void setMounted(Mounted m) {
+		mounted = m;
 	}
 }
