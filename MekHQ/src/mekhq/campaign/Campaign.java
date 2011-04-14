@@ -278,10 +278,12 @@ public class Campaign implements Serializable {
 	 */
 	public void addUnit(Entity en, boolean allowNewPilots) {
 		// TODO: check for duplicate display names
-		// first check to see if the externalId of this entity matches any units
-		// we already have
-		int type = PilotPerson.T_MECH;
+
+		//reset the game object
+		en.setGame(game);
 		
+		//figure out type for pilot addition
+		int type = PilotPerson.T_MECH;
 		if (en instanceof Tank) {
 			type = PilotPerson.T_VEE;
 		} else if (en instanceof Protomech) {
@@ -290,6 +292,8 @@ public class Campaign implements Serializable {
 			type = PilotPerson.T_AERO;
 		}
 
+		//first check to see if the externalId of this entity matches any units
+		// we already have
 		Unit priorUnit = unitIds.get(new Integer(en.getExternalId()));
 		
 		if (null != priorUnit) {
@@ -339,7 +343,6 @@ public class Campaign implements Serializable {
 			int id = lastUnitId + 1;
 			en.setId(id);
 			en.setExternalId(id);
-			en.setGame(game);
 			Unit unit = new Unit(en, this);
 			units.add(unit);
 			unitIds.put(new Integer(id), unit);

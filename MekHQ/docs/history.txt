@@ -41,6 +41,7 @@ v0.1.2 (SVN)
 + Re-factored MekGyro to more closely reflect actual calculations (based on gyro tonnage, not unit tonnage/walk MP).
 + Cleaned up numerous unnecessary imports.
 + Cleaned up some hanging references/unreferenced locals in code.
++ Bug 2908482: Unable to deploy any vehicles
 
 v0.1.1 (2009-09-29)
 + declare pilots KIA and retired
