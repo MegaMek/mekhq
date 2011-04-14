@@ -741,7 +741,14 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 	public boolean hasTSM() {
 		for (Mounted mEquip : entity.getMisc()) {
 			MiscType mtype = (MiscType) mEquip.getType();
-			if (mtype.hasFlag(MiscType.F_TSM)) {
+			 //TODO: I am getting some NPEs for mtype here in some saved games
+            //on further investigation it appears that some tasks are not being 
+            //removed for entities that are no longer part of the game, so their 
+            //equipment types are not restored when the game is loaded
+			//I should be able to check for null mtypes without problem
+			//but I need to figure out why tasks for removed entities are hanging
+			//around when the removeUnit method explicitly removes them
+			if (null != mtype && mtype.hasFlag(MiscType.F_TSM)) {
 				return true;
 			}
 		}
