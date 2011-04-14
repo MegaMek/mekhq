@@ -762,7 +762,11 @@ public class Campaign implements Serializable {
 	}
 
 	public void removeAllTasksFor(Unit unit) {
+		ArrayList<WorkItem> tasksToRemove = new ArrayList<WorkItem>();
 		for (WorkItem task : getAllTasksForUnit(unit.getId())) {
+			tasksToRemove.add(task);
+		}
+		for (WorkItem task : tasksToRemove) {
 			removeTask(task);
 		}
 	}

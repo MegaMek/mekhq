@@ -43,6 +43,7 @@ v0.1.2 (SVN)
 + Cleaned up some hanging references/unreferenced locals in code.
 + Bug 2908482: Unable to deploy any vehicles
 + Bug 3065623: Lock up when trying to do tasks
++ avoid concurrent looping problems in Campaign.RemoveAllTasksFor(Unit)
 
 v0.1.1 (2009-09-29)
 + declare pilots KIA and retired
