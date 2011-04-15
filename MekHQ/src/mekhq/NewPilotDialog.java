@@ -420,6 +420,14 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
                 }
             }
         }
+        
+        if ("specialist".equals(option.getName())) { //$NON-NLS-1$
+            optionComp.addValue(Pilot.SPECIAL_NONE);
+            optionComp.addValue(Pilot.SPECIAL_LASER);
+            optionComp.addValue(Pilot.SPECIAL_BALLISTIC);
+            optionComp.addValue(Pilot.SPECIAL_MISSILE);
+            optionComp.setSelected(option.stringValue());
+        }
 
         gridbag.setConstraints(optionComp, c);
         panOptions.add(optionComp);
