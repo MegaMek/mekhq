@@ -522,6 +522,7 @@ public class Campaign implements Serializable {
 
 	public String getCurrentReportHTML() {
 		String toReturn = "";
+		//lets do the report backwards
 		for (String s : currentReport) {
 			toReturn += s + "<br/>";
 		}
@@ -959,9 +960,9 @@ public class Campaign implements Serializable {
 	public void addReport(String r) {
 		int maxLine = 150;
 		while (currentReport.size() > maxLine) {
-			currentReport.remove(0);
+			currentReport.remove(currentReport.size());
 		}
-		currentReport.add(r);
+		currentReport.add(0,r);
 	}
 
 	public void setCamoCategory(String name) {

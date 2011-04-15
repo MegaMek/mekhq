@@ -1779,7 +1779,7 @@ public class MekHQView extends FrameView {
 
 	protected void refreshReport() {
 		txtPaneReport.setText(campaign.getCurrentReportHTML());
-		txtPaneReport.setCaretPosition(txtPaneReport.getDocument().getLength());
+		txtPaneReport.setCaretPosition(0);
 	}
 
 	protected void refreshFunds() {

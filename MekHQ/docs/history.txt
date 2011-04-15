@@ -52,6 +52,7 @@ v0.1.2 (SVN)
 + Bug: setCaretPosition for txtPaneReport not getting right length
 + Updating unit images to 0.35.22
 + Bug: Armor replacement on locations with no armor left 3 points unfixed
++ reversed ordering of report (new items are added to the top) to remove issue of inconsistent auto-scrolling
 
 v0.1.1 (2009-09-29)
 + declare pilots KIA and retired
