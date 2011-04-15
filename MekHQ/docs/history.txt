@@ -47,6 +47,7 @@ v0.1.2 (SVN)
 + updated MegaMek.jar to 0.35.22
 + Bug 3262646: Report Pane doesn't auto scroll
 + Bug 3014569: Load Campaign Dialog Filter
++ updated mechfiles
 
 v0.1.1 (2009-09-29)
 + declare pilots KIA and retired
