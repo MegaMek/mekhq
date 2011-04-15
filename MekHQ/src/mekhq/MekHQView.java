@@ -121,7 +121,10 @@ public class MekHQView extends FrameView {
 
 		@Override
 		public boolean accept(File dir) {
-			return ((dir.getName() != null) && dir.getName().endsWith(useExt));
+			if (dir.isDirectory()) {
+				return true;
+			}
+			return dir.getName().endsWith(useExt);
 		}
 
 		@Override
@@ -1569,8 +1572,10 @@ public class MekHQView extends FrameView {
 		loadList.setFileFilter(new FileFilter() {
 			@Override
 			public boolean accept(File dir) {
-				return ((dir.getName() != null) && dir.getName().endsWith(
-						".mul"));
+				if (dir.isDirectory()) {
+					return true;
+				}
+				return dir.getName().endsWith(".mul");
 			}
 
 			@Override
@@ -1663,8 +1668,10 @@ public class MekHQView extends FrameView {
 		saveList.setFileFilter(new FileFilter() {
 			@Override
 			public boolean accept(File dir) {
-				return ((dir.getName() != null) && dir.getName().endsWith(
-						".mul"));
+				if (dir.isDirectory()) {
+					return true;
+				}
+				return dir.getName().endsWith(".mul");
 			}
 
 			@Override
