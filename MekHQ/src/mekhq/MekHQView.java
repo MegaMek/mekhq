@@ -60,7 +60,10 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
 import javax.swing.event.MouseInputAdapter;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.table.AbstractTableModel;
@@ -772,6 +775,17 @@ public class MekHQView extends FrameView {
 		txtPaneReport.setMinimumSize(new java.awt.Dimension(800, 200));
 		txtPaneReport.setName("txtPaneReport"); // NOI18N
 		txtPaneReport.setPreferredSize(new java.awt.Dimension(800, 200));
+		txtPaneReport.addCaretListener(new CaretListener() {
+			@Override
+			public void caretUpdate(CaretEvent e) {
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						txtPaneReport.setCaretPosition(txtPaneReport.getText().length());
+					}
+				});
+			}
+		});
+		
 		txtPaneReportScrollPane.setViewportView(txtPaneReport);
 
 		gridBagConstraints = new java.awt.GridBagConstraints();

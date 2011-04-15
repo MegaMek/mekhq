@@ -45,6 +45,7 @@ v0.1.2 (SVN)
 + Bug 3065623: Lock up when trying to do tasks
 + avoid concurrent looping problems in Campaign.RemoveAllTasksFor(Unit)
 + updated MegaMek.jar to 0.35.22
++ Bug 3262646: Report Pane doesn't auto scroll
 
 v0.1.1 (2009-09-29)
 + declare pilots KIA and retired
