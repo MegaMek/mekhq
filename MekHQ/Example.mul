@@ -33,7 +33,7 @@
       </location>
    </entity>
 
-  <entity chassis="Mad Dog" model="Prime" type="Biped">
+  <entity chassis="Vulture (Mad Dog)" model="Prime" type="Biped">
       <pilot name="Star Commander Lucien" gunnery="2" piloting="3" hits="1" advantages="clan_pilot_training" autoeject="false"/>
       The first slot in a location is at index="1".
       <location index="0"> Head
@@ -175,7 +175,7 @@
    </entity>
 
 
-    <entity chassis="Adder" model="D" type="Biped">
+    <entity chassis="Puma (Adder)" model="D" type="Biped">
       <pilot name="Mechwarrior Marcus" gunnery="3" piloting="4" hits="3" advantages="clan_pilot_training" autoeject="f
 alse"/>
       The first slot in a location is at index="1".
@@ -203,7 +203,7 @@ alse"/>
       </location>
    </entity>
 
-   <entity chassis="Burke" model="" type="Tracked">
+   <entity chassis="Burke Defense Tank" model="" type="Tracked">
       <pilot name="Edmund" gunnery="3" piloting="4"/>
       <movement speed="2"/>
       <turretlock direction="1"/>
@@ -221,7 +221,7 @@ alse"/>
       </location>
    </entity>
 
-   <entity chassis="Fury" model="" type="Tracked">
+   <entity chassis="Fury Command Tank" model="" type="Tracked">
       <pilot name="Tommy Paine" gunnery="3" piloting="4"/>
       <movement speed="4"/>
       Tanks have special needs, so don't delete any ammo slots.
