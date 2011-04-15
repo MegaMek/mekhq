@@ -105,8 +105,11 @@ public class ArmorReplacement extends ReplacementItem {
 	public void fix() {
 		if (null != part && part instanceof Armor) {
 			int points = Math.min(amount, ((Armor) part).getAmount());
-			unit.getEntity().setArmor(
-					unit.getEntity().getArmor(loc, rear) + points, loc, rear);
+			int cArmor = unit.getEntity().getArmor(loc, rear);
+			if(cArmor < 0) {
+				cArmor = 0;
+			}
+			unit.getEntity().setArmor(cArmor + points, loc, rear);
 			boolean taskFound = false;
 			// need to check the salvage task for mutation
 			for (WorkItem task : unit.campaign.getAllTasksForUnit(unit.getId())) {

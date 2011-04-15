@@ -51,6 +51,7 @@ v0.1.2 (SVN)
 + Bug 3193405: Cannot Hire Pilots---Latest SVN
 + Bug: setCaretPosition for txtPaneReport not getting right length
 + Updating unit images to 0.35.22
++ Bug: Armor replacement on locations with no armor left 3 points unfixed
 
 v0.1.1 (2009-09-29)
 + declare pilots KIA and retired
