@@ -44,6 +44,7 @@ v0.1.2 (SVN)
 + Bug 2908482: Unable to deploy any vehicles
 + Bug 3065623: Lock up when trying to do tasks
 + avoid concurrent looping problems in Campaign.RemoveAllTasksFor(Unit)
++ updated MegaMek.jar to 0.35.22
 
 v0.1.1 (2009-09-29)
 + declare pilots KIA and retired

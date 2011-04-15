@@ -184,8 +184,8 @@ public class ArmorReplacement extends ReplacementItem {
 	@Override
 	public TargetRoll getAllMods() {
 		TargetRoll target = super.getAllMods();
-		if (unit.getEntity().getArmorTechLevel() == TechConstants.T_IS_EXPERIMENTAL
-				|| unit.getEntity().getArmorTechLevel() == TechConstants.T_CLAN_EXPERIMENTAL) {
+		if (unit.getEntity().getArmorTechLevel(loc) == TechConstants.T_IS_EXPERIMENTAL
+				|| unit.getEntity().getArmorTechLevel(loc) == TechConstants.T_CLAN_EXPERIMENTAL) {
 			target.addModifier(2, "experimental");
 		}
 		return target;
@@ -207,7 +207,7 @@ public class ArmorReplacement extends ReplacementItem {
 	@Override
 	public Part stratopsPartNeeded() {
 		// armor is checked for in 5-ton increments
-		int armorType = unit.getEntity().getArmorType();
+		int armorType = unit.getEntity().getArmorType(loc);
 		double armorPerTon = 16.0 * EquipmentType.getArmorPointMultiplier(
 				armorType, unit.getEntity().getTechLevel());
 		if (armorType == EquipmentType.T_ARMOR_HARDENED) {

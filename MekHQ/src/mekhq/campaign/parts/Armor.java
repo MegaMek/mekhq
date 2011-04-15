@@ -85,7 +85,7 @@ public class Armor extends Part {
     @Override
     public boolean canBeUsedBy(ReplacementItem task) {
         return task instanceof ArmorReplacement 
-                && ((ArmorReplacement)task).getUnit().getEntity().getArmorType() == type;
+                && ((ArmorReplacement)task).getUnit().getEntity().getArmorType(((ArmorReplacement)task).getLoc()) == type;
     }
 
     @Override

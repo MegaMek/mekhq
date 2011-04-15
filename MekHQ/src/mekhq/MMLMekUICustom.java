@@ -497,7 +497,7 @@ public class MMLMekUICustom extends JDialog implements RefreshListener {
         entity.calculateBattleValue(true, true);
         StringBuffer costText = new StringBuffer();
 
-        entity.getCost(costText, true);
+        costText = costText.append(entity.getCost(true));
 
         JEditorPane textPane = new JEditorPane("text/html", "");
         JScrollPane scroll = new JScrollPane();
@@ -711,7 +711,7 @@ public class MMLMekUICustom extends JDialog implements RefreshListener {
         structureTab = new StructureTab(entity);
 
         armorTab = new ArmorTab(entity);
-        armorTab.setArmorType(entity.getArmorType());
+        armorTab.setArmorType(entity.getArmorType(0));
         armorTab.refresh();
 
         header = new Header(entity);

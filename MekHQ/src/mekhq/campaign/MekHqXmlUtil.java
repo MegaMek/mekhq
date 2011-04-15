@@ -209,7 +209,7 @@ public class MekHqXmlUtil {
 			Tank tentity = (Tank) tgtEnt;
 			retVal += getMovementString(tentity, indentLvl+1);
 
-			if (tentity.isTurretLocked()) {
+			if (tentity.isTurretLocked(Tank.LOC_TURRET)) {
 				retVal += getTurretLockedString(tentity, indentLvl+1);
 			}
 		}

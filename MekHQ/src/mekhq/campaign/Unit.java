@@ -311,21 +311,21 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 			int diff = entity.getOArmor(i, false) - entity.getArmor(i, false);
 			if (diff > 0) {
 				campaign.addWork(new ArmorReplacement(this, i, entity
-						.getArmorType(), false));
+						.getArmorType(i), false));
 			}
 			if (entity.getArmor(i, false) > 0) {
 				campaign.addWork(new ArmorSalvage(this, i, entity
-						.getArmorType(), false));
+						.getArmorType(i), false));
 			}
 			if (entity.hasRearArmor(i)) {
 				diff = entity.getOArmor(i, true) - entity.getArmor(i, true);
 				if (diff > 0) {
 					campaign.addWork(new ArmorReplacement(this, i, entity
-							.getArmorType(), true));
+							.getArmorType(i), true));
 				}
 				if (entity.getArmor(i, true) > 0) {
 					campaign.addWork(new ArmorSalvage(this, i, entity
-							.getArmorType(), true));
+							.getArmorType(i), true));
 				}
 			}
 
@@ -443,11 +443,12 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 		// check vee components
 		if (entity instanceof Tank) {
 			Tank tank = (Tank) entity;
-			if (tank.isTurretLocked()) {
+			//TODO: deal with dual turrets
+			if (tank.isTurretLocked(Tank.LOC_TURRET)) {
 				campaign.addWork(new TurretLockRepair(this));
 			}
-			if (tank.isTurretJammed()) {
-				tank.unjamTurret();
+			if (tank.isTurretJammed(Tank.LOC_TURRET)) {
+				tank.unjamTurret(Tank.LOC_TURRET);
 			}
 			if (tank.getSensorHits() > 0) {
 				campaign.addWork(new VeeSensorReplacement(this));
@@ -962,8 +963,8 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 
 				// If current armor type != target armor type or if current max
 				// armor != target max armor, get salvage for armor
-			} else if (currentEntity.getArmorType() != targetEntity
-					.getArmorType()
+			} else if (currentEntity.getArmorType(currentLocation) != targetEntity
+					.getArmorType(currentLocation)
 					|| currentEntity.getOArmor(currentLocation, false) != targetEntity
 							.getOArmor(currentLocation, false)
 					|| (currentEntity.hasRearArmor(currentLocation) && (currentEntity
