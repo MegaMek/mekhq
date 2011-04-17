@@ -960,7 +960,7 @@ public class Campaign implements Serializable {
 	public void addReport(String r) {
 		int maxLine = 150;
 		while (currentReport.size() > maxLine) {
-			currentReport.remove(currentReport.size());
+			currentReport.remove(currentReport.size()-1);
 		}
 		currentReport.add(0,r);
 	}
