@@ -10,17 +10,23 @@ package mekhq;
  *
  * @author natit
  */
-public class PopupTextChoiceDialog extends javax.swing.JDialog {
+public class PopupValueChoiceDialog extends javax.swing.JDialog {
 
     /**
-	 * 
+	 * This was originally set up as a text entry dialog, but there is 
+	 * really no reason to use it instead of the pre-fab inputdialog that
+	 * comes with java and it was actually causing problems because it uses
+	 * a textpane instead of a textfield. Since it is currently only called by 
+	 * the set xp command in MekHQView, I am going to refactor it into a 
+	 * numeric value setter using a spinner.
 	 */
 	private static final long serialVersionUID = 8376874926997734492L;
 	/** Creates new form */
-    public PopupTextChoiceDialog(java.awt.Frame parent, boolean modal, String text) {
+    public PopupValueChoiceDialog(java.awt.Frame parent, boolean modal, String title, int current, int min, int max) {
         super(parent, modal);
-        initComponents();
-        label.setText(text);
+        model = new javax.swing.SpinnerNumberModel(current, min, max, 1);
+        initComponents();      
+        label.setText(title);
     }
 
     /** This method is called from within the constructor to
@@ -31,14 +37,13 @@ public class PopupTextChoiceDialog extends javax.swing.JDialog {
     private void initComponents() {
 
         btnDone = new javax.swing.JButton();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        textPane = new javax.swing.JTextPane();
+        value = new javax.swing.JSpinner(model);
         label = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
 
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(PopupTextChoiceDialog.class);
+        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(PopupValueChoiceDialog.class);
         btnDone.setText(resourceMap.getString("btnDone.text")); // NOI18N
         btnDone.setName("btnDone"); // NOI18N
         btnDone.addActionListener(new java.awt.event.ActionListener() {
@@ -47,10 +52,7 @@ public class PopupTextChoiceDialog extends javax.swing.JDialog {
             }
         });
 
-        jScrollPane1.setName("jScrollPane1"); // NOI18N
-
-        textPane.setName("textPane"); // NOI18N
-        jScrollPane1.setViewportView(textPane);
+        value.setName("value"); // NOI18N
 
         label.setText("Label"); // NOI18N
         label.setName("label"); // NOI18N
@@ -68,7 +70,7 @@ public class PopupTextChoiceDialog extends javax.swing.JDialog {
                         .add(14, 14, 14)
                         .add(label)
                         .add(18, 18, 18)
-                        .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 105, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                        .add(value, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 105, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(46, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -77,7 +79,7 @@ public class PopupTextChoiceDialog extends javax.swing.JDialog {
                 .add(29, 29, 29)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                     .add(label)
-                    .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 20, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                    .add(value, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 20, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .add(18, 18, 18)
                 .add(btnDone)
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -96,7 +98,7 @@ public class PopupTextChoiceDialog extends javax.swing.JDialog {
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                PopupTextChoiceDialog dialog = new PopupTextChoiceDialog(new javax.swing.JFrame(), true, "Label");
+                PopupValueChoiceDialog dialog = new PopupValueChoiceDialog(new javax.swing.JFrame(), true, "Label", 0, 0, 1);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     public void windowClosing(java.awt.event.WindowEvent e) {
                         System.exit(0);
@@ -106,21 +108,17 @@ public class PopupTextChoiceDialog extends javax.swing.JDialog {
             }
         });
     }
-
-    public void setText(String text) {
-        textPane.setText(text);
-    }
-
-    public String getText() {
-        return textPane.getText();
+    
+    public int getValue() {
+    	return (Integer)value.getValue();
     }
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnDone;
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel label;
-    private javax.swing.JTextPane textPane;
+    private javax.swing.JSpinner value;
+    private javax.swing.SpinnerNumberModel model;
     // End of variables declaration//GEN-END:variables
 
 }

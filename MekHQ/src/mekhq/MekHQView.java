@@ -2886,12 +2886,10 @@ public class MekHQView extends FrameView {
 
 				refreshPersonnelList();
 			} else if (command.equalsIgnoreCase("XP_SET")) {
-				PopupTextChoiceDialog popupTextChoiceDialog = new PopupTextChoiceDialog(
-						null, true, "Xp");
-				popupTextChoiceDialog.setText(String.valueOf(selectedPerson
-						.getXp()));
-				popupTextChoiceDialog.setVisible(true);
-				int i = Integer.parseInt(popupTextChoiceDialog.getText());
+				PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(
+						null, true, "XP", selectedPerson.getXp(), 0, Math.max(selectedPerson.getXp()+10,100));
+				pvcd.setVisible(true);
+				int i = pvcd.getValue();
 				selectedPerson.setXp(i);
 				refreshPersonnelList();
 			}
