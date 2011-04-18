@@ -21,6 +21,7 @@
 
 package mekhq;
 
+import megamek.client.RandomNameGenerator;
 import mekhq.campaign.personnel.NameGen;
 import mekhq.campaign.team.SupportTeam;
 import javax.swing.DefaultComboBoxModel;
@@ -35,13 +36,14 @@ public class NewTechTeamDialog extends javax.swing.JDialog {
 	private static final long serialVersionUID = -8038099101234445018L;
 	private Campaign campaign;
     private MekHQView hqView;
-    private static NameGen nameGen;
+    private  RandomNameGenerator nameGen;
     
     /** Creates new form NewTeamDialog */
-    public NewTechTeamDialog(java.awt.Frame parent, boolean modal, Campaign campaign, MekHQView view) {
+    public NewTechTeamDialog(java.awt.Frame parent, boolean modal, Campaign campaign, MekHQView view, RandomNameGenerator rng) {
         super(parent, modal);
         this.campaign = campaign;
         this.hqView = view;
+        this.nameGen = rng;
         
         initComponents();
     }
@@ -69,10 +71,8 @@ public class NewTechTeamDialog extends javax.swing.JDialog {
 
         if (nameGen == null)
         {
-        	nameGen = new NameGen();
-        	nameGen.populateNames("/mekhq/resources/firstNames.txt",
-        			"/mekhq/resources/lastNames.txt",
-        			"/mekhq/resources/namePatterns.txt");
+        	nameGen = new RandomNameGenerator();
+        	nameGen.populateNames();
         }
 
         txtTeamName.setText(nameGen.generate());
@@ -201,7 +201,7 @@ private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                NewTechTeamDialog dialog = new NewTechTeamDialog(new javax.swing.JFrame(), true, null, null);
+                NewTechTeamDialog dialog = new NewTechTeamDialog(new javax.swing.JFrame(), true, null, null, null);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     public void windowClosing(java.awt.event.WindowEvent e) {
                         System.exit(0);

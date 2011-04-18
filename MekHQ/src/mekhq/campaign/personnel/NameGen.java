@@ -5,6 +5,8 @@ import java.util.Random;
 import java.util.Scanner;
 import java.util.Vector;
 
+/**This name generator has now been replaced with the one used by MegaMek**/
+
 public class NameGen {
 	private Vector<String> _names;
 	private Vector<String> _surnames;

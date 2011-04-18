@@ -21,7 +21,7 @@
 
 package mekhq;
 
-import mekhq.campaign.personnel.NameGen;
+import megamek.client.RandomNameGenerator;
 import mekhq.campaign.team.SupportTeam;
 import javax.swing.DefaultComboBoxModel;
 import mekhq.campaign.team.MedicalTeam;
@@ -33,12 +33,13 @@ import mekhq.campaign.team.MedicalTeam;
 public class NewMedicalTeamDialog extends javax.swing.JDialog {
 	private static final long serialVersionUID = 473315007619908689L;
 	private MedicalTeam doc;
-    private static NameGen nameGen;
+    private RandomNameGenerator nameGen;
     
     /** Creates new form NewTeamDialog */
-    public NewMedicalTeamDialog(java.awt.Frame parent, boolean modal) {
+    public NewMedicalTeamDialog(java.awt.Frame parent, boolean modal, RandomNameGenerator rng) {
         super(parent, modal);
         this.doc = null;
+        this.nameGen = rng;
         initComponents();
     }
 
@@ -66,10 +67,8 @@ public class NewMedicalTeamDialog extends javax.swing.JDialog {
        
         if (nameGen == null)
         {
-        	nameGen = new NameGen();
-        	nameGen.populateNames("/mekhq/resources/firstNames.txt",
-        			"/mekhq/resources/lastNames.txt",
-        			"/mekhq/resources/namePatterns.txt");
+        	nameGen = new RandomNameGenerator();
+        	nameGen.populateNames();
         }
         
         txtTeamName.setText(nameGen.generate());
@@ -197,7 +196,7 @@ private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                NewMedicalTeamDialog dialog = new NewMedicalTeamDialog(new javax.swing.JFrame(), true);
+                NewMedicalTeamDialog dialog = new NewMedicalTeamDialog(new javax.swing.JFrame(), true, null);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     public void windowClosing(java.awt.event.WindowEvent e) {
                         System.exit(0);

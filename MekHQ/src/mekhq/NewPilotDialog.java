@@ -15,6 +15,7 @@ import java.util.Enumeration;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JLabel;
 
+import megamek.client.RandomNameGenerator;
 import megamek.client.ui.swing.DialogOptionComponent;
 import megamek.client.ui.swing.DialogOptionListener;
 import megamek.common.EquipmentType;
@@ -40,17 +41,18 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
 	private Pilot pilot;
     private ArrayList<DialogOptionComponent> optionComps = new ArrayList<DialogOptionComponent>();
     private PilotOptions options;
-    private static NameGen nameGen;
+    private RandomNameGenerator nameGen;
 
     private Campaign campaign;
     
     private MekHQView hqView;
 
     /** Creates new form NewPilotDialog */
-    public NewPilotDialog(java.awt.Frame parent, boolean modal, Campaign campaign, MekHQView view) {
+    public NewPilotDialog(java.awt.Frame parent, boolean modal, Campaign campaign, MekHQView view, RandomNameGenerator rng) {
         super(parent, modal);
         this.campaign = campaign;
         this.hqView = view;
+        this.nameGen = rng;
         initializePilotAndOptions();
     }
 
@@ -123,10 +125,8 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
 
         if (nameGen == null)
         {
-        	nameGen = new NameGen();
-        	nameGen.populateNames("/mekhq/resources/firstNames.txt",
-        			"/mekhq/resources/lastNames.txt",
-        			"/mekhq/resources/namePatterns.txt");
+        	nameGen = new RandomNameGenerator();
+        	nameGen.populateNames();
         }
 
         //textName.setText(pilot.getName());
@@ -356,7 +356,7 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                NewPilotDialog dialog = new NewPilotDialog(new javax.swing.JFrame(), true, null, null);
+                NewPilotDialog dialog = new NewPilotDialog(new javax.swing.JFrame(), true, null, null, null);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {
