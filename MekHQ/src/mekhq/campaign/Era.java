@@ -21,6 +21,8 @@
 
 package mekhq.campaign;
 
+import megamek.common.EquipmentType;
+
 /**
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
@@ -94,6 +96,31 @@ public class Era {
     
     public static String getEraNameFromYear(int year) {
         return getEraName(getEra(year));
+    }
+ 
+    /**
+     * Convert the eras used in Strategic Ops to the availability-based eras
+     * used in the TechManual
+     * @param era
+     * @return
+     */
+    public static int convertEra(int era) {
+    	switch(era) {
+    	case E_AOW:
+        case E_RW:
+        case E_SL:
+            return EquipmentType.ERA_SL;
+        case E_1SW:
+        case E_2SW:
+        case E_3SW:
+        case E_4SW:
+        	return EquipmentType.ERA_SW;
+        case E_CLAN:
+        case E_JIHAD:
+            return EquipmentType.ERA_CLAN;
+        default:
+            return -1;
+    	}
     }
     
     public static int getEraMod(int era, int faction) {

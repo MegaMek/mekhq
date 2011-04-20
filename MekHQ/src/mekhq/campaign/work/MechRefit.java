@@ -37,7 +37,7 @@ public class MechRefit extends Refit {
 		this(null, null, 0, 0, ' ', 0, 0);
 	}
 
-	public MechRefit(Unit unit, Entity target, int baseTime, int refitClass, char refitKitAvailability, int refitKitAvailabilityMod, int cost) {
+	public MechRefit(Unit unit, Entity target, int baseTime, int refitClass, int refitKitAvailability, int refitKitAvailabilityMod, int cost) {
         super(unit, target, baseTime, refitClass, refitKitAvailability, refitKitAvailabilityMod, cost);
         reCalc();
     }

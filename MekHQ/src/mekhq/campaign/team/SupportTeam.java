@@ -32,8 +32,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import megamek.common.Compute;
+import megamek.common.EquipmentType;
 import megamek.common.TargetRoll;
-import mekhq.campaign.SSWLibHelper.AvailableCodeHelper;
+import mekhq.campaign.parts.Availability;
 import mekhq.campaign.parts.GenericSparePart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.work.FullRepairWarchest;
@@ -347,28 +348,27 @@ public abstract class SupportTeam implements Serializable, MekHqXmlSerializable 
            report += getName() + " must first obtain " + part.getDesc();
            TargetRoll target = getTarget(WorkItem.MODE_NORMAL);
            replace.setPartCheck(true);
-
-           char availability = 'Z';
            int factionMod = 0;
+           int avail = EquipmentType.RATING_X;
            
            if (task instanceof Refit) {
                Refit refit = (Refit) task;
-               availability = refit.getRefitKitAvailability();
+               avail = refit.getRefitKitAvailability();
                factionMod = refit.getRefitKitAvailabilityMod();
            } else {
-               // Part availability mod
-               AvailableCodeHelper availableCodeHelper = SSWLibHelper.getPartAvailableCodeHelper(part, campaign);
-               availability = availableCodeHelper.getAvailability(campaign.getCalendar());
-
+        	   avail = part.getAvailability(campaign.getEra());
                // Faction and Tech mod
                if (campaign.getCampaignOptions().useFactionModifiers())
-                   factionMod = SSWLibHelper.getFactionAndTechMod(part, availableCodeHelper, campaign);
+            	   factionMod = Availability.getFactionAndTechMod(part, campaign);
            }
-
-           int availabilityMod = SSWLibHelper.getModifierFromAvailability(availability);
-           target.addModifier(availabilityMod, "availability (" + availability + ")");
-           target.addModifier(factionMod, "faction");
-
+           
+           int availabilityMod = Availability.getAvailabilityModifier(avail);
+           target.addModifier(availabilityMod, "availability (" + EquipmentType.getRatingName(avail) + ")");
+           if(factionMod != 0) {
+        	   target.addModifier(factionMod, "faction");
+           }
+           
+           
            int roll = Compute.d6(2);
            report += "  needs " + target.getValueAsString();
            report += "<font color='blue' size='-2'> [" + target.getDesc() + "] </font>";

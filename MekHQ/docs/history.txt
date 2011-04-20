@@ -4,6 +4,7 @@ v0.1.3 (SVN)
 + Bug 3288095: Tasks are not refreshing and dates do not advance
 + MegaMek Random Name Generator
 + Bug 3288083: GM Mode - Set XP spinner not working
++ Removed SSW library and all references to it (availability and tech codes should always be checked through MM)
 
 v0.1.2 (2011-04-15)
 + updated MegaMek.jar

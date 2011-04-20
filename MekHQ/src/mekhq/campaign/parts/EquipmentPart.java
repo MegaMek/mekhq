@@ -21,8 +21,6 @@
 
 package mekhq.campaign.parts;
 
-import components.abPlaceable;
-
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
@@ -35,10 +33,9 @@ import megamek.common.EquipmentType;
 import megamek.common.MiscType;
 import megamek.common.TechConstants;
 import megamek.common.weapons.Weapon;
-import mekhq.campaign.Campaign;
+import mekhq.campaign.Era;
 import mekhq.campaign.Faction;
 import mekhq.campaign.MekHqXmlUtil;
-import mekhq.campaign.SSWLibHelper;
 import mekhq.campaign.Unit;
 import mekhq.campaign.work.EquipmentReplacement;
 import mekhq.campaign.work.ReplacementItem;
@@ -184,6 +181,8 @@ public class EquipmentPart extends Part {
         if (cost == 0) {
             // Some equipments do not have a price set in megamek
             // Check if ssw has the price
+        	//NO - NO SSW IN MHQ - lets figure out what items are missing in MM and fix them
+        	/*
             abPlaceable placeable = null;
             
             for (String sswName : getPotentialSSWNames(Faction.F_FEDSUN)) {
@@ -194,6 +193,7 @@ public class EquipmentPart extends Part {
             
             if (placeable != null)
                 cost = (int) placeable.GetCost();
+           */
         }
 
         if (cost > 100000000 || cost < 0) {
@@ -394,5 +394,15 @@ public class EquipmentPart extends Part {
 				typeName = wn2.getTextContent();
 			} 
 		}
+	}
+
+	@Override
+	public int getAvailability(int era) {		
+		return type.getAvailability(Era.convertEra(era));
+	}
+
+	@Override
+	public int getTechRating() {
+		return type.getTechRating();
 	}
 }

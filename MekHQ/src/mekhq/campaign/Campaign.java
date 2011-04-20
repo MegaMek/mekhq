@@ -21,9 +21,6 @@
 
 package mekhq.campaign;
 
-import common.DataFactory;
-import common.EquipmentFactory;
-
 import java.io.FileInputStream;
 import java.io.PrintWriter;
 import java.text.NumberFormat;
@@ -135,9 +132,6 @@ public class Campaign implements Serializable {
 	private String camoFileName = null;
 	private int colorIndex = 0;
 
-	private static components.Mech sswMech;
-	private static EquipmentFactory sswEquipmentFactory;
-
 	private long funds;
 
 	private CampaignOptions campaignOptions = new CampaignOptions();
@@ -168,8 +162,12 @@ public class Campaign implements Serializable {
 	}
 
 	public int getEraMod() {
-		return Era.getEraMod(Era.getEra(calendar.get(Calendar.YEAR)),
+		return Era.getEraMod(getEra(),
 				getFaction());
+	}
+	
+	public int getEra() {
+		return Era.getEra(calendar.get(Calendar.YEAR));
 	}
 
 	public String getTitle() {
@@ -181,42 +179,12 @@ public class Campaign implements Serializable {
 		return calendar;
 	}
 
-	public static EquipmentFactory getSswEquipmentFactory() {
-		if (sswEquipmentFactory == null)
-			sswEquipmentFactory = getNewSswEquipmentFactory();
-		return sswEquipmentFactory;
-	}
-
-	public static components.Mech getSswMech() {
-		if (sswMech == null)
-			sswMech = getNewSswMech();
-		return sswMech;
-	}
-
 	public long getFunds() {
 		return funds;
 	}
 
 	public void setFunds(long funds) {
 		this.funds = funds;
-	}
-
-	public static EquipmentFactory getNewSswEquipmentFactory() {
-		try {
-			DataFactory sswDataFactory = new DataFactory(getSswMech());
-			EquipmentFactory sswEquipmentFactory = sswDataFactory
-					.GetEquipment();
-			return sswEquipmentFactory;
-		} catch (Exception ex) {
-			Logger.getLogger(Campaign.class.getName()).log(Level.SEVERE,
-					"SSW Lib initialization problem", ex);
-			System.exit(1);
-		}
-		return null;
-	}
-
-	public static components.Mech getNewSswMech() {
-		return new components.Mech();
 	}
 
 	/**

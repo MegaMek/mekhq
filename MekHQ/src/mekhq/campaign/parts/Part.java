@@ -26,6 +26,7 @@ import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.GregorianCalendar;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -130,6 +131,16 @@ public abstract class Part implements Serializable, MekHqXmlSerializable {
 		toReturn += getStatus() + "<br/>";
 		toReturn += "</font>";
 		return toReturn;
+	}
+	
+	//TODO: these two methods need to be abstract so that we HAVE to 
+	//define them for each kind of part
+	public int getTechRating() {
+		return EquipmentType.RATING_A;
+	}
+	
+	public int getAvailability(int era) {
+		return EquipmentType.RATING_A;
 	}
 
 	public abstract boolean canBeUsedBy(ReplacementItem task);

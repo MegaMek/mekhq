@@ -54,14 +54,14 @@ public abstract class Refit extends ReplacementItem {
 
 	protected int minimumSite;
 	protected int refitClass;
-	protected char refitKitAvailability;
+	protected int refitKitAvailability;
 	protected int refitKitAvailabilityMod;
 	protected int cost;
 	private int tmpBaseTime = -1;
 	private Entity tmpTarget = null;
 
 	public Refit(Unit unit, Entity target, int baseTime, int refitClass,
-			char refitKitAvailability, int refitKitAvailabilityMod, int cost) {
+			int refitKitAvailability, int refitKitAvailabilityMod, int cost) {
 		super(unit);
 		this.targetEntity = target;
 
@@ -152,7 +152,7 @@ public abstract class Refit extends ReplacementItem {
 		return minimumSite;
 	}
 
-	public char getRefitKitAvailability() {
+	public int getRefitKitAvailability() {
 		return refitKitAvailability;
 	}
 

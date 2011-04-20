@@ -46,7 +46,7 @@ import megamek.common.TechConstants;
 import megamek.common.VTOL;
 import megamek.common.WeaponType;
 import mekhq.MekHQApp;
-import mekhq.campaign.SSWLibHelper.AvailableCodeHelper;
+import mekhq.campaign.parts.Availability;
 import mekhq.campaign.parts.GenericSparePart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.PilotPerson;
@@ -1396,7 +1396,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 		ArrayList<WorkItem> unitTasks = campaign.getTasksForUnit(targetUnit
 				.getId());
 		int totalRepairTime = 0;
-		char refitKitAvailability = 'A';
+		int refitKitAvailability = EquipmentType.RATING_A;
 		int refitKitAvailabilityMod = 0;
 		for (WorkItem unitTask : unitTasks) {
 			if (unitTask instanceof RepairItem
@@ -1406,21 +1406,16 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 				if (unitTask instanceof ReplacementItem) {
 					Part part = ((ReplacementItem) unitTask).partNeeded();
 					// Part availability
-					AvailableCodeHelper availableCodeHelper = SSWLibHelper
-							.getPartAvailableCodeHelper(part, campaign);
-					char availability = availableCodeHelper
-							.getAvailability(campaign.getCalendar());
+					int availability = part.getAvailability(campaign.getEra());
 
 					// Faction and Tech mod
 					int factionMod = 0;
 					if (campaign.getCampaignOptions().useFactionModifiers()) {
-						factionMod = SSWLibHelper.getFactionAndTechMod(part,
-								availableCodeHelper, campaign);
+						factionMod = Availability.getFactionAndTechMod(part, campaign);
 					}
 
-					if (SSWLibHelper.getModifierFromAvailability(availability)
-							+ factionMod > SSWLibHelper
-							.getModifierFromAvailability(refitKitAvailability)
+					if (Availability.getAvailabilityModifier(availability)
+							+ factionMod > Availability.getAvailabilityModifier(refitKitAvailability)
 							+ refitKitAvailabilityMod) {
 						refitKitAvailability = availability;
 						refitKitAvailabilityMod = factionMod;
