@@ -120,5 +120,32 @@ public class Availability {
 
         return factionMod;
     }
+    
+	public static int getTechModifier(int tech) {
+        int modifier = 999;
+
+        switch (tech) {
+            case (EquipmentType.RATING_A) :
+                modifier = -4;
+                break;
+            case (EquipmentType.RATING_B) :
+                modifier = -2;
+                break;
+            case (EquipmentType.RATING_C) :
+                modifier = 0;
+                break;
+            case (EquipmentType.RATING_D) :
+                modifier = 1;
+                break;
+            case (EquipmentType.RATING_E) :
+                modifier = 2;
+                break;
+            case (EquipmentType.RATING_F) :
+                modifier = 3;
+                break;
+        }
+        
+        return modifier;
+    }
 	
 }

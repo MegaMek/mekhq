@@ -29,6 +29,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import megamek.common.AmmoType;
+import megamek.common.EquipmentType;
 import megamek.common.Mounted;
 import megamek.common.TargetRoll;
 import mekhq.campaign.MekHqXmlUtil;
@@ -235,5 +236,9 @@ public class ReloadItem extends UnitWorkItem {
 
 	public void setMounted(Mounted m) {
 		mounted = m;
+	}
+	
+	public int getTechRating() {
+		return EquipmentType.RATING_A;
 	}
 }

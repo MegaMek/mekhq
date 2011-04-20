@@ -26,9 +26,11 @@ import java.io.PrintWriter;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import megamek.common.EquipmentType;
 import megamek.common.TargetRoll;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
+import mekhq.campaign.parts.Availability;
 import mekhq.campaign.team.SupportTeam;
 
 /**
@@ -74,6 +76,7 @@ public abstract class UnitWorkItem extends WorkItem {
         else if(unit.getEntity().getQuirks().booleanOption("difficult_maintain")) {
             mods.addModifier(1, "difficult to maintain");
         }
+        mods.addModifier(Availability.getTechModifier(getTechRating()), "tech rating " + EquipmentType.getRatingName(getTechRating()));
         return mods;
     }
     
@@ -122,4 +125,6 @@ public abstract class UnitWorkItem extends WorkItem {
 	public void setUnit(Unit nt) {
 		unit = nt;
 	}
+	
+	public abstract int getTechRating();
 }

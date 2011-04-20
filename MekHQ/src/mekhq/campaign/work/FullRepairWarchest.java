@@ -26,6 +26,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import megamek.common.AmmoType;
 import megamek.common.CriticalSlot;
+import megamek.common.EquipmentType;
 import megamek.common.Mounted;
 import megamek.common.TargetRoll;
 import mekhq.CampaignOptionsDialog;
@@ -198,5 +199,10 @@ public class FullRepairWarchest extends UnitWorkItem {
 		}
 		
 		super.loadFieldsFromXmlNode(wn);
+	}
+
+	@Override
+	public int getTechRating() {
+		return EquipmentType.RATING_C;
 	}
 }

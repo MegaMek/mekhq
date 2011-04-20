@@ -26,6 +26,7 @@ import java.io.PrintWriter;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import megamek.common.EquipmentType;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
 import mekhq.campaign.parts.Part;
@@ -140,5 +141,14 @@ public abstract class SalvageItem extends UnitWorkItem {
 		}
 		
 		super.loadFieldsFromXmlNode(wn);
+	}
+	
+	@Override
+	public int getTechRating() {
+		if(null != getPart()) {
+			return getPart().getTechRating();
+		} else {
+			return EquipmentType.RATING_C;
+		}
 	}
 }

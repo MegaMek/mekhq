@@ -126,4 +126,9 @@ public abstract class RepairItem extends UnitWorkItem {
 		
 		super.loadFieldsFromXmlNode(wn);
 	}
+	
+	@Override
+	public int getTechRating() {
+		 return ((ReplacementItem)getReplacementTask()).getTechRating();
+	}
 }

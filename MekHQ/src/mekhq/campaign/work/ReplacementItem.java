@@ -26,6 +26,7 @@ import java.io.PrintWriter;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import megamek.common.EquipmentType;
 import megamek.common.TargetRoll;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.MekHqXmlUtil;
@@ -258,5 +259,17 @@ public abstract class ReplacementItem extends UnitWorkItem {
 		}
 		
 		super.loadFieldsFromXmlNode(wn);
+	}
+	
+
+	@Override
+	public int getTechRating() {
+		if(null != part) {
+			return part.getTechRating();
+		} else if(null != partNeeded()) {
+			return partNeeded().getTechRating();
+		} else {
+			return EquipmentType.RATING_C;
+		}
 	}
 }

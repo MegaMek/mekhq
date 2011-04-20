@@ -27,6 +27,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import megamek.common.CriticalSlot;
+import megamek.common.EquipmentType;
 import megamek.common.Mech;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
