@@ -135,13 +135,9 @@ public abstract class Part implements Serializable, MekHqXmlSerializable {
 	
 	//TODO: these two methods need to be abstract so that we HAVE to 
 	//define them for each kind of part
-	public int getTechRating() {
-		return EquipmentType.RATING_C;
-	}
+	public abstract int getTechRating();
 	
-	public int getAvailability(int era) {
-		return EquipmentType.RATING_E;
-	}
+	public abstract int getAvailability(int era);
 
 	public abstract boolean canBeUsedBy(ReplacementItem task);
 

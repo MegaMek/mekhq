@@ -25,6 +25,7 @@ import java.io.PrintWriter;
 
 import org.w3c.dom.Node;
 
+import megamek.common.EquipmentType;
 import mekhq.campaign.work.ReplacementItem;
 import mekhq.campaign.work.VeeSensorReplacement;
 
@@ -71,5 +72,15 @@ public class VeeSensor extends Part {
 	@Override
 	protected void loadFieldsFromXmlNode(Node wn) {
 		// Do nothing.
+	}
+
+	@Override
+	public int getAvailability(int era) {
+		return EquipmentType.RATING_C;
+	}
+
+	@Override
+	public int getTechRating() {
+		return EquipmentType.RATING_C;
 	}
 }

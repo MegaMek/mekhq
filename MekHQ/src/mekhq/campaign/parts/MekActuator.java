@@ -27,6 +27,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import megamek.common.BipedMech;
+import megamek.common.EquipmentType;
 import megamek.common.Mech;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.work.MekActuatorReplacement;
@@ -150,5 +151,15 @@ public class MekActuator extends Part {
 				type = Integer.parseInt(wn2.getTextContent());
 			} 
 		}
+	}
+
+	@Override
+	public int getAvailability(int era) {
+		return EquipmentType.RATING_C;
+	}
+
+	@Override
+	public int getTechRating() {
+		return EquipmentType.RATING_C;
 	}
 }

@@ -209,4 +209,58 @@ public class MekLocation extends Part {
 			} 
 		}
 	}
+
+	@Override
+	public int getAvailability(int era) {
+		switch(structureType) {
+		case EquipmentType.T_STRUCTURE_ENDO_STEEL:
+		case EquipmentType.T_STRUCTURE_ENDO_PROTOTYPE:
+			if(era == EquipmentType.ERA_SL) {
+				return EquipmentType.RATING_D;
+			} else if(era == EquipmentType.ERA_SW) {
+				return EquipmentType.RATING_F;
+			} else {
+				return EquipmentType.RATING_E;
+			}
+		case EquipmentType.T_STRUCTURE_ENDO_COMPOSITE:
+			if(era == EquipmentType.ERA_SL) {
+				return EquipmentType.RATING_X;
+			} else if(era == EquipmentType.ERA_SW) {
+				return EquipmentType.RATING_X;
+			} else {
+				return EquipmentType.RATING_F;
+			}
+		case EquipmentType.T_STRUCTURE_REINFORCED:
+		case EquipmentType.T_STRUCTURE_COMPOSITE:
+			if(era == EquipmentType.ERA_SL) {
+				return EquipmentType.RATING_X;
+			} else if(era == EquipmentType.ERA_SW) {
+				return EquipmentType.RATING_X;
+			} else {
+				return EquipmentType.RATING_E;
+			}
+		case EquipmentType.T_STRUCTURE_INDUSTRIAL:
+		default:
+			return EquipmentType.RATING_C;	
+		}
+	}
+
+	@Override
+	public int getTechRating() {
+		switch(structureType) {
+		case EquipmentType.T_STRUCTURE_ENDO_STEEL:
+		case EquipmentType.T_STRUCTURE_ENDO_PROTOTYPE:
+			return EquipmentType.RATING_E;
+		case EquipmentType.T_STRUCTURE_ENDO_COMPOSITE:
+		case EquipmentType.T_STRUCTURE_REINFORCED:
+		case EquipmentType.T_STRUCTURE_COMPOSITE:
+			return EquipmentType.RATING_E;
+		case EquipmentType.T_STRUCTURE_INDUSTRIAL:
+			return EquipmentType.RATING_C;
+		default:
+			return EquipmentType.RATING_D;
+		}
+		
+	}
+	
 }

@@ -26,6 +26,7 @@ import java.io.PrintWriter;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import megamek.common.EquipmentType;
 import megamek.common.Mech;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.work.MekGyroReplacement;
@@ -168,6 +169,36 @@ public class MekGyro extends Part {
 			} else if (wn2.getNodeName().equalsIgnoreCase("walkMP")) {
 				walkMP = Integer.parseInt(wn2.getTextContent());
 			} 
+		}
+	}
+
+	@Override
+	public int getAvailability(int era) {
+		switch(type) {
+		case Mech.GYRO_COMPACT:
+		case Mech.GYRO_HEAVY_DUTY:
+		case Mech.GYRO_XL:
+			if(era == EquipmentType.ERA_SL) {
+				return EquipmentType.RATING_X;
+			} else if(era == EquipmentType.ERA_SW) {
+				return EquipmentType.RATING_X;
+			} else {
+				return EquipmentType.RATING_E;
+			}
+		default:
+			return EquipmentType.RATING_C;	
+		}
+	}
+
+	@Override
+	public int getTechRating() {
+		switch(type) {
+		case Mech.GYRO_COMPACT:
+		case Mech.GYRO_HEAVY_DUTY:
+		case Mech.GYRO_XL:
+			return EquipmentType.RATING_E;
+		default:
+			return EquipmentType.RATING_D;	
 		}
 	}
 }

@@ -28,6 +28,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import megamek.common.Engine;
+import megamek.common.EquipmentType;
 import megamek.common.Mech;
 import megamek.common.TechConstants;
 import mekhq.campaign.Faction;
@@ -209,5 +210,87 @@ public class MekEngine extends Part {
 		}
 		
 		engine = new Engine(engineType, engineRating, engineFlags);
+	}
+
+	@Override
+	public int getAvailability(int era) {
+		switch(engine.getTechType()) {
+		case Engine.COMBUSTION_ENGINE:
+			if(era == EquipmentType.ERA_SL) {
+				return EquipmentType.RATING_A;
+			} else if(era == EquipmentType.ERA_SW) {
+				return EquipmentType.RATING_A;
+			} else {
+				return EquipmentType.RATING_A;
+			}
+		case Engine.FUEL_CELL:
+			if(era == EquipmentType.ERA_SL) {
+				return EquipmentType.RATING_C;
+			} else if(era == EquipmentType.ERA_SW) {
+				return EquipmentType.RATING_D;
+			} else {
+				return EquipmentType.RATING_D;
+			}
+		case Engine.FISSION:
+			if(era == EquipmentType.ERA_SL) {
+				return EquipmentType.RATING_E;
+			} else if(era == EquipmentType.ERA_SW) {
+				return EquipmentType.RATING_E;
+			} else {
+				return EquipmentType.RATING_D;
+			}
+		case Engine.XL_ENGINE:
+			if(era == EquipmentType.ERA_SL) {
+				return EquipmentType.RATING_D;
+			} else if(era == EquipmentType.ERA_SW) {
+				return EquipmentType.RATING_F;
+			} else {
+				return EquipmentType.RATING_E;
+			}
+		case Engine.LIGHT_ENGINE:
+		case Engine.COMPACT_ENGINE:
+			if(era == EquipmentType.ERA_SL) {
+				return EquipmentType.RATING_X;
+			} else if(era == EquipmentType.ERA_SW) {
+				return EquipmentType.RATING_X;
+			} else {
+				return EquipmentType.RATING_E;
+			}
+		case Engine.XXL_ENGINE:
+			if(era == EquipmentType.ERA_SL) {
+				return EquipmentType.RATING_X;
+			} else if(era == EquipmentType.ERA_SW) {
+				return EquipmentType.RATING_X;
+			} else {
+				return EquipmentType.RATING_F;
+			}
+		default:
+			if(era == EquipmentType.ERA_SL) {
+				return EquipmentType.RATING_C;
+			} else if(era == EquipmentType.ERA_SW) {
+				return EquipmentType.RATING_E;
+			} else {
+				return EquipmentType.RATING_D;
+			}
+		}
+	}
+
+	@Override
+	public int getTechRating() {
+		switch(engine.getTechType()) {
+		case Engine.COMBUSTION_ENGINE:
+			return EquipmentType.RATING_C;
+		case Engine.FUEL_CELL:
+		case Engine.FISSION:
+			return EquipmentType.RATING_D;
+		case Engine.XL_ENGINE:	
+		case Engine.LIGHT_ENGINE:
+		case Engine.COMPACT_ENGINE:
+			return EquipmentType.RATING_E;
+		case Engine.XXL_ENGINE:
+			return EquipmentType.RATING_F;
+		default:
+			return EquipmentType.RATING_D;
+		}
 	}
 }

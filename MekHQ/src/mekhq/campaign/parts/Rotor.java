@@ -24,6 +24,8 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 
 import org.w3c.dom.Node;
+
+import megamek.common.EquipmentType;
 import megamek.common.VTOL;
 import mekhq.campaign.work.ReplacementItem;
 import mekhq.campaign.work.RotorReplacement;
@@ -73,5 +75,18 @@ public class Rotor extends Part {
 	@Override
 	protected void loadFieldsFromXmlNode(Node wn) {
 		// Do nothing - no fields to load.
+	}
+
+	@Override
+	public int getAvailability(int era) {
+		if(era == EquipmentType.ERA_SW) {
+			return EquipmentType.RATING_D;
+		}
+		return EquipmentType.RATING_C;
+	}
+
+	@Override
+	public int getTechRating() {
+		return EquipmentType.RATING_B;
 	}
 }

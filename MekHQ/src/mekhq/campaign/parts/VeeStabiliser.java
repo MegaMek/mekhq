@@ -25,6 +25,7 @@ import java.io.PrintWriter;
 
 import org.w3c.dom.Node;
 
+import megamek.common.EquipmentType;
 import mekhq.campaign.work.ReplacementItem;
 
 /**
@@ -73,5 +74,15 @@ public class VeeStabiliser extends Part {
 	@Override
 	protected void loadFieldsFromXmlNode(Node wn) {
 		// Do nothing.  There are no class-specific fields here.
+	}
+
+	@Override
+	public int getAvailability(int era) {
+		return EquipmentType.RATING_C;
+	}
+
+	@Override
+	public int getTechRating() {
+		return EquipmentType.RATING_C;
 	}
 }

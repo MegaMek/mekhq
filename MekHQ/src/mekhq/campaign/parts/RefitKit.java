@@ -26,6 +26,7 @@ import java.io.PrintWriter;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import megamek.common.EquipmentType;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.work.Refit;
 import mekhq.campaign.work.ReplacementItem;
@@ -107,5 +108,15 @@ public class RefitKit extends Part {
 				targetName = wn2.getTextContent();
 			} 
 		}
+	}
+
+	@Override
+	public int getAvailability(int era) {
+		return EquipmentType.RATING_A;
+	}
+
+	@Override
+	public int getTechRating() {
+		return EquipmentType.RATING_A;
 	}
 }

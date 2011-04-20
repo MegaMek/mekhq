@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import megamek.common.Engine;
 import megamek.common.EquipmentType;
 import megamek.common.TechConstants;
 import mekhq.campaign.Faction;
@@ -189,6 +190,93 @@ public class Armor extends Part {
 			} else if (wn2.getNodeName().equalsIgnoreCase("type")) {
 				type = Integer.parseInt(wn2.getTextContent());
 			} 
+		}
+	}
+
+	@Override
+	public int getAvailability(int era) {
+		switch(type) {
+		case EquipmentType.T_ARMOR_FERRO_FIBROUS:
+		case EquipmentType.T_ARMOR_FERRO_FIBROUS_PROTO:
+			if(era == EquipmentType.ERA_SL) {
+				return EquipmentType.RATING_D;
+			} else if(era == EquipmentType.ERA_SW) {
+				return EquipmentType.RATING_F;
+			} else {
+				return EquipmentType.RATING_D;
+			}
+		case EquipmentType.T_ARMOR_LIGHT_FERRO:
+		case EquipmentType.T_ARMOR_HEAVY_FERRO:
+		case EquipmentType.T_ARMOR_STEALTH:
+			if(era == EquipmentType.ERA_SL) {
+				return EquipmentType.RATING_X;
+			} else if(era == EquipmentType.ERA_SW) {
+				return EquipmentType.RATING_X;
+			} else {
+				return EquipmentType.RATING_E;
+			}
+		case EquipmentType.T_ARMOR_INDUSTRIAL:
+			if(era == EquipmentType.ERA_SL) {
+				return EquipmentType.RATING_B;
+			} else if(era == EquipmentType.ERA_SW) {
+				return EquipmentType.RATING_C;
+			} else {
+				return EquipmentType.RATING_B;
+			}
+		case EquipmentType.T_ARMOR_COMMERCIAL:	
+			if(era == EquipmentType.ERA_SL) {
+				return EquipmentType.RATING_B;
+			} else if(era == EquipmentType.ERA_SW) {
+				return EquipmentType.RATING_B;
+			} else {
+				return EquipmentType.RATING_A;
+			}
+		case EquipmentType.T_ARMOR_REACTIVE:
+		case EquipmentType.T_ARMOR_REFLECTIVE:
+		case EquipmentType.T_ARMOR_HARDENED:
+		case EquipmentType.T_ARMOR_PATCHWORK:
+		case EquipmentType.T_ARMOR_FERRO_IMP:
+		case EquipmentType.T_ARMOR_FERRO_CARBIDE:
+		case EquipmentType.T_ARMOR_LAMELLOR_FERRO_CARBIDE:
+		case EquipmentType.T_ARMOR_FERRO_LAMELLOR:
+			if(era == EquipmentType.ERA_SL) {
+				return EquipmentType.RATING_X;
+			} else if(era == EquipmentType.ERA_SW) {
+				return EquipmentType.RATING_X;
+			} else {
+				return EquipmentType.RATING_F;
+			}
+		default:
+			return EquipmentType.RATING_C;	
+		}
+	}
+
+	@Override
+	public int getTechRating() {
+		switch(type) {
+		case EquipmentType.T_ARMOR_INDUSTRIAL:
+			return EquipmentType.RATING_C;
+		case EquipmentType.T_ARMOR_COMMERCIAL:	
+			return EquipmentType.RATING_B;
+		case EquipmentType.T_ARMOR_FERRO_FIBROUS:
+		case EquipmentType.T_ARMOR_FERRO_FIBROUS_PROTO:		
+		case EquipmentType.T_ARMOR_LIGHT_FERRO:
+		case EquipmentType.T_ARMOR_HEAVY_FERRO:
+		case EquipmentType.T_ARMOR_STEALTH:
+			return EquipmentType.RATING_E;	
+		case EquipmentType.T_ARMOR_HARDENED:
+			return EquipmentType.RATING_D;
+		case EquipmentType.T_ARMOR_REACTIVE:
+		case EquipmentType.T_ARMOR_REFLECTIVE:
+			return EquipmentType.RATING_E;
+		case EquipmentType.T_ARMOR_PATCHWORK:
+		case EquipmentType.T_ARMOR_FERRO_IMP:
+		case EquipmentType.T_ARMOR_FERRO_CARBIDE:
+		case EquipmentType.T_ARMOR_LAMELLOR_FERRO_CARBIDE:
+		case EquipmentType.T_ARMOR_FERRO_LAMELLOR:
+			return EquipmentType.RATING_F;
+		default:
+			return EquipmentType.RATING_D;	
 		}
 	}
 }
