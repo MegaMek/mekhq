@@ -22,11 +22,9 @@
 package mekhq.campaign.parts;
 
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 
 import megamek.common.EquipmentType;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Era;
 import mekhq.campaign.Faction;
 
 /**
@@ -59,7 +57,7 @@ public class Availability {
             case (EquipmentType.RATING_F) :
                 modifier = 2;
                 break;
-            case ('X') :
+            case (EquipmentType.RATING_X) :
                 modifier = 5;
                 break;
         }
