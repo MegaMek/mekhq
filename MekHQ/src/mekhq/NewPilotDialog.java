@@ -48,11 +48,11 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
     private MekHQView hqView;
 
     /** Creates new form NewPilotDialog */
-    public NewPilotDialog(java.awt.Frame parent, boolean modal, Campaign campaign, MekHQView view, RandomNameGenerator rng) {
+    public NewPilotDialog(java.awt.Frame parent, boolean modal, Campaign campaign, MekHQView view) {
         super(parent, modal);
         this.campaign = campaign;
         this.hqView = view;
-        this.nameGen = rng;
+        this.nameGen = campaign.getRNG();
         initializePilotAndOptions();
     }
 
@@ -356,7 +356,7 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                NewPilotDialog dialog = new NewPilotDialog(new javax.swing.JFrame(), true, null, null, null);
+                NewPilotDialog dialog = new NewPilotDialog(new javax.swing.JFrame(), true, null, null);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {

@@ -39,11 +39,11 @@ public class NewTechTeamDialog extends javax.swing.JDialog {
     private  RandomNameGenerator nameGen;
     
     /** Creates new form NewTeamDialog */
-    public NewTechTeamDialog(java.awt.Frame parent, boolean modal, Campaign campaign, MekHQView view, RandomNameGenerator rng) {
+    public NewTechTeamDialog(java.awt.Frame parent, boolean modal, Campaign campaign, MekHQView view) {
         super(parent, modal);
         this.campaign = campaign;
         this.hqView = view;
-        this.nameGen = rng;
+        this.nameGen = campaign.getRNG();
         
         initComponents();
     }
@@ -201,7 +201,7 @@ private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                NewTechTeamDialog dialog = new NewTechTeamDialog(new javax.swing.JFrame(), true, null, null, null);
+                NewTechTeamDialog dialog = new NewTechTeamDialog(new javax.swing.JFrame(), true, null, null);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     public void windowClosing(java.awt.event.WindowEvent e) {
                         System.exit(0);

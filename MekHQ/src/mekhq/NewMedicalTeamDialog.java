@@ -22,6 +22,7 @@
 package mekhq;
 
 import megamek.client.RandomNameGenerator;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.team.SupportTeam;
 import javax.swing.DefaultComboBoxModel;
 import mekhq.campaign.team.MedicalTeam;
@@ -36,10 +37,10 @@ public class NewMedicalTeamDialog extends javax.swing.JDialog {
     private RandomNameGenerator nameGen;
     
     /** Creates new form NewTeamDialog */
-    public NewMedicalTeamDialog(java.awt.Frame parent, boolean modal, RandomNameGenerator rng) {
+    public NewMedicalTeamDialog(java.awt.Frame parent, boolean modal, Campaign campaign) {
         super(parent, modal);
         this.doc = null;
-        this.nameGen = rng;
+        this.nameGen = campaign.getRNG();
         initComponents();
     }
 

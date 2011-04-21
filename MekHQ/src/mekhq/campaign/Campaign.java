@@ -26,6 +26,8 @@ import java.io.PrintWriter;
 import java.text.NumberFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import megamek.client.RandomNameGenerator;
 import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHQApp;
 import mekhq.campaign.team.SupportTeam;
@@ -116,6 +118,8 @@ public class Campaign implements Serializable {
 
 	private String name;
 
+	private RandomNameGenerator rng;
+	
 	// calendar stuff
 	public GregorianCalendar calendar;
 	private SimpleDateFormat dateFormat;
@@ -144,6 +148,8 @@ public class Campaign implements Serializable {
 		shortDateFormat = new SimpleDateFormat("MMddyyyy");
 		addReport("<b>" + getDateAsString() + "</b>");
 		name = "My Campaign";
+		rng = new RandomNameGenerator();
+		rng.populateNames();
 		overtime = false;
 		gmMode = false;
 		faction = Faction.F_MERC;
@@ -179,6 +185,14 @@ public class Campaign implements Serializable {
 		return calendar;
 	}
 
+	public RandomNameGenerator getRNG() {
+		return rng;
+	}
+	
+	public void setRNG(RandomNameGenerator g) {
+		this.rng = g;
+	}
+	
 	public long getFunds() {
 		return funds;
 	}
@@ -1091,6 +1105,8 @@ public class Campaign implements Serializable {
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "name", name);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "faction", faction);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "funds", funds);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "nameGen", rng.getChosenFaction());
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "percentFemale", rng.getPercentFemale());
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "overtime", overtime);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "gmMode", gmMode);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "camoCategory", camoCategory);
@@ -1108,7 +1124,17 @@ public class Campaign implements Serializable {
 				dateFormat.toLocalizedPattern());
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "shortDateFormat",
 				shortDateFormat.toLocalizedPattern());
-
+		{
+			pw1.println("\t\t<nameGen>");
+			pw1.print("\t\t\t<faction>");
+			pw1.print(rng.getChosenFaction());
+			pw1.println("</faction>");
+			pw1.print("\t\t\t<percentFemale>");
+			pw1.print(rng.getPercentFemale());
+			pw1.println("</percentFemale>");
+			pw1.println("\t\t</nameGen>");
+		}
+		
 		{
 			pw1.println("\t\t<currentReport>");
 
@@ -1596,6 +1622,21 @@ public class Campaign implements Serializable {
 				} else if (xn.equalsIgnoreCase("colorIndex")) {
 					retVal.colorIndex = Integer.parseInt(wn.getTextContent()
 							.trim());
+				} else if (xn.equalsIgnoreCase("nameGen")) {					
+					RandomNameGenerator tmpRNG = new RandomNameGenerator();
+					// First, get all the child nodes;
+					NodeList nl2 = wn.getChildNodes();	
+					for (int x2 = 0; x2 < nl2.getLength(); x2++) {
+						Node wn2 = nl2.item(x2);
+						if (wn2.getParentNode() != wn)
+							continue;
+						if (wn2.getNodeName().equalsIgnoreCase("faction")) {
+							tmpRNG.setChosenFaction(wn2.getTextContent().trim());
+						} else if (wn2.getNodeName().equalsIgnoreCase("percentFemale")) {
+							tmpRNG.setPerentFemale(Integer.parseInt(wn2.getTextContent().trim()));
+						}
+					}
+					retVal.rng = tmpRNG;
 				} else if (xn.equalsIgnoreCase("currentReport")) {
 					// First, get all the child nodes;
 					NodeList nl2 = wn.getChildNodes();

@@ -152,8 +152,6 @@ public class MekHQView extends FrameView {
 	private int currentDoctorId;
 	private int currentPartsId;
 	private int[] selectedTasksIds;
-	
-	private RandomNameGenerator rng;
 
 	public MekHQView(SingleFrameApplication app) {
 		super(app);
@@ -162,8 +160,6 @@ public class MekHQView extends FrameView {
 		partsMouseAdapter = new PartsTableMouseAdapter();
 		taskMouseAdapter = new TaskTableMouseAdapter();
 		personMouseAdapter = new PersonTableMouseAdapter();
-		rng = new RandomNameGenerator();
-		rng.populateNames();
 		initComponents();
 		refreshCalendar();
 
@@ -1231,7 +1227,7 @@ public class MekHQView extends FrameView {
 
 	private void miHirePilotActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miHirePilotActionPerformed
 		NewPilotDialog npd = new NewPilotDialog(getFrame(), true, campaign,
-				this, rng);
+				this);
 		npd.setVisible(true);
 		refreshPersonnelList();
 		refreshReport();
@@ -1239,7 +1235,7 @@ public class MekHQView extends FrameView {
 
 	private void miHireTechActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miHireTechActionPerformed
 		NewTechTeamDialog ntd = new NewTechTeamDialog(getFrame(), true,
-				campaign, this, rng);
+				campaign, this);
 		ntd.setVisible(true);
 		refreshTechsList();
 		refreshPersonnelList();
@@ -1247,7 +1243,7 @@ public class MekHQView extends FrameView {
 	}// GEN-LAST:event_miHireTechActionPerformed
 
 	private void miHireDoctorActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miHireDoctorActionPerformed
-		NewMedicalTeamDialog nmd = new NewMedicalTeamDialog(getFrame(), true, rng);
+		NewMedicalTeamDialog nmd = new NewMedicalTeamDialog(getFrame(), true, campaign);
 		nmd.setVisible(true);
 		
 		if (null != nmd.getMedicalTeam()) {
