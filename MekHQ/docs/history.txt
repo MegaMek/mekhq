@@ -13,6 +13,7 @@ v0.1.3 (SVN)
 + moved random name generator from MekHQView.java to Campaign.java
 + Added random name generator properties to XML load/save
 + chooser for random name generator faction
++ Bug: name generator not being populated with XML load
 
 v0.1.2 (2011-04-15)
 + updated MegaMek.jar

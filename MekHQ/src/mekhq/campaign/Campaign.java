@@ -1623,7 +1623,6 @@ public class Campaign implements Serializable {
 					retVal.colorIndex = Integer.parseInt(wn.getTextContent()
 							.trim());
 				} else if (xn.equalsIgnoreCase("nameGen")) {					
-					RandomNameGenerator tmpRNG = new RandomNameGenerator();
 					// First, get all the child nodes;
 					NodeList nl2 = wn.getChildNodes();	
 					for (int x2 = 0; x2 < nl2.getLength(); x2++) {
@@ -1631,12 +1630,11 @@ public class Campaign implements Serializable {
 						if (wn2.getParentNode() != wn)
 							continue;
 						if (wn2.getNodeName().equalsIgnoreCase("faction")) {
-							tmpRNG.setChosenFaction(wn2.getTextContent().trim());
+							retVal.getRNG().setChosenFaction(wn2.getTextContent().trim());
 						} else if (wn2.getNodeName().equalsIgnoreCase("percentFemale")) {
-							tmpRNG.setPerentFemale(Integer.parseInt(wn2.getTextContent().trim()));
+							retVal.getRNG().setPerentFemale(Integer.parseInt(wn2.getTextContent().trim()));
 						}
 					}
-					retVal.rng = tmpRNG;
 				} else if (xn.equalsIgnoreCase("currentReport")) {
 					// First, get all the child nodes;
 					NodeList nl2 = wn.getChildNodes();
