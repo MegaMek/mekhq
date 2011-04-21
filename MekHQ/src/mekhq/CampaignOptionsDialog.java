@@ -15,6 +15,8 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
+import java.util.Iterator;
+
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JFormattedTextField;
@@ -41,6 +43,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private String camoFileName;
     private int colorIndex;
     private DirectoryItems camos;
+    
     
     /** Creates new form CampaignOptionsDialog */
     public CampaignOptionsDialog(java.awt.Frame parent, boolean modal, Campaign c) {
@@ -84,9 +87,11 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         txtName = new javax.swing.JTextField();
         lblName = new javax.swing.JLabel();
         lblFaction = new javax.swing.JLabel();
+        lblFactionNames = new javax.swing.JLabel();
         lblDate = new javax.swing.JLabel();
         btnDate = new javax.swing.JButton();
         comboFaction = new javax.swing.JComboBox();
+        comboFactionNames = new javax.swing.JComboBox();
         btnCamo = new javax.swing.JButton();
         lblCamo = new javax.swing.JLabel();
         panRules = new javax.swing.JPanel();
@@ -147,11 +152,20 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panGeneral.add(lblFaction, gridBagConstraints);
 
+        lblFactionNames.setText(resourceMap.getString("lblFactionNames.text")); // NOI18N
+        lblFactionNames.setName("lblFactionNames"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        panGeneral.add(lblFactionNames, gridBagConstraints);
+
+        
         lblDate.setText(resourceMap.getString("lblDate.text")); // NOI18N
         lblDate.setName("lblDate"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panGeneral.add(lblDate, gridBagConstraints);
 
@@ -166,7 +180,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panGeneral.add(btnDate, gridBagConstraints);
 
@@ -185,6 +199,22 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panGeneral.add(comboFaction, gridBagConstraints);
 
+        DefaultComboBoxModel factionNamesModel = new DefaultComboBoxModel();
+        for (Iterator<String> i = campaign.getRNG().getFactions(); i.hasNext(); ) {
+            String faction = (String) i.next();
+            factionNamesModel.addElement(faction);
+        }
+        factionNamesModel.setSelectedItem(campaign.getRNG().getChosenFaction());
+        comboFactionNames.setModel(factionNamesModel);
+        comboFactionNames.setMinimumSize(new java.awt.Dimension(400, 30));
+        comboFactionNames.setName("comboFactionNames"); // NOI18N
+        comboFactionNames.setPreferredSize(new java.awt.Dimension(400, 30));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        panGeneral.add(comboFactionNames, gridBagConstraints);
+        
         btnCamo.setMaximumSize(new java.awt.Dimension(84, 72));
         btnCamo.setMinimumSize(new java.awt.Dimension(84, 72));
         btnCamo.setName("btnCamo"); // NOI18N
@@ -196,7 +226,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panGeneral.add(btnCamo, gridBagConstraints);
 
@@ -204,7 +234,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         lblCamo.setName("lblCamo"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panGeneral.add(lblCamo, gridBagConstraints);
 
@@ -342,6 +372,7 @@ private void btnOkayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
     }
     campaign.calendar = date;
     campaign.setFaction(comboFaction.getSelectedIndex());
+    campaign.getRNG().setChosenFaction((String)comboFactionNames.getSelectedItem());
     campaign.setCamoCategory(camoCategory);
     campaign.setCamoFileName(camoFileName);
     campaign.setColorIndex(colorIndex);
@@ -443,9 +474,11 @@ public String getDateAsString() {
     private javax.swing.JCheckBox chkUseFinances;
     private javax.swing.JFormattedTextField clanPriceModifierJFormattedTextField;
     private javax.swing.JComboBox comboFaction;
+    private javax.swing.JComboBox comboFactionNames;
     private javax.swing.JLabel lblCamo;
     private javax.swing.JLabel lblDate;
     private javax.swing.JLabel lblFaction;
+    private javax.swing.JLabel lblFactionNames;
     private javax.swing.JLabel lblName;
     private javax.swing.JPanel panGeneral;
     private javax.swing.JPanel panRules;

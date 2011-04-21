@@ -12,6 +12,7 @@ v0.1.3 (SVN)
 + tech rating modifier for repair, replacement, and salvage
 + moved random name generator from MekHQView.java to Campaign.java
 + Added random name generator properties to XML load/save
++ chooser for random name generator faction
 
 v0.1.2 (2011-04-15)
 + updated MegaMek.jar
