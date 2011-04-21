@@ -244,9 +244,12 @@ public class MekHQView extends FrameView {
 
 		mainPanel = new javax.swing.JPanel();
 		tabMain = new javax.swing.JTabbedPane();
+		tabTasks = new javax.swing.JTabbedPane();
 		panHangar = new javax.swing.JPanel();
 		scrollTaskTable = new javax.swing.JScrollPane();
 		TaskTable = new javax.swing.JTable();
+		scrollAcquisitionTable = new javax.swing.JScrollPane();
+		AcquisitionTable = new javax.swing.JTable();
 		scrollUnitTable = new javax.swing.JScrollPane();
 		UnitTable = new javax.swing.JTable();
 		scrollTechTable = new javax.swing.JScrollPane();
@@ -323,6 +326,11 @@ public class MekHQView extends FrameView {
 		panHangar.setName("panHangar"); // NOI18N
 		panHangar.setLayout(new java.awt.GridBagLayout());
 
+		tabTasks.setToolTipText(resourceMap.getString("tabTasks.toolTipText")); // NOI18N
+		tabTasks.setMinimumSize(new java.awt.Dimension(600, 200));
+		tabTasks.setName("tabTasks"); // NOI18N
+		tabTasks.setPreferredSize(new java.awt.Dimension(300, 300));
+
 		scrollTaskTable.setMinimumSize(new java.awt.Dimension(200, 200));
 		scrollTaskTable.setName("scrollTaskTable"); // NOI18N
 		scrollTaskTable.setPreferredSize(new java.awt.Dimension(300, 300));
@@ -342,13 +350,37 @@ public class MekHQView extends FrameView {
 		TaskTable.addMouseListener(taskMouseAdapter);
 		scrollTaskTable.setViewportView(TaskTable);
 
+		scrollAcquisitionTable.setMinimumSize(new java.awt.Dimension(200, 200));
+		scrollAcquisitionTable.setName("scrollAcquisitionTable"); // NOI18N
+		scrollAcquisitionTable.setPreferredSize(new java.awt.Dimension(300, 300));
+
+		AcquisitionTable.setModel(taskModel);
+		AcquisitionTable.setName("AcquisitionTable"); // NOI18N
+		AcquisitionTable.setRowHeight(60);
+		AcquisitionTable.getColumnModel().getColumn(0)
+				.setCellRenderer(taskModel.getRenderer());
+		AcquisitionTable.getSelectionModel().addListSelectionListener(
+				new javax.swing.event.ListSelectionListener() {
+					public void valueChanged(
+							javax.swing.event.ListSelectionEvent evt) {
+						TaskTableValueChanged(evt);
+					}
+				});
+		//AcquisitionTable.addMouseListener(acquisitionMouseAdapter);
+		scrollAcquisitionTable.setViewportView(AcquisitionTable);
+
+		
+		tabTasks.addTab(resourceMap.getString("scrollTaskTable.TabConstraints.tabTasks"), scrollTaskTable); // NOI18N
+		tabTasks.addTab(resourceMap.getString("scrollAcquisitionTable.TabConstraints.tabTasks"), scrollAcquisitionTable); // NOI18N
+
+		
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 1;
 		gridBagConstraints.gridy = 2;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 		gridBagConstraints.weightx = 0.5;
 		gridBagConstraints.weighty = 1.0;
-		panHangar.add(scrollTaskTable, gridBagConstraints);
+		panHangar.add(tabTasks, gridBagConstraints);
 
 		scrollUnitTable.setMinimumSize(new java.awt.Dimension(300, 200));
 		scrollUnitTable.setName("scrollUnitTable"); // NOI18N
@@ -3199,6 +3231,7 @@ public class MekHQView extends FrameView {
 	private javax.swing.JTable PartsTable;
 	private javax.swing.JTable PersonTable;
 	private javax.swing.JTable TaskTable;
+	private javax.swing.JTable AcquisitionTable;
 	private javax.swing.JTable TechTable;
 	private javax.swing.JTable UnitTable;
 	private javax.swing.JMenuItem addFunds;
@@ -3244,12 +3277,14 @@ public class MekHQView extends FrameView {
 	private javax.swing.JScrollPane scrollDocTable;
 	private javax.swing.JScrollPane scrollPersonTable;
 	private javax.swing.JScrollPane scrollTaskTable;
+	private javax.swing.JScrollPane scrollAcquisitionTable;
 	private javax.swing.JScrollPane scrollTechTable;
 	private javax.swing.JScrollPane scrollUnitTable;
 	private javax.swing.JLabel statusAnimationLabel;
 	private javax.swing.JLabel statusMessageLabel;
 	private javax.swing.JPanel statusPanel;
 	private javax.swing.JTabbedPane tabMain;
+	private javax.swing.JTabbedPane tabTasks;
 	private javax.swing.JTextArea textTarget;
 	private javax.swing.JTextPane txtPaneReport;
 	private javax.swing.JScrollPane txtPaneReportScrollPane;
