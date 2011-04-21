@@ -251,6 +251,44 @@ public abstract class SupportTeam implements Serializable, MekHqXmlSerializable 
        }
    }
    
+   public TargetRoll getTargetForAcquisition(WorkItem task) {
+	   if(null == task) {
+           return new TargetRoll(TargetRoll.IMPOSSIBLE, "no task?");
+       }
+	   if(!(task instanceof ReplacementItem)) {
+           return new TargetRoll(TargetRoll.IMPOSSIBLE, "This is not a replacement task");
+	   }
+	   ReplacementItem replacement = (ReplacementItem)task;
+	   if(replacement.hasPart()) {
+           return new TargetRoll(TargetRoll.IMPOSSIBLE, "A part already exists for this replacement");
+	   }
+	   if(replacement.hasCheckedForPart()) {
+           return new TargetRoll(TargetRoll.IMPOSSIBLE, "Already checked for this part in this cycle");
+	   }
+	   
+	   Part part = replacement.partNeeded();
+	   TargetRoll target = getTarget(WorkItem.MODE_NORMAL);
+       int factionMod = 0;
+       int avail = EquipmentType.RATING_X;    
+       if (task instanceof Refit) {
+           Refit refit = (Refit) task;
+           avail = refit.getRefitKitAvailability();
+           factionMod = refit.getRefitKitAvailabilityMod();
+       } else {
+    	   avail = part.getAvailability(campaign.getEra());
+           // Faction and Tech mod
+           if (campaign.getCampaignOptions().useFactionModifiers())
+        	   factionMod = Availability.getFactionAndTechMod(part, campaign);
+       }
+       
+       int availabilityMod = Availability.getAvailabilityModifier(avail);
+       target.addModifier(availabilityMod, "availability (" + EquipmentType.getRatingName(avail) + ")");
+       if(factionMod != 0) {
+    	   target.addModifier(factionMod, "faction");
+       }
+	   return target;
+   }
+   
    public TargetRoll getTargetFor(WorkItem task) {
        if(null == task) {
            return new TargetRoll(TargetRoll.IMPOSSIBLE, "no task?");
@@ -283,8 +321,8 @@ public abstract class SupportTeam implements Serializable, MekHqXmlSerializable 
        if(!canDo(task)) {
            return new TargetRoll(TargetRoll.IMPOSSIBLE, "Support team cannot do this kind of task.");
        }
-       if(task instanceof ReplacementItem && !((ReplacementItem)task).hasPart() && ((ReplacementItem)task).hasCheckedForPart()) {
-           return new TargetRoll(TargetRoll.IMPOSSIBLE, "part not available and already checked for this cycle");
+       if(task instanceof ReplacementItem && !((ReplacementItem)task).hasPart()) {
+           return new TargetRoll(TargetRoll.IMPOSSIBLE, "part not available.");
        }
        TargetRoll target = getTarget(task.getMode());
        if(target.getValue() == TargetRoll.IMPOSSIBLE) {
@@ -336,42 +374,17 @@ public abstract class SupportTeam implements Serializable, MekHqXmlSerializable 
        return target;
    }
    
-   public String doAssigned(WorkItem task) {
-       // Called by btnDoTaskActionPerformed
-       // if team.getTargetFor(task).getValue() == TargetRoll.IMPOSSIBLE, doAssigned is not called
-       // Not called if not enough funds as long as getTargetFor checks for funds
+   public String acquirePartFor(WorkItem task) {
        String report = "";
-       if(task instanceof ReplacementItem && !((ReplacementItem)task).hasPart()) {
+	   if(task instanceof ReplacementItem && !((ReplacementItem)task).hasPart()) {
            //first we need to source the part
            ReplacementItem replace = (ReplacementItem)task;
            Part part = replace.partNeeded();
-           report += getName() + " must first obtain " + part.getDesc();
-           TargetRoll target = getTarget(WorkItem.MODE_NORMAL);
+           report += getName() + " attempts to find " + part.getDesc();          
+           TargetRoll target = getTargetForAcquisition(replace);     
            replace.setPartCheck(true);
-           int factionMod = 0;
-           int avail = EquipmentType.RATING_X;
-           
-           if (task instanceof Refit) {
-               Refit refit = (Refit) task;
-               avail = refit.getRefitKitAvailability();
-               factionMod = refit.getRefitKitAvailabilityMod();
-           } else {
-        	   avail = part.getAvailability(campaign.getEra());
-               // Faction and Tech mod
-               if (campaign.getCampaignOptions().useFactionModifiers())
-            	   factionMod = Availability.getFactionAndTechMod(part, campaign);
-           }
-           
-           int availabilityMod = Availability.getAvailabilityModifier(avail);
-           target.addModifier(availabilityMod, "availability (" + EquipmentType.getRatingName(avail) + ")");
-           if(factionMod != 0) {
-        	   target.addModifier(factionMod, "faction");
-           }
-           
-           
            int roll = Compute.d6(2);
            report += "  needs " + target.getValueAsString();
-           report += "<font color='blue' size='-2'> [" + target.getDesc() + "] </font>";
            report += " and rolls " + roll + ":";
 
            if(roll >= target.getValue()) {
@@ -380,10 +393,17 @@ public abstract class SupportTeam implements Serializable, MekHqXmlSerializable 
               campaign.buyPart(part);
            } else {
               report += " <font color='red'><b>part not available.</b></font>";
-              return report;
            }
        }
-       
+	   return report;
+   }
+   
+   public String doAssigned(WorkItem task) {
+       // Called by btnDoTaskActionPerformed
+       // if team.getTargetFor(task).getValue() == TargetRoll.IMPOSSIBLE, doAssigned is not called
+       // Not called if not enough funds as long as getTargetFor checks for funds
+       String report = "";
+          
        /*
        else if (task instanceof ReplacementItem
                     && ((ReplacementItem)task).hasPart()

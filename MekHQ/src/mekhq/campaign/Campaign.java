@@ -674,6 +674,10 @@ public class Campaign implements Serializable {
 		getTasks().add(index, newTask);
 	}
 
+	public void getPartFor(WorkItem task, SupportTeam team) {
+		addReport(team.acquirePartFor(task));
+	}
+	
 	public boolean processTask(WorkItem task, SupportTeam team) {
 		addReport(team.doAssigned(task));
 		if (task.isCompleted()) {
@@ -1699,5 +1703,15 @@ public class Campaign implements Serializable {
 				}
 			}
 		}
+	}
+
+	public ArrayList<WorkItem> getAcquisitionsForUnit(int unitId) {
+		ArrayList<WorkItem> acquire = new ArrayList<WorkItem>();
+		for(WorkItem task : getTasksForUnit(unitId)) {
+			if(task instanceof ReplacementItem && !((ReplacementItem)task).hasPart()) {
+				acquire.add(task);
+			}
+		}
+		return acquire;
 	}
 }

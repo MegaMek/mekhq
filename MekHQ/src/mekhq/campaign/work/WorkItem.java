@@ -211,6 +211,10 @@ public abstract class WorkItem implements Serializable, MekHqXmlSerializable {
 		toReturn += "</font></html>";
 		return toReturn;
 	}
+	
+	public String getPartDescHTML() {
+		return "No parts for this work item";
+	}
 
 	public TargetRoll getAllMods() {
 		TargetRoll mods = new TargetRoll(getDifficulty(), "difficulty");

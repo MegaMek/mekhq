@@ -272,4 +272,25 @@ public abstract class ReplacementItem extends UnitWorkItem {
 			return EquipmentType.RATING_C;
 		}
 	}
+	
+	@Override
+	public String getPartDescHTML() {
+		String bonus = getAllMods().getValueAsString();
+		if (getAllMods().getValue() > -1) {
+			bonus = "+" + bonus;
+		}
+		bonus = "(" + bonus + ")";
+		String toReturn = "<html><font size='2'";
+		
+		Part tmpPart = part;
+		if(null == part) {
+			tmpPart = partNeeded();
+		}
+		
+		toReturn += ">";
+		toReturn += "<b>" + tmpPart.getName() + "</b> " + bonus + "<br/>";
+		toReturn += getDetails() + "<br/>";
+		toReturn += "</font></html>";
+		return toReturn;
+	}
 }

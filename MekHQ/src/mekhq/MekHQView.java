@@ -64,6 +64,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.MouseInputAdapter;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.table.AbstractTableModel;
@@ -136,6 +138,7 @@ public class MekHQView extends FrameView {
 
 	private Campaign campaign = new Campaign();
 	private TaskTableModel taskModel = new TaskTableModel();
+	private AcquisitionTableModel acquireModel = new AcquisitionTableModel();
 	private MekTableModel unitModel = new MekTableModel();
 	private TechTableModel techsModel = new TechTableModel();
 	private PersonTableModel personnelModel = new PersonTableModel();
@@ -147,6 +150,7 @@ public class MekHQView extends FrameView {
 	private PersonTableMouseAdapter personMouseAdapter;
 	private int currentUnitId;
 	private int currentTaskId;
+	private int currentAcquisitionId;
 	private int currentTechId;
 	private int currentPersonId;
 	private int currentDoctorId;
@@ -330,6 +334,11 @@ public class MekHQView extends FrameView {
 		tabTasks.setMinimumSize(new java.awt.Dimension(600, 200));
 		tabTasks.setName("tabTasks"); // NOI18N
 		tabTasks.setPreferredSize(new java.awt.Dimension(300, 300));
+		tabTasks.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent evt) {
+		        taskTabChanged();
+		    }
+		});
 
 		scrollTaskTable.setMinimumSize(new java.awt.Dimension(200, 200));
 		scrollTaskTable.setName("scrollTaskTable"); // NOI18N
@@ -354,16 +363,16 @@ public class MekHQView extends FrameView {
 		scrollAcquisitionTable.setName("scrollAcquisitionTable"); // NOI18N
 		scrollAcquisitionTable.setPreferredSize(new java.awt.Dimension(300, 300));
 
-		AcquisitionTable.setModel(taskModel);
+		AcquisitionTable.setModel(acquireModel);
 		AcquisitionTable.setName("AcquisitionTable"); // NOI18N
 		AcquisitionTable.setRowHeight(60);
 		AcquisitionTable.getColumnModel().getColumn(0)
-				.setCellRenderer(taskModel.getRenderer());
+				.setCellRenderer(acquireModel.getRenderer());
 		AcquisitionTable.getSelectionModel().addListSelectionListener(
 				new javax.swing.event.ListSelectionListener() {
 					public void valueChanged(
 							javax.swing.event.ListSelectionEvent evt) {
-						TaskTableValueChanged(evt);
+						AcquisitionTableValueChanged(evt);
 					}
 				});
 		//AcquisitionTable.addMouseListener(acquisitionMouseAdapter);
@@ -1111,19 +1120,24 @@ public class MekHQView extends FrameView {
 
 	private void btnDoTaskActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnDoTaskActionPerformed
 		// assign the task to the team here
-		for (int i = 0; i < selectedTasksIds.length; i++) {
-			WorkItem task = campaign.getTask(selectedTasksIds[i]);
-			SupportTeam team = campaign.getTeam(currentTechId);
-			
-			if ((null != task)
-					&& (null != team)
-					&& (team.getTargetFor(task).getValue() != TargetRoll.IMPOSSIBLE)) {
+		//for (int i = 0; i < selectedTasksIds.length; i++) {
+		//	WorkItem task = campaign.getTask(selectedTasksIds[i]);
+		WorkItem task = campaign.getTask(getSelectedTaskId());
+		SupportTeam team = campaign.getTeam(currentTechId);		
+	
+		if ((null != task)
+				&& (null != team)) {
+			if(acquireSelected()) {
+				campaign.getPartFor(task, team);
+			} else if(repairsSelected() && (team.getTargetFor(task).getValue() != TargetRoll.IMPOSSIBLE)) {
 				campaign.processTask(task, team);
 			}
 		}
+		//}
 		
 		refreshUnitList();
 		refreshTaskList();
+		refreshAcquireList();
 		refreshTechsList();
 		refreshPartsList();
 		refreshReport();
@@ -1171,6 +1185,21 @@ public class MekHQView extends FrameView {
 		updateAssignEnabled();
 		updateTargetText();
 	}
+	
+	private void AcquisitionTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
+		int selected = AcquisitionTable.getSelectedRow();
+		
+		if ((selected > -1)
+				&& (selected < campaign.getAcquisitionsForUnit(currentUnitId).size())) {
+			currentAcquisitionId = campaign.getAcquisitionsForUnit(currentUnitId)
+					.get(selected).getId();
+		} else {
+			currentAcquisitionId = -1;
+		}
+
+		updateAssignEnabled();
+		updateTargetText();
+	}
 
 	private void UnitTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
 		int selected = UnitTable.getSelectedRow();
@@ -1182,6 +1211,14 @@ public class MekHQView extends FrameView {
 		}
 		
 		refreshTaskList();
+		refreshAcquireList();
+	}
+	
+	private void taskTabChanged() {
+		currentAcquisitionId = -1;
+		currentTaskId = -1;
+		updateAssignEnabled();
+		updateTargetText();
 	}
 
 	private void PersonTableValueChanged(
@@ -1223,6 +1260,7 @@ public class MekHQView extends FrameView {
 		campaign.newDay();
 		refreshUnitList();
 		refreshTaskList();
+		refreshAcquireList();
 		refreshTechsList();
 		refreshPersonnelList();
 		refreshDoctorsList();
@@ -1388,6 +1426,7 @@ public class MekHQView extends FrameView {
 
 		refreshUnitList();
 		refreshTaskList();
+		refreshAcquireList();
 		refreshTechsList();
 		refreshPersonnelList();
 		refreshDoctorsList();
@@ -1428,6 +1467,7 @@ public class MekHQView extends FrameView {
 
 		refreshUnitList();
 		refreshTaskList();
+		refreshAcquireList();
 		refreshTechsList();
 		refreshPersonnelList();
 		refreshDoctorsList();
@@ -1466,6 +1506,7 @@ public class MekHQView extends FrameView {
 		campaign.setOvertime(btnOvertime.isSelected());
 		refreshTechsList();
 		refreshTaskList();
+		refreshAcquireList();
 	}// GEN-LAST:event_btnOvertimeActionPerformed
 
 	private void btnGMModeActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnGMModeActionPerformed
@@ -1762,6 +1803,10 @@ public class MekHQView extends FrameView {
 	protected void refreshTaskList() {
 		taskModel.setData(campaign.getTasksForUnit(currentUnitId));
 	}
+	
+	protected void refreshAcquireList() {
+		acquireModel.setData(campaign.getAcquisitionsForUnit(currentUnitId));
+	}
 
 	protected void refreshTechsList() {
 		int selected = TechTable.getSelectedRow();
@@ -1825,12 +1870,17 @@ public class MekHQView extends FrameView {
 
 	protected void updateAssignEnabled() {
 		// must have a valid team and an unassigned task
-		WorkItem curTask = campaign.getTask(currentTaskId);
+		WorkItem curTask = campaign.getTask(getSelectedTaskId());
 		SupportTeam team = campaign.getTeam(currentTechId);
 		if ((null != curTask)
-				&& (null != team)
-				&& (team.getTargetFor(curTask).getValue() != TargetRoll.IMPOSSIBLE)) {
-			btnDoTask.setEnabled(true);
+				&& (null != team)) {
+			if(repairsSelected()) {
+				btnDoTask.setEnabled(team.getTargetFor(curTask).getValue() != TargetRoll.IMPOSSIBLE);
+			} else if(acquireSelected()) {
+				btnDoTask.setEnabled(team.getTargetForAcquisition(curTask).getValue() != TargetRoll.IMPOSSIBLE);
+			} else {
+				btnDoTask.setEnabled(false);
+			}
 		} else {
 			btnDoTask.setEnabled(false);
 		}
@@ -1854,16 +1904,37 @@ public class MekHQView extends FrameView {
 
 	protected void updateTargetText() {
 		// must have a valid team and an unassigned task
-		WorkItem task = campaign.getTask(currentTaskId);
+		WorkItem task = campaign.getTask(getSelectedTaskId());
 		SupportTeam team = campaign.getTeam(currentTechId);
 		if ((null != task) && (null != team)) {
 			TargetRoll target = team.getTargetFor(task);
+			if(acquireSelected()) {
+				target = team.getTargetForAcquisition(task);
+			}
 			textTarget.setText(target.getDesc());
 			lblTargetNum.setText(target.getValueAsString());
 		} else {
 			textTarget.setText("");
 			lblTargetNum.setText("-");
 		}
+	}
+	
+	protected int getSelectedTaskId() {
+		if(repairsSelected()) {
+			return currentTaskId;
+		} else if(acquireSelected()) {
+			return currentAcquisitionId;
+		} else {
+			return -1;
+		}
+	}
+	
+	protected boolean repairsSelected() {
+		return tabTasks.getSelectedIndex() == 0;
+	}
+	
+	protected boolean acquireSelected() {
+		return tabTasks.getSelectedIndex() == 1;
 	}
 
 	/**
@@ -1997,6 +2068,7 @@ public class MekHQView extends FrameView {
 				}
 				refreshUnitList();
 				refreshTaskList();
+				refreshAcquireList();
 			} else if (command.contains("SWAP_AMMO")) {
 				WorkItem task = taskModel.getTaskAt(TaskTable.getSelectedRow());
 				if (task instanceof ReloadItem) {
@@ -2013,6 +2085,7 @@ public class MekHQView extends FrameView {
 							.get(selType);
 					reload.swapAmmo(newType);
 					refreshTaskList();
+					refreshAcquireList();
 				}
 			} else if (command.contains("CHANGE_MODE")) {
 				for (WorkItem task : tasks) {
@@ -2021,6 +2094,7 @@ public class MekHQView extends FrameView {
 					task.setMode(selected);
 					refreshUnitList();
 					refreshTaskList();
+					refreshAcquireList();
 				}
 			} else if (command.contains("UNASSIGN")) {
 				for (WorkItem task : tasks) {
@@ -2028,6 +2102,7 @@ public class MekHQView extends FrameView {
 					task.setTeam(null);
 					refreshUnitList();
 					refreshTaskList();
+					refreshAcquireList();
 				}
 			} else if (command.contains("FIX")) {
 				for (WorkItem task : tasks) {
@@ -2046,6 +2121,7 @@ public class MekHQView extends FrameView {
 					}
 					refreshUnitList();
 					refreshTaskList();
+					refreshAcquireList();
 					refreshPartsList();
 				}
 			}
@@ -2136,6 +2212,63 @@ public class MekHQView extends FrameView {
 				menu.add(menuItem);
 				popup.show(e.getComponent(), e.getX(), e.getY());
 			}
+		}
+	}
+	
+
+	/**
+	 * A table model for displaying work items
+	 */
+	public class AcquisitionTableModel extends ArrayTableModel {
+		private static final long serialVersionUID = -6256038046416893994L;
+
+		public AcquisitionTableModel() {
+			columnNames = new String[] { "Parts Needed" };
+			data = new ArrayList<WorkItem>();
+		}
+
+		public Object getValueAt(int row, int col) {
+			return ((WorkItem) data.get(row)).getPartDescHTML();
+		}
+
+		public WorkItem getTaskAt(int row) {
+			return (WorkItem) data.get(row);
+		}
+
+		public WorkItem[] getTasksAt(int[] rows) {
+			WorkItem[] tasks = new WorkItem[rows.length];
+			for (int i = 0; i < rows.length; i++) {
+				int row = rows[i];
+				tasks[i] = (WorkItem) data.get(row);
+			}
+			return tasks;
+		}
+
+		public AcquisitionTableModel.Renderer getRenderer() {
+			return new AcquisitionTableModel.Renderer();
+		}
+
+		public class Renderer extends TaskInfo implements TableCellRenderer {
+			private static final long serialVersionUID = -3052618135259621130L;
+
+			public Component getTableCellRendererComponent(JTable table,
+					Object value, boolean isSelected, boolean hasFocus,
+					int row, int column) {
+				Component c = this;
+				WorkItem task = getTaskAt(row);
+				setOpaque(true);
+				setText(getValueAt(row, column).toString());
+				setToolTipText(task.getToolTip());
+				if (isSelected) {
+					select();
+				} else {
+					unselect();
+				}
+
+				c.setBackground(new Color(220, 220, 220));
+				return c;
+			}
+
 		}
 	}
 
@@ -2278,6 +2411,7 @@ public class MekHQView extends FrameView {
 				}
 				refreshUnitList();
 				refreshTaskList();
+				refreshAcquireList();
 				refreshTechsList();
 				refreshReport();
 				refreshPartsList();
@@ -2304,6 +2438,7 @@ public class MekHQView extends FrameView {
 					campaign.addWork(reload);
 				}
 				refreshTaskList();
+				refreshAcquireList();
 				refreshUnitList();
 			} else if (command.contains("CHANGE_SITE")) {
 				for (Unit unit : units) {
@@ -2317,6 +2452,7 @@ public class MekHQView extends FrameView {
 				}
 				refreshUnitList();
 				refreshTaskList();
+				refreshAcquireList();
 			} else if (command.equalsIgnoreCase("SALVAGE")) {
 				for (Unit unit : units) {
 					if (!unit.isDeployed()) {
@@ -2464,6 +2600,7 @@ public class MekHQView extends FrameView {
 
 					refreshUnitList();
 					refreshTaskList();
+					refreshAcquireList();
 				}
 			} else if (command.contains("CANCEL_CUSTOMIZE")) {
 				if (selectedUnit.isCustomized()) {
@@ -2472,6 +2609,7 @@ public class MekHQView extends FrameView {
 
 					refreshUnitList();
 					refreshTaskList();
+					refreshAcquireList();
 				}
 			}
 		}
