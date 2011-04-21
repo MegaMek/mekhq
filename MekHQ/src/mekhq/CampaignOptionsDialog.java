@@ -20,6 +20,8 @@ import java.util.Iterator;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JFormattedTextField;
+import javax.swing.SwingConstants;
+
 import megamek.client.ui.swing.util.ImageFileFactory;
 import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Player;
@@ -88,10 +90,12 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         lblName = new javax.swing.JLabel();
         lblFaction = new javax.swing.JLabel();
         lblFactionNames = new javax.swing.JLabel();
+        lblGender = new javax.swing.JLabel();
         lblDate = new javax.swing.JLabel();
         btnDate = new javax.swing.JButton();
         comboFaction = new javax.swing.JComboBox();
         comboFactionNames = new javax.swing.JComboBox();
+        sldGender = new javax.swing.JSlider(SwingConstants.HORIZONTAL);
         btnCamo = new javax.swing.JButton();
         lblCamo = new javax.swing.JLabel();
         panRules = new javax.swing.JPanel();
@@ -324,6 +328,26 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panNameGen.add(comboFactionNames, gridBagConstraints);
         
+        lblGender.setText(resourceMap.getString("lblGender.text")); // NOI18N
+        lblGender.setName("lblGender"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        panNameGen.add(lblGender, gridBagConstraints);
+              
+        sldGender.setMaximum(100);
+        sldGender.setMinimum(0);
+        sldGender.setMajorTickSpacing(25);
+        sldGender.setPaintTicks(true);
+        sldGender.setPaintLabels(true);
+        sldGender.setValue(campaign.getRNG().getPercentFemale());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        panNameGen.add(sldGender, gridBagConstraints);
+        
         tabOptions.addTab(resourceMap.getString("panNameGen.TabConstraints.tabTitle"), panNameGen); // NOI18N
         
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -379,6 +403,7 @@ private void btnOkayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
     campaign.calendar = date;
     campaign.setFaction(comboFaction.getSelectedIndex());
     campaign.getRNG().setChosenFaction((String)comboFactionNames.getSelectedItem());
+    campaign.getRNG().setPerentFemale(sldGender.getValue());
     campaign.setCamoCategory(camoCategory);
     campaign.setCamoFileName(camoFileName);
     campaign.setColorIndex(colorIndex);
@@ -481,10 +506,12 @@ public String getDateAsString() {
     private javax.swing.JFormattedTextField clanPriceModifierJFormattedTextField;
     private javax.swing.JComboBox comboFaction;
     private javax.swing.JComboBox comboFactionNames;
+    private javax.swing.JSlider sldGender;
     private javax.swing.JLabel lblCamo;
     private javax.swing.JLabel lblDate;
     private javax.swing.JLabel lblFaction;
     private javax.swing.JLabel lblFactionNames;
+    private javax.swing.JLabel lblGender;
     private javax.swing.JLabel lblName;
     private javax.swing.JPanel panGeneral;
     private javax.swing.JPanel panRules;
