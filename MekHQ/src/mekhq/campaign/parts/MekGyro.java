@@ -113,14 +113,16 @@ public class MekGyro extends Part {
     
     @Override
     public boolean canBeUsedBy(ReplacementItem task) {
+    	if(!(task instanceof MekGyroReplacement)) {
+    		return false;
+    	}
     	// Gyro compatibility is based on type and gyro tonnage, not unit tonnage...
     	// But gyro tonnage isn't story, only unit tonnage and unit MP.
     	// Unit tonnage and unit walk MP are only relevant in calculating Gyro tonnage...
     	// But with type it's enough to calculate it from.
     	double unitGyroTonnage = MekGyro.getGyroTonnage((int) Math.ceil(((MekGyroReplacement)task).getUnit().getEntity().getEngine().getRating() / 100f), ((MekGyroReplacement)task).getUnit().getEntity().getGyroType());
     	
-        return (task instanceof MekGyroReplacement 
-                && ((MekGyroReplacement)task).getUnit().getEntity().getGyroType() == type
+        return (((MekGyroReplacement)task).getUnit().getEntity().getGyroType() == type
                 && getGyroTonnage() == unitGyroTonnage);
     }
 

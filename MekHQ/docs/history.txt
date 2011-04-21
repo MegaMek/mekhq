@@ -19,6 +19,7 @@ v0.1.3 (SVN)
 + option (true by default) to assign random name generator based on faction selection
 + beginning of acquisition table
 + Acquisition table
++ Bug: NPE on MekGryo.canBeUsedBy check
 
 v0.1.2 (2011-04-15)
 + updated MegaMek.jar
