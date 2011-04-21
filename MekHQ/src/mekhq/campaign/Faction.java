@@ -94,4 +94,36 @@ public class Faction {
         return (faction==F_CLAN);
     }
     
+    public static String getFactionCodeForNameGenerator(int faction) {
+        switch(faction) {
+        
+        case F_CAPCON:
+            return "CC";
+        case F_DRAC:
+            return "DC";
+        case F_FEDSUN:
+            return "FS";
+        case F_FWL:
+            return "FWL";
+        case F_LYRAN:
+            return "LA";
+        case F_CLAN:
+            return "Clan";
+        case F_FRR:
+            return "FRR";    
+        case F_MERC:
+        case F_COMSTAR:
+        case F_WOB:
+        case F_CANOPUS:
+        case F_OA:
+        case F_TC:
+        case F_PERIPHERY:
+        case F_CHAOS:
+        case F_TERRAN:
+        case F_RWR:
+        default:
+            return "General";
+    }
+    }
+    
 }

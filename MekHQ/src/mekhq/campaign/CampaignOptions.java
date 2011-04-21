@@ -45,6 +45,7 @@ public class CampaignOptions implements Serializable {
     private double clanPriceModifier;
     private boolean useEasierRefit;
     private boolean useFinances;
+    private boolean useFactionForNames;
     private int repairSystem;
 
     public CampaignOptions () {
@@ -52,6 +53,7 @@ public class CampaignOptions implements Serializable {
         clanPriceModifier = 1.0;
         useEasierRefit = false;
         useFinances = false;
+        useFactionForNames = true;
         repairSystem = REPAIR_SYSTEM_STRATOPS;    
     }
 
@@ -98,6 +100,14 @@ public class CampaignOptions implements Serializable {
     public void setFinances(boolean b) {
         this.useFinances = b;
     }
+    
+    public boolean useFactionForNames() {
+        return useFactionForNames;
+    }
+    
+    public void setFactionForNames(boolean b) {
+        this.useFactionForNames = b;
+    }
 
 	public void writeToXml(PrintWriter pw1, int indent) {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "<campaignOptions>");
@@ -105,6 +115,7 @@ public class CampaignOptions implements Serializable {
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "clanPriceModifier", clanPriceModifier); //private double clanPriceModifier;
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useEasierRefit", useEasierRefit); //private boolean useEasierRefit;
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useFinances", useFinances); //private boolean useFinances;
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useFactionForNames", useFactionForNames); //private boolean useFinances;
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "repairSystem", repairSystem); //private int repairSystem;
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "</campaignOptions>");
 	}
@@ -145,6 +156,11 @@ public class CampaignOptions implements Serializable {
 					retVal.useFinances = true;
 				else
 					retVal.useFinances = false;
+			} else if (wn2.getNodeName().equalsIgnoreCase("useFactionForNames")) {
+				if (wn2.getTextContent().equalsIgnoreCase("true"))
+					retVal.useFactionForNames = true;
+				else
+					retVal.useFactionForNames = false;
 			} else if (wn2.getNodeName().equalsIgnoreCase("repairSystem")) {
 				retVal.repairSystem = Integer.parseInt(wn2.getTextContent());
 			}

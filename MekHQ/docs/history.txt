@@ -16,6 +16,7 @@ v0.1.3 (SVN)
 + Bug: name generator not being populated with XML load
 + new tab in Campaign Options for name generator
 + percent female slider for random name options
++ option (true by default) to assign random name generator based on faction selection
 
 v0.1.2 (2011-04-15)
 + updated MegaMek.jar

@@ -110,6 +110,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         numberFormat.setDecimalFormatSymbols(decimalFormatSymbols);
         clanPriceModifierJFormattedTextField = new JFormattedTextField(numberFormat);
         useEasierRefitCheckBox = new javax.swing.JCheckBox();
+        useFactionForNamesBox = new javax.swing.JCheckBox();
         repairSystemComboBox = new javax.swing.JComboBox();
         javax.swing.JLabel repairSystemComboBoxLabel = new javax.swing.JLabel();
         chkUseFinances = new javax.swing.JCheckBox();
@@ -190,6 +191,11 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         comboFaction.setMinimumSize(new java.awt.Dimension(400, 30));
         comboFaction.setName("comboFaction"); // NOI18N
         comboFaction.setPreferredSize(new java.awt.Dimension(400, 30));
+        comboFaction.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                factionSelected();
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
@@ -304,11 +310,29 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panNameGen.setName("panNameGen"); // NOI18N
         panNameGen.setLayout(new java.awt.GridBagLayout());
         
+        useFactionForNamesBox.setText(resourceMap.getString("useFactionForNamesBox.text")); // NOI18N
+        useFactionForNamesBox.setToolTipText(resourceMap.getString("useFactionForNamesBox.toolTipText")); // NOI18N
+        useFactionForNamesBox.setName("useFactionForNamesBox"); // NOI18N
+        useFactionForNamesBox.setSelected(campaign.getCampaignOptions().useFactionForNames());
+        useFactionForNamesBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                useFactionForNamesBoxEvent(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panNameGen.add(useFactionForNamesBox, gridBagConstraints);
+
+        
         lblFactionNames.setText(resourceMap.getString("lblFactionNames.text")); // NOI18N
         lblFactionNames.setName("lblFactionNames"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panNameGen.add(lblFactionNames, gridBagConstraints);
         
@@ -322,9 +346,10 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         comboFactionNames.setMinimumSize(new java.awt.Dimension(400, 30));
         comboFactionNames.setName("comboFactionNames"); // NOI18N
         comboFactionNames.setPreferredSize(new java.awt.Dimension(400, 30));
+        comboFactionNames.setEnabled(!useFactionForNamesBox.isSelected());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panNameGen.add(comboFactionNames, gridBagConstraints);
         
@@ -332,7 +357,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         lblGender.setName("lblGender"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panNameGen.add(lblGender, gridBagConstraints);
               
@@ -344,7 +369,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         sldGender.setValue(campaign.getRNG().getPercentFemale());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panNameGen.add(sldGender, gridBagConstraints);
         
@@ -395,6 +420,36 @@ private void txtNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
 // TODO add your handling code here:
 }//GEN-LAST:event_txtNameActionPerformed
 
+	private void factionSelected() {
+		if(useFactionForNamesBox.isSelected()) {
+			switchFaction();
+		}		
+	}
+	
+	private void switchFaction() {
+		String factionCode = Faction.getFactionCodeForNameGenerator(comboFaction.getSelectedIndex());
+		boolean found = false;
+		for (Iterator<String> i = campaign.getRNG().getFactions(); i.hasNext(); ) {
+            String nextFaction = (String) i.next();
+            if(nextFaction.equals(factionCode)) {
+            	found = true;
+            	break;
+            }
+        }
+		if(found) {
+			comboFactionNames.setSelectedItem(factionCode);
+		}
+	}
+	
+	private void useFactionForNamesBoxEvent(java.awt.event.ActionEvent evt) {
+		if(useFactionForNamesBox.isSelected()) {
+			comboFactionNames.setEnabled(false);
+			switchFaction();
+		} else {
+			comboFactionNames.setEnabled(true);
+		}
+	}
+
 private void btnOkayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOkayActionPerformed
     if(txtName.getText().length() > 0) {
         campaign.setName(txtName.getText());
@@ -402,7 +457,9 @@ private void btnOkayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
     }
     campaign.calendar = date;
     campaign.setFaction(comboFaction.getSelectedIndex());
-    campaign.getRNG().setChosenFaction((String)comboFactionNames.getSelectedItem());
+    if(null != comboFactionNames.getSelectedItem()) {
+    	campaign.getRNG().setChosenFaction((String)comboFactionNames.getSelectedItem());
+    }
     campaign.getRNG().setPerentFemale(sldGender.getValue());
     campaign.setCamoCategory(camoCategory);
     campaign.setCamoFileName(camoFileName);
@@ -414,6 +471,7 @@ private void btnOkayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
     String clanPriceModifierString = clanPriceModifierJFormattedTextField.getText();
     options.setClanPriceModifier(new Double(clanPriceModifierString));
     options.setEasierRefit(useEasierRefitCheckBox.isSelected());
+    options.setFactionForNames(useFactionForNamesBox.isSelected());
     options.setRepairSystem(repairSystemComboBox.getSelectedIndex());
 
     campaign.refreshAllUnitDiagnostics();
@@ -521,6 +579,7 @@ public String getDateAsString() {
     private javax.swing.JTextField txtName;
     private javax.swing.JCheckBox useEasierRefitCheckBox;
     private javax.swing.JCheckBox useFactionModifiersCheckBox;
+    private javax.swing.JCheckBox useFactionForNamesBox;
     // End of variables declaration//GEN-END:variables
 
 }
