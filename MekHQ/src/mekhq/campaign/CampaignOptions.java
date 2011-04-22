@@ -47,6 +47,12 @@ public class CampaignOptions implements Serializable {
     private boolean useFinances;
     private boolean useFactionForNames;
     private int repairSystem;
+    
+    //personnel related
+    private boolean useTactics;
+    private boolean useInitBonus;
+    private boolean useToughness;
+    private boolean useArtillery;
 
     public CampaignOptions () {
         useFactionModifiers = false;
@@ -108,6 +114,41 @@ public class CampaignOptions implements Serializable {
     public void setFactionForNames(boolean b) {
         this.useFactionForNames = b;
     }
+    
+    public boolean useTactics() {
+    	return useTactics;
+    }
+   
+    public void setTactics(boolean b) {
+    	this.useTactics = b;
+    }
+    
+    public boolean useInitBonus() {
+    	return useInitBonus;
+    }
+   
+    public void setInitBonus(boolean b) {
+    	this.useInitBonus = b;
+    }
+    
+    public boolean useToughness() {
+    	return useToughness;
+    }
+   
+    public void setToughness(boolean b) {
+    	this.useToughness = b;
+    }
+    
+    public boolean useArtillery() {
+    	return useArtillery;
+    }
+   
+    public void setArtillery(boolean b) {
+    	this.useArtillery = b;
+    }
+
+
+
 
 	public void writeToXml(PrintWriter pw1, int indent) {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "<campaignOptions>");
@@ -117,6 +158,10 @@ public class CampaignOptions implements Serializable {
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useFinances", useFinances); //private boolean useFinances;
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useFactionForNames", useFactionForNames); //private boolean useFinances;
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "repairSystem", repairSystem); //private int repairSystem;
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useTactics", useTactics);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useInitBonus", useInitBonus);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useToughness", useToughness);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useArtillery", useArtillery);
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "</campaignOptions>");
 	}
 
@@ -163,6 +208,26 @@ public class CampaignOptions implements Serializable {
 					retVal.useFactionForNames = false;
 			} else if (wn2.getNodeName().equalsIgnoreCase("repairSystem")) {
 				retVal.repairSystem = Integer.parseInt(wn2.getTextContent());
+			} else if (wn2.getNodeName().equalsIgnoreCase("useTactics")) {
+				if (wn2.getTextContent().equalsIgnoreCase("true"))
+					retVal.useTactics = true;
+				else
+					retVal.useTactics = false;
+			} else if (wn2.getNodeName().equalsIgnoreCase("useInitBonus")) {
+				if (wn2.getTextContent().equalsIgnoreCase("true"))
+					retVal.useInitBonus = true;
+				else
+					retVal.useInitBonus = false;
+			} else if (wn2.getNodeName().equalsIgnoreCase("useToughness")) {
+				if (wn2.getTextContent().equalsIgnoreCase("true"))
+					retVal.useToughness = true;
+				else
+					retVal.useToughness = false;
+			}else if (wn2.getNodeName().equalsIgnoreCase("useArtillery")) {
+				if (wn2.getTextContent().equalsIgnoreCase("true"))
+					retVal.useArtillery = true;
+				else
+					retVal.useArtillery = false;
 			}
 		}
 

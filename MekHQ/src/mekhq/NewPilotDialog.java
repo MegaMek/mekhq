@@ -88,8 +88,12 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         lblPiloting = new javax.swing.JLabel();
         textInitB = new javax.swing.JTextField();
         textCommandB = new javax.swing.JTextField();
+        textToughness = new javax.swing.JTextField();
+        textArtillery = new javax.swing.JTextField();
         lblInitB = new javax.swing.JLabel();
         lblCommandB = new javax.swing.JLabel();
+        lblToughness = new javax.swing.JLabel();
+        lblArtillery = new javax.swing.JLabel();
         choiceType = new javax.swing.JComboBox();
         jScrollPane1 = new javax.swing.JScrollPane();
         panOptions = new javax.swing.JPanel();
@@ -105,6 +109,23 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         setName("Form"); // NOI18N
         getContentPane().setLayout(new java.awt.GridBagLayout());
 
+        DefaultComboBoxModel pilotTypeModel = new DefaultComboBoxModel();
+        for(int i = 0; i < PilotPerson.T_NUM; i++) {
+            pilotTypeModel.addElement(PilotPerson.getTypeDesc(i));
+        }
+        choiceType.setModel(pilotTypeModel);
+        choiceType.setMinimumSize(new java.awt.Dimension(200, 27));
+        choiceType.setName("choiceType"); // NOI18N
+        choiceType.setPreferredSize(new java.awt.Dimension(200, 27));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        getContentPane().add(choiceType, gridBagConstraints);
+        
         lblName.setText(resourceMap.getString("lblName.text")); // NOI18N
         lblName.setName("lblName"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -137,6 +158,7 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         getContentPane().add(textName, gridBagConstraints);
 
@@ -147,6 +169,7 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         getContentPane().add(textNickname, gridBagConstraints);
 
@@ -188,61 +211,108 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
         getContentPane().add(lblPiloting, gridBagConstraints);
 
-        textInitB.setText(Integer.toString(pilot.getInitBonus()));
-        textInitB.setMinimumSize(new java.awt.Dimension(50, 28));
-        textInitB.setName("textInitB"); // NOI18N
-        textInitB.setPreferredSize(new java.awt.Dimension(50, 28));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 5;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        getContentPane().add(textInitB, gridBagConstraints);
-
-        textCommandB.setText(Integer.toString(pilot.getCommandBonus()));
-        textCommandB.setMinimumSize(new java.awt.Dimension(50, 28));
-        textCommandB.setName("textCommandB"); // NOI18N
-        textCommandB.setPreferredSize(new java.awt.Dimension(50, 28));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 6;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        getContentPane().add(textCommandB, gridBagConstraints);
-
-        lblInitB.setText(resourceMap.getString("lblInitB.text")); // NOI18N
-        lblInitB.setName("lblInitB"); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
-        getContentPane().add(lblInitB, gridBagConstraints);
-
-        lblCommandB.setText(resourceMap.getString("lblCommandB.text")); // NOI18N
-        lblCommandB.setName("lblCommandB"); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 6;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
-        getContentPane().add(lblCommandB, gridBagConstraints);
-
-        DefaultComboBoxModel pilotTypeModel = new DefaultComboBoxModel();
-        for(int i = 0; i < PilotPerson.T_NUM; i++) {
-            pilotTypeModel.addElement(PilotPerson.getTypeDesc(i));
+    
+        if(campaign.getCampaignOptions().useArtillery()) {
+        	lblArtillery.setText(resourceMap.getString("lblArtillery.text")); // NOI18N
+        	lblArtillery.setName("lblArtillery"); // NOI18N
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = 5;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+            gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+            getContentPane().add(lblArtillery, gridBagConstraints);
+        
+            textArtillery.setText(Integer.toString(pilot.getArtillery()));
+            textArtillery.setMinimumSize(new java.awt.Dimension(50, 28));
+            textArtillery.setName("textArtillery"); // NOI18N
+            textArtillery.setPreferredSize(new java.awt.Dimension(50, 28));
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = 5;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+            getContentPane().add(textArtillery, gridBagConstraints);
         }
-        choiceType.setModel(pilotTypeModel);
-        choiceType.setMinimumSize(new java.awt.Dimension(200, 27));
-        choiceType.setName("choiceType"); // NOI18N
-        choiceType.setPreferredSize(new java.awt.Dimension(200, 27));
+        
+        if(campaign.getCampaignOptions().useInitBonus()) {
+        	lblInitB.setText(resourceMap.getString("lblInitB.text")); // NOI18N
+            lblInitB.setName("lblInitB"); // NOI18N
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 2;
+            gridBagConstraints.gridy = 3;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+            gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+            getContentPane().add(lblInitB, gridBagConstraints);
+        
+            textInitB.setText(Integer.toString(pilot.getInitBonus()));
+            textInitB.setMinimumSize(new java.awt.Dimension(50, 28));
+            textInitB.setName("textInitB"); // NOI18N
+            textInitB.setPreferredSize(new java.awt.Dimension(50, 28));
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 3;
+            gridBagConstraints.gridy = 3;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+            getContentPane().add(textInitB, gridBagConstraints);
+        }
+
+        if(campaign.getCampaignOptions().useTactics()) {
+        	lblCommandB.setText(resourceMap.getString("lblCommandB.text")); // NOI18N
+            lblCommandB.setName("lblCommandB"); // NOI18N
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 2;
+            gridBagConstraints.gridy = 4;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+            gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+            getContentPane().add(lblCommandB, gridBagConstraints);
+
+        	textCommandB.setText(Integer.toString(pilot.getCommandBonus()));
+        	textCommandB.setMinimumSize(new java.awt.Dimension(50, 28));
+        	textCommandB.setName("textCommandB"); // NOI18N
+        	textCommandB.setPreferredSize(new java.awt.Dimension(50, 28));
+        	gridBagConstraints = new java.awt.GridBagConstraints();
+        	gridBagConstraints.gridx = 3;
+        	gridBagConstraints.gridy = 4;
+        	gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        	getContentPane().add(textCommandB, gridBagConstraints);
+        }
+        
+        if(campaign.getCampaignOptions().useToughness()) {
+        	lblToughness.setText(resourceMap.getString("lblToughness.text")); // NOI18N
+        	lblToughness.setName("lblToughness"); // NOI18N
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 2;
+            gridBagConstraints.gridy = 5;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+            gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+            getContentPane().add(lblToughness, gridBagConstraints);
+        
+            textToughness.setText(Integer.toString(pilot.getToughness()));
+            textToughness.setMinimumSize(new java.awt.Dimension(50, 28));
+            textToughness.setName("textToughness"); // NOI18N
+            textToughness.setPreferredSize(new java.awt.Dimension(50, 28));
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 3;
+            gridBagConstraints.gridy = 5;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+            getContentPane().add(textToughness, gridBagConstraints);
+        }
+        
+        jScrollPane2.setName("jScrollPane2"); // NOI18N
+
+        txtBio.setName("txtBio"); // NOI18N
+        jScrollPane2.setViewportView(txtBio);
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridwidth = 4;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        getContentPane().add(choiceType, gridBagConstraints);
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        getContentPane().add(jScrollPane2, gridBagConstraints);
 
+        
         jScrollPane1.setMinimumSize(new java.awt.Dimension(300, 500));
         jScrollPane1.setName("jScrollPane1"); // NOI18N
         jScrollPane1.setPreferredSize(new java.awt.Dimension(300, 500));
@@ -263,7 +333,7 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         jScrollPane1.setViewportView(panOptions);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridx = 5;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridheight = 8;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
@@ -272,21 +342,7 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 0);
         getContentPane().add(jScrollPane1, gridBagConstraints);
-
-        jScrollPane2.setName("jScrollPane2"); // NOI18N
-
-        txtBio.setName("txtBio"); // NOI18N
-        jScrollPane2.setViewportView(txtBio);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 7;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        getContentPane().add(jScrollPane2, gridBagConstraints);
-
+        
         panButtons.setName("panButtons"); // NOI18N
         panButtons.setLayout(new java.awt.GridBagLayout());
 
@@ -333,13 +389,25 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         PilotPerson person = null;
         int piloting = Integer.parseInt(textPiloting.getText());
         int gunnery = Integer.parseInt(textGunnery.getText());
-        int initb = Integer.parseInt(textInitB.getText());
-        int commandb = Integer.parseInt(textCommandB.getText());
         String name = textName.getText();
         String nick = textNickname.getText();
         pilot = new Pilot(name, gunnery, piloting);
-        pilot.setInitBonus(initb);
-        pilot.setCommandBonus(commandb);
+        if(campaign.getCampaignOptions().useInitBonus()) {
+        	int initb = Integer.parseInt(textInitB.getText());
+        	pilot.setInitBonus(initb);
+        }
+        if(campaign.getCampaignOptions().useTactics()) {
+        	int commandb = Integer.parseInt(textCommandB.getText());
+        	pilot.setCommandBonus(commandb);
+        }
+        if(campaign.getCampaignOptions().useToughness()) {
+        	int tough = Integer.parseInt(textToughness.getText());
+        	pilot.setToughness(tough);
+        }
+        if(campaign.getCampaignOptions().useArtillery()) {
+        	int artillery = Integer.parseInt(textArtillery.getText());
+        	pilot.setArtillery(artillery);
+        }
         pilot.setNickname(nick);
         setOptions();
         person = new PilotPerson(pilot, choiceType.getSelectedIndex());
@@ -458,6 +526,8 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JLabel lblCommandB;
     private javax.swing.JLabel lblGunnery;
+    private javax.swing.JLabel lblArtillery;
+    private javax.swing.JLabel lblToughness;
     private javax.swing.JLabel lblInitB;
     private javax.swing.JLabel lblName;
     private javax.swing.JLabel lblNickname;
@@ -466,6 +536,8 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
     private javax.swing.JPanel panOptions;
     private javax.swing.JTextField textCommandB;
     private javax.swing.JTextField textGunnery;
+    private javax.swing.JTextField textArtillery;
+    private javax.swing.JTextField textToughness;
     private javax.swing.JTextField textInitB;
     private javax.swing.JTextField textName;
     private javax.swing.JTextField textNickname;
