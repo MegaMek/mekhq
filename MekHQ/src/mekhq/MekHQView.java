@@ -60,10 +60,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
-import javax.swing.SwingUtilities;
 import javax.swing.Timer;
-import javax.swing.event.CaretEvent;
-import javax.swing.event.CaretListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.MouseInputAdapter;
@@ -71,7 +68,6 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
 
-import megamek.client.RandomNameGenerator;
 import megamek.client.ui.swing.MechView;
 import megamek.common.AmmoType;
 import megamek.common.Entity;
@@ -143,6 +139,7 @@ public class MekHQView extends FrameView {
 	private TechTableModel techsModel = new TechTableModel();
 	private PatientTableModel patientModel = new PatientTableModel();
 	private DocTableModel doctorsModel = new DocTableModel();
+	private PersonnelTableModel personModel = new PersonnelTableModel();
 	private PartsTableModel partsModel = new PartsTableModel();
 	private MekTableMouseAdapter unitMouseAdapter;
 	private PartsTableMouseAdapter partsMouseAdapter;
@@ -249,6 +246,9 @@ public class MekHQView extends FrameView {
 		mainPanel = new javax.swing.JPanel();
 		tabMain = new javax.swing.JTabbedPane();
 		tabTasks = new javax.swing.JTabbedPane();
+		panPersonnel = new javax.swing.JPanel();
+		scrollPersonnelTable = new javax.swing.JScrollPane();
+		personnelTable = new javax.swing.JTable();
 		panHangar = new javax.swing.JPanel();
 		scrollTaskTable = new javax.swing.JScrollPane();
 		TaskTable = new javax.swing.JTable();
@@ -326,10 +326,31 @@ public class MekHQView extends FrameView {
 		tabMain.setName("tabMain"); // NOI18N
 		tabMain.setPreferredSize(new java.awt.Dimension(900, 300));
 
+		panPersonnel.setFont(resourceMap.getFont("panHangar.font")); // NOI18N
+		panPersonnel.setName("panPersonnel"); // NOI18N
+		panPersonnel.setLayout(new java.awt.GridBagLayout());
+		
+		personnelTable.setModel(personModel);
+		personnelTable.setName("personnelTable"); // NOI18N
+		scrollPersonnelTable.setViewportView(personnelTable);
+	
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.gridheight = 1;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+		gridBagConstraints.weightx = 1.0;
+		gridBagConstraints.weighty = 1.0;
+		panPersonnel.add(scrollPersonnelTable, gridBagConstraints);
+		
+		tabMain.addTab(
+				resourceMap.getString("panPersonnel.TabConstraints.tabTitle"),
+				panPersonnel); // NOI18N
+		
 		panHangar.setFont(resourceMap.getFont("panHangar.font")); // NOI18N
 		panHangar.setName("panHangar"); // NOI18N
 		panHangar.setLayout(new java.awt.GridBagLayout());
-
+		
 		tabTasks.setToolTipText(resourceMap.getString("tabTasks.toolTipText")); // NOI18N
 		tabTasks.setMinimumSize(new java.awt.Dimension(600, 200));
 		tabTasks.setName("tabTasks"); // NOI18N
@@ -715,7 +736,7 @@ public class MekHQView extends FrameView {
 		panInfirmary.add(btnAssignDoc, gridBagConstraints);
 
 		scrollPatientTable.setMinimumSize(new java.awt.Dimension(300, 200));
-		scrollPatientTable.setName("scrollPersonTable"); // NOI18N
+		scrollPatientTable.setName("scrollPatientTable"); // NOI18N
 		scrollPatientTable.setPreferredSize(new java.awt.Dimension(300, 300));
 
 		patientTable.setModel(patientModel);
@@ -1136,6 +1157,7 @@ public class MekHQView extends FrameView {
 		//}
 		
 		refreshUnitList();
+		refreshPersonnelList();
 		refreshTaskList();
 		refreshAcquireList();
 		refreshTechsList();
@@ -1257,6 +1279,7 @@ public class MekHQView extends FrameView {
 	private void btnAdvanceDayActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnAdvanceDayActionPerformed
 		campaign.newDay();
 		refreshUnitList();
+		refreshPersonnelList();
 		refreshTaskList();
 		refreshAcquireList();
 		refreshTechsList();
@@ -1423,6 +1446,7 @@ public class MekHQView extends FrameView {
 		}
 
 		refreshUnitList();
+		refreshPersonnelList();
 		refreshTaskList();
 		refreshAcquireList();
 		refreshTechsList();
@@ -1464,6 +1488,7 @@ public class MekHQView extends FrameView {
 		}
 
 		refreshUnitList();
+		refreshPersonnelList();
 		refreshTaskList();
 		refreshAcquireList();
 		refreshTechsList();
@@ -1537,6 +1562,7 @@ public class MekHQView extends FrameView {
 
 		usd.setVisible(true);
 		refreshUnitList();
+		refreshPersonnelList();
 		refreshReport();
 		refreshFunds();
 	}// GEN-LAST:event_miPurchaseUnitActionPerformed
@@ -1694,6 +1720,7 @@ public class MekHQView extends FrameView {
 		}
 		
 		refreshUnitList();
+		refreshPersonnelList();
 		refreshPatientList();
 		refreshReport();
 	}
@@ -1780,6 +1807,7 @@ public class MekHQView extends FrameView {
 
 		refreshUnitList();
 		refreshPatientList();
+		refreshPersonnelList();
 
 		if (undeployed.length() > 0) {
 			JOptionPane.showMessageDialog(
@@ -1796,6 +1824,10 @@ public class MekHQView extends FrameView {
 		if ((selected > -1) && (selected < campaign.getUnits().size())) {
 			UnitTable.setRowSelectionInterval(selected, selected);
 		}
+	}
+	
+	protected void refreshPersonnelList() {
+		personModel.setData(campaign.getPersonnel());
 	}
 
 	protected void refreshTaskList() {
@@ -2490,6 +2522,7 @@ public class MekHQView extends FrameView {
 				}
 				refreshUnitList();
 				refreshPatientList();
+				refreshPersonnelList();
 			} else if (command.contains("CUSTOMIZE")
 					&& !command.contains("CANCEL")) {
 				if (!selectedUnit.isDeployed() && !selectedUnit.isDamaged()) {
@@ -2933,6 +2966,7 @@ public class MekHQView extends FrameView {
 
 				refreshUnitList();
 				refreshPatientList();
+				refreshPersonnelList();
 				refreshTechsList();
 				refreshDoctorsList();
 				refreshReport();
@@ -2950,6 +2984,7 @@ public class MekHQView extends FrameView {
 				}
 				refreshUnitList();
 				refreshPatientList();
+				refreshPersonnelList();
 				refreshTechsList();
 				refreshDoctorsList();
 				refreshReport();
@@ -2967,6 +3002,7 @@ public class MekHQView extends FrameView {
 				}
 				refreshUnitList();
 				refreshPatientList();
+				refreshPersonnelList();
 				refreshTechsList();
 				refreshDoctorsList();
 				refreshReport();
@@ -2977,6 +3013,7 @@ public class MekHQView extends FrameView {
 					}
 				}
 				refreshPatientList();
+				refreshPersonnelList();
 			} else if (command.equalsIgnoreCase("IMP_PILOTING")) {
 				if (selectedPerson instanceof PilotPerson) {
 					Pilot pilot = ((PilotPerson) selectedPerson).getPilot();
@@ -3198,6 +3235,100 @@ public class MekHQView extends FrameView {
 	}
 
 	/**
+	 * A table Model for displaying information about personnel
+	 * @author Jay lawson
+	 */
+	public class PersonnelTableModel extends AbstractTableModel {
+	
+		private static final long serialVersionUID = -5207167419079014157L;
+		
+		private final static int COL_NAME = 0;
+        private final static int COL_CALL = 1;
+        private final static int COL_GUN = 2;
+        private final static int COL_PILOT = 3;
+        private final static int COL_XP = 4;
+        private final static int N_COL = 5;
+        
+        private ArrayList<Person> data = new ArrayList<Person>();
+        
+        public int getRowCount() {
+            return data.size();
+        }
+
+        public int getColumnCount() {
+            return N_COL;
+        }
+
+        @Override
+        public String getColumnName(int column) {
+            switch(column) {
+                case COL_NAME:
+                    return "Name";
+                case COL_CALL:
+                    return "Callsign";
+                case COL_GUN:
+                    return "Gunnery";
+                case COL_PILOT:
+                    return "Piloting";
+                case COL_XP:
+                    return "XP";
+                default:
+                    return "?";
+            }
+        }
+
+        @Override
+        public Class<?> getColumnClass(int c) {
+            return getValueAt(0, c).getClass();
+        }
+
+        @Override
+        public boolean isCellEditable(int row, int col) {
+            return false;
+        }
+
+        public Person getPerson(int i) {
+            return data.get(i);
+        }
+
+        //fill table with values
+        public void setData(ArrayList<Person> people) {
+            data = people;
+            fireTableDataChanged();
+        }
+
+        public Object getValueAt(int row, int col) {
+            Person p = data.get(row);
+            if(col == COL_NAME) {
+                return p.getName();
+            }
+            if(col == COL_CALL) {
+                return p.getCallsign();
+            }
+            if(col == COL_GUN) {
+            	if(p instanceof PilotPerson) {
+            		return ((PilotPerson)p).getPilot().getGunnery();
+            	} else {
+            		return "-";
+            	}
+            }
+            if(col == COL_PILOT) {
+            	if(p instanceof PilotPerson) {
+            		return ((PilotPerson)p).getPilot().getPiloting();
+            	} else {
+            		return "-";
+            	}
+            }
+            if(col == COL_XP) {
+                return p.getXp();
+            }
+            return "?";
+        }
+
+        
+	}
+	
+	/**
 	 * A table model for displaying doctors
 	 */
 	public class DocTableModel extends ArrayTableModel {
@@ -3370,6 +3501,7 @@ public class MekHQView extends FrameView {
 	private javax.swing.JTable AcquisitionTable;
 	private javax.swing.JTable TechTable;
 	private javax.swing.JTable UnitTable;
+	private javax.swing.JTable personnelTable;
 	private javax.swing.JMenuItem addFunds;
 	private javax.swing.JButton btnAdvanceDay;
 	private javax.swing.JButton btnAssignDoc;
@@ -3417,6 +3549,7 @@ public class MekHQView extends FrameView {
 	private javax.swing.JScrollPane scrollAcquisitionTable;
 	private javax.swing.JScrollPane scrollTechTable;
 	private javax.swing.JScrollPane scrollUnitTable;
+	private javax.swing.JScrollPane scrollPersonnelTable;
 	private javax.swing.JLabel statusAnimationLabel;
 	private javax.swing.JLabel statusMessageLabel;
 	private javax.swing.JPanel statusPanel;

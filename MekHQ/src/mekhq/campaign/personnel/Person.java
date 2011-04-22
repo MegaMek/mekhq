@@ -273,6 +273,10 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
 		return retVal;
 	}
 	
+	public abstract String getName();
+	
+	public abstract String getCallsign();
+
 	public abstract int getMonthlySalary();
 	protected abstract void loadFieldsFromXmlNode(Node wn);
 }

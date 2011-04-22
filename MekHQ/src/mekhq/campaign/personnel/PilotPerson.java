@@ -387,6 +387,28 @@ public class PilotPerson extends Person {
 		return unitId;
 	}
 	
+	@Override
+	public String getName() {
+		if(null != pilot) {
+			return pilot.getName();
+		} else {
+			return "Unknown";
+		}
+	}
+	
+	@Override
+	public String getCallsign() {
+		if(null != pilot) {
+			String nick = pilot.getNickname();
+			if(null == nick || nick.equals("")) {
+				nick = "-";
+			}
+			return nick;
+		} else {
+			return "-";
+		}
+	}
+	
 	public void setUnit(Unit nt) {
 		unit = nt;
 	}

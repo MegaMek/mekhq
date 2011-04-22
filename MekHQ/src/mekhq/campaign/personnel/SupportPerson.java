@@ -96,6 +96,20 @@ public class SupportPerson extends Person {
     }
 
     @Override
+    public String getName() {
+    	if(null != team) {
+    		return team.getName();
+    	} else {
+    		return "Unknown";
+    	}
+    }
+    
+    @Override
+    public String getCallsign() {
+    	return "-";
+    }
+    
+    @Override
     public void heal() {
         if(needsHealing()) {
             team.setCurrentStrength(team.getCurrentStrength() + 1);
