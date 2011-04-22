@@ -23,6 +23,9 @@ package mekhq.campaign.personnel;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -63,6 +66,7 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
     protected String portraitCategory;
     protected String portraitFile;
     protected int gender;
+    protected GregorianCalendar birthday;
 
     protected int xp;
     
@@ -73,6 +77,7 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
         portraitFile = Pilot.PORTRAIT_NONE;
         xp = 0;
         gender = G_MALE;
+        birthday = new GregorianCalendar(3042, Calendar.JANUARY, 1);
     }
     
     public abstract void reCalc();
@@ -112,6 +117,29 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
     	default:
     		return "?";
     	}
+    }
+    
+    public void setBirthday(GregorianCalendar date) {
+    	this.birthday = date;
+    }
+    
+    public GregorianCalendar getBirthday() {
+    	return birthday;
+    }
+    
+    public int getAge(GregorianCalendar today) {
+    	// Get age based on year
+    	int age = today.get(Calendar.YEAR) - birthday.get(Calendar.YEAR);
+
+    	// Add the tentative age to the date of birth to get this year's birthday
+    	GregorianCalendar tmpDate = (GregorianCalendar) birthday.clone();
+    	tmpDate.add(Calendar.YEAR, age);
+
+    	// If this year's birthday has not happened yet, subtract one from age
+    	if (today.before(tmpDate)) {
+    	    age--;
+    	}
+    	return age;
     }
 
     public void setId(int id) {
@@ -239,6 +267,11 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
 				+"<gender>"
 				+gender
 				+"</gender>");
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<birthday>"
+				+df.format(birthday.getTime())
+				+"</birthday>");
 
 		// The task reference can be loaded through its ID.
 		// But...  If the task is null, we just bypass it.
@@ -292,6 +325,10 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
 					retVal.xp = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("gender")) {
 					retVal.gender = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("birthday")) {
+					SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+					retVal.birthday = (GregorianCalendar) GregorianCalendar.getInstance();
+					retVal.birthday.setTime(df.parse(wn2.getTextContent().trim()));
 				}
 			}
 		} catch (Exception ex) {

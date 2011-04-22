@@ -3244,13 +3244,14 @@ public class MekHQView extends FrameView {
 		
 		private final static int COL_NAME = 0;
         private final static int COL_CALL = 1;
-        private final static int COL_TYPE = 2;
+        private final static int COL_AGE = 2;
         private final static int COL_GENDER = 3;
-        private final static int COL_GUN = 4;
-        private final static int COL_PILOT = 5;
-        private final static int COL_TECH = 6;
-        private final static int COL_XP = 7;
-        private final static int N_COL = 8;
+        private final static int COL_TYPE = 4;
+        private final static int COL_GUN = 5;
+        private final static int COL_PILOT = 6;
+        private final static int COL_TECH = 7;
+        private final static int COL_XP = 8;
+        private final static int N_COL = 9;
         
         private ArrayList<Person> data = new ArrayList<Person>();
         
@@ -3269,6 +3270,8 @@ public class MekHQView extends FrameView {
                     return "Name";
                 case COL_CALL:
                     return "Callsign";
+                case COL_AGE:
+                    return "Age";
                 case COL_GENDER:
                     return "Gender";
                 case COL_TYPE:
@@ -3316,6 +3319,9 @@ public class MekHQView extends FrameView {
             }
             if(col == COL_GENDER) {
                 return p.getGenderName();
+            }
+            if(col == COL_AGE) {
+                return p.getAge(campaign.getCalendar());
             }
             if(col == COL_TYPE) {
                 return p.getTypeDesc();
