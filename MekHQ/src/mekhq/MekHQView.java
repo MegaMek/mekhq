@@ -1322,7 +1322,10 @@ public class MekHQView extends FrameView {
 	}// GEN-LAST:event_btnAssignDocActionPerformed
 
 	private void miHirePilotActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miHirePilotActionPerformed
-		CustomizePilotDialog npd = new CustomizePilotDialog(getFrame(), true, null, campaign,
+		CustomizePilotDialog npd = new CustomizePilotDialog(getFrame(), true, 
+				campaign.newPilotPerson(PilotPerson.T_MECH), 
+				true,
+				campaign,
 				this);
 		npd.setVisible(true);
 		refreshPatientList();
@@ -3023,7 +3026,10 @@ public class MekHQView extends FrameView {
 				refreshPersonnelList();
 			} else if (command.equalsIgnoreCase("EDIT")) {
 				if(selectedPerson instanceof PilotPerson) {
-					CustomizePilotDialog npd = new CustomizePilotDialog(getFrame(), true, (PilotPerson)selectedPerson, campaign,
+					CustomizePilotDialog npd = new CustomizePilotDialog(getFrame(), true, 
+							(PilotPerson)selectedPerson, 
+							false,
+							campaign,
 							view);
 					npd.setVisible(true);
 				}

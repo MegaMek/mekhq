@@ -41,7 +41,7 @@ public class CustomizePilotDialog extends javax.swing.JDialog implements DialogO
 
     /**
 	 * This dialog is used to both hire new pilots and to edit existing ones
-	 * To hire new ones, leave PilotPerson in the constructor null
+	 * 
 	 */
 	private static final long serialVersionUID = -6265589976779860566L;
 	private Pilot pilot;
@@ -59,7 +59,7 @@ public class CustomizePilotDialog extends javax.swing.JDialog implements DialogO
     private MekHQView hqView;
 
     /** Creates new form CustomizePilotDialog */
-    public CustomizePilotDialog(java.awt.Frame parent, boolean modal, PilotPerson person, Campaign campaign, MekHQView view) {
+    public CustomizePilotDialog(java.awt.Frame parent, boolean modal, PilotPerson person, boolean hire, Campaign campaign, MekHQView view) {
         super(parent, modal);
         this.campaign = campaign;
         this.hqView = view;
@@ -67,6 +67,7 @@ public class CustomizePilotDialog extends javax.swing.JDialog implements DialogO
         this.nameGen = campaign.getRNG();
         this.dateFormat = new SimpleDateFormat("MMMM d yyyy");
         this.person = person;
+        this.newHire = hire;
         initializePilotAndOptions();
     }
 
@@ -75,23 +76,8 @@ public class CustomizePilotDialog extends javax.swing.JDialog implements DialogO
     }
 
     private void refreshPilotAndOptions () {
-    	if(null == person) {
-    		this.newHire = true;   		
-    		this.pilot = new Pilot("Roy Fokker", 4, 5);   	
-    		this.birthdate = (GregorianCalendar)campaign.getCalendar().clone();
-    		//lets set age to be 16 + 1d6 by default		
-    		birthdate.set(Calendar.YEAR, birthdate.get(Calendar.YEAR) - (15 + Compute.d6(3)));
-    		//choose a random day and month
-    		int randomDay = Compute.randomInt(365)+1;
-    		if(birthdate.isLeapYear(birthdate.get(Calendar.YEAR))) {
-    			randomDay = Compute.randomInt(366)+1;
-    		}
-    		birthdate.set(Calendar.DAY_OF_YEAR, randomDay);
-    	} else {
-    		this.newHire = false;
-    		this.pilot = person.getPilot();
-    		this.birthdate = (GregorianCalendar)person.getBirthday().clone();
-    	}
+    	this.pilot = person.getPilot();
+    	this.birthdate = (GregorianCalendar)person.getBirthday().clone();
     	this.options = pilot.getOptions();		
     	getContentPane().removeAll();
     	initComponents();
@@ -157,11 +143,7 @@ public class CustomizePilotDialog extends javax.swing.JDialog implements DialogO
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        if(isNewHire()) {
-        	choiceType.setSelectedIndex(0);
-        } else {
-        	choiceType.setSelectedIndex(person.getType());
-        }
+        choiceType.setSelectedIndex(person.getType());
         getContentPane().add(choiceType, gridBagConstraints);
         
         if (nameGen == null)
@@ -189,15 +171,7 @@ public class CustomizePilotDialog extends javax.swing.JDialog implements DialogO
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        if(isNewHire()) {
-	        if(nameGen.isFemale()) {
-	        	choiceGender.setSelectedIndex(Person.G_FEMALE);
-	        } else {
-	        	choiceGender.setSelectedIndex(Person.G_MALE);
-	        }
-        } else {
-        	choiceGender.setSelectedIndex(person.getGender());
-        }
+        choiceGender.setSelectedIndex(person.getGender());
         getContentPane().add(choiceGender, gridBagConstraints);
         
         btnDate.setText(getDateAsString());
@@ -260,11 +234,7 @@ public class CustomizePilotDialog extends javax.swing.JDialog implements DialogO
         gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        if(isNewHire()) {
-        	randomName(); 
-        } else {
-        	textName.setText(pilot.getName());
-        }
+        textName.setText(pilot.getName());
         getContentPane().add(textName, gridBagConstraints);
 
         btnRandomName.setText(resourceMap.getString("btnRandomName.text")); // NOI18N
@@ -418,9 +388,7 @@ public class CustomizePilotDialog extends javax.swing.JDialog implements DialogO
         jScrollPane2.setName("jScrollPane2"); // NOI18N
 
         txtBio.setName("txtBio"); // NOI18N
-        if(!isNewHire()) {
-        	txtBio.setText(person.getBiography());
-        }
+        txtBio.setText(person.getBiography());
         jScrollPane2.setViewportView(txtBio);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -537,19 +505,15 @@ public class CustomizePilotDialog extends javax.swing.JDialog implements DialogO
         	pilot.setArtillery(artillery);
         }
         pilot.setNickname(nick);
-        setOptions();
-        if(isNewHire()) {
-        	person = new PilotPerson(pilot, choiceType.getSelectedIndex());
-        } else {
-        	person.setPilot(pilot);
-        }
+        
+        person.setPilot(pilot);
         person.setBiography(txtBio.getText());
         person.setGender(choiceGender.getSelectedIndex());
         person.setBirthday(birthdate);              
         if(isNewHire()) {
         	campaign.addPerson(person);
         	hqView.refreshPersonnelList();
-        	person = null;
+        	person = campaign.newPilotPerson(PilotPerson.T_MECH);
         	refreshPilotAndOptions();
         } else {
         	hqView.refreshPersonnelList();
@@ -571,7 +535,7 @@ public class CustomizePilotDialog extends javax.swing.JDialog implements DialogO
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                CustomizePilotDialog dialog = new CustomizePilotDialog(new javax.swing.JFrame(), true, null, null, null);
+                CustomizePilotDialog dialog = new CustomizePilotDialog(new javax.swing.JFrame(), true, null, false, null, null);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {

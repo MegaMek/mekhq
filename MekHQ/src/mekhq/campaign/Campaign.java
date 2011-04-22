@@ -53,6 +53,7 @@ import org.w3c.dom.NodeList;
 import megamek.common.Aero;
 import megamek.common.Entity;
 
+import megamek.common.Compute;
 import megamek.common.Game;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
@@ -1724,4 +1725,35 @@ public class Campaign implements Serializable {
 		}
 		return acquire;
 	}
+	
+	/**
+	 * Generate a new pilotPerson of the given type
+	 * using whatever randomization options have been
+	 * given in the CampaignOptions
+	 * @param type
+	 * @return
+	 */
+	public PilotPerson newPilotPerson(int type) {
+		boolean isFemale = getRNG().isFemale();
+		Pilot pilot = new Pilot(getRNG().generate(isFemale),4,5);
+		PilotPerson person = new PilotPerson(pilot, type);
+		if(isFemale) {
+			person.setGender(Person.G_FEMALE);
+		}
+		//now lets get a random birthdate, such that the person
+		//is age 15+2d6 by default
+		//TODO: let user specify age distribution
+		GregorianCalendar birthdate = (GregorianCalendar)getCalendar().clone();
+		//lets set age to be 14 + 4d6 by default		
+		birthdate.set(Calendar.YEAR, birthdate.get(Calendar.YEAR) - (13 + Compute.d6(4)));
+		//choose a random day and month
+		int randomDay = Compute.randomInt(365)+1;
+		if(birthdate.isLeapYear(birthdate.get(Calendar.YEAR))) {
+			randomDay = Compute.randomInt(366)+1;
+		}
+		birthdate.set(Calendar.DAY_OF_YEAR, randomDay);
+		person.setBirthday(birthdate);
+		return person;
+	}
+	
 }
