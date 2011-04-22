@@ -1,5 +1,7 @@
 VERSION HISTORY
 ----------------------------------
+v0.1.4 (SVN)
+
 v0.1.3 (2011-04-22)
 + Bug 3288095: Tasks are not refreshing and dates do not advance
 + MegaMek Random Name Generator
