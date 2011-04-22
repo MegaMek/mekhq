@@ -1250,8 +1250,8 @@ public class MekHQView extends FrameView {
 			javax.swing.event.ListSelectionEvent evt) {
 		int selected = patientTable.getSelectedRow();
 		
-		if ((selected > -1) && (selected < campaign.getPersonnel().size())) {
-			currentPatientId = campaign.getPersonnel().get(selected).getId();
+		if ((selected > -1) && (selected < campaign.getPatients().size())) {
+			currentPatientId = campaign.getPatients().get(selected).getId();
 		} else if (selected < 0) {
 			currentPatientId = -1;
 		}
@@ -1313,12 +1313,12 @@ public class MekHQView extends FrameView {
 		
 		refreshTechsList();
 		refreshDoctorsList();
-		refreshPatientList();
+		refreshPatientList();	
 		
 		if (row >= patientTable.getRowCount()) {
 			row = 0;
 		}
-		patientTable.setRowSelectionInterval(row, row);
+		patientTable.setRowSelectionInterval(row, row);	
 	}// GEN-LAST:event_btnAssignDocActionPerformed
 
 	private void miHirePilotActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miHirePilotActionPerformed

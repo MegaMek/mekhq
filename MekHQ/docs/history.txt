@@ -36,6 +36,7 @@ v0.1.3 (SVN)
 + Game options to use artillery skill, init bonus, tactics bonus, and toughness
 + NPE when cancelling loadXML
 + PersonnelList not refreshing when doctors hired
++ Doctors not able to be assigned
 
 v0.1.2 (2011-04-15)
 + updated MegaMek.jar
