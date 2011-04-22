@@ -27,6 +27,7 @@ v0.1.3 (SVN)
 + personnelTable
 + added type and support skill columns to personnel table
 + only wounded personnel are in the infirmary
++ moved PatientMouseAdapter to PersonnelMouseAdapter
 
 v0.1.2 (2011-04-15)
 + updated MegaMek.jar
