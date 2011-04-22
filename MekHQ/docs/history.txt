@@ -37,6 +37,7 @@ v0.1.3 (SVN)
 + NPE when cancelling loadXML
 + PersonnelList not refreshing when doctors hired
 + Doctors not able to be assigned
++ incorrect mods listed in Acquisition Info
 
 v0.1.2 (2011-04-15)
 + updated MegaMek.jar

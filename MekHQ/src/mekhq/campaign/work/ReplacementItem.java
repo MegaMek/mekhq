@@ -31,6 +31,7 @@ import megamek.common.TargetRoll;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
+import mekhq.campaign.parts.Availability;
 import mekhq.campaign.parts.GenericSparePart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.team.SupportTeam;
@@ -272,10 +273,38 @@ public abstract class ReplacementItem extends UnitWorkItem {
 		}
 	}
 	
+    public TargetRoll getAllAcquisitionMods() {
+        TargetRoll target = new TargetRoll();
+        Part part = partNeeded();
+        Part tmpPart = part;
+        if(null == tmpPart) {
+        	tmpPart = partNeeded();
+        }    
+        //if (task instanceof Refit) {
+          //  Refit refit = (Refit) task;
+           // avail = refit.getRefitKitAvailability();
+          //  factionMod = refit.getRefitKitAvailabilityMod();
+        //} else {
+
+        // Faction and Tech mod
+        int factionMod = 0;
+        if (unit.campaign.getCampaignOptions().useFactionModifiers()) {
+        	factionMod = Availability.getFactionAndTechMod(tmpPart, unit.campaign);
+        }   
+        //availability mod
+        int avail = tmpPart.getAvailability(unit.campaign.getEra());
+        int availabilityMod = Availability.getAvailabilityModifier(avail);
+        target.addModifier(availabilityMod, "availability (" + EquipmentType.getRatingName(avail) + ")");
+        if(factionMod != 0) {
+     	   target.addModifier(factionMod, "faction");
+        }
+        return target;
+    }
+	
 	@Override
 	public String getPartDescHTML() {
-		String bonus = getAllMods().getValueAsString();
-		if (getAllMods().getValue() > -1) {
+		String bonus = getAllAcquisitionMods().getValueAsString();
+		if(getAllAcquisitionMods().getValue() > -1) {
 			bonus = "+" + bonus;
 		}
 		bonus = "(" + bonus + ")";

@@ -266,8 +266,8 @@ public class ArmorReplacement extends ReplacementItem {
 	
 	@Override
 	public String getPartDescHTML() {
-		String bonus = getAllMods().getValueAsString();
-		if (getAllMods().getValue() > -1) {
+		String bonus = getAllAcquisitionMods().getValueAsString();
+		if (getAllAcquisitionMods().getValue() > -1) {
 			bonus = "+" + bonus;
 		}
 		bonus = "(" + bonus + ")";

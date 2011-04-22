@@ -266,26 +266,8 @@ public abstract class SupportTeam implements Serializable, MekHqXmlSerializable 
            return new TargetRoll(TargetRoll.IMPOSSIBLE, "Already checked for this part in this cycle");
 	   }
 	   
-	   Part part = replacement.partNeeded();
 	   TargetRoll target = getTarget(WorkItem.MODE_NORMAL);
-       int factionMod = 0;
-       int avail = EquipmentType.RATING_X;    
-       if (task instanceof Refit) {
-           Refit refit = (Refit) task;
-           avail = refit.getRefitKitAvailability();
-           factionMod = refit.getRefitKitAvailabilityMod();
-       } else {
-    	   avail = part.getAvailability(campaign.getEra());
-           // Faction and Tech mod
-           if (campaign.getCampaignOptions().useFactionModifiers())
-        	   factionMod = Availability.getFactionAndTechMod(part, campaign);
-       }
-       
-       int availabilityMod = Availability.getAvailabilityModifier(avail);
-       target.addModifier(availabilityMod, "availability (" + EquipmentType.getRatingName(avail) + ")");
-       if(factionMod != 0) {
-    	   target.addModifier(factionMod, "faction");
-       }
+	   target.append(replacement.getAllAcquisitionMods());
 	   return target;
    }
    

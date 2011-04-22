@@ -28,10 +28,13 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import megamek.common.Entity;
+import megamek.common.EquipmentType;
+import megamek.common.TargetRoll;
 import mekhq.MekHQApp;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
+import mekhq.campaign.parts.Availability;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.RefitKit;
 import mekhq.campaign.personnel.PilotPerson;
@@ -273,6 +276,29 @@ public abstract class Refit extends ReplacementItem {
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1)
 				+ "<refitKitAvailabilityMod>" + refitKitAvailabilityMod
 				+ "</refitKitAvailabilityMod>");
+	}
+	
+	@Override
+	public TargetRoll getAllAcquisitionMods() {
+		TargetRoll target = new TargetRoll();
+        Part part = partNeeded();
+        Part tmpPart = part;
+        if(null == tmpPart) {
+        	tmpPart = partNeeded();
+        }    
+        // Faction and Tech mod
+        int factionMod = 0;
+        if (unit.campaign.getCampaignOptions().useFactionModifiers()) {
+        	factionMod = getRefitKitAvailabilityMod();
+        }   
+        //availability mod
+        int avail = getRefitKitAvailability();
+        int availabilityMod = Availability.getAvailabilityModifier(avail);
+        target.addModifier(availabilityMod, "availability (" + EquipmentType.getRatingName(avail) + ")");
+        if(factionMod != 0) {
+     	   target.addModifier(factionMod, "faction");
+        }
+        return target;
 	}
 
 	@Override
