@@ -183,7 +183,7 @@ private void btnHireActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
     TechTeam tech = new TechTeam(name, rating, type);
     campaign.addTeam(tech);
     txtTeamName.setText(nameGen.generate());
-    hqView.refreshPersonnelList();
+    hqView.refreshPatientList();
     hqView.refreshTechsList();
 }//GEN-LAST:event_btnHireActionPerformed
 

@@ -346,7 +346,7 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         person.setBiography(txtBio.getText());
 
         campaign.addPerson(person);
-        hqView.refreshPersonnelList();
+        hqView.refreshPatientList();
         refreshPilotAndOptions();
     }//GEN-LAST:event_btnOkActionPerformed
 

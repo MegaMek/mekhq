@@ -141,18 +141,18 @@ public class MekHQView extends FrameView {
 	private AcquisitionTableModel acquireModel = new AcquisitionTableModel();
 	private MekTableModel unitModel = new MekTableModel();
 	private TechTableModel techsModel = new TechTableModel();
-	private PersonTableModel personnelModel = new PersonTableModel();
+	private PatientTableModel patientModel = new PatientTableModel();
 	private DocTableModel doctorsModel = new DocTableModel();
 	private PartsTableModel partsModel = new PartsTableModel();
 	private MekTableMouseAdapter unitMouseAdapter;
 	private PartsTableMouseAdapter partsMouseAdapter;
 	private TaskTableMouseAdapter taskMouseAdapter;
-	private PersonTableMouseAdapter personMouseAdapter;
+	private PatientTableMouseAdapter patientMouseAdapter;
 	private int currentUnitId;
 	private int currentTaskId;
 	private int currentAcquisitionId;
 	private int currentTechId;
-	private int currentPersonId;
+	private int currentPatientId;
 	private int currentDoctorId;
 	private int currentPartsId;
 	private int[] selectedTasksIds;
@@ -163,7 +163,7 @@ public class MekHQView extends FrameView {
 		unitMouseAdapter = new MekTableMouseAdapter();
 		partsMouseAdapter = new PartsTableMouseAdapter();
 		taskMouseAdapter = new TaskTableMouseAdapter();
-		personMouseAdapter = new PersonTableMouseAdapter();
+		patientMouseAdapter = new PatientTableMouseAdapter();
 		initComponents();
 		refreshCalendar();
 
@@ -274,10 +274,10 @@ public class MekHQView extends FrameView {
 		PartsFilter = new javax.swing.JComboBox();
 		btnSaveParts = new javax.swing.JButton();
 		btnLoadParts = new javax.swing.JButton();
-		panPersonnel = new javax.swing.JPanel();
+		panInfirmary = new javax.swing.JPanel();
 		btnAssignDoc = new javax.swing.JButton();
-		scrollPersonTable = new javax.swing.JScrollPane();
-		PersonTable = new javax.swing.JTable();
+		scrollPatientTable = new javax.swing.JScrollPane();
+		patientTable = new javax.swing.JTable();
 		scrollDocTable = new javax.swing.JScrollPane();
 		DocTable = new javax.swing.JTable();
 		panFinances = new javax.swing.JPanel();
@@ -695,8 +695,8 @@ public class MekHQView extends FrameView {
 				resourceMap.getString("panSupplies.TabConstraints.tabTitle"),
 				panSupplies); // NOI18N
 
-		panPersonnel.setName("panPersonnel"); // NOI18N
-		panPersonnel.setLayout(new java.awt.GridBagLayout());
+		panInfirmary.setName("panInfirmary"); // NOI18N
+		panInfirmary.setLayout(new java.awt.GridBagLayout());
 
 		btnAssignDoc.setText(resourceMap.getString("btnAssignDoc.text")); // NOI18N
 		btnAssignDoc.setToolTipText(resourceMap
@@ -712,26 +712,26 @@ public class MekHQView extends FrameView {
 		gridBagConstraints.gridx = 1;
 		gridBagConstraints.gridy = 0;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
-		panPersonnel.add(btnAssignDoc, gridBagConstraints);
+		panInfirmary.add(btnAssignDoc, gridBagConstraints);
 
-		scrollPersonTable.setMinimumSize(new java.awt.Dimension(300, 200));
-		scrollPersonTable.setName("scrollPersonTable"); // NOI18N
-		scrollPersonTable.setPreferredSize(new java.awt.Dimension(300, 300));
+		scrollPatientTable.setMinimumSize(new java.awt.Dimension(300, 200));
+		scrollPatientTable.setName("scrollPersonTable"); // NOI18N
+		scrollPatientTable.setPreferredSize(new java.awt.Dimension(300, 300));
 
-		PersonTable.setModel(personnelModel);
-		PersonTable.setName("PersonTable"); // NOI18N
-		PersonTable.setRowHeight(80);
-		PersonTable.getColumnModel().getColumn(0)
-				.setCellRenderer(personnelModel.getRenderer());
-		PersonTable.getSelectionModel().addListSelectionListener(
+		patientTable.setModel(patientModel);
+		patientTable.setName("PersonTable"); // NOI18N
+		patientTable.setRowHeight(80);
+		patientTable.getColumnModel().getColumn(0)
+				.setCellRenderer(patientModel.getRenderer());
+		patientTable.getSelectionModel().addListSelectionListener(
 				new javax.swing.event.ListSelectionListener() {
 					public void valueChanged(
 							javax.swing.event.ListSelectionEvent evt) {
-						PersonTableValueChanged(evt);
+						patientTableValueChanged(evt);
 					}
 				});
-		PersonTable.addMouseListener(personMouseAdapter);
-		scrollPersonTable.setViewportView(PersonTable);
+		patientTable.addMouseListener(patientMouseAdapter);
+		scrollPatientTable.setViewportView(patientTable);
 
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
@@ -740,7 +740,7 @@ public class MekHQView extends FrameView {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		gridBagConstraints.weightx = 0.5;
 		gridBagConstraints.weighty = 1.0;
-		panPersonnel.add(scrollPersonTable, gridBagConstraints);
+		panInfirmary.add(scrollPatientTable, gridBagConstraints);
 
 		scrollDocTable.setMinimumSize(new java.awt.Dimension(300, 300));
 		scrollDocTable.setName("scrollDocTable"); // NOI18N
@@ -767,11 +767,11 @@ public class MekHQView extends FrameView {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		gridBagConstraints.weightx = 0.5;
 		gridBagConstraints.weighty = 1.0;
-		panPersonnel.add(scrollDocTable, gridBagConstraints);
+		panInfirmary.add(scrollDocTable, gridBagConstraints);
 
 		tabMain.addTab(
-				resourceMap.getString("panPersonnel.TabConstraints.tabTitle"),
-				panPersonnel); // NOI18N
+				resourceMap.getString("panInfirmary.TabConstraints.tabTitle"),
+				panInfirmary); // NOI18N
 
 		panFinances.setName("panFinances"); // NOI18N
 
@@ -1219,14 +1219,14 @@ public class MekHQView extends FrameView {
 		updateTargetText();
 	}
 
-	private void PersonTableValueChanged(
+	private void patientTableValueChanged(
 			javax.swing.event.ListSelectionEvent evt) {
-		int selected = PersonTable.getSelectedRow();
+		int selected = patientTable.getSelectedRow();
 		
 		if ((selected > -1) && (selected < campaign.getPersonnel().size())) {
-			currentPersonId = campaign.getPersonnel().get(selected).getId();
+			currentPatientId = campaign.getPersonnel().get(selected).getId();
 		} else if (selected < 0) {
-			currentPersonId = -1;
+			currentPatientId = -1;
 		}
 		
 		updateAssignDoctorEnabled();
@@ -1260,7 +1260,7 @@ public class MekHQView extends FrameView {
 		refreshTaskList();
 		refreshAcquireList();
 		refreshTechsList();
-		refreshPersonnelList();
+		refreshPatientList();
 		refreshDoctorsList();
 		refreshCalendar();
 		refreshReport();
@@ -1271,12 +1271,12 @@ public class MekHQView extends FrameView {
 	}// GEN-LAST:event_btnDeployUnitsActionPerformed
 
 	private void btnAssignDocActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnAssignDocActionPerformed
-		if (currentPersonId == -1) {
+		if (currentPatientId == -1) {
 			return;
 		}
 		
-		int row = PersonTable.getSelectedRow();
-		Person p = campaign.getPerson(currentPersonId);
+		int row = patientTable.getSelectedRow();
+		Person p = campaign.getPerson(currentPatientId);
 		
 		if ((null != p) && (null != p.getTask())) {
 			p.getTask().setTeam(campaign.getTeam(currentDoctorId));
@@ -1285,19 +1285,19 @@ public class MekHQView extends FrameView {
 		
 		refreshTechsList();
 		refreshDoctorsList();
-		refreshPersonnelList();
+		refreshPatientList();
 		
-		if (row >= PersonTable.getRowCount()) {
+		if (row >= patientTable.getRowCount()) {
 			row = 0;
 		}
-		PersonTable.setRowSelectionInterval(row, row);
+		patientTable.setRowSelectionInterval(row, row);
 	}// GEN-LAST:event_btnAssignDocActionPerformed
 
 	private void miHirePilotActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miHirePilotActionPerformed
 		NewPilotDialog npd = new NewPilotDialog(getFrame(), true, campaign,
 				this);
 		npd.setVisible(true);
-		refreshPersonnelList();
+		refreshPatientList();
 		refreshReport();
 	}// GEN-LAST:event_miHirePilotActionPerformed
 
@@ -1306,7 +1306,7 @@ public class MekHQView extends FrameView {
 				campaign, this);
 		ntd.setVisible(true);
 		refreshTechsList();
-		refreshPersonnelList();
+		refreshPatientList();
 		refreshReport();
 	}// GEN-LAST:event_miHireTechActionPerformed
 
@@ -1317,7 +1317,7 @@ public class MekHQView extends FrameView {
 		if (null != nmd.getMedicalTeam()) {
 			campaign.addTeam(nmd.getMedicalTeam());
 			refreshTechsList();
-			refreshPersonnelList();
+			refreshPatientList();
 			refreshDoctorsList();
 			refreshReport();
 		}
@@ -1426,7 +1426,7 @@ public class MekHQView extends FrameView {
 		refreshTaskList();
 		refreshAcquireList();
 		refreshTechsList();
-		refreshPersonnelList();
+		refreshPatientList();
 		refreshDoctorsList();
 		refreshPartsList();
 		refreshCalendar();
@@ -1467,7 +1467,7 @@ public class MekHQView extends FrameView {
 		refreshTaskList();
 		refreshAcquireList();
 		refreshTechsList();
-		refreshPersonnelList();
+		refreshPatientList();
 		refreshDoctorsList();
 		refreshPartsList();
 		refreshCalendar();
@@ -1694,7 +1694,7 @@ public class MekHQView extends FrameView {
 		}
 		
 		refreshUnitList();
-		refreshPersonnelList();
+		refreshPatientList();
 		refreshReport();
 	}
 
@@ -1779,7 +1779,7 @@ public class MekHQView extends FrameView {
 		}
 
 		refreshUnitList();
-		refreshPersonnelList();
+		refreshPatientList();
 
 		if (undeployed.length() > 0) {
 			JOptionPane.showMessageDialog(
@@ -1822,11 +1822,11 @@ public class MekHQView extends FrameView {
 		}
 	}
 
-	protected void refreshPersonnelList() {
-		int selected = PersonTable.getSelectedRow();
-		personnelModel.setData(campaign.getPersonnel());
+	protected void refreshPatientList() {
+		int selected = patientTable.getSelectedRow();
+		patientModel.setData(campaign.getPersonnel());
 		if ((selected > -1) && (selected < campaign.getPersonnel().size())) {
-			PersonTable.setRowSelectionInterval(selected, selected);
+			patientTable.setRowSelectionInterval(selected, selected);
 		}
 	}
 
@@ -1886,7 +1886,7 @@ public class MekHQView extends FrameView {
 
 	protected void updateAssignDoctorEnabled() {
 		// must have a valid doctor and an unassigned task
-		Person curPerson = campaign.getPerson(currentPersonId);
+		Person curPerson = campaign.getPerson(currentPatientId);
 		SupportTeam team = campaign.getTeam(currentDoctorId);
 		PersonnelWorkItem pw = null;
 		if (null != curPerson) {
@@ -2489,7 +2489,7 @@ public class MekHQView extends FrameView {
 					}
 				}
 				refreshUnitList();
-				refreshPersonnelList();
+				refreshPatientList();
 			} else if (command.contains("CUSTOMIZE")
 					&& !command.contains("CANCEL")) {
 				if (!selectedUnit.isDeployed() && !selectedUnit.isDamaged()) {
@@ -2843,12 +2843,12 @@ public class MekHQView extends FrameView {
 	}
 
 	/**
-	 * A table model for displaying personnel
+	 * A table model for displaying personnel in the infirmary
 	 */
-	public class PersonTableModel extends ArrayTableModel {
+	public class PatientTableModel extends ArrayTableModel {
 		private static final long serialVersionUID = -1615929049408417297L;
 
-		public PersonTableModel() {
+		public PatientTableModel() {
 			columnNames = new String[] { "Personnel" };
 			data = new ArrayList<Person>();
 		}
@@ -2873,8 +2873,8 @@ public class MekHQView extends FrameView {
 			return persons;
 		}
 
-		public PersonTableModel.Renderer getRenderer() {
-			return new PersonTableModel.Renderer();
+		public PatientTableModel.Renderer getRenderer() {
+			return new PatientTableModel.Renderer();
 		}
 
 		public class Renderer extends PersonInfo implements TableCellRenderer {
@@ -2909,13 +2909,13 @@ public class MekHQView extends FrameView {
 		}
 	}
 
-	public class PersonTableMouseAdapter extends MouseInputAdapter implements
+	public class PatientTableMouseAdapter extends MouseInputAdapter implements
 			ActionListener {
 		public void actionPerformed(ActionEvent action) {
 			String command = action.getActionCommand();
-			Person selectedPerson = personnelModel.getPersonAt(PersonTable
+			Person selectedPerson = patientModel.getPersonAt(patientTable
 					.getSelectedRow());
-			Person[] persons = personnelModel.getPersonsAt(PersonTable
+			Person[] persons = patientModel.getPersonsAt(patientTable
 					.getSelectedRows());
 
 			if (command.equalsIgnoreCase("KIA")) {
@@ -2932,7 +2932,7 @@ public class MekHQView extends FrameView {
 				}
 
 				refreshUnitList();
-				refreshPersonnelList();
+				refreshPatientList();
 				refreshTechsList();
 				refreshDoctorsList();
 				refreshReport();
@@ -2949,7 +2949,7 @@ public class MekHQView extends FrameView {
 					}
 				}
 				refreshUnitList();
-				refreshPersonnelList();
+				refreshPatientList();
 				refreshTechsList();
 				refreshDoctorsList();
 				refreshReport();
@@ -2966,7 +2966,7 @@ public class MekHQView extends FrameView {
 					}
 				}
 				refreshUnitList();
-				refreshPersonnelList();
+				refreshPatientList();
 				refreshTechsList();
 				refreshDoctorsList();
 				refreshReport();
@@ -2976,31 +2976,31 @@ public class MekHQView extends FrameView {
 						person.setDeployed(false);
 					}
 				}
-				refreshPersonnelList();
+				refreshPatientList();
 			} else if (command.equalsIgnoreCase("IMP_PILOTING")) {
 				if (selectedPerson instanceof PilotPerson) {
 					Pilot pilot = ((PilotPerson) selectedPerson).getPilot();
 					pilot.setPiloting(pilot.getPiloting() - 1);
-					refreshPersonnelList();
+					refreshPatientList();
 				}
 			} else if (command.equalsIgnoreCase("IMP_GUNNERY")) {
 				if (selectedPerson instanceof PilotPerson) {
 					Pilot pilot = ((PilotPerson) selectedPerson).getPilot();
 					pilot.setGunnery(pilot.getGunnery() - 1);
-					refreshPersonnelList();
+					refreshPatientList();
 					refreshUnitList();
 				}
 			} else if (command.equalsIgnoreCase("DEC_PILOTING")) {
 				if (selectedPerson instanceof PilotPerson) {
 					Pilot pilot = ((PilotPerson) selectedPerson).getPilot();
 					pilot.setPiloting(pilot.getPiloting() + 1);
-					refreshPersonnelList();
+					refreshPatientList();
 				}
 			} else if (command.equalsIgnoreCase("DEC_GUNNERY")) {
 				if (selectedPerson instanceof PilotPerson) {
 					Pilot pilot = ((PilotPerson) selectedPerson).getPilot();
 					pilot.setGunnery(pilot.getGunnery() + 1);
-					refreshPersonnelList();
+					refreshPatientList();
 					refreshUnitList();
 				}
 			} else if (command.equalsIgnoreCase("IMP_SUPPORT")) {
@@ -3008,7 +3008,7 @@ public class MekHQView extends FrameView {
 					SupportTeam team = ((SupportPerson) selectedPerson)
 							.getTeam();
 					team.setRating(team.getRating() + 1);
-					refreshPersonnelList();
+					refreshPatientList();
 					refreshDoctorsList();
 					refreshTechsList();
 				}
@@ -3017,7 +3017,7 @@ public class MekHQView extends FrameView {
 					SupportTeam team = ((SupportPerson) selectedPerson)
 							.getTeam();
 					team.setRating(team.getRating() - 1);
-					refreshPersonnelList();
+					refreshPatientList();
 					refreshDoctorsList();
 					refreshTechsList();
 				}
@@ -3030,7 +3030,7 @@ public class MekHQView extends FrameView {
 						person.setTask(null);
 					}
 				}
-				refreshPersonnelList();
+				refreshPatientList();
 				refreshDoctorsList();
 				refreshUnitList();
 			} else if (command.equalsIgnoreCase("PORTRAIT")) {
@@ -3040,7 +3040,7 @@ public class MekHQView extends FrameView {
 				pcd.setVisible(true);
 				selectedPerson.setPortraitCategory(pcd.getCategory());
 				selectedPerson.setPortraitFileName(pcd.getFileName());
-				refreshPersonnelList();
+				refreshPatientList();
 			} else if (command.equalsIgnoreCase("XP_ADD")) {
 				for (Person person : persons) {
 					if (person instanceof PilotPerson) {
@@ -3048,22 +3048,22 @@ public class MekHQView extends FrameView {
 					}
 				}
 
-				refreshPersonnelList();
+				refreshPatientList();
 			} else if (command.equalsIgnoreCase("XP_SET")) {
 				PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(
 						null, true, "XP", selectedPerson.getXp(), 0, Math.max(selectedPerson.getXp()+10,100));
 				pvcd.setVisible(true);
 				int i = pvcd.getValue();
 				selectedPerson.setXp(i);
-				refreshPersonnelList();
+				refreshPatientList();
 			}
 		}
 
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			if (e.getClickCount() == 2) {
-				int row = PersonTable.rowAtPoint(e.getPoint());
-				Person person = personnelModel.getPersonAt(row);
+				int row = patientTable.rowAtPoint(e.getPoint());
+				Person person = patientModel.getPersonAt(row);
 				if (null != person) {
 					PersonViewDialog pvd = new PersonViewDialog(null, true,
 							person);
@@ -3086,8 +3086,8 @@ public class MekHQView extends FrameView {
 			JPopupMenu popup = new JPopupMenu();
 
 			if (e.isPopupTrigger()) {
-				int row = PersonTable.rowAtPoint(e.getPoint());
-				Person person = personnelModel.getPersonAt(row);
+				int row = patientTable.rowAtPoint(e.getPoint());
+				Person person = patientModel.getPersonAt(row);
 				JMenuItem menuItem = null;
 				JMenu menu = null;
 				JMenu impMenu = null;
@@ -3365,7 +3365,7 @@ public class MekHQView extends FrameView {
 	private javax.swing.JTable DocTable;
 	private javax.swing.JComboBox PartsFilter;
 	private javax.swing.JTable PartsTable;
-	private javax.swing.JTable PersonTable;
+	private javax.swing.JTable patientTable;
 	private javax.swing.JTable TaskTable;
 	private javax.swing.JTable AcquisitionTable;
 	private javax.swing.JTable TechTable;
@@ -3405,13 +3405,14 @@ public class MekHQView extends FrameView {
 	private javax.swing.JMenuItem miPurchaseUnit;
 	private javax.swing.JPanel panFinances;
 	private javax.swing.JPanel panHangar;
+	private javax.swing.JPanel panInfirmary;
 	private javax.swing.JPanel panPersonnel;
 	private javax.swing.JPanel panSupplies;
 	private javax.swing.JPanel panelDoTask;
 	private javax.swing.JPanel panelMasterButtons;
 	private javax.swing.JProgressBar progressBar;
 	private javax.swing.JScrollPane scrollDocTable;
-	private javax.swing.JScrollPane scrollPersonTable;
+	private javax.swing.JScrollPane scrollPatientTable;
 	private javax.swing.JScrollPane scrollTaskTable;
 	private javax.swing.JScrollPane scrollAcquisitionTable;
 	private javax.swing.JScrollPane scrollTechTable;
