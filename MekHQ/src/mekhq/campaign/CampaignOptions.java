@@ -49,7 +49,7 @@ public class CampaignOptions implements Serializable {
     private int repairSystem;
 
     public CampaignOptions () {
-        useFactionModifiers = true;
+        useFactionModifiers = false;
         clanPriceModifier = 1.0;
         useEasierRefit = false;
         useFinances = false;
