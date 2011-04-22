@@ -1,6 +1,6 @@
 VERSION HISTORY
 ----------------------------------
-v0.1.3 (SVN)
+v0.1.3 (2011-04-22)
 + Bug 3288095: Tasks are not refreshing and dates do not advance
 + MegaMek Random Name Generator
 + Bug 3288083: GM Mode - Set XP spinner not working
