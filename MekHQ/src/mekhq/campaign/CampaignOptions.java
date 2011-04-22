@@ -53,6 +53,8 @@ public class CampaignOptions implements Serializable {
     private boolean useInitBonus;
     private boolean useToughness;
     private boolean useArtillery;
+    private boolean useAbilities;
+    private boolean useImplants;
 
     public CampaignOptions () {
         useFactionModifiers = false;
@@ -61,6 +63,12 @@ public class CampaignOptions implements Serializable {
         useFinances = false;
         useFactionForNames = true;
         repairSystem = REPAIR_SYSTEM_STRATOPS;    
+        useTactics = false;
+        useInitBonus = false;
+        useToughness = false;
+        useArtillery = false;
+        useAbilities = false;
+        useImplants = false;
     }
 
     public static String getRepairSystemName (int repairSystem) {
@@ -146,9 +154,22 @@ public class CampaignOptions implements Serializable {
     public void setArtillery(boolean b) {
     	this.useArtillery = b;
     }
-
-
-
+    
+    public boolean useAbilities() {
+    	return useAbilities;
+    }
+   
+    public void setAbilities(boolean b) {
+    	this.useAbilities = b;
+    }
+    
+    public boolean useImplants() {
+    	return useImplants;
+    }
+   
+    public void setImplants(boolean b) {
+    	this.useImplants = b;
+    }
 
 	public void writeToXml(PrintWriter pw1, int indent) {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "<campaignOptions>");
@@ -162,6 +183,8 @@ public class CampaignOptions implements Serializable {
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useInitBonus", useInitBonus);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useToughness", useToughness);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useArtillery", useArtillery);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useAbilities", useAbilities);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useImplants", useImplants);
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "</campaignOptions>");
 	}
 
@@ -223,11 +246,21 @@ public class CampaignOptions implements Serializable {
 					retVal.useToughness = true;
 				else
 					retVal.useToughness = false;
-			}else if (wn2.getNodeName().equalsIgnoreCase("useArtillery")) {
+			} else if (wn2.getNodeName().equalsIgnoreCase("useArtillery")) {
 				if (wn2.getTextContent().equalsIgnoreCase("true"))
 					retVal.useArtillery = true;
 				else
 					retVal.useArtillery = false;
+			} else if (wn2.getNodeName().equalsIgnoreCase("useAbilities")) {
+				if (wn2.getTextContent().equalsIgnoreCase("true"))
+					retVal.useAbilities = true;
+				else
+					retVal.useAbilities = false;
+			} else if (wn2.getNodeName().equalsIgnoreCase("useImplants")) {
+				if (wn2.getTextContent().equalsIgnoreCase("true"))
+					retVal.useImplants = true;
+				else
+					retVal.useImplants = false;
 			}
 		}
 

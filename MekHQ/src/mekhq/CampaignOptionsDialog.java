@@ -74,6 +74,14 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         useFactionModifiersCheckBox.setSelected(options.useFactionModifiers());
         clanPriceModifierJFormattedTextField.setValue(options.getClanPriceModifier());
         useEasierRefitCheckBox.setSelected(options.useEasierRefit());
+        useFactionForNamesBox.setSelected(options.useFactionForNames());
+        useTacticsBox.setSelected(options.useTactics());
+        useInitBonusBox.setSelected(options.useInitBonus());
+        useToughnessBox.setSelected(options.useToughness());
+        useArtilleryBox.setSelected(options.useArtillery());
+        useAbilitiesBox.setSelected(options.useAbilities());
+        useImplantsBox.setSelected(options.useImplants());
+
     }
 
     /** This method is called from within the constructor to
@@ -116,6 +124,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         useInitBonusBox = new javax.swing.JCheckBox();
         useToughnessBox = new javax.swing.JCheckBox();
         useArtilleryBox = new javax.swing.JCheckBox();
+        useAbilitiesBox = new javax.swing.JCheckBox();
+        useImplantsBox = new javax.swing.JCheckBox();
         repairSystemComboBox = new javax.swing.JComboBox();
         javax.swing.JLabel repairSystemComboBoxLabel = new javax.swing.JLabel();
         chkUseFinances = new javax.swing.JCheckBox();
@@ -359,6 +369,28 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panPersonnel.add(useArtilleryBox, gridBagConstraints);
         
+        useAbilitiesBox.setText(resourceMap.getString("useAbilitiesBox.text")); // NOI18N
+        useAbilitiesBox.setToolTipText(resourceMap.getString("useAbilitiesBox.toolTipText")); // NOI18N
+        useAbilitiesBox.setName("useAbilitiesBox"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panPersonnel.add(useAbilitiesBox, gridBagConstraints);
+        
+        useImplantsBox.setText(resourceMap.getString("useImplantsBox.text")); // NOI18N
+        useImplantsBox.setToolTipText(resourceMap.getString("useImplantsBox.toolTipText")); // NOI18N
+        useImplantsBox.setName("useImplantsBox"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panPersonnel.add(useImplantsBox, gridBagConstraints);
+        
         tabOptions.addTab(resourceMap.getString("panPersonnel.TabConstraints.tabTitle"), panPersonnel); // NOI18N
 
         panNameGen.setName("panNameGen"); // NOI18N
@@ -532,6 +564,8 @@ private void btnOkayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
     options.setInitBonus(useInitBonusBox.isSelected());
     options.setToughness(useToughnessBox.isSelected());
     options.setArtillery(useArtilleryBox.isSelected());
+    options.setAbilities(useAbilitiesBox.isSelected());
+    options.setImplants(useImplantsBox.isSelected());
     
     campaign.refreshAllUnitDiagnostics();
 }//GEN-LAST:event_btnOkayActionPerformed
@@ -644,6 +678,8 @@ public String getDateAsString() {
     private javax.swing.JCheckBox useInitBonusBox;
     private javax.swing.JCheckBox useToughnessBox;
     private javax.swing.JCheckBox useArtilleryBox;
+    private javax.swing.JCheckBox useAbilitiesBox;
+    private javax.swing.JCheckBox useImplantsBox;
     // End of variables declaration//GEN-END:variables
 
 }

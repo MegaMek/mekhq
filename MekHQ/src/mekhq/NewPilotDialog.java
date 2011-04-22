@@ -25,7 +25,6 @@ import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.NameGen;
 import mekhq.campaign.personnel.PilotPerson;
 
 /**
@@ -102,6 +101,7 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         panButtons = new javax.swing.JPanel();
         btnOk = new javax.swing.JButton();
         btnClose = new javax.swing.JButton();
+        btnRandomName = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(NewPilotDialog.class);
@@ -120,7 +120,7 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridwidth = 4;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
@@ -139,7 +139,7 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         lblNickname.setName("lblNickname"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
         getContentPane().add(lblNickname, gridBagConstraints);
@@ -162,13 +162,27 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         getContentPane().add(textName, gridBagConstraints);
 
+        btnRandomName.setText(resourceMap.getString("btnRandomName.text")); // NOI18N
+        btnRandomName.setName("btnRandomName"); // NOI18N
+        btnRandomName.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            	randomName();
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 4;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        getContentPane().add(btnRandomName, gridBagConstraints);
+        
         textNickname.setText(pilot.getNickname());
         textNickname.setMinimumSize(new java.awt.Dimension(250, 28));
         textNickname.setName("textNickname"); // NOI18N
         textNickname.setPreferredSize(new java.awt.Dimension(250, 28));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         getContentPane().add(textNickname, gridBagConstraints);
@@ -179,7 +193,7 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         textGunnery.setPreferredSize(new java.awt.Dimension(50, 28));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         getContentPane().add(textGunnery, gridBagConstraints);
 
@@ -189,7 +203,7 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         textPiloting.setPreferredSize(new java.awt.Dimension(50, 28));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         getContentPane().add(textPiloting, gridBagConstraints);
 
@@ -197,7 +211,7 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         lblGunnery.setName("lblGunnery"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
         getContentPane().add(lblGunnery, gridBagConstraints);
@@ -206,7 +220,7 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         lblPiloting.setName("lblPiloting"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
         getContentPane().add(lblPiloting, gridBagConstraints);
@@ -217,7 +231,7 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         	lblArtillery.setName("lblArtillery"); // NOI18N
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = 5;
+            gridBagConstraints.gridy = 6;
             gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
             gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
             getContentPane().add(lblArtillery, gridBagConstraints);
@@ -228,7 +242,7 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
             textArtillery.setPreferredSize(new java.awt.Dimension(50, 28));
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = 5;
+            gridBagConstraints.gridy = 6;
             gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
             getContentPane().add(textArtillery, gridBagConstraints);
         }
@@ -238,7 +252,7 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
             lblInitB.setName("lblInitB"); // NOI18N
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 2;
-            gridBagConstraints.gridy = 3;
+            gridBagConstraints.gridy = 4;
             gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
             gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
             getContentPane().add(lblInitB, gridBagConstraints);
@@ -249,7 +263,7 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
             textInitB.setPreferredSize(new java.awt.Dimension(50, 28));
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 3;
-            gridBagConstraints.gridy = 3;
+            gridBagConstraints.gridy = 4;
             gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
             getContentPane().add(textInitB, gridBagConstraints);
         }
@@ -259,7 +273,7 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
             lblCommandB.setName("lblCommandB"); // NOI18N
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 2;
-            gridBagConstraints.gridy = 4;
+            gridBagConstraints.gridy = 5;
             gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
             gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
             getContentPane().add(lblCommandB, gridBagConstraints);
@@ -270,7 +284,7 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         	textCommandB.setPreferredSize(new java.awt.Dimension(50, 28));
         	gridBagConstraints = new java.awt.GridBagConstraints();
         	gridBagConstraints.gridx = 3;
-        	gridBagConstraints.gridy = 4;
+        	gridBagConstraints.gridy = 5;
         	gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         	getContentPane().add(textCommandB, gridBagConstraints);
         }
@@ -280,7 +294,7 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         	lblToughness.setName("lblToughness"); // NOI18N
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 2;
-            gridBagConstraints.gridy = 5;
+            gridBagConstraints.gridy = 6;
             gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
             gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
             getContentPane().add(lblToughness, gridBagConstraints);
@@ -291,7 +305,7 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
             textToughness.setPreferredSize(new java.awt.Dimension(50, 28));
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 3;
-            gridBagConstraints.gridy = 5;
+            gridBagConstraints.gridy = 6;
             gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
             getContentPane().add(textToughness, gridBagConstraints);
         }
@@ -303,9 +317,9 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridy = 7;
         gridBagConstraints.gridwidth = 4;
-        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -332,16 +346,19 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
 
         jScrollPane1.setViewportView(panOptions);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 5;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridheight = 8;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 0);
-        getContentPane().add(jScrollPane1, gridBagConstraints);
+        if(campaign.getCampaignOptions().useAbilities() 
+        		|| campaign.getCampaignOptions().useImplants()) {
+        	gridBagConstraints = new java.awt.GridBagConstraints();
+        	gridBagConstraints.gridx = 5;
+        	gridBagConstraints.gridy = 0;
+        	gridBagConstraints.gridheight = 8;
+        	gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        	gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        	gridBagConstraints.weightx = 1.0;
+        	gridBagConstraints.weighty = 1.0;
+        	gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 0);
+        	getContentPane().add(jScrollPane1, gridBagConstraints);
+        }
         
         panButtons.setName("panButtons"); // NOI18N
         panButtons.setLayout(new java.awt.GridBagLayout());
@@ -355,7 +372,7 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panButtons.add(btnOk, gridBagConstraints);
 
@@ -368,13 +385,13 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridy = 0;
         panButtons.add(btnClose, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 8;
-        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.gridwidth = 6;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         getContentPane().add(panButtons, gridBagConstraints);
 
@@ -418,6 +435,10 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         refreshPilotAndOptions();
     }//GEN-LAST:event_btnOkActionPerformed
 
+    private void randomName() {
+		textName.setText(campaign.getRNG().generate());
+	}
+    
     /**
      * @param args the command line arguments
      */
@@ -454,6 +475,16 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         .hasMoreElements();) {
             IOptionGroup group = i.nextElement();
 
+            if (group.getKey().equalsIgnoreCase(PilotOptions.LVL3_ADVANTAGES)
+                    && !campaign.getCampaignOptions().useAbilities()) {
+                continue;
+            }
+
+            if (group.getKey().equalsIgnoreCase(PilotOptions.MD_ADVANTAGES)
+                    && !campaign.getCampaignOptions().useImplants()) {
+                continue;
+            }
+            
             addGroup(group, gridbag, c);
 
             for (Enumeration<IOption> j = group.getOptions(); j
@@ -521,6 +552,7 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClose;
     private javax.swing.JButton btnOk;
+    private javax.swing.JButton btnRandomName;
     private javax.swing.JComboBox choiceType;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
