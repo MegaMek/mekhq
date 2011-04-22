@@ -23,7 +23,10 @@ package mekhq;
 
 import megamek.client.RandomNameGenerator;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.SupportPerson;
 import mekhq.campaign.team.SupportTeam;
+import mekhq.campaign.team.TechTeam;
+
 import javax.swing.DefaultComboBoxModel;
 import mekhq.campaign.team.MedicalTeam;
 
@@ -31,17 +34,26 @@ import mekhq.campaign.team.MedicalTeam;
  *
  * @author  Taharqa
  */
-public class NewMedicalTeamDialog extends javax.swing.JDialog {
+public class CustomizeMedicalTeamDialog extends javax.swing.JDialog {
 	private static final long serialVersionUID = 473315007619908689L;
-	private MedicalTeam doc;
-    private RandomNameGenerator nameGen;
+	private SupportPerson person;
+	private boolean newHire;
+    private MekHQView hqView;
+    private Campaign campaign;
     
     /** Creates new form NewTeamDialog */
-    public NewMedicalTeamDialog(java.awt.Frame parent, boolean modal, Campaign campaign) {
+    public CustomizeMedicalTeamDialog(java.awt.Frame parent, boolean modal, SupportPerson person, boolean hire, Campaign campaign, MekHQView view) {
         super(parent, modal);
-        this.doc = null;
-        this.nameGen = campaign.getRNG();
+        this.person = person;
+        this.newHire = hire;
+        this.hqView = view;
+        this.campaign = campaign;
         initComponents();
+    }
+    
+    private void refreshDoc() {	
+    	getContentPane().removeAll();
+    	initComponents();
     }
 
     /** This method is called from within the constructor to
@@ -64,15 +76,9 @@ public class NewMedicalTeamDialog extends javax.swing.JDialog {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
 
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(NewMedicalTeamDialog.class);
-       
-        if (nameGen == null)
-        {
-        	nameGen = new RandomNameGenerator();
-        	nameGen.populateNames();
-        }
-        
-        txtTeamName.setText(nameGen.generate());
+        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(CustomizeMedicalTeamDialog.class);
+  
+        txtTeamName.setText(person.getName());
         //txtTeamName.setText(resourceMap.getString("txtTeamName.text")); // NOI18N
         txtTeamName.setName("txtTeamName"); // NOI18N
         txtTeamName.addActionListener(new java.awt.event.ActionListener() {
@@ -87,13 +93,17 @@ public class NewMedicalTeamDialog extends javax.swing.JDialog {
         }
         chTeamRating.setModel(teamRatingModel);
         chTeamRating.setName("chTeamRating"); // NOI18N
-        chTeamRating.setSelectedIndex(SupportTeam.EXP_REGULAR);
+        chTeamRating.setSelectedIndex(person.getTeam().getRating());
 
         lblTeamName.setName("lblTeamName"); // NOI18N
 
         lblTeamRating.setName("lblTeamRating"); // NOI18N
 
-        btnDone.setText(resourceMap.getString("btnDone.text")); // NOI18N
+        if(isNewHire()) {
+        	btnDone.setText(resourceMap.getString("btnHire.text")); // NOI18N
+        } else {
+        	btnDone.setText(resourceMap.getString("btnDone.text")); // NOI18N
+        }
         btnDone.setName("btnDone"); // NOI18N
         btnDone.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -179,8 +189,22 @@ public class NewMedicalTeamDialog extends javax.swing.JDialog {
 private void btnDoneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDoneActionPerformed
     int rating = chTeamRating.getSelectedIndex();
     String name = txtTeamName.getText();
-    doc = new MedicalTeam(name, rating);
-    this.setVisible(false);
+    MedicalTeam doc = new MedicalTeam(name, rating);
+    person.setTeam(doc);
+    if(isNewHire()) {
+    	campaign.addPerson(person);
+    	person = campaign.newDoctorPerson();
+    	refreshDoc();
+    	hqView.refreshPersonnelList();
+    	hqView.refreshPatientList();
+    	hqView.refreshDoctorsList();
+    	hqView.refreshReport();
+    } else {
+    	hqView.refreshPersonnelList();
+    	hqView.refreshPatientList();
+    	hqView.refreshDoctorsList();
+    	setVisible(false);
+    }
 }//GEN-LAST:event_btnDoneActionPerformed
 
 private void txtTeamNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtTeamNameActionPerformed
@@ -191,13 +215,17 @@ private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
     this.setVisible(false);
 }//GEN-LAST:event_btnCancelActionPerformed
 
+	private boolean isNewHire() {
+		return newHire;
+	}
+
     /**
     * @param args the command line arguments
     */
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                NewMedicalTeamDialog dialog = new NewMedicalTeamDialog(new javax.swing.JFrame(), true, null);
+                CustomizeMedicalTeamDialog dialog = new CustomizeMedicalTeamDialog(new javax.swing.JFrame(), true, null, false, null, null);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     public void windowClosing(java.awt.event.WindowEvent e) {
                         System.exit(0);
@@ -206,10 +234,6 @@ private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
                 dialog.setVisible(true);
             }
         });
-    }
-    
-    public MedicalTeam getMedicalTeam() {
-        return doc;
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

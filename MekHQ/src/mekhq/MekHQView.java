@@ -1328,8 +1328,6 @@ public class MekHQView extends FrameView {
 				campaign,
 				this);
 		npd.setVisible(true);
-		refreshPatientList();
-		refreshReport();
 	}// GEN-LAST:event_miHirePilotActionPerformed
 
 	private void miHireTechActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miHireTechActionPerformed
@@ -1338,23 +1336,15 @@ public class MekHQView extends FrameView {
 				true,
 				campaign, this);
 		ntd.setVisible(true);
-		refreshTechsList();
-		refreshPatientList();
-		refreshReport();
 	}// GEN-LAST:event_miHireTechActionPerformed
 
 	private void miHireDoctorActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miHireDoctorActionPerformed
-		NewMedicalTeamDialog nmd = new NewMedicalTeamDialog(getFrame(), true, campaign);
+		CustomizeMedicalTeamDialog nmd = new CustomizeMedicalTeamDialog(getFrame(), true, 
+				campaign.newDoctorPerson(), 
+				true, 
+				campaign,
+				this);
 		nmd.setVisible(true);
-		
-		if (null != nmd.getMedicalTeam()) {
-			campaign.addTeam(nmd.getMedicalTeam());
-			refreshPersonnelList();
-			refreshTechsList();
-			refreshPatientList();
-			refreshDoctorsList();
-			refreshReport();
-		}
 	}// GEN-LAST:event_miHireDoctorActionPerformed
 
 	private void menuSaveActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuSaveActionPerformed
@@ -3042,6 +3032,13 @@ public class MekHQView extends FrameView {
 								campaign,
 								view);
 						ntd.setVisible(true);
+					} else if(((SupportPerson)selectedPerson).getTeam() instanceof MedicalTeam) {
+						CustomizeMedicalTeamDialog ndd = new CustomizeMedicalTeamDialog(getFrame(), true, 
+								(SupportPerson)selectedPerson, 
+								false,
+								campaign,
+								view);
+						ndd.setVisible(true);
 					}
 				}
 			} else if (command.equalsIgnoreCase("IMP_PILOTING")) {

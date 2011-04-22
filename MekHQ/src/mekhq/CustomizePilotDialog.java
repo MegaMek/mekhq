@@ -12,17 +12,14 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JLabel;
 
-import megamek.client.RandomNameGenerator;
 import megamek.client.ui.swing.DialogOptionComponent;
 import megamek.client.ui.swing.DialogOptionListener;
-import megamek.common.Compute;
 import megamek.common.EquipmentType;
 import megamek.common.Pilot;
 import megamek.common.WeaponType;
@@ -48,7 +45,6 @@ public class CustomizePilotDialog extends javax.swing.JDialog implements DialogO
 	private PilotPerson person;
     private ArrayList<DialogOptionComponent> optionComps = new ArrayList<DialogOptionComponent>();
     private PilotOptions options;
-    private RandomNameGenerator nameGen;
     private GregorianCalendar birthdate;
     private SimpleDateFormat dateFormat;
     private Frame frame;
@@ -64,7 +60,6 @@ public class CustomizePilotDialog extends javax.swing.JDialog implements DialogO
         this.campaign = campaign;
         this.hqView = view;
         this.frame = parent;
-        this.nameGen = campaign.getRNG();
         this.dateFormat = new SimpleDateFormat("MMMM d yyyy");
         this.person = person;
         this.newHire = hire;
@@ -145,13 +140,7 @@ public class CustomizePilotDialog extends javax.swing.JDialog implements DialogO
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         choiceType.setSelectedIndex(person.getType());
         getContentPane().add(choiceType, gridBagConstraints);
-        
-        if (nameGen == null)
-        {
-        	nameGen = new RandomNameGenerator();
-        	nameGen.populateNames();
-        }
-        
+ 
         DefaultComboBoxModel genderModel = new DefaultComboBoxModel();
         genderModel.addElement(Person.getGenderName(Person.G_MALE));
         genderModel.addElement(Person.getGenderName(Person.G_FEMALE));
@@ -513,16 +502,20 @@ public class CustomizePilotDialog extends javax.swing.JDialog implements DialogO
         if(isNewHire()) {
         	campaign.addPerson(person);
         	hqView.refreshPersonnelList();
+        	hqView.refreshPatientList();
+    		hqView.refreshReport();
         	person = campaign.newPilotPerson(PilotPerson.T_MECH);
         	refreshPilotAndOptions();
         } else {
         	hqView.refreshPersonnelList();
+        	hqView.refreshPatientList();
+        	hqView.refreshUnitList();
         	setVisible(false);
         }
     }//GEN-LAST:event_btnOkActionPerformed
 
     private void randomName() {
-		textName.setText(nameGen.generate(choiceGender.getSelectedIndex() == Person.G_FEMALE));
+		textName.setText(campaign.getRNG().generate(choiceGender.getSelectedIndex() == Person.G_FEMALE));
 	}
     
     private boolean isNewHire() {

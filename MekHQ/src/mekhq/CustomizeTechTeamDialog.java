@@ -21,7 +21,6 @@
 
 package mekhq;
 
-import megamek.client.RandomNameGenerator;
 import mekhq.campaign.personnel.SupportPerson;
 import mekhq.campaign.team.SupportTeam;
 import javax.swing.DefaultComboBoxModel;
@@ -36,7 +35,6 @@ public class CustomizeTechTeamDialog extends javax.swing.JDialog {
 	private static final long serialVersionUID = -8038099101234445018L;
 	private Campaign campaign;
     private MekHQView hqView;
-    private  RandomNameGenerator nameGen;
     private SupportPerson person;
     private boolean newHire;
     
@@ -45,7 +43,6 @@ public class CustomizeTechTeamDialog extends javax.swing.JDialog {
         super(parent, modal);
         this.campaign = campaign;
         this.hqView = view;
-        this.nameGen = campaign.getRNG();
         this.person = person;
         this.newHire = hire;
         
@@ -77,12 +74,6 @@ public class CustomizeTechTeamDialog extends javax.swing.JDialog {
         setName("Form"); // NOI18N
 
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(CustomizeTechTeamDialog.class);
-
-        if (nameGen == null)
-        {
-        	nameGen = new RandomNameGenerator();
-        	nameGen.populateNames();
-        }
 
         txtTeamName.setText(person.getName());
         //txtTeamName.setText(resourceMap.getString("txtTeamName.text")); // NOI18N
@@ -205,9 +196,12 @@ private void btnHireActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
     	refreshTech();
     	hqView.refreshPersonnelList();
     	hqView.refreshTechsList();
+    	hqView.refreshPatientList();
+    	hqView.refreshReport();
     } else {
     	hqView.refreshPersonnelList();
     	hqView.refreshTechsList();
+    	hqView.refreshPatientList();
     	setVisible(false);
     }
 }//GEN-LAST:event_btnHireActionPerformed
