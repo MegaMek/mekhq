@@ -60,6 +60,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -67,6 +68,7 @@ import javax.swing.event.MouseInputAdapter;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableRowSorter;
 
 import megamek.client.ui.swing.MechView;
 import megamek.common.AmmoType;
@@ -145,6 +147,7 @@ public class MekHQView extends FrameView {
 	private PartsTableMouseAdapter partsMouseAdapter;
 	private TaskTableMouseAdapter taskMouseAdapter;
 	private PersonnelTableMouseAdapter personnelMouseAdapter;
+	private TableRowSorter<PersonnelTableModel> sorter;
 	private int currentUnitId;
 	private int currentTaskId;
 	private int currentAcquisitionId;
@@ -332,6 +335,9 @@ public class MekHQView extends FrameView {
 		
 		personnelTable.setModel(personModel);
 		personnelTable.setName("personnelTable"); // NOI18N
+		personnelTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        sorter = new TableRowSorter<PersonnelTableModel>(personModel);
+        personnelTable.setRowSorter(sorter);
 		personnelTable.addMouseListener(personnelMouseAdapter);
 		scrollPersonnelTable.setViewportView(personnelTable);
 	
@@ -3239,11 +3245,12 @@ public class MekHQView extends FrameView {
 		private final static int COL_NAME = 0;
         private final static int COL_CALL = 1;
         private final static int COL_TYPE = 2;
-        private final static int COL_GUN = 3;
-        private final static int COL_PILOT = 4;
-        private final static int COL_TECH = 5;
-        private final static int COL_XP = 6;
-        private final static int N_COL = 7;
+        private final static int COL_GENDER = 3;
+        private final static int COL_GUN = 4;
+        private final static int COL_PILOT = 5;
+        private final static int COL_TECH = 6;
+        private final static int COL_XP = 7;
+        private final static int N_COL = 8;
         
         private ArrayList<Person> data = new ArrayList<Person>();
         
@@ -3262,6 +3269,8 @@ public class MekHQView extends FrameView {
                     return "Name";
                 case COL_CALL:
                     return "Callsign";
+                case COL_GENDER:
+                    return "Gender";
                 case COL_TYPE:
                     return "Type";
                 case COL_GUN:
@@ -3304,6 +3313,9 @@ public class MekHQView extends FrameView {
             }
             if(col == COL_CALL) {
                 return p.getCallsign();
+            }
+            if(col == COL_GENDER) {
+                return p.getGenderName();
             }
             if(col == COL_TYPE) {
                 return p.getTypeDesc();

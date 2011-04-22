@@ -48,6 +48,10 @@ import mekhq.campaign.work.PersonnelWorkItem;
  */
 public abstract class Person implements Serializable, MekHqXmlSerializable {
 	private static final long serialVersionUID = -847642980395311152L;
+	
+	public static final int G_MALE = 0;
+	public static final int G_FEMALE = 1;
+	
 	protected int id;
     //any existing work item for this person
     protected PersonnelWorkItem task;
@@ -58,6 +62,7 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
     protected String biography;
     protected String portraitCategory;
     protected String portraitFile;
+    protected int gender;
 
     protected int xp;
     
@@ -67,6 +72,7 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
         portraitCategory = Pilot.ROOT_PORTRAIT;
         portraitFile = Pilot.PORTRAIT_NONE;
         xp = 0;
+        gender = G_MALE;
     }
     
     public abstract void reCalc();
@@ -87,6 +93,25 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
 
     public void setPortraitFileName(String s) {
         this.portraitFile = s;
+    }
+    
+    public void setGender(int g) {
+    	this.gender = g;
+    }
+    
+    public int getGender() {
+    	return gender;
+    }
+    
+    public String getGenderName() {
+    	switch(gender) {
+    	case G_MALE:
+    		return "M";
+    	case G_FEMALE:
+    		return "F";
+    	default:
+    		return "?";
+    	}
     }
 
     public void setId(int id) {
@@ -210,6 +235,10 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
 				+"<xp>"
 				+xp
 				+"</xp>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<gender>"
+				+gender
+				+"</gender>");
 
 		// The task reference can be loaded through its ID.
 		// But...  If the task is null, we just bypass it.
@@ -261,6 +290,8 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
 					retVal.taskId = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("xp")) {
 					retVal.xp = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("gender")) {
+					retVal.gender = Integer.parseInt(wn2.getTextContent());
 				}
 			}
 		} catch (Exception ex) {
