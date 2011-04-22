@@ -162,7 +162,7 @@ public class MekHQView extends FrameView {
 		unitMouseAdapter = new MekTableMouseAdapter();
 		partsMouseAdapter = new PartsTableMouseAdapter();
 		taskMouseAdapter = new TaskTableMouseAdapter();
-		personnelMouseAdapter = new PersonnelTableMouseAdapter();
+		personnelMouseAdapter = new PersonnelTableMouseAdapter(this);
 		initComponents();
 		refreshCalendar();
 
@@ -1322,7 +1322,7 @@ public class MekHQView extends FrameView {
 	}// GEN-LAST:event_btnAssignDocActionPerformed
 
 	private void miHirePilotActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miHirePilotActionPerformed
-		NewPilotDialog npd = new NewPilotDialog(getFrame(), true, campaign,
+		CustomizePilotDialog npd = new CustomizePilotDialog(getFrame(), true, null, campaign,
 				this);
 		npd.setVisible(true);
 		refreshPatientList();
@@ -2954,6 +2954,14 @@ public class MekHQView extends FrameView {
 
 	public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
 			ActionListener {
+		
+		private MekHQView view;
+		
+		public PersonnelTableMouseAdapter(MekHQView view) {
+			super();
+			this.view = view;
+		}
+		
 		public void actionPerformed(ActionEvent action) {
 			String command = action.getActionCommand();
 			Person selectedPerson = personModel.getPerson(personnelTable.getSelectedRow());
@@ -2968,7 +2976,7 @@ public class MekHQView extends FrameView {
 								JOptionPane.YES_NO_OPTION))) {
 					campaign.removePerson(selectedPerson.getId());
 				}
-
+			
 				refreshUnitList();
 				refreshPatientList();
 				refreshPersonnelList();
@@ -3013,6 +3021,12 @@ public class MekHQView extends FrameView {
 				}
 				refreshPatientList();
 				refreshPersonnelList();
+			} else if (command.equalsIgnoreCase("EDIT")) {
+				if(selectedPerson instanceof PilotPerson) {
+					CustomizePilotDialog npd = new CustomizePilotDialog(getFrame(), true, (PilotPerson)selectedPerson, campaign,
+							view);
+					npd.setVisible(true);
+				}
 			} else if (command.equalsIgnoreCase("IMP_PILOTING")) {
 				if (selectedPerson instanceof PilotPerson) {
 					Pilot pilot = ((PilotPerson) selectedPerson).getPilot();
@@ -3172,6 +3186,13 @@ public class MekHQView extends FrameView {
 					menuItem.setEnabled(campaign.isGM() && person.isDeployed());
 					menu.add(menuItem);
 				}
+				if (person instanceof PilotPerson) {
+					menuItem = new JMenuItem("Edit...");
+					menuItem.setActionCommand("EDIT");
+					menuItem.addActionListener(this);
+					menuItem.setEnabled(campaign.isGM());
+					menu.add(menuItem);
+				}
 
 				impMenu = new JMenu("Skills");
 				menu.add(impMenu);
@@ -3214,7 +3235,7 @@ public class MekHQView extends FrameView {
 					menuItem.setActionCommand("DEC_SUPPORT");
 					menuItem.addActionListener(this);
 					menuItem.setEnabled(campaign.isGM()
-							&& (sp.getTeam().getRating() > SupportTeam.EXP_REGULAR));
+							&& (sp.getTeam().getRating() > SupportTeam.EXP_GREEN));
 					impMenu.add(menuItem);
 				}
 

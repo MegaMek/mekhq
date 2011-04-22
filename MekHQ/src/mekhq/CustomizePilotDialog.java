@@ -37,32 +37,36 @@ import mekhq.campaign.personnel.PilotPerson;
  *
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionListener {
+public class CustomizePilotDialog extends javax.swing.JDialog implements DialogOptionListener {
 
     /**
-	 * 
+	 * This dialog is used to both hire new pilots and to edit existing ones
+	 * To hire new ones, leave PilotPerson in the constructor null
 	 */
 	private static final long serialVersionUID = -6265589976779860566L;
 	private Pilot pilot;
+	private PilotPerson person;
     private ArrayList<DialogOptionComponent> optionComps = new ArrayList<DialogOptionComponent>();
     private PilotOptions options;
     private RandomNameGenerator nameGen;
     private GregorianCalendar birthdate;
     private SimpleDateFormat dateFormat;
     private Frame frame;
+    private boolean newHire;
     
     private Campaign campaign;
     
     private MekHQView hqView;
 
-    /** Creates new form NewPilotDialog */
-    public NewPilotDialog(java.awt.Frame parent, boolean modal, Campaign campaign, MekHQView view) {
+    /** Creates new form CustomizePilotDialog */
+    public CustomizePilotDialog(java.awt.Frame parent, boolean modal, PilotPerson person, Campaign campaign, MekHQView view) {
         super(parent, modal);
         this.campaign = campaign;
         this.hqView = view;
         this.frame = parent;
         this.nameGen = campaign.getRNG();
         this.dateFormat = new SimpleDateFormat("MMMM d yyyy");
+        this.person = person;
         initializePilotAndOptions();
     }
 
@@ -71,22 +75,27 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
     }
 
     private void refreshPilotAndOptions () {
-        pilot = new Pilot("Roy Fokker", 4, 5);
-        pilot.setNickname("");
-        //decide on pilot's gender
-        options = pilot.getOptions();
-        //lets set age to be 16 + 1d6 by default
-        this.birthdate = (GregorianCalendar)campaign.getCalendar().clone();
-        birthdate.set(Calendar.YEAR, birthdate.get(Calendar.YEAR) - (15 + Compute.d6(3)));
-        //choose a random day and month
-        int randomDay = Compute.randomInt(365)+1;
-        if(birthdate.isLeapYear(birthdate.get(Calendar.YEAR))) {
-        	randomDay = Compute.randomInt(366)+1;
-        }
-        birthdate.set(Calendar.DAY_OF_YEAR, randomDay);
-        getContentPane().removeAll();
-        initComponents();
-        refreshOptions();
+    	if(null == person) {
+    		this.newHire = true;   		
+    		this.pilot = new Pilot("Roy Fokker", 4, 5);   	
+    		this.birthdate = (GregorianCalendar)campaign.getCalendar().clone();
+    		//lets set age to be 16 + 1d6 by default		
+    		birthdate.set(Calendar.YEAR, birthdate.get(Calendar.YEAR) - (15 + Compute.d6(3)));
+    		//choose a random day and month
+    		int randomDay = Compute.randomInt(365)+1;
+    		if(birthdate.isLeapYear(birthdate.get(Calendar.YEAR))) {
+    			randomDay = Compute.randomInt(366)+1;
+    		}
+    		birthdate.set(Calendar.DAY_OF_YEAR, randomDay);
+    	} else {
+    		this.newHire = false;
+    		this.pilot = person.getPilot();
+    		this.birthdate = (GregorianCalendar)person.getBirthday().clone();
+    	}
+    	this.options = pilot.getOptions();		
+    	getContentPane().removeAll();
+    	initComponents();
+    	refreshOptions();
     }
 
     /** This method is called from within the constructor to
@@ -128,7 +137,7 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         btnDate = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(NewPilotDialog.class);
+        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(CustomizePilotDialog.class);
         setTitle(resourceMap.getString("Form.title")); // NOI18N
         setName("Form"); // NOI18N
         getContentPane().setLayout(new java.awt.GridBagLayout());
@@ -148,6 +157,11 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        if(isNewHire()) {
+        	choiceType.setSelectedIndex(0);
+        } else {
+        	choiceType.setSelectedIndex(person.getType());
+        }
         getContentPane().add(choiceType, gridBagConstraints);
         
         if (nameGen == null)
@@ -163,7 +177,9 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         choiceGender.setName("choiceGender"); // NOI18N
         choiceGender.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                randomName();
+            	if(isNewHire()) {
+            		randomName();
+            	}
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -173,10 +189,14 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        if(nameGen.isFemale()) {
-        	choiceGender.setSelectedIndex(Person.G_FEMALE);
+        if(isNewHire()) {
+	        if(nameGen.isFemale()) {
+	        	choiceGender.setSelectedIndex(Person.G_FEMALE);
+	        } else {
+	        	choiceGender.setSelectedIndex(Person.G_MALE);
+	        }
         } else {
-        	choiceGender.setSelectedIndex(Person.G_MALE);
+        	choiceGender.setSelectedIndex(person.getGender());
         }
         getContentPane().add(choiceGender, gridBagConstraints);
         
@@ -240,7 +260,11 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        randomName();
+        if(isNewHire()) {
+        	randomName(); 
+        } else {
+        	textName.setText(pilot.getName());
+        }
         getContentPane().add(textName, gridBagConstraints);
 
         btnRandomName.setText(resourceMap.getString("btnRandomName.text")); // NOI18N
@@ -394,6 +418,9 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         jScrollPane2.setName("jScrollPane2"); // NOI18N
 
         txtBio.setName("txtBio"); // NOI18N
+        if(!isNewHire()) {
+        	txtBio.setText(person.getBiography());
+        }
         jScrollPane2.setViewportView(txtBio);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -444,7 +471,11 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         panButtons.setName("panButtons"); // NOI18N
         panButtons.setLayout(new java.awt.GridBagLayout());
 
-        btnOk.setText(resourceMap.getString("btnOk.text")); // NOI18N
+        if(isNewHire()) {
+        	btnOk.setText(resourceMap.getString("btnHire.text")); // NOI18N
+        } else {
+        	btnOk.setText(resourceMap.getString("btnOk.text")); // NOI18N
+        }
         btnOk.setName("btnOk"); // NOI18N
         btnOk.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -484,7 +515,6 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
     }//GEN-LAST:event_btnCloseActionPerformed
 
     private void btnOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOkActionPerformed
-        PilotPerson person = null;
         int piloting = Integer.parseInt(textPiloting.getText());
         int gunnery = Integer.parseInt(textGunnery.getText());
         String name = textName.getText();
@@ -508,18 +538,32 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         }
         pilot.setNickname(nick);
         setOptions();
-        person = new PilotPerson(pilot, choiceType.getSelectedIndex());
+        if(isNewHire()) {
+        	person = new PilotPerson(pilot, choiceType.getSelectedIndex());
+        } else {
+        	person.setPilot(pilot);
+        }
         person.setBiography(txtBio.getText());
         person.setGender(choiceGender.getSelectedIndex());
-        person.setBirthday(birthdate);
-        campaign.addPerson(person);
-        hqView.refreshPersonnelList();
-        refreshPilotAndOptions();
+        person.setBirthday(birthdate);              
+        if(isNewHire()) {
+        	campaign.addPerson(person);
+        	hqView.refreshPersonnelList();
+        	person = null;
+        	refreshPilotAndOptions();
+        } else {
+        	hqView.refreshPersonnelList();
+        	setVisible(false);
+        }
     }//GEN-LAST:event_btnOkActionPerformed
 
     private void randomName() {
 		textName.setText(nameGen.generate(choiceGender.getSelectedIndex() == Person.G_FEMALE));
 	}
+    
+    private boolean isNewHire() {
+    	return newHire;
+    }
     
     /**
      * @param args the command line arguments
@@ -527,7 +571,7 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                NewPilotDialog dialog = new NewPilotDialog(new javax.swing.JFrame(), true, null, null);
+                CustomizePilotDialog dialog = new CustomizePilotDialog(new javax.swing.JFrame(), true, null, null, null);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {
