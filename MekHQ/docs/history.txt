@@ -22,6 +22,7 @@ v0.1.3 (SVN)
 + Bug: NPE on MekGryo.canBeUsedBy check
 + Bug: selected task should remain current even when moving tabs
 + unofficial faction modifiers off by default
++ improvements to descriptions for replacement items and parts
 
 v0.1.2 (2011-04-15)
 + updated MegaMek.jar

@@ -141,12 +141,11 @@ public abstract class ReplacementItem extends UnitWorkItem {
                 return "Needs " + partNeeded().getDesc();
             }
         } else {
-            if(hasPart()) {
-                return "Using " + part.getDesc();
-            } else {
-                return "Needs " + partNeeded().getDesc();
-            }
+            if(!hasPart()) {
+                return "Missing replacement part";
+            } 
         }
+        return "";
     }
     
     @Override
@@ -289,7 +288,7 @@ public abstract class ReplacementItem extends UnitWorkItem {
 		
 		toReturn += ">";
 		toReturn += "<b>" + tmpPart.getName() + "</b> " + bonus + "<br/>";
-		toReturn += getDetails() + "<br/>";
+		toReturn += tmpPart.getCostString() + "<br/>";
 		toReturn += "</font></html>";
 		return toReturn;
 	}
