@@ -18,7 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq;
 
 import gd.xml.ParseException;
@@ -1345,6 +1344,7 @@ public class MekHQView extends FrameView {
 		
 		if (null != nmd.getMedicalTeam()) {
 			campaign.addTeam(nmd.getMedicalTeam());
+			refreshPersonnelList();
 			refreshTechsList();
 			refreshPatientList();
 			refreshDoctorsList();
@@ -1427,6 +1427,10 @@ public class MekHQView extends FrameView {
 		// First select the file...
 		File file = selectLoadCampaignFile(".xml");
 
+		if(null == file) {
+			return;
+		}
+		
 		// And then load the campaign object from it.
 		FileInputStream fis = null;
 
