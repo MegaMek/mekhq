@@ -26,6 +26,7 @@ v0.1.3 (SVN)
 + renamed Personnel tab to Infirmary and refactored all "personnel" named variables in MekHQView to "patient"
 + personnelTable
 + added type and support skill columns to personnel table
++ only wounded personnel are in the infirmary
 
 v0.1.2 (2011-04-15)
 + updated MegaMek.jar

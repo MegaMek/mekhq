@@ -451,6 +451,16 @@ public class Campaign implements Serializable {
 	public ArrayList<Person> getPersonnel() {
 		return personnel;
 	}
+	
+	public ArrayList<Person> getPatients() {
+		ArrayList<Person> patients = new ArrayList<Person>();
+		for(Person p : getPersonnel()) {
+			if(null != p.getTask()) {
+				patients.add(p);
+			}
+		}
+		return patients;
+	}
 
 	public Person getPerson(int id) {
 		return personnelIds.get(new Integer(id));

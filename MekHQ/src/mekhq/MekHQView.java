@@ -1856,8 +1856,8 @@ public class MekHQView extends FrameView {
 
 	protected void refreshPatientList() {
 		int selected = patientTable.getSelectedRow();
-		patientModel.setData(campaign.getPersonnel());
-		if ((selected > -1) && (selected < campaign.getPersonnel().size())) {
+		patientModel.setData(campaign.getPatients());
+		if ((selected > -1) && (selected < campaign.getPatients().size())) {
 			patientTable.setRowSelectionInterval(selected, selected);
 		}
 	}
