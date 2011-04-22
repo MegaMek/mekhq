@@ -80,6 +80,21 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
         birthday = new GregorianCalendar(3042, Calendar.JANUARY, 1);
     }
     
+    public static String getGenderName(int gender) {
+    	switch(gender) {
+    	case G_MALE:
+    		return "M";
+    	case G_FEMALE:
+    		return "F";
+    	default:
+    		return "?";
+    	}
+    }
+    
+    public String getGenderName() {
+    	return getGenderName(gender);
+    }
+    
     public abstract void reCalc();
     public abstract String getDesc();
     public abstract String getDescHTML();
@@ -106,17 +121,6 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
     
     public int getGender() {
     	return gender;
-    }
-    
-    public String getGenderName() {
-    	switch(gender) {
-    	case G_MALE:
-    		return "M";
-    	case G_FEMALE:
-    		return "F";
-    	default:
-    		return "?";
-    	}
     }
     
     public void setBirthday(GregorianCalendar date) {

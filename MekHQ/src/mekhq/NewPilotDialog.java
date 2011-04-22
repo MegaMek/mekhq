@@ -6,11 +6,15 @@
 
 package mekhq;
 
+import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Enumeration;
+import java.util.GregorianCalendar;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JLabel;
@@ -18,6 +22,7 @@ import javax.swing.JLabel;
 import megamek.client.RandomNameGenerator;
 import megamek.client.ui.swing.DialogOptionComponent;
 import megamek.client.ui.swing.DialogOptionListener;
+import megamek.common.Compute;
 import megamek.common.EquipmentType;
 import megamek.common.Pilot;
 import megamek.common.WeaponType;
@@ -25,6 +30,7 @@ import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PilotPerson;
 
 /**
@@ -41,7 +47,10 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
     private ArrayList<DialogOptionComponent> optionComps = new ArrayList<DialogOptionComponent>();
     private PilotOptions options;
     private RandomNameGenerator nameGen;
-
+    private GregorianCalendar birthdate;
+    private SimpleDateFormat dateFormat;
+    private Frame frame;
+    
     private Campaign campaign;
     
     private MekHQView hqView;
@@ -51,7 +60,9 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         super(parent, modal);
         this.campaign = campaign;
         this.hqView = view;
+        this.frame = parent;
         this.nameGen = campaign.getRNG();
+        this.dateFormat = new SimpleDateFormat("MMMM d yyyy");
         initializePilotAndOptions();
     }
 
@@ -61,9 +72,18 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
 
     private void refreshPilotAndOptions () {
         pilot = new Pilot("Roy Fokker", 4, 5);
-        pilot.setNickname("Big Brother");
+        pilot.setNickname("");
+        //decide on pilot's gender
         options = pilot.getOptions();
-
+        //lets set age to be 16 + 1d6 by default
+        this.birthdate = (GregorianCalendar)campaign.getCalendar().clone();
+        birthdate.set(Calendar.YEAR, birthdate.get(Calendar.YEAR) - (15 + Compute.d6(3)));
+        //choose a random day and month
+        int randomDay = Compute.randomInt(365)+1;
+        if(birthdate.isLeapYear(birthdate.get(Calendar.YEAR))) {
+        	randomDay = Compute.randomInt(366)+1;
+        }
+        birthdate.set(Calendar.DAY_OF_YEAR, randomDay);
         getContentPane().removeAll();
         initComponents();
         refreshOptions();
@@ -78,6 +98,8 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         java.awt.GridBagConstraints gridBagConstraints;
 
         lblName = new javax.swing.JLabel();
+        lblGender = new javax.swing.JLabel();
+        lblBday = new javax.swing.JLabel();
         lblNickname = new javax.swing.JLabel();
         textName = new javax.swing.JTextField();
         textNickname = new javax.swing.JTextField();
@@ -94,6 +116,7 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         lblToughness = new javax.swing.JLabel();
         lblArtillery = new javax.swing.JLabel();
         choiceType = new javax.swing.JComboBox();
+        choiceGender = new javax.swing.JComboBox();
         jScrollPane1 = new javax.swing.JScrollPane();
         panOptions = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
@@ -102,6 +125,7 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         btnOk = new javax.swing.JButton();
         btnClose = new javax.swing.JButton();
         btnRandomName = new javax.swing.JButton();
+        btnDate = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(NewPilotDialog.class);
@@ -126,40 +150,97 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         getContentPane().add(choiceType, gridBagConstraints);
         
-        lblName.setText(resourceMap.getString("lblName.text")); // NOI18N
-        lblName.setName("lblName"); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
-        getContentPane().add(lblName, gridBagConstraints);
-
-        lblNickname.setText(resourceMap.getString("lblNickname.text")); // NOI18N
-        lblNickname.setName("lblNickname"); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
-        getContentPane().add(lblNickname, gridBagConstraints);
-
         if (nameGen == null)
         {
         	nameGen = new RandomNameGenerator();
         	nameGen.populateNames();
         }
+        
+        DefaultComboBoxModel genderModel = new DefaultComboBoxModel();
+        genderModel.addElement(Person.getGenderName(Person.G_MALE));
+        genderModel.addElement(Person.getGenderName(Person.G_FEMALE));
+        choiceGender.setModel(genderModel);
+        choiceGender.setName("choiceGender"); // NOI18N
+        choiceGender.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                randomName();
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        if(nameGen.isFemale()) {
+        	choiceGender.setSelectedIndex(Person.G_FEMALE);
+        } else {
+        	choiceGender.setSelectedIndex(Person.G_MALE);
+        }
+        getContentPane().add(choiceGender, gridBagConstraints);
+        
+        btnDate.setText(getDateAsString());
+        btnDate.setName("btnDate"); // NOI18N
+        btnDate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            	btnDateActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        getContentPane().add(btnDate, gridBagConstraints);
+
+        
+        lblName.setText(resourceMap.getString("lblName.text")); // NOI18N
+        lblName.setName("lblName"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+        getContentPane().add(lblName, gridBagConstraints);
+
+        lblGender.setText(resourceMap.getString("lblGender.text")); // NOI18N
+        lblGender.setName("lblGender"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+        getContentPane().add(lblGender, gridBagConstraints);
+
+        lblBday.setText(resourceMap.getString("lblBday.text")); // NOI18N
+        lblBday.setName("lblBday"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+        getContentPane().add(lblBday, gridBagConstraints);
+
+        
+        lblNickname.setText(resourceMap.getString("lblNickname.text")); // NOI18N
+        lblNickname.setName("lblNickname"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+        getContentPane().add(lblNickname, gridBagConstraints);
 
         //textName.setText(pilot.getName());
-        textName.setText(nameGen.generate());
         textName.setMinimumSize(new java.awt.Dimension(250, 28));
         textName.setName("textName"); // NOI18N
         textName.setPreferredSize(new java.awt.Dimension(250, 28));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        randomName();
         getContentPane().add(textName, gridBagConstraints);
 
         btnRandomName.setText(resourceMap.getString("btnRandomName.text")); // NOI18N
@@ -171,7 +252,7 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.gridwidth = 4;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         getContentPane().add(btnRandomName, gridBagConstraints);
@@ -182,7 +263,7 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         textNickname.setPreferredSize(new java.awt.Dimension(250, 28));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         getContentPane().add(textNickname, gridBagConstraints);
@@ -193,7 +274,7 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         textGunnery.setPreferredSize(new java.awt.Dimension(50, 28));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         getContentPane().add(textGunnery, gridBagConstraints);
 
@@ -203,7 +284,7 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         textPiloting.setPreferredSize(new java.awt.Dimension(50, 28));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 6;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         getContentPane().add(textPiloting, gridBagConstraints);
 
@@ -211,7 +292,7 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         lblGunnery.setName("lblGunnery"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
         getContentPane().add(lblGunnery, gridBagConstraints);
@@ -220,7 +301,7 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         lblPiloting.setName("lblPiloting"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 6;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
         getContentPane().add(lblPiloting, gridBagConstraints);
@@ -231,7 +312,7 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         	lblArtillery.setName("lblArtillery"); // NOI18N
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = 6;
+            gridBagConstraints.gridy = 7;
             gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
             gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
             getContentPane().add(lblArtillery, gridBagConstraints);
@@ -242,7 +323,7 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
             textArtillery.setPreferredSize(new java.awt.Dimension(50, 28));
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = 6;
+            gridBagConstraints.gridy = 7;
             gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
             getContentPane().add(textArtillery, gridBagConstraints);
         }
@@ -252,7 +333,7 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
             lblInitB.setName("lblInitB"); // NOI18N
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 2;
-            gridBagConstraints.gridy = 4;
+            gridBagConstraints.gridy = 5;
             gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
             gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
             getContentPane().add(lblInitB, gridBagConstraints);
@@ -263,7 +344,7 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
             textInitB.setPreferredSize(new java.awt.Dimension(50, 28));
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 3;
-            gridBagConstraints.gridy = 4;
+            gridBagConstraints.gridy = 5;
             gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
             getContentPane().add(textInitB, gridBagConstraints);
         }
@@ -273,7 +354,7 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
             lblCommandB.setName("lblCommandB"); // NOI18N
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 2;
-            gridBagConstraints.gridy = 5;
+            gridBagConstraints.gridy = 6;
             gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
             gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
             getContentPane().add(lblCommandB, gridBagConstraints);
@@ -284,7 +365,7 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         	textCommandB.setPreferredSize(new java.awt.Dimension(50, 28));
         	gridBagConstraints = new java.awt.GridBagConstraints();
         	gridBagConstraints.gridx = 3;
-        	gridBagConstraints.gridy = 5;
+        	gridBagConstraints.gridy = 6;
         	gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         	getContentPane().add(textCommandB, gridBagConstraints);
         }
@@ -294,7 +375,7 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         	lblToughness.setName("lblToughness"); // NOI18N
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 2;
-            gridBagConstraints.gridy = 6;
+            gridBagConstraints.gridy = 7;
             gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
             gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
             getContentPane().add(lblToughness, gridBagConstraints);
@@ -305,7 +386,7 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
             textToughness.setPreferredSize(new java.awt.Dimension(50, 28));
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 3;
-            gridBagConstraints.gridy = 6;
+            gridBagConstraints.gridy = 7;
             gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
             getContentPane().add(textToughness, gridBagConstraints);
         }
@@ -317,7 +398,7 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridy = 8;
         gridBagConstraints.gridwidth = 4;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 1.0;
@@ -351,7 +432,7 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         	gridBagConstraints = new java.awt.GridBagConstraints();
         	gridBagConstraints.gridx = 5;
         	gridBagConstraints.gridy = 0;
-        	gridBagConstraints.gridheight = 8;
+        	gridBagConstraints.gridheight = 9;
         	gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         	gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         	gridBagConstraints.weightx = 1.0;
@@ -390,7 +471,7 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 8;
+        gridBagConstraints.gridy = 9;
         gridBagConstraints.gridwidth = 6;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         getContentPane().add(panButtons, gridBagConstraints);
@@ -429,14 +510,15 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
         setOptions();
         person = new PilotPerson(pilot, choiceType.getSelectedIndex());
         person.setBiography(txtBio.getText());
-
+        person.setGender(choiceGender.getSelectedIndex());
+        person.setBirthday(birthdate);
         campaign.addPerson(person);
         hqView.refreshPersonnelList();
         refreshPilotAndOptions();
     }//GEN-LAST:event_btnOkActionPerformed
 
     private void randomName() {
-		textName.setText(campaign.getRNG().generate());
+		textName.setText(nameGen.generate(choiceGender.getSelectedIndex() == Person.G_FEMALE));
 	}
     
     /**
@@ -548,12 +630,28 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
             }
         }
     }
+    
+    private String getDateAsString() {
+        return dateFormat.format(birthdate.getTime());
+    }
+    
+    private void btnDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDateActionPerformed
+        // show the date chooser
+        DateChooser dc = new DateChooser(frame, birthdate);
+        // user can eiter choose a date or cancel by closing
+        if (dc.showDateChooser() == DateChooser.OK_OPTION) {
+            birthdate = dc.getDate();
+            btnDate.setText(getDateAsString());
+        }
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClose;
     private javax.swing.JButton btnOk;
     private javax.swing.JButton btnRandomName;
+    private javax.swing.JButton btnDate;
     private javax.swing.JComboBox choiceType;
+    private javax.swing.JComboBox choiceGender;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JLabel lblCommandB;
@@ -562,6 +660,8 @@ public class NewPilotDialog extends javax.swing.JDialog implements DialogOptionL
     private javax.swing.JLabel lblToughness;
     private javax.swing.JLabel lblInitB;
     private javax.swing.JLabel lblName;
+    private javax.swing.JLabel lblGender;
+    private javax.swing.JLabel lblBday;
     private javax.swing.JLabel lblNickname;
     private javax.swing.JLabel lblPiloting;
     private javax.swing.JPanel panButtons;
