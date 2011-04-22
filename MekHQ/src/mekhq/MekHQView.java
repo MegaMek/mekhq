@@ -3103,8 +3103,8 @@ public class MekHQView extends FrameView {
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			if (e.getClickCount() == 2) {
-				int row = patientTable.rowAtPoint(e.getPoint());
-				Person person = patientModel.getPersonAt(row);
+				int row = personnelTable.rowAtPoint(e.getPoint());
+				Person person = personModel.getPerson(row);
 				if (null != person) {
 					PersonViewDialog pvd = new PersonViewDialog(null, true,
 							person);
@@ -3127,8 +3127,8 @@ public class MekHQView extends FrameView {
 			JPopupMenu popup = new JPopupMenu();
 
 			if (e.isPopupTrigger()) {
-				int row = patientTable.rowAtPoint(e.getPoint());
-				Person person = patientModel.getPersonAt(row);
+				int row = personnelTable.rowAtPoint(e.getPoint());
+				Person person = personModel.getPerson(row);
 				JMenuItem menuItem = null;
 				JMenu menu = null;
 				JMenu impMenu = null;

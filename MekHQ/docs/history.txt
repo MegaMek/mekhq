@@ -38,6 +38,7 @@ v0.1.3 (2011-04-22)
 + PersonnelList not refreshing when doctors hired
 + Doctors not able to be assigned
 + incorrect mods listed in Acquisition Info
++ Bug: personnelMouseAdapter referencing patientTable
 
 v0.1.2 (2011-04-15)
 + updated MegaMek.jar
