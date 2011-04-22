@@ -20,6 +20,7 @@ v0.1.3 (SVN)
 + beginning of acquisition table
 + Acquisition table
 + Bug: NPE on MekGryo.canBeUsedBy check
++ Bug: selected task should remain current even when moving tabs
 
 v0.1.2 (2011-04-15)
 + updated MegaMek.jar

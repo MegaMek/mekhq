@@ -1215,8 +1215,6 @@ public class MekHQView extends FrameView {
 	}
 	
 	private void taskTabChanged() {
-		currentAcquisitionId = -1;
-		currentTaskId = -1;
 		updateAssignEnabled();
 		updateTargetText();
 	}
