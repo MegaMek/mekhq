@@ -3244,10 +3244,12 @@ public class MekHQView extends FrameView {
 		
 		private final static int COL_NAME = 0;
         private final static int COL_CALL = 1;
-        private final static int COL_GUN = 2;
-        private final static int COL_PILOT = 3;
-        private final static int COL_XP = 4;
-        private final static int N_COL = 5;
+        private final static int COL_TYPE = 2;
+        private final static int COL_GUN = 3;
+        private final static int COL_PILOT = 4;
+        private final static int COL_TECH = 5;
+        private final static int COL_XP = 6;
+        private final static int N_COL = 7;
         
         private ArrayList<Person> data = new ArrayList<Person>();
         
@@ -3266,10 +3268,14 @@ public class MekHQView extends FrameView {
                     return "Name";
                 case COL_CALL:
                     return "Callsign";
+                case COL_TYPE:
+                    return "Type";
                 case COL_GUN:
                     return "Gunnery";
                 case COL_PILOT:
                     return "Piloting";
+                case COL_TECH:
+                    return "Support Skill";
                 case COL_XP:
                     return "XP";
                 default:
@@ -3305,6 +3311,9 @@ public class MekHQView extends FrameView {
             if(col == COL_CALL) {
                 return p.getCallsign();
             }
+            if(col == COL_TYPE) {
+                return p.getTypeDesc();
+            }
             if(col == COL_GUN) {
             	if(p instanceof PilotPerson) {
             		return ((PilotPerson)p).getPilot().getGunnery();
@@ -3315,6 +3324,13 @@ public class MekHQView extends FrameView {
             if(col == COL_PILOT) {
             	if(p instanceof PilotPerson) {
             		return ((PilotPerson)p).getPilot().getPiloting();
+            	} else {
+            		return "-";
+            	}
+            }
+            if(col == COL_TECH) {
+            	if(p instanceof SupportPerson) {
+            		return ((SupportPerson)p).getTeam().getRatingName();
             	} else {
             		return "-";
             	}

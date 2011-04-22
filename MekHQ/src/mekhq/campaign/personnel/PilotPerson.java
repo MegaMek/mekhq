@@ -109,6 +109,7 @@ public class PilotPerson extends Person {
     public String getTypeDesc() {
         return getTypeDesc(type);
     }
+    
     public static int getType(Entity en) {
         if(en instanceof Mech) {
             return T_MECH;

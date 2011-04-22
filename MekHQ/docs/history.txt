@@ -25,6 +25,7 @@ v0.1.3 (SVN)
 + improvements to descriptions for replacement items and parts
 + renamed Personnel tab to Infirmary and refactored all "personnel" named variables in MekHQView to "patient"
 + personnelTable
++ added type and support skill columns to personnel table
 
 v0.1.2 (2011-04-15)
 + updated MegaMek.jar

@@ -66,6 +66,15 @@ public class SupportPerson extends Person {
     public int getTeamId() {
     	return teamId;
     }
+   
+    
+    public String getTypeDesc() {
+    	if(null != team) {
+    		return team.getTypeDesc();
+    	} else {
+    		return "Unknown";
+    	}
+    }
     
     @Override
     public String getDesc() {
