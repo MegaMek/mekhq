@@ -22,7 +22,7 @@
 package mekhq;
 
 import megamek.client.RandomNameGenerator;
-import mekhq.campaign.personnel.NameGen;
+import mekhq.campaign.personnel.SupportPerson;
 import mekhq.campaign.team.SupportTeam;
 import javax.swing.DefaultComboBoxModel;
 import mekhq.campaign.Campaign;
@@ -32,22 +32,31 @@ import mekhq.campaign.team.TechTeam;
  *
  * @author  Taharqa
  */
-public class NewTechTeamDialog extends javax.swing.JDialog {
+public class CustomizeTechTeamDialog extends javax.swing.JDialog {
 	private static final long serialVersionUID = -8038099101234445018L;
 	private Campaign campaign;
     private MekHQView hqView;
     private  RandomNameGenerator nameGen;
+    private SupportPerson person;
+    private boolean newHire;
     
     /** Creates new form NewTeamDialog */
-    public NewTechTeamDialog(java.awt.Frame parent, boolean modal, Campaign campaign, MekHQView view) {
+    public CustomizeTechTeamDialog(java.awt.Frame parent, boolean modal, SupportPerson person, boolean hire, Campaign campaign, MekHQView view) {
         super(parent, modal);
         this.campaign = campaign;
         this.hqView = view;
         this.nameGen = campaign.getRNG();
+        this.person = person;
+        this.newHire = hire;
         
         initComponents();
     }
 
+    private void refreshTech() {	
+    	getContentPane().removeAll();
+    	initComponents();
+    }
+    
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -67,7 +76,7 @@ public class NewTechTeamDialog extends javax.swing.JDialog {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
 
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(NewTechTeamDialog.class);
+        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(CustomizeTechTeamDialog.class);
 
         if (nameGen == null)
         {
@@ -75,7 +84,7 @@ public class NewTechTeamDialog extends javax.swing.JDialog {
         	nameGen.populateNames();
         }
 
-        txtTeamName.setText(nameGen.generate());
+        txtTeamName.setText(person.getName());
         //txtTeamName.setText(resourceMap.getString("txtTeamName.text")); // NOI18N
         txtTeamName.setName("txtTeamName"); // NOI18N
         txtTeamName.addActionListener(new java.awt.event.ActionListener() {
@@ -90,7 +99,7 @@ public class NewTechTeamDialog extends javax.swing.JDialog {
         }
         chTeamRating.setModel(teamRatingModel);
         chTeamRating.setName("chTeamRating"); // NOI18N
-        chTeamRating.setSelectedIndex(SupportTeam.EXP_REGULAR);
+        chTeamRating.setSelectedIndex(person.getTeam().getRating());
 
         lblTeamName.setText(resourceMap.getString("lblTeamName.text")); // NOI18N
         lblTeamName.setName("lblTeamName"); // NOI18N
@@ -98,7 +107,11 @@ public class NewTechTeamDialog extends javax.swing.JDialog {
         lblTeamRating.setText(resourceMap.getString("lblTeamRating.text")); // NOI18N
         lblTeamRating.setName("lblTeamRating"); // NOI18N
 
-        btnHire.setText(resourceMap.getString("btnHire.text")); // NOI18N
+        if(isNewHire()) {
+        	btnHire.setText(resourceMap.getString("btnHire.text")); // NOI18N
+        } else {
+        	btnHire.setText(resourceMap.getString("btnOK.text")); // NOI18N
+        }
         btnHire.setName("btnHire"); // NOI18N
         btnHire.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -123,7 +136,7 @@ public class NewTechTeamDialog extends javax.swing.JDialog {
         }
         chTeamType.setModel(teamTypeModel);
         chTeamType.setName("chTeamType"); // NOI18N
-        chTeamType.setSelectedIndex(TechTeam.T_MECH);
+        chTeamType.setSelectedIndex(((TechTeam)person.getTeam()).getType());
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -176,15 +189,27 @@ public class NewTechTeamDialog extends javax.swing.JDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private boolean isNewHire() {
+    	return newHire;
+    }
+    
 private void btnHireActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
     int rating = chTeamRating.getSelectedIndex();
     int type = chTeamType.getSelectedIndex();
     String name = txtTeamName.getText();
     TechTeam tech = new TechTeam(name, rating, type);
-    campaign.addTeam(tech);
-    txtTeamName.setText(nameGen.generate());
-    hqView.refreshPersonnelList();
-    hqView.refreshTechsList();
+    person.setTeam(tech);
+    if(isNewHire()) {
+    	campaign.addPerson(person);
+    	person = campaign.newTechPerson(TechTeam.T_MECH);
+    	refreshTech();
+    	hqView.refreshPersonnelList();
+    	hqView.refreshTechsList();
+    } else {
+    	hqView.refreshPersonnelList();
+    	hqView.refreshTechsList();
+    	setVisible(false);
+    }
 }//GEN-LAST:event_btnHireActionPerformed
 
 private void txtTeamNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtTeamNameActionPerformed
@@ -201,7 +226,7 @@ private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                NewTechTeamDialog dialog = new NewTechTeamDialog(new javax.swing.JFrame(), true, null, null);
+                CustomizeTechTeamDialog dialog = new CustomizeTechTeamDialog(new javax.swing.JFrame(), true, null, false, null, null);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     public void windowClosing(java.awt.event.WindowEvent e) {
                         System.exit(0);

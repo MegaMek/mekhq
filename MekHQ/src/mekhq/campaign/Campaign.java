@@ -215,7 +215,6 @@ public class Campaign implements Serializable {
 		teams.add(t);
 		teamIds.put(new Integer(id), t);
 		lastTeamId = id;
-		addPerson(new SupportPerson(t));
 	}
 
 	private void addTeamWithoutId(SupportTeam t) {
@@ -437,6 +436,9 @@ public class Campaign implements Serializable {
 		// check for any work items on this person
 		p.runDiagnostic(this);
 		addReport(p.getDesc() + " has been added to the personnel roster.");
+		if(p instanceof SupportPerson) {
+			addTeam(((SupportPerson)p).getTeam());
+		}
 	}
 	
 	private void addPersonWithoutId(Person p) {
@@ -1741,10 +1743,55 @@ public class Campaign implements Serializable {
 			person.setGender(Person.G_FEMALE);
 		}
 		//now lets get a random birthdate, such that the person
-		//is age 15+2d6 by default
+		//is age 13+4d6 by default
 		//TODO: let user specify age distribution
 		GregorianCalendar birthdate = (GregorianCalendar)getCalendar().clone();
 		//lets set age to be 14 + 4d6 by default		
+		birthdate.set(Calendar.YEAR, birthdate.get(Calendar.YEAR) - (13 + Compute.d6(4)));
+		//choose a random day and month
+		int randomDay = Compute.randomInt(365)+1;
+		if(birthdate.isLeapYear(birthdate.get(Calendar.YEAR))) {
+			randomDay = Compute.randomInt(366)+1;
+		}
+		birthdate.set(Calendar.DAY_OF_YEAR, randomDay);
+		person.setBirthday(birthdate);
+		return person;
+	}
+	
+	public SupportPerson newTechPerson(int type) {
+		boolean isFemale = getRNG().isFemale();
+		TechTeam team = new TechTeam(getRNG().generate(isFemale), SupportTeam.EXP_REGULAR, type);
+		SupportPerson person = new SupportPerson(team);
+		if(isFemale) {
+			person.setGender(Person.G_FEMALE);
+		}
+		//now lets get a random birthdate, such that the person
+		//is age 13+4d6 by default
+		//TODO: let user specify age distribution
+		GregorianCalendar birthdate = (GregorianCalendar)getCalendar().clone();
+		//lets set age to be 14 + 4d6 by default		
+		birthdate.set(Calendar.YEAR, birthdate.get(Calendar.YEAR) - (13 + Compute.d6(4)));
+		//choose a random day and month
+		int randomDay = Compute.randomInt(365)+1;
+		if(birthdate.isLeapYear(birthdate.get(Calendar.YEAR))) {
+			randomDay = Compute.randomInt(366)+1;
+		}
+		birthdate.set(Calendar.DAY_OF_YEAR, randomDay);
+		person.setBirthday(birthdate);
+		return person;
+	}
+	
+	public SupportPerson newDoctorPerson() {
+		boolean isFemale = getRNG().isFemale();
+		MedicalTeam team = new MedicalTeam(getRNG().generate(isFemale), SupportTeam.EXP_REGULAR);
+		SupportPerson person = new SupportPerson(team);
+		if(isFemale) {
+			person.setGender(Person.G_FEMALE);
+		}
+		//now lets get a random birthdate, such that the person
+		//is age 13+4d6 by default
+		//TODO: let user specify age distribution
+		GregorianCalendar birthdate = (GregorianCalendar)getCalendar().clone();	
 		birthdate.set(Calendar.YEAR, birthdate.get(Calendar.YEAR) - (13 + Compute.d6(4)));
 		//choose a random day and month
 		int randomDay = Compute.randomInt(365)+1;

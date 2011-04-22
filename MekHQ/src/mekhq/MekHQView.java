@@ -1333,7 +1333,9 @@ public class MekHQView extends FrameView {
 	}// GEN-LAST:event_miHirePilotActionPerformed
 
 	private void miHireTechActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miHireTechActionPerformed
-		NewTechTeamDialog ntd = new NewTechTeamDialog(getFrame(), true,
+		CustomizeTechTeamDialog ntd = new CustomizeTechTeamDialog(getFrame(), true, 
+				campaign.newTechPerson(TechTeam.T_MECH),
+				true,
 				campaign, this);
 		ntd.setVisible(true);
 		refreshTechsList();
@@ -3032,6 +3034,15 @@ public class MekHQView extends FrameView {
 							campaign,
 							view);
 					npd.setVisible(true);
+				} else if(selectedPerson instanceof SupportPerson) {
+					if(((SupportPerson)selectedPerson).getTeam() instanceof TechTeam) {
+						CustomizeTechTeamDialog ntd = new CustomizeTechTeamDialog(getFrame(), true, 
+								(SupportPerson)selectedPerson, 
+								false,
+								campaign,
+								view);
+						ntd.setVisible(true);
+					}
 				}
 			} else if (command.equalsIgnoreCase("IMP_PILOTING")) {
 				if (selectedPerson instanceof PilotPerson) {
@@ -3192,13 +3203,11 @@ public class MekHQView extends FrameView {
 					menuItem.setEnabled(campaign.isGM() && person.isDeployed());
 					menu.add(menuItem);
 				}
-				if (person instanceof PilotPerson) {
-					menuItem = new JMenuItem("Edit...");
-					menuItem.setActionCommand("EDIT");
-					menuItem.addActionListener(this);
-					menuItem.setEnabled(campaign.isGM());
-					menu.add(menuItem);
-				}
+				menuItem = new JMenuItem("Edit...");
+				menuItem.setActionCommand("EDIT");
+				menuItem.addActionListener(this);
+				menuItem.setEnabled(campaign.isGM());
+				menu.add(menuItem);
 
 				impMenu = new JMenu("Skills");
 				menu.add(impMenu);
