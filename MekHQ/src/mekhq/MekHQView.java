@@ -2959,8 +2959,12 @@ public class MekHQView extends FrameView {
 		
 		public void actionPerformed(ActionEvent action) {
 			String command = action.getActionCommand();
-			Person selectedPerson = personModel.getPerson(personnelTable.getSelectedRow());
-
+			int row = personnelTable.getSelectedRow();
+			if(row < 0) {
+				return;
+			}
+			Person selectedPerson = personModel.getPerson(personnelTable.convertRowIndexToModel(row));
+			
 			if (command.equalsIgnoreCase("KIA")) {
 				if (selectedPerson.isDeployed()
 						&& (0 == JOptionPane.showConfirmDialog(
