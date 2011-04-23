@@ -188,11 +188,11 @@ public class CustomizeMedicalTeamDialog extends javax.swing.JDialog {
 
 private void btnDoneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDoneActionPerformed
     int rating = chTeamRating.getSelectedIndex();
-    String name = txtTeamName.getText();
-    MedicalTeam doc = new MedicalTeam(name, rating);
-    person.setTeam(doc);
-    if(isNewHire()) {
-    	campaign.addPerson(person);
+    String name = txtTeamName.getText();  
+    if(isNewHire()) {  	
+    	MedicalTeam doc = new MedicalTeam(name, rating);
+        person.setTeam(doc);
+        campaign.addPerson(person);
     	person = campaign.newDoctorPerson();
     	refreshDoc();
     	hqView.refreshPersonnelList();
@@ -200,6 +200,9 @@ private void btnDoneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
     	hqView.refreshDoctorsList();
     	hqView.refreshReport();
     } else {
+    	MedicalTeam team = (MedicalTeam)person.getTeam();
+    	team.setName(name);
+    	team.setRating(rating);
     	hqView.refreshPersonnelList();
     	hqView.refreshPatientList();
     	hqView.refreshDoctorsList();

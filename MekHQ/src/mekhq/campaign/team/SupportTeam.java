@@ -119,6 +119,10 @@ public abstract class SupportTeam implements Serializable, MekHqXmlSerializable 
         return name;
     }
     
+    public void setName(String s) {
+    	this.name = s;
+    }
+    
     public int getId() {
         return id;
     }

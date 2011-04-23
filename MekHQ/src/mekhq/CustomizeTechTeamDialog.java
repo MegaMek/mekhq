@@ -188,9 +188,9 @@ private void btnHireActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
     int rating = chTeamRating.getSelectedIndex();
     int type = chTeamType.getSelectedIndex();
     String name = txtTeamName.getText();
-    TechTeam tech = new TechTeam(name, rating, type);
-    person.setTeam(tech);
     if(isNewHire()) {
+    	TechTeam tech = new TechTeam(name, rating, type);
+    	person.setTeam(tech);
     	campaign.addPerson(person);
     	person = campaign.newTechPerson(TechTeam.T_MECH);
     	refreshTech();
@@ -199,6 +199,10 @@ private void btnHireActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
     	hqView.refreshPatientList();
     	hqView.refreshReport();
     } else {
+    	TechTeam tech = (TechTeam)person.getTeam();
+    	tech.setRating(rating);
+    	tech.setType(type);
+    	tech.setName(name);
     	hqView.refreshPersonnelList();
     	hqView.refreshTechsList();
     	hqView.refreshPatientList();

@@ -93,6 +93,10 @@ public class TechTeam extends SupportTeam {
     	return type;
     }
     
+    public void setType(int t) {
+    	this.type = t;
+    }
+    
     @Override
     public int getSkillBase(int effectiveRating) {
         int base = 11;

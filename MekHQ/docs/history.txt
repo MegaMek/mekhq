@@ -10,6 +10,7 @@ v0.1.4 (SVN)
 + converted NewTechTeamDialog to CustomizeTechTeamDialog
 + converted NewMedicalteamDialog to CustomizeMedicalTeamDialog
 + put refresh commands inside each Customize dialog
++ Bug: editing personnel does not update on other lists
 
 v0.1.3 (2011-04-22)
 + Bug 3288095: Tasks are not refreshing and dates do not advance

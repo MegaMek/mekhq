@@ -475,38 +475,61 @@ public class CustomizePilotDialog extends javax.swing.JDialog implements DialogO
         int piloting = Integer.parseInt(textPiloting.getText());
         int gunnery = Integer.parseInt(textGunnery.getText());
         String name = textName.getText();
-        String nick = textNickname.getText();
-        pilot = new Pilot(name, gunnery, piloting);
-        if(campaign.getCampaignOptions().useInitBonus()) {
-        	int initb = Integer.parseInt(textInitB.getText());
-        	pilot.setInitBonus(initb);
-        }
-        if(campaign.getCampaignOptions().useTactics()) {
-        	int commandb = Integer.parseInt(textCommandB.getText());
-        	pilot.setCommandBonus(commandb);
-        }
-        if(campaign.getCampaignOptions().useToughness()) {
-        	int tough = Integer.parseInt(textToughness.getText());
-        	pilot.setToughness(tough);
-        }
-        if(campaign.getCampaignOptions().useArtillery()) {
-        	int artillery = Integer.parseInt(textArtillery.getText());
-        	pilot.setArtillery(artillery);
-        }
-        pilot.setNickname(nick);
-        
+        String nick = textNickname.getText();      
         person.setPilot(pilot);
         person.setBiography(txtBio.getText());
         person.setGender(choiceGender.getSelectedIndex());
         person.setBirthday(birthdate);              
         if(isNewHire()) {
-        	campaign.addPerson(person);
+        	pilot = new Pilot(name, gunnery, piloting);
+            if(campaign.getCampaignOptions().useInitBonus()) {
+            	int initb = Integer.parseInt(textInitB.getText());
+            	pilot.setInitBonus(initb);
+            }
+            if(campaign.getCampaignOptions().useTactics()) {
+            	int commandb = Integer.parseInt(textCommandB.getText());
+            	pilot.setCommandBonus(commandb);
+            }
+            if(campaign.getCampaignOptions().useToughness()) {
+            	int tough = Integer.parseInt(textToughness.getText());
+            	pilot.setToughness(tough);
+            }
+            if(campaign.getCampaignOptions().useArtillery()) {
+            	int artillery = Integer.parseInt(textArtillery.getText());
+            	pilot.setArtillery(artillery);
+            }
+            pilot.setNickname(nick);
+            setOptions(pilot);
+            person.setPilot(pilot);
+            campaign.addPerson(person);
         	hqView.refreshPersonnelList();
         	hqView.refreshPatientList();
     		hqView.refreshReport();
         	person = campaign.newPilotPerson(PilotPerson.T_MECH);
         	refreshPilotAndOptions();
         } else {
+        	Pilot p = person.getPilot();
+        	p.setName(name);
+        	p.setGunnery(gunnery);
+        	p.setPiloting(piloting);
+        	p.setNickname(nick);
+        	if(campaign.getCampaignOptions().useInitBonus()) {
+            	int initb = Integer.parseInt(textInitB.getText());
+            	p.setInitBonus(initb);
+            }
+            if(campaign.getCampaignOptions().useTactics()) {
+            	int commandb = Integer.parseInt(textCommandB.getText());
+            	p.setCommandBonus(commandb);
+            }
+            if(campaign.getCampaignOptions().useToughness()) {
+            	int tough = Integer.parseInt(textToughness.getText());
+            	p.setToughness(tough);
+            }
+            if(campaign.getCampaignOptions().useArtillery()) {
+            	int artillery = Integer.parseInt(textArtillery.getText());
+            	p.setArtillery(artillery);
+            }
+            setOptions(p);
         	hqView.refreshPersonnelList();
         	hqView.refreshPatientList();
         	hqView.refreshUnitList();
@@ -617,16 +640,16 @@ public class CustomizePilotDialog extends javax.swing.JDialog implements DialogO
         optionComps.add(optionComp);
     }
 
-    private void setOptions() {
+    private void setOptions(Pilot p) {
         IOption option;
         for (final Object newVar : optionComps) {
             DialogOptionComponent comp = (DialogOptionComponent) newVar;
             option = comp.getOption();
             if ((comp.getValue().equals("None"))) { // NON-NLS-$1
-                pilot.getOptions().getOption(option.getName())
+                p.getOptions().getOption(option.getName())
                 .setValue("None"); // NON-NLS-$1
             } else {
-                pilot.getOptions().getOption(option.getName())
+                p.getOptions().getOption(option.getName())
                 .setValue(comp.getValue());
             }
         }
