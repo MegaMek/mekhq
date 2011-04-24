@@ -44,6 +44,7 @@ import java.io.PrintWriter;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -336,6 +337,9 @@ public class MekHQView extends FrameView {
 		personnelTable.setName("personnelTable"); // NOI18N
 		personnelTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         sorter = new TableRowSorter<PersonnelTableModel>(personModel);
+        sorter.setComparator(PersonnelTableModel.COL_GUN, new SkillSorter());
+        sorter.setComparator(PersonnelTableModel.COL_PILOT, new SkillSorter());
+        sorter.setComparator(PersonnelTableModel.COL_TECH, new LevelSorter());
         personnelTable.setRowSorter(sorter);
 		personnelTable.addMouseListener(personnelMouseAdapter);
 		scrollPersonnelTable.setViewportView(personnelTable);
@@ -3395,6 +3399,70 @@ public class MekHQView extends FrameView {
         }
 
         
+	}
+	
+	/**
+	 * A comparator for skills written as strings with "-" sorted to the bottom always
+	 * @author Jay Lawson
+	 *
+	 */
+	public class SkillSorter implements Comparator<String> {
+
+		@Override
+		public int compare(String s0, String s1) {	
+			if(s0.equals("-") && s1.equals("-")) {
+				return 0;
+			} else if(s0.equals("-")) {
+				return 1;
+			} else if(s1.equals("-")) {
+				return -1;
+			} else {
+				return ((Comparable<String>)s0).compareTo(s1);
+			}			
+		}
+	}
+	
+	/**
+	 * A comparator for skills levels (e.g. Regular, Veteran, etc)
+	 * 	 * @author Jay Lawson
+	 *
+	 */
+	public class LevelSorter implements Comparator<String> {
+
+		@Override
+		public int compare(String s0, String s1) {	
+			if(s0.equals("-") && s1.equals("-")) {
+				return 0;
+			} else if(s0.equals("-")) {
+				return -1;
+			} else if(s1.equals("-")) {
+				return 1;
+			} else {
+				//probably easiest to turn into numbers and then sort that way
+				int l0 = 0;
+				int l1 = 0;
+				//TODO: use the information on skill levels in SupportPerson
+				if(s0.contains("Regular")) {
+					l0 = 1;
+				}
+				if(s1.contains("Regular")) {
+					l1 = 1;
+				}
+				if(s0.contains("Veteran")) {
+					l0 = 2;
+				}
+				if(s1.contains("Veteran")) {
+					l1 = 2;
+				}
+				if(s0.contains("Elite")) {
+					l0 = 3;
+				}
+				if(s1.contains("Elite")) {
+					l1 = 3;
+				}
+				return ((Comparable<Integer>)l0).compareTo(l1);
+			}			
+		}
 	}
 	
 	/**

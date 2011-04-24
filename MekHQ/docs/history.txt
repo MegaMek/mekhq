@@ -14,6 +14,7 @@ v0.1.4 (SVN)
 + Bug: context menu for personnel table picking wrong personnel when sorted
 + added birthdate and gender choosers to CustomizeTechDialog
 + Bug: problem with new personnel when personnel table columns are sorted
++ custom sorting comparators for personnel skills
 
 v0.1.3 (2011-04-22)
 + Bug 3288095: Tasks are not refreshing and dates do not advance
