@@ -3369,14 +3369,14 @@ public class MekHQView extends FrameView {
             }
             if(col == COL_GUN) {
             	if(p instanceof PilotPerson) {
-            		return ((PilotPerson)p).getPilot().getGunnery();
+            		return Integer.toString(((PilotPerson)p).getPilot().getGunnery());
             	} else {
             		return "-";
             	}
             }
             if(col == COL_PILOT) {
             	if(p instanceof PilotPerson) {
-            		return ((PilotPerson)p).getPilot().getPiloting();
+            		return Integer.toString(((PilotPerson)p).getPilot().getPiloting());
             	} else {
             		return "-";
             	}
