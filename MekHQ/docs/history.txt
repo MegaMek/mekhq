@@ -12,6 +12,7 @@ v0.1.4 (SVN)
 + put refresh commands inside each Customize dialog
 + Bug: editing personnel does not update on other lists
 + Bug: context menu for personnel table picking wrong personnel when sorted
++ added birthdate and gender choosers to CustomizeTechDialog
 
 v0.1.3 (2011-04-22)
 + Bug 3288095: Tasks are not refreshing and dates do not advance
