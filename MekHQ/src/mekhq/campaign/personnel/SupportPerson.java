@@ -77,6 +77,11 @@ public class SupportPerson extends Person {
     }
     
     @Override
+    public String getSkillSummary() {
+    	return getTeam().getRatingName();
+    }
+    
+    @Override
     public String getDesc() {
         String casualties = "";
         if(team.getCasualties() > 0) {

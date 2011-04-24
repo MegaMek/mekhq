@@ -110,6 +110,21 @@ public class PilotPerson extends Person {
         return getTypeDesc(type);
     }
     
+    @Override
+    public String getSkillSummary() {
+    	String skillString = " (" + pilot.getGunnery() + "/" + pilot.getPiloting() + ")";
+    	double average = (pilot.getGunnery() + pilot.getPiloting())/2.0;
+    	String level = "Green";
+    	if(average<=2.5) {
+    		level = "Elite";
+    	} else if (average <=3.5) {
+    		level = "Veteran";
+    	} else if (average<=4.5) {
+    		level = "Regular";
+    	}
+    	return level + skillString;
+    }
+    
     public static int getType(Entity en) {
         if(en instanceof Mech) {
             return T_MECH;

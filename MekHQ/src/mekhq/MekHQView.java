@@ -339,7 +339,7 @@ public class MekHQView extends FrameView {
         sorter = new TableRowSorter<PersonnelTableModel>(personModel);
         sorter.setComparator(PersonnelTableModel.COL_GUN, new SkillSorter());
         sorter.setComparator(PersonnelTableModel.COL_PILOT, new SkillSorter());
-        sorter.setComparator(PersonnelTableModel.COL_TECH, new LevelSorter());
+        sorter.setComparator(PersonnelTableModel.COL_SKILL, new LevelSorter());
         personnelTable.setRowSorter(sorter);
 		personnelTable.addMouseListener(personnelMouseAdapter);
 		scrollPersonnelTable.setViewportView(personnelTable);
@@ -3294,7 +3294,7 @@ public class MekHQView extends FrameView {
         private final static int COL_TYPE = 4;
         private final static int COL_GUN = 5;
         private final static int COL_PILOT = 6;
-        private final static int COL_TECH = 7;
+        private final static int COL_SKILL = 7;
         private final static int COL_XP = 8;
         private final static int N_COL = 9;
         
@@ -3325,8 +3325,8 @@ public class MekHQView extends FrameView {
                     return "Gunnery";
                 case COL_PILOT:
                     return "Piloting";
-                case COL_TECH:
-                    return "Support Skill";
+                case COL_SKILL:
+                    return "Skill Level";
                 case COL_XP:
                     return "XP";
                 default:
@@ -3385,12 +3385,8 @@ public class MekHQView extends FrameView {
             		return "-";
             	}
             }
-            if(col == COL_TECH) {
-            	if(p instanceof SupportPerson) {
-            		return ((SupportPerson)p).getTeam().getRatingName();
-            	} else {
-            		return "-";
-            	}
+            if(col == COL_SKILL) {
+            	return p.getSkillSummary();
             }
             if(col == COL_XP) {
                 return p.getXp();
