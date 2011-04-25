@@ -37,7 +37,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlSerializable;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.team.SupportTeam;
-import mekhq.campaign.team.TechTeam;
 import mekhq.campaign.work.PersonnelWorkItem;
 
 /**
@@ -326,6 +325,10 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
 				+"<gender>"
 				+gender
 				+"</gender>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<rank>"
+				+rank
+				+"</rank>");
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<birthday>"
@@ -384,6 +387,8 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
 					retVal.xp = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("gender")) {
 					retVal.gender = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("rank")) {
+					retVal.rank = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("birthday")) {
 					SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 					retVal.birthday = (GregorianCalendar) GregorianCalendar.getInstance();

@@ -1123,6 +1123,7 @@ public class Campaign implements Serializable {
 
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "name", name);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "faction", faction);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "ranks", ranks.getRankSystem());
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "funds", funds);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "nameGen", rng.getChosenFaction());
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "percentFemale", rng.getPercentFemale());
@@ -1678,6 +1679,8 @@ public class Campaign implements Serializable {
 				} else if (xn.equalsIgnoreCase("faction")) {
 					retVal.faction = Integer.parseInt(wn.getTextContent()
 							.trim());
+				} else if (xn.equalsIgnoreCase("ranks")) {
+					retVal.ranks = new Ranks(Integer.parseInt(wn.getTextContent().trim()));
 				} else if (xn.equalsIgnoreCase("funds")) {
 					retVal.funds = Long.parseLong(wn.getTextContent().trim());
 				} else if (xn.equalsIgnoreCase("gmMode")) {

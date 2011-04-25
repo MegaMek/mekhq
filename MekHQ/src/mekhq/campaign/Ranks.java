@@ -38,10 +38,20 @@ public class Ranks implements Serializable {
 	//pre-fab rank systems
 	public static final int RS_SL =  0;
 	public static final int RS_FS =  1;
-	public static final int RS_NUM = 2;
+	public static final int RS_LA =  2;
+	public static final int RS_FWL = 3;
+	public static final int RS_CC =  4;
+	public static final int RS_DC =  5;
+	public static final int RS_CL =  6;
+	public static final int RS_NUM = 7;
 	private static final String[][] rankSystems = {
 		{"None","Recruit","Private","Corporal","Sergeant","Master Sergeant","Warrant Officer","Lieutenant","Captain","Major","Colonel","Lt. General","Major General","General","Commanding General"},
-		{"None","Recruit","Private","Private, FC","Corporal","Sergeant","Sergeant-Major","Command Sergeant-Major","Cadet","Subaltern","Leftenant","Captain","Major","Leftenant Colonel","Colonel","Leftenant General","Major General","General","Marshal","Field Marshal","Marshal of the Armies"}
+		{"None","Recruit","Private","Private, FC","Corporal","Sergeant","Sergeant-Major","Command Sergeant-Major","Cadet","Subaltern","Leftenant","Captain","Major","Leftenant Colonel","Colonel","Leftenant General","Major General","General","Marshal","Field Marshal","Marshal of the Armies"},
+		{"None","Recruit","Private","Private, FC","Corporal","Senior Corporal","Sergeant","Staff Sergeant","Sergeant Major","Staff Sergeant Major","Senior Sergeant Major","Warrant Officer","Warrant Officer, FC","Senior Warrant Officer","Chief Warrant Officer","Cadet","Leutnant","First Leutnant","Hauptmann","Kommandant","Hauptmann-Kommandant","Leutnant-Colonel","Colonel","Leutnant-General","Hauptmann-General","Kommandant-General","General","General of the Armies","Archon"},
+		{"None","Recruit","Private","Private, FC","Corporal","Sergeant","Staff Sergeant","Master Sergeant","Sergeant Major","Lieutenant","Captain","Force Commander","Lieutenant Colonel","Colonel","General","Marshal","Captain-General"},
+		{"None","Shia-ben-bing","San-ben-bing","Si-ben-bing","Yi-si-ben-bing","Sao-wei","Sang-wei","Sao-shao","Zhong-shao","Sang-shao","Jiang-jun","Sang-jiang-jun"},
+		{"None","Hojuhei","Heishi","Gunjin","Go-cho","Gunsho","Shujin","Kashira","Sho-ko","Chu-i","Tai-i","Sho-sa","Chu-sa","Tai-sa","Sho-sho","Tai-sho","Tai-shu","Gunji-no-Kanrei"},
+		{"None","Point","Point Commander","Star Commander","Star Captain","Star Colonel","Galaxy Commander","Khan","ilKhan"}
 	};
 	
 	private int rankSystem;
@@ -57,6 +67,16 @@ public class Ranks implements Serializable {
 			return "Star League";
 		case RS_FS:
 			return "Federated Suns";
+		case RS_LA:
+			return "Lyran Alliance";
+		case RS_FWL:
+			return "Free Worlds League";
+		case RS_CC:
+			return "Capellan Confederation";
+		case RS_DC:
+			return "Draconis Combine";
+		case RS_CL:
+			return "Clan";
 		default:
 			return "?";
 		}
