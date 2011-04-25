@@ -29,6 +29,7 @@ import megamek.common.util.DirectoryItems;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.Faction;
+import mekhq.campaign.Ranks;
 
 /**
  *
@@ -98,17 +99,20 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         lblName = new javax.swing.JLabel();
         lblFaction = new javax.swing.JLabel();
         lblFactionNames = new javax.swing.JLabel();
+        lblRank = new javax.swing.JLabel();
         lblGender = new javax.swing.JLabel();
         lblDate = new javax.swing.JLabel();
         btnDate = new javax.swing.JButton();
         comboFaction = new javax.swing.JComboBox();
         comboFactionNames = new javax.swing.JComboBox();
+        comboRanks = new javax.swing.JComboBox();
         sldGender = new javax.swing.JSlider(SwingConstants.HORIZONTAL);
         btnCamo = new javax.swing.JButton();
         lblCamo = new javax.swing.JLabel();
         panRepair = new javax.swing.JPanel();
         panPersonnel = new javax.swing.JPanel();
         panNameGen = new javax.swing.JPanel();
+        panRank = new javax.swing.JPanel();
         useFactionModifiersCheckBox = new javax.swing.JCheckBox();
         javax.swing.JLabel clanPriceModifierLabel = new javax.swing.JLabel();
         DecimalFormat numberFormat = (DecimalFormat) DecimalFormat.getInstance();
@@ -131,6 +135,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         chkUseFinances = new javax.swing.JCheckBox();
         btnOkay = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
+        textRanks = new javax.swing.JTextArea();
+        scrRanks = new javax.swing.JScrollPane();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
@@ -172,7 +178,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridy = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panGeneral.add(lblFaction, gridBagConstraints);
-
         
         lblDate.setText(resourceMap.getString("lblDate.text")); // NOI18N
         lblDate.setName("lblDate"); // NOI18N
@@ -393,6 +398,49 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         
         tabOptions.addTab(resourceMap.getString("panPersonnel.TabConstraints.tabTitle"), panPersonnel); // NOI18N
 
+        panRank.setName("panRank"); // NOI18N
+        panRank.setLayout(new java.awt.GridBagLayout());
+        
+        lblRank.setText(resourceMap.getString("lblRank.text")); // NOI18N
+        lblRank.setName("lblRank"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panRank.add(lblRank, gridBagConstraints);      
+        
+        DefaultComboBoxModel rankModel = new DefaultComboBoxModel();
+        for(int i = 0; i < Ranks.RS_NUM; i++) {
+            rankModel.addElement(Ranks.getRankSystemName(i));
+        }
+        rankModel.setSelectedItem(Ranks.getRankSystemName(campaign.getRanks().getRankSystem()));
+        comboRanks.setModel(rankModel);
+        comboRanks.setName("comboRanks"); // NOI18N
+        comboRanks.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                fillRankInfo();
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panRank.add(comboRanks, gridBagConstraints);
+
+        fillRankInfo();
+        textRanks.setEditable(false);
+        scrRanks.setViewportView(textRanks);
+    	
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 2;
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+		gridBagConstraints.weightx = 1.0;
+		gridBagConstraints.weighty = 1.0;
+		panRank.add(scrRanks, gridBagConstraints);
+        
+        tabOptions.addTab(resourceMap.getString("panRank.TabConstraints.tabTitle"), panRank); // NOI18N
+        
         panNameGen.setName("panNameGen"); // NOI18N
         panNameGen.setLayout(new java.awt.GridBagLayout());
         
@@ -511,7 +559,7 @@ private void txtNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
 			switchFaction();
 		}		
 	}
-	
+
 	private void switchFaction() {
 		String factionCode = Faction.getFactionCodeForNameGenerator(comboFaction.getSelectedIndex());
 		boolean found = false;
@@ -525,6 +573,14 @@ private void txtNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
 		if(found) {
 			comboFactionNames.setSelectedItem(factionCode);
 		}
+	}
+	
+	private void fillRankInfo() {
+		String ranks = "";
+		for(String r : Ranks.getRankSystem(comboRanks.getSelectedIndex())) {
+			ranks = ranks + r + "\n";
+		}
+		textRanks.setText(ranks);
 	}
 	
 	private void useFactionForNamesBoxEvent(java.awt.event.ActionEvent evt) {
@@ -547,6 +603,9 @@ private void btnOkayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
     	campaign.getRNG().setChosenFaction((String)comboFactionNames.getSelectedItem());
     }
     campaign.getRNG().setPerentFemale(sldGender.getValue());
+    if(campaign.getRanks().getRankSystem() != comboRanks.getSelectedIndex()) {
+    	campaign.setRankSystem(comboRanks.getSelectedIndex());
+    }
     campaign.setCamoCategory(camoCategory);
     campaign.setCamoFileName(camoFileName);
     campaign.setColorIndex(colorIndex);
@@ -657,17 +716,20 @@ public String getDateAsString() {
     private javax.swing.JFormattedTextField clanPriceModifierJFormattedTextField;
     private javax.swing.JComboBox comboFaction;
     private javax.swing.JComboBox comboFactionNames;
+    private javax.swing.JComboBox comboRanks;
     private javax.swing.JSlider sldGender;
     private javax.swing.JLabel lblCamo;
     private javax.swing.JLabel lblDate;
     private javax.swing.JLabel lblFaction;
     private javax.swing.JLabel lblFactionNames;
+    private javax.swing.JLabel lblRank;
     private javax.swing.JLabel lblGender;
     private javax.swing.JLabel lblName;
     private javax.swing.JPanel panGeneral;
     private javax.swing.JPanel panRepair;
     private javax.swing.JPanel panPersonnel;
     private javax.swing.JPanel panNameGen;
+    private javax.swing.JPanel panRank;
     private javax.swing.JComboBox repairSystemComboBox;
     private javax.swing.JTabbedPane tabOptions;
     private javax.swing.JTextField txtName;
@@ -680,6 +742,8 @@ public String getDateAsString() {
     private javax.swing.JCheckBox useArtilleryBox;
     private javax.swing.JCheckBox useAbilitiesBox;
     private javax.swing.JCheckBox useImplantsBox;
+    private javax.swing.JTextArea textRanks;
+    private javax.swing.JScrollPane scrRanks;
     // End of variables declaration//GEN-END:variables
 
 }

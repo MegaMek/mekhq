@@ -1630,6 +1630,7 @@ public class MekHQView extends FrameView {
 				campaign);
 		cod.setVisible(true);
 		refreshCalendar();
+		refreshPersonnelList();
 	}// GEN-LAST:event_menuOptionsActionPerformed
 
 	private void miLoadForcesActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miLoadForcesActionPerformed

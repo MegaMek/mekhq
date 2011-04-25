@@ -20,6 +20,7 @@ v0.1.4 (SVN)
 + Bug: not able to hire all types of personnel
 + personnel filter
 + personnel rankings
++ rank system added to Campaign Options
 
 v0.1.3 (2011-04-22)
 + Bug 3288095: Tasks are not refreshing and dates do not advance

@@ -36,19 +36,39 @@ public class Ranks implements Serializable {
 	private static final long serialVersionUID = -2054016720766034618L;
 
 	//pre-fab rank systems
-	public static final int RS_SL = 0;
+	public static final int RS_SL =  0;
+	public static final int RS_FS =  1;
+	public static final int RS_NUM = 2;
 	private static final String[][] rankSystems = {
-		{"None","Recruit","Private","Corporal","Sergeant","Master Sergeant","Warrant Officer","Lieutenant","Captain","Major","Colonel","Lt. General","Major General","General","Commanding General"}
+		{"None","Recruit","Private","Corporal","Sergeant","Master Sergeant","Warrant Officer","Lieutenant","Captain","Major","Colonel","Lt. General","Major General","General","Commanding General"},
+		{"None","Recruit","Private","Private, FC","Corporal","Sergeant","Sergeant-Major","Command Sergeant-Major","Cadet","Subaltern","Leftenant","Captain","Major","Leftenant Colonel","Colonel","Leftenant General","Major General","General","Marshal","Field Marshal","Marshal of the Armies"}
 	};
 	
+	private int rankSystem;
 	private ArrayList<String> ranks;
 
+	public static String[] getRankSystem(int system) {
+		return rankSystems[system];
+	}
+	
+	public static String getRankSystemName(int system) {
+		switch(system) {
+		case RS_SL:
+			return "Star League";
+		case RS_FS:
+			return "Federated Suns";
+		default:
+			return "?";
+		}
+	}
+	
 	public Ranks() {
 		this(RS_SL);
 	}
 	
 	public Ranks(int system) {
-		useRankSystem(system);
+		rankSystem = system;
+		useRankSystem(rankSystem);
 	}
 	
 	public ArrayList<String> getAllRanks() {
@@ -74,6 +94,17 @@ public class Ranks implements Serializable {
 	
 	public int getRankOrder(String rank) {
 		return ranks.indexOf(rank);
+	}
+	
+	public int getRankSystem() {
+		return rankSystem;
+	}
+	
+	public void setRankSystem(int system) {
+		if(system < RS_NUM) {
+			rankSystem = system;
+			useRankSystem(rankSystem);
+		}	
 	}
 	
 	

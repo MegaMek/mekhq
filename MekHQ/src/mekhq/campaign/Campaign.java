@@ -1809,9 +1809,11 @@ public class Campaign implements Serializable {
 		return ranks;
 	}
 	
-	public void setRanks(Ranks r) {
-		this.ranks = r;
-		//TODO: need to cycle through personnel and reassign ranks
+	public void setRankSystem(int system) {
+		getRanks().setRankSystem(system);
+		for(Person p : getPersonnel()) {
+			p.setRank(0);
+		}
 	}
 	
 }
