@@ -361,7 +361,8 @@ public class MekHQView extends FrameView {
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 0;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+		gridBagConstraints.weightx = 1.0;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
 		panPersonnel.add(lblPersonChoice, gridBagConstraints);
 		
 		DefaultComboBoxModel personGroupModel = new DefaultComboBoxModel();
@@ -382,7 +383,7 @@ public class MekHQView extends FrameView {
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 		gridBagConstraints.weightx = 0.0;
 		gridBagConstraints.weighty = 0.0;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
 		panPersonnel.add(choicePerson, gridBagConstraints);
 		
 		personnelTable.setModel(personModel);
@@ -3416,17 +3417,18 @@ public class MekHQView extends FrameView {
 	
 		private static final long serialVersionUID = -5207167419079014157L;
 		
-		private final static int COL_RANK =   0;
-		private final static int COL_NAME =   1;
-        private final static int COL_CALL =   2;
-        private final static int COL_AGE =    3;
-        private final static int COL_GENDER = 4;
-        private final static int COL_TYPE =   5;
-        private final static int COL_GUN =    6;
-        private final static int COL_PILOT =  7;
-        private final static int COL_SKILL =  8;
-        private final static int COL_XP =     9;
-        private final static int N_COL =      10;
+		private final static int COL_RANK =    0;
+		private final static int COL_NAME =    1;
+        private final static int COL_CALL =    2;
+        private final static int COL_AGE =     3;
+        private final static int COL_GENDER =  4;
+        private final static int COL_TYPE =    5;
+        private final static int COL_SKILL =   6;
+        private final static int COL_ASSIGN =  7;
+        private final static int COL_GUN =     8;
+        private final static int COL_PILOT =   9;
+        private final static int COL_XP =      10;
+        private final static int N_COL =       11;
         
         private ArrayList<Person> data = new ArrayList<Person>();
         
@@ -3459,6 +3461,8 @@ public class MekHQView extends FrameView {
                     return "Piloting";
                 case COL_SKILL:
                     return "Skill Level";
+                case COL_ASSIGN:
+                    return "Unit Assignment";
                 case COL_XP:
                     return "XP";
                 default:
@@ -3522,6 +3526,15 @@ public class MekHQView extends FrameView {
             }
             if(col == COL_SKILL) {
             	return p.getSkillSummary();
+            }
+            if(col == COL_ASSIGN) {
+            	if(p instanceof PilotPerson) {
+            		Unit u = ((PilotPerson)p).getAssignedUnit();
+            		if(null != u) {
+            			return u.getEntity().getDisplayName();
+            		}
+            	}
+            	return "-";
             }
             if(col == COL_XP) {
                 return p.getXp();
