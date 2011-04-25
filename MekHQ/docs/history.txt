@@ -24,6 +24,7 @@ v0.1.4 (SVN)
 + added rank information to XML save and load
 + added ranks for five main factions and clans
 + assigned unit column in personnel tab
++ set preferred widths of personnel table column
 
 v0.1.3 (2011-04-22)
 + Bug 3288095: Tasks are not refreshing and dates do not advance

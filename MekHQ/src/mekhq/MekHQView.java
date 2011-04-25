@@ -64,23 +64,20 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
 import javax.swing.Timer;
-import javax.swing.RowFilter.Entry;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.MouseInputAdapter;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
 import megamek.client.ui.swing.MechView;
-import megamek.client.ui.swing.MechSelectorDialog.MechTableModel;
 import megamek.common.AmmoType;
 import megamek.common.Entity;
 import megamek.common.EntityListFile;
-import megamek.common.EntityWeightClass;
 import megamek.common.MechFileParser;
-import megamek.common.MechSearchFilter;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
 import megamek.common.Mounted;
@@ -396,6 +393,12 @@ public class MekHQView extends FrameView {
         sorter.setComparator(PersonnelTableModel.COL_SKILL, new LevelSorter());
         personnelTable.setRowSorter(sorter);
 		personnelTable.addMouseListener(personnelMouseAdapter);
+		personnelTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+		TableColumn column = null;
+        for (int i = 0; i < PersonnelTableModel.N_COL; i++) {
+            column = personnelTable.getColumnModel().getColumn(i);
+            column.setPreferredWidth(personModel.getColumnWidth(i));
+        }
 		scrollPersonnelTable.setViewportView(personnelTable);
 	
 		gridBagConstraints = new java.awt.GridBagConstraints();
@@ -3468,6 +3471,35 @@ public class MekHQView extends FrameView {
                 default:
                     return "?";
             }
+        }
+        
+        public int getColumnWidth(int c) {
+            switch(c) {
+        	case COL_RANK:
+        		return 80;
+            case COL_NAME:
+                return 150;
+            case COL_CALL:
+                return 50;
+            case COL_AGE:
+                return 20;
+            case COL_GENDER:
+                return 20;
+            case COL_TYPE:
+                return 100;
+            case COL_GUN:
+                return 20;
+            case COL_PILOT:
+                return 20;
+            case COL_SKILL:
+                return 100;
+            case COL_ASSIGN:
+                return 125;
+            case COL_XP:
+                return 20;
+            default:
+                return 20;
+        }
         }
 
         @Override
