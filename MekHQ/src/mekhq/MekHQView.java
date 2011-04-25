@@ -118,6 +118,20 @@ import org.jdesktop.application.TaskMonitor;
  * The application's main frame.
  */
 public class MekHQView extends FrameView {
+	
+	//personnel filter groups
+	private static final int PG_ACTIVE =  0;
+	private static final int PG_COMBAT =  1;
+	private static final int PG_MW =      2;
+	private static final int PG_CREW =    3;
+	private static final int PG_PILOT =   4;
+	private static final int PG_PROTO =   5;
+	private static final int PG_BA =      6;
+	private static final int PG_SUPPORT = 7;
+	private static final int PG_TECH =    8;
+	private static final int PG_DOC =     9;
+	private static final int PG_NUM =     10;
+	
 	class ExtFileFilter extends FileFilter {
 		private String useExt = null;
 
@@ -321,6 +335,9 @@ public class MekHQView extends FrameView {
 		statusMessageLabel = new javax.swing.JLabel();
 		statusAnimationLabel = new javax.swing.JLabel();
 		progressBar = new javax.swing.JProgressBar();
+		lblPersonChoice = new javax.swing.JLabel();
+		choicePerson = new javax.swing.JComboBox();
+
 
 		mainPanel.setAutoscrolls(true);
 		mainPanel.setName("mainPanel"); // NOI18N
@@ -338,6 +355,35 @@ public class MekHQView extends FrameView {
 		panPersonnel.setName("panPersonnel"); // NOI18N
 		panPersonnel.setLayout(new java.awt.GridBagLayout());
 		
+		lblPersonChoice.setText(resourceMap.getString("lblPersonChoice.text")); // NOI18N
+		lblPersonChoice.setName("lblPersonChoice"); // NOI18N
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+		panPersonnel.add(lblPersonChoice, gridBagConstraints);
+		
+		DefaultComboBoxModel personGroupModel = new DefaultComboBoxModel();
+		for (int i = 0; i < PG_NUM; i++) {
+			personGroupModel.addElement(getPersonnelGroupName(i));
+		}
+		choicePerson.setModel(personGroupModel);
+		choicePerson.setName("choicePerson"); // NOI18N
+		choicePerson.setSelectedIndex(0);
+		choicePerson.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				filterPersonnel();
+			}
+		});
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 1;
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+		gridBagConstraints.weightx = 0.0;
+		gridBagConstraints.weighty = 0.0;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+		panPersonnel.add(choicePerson, gridBagConstraints);
+		
 		personnelTable.setModel(personModel);
 		personnelTable.setName("personnelTable"); // NOI18N
 		personnelTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -351,8 +397,8 @@ public class MekHQView extends FrameView {
 	
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 0;
-		gridBagConstraints.gridheight = 1;
+		gridBagConstraints.gridy = 1;
+		gridBagConstraints.gridwidth = 2;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 1.0;
@@ -1538,6 +1584,33 @@ public class MekHQView extends FrameView {
 
 		return file;
 	}
+	
+	public static String getPersonnelGroupName(int group) {
+    	switch(group) {
+    	case PG_ACTIVE:
+    		return "Active Personnel";
+    	case PG_COMBAT:
+    		return "Combat Personnel";
+    	case PG_MW:
+    		return "Mechwarriors";
+    	case PG_CREW:
+    		return "Vehicle Crews";
+    	case PG_PILOT:
+    		return "Aerospace Pilots";
+    	case PG_PROTO:
+    		return "Protomech Pilots";
+    	case PG_BA:
+    		return "Battle Armor Infantry";
+    	case PG_SUPPORT:
+    		return "Support Personnel";
+    	case PG_TECH:
+    		return "Techs";
+    	case PG_DOC:
+    		return "Doctors";
+    	default:
+    		return "?";
+    	}
+    }
 
 	private void btnOvertimeActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnOvertimeActionPerformed
 		campaign.setOvertime(btnOvertime.isSelected());
@@ -1965,16 +2038,23 @@ public class MekHQView extends FrameView {
 	
 	void filterPersonnel() {
         RowFilter<PersonnelTableModel, Integer> personTypeFilter = null;
-       // final int nType = comboType.getSelectedIndex();
-       // final int nClass = comboWeight.getSelectedIndex();
-       // final int nUnit = comboUnitType.getSelectedIndex();
-        //If current expression doesn't parse, don't update.
+       final int nGroup = choicePerson.getSelectedIndex();
         personTypeFilter = new RowFilter<PersonnelTableModel,Integer>() {
         	@Override
         	public boolean include(Entry<? extends PersonnelTableModel, ? extends Integer> entry) {
         		PersonnelTableModel personModel = entry.getModel();
         		Person person = personModel.getPerson(entry.getIdentifier());
-        		if (person.isDeployed()) {
+        		int type = person.getType();
+        		if ((nGroup == PG_ACTIVE) ||
+        				(nGroup == PG_COMBAT && type <= Person.T_BA) ||
+        				(nGroup == PG_SUPPORT && type > Person.T_BA) ||
+        				(nGroup == PG_MW && type == Person.T_MECHWARRIOR) ||
+        				(nGroup == PG_CREW && type == Person.T_VEE_CREW) ||
+        				(nGroup == PG_PILOT && type == Person.T_AERO_PILOT) ||
+        				(nGroup == PG_PROTO && type == Person.T_PROTO_PILOT) ||
+        				(nGroup == PG_BA && type == Person.T_BA) ||
+        				(nGroup == PG_TECH && type > Person.T_BA && type != Person.T_DOCTOR) ||
+        				(nGroup == PG_DOC && type == Person.T_DOCTOR)) {
         			return true;
         		}
         		return false;
@@ -3716,6 +3796,8 @@ public class MekHQView extends FrameView {
 	private javax.swing.JTextArea textTarget;
 	private javax.swing.JTextPane txtPaneReport;
 	private javax.swing.JScrollPane txtPaneReportScrollPane;
+	private javax.swing.JComboBox choicePerson;
+	private javax.swing.JLabel lblPersonChoice;
 	// End of variables declaration//GEN-END:variables
 
 	private final Timer messageTimer;
