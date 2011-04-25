@@ -48,15 +48,8 @@ import mekhq.campaign.work.HealPilot;
  */
 public class PilotPerson extends Person {
 	private static final long serialVersionUID = -4758195062070601267L;
-	public static final int T_MECH = 0;
-    public static final int T_VEE = 1;
-    public static final int T_AERO = 2;
-    public static final int T_PROTO = 3;
-    public static final int T_BA = 4;
-    public static final int T_NUM = 5;
     
     private Pilot pilot;
-    private int type;
     private Unit unit;
     private int unitId;
     
@@ -67,7 +60,7 @@ public class PilotPerson extends Person {
     public PilotPerson(Pilot p, int t) {
         super();
         this.pilot = p;
-        this.type = t;
+        setType(t);
         reCalc();
     }
     
@@ -84,31 +77,7 @@ public class PilotPerson extends Person {
         this.portraitCategory = pilot.getPortraitCategory();
         this.portraitFile = pilot.getPortraitFileName();
     }
-    
-    public int getType() {
-        return type;
-    }
-    
-    public static String getTypeDesc(int type) {
-        switch(type) {
-            case(T_MECH):
-                return "Mechwarrior";
-            case(T_VEE):
-                return "Vehicle crew";
-            case(T_AERO):
-                return "Aero Pilot";
-            case(T_PROTO):
-                return "Proto Pilot";
-            case(T_BA):
-                return "Battle armor Pilot";
-            default:
-                return "??";
-        }
-    }
-    
-    public String getTypeDesc() {
-        return getTypeDesc(type);
-    }
+
     
     @Override
     public String getSkillSummary() {
@@ -125,18 +94,18 @@ public class PilotPerson extends Person {
     	return level + skillString;
     }
     
-    public static int getType(Entity en) {
+    public static int getTypeBy(Entity en) {
         if(en instanceof Mech) {
-            return T_MECH;
+            return T_MECHWARRIOR;
         }
         else if(en instanceof Protomech) {
-            return T_PROTO;
+            return T_PROTO_PILOT;
         } 
         else if(en instanceof Aero) {
-            return T_AERO;
+            return T_AERO_PILOT;
         }
         else if(en instanceof Tank) {
-            return T_VEE;
+            return T_VEE_CREW;
         }
         else if(en instanceof BattleArmor) {
             return T_BA;
@@ -145,19 +114,19 @@ public class PilotPerson extends Person {
     }
     
     public boolean canPilot(Entity en) {
-        if(en instanceof Mech && type == T_MECH) {
+        if(en instanceof Mech && getType() == T_MECHWARRIOR) {
             return true;
         }
-        else if(en instanceof Protomech && type == T_PROTO) {
+        else if(en instanceof Protomech && getType() == T_PROTO_PILOT) {
             return true;
         } 
-        else if(en instanceof Aero && type == T_AERO) {
+        else if(en instanceof Aero && getType() == T_AERO_PILOT) {
             return true;
         }
-        else if(en instanceof Tank && type == T_VEE) {
+        else if(en instanceof Tank && getType() == T_VEE_CREW) {
             return true;
         }
-        else if(en instanceof BattleArmor && type == T_BA) {
+        else if(en instanceof BattleArmor && getType() == T_BA) {
             return true;
         }
         return false;
@@ -297,7 +266,7 @@ public class PilotPerson extends Person {
 		writeToXmlBegin(pw1, indent, id);
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<type>"
-				+type
+				+getType()
 				+"</type>");
 		
 		// If a pilot doesn't have a unit, well...
@@ -378,7 +347,7 @@ public class PilotPerson extends Person {
 			} else if (wn2.getNodeName().equalsIgnoreCase("pilotInitBonus")) {
 				pilotInitBonus = Integer.parseInt(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("type")) {
-				type = Integer.parseInt(wn2.getTextContent());
+				setType(Integer.parseInt(wn2.getTextContent()));
 			} else if (wn2.getNodeName().equalsIgnoreCase("unitId")) {
 				unitId = Integer.parseInt(wn2.getTextContent());
 			}
@@ -428,46 +397,4 @@ public class PilotPerson extends Person {
 	public void setUnit(Unit nt) {
 		unit = nt;
 	}
-    
-    @Override
-    public int getMonthlySalary() {
-    	int retVal = 0;
-
-    	switch (type) {
-		case T_MECH:
-			retVal = 1500;
-			break;
-		case T_VEE:
-			retVal = 900;
-			break;
-		case T_AERO:
-			retVal = 1500;
-			break;
-		case T_PROTO:
-			//TODO: Confirm ProtoMech pilots should be paid as BA pilots?
-			retVal = 960;
-			break;
-		case T_BA:
-			retVal = 960;
-			break;
-		case T_NUM:
-			// Not a real pilot type. If someone has this, they don't get paid!
-			break;
-    	}
-
-    	//TODO: Add conventional aircraft pilots.
-    	//TODO: Add regular infantry.
-    	//TODO: Add specialist/Anti-Mech infantry.
-    	//TODO: Add vessel crewmen (DropShip).
-    	//TODO: Add vessel crewmen (JumpShip).
-    	//TODO: Add vessel crewmen (WarShip).
-    	
-    	//TODO: Properly pay vehicle crews for actual size.
-    	//TODO: Properly pay large ship crews for actual size.
-
-    	//TODO: Add quality mod to salary calc..
-    	//TODO: Add era mod to salary calc..
-    	
-    	return retVal;
-    }
 }

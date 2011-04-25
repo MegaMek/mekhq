@@ -265,13 +265,13 @@ public class Campaign implements Serializable {
 		en.setGame(game);
 		
 		//figure out type for pilot addition
-		int type = PilotPerson.T_MECH;
+		int type = PilotPerson.T_MECHWARRIOR;
 		if (en instanceof Tank) {
-			type = PilotPerson.T_VEE;
+			type = PilotPerson.T_VEE_CREW;
 		} else if (en instanceof Protomech) {
-			type = PilotPerson.T_PROTO;
+			type = PilotPerson.T_PROTO_PILOT;
 		} else if (en instanceof Aero) {
-			type = PilotPerson.T_AERO;
+			type = PilotPerson.T_AERO_PILOT;
 		}
 
 		//first check to see if the externalId of this entity matches any units

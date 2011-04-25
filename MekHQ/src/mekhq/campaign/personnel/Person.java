@@ -37,6 +37,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlSerializable;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.team.SupportTeam;
+import mekhq.campaign.team.TechTeam;
 import mekhq.campaign.work.PersonnelWorkItem;
 
 /**
@@ -55,7 +56,20 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
 	public static final int G_MALE = 0;
 	public static final int G_FEMALE = 1;
 	
+	public static final int T_MECHWARRIOR = 0;
+	public static final int T_VEE_CREW = 1;
+	public static final int T_AERO_PILOT = 2;
+	public static final int T_PROTO_PILOT = 3;
+	public static final int T_BA = 4;
+	public static final int T_MECH_TECH = 5;
+    public static final int T_MECHANIC = 6;
+    public static final int T_AERO_TECH = 7;
+    public static final int T_BA_TECH = 8;
+    public static final int T_DOCTOR = 9;
+    public static final int T_NUM = 10;
+	
 	protected int id;
+    private int type;
     //any existing work item for this person
     protected PersonnelWorkItem task;
     protected int taskId;
@@ -113,6 +127,45 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
 
     public void setPortraitFileName(String s) {
         this.portraitFile = s;
+    }
+    
+    public int getType() {
+        return type;
+    }
+    
+    public void setType(int t) {
+    	this.type = t;
+    }
+
+    public static String getTypeDesc(int type) {
+        switch(type) {
+            case(T_MECHWARRIOR):
+                return "Mechwarrior";
+            case(T_VEE_CREW):
+                return "Vehicle crew";
+            case(T_AERO_PILOT):
+                return "Aero Pilot";
+            case(T_PROTO_PILOT):
+                return "Proto Pilot";
+            case(T_BA):
+                return "Battle armor Pilot";
+            case(T_MECH_TECH):
+                return "Mech Tech";
+            case(T_MECHANIC):
+                    return "Mechanic";
+            case(T_AERO_TECH):
+            	return "Aero Tech";
+            case(T_BA_TECH):
+                return "Battle Armor Tech";
+            case(T_DOCTOR):
+                return "Doctor";
+            default:
+                return "??";
+        }
+    }
+    
+    public String getTypeDesc() {
+        return getTypeDesc(type);
     }
     
     public void setGender(int g) {
@@ -345,14 +398,67 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
 		return retVal;
 	}
 	
+	public int getMonthlySalary() {
+		int retVal = 0;
+		
+		switch (getType()) {
+	    	case T_MECHWARRIOR:
+				retVal = 1500;
+				break;
+			case T_VEE_CREW:
+				retVal = 900;
+				break;
+			case T_AERO_PILOT:
+				retVal = 1500;
+				break;
+			case T_PROTO_PILOT:
+				//TODO: Confirm ProtoMech pilots should be paid as BA pilots?
+				retVal = 960;
+				break;
+			case T_BA:
+				retVal = 960;
+				break;
+			case T_MECH_TECH:
+				retVal = 800;
+				break;
+			case T_MECHANIC:
+				retVal = 640;
+				break;
+			case T_AERO_TECH:
+				retVal = 800;
+				break;
+			case T_BA_TECH:
+				retVal = 800;
+				break;
+			case T_DOCTOR:
+				retVal = 1500;
+				break;
+			case T_NUM:
+				// Not a real pilot type. If someone has this, they don't get paid!
+				break;
+		}
+
+		//TODO: Add conventional aircraft pilots.
+		//TODO: Add regular infantry.
+		//TODO: Add specialist/Anti-Mech infantry.
+		//TODO: Add vessel crewmen (DropShip).
+		//TODO: Add vessel crewmen (JumpShip).
+		//TODO: Add vessel crewmen (WarShip).
+		
+		//TODO: Properly pay vehicle crews for actual size.
+		//TODO: Properly pay large ship crews for actual size.
+		
+		//TODO: Add quality mod to salary calc..
+		//TODO: Add era mod to salary calc..
+		
+		return retVal;
+	}
+	
 	public abstract String getName();
 	
 	public abstract String getCallsign();
-	
-	public abstract String getTypeDesc();
 
 	public abstract String getSkillSummary();
-	
-	public abstract int getMonthlySalary();
+
 	protected abstract void loadFieldsFromXmlNode(Node wn);
 }

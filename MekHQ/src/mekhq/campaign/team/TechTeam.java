@@ -179,9 +179,4 @@ public class TechTeam extends SupportTeam {
 			}
 		}
 	}
-
-	@Override
-	public int getTeamType() {
-		return TYPE_TECH;
-	}
 }

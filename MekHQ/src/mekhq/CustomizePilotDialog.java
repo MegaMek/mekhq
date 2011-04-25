@@ -124,9 +124,11 @@ public class CustomizePilotDialog extends javax.swing.JDialog implements DialogO
         getContentPane().setLayout(new java.awt.GridBagLayout());
 
         DefaultComboBoxModel pilotTypeModel = new DefaultComboBoxModel();
-        for(int i = 0; i < PilotPerson.T_NUM; i++) {
-            pilotTypeModel.addElement(PilotPerson.getTypeDesc(i));
-        }
+        pilotTypeModel.addElement(PilotPerson.getTypeDesc(Person.T_MECHWARRIOR));
+        pilotTypeModel.addElement(PilotPerson.getTypeDesc(Person.T_VEE_CREW));
+        pilotTypeModel.addElement(PilotPerson.getTypeDesc(Person.T_AERO_PILOT));
+        pilotTypeModel.addElement(PilotPerson.getTypeDesc(Person.T_PROTO_PILOT));
+        pilotTypeModel.addElement(PilotPerson.getTypeDesc(Person.T_BA));
         choiceType.setModel(pilotTypeModel);
         choiceType.setMinimumSize(new java.awt.Dimension(200, 27));
         choiceType.setName("choiceType"); // NOI18N
@@ -477,6 +479,7 @@ public class CustomizePilotDialog extends javax.swing.JDialog implements DialogO
         String name = textName.getText();
         String nick = textNickname.getText();      
         person.setPilot(pilot);
+        person.setType(choiceType.getSelectedIndex());
         person.setBiography(txtBio.getText());
         person.setGender(choiceGender.getSelectedIndex());
         person.setBirthday(birthdate);              
@@ -505,7 +508,7 @@ public class CustomizePilotDialog extends javax.swing.JDialog implements DialogO
         	hqView.refreshPersonnelList();
         	hqView.refreshPatientList();
     		hqView.refreshReport();
-        	person = campaign.newPilotPerson(PilotPerson.T_MECH);
+        	person = campaign.newPilotPerson(PilotPerson.T_MECHWARRIOR);
         	refreshPilotAndOptions();
         } else {
         	Pilot p = person.getPilot();

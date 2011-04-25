@@ -281,6 +281,7 @@ private void btnHireActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
     	tech.setRating(rating);
     	tech.setType(type);
     	tech.setName(name);
+    	person.setType(person.getTypeBy(tech));
     	hqView.refreshPersonnelList();
     	hqView.refreshTechsList();
     	hqView.refreshPatientList();

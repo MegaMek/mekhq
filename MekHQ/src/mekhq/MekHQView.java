@@ -61,7 +61,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.RowFilter;
 import javax.swing.Timer;
+import javax.swing.RowFilter.Entry;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.MouseInputAdapter;
@@ -71,10 +73,13 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableRowSorter;
 
 import megamek.client.ui.swing.MechView;
+import megamek.client.ui.swing.MechSelectorDialog.MechTableModel;
 import megamek.common.AmmoType;
 import megamek.common.Entity;
 import megamek.common.EntityListFile;
+import megamek.common.EntityWeightClass;
 import megamek.common.MechFileParser;
+import megamek.common.MechSearchFilter;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
 import megamek.common.Mounted;
@@ -1327,7 +1332,7 @@ public class MekHQView extends FrameView {
 
 	private void miHirePilotActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miHirePilotActionPerformed
 		CustomizePilotDialog npd = new CustomizePilotDialog(getFrame(), true, 
-				campaign.newPilotPerson(PilotPerson.T_MECH), 
+				campaign.newPilotPerson(PilotPerson.T_MECHWARRIOR), 
 				true,
 				campaign,
 				this);
@@ -1723,7 +1728,7 @@ public class MekHQView extends FrameView {
 			// add any ejected pilots
 			for (Pilot pilot : parser.getPilots()) {
 				if (pilot.isEjected()) {
-					campaign.addPilot(pilot, PilotPerson.T_MECH, false);
+					campaign.addPilot(pilot, PilotPerson.T_MECHWARRIOR, false);
 				}
 			}
 		}
@@ -1957,6 +1962,26 @@ public class MekHQView extends FrameView {
 			lblTargetNum.setText("-");
 		}
 	}
+	
+	void filterPersonnel() {
+        RowFilter<PersonnelTableModel, Integer> personTypeFilter = null;
+       // final int nType = comboType.getSelectedIndex();
+       // final int nClass = comboWeight.getSelectedIndex();
+       // final int nUnit = comboUnitType.getSelectedIndex();
+        //If current expression doesn't parse, don't update.
+        personTypeFilter = new RowFilter<PersonnelTableModel,Integer>() {
+        	@Override
+        	public boolean include(Entry<? extends PersonnelTableModel, ? extends Integer> entry) {
+        		PersonnelTableModel personModel = entry.getModel();
+        		Person person = personModel.getPerson(entry.getIdentifier());
+        		if (person.isDeployed()) {
+        			return true;
+        		}
+        		return false;
+        	}
+        };
+        sorter.setRowFilter(personTypeFilter);
+    }
 	
 	protected int getSelectedTaskId() {
 		if(repairsSelected()) {

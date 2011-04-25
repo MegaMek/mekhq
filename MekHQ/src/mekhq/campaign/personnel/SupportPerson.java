@@ -28,6 +28,7 @@ import org.w3c.dom.NodeList;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
+import mekhq.campaign.team.MedicalTeam;
 import mekhq.campaign.team.SupportTeam;
 import mekhq.campaign.team.TechTeam;
 
@@ -47,6 +48,7 @@ public class SupportPerson extends Person {
     public SupportPerson(SupportTeam t) {
         super();
         this.team = t;
+        setType(getTypeBy(team));
         reCalc();
     }
     
@@ -55,25 +57,37 @@ public class SupportPerson extends Person {
     	// Do nothing.
     }
     
+    public int getTypeBy(SupportTeam team) {
+    	if(team instanceof MedicalTeam) {
+    		return T_DOCTOR;
+    	} else if(team instanceof TechTeam) {
+    		switch(((TechTeam)team).getType()) {
+    		case TechTeam.T_MECH:
+    			return Person.T_MECH_TECH;
+    		case TechTeam.T_MECHANIC:
+    			return Person.T_MECHANIC;
+    		case TechTeam.T_AERO:
+    			return Person.T_AERO_TECH;
+    		case TechTeam.T_BA:
+    			return Person.T_BA_TECH;
+    		}
+    	}
+    	return -1;
+    }
+    
     public SupportTeam getTeam() {
         return team;
     }
     
     public void setTeam(SupportTeam t) {
     	team = t;
+    	if(team instanceof TechTeam) {
+    		setType(getTypeBy(team));
+    	}
     }
     
     public int getTeamId() {
     	return teamId;
-    }
-   
-    
-    public String getTypeDesc() {
-    	if(null != team) {
-    		return team.getTypeDesc();
-    	} else {
-    		return "Unknown";
-    	}
     }
     
     @Override
@@ -168,43 +182,5 @@ public class SupportPerson extends Person {
 			}
 		}
 	}
-    
-    @Override
-    public int getMonthlySalary() {
-    	int retVal = 0;
-       	int type = team.getTeamType();
-       	int type2 = -1;
-       	
-       	if (type == SupportTeam.TYPE_TECH)
-       		type2 = ((TechTeam) team).getType();
 
-    	switch (type) {
-		case SupportTeam.TYPE_MEDICAL:
-			retVal = 1500;
-			break;
-		case SupportTeam.TYPE_TECH:
-			switch (type2) {
-			case TechTeam.T_MECH:
-				retVal = 800;
-				break;
-			case TechTeam.T_MECHANIC:
-				retVal = 640;
-				break;
-			case TechTeam.T_AERO:
-				retVal = 800;
-				break;
-			case TechTeam.T_BA:
-				retVal = 800;
-				break;
-			}
-    	}
-    	
-    	//TODO: Add Administrator.
-    	//TODO: Add Astech/Paramedic rules for salary.
-
-    	//TODO: Add era mod to salary calc.
-    	//TODO: Add quality mods to salary calc.
-    	
-    	return retVal;
-    }
 }

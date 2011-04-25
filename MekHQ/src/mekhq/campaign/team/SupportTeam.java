@@ -58,10 +58,6 @@ public abstract class SupportTeam implements Serializable, MekHqXmlSerializable 
     public static final int EXP_ELITE = 3;
     public static final int EXP_NUM = 4;
     
-    //TODO: Properly differentiate different tech types.
-    public static final int TYPE_MEDICAL = 0;
-    public static final int TYPE_TECH = 1;
-
     protected String name;
     protected int rating; 
     protected int id;
@@ -572,7 +568,6 @@ public abstract class SupportTeam implements Serializable, MekHqXmlSerializable 
 		
 		return retVal;
 	}
-
-	public abstract int getTeamType();
+	
 	protected abstract void loadFieldsFromXmlNode(Node wn);
 }

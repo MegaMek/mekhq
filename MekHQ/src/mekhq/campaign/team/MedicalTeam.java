@@ -119,9 +119,4 @@ public class MedicalTeam extends SupportTeam {
 	protected void loadFieldsFromXmlNode(Node wn) {
 		// Do nothing.
 	}
-
-	@Override
-	public int getTeamType() {
-		return TYPE_MEDICAL;
-	}
 }
