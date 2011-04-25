@@ -127,6 +127,7 @@ public class Campaign implements Serializable {
 	private SimpleDateFormat shortDateFormat;
 
 	private int faction;
+	private Ranks ranks;
 
 	private ArrayList<String> currentReport;
 
@@ -154,6 +155,7 @@ public class Campaign implements Serializable {
 		overtime = false;
 		gmMode = false;
 		faction = Faction.F_MERC;
+		ranks = new Ranks();
 	}
 
 	public String getName() {
@@ -1801,6 +1803,15 @@ public class Campaign implements Serializable {
 		birthdate.set(Calendar.DAY_OF_YEAR, randomDay);
 		person.setBirthday(birthdate);
 		return person;
+	}
+	
+	public Ranks getRanks() {
+		return ranks;
+	}
+	
+	public void setRanks(Ranks r) {
+		this.ranks = r;
+		//TODO: need to cycle through personnel and reassign ranks
 	}
 	
 }

@@ -82,6 +82,7 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
     protected int gender;
     protected GregorianCalendar birthday;
 
+    private int rank;
     protected int xp;
     
     //default constructor
@@ -92,6 +93,7 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
         xp = 0;
         gender = G_MALE;
         birthday = new GregorianCalendar(3042, Calendar.JANUARY, 1);
+        rank = 0;
     }
     
     public static String getGenderName(int gender) {
@@ -452,6 +454,14 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
 		//TODO: Add era mod to salary calc..
 		
 		return retVal;
+	}
+	
+	public int getRank() {
+		return rank;
+	}
+	
+	public void setRank(int r) {
+		this.rank = r;
 	}
 	
 	public abstract String getName();

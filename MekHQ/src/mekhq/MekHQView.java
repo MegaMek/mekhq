@@ -46,6 +46,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -388,6 +389,7 @@ public class MekHQView extends FrameView {
 		personnelTable.setName("personnelTable"); // NOI18N
 		personnelTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         sorter = new TableRowSorter<PersonnelTableModel>(personModel);
+        sorter.setComparator(PersonnelTableModel.COL_RANK, new RankSorter());
         sorter.setComparator(PersonnelTableModel.COL_GUN, new SkillSorter());
         sorter.setComparator(PersonnelTableModel.COL_PILOT, new SkillSorter());
         sorter.setComparator(PersonnelTableModel.COL_SKILL, new LevelSorter());
@@ -3067,14 +3069,23 @@ public class MekHQView extends FrameView {
 		}
 		
 		public void actionPerformed(ActionEvent action) {
-			String command = action.getActionCommand();
+			StringTokenizer st = new StringTokenizer(action.getActionCommand(), "|");
+            String command = st.nextToken();
 			int row = personnelTable.getSelectedRow();
 			if(row < 0) {
 				return;
 			}
 			Person selectedPerson = personModel.getPerson(personnelTable.convertRowIndexToModel(row));
 			
-			if (command.equalsIgnoreCase("KIA")) {
+			if(command.contains("RANK")) {
+				int rank = Integer.parseInt(st.nextToken());
+				selectedPerson.setRank(rank);
+				refreshUnitList();
+				refreshPatientList();
+				refreshPersonnelList();
+				refreshTechsList();
+				refreshDoctorsList();
+			} else if (command.equalsIgnoreCase("KIA")) {
 				if (selectedPerson.isDeployed()
 						&& (0 == JOptionPane.showConfirmDialog(
 								null,
@@ -3276,6 +3287,18 @@ public class MekHQView extends FrameView {
 				JCheckBoxMenuItem cbMenuItem = null;
 				// **lets fill the pop up menu**//
 				// retire
+
+				menu = new JMenu("Change Rank");
+				int rankOrder = 0;
+				for(String rank : campaign.getRanks().getAllRanks()) {
+					menuItem = new JMenuItem(rank);
+					menuItem.setActionCommand("RANK|" + rankOrder);
+					menuItem.addActionListener(this);
+					menuItem.setEnabled(true);
+					menu.add(menuItem);
+					rankOrder++;
+				}
+				popup.add(menu);
 				menuItem = new JMenuItem("Retire");
 				menuItem.setActionCommand("RETIRE");
 				menuItem.addActionListener(this);
@@ -3392,16 +3415,17 @@ public class MekHQView extends FrameView {
 	
 		private static final long serialVersionUID = -5207167419079014157L;
 		
-		private final static int COL_NAME = 0;
-        private final static int COL_CALL = 1;
-        private final static int COL_AGE = 2;
-        private final static int COL_GENDER = 3;
-        private final static int COL_TYPE = 4;
-        private final static int COL_GUN = 5;
-        private final static int COL_PILOT = 6;
-        private final static int COL_SKILL = 7;
-        private final static int COL_XP = 8;
-        private final static int N_COL = 9;
+		private final static int COL_RANK =   0;
+		private final static int COL_NAME =   1;
+        private final static int COL_CALL =   2;
+        private final static int COL_AGE =    3;
+        private final static int COL_GENDER = 4;
+        private final static int COL_TYPE =   5;
+        private final static int COL_GUN =    6;
+        private final static int COL_PILOT =  7;
+        private final static int COL_SKILL =  8;
+        private final static int COL_XP =     9;
+        private final static int N_COL =      10;
         
         private ArrayList<Person> data = new ArrayList<Person>();
         
@@ -3416,6 +3440,8 @@ public class MekHQView extends FrameView {
         @Override
         public String getColumnName(int column) {
             switch(column) {
+            	case COL_RANK:
+            		return "Rank";
                 case COL_NAME:
                     return "Name";
                 case COL_CALL:
@@ -3461,6 +3487,9 @@ public class MekHQView extends FrameView {
 
         public Object getValueAt(int row, int col) {
             Person p = data.get(row);
+            if(col == COL_RANK) {
+                return campaign.getRanks().getRank(p.getRank());
+            }
             if(col == COL_NAME) {
                 return p.getName();
             }
@@ -3500,6 +3529,30 @@ public class MekHQView extends FrameView {
         }
 
         
+	}
+	
+	/**
+	 * A comparator for ranks written as strings with "-" sorted to the bottom always
+	 * @author Jay Lawson
+	 *
+	 */
+	public class RankSorter implements Comparator<String> {
+
+		@Override
+		public int compare(String s0, String s1) {	
+			if(s0.equals("-") && s1.equals("-")) {
+				return 0;
+			} else if(s0.equals("-")) {
+				return 1;
+			} else if(s1.equals("-")) {
+				return -1;
+			} else {
+				//get the numbers associated with each rank string
+				int r0 = campaign.getRanks().getRankOrder(s0);
+				int r1 = campaign.getRanks().getRankOrder(s1);
+				return ((Comparable<Integer>)r0).compareTo(r1);
+			}			
+		}
 	}
 	
 	/**
