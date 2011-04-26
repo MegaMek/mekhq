@@ -345,6 +345,8 @@ public class MekHQView extends FrameView {
 		choicePerson = new javax.swing.JComboBox();
 		choicePersonView = new javax.swing.JComboBox();
 		lblPersonView = new javax.swing.JLabel();
+		scrollPersonnelView = new javax.swing.JScrollPane();
+		txtPersonnelView = new javax.swing.JTextPane();
 
 		mainPanel.setAutoscrolls(true);
 		mainPanel.setName("mainPanel"); // NOI18N
@@ -445,6 +447,11 @@ public class MekHQView extends FrameView {
             column.setPreferredWidth(personModel.getColumnWidth(i));
         }
         changePersonnelView();
+        personnelTable.getSelectionModel().addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                refreshPersonnelView();
+            }
+        });
         scrollPersonnelTable.setViewportView(personnelTable);
 	
 		gridBagConstraints = new java.awt.GridBagConstraints();
@@ -455,6 +462,22 @@ public class MekHQView extends FrameView {
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 1.0;
 		panPersonnel.add(scrollPersonnelTable, gridBagConstraints);
+		
+		txtPersonnelView.setContentType(resourceMap.getString("txtDesc.contentType")); // NOI18N
+		txtPersonnelView.setEditable(false);
+		txtPersonnelView.setFont(resourceMap.getFont("txtDesc.font")); // NOI18N
+		txtPersonnelView.setName("txtPersonnelView"); // NOI18N
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 5;
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.gridheight = 2;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+		gridBagConstraints.weightx = 0.0;
+		gridBagConstraints.weighty = 1.0;
+		scrollPersonnelView.setMinimumSize(new java.awt.Dimension(400, 200));
+		scrollPersonnelView.setPreferredSize(new java.awt.Dimension(400, 200));
+		scrollPersonnelView.setViewportView(txtPersonnelView);
+		panPersonnel.add(scrollPersonnelView, gridBagConstraints);
 		
 		tabMain.addTab(
 				resourceMap.getString("panPersonnel.TabConstraints.tabTitle"),
@@ -1719,6 +1742,17 @@ public class MekHQView extends FrameView {
 		refreshFunds();
 	}// GEN-LAST:event_miPurchaseUnitActionPerformed
 
+	private void refreshPersonnelView() {
+		int row = personnelTable.getSelectedRow();
+		if(row < 0) {
+			txtPersonnelView.setText("");
+			return;
+		}
+		Person selectedPerson = personModel.getPerson(personnelTable.convertRowIndexToModel(row));
+		txtPersonnelView.setText(selectedPerson.getDossier());
+		
+	}
+	
 	private void PartsFilterActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_PartsFilterActionPerformed
 		refreshPartsList();
 	}// GEN-LAST:event_PartsFilterActionPerformed
@@ -4300,6 +4334,8 @@ public class MekHQView extends FrameView {
 	private javax.swing.JLabel lblPersonChoice;
 	private javax.swing.JComboBox choicePersonView;
 	private javax.swing.JLabel lblPersonView;
+	private javax.swing.JScrollPane scrollPersonnelView;
+    private javax.swing.JTextPane txtPersonnelView;
 	// End of variables declaration//GEN-END:variables
 
 	private final Timer messageTimer;
