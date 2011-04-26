@@ -3220,6 +3220,7 @@ public class MekHQView extends FrameView {
 			ActionListener {
 		
 		private MekHQView view;
+		private ArrayList<Unit> units;
 		
 		public PersonnelTableMouseAdapter(MekHQView view) {
 			super();
@@ -3243,6 +3244,16 @@ public class MekHQView extends FrameView {
 				refreshPersonnelList();
 				refreshTechsList();
 				refreshDoctorsList();
+			} else if (command.contains("CHANGE_UNIT")) {
+				String sel = command.split(":")[1];
+				int selected = Integer.parseInt(sel);
+				if ((null != units) && (selected > -1)
+						&& (selected < units.size()) 
+						&& selectedPerson instanceof PilotPerson) {
+					campaign.changePilot(units.get(selected), (PilotPerson)selectedPerson);
+				}
+				refreshUnitList();
+				refreshPersonnelList();
 			} else if (command.equalsIgnoreCase("KIA")) {
 				if (selectedPerson.isDeployed()
 						&& (0 == JOptionPane.showConfirmDialog(
@@ -3439,6 +3450,7 @@ public class MekHQView extends FrameView {
 			if (e.isPopupTrigger()) {
 				int row = personnelTable.rowAtPoint(e.getPoint());
 				Person person = personModel.getPerson(row);
+				units = campaign.getEligibleUnitsFor(person);
 				JMenuItem menuItem = null;
 				JMenu menu = null;
 				JMenu impMenu = null;
@@ -3474,6 +3486,22 @@ public class MekHQView extends FrameView {
 				menuItem.addActionListener(this);
 				menuItem.setEnabled(true);
 				popup.add(menuItem);
+				// switch pilot
+				int i = 0;
+				menu = new JMenu("Assign to Unit");
+				for (Unit unit : units) {
+					cbMenuItem = new JCheckBoxMenuItem(unit.getEntity().getDisplayName());
+					if (unit.hasPilot()
+							&& (unit.getPilot().getId() == person.getId())) {
+						cbMenuItem.setSelected(true);
+					}
+					cbMenuItem.setActionCommand("CHANGE_UNIT:" + i);
+					cbMenuItem.addActionListener(this);
+					menu.add(cbMenuItem);
+					i++;
+				}
+				menu.setEnabled(!person.isDeployed());
+				popup.add(menu);
 				// TODO: add quirks?
 				menu = new JMenu("GM Mode");
 				menuItem = new JMenuItem("Remove Person");

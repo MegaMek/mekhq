@@ -895,6 +895,20 @@ public class Campaign implements Serializable {
 		}
 		return pilots;
 	}
+	
+	public ArrayList<Unit> getEligibleUnitsFor(Person person) {
+		ArrayList<Unit> units = new ArrayList<Unit>();
+		if(!(person instanceof PilotPerson)) {
+			return units;
+		}
+		PilotPerson pp = (PilotPerson)person;
+		for (Unit u : this.getUnits()) {
+			if (pp.canPilot(u.getEntity())) {
+				units.add(u);
+			}
+		}
+		return units;
+	}
 
 	public void changePilot(Unit unit, PilotPerson pilot) {
 		if (null != pilot.getAssignedUnit()) {
