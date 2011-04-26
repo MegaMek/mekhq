@@ -3261,8 +3261,13 @@ public class MekHQView extends FrameView {
 				refreshTechsList();
 				refreshDoctorsList();
 			} else if (command.contains("CHANGE_UNIT")) {
-				int selected = Integer.parseInt(st.nextToken());
-				if ((null != units) && (selected > -1)
+				int selected = Integer.parseInt(st.nextToken()) - 1;
+				if(selected == -1 && selectedPerson instanceof PilotPerson) {
+					Unit u = ((PilotPerson)selectedPerson).getAssignedUnit();
+					if(null != u) {
+						u.removePilot();
+					}
+				} else if(null != units
 						&& (selected < units.size()) 
 						&& selectedPerson instanceof PilotPerson) {
 					campaign.changePilot(units.get(selected), (PilotPerson)selectedPerson);
@@ -3442,21 +3447,31 @@ public class MekHQView extends FrameView {
 				}
 				popup.add(menu);
 				// switch pilot
-				int i = 0;
-				menu = new JMenu("Assign to Unit");
-				for (Unit unit : units) {
-					cbMenuItem = new JCheckBoxMenuItem(unit.getEntity().getDisplayName());
-					if (unit.hasPilot()
-							&& (unit.getPilot().getId() == person.getId())) {
+				if(person instanceof PilotPerson) {
+					PilotPerson pp = (PilotPerson)person;
+					menu = new JMenu("Assign to Unit");
+					cbMenuItem = new JCheckBoxMenuItem("None");
+					if(!pp.isAssigned()) {
 						cbMenuItem.setSelected(true);
 					}
-					cbMenuItem.setActionCommand("CHANGE_UNIT|" + i);
+					cbMenuItem.setActionCommand("CHANGE_UNIT|" + 0);
 					cbMenuItem.addActionListener(this);
 					menu.add(cbMenuItem);
-					i++;
+					int i = 1;
+					for (Unit unit : units) {
+						cbMenuItem = new JCheckBoxMenuItem(unit.getEntity().getDisplayName());
+						if (unit.hasPilot()
+								&& (unit.getPilot().getId() == person.getId())) {
+							cbMenuItem.setSelected(true);
+						}
+						cbMenuItem.setActionCommand("CHANGE_UNIT|" + i);
+						cbMenuItem.addActionListener(this);
+						menu.add(cbMenuItem);
+						i++;
+					}
+					menu.setEnabled(!person.isDeployed());
+					popup.add(menu);
 				}
-				menu.setEnabled(!person.isDeployed());
-				popup.add(menu);
 				menuItem = new JMenuItem("Add XP");
 				menuItem.setActionCommand("XP_ADD");
 				menuItem.addActionListener(this);
