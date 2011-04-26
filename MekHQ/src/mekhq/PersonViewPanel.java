@@ -51,6 +51,14 @@ public class PersonViewPanel extends javax.swing.JPanel {
 	private javax.swing.JLabel lblGun2;
 	private javax.swing.JLabel lblPilot1;
 	private javax.swing.JLabel lblPilot2;
+	private javax.swing.JLabel lblArty1;
+	private javax.swing.JLabel lblArty2;
+	private javax.swing.JLabel lblTactics1;
+	private javax.swing.JLabel lblTactics2;
+	private javax.swing.JLabel lblInit1;
+	private javax.swing.JLabel lblInit2;
+	private javax.swing.JLabel lblTough1;
+	private javax.swing.JLabel lblTough2;
 	
 	
 	public PersonViewPanel(Person p, Campaign c) {
@@ -177,6 +185,14 @@ public class PersonViewPanel extends javax.swing.JPanel {
 		lblGun2 = new javax.swing.JLabel();
 		lblPilot1 = new javax.swing.JLabel();
 		lblPilot2 = new javax.swing.JLabel();
+		lblArty1 = new javax.swing.JLabel();
+		lblArty2 = new javax.swing.JLabel();
+		lblTactics1 = new javax.swing.JLabel();
+		lblTactics2 = new javax.swing.JLabel();
+		lblInit1 = new javax.swing.JLabel();
+		lblInit2 = new javax.swing.JLabel();
+		lblTough1 = new javax.swing.JLabel();
+		lblTough2 = new javax.swing.JLabel();
     	
     	java.awt.GridBagConstraints gridBagConstraints;
 		pnlStats.setLayout(new java.awt.GridBagLayout());
@@ -294,6 +310,100 @@ public class PersonViewPanel extends javax.swing.JPanel {
 			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 			pnlStats.add(lblPilot2, gridBagConstraints);
+			
+			int nexty = 2;
+			
+			if(campaign.getCampaignOptions().useArtillery()) {
+				nexty++;
+				lblArty1.setName("lblArty1"); // NOI18N
+				lblArty1.setText(resourceMap.getString("lblArty1.text"));
+				gridBagConstraints = new java.awt.GridBagConstraints();
+				gridBagConstraints.gridx = 2;
+				gridBagConstraints.gridy = nexty;
+				gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+				gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+				pnlStats.add(lblArty1, gridBagConstraints);
+				
+				lblArty2.setName("lblArty2"); // NOI18N
+				lblArty2.setText(Integer.toString(pp.getPilot().getArtillery()));
+				gridBagConstraints = new java.awt.GridBagConstraints();
+				gridBagConstraints.gridx = 3;
+				gridBagConstraints.gridy = nexty;
+				gridBagConstraints.weightx = 0.5;
+				gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+				gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+				gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+				pnlStats.add(lblArty2, gridBagConstraints);
+			}
+			
+			if(campaign.getCampaignOptions().useTactics()) {
+				nexty++;
+				lblTactics1.setName("lblTactics1"); // NOI18N
+				lblTactics1.setText(resourceMap.getString("lblTactics1.text"));
+				gridBagConstraints = new java.awt.GridBagConstraints();
+				gridBagConstraints.gridx = 2;
+				gridBagConstraints.gridy = nexty;
+				gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+				gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+				pnlStats.add(lblTactics1, gridBagConstraints);
+				
+				lblTactics2.setName("lblTactics2"); // NOI18N
+				lblTactics2.setText(Integer.toString(pp.getPilot().getCommandBonus()));
+				gridBagConstraints = new java.awt.GridBagConstraints();
+				gridBagConstraints.gridx = 3;
+				gridBagConstraints.gridy = nexty;
+				gridBagConstraints.weightx = 0.5;
+				gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+				gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+				gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+				pnlStats.add(lblTactics2, gridBagConstraints);
+			}
+			
+			if(campaign.getCampaignOptions().useInitBonus()) {
+				nexty++;
+				lblInit1.setName("lblInit1"); // NOI18N
+				lblInit1.setText(resourceMap.getString("lblInit1.text"));
+				gridBagConstraints = new java.awt.GridBagConstraints();
+				gridBagConstraints.gridx = 2;
+				gridBagConstraints.gridy = nexty;
+				gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+				gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+				pnlStats.add(lblInit1, gridBagConstraints);
+				
+				lblInit2.setName("lblInit2"); // NOI18N
+				lblInit2.setText(Integer.toString(pp.getPilot().getInitBonus()));
+				gridBagConstraints = new java.awt.GridBagConstraints();
+				gridBagConstraints.gridx = 3;
+				gridBagConstraints.gridy = nexty;
+				gridBagConstraints.weightx = 0.5;
+				gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+				gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+				gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+				pnlStats.add(lblInit2, gridBagConstraints);
+			}
+			
+			if(campaign.getCampaignOptions().useToughness()) {
+				nexty++;
+				lblTough1.setName("lblTough1"); // NOI18N
+				lblTough1.setText(resourceMap.getString("lblTough1.text"));
+				gridBagConstraints = new java.awt.GridBagConstraints();
+				gridBagConstraints.gridx = 2;
+				gridBagConstraints.gridy = nexty;
+				gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+				gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+				pnlStats.add(lblTough1, gridBagConstraints);
+				
+				lblTough2.setName("lblTough2"); // NOI18N
+				lblTough2.setText(Integer.toString(pp.getPilot().getToughness()));
+				gridBagConstraints = new java.awt.GridBagConstraints();
+				gridBagConstraints.gridx = 3;
+				gridBagConstraints.gridy = nexty;
+				gridBagConstraints.weightx = 0.5;
+				gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+				gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+				gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+				pnlStats.add(lblTough2, gridBagConstraints);
+			}
 			
 		}
 		
