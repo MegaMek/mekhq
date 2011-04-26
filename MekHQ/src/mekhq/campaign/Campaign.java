@@ -1819,4 +1819,12 @@ public class Campaign implements Serializable {
 		}
 	}
 	
+	public String getFullTitleFor(Person p) {
+		String rank = getRanks().getRank(p.getRank());
+		if(rank.equalsIgnoreCase("None")) {
+			rank = "";
+		}
+		return rank + " " + p.getName();
+	}
+	
 }

@@ -474,8 +474,9 @@ public class MekHQView extends FrameView {
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 		gridBagConstraints.weightx = 0.0;
 		gridBagConstraints.weighty = 1.0;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		scrollPersonnelView.setMinimumSize(new java.awt.Dimension(400, 200));
-		scrollPersonnelView.setPreferredSize(new java.awt.Dimension(400, 200));
+		scrollPersonnelView.setPreferredSize(new java.awt.Dimension(400, 600));
 		scrollPersonnelView.setViewportView(txtPersonnelView);
 		panPersonnel.add(scrollPersonnelView, gridBagConstraints);
 		
@@ -1745,11 +1746,12 @@ public class MekHQView extends FrameView {
 	private void refreshPersonnelView() {
 		int row = personnelTable.getSelectedRow();
 		if(row < 0) {
-			txtPersonnelView.setText("");
+			//txtPersonnelView.setText("");
 			return;
 		}
 		Person selectedPerson = personModel.getPerson(personnelTable.convertRowIndexToModel(row));
-		txtPersonnelView.setText(selectedPerson.getDossier());
+		//txtPersonnelView.setText(selectedPerson.getDossier());
+		scrollPersonnelView.setViewportView(new PersonViewPanel(selectedPerson, campaign));
 		
 	}
 	
