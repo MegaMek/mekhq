@@ -203,53 +203,6 @@ public class PilotPerson extends Person {
     public boolean needsHealing() {
         return (getPilot().getHits() > 0);
     }
-
-    @Override
-    public String getDossier() {
-        File file = new File(".");
-        String path = file.getAbsolutePath();
-        
-        path = path.replace(".", "");
-        String category = getPortraitCategory();
-        String image = getPortraitFileName();
-        if(category.equals(Pilot.ROOT_PORTRAIT)) {
-            category = "";
-        }
-        String toReturn = "<html><b>" + pilot.getName() + "</b><br/>";
-        toReturn += "<i>" + pilot.getNickname() + "</i><br/><br/>";
-        if(!image.equals(Pilot.PORTRAIT_NONE)) {
-            toReturn += "<img src=\"file://" + path + "data/images/portraits/" + category + image + "\"/>";
-        }
-        toReturn += "<table>";
-        toReturn += "<tr><td><b>Gunnery:</b></td><td>" + pilot.getGunnery() + "</td></tr>";
-        toReturn += "<tr><td><b>Piloting:</b></td><td>" + pilot.getPiloting() + "</td></tr>";
-        toReturn += "<tr><td><b>Iniative Bonus:</b></td><td>" + pilot.getInitBonus() + "</td></tr>";
-        toReturn += "<tr><td><b>Commander Bonus:</b></td><td>" + pilot.getCommandBonus() + "</td></tr>";
-        toReturn += "<tr><td><b>XP:</b></td><td>" + getXp() + "</td></tr>";
-        toReturn += "</table>";
-     
-        for (Enumeration<IOptionGroup> advGroups = pilot.getOptions().getGroups(); advGroups.hasMoreElements();) {
-            IOptionGroup advGroup = advGroups.nextElement();
-            if(pilot.countOptions(advGroup.getKey()) > 0) {
-                toReturn += "<p/><b><u>" + advGroup.getDisplayableName() + "</u></b><br/>";    
-                for (Enumeration<IOption> advs = advGroup.getOptions(); advs.hasMoreElements();) {
-                    IOption adv = advs.nextElement();
-                    if(adv.booleanValue()) {
-                        toReturn += "  " + adv.getDisplayableNameWithValue() + "<br/>";
-                    }
-                }
-            }
-        }
-        
-        if(null != getBiography() && getBiography().length() > 0) {
-            toReturn += "<br/><br/><b>Biography</b><br/>";
-            toReturn += getBiography();
-        }
-        toReturn += "</html>";
-        
-        
-        return toReturn;
-    }
     
     @Override
     public void setPortraitCategory(String s) {

@@ -3388,19 +3388,6 @@ public class MekHQView extends FrameView {
 		}
 
 		@Override
-		public void mouseClicked(MouseEvent e) {
-			if (e.getClickCount() == 2) {
-				int row = personnelTable.rowAtPoint(e.getPoint());
-				Person person = personModel.getPerson(row);
-				if (null != person) {
-					PersonViewDialog pvd = new PersonViewDialog(null, true,
-							person);
-					pvd.setVisible(true);
-				}
-			}
-		}
-
-		@Override
 		public void mousePressed(MouseEvent e) {
 			maybeShowPopup(e);
 		}

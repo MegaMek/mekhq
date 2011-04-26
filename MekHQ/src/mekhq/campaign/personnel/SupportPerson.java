@@ -155,14 +155,6 @@ public class SupportPerson extends Person {
     public boolean needsHealing() {
        return (team.getCasualties() > 0);
     }
-  
-    @Override
-    public String getDossier() {
-        String toReturn = "<b>" + team.getName() + "</b><br/>";
-        toReturn += "<b>XP:" + getXp() + "</b><br/>";
-        
-        return toReturn;
-    }
 
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent, int id) {

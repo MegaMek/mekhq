@@ -305,13 +305,7 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
             task.setTeam(null);
         }
     }
-    
-    /**
-     * 
-     * @return an html String report for the person
-     */
-    public abstract String getDossier();
-    
+  
     public String getBiography() {
         return biography;
     }
