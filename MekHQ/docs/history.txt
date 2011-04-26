@@ -27,6 +27,7 @@ v0.1.4 (SVN)
 + set preferred widths of personnel table column
 + view chooser in PersonnelTable
 + Personnel Viewer
++ replaced Personnel#GetDossier with a PersonnelViewPanel
 
 v0.1.3 (2011-04-22)
 + Bug 3288095: Tasks are not refreshing and dates do not advance
