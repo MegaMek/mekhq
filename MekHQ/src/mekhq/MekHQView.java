@@ -136,7 +136,8 @@ public class MekHQView extends FrameView {
 	//personnel views
 	private static final int PV_GENERAL = 0;
 	private static final int PV_COMBAT  = 1;
-	private static final int PV_NUM     = 2;
+	private static final int PV_FLUFF   = 2;
+	private static final int PV_NUM     = 3;
 	
 	class ExtFileFilter extends FileFilter {
 		private String useExt = null;
@@ -475,8 +476,8 @@ public class MekHQView extends FrameView {
 		gridBagConstraints.weightx = 0.0;
 		gridBagConstraints.weighty = 1.0;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		scrollPersonnelView.setMinimumSize(new java.awt.Dimension(400, 200));
-		scrollPersonnelView.setPreferredSize(new java.awt.Dimension(400, 600));
+		scrollPersonnelView.setMinimumSize(new java.awt.Dimension(450, 600));
+		scrollPersonnelView.setPreferredSize(new java.awt.Dimension(450, 600));
 		scrollPersonnelView.setViewportView(txtPersonnelView);
 		panPersonnel.add(scrollPersonnelView, gridBagConstraints);
 		
@@ -1692,8 +1693,10 @@ public class MekHQView extends FrameView {
     	switch(group) {
     	case PV_GENERAL:
     		return "General";
-    	case PG_COMBAT:
+    	case PV_COMBAT:
     		return "Combat Skills";
+    	case PV_FLUFF:
+    		return "Fluff Information";
     	default:
     		return "?";
     	}
@@ -1746,7 +1749,7 @@ public class MekHQView extends FrameView {
 	private void refreshPersonnelView() {
 		int row = personnelTable.getSelectedRow();
 		if(row < 0) {
-			//txtPersonnelView.setText("");
+			scrollPersonnelView.setViewportView(null);
 			return;
 		}
 		Person selectedPerson = personModel.getPerson(personnelTable.convertRowIndexToModel(row));
@@ -2172,8 +2175,8 @@ public class MekHQView extends FrameView {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NAME), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_CALL), false);
-			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_AGE), true);
-			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GENDER), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_AGE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GENDER), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TYPE), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SKILL), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ASSIGN), true);
@@ -2184,7 +2187,6 @@ public class MekHQView extends FrameView {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_INIT), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TOUGH), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT), false);
-
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), true);	
 		} else if(view == PV_COMBAT) {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
@@ -2201,6 +2203,22 @@ public class MekHQView extends FrameView {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TACTICS), campaign.getCampaignOptions().useTactics());
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_INIT), campaign.getCampaignOptions().useInitBonus());
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TOUGH), campaign.getCampaignOptions().useToughness());
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), false);	
+		} else if(view == PV_FLUFF) {
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NAME), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_CALL), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_AGE), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GENDER), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TYPE), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SKILL), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ASSIGN), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ARTY), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TACTICS), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_INIT), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TOUGH), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), false);	
 		}
 	}

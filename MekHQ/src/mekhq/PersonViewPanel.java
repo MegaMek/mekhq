@@ -79,9 +79,7 @@ public class PersonViewPanel extends javax.swing.JPanel {
 		lblUnit = new javax.swing.JLabel();
 		pnlStats = new javax.swing.JPanel();
 		txtDesc = new javax.swing.JTextArea();
-		
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(PersonViewPanel.class);
-        
+		       
 		setLayout(new java.awt.GridBagLayout());
 
 		setBackground(Color.WHITE);
@@ -105,9 +103,7 @@ public class PersonViewPanel extends javax.swing.JPanel {
 		add(lblUnit, gridBagConstraints);
 		
 		pnlStats.setName("pnlStats");
-		pnlStats.setBorder(BorderFactory.createCompoundBorder(
-				BorderFactory.createTitledBorder(campaign.getFullTitleFor(person)),
-                BorderFactory.createEmptyBorder(2,2,2,2)));
+		pnlStats.setBorder(BorderFactory.createTitledBorder(campaign.getFullTitleFor(person)));
 		pnlStats.setBackground(Color.WHITE);
 		fillStats();
 		gridBagConstraints = new java.awt.GridBagConstraints();
@@ -130,6 +126,7 @@ public class PersonViewPanel extends javax.swing.JPanel {
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 2;
 		gridBagConstraints.gridwidth = 2;
+		gridBagConstraints.weighty = 1.0;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		add(txtDesc, gridBagConstraints);
@@ -204,8 +201,9 @@ public class PersonViewPanel extends javax.swing.JPanel {
 		gridBagConstraints.gridy = 0;
 		gridBagConstraints.gridwidth = 4;
 		gridBagConstraints.weightx = 1.0;
+		gridBagConstraints.weighty = 0.0;
 		gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
-		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblType, gridBagConstraints);
 		
