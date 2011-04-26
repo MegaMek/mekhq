@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<campaign>
+	<info>
+		<name>Fox's Teeth</name>
+		<faction>3</faction>
+		<ranks>1</ranks>
+		<funds>0</funds>
+		<nameGen>FS</nameGen>
+		<percentFemale>50</percentFemale>
+		<overtime>false</overtime>
+		<gmMode>false</gmMode>
+		<camoCategory></camoCategory>
+		<camoFileName>Wood1.jpg</camoFileName>
+		<colorIndex>0</colorIndex>
+		<lastTeamId>0</lastTeamId>
+		<lastUnitId>0</lastUnitId>
+		<lastTaskId>0</lastTaskId>
+		<lastPersonId>12</lastPersonId>
+		<lastPartId>0</lastPartId>
+		<calendar>3048-01-01 12:00:00</calendar>
+		<dateFormat>EEEE, MMMM d yyyy</dateFormat>
+		<shortDateFormat>MMddyyyy</shortDateFormat>
+		<nameGen>
+			<faction>FS</faction>
+			<percentFemale>50</percentFemale>
+		</nameGen>
+		<currentReport>
+			<reportLine><![CDATA[Sara Lytton [3/4 Mechwarrior] has been added to the personnel roster.]]></reportLine>
+			<reportLine><![CDATA[Robert Grey [1/2 Mechwarrior] has been added to the personnel roster.]]></reportLine>
+			<reportLine><![CDATA[Mateo Alvarez [2/3 Mechwarrior] has been added to the personnel roster.]]></reportLine>
+			<reportLine><![CDATA[Ross McKinnon [2/3 Mechwarrior] has been added to the personnel roster.]]></reportLine>
+			<reportLine><![CDATA[Henrik Dekker [2/3 Mechwarrior] has been added to the personnel roster.]]></reportLine>
+			<reportLine><![CDATA[Dave Hill [3/4 Mechwarrior] has been added to the personnel roster.]]></reportLine>
+			<reportLine><![CDATA[Hiro Chipende [4/5 Mechwarrior] has been added to the personnel roster.]]></reportLine>
+			<reportLine><![CDATA[Paul Danton [2/3 Mechwarrior] has been added to the personnel roster.]]></reportLine>
+			<reportLine><![CDATA[Daniel Waylen [3/4 Mechwarrior] has been added to the personnel roster.]]></reportLine>
+			<reportLine><![CDATA[Austin Vorster [3/4 Mechwarrior] has been added to the personnel roster.]]></reportLine>
+			<reportLine><![CDATA[George Lytton [2/3 Mechwarrior] has been added to the personnel roster.]]></reportLine>
+			<reportLine><![CDATA[Ian McKinnon [2/3 Mechwarrior] has been added to the personnel roster.]]></reportLine>
+			<reportLine><![CDATA[<b>Tuesday, January 1 3067</b>]]></reportLine>
+		</currentReport>
+	</info>
+	<campaignOptions>
+		<useFactionModifiers>false</useFactionModifiers>
+		<clanPriceModifier>1.0</clanPriceModifier>
+		<useEasierRefit>false</useEasierRefit>
+		<useFinances>false</useFinances>
+		<useFactionForNames>true</useFactionForNames>
+		<repairSystem>0</repairSystem>
+		<useTactics>false</useTactics>
+		<useInitBonus>false</useInitBonus>
+		<useToughness>false</useToughness>
+		<useArtillery>false</useArtillery>
+		<useAbilities>true</useAbilities>
+		<useImplants>false</useImplants>
+	</campaignOptions>
+	<teams>
+	</teams>
+	<units>
+	</units>
+	<tasks>
+	</tasks>
+	<personnel>
+		<person id="12" type="mekhq.campaign.personnel.PilotPerson">
+			<biography></biography>
+			<daysRest>0</daysRest>
+			<deployed>false</deployed>
+			<id>12</id>
+			<portraitCategory>FoxsTeeth/</portraitCategory>
+			<portraitFile>SaraLytton.png</portraitFile>
+			<xp>0</xp>
+			<gender>1</gender>
+			<rank>5</rank>
+			<birthday>3021-12-14 12:00:00</birthday>
+			<type>0</type>
+			<pilotName>Sara Lytton</pilotName>
+			<pilotGunnery>3</pilotGunnery>
+			<pilotPiloting>4</pilotPiloting>
+			<pilotHits>0</pilotHits>
+			<pilotCommandBonus>0</pilotCommandBonus>
+			<pilotInitBonus>0</pilotInitBonus>
+			<pilotNickname></pilotNickname>
+		</person>
+		<person id="11" type="mekhq.campaign.personnel.PilotPerson">
+			<biography></biography>
+			<daysRest>0</daysRest>
+			<deployed>false</deployed>
+			<id>11</id>
+			<portraitCategory>FoxsTeeth/</portraitCategory>
+			<portraitFile>Grey.png</portraitFile>
+			<xp>0</xp>
+			<gender>0</gender>
+			<rank>5</rank>
+			<birthday>3004-11-15 12:00:00</birthday>
+			<type>0</type>
+			<pilotName>Robert Grey</pilotName>
+			<pilotGunnery>1</pilotGunnery>
+			<pilotPiloting>2</pilotPiloting>
+			<pilotHits>0</pilotHits>
+			<pilotCommandBonus>0</pilotCommandBonus>
+			<pilotInitBonus>0</pilotInitBonus>
+			<pilotNickname></pilotNickname>
+		</person>
+		<person id="10" type="mekhq.campaign.personnel.PilotPerson">
+			<biography></biography>
+			<daysRest>0</daysRest>
+			<deployed>false</deployed>
+			<id>10</id>
+			<portraitCategory>FoxsTeeth/</portraitCategory>
+			<portraitFile>Alvarez.png</portraitFile>
+			<xp>0</xp>
+			<gender>0</gender>
+			<rank>5</rank>
+			<birthday>2999-08-18 12:00:00</birthday>
+			<type>0</type>
+			<pilotName>Mateo Alvarez</pilotName>
+			<pilotGunnery>2</pilotGunnery>
+			<pilotPiloting>3</pilotPiloting>
+			<pilotHits>0</pilotHits>
+			<pilotCommandBonus>0</pilotCommandBonus>
+			<pilotInitBonus>0</pilotInitBonus>
+			<pilotNickname></pilotNickname>
+		</person>
+		<person id="9" type="mekhq.campaign.personnel.PilotPerson">
+			<biography></biography>
+			<daysRest>0</daysRest>
+			<deployed>false</deployed>
+			<id>9</id>
+			<portraitCategory>FoxsTeeth/</portraitCategory>
+			<portraitFile>RossMcKinnon.png</portraitFile>
+			<xp>0</xp>
+			<gender>0</gender>
+			<rank>10</rank>
+			<birthday>3015-05-25 12:00:00</birthday>
+			<type>0</type>
+			<pilotName>Ross McKinnon</pilotName>
+			<pilotGunnery>2</pilotGunnery>
+			<pilotPiloting>3</pilotPiloting>
+			<pilotHits>0</pilotHits>
+			<pilotCommandBonus>0</pilotCommandBonus>
+			<pilotInitBonus>0</pilotInitBonus>
+			<pilotNickname></pilotNickname>
+		</person>
+		<person id="8" type="mekhq.campaign.personnel.PilotPerson">
+			<biography></biography>
+			<daysRest>0</daysRest>
+			<deployed>false</deployed>
+			<id>8</id>
+			<portraitCategory>FoxsTeeth/</portraitCategory>
+			<portraitFile>Dekker.png</portraitFile>
+			<xp>0</xp>
+			<gender>0</gender>
+			<rank>5</rank>
+			<birthday>2991-08-22 12:00:00</birthday>
+			<type>0</type>
+			<pilotName>Henrik Dekker</pilotName>
+			<pilotGunnery>2</pilotGunnery>
+			<pilotPiloting>3</pilotPiloting>
+			<pilotHits>0</pilotHits>
+			<pilotCommandBonus>0</pilotCommandBonus>
+			<pilotInitBonus>0</pilotInitBonus>
+			<pilotNickname></pilotNickname>
+		</person>
+		<person id="7" type="mekhq.campaign.personnel.PilotPerson">
+			<biography></biography>
+			<daysRest>0</daysRest>
+			<deployed>false</deployed>
+			<id>7</id>
+			<portraitCategory>FoxsTeeth/</portraitCategory>
+			<portraitFile>Hill.png</portraitFile>
+			<xp>0</xp>
+			<gender>0</gender>
+			<rank>5</rank>
+			<birthday>3019-01-15 12:00:00</birthday>
+			<type>0</type>
+			<pilotName>Dave Hill</pilotName>
+			<pilotGunnery>3</pilotGunnery>
+			<pilotPiloting>4</pilotPiloting>
+			<pilotHits>0</pilotHits>
+			<pilotCommandBonus>0</pilotCommandBonus>
+			<pilotInitBonus>0</pilotInitBonus>
+			<pilotNickname>Tiny</pilotNickname>
+		</person>
+		<person id="6" type="mekhq.campaign.personnel.PilotPerson">
+			<biography></biography>
+			<daysRest>0</daysRest>
+			<deployed>false</deployed>
+			<id>6</id>
+			<portraitCategory>FoxsTeeth/</portraitCategory>
+			<portraitFile>Chipende.png</portraitFile>
+			<xp>0</xp>
+			<gender>0</gender>
+			<rank>5</rank>
+			<birthday>3020-07-15 12:00:00</birthday>
+			<type>0</type>
+			<pilotName>Hiro Chipende</pilotName>
+			<pilotGunnery>4</pilotGunnery>
+			<pilotPiloting>5</pilotPiloting>
+			<pilotHits>0</pilotHits>
+			<pilotCommandBonus>0</pilotCommandBonus>
+			<pilotInitBonus>0</pilotInitBonus>
+			<pilotNickname></pilotNickname>
+		</person>
+		<person id="5" type="mekhq.campaign.personnel.PilotPerson">
+			<biography></biography>
+			<daysRest>0</daysRest>
+			<deployed>false</deployed>
+			<id>5</id>
+			<portraitCategory>FoxsTeeth/</portraitCategory>
+			<portraitFile>Danton.png</portraitFile>
+			<xp>0</xp>
+			<gender>0</gender>
+			<rank>10</rank>
+			<birthday>3000-08-09 12:00:00</birthday>
+			<type>0</type>
+			<pilotName>Paul Danton</pilotName>
+			<pilotGunnery>2</pilotGunnery>
+			<pilotPiloting>3</pilotPiloting>
+			<pilotHits>0</pilotHits>
+			<pilotCommandBonus>0</pilotCommandBonus>
+			<pilotInitBonus>0</pilotInitBonus>
+			<pilotNickname></pilotNickname>
+		</person>
+		<person id="4" type="mekhq.campaign.personnel.PilotPerson">
+			<biography></biography>
+			<daysRest>0</daysRest>
+			<deployed>false</deployed>
+			<id>4</id>
+			<portraitCategory>FoxsTeeth/</portraitCategory>
+			<portraitFile>Waylen.png</portraitFile>
+			<xp>0</xp>
+			<gender>0</gender>
+			<rank>5</rank>
+			<birthday>3008-11-25 12:00:00</birthday>
+			<type>0</type>
+			<pilotName>Daniel Waylen</pilotName>
+			<pilotGunnery>3</pilotGunnery>
+			<pilotPiloting>4</pilotPiloting>
+			<pilotHits>0</pilotHits>
+			<pilotCommandBonus>0</pilotCommandBonus>
+			<pilotInitBonus>0</pilotInitBonus>
+			<pilotNickname></pilotNickname>
+		</person>
+		<person id="3" type="mekhq.campaign.personnel.PilotPerson">
+			<biography></biography>
+			<daysRest>0</daysRest>
+			<deployed>false</deployed>
+			<id>3</id>
+			<portraitCategory>FoxsTeeth/</portraitCategory>
+			<portraitFile>Vorster.png</portraitFile>
+			<xp>0</xp>
+			<gender>0</gender>
+			<rank>5</rank>
+			<birthday>3004-09-28 12:00:00</birthday>
+			<type>0</type>
+			<pilotName>Austin Vorster</pilotName>
+			<pilotGunnery>3</pilotGunnery>
+			<pilotPiloting>4</pilotPiloting>
+			<pilotHits>0</pilotHits>
+			<pilotCommandBonus>0</pilotCommandBonus>
+			<pilotInitBonus>0</pilotInitBonus>
+			<pilotNickname></pilotNickname>
+		</person>
+		<person id="2" type="mekhq.campaign.personnel.PilotPerson">
+			<biography>Members of the Lytton family have served the McKinnons as bodyguards for more than two centuries. George Lytton’s father fell at the Fourth Battle of Harrow’s Sun while guarding Ross McKinnon, Ian’s father. Since that day, George protected Ian McKinnon’s back in fiercely fought campaigns, raids and border skirmishes. A grim and powerfully built man, Lytton’s combat training went beyond that of the average MechWarrior. An expert with small arms and hand-to-hand combat, he also served as the Raiders’ weapons master.
+
+When an assassin was sent to kill Ian, he attacked 
+Lytton during a Kurita raid. When the Fox’s Teeth moved out to engage the DCMS troops, the assassin took George’s place at the controls of his old Warhammer. Despite his injuries, George was able to warn his Captain before the assassin could complete his assignment.
+
+Lytton’s duty was always to his Captain, and when the time came he sacrificed his life to save McKinnon from the Jade Falcons on Wotan in 3051.</biography>
+			<daysRest>0</daysRest>
+			<deployed>false</deployed>
+			<id>2</id>
+			<portraitCategory>FoxsTeeth/</portraitCategory>
+			<portraitFile>Lytton.png</portraitFile>
+			<xp>0</xp>
+			<gender>0</gender>
+			<rank>6</rank>
+			<birthday>2992-11-28 12:00:00</birthday>
+			<type>0</type>
+			<pilotName>George Lytton</pilotName>
+			<pilotGunnery>2</pilotGunnery>
+			<pilotPiloting>3</pilotPiloting>
+			<pilotHits>0</pilotHits>
+			<pilotCommandBonus>0</pilotCommandBonus>
+			<pilotInitBonus>0</pilotInitBonus>
+			<pilotNickname></pilotNickname>
+		</person>
+		<person id="1" type="mekhq.campaign.personnel.PilotPerson">
+			<biography></biography>
+			<daysRest>0</daysRest>
+			<deployed>false</deployed>
+			<id>1</id>
+			<portraitCategory>FoxsTeeth/</portraitCategory>
+			<portraitFile>McKinnon.png</portraitFile>
+			<xp>0</xp>
+			<gender>0</gender>
+			<rank>11</rank>
+			<birthday>2994-04-04 12:00:00</birthday>
+			<type>0</type>
+			<pilotName>Ian McKinnon</pilotName>
+			<pilotGunnery>2</pilotGunnery>
+			<pilotPiloting>3</pilotPiloting>
+			<pilotHits>0</pilotHits>
+			<pilotCommandBonus>0</pilotCommandBonus>
+			<pilotInitBonus>0</pilotInitBonus>
+			<pilotNickname></pilotNickname>
+		</person>
+	</personnel>
+	<parts>
+	</parts>
+</campaign>
