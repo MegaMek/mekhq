@@ -3539,6 +3539,22 @@ public class MekHQView extends FrameView {
 						menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
 						menu.add(menuItem);
 					}
+				} else if(person instanceof SupportPerson) {
+					SupportTeam team = ((SupportPerson)person).getTeam();
+					int type = SkillCosts.SK_TECH;
+					if(team instanceof MedicalTeam) {
+						type = SkillCosts.SK_MED;
+					}
+					int cost = campaign.getSkillCosts().getCost(type, team.getRating() + 1, true);
+					String costDesc = " (" + cost + "XP)";
+					if(cost < 0) {
+						costDesc = " (Not Possible)";
+					}
+					menuItem = new JMenuItem(SkillCosts.getSkillName(type)   + costDesc);
+					menuItem.setActionCommand("IMPROVE|" + type + "|" + cost);
+					menuItem.addActionListener(this);
+					menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
+					menu.add(menuItem);
 				}
 				popup.add(menu);
 				// change portrait
