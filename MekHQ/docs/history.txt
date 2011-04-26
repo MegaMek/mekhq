@@ -33,6 +33,7 @@ v0.1.4 (SVN)
 + Bug: Personnel portrait not correct scale
 + vertical allignment of personnelviewpanel in scrollbar fixed
 + added fluff information view to PersonnelTable
++ better text wrapping in PersonnelViewTable
 
 v0.1.3 (2011-04-22)
 + Bug 3288095: Tasks are not refreshing and dates do not advance

@@ -262,12 +262,9 @@
 			<pilotNickname></pilotNickname>
 		</person>
 		<person id="2" type="mekhq.campaign.personnel.PilotPerson">
-			<biography>Members of the Lytton family have served the McKinnons as bodyguards for more than two centuries. George Lytton’s father fell at the Fourth Battle of Harrow’s Sun while guarding Ross McKinnon, Ian’s father. Since that day, George protected Ian McKinnon’s back in fiercely fought campaigns, raids and border skirmishes. A grim and powerfully built man, Lytton’s combat training went beyond that of the average MechWarrior. An expert with small arms and hand-to-hand combat, he also served as the Raiders’ weapons master.
-
-When an assassin was sent to kill Ian, he attacked 
-Lytton during a Kurita raid. When the Fox’s Teeth moved out to engage the DCMS troops, the assassin took George’s place at the controls of his old Warhammer. Despite his injuries, George was able to warn his Captain before the assassin could complete his assignment.
-
-Lytton’s duty was always to his Captain, and when the time came he sacrificed his life to save McKinnon from the Jade Falcons on Wotan in 3051.</biography>
+			<biography> Members of the Lytton family have served the McKinnons as bodyguard for more than two centuries. George Lytton's father fell at the Fourth Battle of Harrow's Sun while guarding Ross McKinnon, Ian's father. Since that day, George protected Ian McKinnon's back in fiercely fought campaigns, raids, and border skirmishes. A grim and powerfully built man, Lytton's combat training went beyond that of the average Mechwarrior. An expert with small arms and hand-to-hand combat, he also served as the Raider's weapons master.
+            When an assassin was sent to kill Ian, he attacked Lytton during a Kurita raid. When the Fox's Teeth moved out to engage the DCMS troops, the assassin took Georged's place at the controls of his old Warhammer. Despite his injuries, George was able to warn his captain before the assassin could complete his assignment. 
+            Lytton's duty was always to his Captain, and when the time came he sacrificed his life to save McKinnon from the Jade Falcons on Wotan in 3051.</biography>
 			<daysRest>0</daysRest>
 			<deployed>false</deployed>
 			<id>2</id>

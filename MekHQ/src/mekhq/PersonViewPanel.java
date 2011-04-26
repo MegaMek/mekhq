@@ -119,6 +119,7 @@ public class PersonViewPanel extends javax.swing.JPanel {
 		txtDesc.setText(person.getBiography());
 		txtDesc.setEditable(false);
 		txtDesc.setLineWrap(true);
+		txtDesc.setWrapStyleWord(true);
 		txtDesc.setBorder(BorderFactory.createCompoundBorder(
 				BorderFactory.createTitledBorder("Description"),
                 BorderFactory.createEmptyBorder(5,5,5,5)));
