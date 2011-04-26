@@ -378,9 +378,9 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
 				} else if (wn2.getNodeName().equalsIgnoreCase("id")) {
 					retVal.id = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("portraitCategory")) {
-					retVal.portraitCategory = wn2.getTextContent();
+					retVal.setPortraitCategory(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("portraitFile")) {
-					retVal.portraitFile = wn2.getTextContent();
+					retVal.setPortraitFileName(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("taskId")) {
 					retVal.taskId = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("xp")) {
