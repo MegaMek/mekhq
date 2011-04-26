@@ -123,15 +123,18 @@ public class MekHQView extends FrameView {
 	//personnel filter groups
 	private static final int PG_ACTIVE =  0;
 	private static final int PG_COMBAT =  1;
-	private static final int PG_MW =      2;
-	private static final int PG_CREW =    3;
-	private static final int PG_PILOT =   4;
-	private static final int PG_PROTO =   5;
-	private static final int PG_BA =      6;
-	private static final int PG_SUPPORT = 7;
+	private static final int PG_SUPPORT = 2;
+	private static final int PG_MW =      3;
+	private static final int PG_CREW =    4;
+	private static final int PG_PILOT =   5;
+	private static final int PG_PROTO =   6;
+	private static final int PG_BA =      7;
 	private static final int PG_TECH =    8;
 	private static final int PG_DOC =     9;
-	private static final int PG_NUM =     10;
+	private static final int PG_RETIRE =  10;
+	private static final int PG_MIA =     11;
+	private static final int PG_KIA =     12;
+	private static final int PG_NUM =     13;
 	
 	//personnel views
 	private static final int PV_GENERAL = 0;
@@ -1684,6 +1687,12 @@ public class MekHQView extends FrameView {
     		return "Techs";
     	case PG_DOC:
     		return "Doctors";
+    	case PG_RETIRE:
+    		return "Retired Personnel";
+    	case PG_MIA:
+    		return "Personnel MIA";
+    	case PG_KIA:
+    		return "Rolls of Honor (KIA)";
     	default:
     		return "?";
     	}
@@ -2159,7 +2168,13 @@ public class MekHQView extends FrameView {
         				(nGroup == PG_BA && type == Person.T_BA) ||
         				(nGroup == PG_TECH && type > Person.T_BA && type != Person.T_DOCTOR) ||
         				(nGroup == PG_DOC && type == Person.T_DOCTOR)) {
-        			return true;
+        			return person.isActive();
+        		} else if(nGroup == PG_RETIRE) {
+        			return person.getStatus() == Person.S_RETIRED;
+        		} else if(nGroup == PG_MIA) {
+        			return person.getStatus() == Person.S_MIA;
+        		} else if(nGroup == PG_KIA) {
+        			return person.getStatus() == Person.S_KIA;
         		}
         		return false;
         	}
@@ -3245,8 +3260,7 @@ public class MekHQView extends FrameView {
 				refreshTechsList();
 				refreshDoctorsList();
 			} else if (command.contains("CHANGE_UNIT")) {
-				String sel = command.split(":")[1];
-				int selected = Integer.parseInt(sel);
+				int selected = Integer.parseInt(st.nextToken());
 				if ((null != units) && (selected > -1)
 						&& (selected < units.size()) 
 						&& selectedPerson instanceof PilotPerson) {
@@ -3254,20 +3268,22 @@ public class MekHQView extends FrameView {
 				}
 				refreshUnitList();
 				refreshPersonnelList();
-			} else if (command.equalsIgnoreCase("KIA")) {
-				if (selectedPerson.isDeployed()
-						&& (0 == JOptionPane.showConfirmDialog(
+			} else if (command.equalsIgnoreCase("STATUS")) {
+				int selected = Integer.parseInt(st.nextToken());
+				if (selected == Person.S_ACTIVE
+						|| (0 == JOptionPane.showConfirmDialog(
 								null,
-								"Do you really want to declare "
+								"Do you really want to change the status of "
 								+ selectedPerson.getDesc()
-								+ " killed in action?", "KIA?",
+								+ " to a non-active status?", "KIA?",
 								JOptionPane.YES_NO_OPTION))) {
-					campaign.removePerson(selectedPerson.getId());
+					selectedPerson.setStatus(selected);
 				}
 			
 				refreshUnitList();
 				refreshPatientList();
 				refreshPersonnelList();
+				filterPersonnel();
 				refreshTechsList();
 				refreshDoctorsList();
 				refreshReport();
@@ -3469,17 +3485,18 @@ public class MekHQView extends FrameView {
 					rankOrder++;
 				}
 				popup.add(menu);
-				menuItem = new JMenuItem("Retire");
-				menuItem.setActionCommand("RETIRE");
-				menuItem.addActionListener(this);
-				menuItem.setEnabled(!person.isDeployed());
-				popup.add(menuItem);
-				// report KIA
-				menuItem = new JMenuItem("KIA");
-				menuItem.setActionCommand("KIA");
-				menuItem.addActionListener(this);
-				menuItem.setEnabled(person.isDeployed());
-				popup.add(menuItem);
+				menu = new JMenu("Change Status");
+				for(int s = 0; s < Person.S_NUM; s++) {
+					menuItem = new JMenuItem(Person.getStatusName(s));
+					if(person.getStatus() == s) {
+						menuItem.setSelected(true);
+					}
+					menuItem.setActionCommand("STATUS|" + s);
+					menuItem.addActionListener(this);
+					menuItem.setEnabled(true);
+					menu.add(menuItem);
+				}
+				popup.add(menu);
 				// change portrait
 				menuItem = new JMenuItem("Change Portrait...");
 				menuItem.setActionCommand("PORTRAIT");
@@ -3495,7 +3512,7 @@ public class MekHQView extends FrameView {
 							&& (unit.getPilot().getId() == person.getId())) {
 						cbMenuItem.setSelected(true);
 					}
-					cbMenuItem.setActionCommand("CHANGE_UNIT:" + i);
+					cbMenuItem.setActionCommand("CHANGE_UNIT|" + i);
 					cbMenuItem.addActionListener(this);
 					menu.add(cbMenuItem);
 					i++;

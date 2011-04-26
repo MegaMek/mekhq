@@ -66,6 +66,12 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
     public static final int T_BA_TECH = 8;
     public static final int T_DOCTOR = 9;
     public static final int T_NUM = 10;
+    
+    public static final int S_ACTIVE = 0;
+    public static final int S_RETIRED = 1;
+    public static final int S_KIA = 2;
+    public static final int S_MIA = 3;
+    public static final int S_NUM = 4;
 	
 	protected int id;
     private int type;
@@ -82,6 +88,7 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
     protected GregorianCalendar birthday;
 
     private int rank;
+    private int status;
     protected int xp;
     
     //default constructor
@@ -93,14 +100,30 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
         gender = G_MALE;
         birthday = new GregorianCalendar(3042, Calendar.JANUARY, 1);
         rank = 0;
+        status = S_ACTIVE;
     }
     
     public static String getGenderName(int gender) {
     	switch(gender) {
     	case G_MALE:
-    		return "M";
+    		return "Male";
     	case G_FEMALE:
-    		return "F";
+    		return "Female";
+    	default:
+    		return "?";
+    	}
+    }
+    
+    public static String getStatusName(int status) {
+    	switch(status) {
+    	case S_ACTIVE:
+    		return "Active";
+    	case S_RETIRED:
+    		return "Retired";
+    	case S_KIA:
+    		return "Killed in Action";
+    	case S_MIA:
+    		return "Missing in Action";
     	default:
     		return "?";
     	}
@@ -108,6 +131,10 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
     
     public String getGenderName() {
     	return getGenderName(gender);
+    }
+    
+    public String getStatusName() {
+    	return getStatusName(status);
     }
     
     public abstract void reCalc();
@@ -136,6 +163,14 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
     
     public void setType(int t) {
     	this.type = t;
+    }
+    
+    public int getStatus() {
+    	return status;
+    }
+    
+    public void setStatus(int s) {
+    	this.status = s;
     }
 
     public static String getTypeDesc(int type) {
@@ -285,6 +320,10 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
         this.biography = s;
     }
 
+    public boolean isActive() {
+    	return getStatus() == S_ACTIVE;
+    }
+    
 	public abstract void writeToXml(PrintWriter pw1, int indent, int id);
 	
 	protected void writeToXmlBegin(PrintWriter pw1, int indent, int id) {

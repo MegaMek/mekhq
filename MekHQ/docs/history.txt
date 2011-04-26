@@ -36,6 +36,7 @@ v0.1.4 (SVN)
 + better text wrapping in PersonnelViewTable
 + Bug: personnel portraits not being correctly loaded with XML
 + "Assign to Unit" menu in PersonnelTable context menu
++ status variable (active,retired,MIA,KIA) in Person and associated functionality in MekHQView
 
 v0.1.3 (2011-04-22)
 + Bug 3288095: Tasks are not refreshing and dates do not advance

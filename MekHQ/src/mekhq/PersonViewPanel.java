@@ -46,6 +46,8 @@ public class PersonViewPanel extends javax.swing.JPanel {
 	private javax.swing.JLabel lblAge2;
 	private javax.swing.JLabel lblGender1;
 	private javax.swing.JLabel lblGender2;
+	private javax.swing.JLabel lblStatus1;
+	private javax.swing.JLabel lblStatus2;
 	private javax.swing.JLabel lblGun1;
 	private javax.swing.JLabel lblGun2;
 	private javax.swing.JLabel lblPilot1;
@@ -179,6 +181,8 @@ public class PersonViewPanel extends javax.swing.JPanel {
 		lblAge2 = new javax.swing.JLabel();
 		lblGender1 = new javax.swing.JLabel();
 		lblGender2 = new javax.swing.JLabel();
+		lblStatus1 = new javax.swing.JLabel();
+		lblStatus2 = new javax.swing.JLabel();
 		lblGun1 = new javax.swing.JLabel();
 		lblGun2 = new javax.swing.JLabel();
 		lblPilot1 = new javax.swing.JLabel();
@@ -267,6 +271,26 @@ public class PersonViewPanel extends javax.swing.JPanel {
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblGender2, gridBagConstraints);
+		
+		lblStatus1.setName("lblStatus1"); // NOI18N
+		lblStatus1.setText(resourceMap.getString("lblStatus1.text"));
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 4;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+		pnlStats.add(lblStatus1, gridBagConstraints);
+		
+		lblStatus2.setName("lblStatus2"); // NOI18N
+		lblStatus2.setText(person.getStatusName());
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 1;
+		gridBagConstraints.gridy = 4;
+		gridBagConstraints.weightx = 0.5;
+		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+		pnlStats.add(lblStatus2, gridBagConstraints);
 		
 		if(person instanceof PilotPerson) {
 			PilotPerson pp = (PilotPerson)person;
