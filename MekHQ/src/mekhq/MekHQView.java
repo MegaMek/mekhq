@@ -3287,23 +3287,6 @@ public class MekHQView extends FrameView {
 				refreshTechsList();
 				refreshDoctorsList();
 				refreshReport();
-				// TODO: Add to an honor roll
-			} else if (command.equalsIgnoreCase("RETIRE")) {
-				if (!selectedPerson.isDeployed()
-						&& (0 == JOptionPane.showConfirmDialog(
-								null,
-								"Do you really want to retire "
-								+ selectedPerson.getDesc() + "?",
-								"Retire?", JOptionPane.YES_NO_OPTION))) {
-					campaign.removePerson(selectedPerson.getId());
-				}
-				refreshUnitList();
-				refreshPatientList();
-				refreshPersonnelList();
-				refreshTechsList();
-				refreshDoctorsList();
-				refreshReport();
-				// TODO: Add to a retiree list
 			} else if (command.equalsIgnoreCase("REMOVE")) {
 				if (0 == JOptionPane
 						.showConfirmDialog(
@@ -3349,56 +3332,6 @@ public class MekHQView extends FrameView {
 								view);
 						ndd.setVisible(true);
 					}
-				}
-			} else if (command.equalsIgnoreCase("IMP_PILOTING")) {
-				if (selectedPerson instanceof PilotPerson) {
-					Pilot pilot = ((PilotPerson) selectedPerson).getPilot();
-					pilot.setPiloting(pilot.getPiloting() - 1);
-					refreshPatientList();
-					refreshPersonnelList();
-				}
-			} else if (command.equalsIgnoreCase("IMP_GUNNERY")) {
-				if (selectedPerson instanceof PilotPerson) {
-					Pilot pilot = ((PilotPerson) selectedPerson).getPilot();
-					pilot.setGunnery(pilot.getGunnery() - 1);
-					refreshPersonnelList();
-					refreshPatientList();
-					refreshUnitList();
-				}
-			} else if (command.equalsIgnoreCase("DEC_PILOTING")) {
-				if (selectedPerson instanceof PilotPerson) {
-					Pilot pilot = ((PilotPerson) selectedPerson).getPilot();
-					pilot.setPiloting(pilot.getPiloting() + 1);
-					refreshPatientList();
-					refreshPersonnelList();
-				}
-			} else if (command.equalsIgnoreCase("DEC_GUNNERY")) {
-				if (selectedPerson instanceof PilotPerson) {
-					Pilot pilot = ((PilotPerson) selectedPerson).getPilot();
-					pilot.setGunnery(pilot.getGunnery() + 1);
-					refreshPatientList();
-					refreshPersonnelList();
-					refreshUnitList();
-				}
-			} else if (command.equalsIgnoreCase("IMP_SUPPORT")) {
-				if (selectedPerson instanceof SupportPerson) {
-					SupportTeam team = ((SupportPerson) selectedPerson)
-							.getTeam();
-					team.setRating(team.getRating() + 1);
-					refreshPatientList();
-					refreshPersonnelList();
-					refreshDoctorsList();
-					refreshTechsList();
-				}
-			} else if (command.equalsIgnoreCase("DEC_SUPPORT")) {
-				if (selectedPerson instanceof SupportPerson) {
-					SupportTeam team = ((SupportPerson) selectedPerson)
-							.getTeam();
-					team.setRating(team.getRating() - 1);
-					refreshPatientList();
-					refreshPersonnelList();
-					refreshDoctorsList();
-					refreshTechsList();
 				}
 			} else if (command.equalsIgnoreCase("HEAL")) {
 				if (selectedPerson instanceof PilotPerson) {
@@ -3469,7 +3402,6 @@ public class MekHQView extends FrameView {
 				units = campaign.getEligibleUnitsFor(person);
 				JMenuItem menuItem = null;
 				JMenu menu = null;
-				JMenu impMenu = null;
 				JCheckBoxMenuItem cbMenuItem = null;
 				// **lets fill the pop up menu**//
 				// retire
@@ -3497,12 +3429,6 @@ public class MekHQView extends FrameView {
 					menu.add(menuItem);
 				}
 				popup.add(menu);
-				// change portrait
-				menuItem = new JMenuItem("Change Portrait...");
-				menuItem.setActionCommand("PORTRAIT");
-				menuItem.addActionListener(this);
-				menuItem.setEnabled(true);
-				popup.add(menuItem);
 				// switch pilot
 				int i = 0;
 				menu = new JMenu("Assign to Unit");
@@ -3519,6 +3445,17 @@ public class MekHQView extends FrameView {
 				}
 				menu.setEnabled(!person.isDeployed());
 				popup.add(menu);
+				menuItem = new JMenuItem("Add XP");
+				menuItem.setActionCommand("XP_ADD");
+				menuItem.addActionListener(this);
+				menuItem.setEnabled(true);
+				popup.add(menuItem);
+				// change portrait
+				menuItem = new JMenuItem("Change Portrait...");
+				menuItem.setActionCommand("PORTRAIT");
+				menuItem.addActionListener(this);
+				menuItem.setEnabled(true);
+				popup.add(menuItem);		
 				// TODO: add quirks?
 				menu = new JMenu("GM Mode");
 				menuItem = new JMenuItem("Remove Person");
@@ -3544,65 +3481,12 @@ public class MekHQView extends FrameView {
 				menuItem.addActionListener(this);
 				menuItem.setEnabled(campaign.isGM());
 				menu.add(menuItem);
-
-				impMenu = new JMenu("Skills");
-				menu.add(impMenu);
-
-				if (person instanceof PilotPerson) {
-					PilotPerson pp = (PilotPerson) person;
-					menuItem = new JMenuItem("Improve Piloting");
-					menuItem.setActionCommand("IMP_PILOTING");
-					menuItem.addActionListener(this);
-					menuItem.setEnabled(campaign.isGM()
-							&& (pp.getPilot().getPiloting() > 0));
-					impMenu.add(menuItem);
-					menuItem = new JMenuItem("Improve Gunnery");
-					menuItem.setActionCommand("IMP_GUNNERY");
-					menuItem.addActionListener(this);
-					menuItem.setEnabled(campaign.isGM()
-							&& (pp.getPilot().getGunnery() > 0));
-					impMenu.add(menuItem);
-					menuItem = new JMenuItem("Decrease Piloting");
-					menuItem.setActionCommand("DEC_PILOTING");
-					menuItem.addActionListener(this);
-					menuItem.setEnabled(campaign.isGM()
-							&& (pp.getPilot().getPiloting() < 7));
-					impMenu.add(menuItem);
-					menuItem = new JMenuItem("Decrease Gunnery");
-					menuItem.setActionCommand("DEC_GUNNERY");
-					menuItem.addActionListener(this);
-					menuItem.setEnabled(campaign.isGM()
-							&& (pp.getPilot().getGunnery() < 7));
-					impMenu.add(menuItem);
-				} else if (person instanceof SupportPerson) {
-					SupportPerson sp = (SupportPerson) person;
-					menuItem = new JMenuItem("Improve Skill");
-					menuItem.setActionCommand("IMP_SUPPORT");
-					menuItem.addActionListener(this);
-					menuItem.setEnabled(campaign.isGM()
-							&& (sp.getTeam().getRating() < SupportTeam.EXP_ELITE));
-					impMenu.add(menuItem);
-					menuItem = new JMenuItem("Decrease Skill");
-					menuItem.setActionCommand("DEC_SUPPORT");
-					menuItem.addActionListener(this);
-					menuItem.setEnabled(campaign.isGM()
-							&& (sp.getTeam().getRating() > SupportTeam.EXP_GREEN));
-					impMenu.add(menuItem);
-				}
-
-				impMenu = new JMenu("Xp");
-				menu.add(impMenu);
-				menuItem = new JMenuItem("Add xp");
-				menuItem.setActionCommand("XP_ADD");
-				menuItem.addActionListener(this);
-				menuItem.setEnabled(campaign.isGM());
-				impMenu.add(menuItem);
-				menuItem = new JMenuItem("Set xp");
+				menuItem = new JMenuItem("Set XP");
 				menuItem.setActionCommand("XP_SET");
 				menuItem.addActionListener(this);
 				menuItem.setEnabled(campaign.isGM());
-				impMenu.add(menuItem);
-
+				menu.add(menuItem);
+				
 				popup.addSeparator();
 				popup.add(menu);
 				popup.show(e.getComponent(), e.getX(), e.getY());
