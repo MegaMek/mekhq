@@ -45,8 +45,10 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Comparator;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.StringTokenizer;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -69,6 +71,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.MouseInputAdapter;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
@@ -129,6 +132,11 @@ public class MekHQView extends FrameView {
 	private static final int PG_TECH =    8;
 	private static final int PG_DOC =     9;
 	private static final int PG_NUM =     10;
+	
+	//personnel views
+	private static final int PV_GENERAL = 0;
+	private static final int PV_COMBAT  = 1;
+	private static final int PV_NUM     = 2;
 	
 	class ExtFileFilter extends FileFilter {
 		private String useExt = null;
@@ -335,7 +343,8 @@ public class MekHQView extends FrameView {
 		progressBar = new javax.swing.JProgressBar();
 		lblPersonChoice = new javax.swing.JLabel();
 		choicePerson = new javax.swing.JComboBox();
-
+		choicePersonView = new javax.swing.JComboBox();
+		lblPersonView = new javax.swing.JLabel();
 
 		mainPanel.setAutoscrolls(true);
 		mainPanel.setName("mainPanel"); // NOI18N
@@ -382,15 +391,51 @@ public class MekHQView extends FrameView {
 		gridBagConstraints.weighty = 0.0;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
 		panPersonnel.add(choicePerson, gridBagConstraints);
+			
+		lblPersonView.setText(resourceMap.getString("lblPersonView.text")); // NOI18N
+		lblPersonView.setName("lblPersonView"); // NOI18N
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 2;
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+		panPersonnel.add(lblPersonView, gridBagConstraints);
+		
+		DefaultComboBoxModel personViewModel = new DefaultComboBoxModel();
+		for (int i = 0; i < PV_NUM; i++) {
+			personViewModel.addElement(getPersonnelViewName(i));
+		}
+		choicePersonView.setModel(personViewModel);
+		choicePersonView.setName("choicePersonView"); // NOI18N
+		choicePersonView.setSelectedIndex(0);
+		choicePersonView.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				changePersonnelView();
+			}
+		});
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 3;
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+		gridBagConstraints.weightx = 0.0;
+		gridBagConstraints.weighty = 0.0;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+		panPersonnel.add(choicePersonView, gridBagConstraints);
 		
 		personnelTable.setModel(personModel);
 		personnelTable.setName("personnelTable"); // NOI18N
 		personnelTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        XTableColumnModel personColumnModel = new XTableColumnModel();
+        personnelTable.setColumnModel(personColumnModel);
+        personnelTable.createDefaultColumnsFromModel();
         sorter = new TableRowSorter<PersonnelTableModel>(personModel);
         sorter.setComparator(PersonnelTableModel.COL_RANK, new RankSorter());
         sorter.setComparator(PersonnelTableModel.COL_GUN, new SkillSorter());
         sorter.setComparator(PersonnelTableModel.COL_PILOT, new SkillSorter());
+        sorter.setComparator(PersonnelTableModel.COL_ARTY, new SkillSorter());
         sorter.setComparator(PersonnelTableModel.COL_SKILL, new LevelSorter());
+        sorter.setComparator(PersonnelTableModel.COL_TACTICS, new BonusSorter());
+        sorter.setComparator(PersonnelTableModel.COL_INIT, new BonusSorter());
+        sorter.setComparator(PersonnelTableModel.COL_TOUGH, new BonusSorter());
         personnelTable.setRowSorter(sorter);
 		personnelTable.addMouseListener(personnelMouseAdapter);
 		personnelTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
@@ -399,12 +444,13 @@ public class MekHQView extends FrameView {
             column = personnelTable.getColumnModel().getColumn(i);
             column.setPreferredWidth(personModel.getColumnWidth(i));
         }
-		scrollPersonnelTable.setViewportView(personnelTable);
+        changePersonnelView();
+        scrollPersonnelTable.setViewportView(personnelTable);
 	
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 1;
-		gridBagConstraints.gridwidth = 2;
+		gridBagConstraints.gridwidth = 4;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 1.0;
@@ -1617,6 +1663,17 @@ public class MekHQView extends FrameView {
     		return "?";
     	}
     }
+	
+	public static String getPersonnelViewName(int group) {
+    	switch(group) {
+    	case PV_GENERAL:
+    		return "General";
+    	case PG_COMBAT:
+    		return "Combat Skills";
+    	default:
+    		return "?";
+    	}
+    }
 
 	private void btnOvertimeActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnOvertimeActionPerformed
 		campaign.setOvertime(btnOvertime.isSelected());
@@ -1634,6 +1691,7 @@ public class MekHQView extends FrameView {
 				campaign);
 		cod.setVisible(true);
 		refreshCalendar();
+		changePersonnelView();
 		refreshPersonnelList();
 	}// GEN-LAST:event_menuOptionsActionPerformed
 
@@ -2069,6 +2127,47 @@ public class MekHQView extends FrameView {
         };
         sorter.setRowFilter(personTypeFilter);
     }
+	
+	private void changePersonnelView() {
+	
+		int view = choicePersonView.getSelectedIndex();
+		XTableColumnModel columnModel = (XTableColumnModel)personnelTable.getColumnModel();
+		if(view == PV_GENERAL) {
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NAME), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_CALL), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_AGE), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GENDER), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TYPE), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SKILL), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ASSIGN), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ARTY), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TACTICS), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_INIT), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TOUGH), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT), false);
+
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), true);	
+		} else if(view == PV_COMBAT) {
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NAME), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_CALL), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_AGE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GENDER), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TYPE), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SKILL), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ASSIGN), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ARTY), campaign.getCampaignOptions().useArtillery());
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TACTICS), campaign.getCampaignOptions().useTactics());
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_INIT), campaign.getCampaignOptions().useInitBonus());
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TOUGH), campaign.getCampaignOptions().useToughness());
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), false);	
+		}
+	}
 	
 	protected int getSelectedTaskId() {
 		if(repairsSelected()) {
@@ -3430,8 +3529,12 @@ public class MekHQView extends FrameView {
         private final static int COL_ASSIGN =  7;
         private final static int COL_GUN =     8;
         private final static int COL_PILOT =   9;
-        private final static int COL_XP =      10;
-        private final static int N_COL =       11;
+        private final static int COL_ARTY  =   10;
+        private final static int COL_TACTICS = 11;
+        private final static int COL_INIT    = 12;
+        private final static int COL_TOUGH =   13;
+        private final static int COL_XP =      14;
+        private final static int N_COL =       15;
         
         private ArrayList<Person> data = new ArrayList<Person>();
         
@@ -3462,6 +3565,14 @@ public class MekHQView extends FrameView {
                     return "Gunnery";
                 case COL_PILOT:
                     return "Piloting";
+                case COL_ARTY:
+                    return "Artillery";
+                case COL_TACTICS:
+                    return "Tactics";
+                case COL_INIT:
+                    return "Init Bonus";
+                case COL_TOUGH:
+                    return "Toughness";
                 case COL_SKILL:
                     return "Skill Level";
                 case COL_ASSIGN:
@@ -3475,28 +3586,27 @@ public class MekHQView extends FrameView {
         
         public int getColumnWidth(int c) {
             switch(c) {
+            case COL_TYPE:
         	case COL_RANK:
-        		return 80;
+        		return 70;
             case COL_NAME:
                 return 150;
             case COL_CALL:
-                return 50;
-            case COL_AGE:
-                return 20;
-            case COL_GENDER:
-                return 20;
-            case COL_TYPE:
-                return 100;
-            case COL_GUN:
-                return 20;
-            case COL_PILOT:
-                return 20;
+                return 50;        
             case COL_SKILL:
                 return 100;
-            case COL_ASSIGN:
-                return 125;
+            case COL_GENDER:
+            case COL_AGE:
+            case COL_GUN:
+            case COL_PILOT:
+            case COL_ARTY:
+            case COL_TOUGH:
+            case COL_TACTICS:
+            case COL_INIT:
             case COL_XP:
                 return 20;
+            case COL_ASSIGN:
+                return 125;
             default:
                 return 20;
         }
@@ -3545,6 +3655,34 @@ public class MekHQView extends FrameView {
             if(col == COL_GUN) {
             	if(p instanceof PilotPerson) {
             		return Integer.toString(((PilotPerson)p).getPilot().getGunnery());
+            	} else {
+            		return "-";
+            	}
+            }
+            if(col == COL_ARTY) {
+            	if(p instanceof PilotPerson) {
+            		return Integer.toString(((PilotPerson)p).getPilot().getArtillery());
+            	} else {
+            		return "-";
+            	}
+            }
+            if(col == COL_TACTICS) {
+            	if(p instanceof PilotPerson) {
+            		return Integer.toString(((PilotPerson)p).getPilot().getCommandBonus());
+            	} else {
+            		return "-";
+            	}
+            }
+            if(col == COL_INIT) {
+            	if(p instanceof PilotPerson) {
+            		return Integer.toString(((PilotPerson)p).getPilot().getInitBonus());
+            	} else {
+            		return "-";
+            	}
+            }
+            if(col == COL_TOUGH) {
+            	if(p instanceof PilotPerson) {
+            		return Integer.toString(((PilotPerson)p).getPilot().getToughness());
             	} else {
             		return "-";
             	}
@@ -3618,6 +3756,27 @@ public class MekHQView extends FrameView {
 				return -1;
 			} else {
 				return ((Comparable<String>)s0).compareTo(s1);
+			}			
+		}
+	}
+	
+	/**
+	 * A comparator for bonuses written as strings with "-" sorted to the bottom always
+	 * @author Jay Lawson
+	 *
+	 */
+	public class BonusSorter implements Comparator<String> {
+
+		@Override
+		public int compare(String s0, String s1) {	
+			if(s0.equals("-") && s1.equals("-")) {
+				return 0;
+			} else if(s0.equals("-")) {
+				return 1;
+			} else if(s1.equals("-")) {
+				return -1;
+			} else {
+				return ((Comparable<String>)s1).compareTo(s0);
 			}			
 		}
 	}
@@ -3829,6 +3988,248 @@ public class MekHQView extends FrameView {
 		}
 	}
 
+	/**
+	 * <code>XTableColumnModel</code> extends the DefaultTableColumnModel .
+	 * It provides a comfortable way to hide/show columns.
+	 * Columns keep their positions when hidden and shown again.
+	 *
+	 * In order to work with JTable it cannot add any events to <code>TableColumnModelListener</code>.
+	 * Therefore hiding a column will result in <code>columnRemoved</code> event and showing it
+	 * again will notify listeners of a <code>columnAdded</code>, and possibly a <code>columnMoved</code> event.
+	 * For the same reason the following methods still deal with visible columns only:
+	 * getColumnCount(), getColumns(), getColumnIndex(), getColumn()
+	 * There are overloaded versions of these methods that take a parameter <code>onlyVisible</code> which let's
+	 * you specify wether you want invisible columns taken into account.
+	 *
+	 * @version 0.9 04/03/01
+	 * @author Stephen Kelvin, mail@StephenKelvin.de
+	 * @see DefaultTableColumnModel
+	 */
+	public class XTableColumnModel extends DefaultTableColumnModel {
+	    /** Array of TableColumn objects in this model.
+	     *  Holds all column objects, regardless of their visibility
+	     */
+	    protected Vector allTableColumns = new Vector();
+	    
+	    /**
+	     * Creates an extended table column model.
+	     */
+	    XTableColumnModel() {
+	    }
+	    
+	    /**
+	     * Sets the visibility of the specified TableColumn.
+	     * The call is ignored if the TableColumn is not found in this column model
+	     * or its visibility status did not change.
+	     * <p>
+	     *
+	     * @param aColumn        the column to show/hide
+	     * @param visible its new visibility status
+	 */
+	    // listeners will receive columnAdded()/columnRemoved() event
+	    public void setColumnVisible(TableColumn column, boolean visible) {
+	        if(!visible) {
+	            super.removeColumn(column);
+	        }
+	        else {
+	            // find the visible index of the column:
+	            // iterate through both collections of visible and all columns, counting
+	            // visible columns up to the one that's about to be shown again
+	            int noVisibleColumns    = tableColumns.size();
+	            int noInvisibleColumns  = allTableColumns.size();
+	            int visibleIndex        = 0;
+	            
+	            for(int invisibleIndex = 0; invisibleIndex < noInvisibleColumns; ++invisibleIndex) {
+	                TableColumn visibleColumn   = (visibleIndex < noVisibleColumns ? (TableColumn)tableColumns.get(visibleIndex) : null);
+	                TableColumn testColumn      = (TableColumn)allTableColumns.get(invisibleIndex);
+	                
+	                if(testColumn == column) {
+	                    if(visibleColumn != column) {
+	                        super.addColumn(column);
+	                        super.moveColumn(tableColumns.size() - 1, visibleIndex);
+	                    }
+	                    return; // ####################
+	                }
+	                if(testColumn == visibleColumn) {
+	                    ++visibleIndex;
+	                }
+	            }
+	        }
+	    }
+	    
+	    /**
+	     * Makes all columns in this model visible
+	     */
+	    public void setAllColumnsVisible() {
+	        int noColumns       = allTableColumns.size();
+	        
+	        for(int columnIndex = 0; columnIndex < noColumns; ++columnIndex) {
+	            TableColumn visibleColumn = (columnIndex < tableColumns.size() ? (TableColumn)tableColumns.get(columnIndex) : null);
+	            TableColumn invisibleColumn = (TableColumn)allTableColumns.get(columnIndex);
+	            
+	            if(visibleColumn != invisibleColumn) {
+	                super.addColumn(invisibleColumn);
+	                super.moveColumn(tableColumns.size() - 1, columnIndex);
+	            }
+	        }
+	    }
+	    
+	   /**
+	    * Maps the index of the column in the table model at
+	    * <code>modelColumnIndex</code> to the TableColumn object.
+	    * There may me multiple TableColumn objects showing the same model column, though this is uncommon.
+	    * This method will always return the first visible or else the first invisible column with the specified index.
+	    * @param modelColumnIndex index of column in table model
+	    * @return table column object or null if no such column in this column model
+	 */
+	    public TableColumn getColumnByModelIndex(int modelColumnIndex) {
+	        for (int columnIndex = 0; columnIndex < allTableColumns.size(); ++columnIndex) {
+	            TableColumn column = (TableColumn)allTableColumns.elementAt(columnIndex);
+	            if(column.getModelIndex() == modelColumnIndex) {
+	                return column;
+	            }
+	        }
+	        return null;
+	    }
+	    
+	/** Checks wether the specified column is currently visible.
+	 * @param aColumn column to check
+	 * @return visibility of specified column (false if there is no such column at all. [It's not visible, right?])
+	 */    
+	    public boolean isColumnVisible(TableColumn aColumn) {
+	        return (tableColumns.indexOf(aColumn) >= 0);
+	    }
+	    
+	/** Append <code>column</code> to the right of exisiting columns.
+	 * Posts <code>columnAdded</code> event.
+	 * @param column The column to be added
+	 * @see #removeColumn
+	 * @exception IllegalArgumentException if <code>column</code> is <code>null</code>
+	 */    
+	    public void addColumn(TableColumn column) {
+	        allTableColumns.addElement(column);
+	        super.addColumn(column);
+	    }
+	    
+	/** Removes <code>column</code> from this column model.
+	 * Posts <code>columnRemoved</code> event.
+	 * Will do nothing if the column is not in this model.
+	 * @param column the column to be added
+	 * @see #addColumn
+	 */    
+	    public void removeColumn(TableColumn column) {
+	        int allColumnsIndex = allTableColumns.indexOf(column);
+	        if(allColumnsIndex != -1) {
+	            allTableColumns.removeElementAt(allColumnsIndex);
+	        }
+	        super.removeColumn(column);
+	    }
+	    
+	    /** Moves the column from <code>oldIndex</code> to <code>newIndex</code>.
+	     * Posts  <code>columnMoved</code> event.
+	     * Will not move any columns if <code>oldIndex</code> equals <code>newIndex</code>.
+	     *
+	     * @param	oldIndex			index of column to be moved
+	     * @param	newIndex			new index of the column
+	     * @exception IllegalArgumentException	if either <code>oldIndex</code> or
+	     * 						<code>newIndex</code>
+	     *						are not in [0, getColumnCount() - 1]
+	     */
+	    public void moveColumn(int oldIndex, int newIndex) {
+		if ((oldIndex < 0) || (oldIndex >= getColumnCount()) ||
+		    (newIndex < 0) || (newIndex >= getColumnCount()))
+		    throw new IllegalArgumentException("moveColumn() - Index out of range");
+	        
+	        TableColumn fromColumn  = (TableColumn) tableColumns.get(oldIndex);
+	        TableColumn toColumn    = (TableColumn) tableColumns.get(newIndex);
+	        
+	        int allColumnsOldIndex  = allTableColumns.indexOf(fromColumn);
+	        int allColumnsNewIndex  = allTableColumns.indexOf(toColumn);
+
+	        if(oldIndex != newIndex) {
+	            allTableColumns.removeElementAt(allColumnsOldIndex);
+	            allTableColumns.insertElementAt(fromColumn, allColumnsNewIndex);
+	        }
+	        
+	        super.moveColumn(oldIndex, newIndex);
+	    }
+
+	    /**
+	     * Returns the total number of columns in this model.
+	     *
+	     * @param   onlyVisible   if set only visible columns will be counted
+	     * @return	the number of columns in the <code>tableColumns</code> array
+	     * @see	#getColumns
+	     */
+	    public int getColumnCount(boolean onlyVisible) {
+	        Vector columns = (onlyVisible ? tableColumns : allTableColumns);
+		return columns.size();
+	    }
+
+	    /**
+	     * Returns an <code>Enumeration</code> of all the columns in the model.
+	     *
+	     * @param   onlyVisible   if set all invisible columns will be missing from the enumeration.
+	     * @return an <code>Enumeration</code> of the columns in the model
+	     */
+	    public Enumeration getColumns(boolean onlyVisible) {
+	        Vector columns = (onlyVisible ? tableColumns : allTableColumns);
+	        
+		return columns.elements();
+	    }
+
+	    /**
+	     * Returns the position of the first column whose identifier equals <code>identifier</code>.
+	     * Position is the the index in all visible columns if <code>onlyVisible</code> is true or
+	     * else the index in all columns.
+	     *
+	     * @param	identifier   the identifier object to search for
+	     * @param	onlyVisible  if set searches only visible columns
+	     *
+	     * @return		the index of the first column whose identifier
+	     *			equals <code>identifier</code>
+	     *
+	     * @exception       IllegalArgumentException  if <code>identifier</code>
+	     *				is <code>null</code>, or if no
+	     *				<code>TableColumn</code> has this
+	     *				<code>identifier</code>
+	     * @see		#getColumn
+	     */
+	    public int getColumnIndex(Object identifier, boolean onlyVisible) {
+		if (identifier == null) {
+		    throw new IllegalArgumentException("Identifier is null");
+		}
+
+	        Vector      columns     = (onlyVisible ? tableColumns : allTableColumns);
+	        int         noColumns   = columns.size();
+	        TableColumn column;
+	        
+	        for(int columnIndex = 0; columnIndex < noColumns; ++columnIndex) {
+		    column = (TableColumn)columns.get(columnIndex);
+
+	            if(identifier.equals(column.getIdentifier()))
+			return columnIndex;
+	        }
+	        
+		throw new IllegalArgumentException("Identifier not found");
+	    }
+
+	    /**
+	     * Returns the <code>TableColumn</code> object for the column
+	     * at <code>columnIndex</code>.
+	     *
+	     * @param	columnIndex	the index of the column desired
+	     * @param	onlyVisible	if set columnIndex is meant to be relative to all visible columns only
+	     *                          else it is the index in all columns
+	     *
+	     * @return	the <code>TableColumn</code> object for the column
+	     *				at <code>columnIndex</code>
+	     */
+	    public TableColumn getColumn(int columnIndex, boolean onlyVisible) {
+		return (TableColumn)tableColumns.elementAt(columnIndex);
+	    }
+	}
+
 	// Variables declaration - do not modify//GEN-BEGIN:variables
 	private javax.swing.JTable DocTable;
 	private javax.swing.JComboBox PartsFilter;
@@ -3897,6 +4298,8 @@ public class MekHQView extends FrameView {
 	private javax.swing.JScrollPane txtPaneReportScrollPane;
 	private javax.swing.JComboBox choicePerson;
 	private javax.swing.JLabel lblPersonChoice;
+	private javax.swing.JComboBox choicePersonView;
+	private javax.swing.JLabel lblPersonView;
 	// End of variables declaration//GEN-END:variables
 
 	private final Timer messageTimer;
