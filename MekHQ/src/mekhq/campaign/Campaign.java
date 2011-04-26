@@ -128,6 +128,7 @@ public class Campaign implements Serializable {
 
 	private int faction;
 	private Ranks ranks;
+	private SkillCosts skillCosts;
 
 	private ArrayList<String> currentReport;
 
@@ -156,6 +157,7 @@ public class Campaign implements Serializable {
 		gmMode = false;
 		faction = Faction.F_MERC;
 		ranks = new Ranks();
+		skillCosts = new SkillCosts();
 	}
 
 	public String getName() {
@@ -194,6 +196,10 @@ public class Campaign implements Serializable {
 	
 	public void setRNG(RandomNameGenerator g) {
 		this.rng = g;
+	}
+	
+	public SkillCosts getSkillCosts() {
+		return skillCosts;
 	}
 	
 	public long getFunds() {

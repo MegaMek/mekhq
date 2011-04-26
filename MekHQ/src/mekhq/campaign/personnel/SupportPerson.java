@@ -22,12 +22,16 @@
 package mekhq.campaign.personnel;
 
 import java.io.PrintWriter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import megamek.common.Pilot;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
+import mekhq.campaign.SkillCosts;
 import mekhq.campaign.team.MedicalTeam;
 import mekhq.campaign.team.SupportTeam;
 import mekhq.campaign.team.TechTeam;
@@ -180,6 +184,21 @@ public class SupportPerson extends Person {
 			if (wn2.getNodeName().equalsIgnoreCase("teamId")) {
 				teamId = Integer.parseInt(wn2.getTextContent());
 			}
+		}
+	}
+	
+	@Override
+	public void improveSkill(int type) {
+		switch(type) {
+		case SkillCosts.SK_TECH:
+		case SkillCosts.SK_MED:
+			if(team.getRating() < SupportTeam.EXP_ELITE) {
+				team.setRating(team.getRating() + 1);
+				break;
+			}
+		default:
+			Logger.getLogger(Pilot.class.getName()).log(Level.WARNING,
+					"Could not improve " + SkillCosts.getSkillName(type) +" skill for  : " + getName());
 		}
 	}
 

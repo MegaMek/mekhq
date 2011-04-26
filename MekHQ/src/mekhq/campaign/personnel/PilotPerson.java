@@ -24,6 +24,8 @@ package mekhq.campaign.personnel;
 import java.io.File;
 import java.io.PrintWriter;
 import java.util.Enumeration;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -39,6 +41,7 @@ import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
+import mekhq.campaign.SkillCosts;
 import mekhq.campaign.Unit;
 import mekhq.campaign.work.HealPilot;
 
@@ -396,5 +399,32 @@ public class PilotPerson extends Person {
 	
 	public void setUnit(Unit nt) {
 		unit = nt;
+	}
+	
+	@Override
+	public void improveSkill(int type) {
+		switch(type) {
+		case SkillCosts.SK_GUN:
+			pilot.setGunnery(pilot.getGunnery() - 1);
+			break;
+		case SkillCosts.SK_PILOT:
+			pilot.setPiloting(pilot.getPiloting() - 1);
+			break;
+		case SkillCosts.SK_ARTY:
+			pilot.setArtillery(pilot.getArtillery() - 1);
+			break;
+		case SkillCosts.SK_TAC:
+			pilot.setCommandBonus(pilot.getCommandBonus() + 1);
+			break;
+		case SkillCosts.SK_INIT:
+			pilot.setInitBonus(pilot.getInitBonus() + 1);
+			break;
+		case SkillCosts.SK_TOUGH:
+			pilot.setToughness(pilot.getToughness() + 1);
+			break;
+		default:
+			Logger.getLogger(Pilot.class.getName()).log(Level.WARNING,
+					"Could not improve " + SkillCosts.getSkillName(type) +" skill for  : " + getName());
+		}
 	}
 }

@@ -513,6 +513,8 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
 	public abstract String getCallsign();
 
 	public abstract String getSkillSummary();
+	
+	public abstract void improveSkill(int type);
 
 	protected abstract void loadFieldsFromXmlNode(Node wn);
 }

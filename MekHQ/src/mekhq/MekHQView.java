@@ -92,6 +92,7 @@ import megamek.common.XMLStreamParser;
 import megamek.common.loaders.EntityLoadingException;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.PartInventory;
+import mekhq.campaign.SkillCosts;
 import mekhq.campaign.Unit;
 import mekhq.campaign.Utilities;
 import mekhq.campaign.parts.GenericSparePart;
@@ -3268,6 +3269,17 @@ public class MekHQView extends FrameView {
 				}
 				refreshUnitList();
 				refreshPersonnelList();
+			} else if (command.contains("IMPROVE")) {
+				int selected = Integer.parseInt(st.nextToken());
+				int cost =  Integer.parseInt(st.nextToken());
+				selectedPerson.improveSkill(selected);
+				selectedPerson.setXp(selectedPerson.getXp() - cost);
+				campaign.addReport(selectedPerson.getName() + " improved " + SkillCosts.getSkillName(selected) + "!");
+				refreshUnitList();
+				refreshPersonnelList();
+				refreshTechsList();
+				refreshDoctorsList();
+				refreshReport();
 			} else if (command.equalsIgnoreCase("STATUS")) {
 				int selected = Integer.parseInt(st.nextToken());
 				if (selected == Person.S_ACTIVE
@@ -3419,14 +3431,14 @@ public class MekHQView extends FrameView {
 				popup.add(menu);
 				menu = new JMenu("Change Status");
 				for(int s = 0; s < Person.S_NUM; s++) {
-					menuItem = new JMenuItem(Person.getStatusName(s));
+					cbMenuItem = new JCheckBoxMenuItem(Person.getStatusName(s));
 					if(person.getStatus() == s) {
-						menuItem.setSelected(true);
+						cbMenuItem.setSelected(true);
 					}
-					menuItem.setActionCommand("STATUS|" + s);
-					menuItem.addActionListener(this);
-					menuItem.setEnabled(true);
-					menu.add(menuItem);
+					cbMenuItem.setActionCommand("STATUS|" + s);
+					cbMenuItem.addActionListener(this);
+					cbMenuItem.setEnabled(true);
+					menu.add(cbMenuItem);
 				}
 				popup.add(menu);
 				// switch pilot
@@ -3450,6 +3462,85 @@ public class MekHQView extends FrameView {
 				menuItem.addActionListener(this);
 				menuItem.setEnabled(true);
 				popup.add(menuItem);
+				menu = new JMenu("Spend XP");
+				if(person instanceof PilotPerson) {
+					PilotPerson pp = (PilotPerson)person;
+					//Gunnery
+					int cost = campaign.getSkillCosts().getCost(SkillCosts.SK_GUN, pp.getPilot().getGunnery() - 1, false);
+					String costDesc = " (" + cost + "XP)";
+					if(cost < 0) {
+						costDesc = " (Not Possible)";
+					}
+					menuItem = new JMenuItem(SkillCosts.getSkillName(SkillCosts.SK_GUN)   + costDesc);
+					menuItem.setActionCommand("IMPROVE|" + SkillCosts.SK_GUN + "|" + cost);
+					menuItem.addActionListener(this);
+					menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
+					menu.add(menuItem);
+					//Piloting
+					cost = campaign.getSkillCosts().getCost(SkillCosts.SK_PILOT, pp.getPilot().getPiloting() - 1, false);
+					costDesc = " (" + cost + "XP)";
+					if(cost < 0) {
+						costDesc = " (Not Possible)";
+					}
+					menuItem = new JMenuItem(SkillCosts.getSkillName(SkillCosts.SK_PILOT)   + costDesc);
+					menuItem.setActionCommand("IMPROVE|" + SkillCosts.SK_PILOT + "|" + cost);
+					menuItem.addActionListener(this);
+					menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
+					menu.add(menuItem);
+					//Artillery
+					if(campaign.getCampaignOptions().useArtillery()) {
+						cost = campaign.getSkillCosts().getCost(SkillCosts.SK_ARTY, pp.getPilot().getArtillery() - 1, false);
+						costDesc = " (" + cost + "XP)";
+						if(cost < 0) {
+							costDesc = " (Not Possible)";
+						}
+						menuItem = new JMenuItem(SkillCosts.getSkillName(SkillCosts.SK_ARTY)   + costDesc);
+						menuItem.setActionCommand("IMPROVE|" + SkillCosts.SK_ARTY + "|" + cost);
+						menuItem.addActionListener(this);
+						menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
+						menu.add(menuItem);
+					}
+					//Tactics
+					if(campaign.getCampaignOptions().useTactics()) {
+						cost = campaign.getSkillCosts().getCost(SkillCosts.SK_TAC, pp.getPilot().getCommandBonus() + 1, false);
+						costDesc = " (" + cost + "XP)";
+						if(cost < 0) {
+							costDesc = " (Not Possible)";
+						}
+						menuItem = new JMenuItem(SkillCosts.getSkillName(SkillCosts.SK_TAC)   + costDesc);
+						menuItem.setActionCommand("IMPROVE|" + SkillCosts.SK_TAC + "|" + cost);
+						menuItem.addActionListener(this);
+						menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
+						menu.add(menuItem);
+					}
+					//Init Bonus
+					if(campaign.getCampaignOptions().useInitBonus()) {
+						cost = campaign.getSkillCosts().getCost(SkillCosts.SK_INIT, pp.getPilot().getInitBonus() + 1, false);
+						costDesc = " (" + cost + "XP)";
+						if(cost < 0) {
+							costDesc = " (Not Possible)";
+						}
+						menuItem = new JMenuItem(SkillCosts.getSkillName(SkillCosts.SK_INIT)   + costDesc);
+						menuItem.setActionCommand("IMPROVE|" + SkillCosts.SK_INIT + "|" + cost);
+						menuItem.addActionListener(this);
+						menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
+						menu.add(menuItem);
+					}
+					//Toughness
+					if(campaign.getCampaignOptions().useToughness()) {
+						cost = campaign.getSkillCosts().getCost(SkillCosts.SK_TOUGH, pp.getPilot().getToughness() + 1, false);
+						costDesc = " (" + cost + "XP)";
+						if(cost < 0) {
+							costDesc = " (Not Possible)";
+						}
+						menuItem = new JMenuItem(SkillCosts.getSkillName(SkillCosts.SK_TOUGH)   + costDesc);
+						menuItem.setActionCommand("IMPROVE|" + SkillCosts.SK_TOUGH + "|" + cost);
+						menuItem.addActionListener(this);
+						menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
+						menu.add(menuItem);
+					}
+				}
+				popup.add(menu);
 				// change portrait
 				menuItem = new JMenuItem("Change Portrait...");
 				menuItem.setActionCommand("PORTRAIT");
@@ -3468,7 +3559,6 @@ public class MekHQView extends FrameView {
 				menuItem.addActionListener(this);
 				menuItem.setEnabled(campaign.isGM());
 				menu.add(menuItem);
-
 				if (person instanceof PilotPerson) {
 					menuItem = new JMenuItem("Undeploy Pilot");
 					menuItem.setActionCommand("UNDEPLOY");
