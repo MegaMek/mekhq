@@ -12,7 +12,6 @@ import java.io.File;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
-import megamek.client.ui.swing.util.ImageFileFactory;
 import megamek.common.Pilot;
 import megamek.common.util.DirectoryItems;
 import mekhq.campaign.Campaign;
@@ -66,7 +65,7 @@ public class PersonViewPanel extends javax.swing.JPanel {
 		this.campaign = c;
 		try {
             portraits = new DirectoryItems(new File("data/images/portraits"), "", //$NON-NLS-1$ //$NON-NLS-2$
-                    ImageFileFactory.getInstance());
+                    PortraitFileFactory.getInstance());
         } catch (Exception e) {
             portraits = null;
         }
@@ -123,6 +122,7 @@ public class PersonViewPanel extends javax.swing.JPanel {
 		txtDesc.setName("txtDesc");
 		txtDesc.setText(person.getBiography());
 		txtDesc.setEditable(false);
+		txtDesc.setLineWrap(true);
 		txtDesc.setBorder(BorderFactory.createCompoundBorder(
 				BorderFactory.createTitledBorder("Description"),
                 BorderFactory.createEmptyBorder(5,5,5,5)));
@@ -160,7 +160,7 @@ public class PersonViewPanel extends javax.swing.JPanel {
         Image portrait = null;
         try {
             portrait = (Image) portraits.getItem(category, file);
-            //make sure no images are longer than 72 pixels
+            //make sure no images are longer than 150 pixels
             if(null != portrait && portrait.getWidth(lblPortrait) > 150) {
                 portrait = portrait.getScaledInstance(-1, 150, Image.SCALE_DEFAULT);               
             }

@@ -21,7 +21,6 @@ import javax.swing.event.MouseInputAdapter;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
 
-import megamek.client.ui.AWT.util.ImageFileFactory;
 import megamek.common.Pilot;
 import megamek.common.util.DirectoryItems;
 
@@ -54,7 +53,7 @@ public class PortraitChoiceDialog extends javax.swing.JDialog {
         // Parse the camo directory.
         try {
             portraits = new DirectoryItems(new File("data/images/portraits"), "", //$NON-NLS-1$ //$NON-NLS-2$
-                    ImageFileFactory.getInstance());
+                    PortraitFileFactory.getInstance());
         } catch (Exception e) {
             portraits = null;
         }
