@@ -387,21 +387,45 @@ public class PilotPerson extends Person {
     	return pilot.getOptions().intOption("edge");
     }
     
+    public void setEdge(int e) {
+    	for (Enumeration<IOption> i = getPilot().getOptions(PilotOptions.EDGE_ADVANTAGES); i.hasMoreElements();) {
+        	IOption ability = i.nextElement();
+        	if(ability.getName().equals("edge")) {
+        		ability.setValue(e);
+        	}
+        }
+    }
+    
+    /**
+     * This will flip the boolean status of the current edge trigger
+     * @param name
+     */
+    public void changeEdgeTrigger(String name) {
+    	for (Enumeration<IOption> i = getPilot().getOptions(PilotOptions.EDGE_ADVANTAGES); i.hasMoreElements();) {
+        	IOption ability = i.nextElement();
+        	if(ability.getName().equals(name)) {
+        		ability.setValue(!ability.booleanValue());
+        	}
+        }
+    }
+    
     /**
      * This function returns an html-coded tooltip that says what 
      * edge will be used
      * @return
      */
     public String getEdgeTooltip() {
-    	String edgett = "<html>";
-    	for (Enumeration<IOption> i = getPilot().getOptions(PilotOptions.LVL3_ADVANTAGES); i.hasMoreElements();) {
+    	String edgett = "";
+    	for (Enumeration<IOption> i = getPilot().getOptions(PilotOptions.EDGE_ADVANTAGES); i.hasMoreElements();) {
         	IOption ability = i.nextElement();
         	//yuck, it would be nice to have a more fool-proof way of identifying edge triggers
         	if(ability.getName().contains("edge_when") && ability.booleanValue()) {
         		edgett = edgett + ability.getDescription() + "<br>";
         	}
         }
-    	edgett = edgett + "</html>";
-    	return edgett;
+    	if(edgett.equals("")) {
+    		return "No triggers set";
+    	}
+    	return "<html>" + edgett + "</html>";
     }
 }

@@ -81,6 +81,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         useToughnessBox.setSelected(options.useToughness());
         useArtilleryBox.setSelected(options.useArtillery());
         useAbilitiesBox.setSelected(options.useAbilities());
+        useEdgeBox.setSelected(options.useEdge());
         useImplantsBox.setSelected(options.useImplants());
 
     }
@@ -129,6 +130,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         useToughnessBox = new javax.swing.JCheckBox();
         useArtilleryBox = new javax.swing.JCheckBox();
         useAbilitiesBox = new javax.swing.JCheckBox();
+        useEdgeBox = new javax.swing.JCheckBox();
         useImplantsBox = new javax.swing.JCheckBox();
         repairSystemComboBox = new javax.swing.JComboBox();
         javax.swing.JLabel repairSystemComboBoxLabel = new javax.swing.JLabel();
@@ -385,12 +387,23 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panPersonnel.add(useAbilitiesBox, gridBagConstraints);
         
+        useEdgeBox.setText(resourceMap.getString("useEdgeBox.text")); // NOI18N
+        useEdgeBox.setToolTipText(resourceMap.getString("useEdgeBox.toolTipText")); // NOI18N
+        useEdgeBox.setName("useEdgeBox"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panPersonnel.add(useEdgeBox, gridBagConstraints);
+        
         useImplantsBox.setText(resourceMap.getString("useImplantsBox.text")); // NOI18N
         useImplantsBox.setToolTipText(resourceMap.getString("useImplantsBox.toolTipText")); // NOI18N
         useImplantsBox.setName("useImplantsBox"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 6;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -624,6 +637,7 @@ private void btnOkayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
     options.setToughness(useToughnessBox.isSelected());
     options.setArtillery(useArtilleryBox.isSelected());
     options.setAbilities(useAbilitiesBox.isSelected());
+    options.setEdge(useEdgeBox.isSelected());
     options.setImplants(useImplantsBox.isSelected());
     
     campaign.refreshAllUnitDiagnostics();
@@ -741,6 +755,7 @@ public String getDateAsString() {
     private javax.swing.JCheckBox useToughnessBox;
     private javax.swing.JCheckBox useArtilleryBox;
     private javax.swing.JCheckBox useAbilitiesBox;
+    private javax.swing.JCheckBox useEdgeBox;
     private javax.swing.JCheckBox useImplantsBox;
     private javax.swing.JTextArea textRanks;
     private javax.swing.JScrollPane scrRanks;

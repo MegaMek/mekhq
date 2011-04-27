@@ -54,6 +54,7 @@ public class CampaignOptions implements Serializable {
     private boolean useToughness;
     private boolean useArtillery;
     private boolean useAbilities;
+    private boolean useEdge;
     private boolean useImplants;
 
     public CampaignOptions () {
@@ -68,6 +69,7 @@ public class CampaignOptions implements Serializable {
         useToughness = false;
         useArtillery = false;
         useAbilities = false;
+        useEdge = false;
         useImplants = false;
     }
 
@@ -163,6 +165,14 @@ public class CampaignOptions implements Serializable {
     	this.useAbilities = b;
     }
     
+    public boolean useEdge() {
+    	return useEdge;
+    }
+   
+    public void setEdge(boolean b) {
+    	this.useEdge = b;
+    }
+    
     public boolean useImplants() {
     	return useImplants;
     }
@@ -184,6 +194,7 @@ public class CampaignOptions implements Serializable {
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useToughness", useToughness);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useArtillery", useArtillery);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useAbilities", useAbilities);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useEdge", useEdge);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useImplants", useImplants);
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "</campaignOptions>");
 	}
@@ -256,6 +267,11 @@ public class CampaignOptions implements Serializable {
 					retVal.useAbilities = true;
 				else
 					retVal.useAbilities = false;
+			} else if (wn2.getNodeName().equalsIgnoreCase("useEdge")) {
+				if (wn2.getTextContent().equalsIgnoreCase("true"))
+					retVal.useEdge = true;
+				else
+					retVal.useEdge = false;
 			} else if (wn2.getNodeName().equalsIgnoreCase("useImplants")) {
 				if (wn2.getTextContent().equalsIgnoreCase("true"))
 					retVal.useImplants = true;

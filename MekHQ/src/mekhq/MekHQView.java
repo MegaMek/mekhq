@@ -1588,6 +1588,7 @@ public class MekHQView extends FrameView {
 
 		refreshUnitList();
 		refreshPersonnelList();
+		changePersonnelView();
 		refreshTaskList();
 		refreshAcquireList();
 		refreshTechsList();
@@ -1630,6 +1631,7 @@ public class MekHQView extends FrameView {
 
 		refreshUnitList();
 		refreshPersonnelList();
+		changePersonnelView();
 		refreshTaskList();
 		refreshAcquireList();
 		refreshTechsList();
@@ -2220,7 +2222,7 @@ public class MekHQView extends FrameView {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TACTICS), campaign.getCampaignOptions().useTactics());
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_INIT), campaign.getCampaignOptions().useInitBonus());
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TOUGH), campaign.getCampaignOptions().useToughness());
-			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_EDGE), campaign.getCampaignOptions().useAbilities());
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_EDGE), campaign.getCampaignOptions().useEdge());
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), false);	
 		} else if(view == PV_FLUFF) {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
@@ -3307,6 +3309,13 @@ public class MekHQView extends FrameView {
 				refreshTechsList();
 				refreshDoctorsList();
 				refreshReport();
+			} else if (command.equalsIgnoreCase("EDGE")) {
+				String trigger = st.nextToken();
+				if(selectedPerson instanceof PilotPerson) {
+					((PilotPerson)selectedPerson).changeEdgeTrigger(trigger);
+				}
+				refreshPersonnelList();
+				refreshPersonnelView();
 			} else if (command.equalsIgnoreCase("REMOVE")) {
 				if (0 == JOptionPane
 						.showConfirmDialog(
@@ -3387,6 +3396,16 @@ public class MekHQView extends FrameView {
 				selectedPerson.setXp(i);
 				refreshPatientList();
 				refreshPersonnelList();
+			} else if (command.equalsIgnoreCase("EDGE_SET")) {
+				if(selectedPerson instanceof PilotPerson) {
+					PilotPerson pp = (PilotPerson)selectedPerson;
+					PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(
+							null, true, "Edge", pp.getEdge(), 0, 10);
+					pvcd.setVisible(true);
+					int i = pvcd.getValue();
+					pp.setEdge(i);
+					refreshPersonnelList();
+				}
 			}
 		}
 
@@ -3562,6 +3581,38 @@ public class MekHQView extends FrameView {
 					menu.add(menuItem);
 				}
 				popup.add(menu);
+				if(person instanceof PilotPerson && campaign.getCampaignOptions().useEdge()) {
+					menu = new JMenu("Set Edge Triggers");
+					cbMenuItem = new JCheckBoxMenuItem("Head Hits");
+					if (((PilotPerson)person).getPilot().getOptions().booleanOption("edge_when_headhit")) {
+						cbMenuItem.setSelected(true);
+					}
+					cbMenuItem.setActionCommand("EDGE|edge_when_headhit");
+					cbMenuItem.addActionListener(this);
+					menu.add(cbMenuItem);
+					cbMenuItem = new JCheckBoxMenuItem("Through Armor Crits");
+					if (((PilotPerson)person).getPilot().getOptions().booleanOption("edge_when_tac")) {
+						cbMenuItem.setSelected(true);
+					}
+					cbMenuItem.setActionCommand("EDGE|edge_when_tac");
+					cbMenuItem.addActionListener(this);
+					menu.add(cbMenuItem);
+					cbMenuItem = new JCheckBoxMenuItem("Fail KO check");
+					if (((PilotPerson)person).getPilot().getOptions().booleanOption("edge_when_ko")) {
+						cbMenuItem.setSelected(true);
+					}
+					cbMenuItem.setActionCommand("EDGE|edge_when_ko");
+					cbMenuItem.addActionListener(this);
+					menu.add(cbMenuItem);
+					cbMenuItem = new JCheckBoxMenuItem("Ammo Explosion");
+					if (((PilotPerson)person).getPilot().getOptions().booleanOption("edge_when_explosion")) {
+						cbMenuItem.setSelected(true);
+					}
+					cbMenuItem.setActionCommand("EDGE|edge_when_explosion");
+					cbMenuItem.addActionListener(this);
+					menu.add(cbMenuItem);
+					popup.add(menu);
+				}
 				// change portrait
 				menuItem = new JMenuItem("Change Portrait...");
 				menuItem.setActionCommand("PORTRAIT");
@@ -3597,7 +3648,13 @@ public class MekHQView extends FrameView {
 				menuItem.addActionListener(this);
 				menuItem.setEnabled(campaign.isGM());
 				menu.add(menuItem);
-				
+				if(campaign.getCampaignOptions().useEdge() && person instanceof PilotPerson) {
+					menuItem = new JMenuItem("Set Edge");
+					menuItem.setActionCommand("EDGE_SET");
+					menuItem.addActionListener(this);
+					menuItem.setEnabled(campaign.isGM());
+					menu.add(menuItem);
+				}
 				popup.addSeparator();
 				popup.add(menu);
 				popup.show(e.getComponent(), e.getX(), e.getY());

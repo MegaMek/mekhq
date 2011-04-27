@@ -452,7 +452,7 @@ public class PersonViewPanel extends javax.swing.JPanel {
 				pnlStats.add(lblTough2, gridBagConstraints);
 			}		
 			
-			if(campaign.getCampaignOptions().useAbilities()) {
+			if(campaign.getCampaignOptions().useEdge()) {
 				secondy++;
 				lblEdge1.setName("lblEdge1"); // NOI18N
 				lblEdge1.setText(resourceMap.getString("lblEdge1.text"));
@@ -497,7 +497,7 @@ public class PersonViewPanel extends javax.swing.JPanel {
 				String abilityString = "<html>";
 		        for (Enumeration<IOption> i = pp.getPilot().getOptions(PilotOptions.LVL3_ADVANTAGES); i.hasMoreElements();) {
 		        	IOption ability = i.nextElement();
-		        	if(ability.booleanValue() && !ability.getName().startsWith("edge")) {
+		        	if(ability.booleanValue()) {
 		        		abilityString = abilityString + ability.getDisplayableNameWithValue() + "<br>";
 		        	}
 		        }
