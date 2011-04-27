@@ -65,6 +65,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
@@ -486,7 +487,8 @@ public class MekHQView extends FrameView {
 		gridBagConstraints.weighty = 1.0;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		scrollPersonnelView.setMinimumSize(new java.awt.Dimension(450, 600));
-		scrollPersonnelView.setPreferredSize(new java.awt.Dimension(450, 600));
+		scrollPersonnelView.setPreferredSize(new java.awt.Dimension(450, 2000));
+		scrollPersonnelView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPersonnelView.setViewportView(txtPersonnelView);
 		panPersonnel.add(scrollPersonnelView, gridBagConstraints);
 		
@@ -3395,6 +3397,15 @@ public class MekHQView extends FrameView {
 				selectedPerson.setPortraitFileName(pcd.getFileName());
 				refreshPatientList();
 				refreshPersonnelList();
+			} else if (command.equalsIgnoreCase("BIOGRAPHY")) {
+				TextAreaDialog tad = new TextAreaDialog(null, true,
+						"Edit Biography",
+						selectedPerson.getBiography());
+				tad.setVisible(true);
+				if(tad.wasChanged()) {
+					selectedPerson.setBiography(tad.getText());
+				}
+				refreshPersonnelList();
 			} else if (command.equalsIgnoreCase("XP_ADD")) {
 				if (selectedPerson instanceof PilotPerson) {
 					selectedPerson.setXp(selectedPerson.getXp() + 1);
@@ -3631,7 +3642,13 @@ public class MekHQView extends FrameView {
 				menuItem.setActionCommand("PORTRAIT");
 				menuItem.addActionListener(this);
 				menuItem.setEnabled(true);
-				popup.add(menuItem);		
+				popup.add(menuItem);	
+				// change Biography
+				menuItem = new JMenuItem("Change Biography...");
+				menuItem.setActionCommand("BIOGRAPHY");
+				menuItem.addActionListener(this);
+				menuItem.setEnabled(true);
+				popup.add(menuItem);
 				// TODO: add quirks?
 				menu = new JMenu("GM Mode");
 				menuItem = new JMenuItem("Remove Person");

@@ -7,14 +7,14 @@
 package mekhq;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Image;
 import java.io.File;
-import java.util.Enumeration;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
+
 import megamek.common.Pilot;
-import megamek.common.options.IOption;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.DirectoryItems;
 import mekhq.campaign.Campaign;
@@ -81,6 +81,7 @@ public class PersonViewPanel extends javax.swing.JPanel {
             portraits = null;
         }
 		initComponents();
+		//setMinimumSize(new Dimension(400, 200));
 	}
 	
 	private void initComponents() {
@@ -122,6 +123,7 @@ public class PersonViewPanel extends javax.swing.JPanel {
 		gridBagConstraints.gridy = 0;
 		gridBagConstraints.gridheight = 2;
 		gridBagConstraints.weightx = 1.0;
+		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;	
 		add(pnlStats, gridBagConstraints);
@@ -139,6 +141,7 @@ public class PersonViewPanel extends javax.swing.JPanel {
 		gridBagConstraints.gridy = 2;
 		gridBagConstraints.gridwidth = 2;
 		gridBagConstraints.weighty = 1.0;
+		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		add(txtDesc, gridBagConstraints);
