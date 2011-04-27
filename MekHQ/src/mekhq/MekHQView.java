@@ -434,7 +434,6 @@ public class MekHQView extends FrameView {
 		personnelTable.setModel(personModel);
 		personnelTable.setName("personnelTable"); // NOI18N
 		personnelTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        personnelTable.setIntercellSpacing(new Dimension(0, 0));
         XTableColumnModel personColumnModel = new XTableColumnModel();
         personnelTable.setColumnModel(personColumnModel);
         personnelTable.createDefaultColumnsFromModel();
@@ -456,6 +455,7 @@ public class MekHQView extends FrameView {
             column.setPreferredWidth(personModel.getColumnWidth(i));
             column.setCellRenderer(personModel.getRenderer());
         }
+        personnelTable.setIntercellSpacing(new Dimension(0, 0));
         changePersonnelView();
         personnelTable.getSelectionModel().addListSelectionListener(new javax.swing.event.ListSelectionListener() {
             public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
@@ -3969,7 +3969,7 @@ public class MekHQView extends FrameView {
 					int row, int column) {
 				super.getTableCellRendererComponent(table, value, isSelected,
 						hasFocus, row, column);
-				//setOpaque(true);
+				setOpaque(true);
 				int actualCol = table.convertColumnIndexToModel(column);
 				int actualRow = table.convertRowIndexToModel(row);
 				setHorizontalAlignment(getAlignment(actualCol));
