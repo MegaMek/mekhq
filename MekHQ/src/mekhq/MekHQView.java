@@ -48,6 +48,7 @@ import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.StringTokenizer;
+import java.util.TreeSet;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -3319,6 +3320,19 @@ public class MekHQView extends FrameView {
 					refreshDoctorsList();
 					refreshReport();
 				}
+			} else if (command.contains("WSPECIALIST")) {
+				String selected = st.nextToken();
+				int cost =  Integer.parseInt(st.nextToken());
+				if(selectedPerson instanceof PilotPerson) {
+					((PilotPerson)selectedPerson).acquireAbility(PilotOptions.LVL3_ADVANTAGES, "weapon_specialist", selected);
+					selectedPerson.setXp(selectedPerson.getXp() - cost);
+					//TODO: add campaign report
+					refreshUnitList();
+					refreshPersonnelList();
+					refreshTechsList();
+					refreshDoctorsList();
+					refreshReport();
+				}
 			} else if (command.contains("SPECIALIST")) {
 				String selected = st.nextToken();
 				int cost =  Integer.parseInt(st.nextToken());
@@ -3618,16 +3632,30 @@ public class MekHQView extends FrameView {
 						JMenu abMenu = new JMenu("Special Abilities");
 						for (Enumeration<IOption> i = pp.getPilot().getOptions(PilotOptions.LVL3_ADVANTAGES); i.hasMoreElements();) {
 				        	IOption ability = i.nextElement();
-				        	if(ability.getName().equals("weapon_specialist")) {
-				        		continue;
-				        	}
 				        	if(!ability.booleanValue()) {
 				        		cost = campaign.getSkillCosts().getAbilityCost(ability.getName());
 				        		costDesc = " (" + cost + "XP)";
 								if(cost < 0) {
 									costDesc = " (Not Possible)";
 								}
-				        		if(ability.getName().equals("specialist")) {
+								if(ability.getName().equals("weapon_specialist")) {
+									if(null != pp.getAssignedUnit()) {
+										JMenu specialistMenu = new JMenu("Weapon Specialist");
+										TreeSet<String> uniqueWeapons = new TreeSet<String>();
+										for (int j = 0; j < pp.getAssignedUnit().getEntity().getWeaponList().size(); j++) {
+							                Mounted m = pp.getAssignedUnit().getEntity().getWeaponList().get(j);
+							                uniqueWeapons.add(m.getName());
+							            }
+							            for (String name : uniqueWeapons) {
+							            	menuItem = new JMenuItem(name + costDesc);
+											menuItem.setActionCommand("WSPECIALIST|" + name + "|" + cost);
+											menuItem.addActionListener(this);
+											menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
+											specialistMenu.add(menuItem);
+							            }
+							            abMenu.add(specialistMenu);
+									}
+					        	} else if(ability.getName().equals("specialist")) {
 				        			JMenu specialistMenu = new JMenu("Specialist");
 				        			menuItem = new JMenuItem("Laser Specialist" + costDesc);
 									menuItem.setActionCommand("SPECIALIST|" + Pilot.SPECIAL_LASER + "|" + cost);

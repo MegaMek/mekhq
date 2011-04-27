@@ -55,6 +55,7 @@ v0.1.4 (SVN)
 + get rid of annoying table borders in PersonnelTable
 + TextAreaDialog and "Change Biography" menu item in PersonnelTable context menu
 + Spend XP on special abilities
++ weapon specialist options in Spend XP > Special Abilities
 
 v0.1.3 (2011-04-22)
 + Bug 3288095: Tasks are not refreshing and dates do not advance
