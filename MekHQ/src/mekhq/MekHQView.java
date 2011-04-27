@@ -65,12 +65,14 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
+import javax.swing.SwingConstants;
 import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.MouseInputAdapter;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
@@ -90,6 +92,7 @@ import megamek.common.TechConstants;
 import megamek.common.UnitType;
 import megamek.common.XMLStreamParser;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.options.PilotOptions;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.PartInventory;
 import mekhq.campaign.SkillCosts;
@@ -431,6 +434,7 @@ public class MekHQView extends FrameView {
 		personnelTable.setModel(personModel);
 		personnelTable.setName("personnelTable"); // NOI18N
 		personnelTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        personnelTable.setIntercellSpacing(new Dimension(0, 0));
         XTableColumnModel personColumnModel = new XTableColumnModel();
         personnelTable.setColumnModel(personColumnModel);
         personnelTable.createDefaultColumnsFromModel();
@@ -450,6 +454,7 @@ public class MekHQView extends FrameView {
         for (int i = 0; i < PersonnelTableModel.N_COL; i++) {
             column = personnelTable.getColumnModel().getColumn(i);
             column.setPreferredWidth(personModel.getColumnWidth(i));
+            column.setCellRenderer(personModel.getRenderer());
         }
         changePersonnelView();
         personnelTable.getSelectionModel().addListSelectionListener(new javax.swing.event.ListSelectionListener() {
@@ -2205,7 +2210,9 @@ public class MekHQView extends FrameView {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_INIT), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TOUGH), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_EDGE), false);
-			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NABIL), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NIMP), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_HITS), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), true);	
 		} else if(view == PV_COMBAT) {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
@@ -2223,6 +2230,9 @@ public class MekHQView extends FrameView {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_INIT), campaign.getCampaignOptions().useInitBonus());
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TOUGH), campaign.getCampaignOptions().useToughness());
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_EDGE), campaign.getCampaignOptions().useEdge());
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NABIL), campaign.getCampaignOptions().useAbilities());
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NIMP), campaign.getCampaignOptions().useImplants());
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_HITS), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), false);	
 		} else if(view == PV_FLUFF) {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
@@ -2240,6 +2250,9 @@ public class MekHQView extends FrameView {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_INIT), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TOUGH), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_EDGE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NABIL), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NIMP), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_HITS), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), false);	
 		}
 	}
@@ -3685,8 +3698,11 @@ public class MekHQView extends FrameView {
         private final static int COL_INIT    = 12;
         private final static int COL_TOUGH =   13;
         private final static int COL_EDGE  =   14;
-        private final static int COL_XP =      15;
-        private final static int N_COL =       16;
+        private final static int COL_NABIL =   15;
+        private final static int COL_NIMP  =   16;
+        private final static int COL_HITS  =   17;
+        private final static int COL_XP =      18;
+        private final static int N_COL =       19;
         
         private ArrayList<Person> data = new ArrayList<Person>();
         
@@ -3731,6 +3747,12 @@ public class MekHQView extends FrameView {
                     return "Unit Assignment";
                 case COL_EDGE:
                     return "Edge";
+                case COL_NABIL:
+                    return "# Abilities";
+                case COL_NIMP:
+                    return "# Implants";
+                case COL_HITS:
+                    return "Hits";
                 case COL_XP:
                     return "XP";
                 default:
@@ -3758,14 +3780,54 @@ public class MekHQView extends FrameView {
             case COL_TACTICS:
             case COL_INIT:
             case COL_XP:
+            case COL_EDGE:
+            case COL_NABIL:
+            case COL_NIMP:
+            case COL_HITS:
                 return 20;
             case COL_ASSIGN:
                 return 125;
             default:
                 return 20;
+            }
         }
+        
+        public int getAlignment(int col) {
+            switch(col) {
+            case COL_AGE:
+            case COL_GUN:
+            case COL_PILOT:
+            case COL_ARTY:
+            case COL_TOUGH:
+            case COL_TACTICS:
+            case COL_INIT:
+            case COL_XP:
+            case COL_EDGE:
+            case COL_NABIL:
+            case COL_NIMP:
+            case COL_HITS:
+            	return SwingConstants.CENTER;
+            default:
+            	return SwingConstants.LEFT;
+            }
         }
 
+        public String getTooltip(int row, int col) {
+        	Person p = data.get(row);
+        	switch(col) {
+        	case COL_NABIL:
+        		if(p instanceof PilotPerson) {
+        			return ((PilotPerson)p).getAbilityList(PilotOptions.LVL3_ADVANTAGES);
+        		}
+        	case COL_NIMP:
+        		if(p instanceof PilotPerson) {
+        			return ((PilotPerson)p).getAbilityList(PilotOptions.MD_ADVANTAGES);
+        		}
+            default:
+            	return null;
+            }
+        }
+        
         @Override
         public Class<?> getColumnClass(int c) {
             return getValueAt(0, c).getClass();
@@ -3855,6 +3917,27 @@ public class MekHQView extends FrameView {
             		return "-";
             	}
             }
+            if(col == COL_NABIL) {
+            	if(p instanceof PilotPerson) {
+            		return Integer.toString(((PilotPerson)p).getPilot().countOptions(PilotOptions.LVL3_ADVANTAGES));
+            	} else {
+            		return 0;
+            	}
+            }
+            if(col == COL_NIMP) {
+            	if(p instanceof PilotPerson) {
+            		return Integer.toString(((PilotPerson)p).getPilot().countOptions(PilotOptions.MD_ADVANTAGES));
+            	} else {
+            		return 0;
+            	}
+            }
+            if(col == COL_HITS) {
+            	if(p instanceof PilotPerson) {
+            		return Integer.toString(((PilotPerson)p).getPilot().getHits());
+            	} else {
+            		return 0;
+            	}
+            }
             if(col == COL_SKILL) {
             	return p.getSkillSummary();
             }
@@ -3873,6 +3956,41 @@ public class MekHQView extends FrameView {
             return "?";
         }
 
+        public PersonnelTableModel.Renderer getRenderer() {
+			return new PersonnelTableModel.Renderer();
+		}
+
+		public class Renderer extends DefaultTableCellRenderer {
+
+			private static final long serialVersionUID = 9054581142945717303L;
+
+			public Component getTableCellRendererComponent(JTable table,
+					Object value, boolean isSelected, boolean hasFocus,
+					int row, int column) {
+				super.getTableCellRendererComponent(table, value, isSelected,
+						hasFocus, row, column);
+				//setOpaque(true);
+				int actualCol = table.convertColumnIndexToModel(column);
+				int actualRow = table.convertRowIndexToModel(row);
+				setHorizontalAlignment(getAlignment(actualCol));
+				setToolTipText(getTooltip(actualRow, actualCol));
+				
+				if (isSelected) {
+                    setBackground(Color.DARK_GRAY);
+                } else {
+                    // tiger stripes
+                	if(Integer.parseInt((String)getValueAt(actualRow,COL_HITS)) > 0) {
+                		setBackground(Color.RED);
+                	} else if (row % 2 == 0) {
+                        setBackground(new Color(220, 220, 220));
+                    } else {
+                        setBackground(Color.WHITE);
+                    }
+                }
+				return this;
+			}
+
+		}
         
 	}
 	

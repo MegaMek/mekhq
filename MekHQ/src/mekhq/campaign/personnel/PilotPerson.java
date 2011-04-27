@@ -428,4 +428,23 @@ public class PilotPerson extends Person {
     	}
     	return "<html>" + edgett + "</html>";
     }
+    
+    /**
+     * This function returns an html-coded list that says what 
+     * abilities are enabled for this pilot
+     * @return
+     */
+    public String getAbilityList(String type) {
+    	String abilityString = "";
+        for (Enumeration<IOption> i = getPilot().getOptions(type); i.hasMoreElements();) {
+        	IOption ability = i.nextElement();
+        	if(ability.booleanValue()) {
+        		abilityString = abilityString + ability.getDisplayableNameWithValue() + "<br>";
+        	}
+        }
+        if(abilityString.equals("")) {
+        	return null;
+        }
+        return "<html>" + abilityString + "</html>";
+    }
 }

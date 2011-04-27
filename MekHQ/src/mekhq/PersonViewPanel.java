@@ -494,15 +494,7 @@ public class PersonViewPanel extends javax.swing.JPanel {
 				pnlStats.add(lblAbility1, gridBagConstraints);
 				
 				lblAbility2.setName("lblAbility2"); // NOI18N
-				String abilityString = "<html>";
-		        for (Enumeration<IOption> i = pp.getPilot().getOptions(PilotOptions.LVL3_ADVANTAGES); i.hasMoreElements();) {
-		        	IOption ability = i.nextElement();
-		        	if(ability.booleanValue()) {
-		        		abilityString = abilityString + ability.getDisplayableNameWithValue() + "<br>";
-		        	}
-		        }
-		        abilityString = abilityString + "<html>";
-				lblAbility2.setText(abilityString);
+				lblAbility2.setText(pp.getAbilityList(PilotOptions.LVL3_ADVANTAGES));
 				gridBagConstraints = new java.awt.GridBagConstraints();
 				gridBagConstraints.gridx = 1;
 				gridBagConstraints.gridy = secondy;
@@ -526,15 +518,7 @@ public class PersonViewPanel extends javax.swing.JPanel {
 				pnlStats.add(lblImplants1, gridBagConstraints);
 				
 				lblImplants2.setName("lblImplants2"); // NOI18N
-				String abilityString = "<html>";
-		        for (Enumeration<IOption> i = pp.getPilot().getOptions(PilotOptions.MD_ADVANTAGES); i.hasMoreElements();) {
-		        	IOption ability = i.nextElement();
-		        	if(ability.booleanValue()) {
-		        		abilityString = abilityString + ability.getDisplayableNameWithValue() + "<br>";
-		        	}
-		        }
-		        abilityString = abilityString + "<html>";
-				lblImplants2.setText(abilityString);
+				lblImplants2.setText(pp.getAbilityList(PilotOptions.MD_ADVANTAGES));
 				gridBagConstraints = new java.awt.GridBagConstraints();
 				gridBagConstraints.gridx = 1;
 				gridBagConstraints.gridy = secondy;
