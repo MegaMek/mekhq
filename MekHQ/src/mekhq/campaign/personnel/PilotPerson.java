@@ -39,6 +39,7 @@ import megamek.common.Protomech;
 import megamek.common.Tank;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
+import megamek.common.options.PilotOptions;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.SkillCosts;
@@ -380,4 +381,27 @@ public class PilotPerson extends Person {
 					"Could not improve " + SkillCosts.getSkillName(type) +" skill for  : " + getName());
 		}
 	}
+	
+
+    public int getEdge() {
+    	return pilot.getOptions().intOption("edge");
+    }
+    
+    /**
+     * This function returns an html-coded tooltip that says what 
+     * edge will be used
+     * @return
+     */
+    public String getEdgeTooltip() {
+    	String edgett = "<html>";
+    	for (Enumeration<IOption> i = getPilot().getOptions(PilotOptions.LVL3_ADVANTAGES); i.hasMoreElements();) {
+        	IOption ability = i.nextElement();
+        	//yuck, it would be nice to have a more fool-proof way of identifying edge triggers
+        	if(ability.getName().contains("edge_when") && ability.booleanValue()) {
+        		edgett = edgett + ability.getDescription() + "<br>";
+        	}
+        }
+    	edgett = edgett + "</html>";
+    	return edgett;
+    }
 }

@@ -2202,6 +2202,7 @@ public class MekHQView extends FrameView {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TACTICS), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_INIT), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TOUGH), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_EDGE), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), true);	
 		} else if(view == PV_COMBAT) {
@@ -2219,6 +2220,7 @@ public class MekHQView extends FrameView {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TACTICS), campaign.getCampaignOptions().useTactics());
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_INIT), campaign.getCampaignOptions().useInitBonus());
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TOUGH), campaign.getCampaignOptions().useToughness());
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_EDGE), campaign.getCampaignOptions().useAbilities());
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), false);	
 		} else if(view == PV_FLUFF) {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
@@ -2235,6 +2237,7 @@ public class MekHQView extends FrameView {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TACTICS), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_INIT), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TOUGH), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_EDGE), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), false);	
 		}
 	}
@@ -3624,8 +3627,9 @@ public class MekHQView extends FrameView {
         private final static int COL_TACTICS = 11;
         private final static int COL_INIT    = 12;
         private final static int COL_TOUGH =   13;
-        private final static int COL_XP =      14;
-        private final static int N_COL =       15;
+        private final static int COL_EDGE  =   14;
+        private final static int COL_XP =      15;
+        private final static int N_COL =       16;
         
         private ArrayList<Person> data = new ArrayList<Person>();
         
@@ -3668,6 +3672,8 @@ public class MekHQView extends FrameView {
                     return "Skill Level";
                 case COL_ASSIGN:
                     return "Unit Assignment";
+                case COL_EDGE:
+                    return "Edge";
                 case COL_XP:
                     return "XP";
                 default:
@@ -3781,6 +3787,13 @@ public class MekHQView extends FrameView {
             if(col == COL_PILOT) {
             	if(p instanceof PilotPerson) {
             		return Integer.toString(((PilotPerson)p).getPilot().getPiloting());
+            	} else {
+            		return "-";
+            	}
+            }
+            if(col == COL_EDGE) {
+            	if(p instanceof PilotPerson) {
+            		return Integer.toString(((PilotPerson)p).getEdge());
             	} else {
             		return "-";
             	}

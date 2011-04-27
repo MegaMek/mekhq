@@ -44,6 +44,7 @@ v0.1.4 (SVN)
 + "None" as an option in "Assign to Unit" menu
 + removed PersonnelViewDialog and Person#getDossier
 + added special abilities and implants to PersonViewPanel
++ separated edge from other special abilities in PersonnelViewPanel and added edge column to PersonnelTable
 
 v0.1.3 (2011-04-22)
 + Bug 3288095: Tasks are not refreshing and dates do not advance

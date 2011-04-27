@@ -63,6 +63,8 @@ public class PersonViewPanel extends javax.swing.JPanel {
 	private javax.swing.JLabel lblInit2;
 	private javax.swing.JLabel lblTough1;
 	private javax.swing.JLabel lblTough2;
+	private javax.swing.JLabel lblEdge1;
+	private javax.swing.JLabel lblEdge2;
 	private javax.swing.JLabel lblAbility1;
 	private javax.swing.JLabel lblAbility2;
 	private javax.swing.JLabel lblImplants1;
@@ -202,6 +204,8 @@ public class PersonViewPanel extends javax.swing.JPanel {
 		lblInit2 = new javax.swing.JLabel();
 		lblTough1 = new javax.swing.JLabel();
 		lblTough2 = new javax.swing.JLabel();
+		lblEdge1 = new javax.swing.JLabel();
+		lblEdge2 = new javax.swing.JLabel();
 		lblAbility1 = new javax.swing.JLabel();
 		lblAbility2 = new javax.swing.JLabel();
 		lblImplants1 = new javax.swing.JLabel();
@@ -448,6 +452,30 @@ public class PersonViewPanel extends javax.swing.JPanel {
 				pnlStats.add(lblTough2, gridBagConstraints);
 			}		
 			
+			if(campaign.getCampaignOptions().useAbilities()) {
+				secondy++;
+				lblEdge1.setName("lblEdge1"); // NOI18N
+				lblEdge1.setText(resourceMap.getString("lblEdge1.text"));
+				gridBagConstraints = new java.awt.GridBagConstraints();
+				gridBagConstraints.gridx = 2;
+				gridBagConstraints.gridy = secondy;
+				gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+				gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+				pnlStats.add(lblEdge1, gridBagConstraints);
+				
+				lblEdge2.setName("lblEdge2"); // NOI18N
+				lblEdge2.setText(Integer.toString(pp.getEdge()));
+				lblEdge2.setToolTipText(pp.getEdgeTooltip());
+				gridBagConstraints = new java.awt.GridBagConstraints();
+				gridBagConstraints.gridx = 3;
+				gridBagConstraints.gridy = secondy;
+				gridBagConstraints.weightx = 0.5;
+				gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+				gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+				gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+				pnlStats.add(lblEdge2, gridBagConstraints);
+			}
+			
 			//special abilities and implants need to be three columns wide to handle their large width
 			if(firsty > secondy) {
 				secondy = firsty;
@@ -469,7 +497,7 @@ public class PersonViewPanel extends javax.swing.JPanel {
 				String abilityString = "<html>";
 		        for (Enumeration<IOption> i = pp.getPilot().getOptions(PilotOptions.LVL3_ADVANTAGES); i.hasMoreElements();) {
 		        	IOption ability = i.nextElement();
-		        	if(ability.booleanValue()) {
+		        	if(ability.booleanValue() && !ability.getName().startsWith("edge")) {
 		        		abilityString = abilityString + ability.getDisplayableNameWithValue() + "<br>";
 		        	}
 		        }

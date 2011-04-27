@@ -317,7 +317,7 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
     public boolean isActive() {
     	return getStatus() == S_ACTIVE;
     }
-    
+     
 	public abstract void writeToXml(PrintWriter pw1, int indent, int id);
 	
 	protected void writeToXmlBegin(PrintWriter pw1, int indent, int id) {
