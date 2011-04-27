@@ -93,6 +93,7 @@ import megamek.common.TechConstants;
 import megamek.common.UnitType;
 import megamek.common.XMLStreamParser;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.options.IOption;
 import megamek.common.options.PilotOptions;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.PartInventory;
@@ -3305,6 +3306,32 @@ public class MekHQView extends FrameView {
 				refreshTechsList();
 				refreshDoctorsList();
 				refreshReport();
+			} else if (command.contains("ABILITY")) {
+				String selected = st.nextToken();
+				int cost =  Integer.parseInt(st.nextToken());
+				if(selectedPerson instanceof PilotPerson) {
+					((PilotPerson)selectedPerson).acquireAbility(PilotOptions.LVL3_ADVANTAGES, selected, true);
+					selectedPerson.setXp(selectedPerson.getXp() - cost);
+					//TODO: add campaign report
+					refreshUnitList();
+					refreshPersonnelList();
+					refreshTechsList();
+					refreshDoctorsList();
+					refreshReport();
+				}
+			} else if (command.contains("SPECIALIST")) {
+				String selected = st.nextToken();
+				int cost =  Integer.parseInt(st.nextToken());
+				if(selectedPerson instanceof PilotPerson) {
+					((PilotPerson)selectedPerson).acquireAbility(PilotOptions.LVL3_ADVANTAGES, "specialist", selected);
+					selectedPerson.setXp(selectedPerson.getXp() - cost);
+					//TODO: add campaign report
+					refreshUnitList();
+					refreshPersonnelList();
+					refreshTechsList();
+					refreshDoctorsList();
+					refreshReport();
+				}
 			} else if (command.equalsIgnoreCase("STATUS")) {
 				int selected = Integer.parseInt(st.nextToken());
 				if (selected == Person.S_ACTIVE
@@ -3586,6 +3613,48 @@ public class MekHQView extends FrameView {
 						menuItem.addActionListener(this);
 						menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
 						menu.add(menuItem);
+					}
+					if(campaign.getCampaignOptions().useAbilities()) {
+						JMenu abMenu = new JMenu("Special Abilities");
+						for (Enumeration<IOption> i = pp.getPilot().getOptions(PilotOptions.LVL3_ADVANTAGES); i.hasMoreElements();) {
+				        	IOption ability = i.nextElement();
+				        	if(ability.getName().equals("weapon_specialist")) {
+				        		continue;
+				        	}
+				        	if(!ability.booleanValue()) {
+				        		cost = campaign.getSkillCosts().getAbilityCost(ability.getName());
+				        		costDesc = " (" + cost + "XP)";
+								if(cost < 0) {
+									costDesc = " (Not Possible)";
+								}
+				        		if(ability.getName().equals("specialist")) {
+				        			JMenu specialistMenu = new JMenu("Specialist");
+				        			menuItem = new JMenuItem("Laser Specialist" + costDesc);
+									menuItem.setActionCommand("SPECIALIST|" + Pilot.SPECIAL_LASER + "|" + cost);
+									menuItem.addActionListener(this);
+									menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
+									specialistMenu.add(menuItem);
+									menuItem = new JMenuItem("Missile Specialist" + costDesc);
+									menuItem.setActionCommand("SPECIALIST|" + Pilot.SPECIAL_MISSILE + "|" + cost);
+									menuItem.addActionListener(this);
+									menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
+									specialistMenu.add(menuItem);
+									menuItem = new JMenuItem("Ballistic Specialist" + costDesc);
+									menuItem.setActionCommand("SPECIALIST|" + Pilot.SPECIAL_BALLISTIC + "|" + cost);
+									menuItem.addActionListener(this);
+									menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
+									specialistMenu.add(menuItem);
+									abMenu.add(specialistMenu);
+				        		} else {
+									menuItem = new JMenuItem(ability.getDisplayableName() + costDesc);
+									menuItem.setActionCommand("ABILITY|" + ability.getName() + "|" + cost);
+									menuItem.addActionListener(this);
+									menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
+									abMenu.add(menuItem);
+				        		}
+				        	}
+						}
+						menu.add(abMenu);
 					}
 				} else if(person instanceof SupportPerson) {
 					SupportTeam team = ((SupportPerson)person).getTeam();

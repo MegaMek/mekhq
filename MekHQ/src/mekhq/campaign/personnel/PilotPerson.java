@@ -447,4 +447,13 @@ public class PilotPerson extends Person {
         }
         return "<html>" + abilityString + "</html>";
     }
+    
+    public void acquireAbility(String type, String name, Object value) {
+    	for (Enumeration<IOption> i = getPilot().getOptions(type); i.hasMoreElements();) {
+        	IOption ability = i.nextElement();
+        	if(ability.getName().equals(name)) {
+        		ability.setValue(value);
+        	}
+    	}
+    }
 }

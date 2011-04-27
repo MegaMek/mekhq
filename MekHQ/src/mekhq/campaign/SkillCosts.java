@@ -25,6 +25,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Vector;
 
 /**
  * This object will keep track of all the various skill types and their associated experience point costs to advance
@@ -80,9 +81,13 @@ public class SkillCosts implements Serializable {
 	//xpCosts.get(SK_TACTICS)[2]
 	//is the cost of raising tactics from 1 to 2
 	Map<Integer, Integer[]> xpCosts = new HashMap<Integer, Integer[]>();
+	 
+	Map<String, Integer> abilityCosts = new HashMap<String, Integer>();
+	private int defaultAbilityCost;
 	
 	public SkillCosts() {
 		initializeCosts();
+		defaultAbilityCost = 8;
 	}
 	
 	private void initializeCosts() {
@@ -95,6 +100,22 @@ public class SkillCosts implements Serializable {
 		xpCosts.put(SK_TAC, new Integer[]{4,4,4,4,4,4,4});
 		xpCosts.put(SK_INIT, new Integer[]{4,4,4,4,4,4,4});
 		xpCosts.put(SK_TOUGH, new Integer[]{4,4,4,4,4,4,4});
+		
+		abilityCosts.put("hot_dog", 4);
+		abilityCosts.put("jumping_jack", 12);
+		abilityCosts.put("multi_tasker", 4);
+		abilityCosts.put("oblique_attacker", 4);
+		abilityCosts.put("pain_resistance", 4);
+		abilityCosts.put("sniper", 12);
+		abilityCosts.put("weapon_specialist", 12);
+		abilityCosts.put("specialist", 4);
+		abilityCosts.put("tactical_genius", 12);
+		abilityCosts.put("aptitude_gunnery", 40);
+		abilityCosts.put("gunnery_laser", 4);
+		abilityCosts.put("gunnery_ballistic", 4);
+		abilityCosts.put("gunnery_missile", 4);
+		abilityCosts.put("ei_implant", 0);
+		abilityCosts.put("clan_pilot_training", 0);
 	}
 	
 	public int getCost(int skill, int level, boolean usesSupportRating) {
@@ -106,5 +127,13 @@ public class SkillCosts implements Serializable {
 			return costs[level];
 		}
 		return -1;
+	}
+	
+	public int getAbilityCost(String ability) {
+		if(null == abilityCosts.get(ability)) {
+			return defaultAbilityCost;
+		} else {
+			return abilityCosts.get(ability);
+		}
 	}
 }
