@@ -41,6 +41,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -84,6 +85,7 @@ import megamek.client.ui.swing.MechView;
 import megamek.common.AmmoType;
 import megamek.common.Entity;
 import megamek.common.EntityListFile;
+import megamek.common.EntityWeightClass;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
@@ -184,7 +186,8 @@ public class MekHQView extends FrameView {
 	private PartsTableMouseAdapter partsMouseAdapter;
 	private TaskTableMouseAdapter taskMouseAdapter;
 	private PersonnelTableMouseAdapter personnelMouseAdapter;
-	private TableRowSorter<PersonnelTableModel> sorter;
+	private TableRowSorter<PersonnelTableModel> personnelSorter;
+	private TableRowSorter<UnitTableModel> unitSorter;
 	private int currentServicedUnitId;
 	private int currentTaskId;
 	private int currentAcquisitionId;
@@ -444,16 +447,16 @@ public class MekHQView extends FrameView {
         XTableColumnModel personColumnModel = new XTableColumnModel();
         personnelTable.setColumnModel(personColumnModel);
         personnelTable.createDefaultColumnsFromModel();
-        sorter = new TableRowSorter<PersonnelTableModel>(personModel);
-        sorter.setComparator(PersonnelTableModel.COL_RANK, new RankSorter());
-        sorter.setComparator(PersonnelTableModel.COL_GUN, new SkillSorter());
-        sorter.setComparator(PersonnelTableModel.COL_PILOT, new SkillSorter());
-        sorter.setComparator(PersonnelTableModel.COL_ARTY, new SkillSorter());
-        sorter.setComparator(PersonnelTableModel.COL_SKILL, new LevelSorter());
-        sorter.setComparator(PersonnelTableModel.COL_TACTICS, new BonusSorter());
-        sorter.setComparator(PersonnelTableModel.COL_INIT, new BonusSorter());
-        sorter.setComparator(PersonnelTableModel.COL_TOUGH, new BonusSorter());
-        personnelTable.setRowSorter(sorter);
+        personnelSorter = new TableRowSorter<PersonnelTableModel>(personModel);
+        personnelSorter.setComparator(PersonnelTableModel.COL_RANK, new RankSorter());
+        personnelSorter.setComparator(PersonnelTableModel.COL_GUN, new SkillSorter());
+        personnelSorter.setComparator(PersonnelTableModel.COL_PILOT, new SkillSorter());
+        personnelSorter.setComparator(PersonnelTableModel.COL_ARTY, new SkillSorter());
+        personnelSorter.setComparator(PersonnelTableModel.COL_SKILL, new LevelSorter());
+        personnelSorter.setComparator(PersonnelTableModel.COL_TACTICS, new BonusSorter());
+        personnelSorter.setComparator(PersonnelTableModel.COL_INIT, new BonusSorter());
+        personnelSorter.setComparator(PersonnelTableModel.COL_TOUGH, new BonusSorter());
+        personnelTable.setRowSorter(personnelSorter);
 		personnelTable.addMouseListener(personnelMouseAdapter);
 		personnelTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 		TableColumn column = null;
@@ -509,23 +512,17 @@ public class MekHQView extends FrameView {
 		unitTable.setModel(unitModel);
 		unitTable.setName("unitTable"); // NOI18N
 		unitTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-   /*
-		XTableColumnModel personColumnModel = new XTableColumnModel();
-        unitTable.setColumnModel(personColumnModel);
+		XTableColumnModel unitColumnModel = new XTableColumnModel();
+        unitTable.setColumnModel(unitColumnModel);
         unitTable.createDefaultColumnsFromModel();
-        sorter = new TableRowSorter<UnitTableModel>(unitModel);
-        sorter.setComparator(PersonnelTableModel.COL_RANK, new RankSorter());
-        sorter.setComparator(PersonnelTableModel.COL_GUN, new SkillSorter());
-        sorter.setComparator(PersonnelTableModel.COL_PILOT, new SkillSorter());
-        sorter.setComparator(PersonnelTableModel.COL_ARTY, new SkillSorter());
-        sorter.setComparator(PersonnelTableModel.COL_SKILL, new LevelSorter());
-        sorter.setComparator(PersonnelTableModel.COL_TACTICS, new BonusSorter());
-        sorter.setComparator(PersonnelTableModel.COL_INIT, new BonusSorter());
-        sorter.setComparator(PersonnelTableModel.COL_TOUGH, new BonusSorter());
-        unitTable.setRowSorter(sorter);
-		unitTable.addMouseListener(personnelMouseAdapter);
+        TableRowSorter<UnitTableModel> unitSorter = new TableRowSorter<UnitTableModel>(unitModel);
+        unitSorter.setComparator(UnitTableModel.COL_STATUS, new UnitStatusSorter());
+        unitSorter.setComparator(UnitTableModel.COL_WCLASS, new WeightClassSorter());
+        unitSorter.setComparator(UnitTableModel.COL_COST, new FormattedNumberSorter());
+
+        unitTable.setRowSorter(unitSorter);
+		//unitTable.addMouseListener(unitMouseAdapter);
 		unitTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-		*/
 		column = null;
         for (int i = 0; i < UnitTableModel.N_COL; i++) {
             column = unitTable.getColumnModel().getColumn(i);
@@ -2259,7 +2256,7 @@ public class MekHQView extends FrameView {
         		return false;
         	}
         };
-        sorter.setRowFilter(personTypeFilter);
+        personnelSorter.setRowFilter(personTypeFilter);
     }
 	
 	private void changePersonnelView() {
@@ -4306,6 +4303,111 @@ public class MekHQView extends FrameView {
 	}
 	
 	/**
+	 * A comparator for unit status strings
+	 * @author Jay Lawson
+	 *
+	 */
+	public class UnitStatusSorter implements Comparator<String> {
+
+		@Override
+		public int compare(String s0, String s1) {	
+			//probably easiest to turn into numbers and then sort that way
+			int l0 = 0;
+			int l1 = 0;
+			if(s0.contains("Salvage")) {
+				l0 = 1;
+			}
+			if(s1.contains("Salvage")) {
+				l1 = 1;
+			}
+			if(s0.contains("Inoperable")) {
+				l0 = 2;
+			}
+			if(s1.contains("Inoperable")) {
+				l1 = 2;
+			}
+			if(s0.contains("Crippled")) {
+				l0 = 3;
+			}
+			if(s1.contains("Crippled")) {
+				l1 = 3;
+			}
+			if(s0.contains("Heavy")) {
+				l0 = 4;
+			}
+			if(s1.contains("Heavy")) {
+				l1 = 4;
+			}
+			if(s0.contains("Light")) {
+				l0 = 5;
+			}
+			if(s1.contains("Light")) {
+				l1 = 5;
+			}
+			if(s0.contains("Undamaged")) {
+				l0 = 6;
+			}
+			if(s1.contains("Undamaged")) {
+				l1 = 6;
+			}
+			return ((Comparable<Integer>)l0).compareTo(l1);		
+		}
+	}
+	
+	/**
+	 * A comparator for unit weight classes
+	 * @author Jay Lawson
+	 *
+	 */
+	public class WeightClassSorter implements Comparator<String> {
+
+		@Override
+		public int compare(String s0, String s1) {	
+			//lets find the weight class integer for each name
+			int l0 = 0;
+			int l1 = 0;
+			for(int i = 0; i < EntityWeightClass.SIZE; i++) {
+				if(EntityWeightClass.getClassName(i).equals(s0)) {
+					l0 = i;
+				}
+				if(EntityWeightClass.getClassName(i).equals(s1)) {
+					l1 = i;
+				}			
+			}
+			return ((Comparable<Integer>)l0).compareTo(l1);		
+		}
+	}
+	
+	/**
+	 * A comparator for numbers that have been formatted with DecimalFormat
+	 * @author Jay Lawson
+	 *
+	 */
+	public class FormattedNumberSorter implements Comparator<String> {
+
+		@Override
+		public int compare(String s0, String s1) {	
+			//lets find the weight class integer for each name
+			DecimalFormat format = new DecimalFormat();
+			int l0 = 0;
+			try {
+				l0 = format.parse(s0).intValue();
+			} catch (java.text.ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			int l1 = 0;
+			try {
+				l1 = format.parse(s1).intValue();
+			} catch (java.text.ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return ((Comparable<Integer>)l0).compareTo(l1);		
+		}
+	}
+	
+	/**
 	 * A table model for displaying doctors
 	 */
 	public class DocTableModel extends ArrayTableModel {
@@ -4480,10 +4582,10 @@ public class MekHQView extends FrameView {
 		private final static int COL_CHASSIS =    0;
 		private final static int COL_MODEL   =    1;
         private final static int COL_TYPE    =    2;
-        private final static int COL_WEIGHT =     3;
-        private final static int COL_WCLASS    =  4;
-        private final static int COL_COST    =    5;
-        private final static int COL_TECH     =   6;
+        private final static int COL_WCLASS    =  3;
+        private final static int COL_TECH     =   4;
+        private final static int COL_WEIGHT =     5;    
+        private final static int COL_COST    =    6;
         private final static int COL_QUALITY  =   7;
         private final static int COL_STATUS   =   8;
         private final static int COL_PILOT    =   9;
@@ -4550,7 +4652,8 @@ public class MekHQView extends FrameView {
             case COL_COST:
             case COL_STATUS:
                 return 80;        
-            case COL_PILOT:
+            case COL_PILOT:          
+            case COL_TECH:
             	return 150;
             default:
                 return 20;
@@ -4559,6 +4662,15 @@ public class MekHQView extends FrameView {
         
         public int getAlignment(int col) {
             switch(col) {
+            case COL_QUALITY:
+            case COL_QUIRKS:
+            	return SwingConstants.CENTER;
+            case COL_WEIGHT:
+            case COL_COST:
+            case COL_REPAIR:
+            case COL_PARTS:
+            case COL_BV:
+            	return SwingConstants.RIGHT;
             default:
             	return SwingConstants.LEFT;
             }
@@ -4596,6 +4708,7 @@ public class MekHQView extends FrameView {
             Unit u = data.get(row);
             Entity e = u.getEntity();
             PilotPerson pp = u.getPilot();
+            DecimalFormat format = new DecimalFormat();
             if(null == e) {
             	return "?";
             }
@@ -4615,10 +4728,10 @@ public class MekHQView extends FrameView {
                 return e.getWeightClassName();
             }
             if(col == COL_COST) {
-                return u.getSellValue();
+                return format.format(u.getSellValue());
             }
             if(col == COL_TECH) {
-                return e.getTechLevel();
+                return TechConstants.getLevelDisplayableName(e.getTechLevel());
             }
             if(col == COL_QUALITY) {
                 return u.getQualityName();
