@@ -106,6 +106,8 @@
 				<include name="${datadir}/" />
 				<include name="${docdir}/" />
 				<include name="README.txt" />
+				<include name="Example.mul" />
+				<include name="FoxsTeeth.xml" />
 				<include name="license.txt" />
 			</fileset>
 		</copy>

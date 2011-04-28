@@ -1476,7 +1476,7 @@ public class MekHQView extends FrameView {
 	}// GEN-LAST:event_miHirePilotActionPerformed
 
 	private void miHireTechActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miHireTechActionPerformed
-		CustomizeTechTeamDialog ntd = new CustomizeTechTeamDialog(getFrame(), true, 
+		CustomizeSupportTeamDialog ntd = new CustomizeSupportTeamDialog(getFrame(), true, 
 				campaign.newTechPerson(TechTeam.T_MECH),
 				true,
 				campaign, this);
@@ -1484,12 +1484,11 @@ public class MekHQView extends FrameView {
 	}// GEN-LAST:event_miHireTechActionPerformed
 
 	private void miHireDoctorActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miHireDoctorActionPerformed
-		CustomizeMedicalTeamDialog nmd = new CustomizeMedicalTeamDialog(getFrame(), true, 
-				campaign.newDoctorPerson(), 
-				true, 
-				campaign,
-				this);
-		nmd.setVisible(true);
+		CustomizeSupportTeamDialog ntd = new CustomizeSupportTeamDialog(getFrame(), true, 
+				campaign.newDoctorPerson(),
+				true,
+				campaign, this);
+		ntd.setVisible(true);
 	}// GEN-LAST:event_miHireDoctorActionPerformed
 
 	private void menuSaveActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuSaveActionPerformed
@@ -3401,22 +3400,13 @@ public class MekHQView extends FrameView {
 							campaign,
 							view);
 					npd.setVisible(true);
-				} else if(selectedPerson instanceof SupportPerson) {
-					if(((SupportPerson)selectedPerson).getTeam() instanceof TechTeam) {
-						CustomizeTechTeamDialog ntd = new CustomizeTechTeamDialog(getFrame(), true, 
-								(SupportPerson)selectedPerson, 
-								false,
-								campaign,
-								view);
-						ntd.setVisible(true);
-					} else if(((SupportPerson)selectedPerson).getTeam() instanceof MedicalTeam) {
-						CustomizeMedicalTeamDialog ndd = new CustomizeMedicalTeamDialog(getFrame(), true, 
-								(SupportPerson)selectedPerson, 
-								false,
-								campaign,
-								view);
-						ndd.setVisible(true);
-					}
+				} else if(selectedPerson instanceof SupportPerson) {			
+					CustomizeSupportTeamDialog ntd = new CustomizeSupportTeamDialog(getFrame(), true, 
+							(SupportPerson)selectedPerson, 
+							false,
+							campaign,
+							view);
+					ntd.setVisible(true);		
 				}
 			} else if (command.equalsIgnoreCase("HEAL")) {
 				if (selectedPerson instanceof PilotPerson) {
@@ -4050,7 +4040,7 @@ public class MekHQView extends FrameView {
             }
             if(col == COL_HITS) {
             	if(p instanceof PilotPerson) {
-            		return Integer.toString(((PilotPerson)p).getPilot().getHits());
+            		return ((PilotPerson)p).getPilot().getHits();
             	} else {
             		return 0;
             	}
@@ -4096,7 +4086,7 @@ public class MekHQView extends FrameView {
                     setBackground(Color.DARK_GRAY);
                 } else {
                     // tiger stripes
-                	if(Integer.parseInt((String)getValueAt(actualRow,COL_HITS)) > 0) {
+                	if((Integer)getValueAt(actualRow,COL_HITS) > 0) {
                 		setBackground(Color.RED);
                 	} else if (row % 2 == 0) {
                         setBackground(new Color(220, 220, 220));

@@ -27,6 +27,7 @@ import java.util.GregorianCalendar;
 
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SupportPerson;
+import mekhq.campaign.team.MedicalTeam;
 import mekhq.campaign.team.SupportTeam;
 import javax.swing.DefaultComboBoxModel;
 import mekhq.campaign.Campaign;
@@ -36,7 +37,7 @@ import mekhq.campaign.team.TechTeam;
  *
  * @author  Taharqa
  */
-public class CustomizeTechTeamDialog extends javax.swing.JDialog {
+public class CustomizeSupportTeamDialog extends javax.swing.JDialog {
 	private static final long serialVersionUID = -8038099101234445018L;
 	private Campaign campaign;
     private MekHQView hqView;
@@ -47,7 +48,7 @@ public class CustomizeTechTeamDialog extends javax.swing.JDialog {
     private Frame frame;
     
     /** Creates new form NewTeamDialog */
-    public CustomizeTechTeamDialog(java.awt.Frame parent, boolean modal, SupportPerson person, boolean hire, Campaign campaign, MekHQView view) {
+    public CustomizeSupportTeamDialog(java.awt.Frame parent, boolean modal, SupportPerson person, boolean hire, Campaign campaign, MekHQView view) {
         super(parent, modal);
         this.frame = parent;
         this.campaign = campaign;
@@ -55,10 +56,10 @@ public class CustomizeTechTeamDialog extends javax.swing.JDialog {
         this.hqView = view;
         this.person = person;
         this.newHire = hire;       
-        refreshTech();
+        refreshPerson();
     }
 
-    private void refreshTech() {	
+    private void refreshPerson() {	
     	this.birthdate = (GregorianCalendar)person.getBirthday().clone();
     	getContentPane().removeAll();
     	initComponents();
@@ -84,11 +85,12 @@ public class CustomizeTechTeamDialog extends javax.swing.JDialog {
         lblBday = new javax.swing.JLabel();
         btnDate = new javax.swing.JButton();
         choiceGender = new javax.swing.JComboBox();
-
+        btnRandomName = new javax.swing.JButton();
+        
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
 
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(CustomizeTechTeamDialog.class);
+        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(CustomizeSupportTeamDialog.class);
         getContentPane().setLayout(new java.awt.GridBagLayout());
         
         lblTeamName.setText(resourceMap.getString("lblTeamName.text")); // NOI18N
@@ -118,11 +120,25 @@ public class CustomizeTechTeamDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         getContentPane().add(txtTeamName, gridBagConstraints);
  
+        btnRandomName.setText(resourceMap.getString("btnRandomName.text")); // NOI18N
+        btnRandomName.setName("btnRandomName"); // NOI18N
+        btnRandomName.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            	randomName();
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 4;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        getContentPane().add(btnRandomName, gridBagConstraints);
+        
         lblGender.setText(resourceMap.getString("lblGender.text")); // NOI18N
         lblGender.setName("lblGender"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         getContentPane().add(lblGender, gridBagConstraints);
@@ -142,7 +158,7 @@ public class CustomizeTechTeamDialog extends javax.swing.JDialog {
         choiceGender.setSelectedIndex(person.getGender());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         getContentPane().add(choiceGender, gridBagConstraints);
@@ -151,7 +167,7 @@ public class CustomizeTechTeamDialog extends javax.swing.JDialog {
         lblBday.setName("lblBday"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         getContentPane().add(lblBday, gridBagConstraints);
@@ -165,7 +181,7 @@ public class CustomizeTechTeamDialog extends javax.swing.JDialog {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
@@ -175,7 +191,7 @@ public class CustomizeTechTeamDialog extends javax.swing.JDialog {
         lblTeamRating.setName("lblTeamRating"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         getContentPane().add(lblTeamRating, gridBagConstraints);
@@ -189,38 +205,41 @@ public class CustomizeTechTeamDialog extends javax.swing.JDialog {
         chTeamRating.setSelectedIndex(person.getTeam().getRating());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         getContentPane().add(chTeamRating, gridBagConstraints);
-
-        lblTeamType.setText(resourceMap.getString("lblTeamType.text")); // NOI18N
-        lblTeamType.setName("lblTeamType"); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        getContentPane().add(lblTeamType, gridBagConstraints);
-        
+     
         DefaultComboBoxModel teamTypeModel = new DefaultComboBoxModel();
         for(int i = 0; i < TechTeam.T_NUM; i++) {
             teamTypeModel.addElement(TechTeam.getTypeDesc(i));
         }
         chTeamType.setModel(teamTypeModel);
         chTeamType.setName("chTeamType"); // NOI18N
-        chTeamType.setSelectedIndex(((TechTeam)person.getTeam()).getType());
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        getContentPane().add(chTeamType, gridBagConstraints);
- 
+        chTeamType.setSelectedIndex(0);
+        if(person.getType() != Person.T_DOCTOR) {
+        	lblTeamType.setText(resourceMap.getString("lblTeamType.text")); // NOI18N
+            lblTeamType.setName("lblTeamType"); // NOI18N
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = 4;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+            gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+            getContentPane().add(lblTeamType, gridBagConstraints);
+            	        
+            chTeamType.setSelectedIndex(((TechTeam)person.getTeam()).getType());
+	        gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 1;
+	        gridBagConstraints.gridy = 4;
+	        gridBagConstraints.gridwidth = 3;
+	        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+	        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+	        getContentPane().add(chTeamType, gridBagConstraints);
+        }
+	 
         if(isNewHire()) {
         	btnHire.setText(resourceMap.getString("btnHire.text")); // NOI18N
         } else {
@@ -234,7 +253,7 @@ public class CustomizeTechTeamDialog extends javax.swing.JDialog {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.CENTER;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
@@ -249,7 +268,7 @@ public class CustomizeTechTeamDialog extends javax.swing.JDialog {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.CENTER;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
@@ -267,21 +286,30 @@ private void btnHireActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
     int type = chTeamType.getSelectedIndex();
     String name = txtTeamName.getText();
     if(isNewHire()) {
-    	TechTeam tech = new TechTeam(name, rating, type);
-    	person.setTeam(tech);
+    	SupportTeam team = new MedicalTeam(name, rating);;
+    	if(person.getType() != Person.T_DOCTOR) {   		
+    		team = new TechTeam(name, rating, type);
+    	}	
+    	person.setTeam(team);
     	campaign.addPerson(person);
-    	person = campaign.newTechPerson(TechTeam.T_MECH);
-    	refreshTech();
+    	if(person.getType() == Person.T_DOCTOR) {
+    		person = campaign.newDoctorPerson();
+    	} else {
+    		person = campaign.newTechPerson(TechTeam.T_MECH);
+    	}
+    	refreshPerson();
     	hqView.refreshPersonnelList();
     	hqView.refreshTechsList();
     	hqView.refreshPatientList();
     	hqView.refreshReport();
     } else {
-    	TechTeam tech = (TechTeam)person.getTeam();
-    	tech.setRating(rating);
-    	tech.setType(type);
-    	tech.setName(name);
-    	person.setType(person.getTypeBy(tech));
+    	SupportTeam team = (SupportTeam)person.getTeam();
+    	team.setRating(rating);    	
+    	team.setName(name);
+    	if(person.getType() != Person.T_DOCTOR && team instanceof TechTeam) {   	
+    		((TechTeam)team).setType(type);
+    	}
+    	person.setType(person.getTypeBy(team));
     	hqView.refreshPersonnelList();
     	hqView.refreshTechsList();
     	hqView.refreshPatientList();
@@ -322,7 +350,7 @@ private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                CustomizeTechTeamDialog dialog = new CustomizeTechTeamDialog(new javax.swing.JFrame(), true, null, false, null, null);
+                CustomizeSupportTeamDialog dialog = new CustomizeSupportTeamDialog(new javax.swing.JFrame(), true, null, false, null, null);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     public void windowClosing(java.awt.event.WindowEvent e) {
                         System.exit(0);
@@ -336,6 +364,7 @@ private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClose;
     private javax.swing.JButton btnHire;
+    private javax.swing.JButton btnRandomName;
     private javax.swing.JComboBox chTeamRating;
     private javax.swing.JComboBox chTeamType;
     private javax.swing.JLabel lblTeamName;
