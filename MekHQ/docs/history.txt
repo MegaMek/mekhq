@@ -1,6 +1,6 @@
 VERSION HISTORY
 ----------------------------------
-v0.1.4 (SVN)
+v0.1.4 (2011-04-28)
 + Bug: personnel options not updating in CampaignOptionsDialog
 + improvements to NewPilotDialog.java
 + new MegaMek.jar
