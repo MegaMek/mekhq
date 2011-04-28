@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.1.5 (SVN)
++ refactored Hangar Panel into separate Hangar and Repair Bay panel
 
 
 v0.1.4 (2011-04-28)

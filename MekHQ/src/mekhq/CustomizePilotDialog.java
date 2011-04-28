@@ -535,7 +535,7 @@ public class CustomizePilotDialog extends javax.swing.JDialog implements DialogO
             setOptions(p);
         	hqView.refreshPersonnelList();
         	hqView.refreshPatientList();
-        	hqView.refreshUnitList();
+        	hqView.refreshServicedUnitList();
         	setVisible(false);
         }
     }//GEN-LAST:event_btnOkActionPerformed
