@@ -151,6 +151,12 @@ public class MekHQView extends FrameView {
 	private static final int PV_FLUFF   = 2;
 	private static final int PV_NUM     = 3;
 	
+	//unit views
+	private static final int UV_GENERAL = 0;
+	private static final int UV_DETAILS = 1;
+	private static final int UV_STATUS  = 2;
+	private static final int UV_NUM     = 3;
+	
 	class ExtFileFilter extends FileFilter {
 		private String useExt = null;
 
@@ -367,6 +373,8 @@ public class MekHQView extends FrameView {
 		txtPersonnelView = new javax.swing.JTextPane();
 		lblUnitChoice = new javax.swing.JLabel();
 		choiceUnit = new javax.swing.JComboBox();
+		choiceUnitView = new javax.swing.JComboBox();
+		lblUnitView = new javax.swing.JLabel();
 
 		mainPanel.setAutoscrolls(true);
 		mainPanel.setName("mainPanel"); // NOI18N
@@ -542,6 +550,34 @@ public class MekHQView extends FrameView {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
 		panHangar.add(choiceUnit, gridBagConstraints);
 			
+		lblUnitView.setText(resourceMap.getString("lblUnitView.text")); // NOI18N
+		lblPersonView.setName("lblUnitView"); // NOI18N
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 2;
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+		panHangar.add(lblUnitView, gridBagConstraints);
+		
+		DefaultComboBoxModel unitViewModel = new DefaultComboBoxModel();
+		for (int i = 0; i < UV_NUM; i++) {
+			unitViewModel.addElement(getUnitViewName(i));
+		}
+		choiceUnitView.setModel(unitViewModel);
+		choiceUnitView.setName("choiceUnitView"); // NOI18N
+		choiceUnitView.setSelectedIndex(0);
+		choiceUnitView.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				changeUnitView();
+			}
+		});
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 3;
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+		gridBagConstraints.weightx = 0.0;
+		gridBagConstraints.weighty = 0.0;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+		panHangar.add(choiceUnitView, gridBagConstraints);
 		
 		unitTable.setModel(unitModel);
 		unitTable.setName("unitTable"); // NOI18N
@@ -563,7 +599,7 @@ public class MekHQView extends FrameView {
             column.setCellRenderer(unitModel.getRenderer());
         }
         unitTable.setIntercellSpacing(new Dimension(0, 0));
-        //changeUnitView();
+        changeUnitView();
         unitTable.getSelectionModel().addListSelectionListener(new javax.swing.event.ListSelectionListener() {
             public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
                 //refreshUnitView();
@@ -1813,6 +1849,19 @@ public class MekHQView extends FrameView {
     		return "?";
     	}
     }
+	
+	public static String getUnitViewName(int group) {
+    	switch(group) {
+    	case UV_GENERAL:
+    		return "General";
+    	case UV_DETAILS:
+    		return "Details";
+    	case UV_STATUS:
+    		return "Status";
+    	default:
+    		return "?";
+    	}
+    }
 
 	private void btnOvertimeActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnOvertimeActionPerformed
 		campaign.setOvertime(btnOvertime.isSelected());
@@ -2378,6 +2427,58 @@ public class MekHQView extends FrameView {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NIMP), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_HITS), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), false);	
+		}
+	}
+	
+	private void changeUnitView() {
+		
+		int view = choiceUnitView.getSelectedIndex();
+		XTableColumnModel columnModel = (XTableColumnModel)unitTable.getColumnModel();
+		if(view == PV_GENERAL) {
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_CHASSIS), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_MODEL), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TYPE), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_WCLASS), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TECH), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_WEIGHT), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_COST), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_QUALITY), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_STATUS), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_PILOT), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_BV), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_REPAIR), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_PARTS), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_QUIRKS), false);
+		} else if(view == UV_DETAILS) {
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_CHASSIS), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_MODEL), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TYPE), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_WCLASS), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TECH), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_WEIGHT), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_COST), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_QUALITY), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_STATUS), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_PILOT), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_BV), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_REPAIR), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_PARTS), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_QUIRKS), true);
+		} else if(view == UV_STATUS) {
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_CHASSIS), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_MODEL), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TYPE), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_WCLASS), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TECH), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_WEIGHT), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_COST), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_QUALITY), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_STATUS), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_PILOT), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_BV), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_REPAIR), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_PARTS), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_QUIRKS), false);
 		}
 	}
 	
