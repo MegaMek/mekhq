@@ -370,11 +370,12 @@ public class MekHQView extends FrameView {
 		choicePersonView = new javax.swing.JComboBox();
 		lblPersonView = new javax.swing.JLabel();
 		scrollPersonnelView = new javax.swing.JScrollPane();
-		txtPersonnelView = new javax.swing.JTextPane();
 		lblUnitChoice = new javax.swing.JLabel();
 		choiceUnit = new javax.swing.JComboBox();
 		choiceUnitView = new javax.swing.JComboBox();
 		lblUnitView = new javax.swing.JLabel();
+		scrollUnitView = new javax.swing.JScrollPane();
+		txtUnitView = new javax.swing.JTextPane();
 
 		mainPanel.setAutoscrolls(true);
 		mainPanel.setName("mainPanel"); // NOI18N
@@ -493,10 +494,6 @@ public class MekHQView extends FrameView {
 		gridBagConstraints.weighty = 1.0;
 		panPersonnel.add(scrollPersonnelTable, gridBagConstraints);
 		
-		txtPersonnelView.setContentType(resourceMap.getString("txtDesc.contentType")); // NOI18N
-		txtPersonnelView.setEditable(false);
-		txtPersonnelView.setFont(resourceMap.getFont("txtDesc.font")); // NOI18N
-		txtPersonnelView.setName("txtPersonnelView"); // NOI18N
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 5;
 		gridBagConstraints.gridy = 0;
@@ -508,7 +505,7 @@ public class MekHQView extends FrameView {
 		scrollPersonnelView.setMinimumSize(new java.awt.Dimension(450, 600));
 		scrollPersonnelView.setPreferredSize(new java.awt.Dimension(450, 2000));
 		scrollPersonnelView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		scrollPersonnelView.setViewportView(txtPersonnelView);
+		scrollPersonnelView.setViewportView(null);
 		panPersonnel.add(scrollPersonnelView, gridBagConstraints);
 		
 		tabMain.addTab(
@@ -602,7 +599,7 @@ public class MekHQView extends FrameView {
         changeUnitView();
         unitTable.getSelectionModel().addListSelectionListener(new javax.swing.event.ListSelectionListener() {
             public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
-                //refreshUnitView();
+                refreshUnitView();
             }
         });
         
@@ -617,6 +614,23 @@ public class MekHQView extends FrameView {
 		gridBagConstraints.weighty = 1.0;
 		panHangar.add(scrollUnitTable, gridBagConstraints);
 		
+		txtUnitView.setContentType(resourceMap.getString("txtDesc.contentType")); // NOI18N
+		txtUnitView.setEditable(false);
+		txtUnitView.setFont(resourceMap.getFont("txtDesc.font")); // NOI18N
+		txtUnitView.setName("txtUnitView"); // NOI18N
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 5;
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.gridheight = 2;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+		gridBagConstraints.weightx = 0.0;
+		gridBagConstraints.weighty = 1.0;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+		scrollUnitView.setMinimumSize(new java.awt.Dimension(450, 600));
+		scrollUnitView.setPreferredSize(new java.awt.Dimension(450, 2000));
+		scrollUnitView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		scrollUnitView.setViewportView(txtUnitView);
+		panHangar.add(scrollUnitView, gridBagConstraints);
 		
 		tabMain.addTab(
 				resourceMap.getString("panHangar.TabConstraints.tabTitle"),
@@ -1920,6 +1934,19 @@ public class MekHQView extends FrameView {
 		
 	}
 	
+	private void refreshUnitView() {
+		int row = unitTable.getSelectedRow();
+		if(row < 0) {
+			scrollUnitView.setViewportView(null);
+			return;
+		}
+		Unit selectedUnit = unitModel.getUnit(unitTable.convertRowIndexToModel(row));
+		MechView mv = new MechView(selectedUnit.getEntity(), false);
+		txtUnitView.setText(mv.getMechReadout());
+		//scrollPersonnelView.setViewportView(new PersonViewPanel(selectedPerson, campaign));
+		
+	}
+	
 	private void PartsFilterActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_PartsFilterActionPerformed
 		refreshPartsList();
 	}// GEN-LAST:event_PartsFilterActionPerformed
@@ -2632,6 +2659,7 @@ public class MekHQView extends FrameView {
 				refreshServicedUnitList();
 				refreshUnitList();
 				refreshTaskList();
+				refreshUnitView();
 				refreshAcquireList();
 			} else if (command.contains("SWAP_AMMO")) {
 				WorkItem task = taskModel.getTaskAt(TaskTable.getSelectedRow());
@@ -2649,6 +2677,7 @@ public class MekHQView extends FrameView {
 							.get(selType);
 					reload.swapAmmo(newType);
 					refreshTaskList();
+					refreshUnitView();
 					refreshAcquireList();
 				}
 			} else if (command.contains("CHANGE_MODE")) {
@@ -2659,6 +2688,7 @@ public class MekHQView extends FrameView {
 					refreshServicedUnitList();
 					refreshUnitList();
 					refreshTaskList();
+					refreshUnitView();
 					refreshAcquireList();
 				}
 			} else if (command.contains("UNASSIGN")) {
@@ -5276,11 +5306,12 @@ public class MekHQView extends FrameView {
 	private javax.swing.JComboBox choicePersonView;
 	private javax.swing.JLabel lblPersonView;
 	private javax.swing.JScrollPane scrollPersonnelView;
-    private javax.swing.JTextPane txtPersonnelView;
     private javax.swing.JComboBox choiceUnit;
 	private javax.swing.JLabel lblUnitChoice;
 	private javax.swing.JComboBox choiceUnitView;
 	private javax.swing.JLabel lblUnitView;
+	private javax.swing.JScrollPane scrollUnitView;
+    private javax.swing.JTextPane txtUnitView;
 	// End of variables declaration//GEN-END:variables
 
 	private final Timer messageTimer;
