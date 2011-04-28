@@ -3489,7 +3489,7 @@ public class MekHQView extends FrameView {
 
 			if (e.isPopupTrigger()) {
 				int row = personnelTable.rowAtPoint(e.getPoint());
-				Person person = personModel.getPerson(row);
+				Person person = personModel.getPerson(personnelTable.convertRowIndexToModel(row));
 				units = campaign.getEligibleUnitsFor(person);
 				JMenuItem menuItem = null;
 				JMenu menu = null;
@@ -3500,11 +3500,14 @@ public class MekHQView extends FrameView {
 				menu = new JMenu("Change Rank");
 				int rankOrder = 0;
 				for(String rank : campaign.getRanks().getAllRanks()) {
-					menuItem = new JMenuItem(rank);
-					menuItem.setActionCommand("RANK|" + rankOrder);
-					menuItem.addActionListener(this);
-					menuItem.setEnabled(true);
-					menu.add(menuItem);
+					cbMenuItem = new JCheckBoxMenuItem(rank);
+					cbMenuItem.setActionCommand("RANK|" + rankOrder);
+					if(person.getRank() == rankOrder) {
+						cbMenuItem.setSelected(true);
+					}
+					cbMenuItem.addActionListener(this);
+					cbMenuItem.setEnabled(true);
+					menu.add(cbMenuItem);
 					rankOrder++;
 				}
 				popup.add(menu);
