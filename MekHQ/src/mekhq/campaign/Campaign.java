@@ -945,6 +945,7 @@ public class Campaign implements Serializable {
 
 		for (Unit unit : getUnits()) {
 			if (null != unit.getEntity()) {
+				unit.getEntity().setGame(game);
 				unit.getEntity().restore();
 			}
 		}
