@@ -57,7 +57,7 @@ public class MekInfo extends JPanel {
         setLayout(new java.awt.GridLayout(1, 0));
 
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(MekInfo.class);
-        lblImage.setIcon(resourceMap.getIcon("lblImage.icon")); // NOI18N
+        //lblImage.setIcon(resourceMap.getIcon("lblImage.icon")); // NOI18N
         lblImage.setText(resourceMap.getString("lblImage.text")); // NOI18N
         lblImage.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         lblImage.setName("lblImage"); // NOI18N

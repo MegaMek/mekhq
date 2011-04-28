@@ -39,7 +39,7 @@ public class PartInfo extends javax.swing.JPanel {
         setLayout(new java.awt.GridLayout(1, 0));
 
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(PartInfo.class);
-        lblImage.setIcon(resourceMap.getIcon("lblImage.icon")); // NOI18N
+        //lblImage.setIcon(resourceMap.getIcon("lblImage.icon")); // NOI18N
         lblImage.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         lblImage.setName("lblImage"); // NOI18N
         add(lblImage);

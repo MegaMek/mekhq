@@ -78,6 +78,8 @@
 
 		<!-- jar -->
 		<jar basedir="${svnbuilddir}" jarfile="${svndir}/${jarfile}">
+			<fileset dir="${svndir}/${srcdir}" includes="**/*.properties"/>
+			<fileset dir="${svndir}/${srcdir}" includes="**/*.png"/>
 			<manifest>
 				<attribute name="Built-By" value="${user.name}" />
 				<attribute name="Class-Path" value=". ${jarclasspath}" />

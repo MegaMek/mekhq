@@ -57,6 +57,7 @@ v0.1.4 (SVN)
 + Spend XP on special abilities
 + weapon specialist options in Spend XP > Special Abilities
 + context menu selecting wrong person on sorted rows
++ changes to packaging.xml and resource handling
 
 v0.1.3 (2011-04-22)
 + Bug 3288095: Tasks are not refreshing and dates do not advance
