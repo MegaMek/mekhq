@@ -628,6 +628,28 @@ public class Campaign implements Serializable {
 		}
 		return total;
 	}
+	
+	public int getTotalTasksFor(int unitId) {
+		ArrayList<WorkItem> unitTasks = getTasksForUnit(unitId);
+		int n = 0;
+		for (WorkItem task : unitTasks) {
+			if(task.isNeeded()) {
+				n++;
+			}
+		}
+		return n;
+	}
+	
+	public int getTotalPartsFor(int unitId) {
+		ArrayList<WorkItem> unitTasks = getTasksForUnit(unitId);
+		int n = 0;
+		for (WorkItem task : unitTasks) {
+			if(task instanceof ReplacementItem && !((ReplacementItem)task).hasPart()) {
+				n++;
+			}
+		}
+		return n;
+	}
 
 	/**
 	 * return an html report on this unit. This will go in MekInfo

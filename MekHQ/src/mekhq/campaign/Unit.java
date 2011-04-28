@@ -72,6 +72,13 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 	public static final int STATE_HEAVY_DAMAGE = 2;
 	public static final int STATE_CRIPPLED = 3;
 
+	public static final int QUALITY_A = 0;
+	public static final int QUALITY_B = 1;
+	public static final int QUALITY_C = 2;
+	public static final int QUALITY_D = 3;
+	public static final int QUALITY_E = 4;
+	public static final int QUALITY_F = 5;
+
 	private Entity entity;
 	private int site;
 	private boolean deployed;
@@ -80,6 +87,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 	private boolean salvaged;
 	private boolean customized;
 	private int id = -1;
+	private int quality;
 
 	public Campaign campaign;
 
@@ -97,8 +105,60 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 		this.salvaged = false;
 		this.campaign = c;
 		this.customized = false;
+		this.quality = QUALITY_D;
 		reCalc();
 	}
+	
+	public static String getDamageStateName(int i) {
+		switch(i) {
+		case STATE_UNDAMAGED:
+			return "Undamaged";
+		case STATE_LIGHT_DAMAGE:
+			return "Light Damage";
+		case STATE_HEAVY_DAMAGE:
+			return "Heavy Damage";
+		case STATE_CRIPPLED:
+			return "Crippled";
+		default:
+			return "Unknown";
+		}
+	}
+	
+	public static String getQualityName(int quality) {
+		switch(quality) {
+		case QUALITY_A:
+			return "A";
+		case QUALITY_B:
+			return "B";
+		case QUALITY_C:
+			return "C";
+		case QUALITY_D:
+			return "D";
+		case QUALITY_E:
+			return "E";
+		case QUALITY_F:
+			return "F";
+		default:
+			return "?";
+		}
+	}
+	
+	public String getQualityName() {
+		return getQualityName(getQuality());
+	}
+	
+	public String getStatus() {
+		if(!isRepairable()) {
+			return "Salvage";
+		}
+		else if(!isFunctional()) {
+			return "Inoperable";
+		}
+		else {
+			return getDamageStateName(getDamageState());
+		}
+	}
+	
 	
 	public void reCalc() {
 		// Do nothing.
@@ -152,6 +212,14 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 		}
 	}
 
+	public int getQuality() {
+		return quality;
+	}
+	
+	public void setQuality(int q) {
+		this.quality = q;
+	}
+	
 	public boolean isSalvage() {
 		return salvaged;
 	}
@@ -1762,6 +1830,8 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 				+ deployed + "</customized>");
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<deployed>"
 				+ deployed + "</deployed>");
+		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<quality>"
+				+ quality + "</quality>");
 		
 		// Units may not have a pilot!
 		if (pilot != null) {
@@ -1791,6 +1861,8 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 				
 				if (wn2.getNodeName().equalsIgnoreCase("pilotId")) {
 					retVal.pilotId = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("quality")) {
+					retVal.quality = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("site")) {
 					retVal.site = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("salvaged")) {

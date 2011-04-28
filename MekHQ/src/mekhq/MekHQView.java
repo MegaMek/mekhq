@@ -178,6 +178,7 @@ public class MekHQView extends FrameView {
 	private PatientTableModel patientModel = new PatientTableModel();
 	private DocTableModel doctorsModel = new DocTableModel();
 	private PersonnelTableModel personModel = new PersonnelTableModel();
+	private UnitTableModel unitModel = new UnitTableModel();
 	private PartsTableModel partsModel = new PartsTableModel();
 	private ServicedUnitsTableMouseAdapter servicedUnitMouseAdapter;
 	private PartsTableMouseAdapter partsMouseAdapter;
@@ -289,6 +290,8 @@ public class MekHQView extends FrameView {
 		scrollPersonnelTable = new javax.swing.JScrollPane();
 		personnelTable = new javax.swing.JTable();
 		panHangar = new javax.swing.JPanel();
+		scrollUnitTable = new javax.swing.JScrollPane();
+		unitTable = new javax.swing.JTable();
 		panRepairBay = new javax.swing.JPanel();
 		scrollTaskTable = new javax.swing.JScrollPane();
 		TaskTable = new javax.swing.JTable();
@@ -502,6 +505,52 @@ public class MekHQView extends FrameView {
 		panHangar.setFont(resourceMap.getFont("panHangar.font")); // NOI18N
 		panHangar.setName("panHangar"); // NOI18N
 		panHangar.setLayout(new java.awt.GridBagLayout());
+		
+		unitTable.setModel(unitModel);
+		unitTable.setName("unitTable"); // NOI18N
+		unitTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+   /*
+		XTableColumnModel personColumnModel = new XTableColumnModel();
+        unitTable.setColumnModel(personColumnModel);
+        unitTable.createDefaultColumnsFromModel();
+        sorter = new TableRowSorter<UnitTableModel>(unitModel);
+        sorter.setComparator(PersonnelTableModel.COL_RANK, new RankSorter());
+        sorter.setComparator(PersonnelTableModel.COL_GUN, new SkillSorter());
+        sorter.setComparator(PersonnelTableModel.COL_PILOT, new SkillSorter());
+        sorter.setComparator(PersonnelTableModel.COL_ARTY, new SkillSorter());
+        sorter.setComparator(PersonnelTableModel.COL_SKILL, new LevelSorter());
+        sorter.setComparator(PersonnelTableModel.COL_TACTICS, new BonusSorter());
+        sorter.setComparator(PersonnelTableModel.COL_INIT, new BonusSorter());
+        sorter.setComparator(PersonnelTableModel.COL_TOUGH, new BonusSorter());
+        unitTable.setRowSorter(sorter);
+		unitTable.addMouseListener(personnelMouseAdapter);
+		unitTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+		*/
+		column = null;
+        for (int i = 0; i < UnitTableModel.N_COL; i++) {
+            column = unitTable.getColumnModel().getColumn(i);
+            column.setPreferredWidth(unitModel.getColumnWidth(i));
+            column.setCellRenderer(unitModel.getRenderer());
+        }
+        unitTable.setIntercellSpacing(new Dimension(0, 0));
+        //changeUnitView();
+        unitTable.getSelectionModel().addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                //refreshUnitView();
+            }
+        });
+        
+        scrollUnitTable.setViewportView(unitTable);
+	
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 1;
+		gridBagConstraints.gridwidth = 4;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+		gridBagConstraints.weightx = 1.0;
+		gridBagConstraints.weighty = 1.0;
+		panHangar.add(scrollUnitTable, gridBagConstraints);
+		
 		
 		tabMain.addTab(
 				resourceMap.getString("panHangar.TabConstraints.tabTitle"),
@@ -1316,6 +1365,7 @@ public class MekHQView extends FrameView {
 		//}
 		
 		refreshServicedUnitList();
+		refreshUnitList();
 		refreshPersonnelList();
 		refreshTaskList();
 		refreshAcquireList();
@@ -1438,6 +1488,7 @@ public class MekHQView extends FrameView {
 	private void btnAdvanceDayActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnAdvanceDayActionPerformed
 		campaign.newDay();
 		refreshServicedUnitList();
+		refreshUnitList();
 		refreshPersonnelList();
 		refreshTaskList();
 		refreshAcquireList();
@@ -1604,6 +1655,7 @@ public class MekHQView extends FrameView {
 		}
 
 		refreshServicedUnitList();
+		refreshUnitList();
 		refreshPersonnelList();
 		changePersonnelView();
 		refreshTaskList();
@@ -1647,6 +1699,7 @@ public class MekHQView extends FrameView {
 		}
 
 		refreshServicedUnitList();
+		refreshUnitList();
 		refreshPersonnelList();
 		changePersonnelView();
 		refreshTaskList();
@@ -1770,6 +1823,7 @@ public class MekHQView extends FrameView {
 
 		usd.setVisible(true);
 		refreshServicedUnitList();
+		refreshUnitList();
 		refreshPersonnelList();
 		refreshReport();
 		refreshFunds();
@@ -1940,6 +1994,7 @@ public class MekHQView extends FrameView {
 		}
 		
 		refreshServicedUnitList();
+		refreshUnitList();
 		refreshPersonnelList();
 		refreshPatientList();
 		refreshReport();
@@ -2026,6 +2081,7 @@ public class MekHQView extends FrameView {
 		}
 
 		refreshServicedUnitList();
+		refreshUnitList();
 		refreshPatientList();
 		refreshPersonnelList();
 
@@ -2048,6 +2104,10 @@ public class MekHQView extends FrameView {
 	
 	protected void refreshPersonnelList() {
 		personModel.setData(campaign.getPersonnel());
+	}
+	
+	protected void refreshUnitList() {
+		unitModel.setData(campaign.getUnits());
 	}
 
 	protected void refreshTaskList() {
@@ -2417,6 +2477,7 @@ public class MekHQView extends FrameView {
 					}
 				}
 				refreshServicedUnitList();
+				refreshUnitList();
 				refreshTaskList();
 				refreshAcquireList();
 			} else if (command.contains("SWAP_AMMO")) {
@@ -2443,6 +2504,7 @@ public class MekHQView extends FrameView {
 					int selected = Integer.parseInt(sel);
 					task.setMode(selected);
 					refreshServicedUnitList();
+					refreshUnitList();
 					refreshTaskList();
 					refreshAcquireList();
 				}
@@ -2451,6 +2513,7 @@ public class MekHQView extends FrameView {
 					task.resetTimeSpent();
 					task.setTeam(null);
 					refreshServicedUnitList();
+					refreshUnitList();
 					refreshTaskList();
 					refreshAcquireList();
 				}
@@ -2470,6 +2533,7 @@ public class MekHQView extends FrameView {
 						}
 					}
 					refreshServicedUnitList();
+					refreshUnitList();
 					refreshTaskList();
 					refreshAcquireList();
 					refreshPartsList();
@@ -2704,6 +2768,7 @@ public class MekHQView extends FrameView {
 					unit.removePilot();
 				}
 				refreshServicedUnitList();
+				refreshUnitList();
 			} else if (command.contains("CHANGE_PILOT")) {
 				String sel = command.split(":")[1];
 				int selected = Integer.parseInt(sel);
@@ -2712,6 +2777,7 @@ public class MekHQView extends FrameView {
 					campaign.changePilot(selectedUnit, pilots.get(selected));
 				}
 				refreshServicedUnitList();
+				refreshUnitList();
 			} else if (command.equalsIgnoreCase("SELL")) {
 				for (Unit unit : units) {
 					if (!unit.isDeployed()) {
@@ -2730,6 +2796,7 @@ public class MekHQView extends FrameView {
 					}
 				}
 				refreshServicedUnitList();
+				refreshUnitList();
 				refreshReport();
 				refreshFunds();
 			} else if (command.equalsIgnoreCase("LOSS")) {
@@ -2743,6 +2810,7 @@ public class MekHQView extends FrameView {
 					}
 				}
 				refreshServicedUnitList();
+				refreshUnitList();
 				refreshReport();
 			} else if (command.contains("ASSIGN_TECH")) {
 				String sel = command.split(":")[1];
@@ -2760,6 +2828,7 @@ public class MekHQView extends FrameView {
 					}
 				}
 				refreshServicedUnitList();
+				refreshUnitList();
 				refreshTaskList();
 				refreshAcquireList();
 				refreshTechsList();
@@ -2790,6 +2859,7 @@ public class MekHQView extends FrameView {
 				refreshTaskList();
 				refreshAcquireList();
 				refreshServicedUnitList();
+				refreshUnitList();
 			} else if (command.contains("CHANGE_SITE")) {
 				for (Unit unit : units) {
 					if (!unit.isDeployed()) {
@@ -2801,6 +2871,7 @@ public class MekHQView extends FrameView {
 					}
 				}
 				refreshServicedUnitList();
+				refreshUnitList();
 				refreshTaskList();
 				refreshAcquireList();
 			} else if (command.equalsIgnoreCase("SALVAGE")) {
@@ -2810,6 +2881,7 @@ public class MekHQView extends FrameView {
 					}
 				}
 				refreshServicedUnitList();
+				refreshUnitList();
 			} else if (command.equalsIgnoreCase("REPAIR")) {
 				for (Unit unit : units) {
 					if (!unit.isDeployed() && unit.isRepairable()) {
@@ -2817,6 +2889,7 @@ public class MekHQView extends FrameView {
 					}
 				}
 				refreshServicedUnitList();
+				refreshUnitList();
 			} else if (command.equalsIgnoreCase("REMOVE")) {
 				for (Unit unit : units) {
 					if (!unit.isDeployed()) {
@@ -2830,6 +2903,7 @@ public class MekHQView extends FrameView {
 					}
 				}
 				refreshServicedUnitList();
+				refreshUnitList();
 				refreshReport();
 			} else if (command.equalsIgnoreCase("UNDEPLOY")) {
 				for (Unit unit : units) {
@@ -2841,6 +2915,7 @@ public class MekHQView extends FrameView {
 					}
 				}
 				refreshServicedUnitList();
+				refreshUnitList();
 				refreshPatientList();
 				refreshPersonnelList();
 			} else if (command.contains("CUSTOMIZE")
@@ -2950,6 +3025,7 @@ public class MekHQView extends FrameView {
 					}
 
 					refreshServicedUnitList();
+					refreshUnitList();
 					refreshTaskList();
 					refreshAcquireList();
 				}
@@ -2959,6 +3035,7 @@ public class MekHQView extends FrameView {
 					selectedUnit.cancelCustomize(campaign);
 
 					refreshServicedUnitList();
+					refreshUnitList();
 					refreshTaskList();
 					refreshAcquireList();
 				}
@@ -3286,6 +3363,7 @@ public class MekHQView extends FrameView {
 				int rank = Integer.parseInt(st.nextToken());
 				selectedPerson.setRank(rank);
 				refreshServicedUnitList();
+				refreshUnitList();
 				refreshPatientList();
 				refreshPersonnelList();
 				refreshTechsList();
@@ -3303,6 +3381,7 @@ public class MekHQView extends FrameView {
 					campaign.changePilot(units.get(selected), (PilotPerson)selectedPerson);
 				}
 				refreshServicedUnitList();
+				refreshUnitList();
 				refreshPersonnelList();
 			} else if (command.contains("IMPROVE")) {
 				int selected = Integer.parseInt(st.nextToken());
@@ -3311,6 +3390,7 @@ public class MekHQView extends FrameView {
 				selectedPerson.setXp(selectedPerson.getXp() - cost);
 				campaign.addReport(selectedPerson.getName() + " improved " + SkillCosts.getSkillName(selected) + "!");
 				refreshServicedUnitList();
+				refreshUnitList();
 				refreshPersonnelList();
 				refreshTechsList();
 				refreshDoctorsList();
@@ -3323,6 +3403,7 @@ public class MekHQView extends FrameView {
 					selectedPerson.setXp(selectedPerson.getXp() - cost);
 					//TODO: add campaign report
 					refreshServicedUnitList();
+					refreshUnitList();
 					refreshPersonnelList();
 					refreshTechsList();
 					refreshDoctorsList();
@@ -3336,6 +3417,7 @@ public class MekHQView extends FrameView {
 					selectedPerson.setXp(selectedPerson.getXp() - cost);
 					//TODO: add campaign report
 					refreshServicedUnitList();
+					refreshUnitList();
 					refreshPersonnelList();
 					refreshTechsList();
 					refreshDoctorsList();
@@ -3349,6 +3431,7 @@ public class MekHQView extends FrameView {
 					selectedPerson.setXp(selectedPerson.getXp() - cost);
 					//TODO: add campaign report
 					refreshServicedUnitList();
+					refreshUnitList();
 					refreshPersonnelList();
 					refreshTechsList();
 					refreshDoctorsList();
@@ -3367,6 +3450,7 @@ public class MekHQView extends FrameView {
 				}
 			
 				refreshServicedUnitList();
+				refreshUnitList();
 				refreshPatientList();
 				refreshPersonnelList();
 				filterPersonnel();
@@ -3390,6 +3474,7 @@ public class MekHQView extends FrameView {
 					campaign.removePerson(selectedPerson.getId());
 				}
 				refreshServicedUnitList();
+				refreshUnitList();
 				refreshPatientList();
 				refreshPersonnelList();
 				refreshTechsList();
@@ -3427,6 +3512,7 @@ public class MekHQView extends FrameView {
 				refreshPatientList();
 				refreshDoctorsList();
 				refreshServicedUnitList();
+				refreshUnitList();
 				refreshPersonnelList();
 			} else if (command.equalsIgnoreCase("PORTRAIT")) {
 				PortraitChoiceDialog pcd = new PortraitChoiceDialog(null, true,
@@ -4382,6 +4468,228 @@ public class MekHQView extends FrameView {
 			}
 		}
 	}
+	
+	/**
+	 * A table Model for displaying information about units
+	 * @author Jay lawson
+	 */
+	public class UnitTableModel extends AbstractTableModel {
+	
+		private static final long serialVersionUID = -5207167419079014157L;
+		
+		private final static int COL_CHASSIS =    0;
+		private final static int COL_MODEL   =    1;
+        private final static int COL_TYPE    =    2;
+        private final static int COL_WEIGHT =     3;
+        private final static int COL_WCLASS    =  4;
+        private final static int COL_COST    =    5;
+        private final static int COL_TECH     =   6;
+        private final static int COL_QUALITY  =   7;
+        private final static int COL_STATUS   =   8;
+        private final static int COL_PILOT    =   9;
+        private final static int COL_BV        =  10;
+        private final static int COL_REPAIR  =    11;
+        private final static int COL_PARTS    =   12;
+        private final static int COL_QUIRKS   =   13;
+        private final static int N_COL =          14;
+        
+        private ArrayList<Unit> data = new ArrayList<Unit>();
+        
+        public int getRowCount() {
+            return data.size();
+        }
+
+        public int getColumnCount() {
+            return N_COL;
+        }
+
+        @Override
+        public String getColumnName(int column) {
+            switch(column) {
+            	case COL_CHASSIS:
+            		return "Chassis";
+                case COL_MODEL:
+                    return "Model";
+                case COL_TYPE:
+                    return "Type";
+                case COL_WEIGHT:
+                    return "Weight";
+                case COL_WCLASS:
+                    return "Class";
+                case COL_COST:
+                    return "Value";
+                case COL_TECH:
+                    return "Tech";
+                case COL_QUALITY:
+                    return "Quality";
+                case COL_STATUS:
+                    return "Status";
+                case COL_PILOT:
+                    return "Assigned to";
+                case COL_BV:
+                    return "BV";
+                case COL_REPAIR:
+                    return "# Repairs";
+                case COL_PARTS:
+                    return "# Parts";
+                case COL_QUIRKS:
+                    return "Quirks";
+                default:
+                    return "?";
+            }
+        }
+        
+        public int getColumnWidth(int c) {
+            switch(c) {
+        	case COL_CHASSIS:
+        		return 100;
+            case COL_MODEL:
+            case COL_WCLASS:
+            case COL_TYPE:
+            	return 50;
+            case COL_COST:
+            case COL_STATUS:
+                return 80;        
+            case COL_PILOT:
+            	return 150;
+            default:
+                return 20;
+            }
+        }
+        
+        public int getAlignment(int col) {
+            switch(col) {
+            default:
+            	return SwingConstants.LEFT;
+            }
+        }
+
+        public String getTooltip(int row, int col) {
+        	Unit u = data.get(row);
+        	switch(col) {
+            default:
+            	return null;
+            }
+        }
+        
+        @Override
+        public Class<?> getColumnClass(int c) {
+            return getValueAt(0, c).getClass();
+        }
+
+        @Override
+        public boolean isCellEditable(int row, int col) {
+            return false;
+        }
+
+        public Unit getUnit(int i) {
+            return data.get(i);
+        }
+
+        //fill table with values
+        public void setData(ArrayList<Unit> units) {
+            data = units;
+            fireTableDataChanged();
+        }
+
+        public Object getValueAt(int row, int col) {
+            Unit u = data.get(row);
+            Entity e = u.getEntity();
+            PilotPerson pp = u.getPilot();
+            if(null == e) {
+            	return "?";
+            }
+            if(col == COL_CHASSIS) {
+                return e.getChassis();
+            }  
+            if(col == COL_MODEL) {
+                return e.getModel();
+            }
+            if(col == COL_TYPE) {
+            	return UnitType.getTypeDisplayableName(UnitType.determineUnitTypeCode(e));
+            }
+            if(col == COL_WEIGHT) {
+                return e.getWeight();
+            }
+            if(col == COL_WCLASS) {
+                return e.getWeightClassName();
+            }
+            if(col == COL_COST) {
+                return u.getSellValue();
+            }
+            if(col == COL_TECH) {
+                return e.getTechLevel();
+            }
+            if(col == COL_QUALITY) {
+                return u.getQualityName();
+            }
+            if(col == COL_STATUS) {
+                return u.getStatus();
+            }
+            if(col == COL_PILOT) {
+            	if(null == pp) {
+            		return "-";
+            	} else {
+            		return campaign.getFullTitleFor(pp);
+            	}
+            }
+            if(col == COL_BV) {
+            	if(null == pp) {
+            		return e.calculateBattleValue(true, true);
+            	} else {
+            		return e.calculateBattleValue(true, false);
+            	}
+            }
+            if(col == COL_REPAIR) {
+                return campaign.getTotalTasksFor(u.getId());
+            }
+            if(col == COL_PARTS) {
+                return campaign.getTotalPartsFor(u.getId());
+            }
+            if(col == COL_QUIRKS) {
+            	return e.countQuirks();
+            }
+            return "?";
+        }
+
+        public UnitTableModel.Renderer getRenderer() {
+			return new UnitTableModel.Renderer();
+		}
+
+		public class Renderer extends DefaultTableCellRenderer {
+
+			private static final long serialVersionUID = 9054581142945717303L;
+
+			public Component getTableCellRendererComponent(JTable table,
+					Object value, boolean isSelected, boolean hasFocus,
+					int row, int column) {
+				super.getTableCellRendererComponent(table, value, isSelected,
+						hasFocus, row, column);
+				setOpaque(true);
+				int actualCol = table.convertColumnIndexToModel(column);
+				int actualRow = table.convertRowIndexToModel(row);
+				setHorizontalAlignment(getAlignment(actualCol));
+				setToolTipText(getTooltip(actualRow, actualCol));
+				
+				if (isSelected) {
+                    setBackground(Color.DARK_GRAY);
+                } else {
+                    // tiger stripes
+                	//if((Integer)getValueAt(actualRow,COL_HITS) > 0) {
+                		//setBackground(Color.RED);
+                //	} else 
+                	if (row % 2 == 0) {
+                        setBackground(new Color(220, 220, 220));
+                    } else {
+                        setBackground(Color.WHITE);
+                    }
+                }
+				return this;
+			}
+
+		}
+        
+	}
 
 	/**
 	 * <code>XTableColumnModel</code> extends the DefaultTableColumnModel .
@@ -4634,6 +4942,7 @@ public class MekHQView extends FrameView {
 	private javax.swing.JTable AcquisitionTable;
 	private javax.swing.JTable TechTable;
 	private javax.swing.JTable servicedUnitTable;
+	private javax.swing.JTable unitTable;
 	private javax.swing.JTable personnelTable;
 	private javax.swing.JMenuItem addFunds;
 	private javax.swing.JButton btnAdvanceDay;
@@ -4684,6 +4993,7 @@ public class MekHQView extends FrameView {
 	private javax.swing.JScrollPane scrollTechTable;
 	private javax.swing.JScrollPane scrollServicedUnitTable;
 	private javax.swing.JScrollPane scrollPersonnelTable;
+	private javax.swing.JScrollPane scrollUnitTable;
 	private javax.swing.JLabel statusAnimationLabel;
 	private javax.swing.JLabel statusMessageLabel;
 	private javax.swing.JPanel statusPanel;
