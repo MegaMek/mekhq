@@ -365,6 +365,8 @@ public class MekHQView extends FrameView {
 		lblPersonView = new javax.swing.JLabel();
 		scrollPersonnelView = new javax.swing.JScrollPane();
 		txtPersonnelView = new javax.swing.JTextPane();
+		lblUnitChoice = new javax.swing.JLabel();
+		choiceUnit = new javax.swing.JComboBox();
 
 		mainPanel.setAutoscrolls(true);
 		mainPanel.setName("mainPanel"); // NOI18N
@@ -509,17 +511,48 @@ public class MekHQView extends FrameView {
 		panHangar.setName("panHangar"); // NOI18N
 		panHangar.setLayout(new java.awt.GridBagLayout());
 		
+		lblUnitChoice.setText(resourceMap.getString("lblUnitChoice.text")); // NOI18N
+		lblUnitChoice.setName("lblUnitChoice"); // NOI18N
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.weightx = 1.0;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+		panHangar.add(lblUnitChoice, gridBagConstraints);
+		
+		DefaultComboBoxModel unitGroupModel = new DefaultComboBoxModel();
+		unitGroupModel.addElement("All Units");
+		for (int i = 0; i < UnitType.SIZE; i++) {
+			unitGroupModel.addElement(UnitType.getTypeDisplayableName(i));
+		}
+		choiceUnit.setModel(unitGroupModel);
+		choiceUnit.setName("choiceUnit"); // NOI18N
+		choiceUnit.setSelectedIndex(0);
+		choiceUnit.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				filterUnits();
+			}
+		});
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 1;
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+		gridBagConstraints.weightx = 0.0;
+		gridBagConstraints.weighty = 0.0;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+		panHangar.add(choiceUnit, gridBagConstraints);
+			
+		
 		unitTable.setModel(unitModel);
 		unitTable.setName("unitTable"); // NOI18N
 		unitTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		XTableColumnModel unitColumnModel = new XTableColumnModel();
         unitTable.setColumnModel(unitColumnModel);
         unitTable.createDefaultColumnsFromModel();
-        TableRowSorter<UnitTableModel> unitSorter = new TableRowSorter<UnitTableModel>(unitModel);
+        unitSorter = new TableRowSorter<UnitTableModel>(unitModel);
         unitSorter.setComparator(UnitTableModel.COL_STATUS, new UnitStatusSorter());
         unitSorter.setComparator(UnitTableModel.COL_WCLASS, new WeightClassSorter());
         unitSorter.setComparator(UnitTableModel.COL_COST, new FormattedNumberSorter());
-
         unitTable.setRowSorter(unitSorter);
 		//unitTable.addMouseListener(unitMouseAdapter);
 		unitTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
@@ -2093,8 +2126,8 @@ public class MekHQView extends FrameView {
 
 	protected void refreshServicedUnitList() {
 		int selected = servicedUnitTable.getSelectedRow();
-		servicedUnitModel.setData(campaign.getUnits());
-		if ((selected > -1) && (selected < campaign.getUnits().size())) {
+		servicedUnitModel.setData(campaign.getServiceableUnits());
+		if ((selected > -1) && (selected < campaign.getServiceableUnits().size())) {
 			servicedUnitTable.setRowSelectionInterval(selected, selected);
 		}
 	}
@@ -2228,7 +2261,7 @@ public class MekHQView extends FrameView {
 	
 	void filterPersonnel() {
         RowFilter<PersonnelTableModel, Integer> personTypeFilter = null;
-       final int nGroup = choicePerson.getSelectedIndex();
+        final int nGroup = choicePerson.getSelectedIndex();
         personTypeFilter = new RowFilter<PersonnelTableModel,Integer>() {
         	@Override
         	public boolean include(Entry<? extends PersonnelTableModel, ? extends Integer> entry) {
@@ -2257,6 +2290,28 @@ public class MekHQView extends FrameView {
         	}
         };
         personnelSorter.setRowFilter(personTypeFilter);
+    }
+	
+	void filterUnits() {
+		RowFilter<UnitTableModel, Integer> unitTypeFilter = null;
+		final int nGroup = choiceUnit.getSelectedIndex() - 1;
+        unitTypeFilter = new RowFilter<UnitTableModel,Integer>() {
+        	@Override
+        	public boolean include(Entry<? extends UnitTableModel, ? extends Integer> entry) {
+        		if(nGroup < 0) {
+        			return true;
+        		}
+        		UnitTableModel unitModel = entry.getModel();
+        		Unit unit = unitModel.getUnit(entry.getIdentifier());
+        		Entity en = unit.getEntity();
+        		int type = -1;
+        		if(null != en) {
+        			type = UnitType.determineUnitTypeCode(en);
+        		}
+        		return type == nGroup;
+        	}
+        };
+        unitSorter.setRowFilter(unitTypeFilter);
     }
 	
 	private void changePersonnelView() {
@@ -5121,6 +5176,10 @@ public class MekHQView extends FrameView {
 	private javax.swing.JLabel lblPersonView;
 	private javax.swing.JScrollPane scrollPersonnelView;
     private javax.swing.JTextPane txtPersonnelView;
+    private javax.swing.JComboBox choiceUnit;
+	private javax.swing.JLabel lblUnitChoice;
+	private javax.swing.JComboBox choiceUnitView;
+	private javax.swing.JLabel lblUnitView;
 	// End of variables declaration//GEN-END:variables
 
 	private final Timer messageTimer;

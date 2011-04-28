@@ -472,6 +472,16 @@ public class Campaign implements Serializable {
 		}
 		return patients;
 	}
+	
+	public ArrayList<Unit> getServiceableUnits() {
+		ArrayList<Unit> service = new ArrayList<Unit>();
+		for(Unit u : getUnits()) {
+			if(countTasksFor(u.getId()) > 0) {
+				service.add(u);
+			}
+		}
+		return service;
+	}
 
 	public Person getPerson(int id) {
 		return personnelIds.get(new Integer(id));

@@ -4,6 +4,8 @@ v0.1.5 (SVN)
 + refactored Hangar Panel into separate Hangar and Repair Bay panel
 + UnitTable and UnitTableModel in HangarPanel
 + sorting of UnitTable
++ Unit type filter for UnitTable
++ only units needing service should show up in the Repair Bay
 
 
 v0.1.4 (2011-04-28)
