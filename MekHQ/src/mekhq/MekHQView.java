@@ -3596,6 +3596,7 @@ public class MekHQView extends FrameView {
             String command = st.nextToken();
             int id = Integer.parseInt(st.nextToken());
             Force force = campaign.getForce(id);
+            Person person = campaign.getPerson(id);
             if(command.contains("ADD_FORCE")) {
             	if(null != force) {
 	            	String name = (String)JOptionPane.showInputDialog(
@@ -3645,6 +3646,14 @@ public class MekHQView extends FrameView {
             	if(null != force) {
             		campaign.removeForce(force);
             		refreshOrganization();   	
+            	}
+            } else if(command.contains("REMOVE_PERSON")) {
+            	if(null != person) {
+            		Force parentForce = campaign.getForceFor(person);
+            		if(null != parentForce) {
+            			parentForce.removePerson(id);
+            			refreshOrganization();   	
+            		}
             	}
             }
 		}
@@ -3714,6 +3723,17 @@ public class MekHQView extends FrameView {
 					menuItem.addActionListener(this);
 					menuItem.setEnabled(null != force.getParentForce());
 	                popup.add(menuItem);
+                }
+                else if(null != person) {
+                	int personId = person.getId();
+                	Force parentForce = campaign.getForceFor(person);
+                	if(null != parentForce) {
+	                	menuItem = new JMenuItem("Remove Person from " + parentForce.getName());
+		                menuItem.setActionCommand("REMOVE_PERSON|" + personId);
+						menuItem.addActionListener(this);
+						menuItem.setEnabled(true);
+		                popup.add(menuItem);
+                	}
                 }
 				popup.show(e.getComponent(), e.getX(), e.getY());
 			}

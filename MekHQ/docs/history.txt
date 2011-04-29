@@ -25,6 +25,7 @@ v0.1.5 (SVN)
 + context-menu for OrgTree
 + ability to add forces and personnel to orgTree
 + "remove force" menu item for orgTree context menu
++ "remove person from force" menu item for orgTree context menu
 
 v0.1.4 (2011-04-28)
 + Bug: personnel options not updating in CampaignOptionsDialog

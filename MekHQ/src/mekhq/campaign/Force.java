@@ -112,6 +112,22 @@ public class Force implements Serializable, MekHqXmlSerializable {
 		personnel.add(person);
 	}
 	
+	public void removePerson(int id) {
+		int idx = 0;
+		boolean found = false;
+		for(PilotPerson person : getPersonnel()) {
+			if(person.getId() == id) {
+				found = true;
+				break;
+			}
+			idx++;
+		}
+		if(found) {
+			personnel.get(idx).setForceId(0);
+			personnel.remove(idx);
+		}
+	}
+	
 	public String toString() {
 		return name;
 	}

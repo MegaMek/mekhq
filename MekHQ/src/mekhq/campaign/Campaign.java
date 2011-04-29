@@ -936,6 +936,10 @@ public class Campaign implements Serializable {
 		}
 	}
 	
+	public Force getForceFor(Person p) {
+		return getForce(p.getForceId());
+	}
+	
 	/**
 	 * return a string (HTML formatted) of tasks for this unit
 	 * 
