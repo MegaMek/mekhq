@@ -71,17 +71,11 @@ public class PersonViewPanel extends javax.swing.JPanel {
 	private javax.swing.JLabel lblImplants2;
 	
 	
-	public PersonViewPanel(Person p, Campaign c) {
+	public PersonViewPanel(Person p, Campaign c, DirectoryItems portraits) {
 		this.person = p;
 		this.campaign = c;
-		try {
-            portraits = new DirectoryItems(new File("data/images/portraits"), "", //$NON-NLS-1$ //$NON-NLS-2$
-                    PortraitFileFactory.getInstance());
-        } catch (Exception e) {
-            portraits = null;
-        }
+		this.portraits = portraits;
 		initComponents();
-		//setMinimumSize(new Dimension(400, 200));
 	}
 	
 	private void initComponents() {

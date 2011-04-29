@@ -34,13 +34,9 @@ public class MekInfo extends JPanel {
     private DirectoryItems camos;
     
     /** Creates new form MekInfo */
-    public MekInfo() {
-        try {
-            camos = new DirectoryItems(new File("data/images/camo"), "", //$NON-NLS-1$ //$NON-NLS-2$
-                    ImageFileFactory.getInstance());
-        } catch (Exception e) {
-            camos = null;
-        }
+    public MekInfo(DirectoryItems camo, MechTileset mt) {
+    	this.camos = camo;
+    	this.mt = mt;
         initComponents();
     }
 
@@ -88,15 +84,9 @@ public class MekInfo extends JPanel {
     
     public Image getImageFor(Unit u, Component c) {
         
-        if (mt == null) {
-            mt = new MechTileset("data/images/units/");
-            try {
-                mt.loadFromFile("mechset.txt");
-            } catch (IOException ex) {
-            	MekHQApp.logError(ex);
-                //TODO: do something here
-            }
-        }// end if(null tileset)
+    	if(null == mt) {
+    		return null;
+    	}
         Image base = mt.imageFor(u.getEntity(), c, -1);
         int tint = PlayerColors.getColorRGB(u.campaign.getColorIndex());
         EntityImage entityImage = new EntityImage(base, tint, getCamo(u.campaign), c);

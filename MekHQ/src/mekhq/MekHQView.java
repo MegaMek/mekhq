@@ -92,7 +92,9 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
+import megamek.client.ui.swing.MechTileset;
 import megamek.client.ui.swing.MechView;
+import megamek.client.ui.swing.util.ImageFileFactory;
 import megamek.common.AmmoType;
 import megamek.common.Entity;
 import megamek.common.EntityListFile;
@@ -218,6 +220,11 @@ public class MekHQView extends FrameView {
 	private int currentPartsId;
 	private int[] selectedTasksIds;
 
+	//the various directory items we need to access
+	private DirectoryItems portraits;
+    private DirectoryItems camos;
+	protected static MechTileset mt;
+	
 	public MekHQView(SingleFrameApplication app) {
 		super(app);
 
@@ -226,9 +233,31 @@ public class MekHQView extends FrameView {
 		taskMouseAdapter = new TaskTableMouseAdapter();
 		personnelMouseAdapter = new PersonnelTableMouseAdapter(this);
 		orgMouseAdapter = new OrgTreeMouseAdapter();
+		
+		//load in directory items and tilesets
+		try {
+            portraits = new DirectoryItems(new File("data/images/portraits"), "", //$NON-NLS-1$ //$NON-NLS-2$
+                    PortraitFileFactory.getInstance());
+        } catch (Exception e) {
+            portraits = null;
+        }
+        try {
+            camos = new DirectoryItems(new File("data/images/camo"), "", //$NON-NLS-1$ //$NON-NLS-2$
+                    ImageFileFactory.getInstance());
+        } catch (Exception e) {
+            camos = null;
+        }
+        mt = new MechTileset("data/images/units/");
+        try {
+            mt.loadFromFile("mechset.txt");
+        } catch (IOException ex) {
+        	MekHQApp.logError(ex);
+            //TODO: do something here
+        }
+		
 		initComponents();
 		refreshCalendar();
-
+		
 		// status bar initialization - message timeout, idle icon and busy
 		// animation, etc
 		ResourceMap resourceMap = getResourceMap();
@@ -1927,7 +1956,7 @@ public class MekHQView extends FrameView {
 
 	private void menuOptionsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuOptionsActionPerformed
 		CampaignOptionsDialog cod = new CampaignOptionsDialog(getFrame(), true,
-				campaign);
+				campaign, camos);
 		cod.setVisible(true);
 		refreshCalendar();
 		changePersonnelView();
@@ -1966,7 +1995,7 @@ public class MekHQView extends FrameView {
 			return;
 		}
 		Person selectedPerson = personModel.getPerson(personnelTable.convertRowIndexToModel(row));
-		scrollPersonnelView.setViewportView(new PersonViewPanel(selectedPerson, campaign));
+		scrollPersonnelView.setViewportView(new PersonViewPanel(selectedPerson, campaign, portraits));
 		//This odd code is to make sure that the scrollbar stays at the top
 		//I cant just call it here, because it ends up getting reset somewhere later
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -1984,7 +2013,7 @@ public class MekHQView extends FrameView {
 			return;
 		}
 		Unit selectedUnit = unitModel.getUnit(unitTable.convertRowIndexToModel(row));
-		scrollUnitView.setViewportView(new UnitViewPanel(selectedUnit, campaign));
+		scrollUnitView.setViewportView(new UnitViewPanel(selectedUnit, campaign, camos, mt));
 		//This odd code is to make sure that the scrollbar stays at the top
 		//I cant just call it here, because it ends up getting reset somewhere later
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -2980,10 +3009,16 @@ public class MekHQView extends FrameView {
 		}
 
 		public ServicedUnitTableModel.Renderer getRenderer() {
-			return new ServicedUnitTableModel.Renderer();
+			return new ServicedUnitTableModel.Renderer(camos, mt);
 		}
 
 		public class Renderer extends MekInfo implements TableCellRenderer {
+			
+			public Renderer(DirectoryItems camo, MechTileset mt) {
+				super(camo, mt);
+				// TODO Auto-generated constructor stub
+			}
+
 			private static final long serialVersionUID = 6767431355690868748L;
 
 			public Component getTableCellRendererComponent(JTable table,
@@ -3786,42 +3821,32 @@ public class MekHQView extends FrameView {
         protected Icon getPortrait(Object value) {
         	 DefaultMutableTreeNode node = (DefaultMutableTreeNode)value;
              Person person = (Person)node.getUserObject();      	
-             //TODO: we should really set up all the relevant directory items (portraits, units, etc)
-        	//at the beginning of MekHQView once
-        	try {
-                DirectoryItems portraits = new DirectoryItems(new File("data/images/portraits"), "", //$NON-NLS-1$ //$NON-NLS-2$
-                        PortraitFileFactory.getInstance());
-            
 
-                String category = person.getPortraitCategory();
-                String file = person.getPortraitFileName();
+             String category = person.getPortraitCategory();
+             String file = person.getPortraitFileName();
 
-                if(Pilot.ROOT_PORTRAIT.equals(category)) {
-                	category = "";
-                }
+             if(Pilot.ROOT_PORTRAIT.equals(category)) {
+            	 category = "";
+             }
 
-                // Return a null if the player has selected no portrait file.
-                if ((null == category) || (null == file) || Pilot.PORTRAIT_NONE.equals(file)) {
-                	file = "default.gif";
-                }
+             // Return a null if the player has selected no portrait file.
+             if ((null == category) || (null == file) || Pilot.PORTRAIT_NONE.equals(file)) {
+            	 file = "default.gif";
+             }
 
-                // Try to get the player's portrait file.
-                Image portrait = null;
-                try {
-                	portrait = (Image) portraits.getItem(category, file);
-                	//make sure no images are longer than 50 pixels
-                	if(null != portrait && portrait.getHeight(this) > 50) {
-                		portrait = portrait.getScaledInstance(-1, 50, Image.SCALE_DEFAULT);               
-                	}
-                	return new ImageIcon(portrait);
-                } catch (Exception err) {
-                	err.printStackTrace();
-                	return null;     	
-                }
-        	} catch (Exception e) {
-        		e.printStackTrace();
-        		return null;
-            }
+             // Try to get the player's portrait file.
+             Image portrait = null;
+             try {
+            	 portrait = (Image) portraits.getItem(category, file);
+            	 //make sure no images are longer than 50 pixels
+            	 if(null != portrait && portrait.getHeight(this) > 50) {
+            		 portrait = portrait.getScaledInstance(-1, 50, Image.SCALE_DEFAULT);               
+            	 }
+            	 return new ImageIcon(portrait);
+             } catch (Exception err) {
+            	 err.printStackTrace();
+            	 return null;     	
+             }
         }
     }	
 	public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
@@ -4002,7 +4027,7 @@ public class MekHQView extends FrameView {
 			} else if (command.equalsIgnoreCase("PORTRAIT")) {
 				PortraitChoiceDialog pcd = new PortraitChoiceDialog(null, true,
 						selectedPerson.getPortraitCategory(),
-						selectedPerson.getPortraitFileName());
+						selectedPerson.getPortraitFileName(), portraits);
 				pcd.setVisible(true);
 				selectedPerson.setPortraitCategory(pcd.getCategory());
 				selectedPerson.setPortraitFileName(pcd.getFileName());

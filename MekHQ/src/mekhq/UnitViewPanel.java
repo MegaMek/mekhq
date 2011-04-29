@@ -69,16 +69,11 @@ public class UnitViewPanel extends javax.swing.JPanel {
 	private javax.swing.JLabel lblQuirk1;
 	private javax.swing.JLabel lblQuirk2;
 	
-	public UnitViewPanel(Unit u, Campaign c) {
+	public UnitViewPanel(Unit u, Campaign c, DirectoryItems camos, MechTileset mt) {
 		unit = u;
 		entity = u.getEntity();
-		this.campaign = c;
-		try {
-            camos = new DirectoryItems(new File("data/images/camo"), "", //$NON-NLS-1$ //$NON-NLS-2$
-                    ImageFileFactory.getInstance());
-        } catch (Exception e) {
-            camos = null;
-        }
+		this.camos = camos;
+		this.mt = mt;
 		initComponents();
 		//setMinimumSize(new Dimension(400, 200));
 	}
@@ -310,15 +305,9 @@ public class UnitViewPanel extends javax.swing.JPanel {
 	
 	private Image getImageFor(Unit u, Component c) {
         
-        if (mt == null) {
-            mt = new MechTileset("data/images/units/");
-            try {
-                mt.loadFromFile("mechset.txt");
-            } catch (IOException ex) {
-            	MekHQApp.logError(ex);
-                //TODO: do something here
-            }
-        }// end if(null tileset)
+		if(null == mt) { 
+			return null;
+		}
         Image base = mt.imageFor(u.getEntity(), c, -1);
         int tint = PlayerColors.getColorRGB(u.campaign.getColorIndex());
         EntityImage entityImage = new EntityImage(base, tint, getCamo(u.campaign), c);

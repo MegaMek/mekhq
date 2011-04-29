@@ -26,13 +26,8 @@ public class PortraitPanel extends javax.swing.JPanel {
 	private DirectoryItems portraits;
     
     /** Creates new form CamoPanel */
-    public PortraitPanel() {
-         try {
-            portraits = new DirectoryItems(new File("data/images/portraits"), "", //$NON-NLS-1$ //$NON-NLS-2$
-                    ImageFileFactory.getInstance());
-        } catch (Exception e) {
-            portraits = null;
-        }
+    public PortraitPanel(DirectoryItems portraits) {
+        this.portraits = portraits;
         initComponents();
     }
 

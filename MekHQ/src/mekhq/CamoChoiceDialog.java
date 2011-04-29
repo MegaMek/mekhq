@@ -43,19 +43,13 @@ public class CamoChoiceDialog extends javax.swing.JDialog {
 
 
     /** Creates new form CamoChoiceDialog */
-    public CamoChoiceDialog(java.awt.Frame parent, boolean modal, String category, String file, int color) {
+    public CamoChoiceDialog(java.awt.Frame parent, boolean modal, String category, String file, int color, DirectoryItems camos) {
         super(parent, modal);
         this.category = category;
+        this.camos = camos;
         filename = file;
         colorIndex = color;
         camoMouseAdapter = new CamoTableMouseAdapter();
-        // Parse the camo directory.
-        try {
-            camos = new DirectoryItems(new File("data/images/camo"), "", //$NON-NLS-1$ //$NON-NLS-2$
-                    ImageFileFactory.getInstance());
-        } catch (Exception e) {
-            camos = null;
-        }
         initComponents();
         fillTable((String) comboCategories.getSelectedItem());
         int rowIndex = 0;
@@ -243,7 +237,7 @@ private void comboCategoriesItemStateChanged(java.awt.event.ItemEvent evt) {//GE
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                CamoChoiceDialog dialog = new CamoChoiceDialog(new javax.swing.JFrame(), true, Player.NO_CAMO, null, -1);
+                CamoChoiceDialog dialog = new CamoChoiceDialog(new javax.swing.JFrame(), true, Player.NO_CAMO, null, -1, null);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {
@@ -323,11 +317,16 @@ private void comboCategoriesItemStateChanged(java.awt.event.ItemEvent evt) {//GE
         }
 
         public CamoTableModel.Renderer getRenderer() {
-            return new CamoTableModel.Renderer();
+            return new CamoTableModel.Renderer(camos);
         }
 
 
         public class Renderer extends CamoPanel implements TableCellRenderer {
+			
+        	public Renderer(DirectoryItems camos) {
+				super(camos);
+			}
+
 			private static final long serialVersionUID = -7106605749246434963L;
 
 			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {

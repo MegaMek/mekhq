@@ -49,7 +49,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     
     
     /** Creates new form CampaignOptionsDialog */
-    public CampaignOptionsDialog(java.awt.Frame parent, boolean modal, Campaign c) {
+    public CampaignOptionsDialog(java.awt.Frame parent, boolean modal, Campaign c, DirectoryItems camos) {
         super(parent, modal);
         this.campaign = c;
         this.options = c.getCampaignOptions();
@@ -60,13 +60,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         this.camoCategory = campaign.getCamoCategory();
         this.camoFileName = campaign.getCamoFileName();
         this.colorIndex = campaign.getColorIndex();
-        // Parse the camo directory.
-        try {
-            camos = new DirectoryItems(new File("data/images/camo"), "", //$NON-NLS-1$ //$NON-NLS-2$
-                    ImageFileFactory.getInstance());
-        } catch (Exception e) {
-            camos = null;
-        }
+        this.camos = camos;
         initComponents();
         setCamoIcon();
         
@@ -658,7 +652,7 @@ private void btnDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
 }//GEN-LAST:event_btnDateActionPerformed
 
 private void btnCamoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCamoActionPerformed
-    CamoChoiceDialog ccd = new CamoChoiceDialog(frame, true, camoCategory, camoFileName, colorIndex);
+    CamoChoiceDialog ccd = new CamoChoiceDialog(frame, true, camoCategory, camoFileName, colorIndex, camos);
     ccd.setVisible(true);
     camoCategory = ccd.getCategory();
     camoFileName = ccd.getFileName();
@@ -710,7 +704,7 @@ public String getDateAsString() {
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                CampaignOptionsDialog dialog = new CampaignOptionsDialog(new javax.swing.JFrame(), true, null);
+                CampaignOptionsDialog dialog = new CampaignOptionsDialog(new javax.swing.JFrame(), true, null, null);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     public void windowClosing(java.awt.event.WindowEvent e) {
                         System.exit(0);

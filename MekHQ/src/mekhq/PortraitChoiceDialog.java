@@ -45,18 +45,12 @@ public class PortraitChoiceDialog extends javax.swing.JDialog {
 
 
     /** Creates new form CamoChoiceDialog */
-    public PortraitChoiceDialog(java.awt.Frame parent, boolean modal, String category, String file) {
+    public PortraitChoiceDialog(java.awt.Frame parent, boolean modal, String category, String file, DirectoryItems portraits) {
         super(parent, modal);
         this.category = category;
         filename = file;
         portraitMouseAdapter = new PortraitTableMouseAdapter();
-        // Parse the camo directory.
-        try {
-            portraits = new DirectoryItems(new File("data/images/portraits"), "", //$NON-NLS-1$ //$NON-NLS-2$
-                    PortraitFileFactory.getInstance());
-        } catch (Exception e) {
-            portraits = null;
-        }
+        this.portraits = portraits;
         initComponents();
         fillTable((String) comboCategories.getSelectedItem());
         int rowIndex = 0;
@@ -227,7 +221,7 @@ private void comboCategoriesItemStateChanged(java.awt.event.ItemEvent evt) {//GE
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                PortraitChoiceDialog dialog = new PortraitChoiceDialog(new javax.swing.JFrame(), true, Pilot.ROOT_PORTRAIT, Pilot.PORTRAIT_NONE);
+                PortraitChoiceDialog dialog = new PortraitChoiceDialog(new javax.swing.JFrame(), true, Pilot.ROOT_PORTRAIT, Pilot.PORTRAIT_NONE, null);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {
@@ -311,11 +305,16 @@ private void comboCategoriesItemStateChanged(java.awt.event.ItemEvent evt) {//GE
         }
 
         public PortraitTableModel.Renderer getRenderer() {
-            return new PortraitTableModel.Renderer();
+            return new PortraitTableModel.Renderer(portraits);
         }
 
 
         public class Renderer extends PortraitPanel implements TableCellRenderer {
+			
+        	public Renderer(DirectoryItems portraits) {
+				super(portraits);
+			}
+
 			private static final long serialVersionUID = -6025788865509594987L;
 
 			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {

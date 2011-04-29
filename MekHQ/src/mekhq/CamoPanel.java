@@ -25,13 +25,8 @@ public class CamoPanel extends javax.swing.JPanel {
 	private DirectoryItems camos;
     
     /** Creates new form CamoPanel */
-    public CamoPanel() {
-         try {
-            camos = new DirectoryItems(new File("data/images/camo"), "", //$NON-NLS-1$ //$NON-NLS-2$
-                    ImageFileFactory.getInstance());
-        } catch (Exception e) {
-            camos = null;
-        }
+    public CamoPanel(DirectoryItems camos) {
+        this.camos = camos;
         initComponents();
     }
 
