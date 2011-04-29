@@ -87,6 +87,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
 
 import megamek.client.ui.swing.MechView;
 import megamek.common.AmmoType;
@@ -201,6 +202,7 @@ public class MekHQView extends FrameView {
 	private PartsTableMouseAdapter partsMouseAdapter;
 	private TaskTableMouseAdapter taskMouseAdapter;
 	private PersonnelTableMouseAdapter personnelMouseAdapter;
+	private OrgTreeMouseAdapter orgMouseAdapter;
 	private TableRowSorter<PersonnelTableModel> personnelSorter;
 	private TableRowSorter<UnitTableModel> unitSorter;
 	private int currentServicedUnitId;
@@ -219,6 +221,7 @@ public class MekHQView extends FrameView {
 		partsMouseAdapter = new PartsTableMouseAdapter();
 		taskMouseAdapter = new TaskTableMouseAdapter();
 		personnelMouseAdapter = new PersonnelTableMouseAdapter(this);
+		orgMouseAdapter = new OrgTreeMouseAdapter();
 		initComponents();
 		refreshCalendar();
 
@@ -406,6 +409,7 @@ public class MekHQView extends FrameView {
 		
 		refreshOrganization();
 		orgTree.setModel(orgModel);
+		orgTree.addMouseListener(orgMouseAdapter);
 		scrollOrgTree.setViewportView(orgTree);
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
@@ -3583,6 +3587,45 @@ public class MekHQView extends FrameView {
 		}
 	}
 
+	public class OrgTreeMouseAdapter extends MouseInputAdapter implements
+	ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		@Override
+		public void mousePressed(MouseEvent e) {
+			maybeShowPopup(e);
+		}
+
+		@Override
+		public void mouseReleased(MouseEvent e) {
+			maybeShowPopup(e);
+		}
+
+		private void maybeShowPopup(MouseEvent e) {
+			JPopupMenu popup = new JPopupMenu();
+
+			if (e.isPopupTrigger()) {
+				int x = e.getX();
+                int y = e.getY();
+                JTree tree = (JTree)e.getSource();
+                TreePath path = tree.getPathForLocation(x, y);
+                if (path == null)
+                        return; 
+                tree.setSelectionPath(path);
+                DefaultMutableTreeNode node = (DefaultMutableTreeNode)path.getLastPathComponent();
+                JMenuItem menu = new JMenuItem(node.toString() + "It Works!");
+                popup.add(menu);
+				popup.show(e.getComponent(), e.getX(), e.getY());
+			}
+		}
+		
+	}
+	
 	public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
 			ActionListener {
 		
