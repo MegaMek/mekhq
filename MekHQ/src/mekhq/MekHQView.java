@@ -86,6 +86,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 
 import megamek.client.ui.swing.MechView;
 import megamek.common.AmmoType;
@@ -195,6 +196,7 @@ public class MekHQView extends FrameView {
 	private PersonnelTableModel personModel = new PersonnelTableModel();
 	private UnitTableModel unitModel = new UnitTableModel();
 	private PartsTableModel partsModel = new PartsTableModel();
+	private DefaultTreeModel orgModel;
 	private ServicedUnitsTableMouseAdapter servicedUnitMouseAdapter;
 	private PartsTableMouseAdapter partsMouseAdapter;
 	private TaskTableMouseAdapter taskMouseAdapter;
@@ -304,6 +306,7 @@ public class MekHQView extends FrameView {
 		tabTasks = new javax.swing.JTabbedPane();
 		panOrganization = new javax.swing.JPanel();
 		scrollOrgTree = new javax.swing.JScrollPane();
+		orgTree = new javax.swing.JTree();
 		panPersonnel = new javax.swing.JPanel();
 		scrollPersonnelTable = new javax.swing.JScrollPane();
 		personnelTable = new javax.swing.JTable();
@@ -402,6 +405,8 @@ public class MekHQView extends FrameView {
 		panOrganization.setLayout(new java.awt.GridBagLayout());
 		
 		refreshOrganization();
+		orgTree.setModel(orgModel);
+		scrollOrgTree.setViewportView(orgTree);
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 0;
@@ -2318,8 +2323,12 @@ public class MekHQView extends FrameView {
 			Force subforce = subforces.nextElement();
 			addForce(subforce, top);
 		}
-		orgTree = new JTree(top);
-		scrollOrgTree.setViewportView(orgTree);
+		if(null == orgModel) {
+			orgModel = new DefaultTreeModel(top);
+		} else {
+			orgModel.setRoot(top);
+		}
+		//scrollOrgTree.setViewportView(orgTree);
 		
 	}
 	
