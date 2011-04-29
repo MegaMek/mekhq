@@ -83,8 +83,6 @@ public class UnitViewPanel extends javax.swing.JPanel {
 		txtReadout = new javax.swing.JTextPane();
 		txtFluff = new javax.swing.JTextPane();
 		pnlStats = new javax.swing.JPanel();
-
-		
 		
     	org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(UnitViewPanel.class);
 
@@ -94,12 +92,15 @@ public class UnitViewPanel extends javax.swing.JPanel {
 		
 		lblImage.setName("lblImage"); // NOI18N
 		lblImage.setBackground(Color.WHITE);
-		//Image image = FluffImageHelper.getFluffImage(entity);
-       // Icon icon = null;
-      //  if(null != image) {
-          //  icon = new ImageIcon(image);
-        //    lblImage.setIcon(icon);
-        //}
+		Image image = FluffImageHelper.getFluffImage(entity);
+        Icon icon = null;
+		if(null != image) {
+			if(image.getWidth(lblImage) > 200) {
+                image = image.getScaledInstance(150, -1, Image.SCALE_DEFAULT);               
+            }
+            icon = new ImageIcon(image);
+            lblImage.setIcon(icon);
+        }
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 0;
@@ -184,7 +185,7 @@ public class UnitViewPanel extends javax.swing.JPanel {
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 0;
-		gridBagConstraints.gridwidth = 4;
+		gridBagConstraints.gridwidth = 2;
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 0.0;
 		gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
@@ -192,14 +193,11 @@ public class UnitViewPanel extends javax.swing.JPanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblType, gridBagConstraints);
 		
-		int firsty = 0;
-		
-		firsty++;
 		lblTech1.setName("lblTech1"); // NOI18N
 		lblTech1.setText(resourceMap.getString("lblTech1.text"));
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = firsty;
+		gridBagConstraints.gridy = 1;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblTech1, gridBagConstraints);
@@ -208,21 +206,18 @@ public class UnitViewPanel extends javax.swing.JPanel {
 		lblTech2.setText(TechConstants.getLevelDisplayableName(entity.getTechLevel()));
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = firsty;
+		gridBagConstraints.gridy = 1;
 		gridBagConstraints.weightx = 0.5;
 		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblTech2, gridBagConstraints);
 
-		int secondy = 0;
-		
-		secondy++;
-		lblTonnage1.setName("lblTonnage"); // NOI18N
+		lblTonnage1.setName("lblTonnage1"); // NOI18N
 		lblTonnage1.setText(resourceMap.getString("lblTonnage1.text"));
 		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 2;
-		gridBagConstraints.gridy = secondy;
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 2;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblTonnage1, gridBagConstraints);
@@ -230,20 +225,19 @@ public class UnitViewPanel extends javax.swing.JPanel {
 		lblTonnage2.setName("lblTonnage2"); // NOI18N
 		lblTonnage2.setText(Float.toString(entity.getWeight()));
 		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 3;
-		gridBagConstraints.gridy = secondy;
-		gridBagConstraints.weightx = 0.5;
+		gridBagConstraints.gridx = 1;
+		gridBagConstraints.gridy = 2;
+		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblTonnage2, gridBagConstraints);
-		
-		secondy++;
+
 		lblBV1.setName("lblBV1"); // NOI18N
 		lblBV1.setText(resourceMap.getString("lblBV1.text"));
 		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 2;
-		gridBagConstraints.gridy = secondy;
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 3;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblBV1, gridBagConstraints);
@@ -251,20 +245,19 @@ public class UnitViewPanel extends javax.swing.JPanel {
 		lblBV2.setName("lblBV2"); // NOI18N
 		lblBV2.setText(Integer.toString(entity.calculateBattleValue(true, true)));
 		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 3;
-		gridBagConstraints.gridy = secondy;
-		gridBagConstraints.weightx = 0.5;
+		gridBagConstraints.gridx = 1;
+		gridBagConstraints.gridy = 3;
+		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblBV2, gridBagConstraints);
-		
-		secondy++;
+
 		lblCost1.setName("lblCost1"); // NOI18N
 		lblCost1.setText(resourceMap.getString("lblCost1.text"));
 		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 2;
-		gridBagConstraints.gridy = secondy;
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 4;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblCost1, gridBagConstraints);
@@ -273,25 +266,20 @@ public class UnitViewPanel extends javax.swing.JPanel {
 		DecimalFormat format = new DecimalFormat();
 		lblCost2.setText(format.format(entity.getCost(false)));
 		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 3;
-		gridBagConstraints.gridy = secondy;
-		gridBagConstraints.weightx = 0.5;
+		gridBagConstraints.gridx = 1;
+		gridBagConstraints.gridy = 4;
+		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblCost2, gridBagConstraints);
 		
-		if(firsty > secondy) {
-			secondy = firsty;
-		}
-		
 		if(entity.countQuirks() > 0) {
-			secondy++;
 			lblQuirk1.setName("lblQuirk1"); // NOI18N
 			lblQuirk1.setText(resourceMap.getString("lblQuirk1.text"));
 			gridBagConstraints = new java.awt.GridBagConstraints();
 			gridBagConstraints.gridx = 0;
-			gridBagConstraints.gridy = secondy;
+			gridBagConstraints.gridy = 5;
 			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 			pnlStats.add(lblQuirk1, gridBagConstraints);
@@ -300,8 +288,7 @@ public class UnitViewPanel extends javax.swing.JPanel {
 			lblQuirk2.setText(unit.getQuirksList());
 			gridBagConstraints = new java.awt.GridBagConstraints();
 			gridBagConstraints.gridx = 1;
-			gridBagConstraints.gridy = secondy;
-			gridBagConstraints.gridwidth = 3;
+			gridBagConstraints.gridy = 5;
 			gridBagConstraints.weightx = 1.0;
 			gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
 			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
