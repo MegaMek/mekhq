@@ -878,21 +878,22 @@ public class Campaign implements Serializable {
 		tasks.remove(task);
 		taskIds.remove(new Integer(task.getId()));
 	}
-
+	
 	/**
 	 * return a string (HTML formatted) of tasks for this unit
 	 * 
 	 * @param unit
 	 * @return
 	 */
-	public String getToolTipFor(Unit unit) {
-
-		String toReturn = "<html>Double-click for unit view<br/>Right-click for further actions<br/><b>Tasks:</b><br/>";
+	public String getTaskListFor(Unit unit) {
+		String toReturn = "";
 		for (WorkItem task : getTasksForUnit(unit.getId())) {
 			toReturn += task.getDesc() + "<br/>";
 		}
-		toReturn += "</html>";
-		return toReturn;
+		if(toReturn.equals("")) {
+			return null;
+		}
+		return "<html>" + toReturn + "</html>";
 	}
 
 	/**

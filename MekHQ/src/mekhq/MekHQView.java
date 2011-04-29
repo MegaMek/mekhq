@@ -2470,7 +2470,7 @@ public class MekHQView extends FrameView {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_WEIGHT), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_COST), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_QUALITY), false);
-			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_STATUS), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_STATUS), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_PILOT), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_BV), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_REPAIR), false);
@@ -2912,7 +2912,7 @@ public class MekHQView extends FrameView {
 				setOpaque(true);
 				setUnit(u);
 				setText(getValueAt(row, column).toString());
-				setToolTipText(campaign.getToolTipFor(u));
+				setToolTipText(campaign.getTaskListFor(u));
 				if (isSelected) {
 					select();
 				} else {
@@ -4854,7 +4854,11 @@ public class MekHQView extends FrameView {
         public String getTooltip(int row, int col) {
         	Unit u = data.get(row);
         	switch(col) {
-            default:
+        	case COL_REPAIR:
+        		return campaign.getTaskListFor(u);
+        	case COL_QUIRKS:
+        		return u.getQuirksList();
+            default:		
             	return null;
             }
         }
