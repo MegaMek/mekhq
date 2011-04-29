@@ -16,6 +16,7 @@ v0.1.5 (SVN)
 + Bug: tasks not displaying when mul added after xml loaded
 + changed FoxsTeeth Unit fluff pictures to mini pics
 + tooltips for UnitTable
++ use JSplitPanes for personnel and unit tables and views (duh)
 
 v0.1.4 (2011-04-28)
 + Bug: personnel options not updating in CampaignOptionsDialog

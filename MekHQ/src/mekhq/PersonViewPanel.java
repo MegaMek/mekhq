@@ -174,7 +174,7 @@ public class PersonViewPanel extends javax.swing.JPanel {
             portrait = (Image) portraits.getItem(category, file);
             //make sure no images are longer than 150 pixels
             if(null != portrait && portrait.getWidth(lblPortrait) > 150) {
-                portrait = portrait.getScaledInstance(-1, 150, Image.SCALE_DEFAULT);               
+                portrait = portrait.getScaledInstance(150, -1, Image.SCALE_DEFAULT);               
             }
             lblPortrait.setIcon(new ImageIcon(portrait));
         } catch (Exception err) {

@@ -28,6 +28,8 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -64,6 +66,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
@@ -375,7 +378,6 @@ public class MekHQView extends FrameView {
 		choiceUnitView = new javax.swing.JComboBox();
 		lblUnitView = new javax.swing.JLabel();
 		scrollUnitView = new javax.swing.JScrollPane();
-		txtUnitView = new javax.swing.JTextPane();
 
 		mainPanel.setAutoscrolls(true);
 		mainPanel.setName("mainPanel"); // NOI18N
@@ -398,8 +400,8 @@ public class MekHQView extends FrameView {
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 0;
-		gridBagConstraints.weightx = 1.0;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+		gridBagConstraints.weightx = 0.0;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
 		panPersonnel.add(lblPersonChoice, gridBagConstraints);
 		
 		DefaultComboBoxModel personGroupModel = new DefaultComboBoxModel();
@@ -420,7 +422,7 @@ public class MekHQView extends FrameView {
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 		gridBagConstraints.weightx = 0.0;
 		gridBagConstraints.weighty = 0.0;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
 		panPersonnel.add(choicePerson, gridBagConstraints);
 			
 		lblPersonView.setText(resourceMap.getString("lblPersonView.text")); // NOI18N
@@ -428,7 +430,7 @@ public class MekHQView extends FrameView {
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 2;
 		gridBagConstraints.gridy = 0;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
 		panPersonnel.add(lblPersonView, gridBagConstraints);
 		
 		DefaultComboBoxModel personViewModel = new DefaultComboBoxModel();
@@ -447,9 +449,9 @@ public class MekHQView extends FrameView {
 		gridBagConstraints.gridx = 3;
 		gridBagConstraints.gridy = 0;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-		gridBagConstraints.weightx = 0.0;
+		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 0.0;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
 		panPersonnel.add(choicePersonView, gridBagConstraints);
 		
 		personnelTable.setModel(personModel);
@@ -485,28 +487,28 @@ public class MekHQView extends FrameView {
         });
         scrollPersonnelTable.setViewportView(personnelTable);
 	
-		gridBagConstraints = new java.awt.GridBagConstraints();
+		scrollPersonnelView.setMinimumSize(new java.awt.Dimension(450, 600));
+		scrollPersonnelView.setPreferredSize(new java.awt.Dimension(450, 2000));
+		scrollPersonnelView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		scrollPersonnelView.setViewportView(null);
+		
+		splitPersonnel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,scrollPersonnelTable, scrollPersonnelView);
+		splitPersonnel.setOneTouchExpandable(true);
+		splitPersonnel.setResizeWeight(1.0);
+		splitPersonnel.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent pce) {
+				//this can mess up the pilot view pane so refresh it
+				refreshPersonnelView();
+			}
+		});
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 1;
 		gridBagConstraints.gridwidth = 4;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 1.0;
-		panPersonnel.add(scrollPersonnelTable, gridBagConstraints);
-		
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 5;
-		gridBagConstraints.gridy = 0;
-		gridBagConstraints.gridheight = 2;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-		gridBagConstraints.weightx = 0.0;
-		gridBagConstraints.weighty = 1.0;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		scrollPersonnelView.setMinimumSize(new java.awt.Dimension(450, 600));
-		scrollPersonnelView.setPreferredSize(new java.awt.Dimension(450, 2000));
-		scrollPersonnelView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		scrollPersonnelView.setViewportView(null);
-		panPersonnel.add(scrollPersonnelView, gridBagConstraints);
+		panPersonnel.add(splitPersonnel, gridBagConstraints);
 		
 		tabMain.addTab(
 				resourceMap.getString("panPersonnel.TabConstraints.tabTitle"),
@@ -521,8 +523,8 @@ public class MekHQView extends FrameView {
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 0;
-		gridBagConstraints.weightx = 1.0;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+		gridBagConstraints.weightx = 0.0;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
 		panHangar.add(lblUnitChoice, gridBagConstraints);
 		
 		DefaultComboBoxModel unitGroupModel = new DefaultComboBoxModel();
@@ -544,7 +546,7 @@ public class MekHQView extends FrameView {
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 		gridBagConstraints.weightx = 0.0;
 		gridBagConstraints.weighty = 0.0;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
 		panHangar.add(choiceUnit, gridBagConstraints);
 			
 		lblUnitView.setText(resourceMap.getString("lblUnitView.text")); // NOI18N
@@ -552,7 +554,7 @@ public class MekHQView extends FrameView {
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 2;
 		gridBagConstraints.gridy = 0;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
 		panHangar.add(lblUnitView, gridBagConstraints);
 		
 		DefaultComboBoxModel unitViewModel = new DefaultComboBoxModel();
@@ -572,8 +574,8 @@ public class MekHQView extends FrameView {
 		gridBagConstraints.gridy = 0;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 		gridBagConstraints.weightx = 0.0;
-		gridBagConstraints.weighty = 0.0;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+		gridBagConstraints.weighty = 1.0;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
 		panHangar.add(choiceUnitView, gridBagConstraints);
 		
 		unitTable.setModel(unitModel);
@@ -604,33 +606,29 @@ public class MekHQView extends FrameView {
         });
         
         scrollUnitTable.setViewportView(unitTable);
-	
-		gridBagConstraints = new java.awt.GridBagConstraints();
+
+		scrollUnitView.setMinimumSize(new java.awt.Dimension(500, 600));
+		scrollUnitView.setPreferredSize(new java.awt.Dimension(500, 2000));
+		scrollUnitView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		scrollUnitView.setViewportView(null);
+		
+		splitUnit = new javax.swing.JSplitPane(javax.swing.JSplitPane.HORIZONTAL_SPLIT,scrollUnitTable, scrollUnitView);
+		splitUnit.setOneTouchExpandable(true);
+		splitUnit.setResizeWeight(1.0);
+		splitUnit.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent pce) {
+				//this can mess up the unit view panel so refresh it
+				refreshUnitView();
+			}
+		});
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 1;
 		gridBagConstraints.gridwidth = 4;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 1.0;
-		panHangar.add(scrollUnitTable, gridBagConstraints);
-		
-		txtUnitView.setContentType(resourceMap.getString("txtDesc.contentType")); // NOI18N
-		txtUnitView.setEditable(false);
-		txtUnitView.setFont(resourceMap.getFont("txtDesc.font")); // NOI18N
-		txtUnitView.setName("txtUnitView"); // NOI18N
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 5;
-		gridBagConstraints.gridy = 0;
-		gridBagConstraints.gridheight = 2;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-		gridBagConstraints.weightx = 0.0;
-		gridBagConstraints.weighty = 1.0;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		scrollUnitView.setMinimumSize(new java.awt.Dimension(500, 600));
-		scrollUnitView.setPreferredSize(new java.awt.Dimension(500, 2000));
-		scrollUnitView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		scrollUnitView.setViewportView(txtUnitView);
-		panHangar.add(scrollUnitView, gridBagConstraints);
+		panHangar.add(splitUnit, gridBagConstraints);
 		
 		tabMain.addTab(
 				resourceMap.getString("panHangar.TabConstraints.tabTitle"),
@@ -5303,12 +5301,13 @@ public class MekHQView extends FrameView {
 	private javax.swing.JComboBox choicePersonView;
 	private javax.swing.JLabel lblPersonView;
 	private javax.swing.JScrollPane scrollPersonnelView;
+    private javax.swing.JSplitPane splitPersonnel;
     private javax.swing.JComboBox choiceUnit;
 	private javax.swing.JLabel lblUnitChoice;
 	private javax.swing.JComboBox choiceUnitView;
 	private javax.swing.JLabel lblUnitView;
 	private javax.swing.JScrollPane scrollUnitView;
-    private javax.swing.JTextPane txtUnitView;
+    private javax.swing.JSplitPane splitUnit;
 	// End of variables declaration//GEN-END:variables
 
 	private final Timer messageTimer;
