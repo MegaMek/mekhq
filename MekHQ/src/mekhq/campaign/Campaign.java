@@ -162,6 +162,19 @@ public class Campaign implements Serializable {
 		ranks = new Ranks();
 		skillCosts = new SkillCosts();
 		forces = new Force(name);
+		/*
+		 *This is just for testing out forces hierarchy 
+		Force companya = new Force("Company A");
+		companya.addSubForce(new Force("Alpha Lance"));
+		companya.addSubForce(new Force("Baker Lance"));
+		companya.addSubForce(new Force("Charlie Lance"));
+		companya.addPerson(new PilotPerson(new Pilot("Bob Smith,",4,5), 0));
+		Force companyb = new Force("Company B");
+		Force companyc = new Force("Company C");
+		forces.addSubForce(companya);
+		forces.addSubForce(companyb);
+		forces.addSubForce(companyc);
+		 */
 	}
 
 	public String getName() {

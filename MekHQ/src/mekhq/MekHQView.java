@@ -69,6 +69,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollBar;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
+import javax.swing.JTree;
 import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
 import javax.swing.ScrollPaneConstants;
@@ -84,6 +85,7 @@ import javax.swing.table.DefaultTableColumnModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
+import javax.swing.tree.DefaultMutableTreeNode;
 
 import megamek.client.ui.swing.MechView;
 import megamek.common.AmmoType;
@@ -103,6 +105,7 @@ import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.IOption;
 import megamek.common.options.PilotOptions;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.Force;
 import mekhq.campaign.PartInventory;
 import mekhq.campaign.SkillCosts;
 import mekhq.campaign.Unit;
@@ -299,6 +302,8 @@ public class MekHQView extends FrameView {
 		mainPanel = new javax.swing.JPanel();
 		tabMain = new javax.swing.JTabbedPane();
 		tabTasks = new javax.swing.JTabbedPane();
+		panOrganization = new javax.swing.JPanel();
+		scrollOrgTree = new javax.swing.JScrollPane();
 		panPersonnel = new javax.swing.JPanel();
 		scrollPersonnelTable = new javax.swing.JScrollPane();
 		personnelTable = new javax.swing.JTable();
@@ -392,6 +397,24 @@ public class MekHQView extends FrameView {
 		tabMain.setName("tabMain"); // NOI18N
 		tabMain.setPreferredSize(new java.awt.Dimension(900, 300));
 
+		panOrganization.setFont(resourceMap.getFont("panHangar.font")); // NOI18N
+		panOrganization.setName("panOrganization"); // NOI18N
+		panOrganization.setLayout(new java.awt.GridBagLayout());
+		
+		refreshOrganization();
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+		gridBagConstraints.weightx = 1.0;
+		gridBagConstraints.weighty = 1.0;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+		panOrganization.add(scrollOrgTree, gridBagConstraints);
+		
+		tabMain.addTab(
+				resourceMap.getString("panOrganization.TabConstraints.tabTitle"),
+				panOrganization); // NOI18N
+		
 		panPersonnel.setFont(resourceMap.getFont("panHangar.font")); // NOI18N
 		panPersonnel.setName("panPersonnel"); // NOI18N
 		panPersonnel.setLayout(new java.awt.GridBagLayout());
@@ -2284,6 +2307,36 @@ public class MekHQView extends FrameView {
 	protected void refreshReport() {
 		txtPaneReport.setText(campaign.getCurrentReportHTML());
 		txtPaneReport.setCaretPosition(0);
+	}
+	
+	protected void refreshOrganization() {
+		//traverse the force object and assign TreeNodes
+		Force force = campaign.getForces();
+		DefaultMutableTreeNode top = new DefaultMutableTreeNode(campaign.getForces());
+		Enumeration<Force> subforces = force.getSubForces().elements();
+		while(subforces.hasMoreElements()) {
+			Force subforce = subforces.nextElement();
+			addForce(subforce, top);
+		}
+		orgTree = new JTree(top);
+		scrollOrgTree.setViewportView(orgTree);
+		
+	}
+	
+	private void addForce(Force force, DefaultMutableTreeNode top) {
+		DefaultMutableTreeNode category = new DefaultMutableTreeNode(force);
+		top.add(category);
+		Enumeration<Force> subforces = force.getSubForces().elements();
+		while(subforces.hasMoreElements()) {
+			Force subforce = subforces.nextElement();
+			addForce(subforce, category);
+		}
+		//add any personnel
+		Enumeration<PilotPerson> personnel = force.getPersonnel().elements();
+		while(personnel.hasMoreElements()) {
+			PilotPerson p = personnel.nextElement();
+			category.add(new DefaultMutableTreeNode(p));
+		}
 	}
 
 	protected void refreshFunds() {
@@ -5295,6 +5348,7 @@ public class MekHQView extends FrameView {
 	private javax.swing.JMenuItem miPurchaseUnit;
 	private javax.swing.JPanel panFinances;
 	private javax.swing.JPanel panHangar;
+	private javax.swing.JPanel panOrganization;
 	private javax.swing.JPanel panRepairBay;
 	private javax.swing.JPanel panInfirmary;
 	private javax.swing.JPanel panPersonnel;
@@ -5330,6 +5384,8 @@ public class MekHQView extends FrameView {
 	private javax.swing.JLabel lblUnitView;
 	private javax.swing.JScrollPane scrollUnitView;
     private javax.swing.JSplitPane splitUnit;
+	private javax.swing.JScrollPane scrollOrgTree;
+	private javax.swing.JTree orgTree;
 	// End of variables declaration//GEN-END:variables
 
 	private final Timer messageTimer;

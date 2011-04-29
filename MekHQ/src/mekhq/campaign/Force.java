@@ -100,6 +100,10 @@ public class Force implements Serializable, MekHqXmlSerializable {
 		personnel.add(person);
 	}
 	
+	public String toString() {
+		return name;
+	}
+	
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent, int inId) {
 		// TODO Auto-generated method stub

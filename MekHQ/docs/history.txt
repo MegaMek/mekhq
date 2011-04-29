@@ -20,6 +20,7 @@ v0.1.5 (SVN)
 + Patch 3294109: Doing anything with an empty personal list currently causes an array out of bounds exception. (Thanks Longinus00!)
 + bug: personnel and unit view scroll to the bottom when selected or if the split pane is resized
 + hierarchically-structured Force object
++ beginning of TO&E Panel (not yet functional)
 
 v0.1.4 (2011-04-28)
 + Bug: personnel options not updating in CampaignOptionsDialog
