@@ -714,7 +714,7 @@ public class MekHQView extends FrameView {
 				new javax.swing.event.ListSelectionListener() {
 					public void valueChanged(
 							javax.swing.event.ListSelectionEvent evt) {
-						UnitTableValueChanged(evt);
+						servicedUnitTableValueChanged(evt);
 					}
 				});
 		servicedUnitTable.addMouseListener(servicedUnitMouseAdapter);
@@ -1512,11 +1512,11 @@ public class MekHQView extends FrameView {
 		updateTargetText();
 	}
 
-	private void UnitTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
+	private void servicedUnitTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
 		int selected = servicedUnitTable.getSelectedRow();
 		
-		if ((selected > -1) && (selected < campaign.getUnits().size())) {
-			currentServicedUnitId = campaign.getUnits().get(selected).getId();
+		if ((selected > -1) && (selected < campaign.getServiceableUnits().size())) {
+			currentServicedUnitId = campaign.getServiceableUnits().get(selected).getId();
 		} else if (selected < 0) {
 			currentServicedUnitId = -1;
 		}

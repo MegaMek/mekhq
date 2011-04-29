@@ -13,6 +13,7 @@ v0.1.5 (SVN)
 + allow fluff images in UnitViewPanel
 + show unit image if no fluff image in UnitViewPanel
 + color-coding of UnitTable rows by condition
++ Bug: tasks not displaying when mul added after xml loaded
 
 v0.1.4 (2011-04-28)
 + Bug: personnel options not updating in CampaignOptionsDialog
