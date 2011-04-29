@@ -25,6 +25,7 @@ import gd.xml.ParseException;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -58,6 +59,7 @@ import java.util.logging.Logger;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -86,6 +88,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
@@ -106,6 +109,7 @@ import megamek.common.XMLStreamParser;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.IOption;
 import megamek.common.options.PilotOptions;
+import megamek.common.util.DirectoryItems;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Force;
 import mekhq.campaign.PartInventory;
@@ -410,6 +414,8 @@ public class MekHQView extends FrameView {
 		refreshOrganization();
 		orgTree.setModel(orgModel);
 		orgTree.addMouseListener(orgMouseAdapter);
+        orgTree.setCellRenderer(new ForceRenderer());
+        orgTree.setRowHeight(0);
 		scrollOrgTree.setViewportView(orgTree);
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
@@ -3741,6 +3747,83 @@ public class MekHQView extends FrameView {
 		
 	}
 	
+	private class ForceRenderer extends DefaultTreeCellRenderer {
+     
+		private static final long serialVersionUID = -553191867660269247L;
+
+		public ForceRenderer() {
+        	
+        }
+
+        public Component getTreeCellRendererComponent(
+                            JTree tree,
+                            Object value,
+                            boolean sel,
+                            boolean expanded,
+                            boolean leaf,
+                            int row,
+                            boolean hasFocus) {
+
+            super.getTreeCellRendererComponent(
+                            tree, value, sel,
+                            expanded, leaf, row,
+                            hasFocus);
+                     
+            if (isPerson(value)) {
+            	setIcon(getPortrait(value));
+            } else {
+     
+            }
+
+            return this;
+        }
+
+        protected boolean isPerson(Object value) {
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode)value;
+            return node.getUserObject() instanceof Person;
+        }
+        
+        protected Icon getPortrait(Object value) {
+        	 DefaultMutableTreeNode node = (DefaultMutableTreeNode)value;
+             Person person = (Person)node.getUserObject();      	
+             //TODO: we should really set up all the relevant directory items (portraits, units, etc)
+        	//at the beginning of MekHQView once
+        	try {
+                DirectoryItems portraits = new DirectoryItems(new File("data/images/portraits"), "", //$NON-NLS-1$ //$NON-NLS-2$
+                        PortraitFileFactory.getInstance());
+            
+
+                String category = person.getPortraitCategory();
+                String file = person.getPortraitFileName();
+
+                if(Pilot.ROOT_PORTRAIT.equals(category)) {
+                	category = "";
+                }
+
+                // Return a null if the player has selected no portrait file.
+                if ((null == category) || (null == file) || Pilot.PORTRAIT_NONE.equals(file)) {
+                	file = "default.gif";
+                }
+
+                // Try to get the player's portrait file.
+                Image portrait = null;
+                try {
+                	portrait = (Image) portraits.getItem(category, file);
+                	//make sure no images are longer than 50 pixels
+                	if(null != portrait && portrait.getHeight(this) > 50) {
+                		portrait = portrait.getScaledInstance(-1, 50, Image.SCALE_DEFAULT);               
+                	}
+                	return new ImageIcon(portrait);
+                } catch (Exception err) {
+                	err.printStackTrace();
+                	return null;     	
+                }
+        	} catch (Exception e) {
+        		e.printStackTrace();
+        		return null;
+            }
+        }
+    }	
 	public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
 			ActionListener {
 		
