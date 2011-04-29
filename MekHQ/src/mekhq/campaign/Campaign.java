@@ -922,6 +922,20 @@ public class Campaign implements Serializable {
 		taskIds.remove(new Integer(task.getId()));
 	}
 	
+	public void removeForce(Force force) {
+		int fid = force.getId();
+		forceIds.remove(new Integer(fid));
+		//clear forceIds of all personnel with this force
+		for(Person p : personnel) {
+			if(p.getForceId() == fid) {
+				p.setForceId(0);
+			}
+		}
+		if(null != force.getParentForce()) {
+			force.getParentForce().removeSubForce(fid);
+		}
+	}
+	
 	/**
 	 * return a string (HTML formatted) of tasks for this unit
 	 * 

@@ -3641,6 +3641,11 @@ public class MekHQView extends FrameView {
     					refreshOrganization();
     				}        	
             	}
+            } else if(command.contains("REMOVE_FORCE")) {
+            	if(null != force) {
+            		campaign.removeForce(force);
+            		refreshOrganization();   	
+            	}
             }
 		}
 		
@@ -3695,7 +3700,7 @@ public class MekHQView extends FrameView {
 	                popup.add(menuItem);
 	                menu = new JMenu("Add Personnel");
 	                for(Person p : campaign.getPersonnel()) {
-	                	if(p instanceof PilotPerson && p.isActive()) {// && p.getForceId() < 0) {
+	                	if(p instanceof PilotPerson && p.isActive() && p.getForceId() < 1) {
 			                menuItem = new JMenuItem(p.getDesc());
 		                	menuItem.setActionCommand("ADD_PERSON|" + forceId + "|" + p.getId());
 		                	menuItem.addActionListener(this);
@@ -3704,6 +3709,11 @@ public class MekHQView extends FrameView {
 	                	}
 	                }
 	                popup.add(menu);    
+	                menuItem = new JMenuItem("Remove Force");
+	                menuItem.setActionCommand("REMOVE_FORCE|" + forceId);
+					menuItem.addActionListener(this);
+					menuItem.setEnabled(null != force.getParentForce());
+	                popup.add(menuItem);
                 }
 				popup.show(e.getComponent(), e.getX(), e.getY());
 			}

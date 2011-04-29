@@ -99,6 +99,7 @@ public class Force implements Serializable, MekHqXmlSerializable {
 	 * @param sub
 	 */
 	public void addSubForce(Force sub) {
+		sub.setParentForce(this);
 		subForces.add(sub);
 	}
 	
@@ -121,6 +122,21 @@ public class Force implements Serializable, MekHqXmlSerializable {
 	
 	public void setId(int i) {
 		this.id = i;
+	}
+	
+	public void removeSubForce(int id) {
+		int idx = 0;
+		boolean found = false;
+		for(Force sforce : getSubForces()) {
+			if(sforce.getId() == id) {
+				found = true;
+				break;
+			}
+			idx++;
+		}
+		if(found) {
+			subForces.remove(idx);
+		}
 	}
 	
 	@Override
