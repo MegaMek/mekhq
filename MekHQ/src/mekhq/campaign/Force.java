@@ -41,6 +41,13 @@ public class Force implements Serializable, MekHqXmlSerializable {
 
 	private static final long serialVersionUID = -3018542172119419401L;
 
+	// pathway to force icon
+    public static final String ROOT_ICON = "-- General --";
+    public static final String ICON_NONE = "None";
+    private String iconCategory = ROOT_ICON;
+    private String iconFileName = ICON_NONE;
+
+	
 	private String name;
 	private String desc;
 	private Force parentForce;
@@ -153,6 +160,22 @@ public class Force implements Serializable, MekHqXmlSerializable {
 		if(found) {
 			subForces.remove(idx);
 		}
+	}
+	
+	public String getIconCategory() {
+		return iconCategory;
+	}
+	
+	public void setIconCategory(String s) {
+		this.iconCategory = s;
+	}
+	
+	public String getIconFileName() {
+		return iconFileName;
+	}
+	
+	public void setIconFileName(String s) {
+		this.iconFileName = s;
 	}
 	
 	@Override

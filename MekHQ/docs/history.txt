@@ -28,6 +28,7 @@ v0.1.5 (SVN)
 + "remove person from force" menu item for orgTree context menu
 + custom renderer for orgTree
 + define DirectoryItems (portraits, camos) once in MekHQView and pass them as needed into other components
++ added force icons and ability to set them
 
 v0.1.4 (2011-04-28)
 + Bug: personnel options not updating in CampaignOptionsDialog

@@ -223,6 +223,7 @@ public class MekHQView extends FrameView {
 	//the various directory items we need to access
 	private DirectoryItems portraits;
     private DirectoryItems camos;
+    private DirectoryItems forceIcons;
 	protected static MechTileset mt;
 	
 	public MekHQView(SingleFrameApplication app) {
@@ -246,6 +247,12 @@ public class MekHQView extends FrameView {
                     ImageFileFactory.getInstance());
         } catch (Exception e) {
             camos = null;
+        }
+        try {
+            forceIcons = new DirectoryItems(new File("data/images/force"), "", //$NON-NLS-1$ //$NON-NLS-2$
+                    PortraitFileFactory.getInstance());
+        } catch (Exception e) {
+            forceIcons = null;
         }
         mt = new MechTileset("data/images/units/");
         try {
@@ -3659,6 +3666,16 @@ public class MekHQView extends FrameView {
                     	refreshOrganization();
                     }
             	}
+            } else if(command.contains("CHANGE_ICON")) {
+            	if(null != force) {
+            		PortraitChoiceDialog pcd = new PortraitChoiceDialog(null, true,
+    						force.getIconCategory(),
+    						force.getIconFileName(), forceIcons);
+    				pcd.setVisible(true);
+    				force.setIconCategory(pcd.getCategory());
+    				force.setIconFileName(pcd.getFileName());
+	            	refreshOrganization();
+            	}
             } else if(command.contains("CHANGE_NAME")) {
             	if(null != force) {
 	            	String name = (String)JOptionPane.showInputDialog(
@@ -3733,18 +3750,23 @@ public class MekHQView extends FrameView {
                 }
                 if(null != force) {
                 	int forceId = force.getId();
-	                menuItem = new JMenuItem("Change Name");
+	                menuItem = new JMenuItem("Change Name...");
 	                menuItem.setActionCommand("CHANGE_NAME|" + forceId);
 					menuItem.addActionListener(this);
 					menuItem.setEnabled(true);
 	                popup.add(menuItem);
-	                menuItem = new JMenuItem("Change Description");
+	                menuItem = new JMenuItem("Change Description...");
 	                menuItem.setActionCommand("CHANGE_DESC|" + forceId);
 					menuItem.addActionListener(this);
 					menuItem.setEnabled(true);
 	                popup.add(menuItem);
-	                menuItem = new JMenuItem("Add New Force");
+	                menuItem = new JMenuItem("Add New Force...");
 	                menuItem.setActionCommand("ADD_FORCE|" + forceId);
+					menuItem.addActionListener(this);
+					menuItem.setEnabled(true);
+	                popup.add(menuItem);
+	                menuItem = new JMenuItem("Change Force Icon...");
+	                menuItem.setActionCommand("CHANGE_ICON|" + forceId);
 					menuItem.addActionListener(this);
 					menuItem.setEnabled(true);
 	                popup.add(menuItem);
@@ -3804,24 +3826,23 @@ public class MekHQView extends FrameView {
                             expanded, leaf, row,
                             hasFocus);
                      
-            if (isPerson(value)) {
-            	setIcon(getPortrait(value));
-            } else {
-     
-            }
-
+            setIcon(getIcon(value));
+            
             return this;
         }
-
-        protected boolean isPerson(Object value) {
-            DefaultMutableTreeNode node = (DefaultMutableTreeNode)value;
-            return node.getUserObject() instanceof Person;
+        
+        protected Icon getIcon(Object value) {
+        	DefaultMutableTreeNode node = (DefaultMutableTreeNode)value;
+        	if(node.getUserObject() instanceof Person) {
+        		return getIconFrom((Person)node.getUserObject());
+        	} else if(node.getUserObject() instanceof Force) {
+        		return getIconFrom((Force)node.getUserObject());
+        	} else {
+        		return null;
+        	}
         }
         
-        protected Icon getPortrait(Object value) {
-        	 DefaultMutableTreeNode node = (DefaultMutableTreeNode)value;
-             Person person = (Person)node.getUserObject();      	
-
+        protected Icon getIconFrom(Person person) {
              String category = person.getPortraitCategory();
              String file = person.getPortraitFileName();
 
@@ -3848,6 +3869,34 @@ public class MekHQView extends FrameView {
             	 return null;     	
              }
         }
+        
+        protected Icon getIconFrom(Force force) {
+            String category = force.getIconCategory();
+            String file = force.getIconFileName();
+
+            if(Pilot.ROOT_PORTRAIT.equals(category)) {
+           	 category = "";
+            }
+
+            // Return a null if the player has selected no portrait file.
+            if ((null == category) || (null == file) || Pilot.PORTRAIT_NONE.equals(file)) {
+           	 file = "empty.png";
+            }
+
+            // Try to get the player's portrait file.
+            Image portrait = null;
+            try {
+           	 portrait = (Image) forceIcons.getItem(category, file);
+           	 //make sure no images are longer than 50 pixels
+           	 if(null != portrait && portrait.getHeight(this) > 50) {
+           		 portrait = portrait.getScaledInstance(-1, 50, Image.SCALE_DEFAULT);               
+           	 }
+           	 return new ImageIcon(portrait);
+            } catch (Exception err) {
+           	 err.printStackTrace();
+           	 return null;     	
+            }
+       }
     }	
 	public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
 			ActionListener {
