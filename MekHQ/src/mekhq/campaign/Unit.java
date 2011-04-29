@@ -25,6 +25,7 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Iterator;
 
 import org.w3c.dom.NamedNodeMap;
@@ -45,6 +46,8 @@ import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
 import megamek.common.VTOL;
 import megamek.common.WeaponType;
+import megamek.common.options.IOption;
+import megamek.common.options.IOptionGroup;
 import mekhq.MekHQApp;
 import mekhq.campaign.parts.Availability;
 import mekhq.campaign.parts.GenericSparePart;
@@ -1899,4 +1902,26 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 		
 		return retVal;
 	}
+	
+	/**
+     * This function returns an html-coded list that says what 
+     * quirks are enabled for this unit
+     * @return
+     */
+    public String getQuirksList() {
+    	String quirkString = "";
+    	for (Enumeration<IOptionGroup> i = getEntity().getQuirks().getGroups(); i.hasMoreElements();) {
+            IOptionGroup group = i.nextElement();
+            for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements();) {
+                IOption quirk = j.nextElement();
+                if (quirk.booleanValue()) {
+                	quirkString = quirkString + quirk.getDisplayableNameWithValue() + "<br>";
+                }
+            }
+        }
+        if(quirkString.equals("")) {
+        	return null;
+        }
+        return "<html>" + quirkString + "</html>";
+    }
 }

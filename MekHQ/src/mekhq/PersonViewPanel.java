@@ -182,7 +182,7 @@ public class PersonViewPanel extends javax.swing.JPanel {
         }
     }
     
-    public void fillStats() {
+    private void fillStats() {
     	
     	org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(PersonViewPanel.class);
     	

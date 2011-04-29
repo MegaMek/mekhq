@@ -1941,9 +1941,9 @@ public class MekHQView extends FrameView {
 			return;
 		}
 		Unit selectedUnit = unitModel.getUnit(unitTable.convertRowIndexToModel(row));
-		MechView mv = new MechView(selectedUnit.getEntity(), false);
-		txtUnitView.setText(mv.getMechReadout());
-		//scrollPersonnelView.setViewportView(new PersonViewPanel(selectedPerson, campaign));
+		//MechView mv = new MechView(selectedUnit.getEntity(), false);
+		//txtUnitView.setText(mv.getMechReadout());
+		scrollUnitView.setViewportView(new UnitViewPanel(selectedUnit, campaign));
 		
 	}
 	
