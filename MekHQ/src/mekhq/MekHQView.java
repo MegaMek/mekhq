@@ -66,6 +66,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.JScrollBar;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
@@ -1927,8 +1928,14 @@ public class MekHQView extends FrameView {
 			return;
 		}
 		Person selectedPerson = personModel.getPerson(personnelTable.convertRowIndexToModel(row));
-		//txtPersonnelView.setText(selectedPerson.getDossier());
 		scrollPersonnelView.setViewportView(new PersonViewPanel(selectedPerson, campaign));
+		//This odd code is to make sure that the scrollbar stays at the top
+		//I cant just call it here, because it ends up getting reset somewhere later
+		javax.swing.SwingUtilities.invokeLater(new Runnable() {
+			public void run() { 
+				scrollPersonnelView.getVerticalScrollBar().setValue(0);
+			}
+		});
 		
 	}
 	
@@ -1939,9 +1946,14 @@ public class MekHQView extends FrameView {
 			return;
 		}
 		Unit selectedUnit = unitModel.getUnit(unitTable.convertRowIndexToModel(row));
-		//MechView mv = new MechView(selectedUnit.getEntity(), false);
-		//txtUnitView.setText(mv.getMechReadout());
 		scrollUnitView.setViewportView(new UnitViewPanel(selectedUnit, campaign));
+		//This odd code is to make sure that the scrollbar stays at the top
+		//I cant just call it here, because it ends up getting reset somewhere later
+		javax.swing.SwingUtilities.invokeLater(new Runnable() {
+			public void run() { 
+				scrollUnitView.getVerticalScrollBar().setValue(0);
+			}
+		});
 		
 	}
 	
