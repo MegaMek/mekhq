@@ -1241,6 +1241,7 @@ public class Campaign implements Serializable {
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "lastTaskId", lastTaskId);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "lastPersonId", lastPersonId);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "lastPartId", lastPartId);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "lastForceId", lastForceId);
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "calendar",
 				df.format(calendar.getTime()));
@@ -1284,6 +1285,7 @@ public class Campaign implements Serializable {
 		writeArrayAndHashToXml(pw1, 1, "tasks", tasks, taskIds); // Tasks
 		writeArrayAndHashToXml(pw1, 1, "personnel", personnel, personnelIds); // Personnel
 		writeArrayAndHashToXml(pw1, 1, "parts", parts, partIds); // Parts
+		//writeArrayAndHashToXml(pw1, 1, "forces", null, forceIds); // Forces
 
 		// Okay, we're done.
 		// Close everything out and be done with it.
@@ -1327,6 +1329,8 @@ public class Campaign implements Serializable {
 
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "</" + tag + ">");
 	}
+	
+	 
 
 	/**
 	 * Designed to create a campaign object from a file containing an XML
@@ -1794,6 +1798,9 @@ public class Campaign implements Serializable {
 						retVal.gmMode = false;
 				} else if (xn.equalsIgnoreCase("lastPartId")) {
 					retVal.lastPartId = Integer.parseInt(wn.getTextContent()
+							.trim());
+				} else if (xn.equalsIgnoreCase("lastForceId")) {
+					retVal.lastForceId = Integer.parseInt(wn.getTextContent()
 							.trim());
 				} else if (xn.equalsIgnoreCase("lastPersonId")) {
 					retVal.lastPersonId = Integer.parseInt(wn.getTextContent()
