@@ -626,8 +626,8 @@ public class MekHQView extends FrameView {
 		gridBagConstraints.weightx = 0.0;
 		gridBagConstraints.weighty = 1.0;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		scrollUnitView.setMinimumSize(new java.awt.Dimension(450, 600));
-		scrollUnitView.setPreferredSize(new java.awt.Dimension(450, 2000));
+		scrollUnitView.setMinimumSize(new java.awt.Dimension(500, 600));
+		scrollUnitView.setPreferredSize(new java.awt.Dimension(500, 2000));
 		scrollUnitView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollUnitView.setViewportView(txtUnitView);
 		panHangar.add(scrollUnitView, gridBagConstraints);
@@ -2486,7 +2486,7 @@ public class MekHQView extends FrameView {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_COST), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_QUALITY), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_STATUS), false);
-			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_PILOT), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_PILOT), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_BV), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_REPAIR), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_PARTS), false);
@@ -2918,19 +2918,8 @@ public class MekHQView extends FrameView {
 				} else {
 					unselect();
 				}
-
-				if ((null != u) && u.isDeployed()) {
-					c.setBackground(Color.GRAY);
-				} else if ((null != u) && !u.isRepairable()) {
-					c.setBackground(new Color(190, 150, 55));
-				} else if ((null != u) && !u.isFunctional()) {
-					c.setBackground(new Color(205, 92, 92));
-				} else if ((null != u)
-						&& (campaign.countTasksFor(u.getId()) > 0)) {
-					c.setBackground(new Color(238, 238, 0));
-				} else {
-					c.setBackground(new Color(220, 220, 220));
-				}
+	
+				c.setBackground(new Color(220, 220, 220));
 				return c;
 			}
 
@@ -4969,15 +4958,19 @@ public class MekHQView extends FrameView {
 				int actualRow = table.convertRowIndexToModel(row);
 				setHorizontalAlignment(getAlignment(actualCol));
 				setToolTipText(getTooltip(actualRow, actualCol));
+				Unit u = getUnit(actualRow);
 				
 				if (isSelected) {
                     setBackground(Color.DARK_GRAY);
                 } else {
-                    // tiger stripes
-                	//if((Integer)getValueAt(actualRow,COL_HITS) > 0) {
-                		//setBackground(Color.RED);
-                //	} else 
-                	if (row % 2 == 0) {
+                	if (null != u && !u.isRepairable()) {
+    					setBackground(new Color(190, 150, 55));
+    				} else if ((null != u) && !u.isFunctional()) {
+    					setBackground(new Color(205, 92, 92));
+    				} else if ((null != u)
+    						&& (campaign.countTasksFor(u.getId()) > 0)) {
+    					setBackground(new Color(238, 238, 0));
+    				} else if (row % 2 == 0) {
                         setBackground(new Color(220, 220, 220));
                     } else {
                         setBackground(Color.WHITE);

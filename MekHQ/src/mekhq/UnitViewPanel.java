@@ -7,9 +7,14 @@
 package mekhq;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Image;
+import java.awt.image.ImageObserver;
+import java.awt.image.MemoryImageSource;
+import java.awt.image.PixelGrabber;
 import java.io.File;
+import java.io.IOException;
 import java.text.DecimalFormat;
 
 import javax.swing.BorderFactory;
@@ -20,7 +25,9 @@ import megamek.client.ui.swing.MechTileset;
 import megamek.client.ui.swing.MechView;
 import megamek.client.ui.swing.util.FluffImageHelper;
 import megamek.client.ui.swing.util.ImageFileFactory;
+import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Entity;
+import megamek.common.Player;
 import megamek.common.TechConstants;
 import megamek.common.UnitType;
 import megamek.common.util.DirectoryItems;
@@ -93,10 +100,13 @@ public class UnitViewPanel extends javax.swing.JPanel {
 		lblImage.setName("lblImage"); // NOI18N
 		lblImage.setBackground(Color.WHITE);
 		Image image = FluffImageHelper.getFluffImage(entity);
+		if(null == image) {
+			image = getImageFor(unit, lblImage);     
+		}
         Icon icon = null;
 		if(null != image) {
 			if(image.getWidth(lblImage) > 200) {
-                image = image.getScaledInstance(150, -1, Image.SCALE_DEFAULT);               
+                image = image.getScaledInstance(200, -1, Image.SCALE_DEFAULT);               
             }
             icon = new ImageIcon(image);
             lblImage.setIcon(icon);
@@ -105,7 +115,7 @@ public class UnitViewPanel extends javax.swing.JPanel {
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 0;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.CENTER;
 		add(lblImage, gridBagConstraints);
 	
 		pnlStats.setName("pnlBasic");
@@ -115,7 +125,6 @@ public class UnitViewPanel extends javax.swing.JPanel {
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 1;
 		gridBagConstraints.gridy = 0;
-		gridBagConstraints.gridheight = 1;
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
@@ -269,6 +278,7 @@ public class UnitViewPanel extends javax.swing.JPanel {
 		gridBagConstraints.gridx = 1;
 		gridBagConstraints.gridy = 4;
 		gridBagConstraints.weightx = 1.0;
+		gridBagConstraints.weighty = 1.0;
 		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -298,4 +308,151 @@ public class UnitViewPanel extends javax.swing.JPanel {
 		
 	}
 	
+	private Image getImageFor(Unit u, Component c) {
+        
+        if (mt == null) {
+            mt = new MechTileset("data/images/units/");
+            try {
+                mt.loadFromFile("mechset.txt");
+            } catch (IOException ex) {
+            	MekHQApp.logError(ex);
+                //TODO: do something here
+            }
+        }// end if(null tileset)
+        Image base = mt.imageFor(u.getEntity(), c, -1);
+        int tint = PlayerColors.getColorRGB(u.campaign.getColorIndex());
+        EntityImage entityImage = new EntityImage(base, tint, getCamo(u.campaign), c);
+        return entityImage.loadPreviewImage();
+    }
+    
+    private Image getCamo(Campaign c) {
+
+        // Return a null if the campaign has selected no camo file.
+        if (null == c.getCamoCategory()
+                || Player.NO_CAMO.equals(c.getCamoCategory())) {
+            return null;
+        }
+
+        // Try to get the player's camo file.
+        Image camo = null;
+        try {
+
+            // Translate the root camo directory name.
+            String category = c.getCamoCategory();
+            if (Player.ROOT_CAMO.equals(category))
+                category = ""; //$NON-NLS-1$
+            camo = (Image) camos.getItem(category, c.getCamoFileName());
+
+        } catch (Exception err) {
+            err.printStackTrace();
+        }
+        return camo;
+    }
+    
+    /**
+     * A class to handle the image permutations for an entity (borrowed from MegaMek#TileSetManager
+     */
+    private class EntityImage {
+        private Image base;
+        private Image wreck;
+        private Image icon;
+        int tint;
+        private Image camo;
+        private Component parent;
+
+        private static final int IMG_WIDTH = 84;
+        private static final int IMG_HEIGHT = 72;
+        private static final int IMG_SIZE = IMG_WIDTH * IMG_HEIGHT;
+
+        public EntityImage(Image base, int tint, Image camo, Component comp) {
+            this(base, null, tint, camo, comp);
+        }
+
+        public EntityImage(Image base, Image wreck, int tint, Image camo, Component comp) {
+            this.base = base;
+            this.tint = tint;
+            this.camo = camo;
+            this.parent = comp;
+            this.wreck = wreck;
+        }
+
+        public Image loadPreviewImage() {
+            base = applyColor(base);
+            return base;
+        }
+
+        public Image getBase() {
+            return base;
+        }
+
+        public Image getIcon() {
+            return icon;
+        }
+
+        private Image applyColor(Image image) {
+            Image iMech;
+            boolean useCamo = (camo != null);
+
+            iMech = image;
+
+            int[] pMech = new int[IMG_SIZE];
+            int[] pCamo = new int[IMG_SIZE];
+            PixelGrabber pgMech = new PixelGrabber(iMech, 0, 0, IMG_WIDTH, IMG_HEIGHT, pMech, 0, IMG_WIDTH);
+
+            try {
+                pgMech.grabPixels();
+            } catch (InterruptedException e) {
+                System.err
+                        .println("EntityImage.applyColor(): Failed to grab pixels for mech image." + e.getMessage()); //$NON-NLS-1$
+                return image;
+            }
+            if ((pgMech.getStatus() & ImageObserver.ABORT) != 0) {
+                System.err
+                        .println("EntityImage.applyColor(): Failed to grab pixels for mech image. ImageObserver aborted."); //$NON-NLS-1$
+                return image;
+            }
+
+            if (useCamo) {
+                PixelGrabber pgCamo = new PixelGrabber(camo, 0, 0, IMG_WIDTH,
+                        IMG_HEIGHT, pCamo, 0, IMG_WIDTH);
+                try {
+                    pgCamo.grabPixels();
+                } catch (InterruptedException e) {
+                    System.err
+                            .println("EntityImage.applyColor(): Failed to grab pixels for camo image." + e.getMessage()); //$NON-NLS-1$
+                    return image;
+                }
+                if ((pgCamo.getStatus() & ImageObserver.ABORT) != 0) {
+                    System.err
+                            .println("EntityImage.applyColor(): Failed to grab pixels for mech image. ImageObserver aborted."); //$NON-NLS-1$
+                    return image;
+                }
+            }
+
+            for (int i = 0; i < IMG_SIZE; i++) {
+                int pixel = pMech[i];
+                int alpha = (pixel >> 24) & 0xff;
+
+                if (alpha != 0) {
+                    int pixel1 = useCamo ? pCamo[i] : tint;
+                    float red1 = ((float) ((pixel1 >> 16) & 0xff)) / 255;
+                    float green1 = ((float) ((pixel1 >> 8) & 0xff)) / 255;
+                    float blue1 = ((float) ((pixel1) & 0xff)) / 255;
+
+                    float black = ((pMech[i]) & 0xff);
+
+                    int red2 = Math.round(red1 * black);
+                    int green2 = Math.round(green1 * black);
+                    int blue2 = Math.round(blue1 * black);
+
+                    pMech[i] = (alpha << 24) | (red2 << 16) | (green2 << 8)
+                            | blue2;
+                }
+            }
+
+            image = parent.createImage(new MemoryImageSource(IMG_WIDTH,
+                    IMG_HEIGHT, pMech, 0, IMG_WIDTH));
+            return image;
+        }
+    }	
 }

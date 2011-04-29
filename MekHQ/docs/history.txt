@@ -11,7 +11,8 @@ v0.1.5 (SVN)
 + updated MegaMek.jar
 + improvements to UnitViewPanel
 + allow fluff images in UnitViewPanel
-
++ show unit image if no fluff image in UnitViewPanel
++ color-coding of UnitTable rows by condition
 
 v0.1.4 (2011-04-28)
 + Bug: personnel options not updating in CampaignOptionsDialog
