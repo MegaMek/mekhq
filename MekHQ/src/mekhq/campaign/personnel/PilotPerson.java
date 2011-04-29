@@ -155,6 +155,15 @@ public class PilotPerson extends Person {
     }
     
     @Override
+    public String toString() {
+    	String s = pilot.getName() + " (" + pilot.getGunnery() + "/" + pilot.getPiloting() + ")";
+    	if(null != unit) {
+    		s = s + ", <i>" + unit.getEntity().getDisplayName() + "</i>";
+    	}
+    	return "<html>" + s + "</html>";
+    }
+    
+    @Override
     public String getDescHTML() {
         String toReturn = "<html><font size='2'><b>" + pilot.getName() + "</b><br/>";
         toReturn += getTypeDesc() + " (" + pilot.getGunnery() + "/" + pilot.getPiloting() + ")<br/>";
