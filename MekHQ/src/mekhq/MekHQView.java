@@ -4221,7 +4221,12 @@ public class MekHQView extends FrameView {
         }
 
         public Object getValueAt(int row, int col) {
-            Person p = data.get(row);
+        	Person p;
+        	if(data.isEmpty()) {
+        		return "";
+        	} else {
+        		p = data.get(row);
+        	}
             if(col == COL_RANK) {
                 return campaign.getRanks().getRank(p.getRank());
             }
@@ -4882,7 +4887,12 @@ public class MekHQView extends FrameView {
         }
 
         public Object getValueAt(int row, int col) {
-            Unit u = data.get(row);
+        	Unit u;
+        	if(data.isEmpty()) {
+        		return "";
+        	} else {
+        		u = data.get(row);
+        	}
             Entity e = u.getEntity();
             PilotPerson pp = u.getPilot();
             DecimalFormat format = new DecimalFormat();
