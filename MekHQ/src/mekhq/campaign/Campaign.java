@@ -121,6 +121,9 @@ public class Campaign implements Serializable {
 
 	private RandomNameGenerator rng;
 	
+	//hierarchically structured Force object to define TO&E
+	private Force forces;
+	
 	// calendar stuff
 	public GregorianCalendar calendar;
 	private SimpleDateFormat dateFormat;
@@ -158,6 +161,7 @@ public class Campaign implements Serializable {
 		faction = Faction.F_MERC;
 		ranks = new Ranks();
 		skillCosts = new SkillCosts();
+		forces = new Force(name);
 	}
 
 	public String getName() {
@@ -208,6 +212,10 @@ public class Campaign implements Serializable {
 
 	public void setFunds(long funds) {
 		this.funds = funds;
+	}
+	
+	public Force getForces() {
+		return forces;
 	}
 
 	/**
