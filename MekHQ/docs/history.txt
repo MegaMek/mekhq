@@ -31,6 +31,7 @@ v0.1.5 (SVN)
 + added force icons and ability to set them
 + changes to PilotPerson#toString
 + save lastForceId in XML
++ saved forceId to XML
 
 v0.1.4 (2011-04-28)
 + Bug: personnel options not updating in CampaignOptionsDialog

@@ -364,6 +364,10 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
 				+"<rank>"
 				+rank
 				+"</rank>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<forceId>"
+				+forceId
+				+"</forceId>");
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<birthday>"
@@ -424,6 +428,8 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
 					retVal.gender = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("rank")) {
 					retVal.rank = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("forceId")) {
+					retVal.forceId = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("birthday")) {
 					SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 					retVal.birthday = (GregorianCalendar) GregorianCalendar.getInstance();
