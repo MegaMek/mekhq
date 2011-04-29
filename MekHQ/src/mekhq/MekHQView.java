@@ -3591,9 +3591,57 @@ public class MekHQView extends FrameView {
 	ActionListener {
 
 		@Override
-		public void actionPerformed(ActionEvent arg0) {
-			// TODO Auto-generated method stub
-			
+		public void actionPerformed(ActionEvent action) {
+			StringTokenizer st = new StringTokenizer(action.getActionCommand(), "|");
+            String command = st.nextToken();
+            int id = Integer.parseInt(st.nextToken());
+            Force force = campaign.getForce(id);
+            if(command.contains("ADD_FORCE")) {
+            	if(null != force) {
+	            	String name = (String)JOptionPane.showInputDialog(
+	                        null,
+	                        "Enter the force name",
+	                        "Force Name",
+	                        JOptionPane.PLAIN_MESSAGE,
+	                        null,
+	                        null,
+	                        "My Lance");
+	            	campaign.addForce(new Force(name), force);
+	            	refreshOrganization();
+            	}
+            } if(command.contains("ADD_PERSON")) {
+            	if(null != force) {
+                    Person p = campaign.getPerson(Integer.parseInt(st.nextToken()));
+                    if(null != p && p instanceof PilotPerson) {
+                    	force.addPerson((PilotPerson)p);
+                    	refreshOrganization();
+                    }
+            	}
+            } else if(command.contains("CHANGE_NAME")) {
+            	if(null != force) {
+	            	String name = (String)JOptionPane.showInputDialog(
+	                        null,
+	                        "Enter the force name",
+	                        "Force Name",
+	                        JOptionPane.PLAIN_MESSAGE,
+	                        null,
+	                        null,
+	                        "My Lance");
+	            	force.setName(name);
+	            	refreshOrganization();
+            	}
+            } else if(command.contains("CHANGE_DESC")) {
+            	if(null != force) {
+            		TextAreaDialog tad = new TextAreaDialog(null, true,
+    						"Edit Force Description",
+    						force.getDescription());
+    				tad.setVisible(true);
+    				if(tad.wasChanged()) {
+    					force.setDescription(tad.getText());
+    					refreshOrganization();
+    				}        	
+            	}
+            }
 		}
 		
 		@Override
@@ -3607,9 +3655,11 @@ public class MekHQView extends FrameView {
 		}
 
 		private void maybeShowPopup(MouseEvent e) {
-			JPopupMenu popup = new JPopupMenu();
-
+				
 			if (e.isPopupTrigger()) {
+				JPopupMenu popup = new JPopupMenu();
+				JMenuItem menuItem;
+				JMenu menu;
 				int x = e.getX();
                 int y = e.getY();
                 JTree tree = (JTree)e.getSource();
@@ -3618,8 +3668,43 @@ public class MekHQView extends FrameView {
                         return; 
                 tree.setSelectionPath(path);
                 DefaultMutableTreeNode node = (DefaultMutableTreeNode)path.getLastPathComponent();
-                JMenuItem menu = new JMenuItem(node.toString() + "It Works!");
-                popup.add(menu);
+                Force force = null;
+                PilotPerson person = null;
+                if(node.getUserObject() instanceof Force) {
+                	force = (Force)node.getUserObject();
+                }
+                if(node.getUserObject() instanceof PilotPerson) {
+                	person = (PilotPerson)node.getUserObject();
+                }
+                if(null != force) {
+                	int forceId = force.getId();
+	                menuItem = new JMenuItem("Change Name");
+	                menuItem.setActionCommand("CHANGE_NAME|" + forceId);
+					menuItem.addActionListener(this);
+					menuItem.setEnabled(true);
+	                popup.add(menuItem);
+	                menuItem = new JMenuItem("Change Description");
+	                menuItem.setActionCommand("CHANGE_DESC|" + forceId);
+					menuItem.addActionListener(this);
+					menuItem.setEnabled(true);
+	                popup.add(menuItem);
+	                menuItem = new JMenuItem("Add New Force");
+	                menuItem.setActionCommand("ADD_FORCE|" + forceId);
+					menuItem.addActionListener(this);
+					menuItem.setEnabled(true);
+	                popup.add(menuItem);
+	                menu = new JMenu("Add Personnel");
+	                for(Person p : campaign.getPersonnel()) {
+	                	if(p instanceof PilotPerson && p.isActive()) {// && p.getForceId() < 0) {
+			                menuItem = new JMenuItem(p.getDesc());
+		                	menuItem.setActionCommand("ADD_PERSON|" + forceId + "|" + p.getId());
+		                	menuItem.addActionListener(this);
+		                	menuItem.setEnabled(!p.isDeployed());
+		                	menu.add(menuItem);
+	                	}
+	                }
+	                popup.add(menu);    
+                }
 				popup.show(e.getComponent(), e.getX(), e.getY());
 			}
 		}

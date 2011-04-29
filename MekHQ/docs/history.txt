@@ -23,6 +23,7 @@ v0.1.5 (SVN)
 + beginning of TO&E Panel (not yet functional)
 + use TreeModel to set up treeNodes for forces
 + context-menu for OrgTree
++ ability to add forces and personnel to orgTree
 
 v0.1.4 (2011-04-28)
 + Bug: personnel options not updating in CampaignOptionsDialog

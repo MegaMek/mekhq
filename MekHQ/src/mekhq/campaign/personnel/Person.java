@@ -91,6 +91,8 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
     private int status;
     protected int xp;
     
+    protected int forceId;
+    
     //default constructor
     public Person() {
         daysRest = 0;
@@ -514,5 +516,13 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
 	
 	public String toString() {
 		return getDesc();
+	}
+	
+	public int getForceId() {
+		return forceId;
+	}
+	
+	public void setForceId(int id) {
+		this.forceId = id;
 	}
 }

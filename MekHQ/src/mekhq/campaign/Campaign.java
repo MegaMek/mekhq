@@ -105,12 +105,15 @@ public class Campaign implements Serializable {
 	private Hashtable<Integer, Person> personnelIds = new Hashtable<Integer, Person>();
 	private ArrayList<Part> parts = new ArrayList<Part>();
 	private Hashtable<Integer, Part> partIds = new Hashtable<Integer, Part>();
+	private Hashtable<Integer, Force> forceIds = new Hashtable<Integer, Force>();
+
 
 	private int lastTeamId;
 	private int lastUnitId;
 	private int lastTaskId;
 	private int lastPersonId;
 	private int lastPartId;
+	private int lastForceId;
 
 	// I need to put a basic game object in campaign so that I can
 	// asssign it to the entities, otherwise some entity methods may get NPE
@@ -165,15 +168,15 @@ public class Campaign implements Serializable {
 		
 		 //This is just for testing out forces hierarchy 
 		Force companya = new Force("Company A");
-		companya.addSubForce(new Force("Alpha Lance"));
-		companya.addSubForce(new Force("Baker Lance"));
-		companya.addSubForce(new Force("Charlie Lance"));
+		addForce(new Force("Alpha Lance"), companya);
+		addForce(new Force("Baker Lance"), companya);
+		addForce(new Force("Charlie Lance"), companya);
 		companya.addPerson(new PilotPerson(new Pilot("Bob Smith,",4,5), 0));
 		Force companyb = new Force("Company B");
 		Force companyc = new Force("Company C");
-		forces.addSubForce(companya);
-		forces.addSubForce(companyb);
-		forces.addSubForce(companyc);
+		addForce(companya, forces);
+		addForce(companyb, forces);
+		addForce(companyc, forces);
 		 
 	}
 
@@ -231,6 +234,21 @@ public class Campaign implements Serializable {
 		return forces;
 	}
 
+	/**
+	 * Add force to an existing superforce. This method will also
+	 * assign the force an id and place it in the forceId hash
+	 * @param force - the Force to add
+	 * @param superForce - the superforce to add the new force to
+	 */
+	public void addForce(Force force, Force superForce) {
+		int id = lastForceId + 1;
+		force.setId(id);
+		superForce.addSubForce(force);
+		forceIds.put(new Integer(id), force);
+		lastForceId = id;
+		
+	}
+	
 	/**
 	 * Add a support team to the campaign
 	 * 
@@ -548,6 +566,10 @@ public class Campaign implements Serializable {
 
 	public Part getPart(int id) {
 		return partIds.get(new Integer(id));
+	}
+	
+	public Force getForce(int id) {
+		return forceIds.get(new Integer(id));
 	}
 
 	public ArrayList<String> getCurrentReport() {

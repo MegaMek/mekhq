@@ -46,6 +46,9 @@ public class Force implements Serializable, MekHqXmlSerializable {
 	private Force parentForce;
 	private Vector<Force> subForces;
 	private Vector<PilotPerson> personnel;
+
+	//an ID so that forces can be tracked in Campaign hash
+	private int id;
 	
 	public Force(String n) {
 		this.name = n;
@@ -55,7 +58,7 @@ public class Force implements Serializable, MekHqXmlSerializable {
 		this.personnel = new Vector<PilotPerson>();
 	}
 	
-	public Force(String n, Force parent) {
+	public Force(String n, int id, Force parent) {
 		this(n);
 		this.parentForce = parent;
 	}
@@ -72,7 +75,7 @@ public class Force implements Serializable, MekHqXmlSerializable {
 		return desc;
 	}
 	
-	public void setDesc(String d) {
+	public void setDescription(String d) {
 		this.desc = d;
 	}
 	
@@ -88,6 +91,13 @@ public class Force implements Serializable, MekHqXmlSerializable {
 		return subForces;
 	}
 	
+	/**
+	 * Add a subforce to the subforce vector. In general, this
+	 * should not be called directly to add forces to the campaign
+	 * because they will not be assigned an id. Use {@link Campaign#addForce(Force, Force)}
+	 * instead
+	 * @param sub
+	 */
 	public void addSubForce(Force sub) {
 		subForces.add(sub);
 	}
@@ -97,11 +107,20 @@ public class Force implements Serializable, MekHqXmlSerializable {
 	}
 	
 	public void addPerson(PilotPerson person) {
+		person.setForceId(id);
 		personnel.add(person);
 	}
 	
 	public String toString() {
 		return name;
+	}
+	
+	public int getId() {
+		return id;
+	}
+	
+	public void setId(int i) {
+		this.id = i;
 	}
 	
 	@Override
