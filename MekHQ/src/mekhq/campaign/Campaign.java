@@ -1285,7 +1285,12 @@ public class Campaign implements Serializable {
 		writeArrayAndHashToXml(pw1, 1, "tasks", tasks, taskIds); // Tasks
 		writeArrayAndHashToXml(pw1, 1, "personnel", personnel, personnelIds); // Personnel
 		writeArrayAndHashToXml(pw1, 1, "parts", parts, partIds); // Parts
-		//writeArrayAndHashToXml(pw1, 1, "forces", null, forceIds); // Forces
+		
+		//the forces structure is hierarchical, but that should be handled internally
+		//from with writeToXML function for Force
+		pw1.println("\t<forces>");
+		forces.writeToXml(pw1, 2);
+		pw1.println("\t</forces>");
 
 		// Okay, we're done.
 		// Close everything out and be done with it.

@@ -37,7 +37,7 @@ import mekhq.campaign.personnel.PilotPerson;
  * 
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class Force implements Serializable, MekHqXmlSerializable {
+public class Force implements Serializable {
 
 	private static final long serialVersionUID = -3018542172119419401L;
 
@@ -177,10 +177,51 @@ public class Force implements Serializable, MekHqXmlSerializable {
 	public void setIconFileName(String s) {
 		this.iconFileName = s;
 	}
-	
-	@Override
-	public void writeToXml(PrintWriter pw1, int indent, int inId) {
-		// TODO Auto-generated method stub
+
+	public void writeToXml(PrintWriter pw1, int indent) {
+		pw1.println(MekHqXmlUtil.indentStr(indent) + "<force id=\""
+				+id
+				+"\" type=\""
+				+this.getClass().getName()
+				+"\">");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<name>"
+				+name
+				+"</name>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<desc>"
+				+desc
+				+"</desc>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<iconCategory>"
+				+iconCategory
+				+"</iconCategory>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<iconFileName>"
+				+iconFileName
+				+"</iconFileName>");
+		if(personnel.size() > 0) {
+			//for now I am just going to print person ids to xml
+			//TODO: change personnel to a vector of ids rather than persons
+			pw1.println(MekHqXmlUtil.indentStr(indent+1)
+					+"<personnel>");
+			for(PilotPerson p : personnel) {
+				pw1.println(MekHqXmlUtil.indentStr(indent+2)
+						+"<person id= " + p.getId() + "/>");
+			}
+			pw1.println(MekHqXmlUtil.indentStr(indent+1)
+					+"</personnel>");
+		}
+		if(subForces.size() > 0) {
+			pw1.println(MekHqXmlUtil.indentStr(indent+1)
+					+"<subforces>");		
+			for(Force sub : subForces) {
+				sub.writeToXml(pw1, indent+2);
+			}
+			pw1.println(MekHqXmlUtil.indentStr(indent+1)
+					+"</subforces>");
+			}
+		pw1.println(MekHqXmlUtil.indentStr(indent) + "</force>");
 		
 	}
 	
