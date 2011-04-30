@@ -204,6 +204,7 @@ public class MekHQView extends FrameView {
 	private UnitTableModel unitModel = new UnitTableModel();
 	private PartsTableModel partsModel = new PartsTableModel();
 	private DefaultTreeModel orgModel;
+	private UnitTableMouseAdapter unitMouseAdapter;
 	private ServicedUnitsTableMouseAdapter servicedUnitMouseAdapter;
 	private PartsTableMouseAdapter partsMouseAdapter;
 	private TaskTableMouseAdapter taskMouseAdapter;
@@ -229,6 +230,7 @@ public class MekHQView extends FrameView {
 	public MekHQView(SingleFrameApplication app) {
 		super(app);
 
+		unitMouseAdapter = new UnitTableMouseAdapter();
 		servicedUnitMouseAdapter = new ServicedUnitsTableMouseAdapter();
 		partsMouseAdapter = new PartsTableMouseAdapter();
 		taskMouseAdapter = new TaskTableMouseAdapter();
@@ -655,7 +657,7 @@ public class MekHQView extends FrameView {
 		
 		unitTable.setModel(unitModel);
 		unitTable.setName("unitTable"); // NOI18N
-		unitTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		unitTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		XTableColumnModel unitColumnModel = new XTableColumnModel();
         unitTable.setColumnModel(unitColumnModel);
         unitTable.createDefaultColumnsFromModel();
@@ -664,7 +666,7 @@ public class MekHQView extends FrameView {
         unitSorter.setComparator(UnitTableModel.COL_WCLASS, new WeightClassSorter());
         unitSorter.setComparator(UnitTableModel.COL_COST, new FormattedNumberSorter());
         unitTable.setRowSorter(unitSorter);
-		//unitTable.addMouseListener(unitMouseAdapter);
+		unitTable.addMouseListener(unitMouseAdapter);
 		unitTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 		column = null;
         for (int i = 0; i < UnitTableModel.N_COL; i++) {
@@ -3053,62 +3055,11 @@ public class MekHQView extends FrameView {
 	public class ServicedUnitsTableMouseAdapter extends MouseInputAdapter implements
 			ActionListener {
 
-		private ArrayList<PilotPerson> pilots;
-
 		public void actionPerformed(ActionEvent action) {
 			String command = action.getActionCommand();
 			Unit selectedUnit = servicedUnitModel.getUnitAt(servicedUnitTable.getSelectedRow());
 			Unit[] units = servicedUnitModel.getUnitsAt(servicedUnitTable.getSelectedRows());
-			if (command.equalsIgnoreCase("REMOVE_PILOT")) {
-				for (Unit unit : units) {
-					unit.removePilot();
-				}
-				refreshServicedUnitList();
-				refreshUnitList();
-			} else if (command.contains("CHANGE_PILOT")) {
-				String sel = command.split(":")[1];
-				int selected = Integer.parseInt(sel);
-				if ((null != pilots) && (selected > -1)
-						&& (selected < pilots.size())) {
-					campaign.changePilot(selectedUnit, pilots.get(selected));
-				}
-				refreshServicedUnitList();
-				refreshUnitList();
-			} else if (command.equalsIgnoreCase("SELL")) {
-				for (Unit unit : units) {
-					if (!unit.isDeployed()) {
-						int sellValue = unit.getSellValue();
-						NumberFormat numberFormat = NumberFormat
-								.getIntegerInstance();
-						String text = numberFormat.format(sellValue) + " "
-								+ (sellValue != 0 ? "CBills" : "CBill");
-						if (0 == JOptionPane.showConfirmDialog(null,
-								"Do you really want to sell "
-										+ unit.getEntity().getDisplayName()
-										+ " for " + text, "Sell Unit?",
-								JOptionPane.YES_NO_OPTION)) {
-							campaign.sellUnit(unit.getId());
-						}
-					}
-				}
-				refreshServicedUnitList();
-				refreshUnitList();
-				refreshReport();
-				refreshFunds();
-			} else if (command.equalsIgnoreCase("LOSS")) {
-				for (Unit unit : units) {
-					if (0 == JOptionPane.showConfirmDialog(null,
-							"Do you really want to consider "
-									+ unit.getEntity().getDisplayName()
-									+ " a combat loss?", "Remove Unit?",
-							JOptionPane.YES_NO_OPTION)) {
-						campaign.removeUnit(unit.getId());
-					}
-				}
-				refreshServicedUnitList();
-				refreshUnitList();
-				refreshReport();
-			} else if (command.contains("ASSIGN_TECH")) {
+			if (command.contains("ASSIGN_TECH")) {
 				String sel = command.split(":")[1];
 				int selected = Integer.parseInt(sel);
 				if ((selected > -1)
@@ -3367,7 +3318,6 @@ public class MekHQView extends FrameView {
 			if (e.isPopupTrigger()) {
 				int row = servicedUnitTable.rowAtPoint(e.getPoint());
 				Unit unit = servicedUnitModel.getUnitAt(row);
-				pilots = campaign.getEligiblePilotsFor(unit);
 				JMenuItem menuItem = null;
 				JMenu menu = null;
 				JCheckBoxMenuItem cbMenuItem = null;
@@ -3466,58 +3416,6 @@ public class MekHQView extends FrameView {
 					menuItem.setEnabled(unit.isCustomized());
 					popup.add(menuItem);
 				}
-				// remove pilot
-				popup.addSeparator();
-				menuItem = new JMenuItem("Remove pilot");
-				menuItem.setActionCommand("REMOVE_PILOT");
-				menuItem.addActionListener(this);
-				menuItem.setEnabled(unit.hasPilot() && !unit.isDeployed());
-				popup.add(menuItem);
-				// switch pilot
-				menu = new JMenu("Change pilot");
-				i = 0;
-				for (PilotPerson pp : pilots) {
-					cbMenuItem = new JCheckBoxMenuItem(pp.getDesc());
-					if (unit.hasPilot()
-							&& (unit.getPilot().getId() == pp.getId())) {
-						cbMenuItem.setSelected(true);
-					}
-					cbMenuItem.setActionCommand("CHANGE_PILOT:" + i);
-					cbMenuItem.addActionListener(this);
-					menu.add(cbMenuItem);
-					i++;
-				}
-				menu.setEnabled(!unit.isDeployed());
-				popup.add(menu);
-				popup.addSeparator();
-				// sell unit
-				menuItem = new JMenuItem("Sell Unit");
-				menuItem.setActionCommand("SELL");
-				menuItem.addActionListener(this);
-				menuItem.setEnabled(!unit.isDeployed());
-				popup.add(menuItem);
-				// TODO: scrap unit
-				// combat loss
-				menuItem = new JMenuItem("Combat Loss");
-				menuItem.setActionCommand("LOSS");
-				menuItem.addActionListener(this);
-				menuItem.setEnabled(unit.isDeployed());
-				popup.add(menuItem);
-				// TODO: add quirks?
-				// GM mode
-				menu = new JMenu("GM Mode");
-				menuItem = new JMenuItem("Remove Unit");
-				menuItem.setActionCommand("REMOVE");
-				menuItem.addActionListener(this);
-				menuItem.setEnabled(campaign.isGM());
-				menu.add(menuItem);
-				menuItem = new JMenuItem("Undeploy Unit");
-				menuItem.setActionCommand("UNDEPLOY");
-				menuItem.addActionListener(this);
-				menuItem.setEnabled(campaign.isGM() && unit.isDeployed());
-				menu.add(menuItem);
-				popup.addSeparator();
-				popup.add(menu);
 				popup.show(e.getComponent(), e.getX(), e.getY());
 			}
 		}
@@ -5382,6 +5280,443 @@ public class MekHQView extends FrameView {
 
 		}
         
+	}
+	
+	public class UnitTableMouseAdapter extends MouseInputAdapter implements
+		ActionListener {
+	
+		private ArrayList<PilotPerson> pilots;
+		
+		public void actionPerformed(ActionEvent action) {
+			String command = action.getActionCommand();
+			Unit selectedUnit = unitModel.getUnit(unitTable.convertRowIndexToModel(unitTable.getSelectedRow()));
+			int[] rows = unitTable.getSelectedRows();
+			Unit[] units = new Unit[rows.length];
+			for(int i=0; i<rows.length; i++) {
+				units[i] = unitModel.getUnit(unitTable.convertRowIndexToModel(rows[i]));
+			}
+			if (command.equalsIgnoreCase("REMOVE_PILOT")) {
+				for (Unit unit : units) {
+					unit.removePilot();
+				}
+				refreshServicedUnitList();
+				refreshUnitList();
+				refreshOrganization();
+			} else if (command.contains("CHANGE_PILOT")) {
+				String sel = command.split(":")[1];
+				int selected = Integer.parseInt(sel);
+				if ((null != pilots) && (selected > -1)
+						&& (selected < pilots.size())) {
+					campaign.changePilot(selectedUnit, pilots.get(selected));
+				}
+				refreshServicedUnitList();
+				refreshUnitList();
+				refreshPersonnelList();
+				refreshOrganization();
+			} else if (command.equalsIgnoreCase("SELL")) {
+				for (Unit unit : units) {
+					if (!unit.isDeployed()) {
+						int sellValue = unit.getSellValue();
+						NumberFormat numberFormat = NumberFormat
+								.getIntegerInstance();
+						String text = numberFormat.format(sellValue) + " "
+								+ (sellValue != 0 ? "CBills" : "CBill");
+						if (0 == JOptionPane.showConfirmDialog(null,
+								"Do you really want to sell "
+										+ unit.getEntity().getDisplayName()
+										+ " for " + text, "Sell Unit?",
+								JOptionPane.YES_NO_OPTION)) {
+							campaign.sellUnit(unit.getId());
+						}
+					}
+				}
+				refreshServicedUnitList();
+				refreshUnitList();
+				refreshPersonnelList();
+				refreshOrganization();
+				refreshReport();
+				refreshFunds();
+			} else if (command.equalsIgnoreCase("LOSS")) {
+				for (Unit unit : units) {
+					if (0 == JOptionPane.showConfirmDialog(null,
+							"Do you really want to consider "
+									+ unit.getEntity().getDisplayName()
+									+ " a combat loss?", "Remove Unit?",
+							JOptionPane.YES_NO_OPTION)) {
+						campaign.removeUnit(unit.getId());
+					}
+				}
+				refreshServicedUnitList();
+				refreshUnitList();
+				refreshPersonnelList();
+				refreshOrganization();
+				refreshReport();
+			} else if (command.contains("SWAP_AMMO")) {
+				String sel = command.split(":")[1];
+				int selMount = Integer.parseInt(sel);
+				Mounted m = selectedUnit.getEntity().getEquipment(selMount);
+				if (null == m) {
+					return;
+				}
+				AmmoType curType = (AmmoType) m.getType();
+				ReloadItem reload = campaign.getReloadWorkFor(m, selectedUnit);
+				boolean newWork = false;
+				if (null == reload) {
+					newWork = true;
+					reload = new ReloadItem(selectedUnit, m);
+				}
+				sel = command.split(":")[2];
+				int selType = Integer.parseInt(sel);
+				AmmoType newType = Utilities.getMunitionsFor(
+						selectedUnit.getEntity(), curType).get(selType);
+				reload.swapAmmo(newType);
+				if (newWork) {
+					campaign.addWork(reload);
+				}
+				refreshTaskList();
+				refreshAcquireList();
+				refreshServicedUnitList();
+				refreshUnitList();
+			} else if (command.contains("CHANGE_SITE")) {
+				for (Unit unit : units) {
+					if (!unit.isDeployed()) {
+						String sel = command.split(":")[1];
+						int selected = Integer.parseInt(sel);
+						if ((selected > -1) && (selected < Unit.SITE_N)) {
+							unit.setSite(selected);
+						}
+					}
+				}
+				refreshServicedUnitList();
+				refreshUnitList();
+				refreshTaskList();
+				refreshAcquireList();
+			} else if (command.equalsIgnoreCase("SALVAGE")) {
+				for (Unit unit : units) {
+					if (!unit.isDeployed()) {
+						unit.setSalvage(true);
+					}
+				}
+				refreshServicedUnitList();
+				refreshUnitList();
+			} else if (command.equalsIgnoreCase("REPAIR")) {
+				for (Unit unit : units) {
+					if (!unit.isDeployed() && unit.isRepairable()) {
+						unit.setSalvage(false);
+					}
+				}
+				refreshServicedUnitList();
+				refreshUnitList();
+			} else if (command.equalsIgnoreCase("REMOVE")) {
+				for (Unit unit : units) {
+					if (!unit.isDeployed()) {
+						if (0 == JOptionPane.showConfirmDialog(null,
+								"Do you really want to remove "
+										+ unit.getEntity().getDisplayName()
+										+ "?", "Remove Unit?",
+								JOptionPane.YES_NO_OPTION)) {
+							campaign.removeUnit(unit.getId());
+						}
+					}
+				}
+				refreshServicedUnitList();
+				refreshUnitList();
+				refreshPersonnelList();
+				refreshOrganization();
+				refreshReport();
+			} else if (command.equalsIgnoreCase("UNDEPLOY")) {
+				for (Unit unit : units) {
+					if (unit.isDeployed()) {
+						unit.setDeployed(false);
+						if (null != unit.getPilot()) {
+							unit.getPilot().setDeployed(false);
+						}
+					}
+				}
+				refreshServicedUnitList();
+				refreshUnitList();
+				refreshPatientList();
+				refreshPersonnelList();
+			} else if (command.contains("CUSTOMIZE")
+					&& !command.contains("CANCEL")) {
+				if (!selectedUnit.isDeployed() && !selectedUnit.isDamaged()) {
+					Entity targetEntity = null;
+					String targetMechName = command.split(":")[1];
+					if (targetMechName.equals("MML")) {
+						if (selectedUnit.getEntity() instanceof megamek.common.Mech) {
+							MechSummary mechSummary = MechSummaryCache
+									.getInstance().getMech(
+											selectedUnit.getEntity()
+													.getShortName());
+							megamek.common.Mech selectedMech = null;
+		
+							try {
+								Entity e = (new MechFileParser(
+										mechSummary.getSourceFile()))
+										.getEntity();
+								if (e instanceof megamek.common.Mech) {
+									selectedMech = (megamek.common.Mech) e;
+								}
+							} catch (EntityLoadingException ex) {
+								Logger.getLogger(MekHQView.class.getName())
+										.log(Level.SEVERE, null, ex);
+							}
+		
+							if (selectedMech == null) {
+								return;
+							}
+		
+							String modelTmp = "CST01";
+							selectedMech.setModel(modelTmp);
+		
+							MMLMekUICustom megamekLabMekUI = new MMLMekUICustom();
+							megamekLabMekUI.setVisible(false);
+							megamekLabMekUI.setModal(true);
+		
+							megamekLabMekUI.loadUnit(selectedMech);
+							megamekLabMekUI.setVisible(true);
+		
+							megamek.common.Mech mmlEntity = megamekLabMekUI
+									.getEntity();
+							if (MMLMekUICustom.isEntityValid(mmlEntity)
+									&& mmlEntity.getChassis().equals(
+											selectedMech.getChassis())
+									&& (mmlEntity.getWeight() == selectedMech
+											.getWeight())) {
+								targetEntity = mmlEntity;
+							}
+						}
+		
+					} else if (targetMechName.equals("CHOOSE_VARIANT")) {
+						UnitSelectorDialog usd = new UnitSelectorDialog(null,
+								true, campaign, null);
+						usd.restrictToChassis(selectedUnit.getEntity()
+								.getChassis());
+						usd.getComboUnitType().setSelectedIndex(UnitType.MEK);
+						usd.getComboType()
+								.setSelectedIndex(TechConstants.T_ALL);
+						usd.getComboWeight().setSelectedIndex(
+								selectedUnit.getEntity().getWeightClass());
+						usd.changeBuyBtnToSelectBtn();
+		
+						if (!campaign.isGM()) {
+							usd.restrictToYear(campaign.getCalendar().get(
+									Calendar.YEAR));
+						}
+		
+						usd.setVisible(true);
+		
+						megamek.common.Mech selectedMech = null;
+		
+						MechSummary mechSummary = MechSummaryCache
+								.getInstance()
+								.getMech(
+										selectedUnit.getEntity().getShortName());
+						try {
+							Entity e = (new MechFileParser(
+									mechSummary.getSourceFile())).getEntity();
+							if (e instanceof megamek.common.Mech) {
+								selectedMech = (megamek.common.Mech) e;
+							}
+						} catch (EntityLoadingException ex) {
+							Logger.getLogger(MekHQView.class.getName()).log(
+									Level.SEVERE, null, ex);
+						}
+		
+						if (selectedMech == null) {
+							return;
+						}
+		
+						Entity chosenTarget = usd.getSelectedEntity();
+						if ((chosenTarget instanceof megamek.common.Mech)
+								&& chosenTarget.getChassis().equals(
+										selectedMech.getChassis())
+								&& (chosenTarget.getWeight() == selectedMech
+										.getWeight())) {
+							targetEntity = chosenTarget;
+						}
+		
+					}
+		
+					if (targetEntity != null) {
+						selectedUnit.setCustomized(true);
+						selectedUnit.customize(targetEntity, campaign);
+					}
+		
+					refreshServicedUnitList();
+					refreshUnitList();
+					refreshTaskList();
+					refreshAcquireList();
+				}
+			} else if (command.contains("CANCEL_CUSTOMIZE")) {
+				if (selectedUnit.isCustomized()) {
+					selectedUnit.setCustomized(false);
+					selectedUnit.cancelCustomize(campaign);
+		
+					refreshServicedUnitList();
+					refreshUnitList();
+					refreshTaskList();
+					refreshAcquireList();
+				}
+			}
+		}
+		
+		@Override
+		public void mousePressed(MouseEvent e) {
+			maybeShowPopup(e);
+		}
+		
+		@Override
+		public void mouseReleased(MouseEvent e) {
+			maybeShowPopup(e);
+		}
+		
+		private void maybeShowPopup(MouseEvent e) {
+			JPopupMenu popup = new JPopupMenu();
+			if (e.isPopupTrigger()) {
+				int row = unitTable.rowAtPoint(e.getPoint());
+				Unit unit = unitModel.getUnit(unitTable.convertRowIndexToModel(row));
+				pilots = campaign.getEligiblePilotsFor(unit);
+				JMenuItem menuItem = null;
+				JMenu menu = null;
+				JCheckBoxMenuItem cbMenuItem = null;
+				// **lets fill the pop up menu**//
+				// change the location
+				menu = new JMenu("Change site");
+				int i = 0;
+				for (i = 0; i < Unit.SITE_N; i++) {
+					cbMenuItem = new JCheckBoxMenuItem(Unit.getSiteName(i));
+					if (unit.getSite() == i) {
+						cbMenuItem.setSelected(true);
+					} else {
+						cbMenuItem.setActionCommand("CHANGE_SITE:" + i);
+						cbMenuItem.addActionListener(this);
+					}
+					menu.add(cbMenuItem);
+				}
+				menu.setEnabled(!unit.isDeployed());
+				popup.add(menu);
+				// swap ammo
+				menu = new JMenu("Swap ammo");
+				JMenu ammoMenu = null;
+				for (Mounted m : unit.getEntity().getAmmo()) {
+					ammoMenu = new JMenu(m.getDesc());
+					i = 0;
+					AmmoType curType = (AmmoType) m.getType();
+					for (AmmoType atype : Utilities.getMunitionsFor(
+							unit.getEntity(), curType)) {
+						cbMenuItem = new JCheckBoxMenuItem(atype.getDesc());
+						if (atype.equals(curType)) {
+							cbMenuItem.setSelected(true);
+						} else {
+							cbMenuItem.setActionCommand("SWAP_AMMO:"
+									+ unit.getEntity().getEquipmentNum(m) + ":"
+									+ i);
+							cbMenuItem.addActionListener(this);
+						}
+						ammoMenu.add(cbMenuItem);
+						i++;
+					}
+					menu.add(ammoMenu);
+				}
+				menu.setEnabled(!unit.isDeployed());
+				popup.add(menu);
+				// Salvage / Repair
+				if (unit.isSalvage()) {
+					menuItem = new JMenuItem("Repair");
+					menuItem.setActionCommand("REPAIR");
+					menuItem.addActionListener(this);
+					menuItem.setEnabled(!unit.isDeployed()
+							&& unit.isRepairable() && !unit.isCustomized());
+					popup.add(menuItem);
+				} else if (!unit.isSalvage()) {
+					menuItem = new JMenuItem("Salvage");
+					menuItem.setActionCommand("SALVAGE");
+					menuItem.addActionListener(this);
+					menuItem.setEnabled(!unit.isDeployed()
+							&& !unit.isCustomized());
+					popup.add(menuItem);
+				}
+				// Customize
+				if (!unit.isCustomized()) {
+					menu = new JMenu("Customize");
+		
+					menuItem = new JMenuItem("To existing variant");
+					menuItem.setActionCommand("CUSTOMIZE:" + "CHOOSE_VARIANT");
+					menuItem.addActionListener(this);
+					menu.add(menuItem);
+		
+					menuItem = new JMenuItem("MegaMekLab");
+					menuItem.setActionCommand("CUSTOMIZE:" + "MML");
+					menuItem.addActionListener(this);
+					menu.add(menuItem);
+		
+					menu.setEnabled(!unit.isDeployed()
+							&& !unit.isDamaged()
+							&& (unit.getEntity() instanceof megamek.common.Mech));
+					popup.add(menu);
+				} else if (unit.isCustomized()) {
+					menuItem = new JMenuItem("Cancel Customize");
+					menuItem.setActionCommand("CANCEL_CUSTOMIZE");
+					menuItem.addActionListener(this);
+					menuItem.setEnabled(unit.isCustomized());
+					popup.add(menuItem);
+				}
+				// remove pilot
+				popup.addSeparator();
+				menuItem = new JMenuItem("Remove pilot");
+				menuItem.setActionCommand("REMOVE_PILOT");
+				menuItem.addActionListener(this);
+				menuItem.setEnabled(unit.hasPilot() && !unit.isDeployed());
+				popup.add(menuItem);
+				// switch pilot
+				menu = new JMenu("Change pilot");
+				i = 0;
+				for (PilotPerson pp : pilots) {
+					cbMenuItem = new JCheckBoxMenuItem(pp.getDesc());
+					if (unit.hasPilot()
+							&& (unit.getPilot().getId() == pp.getId())) {
+						cbMenuItem.setSelected(true);
+					}
+					cbMenuItem.setActionCommand("CHANGE_PILOT:" + i);
+					cbMenuItem.addActionListener(this);
+					menu.add(cbMenuItem);
+					i++;
+				}
+				menu.setEnabled(!unit.isDeployed());
+				popup.add(menu);
+				popup.addSeparator();
+				// sell unit
+				menuItem = new JMenuItem("Sell Unit");
+				menuItem.setActionCommand("SELL");
+				menuItem.addActionListener(this);
+				menuItem.setEnabled(!unit.isDeployed());
+				popup.add(menuItem);
+				// TODO: scrap unit
+				// combat loss
+				menuItem = new JMenuItem("Combat Loss");
+				menuItem.setActionCommand("LOSS");
+				menuItem.addActionListener(this);
+				menuItem.setEnabled(unit.isDeployed());
+				popup.add(menuItem);
+				// TODO: add quirks?
+				// GM mode
+				menu = new JMenu("GM Mode");
+				menuItem = new JMenuItem("Remove Unit");
+				menuItem.setActionCommand("REMOVE");
+				menuItem.addActionListener(this);
+				menuItem.setEnabled(campaign.isGM());
+				menu.add(menuItem);
+				menuItem = new JMenuItem("Undeploy Unit");
+				menuItem.setActionCommand("UNDEPLOY");
+				menuItem.addActionListener(this);
+				menuItem.setEnabled(campaign.isGM() && unit.isDeployed());
+				menu.add(menuItem);
+				popup.addSeparator();
+				popup.add(menu);
+				popup.show(e.getComponent(), e.getX(), e.getY());
+			}
+		}
 	}
 
 	/**
