@@ -34,6 +34,7 @@ v0.1.5 (SVN)
 + saved forceId to XML
 + writeToXML function for Force (still need the function to reconstruct it)
 + context menu for unit table
++ keep personnel ids not personnel in Force.java
 
 v0.1.4 (2011-04-28)
 + Bug: personnel options not updating in CampaignOptionsDialog

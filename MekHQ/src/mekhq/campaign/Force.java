@@ -52,7 +52,7 @@ public class Force implements Serializable {
 	private String desc;
 	private Force parentForce;
 	private Vector<Force> subForces;
-	private Vector<PilotPerson> personnel;
+	private Vector<Integer> personnel;
 
 	//an ID so that forces can be tracked in Campaign hash
 	private int id;
@@ -62,7 +62,7 @@ public class Force implements Serializable {
 		this.desc = "";
 		this.parentForce = null;
 		this.subForces = new Vector<Force>();
-		this.personnel = new Vector<PilotPerson>();
+		this.personnel = new Vector<Integer>();
 	}
 	
 	public Force(String n, int id, Force parent) {
@@ -110,27 +110,37 @@ public class Force implements Serializable {
 		subForces.add(sub);
 	}
 	
-	public Vector<PilotPerson> getPersonnel() {
+	public Vector<Integer> getPersonnel() {
 		return personnel;
 	}
 	
-	public void addPerson(PilotPerson person) {
-		person.setForceId(id);
-		personnel.add(person);
+	/**
+	 * Add a person id to the personnel vector. In general, this 
+	 * should not be called directly to add personnel because they will
+	 * not be assigned a force id. Use {@link Campaign#addPersonToForce(mekhq.campaign.personnel.Person, int)}
+	 * instead
+	 * @param pid
+	 */
+	public void addPerson(int pid) {
+		personnel.add(pid);
 	}
 	
+	/**
+	 * This should not be directly called except by {@link Campaign#RemovePersonFromForce(mekhq.campaign.personnel.Person)}
+	 * instead
+	 * @param id
+	 */
 	public void removePerson(int id) {
 		int idx = 0;
 		boolean found = false;
-		for(PilotPerson person : getPersonnel()) {
-			if(person.getId() == id) {
+		for(int pid : getPersonnel()) {
+			if(pid == id) {
 				found = true;
 				break;
 			}
 			idx++;
 		}
 		if(found) {
-			personnel.get(idx).setForceId(0);
 			personnel.remove(idx);
 		}
 	}
@@ -205,9 +215,9 @@ public class Force implements Serializable {
 			//TODO: change personnel to a vector of ids rather than persons
 			pw1.println(MekHqXmlUtil.indentStr(indent+1)
 					+"<personnel>");
-			for(PilotPerson p : personnel) {
+			for(int pid : personnel) {
 				pw1.println(MekHqXmlUtil.indentStr(indent+2)
-						+"<person id= " + p.getId() + "/>");
+						+"<person id= " + pid + "/>");
 			}
 			pw1.println(MekHqXmlUtil.indentStr(indent+1)
 					+"</personnel>");

@@ -2389,9 +2389,9 @@ public class MekHQView extends FrameView {
 			addForce(subforce, category);
 		}
 		//add any personnel
-		Enumeration<PilotPerson> personnel = force.getPersonnel().elements();
+		Enumeration<Integer> personnel = force.getPersonnel().elements();
 		while(personnel.hasMoreElements()) {
-			PilotPerson p = personnel.nextElement();
+			Person p = campaign.getPerson(personnel.nextElement());
 			category.add(new DefaultMutableTreeNode(p));
 		}
 	}
@@ -3560,7 +3560,7 @@ public class MekHQView extends FrameView {
             	if(null != force) {
                     Person p = campaign.getPerson(Integer.parseInt(st.nextToken()));
                     if(null != p && p instanceof PilotPerson) {
-                    	force.addPerson((PilotPerson)p);
+                    	campaign.addPersonToForce(p, force.getId());
                     	refreshOrganization();
                     }
             	}
@@ -3607,7 +3607,7 @@ public class MekHQView extends FrameView {
             	if(null != person) {
             		Force parentForce = campaign.getForceFor(person);
             		if(null != parentForce) {
-            			parentForce.removePerson(id);
+            			campaign.RemovePersonFromForce(person);
             			refreshOrganization();   	
             		}
             	}

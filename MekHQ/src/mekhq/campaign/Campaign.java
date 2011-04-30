@@ -239,6 +239,20 @@ public class Campaign implements Serializable {
 	}
 	
 	/**
+	 * Add person to an existing force. This method will also
+	 * assign that force's id to the person.
+	 * @param p
+	 * @param id
+	 */
+	public void addPersonToForce(Person p, int id) {
+		Force force = forceIds.get(id);
+		if(null != force) {
+			p.setForceId(id);
+			force.addPerson(p.getId());
+		}
+	}
+	
+	/**
 	 * Add a support team to the campaign
 	 * 
 	 * @param t
@@ -925,6 +939,14 @@ public class Campaign implements Serializable {
 		}
 	}
 	
+	public void RemovePersonFromForce(Person p) {
+		Force force = getForce(p.getForceId());
+		if(null != force) {
+			force.removePerson(p.getId());
+			p.setForceId(0);
+		}
+	}
+	 
 	public Force getForceFor(Person p) {
 		return getForce(p.getForceId());
 	}
