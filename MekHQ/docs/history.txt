@@ -35,6 +35,8 @@ v0.1.5 (SVN)
 + writeToXML function for Force (still need the function to reconstruct it)
 + context menu for unit table
 + keep personnel ids not personnel in Force.java
++ loading of force organization from XML
++ updated FoxsTeeth.xml with force organization
 
 v0.1.4 (2011-04-28)
 + Bug: personnel options not updating in CampaignOptionsDialog

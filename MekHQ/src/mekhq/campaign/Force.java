@@ -25,6 +25,12 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.Vector;
 
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import mekhq.MekHQApp;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PilotPerson;
 
 /**
@@ -217,7 +223,7 @@ public class Force implements Serializable {
 					+"<personnel>");
 			for(int pid : personnel) {
 				pw1.println(MekHqXmlUtil.indentStr(indent+2)
-						+"<person id= " + pid + "/>");
+						+"<person id=\"" + pid + "\"/>");
 			}
 			pw1.println(MekHqXmlUtil.indentStr(indent+1)
 					+"</personnel>");
@@ -233,6 +239,73 @@ public class Force implements Serializable {
 			}
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "</force>");
 		
+	}
+	
+	public static Force generateInstanceFromXML(Node wn, Campaign c) {
+		Force retVal = null;
+		NamedNodeMap attrs = wn.getAttributes();
+		Node idNameNode = attrs.getNamedItem("id");
+		String idString = idNameNode.getTextContent();
+		
+		try {		
+			retVal = new Force("");
+			NodeList nl = wn.getChildNodes();
+			retVal.id = Integer.parseInt(idString);
+			
+			for (int x=0; x<nl.getLength(); x++) {
+				Node wn2 = nl.item(x);
+				if (wn2.getNodeName().equalsIgnoreCase("name")) {
+					retVal.name = wn2.getTextContent();
+				} else if (wn2.getNodeName().equalsIgnoreCase("desc")) {
+					retVal.desc = wn2.getTextContent();
+				} else if (wn2.getNodeName().equalsIgnoreCase("iconCategory")) {
+					retVal.iconCategory = wn2.getTextContent();
+				} else if (wn2.getNodeName().equalsIgnoreCase("iconFileName")) {
+					retVal.iconFileName = wn2.getTextContent();
+				} else if (wn2.getNodeName().equalsIgnoreCase("personnel")) {
+						processPersonnelNodes(retVal, wn2);
+				} else if (wn2.getNodeName().equalsIgnoreCase("subforces")) {
+					NodeList nl2 = wn2.getChildNodes();
+					for (int y=0; y<nl2.getLength(); y++) {
+						Node wn3 = nl2.item(y);
+						// If it's not an element node, we ignore it.
+						if (wn3.getNodeType() != Node.ELEMENT_NODE)
+							continue;
+						
+						if (!wn3.getNodeName().equalsIgnoreCase("force")) {
+							// Error condition of sorts!
+							// Errr, what should we do here?
+							MekHQApp.logMessage("Unknown node type not loaded in Forces nodes: "+wn3.getNodeName());
+							continue;
+						}
+						
+						retVal.addSubForce(generateInstanceFromXML(wn3, c));
+					}
+				}
+			}	
+			c.addForceToHash(retVal);	
+		} catch (Exception ex) {
+			// Errrr, apparently either the class name was invalid...
+			// Or the listed name doesn't exist.
+			// Doh!
+			MekHQApp.logError(ex);
+		}
+		
+		return retVal;
+	}
+	
+	private static void processPersonnelNodes(Force retVal, Node wn) {
+	
+		NodeList nl = wn.getChildNodes();
+		for (int x=0; x<nl.getLength(); x++) {
+			Node wn2 = nl.item(x);
+			if (wn2.getNodeType() != Node.ELEMENT_NODE)
+				continue;
+			NamedNodeMap attrs = wn2.getAttributes();
+			Node classNameNode = attrs.getNamedItem("id");
+			String idString = classNameNode.getTextContent();
+			retVal.addPerson(Integer.parseInt(idString));			
+		}
 	}
 	
 }

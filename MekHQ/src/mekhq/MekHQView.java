@@ -1822,6 +1822,7 @@ public class MekHQView extends FrameView {
 		refreshCalendar();
 		refreshReport();
 		refreshFunds();
+		refreshOrganization();
 
 		// Without this, the report scrollbar doesn't seem to load properly
 		// after loading a campaign
@@ -3583,7 +3584,7 @@ public class MekHQView extends FrameView {
 	                        JOptionPane.PLAIN_MESSAGE,
 	                        null,
 	                        null,
-	                        "My Lance");
+	                        force.getName());
 	            	force.setName(name);
 	            	refreshOrganization();
             	}

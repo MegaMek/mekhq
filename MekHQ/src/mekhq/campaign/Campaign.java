@@ -239,6 +239,15 @@ public class Campaign implements Serializable {
 	}
 	
 	/**
+	 * This is used by the XML loader. The id should already be
+	 * set for this force so dont increment
+	 * @param force
+	 */
+	public void addForceToHash(Force force) {
+		forceIds.put(force.getId(), force);
+	}
+	
+	/**
 	 * Add person to an existing force. This method will also
 	 * assign that force's id to the person.
 	 * @param p
@@ -1426,6 +1435,8 @@ public class Campaign implements Serializable {
 					processTeamNodes(retVal, wn);
 				} else if (xn.equalsIgnoreCase("units")) {
 					processUnitNodes(retVal, wn);
+				} else if (xn.equalsIgnoreCase("forces")) {
+					processForces(retVal, wn);
 				}
 			} else {
 				// If it's a text node or attribute or whatever at this level,
@@ -1571,6 +1582,42 @@ public class Campaign implements Serializable {
 		return retVal;
 	}
 
+	private static void processForces(Campaign retVal, Node wn) {
+		MekHQApp.logMessage("Loading Force Organization from XML...", 4);
+
+		NodeList wList = wn.getChildNodes();
+		
+		boolean foundForceAlready = false;
+		// Okay, lets iterate through the children, eh?
+		for (int x = 0; x < wList.getLength(); x++) {
+			Node wn2 = wList.item(x);
+
+			// If it's not an element node, we ignore it.
+			if (wn2.getNodeType() != Node.ELEMENT_NODE)
+				continue;
+			
+			if (!wn2.getNodeName().equalsIgnoreCase("force")) {
+				// Error condition of sorts!
+				// Errr, what should we do here?
+				MekHQApp.logMessage("Unknown node type not loaded in Forces nodes: "+wn2.getNodeName());
+
+				continue;
+			}
+			
+			if(!foundForceAlready)  {
+				Force f = Force.generateInstanceFromXML(wn2, retVal);
+				if(null != f) {
+					retVal.forces = f;
+					foundForceAlready = true;
+				}
+			} else {
+				MekHQApp.logMessage("More than one type-level force found", 5);
+			}
+		}
+		
+		MekHQApp.logMessage("Load of Force Organization complete!");
+	}
+	
 	private static void processPersonnelNodes(Campaign retVal, Node wn) {
 		MekHQApp.logMessage("Loading Personnel Nodes from XML...", 4);
 

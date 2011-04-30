@@ -17,6 +17,7 @@
 		<lastTaskId>535</lastTaskId>
 		<lastPersonId>12</lastPersonId>
 		<lastPartId>0</lastPartId>
+		<lastForceId>4</lastForceId>
 		<calendar>3048-01-01 12:00:00</calendar>
 		<dateFormat>EEEE, MMMM d yyyy</dateFormat>
 		<shortDateFormat>MMddyyyy</shortDateFormat>
@@ -81,6 +82,7 @@
 			</entity>
 			<customized>false</customized>
 			<deployed>false</deployed>
+			<quality>3</quality>
 			<pilotId>12</pilotId>
 			<salvaged>false</salvaged>
 			<site>2</site>
@@ -99,6 +101,7 @@
 			</entity>
 			<customized>false</customized>
 			<deployed>false</deployed>
+			<quality>3</quality>
 			<pilotId>11</pilotId>
 			<salvaged>false</salvaged>
 			<site>2</site>
@@ -114,6 +117,7 @@
 			</entity>
 			<customized>false</customized>
 			<deployed>false</deployed>
+			<quality>3</quality>
 			<pilotId>10</pilotId>
 			<salvaged>false</salvaged>
 			<site>2</site>
@@ -123,6 +127,7 @@
 			</entity>
 			<customized>false</customized>
 			<deployed>false</deployed>
+			<quality>3</quality>
 			<pilotId>9</pilotId>
 			<salvaged>false</salvaged>
 			<site>2</site>
@@ -138,6 +143,7 @@
 			</entity>
 			<customized>false</customized>
 			<deployed>false</deployed>
+			<quality>3</quality>
 			<pilotId>8</pilotId>
 			<salvaged>false</salvaged>
 			<site>2</site>
@@ -156,6 +162,7 @@
 			</entity>
 			<customized>false</customized>
 			<deployed>false</deployed>
+			<quality>3</quality>
 			<pilotId>7</pilotId>
 			<salvaged>false</salvaged>
 			<site>2</site>
@@ -177,6 +184,7 @@
 			</entity>
 			<customized>false</customized>
 			<deployed>false</deployed>
+			<quality>3</quality>
 			<pilotId>6</pilotId>
 			<salvaged>false</salvaged>
 			<site>2</site>
@@ -194,6 +202,7 @@
 			</entity>
 			<customized>false</customized>
 			<deployed>false</deployed>
+			<quality>3</quality>
 			<pilotId>5</pilotId>
 			<salvaged>false</salvaged>
 			<site>2</site>
@@ -207,6 +216,7 @@
 			</entity>
 			<customized>false</customized>
 			<deployed>false</deployed>
+			<quality>3</quality>
 			<pilotId>4</pilotId>
 			<salvaged>false</salvaged>
 			<site>2</site>
@@ -220,6 +230,7 @@
 			</entity>
 			<customized>false</customized>
 			<deployed>false</deployed>
+			<quality>3</quality>
 			<pilotId>3</pilotId>
 			<salvaged>false</salvaged>
 			<site>2</site>
@@ -234,6 +245,7 @@
 			</entity>
 			<customized>false</customized>
 			<deployed>false</deployed>
+			<quality>3</quality>
 			<pilotId>2</pilotId>
 			<salvaged>false</salvaged>
 			<site>2</site>
@@ -243,6 +255,7 @@
 			</entity>
 			<customized>false</customized>
 			<deployed>false</deployed>
+			<quality>3</quality>
 			<pilotId>1</pilotId>
 			<salvaged>false</salvaged>
 			<site>2</site>
@@ -3374,7 +3387,7 @@
 			<mountedEqNum>4</mountedEqNum>
 		</workItem>
 		<workItem id="310" type="mekhq.campaign.work.EquipmentSalvage">
-			<name>Salvage Autocannon/2</name>
+			<name>Salvage AC/2</name>
 			<id>310</id>
 			<difficulty>0</difficulty>
 			<time>120</time>
@@ -3387,7 +3400,7 @@
 			<mountedEqNum>3</mountedEqNum>
 		</workItem>
 		<workItem id="309" type="mekhq.campaign.work.EquipmentSalvage">
-			<name>Salvage Autocannon/5</name>
+			<name>Salvage AC/5</name>
 			<id>309</id>
 			<difficulty>0</difficulty>
 			<time>120</time>
@@ -3400,7 +3413,7 @@
 			<mountedEqNum>2</mountedEqNum>
 		</workItem>
 		<workItem id="308" type="mekhq.campaign.work.EquipmentSalvage">
-			<name>Salvage Autocannon/2</name>
+			<name>Salvage AC/2</name>
 			<id>308</id>
 			<difficulty>0</difficulty>
 			<time>120</time>
@@ -3413,7 +3426,7 @@
 			<mountedEqNum>1</mountedEqNum>
 		</workItem>
 		<workItem id="307" type="mekhq.campaign.work.EquipmentSalvage">
-			<name>Salvage Autocannon/5</name>
+			<name>Salvage AC/5</name>
 			<id>307</id>
 			<difficulty>0</difficulty>
 			<time>120</time>
@@ -4620,7 +4633,7 @@
 			<mountedEqNum>1</mountedEqNum>
 		</workItem>
 		<workItem id="220" type="mekhq.campaign.work.EquipmentSalvage">
-			<name>Salvage Autocannon/10</name>
+			<name>Salvage AC/10</name>
 			<id>220</id>
 			<difficulty>0</difficulty>
 			<time>120</time>
@@ -6404,7 +6417,7 @@
 			<loc>0</loc>
 		</workItem>
 		<workItem id="92" type="mekhq.campaign.work.EquipmentSalvage">
-			<name>Salvage Autocannon/10</name>
+			<name>Salvage AC/10</name>
 			<id>92</id>
 			<difficulty>0</difficulty>
 			<time>120</time>
@@ -7694,6 +7707,7 @@ Twice decorated for valor, Sara has been called on to save Ross McKinnon’s lif
 			<xp>0</xp>
 			<gender>1</gender>
 			<rank>5</rank>
+			<forceId>4</forceId>
 			<birthday>3021-12-14 12:00:00</birthday>
 			<type>0</type>
 			<unitId>12</unitId>
@@ -7717,6 +7731,7 @@ For a light BattleMech pilot, Grey has lost remarkably few ’Mechs. Forced to s
 			<xp>0</xp>
 			<gender>0</gender>
 			<rank>5</rank>
+			<forceId>4</forceId>
 			<birthday>3004-11-15 12:00:00</birthday>
 			<type>0</type>
 			<unitId>11</unitId>
@@ -7740,6 +7755,7 @@ Admitting she had been wrong about Alvarez, Nomura resigned her commission. His 
 			<xp>0</xp>
 			<gender>0</gender>
 			<rank>5</rank>
+			<forceId>4</forceId>
 			<birthday>2999-08-18 12:00:00</birthday>
 			<type>0</type>
 			<unitId>10</unitId>
@@ -7765,6 +7781,7 @@ More politically active than his father, Ross agitated for the Seventh Crucis La
 			<xp>0</xp>
 			<gender>0</gender>
 			<rank>10</rank>
+			<forceId>4</forceId>
 			<birthday>3015-05-25 12:00:00</birthday>
 			<type>0</type>
 			<unitId>9</unitId>
@@ -7788,6 +7805,7 @@ Henrik Dekker’s late night debates with Hill have become the stuff of legends 
 			<xp>0</xp>
 			<gender>0</gender>
 			<rank>5</rank>
+			<forceId>3</forceId>
 			<birthday>2991-08-22 12:00:00</birthday>
 			<type>0</type>
 			<unitId>8</unitId>
@@ -7813,6 +7831,7 @@ A confirmed atheist, Hill has been engaged with Dekker in an extended debate abo
 			<xp>0</xp>
 			<gender>0</gender>
 			<rank>5</rank>
+			<forceId>3</forceId>
 			<birthday>3019-01-15 12:00:00</birthday>
 			<type>0</type>
 			<unitId>7</unitId>
@@ -7838,6 +7857,7 @@ Hiro himself was killed on Greenlaw during the FedCom Civil War. Next in line fo
 			<xp>0</xp>
 			<gender>0</gender>
 			<rank>5</rank>
+			<forceId>3</forceId>
 			<birthday>3020-07-15 12:00:00</birthday>
 			<type>0</type>
 			<unitId>6</unitId>
@@ -7863,6 +7883,7 @@ Paul Danton sees no reason to be uncomfortable while in the field, and his wealt
 			<xp>0</xp>
 			<gender>0</gender>
 			<rank>10</rank>
+			<forceId>3</forceId>
 			<birthday>3000-08-09 12:00:00</birthday>
 			<type>0</type>
 			<unitId>5</unitId>
@@ -7886,6 +7907,7 @@ Ian’s judgment proved correct, and Waylen has served with distinction, later e
 			<xp>0</xp>
 			<gender>0</gender>
 			<rank>5</rank>
+			<forceId>2</forceId>
 			<birthday>3008-11-25 12:00:00</birthday>
 			<type>0</type>
 			<unitId>4</unitId>
@@ -7909,6 +7931,7 @@ When Ian McKinnon retired, Austin considered going with him, but Ian advised aga
 			<xp>0</xp>
 			<gender>0</gender>
 			<rank>5</rank>
+			<forceId>2</forceId>
 			<birthday>3004-09-28 12:00:00</birthday>
 			<type>0</type>
 			<unitId>3</unitId>
@@ -7934,6 +7957,7 @@ Lytton’s duty was always to his Captain, and when the time came he sacrificed 
 			<xp>0</xp>
 			<gender>0</gender>
 			<rank>6</rank>
+			<forceId>2</forceId>
 			<birthday>2992-11-28 12:00:00</birthday>
 			<type>0</type>
 			<unitId>2</unitId>
@@ -7959,6 +7983,7 @@ Ian retired in 3051, accepting a battalion command in the Kestrel Militia.</biog
 			<xp>0</xp>
 			<gender>0</gender>
 			<rank>11</rank>
+			<forceId>2</forceId>
 			<birthday>2994-04-04 12:00:00</birthday>
 			<type>0</type>
 			<unitId>1</unitId>
@@ -7973,4 +7998,50 @@ Ian retired in 3051, accepting a battalion command in the Kestrel Militia.</biog
 	</personnel>
 	<parts>
 	</parts>
+	<forces>
+		<force id="0" type="mekhq.campaign.Force">
+			<name>McKinnon's Company, Vausur's Battalion, 7th Crusis Lancers RCT (The Fox's Teeth)</name>
+			<desc></desc>
+			<iconCategory>-- General --</iconCategory>
+			<iconFileName>foxsteeth.png</iconFileName>
+			<subforces>
+				<force id="2" type="mekhq.campaign.Force">
+					<name>Command Lance</name>
+					<desc></desc>
+					<iconCategory>-- General --</iconCategory>
+					<iconFileName>hmech.png</iconFileName>
+					<personnel>
+						<person id="1"/>
+						<person id="2"/>
+						<person id="3"/>
+						<person id="4"/>
+					</personnel>
+				</force>
+				<force id="3" type="mekhq.campaign.Force">
+					<name>Medium Lance</name>
+					<desc></desc>
+					<iconCategory>-- General --</iconCategory>
+					<iconFileName>mmech.png</iconFileName>
+					<personnel>
+						<person id="5"/>
+						<person id="6"/>
+						<person id="7"/>
+						<person id="8"/>
+					</personnel>
+				</force>
+				<force id="4" type="mekhq.campaign.Force">
+					<name>Recon Lance</name>
+					<desc></desc>
+					<iconCategory>-- General --</iconCategory>
+					<iconFileName>lmech.png</iconFileName>
+					<personnel>
+						<person id="9"/>
+						<person id="10"/>
+						<person id="11"/>
+						<person id="12"/>
+					</personnel>
+				</force>
+			</subforces>
+		</force>
+	</forces>
 </campaign>
