@@ -41,6 +41,7 @@ v0.1.5 (SVN)
 + color coding for deployed units and a deployed (Y/N) column for personnelTable and unitTable
 + Bug: pilot external ids not being set when campaign reloaded from XML
 + rank name and condition color coding added to ForceRenderer for personnel
++ height issue of orgTree personnel nodes
 
 v0.1.4 (2011-04-28)
 + Bug: personnel options not updating in CampaignOptionsDialog

@@ -453,7 +453,7 @@ public class MekHQView extends FrameView {
 		orgTree.setModel(orgModel);
 		orgTree.addMouseListener(orgMouseAdapter);
         orgTree.setCellRenderer(new ForceRenderer());
-        orgTree.setRowHeight(0);
+        orgTree.setRowHeight(50);
 		scrollOrgTree.setViewportView(orgTree);
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
