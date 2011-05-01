@@ -595,10 +595,41 @@ public class MekHQView extends FrameView {
 		panHangar.setName("panHangar"); // NOI18N
 		panHangar.setLayout(new java.awt.GridBagLayout());
 		
+		btnDeployUnits.setText(resourceMap.getString("btnDeployUnits.text")); // NOI18N
+		btnDeployUnits.setToolTipText(resourceMap
+				.getString("btnDeployUnits.toolTipText")); // NOI18N
+		btnDeployUnits.setName("btnDeployUnits"); // NOI18N
+		btnDeployUnits.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				btnDeployUnitsActionPerformed(evt);
+			}
+		});
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.weightx = 0.0;
+		panHangar.add(btnDeployUnits, gridBagConstraints);
+
+		btnRetrieveUnits
+				.setText(resourceMap.getString("btnRetrieveUnits.text")); // NOI18N
+		btnRetrieveUnits.setToolTipText(resourceMap
+				.getString("btnRetrieveUnits.toolTipText")); // NOI18N
+		btnRetrieveUnits.setName("btnRetrieveUnits"); // NOI18N
+		btnRetrieveUnits.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				btnRetrieveUnitsActionPerformed(evt);
+			}
+		});
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 1;
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.weightx = 0.0;
+		panHangar.add(btnRetrieveUnits, gridBagConstraints);
+		
 		lblUnitChoice.setText(resourceMap.getString("lblUnitChoice.text")); // NOI18N
 		lblUnitChoice.setName("lblUnitChoice"); // NOI18N
 		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridx = 2;
 		gridBagConstraints.gridy = 0;
 		gridBagConstraints.weightx = 0.0;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
@@ -618,7 +649,7 @@ public class MekHQView extends FrameView {
 			}
 		});
 		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 1;
+		gridBagConstraints.gridx = 3;
 		gridBagConstraints.gridy = 0;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 		gridBagConstraints.weightx = 0.0;
@@ -629,7 +660,7 @@ public class MekHQView extends FrameView {
 		lblUnitView.setText(resourceMap.getString("lblUnitView.text")); // NOI18N
 		lblPersonView.setName("lblUnitView"); // NOI18N
 		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 2;
+		gridBagConstraints.gridx = 4;
 		gridBagConstraints.gridy = 0;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
 		panHangar.add(lblUnitView, gridBagConstraints);
@@ -647,7 +678,7 @@ public class MekHQView extends FrameView {
 			}
 		});
 		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 3;
+		gridBagConstraints.gridx = 5;
 		gridBagConstraints.gridy = 0;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 		gridBagConstraints.weightx = 0.0;
@@ -701,7 +732,7 @@ public class MekHQView extends FrameView {
 		});
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 1;
-		gridBagConstraints.gridwidth = 4;
+		gridBagConstraints.gridwidth = 6;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 1.0;
@@ -797,8 +828,8 @@ public class MekHQView extends FrameView {
 
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 1;
-		gridBagConstraints.gridheight = 2;
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.gridheight = 3;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 		gridBagConstraints.weightx = 0.5;
 		gridBagConstraints.weighty = 1.0;
@@ -830,47 +861,6 @@ public class MekHQView extends FrameView {
 		gridBagConstraints.weightx = 0.5;
 		gridBagConstraints.weighty = 1.0;
 		panRepairBay.add(scrollTechTable, gridBagConstraints);
-
-		btnUnitPanel.setMinimumSize(new java.awt.Dimension(300, 50));
-		btnUnitPanel.setName("btnUnitPanel"); // NOI18N
-		btnUnitPanel.setPreferredSize(new java.awt.Dimension(300, 50));
-		btnUnitPanel.setLayout(new java.awt.GridBagLayout());
-
-		btnDeployUnits.setText(resourceMap.getString("btnDeployUnits.text")); // NOI18N
-		btnDeployUnits.setToolTipText(resourceMap
-				.getString("btnDeployUnits.toolTipText")); // NOI18N
-		btnDeployUnits.setName("btnDeployUnits"); // NOI18N
-		btnDeployUnits.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				btnDeployUnitsActionPerformed(evt);
-			}
-		});
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 0;
-		btnUnitPanel.add(btnDeployUnits, gridBagConstraints);
-
-		btnRetrieveUnits
-				.setText(resourceMap.getString("btnRetrieveUnits.text")); // NOI18N
-		btnRetrieveUnits.setToolTipText(resourceMap
-				.getString("btnRetrieveUnits.toolTipText")); // NOI18N
-		btnRetrieveUnits.setName("btnRetrieveUnits"); // NOI18N
-		btnRetrieveUnits.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				btnRetrieveUnitsActionPerformed(evt);
-			}
-		});
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 0;
-		btnUnitPanel.add(btnRetrieveUnits, gridBagConstraints);
-
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 0;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.weightx = 0.5;
-		panRepairBay.add(btnUnitPanel, gridBagConstraints);
 
 		panelDoTask.setMinimumSize(new java.awt.Dimension(300, 100));
 		panelDoTask.setName("panelDoTask"); // NOI18N
@@ -2194,7 +2184,7 @@ public class MekHQView extends FrameView {
 	}
 
 	protected void deployListFile() {
-		if (servicedUnitTable.getSelectedRow() == -1) {
+		if (unitTable.getSelectedRow() == -1) {
 			return;
 		}
 
@@ -2202,8 +2192,8 @@ public class MekHQView extends FrameView {
 		ArrayList<Unit> toDeploy = new ArrayList<Unit>();
 		StringBuffer undeployed = new StringBuffer();
 		
-		for (int i : servicedUnitTable.getSelectedRows()) {
-			Unit u = campaign.getUnits().get(i);
+		for (int i : unitTable.getSelectedRows()) {
+			Unit u = unitModel.getUnit(unitTable.convertRowIndexToModel(i));;
 			
 			if (null != u.getEntity()) {
 				if (null == u.checkDeployment()) {

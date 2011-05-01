@@ -37,6 +37,7 @@ v0.1.5 (SVN)
 + keep personnel ids not personnel in Force.java
 + loading of force organization from XML
 + updated FoxsTeeth.xml with force organization
++ deployment and retrieval button belong in hangar
 
 v0.1.4 (2011-04-28)
 + Bug: personnel options not updating in CampaignOptionsDialog
