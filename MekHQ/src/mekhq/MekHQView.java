@@ -3720,14 +3720,39 @@ public class MekHQView extends FrameView {
                             tree, value, sel,
                             expanded, leaf, row,
                             hasFocus);
-                     
-            setIcon(getIcon(value));
+                
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode)value;
+            if(node.getUserObject() instanceof PilotPerson) {
+            	//need to set the string here so I can add rank from campaign
+            	PilotPerson pp = (PilotPerson)node.getUserObject();
+            	String rank = campaign.getRanks().getRank(pp.getRank());
+            	if(pp.getRank() == 0) {
+            		rank = "";
+            	}
+            	String name = pp.getName() + " (" + pp.getPilot().getGunnery() + "/" + pp.getPilot().getPiloting() + ")";
+            	if(pp.needsHealing()) {
+            		name = "<font color='red'>" + name + "</font>";
+            	}
+            	Unit u = campaign.getUnit(pp.getUnitId());
+            	String uname = "";
+            	if(null != u) {
+            		uname = "<i>" + u.getEntity().getDisplayName() + "</i>";
+            		name = name + ",";
+            		if(u.isDamaged()) {
+                		uname = "<font color='red'>" + uname + "</font>";
+                	}
+            	}           	
+            	setText("<html>" + rank + " " + name + " " + uname + "</html>");
+            }
+            setIcon(getIcon(node));
+
+            
             
             return this;
         }
         
-        protected Icon getIcon(Object value) {
-        	DefaultMutableTreeNode node = (DefaultMutableTreeNode)value;
+        protected Icon getIcon(DefaultMutableTreeNode node) {
+        	
         	if(node.getUserObject() instanceof Person) {
         		return getIconFrom((Person)node.getUserObject());
         	} else if(node.getUserObject() instanceof Force) {

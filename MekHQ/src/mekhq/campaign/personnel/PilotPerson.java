@@ -334,7 +334,7 @@ public class PilotPerson extends Person {
 			pilot.setCommandBonus(pilotCommandBonus);
 	}
 
-	public int getUnitIt() {
+	public int getUnitId() {
 		return unitId;
 	}
 	
