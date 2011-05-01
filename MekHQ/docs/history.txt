@@ -43,6 +43,7 @@ v0.1.5 (SVN)
 + rank name and condition color coding added to ForceRenderer for personnel
 + height issue of orgTree personnel nodes
 + force column in personnel table
++ sort personnel in orgTable by rank
 
 v0.1.4 (2011-04-28)
 + Bug: personnel options not updating in CampaignOptionsDialog

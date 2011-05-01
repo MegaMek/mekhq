@@ -48,6 +48,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.Iterator;
@@ -2367,8 +2368,7 @@ public class MekHQView extends FrameView {
 		} else {
 			orgModel.setRoot(top);
 		}
-		//scrollOrgTree.setViewportView(orgTree);
-		
+		//scrollOrgTree.setViewportView(orgTree);	
 	}
 	
 	private void addForce(Force force, DefaultMutableTreeNode top) {
@@ -2381,9 +2381,22 @@ public class MekHQView extends FrameView {
 		}
 		//add any personnel
 		Enumeration<Integer> personnel = force.getPersonnel().elements();
+		//put them into a temporary array so I can sort it by rank
+		ArrayList<Person> people = new ArrayList<Person>();
 		while(personnel.hasMoreElements()) {
 			Person p = campaign.getPerson(personnel.nextElement());
-			category.add(new DefaultMutableTreeNode(p));
+			people.add(p);
+		}
+		Collections.sort(people, new Comparator(){
+			 
+            public int compare(Object o1, Object o2) {
+                Person p1 = (Person) o1;
+                Person p2 = (Person) o2;
+               return ((Comparable<Integer>)p2.getRank()).compareTo(p1.getRank());
+            }
+        });
+		for(Person person : people) {
+			category.add(new DefaultMutableTreeNode(person));
 		}
 	}
 
