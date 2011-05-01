@@ -38,6 +38,7 @@ v0.1.5 (SVN)
 + loading of force organization from XML
 + updated FoxsTeeth.xml with force organization
 + deployment and retrieval button belong in hangar
++ color coding for deployed units and a deployed (Y/N) column for personnelTable and unitTable
 
 v0.1.4 (2011-04-28)
 + Bug: personnel options not updating in CampaignOptionsDialog

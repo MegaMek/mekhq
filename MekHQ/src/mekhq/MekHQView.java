@@ -2514,6 +2514,7 @@ public class MekHQView extends FrameView {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TYPE), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SKILL), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ASSIGN), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_DEPLOY), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ARTY), false);
@@ -2534,6 +2535,7 @@ public class MekHQView extends FrameView {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TYPE), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SKILL), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ASSIGN), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_DEPLOY), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ARTY), campaign.getCampaignOptions().useArtillery());
@@ -2554,6 +2556,7 @@ public class MekHQView extends FrameView {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TYPE), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SKILL), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ASSIGN), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_DEPLOY), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ARTY), false);
@@ -2583,6 +2586,7 @@ public class MekHQView extends FrameView {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_QUALITY), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_STATUS), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_PILOT), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_DEPLOY), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_BV), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_REPAIR), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_PARTS), false);
@@ -2598,6 +2602,7 @@ public class MekHQView extends FrameView {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_QUALITY), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_STATUS), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_PILOT), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_DEPLOY), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_BV), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_REPAIR), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_PARTS), false);
@@ -2613,6 +2618,7 @@ public class MekHQView extends FrameView {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_QUALITY), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_STATUS), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_PILOT), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_DEPLOY), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_BV), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_REPAIR), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_PARTS), true);
@@ -4341,18 +4347,19 @@ public class MekHQView extends FrameView {
         private final static int COL_TYPE =    5;
         private final static int COL_SKILL =   6;
         private final static int COL_ASSIGN =  7;
-        private final static int COL_GUN =     8;
-        private final static int COL_PILOT =   9;
-        private final static int COL_ARTY  =   10;
-        private final static int COL_TACTICS = 11;
-        private final static int COL_INIT    = 12;
-        private final static int COL_TOUGH =   13;
-        private final static int COL_EDGE  =   14;
-        private final static int COL_NABIL =   15;
-        private final static int COL_NIMP  =   16;
-        private final static int COL_HITS  =   17;
-        private final static int COL_XP =      18;
-        private final static int N_COL =       19;
+        private final static int COL_DEPLOY =  8;
+        private final static int COL_GUN =     9;
+        private final static int COL_PILOT =   10;
+        private final static int COL_ARTY  =   11;
+        private final static int COL_TACTICS = 12;
+        private final static int COL_INIT    = 13;
+        private final static int COL_TOUGH =   14;
+        private final static int COL_EDGE  =   15;
+        private final static int COL_NABIL =   16;
+        private final static int COL_NIMP  =   17;
+        private final static int COL_HITS  =   18;
+        private final static int COL_XP =      19;
+        private final static int N_COL =       20;
         
         private ArrayList<Person> data = new ArrayList<Person>();
         
@@ -4405,6 +4412,8 @@ public class MekHQView extends FrameView {
                     return "Hits";
                 case COL_XP:
                     return "XP";
+                case COL_DEPLOY:
+                    return "Deployed";
                 default:
                     return "?";
             }
@@ -4456,6 +4465,7 @@ public class MekHQView extends FrameView {
             case COL_NABIL:
             case COL_NIMP:
             case COL_HITS:
+            case COL_DEPLOY:
             	return SwingConstants.CENTER;
             default:
             	return SwingConstants.LEFT;
@@ -4496,6 +4506,10 @@ public class MekHQView extends FrameView {
         public void setData(ArrayList<Person> people) {
             data = people;
             fireTableDataChanged();
+        }
+        
+        public boolean isDeployed(int row) {
+        	return getPerson(row).isDeployed();
         }
 
         public Object getValueAt(int row, int col) {
@@ -4608,6 +4622,13 @@ public class MekHQView extends FrameView {
             if(col == COL_XP) {
                 return p.getXp();
             }
+            if(col == COL_DEPLOY) {
+            	if(p.isDeployed()) {
+            		return "Y";
+            	} else {
+            		return "N";
+            	}
+            }
             return "?";
         }
 
@@ -4630,14 +4651,16 @@ public class MekHQView extends FrameView {
 				setHorizontalAlignment(getAlignment(actualCol));
 				setToolTipText(getTooltip(actualRow, actualCol));
 				
+				setForeground(Color.BLACK);
 				if (isSelected) {
                     setBackground(Color.DARK_GRAY);
+                    setForeground(Color.WHITE);
                 } else {
                     // tiger stripes
-                	if((Integer)getValueAt(actualRow,COL_HITS) > 0) {
+                	if (isDeployed(actualRow)) {
+                		setBackground(Color.LIGHT_GRAY);
+                	} else if((Integer)getValueAt(actualRow,COL_HITS) > 0) {
                 		setBackground(Color.RED);
-                	} else if (row % 2 == 0) {
-                        setBackground(new Color(220, 220, 220));
                     } else {
                         setBackground(Color.WHITE);
                     }
@@ -5045,11 +5068,12 @@ public class MekHQView extends FrameView {
         private final static int COL_QUALITY  =   7;
         private final static int COL_STATUS   =   8;
         private final static int COL_PILOT    =   9;
-        private final static int COL_BV        =  10;
-        private final static int COL_REPAIR  =    11;
-        private final static int COL_PARTS    =   12;
-        private final static int COL_QUIRKS   =   13;
-        private final static int N_COL =          14;
+        private final static int COL_DEPLOY   =   10;
+        private final static int COL_BV        =  11;
+        private final static int COL_REPAIR  =    12;
+        private final static int COL_PARTS    =   13;
+        private final static int COL_QUIRKS   =   14;
+        private final static int N_COL =          15;
         
         private ArrayList<Unit> data = new ArrayList<Unit>();
         
@@ -5092,6 +5116,8 @@ public class MekHQView extends FrameView {
                     return "# Parts";
                 case COL_QUIRKS:
                     return "Quirks";
+                case COL_DEPLOY:
+                    return "Deployed";
                 default:
                     return "?";
             }
@@ -5120,6 +5146,7 @@ public class MekHQView extends FrameView {
             switch(col) {
             case COL_QUALITY:
             case COL_QUIRKS:
+            case COL_DEPLOY:
             	return SwingConstants.CENTER;
             case COL_WEIGHT:
             case COL_COST:
@@ -5227,6 +5254,13 @@ public class MekHQView extends FrameView {
             if(col == COL_QUIRKS) {
             	return e.countQuirks();
             }
+            if(col == COL_DEPLOY) {
+            	if(u.isDeployed()) {
+            		return "Y";
+            	} else {
+            		return "N";
+            	}
+            }
             return "?";
         }
 
@@ -5250,18 +5284,21 @@ public class MekHQView extends FrameView {
 				setToolTipText(getTooltip(actualRow, actualCol));
 				Unit u = getUnit(actualRow);
 				
+				setForeground(Color.BLACK);
 				if (isSelected) {
                     setBackground(Color.DARK_GRAY);
+                    setForeground(Color.WHITE);
                 } else {
-                	if (null != u && !u.isRepairable()) {
+                	if (u.isDeployed()) {
+                		setBackground(Color.LIGHT_GRAY);
+                	}
+                	else if (null != u && !u.isRepairable()) {
     					setBackground(new Color(190, 150, 55));
     				} else if ((null != u) && !u.isFunctional()) {
     					setBackground(new Color(205, 92, 92));
     				} else if ((null != u)
     						&& (campaign.countTasksFor(u.getId()) > 0)) {
     					setBackground(new Color(238, 238, 0));
-    				} else if (row % 2 == 0) {
-                        setBackground(new Color(220, 220, 220));
                     } else {
                         setBackground(Color.WHITE);
                     }
