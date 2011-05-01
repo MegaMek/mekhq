@@ -2387,11 +2387,8 @@ public class MekHQView extends FrameView {
 			Person p = campaign.getPerson(personnel.nextElement());
 			people.add(p);
 		}
-		Collections.sort(people, new Comparator(){
-			 
-            public int compare(Object o1, Object o2) {
-                Person p1 = (Person) o1;
-                Person p2 = (Person) o2;
+		Collections.sort(people, new Comparator<Person>(){		 
+            public int compare(final Person p1, final Person p2) {
                return ((Comparable<Integer>)p2.getRank()).compareTo(p1.getRank());
             }
         });
