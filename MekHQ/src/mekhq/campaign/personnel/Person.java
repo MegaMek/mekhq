@@ -436,6 +436,10 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
 					retVal.birthday.setTime(df.parse(wn2.getTextContent().trim()));
 				}
 			}
+			//pilots do not have external ids set
+			if(retVal instanceof PilotPerson) {
+				((PilotPerson) retVal).getPilot().setExternalId(retVal.id);
+			}
 		} catch (Exception ex) {
 			// Errrr, apparently either the class name was invalid...
 			// Or the listed name doesn't exist.
