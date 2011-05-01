@@ -2514,6 +2514,7 @@ public class MekHQView extends FrameView {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TYPE), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SKILL), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ASSIGN), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_FORCE), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_DEPLOY), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT), false);
@@ -2535,6 +2536,7 @@ public class MekHQView extends FrameView {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TYPE), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SKILL), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ASSIGN), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_FORCE), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_DEPLOY), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT), true);
@@ -2556,6 +2558,7 @@ public class MekHQView extends FrameView {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TYPE), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SKILL), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ASSIGN), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_FORCE), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_DEPLOY), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT), false);
@@ -4372,19 +4375,20 @@ public class MekHQView extends FrameView {
         private final static int COL_TYPE =    5;
         private final static int COL_SKILL =   6;
         private final static int COL_ASSIGN =  7;
-        private final static int COL_DEPLOY =  8;
-        private final static int COL_GUN =     9;
-        private final static int COL_PILOT =   10;
-        private final static int COL_ARTY  =   11;
-        private final static int COL_TACTICS = 12;
-        private final static int COL_INIT    = 13;
-        private final static int COL_TOUGH =   14;
-        private final static int COL_EDGE  =   15;
-        private final static int COL_NABIL =   16;
-        private final static int COL_NIMP  =   17;
-        private final static int COL_HITS  =   18;
-        private final static int COL_XP =      19;
-        private final static int N_COL =       20;
+        private final static int COL_FORCE  =  8;
+        private final static int COL_DEPLOY =  9;
+        private final static int COL_GUN =     10;
+        private final static int COL_PILOT =   11;
+        private final static int COL_ARTY  =   12;
+        private final static int COL_TACTICS = 13;
+        private final static int COL_INIT    = 14;
+        private final static int COL_TOUGH =   15;
+        private final static int COL_EDGE  =   16;
+        private final static int COL_NABIL =   17;
+        private final static int COL_NIMP  =   18;
+        private final static int COL_HITS  =   19;
+        private final static int COL_XP =      20;
+        private final static int N_COL =       21;
         
         private ArrayList<Person> data = new ArrayList<Person>();
         
@@ -4439,6 +4443,8 @@ public class MekHQView extends FrameView {
                     return "XP";
                 case COL_DEPLOY:
                     return "Deployed";
+                case COL_FORCE:
+                    return "Force";
                 default:
                     return "?";
             }
@@ -4449,11 +4455,10 @@ public class MekHQView extends FrameView {
             case COL_TYPE:
         	case COL_RANK:
         		return 70;
-            case COL_NAME:
-                return 150;
             case COL_CALL:
                 return 50;        
             case COL_SKILL:
+            case COL_FORCE:
                 return 100;
             case COL_GENDER:
             case COL_AGE:
@@ -4469,6 +4474,7 @@ public class MekHQView extends FrameView {
             case COL_NIMP:
             case COL_HITS:
                 return 20;
+            case COL_NAME:
             case COL_ASSIGN:
                 return 125;
             default:
@@ -4652,6 +4658,14 @@ public class MekHQView extends FrameView {
             		return "Y";
             	} else {
             		return "N";
+            	}
+            }
+            if(col == COL_FORCE) {
+            	Force force = campaign.getForce(p.getForceId());
+            	if(null != force) {
+            		return force.getName();
+            	} else {
+            		return "None";
             	}
             }
             return "?";

@@ -42,6 +42,7 @@ v0.1.5 (SVN)
 + Bug: pilot external ids not being set when campaign reloaded from XML
 + rank name and condition color coding added to ForceRenderer for personnel
 + height issue of orgTree personnel nodes
++ force column in personnel table
 
 v0.1.4 (2011-04-28)
 + Bug: personnel options not updating in CampaignOptionsDialog
