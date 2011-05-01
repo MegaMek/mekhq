@@ -44,6 +44,7 @@ v0.1.5 (SVN)
 + height issue of orgTree personnel nodes
 + force column in personnel table
 + sort personnel in orgTable by rank
++ Bug: unitId not set on personnel entered via MUL
 
 v0.1.4 (2011-04-28)
 + Bug: personnel options not updating in CampaignOptionsDialog

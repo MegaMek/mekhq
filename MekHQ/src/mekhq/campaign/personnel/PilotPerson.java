@@ -185,6 +185,7 @@ public class PilotPerson extends Person {
     
     public void setAssignedUnit(Unit u) {
         this.unit = u;
+        this.unitId = u.getId();
     }
     
     @Override
@@ -358,10 +359,6 @@ public class PilotPerson extends Person {
 		} else {
 			return "-";
 		}
-	}
-	
-	public void setUnit(Unit nt) {
-		unit = nt;
 	}
 	
 	@Override
