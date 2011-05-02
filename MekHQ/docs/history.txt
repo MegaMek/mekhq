@@ -54,6 +54,7 @@ v0.1.5 (SVN)
 + adjust contextmenu depending on single or multiple person selection
 + Bug: top-level buttons and comboboxes not showing up above unit table
 + assign to force menu in personnel table
++ simplified code for assigning units
 
 v0.1.4 (2011-04-28)
 + Bug: personnel options not updating in CampaignOptionsDialog

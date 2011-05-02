@@ -3893,7 +3893,6 @@ public class MekHQView extends FrameView {
 			ActionListener {
 		
 		private MekHQView view;
-		private ArrayList<Unit> units;
 		
 		public PersonnelTableMouseAdapter(MekHQView view) {
 			super();
@@ -3925,16 +3924,20 @@ public class MekHQView extends FrameView {
 				refreshTechsList();
 				refreshDoctorsList();
 			} else if (command.contains("CHANGE_UNIT")) {
-				int selected = Integer.parseInt(st.nextToken()) - 1;
-				if(selected == -1 && selectedPerson instanceof PilotPerson) {
-					Unit u = ((PilotPerson)selectedPerson).getAssignedUnit();
-					if(null != u) {
-						u.removePilot();
+				int selected = Integer.parseInt(st.nextToken());
+				if(selectedPerson instanceof PilotPerson) {
+					PilotPerson pp = (PilotPerson)selectedPerson;			
+					if(selected == -1) {
+						Unit u = pp.getAssignedUnit();
+						if(null != u) {
+							u.removePilot();
+						}
+					} else {
+						Unit u = campaign.getUnit(selected);
+						if(null != u) {
+							campaign.changePilot(u, pp);
+						}
 					}
-				} else if(null != units
-						&& (selected < units.size()) 
-						&& selectedPerson instanceof PilotPerson) {
-					campaign.changePilot(units.get(selected), (PilotPerson)selectedPerson);
 				}
 				refreshServicedUnitList();
 				refreshUnitList();
@@ -4154,7 +4157,6 @@ public class MekHQView extends FrameView {
 	            int row = personnelTable.getSelectedRow();
 	            boolean oneSelected = personnelTable.getSelectedRowCount() == 1;
 				Person person = personModel.getPerson(personnelTable.convertRowIndexToModel(row));
-				units = campaign.getEligibleUnitsFor(person);
 				JMenuItem menuItem = null;
 				JMenu menu = null;
 				JCheckBoxMenuItem cbMenuItem = null;
@@ -4194,20 +4196,18 @@ public class MekHQView extends FrameView {
 						if(!pp.isAssigned()) {
 							cbMenuItem.setSelected(true);
 						}
-						cbMenuItem.setActionCommand("CHANGE_UNIT|" + 0);
+						cbMenuItem.setActionCommand("CHANGE_UNIT|" + -1);
 						cbMenuItem.addActionListener(this);
 						menu.add(cbMenuItem);
-						int i = 1;
-						for (Unit unit : units) {
+						for (Unit unit : campaign.getEligibleUnitsFor(person)) {
 							cbMenuItem = new JCheckBoxMenuItem(unit.getEntity().getDisplayName());
 							if (unit.hasPilot()
 									&& (unit.getPilot().getId() == person.getId())) {
 								cbMenuItem.setSelected(true);
 							}
-							cbMenuItem.setActionCommand("CHANGE_UNIT|" + i);
+							cbMenuItem.setActionCommand("CHANGE_UNIT|" + unit.getId());
 							cbMenuItem.addActionListener(this);
 							menu.add(cbMenuItem);
-							i++;
 						}
 						menu.setEnabled(!person.isDeployed());
 						popup.add(menu);
