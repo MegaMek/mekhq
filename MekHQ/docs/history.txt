@@ -50,6 +50,9 @@ v0.1.5 (SVN)
 + improvements to ForceViewPanel
 + unit selected in unit context menu is the one highlighted not moused over
 + adjust contextmenu depending on single or multiple unit selection
++ person selected in person context menu is the one highlighted not moused over
++ adjust contextmenu depending on single or multiple person selection
++ Bug: top-level buttons and comboboxes not showing up above unit table
 
 v0.1.4 (2011-04-28)
 + Bug: personnel options not updating in CampaignOptionsDialog

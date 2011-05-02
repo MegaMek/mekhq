@@ -562,7 +562,7 @@ public class MekHQView extends FrameView {
 		
 		personnelTable.setModel(personModel);
 		personnelTable.setName("personnelTable"); // NOI18N
-		personnelTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		personnelTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         XTableColumnModel personColumnModel = new XTableColumnModel();
         personnelTable.setColumnModel(personColumnModel);
         personnelTable.createDefaultColumnsFromModel();
@@ -682,7 +682,6 @@ public class MekHQView extends FrameView {
 		gridBagConstraints.gridy = 0;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 		gridBagConstraints.weightx = 0.0;
-		gridBagConstraints.weighty = 0.0;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
 		panHangar.add(choiceUnit, gridBagConstraints);
 			
@@ -710,8 +709,7 @@ public class MekHQView extends FrameView {
 		gridBagConstraints.gridx = 5;
 		gridBagConstraints.gridy = 0;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-		gridBagConstraints.weightx = 0.0;
-		gridBagConstraints.weighty = 1.0;
+		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
 		panHangar.add(choiceUnitView, gridBagConstraints);
 		
@@ -3910,10 +3908,16 @@ public class MekHQView extends FrameView {
 				return;
 			}
 			Person selectedPerson = personModel.getPerson(personnelTable.convertRowIndexToModel(row));
-			
+			int[] rows = personnelTable.getSelectedRows();
+			Person[] people = new Person[rows.length];
+			for(int i=0; i<rows.length; i++) {
+				people[i] = personModel.getPerson(personnelTable.convertRowIndexToModel(rows[i]));
+			}
 			if(command.contains("RANK")) {
 				int rank = Integer.parseInt(st.nextToken());
-				selectedPerson.setRank(rank);
+				for(Person person : people) {
+					person.setRank(rank);
+				}
 				refreshServicedUnitList();
 				refreshUnitList();
 				refreshPatientList();
@@ -3991,16 +3995,17 @@ public class MekHQView extends FrameView {
 				}
 			} else if (command.equalsIgnoreCase("STATUS")) {
 				int selected = Integer.parseInt(st.nextToken());
-				if (selected == Person.S_ACTIVE
-						|| (0 == JOptionPane.showConfirmDialog(
-								null,
-								"Do you really want to change the status of "
-								+ selectedPerson.getDesc()
-								+ " to a non-active status?", "KIA?",
-								JOptionPane.YES_NO_OPTION))) {
-					selectedPerson.setStatus(selected);
+				for(Person person : people) {				
+					if (selected == Person.S_ACTIVE
+							|| (0 == JOptionPane.showConfirmDialog(
+									null,
+									"Do you really want to change the status of "
+									+ person.getDesc()
+									+ " to a non-active status?", "KIA?",
+									JOptionPane.YES_NO_OPTION))) {
+						person.setStatus(selected);
+					}
 				}
-			
 				refreshServicedUnitList();
 				refreshUnitList();
 				refreshPatientList();
@@ -4017,13 +4022,15 @@ public class MekHQView extends FrameView {
 				refreshPersonnelList();
 				refreshPersonnelView();
 			} else if (command.equalsIgnoreCase("REMOVE")) {
-				if (0 == JOptionPane
-						.showConfirmDialog(
-								null,
-								"Do you really want to remove "
-								+ selectedPerson.getDesc() + "?",
-								"Remove?", JOptionPane.YES_NO_OPTION)) {
-					campaign.removePerson(selectedPerson.getId());
+				for(Person person : people) {
+					if (0 == JOptionPane
+							.showConfirmDialog(
+									null,
+									"Do you really want to remove "
+									+ person.getDesc() + "?",
+									"Remove?", JOptionPane.YES_NO_OPTION)) {
+						campaign.removePerson(person.getId());
+					}
 				}
 				refreshServicedUnitList();
 				refreshUnitList();
@@ -4055,11 +4062,13 @@ public class MekHQView extends FrameView {
 					ntd.setVisible(true);		
 				}
 			} else if (command.equalsIgnoreCase("HEAL")) {
-				if (selectedPerson instanceof PilotPerson) {
-					Pilot pilot = ((PilotPerson) selectedPerson).getPilot();
-					pilot.setHits(0);
-					selectedPerson.getTask().setTeam(null);
-					selectedPerson.setTask(null);
+				for(Person person : people) {
+					if (person instanceof PilotPerson) {
+						Pilot pilot = ((PilotPerson) person).getPilot();
+						pilot.setHits(0);
+						person.getTask().setTeam(null);
+						person.setTask(null);
+					}
 				}
 				refreshPatientList();
 				refreshDoctorsList();
@@ -4085,8 +4094,10 @@ public class MekHQView extends FrameView {
 				}
 				refreshPersonnelList();
 			} else if (command.equalsIgnoreCase("XP_ADD")) {
-				if (selectedPerson instanceof PilotPerson) {
-					selectedPerson.setXp(selectedPerson.getXp() + 1);
+				for(Person person : people) {
+					if (person instanceof PilotPerson) {
+						person.setXp(person.getXp() + 1);
+					}
 				}
 				refreshPatientList();
 				refreshPersonnelList();
@@ -4125,15 +4136,18 @@ public class MekHQView extends FrameView {
 			JPopupMenu popup = new JPopupMenu();
 
 			if (e.isPopupTrigger()) {
-				int row = personnelTable.rowAtPoint(e.getPoint());
+				if(personnelTable.getSelectedRowCount() == 0) {
+	            	return;
+	            }
+	            int[] rows = personnelTable.getSelectedRows();
+	            int row = personnelTable.getSelectedRow();
+	            boolean oneSelected = personnelTable.getSelectedRowCount() == 1;
 				Person person = personModel.getPerson(personnelTable.convertRowIndexToModel(row));
 				units = campaign.getEligibleUnitsFor(person);
 				JMenuItem menuItem = null;
 				JMenu menu = null;
 				JCheckBoxMenuItem cbMenuItem = null;
 				// **lets fill the pop up menu**//
-				// retire
-
 				menu = new JMenu("Change Rank");
 				int rankOrder = 0;
 				for(String rank : campaign.getRanks().getAllRanks()) {
@@ -4161,232 +4175,239 @@ public class MekHQView extends FrameView {
 				}
 				popup.add(menu);
 				// switch pilot
-				if(person instanceof PilotPerson) {
-					PilotPerson pp = (PilotPerson)person;
-					menu = new JMenu("Assign to Unit");
-					cbMenuItem = new JCheckBoxMenuItem("None");
-					if(!pp.isAssigned()) {
-						cbMenuItem.setSelected(true);
-					}
-					cbMenuItem.setActionCommand("CHANGE_UNIT|" + 0);
-					cbMenuItem.addActionListener(this);
-					menu.add(cbMenuItem);
-					int i = 1;
-					for (Unit unit : units) {
-						cbMenuItem = new JCheckBoxMenuItem(unit.getEntity().getDisplayName());
-						if (unit.hasPilot()
-								&& (unit.getPilot().getId() == person.getId())) {
+				if(oneSelected) {
+					if(person instanceof PilotPerson) {
+						PilotPerson pp = (PilotPerson)person;
+						menu = new JMenu("Assign to Unit");
+						cbMenuItem = new JCheckBoxMenuItem("None");
+						if(!pp.isAssigned()) {
 							cbMenuItem.setSelected(true);
 						}
-						cbMenuItem.setActionCommand("CHANGE_UNIT|" + i);
+						cbMenuItem.setActionCommand("CHANGE_UNIT|" + 0);
 						cbMenuItem.addActionListener(this);
 						menu.add(cbMenuItem);
-						i++;
+						int i = 1;
+						for (Unit unit : units) {
+							cbMenuItem = new JCheckBoxMenuItem(unit.getEntity().getDisplayName());
+							if (unit.hasPilot()
+									&& (unit.getPilot().getId() == person.getId())) {
+								cbMenuItem.setSelected(true);
+							}
+							cbMenuItem.setActionCommand("CHANGE_UNIT|" + i);
+							cbMenuItem.addActionListener(this);
+							menu.add(cbMenuItem);
+							i++;
+						}
+						menu.setEnabled(!person.isDeployed());
+						popup.add(menu);
 					}
-					menu.setEnabled(!person.isDeployed());
-					popup.add(menu);
 				}
 				menuItem = new JMenuItem("Add XP");
 				menuItem.setActionCommand("XP_ADD");
 				menuItem.addActionListener(this);
 				menuItem.setEnabled(true);
 				popup.add(menuItem);
-				menu = new JMenu("Spend XP");
-				if(person instanceof PilotPerson) {
-					PilotPerson pp = (PilotPerson)person;
-					//Gunnery
-					int cost = campaign.getSkillCosts().getCost(SkillCosts.SK_GUN, pp.getPilot().getGunnery() - 1, false);
-					String costDesc = " (" + cost + "XP)";
-					if(cost < 0) {
-						costDesc = " (Not Possible)";
-					}
-					menuItem = new JMenuItem(SkillCosts.getSkillName(SkillCosts.SK_GUN)   + costDesc);
-					menuItem.setActionCommand("IMPROVE|" + SkillCosts.SK_GUN + "|" + cost);
-					menuItem.addActionListener(this);
-					menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
-					menu.add(menuItem);
-					//Piloting
-					cost = campaign.getSkillCosts().getCost(SkillCosts.SK_PILOT, pp.getPilot().getPiloting() - 1, false);
-					costDesc = " (" + cost + "XP)";
-					if(cost < 0) {
-						costDesc = " (Not Possible)";
-					}
-					menuItem = new JMenuItem(SkillCosts.getSkillName(SkillCosts.SK_PILOT)   + costDesc);
-					menuItem.setActionCommand("IMPROVE|" + SkillCosts.SK_PILOT + "|" + cost);
-					menuItem.addActionListener(this);
-					menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
-					menu.add(menuItem);
-					//Artillery
-					if(campaign.getCampaignOptions().useArtillery()) {
-						cost = campaign.getSkillCosts().getCost(SkillCosts.SK_ARTY, pp.getPilot().getArtillery() - 1, false);
+				if(oneSelected) {
+					menu = new JMenu("Spend XP");
+					if(person instanceof PilotPerson) {
+						PilotPerson pp = (PilotPerson)person;
+						//Gunnery
+						int cost = campaign.getSkillCosts().getCost(SkillCosts.SK_GUN, pp.getPilot().getGunnery() - 1, false);
+						String costDesc = " (" + cost + "XP)";
+						if(cost < 0) {
+							costDesc = " (Not Possible)";
+						}
+						menuItem = new JMenuItem(SkillCosts.getSkillName(SkillCosts.SK_GUN)   + costDesc);
+						menuItem.setActionCommand("IMPROVE|" + SkillCosts.SK_GUN + "|" + cost);
+						menuItem.addActionListener(this);
+						menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
+						menu.add(menuItem);
+						//Piloting
+						cost = campaign.getSkillCosts().getCost(SkillCosts.SK_PILOT, pp.getPilot().getPiloting() - 1, false);
 						costDesc = " (" + cost + "XP)";
 						if(cost < 0) {
 							costDesc = " (Not Possible)";
 						}
-						menuItem = new JMenuItem(SkillCosts.getSkillName(SkillCosts.SK_ARTY)   + costDesc);
-						menuItem.setActionCommand("IMPROVE|" + SkillCosts.SK_ARTY + "|" + cost);
+						menuItem = new JMenuItem(SkillCosts.getSkillName(SkillCosts.SK_PILOT)   + costDesc);
+						menuItem.setActionCommand("IMPROVE|" + SkillCosts.SK_PILOT + "|" + cost);
 						menuItem.addActionListener(this);
 						menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
 						menu.add(menuItem);
-					}
-					//Tactics
-					if(campaign.getCampaignOptions().useTactics()) {
-						cost = campaign.getSkillCosts().getCost(SkillCosts.SK_TAC, pp.getPilot().getCommandBonus() + 1, false);
-						costDesc = " (" + cost + "XP)";
-						if(cost < 0) {
-							costDesc = " (Not Possible)";
+						//Artillery
+						if(campaign.getCampaignOptions().useArtillery()) {
+							cost = campaign.getSkillCosts().getCost(SkillCosts.SK_ARTY, pp.getPilot().getArtillery() - 1, false);
+							costDesc = " (" + cost + "XP)";
+							if(cost < 0) {
+								costDesc = " (Not Possible)";
+							}
+							menuItem = new JMenuItem(SkillCosts.getSkillName(SkillCosts.SK_ARTY)   + costDesc);
+							menuItem.setActionCommand("IMPROVE|" + SkillCosts.SK_ARTY + "|" + cost);
+							menuItem.addActionListener(this);
+							menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
+							menu.add(menuItem);
 						}
-						menuItem = new JMenuItem(SkillCosts.getSkillName(SkillCosts.SK_TAC)   + costDesc);
-						menuItem.setActionCommand("IMPROVE|" + SkillCosts.SK_TAC + "|" + cost);
-						menuItem.addActionListener(this);
-						menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
-						menu.add(menuItem);
-					}
-					//Init Bonus
-					if(campaign.getCampaignOptions().useInitBonus()) {
-						cost = campaign.getSkillCosts().getCost(SkillCosts.SK_INIT, pp.getPilot().getInitBonus() + 1, false);
-						costDesc = " (" + cost + "XP)";
-						if(cost < 0) {
-							costDesc = " (Not Possible)";
+						//Tactics
+						if(campaign.getCampaignOptions().useTactics()) {
+							cost = campaign.getSkillCosts().getCost(SkillCosts.SK_TAC, pp.getPilot().getCommandBonus() + 1, false);
+							costDesc = " (" + cost + "XP)";
+							if(cost < 0) {
+								costDesc = " (Not Possible)";
+							}
+							menuItem = new JMenuItem(SkillCosts.getSkillName(SkillCosts.SK_TAC)   + costDesc);
+							menuItem.setActionCommand("IMPROVE|" + SkillCosts.SK_TAC + "|" + cost);
+							menuItem.addActionListener(this);
+							menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
+							menu.add(menuItem);
 						}
-						menuItem = new JMenuItem(SkillCosts.getSkillName(SkillCosts.SK_INIT)   + costDesc);
-						menuItem.setActionCommand("IMPROVE|" + SkillCosts.SK_INIT + "|" + cost);
-						menuItem.addActionListener(this);
-						menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
-						menu.add(menuItem);
-					}
-					//Toughness
-					if(campaign.getCampaignOptions().useToughness()) {
-						cost = campaign.getSkillCosts().getCost(SkillCosts.SK_TOUGH, pp.getPilot().getToughness() + 1, false);
-						costDesc = " (" + cost + "XP)";
-						if(cost < 0) {
-							costDesc = " (Not Possible)";
+						//Init Bonus
+						if(campaign.getCampaignOptions().useInitBonus()) {
+							cost = campaign.getSkillCosts().getCost(SkillCosts.SK_INIT, pp.getPilot().getInitBonus() + 1, false);
+							costDesc = " (" + cost + "XP)";
+							if(cost < 0) {
+								costDesc = " (Not Possible)";
+							}
+							menuItem = new JMenuItem(SkillCosts.getSkillName(SkillCosts.SK_INIT)   + costDesc);
+							menuItem.setActionCommand("IMPROVE|" + SkillCosts.SK_INIT + "|" + cost);
+							menuItem.addActionListener(this);
+							menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
+							menu.add(menuItem);
 						}
-						menuItem = new JMenuItem(SkillCosts.getSkillName(SkillCosts.SK_TOUGH)   + costDesc);
-						menuItem.setActionCommand("IMPROVE|" + SkillCosts.SK_TOUGH + "|" + cost);
-						menuItem.addActionListener(this);
-						menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
-						menu.add(menuItem);
-					}
-					if(campaign.getCampaignOptions().useAbilities()) {
-						JMenu abMenu = new JMenu("Special Abilities");
-						for (Enumeration<IOption> i = pp.getPilot().getOptions(PilotOptions.LVL3_ADVANTAGES); i.hasMoreElements();) {
-				        	IOption ability = i.nextElement();
-				        	if(!ability.booleanValue()) {
-				        		cost = campaign.getSkillCosts().getAbilityCost(ability.getName());
-				        		costDesc = " (" + cost + "XP)";
-								if(cost < 0) {
-									costDesc = " (Not Possible)";
-								}
-								if(ability.getName().equals("weapon_specialist")) {
-									if(null != pp.getAssignedUnit()) {
-										JMenu specialistMenu = new JMenu("Weapon Specialist");
-										TreeSet<String> uniqueWeapons = new TreeSet<String>();
-										for (int j = 0; j < pp.getAssignedUnit().getEntity().getWeaponList().size(); j++) {
-							                Mounted m = pp.getAssignedUnit().getEntity().getWeaponList().get(j);
-							                uniqueWeapons.add(m.getName());
-							            }
-							            for (String name : uniqueWeapons) {
-							            	menuItem = new JMenuItem(name + costDesc);
-											menuItem.setActionCommand("WSPECIALIST|" + name + "|" + cost);
-											menuItem.addActionListener(this);
-											menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
-											specialistMenu.add(menuItem);
-							            }
-							            abMenu.add(specialistMenu);
+						//Toughness
+						if(campaign.getCampaignOptions().useToughness()) {
+							cost = campaign.getSkillCosts().getCost(SkillCosts.SK_TOUGH, pp.getPilot().getToughness() + 1, false);
+							costDesc = " (" + cost + "XP)";
+							if(cost < 0) {
+								costDesc = " (Not Possible)";
+							}
+							menuItem = new JMenuItem(SkillCosts.getSkillName(SkillCosts.SK_TOUGH)   + costDesc);
+							menuItem.setActionCommand("IMPROVE|" + SkillCosts.SK_TOUGH + "|" + cost);
+							menuItem.addActionListener(this);
+							menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
+							menu.add(menuItem);
+						}
+						if(campaign.getCampaignOptions().useAbilities()) {
+							JMenu abMenu = new JMenu("Special Abilities");
+							for (Enumeration<IOption> i = pp.getPilot().getOptions(PilotOptions.LVL3_ADVANTAGES); i.hasMoreElements();) {
+					        	IOption ability = i.nextElement();
+					        	if(!ability.booleanValue()) {
+					        		cost = campaign.getSkillCosts().getAbilityCost(ability.getName());
+					        		costDesc = " (" + cost + "XP)";
+									if(cost < 0) {
+										costDesc = " (Not Possible)";
 									}
-					        	} else if(ability.getName().equals("specialist")) {
-				        			JMenu specialistMenu = new JMenu("Specialist");
-				        			menuItem = new JMenuItem("Laser Specialist" + costDesc);
-									menuItem.setActionCommand("SPECIALIST|" + Pilot.SPECIAL_LASER + "|" + cost);
-									menuItem.addActionListener(this);
-									menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
-									specialistMenu.add(menuItem);
-									menuItem = new JMenuItem("Missile Specialist" + costDesc);
-									menuItem.setActionCommand("SPECIALIST|" + Pilot.SPECIAL_MISSILE + "|" + cost);
-									menuItem.addActionListener(this);
-									menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
-									specialistMenu.add(menuItem);
-									menuItem = new JMenuItem("Ballistic Specialist" + costDesc);
-									menuItem.setActionCommand("SPECIALIST|" + Pilot.SPECIAL_BALLISTIC + "|" + cost);
-									menuItem.addActionListener(this);
-									menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
-									specialistMenu.add(menuItem);
-									abMenu.add(specialistMenu);
-				        		} else {
-									menuItem = new JMenuItem(ability.getDisplayableName() + costDesc);
-									menuItem.setActionCommand("ABILITY|" + ability.getName() + "|" + cost);
-									menuItem.addActionListener(this);
-									menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
-									abMenu.add(menuItem);
-				        		}
-				        	}
+									if(ability.getName().equals("weapon_specialist")) {
+										if(null != pp.getAssignedUnit()) {
+											JMenu specialistMenu = new JMenu("Weapon Specialist");
+											TreeSet<String> uniqueWeapons = new TreeSet<String>();
+											for (int j = 0; j < pp.getAssignedUnit().getEntity().getWeaponList().size(); j++) {
+								                Mounted m = pp.getAssignedUnit().getEntity().getWeaponList().get(j);
+								                uniqueWeapons.add(m.getName());
+								            }
+								            for (String name : uniqueWeapons) {
+								            	menuItem = new JMenuItem(name + costDesc);
+												menuItem.setActionCommand("WSPECIALIST|" + name + "|" + cost);
+												menuItem.addActionListener(this);
+												menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
+												specialistMenu.add(menuItem);
+								            }
+								            abMenu.add(specialistMenu);
+										}
+						        	} else if(ability.getName().equals("specialist")) {
+					        			JMenu specialistMenu = new JMenu("Specialist");
+					        			menuItem = new JMenuItem("Laser Specialist" + costDesc);
+										menuItem.setActionCommand("SPECIALIST|" + Pilot.SPECIAL_LASER + "|" + cost);
+										menuItem.addActionListener(this);
+										menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
+										specialistMenu.add(menuItem);
+										menuItem = new JMenuItem("Missile Specialist" + costDesc);
+										menuItem.setActionCommand("SPECIALIST|" + Pilot.SPECIAL_MISSILE + "|" + cost);
+										menuItem.addActionListener(this);
+										menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
+										specialistMenu.add(menuItem);
+										menuItem = new JMenuItem("Ballistic Specialist" + costDesc);
+										menuItem.setActionCommand("SPECIALIST|" + Pilot.SPECIAL_BALLISTIC + "|" + cost);
+										menuItem.addActionListener(this);
+										menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
+										specialistMenu.add(menuItem);
+										abMenu.add(specialistMenu);
+					        		} else {
+										menuItem = new JMenuItem(ability.getDisplayableName() + costDesc);
+										menuItem.setActionCommand("ABILITY|" + ability.getName() + "|" + cost);
+										menuItem.addActionListener(this);
+										menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
+										abMenu.add(menuItem);
+					        		}
+					        	}
+							}
+							menu.add(abMenu);
 						}
-						menu.add(abMenu);
+					} else if(person instanceof SupportPerson) {
+						SupportTeam team = ((SupportPerson)person).getTeam();
+						int type = SkillCosts.SK_TECH;
+						if(team instanceof MedicalTeam) {
+							type = SkillCosts.SK_MED;
+						}
+						int cost = campaign.getSkillCosts().getCost(type, team.getRating() + 1, true);
+						String costDesc = " (" + cost + "XP)";
+						if(cost < 0) {
+							costDesc = " (Not Possible)";
+						}
+						menuItem = new JMenuItem(SkillCosts.getSkillName(type)   + costDesc);
+						menuItem.setActionCommand("IMPROVE|" + type + "|" + cost);
+						menuItem.addActionListener(this);
+						menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
+						menu.add(menuItem);
 					}
-				} else if(person instanceof SupportPerson) {
-					SupportTeam team = ((SupportPerson)person).getTeam();
-					int type = SkillCosts.SK_TECH;
-					if(team instanceof MedicalTeam) {
-						type = SkillCosts.SK_MED;
-					}
-					int cost = campaign.getSkillCosts().getCost(type, team.getRating() + 1, true);
-					String costDesc = " (" + cost + "XP)";
-					if(cost < 0) {
-						costDesc = " (Not Possible)";
-					}
-					menuItem = new JMenuItem(SkillCosts.getSkillName(type)   + costDesc);
-					menuItem.setActionCommand("IMPROVE|" + type + "|" + cost);
-					menuItem.addActionListener(this);
-					menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
-					menu.add(menuItem);
-				}
-				popup.add(menu);
-				if(person instanceof PilotPerson && campaign.getCampaignOptions().useEdge()) {
-					menu = new JMenu("Set Edge Triggers");
-					cbMenuItem = new JCheckBoxMenuItem("Head Hits");
-					if (((PilotPerson)person).getPilot().getOptions().booleanOption("edge_when_headhit")) {
-						cbMenuItem.setSelected(true);
-					}
-					cbMenuItem.setActionCommand("EDGE|edge_when_headhit");
-					cbMenuItem.addActionListener(this);
-					menu.add(cbMenuItem);
-					cbMenuItem = new JCheckBoxMenuItem("Through Armor Crits");
-					if (((PilotPerson)person).getPilot().getOptions().booleanOption("edge_when_tac")) {
-						cbMenuItem.setSelected(true);
-					}
-					cbMenuItem.setActionCommand("EDGE|edge_when_tac");
-					cbMenuItem.addActionListener(this);
-					menu.add(cbMenuItem);
-					cbMenuItem = new JCheckBoxMenuItem("Fail KO check");
-					if (((PilotPerson)person).getPilot().getOptions().booleanOption("edge_when_ko")) {
-						cbMenuItem.setSelected(true);
-					}
-					cbMenuItem.setActionCommand("EDGE|edge_when_ko");
-					cbMenuItem.addActionListener(this);
-					menu.add(cbMenuItem);
-					cbMenuItem = new JCheckBoxMenuItem("Ammo Explosion");
-					if (((PilotPerson)person).getPilot().getOptions().booleanOption("edge_when_explosion")) {
-						cbMenuItem.setSelected(true);
-					}
-					cbMenuItem.setActionCommand("EDGE|edge_when_explosion");
-					cbMenuItem.addActionListener(this);
-					menu.add(cbMenuItem);
 					popup.add(menu);
 				}
-				// change portrait
-				menuItem = new JMenuItem("Change Portrait...");
-				menuItem.setActionCommand("PORTRAIT");
-				menuItem.addActionListener(this);
-				menuItem.setEnabled(true);
-				popup.add(menuItem);	
-				// change Biography
-				menuItem = new JMenuItem("Change Biography...");
-				menuItem.setActionCommand("BIOGRAPHY");
-				menuItem.addActionListener(this);
-				menuItem.setEnabled(true);
-				popup.add(menuItem);
-				// TODO: add quirks?
+				if(oneSelected) {
+					if(person instanceof PilotPerson && campaign.getCampaignOptions().useEdge()) {
+						menu = new JMenu("Set Edge Triggers");
+						cbMenuItem = new JCheckBoxMenuItem("Head Hits");
+						if (((PilotPerson)person).getPilot().getOptions().booleanOption("edge_when_headhit")) {
+							cbMenuItem.setSelected(true);
+						}
+						cbMenuItem.setActionCommand("EDGE|edge_when_headhit");
+						cbMenuItem.addActionListener(this);
+						menu.add(cbMenuItem);
+						cbMenuItem = new JCheckBoxMenuItem("Through Armor Crits");
+						if (((PilotPerson)person).getPilot().getOptions().booleanOption("edge_when_tac")) {
+							cbMenuItem.setSelected(true);
+						}
+						cbMenuItem.setActionCommand("EDGE|edge_when_tac");
+						cbMenuItem.addActionListener(this);
+						menu.add(cbMenuItem);
+						cbMenuItem = new JCheckBoxMenuItem("Fail KO check");
+						if (((PilotPerson)person).getPilot().getOptions().booleanOption("edge_when_ko")) {
+							cbMenuItem.setSelected(true);
+						}
+						cbMenuItem.setActionCommand("EDGE|edge_when_ko");
+						cbMenuItem.addActionListener(this);
+						menu.add(cbMenuItem);
+						cbMenuItem = new JCheckBoxMenuItem("Ammo Explosion");
+						if (((PilotPerson)person).getPilot().getOptions().booleanOption("edge_when_explosion")) {
+							cbMenuItem.setSelected(true);
+						}
+						cbMenuItem.setActionCommand("EDGE|edge_when_explosion");
+						cbMenuItem.addActionListener(this);
+						menu.add(cbMenuItem);
+						popup.add(menu);
+					}
+				}
+				if(oneSelected) {
+					// change portrait
+					menuItem = new JMenuItem("Change Portrait...");
+					menuItem.setActionCommand("PORTRAIT");
+					menuItem.addActionListener(this);
+					menuItem.setEnabled(true);
+					popup.add(menuItem);	
+					// change Biography
+					menuItem = new JMenuItem("Change Biography...");
+					menuItem.setActionCommand("BIOGRAPHY");
+					menuItem.addActionListener(this);
+					menuItem.setEnabled(true);
+					popup.add(menuItem);
+				}
 				menu = new JMenu("GM Mode");
 				menuItem = new JMenuItem("Remove Person");
 				menuItem.setActionCommand("REMOVE");
@@ -4398,23 +4419,25 @@ public class MekHQView extends FrameView {
 				menuItem.addActionListener(this);
 				menuItem.setEnabled(campaign.isGM());
 				menu.add(menuItem);
-				if (person instanceof PilotPerson) {
-					menuItem = new JMenuItem("Undeploy Pilot");
-					menuItem.setActionCommand("UNDEPLOY");
+				if(oneSelected) {
+					if (person instanceof PilotPerson) {
+						menuItem = new JMenuItem("Undeploy Pilot");
+						menuItem.setActionCommand("UNDEPLOY");
+						menuItem.addActionListener(this);
+						menuItem.setEnabled(campaign.isGM() && person.isDeployed());
+						menu.add(menuItem);
+					}		
+					menuItem = new JMenuItem("Edit...");
+					menuItem.setActionCommand("EDIT");
 					menuItem.addActionListener(this);
-					menuItem.setEnabled(campaign.isGM() && person.isDeployed());
+					menuItem.setEnabled(campaign.isGM());
+					menu.add(menuItem);
+					menuItem = new JMenuItem("Set XP");
+					menuItem.setActionCommand("XP_SET");
+					menuItem.addActionListener(this);
+					menuItem.setEnabled(campaign.isGM());
 					menu.add(menuItem);
 				}
-				menuItem = new JMenuItem("Edit...");
-				menuItem.setActionCommand("EDIT");
-				menuItem.addActionListener(this);
-				menuItem.setEnabled(campaign.isGM());
-				menu.add(menuItem);
-				menuItem = new JMenuItem("Set XP");
-				menuItem.setActionCommand("XP_SET");
-				menuItem.addActionListener(this);
-				menuItem.setEnabled(campaign.isGM());
-				menu.add(menuItem);
 				if(campaign.getCampaignOptions().useEdge() && person instanceof PilotPerson) {
 					menuItem = new JMenuItem("Set Edge");
 					menuItem.setActionCommand("EDGE_SET");
