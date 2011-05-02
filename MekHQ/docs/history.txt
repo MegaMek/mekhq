@@ -48,6 +48,8 @@ v0.1.5 (SVN)
 + ForceViewPanel for personnel on TO&E tab
 + ForceViewPanel (needs filling in)
 + improvements to ForceViewPanel
++ unit selected in unit context menu is the one highlighted not moused over
++ adjust contextmenu depending on single or multiple unit selection
 
 v0.1.4 (2011-04-28)
 + Bug: personnel options not updating in CampaignOptionsDialog

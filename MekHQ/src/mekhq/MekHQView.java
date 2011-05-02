@@ -5711,7 +5711,12 @@ public class MekHQView extends FrameView {
 		private void maybeShowPopup(MouseEvent e) {
 			JPopupMenu popup = new JPopupMenu();
 			if (e.isPopupTrigger()) {
-				int row = unitTable.rowAtPoint(e.getPoint());
+				if(unitTable.getSelectedRowCount() == 0) {
+	            	return;
+	            }
+	            int[] rows = unitTable.getSelectedRows();
+	            int row = unitTable.getSelectedRow();
+	            boolean oneSelected = unitTable.getSelectedRowCount() == 1;
 				Unit unit = unitModel.getUnit(unitTable.convertRowIndexToModel(row));
 				pilots = campaign.getEligiblePilotsFor(unit);
 				JMenuItem menuItem = null;
@@ -5734,94 +5739,104 @@ public class MekHQView extends FrameView {
 				menu.setEnabled(!unit.isDeployed());
 				popup.add(menu);
 				// swap ammo
-				menu = new JMenu("Swap ammo");
-				JMenu ammoMenu = null;
-				for (Mounted m : unit.getEntity().getAmmo()) {
-					ammoMenu = new JMenu(m.getDesc());
-					i = 0;
-					AmmoType curType = (AmmoType) m.getType();
-					for (AmmoType atype : Utilities.getMunitionsFor(
-							unit.getEntity(), curType)) {
-						cbMenuItem = new JCheckBoxMenuItem(atype.getDesc());
-						if (atype.equals(curType)) {
-							cbMenuItem.setSelected(true);
-						} else {
-							cbMenuItem.setActionCommand("SWAP_AMMO:"
-									+ unit.getEntity().getEquipmentNum(m) + ":"
-									+ i);
-							cbMenuItem.addActionListener(this);
+				if(oneSelected) {			
+					menu = new JMenu("Swap ammo");
+					JMenu ammoMenu = null;
+					for (Mounted m : unit.getEntity().getAmmo()) {
+						ammoMenu = new JMenu(m.getDesc());
+						i = 0;
+						AmmoType curType = (AmmoType) m.getType();
+						for (AmmoType atype : Utilities.getMunitionsFor(
+								unit.getEntity(), curType)) {
+							cbMenuItem = new JCheckBoxMenuItem(atype.getDesc());
+							if (atype.equals(curType)) {
+								cbMenuItem.setSelected(true);
+							} else {
+								cbMenuItem.setActionCommand("SWAP_AMMO:"
+										+ unit.getEntity().getEquipmentNum(m) + ":"
+										+ i);
+								cbMenuItem.addActionListener(this);
+							}
+							ammoMenu.add(cbMenuItem);
+							i++;
 						}
-						ammoMenu.add(cbMenuItem);
-						i++;
+						menu.add(ammoMenu);
 					}
-					menu.add(ammoMenu);
+					menu.setEnabled(!unit.isDeployed());
+					popup.add(menu);
 				}
-				menu.setEnabled(!unit.isDeployed());
-				popup.add(menu);
 				// Salvage / Repair
-				if (unit.isSalvage()) {
-					menuItem = new JMenuItem("Repair");
-					menuItem.setActionCommand("REPAIR");
-					menuItem.addActionListener(this);
-					menuItem.setEnabled(!unit.isDeployed()
-							&& unit.isRepairable() && !unit.isCustomized());
-					popup.add(menuItem);
-				} else if (!unit.isSalvage()) {
-					menuItem = new JMenuItem("Salvage");
-					menuItem.setActionCommand("SALVAGE");
-					menuItem.addActionListener(this);
-					menuItem.setEnabled(!unit.isDeployed()
-							&& !unit.isCustomized());
-					popup.add(menuItem);
+				if(oneSelected) {
+					if (unit.isSalvage()) {
+						menuItem = new JMenuItem("Repair");
+						menuItem.setActionCommand("REPAIR");
+						menuItem.addActionListener(this);
+						menuItem.setEnabled(!unit.isDeployed()
+								&& unit.isRepairable() && !unit.isCustomized());
+						popup.add(menuItem);
+					} else if (!unit.isSalvage()) {
+						menuItem = new JMenuItem("Salvage");
+						menuItem.setActionCommand("SALVAGE");
+						menuItem.addActionListener(this);
+						menuItem.setEnabled(!unit.isDeployed()
+								&& !unit.isCustomized());
+						popup.add(menuItem);
+					}
 				}
 				// Customize
-				if (!unit.isCustomized()) {
-					menu = new JMenu("Customize");
-		
-					menuItem = new JMenuItem("To existing variant");
-					menuItem.setActionCommand("CUSTOMIZE:" + "CHOOSE_VARIANT");
+				if(oneSelected) {
+					if (!unit.isCustomized()) {
+						menu = new JMenu("Customize");
+			
+						menuItem = new JMenuItem("To existing variant");
+						menuItem.setActionCommand("CUSTOMIZE:" + "CHOOSE_VARIANT");
+						menuItem.addActionListener(this);
+						menu.add(menuItem);
+			
+						menuItem = new JMenuItem("MegaMekLab");
+						menuItem.setActionCommand("CUSTOMIZE:" + "MML");
+						menuItem.addActionListener(this);
+						menu.add(menuItem);
+			
+						menu.setEnabled(!unit.isDeployed()
+								&& !unit.isDamaged()
+								&& (unit.getEntity() instanceof megamek.common.Mech));
+						popup.add(menu);
+					} else if (unit.isCustomized()) {
+						menuItem = new JMenuItem("Cancel Customize");
+						menuItem.setActionCommand("CANCEL_CUSTOMIZE");
+						menuItem.addActionListener(this);
+						menuItem.setEnabled(unit.isCustomized());
+						popup.add(menuItem);
+					}
+				}
+				if(oneSelected) {
+					// remove pilot
+					popup.addSeparator();
+					menuItem = new JMenuItem("Remove pilot");
+					menuItem.setActionCommand("REMOVE_PILOT");
 					menuItem.addActionListener(this);
-					menu.add(menuItem);
-		
-					menuItem = new JMenuItem("MegaMekLab");
-					menuItem.setActionCommand("CUSTOMIZE:" + "MML");
-					menuItem.addActionListener(this);
-					menu.add(menuItem);
-		
-					menu.setEnabled(!unit.isDeployed()
-							&& !unit.isDamaged()
-							&& (unit.getEntity() instanceof megamek.common.Mech));
-					popup.add(menu);
-				} else if (unit.isCustomized()) {
-					menuItem = new JMenuItem("Cancel Customize");
-					menuItem.setActionCommand("CANCEL_CUSTOMIZE");
-					menuItem.addActionListener(this);
-					menuItem.setEnabled(unit.isCustomized());
+					menuItem.setEnabled(unit.hasPilot() && !unit.isDeployed());
 					popup.add(menuItem);
 				}
-				// remove pilot
-				popup.addSeparator();
-				menuItem = new JMenuItem("Remove pilot");
-				menuItem.setActionCommand("REMOVE_PILOT");
-				menuItem.addActionListener(this);
-				menuItem.setEnabled(unit.hasPilot() && !unit.isDeployed());
-				popup.add(menuItem);
 				// switch pilot
-				menu = new JMenu("Change pilot");
-				i = 0;
-				for (PilotPerson pp : pilots) {
-					cbMenuItem = new JCheckBoxMenuItem(pp.getDesc());
-					if (unit.hasPilot()
-							&& (unit.getPilot().getId() == pp.getId())) {
-						cbMenuItem.setSelected(true);
+				if(oneSelected) {
+					menu = new JMenu("Change pilot");
+					i = 0;
+					for (PilotPerson pp : pilots) {
+						cbMenuItem = new JCheckBoxMenuItem(pp.getDesc());
+						if (unit.hasPilot()
+								&& (unit.getPilot().getId() == pp.getId())) {
+							cbMenuItem.setSelected(true);
+						}
+						cbMenuItem.setActionCommand("CHANGE_PILOT:" + i);
+						cbMenuItem.addActionListener(this);
+						menu.add(cbMenuItem);
+						i++;
 					}
-					cbMenuItem.setActionCommand("CHANGE_PILOT:" + i);
-					cbMenuItem.addActionListener(this);
-					menu.add(cbMenuItem);
-					i++;
+					menu.setEnabled(!unit.isDeployed());
+					popup.add(menu);
 				}
-				menu.setEnabled(!unit.isDeployed());
-				popup.add(menu);
 				popup.addSeparator();
 				// sell unit
 				menuItem = new JMenuItem("Sell Unit");
