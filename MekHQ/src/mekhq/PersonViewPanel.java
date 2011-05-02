@@ -159,7 +159,7 @@ public class PersonViewPanel extends javax.swing.JPanel {
 
         // Return a null if the player has selected no portrait file.
         if ((null == category) || (null == file) || Pilot.PORTRAIT_NONE.equals(file)) {
-            return;
+        	file = "default.gif";
         }
 
         // Try to get the player's portrait file.

@@ -8000,7 +8000,7 @@ Ian retired in 3051, accepting a battalion command in the Kestrel Militia.</biog
 	</parts>
 	<forces>
 		<force id="0" type="mekhq.campaign.Force">
-			<name>McKinnon's Company, Vausur's Battalion, 7th Crusis Lancers RCT (The Fox's Teeth)</name>
+			<name>McKinnon's Company (The Fox's Teeth)</name>
 			<desc></desc>
 			<iconCategory>-- General --</iconCategory>
 			<iconFileName>foxsteeth.png</iconFileName>

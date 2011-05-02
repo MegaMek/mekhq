@@ -121,6 +121,21 @@ public class Force implements Serializable {
 	}
 	
 	/**
+	 * This returns all the personnel ids in this force and all of its subforces
+	 * @return
+	 */
+	public Vector<Integer> getAllPersonnel() {
+		Vector<Integer> people = new Vector<Integer>();
+		for(int pid : personnel) {
+			people.add(pid);
+		}
+		for(Force f : subForces) {
+			people.addAll(f.getAllPersonnel());
+		}
+		return people;	
+	}
+	
+	/**
 	 * Add a person id to the personnel vector. In general, this 
 	 * should not be called directly to add personnel because they will
 	 * not be assigned a force id. Use {@link Campaign#addPersonToForce(mekhq.campaign.personnel.Person, int)}

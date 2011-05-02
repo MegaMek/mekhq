@@ -467,8 +467,8 @@ public class MekHQView extends FrameView {
         });
 		scrollOrgTree.setViewportView(orgTree);
 		
-		scrollForceView.setMinimumSize(new java.awt.Dimension(450, 600));
-		scrollForceView.setPreferredSize(new java.awt.Dimension(450, 2000));
+		scrollForceView.setMinimumSize(new java.awt.Dimension(550, 600));
+		scrollForceView.setPreferredSize(new java.awt.Dimension(550, 2000));
 		scrollForceView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollForceView.setViewportView(null);
 		
@@ -2068,7 +2068,7 @@ public class MekHQView extends FrameView {
 				}
 			});
 		} else if (node.getUserObject() instanceof Force) {
-			scrollForceView.setViewportView(new ForceViewPanel((Force)node.getUserObject(), campaign, portraits, forceIcons));
+			scrollForceView.setViewportView(new ForceViewPanel((Force)node.getUserObject(), campaign, portraits, forceIcons, camos, mt));
 			javax.swing.SwingUtilities.invokeLater(new Runnable() {
 				public void run() { 
 					scrollForceView.getVerticalScrollBar().setValue(0);
@@ -3618,6 +3618,7 @@ public class MekHQView extends FrameView {
 	                        "My Lance");
 	            	campaign.addForce(new Force(name), force);
 	            	refreshOrganization();
+	            	refreshForceView();
             	}
             } if(command.contains("ADD_PERSON")) {
             	if(null != force) {
@@ -3625,6 +3626,7 @@ public class MekHQView extends FrameView {
                     if(null != p && p instanceof PilotPerson) {
                     	campaign.addPersonToForce(p, force.getId());
                     	refreshOrganization();
+    	            	refreshForceView();
                     }
             	}
             } else if(command.contains("CHANGE_ICON")) {
@@ -3636,6 +3638,7 @@ public class MekHQView extends FrameView {
     				force.setIconCategory(pcd.getCategory());
     				force.setIconFileName(pcd.getFileName());
 	            	refreshOrganization();
+	            	refreshForceView();
             	}
             } else if(command.contains("CHANGE_NAME")) {
             	if(null != force) {
@@ -3649,6 +3652,7 @@ public class MekHQView extends FrameView {
 	                        force.getName());
 	            	force.setName(name);
 	            	refreshOrganization();
+	            	refreshForceView();
             	}
             } else if(command.contains("CHANGE_DESC")) {
             	if(null != force) {
@@ -3659,19 +3663,22 @@ public class MekHQView extends FrameView {
     				if(tad.wasChanged()) {
     					force.setDescription(tad.getText());
     					refreshOrganization();
+    	            	refreshForceView();
     				}        	
             	}
             } else if(command.contains("REMOVE_FORCE")) {
             	if(null != force) {
             		campaign.removeForce(force);
-            		refreshOrganization();   	
+            		refreshOrganization();   
+	            	refreshForceView();
             	}
             } else if(command.contains("REMOVE_PERSON")) {
             	if(null != person) {
             		Force parentForce = campaign.getForceFor(person);
             		if(null != parentForce) {
             			campaign.RemovePersonFromForce(person);
-            			refreshOrganization();   	
+            			refreshOrganization();   
+    	            	refreshForceView();
             		}
             	}
             }
