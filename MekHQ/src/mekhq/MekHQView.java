@@ -2051,9 +2051,10 @@ public class MekHQView extends FrameView {
 		
 	}
 	
-	private void refreshForceView() {
+	protected void refreshForceView() {
 		DefaultMutableTreeNode node = (DefaultMutableTreeNode)orgTree.getLastSelectedPathComponent();
 		if(null == node) {
+			scrollForceView.setViewportView(null);
 			return;
 		}
 		if(node.getUserObject() instanceof Person) {
@@ -2420,6 +2421,8 @@ public class MekHQView extends FrameView {
 			orgModel.setRoot(top);
 		}
 		//scrollOrgTree.setViewportView(orgTree);	
+		refreshForceView();
+		
 	}
 	
 	private void addForce(Force force, DefaultMutableTreeNode top) {
@@ -3616,7 +3619,6 @@ public class MekHQView extends FrameView {
 	                        "My Lance");
 	            	campaign.addForce(new Force(name), force);
 	            	refreshOrganization();
-	            	refreshForceView();
             	}
             } if(command.contains("ADD_PERSON")) {
             	if(null != force) {
@@ -3624,7 +3626,6 @@ public class MekHQView extends FrameView {
                     if(null != p && p instanceof PilotPerson) {
                     	campaign.addPersonToForce(p, force.getId());
                     	refreshOrganization();
-    	            	refreshForceView();
                     }
             	}
             } else if(command.contains("CHANGE_ICON")) {
@@ -3636,7 +3637,6 @@ public class MekHQView extends FrameView {
     				force.setIconCategory(pcd.getCategory());
     				force.setIconFileName(pcd.getFileName());
 	            	refreshOrganization();
-	            	refreshForceView();
             	}
             } else if(command.contains("CHANGE_NAME")) {
             	if(null != force) {
@@ -3650,7 +3650,6 @@ public class MekHQView extends FrameView {
 	                        force.getName());
 	            	force.setName(name);
 	            	refreshOrganization();
-	            	refreshForceView();
             	}
             } else if(command.contains("CHANGE_DESC")) {
             	if(null != force) {
@@ -3661,22 +3660,19 @@ public class MekHQView extends FrameView {
     				if(tad.wasChanged()) {
     					force.setDescription(tad.getText());
     					refreshOrganization();
-    	            	refreshForceView();
     				}        	
             	}
             } else if(command.contains("REMOVE_FORCE")) {
             	if(null != force) {
             		campaign.removeForce(force);
             		refreshOrganization();   
-	            	refreshForceView();
             	}
             } else if(command.contains("REMOVE_PERSON")) {
             	if(null != person) {
             		Force parentForce = campaign.getForceFor(person);
             		if(null != parentForce) {
             			campaign.removePersonFromForce(person);
-            			refreshOrganization();   
-    	            	refreshForceView();
+            			refreshOrganization();
             		}
             	}
             }
@@ -3923,6 +3919,7 @@ public class MekHQView extends FrameView {
 				refreshPersonnelList();
 				refreshTechsList();
 				refreshDoctorsList();
+				refreshOrganization();
 			} else if (command.contains("CHANGE_UNIT")) {
 				int selected = Integer.parseInt(st.nextToken());
 				if(selectedPerson instanceof PilotPerson) {
@@ -3942,6 +3939,7 @@ public class MekHQView extends FrameView {
 				refreshServicedUnitList();
 				refreshUnitList();
 				refreshPersonnelList();
+				refreshOrganization();
 			} else if (command.contains("CHANGE_FORCE")) {
 				int selected = Integer.parseInt(st.nextToken());
 				campaign.removePersonFromForce(selectedPerson);
@@ -3965,6 +3963,7 @@ public class MekHQView extends FrameView {
 				refreshTechsList();
 				refreshDoctorsList();
 				refreshReport();
+				refreshOrganization();
 			} else if (command.contains("ABILITY")) {
 				String selected = st.nextToken();
 				int cost =  Integer.parseInt(st.nextToken());
@@ -4028,6 +4027,7 @@ public class MekHQView extends FrameView {
 				refreshTechsList();
 				refreshDoctorsList();
 				refreshReport();
+				refreshOrganization();
 			} else if (command.equalsIgnoreCase("EDGE")) {
 				String trigger = st.nextToken();
 				if(selectedPerson instanceof PilotPerson) {
@@ -4052,6 +4052,7 @@ public class MekHQView extends FrameView {
 				refreshPersonnelList();
 				refreshTechsList();
 				refreshDoctorsList();
+				refreshOrganization();
 				refreshReport();
 			} else if (command.equalsIgnoreCase("UNDEPLOY")) {
 				if (selectedPerson.isDeployed()) {
@@ -4075,6 +4076,12 @@ public class MekHQView extends FrameView {
 							view);
 					ntd.setVisible(true);		
 				}
+				refreshPatientList();
+				refreshDoctorsList();
+				refreshServicedUnitList();
+				refreshUnitList();
+				refreshPersonnelList();
+				refreshOrganization();
 			} else if (command.equalsIgnoreCase("HEAL")) {
 				for(Person person : people) {
 					if (person instanceof PilotPerson) {
@@ -4089,6 +4096,7 @@ public class MekHQView extends FrameView {
 				refreshServicedUnitList();
 				refreshUnitList();
 				refreshPersonnelList();
+				refreshOrganization();
 			} else if (command.equalsIgnoreCase("PORTRAIT")) {
 				PortraitChoiceDialog pcd = new PortraitChoiceDialog(null, true,
 						selectedPerson.getPortraitCategory(),
@@ -4098,6 +4106,7 @@ public class MekHQView extends FrameView {
 				selectedPerson.setPortraitFileName(pcd.getFileName());
 				refreshPatientList();
 				refreshPersonnelList();
+				refreshOrganization();
 			} else if (command.equalsIgnoreCase("BIOGRAPHY")) {
 				TextAreaDialog tad = new TextAreaDialog(null, true,
 						"Edit Biography",
