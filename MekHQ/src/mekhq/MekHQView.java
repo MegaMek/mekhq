@@ -115,6 +115,7 @@ import megamek.common.XMLStreamParser;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.IOption;
 import megamek.common.options.PilotOptions;
+import megamek.common.options.Quirks;
 import megamek.common.util.DirectoryItems;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Force;
@@ -5504,6 +5505,13 @@ public class MekHQView extends FrameView {
 				refreshUnitList();
 				refreshPersonnelList();
 				refreshOrganization();
+			} else if (command.contains("QUIRK")) {
+				String sel = command.split(":")[1];
+					selectedUnit.acquireQuirk(sel, true);
+					refreshServicedUnitList();
+					refreshUnitList();
+					refreshTechsList();
+					refreshReport();
 			} else if (command.equalsIgnoreCase("SELL")) {
 				for (Unit unit : units) {
 					if (!unit.isDeployed()) {
@@ -5867,6 +5875,20 @@ public class MekHQView extends FrameView {
 						menuItem.setEnabled(unit.isCustomized());
 						popup.add(menuItem);
 					}
+				}
+				if(oneSelected && campaign.getCampaignOptions().useQuirks()) {
+					menu = new JMenu("Add Quirk");			
+					for (Enumeration<IOption> q = unit.getEntity().getQuirks().getOptions(); q.hasMoreElements();) {
+			        	IOption quirk = q.nextElement();
+			        	if(!quirk.booleanValue()) {
+			        		menuItem = new JMenuItem(quirk.getDisplayableName());
+			        		menuItem.setActionCommand("QUIRK:" + quirk.getName());
+			        		menuItem.addActionListener(this);
+			        		menuItem.setEnabled(true);
+			        		menu.add(menuItem);
+			        	}
+					}
+					popup.add(menu);
 				}
 				if(oneSelected) {
 					// remove pilot

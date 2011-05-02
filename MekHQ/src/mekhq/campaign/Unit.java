@@ -1924,4 +1924,13 @@ public class Unit implements Serializable, MekHqXmlSerializable {
         }
         return "<html>" + quirkString + "</html>";
     }
+    
+    public void acquireQuirk(String name, Object value) {
+    	for (Enumeration<IOption> i = getEntity().getQuirks().getOptions(); i.hasMoreElements();) {
+        	IOption ability = i.nextElement();
+        	if(ability.getName().equals(name)) {
+        		ability.setValue(value);
+        	}
+    	}
+    }
 }

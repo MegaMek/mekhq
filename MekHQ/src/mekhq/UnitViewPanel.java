@@ -65,6 +65,7 @@ public class UnitViewPanel extends javax.swing.JPanel {
 	public UnitViewPanel(Unit u, Campaign c, DirectoryItems camos, MechTileset mt) {
 		unit = u;
 		entity = u.getEntity();
+		campaign = c;
 		this.camos = camos;
 		this.mt = mt;
 		initComponents();
@@ -250,6 +251,12 @@ public class UnitViewPanel extends javax.swing.JPanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblBV2, gridBagConstraints);
 
+		
+		double weight = 1.0;
+		if(campaign.getCampaignOptions().useQuirks() && entity.countQuirks() > 0) {
+			weight = 0.0;
+		}
+		
 		lblCost1.setName("lblCost1"); // NOI18N
 		lblCost1.setText(resourceMap.getString("lblCost1.text"));
 		gridBagConstraints = new java.awt.GridBagConstraints();
@@ -266,13 +273,13 @@ public class UnitViewPanel extends javax.swing.JPanel {
 		gridBagConstraints.gridx = 1;
 		gridBagConstraints.gridy = 4;
 		gridBagConstraints.weightx = 1.0;
-		gridBagConstraints.weighty = 1.0;
+		gridBagConstraints.weighty = weight;
 		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblCost2, gridBagConstraints);
 		
-		if(entity.countQuirks() > 0) {
+		if(campaign.getCampaignOptions().useQuirks() && entity.countQuirks() > 0) {
 			lblQuirk1.setName("lblQuirk1"); // NOI18N
 			lblQuirk1.setText(resourceMap.getString("lblQuirk1.text"));
 			gridBagConstraints = new java.awt.GridBagConstraints();
@@ -288,6 +295,7 @@ public class UnitViewPanel extends javax.swing.JPanel {
 			gridBagConstraints.gridx = 1;
 			gridBagConstraints.gridy = 5;
 			gridBagConstraints.weightx = 1.0;
+			gridBagConstraints.weighty = 1.0;
 			gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
 			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;

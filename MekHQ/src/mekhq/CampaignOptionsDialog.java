@@ -77,6 +77,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         useAbilitiesBox.setSelected(options.useAbilities());
         useEdgeBox.setSelected(options.useEdge());
         useImplantsBox.setSelected(options.useImplants());
+        useQuirksBox.setSelected(options.useQuirks());
 
     }
 
@@ -126,6 +127,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         useAbilitiesBox = new javax.swing.JCheckBox();
         useEdgeBox = new javax.swing.JCheckBox();
         useImplantsBox = new javax.swing.JCheckBox();
+        useQuirksBox = new javax.swing.JCheckBox();
         repairSystemComboBox = new javax.swing.JComboBox();
         javax.swing.JLabel repairSystemComboBoxLabel = new javax.swing.JLabel();
         chkUseFinances = new javax.swing.JCheckBox();
@@ -321,6 +323,18 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panRepair.add(chkUseFinances, gridBagConstraints);
 
+        useQuirksBox.setText(resourceMap.getString("useQuirksBox.text")); // NOI18N
+        useQuirksBox.setToolTipText(resourceMap.getString("useQuirksBox.toolTipText")); // NOI18N
+        useQuirksBox.setName("useQuirksBox"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panRepair.add(useQuirksBox, gridBagConstraints);
+
+        
         tabOptions.addTab(resourceMap.getString("panRepair.TabConstraints.tabTitle"), panRepair); // NOI18N
 
         panPersonnel.setName("panPersonnel"); // NOI18N
@@ -634,6 +648,8 @@ private void btnOkayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
     options.setEdge(useEdgeBox.isSelected());
     options.setImplants(useImplantsBox.isSelected());
     
+    options.setQuirks(useQuirksBox.isSelected());
+    
     campaign.refreshAllUnitDiagnostics();
 }//GEN-LAST:event_btnOkayActionPerformed
 
@@ -749,6 +765,7 @@ public String getDateAsString() {
     private javax.swing.JCheckBox useToughnessBox;
     private javax.swing.JCheckBox useArtilleryBox;
     private javax.swing.JCheckBox useAbilitiesBox;
+    private javax.swing.JCheckBox useQuirksBox;
     private javax.swing.JCheckBox useEdgeBox;
     private javax.swing.JCheckBox useImplantsBox;
     private javax.swing.JTextArea textRanks;
