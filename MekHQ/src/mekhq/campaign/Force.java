@@ -105,6 +105,18 @@ public class Force implements Serializable {
 	}
 	
 	/**
+	 * This returns the full hierarchical name of the force, including all parents
+	 * @return
+	 */
+	public String getFullName() {
+		String toReturn = getName();
+		if(null != parentForce) {
+			toReturn += ", " + parentForce.getFullName();
+		}
+		return toReturn;
+	}
+	
+	/**
 	 * Add a subforce to the subforce vector. In general, this
 	 * should not be called directly to add forces to the campaign
 	 * because they will not be assigned an id. Use {@link Campaign#addForce(Force, Force)}

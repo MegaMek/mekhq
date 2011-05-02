@@ -948,7 +948,7 @@ public class Campaign implements Serializable {
 		}
 	}
 	
-	public void RemovePersonFromForce(Person p) {
+	public void removePersonFromForce(Person p) {
 		Force force = getForce(p.getForceId());
 		if(null != force) {
 			force.removePerson(p.getId());
@@ -2010,6 +2010,14 @@ public class Campaign implements Serializable {
 			rank = "";
 		}
 		return rank + " " + p.getName();
+	}
+	
+	public ArrayList<Force> getAllForces() {
+		ArrayList<Force> allForces = new ArrayList<Force>();
+		for(int x : forceIds.keySet()) {
+			allForces.add(forceIds.get(x));
+		}
+		return allForces;
 	}
 	
 }

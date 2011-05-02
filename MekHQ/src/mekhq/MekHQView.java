@@ -3674,7 +3674,7 @@ public class MekHQView extends FrameView {
             	if(null != person) {
             		Force parentForce = campaign.getForceFor(person);
             		if(null != parentForce) {
-            			campaign.RemovePersonFromForce(person);
+            			campaign.removePersonFromForce(person);
             			refreshOrganization();   
     	            	refreshForceView();
             		}
@@ -3939,6 +3939,17 @@ public class MekHQView extends FrameView {
 				refreshServicedUnitList();
 				refreshUnitList();
 				refreshPersonnelList();
+			} else if (command.contains("CHANGE_FORCE")) {
+				int selected = Integer.parseInt(st.nextToken());
+				campaign.removePersonFromForce(selectedPerson);
+				if(selected != -1) {
+					campaign.addPersonToForce(selectedPerson, selected);
+				}
+				refreshOrganization();
+				refreshForceView();
+				refreshServicedUnitList();
+				refreshUnitList();
+				refreshPersonnelList();
 			} else if (command.contains("IMPROVE")) {
 				int selected = Integer.parseInt(st.nextToken());
 				int cost =  Integer.parseInt(st.nextToken());
@@ -4119,7 +4130,7 @@ public class MekHQView extends FrameView {
 					pp.setEdge(i);
 					refreshPersonnelList();
 				}
-			}
+			} 
 		}
 
 		@Override
@@ -4199,6 +4210,19 @@ public class MekHQView extends FrameView {
 							i++;
 						}
 						menu.setEnabled(!person.isDeployed());
+						popup.add(menu);
+						//Assign to Force
+						menu = new JMenu("Assign to Force");
+						cbMenuItem = new JCheckBoxMenuItem("None");
+						cbMenuItem.setActionCommand("CHANGE_FORCE|" + -1);
+						cbMenuItem.addActionListener(this);
+						menu.add(cbMenuItem);
+						for(Force f : campaign.getAllForces()) {
+							cbMenuItem = new JCheckBoxMenuItem(f.getFullName());
+							cbMenuItem.setActionCommand("CHANGE_FORCE|" + f.getId());
+							cbMenuItem.addActionListener(this);
+							menu.add(cbMenuItem);
+						}
 						popup.add(menu);
 					}
 				}
