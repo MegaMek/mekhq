@@ -56,6 +56,7 @@ v0.1.5 (SVN)
 + assign to force menu in personnel table
 + simplified code for assigning units
 + fixed refresh issues with ForceViewPanel
++ only allow unassigned pilots to be assigned in unit context menu
 
 v0.1.4 (2011-04-28)
 + Bug: personnel options not updating in CampaignOptionsDialog

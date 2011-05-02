@@ -5478,8 +5478,6 @@ public class MekHQView extends FrameView {
 	public class UnitTableMouseAdapter extends MouseInputAdapter implements
 		ActionListener {
 	
-		private ArrayList<PilotPerson> pilots;
-		
 		public void actionPerformed(ActionEvent action) {
 			String command = action.getActionCommand();
 			Unit selectedUnit = unitModel.getUnit(unitTable.convertRowIndexToModel(unitTable.getSelectedRow()));
@@ -5498,9 +5496,9 @@ public class MekHQView extends FrameView {
 			} else if (command.contains("CHANGE_PILOT")) {
 				String sel = command.split(":")[1];
 				int selected = Integer.parseInt(sel);
-				if ((null != pilots) && (selected > -1)
-						&& (selected < pilots.size())) {
-					campaign.changePilot(selectedUnit, pilots.get(selected));
+				Person p = campaign.getPerson(selected);
+				if (null != p && p instanceof PilotPerson) {
+					campaign.changePilot(selectedUnit, (PilotPerson)p);
 				}
 				refreshServicedUnitList();
 				refreshUnitList();
@@ -5774,7 +5772,6 @@ public class MekHQView extends FrameView {
 	            int row = unitTable.getSelectedRow();
 	            boolean oneSelected = unitTable.getSelectedRowCount() == 1;
 				Unit unit = unitModel.getUnit(unitTable.convertRowIndexToModel(row));
-				pilots = campaign.getEligiblePilotsFor(unit);
 				JMenuItem menuItem = null;
 				JMenu menu = null;
 				JCheckBoxMenuItem cbMenuItem = null;
@@ -5878,17 +5875,15 @@ public class MekHQView extends FrameView {
 				// switch pilot
 				if(oneSelected) {
 					menu = new JMenu("Change pilot");
-					i = 0;
-					for (PilotPerson pp : pilots) {
-						cbMenuItem = new JCheckBoxMenuItem(pp.getDesc());
-						if (unit.hasPilot()
-								&& (unit.getPilot().getId() == pp.getId())) {
-							cbMenuItem.setSelected(true);
+					for (PilotPerson pp : campaign.getEligiblePilotsFor(unit)) {
+						menuItem = new JMenuItem(pp.getDesc());
+						if (pp.isAssigned() || (unit.hasPilot()
+								&& (unit.getPilot().getId() == pp.getId()))) {
+							continue;
 						}
-						cbMenuItem.setActionCommand("CHANGE_PILOT:" + i);
-						cbMenuItem.addActionListener(this);
-						menu.add(cbMenuItem);
-						i++;
+						menuItem.setActionCommand("CHANGE_PILOT:" + pp.getId());
+						menuItem.addActionListener(this);
+						menu.add(menuItem);
 					}
 					menu.setEnabled(!unit.isDeployed());
 					popup.add(menu);
