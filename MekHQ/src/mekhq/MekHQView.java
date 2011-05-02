@@ -81,6 +81,8 @@ import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.MouseInputAdapter;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -92,6 +94,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 
 import megamek.client.ui.swing.MechTileset;
 import megamek.client.ui.swing.MechView;
@@ -433,7 +436,8 @@ public class MekHQView extends FrameView {
 		choiceUnitView = new javax.swing.JComboBox();
 		lblUnitView = new javax.swing.JLabel();
 		scrollUnitView = new javax.swing.JScrollPane();
-
+		scrollForceView = new javax.swing.JScrollPane();
+		
 		mainPanel.setAutoscrolls(true);
 		mainPanel.setName("mainPanel"); // NOI18N
 		mainPanel.setLayout(new java.awt.GridBagLayout());
@@ -455,15 +459,39 @@ public class MekHQView extends FrameView {
 		orgTree.addMouseListener(orgMouseAdapter);
         orgTree.setCellRenderer(new ForceRenderer());
         orgTree.setRowHeight(50);
+        orgTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        orgTree.addTreeSelectionListener(new TreeSelectionListener() {
+            public void valueChanged(TreeSelectionEvent e) {
+                refreshForceView();
+            }
+        });
 		scrollOrgTree.setViewportView(orgTree);
+		
+		scrollForceView.setMinimumSize(new java.awt.Dimension(450, 600));
+		scrollForceView.setPreferredSize(new java.awt.Dimension(450, 2000));
+		scrollForceView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		scrollForceView.setViewportView(null);
+		
+		splitOrg = new javax.swing.JSplitPane(javax.swing.JSplitPane.HORIZONTAL_SPLIT,scrollOrgTree, scrollForceView);
+		splitOrg.setOneTouchExpandable(true);
+		splitOrg.setResizeWeight(1.0);
+		splitOrg.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent pce) {
+				//this can mess up the unit view panel so refresh it
+				refreshForceView();
+			}
+		});
 		gridBagConstraints = new java.awt.GridBagConstraints();
+
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 0;
+		gridBagConstraints.gridwidth = 1;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 1.0;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		panOrganization.add(scrollOrgTree, gridBagConstraints);
+		panOrganization.add(splitOrg, gridBagConstraints);
+		
 		
 		tabMain.addTab(
 				resourceMap.getString("panOrganization.TabConstraints.tabTitle"),
@@ -2022,6 +2050,26 @@ public class MekHQView extends FrameView {
 				scrollUnitView.getVerticalScrollBar().setValue(0);
 			}
 		});
+		
+	}
+	
+	private void refreshForceView() {
+		DefaultMutableTreeNode node = (DefaultMutableTreeNode)orgTree.getLastSelectedPathComponent();
+		if(null == node) {
+			return;
+		}
+		if(node.getUserObject() instanceof Person) {
+			scrollForceView.setViewportView(new PersonViewPanel((Person)node.getUserObject(), campaign, portraits));
+			//This odd code is to make sure that the scrollbar stays at the top
+			//I cant just call it here, because it ends up getting reset somewhere later
+			javax.swing.SwingUtilities.invokeLater(new Runnable() {
+				public void run() { 
+					scrollForceView.getVerticalScrollBar().setValue(0);
+				}
+			});
+		} else {
+			scrollForceView.setViewportView(null);
+		}
 		
 	}
 	
@@ -6122,6 +6170,8 @@ public class MekHQView extends FrameView {
     private javax.swing.JSplitPane splitUnit;
 	private javax.swing.JScrollPane scrollOrgTree;
 	private javax.swing.JTree orgTree;
+    private javax.swing.JSplitPane splitOrg;
+	private javax.swing.JScrollPane scrollForceView;
 	// End of variables declaration//GEN-END:variables
 
 	private final Timer messageTimer;
