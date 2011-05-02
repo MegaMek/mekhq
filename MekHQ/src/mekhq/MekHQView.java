@@ -5820,21 +5820,26 @@ public class MekHQView extends FrameView {
 				}
 				// Salvage / Repair
 				if(oneSelected) {
-					if (unit.isSalvage()) {
-						menuItem = new JMenuItem("Repair");
-						menuItem.setActionCommand("REPAIR");
-						menuItem.addActionListener(this);
-						menuItem.setEnabled(!unit.isDeployed()
-								&& unit.isRepairable() && !unit.isCustomized());
-						popup.add(menuItem);
-					} else if (!unit.isSalvage()) {
-						menuItem = new JMenuItem("Salvage");
-						menuItem.setActionCommand("SALVAGE");
-						menuItem.addActionListener(this);
-						menuItem.setEnabled(!unit.isDeployed()
-								&& !unit.isCustomized());
-						popup.add(menuItem);
+					menu = new JMenu("Repair Status");
+					menu.setEnabled(!unit.isDeployed() && !unit.isCustomized());
+					cbMenuItem = new JCheckBoxMenuItem("Repair");
+					if(!unit.isSalvage()) {
+						cbMenuItem.setSelected(true);
 					}
+					cbMenuItem.setActionCommand("REPAIR");
+					cbMenuItem.addActionListener(this);
+					cbMenuItem.setEnabled(!unit.isDeployed()
+							&& unit.isRepairable() && !unit.isCustomized());
+					menu.add(cbMenuItem);
+					cbMenuItem = new JCheckBoxMenuItem("Salvage");
+					if(unit.isSalvage()) {
+						cbMenuItem.setSelected(true);
+					}
+					cbMenuItem.setActionCommand("SALVAGE");
+					cbMenuItem.addActionListener(this);
+					cbMenuItem.setEnabled(!unit.isDeployed() && !unit.isCustomized());
+					menu.add(cbMenuItem);
+					popup.add(menu);
 				}
 				// Customize
 				if(oneSelected) {

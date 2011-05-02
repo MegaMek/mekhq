@@ -57,6 +57,7 @@ v0.1.5 (SVN)
 + simplified code for assigning units
 + fixed refresh issues with ForceViewPanel
 + only allow unassigned pilots to be assigned in unit context menu
++ put "Repair" and "Salvage" menu items in a sub-menu called "Repair Status" in unit table context menu
 
 v0.1.4 (2011-04-28)
 + Bug: personnel options not updating in CampaignOptionsDialog
