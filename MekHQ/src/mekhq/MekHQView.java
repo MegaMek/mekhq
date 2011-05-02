@@ -2067,8 +2067,13 @@ public class MekHQView extends FrameView {
 					scrollForceView.getVerticalScrollBar().setValue(0);
 				}
 			});
-		} else {
-			scrollForceView.setViewportView(null);
+		} else if (node.getUserObject() instanceof Force) {
+			scrollForceView.setViewportView(new ForceViewPanel((Force)node.getUserObject(), campaign, portraits, forceIcons));
+			javax.swing.SwingUtilities.invokeLater(new Runnable() {
+				public void run() { 
+					scrollForceView.getVerticalScrollBar().setValue(0);
+				}
+			});
 		}
 		
 	}

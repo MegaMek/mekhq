@@ -46,6 +46,7 @@ v0.1.5 (SVN)
 + sort personnel in orgTable by rank
 + Bug: unitId not set on personnel entered via MUL
 + ForceViewPanel for personnel on TO&E tab
++ ForceViewPanel (needs filling in)
 
 v0.1.4 (2011-04-28)
 + Bug: personnel options not updating in CampaignOptionsDialog
