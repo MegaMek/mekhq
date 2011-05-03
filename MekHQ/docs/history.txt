@@ -59,6 +59,7 @@ v0.1.5 (SVN)
 + only allow unassigned pilots to be assigned in unit context menu
 + put "Repair" and "Salvage" menu items in a sub-menu called "Repair Status" in unit table context menu
 + use Quirks campaign option
++ beginning of parts table redesign
 
 v0.1.4 (2011-04-28)
 + Bug: personnel options not updating in CampaignOptionsDialog

@@ -372,7 +372,6 @@ public class MekHQView extends FrameView {
 		servicedUnitTable = new javax.swing.JTable();
 		scrollTechTable = new javax.swing.JScrollPane();
 		TechTable = new javax.swing.JTable();
-		btnUnitPanel = new javax.swing.JPanel();
 		btnDeployUnits = new javax.swing.JButton();
 		btnRetrieveUnits = new javax.swing.JButton();
 		panelDoTask = new javax.swing.JPanel();
@@ -382,12 +381,8 @@ public class MekHQView extends FrameView {
 		jScrollPane6 = new javax.swing.JScrollPane();
 		textTarget = new javax.swing.JTextArea();
 		panSupplies = new javax.swing.JPanel();
-		jScrollPane8 = new javax.swing.JScrollPane();
-		PartsTable = new javax.swing.JTable();
-		jScrollPane1 = new javax.swing.JScrollPane();
-		PartsFilter = new javax.swing.JComboBox();
-		btnSaveParts = new javax.swing.JButton();
-		btnLoadParts = new javax.swing.JButton();
+		scrollPartsTable = new javax.swing.JScrollPane();
+		partsTable = new javax.swing.JTable();
 		panInfirmary = new javax.swing.JPanel();
 		btnAssignDoc = new javax.swing.JButton();
 		scrollPatientTable = new javax.swing.JScrollPane();
@@ -769,6 +764,40 @@ public class MekHQView extends FrameView {
 		tabMain.addTab(
 				resourceMap.getString("panHangar.TabConstraints.tabTitle"),
 				panHangar); // NOI18N
+	
+		panSupplies.setName("panSupplies"); // NOI18N
+		panSupplies.setFont(resourceMap.getFont("panHangar.font")); // NOI18N
+		panSupplies.setLayout(new java.awt.GridBagLayout());
+		
+		partsTable.setModel(partsModel);
+		partsTable.setName("partsTable"); // NOI18N
+		//partsTable.getColumnModel().getColumn(0)
+			//	.setCellRenderer(partsModel.getRenderer());
+		partsTable.getSelectionModel().addListSelectionListener(
+				new javax.swing.event.ListSelectionListener() {
+					public void valueChanged(
+							javax.swing.event.ListSelectionEvent evt) {
+						PartsTableValueChanged(evt);
+					}
+				});
+		partsTable.addMouseListener(partsMouseAdapter);
+		
+		scrollPartsTable.setName("scrollPartsTable"); // NOI18N
+		scrollPartsTable.setViewportView(partsTable);
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 1;
+		gridBagConstraints.gridwidth = 4;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+		gridBagConstraints.weightx = 1.0;
+		gridBagConstraints.weighty = 1.0;
+		panSupplies.add(scrollPartsTable, gridBagConstraints);
+
+		tabMain.addTab(
+				resourceMap.getString("panSupplies.TabConstraints.tabTitle"),
+				panSupplies); // NOI18N
+
 		
 		panRepairBay.setFont(resourceMap.getFont("panHangar.font")); // NOI18N
 		panRepairBay.setName("panRepairBay"); // NOI18N
@@ -964,140 +993,7 @@ public class MekHQView extends FrameView {
 		tabMain.addTab(
 				resourceMap.getString("panRepairBay.TabConstraints.tabTitle"),
 				panRepairBay); // NOI18N
-
-		panSupplies.setName("panSupplies"); // NOI18N
-
-		jScrollPane8.setName("jScrollPane8"); // NOI18N
-
-		PartsTable.setModel(partsModel);
-		PartsTable.setName("PartsTable"); // NOI18N
-		PartsTable.setRowHeight(60);
-		PartsTable.getColumnModel().getColumn(0)
-				.setCellRenderer(partsModel.getRenderer());
-		PartsTable.getSelectionModel().addListSelectionListener(
-				new javax.swing.event.ListSelectionListener() {
-					public void valueChanged(
-							javax.swing.event.ListSelectionEvent evt) {
-						PartsTableValueChanged(evt);
-					}
-				});
-		PartsTable.addMouseListener(partsMouseAdapter);
-		jScrollPane8.setViewportView(PartsTable);
-
-		jScrollPane1.setName("jScrollPane1"); // NOI18N
-
-		DefaultComboBoxModel partTypesModel = new DefaultComboBoxModel();
-		String[] partTypeLabels = Part.getPartTypeLabels();
-		partTypesModel.addElement("All");
-		for (int i = 0; i < partTypeLabels.length; i++) {
-			partTypesModel.addElement(partTypeLabels[i]);
-		}
-		PartsFilter.setModel(partTypesModel);
-		PartsFilter.setName("PartsFilter"); // NOI18N
-		PartsFilter.setSelectedIndex(0);
-		PartsFilter.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				PartsFilterActionPerformed(evt);
-			}
-		});
-
-		btnSaveParts.setText(resourceMap.getString("btnSaveParts.text")); // NOI18N
-		btnSaveParts.setToolTipText(resourceMap
-				.getString("btnSaveParts.toolTipText")); // NOI18N
-		btnSaveParts.setName("btnSaveParts"); // NOI18N
-		btnSaveParts.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				btnSavePartsActionPerformed(evt);
-			}
-		});
-
-		btnLoadParts.setText(resourceMap.getString("btnLoadParts.text")); // NOI18N
-		btnLoadParts.setToolTipText(resourceMap
-				.getString("btnLoadParts.toolTipText")); // NOI18N
-		btnLoadParts.setName("btnLoadParts"); // NOI18N
-		btnLoadParts.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				btnLoadPartsActionPerformed(evt);
-			}
-		});
-
-		org.jdesktop.layout.GroupLayout panSuppliesLayout = new org.jdesktop.layout.GroupLayout(
-				panSupplies);
-		panSupplies.setLayout(panSuppliesLayout);
-		panSuppliesLayout
-				.setHorizontalGroup(panSuppliesLayout
-						.createParallelGroup(
-								org.jdesktop.layout.GroupLayout.LEADING)
-						.add(panSuppliesLayout
-								.createSequentialGroup()
-								.add(panSuppliesLayout
-										.createParallelGroup(
-												org.jdesktop.layout.GroupLayout.LEADING)
-										.add(panSuppliesLayout
-												.createSequentialGroup()
-												.add(jScrollPane8,
-														org.jdesktop.layout.GroupLayout.PREFERRED_SIZE,
-														428,
-														org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-												.add(132, 132, 132)
-												.add(jScrollPane1,
-														org.jdesktop.layout.GroupLayout.PREFERRED_SIZE,
-														org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
-														org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-										.add(panSuppliesLayout
-												.createSequentialGroup()
-												.add(PartsFilter,
-														org.jdesktop.layout.GroupLayout.PREFERRED_SIZE,
-														162,
-														org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-												.addPreferredGap(
-														org.jdesktop.layout.LayoutStyle.RELATED)
-												.add(btnSaveParts)
-												.addPreferredGap(
-														org.jdesktop.layout.LayoutStyle.RELATED)
-												.add(btnLoadParts)))
-								.addContainerGap(498, Short.MAX_VALUE)));
-		panSuppliesLayout
-				.setVerticalGroup(panSuppliesLayout
-						.createParallelGroup(
-								org.jdesktop.layout.GroupLayout.LEADING)
-						.add(panSuppliesLayout
-								.createSequentialGroup()
-								.add(panSuppliesLayout
-										.createParallelGroup(
-												org.jdesktop.layout.GroupLayout.LEADING)
-										.add(panSuppliesLayout
-												.createSequentialGroup()
-												.add(panSuppliesLayout
-														.createParallelGroup(
-																org.jdesktop.layout.GroupLayout.BASELINE)
-														.add(PartsFilter,
-																org.jdesktop.layout.GroupLayout.PREFERRED_SIZE,
-																20,
-																org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-														.add(btnSaveParts)
-														.add(btnLoadParts))
-												.addPreferredGap(
-														org.jdesktop.layout.LayoutStyle.RELATED)
-												.add(jScrollPane8,
-														org.jdesktop.layout.GroupLayout.PREFERRED_SIZE,
-														573,
-														org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-										.add(panSuppliesLayout
-												.createSequentialGroup()
-												.add(192, 192, 192)
-												.add(jScrollPane1,
-														org.jdesktop.layout.GroupLayout.PREFERRED_SIZE,
-														org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
-														org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-								.addContainerGap(
-										org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
-										Short.MAX_VALUE)));
-
-		tabMain.addTab(
-				resourceMap.getString("panSupplies.TabConstraints.tabTitle"),
-				panSupplies); // NOI18N
-
+	
 		panInfirmary.setName("panInfirmary"); // NOI18N
 		panInfirmary.setLayout(new java.awt.GridBagLayout());
 
@@ -1649,7 +1545,7 @@ public class MekHQView extends FrameView {
 	}
 
 	private void PartsTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
-		int selected = PartsTable.getSelectedRow();
+		int selected = partsTable.getSelectedRow();
 		
 		if ((selected > -1) && (selected < campaign.getParts().size())) {
 			currentPartsId = campaign.getParts().get(selected).getId();
@@ -2075,7 +1971,6 @@ public class MekHQView extends FrameView {
 				}
 			});
 		}
-		
 	}
 	
 	private void PartsFilterActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_PartsFilterActionPerformed
@@ -2380,22 +2275,7 @@ public class MekHQView extends FrameView {
 	}
 
 	protected void refreshPartsList() {
-
-		int partTypeFilter = PartsFilter.getSelectedIndex();
-		ArrayList<PartInventory> partsInventory = null;
-		if (partTypeFilter == 0) {
-			partsInventory = campaign.getPartsInventory();
-		} else {
-			// -1 because "All" is appended at the begining of the list of part
-			// types
-			partsInventory = campaign.getPartsInventory(partTypeFilter - 1);
-		}
-		partsModel.setData(partsInventory);
-
-		int selected = PartsTable.getSelectedRow();
-		if ((selected > -1) && (selected < partsInventory.size())) {
-			PartsTable.setRowSelectionInterval(selected, selected);
-		}
+		partsModel.setData(campaign.getPartsInventory());
 	}
 
 	protected void refreshCalendar() {
@@ -5103,16 +4983,62 @@ public class MekHQView extends FrameView {
 	public class PartsTableModel extends ArrayTableModel {
 		private static final long serialVersionUID = 534443424190075264L;
 
+		private final static int COL_NAME =    0;
+		private final static int COL_COST   =   1;
+        private final static int COL_QUANTITY = 2;
+        private final static int COL_TON    =  3;
+        private final static int COL_STATUS     =   4;
+        private final static int N_COL = 5;
+		
 		public PartsTableModel() {
-			columnNames = new String[] { "Parts" };
 			data = new ArrayList<PartInventory>();
 		}
+		
+		public int getRowCount() {
+            return data.size();
+        }
+
+        public int getColumnCount() {
+            return N_COL;
+        }
+
+        @Override
+        public String getColumnName(int column) {
+            switch(column) {
+            	case COL_NAME:
+            		return "Name";
+                case COL_COST:
+                    return "Cost";
+                case COL_QUANTITY:
+                    return "#";
+                case COL_TON:
+                    return "Tonnage";
+                case COL_STATUS:
+                    return "Status";
+                default:
+                    return "?";
+            }
+        }
 
 		public Object getValueAt(int row, int col) {
 			PartInventory partInventory = (PartInventory) data.get(row);
-			StringBuffer descHTML = new StringBuffer(
-					partInventory.getDescHTML());
-			return descHTML.toString();
+			Part part = partInventory.getPart();
+			if(col == COL_NAME) {
+				return part.getName();
+			}
+			if(col == COL_COST) {
+				return part.getCost();
+			}
+			if(col == COL_QUANTITY) {
+				return partInventory.getQuantity();
+			}
+			if(col == COL_TON) {
+				return part.getTonnage();
+			}
+			if(col == COL_STATUS) {
+				return part.getStatus();
+			}
+			return "?";
 		}
 
 		public Part getPartAt(int row) {
@@ -5127,31 +5053,6 @@ public class MekHQView extends FrameView {
 			}
 			return parts;
 		}
-
-		public PartsTableModel.Renderer getRenderer() {
-			return new PartsTableModel.Renderer();
-		}
-
-		public class Renderer extends PartInfo implements TableCellRenderer {
-			private static final long serialVersionUID = -167722442590291248L;
-
-			public Component getTableCellRendererComponent(JTable table,
-					Object value, boolean isSelected, boolean hasFocus,
-					int row, int column) {
-				Component c = this;
-				setOpaque(true);
-				setText(getValueAt(row, column).toString());
-				// setToolTipText(campaign.getToolTipFor(u));
-				if (isSelected) {
-					select();
-				} else {
-					unselect();
-				}
-				c.setBackground(new Color(220, 220, 220));
-				return c;
-			}
-
-		}
 	}
 
 	public class PartsTableMouseAdapter extends MouseInputAdapter implements
@@ -5159,7 +5060,7 @@ public class MekHQView extends FrameView {
 
 		public void actionPerformed(ActionEvent action) {
 			String command = action.getActionCommand();
-			Part[] parts = partsModel.getPartstAt(PartsTable.getSelectedRows());
+			Part[] parts = partsModel.getPartstAt(partsTable.getSelectedRows());
 			if (command.equalsIgnoreCase("SELL")) {
 				for (Part part : parts) {
 					campaign.sellPart(part);
@@ -5189,7 +5090,7 @@ public class MekHQView extends FrameView {
 		private void maybeShowPopup(MouseEvent e) {
 			JPopupMenu popup = new JPopupMenu();
 			if (e.isPopupTrigger()) {
-				int row = PartsTable.rowAtPoint(e.getPoint());
+				int row = partsTable.rowAtPoint(e.getPoint());
 				Part part = partsModel.getPartAt(row);
 				JMenuItem menuItem = null;
 				JMenu menu = null;
@@ -6193,8 +6094,7 @@ public class MekHQView extends FrameView {
 
 	// Variables declaration - do not modify//GEN-BEGIN:variables
 	private javax.swing.JTable DocTable;
-	private javax.swing.JComboBox PartsFilter;
-	private javax.swing.JTable PartsTable;
+	private javax.swing.JTable partsTable;
 	private javax.swing.JTable patientTable;
 	private javax.swing.JTable TaskTable;
 	private javax.swing.JTable AcquisitionTable;
@@ -6208,16 +6108,12 @@ public class MekHQView extends FrameView {
 	private javax.swing.JButton btnDeployUnits;
 	private javax.swing.JButton btnDoTask;
 	private javax.swing.JToggleButton btnGMMode;
-	private javax.swing.JButton btnLoadParts;
 	private javax.swing.JToggleButton btnOvertime;
 	private javax.swing.JButton btnRetrieveUnits;
-	private javax.swing.JButton btnSaveParts;
-	private javax.swing.JPanel btnUnitPanel;
 	private javax.swing.JLabel fundsLabel;
 	private javax.swing.JLabel jLabel2;
-	private javax.swing.JScrollPane jScrollPane1;
 	private javax.swing.JScrollPane jScrollPane6;
-	private javax.swing.JScrollPane jScrollPane8;
+	private javax.swing.JScrollPane scrollPartsTable;
 	private javax.swing.JLabel lblTarget;
 	private javax.swing.JLabel lblTargetNum;
 	private javax.swing.JPanel mainPanel;
