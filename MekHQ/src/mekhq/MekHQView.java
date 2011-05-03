@@ -433,6 +433,7 @@ public class MekHQView extends FrameView {
 		lblUnitView = new javax.swing.JLabel();
 		scrollUnitView = new javax.swing.JScrollPane();
 		scrollForceView = new javax.swing.JScrollPane();
+		panMap = new InterstellarMapPanel();
 		
 		mainPanel.setAutoscrolls(true);
 		mainPanel.setName("mainPanel"); // NOI18N
@@ -492,6 +493,11 @@ public class MekHQView extends FrameView {
 		tabMain.addTab(
 				resourceMap.getString("panOrganization.TabConstraints.tabTitle"),
 				panOrganization); // NOI18N
+		
+		//panMap.setName("panMap"); // NOI18N
+		//tabMain.addTab(
+		//		resourceMap.getString("panMap.TabConstraints.tabTitle"),
+		//		panMap); // NOI18N
 		
 		panPersonnel.setFont(resourceMap.getFont("panHangar.font")); // NOI18N
 		panPersonnel.setName("panPersonnel"); // NOI18N
@@ -6173,6 +6179,7 @@ public class MekHQView extends FrameView {
 	private javax.swing.JTree orgTree;
     private javax.swing.JSplitPane splitOrg;
 	private javax.swing.JScrollPane scrollForceView;
+	InterstellarMapPanel panMap;
 	// End of variables declaration//GEN-END:variables
 
 	private final Timer messageTimer;
