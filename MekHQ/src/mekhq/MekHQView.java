@@ -46,6 +46,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -123,6 +124,7 @@ import mekhq.campaign.PartInventory;
 import mekhq.campaign.SkillCosts;
 import mekhq.campaign.Unit;
 import mekhq.campaign.Utilities;
+import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.parts.GenericSparePart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
@@ -208,6 +210,7 @@ public class MekHQView extends FrameView {
 	private PersonnelTableModel personModel = new PersonnelTableModel();
 	private UnitTableModel unitModel = new UnitTableModel();
 	private PartsTableModel partsModel = new PartsTableModel();
+	private FinanceTableModel financeModel = new FinanceTableModel();
 	private DefaultTreeModel orgModel;
 	private UnitTableMouseAdapter unitMouseAdapter;
 	private ServicedUnitsTableMouseAdapter servicedUnitMouseAdapter;
@@ -390,7 +393,8 @@ public class MekHQView extends FrameView {
 		scrollDocTable = new javax.swing.JScrollPane();
 		DocTable = new javax.swing.JTable();
 		panFinances = new javax.swing.JPanel();
-		jLabel2 = new javax.swing.JLabel();
+		scrollFinanceTable = new javax.swing.JScrollPane();
+		financeTable = new javax.swing.JTable();
 		txtPaneReportScrollPane = new javax.swing.JScrollPane();
 		txtPaneReport = new javax.swing.JTextPane();
 		panelMasterButtons = new javax.swing.JPanel();
@@ -1078,23 +1082,33 @@ public class MekHQView extends FrameView {
 				panInfirmary); // NOI18N
 
 		panFinances.setName("panFinances"); // NOI18N
+		panFinances.setLayout(new java.awt.GridBagLayout());
 
-		jLabel2.setText(resourceMap.getString("jLabel2.text")); // NOI18N
-		jLabel2.setName("jLabel2"); // NOI18N
-
-		org.jdesktop.layout.GroupLayout panFinancesLayout = new org.jdesktop.layout.GroupLayout(
-				panFinances);
-		panFinances.setLayout(panFinancesLayout);
-		panFinancesLayout.setHorizontalGroup(panFinancesLayout
-				.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-				.add(panFinancesLayout.createSequentialGroup()
-						.addContainerGap().add(jLabel2)
-						.addContainerGap(891, Short.MAX_VALUE)));
-		panFinancesLayout.setVerticalGroup(panFinancesLayout
-				.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-				.add(panFinancesLayout.createSequentialGroup()
-						.addContainerGap().add(jLabel2)
-						.addContainerGap(566, Short.MAX_VALUE)));
+		financeTable.setModel(financeModel);
+		financeTable.setName("financeTable"); // NOI18N
+		financeTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		personnelTable.setColumnModel(personColumnModel);
+//		financeTable.addMouseListener(personnelMouseAdapter);
+		financeTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+		column = null;
+		for (int i = 0; i < FinanceTableModel.N_COL; i++) {
+			column = financeTable.getColumnModel().getColumn(i);
+			column.setPreferredWidth(financeModel.getColumnWidth(i));
+			column.setCellRenderer(financeModel.getRenderer());
+		}
+        financeTable.setIntercellSpacing(new Dimension(0, 0));
+        scrollFinanceTable.setName("scrollFinanceTable");
+        scrollFinanceTable.setViewportView(financeTable);
+        
+        gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 1;
+		gridBagConstraints.gridwidth = 4;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+		gridBagConstraints.weightx = 1.0;
+		gridBagConstraints.weighty = 1.0;
+		panFinances.add(scrollFinanceTable, gridBagConstraints);
 
 		tabMain.addTab(
 				resourceMap.getString("panFinances.TabConstraints.tabTitle"),
@@ -1448,6 +1462,7 @@ public class MekHQView extends FrameView {
 		refreshPartsList();
 		refreshReport();
 		refreshFunds();
+		refreshFinancialTransactions();
 	}// GEN-LAST:event_btnDoTaskActionPerformed
 
 	private void TechTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
@@ -1573,6 +1588,7 @@ public class MekHQView extends FrameView {
 		refreshCalendar();
 		refreshReport();
 		refreshFunds();
+		refreshFinancialTransactions();
 	}// GEN-LAST:event_btnAdvanceDayActionPerformed
 
 	private void btnDeployUnitsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnDeployUnitsActionPerformed
@@ -1743,6 +1759,7 @@ public class MekHQView extends FrameView {
 		refreshCalendar();
 		refreshReport();
 		refreshFunds();
+		refreshFinancialTransactions();
 		refreshOrganization();
 
 		// Without this, the report scrollbar doesn't seem to load properly
@@ -1788,6 +1805,7 @@ public class MekHQView extends FrameView {
 		refreshCalendar();
 		refreshReport();
 		refreshFunds();
+		refreshFinancialTransactions();
 
 		// Without this, the report scrollbar doesn't seem to load properly
 		// after loading a campaign
@@ -1917,6 +1935,7 @@ public class MekHQView extends FrameView {
 		refreshPersonnelList();
 		refreshReport();
 		refreshFunds();
+		refreshFinancialTransactions();
 	}// GEN-LAST:event_miPurchaseUnitActionPerformed
 
 	private void refreshPersonnelView() {
@@ -1991,6 +2010,7 @@ public class MekHQView extends FrameView {
 		campaign.addFunds(funds);
 		refreshReport();
 		refreshFunds();
+		refreshFinancialTransactions();
 	}// GEN-LAST:event_addFundsActionPerformed
 
 	private void btnSavePartsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnSavePartsActionPerformed
@@ -2283,6 +2303,10 @@ public class MekHQView extends FrameView {
 
 	protected void refreshPartsList() {
 		partsModel.setData(campaign.getPartsInventory());
+	}
+	
+	protected void refreshFinancialTransactions() {
+		financeModel.setData(campaign.getFinances().getAllTransactions());
 	}
 
 	protected void refreshCalendar() {
@@ -5088,6 +5112,7 @@ public class MekHQView extends FrameView {
 				refreshPartsList();
 				refreshReport();
 				refreshFunds();
+				refreshFinancialTransactions();
 			} else if (command.equalsIgnoreCase("REMOVE")) {
 				for (Part part : parts) {
 					campaign.removePart(part);
@@ -5134,6 +5159,153 @@ public class MekHQView extends FrameView {
 				popup.add(menu);
 				popup.show(e.getComponent(), e.getX(), e.getY());
 			}
+		}
+	}
+	
+	/**
+	 * A table model for displaying financial transactions (i.e. a ledger)
+	 */
+	public class FinanceTableModel extends AbstractTableModel {
+		private static final long serialVersionUID = 534443424190075264L;
+
+		private final static int COL_DATE    =    0;
+		private final static int COL_CATEGORY =   1;
+        private final static int COL_DESC       = 2;
+        private final static int COL_DEBIT     =  3;
+        private final static int COL_CREDIT   =   4;
+        private final static int N_COL          = 5;
+		
+        private ArrayList<Transaction> data = new ArrayList<Transaction>();
+		
+		public int getRowCount() {
+            return data.size();
+        }
+
+        public int getColumnCount() {
+            return N_COL;
+        }
+
+        @Override
+        public String getColumnName(int column) {
+            switch(column) {
+            	case COL_DATE:
+            		return "Date";
+                case COL_CATEGORY:
+                    return "Category";
+                case COL_DESC:
+                    return "Notes";
+                case COL_DEBIT:
+                    return "Debit";
+                case COL_CREDIT:
+                    return "Credit";
+                default:
+                    return "?";
+            }
+        }
+
+		public Object getValueAt(int row, int col) {
+			Transaction transaction = data.get(row);
+			long amount = transaction.getAmount();
+			DecimalFormat formatter = new DecimalFormat();
+			if(col == COL_CATEGORY) {
+				return transaction.getCategoryName();
+			}
+			if(col == COL_DESC) {
+				return transaction.getDescription();
+			}
+			if(col == COL_DEBIT) {
+				if(amount < 0) {
+					return formatter.format(-1 * amount);
+				} else {
+					return "";
+				}	
+			}
+			if(col == COL_CREDIT) {
+				if(amount > 0) {
+					return formatter.format(amount);
+				} else {
+					return "";
+				}
+			}
+			if(col == COL_DATE) {
+				SimpleDateFormat shortDateFormat = new SimpleDateFormat("MM/dd/yyyy");
+				return shortDateFormat.format(transaction.getDate());
+			}
+			return "?";
+		}
+		
+		public int getColumnWidth(int c) {
+            switch(c) {
+            case COL_DESC:
+                return 150;
+            case COL_CATEGORY:
+                return 100;
+            default:
+                return 50;
+            }
+        }
+        
+        public int getAlignment(int col) {
+            switch(col) {
+            case COL_DEBIT:
+            case COL_CREDIT:
+            	return SwingConstants.RIGHT;
+            default:
+            	return SwingConstants.LEFT;
+            }
+        }
+		
+		@Override
+        public Class<?> getColumnClass(int c) {
+            return getValueAt(0, c).getClass();
+        }
+
+        @Override
+        public boolean isCellEditable(int row, int col) {
+            return false;
+        }
+
+        //fill table with values
+        public void setData(ArrayList<Transaction> transactions) {
+            data = transactions;
+            fireTableDataChanged();
+        }
+
+		public Transaction getTransaction(int row) {
+			return data.get(row);
+		}
+		
+		public FinanceTableModel.Renderer getRenderer() {
+			return new FinanceTableModel.Renderer();
+		}
+
+		public class Renderer extends DefaultTableCellRenderer {
+
+			private static final long serialVersionUID = 9054581142945717303L;
+
+			public Component getTableCellRendererComponent(JTable table,
+					Object value, boolean isSelected, boolean hasFocus,
+					int row, int column) {
+				super.getTableCellRendererComponent(table, value, isSelected,
+						hasFocus, row, column);
+				setOpaque(true);
+				setHorizontalAlignment(getAlignment(column));
+				
+				setForeground(Color.BLACK);
+				if (isSelected) {
+                    setBackground(Color.DARK_GRAY);
+                    setForeground(Color.WHITE);
+                } else {
+                    // tiger stripes
+                	if (row % 2 == 1) {
+                        setBackground(Color.LIGHT_GRAY);
+                	} else {
+                        setBackground(Color.WHITE);
+                    }
+                }
+				return this;
+			}
+
 		}
 	}
 	
@@ -5456,6 +5628,7 @@ public class MekHQView extends FrameView {
 				refreshOrganization();
 				refreshReport();
 				refreshFunds();
+				refreshFinancialTransactions();
 			} else if (command.equalsIgnoreCase("LOSS")) {
 				for (Unit unit : units) {
 					if (0 == JOptionPane.showConfirmDialog(null,
@@ -6122,6 +6295,7 @@ public class MekHQView extends FrameView {
 	private javax.swing.JTable servicedUnitTable;
 	private javax.swing.JTable unitTable;
 	private javax.swing.JTable personnelTable;
+	private javax.swing.JTable financeTable;
 	private javax.swing.JMenuItem addFunds;
 	private javax.swing.JButton btnAdvanceDay;
 	private javax.swing.JButton btnAssignDoc;
@@ -6131,7 +6305,6 @@ public class MekHQView extends FrameView {
 	private javax.swing.JToggleButton btnOvertime;
 	private javax.swing.JButton btnRetrieveUnits;
 	private javax.swing.JLabel fundsLabel;
-	private javax.swing.JLabel jLabel2;
 	private javax.swing.JScrollPane jScrollPane6;
 	private javax.swing.JScrollPane scrollPartsTable;
 	private javax.swing.JLabel lblTarget;
@@ -6169,6 +6342,7 @@ public class MekHQView extends FrameView {
 	private javax.swing.JScrollPane scrollServicedUnitTable;
 	private javax.swing.JScrollPane scrollPersonnelTable;
 	private javax.swing.JScrollPane scrollUnitTable;
+	private javax.swing.JScrollPane scrollFinanceTable;
 	private javax.swing.JLabel statusAnimationLabel;
 	private javax.swing.JLabel statusMessageLabel;
 	private javax.swing.JPanel statusPanel;

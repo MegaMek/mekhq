@@ -64,6 +64,7 @@ import megamek.common.Player;
 import megamek.common.Protomech;
 import megamek.common.Tank;
 import mekhq.campaign.finances.Finances;
+import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.parts.EquipmentPart;
 import mekhq.campaign.parts.GenericSparePart;
 import mekhq.campaign.parts.Part;
@@ -215,10 +216,6 @@ public class Campaign implements Serializable {
 	
 	public long getFunds() {
 		return finances.getBalance();
-	}
-
-	public void setFunds(long funds) {
-		finances.credit(funds, "Rich Uncle Dies", calendar);
 	}
 	
 	public Force getForces() {
@@ -845,26 +842,22 @@ public class Campaign implements Serializable {
 				addReport(p.getDesc() + " heals naturally!");
 			}
 		}
+		//check for a new year
+		if(calendar.get(Calendar.MONTH) == 0 && calendar.get(Calendar.DAY_OF_MONTH) == 1) {
+			//clear the ledger
+			finances.newFiscalYear(calendar.getTime());
+		}
 		if(calendar.get(Calendar.DAY_OF_MONTH) == 1) {
 			//Payday!
 			DecimalFormat formatter = new DecimalFormat();
 			if(campaignOptions.payForSalaries()) {
-				finances.debit(getPayRoll(), "Monthly salaries", calendar);
+				finances.debit(getPayRoll(), Transaction.C_SALARY, "Monthly salaries", calendar.getTime());
 				addReport("Payday! Your account has been debited for " + formatter.format(getPayRoll()) + " C-bills in personnel salaries");
 			}
 			if(campaignOptions.payForOverhead()) {
-				finances.debit(getOverheadExpenses(), "Monthly overhead", calendar);
+				finances.debit(getOverheadExpenses(), Transaction.C_OVERHEAD, "Monthly overhead", calendar.getTime());
 				addReport("Your account has been debited for " + formatter.format(getOverheadExpenses()) + " C-bills in overhead expenses");
 
-			}
-		}
-	}
-	
-	public void payDay() {
-		long salaries = 0;
-		for(Person p : personnel) {
-			if(p.isActive()) {
-				salaries += p.getSalary();
 			}
 		}
 	}
@@ -1209,7 +1202,7 @@ public class Campaign implements Serializable {
 	}
 
 	public void addFunds(long quantity) {
-		finances.credit(quantity, "Rich Uncle", calendar);
+		finances.credit(quantity, Transaction.C_MISC, "Rich Uncle", calendar.getTime());
 		NumberFormat numberFormat = DecimalFormat.getIntegerInstance();
 		String quantityString = numberFormat.format(quantity);
 		addReport("Funds added : " + quantityString);
@@ -1224,7 +1217,9 @@ public class Campaign implements Serializable {
 
 		if (hasEnoughFunds(cost) || !campaignOptions.payForUnits()) {
 			addUnit(en, allowNewPilots);
-			addFunds(-cost);
+			if(campaignOptions.payForUnits()) {
+				finances.debit(cost, Transaction.C_UNIT, "Purchased " + en.getDisplayName(), calendar.getTime());
+			}
 			return true;
 		} else
 			return false;
@@ -1233,20 +1228,19 @@ public class Campaign implements Serializable {
 	public void sellUnit(int id) {
 		Unit unit = getUnit(id);
 		int sellValue = unit.getSellValue();
-
-		addFunds(sellValue);
+		finances.credit(sellValue, Transaction.C_UNIT_SALE, "Sale of " + unit.getEntity().getDisplayName(), calendar.getTime());
 		removeUnit(id);
 	}
 
 	public void sellPart(Part part) {
 		long cost = part.getCost();
-		addFunds(cost / 2);
+		finances.credit(cost, Transaction.C_EQUIP_SALE, "Sale of " + part.getName(), calendar.getTime());
 		removePart(part);
 	}
 
 	public void buyPart(Part part) {
 		long cost = part.getCost();
-		addFunds(-cost);
+		finances.debit(cost, Transaction.C_EQUIP, "Sale of " + part.getName(), calendar.getTime());
 		addPart(part);
 	}
 
@@ -2045,6 +2039,10 @@ public class Campaign implements Serializable {
 			allForces.add(forceIds.get(x));
 		}
 		return allForces;
+	}
+	
+	public Finances getFinances() {
+		return finances;
 	}
 	
 }

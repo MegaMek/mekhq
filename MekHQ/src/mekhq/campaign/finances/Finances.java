@@ -22,6 +22,7 @@ package mekhq.campaign.finances;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.GregorianCalendar;
 
 /**
@@ -49,11 +50,31 @@ public class Finances implements Serializable {
 		return balance;
 	}
 	
-	public void debit(long amount, String reason, GregorianCalendar date) {
-		transactions.add(new Transaction(-1 * amount, reason, date));
+	public void debit(long amount, int category, String reason, Date date) {
+		transactions.add(new Transaction(-1 * amount, category, reason, date));
 	}
 	
-	public void credit(long amount, String reason, GregorianCalendar date) {
-		transactions.add(new Transaction(amount, reason, date));
+	public void credit(long amount, int category, String reason, Date date) {
+		transactions.add(new Transaction(amount, category, reason, date));
+	}
+	
+	/**
+	 * This function will update the starting amount to the current balance
+	 * and clear transactions
+	 * By default, this will be called up on Jan 1 of every year in order to keep
+	 * the transaction record from becoming too large
+	 */
+	public void newFiscalYear(Date date) {
+		long carryover = getBalance();
+		transactions = new ArrayList<Transaction>();
+		if(carryover < 0) {
+			debit(carryover, Transaction.C_START, "Carryover from previous year", date);
+		} else if(carryover > 0) {
+			credit(carryover, Transaction.C_START, "Carryover from previous year", date);
+		}
+	}
+	
+	public ArrayList<Transaction> getAllTransactions() {
+		return transactions;
 	}
 }
