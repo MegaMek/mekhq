@@ -65,7 +65,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         setCamoIcon();
         
         // Rules panel
-        chkUseFinances.setSelected(options.useFinances());
         useFactionModifiersCheckBox.setSelected(options.useFactionModifiers());
         clanPriceModifierJFormattedTextField.setValue(options.getClanPriceModifier());
         useEasierRefitCheckBox.setSelected(options.useEasierRefit());
@@ -632,7 +631,6 @@ private void btnOkayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
     campaign.setColorIndex(colorIndex);
     
     // Rules panel
-    options.setFinances(chkUseFinances.isSelected());
     options.setFactionModifiers(useFactionModifiersCheckBox.isSelected());
     String clanPriceModifierString = clanPriceModifierJFormattedTextField.getText();
     options.setClanPriceModifier(new Double(clanPriceModifierString));

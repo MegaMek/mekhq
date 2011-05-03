@@ -340,14 +340,17 @@ public abstract class SupportTeam implements Serializable, MekHqXmlSerializable 
            return new TargetRoll(TargetRoll.IMPOSSIBLE, "Not enough spare parts");
        }
        // check funds
-       if (task instanceof ReplacementItem
+       if (campaign.getCampaignOptions().payForParts()
+    		   && task instanceof ReplacementItem
                && !((ReplacementItem) task).hasPart()
                && !campaign.hasEnoughFunds(((ReplacementItem) task).partNeeded().getCost())) {
            return new TargetRoll(TargetRoll.IMPOSSIBLE, "Not enough funds");
-       } else if (task instanceof ReloadItem
+       } else if (campaign.getCampaignOptions().payForParts()
+    		   && task instanceof ReloadItem
                && !campaign.hasEnoughFunds(((ReloadItem) task).getCost())) {
            return new TargetRoll(TargetRoll.IMPOSSIBLE, "Not enough funds");
-       } else if (task instanceof FullRepairWarchest
+       } else if (campaign.getCampaignOptions().payForParts()
+    		   && task instanceof FullRepairWarchest
                && !campaign.hasEnoughFunds(((FullRepairWarchest) task).getCost())) {
            return new TargetRoll(TargetRoll.IMPOSSIBLE, "Not enough funds");
        }

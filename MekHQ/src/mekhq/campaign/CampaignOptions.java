@@ -44,7 +44,6 @@ public class CampaignOptions implements Serializable {
     private boolean useFactionModifiers;
     private double clanPriceModifier;
     private boolean useEasierRefit;
-    private boolean useFinances;
     private boolean useFactionForNames;
     private int repairSystem;
     
@@ -59,12 +58,17 @@ public class CampaignOptions implements Serializable {
     
     //unit related
     private boolean useQuirks;
+    
+    //finance related
+    private boolean payForParts;
+    private boolean payForUnits;
+    private boolean payForSalaries;
+    private boolean payForOverhead;
 
     public CampaignOptions () {
         useFactionModifiers = false;
         clanPriceModifier = 1.0;
         useEasierRefit = false;
-        useFinances = false;
         useFactionForNames = true;
         repairSystem = REPAIR_SYSTEM_STRATOPS;    
         useTactics = false;
@@ -75,6 +79,10 @@ public class CampaignOptions implements Serializable {
         useEdge = false;
         useImplants = false;
         useQuirks = false;
+        payForParts = false;
+        payForUnits = false;
+        payForSalaries = false;
+        payForOverhead = false;
     }
 
     public static String getRepairSystemName (int repairSystem) {
@@ -111,14 +119,6 @@ public class CampaignOptions implements Serializable {
     
     public void setRepairSystem(int i) {
         this.repairSystem = i;
-    }
-    
-    public boolean useFinances() {
-        return useFinances;
-    }
-    
-    public void setFinances(boolean b) {
-        this.useFinances = b;
     }
     
     public boolean useFactionForNames() {
@@ -185,6 +185,38 @@ public class CampaignOptions implements Serializable {
     	this.useImplants = b;
     }
     
+    public boolean payForParts() {
+    	return payForParts;
+    }
+    
+    public void setPayForParts(boolean b) {
+    	this.payForParts = b;
+    }
+    
+    public boolean payForUnits() {
+    	return payForUnits;
+    }
+    
+    public void setPayForUnits(boolean b) {
+    	this.payForUnits = b;
+    }
+    
+    public boolean payForSalaries() {
+    	return payForSalaries;
+    }
+    
+    public void setPayForSalaries(boolean b) {
+    	this.payForSalaries = b;
+    }
+    
+    public boolean payForOverhead() {
+    	return payForOverhead;
+    }
+    
+    public void setPayForOverhead(boolean b) {
+    	this.payForOverhead = b;
+    }
+    
     public boolean useQuirks() {
     	return useQuirks;
     }
@@ -198,7 +230,6 @@ public class CampaignOptions implements Serializable {
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useFactionModifiers", useFactionModifiers); //private boolean useFactionModifiers;
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "clanPriceModifier", clanPriceModifier); //private double clanPriceModifier;
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useEasierRefit", useEasierRefit); //private boolean useEasierRefit;
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useFinances", useFinances); //private boolean useFinances;
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useFactionForNames", useFactionForNames); //private boolean useFinances;
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "repairSystem", repairSystem); //private int repairSystem;
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useTactics", useTactics);
@@ -209,6 +240,10 @@ public class CampaignOptions implements Serializable {
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useEdge", useEdge);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useImplants", useImplants);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useQuirks", useQuirks);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "payForParts", payForParts);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "payForUnits", payForUnits);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "payForSalaries", payForSalaries);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "payForOverhead", payForOverhead);
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "</campaignOptions>");
 	}
 
@@ -243,11 +278,6 @@ public class CampaignOptions implements Serializable {
 					retVal.useEasierRefit = true;
 				else
 					retVal.useEasierRefit = false;
-			} else if (wn2.getNodeName().equalsIgnoreCase("useFinances")) {
-				if (wn2.getTextContent().equalsIgnoreCase("true"))
-					retVal.useFinances = true;
-				else
-					retVal.useFinances = false;
 			} else if (wn2.getNodeName().equalsIgnoreCase("useFactionForNames")) {
 				if (wn2.getTextContent().equalsIgnoreCase("true"))
 					retVal.useFactionForNames = true;
@@ -295,7 +325,27 @@ public class CampaignOptions implements Serializable {
 					retVal.useQuirks = true;
 				else
 					retVal.useQuirks = false;
-			}
+			} else if (wn2.getNodeName().equalsIgnoreCase("payForParts")) {
+				if (wn2.getTextContent().equalsIgnoreCase("true"))
+					retVal.payForParts = true;
+				else
+					retVal.payForParts = false;
+			} else if (wn2.getNodeName().equalsIgnoreCase("payForUnits")) {
+				if (wn2.getTextContent().equalsIgnoreCase("true"))
+					retVal.payForUnits = true;
+				else
+					retVal.payForUnits = false;
+			} else if (wn2.getNodeName().equalsIgnoreCase("payForSalaries")) {
+				if (wn2.getTextContent().equalsIgnoreCase("true"))
+					retVal.payForSalaries = true;
+				else
+					retVal.payForSalaries = false;
+			} else if (wn2.getNodeName().equalsIgnoreCase("payForOverhead")) {
+				if (wn2.getTextContent().equalsIgnoreCase("true"))
+					retVal.payForOverhead = true;
+				else
+					retVal.payForOverhead = false;
+			} 
 		}
 
 		MekHQApp.logMessage("Load Campaign Options Complete!", 4);

@@ -1173,23 +1173,20 @@ public class Campaign implements Serializable {
 	}
 
 	public void addFunds(long quantity) {
-		if (!getCampaignOptions().useFinances()) {
-			return;
-		}
-		setFunds(getFunds() + quantity);
+		finances.credit(quantity, "Rich Uncle", calendar);
 		NumberFormat numberFormat = DecimalFormat.getIntegerInstance();
 		String quantityString = numberFormat.format(quantity);
 		addReport("Funds added : " + quantityString);
 	}
 
 	public boolean hasEnoughFunds(long cost) {
-		return getFunds() >= cost || !getCampaignOptions().useFinances();
+		return getFunds() >= cost;
 	}
-
+	
 	public boolean buyUnit(Entity en, boolean allowNewPilots) {
 		int cost = new Unit(en, this).getBuyCost();
 
-		if (hasEnoughFunds(cost)) {
+		if (hasEnoughFunds(cost) || !campaignOptions.payForUnits()) {
 			addUnit(en, allowNewPilots);
 			addFunds(-cost);
 			return true;
