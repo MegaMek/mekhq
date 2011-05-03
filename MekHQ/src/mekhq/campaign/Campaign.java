@@ -63,6 +63,7 @@ import megamek.common.Pilot;
 import megamek.common.Player;
 import megamek.common.Protomech;
 import megamek.common.Tank;
+import mekhq.campaign.finances.Finances;
 import mekhq.campaign.parts.EquipmentPart;
 import mekhq.campaign.parts.GenericSparePart;
 import mekhq.campaign.parts.Part;
@@ -145,7 +146,7 @@ public class Campaign implements Serializable {
 	private String camoFileName = null;
 	private int colorIndex = 0;
 
-	private long funds;
+	private Finances finances;
 
 	private CampaignOptions campaignOptions = new CampaignOptions();
 
@@ -167,6 +168,7 @@ public class Campaign implements Serializable {
 		forces = new Force(name);
 		forceIds.put(new Integer(lastForceId), forces);
 		lastForceId++;
+		finances = new Finances();
 	}
 
 	public String getName() {
@@ -212,11 +214,11 @@ public class Campaign implements Serializable {
 	}
 	
 	public long getFunds() {
-		return funds;
+		return finances.getBalance();
 	}
 
 	public void setFunds(long funds) {
-		this.funds = funds;
+		finances.credit(funds, "Rich Uncle Dies", calendar);
 	}
 	
 	public Force getForces() {
@@ -1259,7 +1261,6 @@ public class Campaign implements Serializable {
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "name", name);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "faction", faction);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "ranks", ranks.getRankSystem());
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "funds", funds);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "nameGen", rng.getChosenFaction());
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "percentFemale", rng.getPercentFemale());
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "overtime", overtime);
@@ -1863,8 +1864,6 @@ public class Campaign implements Serializable {
 							.trim());
 				} else if (xn.equalsIgnoreCase("ranks")) {
 					retVal.ranks = new Ranks(Integer.parseInt(wn.getTextContent().trim()));
-				} else if (xn.equalsIgnoreCase("funds")) {
-					retVal.funds = Long.parseLong(wn.getTextContent().trim());
 				} else if (xn.equalsIgnoreCase("gmMode")) {
 					if (wn.getTextContent().trim().equals("true"))
 						retVal.gmMode = true;
