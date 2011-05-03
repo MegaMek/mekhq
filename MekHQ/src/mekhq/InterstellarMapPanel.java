@@ -8,6 +8,10 @@ package mekhq;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.util.ArrayList;
+
+import mekhq.campaign.Faction;
+import mekhq.campaign.Planet;
 
 
 /**
@@ -22,8 +26,10 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
 	 */
 	private static final long serialVersionUID = -1110105822399704646L;
 
-	public InterstellarMapPanel() {
-		
+	private ArrayList<Planet> planets;
+	
+	public InterstellarMapPanel(ArrayList<Planet> p) {
+		planets = p;
 	}
 	
 	/**
@@ -43,7 +49,7 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
     }
 
     private int map2scrY(double y) {
-        return (int) Math.round(getHeight() / 2 - y);
+        return (int) Math.round(getHeight() / 2 + y);
     }
 
 	
@@ -51,12 +57,10 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
 		g.setColor(Color.BLACK);
 		g.fillRect(0, 0, getWidth(), getHeight());
 		
-		//lets test draw a single planet
-		g.setColor(Color.YELLOW);
-		g.fillArc(map2scrX(10), map2scrY(10), 5, 5, 0, 360);
-		
-		g.setColor(Color.WHITE);
-		g.fillArc(map2scrX(0), map2scrY(0), 5, 5, 0, 360);
+		for(Planet planet : planets) {
+			g.setColor(Faction.getFactionColor(planet.getFaction()));
+			g.fillArc(map2scrX(planet.getX()), map2scrY(planet.getY()), 5, 5, 0, 360);		
+		}
 	}
 	
 }

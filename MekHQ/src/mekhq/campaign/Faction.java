@@ -21,6 +21,8 @@
 
 package mekhq.campaign;
 
+import java.awt.Color;
+
 /**
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
@@ -123,7 +125,39 @@ public class Faction {
         case F_RWR:
         default:
             return "General";
+        }
     }
+    
+    public static Color getFactionColor(int faction) {
+        switch(faction) {
+        
+        case F_CAPCON:
+            return Color.GREEN;
+        case F_DRAC:
+            return Color.RED;
+        case F_FEDSUN:
+            return Color.YELLOW;
+        case F_FWL:
+            return Color.PINK;
+        case F_LYRAN:
+            return Color.BLUE;
+        case F_CLAN:
+            return Color.CYAN;
+        case F_FRR:    
+        case F_MERC:
+        case F_COMSTAR:
+        case F_WOB:
+        case F_CANOPUS:
+        case F_OA:
+        case F_TC:
+        case F_PERIPHERY:
+        case F_CHAOS:
+        case F_TERRAN:
+        case F_RWR:
+        default:
+            return Color.WHITE;
+        }
     }
+
     
 }

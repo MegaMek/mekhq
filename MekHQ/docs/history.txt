@@ -69,6 +69,9 @@ v0.1.5 (SVN)
 + financial balance sheet in Finance tab
 + added Finances to XML load and save 
 + pay for maintenance, sell units for money, and sell parts for money options added
++ Planet object
++ read in planet.xml data (from MekWars) for InterstellarMap
++ color coding of InterstellarMap by faction
 
 v0.1.4 (2011-04-28)
 + Bug: personnel options not updating in CampaignOptionsDialog

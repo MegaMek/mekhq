@@ -148,6 +148,8 @@ public class Campaign implements Serializable {
 	private int colorIndex = 0;
 
 	private Finances finances;
+	
+	private transient ArrayList<Planet> planets = new ArrayList<Planet>();
 
 	private CampaignOptions campaignOptions = new CampaignOptions();
 
@@ -170,6 +172,15 @@ public class Campaign implements Serializable {
 		forceIds.put(new Integer(lastForceId), forces);
 		lastForceId++;
 		finances = new Finances();
+		try {
+			planets = generatePlanets();
+		} catch (DOMException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public String getName() {
@@ -1964,6 +1975,58 @@ public class Campaign implements Serializable {
 			}
 		}
 	}
+	
+	public static ArrayList<Planet> generatePlanets()
+		throws DOMException, ParseException {
+		MekHQApp.logMessage("Starting load of planetary data from XML...");
+		// Initialize variables.
+		ArrayList<Planet> retVal = new ArrayList<Planet>();
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		Document xmlDoc = null;
+
+		
+		try {
+			FileInputStream fis = new FileInputStream("data/planets.xml");
+			// Using factory get an instance of document builder
+			DocumentBuilder db = dbf.newDocumentBuilder();
+
+			// Parse using builder to get DOM representation of the XML file
+			xmlDoc = db.parse(fis);
+		} catch (Exception ex) {
+			MekHQApp.logError(ex);
+		}
+
+		Element planetEle = xmlDoc.getDocumentElement();
+		NodeList nl = planetEle.getChildNodes();
+
+		// Get rid of empty text nodes and adjacent text nodes...
+		// Stupid weird parsing of XML.  At least this cleans it up.
+		planetEle.normalize(); 
+
+		// Okay, lets iterate through the children, eh?
+		for (int x = 0; x < nl.getLength(); x++) {
+			Node wn = nl.item(x);
+
+			if (wn.getParentNode() != planetEle)
+				continue;
+
+			int xc = wn.getNodeType();
+
+			if (xc == Node.ELEMENT_NODE) {
+				// This is what we really care about.
+				// All the meat of our document is in this node type, at this
+				// level.
+				// Okay, so what element is it?
+				String xn = wn.getNodeName();
+
+				if (xn.equalsIgnoreCase("planet")) {
+					retVal.add(Planet.getPlanetFromXML(wn));
+				}
+			}
+		}	
+		MekHQApp.logMessage("Loaded a total of " + retVal.size() + " planets");
+		return retVal;
+	}
 
 	public ArrayList<WorkItem> getAcquisitionsForUnit(int unitId) {
 		ArrayList<WorkItem> acquire = new ArrayList<WorkItem>();
@@ -1973,6 +2036,10 @@ public class Campaign implements Serializable {
 			}
 		}
 		return acquire;
+	}
+	
+	public ArrayList<Planet> getPlanets() {
+		return planets;
 	}
 	
 	/**
