@@ -1351,6 +1351,8 @@ public class Campaign implements Serializable {
 		forces.writeToXml(pw1, 2);
 		pw1.println("\t</forces>");
 
+		finances.writeToXml(pw1,1);
+		
 		// Okay, we're done.
 		// Close everything out and be done with it.
 		pw1.println("</campaign>");
@@ -1465,7 +1467,10 @@ public class Campaign implements Serializable {
 					processUnitNodes(retVal, wn);
 				} else if (xn.equalsIgnoreCase("forces")) {
 					processForces(retVal, wn);
+				} else if (xn.equalsIgnoreCase("finances")) {
+					processFinances(retVal, wn);
 				}
+				
 			} else {
 				// If it's a text node or attribute or whatever at this level,
 				// it's probably white-space.
@@ -1613,6 +1618,13 @@ public class Campaign implements Serializable {
 		return retVal;
 	}
 
+	private static void processFinances(Campaign retVal, Node wn) {
+		MekHQApp.logMessage("Loading Finances from XML...", 4);
+		retVal.finances = Finances.generateInstanceFromXML(wn);
+		MekHQApp.logMessage("Load of Finances complete!");
+	}
+
+	
 	private static void processForces(Campaign retVal, Node wn) {
 		MekHQApp.logMessage("Loading Force Organization from XML...", 4);
 

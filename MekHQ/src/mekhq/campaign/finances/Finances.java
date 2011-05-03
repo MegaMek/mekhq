@@ -20,10 +20,20 @@
 
 package mekhq.campaign.finances;
 
+import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
+
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import mekhq.MekHQApp;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.Force;
+import mekhq.campaign.MekHqXmlUtil;
 
 /**
  *
@@ -76,5 +86,26 @@ public class Finances implements Serializable {
 	
 	public ArrayList<Transaction> getAllTransactions() {
 		return transactions;
+	}
+	
+	public void writeToXml(PrintWriter pw1, int indent) {
+		pw1.println(MekHqXmlUtil.indentStr(indent) + "<finances>");
+		for(Transaction trans : transactions) {
+			trans.writeToXml(pw1, indent+1);
+		}
+		pw1.println(MekHqXmlUtil.indentStr(indent) + "</finances>");
+	}
+	
+	public static Finances generateInstanceFromXML(Node wn) {
+		Finances retVal = new Finances();
+		NodeList nl = wn.getChildNodes();
+		for (int x=0; x<nl.getLength(); x++) {
+			Node wn2 = nl.item(x);
+			 if (wn2.getNodeName().equalsIgnoreCase("transaction")) {
+				 retVal.transactions.add(Transaction.generateInstanceFromXML(wn2));
+			 }
+		}
+		
+		return retVal;
 	}
 }

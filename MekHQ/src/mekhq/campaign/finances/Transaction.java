@@ -21,9 +21,18 @@
 
 package mekhq.campaign.finances;
 
+import java.io.PrintWriter;
 import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
+
+import org.w3c.dom.DOMException;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import mekhq.campaign.MekHqXmlUtil;
 
 /**
  *
@@ -74,6 +83,10 @@ public class Transaction implements Serializable {
 	private Date date;
 	private int category;
 	
+	public Transaction() {
+		this(-1,-1,"",null);
+	}
+	
 	public Transaction(long a, int c, String d, Date dt) {
 		amount = a;
 		category = c;
@@ -111,5 +124,55 @@ public class Transaction implements Serializable {
 	
 	public Date getDate() {
 		return date;
+	}
+	
+	protected void writeToXml(PrintWriter pw1, int indent) {
+		pw1.println(MekHqXmlUtil.indentStr(indent) + "<transaction>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<amount>"
+				+amount
+				+"</amount>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<description>"
+				+description
+				+"</description>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<category>"
+				+category
+				+"</category>");
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<date>"
+				+df.format(date)
+				+"</date>");
+		pw1.println(MekHqXmlUtil.indentStr(indent) + "</transaction>");
+	}
+
+	public static Transaction generateInstanceFromXML(Node wn) {
+		Transaction retVal = new Transaction();
+		
+		NodeList nl = wn.getChildNodes();
+		for (int x=0; x<nl.getLength(); x++) {
+			Node wn2 = nl.item(x);
+			if (wn2.getNodeName().equalsIgnoreCase("amount")) {
+				retVal.amount = Long.parseLong(wn2.getTextContent().trim());
+			} else if (wn2.getNodeName().equalsIgnoreCase("category")) {
+				retVal.category = Integer.parseInt(wn2.getTextContent().trim());
+			} else if (wn2.getNodeName().equalsIgnoreCase("description")) {
+				retVal.description = wn2.getTextContent();
+			} else if (wn2.getNodeName().equalsIgnoreCase("date")) {
+				SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+				try {
+					retVal.date = df.parse(wn2.getTextContent().trim());
+				} catch (DOMException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		return retVal;
 	}
 }
