@@ -2565,6 +2565,7 @@ public class MekHQView extends FrameView {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TECH), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_WEIGHT), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_COST), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_MAINTAIN), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_QUALITY), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_STATUS), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_PILOT), true);
@@ -2581,6 +2582,7 @@ public class MekHQView extends FrameView {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TECH), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_WEIGHT), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_COST), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_MAINTAIN), campaign.getCampaignOptions().payForMaintain());
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_QUALITY), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_STATUS), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_PILOT), false);
@@ -2597,6 +2599,7 @@ public class MekHQView extends FrameView {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TECH), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_WEIGHT), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_COST), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_MAINTAIN), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_QUALITY), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_STATUS), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_PILOT), false);
@@ -5142,10 +5145,12 @@ public class MekHQView extends FrameView {
 				JCheckBoxMenuItem cbMenuItem = null;
 				// **lets fill the pop up menu**//
 				// sell part
-				menuItem = new JMenuItem("Sell Part");
-				menuItem.setActionCommand("SELL");
-				menuItem.addActionListener(this);
-				popup.add(menuItem);
+				if(campaign.getCampaignOptions().canSellParts()) {
+					menuItem = new JMenuItem("Sell Part");
+					menuItem.setActionCommand("SELL");
+					menuItem.addActionListener(this);
+					popup.add(menuItem);
+				}
 				// GM mode
 				menu = new JMenu("GM Mode");
 				// remove part
@@ -5324,15 +5329,16 @@ public class MekHQView extends FrameView {
         private final static int COL_TECH     =   4;
         private final static int COL_WEIGHT =     5;    
         private final static int COL_COST    =    6;
-        private final static int COL_QUALITY  =   7;
-        private final static int COL_STATUS   =   8;
-        private final static int COL_PILOT    =   9;
-        private final static int COL_DEPLOY   =   10;
-        private final static int COL_BV        =  11;
-        private final static int COL_REPAIR  =    12;
-        private final static int COL_PARTS    =   13;
-        private final static int COL_QUIRKS   =   14;
-        private final static int N_COL =          15;
+        private final static int COL_MAINTAIN  =  7;
+        private final static int COL_QUALITY  =   8;
+        private final static int COL_STATUS   =   9;
+        private final static int COL_PILOT    =   10;
+        private final static int COL_DEPLOY   =   11;
+        private final static int COL_BV        =  12;
+        private final static int COL_REPAIR  =    13;
+        private final static int COL_PARTS    =   14;
+        private final static int COL_QUIRKS   =   15;
+        private final static int N_COL =          16;
         
         private ArrayList<Unit> data = new ArrayList<Unit>();
         
@@ -5377,6 +5383,8 @@ public class MekHQView extends FrameView {
                     return "Quirks";
                 case COL_DEPLOY:
                     return "Deployed";
+                case COL_MAINTAIN:
+                    return "Maintenance Costs";
                 default:
                     return "?";
             }
@@ -5409,6 +5417,7 @@ public class MekHQView extends FrameView {
             	return SwingConstants.CENTER;
             case COL_WEIGHT:
             case COL_COST:
+            case COL_MAINTAIN:
             case COL_REPAIR:
             case COL_PARTS:
             case COL_BV:
@@ -5480,6 +5489,9 @@ public class MekHQView extends FrameView {
             }
             if(col == COL_COST) {
                 return format.format(u.getSellValue());
+            }
+            if(col == COL_MAINTAIN) {
+                return u.getMaintenanceCost();
             }
             if(col == COL_TECH) {
                 return TechConstants.getLevelDisplayableName(e.getTechLevel());
@@ -6011,11 +6023,13 @@ public class MekHQView extends FrameView {
 				}
 				popup.addSeparator();
 				// sell unit
-				menuItem = new JMenuItem("Sell Unit");
-				menuItem.setActionCommand("SELL");
-				menuItem.addActionListener(this);
-				menuItem.setEnabled(!unit.isDeployed());
-				popup.add(menuItem);
+				if(campaign.getCampaignOptions().canSellUnits()) {
+					menuItem = new JMenuItem("Sell Unit");
+					menuItem.setActionCommand("SELL");
+					menuItem.addActionListener(this);
+					menuItem.setEnabled(!unit.isDeployed());
+					popup.add(menuItem);
+				}
 				// TODO: scrap unit
 				// combat loss
 				menuItem = new JMenuItem("Combat Loss");

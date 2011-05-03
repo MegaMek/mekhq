@@ -32,11 +32,17 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import megamek.common.Aero;
 import megamek.common.AmmoType;
+import megamek.common.BattleArmor;
+import megamek.common.ConvFighter;
 import megamek.common.CriticalSlot;
+import megamek.common.Dropship;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
+import megamek.common.Infantry;
+import megamek.common.Jumpship;
 import megamek.common.Mech;
 import megamek.common.MiscType;
 import megamek.common.Mounted;
@@ -45,6 +51,7 @@ import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
 import megamek.common.VTOL;
+import megamek.common.Warship;
 import megamek.common.WeaponType;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
@@ -1932,5 +1939,40 @@ public class Unit implements Serializable, MekHqXmlSerializable {
         		ability.setValue(value);
         	}
     	}
+    }
+    
+    public int getMaintenanceCost() {
+    	Entity en = getEntity();
+    	Boolean isOmni = en.isOmni();
+    	if(en instanceof Mech) {
+    		if(isOmni) {
+    			return 100;
+    		} else {
+    			return 75;
+    		}
+    	} else if(en instanceof Warship) {
+    		return 5000;
+    	} else if(en instanceof Jumpship) {
+    		return 800;
+    	} else if(en instanceof Dropship) {
+    		return 500;
+    	} else if(en instanceof ConvFighter) {
+    		return 50;
+    	} else if(en instanceof Aero) {
+    		if(isOmni) {
+    			return 125;
+    		} else  {
+    			return 65;
+    		}
+    	} else if(en instanceof VTOL) {
+    		return 65;
+    	} else if(en instanceof Tank) {
+    		return 25;
+    	} else if(en instanceof BattleArmor) {
+    		return ((BattleArmor)en).getTroopers() * 50;
+    	} else if(en instanceof Infantry) {
+    		return ((Infantry)en).getSquadN()*10;
+    	}
+    	return 0;
     }
 }

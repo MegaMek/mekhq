@@ -842,14 +842,21 @@ public class Campaign implements Serializable {
 				addReport(p.getDesc() + " heals naturally!");
 			}
 		}
+		DecimalFormat formatter = new DecimalFormat();
 		//check for a new year
 		if(calendar.get(Calendar.MONTH) == 0 && calendar.get(Calendar.DAY_OF_MONTH) == 1) {
 			//clear the ledger
 			finances.newFiscalYear(calendar.getTime());
 		}
+		if(calendar.get(Calendar.DAY_OF_WEEK) == 0) {
+			//maintenance costs
+			if(campaignOptions.payForMaintain()) {
+				finances.debit(getMaintenanceCosts(), Transaction.C_MAINTAIN, "Weekly Maintenance", calendar.getTime());
+				addReport("Your account has been debited for " + formatter.format(getMaintenanceCosts()) + " C-bills in maintenance costs");
+			}
+		}
 		if(calendar.get(Calendar.DAY_OF_MONTH) == 1) {
 			//Payday!
-			DecimalFormat formatter = new DecimalFormat();
 			if(campaignOptions.payForSalaries()) {
 				finances.debit(getPayRoll(), Transaction.C_SALARY, "Monthly salaries", calendar.getTime());
 				addReport("Payday! Your account has been debited for " + formatter.format(getPayRoll()) + " C-bills in personnel salaries");
@@ -857,7 +864,6 @@ public class Campaign implements Serializable {
 			if(campaignOptions.payForOverhead()) {
 				finances.debit(getOverheadExpenses(), Transaction.C_OVERHEAD, "Monthly overhead", calendar.getTime());
 				addReport("Your account has been debited for " + formatter.format(getOverheadExpenses()) + " C-bills in overhead expenses");
-
 			}
 		}
 	}
@@ -870,6 +876,16 @@ public class Campaign implements Serializable {
 			}
 		}
 		return salaries;
+	}
+	
+	public long getMaintenanceCosts() {
+		long costs = 0;
+		for(Unit u : units) {
+			if(!u.isSalvage()) {
+				costs += u.getMaintenanceCost();
+			}
+		}
+		return costs;
 	}
 	
 	public long getOverheadExpenses() {

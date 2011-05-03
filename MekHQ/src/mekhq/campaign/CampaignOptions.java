@@ -64,6 +64,10 @@ public class CampaignOptions implements Serializable {
     private boolean payForUnits;
     private boolean payForSalaries;
     private boolean payForOverhead;
+    private boolean payForMaintain;
+    private boolean sellUnits;
+    private boolean sellParts;
+
 
     public CampaignOptions () {
         useFactionModifiers = false;
@@ -83,6 +87,9 @@ public class CampaignOptions implements Serializable {
         payForUnits = false;
         payForSalaries = false;
         payForOverhead = false;
+        payForMaintain = false;
+        sellUnits = false;
+        sellParts = false;
     }
 
     public static String getRepairSystemName (int repairSystem) {
@@ -217,6 +224,30 @@ public class CampaignOptions implements Serializable {
     	this.payForOverhead = b;
     }
     
+    public boolean payForMaintain() {
+    	return payForMaintain;
+    }
+    
+    public void setPayForMaintain(boolean b) {
+    	this.payForMaintain = b;
+    }
+    
+    public boolean canSellUnits() {
+    	return  sellUnits;
+    }
+    
+    public void setSellUnits(boolean b) {
+    	this.sellUnits = b;
+    }
+    
+    public boolean canSellParts() {
+    	return  sellParts;
+    }
+    
+    public void setSellParts(boolean b) {
+    	this.sellParts = b;
+    }
+    
     public boolean useQuirks() {
     	return useQuirks;
     }
@@ -244,6 +275,10 @@ public class CampaignOptions implements Serializable {
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "payForUnits", payForUnits);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "payForSalaries", payForSalaries);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "payForOverhead", payForOverhead);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "payForMaintain", payForMaintain);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "sellUnits", sellUnits);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "sellParts", sellParts);
+
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "</campaignOptions>");
 	}
 
@@ -345,6 +380,21 @@ public class CampaignOptions implements Serializable {
 					retVal.payForOverhead = true;
 				else
 					retVal.payForOverhead = false;
+			} else if (wn2.getNodeName().equalsIgnoreCase("payForMaintain")) {
+				if (wn2.getTextContent().equalsIgnoreCase("true"))
+					retVal.payForMaintain = true;
+				else
+					retVal.payForMaintain = false;
+			} else if (wn2.getNodeName().equalsIgnoreCase("sellUnits")) {
+				if (wn2.getTextContent().equalsIgnoreCase("true"))
+					retVal.sellUnits = true;
+				else
+					retVal.sellUnits = false;
+			} else if (wn2.getNodeName().equalsIgnoreCase("sellParts")) {
+				if (wn2.getTextContent().equalsIgnoreCase("true"))
+					retVal.sellParts = true;
+				else
+					retVal.sellParts = false;
 			} 
 		}
 
