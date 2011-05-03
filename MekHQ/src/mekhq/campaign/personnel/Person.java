@@ -36,6 +36,7 @@ import mekhq.MekHQApp;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlSerializable;
 import mekhq.campaign.MekHqXmlUtil;
+import mekhq.campaign.Ranks;
 import mekhq.campaign.team.SupportTeam;
 import mekhq.campaign.work.PersonnelWorkItem;
 
@@ -73,7 +74,12 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
     public static final int S_MIA = 3;
     public static final int S_NUM = 4;
 	
-	protected int id;
+    public static final int EXP_GREEN = 0;
+	public static final int EXP_REGULAR = 1;
+	public static final int EXP_VETERAN = 2;
+	public static final int EXP_ELITE = 3;
+    
+    protected int id;
     private int type;
     //any existing work item for this person
     protected PersonnelWorkItem task;
@@ -87,6 +93,9 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
     protected int gender;
     protected GregorianCalendar birthday;
 
+    //need to pass in the rank system
+    private Ranks ranks;
+    
     private int rank;
     private int status;
     protected int xp;
@@ -97,6 +106,10 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
     
     //default constructor
     public Person() {
+    	this(null);
+    }
+    
+    public Person(Ranks r) {
         daysRest = 0;
         portraitCategory = Pilot.ROOT_PORTRAIT;
         portraitFile = Pilot.PORTRAIT_NONE;
@@ -105,7 +118,8 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
         birthday = new GregorianCalendar(3042, Calendar.JANUARY, 1);
         rank = 0;
         status = S_ACTIVE;
-        setBaseSalary();
+        salary = -1;
+        ranks = r;
     }
     
     public static String getGenderName(int gender) {
@@ -460,49 +474,73 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
 	}
 	
 	public int getSalary() {
-		return salary;
-	}
-	
-	public void setBaseSalary() {
+		
+		if(salary > -1) {
+			return salary;
+		}
+		
+		//if salary is -1, then use the standard amounts
+		int base = 0;
 		
 		switch (getType()) {
 	    	case T_MECHWARRIOR:
-				salary = 1500;
+				base = 1500;
 				break;
 			case T_VEE_CREW:
-				salary = 900;
+				base = 900;
 				break;
 			case T_AERO_PILOT:
-				salary = 1500;
+				base = 1500;
 				break;
 			case T_PROTO_PILOT:
 				//TODO: Confirm ProtoMech pilots should be paid as BA pilots?
-				salary = 960;
+				base = 960;
 				break;
 			case T_BA:
-				salary = 960;
+				base = 960;
 				break;
 			case T_MECH_TECH:
-				salary = 800;
+				base = 800;
 				break;
 			case T_MECHANIC:
-				salary = 640;
+				base = 640;
 				break;
 			case T_AERO_TECH:
-				salary = 800;
+				base = 800;
 				break;
 			case T_BA_TECH:
-				salary = 800;
+				base = 800;
 				break;
 			case T_DOCTOR:
-				salary = 1500;
+				base = 1500;
 				break;
 			case T_NUM:
 				// Not a real pilot type. If someone has this, they don't get paid!
-				salary = 0;
+				base = 0;
 				break;
 		}
 
+		double expMult = 1.0;
+		switch(getExperienceLevel()) {
+		case EXP_GREEN:
+			expMult = 0.6;
+			break;
+		case EXP_VETERAN:
+			expMult = 1.6;
+			break;
+		case EXP_ELITE:
+			expMult =3.2;
+			break;
+		default:
+			expMult = 1.0;
+		}
+		
+		double offMult = 0.6;
+		if(ranks.isOfficer(getRank())) {
+			offMult = 1.2;
+		}
+		
+		return (int)(base * expMult * offMult);
 		//TODO: Add conventional aircraft pilots.
 		//TODO: Add regular infantry.
 		//TODO: Add specialist/Anti-Mech infantry.
@@ -546,4 +584,35 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
 	public void setForceId(int id) {
 		this.forceId = id;
 	}
+	
+	public static String getExperienceLevelName(int level) {
+    	switch(level) {
+    	case EXP_GREEN:
+    		return "Green";
+    	case EXP_REGULAR:
+    		return "Regular";
+    	case EXP_VETERAN:
+    		return "Veteran";
+    	case EXP_ELITE:
+    		return "Elite";
+    	default:
+    		return "Unknown";
+    	}
+    }
+	
+	public abstract int getExperienceLevel();
+	
+	
+	public String getFullTitle() {
+		String rank = ranks.getRank(getRank());
+		if(rank.equalsIgnoreCase("None")) {
+			return getName();
+		}
+		return rank + " " + getName();
+	}
+	
+	public void setRankSystem(Ranks r) {
+		this.ranks = r;
+	}
+	
 }

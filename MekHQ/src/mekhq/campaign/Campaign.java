@@ -436,7 +436,7 @@ public class Campaign implements Serializable {
 			addReport(priorPilot.getDesc() + " has been recovered");
 			return (PilotPerson) priorPilot;
 		} else if (allowNewPilots) {
-			PilotPerson pp = new PilotPerson(pilot, type);
+			PilotPerson pp = new PilotPerson(pilot, type, ranks);
 			addPerson(pp);
 			return pp;
 		}
@@ -1519,8 +1519,11 @@ public class Campaign implements Serializable {
 		}
 		
 		// Some personnel need their task references fixed.
+		// All personnel need the rank reference fixed
 		for (int x=0; x<retVal.personnel.size(); x++) {
 			Person psn = retVal.personnel.get(x);
+			
+			psn.setRankSystem(retVal.ranks);
 			
 			if (psn.getTaskId() >= 0)
 				psn.setTask((PersonnelWorkItem) retVal.taskIds.get(psn.getTaskId()));
@@ -1960,7 +1963,7 @@ public class Campaign implements Serializable {
 	public PilotPerson newPilotPerson(int type) {
 		boolean isFemale = getRNG().isFemale();
 		Pilot pilot = new Pilot(getRNG().generate(isFemale),4,5);
-		PilotPerson person = new PilotPerson(pilot, type);
+		PilotPerson person = new PilotPerson(pilot, type, ranks);
 		if(isFemale) {
 			person.setGender(Person.G_FEMALE);
 		}
@@ -1983,7 +1986,7 @@ public class Campaign implements Serializable {
 	public SupportPerson newTechPerson(int type) {
 		boolean isFemale = getRNG().isFemale();
 		TechTeam team = new TechTeam(getRNG().generate(isFemale), SupportTeam.EXP_REGULAR, type);
-		SupportPerson person = new SupportPerson(team);
+		SupportPerson person = new SupportPerson(team, ranks);
 		if(isFemale) {
 			person.setGender(Person.G_FEMALE);
 		}
@@ -2006,7 +2009,7 @@ public class Campaign implements Serializable {
 	public SupportPerson newDoctorPerson() {
 		boolean isFemale = getRNG().isFemale();
 		MedicalTeam team = new MedicalTeam(getRNG().generate(isFemale), SupportTeam.EXP_REGULAR);
-		SupportPerson person = new SupportPerson(team);
+		SupportPerson person = new SupportPerson(team, ranks);
 		if(isFemale) {
 			person.setGender(Person.G_FEMALE);
 		}
@@ -2034,14 +2037,6 @@ public class Campaign implements Serializable {
 		for(Person p : getPersonnel()) {
 			p.setRank(0);
 		}
-	}
-	
-	public String getFullTitleFor(Person p) {
-		String rank = getRanks().getRank(p.getRank());
-		if(rank.equalsIgnoreCase("None")) {
-			rank = "";
-		}
-		return rank + " " + p.getName();
 	}
 	
 	public ArrayList<Force> getAllForces() {

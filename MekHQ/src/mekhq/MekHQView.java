@@ -5322,7 +5322,7 @@ public class MekHQView extends FrameView {
             	if(null == pp) {
             		return "-";
             	} else {
-            		return campaign.getFullTitleFor(pp);
+            		return pp.getFullTitle();
             	}
             }
             if(col == COL_BV) {

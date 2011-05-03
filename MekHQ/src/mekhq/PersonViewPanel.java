@@ -109,7 +109,7 @@ public class PersonViewPanel extends javax.swing.JPanel {
 		add(lblUnit, gridBagConstraints);
 		
 		pnlStats.setName("pnlStats");
-		pnlStats.setBorder(BorderFactory.createTitledBorder(campaign.getFullTitleFor(person)));
+		pnlStats.setBorder(BorderFactory.createTitledBorder(person.getFullTitle()));
 		pnlStats.setBackground(Color.WHITE);
 		fillStats();
 		gridBagConstraints = new java.awt.GridBagConstraints();

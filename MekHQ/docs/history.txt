@@ -64,6 +64,8 @@ v0.1.5 (SVN)
 + Finances and Transaction object
 + finance campaign options
 + pay salaries and overhead expenses finance options
++ included a rank reference from campaign in Person.java and refactored Campaign#GetTitleFor(Person) into Person.java
++ adjust salaries by experience and officer status
 
 v0.1.4 (2011-04-28)
 + Bug: personnel options not updating in CampaignOptionsDialog

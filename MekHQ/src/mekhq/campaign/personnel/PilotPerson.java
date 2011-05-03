@@ -42,6 +42,7 @@ import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
+import mekhq.campaign.Ranks;
 import mekhq.campaign.SkillCosts;
 import mekhq.campaign.Unit;
 import mekhq.campaign.work.HealPilot;
@@ -52,24 +53,24 @@ import mekhq.campaign.work.HealPilot;
  */
 public class PilotPerson extends Person {
 	private static final long serialVersionUID = -4758195062070601267L;
-    
+	
     private Pilot pilot;
     private Unit unit;
     private int unitId;
-    
+   
     public PilotPerson() {
-    	this(null, 0);
+    	this(null, 0, null);
     }
     
-    public PilotPerson(Pilot p, int t) {
-        super();
+    public PilotPerson(Pilot p, int t, Ranks r) {
+        super(r);
         this.pilot = p;
         setType(t);
         reCalc();
     }
     
-    public PilotPerson(Pilot p, int t, Unit u) {
-        this(p,t);
+    public PilotPerson(Pilot p, int t, Unit u, Ranks r) {
+        this(p,t,r);
         this.unit = u;
     }
 
@@ -81,21 +82,24 @@ public class PilotPerson extends Person {
         this.portraitCategory = pilot.getPortraitCategory();
         this.portraitFile = pilot.getPortraitFileName();
     }
-
+    
+    @Override
+    public int getExperienceLevel() {
+    	double average = (pilot.getGunnery() + pilot.getPiloting())/2.0;
+    	int level = EXP_GREEN;;
+    	if(average<=2.5) {
+    		level = EXP_ELITE;
+    	} else if (average <=3.5) {
+    		level = EXP_VETERAN;
+    	} else if (average<=4.5) {
+    		level = EXP_REGULAR;
+    	}
+    	return level;
+    }
     
     @Override
     public String getSkillSummary() {
-    	String skillString = " (" + pilot.getGunnery() + "/" + pilot.getPiloting() + ")";
-    	double average = (pilot.getGunnery() + pilot.getPiloting())/2.0;
-    	String level = "Green";
-    	if(average<=2.5) {
-    		level = "Elite";
-    	} else if (average <=3.5) {
-    		level = "Veteran";
-    	} else if (average<=4.5) {
-    		level = "Regular";
-    	}
-    	return level + skillString;
+    	return getExperienceLevelName(getExperienceLevel()) + " (" + pilot.getGunnery() + "/" + pilot.getPiloting() + ")";
     }
     
     public static int getTypeBy(Entity en) {

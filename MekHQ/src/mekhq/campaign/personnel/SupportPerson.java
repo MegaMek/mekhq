@@ -31,6 +31,7 @@ import org.w3c.dom.NodeList;
 import megamek.common.Pilot;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
+import mekhq.campaign.Ranks;
 import mekhq.campaign.SkillCosts;
 import mekhq.campaign.team.MedicalTeam;
 import mekhq.campaign.team.SupportTeam;
@@ -46,11 +47,12 @@ public class SupportPerson extends Person {
 	private int teamId;
     
 	public SupportPerson() {
-		this(null);
+		this(null, null);
 	}
+
 	
-    public SupportPerson(SupportTeam t) {
-        super();
+    public SupportPerson(SupportTeam t, Ranks r) {
+        super(r);
         this.team = t;
         setType(getTypeBy(team));
         reCalc();
@@ -194,4 +196,9 @@ public class SupportPerson extends Person {
 		}
 	}
 
+	@Override
+	public int getExperienceLevel() {
+		return team.getRating();
+	}
+	
 }

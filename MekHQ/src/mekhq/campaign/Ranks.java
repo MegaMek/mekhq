@@ -53,9 +53,12 @@ public class Ranks implements Serializable {
 		{"None","Hojuhei","Heishi","Gunjin","Go-cho","Gunsho","Shujin","Kashira","Sho-ko","Chu-i","Tai-i","Sho-sa","Chu-sa","Tai-sa","Sho-sho","Tai-sho","Tai-shu","Gunji-no-Kanrei"},
 		{"None","Point","Point Commander","Star Commander","Star Captain","Star Colonel","Galaxy Commander","Khan","ilKhan"}
 	};
+	private static final int[] officerCut = {7,8,11,9,5,9,3};
 	
 	private int rankSystem;
 	private ArrayList<String> ranks;
+	//an int indicating where the officer ranks start
+	private int officer;
 
 	public static String[] getRankSystem(int system) {
 		return rankSystems[system];
@@ -89,6 +92,7 @@ public class Ranks implements Serializable {
 	public Ranks(int system) {
 		rankSystem = system;
 		useRankSystem(rankSystem);
+		officer = officerCut[rankSystem];
 	}
 	
 	public ArrayList<String> getAllRanks() {
@@ -102,6 +106,9 @@ public class Ranks implements Serializable {
 		}
 		for (int i = 0; i < rankSystems[system].length; i++) {
 			ranks.add(rankSystems[system][i]);
+		}
+		if(system < officerCut.length) {
+			officer = officerCut[system];
 		}
 	}
 	
@@ -125,6 +132,10 @@ public class Ranks implements Serializable {
 			rankSystem = system;
 			useRankSystem(rankSystem);
 		}	
+	}
+	
+	public boolean isOfficer(int rank) {
+		return rank >= officer;
 	}
 	
 	

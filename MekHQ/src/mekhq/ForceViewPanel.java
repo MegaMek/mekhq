@@ -227,7 +227,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
             }
         });
     	if(people.size() > 0) {
-    		commander = campaign.getFullTitleFor(people.get(0));
+    		commander = people.get(0).getFullTitle();
     	}
     	if(null != force.getParentForce()) {
     		assigned = force.getParentForce().getName();
@@ -511,7 +511,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
     }
     
     public String getSummaryFor(Person person) {
-        String toReturn = "<html><font size='2'><b>" + campaign.getFullTitleFor(person) + "</b><br/>";
+        String toReturn = "<html><font size='2'><b>" + person.getFullTitle() + "</b><br/>";
         toReturn += person.getTypeDesc();
         if(person instanceof PilotPerson) {
         	Pilot pilot = ((PilotPerson)person).getPilot();
@@ -559,7 +559,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
             }
         });
     	if(people.size() > 0) {
-    		commander = campaign.getFullTitleFor(people.get(0));
+    		commander = people.get(0).getFullTitle();
     	}
     	DecimalFormat format = new DecimalFormat();
         String toReturn = "<html><font size='2'><b>" + f.getName() + "</b> (" + commander + ")<br/>";
