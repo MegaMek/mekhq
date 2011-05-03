@@ -93,6 +93,8 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
     
     protected int forceId;
     
+    protected int salary;
+    
     //default constructor
     public Person() {
         daysRest = 0;
@@ -103,6 +105,7 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
         birthday = new GregorianCalendar(3042, Calendar.JANUARY, 1);
         rank = 0;
         status = S_ACTIVE;
+        setBaseSalary();
     }
     
     public static String getGenderName(int gender) {
@@ -368,6 +371,10 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
 				+"<forceId>"
 				+forceId
 				+"</forceId>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<salary>"
+				+salary
+				+"</salary>");
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<birthday>"
@@ -430,6 +437,8 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
 					retVal.rank = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("forceId")) {
 					retVal.forceId = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("salary")) {
+					retVal.salary = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("birthday")) {
 					SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 					retVal.birthday = (GregorianCalendar) GregorianCalendar.getInstance();
@@ -450,43 +459,47 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
 		return retVal;
 	}
 	
-	public int getMonthlySalary() {
-		int retVal = 0;
+	public int getSalary() {
+		return salary;
+	}
+	
+	public void setBaseSalary() {
 		
 		switch (getType()) {
 	    	case T_MECHWARRIOR:
-				retVal = 1500;
+				salary = 1500;
 				break;
 			case T_VEE_CREW:
-				retVal = 900;
+				salary = 900;
 				break;
 			case T_AERO_PILOT:
-				retVal = 1500;
+				salary = 1500;
 				break;
 			case T_PROTO_PILOT:
 				//TODO: Confirm ProtoMech pilots should be paid as BA pilots?
-				retVal = 960;
+				salary = 960;
 				break;
 			case T_BA:
-				retVal = 960;
+				salary = 960;
 				break;
 			case T_MECH_TECH:
-				retVal = 800;
+				salary = 800;
 				break;
 			case T_MECHANIC:
-				retVal = 640;
+				salary = 640;
 				break;
 			case T_AERO_TECH:
-				retVal = 800;
+				salary = 800;
 				break;
 			case T_BA_TECH:
-				retVal = 800;
+				salary = 800;
 				break;
 			case T_DOCTOR:
-				retVal = 1500;
+				salary = 1500;
 				break;
 			case T_NUM:
 				// Not a real pilot type. If someone has this, they don't get paid!
+				salary = 0;
 				break;
 		}
 
@@ -502,8 +515,6 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
 		
 		//TODO: Add quality mod to salary calc..
 		//TODO: Add era mod to salary calc..
-		
-		return retVal;
 	}
 	
 	public int getRank() {

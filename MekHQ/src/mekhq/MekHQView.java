@@ -1572,6 +1572,7 @@ public class MekHQView extends FrameView {
 		refreshDoctorsList();
 		refreshCalendar();
 		refreshReport();
+		refreshFunds();
 	}// GEN-LAST:event_btnAdvanceDayActionPerformed
 
 	private void btnDeployUnitsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnDeployUnitsActionPerformed
@@ -2477,6 +2478,7 @@ public class MekHQView extends FrameView {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NABIL), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NIMP), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_HITS), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SALARY), campaign.getCampaignOptions().payForSalaries());
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), true);	
 		} else if(view == PV_COMBAT) {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
@@ -2499,6 +2501,7 @@ public class MekHQView extends FrameView {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NABIL), campaign.getCampaignOptions().useAbilities());
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NIMP), campaign.getCampaignOptions().useImplants());
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_HITS), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SALARY), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), false);	
 		} else if(view == PV_FLUFF) {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
@@ -2521,6 +2524,7 @@ public class MekHQView extends FrameView {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NABIL), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NIMP), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_HITS), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SALARY), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), false);	
 		}
 	}
@@ -4400,8 +4404,9 @@ public class MekHQView extends FrameView {
         private final static int COL_NABIL =   17;
         private final static int COL_NIMP  =   18;
         private final static int COL_HITS  =   19;
-        private final static int COL_XP =      20;
-        private final static int N_COL =       21;
+        private final static int COL_SALARY =  20;
+        private final static int COL_XP =      21;
+        private final static int N_COL =       22;
         
         private ArrayList<Person> data = new ArrayList<Person>();
         
@@ -4458,6 +4463,8 @@ public class MekHQView extends FrameView {
                     return "Deployed";
                 case COL_FORCE:
                     return "Force";
+                case COL_SALARY:
+                    return "Salary";
                 default:
                     return "?";
             }
@@ -4469,6 +4476,7 @@ public class MekHQView extends FrameView {
         	case COL_RANK:
         		return 70;
             case COL_CALL:
+            case COL_SALARY:
                 return 50;        
             case COL_SKILL:
             case COL_FORCE:
@@ -4497,6 +4505,8 @@ public class MekHQView extends FrameView {
         
         public int getAlignment(int col) {
             switch(col) {
+            case COL_SALARY:
+            	return SwingConstants.RIGHT;
             case COL_AGE:
             case COL_GUN:
             case COL_PILOT:
@@ -4558,6 +4568,7 @@ public class MekHQView extends FrameView {
 
         public Object getValueAt(int row, int col) {
         	Person p;
+        	DecimalFormat formatter = new DecimalFormat();
         	if(data.isEmpty()) {
         		return "";
         	} else {
@@ -4680,6 +4691,9 @@ public class MekHQView extends FrameView {
             	} else {
             		return "None";
             	}
+            }
+            if(col == COL_SALARY) {
+            	return formatter.format(p.getSalary());
             }
             return "?";
         }

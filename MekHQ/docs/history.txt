@@ -63,6 +63,7 @@ v0.1.5 (SVN)
 + some basic code for InterstellarMap (not much yet, don't get excited)
 + Finances and Transaction object
 + finance campaign options
++ pay salaries and overhead expenses finance options
 
 v0.1.4 (2011-04-28)
 + Bug: personnel options not updating in CampaignOptionsDialog

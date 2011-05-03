@@ -76,6 +76,10 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         useAbilitiesBox.setSelected(options.useAbilities());
         useEdgeBox.setSelected(options.useEdge());
         useImplantsBox.setSelected(options.useImplants());
+        payForPartsBox.setSelected(options.payForParts());
+        payForUnitsBox.setSelected(options.payForUnits());
+        payForSalariesBox.setSelected(options.payForSalaries());
+        payForOverheadBox.setSelected(options.payForOverhead());
         useQuirksBox.setSelected(options.useQuirks());
 
     }
@@ -106,6 +110,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         lblCamo = new javax.swing.JLabel();
         panRepair = new javax.swing.JPanel();
         panPersonnel = new javax.swing.JPanel();
+        panFinances = new javax.swing.JPanel();
         panNameGen = new javax.swing.JPanel();
         panRank = new javax.swing.JPanel();
         useFactionModifiersCheckBox = new javax.swing.JCheckBox();
@@ -126,6 +131,10 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         useAbilitiesBox = new javax.swing.JCheckBox();
         useEdgeBox = new javax.swing.JCheckBox();
         useImplantsBox = new javax.swing.JCheckBox();
+        payForPartsBox = new javax.swing.JCheckBox();
+        payForUnitsBox = new javax.swing.JCheckBox();
+        payForSalariesBox = new javax.swing.JCheckBox();
+        payForOverheadBox = new javax.swing.JCheckBox();
         useQuirksBox = new javax.swing.JCheckBox();
         repairSystemComboBox = new javax.swing.JComboBox();
         javax.swing.JLabel repairSystemComboBoxLabel = new javax.swing.JLabel();
@@ -418,6 +427,55 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         
         tabOptions.addTab(resourceMap.getString("panPersonnel.TabConstraints.tabTitle"), panPersonnel); // NOI18N
 
+        panFinances.setName("panFinances"); // NOI18N
+        panFinances.setLayout(new java.awt.GridBagLayout());
+        
+        payForPartsBox.setText(resourceMap.getString("payForPartsBox.text")); // NOI18N
+        payForPartsBox.setToolTipText(resourceMap.getString("payForPartsBox.toolTipText")); // NOI18N
+        payForPartsBox.setName("payForPartsBox"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panFinances.add(payForPartsBox, gridBagConstraints);
+        
+        payForUnitsBox.setText(resourceMap.getString("payForUnitsBox.text")); // NOI18N
+        payForUnitsBox.setToolTipText(resourceMap.getString("payForUnitsBox.toolTipText")); // NOI18N
+        payForUnitsBox.setName("payForUnitsBox"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panFinances.add(payForUnitsBox, gridBagConstraints);
+        
+        payForSalariesBox.setText(resourceMap.getString("payForSalariesBox.text")); // NOI18N
+        payForSalariesBox.setToolTipText(resourceMap.getString("payForSalariesBox.toolTipText")); // NOI18N
+        payForSalariesBox.setName("payForSalariesBox"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panFinances.add(payForSalariesBox, gridBagConstraints);
+        
+        payForOverheadBox.setText(resourceMap.getString("payForOverheadBox.text")); // NOI18N
+        payForOverheadBox.setToolTipText(resourceMap.getString("payForOverheadBox.toolTipText")); // NOI18N
+        payForOverheadBox.setName("payForOverheadBox"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panFinances.add(payForOverheadBox, gridBagConstraints);
+        
+        tabOptions.addTab(resourceMap.getString("panFinances.TabConstraints.tabTitle"), panFinances); // NOI18N
+        
         panRank.setName("panRank"); // NOI18N
         panRank.setLayout(new java.awt.GridBagLayout());
         
@@ -645,7 +703,11 @@ private void btnOkayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
     options.setAbilities(useAbilitiesBox.isSelected());
     options.setEdge(useEdgeBox.isSelected());
     options.setImplants(useImplantsBox.isSelected());
-    
+    options.setPayForParts(payForPartsBox.isSelected());
+    options.setPayForUnits(payForUnitsBox.isSelected());
+    options.setPayForSalaries(payForSalariesBox.isSelected());
+    options.setPayForOverhead(payForOverheadBox.isSelected());
+
     options.setQuirks(useQuirksBox.isSelected());
     
     campaign.refreshAllUnitDiagnostics();
@@ -750,6 +812,7 @@ public String getDateAsString() {
     private javax.swing.JPanel panGeneral;
     private javax.swing.JPanel panRepair;
     private javax.swing.JPanel panPersonnel;
+    private javax.swing.JPanel panFinances;
     private javax.swing.JPanel panNameGen;
     private javax.swing.JPanel panRank;
     private javax.swing.JComboBox repairSystemComboBox;
@@ -766,6 +829,11 @@ public String getDateAsString() {
     private javax.swing.JCheckBox useQuirksBox;
     private javax.swing.JCheckBox useEdgeBox;
     private javax.swing.JCheckBox useImplantsBox;
+    private javax.swing.JCheckBox payForPartsBox;
+    private javax.swing.JCheckBox payForUnitsBox;
+    private javax.swing.JCheckBox payForSalariesBox;
+    private javax.swing.JCheckBox payForOverheadBox;
+    
     private javax.swing.JTextArea textRanks;
     private javax.swing.JScrollPane scrRanks;
     // End of variables declaration//GEN-END:variables

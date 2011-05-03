@@ -845,6 +845,42 @@ public class Campaign implements Serializable {
 				addReport(p.getDesc() + " heals naturally!");
 			}
 		}
+		if(calendar.get(Calendar.DAY_OF_MONTH) == 1) {
+			//Payday!
+			DecimalFormat formatter = new DecimalFormat();
+			if(campaignOptions.payForSalaries()) {
+				finances.debit(getPayRoll(), "Monthly salaries", calendar);
+				addReport("Payday! Your account has been debited for " + formatter.format(getPayRoll()) + " C-bills in personnel salaries");
+			}
+			if(campaignOptions.payForOverhead()) {
+				finances.debit(getOverheadExpenses(), "Monthly overhead", calendar);
+				addReport("Your account has been debited for " + formatter.format(getOverheadExpenses()) + " C-bills in overhead expenses");
+
+			}
+		}
+	}
+	
+	public void payDay() {
+		long salaries = 0;
+		for(Person p : personnel) {
+			if(p.isActive()) {
+				salaries += p.getSalary();
+			}
+		}
+	}
+	
+	public long getPayRoll() {
+		long salaries = 0;
+		for(Person p : personnel) {
+			if(p.isActive()) {
+				salaries += p.getSalary();
+			}
+		}
+		return salaries;
+	}
+	
+	public long getOverheadExpenses() {
+		return (long)(getPayRoll() * 0.05);
 	}
 
 	public void clearAllUnits() {
