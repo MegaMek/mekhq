@@ -108,14 +108,14 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
                 	item = new JMenuItem("Zoom In");
                 	item.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent ae) {
-                            zoom(0.5);
+                            zoom(1.5);
                         }
                     });
                 	popup.add(item);
                 	item = new JMenuItem("Zoom Out");
                 	item.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent ae) {
-                            zoom(-0.5);
+                            zoom(0.5);
                         }
                     });
                 	popup.add(item);
@@ -303,7 +303,7 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
         
         addMouseWheelListener(new MouseAdapter() {
         	 public void mouseWheelMoved(MouseWheelEvent e) {
-        	       zoom(e.getWheelRotation() * -0.5);
+        		 zoom(Math.pow(1.5,-1 * e.getWheelRotation()));
         	 }
         });
 	}
@@ -382,7 +382,7 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
     }
     
     public void zoom(double percent) {
-    	conf.scale *= (1+percent);
+    	conf.scale *= percent;
         if (selectedPlanet != null) {
             conf.offset.setLocation(-selectedPlanet.getX() * conf.scale, selectedPlanet.getY() * conf.scale);
         }

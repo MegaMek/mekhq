@@ -84,6 +84,7 @@ v0.1.5 (SVN)
 + improved zooming
 + top elements of main panel and main TabbedPane places in a split pane (so you can maximize whichever view you want)
 + "Select planet" context menu option (planets organized alphabetically, in submenus (A,B,C,etc)
++ improvements to zooming
 
 v0.1.4 (2011-04-28)
 + Bug: personnel options not updating in CampaignOptionsDialog
