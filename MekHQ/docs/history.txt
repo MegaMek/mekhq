@@ -78,6 +78,8 @@ v0.1.5 (SVN)
 + changed planets.xml map to one based off the PRSC data in 3062
 + color-coding of all factions on InterstellarMap
 + improvements to mouse interaction in InterstellarMap
++ highlight selected planet
++ keep selected planet in center when rescaling
 
 v0.1.4 (2011-04-28)
 + Bug: personnel options not updating in CampaignOptionsDialog

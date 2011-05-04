@@ -9,6 +9,8 @@ package mekhq;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseAdapter;
@@ -45,6 +47,31 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
 		
 		setBorder(BorderFactory.createLineBorder(Color.black));
         
+		//TODO: get the key listener working
+		addKeyListener(new KeyAdapter() {
+			/** Handle the key pressed event from the text field. */
+			public void keyPressed(KeyEvent e) {
+				int keyCode = e.getKeyCode();
+	        
+				if (keyCode == 37)// left arrow
+		        {
+		        	conf.offset.y -= conf.scale;
+		        } else if (keyCode == 38) // uparrow
+		        {
+		        	conf.offset.x -= conf.scale;
+		        } else if (keyCode == 39)// right arrow
+		        {
+	     	      conf.offset.y += conf.scale;
+		        } else if (keyCode == 40)// down arrow
+		        {
+		        	conf.offset.x += conf.scale;
+		        } else {
+		        	return;
+		        }
+		        repaint();
+			}
+		});
+		
         addMouseListener(new MouseAdapter() {
         	
         	public void mouseEntered(MouseEvent e) {
@@ -65,6 +92,7 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
                     return;
                 }
             	selectedPlanet = nearestNeighbour(scr2mapX(e.getX()), scr2mapY(e.getY()));  
+            	repaint();
             }          
             
             public void mouseClicked(MouseEvent e) {
@@ -113,10 +141,10 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
         addMouseWheelListener(new MouseAdapter() {
         	 public void mouseWheelMoved(MouseWheelEvent e) {
         	        conf.scale += e.getWheelRotation() * 0.25;
-        	        //if (selectedPlanet != null) {
-        	        //    conf.offset.setLocation(-selectedPlanet.getPosition().x * conf.scale, selectedPlanet.getPosition().y * conf.scale);
+        	        if (selectedPlanet != null) {
+        	            conf.offset.setLocation(-selectedPlanet.getX() * conf.scale, selectedPlanet.getY() * conf.scale);
+        	        }
         	        repaint();
-        	        //}
         	 }
         });
 	}
@@ -150,6 +178,12 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
 		for(Planet planet : planets) {
 			int x = map2scrX(planet.getX());
 			int y = map2scrY(planet.getY());
+			
+			if(null != selectedPlanet && selectedPlanet.equals(planet)) {
+				g.setColor(Color.WHITE);
+				int adjust = size/2;
+				g.fillArc(x-adjust/2, y-adjust/2, size+adjust, size+adjust, 0, 360);	
+			}
 			g.setColor(Faction.getFactionColor(planet.getFaction()));
 			g.fillArc(x, y, size, size, 0, 360);	
 			//name
