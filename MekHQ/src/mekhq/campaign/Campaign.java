@@ -1121,6 +1121,15 @@ public class Campaign implements Serializable {
 				unit.getEntity().restore();
 			}
 		}
+		try {
+			planets = generatePlanets();
+		} catch (DOMException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
 	}
 
 	public boolean isOvertimeAllowed() {

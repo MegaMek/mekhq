@@ -121,6 +121,7 @@ import megamek.common.util.DirectoryItems;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Force;
 import mekhq.campaign.PartInventory;
+import mekhq.campaign.Planet;
 import mekhq.campaign.SkillCosts;
 import mekhq.campaign.Unit;
 import mekhq.campaign.Utilities;
@@ -437,7 +438,7 @@ public class MekHQView extends FrameView {
 		lblUnitView = new javax.swing.JLabel();
 		scrollUnitView = new javax.swing.JScrollPane();
 		scrollForceView = new javax.swing.JScrollPane();
-		panMap = new InterstellarMapPanel(campaign.getPlanets());
+		scrollPlanetView = new javax.swing.JScrollPane();
 		
 		org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application
 				.getInstance(mekhq.MekHQApp.class).getContext()
@@ -494,10 +495,25 @@ public class MekHQView extends FrameView {
 				resourceMap.getString("panOrganization.TabConstraints.tabTitle"),
 				panOrganization); // NOI18N
 		
-		panMap.setName("panMap"); // NOI18N
+		panMap = new InterstellarMapPanel(campaign.getPlanets(), this);
+		panMap.setName("panMap"); // NOI18N		
+		scrollPlanetView.setMinimumSize(new java.awt.Dimension(400, 600));
+		scrollPlanetView.setPreferredSize(new java.awt.Dimension(400, 2000));
+		scrollPlanetView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		scrollPlanetView.setViewportView(null);
+		splitMap = new javax.swing.JSplitPane(javax.swing.JSplitPane.HORIZONTAL_SPLIT,panMap, scrollPlanetView);
+		splitMap.setOneTouchExpandable(true);
+		splitMap.setResizeWeight(1.0);
+		splitMap.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent pce) {
+				//this can mess up the unit view panel so refresh it
+				//refreshPlanetView();
+			}
+		});
 		tabMain.addTab(
 				resourceMap.getString("panMap.TabConstraints.tabTitle"),
-				panMap); // NOI18N
+				splitMap); // NOI18N
 		
 		panPersonnel.setFont(resourceMap.getFont("panHangar.font")); // NOI18N
 		panPersonnel.setName("panPersonnel"); // NOI18N
@@ -1991,6 +2007,11 @@ public class MekHQView extends FrameView {
 				}
 			});
 		}
+	}
+	
+	protected void refreshPlanetView() {
+		Planet planet = panMap.getSelectedPlanet();
+		scrollPlanetView.setViewportView(new PlanetViewPanel(planet, campaign));
 	}
 	
 	private void PartsFilterActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_PartsFilterActionPerformed
@@ -6377,6 +6398,8 @@ public class MekHQView extends FrameView {
     private javax.swing.JSplitPane splitOrg;
 	private javax.swing.JScrollPane scrollForceView;
 	InterstellarMapPanel panMap;
+    private javax.swing.JSplitPane splitMap;
+	private javax.swing.JScrollPane scrollPlanetView;
 	// End of variables declaration//GEN-END:variables
 
 	private final Timer messageTimer;

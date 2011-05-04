@@ -86,6 +86,9 @@ v0.1.5 (SVN)
 + "Select planet" context menu option (planets organized alphabetically, in submenus (A,B,C,etc)
 + improvements to zooming
 + improved planets.xml
++ PlanetViewPanel
++ changed color of Chaos March to a lighter gray
++ load planets.xml in Campaign.restore()
 
 v0.1.4 (2011-04-28)
 + Bug: personnel options not updating in CampaignOptionsDialog

@@ -43,12 +43,14 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
 
 	private ArrayList<Planet> planets;
 	InnerStellarMapConfig conf = new InnerStellarMapConfig();
+	MekHQView hqview;
 	private Planet selectedPlanet = null;
 	Point lastMousePos = null;
     int mouseMod = 0;
 	
-	public InterstellarMapPanel(ArrayList<Planet> p) {
+	public InterstellarMapPanel(ArrayList<Planet> p, MekHQView view) {
 		planets = p;
+		hqview = view;
 		
 		setBorder(BorderFactory.createLineBorder(Color.black));
         
@@ -96,7 +98,7 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
                 if (e.getButton() != MouseEvent.BUTTON1) {
                     return;
                 }
-            	selectedPlanet = nearestNeighbour(scr2mapX(e.getX()), scr2mapY(e.getY()));  
+            	changeSelectedPlanet(nearestNeighbour(scr2mapX(e.getX()), scr2mapY(e.getY())));  
             	repaint();
             }          
             
@@ -174,7 +176,7 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
             			item.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent ae) {
                             	int pos = Integer.parseInt(ae.getActionCommand());
-                                selectedPlanet = planets.get(pos);
+                                changeSelectedPlanet(planets.get(pos));
                                 center(selectedPlanet);
                             }
                         });
@@ -266,7 +268,7 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
 
                     if (e.getClickCount() >= 2) {
                     	//center and zoom
-                    	selectedPlanet = nearestNeighbour(scr2mapX(e.getX()), scr2mapY(e.getY()));  
+                    	changeSelectedPlanet(nearestNeighbour(scr2mapX(e.getX()), scr2mapY(e.getY())));  
                     	if(conf.scale < 4.0) {
                     		conf.scale = 4.0;
                     	}
@@ -372,7 +374,7 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
     /**
      * Activate and Center
      */
-    public void center(Planet p) {
+    private void center(Planet p) {
 
         if (p == null) {
             return;
@@ -381,7 +383,7 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
         repaint();
     }
     
-    public void zoom(double percent) {
+    private void zoom(double percent) {
     	conf.scale *= percent;
         if (selectedPlanet != null) {
             conf.offset.setLocation(-selectedPlanet.getX() * conf.scale, selectedPlanet.getY() * conf.scale);
@@ -392,6 +394,12 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
     public Planet getSelectedPlanet() {
     	return selectedPlanet;
     }
+    
+    private void changeSelectedPlanet(Planet p) {
+    	selectedPlanet = p;
+    	hqview.refreshPlanetView();
+    }
+    
     
     /**
      * All configuration behaviour of InterStellarMap are saved here.

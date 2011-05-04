@@ -252,7 +252,7 @@ public class Faction {
         case F_ARDC:
         	return new Color(218,165,32);
         case F_CHAOS:
-        	return Color.DARK_GRAY;
+        	return Color.GRAY;
         default:
             return Color.LIGHT_GRAY;
         }
