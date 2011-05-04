@@ -439,10 +439,6 @@ public class MekHQView extends FrameView {
 		scrollForceView = new javax.swing.JScrollPane();
 		panMap = new InterstellarMapPanel(campaign.getPlanets());
 		
-		mainPanel.setAutoscrolls(true);
-		mainPanel.setName("mainPanel"); // NOI18N
-		mainPanel.setLayout(new java.awt.GridBagLayout());
-
 		org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application
 				.getInstance(mekhq.MekHQApp.class).getContext()
 				.getResourceMap(MekHQView.class);
@@ -1113,16 +1109,10 @@ public class MekHQView extends FrameView {
 		tabMain.addTab(
 				resourceMap.getString("panFinances.TabConstraints.tabTitle"),
 				panFinances); // NOI18N
-
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 1;
-		gridBagConstraints.gridwidth = 2;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHEAST;
-		gridBagConstraints.weightx = 1.0;
-		gridBagConstraints.weighty = 1.0;
-		mainPanel.add(tabMain, gridBagConstraints);
+		
+		mainPanel.setAutoscrolls(true);
+		mainPanel.setName("mainPanel"); // NOI18N
+		mainPanel.setLayout(new java.awt.GridBagLayout());
 
 		txtPaneReportScrollPane
 				.setMinimumSize(new java.awt.Dimension(800, 200));
@@ -1224,6 +1214,10 @@ public class MekHQView extends FrameView {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHEAST;
 		mainPanel.add(panelMasterButtons, gridBagConstraints);
 
+		splitMain = new javax.swing.JSplitPane(javax.swing.JSplitPane.VERTICAL_SPLIT,mainPanel,tabMain);
+		splitMain.setOneTouchExpandable(true);
+		splitMain.setResizeWeight(0.0);
+		
 		menuBar.setName("menuBar"); // NOI18N
 
 		fileMenu.setText(resourceMap.getString("fileMenu.text")); // NOI18N
@@ -1421,7 +1415,7 @@ public class MekHQView extends FrameView {
 												org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
 								.add(3, 3, 3)));
 
-		setComponent(mainPanel);
+		setComponent(splitMain);
 		setMenuBar(menuBar);
 		setStatusBar(statusPanel);
 	}// </editor-fold>//GEN-END:initComponents
@@ -6347,6 +6341,7 @@ public class MekHQView extends FrameView {
 	private javax.swing.JPanel panSupplies;
 	private javax.swing.JPanel panelDoTask;
 	private javax.swing.JPanel panelMasterButtons;
+    private javax.swing.JSplitPane splitMain;
 	private javax.swing.JProgressBar progressBar;
 	private javax.swing.JScrollPane scrollDocTable;
 	private javax.swing.JScrollPane scrollPatientTable;
