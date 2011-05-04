@@ -9,6 +9,8 @@ package mekhq;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -19,6 +21,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import javax.swing.BorderFactory;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 
 import mekhq.campaign.Faction;
 import mekhq.campaign.Planet;
@@ -98,6 +103,43 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
             public void mouseClicked(MouseEvent e) {
 
                 if (e.getButton() == MouseEvent.BUTTON3) {
+                	JPopupMenu popup = new JPopupMenu();
+                	JMenuItem item;
+                	item = new JMenuItem("Zoom In");
+                	item.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent ae) {
+                            zoom(0.5);
+                        }
+                    });
+                	popup.add(item);
+                	item = new JMenuItem("Zoom Out");
+                	item.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent ae) {
+                            zoom(-0.5);
+                        }
+                    });
+                	popup.add(item);
+                	JMenu centerM = new JMenu("Center Map");
+                    item = new JMenuItem("On Selected Planet");
+                    item.setEnabled(selectedPlanet != null);
+                    if (selectedPlanet != null) {// only add if there is a planet to center on
+                        item.addActionListener(new ActionListener() {
+                            public void actionPerformed(ActionEvent ae) {
+                                center(selectedPlanet);
+                            }
+                        });
+                    }
+                    centerM.add(item);
+                    item = new JMenuItem("On Terra");
+                    item.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent ae) {
+                            conf.offset = new Point();
+                            repaint();
+                        }
+                    });
+                    centerM.add(item);
+                    popup.add(centerM);
+                	popup.show(e.getComponent(), e.getX() + 10, e.getY() + 10);
                 }
                 else if (e.getButton() == MouseEvent.BUTTON1) {
 
@@ -140,11 +182,7 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
         
         addMouseWheelListener(new MouseAdapter() {
         	 public void mouseWheelMoved(MouseWheelEvent e) {
-        	        conf.scale += e.getWheelRotation() * 0.25;
-        	        if (selectedPlanet != null) {
-        	            conf.offset.setLocation(-selectedPlanet.getX() * conf.scale, selectedPlanet.getY() * conf.scale);
-        	        }
-        	        repaint();
+        	       zoom(e.getWheelRotation() * -0.5);
         	 }
         });
 	}
@@ -219,6 +257,14 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
             return;
         }
         conf.offset.setLocation(-p.getX() * conf.scale, p.getY() * conf.scale);
+        repaint();
+    }
+    
+    public void zoom(double percent) {
+    	conf.scale *= (1+percent);
+        if (selectedPlanet != null) {
+            conf.offset.setLocation(-selectedPlanet.getX() * conf.scale, selectedPlanet.getY() * conf.scale);
+        }
         repaint();
     }
     
