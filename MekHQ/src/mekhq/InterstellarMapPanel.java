@@ -149,20 +149,14 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
         /**
          * Threshold to not show planet names. 0 means show always
          */
-        double showPlanetNamesThreshold = 2.0;
+        double showPlanetNamesThreshold = 3.0;
         /**
          * brightness correction for colors. This is no gamma correction! Gamma correction brightens medium level colors more than extreme ones. 0 means no brightening.
          */
-        double colorAdjustment = 0.5;
-        /**
-         * The maps background color
-         */
-        String backgroundColor = "#000000";
-
         /**
          * The actual scale factor. 1.0 for default, higher means bigger.
          */
-        double scale = 1.0;
+        double scale = 0.5;
         /**
          * The scrolling offset
          */

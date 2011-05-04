@@ -204,35 +204,57 @@ public class Faction {
         case F_DRAC:
             return Color.RED;
         case F_FEDSUN:
+        	return Color.YELLOW;
         case F_FEDCOM:
-            return Color.YELLOW;
+            return new Color(255,215,0);
         case F_FWL:
-            return Color.PINK;
+            return new Color(160,32,240);
         case F_LYRAN:
             return Color.BLUE;
+        case F_ROS:
+            return Color.ORANGE;
         case F_C_WOLF:
+        	return new Color(139,69,19);
         case F_C_JF:
+        	return new Color(154, 205, 50);
         case F_C_GB:
+        	return new Color(135,206,250);
         case F_C_SJ:
+        	return new Color(119,136,153);
         case F_C_NC:
+        	return new Color(238,221,130);
         case F_C_DS:
+        	return new Color(250,128,114);
         case F_C_SV:
+        	return new Color(188,143,143);
         case F_C_HH:
+        	return new Color(178,34,34);
         case F_C_OTHER:
-            return Color.CYAN;
+            return new Color(210,180,140);
         case F_FRR:    
-        case F_MERC:
-        case F_COMSTAR:
-        case F_WOB:
-        case F_CANOPUS:
-        case F_OA:
-        case F_TC:
-        case F_PERIPHERY:
-        case F_CHAOS:
+        	return new Color(148,0,11);
+        case F_SIC:
+        	return new Color(0,250,154);
         case F_TERRAN:
+        case F_COMSTAR:
+        	return Color.WHITE;
         case F_RWR:
+        case F_WOB:
+        	return new Color(205,192,176);
+        case F_CANOPUS:
+        	return new Color(34,139,34);
+        case F_OA:
+        	return Color.CYAN;
+        case F_TC:
+        	return new Color(205,133,63);
+        case F_MH:
+        	return new Color(0,206,209);
+        case F_ARDC:
+        	return new Color(218,165,32);
+        case F_CHAOS:
+        	return Color.DARK_GRAY;
         default:
-            return Color.WHITE;
+            return Color.LIGHT_GRAY;
         }
     }
 
