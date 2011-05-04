@@ -169,7 +169,7 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
                 	JMenu zMenu = new JMenu("Z");
                 	for(int i = 0; i < planets.size(); i++) {
                 		Planet p = planets.get(i);
-                		item = new JMenuItem(p.getName());
+                		item = new JMenuItem(p.getName() + " (" + Faction.getFactionName(p.getFaction()) + ")");
     					item.setActionCommand(Integer.toString(i));
             			item.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent ae) {

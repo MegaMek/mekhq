@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <planets>
 	<planet>
-		<name>APlace</name>
+		<name>A Place</name>
 		<xcood>-125.18</xcood>
 		<ycood>274.88</ycood>
 		<faction>17</faction>
@@ -43,7 +43,7 @@
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>AbiyAdi</name>
+		<name>Abiy Adi</name>
 		<xcood>352.6</xcood>
 		<ycood>317.39</ycood>
 		<faction>2</faction>
@@ -103,7 +103,7 @@
 		<faction>4</faction>
 	</planet>
 	<planet>
-		<name>AdDuwayd</name>
+		<name>Ad Duwayd</name>
 		<xcood>365.12</xcood>
 		<ycood>377.9</ycood>
 		<faction>2</faction>
@@ -217,25 +217,25 @@
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>AlHillah</name>
+		<name>Al Hillah</name>
 		<xcood>-23.47</xcood>
 		<ycood>180.21</ycood>
 		<faction>10</faction>
 	</planet>
 	<planet>
-		<name>AlJafr</name>
+		<name>Al Jafr</name>
 		<xcood>-416.5</xcood>
 		<ycood>12.26</ycood>
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>AlJubaylah</name>
+		<name>Al Jubaylah</name>
 		<xcood>-185.43</xcood>
 		<ycood>-284.27</ycood>
 		<faction>4</faction>
 	</planet>
 	<planet>
-		<name>AlNair</name>
+		<name>Al Na'ir</name>
 		<xcood>60.77</xcood>
 		<ycood>31.56</ycood>
 		<faction>2</faction>
@@ -253,7 +253,7 @@
 		<faction>2</faction>
 	</planet>
 	<planet>
-		<name>AlbertFalls</name>
+		<name>Albert Falls</name>
 		<xcood>-271.23</xcood>
 		<ycood>-133.01</ycood>
 		<faction>4</faction>
@@ -391,7 +391,7 @@
 		<faction>4</faction>
 	</planet>
 	<planet>
-		<name>AllDawn</name>
+		<name>All Dawn</name>
 		<xcood>-463.4</xcood>
 		<ycood>155.44</ycood>
 		<faction>20</faction>
@@ -409,7 +409,7 @@
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>AlmaAlta</name>
+		<name>Alma Alta</name>
 		<xcood>-185.17</xcood>
 		<ycood>187.78</ycood>
 		<faction>5</faction>
@@ -439,13 +439,13 @@
 		<faction>4</faction>
 	</planet>
 	<planet>
-		<name>AlphardMH</name>
+		<name>Alphard</name>
 		<xcood>-409.71</xcood>
 		<ycood>-300.89</ycood>
 		<faction>15</faction>
 	</planet>
 	<planet>
-		<name>AlphardFWL</name>
+		<name>Alphard</name>
 		<xcood>-65.98</xcood>
 		<ycood>-52.42</ycood>
 		<faction>4</faction>
@@ -487,7 +487,7 @@
 		<faction>23</faction>
 	</planet>
 	<planet>
-		<name>AltaVista</name>
+		<name>Alta Vista</name>
 		<xcood>511.17</xcood>
 		<ycood>13.04</ycood>
 		<faction>6</faction>
@@ -529,7 +529,7 @@
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>AltheasChoice</name>
+		<name>Althea's Choice</name>
 		<xcood>383.37</xcood>
 		<ycood>-343.06</ycood>
 		<faction>14</faction>
@@ -553,13 +553,13 @@
 		<faction>1</faction>
 	</planet>
 	<planet>
-		<name>AlulaAustralis</name>
+		<name>Alula Australis</name>
 		<xcood>-24.52</xcood>
 		<ycood>-4.69</ycood>
 		<faction>4</faction>
 	</planet>
 	<planet>
-		<name>AlulaBorealis</name>
+		<name>Alula Borealis</name>
 		<xcood>-261.32</xcood>
 		<ycood>-54.51</ycood>
 		<faction>4</faction>
@@ -571,7 +571,7 @@
 		<faction>2</faction>
 	</planet>
 	<planet>
-		<name>AmberGrove</name>
+		<name>Amber Grove</name>
 		<xcood>275.15</xcood>
 		<ycood>-365.46</ycood>
 		<faction>14</faction>
@@ -601,7 +601,7 @@
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>AnTing</name>
+		<name>An Ting</name>
 		<xcood>304.35</xcood>
 		<ycood>110.84</ycood>
 		<faction>2</faction>
@@ -661,7 +661,7 @@
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>AngellII</name>
+		<name>Angell II</name>
 		<xcood>-99.1</xcood>
 		<ycood>-84.76</ycood>
 		<faction>4</faction>
@@ -679,7 +679,7 @@
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>AnjinMuerto</name>
+		<name>Anjin Muerto</name>
 		<xcood>591.76</xcood>
 		<ycood>-78.76</ycood>
 		<faction>6</faction>
@@ -709,7 +709,7 @@
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>Antallos</name>
+		<name>Antallos (Port Krin)</name>
 		<xcood>467.09</xcood>
 		<ycood>283.92</ycood>
 		<faction>20</faction>
@@ -775,13 +775,13 @@
 		<faction>17</faction>
 	</planet>
 	<planet>
-		<name>ArcadiaLA</name>
+		<name>Arcadia</name>
 		<xcood>-188.04</xcood>
 		<ycood>-8.08</ycood>
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>ArcadiaC</name>
+		<name>Arcadia</name>
 		<xcood>-116</xcood>
 		<ycood>1605</ycood>
 		<faction>29</faction>
@@ -871,7 +871,7 @@
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>AsSamik</name>
+		<name>As Samik</name>
 		<xcood>349.99</xcood>
 		<ycood>-289.23</ycood>
 		<faction>6</faction>
@@ -883,13 +883,13 @@
 		<faction>2</faction>
 	</planet>
 	<planet>
-		<name>AsellusAustralis</name>
+		<name>Asellus Australis</name>
 		<xcood>-100.93</xcood>
 		<ycood>-114.75</ycood>
 		<faction>4</faction>
 	</planet>
 	<planet>
-		<name>AsellusBorealis</name>
+		<name>Asellus Borealis</name>
 		<xcood>-101.45</xcood>
 		<ycood>-119.19</ycood>
 		<faction>4</faction>
@@ -973,13 +973,13 @@
 		<faction>4</faction>
 	</planet>
 	<planet>
-		<name>AtreusC</name>
+		<name>Atreus</name>
 		<xcood>71</xcood>
 		<ycood>1732</ycood>
 		<faction>29</faction>
 	</planet>
 	<planet>
-		<name>AtreusPrime</name>
+		<name>Atreus Prime</name>
 		<xcood>229.59</xcood>
 		<ycood>-376.72</ycood>
 		<faction>14</faction>
@@ -1051,7 +1051,7 @@
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>AutumnWind</name>
+		<name>Autumn Wind</name>
 		<xcood>-169</xcood>
 		<ycood>-88.15</ycood>
 		<faction>4</faction>
@@ -1111,7 +1111,7 @@
 		<faction>4</faction>
 	</planet>
 	<planet>
-		<name>AynTarma</name>
+		<name>Ayn Tarma</name>
 		<xcood>-173.95</xcood>
 		<ycood>-305.4</ycood>
 		<faction>4</faction>
@@ -1153,7 +1153,7 @@
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>BadNews</name>
+		<name>Bad News</name>
 		<xcood>425.89</xcood>
 		<ycood>197.16</ycood>
 		<faction>2</faction>
@@ -1183,7 +1183,7 @@
 		<faction>13</faction>
 	</planet>
 	<planet>
-		<name>BalladII</name>
+		<name>Ballad II</name>
 		<xcood>-272.18</xcood>
 		<ycood>-469.01</ycood>
 		<faction>12</faction>
@@ -1207,13 +1207,13 @@
 		<faction>21</faction>
 	</planet>
 	<planet>
-		<name>BaltazarIII</name>
+		<name>Baltazar III</name>
 		<xcood>-444.03</xcood>
 		<ycood>-59.97</ycood>
 		<faction>20</faction>
 	</planet>
 	<planet>
-		<name>BanNaSan</name>
+		<name>Ban Na San</name>
 		<xcood>363.03</xcood>
 		<ycood>222.72</ycood>
 		<faction>2</faction>
@@ -1261,13 +1261,13 @@
 		<faction>4</faction>
 	</planet>
 	<planet>
-		<name>BarlowsEnd</name>
+		<name>Barlow's End</name>
 		<xcood>307.22</xcood>
 		<ycood>63.64</ycood>
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>BarlowsFolly</name>
+		<name>Barlow's Folly</name>
 		<xcood>174.74</xcood>
 		<ycood>67.55</ycood>
 		<faction>2</faction>
@@ -1417,7 +1417,7 @@
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>BellaI</name>
+		<name>Bella I</name>
 		<xcood>-261.58</xcood>
 		<ycood>-44.6</ycood>
 		<faction>4</faction>
@@ -1435,7 +1435,7 @@
 		<faction>1</faction>
 	</planet>
 	<planet>
-		<name>BelleIsle</name>
+		<name>Belle Isle</name>
 		<xcood>449.01</xcood>
 		<ycood>-455.49</ycood>
 		<faction>14</faction>
@@ -1453,7 +1453,7 @@
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>BenetIII</name>
+		<name>Benet III</name>
 		<xcood>265.23</xcood>
 		<ycood>58.68</ycood>
 		<faction>6</faction>
@@ -1489,7 +1489,7 @@
 		<faction>4</faction>
 	</planet>
 	<planet>
-		<name>BergmansPlanet</name>
+		<name>Bergman's Planet</name>
 		<xcood>268.36</xcood>
 		<ycood>75.63</ycood>
 		<faction>2</faction>
@@ -1507,13 +1507,13 @@
 		<faction>21</faction>
 	</planet>
 	<planet>
-		<name>BetaMensaeV</name>
+		<name>Beta Mensae V</name>
 		<xcood>320</xcood>
 		<ycood>130.4</ycood>
 		<faction>2</faction>
 	</planet>
 	<planet>
-		<name>BetaVII</name>
+		<name>Beta VII</name>
 		<xcood>-156.22</xcood>
 		<ycood>387.81</ycood>
 		<faction>22</faction>
@@ -1525,7 +1525,7 @@
 		<faction>1</faction>
 	</planet>
 	<planet>
-		<name>BetenKaitos</name>
+		<name>Beten Kaitos</name>
 		<xcood>167.17</xcood>
 		<ycood>-114.23</ycood>
 		<faction>6</faction>
@@ -1627,7 +1627,7 @@
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>BlackEarth</name>
+		<name>Black Earth</name>
 		<xcood>-182.04</xcood>
 		<ycood>397.2</ycood>
 		<faction>22</faction>
@@ -1645,7 +1645,7 @@
 		<faction>21</faction>
 	</planet>
 	<planet>
-		<name>BlairAtholl</name>
+		<name>Blair Atholl</name>
 		<xcood>-99.63</xcood>
 		<ycood>273.58</ycood>
 		<faction>22</faction>
@@ -1663,13 +1663,13 @@
 		<faction>20</faction>
 	</planet>
 	<planet>
-		<name>BlueDiamond</name>
+		<name>Blue Diamond</name>
 		<xcood>-38.86</xcood>
 		<ycood>20.86</ycood>
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>BlueHole</name>
+		<name>Blue Hole</name>
 		<xcood>-188.3</xcood>
 		<ycood>351.82</ycood>
 		<faction>5</faction>
@@ -1759,7 +1759,7 @@
 		<faction>4</faction>
 	</planet>
 	<planet>
-		<name>BorgansRift</name>
+		<name>Borgan's Rift</name>
 		<xcood>-106.08</xcood>
 		<ycood>-415.57</ycood>
 		<faction>12</faction>
@@ -1771,13 +1771,13 @@
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>BotanyBay</name>
+		<name>Botany Bay</name>
 		<xcood>-179.43</xcood>
 		<ycood>487.44</ycood>
 		<faction>22</faction>
 	</planet>
 	<planet>
-		<name>BountifulHarvest</name>
+		<name>Bountiful Harvest</name>
 		<xcood>-138.48</xcood>
 		<ycood>263.41</ycood>
 		<faction>17</faction>
@@ -1867,7 +1867,7 @@
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>BrocchisCluster</name>
+		<name>Brocchi's Cluster</name>
 		<xcood>162.22</xcood>
 		<ycood>391.2</ycood>
 		<faction>2</faction>
@@ -1885,7 +1885,7 @@
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>BrokenWheel</name>
+		<name>Broken Wheel</name>
 		<xcood>539.07</xcood>
 		<ycood>-175</ycood>
 		<faction>6</faction>
@@ -1969,7 +1969,7 @@
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>BuenosAires</name>
+		<name>Buenos Aires</name>
 		<xcood>18.26</xcood>
 		<ycood>-345.04</ycood>
 		<faction>1</faction>
@@ -1987,7 +1987,7 @@
 		<faction>22</faction>
 	</planet>
 	<planet>
-		<name>ButteHold</name>
+		<name>Butte Hold</name>
 		<xcood>-101.71</xcood>
 		<ycood>466.57</ycood>
 		<faction>21</faction>
@@ -2005,13 +2005,13 @@
 		<faction>2</faction>
 	</planet>
 	<planet>
-		<name>CadizDC</name>
+		<name>Cadiz</name>
 		<xcood>123.1</xcood>
 		<ycood>150.48</ycood>
 		<faction>2</faction>
 	</planet>
 	<planet>
-		<name>CadizTC</name>
+		<name>Cadiz</name>
 		<xcood>330.81</xcood>
 		<ycood>-427.55</ycood>
 		<faction>14</faction>
@@ -2059,13 +2059,13 @@
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>CalishII</name>
+		<name>Calish II</name>
 		<xcood>460.86</xcood>
 		<ycood>162.24</ycood>
 		<faction>13</faction>
 	</planet>
 	<planet>
-		<name>CalishIII</name>
+		<name>Calish III</name>
 		<xcood>461.95</xcood>
 		<ycood>159.86</ycood>
 		<faction>13</faction>
@@ -2077,13 +2077,13 @@
 		<faction>4</faction>
 	</planet>
 	<planet>
-		<name>CallistoV</name>
+		<name>Callisto V</name>
 		<xcood>-156.74</xcood>
 		<ycood>125.18</ycood>
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>CallowayVI</name>
+		<name>Calloway VI</name>
 		<xcood>-58.68</xcood>
 		<ycood>-201.34</ycood>
 		<faction>4</faction>
@@ -2119,25 +2119,25 @@
 		<faction>22</faction>
 	</planet>
 	<planet>
-		<name>CameronLC</name>
+		<name>Cameron</name>
 		<xcood>-174.48</xcood>
 		<ycood>168.74</ycood>
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>CameronFWL</name>
+		<name>Cameron</name>
 		<xcood>-159.09</xcood>
 		<ycood>-198.47</ycood>
 		<faction>4</faction>
 	</planet>
 	<planet>
-		<name>CamlannFWL</name>
+		<name>Camlann</name>
 		<xcood>-158.57</xcood>
 		<ycood>-235.5</ycood>
 		<faction>4</faction>
 	</planet>
 	<planet>
-		<name>CamlannDC</name>
+		<name>Camlann</name>
 		<xcood>0.52</xcood>
 		<ycood>167.17</ycood>
 		<faction>2</faction>
@@ -2185,13 +2185,13 @@
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>CanopusIV</name>
+		<name>Canopus IV</name>
 		<xcood>-148.44</xcood>
 		<ycood>-398.49</ycood>
 		<faction>12</faction>
 	</planet>
 	<planet>
-		<name>CapRouge</name>
+		<name>Cap Rouge</name>
 		<xcood>-124.66</xcood>
 		<ycood>-310.35</ycood>
 		<faction>4</faction>
@@ -2227,7 +2227,7 @@
 		<faction>2</faction>
 	</planet>
 	<planet>
-		<name>CapricornIII</name>
+		<name>Capricorn III</name>
 		<xcood>88.41</xcood>
 		<ycood>-188.04</ycood>
 		<faction>1</faction>
@@ -2311,7 +2311,7 @@
 		<faction>14</faction>
 	</planet>
 	<planet>
-		<name>CarverV</name>
+		<name>Carver V</name>
 		<xcood>-5.48</xcood>
 		<ycood>-20.86</ycood>
 		<faction>16</faction>
@@ -2353,7 +2353,7 @@
 		<faction>1</faction>
 	</planet>
 	<planet>
-		<name>CatesHold</name>
+		<name>Cate's Hold</name>
 		<xcood>-70.27</xcood>
 		<ycood>-475.66</ycood>
 		<faction>12</faction>
@@ -2365,7 +2365,7 @@
 		<faction>1</faction>
 	</planet>
 	<planet>
-		<name>CavanaughII</name>
+		<name>Cavanaugh II</name>
 		<xcood>-310.61</xcood>
 		<ycood>-52.16</ycood>
 		<faction>5</faction>
@@ -2557,7 +2557,7 @@
 		<faction>4</faction>
 	</planet>
 	<planet>
-		<name>ChinmenTao</name>
+		<name>Chinmen Tao</name>
 		<xcood>344.26</xcood>
 		<ycood>217.51</ycood>
 		<faction>2</faction>
@@ -2593,7 +2593,7 @@
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>ChukchiIII</name>
+		<name>Chukchi III</name>
 		<xcood>-182.3</xcood>
 		<ycood>91.28</ycood>
 		<faction>5</faction>
@@ -2647,7 +2647,7 @@
 		<faction>1</faction>
 	</planet>
 	<planet>
-		<name>ClayborneII</name>
+		<name>Clayborne II</name>
 		<xcood>-409.56</xcood>
 		<ycood>-80.56</ycood>
 		<faction>20</faction>
@@ -2725,7 +2725,7 @@
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>ColeHarbour</name>
+		<name>Cole Harbour</name>
 		<xcood>-122.05</xcood>
 		<ycood>-294.96</ycood>
 		<faction>4</faction>
@@ -2815,7 +2815,7 @@
 		<faction>23</faction>
 	</planet>
 	<planet>
-		<name>CorCaroli</name>
+		<name>Cor Caroli</name>
 		<xcood>-62.85</xcood>
 		<ycood>15.65</ycood>
 		<faction>5</faction>
@@ -2863,13 +2863,13 @@
 		<faction>1</faction>
 	</planet>
 	<planet>
-		<name>CorridanIV</name>
+		<name>Corridan IV</name>
 		<xcood>-38.34</xcood>
 		<ycood>122.58</ycood>
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>CorsicaNueva</name>
+		<name>Corsica Nueva</name>
 		<xcood>195.86</xcood>
 		<ycood>229.24</ycood>
 		<faction>2</faction>
@@ -2923,7 +2923,7 @@
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>CrawfordsDelight</name>
+		<name>Crawford's Delight</name>
 		<xcood>-210.98</xcood>
 		<ycood>-523.78</ycood>
 		<faction>12</faction>
@@ -2971,7 +2971,7 @@
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>CruzAlta</name>
+		<name>Cruz Alta</name>
 		<xcood>-440.76</xcood>
 		<ycood>20.86</ycood>
 		<faction>5</faction>
@@ -3061,13 +3061,13 @@
 		<faction>29</faction>
 	</planet>
 	<planet>
-		<name>DaharIV</name>
+		<name>Dahar IV</name>
 		<xcood>281.92</xcood>
 		<ycood>20.34</ycood>
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>DainmarMajoris</name>
+		<name>Dainmar Majoris</name>
 		<xcood>-62.84</xcood>
 		<ycood>-488.3</ycood>
 		<faction>12</faction>
@@ -3151,13 +3151,13 @@
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>DavetalII</name>
+		<name>Davetal II</name>
 		<xcood>274.41</xcood>
 		<ycood>-449.73</ycood>
 		<faction>14</faction>
 	</planet>
 	<planet>
-		<name>DavetalIII</name>
+		<name>Davetal III</name>
 		<xcood>273.08</xcood>
 		<ycood>-451.65</ycood>
 		<faction>14</faction>
@@ -3181,13 +3181,13 @@
 		<faction>21</faction>
 	</planet>
 	<planet>
-		<name>DayrKhuna</name>
+		<name>Dayr Khuna</name>
 		<xcood>-114.75</xcood>
 		<ycood>-198.21</ycood>
 		<faction>4</faction>
 	</planet>
 	<planet>
-		<name>DeBerry</name>
+		<name>De Berry</name>
 		<xcood>450.66</xcood>
 		<ycood>63.11</ycood>
 		<faction>6</faction>
@@ -3265,7 +3265,7 @@
 		<faction>21</faction>
 	</planet>
 	<planet>
-		<name>DelosIV</name>
+		<name>Delos IV</name>
 		<xcood>618.88</xcood>
 		<ycood>60.51</ycood>
 		<faction>6</faction>
@@ -3289,13 +3289,13 @@
 		<faction>1</faction>
 	</planet>
 	<planet>
-		<name>DenebAlgedi</name>
+		<name>Deneb Algedi</name>
 		<xcood>41.47</xcood>
 		<ycood>26.34</ycood>
 		<faction>2</faction>
 	</planet>
 	<planet>
-		<name>DenebKaitos</name>
+		<name>Deneb Kaitos</name>
 		<xcood>65.2</xcood>
 		<ycood>-13.04</ycood>
 		<faction>6</faction>
@@ -3319,7 +3319,7 @@
 		<faction>22</faction>
 	</planet>
 	<planet>
-		<name>DesArc</name>
+		<name>Des Arc</name>
 		<xcood>501</xcood>
 		<ycood>-84.24</ycood>
 		<faction>6</faction>
@@ -3343,7 +3343,7 @@
 		<faction>20</faction>
 	</planet>
 	<planet>
-		<name>DevilsRock</name>
+		<name>Devil's Rock</name>
 		<xcood>-36.51</xcood>
 		<ycood>-15.39</ycood>
 		<faction>4</faction>
@@ -3397,13 +3397,13 @@
 		<faction>1</faction>
 	</planet>
 	<planet>
-		<name>DieMoot</name>
+		<name>Die Moot</name>
 		<xcood>286.88</xcood>
 		<ycood>-305.4</ycood>
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>DiedresDen</name>
+		<name>Diedre's Den</name>
 		<xcood>-421.36</xcood>
 		<ycood>-62.97</ycood>
 		<faction>20</faction>
@@ -3487,7 +3487,7 @@
 		<faction>2</faction>
 	</planet>
 	<planet>
-		<name>DonevalII</name>
+		<name>Doneval II</name>
 		<xcood>200.56</xcood>
 		<ycood>8.87</ycood>
 		<faction>6</faction>
@@ -3511,7 +3511,7 @@
 		<faction>2</faction>
 	</planet>
 	<planet>
-		<name>DrasksDen</name>
+		<name>Drask's Den</name>
 		<xcood>-87.06</xcood>
 		<ycood>493.04</ycood>
 		<faction>21</faction>
@@ -3523,7 +3523,7 @@
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>DrominiVI</name>
+		<name>Dromini VI</name>
 		<xcood>-21.12</xcood>
 		<ycood>66.76</ycood>
 		<faction>2</faction>
@@ -3601,7 +3601,7 @@
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>EarlyDawn</name>
+		<name>Early Dawn</name>
 		<xcood>-93.89</xcood>
 		<ycood>-432.2</ycood>
 		<faction>12</faction>
@@ -3679,13 +3679,13 @@
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>ElDorado</name>
+		<name>El Dorado</name>
 		<xcood>268.88</xcood>
 		<ycood>-146.31</ycood>
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>ElGiza</name>
+		<name>El Giza</name>
 		<xcood>-69.89</xcood>
 		<ycood>-276.45</ycood>
 		<faction>4</faction>
@@ -3721,7 +3721,7 @@
 		<faction>16</faction>
 	</planet>
 	<planet>
-		<name>ElidereIV</name>
+		<name>Elidere IV</name>
 		<xcood>282.45</xcood>
 		<ycood>76.68</ycood>
 		<faction>2</faction>
@@ -3781,7 +3781,7 @@
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>EmrisIV</name>
+		<name>Emris IV</name>
 		<xcood>-89.72</xcood>
 		<ycood>-150.74</ycood>
 		<faction>4</faction>
@@ -3793,7 +3793,7 @@
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>EndersCluster</name>
+		<name>Enders Cluster</name>
 		<xcood>-451.18</xcood>
 		<ycood>69.89</ycood>
 		<faction>5</faction>
@@ -3841,13 +3841,13 @@
 		<faction>4</faction>
 	</planet>
 	<planet>
-		<name>EpsilonEridani</name>
+		<name>Epsilon Eridani</name>
 		<xcood>18.52</xcood>
 		<ycood>-21.39</ycood>
 		<faction>16</faction>
 	</planet>
 	<planet>
-		<name>EpsilonIndi</name>
+		<name>Epsilon Indi</name>
 		<xcood>29.47</xcood>
 		<ycood>-15.65</ycood>
 		<faction>16</faction>
@@ -3859,7 +3859,7 @@
 		<faction>22</faction>
 	</planet>
 	<planet>
-		<name>ErodsEscape</name>
+		<name>Erod's Escape</name>
 		<xcood>487.71</xcood>
 		<ycood>-506.05</ycood>
 		<faction>14</faction>
@@ -3991,7 +3991,7 @@
 		<faction>4</faction>
 	</planet>
 	<planet>
-		<name>FallonII</name>
+		<name>Fallon II</name>
 		<xcood>371.12</xcood>
 		<ycood>49.03</ycood>
 		<faction>6</faction>
@@ -4033,7 +4033,7 @@
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>FellaninII</name>
+		<name>Fellanin II</name>
 		<xcood>133.27</xcood>
 		<ycood>33.12</ycood>
 		<faction>2</faction>
@@ -4057,13 +4057,13 @@
 		<faction>21</faction>
 	</planet>
 	<planet>
-		<name>FerrisCW</name>
+		<name>Ferris</name>
 		<xcood>-55.64</xcood>
 		<ycood>510.37</ycood>
 		<faction>21</faction>
 	</planet>
 	<planet>
-		<name>FerrisOA</name>
+		<name>Ferris</name>
 		<xcood>588.89</xcood>
 		<ycood>128.05</ycood>
 		<faction>13</faction>
@@ -4117,7 +4117,7 @@
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>FlannagansNebulea</name>
+		<name>Flannagan's Nebulea</name>
 		<xcood>183.34</xcood>
 		<ycood>-393.55</ycood>
 		<faction>14</faction>
@@ -4129,19 +4129,19 @@
 		<faction>14</faction>
 	</planet>
 	<planet>
-		<name>FletcherFWL</name>
+		<name>Fletcher</name>
 		<xcood>-68.33</xcood>
 		<ycood>-211.77</ycood>
 		<faction>4</faction>
 	</planet>
 	<planet>
-		<name>FletcherCM</name>
+		<name>Fletcher</name>
 		<xcood>47.2</xcood>
 		<ycood>-23.73</ycood>
 		<faction>16</faction>
 	</planet>
 	<planet>
-		<name>FletchersFeast</name>
+		<name>Fletcher's Feast</name>
 		<xcood>683.22</xcood>
 		<ycood>-220.79</ycood>
 		<faction>20</faction>
@@ -4177,7 +4177,7 @@
 		<faction>1</faction>
 	</planet>
 	<planet>
-		<name>FootFall</name>
+		<name>Foot Fall</name>
 		<xcood>95.45</xcood>
 		<ycood>-110.84</ycood>
 		<faction>1</faction>
@@ -4195,7 +4195,7 @@
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>FortLoudon</name>
+		<name>Fort Loudon</name>
 		<xcood>-32.6</xcood>
 		<ycood>210.99</ycood>
 		<faction>5</faction>
@@ -4303,7 +4303,7 @@
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>GalatiaIII</name>
+		<name>Galatia III</name>
 		<xcood>91.54</xcood>
 		<ycood>14.87</ycood>
 		<faction>6</faction>
@@ -4315,7 +4315,7 @@
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>GaledonV</name>
+		<name>Galedon V</name>
 		<xcood>336.17</xcood>
 		<ycood>175.26</ycood>
 		<faction>2</faction>
@@ -4351,7 +4351,7 @@
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>GaltorIII</name>
+		<name>Galtor III</name>
 		<xcood>195.86</xcood>
 		<ycood>73.81</ycood>
 		<faction>2</faction>
@@ -4381,13 +4381,13 @@
 		<faction>12</faction>
 	</planet>
 	<planet>
-		<name>GanSingh</name>
+		<name>Gan Singh</name>
 		<xcood>41.99</xcood>
 		<ycood>-80.33</ycood>
 		<faction>16</faction>
 	</planet>
 	<planet>
-		<name>GandysLuck</name>
+		<name>Gandy's Luck</name>
 		<xcood>252.45</xcood>
 		<ycood>93.89</ycood>
 		<faction>2</faction>
@@ -4507,7 +4507,7 @@
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>GillfilliansGold</name>
+		<name>Gillfillian's Gold</name>
 		<xcood>-479.6</xcood>
 		<ycood>114.23</ycood>
 		<faction>20</faction>
@@ -4567,7 +4567,7 @@
 		<faction>29</faction>
 	</planet>
 	<planet>
-		<name>GoatPath</name>
+		<name>Goat Path</name>
 		<xcood>-155.7</xcood>
 		<ycood>356.77</ycood>
 		<faction>22</faction>
@@ -4615,7 +4615,7 @@
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>GothKhakar</name>
+		<name>Goth Khakar</name>
 		<xcood>-335.39</xcood>
 		<ycood>-246.72</ycood>
 		<faction>4</faction>
@@ -4645,7 +4645,7 @@
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>GrahamIV</name>
+		<name>Graham IV</name>
 		<xcood>-23.73</xcood>
 		<ycood>-10.43</ycood>
 		<faction>4</faction>
@@ -4657,7 +4657,7 @@
 		<faction>2</faction>
 	</planet>
 	<planet>
-		<name>GrandBase</name>
+		<name>Grand Base</name>
 		<xcood>46.42</xcood>
 		<ycood>-301.48</ycood>
 		<faction>1</faction>
@@ -4669,7 +4669,7 @@
 		<faction>4</faction>
 	</planet>
 	<planet>
-		<name>GrantsStation</name>
+		<name>Grants Station</name>
 		<xcood>-70</xcood>
 		<ycood>1835</ycood>
 		<faction>29</faction>
@@ -4687,13 +4687,13 @@
 		<faction>2</faction>
 	</planet>
 	<planet>
-		<name>GreatGorge</name>
+		<name>Great Gorge</name>
 		<xcood>497.08</xcood>
 		<ycood>-269.15</ycood>
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>GreatX</name>
+		<name>Great X</name>
 		<xcood>-185.95</xcood>
 		<ycood>290.53</ycood>
 		<faction>17</faction>
@@ -4735,7 +4735,7 @@
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>GroveldIII</name>
+		<name>Groveld III</name>
 		<xcood>390.42</xcood>
 		<ycood>114.49</ycood>
 		<faction>2</faction>
@@ -4765,7 +4765,7 @@
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>GulfBreeze</name>
+		<name>Gulf Breeze</name>
 		<xcood>-306.96</xcood>
 		<ycood>205.25</ycood>
 		<faction>5</faction>
@@ -4873,19 +4873,19 @@
 		<faction>16</faction>
 	</planet>
 	<planet>
-		<name>HalloranV</name>
+		<name>Halloran V</name>
 		<xcood>73.55</xcood>
 		<ycood>-77.2</ycood>
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>HalmyreDeans</name>
+		<name>Halmyre Deans</name>
 		<xcood>-127.01</xcood>
 		<ycood>99.1</ycood>
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>HalsteadStation</name>
+		<name>Halstead Station</name>
 		<xcood>78.76</xcood>
 		<ycood>44.34</ycood>
 		<faction>2</faction>
@@ -4897,13 +4897,13 @@
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>HamiltonLA</name>
+		<name>Hamilton</name>
 		<xcood>-152.05</xcood>
 		<ycood>224.03</ycood>
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>HamiltonFWL</name>
+		<name>Hamilton</name>
 		<xcood>-35.99</xcood>
 		<ycood>-81.99</ycood>
 		<faction>4</faction>
@@ -4933,7 +4933,7 @@
 		<faction>12</faction>
 	</planet>
 	<planet>
-		<name>HardiseysHaven</name>
+		<name>Hardisey's Haven</name>
 		<xcood>-418.35</xcood>
 		<ycood>-92.36</ycood>
 		<faction>20</faction>
@@ -4975,7 +4975,7 @@
 		<faction>21</faction>
 	</planet>
 	<planet>
-		<name>HarrowsSun</name>
+		<name>Harrow's Sun</name>
 		<xcood>264.19</xcood>
 		<ycood>71.72</ycood>
 		<faction>2</faction>
@@ -5005,7 +5005,7 @@
 		<faction>4</faction>
 	</planet>
 	<planet>
-		<name>HassiRmel</name>
+		<name>Hassi'R'mel</name>
 		<xcood>291.31</xcood>
 		<ycood>281.4</ycood>
 		<faction>2</faction>
@@ -5089,7 +5089,7 @@
 		<faction>29</faction>
 	</planet>
 	<planet>
-		<name>HellosMinor</name>
+		<name>Hellos Minor</name>
 		<xcood>-187.52</xcood>
 		<ycood>-182.3</ycood>
 		<faction>4</faction>
@@ -5143,7 +5143,7 @@
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>HesperusII</name>
+		<name>Hesperus II</name>
 		<xcood>-124.66</xcood>
 		<ycood>47.2</ycood>
 		<faction>5</faction>
@@ -5287,7 +5287,7 @@
 		<faction>4</faction>
 	</planet>
 	<planet>
-		<name>HoodIV</name>
+		<name>Hood IV</name>
 		<xcood>-271.49</xcood>
 		<ycood>372.68</ycood>
 		<faction>5</faction>
@@ -5323,7 +5323,7 @@
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>HotSprings</name>
+		<name>Hot Springs</name>
 		<xcood>-172.13</xcood>
 		<ycood>371.12</ycood>
 		<faction>22</faction>
@@ -5383,7 +5383,7 @@
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>HunHo</name>
+		<name>Hun Ho</name>
 		<xcood>252.45</xcood>
 		<ycood>137.96</ycood>
 		<faction>2</faction>
@@ -5395,7 +5395,7 @@
 		<faction>1</faction>
 	</planet>
 	<planet>
-		<name>HuntersParadise</name>
+		<name>Hunter's Paradise</name>
 		<xcood>-605.32</xcood>
 		<ycood>134.85</ycood>
 		<faction>20</faction>
@@ -5533,13 +5533,13 @@
 		<faction>1</faction>
 	</planet>
 	<planet>
-		<name>ImbrialIII</name>
+		<name>Imbrial III</name>
 		<xcood>296.79</xcood>
 		<ycood>-49.81</ycood>
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>ImbrosIII</name>
+		<name>Imbros III</name>
 		<xcood>-2.09</xcood>
 		<ycood>34.43</ycood>
 		<faction>2</faction>
@@ -5605,7 +5605,7 @@
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>InnerEnd</name>
+		<name>Inner End</name>
 		<xcood>592.54</xcood>
 		<ycood>75.89</ycood>
 		<faction>6</faction>
@@ -5743,7 +5743,7 @@
 		<faction>14</faction>
 	</planet>
 	<planet>
-		<name>JansensHold</name>
+		<name>Jansen's Hold</name>
 		<xcood>185.49</xcood>
 		<ycood>-381.48</ycood>
 		<faction>14</faction>
@@ -5893,7 +5893,7 @@
 		<faction>23</faction>
 	</planet>
 	<planet>
-		<name>KafrSilim</name>
+		<name>Kafr Silim</name>
 		<xcood>119.71</xcood>
 		<ycood>-290.53</ycood>
 		<faction>6</faction>
@@ -6031,7 +6031,7 @@
 		<faction>1</faction>
 	</planet>
 	<planet>
-		<name>KassandrasMemory</name>
+		<name>Kassandra's Memory</name>
 		<xcood>-234.26</xcood>
 		<ycood>-478.77</ycood>
 		<faction>12</faction>
@@ -6055,19 +6055,19 @@
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>KausAustralis</name>
+		<name>Kaus Australis</name>
 		<xcood>5.74</xcood>
 		<ycood>84.24</ycood>
 		<faction>2</faction>
 	</planet>
 	<planet>
-		<name>KausBorealis</name>
+		<name>Kaus Borealis</name>
 		<xcood>11.48</xcood>
 		<ycood>97.28</ycood>
 		<faction>2</faction>
 	</planet>
 	<planet>
-		<name>KausMedia</name>
+		<name>Kaus Media</name>
 		<xcood>7.82</xcood>
 		<ycood>80.85</ycood>
 		<faction>2</faction>
@@ -6151,7 +6151,7 @@
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>KentaresIV</name>
+		<name>Kentares IV</name>
 		<xcood>150.74</xcood>
 		<ycood>-13.3</ycood>
 		<faction>6</faction>
@@ -6169,7 +6169,7 @@
 		<faction>2</faction>
 	</planet>
 	<planet>
-		<name>KesaiIV</name>
+		<name>Kesai IV</name>
 		<xcood>373.47</xcood>
 		<ycood>106.67</ycood>
 		<faction>6</faction>
@@ -6217,7 +6217,7 @@
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>KhonKaen</name>
+		<name>Khon Kaen</name>
 		<xcood>-387.81</xcood>
 		<ycood>-46.68</ycood>
 		<faction>5</faction>
@@ -6271,7 +6271,7 @@
 		<faction>2</faction>
 	</planet>
 	<planet>
-		<name>KimballII</name>
+		<name>Kimball II</name>
 		<xcood>-35.99</xcood>
 		<ycood>100.67</ycood>
 		<faction>2</faction>
@@ -6283,7 +6283,7 @@
 		<faction>27</faction>
 	</planet>
 	<planet>
-		<name>KinkaidII</name>
+		<name>Kinkaid II</name>
 		<xcood>444.2</xcood>
 		<ycood>123.63</ycood>
 		<faction>13</faction>
@@ -6301,7 +6301,7 @@
 		<faction>21</faction>
 	</planet>
 	<planet>
-		<name>KireiNaNiwa</name>
+		<name>Kirei Na Niwa</name>
 		<xcood>300.44</xcood>
 		<ycood>148.66</ycood>
 		<faction>2</faction>
@@ -6367,7 +6367,7 @@
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>KlathanduIV</name>
+		<name>Klathandu IV</name>
 		<xcood>176.82</xcood>
 		<ycood>31.82</ycood>
 		<faction>2</faction>
@@ -6439,13 +6439,13 @@
 		<faction>2</faction>
 	</planet>
 	<planet>
-		<name>KookensPleasurePit</name>
+		<name>Kookens Pleasure Pit</name>
 		<xcood>-166.65</xcood>
 		<ycood>348.95</ycood>
 		<faction>17</faction>
 	</planet>
 	<planet>
-		<name>KopingChian</name>
+		<name>Koping Chian</name>
 		<xcood>182.82</xcood>
 		<ycood>117.36</ycood>
 		<faction>2</faction>
@@ -6523,7 +6523,7 @@
 		<faction>1</faction>
 	</planet>
 	<planet>
-		<name>KrungThep</name>
+		<name>Krung Thep</name>
 		<xcood>-372.94</xcood>
 		<ycood>237.59</ycood>
 		<faction>5</faction>
@@ -6607,13 +6607,13 @@
 		<faction>4</faction>
 	</planet>
 	<planet>
-		<name>LaBlon</name>
+		<name>La Blon</name>
 		<xcood>-32.08</xcood>
 		<ycood>73.55</ycood>
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>LaGrave</name>
+		<name>La Grave</name>
 		<xcood>-51.64</xcood>
 		<ycood>249.32</ycood>
 		<faction>22</faction>
@@ -6673,19 +6673,19 @@
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>LancasterLA</name>
+		<name>Lancaster</name>
 		<xcood>-270.71</xcood>
 		<ycood>111.36</ycood>
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>LancasterFWL</name>
+		<name>Lancaster</name>
 		<xcood>-116.84</xcood>
 		<ycood>-88.93</ycood>
 		<faction>4</faction>
 	</planet>
 	<planet>
-		<name>LandsEnd</name>
+		<name>Land's End</name>
 		<xcood>411.54</xcood>
 		<ycood>322.87</ycood>
 		<faction>2</faction>
@@ -6709,7 +6709,7 @@
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>LapidaII</name>
+		<name>Lapida II</name>
 		<xcood>113.97</xcood>
 		<ycood>51.64</ycood>
 		<faction>2</faction>
@@ -6727,13 +6727,13 @@
 		<faction>1</faction>
 	</planet>
 	<planet>
-		<name>LastChance</name>
+		<name>Last Chance</name>
 		<xcood>-161.17</xcood>
 		<ycood>481.44</ycood>
 		<faction>22</faction>
 	</planet>
 	<planet>
-		<name>LastFrontier</name>
+		<name>Last Frontier</name>
 		<xcood>80.85</xcood>
 		<ycood>391.46</ycood>
 		<faction>23</faction>
@@ -6787,7 +6787,7 @@
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>LeBlanc</name>
+		<name>Le Blanc</name>
 		<xcood>208.9</xcood>
 		<ycood>18.52</ycood>
 		<faction>6</faction>
@@ -6841,7 +6841,7 @@
 		<faction>4</faction>
 	</planet>
 	<planet>
-		<name>LesHalles</name>
+		<name>Les Halles</name>
 		<xcood>-39.38</xcood>
 		<ycood>-189.6</ycood>
 		<faction>4</faction>
@@ -6985,13 +6985,13 @@
 		<faction>4</faction>
 	</planet>
 	<planet>
-		<name>LoganPrime</name>
+		<name>Logan Prime</name>
 		<xcood>-489.1</xcood>
 		<ycood>-230.59</ycood>
 		<faction>15</faction>
 	</planet>
 	<planet>
-		<name>LogansLand</name>
+		<name>Logan's Land</name>
 		<xcood>326.38</xcood>
 		<ycood>-359.69</ycood>
 		<faction>14</faction>
@@ -7183,7 +7183,7 @@
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>Maanshan</name>
+		<name>Ma'anshan</name>
 		<xcood>-392.5</xcood>
 		<ycood>275.14</ycood>
 		<faction>5</faction>
@@ -7213,7 +7213,7 @@
 		<faction>2</faction>
 	</planet>
 	<planet>
-		<name>MacLeodsLand</name>
+		<name>MacLeod's Land</name>
 		<xcood>170.85</xcood>
 		<ycood>-390.45</ycood>
 		<faction>14</faction>
@@ -7261,7 +7261,7 @@
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>MainStreet</name>
+		<name>Main Street</name>
 		<xcood>-381.29</xcood>
 		<ycood>354.69</ycood>
 		<faction>5</faction>
@@ -7303,7 +7303,7 @@
 		<faction>22</faction>
 	</planet>
 	<planet>
-		<name>MallorysWorld</name>
+		<name>Mallory's World</name>
 		<xcood>112.4</xcood>
 		<ycood>6</ycood>
 		<faction>6</faction>
@@ -7447,7 +7447,7 @@
 		<faction>4</faction>
 	</planet>
 	<planet>
-		<name>MariussTears</name>
+		<name>Marius's Tears</name>
 		<xcood>-472.69</xcood>
 		<ycood>-360.65</ycood>
 		<faction>15</faction>
@@ -7471,7 +7471,7 @@
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>MarlowesRift</name>
+		<name>Marlowe's Rift</name>
 		<xcood>236.81</xcood>
 		<ycood>88.67</ycood>
 		<faction>2</faction>
@@ -7549,7 +7549,7 @@
 		<faction>4</faction>
 	</planet>
 	<planet>
-		<name>MaxiesPlanet</name>
+		<name>Maxie's Planet</name>
 		<xcood>-97.28</xcood>
 		<ycood>393.03</ycood>
 		<faction>22</faction>
@@ -7771,7 +7771,7 @@
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>MersaMatruh</name>
+		<name>Mersa Matruh</name>
 		<xcood>132.49</xcood>
 		<ycood>170.56</ycood>
 		<faction>2</faction>
@@ -7783,7 +7783,7 @@
 		<faction>4</faction>
 	</planet>
 	<planet>
-		<name>MesaVerde</name>
+		<name>Mesa Verde</name>
 		<xcood>-137.7</xcood>
 		<ycood>117.62</ycood>
 		<faction>5</faction>
@@ -7813,25 +7813,25 @@
 		<faction>4</faction>
 	</planet>
 	<planet>
-		<name>MicaI</name>
+		<name>Mica I</name>
 		<xcood>686.13</xcood>
 		<ycood>19.3</ycood>
 		<faction>20</faction>
 	</planet>
 	<planet>
-		<name>MicaV</name>
+		<name>Mica V</name>
 		<xcood>685.23</xcood>
 		<ycood>17.47</ycood>
 		<faction>20</faction>
 	</planet>
 	<planet>
-		<name>MicaVII</name>
+		<name>Mica VII</name>
 		<xcood>685.41</xcood>
 		<ycood>15.28</ycood>
 		<faction>20</faction>
 	</planet>
 	<planet>
-		<name>MicrosIII</name>
+		<name>Micros III</name>
 		<xcood>364.52</xcood>
 		<ycood>-437.09</ycood>
 		<faction>14</faction>
@@ -7867,7 +7867,7 @@
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>MilligansWorld</name>
+		<name>Milligan's World</name>
 		<xcood>454.28</xcood>
 		<ycood>219.33</ycood>
 		<faction>13</faction>
@@ -8113,7 +8113,7 @@
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>MorgansHoldfast</name>
+		<name>Morgan's Holdfast</name>
 		<xcood>678.27</xcood>
 		<ycood>-194.44</ycood>
 		<faction>20</faction>
@@ -8251,7 +8251,7 @@
 		<faction>2</faction>
 	</planet>
 	<planet>
-		<name>NakaPabni</name>
+		<name>Naka Pabni</name>
 		<xcood>381.29</xcood>
 		<ycood>-294.18</ycood>
 		<faction>6</faction>
@@ -8341,235 +8341,235 @@
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>NewAberdeen</name>
+		<name>New Aberdeen</name>
 		<xcood>259.24</xcood>
 		<ycood>79.02</ycood>
 		<faction>2</faction>
 	</planet>
 	<planet>
-		<name>NewAbilene</name>
+		<name>New Abilene</name>
 		<xcood>-72.38</xcood>
 		<ycood>-454.37</ycood>
 		<faction>12</faction>
 	</planet>
 	<planet>
-		<name>NewAragon</name>
+		<name>New Aragon</name>
 		<xcood>70.16</xcood>
 		<ycood>-88.93</ycood>
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>NewAvalon</name>
+		<name>New Avalon</name>
 		<xcood>269.15</xcood>
 		<ycood>-112.14</ycood>
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>NewBergen</name>
+		<name>New Bergen</name>
 		<xcood>19.56</xcood>
 		<ycood>406.59</ycood>
 		<faction>21</faction>
 	</planet>
 	<planet>
-		<name>NewCaledonia</name>
+		<name>New Caledonia</name>
 		<xcood>-59.72</xcood>
 		<ycood>409.2</ycood>
 		<faction>21</faction>
 	</planet>
 	<planet>
-		<name>NewCanton</name>
+		<name>New Canton</name>
 		<xcood>8.35</xcood>
 		<ycood>-73.55</ycood>
 		<faction>16</faction>
 	</planet>
 	<planet>
-		<name>NewCapetown</name>
+		<name>New Capetown</name>
 		<xcood>-254.28</xcood>
 		<ycood>263.15</ycood>
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>NewDamascus</name>
+		<name>New Damascus</name>
 		<xcood>276.45</xcood>
 		<ycood>-208.38</ycood>
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>NewDelos</name>
+		<name>New Delos</name>
 		<xcood>-38.34</xcood>
 		<ycood>-141.88</ycood>
 		<faction>4</faction>
 	</planet>
 	<planet>
-		<name>NewEarth</name>
+		<name>New Earth</name>
 		<xcood>-12.52</xcood>
 		<ycood>3.13</ycood>
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>NewExford</name>
+		<name>New Exford</name>
 		<xcood>-138.48</xcood>
 		<ycood>245.41</ycood>
 		<faction>17</faction>
 	</planet>
 	<planet>
-		<name>NewGanymede</name>
+		<name>New Ganymede</name>
 		<xcood>199.03</xcood>
 		<ycood>-380.57</ycood>
 		<faction>14</faction>
 	</planet>
 	<planet>
-		<name>NewGascony</name>
+		<name>New Gascony</name>
 		<xcood>668.21</xcood>
 		<ycood>-263.43</ycood>
 		<faction>20</faction>
 	</planet>
 	<planet>
-		<name>NewHati</name>
+		<name>New Hati</name>
 		<xcood>657.78</xcood>
 		<ycood>-248.98</ycood>
 		<faction>20</faction>
 	</planet>
 	<planet>
-		<name>NewHessen</name>
+		<name>New Hessen</name>
 		<xcood>84.76</xcood>
 		<ycood>-57.12</ycood>
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>NewHome</name>
+		<name>New Home</name>
 		<xcood>7.3</xcood>
 		<ycood>-12.78</ycood>
 		<faction>16</faction>
 	</planet>
 	<planet>
-		<name>NewHope</name>
+		<name>New Hope</name>
 		<xcood>-114.23</xcood>
 		<ycood>-33.12</ycood>
 		<faction>4</faction>
 	</planet>
 	<planet>
-		<name>NewIndia</name>
+		<name>New India</name>
 		<xcood>-462.4</xcood>
 		<ycood>47.99</ycood>
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>NewIvaarsen</name>
+		<name>New Ivaarsen</name>
 		<xcood>228.98</xcood>
 		<ycood>34.95</ycood>
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>NewKent</name>
+		<name>New Kent</name>
 		<xcood>121</xcood>
 		<ycood>1783</ycood>
 		<faction>29</faction>
 	</planet>
 	<planet>
-		<name>NewKyoto</name>
+		<name>New Kyoto</name>
 		<xcood>-125.97</xcood>
 		<ycood>12.78</ycood>
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>NewMacao</name>
+		<name>New Macao</name>
 		<xcood>78.24</xcood>
 		<ycood>-123.36</ycood>
 		<faction>1</faction>
 	</planet>
 	<planet>
-		<name>NewMendham</name>
+		<name>New Mendham</name>
 		<xcood>180.73</xcood>
 		<ycood>59.98</ycood>
 		<faction>2</faction>
 	</planet>
 	<planet>
-		<name>NewOlympia</name>
+		<name>New Olympia</name>
 		<xcood>-151.52</xcood>
 		<ycood>-131.44</ycood>
 		<faction>4</faction>
 	</planet>
 	<planet>
-		<name>NewOslo</name>
+		<name>New Oslo</name>
 		<xcood>15.39</xcood>
 		<ycood>389.64</ycood>
 		<faction>21</faction>
 	</planet>
 	<planet>
-		<name>NewPortRoyal</name>
+		<name>New Port Royal</name>
 		<xcood>664</xcood>
 		<ycood>-212.92</ycood>
 		<faction>20</faction>
 	</planet>
 	<planet>
-		<name>NewRhodesIII</name>
+		<name>New Rhodes III</name>
 		<xcood>103.28</xcood>
 		<ycood>-15.91</ycood>
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>NewRoland</name>
+		<name>New Roland</name>
 		<xcood>-8.08</xcood>
 		<ycood>-404.76</ycood>
 		<faction>1</faction>
 	</planet>
 	<planet>
-		<name>NewSagan</name>
+		<name>New Sagan</name>
 		<xcood>80.59</xcood>
 		<ycood>-179.17</ycood>
 		<faction>1</faction>
 	</planet>
 	<planet>
-		<name>NewSamarkand</name>
+		<name>New Samarkand</name>
 		<xcood>362.77</xcood>
 		<ycood>250.89</ycood>
 		<faction>2</faction>
 	</planet>
 	<planet>
-		<name>NewSt.Andrews</name>
+		<name>New St. Andrews</name>
 		<xcood>-517.6</xcood>
 		<ycood>-108.78</ycood>
 		<faction>20</faction>
 	</planet>
 	<planet>
-		<name>NewSyrtis</name>
+		<name>New Syrtis</name>
 		<xcood>233.16</xcood>
 		<ycood>-298.88</ycood>
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>NewValencia</name>
+		<name>New Valencia</name>
 		<xcood>221.94</xcood>
 		<ycood>-29.47</ycood>
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>NewVallis</name>
+		<name>New Vallis</name>
 		<xcood>193.36</xcood>
 		<ycood>-378.74</ycood>
 		<faction>14</faction>
 	</planet>
 	<planet>
-		<name>NewVandenburg</name>
+		<name>New Vandenburg</name>
 		<xcood>157.26</xcood>
 		<ycood>-409.2</ycood>
 		<faction>14</faction>
 	</planet>
 	<planet>
-		<name>NewVenice</name>
+		<name>New Venice</name>
 		<xcood>-474.91</xcood>
 		<ycood>-298.89</ycood>
 		<faction>15</faction>
 	</planet>
 	<planet>
-		<name>NewWessex</name>
+		<name>New Wessex</name>
 		<xcood>-12.52</xcood>
 		<ycood>114.49</ycood>
 		<faction>2</faction>
 	</planet>
 	<planet>
-		<name>NewWestin</name>
+		<name>New Westin</name>
 		<xcood>38.6</xcood>
 		<ycood>-244.11</ycood>
 		<faction>1</faction>
@@ -8587,7 +8587,7 @@
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>NewtownSquare</name>
+		<name>Newtown Square</name>
 		<xcood>-230.29</xcood>
 		<ycood>396.68</ycood>
 		<faction>5</faction>
@@ -8617,13 +8617,13 @@
 		<faction>4</faction>
 	</planet>
 	<planet>
-		<name>NilesC</name>
+		<name>Niles</name>
 		<xcood>119</xcood>
 		<ycood>1704</ycood>
 		<faction>29</faction>
 	</planet>
 	<planet>
-		<name>NilesDC</name>
+		<name>Niles</name>
 		<xcood>402.15</xcood>
 		<ycood>121.01</ycood>
 		<faction>2</faction>
@@ -8647,19 +8647,19 @@
 		<faction>1</faction>
 	</planet>
 	<planet>
-		<name>NiopsV</name>
+		<name>Niops V</name>
 		<xcood>-378.34</xcood>
 		<ycood>-263.8</ycood>
 		<faction>20</faction>
 	</planet>
 	<planet>
-		<name>NiopsVI</name>
+		<name>Niops VI</name>
 		<xcood>-376.76</xcood>
 		<ycood>-264.1</ycood>
 		<faction>20</faction>
 	</planet>
 	<planet>
-		<name>NiopsVII</name>
+		<name>Niops VII</name>
 		<xcood>-377.01</xcood>
 		<ycood>-267.23</ycood>
 		<faction>20</faction>
@@ -8683,7 +8683,7 @@
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>NoReturn</name>
+		<name>No Return</name>
 		<xcood>56.85</xcood>
 		<ycood>-178.91</ycood>
 		<faction>1</faction>
@@ -8719,7 +8719,7 @@
 		<faction>4</faction>
 	</planet>
 	<planet>
-		<name>NormansWorld</name>
+		<name>Norman's World</name>
 		<xcood>333.25</xcood>
 		<ycood>-356.59</ycood>
 		<faction>14</faction>
@@ -8749,13 +8749,13 @@
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>NouveauxParis</name>
+		<name>Nouveaux Paris</name>
 		<xcood>129</xcood>
 		<ycood>843</ycood>
 		<faction>20</faction>
 	</planet>
 	<planet>
-		<name>NovaRoma</name>
+		<name>Nova Roma</name>
 		<xcood>-83.98</xcood>
 		<ycood>-135.09</ycood>
 		<faction>4</faction>
@@ -8767,19 +8767,19 @@
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>NovayaZemlya</name>
+		<name>Novaya Zemlya</name>
 		<xcood>182.3</xcood>
 		<ycood>-184.91</ycood>
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>NovoFranklin</name>
+		<name>Novo Franklin</name>
 		<xcood>673.52</xcood>
 		<ycood>62.13</ycood>
 		<faction>20</faction>
 	</planet>
 	<planet>
-		<name>NovoTressida</name>
+		<name>Novo Tressida</name>
 		<xcood>-173.94</xcood>
 		<ycood>-497.4</ycood>
 		<faction>12</faction>
@@ -8845,13 +8845,13 @@
 		<faction>21</faction>
 	</planet>
 	<planet>
-		<name>OFallon</name>
+		<name>O'Fallon</name>
 		<xcood>316.35</xcood>
 		<ycood>-83.98</ycood>
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>OberonVI</name>
+		<name>Oberon VI</name>
 		<xcood>-112.4</xcood>
 		<ycood>477.52</ycood>
 		<faction>21</faction>
@@ -8935,7 +8935,7 @@
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>OldKentucky</name>
+		<name>Old Kentucky</name>
 		<xcood>2.09</xcood>
 		<ycood>-142.92</ycood>
 		<faction>1</faction>
@@ -8989,13 +8989,13 @@
 		<faction>4</faction>
 	</planet>
 	<planet>
-		<name>OrkneyCJF</name>
+		<name>Orkney</name>
 		<xcood>-49.03</xcood>
 		<ycood>237.07</ycood>
 		<faction>22</faction>
 	</planet>
 	<planet>
-		<name>OrkneyTC</name>
+		<name>Orkney</name>
 		<xcood>382.04</xcood>
 		<ycood>-402.6</ycood>
 		<faction>14</faction>
@@ -9019,7 +9019,7 @@
 		<faction>2</faction>
 	</planet>
 	<planet>
-		<name>OsmusSaar</name>
+		<name>Osmus Saar</name>
 		<xcood>150.74</xcood>
 		<ycood>175.52</ycood>
 		<faction>2</faction>
@@ -9043,7 +9043,7 @@
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>OuterVolta</name>
+		<name>Outer Volta</name>
 		<xcood>156.74</xcood>
 		<ycood>320.78</ycood>
 		<faction>2</faction>
@@ -9181,7 +9181,7 @@
 		<faction>2</faction>
 	</planet>
 	<planet>
-		<name>ParkPlace</name>
+		<name>Park Place</name>
 		<xcood>-29.73</xcood>
 		<ycood>-111.88</ycood>
 		<faction>4</faction>
@@ -9229,7 +9229,7 @@
 		<faction>15</faction>
 	</planet>
 	<planet>
-		<name>PaulusPrime</name>
+		<name>Paulus Prime</name>
 		<xcood>-73.43</xcood>
 		<ycood>484.03</ycood>
 		<faction>21</faction>
@@ -9259,7 +9259,7 @@
 		<faction>2</faction>
 	</planet>
 	<planet>
-		<name>PellaII</name>
+		<name>Pella II</name>
 		<xcood>-30.77</xcood>
 		<ycood>-228.98</ycood>
 		<faction>1</faction>
@@ -9355,7 +9355,7 @@
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>PikeIV</name>
+		<name>Pike IV</name>
 		<xcood>20.34</xcood>
 		<ycood>39.64</ycood>
 		<faction>2</faction>
@@ -9391,7 +9391,7 @@
 		<faction>23</faction>
 	</planet>
 	<planet>
-		<name>PiratesHaven</name>
+		<name>Pirates Haven (clst)</name>
 		<xcood>428.76</xcood>
 		<ycood>-352.86</ycood>
 		<faction>20</faction>
@@ -9421,7 +9421,7 @@
 		<faction>21</faction>
 	</planet>
 	<planet>
-		<name>PleiadesCluster</name>
+		<name>Pleiades Cluster</name>
 		<xcood>218.29</xcood>
 		<ycood>-322.35</ycood>
 		<faction>6</faction>
@@ -9451,7 +9451,7 @@
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>PointBarrow</name>
+		<name>Point Barrow</name>
 		<xcood>366.16</xcood>
 		<ycood>-130.92</ycood>
 		<faction>6</faction>
@@ -9475,7 +9475,7 @@
 		<faction>4</faction>
 	</planet>
 	<planet>
-		<name>PommeDeTerre</name>
+		<name>Pomme De Terre</name>
 		<xcood>56.85</xcood>
 		<ycood>366.16</ycood>
 		<faction>23</faction>
@@ -9499,13 +9499,13 @@
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>PortArthur</name>
+		<name>Port Arthur</name>
 		<xcood>132.75</xcood>
 		<ycood>257.67</ycood>
 		<faction>2</faction>
 	</planet>
 	<planet>
-		<name>PortMoseby</name>
+		<name>Port Moseby</name>
 		<xcood>3.39</xcood>
 		<ycood>161.7</ycood>
 		<faction>5</faction>
@@ -9565,13 +9565,13 @@
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>PrestonFWL</name>
+		<name>Preston</name>
 		<xcood>-225.85</xcood>
 		<ycood>-71.72</ycood>
 		<faction>4</faction>
 	</planet>
 	<planet>
-		<name>PrestonCC</name>
+		<name>Preston</name>
 		<xcood>13.3</xcood>
 		<ycood>-215.94</ycood>
 		<faction>1</faction>
@@ -9595,7 +9595,7 @@
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>PrinisPrime</name>
+		<name>Prinis Prime</name>
 		<xcood>477.16</xcood>
 		<ycood>235.43</ycood>
 		<faction>13</faction>
@@ -9619,7 +9619,7 @@
 		<faction>4</faction>
 	</planet>
 	<planet>
-		<name>PromisedLand</name>
+		<name>Promised Land</name>
 		<xcood>-306.96</xcood>
 		<ycood>-73.02</ycood>
 		<faction>4</faction>
@@ -9685,7 +9685,7 @@
 		<faction>22</faction>
 	</planet>
 	<planet>
-		<name>QuatreBelle</name>
+		<name>Quatre Belle</name>
 		<xcood>485.38</xcood>
 		<ycood>157.85</ycood>
 		<faction>13</faction>
@@ -9817,7 +9817,7 @@
 		<faction>1</faction>
 	</planet>
 	<planet>
-		<name>RandisIV</name>
+		<name>Randis IV</name>
 		<xcood>626.8</xcood>
 		<ycood>-345.81</ycood>
 		<faction>20</faction>
@@ -9877,13 +9877,13 @@
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>ReeseStation</name>
+		<name>Reese Station</name>
 		<xcood>-295.23</xcood>
 		<ycood>172.39</ycood>
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>RegisRoost</name>
+		<name>Regis Roost</name>
 		<xcood>154.75</xcood>
 		<ycood>-445.9</ycood>
 		<faction>14</faction>
@@ -9895,7 +9895,7 @@
 		<faction>4</faction>
 	</planet>
 	<planet>
-		<name>ReislingsPlanet</name>
+		<name>Reisling's Planet</name>
 		<xcood>177.34</xcood>
 		<ycood>81.37</ycood>
 		<faction>2</faction>
@@ -9973,7 +9973,7 @@
 		<faction>20</faction>
 	</planet>
 	<planet>
-		<name>RezaksHole</name>
+		<name>Rezak's Hole</name>
 		<xcood>421.89</xcood>
 		<ycood>342.12</ycood>
 		<faction>20</faction>
@@ -10003,7 +10003,7 @@
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>RigilKentarus</name>
+		<name>Rigil Kentarus</name>
 		<xcood>-2.87</xcood>
 		<ycood>2.61</ycood>
 		<faction>5</faction>
@@ -10147,7 +10147,7 @@
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>RoyalFoxx</name>
+		<name>Royal Foxx</name>
 		<xcood>-198.11</xcood>
 		<ycood>-398.71</ycood>
 		<faction>12</faction>
@@ -10255,7 +10255,7 @@
 		<faction>4</faction>
 	</planet>
 	<planet>
-		<name>SafePort</name>
+		<name>Safe Port</name>
 		<xcood>135.62</xcood>
 		<ycood>-289.49</ycood>
 		<faction>6</faction>
@@ -10285,19 +10285,19 @@
 		<faction>2</faction>
 	</planet>
 	<planet>
-		<name>SakhalinLA</name>
+		<name>Sakhalin</name>
 		<xcood>-24.25</xcood>
 		<ycood>153.09</ycood>
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>SakhalinCC</name>
+		<name>Sakhalin</name>
 		<xcood>62.33</xcood>
 		<ycood>-142.92</ycood>
 		<faction>16</faction>
 	</planet>
 	<planet>
-		<name>SakharaV</name>
+		<name>Sakhara V</name>
 		<xcood>279.06</xcood>
 		<ycood>34.43</ycood>
 		<faction>6</faction>
@@ -10345,7 +10345,7 @@
 		<faction>14</faction>
 	</planet>
 	<planet>
-		<name>SanNicolas</name>
+		<name>San Nicolas</name>
 		<xcood>-393.81</xcood>
 		<ycood>-169.78</ycood>
 		<faction>4</faction>
@@ -10369,7 +10369,7 @@
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>SantanderV</name>
+		<name>Santander V</name>
 		<xcood>78.5</xcood>
 		<ycood>485.35</ycood>
 		<faction>23</faction>
@@ -10441,7 +10441,7 @@
 		<faction>23</faction>
 	</planet>
 	<planet>
-		<name>SaukCity</name>
+		<name>Sauk City</name>
 		<xcood>279.06</xcood>
 		<ycood>-3.13</ycood>
 		<faction>6</faction>
@@ -10549,13 +10549,13 @@
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>SecondChance</name>
+		<name>Second Chance</name>
 		<xcood>-22.95</xcood>
 		<ycood>-130.92</ycood>
 		<faction>4</faction>
 	</planet>
 	<planet>
-		<name>SecondTry</name>
+		<name>Second Try</name>
 		<xcood>34.69</xcood>
 		<ycood>-116.84</ycood>
 		<faction>1</faction>
@@ -10639,7 +10639,7 @@
 		<faction>29</faction>
 	</planet>
 	<planet>
-		<name>ShahrKord</name>
+		<name>Shahr Kord</name>
 		<xcood>-435.28</xcood>
 		<ycood>-10.43</ycood>
 		<faction>5</faction>
@@ -10657,7 +10657,7 @@
 		<faction>4</faction>
 	</planet>
 	<planet>
-		<name>ShaulKhala</name>
+		<name>Shaul Khala</name>
 		<xcood>221.42</xcood>
 		<ycood>134.57</ycood>
 		<faction>2</faction>
@@ -10711,7 +10711,7 @@
 		<faction>4</faction>
 	</planet>
 	<planet>
-		<name>SheridanC</name>
+		<name>Sheridan</name>
 		<xcood>126</xcood>
 		<ycood>1793</ycood>
 		<faction>29</faction>
@@ -10777,7 +10777,7 @@
 		<faction>1</faction>
 	</planet>
 	<planet>
-		<name>ShiroIII</name>
+		<name>Shiro III</name>
 		<xcood>-28.43</xcood>
 		<ycood>-295.23</ycood>
 		<faction>4</faction>
@@ -10807,7 +10807,7 @@
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>ShuenWan</name>
+		<name>Shuen Wan</name>
 		<xcood>-37.56</xcood>
 		<ycood>-221.16</ycood>
 		<faction>4</faction>
@@ -10843,7 +10843,7 @@
 		<faction>2</faction>
 	</planet>
 	<planet>
-		<name>SigmaMare</name>
+		<name>Sigma Mare</name>
 		<xcood>6.52</xcood>
 		<ycood>-317.65</ycood>
 		<faction>1</faction>
@@ -10873,7 +10873,7 @@
 		<faction>2</faction>
 	</planet>
 	<planet>
-		<name>SimpsonDesert</name>
+		<name>Simpson Desert</name>
 		<xcood>-273.84</xcood>
 		<ycood>-127.79</ycood>
 		<faction>4</faction>
@@ -10963,7 +10963,7 @@
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>SmallWorld</name>
+		<name>Small World</name>
 		<xcood>52.16</xcood>
 		<ycood>-7.04</ycood>
 		<faction>16</faction>
@@ -11011,7 +11011,7 @@
 		<faction>22</faction>
 	</planet>
 	<planet>
-		<name>SonHoa</name>
+		<name>Son Hoa</name>
 		<xcood>-424.84</xcood>
 		<ycood>-36.77</ycood>
 		<faction>5</faction>
@@ -11029,7 +11029,7 @@
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>SophiesWorld</name>
+		<name>Sophie's World</name>
 		<xcood>-103.54</xcood>
 		<ycood>-133.01</ycood>
 		<faction>4</faction>
@@ -11083,37 +11083,37 @@
 		<faction>14</faction>
 	</planet>
 	<planet>
-		<name>St.Andre</name>
+		<name>St. Andre</name>
 		<xcood>66.24</xcood>
 		<ycood>-101.45</ycood>
 		<faction>1</faction>
 	</planet>
 	<planet>
-		<name>St.Ives</name>
+		<name>St. Ives</name>
 		<xcood>112.4</xcood>
 		<ycood>-217.51</ycood>
 		<faction>1</faction>
 	</planet>
 	<planet>
-		<name>St.Jean</name>
+		<name>St. Jean</name>
 		<xcood>-468</xcood>
 		<ycood>1065</ycood>
 		<faction>22</faction>
 	</planet>
 	<planet>
-		<name>St.John</name>
+		<name>St. John</name>
 		<xcood>-13.56</xcood>
 		<ycood>404.5</ycood>
 		<faction>21</faction>
 	</planet>
 	<planet>
-		<name>St.Loris</name>
+		<name>St. Loris</name>
 		<xcood>90.76</xcood>
 		<ycood>-244.11</ycood>
 		<faction>11</faction>
 	</planet>
 	<planet>
-		<name>St.Robert</name>
+		<name>St. Robert</name>
 		<xcood>437.36</xcood>
 		<ycood>-31.56</ycood>
 		<faction>6</faction>
@@ -11149,7 +11149,7 @@
 		<faction>2</faction>
 	</planet>
 	<planet>
-		<name>StarsEnd</name>
+		<name>Star's End</name>
 		<xcood>-83.98</xcood>
 		<ycood>436.06</ycood>
 		<faction>21</faction>
@@ -11167,7 +11167,7 @@
 		<faction>22</faction>
 	</planet>
 	<planet>
-		<name>SteinsFolly</name>
+		<name>Stein's Folly</name>
 		<xcood>161.17</xcood>
 		<ycood>-202.12</ycood>
 		<faction>6</faction>
@@ -11221,7 +11221,7 @@
 		<faction>4</faction>
 	</planet>
 	<planet>
-		<name>StranaMechty</name>
+		<name>Strana Mechty</name>
 		<xcood>31</xcood>
 		<ycood>1766</ycood>
 		<faction>29</faction>
@@ -11239,7 +11239,7 @@
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>StratoDomingo</name>
+		<name>Strato Domingo</name>
 		<xcood>9</xcood>
 		<ycood>1881</ycood>
 		<faction>29</faction>
@@ -11275,7 +11275,7 @@
 		<faction>2</faction>
 	</planet>
 	<planet>
-		<name>SudaBay</name>
+		<name>Suda Bay</name>
 		<xcood>245</xcood>
 		<ycood>947</ycood>
 		<faction>20</faction>
@@ -11299,7 +11299,7 @@
 		<faction>2</faction>
 	</planet>
 	<planet>
-		<name>SukII</name>
+		<name>Suk II</name>
 		<xcood>-29.47</xcood>
 		<ycood>258.45</ycood>
 		<faction>21</faction>
@@ -11329,7 +11329,7 @@
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>SunPrairie</name>
+		<name>Sun Prairie</name>
 		<xcood>328.09</xcood>
 		<ycood>29.21</ycood>
 		<faction>6</faction>
@@ -11455,7 +11455,7 @@
 		<faction>4</faction>
 	</planet>
 	<planet>
-		<name>TallTrees</name>
+		<name>Tall Trees</name>
 		<xcood>0.78</xcood>
 		<ycood>-67.29</ycood>
 		<faction>16</faction>
@@ -11497,7 +11497,7 @@
 		<faction>2</faction>
 	</planet>
 	<planet>
-		<name>TancrediIV</name>
+		<name>Tancredi IV</name>
 		<xcood>433.45</xcood>
 		<ycood>94.41</ycood>
 		<faction>6</faction>
@@ -11515,19 +11515,19 @@
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>TanhLinh</name>
+		<name>Tanh Linh</name>
 		<xcood>91.02</xcood>
 		<ycood>234.46</ycood>
 		<faction>2</faction>
 	</planet>
 	<planet>
-		<name>TaniaAustralis</name>
+		<name>Tania Australis</name>
 		<xcood>-141.88</xcood>
 		<ycood>-65.2</ycood>
 		<faction>4</faction>
 	</planet>
 	<planet>
-		<name>TaniaBorealis</name>
+		<name>Tania Borealis</name>
 		<xcood>-107.71</xcood>
 		<ycood>-52.94</ycood>
 		<faction>4</faction>
@@ -11575,7 +11575,7 @@
 		<faction>2</faction>
 	</planet>
 	<planet>
-		<name>TarolIV</name>
+		<name>Tarol IV</name>
 		<xcood>-231.6</xcood>
 		<ycood>-402.7</ycood>
 		<faction>12</faction>
@@ -11623,7 +11623,7 @@
 		<faction>4</faction>
 	</planet>
 	<planet>
-		<name>TechnesRevenge</name>
+		<name>Techne's Revenge</name>
 		<xcood>-233.7</xcood>
 		<ycood>-428.21</ycood>
 		<faction>12</faction>
@@ -11641,19 +11641,19 @@
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>TellmanIV</name>
+		<name>Tellman IV</name>
 		<xcood>541.94</xcood>
 		<ycood>99.1</ycood>
 		<faction>13</faction>
 	</planet>
 	<planet>
-		<name>TellmansMistake</name>
+		<name>Tellman's Mistake</name>
 		<xcood>-245.67</xcood>
 		<ycood>-313.48</ycood>
 		<faction>4</faction>
 	</planet>
 	<planet>
-		<name>TelosIV</name>
+		<name>Telos IV</name>
 		<xcood>44.34</xcood>
 		<ycood>40.68</ycood>
 		<faction>2</faction>
@@ -11689,7 +11689,7 @@
 		<faction>9</faction>
 	</planet>
 	<planet>
-		<name>TerraFirma</name>
+		<name>Terra Firma</name>
 		<xcood>22.69</xcood>
 		<ycood>-33.9</ycood>
 		<faction>16</faction>
@@ -11719,7 +11719,7 @@
 		<faction>20</faction>
 	</planet>
 	<planet>
-		<name>ThadorasLand</name>
+		<name>Thadora's Land</name>
 		<xcood>-446.81</xcood>
 		<ycood>-91.66</ycood>
 		<faction>20</faction>
@@ -11737,19 +11737,19 @@
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>TheEdge</name>
+		<name>The Edge</name>
 		<xcood>-33.9</xcood>
 		<ycood>410.76</ycood>
 		<faction>21</faction>
 	</planet>
 	<planet>
-		<name>TheRack</name>
+		<name>The Rack</name>
 		<xcood>-404.51</xcood>
 		<ycood>374.3</ycood>
 		<faction>20</faction>
 	</planet>
 	<planet>
-		<name>TheRock</name>
+		<name>The Rock</name>
 		<xcood>-82.93</xcood>
 		<ycood>504.91</ycood>
 		<faction>21</faction>
@@ -11827,7 +11827,7 @@
 		<faction>4</faction>
 	</planet>
 	<planet>
-		<name>TiberC</name>
+		<name>Tiber</name>
 		<xcood>89</xcood>
 		<ycood>1877</ycood>
 		<faction>29</faction>
@@ -11929,7 +11929,7 @@
 		<faction>4</faction>
 	</planet>
 	<planet>
-		<name>TokDo</name>
+		<name>Tok Do</name>
 		<xcood>94.41</xcood>
 		<ycood>169.26</ycood>
 		<faction>2</faction>
@@ -11971,7 +11971,7 @@
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>TortugaPrime</name>
+		<name>Tortuga Prime</name>
 		<xcood>670.31</xcood>
 		<ycood>-235.62</ycood>
 		<faction>20</faction>
@@ -11995,7 +11995,7 @@
 		<faction>20</faction>
 	</planet>
 	<planet>
-		<name>TrellI</name>
+		<name>Trell I</name>
 		<xcood>-115.01</xcood>
 		<ycood>390.42</ycood>
 		<faction>22</faction>
@@ -12055,7 +12055,7 @@
 		<faction>2</faction>
 	</planet>
 	<planet>
-		<name>TrollocPrime</name>
+		<name>Trolloc Prime</name>
 		<xcood>33.9</xcood>
 		<ycood>172.65</ycood>
 		<faction>2</faction>
@@ -12079,7 +12079,7 @@
 		<faction>1</faction>
 	</planet>
 	<planet>
-		<name>TrznadelCluster</name>
+		<name>Trznadel Cluster</name>
 		<xcood>-161.17</xcood>
 		<ycood>-462.66</ycood>
 		<faction>12</faction>
@@ -12151,7 +12151,7 @@
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>TurtleBay</name>
+		<name>Turtle Bay</name>
 		<xcood>154.13</xcood>
 		<ycood>404.5</ycood>
 		<faction>2</faction>
@@ -12193,13 +12193,13 @@
 		<faction>4</faction>
 	</planet>
 	<planet>
-		<name>UlanBatar</name>
+		<name>Ulan Batar</name>
 		<xcood>126.23</xcood>
 		<ycood>-101.45</ycood>
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>UlanBator</name>
+		<name>Ulan Bator</name>
 		<xcood>36.25</xcood>
 		<ycood>-140.57</ycood>
 		<faction>1</faction>
@@ -12325,7 +12325,7 @@
 		<faction>2</faction>
 	</planet>
 	<planet>
-		<name>VanDiemenIV</name>
+		<name>Van Diemen IV</name>
 		<xcood>-33.12</xcood>
 		<ycood>-41.99</ycood>
 		<faction>4</faction>
@@ -12457,13 +12457,13 @@
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>VictoriaCC</name>
+		<name>Victoria</name>
 		<xcood>93.63</xcood>
 		<ycood>-351.04</ycood>
 		<faction>1</faction>
 	</planet>
 	<planet>
-		<name>VictoriaFS</name>
+		<name>Victoria</name>
 		<xcood>227.68</xcood>
 		<ycood>-178.39</ycood>
 		<faction>6</faction>
@@ -12529,7 +12529,7 @@
 		<faction>21</faction>
 	</planet>
 	<planet>
-		<name>VonStrangsWorld</name>
+		<name>Von Strang's World</name>
 		<xcood>-161.2</xcood>
 		<ycood>520.07</ycood>
 		<faction>22</faction>
@@ -12817,13 +12817,13 @@
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>WinfieldCJF</name>
+		<name>Winfield</name>
 		<xcood>-112.67</xcood>
 		<ycood>408.93</ycood>
 		<faction>22</faction>
 	</planet>
 	<planet>
-		<name>WinfieldFS</name>
+		<name>Winfield</name>
 		<xcood>542.2</xcood>
 		<ycood>23.73</ycood>
 		<faction>6</faction>
@@ -12919,7 +12919,7 @@
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>XantheIII</name>
+		<name>Xanthe III</name>
 		<xcood>-67.81</xcood>
 		<ycood>-333.56</ycood>
 		<faction>4</faction>
@@ -12931,13 +12931,13 @@
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>XhosaVII</name>
+		<name>Xhosa VII</name>
 		<xcood>175.52</xcood>
 		<ycood>14.6</ycood>
 		<faction>6</faction>
 	</planet>
 	<planet>
-		<name>XiengKhouang</name>
+		<name>Xieng Khouang</name>
 		<xcood>86.06</xcood>
 		<ycood>-314.52</ycood>
 		<faction>1</faction>
@@ -12955,7 +12955,7 @@
 		<faction>2</faction>
 	</planet>
 	<planet>
-		<name>YanceI</name>
+		<name>Yance I</name>
 		<xcood>70.42</xcood>
 		<ycood>52.16</ycood>
 		<faction>2</faction>
@@ -12979,13 +12979,13 @@
 		<faction>2</faction>
 	</planet>
 	<planet>
-		<name>YedPosterior</name>
+		<name>Yed Posterior</name>
 		<xcood>-44.6</xcood>
 		<ycood>120.23</ycood>
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>YedPrior</name>
+		<name>Yed Prior</name>
 		<xcood>-62.59</xcood>
 		<ycood>125.18</ycood>
 		<faction>5</faction>
@@ -13009,7 +13009,7 @@
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>YorkC</name>
+		<name>York</name>
 		<xcood>-74</xcood>
 		<ycood>1806</ycood>
 		<faction>29</faction>
@@ -13135,7 +13135,7 @@
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>ZornsKeep</name>
+		<name>Zorn's Keep</name>
 		<xcood>-432.69</xcood>
 		<ycood>-113.64</ycood>
 		<faction>20</faction>
@@ -13177,7 +13177,7 @@
 		<faction>5</faction>
 	</planet>
 	<planet>
-		<name>UrCruinne</name>
+		<name>Ur Cruinne</name>
 		<xcood>-15</xcood>
 		<ycood>-476</ycood>
 		<faction>20</faction>
