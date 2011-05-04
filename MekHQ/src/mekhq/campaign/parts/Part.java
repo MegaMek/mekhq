@@ -263,7 +263,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable {
 			int flags = (clanEngine ? Engine.CLAN_ENGINE : 0)
 					+ (tankEngine ? Engine.TANK_ENGINE : 0)
 					+ (largeEngine ? Engine.LARGE_ENGINE : 0);
-			int faction = (clanEngine ? Faction.F_CLAN : Faction.F_FEDSUN);
+			int faction = (clanEngine ? Faction.F_C_OTHER : Faction.F_FEDSUN);
 
 			Engine engine = new Engine(rating, type, flags);
 			MekEngine mekEngine = new MekEngine(false, tonnage, faction,

@@ -41,8 +41,8 @@ import org.w3c.dom.NodeList;
  */
 public class Planet {
 	
-	private int x; 
-	private int y;
+	private double x; 
+	private double y;
 	private int faction;
 	private String name;
 	
@@ -53,11 +53,11 @@ public class Planet {
 		this.name = "Terra";
 	}
 	
-	public int getX() {
+	public double getX() {
 		return x;
 	}
 	
-	public int getY() {
+	public double getY() {
 		return y;
 	}
 	
@@ -78,39 +78,11 @@ public class Planet {
 			if (wn2.getNodeName().equalsIgnoreCase("name")) {
 				retVal.name = wn2.getTextContent();
 			} else if (wn2.getNodeName().equalsIgnoreCase("xcood")) {
-				retVal.x = Integer.parseInt(wn2.getTextContent());
+				retVal.x = Double.parseDouble(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("ycood")) {
-				retVal.y = Integer.parseInt(wn2.getTextContent());
-			}
-			//I have to dig down two levels for faction info. I should really
-			//just build up my own xml files from the ISCS files
-			else if (wn2.getNodeName().equalsIgnoreCase("influence")) {
-				NodeList nl2 = wn2.getChildNodes();
-				for (int y=0; y<nl2.getLength(); y++) {
-					Node wn3 = nl2.item(y);
-					 if (wn3.getNodeName().equalsIgnoreCase("inf")) {
-						 NodeList nl3 = wn3.getChildNodes();
-						 for (int z=0; z<nl3.getLength(); z++) {
-							 Node wn4 = nl3.item(y);
-							 if (wn4.getNodeName().equalsIgnoreCase("faction")) {
-								 String fname = wn4.getTextContent();
-								 if(fname.equalsIgnoreCase("davion")) {
-									 retVal.faction = Faction.F_FEDSUN;
-								 } else if(fname.equalsIgnoreCase("liao")) {
-									 retVal.faction = Faction.F_CAPCON;
-								 } else if(fname.equalsIgnoreCase("steiner")) {
-									 retVal.faction = Faction.F_LYRAN;
-								 } else if(fname.equalsIgnoreCase("kurita")) {
-									 retVal.faction = Faction.F_DRAC;
-								 } else if(fname.equalsIgnoreCase("marik")) {
-									 retVal.faction = Faction.F_FWL;
-								 } else {
-									 retVal.faction = Faction.F_COMSTAR;
-								 }
-							 }
-						 }
-					 }
-				}
+				retVal.y = Double.parseDouble(wn2.getTextContent());
+			} else if (wn2.getNodeName().equalsIgnoreCase("faction")) {
+				retVal.faction = Integer.parseInt(wn2.getTextContent());
 			}
 		}
 		return retVal;

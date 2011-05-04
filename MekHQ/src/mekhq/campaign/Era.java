@@ -124,7 +124,7 @@ public class Era {
     }
     
     public static int getEraMod(int era, int faction) {
-        if(faction == Faction.F_COMSTAR || faction == Faction.F_CLAN || faction == Faction.F_WOB) {
+        if(faction == Faction.F_COMSTAR || Faction.isClanFaction(faction) || faction == Faction.F_WOB) {
             return 0;
         }
         switch(era) {
