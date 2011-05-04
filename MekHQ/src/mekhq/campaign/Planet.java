@@ -87,4 +87,17 @@ public class Planet {
 		}
 		return retVal;
 	}
+	
+	@Override
+	public boolean equals(Object object) {
+		if(object instanceof Planet) {
+			Planet planet = (Planet)object;
+			if(planet.getName().equalsIgnoreCase(name) 
+					&& planet.getX() == x
+					&& planet.getY() == y) {
+				return true;
+			}
+		}
+		return false;
+	}
 }

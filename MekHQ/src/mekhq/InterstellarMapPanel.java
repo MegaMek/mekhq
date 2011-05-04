@@ -36,6 +36,9 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
 
 	private ArrayList<Planet> planets;
 	InnerStellarMapConfig conf = new InnerStellarMapConfig();
+	private Planet selectedPlanet = null;
+	Point lastMousePos = null;
+    int mouseMod = 0;
 	
 	public InterstellarMapPanel(ArrayList<Planet> p) {
 		planets = p;
@@ -43,10 +46,68 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
 		setBorder(BorderFactory.createLineBorder(Color.black));
         
         addMouseListener(new MouseAdapter() {
+        	
+        	public void mouseEntered(MouseEvent e) {
+                lastMousePos = new Point(e.getX(), e.getY());
+            }
+
+            public void mouseExited(MouseEvent e) {
+                lastMousePos = null;
+            }
+            
+            public void mouseReleased(MouseEvent e) {
+                mouseMod = 0;
+            }
+            
             public void mousePressed(MouseEvent e) {
-            	Planet selectedPlanet = nearestNeighbour(scr2mapX(e.getX()), scr2mapY(e.getY()));  
-            	center(selectedPlanet);
+            	mouseMod = e.getButton();
+                if (e.getButton() != MouseEvent.BUTTON1) {
+                    return;
+                }
+            	selectedPlanet = nearestNeighbour(scr2mapX(e.getX()), scr2mapY(e.getY()));  
             }          
+            
+            public void mouseClicked(MouseEvent e) {
+
+                if (e.getButton() == MouseEvent.BUTTON3) {
+                }
+                else if (e.getButton() == MouseEvent.BUTTON1) {
+
+                    if (e.getClickCount() >= 2) {
+                    	//center and zoom
+                    	selectedPlanet = nearestNeighbour(scr2mapX(e.getX()), scr2mapY(e.getY()));  
+                    	if(conf.scale < 4.0) {
+                    		conf.scale = 4.0;
+                    	}
+                    	center(selectedPlanet);             	
+                    }
+                }
+            }
+        });
+        
+        addMouseMotionListener(new MouseAdapter() {
+        	
+        	public void mouseDragged(MouseEvent e) {
+                if (mouseMod != MouseEvent.BUTTON1) {
+                    return;
+                }
+                //TODO: dragging is too fast and awkward
+                if (lastMousePos != null) {
+                    conf.offset.x -= lastMousePos.x - e.getX();
+                    conf.offset.y -= lastMousePos.y - e.getY();
+                }
+                repaint();
+            }
+        	
+        	public void mouseMoved(MouseEvent e) {
+
+                if (lastMousePos == null) {
+                    lastMousePos = new Point(e.getX(), e.getY());
+                } else {
+                    lastMousePos.x = e.getX();
+                    lastMousePos.y = e.getY();
+                }
+            }
         });
         
         addMouseWheelListener(new MouseAdapter() {
@@ -125,6 +186,10 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
         }
         conf.offset.setLocation(-p.getX() * conf.scale, p.getY() * conf.scale);
         repaint();
+    }
+    
+    public Planet getSelectedPlanet() {
+    	return selectedPlanet;
     }
     
     /**

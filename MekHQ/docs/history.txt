@@ -77,6 +77,7 @@ v0.1.5 (SVN)
 + changed x,y variable in Planet to double
 + changed planets.xml map to one based off the PRSC data in 3062
 + color-coding of all factions on InterstellarMap
++ improvements to mouse interaction in InterstellarMap
 
 v0.1.4 (2011-04-28)
 + Bug: personnel options not updating in CampaignOptionsDialog
