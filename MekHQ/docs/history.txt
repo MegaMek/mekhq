@@ -73,6 +73,7 @@ v0.1.5 (SVN)
 + read in planet.xml data (from MekWars) for InterstellarMap
 + color coding of InterstellarMap by faction
 + mouseListener for InterStellarMap
++ mouseWheelListener for InterStellarMap
 
 v0.1.4 (2011-04-28)
 + Bug: personnel options not updating in CampaignOptionsDialog

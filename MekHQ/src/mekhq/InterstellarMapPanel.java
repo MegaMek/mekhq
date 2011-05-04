@@ -12,6 +12,7 @@ import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseAdapter;
+import java.awt.event.MouseWheelEvent;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -47,6 +48,16 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
             	center(selectedPlanet);
             }          
         });
+        
+        addMouseWheelListener(new MouseAdapter() {
+        	 public void mouseWheelMoved(MouseWheelEvent e) {
+        	        conf.scale += e.getWheelRotation() * 0.25;
+        	        //if (selectedPlanet != null) {
+        	        //    conf.offset.setLocation(-selectedPlanet.getPosition().x * conf.scale, selectedPlanet.getPosition().y * conf.scale);
+        	        repaint();
+        	        //}
+        	 }
+        });
 	}
 	
 	/**
@@ -79,7 +90,11 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
 			int x = map2scrX(planet.getX());
 			int y = map2scrY(planet.getY());
 			g.setColor(Faction.getFactionColor(planet.getFaction()));
-			g.fillArc(x, y, size, size, 0, 360);		
+			g.fillArc(x, y, size, size, 0, 360);	
+			//name
+			if (conf.showPlanetNamesThreshold == 0 || conf.scale > conf.showPlanetNamesThreshold) {
+                g.drawString(planet.getName(), x + size, y);
+            }
 		}
 	}
 	
@@ -134,7 +149,7 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
         /**
          * Threshold to not show planet names. 0 means show always
          */
-        double showPlanetNamesThreshold = 0.0;
+        double showPlanetNamesThreshold = 2.0;
         /**
          * brightness correction for colors. This is no gamma correction! Gamma correction brightens medium level colors more than extreme ones. 0 means no brightening.
          */
