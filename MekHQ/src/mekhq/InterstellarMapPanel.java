@@ -90,21 +90,23 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
             }
             
             public void mouseReleased(MouseEvent e) {
+            	maybeShowPopup(e);
                 mouseMod = 0;
             }
             
             public void mousePressed(MouseEvent e) {
+            	maybeShowPopup(e);
             	mouseMod = e.getButton();
-                if (e.getButton() != MouseEvent.BUTTON1) {
+                if (e.isPopupTrigger() || e.getButton() != MouseEvent.BUTTON1) {
                     return;
                 }
             	changeSelectedPlanet(nearestNeighbour(scr2mapX(e.getX()), scr2mapY(e.getY())));  
             	repaint();
             }          
             
-            public void mouseClicked(MouseEvent e) {
-
-                if (e.getButton() == MouseEvent.BUTTON3) {
+     
+            public void maybeShowPopup(MouseEvent e) {
+                if (e.isPopupTrigger()) {
                 	JPopupMenu popup = new JPopupMenu();
                 	JMenuItem item;
                 	item = new JMenuItem("Zoom In");
@@ -264,17 +266,20 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
                     popup.add(selectM);
                 	popup.show(e.getComponent(), e.getX() + 10, e.getY() + 10);
                 }
-                else if (e.getButton() == MouseEvent.BUTTON1) {
-
-                    if (e.getClickCount() >= 2) {
-                    	//center and zoom
-                    	changeSelectedPlanet(nearestNeighbour(scr2mapX(e.getX()), scr2mapY(e.getY())));  
-                    	if(conf.scale < 4.0) {
-                    		conf.scale = 4.0;
-                    	}
-                    	center(selectedPlanet);             	
-                    }
-                }
+            }
+                
+            public void mouseClicked(MouseEvent e) {
+            	if (e.getButton() == MouseEvent.BUTTON1) {
+        		
+            		if (e.getClickCount() >= 2) {
+            			//center and zoom
+            			changeSelectedPlanet(nearestNeighbour(scr2mapX(e.getX()), scr2mapY(e.getY())));  
+            			if(conf.scale < 4.0) {
+            				conf.scale = 4.0;
+            			}
+            			center(selectedPlanet);             	
+            		}
+            	}
             }
         });
         
