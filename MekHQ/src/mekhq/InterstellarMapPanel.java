@@ -139,6 +139,127 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
                     });
                     centerM.add(item);
                     popup.add(centerM);
+                    //set up a series of menus by alphabet and allow user to select
+                	JMenu selectM = new JMenu("Select Planet");
+                	JMenu aMenu = new JMenu("A");
+                	JMenu bMenu = new JMenu("B");
+                	JMenu cMenu = new JMenu("C");
+                	JMenu dMenu = new JMenu("D");
+                	JMenu eMenu = new JMenu("E");
+                	JMenu fMenu = new JMenu("F");
+                	JMenu gMenu = new JMenu("G");
+                	JMenu hMenu = new JMenu("H");
+                	JMenu iMenu = new JMenu("I");
+                	JMenu jMenu = new JMenu("J");
+                	JMenu kMenu = new JMenu("K");
+                	JMenu lMenu = new JMenu("L");
+                	JMenu mMenu = new JMenu("M");
+                	JMenu nMenu = new JMenu("N");
+                	JMenu oMenu = new JMenu("O");
+                	JMenu pMenu = new JMenu("P");
+                	JMenu qMenu = new JMenu("Q");
+                	JMenu rMenu = new JMenu("R");
+                	JMenu sMenu = new JMenu("S");
+                	JMenu tMenu = new JMenu("T");
+                	JMenu uMenu = new JMenu("U");
+                	JMenu vMenu = new JMenu("V");
+                	JMenu wMenu = new JMenu("W");
+                	JMenu xMenu = new JMenu("X");
+                	JMenu yMenu = new JMenu("Y");
+                	JMenu zMenu = new JMenu("Z");
+                	for(int i = 0; i < planets.size(); i++) {
+                		Planet p = planets.get(i);
+                		item = new JMenuItem(p.getName());
+    					item.setActionCommand(Integer.toString(i));
+            			item.addActionListener(new ActionListener() {
+                            public void actionPerformed(ActionEvent ae) {
+                            	int pos = Integer.parseInt(ae.getActionCommand());
+                                selectedPlanet = planets.get(pos);
+                                center(selectedPlanet);
+                            }
+                        });
+                		if(p.getName().toLowerCase().startsWith("a")) {
+                			aMenu.add(item);
+                		} else if(p.getName().toLowerCase().startsWith("b")) {
+                			bMenu.add(item);
+                		} else if(p.getName().toLowerCase().startsWith("c")) {
+                			cMenu.add(item);
+                		} else if(p.getName().toLowerCase().startsWith("d")) {
+                			dMenu.add(item);
+                		} else if(p.getName().toLowerCase().startsWith("e")) {
+                			eMenu.add(item);
+                		} else if(p.getName().toLowerCase().startsWith("f")) {
+                			fMenu.add(item);
+                		} else if(p.getName().toLowerCase().startsWith("g")) {
+                			gMenu.add(item);
+                		} else if(p.getName().toLowerCase().startsWith("h")) {
+                			hMenu.add(item);
+                		} else if(p.getName().toLowerCase().startsWith("i")) {
+                			iMenu.add(item);
+                		} else if(p.getName().toLowerCase().startsWith("j")) {
+                			jMenu.add(item);
+                		} else if(p.getName().toLowerCase().startsWith("k")) {
+                			kMenu.add(item);
+                		} else if(p.getName().toLowerCase().startsWith("l")) {
+                			lMenu.add(item);
+                		} else if(p.getName().toLowerCase().startsWith("m")) {
+                			mMenu.add(item);
+                		} else if(p.getName().toLowerCase().startsWith("n")) {
+                			nMenu.add(item);
+                		} else if(p.getName().toLowerCase().startsWith("o")) {
+                			oMenu.add(item);
+                		} else if(p.getName().toLowerCase().startsWith("p")) {
+                			pMenu.add(item);
+                		} else if(p.getName().toLowerCase().startsWith("q")) {
+                			qMenu.add(item);
+                		} else if(p.getName().toLowerCase().startsWith("r")) {
+                			rMenu.add(item);
+                		} else if(p.getName().toLowerCase().startsWith("s")) {
+                			sMenu.add(item);
+                		} else if(p.getName().toLowerCase().startsWith("t")) {
+                			tMenu.add(item);
+                		} else if(p.getName().toLowerCase().startsWith("u")) {
+                			uMenu.add(item);
+                		} else if(p.getName().toLowerCase().startsWith("v")) {
+                			vMenu.add(item);
+                		} else if(p.getName().toLowerCase().startsWith("w")) {
+                			wMenu.add(item);
+                		} else if(p.getName().toLowerCase().startsWith("x")) {
+                			xMenu.add(item);
+                		} else if(p.getName().toLowerCase().startsWith("y")) {
+                			yMenu.add(item);
+                		} else if(p.getName().toLowerCase().startsWith("z")) {
+                			zMenu.add(item);
+                		}
+                		
+                	}
+                    selectM.add(aMenu);
+                    selectM.add(bMenu);
+                    selectM.add(cMenu);
+                    selectM.add(dMenu);
+                    selectM.add(eMenu);
+                    selectM.add(fMenu);
+                    selectM.add(gMenu);
+                    selectM.add(hMenu);
+                    selectM.add(iMenu);
+                    selectM.add(jMenu);
+                    selectM.add(kMenu);
+                    selectM.add(lMenu);
+                    selectM.add(mMenu);
+                    selectM.add(nMenu);
+                    selectM.add(oMenu);
+                    selectM.add(pMenu);
+                    selectM.add(qMenu);
+                    selectM.add(rMenu);
+                    selectM.add(sMenu);
+                    selectM.add(tMenu);
+                    selectM.add(uMenu);
+                    selectM.add(vMenu);
+                    selectM.add(wMenu);
+                    selectM.add(xMenu);
+                    selectM.add(yMenu);
+                    selectM.add(zMenu);
+                    popup.add(selectM);
                 	popup.show(e.getComponent(), e.getX() + 10, e.getY() + 10);
                 }
                 else if (e.getButton() == MouseEvent.BUTTON1) {
