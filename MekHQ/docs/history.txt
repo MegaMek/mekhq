@@ -1,5 +1,7 @@
 VERSION HISTORY
 ----------------------------------
+v0.1.6 (SVN)
+
 v0.1.5 (2011-05-05)
 + refactored Hangar Panel into separate Hangar and Repair Bay panel
 + UnitTable and UnitTableModel in HangarPanel
