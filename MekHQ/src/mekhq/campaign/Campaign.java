@@ -65,6 +65,7 @@ import megamek.common.Protomech;
 import megamek.common.Tank;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Transaction;
+import mekhq.campaign.mission.Mission;
 import mekhq.campaign.parts.EquipmentPart;
 import mekhq.campaign.parts.GenericSparePart;
 import mekhq.campaign.parts.Part;
@@ -96,7 +97,7 @@ public class Campaign implements Serializable {
 	// we have three things to track: (1) teams, (2) units, (3) repair tasks
 	// we will use the same basic system (borrowed from MegaMek) for tracking
 	// all three
-	// OK now we have more, parts and personnel.
+	// OK now we have more, parts, personnel, forces, missions, and scenarios.
 	private ArrayList<SupportTeam> teams = new ArrayList<SupportTeam>();
 	private Hashtable<Integer, SupportTeam> teamIds = new Hashtable<Integer, SupportTeam>();
 	private ArrayList<Unit> units = new ArrayList<Unit>();
@@ -108,14 +109,16 @@ public class Campaign implements Serializable {
 	private ArrayList<Part> parts = new ArrayList<Part>();
 	private Hashtable<Integer, Part> partIds = new Hashtable<Integer, Part>();
 	private Hashtable<Integer, Force> forceIds = new Hashtable<Integer, Force>();
-
-
+	private ArrayList<Mission> missions = new ArrayList<Mission>();
+	private Hashtable<Integer, Mission> missionIds = new Hashtable<Integer, Mission>();
+	
 	private int lastTeamId;
 	private int lastUnitId;
 	private int lastTaskId;
 	private int lastPersonId;
 	private int lastPartId;
 	private int lastForceId;
+	private int lastMissionId;
 
 	// I need to put a basic game object in campaign so that I can
 	// asssign it to the entities, otherwise some entity methods may get NPE
@@ -148,7 +151,7 @@ public class Campaign implements Serializable {
 	private int colorIndex = 0;
 
 	private Finances finances;
-	
+
 	private transient ArrayList<Planet> planets = new ArrayList<Planet>();
 
 	private CampaignOptions campaignOptions = new CampaignOptions();
@@ -303,11 +306,49 @@ public class Campaign implements Serializable {
 
 	/**
 	 * @param id
-	 *            the <code>int</code> id of the team
-	 * @return a <code>SupportTeam</code> object
+	 *            the <code>int</code> id of the support team
+	 * @return a <code>Support Team</code> object
 	 */
 	public SupportTeam getTeam(int id) {
 		return teamIds.get(new Integer(id));
+	}
+	
+	/**
+	 * Add a mission to the campaign
+	 * 
+	 * @param 
+	 *            The mission to be added
+	 */
+	public void addMission(Mission m) {
+		int id = lastMissionId + 1;
+		m.setId(id);
+		missions.add(m);
+		missionIds.put(new Integer(id), m);
+		lastMissionId = id;
+	}
+
+	private void addMissionWithoutId(Mission m) {
+		missions.add(m);
+		missionIds.put(new Integer(m.getId()), m);
+		
+		if (m.getId() > lastMissionId)
+			lastMissionId = m.getId();
+	}
+	
+	/**
+	 * @return an <code>ArrayList</code> of missions in the campaign
+	 */
+	public ArrayList<Mission> getMissions() {
+		return missions;
+	}
+
+	/**
+	 * @param id
+	 *            the <code>int</code> id of the team
+	 * @return a <code>SupportTeam</code> object
+	 */
+	public Mission getMission(int id) {
+		return missionIds.get(new Integer(id));
 	}
 
 

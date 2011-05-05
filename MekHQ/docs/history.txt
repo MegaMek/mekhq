@@ -90,6 +90,7 @@ v0.1.5 (SVN)
 + changed color of Chaos March to a lighter gray
 + load planets.xml in Campaign.restore()
 + Bug: map context menu should be a result of popup trigger not mouse 3 button
++ Mission and Scenario objects
 
 v0.1.4 (2011-04-28)
 + Bug: personnel options not updating in CampaignOptionsDialog

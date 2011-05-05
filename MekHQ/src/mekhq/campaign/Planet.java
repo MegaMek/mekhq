@@ -1,7 +1,7 @@
 /*
- * Unit.java
+ * Planet.java
  * 
- * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
+ * Copyright (c) 2011 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
  * This file is part of MekHQ.
  * 
@@ -31,11 +31,6 @@ import org.w3c.dom.NodeList;
  * *NOT* be serialized. The arraylist of planets in campaign will be loaded
  * from scratch on start up.
  * 
- * At the moment, I am using the planets.xml file from MekWars to test things out.
- * I am just going to use the x,y coordinate and faction owner for starters to 
- * see if i can actually plot it all on the map, but in the future we can expand this
- * using the existing MekWars info (like terrain options for map selection), plus any we 
- * want to add (like canonical factories and such). 
  * 
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
