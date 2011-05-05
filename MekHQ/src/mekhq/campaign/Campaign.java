@@ -66,6 +66,7 @@ import megamek.common.Tank;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.mission.Mission;
+import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.EquipmentPart;
 import mekhq.campaign.parts.GenericSparePart;
 import mekhq.campaign.parts.Part;
@@ -184,6 +185,17 @@ public class Campaign implements Serializable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		Mission m = new Mission("Test Mission 1");
+		m.addScenario(new Scenario("Test Scenario 1"));
+		m.addScenario(new Scenario("Test Scenario 2"));
+		m.addScenario(new Scenario("Test Scenario 3"));
+		addMission(m);
+		Mission m2 = new Mission("Test Mission 2");
+		m2.addScenario(new Scenario("Test Scenario 4"));
+		m2.addScenario(new Scenario("Test Scenario 5"));
+		m2.addScenario(new Scenario("Test Scenario 6"));
+		addMission(m2);
+		
 	}
 
 	public String getName() {
@@ -319,12 +331,13 @@ public class Campaign implements Serializable {
 	 * @param 
 	 *            The mission to be added
 	 */
-	public void addMission(Mission m) {
+	public int addMission(Mission m) {
 		int id = lastMissionId + 1;
 		m.setId(id);
 		missions.add(m);
 		missionIds.put(new Integer(id), m);
 		lastMissionId = id;
+		return id;
 	}
 
 	private void addMissionWithoutId(Mission m) {
@@ -342,6 +355,16 @@ public class Campaign implements Serializable {
 		return missions;
 	}
 
+	public ArrayList<Mission> getActiveMissions() {
+		ArrayList<Mission> active = new ArrayList<Mission>();
+		for(Mission m : getMissions()) {
+			if(m.isActive()) {
+				active.add(m);
+			}
+		}
+		return active;
+	}
+	
 	/**
 	 * @param id
 	 *            the <code>int</code> id of the team

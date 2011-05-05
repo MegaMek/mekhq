@@ -126,6 +126,8 @@ import mekhq.campaign.SkillCosts;
 import mekhq.campaign.Unit;
 import mekhq.campaign.Utilities;
 import mekhq.campaign.finances.Transaction;
+import mekhq.campaign.mission.Mission;
+import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.GenericSparePart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
@@ -212,6 +214,7 @@ public class MekHQView extends FrameView {
 	private UnitTableModel unitModel = new UnitTableModel();
 	private PartsTableModel partsModel = new PartsTableModel();
 	private FinanceTableModel financeModel = new FinanceTableModel();
+	private ScenarioTableModel scenarioModel = new ScenarioTableModel();
 	private DefaultTreeModel orgModel;
 	private UnitTableMouseAdapter unitMouseAdapter;
 	private ServicedUnitsTableMouseAdapter servicedUnitMouseAdapter;
@@ -229,6 +232,8 @@ public class MekHQView extends FrameView {
 	private int currentDoctorId;
 	private int currentPartsId;
 	private int[] selectedTasksIds;
+	
+	private int selectedMission = -1;
 
 	//the various directory items we need to access
 	private DirectoryItems portraits;
@@ -361,6 +366,14 @@ public class MekHQView extends FrameView {
 		panOrganization = new javax.swing.JPanel();
 		scrollOrgTree = new javax.swing.JScrollPane();
 		orgTree = new javax.swing.JTree();
+		panBriefing = new javax.swing.JPanel();
+		scrollScenarioTable = new javax.swing.JScrollPane();
+		scenarioTable = new javax.swing.JTable();
+		scrollMissionView = new javax.swing.JScrollPane();
+		scrollScenarioView = new javax.swing.JScrollPane();
+		choiceMission = new javax.swing.JComboBox();
+		btnAddMission = new javax.swing.JButton();
+		btnAddScenario = new javax.swing.JButton();
 		panPersonnel = new javax.swing.JPanel();
 		scrollPersonnelTable = new javax.swing.JScrollPane();
 		personnelTable = new javax.swing.JTable();
@@ -494,6 +507,131 @@ public class MekHQView extends FrameView {
 		tabMain.addTab(
 				resourceMap.getString("panOrganization.TabConstraints.tabTitle"),
 				panOrganization); // NOI18N
+		
+		panBriefing.setFont(resourceMap.getFont("panHangar.font")); // NOI18N
+		panBriefing.setName("panBriefing"); // NOI18N
+		panBriefing.setLayout(new java.awt.GridBagLayout());
+		
+		refreshMissions();
+		choiceMission.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				changeMission();
+			}
+		});
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.gridwidth = 1;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+		gridBagConstraints.weightx = 1.0;
+		gridBagConstraints.weighty = 0.0;
+		panBriefing.add(choiceMission, gridBagConstraints);
+		
+		btnAddMission.setText(resourceMap.getString("btnAddMission.text")); // NOI18N
+		btnAddMission.setToolTipText(resourceMap
+				.getString("btnAddMission.toolTipText")); // NOI18N
+		btnAddMission.setName("btnAddMission"); // NOI18N
+		btnAddMission.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				btnAddMissionActionPerformed(evt);
+			}
+		});
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 1;
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.gridwidth = 1;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+		gridBagConstraints.weightx = 1.0;
+		gridBagConstraints.weighty = 0.0;
+		panBriefing.add(btnAddMission, gridBagConstraints);
+		
+		btnAddScenario.setText(resourceMap.getString("btnAddScenario.text")); // NOI18N
+		btnAddScenario.setToolTipText(resourceMap
+				.getString("btnAddScenario.toolTipText")); // NOI18N
+		btnAddScenario.setName("btnAddScenario"); // NOI18N
+		btnAddScenario.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				btnAddScenarioActionPerformed(evt);
+			}
+		});
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 2;
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.gridwidth = 1;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+		gridBagConstraints.weightx = 1.0;
+		gridBagConstraints.weighty = 0.0;
+		panBriefing.add(btnAddScenario, gridBagConstraints);
+		
+		scrollMissionView.setViewportView(null);
+		scrollMissionView.setMinimumSize(new java.awt.Dimension(500, 200));
+		scrollMissionView.setPreferredSize(new java.awt.Dimension(500, 200));
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 1;
+		gridBagConstraints.gridwidth = 3;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+		gridBagConstraints.weightx = 1.0;
+		gridBagConstraints.weighty = 0.0;
+		panBriefing.add(scrollMissionView, gridBagConstraints);
+		
+		scenarioTable.setModel(scenarioModel);
+		scenarioTable.setName("scenarioTable"); // NOI18N
+		scenarioTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        //scenarioTable.setRowSorter(new TableRowSorter<ScenarioTableModel>(scenarioModel));
+		//personnelTable.addMouseListener(scenarioMouseAdapter);
+		scenarioTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+		/*
+		TableColumn column = null;
+        for (int i = 0; i < PersonnelTableModel.N_COL; i++) {
+            column = personnelTable.getColumnModel().getColumn(i);
+            column.setPreferredWidth(personModel.getColumnWidth(i));
+            column.setCellRenderer(personModel.getRenderer());
+        }
+        */
+		refreshScenarioList();
+        scenarioTable.setIntercellSpacing(new Dimension(0, 0));
+        scenarioTable.getSelectionModel().addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                //refreshScenarioView();
+            }
+        });
+        scrollScenarioTable.setViewportView(scenarioTable);
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 2;
+		gridBagConstraints.gridwidth = 3;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+		gridBagConstraints.weightx = 1.0;
+		gridBagConstraints.weighty = 1.0;
+		panBriefing.add(scrollScenarioTable, gridBagConstraints);
+		
+		scrollScenarioView.setViewportView(null);
+		scrollScenarioView.setMinimumSize(new java.awt.Dimension(400, 600));
+		scrollScenarioView.setPreferredSize(new java.awt.Dimension(400, 2000));
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 3;
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.gridheight = 3;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+		gridBagConstraints.weightx = 1.0;
+		gridBagConstraints.weighty = 1.0;
+		//panBriefing.add(scrollScenarioView, gridBagConstraints);
+		
+		splitBrief = new javax.swing.JSplitPane(javax.swing.JSplitPane.HORIZONTAL_SPLIT, panBriefing, scrollScenarioView);
+		splitBrief.setOneTouchExpandable(true);
+		splitBrief.setResizeWeight(1.0);
+		splitBrief.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent pce) {
+				//this can mess up the unit view panel so refresh it
+				//refreshForceView();
+			}
+		});
+	
+		tabMain.addTab(
+				resourceMap.getString("panBriefing.TabConstraints.tabTitle"),
+				splitBrief); // NOI18N
 		
 		panMap = new InterstellarMapPanel(campaign.getPlanets(), this);
 		panMap.setName("panMap"); // NOI18N		
@@ -1445,6 +1583,24 @@ public class MekHQView extends FrameView {
 					ex);
 		}
 	}
+	
+	private void btnAddMissionActionPerformed(java.awt.event.ActionEvent evt) {
+		CustomizeMissionDialog cmd = new CustomizeMissionDialog(null, true, null, campaign);
+		cmd.setVisible(true);
+		if(cmd.getMissionId() != -1) {
+			selectedMission = cmd.getMissionId();
+		}
+		refreshMissions();
+	}
+	
+	private void btnAddScenarioActionPerformed(java.awt.event.ActionEvent evt) {
+		Mission m = campaign.getMission(selectedMission);
+		if(null != m) {
+			CustomizeScenarioDialog csd = new CustomizeScenarioDialog(null, true, null, m, campaign);
+			csd.setVisible(true);
+			refreshScenarioList();
+		}
+	}
 
 	private void btnDoTaskActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnDoTaskActionPerformed
 		// assign the task to the team here
@@ -2280,6 +2436,26 @@ public class MekHQView extends FrameView {
 		personModel.setData(campaign.getPersonnel());
 	}
 	
+	protected void changeMission() {
+		int idx = choiceMission.getSelectedIndex();
+		if(idx >= 0 && idx < campaign.getActiveMissions().size()) {
+			Mission m = campaign.getActiveMissions().get(idx);
+			selectedMission = m.getId();
+		} else {
+			selectedMission = -1;
+		}
+		refreshScenarioList();
+	}
+	
+	protected void refreshScenarioList() {
+		Mission m = campaign.getMission(selectedMission);
+		if(null != m) {
+			scenarioModel.setData(m.getScenarios());
+		} else {
+			scenarioModel.setData(new ArrayList<Scenario>());
+		}
+	}
+	
 	protected void refreshUnitList() {
 		unitModel.setData(campaign.getUnits());
 	}
@@ -2290,6 +2466,17 @@ public class MekHQView extends FrameView {
 	
 	protected void refreshAcquireList() {
 		acquireModel.setData(campaign.getAcquisitionsForUnit(currentServicedUnitId));
+	}
+	
+	protected void refreshMissions() {
+		choiceMission.removeAllItems();
+		for(Mission m : campaign.getActiveMissions()) {
+			choiceMission.addItem(m.getName());
+			if(m.getId() == selectedMission) {
+				choiceMission.setSelectedItem(m.getName());
+			}
+		}
+		changeMission();
 	}
 
 	protected void refreshTechsList() {
@@ -5183,6 +5370,94 @@ public class MekHQView extends FrameView {
 	}
 	
 	/**
+	 * A table model for displaying scenarios
+	 */
+	public class ScenarioTableModel extends AbstractTableModel {
+		private static final long serialVersionUID = 534443424190075264L;
+
+		private final static int COL_NAME       = 0;
+		private final static int COL_STATUS     = 1;
+        private final static int COL_ASSIGN     = 2;
+        private final static int N_COL          = 3;
+		
+        private ArrayList<Scenario> data = new ArrayList<Scenario>();
+		
+		public int getRowCount() {
+            return data.size();
+        }
+
+        public int getColumnCount() {
+            return N_COL;
+        }
+
+        @Override
+        public String getColumnName(int column) {
+            switch(column) {
+            	case COL_NAME:
+            		return "Name";
+                case COL_STATUS:
+                    return "Status";
+                case COL_ASSIGN:
+                    return "# Units Assigned";
+                default:
+                    return "?";
+            }
+        }
+
+		public Object getValueAt(int row, int col) {
+			Scenario scenario = data.get(row);
+			if(col == COL_NAME) {
+				return scenario.getName();
+			}
+			if(col == COL_STATUS) {
+				return scenario.getStatus();
+			}
+			if(col == COL_ASSIGN) {
+				return scenario.getUnitIds().size();
+			}
+			return "?";
+		}
+		
+		public int getColumnWidth(int c) {
+            switch(c) {
+            case COL_NAME:
+                return 100;
+            case COL_STATUS:
+            	return 50;
+            default:
+                return 20;
+            }
+        }
+        
+        public int getAlignment(int col) {
+            switch(col) {
+            default:
+            	return SwingConstants.LEFT;
+            }
+        }
+		
+		@Override
+        public Class<?> getColumnClass(int c) {
+            return getValueAt(0, c).getClass();
+        }
+
+        @Override
+        public boolean isCellEditable(int row, int col) {
+            return false;
+        }
+
+        //fill table with values
+        public void setData(ArrayList<Scenario> scenarios) {
+            data = scenarios;
+            fireTableDataChanged();
+        }
+
+		public Scenario getScenario(int row) {
+			return data.get(row);
+		}
+	}
+	
+	/**
 	 * A table model for displaying financial transactions (i.e. a ledger)
 	 */
 	public class FinanceTableModel extends AbstractTableModel {
@@ -6324,6 +6599,7 @@ public class MekHQView extends FrameView {
 	private javax.swing.JTable servicedUnitTable;
 	private javax.swing.JTable unitTable;
 	private javax.swing.JTable personnelTable;
+	private javax.swing.JTable scenarioTable;
 	private javax.swing.JTable financeTable;
 	private javax.swing.JMenuItem addFunds;
 	private javax.swing.JButton btnAdvanceDay;
@@ -6359,6 +6635,7 @@ public class MekHQView extends FrameView {
 	private javax.swing.JPanel panRepairBay;
 	private javax.swing.JPanel panInfirmary;
 	private javax.swing.JPanel panPersonnel;
+	private javax.swing.JPanel panBriefing;
 	private javax.swing.JPanel panSupplies;
 	private javax.swing.JPanel panelDoTask;
 	private javax.swing.JPanel panelMasterButtons;
@@ -6371,6 +6648,7 @@ public class MekHQView extends FrameView {
 	private javax.swing.JScrollPane scrollTechTable;
 	private javax.swing.JScrollPane scrollServicedUnitTable;
 	private javax.swing.JScrollPane scrollPersonnelTable;
+	private javax.swing.JScrollPane scrollScenarioTable;
 	private javax.swing.JScrollPane scrollUnitTable;
 	private javax.swing.JScrollPane scrollFinanceTable;
 	private javax.swing.JLabel statusAnimationLabel;
@@ -6400,6 +6678,12 @@ public class MekHQView extends FrameView {
 	InterstellarMapPanel panMap;
     private javax.swing.JSplitPane splitMap;
 	private javax.swing.JScrollPane scrollPlanetView;
+    private javax.swing.JComboBox choiceMission;
+	private javax.swing.JScrollPane scrollMissionView;
+	private javax.swing.JScrollPane scrollScenarioView;
+	private javax.swing.JButton btnAddScenario;
+	private javax.swing.JButton btnAddMission;
+    private javax.swing.JSplitPane splitBrief;
 	// End of variables declaration//GEN-END:variables
 
 	private final Timer messageTimer;
