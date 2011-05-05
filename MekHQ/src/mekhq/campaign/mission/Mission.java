@@ -38,10 +38,10 @@ public class Mission implements Serializable {
 	 */
 	private static final long serialVersionUID = -5692134027829715149L;
 	
-	public static final int S_ACTIVE = 0;
-	public static final int S_SUCESS = 1;
-	public static final int S_FAILED = 2;
-	public static final int S_BREACH = 3;
+	public static final int S_ACTIVE  = 0;
+	public static final int S_SUCCESS = 1;
+	public static final int S_FAILED  = 2;
+	public static final int S_BREACH  = 3;
 	
 	private String name;
 	private int status;
@@ -54,6 +54,22 @@ public class Mission implements Serializable {
 		this.desc = "";
 		this.status = S_ACTIVE;
 		scenarios = new ArrayList<Scenario>();
+	}
+	
+	public static String getStatusName(int s) {
+		
+		switch(s) {
+		case S_ACTIVE:
+			return "Active";
+		case S_SUCCESS:
+			return "Success";
+		case S_FAILED:
+			return "Failed";
+		case S_BREACH:
+			return "Contract Breach";
+		default:
+			return "?";
+		}
 	}
 	
 	public String getName() {
@@ -77,6 +93,10 @@ public class Mission implements Serializable {
 	
 	public void setStatus(int s) {
 		this.status = s;
+	}
+	
+	public String getStatusName() {
+		return getStatusName(getStatus());
 	}
 	
 	public ArrayList<Scenario> getScenarios() {

@@ -593,7 +593,7 @@ public class MekHQView extends FrameView {
         scenarioTable.setIntercellSpacing(new Dimension(0, 0));
         scenarioTable.getSelectionModel().addListSelectionListener(new javax.swing.event.ListSelectionListener() {
             public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
-                //refreshScenarioView();
+                refreshScenarioView();
             }
         });
         scrollScenarioTable.setViewportView(scenarioTable);
@@ -2140,6 +2140,24 @@ public class MekHQView extends FrameView {
 		
 	}
 	
+	private void refreshScenarioView() {
+		int row = scenarioTable.getSelectedRow();
+		if(row < 0) {
+			scrollScenarioView.setViewportView(null);
+			return;
+		}
+		Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
+		scrollScenarioView.setViewportView(new ScenarioViewPanel(scenario));
+		//This odd code is to make sure that the scrollbar stays at the top
+		//I cant just call it here, because it ends up getting reset somewhere later
+		javax.swing.SwingUtilities.invokeLater(new Runnable() {
+			public void run() { 
+				scrollScenarioView.getVerticalScrollBar().setValue(0);
+			}
+		});
+		
+	}
+	
 	protected void refreshForceView() {
 		DefaultMutableTreeNode node = (DefaultMutableTreeNode)orgTree.getLastSelectedPathComponent();
 		if(null == node) {
@@ -2440,7 +2458,17 @@ public class MekHQView extends FrameView {
 		int idx = choiceMission.getSelectedIndex();
 		if(idx >= 0 && idx < campaign.getActiveMissions().size()) {
 			Mission m = campaign.getActiveMissions().get(idx);
-			selectedMission = m.getId();
+			if(null != m) {
+				selectedMission = m.getId();		
+				scrollMissionView.setViewportView(new MissionViewPanel(m));
+				//This odd code is to make sure that the scrollbar stays at the top
+				//I cant just call it here, because it ends up getting reset somewhere later
+				javax.swing.SwingUtilities.invokeLater(new Runnable() {
+					public void run() { 
+						scrollMissionView.getVerticalScrollBar().setValue(0);
+					}
+				});
+			}
 		} else {
 			selectedMission = -1;
 		}
@@ -5410,7 +5438,7 @@ public class MekHQView extends FrameView {
 				return scenario.getName();
 			}
 			if(col == COL_STATUS) {
-				return scenario.getStatus();
+				return scenario.getStatusName();
 			}
 			if(col == COL_ASSIGN) {
 				return scenario.getUnitIds().size();

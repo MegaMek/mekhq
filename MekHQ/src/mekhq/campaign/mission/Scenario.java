@@ -55,6 +55,21 @@ public class Scenario implements Serializable {
 		this.units = new ArrayList<Integer>();
 	}
 	
+	public static String getStatusName(int s) {
+		switch(s) {
+		case S_CURRENT:
+			return "Pending";
+		case S_VICTORY:
+			return "Victory";
+		case S_DEFEAT:
+			return "Defeat";
+		case S_DRAW:
+			return "Draw";
+		default:
+			return "?";
+		}
+	}
+	
 	public String getName() {
 		return name;
 	}
@@ -76,6 +91,10 @@ public class Scenario implements Serializable {
 	
 	public void setStatus(int s) {
 		this.status = s;
+	}
+	
+	public String getStatusName() {
+		return getStatusName(getStatus());
 	}
 	
 	public void setDate(Date d) {
