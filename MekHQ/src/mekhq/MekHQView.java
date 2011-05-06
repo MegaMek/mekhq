@@ -222,6 +222,7 @@ public class MekHQView extends FrameView {
 	private TaskTableMouseAdapter taskMouseAdapter;
 	private PersonnelTableMouseAdapter personnelMouseAdapter;
 	private OrgTreeMouseAdapter orgMouseAdapter;
+	private ScenarioTableMouseAdapter scenarioMouseAdapter;
 	private TableRowSorter<PersonnelTableModel> personnelSorter;
 	private TableRowSorter<UnitTableModel> unitSorter;
 	private int currentServicedUnitId;
@@ -250,7 +251,8 @@ public class MekHQView extends FrameView {
 		taskMouseAdapter = new TaskTableMouseAdapter();
 		personnelMouseAdapter = new PersonnelTableMouseAdapter(this);
 		orgMouseAdapter = new OrgTreeMouseAdapter();
-		
+		scenarioMouseAdapter = new ScenarioTableMouseAdapter();
+
 		//load in directory items and tilesets
 		try {
             portraits = new DirectoryItems(new File("data/images/portraits"), "", //$NON-NLS-1$ //$NON-NLS-2$
@@ -581,7 +583,7 @@ public class MekHQView extends FrameView {
 		scenarioTable.setName("scenarioTable"); // NOI18N
 		scenarioTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         //scenarioTable.setRowSorter(new TableRowSorter<ScenarioTableModel>(scenarioModel));
-		//personnelTable.addMouseListener(scenarioMouseAdapter);
+		scenarioTable.addMouseListener(scenarioMouseAdapter);
 		scenarioTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 		/*
 		TableColumn column = null;
@@ -5630,6 +5632,71 @@ public class MekHQView extends FrameView {
 
 		public Scenario getScenario(int row) {
 			return data.get(row);
+		}
+	}
+	
+	public class ScenarioTableMouseAdapter extends MouseInputAdapter implements ActionListener {
+
+		public void actionPerformed(ActionEvent action) {
+			String command = action.getActionCommand();
+			Scenario scenario = scenarioModel.getScenario(scenarioTable.getSelectedRow());
+			Mission mission = campaign.getMission(selectedMission);
+			if (command.equalsIgnoreCase("EDIT")) {
+				if(null != mission && null != scenario) {
+					CustomizeScenarioDialog csd = new CustomizeScenarioDialog(null, true, scenario, mission, campaign);
+					csd.setVisible(true);
+					refreshScenarioList();
+				}
+			} else if (command.equalsIgnoreCase("REMOVE")) {
+				campaign.removeScenario(scenario.getId());
+				refreshScenarioList();
+				refreshOrganization();
+				refreshPersonnelList();
+				refreshUnitList();
+			}
+		}
+		
+		@Override
+		public void mousePressed(MouseEvent e) {
+			maybeShowPopup(e);
+		}
+		
+		@Override
+		public void mouseReleased(MouseEvent e) {
+			maybeShowPopup(e);
+		}
+		
+		private void maybeShowPopup(MouseEvent e) {
+			JPopupMenu popup = new JPopupMenu();
+			if (e.isPopupTrigger()) {
+				int row = scenarioTable.getSelectedRow();
+				if(row < 0) {
+					return;
+				}
+				Scenario scenario = scenarioModel.getScenario(row);
+				JMenuItem menuItem = null;
+				JMenu menu = null;
+				JCheckBoxMenuItem cbMenuItem = null;
+				// **lets fill the pop up menu**//
+				menuItem = new JMenuItem("Edit...");
+				menuItem.setActionCommand("EDIT");
+				menuItem.addActionListener(this);
+				popup.add(menuItem);
+				// GM mode
+				menu = new JMenu("GM Mode");
+				// remove part
+				if(scenario.isCurrent()) {
+					menuItem = new JMenuItem("Remove Scenario");
+					menuItem.setActionCommand("REMOVE");
+					menuItem.addActionListener(this);
+					menuItem.setEnabled(campaign.isGM());
+					menu.add(menuItem);
+				}
+				// end
+				popup.addSeparator();
+				popup.add(menu);
+				popup.show(e.getComponent(), e.getX(), e.getY());
+			}
 		}
 	}
 	

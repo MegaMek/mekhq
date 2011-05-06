@@ -8139,7 +8139,13 @@ Ian retired in 3051, accepting a battalion command in the Kestrel Militia.</biog
 			<scenarios>
 				<scenario id="1" type="mekhq.campaign.mission.Scenario">
 					<name>Main Track</name>
-					<desc></desc>
+					<desc>Fortress Ningpo 
+Thestria, Draconis Combine 
+19 August 3048
+
+After a few months of raiding worlds in the Galedon District, a MIIO tip-off suggested that the DCMS may be stockpiling several supplies for a possible buildup on Thestria, near an ancient Star League-era fortress. Because the Raiders are the closest unit, Captain McKinnon is ordered to investigate.
+
+The Galloping Ghost slipped into orbit masquerading as a merchant and hot-dropped a lance of Raiders roughly two hundred kilometers from the fortress. The DropShip then took on a supply shuttle in orbit and departed as an MIIO vessel burns in to pick up the lance at a designated pickup point.</desc>
 					<report>null</report>
 					<status>0</status>
 					<id>1</id>

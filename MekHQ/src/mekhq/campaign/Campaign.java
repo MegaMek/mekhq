@@ -1049,6 +1049,16 @@ public class Campaign implements Serializable {
 		teams.remove(team);
 		teamIds.remove(new Integer(id));
 	}
+	
+	public void removeScenario(int id) {
+		Scenario scenario = getScenario(id);	
+		scenario.clearAllForcesAndPersonnel(this);
+		Mission mission = getMission(scenario.getMissionId());
+		if(null != mission) {
+			mission.removeScenario(scenario.getId());
+		}
+		scenarioIds.remove(new Integer(id));
+	}
 
 	public void removePart(Part part) {
 		parts.remove(part);

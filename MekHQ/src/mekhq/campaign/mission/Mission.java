@@ -31,6 +31,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import mekhq.MekHQApp;
+import mekhq.campaign.Force;
 import mekhq.campaign.MekHqXmlSerializable;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.personnel.Person;
@@ -126,6 +127,7 @@ public class Mission implements Serializable, MekHqXmlSerializable {
 	 * @param s
 	 */
 	public void addScenario(Scenario s) {
+		s.setMissionId(getId());
 		scenarios.add(s);
 	}
 	
@@ -139,6 +141,21 @@ public class Mission implements Serializable, MekHqXmlSerializable {
 	
 	public boolean isActive() {
 		return status ==S_ACTIVE;
+	}
+	
+	public void removeScenario(int id) {
+		int idx = 0;
+		boolean found = false;
+		for(Scenario s : getScenarios()) {
+			if(s.getId() == id) {
+				found = true;
+				break;
+			}
+			idx++;
+		}
+		if(found) {
+			scenarios.remove(idx);
+		}
 	}
 
 	@Override

@@ -23,6 +23,7 @@ v0.1.6 (SVN)
 + Bug: scenarios not loading through XML
 + various bugs with mission and scenario id loading
 + description fields in customizeMission and customizeScenario dialogs
++ context menu for scenario table
 
 v0.1.5 (2011-05-05)
 + refactored Hangar Panel into separate Hangar and Repair Bay panel

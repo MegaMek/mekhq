@@ -63,6 +63,7 @@ public class Scenario implements Serializable {
 	private ArrayList<Integer> subForceIds;
 	private ArrayList<Integer> personnelIds;
 	private int id = -1;
+	private int missionId;
 	
 	public Scenario() {
 		this(null);
@@ -148,6 +149,14 @@ public class Scenario implements Serializable {
 		this.id = i;
 	}
 	
+	public int getMissionId() {
+		return missionId;
+	}
+	
+	public void setMissionId(int i) {
+		this.missionId = i;
+	}
+	
 	public Force getForces(Campaign campaign) {
 		Force force = new Force("Assigned Forces");
 		for(int subid : subForceIds) {
@@ -207,7 +216,7 @@ public class Scenario implements Serializable {
 				f.setScenarioId(-1);
 			}	
 		}
-		for(int pid : personnelIds) {
+		for(int pid : getForces(campaign).getAllPersonnel()) {
 			Person p = campaign.getPerson(pid);
 			if(null != p) {
 				p.setScenarioId(-1);
