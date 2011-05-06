@@ -57,6 +57,7 @@ public class ResolveScenarioTracker {
 	ArrayList<PilotPerson> people;
 	ArrayList<Unit> missingUnits;
 	ArrayList<PilotPerson> missingPilots;
+	ArrayList<Pilot> deadPilots;
 	Campaign campaign;
 	Scenario scenario;
 	JFileChooser unitList;
@@ -177,7 +178,16 @@ public class ResolveScenarioTracker {
 				missingPilots.add(person);
 			}
 		}
-		//identify dead pilots
+		checkForCasualties();
+	}
+	
+	public void checkForCasualties() {
+		deadPilots = new ArrayList<Pilot>();
+		for(Pilot p : pilots) {
+			if(p.isDead()) {
+				deadPilots.add(p);
+			}
+		}
 	}
 	
 	private void loadUnitsAndPilots(File unitFile) throws IOException {
@@ -296,4 +306,16 @@ public class ResolveScenarioTracker {
 		pilots.add(pp.getPilot());
 	}
 	
+	public ArrayList<Pilot> getDeadPilots() {
+		return deadPilots;
+	}
+	
+	public void removeCasaulty(int i) {
+		if(i < 0 || i > deadPilots.size()) {
+			return;
+		}
+		Pilot casualty = deadPilots.get(i);
+		casualty.setHits(5);
+		casualty.setDead(false);
+	}
 }
