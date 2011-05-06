@@ -378,7 +378,7 @@ public class ResolveScenarioTracker {
 			campaign.addUnit(salvageEn, false);
 		}
 		scenario.setStatus(resolution);
-		scenario.setDesc(report);
+		scenario.setReport(report);
 		scenario.clearAllForcesAndPersonnel(campaign);
 	}
 	

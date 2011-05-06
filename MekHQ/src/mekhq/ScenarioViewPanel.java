@@ -39,6 +39,7 @@ public class ScenarioViewPanel extends javax.swing.JPanel {
 	
 	private javax.swing.JPanel pnlStats;
 	private javax.swing.JTextArea txtDesc;
+	private javax.swing.JTextArea txtReport;
 	private javax.swing.JTree forceTree;
 	private javax.swing.JLabel lblStatus;
 	
@@ -57,6 +58,7 @@ public class ScenarioViewPanel extends javax.swing.JPanel {
 
 		pnlStats = new javax.swing.JPanel();
 		txtDesc = new javax.swing.JTextArea();
+		txtReport = new javax.swing.JTextArea();
 		forceTree = new javax.swing.JTree();
 		       
 		setLayout(new java.awt.GridBagLayout());
@@ -115,6 +117,25 @@ public class ScenarioViewPanel extends javax.swing.JPanel {
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		add(txtDesc, gridBagConstraints);
+		
+		txtReport.setName("txtReport");
+		txtReport.setText(scenario.getReport());
+		txtReport.setEditable(false);
+		txtReport.setLineWrap(true);
+		txtReport.setWrapStyleWord(true);
+		txtReport.setBorder(BorderFactory.createCompoundBorder(
+				BorderFactory.createTitledBorder("After-Action Report"),
+                BorderFactory.createEmptyBorder(5,5,5,5)));
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 3;
+		gridBagConstraints.gridwidth = 1;
+		gridBagConstraints.weightx = 1.0;
+		gridBagConstraints.weighty = 1.0;
+		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
+		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+		add(txtReport, gridBagConstraints);
 	}
 
     private void fillStats() {

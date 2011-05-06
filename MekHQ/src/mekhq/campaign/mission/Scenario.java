@@ -50,6 +50,7 @@ public class Scenario implements Serializable {
 	
 	private String name;
 	private String desc;
+	private String report;
 	private int status;
 	private Date date;
 	private ArrayList<Integer> subForceIds;
@@ -97,6 +98,14 @@ public class Scenario implements Serializable {
 	
 	public void setDesc(String d) {
 		this.desc = d;
+	}
+	
+	public String getReport() {
+		return report;
+	}
+	
+	public void setReport(String r) {
+		this.report = r;
 	}
 	
 	public int getStatus() {
