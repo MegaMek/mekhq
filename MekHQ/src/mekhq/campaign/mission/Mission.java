@@ -159,6 +159,15 @@ public class Mission implements Serializable, MekHqXmlSerializable {
 		}
 	}
 
+	public boolean hasPendingScenarios() {
+		for(Scenario s : scenarios) {
+			if(s.isCurrent()) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent, int inId) {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "<mission id=\""

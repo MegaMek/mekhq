@@ -1678,15 +1678,22 @@ public class MekHQView extends FrameView {
 	private void btnCompleteMissionActionPerformed(java.awt.event.ActionEvent evt) {
 		Mission mission = campaign.getMission(selectedMission);
 		if(null != mission) {
-			CompleteMissionDialog cmd = new CompleteMissionDialog(null, true, mission);
-			cmd.setVisible(true);
-			if(!mission.isActive()) {
-				if(campaign.getActiveMissions().size() > 0) {
-					selectedMission = campaign.getActiveMissions().get(0).getId();
-				} else {
-					selectedMission = -1;
+			if(mission.hasPendingScenarios()) {
+				JOptionPane.showMessageDialog(this.getFrame(),
+					    "You cannot complete a mission that has pending scenarios",
+					    "Pending Scenarios",
+					    JOptionPane.WARNING_MESSAGE);
+			} else {
+				CompleteMissionDialog cmd = new CompleteMissionDialog(null, true, mission);
+				cmd.setVisible(true);
+				if(!mission.isActive()) {
+					if(campaign.getActiveMissions().size() > 0) {
+						selectedMission = campaign.getActiveMissions().get(0).getId();
+					} else {
+						selectedMission = -1;
+					}
+					refreshMissions();
 				}
-				refreshMissions();
 			}
 		}	
 	}
