@@ -17,6 +17,7 @@ v0.1.6 (SVN)
 + resolve salvage wizard
 + process resolved scenario
 + final check resolution wizard
++ allow for skipping of irrelevant wizards
 
 v0.1.5 (2011-05-05)
 + refactored Hangar Panel into separate Hangar and Repair Bay panel

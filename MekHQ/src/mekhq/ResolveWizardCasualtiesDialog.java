@@ -186,8 +186,13 @@ public class ResolveWizardCasualtiesDialog extends javax.swing.JDialog {
     	}
     	tracker.checkForCasualties();
     	this.setVisible(false);  	
-    	ResolveWizardSalvageDialog resolveDialog = new ResolveWizardSalvageDialog(null, true, tracker);
-    	resolveDialog.setVisible(true);
+    	if(tracker.getSalvage().size() > 0) {
+    		ResolveWizardSalvageDialog resolveDialog = new ResolveWizardSalvageDialog(null, true, tracker);
+    		resolveDialog.setVisible(true);
+    	} else {
+    		ResolveWizardFinalCheckDialog resolveDialog = new ResolveWizardFinalCheckDialog(null, true, tracker);
+    		resolveDialog.setVisible(true);
+    	}
     }
 
 

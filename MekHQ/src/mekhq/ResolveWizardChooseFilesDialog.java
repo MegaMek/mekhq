@@ -211,8 +211,22 @@ public class ResolveWizardChooseFilesDialog extends javax.swing.JDialog {
     private void btnNextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
     	tracker.processMulFiles();
     	this.setVisible(false);
-    	ResolveWizardMissingUnitsDialog resolveDialog = new ResolveWizardMissingUnitsDialog(null, true, tracker);
-    	resolveDialog.setVisible(true);
+    	if(tracker.getMissingUnits().size() > 0) {
+    		ResolveWizardMissingUnitsDialog resolveDialog = new ResolveWizardMissingUnitsDialog(null, true, tracker);
+    		resolveDialog.setVisible(true);
+    	} else if(tracker.getMissingPilots().size() > 0) {
+    		ResolveWizardMissingPilotsDialog resolveDialog = new ResolveWizardMissingPilotsDialog(null, true, tracker);
+    		resolveDialog.setVisible(true);
+    	} else if(tracker.getDeadPilots().size() > 0) {
+    		ResolveWizardCasualtiesDialog resolveDialog = new ResolveWizardCasualtiesDialog(null, true, tracker);
+    		resolveDialog.setVisible(true);
+    	} else if(tracker.getSalvage().size() > 0) {
+    		ResolveWizardSalvageDialog resolveDialog = new ResolveWizardSalvageDialog(null, true, tracker);
+    		resolveDialog.setVisible(true);
+    	} else {
+    		ResolveWizardFinalCheckDialog resolveDialog = new ResolveWizardFinalCheckDialog(null, true, tracker);
+    		resolveDialog.setVisible(true);
+    	}
     }
 
 

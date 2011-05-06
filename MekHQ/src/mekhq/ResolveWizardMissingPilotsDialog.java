@@ -185,8 +185,16 @@ public class ResolveWizardMissingPilotsDialog extends javax.swing.JDialog {
     	tracker.identifyMissingPilots();
     	this.setVisible(false);
     	tracker.checkForCasualties();
-    	ResolveWizardCasualtiesDialog resolveDialog = new ResolveWizardCasualtiesDialog(null, true, tracker);
-    	resolveDialog.setVisible(true);
+    	if(tracker.getDeadPilots().size() > 0) {
+    		ResolveWizardCasualtiesDialog resolveDialog = new ResolveWizardCasualtiesDialog(null, true, tracker);
+    		resolveDialog.setVisible(true);
+    	} else if(tracker.getSalvage().size() > 0) {
+    		ResolveWizardSalvageDialog resolveDialog = new ResolveWizardSalvageDialog(null, true, tracker);
+    		resolveDialog.setVisible(true);
+    	} else {
+    		ResolveWizardFinalCheckDialog resolveDialog = new ResolveWizardFinalCheckDialog(null, true, tracker);
+    		resolveDialog.setVisible(true);
+    	}
     }
 
 
