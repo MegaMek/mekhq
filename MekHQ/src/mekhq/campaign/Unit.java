@@ -789,9 +789,6 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 	}
 
 	public String checkDeployment() {
-		if (isDeployed()) {
-			return "unit is already deployed";
-		}
 		if (!isFunctional()) {
 			return "unit is not functional";
 		}
