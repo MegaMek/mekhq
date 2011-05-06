@@ -21,7 +21,10 @@
 
 package mekhq;
 
+import java.awt.Dimension;
 import java.awt.Frame;
+
+import javax.swing.BorderFactory;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Mission;
@@ -59,7 +62,9 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
         lblName = new javax.swing.JLabel();
         btnOK = new javax.swing.JButton();
         btnClose = new javax.swing.JButton();
-  
+        scrDesc = new javax.swing.JScrollPane();
+        txtDesc = new javax.swing.JTextArea();
+        
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
 
@@ -87,6 +92,28 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(txtName, gridBagConstraints);
  
+        txtDesc.setText("");
+        txtDesc.setName("txtDesc");
+        txtDesc.setEditable(true);
+        txtDesc.setLineWrap(true);
+        txtDesc.setWrapStyleWord(true);
+        txtDesc.setBorder(BorderFactory.createCompoundBorder(
+	   			 BorderFactory.createTitledBorder("Description"),
+	   			 BorderFactory.createEmptyBorder(5,5,5,5)));
+        scrDesc.setViewportView(txtDesc);
+        scrDesc.setPreferredSize(new Dimension(400,200));
+        scrDesc.setMinimumSize(new Dimension(400,200));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        getContentPane().add(scrDesc, gridBagConstraints);
+        
         btnOK.setText(resourceMap.getString("btnOkay.text")); // NOI18N
         btnOK.setName("btnOK"); // NOI18N
         btnOK.addActionListener(new java.awt.event.ActionListener() {
@@ -96,7 +123,7 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.CENTER;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
@@ -111,7 +138,7 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.CENTER;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
@@ -123,6 +150,7 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
     
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
     	mission.setName(txtName.getText());
+    	mission.setDesc(txtDesc.getText());
     	if(newMission) {
     		campaign.addMission(mission);
     	}
@@ -141,6 +169,8 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
     private javax.swing.JButton btnOK;
     private javax.swing.JLabel lblName;
     private javax.swing.JTextField txtName;
+    private javax.swing.JTextArea txtDesc;
+    private javax.swing.JScrollPane scrDesc;
 
     // End of variables declaration//GEN-END:variables
 
