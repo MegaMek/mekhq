@@ -340,8 +340,16 @@ public class ResolveScenarioTracker {
 		return salvage.get(i);
 	}
 	
+	public ArrayList<Entity> getRecoveredUnits() {
+		return entities;
+	}
 	
-	public void resolveScenario() {
+	public ArrayList<Pilot> getRecoveredPilots() {
+		return pilots;
+	}
+	
+	
+	public void resolveScenario(int resolution, String report) {
 
 		//ok lets do the whole enchilada and go ahead and update campaign
 		
@@ -369,8 +377,9 @@ public class ResolveScenarioTracker {
 		for(Entity salvageEn : salvage) {
 			campaign.addUnit(salvageEn, false);
 		}
+		scenario.setStatus(resolution);
+		scenario.setDesc(report);
 		scenario.clearAllForcesAndPersonnel(campaign);
-		scenario.setStatus(Scenario.S_VICTORY);
 	}
 	
 	private void updateUnitWith(Entity en) {

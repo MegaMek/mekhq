@@ -90,7 +90,7 @@ public class ResolveWizardSalvageDialog extends javax.swing.JDialog {
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.weighty = 0.0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
@@ -185,8 +185,9 @@ public class ResolveWizardSalvageDialog extends javax.swing.JDialog {
     		}  		
     	}
     	tracker.setSalvage(s);
-    	tracker.resolveScenario();
     	this.setVisible(false);
+    	ResolveWizardFinalCheckDialog resolveDialog = new ResolveWizardFinalCheckDialog(null, true, tracker);
+    	resolveDialog.setVisible(true);
     }
 
 

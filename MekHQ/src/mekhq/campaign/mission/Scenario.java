@@ -40,10 +40,13 @@ public class Scenario implements Serializable {
 	 */
 	private static final long serialVersionUID = -2193761569359938090L;
 	
-	public static final int S_CURRENT = 0;
-	public static final int S_VICTORY = 1;
-	public static final int S_DEFEAT  = 2;
-	public static final int S_DRAW    = 3;
+	public static final int S_CURRENT  = 0;
+	public static final int S_VICTORY  = 1;
+	public static final int S_MVICTORY = 2;
+	public static final int S_DEFEAT   = 3;
+	public static final int S_MDEFEAT  = 4;
+	public static final int S_DRAW     = 5;
+	public static final int S_NUM      = 6;
 	
 	private String name;
 	private String desc;
@@ -68,8 +71,12 @@ public class Scenario implements Serializable {
 			return "Pending";
 		case S_VICTORY:
 			return "Victory";
+		case S_MVICTORY:
+			return "Marginal Victory";
 		case S_DEFEAT:
 			return "Defeat";
+		case S_MDEFEAT:
+			return "Marginal Defeat";
 		case S_DRAW:
 			return "Draw";
 		default:
