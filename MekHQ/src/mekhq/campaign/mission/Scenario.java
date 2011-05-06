@@ -20,12 +20,19 @@
  */
 package mekhq.campaign.mission;
 
+import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import mekhq.MekHQApp;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Force;
+import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.personnel.Person;
 
 
@@ -203,6 +210,79 @@ public class Scenario implements Serializable {
 		}
 		subForceIds = new ArrayList<Integer>();
 		personnelIds = new ArrayList<Integer>();
+	}
+	
+	public boolean isAssigned(Person person, Campaign campaign) {
+		for(int pid : getForces(campaign).getAllPersonnel()) {
+			if(pid == person.getId()) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public void writeToXml(PrintWriter pw1, int indent) {
+		pw1.println(MekHqXmlUtil.indentStr(indent) + "<scenario id=\""
+				+id
+				+"\" type=\""
+				+this.getClass().getName()
+				+"\">");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<name>"
+				+name
+				+"</name>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<desc>"
+				+desc
+				+"</desc>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<report>"
+				+report
+				+"</report>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<status>"
+				+status
+				+"</status>");
+		pw1.println(MekHqXmlUtil.indentStr(indent) + "</scenario>");
+		
+	}
+	
+	public static Scenario generateInstanceFromXML(Node wn) {
+		Scenario retVal = null;
+		NamedNodeMap attrs = wn.getAttributes();
+		Node classNameNode = attrs.getNamedItem("type");
+		String className = classNameNode.getTextContent();
+
+		try {
+			// Instantiate the correct child class, and call its parsing function.
+			retVal = (Scenario) Class.forName(className).newInstance();
+			
+			// Okay, now load Part-specific fields!
+			NodeList nl = wn.getChildNodes();
+			
+			for (int x=0; x<nl.getLength(); x++) {
+				Node wn2 = nl.item(x);
+				
+				if (wn2.getNodeName().equalsIgnoreCase("name")) {
+					retVal.name = wn2.getTextContent();
+				} else if (wn2.getNodeName().equalsIgnoreCase("status")) {
+					retVal.status = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("id")) {
+					retVal.id = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("desc")) {
+					retVal.setDesc(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("report")) {
+					retVal.setReport(wn2.getTextContent());
+				} 
+			}
+		} catch (Exception ex) {
+			// Errrr, apparently either the class name was invalid...
+			// Or the listed name doesn't exist.
+			// Doh!
+			MekHQApp.logError(ex);
+		}
+		
+		return retVal;
 	}
 	
 }

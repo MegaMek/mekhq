@@ -188,17 +188,6 @@ public class Campaign implements Serializable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		Mission m = new Mission("Test Mission 1");
-		addScenario(new Scenario("Test Scenario 1"),m);
-		addScenario(new Scenario("Test Scenario 2"),m);
-		addScenario(new Scenario("Test Scenario 3"),m);
-		addMission(m);
-		Mission m2 = new Mission("Test Mission 2");
-		addScenario(new Scenario("Test Scenario 4"),m2);
-		addScenario(new Scenario("Test Scenario 5"),m2);
-		addScenario(new Scenario("Test Scenario 6"),m2);
-		addMission(m2);
-		
 	}
 
 	public String getName() {
@@ -1459,6 +1448,7 @@ public class Campaign implements Serializable {
 		writeArrayAndHashToXml(pw1, 1, "tasks", tasks, taskIds); // Tasks
 		writeArrayAndHashToXml(pw1, 1, "personnel", personnel, personnelIds); // Personnel
 		writeArrayAndHashToXml(pw1, 1, "parts", parts, partIds); // Parts
+		writeArrayAndHashToXml(pw1, 1, "missions", missions, missionIds); // Parts
 		
 		//the forces structure is hierarchical, but that should be handled internally
 		//from with writeToXML function for Force
@@ -1580,6 +1570,8 @@ public class Campaign implements Serializable {
 					processTeamNodes(retVal, wn);
 				} else if (xn.equalsIgnoreCase("units")) {
 					processUnitNodes(retVal, wn);
+				} else if (xn.equalsIgnoreCase("missions")) {
+					processMissionNodes(retVal, wn);
 				} else if (xn.equalsIgnoreCase("forces")) {
 					processForces(retVal, wn);
 				} else if (xn.equalsIgnoreCase("finances")) {
@@ -1606,6 +1598,15 @@ public class Campaign implements Serializable {
 			// Okay, last trigger a reCalc.
 			// This should fix some holes in the data.
 			st.reCalc();
+		}
+	
+		//loop through forces to set force id
+		for(int fid : retVal.forceIds.keySet()) {
+			Force f = retVal.forceIds.get(fid);
+			Scenario s = retVal.getScenario(f.getScenarioId());
+			if(null != s) {
+				s.addForces(fid);
+			}
 		}
 		
 		// Okay, Units, need their pilot references fixed.
@@ -1634,10 +1635,20 @@ public class Campaign implements Serializable {
 		
 		// Some personnel need their task references fixed.
 		// All personnel need the rank reference fixed
+		// some personnel may need to be assigned to scenarios
 		for (int x=0; x<retVal.personnel.size(); x++) {
 			Person psn = retVal.personnel.get(x);
 			
 			psn.setRankSystem(retVal.ranks);
+			
+			Scenario s = retVal.getScenario(psn.getScenarioId());
+			if(null != s) {
+				//most personnel will be properly assigned through their
+				//force, so check to make sure they aren't already here
+				if(!s.isAssigned(psn, retVal)) {
+					s.addPersonnel(psn.getId());
+				}
+			}
 			
 			if (psn.getTaskId() >= 0)
 				psn.setTask((PersonnelWorkItem) retVal.taskIds.get(psn.getTaskId()));
@@ -1805,6 +1816,37 @@ public class Campaign implements Serializable {
 		}
 
 		MekHQApp.logMessage("Load Personnel Nodes Complete!", 4);
+	}
+	
+	private static void processMissionNodes(Campaign retVal, Node wn) {
+		MekHQApp.logMessage("Loading Mission Nodes from XML...", 4);
+
+		NodeList wList = wn.getChildNodes();
+		
+		// Okay, lets iterate through the children, eh?
+		for (int x = 0; x < wList.getLength(); x++) {
+			Node wn2 = wList.item(x);
+
+			// If it's not an element node, we ignore it.
+			if (wn2.getNodeType() != Node.ELEMENT_NODE)
+				continue;
+			
+			if (!wn2.getNodeName().equalsIgnoreCase("mission")) {
+				// Error condition of sorts!
+				// Errr, what should we do here?
+				MekHQApp.logMessage("Unknown node type not loaded in Mission nodes: "+wn2.getNodeName());
+
+				continue;
+			}
+
+			Mission m = Mission.generateInstanceFromXML(wn2);
+			
+			if (m != null) {
+				retVal.addMissionWithoutId(m);
+			}
+		}
+
+		MekHQApp.logMessage("Load Mission Nodes Complete!", 4);
 	}
 
 	private static void processTaskNodes(Campaign retVal, Node wn) {

@@ -19,6 +19,7 @@ v0.1.6 (SVN)
 + final check resolution wizard
 + allow for skipping of irrelevant wizards
 + separate after-action report from description
++ mission and scenario added to XML serialization
 
 v0.1.5 (2011-05-05)
 + refactored Hangar Panel into separate Hangar and Repair Bay panel

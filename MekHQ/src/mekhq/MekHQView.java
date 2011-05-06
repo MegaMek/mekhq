@@ -1952,6 +1952,7 @@ public class MekHQView extends FrameView {
 		refreshFunds();
 		refreshFinancialTransactions();
 		refreshOrganization();
+		refreshMissions();
 
 		// Without this, the report scrollbar doesn't seem to load properly
 		// after loading a campaign
@@ -1997,6 +1998,7 @@ public class MekHQView extends FrameView {
 		refreshReport();
 		refreshFunds();
 		refreshFinancialTransactions();
+		refreshMissions();
 
 		// Without this, the report scrollbar doesn't seem to load properly
 		// after loading a campaign
