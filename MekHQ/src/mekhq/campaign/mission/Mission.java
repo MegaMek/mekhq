@@ -103,6 +103,11 @@ public class Mission implements Serializable {
 		return scenarios;
 	}
 	
+	/**
+	 * Don't use this method directly as it will not
+	 * add an id to the added scenario. Use Campaign#AddScenario instead
+	 * @param s
+	 */
 	public void addScenario(Scenario s) {
 		scenarios.add(s);
 	}

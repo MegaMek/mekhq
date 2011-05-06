@@ -7,10 +7,19 @@
 package mekhq;
 
 import java.awt.Color;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Enumeration;
 
 import javax.swing.BorderFactory;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 
+import mekhq.campaign.Campaign;
+import mekhq.campaign.Force;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.personnel.Person;
 
 /**
  * A custom panel that gets filled in with goodies from a scenario object
@@ -24,15 +33,22 @@ public class ScenarioViewPanel extends javax.swing.JPanel {
 	private static final long serialVersionUID = 7004741688464105277L;
 
 	private Scenario scenario;
+	private Campaign campaign;
+	private Force forces;
+	private MekHQView view;
 	
 	private javax.swing.JPanel pnlStats;
 	private javax.swing.JTextArea txtDesc;
-	
+	private javax.swing.JTree forceTree;
 	private javax.swing.JLabel lblStatus;
 	
+	private DefaultTreeModel forceModel;
 	
-	public ScenarioViewPanel(Scenario s) {
+	public ScenarioViewPanel(Scenario s, Campaign c, MekHQView v) {
 		this.scenario = s;
+		this.campaign = c;
+		this.forces = s.getForces(campaign);
+		this.view = v;
 		initComponents();
 	}
 	
@@ -41,6 +57,7 @@ public class ScenarioViewPanel extends javax.swing.JPanel {
 
 		pnlStats = new javax.swing.JPanel();
 		txtDesc = new javax.swing.JTextArea();
+		forceTree = new javax.swing.JTree();
 		       
 		setLayout(new java.awt.GridBagLayout());
 
@@ -54,11 +71,30 @@ public class ScenarioViewPanel extends javax.swing.JPanel {
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 0;
 		gridBagConstraints.gridheight = 1;
-		gridBagConstraints.weightx = 1.0;
+		gridBagConstraints.weightx = 0.0;
 		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;	
 		add(pnlStats, gridBagConstraints);
+		
+		if(forces.getAllPersonnel().size() > 0) {
+			makeTree();
+			forceTree.setModel(forceModel);
+			//forceTree.addMouseListener(orgMouseAdapter);
+			forceTree.setCellRenderer(view.new ForceRenderer());
+			forceTree.setRowHeight(50);
+			forceTree.setRootVisible(false);
+			gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints.gridx = 0;
+			gridBagConstraints.gridy = 1;
+			gridBagConstraints.gridheight = 1;
+			gridBagConstraints.weightx = 1.0;
+			gridBagConstraints.weightx = 1.0;
+			gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
+			gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;	
+			add(forceTree, gridBagConstraints);
+		}
 		
 		txtDesc.setName("txtDesc");
 		txtDesc.setText(scenario.getDescription());
@@ -70,8 +106,9 @@ public class ScenarioViewPanel extends javax.swing.JPanel {
                 BorderFactory.createEmptyBorder(5,5,5,5)));
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 1;
+		gridBagConstraints.gridy = 2;
 		gridBagConstraints.gridwidth = 1;
+		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 1.0;
 		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
@@ -101,5 +138,66 @@ public class ScenarioViewPanel extends javax.swing.JPanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblStatus, gridBagConstraints);
 		
+    }
+    
+    private void makeTree() {
+    	//traverse the force object and assign TreeNodes
+		DefaultMutableTreeNode top = new DefaultMutableTreeNode(forces);
+		Enumeration<Force> subforces = forces.getSubForces().elements();
+		while(subforces.hasMoreElements()) {
+			Force subforce = subforces.nextElement();
+			addForce(subforce, top);
+		}
+		//add any personnel
+		Enumeration<Integer> personnel = forces.getPersonnel().elements();
+		//put them into a temporary array so I can sort it by rank
+		ArrayList<Person> people = new ArrayList<Person>();
+		while(personnel.hasMoreElements()) {
+			Person p = campaign.getPerson(personnel.nextElement());
+			if(p != null) {
+				people.add(p);
+			}
+		}
+		Collections.sort(people, new Comparator<Person>(){		 
+            public int compare(final Person p1, final Person p2) {
+               return ((Comparable<Integer>)p2.getRank()).compareTo(p1.getRank());
+            }
+        });
+		for(Person person : people) {
+			top.add(new DefaultMutableTreeNode(person));
+		}
+		if(null == forceModel) {
+			forceModel = new DefaultTreeModel(top);
+		} else {
+			forceModel.setRoot(top);
+		}
+    }
+    
+    private void addForce(Force force, DefaultMutableTreeNode top) {
+		DefaultMutableTreeNode category = new DefaultMutableTreeNode(force);
+		top.add(category);
+		Enumeration<Force> subforces = force.getSubForces().elements();
+		while(subforces.hasMoreElements()) {
+			Force subforce = subforces.nextElement();
+			addForce(subforce, category);
+		}
+		//add any personnel
+		Enumeration<Integer> personnel = force.getPersonnel().elements();
+		//put them into a temporary array so I can sort it by rank
+		ArrayList<Person> people = new ArrayList<Person>();
+		while(personnel.hasMoreElements()) {
+			Person p = campaign.getPerson(personnel.nextElement());
+			if(p != null) {
+				people.add(p);
+			}
+		}
+		Collections.sort(people, new Comparator<Person>(){		 
+            public int compare(final Person p1, final Person p2) {
+               return ((Comparable<Integer>)p2.getRank()).compareTo(p1.getRank());
+            }
+        });
+		for(Person person : people) {
+			category.add(new DefaultMutableTreeNode(person));
+		}
     }
 }

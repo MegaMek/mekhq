@@ -37,6 +37,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlSerializable;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Ranks;
+import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.team.SupportTeam;
 import mekhq.campaign.work.PersonnelWorkItem;
 
@@ -86,7 +87,6 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
     protected int taskId;
     //days of rest
     protected int daysRest;
-    protected boolean deployed;
     protected String biography;
     protected String portraitCategory;
     protected String portraitFile;
@@ -101,6 +101,8 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
     protected int xp;
     
     protected int forceId;
+    
+    protected int scenarioId;
     
     protected int salary;
     
@@ -120,6 +122,7 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
         status = S_ACTIVE;
         salary = -1;
         ranks = r;
+        scenarioId = -1;
     }
     
     public static String getGenderName(int gender) {
@@ -314,15 +317,32 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
         return false;
     }
     
-    public boolean isDeployed() {
-        return deployed;
+    public int getScenarioId() {
+    	return scenarioId;
     }
     
-    public void setDeployed(boolean b) {
-        this.deployed = b;
-        if(null != task && deployed) {
-            task.setTeam(null);
-        }
+    public void setScenarioId(int i) {
+    	this.scenarioId = i;
+    }
+    
+    public boolean isDeployed() {
+        return scenarioId != -1;
+    }
+    
+    public void undeploy(Campaign campaign) {
+    	Scenario s = campaign.getScenario(scenarioId);
+    	if(null == s) {
+    		return;
+    	}
+    	//only remove pilots from current scenarios
+    	//that allows for us to keep an accurate history 
+    	//of forces deployed in engagements, even when 
+    	//there is a hiccup
+    	if(s.isCurrent()) {
+    		//TODO: this doesn't work right
+    		s.removePersonnel(id);
+    	}
+    	scenarioId = -1;
     }
   
     public String getBiography() {
@@ -354,9 +374,9 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
 				+daysRest
 				+"</daysRest>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<deployed>"
-				+deployed
-				+"</deployed>");
+				+"<scenarioId>"
+				+scenarioId
+				+"</scenarioId>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<id>"
 				+this.id
@@ -430,11 +450,8 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
 					retVal.biography = wn2.getTextContent();
 				} else if (wn2.getNodeName().equalsIgnoreCase("daysRest")) {
 					retVal.daysRest = Integer.parseInt(wn2.getTextContent());
-				} else if (wn2.getNodeName().equalsIgnoreCase("deployed")) {
-					if (wn2.getTextContent().equalsIgnoreCase("true"))
-						retVal.deployed = true;
-					else
-						retVal.deployed = false;
+				} else if (wn2.getNodeName().equalsIgnoreCase("scenarioId")) {
+					retVal.scenarioId = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("id")) {
 					retVal.id = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("portraitCategory")) {

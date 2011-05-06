@@ -785,17 +785,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 	}
 
 	public boolean isDeployed() {
-		return deployed;
-	}
-
-	public void setDeployed(boolean b) {
-		this.deployed = b;
-		if (deployed) {
-			setSite(SITE_FIELD);
-			if (null != pilot) {
-				pilot.setDeployed(true);
-			}
-		}
+		return (pilot != null && pilot.isDeployed());
 	}
 
 	public String checkDeployment() {

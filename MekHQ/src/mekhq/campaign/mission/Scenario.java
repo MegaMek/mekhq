@@ -24,6 +24,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 
+import mekhq.campaign.Campaign;
+import mekhq.campaign.Force;
+
 
 /**
  * 
@@ -45,14 +48,17 @@ public class Scenario implements Serializable {
 	private String desc;
 	private int status;
 	private Date date;
-	private ArrayList<Integer> units;
+	private ArrayList<Integer> subForceIds;
+	private ArrayList<Integer> personnelIds;
+	private int id = -1;
 	
 	public Scenario(String n) {
 		this.name = n;
 		this.desc = "";
 		this.status = S_CURRENT;
 		this.date = null;
-		this.units = new ArrayList<Integer>();
+		this.subForceIds = new ArrayList<Integer>();
+		this.personnelIds = new ArrayList<Integer>();
 	}
 	
 	public static String getStatusName(int s) {
@@ -105,12 +111,64 @@ public class Scenario implements Serializable {
 		return date;
 	}
 	
-	public ArrayList<Integer> getUnitIds() {
-		return units;
+	public int getId() {
+		return id;
 	}
 	
-	public void addUnits(int uid) {
-		units.add(uid);
+	public void setId(int i) {
+		this.id = i;
+	}
+	
+	public Force getForces(Campaign campaign) {
+		Force force = new Force("Assigned Forces");
+		for(int subid : subForceIds) {
+			Force sub = campaign.getForce(subid);
+			if(null != sub) {
+				force.addSubForce(sub);
+			}
+		}
+		for(int pid : personnelIds) {
+			force.addPerson(pid);
+		}
+		return force;
+	}
+	
+	public void addForces(int fid) {
+		subForceIds.add(fid);
+	}
+	
+	public void addPersonnel(int pid) {
+		personnelIds.add(pid);
+	}
+	
+	public void removePersonnel(int pid) {
+		int idx = -1;
+		for(int i = 0; i < personnelIds.size(); i++) {
+			if(pid == personnelIds.get(i)) {
+				idx = i;
+				break;
+			}
+		}
+		if(idx > -1) {
+			personnelIds.remove(idx);
+		}
+	}
+	
+	public void removeForce(int fid) {
+		int idx = -1;
+		for(int i = 0; i < subForceIds.size(); i++) {
+			if(fid == subForceIds.get(i)) {
+				idx = i;
+				break;
+			}
+		}
+		if(idx > -1) {
+			subForceIds.remove(idx);
+		}
+	}
+	
+	public boolean isCurrent() {
+		return status == S_CURRENT;
 	}
 	
 }

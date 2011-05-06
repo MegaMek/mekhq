@@ -564,8 +564,8 @@ public class MekHQView extends FrameView {
 		panBriefing.add(btnAddScenario, gridBagConstraints);
 		
 		scrollMissionView.setViewportView(null);
-		scrollMissionView.setMinimumSize(new java.awt.Dimension(500, 200));
-		scrollMissionView.setPreferredSize(new java.awt.Dimension(500, 200));
+		scrollMissionView.setMinimumSize(new java.awt.Dimension(400, 200));
+		scrollMissionView.setPreferredSize(new java.awt.Dimension(400, 200));
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 1;
@@ -607,8 +607,8 @@ public class MekHQView extends FrameView {
 		panBriefing.add(scrollScenarioTable, gridBagConstraints);
 		
 		scrollScenarioView.setViewportView(null);
-		scrollScenarioView.setMinimumSize(new java.awt.Dimension(400, 600));
-		scrollScenarioView.setPreferredSize(new java.awt.Dimension(400, 2000));
+		scrollScenarioView.setMinimumSize(new java.awt.Dimension(550, 600));
+		scrollScenarioView.setPreferredSize(new java.awt.Dimension(550, 2000));
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 3;
 		gridBagConstraints.gridy = 0;
@@ -624,8 +624,8 @@ public class MekHQView extends FrameView {
 		splitBrief.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent pce) {
-				//this can mess up the unit view panel so refresh it
-				//refreshForceView();
+				//this can mess up the view panel so refresh it
+				refreshScenarioView();
 			}
 		});
 	
@@ -2147,7 +2147,7 @@ public class MekHQView extends FrameView {
 			return;
 		}
 		Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
-		scrollScenarioView.setViewportView(new ScenarioViewPanel(scenario));
+		scrollScenarioView.setViewportView(new ScenarioViewPanel(scenario, campaign, this));
 		//This odd code is to make sure that the scrollbar stays at the top
 		//I cant just call it here, because it ends up getting reset somewhere later
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -2418,11 +2418,6 @@ public class MekHQView extends FrameView {
 				// FIXME: this is not working
 				EntityListFile.saveTo(unitFile, chosen);
 
-				// set the unit and pilot as deployed
-				for (Unit u : toDeploy) {
-					u.setDeployed(true);
-				}
-
 			} catch (IOException excep) {
 				excep.printStackTrace(System.err);
 			}
@@ -2581,7 +2576,9 @@ public class MekHQView extends FrameView {
 		ArrayList<Person> people = new ArrayList<Person>();
 		while(personnel.hasMoreElements()) {
 			Person p = campaign.getPerson(personnel.nextElement());
-			people.add(p);
+			if(null != p) {
+				people.add(p);
+			}
 		}
 		Collections.sort(people, new Comparator<Person>(){		 
             public int compare(final Person p1, final Person p2) {
@@ -3367,9 +3364,8 @@ public class MekHQView extends FrameView {
 			} else if (command.equalsIgnoreCase("UNDEPLOY")) {
 				for (Unit unit : units) {
 					if (unit.isDeployed()) {
-						unit.setDeployed(false);
 						if (null != unit.getPilot()) {
-							unit.getPilot().setDeployed(false);
+							unit.getPilot().undeploy(campaign);
 						}
 					}
 				}
@@ -3377,6 +3373,7 @@ public class MekHQView extends FrameView {
 				refreshUnitList();
 				refreshPatientList();
 				refreshPersonnelList();
+				refreshScenarioList();
 			} else if (command.contains("CUSTOMIZE")
 					&& !command.contains("CANCEL")) {
 				if (!selectedUnit.isDeployed() && !selectedUnit.isDamaged()) {
@@ -3776,6 +3773,22 @@ public class MekHQView extends FrameView {
                     	refreshOrganization();
                     }
             	}
+            } else if(command.contains("DEPLOY_FORCE")) {
+                int sid = Integer.parseInt(st.nextToken());
+            	Scenario scenario = campaign.getScenario(sid);
+            	if(null != force && null != scenario) {
+                    scenario.addForces(force.getId());
+                    force.setScenarioId(scenario.getId());
+                    refreshScenarioList();
+                    for(int pid : force.getAllPersonnel()) {
+                    	Person p = campaign.getPerson(pid);
+                    	if(null != p) {
+                    		p.setScenarioId(scenario.getId());
+                    	}
+                    }
+            	}
+            	refreshScenarioList();
+            	refreshOrganization();
             } else if(command.contains("CHANGE_ICON")) {
             	if(null != force) {
             		PortraitChoiceDialog pcd = new PortraitChoiceDialog(null, true,
@@ -3814,6 +3827,8 @@ public class MekHQView extends FrameView {
             	if(null != force) {
             		campaign.removeForce(force);
             		refreshOrganization();   
+            		refreshPersonnelList();
+            		refreshScenarioList();
             	}
             } else if(command.contains("REMOVE_PERSON")) {
             	if(null != person) {
@@ -3821,7 +3836,17 @@ public class MekHQView extends FrameView {
             		if(null != parentForce) {
             			campaign.removePersonFromForce(person);
             			refreshOrganization();
+            			refreshPersonnelList();
+            			refreshScenarioList();
             		}
+            	}
+            } else if(command.contains("DEPLOY_PERSON")) {
+                int sid = Integer.parseInt(st.nextToken());
+            	Scenario scenario = campaign.getScenario(sid);
+            	if(null != person && null != scenario) {
+                    scenario.addPersonnel(person.getId());
+                    person.setScenarioId(scenario.getId());
+                    refreshScenarioList();
             	}
             }
 		}
@@ -3875,11 +3900,6 @@ public class MekHQView extends FrameView {
 					menuItem.addActionListener(this);
 					menuItem.setEnabled(true);
 	                popup.add(menuItem);
-	                menuItem = new JMenuItem("Change Force Icon...");
-	                menuItem.setActionCommand("CHANGE_ICON|" + forceId);
-					menuItem.addActionListener(this);
-					menuItem.setEnabled(true);
-	                popup.add(menuItem);
 	                menu = new JMenu("Add Personnel");
 	                for(Person p : campaign.getPersonnel()) {
 	                	if(p instanceof PilotPerson && p.isActive() && p.getForceId() < 1) {
@@ -3890,11 +3910,34 @@ public class MekHQView extends FrameView {
 		                	menu.add(menuItem);
 	                	}
 	                }
-	                popup.add(menu);    
+	                popup.add(menu);   
+	                if(force.getAllPersonnel().size()>0) {
+	                	menu = new JMenu("Deploy Force");
+	                	JMenu missionMenu;
+	                	for(Mission m : campaign.getActiveMissions()) {
+	                		missionMenu = new JMenu(m.getName());
+	                		for(Scenario s : m.getScenarios()) {
+	                			if(s.isCurrent()) {
+	                				menuItem = new JMenuItem(s.getName());
+		                			menuItem.setActionCommand("DEPLOY_FORCE|" + forceId + "|" + s.getId());
+		    						menuItem.addActionListener(this);
+		    						menuItem.setEnabled(true);
+		    		                missionMenu.add(menuItem);
+	                			}
+	                		}
+	                		menu.add(missionMenu);
+	                	}
+	                	popup.add(menu);
+	                }
 	                menuItem = new JMenuItem("Remove Force");
 	                menuItem.setActionCommand("REMOVE_FORCE|" + forceId);
 					menuItem.addActionListener(this);
 					menuItem.setEnabled(null != force.getParentForce());
+	                popup.add(menuItem);
+	                menuItem = new JMenuItem("Change Force Icon...");
+	                menuItem.setActionCommand("CHANGE_ICON|" + forceId);
+					menuItem.addActionListener(this);
+					menuItem.setEnabled(true);
 	                popup.add(menuItem);
                 }
                 else if(null != person) {
@@ -3907,6 +3950,24 @@ public class MekHQView extends FrameView {
 						menuItem.setEnabled(true);
 		                popup.add(menuItem);
                 	}
+                	if(!person.isDeployed()) {
+                		menu = new JMenu("Deploy Person");
+	                	JMenu missionMenu;
+	                	for(Mission m : campaign.getActiveMissions()) {
+	                		missionMenu = new JMenu(m.getName());
+	                		for(Scenario s : m.getScenarios()) {
+	                			if(s.isCurrent()) {
+	                				menuItem = new JMenuItem(s.getName());
+		                			menuItem.setActionCommand("DEPLOY_PERSON|" + personId + "|" + s.getId());
+		    						menuItem.addActionListener(this);
+		    						menuItem.setEnabled(true);
+		    		                missionMenu.add(menuItem);
+	                			}
+	                		}
+	                		menu.add(missionMenu);
+	                	}
+	                	popup.add(menu);
+                	}
                 }
 				popup.show(e.getComponent(), e.getX(), e.getY());
 			}
@@ -3914,7 +3975,7 @@ public class MekHQView extends FrameView {
 		
 	}
 	
-	private class ForceRenderer extends DefaultTreeCellRenderer {
+	public class ForceRenderer extends DefaultTreeCellRenderer {
      
 		private static final long serialVersionUID = -553191867660269247L;
 
@@ -3935,7 +3996,8 @@ public class MekHQView extends FrameView {
                             tree, value, sel,
                             expanded, leaf, row,
                             hasFocus);
-                
+            setOpaque(true);
+            setBackground(Color.WHITE);
             DefaultMutableTreeNode node = (DefaultMutableTreeNode)value;
             if(node.getUserObject() instanceof PilotPerson) {
             	//need to set the string here so I can add rank from campaign
@@ -3958,6 +4020,9 @@ public class MekHQView extends FrameView {
                 	}
             	}           	
             	setText("<html>" + rank + " " + name + " " + uname + "</html>");
+            	if(pp.isDeployed()) {   		
+            		setBackground(Color.LIGHT_GRAY);
+            	} 
             }
             setIcon(getIcon(node));
 
@@ -4204,10 +4269,11 @@ public class MekHQView extends FrameView {
 				refreshReport();
 			} else if (command.equalsIgnoreCase("UNDEPLOY")) {
 				if (selectedPerson.isDeployed()) {
-					selectedPerson.setDeployed(false);
+					selectedPerson.undeploy(campaign);
 				}
 				refreshPatientList();
 				refreshPersonnelList();
+				refreshScenarioList();
 			} else if (command.equalsIgnoreCase("EDIT")) {
 				if(selectedPerson instanceof PilotPerson) {
 					CustomizePilotDialog npd = new CustomizePilotDialog(getFrame(), true, 
@@ -5441,7 +5507,7 @@ public class MekHQView extends FrameView {
 				return scenario.getStatusName();
 			}
 			if(col == COL_ASSIGN) {
-				return scenario.getUnitIds().size();
+				return scenario.getForces(campaign).getAllPersonnel().size();
 			}
 			return "?";
 		}
@@ -6050,9 +6116,8 @@ public class MekHQView extends FrameView {
 			} else if (command.equalsIgnoreCase("UNDEPLOY")) {
 				for (Unit unit : units) {
 					if (unit.isDeployed()) {
-						unit.setDeployed(false);
 						if (null != unit.getPilot()) {
-							unit.getPilot().setDeployed(false);
+							unit.getPilot().undeploy(campaign);
 						}
 					}
 				}
@@ -6060,6 +6125,7 @@ public class MekHQView extends FrameView {
 				refreshUnitList();
 				refreshPatientList();
 				refreshPersonnelList();
+				refreshScenarioList();
 			} else if (command.contains("CUSTOMIZE")
 					&& !command.contains("CANCEL")) {
 				if (!selectedUnit.isDeployed() && !selectedUnit.isDamaged()) {

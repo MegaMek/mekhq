@@ -59,6 +59,7 @@ public class Force implements Serializable {
 	private Force parentForce;
 	private Vector<Force> subForces;
 	private Vector<Integer> personnel;
+	private int scenarioId;
 
 	//an ID so that forces can be tracked in Campaign hash
 	private int id;
@@ -69,6 +70,7 @@ public class Force implements Serializable {
 		this.parentForce = null;
 		this.subForces = new Vector<Force>();
 		this.personnel = new Vector<Integer>();
+		this.scenarioId = -1;
 	}
 	
 	public Force(String n, int id, Force parent) {
@@ -90,6 +92,18 @@ public class Force implements Serializable {
 	
 	public void setDescription(String d) {
 		this.desc = d;
+	}
+	
+	public int getScenarioId() {
+		return scenarioId;
+	}
+	
+	public void setScenarioId(int i) {
+		this.scenarioId = i;
+	}
+	
+	public boolean isDeployed() {
+		return scenarioId != -1;
 	}
 	
 	public Force getParentForce() {
@@ -178,6 +192,29 @@ public class Force implements Serializable {
 		}
 	}
 	
+	public boolean removePersonFromAllForces(int id) {
+		int idx = 0;
+		boolean found = false;
+		for(int pid : getPersonnel()) {
+			if(pid == id) {
+				found = true;
+				break;
+			}
+			idx++;
+		}
+		if(found) {
+			personnel.remove(idx);
+		} else {
+			for(Force sub : getSubForces()) {
+				found = sub.removePersonFromAllForces(id);
+				if(found) {
+					break;
+				}
+			}
+		} 
+		return found;
+	}
+	
 	public String toString() {
 		return name;
 	}
@@ -204,7 +241,7 @@ public class Force implements Serializable {
 			subForces.remove(idx);
 		}
 	}
-	
+
 	public String getIconCategory() {
 		return iconCategory;
 	}

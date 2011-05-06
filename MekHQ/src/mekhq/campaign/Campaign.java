@@ -112,6 +112,8 @@ public class Campaign implements Serializable {
 	private Hashtable<Integer, Force> forceIds = new Hashtable<Integer, Force>();
 	private ArrayList<Mission> missions = new ArrayList<Mission>();
 	private Hashtable<Integer, Mission> missionIds = new Hashtable<Integer, Mission>();
+	private Hashtable<Integer, Scenario> scenarioIds = new Hashtable<Integer, Scenario>();
+
 	
 	private int lastTeamId;
 	private int lastUnitId;
@@ -120,6 +122,7 @@ public class Campaign implements Serializable {
 	private int lastPartId;
 	private int lastForceId;
 	private int lastMissionId;
+	private int lastScenarioId;
 
 	// I need to put a basic game object in campaign so that I can
 	// asssign it to the entities, otherwise some entity methods may get NPE
@@ -186,14 +189,14 @@ public class Campaign implements Serializable {
 			e.printStackTrace();
 		}
 		Mission m = new Mission("Test Mission 1");
-		m.addScenario(new Scenario("Test Scenario 1"));
-		m.addScenario(new Scenario("Test Scenario 2"));
-		m.addScenario(new Scenario("Test Scenario 3"));
+		addScenario(new Scenario("Test Scenario 1"),m);
+		addScenario(new Scenario("Test Scenario 2"),m);
+		addScenario(new Scenario("Test Scenario 3"),m);
 		addMission(m);
 		Mission m2 = new Mission("Test Mission 2");
-		m2.addScenario(new Scenario("Test Scenario 4"));
-		m2.addScenario(new Scenario("Test Scenario 5"));
-		m2.addScenario(new Scenario("Test Scenario 6"));
+		addScenario(new Scenario("Test Scenario 4"),m2);
+		addScenario(new Scenario("Test Scenario 5"),m2);
+		addScenario(new Scenario("Test Scenario 6"),m2);
 		addMission(m2);
 		
 	}
@@ -354,6 +357,21 @@ public class Campaign implements Serializable {
 	public ArrayList<Mission> getMissions() {
 		return missions;
 	}
+	
+	/**
+	 * Add scenario to an existing mission. This method will also
+	 * assign the scenario an id and place it in the scenarioId hash
+	 * @param s - the Scenario to add
+	 * @param m - the mission to add the new scenario to
+	 */
+	public void addScenario(Scenario s, Mission m) {
+		int id = lastScenarioId + 1;
+		s.setId(id);
+		m.addScenario(s);
+		scenarioIds.put(new Integer(id), s);
+		lastScenarioId = id;
+		
+	}
 
 	public ArrayList<Mission> getActiveMissions() {
 		ArrayList<Mission> active = new ArrayList<Mission>();
@@ -372,6 +390,10 @@ public class Campaign implements Serializable {
 	 */
 	public Mission getMission(int id) {
 		return missionIds.get(new Integer(id));
+	}
+	
+	public Scenario getScenario(int id) {
+		return scenarioIds.get(new Integer(id));
 	}
 
 
@@ -415,7 +437,6 @@ public class Campaign implements Serializable {
 			// this is an existing unit so we need to update it
 			en.setId(priorUnit.getId());
 			priorUnit.setEntity(en);
-			priorUnit.setDeployed(false);
 			
 			if (null == en.getCrew() || en.getCrew().isDead()
 					|| en.getCrew().isEjected()) {
@@ -497,7 +518,7 @@ public class Campaign implements Serializable {
 			}
 			pilot.setEjected(false);
 			((PilotPerson) priorPilot).setPilot(pilot);
-			priorPilot.setDeployed(false);
+			priorPilot.setScenarioId(-1);
 			// remove any existing tasks for pilot so we can diagnose new ones
 			if (null != priorPilot.getTask()) {
 				WorkItem task = priorPilot.getTask();
@@ -1062,12 +1083,20 @@ public class Campaign implements Serializable {
 		//clear forceIds of all personnel with this force
 		for(Person p : personnel) {
 			if(p.getForceId() == fid) {
-				p.setForceId(0);
+				p.setForceId(-1);
+				if(force.isDeployed()) {
+					p.setScenarioId(-1);
+				}
 			}
+		}
+		//also remove this force's id from any scenarios
+		if(force.isDeployed()) {
+			Scenario s = getScenario(force.getScenarioId());
+			s.removeForce(fid);
 		}
 		if(null != force.getParentForce()) {
 			force.getParentForce().removeSubForce(fid);
-		}
+		}	
 	}
 	
 	public void removePersonFromForce(Person p) {

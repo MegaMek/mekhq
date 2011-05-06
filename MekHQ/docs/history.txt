@@ -3,6 +3,7 @@ VERSION HISTORY
 v0.1.6 (SVN)
 + beginning of Briefing Room tab
 + mission and scenario view panels
++ deploy forces and personnel to scenarios from TOE tab
 
 v0.1.5 (2011-05-05)
 + refactored Hangar Panel into separate Hangar and Repair Bay panel
