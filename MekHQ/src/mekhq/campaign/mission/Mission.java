@@ -194,9 +194,9 @@ public class Mission implements Serializable, MekHqXmlSerializable {
 				} else if (wn2.getNodeName().equalsIgnoreCase("desc")) {
 					retVal.setDesc(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("scenarios")) {
-					NodeList nl2 = wn.getChildNodes();
-					Node wn3 = nl.item(x);
+					NodeList nl2 = wn2.getChildNodes();
 					for (int y=0; y<nl2.getLength(); y++) {
+						Node wn3 = nl2.item(y);
 						// If it's not an element node, we ignore it.
 						if (wn3.getNodeType() != Node.ELEMENT_NODE)
 							continue;

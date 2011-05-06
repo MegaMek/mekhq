@@ -64,6 +64,10 @@ public class Scenario implements Serializable {
 	private ArrayList<Integer> personnelIds;
 	private int id = -1;
 	
+	public Scenario() {
+		this(null);
+	}
+	
 	public Scenario(String n) {
 		this.name = n;
 		this.desc = "";
