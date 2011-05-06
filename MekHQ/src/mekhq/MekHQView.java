@@ -374,6 +374,7 @@ public class MekHQView extends FrameView {
 		scenarioTable = new javax.swing.JTable();
 		scrollMissionView = new javax.swing.JScrollPane();
 		scrollScenarioView = new javax.swing.JScrollPane();
+		lblMission = new javax.swing.JLabel();
 		choiceMission = new javax.swing.JComboBox();
 		btnAddMission = new javax.swing.JButton();
 		btnEditMission = new javax.swing.JButton();
@@ -518,6 +519,16 @@ public class MekHQView extends FrameView {
 		panBriefing.setName("panBriefing"); // NOI18N
 		panBriefing.setLayout(new java.awt.GridBagLayout());
 		
+		lblMission.setText(resourceMap.getString("lblMission.text")); // NOI18N
+		lblMission.setName("lblMission"); // NOI18N
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.weightx = 1.0;
+		gridBagConstraints.weighty = 0.0;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.CENTER;
+		panBriefing.add(lblMission, gridBagConstraints);
+		
 		refreshMissions();
 		choiceMission.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -526,7 +537,7 @@ public class MekHQView extends FrameView {
 		});
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 0;
+		gridBagConstraints.gridy = 1;
 		gridBagConstraints.gridwidth = 1;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 		gridBagConstraints.weightx = 1.0;
@@ -605,9 +616,8 @@ public class MekHQView extends FrameView {
 		gridBagConstraints.weighty = 0.0;
 		panBriefing.add(btnCompleteMission, gridBagConstraints);
 		
+		scrollMissionView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollMissionView.setViewportView(null);
-		scrollMissionView.setMinimumSize(new java.awt.Dimension(400, 200));
-		scrollMissionView.setPreferredSize(new java.awt.Dimension(400, 200));
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 2;
@@ -638,15 +648,13 @@ public class MekHQView extends FrameView {
                 refreshScenarioView();
             }
         });
+		scrollScenarioTable.setMinimumSize(new java.awt.Dimension(200, 200));
+		scrollScenarioTable.setPreferredSize(new java.awt.Dimension(200, 200));
         scrollScenarioTable.setViewportView(scenarioTable);
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 3;
-		gridBagConstraints.gridwidth = 3;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-		gridBagConstraints.weightx = 1.0;
-		gridBagConstraints.weighty = 1.0;
-		panBriefing.add(scrollScenarioTable, gridBagConstraints);
+		
+		splitMission = new javax.swing.JSplitPane(javax.swing.JSplitPane.VERTICAL_SPLIT, panBriefing, scrollScenarioTable);
+		splitMission.setOneTouchExpandable(true);
+		splitMission.setResizeWeight(1.0);
 		
 		panelScenario.setFont(resourceMap.getFont("panHangar.font")); // NOI18N
 		panelScenario.setName("panelScenario"); // NOI18N
@@ -718,13 +726,14 @@ public class MekHQView extends FrameView {
 		gridBagConstraints.weighty = 1.0;
 		panelScenario.add(scrollScenarioView, gridBagConstraints);
 		
-		splitBrief = new javax.swing.JSplitPane(javax.swing.JSplitPane.HORIZONTAL_SPLIT, panBriefing, panelScenario);
+		splitBrief = new javax.swing.JSplitPane(javax.swing.JSplitPane.HORIZONTAL_SPLIT, splitMission, panelScenario);
 		splitBrief.setOneTouchExpandable(true);
 		splitBrief.setResizeWeight(1.0);
 		splitBrief.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent pce) {
 				//this can mess up the view panel so refresh it
+				changeMission();
 				refreshScenarioView();
 			}
 		});
@@ -2646,6 +2655,10 @@ public class MekHQView extends FrameView {
 			if(m.getId() == selectedMission) {
 				choiceMission.setSelectedItem(m.getName());
 			}
+		}
+		if(choiceMission.getSelectedIndex() == -1 && campaign.getActiveMissions().size() > 0) {
+			selectedMission = campaign.getActiveMissions().get(0).getId();
+			choiceMission.setSelectedIndex(0);
 		}
 		changeMission();
 	}
@@ -7006,6 +7019,8 @@ public class MekHQView extends FrameView {
 	private javax.swing.JButton btnClearAssignedUnits;
 	private javax.swing.JButton btnResolveScenario;
     private javax.swing.JSplitPane splitBrief;
+    private javax.swing.JSplitPane splitMission;
+    private javax.swing.JLabel lblMission;
 	// End of variables declaration//GEN-END:variables
 
 	private final Timer messageTimer;

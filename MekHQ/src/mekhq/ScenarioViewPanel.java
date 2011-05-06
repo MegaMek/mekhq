@@ -98,26 +98,6 @@ public class ScenarioViewPanel extends javax.swing.JPanel {
 			add(forceTree, gridBagConstraints);
 		}
 		
-		
-		txtDesc.setName("txtDesc");
-		txtDesc.setText(scenario.getDescription());
-		txtDesc.setEditable(false);
-		txtDesc.setLineWrap(true);
-		txtDesc.setWrapStyleWord(true);
-		txtDesc.setBorder(BorderFactory.createCompoundBorder(
-				BorderFactory.createTitledBorder("Description"),
-                BorderFactory.createEmptyBorder(5,5,5,5)));
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 2;
-		gridBagConstraints.gridwidth = 1;
-		gridBagConstraints.weightx = 1.0;
-		gridBagConstraints.weighty = 1.0;
-		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
-		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		add(txtDesc, gridBagConstraints);
-		
 		txtReport.setName("txtReport");
 		txtReport.setText(scenario.getReport());
 		txtReport.setEditable(false);
@@ -128,7 +108,7 @@ public class ScenarioViewPanel extends javax.swing.JPanel {
                 BorderFactory.createEmptyBorder(5,5,5,5)));
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 3;
+		gridBagConstraints.gridy = 2;
 		gridBagConstraints.gridwidth = 1;
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 1.0;
@@ -154,11 +134,28 @@ public class ScenarioViewPanel extends javax.swing.JPanel {
 		gridBagConstraints.gridy = 0;
 		gridBagConstraints.gridwidth = 2;
 		gridBagConstraints.weightx = 1.0;
-		gridBagConstraints.weighty = 1.0;
+		gridBagConstraints.weighty = 0.0;
 		gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblStatus, gridBagConstraints);
+		
+		txtDesc.setName("txtDesc");
+		txtDesc.setText(scenario.getDescription());
+		txtDesc.setEditable(false);
+		txtDesc.setLineWrap(true);
+		txtDesc.setWrapStyleWord(true);
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 2;
+		gridBagConstraints.gridwidth = 1;
+		gridBagConstraints.weightx = 1.0;
+		gridBagConstraints.weighty = 1.0;
+		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
+		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+		pnlStats.add(txtDesc, gridBagConstraints);
+		
 		
     }
     

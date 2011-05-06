@@ -7922,7 +7922,7 @@ More politically active than his father, Ross agitated for the Seventh Crucis La
 
 Henrik Dekker’s late night debates with Hill have become the stuff of legends among the Fox’s Teeth.</biography>
 			<daysRest>0</daysRest>
-			<scenarioId>-1</scenarioId>
+			<scenarioId>1</scenarioId>
 			<id>8</id>
 			<portraitCategory>FoxsTeeth/</portraitCategory>
 			<portraitFile>Dekker.png</portraitFile>
@@ -7949,7 +7949,7 @@ One of the few “outsiders” to serve with the Fox’s Teeth, “Tiny” had t
 
 A confirmed atheist, Hill has been engaged with Dekker in an extended debate about the place of God and religion in a star-faring society for over ten years. The other members of the company make a point of not becoming involved, finding something—anything—that requires their immediate attention elsewhere.</biography>
 			<daysRest>0</daysRest>
-			<scenarioId>-1</scenarioId>
+			<scenarioId>1</scenarioId>
 			<id>7</id>
 			<portraitCategory>FoxsTeeth/</portraitCategory>
 			<portraitFile>Hill.png</portraitFile>
@@ -7976,7 +7976,7 @@ However, with his brother Takeo’s death, the fortunes of the Chipende family f
 
 Hiro himself was killed on Greenlaw during the FedCom Civil War. Next in line for the Chipende clan’s slot in McKinnon’s Raiders was his niece, Jenna.</biography>
 			<daysRest>0</daysRest>
-			<scenarioId>-1</scenarioId>
+			<scenarioId>1</scenarioId>
 			<id>6</id>
 			<portraitCategory>FoxsTeeth/</portraitCategory>
 			<portraitFile>Chipende.png</portraitFile>
@@ -8003,7 +8003,7 @@ Always immaculately groomed, Paul Danton gives all the appearance of being a sti
 
 Paul Danton sees no reason to be uncomfortable while in the field, and his wealth has allowed him to acquire the last word in MechWarrior combat suits.</biography>
 			<daysRest>0</daysRest>
-			<scenarioId>-1</scenarioId>
+			<scenarioId>1</scenarioId>
 			<id>5</id>
 			<portraitCategory>FoxsTeeth/</portraitCategory>
 			<portraitFile>Danton.png</portraitFile>
@@ -8132,9 +8132,15 @@ Ian retired in 3051, accepting a battalion command in the Kestrel Militia.</biog
 	</parts>
 	<missions>
 		<mission id="1" type="mekhq.campaign.mission.Mission">
-			<name>Touchpoint: Thestra</name>
+			<name>Touchpoint: Thestria</name>
 			<status>0</status>
-			<desc></desc>
+			<desc>When somebody in the MIIO had a bee in their bonnet about reports that the Snakes were stockpiling supplies on Thestria, guess who got roped in to give the boys and girls in intel their precious “Ground Truth”? At least they came up with a plan to insert us without raising the alarm immediately, but things began to head south when we ran into ‘Mechs from the First Proserpina Hussars. First thing I knew about it was when Grey broke comm silence as we were moving in on Fortress Ningpo—yelling that he had ’Mechs inbound. Normally Captain McKinnon would have bugged out right there. We were playing with a busted flush on a planet full of unfriendliness.
+
+But the Intel types had been adamant. They desperately needed reliable information to corroborate their other sources.
+
+We were going to have to do this the hard way. 
+
+—From the journals of Daniel Waylen (3048)</desc>
 			<id>1</id>
 			<scenarios>
 				<scenario id="1" type="mekhq.campaign.mission.Scenario">
@@ -8179,7 +8185,7 @@ The Galloping Ghost slipped into orbit masquerading as a merchant and hot-droppe
 					<desc></desc>
 					<iconCategory>-- General --</iconCategory>
 					<iconFileName>mmech.png</iconFileName>
-					<scenarioId>-1</scenarioId>
+					<scenarioId>1</scenarioId>
 					<personnel>
 						<person id="5"/>
 						<person id="6"/>
