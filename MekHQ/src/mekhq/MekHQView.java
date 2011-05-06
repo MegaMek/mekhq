@@ -3998,6 +3998,12 @@ public class MekHQView extends FrameView {
                             hasFocus);
             setOpaque(true);
             setBackground(Color.WHITE);
+            setForeground(Color.BLACK);
+            if(hasFocus) {
+            	setBackground(Color.DARK_GRAY);
+                setForeground(Color.WHITE);
+            }
+            
             DefaultMutableTreeNode node = (DefaultMutableTreeNode)value;
             if(node.getUserObject() instanceof PilotPerson) {
             	//need to set the string here so I can add rank from campaign
@@ -4020,9 +4026,14 @@ public class MekHQView extends FrameView {
                 	}
             	}           	
             	setText("<html>" + rank + " " + name + " " + uname + "</html>");
-            	if(pp.isDeployed()) {   		
+            	if(pp.isDeployed() && !hasFocus) {   		
             		setBackground(Color.LIGHT_GRAY);
             	} 
+            }
+            if(node.getUserObject() instanceof Force) {
+            	if(!hasFocus && ((Force)node.getUserObject()).isDeployed()) {
+            		setBackground(Color.LIGHT_GRAY);
+            	}
             }
             setIcon(getIcon(node));
 
@@ -5507,7 +5518,7 @@ public class MekHQView extends FrameView {
 				return scenario.getStatusName();
 			}
 			if(col == COL_ASSIGN) {
-				return scenario.getForces(campaign).getAllPersonnel().size();
+				scenario.getForces(campaign).getAllPersonnel().size();
 			}
 			return "?";
 		}

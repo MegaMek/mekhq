@@ -124,7 +124,7 @@ public class Scenario implements Serializable {
 		for(int subid : subForceIds) {
 			Force sub = campaign.getForce(subid);
 			if(null != sub) {
-				force.addSubForce(sub);
+				force.addSubForce(sub, false);
 			}
 		}
 		for(int pid : personnelIds) {

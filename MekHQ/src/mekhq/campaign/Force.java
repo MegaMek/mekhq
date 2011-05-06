@@ -135,10 +135,14 @@ public class Force implements Serializable {
 	 * should not be called directly to add forces to the campaign
 	 * because they will not be assigned an id. Use {@link Campaign#addForce(Force, Force)}
 	 * instead
+	 * The boolean assignParent here is set to false when assigning forces from the 
+	 * TOE to a scenario, because we don't want to switch this forces real parent
 	 * @param sub
 	 */
-	public void addSubForce(Force sub) {
-		sub.setParentForce(this);
+	public void addSubForce(Force sub, boolean assignParent) {
+		if(assignParent) {
+			sub.setParentForce(this);
+		}
 		subForces.add(sub);
 	}
 	
@@ -343,7 +347,7 @@ public class Force implements Serializable {
 							continue;
 						}
 						
-						retVal.addSubForce(generateInstanceFromXML(wn3, c));
+						retVal.addSubForce(generateInstanceFromXML(wn3, c), true);
 					}
 				}
 			}	

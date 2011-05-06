@@ -96,6 +96,7 @@ public class ScenarioViewPanel extends javax.swing.JPanel {
 			add(forceTree, gridBagConstraints);
 		}
 		
+		
 		txtDesc.setName("txtDesc");
 		txtDesc.setText(scenario.getDescription());
 		txtDesc.setEditable(false);

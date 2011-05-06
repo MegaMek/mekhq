@@ -260,7 +260,7 @@ public class Campaign implements Serializable {
 	public void addForce(Force force, Force superForce) {
 		int id = lastForceId + 1;
 		force.setId(id);
-		superForce.addSubForce(force);
+		superForce.addSubForce(force, true);
 		forceIds.put(new Integer(id), force);
 		lastForceId = id;
 		
