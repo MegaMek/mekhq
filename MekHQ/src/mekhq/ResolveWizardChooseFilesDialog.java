@@ -133,7 +133,7 @@ public class ResolveWizardChooseFilesDialog extends javax.swing.JDialog {
     	 btnSalvageFile.addActionListener(new java.awt.event.ActionListener() {
     		 public void actionPerformed(java.awt.event.ActionEvent evt) {
     			 tracker.findSalvageFile();
-    			 txtUnitFile.setText(tracker.getSalvageFilePath());
+    			 txtSalvageFile.setText(tracker.getSalvageFilePath());
     		 }
     	 });
     	 gridBagConstraints = new java.awt.GridBagConstraints();

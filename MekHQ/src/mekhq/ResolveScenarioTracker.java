@@ -318,4 +318,16 @@ public class ResolveScenarioTracker {
 		casualty.setHits(5);
 		casualty.setDead(false);
 	}
+	
+	public ArrayList<Entity> getSalvage() {
+		return salvage;
+	}
+	
+	public void setSalvage(ArrayList<Entity> s) {
+		this.salvage = s;
+	}
+	
+	public Entity getSalvagedUnit(int i) {
+		return salvage.get(i);
+	}
 }

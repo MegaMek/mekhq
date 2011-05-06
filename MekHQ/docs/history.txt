@@ -14,6 +14,7 @@ v0.1.6 (SVN)
 + removed unused deploy boolean in Unit.java
 + resolve missing pilots wizard
 + resolve casualties wizard
++ resolve salvage wizard
 
 v0.1.5 (2011-05-05)
 + refactored Hangar Panel into separate Hangar and Repair Bay panel

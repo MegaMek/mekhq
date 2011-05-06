@@ -1,5 +1,5 @@
 /*
- * ResolveWizardCasualtiesDialog.java
+ * ResolveWizardSalvageDialog.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -29,14 +29,13 @@ import java.util.ArrayList;
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 
-import megamek.common.Pilot;
 import mekhq.campaign.Unit;
-import mekhq.campaign.personnel.PilotPerson;
+import megamek.common.Entity;
 /**
  *
  * @author  Taharqa
  */
-public class ResolveWizardCasualtiesDialog extends javax.swing.JDialog {
+public class ResolveWizardSalvageDialog extends javax.swing.JDialog {
 	private static final long serialVersionUID = -8038099101234445018L;
     
 	private ResolveScenarioTracker tracker;
@@ -44,13 +43,13 @@ public class ResolveWizardCasualtiesDialog extends javax.swing.JDialog {
 	private javax.swing.JPanel panButtons;
 	private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnNext;
-    private javax.swing.JScrollPane scrDeadPilots;
-	private javax.swing.JPanel panDeadPilots;
+    private javax.swing.JScrollPane scrSalvage;
+	private javax.swing.JPanel panSalvage;
     private javax.swing.JTextArea txtInstructions;
     private ArrayList<javax.swing.JCheckBox> boxes;
 	
     /** Creates new form NewTeamDialog */
-    public ResolveWizardCasualtiesDialog(java.awt.Frame parent, boolean modal, ResolveScenarioTracker t) {
+    public ResolveWizardSalvageDialog(java.awt.Frame parent, boolean modal, ResolveScenarioTracker t) {
         super(parent, modal);
         this.tracker = t;
         initComponents();
@@ -60,10 +59,10 @@ public class ResolveWizardCasualtiesDialog extends javax.swing.JDialog {
     	java.awt.GridBagConstraints gridBagConstraints;
 
     	panButtons = new javax.swing.JPanel();
-    	panDeadPilots = new javax.swing.JPanel();
+    	panSalvage = new javax.swing.JPanel();
     	btnNext = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
-        scrDeadPilots = new javax.swing.JScrollPane();
+        scrSalvage = new javax.swing.JScrollPane();
         txtInstructions = new javax.swing.JTextArea();
         boxes = new ArrayList<javax.swing.JCheckBox>();
 
@@ -71,7 +70,7 @@ public class ResolveWizardCasualtiesDialog extends javax.swing.JDialog {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
 
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(ResolveWizardCasualtiesDialog.class);
+        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(ResolveWizardSalvageDialog.class);
         getContentPane().setLayout(new java.awt.GridBagLayout());
         
         setTitle(resourceMap.getString("title"));
@@ -97,13 +96,13 @@ public class ResolveWizardCasualtiesDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         getContentPane().add(txtInstructions, gridBagConstraints);
 	
-        panDeadPilots.setName("panMissingPilots");
-        panDeadPilots.setLayout(new GridBagLayout()); 
+        panSalvage.setName("panSalvage");
+        panSalvage.setLayout(new GridBagLayout()); 
         
         JCheckBox box;
         int i = 1;
-        for(Pilot p : tracker.getDeadPilots()) {
-        	box = new JCheckBox(p.getName());
+        for(Entity en : tracker.getSalvage()) {
+        	box = new JCheckBox(en.getDisplayName());
         	box.setSelected(false);
         	boxes.add(box);
         	gridBagConstraints = new java.awt.GridBagConstraints();
@@ -112,10 +111,10 @@ public class ResolveWizardCasualtiesDialog extends javax.swing.JDialog {
             gridBagConstraints.gridwidth = 2;
             gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
             gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-            panDeadPilots.add(box, gridBagConstraints);
+            panSalvage.add(box, gridBagConstraints);
             i++;
         }              
-        scrDeadPilots.setViewportView(panDeadPilots);
+        scrSalvage.setViewportView(panSalvage);
         
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -126,7 +125,7 @@ public class ResolveWizardCasualtiesDialog extends javax.swing.JDialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        getContentPane().add(scrDeadPilots, gridBagConstraints);
+        getContentPane().add(scrSalvage, gridBagConstraints);
         
         panButtons.setName("panButtons");
         panButtons.setLayout(new GridBagLayout());  
@@ -178,16 +177,17 @@ public class ResolveWizardCasualtiesDialog extends javax.swing.JDialog {
 
     
     private void btnNextActionPerformed(java.awt.event.ActionEvent evt) {
+    	ArrayList<Entity> s = new ArrayList<Entity>();
     	for(int i = 0; i < boxes.size(); i++) {
     		JCheckBox box = boxes.get(i);
     		if(box.isSelected()) {
-    			tracker.removeCasaulty(i);
-    		}
+    			s.add(tracker.getSalvagedUnit(i));
+    		}  		
     	}
-    	tracker.checkForCasualties();
-    	this.setVisible(false);  	
-    	ResolveWizardSalvageDialog resolveDialog = new ResolveWizardSalvageDialog(null, true, tracker);
-    	resolveDialog.setVisible(true);
+    	tracker.setSalvage(s);
+    	this.setVisible(false);
+    	//ResolveWizardMissingPilotsDialog resolveDialog = new ResolveWizardMissingPilotsDialog(null, true, tracker);
+    	//resolveDialog.setVisible(true);
     }
 
 

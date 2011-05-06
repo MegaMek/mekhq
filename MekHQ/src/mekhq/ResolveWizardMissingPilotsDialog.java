@@ -175,7 +175,6 @@ public class ResolveWizardMissingPilotsDialog extends javax.swing.JDialog {
 	   	 pack();
     }
 
-    
     private void btnNextActionPerformed(java.awt.event.ActionEvent evt) {
     	for(int i = 0; i < boxes.size(); i++) {
     		JCheckBox box = boxes.get(i);
@@ -185,6 +184,8 @@ public class ResolveWizardMissingPilotsDialog extends javax.swing.JDialog {
     	}
     	this.setVisible(false);
     	tracker.checkForCasualties();
+    	ResolveWizardCasualtiesDialog resolveDialog = new ResolveWizardCasualtiesDialog(null, true, tracker);
+    	resolveDialog.setVisible(true);
     }
 
 
