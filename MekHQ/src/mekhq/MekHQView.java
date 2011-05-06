@@ -376,6 +376,8 @@ public class MekHQView extends FrameView {
 		scrollScenarioView = new javax.swing.JScrollPane();
 		choiceMission = new javax.swing.JComboBox();
 		btnAddMission = new javax.swing.JButton();
+		btnEditMission = new javax.swing.JButton();
+		btnCompleteMission = new javax.swing.JButton();
 		btnAddScenario = new javax.swing.JButton();
 		btnGetMul = new javax.swing.JButton();
 		btnClearAssignedUnits = new javax.swing.JButton();
@@ -567,16 +569,52 @@ public class MekHQView extends FrameView {
 		gridBagConstraints.weighty = 0.0;
 		panBriefing.add(btnAddScenario, gridBagConstraints);
 		
+		btnEditMission.setText(resourceMap.getString("btnEditMission.text")); // NOI18N
+		btnEditMission.setToolTipText(resourceMap
+				.getString("btnEditMission.toolTipText")); // NOI18N
+		btnEditMission.setName("btnEditMission"); // NOI18N
+		btnEditMission.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				btnEditMissionActionPerformed(evt);
+			}
+		});
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 1;
+		gridBagConstraints.gridy = 1;
+		gridBagConstraints.gridwidth = 1;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+		gridBagConstraints.weightx = 1.0;
+		gridBagConstraints.weighty = 0.0;
+		panBriefing.add(btnEditMission, gridBagConstraints);
+		
+		btnCompleteMission.setText(resourceMap.getString("btnCompleteMission.text")); // NOI18N
+		btnCompleteMission.setToolTipText(resourceMap
+				.getString("btnCompleteMission.toolTipText")); // NOI18N
+		btnCompleteMission.setName("btnCompleteMission"); // NOI18N
+		btnCompleteMission.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				btnCompleteMissionActionPerformed(evt);
+			}
+		});
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 2;
+		gridBagConstraints.gridy = 1;
+		gridBagConstraints.gridwidth = 1;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+		gridBagConstraints.weightx = 1.0;
+		gridBagConstraints.weighty = 0.0;
+		panBriefing.add(btnCompleteMission, gridBagConstraints);
+		
 		scrollMissionView.setViewportView(null);
 		scrollMissionView.setMinimumSize(new java.awt.Dimension(400, 200));
 		scrollMissionView.setPreferredSize(new java.awt.Dimension(400, 200));
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 1;
+		gridBagConstraints.gridy = 2;
 		gridBagConstraints.gridwidth = 3;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 		gridBagConstraints.weightx = 1.0;
-		gridBagConstraints.weighty = 0.0;
+		gridBagConstraints.weighty = 1.0;
 		panBriefing.add(scrollMissionView, gridBagConstraints);
 		
 		scenarioTable.setModel(scenarioModel);
@@ -603,7 +641,7 @@ public class MekHQView extends FrameView {
         scrollScenarioTable.setViewportView(scenarioTable);
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 2;
+		gridBagConstraints.gridy = 3;
 		gridBagConstraints.gridwidth = 3;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 		gridBagConstraints.weightx = 1.0;
@@ -1624,6 +1662,35 @@ public class MekHQView extends FrameView {
 		refreshMissions();
 	}
 	
+	private void btnEditMissionActionPerformed(java.awt.event.ActionEvent evt) {
+		Mission mission = campaign.getMission(selectedMission);
+		if(null != mission) {
+			CustomizeMissionDialog cmd = new CustomizeMissionDialog(null, true, mission, campaign);
+			cmd.setVisible(true);
+			if(cmd.getMissionId() != -1) {
+				selectedMission = cmd.getMissionId();
+			}
+			refreshMissions();
+		}
+		
+	}
+	
+	private void btnCompleteMissionActionPerformed(java.awt.event.ActionEvent evt) {
+		Mission mission = campaign.getMission(selectedMission);
+		if(null != mission) {
+			CompleteMissionDialog cmd = new CompleteMissionDialog(null, true, mission);
+			cmd.setVisible(true);
+			if(!mission.isActive()) {
+				if(campaign.getActiveMissions().size() > 0) {
+					selectedMission = campaign.getActiveMissions().get(0).getId();
+				} else {
+					selectedMission = -1;
+				}
+				refreshMissions();
+			}
+		}	
+	}
+	
 	private void btnAddScenarioActionPerformed(java.awt.event.ActionEvent evt) {
 		Mission m = campaign.getMission(selectedMission);
 		if(null != m) {
@@ -2539,6 +2606,7 @@ public class MekHQView extends FrameView {
 			}
 		} else {
 			selectedMission = -1;
+			scrollMissionView.setViewportView(null);
 		}
 		refreshScenarioList();
 	}
@@ -5572,11 +5640,11 @@ public class MekHQView extends FrameView {
         public String getColumnName(int column) {
             switch(column) {
             	case COL_NAME:
-            		return "Name";
+            		return "Scenario Name";
                 case COL_STATUS:
-                    return "Status";
+                    return "Resolution";
                 case COL_ASSIGN:
-                    return "# Units Assigned";
+                    return "# Units";
                 default:
                     return "?";
             }
@@ -6925,6 +6993,8 @@ public class MekHQView extends FrameView {
 	private javax.swing.JScrollPane scrollScenarioView;
 	private javax.swing.JButton btnAddScenario;
 	private javax.swing.JButton btnAddMission;
+	private javax.swing.JButton btnEditMission;
+	private javax.swing.JButton btnCompleteMission;
 	private javax.swing.JButton btnGetMul;
 	private javax.swing.JButton btnClearAssignedUnits;
 	private javax.swing.JButton btnResolveScenario;

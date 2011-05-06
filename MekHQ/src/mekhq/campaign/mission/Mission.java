@@ -56,6 +56,7 @@ public class Mission implements Serializable, MekHqXmlSerializable {
 	public static final int S_SUCCESS = 1;
 	public static final int S_FAILED  = 2;
 	public static final int S_BREACH  = 3;
+	public static final int S_NUM     = 4;
 	
 	private String name;
 	private int status;
