@@ -91,7 +91,6 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 
 	private Entity entity;
 	private int site;
-	private boolean deployed;
 	private PilotPerson pilot;
 	private int pilotId = -1;
 	private boolean salvaged;
@@ -111,7 +110,6 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 	public Unit(Entity en, Campaign c) {
 		this.entity = en;
 		this.site = SITE_BAY;
-		this.deployed = false;
 		this.salvaged = false;
 		this.campaign = c;
 		this.customized = false;
@@ -1824,9 +1822,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 
 		pw1.println(MekHqXmlUtil.writeEntityToXmlString(entity, indentLvl+1));
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<customized>"
-				+ deployed + "</customized>");
-		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<deployed>"
-				+ deployed + "</deployed>");
+				+ customized + "</customized>");
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<quality>"
 				+ quality + "</quality>");
 		
@@ -1867,11 +1863,6 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 						retVal.salvaged = true;
 					else
 						retVal.salvaged = false;
-				} else if (wn2.getNodeName().equalsIgnoreCase("deployed")) {
-					if (wn2.getTextContent().equalsIgnoreCase("true"))
-						retVal.deployed = true;
-					else
-						retVal.deployed = false;
 				} else if (wn2.getNodeName().equalsIgnoreCase("customized")) {
 					if (wn2.getTextContent().equalsIgnoreCase("true"))
 						retVal.customized = true;

@@ -654,7 +654,7 @@ public class MekHQView extends FrameView {
 		btnResolveScenario.setName("btnResolveScenario"); // NOI18N
 		btnResolveScenario.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				//btnGetMulActionPerformed(evt);
+				resolveScenario();
 			}
 		});
 		gridBagConstraints = new java.awt.GridBagConstraints();
@@ -2379,12 +2379,26 @@ public class MekHQView extends FrameView {
 				JOptionPane.YES_NO_OPTION)) {
 			int row = scenarioTable.getSelectedRow();
 			Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
+			if(null == scenario) {
+				return;
+			}
 			scenario.clearAllForcesAndPersonnel(campaign);
 			refreshScenarioList();
 			refreshPersonnelList();
 			refreshUnitList();
 			refreshOrganization();
 		}
+	}
+	
+	protected void resolveScenario() {
+		int row = scenarioTable.getSelectedRow();
+		Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
+		if(null == scenario) {
+			return;
+		}
+		ResolveWizardChooseFilesDialog resolveDialog = new ResolveWizardChooseFilesDialog(null, true, new ResolveScenarioTracker(scenario, campaign));
+		resolveDialog.setVisible(true);
+		
 	}
 	
 	protected void deployListFile() {
