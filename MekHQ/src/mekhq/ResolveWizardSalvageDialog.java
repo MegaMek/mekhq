@@ -185,9 +185,8 @@ public class ResolveWizardSalvageDialog extends javax.swing.JDialog {
     		}  		
     	}
     	tracker.setSalvage(s);
+    	tracker.resolveScenario();
     	this.setVisible(false);
-    	//ResolveWizardMissingPilotsDialog resolveDialog = new ResolveWizardMissingPilotsDialog(null, true, tracker);
-    	//resolveDialog.setVisible(true);
     }
 
 

@@ -166,19 +166,28 @@ public class ResolveScenarioTracker {
 			}
 		}
 		
-		//identify missing units
+		identifyMissingUnits();
+		identifyMissingPilots();
+		checkForCasualties();
+	}
+	
+	
+	public void identifyMissingUnits() {
+		missingUnits = new ArrayList<Unit>();
 		for(Unit u : units) {
 			if(!foundMatch(u.getEntity(), entities) && !foundMatch(u.getEntity(), salvage)) {
 				missingUnits.add(u);
 			}
 		}
-		//identify missing pilots
+	}
+	
+	public void identifyMissingPilots() {
+		missingPilots = new ArrayList<PilotPerson>();
 		for(PilotPerson person : people) {
 			if(!foundMatch(person.getPilot(), pilots)) {
 				missingPilots.add(person);
 			}
 		}
-		checkForCasualties();
 	}
 	
 	public void checkForCasualties() {
@@ -329,5 +338,95 @@ public class ResolveScenarioTracker {
 	
 	public Entity getSalvagedUnit(int i) {
 		return salvage.get(i);
+	}
+	
+	
+	public void resolveScenario() {
+
+		//ok lets do the whole enchilada and go ahead and update campaign
+		
+		//first lets update the entities on all units
+		for(Entity en : entities) {
+			updateUnitWith(en);
+		}
+		//now lets update pilots
+		for(Pilot p : pilots) {
+			updatePilotWith(p);
+		}
+		//now lets take care of dead pilots
+		for(Pilot dead : deadPilots) {
+			killPilot(dead);
+		}
+		//now lets take take care of missing pilots
+		for(PilotPerson miss : missingPilots) {
+			setMIA(miss);
+		}
+		//now lets take care of missing units
+		for(Unit missUnit : missingUnits) {
+			campaign.removeUnit(missUnit.getId());
+		}
+		//now lets take care of salvage
+		for(Entity salvageEn : salvage) {
+			campaign.addUnit(salvageEn, false);
+		}
+		scenario.clearAllForcesAndPersonnel(campaign);
+		scenario.setStatus(Scenario.S_VICTORY);
+	}
+	
+	private void updateUnitWith(Entity en) {
+		for(Unit u : campaign.getUnits()) {
+			if(u.getEntity().getExternalId() == en.getExternalId()) {
+				u.setEntity(en);
+				campaign.runNewDiagnostics(u.getId());
+				campaign.addReport(u.getEntity().getDisplayName() + " has been recovered.");
+				return;
+			}
+		}
+	}
+	
+	private void updatePilotWith(Pilot pilot) {
+		for(Person person : campaign.getPersonnel()) {
+			if(!(person instanceof PilotPerson)) {
+				continue;
+			}
+			PilotPerson pp = (PilotPerson)person;
+			if(pp.getPilot().getExternalId() == pilot.getExternalId()) {
+				pp.setPilot(pilot);
+				pp.undeploy(campaign);
+				if(null != pp.getAssignedUnit()) {
+					//TODO: this is such a roundabout way of doing this - lets
+					//make it personnel centric
+					pp.getAssignedUnit().setPilot(pp);
+					pp.runDiagnostic(campaign);
+					campaign.addReport(pp.getFullTitle() + " has been recovered.");
+				}
+				return;
+			}
+		}
+	}
+	
+	private void killPilot(Pilot pilot) {
+		for(Person person : campaign.getPersonnel()) {
+			if(!(person instanceof PilotPerson)) {
+				continue;
+			}
+			PilotPerson pp = (PilotPerson)person;
+			if(pp.getPilot().getExternalId() == pilot.getExternalId()) {
+				pp.setStatus(Person.S_KIA);
+				campaign.removePersonFromForce(pp);
+				campaign.addReport(pp.getFullTitle() + " has been killed in action.");
+				return;
+			}
+		}
+	}
+	
+	private void setMIA(PilotPerson pilot) {
+		Person person = campaign.getPerson(pilot.getId());
+		if(null != person) {
+			person.setStatus(Person.S_MIA);
+			person.undeploy(campaign);
+			campaign.removePersonFromForce(person);
+			campaign.addReport(person.getFullTitle() + " is missing in action.");
+		}
 	}
 }

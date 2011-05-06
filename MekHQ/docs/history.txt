@@ -15,6 +15,7 @@ v0.1.6 (SVN)
 + resolve missing pilots wizard
 + resolve casualties wizard
 + resolve salvage wizard
++ process resolved scenario
 
 v0.1.5 (2011-05-05)
 + refactored Hangar Panel into separate Hangar and Repair Bay panel

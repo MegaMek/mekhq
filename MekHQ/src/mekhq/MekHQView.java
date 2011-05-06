@@ -2399,6 +2399,14 @@ public class MekHQView extends FrameView {
 		ResolveWizardChooseFilesDialog resolveDialog = new ResolveWizardChooseFilesDialog(null, true, new ResolveScenarioTracker(scenario, campaign));
 		resolveDialog.setVisible(true);
 		
+		refreshScenarioList();
+		refreshOrganization();
+		refreshServicedUnitList();
+		refreshUnitList();
+		filterPersonnel();
+		refreshPersonnelList();
+		refreshPatientList();
+		refreshReport();
 	}
 	
 	protected void deployListFile() {

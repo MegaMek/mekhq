@@ -182,6 +182,7 @@ public class ResolveWizardMissingPilotsDialog extends javax.swing.JDialog {
     			tracker.recoverMissingPilot(i);
     		}
     	}
+    	tracker.identifyMissingPilots();
     	this.setVisible(false);
     	tracker.checkForCasualties();
     	ResolveWizardCasualtiesDialog resolveDialog = new ResolveWizardCasualtiesDialog(null, true, tracker);

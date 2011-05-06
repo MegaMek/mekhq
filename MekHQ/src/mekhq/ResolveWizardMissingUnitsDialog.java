@@ -182,6 +182,7 @@ public class ResolveWizardMissingUnitsDialog extends javax.swing.JDialog {
     			tracker.recoverMissingEntity(i);
     		}
     	}
+    	tracker.identifyMissingUnits();
     	this.setVisible(false);
     	ResolveWizardMissingPilotsDialog resolveDialog = new ResolveWizardMissingPilotsDialog(null, true, tracker);
     	resolveDialog.setVisible(true);

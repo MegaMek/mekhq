@@ -406,8 +406,43 @@ public class Campaign implements Serializable {
 			lastUnitId = u.getId();
 	}
 
+	public void runNewDiagnostics(int uid) {
+		Unit unit = getUnit(uid);
+		
+		if(null == unit) {
+			return;
+		}
+		
+		// remove old tasks
+		ArrayList<WorkItem> oldTasks = new ArrayList<WorkItem>();
+		
+		for (WorkItem task : getAllTasksForUnit(unit.getId())) {
+			if (task instanceof RepairItem
+					|| task instanceof ReplacementItem) {
+				oldTasks.add(task);
+			}
+			
+			tasks.remove(task);
+			taskIds.remove(new Integer(task.getId()));
+		}
+		
+		unit.runDiagnostic();
+		
+		// this last one is tricky because I want to keep information about
+		// skill level required from the old
+		// tasks, otherwise reloading a unit will allow user to reset the
+		// skill required to green (i.e. cheat)
+		for (WorkItem task : getTasksForUnit(unit.getId())) {
+			for (WorkItem oldTask : oldTasks) {
+				if (task.sameAs(oldTask)) {
+					task.setSkillMin(oldTask.getSkillMin());
+				}
+			}
+		}
+	}
+	
 	/**
-	 * Add a unit to the campaign
+	 * Add a unit to the campaign. This is only for new units
 	 * 
 	 * @param en
 	 *            An <code>Entity</code> object that the new unit will be
@@ -428,76 +463,27 @@ public class Campaign implements Serializable {
 		} else if (en instanceof Aero) {
 			type = PilotPerson.T_AERO_PILOT;
 		}
-
-		//first check to see if the externalId of this entity matches any units
-		// we already have
-		Unit priorUnit = unitIds.get(new Integer(en.getExternalId()));
 		
-		if (null != priorUnit) {
-			// this is an existing unit so we need to update it
-			en.setId(priorUnit.getId());
-			priorUnit.setEntity(en);
-			
-			if (null == en.getCrew() || en.getCrew().isDead()
-					|| en.getCrew().isEjected()) {
-				priorUnit.removePilot();
-			} else {
-				addPilot(en.getCrew(), type, allowNewPilots);
+		int id = lastUnitId + 1;
+		en.setId(id);
+		en.setExternalId(id);
+		Unit unit = new Unit(en, this);
+		units.add(unit);
+		unitIds.put(new Integer(id), unit);
+		lastUnitId = id;
+		
+		if (null != en.getCrew() && !en.getCrew().isDead()
+				&& !en.getCrew().isEjected()) {
+			PilotPerson pp = addPilot(en.getCrew(), type, allowNewPilots);
+			if (pp != null) {
+				unit.setPilot(pp);
 			}
-			
-			// remove old tasks
-			ArrayList<WorkItem> oldTasks = new ArrayList<WorkItem>();
-			
-			for (WorkItem task : getAllTasksForUnit(priorUnit.getId())) {
-				if (task instanceof RepairItem
-						|| task instanceof ReplacementItem) {
-					oldTasks.add(task);
-				}
-				
-				tasks.remove(task);
-				taskIds.remove(new Integer(task.getId()));
-			}
-			
-			priorUnit.runDiagnostic();
-			
-			// this last one is tricky because I want to keep information about
-			// skill level required from the old
-			// tasks, otherwise reloading a unit will allow user to reset the
-			// skill required to green (i.e. cheat)
-			for (WorkItem task : getTasksForUnit(priorUnit.getId())) {
-				for (WorkItem oldTask : oldTasks) {
-					if (task.sameAs(oldTask)) {
-						task.setSkillMin(oldTask.getSkillMin());
-					}
-				}
-			}
-			
-			addReport(priorUnit.getEntity().getDisplayName()
-					+ " has been recovered.");
-		} else {
-			// This is a new unit so add it
-			int id = lastUnitId + 1;
-			en.setId(id);
-			en.setExternalId(id);
-			Unit unit = new Unit(en, this);
-			units.add(unit);
-			unitIds.put(new Integer(id), unit);
-			lastUnitId = id;
-			
-			if (null != en.getCrew() && !en.getCrew().isDead()
-					&& !en.getCrew().isEjected()) {
-				PilotPerson pp = addPilot(en.getCrew(), type, allowNewPilots);
-				if (pp != null) {
-					unit.setPilot(pp);
-				}
-			}
-			
-			// collect all the work items outstanding on this unit and add them
-			// to the workitem vector
-			unit.runDiagnostic();
-			addReport(unit.getEntity().getDisplayName()
-					+ " has been added to the unit roster.");
 		}
+			
+		// collect all the work items outstanding on this unit and add them
+		// to the workitem vector
+		unit.runDiagnostic();
+		addReport(unit.getEntity().getDisplayName() + " has been added to the unit roster.");
 	}
 
 	/**
@@ -1103,7 +1089,7 @@ public class Campaign implements Serializable {
 		Force force = getForce(p.getForceId());
 		if(null != force) {
 			force.removePerson(p.getId());
-			p.setForceId(0);
+			p.setForceId(-1);
 		}
 	}
 	 
