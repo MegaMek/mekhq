@@ -284,6 +284,10 @@ public class Force implements Serializable {
 				+"<iconFileName>"
 				+iconFileName
 				+"</iconFileName>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<scenarioId>"
+				+scenarioId
+				+"</scenarioId>");
 		if(personnel.size() > 0) {
 			//for now I am just going to print person ids to xml
 			//TODO: change personnel to a vector of ids rather than persons
@@ -330,6 +334,8 @@ public class Force implements Serializable {
 					retVal.iconCategory = wn2.getTextContent();
 				} else if (wn2.getNodeName().equalsIgnoreCase("iconFileName")) {
 					retVal.iconFileName = wn2.getTextContent();
+				} else if (wn2.getNodeName().equalsIgnoreCase("scenarioId")) {
+					retVal.scenarioId = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("personnel")) {
 						processPersonnelNodes(retVal, wn2);
 				} else if (wn2.getNodeName().equalsIgnoreCase("subforces")) {

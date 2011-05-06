@@ -6,6 +6,7 @@ v0.1.6 (SVN)
 + deploy forces and personnel to scenarios from TOE tab
 + color-coding of deployed forces and personnel in TOE
 + Bug: force not deleting once deployed
++ save and load scenarioId to XML in Force
 
 v0.1.5 (2011-05-05)
 + refactored Hangar Panel into separate Hangar and Repair Bay panel
