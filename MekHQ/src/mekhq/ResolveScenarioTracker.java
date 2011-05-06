@@ -56,7 +56,7 @@ public class ResolveScenarioTracker {
 	ArrayList<Unit> units;
 	ArrayList<PilotPerson> people;
 	ArrayList<Unit> missingUnits;
-	ArrayList<PilotPerson> missingPeople;
+	ArrayList<PilotPerson> missingPilots;
 	Campaign campaign;
 	Scenario scenario;
 	JFileChooser unitList;
@@ -71,7 +71,7 @@ public class ResolveScenarioTracker {
 		units = new ArrayList<Unit>();
 		people = new ArrayList<PilotPerson>();
 		missingUnits = new ArrayList<Unit>();
-		missingPeople = new ArrayList<PilotPerson>();
+		missingPilots = new ArrayList<PilotPerson>();
 		for(int pid : scenario.getForces(campaign).getAllPersonnel()) {
 			Person p = campaign.getPerson(pid);
 			if(p instanceof PilotPerson) {
@@ -172,6 +172,11 @@ public class ResolveScenarioTracker {
 			}
 		}
 		//identify missing pilots
+		for(PilotPerson person : people) {
+			if(!foundMatch(person.getPilot(), pilots)) {
+				missingPilots.add(person);
+			}
+		}
 		//identify dead pilots
 	}
 	
@@ -257,6 +262,16 @@ public class ResolveScenarioTracker {
 		return false;
 	}
 	
+	private boolean foundMatch(Pilot p, ArrayList<Pilot> pils) {
+		for(Pilot otherPilots : pils) {
+			if(otherPilots.getExternalId() == p.getExternalId()) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	
 	public ArrayList<Unit> getMissingUnits() {
 		return missingUnits;
 	}
@@ -267,6 +282,18 @@ public class ResolveScenarioTracker {
 		}
 		Unit u = missingUnits.get(i);
 		entities.add(u.getEntity());
+	}
+	
+	public ArrayList<PilotPerson> getMissingPilots() {
+		return missingPilots;
+	}
+	
+	public void recoverMissingPilot(int i) {
+		if(i < 0 || i > missingPilots.size()) {
+			return;
+		}
+		PilotPerson pp = missingPilots.get(i);
+		pilots.add(pp.getPilot());
 	}
 	
 }

@@ -12,6 +12,7 @@ v0.1.6 (SVN)
 + Bug: can deploy a force even when already deployed
 + beginning of Resolve Scenario Wizard
 + removed unused deploy boolean in Unit.java
++ resolve missing pilots wizard
 
 v0.1.5 (2011-05-05)
 + refactored Hangar Panel into separate Hangar and Repair Bay panel

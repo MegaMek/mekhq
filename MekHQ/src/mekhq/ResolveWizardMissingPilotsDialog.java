@@ -30,11 +30,12 @@ import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 
 import mekhq.campaign.Unit;
+import mekhq.campaign.personnel.PilotPerson;
 /**
  *
  * @author  Taharqa
  */
-public class ResolveWizardMissingUnitsDialog extends javax.swing.JDialog {
+public class ResolveWizardMissingPilotsDialog extends javax.swing.JDialog {
 	private static final long serialVersionUID = -8038099101234445018L;
     
 	private ResolveScenarioTracker tracker;
@@ -42,13 +43,13 @@ public class ResolveWizardMissingUnitsDialog extends javax.swing.JDialog {
 	private javax.swing.JPanel panButtons;
 	private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnNext;
-    private javax.swing.JScrollPane scrMissingUnits;
-	private javax.swing.JPanel panMissingUnits;
+    private javax.swing.JScrollPane scrMissingPilots;
+	private javax.swing.JPanel panMissingPilots;
     private javax.swing.JTextArea txtInstructions;
     private ArrayList<javax.swing.JCheckBox> boxes;
 	
     /** Creates new form NewTeamDialog */
-    public ResolveWizardMissingUnitsDialog(java.awt.Frame parent, boolean modal, ResolveScenarioTracker t) {
+    public ResolveWizardMissingPilotsDialog(java.awt.Frame parent, boolean modal, ResolveScenarioTracker t) {
         super(parent, modal);
         this.tracker = t;
         initComponents();
@@ -58,10 +59,10 @@ public class ResolveWizardMissingUnitsDialog extends javax.swing.JDialog {
     	java.awt.GridBagConstraints gridBagConstraints;
 
     	panButtons = new javax.swing.JPanel();
-    	panMissingUnits = new javax.swing.JPanel();
+    	panMissingPilots = new javax.swing.JPanel();
     	btnNext = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
-        scrMissingUnits = new javax.swing.JScrollPane();
+        scrMissingPilots = new javax.swing.JScrollPane();
         txtInstructions = new javax.swing.JTextArea();
         boxes = new ArrayList<javax.swing.JCheckBox>();
 
@@ -69,7 +70,7 @@ public class ResolveWizardMissingUnitsDialog extends javax.swing.JDialog {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
 
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(ResolveWizardMissingUnitsDialog.class);
+        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(ResolveWizardMissingPilotsDialog.class);
         getContentPane().setLayout(new java.awt.GridBagLayout());
         
         setTitle(resourceMap.getString("title"));
@@ -95,13 +96,13 @@ public class ResolveWizardMissingUnitsDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         getContentPane().add(txtInstructions, gridBagConstraints);
 	
-        panMissingUnits.setName("panMissingUnits");
-        panMissingUnits.setLayout(new GridBagLayout()); 
+        panMissingPilots.setName("panMissingPilots");
+        panMissingPilots.setLayout(new GridBagLayout()); 
         
         JCheckBox box;
         int i = 1;
-        for(Unit u : tracker.getMissingUnits()) {
-        	box = new JCheckBox(u.getEntity().getDisplayName());
+        for(PilotPerson pp : tracker.getMissingPilots()) {
+        	box = new JCheckBox(pp.getFullTitle());
         	box.setSelected(false);
         	boxes.add(box);
         	gridBagConstraints = new java.awt.GridBagConstraints();
@@ -110,10 +111,10 @@ public class ResolveWizardMissingUnitsDialog extends javax.swing.JDialog {
             gridBagConstraints.gridwidth = 2;
             gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
             gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-            panMissingUnits.add(box, gridBagConstraints);
+            panMissingPilots.add(box, gridBagConstraints);
             i++;
         }              
-        scrMissingUnits.setViewportView(panMissingUnits);
+        scrMissingPilots.setViewportView(panMissingPilots);
         
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -124,7 +125,7 @@ public class ResolveWizardMissingUnitsDialog extends javax.swing.JDialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        getContentPane().add(scrMissingUnits, gridBagConstraints);
+        getContentPane().add(scrMissingPilots, gridBagConstraints);
         
         panButtons.setName("panButtons");
         panButtons.setLayout(new GridBagLayout());  
@@ -179,12 +180,10 @@ public class ResolveWizardMissingUnitsDialog extends javax.swing.JDialog {
     	for(int i = 0; i < boxes.size(); i++) {
     		JCheckBox box = boxes.get(i);
     		if(box.isSelected()) {
-    			tracker.recoverMissingEntity(i);
+    			tracker.recoverMissingPilot(i);
     		}
     	}
     	this.setVisible(false);
-    	ResolveWizardMissingPilotsDialog resolveDialog = new ResolveWizardMissingPilotsDialog(null, true, tracker);
-    	resolveDialog.setVisible(true);
     }
 
 
