@@ -26,6 +26,7 @@ import java.util.Date;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Force;
+import mekhq.campaign.personnel.Person;
 
 
 /**
@@ -169,6 +170,23 @@ public class Scenario implements Serializable {
 	
 	public boolean isCurrent() {
 		return status == S_CURRENT;
+	}
+	
+	public void clearAllForcesAndPersonnel(Campaign campaign) {
+		for(int fid : subForceIds) {
+			Force f = campaign.getForce(fid);
+			if(null != f) {
+				f.setScenarioId(-1);
+			}	
+		}
+		for(int pid : personnelIds) {
+			Person p = campaign.getPerson(pid);
+			if(null != p) {
+				p.setScenarioId(-1);
+			}	
+		}
+		subForceIds = new ArrayList<Integer>();
+		personnelIds = new ArrayList<Integer>();
 	}
 	
 }

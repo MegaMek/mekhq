@@ -103,6 +103,10 @@ public class Force implements Serializable {
 	}
 	
 	public boolean isDeployed() {
+		//forces are deployed if their parent force is
+		if(null != parentForce && parentForce.isDeployed()) {
+			return true;
+		}
 		return scenarioId != -1;
 	}
 	

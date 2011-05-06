@@ -636,7 +636,7 @@ public class MekHQView extends FrameView {
 		btnClearAssignedUnits.setName("btnClearAssignedUnits"); // NOI18N
 		btnClearAssignedUnits.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				//btnGetMulActionPerformed(evt);
+				clearAssignedUnits();
 			}
 		});
 		gridBagConstraints = new java.awt.GridBagConstraints();
@@ -2373,10 +2373,23 @@ public class MekHQView extends FrameView {
 		refreshReport();
 	}
 
+	protected void clearAssignedUnits() {
+		if (0 == JOptionPane.showConfirmDialog(null,
+				"Do you really want to remove all units from this scenario?","Clear Units?",
+				JOptionPane.YES_NO_OPTION)) {
+			int row = scenarioTable.getSelectedRow();
+			Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
+			scenario.clearAllForcesAndPersonnel(campaign);
+			refreshScenarioList();
+			refreshPersonnelList();
+			refreshUnitList();
+			refreshOrganization();
+		}
+	}
+	
 	protected void deployListFile() {
 		int row = scenarioTable.getSelectedRow();
 		if(row < 0) {
-			scrollScenarioView.setViewportView(null);
 			return;
 		}
 		Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
@@ -3945,7 +3958,7 @@ public class MekHQView extends FrameView {
 	                	}
 	                }
 	                popup.add(menu);   
-	                if(force.getAllPersonnel().size()>0) {
+	                if(!force.isDeployed() && force.getAllPersonnel().size()>0) {
 	                	menu = new JMenu("Deploy Force");
 	                	JMenu missionMenu;
 	                	for(Mission m : campaign.getActiveMissions()) {

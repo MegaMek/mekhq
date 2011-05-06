@@ -8,6 +8,8 @@ v0.1.6 (SVN)
 + Bug: force not deleting once deployed
 + save and load scenarioId to XML in Force
 + scenario related buttons (not fully functional)
++ Clear Units from scenario button
++ Bug: can deploy a force even when already deployed
 
 v0.1.5 (2011-05-05)
 + refactored Hangar Panel into separate Hangar and Repair Bay panel
