@@ -127,7 +127,7 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
     	scenario.setName(txtName.getText());
     	if(newScenario) {
-    		mission.addScenario(scenario);
+    		campaign.addScenario(scenario, mission);
     	}
     	this.setVisible(false);
     }

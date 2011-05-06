@@ -8135,12 +8135,14 @@ Ian retired in 3051, accepting a battalion command in the Kestrel Militia.</biog
 			<name>Touchpoint: Thestra</name>
 			<status>0</status>
 			<desc></desc>
+			<id>1</id>
 			<scenarios>
-				<scenario id="-1" type="mekhq.campaign.mission.Scenario">
+				<scenario id="1" type="mekhq.campaign.mission.Scenario">
 					<name>Main Track</name>
 					<desc></desc>
 					<report>null</report>
 					<status>0</status>
+					<id>1</id>
 				</scenario>
 			</scenarios>
 		</mission>

@@ -160,6 +160,10 @@ public class Mission implements Serializable, MekHqXmlSerializable {
 				+"<desc>"
 				+desc
 				+"</desc>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<id>"
+				+id
+				+"</id>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1) + "<scenarios>");
 		for(Scenario s : scenarios) {
 			s.writeToXml(pw1, indent+2);

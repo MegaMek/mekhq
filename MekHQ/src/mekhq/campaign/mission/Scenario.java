@@ -71,6 +71,7 @@ public class Scenario implements Serializable {
 	public Scenario(String n) {
 		this.name = n;
 		this.desc = "";
+		this.report = "";
 		this.status = S_CURRENT;
 		this.date = null;
 		this.subForceIds = new ArrayList<Integer>();
@@ -247,6 +248,10 @@ public class Scenario implements Serializable {
 				+"<status>"
 				+status
 				+"</status>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<id>"
+				+id
+				+"</id>");
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "</scenario>");
 		
 	}

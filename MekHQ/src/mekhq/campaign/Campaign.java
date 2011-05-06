@@ -265,6 +265,15 @@ public class Campaign implements Serializable {
 	}
 	
 	/**
+	 * This is used by the XML loader. The id should already be
+	 * set for this scenario so dont increment
+	 * @param force
+	 */
+	public void addScenarioToHash(Scenario scenario) {
+		scenarioIds.put(scenario.getId(), scenario);
+	}
+	
+	/**
 	 * Add person to an existing force. This method will also
 	 * assign that force's id to the person.
 	 * @param p
@@ -1599,7 +1608,7 @@ public class Campaign implements Serializable {
 			// This should fix some holes in the data.
 			st.reCalc();
 		}
-	
+		
 		//loop through forces to set force id
 		for(int fid : retVal.forceIds.keySet()) {
 			Force f = retVal.forceIds.get(fid);
@@ -1842,6 +1851,10 @@ public class Campaign implements Serializable {
 			Mission m = Mission.generateInstanceFromXML(wn2);
 			
 			if (m != null) {
+				//add scenarios to the scenarioId hash
+				for(Scenario s : m.getScenarios()) {
+					retVal.addScenarioToHash(s);
+				}
 				retVal.addMissionWithoutId(m);
 			}
 		}
