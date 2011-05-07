@@ -27,6 +27,7 @@ v0.1.6 (SVN)
 + edit mission and complete mission buttons in Briefing Room
 + don't allow the completion of missions with pending scenarios
 + various improvements to the Briefing Room GUI
++ added time to jump point, gravity, atmospheric pressure, and recharge station tags (see El Dorado, for an example)
 
 v0.1.5 (2011-05-05)
 + refactored Hangar Panel into separate Hangar and Repair Bay panel

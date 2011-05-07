@@ -21,6 +21,8 @@
 
 package mekhq.campaign;
 
+import megamek.common.PlanetaryConditions;
+
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -41,11 +43,23 @@ public class Planet {
 	private int faction;
 	private String name;
 	
+	private int pressure;
+	private double jumpPoint;
+	private double gravity;
+	private boolean nadirCharge;
+	private boolean zenithCharge;
+	
 	public Planet() {
 		this.x = 0;
 		this.y = 0;
 		this.faction = Faction.F_COMSTAR;
 		this.name = "Terra";
+		
+		this.pressure = PlanetaryConditions.ATMO_STANDARD;
+		this.gravity = 1.0;
+		this.jumpPoint = 7.0;
+		this.nadirCharge = false;
+		this.zenithCharge = false;
 	}
 	
 	public double getX() {
@@ -64,6 +78,32 @@ public class Planet {
 		return name;
 	}
 	
+	public double getTimeToJumpPoint() {
+		return jumpPoint;
+	}
+	
+	public double getGravity() {
+		return gravity;
+	}
+	
+	public String getPressureName() {
+		return PlanetaryConditions.getAtmosphereDisplayableName(pressure);
+	}
+	
+	public String getRechargeStations() {
+		if(zenithCharge && nadirCharge) {
+			return "Zenith, Nadir";
+		} else if(zenithCharge) {
+			return "Zenith";
+		} else if(nadirCharge) {
+			return "Nadir";
+		} else {
+			return "None";
+		}
+	}
+	
+	
+	
 	public static Planet getPlanetFromXML(Node wn) {
 		Planet retVal = new Planet();
 		NodeList nl = wn.getChildNodes();
@@ -78,6 +118,22 @@ public class Planet {
 				retVal.y = Double.parseDouble(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("faction")) {
 				retVal.faction = Integer.parseInt(wn2.getTextContent());
+			} else if (wn2.getNodeName().equalsIgnoreCase("pressure")) {
+				retVal.pressure = Integer.parseInt(wn2.getTextContent());
+			} else if (wn2.getNodeName().equalsIgnoreCase("gravity")) {
+				retVal.gravity = Double.parseDouble(wn2.getTextContent());
+			} else if (wn2.getNodeName().equalsIgnoreCase("jumpPoint")) {
+				retVal.jumpPoint = Double.parseDouble(wn2.getTextContent());
+			} else if (wn2.getNodeName().equalsIgnoreCase("nadirCharge")) {
+				if (wn2.getTextContent().equalsIgnoreCase("true"))
+					retVal.nadirCharge = true;
+				else
+					retVal.nadirCharge = false;
+			} else if (wn2.getNodeName().equalsIgnoreCase("zenithCharge")) {
+				if (wn2.getTextContent().equalsIgnoreCase("true"))
+					retVal.zenithCharge = true;
+				else
+					retVal.zenithCharge = false;
 			}
 		}
 		return retVal;

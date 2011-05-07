@@ -3683,6 +3683,11 @@
 		<xcood>268.88</xcood>
 		<ycood>-146.31</ycood>
 		<faction>6</faction>
+		<jumpPoint>10.43</jumpPoint>
+		<gravity>1.25</gravity>
+		<pressure>3</pressure>
+		<nadirCharge>true</nadirCharge>
+		<zenithCharge>true</zenithCharge>
 	</planet>
 	<planet>
 		<name>El Giza</name>
