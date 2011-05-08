@@ -61,7 +61,7 @@ public class Utilities {
                 continue;
             }
             
-            boolean bTechMatch = TechConstants.isLegal(entity.getTechLevel(), atype.getTechLevel());
+            boolean bTechMatch = TechConstants.isLegal(entity.getTechLevel(), atype.getTechLevel(), entity.isMixedTech());
 
             //TODO: a lot of the level 2 v. level 1 stuff should get replaced by actual
             //year of introduction, and extinction and so forth
