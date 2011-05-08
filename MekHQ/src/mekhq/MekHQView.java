@@ -3286,6 +3286,9 @@ public class MekHQView extends FrameView {
 						menu.add(cbMenuItem);
 						i++;
 					}
+					if(menu.getItemCount() > 20) {
+	                	MenuScroller.setScrollerFor(menu, 20);
+	                }
 					popup.add(menu);
 				}
 				menu = new JMenu("GM Mode");
@@ -3719,6 +3722,9 @@ public class MekHQView extends FrameView {
 					i++;
 				}
 				menu.setEnabled(!unit.isDeployed());
+				if(menu.getItemCount() > 20) {
+                	MenuScroller.setScrollerFor(menu, 20);
+                }
 				popup.add(menu);
 				// swap ammo
 				menu = new JMenu("Swap ammo");
@@ -3741,6 +3747,9 @@ public class MekHQView extends FrameView {
 						ammoMenu.add(cbMenuItem);
 						i++;
 					}
+					if(menu.getItemCount() > 20) {
+	                	MenuScroller.setScrollerFor(menu, 20);
+	                }
 					menu.add(ammoMenu);
 				}
 				menu.setEnabled(!unit.isDeployed());
@@ -4071,6 +4080,9 @@ public class MekHQView extends FrameView {
 		                	menu.add(menuItem);
 	                	}
 	                }
+	                if(menu.getItemCount() > 30) {
+	                	MenuScroller.setScrollerFor(menu, 30);
+	                }
 	                popup.add(menu);   
 	                if(!force.isDeployed() && force.getAllPersonnel().size()>0) {
 	                	menu = new JMenu("Deploy Force");
@@ -4125,8 +4137,14 @@ public class MekHQView extends FrameView {
 		    		                missionMenu.add(menuItem);
 	                			}
 	                		}
+	                		if(missionMenu.getItemCount() > 30) {
+	    	                	MenuScroller.setScrollerFor(missionMenu, 30);
+	    	                }
 	                		menu.add(missionMenu);
 	                	}
+	                	if(menu.getItemCount() > 30) {
+		                	MenuScroller.setScrollerFor(menu, 30);
+		                }
 	                	popup.add(menu);
                 	}
                 }
@@ -4569,6 +4587,9 @@ public class MekHQView extends FrameView {
 					menu.add(cbMenuItem);
 					rankOrder++;
 				}
+				if(menu.getItemCount() > 20) {
+                	MenuScroller.setScrollerFor(menu, 20);
+                }
 				popup.add(menu);
 				menu = new JMenu("Change Status");
 				for(int s = 0; s < Person.S_NUM; s++) {
@@ -4605,6 +4626,9 @@ public class MekHQView extends FrameView {
 							menu.add(cbMenuItem);
 						}
 						menu.setEnabled(!person.isDeployed());
+						if(menu.getItemCount() > 20) {
+		                	MenuScroller.setScrollerFor(menu, 20);
+		                }
 						popup.add(menu);
 						//Assign to Force
 						menu = new JMenu("Assign to Force");
@@ -4618,6 +4642,9 @@ public class MekHQView extends FrameView {
 							cbMenuItem.addActionListener(this);
 							menu.add(cbMenuItem);
 						}
+						if(menu.getItemCount() > 20) {
+		                	MenuScroller.setScrollerFor(menu, 20);
+		                }
 						popup.add(menu);
 					}
 				}
@@ -4758,6 +4785,9 @@ public class MekHQView extends FrameView {
 					        		}
 					        	}
 							}
+							if(abMenu.getItemCount() > 20) {
+			                	MenuScroller.setScrollerFor(abMenu, 20);
+			                }
 							menu.add(abMenu);
 						}
 					} else if(person instanceof SupportPerson) {
@@ -6548,9 +6578,15 @@ public class MekHQView extends FrameView {
 							ammoMenu.add(cbMenuItem);
 							i++;
 						}
+						if(ammoMenu.getItemCount() > 20) {
+		                	MenuScroller.setScrollerFor(ammoMenu, 20);
+		                }
 						menu.add(ammoMenu);
 					}
 					menu.setEnabled(!unit.isDeployed());
+					if(menu.getItemCount() > 20) {
+	                	MenuScroller.setScrollerFor(menu, 20);
+	                }
 					popup.add(menu);
 				}
 				// Salvage / Repair
@@ -6615,6 +6651,9 @@ public class MekHQView extends FrameView {
 			        		menu.add(menuItem);
 			        	}
 					}
+					if(menu.getItemCount() > 20) {
+	                	MenuScroller.setScrollerFor(menu, 20);
+	                }
 					popup.add(menu);
 				}
 				if(oneSelected) {
@@ -6640,6 +6679,9 @@ public class MekHQView extends FrameView {
 						menu.add(menuItem);
 					}
 					menu.setEnabled(!unit.isDeployed());
+					if(menu.getItemCount() > 20) {
+	                	MenuScroller.setScrollerFor(menu, 20);
+	                }
 					popup.add(menu);
 				}
 				popup.addSeparator();
