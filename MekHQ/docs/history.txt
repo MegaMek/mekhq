@@ -30,6 +30,7 @@ v0.1.6 (SVN)
 + added time to jump point, gravity, atmospheric pressure, and recharge station tags (see El Dorado, for an example)
 + added menu scroller for all popup menus with lots of potential entries
 + updated MegaMek.jar (should resolve problem with Unit view for units with unassigned pilots
++ Bug: personnel reassigned to different force or unassigned do not have scenario id reset
 
 v0.1.5 (2011-05-05)
 + refactored Hangar Panel into separate Hangar and Repair Bay panel

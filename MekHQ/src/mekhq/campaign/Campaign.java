@@ -284,6 +284,7 @@ public class Campaign implements Serializable {
 		if(null != force) {
 			p.setForceId(id);
 			force.addPerson(p.getId());
+			p.setScenarioId(force.getScenarioId());
 		}
 	}
 	
@@ -1098,6 +1099,7 @@ public class Campaign implements Serializable {
 		if(null != force) {
 			force.removePerson(p.getId());
 			p.setForceId(-1);
+			p.setScenarioId(-1);
 		}
 	}
 	 
