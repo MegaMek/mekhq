@@ -123,6 +123,7 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
         salary = -1;
         ranks = r;
         scenarioId = -1;
+        forceId = -1;
     }
     
     public static String getGenderName(int gender) {

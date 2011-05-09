@@ -291,6 +291,7 @@ private void btnHireActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
     		team = new TechTeam(name, rating, type);
     	}	
     	person.setTeam(team);
+    	person.setBirthday(birthdate);   
     	campaign.addPerson(person);
     	if(person.getType() == Person.T_DOCTOR) {
     		person = campaign.newDoctorPerson();
@@ -310,6 +311,7 @@ private void btnHireActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
     		((TechTeam)team).setType(type);
     	}
     	person.setType(person.getTypeBy(team));
+    	person.setBirthday(birthdate);   
     	hqView.refreshPersonnelList();
     	hqView.refreshTechsList();
     	hqView.refreshPatientList();
