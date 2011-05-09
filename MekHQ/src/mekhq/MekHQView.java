@@ -3941,6 +3941,10 @@ public class MekHQView extends FrameView {
                     if(null != p && p instanceof PilotPerson) {
                     	campaign.addPersonToForce(p, force.getId());
                     	refreshOrganization();
+                    	refreshScenarioList();
+                    	refreshPersonnelList();
+                    	refreshUnitList();
+                    	refreshServicedUnitList();
                     }
             	}
             } else if(command.contains("DEPLOY_FORCE")) {
@@ -3959,6 +3963,9 @@ public class MekHQView extends FrameView {
             	}
             	refreshScenarioList();
             	refreshOrganization();
+            	refreshPersonnelList();
+            	refreshUnitList();
+            	refreshServicedUnitList();
             } else if(command.contains("CHANGE_ICON")) {
             	if(null != force) {
             		PortraitChoiceDialog pcd = new PortraitChoiceDialog(null, true,
@@ -4017,6 +4024,10 @@ public class MekHQView extends FrameView {
                     scenario.addPersonnel(person.getId());
                     person.setScenarioId(scenario.getId());
                     refreshScenarioList();
+                    refreshOrganization();
+                    refreshPersonnelList();
+                	refreshUnitList();
+                	refreshServicedUnitList();
             	}
             }
 		}
@@ -6693,14 +6704,6 @@ public class MekHQView extends FrameView {
 					menuItem.setEnabled(!unit.isDeployed());
 					popup.add(menuItem);
 				}
-				// TODO: scrap unit
-				// combat loss
-				menuItem = new JMenuItem("Combat Loss");
-				menuItem.setActionCommand("LOSS");
-				menuItem.addActionListener(this);
-				menuItem.setEnabled(unit.isDeployed());
-				popup.add(menuItem);
-				// TODO: add quirks?
 				// GM mode
 				menu = new JMenu("GM Mode");
 				menuItem = new JMenuItem("Remove Unit");

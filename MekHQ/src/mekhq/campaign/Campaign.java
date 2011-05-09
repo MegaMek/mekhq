@@ -607,7 +607,7 @@ public class Campaign implements Serializable {
 	public ArrayList<Unit> getServiceableUnits() {
 		ArrayList<Unit> service = new ArrayList<Unit>();
 		for(Unit u : getUnits()) {
-			if(countTasksFor(u.getId()) > 0) {
+			if(countTasksFor(u.getId()) > 0 && !u.isDeployed()) {
 				service.add(u);
 			}
 		}
