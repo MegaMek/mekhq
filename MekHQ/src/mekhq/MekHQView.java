@@ -136,7 +136,6 @@ import mekhq.campaign.personnel.SupportPerson;
 import mekhq.campaign.team.MedicalTeam;
 import mekhq.campaign.team.SupportTeam;
 import mekhq.campaign.team.TechTeam;
-import mekhq.campaign.work.PersonnelWorkItem;
 import mekhq.campaign.work.ReloadItem;
 import mekhq.campaign.work.RepairItem;
 import mekhq.campaign.work.ReplacementItem;
@@ -1879,8 +1878,8 @@ public class MekHQView extends FrameView {
 		int row = patientTable.getSelectedRow();
 		Person p = campaign.getPerson(currentPatientId);
 		
-		if ((null != p) && (null != p.getTask())) {
-			p.getTask().setTeam(campaign.getTeam(currentDoctorId));
+		if ((null != p) && (p.needsFixing())) {
+			p.setTeamId(currentDoctorId);
 			row++;
 		}
 		
@@ -2781,12 +2780,7 @@ public class MekHQView extends FrameView {
 		// must have a valid doctor and an unassigned task
 		Person curPerson = campaign.getPerson(currentPatientId);
 		SupportTeam team = campaign.getTeam(currentDoctorId);
-		PersonnelWorkItem pw = null;
-		if (null != curPerson) {
-			pw = curPerson.getTask();
-		}
-		if ((null != pw) && (null != team) && !pw.isAssigned()
-				&& (team.getTargetFor(pw).getValue() != TargetRoll.IMPOSSIBLE)) {
+		if (null != curPerson && curPerson.getTeamId() == -1 && null != team && curPerson.canFix(team)) {
 			btnAssignDoc.setEnabled(true);
 		} else {
 			btnAssignDoc.setEnabled(false);
@@ -3901,7 +3895,7 @@ public class MekHQView extends FrameView {
 
 				if ((null != p) && p.isDeployed()) {
 					c.setBackground(Color.GRAY);
-				} else if ((null != p) && (null != p.getTask())) {
+				} else if ((null != p) && p.needsFixing()) {
 					c.setBackground(new Color(205, 92, 92));
 				} else {
 					c.setBackground(new Color(220, 220, 220));
@@ -4203,7 +4197,7 @@ public class MekHQView extends FrameView {
             		rank = "";
             	}
             	String name = pp.getName() + " (" + pp.getPilot().getGunnery() + "/" + pp.getPilot().getPiloting() + ")";
-            	if(pp.needsHealing()) {
+            	if(pp.needsFixing()) {
             		name = "<font color='red'>" + name + "</font>";
             	}
             	Unit u = campaign.getUnit(pp.getUnitId());
@@ -4502,8 +4496,7 @@ public class MekHQView extends FrameView {
 					if (person instanceof PilotPerson) {
 						Pilot pilot = ((PilotPerson) person).getPilot();
 						pilot.setHits(0);
-						person.getTask().setTeam(null);
-						person.setTask(null);
+						person.setTeamId(-1);
 					}
 				}
 				refreshPatientList();

@@ -63,6 +63,7 @@ import megamek.common.Pilot;
 import megamek.common.Player;
 import megamek.common.Protomech;
 import megamek.common.Tank;
+import megamek.common.TargetRoll;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.mission.Mission;
@@ -80,7 +81,6 @@ import mekhq.campaign.work.EquipmentRepair;
 import mekhq.campaign.work.EquipmentReplacement;
 import mekhq.campaign.work.EquipmentSalvage;
 import mekhq.campaign.work.FullRepairWarchest;
-import mekhq.campaign.work.PersonnelWorkItem;
 import mekhq.campaign.work.Refit;
 import mekhq.campaign.work.ReloadItem;
 import mekhq.campaign.work.UnitWorkItem;
@@ -504,13 +504,6 @@ public class Campaign implements Serializable {
 			pilot.setEjected(false);
 			((PilotPerson) priorPilot).setPilot(pilot);
 			priorPilot.setScenarioId(-1);
-			// remove any existing tasks for pilot so we can diagnose new ones
-			if (null != priorPilot.getTask()) {
-				WorkItem task = priorPilot.getTask();
-				tasks.remove(task);
-				taskIds.remove(new Integer(task.getId()));
-			}
-			priorPilot.runDiagnostic(this);
 			addReport(priorPilot.getDesc() + " has been recovered");
 			return (PilotPerson) priorPilot;
 		} else if (allowNewPilots) {
@@ -572,8 +565,6 @@ public class Campaign implements Serializable {
 		personnel.add(p);
 		personnelIds.put(new Integer(id), p);
 		lastPersonId = id;
-		// check for any work items on this person
-		p.runDiagnostic(this);
 		addReport(p.getDesc() + " has been added to the personnel roster.");
 		if(p instanceof SupportPerson) {
 			addTeam(((SupportPerson)p).getTeam());
@@ -597,7 +588,7 @@ public class Campaign implements Serializable {
 	public ArrayList<Person> getPatients() {
 		ArrayList<Person> patients = new ArrayList<Person>();
 		for(Person p : getPersonnel()) {
-			if(null != p.getTask()) {
+			if(p.needsFixing()) {
 				patients.add(p);
 			}
 		}
@@ -898,6 +889,20 @@ public class Campaign implements Serializable {
 			}
 		}
 	}
+	
+	public String healPerson(Person p, MedicalTeam t) {
+		String report = "";
+		report += t.getName() + " attempts to heal " + p.getName();   
+		TargetRoll target = t.getTargetFor(p);
+		int roll = Compute.d6(2);
+		report = report + ",  needs " + target.getValueAsString() + " and rolls " + roll + ":";
+		if(roll >= target.getValue()) {
+			report = report + p.succeed();	
+		} else {
+			report = report + p.fail(t.getRating());
+		}
+		return report;
+	}
 
 	public void newDay() {
 		calendar.add(Calendar.DAY_OF_MONTH, 1);
@@ -919,9 +924,14 @@ public class Campaign implements Serializable {
 			processTask(task, task.getTeam());
 		}
 		for (Person p : getPersonnel()) {
-			if (p.checkNaturalHealing()) {
-				addReport(p.getDesc() + " heals naturally!");
-			}
+			if(p.needsFixing()) {
+				SupportTeam t = getTeam(p.getTeamId());
+				if(null != t && t instanceof MedicalTeam) {
+					addReport(healPerson(p, (MedicalTeam)t));
+				} else if(p.checkNaturalHealing()) {
+					addReport(p.getDesc() + " heals naturally!");
+				}
+			} 
 		}
 		DecimalFormat formatter = new DecimalFormat();
 		//check for a new year
@@ -1671,9 +1681,6 @@ public class Campaign implements Serializable {
 				}
 			}
 			
-			if (psn.getTaskId() >= 0)
-				psn.setTask((PersonnelWorkItem) retVal.taskIds.get(psn.getTaskId()));
-			
 			if (psn instanceof SupportPerson) {
 				SupportPerson psn2 = (SupportPerson)psn;
 
@@ -1695,13 +1702,8 @@ public class Campaign implements Serializable {
 			
 			if (supportTeamId >= 0)
 				wrk.setSupportTeam(retVal.teamIds.get(supportTeamId));
-			
-			if (wrk instanceof PersonnelWorkItem) {
-				int personId = ((PersonnelWorkItem)wrk).getPersonId();
-				
-				if (personId >= 0)
-					((PersonnelWorkItem)wrk).setPerson(retVal.personnelIds.get(personId));
-			} else if (wrk instanceof UnitWorkItem) {
+		
+			if (wrk instanceof UnitWorkItem) {
 				int unitId = ((UnitWorkItem)wrk).getUnitStoredId();
 				
 				if (unitId >= 0) {

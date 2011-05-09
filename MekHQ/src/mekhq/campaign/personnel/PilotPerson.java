@@ -37,6 +37,7 @@ import megamek.common.Mech;
 import megamek.common.Pilot;
 import megamek.common.Protomech;
 import megamek.common.Tank;
+import megamek.common.TargetRoll;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
@@ -45,13 +46,16 @@ import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Ranks;
 import mekhq.campaign.SkillCosts;
 import mekhq.campaign.Unit;
-import mekhq.campaign.work.HealPilot;
+import mekhq.campaign.team.MedicalTeam;
+import mekhq.campaign.team.SupportTeam;
+import mekhq.campaign.work.IMedicalWork;
+import mekhq.campaign.work.IWork;
 
 /**
  * A Person wrapper for pilots and vee crews
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class PilotPerson extends Person {
+public class PilotPerson extends Person implements IMedicalWork {
 	private static final long serialVersionUID = -4758195062070601267L;
 	
     private Pilot pilot;
@@ -171,7 +175,7 @@ public class PilotPerson extends Person {
     public String getDescHTML() {
         String toReturn = "<html><font size='2'><b>" + pilot.getName() + "</b><br/>";
         toReturn += getTypeDesc() + " (" + pilot.getGunnery() + "/" + pilot.getPiloting() + ")<br/>";
-        toReturn += pilot.getStatusDesc() + getAssignedDoctorString();
+        toReturn += pilot.getStatusDesc();
         if(isDeployed()) {
             toReturn += " (DEPLOYED)";
         }
@@ -195,32 +199,18 @@ public class PilotPerson extends Person {
         	this.unitId = -1;
         }
     }
-    
-    @Override
-    public void runDiagnostic(Campaign campaign) {
-        if(pilot.getHits() > 0) {
-            setTask(new HealPilot(this));
-            campaign.addWork(getTask());
-            
-        }
-    }
-    
+
     /**
      * heal one hit on the pilot/crew
      */
     @Override
     public void heal() {
-        if(needsHealing()) {
-            getPilot().setHits(getPilot().getHits() - 1);
-        }
-        if(!needsHealing() && null != task) {
-            task.complete();
-        }
-    }
-
-    @Override
-    public boolean needsHealing() {
-        return (getPilot().getHits() > 0);
+    	if(getPilot().getHits() > 0) {
+    		getPilot().setHits(getPilot().getHits() - 1);
+    	}
+    	if(!needsFixing()) {
+			medicalTeamId = -1;
+		}
     }
     
     @Override
@@ -470,4 +460,21 @@ public class PilotPerson extends Person {
         	}
     	}
     }
+
+	@Override
+	public boolean needsFixing() {
+		return pilot.getHits() > 0;
+	}
+
+	@Override
+	public String succeed() {
+		heal();
+		return " <font color='green'><b>Successfully healed one hit.</b></font>";
+	}
+
+	@Override
+	public boolean canFix(SupportTeam team) {
+		return team instanceof MedicalTeam && ((MedicalTeam)team).getPatients() < 25;
+	}
+	
 }

@@ -32,14 +32,17 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import megamek.common.Pilot;
+import megamek.common.TargetRoll;
 import mekhq.MekHQApp;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlSerializable;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Ranks;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.team.MedicalTeam;
 import mekhq.campaign.team.SupportTeam;
-import mekhq.campaign.work.PersonnelWorkItem;
+import mekhq.campaign.work.IMedicalWork;
+import mekhq.campaign.work.IWork;
 
 /**
  * This is an abstract class for verious types of personnel
@@ -51,7 +54,7 @@ import mekhq.campaign.work.PersonnelWorkItem;
  * 5) Administrators/other staff?
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public abstract class Person implements Serializable, MekHqXmlSerializable {
+public abstract class Person implements Serializable, MekHqXmlSerializable, IMedicalWork {
 	private static final long serialVersionUID = -847642980395311152L;
 	
 	public static final int G_MALE = 0;
@@ -82,9 +85,7 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
     
     protected int id;
     private int type;
-    //any existing work item for this person
-    protected PersonnelWorkItem task;
-    protected int taskId;
+ 
     //days of rest
     protected int daysRest;
     protected String biography;
@@ -103,6 +104,9 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
     protected int forceId;
     
     protected int scenarioId;
+    
+    //team id for the MedicalTeam
+    protected int medicalTeamId;
     
     protected int salary;
     
@@ -124,6 +128,7 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
         ranks = r;
         scenarioId = -1;
         forceId = -1;
+        medicalTeamId = -1;
     }
     
     public static String getGenderName(int gender) {
@@ -265,18 +270,6 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
     public int getId() {
         return id;
     }
-    
-    public void setTask(PersonnelWorkItem task) {
-        this.task = task;
-    }
-    
-    public PersonnelWorkItem getTask() {
-        return task;
-    }
-    
-    public int getTaskId() {
-    	return taskId;
-    }
 
     public int getXp() {
         return xp;
@@ -286,28 +279,16 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
         this.xp = xp;
     }
     
-    public SupportTeam getTeamAssigned() {
-        if(null == task) {
-            return null;
-        }
-        return task.getTeam();
+    public int getTeamId() {
+        return medicalTeamId;
     }
     
-    public String getAssignedDoctorString() {
-        if(null == getTeamAssigned()) {
-            return "";
-        }
-        return " (assigned to " + getTeamAssigned().getName() + ")";
+    public void setTeamId(int t) {
+    	this.medicalTeamId = t;
     }
-    
-    public abstract void runDiagnostic(Campaign campaign);
-    
-    public abstract void heal();
-    
-    public abstract boolean needsHealing();
-    
+  
     public boolean checkNaturalHealing() {
-        if(needsHealing() && null == task.getTeam()) {
+        if(needsFixing() && medicalTeamId == -1) {
             daysRest++;
             if(daysRest >= 15) {
                 heal();
@@ -415,15 +396,6 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
 				+"<birthday>"
 				+df.format(birthday.getTime())
 				+"</birthday>");
-
-		// The task reference can be loaded through its ID.
-		// But...  If the task is null, we just bypass it.
-		if (task != null) {
-			pw1.println(MekHqXmlUtil.indentStr(indent+1)
-					+"<taskId>"
-					+task.getId()
-					+"</taskId>");
-		}
 	}
 	
 	protected void writeToXmlEnd(PrintWriter pw1, int indent, int id) {
@@ -459,8 +431,6 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
 					retVal.setPortraitCategory(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("portraitFile")) {
 					retVal.setPortraitFileName(wn2.getTextContent());
-				} else if (wn2.getNodeName().equalsIgnoreCase("taskId")) {
-					retVal.taskId = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("xp")) {
 					retVal.xp = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("gender")) {
@@ -631,6 +601,27 @@ public abstract class Person implements Serializable, MekHqXmlSerializable {
 	
 	public void setRankSystem(Ranks r) {
 		this.ranks = r;
+	}
+	
+	@Override public int getMode() {
+		return IWork.MODE_NORMAL;
+	}
+	
+
+	@Override
+	public int getDifficulty() {
+		return 0;
+	}
+
+	@Override
+	public TargetRoll getAllMods() {
+		TargetRoll mods = new TargetRoll(getDifficulty(), "difficulty");
+		return mods;
+	}
+	
+	@Override
+	public String fail(int rating) {
+		return " <font color='red'><b>Failed to heal.</b></font>";
 	}
 	
 }

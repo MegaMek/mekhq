@@ -38,7 +38,6 @@ import mekhq.campaign.parts.Availability;
 import mekhq.campaign.parts.GenericSparePart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.work.FullRepairWarchest;
-import mekhq.campaign.work.PersonnelWorkItem;
 import mekhq.campaign.work.Refit;
 import mekhq.campaign.work.ReloadItem;
 import mekhq.campaign.work.ReplacementItem;
@@ -281,22 +280,14 @@ public abstract class SupportTeam implements Serializable, MekHqXmlSerializable 
        if(task instanceof UnitWorkItem && ((UnitWorkItem)task).getUnit().isDeployed()) {
            return new TargetRoll(TargetRoll.IMPOSSIBLE, "This unit is currently deployed!");
        }
-       if(task instanceof PersonnelWorkItem && ((PersonnelWorkItem)task).getPerson().isDeployed()) {
-           return new TargetRoll(TargetRoll.IMPOSSIBLE, "This person is currently deployed!");
-       }
+       
        if(null != task.checkFixable()) {
            return new TargetRoll(TargetRoll.IMPOSSIBLE, task.checkFixable());
        } 
        if(task.getSkillMin() > getRating()) {
            return new TargetRoll(TargetRoll.IMPOSSIBLE, "Task is beyond this team's skill level");
        }
-       if(this instanceof MedicalTeam && task instanceof PersonnelWorkItem) {
-           PersonnelWorkItem pw = (PersonnelWorkItem)task;
-           MedicalTeam doc = (MedicalTeam)this;
-           if((pw.getPatients() + doc.getPatients()) > 25) {
-               return new TargetRoll(TargetRoll.IMPOSSIBLE, "The doctor already has 25 patients");
-           }
-       }
+       
        if(!task.isNeeded()) {
            return new TargetRoll(TargetRoll.IMPOSSIBLE, "Task is not needed.");
        }
@@ -475,6 +466,7 @@ public abstract class SupportTeam implements Serializable, MekHqXmlSerializable 
        }
        return report;
    }
+ 
 
 	public abstract void writeToXml(PrintWriter pw1, int indent, int id);
 	

@@ -26,7 +26,14 @@ import java.io.PrintWriter;
 import org.w3c.dom.Node;
 
 import megamek.common.Compute;
-import mekhq.campaign.work.PersonnelWorkItem;
+import megamek.common.TargetRoll;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.parts.GenericSparePart;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.work.FullRepairWarchest;
+import mekhq.campaign.work.ReloadItem;
+import mekhq.campaign.work.ReplacementItem;
+import mekhq.campaign.work.UnitWorkItem;
 import mekhq.campaign.work.WorkItem;
 
 /**
@@ -72,13 +79,13 @@ public class MedicalTeam extends SupportTeam {
        return base;
     }
 
-    protected int getPatients() {
+    public int getPatients() {
        int patients = 0;
-        for(WorkItem task : campaign.getTasks()) {
-           if(task instanceof PersonnelWorkItem && task.isAssigned() && task.getTeam().getId() == getId()) {
-               patients += ((PersonnelWorkItem)task).getPatients();
-           }
-       }
+        for(Person person : campaign.getPersonnel()) {
+        	if(person.getTeamId() == getId()) {
+        		patients++;
+        	}
+        }
        return patients;
     }
 
@@ -89,10 +96,7 @@ public class MedicalTeam extends SupportTeam {
 
     @Override
     public boolean canDo(WorkItem task) {
-        if(!(task instanceof PersonnelWorkItem)) {
-            return false;
-        }
-        return true; 
+        return false; 
     }
 
     @Override
@@ -108,6 +112,25 @@ public class MedicalTeam extends SupportTeam {
         toReturn += "</font></html>";
         return toReturn;
    }
+    
+    public TargetRoll getTargetFor(Person person) {
+        if(person.getTeamId() != getId() ) {
+            return new TargetRoll(TargetRoll.IMPOSSIBLE, person.getName() + " is already being tended by another doctor");
+        }
+        if(person.isDeployed()) {
+            return new TargetRoll(TargetRoll.IMPOSSIBLE, person.getName() + " is currently deployed!");
+        }      
+        if(!person.needsFixing()) {
+            return new TargetRoll(TargetRoll.IMPOSSIBLE, person.getName() + " does not require healing.");
+        }
+        TargetRoll target = getTarget(person.getMode());
+        if(target.getValue() == TargetRoll.IMPOSSIBLE) {
+            return target;
+        }
+
+        target.append(person.getAllMods());
+        return target;
+    }
 
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent, int id) {

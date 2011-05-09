@@ -34,7 +34,6 @@ import megamek.common.Mech;
 import megamek.common.Tank;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Utilities;
-import mekhq.campaign.work.PersonnelWorkItem;
 import mekhq.campaign.work.UnitWorkItem;
 import mekhq.campaign.work.WorkItem;
 
@@ -119,9 +118,6 @@ public class TechTeam extends SupportTeam {
    
    @Override
    public boolean canDo(WorkItem task) {
-       if(task instanceof PersonnelWorkItem) {
-            return false;
-        }
         return true; 
 
    } 

@@ -406,7 +406,6 @@ public class ResolveScenarioTracker {
 					//TODO: this is such a roundabout way of doing this - lets
 					//make it personnel centric
 					pp.getAssignedUnit().setPilot(pp);
-					pp.runDiagnostic(campaign);
 					campaign.addReport(pp.getFullTitle() + " has been recovered.");
 				}
 				return;

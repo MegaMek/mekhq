@@ -35,6 +35,7 @@ v0.1.6 (SVN)
 + removed Combat Loss menu option (handled from scenario resolution now)
 + Bug 3294979: Support personnel age
 + Bug: force id of new personnel set to overall force id
++ removed PersonnelWorkItem, implemented IWork and IMedicalWork interface to handle pilot healing
 
 v0.1.5 (2011-05-05)
 + refactored Hangar Panel into separate Hangar and Repair Bay panel

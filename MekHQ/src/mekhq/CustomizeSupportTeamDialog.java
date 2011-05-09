@@ -302,6 +302,7 @@ private void btnHireActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
     	hqView.refreshPersonnelList();
     	hqView.refreshTechsList();
     	hqView.refreshPatientList();
+    	hqView.refreshDoctorsList();
     	hqView.refreshReport();
     } else {
     	SupportTeam team = (SupportTeam)person.getTeam();
@@ -314,6 +315,7 @@ private void btnHireActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
     	person.setBirthday(birthdate);   
     	hqView.refreshPersonnelList();
     	hqView.refreshTechsList();
+    	hqView.refreshDoctorsList();
     	hqView.refreshPatientList();
     	setVisible(false);
     }

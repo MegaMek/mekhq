@@ -29,6 +29,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import megamek.common.Pilot;
+import megamek.common.TargetRoll;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Ranks;
@@ -36,6 +37,7 @@ import mekhq.campaign.SkillCosts;
 import mekhq.campaign.team.MedicalTeam;
 import mekhq.campaign.team.SupportTeam;
 import mekhq.campaign.team.TechTeam;
+import mekhq.campaign.work.IWork;
 
 /**
  * A person wrapper for support teams
@@ -115,18 +117,13 @@ public class SupportPerson extends Person {
         String toReturn = "<html><font size='2'><b>" + team.getName() + "</b><br/>";
         toReturn += team.getRatingName() + " " + team.getTypeDesc() + "<br/>";
         if(team.getCasualties() > 0) {
-            toReturn = team.getCasualties() + " casualties" + getAssignedDoctorString();
+            toReturn = team.getCasualties() + " casualties";
         }
         if(isDeployed()) {
             toReturn += "DEPLOYED!";
         }
         toReturn += "</font></html>";
         return toReturn;
-    }
-
-    @Override
-    public void runDiagnostic(Campaign campaign) {
-        //TODO: Implement diagnostics on the SupportPerson class.
     }
 
     @Override
@@ -145,17 +142,12 @@ public class SupportPerson extends Person {
     
     @Override
     public void heal() {
-        if(needsHealing()) {
+    	if(needsFixing()) {
             team.setCurrentStrength(team.getCurrentStrength() + 1);
         }
-        if(!needsHealing() && null != task) {
-            task.complete();
-        }
-    }
-
-    @Override
-    public boolean needsHealing() {
-       return (team.getCasualties() > 0);
+    	if(!needsFixing()) {
+			medicalTeamId = -1;
+		}
     }
 
 	@Override
@@ -200,5 +192,21 @@ public class SupportPerson extends Person {
 	public int getExperienceLevel() {
 		return team.getRating();
 	}
-	
+
+
+	@Override
+	public boolean needsFixing() {
+		return team.getCasualties() > 0;
+	}
+
+	@Override
+	public String succeed() {
+		heal();
+		return " <font color='green'><b>Successfully healed one casualty.</b></font>";
+	}
+
+	@Override
+	public boolean canFix(SupportTeam team) {
+		return team instanceof MedicalTeam && ((MedicalTeam)team).getPatients() < (25-team.getCasualties());
+	}
 }
