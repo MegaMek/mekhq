@@ -36,6 +36,7 @@ v0.1.6 (SVN)
 + Bug 3294979: Support personnel age
 + Bug: force id of new personnel set to overall force id
 + removed PersonnelWorkItem, implemented IWork and IMedicalWork interface to handle pilot healing
++ Bug 3299547: Problems w/ loading campagin files (removed dateFormat and simpleDateFormat from XML load and save)
 
 v0.1.5 (2011-05-05)
 + refactored Hangar Panel into separate Hangar and Repair Bay panel

@@ -1439,10 +1439,6 @@ public class Campaign implements Serializable {
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "calendar",
 				df.format(calendar.getTime()));
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "dateFormat",
-				dateFormat.toLocalizedPattern());
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "shortDateFormat",
-				shortDateFormat.toLocalizedPattern());
 		{
 			pw1.println("\t\t<nameGen>");
 			pw1.print("\t\t\t<faction>");
@@ -2082,9 +2078,6 @@ public class Campaign implements Serializable {
 						if (wn2.getNodeName().equalsIgnoreCase("reportLine"))
 							retVal.currentReport.add(wn2.getTextContent());
 					}
-				} else if (xn.equalsIgnoreCase("dateFormat")) {
-					retVal.dateFormat = new SimpleDateFormat(wn
-							.getTextContent().trim());
 				} else if (xn.equalsIgnoreCase("faction")) {
 					retVal.faction = Integer.parseInt(wn.getTextContent()
 							.trim());
@@ -2125,9 +2118,6 @@ public class Campaign implements Serializable {
 						retVal.overtime = true;
 					else
 						retVal.overtime = false;
-				} else if (xn.equalsIgnoreCase("shortDateFormat")) {
-					retVal.shortDateFormat = new SimpleDateFormat(wn
-							.getTextContent().trim());
 				}
 			}
 		}
