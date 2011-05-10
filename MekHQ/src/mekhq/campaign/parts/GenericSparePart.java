@@ -53,13 +53,6 @@ public class GenericSparePart extends Part {
         super(false, 0);
         this.tech = tech;
         this.amount = amount;
-        reCalc();
-    }
-    
-    @Override
-    public void reCalc() {
-        this.name = "Spare Part " + TechConstants.getLevelName(tech);
-        this.cost = GenericSparePart.UNITARY_COST * getAmount();
     }
 
     public int getAmount() {
@@ -68,7 +61,6 @@ public class GenericSparePart extends Part {
 
     public void setAmount(int amount) {
         this.amount = amount;
-        reCalc();
     }
 
     @Override
@@ -93,11 +85,6 @@ public class GenericSparePart extends Part {
     @Override
     public int getPartType() {
         return PART_TYPE_GENERIC_SPARE_PART;
-    }
-
-    @Override
-    public String getSaveString () {
-        return getName() + ";" + getTonnage() + ";" + getTech() + ";" + getAmount();
     }
 
     @Override
@@ -150,5 +137,35 @@ public class GenericSparePart extends Part {
 	public int getTechRating() {
 		// TODO Auto-generated method stub
 		return EquipmentType.RATING_C;
+	}
+
+	@Override
+	public void fix() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Part getReplacementPart() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void remove(boolean salvage) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void updateCondition() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean needsFixing() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }

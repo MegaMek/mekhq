@@ -224,6 +224,7 @@ public abstract class Refit extends ReplacementItem {
 		}
 
 		// Fix target unit
+		/*
 		for (WorkItem task : campaign.getTasksForUnit(targetUnit.getId())) {
 			if (task.checkFixable() == null) {
 				if (task instanceof ReplacementItem
@@ -239,6 +240,7 @@ public abstract class Refit extends ReplacementItem {
 				}
 			}
 		}
+		*/
 
 		targetUnit.setPilot(pilotPerson);
 
@@ -249,14 +251,14 @@ public abstract class Refit extends ReplacementItem {
 
 	@Override
 	public String checkFixable() {
-		ArrayList<WorkItem> tasks = getUnit().campaign
+		/*ArrayList<WorkItem> tasks = getUnit().campaign
 				.getAllTasksForUnit(getUnitId());
 
 		for (WorkItem task : tasks) {
 			if (task instanceof SalvageItem) {
 				return "Some items must be salvaged/scrapped";
 			}
-		}
+		}*/
 
 		return super.checkFixable();
 	}

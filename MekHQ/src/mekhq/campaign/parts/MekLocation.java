@@ -27,7 +27,9 @@ import java.util.ArrayList;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import megamek.common.CriticalSlot;
 import megamek.common.EquipmentType;
+import megamek.common.IArmorState;
 import megamek.common.Mech;
 import mekhq.campaign.Faction;
 import mekhq.campaign.MekHqXmlUtil;
@@ -43,15 +45,10 @@ public class MekLocation extends Part {
 	protected int loc;
     protected int structureType;
     protected boolean tsm;
+    double percent;
 
     public MekLocation() {
     	this(false, 0, 0, 0, false);
-    	reCalc();
-    }
-    
-	@Override
-    public void reCalc() {
-    	// Do nothing.
     }
     
     public int getLoc() {
@@ -71,6 +68,7 @@ public class MekLocation extends Part {
         this.loc = loc;
         this.structureType = structureType;
         this.tsm = hasTSM;
+        this.percent = 1.0;
         //TODO: need to account for internal structure and myomer types
         //crap, no static report for location names?
         this.name = "Mech Location";
@@ -106,7 +104,6 @@ public class MekLocation extends Part {
         if(tsm) {
             this.name += " (TSM)";
         }
-        this.name += " (" + tonnage + ")";
         computeCost();
     }
     
@@ -151,27 +148,6 @@ public class MekLocation extends Part {
         return PART_TYPE_MEK_BODY_PART;
     }
 
-    @Override
-    public ArrayList<String> getPotentialSSWNames(int faction) {
-        ArrayList<String> sswNames = new ArrayList<String>();
-
-        // The tech base of the part doesn't matter (Clan and IS can use each other's Endo Steel parts)
-        // However the tech base of the faction is important : Clans get Endo Steel parts before IS
-        String techBase = (Faction.isClanFaction(faction) ? "(CL)" : "(IS)");
-
-        String sswName = getName();
-
-        sswNames.add(techBase + " " + sswName);
-        sswNames.add(sswName);
-
-        return sswNames;
-    }
-
-    @Override
-    public String getSaveString () {
-        return getName() + ";" + getTonnage() + ";" + getLoc() + ";" + getStructureType() + ";" + (isTsm()?"true":"false");
-    }
-
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent, int id) {
 		writeToXmlBegin(pw1, indent, id);
@@ -187,6 +163,10 @@ public class MekLocation extends Part {
 				+"<tsm>"
 				+tsm
 				+"</tsm>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<percent>"
+				+percent
+				+"</percent>");
 		writeToXmlEnd(pw1, indent, id);
 	}
 
@@ -201,6 +181,8 @@ public class MekLocation extends Part {
 				loc = Integer.parseInt(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("structureType")) {
 				structureType = Integer.parseInt(wn2.getTextContent());
+			} else if (wn2.getNodeName().equalsIgnoreCase("percent")) {
+				percent = Double.parseDouble(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("tsm")) {
 				if (wn2.getTextContent().equalsIgnoreCase("true"))
 					tsm = true;
@@ -262,5 +244,61 @@ public class MekLocation extends Part {
 		}
 		
 	}
+
+	@Override
+	public void fix() {
+		percent = 1.0;
+		if(null != unit) {
+			unit.getEntity().setInternal(unit.getEntity().getOInternal(loc), loc);
+		}
+	}
+
+	@Override
+	public Part getReplacementPart() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void remove(boolean salvage) {
+		if(null != unit) {
+			unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, loc);
+			if(!salvage) {
+				unit.campaign.removePart(this);
+			}
+			//TODO create replacement part and add it to entity
+		}
+		unit = null;		
+	}
+
+	@Override
+	public void updateCondition() {
+		if(null != unit) {
+			percent = ((double) unit.getEntity().getInternal(loc)) / ((double) unit.getEntity().getOInternal(loc));
+			if(percent >= 1.0) {
+				this.time = 0;
+				this.difficulty = 0;
+			}
+			else if (percent > 0.75) {
+	            this.time = 270;
+	            this.difficulty = 2;
+	        } else if (percent > 0.5) {
+	            this.time = 180;
+	            this.difficulty = 1;
+	        } else if (percent > 0.25) {
+	            this.time = 135;
+	            this.difficulty = 0;
+	        }
+		}		
+	}
+
+	@Override
+	public boolean needsFixing() {
+		return percent < 1.0;
+	}
 	
+	@Override
+    public String getDetails() {
+        return unit.getEntity().getLocationName(loc) + " (" + Math.round(100*percent) + "%)";
+    }
 }

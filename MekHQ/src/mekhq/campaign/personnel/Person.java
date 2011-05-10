@@ -624,4 +624,9 @@ public abstract class Person implements Serializable, MekHqXmlSerializable, IMed
 		return " <font color='red'><b>Failed to heal.</b></font>";
 	}
 	
+	@Override
+	public String getPatientName() {
+		return getName();
+	}
+	
 }

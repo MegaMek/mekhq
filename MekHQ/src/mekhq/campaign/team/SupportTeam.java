@@ -38,6 +38,7 @@ import mekhq.campaign.parts.Availability;
 import mekhq.campaign.parts.GenericSparePart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.work.FullRepairWarchest;
+import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.Refit;
 import mekhq.campaign.work.ReloadItem;
 import mekhq.campaign.work.ReplacementItem;
@@ -235,10 +236,10 @@ public abstract class SupportTeam implements Serializable, MekHqXmlSerializable 
    
    public abstract int makeRoll(WorkItem task);
    
-   public boolean isTaskOvertime(WorkItem task) {
-       return task.getTimeLeft() > getMinutesLeft()
+   public boolean isTaskOvertime(IPartWork partWork) {
+       return partWork.getTimeLeft() > getMinutesLeft()
                 && (campaign.isOvertimeAllowed()  
-                    && (task.getTimeLeft() - getMinutesLeft()) <= getOvertimeLeft());
+                    && (partWork.getTimeLeft() - getMinutesLeft()) <= getOvertimeLeft());
    }
    
    public boolean isNotEnoughTime(WorkItem task) {
@@ -268,86 +269,6 @@ public abstract class SupportTeam implements Serializable, MekHqXmlSerializable 
 	   TargetRoll target = getTarget(WorkItem.MODE_NORMAL);
 	   target.append(replacement.getAllAcquisitionMods());
 	   return target;
-   }
-   
-   public TargetRoll getTargetFor(WorkItem task) {
-       if(null == task) {
-           return new TargetRoll(TargetRoll.IMPOSSIBLE, "no task?");
-       }
-       if(task.isAssigned() && task.getTeam().getId() != getId() ) {
-           return new TargetRoll(TargetRoll.IMPOSSIBLE, "This task is already being worked on by another team");
-       }
-       if(task instanceof UnitWorkItem && ((UnitWorkItem)task).getUnit().isDeployed()) {
-           return new TargetRoll(TargetRoll.IMPOSSIBLE, "This unit is currently deployed!");
-       }
-       
-       if(null != task.checkFixable()) {
-           return new TargetRoll(TargetRoll.IMPOSSIBLE, task.checkFixable());
-       } 
-       if(task.getSkillMin() > getRating()) {
-           return new TargetRoll(TargetRoll.IMPOSSIBLE, "Task is beyond this team's skill level");
-       }
-       
-       if(!task.isNeeded()) {
-           return new TargetRoll(TargetRoll.IMPOSSIBLE, "Task is not needed.");
-       }
-       if(!canDo(task)) {
-           return new TargetRoll(TargetRoll.IMPOSSIBLE, "Support team cannot do this kind of task.");
-       }
-       if(task instanceof ReplacementItem && !((ReplacementItem)task).hasPart()) {
-           return new TargetRoll(TargetRoll.IMPOSSIBLE, "part not available.");
-       }
-       TargetRoll target = getTarget(task.getMode());
-       if(target.getValue() == TargetRoll.IMPOSSIBLE) {
-           return target;
-       }
-       
-       //check time
-       //if you have zero total minutes left, you can't do a thing
-       if(getMinutesLeft() <= 0 && (!campaign.isOvertimeAllowed() || getOvertimeLeft() <= 0)) {
-           return new TargetRoll(TargetRoll.IMPOSSIBLE, "team has no time left");
-       }
-       
-       if(isTaskOvertime(task)) {
-           target.addModifier(3, "overtime");
-       }
-       
-       // Generic spare parts
-       if (task instanceof ReplacementItem
-               && ((ReplacementItem) task).partNeeded() instanceof GenericSparePart
-               && !((ReplacementItem) task).hasPart()) {
-           return new TargetRoll(TargetRoll.IMPOSSIBLE, "Not enough spare parts");
-       } else if (task instanceof ReplacementItem
-               && ((ReplacementItem) task).hasPart()
-               && ((ReplacementItem) task).partNeeded() instanceof GenericSparePart
-               && !((ReplacementItem) task).hasEnoughGenericSpareParts()) {
-           /*
-           GenericSparePart partNeeded = (GenericSparePart) ((ReplacementItem) task).partNeeded();
-           GenericSparePart part = (GenericSparePart) ((ReplacementItem) task).getPart();
-           if (campaign.getFunds() < new GenericSparePart(part.getTech(), partNeeded.getAmount()-part.getAmount()).getCost()) {
-               return new TargetRoll(TargetRoll.IMPOSSIBLE, "Not enough funds");
-           }
-           */
-           return new TargetRoll(TargetRoll.IMPOSSIBLE, "Not enough spare parts");
-       }
-       // check funds
-       if (campaign.getCampaignOptions().payForParts()
-    		   && task instanceof ReplacementItem
-               && !((ReplacementItem) task).hasPart()
-               && !campaign.hasEnoughFunds(((ReplacementItem) task).partNeeded().getCost())) {
-           return new TargetRoll(TargetRoll.IMPOSSIBLE, "Not enough funds");
-       } else if (campaign.getCampaignOptions().payForParts()
-    		   && task instanceof ReloadItem
-               && !campaign.hasEnoughFunds(((ReloadItem) task).getCost())) {
-           return new TargetRoll(TargetRoll.IMPOSSIBLE, "Not enough funds");
-       } else if (campaign.getCampaignOptions().payForParts()
-    		   && task instanceof FullRepairWarchest
-               && !campaign.hasEnoughFunds(((FullRepairWarchest) task).getCost())) {
-           return new TargetRoll(TargetRoll.IMPOSSIBLE, "Not enough funds");
-       }
-
-       target.append(task.getAllMods());
-       return target;
    }
    
    public String acquirePartFor(WorkItem task) {
@@ -419,7 +340,7 @@ public abstract class SupportTeam implements Serializable, MekHqXmlSerializable 
            }
        }
        */
-       
+       /*
        report += getName() + " attempts to " + task.getDisplayName();    
        TargetRoll target = getTargetFor(task);
        
@@ -464,6 +385,7 @@ public abstract class SupportTeam implements Serializable, MekHqXmlSerializable 
        } else {
            report = report + task.fail(getRating());
        }
+       */
        return report;
    }
  

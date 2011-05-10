@@ -34,18 +34,24 @@ import org.w3c.dom.NodeList;
 
 import megamek.common.Engine;
 import megamek.common.EquipmentType;
+import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
 import mekhq.MekHQApp;
 import mekhq.campaign.Faction;
 import mekhq.campaign.MekHqXmlSerializable;
 import mekhq.campaign.MekHqXmlUtil;
+import mekhq.campaign.Unit;
+import mekhq.campaign.team.SupportTeam;
+import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.ReplacementItem;
 
 /**
- * 
+ * I am totally reworking part so that the repair system is part-centric.
+ * All the methods that used to be parts of WorkItems will now be a part
+ * of Part through the IPartWork interface
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public abstract class Part implements Serializable, MekHqXmlSerializable {
+public abstract class Part implements Serializable, MekHqXmlSerializable, IPartWork {
 	private static final long serialVersionUID = 6185232893259168810L;
 	public static final int PART_TYPE_ARMOR = 0;
 	public static final int PART_TYPE_WEAPON = 1;
@@ -76,6 +82,22 @@ public abstract class Part implements Serializable, MekHqXmlSerializable {
 	protected long cost;
 	protected int tonnage;
 
+	//hits to this part
+	int hits;
+	// the skill modifier for difficulty
+	protected int difficulty;
+	// the amount of time for the repair (this is the base time)
+	protected int time;
+	// time spent on the task so far for tasks that span days
+	protected int timeSpent;
+	// the minimum skill level in order to attempt
+	protected int skillMin;
+	//current repair mode for part
+	protected int mode;
+	protected int teamId;
+	//null is valid. It indicates parts that are not attached to units.
+	Unit unit;
+	
 	public Part() {
 		this(false, 0);
 	}
@@ -85,10 +107,15 @@ public abstract class Part implements Serializable, MekHqXmlSerializable {
 		this.salvage = salvage;
 		this.tonnage = tonnage;
 		this.cost = 0;
+		this.hits = 0;
+		this.skillMin = SupportTeam.EXP_GREEN;
+		this.mode = MODE_NORMAL;
+		this.timeSpent = 0;
+		this.teamId = -1;
+		this.time = 0;
+		this.difficulty = 0;
 	}
 
-	public abstract void reCalc();
-	
 	public void setId(int id) {
 		this.id = id;
 	}
@@ -105,16 +132,20 @@ public abstract class Part implements Serializable, MekHqXmlSerializable {
 		return name;
 	}
 
-	public String getDesc() {
-		return name + " (" + getCostString() + ")";
-	}
-
 	public long getCost() {
 		return cost;
 	}
 
 	public int getTonnage() {
 		return tonnage;
+	}
+	
+	public Unit getUnit() {
+		return unit;
+	}
+	
+	public void setUnit(Unit u) {
+		this.unit = u;
 	}
 
 	public String getStatus() {
@@ -124,12 +155,38 @@ public abstract class Part implements Serializable, MekHqXmlSerializable {
 		}
 		return toReturn;
 	}
+	
+	public int getHits() {
+		return hits;
+	}
 
-	public String getDescHTML() {
-		String toReturn = "<font size='2'>";
-		toReturn += "<b>" + getDesc() + "</b><br/>";
-		toReturn += getStatus() + "<br/>";
-		toReturn += "</font>";
+	public String getDesc() {
+		String bonus = getAllMods().getValueAsString();
+		if (getAllMods().getValue() > -1) {
+			bonus = "+" + bonus;
+		}
+		bonus = "(" + bonus + ")";
+		String toReturn = "<html><font size='2'";
+	
+		String scheduled = "";
+		//if (isAssigned()) {
+		//	scheduled = " (scheduled) ";
+		//}
+	
+		//if (this instanceof ReplacementItem
+		//		&& !((ReplacementItem) this).hasPart()) {
+		//	toReturn += " color='white'";
+		//}
+		toReturn += ">";
+		toReturn += "<b>Repair " + getName() + "</b><br/>";
+		toReturn += getDetails() + "<br/>";
+		toReturn += "" + getTimeLeft() + " minutes" + scheduled;
+		toReturn += ", " + SupportTeam.getRatingName(getSkillMin());
+		toReturn += " " + bonus;
+		if (getMode() != MODE_NORMAL) {
+			toReturn += "<br/><i>" + getCurrentModeName() + "</i>";
+		}
+		toReturn += "</font></html>";
 		return toReturn;
 	}
 	
@@ -170,128 +227,11 @@ public abstract class Part implements Serializable, MekHqXmlSerializable {
 		return TechConstants.T_INTRO_BOXSET;
 	}
 
-	/**
-	 * Gets potential SSW names which can be used by
-	 * SSWLibHelper.getAbPlaceableByName
-	 * 
-	 * @return
-	 */
-	public ArrayList<String> getPotentialSSWNames(int faction) {
-		ArrayList<String> sswNames = new ArrayList<String>();
-
-		String sswName = getName();
-		sswNames.add(sswName);
-
-		return sswNames;
-	}
-
 	public String getCostString() {
 		NumberFormat numberFormat = DecimalFormat.getIntegerInstance();
 		String text = numberFormat.format(getCost()) + " "
 				+ (getCost() != 0 ? "CBills" : "CBill");
 		return text;
-	}
-
-	public String getSaveString() {
-		return getName() + ";" + getTonnage();
-	}
-
-	public static Part getPartByName(String saveString) {
-		String name = saveString.split(";")[0];
-		int tonnage = Integer.parseInt(saveString.split(";")[1]);
-
-		if (saveString.contains("Armor")) {
-			String typeString = saveString.split(";")[2];
-			int type = Integer.parseInt(typeString);
-			String amountString = saveString.split(";")[3];
-			int amount = Integer.parseInt(amountString);
-
-			Armor armor = new Armor(false, tonnage, type, amount);
-			return armor;
-
-		} else if (saveString.contains("Actuator")) {
-			String typeString = saveString.split(";")[2];
-			int type = Integer.parseInt(typeString);
-
-			MekActuator mekActuator = new MekActuator(false, tonnage, type);
-			return mekActuator;
-
-		} else if (saveString.contains("Gyro")) {
-			String typeString = saveString.split(";")[2];
-			int type = Integer.parseInt(typeString);
-			String walkMpString = saveString.split(";")[3];
-			int walkMp = Integer.parseInt(walkMpString);
-
-			MekGyro mekGyro = new MekGyro(false, tonnage, type, walkMp);
-			return mekGyro;
-
-		} else if (saveString.contains("Mech Life Support System")) {
-			MekLifeSupport mekLifeSupport = new MekLifeSupport(false, tonnage);
-
-			return mekLifeSupport;
-		} else if (saveString.contains("Mech Head")
-				|| saveString.contains("Mech Center Torso")
-				|| saveString.contains("Mech Left Torso")
-				|| saveString.contains("Mech Right Torso")
-				|| saveString.contains("Mech Left Arm")
-				|| saveString.contains("Mech Right Arm")
-				|| saveString.contains("Mech Left Leg")
-				|| saveString.contains("Mech Right Leg")) {
-			String locString = saveString.split(";")[2];
-			int loc = Integer.parseInt(locString);
-			String structureTypeString = saveString.split(";")[3];
-			int structureType = Integer.parseInt(structureTypeString);
-			String tsmString = saveString.split(";")[4];
-			boolean tsm = Boolean.parseBoolean(tsmString);
-
-			MekLocation mekLocation = new MekLocation(false, loc, tonnage,
-					structureType, tsm);
-			
-			return mekLocation;
-		} else if (saveString.contains("Mech Sensors")) {
-			MekSensor mekSensor = new MekSensor(false, tonnage);
-			return mekSensor;
-		} else if (saveString.contains("Engine")) {
-			String ratingString = saveString.split(";")[2];
-			int rating = Integer.parseInt(ratingString);
-			String typeString = saveString.split(";")[3];
-			int type = Integer.parseInt(typeString);
-			boolean clanEngine = Boolean.parseBoolean(saveString.split(";")[4]);
-			boolean tankEngine = Boolean.parseBoolean(saveString.split(";")[5]);
-			boolean largeEngine = Boolean
-					.parseBoolean(saveString.split(";")[6]);
-			int flags = (clanEngine ? Engine.CLAN_ENGINE : 0)
-					+ (tankEngine ? Engine.TANK_ENGINE : 0)
-					+ (largeEngine ? Engine.LARGE_ENGINE : 0);
-			int faction = (clanEngine ? Faction.F_C_OTHER : Faction.F_FEDSUN);
-
-			Engine engine = new Engine(rating, type, flags);
-			MekEngine mekEngine = new MekEngine(false, tonnage, faction,
-					engine, 1.0);
-
-			return mekEngine;
-		} else if (name.contains("EquipmentPart")) {
-			String typeName = saveString.split(";")[2];
-			EquipmentType type = EquipmentType.get(typeName);
-			int cost = Integer.parseInt(saveString.split(";")[3]);
-
-			EquipmentPart equipmentPart = new EquipmentPart(false, tonnage, -1,
-					type, null);
-			equipmentPart.setCost(cost);
-
-			return equipmentPart;
-		} else if (name.contains("Spare Part")) {
-			String techString = saveString.split(";")[2];
-			int tech = Integer.parseInt(techString);
-			String amountString = saveString.split(";")[3];
-			int amount = Integer.parseInt(amountString);
-			GenericSparePart genericSparePart = new GenericSparePart(tech,
-					amount);
-
-			return genericSparePart;
-		} else {
-			return null;
-		}
 	}
 
 	public abstract void writeToXml(PrintWriter pw1, int indent, int id);
@@ -322,6 +262,34 @@ public abstract class Part implements Serializable, MekHqXmlSerializable {
 				+"<tonnage>"
 				+tonnage
 				+"</tonnage>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<hits>"
+				+hits
+				+"</hits>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<difficulty>"
+				+difficulty
+				+"</difficulty>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<time>"
+				+time
+				+"</time>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<timeSpent>"
+				+timeSpent
+				+"</timeSpent>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<mode>"
+				+mode
+				+"</mode>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<teamId>"
+				+teamId
+				+"</teamId>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<skillMin>"
+				+skillMin
+				+"</skillMin>");
 	}
 	
 	protected void writeToXmlEnd(PrintWriter pw1, int indent, int id) {
@@ -358,6 +326,20 @@ public abstract class Part implements Serializable, MekHqXmlSerializable {
 						retVal.salvage = false;
 				} else if (wn2.getNodeName().equalsIgnoreCase("tonnage")) {
 					retVal.tonnage = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("hits")) {
+					retVal.hits = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("difficulty")) {
+					retVal.difficulty = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("time")) {
+					retVal.time = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("timeSpent")) {
+					retVal.timeSpent = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("skillMin")) {
+					retVal.skillMin = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("mode")) {
+					retVal.mode = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("teamId")) {
+					retVal.teamId = Integer.parseInt(wn2.getTextContent());
 				}
 			}
 		} catch (Exception ex) {
@@ -371,5 +353,150 @@ public abstract class Part implements Serializable, MekHqXmlSerializable {
 	}
 	
 	protected abstract void loadFieldsFromXmlNode(Node wn);
+	
+	@Override
+	public int getDifficulty() {
+		return difficulty;
+	}
+
+	@Override
+	public int getBaseTime() {
+		return time;
+	}
+
+	@Override
+	public int getActualTime() {
+		switch (mode) {
+		case MODE_EXTRA_ONE:
+			return 2 * time;
+		case MODE_EXTRA_TWO:
+			return 4 * time;
+		case MODE_RUSH_ONE:
+			return (int) Math.ceil(time / 2.0);
+		case MODE_RUSH_TWO:
+			return (int) Math.ceil(time / 4.0);
+		case MODE_RUSH_THREE:
+			return (int) Math.ceil(time / 8.0);
+		default:
+			return time;
+		}
+	}
+
+	@Override
+	public int getTimeLeft() {
+		return getActualTime() - getTimeSpent();
+	}
+
+	@Override
+	public int getTimeSpent() {
+		return timeSpent;
+	}
+
+	public void addTimeSpent(int m) {
+		this.timeSpent += m;
+	}
+
+	public void resetTimeSpent() {
+		this.timeSpent = 0;
+	}
+
+	@Override
+	public int getSkillMin() {
+		return skillMin;
+	}
+
+	public void setSkillMin(int i) {
+		this.skillMin = i;
+	}
+	
+	public int getMode() {
+		return mode;
+	}
+
+	public void setMode(int i) {
+		this.mode = i;
+	}
+	
+	@Override
+	public TargetRoll getAllMods() {
+		TargetRoll mods = new TargetRoll(getDifficulty(), "difficulty");
+		if (getModeMod() != 0) {
+			mods.addModifier(getModeMod(), getCurrentModeName());
+		}
+		mods.append(unit.getSiteMod());
+        if(unit.getEntity().getQuirks().booleanOption("easy_maintain")) {
+            mods.addModifier(-1, "easy to maintain");
+        }
+        else if(unit.getEntity().getQuirks().booleanOption("difficult_maintain")) {
+            mods.addModifier(1, "difficult to maintain");
+        }
+        mods.addModifier(Availability.getTechModifier(getTechRating()), "tech rating " + EquipmentType.getRatingName(getTechRating()));
+		return mods;
+	}
+	
+
+	public int getModeMod() {
+		switch (mode) {
+		case MODE_EXTRA_ONE:
+			return -1;
+		case MODE_EXTRA_TWO:
+			return -2;
+		default:
+			return 0;
+		}
+	}
+
+	public static String getModeName(int mode) {
+		switch (mode) {
+		case MODE_EXTRA_ONE:
+			return "Extra time";
+		case MODE_EXTRA_TWO:
+			return "Extra time (x2)";
+		case MODE_RUSH_ONE:
+			return "Rush Job (1/2)";
+		case MODE_RUSH_TWO:
+			return "Rush Job (1/4)";
+		case MODE_RUSH_THREE:
+			return "Rush Job (1/8)";
+		default:
+			return "Normal";
+		}
+	}
+
+	public String getCurrentModeName() {
+		return getModeName(mode);
+	}
+	
+	@Override
+	public int getTeamId() {
+		return teamId;
+	}
+	
+	@Override
+	public String getPartName() {
+		return name;
+	}
+	
+	@Override
+	public boolean canFix(SupportTeam team) {
+		return team.getRating() >= skillMin; 
+	}
+	
+	@Override
+	public String fail(int rating) {
+		skillMin = ++rating;
+		return " <font color='red'><b> failed.</b></font>";
+	}
+
+	@Override
+	public String succeed() {
+		fix();
+		return " <font color='green'><b> fixed.</b></font>";
+	}
+	
+	@Override
+    public String getDetails() {
+        return hits + " hit(s)";
+    }
 }
 

@@ -27,6 +27,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import megamek.common.BipedMech;
+import megamek.common.CriticalSlot;
+import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Mech;
 import mekhq.campaign.MekHqXmlUtil;
@@ -40,15 +42,10 @@ import mekhq.campaign.work.ReplacementItem;
 public class MekActuator extends Part {
 	private static final long serialVersionUID = 719878556021696393L;
 	protected int type;
+	protected int location;
 
 	public MekActuator() {
 		this(false, 0, 0);
-		reCalc();
-	}
-	
-	@Override
-	public void reCalc() {
-		// Do nothing.
 	}
 	
     public int getType() {
@@ -56,10 +53,15 @@ public class MekActuator extends Part {
     }
     
     public MekActuator(boolean salvage, int tonnage, int type) {
-        super(salvage, tonnage);
+        this(salvage, tonnage, type, -1);
+    }
+    
+    public MekActuator(boolean salvage, int tonnage, int type, int loc) {
+    	super(salvage, tonnage);
         this.type = type;
         Mech m = new BipedMech();
-        this.name = m.getSystemName(type) + " Actuator (" + tonnage + " tons)" ;
+        this.name = m.getSystemName(type) + " Actuator" ;
+        this.location = loc;
         computeCost();
     }
 
@@ -124,12 +126,11 @@ public class MekActuator extends Part {
     public int getPartType() {
         return PART_TYPE_MEK_ACTUATOR;
     }
-
-    @Override
-    public String getSaveString () {
-        return getName() + ";" + getTonnage() + ";" + getType();
+    
+    public int getLocation() {
+    	return location;
     }
-
+    
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent, int id) {
 		writeToXmlBegin(pw1, indent, id);
@@ -137,6 +138,10 @@ public class MekActuator extends Part {
 				+"<type>"
 				+type
 				+"</type>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<location>"
+				+location
+				+"</location>");
 		writeToXmlEnd(pw1, indent, id);
 	}
 
@@ -149,6 +154,8 @@ public class MekActuator extends Part {
 			
 			if (wn2.getNodeName().equalsIgnoreCase("type")) {
 				type = Integer.parseInt(wn2.getTextContent());
+			} else if (wn2.getNodeName().equalsIgnoreCase("location")) {
+				location = Integer.parseInt(wn2.getTextContent());
 			} 
 		}
 	}
@@ -161,5 +168,72 @@ public class MekActuator extends Part {
 	@Override
 	public int getTechRating() {
 		return EquipmentType.RATING_C;
+	}
+	
+	@Override
+	public void fix() {
+		hits = 0;
+		if(null != unit) {
+			unit.repairSystem(CriticalSlot.TYPE_SYSTEM, type, location);
+		}
+	}
+
+	@Override
+	public Part getReplacementPart() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void remove(boolean salvage) {
+		if(null != unit) {
+			unit.destroySystem(CriticalSlot.TYPE_SYSTEM, type, location);
+			if(!salvage) {
+				unit.campaign.removePart(this);
+			}
+			//TODO create replacement part and add it to entity
+		}
+		unit = null;
+		location = -1;
+	}
+
+	@Override
+	public void updateCondition() {
+		if(null != unit) {
+			Entity entity = unit.getEntity();
+			for (int i = 0; i < entity.locations(); i++) {
+				if (entity.getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, type, i) > 0) {
+					if (entity.isSystemRepairable(Mech.SYSTEM_LIFE_SUPPORT, i)) {					
+						hits = entity.getHitCriticals(CriticalSlot.TYPE_SYSTEM, type, i);	
+						break;
+					} else {
+						remove(false);
+						return;
+					}
+				}
+			}
+			if(hits == 0) {
+				time = 0;
+				difficulty = 0;
+			} 
+			else if(hits >= 1) {
+				time = 120;
+				difficulty = 0;
+			}
+		}
+		
+	}
+
+	@Override
+	public boolean needsFixing() {
+		return hits > 0;
+	}
+	
+	@Override
+	public String getDetails() {
+		if(null != unit) {
+			return unit.getEntity().getLocationName(location);
+		}
+		return "";
 	}
 }

@@ -103,10 +103,10 @@ public abstract class ReplacementItem extends UnitWorkItem {
         if (hasPart() && getPart() instanceof GenericSparePart) {
             GenericSparePart genericSparePart = (GenericSparePart) getPart();
             GenericSparePart partNeeded = (GenericSparePart) partNeeded();
-            unit.campaign.addWork(getSalvage());
+            //unit.campaign.addWork(getSalvage());
             useUpPart();
         } else {
-            unit.campaign.addWork(getSalvage());
+            //unit.campaign.addWork(getSalvage());
             useUpPart();
         }
     }

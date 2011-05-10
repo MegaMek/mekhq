@@ -112,6 +112,7 @@ public class ArmorReplacement extends ReplacementItem {
 			unit.getEntity().setArmor(cArmor + points, loc, rear);
 			boolean taskFound = false;
 			// need to check the salvage task for mutation
+			/*
 			for (WorkItem task : unit.campaign.getAllTasksForUnit(unit.getId())) {
 				if (task instanceof ArmorSalvage
 						&& ((ArmorSalvage) task).getLoc() == loc
@@ -123,6 +124,7 @@ public class ArmorReplacement extends ReplacementItem {
 			if (!taskFound) {
 				unit.campaign.addWork(getSalvage());
 			}
+			*/
 			useUpPart();
 		} else {
 			super.fix();

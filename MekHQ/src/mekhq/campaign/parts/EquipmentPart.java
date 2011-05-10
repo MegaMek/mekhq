@@ -28,16 +28,20 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import megamek.common.AmmoType;
+import megamek.common.CriticalSlot;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.MiscType;
+import megamek.common.Mounted;
 import megamek.common.TechConstants;
 import megamek.common.weapons.Weapon;
 import mekhq.campaign.Era;
 import mekhq.campaign.Faction;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
+import mekhq.campaign.work.EquipmentRepair;
 import mekhq.campaign.work.EquipmentReplacement;
+import mekhq.campaign.work.EquipmentSalvage;
 import mekhq.campaign.work.ReplacementItem;
 
 /**
@@ -47,20 +51,17 @@ import mekhq.campaign.work.ReplacementItem;
 public class EquipmentPart extends Part {
 	private static final long serialVersionUID = 2892728320891712304L;
 
-	private Unit tmpUnit = null; // This is *not* serialized in XML.  Should only be necessary for calculations.
-	private int tmpFaction = -1; // This is *not* serialized in XML.  Should only be necessary for calculations.
-	
 	//crap equipmenttype is not serialized!
     protected transient EquipmentType type;
 
-    protected String typeName;
+	private int equipmentNum = -1;
 
     public EquipmentType getType() {
         return type;
     }
-
-    public String getTypeName() {
-        return typeName;
+    
+    public int getEquipmentNum() {
+    	return equipmentNum;
     }
 
     public void setCost(long cost) {
@@ -68,46 +69,20 @@ public class EquipmentPart extends Part {
     }
     
     public EquipmentPart() {
-    	this(false, 0, 0, null, null);
+    	this(false, 0, null, -1);
     }
     
-    public EquipmentPart(boolean salvage, int tonnage, int faction, EquipmentType et, Unit unit) {
+    public EquipmentPart(boolean salvage, int tonnage, EquipmentType et, int equipNum) {
         // TODO Memorize all entity attributes needed to calculate cost
         // As it is a part bought with one entity can be used on another entity
         // on which it would have a different price (only tonnage is taken into
         // account for compatibility)
         super(salvage, tonnage);
-        this.type = et;
-        this.tmpUnit = unit;
-        this.tmpFaction = faction;
-        reCalc();
-    }
-    
-    @Override
-    public void reCalc() {
-        if (type != null) {
-        	this.name = type.getDesc();
-        	this.typeName = type.getInternalName();
-
-            if (type.getCost(null, false) == EquipmentType.COST_VARIABLE)
-                this.name += " (" + getTonnage() + ")";
+        this.type =et;
+        if(null != type) {
+        	this.name = type.getName();
         }
-
-        // The cost is calculated here.
-        // Upon initial construction, a temporary unit and faction are passed in.
-        // They are *only* used to calculate the cost, and therefore correctly are not necessarily here.
-        //TODO: Convert to static cost calc function for construction?
-        if (tmpUnit == null)
-        	return;
-        
-        computeCost(tmpUnit.getEntity());
-
-        if (tmpFaction < 0)
-        	return;
-        
-        // Increase cost for Clan parts when player is IS faction
-        if (isClanTechBase() && !Faction.isClanFaction(tmpFaction))
-            this.cost *= tmpUnit.campaign.getCampaignOptions().getClanPriceModifier();
+        this.equipmentNum = equipNum;
     }
 
     /**
@@ -221,16 +196,16 @@ public class EquipmentPart extends Part {
      * Restores the equipment from the name
      */
     public void restore() {
-        if (typeName == null) {
-            typeName = type.getName();
+        if (name == null) {
+            name = type.getName();
         } else {
-            type = EquipmentType.get(typeName);
+            type = EquipmentType.get(name);
         }
 
         if (type == null) {
             System.err
             .println("Mounted.restore: could not restore equipment type \""
-                    + typeName + "\"");
+                    + name + "\"");
         }
     }
 
@@ -257,88 +232,6 @@ public class EquipmentPart extends Part {
     }
 
     @Override
-    public ArrayList<String> getPotentialSSWNames (int faction) {
-        ArrayList<String> sswNames = new ArrayList<String>();
-
-        // The tech base matters for equipments (ie. you can't use a IS medium pulse laser to replace a Clan medium pulse laser
-        String techBase = (isClanTechBase() ? "(CL)" : "(IS)");
-        
-        if (getPartType()==PART_TYPE_AMMO || getPartType()==PART_TYPE_WEAPON) {
-            String sswName = getName();
-
-            sswName = sswName.replace("SRM ", "SRM-");
-            sswName = sswName.replace("MRM ", "MRM-");
-            sswName = sswName.replace("LRM ", "LRM-");
-            sswName = sswName.replace("ATM ", "ATM-");
-
-            sswName = sswName.replace("X Pulse", "X-Pulse");
-
-            sswName = sswName.replace("LAC/2", "Light AC/2");
-            sswName = sswName.replace("LAC/5", "Light AC/5");
-
-            sswName = sswName.replace("AMS", "Anti-Missile System");
-
-            sswName = sswName.replace("HAG/20", "Hyper Assault Gauss 20");
-            sswName = sswName.replace("HAG/30", "Hyper Assault Gauss 30");
-            sswName = sswName.replace("HAG/40", "Hyper Assault Gauss 40");
-
-            if (getPartType()==PART_TYPE_AMMO) {
-                sswName = sswName.replace(" Ammo","");
-                sswName = "@ " + sswName;
-
-                sswName = sswName.replace("Cluster", "(Cluster)");
-
-                if (sswName.contains("-X") && !sswName.contains("AC"))
-                    sswName = sswName.replace("-X","-X AC");
-
-                if (sswName.contains("-X AC") && !sswName.contains("Cluster"))
-                    sswName = sswName.replace("-X AC", "-X AC (Slug)");
-
-                sswName = sswName.replace("Artemis-capable", "(Artemis IV Capable)");
-                sswName = sswName.replace("Narc-capable", "(Narc Capable)");
-
-                if (sswName.contains("Gauss") && !sswName.contains("Gauss Rifle") && !sswName.contains("Hyper Assault"))
-                    sswName = sswName.replace("Gauss", "Gauss Rifle");
-
-                sswName = sswName.replace(" (Clan)", "");
-
-                sswName = sswName.replace("Arrow IV Homing", "Arrow IV (Homing)");
-                sswName = sswName.replace("Arrow IV FASCAM", "Arrow IV (FASCAM)");
-                if (sswName.contains("Arrow IV") && !sswName.contains("Homing") && !sswName.contains("FASCAM"))
-                    sswName = sswName.replace("Arrow IV", "Arrow IV (Non-Homing)");
-
-                if (sswName.contains("MML") && sswName.contains("-Ammo")) {
-                    sswName = sswName.replace("LRM-Ammo", "(LRM)");
-                    sswName = sswName.replace("MRM-Ammo", "(MRM)");
-                    sswName = sswName.replace("SRM-Ammo", "(SRM)");
-                    sswName = sswName.replace("MML ", "MML-");
-                }
-            } else if (getPartType()==PART_TYPE_WEAPON) {
-
-                sswName = sswName.replace("Narc", "Narc Missile Beacon");
-                sswName = sswName.replace("Arrow IV", "Arrow IV Missile");
-
-                sswName = sswName.replace("Machine Gun Array", "Machine Gun");
-                sswName = sswName.replace("MML ", "MML-");
-            }
-
-            sswNames.add(techBase + " " + sswName);
-            sswNames.add(sswName);
-        } else if (getPartType() == Part.PART_TYPE_EQUIPMENT_PART) {
-            String sswName = getName();
-
-            sswName = sswName.replace("C3 Slave", "C3 Computer (Slave)");
-            sswName = sswName.replace("C3i Computer", "Improved C3 Computer");
-            sswName = sswName.replace("Angel ECM Suite", "Angel ECM");
-
-            sswNames.add(techBase + " " + sswName);
-            sswNames.add(sswName);
-        }
-        
-        return sswNames;
-    }
-
-    @Override
     public boolean isClanTechBase() {
         String techBase = TechConstants.getTechName(getType().getTechLevel());
 
@@ -358,28 +251,9 @@ public class EquipmentPart extends Part {
             return getType().getTechLevel();
     }
 
-    @Override
-    public String getDesc() {
-        return (isClanTechBase() ? "Clan " : "") + super.getDesc();
-    }
-
-    @Override
-    public String getSaveString () {
-        return "EquipmentPart" 
-                    + ";" + getTonnage()
-                    + ";" + getTypeName()
-                    + ";" + getCost();
-    }
-
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent, int id) {
-		writeToXmlBegin(pw1, indent, id);
-		// We should be able to regenerate the EquipmentType from its name,
-		// using the "restore()" function.
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<typeName>"
-				+(typeName==null?type.getName():typeName)
-				+"</typeName>");
+		writeToXmlBegin(pw1, indent, id);		
 		writeToXmlEnd(pw1, indent, id);
 	}
 
@@ -390,9 +264,6 @@ public class EquipmentPart extends Part {
 		for (int x=0; x<nl.getLength(); x++) {
 			Node wn2 = nl.item(x);
 			
-			if (wn2.getNodeName().equalsIgnoreCase("typeName")) {
-				typeName = wn2.getTextContent();
-			} 
 		}
 	}
 
@@ -405,4 +276,93 @@ public class EquipmentPart extends Part {
 	public int getTechRating() {
 		return type.getTechRating();
 	}
+
+	@Override
+	public void fix() {
+		hits = 0;
+		if(null != unit) {
+			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
+			if(null != mounted) {
+				mounted.setHit(false);
+		        mounted.setDestroyed(false);
+		        unit.repairSystem(CriticalSlot.TYPE_EQUIPMENT, unit.getEntity().getEquipmentNum(mounted));
+			}
+		}
+	}
+
+	@Override
+	public Part getReplacementPart() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void remove(boolean salvage) {
+		if(null != unit) {
+			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
+			if(null != mounted) {
+				mounted.setHit(true);
+		        mounted.setDestroyed(true);
+		        unit.destroySystem(CriticalSlot.TYPE_EQUIPMENT, unit.getEntity().getEquipmentNum(mounted));	
+			}
+	        if(!salvage) {
+				unit.campaign.removePart(this);
+			}
+		}
+		//TODO create replacement part and add it to entity
+		unit = null;
+		equipmentNum = -1;
+	}
+
+	@Override
+	public void updateCondition() {
+		if(null != unit) {
+			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
+			if(null != mounted) {
+				//if(!mounted.isRepairable()) {
+					//remove(false);
+				//	return;
+				//} else 
+				if(mounted.isDestroyed()) {
+					//TODO: calculate actual hits
+					hits = 1;
+				} else {
+					hits = 0;
+				}
+			}
+			if(hits == 0) {
+				time = 0;
+				difficulty = 0;
+			} else if(hits == 1) {
+				time = 100;
+				difficulty = -3;
+			} else if(hits == 2) {
+				time = 150;
+				difficulty = -2;
+			} else if(hits == 3) {
+				time = 200;
+				difficulty = 0;
+			} else if(hits > 3) {
+				time = 250;
+				difficulty = +2;
+			}
+		}
+	}
+
+	@Override
+	public boolean needsFixing() {
+		return hits > 0;
+	}
+	
+
+    @Override
+    public String getDetails() {
+    	if(null != unit) {
+			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
+			if(null != mounted) {
+				return unit.getEntity().getLocationName(mounted.getLocation()) + ", " + super.getDetails();
+			}
+    	}
+    	return "";
+    }
 }

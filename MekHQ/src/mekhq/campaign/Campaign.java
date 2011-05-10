@@ -81,6 +81,8 @@ import mekhq.campaign.work.EquipmentRepair;
 import mekhq.campaign.work.EquipmentReplacement;
 import mekhq.campaign.work.EquipmentSalvage;
 import mekhq.campaign.work.FullRepairWarchest;
+import mekhq.campaign.work.IMedicalWork;
+import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.Refit;
 import mekhq.campaign.work.ReloadItem;
 import mekhq.campaign.work.UnitWorkItem;
@@ -103,8 +105,6 @@ public class Campaign implements Serializable {
 	private Hashtable<Integer, SupportTeam> teamIds = new Hashtable<Integer, SupportTeam>();
 	private ArrayList<Unit> units = new ArrayList<Unit>();
 	private Hashtable<Integer, Unit> unitIds = new Hashtable<Integer, Unit>();
-	private ArrayList<WorkItem> tasks = new ArrayList<WorkItem>();
-	private Hashtable<Integer, WorkItem> taskIds = new Hashtable<Integer, WorkItem>();
 	private ArrayList<Person> personnel = new ArrayList<Person>();
 	private Hashtable<Integer, Person> personnelIds = new Hashtable<Integer, Person>();
 	private ArrayList<Part> parts = new ArrayList<Part>();
@@ -117,7 +117,6 @@ public class Campaign implements Serializable {
 	
 	private int lastTeamId;
 	private int lastUnitId;
-	private int lastTaskId;
 	private int lastPersonId;
 	private int lastPartId;
 	private int lastForceId;
@@ -404,41 +403,6 @@ public class Campaign implements Serializable {
 		if (u.getId() > lastUnitId)
 			lastUnitId = u.getId();
 	}
-
-	public void runNewDiagnostics(int uid) {
-		Unit unit = getUnit(uid);
-		
-		if(null == unit) {
-			return;
-		}
-		
-		// remove old tasks
-		ArrayList<WorkItem> oldTasks = new ArrayList<WorkItem>();
-		
-		for (WorkItem task : getAllTasksForUnit(unit.getId())) {
-			if (task instanceof RepairItem
-					|| task instanceof ReplacementItem) {
-				oldTasks.add(task);
-			}
-			
-			tasks.remove(task);
-			taskIds.remove(new Integer(task.getId()));
-		}
-		
-		unit.runDiagnostic();
-		
-		// this last one is tricky because I want to keep information about
-		// skill level required from the old
-		// tasks, otherwise reloading a unit will allow user to reset the
-		// skill required to green (i.e. cheat)
-		for (WorkItem task : getTasksForUnit(unit.getId())) {
-			for (WorkItem oldTask : oldTasks) {
-				if (task.sameAs(oldTask)) {
-					task.setSkillMin(oldTask.getSkillMin());
-				}
-			}
-		}
-	}
 	
 	/**
 	 * Add a unit to the campaign. This is only for new units
@@ -481,7 +445,7 @@ public class Campaign implements Serializable {
 			
 		// collect all the work items outstanding on this unit and add them
 		// to the workitem vector
-		unit.runDiagnostic();
+		unit.initializeParts();
 		addReport(unit.getEntity().getDisplayName() + " has been added to the unit roster.");
 	}
 
@@ -530,32 +494,6 @@ public class Campaign implements Serializable {
 		return unitIds.get(new Integer(id));
 	}
 
-	public void addWork(WorkItem task) {
-		// TODO: check for duplicate display names
-		int id = lastTaskId + 1;
-		task.setId(id);
-		tasks.add(task);
-		taskIds.put(new Integer(id), task);
-		lastTaskId = id;
-		assignPart(task);
-	}
-	
-	private void addWorkWithoutId(WorkItem task) {
-		tasks.add(task);
-		taskIds.put(task.getId(), task);
-		
-		if (task.getId() > lastTaskId)
-			lastTaskId = task.getId();
-	}
-
-	public ArrayList<WorkItem> getTasks() {
-		return tasks;
-	}
-
-	public WorkItem getTask(int id) {
-		return taskIds.get(new Integer(id));
-	}
-
 	public void addPerson(Person p) {
 		int id = lastPersonId + 1;
 		p.setId(id);
@@ -598,7 +536,7 @@ public class Campaign implements Serializable {
 	public ArrayList<Unit> getServiceableUnits() {
 		ArrayList<Unit> service = new ArrayList<Unit>();
 		for(Unit u : getUnits()) {
-			if(countTasksFor(u.getId()) > 0 && !u.isDeployed()) {
+			if(u.getPartsNeedingFixing().size() > 0 && !u.isDeployed()) {
 				service.add(u);
 			}
 		}
@@ -688,105 +626,6 @@ public class Campaign implements Serializable {
 		return techs;
 	}
 
-	public ArrayList<WorkItem> getTasksForUnit(int unitId) {
-		Unit unit = getUnit(unitId);
-		ArrayList<WorkItem> newTasks = new ArrayList<WorkItem>();
-		if (null == unit) {
-			return newTasks;
-		}
-		int repairSystem = getCampaignOptions().getRepairSystem();
-		for (WorkItem task : getTasks()) {
-			if (task instanceof UnitWorkItem
-					&& ((UnitWorkItem) task).getUnitId() == unitId) {
-				if (task instanceof SalvageItem) {
-					if (unit.isSalvage() || unit.isCustomized())
-						newTasks.add(task);
-				} else if (task instanceof Refit
-						|| task instanceof Customization) {
-					if (unit.isCustomized())
-						newTasks.add(task);
-				} else if (task instanceof RepairItem
-						|| task instanceof ReplacementItem) {
-					if ((repairSystem == CampaignOptions.REPAIR_SYSTEM_STRATOPS || repairSystem == CampaignOptions.REPAIR_SYSTEM_GENERIC_PARTS)
-							&& !unit.isSalvage() && !unit.isCustomized())
-						newTasks.add(task);
-				} else if (task instanceof ReloadItem) {
-					if ((repairSystem == CampaignOptions.REPAIR_SYSTEM_STRATOPS || repairSystem == CampaignOptions.REPAIR_SYSTEM_GENERIC_PARTS)
-							&& !unit.isSalvage() && !unit.isCustomized()) {
-						newTasks.add(task);
-					} else if (repairSystem == CampaignOptions.REPAIR_SYSTEM_WARCHEST_CUSTOM
-							&& !unit.isSalvage() && !unit.isCustomized()) {
-						newTasks.add(task);
-					}
-				} else if (task instanceof FullRepairWarchest) {
-					if (repairSystem == CampaignOptions.REPAIR_SYSTEM_WARCHEST_CUSTOM
-							&& !unit.isSalvage() && !unit.isCustomized())
-						newTasks.add(task);
-				}
-			}
-		}
-		return newTasks;
-	}
-
-	public ArrayList<WorkItem> getSalvageTasksForUnit(int unitId) {
-		Unit unit = getUnit(unitId);
-		ArrayList<WorkItem> newTasks = new ArrayList<WorkItem>();
-		if (null == unit) {
-			return newTasks;
-		}
-		for (WorkItem task : getTasks()) {
-			if (task instanceof UnitWorkItem
-					&& ((UnitWorkItem) task).getUnitId() == unitId
-					&& task instanceof SalvageItem) {
-				newTasks.add(task);
-			}
-		}
-		return newTasks;
-	}
-
-	public ArrayList<WorkItem> getAllTasksForUnit(int unitId) {
-		ArrayList<WorkItem> newTasks = new ArrayList<WorkItem>();
-		for (WorkItem task : getTasks()) {
-			if (task instanceof UnitWorkItem
-					&& ((UnitWorkItem) task).getUnitId() == unitId) {
-				newTasks.add(task);
-			}
-		}
-		return newTasks;
-	}
-
-	public int countTasksFor(int unitId) {
-		int total = 0;
-		for (WorkItem task : getTasksForUnit(unitId)) {
-			if (task.isNeeded()) {
-				total++;
-			}
-		}
-		return total;
-	}
-	
-	public int getTotalTasksFor(int unitId) {
-		ArrayList<WorkItem> unitTasks = getTasksForUnit(unitId);
-		int n = 0;
-		for (WorkItem task : unitTasks) {
-			if(task.isNeeded()) {
-				n++;
-			}
-		}
-		return n;
-	}
-	
-	public int getTotalPartsFor(int unitId) {
-		ArrayList<WorkItem> unitTasks = getTasksForUnit(unitId);
-		int n = 0;
-		for (WorkItem task : unitTasks) {
-			if(task instanceof ReplacementItem && !((ReplacementItem)task).hasPart()) {
-				n++;
-			}
-		}
-		return n;
-	}
-
 	/**
 	 * return an html report on this unit. This will go in MekInfo
 	 * 
@@ -801,16 +640,9 @@ public class Campaign implements Serializable {
 		}
 		toReturn += ">";
 		toReturn += unit.getDescHTML();
-		ArrayList<WorkItem> unitTasks = getTasksForUnit(unitId);
 		int totalMin = 0;
 		int total = 0;
 		int cost = unit.getRepairCost();
-		for (WorkItem task : unitTasks) {
-			if (task.isNeeded()) {
-				total++;
-				totalMin += task.getTimeLeft();
-			}
-		}
 
 		if (total > 0) {
 			toReturn += "Total tasks: " + total + " (" + totalMin
@@ -829,79 +661,42 @@ public class Campaign implements Serializable {
 	}
 
 	/**
-	 * Transform one task into another
-	 * 
-	 * @param oldTask
-	 *            The <code>WorkItem</code> to be transformed
-	 * @param newTask
-	 *            The new <code>WorkItem</code> to be transformed into
-	 */
-	public void mutateTask(WorkItem oldTask, WorkItem newTask) {
-		newTask.setId(oldTask.getId());
-		taskIds.put(oldTask.getId(), newTask);
-		if (newTask instanceof ReplacementItem) {
-			assignPart(newTask);
-		}
-		int index = -1;
-		for (WorkItem task : getTasks()) {
-			index++;
-			if (oldTask.getId() == task.getId()) {
-				break;
-			}
-		}
-		getTasks().remove(index);
-		getTasks().add(index, newTask);
-	}
-
-	public void getPartFor(WorkItem task, SupportTeam team) {
-		addReport(team.acquirePartFor(task));
-	}
-	
-	public boolean processTask(WorkItem task, SupportTeam team) {
-		addReport(team.doAssigned(task));
-		if (task.isCompleted()) {
-			removeTask(task);
-			return true;
-		}
-		return false;
-	}
-
-	/**
 	 * loop through all replacement items and assign the best available part if
 	 * possible The same part may be assigned to multiple tasks, so rerun this
 	 * method after each task is processed
 	 */
 	public void assignParts() {
-		for (WorkItem task : getTasks()) {
-			assignPart(task);
-		}
-	}
-
-	public void assignPart(WorkItem task) {
-		if (task instanceof ReplacementItem) {
-			ReplacementItem replacement = (ReplacementItem) task;
-			replacement.setPart(null);
-			for (Part part : getParts()) {
-				if (part.canBeUsedBy(replacement)) {
-					replacement.setPart(part);
-					break;
-				}
-			}
-		}
+		
 	}
 	
-	public String healPerson(Person p, MedicalTeam t) {
+	public String healPerson(IMedicalWork medWork, MedicalTeam t) {
 		String report = "";
-		report += t.getName() + " attempts to heal " + p.getName();   
-		TargetRoll target = t.getTargetFor(p);
+		report += t.getName() + " attempts to heal " + medWork.getPatientName();   
+		TargetRoll target = t.getTargetFor(medWork);
 		int roll = Compute.d6(2);
 		report = report + ",  needs " + target.getValueAsString() + " and rolls " + roll + ":";
 		if(roll >= target.getValue()) {
-			report = report + p.succeed();	
+			report = report + medWork.succeed();	
 		} else {
-			report = report + p.fail(t.getRating());
+			report = report + medWork.fail(t.getRating());
 		}
 		return report;
+	}
+	
+	public void fixPart(IPartWork partWork, TechTeam t) {
+		String report = "";
+		report += t.getName() + " attempts to fix " + partWork.getPartName();   
+		TargetRoll target = t.getTargetFor(partWork);
+		int roll = Compute.d6(2);
+		report = report + ",  needs " + target.getValueAsString() + " and rolls " + roll + ":";
+		if(roll >= target.getValue()) {
+			report = report + partWork.succeed();	
+		} else {
+			report = report + partWork.fail(t.getRating());
+		}
+		//use up time
+		t.setMinutesLeft(t.getMinutesLeft() - partWork.getActualTime());
+		addReport(report);
 	}
 
 	public void newDay() {
@@ -910,18 +705,6 @@ public class Campaign implements Serializable {
 
 		for (SupportTeam team : getTeams()) {
 			team.resetMinutesLeft();
-		}
-		ArrayList<WorkItem> assigned = new ArrayList<WorkItem>();
-		for (WorkItem task : getTasks()) {
-			if (task instanceof ReplacementItem) {
-				((ReplacementItem) task).setPartCheck(false);
-			}
-			if (task.isAssigned()) {
-				assigned.add(task);
-			}
-		}
-		for (WorkItem task : assigned) {
-			processTask(task, task.getTeam());
 		}
 		for (Person p : getPersonnel()) {
 			if(p.needsFixing()) {
@@ -987,39 +770,15 @@ public class Campaign implements Serializable {
 		this.units = new ArrayList<Unit>();
 		this.unitIds = new Hashtable<Integer, Unit>();
 		this.lastUnitId = 0;
-		// also clear tasks, because you can't have tasks without entities
-		this.tasks = new ArrayList<WorkItem>();
-		this.taskIds = new Hashtable<Integer, WorkItem>();
-		this.lastTaskId = 0;
+		//TODO: clear parts associated with unit
 
-	}
-
-	public void removeAllTasksFor(Unit unit) {
-		ArrayList<WorkItem> tasksToRemove = new ArrayList<WorkItem>();
-		for (WorkItem task : getAllTasksForUnit(unit.getId())) {
-			tasksToRemove.add(task);
-		}
-		for (WorkItem task : tasksToRemove) {
-			removeTask(task);
-		}
-	}
-
-	public void removeAllUnitWorkItems() {
-		ArrayList<WorkItem> tasksToRemove = new ArrayList<WorkItem>();
-		for (WorkItem task : getTasks()) {
-			if (task instanceof UnitWorkItem)
-				tasksToRemove.add(task);
-		}
-		for (WorkItem task : tasksToRemove) {
-			removeTask(task);
-		}
 	}
 
 	public void removeUnit(int id) {
 		Unit unit = getUnit(id);
 		// remove any tasks associated with this unit
 
-		removeAllTasksFor(unit);
+		//TODO: remove all parts for this unit as well
 
 		// remove the pilot from this unit
 		unit.removePilot();
@@ -1051,12 +810,6 @@ public class Campaign implements Serializable {
 	public void removeTeam(int id) {
 		SupportTeam team = getTeam(id);
 
-		for (WorkItem task : getTasks()) {
-			if (task.isAssigned() && task.getTeam().getId() == id) {
-				task.setTeam(null);
-			}
-		}
-
 		teams.remove(team);
 		teamIds.remove(new Integer(id));
 	}
@@ -1077,11 +830,6 @@ public class Campaign implements Serializable {
 		assignParts();
 	}
 
-	public void removeTask(WorkItem task) {
-		tasks.remove(task);
-		taskIds.remove(new Integer(task.getId()));
-	}
-	
 	public void removeForce(Force force) {
 		int fid = force.getId();
 		forceIds.remove(new Integer(fid));
@@ -1116,23 +864,6 @@ public class Campaign implements Serializable {
 	public Force getForceFor(Person p) {
 		return getForce(p.getForceId());
 	}
-	
-	/**
-	 * return a string (HTML formatted) of tasks for this unit
-	 * 
-	 * @param unit
-	 * @return
-	 */
-	public String getTaskListFor(Unit unit) {
-		String toReturn = "";
-		for (WorkItem task : getTasksForUnit(unit.getId())) {
-			toReturn += task.getDesc() + "<br/>";
-		}
-		if(toReturn.equals("")) {
-			return null;
-		}
-		return "<html>" + toReturn + "</html>";
-	}
 
 	/**
 	 * return a string (HTML formatted) of tasks for this doctor
@@ -1142,11 +873,6 @@ public class Campaign implements Serializable {
 	 */
 	public String getToolTipFor(MedicalTeam doctor) {
 		String toReturn = "<html><b>Tasks:</b><br/>";
-		for (WorkItem task : getTasks()) {
-			if (task.isAssigned() && task.getTeam().getId() == doctor.getId()) {
-				toReturn += task.getDesc() + "<br/>";
-			}
-		}
 		toReturn += "</html>";
 		return toReturn;
 	}
@@ -1192,19 +918,6 @@ public class Campaign implements Serializable {
 			pilot.getAssignedUnit().removePilot();
 		}
 		unit.setPilot(pilot);
-	}
-
-	public ReloadItem getReloadWorkFor(Mounted m, Unit unit) {
-		for (WorkItem task : getTasks()) {
-			if (task instanceof ReloadItem) {
-				ReloadItem reload = (ReloadItem) task;
-				if (unit.getEntity().getEquipmentNum(m) == unit.getEntity()
-						.getEquipmentNum(reload.getMounted())) {
-					return reload;
-				}
-			}
-		}
-		return null;
 	}
 
 	public void restore() {
@@ -1379,13 +1092,6 @@ public class Campaign implements Serializable {
 		addPart(part);
 	}
 
-	public void refreshAllUnitDiagnostics() {
-		removeAllUnitWorkItems();
-		for (Unit unit : getUnits()) {
-			unit.runDiagnostic();
-		}
-	}
-
 	public static Entity getBrandNewUndamagedEntity(String entityShortName) {
 		MechSummary mechSummary = MechSummaryCache.getInstance().getMech(
 				entityShortName);
@@ -1432,7 +1138,6 @@ public class Campaign implements Serializable {
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "colorIndex", colorIndex);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "lastTeamId", lastTeamId);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "lastUnitId", lastUnitId);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "lastTaskId", lastTaskId);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "lastPersonId", lastPersonId);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "lastPartId", lastPartId);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "lastForceId", lastForceId);
@@ -1472,7 +1177,6 @@ public class Campaign implements Serializable {
 		// Lists of objects:
 		writeArrayAndHashToXml(pw1, 1, "teams", teams, teamIds); // Teams
 		writeArrayAndHashToXml(pw1, 1, "units", units, unitIds); // Units
-		writeArrayAndHashToXml(pw1, 1, "tasks", tasks, taskIds); // Tasks
 		writeArrayAndHashToXml(pw1, 1, "personnel", personnel, personnelIds); // Personnel
 		writeArrayAndHashToXml(pw1, 1, "parts", parts, partIds); // Parts
 		writeArrayAndHashToXml(pw1, 1, "missions", missions, missionIds); // Parts
@@ -1591,8 +1295,6 @@ public class Campaign implements Serializable {
 					processPartNodes(retVal, wn);
 				} else if (xn.equalsIgnoreCase("personnel")) {
 					processPersonnelNodes(retVal, wn);
-				} else if (xn.equalsIgnoreCase("tasks")) {
-					processTaskNodes(retVal, wn);
 				} else if (xn.equalsIgnoreCase("teams")) {
 					processTeamNodes(retVal, wn);
 				} else if (xn.equalsIgnoreCase("units")) {
@@ -1655,9 +1357,6 @@ public class Campaign implements Serializable {
 		for (int x=0; x<retVal.parts.size(); x++) {
 			Part prt = retVal.parts.get(x);
 			
-			// Okay, last trigger a reCalc.
-			// This should fix some holes in the data.
-			prt.reCalc();
 		}
 		
 		// Some personnel need their task references fixed.
@@ -1688,74 +1387,6 @@ public class Campaign implements Serializable {
 			// Okay, last trigger a reCalc.
 			// This should fix some holes in the data.
 			psn.reCalc();
-		}
-		
-		// Okay, work items.
-		// ReplacementItem needs to have references to Part fixed.
-		for (int x=0; x<retVal.tasks.size(); x++) {
-			WorkItem wrk = retVal.tasks.get(x);
-			int supportTeamId = wrk.getSupportTeamId();
-			
-			if (supportTeamId >= 0)
-				wrk.setSupportTeam(retVal.teamIds.get(supportTeamId));
-		
-			if (wrk instanceof UnitWorkItem) {
-				int unitId = ((UnitWorkItem)wrk).getUnitStoredId();
-				
-				if (unitId >= 0) {
-					((UnitWorkItem)wrk).setUnit(retVal.unitIds.get(unitId));
-				}
-
-				// If it's a replacement part, then it references a Part.
-				// The part was stored as an ID.
-				// Grab the part reference based on the ID.
-				if (wrk instanceof ReplacementItem) {
-					int partId = ((ReplacementItem) wrk).getPartId();
-					
-					if (partId >= 0)
-						((ReplacementItem) wrk).setPart(retVal.partIds.get(partId));
-				}
-				
-				// If it's one of several types, then the Mounted was stored as an Equipment ID.
-				// We know, since it's a UnitWorkItem, that the unit was just defined above...
-				// So we go to the unit...  Grab the entity...  And then pull the Mounted off of that.
-				if (wrk instanceof EquipmentRepair) {
-					int equipId = ((EquipmentRepair) wrk).getEquipmentNum();
-					
-					if (equipId >= 0)
-						((EquipmentRepair) wrk).setMounted(((UnitWorkItem)wrk).getUnit().getEntity().getEquipment(equipId));
-				}
-
-				if (wrk instanceof EquipmentReplacement) {
-					int equipId = ((EquipmentReplacement) wrk).getEquipmentNum();
-					
-					if (equipId >= 0)
-						((EquipmentReplacement) wrk).setMounted(((UnitWorkItem)wrk).getUnit().getEntity().getEquipment(equipId));
-				}
-
-				if (wrk instanceof ReloadItem) {
-					int equipId = ((ReloadItem) wrk).getEquipmentNum();
-					
-					if (equipId >= 0) {
-						UnitWorkItem uwi = (UnitWorkItem)wrk;
-						Unit un = uwi.getUnit();
-						Entity en = un.getEntity();
-						Mounted eq = en.getEquipment(equipId);
-						((ReloadItem) wrk).setMounted(eq);
-					}
-				}
-
-				if (wrk instanceof EquipmentSalvage) {
-					int equipId = ((EquipmentSalvage) wrk).getEquipmentNum();
-					
-					if (equipId >= 0)
-						((EquipmentSalvage) wrk).setMounted(((UnitWorkItem)wrk).getUnit().getEntity().getEquipment(equipId));
-				}
-			}
-			
-			// Okay, last trigger a reCalc.
-			// This should fix some holes in the data.
-			wrk.reCalc();
 		}
 
 		MekHQApp.logMessage("Load of campaign file complete!");
@@ -1870,37 +1501,6 @@ public class Campaign implements Serializable {
 		}
 
 		MekHQApp.logMessage("Load Mission Nodes Complete!", 4);
-	}
-
-	private static void processTaskNodes(Campaign retVal, Node wn) {
-		MekHQApp.logMessage("Loading Task Nodes from XML...", 4);
-
-		NodeList wList = wn.getChildNodes();
-		
-		// Okay, lets iterate through the children, eh?
-		for (int x = 0; x < wList.getLength(); x++) {
-			Node wn2 = wList.item(x);
-
-			// If it's not an element node, we ignore it.
-			if (wn2.getNodeType() != Node.ELEMENT_NODE)
-				continue;
-			
-			if (!wn2.getNodeName().equalsIgnoreCase("workItem")) {
-				// Error condition of sorts!
-				// Errr, what should we do here?
-				MekHQApp.logMessage("Unknown node type not loaded in Task nodes: "+wn2.getNodeName());
-
-				continue;
-			}
-
-			WorkItem w = WorkItem.generateInstanceFromXML(wn2);
-			
-			if (w != null) {
-				retVal.addWorkWithoutId(w);
-			}
-		}
-
-		MekHQApp.logMessage("Load Task Nodes Complete!", 4);
 	}
 
 	private static void processTeamNodes(Campaign retVal, Node wn) {
@@ -2097,9 +1697,6 @@ public class Campaign implements Serializable {
 				} else if (xn.equalsIgnoreCase("lastPersonId")) {
 					retVal.lastPersonId = Integer.parseInt(wn.getTextContent()
 							.trim());
-				} else if (xn.equalsIgnoreCase("lastTaskId")) {
-					retVal.lastTaskId = Integer.parseInt(wn.getTextContent()
-							.trim());
 				} else if (xn.equalsIgnoreCase("lastTeamId")) {
 					retVal.lastTeamId = Integer.parseInt(wn.getTextContent()
 							.trim());
@@ -2173,16 +1770,6 @@ public class Campaign implements Serializable {
 		}	
 		MekHQApp.logMessage("Loaded a total of " + retVal.size() + " planets");
 		return retVal;
-	}
-
-	public ArrayList<WorkItem> getAcquisitionsForUnit(int unitId) {
-		ArrayList<WorkItem> acquire = new ArrayList<WorkItem>();
-		for(WorkItem task : getTasksForUnit(unitId)) {
-			if(task instanceof ReplacementItem && !((ReplacementItem)task).hasPart()) {
-				acquire.add(task);
-			}
-		}
-		return acquire;
 	}
 	
 	public ArrayList<Planet> getPlanets() {
@@ -2285,6 +1872,14 @@ public class Campaign implements Serializable {
 	
 	public Finances getFinances() {
 		return finances;
+	}
+	
+	public ArrayList<Part> getPartsNeedingServiceFor(int uid) {
+		Unit u = getUnit(uid);
+		if(u != null) {
+			return u.getPartsNeedingFixing();
+		}
+		return new ArrayList<Part>();
 	}
 	
 }

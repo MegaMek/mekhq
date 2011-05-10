@@ -31,6 +31,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.GenericSparePart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.work.FullRepairWarchest;
+import mekhq.campaign.work.IMedicalWork;
 import mekhq.campaign.work.ReloadItem;
 import mekhq.campaign.work.ReplacementItem;
 import mekhq.campaign.work.UnitWorkItem;
@@ -113,22 +114,18 @@ public class MedicalTeam extends SupportTeam {
         return toReturn;
    }
     
-    public TargetRoll getTargetFor(Person person) {
-        if(person.getTeamId() != getId() ) {
-            return new TargetRoll(TargetRoll.IMPOSSIBLE, person.getName() + " is already being tended by another doctor");
-        }
-        if(person.isDeployed()) {
-            return new TargetRoll(TargetRoll.IMPOSSIBLE, person.getName() + " is currently deployed!");
+    public TargetRoll getTargetFor(IMedicalWork medWork) {
+        if(medWork.getTeamId() != getId() ) {
+            return new TargetRoll(TargetRoll.IMPOSSIBLE, medWork.getPatientName() + " is already being tended by another doctor");
         }      
-        if(!person.needsFixing()) {
-            return new TargetRoll(TargetRoll.IMPOSSIBLE, person.getName() + " does not require healing.");
+        if(!medWork.needsFixing()) {
+            return new TargetRoll(TargetRoll.IMPOSSIBLE, medWork.getPatientName() + " does not require healing.");
         }
-        TargetRoll target = getTarget(person.getMode());
+        TargetRoll target = getTarget(medWork.getMode());
         if(target.getValue() == TargetRoll.IMPOSSIBLE) {
             return target;
         }
-
-        target.append(person.getAllMods());
+        target.append(medWork.getAllMods());
         return target;
     }
 

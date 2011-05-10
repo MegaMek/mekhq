@@ -43,13 +43,7 @@ public class Turret extends Part {
 	
 	public Turret(boolean salvage, int tonnage) {
         super(salvage, tonnage);
-        reCalc();
     }
-	
-	@Override
-	public void reCalc() {
-        this.name = "Vehicle Turret" + " (" + getTonnage() + ")";
-	}
     
     @Override
     public boolean canBeUsedBy(ReplacementItem task) {
@@ -85,5 +79,35 @@ public class Turret extends Part {
 	@Override
 	public int getTechRating() {
 		return EquipmentType.RATING_B;
+	}
+
+	@Override
+	public void fix() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Part getReplacementPart() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void remove(boolean salvage) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void updateCondition() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean needsFixing() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }

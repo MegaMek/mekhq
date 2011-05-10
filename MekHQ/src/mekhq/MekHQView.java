@@ -225,12 +225,11 @@ public class MekHQView extends FrameView {
 	private TableRowSorter<PersonnelTableModel> personnelSorter;
 	private TableRowSorter<UnitTableModel> unitSorter;
 	private int currentServicedUnitId;
-	private int currentTaskId;
 	private int currentAcquisitionId;
 	private int currentTechId;
 	private int currentPatientId;
 	private int currentDoctorId;
-	private int currentPartsId;
+	private int currentServiceablePartsId;
 	private int[] selectedTasksIds;
 	
 	private int selectedMission = -1;
@@ -1719,16 +1718,16 @@ public class MekHQView extends FrameView {
 		// assign the task to the team here
 		//for (int i = 0; i < selectedTasksIds.length; i++) {
 		//	WorkItem task = campaign.getTask(selectedTasksIds[i]);
-		WorkItem task = campaign.getTask(getSelectedTaskId());
+		Part part = campaign.getPart(currentServiceablePartsId);
 		SupportTeam team = campaign.getTeam(currentTechId);		
 	
-		if ((null != task)
-				&& (null != team)) {
-			if(acquireSelected()) {
-				campaign.getPartFor(task, team);
-			} else if(repairsSelected() && (team.getTargetFor(task).getValue() != TargetRoll.IMPOSSIBLE)) {
-				campaign.processTask(task, team);
-			}
+		if ((null != part)
+				&& (null != team) && team instanceof TechTeam) {
+			//if(acquireSelected()) {
+				//campaign.getPartFor(task, team);
+			//} else if(repairsSelected() && (team.getTargetFor(task).getValue() != TargetRoll.IMPOSSIBLE)) {
+				campaign.fixPart(part, (TechTeam)team);
+			//}
 		}
 		//}
 		
@@ -1761,11 +1760,11 @@ public class MekHQView extends FrameView {
 		int selected = TaskTable.getSelectedRow();
 		
 		if ((selected > -1)
-				&& (selected < campaign.getTasksForUnit(currentServicedUnitId).size())) {
-			currentTaskId = campaign.getTasksForUnit(currentServicedUnitId)
+				&& (selected < campaign.getPartsNeedingServiceFor(currentServicedUnitId).size())) {
+			currentServiceablePartsId = campaign.getPartsNeedingServiceFor(currentServicedUnitId)
 					.get(selected).getId();
 		} else {
-			currentTaskId = -1;
+			currentServiceablePartsId = -1;
 		}
 
 		selectedTasksIds = new int[TaskTable.getSelectedRowCount()];
@@ -1774,8 +1773,8 @@ public class MekHQView extends FrameView {
 			int sel = TaskTable.getSelectedRows()[i];
 			
 			if ((sel > -1)
-					&& (sel < campaign.getTasksForUnit(currentServicedUnitId).size())) {
-				selectedTasksIds[i] = campaign.getTasksForUnit(currentServicedUnitId)
+					&& (sel < campaign.getPartsNeedingServiceFor(currentServicedUnitId).size())) {
+				selectedTasksIds[i] = campaign.getPartsNeedingServiceFor(currentServicedUnitId)
 						.get(sel).getId();
 			} else {
 				selectedTasksIds[i] = -1;
@@ -1789,13 +1788,13 @@ public class MekHQView extends FrameView {
 	private void AcquisitionTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
 		int selected = AcquisitionTable.getSelectedRow();
 		
-		if ((selected > -1)
-				&& (selected < campaign.getAcquisitionsForUnit(currentServicedUnitId).size())) {
-			currentAcquisitionId = campaign.getAcquisitionsForUnit(currentServicedUnitId)
-					.get(selected).getId();
-		} else {
+	//	if ((selected > -1)
+		//		&& (selected < campaign.getAcquisitionsForUnit(currentServicedUnitId).size())) {
+//			currentAcquisitionId = campaign.getAcquisitionsForUnit(currentServicedUnitId)
+	//				.get(selected).getId();
+	//	} else {
 			currentAcquisitionId = -1;
-		}
+	//	}
 
 		updateAssignEnabled();
 		updateTargetText();
@@ -1848,9 +1847,9 @@ public class MekHQView extends FrameView {
 		int selected = partsTable.getSelectedRow();
 		
 		if ((selected > -1) && (selected < campaign.getParts().size())) {
-			currentPartsId = campaign.getParts().get(selected).getId();
+		//	currentPartsId = campaign.getParts().get(selected).getId();
 		} else if (selected < 0) {
-			currentPartsId = -1;
+			//currentPartsId = -1;
 		}
 	}
 
@@ -2313,78 +2312,6 @@ public class MekHQView extends FrameView {
 		refreshFinancialTransactions();
 	}// GEN-LAST:event_addFundsActionPerformed
 
-	private void btnSavePartsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnSavePartsActionPerformed
-		Iterator<Part> itParts = campaign.getParts().iterator();
-		StringBuffer stringBuffer = new StringBuffer();
-		String newLine = System.getProperty("line.separator");
-		
-		while (itParts.hasNext()) {
-			Part part = itParts.next();
-			stringBuffer.append(part.getSaveString() + newLine);
-		}
-		
-		JFileChooser jFileChooser = new JFileChooser(new File(
-				System.getProperty("user.dir")));
-		jFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-		jFileChooser.setApproveButtonText("Save file");
-		int retVal = jFileChooser.showSaveDialog(null);
-		
-		if (retVal == JFileChooser.APPROVE_OPTION) {
-			File selectedFile = jFileChooser.getSelectedFile();
-			
-			try {
-				FileWriter fileWriter = new FileWriter(selectedFile);
-				BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-				bufferedWriter.write(stringBuffer.toString());
-				bufferedWriter.close();
-			} catch (IOException ex) {
-				Logger.getLogger(MekHQView.class.getName()).log(
-						Level.SEVERE,
-						"Could not write to file "
-								+ selectedFile.getAbsolutePath(), ex);
-				AlertPopup alertPopup = new AlertPopup(null, true,
-						"Could not write to file "
-								+ selectedFile.getAbsolutePath());
-				alertPopup.setVisible(true);
-			}
-		}
-	}// GEN-LAST:event_btnSavePartsActionPerformed
-
-	private void btnLoadPartsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnLoadPartsActionPerformed
-		JFileChooser jFileChooser = new JFileChooser(new File(
-				System.getProperty("user.dir")));
-		jFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-		jFileChooser.setApproveButtonText("Load file");
-		int retVal = jFileChooser.showOpenDialog(null);
-		
-		if (retVal == JFileChooser.APPROVE_OPTION) {
-			File selectedFile = jFileChooser.getSelectedFile();
-			
-			try {
-				FileReader fileReader = new FileReader(selectedFile);
-				BufferedReader bufferedReader = new BufferedReader(fileReader);
-				String line = null;
-				
-				while ((line = bufferedReader.readLine()) != null) {
-					Part part = Part.getPartByName(line);
-					
-					if (part != null) {
-						campaign.addPart(part);
-					}
-				}
-				refreshPartsList();
-			} catch (IOException ex) {
-				Logger.getLogger(MekHQView.class.getName())
-						.log(Level.SEVERE,
-								"Could not read file "
-										+ selectedFile.getAbsolutePath(), ex);
-				AlertPopup alertPopup = new AlertPopup(null, true,
-						"Could not read file " + selectedFile.getAbsolutePath());
-				alertPopup.setVisible(true);
-			}
-		}
-	}// GEN-LAST:event_btnLoadPartsActionPerformed
-
 	protected void loadListFile(boolean allowNewPilots) throws IOException {
 		JFileChooser loadList = new JFileChooser(".");
 		loadList.setDialogTitle("Load Units");
@@ -2640,11 +2567,11 @@ public class MekHQView extends FrameView {
 	}
 
 	protected void refreshTaskList() {
-		taskModel.setData(campaign.getTasksForUnit(currentServicedUnitId));
+		taskModel.setData(campaign.getPartsNeedingServiceFor(currentServicedUnitId));
 	}
 	
 	protected void refreshAcquireList() {
-		acquireModel.setData(campaign.getAcquisitionsForUnit(currentServicedUnitId));
+		//acquireModel.setData(campaign.getAcquisitionsForUnit(currentServicedUnitId));
 	}
 	
 	protected void refreshMissions() {
@@ -2760,14 +2687,14 @@ public class MekHQView extends FrameView {
 
 	protected void updateAssignEnabled() {
 		// must have a valid team and an unassigned task
-		WorkItem curTask = campaign.getTask(getSelectedTaskId());
+		Part part = campaign.getPart(currentServiceablePartsId);
 		SupportTeam team = campaign.getTeam(currentTechId);
-		if ((null != curTask)
-				&& (null != team)) {
+		if ((null != part)
+				&& (null != team) && team instanceof TechTeam) {
 			if(repairsSelected()) {
-				btnDoTask.setEnabled(team.getTargetFor(curTask).getValue() != TargetRoll.IMPOSSIBLE);
-			} else if(acquireSelected()) {
-				btnDoTask.setEnabled(team.getTargetForAcquisition(curTask).getValue() != TargetRoll.IMPOSSIBLE);
+				btnDoTask.setEnabled(((TechTeam)team).getTargetFor(part).getValue() != TargetRoll.IMPOSSIBLE);
+			//} else if(acquireSelected()) {
+				//btnDoTask.setEnabled(team.getTargetForAcquisition(curTask).getValue() != TargetRoll.IMPOSSIBLE);
 			} else {
 				btnDoTask.setEnabled(false);
 			}
@@ -2789,12 +2716,12 @@ public class MekHQView extends FrameView {
 
 	protected void updateTargetText() {
 		// must have a valid team and an unassigned task
-		WorkItem task = campaign.getTask(getSelectedTaskId());
+		Part part = campaign.getPart(currentServiceablePartsId);
 		SupportTeam team = campaign.getTeam(currentTechId);
-		if ((null != task) && (null != team)) {
-			TargetRoll target = team.getTargetFor(task);
+		if ((null != part) && (null != team) && team instanceof TechTeam) {
+			TargetRoll target = ((TechTeam)team).getTargetFor(part);
 			if(acquireSelected()) {
-				target = team.getTargetForAcquisition(task);
+				//target = team.getTargetForAcquisition(task);
 			}
 			textTarget.setText(target.getDesc());
 			lblTargetNum.setText(target.getValueAsString());
@@ -2993,6 +2920,7 @@ public class MekHQView extends FrameView {
 		}
 	}
 	
+	/*
 	protected int getSelectedTaskId() {
 		if(repairsSelected()) {
 			return currentTaskId;
@@ -3002,6 +2930,7 @@ public class MekHQView extends FrameView {
 			return -1;
 		}
 	}
+	*/
 	
 	protected boolean repairsSelected() {
 		return tabTasks.getSelectedIndex() == 0;
@@ -3058,22 +2987,22 @@ public class MekHQView extends FrameView {
 
 		public TaskTableModel() {
 			columnNames = new String[] { "Tasks" };
-			data = new ArrayList<WorkItem>();
+			data = new ArrayList<Part>();
 		}
 
 		public Object getValueAt(int row, int col) {
-			return ((WorkItem) data.get(row)).getDescHTML();
+			return ((Part) data.get(row)).getDesc();
 		}
 
-		public WorkItem getTaskAt(int row) {
-			return (WorkItem) data.get(row);
+		public Part getTaskAt(int row) {
+			return (Part) data.get(row);
 		}
 
-		public WorkItem[] getTasksAt(int[] rows) {
-			WorkItem[] tasks = new WorkItem[rows.length];
+		public Part[] getTasksAt(int[] rows) {
+			Part[] tasks = new Part[rows.length];
 			for (int i = 0; i < rows.length; i++) {
 				int row = rows[i];
-				tasks[i] = (WorkItem) data.get(row);
+				tasks[i] = (Part) data.get(row);
 			}
 			return tasks;
 		}
@@ -3089,29 +3018,16 @@ public class MekHQView extends FrameView {
 					Object value, boolean isSelected, boolean hasFocus,
 					int row, int column) {
 				Component c = this;
-				WorkItem task = getTaskAt(row);
+				Part task = getTaskAt(row);
 				setOpaque(true);
-				setText(getValueAt(row, column).toString());
-				setToolTipText(task.getToolTip());
+				setText("<html>" + getValueAt(row, column).toString() + "</html>");
+				//setToolTipText(task.getToolTip());
 				if (isSelected) {
 					select();
 				} else {
 					unselect();
 				}
 
-				if ((null != task) && (task instanceof ReplacementItem)
-						&& !((ReplacementItem) task).hasPart()) {
-					c.setBackground(Color.GRAY);
-				} else if ((task != null)
-						&& (task instanceof ReplacementItem)
-						&& ((ReplacementItem) task).hasPart()
-						&& (((ReplacementItem) task).partNeeded() instanceof GenericSparePart)
-						&& (!((ReplacementItem) task)
-								.hasEnoughGenericSpareParts())) {
-					c.setBackground(Color.GRAY);
-				} else {
-					c.setBackground(new Color(220, 220, 220));
-				}
 				return c;
 			}
 
@@ -3122,9 +3038,9 @@ public class MekHQView extends FrameView {
 			ActionListener {
 
 		public void actionPerformed(ActionEvent action) {
+			/*
 			String command = action.getActionCommand();
-			WorkItem[] tasks = taskModel
-					.getTasksAt(TaskTable.getSelectedRows());
+			Part[] tasks = taskModel.getTasksAt(TaskTable.getSelectedRows());
 			if (command.equalsIgnoreCase("REPLACE")) {
 				for (WorkItem task : tasks) {
 					if (task instanceof RepairItem) {
@@ -3206,6 +3122,7 @@ public class MekHQView extends FrameView {
 					refreshPartsList();
 				}
 			}
+			*/
 		}
 
 		@Override
@@ -3219,6 +3136,7 @@ public class MekHQView extends FrameView {
 		}
 
 		private void maybeShowPopup(MouseEvent e) {
+			/*
 			JPopupMenu popup = new JPopupMenu();
 			if (e.isPopupTrigger()) {
 				int row = TaskTable.rowAtPoint(e.getPoint());
@@ -3226,7 +3144,6 @@ public class MekHQView extends FrameView {
 				JMenuItem menuItem = null;
 				JMenu menu = null;
 				JCheckBoxMenuItem cbMenuItem = null;
-				// **lets fill the pop up menu**//
 				if ((task instanceof RepairItem)
 						|| (task instanceof ReplacementItem)
 						|| (task instanceof SalvageItem)) {
@@ -3296,7 +3213,8 @@ public class MekHQView extends FrameView {
 				menu.add(menuItem);
 				popup.show(e.getComponent(), e.getX(), e.getY());
 			}
-		}
+			*/
+		}	
 	}
 	
 
@@ -3405,7 +3323,7 @@ public class MekHQView extends FrameView {
 				setOpaque(true);
 				setUnit(u);
 				setText(getValueAt(row, column).toString());
-				setToolTipText(campaign.getTaskListFor(u));
+				//setToolTipText(campaign.getTaskListFor(u));
 				if (isSelected) {
 					select();
 				} else {
@@ -3427,6 +3345,7 @@ public class MekHQView extends FrameView {
 			Unit selectedUnit = servicedUnitModel.getUnitAt(servicedUnitTable.getSelectedRow());
 			Unit[] units = servicedUnitModel.getUnitsAt(servicedUnitTable.getSelectedRows());
 			if (command.contains("ASSIGN_TECH")) {
+				/*
 				String sel = command.split(":")[1];
 				int selected = Integer.parseInt(sel);
 				if ((selected > -1)
@@ -3448,7 +3367,7 @@ public class MekHQView extends FrameView {
 				refreshTechsList();
 				refreshReport();
 				refreshPartsList();
-			} else if (command.contains("SWAP_AMMO")) {
+			/*} else if (command.contains("SWAP_AMMO")) {
 				String sel = command.split(":")[1];
 				int selMount = Integer.parseInt(sel);
 				Mounted m = selectedUnit.getEntity().getEquipment(selMount);
@@ -3474,6 +3393,7 @@ public class MekHQView extends FrameView {
 				refreshAcquireList();
 				refreshServicedUnitList();
 				refreshUnitList();
+				*/
 			} else if (command.contains("CHANGE_SITE")) {
 				for (Unit unit : units) {
 					if (!unit.isDeployed()) {
@@ -6085,8 +6005,8 @@ public class MekHQView extends FrameView {
         public String getTooltip(int row, int col) {
         	Unit u = data.get(row);
         	switch(col) {
-        	case COL_REPAIR:
-        		return campaign.getTaskListFor(u);
+        	//case COL_REPAIR:
+        		//return campaign.getTaskListFor(u);
         	case COL_QUIRKS:
         		return u.getQuirksList();
             default:		
@@ -6172,10 +6092,10 @@ public class MekHQView extends FrameView {
             	}
             }
             if(col == COL_REPAIR) {
-                return campaign.getTotalTasksFor(u.getId());
+                return u.getPartsNeedingFixing().size();
             }
             if(col == COL_PARTS) {
-                return campaign.getTotalPartsFor(u.getId());
+                return "?";//campaign.getTotalPartsFor(u.getId());
             }
             if(col == COL_QUIRKS) {
             	return e.countQuirks();
@@ -6223,7 +6143,7 @@ public class MekHQView extends FrameView {
     				} else if ((null != u) && !u.isFunctional()) {
     					setBackground(new Color(205, 92, 92));
     				} else if ((null != u)
-    						&& (campaign.countTasksFor(u.getId()) > 0)) {
+    						&& (u.getPartsNeedingFixing().size() > 0)) {
     					setBackground(new Color(238, 238, 0));
                     } else {
                         setBackground(Color.WHITE);
@@ -6311,7 +6231,7 @@ public class MekHQView extends FrameView {
 				refreshPersonnelList();
 				refreshOrganization();
 				refreshReport();
-			} else if (command.contains("SWAP_AMMO")) {
+			/*} else if (command.contains("SWAP_AMMO")) {
 				String sel = command.split(":")[1];
 				int selMount = Integer.parseInt(sel);
 				Mounted m = selectedUnit.getEntity().getEquipment(selMount);
@@ -6337,6 +6257,7 @@ public class MekHQView extends FrameView {
 				refreshAcquireList();
 				refreshServicedUnitList();
 				refreshUnitList();
+				*/
 			} else if (command.contains("CHANGE_SITE")) {
 				for (Unit unit : units) {
 					if (!unit.isDeployed()) {

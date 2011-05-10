@@ -53,16 +53,6 @@ public class Armor extends Part {
         super(false, tonnage);
         this.type = t;
         this.amount = points;
-
-        reCalc();
-    }
-    
-    @Override
-    public void reCalc() {
-        this.name = EquipmentType.getArmorTypeName(type) + " Armor";
-
-        // TechBase needs to be set to calculate cost more precisely
-        this.cost = (long) Math.round(getArmorWeight(getAmount()) * EquipmentType.getArmorCost(getType()));
     }
     
     public int getType() {
@@ -75,12 +65,6 @@ public class Armor extends Part {
 
     public void setAmount(int amount) {
         this.amount = amount;
-        reCalc();
-    }
-    
-    @Override
-    public String getDesc() {
-        return super.getDesc() + " (" + getAmount() + ")";
     }
     
     @Override
@@ -118,22 +102,6 @@ public class Armor extends Part {
         return TechConstants.T_INTRO_BOXSET;
     }
 
-    @Override
-    public ArrayList<String> getPotentialSSWNames(int faction) {
-        ArrayList<String> sswNames = new ArrayList<String>();
-
-        // The tech base of the part doesn't matter (Clan and IS can use each other's Ferro-Fibrous armor)
-        // However the tech base of the faction is important : Clans get Ferro-Fibrous armor before IS
-        String techBase = (Faction.isClanFaction(faction) ? "(CL)" : "(IS)");
-
-        String sswName = getName();
-
-        sswNames.add(techBase + " " + sswName);
-        sswNames.add(sswName);
-
-        return sswNames;
-    }
-
     public double getArmorWeight(int points) {
         // from megamek.common.Entity.getArmorWeight()
         
@@ -157,11 +125,6 @@ public class Armor extends Part {
 
     public int getCost (int amount) {
         return (int) Math.round(getArmorWeight(amount) * EquipmentType.getArmorCost(getType()));
-    }
-
-    @Override
-    public String getSaveString () {
-        return getName() + ";" + getTonnage() + ";" + getType() + ";" + getAmount();
     }
 
 	@Override
@@ -278,5 +241,35 @@ public class Armor extends Part {
 		default:
 			return EquipmentType.RATING_D;	
 		}
+	}
+
+	@Override
+	public void fix() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Part getReplacementPart() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void remove(boolean salvage) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void updateCondition() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean needsFixing() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }

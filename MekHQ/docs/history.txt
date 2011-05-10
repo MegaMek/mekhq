@@ -38,6 +38,8 @@ v0.1.6 (SVN)
 + removed PersonnelWorkItem, implemented IWork and IMedicalWork interface to handle pilot healing
 + Bug 3299547: Problems w/ loading campagin files (removed dateFormat and simpleDateFormat from XML load and save)
 + star type, recharge time, life form, climate, temperature, and percent water added to Planet
++ beginning of BIG change to repair system - no more tasks, repairs are performed directly on parts
+   don't use this yet, salvage and replacement are not implemented
 
 v0.1.5 (2011-05-05)
 + refactored Hangar Panel into separate Hangar and Repair Bay panel

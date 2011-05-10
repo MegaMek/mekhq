@@ -49,12 +49,6 @@ public class RefitKit extends Part {
         this.sourceName = sourceName;
         this.targetName = targetName;
         this.cost = cost;
-        reCalc();
-    }
-
-    @Override
-    public void reCalc() {
-        this.name ="Refit Kit [" + sourceName + " -> " + targetName + "]";
     }
     
     @Override
@@ -118,5 +112,35 @@ public class RefitKit extends Part {
 	@Override
 	public int getTechRating() {
 		return EquipmentType.RATING_A;
+	}
+
+	@Override
+	public void fix() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Part getReplacementPart() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void remove(boolean salvage) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void updateCondition() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean needsFixing() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }

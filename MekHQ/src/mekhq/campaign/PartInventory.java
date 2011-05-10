@@ -52,7 +52,7 @@ public class PartInventory {
 
     public String getDescHTML() {
         String toReturn = "<html>";
-        toReturn += part.getDescHTML();
+        toReturn += part.getName();
         toReturn += "<font size='2'>";
 
         if (part instanceof Armor)

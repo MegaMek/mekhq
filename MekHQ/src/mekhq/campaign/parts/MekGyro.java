@@ -26,9 +26,12 @@ import java.io.PrintWriter;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import megamek.common.CriticalSlot;
+import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Mech;
 import mekhq.campaign.MekHqXmlUtil;
+import mekhq.campaign.team.SupportTeam;
 import mekhq.campaign.work.MekGyroReplacement;
 import mekhq.campaign.work.ReplacementItem;
 
@@ -43,12 +46,14 @@ public class MekGyro extends Part {
 
     public MekGyro() {
     	this(false, 0, 0, 0);
-    	reCalc();
     }
     
-	@Override
-   public void reCalc() {
-    	// Do nothing.
+    public MekGyro(boolean salvage, int tonnage, int type, int walkMP) {
+        super(salvage, tonnage);
+        this.type = type;
+        this.name = Mech.getGyroTypeString(type);
+        this.walkMP = walkMP;
+        computeCost();
     }
     
     public int getType() {
@@ -59,13 +64,7 @@ public class MekGyro extends Part {
         return walkMP;
     }
     
-    public MekGyro(boolean salvage, int tonnage, int type, int walkMP) {
-        super(salvage, tonnage);
-        this.type = type;
-        this.name = Mech.getGyroTypeString(type) + " (" + tonnage + ")";
-        this.walkMP = walkMP;
-        computeCost();
-    }
+   
 
     public static int getGyroBaseTonnage(int walkMP, int unitTonnage) {
     	return (int) Math.ceil(walkMP * unitTonnage / 100f);
@@ -140,11 +139,6 @@ public class MekGyro extends Part {
         return PART_TYPE_MEK_GYRO;
     }
 
-    @Override
-    public String getSaveString() {
-        return getName() + ";" + getTonnage() + ";" + getType() + ";" + getWalkMP();
-    }
-
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent, int id) {
 		writeToXmlBegin(pw1, indent, id);
@@ -202,5 +196,61 @@ public class MekGyro extends Part {
 		default:
 			return EquipmentType.RATING_D;	
 		}
+	}
+
+	@Override
+	public void fix() {
+		hits = 0;
+		updateCondition();
+		if(null != unit) {
+			unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_GYRO, Mech.LOC_CT);
+		}
+
+	}
+
+	@Override
+	public Part getReplacementPart() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void remove(boolean salvage) {
+		if(null != unit) {
+			unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_GYRO, Mech.LOC_CT);
+			if(!salvage) {
+				unit.campaign.removePart(this);
+			}
+			//TODO create replacement part and add it to entity
+
+		}
+		unit = null;
+	}
+
+	@Override
+	public void updateCondition() {
+		if(null != unit) {
+			hits = unit.getEntity().getHitCriticals(CriticalSlot.TYPE_SYSTEM,Mech.SYSTEM_GYRO, Mech.LOC_CT);
+			if(hits == 0) {
+				time = 0;
+				difficulty = 0;
+			}
+			else if(hits == 1) {
+				time = 120;
+				difficulty = 1;
+			} 
+			else if(hits == 2) {
+				time = 240;
+				difficulty = 4;
+			}
+			else if(hits > 2) {
+				remove(false);
+			}
+		}	
+	}
+
+	@Override
+	public boolean needsFixing() {
+		return hits > 0;
 	}
 }

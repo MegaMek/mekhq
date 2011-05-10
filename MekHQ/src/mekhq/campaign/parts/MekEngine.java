@@ -27,7 +27,9 @@ import java.util.ArrayList;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import megamek.common.CriticalSlot;
 import megamek.common.Engine;
+import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Mech;
 import megamek.common.TechConstants;
@@ -46,24 +48,13 @@ public class MekEngine extends Part {
 
 	public MekEngine() {
 		this(false, 0, 0, null, 0);
-		reCalc();
-	}
-	
-	@Override
-	public void reCalc() {
-		// Do nothing.
-	}
-	
-	public Engine getEngine() {
-		return engine;
 	}
 
 	public MekEngine(boolean salvage, int tonnage, int faction, Engine e,
 			double clanMultiplier) {
 		super(salvage, tonnage);
 		this.engine = e;
-		this.name = engine.getEngineName() + " Engine" + " (" + getTonnage()
-				+ " tons)";
+		this.name = engine.getEngineName() + " Engine";
 		this.engine = e;
 
 		double c = getEngine().getBaseCost() * getEngine().getRating()
@@ -75,6 +66,11 @@ public class MekEngine extends Part {
 		if (isClanTechBase() && !Faction.isClanFaction(faction))
 			this.cost *= clanMultiplier;
 	}
+
+	public Engine getEngine() {
+		return engine;
+	}
+
 
 	@Override
 	public boolean canBeUsedBy(ReplacementItem task) {
@@ -130,43 +126,6 @@ public class MekEngine extends Part {
 			return TechConstants.T_IS_TW_NON_BOX;
 		else
 			return getEngine().getTechType();
-	}
-
-	@Override
-	public ArrayList<String> getPotentialSSWNames(int faction) {
-		ArrayList<String> sswNames = new ArrayList<String>();
-
-		// The tech base matters for engines (ie. you can't use a IS XL engine
-		// to replace a Clan XL engine
-		String techBase = (isClanTechBase() ? "(CL)" : "(IS)");
-
-		String sswName = getName();
-
-		sswNames.add(techBase + " " + sswName);
-		sswNames.add(sswName);
-
-		return sswNames;
-	}
-
-	@Override
-	public String getDesc() {
-
-		// "Clan" already included in super.getDesc()
-		// return (getTechBase()==Part.TECH_BASE_CLAN ? "Clan " : "") +
-		// super.getDesc();
-
-		return super.getDesc();
-	}
-
-	@Override
-	public String getSaveString() {
-		return getName() + ";" + getTonnage() + ";" + getEngine().getRating()
-				+ ";" + getEngine().getEngineType() + ";"
-				+ (getEngine().hasFlag(Engine.CLAN_ENGINE) ? "true" : "false")
-				+ ";"
-				+ (getEngine().hasFlag(Engine.TANK_ENGINE) ? "true" : "false")
-				+ ";"
-				+ (getEngine().hasFlag(Engine.LARGE_ENGINE) ? "true" : "false");
 	}
 
 	@Override
@@ -292,5 +251,73 @@ public class MekEngine extends Part {
 		default:
 			return EquipmentType.RATING_D;
 		}
+	}
+
+	@Override
+	public void fix() {
+		hits = 0;
+		if(null != unit) {
+			unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE);
+		}
+	}
+
+	@Override
+	public Part getReplacementPart() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void remove(boolean salvage) {
+		if(null != unit) {
+			unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE);
+			if(!salvage) {
+				unit.campaign.removePart(this);
+			}
+			//TODO create replacement part and add it to entity
+
+		}
+		unit = null;	
+	}
+
+	@Override
+	public void updateCondition() {
+		if(null != unit) {
+			int engineHits = 0;
+			int engineCrits = 0;
+			Entity entity = unit.getEntity();
+			for (int i = 0; i < entity.locations(); i++) {
+				engineHits += entity.getHitCriticals(CriticalSlot.TYPE_SYSTEM,
+						Mech.SYSTEM_ENGINE, i);
+				engineCrits += entity.getNumberOfCriticals(
+						CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE, i);
+			}
+			if(engineHits > engineCrits) {
+				remove(false);
+				return;
+			} 
+			else if(engineHits > 0) {
+				hits = engineHits;
+			} else {
+				hits = 0;
+			}
+			this.time = 0;
+			this.difficulty = 0;
+			if (hits == 1) {
+	            this.time = 100;
+	            this.difficulty = -1;
+	        } else if (hits == 2) {
+	            this.time = 200;
+	            this.difficulty = 0;
+	        } else if (hits > 2) {
+	            this.time = 300;
+	            this.difficulty = 2;
+	        }
+		}		
+	}
+
+	@Override
+	public boolean needsFixing() {
+		return hits > 0;
 	}
 }

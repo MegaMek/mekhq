@@ -32,8 +32,14 @@ import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.Mech;
 import megamek.common.Tank;
+import megamek.common.TargetRoll;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Utilities;
+import mekhq.campaign.parts.GenericSparePart;
+import mekhq.campaign.work.FullRepairWarchest;
+import mekhq.campaign.work.IPartWork;
+import mekhq.campaign.work.ReloadItem;
+import mekhq.campaign.work.ReplacementItem;
 import mekhq.campaign.work.UnitWorkItem;
 import mekhq.campaign.work.WorkItem;
 
@@ -151,6 +157,78 @@ public class TechTeam extends SupportTeam {
         }
         toReturn += "</font></html>";
         return toReturn;
+   }
+   
+   public TargetRoll getTargetFor(IPartWork partWork) {
+       if(null == partWork) {
+           return new TargetRoll(TargetRoll.IMPOSSIBLE, "no task?");
+       }
+       if(null != partWork.getUnit() && partWork.getUnit().isDeployed()) {
+           return new TargetRoll(TargetRoll.IMPOSSIBLE, "This unit is currently deployed!");
+       } 
+       if(partWork.getSkillMin() > getRating()) {
+           return new TargetRoll(TargetRoll.IMPOSSIBLE, "Task is beyond this team's skill level");
+       }
+       if(!partWork.needsFixing()) {
+           return new TargetRoll(TargetRoll.IMPOSSIBLE, "Task is not needed.");
+       }
+      /* if(task instanceof ReplacementItem && !((ReplacementItem)task).hasPart()) {
+           return new TargetRoll(TargetRoll.IMPOSSIBLE, "part not available.");
+       }*/
+       TargetRoll target = getTarget(partWork.getMode());
+       if(target.getValue() == TargetRoll.IMPOSSIBLE) {
+           return target;
+       }
+       
+       //check time
+       //if you have zero total minutes left, you can't do a thing
+       if(getMinutesLeft() <= 0 && (!campaign.isOvertimeAllowed() || getOvertimeLeft() <= 0)) {
+           return new TargetRoll(TargetRoll.IMPOSSIBLE, "team has no time left");
+       }
+       
+       if(isTaskOvertime(partWork)) {
+           target.addModifier(3, "overtime");
+       }
+       
+       /*
+       // Generic spare parts
+       if (task instanceof ReplacementItem
+               && ((ReplacementItem) task).partNeeded() instanceof GenericSparePart
+               && !((ReplacementItem) task).hasPart()) {
+           return new TargetRoll(TargetRoll.IMPOSSIBLE, "Not enough spare parts");
+       } else if (task instanceof ReplacementItem
+               && ((ReplacementItem) task).hasPart()
+               && ((ReplacementItem) task).partNeeded() instanceof GenericSparePart
+               && !((ReplacementItem) task).hasEnoughGenericSpareParts()) {
+           /*
+           GenericSparePart partNeeded = (GenericSparePart) ((ReplacementItem) task).partNeeded();
+           GenericSparePart part = (GenericSparePart) ((ReplacementItem) task).getPart();
+           if (campaign.getFunds() < new GenericSparePart(part.getTech(), partNeeded.getAmount()-part.getAmount()).getCost()) {
+               return new TargetRoll(TargetRoll.IMPOSSIBLE, "Not enough funds");
+           }
+           */
+           //return new TargetRoll(TargetRoll.IMPOSSIBLE, "Not enough spare parts");
+       //}
+       // check funds
+       /*
+       if (campaign.getCampaignOptions().payForParts()
+    		   && task instanceof ReplacementItem
+               && !((ReplacementItem) task).hasPart()
+               && !campaign.hasEnoughFunds(((ReplacementItem) task).partNeeded().getCost())) {
+           return new TargetRoll(TargetRoll.IMPOSSIBLE, "Not enough funds");
+       } else if (campaign.getCampaignOptions().payForParts()
+    		   && task instanceof ReloadItem
+               && !campaign.hasEnoughFunds(((ReloadItem) task).getCost())) {
+           return new TargetRoll(TargetRoll.IMPOSSIBLE, "Not enough funds");
+       } else if (campaign.getCampaignOptions().payForParts()
+    		   && task instanceof FullRepairWarchest
+               && !campaign.hasEnoughFunds(((FullRepairWarchest) task).getCost())) {
+           return new TargetRoll(TargetRoll.IMPOSSIBLE, "Not enough funds");
+       }
+       */
+
+       target.append(partWork.getAllMods());
+       return target;
    }
 
 	@Override

@@ -1,5 +1,5 @@
 /*
- * IWork.java
+ * IPartWork.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -20,14 +20,34 @@
  */
 package mekhq.campaign.work;
 
+import mekhq.campaign.Unit;
+import mekhq.campaign.parts.Part;
+
 /**
  * 
  * @author Jay
  */
-public interface IMedicalWork extends IWork {
+public interface IPartWork extends IWork {
 	
-	public void heal();
 	
-	public String getPatientName();
+	
+	public String getPartName();
+	
+	public int getSkillMin();
+
+	public int getBaseTime();
+	public int getActualTime();
+	public int getTimeSpent();
+	public int getTimeLeft();
+	
+	public void updateCondition();
+	public void fix();
+	public void remove(boolean salvage);
+	public Part getReplacementPart();
+	
+	public String getDesc();
+	public String getDetails();
+	
+	public Unit getUnit();
 	
 }

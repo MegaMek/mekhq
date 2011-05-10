@@ -64,23 +64,23 @@ public abstract class SalvageItem extends UnitWorkItem {
     public void fix() {
         removePart();
         unit.campaign.addPart(getPart());
-        unit.campaign.addWork(getReplacement());
+        /*unit.campaign.addWork(getReplacement());
         RepairItem repair = (RepairItem)unit.campaign.getTask(repairId);
         if(null != repair) {
             //remove the repair item
             unit.campaign.removeTask(repair);
-        }
+        }*/
     }
     
     public void scrap() {
         removePart();
-        unit.campaign.addWork(getReplacement());
+       /* unit.campaign.addWork(getReplacement());
         RepairItem repair = (RepairItem)unit.campaign.getTask(repairId);
         if(null != repair) {
             //remove the repair item
             unit.campaign.removeTask(repair);
         }
-        unit.campaign.removeTask(this);
+        unit.campaign.removeTask(this);*/
     }
     
     @Override

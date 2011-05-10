@@ -121,6 +121,7 @@ public class ArmorSalvage extends SalvageItem {
         removePart();
         //need to find old armor replacement and mutate it
         boolean taskFound = false;
+        /*
         for(WorkItem task : unit.campaign.getAllTasksForUnit(unit.getId())) {
             if(task instanceof ArmorReplacement 
                     && ((ArmorReplacement)task).getLoc() == loc
@@ -132,6 +133,7 @@ public class ArmorSalvage extends SalvageItem {
         if(!taskFound) {
             unit.campaign.addWork(getReplacement());
         }
+        */
         boolean partFound = false;
         for(Part part : unit.campaign.getParts()) {
             if(part instanceof Armor && ((Armor)part).getType() == type) {
@@ -150,6 +152,7 @@ public class ArmorSalvage extends SalvageItem {
         removePart();
         //need to find old armor replacement and mutate it
         boolean taskFound = false;
+        /*
         for(WorkItem task : unit.campaign.getAllTasksForUnit(unit.getId())) {
             if(task instanceof ArmorReplacement 
                     && ((ArmorReplacement)task).getLoc() == loc
@@ -162,6 +165,7 @@ public class ArmorSalvage extends SalvageItem {
             unit.campaign.addWork(getReplacement());
         }
         unit.campaign.removeTask(this);
+        */
     }
 
     @Override

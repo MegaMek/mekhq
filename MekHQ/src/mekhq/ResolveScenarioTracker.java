@@ -386,7 +386,7 @@ public class ResolveScenarioTracker {
 		for(Unit u : campaign.getUnits()) {
 			if(u.getEntity().getExternalId() == en.getExternalId()) {
 				u.setEntity(en);
-				campaign.runNewDiagnostics(u.getId());
+				u.runDiagnostic();
 				campaign.addReport(u.getEntity().getDisplayName() + " has been recovered.");
 				return;
 			}

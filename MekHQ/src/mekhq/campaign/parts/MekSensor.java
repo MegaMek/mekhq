@@ -25,7 +25,10 @@ import java.io.PrintWriter;
 
 import org.w3c.dom.Node;
 
+import megamek.common.CriticalSlot;
+import megamek.common.Entity;
 import megamek.common.EquipmentType;
+import megamek.common.Mech;
 import mekhq.campaign.work.MekSensorReplacement;
 import mekhq.campaign.work.ReplacementItem;
 
@@ -43,13 +46,7 @@ public class MekSensor extends Part {
 	public MekSensor(boolean salvage, int tonnage) {
         super(salvage, tonnage);
         this.name = "Mech Sensors";
-        reCalc();
     }
-
-	@Override
-	public void reCalc() {
-        this.cost = getTonnage() * 2000;
-	}
     
     @Override
     public boolean canBeUsedBy(ReplacementItem task) {
@@ -87,5 +84,67 @@ public class MekSensor extends Part {
 	@Override
 	public int getTechRating() {
 		return EquipmentType.RATING_C;
+	}
+	
+	@Override
+	public void fix() {
+		hits = 0;
+		if(null != unit) {
+			unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS);
+		}
+	}
+
+	@Override
+	public Part getReplacementPart() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void remove(boolean salvage) {
+		if(null != unit) {
+			unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS);
+			if(!salvage) {
+				unit.campaign.removePart(this);
+			}
+			//TODO create replacement part and add it to entity
+		}
+		unit = null;	
+	}
+
+	@Override
+	public void updateCondition() {
+		if(null != unit) {
+			Entity entity = unit.getEntity();
+			for (int i = 0; i < entity.locations(); i++) {
+				if (entity.getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS, i) > 0) {
+					if (entity.isSystemRepairable(Mech.SYSTEM_SENSORS, i)) {					
+						hits = entity.getHitCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS, i);	
+						break;
+					} else {
+						remove(false);
+						return;
+					}
+				}
+			}
+			if(hits == 0) {
+				time = 0;
+				difficulty = 0;
+			} 
+			else if(hits == 1) {
+				time = 75;
+				difficulty = 0;
+			}
+			else if(hits > 1) {
+				time = 150;
+				difficulty = 3;
+			}
+		}
+		
+	}
+
+	@Override
+	public boolean needsFixing() {
+		return hits > 0;
 	}
 }

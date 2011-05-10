@@ -25,8 +25,13 @@ import java.io.PrintWriter;
 
 import org.w3c.dom.Node;
 
+import megamek.common.CriticalSlot;
+import megamek.common.Entity;
 import megamek.common.EquipmentType;
+import megamek.common.Mech;
+import mekhq.campaign.work.MekLifeSupportRepair;
 import mekhq.campaign.work.MekLifeSupportReplacement;
+import mekhq.campaign.work.MekLifeSupportSalvage;
 import mekhq.campaign.work.ReplacementItem;
 
 /**
@@ -38,12 +43,6 @@ public class MekLifeSupport extends Part {
 
 	public MekLifeSupport() {
 		this(false, 0);
-		reCalc();
-	}
-	
-	@Override
-	public void reCalc() {
-		// Do nothing.
 	}
 	
 	public MekLifeSupport(boolean salvage, int tonnage) {
@@ -88,5 +87,67 @@ public class MekLifeSupport extends Part {
 	@Override
 	public int getTechRating() {
 		return EquipmentType.RATING_C;
+	}
+
+	@Override
+	public void fix() {
+		hits = 0;
+		if(null != unit) {
+			unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_LIFE_SUPPORT);
+		}
+	}
+
+	@Override
+	public Part getReplacementPart() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void remove(boolean salvage) {
+		if(null != unit) {
+			unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_LIFE_SUPPORT);
+			if(!salvage) {
+				unit.campaign.removePart(this);
+			}
+			//TODO create replacement part and add it to entity
+		}
+		unit = null;	
+	}
+
+	@Override
+	public void updateCondition() {
+		if(null != unit) {
+			Entity entity = unit.getEntity();
+			for (int i = 0; i < entity.locations(); i++) {
+				if (entity.getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_LIFE_SUPPORT, i) > 0) {
+					if (entity.isSystemRepairable(Mech.SYSTEM_LIFE_SUPPORT, i)) {					
+						hits = entity.getHitCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_LIFE_SUPPORT, i);	
+						break;
+					} else {
+						remove(false);
+						return;
+					}
+				}
+			}
+			if(hits == 0) {
+				time = 0;
+				difficulty = 0;
+			} 
+			else if(hits == 1) {
+				time = 60;
+				difficulty = -1;
+			}
+			else if(hits > 1) {
+				time = 120;
+				difficulty = 1;
+			}
+		}
+		
+	}
+
+	@Override
+	public boolean needsFixing() {
+		return hits > 0;
 	}
 }

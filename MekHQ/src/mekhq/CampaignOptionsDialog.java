@@ -753,7 +753,7 @@ private void btnOkayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
 
     options.setQuirks(useQuirksBox.isSelected());
     
-    campaign.refreshAllUnitDiagnostics();
+    //campaign.refreshAllUnitDiagnostics();
 }//GEN-LAST:event_btnOkayActionPerformed
 
 private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed

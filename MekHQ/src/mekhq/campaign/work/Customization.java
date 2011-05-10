@@ -196,14 +196,14 @@ public abstract class Customization extends UnitWorkItem {
 
     @Override
     public String checkFixable() {
-        ArrayList<WorkItem> tasks = getUnit().campaign.getAllTasksForUnit(getUnitId());
+        /*ArrayList<WorkItem> tasks = getUnit().campaign.getAllTasksForUnit(getUnitId());
  
         for (WorkItem task : tasks) {
             if (task instanceof SalvageItem) {
                 return "Some items must be salvaged/scrapped";
             }
         }
-
+*/
         return super.checkFixable();
     }
 
@@ -212,7 +212,7 @@ public abstract class Customization extends UnitWorkItem {
         campaign.addUnit(targetEntity, false);
         Unit targetUnit = campaign.getUnits().get(campaign.getUnits().size()-1);
         this.targetEntity = targetUnit.getEntity();
-        ArrayList<WorkItem> unitTasks = campaign.getTasksForUnit(targetUnit.getId());
+        /*ArrayList<WorkItem> unitTasks = campaign.getTasksForUnit(targetUnit.getId());
         int totalRepairTime = 0;
         
         for (WorkItem unitTask : unitTasks) {
@@ -221,11 +221,11 @@ public abstract class Customization extends UnitWorkItem {
                     || unitTask instanceof ReloadItem) {
                 totalRepairTime += unitTask.getTimeLeft();
             }
-        }
+        }*/
 
         campaign.removeUnit(targetUnit.getId());
 
-        return totalRepairTime;
+        return -1;//totalRepairTime;
     }
 
     @Override

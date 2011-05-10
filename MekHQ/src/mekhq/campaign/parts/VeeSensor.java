@@ -43,13 +43,7 @@ public class VeeSensor extends Part {
 	public VeeSensor(boolean salvage, int tonnage) {
         super(salvage, tonnage);
         this.name = "Vehicle Sensors";
-        reCalc();
     }
-	
-	@Override
-	public void reCalc() {
-		// Do nothing.
-	}
     
     @Override
     public boolean canBeUsedBy(ReplacementItem task) {
@@ -82,5 +76,35 @@ public class VeeSensor extends Part {
 	@Override
 	public int getTechRating() {
 		return EquipmentType.RATING_C;
+	}
+
+	@Override
+	public void fix() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Part getReplacementPart() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void remove(boolean salvage) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void updateCondition() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean needsFixing() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }
