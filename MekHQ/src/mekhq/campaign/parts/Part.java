@@ -423,13 +423,15 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		if (getModeMod() != 0) {
 			mods.addModifier(getModeMod(), getCurrentModeName());
 		}
-		mods.append(unit.getSiteMod());
-        if(unit.getEntity().getQuirks().booleanOption("easy_maintain")) {
-            mods.addModifier(-1, "easy to maintain");
-        }
-        else if(unit.getEntity().getQuirks().booleanOption("difficult_maintain")) {
-            mods.addModifier(1, "difficult to maintain");
-        }
+		if(null != unit) {
+			mods.append(unit.getSiteMod());
+	        if(unit.getEntity().getQuirks().booleanOption("easy_maintain")) {
+	            mods.addModifier(-1, "easy to maintain");
+	        }
+	        else if(unit.getEntity().getQuirks().booleanOption("difficult_maintain")) {
+	            mods.addModifier(1, "difficult to maintain");
+	        }
+		}
         mods.addModifier(Availability.getTechModifier(getTechRating()), "tech rating " + EquipmentType.getRatingName(getTechRating()));
 		return mods;
 	}

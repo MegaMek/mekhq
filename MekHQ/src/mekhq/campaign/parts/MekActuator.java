@@ -200,18 +200,7 @@ public class MekActuator extends Part {
 	@Override
 	public void updateCondition() {
 		if(null != unit) {
-			Entity entity = unit.getEntity();
-			for (int i = 0; i < entity.locations(); i++) {
-				if (entity.getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, type, i) > 0) {
-					if (entity.isSystemRepairable(Mech.SYSTEM_LIFE_SUPPORT, i)) {					
-						hits = entity.getHitCriticals(CriticalSlot.TYPE_SYSTEM, type, i);	
-						break;
-					} else {
-						remove(false);
-						return;
-					}
-				}
-			}
+			hits = unit.getEntity().getHitCriticals(CriticalSlot.TYPE_SYSTEM, type, location);	
 			if(hits == 0) {
 				time = 0;
 				difficulty = 0;

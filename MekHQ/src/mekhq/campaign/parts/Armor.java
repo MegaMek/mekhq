@@ -43,17 +43,39 @@ public class Armor extends Part {
 	private static final long serialVersionUID = 5275226057484468868L;
 	protected int type;
     protected int amount;
+    protected int amountNeeded;
+    private int location;
+    private boolean rear;
     
     public Armor() {
     	this(false, 0, 0, 0);
     }
     
     public Armor(boolean salvage, int tonnage, int t, int points) {
+    	this(salvage, tonnage, t, points, -1, false);
+    }
+    
+    public Armor(boolean salvage, int tonnage, int t, int points, int loc, boolean r) {
         // Amount is used for armor quantity, not tonnage
         super(false, tonnage);
         this.type = t;
         this.amount = points;
+        this.location = loc;
+        this.rear = r;
+        this.name = "Armor (" + EquipmentType.armorNames[type] + ")";
     }
+    
+    @Override
+	public String getDetails() {
+		if(null != unit) {
+			String rearMount = "";
+			if(rear) {
+				rearMount = " (R)";
+			}
+			return unit.getEntity().getLocationName(location) + rearMount + ", " + amountNeeded + " points";
+		}
+		return "";
+	}
     
     public int getType() {
         return type;
@@ -61,6 +83,14 @@ public class Armor extends Part {
 
     public int getAmount() {
         return amount;
+    }
+    
+    public int getLocation() {
+    	return location;
+    }
+    
+    public boolean isRearMounted() {
+    	return rear;
     }
 
     public void setAmount(int amount) {
@@ -138,6 +168,18 @@ public class Armor extends Part {
 				+"<type>"
 				+type
 				+"</type>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<location>"
+				+type
+				+"</location>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<rear>"
+				+rear
+				+"</rear>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<amountNeeded>"
+				+amountNeeded
+				+"</amountNeeded>");
 		writeToXmlEnd(pw1, indent, id);
 	}
 
@@ -152,6 +194,16 @@ public class Armor extends Part {
 				amount = Integer.parseInt(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("type")) {
 				type = Integer.parseInt(wn2.getTextContent());
+			} else if (wn2.getNodeName().equalsIgnoreCase("location")) {
+				location = Integer.parseInt(wn2.getTextContent());
+			} else if (wn2.getNodeName().equalsIgnoreCase("amountNeeded")) {
+				amountNeeded = Integer.parseInt(wn2.getTextContent());
+			} else if (wn2.getNodeName().equalsIgnoreCase("rear")) {
+				if(wn2.getTextContent().equalsIgnoreCase("true")) {
+					rear = true;
+				} else {
+					rear = false;
+				}
 			} 
 		}
 	}
@@ -245,31 +297,40 @@ public class Armor extends Part {
 
 	@Override
 	public void fix() {
-		// TODO Auto-generated method stub
-		
+		unit.getEntity().setArmor(unit.getEntity().getOArmor(location, rear), location, rear);
+		amountNeeded = 0;
 	}
 
 	@Override
 	public Part getReplacementPart() {
-		// TODO Auto-generated method stub
+		//no such thing
 		return null;
 	}
 
 	@Override
 	public void remove(boolean salvage) {
-		// TODO Auto-generated method stub
-		
+		//don't do anything here yet, because we don't actually remove armor, just set it at zero
+		//in the future, we need a method for adding armor points to salvage parts
 	}
 
 	@Override
 	public void updateCondition() {
-		// TODO Auto-generated method stub
-		
+		int currentArmor = unit.getEntity().getArmor(location, rear);
+		if(currentArmor < 0) {
+			currentArmor = 0;
+		}
+		amountNeeded = unit.getEntity().getOArmor(location, rear) - currentArmor;
+		if(amountNeeded > 0) {
+			time = 5 * amountNeeded;
+			difficulty = -2;
+		} else {
+			time = 0;
+			difficulty = 0;
+		}
 	}
 
 	@Override
 	public boolean needsFixing() {
-		// TODO Auto-generated method stub
-		return false;
+		return amountNeeded > 0;
 	}
 }

@@ -40,6 +40,7 @@ v0.1.6 (SVN)
 + star type, recharge time, life form, climate, temperature, and percent water added to Planet
 + beginning of BIG change to repair system - no more tasks, repairs are performed directly on parts
    don't use this yet, salvage and replacement are not implemented
++ Mech repairs complete under new system (still need salvage and replacement)
 
 v0.1.5 (2011-05-05)
 + refactored Hangar Panel into separate Hangar and Repair Bay panel
