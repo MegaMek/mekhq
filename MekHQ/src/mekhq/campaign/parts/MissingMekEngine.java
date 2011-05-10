@@ -1,5 +1,5 @@
 /*
- * MekEngine.java
+ * MissingMekEngine.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -42,20 +42,22 @@ import mekhq.campaign.work.ReplacementItem;
  * 
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class MekEngine extends Part {
+public class MissingMekEngine extends MissingPart {
 	private static final long serialVersionUID = -6961398614705924172L;
 	protected Engine engine;
 
-	public MekEngine() {
+	public MissingMekEngine() {
 		this(false, 0, 0, null, 0);
 	}
 
-	public MekEngine(boolean salvage, int tonnage, int faction, Engine e,
+	public MissingMekEngine(boolean salvage, int tonnage, int faction, Engine e,
 			double clanMultiplier) {
 		super(salvage, tonnage);
 		this.engine = e;
 		this.name = engine.getEngineName() + " Engine";
 		this.engine = e;
+		this.time = 360;
+		this.difficulty = -1;
 
 		double c = getEngine().getBaseCost() * getEngine().getRating()
 				* getTonnage() / 75.0;
@@ -254,84 +256,18 @@ public class MekEngine extends Part {
 	}
 
 	@Override
-	public void fix() {
-		hits = 0;
-		if(null != unit) {
-			unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE);
-		}
-	}
-
-	@Override
-	public Part getMissingPart() {
-		return new MissingMekEngine(isSalvage(), getTonnage(), 0, getEngine(), 0);
-	}
-
-	@Override
-	public void remove(boolean salvage) {
-		if(null != unit) {
-			unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE);
-			if(!salvage) {
-				unit.campaign.removePart(this);
-			}
-			unit.removePart(this);
-			Part missing = getMissingPart();
-			unit.campaign.addPart(missing);
-			unit.addPart(missing);
-		}
-		unit = null;	
-	}
-
-	@Override
-	public void updateConditionFromEntity() {
-		if(null != unit) {
-			int engineHits = 0;
-			int engineCrits = 0;
-			Entity entity = unit.getEntity();
-			for (int i = 0; i < entity.locations(); i++) {
-				engineHits += entity.getHitCriticals(CriticalSlot.TYPE_SYSTEM,
-						Mech.SYSTEM_ENGINE, i);
-				engineCrits += entity.getNumberOfCriticals(
-						CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE, i);
-			}
-			if(engineHits > engineCrits) {
-				remove(false);
-				return;
-			} 
-			else if(engineHits > 0) {
-				hits = engineHits;
-			} else {
-				hits = 0;
-			}
-			this.time = 0;
-			this.difficulty = 0;
-			if (hits == 1) {
-	            this.time = 100;
-	            this.difficulty = -1;
-	        } else if (hits == 2) {
-	            this.time = 200;
-	            this.difficulty = 0;
-	        } else if (hits > 2) {
-	            this.time = 300;
-	            this.difficulty = 2;
-	        }
-		}		
-	}
-
-	@Override
-	public boolean needsFixing() {
-		return hits > 0;
-	}
-
-	@Override
-	public void updateConditionFromPart() {
-		if(null != unit) {
-			if(hits == 0) {
-				unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE);
-			} else {
-				for(int i = 0; i < hits; i++) {
-					unit.hitSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE);
-				}
+	public boolean isAcceptableReplacement(Part part) {
+		if(part instanceof MekEngine) {
+			Engine eng = ((MekEngine)part).getEngine();
+			if (null != eng) {
+				return getEngine().getEngineType() == eng.getEngineType()
+						&& getEngine().getRating() == eng.getRating()
+						&& getEngine().getTechType() == eng.getTechType()
+						&& getTonnage() == part.getTonnage();
 			}
 		}
+		return false;
 	}
+
+
 }

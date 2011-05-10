@@ -1,5 +1,5 @@
 /*
- * MekSensor.java
+ * MissingMekSensor.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -36,16 +36,18 @@ import mekhq.campaign.work.ReplacementItem;
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class MekSensor extends Part {
+public class MissingMekSensor extends MissingPart {
 	private static final long serialVersionUID = 931907976883324097L;
 
-	public MekSensor() {
+	public MissingMekSensor() {
 		this(false, 0);
 	}
 	
-	public MekSensor(boolean salvage, int tonnage) {
+	public MissingMekSensor(boolean salvage, int tonnage) {
         super(salvage, tonnage);
         this.name = "Mech Sensors";
+        this.time = 260;
+        this.difficulty = 0;
     }
     
     @Override
@@ -85,81 +87,10 @@ public class MekSensor extends Part {
 	public int getTechRating() {
 		return EquipmentType.RATING_C;
 	}
-	
-	@Override
-	public void fix() {
-		hits = 0;
-		if(null != unit) {
-			unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS);
-		}
-	}
 
 	@Override
-	public Part getMissingPart() {
-		return new MissingMekSensor(isSalvage(), getTonnage());
+	public boolean isAcceptableReplacement(Part part) {
+		return part instanceof MekSensor;
 	}
 
-	@Override
-	public void remove(boolean salvage) {
-		if(null != unit) {
-			unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS);
-			if(!salvage) {
-				unit.campaign.removePart(this);
-			}
-			unit.removePart(this);
-			Part missing = getMissingPart();
-			unit.campaign.addPart(missing);
-			unit.addPart(missing);
-		}
-		unit = null;
-	}
-
-	@Override
-	public void updateConditionFromEntity() {
-		if(null != unit) {
-			Entity entity = unit.getEntity();
-			for (int i = 0; i < entity.locations(); i++) {
-				if (entity.getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS, i) > 0) {
-					if (entity.isSystemRepairable(Mech.SYSTEM_SENSORS, i)) {					
-						hits = entity.getHitCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS, i);	
-						break;
-					} else {
-						remove(false);
-						return;
-					}
-				}
-			}
-			if(hits == 0) {
-				time = 0;
-				difficulty = 0;
-			} 
-			else if(hits == 1) {
-				time = 75;
-				difficulty = 0;
-			}
-			else if(hits > 1) {
-				time = 150;
-				difficulty = 3;
-			}
-		}
-		
-	}
-
-	@Override
-	public boolean needsFixing() {
-		return hits > 0;
-	}
-	
-	@Override
-	public void updateConditionFromPart() {
-		if(null != unit) {
-			if(hits == 0) {
-				unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS);
-			} else {
-				for(int i = 0; i < hits; i++) {
-					unit.hitSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS);
-				}
-			}
-		}
-	}
 }

@@ -68,6 +68,10 @@ public class EquipmentPart extends Part {
         this.cost = cost;
     }
     
+    public void setEquipmentNum(int n) {
+    	this.equipmentNum = n;
+    }
+    
     public EquipmentPart() {
     	this(false, 0, null, -1);
     }
@@ -292,8 +296,7 @@ public class EquipmentPart extends Part {
 
 	@Override
 	public Part getMissingPart() {
-		// TODO Auto-generated method stub
-		return null;
+		return new MissingEquipmentPart(isSalvage(), getTonnage(), type, equipmentNum);
 	}
 
 	@Override
@@ -308,9 +311,11 @@ public class EquipmentPart extends Part {
 	        if(!salvage) {
 				unit.campaign.removePart(this);
 			}
+	        unit.removePart(this);
+	        Part missing = getMissingPart();
+			unit.campaign.addPart(missing);
+			unit.addPart(missing);
 		}
-		//TODO create replacement part and add it to entity
-		unit.removePart(this);
 		unit = null;
 		equipmentNum = -1;
 	}
@@ -320,11 +325,10 @@ public class EquipmentPart extends Part {
 		if(null != unit) {
 			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
 			if(null != mounted) {
-				//if(!mounted.isRepairable()) {
-					//remove(false);
-				//	return;
-				//} else 
-				if(mounted.isDestroyed()) {
+				if(!mounted.isRepairable()) {
+					remove(false);
+					return;
+				} else if(mounted.isDestroyed()) {
 					//TODO: calculate actual hits
 					hits = 1;
 				} else {
@@ -372,11 +376,16 @@ public class EquipmentPart extends Part {
 		if(null != unit) {
 			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
 			if(null != mounted) {
-				if(hits > 1) {
+				if(hits >= 1) {
 					mounted.setDestroyed(true);
 					mounted.setHit(true);
+					mounted.setRepairable(true);
+			        unit.destroySystem(CriticalSlot.TYPE_EQUIPMENT, unit.getEntity().getEquipmentNum(mounted));	
 				} else {
-					fix();
+					mounted.setHit(false);
+			        mounted.setDestroyed(false);
+			        mounted.setRepairable(true);
+			        unit.repairSystem(CriticalSlot.TYPE_EQUIPMENT, unit.getEntity().getEquipmentNum(mounted));
 				}
 			}
 		}

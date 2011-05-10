@@ -1,5 +1,5 @@
 /*
- * MekActuator.java
+ * MissingMekActuator.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -39,12 +39,12 @@ import mekhq.campaign.work.ReplacementItem;
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class MekActuator extends Part {
+public class MissingMekActuator extends MissingPart {
 	private static final long serialVersionUID = 719878556021696393L;
 	protected int type;
 	protected int location;
 
-	public MekActuator() {
+	public MissingMekActuator() {
 		this(false, 0, 0);
 	}
 	
@@ -52,16 +52,18 @@ public class MekActuator extends Part {
         return type;
     }
     
-    public MekActuator(boolean salvage, int tonnage, int type) {
+    public MissingMekActuator(boolean salvage, int tonnage, int type) {
         this(salvage, tonnage, type, -1);
     }
     
-    public MekActuator(boolean salvage, int tonnage, int type, int loc) {
+    public MissingMekActuator(boolean salvage, int tonnage, int type, int loc) {
     	super(salvage, tonnage);
         this.type = type;
         Mech m = new BipedMech();
         this.name = m.getSystemName(type) + " Actuator" ;
         this.location = loc;
+        this.time = 90;
+        this.difficulty = -3;
         computeCost();
     }
 
@@ -169,74 +171,13 @@ public class MekActuator extends Part {
 	public int getTechRating() {
 		return EquipmentType.RATING_C;
 	}
-	
+
 	@Override
-	public void fix() {
-		hits = 0;
-		if(null != unit) {
-			unit.repairSystem(CriticalSlot.TYPE_SYSTEM, type, location);
+	public boolean isAcceptableReplacement(Part part) {
+		if(part instanceof MekActuator) {
+			MekActuator actuator = (MekActuator)part;
+			return actuator.getType() == type && tonnage == actuator.getTonnage();
 		}
-	}
-
-	@Override
-	public Part getMissingPart() {
-		return new MissingMekActuator(isSalvage(), getTonnage(), type, location);
-	}
-
-	@Override
-	public void remove(boolean salvage) {
-		if(null != unit) {
-			unit.destroySystem(CriticalSlot.TYPE_SYSTEM, type, location);
-			if(!salvage) {
-				unit.campaign.removePart(this);
-			}
-			unit.removePart(this);
-			Part missing = getMissingPart();
-			unit.campaign.addPart(missing);
-			unit.addPart(missing);
-		}	
-		unit = null;
-		location = -1;
-	}
-
-	@Override
-	public void updateConditionFromEntity() {
-		if(null != unit) {
-			hits = unit.getEntity().getHitCriticals(CriticalSlot.TYPE_SYSTEM, type, location);	
-			if(hits == 0) {
-				time = 0;
-				difficulty = 0;
-			} 
-			else if(hits >= 1) {
-				time = 120;
-				difficulty = 0;
-			}
-		}
-		
-	}
-
-	@Override
-	public boolean needsFixing() {
-		return hits > 0;
-	}
-	
-	@Override
-	public String getDetails() {
-		if(null != unit) {
-			return unit.getEntity().getLocationName(location);
-		}
-		return "";
-	}
-
-	@Override
-	public void updateConditionFromPart() {
-		if(null != unit) {
-			if(hits > 0) {
-				unit.destroySystem(CriticalSlot.TYPE_SYSTEM, type, location);
-			} else {
-				unit.repairSystem(CriticalSlot.TYPE_SYSTEM, type, location);
-			}
-		}
-		
+		return false;
 	}
 }

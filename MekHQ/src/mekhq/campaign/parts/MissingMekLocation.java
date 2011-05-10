@@ -1,5 +1,5 @@
 /*
- * Location.java
+ * MissingMekLocation.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -40,14 +40,14 @@ import mekhq.campaign.work.ReplacementItem;
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class MekLocation extends Part {
+public class MissingMekLocation extends MissingPart {
 	private static final long serialVersionUID = -122291037522319765L;
 	protected int loc;
     protected int structureType;
     protected boolean tsm;
     double percent;
 
-    public MekLocation() {
+    public MissingMekLocation() {
     	this(false, 0, 0, 0, false);
     }
     
@@ -63,7 +63,7 @@ public class MekLocation extends Part {
         return structureType;
     }
     
-    public MekLocation(boolean salvage, int loc, int tonnage, int structureType, boolean hasTSM) {
+    public MissingMekLocation(boolean salvage, int loc, int tonnage, int structureType, boolean hasTSM) {
         super(salvage, tonnage);
         this.loc = loc;
         this.structureType = structureType;
@@ -104,6 +104,8 @@ public class MekLocation extends Part {
         if(tsm) {
             this.name += " (TSM)";
         }
+        this.time = 240;
+        this.difficulty = 3;
         computeCost();
     }
     
@@ -246,71 +248,14 @@ public class MekLocation extends Part {
 	}
 
 	@Override
-	public void fix() {
-		percent = 1.0;
-		if(null != unit) {
-			unit.getEntity().setInternal(unit.getEntity().getOInternal(loc), loc);
+	public boolean isAcceptableReplacement(Part part) {
+		if(part instanceof MekLocation) {
+			MekLocation mekLoc = (MekLocation)part;
+			return mekLoc.getLoc() == loc
+			&& mekLoc.getTonnage() == tonnage
+	        && mekLoc.isTsm() == tsm
+	        && mekLoc.getStructureType() == structureType;
 		}
-	}
-
-	@Override
-	public Part getMissingPart() {
-		return new MissingMekLocation(isSalvage(), loc, getTonnage(), structureType, tsm);
-	}
-
-	@Override
-	public void remove(boolean salvage) {
-		if(null != unit) {
-			unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, loc);
-			if(!salvage) {
-				unit.campaign.removePart(this);
-			}
-			unit.removePart(this);
-			Part missing = getMissingPart();
-			unit.campaign.addPart(missing);
-			unit.addPart(missing);
-		}
-		unit = null;		
-	}
-
-	@Override
-	public void updateConditionFromEntity() {
-		if(null != unit) {
-			percent = ((double) unit.getEntity().getInternal(loc)) / ((double) unit.getEntity().getOInternal(loc));
-			if(percent >= 1.0) {
-				this.time = 0;
-				this.difficulty = 0;
-			}
-			else if (percent > 0.75) {
-	            this.time = 270;
-	            this.difficulty = 2;
-	        } else if (percent > 0.5) {
-	            this.time = 180;
-	            this.difficulty = 1;
-	        } else if (percent > 0.25) {
-	            this.time = 135;
-	            this.difficulty = 0;
-	        }
-		}		
-	}
-
-	@Override
-	public boolean needsFixing() {
-		return percent < 1.0;
-	}
-	
-	@Override
-    public String getDetails() {
-		if(null != unit) {
-			return unit.getEntity().getLocationName(loc) + " (" + Math.round(100*percent) + "%)";
-		}
-		return "";
-    }
-
-	@Override
-	public void updateConditionFromPart() {
-		if(null != unit) {
-			unit.getEntity().setInternal((int)Math.round(percent * unit.getEntity().getOInternal(loc)), loc);
-		}
+		return false;
 	}
 }
