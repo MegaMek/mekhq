@@ -268,6 +268,7 @@ public class MekLocation extends Part {
 			}
 			//TODO create replacement part and add it to entity
 		}
+		unit.removePart(this);
 		unit = null;		
 	}
 
@@ -299,6 +300,9 @@ public class MekLocation extends Part {
 	
 	@Override
     public String getDetails() {
-        return unit.getEntity().getLocationName(loc) + " (" + Math.round(100*percent) + "%)";
+		if(null != unit) {
+			return unit.getEntity().getLocationName(loc) + " (" + Math.round(100*percent) + "%)";
+		}
+		return "";
     }
 }

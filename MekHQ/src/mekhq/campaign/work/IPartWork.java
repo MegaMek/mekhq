@@ -50,4 +50,6 @@ public interface IPartWork extends IWork {
 	
 	public Unit getUnit();
 	
+	public boolean isSalvaging();
+	
 }

@@ -97,6 +97,9 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	protected int teamId;
 	//null is valid. It indicates parts that are not attached to units.
 	Unit unit;
+	//boolean to indicate whether the repair status on this part is set to salvage or 
+	//to repair
+	protected boolean salvaging;
 	
 	public Part() {
 		this(false, 0);
@@ -114,6 +117,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		this.teamId = -1;
 		this.time = 0;
 		this.difficulty = 0;
+		this.salvaging = false;
 	}
 
 	public void setId(int id) {
@@ -167,7 +171,10 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		}
 		bonus = "(" + bonus + ")";
 		String toReturn = "<html><font size='2'";
-	
+		String action = "Repair ";
+		if(salvaging) {
+			action = "Salvage ";
+		}
 		String scheduled = "";
 		//if (isAssigned()) {
 		//	scheduled = " (scheduled) ";
@@ -178,7 +185,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		//	toReturn += " color='white'";
 		//}
 		toReturn += ">";
-		toReturn += "<b>Repair " + getName() + "</b><br/>";
+		toReturn += "<b>" + action + getName() + "</b><br/>";
 		toReturn += getDetails() + "<br/>";
 		toReturn += "" + getTimeLeft() + " minutes" + scheduled;
 		toReturn += ", " + SupportTeam.getRatingName(getSkillMin());
@@ -492,13 +499,28 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
 	@Override
 	public String succeed() {
-		fix();
-		return " <font color='green'><b> fixed.</b></font>";
+		if(salvaging) {
+			remove(true);
+			salvaging = false;
+			return " <font color='green'><b> salvaged.</b></font>";
+		} else {
+			fix();
+			return " <font color='green'><b> fixed.</b></font>";
+		}
 	}
 	
 	@Override
     public String getDetails() {
         return hits + " hit(s)";
     }
+	
+	@Override 
+	public boolean isSalvaging() {
+		return salvaging;
+	}
+
+	public void setSalvaging(boolean b) {
+		this.salvaging = b;
+	}
 }
 

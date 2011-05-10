@@ -169,7 +169,7 @@ public class TechTeam extends SupportTeam {
        if(partWork.getSkillMin() > getRating()) {
            return new TargetRoll(TargetRoll.IMPOSSIBLE, "Task is beyond this team's skill level");
        }
-       if(!partWork.needsFixing()) {
+       if(!partWork.needsFixing() && !partWork.isSalvaging()) {
            return new TargetRoll(TargetRoll.IMPOSSIBLE, "Task is not needed.");
        }
       /* if(task instanceof ReplacementItem && !((ReplacementItem)task).hasPart()) {

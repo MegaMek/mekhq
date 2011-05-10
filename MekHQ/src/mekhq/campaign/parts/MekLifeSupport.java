@@ -112,6 +112,7 @@ public class MekLifeSupport extends Part {
 			}
 			//TODO create replacement part and add it to entity
 		}
+		unit.removePart(this);
 		unit = null;	
 	}
 

@@ -29,6 +29,7 @@ import org.w3c.dom.NodeList;
 
 import megamek.common.Engine;
 import megamek.common.EquipmentType;
+import megamek.common.IArmorState;
 import megamek.common.TechConstants;
 import mekhq.campaign.Faction;
 import mekhq.campaign.MekHqXmlUtil;
@@ -309,8 +310,21 @@ public class Armor extends Part {
 
 	@Override
 	public void remove(boolean salvage) {
-		//don't do anything here yet, because we don't actually remove armor, just set it at zero
-		//in the future, we need a method for adding armor points to salvage parts
+		//TODO: we need a method for adding armor points to salvage parts
+		unit.getEntity().setArmor(IArmorState.ARMOR_DESTROYED, location, rear);
+		//cycle through spare parts and add to existing armor if found
+		for(Part part : unit.campaign.getSpareParts()) {
+			if(part instanceof Armor) {
+				Armor a = (Armor)part;
+				if(a.getType() == type) {
+					a.setAmount(a.getAmount() + amountNeeded);
+					return;
+				}
+			}
+		}
+		//if we are still here then we did not find any armor, so lets create a new part and stick it in spares
+		Armor newArmor = new Armor(true,tonnage,type,amountNeeded,location,rear);
+		unit.campaign.addPart(newArmor);
 	}
 
 	@Override
@@ -319,7 +333,11 @@ public class Armor extends Part {
 		if(currentArmor < 0) {
 			currentArmor = 0;
 		}
-		amountNeeded = unit.getEntity().getOArmor(location, rear) - currentArmor;
+		if(salvaging) {
+			amountNeeded = currentArmor;
+		} else {			
+			amountNeeded = unit.getEntity().getOArmor(location, rear) - currentArmor;
+		}
 		if(amountNeeded > 0) {
 			time = 5 * amountNeeded;
 			difficulty = -2;
@@ -327,6 +345,22 @@ public class Armor extends Part {
 			time = 0;
 			difficulty = 0;
 		}
+	}
+	
+	@Override
+	public boolean isSalvaging() {
+		return salvaging && amountNeeded > 0;
+	}
+	
+	@Override
+	public String succeed() {
+		boolean tmpSalvaging = salvaging;
+		String toReturn = super.succeed();
+		if(tmpSalvaging) {
+			salvaging = true;
+			updateCondition();
+		}
+		return toReturn;
 	}
 
 	@Override

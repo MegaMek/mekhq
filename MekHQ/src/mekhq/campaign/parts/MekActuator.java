@@ -193,6 +193,7 @@ public class MekActuator extends Part {
 			}
 			//TODO create replacement part and add it to entity
 		}
+		unit.removePart(this);
 		unit = null;
 		location = -1;
 	}

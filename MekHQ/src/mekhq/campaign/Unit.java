@@ -690,7 +690,21 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 	 * Run a diagnostic on this unit
 	 */
 	public void runDiagnostic() {
-		for(Part part : parts) {
+		
+		//need to set up an array of part ids to avoid concurrent modification
+		//problems because some updateCondition methods will remove the part and put
+		//in a new one
+		ArrayList<Integer> partIds = new ArrayList<Integer>();
+		for(Part p : parts) {
+			partIds.add(p.getId());
+		}
+		for(int pid : partIds) {
+			Part part = campaign.getPart(pid);
+			if(!isRepairable() || isSalvage()) {
+				part.setSalvaging(true);
+			} else {
+				part.setSalvaging(false);
+			}
 			part.updateCondition();
 		}
 		/*
@@ -708,13 +722,17 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 	public ArrayList<Part> getPartsNeedingFixing() {
 		ArrayList<Part> brokenParts = new ArrayList<Part>();
 		for(Part part: parts) {
-			if(part.needsFixing()) {
+			if(part.needsFixing() || part.isSalvaging()) {
 				brokenParts.add(part);
 			}
 		}
 		return brokenParts;
 	}
 
+	public void removePart(Part part) {
+		parts.remove(part);
+	}
+	
 	/**
 	 * @param m
 	 *            - A Mounted class to find crits for
@@ -2092,44 +2110,37 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     			gyro =  new MekGyro(false, (int) entity.getWeight(), entity.getGyroType(), entity.getOriginalWalkMP());
     			addPart(gyro);
     			campaign.addPart(gyro);
-    			gyro.updateCondition();
     		}
     		if(null == engine) {
     			engine = new MekEngine(false, (int) entity.getWeight(), campaign.getFaction(), entity.getEngine(), campaign.getCampaignOptions().getClanPriceModifier());
     			addPart(engine);
     			campaign.addPart(engine);
-    			engine.updateCondition();
     		}
     		if(null == lifeSupport) {
     			lifeSupport = new MekLifeSupport(false, (int) entity.getWeight());
     			addPart(lifeSupport);
     			campaign.addPart(lifeSupport);
-    			lifeSupport.updateCondition();
     		}
     		if(null == sensor) {
     			sensor = new MekSensor(false, (int) entity.getWeight());
     			addPart(sensor);
     			campaign.addPart(sensor);
-    			sensor.updateCondition();
     		}
     		for(int i = 0; i<locations.length; i++) {
     			if(null == locations[i]) {
     				MekLocation mekLocation = new MekLocation(false, i, (int) getEntity().getWeight(), getEntity().getStructureType(), hasTSM());
     				addPart(mekLocation);
     				campaign.addPart(mekLocation);
-    				mekLocation.updateCondition();
     			}
     			if(null == armor[i]) {
     				Armor mekArmor = new Armor(false, (int) getEntity().getWeight(), getEntity().getArmorType(i), getEntity().getOArmor(i, false), i, false);
     				addPart(mekArmor);
     				campaign.addPart(mekArmor);
-    				mekArmor.updateCondition();
     			}
     			if(null == armorRear[i] && entity.hasRearArmor(i)) {
     				Armor mekArmor = new Armor(false, (int) getEntity().getWeight(), getEntity().getArmorType(i), getEntity().getOArmor(i, false), i, true);
     				addPart(mekArmor);
     				campaign.addPart(mekArmor);
-    				mekArmor.updateCondition();
     			}
     		}
     		for(Mounted m : entity.getEquipment()) {
@@ -2140,7 +2151,6 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 	    				epart = new EquipmentPart(false, (int)entity.getWeight(), m.getType(), eqnum);
 	    				addPart(epart);
 	    				campaign.addPart(epart);
-	    				epart.updateCondition();
 	    			}
     			}
     		}
@@ -2148,74 +2158,63 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     			rightUpperArm = new MekActuator(false, (int)entity.getWeight(), Mech.ACTUATOR_UPPER_ARM, Mech.LOC_RARM);
     			addPart(rightUpperArm);
     			campaign.addPart(rightUpperArm);
-    			rightUpperArm.updateCondition();
     		}
     		if(null == leftUpperArm && entity.hasSystem(Mech.ACTUATOR_UPPER_ARM, Mech.LOC_LARM)) {
     			leftUpperArm = new MekActuator(false, (int)entity.getWeight(), Mech.ACTUATOR_UPPER_ARM, Mech.LOC_LARM);
     			addPart(leftUpperArm);
     			campaign.addPart(leftUpperArm);
-    			leftUpperArm.updateCondition();
     		}
     		if(null == rightLowerArm && entity.hasSystem(Mech.ACTUATOR_LOWER_ARM, Mech.LOC_RARM)) {
     			rightLowerArm = new MekActuator(false, (int)entity.getWeight(), Mech.ACTUATOR_LOWER_ARM, Mech.LOC_RARM);
     			addPart(rightLowerArm);
     			campaign.addPart(rightLowerArm);
-    			rightLowerArm.updateCondition();
     		}
     		if(null == leftLowerArm && entity.hasSystem(Mech.ACTUATOR_LOWER_ARM, Mech.LOC_LARM)) {
     			leftLowerArm = new MekActuator(false, (int)entity.getWeight(), Mech.ACTUATOR_LOWER_ARM, Mech.LOC_LARM);
     			addPart(leftLowerArm);
     			campaign.addPart(leftLowerArm);
-    			leftLowerArm.updateCondition();
     		}
     		if(null == rightHand && entity.hasSystem(Mech.ACTUATOR_HAND, Mech.LOC_RARM)) {
     			rightHand = new MekActuator(false, (int)entity.getWeight(), Mech.ACTUATOR_HAND, Mech.LOC_RARM);
     			addPart(rightHand);
     			campaign.addPart(rightHand);
-    			rightHand.updateCondition();
     		}
     		if(null == leftHand && entity.hasSystem(Mech.ACTUATOR_HAND, Mech.LOC_LARM)) {
     			leftHand = new MekActuator(false, (int)entity.getWeight(), Mech.ACTUATOR_HAND, Mech.LOC_LARM);
     			addPart(leftHand);
     			campaign.addPart(leftHand);
-    			leftHand.updateCondition();
     		}
     		if(null == rightUpperLeg && entity.hasSystem(Mech.ACTUATOR_UPPER_LEG, Mech.LOC_RLEG)) {
     			rightUpperLeg = new MekActuator(false, (int)entity.getWeight(), Mech.ACTUATOR_UPPER_LEG, Mech.LOC_RLEG);
     			addPart(rightUpperLeg);
     			campaign.addPart(rightUpperLeg);
-    			rightUpperLeg.updateCondition();
     		}
     		if(null == leftUpperLeg && entity.hasSystem(Mech.ACTUATOR_UPPER_LEG, Mech.LOC_LLEG)) {
     			leftUpperLeg = new MekActuator(false, (int)entity.getWeight(), Mech.ACTUATOR_UPPER_LEG, Mech.LOC_LLEG);
     			addPart(leftUpperLeg);
     			campaign.addPart(leftUpperLeg);
-    			leftUpperLeg.updateCondition();
     		}
     		if(null == rightLowerLeg && entity.hasSystem(Mech.ACTUATOR_LOWER_LEG, Mech.LOC_RLEG)) {
     			rightLowerLeg = new MekActuator(false, (int)entity.getWeight(), Mech.ACTUATOR_LOWER_LEG, Mech.LOC_RLEG);
     			addPart(rightLowerLeg);
     			campaign.addPart(rightLowerLeg);
-    			rightLowerLeg.updateCondition();
     		}
     		if(null == leftLowerLeg && entity.hasSystem(Mech.ACTUATOR_LOWER_LEG, Mech.LOC_LLEG)) {
     			leftLowerLeg = new MekActuator(false, (int)entity.getWeight(), Mech.ACTUATOR_LOWER_LEG, Mech.LOC_LLEG);
     			addPart(leftLowerLeg);
     			campaign.addPart(leftLowerLeg);
-    			leftLowerLeg.updateCondition();
     		}
     		if(null == rightFoot && entity.hasSystem(Mech.ACTUATOR_FOOT, Mech.LOC_RLEG)) {
     			rightFoot = new MekActuator(false, (int)entity.getWeight(), Mech.ACTUATOR_FOOT, Mech.LOC_RLEG);
     			addPart(rightFoot);
     			campaign.addPart(rightFoot);
-    			rightFoot.updateCondition();
     		}
     		if(null == leftFoot && entity.hasSystem(Mech.ACTUATOR_FOOT, Mech.LOC_LLEG)) {
     			leftFoot = new MekActuator(false, (int)entity.getWeight(), Mech.ACTUATOR_FOOT, Mech.LOC_LLEG);
     			addPart(leftFoot);
     			campaign.addPart(leftFoot);
-    			leftFoot.updateCondition();
     		}
     	}
+    	runDiagnostic();
     }
 }

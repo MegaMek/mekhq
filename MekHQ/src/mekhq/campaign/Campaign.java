@@ -1004,6 +1004,16 @@ public class Campaign implements Serializable {
 		colorIndex = index;
 	}
 
+	public ArrayList<Part> getSpareParts() {
+		ArrayList<Part> spares = new ArrayList<Part>();
+		for(Part part : getParts()) {
+			if(null == part.getUnit()) {
+				spares.add(part);
+			}
+		}
+		return spares;
+	}
+	
 	/**
 	 * Creates an {@link ArrayList} containing a {@link PartInventory} for each
 	 * part owned ({@link parts})
@@ -1014,7 +1024,7 @@ public class Campaign implements Serializable {
 	public ArrayList<PartInventory> getPartsInventory() {
 		ArrayList<PartInventory> partsInventory = new ArrayList<PartInventory>();
 
-		Iterator<Part> itParts = getParts().iterator();
+		Iterator<Part> itParts = getSpareParts().iterator();
 		while (itParts.hasNext()) {
 			Part part = itParts.next();
 			if (!partsInventory.contains(new PartInventory(part, 0))) {
@@ -1026,26 +1036,6 @@ public class Campaign implements Serializable {
 			}
 		}
 
-		return partsInventory;
-	}
-
-	/**
-	 * Creates an {@link ArrayList} containing a {@link PartInventory} for each
-	 * part returned by {@link getPartsInventory()} which is of the type
-	 * {@link partType}
-	 * 
-	 * @param partType
-	 *            The type of the part as defined in {@link Part}
-	 */
-	public ArrayList<PartInventory> getPartsInventory(int partType) {
-		ArrayList<PartInventory> partsInventory = new ArrayList<PartInventory>();
-		Iterator<PartInventory> itParts = getPartsInventory().iterator();
-		while (itParts.hasNext()) {
-			PartInventory partInventory = itParts.next();
-			Part part = partInventory.getPart();
-			if (part.getPartType() == partType)
-				partsInventory.add(partInventory);
-		}
 		return partsInventory;
 	}
 

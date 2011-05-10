@@ -41,6 +41,8 @@ v0.1.6 (SVN)
 + beginning of BIG change to repair system - no more tasks, repairs are performed directly on parts
    don't use this yet, salvage and replacement are not implemented
 + Mech repairs complete under new system (still need salvage and replacement)
++ mech salvage complete under new system 
++ tasktablemouseadapter 
 
 v0.1.5 (2011-05-05)
 + refactored Hangar Panel into separate Hangar and Repair Bay panel

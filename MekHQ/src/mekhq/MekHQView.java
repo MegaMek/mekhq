@@ -3038,30 +3038,20 @@ public class MekHQView extends FrameView {
 			ActionListener {
 
 		public void actionPerformed(ActionEvent action) {
-			/*
 			String command = action.getActionCommand();
-			Part[] tasks = taskModel.getTasksAt(TaskTable.getSelectedRows());
+			Part part = taskModel.getTaskAt(TaskTable.getSelectedRow());
+			if(null == part) {
+				return;
+			}
 			if (command.equalsIgnoreCase("REPLACE")) {
-				for (WorkItem task : tasks) {
-					if (task instanceof RepairItem) {
-						if (((RepairItem) task).canScrap()) {
-							campaign.mutateTask(task,
-									((RepairItem) task).replace());
-						}
-					} else if (task instanceof ReplacementItem) {
-						((ReplacementItem) task).useUpPart();
-						task.setSkillMin(SupportTeam.EXP_GREEN);
-					} else if (task instanceof SalvageItem) {
-						SalvageItem salvage = (SalvageItem) task;
-						salvage.scrap();
-					}
-				}
+				part.remove(false);
 				refreshServicedUnitList();
 				refreshUnitList();
 				refreshTaskList();
 				refreshUnitView();
 				refreshAcquireList();
 			} else if (command.contains("SWAP_AMMO")) {
+				/*
 				WorkItem task = taskModel.getTaskAt(TaskTable.getSelectedRow());
 				if (task instanceof ReloadItem) {
 					ReloadItem reload = (ReloadItem) task;
@@ -3079,29 +3069,27 @@ public class MekHQView extends FrameView {
 					refreshTaskList();
 					refreshUnitView();
 					refreshAcquireList();
-				}
+				}*/
 			} else if (command.contains("CHANGE_MODE")) {
-				for (WorkItem task : tasks) {
-					String sel = command.split(":")[1];
-					int selected = Integer.parseInt(sel);
-					task.setMode(selected);
-					refreshServicedUnitList();
-					refreshUnitList();
-					refreshTaskList();
-					refreshUnitView();
-					refreshAcquireList();
-				}
+				String sel = command.split(":")[1];
+				int selected = Integer.parseInt(sel);
+				part.setMode(selected);
+				refreshServicedUnitList();
+				refreshUnitList();
+				refreshTaskList();
+				refreshUnitView();
+				refreshAcquireList();
 			} else if (command.contains("UNASSIGN")) {
-				for (WorkItem task : tasks) {
+			/*	for (WorkItem task : tasks) {
 					task.resetTimeSpent();
 					task.setTeam(null);
 					refreshServicedUnitList();
 					refreshUnitList();
 					refreshTaskList();
 					refreshAcquireList();
-				}
+				}*/
 			} else if (command.contains("FIX")) {
-				for (WorkItem task : tasks) {
+			/*	for (WorkItem task : tasks) {
 					if (task.checkFixable() == null) {
 						if ((task instanceof ReplacementItem)
 								&& !((ReplacementItem) task).hasPart()) {
@@ -3120,9 +3108,8 @@ public class MekHQView extends FrameView {
 					refreshTaskList();
 					refreshAcquireList();
 					refreshPartsList();
-				}
+				}*/
 			}
-			*/
 		}
 
 		@Override
@@ -3136,47 +3123,48 @@ public class MekHQView extends FrameView {
 		}
 
 		private void maybeShowPopup(MouseEvent e) {
-			/*
 			JPopupMenu popup = new JPopupMenu();
 			if (e.isPopupTrigger()) {
-				int row = TaskTable.rowAtPoint(e.getPoint());
-				WorkItem task = taskModel.getTaskAt(row);
+				int row = TaskTable.getSelectedRow();
+				if(row < 0) {
+					return;
+				}
+				Part part = taskModel.getTaskAt(row);
 				JMenuItem menuItem = null;
 				JMenu menu = null;
 				JCheckBoxMenuItem cbMenuItem = null;
-				if ((task instanceof RepairItem)
-						|| (task instanceof ReplacementItem)
-						|| (task instanceof SalvageItem)) {
-					// Mode (extra time, rush job, ...
-					menu = new JMenu("Mode");
-					for (int i = 0; i < WorkItem.MODE_N; i++) {
-						cbMenuItem = new JCheckBoxMenuItem(
-								WorkItem.getModeName(i));
-						if (task.getMode() == i) {
-							cbMenuItem.setSelected(true);
-						} else {
-							cbMenuItem.setActionCommand("CHANGE_MODE:" + i);
-							cbMenuItem.addActionListener(this);
-						}
-						menu.add(cbMenuItem);
+				// Mode (extra time, rush job, ...
+				menu = new JMenu("Mode");
+				for (int i = 0; i < Part.MODE_N; i++) {
+					cbMenuItem = new JCheckBoxMenuItem(
+							WorkItem.getModeName(i));
+					if (part.getMode() == i) {
+						cbMenuItem.setSelected(true);
+					} else {
+						cbMenuItem.setActionCommand("CHANGE_MODE:" + i);
+						cbMenuItem.addActionListener(this);
 					}
-					popup.add(menu);
-					// Scrap component
-					menuItem = new JMenuItem("Scrap component");
-					menuItem.setActionCommand("REPLACE");
-					menuItem.addActionListener(this);
+					menu.add(cbMenuItem);
+				}		
+				popup.add(menu);
+				// Scrap component
+				menuItem = new JMenuItem("Scrap component");
+				menuItem.setActionCommand("REPLACE");
+				menuItem.addActionListener(this);
 
-					// Everything needs to be scrapable
-					// menuItem.setEnabled(((UnitWorkItem)task).canScrap());
-					menuItem.setEnabled(true);
-					popup.add(menuItem);
-					// Remove assigned team for scheduled tasks
-					menuItem = new JMenuItem("Remove Assigned Team");
-					menuItem.setActionCommand("UNASSIGN");
-					menuItem.addActionListener(this);
-					menuItem.setEnabled(task.isAssigned());
-					popup.add(menuItem);
-				}
+				// Everything needs to be scrapable
+				// menuItem.setEnabled(((UnitWorkItem)task).canScrap());
+				menuItem.setEnabled(true);
+				popup.add(menuItem);
+				// Remove assigned team for scheduled tasks
+				/*
+				menuItem = new JMenuItem("Remove Assigned Team");
+				menuItem.setActionCommand("UNASSIGN");
+				menuItem.addActionListener(this);
+				menuItem.setEnabled(task.isAssigned());
+				popup.add(menuItem);
+				*/
+				/*
 				if (task instanceof ReloadItem) {
 					ReloadItem reload = (ReloadItem) task;
 					Entity en = reload.getUnit().getEntity();
@@ -3202,18 +3190,20 @@ public class MekHQView extends FrameView {
 	                }
 					popup.add(menu);
 				}
+				*/
 				menu = new JMenu("GM Mode");
 				popup.add(menu);
 				// Auto complete task
+				/*
 				menuItem = new JMenuItem("Complete Task");
 				menuItem.setActionCommand("FIX");
 				menuItem.addActionListener(this);
 				menuItem.setEnabled(campaign.isGM()
 						&& (null == task.checkFixable()));
 				menu.add(menuItem);
+				*/
 				popup.show(e.getComponent(), e.getX(), e.getY());
 			}
-			*/
 		}	
 	}
 	
@@ -3412,6 +3402,7 @@ public class MekHQView extends FrameView {
 				for (Unit unit : units) {
 					if (!unit.isDeployed()) {
 						unit.setSalvage(true);
+						unit.runDiagnostic();
 					}
 				}
 				refreshServicedUnitList();
@@ -6276,6 +6267,7 @@ public class MekHQView extends FrameView {
 				for (Unit unit : units) {
 					if (!unit.isDeployed()) {
 						unit.setSalvage(true);
+						unit.runDiagnostic();
 					}
 				}
 				refreshServicedUnitList();
