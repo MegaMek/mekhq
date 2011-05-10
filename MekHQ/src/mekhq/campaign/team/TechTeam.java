@@ -36,6 +36,7 @@ import megamek.common.TargetRoll;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Utilities;
 import mekhq.campaign.parts.GenericSparePart;
+import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.work.FullRepairWarchest;
 import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.ReloadItem;
@@ -172,9 +173,9 @@ public class TechTeam extends SupportTeam {
        if(!partWork.needsFixing() && !partWork.isSalvaging()) {
            return new TargetRoll(TargetRoll.IMPOSSIBLE, "Task is not needed.");
        }
-      /* if(task instanceof ReplacementItem && !((ReplacementItem)task).hasPart()) {
+       if(partWork instanceof MissingPart && null == ((MissingPart)partWork).findReplacement()) {
            return new TargetRoll(TargetRoll.IMPOSSIBLE, "part not available.");
-       }*/
+       }
        TargetRoll target = getTarget(partWork.getMode());
        if(target.getValue() == TargetRoll.IMPOSSIBLE) {
            return target;

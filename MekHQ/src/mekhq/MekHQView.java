@@ -3411,6 +3411,7 @@ public class MekHQView extends FrameView {
 				for (Unit unit : units) {
 					if (!unit.isDeployed() && unit.isRepairable()) {
 						unit.setSalvage(false);
+						unit.runDiagnostic();
 					}
 				}
 				refreshServicedUnitList();
@@ -6276,6 +6277,7 @@ public class MekHQView extends FrameView {
 				for (Unit unit : units) {
 					if (!unit.isDeployed() && unit.isRepairable()) {
 						unit.setSalvage(false);
+						unit.runDiagnostic();
 					}
 				}
 				refreshServicedUnitList();

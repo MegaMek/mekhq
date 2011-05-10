@@ -705,7 +705,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 			} else {
 				part.setSalvaging(false);
 			}
-			part.updateCondition();
+			part.updateConditionFromEntity();
 		}
 		/*
 		int repairSystem = campaign.getCampaignOptions().getRepairSystem();
@@ -883,6 +883,24 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 			}
 		}
 	}
+	
+	public void hitSystem(int type, int slot) {
+		for (int loc = 0; loc < getEntity().locations(); loc++) {
+			for (int i = 0; i < getEntity().getNumberOfCriticals(loc); i++) {
+				CriticalSlot cs = getEntity().getCritical(loc, i);
+				// ignore empty & system slots
+				if ((cs == null) || (cs.getType() != type)) {
+					continue;
+				}
+				if (cs.getIndex() == slot && !cs.isDestroyed()) {
+					cs.setHit(true);
+					cs.setDestroyed(true);
+					cs.setRepairable(true);
+					return;
+				}
+			}
+		}
+	}
 
 	public void destroySystem(int type, int slot) {
 		for (int loc = 0; loc < getEntity().locations(); loc++) {
@@ -932,6 +950,23 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 			}
 		}
 	}
+	
+	public void hitSystem(int type, int slot, int loc) {
+		for (int i = 0; i < getEntity().getNumberOfCriticals(loc); i++) {
+			CriticalSlot cs = getEntity().getCritical(loc, i);
+			// ignore empty & system slots
+			if ((cs == null) || (cs.getType() != type)) {
+				continue;
+			}
+			if (cs.getIndex() == slot  && !cs.isDestroyed()) {
+				cs.setHit(true);
+				cs.setDestroyed(true);
+				cs.setRepairable(true);
+				return;
+			}
+		}
+	}
+		
 
 	public void destroySystem(int type, int slot, int loc) {
 		for (int i = 0; i < getEntity().getNumberOfCriticals(loc); i++) {

@@ -43,6 +43,7 @@ v0.1.6 (SVN)
 + Mech repairs complete under new system (still need salvage and replacement)
 + mech salvage complete under new system 
 + tasktablemouseadapter 
++ MissingPart and MissingMekGyro (beginning of replacements under new system)
 
 v0.1.5 (2011-05-05)
 + refactored Hangar Panel into separate Hangar and Repair Bay panel

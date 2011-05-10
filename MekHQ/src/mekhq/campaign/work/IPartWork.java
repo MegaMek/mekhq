@@ -40,10 +40,11 @@ public interface IPartWork extends IWork {
 	public int getTimeSpent();
 	public int getTimeLeft();
 	
-	public void updateCondition();
+	public void updateConditionFromEntity();
+	public void updateConditionFromPart();
 	public void fix();
 	public void remove(boolean salvage);
-	public Part getReplacementPart();
+	public Part getMissingPart();
 	
 	public String getDesc();
 	public String getDetails();

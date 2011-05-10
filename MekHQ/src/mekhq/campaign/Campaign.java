@@ -70,6 +70,7 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.EquipmentPart;
 import mekhq.campaign.parts.GenericSparePart;
+import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PilotPerson;
@@ -685,7 +686,14 @@ public class Campaign implements Serializable {
 	
 	public void fixPart(IPartWork partWork, TechTeam t) {
 		String report = "";
-		report += t.getName() + " attempts to fix " + partWork.getPartName();   
+		String action = " fix ";
+		if(partWork.isSalvaging()) {
+			action = " salvage ";
+		}
+		if(partWork instanceof MissingPart) {
+			action = " replace ";
+		}
+		report += t.getName() + " attempts to" + action + partWork.getPartName();   
 		TargetRoll target = t.getTargetFor(partWork);
 		int roll = Compute.d6(2);
 		report = report + ",  needs " + target.getValueAsString() + " and rolls " + roll + ":";

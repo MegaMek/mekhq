@@ -262,7 +262,7 @@ public class MekEngine extends Part {
 	}
 
 	@Override
-	public Part getReplacementPart() {
+	public Part getMissingPart() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -282,7 +282,7 @@ public class MekEngine extends Part {
 	}
 
 	@Override
-	public void updateCondition() {
+	public void updateConditionFromEntity() {
 		if(null != unit) {
 			int engineHits = 0;
 			int engineCrits = 0;
@@ -320,5 +320,18 @@ public class MekEngine extends Part {
 	@Override
 	public boolean needsFixing() {
 		return hits > 0;
+	}
+
+	@Override
+	public void updateConditionFromPart() {
+		if(null != unit) {
+			if(hits == 0) {
+				unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE);
+			} else {
+				for(int i = 0; i < hits; i++) {
+					unit.hitSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE);
+				}
+			}
+		}
 	}
 }

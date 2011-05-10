@@ -254,7 +254,7 @@ public class MekLocation extends Part {
 	}
 
 	@Override
-	public Part getReplacementPart() {
+	public Part getMissingPart() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -273,7 +273,7 @@ public class MekLocation extends Part {
 	}
 
 	@Override
-	public void updateCondition() {
+	public void updateConditionFromEntity() {
 		if(null != unit) {
 			percent = ((double) unit.getEntity().getInternal(loc)) / ((double) unit.getEntity().getOInternal(loc));
 			if(percent >= 1.0) {
@@ -305,4 +305,11 @@ public class MekLocation extends Part {
 		}
 		return "";
     }
+
+	@Override
+	public void updateConditionFromPart() {
+		if(null != unit) {
+			unit.getEntity().setInternal((int)Math.round(percent * unit.getEntity().getOInternal(loc)), loc);
+		}
+	}
 }

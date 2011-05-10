@@ -91,7 +91,7 @@ public class Rotor extends Part {
 	}
 
 	@Override
-	public Part getReplacementPart() {
+	public Part getMissingPart() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -103,7 +103,7 @@ public class Rotor extends Part {
 	}
 
 	@Override
-	public void updateCondition() {
+	public void updateConditionFromEntity() {
 		// TODO Auto-generated method stub
 		
 	}
@@ -112,5 +112,11 @@ public class Rotor extends Part {
 	public boolean needsFixing() {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	@Override
+	public void updateConditionFromPart() {
+		// TODO Auto-generated method stub
+		
 	}
 }

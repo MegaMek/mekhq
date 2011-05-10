@@ -98,7 +98,7 @@ public class MekLifeSupport extends Part {
 	}
 
 	@Override
-	public Part getReplacementPart() {
+	public Part getMissingPart() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -117,7 +117,7 @@ public class MekLifeSupport extends Part {
 	}
 
 	@Override
-	public void updateCondition() {
+	public void updateConditionFromEntity() {
 		if(null != unit) {
 			Entity entity = unit.getEntity();
 			for (int i = 0; i < entity.locations(); i++) {
@@ -150,5 +150,18 @@ public class MekLifeSupport extends Part {
 	@Override
 	public boolean needsFixing() {
 		return hits > 0;
+	}
+	
+	@Override
+	public void updateConditionFromPart() {
+		if(null != unit) {
+			if(hits == 0) {
+				unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_LIFE_SUPPORT);
+			} else {
+				for(int i = 0; i < hits; i++) {
+					unit.hitSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_LIFE_SUPPORT);
+				}
+			}
+		}
 	}
 }

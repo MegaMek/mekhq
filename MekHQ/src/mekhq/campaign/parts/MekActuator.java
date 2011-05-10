@@ -179,7 +179,7 @@ public class MekActuator extends Part {
 	}
 
 	@Override
-	public Part getReplacementPart() {
+	public Part getMissingPart() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -199,7 +199,7 @@ public class MekActuator extends Part {
 	}
 
 	@Override
-	public void updateCondition() {
+	public void updateConditionFromEntity() {
 		if(null != unit) {
 			hits = unit.getEntity().getHitCriticals(CriticalSlot.TYPE_SYSTEM, type, location);	
 			if(hits == 0) {
@@ -225,5 +225,17 @@ public class MekActuator extends Part {
 			return unit.getEntity().getLocationName(location);
 		}
 		return "";
+	}
+
+	@Override
+	public void updateConditionFromPart() {
+		if(null != unit) {
+			if(hits > 0) {
+				unit.destroySystem(CriticalSlot.TYPE_SYSTEM, type, location);
+			} else {
+				unit.repairSystem(CriticalSlot.TYPE_SYSTEM, type, location);
+			}
+		}
+		
 	}
 }

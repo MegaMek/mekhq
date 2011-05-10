@@ -1,5 +1,5 @@
 /*
- * MekGyro.java
+ * MissingMekGyro.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -39,21 +39,22 @@ import mekhq.campaign.work.ReplacementItem;
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class MekGyro extends Part {
+public class MissingMekGyro extends MissingPart {
 	private static final long serialVersionUID = 3420475726506139139L;
 	protected int type;
     protected int walkMP;
 
-    public MekGyro() {
+    public MissingMekGyro() {
     	this(false, 0, 0, 0);
     }
     
-    public MekGyro(boolean salvage, int tonnage, int type, int walkMP) {
+    public MissingMekGyro(boolean salvage, int tonnage, int type, int walkMP) {
         super(salvage, tonnage);
         this.type = type;
         this.name = Mech.getGyroTypeString(type);
         this.walkMP = walkMP;
-        computeCost();
+        this.time = 200;
+        this.difficulty = 0;
     }
     
     public int getType() {
@@ -94,22 +95,6 @@ public class MekGyro extends Part {
     	return MekGyro.getGyroTonnage(getGyroBaseTonnage(), getType());
     }
     
-    private void computeCost() {
-        double c = 0;
-        
-        if (getType() == Mech.GYRO_XL) {
-            c = 750000 * getGyroTonnage();
-        } else if (getType() == Mech.GYRO_COMPACT) {
-            c = 400000 * getGyroTonnage();
-        } else if (getType() == Mech.GYRO_HEAVY_DUTY) {
-            c = 500000 * getGyroTonnage();
-        } else {
-            c = 300000 * getGyroTonnage();
-        }
-        
-        this.cost = (long) Math.round(c);
-    }
-    
     @Override
     public boolean canBeUsedBy(ReplacementItem task) {
     	if(!(task instanceof MekGyroReplacement)) {
@@ -123,20 +108,6 @@ public class MekGyro extends Part {
     	
         return (((MekGyroReplacement)task).getUnit().getEntity().getGyroType() == type
                 && getGyroTonnage() == unitGyroTonnage);
-    }
-
-    @Override
-    public boolean isSamePartTypeAndStatus (Part part) {
-        return part instanceof MekGyro
-                && getName().equals(part.getName())
-                && getStatus().equals(part.getStatus())
-                && getType() == ((MekGyro) part).getType()
-                && getTonnage() == ((MekGyro) part).getTonnage();
-    }
-
-    @Override
-    public int getPartType() {
-        return PART_TYPE_MEK_GYRO;
     }
 
 	@Override
@@ -199,72 +170,17 @@ public class MekGyro extends Part {
 	}
 
 	@Override
-	public void fix() {
-		hits = 0;
-		updateConditionFromEntity();
-		if(null != unit) {
-			unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_GYRO, Mech.LOC_CT);
+	public boolean isAcceptableReplacement(Part part) {
+		if(part instanceof MekGyro) {
+			MekGyro gyro = (MekGyro)part;
+			return type == gyro.getType() && getGyroTonnage() == gyro.getGyroTonnage();
 		}
-
+		return false;
 	}
 
 	@Override
-	public Part getMissingPart() {
-		return new MissingMekGyro(isSalvage(), getTonnage(), getType(), getWalkMP());
-	}
-
-	@Override
-	public void remove(boolean salvage) {
-		if(null != unit) {
-			unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_GYRO, Mech.LOC_CT);
-			if(!salvage) {
-				unit.campaign.removePart(this);
-			}
-			unit.removePart(this);
-			Part missing = getMissingPart();
-			unit.campaign.addPart(missing);
-			unit.addPart(missing);
-		}	
-		unit = null;
-	}
-
-	@Override
-	public void updateConditionFromEntity() {
-		if(null != unit) {
-			hits = unit.getEntity().getHitCriticals(CriticalSlot.TYPE_SYSTEM,Mech.SYSTEM_GYRO, Mech.LOC_CT);
-			if(hits == 0) {
-				time = 0;
-				difficulty = 0;
-			}
-			else if(hits == 1) {
-				time = 120;
-				difficulty = 1;
-			} 
-			else if(hits == 2) {
-				time = 240;
-				difficulty = 4;
-			}
-			else if(hits > 2) {
-				remove(false);
-			}
-		}	
-	}
-
-	@Override
-	public boolean needsFixing() {
-		return hits > 0;
-	}
-
-	@Override
-	public void updateConditionFromPart() {
-		if(null != unit) {
-			if(hits == 0) {
-				unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_GYRO, Mech.LOC_CT);
-			} else {
-				for(int i = 0; i < hits; i++) {
-					unit.hitSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_GYRO, Mech.LOC_CT);
-				}
-			}
-		}
+	public boolean isSamePartTypeAndStatus(Part part) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }

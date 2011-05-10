@@ -303,7 +303,7 @@ public class Armor extends Part {
 	}
 
 	@Override
-	public Part getReplacementPart() {
+	public Part getMissingPart() {
 		//no such thing
 		return null;
 	}
@@ -328,7 +328,7 @@ public class Armor extends Part {
 	}
 
 	@Override
-	public void updateCondition() {
+	public void updateConditionFromEntity() {
 		int currentArmor = unit.getEntity().getArmor(location, rear);
 		if(currentArmor < 0) {
 			currentArmor = 0;
@@ -358,7 +358,7 @@ public class Armor extends Part {
 		String toReturn = super.succeed();
 		if(tmpSalvaging) {
 			salvaging = true;
-			updateCondition();
+			updateConditionFromEntity();
 		}
 		return toReturn;
 	}
@@ -366,5 +366,10 @@ public class Armor extends Part {
 	@Override
 	public boolean needsFixing() {
 		return amountNeeded > 0;
+	}
+
+	@Override
+	public void updateConditionFromPart() {
+		//this should never happen for armor
 	}
 }

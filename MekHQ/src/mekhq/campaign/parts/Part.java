@@ -180,10 +180,6 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		//	scheduled = " (scheduled) ";
 		//}
 	
-		//if (this instanceof ReplacementItem
-		//		&& !((ReplacementItem) this).hasPart()) {
-		//	toReturn += " color='white'";
-		//}
 		toReturn += ">";
 		toReturn += "<b>" + action + getName() + "</b><br/>";
 		toReturn += getDetails() + "<br/>";

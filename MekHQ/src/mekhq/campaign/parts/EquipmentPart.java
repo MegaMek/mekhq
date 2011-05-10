@@ -291,7 +291,7 @@ public class EquipmentPart extends Part {
 	}
 
 	@Override
-	public Part getReplacementPart() {
+	public Part getMissingPart() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -316,7 +316,7 @@ public class EquipmentPart extends Part {
 	}
 
 	@Override
-	public void updateCondition() {
+	public void updateConditionFromEntity() {
 		if(null != unit) {
 			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
 			if(null != mounted) {
@@ -360,10 +360,25 @@ public class EquipmentPart extends Part {
     public String getDetails() {
     	if(null != unit) {
 			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
-			if(null != mounted) {
+			if(null != mounted && mounted.getLocation() != -1) {
 				return unit.getEntity().getLocationName(mounted.getLocation()) + ", " + super.getDetails();
 			}
     	}
-    	return "";
+    	return super.getDetails();
     }
+
+	@Override
+	public void updateConditionFromPart() {
+		if(null != unit) {
+			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
+			if(null != mounted) {
+				if(hits > 1) {
+					mounted.setDestroyed(true);
+					mounted.setHit(true);
+				} else {
+					fix();
+				}
+			}
+		}
+	}
 }
