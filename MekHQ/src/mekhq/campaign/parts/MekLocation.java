@@ -277,20 +277,23 @@ public class MekLocation extends Part {
 	public void updateConditionFromEntity() {
 		if(null != unit) {
 			percent = ((double) unit.getEntity().getInternal(loc)) / ((double) unit.getEntity().getOInternal(loc));
-			if(percent >= 1.0) {
-				this.time = 0;
-				this.difficulty = 0;
-			}
-			else if (percent > 0.75) {
-	            this.time = 270;
-	            this.difficulty = 2;
-	        } else if (percent > 0.5) {
-	            this.time = 180;
-	            this.difficulty = 1;
-	        } else if (percent > 0.25) {
+			if(percent <= 0.0) {
+				remove(false);
+				return;
+			} else if (percent <= 0.25) {
+	            this.time = 90;
+	            this.difficulty = -1;
+	        } else if (percent <= 0.5) {
 	            this.time = 135;
 	            this.difficulty = 0;
+	        } else if (percent <= 0.75) {
+	            this.time = 180;
+	            this.difficulty = 1;
+	        } else {
+	        	this.time = 270;
+	        	this.difficulty = 2;
 	        }
+			 
 		}		
 	}
 
