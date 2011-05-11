@@ -348,4 +348,13 @@ public class MekLocation extends Part {
 		}
         return null;
     }
+	
+	@Override
+	public boolean isSalvaging() {
+		//cant salvage a center torso
+		if(loc ==  Mech.LOC_CT) {
+			return false;
+		}
+		return super.isSalvaging();
+	}
 }
