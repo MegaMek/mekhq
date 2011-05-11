@@ -128,6 +128,7 @@ import mekhq.campaign.Utilities;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.parts.AmmoBin;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.GenericSparePart;
 import mekhq.campaign.parts.MissingPart;
@@ -3368,33 +3369,22 @@ public class MekHQView extends FrameView {
 				refreshTechsList();
 				refreshReport();
 				refreshPartsList();
-			/*} else if (command.contains("SWAP_AMMO")) {
+				*/
+			} else if (command.contains("SWAP_AMMO")) {
 				String sel = command.split(":")[1];
-				int selMount = Integer.parseInt(sel);
-				Mounted m = selectedUnit.getEntity().getEquipment(selMount);
-				if (null == m) {
+				int selAmmoId = Integer.parseInt(sel);
+				Part part = campaign.getPart(selAmmoId);
+				if (null == part || !(part instanceof AmmoBin)) {
 					return;
 				}
-				AmmoType curType = (AmmoType) m.getType();
-				ReloadItem reload = campaign.getReloadWorkFor(m, selectedUnit);
-				boolean newWork = false;
-				if (null == reload) {
-					newWork = true;
-					reload = new ReloadItem(selectedUnit, m);
-				}
+				AmmoBin ammo = (AmmoBin)part;
 				sel = command.split(":")[2];
-				int selType = Integer.parseInt(sel);
-				AmmoType newType = Utilities.getMunitionsFor(
-						selectedUnit.getEntity(), curType).get(selType);
-				reload.swapAmmo(newType);
-				if (newWork) {
-					campaign.addWork(reload);
-				}
+				long munition = Long.parseLong(sel);
+				ammo.changeMunition(munition);
 				refreshTaskList();
 				refreshAcquireList();
 				refreshServicedUnitList();
 				refreshUnitList();
-				*/
 			} else if (command.contains("CHANGE_SITE")) {
 				for (Unit unit : units) {
 					if (!unit.isDeployed()) {
@@ -3646,19 +3636,17 @@ public class MekHQView extends FrameView {
 				// swap ammo
 				menu = new JMenu("Swap ammo");
 				JMenu ammoMenu = null;
-				for (Mounted m : unit.getEntity().getAmmo()) {
-					ammoMenu = new JMenu(m.getDesc());
-					i = 0;
-					AmmoType curType = (AmmoType) m.getType();
-					for (AmmoType atype : Utilities.getMunitionsFor(
-							unit.getEntity(), curType)) {
+				for (AmmoBin ammo : unit.getWorkingAmmoBins()) {
+					ammoMenu = new JMenu(ammo.getType().getDesc());
+					AmmoType curType = (AmmoType) ammo.getType();
+					for (AmmoType atype : Utilities.getMunitionsFor(unit.getEntity(), curType)) {
 						cbMenuItem = new JCheckBoxMenuItem(atype.getDesc());
 						if (atype.equals(curType)) {
 							cbMenuItem.setSelected(true);
 						} else {
 							cbMenuItem.setActionCommand("SWAP_AMMO:"
-									+ unit.getEntity().getEquipmentNum(m) + ":"
-									+ i);
+									+ ammo.getId() + ":"
+									+ atype.getMunitionType());
 							cbMenuItem.addActionListener(this);
 						}
 						ammoMenu.add(cbMenuItem);
@@ -6234,33 +6222,21 @@ public class MekHQView extends FrameView {
 				refreshPersonnelList();
 				refreshOrganization();
 				refreshReport();
-			/*} else if (command.contains("SWAP_AMMO")) {
+			} else if (command.contains("SWAP_AMMO")) {
 				String sel = command.split(":")[1];
-				int selMount = Integer.parseInt(sel);
-				Mounted m = selectedUnit.getEntity().getEquipment(selMount);
-				if (null == m) {
+				int selAmmoId = Integer.parseInt(sel);
+				Part part = campaign.getPart(selAmmoId);
+				if (null == part || !(part instanceof AmmoBin)) {
 					return;
 				}
-				AmmoType curType = (AmmoType) m.getType();
-				ReloadItem reload = campaign.getReloadWorkFor(m, selectedUnit);
-				boolean newWork = false;
-				if (null == reload) {
-					newWork = true;
-					reload = new ReloadItem(selectedUnit, m);
-				}
+				AmmoBin ammo = (AmmoBin)part;
 				sel = command.split(":")[2];
-				int selType = Integer.parseInt(sel);
-				AmmoType newType = Utilities.getMunitionsFor(
-						selectedUnit.getEntity(), curType).get(selType);
-				reload.swapAmmo(newType);
-				if (newWork) {
-					campaign.addWork(reload);
-				}
+				long munition = Long.parseLong(sel);
+				ammo.changeMunition(munition);
 				refreshTaskList();
 				refreshAcquireList();
 				refreshServicedUnitList();
 				refreshUnitList();
-				*/
 			} else if (command.contains("CHANGE_SITE")) {
 				for (Unit unit : units) {
 					if (!unit.isDeployed()) {
@@ -6490,23 +6466,20 @@ public class MekHQView extends FrameView {
 				if(oneSelected) {			
 					menu = new JMenu("Swap ammo");
 					JMenu ammoMenu = null;
-					for (Mounted m : unit.getEntity().getAmmo()) {
-						ammoMenu = new JMenu(m.getDesc());
-						i = 0;
-						AmmoType curType = (AmmoType) m.getType();
-						for (AmmoType atype : Utilities.getMunitionsFor(
-								unit.getEntity(), curType)) {
+					for (AmmoBin ammo : unit.getWorkingAmmoBins()) {
+						ammoMenu = new JMenu(ammo.getType().getDesc());
+						AmmoType curType = (AmmoType) ammo.getType();
+						for (AmmoType atype : Utilities.getMunitionsFor(unit.getEntity(), curType)) {
 							cbMenuItem = new JCheckBoxMenuItem(atype.getDesc());
 							if (atype.equals(curType)) {
 								cbMenuItem.setSelected(true);
 							} else {
 								cbMenuItem.setActionCommand("SWAP_AMMO:"
-										+ unit.getEntity().getEquipmentNum(m) + ":"
-										+ i);
+										+ ammo.getId() + ":"
+										+ atype.getMunitionType());
 								cbMenuItem.addActionListener(this);
 							}
 							ammoMenu.add(cbMenuItem);
-							i++;
 						}
 						if(ammoMenu.getItemCount() > 20) {
 		                	MenuScroller.setScrollerFor(ammoMenu, 20);

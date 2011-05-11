@@ -2318,4 +2318,14 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     public ArrayList<Part> getParts() {
     	return parts;
     }
+    
+    public ArrayList<AmmoBin> getWorkingAmmoBins() {
+    	ArrayList<AmmoBin> ammo = new ArrayList<AmmoBin>();
+    	for(Part part : parts) {
+    		if(part instanceof AmmoBin) {
+    			ammo.add((AmmoBin)part);
+    		}
+    	}
+    	return ammo;
+    }
 }

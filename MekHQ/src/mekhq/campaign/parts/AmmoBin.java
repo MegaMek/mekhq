@@ -40,6 +40,7 @@ import mekhq.campaign.Era;
 import mekhq.campaign.Faction;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
+import mekhq.campaign.Utilities;
 import mekhq.campaign.team.SupportTeam;
 import mekhq.campaign.work.EquipmentRepair;
 import mekhq.campaign.work.EquipmentReplacement;
@@ -74,6 +75,17 @@ public class AmmoBin extends EquipmentPart {
 
     public int getShotsNeeded() {
     	return shotsNeeded;
+    }
+    
+    public void changeMunition(long m) {
+    	this.munition = m;
+    	for (AmmoType atype : Utilities.getMunitionsFor(unit.getEntity(),(AmmoType)type)) {
+    		if (atype.getMunitionType() == munition) {
+    			type = atype;
+    			break;
+    		}
+    	}
+    	updateConditionFromEntity();
     }
     
 	@Override
@@ -119,6 +131,7 @@ public class AmmoBin extends EquipmentPart {
 		if(null != unit) {
 			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
 			if(null != mounted) {
+				mounted.changeAmmoType((AmmoType)type);
 				mounted.setShotsLeft(((AmmoType)type).getShots());
 			}
 			updateConditionFromEntity();
@@ -144,8 +157,14 @@ public class AmmoBin extends EquipmentPart {
 					remove(false);
 					return;
 				}
-				shotsNeeded = ((AmmoType)type).getShots() - mounted.getShotsLeft();	
-				time = 15;
+				if(type.equals(mounted.getType())) {
+					shotsNeeded = ((AmmoType)type).getShots() - mounted.getShotsLeft();	
+					time = 15;
+				} else {
+					//we have a change of munitions
+					shotsNeeded = ((AmmoType)type).getShots();
+					time = 30;
+				}
 			}
 		}
 	}
