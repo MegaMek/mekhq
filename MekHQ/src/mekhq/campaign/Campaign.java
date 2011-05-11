@@ -685,12 +685,29 @@ public class Campaign implements Serializable {
 	}
 	
 	public void fixPart(IPartWork partWork, TechTeam t) {
-		if(t.getMinutesLeft() < partWork.getTimeLeft()) {
-			addReport("There is not enough time left for this task. The remainder will be finished tomorrow.");
-			partWork.addTimeSpent(t.getMinutesLeft());
-			partWork.setTeamId(t.getId());
-			t.setMinutesLeft(0);
-			return;
+		int minutes = partWork.getTimeLeft();
+		if(minutes > t.getMinutesLeft()) {
+			minutes -= t.getMinutesLeft();
+			//check for overtime first
+			if(isOvertimeAllowed() && minutes <= t.getOvertimeLeft()) {
+	               //we are working overtime
+	               t.setMinutesLeft(0);
+	               t.setOvertimeLeft(t.getOvertimeLeft() - minutes);
+			} else {
+				//we need to finish the task tomorrow
+				int minutesUsed = t.getMinutesLeft();
+				if(isOvertimeAllowed()) {
+					minutesUsed += t.getOvertimeLeft();
+				}
+				partWork.addTimeSpent(minutesUsed);
+				t.setMinutesLeft(0);
+				t.setOvertimeLeft(0);
+				partWork.setTeamId(t.getId());
+				addReport(" - <b>Not enough time, the remainder of the task will be finished tomorrow.</b>");
+	             return;
+			}     
+		} else {
+			t.setMinutesLeft(t.getMinutesLeft() - minutes);
 		}
 		String report = "";
 		String action = " fix ";
@@ -710,8 +727,6 @@ public class Campaign implements Serializable {
 			report = report + partWork.fail(t.getRating());
 		}
 		partWork.setTeamId(-1);
-		//use up time
-		t.setMinutesLeft(t.getMinutesLeft() - partWork.getActualTime());
 		addReport(report);
 	}
 

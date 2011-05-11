@@ -51,6 +51,7 @@ v0.1.6 (SVN)
 + initializeParts to XML loading
 + initializeParts should look for MissingParts
 + Bug: location repair mods are reversed
++ Bug: overtime not working right
 
 v0.1.5 (2011-05-05)
 + refactored Hangar Panel into separate Hangar and Repair Bay panel
