@@ -54,7 +54,7 @@ public class EquipmentPart extends Part {
 	//crap equipmenttype is not serialized!
     protected transient EquipmentType type;
     protected String typeName;
-	private int equipmentNum = -1;
+	protected int equipmentNum = -1;
 
     public EquipmentType getType() {
         return type;

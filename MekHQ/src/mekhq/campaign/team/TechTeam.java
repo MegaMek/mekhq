@@ -184,13 +184,7 @@ public class TechTeam extends SupportTeam {
        if(target.getValue() == TargetRoll.IMPOSSIBLE) {
            return target;
        }
-       
-       //check time
-       //if you have zero total minutes left, you can't do a thing
-       if(getMinutesLeft() <= 0 && (!campaign.isOvertimeAllowed() || getOvertimeLeft() <= 0)) {
-           return new TargetRoll(TargetRoll.IMPOSSIBLE, "team has no time left");
-       }
-       
+
        if(isTaskOvertime(partWork)) {
            target.addModifier(3, "overtime");
        }

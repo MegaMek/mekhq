@@ -57,6 +57,7 @@ import megamek.common.WeaponType;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import mekhq.MekHQApp;
+import mekhq.campaign.parts.AmmoBin;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Availability;
 import mekhq.campaign.parts.EquipmentPart;
@@ -2113,7 +2114,8 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     		Armor[] armor = new Armor[entity.locations()];
     		Armor[] armorRear = new Armor[entity.locations()];
     		Hashtable<Integer,Part> equipParts = new Hashtable<Integer,Part>();
-    		
+    		Hashtable<Integer,Part> ammoParts = new Hashtable<Integer,Part>();
+
     		for(Part part : parts) {
     			if(part instanceof MekGyro || part instanceof MissingMekGyro) {
     				gyro = part;
@@ -2133,6 +2135,8 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     				} else {
     					armor[((Armor)part).getLocation()] = (Armor)part;
     				}
+    			} else if(part instanceof AmmoBin) {
+    				ammoParts.put(((AmmoBin)part).getEquipmentNum(), part);
     			} else if(part instanceof EquipmentPart) {
     				equipParts.put(((EquipmentPart)part).getEquipmentNum(), part);
     			} else if(part instanceof MissingEquipmentPart) {
@@ -2228,13 +2232,23 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     		}
     		for(Mounted m : entity.getEquipment()) {
     			if(m.getType().isHittable()) {
-	    			int eqnum = entity.getEquipmentNum(m);
-	    			Part epart = equipParts.get(eqnum);
-	    			if(null == epart) {
-	    				epart = new EquipmentPart(false, (int)entity.getWeight(), m.getType(), eqnum);
-	    				addPart(epart);
-	    				campaign.addPart(epart);
-	    			}
+    				if(m.getType() instanceof AmmoType) {
+    					int eqnum = entity.getEquipmentNum(m);
+		    			Part apart = ammoParts.get(eqnum);
+		    			if(null == apart) {
+		    				apart = new AmmoBin(false, (int)entity.getWeight(), m.getType(), eqnum, ((AmmoType)m.getType()).getShots() - m.getShotsLeft());
+		    				addPart(apart);
+		    				campaign.addPart(apart);
+		    			}
+    				} else {
+		    			int eqnum = entity.getEquipmentNum(m);
+		    			Part epart = equipParts.get(eqnum);
+		    			if(null == epart) {
+		    				epart = new EquipmentPart(false, (int)entity.getWeight(), m.getType(), eqnum);
+		    				addPart(epart);
+		    				campaign.addPart(epart);
+		    			}
+    				}
     			}
     		}
     		if(null == rightUpperArm && entity.hasSystem(Mech.ACTUATOR_UPPER_ARM, Mech.LOC_RARM)) {
