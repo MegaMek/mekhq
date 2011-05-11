@@ -67,6 +67,13 @@ import mekhq.campaign.parts.MekGyro;
 import mekhq.campaign.parts.MekLifeSupport;
 import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.MekSensor;
+import mekhq.campaign.parts.MissingEquipmentPart;
+import mekhq.campaign.parts.MissingMekActuator;
+import mekhq.campaign.parts.MissingMekEngine;
+import mekhq.campaign.parts.MissingMekGyro;
+import mekhq.campaign.parts.MissingMekLifeSupport;
+import mekhq.campaign.parts.MissingMekLocation;
+import mekhq.campaign.parts.MissingMekSensor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.PilotPerson;
 import mekhq.campaign.work.*;
@@ -2057,38 +2064,40 @@ public class Unit implements Serializable, MekHqXmlSerializable {
      */
     public void initializeParts() {
     	if(getEntity() instanceof Mech) {
-    		MekGyro gyro = null;
-    		MekEngine engine = null;
-    		MekLifeSupport lifeSupport = null;
-    		MekSensor sensor = null;
-    		MekActuator rightHand = null;
-    		MekActuator rightLowerArm = null;
-    		MekActuator rightUpperArm = null;
-    		MekActuator leftHand = null;
-    		MekActuator leftLowerArm = null;
-    		MekActuator leftUpperArm = null;
-    		MekActuator rightFoot = null;
-    		MekActuator rightLowerLeg = null;
-    		MekActuator rightUpperLeg = null;
-    		MekActuator leftFoot = null;
-    		MekActuator leftLowerLeg = null;
-    		MekActuator leftUpperLeg = null;
-    		MekLocation[] locations = new MekLocation[entity.locations()];
+    		Part gyro = null;
+    		Part engine = null;
+    		Part lifeSupport = null;
+    		Part sensor = null;
+    		Part rightHand = null;
+    		Part rightLowerArm = null;
+    		Part rightUpperArm = null;
+    		Part leftHand = null;
+    		Part leftLowerArm = null;
+    		Part leftUpperArm = null;
+    		Part rightFoot = null;
+    		Part rightLowerLeg = null;
+    		Part rightUpperLeg = null;
+    		Part leftFoot = null;
+    		Part leftLowerLeg = null;
+    		Part leftUpperLeg = null;
+    		Part[] locations = new MekLocation[entity.locations()];
     		Armor[] armor = new Armor[entity.locations()];
     		Armor[] armorRear = new Armor[entity.locations()];
-    		Hashtable<Integer,EquipmentPart> equipParts = new Hashtable<Integer,EquipmentPart>();
+    		Hashtable<Integer,Part> equipParts = new Hashtable<Integer,Part>();
     		
     		for(Part part : parts) {
-    			if(part instanceof MekGyro) {
-    				gyro = (MekGyro)part;
-    			} else if(part instanceof MekEngine) {
-    				engine = (MekEngine)part;
-    			} else if(part instanceof MekLifeSupport) {
-    				lifeSupport = (MekLifeSupport)part;
-    			} else if(part instanceof MekSensor) {
+    			if(part instanceof MekGyro || part instanceof MissingMekGyro) {
+    				gyro = part;
+    			} else if(part instanceof MekEngine || part instanceof MissingMekEngine) {
+    				engine = part;
+    			} else if(part instanceof MekLifeSupport  || part instanceof MissingMekLifeSupport) {
+    				lifeSupport = part;
+    			} else if(part instanceof MekSensor || part instanceof MissingMekSensor) {
     				sensor = (MekSensor)part;
     			} else if(part instanceof MekLocation) {
-    				locations[((MekLocation)part).getLoc()] = (MekLocation)part;
+    				locations[((MekLocation)part).getLoc()] = part;
+    			} else if(part instanceof MissingMekLocation) {
+    				locations[((MissingMekLocation)part).getLoc()] = part;	
     			} else if(part instanceof Armor) {
     				if(((Armor)part).isRearMounted()) {
     					armorRear[((Armor)part).getLocation()] = (Armor)part;
@@ -2096,44 +2105,54 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     					armor[((Armor)part).getLocation()] = (Armor)part;
     				}
     			} else if(part instanceof EquipmentPart) {
-    				equipParts.put(((EquipmentPart)part).getEquipmentNum(), (EquipmentPart)part);
-    			} else if(part instanceof MekActuator) {
-    				MekActuator actuator = (MekActuator)part;
-    				if(actuator.getType() == Mech.ACTUATOR_UPPER_ARM) {
-    					if(actuator.getLocation() == Mech.LOC_RARM) {
-    						rightUpperArm = actuator;
+    				equipParts.put(((EquipmentPart)part).getEquipmentNum(), part);
+    			} else if(part instanceof MissingEquipmentPart) {
+    				equipParts.put(((MissingEquipmentPart)part).getEquipmentNum(), part);
+    			} else if(part instanceof MekActuator || part instanceof MissingMekActuator) {
+    				int type = -1;
+    				int loc = -1;
+    				if(part instanceof MekActuator) {
+    					type = ((MekActuator)part).getType();
+    					loc = ((MekActuator)part).getLocation();
+    				} else {
+    					type = ((MissingMekActuator)part).getType();
+    					loc = ((MissingMekActuator)part).getLocation();
+    				}
+    				if(type == Mech.ACTUATOR_UPPER_ARM) {
+    					if(loc == Mech.LOC_RARM) {
+    						rightUpperArm = part;
     					} else {
-    						leftUpperArm = actuator;
+    						leftUpperArm = part;
     					}
-    				} else if(actuator.getType() == Mech.ACTUATOR_LOWER_ARM) {
-    					if(actuator.getLocation() == Mech.LOC_RARM) {
-    						rightLowerArm = actuator;
+    				} else if(type == Mech.ACTUATOR_LOWER_ARM) {
+    					if(loc == Mech.LOC_RARM) {
+    						rightLowerArm = part;
     					} else {
-    						leftLowerArm = actuator;
+    						leftLowerArm = part;
     					}
-    				} else if(actuator.getType() == Mech.ACTUATOR_HAND) {
-    					if(actuator.getLocation() == Mech.LOC_RARM) {
-    						rightHand = actuator;
+    				} else if(type == Mech.ACTUATOR_HAND) {
+    					if(loc == Mech.LOC_RARM) {
+    						rightHand = part;
     					} else {
-    						leftHand = actuator;
+    						leftHand = part;
     					}
-    				} else if(actuator.getType() == Mech.ACTUATOR_UPPER_LEG) {
-    					if(actuator.getLocation() == Mech.LOC_RLEG) {
-    						rightUpperLeg = actuator;
+    				} else if(type == Mech.ACTUATOR_UPPER_LEG) {
+    					if(loc == Mech.LOC_RLEG) {
+    						rightUpperLeg = part;
     					} else {
-    						leftUpperLeg = actuator;
+    						leftUpperLeg = part;
     					}
-    				} else if(actuator.getType() == Mech.ACTUATOR_LOWER_LEG) {
-    					if(actuator.getLocation() == Mech.LOC_RLEG) {
-    						rightLowerLeg = actuator;
+    				} else if(type == Mech.ACTUATOR_LOWER_LEG) {
+    					if(loc == Mech.LOC_RLEG) {
+    						rightLowerLeg = part;
     					} else {
-    						leftLowerLeg = actuator;
+    						leftLowerLeg = part;
     					}
-    				} else if(actuator.getType() == Mech.ACTUATOR_FOOT) {
-    					if(actuator.getLocation() == Mech.LOC_RLEG) {
-    						rightFoot = actuator;
+    				} else if(type == Mech.ACTUATOR_FOOT) {
+    					if(loc == Mech.LOC_RLEG) {
+    						rightFoot = part;
     					} else {
-    						leftFoot = actuator;
+    						leftFoot = part;
     					}
     				}
     				
@@ -2181,7 +2200,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     		for(Mounted m : entity.getEquipment()) {
     			if(m.getType().isHittable()) {
 	    			int eqnum = entity.getEquipmentNum(m);
-	    			EquipmentPart epart = equipParts.get(eqnum);
+	    			Part epart = equipParts.get(eqnum);
 	    			if(null == epart) {
 	    				epart = new EquipmentPart(false, (int)entity.getWeight(), m.getType(), eqnum);
 	    				addPart(epart);

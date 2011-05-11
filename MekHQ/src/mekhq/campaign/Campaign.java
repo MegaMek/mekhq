@@ -1365,6 +1365,7 @@ public class Campaign implements Serializable {
 			// Okay, last trigger a reCalc.
 			// This should fix some holes in the data.
 			unit.reCalc();
+			unit.initializeParts();
 		}
 		
 		// Process parts...
