@@ -39,6 +39,10 @@ public interface IPartWork extends IWork {
 	public int getActualTime();
 	public int getTimeSpent();
 	public int getTimeLeft();
+	public void addTimeSpent(int time);
+	
+	public int getTeamId();
+	public void setTeamId(int id);
 	
 	public void updateConditionFromEntity();
 	public void updateConditionFromPart();

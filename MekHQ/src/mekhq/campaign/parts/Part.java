@@ -478,6 +478,11 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	}
 	
 	@Override
+	public void setTeamId(int i) {
+		this.teamId = i;
+	}
+	
+	@Override
 	public String getPartName() {
 		return name;
 	}

@@ -685,6 +685,13 @@ public class Campaign implements Serializable {
 	}
 	
 	public void fixPart(IPartWork partWork, TechTeam t) {
+		if(t.getMinutesLeft() < partWork.getTimeLeft()) {
+			addReport("There is not enough time left for this task. The remainder will be finished tomorrow.");
+			partWork.addTimeSpent(t.getMinutesLeft());
+			partWork.setTeamId(t.getId());
+			t.setMinutesLeft(0);
+			return;
+		}
 		String report = "";
 		String action = " fix ";
 		if(partWork.isSalvaging()) {
@@ -702,6 +709,7 @@ public class Campaign implements Serializable {
 		} else {
 			report = report + partWork.fail(t.getRating());
 		}
+		partWork.setTeamId(-1);
 		//use up time
 		t.setMinutesLeft(t.getMinutesLeft() - partWork.getActualTime());
 		addReport(report);
@@ -723,6 +731,14 @@ public class Campaign implements Serializable {
 					addReport(p.getDesc() + " heals naturally!");
 				}
 			} 
+		}
+		for(Part part : getParts()) {
+			if(null != part.getUnit() && part.getTeamId() != -1) {
+				SupportTeam t = getTeam(part.getTeamId());
+				if(null != t && t instanceof TechTeam) {
+					fixPart(part, (TechTeam)t);
+				}
+			}
 		}
 		DecimalFormat formatter = new DecimalFormat();
 		//check for a new year
