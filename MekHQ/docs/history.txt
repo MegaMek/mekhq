@@ -57,6 +57,9 @@ v0.1.6 (SVN)
 + Bug: salvage times and difficulties not right
 + beginning of acquisition work
 + completed acqusition work
++ armor needs to be acquired
++ Bug 2854851: Part scrounging bug
++ Bug 2834251: time used for incomplete repair (armor)
 
 v0.1.5 (2011-05-05)
 + refactored Hangar Panel into separate Hangar and Repair Bay panel

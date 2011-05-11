@@ -154,7 +154,6 @@ public class ArmorReplacement extends ReplacementItem {
 				}
 			}
 		}
-		unit.campaign.assignParts();
 	}
 
 	@Override

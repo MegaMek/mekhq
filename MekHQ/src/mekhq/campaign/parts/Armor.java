@@ -30,23 +30,27 @@ import org.w3c.dom.NodeList;
 import megamek.common.Engine;
 import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
+import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
 import mekhq.campaign.Faction;
 import mekhq.campaign.MekHqXmlUtil;
+import mekhq.campaign.team.SupportTeam;
 import mekhq.campaign.work.ArmorReplacement;
+import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.ReplacementItem;
 
 /**
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class Armor extends Part {
+public class Armor extends Part implements IAcquisitionWork {
 	private static final long serialVersionUID = 5275226057484468868L;
 	protected int type;
     protected int amount;
     protected int amountNeeded;
     private int location;
     private boolean rear;
+    private boolean checkedToday;
     
     public Armor() {
     	this(false, 0, 0, 0);
@@ -66,6 +70,35 @@ public class Armor extends Part {
         this.name = "Armor (" + EquipmentType.armorNames[type] + ")";
     }
     
+    
+    public String getDesc() {
+		String bonus = getAllMods().getValueAsString();
+		if (getAllMods().getValue() > -1) {
+			bonus = "+" + bonus;
+		}
+		bonus = "(" + bonus + ")";
+		String toReturn = "<html><font size='2'";
+	
+		String scheduled = "";
+		if (getTeamId() != -1) {
+			scheduled = " (scheduled) ";
+		}
+	
+		toReturn += ">";
+		toReturn += "<b>Replace " + getName() + "</b><br/>";
+		toReturn += getDetails() + "<br/>";
+		if(getAmountAvailable() > 0) {
+			toReturn += "" + getTimeLeft() + " minutes" + scheduled;
+			toReturn += ", " + SupportTeam.getRatingName(getSkillMin());
+			toReturn += " " + bonus;
+		}
+		if (getMode() != MODE_NORMAL) {
+			toReturn += "<br/><i>" + getCurrentModeName() + "</i>";
+		}
+		toReturn += "</font></html>";
+		return toReturn;
+	}
+    
     @Override
 	public String getDetails() {
 		if(null != unit) {
@@ -73,7 +106,16 @@ public class Armor extends Part {
 			if(rear) {
 				rearMount = " (R)";
 			}
-			return unit.getEntity().getLocationName(location) + rearMount + ", " + amountNeeded + " points";
+			String availability = "";
+			int amountAvailable = getAmountAvailable();
+			if(!salvaging) {
+				if(amountAvailable == 0) {
+					availability = "<br>No spare armor available";
+				} else if(amountAvailable < amountNeeded) {
+					availability = "<br>Only " + amountAvailable + " points of armor available";
+				}
+			}
+			return unit.getEntity().getLocationName(location) + rearMount + ", " + amountNeeded + " points" + availability;
 		}
 		return "";
 	}
@@ -181,6 +223,10 @@ public class Armor extends Part {
 				+"<amountNeeded>"
 				+amountNeeded
 				+"</amountNeeded>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<checkedToday>"
+				+checkedToday
+				+"</checkedToday>");
 		writeToXmlEnd(pw1, indent, id);
 	}
 
@@ -204,6 +250,12 @@ public class Armor extends Part {
 					rear = true;
 				} else {
 					rear = false;
+				}
+			} else if (wn2.getNodeName().equalsIgnoreCase("checkedToday")) {
+				if(wn2.getTextContent().equalsIgnoreCase("true")) {
+					checkedToday = true;
+				} else {
+					checkedToday = false;
 				}
 			} 
 		}
@@ -298,8 +350,14 @@ public class Armor extends Part {
 
 	@Override
 	public void fix() {
-		unit.getEntity().setArmor(unit.getEntity().getOArmor(location, rear), location, rear);
-		amountNeeded = 0;
+		int amount = Math.min(getAmountAvailable(), amountNeeded);
+		int curAmount = unit.getEntity().getArmor(location, rear);
+		if(curAmount < 0) {
+			curAmount = 0;
+		}
+		unit.getEntity().setArmor(amount + curAmount, location, rear);
+		reduceAmountAvailable(amount);
+		updateConditionFromEntity();
 	}
 
 	@Override
@@ -318,12 +376,13 @@ public class Armor extends Part {
 				Armor a = (Armor)part;
 				if(a.getType() == type) {
 					a.setAmount(a.getAmount() + amountNeeded);
+					unit.campaign.updateAllArmorForNewSpares();
 					return;
 				}
 			}
 		}
 		//if we are still here then we did not find any armor, so lets create a new part and stick it in spares
-		Armor newArmor = new Armor(true,tonnage,type,amountNeeded,location,rear);
+		Armor newArmor = new Armor(true,tonnage,type,amountNeeded,-1,false);
 		unit.campaign.addPart(newArmor);
 	}
 
@@ -338,8 +397,13 @@ public class Armor extends Part {
 		} else {			
 			amountNeeded = unit.getEntity().getOArmor(location, rear) - currentArmor;
 		}
+		//time should be based on amount available if less than amount needed
 		if(amountNeeded > 0) {
-			time = 5 * amountNeeded;
+			if(salvaging) {
+				time = 5 * amountNeeded;
+			} else {
+				time = 5 * Math.min(amountNeeded, getAmountAvailable());
+			}
 			difficulty = -2;
 		} else {
 			time = 0;
@@ -382,5 +446,122 @@ public class Armor extends Part {
 			return unit.getEntity().getLocationName(location) + " is destroyed.";
 		}
 		return null;
+	}
+
+	@Override
+	public String getAcquisitionDesc() {
+		String bonus = getAllAcquisitionMods().getValueAsString();
+		if(getAllAcquisitionMods().getValue() > -1) {
+			bonus = "+" + bonus;
+		}
+		bonus = "(" + bonus + ")";
+		String toReturn = "<html><font size='2'";
+		
+		toReturn += ">";
+		toReturn += "<b>" + getName() + "</b> " + bonus + "<br/>";
+		toReturn += getCostString() + "<br/>";
+		toReturn += "</font></html>";
+		return toReturn;
+	}
+	
+	@Override 
+	public TargetRoll getAllMods() {
+		//check to see if enough armor is available
+		if(getAmountAvailable() == 0) {
+			return new TargetRoll(TargetRoll.IMPOSSIBLE, "No spare armor is available");
+		}
+		return super.getAllMods();
+	}
+	
+	@Override
+	public TargetRoll getAllAcquisitionMods() {
+        TargetRoll target = new TargetRoll();
+        // Faction and Tech mod
+        int factionMod = 0;
+        if (null != unit && unit.campaign.getCampaignOptions().useFactionModifiers()) {
+        	factionMod = Availability.getFactionAndTechMod(this, unit.campaign);
+        }   
+        //availability mod
+        int avail = getAvailability(unit.campaign.getEra());
+        int availabilityMod = Availability.getAvailabilityModifier(avail);
+        target.addModifier(availabilityMod, "availability (" + EquipmentType.getRatingName(avail) + ")");
+        if(factionMod != 0) {
+     	   target.addModifier(factionMod, "faction");
+        }
+        return target;
+    }
+
+	@Override
+	public Part getNewPart() {
+		if(null != unit) {
+			// armor is checked for in 5-ton increments
+			int armorType = unit.getEntity().getArmorType(location);
+			double armorPerTon = 16.0 * EquipmentType.getArmorPointMultiplier(armorType, unit.getEntity().getTechLevel());
+			if (armorType == EquipmentType.T_ARMOR_HARDENED) {
+				armorPerTon = 8.0;
+			}
+			int points = (int) Math.floor(armorPerTon * 5);
+			return new Armor(false, (int) unit.getEntity().getWeight(), armorType, points);
+		}
+		return null;
+	}
+
+	@Override
+	public boolean hasCheckedToday() {
+		return checkedToday;
+	}
+
+	@Override
+	public void setCheckedToday(boolean b) {
+		this.checkedToday = b;
+	}
+	
+	public boolean isEnoughSpareArmorAvailable() {
+		if(null != unit) {
+			for(Part part : unit.campaign.getSpareParts()) {
+				if(part instanceof Armor) {
+					Armor a = (Armor)part;
+					if(a.getType() == type) {
+						return a.getAmount() >= amountNeeded;
+					}
+				}
+			}
+			return false;
+		}
+		return true;
+	}
+	
+	public int getAmountAvailable() {
+		if(null != unit) {
+			for(Part part : unit.campaign.getSpareParts()) {
+				if(part instanceof Armor) {
+					Armor a = (Armor)part;
+					if(a.getType() == type) {
+						return a.getAmount();
+					}
+				}
+			}
+			return 0;
+		}
+		return 0;
+	}
+	
+	public void reduceAmountAvailable(int amount) {
+		if(null != unit) {
+			Armor a = null;
+			for(Part part : unit.campaign.getSpareParts()) {
+				if(part instanceof Armor) {
+					a = (Armor)part;
+					if(a.getType() == type) {
+						a.setAmount(a.getAmount() - amount);
+						break;
+					}
+				}
+			}
+			if(null != a && a.getAmount() <= 0) {
+				unit.campaign.removePart(a);
+			}
+			unit.campaign.updateAllArmorForNewSpares();
+		}
 	}
 }

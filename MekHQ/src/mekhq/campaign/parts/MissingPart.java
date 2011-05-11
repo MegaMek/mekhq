@@ -62,11 +62,11 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 	 */
 	private static final long serialVersionUID = 300672661487966982L;
 	
-	private boolean hasChecked;
+	protected boolean checkedToday;
 	
 	public MissingPart(boolean salvage, int tonnage) {
 		super(salvage, tonnage);
-		this.hasChecked = false;
+		this.checkedToday = false;
 	}
 	
 	@Override
@@ -82,9 +82,9 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		bonus = "(" + bonus + ")";
 		String toReturn = "<html><font size='2'";
 		String scheduled = "";
-		//if (isAssigned()) {
-		//	scheduled = " (scheduled) ";
-		//}
+		if (getTeamId() != -1) {
+			scheduled = " (scheduled) ";
+		}
 	
 		//if (this instanceof ReplacementItem
 		//		&& !((ReplacementItem) this).hasPart()) {
@@ -183,6 +183,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 	@Override
 	public String fail(int rating) {
 		skillMin = ++rating;
+		timeSpent = 0;
 		if(skillMin >= SupportTeam.EXP_NUM) {
 			Part part = findReplacement();
 			if(null != part && null != unit) {
@@ -215,12 +216,12 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 	
 	@Override 
 	public boolean hasCheckedToday() {
-		return hasChecked;
+		return checkedToday;
 	}
 	
 	@Override
 	public void setCheckedToday(boolean b) {
-		this.hasChecked = b;
+		this.checkedToday = b;
 	}
 	
 	@Override
@@ -237,6 +238,33 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		toReturn += getCostString() + "<br/>";
 		toReturn += "</font></html>";
 		return toReturn;
+	}
+	
+	@Override
+	public void writeToXml(PrintWriter pw1, int indent, int id) {
+		writeToXmlBegin(pw1, indent, id);
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<checkedToday>"
+				+checkedToday
+				+"</checkedToday>");
+		writeToXmlEnd(pw1, indent, id);
+	}
+
+	@Override
+	protected void loadFieldsFromXmlNode(Node wn) {
+		NodeList nl = wn.getChildNodes();
+		
+		for (int x=0; x<nl.getLength(); x++) {
+			Node wn2 = nl.item(x);
+			
+			if (wn2.getNodeName().equalsIgnoreCase("checkedToday")) {
+				if(wn2.getTextContent().equalsIgnoreCase("true")) {
+					checkedToday = true;
+				} else {
+					checkedToday = false;
+				}
+			} 
+		}
 	}
 	
 }

@@ -137,6 +137,7 @@ import mekhq.campaign.personnel.SupportPerson;
 import mekhq.campaign.team.MedicalTeam;
 import mekhq.campaign.team.SupportTeam;
 import mekhq.campaign.team.TechTeam;
+import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.ReloadItem;
 import mekhq.campaign.work.RepairItem;
 import mekhq.campaign.work.ReplacementItem;
@@ -1722,8 +1723,8 @@ public class MekHQView extends FrameView {
 		if (null != team && team instanceof TechTeam) {
 			if(acquireSelected()) {
 				Part part = campaign.getPart(currentAcquisitionId);
-				if(null != part && part instanceof MissingPart) {
-					campaign.acquirePart((MissingPart)part, team);
+				if(null != part && part instanceof IAcquisitionWork) {
+					campaign.acquirePart((IAcquisitionWork)part, team);
 				}
 			} else if(repairsSelected()) {
 				Part part = campaign.getPart(currentServiceablePartsId);
@@ -2701,8 +2702,8 @@ public class MekHQView extends FrameView {
 				}
 			} else if(acquireSelected()) {
 				Part part = campaign.getPart(currentAcquisitionId);
-				if(null != part && part instanceof MissingPart) {
-					btnDoTask.setEnabled(((TechTeam)team).getTargetForAcquisition((MissingPart)part).getValue() != TargetRoll.IMPOSSIBLE);
+				if(null != part && part instanceof IAcquisitionWork) {
+					btnDoTask.setEnabled(((TechTeam)team).getTargetForAcquisition((IAcquisitionWork)part).getValue() != TargetRoll.IMPOSSIBLE);
 				} else {
 					btnDoTask.setEnabled(false);
 				}
@@ -2732,8 +2733,8 @@ public class MekHQView extends FrameView {
 			TargetRoll target = null;
 			if(acquireSelected()) {
 				Part part = campaign.getPart(currentAcquisitionId);
-				if(null != part && part instanceof MissingPart)
-				target = team.getTargetForAcquisition((MissingPart)part);
+				if(null != part && part instanceof IAcquisitionWork)
+				target = team.getTargetForAcquisition((IAcquisitionWork)part);
 			} else {
 				Part part = campaign.getPart(currentServiceablePartsId);
 				if(null != part) {
@@ -3236,15 +3237,15 @@ public class MekHQView extends FrameView {
 
 		public AcquisitionTableModel() {
 			columnNames = new String[] { "Parts Needed" };
-			data = new ArrayList<MissingPart>();
+			data = new ArrayList<IAcquisitionWork>();
 		}
 
 		public Object getValueAt(int row, int col) {
-			return ((MissingPart) data.get(row)).getAcquisitionDesc();
+			return ((IAcquisitionWork) data.get(row)).getAcquisitionDesc();
 		}
 
-		public MissingPart getAcquisitionAt(int row) {
-			return (MissingPart) data.get(row);
+		public IAcquisitionWork getAcquisitionAt(int row) {
+			return (IAcquisitionWork) data.get(row);
 		}
 
 		public AcquisitionTableModel.Renderer getRenderer() {
@@ -3258,7 +3259,7 @@ public class MekHQView extends FrameView {
 					Object value, boolean isSelected, boolean hasFocus,
 					int row, int column) {
 				Component c = this;
-				MissingPart task = getAcquisitionAt(row);
+				//MissingPart task = getAcquisitionAt(row);
 				setOpaque(true);
 				setText(getValueAt(row, column).toString());
 				//setToolTipText(task.getToolTip());

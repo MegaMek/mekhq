@@ -176,9 +176,9 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 			action = "Salvage ";
 		}
 		String scheduled = "";
-		//if (isAssigned()) {
-		//	scheduled = " (scheduled) ";
-		//}
+		if (getTeamId() != -1) {
+			scheduled = " (scheduled) ";
+		}
 	
 		toReturn += ">";
 		toReturn += "<b>" + action + getName() + "</b><br/>";
@@ -495,6 +495,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	@Override
 	public String fail(int rating) {
 		skillMin = ++rating;
+		timeSpent = 0;
 		return " <font color='red'><b> failed.</b></font>";
 	}
 

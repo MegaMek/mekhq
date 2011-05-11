@@ -42,6 +42,7 @@ import mekhq.campaign.Unit;
 import mekhq.campaign.work.EquipmentRepair;
 import mekhq.campaign.work.EquipmentReplacement;
 import mekhq.campaign.work.EquipmentSalvage;
+import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.ReplacementItem;
 
 /**
@@ -239,5 +240,28 @@ public class MissingEquipmentPart extends MissingPart {
 	@Override
 	public Part getNewPart() {
 		return new EquipmentPart(isSalvage(), getTonnage(), type, -1);
+	}
+	
+	private boolean hasReallyCheckedToday() {
+		return checkedToday;
+	}
+	
+	@Override
+	public boolean hasCheckedToday() {
+		//if this unit has been checked for any other equipment of this same type
+		//then return false, regardless of whether this one has been checked
+		if(null != unit) {
+			for(Part part : unit.getParts()) {
+				if(part.getId() == getId()) {
+					continue;
+				}
+				if(part instanceof MissingEquipmentPart 
+						&& ((MissingEquipmentPart)part).getType().equals(type) 
+						&& ((MissingEquipmentPart)part).hasReallyCheckedToday()) {
+					return true;
+				}
+			}
+		}
+		return super.hasCheckedToday();
 	}
 }

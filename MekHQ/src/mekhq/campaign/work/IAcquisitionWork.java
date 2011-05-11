@@ -43,6 +43,8 @@ public interface IAcquisitionWork extends IWork {
 	public boolean hasCheckedToday();
 	public void setCheckedToday(boolean b);
 	
+	public int getId();
+	
 	public TargetRoll getAllAcquisitionMods();
 	
 }

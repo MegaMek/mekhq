@@ -68,6 +68,7 @@ import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.EquipmentPart;
 import mekhq.campaign.parts.GenericSparePart;
 import mekhq.campaign.parts.MissingPart;
@@ -558,7 +559,6 @@ public class Campaign implements Serializable {
 					((GenericSparePart) part)
 							.setAmount(((GenericSparePart) part).getAmount()
 									+ ((GenericSparePart) p).getAmount());
-					assignParts();
 					return;
 				}
 			}
@@ -569,7 +569,24 @@ public class Campaign implements Serializable {
 		parts.add(p);
 		partIds.put(new Integer(id), p);
 		lastPartId = id;
-		assignParts();
+		if(p instanceof Armor) {
+			updateAllArmorForNewSpares();
+		}
+	}
+	
+	/**
+	 * call this whenever armor spare parts are changed so that 
+	 * armor knows whether it gets partial repairs or not
+	 */
+	public void updateAllArmorForNewSpares() {
+		for(Part part : getParts()) {
+			if(part instanceof Armor) {
+				Armor a = (Armor)part;
+				if(null != a.getUnit() && a.needsFixing()) {
+					a.updateConditionFromEntity();
+				}
+			}
+		}
 	}
 	
 	private void addPartWithoutId(Part p) {
@@ -660,15 +677,6 @@ public class Campaign implements Serializable {
 		toReturn += "</font>";
 		toReturn += "</html>";
 		return toReturn;
-	}
-
-	/**
-	 * loop through all replacement items and assign the best available part if
-	 * possible The same part may be assigned to multiple tasks, so rerun this
-	 * method after each task is processed
-	 */
-	public void assignParts() {
-		
 	}
 	
 	public String healPerson(IMedicalWork medWork, MedicalTeam t) {
@@ -772,8 +780,8 @@ public class Campaign implements Serializable {
 			if(null != part.getUnit() && part.getTeamId() != -1) {
 				assignedPartIds.add(part.getId());
 			}
-			if(part instanceof MissingPart) {
-				((MissingPart)part).setCheckedToday(false);
+			if(part instanceof IAcquisitionWork) {
+				((IAcquisitionWork)part).setCheckedToday(false);
 			}
 		}
 		for(int pid : assignedPartIds) {
@@ -896,7 +904,6 @@ public class Campaign implements Serializable {
 	public void removePart(Part part) {
 		parts.remove(part);
 		partIds.remove(new Integer(part.getId()));
-		assignParts();
 	}
 
 	public void removeForce(Force force) {
@@ -1942,12 +1949,12 @@ public class Campaign implements Serializable {
 		return new ArrayList<Part>();
 	}
 	
-	public ArrayList<MissingPart> getAcquisitionsForUnit(int uid) {
+	public ArrayList<IAcquisitionWork> getAcquisitionsForUnit(int uid) {
 		Unit u = getUnit(uid);
 		if(u != null) {
 			return u.getPartsNeeded();
 		}
-		return new ArrayList<MissingPart>();
+		return new ArrayList<IAcquisitionWork>();
 	}
 	
 }

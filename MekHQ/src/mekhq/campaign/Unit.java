@@ -737,16 +737,31 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 		return brokenParts;
 	}
 	
-	public ArrayList<MissingPart> getPartsNeeded() {
-		ArrayList<MissingPart> missingParts = new ArrayList<MissingPart>();
+	public ArrayList<IAcquisitionWork> getPartsNeeded() {
+		ArrayList<IAcquisitionWork> missingParts = new ArrayList<IAcquisitionWork>();
 		if(isSalvage() || !isRepairable()) {
 			return missingParts;
 		}
+		boolean armorFound = false;
 		for(Part part: parts) {
 			if(part instanceof MissingPart && null == ((MissingPart)part).findReplacement()) {
 				missingParts.add((MissingPart)part);
 			}
+			//we need to check for armor as well, but this one is funny because we dont want to
+			//check per location really, since armor can be used anywhere. So stop after we reach
+			//the first Armor needing replacement
+			//TODO: we need to adjust for patchwork armor, which can have different armor types by location
+			//TODO: how does it work when you need more than 5 tons
+			
+			if(!armorFound && part instanceof Armor) {
+				Armor a = (Armor)part;
+				if(a.needsFixing() && !a.isEnoughSpareArmorAvailable()) {
+					missingParts.add(a);
+					armorFound = true;
+				}
+			}
 		}
+		
 		return missingParts;
 	}
 
@@ -2284,5 +2299,9 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     		}
     	}
     	runDiagnostic();
+    }
+    
+    public ArrayList<Part> getParts() {
+    	return parts;
     }
 }
