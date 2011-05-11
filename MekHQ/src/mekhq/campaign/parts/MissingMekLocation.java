@@ -277,4 +277,9 @@ public class MissingMekLocation extends MissingPart {
 		}
 		return null;
 	}
+
+	@Override
+	public Part getNewPart() {
+		return new MekLocation(isSalvage(), loc, getTonnage(), structureType, tsm);
+	}
 }

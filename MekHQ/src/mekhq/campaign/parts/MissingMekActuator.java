@@ -172,6 +172,18 @@ public class MissingMekActuator extends MissingPart {
 		return EquipmentType.RATING_C;
 	}
 
+	@Override 
+	public void fix() {
+		Part replacement = findReplacement();
+		if(null != replacement) {
+			unit.addPart(replacement);
+			((MekActuator)replacement).setLocation(location);
+			remove(false);
+			//assign the replacement part to the unit			
+			replacement.updateConditionFromPart();
+		}
+	}
+	
 	@Override
 	public boolean isAcceptableReplacement(Part part) {
 		if(part instanceof MekActuator) {
@@ -187,5 +199,10 @@ public class MissingMekActuator extends MissingPart {
 			return unit.getEntity().getLocationName(location) + " is destroyed.";
 		}
 		return null;
+	}
+
+	@Override
+	public Part getNewPart() {
+		return new MekActuator(isSalvage(), getTonnage(), type, -1);
 	}
 }

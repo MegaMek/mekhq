@@ -235,6 +235,9 @@ public class MissingEquipmentPart extends MissingPart {
         }       
         return null;
     }
-	
 
+	@Override
+	public Part getNewPart() {
+		return new EquipmentPart(isSalvage(), getTonnage(), type, -1);
+	}
 }

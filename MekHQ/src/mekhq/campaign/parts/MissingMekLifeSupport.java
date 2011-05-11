@@ -107,4 +107,9 @@ public class MissingMekLifeSupport extends MissingPart {
         }
         return null;
     }
+
+	@Override
+	public Part getNewPart() {
+		return new MekLifeSupport(isSalvage(), getTonnage());
+	}
 }

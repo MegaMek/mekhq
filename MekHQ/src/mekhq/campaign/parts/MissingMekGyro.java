@@ -188,4 +188,9 @@ public class MissingMekGyro extends MissingPart {
 	public String checkFixable() {
 		return null;
 	}
+
+	@Override
+	public Part getNewPart() {
+		return new MekGyro(isSalvage(), getTonnage(), getType(), getWalkMP());
+	}
 }

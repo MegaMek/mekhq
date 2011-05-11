@@ -46,6 +46,7 @@ import mekhq.campaign.MekHqXmlSerializable;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
 import mekhq.campaign.team.SupportTeam;
+import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.ReplacementItem;
 
@@ -54,15 +55,18 @@ import mekhq.campaign.work.ReplacementItem;
  * task needs to be performed
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public abstract class MissingPart extends Part implements Serializable, MekHqXmlSerializable, IPartWork {
+public abstract class MissingPart extends Part implements Serializable, MekHqXmlSerializable, IPartWork, IAcquisitionWork {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 300672661487966982L;
 	
+	private boolean hasChecked;
+	
 	public MissingPart(boolean salvage, int tonnage) {
 		super(salvage, tonnage);
+		this.hasChecked = false;
 	}
 	
 	@Override
@@ -189,6 +193,34 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		} else {
 			return " <font color='red'><b> failed.</b></font>";
 		}
+	}
+	
+	@Override
+	public TargetRoll getAllAcquisitionMods() {
+        TargetRoll target = new TargetRoll();
+        // Faction and Tech mod
+        int factionMod = 0;
+        if (null != unit && unit.campaign.getCampaignOptions().useFactionModifiers()) {
+        	factionMod = Availability.getFactionAndTechMod(this, unit.campaign);
+        }   
+        //availability mod
+        int avail = getAvailability(unit.campaign.getEra());
+        int availabilityMod = Availability.getAvailabilityModifier(avail);
+        target.addModifier(availabilityMod, "availability (" + EquipmentType.getRatingName(avail) + ")");
+        if(factionMod != 0) {
+     	   target.addModifier(factionMod, "faction");
+        }
+        return target;
+    }
+	
+	@Override 
+	public boolean hasCheckedToday() {
+		return hasChecked;
+	}
+	
+	@Override
+	public void setCheckedToday(boolean b) {
+		this.hasChecked = b;
 	}
 	
 }

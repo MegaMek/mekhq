@@ -52,6 +52,10 @@ public class MekActuator extends Part {
         return type;
     }
     
+    public void setLocation(int loc) {
+    	this.location = loc;
+    }
+    
     public MekActuator(boolean salvage, int tonnage, int type) {
         this(salvage, tonnage, type, -1);
     }

@@ -280,5 +280,10 @@ public class MissingMekEngine extends MissingPart {
 		 return null;
 	 }
 
+	@Override
+	public Part getNewPart() {
+		return new MekEngine(isSalvage(), getTonnage(), 0, getEngine(), 0);
+	}
+
 
 }

@@ -104,4 +104,9 @@ public class MissingMekSensor extends MissingPart {
         return null;
     }
 
+	@Override
+	public Part getNewPart() {
+		return new MekSensor(isSalvage(), getTonnage());
+	}
+
 }
