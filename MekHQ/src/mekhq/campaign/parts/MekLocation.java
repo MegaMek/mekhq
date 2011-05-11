@@ -266,9 +266,11 @@ public class MekLocation extends Part {
 				unit.campaign.removePart(this);
 			}
 			unit.removePart(this);
-			Part missing = getMissingPart();
-			unit.campaign.addPart(missing);
-			unit.addPart(missing);
+			if(loc != Mech.LOC_CT) {
+				Part missing = getMissingPart();
+				unit.campaign.addPart(missing);
+				unit.addPart(missing);
+			}
 		}
 		unit = null;		
 	}
