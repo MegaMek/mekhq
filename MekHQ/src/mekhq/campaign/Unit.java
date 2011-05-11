@@ -74,6 +74,7 @@ import mekhq.campaign.parts.MissingMekGyro;
 import mekhq.campaign.parts.MissingMekLifeSupport;
 import mekhq.campaign.parts.MissingMekLocation;
 import mekhq.campaign.parts.MissingMekSensor;
+import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.PilotPerson;
 import mekhq.campaign.work.*;
@@ -734,6 +735,19 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 			}
 		}
 		return brokenParts;
+	}
+	
+	public ArrayList<MissingPart> getPartsNeeded() {
+		ArrayList<MissingPart> missingParts = new ArrayList<MissingPart>();
+		if(isSalvage() || !isRepairable()) {
+			return missingParts;
+		}
+		for(Part part: parts) {
+			if(part instanceof MissingPart && null == ((MissingPart)part).findReplacement()) {
+				missingParts.add((MissingPart)part);
+			}
+		}
+		return missingParts;
 	}
 
 	public void removePart(Part part) {

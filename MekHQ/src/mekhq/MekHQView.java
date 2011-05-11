@@ -129,6 +129,7 @@ import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.GenericSparePart;
+import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PilotPerson;
@@ -1715,19 +1716,21 @@ public class MekHQView extends FrameView {
 	}
 
 	private void btnDoTaskActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnDoTaskActionPerformed
-		// assign the task to the team here
-		//for (int i = 0; i < selectedTasksIds.length; i++) {
-		//	WorkItem task = campaign.getTask(selectedTasksIds[i]);
-		Part part = campaign.getPart(currentServiceablePartsId);
+		
 		SupportTeam team = campaign.getTeam(currentTechId);		
 	
-		if ((null != part)
-				&& (null != team) && team instanceof TechTeam) {
-			//if(acquireSelected()) {
-				//campaign.getPartFor(task, team);
-			//} else if(repairsSelected() && (team.getTargetFor(task).getValue() != TargetRoll.IMPOSSIBLE)) {
-				campaign.fixPart(part, (TechTeam)team);
-			//}
+		if (null != team && team instanceof TechTeam) {
+			if(acquireSelected()) {
+				Part part = campaign.getPart(currentAcquisitionId);
+				if(null != part && part instanceof MissingPart) {
+					campaign.acquirePart((MissingPart)part, team);
+				}
+			} else if(repairsSelected()) {
+				Part part = campaign.getPart(currentServiceablePartsId);
+				if(null != part) {
+					campaign.fixPart(part, (TechTeam)team);
+				}
+			}
 		}
 		//}
 		
@@ -1788,13 +1791,13 @@ public class MekHQView extends FrameView {
 	private void AcquisitionTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
 		int selected = AcquisitionTable.getSelectedRow();
 		
-	//	if ((selected > -1)
-		//		&& (selected < campaign.getAcquisitionsForUnit(currentServicedUnitId).size())) {
-//			currentAcquisitionId = campaign.getAcquisitionsForUnit(currentServicedUnitId)
-	//				.get(selected).getId();
-	//	} else {
+		if ((selected > -1)
+				&& (selected < campaign.getAcquisitionsForUnit(currentServicedUnitId).size())) {
+			currentAcquisitionId = campaign.getAcquisitionsForUnit(currentServicedUnitId)
+					.get(selected).getId();
+		} else {
 			currentAcquisitionId = -1;
-	//	}
+		}
 
 		updateAssignEnabled();
 		updateTargetText();
@@ -2571,7 +2574,7 @@ public class MekHQView extends FrameView {
 	}
 	
 	protected void refreshAcquireList() {
-		//acquireModel.setData(campaign.getAcquisitionsForUnit(currentServicedUnitId));
+		acquireModel.setData(campaign.getAcquisitionsForUnit(currentServicedUnitId));
 	}
 	
 	protected void refreshMissions() {
@@ -2686,15 +2689,23 @@ public class MekHQView extends FrameView {
 	}
 
 	protected void updateAssignEnabled() {
-		// must have a valid team and an unassigned task
-		Part part = campaign.getPart(currentServiceablePartsId);
+		// must have a valid team and an unassigned task	
 		SupportTeam team = campaign.getTeam(currentTechId);
-		if ((null != part)
-				&& (null != team) && team instanceof TechTeam) {
+		if (null != team && team instanceof TechTeam) {
 			if(repairsSelected()) {
-				btnDoTask.setEnabled(((TechTeam)team).getTargetFor(part).getValue() != TargetRoll.IMPOSSIBLE);
-			//} else if(acquireSelected()) {
-				//btnDoTask.setEnabled(team.getTargetForAcquisition(curTask).getValue() != TargetRoll.IMPOSSIBLE);
+				Part part = campaign.getPart(currentServiceablePartsId);
+				if(null != part) {
+					btnDoTask.setEnabled(((TechTeam)team).getTargetFor(part).getValue() != TargetRoll.IMPOSSIBLE);
+				} else {
+					btnDoTask.setEnabled(false);
+				}
+			} else if(acquireSelected()) {
+				Part part = campaign.getPart(currentAcquisitionId);
+				if(null != part && part instanceof MissingPart) {
+					btnDoTask.setEnabled(((TechTeam)team).getTargetForAcquisition((MissingPart)part).getValue() != TargetRoll.IMPOSSIBLE);
+				} else {
+					btnDoTask.setEnabled(false);
+				}
 			} else {
 				btnDoTask.setEnabled(false);
 			}
@@ -2716,15 +2727,26 @@ public class MekHQView extends FrameView {
 
 	protected void updateTargetText() {
 		// must have a valid team and an unassigned task
-		Part part = campaign.getPart(currentServiceablePartsId);
 		SupportTeam team = campaign.getTeam(currentTechId);
-		if ((null != part) && (null != team) && team instanceof TechTeam) {
-			TargetRoll target = ((TechTeam)team).getTargetFor(part);
+		if (null != team && team instanceof TechTeam) {
+			TargetRoll target = null;
 			if(acquireSelected()) {
-				//target = team.getTargetForAcquisition(task);
+				Part part = campaign.getPart(currentAcquisitionId);
+				if(null != part && part instanceof MissingPart)
+				target = team.getTargetForAcquisition((MissingPart)part);
+			} else {
+				Part part = campaign.getPart(currentServiceablePartsId);
+				if(null != part) {
+					target = ((TechTeam)team).getTargetFor(part);
+				}
 			}
-			textTarget.setText(target.getDesc());
-			lblTargetNum.setText(target.getValueAsString());
+			if(null != target) {
+				textTarget.setText(target.getDesc());
+				lblTargetNum.setText(target.getValueAsString());
+			} else {
+				textTarget.setText("");
+				lblTargetNum.setText("-");
+			}
 		} else {
 			textTarget.setText("");
 			lblTargetNum.setText("-");
@@ -2920,17 +2942,16 @@ public class MekHQView extends FrameView {
 		}
 	}
 	
-	/*
+	
 	protected int getSelectedTaskId() {
 		if(repairsSelected()) {
-			return currentTaskId;
+			return currentServiceablePartsId;
 		} else if(acquireSelected()) {
 			return currentAcquisitionId;
 		} else {
 			return -1;
 		}
 	}
-	*/
 	
 	protected boolean repairsSelected() {
 		return tabTasks.getSelectedIndex() == 0;
@@ -3215,24 +3236,15 @@ public class MekHQView extends FrameView {
 
 		public AcquisitionTableModel() {
 			columnNames = new String[] { "Parts Needed" };
-			data = new ArrayList<WorkItem>();
+			data = new ArrayList<MissingPart>();
 		}
 
 		public Object getValueAt(int row, int col) {
-			return ((WorkItem) data.get(row)).getPartDescHTML();
+			return ((MissingPart) data.get(row)).getAcquisitionDesc();
 		}
 
-		public WorkItem getTaskAt(int row) {
-			return (WorkItem) data.get(row);
-		}
-
-		public WorkItem[] getTasksAt(int[] rows) {
-			WorkItem[] tasks = new WorkItem[rows.length];
-			for (int i = 0; i < rows.length; i++) {
-				int row = rows[i];
-				tasks[i] = (WorkItem) data.get(row);
-			}
-			return tasks;
+		public MissingPart getAcquisitionAt(int row) {
+			return (MissingPart) data.get(row);
 		}
 
 		public AcquisitionTableModel.Renderer getRenderer() {
@@ -3246,10 +3258,10 @@ public class MekHQView extends FrameView {
 					Object value, boolean isSelected, boolean hasFocus,
 					int row, int column) {
 				Component c = this;
-				WorkItem task = getTaskAt(row);
+				MissingPart task = getAcquisitionAt(row);
 				setOpaque(true);
 				setText(getValueAt(row, column).toString());
-				setToolTipText(task.getToolTip());
+				//setToolTipText(task.getToolTip());
 				if (isSelected) {
 					select();
 				} else {

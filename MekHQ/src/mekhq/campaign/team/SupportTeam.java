@@ -38,6 +38,7 @@ import mekhq.campaign.parts.Availability;
 import mekhq.campaign.parts.GenericSparePart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.work.FullRepairWarchest;
+import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.Refit;
 import mekhq.campaign.work.ReloadItem;
@@ -251,28 +252,22 @@ public abstract class SupportTeam implements Serializable, MekHqXmlSerializable 
        }
    }
    
-   public TargetRoll getTargetForAcquisition(WorkItem task) {
-	   if(null == task) {
+   public TargetRoll getTargetForAcquisition(IAcquisitionWork acquisition) {
+	   if(null == acquisition) {
            return new TargetRoll(TargetRoll.IMPOSSIBLE, "no task?");
        }
-	   if(!(task instanceof ReplacementItem)) {
-           return new TargetRoll(TargetRoll.IMPOSSIBLE, "This is not a replacement task");
-	   }
-	   ReplacementItem replacement = (ReplacementItem)task;
-	   if(replacement.hasPart()) {
-           return new TargetRoll(TargetRoll.IMPOSSIBLE, "A part already exists for this replacement");
-	   }
-	   if(replacement.hasCheckedForPart()) {
+	   if(acquisition.hasCheckedToday()) {
            return new TargetRoll(TargetRoll.IMPOSSIBLE, "Already checked for this part in this cycle");
 	   }
 	   
 	   TargetRoll target = getTarget(WorkItem.MODE_NORMAL);
-	   target.append(replacement.getAllAcquisitionMods());
+	   target.append(acquisition.getAllAcquisitionMods());
 	   return target;
    }
-   
+  
    public String acquirePartFor(WorkItem task) {
        String report = "";
+       /*
 	   if(task instanceof ReplacementItem && !((ReplacementItem)task).hasPart()) {
            //first we need to source the part
            ReplacementItem replace = (ReplacementItem)task;
@@ -292,6 +287,7 @@ public abstract class SupportTeam implements Serializable, MekHqXmlSerializable 
               report += " <font color='red'><b>part not available.</b></font>";
            }
        }
+       */
 	   return report;
    }
    

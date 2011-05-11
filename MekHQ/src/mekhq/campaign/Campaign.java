@@ -82,6 +82,7 @@ import mekhq.campaign.work.EquipmentRepair;
 import mekhq.campaign.work.EquipmentReplacement;
 import mekhq.campaign.work.EquipmentSalvage;
 import mekhq.campaign.work.FullRepairWarchest;
+import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IMedicalWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.Refit;
@@ -684,6 +685,23 @@ public class Campaign implements Serializable {
 		return report;
 	}
 	
+	public void acquirePart(IAcquisitionWork acquisition, SupportTeam t) {
+		String report = "";
+		report += getName() + " attempts to find " + acquisition.getPartName();          
+		TargetRoll target = t.getTargetForAcquisition(acquisition);     
+		acquisition.setCheckedToday(true);
+		int roll = Compute.d6(2);
+		report += "  needs " + target.getValueAsString();
+		report += " and rolls " + roll + ":";		
+		if(roll >= target.getValue()) {
+			report += " <font color='green'><b>part found.</b></font><br/>";
+			buyPart(acquisition.getNewPart());
+		} else {
+			report += " <font color='red'><b>part not available.</b></font>";
+		}
+		addReport(report);
+	}
+	
 	public void fixPart(IPartWork partWork, TechTeam t) {
 		int minutes = partWork.getTimeLeft();
 		if(minutes > t.getMinutesLeft()) {
@@ -747,8 +765,20 @@ public class Campaign implements Serializable {
 				}
 			} 
 		}
+		//need to check for assigned tasks in two steps to avoid
+		//concurrent mod problems
+		ArrayList<Integer> assignedPartIds = new ArrayList<Integer>();
 		for(Part part : getParts()) {
 			if(null != part.getUnit() && part.getTeamId() != -1) {
+				assignedPartIds.add(part.getId());
+			}
+			if(part instanceof MissingPart) {
+				((MissingPart)part).setCheckedToday(false);
+			}
+		}
+		for(int pid : assignedPartIds) {
+			Part part = getPart(pid);
+			if(null != part) {
 				SupportTeam t = getTeam(part.getTeamId());
 				if(null != t && t instanceof TechTeam) {
 					fixPart(part, (TechTeam)t);
@@ -1910,6 +1940,14 @@ public class Campaign implements Serializable {
 			return u.getPartsNeedingFixing();
 		}
 		return new ArrayList<Part>();
+	}
+	
+	public ArrayList<MissingPart> getAcquisitionsForUnit(int uid) {
+		Unit u = getUnit(uid);
+		if(u != null) {
+			return u.getPartsNeeded();
+		}
+		return new ArrayList<MissingPart>();
 	}
 	
 }

@@ -223,5 +223,21 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		this.hasChecked = b;
 	}
 	
+	@Override
+	public String getAcquisitionDesc() {
+		String bonus = getAllAcquisitionMods().getValueAsString();
+		if(getAllAcquisitionMods().getValue() > -1) {
+			bonus = "+" + bonus;
+		}
+		bonus = "(" + bonus + ")";
+		String toReturn = "<html><font size='2'";
+		
+		toReturn += ">";
+		toReturn += "<b>" + getName() + "</b> " + bonus + "<br/>";
+		toReturn += getCostString() + "<br/>";
+		toReturn += "</font></html>";
+		return toReturn;
+	}
+	
 }
 

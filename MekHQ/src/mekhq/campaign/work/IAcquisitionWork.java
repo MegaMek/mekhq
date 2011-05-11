@@ -36,8 +36,7 @@ public interface IAcquisitionWork extends IWork {
 	
 	public Part getNewPart();
 	
-	public String getDesc();
-	public String getDetails();
+	public String getAcquisitionDesc();
 	
 	public Unit getUnit();
 
