@@ -258,4 +258,19 @@ public class MissingMekLocation extends MissingPart {
 		}
 		return false;
 	}
+	
+	@Override
+	public String checkFixable() {
+		if (unit.getEntity() instanceof Mech) {
+			// cant replace appendages when corresponding torso is gone
+			if (loc == Mech.LOC_LARM
+					&& unit.getEntity().isLocationBad(Mech.LOC_LT)) {
+				return "must replace left torso first";
+			} else if (loc == Mech.LOC_RARM
+					&& unit.getEntity().isLocationBad(Mech.LOC_RT)) {
+				return "must replace right torso first";
+			}
+		}
+		return null;
+	}
 }

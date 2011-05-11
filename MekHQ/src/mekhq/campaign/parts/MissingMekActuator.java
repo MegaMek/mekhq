@@ -180,4 +180,12 @@ public class MissingMekActuator extends MissingPart {
 		}
 		return false;
 	}
+	
+	@Override
+	public String checkFixable() {
+		if(unit.isLocationDestroyed(location)) {
+			return unit.getEntity().getLocationName(location) + " is destroyed.";
+		}
+		return null;
+	}
 }

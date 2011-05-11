@@ -92,5 +92,16 @@ public class MissingMekSensor extends MissingPart {
 	public boolean isAcceptableReplacement(Part part) {
 		return part instanceof MekSensor;
 	}
+	
+	@Override
+    public String checkFixable() {
+        for(int i = 0; i < unit.getEntity().locations(); i++) {
+            if(unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS, i) > 0
+                    && unit.isLocationDestroyed(i)) {
+                return unit.getEntity().getLocationName(i) + " is destroyed.";
+            }
+        }
+        return null;
+    }
 
 }

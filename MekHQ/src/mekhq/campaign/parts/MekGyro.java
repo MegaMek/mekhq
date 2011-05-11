@@ -267,4 +267,9 @@ public class MekGyro extends Part {
 			}
 		}
 	}
+	
+	@Override
+	public String checkFixable() {
+		return null;
+	}
 }

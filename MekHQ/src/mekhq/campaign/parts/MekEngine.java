@@ -334,4 +334,18 @@ public class MekEngine extends Part {
 			}
 		}
 	}
+	
+	@Override
+	 public String checkFixable() {
+		if(isSalvaging()) {
+			return null;
+		}
+		 for(int i = 0; i < unit.getEntity().locations(); i++) {
+			 if(unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE, i) > 0
+					 && unit.isLocationDestroyed(i)) {
+				 return unit.getEntity().getLocationName(i) + " is destroyed.";
+			 }
+		 }
+		 return null;
+	 }
 }

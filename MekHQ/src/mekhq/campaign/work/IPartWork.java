@@ -53,4 +53,6 @@ public interface IPartWork extends IWork {
 	
 	public boolean isSalvaging();
 	
+	public String checkFixable();
+	
 }

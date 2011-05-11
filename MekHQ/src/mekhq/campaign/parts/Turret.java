@@ -116,4 +116,10 @@ public class Turret extends Part {
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public String checkFixable() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

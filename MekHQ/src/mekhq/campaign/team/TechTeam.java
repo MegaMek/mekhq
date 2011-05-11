@@ -176,6 +176,10 @@ public class TechTeam extends SupportTeam {
        if(partWork instanceof MissingPart && null == ((MissingPart)partWork).findReplacement()) {
            return new TargetRoll(TargetRoll.IMPOSSIBLE, "part not available.");
        }
+       String notFixable = partWork.checkFixable();
+       if(null != notFixable) {
+    	   return new TargetRoll(TargetRoll.IMPOSSIBLE, notFixable);
+       }
        TargetRoll target = getTarget(partWork.getMode());
        if(target.getValue() == TargetRoll.IMPOSSIBLE) {
            return target;

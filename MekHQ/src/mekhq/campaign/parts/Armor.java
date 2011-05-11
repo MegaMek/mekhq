@@ -372,4 +372,15 @@ public class Armor extends Part {
 	public void updateConditionFromPart() {
 		//this should never happen for armor
 	}
+	
+	@Override
+	public String checkFixable() {
+		if(isSalvaging()) {
+			return null;
+		}
+		if (unit.isLocationDestroyed(location)) {
+			return unit.getEntity().getLocationName(location) + " is destroyed.";
+		}
+		return null;
+	}
 }

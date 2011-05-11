@@ -236,7 +236,17 @@ public class MekActuator extends Part {
 			} else {
 				unit.repairSystem(CriticalSlot.TYPE_SYSTEM, type, location);
 			}
+		}	
+	}
+	
+	@Override
+	public String checkFixable() {
+		if(isSalvaging()) {
+			return null;
 		}
-		
+		if(unit.isLocationDestroyed(location)) {
+			return unit.getEntity().getLocationName(location) + " is destroyed.";
+		}
+		return null;
 	}
 }

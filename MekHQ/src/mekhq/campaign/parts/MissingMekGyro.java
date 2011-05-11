@@ -183,4 +183,9 @@ public class MissingMekGyro extends MissingPart {
 		// TODO Auto-generated method stub
 		return false;
 	}
+	
+	@Override
+	public String checkFixable() {
+		return null;
+	}
 }

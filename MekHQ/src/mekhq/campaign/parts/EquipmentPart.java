@@ -390,4 +390,30 @@ public class EquipmentPart extends Part {
 			}
 		}
 	}
+	
+	@Override
+    public String checkFixable() {
+		if(isSalvaging()) {
+			return null;
+		}
+        // The part is only fixable if the location is not destroyed.
+        // We have to cycle through all locations because some equipment is spreadable.
+        for(int loc = 0; loc < unit.getEntity().locations(); loc++) {
+            for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
+                CriticalSlot slot = unit.getEntity().getCritical(loc, i);
+                
+                // ignore empty & system slots
+                if ((slot == null) || (slot.getType() != CriticalSlot.TYPE_EQUIPMENT)) {
+                    continue;
+                }
+                
+                if (equipmentNum == slot.getIndex()) {
+                    if (unit.isLocationDestroyed(loc)) {
+                        return unit.getEntity().getLocationName(loc) + " is destroyed.";
+                    }
+                }
+            }
+        }       
+        return null;
+    }
 }

@@ -268,6 +268,17 @@ public class MissingMekEngine extends MissingPart {
 		}
 		return false;
 	}
+	
+	 @Override
+	 public String checkFixable() {
+		 for(int i = 0; i < unit.getEntity().locations(); i++) {
+			 if(unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE, i) > 0
+					 && unit.isLocationDestroyed(i)) {
+				 return unit.getEntity().getLocationName(i) + " is destroyed.";
+			 }
+		 }
+		 return null;
+	 }
 
 
 }
