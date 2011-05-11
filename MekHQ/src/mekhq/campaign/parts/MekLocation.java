@@ -272,7 +272,7 @@ public class MekLocation extends Part {
 				unit.addPart(missing);
 			}
 		}
-		unit = null;		
+		setUnit(null);
 	}
 
 	@Override

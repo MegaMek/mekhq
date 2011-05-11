@@ -124,9 +124,9 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 	public void remove(boolean salvage) {
 		if(null != unit) {
 			unit.campaign.removePart(this);
-		}
-		unit.removePart(this);
-		unit = null;
+			unit.removePart(this);
+		}	
+		setUnit(null);
 	}
 	
 	public abstract boolean isAcceptableReplacement(Part part);

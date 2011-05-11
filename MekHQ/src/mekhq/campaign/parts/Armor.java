@@ -213,7 +213,7 @@ public class Armor extends Part implements IAcquisitionWork {
 				+"</type>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<location>"
-				+type
+				+location
 				+"</location>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<rear>"
@@ -368,22 +368,24 @@ public class Armor extends Part implements IAcquisitionWork {
 
 	@Override
 	public void remove(boolean salvage) {
-		//TODO: we need a method for adding armor points to salvage parts
 		unit.getEntity().setArmor(IArmorState.ARMOR_DESTROYED, location, rear);
 		//cycle through spare parts and add to existing armor if found
-		for(Part part : unit.campaign.getSpareParts()) {
-			if(part instanceof Armor) {
-				Armor a = (Armor)part;
-				if(a.getType() == type) {
-					a.setAmount(a.getAmount() + amountNeeded);
-					unit.campaign.updateAllArmorForNewSpares();
-					return;
+		if(salvage) {
+			for(Part part : unit.campaign.getSpareParts()) {
+				if(part instanceof Armor) {
+					Armor a = (Armor)part;
+					if(a.getType() == type) {
+						a.setAmount(a.getAmount() + amountNeeded);
+						unit.campaign.updateAllArmorForNewSpares();
+						return;
+					}
 				}
 			}
+			//if we are still here then we did not find any armor, so lets create a new part and stick it in spares
+			Armor newArmor = new Armor(true,tonnage,type,amountNeeded,-1,false);
+			unit.campaign.addPart(newArmor);
 		}
-		//if we are still here then we did not find any armor, so lets create a new part and stick it in spares
-		Armor newArmor = new Armor(true,tonnage,type,amountNeeded,-1,false);
-		unit.campaign.addPart(newArmor);
+		updateConditionFromEntity();
 	}
 
 	@Override
@@ -563,5 +565,25 @@ public class Armor extends Part implements IAcquisitionWork {
 			}
 			unit.campaign.updateAllArmorForNewSpares();
 		}
+	}
+	
+
+	@Override
+	public String fail(int rating) {
+		skillMin = ++rating;
+		timeSpent = 0;
+		//if we are impossible to fix now, we should scrap this amount of armor
+		//from spares and start over
+		String scrap = "";
+		if(skillMin > SupportTeam.EXP_ELITE) {
+			scrap = " Armor supplies lost!";
+			if(salvaging) {
+				remove(false);
+			} else {
+				skillMin = SupportTeam.EXP_GREEN;
+				reduceAmountAvailable(Math.min(amountNeeded, getAmountAvailable()));
+			}
+		}
+		return " <font color='red'><b> failed." + scrap + "</b></font>";
 	}
 }

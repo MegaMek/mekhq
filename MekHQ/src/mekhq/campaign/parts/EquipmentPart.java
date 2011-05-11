@@ -53,7 +53,7 @@ public class EquipmentPart extends Part {
 
 	//crap equipmenttype is not serialized!
     protected transient EquipmentType type;
-
+    protected String typeName;
 	private int equipmentNum = -1;
 
     public EquipmentType getType() {
@@ -85,6 +85,7 @@ public class EquipmentPart extends Part {
         this.type =et;
         if(null != type) {
         	this.name = type.getName();
+        	this.typeName = type.getInternalName();
         }
         this.equipmentNum = equipNum;
     }
@@ -200,16 +201,16 @@ public class EquipmentPart extends Part {
      * Restores the equipment from the name
      */
     public void restore() {
-        if (name == null) {
-            name = type.getName();
+        if (typeName == null) {
+        	typeName = type.getName();
         } else {
-            type = EquipmentType.get(name);
+            type = EquipmentType.get(typeName);
         }
 
         if (type == null) {
             System.err
             .println("Mounted.restore: could not restore equipment type \""
-                    + name + "\"");
+                    + typeName + "\"");
         }
     }
 
@@ -258,6 +259,14 @@ public class EquipmentPart extends Part {
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent, int id) {
 		writeToXmlBegin(pw1, indent, id);		
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<equipmentNum>"
+				+equipmentNum
+				+"</equipmentNum>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<typeName>"
+				+typeName
+				+"</typeName>");
 		writeToXmlEnd(pw1, indent, id);
 	}
 
@@ -267,7 +276,12 @@ public class EquipmentPart extends Part {
 		
 		for (int x=0; x<nl.getLength(); x++) {
 			Node wn2 = nl.item(x);
-			
+			if (wn2.getNodeName().equalsIgnoreCase("equipmentNum")) {
+				equipmentNum = Integer.parseInt(wn2.getTextContent());
+			}
+			else if (wn2.getNodeName().equalsIgnoreCase("typeName")) {
+				typeName = wn2.getTextContent();
+			}
 		}
 	}
 
@@ -316,7 +330,7 @@ public class EquipmentPart extends Part {
 			unit.campaign.addPart(missing);
 			unit.addPart(missing);
 		}
-		unit = null;
+		setUnit(null);
 		equipmentNum = -1;
 	}
 

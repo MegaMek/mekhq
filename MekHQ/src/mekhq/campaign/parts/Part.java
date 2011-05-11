@@ -96,7 +96,8 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	protected int mode;
 	protected int teamId;
 	//null is valid. It indicates parts that are not attached to units.
-	Unit unit;
+	protected Unit unit;
+	protected int unitId;
 	//boolean to indicate whether the repair status on this part is set to salvage or 
 	//to repair
 	protected boolean salvaging;
@@ -118,6 +119,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		this.time = 0;
 		this.difficulty = 0;
 		this.salvaging = false;
+		this.unitId = -1;
 	}
 
 	public void setId(int id) {
@@ -126,6 +128,10 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
 	public int getId() {
 		return id;
+	}
+	
+	public int getUnitId() {
+		return unitId;
 	}
 
 	public boolean isSalvage() {
@@ -150,6 +156,11 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	
 	public void setUnit(Unit u) {
 		this.unit = u;
+		if(null != unit) {
+			unitId = unit.getId();
+		} else {
+			unitId = -1;
+		}
 	}
 
 	public String getStatus() {
@@ -293,6 +304,10 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 				+"<skillMin>"
 				+skillMin
 				+"</skillMin>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<unitId>"
+				+unitId
+				+"</unitId>");
 	}
 	
 	protected void writeToXmlEnd(PrintWriter pw1, int indent, int id) {
@@ -343,6 +358,8 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 					retVal.mode = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("teamId")) {
 					retVal.teamId = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("unitId")) {
+					retVal.unitId = Integer.parseInt(wn2.getTextContent());
 				}
 			}
 		} catch (Exception ex) {

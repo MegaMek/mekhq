@@ -128,6 +128,7 @@ import mekhq.campaign.Utilities;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.GenericSparePart;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
@@ -3173,8 +3174,6 @@ public class MekHQView extends FrameView {
 				menuItem = new JMenuItem("Scrap component");
 				menuItem.setActionCommand("REPLACE");
 				menuItem.addActionListener(this);
-				// Everything needs to be scrapable
-				// menuItem.setEnabled(((UnitWorkItem)task).canScrap());
 				menuItem.setEnabled(true);
 				popup.add(menuItem);
 				// Remove assigned team for scheduled tasks

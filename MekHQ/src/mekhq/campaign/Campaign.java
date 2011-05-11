@@ -71,6 +71,7 @@ import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.EquipmentPart;
 import mekhq.campaign.parts.GenericSparePart;
+import mekhq.campaign.parts.MissingEquipmentPart;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
@@ -1001,6 +1002,9 @@ public class Campaign implements Serializable {
 			if (part instanceof EquipmentPart) {
 				((EquipmentPart) part).restore();
 			}
+			if (part instanceof MissingEquipmentPart) {
+				((MissingEquipmentPart) part).restore();
+			}
 		}
 
 		for (Unit unit : getUnits()) {
@@ -1244,16 +1248,15 @@ public class Campaign implements Serializable {
 		writeArrayAndHashToXml(pw1, 1, "teams", teams, teamIds); // Teams
 		writeArrayAndHashToXml(pw1, 1, "units", units, unitIds); // Units
 		writeArrayAndHashToXml(pw1, 1, "personnel", personnel, personnelIds); // Personnel
-		writeArrayAndHashToXml(pw1, 1, "parts", parts, partIds); // Parts
-		writeArrayAndHashToXml(pw1, 1, "missions", missions, missionIds); // Parts
-		
+		writeArrayAndHashToXml(pw1, 1, "missions", missions, missionIds); // Missions
 		//the forces structure is hierarchical, but that should be handled internally
 		//from with writeToXML function for Force
 		pw1.println("\t<forces>");
 		forces.writeToXml(pw1, 2);
 		pw1.println("\t</forces>");
-
 		finances.writeToXml(pw1,1);
+		//parts is the biggest so it goes last
+		writeArrayAndHashToXml(pw1, 1, "parts", parts, partIds); // Parts
 		
 		// Okay, we're done.
 		// Close everything out and be done with it.
@@ -1404,6 +1407,16 @@ public class Campaign implements Serializable {
 			}
 		}
 		
+		// Process parts...
+		for (int x=0; x<retVal.parts.size(); x++) {
+			Part prt = retVal.parts.get(x);
+			Unit u = retVal.getUnit(prt.getUnitId());
+			prt.setUnit(u);
+			if(null != u) {
+				u.addPart(prt);
+			}
+		}
+		
 		// Okay, Units, need their pilot references fixed.
 		for (int x=0; x<retVal.units.size(); x++) {
 			Unit unit = retVal.units.get(x);
@@ -1417,13 +1430,8 @@ public class Campaign implements Serializable {
 			// Okay, last trigger a reCalc.
 			// This should fix some holes in the data.
 			unit.reCalc();
+			//just in case parts are missing (i.e. because they weren't tracked in previous versions)
 			unit.initializeParts();
-		}
-		
-		// Process parts...
-		for (int x=0; x<retVal.parts.size(); x++) {
-			Part prt = retVal.parts.get(x);
-			
 		}
 		
 		// Some personnel need their task references fixed.

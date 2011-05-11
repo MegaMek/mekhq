@@ -47,7 +47,7 @@ public class MekEngine extends Part {
 	protected Engine engine;
 
 	public MekEngine() {
-		this(false, 0, 0, null, 0);
+		this(false, 0, 0, new Engine(0, -1, -1), 0);
 	}
 
 	public MekEngine(boolean salvage, int tonnage, int faction, Engine e,
@@ -278,7 +278,7 @@ public class MekEngine extends Part {
 			unit.campaign.addPart(missing);
 			unit.addPart(missing);
 		}
-		unit = null;	
+		setUnit(null);	
 	}
 
 	@Override

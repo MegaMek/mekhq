@@ -2109,7 +2109,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     		Part leftFoot = null;
     		Part leftLowerLeg = null;
     		Part leftUpperLeg = null;
-    		Part[] locations = new MekLocation[entity.locations()];
+    		Part[] locations = new Part[entity.locations()];
     		Armor[] armor = new Armor[entity.locations()];
     		Armor[] armorRear = new Armor[entity.locations()];
     		Hashtable<Integer,Part> equipParts = new Hashtable<Integer,Part>();

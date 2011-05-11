@@ -199,7 +199,7 @@ public class MekActuator extends Part {
 			unit.campaign.addPart(missing);
 			unit.addPart(missing);
 		}	
-		unit = null;
+		setUnit(null);
 		location = -1;
 	}
 

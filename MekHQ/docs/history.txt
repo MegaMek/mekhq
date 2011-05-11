@@ -60,6 +60,8 @@ v0.1.6 (SVN)
 + armor needs to be acquired
 + Bug 2854851: Part scrounging bug
 + Bug 2834251: time used for incomplete repair (armor)
++ new parts fully integrated into XML load and save
++ when armor replacement fails by elite tech, armor should be removed from spares and skill min reset to Green
 
 v0.1.5 (2011-05-05)
 + refactored Hangar Panel into separate Hangar and Repair Bay panel

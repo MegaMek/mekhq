@@ -225,7 +225,7 @@ public class MekGyro extends Part {
 			unit.campaign.addPart(missing);
 			unit.addPart(missing);
 		}	
-		unit = null;
+		setUnit(null);
 	}
 
 	@Override
