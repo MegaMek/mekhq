@@ -3151,7 +3151,6 @@ public class MekHQView extends FrameView {
 				menuItem = new JMenuItem("Scrap component");
 				menuItem.setActionCommand("REPLACE");
 				menuItem.addActionListener(this);
-
 				// Everything needs to be scrapable
 				// menuItem.setEnabled(((UnitWorkItem)task).canScrap());
 				menuItem.setEnabled(true);

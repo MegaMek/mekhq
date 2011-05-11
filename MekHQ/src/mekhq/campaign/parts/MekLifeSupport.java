@@ -144,6 +144,10 @@ public class MekLifeSupport extends Part {
 				time = 120;
 				difficulty = 1;
 			}
+			if(isSalvaging()) {
+				this.time = 180;
+				this.difficulty = -1;
+			}
 		}
 		
 	}

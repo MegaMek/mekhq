@@ -53,6 +53,8 @@ v0.1.6 (SVN)
 + Bug: location repair mods are reversed
 + Bug: overtime not working right
 + dont allow salvaging or replacing of center torso
++ different time and difficulty for jump jets and heat sinks than other equipment parts
++ Bug: salvage times and difficulties not right
 
 v0.1.5 (2011-05-05)
 + refactored Hangar Panel into separate Hangar and Repair Bay panel

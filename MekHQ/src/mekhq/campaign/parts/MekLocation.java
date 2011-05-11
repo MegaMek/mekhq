@@ -295,7 +295,10 @@ public class MekLocation extends Part {
 	        	this.time = 90;
 	        	this.difficulty = -1;
 	        }
-			 
+			if(isSalvaging()) {
+				this.time = 240;
+				this.difficulty = 3;
+			}
 		}		
 	}
 

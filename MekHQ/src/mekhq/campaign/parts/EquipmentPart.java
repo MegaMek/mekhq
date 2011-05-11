@@ -324,6 +324,8 @@ public class EquipmentPart extends Part {
 	public void updateConditionFromEntity() {
 		if(null != unit) {
 			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
+			boolean isJumpJet = false;
+			boolean isHeatSink = false;
 			if(null != mounted) {
 				if(!mounted.isRepairable()) {
 					remove(false);
@@ -334,6 +336,8 @@ public class EquipmentPart extends Part {
 				} else {
 					hits = 0;
 				}
+				isJumpJet = mounted.getType() instanceof MiscType && mounted.getType().hasFlag(MiscType.F_JUMP_JET);
+				isHeatSink = mounted.getType() instanceof MiscType && (mounted.getType().hasFlag(MiscType.F_HEAT_SINK) || mounted.getType().hasFlag(MiscType.F_DOUBLE_HEAT_SINK) || mounted.getType().hasFlag(MiscType.F_LASER_HEAT_SINK));
 			}
 			if(hits == 0) {
 				time = 0;
@@ -349,7 +353,29 @@ public class EquipmentPart extends Part {
 				difficulty = 0;
 			} else if(hits > 3) {
 				time = 250;
-				difficulty = +2;
+				difficulty = 2;
+			}
+			if(isSalvaging()) {
+				this.time = 120;
+				this.difficulty = 0;
+			}
+			if(isJumpJet) {
+				if(isSalvaging()) {
+					this.time = 60;
+					this.difficulty = 0;
+				} else if(hits > 0) {
+					this.time = 90;
+					this.difficulty = 0;
+				}
+			}
+			if(isHeatSink) {
+				if(isSalvaging()) {
+					this.time = 90;
+					this.difficulty = -2;
+				} else if(hits > 0) {
+					this.time = 120;
+					this.difficulty = -1;
+				}
 			}
 		}
 	}

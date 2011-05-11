@@ -247,6 +247,10 @@ public class MekGyro extends Part {
 			else if(hits > 2) {
 				remove(false);
 			}
+			if(isSalvaging()) {
+				this.time = 200;
+				this.difficulty = 0;
+			}
 		}	
 	}
 

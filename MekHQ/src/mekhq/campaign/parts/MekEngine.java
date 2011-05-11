@@ -314,6 +314,10 @@ public class MekEngine extends Part {
 	            this.time = 300;
 	            this.difficulty = 2;
 	        }
+			if(isSalvaging()) {
+				this.time = 360;
+				this.difficulty = -1;
+			}
 		}		
 	}
 

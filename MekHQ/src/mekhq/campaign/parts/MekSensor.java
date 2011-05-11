@@ -141,6 +141,10 @@ public class MekSensor extends Part {
 				time = 150;
 				difficulty = 3;
 			}
+			if(isSalvaging()) {
+				this.time = 260;
+				this.difficulty = 0;
+			}
 		}
 		
 	}

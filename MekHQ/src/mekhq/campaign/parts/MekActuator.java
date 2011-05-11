@@ -211,6 +211,10 @@ public class MekActuator extends Part {
 				time = 120;
 				difficulty = 0;
 			}
+			if(isSalvaging()) {
+				this.time = 90;
+				this.difficulty = -3;
+			}
 		}
 		
 	}
