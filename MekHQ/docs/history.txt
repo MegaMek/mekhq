@@ -73,6 +73,9 @@ v0.1.6 (SVN)
 + adjust time for armor replacement by unit type
 + Tank MissingTurret part
 + VTOL MissingRotor part
++ Bug 3288578: Cannot add aero pilots to aerospace units
++ Bug 3298152: TO&E Tab Locks Up with Aerospace Force 0.1.5
++ Bug 3298314: Dropship added to unit cannot be deleted
 
 v0.1.5 (2011-05-05)
 + refactored Hangar Panel into separate Hangar and Repair Bay panel

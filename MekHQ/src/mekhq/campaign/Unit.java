@@ -1878,55 +1878,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 				return Unit.STATE_UNDAMAGED;
 			}
 		} else {
-			Entity entity = (Tank) getEntity();
-
-			int nbDestroyedLocations = 0;
-			int nbWeaponsDestroyed = 0;
-			int nbLimbsWithArmorDamage = 0;
-			int nbLimbsWithInternalDamage = 0;
-			int nbCrits = 0;
-
-			for (int i = 0; i < entity.locations(); i++) {
-				if (entity.getInternal(i) < entity.getOInternal(i)) {
-					nbLimbsWithInternalDamage++;
-				}
-				if (entity.getArmor(i) < entity.getOArmor(i))
-					nbLimbsWithArmorDamage++;
-				if (entity.hasRearArmor(i)) {
-					if (entity.getArmor(i, true) < entity.getOArmor(i, true))
-						nbLimbsWithArmorDamage++;
-				}
-			}
-
-			Iterator<Mounted> itWeapons = entity.getWeapons();
-			while (itWeapons.hasNext()) {
-				Mounted weapon = itWeapons.next();
-				if (weapon.isInoperable())
-					nbWeaponsDestroyed++;
-			}
-
-			for (int loc = 0; loc < entity.locations(); loc++) {
-				int nbCriticalSlots = entity.getNumberOfCriticals(loc);
-				for (int crit = 0; crit < nbCriticalSlots; crit++) {
-					CriticalSlot criticalSlot = entity.getCritical(loc, crit);
-					if (criticalSlot != null) {
-						if (criticalSlot.isDamaged() || criticalSlot.isHit()
-								|| criticalSlot.isDestroyed())
-							nbCrits++;
-					}
-				}
-			}
-
-			if (nbDestroyedLocations >= 1
-					|| nbWeaponsDestroyed >= entity.getWeaponList().size()) {
-				return Unit.STATE_CRIPPLED;
-			} else if (nbLimbsWithInternalDamage >= 1 || nbCrits >= 1) {
-				return Unit.STATE_HEAVY_DAMAGE;
-			} else if (nbLimbsWithArmorDamage >= 1) {
-				return Unit.STATE_LIGHT_DAMAGE;
-			} else {
-				return Unit.STATE_UNDAMAGED;
-			}
+			return Unit.STATE_UNDAMAGED;
 		}
 	}
 
