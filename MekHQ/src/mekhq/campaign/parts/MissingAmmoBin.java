@@ -57,14 +57,7 @@ public class MissingAmmoBin extends MissingEquipmentPart {
     }
     
     public MissingAmmoBin(boolean salvage, int tonnage, EquipmentType et, int equipNum) {
-        // TODO Memorize all entity attributes needed to calculate cost
-        // As it is a part bought with one entity can be used on another entity
-        // on which it would have a different price (only tonnage is taken into
-        // account for compatibility)
         super(salvage, tonnage, et, equipNum);
-        if(null != name) {
-        	this.name += " Bin";
-        }
         this.difficulty = -2;
     }
 	

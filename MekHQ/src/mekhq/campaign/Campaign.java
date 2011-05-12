@@ -68,6 +68,7 @@ import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.parts.AmmoBin;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.EquipmentPart;
 import mekhq.campaign.parts.GenericSparePart;
@@ -743,6 +744,9 @@ public class Campaign implements Serializable {
 		}
 		if(partWork instanceof MissingPart) {
 			action = " replace ";
+		}
+		if(partWork instanceof AmmoBin) {
+			action = " reload ";
 		}
 		report += t.getName() + " attempts to" + action + partWork.getPartName();   
 		TargetRoll target = t.getTargetFor(partWork);
