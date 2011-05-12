@@ -9,10 +9,10 @@ package mekhq;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
-import java.io.File;
+
 import javax.swing.ImageIcon;
+
 import megamek.client.ui.AWT.util.PlayerColors;
-import megamek.client.ui.swing.util.ImageFileFactory;
 import megamek.common.Player;
 import megamek.common.util.DirectoryItems;
 

@@ -11,7 +11,6 @@ import java.awt.Component;
 import java.awt.Image;
 import java.awt.event.ItemEvent;
 import java.awt.event.MouseEvent;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 

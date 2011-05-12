@@ -21,30 +21,21 @@
 
 package mekhq.campaign.team;
 
-import mekhq.MekHQApp;
-import mekhq.campaign.*;
-
 import java.io.PrintWriter;
 import java.io.Serializable;
+
+import megamek.common.TargetRoll;
+import mekhq.MekHQApp;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.MekHqXmlSerializable;
+import mekhq.campaign.MekHqXmlUtil;
+import mekhq.campaign.work.IAcquisitionWork;
+import mekhq.campaign.work.IPartWork;
+import mekhq.campaign.work.Modes;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import megamek.common.Compute;
-import megamek.common.EquipmentType;
-import megamek.common.TargetRoll;
-import mekhq.campaign.parts.Availability;
-import mekhq.campaign.parts.GenericSparePart;
-import mekhq.campaign.parts.Part;
-import mekhq.campaign.work.FullRepairWarchest;
-import mekhq.campaign.work.IAcquisitionWork;
-import mekhq.campaign.work.IPartWork;
-import mekhq.campaign.work.Refit;
-import mekhq.campaign.work.ReloadItem;
-import mekhq.campaign.work.ReplacementItem;
-import mekhq.campaign.work.UnitWorkItem;
-import mekhq.campaign.work.WorkItem;
 
 /**
  *
@@ -176,11 +167,11 @@ public abstract class SupportTeam implements Serializable, MekHqXmlSerializable 
     public TargetRoll getTarget(int mode) {    
         int effRating = getRating();
         switch(mode) {
-            case WorkItem.MODE_RUSH_THREE:
+            case Modes.MODE_RUSH_THREE:
                 effRating--;
-            case WorkItem.MODE_RUSH_TWO:
+            case Modes.MODE_RUSH_TWO:
                 effRating--;
-            case WorkItem.MODE_RUSH_ONE:
+            case Modes.MODE_RUSH_ONE:
                 effRating--;
                 break;
         }
@@ -233,23 +224,10 @@ public abstract class SupportTeam implements Serializable, MekHqXmlSerializable 
    
    public abstract String getTypeDesc();
    
-   public abstract boolean canDo(WorkItem task);
-   
-   public abstract int makeRoll(WorkItem task);
-   
    public boolean isTaskOvertime(IPartWork partWork) {
        return partWork.getTimeLeft() > getMinutesLeft()
                 && (campaign.isOvertimeAllowed()  
                     && (partWork.getTimeLeft() - getMinutesLeft()) <= getOvertimeLeft());
-   }
-   
-   public boolean isNotEnoughTime(WorkItem task) {
-       if(!campaign.isOvertimeAllowed()) {
-           return (task.getTimeLeft() > getMinutesLeft());
-       }
-       else {
-           return (task.getTimeLeft() - getMinutesLeft()) > getOvertimeLeft();
-       }
    }
    
    public TargetRoll getTargetForAcquisition(IAcquisitionWork acquisition) {
@@ -260,131 +238,10 @@ public abstract class SupportTeam implements Serializable, MekHqXmlSerializable 
            return new TargetRoll(TargetRoll.IMPOSSIBLE, "Already checked for this part in this cycle");
 	   }
 	   
-	   TargetRoll target = getTarget(WorkItem.MODE_NORMAL);
+	   TargetRoll target = getTarget(Modes.MODE_NORMAL);
 	   target.append(acquisition.getAllAcquisitionMods());
 	   return target;
    }
-  
-   public String acquirePartFor(WorkItem task) {
-       String report = "";
-       /*
-	   if(task instanceof ReplacementItem && !((ReplacementItem)task).hasPart()) {
-           //first we need to source the part
-           ReplacementItem replace = (ReplacementItem)task;
-           Part part = replace.partNeeded();
-           report += getName() + " attempts to find " + part.getDesc();          
-           TargetRoll target = getTargetForAcquisition(replace);     
-           replace.setPartCheck(true);
-           int roll = Compute.d6(2);
-           report += "  needs " + target.getValueAsString();
-           report += " and rolls " + roll + ":";
-
-           if(roll >= target.getValue()) {
-              report += " <font color='green'><b>part found.</b></font><br/>";
-              replace.setPart(part);
-              campaign.buyPart(part);
-           } else {
-              report += " <font color='red'><b>part not available.</b></font>";
-           }
-       }
-       */
-	   return report;
-   }
-   
-   public String doAssigned(WorkItem task) {
-       // Called by btnDoTaskActionPerformed
-       // if team.getTargetFor(task).getValue() == TargetRoll.IMPOSSIBLE, doAssigned is not called
-       // Not called if not enough funds as long as getTargetFor checks for funds
-       String report = "";
-          
-       /*
-       else if (task instanceof ReplacementItem
-                    && ((ReplacementItem)task).hasPart()
-                    && ((ReplacementItem) task).partNeeded() instanceof GenericSparePart
-                    && !((ReplacementItem) task).hasEnoughGenericSpareParts()){
-           GenericSparePart partNeeded = (GenericSparePart) ((ReplacementItem) task).partNeeded();
-           GenericSparePart currentPart = (GenericSparePart) ((ReplacementItem) task).getPart();
-           
-           //first we need to source the amount missing
-           ReplacementItem replace = (ReplacementItem)task;
-           GenericSparePart partMissing = (GenericSparePart) replace.partNeeded();
-           partMissing.setAmount(partNeeded.getAmount()-currentPart.getAmount());
-           
-           report += getName() + " must first obtain " + partMissing.getDesc();
-           TargetRoll target = getTarget(WorkItem.MODE_NORMAL);
-           replace.setPartCheck(true);
-
-           char availability = GenericSparePart.getAvailability();
-           int factionMod = 0;
-
-           int availabilityMod = SSWLibHelper.getModifierFromAvailability(availability);
-           target.addModifier(availabilityMod, "availability (" + availability + ")");
-           target.addModifier(factionMod, "faction");
-
-           int roll = Compute.d6(2);
-           report += "  needs " + target.getValueAsString();
-           report += "<font color='blue' size='-2'> [" + target.getDesc() + "] </font>";
-           report += " and rolls " + roll + ":";
-
-           if(roll >= target.getValue()) {
-              report += " <font color='green'><b>part found.</b></font><br/>";
-              currentPart.setAmount(partNeeded.getAmount());
-              campaign.buyPart(partMissing);
-           } else {
-              report += " <font color='red'><b>part not available.</b></font>";
-              return report;
-           }
-       }
-       */
-       /*
-       report += getName() + " attempts to " + task.getDisplayName();    
-       TargetRoll target = getTargetFor(task);
-       
-       //check and use time
-       int minutes = task.getTimeLeft();
-       if(minutes > getMinutesLeft()) {
-           minutes -= getMinutesLeft();
-           //check for overtime first
-           if(campaign.isOvertimeAllowed() && minutes <= getOvertimeLeft()) {
-               //we ar working overtime
-               setMinutesLeft(0);
-               setOvertimeLeft(getOvertimeLeft() - minutes);
-           } else {
-               //we need to finish the task tomorrow
-               int minutesUsed = getMinutesLeft();
-               if(campaign.isOvertimeAllowed()) {
-                   minutesUsed += getOvertimeLeft();
-               }
-               task.addTimeSpent(minutesUsed);
-               setMinutesLeft(0);
-               setOvertimeLeft(0);
-               task.setTeam(this);
-               report += " - <b>Not enough time, the remainder of the task will be finished tomorrow.</b>";
-               return report;
-           }     
-       } else {
-           setMinutesLeft(getMinutesLeft() - minutes);
-       }
-       
-       //make the roll
-       int roll = makeRoll(task);
-       report = report + "  needs " + target.getValueAsString() + " and rolls " + roll + ":";
-       if(roll >= target.getValue()) {
-           report = report + task.succeed();
-
-           // Substract cost
-           if (task instanceof FullRepairWarchest) {
-               campaign.addFunds(-((FullRepairWarchest) task).getCost());
-           } else if (task instanceof ReloadItem) {
-               campaign.addFunds(-((ReloadItem) task).getCost());
-           }
-       } else {
-           report = report + task.fail(getRating());
-       }
-       */
-       return report;
-   }
- 
 
 	public abstract void writeToXml(PrintWriter pw1, int indent, int id);
 	

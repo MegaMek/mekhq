@@ -25,19 +25,16 @@ import java.io.PrintWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.Pilot;
-import megamek.common.TargetRoll;
-import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Ranks;
 import mekhq.campaign.SkillCosts;
 import mekhq.campaign.team.MedicalTeam;
 import mekhq.campaign.team.SupportTeam;
 import mekhq.campaign.team.TechTeam;
-import mekhq.campaign.work.IWork;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * A person wrapper for support teams

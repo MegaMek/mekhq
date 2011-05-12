@@ -23,9 +23,6 @@ package mekhq.campaign.team;
 
 import java.io.PrintWriter;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.Aero;
 import megamek.common.BattleArmor;
 import megamek.common.Compute;
@@ -35,14 +32,11 @@ import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Utilities;
-import mekhq.campaign.parts.GenericSparePart;
 import mekhq.campaign.parts.MissingPart;
-import mekhq.campaign.work.FullRepairWarchest;
 import mekhq.campaign.work.IPartWork;
-import mekhq.campaign.work.ReloadItem;
-import mekhq.campaign.work.ReplacementItem;
-import mekhq.campaign.work.UnitWorkItem;
-import mekhq.campaign.work.WorkItem;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  *
@@ -122,21 +116,6 @@ public class TechTeam extends SupportTeam {
        }
        return base;
     }
-   
-   @Override
-   public boolean canDo(WorkItem task) {
-        return true; 
-
-   } 
-    
-   @Override
-   public int makeRoll(WorkItem task) {
-       if(task instanceof UnitWorkItem && isRightType(((UnitWorkItem)task).getUnit().getEntity())) {
-           return Compute.d6(2);
-       } else {
-           return Utilities.roll3d6();
-       }
-   }
    
    public boolean isRightType(Entity en) {
        if((type == T_MECH && !(en instanceof Mech)) 

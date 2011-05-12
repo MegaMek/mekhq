@@ -24,6 +24,7 @@ package mekhq.campaign;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Vector;
+
 import megamek.common.Aero;
 import megamek.common.AmmoType;
 import megamek.common.Compute;

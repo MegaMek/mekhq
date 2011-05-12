@@ -10,7 +10,6 @@ import java.awt.Color;
 
 import javax.swing.BorderFactory;
 
-import megamek.common.TechConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Faction;
 import mekhq.campaign.Planet;

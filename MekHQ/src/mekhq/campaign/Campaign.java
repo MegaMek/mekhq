@@ -23,16 +23,9 @@ package mekhq.campaign;
 
 import java.io.FileInputStream;
 import java.io.PrintWriter;
-import java.text.NumberFormat;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import megamek.client.RandomNameGenerator;
-import megamek.common.loaders.EntityLoadingException;
-import mekhq.MekHQApp;
-import mekhq.campaign.team.SupportTeam;
 import java.io.Serializable;
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -40,30 +33,27 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
+import megamek.client.RandomNameGenerator;
 import megamek.common.Aero;
-import megamek.common.Entity;
-
 import megamek.common.Compute;
+import megamek.common.Entity;
 import megamek.common.Game;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
-import megamek.common.Mounted;
 import megamek.common.Pilot;
 import megamek.common.Player;
 import megamek.common.Protomech;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
+import megamek.common.loaders.EntityLoadingException;
+import mekhq.MekHQApp;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.mission.Mission;
@@ -79,22 +69,17 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PilotPerson;
 import mekhq.campaign.personnel.SupportPerson;
 import mekhq.campaign.team.MedicalTeam;
+import mekhq.campaign.team.SupportTeam;
 import mekhq.campaign.team.TechTeam;
-import mekhq.campaign.work.Customization;
-import mekhq.campaign.work.EquipmentRepair;
-import mekhq.campaign.work.EquipmentReplacement;
-import mekhq.campaign.work.EquipmentSalvage;
-import mekhq.campaign.work.FullRepairWarchest;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IMedicalWork;
 import mekhq.campaign.work.IPartWork;
-import mekhq.campaign.work.Refit;
-import mekhq.campaign.work.ReloadItem;
-import mekhq.campaign.work.UnitWorkItem;
-import mekhq.campaign.work.WorkItem;
-import mekhq.campaign.work.RepairItem;
-import mekhq.campaign.work.ReplacementItem;
-import mekhq.campaign.work.SalvageItem;
+
+import org.w3c.dom.DOMException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * 

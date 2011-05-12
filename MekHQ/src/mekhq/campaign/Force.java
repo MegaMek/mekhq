@@ -25,13 +25,11 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.Vector;
 
+import mekhq.MekHQApp;
+
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import mekhq.MekHQApp;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.PilotPerson;
 
 /**
  * This is a hierarchical object to define forces for TO&E. Each Force

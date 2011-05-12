@@ -23,10 +23,9 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import org.w3c.dom.Node;
-
 import megamek.common.EquipmentType;
-import mekhq.campaign.work.ReplacementItem;
+
+import org.w3c.dom.Node;
 
 /**
  *
@@ -42,13 +41,6 @@ public class VeeStabiliser extends Part {
 	public VeeStabiliser(boolean salvage, int tonnage) {
         super(salvage, tonnage);
         this.name = "Vehicle Stabiliser";
-    }
-    
-    @Override
-    public boolean canBeUsedBy(ReplacementItem task) {
-        //What the hell is going on here?
-        //return task instanceof VeeStabiliserReplacement;
-        return false;
     }
 
     @Override

@@ -23,32 +23,18 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.GregorianCalendar;
 
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import com.sun.tools.internal.ws.wscompile.Options.Target;
-
-import megamek.common.CriticalSlot;
-import megamek.common.Engine;
 import megamek.common.EquipmentType;
-import megamek.common.Mech;
 import megamek.common.TargetRoll;
-import megamek.common.TechConstants;
-import mekhq.MekHQApp;
-import mekhq.campaign.Faction;
 import mekhq.campaign.MekHqXmlSerializable;
 import mekhq.campaign.MekHqXmlUtil;
-import mekhq.campaign.Unit;
 import mekhq.campaign.team.SupportTeam;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
-import mekhq.campaign.work.ReplacementItem;
+import mekhq.campaign.work.Modes;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * A missing part is a placeholder on a unit to indicate that a replacement
@@ -96,7 +82,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		toReturn += "" + getTimeLeft() + " minutes" + scheduled;
 		toReturn += ", " + SupportTeam.getRatingName(getSkillMin());
 		toReturn += " " + bonus;
-		if (getMode() != MODE_NORMAL) {
+		if (getMode() != Modes.MODE_NORMAL) {
 			toReturn += "<br/><i>" + getCurrentModeName() + "</i>";
 		}
 		toReturn += "</font></html>";

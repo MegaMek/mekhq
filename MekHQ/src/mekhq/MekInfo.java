@@ -12,12 +12,11 @@ import java.awt.Image;
 import java.awt.image.ImageObserver;
 import java.awt.image.MemoryImageSource;
 import java.awt.image.PixelGrabber;
-import java.io.File;
-import java.io.IOException;
+
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
+
 import megamek.client.ui.swing.MechTileset;
-import megamek.client.ui.swing.util.ImageFileFactory;
 import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Player;
 import megamek.common.util.DirectoryItems;

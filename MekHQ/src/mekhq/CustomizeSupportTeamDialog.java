@@ -25,12 +25,13 @@ import java.awt.Frame;
 import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
 
+import javax.swing.DefaultComboBoxModel;
+
+import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SupportPerson;
 import mekhq.campaign.team.MedicalTeam;
 import mekhq.campaign.team.SupportTeam;
-import javax.swing.DefaultComboBoxModel;
-import mekhq.campaign.Campaign;
 import mekhq.campaign.team.TechTeam;
 
 /**

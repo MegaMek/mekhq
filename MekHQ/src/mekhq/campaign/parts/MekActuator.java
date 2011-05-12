@@ -23,17 +23,14 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.BipedMech;
 import megamek.common.CriticalSlot;
-import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Mech;
 import mekhq.campaign.MekHqXmlUtil;
-import mekhq.campaign.work.MekActuatorReplacement;
-import mekhq.campaign.work.ReplacementItem;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  *
@@ -108,13 +105,6 @@ public class MekActuator extends Part {
             }
         }
         this.cost = getTonnage() * unitCost;
-    }
-
-    @Override
-    public boolean canBeUsedBy(ReplacementItem task) {
-        return task instanceof MekActuatorReplacement 
-                && tonnage == ((MekActuatorReplacement)task).getUnit().getEntity().getWeight()
-                && type == ((MekActuatorReplacement)task).getType();
     }
 
     @Override

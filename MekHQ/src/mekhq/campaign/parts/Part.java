@@ -25,25 +25,20 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.GregorianCalendar;
 
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import megamek.common.Engine;
 import megamek.common.EquipmentType;
 import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
 import mekhq.MekHQApp;
-import mekhq.campaign.Faction;
 import mekhq.campaign.MekHqXmlSerializable;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
 import mekhq.campaign.team.SupportTeam;
 import mekhq.campaign.work.IPartWork;
-import mekhq.campaign.work.ReplacementItem;
+
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * I am totally reworking part so that the repair system is part-centric.
@@ -209,8 +204,6 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	public abstract int getTechRating();
 	
 	public abstract int getAvailability(int era);
-
-	public abstract boolean canBeUsedBy(ReplacementItem task);
 
 	/**
 	 * Checks if the current part is exactly the "same kind" of part as the part

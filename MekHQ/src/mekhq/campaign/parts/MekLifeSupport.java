@@ -23,16 +23,12 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import org.w3c.dom.Node;
-
 import megamek.common.CriticalSlot;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Mech;
-import mekhq.campaign.work.MekLifeSupportRepair;
-import mekhq.campaign.work.MekLifeSupportReplacement;
-import mekhq.campaign.work.MekLifeSupportSalvage;
-import mekhq.campaign.work.ReplacementItem;
+
+import org.w3c.dom.Node;
 
 /**
  *
@@ -49,11 +45,6 @@ public class MekLifeSupport extends Part {
         super(salvage, tonnage);
         this.name = "Mech Life Support System";
         this.cost = 50000;
-    }
-    
-    @Override
-    public boolean canBeUsedBy(ReplacementItem task) {
-        return task instanceof MekLifeSupportReplacement;
     }
 
     @Override

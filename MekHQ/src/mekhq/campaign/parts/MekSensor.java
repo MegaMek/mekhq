@@ -23,14 +23,12 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import org.w3c.dom.Node;
-
 import megamek.common.CriticalSlot;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Mech;
-import mekhq.campaign.work.MekSensorReplacement;
-import mekhq.campaign.work.ReplacementItem;
+
+import org.w3c.dom.Node;
 
 /**
  *
@@ -46,11 +44,6 @@ public class MekSensor extends Part {
 	public MekSensor(boolean salvage, int tonnage) {
         super(salvage, tonnage);
         this.name = "Mech Sensors";
-    }
-    
-    @Override
-    public boolean canBeUsedBy(ReplacementItem task) {
-        return task instanceof MekSensorReplacement;
     }
 
     @Override

@@ -23,19 +23,12 @@ package mekhq.campaign.team;
 
 import java.io.PrintWriter;
 
-import org.w3c.dom.Node;
-
 import megamek.common.Compute;
 import megamek.common.TargetRoll;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.parts.GenericSparePart;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.work.FullRepairWarchest;
 import mekhq.campaign.work.IMedicalWork;
-import mekhq.campaign.work.ReloadItem;
-import mekhq.campaign.work.ReplacementItem;
-import mekhq.campaign.work.UnitWorkItem;
-import mekhq.campaign.work.WorkItem;
+
+import org.w3c.dom.Node;
 
 /**
  *
@@ -93,16 +86,6 @@ public class MedicalTeam extends SupportTeam {
     @Override
     public String getTypeDesc() {
         return "Doctor";
-    }
-
-    @Override
-    public boolean canDo(WorkItem task) {
-        return false; 
-    }
-
-    @Override
-    public int makeRoll(WorkItem task) {
-        return Compute.d6(2);
     }
    
     @Override

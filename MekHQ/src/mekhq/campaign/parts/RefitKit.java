@@ -23,13 +23,11 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.EquipmentType;
 import mekhq.campaign.MekHqXmlUtil;
-import mekhq.campaign.work.Refit;
-import mekhq.campaign.work.ReplacementItem;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  *
@@ -64,17 +62,7 @@ public class RefitKit extends Part {
     public int getPartType() {
         return PART_TYPE_OTHER;
     }
-
-    @Override
-    public boolean canBeUsedBy(ReplacementItem task) {
-        if (task instanceof Refit) {
-            return task.getUnit().getEntity().getShortName().equals(this.sourceName)
-                    && ((Refit) task).getTargetEntity().getShortName().equals(this.targetName);
-        } else {
-            return false;
-        }
-    }
-
+    
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent, int id) {
 		writeToXmlBegin(pw1, indent, id);

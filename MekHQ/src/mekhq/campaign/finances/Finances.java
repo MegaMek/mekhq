@@ -24,16 +24,11 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.GregorianCalendar;
 
-import org.w3c.dom.NamedNodeMap;
+import mekhq.campaign.MekHqXmlUtil;
+
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import mekhq.MekHQApp;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.Force;
-import mekhq.campaign.MekHqXmlUtil;
 
 /**
  *

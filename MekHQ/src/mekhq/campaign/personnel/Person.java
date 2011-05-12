@@ -27,10 +27,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.Pilot;
 import megamek.common.TargetRoll;
 import mekhq.MekHQApp;
@@ -39,10 +35,12 @@ import mekhq.campaign.MekHqXmlSerializable;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Ranks;
 import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.team.MedicalTeam;
-import mekhq.campaign.team.SupportTeam;
 import mekhq.campaign.work.IMedicalWork;
 import mekhq.campaign.work.IWork;
+
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * This is an abstract class for verious types of personnel

@@ -23,12 +23,10 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import org.w3c.dom.Node;
-
 import megamek.common.EquipmentType;
 import megamek.common.Tank;
-import mekhq.campaign.work.ReplacementItem;
-import mekhq.campaign.work.TurretReplacement;
+
+import org.w3c.dom.Node;
 
 /**
  *
@@ -43,13 +41,6 @@ public class Turret extends Part {
 	
 	public Turret(boolean salvage, int tonnage) {
         super(salvage, tonnage);
-    }
-    
-    @Override
-    public boolean canBeUsedBy(ReplacementItem task) {
-        return task instanceof TurretReplacement 
-                && ((TurretReplacement)task).getUnit().getEntity() instanceof Tank
-                && ((TurretReplacement)task).getUnit().getEntity().getWeight() == tonnage;
     }
 
     @Override

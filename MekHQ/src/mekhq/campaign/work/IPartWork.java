@@ -29,8 +29,6 @@ import mekhq.campaign.parts.Part;
  */
 public interface IPartWork extends IWork {
 	
-	
-	
 	public String getPartName();
 	
 	public int getSkillMin();

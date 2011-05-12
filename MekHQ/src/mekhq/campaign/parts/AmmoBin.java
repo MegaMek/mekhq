@@ -22,32 +22,19 @@
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
-import java.util.ArrayList;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import megamek.common.AmmoType;
 import megamek.common.CriticalSlot;
-import megamek.common.Entity;
 import megamek.common.EquipmentType;
-import megamek.common.IArmorState;
-import megamek.common.MiscType;
 import megamek.common.Mounted;
 import megamek.common.TargetRoll;
-import megamek.common.TechConstants;
-import megamek.common.weapons.Weapon;
 import mekhq.campaign.Era;
-import mekhq.campaign.Faction;
 import mekhq.campaign.MekHqXmlUtil;
-import mekhq.campaign.Unit;
 import mekhq.campaign.Utilities;
-import mekhq.campaign.team.SupportTeam;
-import mekhq.campaign.work.EquipmentRepair;
-import mekhq.campaign.work.EquipmentReplacement;
-import mekhq.campaign.work.EquipmentSalvage;
 import mekhq.campaign.work.IAcquisitionWork;
-import mekhq.campaign.work.ReplacementItem;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  *

@@ -22,10 +22,6 @@
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
-import java.util.ArrayList;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import megamek.common.CriticalSlot;
 import megamek.common.Engine;
@@ -35,8 +31,9 @@ import megamek.common.Mech;
 import megamek.common.TechConstants;
 import mekhq.campaign.Faction;
 import mekhq.campaign.MekHqXmlUtil;
-import mekhq.campaign.work.MekEngineReplacement;
-import mekhq.campaign.work.ReplacementItem;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * 
@@ -69,23 +66,6 @@ public class MekEngine extends Part {
 
 	public Engine getEngine() {
 		return engine;
-	}
-
-
-	@Override
-	public boolean canBeUsedBy(ReplacementItem task) {
-		if (task instanceof MekEngineReplacement
-				&& task.getUnit().getEntity() instanceof Mech) {
-			Engine eng = task.getUnit().getEntity().getEngine();
-			if (null != eng) {
-				return getEngine().getEngineType() == eng.getEngineType()
-						&& getEngine().getRating() == eng.getRating()
-						&& getEngine().getTechType() == eng.getTechType()
-						&& getTonnage() == task.getUnit().getEntity()
-								.getWeight();
-			}
-		}
-		return false;
 	}
 
 	@Override

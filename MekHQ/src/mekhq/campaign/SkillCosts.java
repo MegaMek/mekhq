@@ -22,10 +22,8 @@
 package mekhq.campaign;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Vector;
 
 /**
  * This object will keep track of all the various skill types and their associated experience point costs to advance

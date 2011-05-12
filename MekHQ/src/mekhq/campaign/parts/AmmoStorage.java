@@ -23,14 +23,14 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.AmmoType;
 import megamek.common.EquipmentType;
 import megamek.common.TargetRoll;
 import mekhq.campaign.Era;
 import mekhq.campaign.MekHqXmlUtil;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * This will be a special type of part that will only exist as spares

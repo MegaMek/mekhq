@@ -21,14 +21,10 @@
 
 package mekhq.campaign.personnel;
 
-import java.io.File;
 import java.io.PrintWriter;
 import java.util.Enumeration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import megamek.common.Aero;
 import megamek.common.BattleArmor;
@@ -37,11 +33,8 @@ import megamek.common.Mech;
 import megamek.common.Pilot;
 import megamek.common.Protomech;
 import megamek.common.Tank;
-import megamek.common.TargetRoll;
 import megamek.common.options.IOption;
-import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
-import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Ranks;
 import mekhq.campaign.SkillCosts;
@@ -49,7 +42,9 @@ import mekhq.campaign.Unit;
 import mekhq.campaign.team.MedicalTeam;
 import mekhq.campaign.team.SupportTeam;
 import mekhq.campaign.work.IMedicalWork;
-import mekhq.campaign.work.IWork;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * A Person wrapper for pilots and vee crews

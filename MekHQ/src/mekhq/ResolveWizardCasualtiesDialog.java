@@ -22,7 +22,6 @@
 package mekhq;
 
 import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.GridBagLayout;
 import java.util.ArrayList;
 
@@ -30,8 +29,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 
 import megamek.common.Pilot;
-import mekhq.campaign.Unit;
-import mekhq.campaign.personnel.PilotPerson;
 /**
  *
  * @author  Taharqa

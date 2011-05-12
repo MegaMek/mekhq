@@ -26,13 +26,12 @@ import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.GregorianCalendar;
+
+import mekhq.campaign.MekHqXmlUtil;
 
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import mekhq.campaign.MekHqXmlUtil;
 
 /**
  *

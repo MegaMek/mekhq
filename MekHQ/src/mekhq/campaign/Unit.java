@@ -29,10 +29,6 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
 
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.Aero;
 import megamek.common.AmmoType;
 import megamek.common.BattleArmor;
@@ -41,27 +37,22 @@ import megamek.common.CriticalSlot;
 import megamek.common.Dropship;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
-import megamek.common.IArmorState;
 import megamek.common.Infantry;
 import megamek.common.Jumpship;
 import megamek.common.Mech;
 import megamek.common.MiscType;
 import megamek.common.Mounted;
-import megamek.common.Protomech;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
 import megamek.common.VTOL;
 import megamek.common.Warship;
-import megamek.common.WeaponType;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import mekhq.MekHQApp;
 import mekhq.campaign.parts.AmmoBin;
 import mekhq.campaign.parts.Armor;
-import mekhq.campaign.parts.Availability;
 import mekhq.campaign.parts.EquipmentPart;
-import mekhq.campaign.parts.GenericSparePart;
 import mekhq.campaign.parts.MekActuator;
 import mekhq.campaign.parts.MekEngine;
 import mekhq.campaign.parts.MekGyro;
@@ -79,7 +70,11 @@ import mekhq.campaign.parts.MissingMekSensor;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.PilotPerson;
-import mekhq.campaign.work.*;
+import mekhq.campaign.work.IAcquisitionWork;
+
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * This is a wrapper class for entity, so that we can add some functionality to

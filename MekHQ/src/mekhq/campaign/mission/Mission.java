@@ -22,20 +22,15 @@ package mekhq.campaign.mission;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.GregorianCalendar;
+
+import mekhq.MekHQApp;
+import mekhq.campaign.MekHqXmlSerializable;
+import mekhq.campaign.MekHqXmlUtil;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import mekhq.MekHQApp;
-import mekhq.campaign.Force;
-import mekhq.campaign.MekHqXmlSerializable;
-import mekhq.campaign.MekHqXmlUtil;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.PilotPerson;
 
 
 /**

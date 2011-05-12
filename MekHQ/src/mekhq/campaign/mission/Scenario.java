@@ -25,15 +25,15 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import mekhq.MekHQApp;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Force;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.personnel.Person;
+
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 
 /**

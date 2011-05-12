@@ -25,13 +25,11 @@ import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
+import megamek.common.EquipmentType;
+import mekhq.campaign.MekHqXmlUtil;
+
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import megamek.common.EquipmentType;
-import megamek.common.TechConstants;
-import mekhq.campaign.MekHqXmlUtil;
-import mekhq.campaign.work.ReplacementItem;
 
 /**
  *
@@ -66,12 +64,6 @@ public class GenericSparePart extends Part {
     @Override
     public int getTech () {
         return this.tech;
-    }
-  
-    @Override
-    public boolean canBeUsedBy(ReplacementItem task) {
-        return (task instanceof ReplacementItem
-                && ((ReplacementItem) task).partNeeded().getTech() == getTech());
     }
 
     @Override

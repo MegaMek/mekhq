@@ -36,6 +36,7 @@ import megamek.common.UnitType;
 import megamek.common.loaders.EntityLoadingException;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Unit;
+
 import org.jdesktop.application.ResourceMap;
 
 /**

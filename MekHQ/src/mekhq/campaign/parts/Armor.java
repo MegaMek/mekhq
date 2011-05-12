@@ -22,22 +22,18 @@
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
-import java.util.ArrayList;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import megamek.common.Engine;
 import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
 import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
-import mekhq.campaign.Faction;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.team.SupportTeam;
-import mekhq.campaign.work.ArmorReplacement;
 import mekhq.campaign.work.IAcquisitionWork;
-import mekhq.campaign.work.ReplacementItem;
+import mekhq.campaign.work.Modes;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  *
@@ -95,7 +91,7 @@ public class Armor extends Part implements IAcquisitionWork {
 			toReturn += ", " + SupportTeam.getRatingName(getSkillMin());
 			toReturn += " " + bonus;
 		}
-		if (getMode() != MODE_NORMAL) {
+		if (getMode() != Modes.MODE_NORMAL) {
 			toReturn += "<br/><i>" + getCurrentModeName() + "</i>";
 		}
 		toReturn += "</font></html>";
@@ -141,12 +137,6 @@ public class Armor extends Part implements IAcquisitionWork {
 
     public void setAmount(int amount) {
         this.amount = amount;
-    }
-    
-    @Override
-    public boolean canBeUsedBy(ReplacementItem task) {
-        return task instanceof ArmorReplacement 
-                && ((ArmorReplacement)task).getUnit().getEntity().getArmorType(((ArmorReplacement)task).getLoc()) == type;
     }
 
     @Override

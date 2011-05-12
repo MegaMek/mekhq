@@ -22,14 +22,9 @@
 package mekhq;
 
 import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.GridBagLayout;
 
 import javax.swing.BorderFactory;
-
-import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.Mission;
-import mekhq.campaign.mission.Scenario;
 
 /**
  *

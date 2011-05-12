@@ -22,19 +22,15 @@
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
-import java.util.ArrayList;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import megamek.common.CriticalSlot;
 import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
 import megamek.common.Mech;
-import mekhq.campaign.Faction;
 import mekhq.campaign.MekHqXmlUtil;
-import mekhq.campaign.work.LocationReplacement;
-import mekhq.campaign.work.ReplacementItem;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  *
@@ -120,16 +116,6 @@ public class MekLocation extends Part {
         }
 
         this.cost = (long) Math.round(cost);
-    }
-    
-    @Override
-    public boolean canBeUsedBy(ReplacementItem task) {
-        return task instanceof LocationReplacement 
-                && ((LocationReplacement)task).getUnit().getEntity() instanceof Mech
-                && ((LocationReplacement)task).getLoc() == loc
-                && ((LocationReplacement)task).getUnit().getEntity().getWeight() == tonnage
-                && ((LocationReplacement)task).getUnit().hasTSM() == tsm
-                && ((LocationReplacement)task).getUnit().getEntity().getStructureType() == structureType;
     }
 
     @Override

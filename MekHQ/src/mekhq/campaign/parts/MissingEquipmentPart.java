@@ -22,28 +22,17 @@
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
-import java.util.ArrayList;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import megamek.common.AmmoType;
 import megamek.common.CriticalSlot;
-import megamek.common.Entity;
 import megamek.common.EquipmentType;
-import megamek.common.MiscType;
-import megamek.common.Mounted;
 import megamek.common.TechConstants;
 import megamek.common.weapons.Weapon;
 import mekhq.campaign.Era;
-import mekhq.campaign.Faction;
 import mekhq.campaign.MekHqXmlUtil;
-import mekhq.campaign.Unit;
-import mekhq.campaign.work.EquipmentRepair;
-import mekhq.campaign.work.EquipmentReplacement;
-import mekhq.campaign.work.EquipmentSalvage;
-import mekhq.campaign.work.IAcquisitionWork;
-import mekhq.campaign.work.ReplacementItem;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  *
@@ -87,20 +76,6 @@ public class MissingEquipmentPart extends MissingPart {
         this.equipmentNum = equipNum;
         this.time = 120;
         this.difficulty = 0;
-    }
-    
-    @Override
-    public boolean canBeUsedBy(ReplacementItem task) {
-        if(task instanceof EquipmentReplacement) {
-            EquipmentType et = ((EquipmentReplacement)task).getMounted().getType();
-            if (et.getCost(null, false) == EquipmentType.COST_VARIABLE) {
-                // In this case tonnage matters (ex. : hartchet, sword, ...
-                return type.equals(et) && getTonnage() == ((EquipmentReplacement)task).getUnit().getEntity().getWeight();
-            } else {
-                return type.equals(et);
-            }
-        }
-        return false;
     }
     
     /**

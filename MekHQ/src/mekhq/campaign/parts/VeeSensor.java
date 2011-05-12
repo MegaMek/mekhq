@@ -23,11 +23,9 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import org.w3c.dom.Node;
-
 import megamek.common.EquipmentType;
-import mekhq.campaign.work.ReplacementItem;
-import mekhq.campaign.work.VeeSensorReplacement;
+
+import org.w3c.dom.Node;
 
 /**
  *
@@ -43,11 +41,6 @@ public class VeeSensor extends Part {
 	public VeeSensor(boolean salvage, int tonnage) {
         super(salvage, tonnage);
         this.name = "Vehicle Sensors";
-    }
-    
-    @Override
-    public boolean canBeUsedBy(ReplacementItem task) {
-        return task instanceof VeeSensorReplacement;
     }
 
     @Override

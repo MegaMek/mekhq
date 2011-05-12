@@ -22,14 +22,12 @@
 package mekhq;
 
 import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.GridBagLayout;
 import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 
-import mekhq.campaign.Unit;
 import megamek.common.Entity;
 /**
  *
