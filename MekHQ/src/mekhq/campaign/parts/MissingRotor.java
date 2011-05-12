@@ -24,6 +24,7 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 
 import megamek.common.EquipmentType;
+import megamek.common.Tank;
 import megamek.common.VTOL;
 
 import org.w3c.dom.Node;
@@ -32,23 +33,23 @@ import org.w3c.dom.Node;
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class Rotor extends Part {
+public class MissingRotor extends MissingPart {
 	private static final long serialVersionUID = -3277611762625095964L;
 
-	public Rotor() {
+	public MissingRotor() {
 		this(false, 0);
 	}
 	
-	public Rotor(boolean salvage, int tonnage) {
+	public MissingRotor(boolean salvage, int tonnage) {
         super(salvage, tonnage);
     }
 
     @Override
     public boolean isSamePartTypeAndStatus (Part part) {
-        return part instanceof Rotor
+        return part instanceof MissingRotor
                 && getName().equals(part.getName())
                 && getStatus().equals(part.getStatus())
-                && getTonnage() == ((Rotor)part).getTonnage();
+                && getTonnage() == ((MissingRotor)part).getTonnage();
     }
 
 	@Override
@@ -75,45 +76,21 @@ public class Rotor extends Part {
 		return EquipmentType.RATING_B;
 	}
 
-	@Override
-	public void fix() {
-		// TODO Auto-generated method stub
-		
-	}
 
 	@Override
-	public Part getMissingPart() {
-		// TODO Auto-generated method stub
-		return null;
+	public boolean isAcceptableReplacement(Part part) {
+		return part instanceof TankLocation 
+			&& ((TankLocation)part).getLoc() == Tank.LOC_TURRET;
 	}
-
-	@Override
-	public void remove(boolean salvage) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void updateConditionFromEntity() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public boolean needsFixing() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void updateConditionFromPart() {
-		// TODO Auto-generated method stub
-		
-	}
-
+	
 	@Override
 	public String checkFixable() {
-		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public Part getNewPart() {
+		//TODO: how to get second turret location?
+		return new TankLocation(isSalvage(), Tank.LOC_TURRET, getTonnage(), true);
 	}
 }

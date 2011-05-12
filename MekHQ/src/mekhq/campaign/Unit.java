@@ -2210,10 +2210,10 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     				if(i == Tank.LOC_TURRET_2 && ((Tank)entity).hasNoDualTurret()) {
     					continue;
     				}
-    				if(i == Tank.LOC_TURRET && ((Tank)entity).hasNoTurret()) {
+    				if(i == Tank.LOC_TURRET && ((Tank)entity).hasNoTurret() && !(entity instanceof VTOL)) {
     					continue;
     				}
-    				TankLocation tankLocation = new TankLocation(false, i, (int) getEntity().getWeight());
+    				TankLocation tankLocation = new TankLocation(false, i, (int) getEntity().getWeight(), entity instanceof VTOL);
     				addPart(tankLocation);
     				campaign.addPart(tankLocation);
     			}

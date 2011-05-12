@@ -26,6 +26,7 @@ import java.io.PrintWriter;
 import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
 import megamek.common.Tank;
+import megamek.common.VTOL;
 import mekhq.campaign.MekHqXmlUtil;
 
 import org.w3c.dom.Node;
@@ -38,21 +39,23 @@ import org.w3c.dom.NodeList;
 public class TankLocation extends Part {
 	private static final long serialVersionUID = -122291037522319765L;
 	protected int loc;
+	protected boolean isVTOL;
 
     public TankLocation() {
-    	this(false, 0, 0);
+    	this(false, 0, 0, false);
     }
     
     public int getLoc() {
         return loc;
     }
     
-    public TankLocation(boolean salvage, int loc, int tonnage) {
+    public TankLocation(boolean salvage, int loc, int tonnage, boolean vtol) {
         super(salvage, tonnage);
         this.loc = loc;
         this.time = 60;
         this.difficulty = 0;
         this.name = "Tank Location";
+        this.isVTOL = vtol;
         switch(loc) {
             case(Tank.LOC_FRONT):
                 this.name = "Vehicle Front";
@@ -68,6 +71,9 @@ public class TankLocation extends Part {
                 break;
             case(Tank.LOC_TURRET):
             case(Tank.LOC_TURRET_2):
+            	if(isVTOL) {
+            		this.name = "VTOL Rotor";
+            	}
                 this.name = "Vehicle Turret";
                 break;
         }
@@ -129,8 +135,12 @@ public class TankLocation extends Part {
 
 	@Override
 	public Part getMissingPart() {
-		//this can only be a turret
-		return new MissingTurret(true, getTonnage());
+		if(isVTOL) {
+			return new MissingRotor(true, getTonnage());
+		} else {
+			//this can only be a turret
+			return new MissingTurret(true, getTonnage());
+		}
 	}
 
 	@Override

@@ -72,6 +72,7 @@ v0.1.6 (SVN)
 + TankLocation part
 + adjust time for armor replacement by unit type
 + Tank MissingTurret part
++ VTOL MissingRotor part
 
 v0.1.5 (2011-05-05)
 + refactored Hangar Panel into separate Hangar and Repair Bay panel
