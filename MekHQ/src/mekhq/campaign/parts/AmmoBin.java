@@ -191,9 +191,6 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 		if(isSalvaging()) {
 			return super.getAllMods();
 		}
-		if(getAmountAvailable() == 0) {
-			return new TargetRoll(TargetRoll.IMPOSSIBLE, "No ammo of this type is available");
-		}
 		return new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS, "ammo loading");
 	}
 
@@ -278,6 +275,9 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 	
 	@Override
     public String checkFixable() {
+		if(getAmountAvailable() == 0) {
+			return "No ammo of this type is available";
+		}
         return null;
     }
 	

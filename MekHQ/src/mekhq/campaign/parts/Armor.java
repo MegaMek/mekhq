@@ -450,6 +450,9 @@ public class Armor extends Part implements IAcquisitionWork {
 		if(isSalvaging()) {
 			return null;
 		}
+		if(getAmountAvailable() == 0) {
+			return "No spare armor available";
+		}
 		if (unit.isLocationDestroyed(location)) {
 			return unit.getEntity().getLocationName(location) + " is destroyed.";
 		}
@@ -470,15 +473,6 @@ public class Armor extends Part implements IAcquisitionWork {
 		toReturn += getCostString() + "<br/>";
 		toReturn += "</font></html>";
 		return toReturn;
-	}
-	
-	@Override 
-	public TargetRoll getAllMods() {
-		//check to see if enough armor is available
-		if(!isSalvaging() && getAmountAvailable() == 0) {
-			return new TargetRoll(TargetRoll.IMPOSSIBLE, "No spare armor is available");
-		}
-		return super.getAllMods();
 	}
 	
 	@Override

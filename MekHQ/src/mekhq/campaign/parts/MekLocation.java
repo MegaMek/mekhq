@@ -305,6 +305,12 @@ public class MekLocation extends Part {
 	public void updateConditionFromPart() {
 		if(null != unit) {
 			unit.getEntity().setInternal((int)Math.round(percent * unit.getEntity().getOInternal(loc)), loc);
+			if(loc == Mech.LOC_RARM || loc == Mech.LOC_LARM) {
+				unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_SHOULDER, loc);
+			}
+			else if(loc == Mech.LOC_RLEG || loc == Mech.LOC_LLEG) {
+				unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_HIP, loc);
+			}
 		}
 	}
 	
@@ -325,6 +331,19 @@ public class MekLocation extends Part {
 	            if ((slot == null) || !slot.isEverHittable()) {
 	                continue;
 	            }
+	            if(slot.getType() == CriticalSlot.TYPE_SYSTEM 
+	            		&& slot.getIndex() == Mech.ACTUATOR_HIP
+	            		&& !slot.isRepairable()) {
+	            	return "You cannot repair a leg with a damaged hip. This leg must be scrapped and replaced instead.";
+	            	
+	            }
+	            if(slot.getType() == CriticalSlot.TYPE_SYSTEM 
+	            		&& slot.getIndex() == Mech.ACTUATOR_SHOULDER
+	            		&& !slot.isRepairable()) {
+	            	return "You cannot repair an arm with a damaged shoulder. This arm must be scrapped and replaced instead.";
+	            	
+	            }
+	            
 	            //certain other specific crits need to be left out (uggh, must be a better way to do this!)
 	            if(slot.getType() == CriticalSlot.TYPE_SYSTEM 
 	                    && (slot.getIndex() == Mech.SYSTEM_COCKPIT
