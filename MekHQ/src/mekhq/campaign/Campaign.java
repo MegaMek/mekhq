@@ -1444,7 +1444,14 @@ public class Campaign implements Serializable {
 				SupportPerson psn2 = (SupportPerson)psn;
 
 				if (psn2.getTeamId() >= 0) {
-					psn2.setTeam(retVal.teamIds.get(psn2.getTeamId()));
+					SupportTeam t = retVal.teamIds.get(psn2.getTeamId());
+					psn2.setTeam(t);
+					//lets just do a double-check and set the person's
+					//type based on the team
+					if(null != t) {
+						psn2.setType(SupportPerson.getTypeBy(t));
+					}
+					
 				}
 			}
 			

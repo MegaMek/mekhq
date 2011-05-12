@@ -62,7 +62,7 @@ public class SupportPerson extends Person {
     	// Do nothing.
     }
     
-    public int getTypeBy(SupportTeam team) {
+    public static int getTypeBy(SupportTeam team) {
     	if(team instanceof MedicalTeam) {
     		return T_DOCTOR;
     	} else if(team instanceof TechTeam) {
