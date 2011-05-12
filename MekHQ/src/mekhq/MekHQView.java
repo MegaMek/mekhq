@@ -4423,9 +4423,7 @@ public class MekHQView extends FrameView {
 				refreshPersonnelList();
 			} else if (command.equalsIgnoreCase("XP_ADD")) {
 				for(Person person : people) {
-					if (person instanceof PilotPerson) {
-						person.setXp(person.getXp() + 1);
-					}
+					person.setXp(person.getXp() + 1);
 				}
 				refreshPatientList();
 				refreshPersonnelList();
