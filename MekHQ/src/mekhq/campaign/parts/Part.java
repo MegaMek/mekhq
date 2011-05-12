@@ -41,9 +41,18 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * I am totally reworking part so that the repair system is part-centric.
- * All the methods that used to be parts of WorkItems will now be a part
- * of Part through the IPartWork interface
+ * Parts do the lions share of the work of repairing, salvaging, reloading, refueling, etc. 
+ * for units. Each unit has an ArrayList of all its relevant parts. There is a corresponding unit
+ * variable in part but this can be null when we are dealing with a spare part, so when putting in 
+ * calls to unit, you should always check to make sure it is not null. 
+ * 
+ * There are two kinds of parts: Part and MissingPart. The latter is used as a placeholder on a unit to 
+ * indicate it is missing the given part. When parts are removed from a unit, they shold be replaced 
+ * with the appropriate missing part which will remind MHQ that a replacement needs to be done.
+ * 
+ * Parts implement IPartWork and MissingParts also implement IAcquisitionWork. These interfaces allow for 
+ * most of the actual work that can be done on parts. There is a lot of variability in how parts actually handle
+ * this work
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public abstract class Part implements Serializable, MekHqXmlSerializable, IPartWork {
