@@ -2090,117 +2090,154 @@ public class Unit implements Serializable, MekHqXmlSerializable {
      * parts
      */
     public void initializeParts() {
-    	if(getEntity() instanceof Mech) {
-    		Part gyro = null;
-    		Part engine = null;
-    		Part lifeSupport = null;
-    		Part sensor = null;
-    		Part rightHand = null;
-    		Part rightLowerArm = null;
-    		Part rightUpperArm = null;
-    		Part leftHand = null;
-    		Part leftLowerArm = null;
-    		Part leftUpperArm = null;
-    		Part rightFoot = null;
-    		Part rightLowerLeg = null;
-    		Part rightUpperLeg = null;
-    		Part leftFoot = null;
-    		Part leftLowerLeg = null;
-    		Part leftUpperLeg = null;
-    		Part[] locations = new Part[entity.locations()];
-    		Armor[] armor = new Armor[entity.locations()];
-    		Armor[] armorRear = new Armor[entity.locations()];
-    		Hashtable<Integer,Part> equipParts = new Hashtable<Integer,Part>();
-    		Hashtable<Integer,Part> ammoParts = new Hashtable<Integer,Part>();
-
-    		for(Part part : parts) {
-    			if(part instanceof MekGyro || part instanceof MissingMekGyro) {
-    				gyro = part;
-    			} else if(part instanceof MekEngine || part instanceof MissingMekEngine) {
-    				engine = part;
-    			} else if(part instanceof MekLifeSupport  || part instanceof MissingMekLifeSupport) {
-    				lifeSupport = part;
-    			} else if(part instanceof MekSensor || part instanceof MissingMekSensor) {
-    				sensor = (MekSensor)part;
-    			} else if(part instanceof MekLocation) {
-    				locations[((MekLocation)part).getLoc()] = part;
-    			} else if(part instanceof MissingMekLocation) {
-    				locations[((MissingMekLocation)part).getLoc()] = part;	
-    			} else if(part instanceof Armor) {
-    				if(((Armor)part).isRearMounted()) {
-    					armorRear[((Armor)part).getLocation()] = (Armor)part;
+    	Part gyro = null;
+    	Part engine = null;
+    	Part lifeSupport = null;
+    	Part sensor = null;
+    	Part rightHand = null;
+    	Part rightLowerArm = null;
+    	Part rightUpperArm = null;
+    	Part leftHand = null;
+    	Part leftLowerArm = null;
+    	Part leftUpperArm = null;
+    	Part rightFoot = null;
+    	Part rightLowerLeg = null;
+    	Part rightUpperLeg = null;
+    	Part leftFoot = null;
+    	Part leftLowerLeg = null;
+    	Part leftUpperLeg = null;
+    	Part[] locations = new Part[entity.locations()];
+    	Armor[] armor = new Armor[entity.locations()];
+    	Armor[] armorRear = new Armor[entity.locations()];
+    	Hashtable<Integer,Part> equipParts = new Hashtable<Integer,Part>();
+    	Hashtable<Integer,Part> ammoParts = new Hashtable<Integer,Part>();
+    	
+    	for(Part part : parts) {
+    		if(part instanceof MekGyro || part instanceof MissingMekGyro) {
+    			gyro = part;
+    		} else if(part instanceof MekEngine || part instanceof MissingMekEngine) {
+    			engine = part;
+    		} else if(part instanceof MekLifeSupport  || part instanceof MissingMekLifeSupport) {
+    			lifeSupport = part;
+    		} else if(part instanceof MekSensor || part instanceof MissingMekSensor) {
+    			sensor = (MekSensor)part;
+    		} else if(part instanceof MekLocation) {
+    			locations[((MekLocation)part).getLoc()] = part;
+    		} else if(part instanceof MissingMekLocation) {
+    			locations[((MissingMekLocation)part).getLoc()] = part;	
+    		} else if(part instanceof Armor) {
+    			if(((Armor)part).isRearMounted()) {
+    				armorRear[((Armor)part).getLocation()] = (Armor)part;
+    			} else {
+    				armor[((Armor)part).getLocation()] = (Armor)part;
+    			}
+    		} else if(part instanceof AmmoBin) {
+    			ammoParts.put(((AmmoBin)part).getEquipmentNum(), part);
+    		} else if(part instanceof MissingAmmoBin) {
+    			ammoParts.put(((MissingAmmoBin)part).getEquipmentNum(), part);
+    		} else if(part instanceof EquipmentPart) {
+    			equipParts.put(((EquipmentPart)part).getEquipmentNum(), part);
+    		} else if(part instanceof MissingEquipmentPart) {
+    			equipParts.put(((MissingEquipmentPart)part).getEquipmentNum(), part);
+    		} else if(part instanceof MekActuator || part instanceof MissingMekActuator) {
+    			int type = -1;
+    			int loc = -1;
+    			if(part instanceof MekActuator) {
+    				type = ((MekActuator)part).getType();
+    				loc = ((MekActuator)part).getLocation();
+    			} else {
+    				type = ((MissingMekActuator)part).getType();
+    				loc = ((MissingMekActuator)part).getLocation();
+    			}
+    			if(type == Mech.ACTUATOR_UPPER_ARM) {
+    				if(loc == Mech.LOC_RARM) {
+    					rightUpperArm = part;
     				} else {
-    					armor[((Armor)part).getLocation()] = (Armor)part;
+    					leftUpperArm = part;
     				}
-    			} else if(part instanceof AmmoBin) {
-    				ammoParts.put(((AmmoBin)part).getEquipmentNum(), part);
-    			} else if(part instanceof MissingAmmoBin) {
-    				ammoParts.put(((MissingAmmoBin)part).getEquipmentNum(), part);
-    			} else if(part instanceof EquipmentPart) {
-    				equipParts.put(((EquipmentPart)part).getEquipmentNum(), part);
-    			} else if(part instanceof MissingEquipmentPart) {
-    				equipParts.put(((MissingEquipmentPart)part).getEquipmentNum(), part);
-    			} else if(part instanceof MekActuator || part instanceof MissingMekActuator) {
-    				int type = -1;
-    				int loc = -1;
-    				if(part instanceof MekActuator) {
-    					type = ((MekActuator)part).getType();
-    					loc = ((MekActuator)part).getLocation();
+    			} else if(type == Mech.ACTUATOR_LOWER_ARM) {
+    				if(loc == Mech.LOC_RARM) {
+    					rightLowerArm = part;
     				} else {
-    					type = ((MissingMekActuator)part).getType();
-    					loc = ((MissingMekActuator)part).getLocation();
+    					leftLowerArm = part;
     				}
-    				if(type == Mech.ACTUATOR_UPPER_ARM) {
-    					if(loc == Mech.LOC_RARM) {
-    						rightUpperArm = part;
-    					} else {
-    						leftUpperArm = part;
-    					}
-    				} else if(type == Mech.ACTUATOR_LOWER_ARM) {
-    					if(loc == Mech.LOC_RARM) {
-    						rightLowerArm = part;
-    					} else {
-    						leftLowerArm = part;
-    					}
-    				} else if(type == Mech.ACTUATOR_HAND) {
-    					if(loc == Mech.LOC_RARM) {
-    						rightHand = part;
-    					} else {
-    						leftHand = part;
-    					}
-    				} else if(type == Mech.ACTUATOR_UPPER_LEG) {
-    					if(loc == Mech.LOC_RLEG) {
-    						rightUpperLeg = part;
-    					} else {
-    						leftUpperLeg = part;
-    					}
-    				} else if(type == Mech.ACTUATOR_LOWER_LEG) {
-    					if(loc == Mech.LOC_RLEG) {
-    						rightLowerLeg = part;
-    					} else {
-    						leftLowerLeg = part;
-    					}
-    				} else if(type == Mech.ACTUATOR_FOOT) {
-    					if(loc == Mech.LOC_RLEG) {
-    						rightFoot = part;
-    					} else {
-    						leftFoot = part;
-    					}
+    			} else if(type == Mech.ACTUATOR_HAND) {
+    				if(loc == Mech.LOC_RARM) {
+    					rightHand = part;
+    				} else {
+    					leftHand = part;
     				}
-    				
+    			} else if(type == Mech.ACTUATOR_UPPER_LEG) {
+    				if(loc == Mech.LOC_RLEG) {
+    					rightUpperLeg = part;
+    				} else {
+    					leftUpperLeg = part;
+    				}
+    			} else if(type == Mech.ACTUATOR_LOWER_LEG) {
+    				if(loc == Mech.LOC_RLEG) {
+    					rightLowerLeg = part;
+    				} else {
+    					leftLowerLeg = part;
+    				}
+    			} else if(type == Mech.ACTUATOR_FOOT) {
+    				if(loc == Mech.LOC_RLEG) {
+    					rightFoot = part;
+    				} else {
+    					leftFoot = part;
+    				}
     			}
     		}
-    		
-    		//now check to see what is still null
+    	}
+    	//now check to see what is null
+    	for(int i = 0; i<locations.length; i++) {
+    		if(null == locations[i]) {
+    			MekLocation mekLocation = new MekLocation(false, i, (int) getEntity().getWeight(), getEntity().getStructureType(), hasTSM());
+    			addPart(mekLocation);
+    			campaign.addPart(mekLocation);
+    		}
+    		if(null == armor[i]) {
+    			Armor a = new Armor(false, (int) getEntity().getWeight(), getEntity().getArmorType(i), getEntity().getOArmor(i, false), i, false);
+    			addPart(a);
+    			campaign.addPart(a);
+    		}
+    		if(null == armorRear[i] && entity.hasRearArmor(i)) {
+    			Armor a = new Armor(false, (int) getEntity().getWeight(), getEntity().getArmorType(i), getEntity().getOArmor(i, false), i, true);
+    			addPart(a);
+    			campaign.addPart(a);
+    		}
+    	}
+    	for(Mounted m : entity.getEquipment()) {
+    		if(m.getType().isHittable()) {
+    			if(m.getType() instanceof AmmoType) {
+    				int eqnum = entity.getEquipmentNum(m);
+    				Part apart = ammoParts.get(eqnum);
+    				if(null == apart) {
+    					apart = new AmmoBin(false, (int)entity.getWeight(), m.getType(), eqnum, ((AmmoType)m.getType()).getShots() - m.getShotsLeft());
+    					addPart(apart);
+    					campaign.addPart(apart);
+    				}
+    			} else {
+    				int eqnum = entity.getEquipmentNum(m);
+    				Part epart = equipParts.get(eqnum);
+    				if(null == epart) {
+    					epart = new EquipmentPart(false, (int)entity.getWeight(), m.getType(), eqnum);
+    					addPart(epart);
+    					campaign.addPart(epart);
+    				}
+    			}
+    		}
+    	}
+    	
+    	if(null == engine) {
+    		engine = new MekEngine(false, (int) entity.getWeight(), campaign.getFaction(), entity.getEngine(), campaign.getCampaignOptions().getClanPriceModifier());
+    		addPart(engine);
+    		campaign.addPart(engine);
+    	}
+    	if(entity instanceof Mech) {
     		if(null == gyro) {
     			gyro =  new MekGyro(false, (int) entity.getWeight(), entity.getGyroType(), entity.getOriginalWalkMP());
     			addPart(gyro);
     			campaign.addPart(gyro);
-    		}
-    		if(null == engine) {
-    			engine = new MekEngine(false, (int) entity.getWeight(), campaign.getFaction(), entity.getEngine(), campaign.getCampaignOptions().getClanPriceModifier());
-    			addPart(engine);
-    			campaign.addPart(engine);
     		}
     		if(null == lifeSupport) {
     			lifeSupport = new MekLifeSupport(false, (int) entity.getWeight());
@@ -2211,44 +2248,6 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     			sensor = new MekSensor(false, (int) entity.getWeight());
     			addPart(sensor);
     			campaign.addPart(sensor);
-    		}
-    		for(int i = 0; i<locations.length; i++) {
-    			if(null == locations[i]) {
-    				MekLocation mekLocation = new MekLocation(false, i, (int) getEntity().getWeight(), getEntity().getStructureType(), hasTSM());
-    				addPart(mekLocation);
-    				campaign.addPart(mekLocation);
-    			}
-    			if(null == armor[i]) {
-    				Armor mekArmor = new Armor(false, (int) getEntity().getWeight(), getEntity().getArmorType(i), getEntity().getOArmor(i, false), i, false);
-    				addPart(mekArmor);
-    				campaign.addPart(mekArmor);
-    			}
-    			if(null == armorRear[i] && entity.hasRearArmor(i)) {
-    				Armor mekArmor = new Armor(false, (int) getEntity().getWeight(), getEntity().getArmorType(i), getEntity().getOArmor(i, false), i, true);
-    				addPart(mekArmor);
-    				campaign.addPart(mekArmor);
-    			}
-    		}
-    		for(Mounted m : entity.getEquipment()) {
-    			if(m.getType().isHittable()) {
-    				if(m.getType() instanceof AmmoType) {
-    					int eqnum = entity.getEquipmentNum(m);
-		    			Part apart = ammoParts.get(eqnum);
-		    			if(null == apart) {
-		    				apart = new AmmoBin(false, (int)entity.getWeight(), m.getType(), eqnum, ((AmmoType)m.getType()).getShots() - m.getShotsLeft());
-		    				addPart(apart);
-		    				campaign.addPart(apart);
-		    			}
-    				} else {
-		    			int eqnum = entity.getEquipmentNum(m);
-		    			Part epart = equipParts.get(eqnum);
-		    			if(null == epart) {
-		    				epart = new EquipmentPart(false, (int)entity.getWeight(), m.getType(), eqnum);
-		    				addPart(epart);
-		    				campaign.addPart(epart);
-		    			}
-    				}
-    			}
     		}
     		if(null == rightUpperArm && entity.hasSystem(Mech.ACTUATOR_UPPER_ARM, Mech.LOC_RARM)) {
     			rightUpperArm = new MekActuator(false, (int)entity.getWeight(), Mech.ACTUATOR_UPPER_ARM, Mech.LOC_RARM);
