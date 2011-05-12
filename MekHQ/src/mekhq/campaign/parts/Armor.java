@@ -519,18 +519,7 @@ public class Armor extends Part implements IAcquisitionWork {
 	}
 	
 	public boolean isEnoughSpareArmorAvailable() {
-		if(null != unit) {
-			for(Part part : unit.campaign.getSpareParts()) {
-				if(part instanceof Armor) {
-					Armor a = (Armor)part;
-					if(a.getType() == type) {
-						return a.getAmount() >= amountNeeded;
-					}
-				}
-			}
-			return false;
-		}
-		return true;
+		return getAmountAvailable() >= amountNeeded;
 	}
 	
 	public int getAmountAvailable() {

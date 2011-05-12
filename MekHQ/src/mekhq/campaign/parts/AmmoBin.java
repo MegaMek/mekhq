@@ -31,6 +31,7 @@ import megamek.common.AmmoType;
 import megamek.common.CriticalSlot;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
+import megamek.common.IArmorState;
 import megamek.common.MiscType;
 import megamek.common.Mounted;
 import megamek.common.TargetRoll;
@@ -127,14 +128,51 @@ public class AmmoBin extends EquipmentPart {
 
 	@Override
 	public void fix() {
+		int shots = Math.min(getAmountAvailable(), shotsNeeded);
 		if(null != unit) {
 			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
 			if(null != mounted) {
 				mounted.changeAmmoType((AmmoType)type);
-				mounted.setShotsLeft(((AmmoType)type).getShots());
+				mounted.setShotsLeft(mounted.getShotsLeft() + shots);
 			}
-			updateConditionFromEntity();
 		}
+		shotsNeeded -= shots;
+	}
+	
+	public void unload() {
+		if(null != unit) {
+			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
+			int shots = 0;
+			if(null != mounted) {
+				shots = mounted.getShotsLeft();
+				mounted.setShotsLeft(0);
+			}
+			shotsNeeded = ((AmmoType)type).getShots();
+			if(shots > 0) {
+				//now lets cycle through and add ammo to ammo storage
+				for(Part part : unit.campaign.getSpareParts()) {
+					if(part instanceof AmmoStorage) {
+						AmmoStorage a = (AmmoStorage)part;
+						if(a.getType() == type) {
+							a.addShots(shots);
+							return;
+						}
+					}
+				}
+				//if we are still here then we did not find any armor, so lets create a new part and stick it in spares
+				AmmoStorage newAmmo = new AmmoStorage(true,tonnage,type,-1,shots);
+				unit.campaign.addPart(newAmmo);
+			}	
+		}
+	}
+	
+	@Override
+	public void remove(boolean salvage) {
+		//cycle through spare parts and add to existing ammo if found
+		if(salvage) {
+			unload();
+		}
+		super.remove(salvage);
 	}
 
 	@Override
@@ -211,4 +249,37 @@ public class AmmoBin extends EquipmentPart {
     public String checkFixable() {
         return null;
     }
+	
+	public void reduceAmountAvailable(int amount) {
+		if(null != unit) {
+			AmmoStorage a = null;
+			for(Part part : unit.campaign.getSpareParts()) {
+				if(part instanceof AmmoStorage) {
+					a = (AmmoStorage)part;
+					if(a.getType() == type) {
+						a.reduceShots(amount);
+						break;
+					}
+				}
+			}
+			if(null != a && a.getShots() <= 0) {
+				unit.campaign.removePart(a);
+			}
+		}
+	}
+	
+	public int getAmountAvailable() {
+		if(null != unit) {
+			for(Part part : unit.campaign.getSpareParts()) {
+				if(part instanceof AmmoStorage) {
+					AmmoStorage a = (AmmoStorage)part;
+					if(a.getType() == type) {
+						return a.getShots();
+					}
+				}
+			}
+			return 0;
+		}
+		return 0;
+	}
 }
