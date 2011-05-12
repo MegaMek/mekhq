@@ -182,6 +182,9 @@ public class AmmoBin extends EquipmentPart {
 	
 	@Override
 	public TargetRoll getAllMods() {
+		if(getAmountAvailable() == 0) {
+			return new TargetRoll(TargetRoll.IMPOSSIBLE, "No ammo of this type is available");
+		}
 		return new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS, "ammo loading");
 	}
 
@@ -235,7 +238,14 @@ public class AmmoBin extends EquipmentPart {
 		toReturn += ">";
 		toReturn += "<b>Reload " + getName() + "</b><br/>";
 		toReturn += getDetails() + "<br/>";
-		toReturn += "" + getTimeLeft() + " minutes" + scheduled;
+		int amountAvailable = getAmountAvailable();
+		if(!salvaging) {
+			if(amountAvailable == 0) {
+				toReturn += "No ammo available";
+			} else {
+				toReturn += "" + getTimeLeft() + " minutes" + scheduled;
+			}
+		}
 		toReturn += "</font></html>";
 		return toReturn;
 	}
