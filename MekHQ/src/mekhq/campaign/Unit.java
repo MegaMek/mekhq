@@ -68,6 +68,7 @@ import mekhq.campaign.parts.MekGyro;
 import mekhq.campaign.parts.MekLifeSupport;
 import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.MekSensor;
+import mekhq.campaign.parts.MissingAmmoBin;
 import mekhq.campaign.parts.MissingEquipmentPart;
 import mekhq.campaign.parts.MissingMekActuator;
 import mekhq.campaign.parts.MissingMekEngine;
@@ -2137,6 +2138,8 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     				}
     			} else if(part instanceof AmmoBin) {
     				ammoParts.put(((AmmoBin)part).getEquipmentNum(), part);
+    			} else if(part instanceof MissingAmmoBin) {
+    				ammoParts.put(((MissingAmmoBin)part).getEquipmentNum(), part);
     			} else if(part instanceof EquipmentPart) {
     				equipParts.put(((EquipmentPart)part).getEquipmentNum(), part);
     			} else if(part instanceof MissingEquipmentPart) {

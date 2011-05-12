@@ -64,6 +64,7 @@ v0.1.6 (SVN)
 + when armor replacement fails by elite tech, armor should be removed from spares and skill min reset to Green
 + beginning of ammo part replacement and reloading
 + ammo swapping
++ look for missing ammo bin in Unit#initializeParts
 
 v0.1.5 (2011-05-05)
 + refactored Hangar Panel into separate Hangar and Repair Bay panel
