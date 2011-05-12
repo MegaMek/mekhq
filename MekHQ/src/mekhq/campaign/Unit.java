@@ -2053,6 +2053,10 @@ public class Unit implements Serializable, MekHqXmlSerializable {
      * parts
      */
     public void initializeParts() {
+    	if(entity instanceof Infantry && !(entity instanceof BattleArmor)) {
+    		return;
+    	}
+    	
     	Part gyro = null;
     	Part engine = null;
     	Part lifeSupport = null;
@@ -2203,7 +2207,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     		}
     	}
     	
-    	if(null == engine) {
+    	if(null == engine && !(entity instanceof BattleArmor)) {
     		engine = new MekEngine(false, (int) entity.getWeight(), campaign.getFaction(), entity.getEngine(), campaign.getCampaignOptions().getClanPriceModifier());
     		addPart(engine);
     		campaign.addPart(engine);

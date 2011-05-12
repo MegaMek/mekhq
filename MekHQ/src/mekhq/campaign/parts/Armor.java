@@ -66,7 +66,10 @@ public class Armor extends Part implements IAcquisitionWork {
         this.amount = points;
         this.location = loc;
         this.rear = r;
-        this.name = "Armor (" + EquipmentType.armorNames[type] + ")";
+        this.name = "Armor";
+        if(type > -1) {
+        	this.name += " (" + EquipmentType.armorNames[type] + ")";
+        }
     }
     
     
