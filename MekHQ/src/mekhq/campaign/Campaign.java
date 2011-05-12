@@ -1941,7 +1941,11 @@ public class Campaign implements Serializable {
 	public ArrayList<Part> getPartsNeedingServiceFor(int uid) {
 		Unit u = getUnit(uid);
 		if(u != null) {
-			return u.getPartsNeedingFixing();
+			if(u.isSalvage() || !u.isRepairable()) {
+				return u.getSalvageableParts();
+			} else {
+				return u.getPartsNeedingFixing();
+			}
 		}
 		return new ArrayList<Part>();
 	}

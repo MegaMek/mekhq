@@ -71,7 +71,7 @@ public class Armor extends Part implements IAcquisitionWork {
     
     
     public String getDesc() {
-    	if(salvaging) {
+    	if(isSalvaging()) {
     		return super.getDesc();
     	}
 		String bonus = getAllMods().getValueAsString();
@@ -110,7 +110,7 @@ public class Armor extends Part implements IAcquisitionWork {
 			}
 			String availability = "";
 			int amountAvailable = getAmountAvailable();
-			if(!salvaging) {
+			if(!isSalvaging()) {
 				if(amountAvailable == 0) {
 					availability = "<br>No spare armor available";
 				} else if(amountAvailable < amountNeeded) {
@@ -475,7 +475,7 @@ public class Armor extends Part implements IAcquisitionWork {
 	@Override 
 	public TargetRoll getAllMods() {
 		//check to see if enough armor is available
-		if(getAmountAvailable() == 0) {
+		if(!isSalvaging() && getAmountAvailable() == 0) {
 			return new TargetRoll(TargetRoll.IMPOSSIBLE, "No spare armor is available");
 		}
 		return super.getAllMods();
@@ -572,7 +572,7 @@ public class Armor extends Part implements IAcquisitionWork {
 		String scrap = "";
 		if(skillMin > SupportTeam.EXP_ELITE) {
 			scrap = " Armor supplies lost!";
-			if(salvaging) {
+			if(isSalvaging()) {
 				remove(false);
 			} else {
 				skillMin = SupportTeam.EXP_GREEN;

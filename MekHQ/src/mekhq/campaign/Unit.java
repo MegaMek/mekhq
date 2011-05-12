@@ -728,7 +728,17 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 	public ArrayList<Part> getPartsNeedingFixing() {
 		ArrayList<Part> brokenParts = new ArrayList<Part>();
 		for(Part part: parts) {
-			if(part.needsFixing() || part.isSalvaging()) {
+			if(part.needsFixing()) {
+				brokenParts.add(part);
+			}
+		}
+		return brokenParts;
+	}
+	
+	public ArrayList<Part> getSalvageableParts() {
+		ArrayList<Part> brokenParts = new ArrayList<Part>();
+		for(Part part: parts) {
+			if(part.isSalvaging()) {
 				brokenParts.add(part);
 			}
 		}
@@ -2197,6 +2207,12 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     				addPart(mekLocation);
     				campaign.addPart(mekLocation);
     			} else if(entity instanceof Tank && i != Tank.LOC_BODY) {
+    				if(i == Tank.LOC_TURRET_2 && ((Tank)entity).hasNoDualTurret()) {
+    					continue;
+    				}
+    				if(i == Tank.LOC_TURRET && ((Tank)entity).hasNoTurret()) {
+    					continue;
+    				}
     				TankLocation tankLocation = new TankLocation(false, i, (int) getEntity().getWeight());
     				addPart(tankLocation);
     				campaign.addPart(tankLocation);

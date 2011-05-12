@@ -23,10 +23,8 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import megamek.common.CriticalSlot;
 import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
-import megamek.common.Mech;
 import megamek.common.Tank;
 import mekhq.campaign.MekHqXmlUtil;
 
@@ -57,22 +55,20 @@ public class TankLocation extends Part {
         this.name = "Tank Location";
         switch(loc) {
             case(Tank.LOC_FRONT):
-                this.name = "Front Internal Structure";
+                this.name = "Vehicle Front";
                 break;
             case(Tank.LOC_LEFT):
-                this.name = "Left Internal Structure";
+                this.name = "Vehicle Left";
                 break;
             case(Tank.LOC_RIGHT):
-                this.name = "Right Internal Structure";
+                this.name = "Vehicle Right";
                 break;
             case(Tank.LOC_REAR):
-                this.name = "Rear Internal Structure";
+                this.name = "Vehicle Rear";
                 break;
             case(Tank.LOC_TURRET):
-                this.name = "Turret Internal Structure";
-                break;
             case(Tank.LOC_TURRET_2):
-                this.name = "Second Turret Internal Structure";
+                this.name = "Vehicle Turret";
                 break;
         }
         computeCost();
@@ -133,8 +129,8 @@ public class TankLocation extends Part {
 
 	@Override
 	public Part getMissingPart() {
-		//you cant salvage tank locations, so it should be ok to return null
-		return null;
+		//this can only be a turret
+		return new MissingTurret(true, getTonnage());
 	}
 
 	@Override
@@ -145,6 +141,11 @@ public class TankLocation extends Part {
 				unit.campaign.removePart(this);
 			}
 			unit.removePart(this);
+			if(loc == Tank.LOC_TURRET && loc == Tank.LOC_TURRET_2) {
+				Part missing = getMissingPart();
+				unit.campaign.addPart(missing);
+				unit.addPart(missing);
+			}
 		}
 		setUnit(null);
 	}
@@ -162,7 +163,7 @@ public class TankLocation extends Part {
 	@Override
 	public boolean needsFixing() {
 		if(null != unit) {
-			return !salvaging && unit.getEntity().getInternal(loc) < unit.getEntity().getOInternal(loc);
+			return unit.getEntity().getInternal(loc) < unit.getEntity().getOInternal(loc);
 		} 
 		return false;
 	}
@@ -188,7 +189,6 @@ public class TankLocation extends Part {
 	
 	@Override
 	public boolean isSalvaging() {
-		//you cant salvage tank locations
-		return false;
+		return salvaging && (loc == Tank.LOC_TURRET || loc == Tank.LOC_TURRET_2);
 	}
 }

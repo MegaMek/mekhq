@@ -71,6 +71,7 @@ v0.1.6 (SVN)
 + reorganized initializeParts for non-mech units
 + TankLocation part
 + adjust time for armor replacement by unit type
++ Tank MissingTurret part
 
 v0.1.5 (2011-05-05)
 + refactored Hangar Panel into separate Hangar and Repair Bay panel

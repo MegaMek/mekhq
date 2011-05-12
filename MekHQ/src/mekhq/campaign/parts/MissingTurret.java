@@ -24,6 +24,7 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 
 import megamek.common.EquipmentType;
+import megamek.common.Mech;
 import megamek.common.Tank;
 
 import org.w3c.dom.Node;
@@ -32,23 +33,25 @@ import org.w3c.dom.Node;
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class Turret extends Part {
+public class MissingTurret extends MissingPart {
 	private static final long serialVersionUID = 719267861685599789L;
 
-	public Turret() {
+	public MissingTurret() {
 		this(false, 0);
 	}
 	
-	public Turret(boolean salvage, int tonnage) {
+	public MissingTurret(boolean salvage, int tonnage) {
         super(salvage, tonnage);
+        this.time = 160;
+        this.difficulty = -1;
     }
 
     @Override
     public boolean isSamePartTypeAndStatus (Part part) {
-        return part instanceof Turret
+        return part instanceof MissingTurret
                 && getName().equals(part.getName())
                 && getStatus().equals(part.getStatus())
-                && getTonnage() == ((Turret)part).getTonnage();
+                && getTonnage() == ((MissingTurret)part).getTonnage();
     }
 
 	@Override
@@ -72,45 +75,21 @@ public class Turret extends Part {
 		return EquipmentType.RATING_B;
 	}
 
-	@Override
-	public void fix() {
-		// TODO Auto-generated method stub
-		
-	}
 
 	@Override
-	public Part getMissingPart() {
-		// TODO Auto-generated method stub
-		return null;
+	public boolean isAcceptableReplacement(Part part) {
+		return part instanceof TankLocation 
+			&& (((TankLocation)part).getLoc() == Tank.LOC_TURRET || ((TankLocation)part).getLoc() == Tank.LOC_TURRET_2);
 	}
-
-	@Override
-	public void remove(boolean salvage) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void updateConditionFromEntity() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public boolean needsFixing() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void updateConditionFromPart() {
-		// TODO Auto-generated method stub
-		
-	}
-
+	
 	@Override
 	public String checkFixable() {
-		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public Part getNewPart() {
+		//TODO: how to get second turret location?
+		return new TankLocation(isSalvage(), Tank.LOC_TURRET, getTonnage());
 	}
 }
