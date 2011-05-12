@@ -752,15 +752,16 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 			//we need to check for armor as well, but this one is funny because we dont want to
 			//check per location really, since armor can be used anywhere. So stop after we reach
 			//the first Armor needing replacement
-			//TODO: we need to adjust for patchwork armor, which can have different armor types by location
-			//TODO: how does it work when you need more than 5 tons
-			
+			//TODO: we need to adjust for patchwork armor, which can have different armor types by location		
 			if(!armorFound && part instanceof Armor) {
 				Armor a = (Armor)part;
 				if(a.needsFixing() && !a.isEnoughSpareArmorAvailable()) {
 					missingParts.add(a);
 					armorFound = true;
 				}
+			}
+			if(part instanceof AmmoBin && !((AmmoBin)part).isEnoughSpareAmmoAvailable()) {
+				missingParts.add((AmmoBin)part);
 			}
 		}
 		

@@ -45,11 +45,11 @@ public class AmmoStorage extends EquipmentPart {
 	protected int shots;
 	
     public AmmoStorage() {
-    	this(false, 0, null, -1, 0);
+    	this(false, 0, null, 0);
     }
     
-    public AmmoStorage(boolean salvage, int tonnage, EquipmentType et, int equipNum, int shots) {
-        super(salvage, tonnage, et, equipNum);
+    public AmmoStorage(boolean salvage, int tonnage, EquipmentType et, int shots) {
+        super(salvage, tonnage, et, -1);
         this.shots = shots;
         if(null != type && type instanceof AmmoType) {
         	this.munition = ((AmmoType)type).getMunitionType();

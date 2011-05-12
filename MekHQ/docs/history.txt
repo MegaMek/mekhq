@@ -66,6 +66,7 @@ v0.1.6 (SVN)
 + ammo swapping
 + look for missing ammo bin in Unit#initializeParts
 + better reporting of ammo bin reloading
++ finished ammo work
 
 v0.1.5 (2011-05-05)
 + refactored Hangar Panel into separate Hangar and Repair Bay panel

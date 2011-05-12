@@ -59,6 +59,9 @@ public class MissingAmmoBin extends MissingEquipmentPart {
     public MissingAmmoBin(boolean salvage, int tonnage, EquipmentType et, int equipNum) {
         super(salvage, tonnage, et, equipNum);
         this.difficulty = -2;
+        if(null != name) {
+        	this.name += " Bin";
+        }
     }
 	
 	@Override

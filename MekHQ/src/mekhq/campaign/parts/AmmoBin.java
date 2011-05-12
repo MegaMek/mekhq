@@ -46,18 +46,20 @@ import mekhq.campaign.team.SupportTeam;
 import mekhq.campaign.work.EquipmentRepair;
 import mekhq.campaign.work.EquipmentReplacement;
 import mekhq.campaign.work.EquipmentSalvage;
+import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.ReplacementItem;
 
 /**
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class AmmoBin extends EquipmentPart {
+public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 	private static final long serialVersionUID = 2892728320891712304L;
 
 	protected long munition;
 	protected int shotsNeeded;
-    
+	protected boolean checkedToday;
+	
     public AmmoBin() {
     	this(false, 0, null, -1, 0);
     }
@@ -65,6 +67,7 @@ public class AmmoBin extends EquipmentPart {
     public AmmoBin(boolean salvage, int tonnage, EquipmentType et, int equipNum, int shots) {
         super(salvage, tonnage, et, equipNum);
         this.shotsNeeded = shots;
+        this.checkedToday = false;
         if(null != type && type instanceof AmmoType) {
         	this.munition = ((AmmoType)type).getMunitionType();
         }
@@ -99,6 +102,10 @@ public class AmmoBin extends EquipmentPart {
 				+"<shotsNeeded>"
 				+shotsNeeded
 				+"</shotsNeeded>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<checkedToday>"
+				+checkedToday
+				+"</checkedToday>");
 		writeToXmlEnd(pw1, indent, id);
 	}
 
@@ -112,7 +119,13 @@ public class AmmoBin extends EquipmentPart {
 				munition = Long.parseLong(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("shotsNeeded")) {
 				shotsNeeded = Integer.parseInt(wn2.getTextContent());
-			}
+			} else if (wn2.getNodeName().equalsIgnoreCase("checkedToday")) {
+				if(wn2.getTextContent().equalsIgnoreCase("true")) {
+					checkedToday = true;
+				} else {
+					checkedToday = false;
+				}
+			} 
 		}
 	}
 
@@ -166,8 +179,8 @@ public class AmmoBin extends EquipmentPart {
 						}
 					}
 				}
-				//if we are still here then we did not find any armor, so lets create a new part and stick it in spares
-				AmmoStorage newAmmo = new AmmoStorage(true,tonnage,type,-1,shots);
+				//if we are still here then we did not find any ammo, so lets create a new part and stick it in spares
+				AmmoStorage newAmmo = new AmmoStorage(false,1,type,shots);
 				unit.campaign.addPart(newAmmo);
 			}	
 		}
@@ -175,7 +188,6 @@ public class AmmoBin extends EquipmentPart {
 	
 	@Override
 	public void remove(boolean salvage) {
-		//cycle through spare parts and add to existing ammo if found
 		if(salvage) {
 			unload();
 		}
@@ -189,6 +201,9 @@ public class AmmoBin extends EquipmentPart {
 	
 	@Override
 	public TargetRoll getAllMods() {
+		if(isSalvaging()) {
+			return super.getAllMods();
+		}
 		if(getAmountAvailable() == 0) {
 			return new TargetRoll(TargetRoll.IMPOSSIBLE, "No ammo of this type is available");
 		}
@@ -207,10 +222,16 @@ public class AmmoBin extends EquipmentPart {
 				if(type.equals(mounted.getType())) {
 					shotsNeeded = ((AmmoType)type).getShots() - mounted.getShotsLeft();	
 					time = 15;
+					difficulty = 0;
 				} else {
 					//we have a change of munitions
 					shotsNeeded = ((AmmoType)type).getShots();
 					time = 30;
+					difficulty = 0;
+				}
+				if(isSalvaging()) {
+					time = 120;
+					difficulty = -2;
 				}
 			}
 		}
@@ -236,6 +257,9 @@ public class AmmoBin extends EquipmentPart {
 	}
 	
 	public String getDesc() {
+		if(isSalvaging()) {
+			return super.getDesc();
+		}
 		String toReturn = "<html><font size='2'";
 		String scheduled = "";
 		if (getTeamId() != -1) {
@@ -259,6 +283,9 @@ public class AmmoBin extends EquipmentPart {
 	
     @Override
     public String getDetails() {
+    	if(isSalvaging()) {
+    		super.getDetails();
+    	}
     	return ((AmmoType)type).getDesc() + ", " + shotsNeeded + " shots needed";
     }
 	
@@ -298,5 +325,59 @@ public class AmmoBin extends EquipmentPart {
 			return 0;
 		}
 		return 0;
+	}
+	
+	public boolean isEnoughSpareAmmoAvailable() {
+		return getAmountAvailable() >= shotsNeeded;
+	}
+
+	@Override
+	public String getAcquisitionDesc() {
+		String bonus = getAllAcquisitionMods().getValueAsString();
+		if(getAllAcquisitionMods().getValue() > -1) {
+			bonus = "+" + bonus;
+		}
+		bonus = "(" + bonus + ")";
+		String toReturn = "<html><font size='2'";
+		
+		toReturn += ">";
+		toReturn += "<b>" + type.getDesc() + "</b> " + bonus + "<br/>";
+		toReturn += ((AmmoType)type).getShots() + " shots (1 ton)<br/>";
+		toReturn += getCostString() + "<br/>";
+		toReturn += "</font></html>";
+		return toReturn;
+	}
+
+	@Override
+	public TargetRoll getAllAcquisitionMods() {
+        TargetRoll target = new TargetRoll();
+        // Faction and Tech mod
+        int factionMod = 0;
+        if (null != unit && unit.campaign.getCampaignOptions().useFactionModifiers()) {
+        	factionMod = Availability.getFactionAndTechMod(this, unit.campaign);
+        }   
+        //availability mod
+        int avail = getAvailability(unit.campaign.getEra());
+        int availabilityMod = Availability.getAvailabilityModifier(avail);
+        target.addModifier(availabilityMod, "availability (" + EquipmentType.getRatingName(avail) + ")");
+        if(factionMod != 0) {
+     	   target.addModifier(factionMod, "faction");
+        }
+        return target;
+    }
+
+	@Override
+	public Part getNewPart() {
+		return new AmmoStorage(false,1,type,((AmmoType)type).getShots());
+	}
+
+	@Override
+	public boolean hasCheckedToday() {
+		return checkedToday;
+	}
+
+	@Override
+	public void setCheckedToday(boolean b) {
+		this.checkedToday = b;
 	}
 }

@@ -739,14 +739,14 @@ public class Campaign implements Serializable {
 		}
 		String report = "";
 		String action = " fix ";
+		if(partWork instanceof AmmoBin) {
+			action = " reload ";
+		}
 		if(partWork.isSalvaging()) {
 			action = " salvage ";
 		}
 		if(partWork instanceof MissingPart) {
 			action = " replace ";
-		}
-		if(partWork instanceof AmmoBin) {
-			action = " reload ";
 		}
 		report += t.getName() + " attempts to" + action + partWork.getPartName();   
 		TargetRoll target = t.getTargetFor(partWork);
