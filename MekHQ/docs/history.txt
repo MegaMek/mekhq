@@ -69,6 +69,7 @@ v0.1.6 (SVN)
 + finished ammo work
 + removed all WorkItems, parts refactoring project complete
 + reorganized initializeParts for non-mech units
++ TankLocation part
 
 v0.1.5 (2011-05-05)
 + refactored Hangar Panel into separate Hangar and Repair Bay panel

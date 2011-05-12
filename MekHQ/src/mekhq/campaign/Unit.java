@@ -69,6 +69,7 @@ import mekhq.campaign.parts.MissingMekLocation;
 import mekhq.campaign.parts.MissingMekSensor;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.TankLocation;
 import mekhq.campaign.personnel.PilotPerson;
 import mekhq.campaign.work.IAcquisitionWork;
 
@@ -2191,9 +2192,15 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     	//now check to see what is null
     	for(int i = 0; i<locations.length; i++) {
     		if(null == locations[i]) {
-    			MekLocation mekLocation = new MekLocation(false, i, (int) getEntity().getWeight(), getEntity().getStructureType(), hasTSM());
-    			addPart(mekLocation);
-    			campaign.addPart(mekLocation);
+    			if(entity instanceof Mech) {
+    				MekLocation mekLocation = new MekLocation(false, i, (int) getEntity().getWeight(), getEntity().getStructureType(), hasTSM());
+    				addPart(mekLocation);
+    				campaign.addPart(mekLocation);
+    			} else if(entity instanceof Tank && i != Tank.LOC_BODY) {
+    				TankLocation tankLocation = new TankLocation(false, i, (int) getEntity().getWeight());
+    				addPart(tankLocation);
+    				campaign.addPart(tankLocation);
+    			}
     		}
     		if(null == armor[i]) {
     			Armor a = new Armor(false, (int) getEntity().getWeight(), getEntity().getArmorType(i), getEntity().getOArmor(i, false), i, false);
