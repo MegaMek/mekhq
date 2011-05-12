@@ -23,8 +23,11 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import megamek.common.Aero;
+import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
+import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
 import mekhq.campaign.MekHqXmlUtil;
@@ -381,6 +384,16 @@ public class Armor extends Part implements IAcquisitionWork {
 		updateConditionFromEntity();
 	}
 
+	private int getBaseTimeFor(Entity entity) {
+		if(entity instanceof Tank) {
+			return 3;
+		} 
+		else if(entity instanceof Aero) {
+			return 15;
+		}
+		return 5;
+	}
+	
 	@Override
 	public void updateConditionFromEntity() {
 		int currentArmor = unit.getEntity().getArmor(location, rear);
@@ -395,9 +408,9 @@ public class Armor extends Part implements IAcquisitionWork {
 		//time should be based on amount available if less than amount needed
 		if(amountNeeded > 0) {
 			if(salvaging) {
-				time = 5 * amountNeeded;
+				time = getBaseTimeFor(unit.getEntity()) * amountNeeded;
 			} else {
-				time = 5 * Math.min(amountNeeded, getAmountAvailable());
+				time = getBaseTimeFor(unit.getEntity()) * Math.min(amountNeeded, getAmountAvailable());
 			}
 			difficulty = -2;
 		} else {
