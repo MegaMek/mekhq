@@ -132,8 +132,15 @@ public class AmmoBin extends EquipmentPart {
 		if(null != unit) {
 			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
 			if(null != mounted) {
-				mounted.changeAmmoType((AmmoType)type);
-				mounted.setShotsLeft(mounted.getShotsLeft() + shots);
+				if(mounted.getType().equals(type)) {
+					//just a simple reload
+					mounted.setShotsLeft(mounted.getShotsLeft() + shots);
+				} else {
+					//loading a new type of ammo
+					mounted.changeAmmoType((AmmoType)type);
+					unload();
+					mounted.setShotsLeft(shots);
+				}
 			}
 		}
 		shotsNeeded -= shots;
