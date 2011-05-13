@@ -136,14 +136,20 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 	public abstract boolean isAcceptableReplacement(Part part);
 	
 	public Part findReplacement() {
-		if(null != unit) {
+		Part bestPart = null;
+		if(null != unit) {	
+			//dont just return with the first part if it is damaged
 			for(Part part : unit.campaign.getSpareParts()) {
 				if(isAcceptableReplacement(part)) {
-					return part;
+					if(null == bestPart) {
+						bestPart = part;
+					} else if(bestPart.needsFixing() && !part.needsFixing()) {
+						bestPart = part;
+					}
 				}
 			}
 		}
-		return null;
+		return bestPart;
 	}
 	
 	public boolean isReplacementAvailable() {
