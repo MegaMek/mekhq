@@ -59,12 +59,6 @@ public class MissingMekSensor extends MissingPart {
 	}
 
     @Override
-    public boolean isSamePartTypeAndStatus (Part part) {
-        return part instanceof MekSensor
-                && getName().equals(part.getName());
-    }
-
-    @Override
     public int getPartType() {
         return PART_TYPE_MEK_SENSOR;
     }
@@ -92,7 +86,7 @@ public class MissingMekSensor extends MissingPart {
 
 	@Override
 	public boolean isAcceptableReplacement(Part part) {
-		return part instanceof MekSensor;
+		return part instanceof MekSensor && getUnitTonnage() == part.getUnitTonnage();
 	}
 	
 	@Override

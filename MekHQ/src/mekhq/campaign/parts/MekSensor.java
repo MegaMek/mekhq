@@ -59,8 +59,13 @@ public class MekSensor extends Part {
 
     @Override
     public boolean isSamePartTypeAndStatus (Part part) {
+    	if(needsFixing() || part.needsFixing()) {
+    		return false;
+    	}
+    	//the cost of sensors varies by tonnage, so according to
+    	//pg. 180 of StratOps that means they can only be exchanged
+    	//between meks of the same tonnage
         return part instanceof MekSensor
-                && getName().equals(part.getName())
                 && getUnitTonnage() == part.getUnitTonnage();
     }
 

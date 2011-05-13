@@ -125,8 +125,10 @@ public class MekLocation extends Part {
 
     @Override
     public boolean isSamePartTypeAndStatus (Part part) {
+    	if(needsFixing() || part.needsFixing()) {
+    		return false;
+    	}
         return part instanceof MekLocation
-                && getName().equals(part.getName())
                 && getLoc() == ((MekLocation)part).getLoc()
                 && getUnitTonnage() == ((MekLocation)part).getUnitTonnage()
                 && isTsm() == ((MekLocation)part).isTsm()

@@ -124,16 +124,6 @@ public class MissingMekLocation extends MissingPart {
     }
 
     @Override
-    public boolean isSamePartTypeAndStatus (Part part) {
-        return part instanceof MekLocation
-                && getName().equals(part.getName())
-                && getLoc() == ((MekLocation)part).getLoc()
-                && getUnitTonnage() == ((MekLocation)part).getUnitTonnage()
-                && isTsm() == ((MekLocation)part).isTsm()
-                && getStructureType() == ((MekLocation) part).getStructureType();
-    }
-
-    @Override
     public int getPartType() {
         return PART_TYPE_MEK_BODY_PART;
     }
@@ -244,9 +234,9 @@ public class MissingMekLocation extends MissingPart {
 		if(part instanceof MekLocation) {
 			MekLocation mekLoc = (MekLocation)part;
 			return mekLoc.getLoc() == loc
-			&& mekLoc.getUnitTonnage() == getUnitTonnage()
-	        && mekLoc.isTsm() == tsm
-	        && mekLoc.getStructureType() == structureType;
+				&& mekLoc.getUnitTonnage() == getUnitTonnage()
+				&& mekLoc.isTsm() == tsm
+				&& mekLoc.getStructureType() == structureType;
 		}
 		return false;
 	}

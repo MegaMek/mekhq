@@ -169,14 +169,8 @@ public class MissingMekGyro extends MissingPart {
 	public boolean isAcceptableReplacement(Part part) {
 		if(part instanceof MekGyro) {
 			MekGyro gyro = (MekGyro)part;
-			return type == gyro.getType() && getTonnage() == gyro.getTonnage();
+			return getType() == gyro.getType() && getTonnage() == gyro.getTonnage();
 		}
-		return false;
-	}
-
-	@Override
-	public boolean isSamePartTypeAndStatus(Part part) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 	

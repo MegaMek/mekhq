@@ -72,6 +72,12 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		return "Destroyed";
 	}
 	
+	@Override 
+	public boolean isSamePartTypeAndStatus(Part part) {
+		//missing parts should always return false
+		return false;
+	}
+	
 	public String getDesc() {
 		String bonus = getAllMods().getValueAsString();
 		if (getAllMods().getValue() > -1) {

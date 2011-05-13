@@ -59,8 +59,10 @@ public class MekLifeSupport extends Part {
 
     @Override
     public boolean isSamePartTypeAndStatus (Part part) {
-        return part instanceof MekLifeSupport
-                && getName().equals(part.getName());
+    	if(needsFixing() || part.needsFixing()) {
+    		return false;
+    	}
+        return part instanceof MekLifeSupport;
     }
 
     @Override

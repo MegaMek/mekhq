@@ -109,10 +109,12 @@ public class MekGyro extends Part {
  
     @Override
     public boolean isSamePartTypeAndStatus (Part part) {
+    	if(needsFixing() || part.needsFixing()) {
+    		return false;
+    	}
         return part instanceof MekGyro
-                && getName().equals(part.getName())
                 && getType() == ((MekGyro) part).getType()
-                && getUnitTonnage() == ((MekGyro) part).getUnitTonnage();
+                && getTonnage() == ((MekGyro) part).getTonnage();
     }
 
     @Override

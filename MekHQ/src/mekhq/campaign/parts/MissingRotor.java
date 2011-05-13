@@ -43,14 +43,7 @@ public class MissingRotor extends MissingPart {
 	public MissingRotor(int tonnage) {
         super(tonnage);
     }
-
-    @Override
-    public boolean isSamePartTypeAndStatus (Part part) {
-        return part instanceof MissingRotor
-                && getName().equals(part.getName())
-                && getUnitTonnage() == ((MissingRotor)part).getUnitTonnage();
-    }
-
+	
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent, int id) {
 		writeToXmlBegin(pw1, indent, id);

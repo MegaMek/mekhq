@@ -116,8 +116,10 @@ public class MekActuator extends Part {
 
     @Override
     public boolean isSamePartTypeAndStatus (Part part) {
+    	if(needsFixing() || part.needsFixing()) {
+    		return false;
+    	}
         return part instanceof MekActuator
-                && getName().equals(part.getName())
                 && getType() == ((MekActuator)part).getType()
                 && getUnitTonnage() == ((MekActuator)part).getUnitTonnage();
     }

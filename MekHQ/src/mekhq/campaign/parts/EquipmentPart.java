@@ -132,11 +132,15 @@ public class EquipmentPart extends Part {
 
     @Override
     public boolean isSamePartTypeAndStatus (Part part) {
+    	if(needsFixing() || part.needsFixing()) {
+    		return false;
+    	}
         boolean b =  part instanceof EquipmentPart
-                        && getName().equals(part.getName())
                         && getType().equals( ((EquipmentPart)part).getType() );
-        if (getType().getCost(null, false) == EquipmentType.COST_VARIABLE)
+        if (getType().getCost(null, false) == EquipmentType.COST_VARIABLE) {
+        	//TODO: this needs a lot of work. There are other potential conditions here, I think
             return b && getUnitTonnage() == part.getUnitTonnage();
+        }
         else
             return b;
     }

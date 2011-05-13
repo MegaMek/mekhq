@@ -46,13 +46,6 @@ public class MissingTurret extends MissingPart {
         this.difficulty = -1;
     }
 
-    @Override
-    public boolean isSamePartTypeAndStatus (Part part) {
-        return part instanceof MissingTurret
-                && getName().equals(part.getName())
-                && getUnitTonnage() == ((MissingTurret)part).getUnitTonnage();
-    }
-
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent, int id) {
 		writeToXmlBegin(pw1, indent, id);

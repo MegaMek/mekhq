@@ -218,8 +218,10 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
 	/**
 	 * Checks if the current part is exactly the "same kind" of part as the part
-	 * given in argument. It also takes into account the status {@link
-	 * getStatus()} of the part
+	 * given in argument. It only returns true for undamaged parts. Damaged parts
+	 * are never considered the same type.
+	 * 
+	 *  Primarily used to construct partInventory
 	 * 
 	 * @param part
 	 *            The part to be compared with the current part

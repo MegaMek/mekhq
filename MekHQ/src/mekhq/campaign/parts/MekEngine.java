@@ -73,6 +73,9 @@ public class MekEngine extends Part {
 
 	@Override
 	public boolean isSamePartTypeAndStatus(Part part) {
+		if(needsFixing() || part.needsFixing()) {
+    		return false;
+    	}
 		return part instanceof MekEngine
 				&& getName().equals(part.getName())
 				&& getEngine().getEngineType() == ((MekEngine) part)

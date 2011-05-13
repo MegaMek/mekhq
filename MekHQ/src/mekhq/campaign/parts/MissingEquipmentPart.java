@@ -126,17 +126,6 @@ public class MissingEquipmentPart extends MissingPart {
     }
 
     @Override
-    public boolean isSamePartTypeAndStatus (Part part) {
-        boolean b =  part instanceof EquipmentPart
-                        && getName().equals(part.getName())
-                        && getType().equals( ((EquipmentPart)part).getType() );
-        if (getType().getCost(null, false) == EquipmentType.COST_VARIABLE)
-            return b && getUnitTonnage() == part.getUnitTonnage();
-        else
-            return b;
-    }
-
-    @Override
     public int getPartType() {
         if (getType() instanceof Weapon)
             return PART_TYPE_WEAPON;

@@ -112,14 +112,6 @@ public class MissingMekActuator extends MissingPart {
     }
 
     @Override
-    public boolean isSamePartTypeAndStatus (Part part) {
-        return part instanceof MekActuator
-                && getName().equals(part.getName())
-                && getType() == ((MekActuator)part).getType()
-                && getUnitTonnage() == ((MekActuator)part).getUnitTonnage();
-    }
-
-    @Override
     public int getPartType() {
         return PART_TYPE_MEK_ACTUATOR;
     }

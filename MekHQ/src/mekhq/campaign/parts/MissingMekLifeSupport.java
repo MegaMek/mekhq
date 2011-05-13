@@ -57,12 +57,6 @@ public class MissingMekLifeSupport extends MissingPart {
 	public long getPurchasePrice() {
 		return 50000;
 	}
-	
-    @Override
-    public boolean isSamePartTypeAndStatus (Part part) {
-        return part instanceof MekLifeSupport
-                && getName().equals(part.getName());
-    }
 
     @Override
     public int getPartType() {

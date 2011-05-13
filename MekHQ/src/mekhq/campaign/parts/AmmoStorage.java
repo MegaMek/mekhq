@@ -84,6 +84,17 @@ public class AmmoStorage extends EquipmentPart {
     	return shots;
     }
     
+    @Override
+    public boolean isSamePartTypeAndStatus (Part part) {
+    	if(needsFixing() || part.needsFixing()) {
+    		return false;
+    	}
+        return part instanceof AmmoStorage
+                        && getType().equals( ((EquipmentPart)part).getType())
+                        		&& ((AmmoType)getType()).getMunitionType() == ((AmmoType)((AmmoStorage)part).getType()).getMunitionType();
+    
+    }
+    
     public void addShots(int s) {
     	shots += s;
     }

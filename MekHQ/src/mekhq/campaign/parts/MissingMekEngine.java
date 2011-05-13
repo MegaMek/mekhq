@@ -74,19 +74,6 @@ public class MissingMekEngine extends MissingPart {
 	}
 
 	@Override
-	public boolean isSamePartTypeAndStatus(Part part) {
-		return part instanceof MekEngine
-				&& getName().equals(part.getName())
-				&& getEngine().getEngineType() == ((MekEngine) part)
-						.getEngine().getEngineType()
-				&& getEngine().getRating() == ((MekEngine) part).getEngine()
-						.getRating()
-				&& getEngine().getTechType() == ((MekEngine) part).getEngine()
-						.getTechType()
-				&& getUnitTonnage() == ((MekEngine) part).getUnitTonnage();
-	}
-
-	@Override
 	public int getPartType() {
 		return PART_TYPE_MEK_ENGINE;
 	}
