@@ -80,6 +80,7 @@ v0.1.6 (SVN)
 + Bug: Unit#initializeParts choking on BattleArmor and Infantry
 + Bug: "Add XP" doesn't do anything for support personnel
 + Bug 3301119: Doctor is not a recognized Personnel Type
++ getCost for units follows StratOps, pg. 181 (1/2 for undamaged, 1/3 for damaged, 1/10 for destroyed)
 
 v0.1.5 (2011-05-05)
 + refactored Hangar Panel into separate Hangar and Repair Bay panel

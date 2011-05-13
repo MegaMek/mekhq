@@ -1665,41 +1665,21 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 		*/
 	}
 
-	public int getRepairCost() {
-		int cost = 0;
-	/*
-		int repairSystem = campaign.getCampaignOptions().getRepairSystem();
-
-		for (WorkItem task : campaign.getAllTasksForUnit(getId())) {
-			if (repairSystem == CampaignOptions.REPAIR_SYSTEM_STRATOPS) {
-				if (task instanceof ReplacementItem) {
-					cost += ((ReplacementItem) task).partNeeded().getCost();
-				} else if (task instanceof ReloadItem) {
-					cost += ((ReloadItem) task).getCost();
-				}
-			} else if (repairSystem == CampaignOptions.REPAIR_SYSTEM_WARCHEST_CUSTOM) {
-				if (task instanceof FullRepairWarchest) {
-					cost += ((FullRepairWarchest) task).getCost();
-				}
-			} else if (repairSystem == CampaignOptions.REPAIR_SYSTEM_GENERIC_PARTS) {
-				if (task instanceof ReplacementItem
-						&& ((ReplacementItem) task).partNeeded() instanceof GenericSparePart) {
-					cost += ((ReplacementItem) task).partNeeded().getCost();
-				}
-			}
-		}
-*/
-		return cost;
-	}
 
 	public int getSellValue() {
 		int residualValue = 0;
 
-		int valueOfSalvage = 0;
+		
 		/*
-		for (WorkItem task : campaign.getAllTasksForUnit(getId())) {
-			if (task instanceof SalvageItem) {
-				valueOfSalvage += ((SalvageItem) task).getPart().getCost();
+		 * TODO: We should do this the full accounting way below, but for the 
+		 * short term I am going to just use the StratOps rule on pg. 181
+		 * undamaged units sell for 1/2, damaged units sell for 1/3,
+		 * destroyed units sell for 1/10
+		int valueOfSalvage = 0;
+		
+		for (Part part : parts) {
+			if (!(part instanceof MissingPart)) {
+				valueOfSalvage += part.getCost();
 			}
 		}
 
@@ -1726,11 +1706,17 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 
 		if (residualValue < 0)
 			residualValue = 0;
-
-		// Sell unit => divide price by 2
-		 * 
 		 */
-		return residualValue / 2;
+		
+		int cost = (int) Math.round(getEntity().getCost(false));
+		cost *= campaign.getCampaignOptions().getClanPriceModifier();
+		if(!isDamaged()) {
+			return cost / 2;
+		} else if(isFunctional()) {
+			return cost / 3;
+		} else {
+			return cost / 10;
+		}
 	}
 
 	public int getBuyCost() {

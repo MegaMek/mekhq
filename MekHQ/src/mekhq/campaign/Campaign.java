@@ -648,18 +648,20 @@ public class Campaign implements Serializable {
 		toReturn += unit.getDescHTML();
 		int totalMin = 0;
 		int total = 0;
-		int cost = unit.getRepairCost();
+		//int cost = unit.getRepairCost();
 
 		if (total > 0) {
 			toReturn += "Total tasks: " + total + " (" + totalMin
 					+ " minutes)<br/>";
 		}
+		/*
 		if (cost > 0) {
 			NumberFormat numberFormat = DecimalFormat.getIntegerInstance();
 			String text = numberFormat.format(cost) + " "
 					+ (cost != 0 ? "CBills" : "CBill");
 			toReturn += "Repair cost : " + text + "<br/>";
 		}
+		*/
 
 		toReturn += "</font>";
 		toReturn += "</html>";
