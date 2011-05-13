@@ -35,19 +35,18 @@ public class VeeSensor extends Part {
 	private static final long serialVersionUID = 4101969895094531892L;
 
 	public VeeSensor() {
-		this(false, 0);
+		this(0);
 	}
 	
-	public VeeSensor(boolean salvage, int tonnage) {
-        super(salvage, tonnage);
+	public VeeSensor(int tonnage) {
+        super(tonnage);
         this.name = "Vehicle Sensors";
     }
 
     @Override
     public boolean isSamePartTypeAndStatus (Part part) {
         return part instanceof VeeSensor
-                && getName().equals(part.getName())
-                && getStatus().equals(part.getStatus());
+                && getName().equals(part.getName());
     }
 
 	@Override

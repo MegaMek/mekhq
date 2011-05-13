@@ -44,11 +44,11 @@ public class MekEngine extends Part {
 	protected Engine engine;
 
 	public MekEngine() {
-		this(false, 0, new Engine(0, 0, -1));
+		this(0, new Engine(0, 0, -1));
 	}
 
-	public MekEngine(boolean salvage, int tonnage, Engine e) {
-		super(salvage, tonnage);
+	public MekEngine(int tonnage, Engine e) {
+		super(tonnage);
 		this.engine = e;
 		this.name = engine.getEngineName() + " Engine";
 		this.engine = e;
@@ -75,7 +75,6 @@ public class MekEngine extends Part {
 	public boolean isSamePartTypeAndStatus(Part part) {
 		return part instanceof MekEngine
 				&& getName().equals(part.getName())
-				&& getStatus().equals(part.getStatus())
 				&& getEngine().getEngineType() == ((MekEngine) part)
 						.getEngine().getEngineType()
 				&& getEngine().getRating() == ((MekEngine) part).getEngine()
@@ -245,7 +244,7 @@ public class MekEngine extends Part {
 
 	@Override
 	public Part getMissingPart() {
-		return new MissingMekEngine(isSalvage(), getUnitTonnage(), getEngine());
+		return new MissingMekEngine(getUnitTonnage(), getEngine());
 	}
 
 	@Override

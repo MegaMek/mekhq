@@ -41,19 +41,19 @@ public class MissingMekActuator extends MissingPart {
 	protected int location;
 
 	public MissingMekActuator() {
-		this(false, 0, 0);
+		this(0, 0);
 	}
 	
     public int getType() {
         return type;
     }
     
-    public MissingMekActuator(boolean salvage, int tonnage, int type) {
-        this(salvage, tonnage, type, -1);
+    public MissingMekActuator(int tonnage, int type) {
+        this(tonnage, type, -1);
     }
     
-    public MissingMekActuator(boolean salvage, int tonnage, int type, int loc) {
-    	super(salvage, tonnage);
+    public MissingMekActuator(int tonnage, int type, int loc) {
+    	super(tonnage);
         this.type = type;
         Mech m = new BipedMech();
         this.name = m.getSystemName(type) + " Actuator" ;
@@ -115,7 +115,6 @@ public class MissingMekActuator extends MissingPart {
     public boolean isSamePartTypeAndStatus (Part part) {
         return part instanceof MekActuator
                 && getName().equals(part.getName())
-                && getStatus().equals(part.getStatus())
                 && getType() == ((MekActuator)part).getType()
                 && getUnitTonnage() == ((MekActuator)part).getUnitTonnage();
     }
@@ -199,7 +198,7 @@ public class MissingMekActuator extends MissingPart {
 
 	@Override
 	public Part getNewPart() {
-		return new MekActuator(isSalvage(), getUnitTonnage(), type, -1);
+		return new MekActuator(getUnitTonnage(), type, -1);
 	}
 	
 	

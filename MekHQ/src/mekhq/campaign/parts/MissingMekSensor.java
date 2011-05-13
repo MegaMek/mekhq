@@ -37,11 +37,11 @@ public class MissingMekSensor extends MissingPart {
 	private static final long serialVersionUID = 931907976883324097L;
 
 	public MissingMekSensor() {
-		this(false, 0);
+		this(0);
 	}
 	
-	public MissingMekSensor(boolean salvage, int tonnage) {
-        super(salvage, tonnage);
+	public MissingMekSensor(int tonnage) {
+        super(tonnage);
         this.name = "Mech Sensors";
         this.time = 260;
         this.difficulty = 0;
@@ -61,8 +61,7 @@ public class MissingMekSensor extends MissingPart {
     @Override
     public boolean isSamePartTypeAndStatus (Part part) {
         return part instanceof MekSensor
-                && getName().equals(part.getName())
-                && getStatus().equals(part.getStatus());
+                && getName().equals(part.getName());
     }
 
     @Override
@@ -109,7 +108,7 @@ public class MissingMekSensor extends MissingPart {
 
 	@Override
 	public Part getNewPart() {
-		return new MekSensor(isSalvage(), getUnitTonnage());
+		return new MekSensor(getUnitTonnage());
 	}
 
 }

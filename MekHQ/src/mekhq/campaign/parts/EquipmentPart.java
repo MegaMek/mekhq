@@ -63,15 +63,15 @@ public class EquipmentPart extends Part {
     }
     
     public EquipmentPart() {
-    	this(false, 0, null, -1);
+    	this(0, null, -1);
     }
     
-    public EquipmentPart(boolean salvage, int tonnage, EquipmentType et, int equipNum) {
+    public EquipmentPart(int tonnage, EquipmentType et, int equipNum) {
         // TODO Memorize all entity attributes needed to calculate cost
         // As it is a part bought with one entity can be used on another entity
         // on which it would have a different price (only tonnage is taken into
         // account for compatibility)
-        super(salvage, tonnage);
+        super(tonnage);
         this.type =et;
         if(null != type) {
         	this.name = type.getName();
@@ -134,7 +134,6 @@ public class EquipmentPart extends Part {
     public boolean isSamePartTypeAndStatus (Part part) {
         boolean b =  part instanceof EquipmentPart
                         && getName().equals(part.getName())
-                        && getStatus().equals(part.getStatus())
                         && getType().equals( ((EquipmentPart)part).getType() );
         if (getType().getCost(null, false) == EquipmentType.COST_VARIABLE)
             return b && getUnitTonnage() == part.getUnitTonnage();
@@ -226,7 +225,7 @@ public class EquipmentPart extends Part {
 
 	@Override
 	public Part getMissingPart() {
-		return new MissingEquipmentPart(isSalvage(), getUnitTonnage(), type, equipmentNum);
+		return new MissingEquipmentPart(getUnitTonnage(), type, equipmentNum);
 	}
 
 	@Override

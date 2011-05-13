@@ -37,11 +37,11 @@ public class MissingTurret extends MissingPart {
 	private static final long serialVersionUID = 719267861685599789L;
 
 	public MissingTurret() {
-		this(false, 0);
+		this(0);
 	}
 	
-	public MissingTurret(boolean salvage, int tonnage) {
-        super(salvage, tonnage);
+	public MissingTurret(int tonnage) {
+        super(tonnage);
         this.time = 160;
         this.difficulty = -1;
     }
@@ -50,7 +50,6 @@ public class MissingTurret extends MissingPart {
     public boolean isSamePartTypeAndStatus (Part part) {
         return part instanceof MissingTurret
                 && getName().equals(part.getName())
-                && getStatus().equals(part.getStatus())
                 && getUnitTonnage() == ((MissingTurret)part).getUnitTonnage();
     }
 
@@ -90,7 +89,7 @@ public class MissingTurret extends MissingPart {
 	@Override
 	public Part getNewPart() {
 		//TODO: how to get second turret location?
-		return new TankLocation(isSalvage(), Tank.LOC_TURRET, getUnitTonnage(), false);
+		return new TankLocation(Tank.LOC_TURRET, getUnitTonnage(), false);
 	}
 
 	@Override

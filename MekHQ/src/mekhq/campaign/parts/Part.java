@@ -82,8 +82,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	// TODO: how to track clan vs. inner sphere
 	protected String name;
 	protected int id;
-	protected boolean salvage;
-	
+
 	//this is the unitTonnage which needs to be tracked for some parts
 	//even when off the unit. actual tonnage is returned via the 
 	//getTonnage() method
@@ -110,12 +109,11 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	protected boolean salvaging;
 	
 	public Part() {
-		this(false, 0);
+		this(0);
 	}
 	
-	public Part(boolean salvage, int tonnage) {
+	public Part(int tonnage) {
 		this.name = "Unknown";
-		this.salvage = salvage;
 		this.unitTonnage = tonnage;
 		this.hits = 0;
 		this.skillMin = SupportTeam.EXP_GREEN;
@@ -138,10 +136,6 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	
 	public int getUnitId() {
 		return unitId;
-	}
-
-	public boolean isSalvage() {
-		return salvage;
 	}
 
 	public String getName() {
@@ -176,9 +170,9 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	}
 	
 	public String getStatus() {
-		String toReturn = "Mint";
-		if (isSalvage()) {
-			toReturn = "Salvage";
+		String toReturn = "Functional";
+		if(needsFixing()) {
+			toReturn = "Damaged";
 		}
 		return toReturn;
 	}
@@ -268,10 +262,6 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 				+name
 				+"</name>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<salvage>"
-				+salvage
-				+"</salvage>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<unitTonnage>"
 				+unitTonnage
 				+"</unitTonnage>");
@@ -334,14 +324,6 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 					retVal.id = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("name")) {
 					retVal.name = wn2.getTextContent();
-				} else if (wn2.getNodeName().equalsIgnoreCase("salvage")) {
-					if (wn2.getTextContent().equalsIgnoreCase("true"))
-						retVal.salvage = true;
-					else
-						retVal.salvage = false;
-				} else if (wn2.getNodeName().equalsIgnoreCase("tonnage")) {
-					//legacy effect
-					retVal.unitTonnage = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("unitTonnage")) {
 					retVal.unitTonnage = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("hits")) {

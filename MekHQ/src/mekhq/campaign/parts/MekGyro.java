@@ -41,11 +41,11 @@ public class MekGyro extends Part {
     protected int walkMP;
 
     public MekGyro() {
-    	this(false, 0, 0, 0);
+    	this(0, 0, 0);
     }
     
-    public MekGyro(boolean salvage, int tonnage, int type, int walkMP) {
-        super(salvage, tonnage);
+    public MekGyro(int tonnage, int type, int walkMP) {
+        super(tonnage);
         this.type = type;
         this.name = Mech.getGyroTypeString(type);
         this.walkMP = walkMP;
@@ -111,7 +111,6 @@ public class MekGyro extends Part {
     public boolean isSamePartTypeAndStatus (Part part) {
         return part instanceof MekGyro
                 && getName().equals(part.getName())
-                && getStatus().equals(part.getStatus())
                 && getType() == ((MekGyro) part).getType()
                 && getUnitTonnage() == ((MekGyro) part).getUnitTonnage();
     }
@@ -192,7 +191,7 @@ public class MekGyro extends Part {
 
 	@Override
 	public Part getMissingPart() {
-		return new MissingMekGyro(isSalvage(), getUnitTonnage(), getType(), getWalkMP());
+		return new MissingMekGyro(getUnitTonnage(), getType(), getWalkMP());
 	}
 
 	@Override

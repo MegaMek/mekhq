@@ -37,18 +37,17 @@ public class MissingRotor extends MissingPart {
 	private static final long serialVersionUID = -3277611762625095964L;
 
 	public MissingRotor() {
-		this(false, 0);
+		this(0);
 	}
 	
-	public MissingRotor(boolean salvage, int tonnage) {
-        super(salvage, tonnage);
+	public MissingRotor(int tonnage) {
+        super(tonnage);
     }
 
     @Override
     public boolean isSamePartTypeAndStatus (Part part) {
         return part instanceof MissingRotor
                 && getName().equals(part.getName())
-                && getStatus().equals(part.getStatus())
                 && getUnitTonnage() == ((MissingRotor)part).getUnitTonnage();
     }
 
@@ -91,7 +90,7 @@ public class MissingRotor extends MissingPart {
 	@Override
 	public Part getNewPart() {
 		//TODO: how to get second turret location?
-		return new TankLocation(isSalvage(), Tank.LOC_TURRET, getUnitTonnage(), true);
+		return new TankLocation(Tank.LOC_TURRET, getUnitTonnage(), true);
 	}
 
 	@Override

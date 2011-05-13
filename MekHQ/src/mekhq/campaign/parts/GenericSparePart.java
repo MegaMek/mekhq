@@ -48,7 +48,7 @@ public class GenericSparePart extends Part {
     }
     
     public GenericSparePart(int tech, int amount) {
-        super(false, 0);
+        super(0);
         this.tech = tech;
         this.amount = amount;
     }
@@ -70,7 +70,6 @@ public class GenericSparePart extends Part {
     public boolean isSamePartTypeAndStatus (Part part) {
         return part instanceof GenericSparePart
                 && getName().equals(part.getName())
-                && getStatus().equals(part.getStatus())
                 && ((GenericSparePart) part).getTech() == getTech();
     }
 

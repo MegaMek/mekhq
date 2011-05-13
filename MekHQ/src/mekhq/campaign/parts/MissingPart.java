@@ -51,8 +51,8 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 	
 	protected boolean checkedToday;
 	
-	public MissingPart(boolean salvage, int tonnage) {
-		super(salvage, tonnage);
+	public MissingPart(int tonnage) {
+		super(tonnage);
 		this.checkedToday = false;
 	}
 	
@@ -65,6 +65,11 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 	@Override
 	public boolean isSalvaging() {
 		return false;
+	}
+	
+	@Override
+	public String getStatus() {
+		return "Destroyed";
 	}
 	
 	public String getDesc() {

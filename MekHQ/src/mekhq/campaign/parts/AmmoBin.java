@@ -48,11 +48,11 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 	protected boolean checkedToday;
 	
     public AmmoBin() {
-    	this(false, 0, null, -1, 0);
+    	this(0, null, -1, 0);
     }
     
-    public AmmoBin(boolean salvage, int tonnage, EquipmentType et, int equipNum, int shots) {
-        super(salvage, tonnage, et, equipNum);
+    public AmmoBin(int tonnage, EquipmentType et, int equipNum, int shots) {
+        super(tonnage, et, equipNum);
         this.shotsNeeded = shots;
         this.checkedToday = false;
         if(null != type && type instanceof AmmoType) {
@@ -199,7 +199,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 					}
 				}
 				//if we are still here then we did not find any ammo, so lets create a new part and stick it in spares
-				AmmoStorage newAmmo = new AmmoStorage(false,1,type,shots);
+				AmmoStorage newAmmo = new AmmoStorage(1,type,shots);
 				unit.campaign.addPart(newAmmo);
 			}	
 		}
@@ -215,7 +215,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
 	@Override
 	public Part getMissingPart() {
-		return new MissingAmmoBin(isSalvage(), getUnitTonnage(), type, equipmentNum);
+		return new MissingAmmoBin(getUnitTonnage(), type, equipmentNum);
 	}
 	
 	@Override
@@ -387,7 +387,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
 	@Override
 	public Part getNewPart() {
-		return new AmmoStorage(false,1,type,((AmmoType)type).getShots());
+		return new AmmoStorage(1,type,((AmmoType)type).getShots());
 	}
 
 	@Override

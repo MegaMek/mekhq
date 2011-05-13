@@ -39,11 +39,11 @@ public class RefitKit extends Part {
     protected String targetName;
     
     public RefitKit() {
-    	this(false, 0, null, null, 0);
+    	this(0, null, null, 0);
     }
     
-    public RefitKit (boolean salvage, int tonnage, String sourceName, String targetName, long cost) {
-        super(salvage, tonnage);
+    public RefitKit (int tonnage, String sourceName, String targetName, long cost) {
+        super(tonnage);
         this.sourceName = sourceName;
         this.targetName = targetName;
     }
@@ -52,7 +52,6 @@ public class RefitKit extends Part {
     public boolean isSamePartTypeAndStatus (Part part) {
         return part instanceof RefitKit
                 && getName().equals(part.getName())
-                && getStatus().equals(part.getStatus())
                 && this.sourceName.equals(((RefitKit) part).sourceName)
                 && this.targetName.equals(((RefitKit) part).targetName);
     }

@@ -37,11 +37,11 @@ public class MissingMekLifeSupport extends MissingPart {
 	private static final long serialVersionUID = -1989526319692474127L;
 
 	public MissingMekLifeSupport() {
-		this(false, 0);
+		this(0);
 	}
 	
-	public MissingMekLifeSupport(boolean salvage, int tonnage) {
-        super(salvage, tonnage);
+	public MissingMekLifeSupport(int tonnage) {
+        super(tonnage);
         this.name = "Mech Life Support System";
         this.time = 180;
         this.difficulty = -1;
@@ -61,8 +61,7 @@ public class MissingMekLifeSupport extends MissingPart {
     @Override
     public boolean isSamePartTypeAndStatus (Part part) {
         return part instanceof MekLifeSupport
-                && getName().equals(part.getName())
-                && getStatus().equals(part.getStatus());
+                && getName().equals(part.getName());
     }
 
     @Override
@@ -110,6 +109,6 @@ public class MissingMekLifeSupport extends MissingPart {
 
 	@Override
 	public Part getNewPart() {
-		return new MekLifeSupport(isSalvage(), getUnitTonnage());
+		return new MekLifeSupport(getUnitTonnage());
 	}
 }

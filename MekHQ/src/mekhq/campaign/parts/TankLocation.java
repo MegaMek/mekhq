@@ -42,15 +42,15 @@ public class TankLocation extends Part {
 	protected boolean isVTOL;
 
     public TankLocation() {
-    	this(false, 0, 0, false);
+    	this(0, 0, false);
     }
     
     public int getLoc() {
         return loc;
     }
     
-    public TankLocation(boolean salvage, int loc, int tonnage, boolean vtol) {
-        super(salvage, tonnage);
+    public TankLocation(int loc, int tonnage, boolean vtol) {
+        super(tonnage);
         this.loc = loc;
         this.time = 60;
         this.difficulty = 0;
@@ -88,7 +88,6 @@ public class TankLocation extends Part {
     public boolean isSamePartTypeAndStatus (Part part) {
         return part instanceof TankLocation
                 && getName().equals(part.getName())
-                && getStatus().equals(part.getStatus())
                 && getLoc() == ((TankLocation)part).getLoc()
                 && getUnitTonnage() == ((TankLocation)part).getUnitTonnage();
     }
@@ -136,10 +135,10 @@ public class TankLocation extends Part {
 	@Override
 	public Part getMissingPart() {
 		if(isVTOL) {
-			return new MissingRotor(true, getUnitTonnage());
+			return new MissingRotor(getUnitTonnage());
 		} else {
 			//this can only be a turret
-			return new MissingTurret(true, getUnitTonnage());
+			return new MissingTurret(getUnitTonnage());
 		}
 	}
 

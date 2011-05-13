@@ -42,7 +42,7 @@ public class MissingMekLocation extends MissingPart {
     double percent;
 
     public MissingMekLocation() {
-    	this(false, 0, 0, 0, false);
+    	this(0, 0, 0, false);
     }
     
     public int getLoc() {
@@ -57,8 +57,8 @@ public class MissingMekLocation extends MissingPart {
         return structureType;
     }
     
-    public MissingMekLocation(boolean salvage, int loc, int tonnage, int structureType, boolean hasTSM) {
-        super(salvage, tonnage);
+    public MissingMekLocation(int loc, int tonnage, int structureType, boolean hasTSM) {
+        super(tonnage);
         this.loc = loc;
         this.structureType = structureType;
         this.tsm = hasTSM;
@@ -127,7 +127,6 @@ public class MissingMekLocation extends MissingPart {
     public boolean isSamePartTypeAndStatus (Part part) {
         return part instanceof MekLocation
                 && getName().equals(part.getName())
-                && getStatus().equals(part.getStatus())
                 && getLoc() == ((MekLocation)part).getLoc()
                 && getUnitTonnage() == ((MekLocation)part).getUnitTonnage()
                 && isTsm() == ((MekLocation)part).isTsm()
@@ -269,6 +268,6 @@ public class MissingMekLocation extends MissingPart {
 
 	@Override
 	public Part getNewPart() {
-		return new MekLocation(isSalvage(), loc, getUnitTonnage(), structureType, tsm);
+		return new MekLocation(loc, getUnitTonnage(), structureType, tsm);
 	}
 }

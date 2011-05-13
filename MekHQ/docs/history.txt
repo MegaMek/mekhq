@@ -86,6 +86,8 @@ v0.1.6 (SVN)
 + show parts needed in unit table
 + Bug: current description not showing when editing missions and scenarios
 + replaced Part#computeCost with getCurrentValue and getPurchasePrice, removed static cost variable from Part
++ removed salvage boolean from Part (it has no use) and removed all referencing methods
++ change getStatus() in Part to return Functional/Damaged/Destroyed
 
 v0.1.5 (2011-05-05)
 + refactored Hangar Panel into separate Hangar and Repair Bay panel

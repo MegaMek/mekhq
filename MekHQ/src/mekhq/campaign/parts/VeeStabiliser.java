@@ -35,11 +35,11 @@ public class VeeStabiliser extends Part {
 	private static final long serialVersionUID = 6708245721569856817L;
 
 	public VeeStabiliser() {
-		this(false, 0);
+		this(0);
 	}
 	
-	public VeeStabiliser(boolean salvage, int tonnage) {
-        super(salvage, tonnage);
+	public VeeStabiliser(int tonnage) {
+        super(tonnage);
         this.name = "Vehicle Stabiliser";
     }
 
@@ -47,7 +47,6 @@ public class VeeStabiliser extends Part {
     public boolean isSamePartTypeAndStatus (Part part) {
         return part instanceof VeeStabiliser
                 && getName().equals(part.getName())
-                && getStatus().equals(part.getStatus())
                 && false;
     }
 

@@ -53,16 +53,16 @@ public class Armor extends Part implements IAcquisitionWork {
     private boolean checkedToday;
     
     public Armor() {
-    	this(false, 0, 0, 0);
+    	this(0, 0, 0);
     }
     
-    public Armor(boolean salvage, int tonnage, int t, int points) {
-    	this(salvage, tonnage, t, points, -1, false);
+    public Armor(int tonnage, int t, int points) {
+    	this(tonnage, t, points, -1, false);
     }
     
-    public Armor(boolean salvage, int tonnage, int t, int points, int loc, boolean r) {
+    public Armor(int tonnage, int t, int points, int loc, boolean r) {
         // Amount is used for armor quantity, not tonnage
-        super(false, tonnage);
+        super(tonnage);
         this.type = t;
         this.amount = points;
         this.location = loc;
@@ -169,7 +169,6 @@ public class Armor extends Part implements IAcquisitionWork {
     public boolean isSamePartTypeAndStatus (Part part) {
         return part instanceof Armor
                 && getName().equals(part.getName())
-                && getStatus().equals(part.getStatus())
                 && getType() == ((Armor)part).getType();
     }
 
@@ -397,7 +396,7 @@ public class Armor extends Part implements IAcquisitionWork {
 				}
 			}
 			//if we are still here then we did not find any armor, so lets create a new part and stick it in spares
-			Armor newArmor = new Armor(true,getUnitTonnage(),type,amountNeeded,-1,false);
+			Armor newArmor = new Armor(getUnitTonnage(),type,amountNeeded,-1,false);
 			unit.campaign.addPart(newArmor);
 		}
 		updateConditionFromEntity();
@@ -522,7 +521,7 @@ public class Armor extends Part implements IAcquisitionWork {
 				armorPerTon = 8.0;
 			}
 			int points = (int) Math.floor(armorPerTon * 5);
-			return new Armor(false, (int) unit.getEntity().getWeight(), armorType, points);
+			return new Armor((int) unit.getEntity().getWeight(), armorType, points);
 		}
 		return null;
 	}

@@ -40,11 +40,11 @@ public class MissingMekGyro extends MissingPart {
     protected int walkMP;
 
     public MissingMekGyro() {
-    	this(false, 0, 0, 0);
+    	this(0, 0, 0);
     }
     
-    public MissingMekGyro(boolean salvage, int tonnage, int type, int walkMP) {
-        super(salvage, tonnage);
+    public MissingMekGyro(int tonnage, int type, int walkMP) {
+        super(tonnage);
         this.type = type;
         this.name = Mech.getGyroTypeString(type);
         this.walkMP = walkMP;
@@ -187,6 +187,6 @@ public class MissingMekGyro extends MissingPart {
 
 	@Override
 	public Part getNewPart() {
-		return new MekGyro(isSalvage(), getUnitTonnage(), getType(), getWalkMP());
+		return new MekGyro(getUnitTonnage(), getType(), getWalkMP());
 	}
 }

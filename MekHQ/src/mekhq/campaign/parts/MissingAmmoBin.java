@@ -32,11 +32,11 @@ public class MissingAmmoBin extends MissingEquipmentPart {
 	private static final long serialVersionUID = 2892728320891712304L;
 
     public MissingAmmoBin() {
-    	this(false, 0, null, -1);
+    	this(0, null, -1);
     }
     
-    public MissingAmmoBin(boolean salvage, int tonnage, EquipmentType et, int equipNum) {
-        super(salvage, tonnage, et, equipNum);
+    public MissingAmmoBin(int tonnage, EquipmentType et, int equipNum) {
+        super(tonnage, et, equipNum);
         this.difficulty = -2;
         if(null != name) {
         	this.name += " Bin";
@@ -56,6 +56,6 @@ public class MissingAmmoBin extends MissingEquipmentPart {
 	
 	@Override
 	public Part getNewPart() {
-		return new AmmoBin(isSalvage(), getUnitTonnage(), type, -1, ((AmmoType)type).getShots());
+		return new AmmoBin(getUnitTonnage(), type, -1, ((AmmoType)type).getShots());
 	}
 }
