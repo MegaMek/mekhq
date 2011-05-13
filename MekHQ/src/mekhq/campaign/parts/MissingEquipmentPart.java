@@ -25,6 +25,7 @@ import java.io.PrintWriter;
 
 import megamek.common.AmmoType;
 import megamek.common.CriticalSlot;
+import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Mounted;
 import megamek.common.TechConstants;
@@ -109,18 +110,26 @@ public class MissingEquipmentPart extends MissingPart {
         //some costs depend on entity, but we can't do it that way
         //because spare parts don't have entities. If parts start on an entity
         //thats fine, but this will become problematic when we set up a parts
-        //store
-    	if (unit == null)
-    		//should never happen
-            return 0;
-
-        int itemCost = 0;
-        Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
-        if(null != mounted) {
-        	itemCost = (int) mounted.getType().getCost(unit.getEntity(), mounted.isArmored());
-            if (itemCost == EquipmentType.COST_VARIABLE) {
-                itemCost = mounted.getType().resolveVariableCost(unit.getEntity(), mounted.isArmored());
+        //store. For now I am just going to pass in a null entity and attempt
+    	//to catch any resulting NPEs
+    	Entity en = null;
+    	boolean isArmored = false;
+    	if (unit != null) {
+            en = unit.getEntity();
+            Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
+            if(null != mounted) {
+            	isArmored = mounted.isArmored();
             }
+    	}
+
+        int itemCost = 0;      
+        try {
+        	itemCost = (int) type.getCost(en, isArmored);
+        	if (itemCost == EquipmentType.COST_VARIABLE) {
+        		itemCost = type.resolveVariableCost(en, isArmored);
+        	}
+        } catch(NullPointerException ex) {
+        	System.out.println("Found a null entity while calculating cost for " + name);
         }
         return itemCost;
     }

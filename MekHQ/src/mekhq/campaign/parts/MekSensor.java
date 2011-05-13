@@ -73,6 +73,11 @@ public class MekSensor extends Part {
     public int getPartType() {
         return PART_TYPE_MEK_SENSOR;
     }
+    
+    @Override
+	public int getTechBase() {
+		return T_BOTH;
+	}
 
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent, int id) {

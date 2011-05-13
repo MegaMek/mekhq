@@ -64,6 +64,11 @@ public class MekLifeSupport extends Part {
     	}
         return part instanceof MekLifeSupport;
     }
+    
+    @Override
+	public int getTechBase() {
+		return T_BOTH;
+	}
 
     @Override
     public int getPartType() {

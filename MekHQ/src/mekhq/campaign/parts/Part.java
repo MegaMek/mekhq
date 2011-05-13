@@ -69,6 +69,10 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	public static final int PART_TYPE_MEK_SENSOR = 9;
 	public static final int PART_TYPE_GENERIC_SPARE_PART = 10;
 	public static final int PART_TYPE_OTHER = 11;
+	
+	public static final int T_BOTH = 0;
+	public static final int T_IS   = 1;
+	public static final int T_CLAN = 2;
 
 	private static final String[] partTypeLabels = { "Armor", "Weapon", "Ammo",
 			"Equipment Part", "Mek Actuator", "Mek Engine", "Mek Gyro",
@@ -216,6 +220,31 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	
 	public abstract int getAvailability(int era);
 
+
+	public int getTechBase() {
+		if(isClanTechBase()) {
+			return T_CLAN;
+		} else {
+			return T_IS;
+		}
+	}
+	
+	public String getTechBaseName() {
+		return getTechBaseName(getTechBase());
+	}
+	
+	public static String getTechBaseName(int base) {
+		switch(base) {
+		case T_BOTH:
+			return "IS/Clan";
+		case T_CLAN:
+			return "Clan";
+		case T_IS:
+			return "IS";
+		default: 
+			return "??";
+		}
+	}
 	/**
 	 * Checks if the current part is exactly the "same kind" of part as the part
 	 * given in argument. It only returns true for undamaged parts. Damaged parts
@@ -237,10 +266,9 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		return PART_TYPE_OTHER;
 	}
 
-	public boolean isClanTechBase() {
-		// By default : IS tech base
-		return false;
-	}
+    public boolean isClanTechBase() {
+        return TechConstants.isClan(getTech());
+    }
 
 	public int getTech() {
 		// By default : IS intro box

@@ -5429,11 +5429,12 @@ public class MekHQView extends FrameView {
 
 		private final static int COL_NAME    =    0;
 		private final static int COL_DETAIL   =   1;
-		private final static int COL_COST     =   2;
-        private final static int COL_QUANTITY   = 3;
-        private final static int COL_TON       =  4;
-        private final static int COL_STATUS   =   5;
-        private final static int N_COL          = 6;
+		private final static int COL_TECH_BASE  = 2;
+		private final static int COL_COST     =   3;
+        private final static int COL_QUANTITY   = 4;
+        private final static int COL_TON       =  5;
+        private final static int COL_STATUS   =   6;
+        private final static int N_COL          = 7;
 		
 		public PartsTableModel() {
 			data = new ArrayList<PartInventory>();
@@ -5462,6 +5463,8 @@ public class MekHQView extends FrameView {
                     return "Status";
                 case COL_DETAIL:
                     return "Detail";
+                case COL_TECH_BASE:
+                    return "Tech Base";
                 default:
                     return "?";
             }
@@ -5487,6 +5490,9 @@ public class MekHQView extends FrameView {
 			}
 			if(col == COL_STATUS) {
 				return part.getStatus();
+			}
+			if(col == COL_TECH_BASE) {
+				return part.getTechBaseName();
 			}
 			return "?";
 		}

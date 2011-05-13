@@ -179,6 +179,11 @@ public class MekActuator extends Part {
 			unit.repairSystem(CriticalSlot.TYPE_SYSTEM, type, location);
 		}
 	}
+	
+	@Override
+	public int getTechBase() {
+		return T_BOTH;
+	}
 
 	@Override
 	public Part getMissingPart() {

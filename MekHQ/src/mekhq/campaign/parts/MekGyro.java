@@ -26,6 +26,7 @@ import java.io.PrintWriter;
 import megamek.common.CriticalSlot;
 import megamek.common.EquipmentType;
 import megamek.common.Mech;
+import megamek.common.TechConstants;
 import mekhq.campaign.MekHqXmlUtil;
 
 import org.w3c.dom.Node;
@@ -178,6 +179,23 @@ public class MekGyro extends Part {
 			return EquipmentType.RATING_E;
 		default:
 			return EquipmentType.RATING_D;	
+		}
+	}
+	
+	@Override
+	public int getTech() {
+		return TechConstants.T_IS_TW_ALL;
+	}
+	
+	@Override 
+	public int getTechBase() {
+		switch(type) {
+		case Mech.GYRO_COMPACT:
+		case Mech.GYRO_HEAVY_DUTY:
+		case Mech.GYRO_XL:
+			return T_IS;
+		default:
+			return T_BOTH;	
 		}
 	}
 

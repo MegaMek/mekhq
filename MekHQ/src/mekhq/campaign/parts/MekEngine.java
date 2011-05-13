@@ -92,18 +92,6 @@ public class MekEngine extends Part {
 	}
 
 	@Override
-	public boolean isClanTechBase() {
-		String techBase = TechConstants.getTechName(getEngine().getTechType());
-
-		if (techBase.equals("Clan"))
-			return true;
-		else if (techBase.equals("Inner Sphere"))
-			return false;
-		else
-			return false;
-	}
-
-	@Override
 	public int getTech() {
 		if (getEngine().getTechType() < 0
 				|| getEngine().getTechType() >= TechConstants.SIZE)
