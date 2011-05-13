@@ -80,7 +80,7 @@ public class TankLocation extends Part {
         computeCost();
     }
     
-    private void computeCost () {
+    protected void computeCost () {
     	//TODO: implement
     }
 

@@ -60,8 +60,22 @@ public class MissingMekGyro extends MissingPart {
         return walkMP;
     }
     
-   
-
+    protected void computeCost() {
+        double c = 0;
+        
+        if (getType() == Mech.GYRO_XL) {
+            c = 750000 * getGyroTonnage();
+        } else if (getType() == Mech.GYRO_COMPACT) {
+            c = 400000 * getGyroTonnage();
+        } else if (getType() == Mech.GYRO_HEAVY_DUTY) {
+            c = 500000 * getGyroTonnage();
+        } else {
+            c = 300000 * getGyroTonnage();
+        }
+        
+        this.cost = (long) Math.round(c);
+    }
+  
     public static int getGyroBaseTonnage(int walkMP, int unitTonnage) {
     	return (int) Math.ceil(walkMP * unitTonnage / 100f);
     }

@@ -70,8 +70,19 @@ public class Armor extends Part implements IAcquisitionWork {
         if(type > -1) {
         	this.name += " (" + EquipmentType.armorNames[type] + ")";
         }
+        computeCost();
     }
     
+    protected void computeCost() {
+    	double armorPerTon = 16.0 * EquipmentType.getArmorPointMultiplier(type);
+        if (type == EquipmentType.T_ARMOR_HARDENED) {
+            armorPerTon = 8.0;
+        }
+        double armorWeight = amount / armorPerTon;
+        armorWeight = Math.ceil(armorWeight * 2.0) / 2.0;
+
+    	this.cost = (int)(armorWeight * EquipmentType.getArmorCost(type));
+    }
     
     public String getDesc() {
     	if(isSalvaging()) {

@@ -90,7 +90,7 @@ public class MekGyro extends Part {
     	return MekGyro.getGyroTonnage(getGyroBaseTonnage(), getType());
     }
     
-    private void computeCost() {
+    protected void computeCost() {
         double c = 0;
         
         if (getType() == Mech.GYRO_XL) {

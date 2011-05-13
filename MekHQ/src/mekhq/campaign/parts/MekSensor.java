@@ -44,7 +44,12 @@ public class MekSensor extends Part {
 	public MekSensor(boolean salvage, int tonnage) {
         super(salvage, tonnage);
         this.name = "Mech Sensors";
+        computeCost();
     }
+	
+	protected void computeCost() {
+		this.cost = 2000 * getTonnage();
+	}
 
     @Override
     public boolean isSamePartTypeAndStatus (Part part) {

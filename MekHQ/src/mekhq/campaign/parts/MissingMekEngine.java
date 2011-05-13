@@ -54,19 +54,17 @@ public class MissingMekEngine extends MissingPart {
 		this.engine = e;
 		this.time = 360;
 		this.difficulty = -1;
-
-		double c = getEngine().getBaseCost() * getEngine().getRating()
-				* getTonnage() / 75.0;
-		this.cost = (long) Math.round(c);
-
-		// Increase cost for Clan parts when player is IS faction
-		// Increase cost for Clan parts when player is IS faction
-		if (isClanTechBase() && !Faction.isClanFaction(faction))
-			this.cost *= clanMultiplier;
+		computeCost();
 	}
 
 	public Engine getEngine() {
 		return engine;
+	}
+	
+	@Override 
+	protected void computeCost() {
+		double c = getEngine().getBaseCost() * getEngine().getRating() * getTonnage() / 75.0;
+		this.cost = (long) Math.round(c);
 	}
 
 	@Override

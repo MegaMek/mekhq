@@ -63,7 +63,7 @@ public class MissingMekActuator extends MissingPart {
         computeCost();
     }
 
-    private void computeCost () {
+    protected void computeCost () {
         long unitCost = 0;
         switch (getType()) {
             case (Mech.ACTUATOR_UPPER_ARM) : {

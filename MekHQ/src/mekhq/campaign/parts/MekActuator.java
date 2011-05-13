@@ -66,7 +66,8 @@ public class MekActuator extends Part {
         computeCost();
     }
 
-    private void computeCost () {
+    @Override
+    protected void computeCost() {
         long unitCost = 0;
         switch (getType()) {
             case (Mech.ACTUATOR_UPPER_ARM) : {

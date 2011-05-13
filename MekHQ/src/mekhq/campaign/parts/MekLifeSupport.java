@@ -44,8 +44,13 @@ public class MekLifeSupport extends Part {
 	public MekLifeSupport(boolean salvage, int tonnage) {
         super(salvage, tonnage);
         this.name = "Mech Life Support System";
-        this.cost = 50000;
+        computeCost();
     }
+	
+	@Override
+	protected void computeCost() {
+		this.cost = 50000;
+	}
 
     @Override
     public boolean isSamePartTypeAndStatus (Part part) {

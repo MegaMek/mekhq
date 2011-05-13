@@ -162,11 +162,16 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		this.unit = u;
 		if(null != unit) {
 			unitId = unit.getId();
+			computeCost();
 		} else {
 			unitId = -1;
 		}
 	}
 
+	protected void computeCost() {
+		cost = 0;
+	}
+	
 	public String getStatus() {
 		String toReturn = "Mint";
 		if (isSalvage()) {

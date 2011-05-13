@@ -103,7 +103,7 @@ public class MekLocation extends Part {
         computeCost();
     }
     
-    private void computeCost () {
+    protected void computeCost () {
         double totalStructureCost = EquipmentType.getStructureCost(getStructureType()) * getTonnage();
         int muscCost = isTsm() ? 16000 : 2000;
         double totalMuscleCost = muscCost * getTonnage();

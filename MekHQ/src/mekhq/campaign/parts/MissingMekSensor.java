@@ -45,7 +45,12 @@ public class MissingMekSensor extends MissingPart {
         this.name = "Mech Sensors";
         this.time = 260;
         this.difficulty = 0;
+        computeCost();
     }
+	
+	protected void computeCost() {
+		this.cost = 2000 * getTonnage();
+	}
 
     @Override
     public boolean isSamePartTypeAndStatus (Part part) {

@@ -39,6 +39,8 @@ public interface IAcquisitionWork extends IWork {
 	public String getAcquisitionDesc();
 	
 	public Unit getUnit();
+	
+	public long getCost();
 
 	public boolean hasCheckedToday();
 	public void setCheckedToday(boolean b);

@@ -46,8 +46,14 @@ public class MissingMekLifeSupport extends MissingPart {
         this.cost = 50000;
         this.time = 180;
         this.difficulty = -1;
+        computeCost();
     }
 
+	@Override
+	protected void computeCost() {
+		this.cost = 50000;
+	}
+	
     @Override
     public boolean isSamePartTypeAndStatus (Part part) {
         return part instanceof MekLifeSupport

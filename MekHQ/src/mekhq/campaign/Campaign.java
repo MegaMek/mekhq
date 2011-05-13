@@ -692,7 +692,7 @@ public class Campaign implements Serializable {
 		report += " and rolls " + roll + ":";		
 		if(roll >= target.getValue()) {
 			report += " <font color='green'><b>part found.</b></font><br/>";
-			buyPart(acquisition.getNewPart());
+			buyPart(acquisition.getNewPart(), acquisition.getCost());
 		} else {
 			report += " <font color='red'><b>part not available.</b></font>";
 		}
@@ -1147,10 +1147,11 @@ public class Campaign implements Serializable {
 		removePart(part);
 	}
 
-	public void buyPart(Part part) {
-		long cost = part.getCost();
-		finances.debit(cost, Transaction.C_EQUIP, "Sale of " + part.getName(), calendar.getTime());
+	public void buyPart(Part part, long cost) {
 		addPart(part);
+		if(getCampaignOptions().payForParts()) {
+			finances.debit(cost, Transaction.C_EQUIP, "Sale of " + part.getName(), calendar.getTime());		
+		}
 	}
 
 	public static Entity getBrandNewUndamagedEntity(String entityShortName) {

@@ -22,6 +22,7 @@
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
+import java.text.NumberFormat;
 
 import megamek.common.AmmoType;
 import megamek.common.CriticalSlot;
@@ -81,6 +82,7 @@ public class EquipmentPart extends Part {
         	this.typeName = type.getInternalName();
         }
         this.equipmentNum = equipNum;
+        computeCost();
     }
 
     /**
@@ -88,92 +90,25 @@ public class EquipmentPart extends Part {
      *
      * @param entity The entity the Equipment comes from / is added to
      */
-    private void computeCost (Entity entity) {
-        if (entity == null)
+    @Override
+    protected void computeCost() {
+    	//costs are a total nightmare
+        //some costs depend on entity, but we can't do it that way
+        //because spare parts don't have entities. If parts start on an entity
+        //thats fine, but this will become problematic when we set up a parts
+        //store
+    	if (unit == null)
             return;
 
-        EquipmentType type = getType();
-        float weight = entity.getWeight();
-        int cost = 0;
-
-        if (type instanceof MiscType
-                && type.hasFlag(MiscType.F_LASER_HEAT_SINK)) {
-            // TODO Laser heat sink cost ?
-            cost = 6000;
-        } else if (type instanceof MiscType
-                && type.hasFlag(MiscType.F_DOUBLE_HEAT_SINK)) {
-            cost = 6000;
-        } else if (type instanceof MiscType
-                && type.hasFlag(MiscType.F_HEAT_SINK)) {
-            cost = 2000;
-        } else if (entity instanceof megamek.common.Mech
-                && type instanceof MiscType
-                && type.hasFlag(MiscType.F_JUMP_JET)) {
-            megamek.common.Mech mech = (megamek.common.Mech) entity;
-
-            double jumpBaseCost = 200;
-            // You cannot have JJ's and UMU's on the same unit.
-            double c = 0;
-            
-            if (mech.hasUMU()) {
-                c = Math.pow(mech.getAllUMUCount(), 2.0) * weight * jumpBaseCost;
-            } else {
-                if (mech.getJumpType() == megamek.common.Mech.JUMP_BOOSTER) {
-                    jumpBaseCost = 150;
-                } else if (mech.getJumpType() == megamek.common.Mech.JUMP_IMPROVED) {
-                    jumpBaseCost = 500;
-                }
-                c = Math.pow(mech.getOriginalJumpMP(), 2.0) * weight * jumpBaseCost;
-            }
-
-            cost = (int) c;
-        } else {
-            // TODO take isArmored into account
-            boolean isArmored = false;
-
-            // TODO set isWeaponGroup correctly
-            boolean isWeaponGroup = false;
-
-            if (isWeaponGroup) {
-                this.cost = 2;
-                return ;
-            }
-
-            int itemCost = (int) type.getCost(entity, isArmored);
+        int itemCost = 0;
+        Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
+        if(null != mounted) {
+        	itemCost = (int) mounted.getType().getCost(unit.getEntity(), mounted.isArmored());
             if (itemCost == EquipmentType.COST_VARIABLE) {
-                itemCost = type.resolveVariableCost(entity, isArmored);
+                itemCost = mounted.getType().resolveVariableCost(unit.getEntity(), mounted.isArmored());
             }
-
-            cost = itemCost;
         }
-
-        if (cost > 100000000 || cost < 0) {
-            cost = 0;
-        }
-
-        if (cost == 0) {
-            // Some equipments do not have a price set in megamek
-            // Check if ssw has the price
-        	//NO - NO SSW IN MHQ - lets figure out what items are missing in MM and fix them
-        	/*
-            abPlaceable placeable = null;
-            
-            for (String sswName : getPotentialSSWNames(Faction.F_FEDSUN)) {
-                placeable = SSWLibHelper.getAbPlaceableByName(Campaign.getSswEquipmentFactory(), Campaign.getSswMech(), sswName);
-                if (placeable != null)
-                    break;
-            }
-            
-            if (placeable != null)
-                cost = (int) placeable.GetCost();
-           */
-        }
-
-        if (cost > 100000000 || cost < 0) {
-            cost = 0;
-        }
-
-        this.cost = cost;
+        this.cost = itemCost;
     }
     
     /**
