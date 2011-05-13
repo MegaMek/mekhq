@@ -119,7 +119,6 @@ public class MekLocation extends Part {
             // TODO create a class for cockpit or memorize cockpit type
             cost += 200000;
         }
-
         return (long) Math.round(cost);
     }
 

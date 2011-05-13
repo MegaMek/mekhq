@@ -82,10 +82,17 @@ public class EquipmentPart extends Part {
 
     @Override
     public double getTonnage() {
+    	Entity en = null;
     	if(null != unit) {
-    		return type.getTonnage(unit.getEntity());
+    		en = unit.getEntity();
     	}
-    	return 0;
+    	double ton = 0;
+    	try {
+    		ton = type.getTonnage(en);
+    	} catch(NullPointerException ex) {
+        	System.out.println("Found a null entity while calculating weight for " + name);
+        }
+    	return ton;
     }
     
     /**
