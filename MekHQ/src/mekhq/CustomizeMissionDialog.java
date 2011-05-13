@@ -92,7 +92,7 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(txtName, gridBagConstraints);
  
-        txtDesc.setText("");
+        txtDesc.setText(mission.getDescription());
         txtDesc.setName("txtDesc");
         txtDesc.setEditable(true);
         txtDesc.setLineWrap(true);

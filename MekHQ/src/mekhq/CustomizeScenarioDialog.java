@@ -95,7 +95,7 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(txtName, gridBagConstraints);
  
-        txtDesc.setText("");
+        txtDesc.setText(scenario.getDescription());
         txtDesc.setName("txtDesc");
         txtDesc.setEditable(true);
         txtDesc.setLineWrap(true);
