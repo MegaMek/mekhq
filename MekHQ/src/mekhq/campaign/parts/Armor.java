@@ -73,15 +73,17 @@ public class Armor extends Part implements IAcquisitionWork {
         computeCost();
     }
     
-    protected void computeCost() {
+    @Override
+    public double getTonnage() {
     	double armorPerTon = 16.0 * EquipmentType.getArmorPointMultiplier(type);
         if (type == EquipmentType.T_ARMOR_HARDENED) {
             armorPerTon = 8.0;
         }
-        double armorWeight = amount / armorPerTon;
-        armorWeight = Math.ceil(armorWeight * 2.0) / 2.0;
-
-    	this.cost = (int)(armorWeight * EquipmentType.getArmorCost(type));
+        return amount / armorPerTon;
+    }
+    
+    protected void computeCost() {
+    	this.cost = (int)(getTonnage() * EquipmentType.getArmorCost(type));
     }
     
     public String getDesc() {
@@ -204,10 +206,6 @@ public class Armor extends Part implements IAcquisitionWork {
         double armorWeight = points / armorPerTon;
         armorWeight = Math.ceil(armorWeight * 2.0) / 2.0;
         return armorWeight;
-    }
-
-    public int getCost (int amount) {
-        return (int) Math.round(getArmorWeight(amount) * EquipmentType.getArmorCost(getType()));
     }
 
 	@Override
@@ -392,7 +390,7 @@ public class Armor extends Part implements IAcquisitionWork {
 				}
 			}
 			//if we are still here then we did not find any armor, so lets create a new part and stick it in spares
-			Armor newArmor = new Armor(true,tonnage,type,amountNeeded,-1,false);
+			Armor newArmor = new Armor(true,getUnitTonnage(),type,amountNeeded,-1,false);
 			unit.campaign.addPart(newArmor);
 		}
 		updateConditionFromEntity();

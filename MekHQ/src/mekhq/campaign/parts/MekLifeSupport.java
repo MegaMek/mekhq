@@ -48,6 +48,12 @@ public class MekLifeSupport extends Part {
     }
 	
 	@Override
+	public double getTonnage() {
+		//TODO: what should this tonnage be?
+		return 0;
+	}
+	
+	@Override
 	protected void computeCost() {
 		this.cost = 50000;
 	}
@@ -95,7 +101,7 @@ public class MekLifeSupport extends Part {
 
 	@Override
 	public Part getMissingPart() {
-		return new MissingMekLifeSupport(isSalvage(), getTonnage());
+		return new MissingMekLifeSupport(isSalvage(), getUnitTonnage());
 	}
 
 	@Override

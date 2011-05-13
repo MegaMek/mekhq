@@ -62,6 +62,11 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         	this.name += " Bin";
         }
     }
+    
+    @Override
+    public double getTonnage() {
+    	return 1.0;
+    }
 
     public int getShotsNeeded() {
     	return shotsNeeded;
@@ -183,7 +188,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
 	@Override
 	public Part getMissingPart() {
-		return new MissingAmmoBin(isSalvage(), getTonnage(), type, equipmentNum);
+		return new MissingAmmoBin(isSalvage(), getUnitTonnage(), type, equipmentNum);
 	}
 	
 	@Override

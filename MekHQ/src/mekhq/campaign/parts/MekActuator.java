@@ -67,6 +67,13 @@ public class MekActuator extends Part {
     }
 
     @Override
+    public double getTonnage() {
+    	//TODO: how much do actuators weight?
+    	//apparently nothing
+    	return 0;
+    }
+    
+    @Override
     protected void computeCost() {
         long unitCost = 0;
         switch (getType()) {
@@ -105,7 +112,7 @@ public class MekActuator extends Part {
                 break;
             }
         }
-        this.cost = getTonnage() * unitCost;
+        this.cost = getUnitTonnage() * unitCost;
     }
 
     @Override
@@ -114,7 +121,7 @@ public class MekActuator extends Part {
                 && getName().equals(part.getName())
                 && getStatus().equals(part.getStatus())
                 && getType() == ((MekActuator)part).getType()
-                && getTonnage() == ((MekActuator)part).getTonnage();
+                && getUnitTonnage() == ((MekActuator)part).getUnitTonnage();
     }
 
     @Override
@@ -175,7 +182,7 @@ public class MekActuator extends Part {
 
 	@Override
 	public Part getMissingPart() {
-		return new MissingMekActuator(isSalvage(), getTonnage(), type, location);
+		return new MissingMekActuator(isSalvage(), getUnitTonnage(), type, location);
 	}
 
 	@Override

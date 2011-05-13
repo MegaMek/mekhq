@@ -48,8 +48,14 @@ public class MissingMekSensor extends MissingPart {
         computeCost();
     }
 	
+	@Override
+	public double getTonnage() {
+		//TODO: what should this tonnage be?
+		return 0;
+	}
+	
 	protected void computeCost() {
-		this.cost = 2000 * getTonnage();
+		this.cost = 2000 * getUnitTonnage();
 	}
 
     @Override
@@ -103,7 +109,7 @@ public class MissingMekSensor extends MissingPart {
 
 	@Override
 	public Part getNewPart() {
-		return new MekSensor(isSalvage(), getTonnage());
+		return new MekSensor(isSalvage(), getUnitTonnage());
 	}
 
 }

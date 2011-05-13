@@ -67,7 +67,7 @@ public class MekGyro extends Part {
     }
     
     private int getGyroBaseTonnage() {
-    	return MekGyro.getGyroBaseTonnage(getWalkMP(), getTonnage());
+    	return MekGyro.getGyroBaseTonnage(getWalkMP(), getUnitTonnage());
     }
     
     public static double getGyroTonnage(double gyroBaseTonnage, int gyroType) {
@@ -86,7 +86,8 @@ public class MekGyro extends Part {
     	return MekGyro.getGyroTonnage(MekGyro.getGyroBaseTonnage(walkMP, unitTonnage), gyroType);
     }
     
-    public double getGyroTonnage() {
+    @Override
+    public double getTonnage() {
     	return MekGyro.getGyroTonnage(getGyroBaseTonnage(), getType());
     }
     
@@ -94,13 +95,13 @@ public class MekGyro extends Part {
         double c = 0;
         
         if (getType() == Mech.GYRO_XL) {
-            c = 750000 * getGyroTonnage();
+            c = 750000 * getTonnage();
         } else if (getType() == Mech.GYRO_COMPACT) {
-            c = 400000 * getGyroTonnage();
+            c = 400000 * getTonnage();
         } else if (getType() == Mech.GYRO_HEAVY_DUTY) {
-            c = 500000 * getGyroTonnage();
+            c = 500000 * getTonnage();
         } else {
-            c = 300000 * getGyroTonnage();
+            c = 300000 * getTonnage();
         }
         
         this.cost = (long) Math.round(c);
@@ -112,7 +113,7 @@ public class MekGyro extends Part {
                 && getName().equals(part.getName())
                 && getStatus().equals(part.getStatus())
                 && getType() == ((MekGyro) part).getType()
-                && getTonnage() == ((MekGyro) part).getTonnage();
+                && getUnitTonnage() == ((MekGyro) part).getUnitTonnage();
     }
 
     @Override
@@ -191,7 +192,7 @@ public class MekGyro extends Part {
 
 	@Override
 	public Part getMissingPart() {
-		return new MissingMekGyro(isSalvage(), getTonnage(), getType(), getWalkMP());
+		return new MissingMekGyro(isSalvage(), getUnitTonnage(), getType(), getWalkMP());
 	}
 
 	@Override

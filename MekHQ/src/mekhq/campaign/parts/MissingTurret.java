@@ -51,7 +51,7 @@ public class MissingTurret extends MissingPart {
         return part instanceof MissingTurret
                 && getName().equals(part.getName())
                 && getStatus().equals(part.getStatus())
-                && getTonnage() == ((MissingTurret)part).getTonnage();
+                && getUnitTonnage() == ((MissingTurret)part).getUnitTonnage();
     }
 
 	@Override
@@ -90,6 +90,12 @@ public class MissingTurret extends MissingPart {
 	@Override
 	public Part getNewPart() {
 		//TODO: how to get second turret location?
-		return new TankLocation(isSalvage(), Tank.LOC_TURRET, getTonnage(), false);
+		return new TankLocation(isSalvage(), Tank.LOC_TURRET, getUnitTonnage(), false);
+	}
+
+	@Override
+	public double getTonnage() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 }

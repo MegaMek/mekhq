@@ -103,10 +103,15 @@ public class MekLocation extends Part {
         computeCost();
     }
     
+    public double getTonnage() {
+    	//TODO: how much should this weigh?
+    	return 0;
+    }
+    
     protected void computeCost () {
-        double totalStructureCost = EquipmentType.getStructureCost(getStructureType()) * getTonnage();
+        double totalStructureCost = EquipmentType.getStructureCost(getStructureType()) * getUnitTonnage();
         int muscCost = isTsm() ? 16000 : 2000;
-        double totalMuscleCost = muscCost * getTonnage();
+        double totalMuscleCost = muscCost * getUnitTonnage();
         double cost = 0.1 * (totalStructureCost + totalMuscleCost);
 
         if (loc == Mech.LOC_HEAD) {
@@ -124,7 +129,7 @@ public class MekLocation extends Part {
                 && getName().equals(part.getName())
                 && getStatus().equals(part.getStatus())
                 && getLoc() == ((MekLocation)part).getLoc()
-                && getTonnage() == ((MekLocation)part).getTonnage()
+                && getUnitTonnage() == ((MekLocation)part).getUnitTonnage()
                 && isTsm() == ((MekLocation)part).isTsm()
                 && getStructureType() == ((MekLocation) part).getStructureType();
     }
@@ -241,7 +246,7 @@ public class MekLocation extends Part {
 
 	@Override
 	public Part getMissingPart() {
-		return new MissingMekLocation(isSalvage(), loc, getTonnage(), structureType, tsm);
+		return new MissingMekLocation(isSalvage(), loc, getUnitTonnage(), structureType, tsm);
 	}
 
 	@Override

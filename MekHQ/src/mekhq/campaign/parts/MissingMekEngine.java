@@ -61,9 +61,17 @@ public class MissingMekEngine extends MissingPart {
 		return engine;
 	}
 	
+	@Override
+	public double getTonnage() {
+		if(null != unit) {
+			return engine.getWeightEngine(unit.getEntity());
+		}
+		return 0;
+	}
+	
 	@Override 
 	protected void computeCost() {
-		double c = getEngine().getBaseCost() * getEngine().getRating() * getTonnage() / 75.0;
+		double c = getEngine().getBaseCost() * getEngine().getRating() * getUnitTonnage() / 75.0;
 		this.cost = (long) Math.round(c);
 	}
 
@@ -78,7 +86,7 @@ public class MissingMekEngine extends MissingPart {
 						.getRating()
 				&& getEngine().getTechType() == ((MekEngine) part).getEngine()
 						.getTechType()
-				&& getTonnage() == ((MekEngine) part).getTonnage();
+				&& getUnitTonnage() == ((MekEngine) part).getUnitTonnage();
 	}
 
 	@Override
@@ -240,7 +248,7 @@ public class MissingMekEngine extends MissingPart {
 				return getEngine().getEngineType() == eng.getEngineType()
 						&& getEngine().getRating() == eng.getRating()
 						&& getEngine().getTechType() == eng.getTechType()
-						&& getTonnage() == part.getTonnage();
+						&& getUnitTonnage() == part.getUnitTonnage();
 			}
 		}
 		return false;
@@ -259,7 +267,7 @@ public class MissingMekEngine extends MissingPart {
 
 	@Override
 	public Part getNewPart() {
-		return new MekEngine(isSalvage(), getTonnage(), 0, getEngine(), 0);
+		return new MekEngine(isSalvage(), getUnitTonnage(), 0, getEngine(), 0);
 	}
 
 

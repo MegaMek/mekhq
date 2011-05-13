@@ -84,7 +84,11 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	protected int id;
 	protected boolean salvage;
 	protected long cost;
-	protected int tonnage;
+	
+	//this is the unitTonnage which needs to be tracked for some parts
+	//even when off the unit. actual tonnage is returned via the 
+	//getTonnage() method
+	protected int unitTonnage;
 
 	//hits to this part
 	int hits;
@@ -113,7 +117,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	public Part(boolean salvage, int tonnage) {
 		this.name = "Unknown";
 		this.salvage = salvage;
-		this.tonnage = tonnage;
+		this.unitTonnage = tonnage;
 		this.cost = 0;
 		this.hits = 0;
 		this.skillMin = SupportTeam.EXP_GREEN;
@@ -150,9 +154,11 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		return cost;
 	}
 
-	public int getTonnage() {
-		return tonnage;
+	public int getUnitTonnage() {
+		return unitTonnage;
 	}
+	
+	public abstract double getTonnage();
 	
 	public Unit getUnit() {
 		return unit;
@@ -280,9 +286,9 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 				+salvage
 				+"</salvage>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<tonnage>"
-				+tonnage
-				+"</tonnage>");
+				+"<unitTonnage>"
+				+unitTonnage
+				+"</unitTonnage>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<hits>"
 				+hits
@@ -350,7 +356,10 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 					else
 						retVal.salvage = false;
 				} else if (wn2.getNodeName().equalsIgnoreCase("tonnage")) {
-					retVal.tonnage = Integer.parseInt(wn2.getTextContent());
+					//legacy effect
+					retVal.unitTonnage = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("unitTonnage")) {
+					retVal.unitTonnage = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("hits")) {
 					retVal.hits = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("difficulty")) {

@@ -56,6 +56,11 @@ public class AmmoStorage extends EquipmentPart {
         }
 
     }
+    
+    @Override
+    public double getTonnage() {
+    	return shots / ((AmmoType)type).getShots();
+    }
 
     public int getShots() {
     	return shots;

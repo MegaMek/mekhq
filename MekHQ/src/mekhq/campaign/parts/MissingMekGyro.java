@@ -64,13 +64,13 @@ public class MissingMekGyro extends MissingPart {
         double c = 0;
         
         if (getType() == Mech.GYRO_XL) {
-            c = 750000 * getGyroTonnage();
+            c = 750000 * getTonnage();
         } else if (getType() == Mech.GYRO_COMPACT) {
-            c = 400000 * getGyroTonnage();
+            c = 400000 * getTonnage();
         } else if (getType() == Mech.GYRO_HEAVY_DUTY) {
-            c = 500000 * getGyroTonnage();
+            c = 500000 * getTonnage();
         } else {
-            c = 300000 * getGyroTonnage();
+            c = 300000 * getTonnage();
         }
         
         this.cost = (long) Math.round(c);
@@ -81,7 +81,7 @@ public class MissingMekGyro extends MissingPart {
     }
     
     private int getGyroBaseTonnage() {
-    	return MekGyro.getGyroBaseTonnage(getWalkMP(), getTonnage());
+    	return MekGyro.getGyroBaseTonnage(getWalkMP(), getUnitTonnage());
     }
     
     public static double getGyroTonnage(double gyroBaseTonnage, int gyroType) {
@@ -100,7 +100,8 @@ public class MissingMekGyro extends MissingPart {
     	return MekGyro.getGyroTonnage(MekGyro.getGyroBaseTonnage(walkMP, unitTonnage), gyroType);
     }
     
-    public double getGyroTonnage() {
+    @Override
+    public double getTonnage() {
     	return MekGyro.getGyroTonnage(getGyroBaseTonnage(), getType());
     }
 
@@ -167,7 +168,7 @@ public class MissingMekGyro extends MissingPart {
 	public boolean isAcceptableReplacement(Part part) {
 		if(part instanceof MekGyro) {
 			MekGyro gyro = (MekGyro)part;
-			return type == gyro.getType() && getGyroTonnage() == gyro.getGyroTonnage();
+			return type == gyro.getType() && getTonnage() == gyro.getTonnage();
 		}
 		return false;
 	}
@@ -185,6 +186,6 @@ public class MissingMekGyro extends MissingPart {
 
 	@Override
 	public Part getNewPart() {
-		return new MekGyro(isSalvage(), getTonnage(), getType(), getWalkMP());
+		return new MekGyro(isSalvage(), getUnitTonnage(), getType(), getWalkMP());
 	}
 }

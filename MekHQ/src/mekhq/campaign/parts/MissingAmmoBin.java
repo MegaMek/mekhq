@@ -56,6 +56,6 @@ public class MissingAmmoBin extends MissingEquipmentPart {
 	
 	@Override
 	public Part getNewPart() {
-		return new AmmoBin(isSalvage(), getTonnage(), type, -1, ((AmmoType)type).getShots());
+		return new AmmoBin(isSalvage(), getUnitTonnage(), type, -1, ((AmmoType)type).getShots());
 	}
 }

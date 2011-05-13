@@ -90,7 +90,7 @@ public class TankLocation extends Part {
                 && getName().equals(part.getName())
                 && getStatus().equals(part.getStatus())
                 && getLoc() == ((TankLocation)part).getLoc()
-                && getTonnage() == ((TankLocation)part).getTonnage();
+                && getUnitTonnage() == ((TankLocation)part).getUnitTonnage();
     }
 
 	@Override
@@ -136,10 +136,10 @@ public class TankLocation extends Part {
 	@Override
 	public Part getMissingPart() {
 		if(isVTOL) {
-			return new MissingRotor(true, getTonnage());
+			return new MissingRotor(true, getUnitTonnage());
 		} else {
 			//this can only be a turret
-			return new MissingTurret(true, getTonnage());
+			return new MissingTurret(true, getUnitTonnage());
 		}
 	}
 
@@ -200,5 +200,11 @@ public class TankLocation extends Part {
 	@Override
 	public boolean isSalvaging() {
 		return salvaging && (loc == Tank.LOC_TURRET || loc == Tank.LOC_TURRET_2);
+	}
+
+	@Override
+	public double getTonnage() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 }

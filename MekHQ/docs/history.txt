@@ -82,6 +82,7 @@ v0.1.6 (SVN)
 + Bug 3301119: Doctor is not a recognized Personnel Type
 + getCost for units follows StratOps, pg. 181 (1/2 for undamaged, 1/3 for damaged, 1/10 for destroyed)
 + some improvements to part costs (but it is still a mess)
++ separate unit tonnage from part tonnage (part tonnage still needs lots of work)
 
 v0.1.5 (2011-05-05)
 + refactored Hangar Panel into separate Hangar and Repair Bay panel

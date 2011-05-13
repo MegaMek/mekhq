@@ -60,9 +60,17 @@ public class MekEngine extends Part {
 		return engine;
 	}
 	
+	@Override
+	public double getTonnage() {
+		if(null != unit) {
+			return engine.getWeightEngine(unit.getEntity());
+		}
+		return 0;
+	}
+	
 	@Override 
 	protected void computeCost() {
-		double c = getEngine().getBaseCost() * getEngine().getRating() * getTonnage() / 75.0;
+		double c = getEngine().getBaseCost() * getEngine().getRating() * getUnitTonnage() / 75.0;
 		this.cost = (long) Math.round(c);
 	}
 
@@ -77,7 +85,7 @@ public class MekEngine extends Part {
 						.getRating()
 				&& getEngine().getTechType() == ((MekEngine) part).getEngine()
 						.getTechType()
-				&& getTonnage() == ((MekEngine) part).getTonnage();
+				&& getUnitTonnage() == ((MekEngine) part).getUnitTonnage();
 	}
 
 	@Override
@@ -241,7 +249,7 @@ public class MekEngine extends Part {
 
 	@Override
 	public Part getMissingPart() {
-		return new MissingMekEngine(isSalvage(), getTonnage(), 0, getEngine(), 0);
+		return new MissingMekEngine(isSalvage(), getUnitTonnage(), 0, getEngine(), 0);
 	}
 
 	@Override

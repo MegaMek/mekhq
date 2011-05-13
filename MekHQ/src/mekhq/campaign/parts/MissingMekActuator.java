@@ -63,6 +63,13 @@ public class MissingMekActuator extends MissingPart {
         computeCost();
     }
 
+    @Override
+    public double getTonnage() {
+    	//TODO: how much do actuators weight?
+    	//apparently nothing
+    	return 0;
+    }
+    
     protected void computeCost () {
         long unitCost = 0;
         switch (getType()) {
@@ -101,7 +108,7 @@ public class MissingMekActuator extends MissingPart {
                 break;
             }
         }
-        this.cost = getTonnage() * unitCost;
+        this.cost = getUnitTonnage() * unitCost;
     }
 
     @Override
@@ -110,7 +117,7 @@ public class MissingMekActuator extends MissingPart {
                 && getName().equals(part.getName())
                 && getStatus().equals(part.getStatus())
                 && getType() == ((MekActuator)part).getType()
-                && getTonnage() == ((MekActuator)part).getTonnage();
+                && getUnitTonnage() == ((MekActuator)part).getUnitTonnage();
     }
 
     @Override
@@ -177,7 +184,7 @@ public class MissingMekActuator extends MissingPart {
 	public boolean isAcceptableReplacement(Part part) {
 		if(part instanceof MekActuator) {
 			MekActuator actuator = (MekActuator)part;
-			return actuator.getType() == type && tonnage == actuator.getTonnage();
+			return actuator.getType() == type && getUnitTonnage() == actuator.getUnitTonnage();
 		}
 		return false;
 	}
@@ -192,7 +199,7 @@ public class MissingMekActuator extends MissingPart {
 
 	@Override
 	public Part getNewPart() {
-		return new MekActuator(isSalvage(), getTonnage(), type, -1);
+		return new MekActuator(isSalvage(), getUnitTonnage(), type, -1);
 	}
 	
 	

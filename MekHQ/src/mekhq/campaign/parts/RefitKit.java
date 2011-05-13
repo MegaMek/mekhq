@@ -143,4 +143,10 @@ public class RefitKit extends Part {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public double getTonnage() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 }

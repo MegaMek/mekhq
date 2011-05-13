@@ -103,10 +103,15 @@ public class MissingMekLocation extends MissingPart {
         computeCost();
     }
     
+    public double getTonnage() {
+    	//TODO: how much should this weigh?
+    	return 0;
+    }
+    
     protected void computeCost() {
-        double totalStructureCost = EquipmentType.getStructureCost(getStructureType()) * getTonnage();
+        double totalStructureCost = EquipmentType.getStructureCost(getStructureType()) * getUnitTonnage();
         int muscCost = isTsm() ? 16000 : 2000;
-        double totalMuscleCost = muscCost * getTonnage();
+        double totalMuscleCost = muscCost * getUnitTonnage();
         double cost = 0.1 * (totalStructureCost + totalMuscleCost);
 
         if (loc == Mech.LOC_HEAD) {
@@ -124,7 +129,7 @@ public class MissingMekLocation extends MissingPart {
                 && getName().equals(part.getName())
                 && getStatus().equals(part.getStatus())
                 && getLoc() == ((MekLocation)part).getLoc()
-                && getTonnage() == ((MekLocation)part).getTonnage()
+                && getUnitTonnage() == ((MekLocation)part).getUnitTonnage()
                 && isTsm() == ((MekLocation)part).isTsm()
                 && getStructureType() == ((MekLocation) part).getStructureType();
     }
@@ -240,7 +245,7 @@ public class MissingMekLocation extends MissingPart {
 		if(part instanceof MekLocation) {
 			MekLocation mekLoc = (MekLocation)part;
 			return mekLoc.getLoc() == loc
-			&& mekLoc.getTonnage() == tonnage
+			&& mekLoc.getUnitTonnage() == getUnitTonnage()
 	        && mekLoc.isTsm() == tsm
 	        && mekLoc.getStructureType() == structureType;
 		}
@@ -264,6 +269,6 @@ public class MissingMekLocation extends MissingPart {
 
 	@Override
 	public Part getNewPart() {
-		return new MekLocation(isSalvage(), loc, getTonnage(), structureType, tsm);
+		return new MekLocation(isSalvage(), loc, getUnitTonnage(), structureType, tsm);
 	}
 }

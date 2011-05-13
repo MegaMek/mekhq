@@ -85,6 +85,14 @@ public class EquipmentPart extends Part {
         computeCost();
     }
 
+    @Override
+    public double getTonnage() {
+    	if(null != unit) {
+    		return type.getTonnage(unit.getEntity());
+    	}
+    	return 0;
+    }
+    
     /**
      * Copied from megamek.common.Entity.getWeaponsAndEquipmentCost(StringBuffer detail, boolean ignoreAmmo)
      *
@@ -135,7 +143,7 @@ public class EquipmentPart extends Part {
                         && getStatus().equals(part.getStatus())
                         && getType().equals( ((EquipmentPart)part).getType() );
         if (getType().getCost(null, false) == EquipmentType.COST_VARIABLE)
-            return b && getTonnage() == part.getTonnage();
+            return b && getUnitTonnage() == part.getUnitTonnage();
         else
             return b;
     }
@@ -224,7 +232,7 @@ public class EquipmentPart extends Part {
 
 	@Override
 	public Part getMissingPart() {
-		return new MissingEquipmentPart(isSalvage(), getTonnage(), type, equipmentNum);
+		return new MissingEquipmentPart(isSalvage(), getUnitTonnage(), type, equipmentNum);
 	}
 
 	@Override
