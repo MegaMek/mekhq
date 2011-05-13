@@ -43,10 +43,8 @@ public class MissingMekLifeSupport extends MissingPart {
 	public MissingMekLifeSupport(boolean salvage, int tonnage) {
         super(salvage, tonnage);
         this.name = "Mech Life Support System";
-        this.cost = 50000;
         this.time = 180;
         this.difficulty = -1;
-        computeCost();
     }
 
 	@Override
@@ -56,8 +54,8 @@ public class MissingMekLifeSupport extends MissingPart {
 	}
 	
 	@Override
-	protected void computeCost() {
-		this.cost = 50000;
+	public long getPurchasePrice() {
+		return 50000;
 	}
 	
     @Override

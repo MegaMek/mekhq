@@ -49,7 +49,6 @@ public class MekGyro extends Part {
         this.type = type;
         this.name = Mech.getGyroTypeString(type);
         this.walkMP = walkMP;
-        computeCost();
     }
     
     public int getType() {
@@ -91,7 +90,8 @@ public class MekGyro extends Part {
     	return MekGyro.getGyroTonnage(getGyroBaseTonnage(), getType());
     }
     
-    protected void computeCost() {
+    @Override
+    public long getCurrentValue() {
         double c = 0;
         
         if (getType() == Mech.GYRO_XL) {
@@ -104,7 +104,7 @@ public class MekGyro extends Part {
             c = 300000 * getTonnage();
         }
         
-        this.cost = (long) Math.round(c);
+        return (long) Math.round(c);
     }
  
     @Override

@@ -100,7 +100,6 @@ public class MissingMekLocation extends MissingPart {
         }
         this.time = 240;
         this.difficulty = 3;
-        computeCost();
     }
     
     public double getTonnage() {
@@ -108,7 +107,8 @@ public class MissingMekLocation extends MissingPart {
     	return 0;
     }
     
-    protected void computeCost() {
+    @Override
+    public long getPurchasePrice() {
         double totalStructureCost = EquipmentType.getStructureCost(getStructureType()) * getUnitTonnage();
         int muscCost = isTsm() ? 16000 : 2000;
         double totalMuscleCost = muscCost * getUnitTonnage();
@@ -120,7 +120,7 @@ public class MissingMekLocation extends MissingPart {
             cost += 200000;
         }
 
-        this.cost = (long) Math.round(cost);
+        return (long) Math.round(cost);
     }
 
     @Override

@@ -83,7 +83,6 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	protected String name;
 	protected int id;
 	protected boolean salvage;
-	protected long cost;
 	
 	//this is the unitTonnage which needs to be tracked for some parts
 	//even when off the unit. actual tonnage is returned via the 
@@ -118,7 +117,6 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		this.name = "Unknown";
 		this.salvage = salvage;
 		this.unitTonnage = tonnage;
-		this.cost = 0;
 		this.hits = 0;
 		this.skillMin = SupportTeam.EXP_GREEN;
 		this.mode = MODE_NORMAL;
@@ -150,9 +148,13 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		return name;
 	}
 
-	public long getCost() {
-		return cost;
-	}
+	/**
+	 * Determine the current value of the part - This 
+	 * can be tricky in the case of some parts that need
+	 * entity information to determine price
+	 * @return
+	 */
+	public abstract long getCurrentValue();
 
 	public int getUnitTonnage() {
 		return unitTonnage;
@@ -168,14 +170,9 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		this.unit = u;
 		if(null != unit) {
 			unitId = unit.getId();
-			computeCost();
 		} else {
 			unitId = -1;
 		}
-	}
-
-	protected void computeCost() {
-		cost = 0;
 	}
 	
 	public String getStatus() {
@@ -254,13 +251,6 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		return TechConstants.T_INTRO_BOXSET;
 	}
 
-	public String getCostString() {
-		NumberFormat numberFormat = DecimalFormat.getIntegerInstance();
-		String text = numberFormat.format(getCost()) + " "
-				+ (getCost() != 0 ? "CBills" : "CBill");
-		return text;
-	}
-
 	public abstract void writeToXml(PrintWriter pw1, int indent, int id);
 	
 	protected void writeToXmlBegin(PrintWriter pw1, int indent, int id) {
@@ -269,10 +259,6 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 				+"\" type=\""
 				+this.getClass().getName()
 				+"\">");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<cost>"
-				+cost
-				+"</cost>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<id>"
 				+this.id
@@ -344,9 +330,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 			for (int x=0; x<nl.getLength(); x++) {
 				Node wn2 = nl.item(x);
 				
-				if (wn2.getNodeName().equalsIgnoreCase("cost")) {
-					retVal.cost = Long.parseLong(wn2.getTextContent());
-				} else if (wn2.getNodeName().equalsIgnoreCase("id")) {
+				 if (wn2.getNodeName().equalsIgnoreCase("id")) {
 					retVal.id = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("name")) {
 					retVal.name = wn2.getTextContent();

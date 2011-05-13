@@ -84,13 +84,6 @@ public class GenericSparePart extends Part {
         return super.getDesc();
     }
 
-    @Override
-    public String getCostString () {
-        NumberFormat numberFormat = DecimalFormat.getIntegerInstance();
-        String text = numberFormat.format(getAmount()) + " " + (getAmount()!=0?"Parts":"Part");
-        return text;
-    }
-
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent, int id) {
 		writeToXmlBegin(pw1, indent, id);
@@ -175,6 +168,12 @@ public class GenericSparePart extends Part {
 
 	@Override
 	public double getTonnage() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public long getCurrentValue() {
 		// TODO Auto-generated method stub
 		return 0;
 	}

@@ -67,6 +67,33 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     public double getTonnage() {
     	return 1.0;
     }
+    
+    @Override
+    public long getCurrentValue() {
+    	//multiply full value of ammo ton by the percent of shots remaining
+    	return (long)(getPurchasePrice() * ((double)shotsNeeded / ((AmmoType)type).getShots()));
+    }
+    
+    @Override
+    public long getPurchasePrice() {
+    	//costs are a total nightmare
+        //some costs depend on entity, but we can't do it that way
+        //because spare parts don't have entities. If parts start on an entity
+        //thats fine, but this will become problematic when we set up a parts
+        //store
+    	if (unit == null)
+            return 0;
+
+        int itemCost = 0;
+        Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
+        if(null != mounted) {
+        	itemCost = (int) mounted.getType().getCost(unit.getEntity(), mounted.isArmored());
+            if (itemCost == EquipmentType.COST_VARIABLE) {
+                itemCost = mounted.getType().resolveVariableCost(unit.getEntity(), mounted.isArmored());
+            }
+        }
+        return itemCost;
+    }
 
     public int getShotsNeeded() {
     	return shotsNeeded;
@@ -335,7 +362,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 		toReturn += ">";
 		toReturn += "<b>" + type.getDesc() + "</b> " + bonus + "<br/>";
 		toReturn += ((AmmoType)type).getShots() + " shots (1 ton)<br/>";
-		toReturn += getCostString() + "<br/>";
+		toReturn += Utilities.getCurrencyString(getPurchasePrice()) + "<br/>";
 		toReturn += "</font></html>";
 		return toReturn;
 	}

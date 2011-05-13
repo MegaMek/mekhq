@@ -21,6 +21,8 @@
 
 package mekhq.campaign;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Vector;
@@ -148,4 +150,11 @@ public class Utilities {
             return false;
         return true;
     }
+    
+
+	public static String getCurrencyString(long value) {
+		NumberFormat numberFormat = DecimalFormat.getIntegerInstance();
+		String text = numberFormat.format(value) + " C-Bills";
+		return text;
+	}
 }

@@ -28,6 +28,7 @@ import megamek.common.EquipmentType;
 import megamek.common.TargetRoll;
 import mekhq.campaign.MekHqXmlSerializable;
 import mekhq.campaign.MekHqXmlUtil;
+import mekhq.campaign.Utilities;
 import mekhq.campaign.team.SupportTeam;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
@@ -53,6 +54,12 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 	public MissingPart(boolean salvage, int tonnage) {
 		super(salvage, tonnage);
 		this.checkedToday = false;
+	}
+	
+	@Override
+	public long getCurrentValue() {
+		//missing parts aren't worth a thing
+		return 0;
 	}
 	
 	@Override
@@ -221,7 +228,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		
 		toReturn += ">";
 		toReturn += "<b>" + getName() + "</b> " + bonus + "<br/>";
-		toReturn += getCostString() + "<br/>";
+		toReturn += Utilities.getCurrencyString(getPurchasePrice()) + "<br/>";
 		toReturn += "</font></html>";
 		return toReturn;
 	}

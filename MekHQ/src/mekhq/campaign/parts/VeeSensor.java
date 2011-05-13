@@ -118,4 +118,10 @@ public class VeeSensor extends Part {
 		// TODO Auto-generated method stub
 		return 0;
 	}
+
+	@Override
+	public long getCurrentValue() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 }

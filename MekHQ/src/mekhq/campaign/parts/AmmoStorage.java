@@ -25,6 +25,7 @@ import java.io.PrintWriter;
 
 import megamek.common.AmmoType;
 import megamek.common.EquipmentType;
+import megamek.common.Mounted;
 import megamek.common.TargetRoll;
 import mekhq.campaign.Era;
 import mekhq.campaign.MekHqXmlUtil;
@@ -59,7 +60,24 @@ public class AmmoStorage extends EquipmentPart {
     
     @Override
     public double getTonnage() {
-    	return shots / ((AmmoType)type).getShots();
+    	return ((double)shots / ((AmmoType)type).getShots());
+    }
+    
+    @Override
+    public long getCurrentValue() {
+    	//multiply full value of ammo ton by the percent of shots remaining
+    	if (unit == null)
+            return 0;
+
+        int itemCost = 0;
+        Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
+        if(null != mounted) {
+        	itemCost = (int) mounted.getType().getCost(unit.getEntity(), mounted.isArmored());
+            if (itemCost == EquipmentType.COST_VARIABLE) {
+                itemCost = mounted.getType().resolveVariableCost(unit.getEntity(), mounted.isArmored());
+            }
+        }
+    	return (long)(itemCost * ((double)shots / ((AmmoType)type).getShots()));
     }
 
     public int getShots() {

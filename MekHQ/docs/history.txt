@@ -85,6 +85,7 @@ v0.1.6 (SVN)
 + separate unit tonnage from part tonnage (part tonnage still needs lots of work)
 + show parts needed in unit table
 + Bug: current description not showing when editing missions and scenarios
++ replaced Part#computeCost with getCurrentValue and getPurchasePrice, removed static cost variable from Part
 
 v0.1.5 (2011-05-05)
 + refactored Hangar Panel into separate Hangar and Repair Bay panel

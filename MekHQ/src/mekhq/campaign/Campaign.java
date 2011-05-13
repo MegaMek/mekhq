@@ -692,7 +692,7 @@ public class Campaign implements Serializable {
 		report += " and rolls " + roll + ":";		
 		if(roll >= target.getValue()) {
 			report += " <font color='green'><b>part found.</b></font><br/>";
-			buyPart(acquisition.getNewPart(), acquisition.getCost());
+			buyPart(acquisition.getNewPart(), acquisition.getPurchasePrice());
 		} else {
 			report += " <font color='red'><b>part not available.</b></font>";
 		}
@@ -1142,7 +1142,7 @@ public class Campaign implements Serializable {
 	}
 
 	public void sellPart(Part part) {
-		long cost = part.getCost();
+		long cost = part.getCurrentValue();
 		finances.credit(cost, Transaction.C_EQUIP_SALE, "Sale of " + part.getName(), calendar.getTime());
 		removePart(part);
 	}

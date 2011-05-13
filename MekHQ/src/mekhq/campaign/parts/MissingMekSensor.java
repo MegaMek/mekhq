@@ -45,7 +45,6 @@ public class MissingMekSensor extends MissingPart {
         this.name = "Mech Sensors";
         this.time = 260;
         this.difficulty = 0;
-        computeCost();
     }
 	
 	@Override
@@ -54,8 +53,9 @@ public class MissingMekSensor extends MissingPart {
 		return 0;
 	}
 	
-	protected void computeCost() {
-		this.cost = 2000 * getUnitTonnage();
+	@Override
+	public long getPurchasePrice() {
+		return 2000 * getUnitTonnage();
 	}
 
     @Override

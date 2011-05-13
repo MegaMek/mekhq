@@ -46,7 +46,6 @@ public class RefitKit extends Part {
         super(salvage, tonnage);
         this.sourceName = sourceName;
         this.targetName = targetName;
-        this.cost = cost;
     }
     
     @Override
@@ -146,6 +145,12 @@ public class RefitKit extends Part {
 
 	@Override
 	public double getTonnage() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public long getCurrentValue() {
 		// TODO Auto-generated method stub
 		return 0;
 	}

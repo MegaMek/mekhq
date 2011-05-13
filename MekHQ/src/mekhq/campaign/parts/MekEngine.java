@@ -44,16 +44,14 @@ public class MekEngine extends Part {
 	protected Engine engine;
 
 	public MekEngine() {
-		this(false, 0, 0, new Engine(0, -1, -1), 0);
+		this(false, 0, new Engine(0, 0, -1));
 	}
 
-	public MekEngine(boolean salvage, int tonnage, int faction, Engine e,
-			double clanMultiplier) {
+	public MekEngine(boolean salvage, int tonnage, Engine e) {
 		super(salvage, tonnage);
 		this.engine = e;
 		this.name = engine.getEngineName() + " Engine";
 		this.engine = e;
-		computeCost();
 	}
 
 	public Engine getEngine() {
@@ -69,9 +67,8 @@ public class MekEngine extends Part {
 	}
 	
 	@Override 
-	protected void computeCost() {
-		double c = getEngine().getBaseCost() * getEngine().getRating() * getUnitTonnage() / 75.0;
-		this.cost = (long) Math.round(c);
+	public long getCurrentValue() {
+		return (long)Math.round(getEngine().getBaseCost() * getEngine().getRating() * getUnitTonnage() / 75.0);
 	}
 
 	@Override
@@ -84,8 +81,7 @@ public class MekEngine extends Part {
 				&& getEngine().getRating() == ((MekEngine) part).getEngine()
 						.getRating()
 				&& getEngine().getTechType() == ((MekEngine) part).getEngine()
-						.getTechType()
-				&& getUnitTonnage() == ((MekEngine) part).getUnitTonnage();
+						.getTechType();
 	}
 
 	@Override
@@ -249,7 +245,7 @@ public class MekEngine extends Part {
 
 	@Override
 	public Part getMissingPart() {
-		return new MissingMekEngine(isSalvage(), getUnitTonnage(), 0, getEngine(), 0);
+		return new MissingMekEngine(isSalvage(), getUnitTonnage(), getEngine());
 	}
 
 	@Override

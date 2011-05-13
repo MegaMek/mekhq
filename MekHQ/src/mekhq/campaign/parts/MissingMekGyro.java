@@ -60,7 +60,8 @@ public class MissingMekGyro extends MissingPart {
         return walkMP;
     }
     
-    protected void computeCost() {
+    @Override
+    public long getPurchasePrice() {
         double c = 0;
         
         if (getType() == Mech.GYRO_XL) {
@@ -73,7 +74,7 @@ public class MissingMekGyro extends MissingPart {
             c = 300000 * getTonnage();
         }
         
-        this.cost = (long) Math.round(c);
+        return (long) Math.round(c);
     }
   
     public static int getGyroBaseTonnage(int walkMP, int unitTonnage) {

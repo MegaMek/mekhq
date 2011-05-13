@@ -5471,7 +5471,7 @@ public class MekHQView extends FrameView {
 				return part.getName();
 			}
 			if(col == COL_COST) {
-				return part.getCost();
+				return Utilities.getCurrencyString(part.getCurrentValue());
 			}
 			if(col == COL_QUANTITY) {
 				return partInventory.getQuantity();

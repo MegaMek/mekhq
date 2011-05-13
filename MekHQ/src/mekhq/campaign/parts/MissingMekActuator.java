@@ -60,7 +60,6 @@ public class MissingMekActuator extends MissingPart {
         this.location = loc;
         this.time = 90;
         this.difficulty = -3;
-        computeCost();
     }
 
     @Override
@@ -70,7 +69,8 @@ public class MissingMekActuator extends MissingPart {
     	return 0;
     }
     
-    protected void computeCost () {
+    @Override
+    public long getPurchasePrice() {
         long unitCost = 0;
         switch (getType()) {
             case (Mech.ACTUATOR_UPPER_ARM) : {
@@ -108,7 +108,7 @@ public class MissingMekActuator extends MissingPart {
                 break;
             }
         }
-        this.cost = getUnitTonnage() * unitCost;
+       return getUnitTonnage() * unitCost;
     }
 
     @Override

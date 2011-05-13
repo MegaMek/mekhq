@@ -63,7 +63,6 @@ public class MekActuator extends Part {
         Mech m = new BipedMech();
         this.name = m.getSystemName(type) + " Actuator" ;
         this.location = loc;
-        computeCost();
     }
 
     @Override
@@ -74,7 +73,7 @@ public class MekActuator extends Part {
     }
     
     @Override
-    protected void computeCost() {
+    public long getCurrentValue() {
         long unitCost = 0;
         switch (getType()) {
             case (Mech.ACTUATOR_UPPER_ARM) : {
@@ -112,7 +111,7 @@ public class MekActuator extends Part {
                 break;
             }
         }
-        this.cost = getUnitTonnage() * unitCost;
+        return getUnitTonnage() * unitCost;
     }
 
     @Override

@@ -44,7 +44,6 @@ public class MekLifeSupport extends Part {
 	public MekLifeSupport(boolean salvage, int tonnage) {
         super(salvage, tonnage);
         this.name = "Mech Life Support System";
-        computeCost();
     }
 	
 	@Override
@@ -54,8 +53,8 @@ public class MekLifeSupport extends Part {
 	}
 	
 	@Override
-	protected void computeCost() {
-		this.cost = 50000;
+	public long getCurrentValue() {
+		return 50000;
 	}
 
     @Override

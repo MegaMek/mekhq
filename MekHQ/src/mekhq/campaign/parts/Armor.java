@@ -31,6 +31,7 @@ import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
 import mekhq.campaign.MekHqXmlUtil;
+import mekhq.campaign.Utilities;
 import mekhq.campaign.team.SupportTeam;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.Modes;
@@ -70,7 +71,6 @@ public class Armor extends Part implements IAcquisitionWork {
         if(type > -1) {
         	this.name += " (" + EquipmentType.armorNames[type] + ")";
         }
-        computeCost();
     }
     
     @Override
@@ -82,8 +82,15 @@ public class Armor extends Part implements IAcquisitionWork {
         return amount / armorPerTon;
     }
     
-    protected void computeCost() {
-    	this.cost = (int)(getTonnage() * EquipmentType.getArmorCost(type));
+    @Override
+    public long getCurrentValue() {
+    	return (long)(getTonnage() * EquipmentType.getArmorCost(type));
+    }
+    
+    @Override
+    public long getPurchasePrice() {
+    	//always in 5-ton increments
+    	return (long)(5 * EquipmentType.getArmorCost(type));
     }
     
     public String getDesc() {
@@ -482,7 +489,7 @@ public class Armor extends Part implements IAcquisitionWork {
 		
 		toReturn += ">";
 		toReturn += "<b>" + getName() + "</b> " + bonus + "<br/>";
-		toReturn += getCostString() + "<br/>";
+		toReturn += Utilities.getCurrencyString(getPurchasePrice()) + "<br/>";
 		toReturn += "</font></html>";
 		return toReturn;
 	}

@@ -100,7 +100,6 @@ public class MekLocation extends Part {
         if(tsm) {
             this.name += " (TSM)";
         }
-        computeCost();
     }
     
     public double getTonnage() {
@@ -108,7 +107,8 @@ public class MekLocation extends Part {
     	return 0;
     }
     
-    protected void computeCost () {
+    @Override
+    public long getCurrentValue() {
         double totalStructureCost = EquipmentType.getStructureCost(getStructureType()) * getUnitTonnage();
         int muscCost = isTsm() ? 16000 : 2000;
         double totalMuscleCost = muscCost * getUnitTonnage();
@@ -120,7 +120,7 @@ public class MekLocation extends Part {
             cost += 200000;
         }
 
-        this.cost = (long) Math.round(cost);
+        return (long) Math.round(cost);
     }
 
     @Override

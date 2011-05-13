@@ -57,10 +57,6 @@ public class EquipmentPart extends Part {
     public int getEquipmentNum() {
     	return equipmentNum;
     }
-
-    public void setCost(long cost) {
-        this.cost = cost;
-    }
     
     public void setEquipmentNum(int n) {
     	this.equipmentNum = n;
@@ -82,7 +78,6 @@ public class EquipmentPart extends Part {
         	this.typeName = type.getInternalName();
         }
         this.equipmentNum = equipNum;
-        computeCost();
     }
 
     @Override
@@ -96,17 +91,16 @@ public class EquipmentPart extends Part {
     /**
      * Copied from megamek.common.Entity.getWeaponsAndEquipmentCost(StringBuffer detail, boolean ignoreAmmo)
      *
-     * @param entity The entity the Equipment comes from / is added to
      */
     @Override
-    protected void computeCost() {
+    public long getCurrentValue() {
     	//costs are a total nightmare
         //some costs depend on entity, but we can't do it that way
         //because spare parts don't have entities. If parts start on an entity
         //thats fine, but this will become problematic when we set up a parts
         //store
     	if (unit == null)
-            return;
+            return 0;
 
         int itemCost = 0;
         Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
@@ -116,7 +110,7 @@ public class EquipmentPart extends Part {
                 itemCost = mounted.getType().resolveVariableCost(unit.getEntity(), mounted.isArmored());
             }
         }
-        this.cost = itemCost;
+        return itemCost;
     }
     
     /**

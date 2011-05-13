@@ -2194,7 +2194,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     	}
     	
     	if(null == engine && !(entity instanceof BattleArmor)) {
-    		engine = new MekEngine(false, (int) entity.getWeight(), campaign.getFaction(), entity.getEngine(), campaign.getCampaignOptions().getClanPriceModifier());
+    		engine = new MekEngine(false, (int) entity.getWeight(), entity.getEngine());
     		addPart(engine);
     		campaign.addPart(engine);
     	}
