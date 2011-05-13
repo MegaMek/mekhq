@@ -6070,7 +6070,7 @@ public class MekHQView extends FrameView {
                 return u.getPartsNeedingFixing().size();
             }
             if(col == COL_PARTS) {
-                return "?";//campaign.getTotalPartsFor(u.getId());
+                return u.getPartsNeeded().size();
             }
             if(col == COL_QUIRKS) {
             	return e.countQuirks();
