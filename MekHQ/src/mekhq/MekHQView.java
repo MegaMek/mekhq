@@ -149,6 +149,8 @@ import org.jdesktop.application.ResourceMap;
 import org.jdesktop.application.SingleFrameApplication;
 import org.jdesktop.application.TaskMonitor;
 
+import ch.rakudave.suggest.JSuggestField;
+
 /**
  * The application's main frame.
  */
@@ -385,6 +387,7 @@ public class MekHQView extends FrameView {
 		orgTree = new javax.swing.JTree();
 		panBriefing = new javax.swing.JPanel();
 		panelScenario = new javax.swing.JPanel();
+		panelMapView = new javax.swing.JPanel();
 		scrollScenarioTable = new javax.swing.JScrollPane();
 		scenarioTable = new javax.swing.JTable();
 		scrollMissionView = new javax.swing.JScrollPane();
@@ -759,13 +762,45 @@ public class MekHQView extends FrameView {
 				resourceMap.getString("panBriefing.TabConstraints.tabTitle"),
 				splitBrief); // NOI18N
 		
+		panelMapView.setFont(resourceMap.getFont("panHangar.font")); // NOI18N
+		panelMapView.setName("panelMapView"); // NOI18N
+		panelMapView.setLayout(new java.awt.GridBagLayout());
+		
+		suggestPlanet = new JSuggestField(this.getFrame(), campaign.getPlanetNames());
+		suggestPlanet.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				Planet p = campaign.getPlanet(suggestPlanet.getText());
+				if(null != p) {
+					panMap.setSelectedPlanet(p);
+					refreshPlanetView();
+				}
+			}
+		});
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.gridwidth = 0;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+		gridBagConstraints.weightx = 1.0;
+		gridBagConstraints.weighty = 0.0;
+		panelMapView.add(suggestPlanet, gridBagConstraints);
+		
 		panMap = new InterstellarMapPanel(campaign.getPlanets(), this);
 		panMap.setName("panMap"); // NOI18N		
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 1;
+		gridBagConstraints.gridwidth = 4;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+		gridBagConstraints.weightx = 1.0;
+		gridBagConstraints.weighty = 1.0;
+		panelMapView.add(panMap, gridBagConstraints);
+		
 		scrollPlanetView.setMinimumSize(new java.awt.Dimension(400, 600));
 		scrollPlanetView.setPreferredSize(new java.awt.Dimension(400, 2000));
 		scrollPlanetView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPlanetView.setViewportView(null);
-		splitMap = new javax.swing.JSplitPane(javax.swing.JSplitPane.HORIZONTAL_SPLIT,panMap, scrollPlanetView);
+		splitMap = new javax.swing.JSplitPane(javax.swing.JSplitPane.HORIZONTAL_SPLIT,panelMapView, scrollPlanetView);
 		splitMap.setOneTouchExpandable(true);
 		splitMap.setResizeWeight(1.0);
 		splitMap.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
@@ -7103,6 +7138,7 @@ public class MekHQView extends FrameView {
 	private javax.swing.JPanel panSupplies;
 	private javax.swing.JPanel panelDoTask;
 	private javax.swing.JPanel panelMasterButtons;
+	private javax.swing.JPanel panelMapView;
     private javax.swing.JSplitPane splitMain;
 	private javax.swing.JProgressBar progressBar;
 	private javax.swing.JScrollPane scrollDocTable;
@@ -7157,6 +7193,7 @@ public class MekHQView extends FrameView {
     private javax.swing.JLabel lblMission;
     private javax.swing.JComboBox choiceParts;
 	private javax.swing.JLabel lblPartsChoice;
+	private JSuggestField suggestPlanet;
 	// End of variables declaration//GEN-END:variables
 
 	private final Timer messageTimer;

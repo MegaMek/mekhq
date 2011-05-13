@@ -358,6 +358,15 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
     private int map2scrY(double y) {
         return (int) Math.round(getHeight() / 2 - y * conf.scale) + conf.offset.y;
     }
+    
+    public void setSelectedPlanet(Planet p) {
+    	selectedPlanet = p;
+    	if(conf.scale < 4.0) {
+			conf.scale = 4.0;
+		}
+		center(selectedPlanet);      
+    	repaint();
+    }
 
 	
 	protected void paintComponent(Graphics g) {

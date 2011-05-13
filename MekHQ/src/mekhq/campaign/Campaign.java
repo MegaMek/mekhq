@@ -33,6 +33,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -145,7 +146,7 @@ public class Campaign implements Serializable {
 
 	private Finances finances;
 
-	private transient ArrayList<Planet> planets = new ArrayList<Planet>();
+	private transient Hashtable<String, Planet> planets = new Hashtable<String, Planet>();
 
 	private CampaignOptions campaignOptions = new CampaignOptions();
 
@@ -1794,11 +1795,11 @@ public class Campaign implements Serializable {
 		}
 	}
 	
-	public static ArrayList<Planet> generatePlanets()
+	public static Hashtable<String,Planet> generatePlanets()
 		throws DOMException, ParseException {
 		MekHQApp.logMessage("Starting load of planetary data from XML...");
 		// Initialize variables.
-		ArrayList<Planet> retVal = new ArrayList<Planet>();
+		Hashtable<String,Planet> retVal = new Hashtable<String,Planet>();
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		Document xmlDoc = null;
 
@@ -1838,7 +1839,15 @@ public class Campaign implements Serializable {
 				String xn = wn.getNodeName();
 
 				if (xn.equalsIgnoreCase("planet")) {
-					retVal.add(Planet.getPlanetFromXML(wn));
+					Planet p = Planet.getPlanetFromXML(wn);
+					String name = p.getName() + " (" + Faction.getFactionName(p.getFaction()) + ")";
+					if(null == retVal.get(name)) {
+						retVal.put(name, p);
+					} else {
+						name += " 2";
+						retVal.put(name, p);
+					}
+					
 				}
 			}
 		}	
@@ -1847,7 +1856,23 @@ public class Campaign implements Serializable {
 	}
 	
 	public ArrayList<Planet> getPlanets() {
-		return planets;
+		ArrayList<Planet> plnts = new ArrayList<Planet>();
+		for(String key : planets.keySet()) {
+			plnts.add(planets.get(key));
+		}
+		return plnts;
+	}
+	
+	public Vector<String> getPlanetNames() {
+		Vector<String> plntNames = new Vector<String>();
+		for(String key : planets.keySet()) {
+			plntNames.add(key);
+		}
+		return plntNames;
+	}
+	
+	public Planet getPlanet(String name) {
+		return planets.get(name);
 	}
 	
 	/**
