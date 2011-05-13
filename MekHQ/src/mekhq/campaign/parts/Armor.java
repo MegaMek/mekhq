@@ -51,22 +51,20 @@ public class Armor extends Part implements IAcquisitionWork {
     private int location;
     private boolean rear;
     private boolean checkedToday;
+    private boolean clan;
     
     public Armor() {
-    	this(0, 0, 0);
+    	this(0, 0, 0, -1, false, false);
     }
     
-    public Armor(int tonnage, int t, int points) {
-    	this(tonnage, t, points, -1, false);
-    }
-    
-    public Armor(int tonnage, int t, int points, int loc, boolean r) {
+    public Armor(int tonnage, int t, int points, int loc, boolean r, boolean clan) {
         // Amount is used for armor quantity, not tonnage
         super(tonnage);
         this.type = t;
         this.amount = points;
         this.location = loc;
         this.rear = r;
+        this.clan = clan;
         this.name = "Armor";
         if(type > -1) {
         	this.name += " (" + EquipmentType.armorNames[type] + ")";
@@ -168,7 +166,7 @@ public class Armor extends Part implements IAcquisitionWork {
     @Override
     public boolean isSamePartTypeAndStatus (Part part) {
         return part instanceof Armor
-                && getType() == ((Armor)part).getType();
+                && getType() == ((Armor)part).getType() && isClanTechBase() == ((Armor)part).isClanTechBase();
     }
 
     @Override
@@ -176,6 +174,11 @@ public class Armor extends Part implements IAcquisitionWork {
         return PART_TYPE_ARMOR;
     }
 
+    @Override
+    public boolean isClanTechBase() {
+    	return clan;
+    }
+    
     @Override
     public int getTech () {
         // Armor tech base is not used (Clan/IS can use each other's armor for now)
@@ -189,12 +192,7 @@ public class Armor extends Part implements IAcquisitionWork {
         
         // this roundabout method is actually necessary to avoid rounding
         // weirdness. Yeah, it's dumb.
-
-        boolean isClanArmor = false;
-        if (isClanTechBase())
-            isClanArmor= true;
-
-        double armorPointMultiplier = EquipmentType.getArmorPointMultiplier(getType(), isClanArmor);
+        double armorPointMultiplier = EquipmentType.getArmorPointMultiplier(getType(), isClanTechBase());
         double armorPerTon = 16.0 * armorPointMultiplier;
         if (getType() == EquipmentType.T_ARMOR_HARDENED) {
             armorPerTon = 8.0;
@@ -232,6 +230,10 @@ public class Armor extends Part implements IAcquisitionWork {
 				+"<checkedToday>"
 				+checkedToday
 				+"</checkedToday>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<clan>"
+				+clan
+				+"</clan>");
 		writeToXmlEnd(pw1, indent, id);
 	}
 
@@ -261,6 +263,12 @@ public class Armor extends Part implements IAcquisitionWork {
 					checkedToday = true;
 				} else {
 					checkedToday = false;
+				}
+			} else if (wn2.getNodeName().equalsIgnoreCase("clan")) {
+				if(wn2.getTextContent().equalsIgnoreCase("true")) {
+					clan = true;
+				} else {
+					clan = false;
 				}
 			} 
 		}
@@ -379,7 +387,7 @@ public class Armor extends Part implements IAcquisitionWork {
 			for(Part part : unit.campaign.getSpareParts()) {
 				if(part instanceof Armor) {
 					Armor a = (Armor)part;
-					if(a.getType() == type) {
+					if(a.getType() == type && a.isClanTechBase() == clan) {
 						a.setAmount(a.getAmount() + amountNeeded);
 						unit.campaign.updateAllArmorForNewSpares();
 						return;
@@ -387,7 +395,7 @@ public class Armor extends Part implements IAcquisitionWork {
 				}
 			}
 			//if we are still here then we did not find any armor, so lets create a new part and stick it in spares
-			Armor newArmor = new Armor(getUnitTonnage(),type,amountNeeded,-1,false);
+			Armor newArmor = new Armor(getUnitTonnage(),type,amountNeeded,-1,false, isClanTechBase());
 			unit.campaign.addPart(newArmor);
 		}
 		updateConditionFromEntity();
@@ -512,7 +520,7 @@ public class Armor extends Part implements IAcquisitionWork {
 				armorPerTon = 8.0;
 			}
 			int points = (int) Math.floor(armorPerTon * 5);
-			return new Armor((int) unit.getEntity().getWeight(), armorType, points);
+			return new Armor((int) unit.getEntity().getWeight(), armorType, points, -1, false, isClanTechBase());
 		}
 		return null;
 	}
@@ -536,7 +544,7 @@ public class Armor extends Part implements IAcquisitionWork {
 			for(Part part : unit.campaign.getSpareParts()) {
 				if(part instanceof Armor) {
 					Armor a = (Armor)part;
-					if(a.getType() == type) {
+					if(a.getType() == type && a.isClanTechBase() == clan) {
 						return a.getAmount();
 					}
 				}
@@ -552,7 +560,7 @@ public class Armor extends Part implements IAcquisitionWork {
 			for(Part part : unit.campaign.getSpareParts()) {
 				if(part instanceof Armor) {
 					a = (Armor)part;
-					if(a.getType() == type) {
+					if(a.getType() == type && a.isClanTechBase() == clan) {
 						a.setAmount(a.getAmount() - amount);
 						break;
 					}

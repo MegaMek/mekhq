@@ -154,6 +154,11 @@ public class AmmoStorage extends EquipmentPart {
 	public int getTechRating() {
 		return type.getTechRating();
 	}
+	
+	@Override
+	public int getTechBase() {
+		return T_BOTH;
+	}
 
 	@Override
 	public void fix() {

@@ -167,6 +167,11 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 	public int getTechRating() {
 		return type.getTechRating();
 	}
+	
+	@Override
+	public int getTechBase() {
+		return T_BOTH;
+	}
 
 	@Override
 	public String getStatus() {

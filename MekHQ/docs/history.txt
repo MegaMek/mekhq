@@ -91,6 +91,7 @@ v0.1.6 (SVN)
 + improvements to replacement part checking
 + report details in parts table
 + values for equipment parts (catching NPE errors as a result of null entities)
++ boolean variable identifying clan-based armor in Armor.java
 
 v0.1.5 (2011-05-05)
 + refactored Hangar Panel into separate Hangar and Repair Bay panel

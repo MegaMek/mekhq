@@ -2161,12 +2161,12 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     			}
     		}
     		if(null == armor[i]) {
-    			Armor a = new Armor((int) getEntity().getWeight(), getEntity().getArmorType(i), getEntity().getOArmor(i, false), i, false);
+    			Armor a = new Armor((int) getEntity().getWeight(), getEntity().getArmorType(i), getEntity().getOArmor(i, false), i, false, entity.isClanArmor(i));
     			addPart(a);
     			campaign.addPart(a);
     		}
     		if(null == armorRear[i] && entity.hasRearArmor(i)) {
-    			Armor a = new Armor((int) getEntity().getWeight(), getEntity().getArmorType(i), getEntity().getOArmor(i, false), i, true);
+    			Armor a = new Armor((int) getEntity().getWeight(), getEntity().getArmorType(i), getEntity().getOArmor(i, false), i, true, entity.isClanArmor(i));
     			addPart(a);
     			campaign.addPart(a);
     		}

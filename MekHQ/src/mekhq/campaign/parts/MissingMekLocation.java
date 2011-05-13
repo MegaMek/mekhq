@@ -224,6 +224,11 @@ public class MissingMekLocation extends MissingPart {
 		}
 		
 	}
+	
+	@Override
+	public int getTechBase() {
+		return T_BOTH;
+	}
 
 	@Override
 	public boolean isAcceptableReplacement(Part part) {
