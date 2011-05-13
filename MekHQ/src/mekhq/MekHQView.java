@@ -213,6 +213,7 @@ public class MekHQView extends FrameView {
 	private OrgTreeMouseAdapter orgMouseAdapter;
 	private ScenarioTableMouseAdapter scenarioMouseAdapter;
 	private TableRowSorter<PersonnelTableModel> personnelSorter;
+	private TableRowSorter<PartsTableModel> partsSorter;
 	private TableRowSorter<UnitTableModel> unitSorter;
 	private int currentServicedUnitId;
 	private int currentAcquisitionId;
@@ -997,8 +998,16 @@ public class MekHQView extends FrameView {
 		
 		partsTable.setModel(partsModel);
 		partsTable.setName("partsTable"); // NOI18N
-		//partsTable.getColumnModel().getColumn(0)
-			//	.setCellRenderer(partsModel.getRenderer());
+		partsSorter = new TableRowSorter<PartsTableModel>(partsModel);
+        //personnelSorter.setComparator(PersonnelTableModel.COL_GUN, new SkillSorter());
+        partsTable.setRowSorter(partsSorter);
+		column = null;
+        for (int i = 0; i < PartsTableModel.N_COL; i++) {
+            column = partsTable.getColumnModel().getColumn(i);
+            column.setPreferredWidth(partsModel.getColumnWidth(i));
+            column.setCellRenderer(partsModel.getRenderer());
+        }
+        partsTable.setIntercellSpacing(new Dimension(0, 0));
 		partsTable.getSelectionModel().addListSelectionListener(
 				new javax.swing.event.ListSelectionListener() {
 					public void valueChanged(
@@ -5430,10 +5439,10 @@ public class MekHQView extends FrameView {
 		private final static int COL_NAME    =    0;
 		private final static int COL_DETAIL   =   1;
 		private final static int COL_TECH_BASE  = 2;
-		private final static int COL_COST     =   3;
-        private final static int COL_QUANTITY   = 4;
-        private final static int COL_TON       =  5;
-        private final static int COL_STATUS   =   6;
+        private final static int COL_STATUS   =   3;
+		private final static int COL_COST     =   4;
+        private final static int COL_QUANTITY   = 5;
+        private final static int COL_TON       =  6;
         private final static int N_COL          = 7;
 		
 		public PartsTableModel() {
@@ -5471,8 +5480,14 @@ public class MekHQView extends FrameView {
         }
 
 		public Object getValueAt(int row, int col) {
-			PartInventory partInventory = (PartInventory) data.get(row);
+	        PartInventory partInventory;
+	        if(data.isEmpty()) {
+	        	return "";
+	        } else {
+	        	partInventory = (PartInventory)data.get(row);
+	        }
 			Part part = partInventory.getPart();
+			DecimalFormat format = new DecimalFormat();
 			if(col == COL_NAME) {
 				return part.getName();
 			}
@@ -5480,7 +5495,7 @@ public class MekHQView extends FrameView {
 				return part.getDetails();
 			}
 			if(col == COL_COST) {
-				return Utilities.getCurrencyString(part.getCurrentValue());
+				return format.format(part.getCurrentValue());
 			}
 			if(col == COL_QUANTITY) {
 				return partInventory.getQuantity();
@@ -5509,6 +5524,60 @@ public class MekHQView extends FrameView {
 			}
 			return parts;
 		}
+		
+		 public int getColumnWidth(int c) {
+	            switch(c) {
+	            case COL_NAME:
+	        	case COL_DETAIL:
+	        		return 100;
+	            case COL_STATUS:
+	            case COL_TECH_BASE:
+	                return 40;        
+	            default:
+	                return 10;
+	            }
+	        }
+	        
+	        public int getAlignment(int col) {
+	            switch(col) {
+	            case COL_COST:
+	            case COL_QUANTITY:
+	            case COL_TON:
+	            	return SwingConstants.RIGHT;
+	            default:
+	            	return SwingConstants.LEFT;
+	            }
+	        }
+
+	        public String getTooltip(int row, int col) {
+	        	switch(col) {
+	            default:
+	            	return null;
+	            }
+	        }
+	        public PartsTableModel.Renderer getRenderer() {
+				return new PartsTableModel.Renderer();
+			}
+
+			public class Renderer extends DefaultTableCellRenderer {
+
+				private static final long serialVersionUID = 9054581142945717303L;
+
+				public Component getTableCellRendererComponent(JTable table,
+						Object value, boolean isSelected, boolean hasFocus,
+						int row, int column) {
+					super.getTableCellRendererComponent(table, value, isSelected,
+							hasFocus, row, column);
+					setOpaque(true);
+					int actualCol = table.convertColumnIndexToModel(column);
+					int actualRow = table.convertRowIndexToModel(row);
+					setHorizontalAlignment(getAlignment(actualCol));
+					setToolTipText(getTooltip(actualRow, actualCol));
+					
+					return this;
+				}
+
+			}
 	}
 
 	public class PartsTableMouseAdapter extends MouseInputAdapter implements
