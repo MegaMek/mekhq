@@ -193,7 +193,7 @@ public class AmmoStorage extends EquipmentPart {
 	
     @Override
     public String getDetails() {
-    	return ((AmmoType)type).getDesc() + ", " + shots + " shots";
+    	return shots + " shots";
     }
 	
 	@Override

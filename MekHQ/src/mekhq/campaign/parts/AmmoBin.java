@@ -159,6 +159,19 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 	}
 
 	@Override
+	public String getStatus() {
+		String toReturn = "Fully Loaded";
+		if(needsFixing()) {
+			if(shotsNeeded >= ((AmmoType)type).getShots()) {
+				toReturn = "Empty";
+			} else {
+				toReturn = "Partially Loaded";
+			}
+		}
+		return toReturn;
+	}
+	
+	@Override
 	public void fix() {
 		int shots = Math.min(getAmountAvailable(), shotsNeeded);
 		if(null != unit) {
@@ -300,9 +313,13 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     @Override
     public String getDetails() {
     	if(isSalvaging()) {
-    		super.getDetails();
+    		return super.getDetails();
     	}
-    	return ((AmmoType)type).getDesc() + ", " + shotsNeeded + " shots needed";
+    	if(null != unit) {
+    		return ((AmmoType)type).getDesc() + ", " + shotsNeeded + " shots needed";
+    	} else {
+    		return "";
+    	}
     }
 	
 	@Override

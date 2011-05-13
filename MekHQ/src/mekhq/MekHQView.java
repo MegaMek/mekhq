@@ -5427,12 +5427,13 @@ public class MekHQView extends FrameView {
 	public class PartsTableModel extends ArrayTableModel {
 		private static final long serialVersionUID = 534443424190075264L;
 
-		private final static int COL_NAME =    0;
-		private final static int COL_COST   =   1;
-        private final static int COL_QUANTITY = 2;
-        private final static int COL_TON    =  3;
-        private final static int COL_STATUS     =   4;
-        private final static int N_COL = 5;
+		private final static int COL_NAME    =    0;
+		private final static int COL_DETAIL   =   1;
+		private final static int COL_COST     =   2;
+        private final static int COL_QUANTITY   = 3;
+        private final static int COL_TON       =  4;
+        private final static int COL_STATUS   =   5;
+        private final static int N_COL          = 6;
 		
 		public PartsTableModel() {
 			data = new ArrayList<PartInventory>();
@@ -5452,13 +5453,15 @@ public class MekHQView extends FrameView {
             	case COL_NAME:
             		return "Name";
                 case COL_COST:
-                    return "Cost";
+                    return "Value";
                 case COL_QUANTITY:
                     return "#";
                 case COL_TON:
                     return "Tonnage";
                 case COL_STATUS:
                     return "Status";
+                case COL_DETAIL:
+                    return "Detail";
                 default:
                     return "?";
             }
@@ -5469,6 +5472,9 @@ public class MekHQView extends FrameView {
 			Part part = partInventory.getPart();
 			if(col == COL_NAME) {
 				return part.getName();
+			}
+			if(col == COL_DETAIL) {
+				return part.getDetails();
 			}
 			if(col == COL_COST) {
 				return Utilities.getCurrencyString(part.getCurrentValue());

@@ -75,7 +75,7 @@ public class Armor extends Part implements IAcquisitionWork {
     
     @Override
     public double getTonnage() {
-    	double armorPerTon = 16.0 * EquipmentType.getArmorPointMultiplier(type);
+    	double armorPerTon = 16.0 * EquipmentType.getArmorPointMultiplier(type, isClanTechBase());
         if (type == EquipmentType.T_ARMOR_HARDENED) {
             armorPerTon = 8.0;
         }
@@ -142,7 +142,7 @@ public class Armor extends Part implements IAcquisitionWork {
 			}
 			return unit.getEntity().getLocationName(location) + rearMount + ", " + amountNeeded + " points" + availability;
 		}
-		return "";
+		return amount + " points";
 	}
     
     public int getType() {
