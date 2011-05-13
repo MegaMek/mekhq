@@ -95,6 +95,7 @@ v0.1.6 (SVN)
 + tonnage for equipment parts (catching NPE errors as a result of null entities)
 + improvements to look of parts table
 + don't load a damaged replacement part if an undamaged one exists
++ SubmitBug.html
 
 v0.1.5 (2011-05-05)
 + refactored Hangar Panel into separate Hangar and Repair Bay panel
