@@ -98,6 +98,7 @@ v0.1.6 (SVN)
 + SubmitBug.html
 + filter for parts table
 + very basic Jtextfield with auto-complete for planet searching
++ added temperature, surface water, and life forms to planet view panel
 
 v0.1.5 (2011-05-05)
 + refactored Hangar Panel into separate Hangar and Repair Bay panel

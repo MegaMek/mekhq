@@ -40,8 +40,14 @@ public class PlanetViewPanel extends javax.swing.JPanel {
 	private javax.swing.JLabel lblGravity2;
 	private javax.swing.JLabel lblPressure1;
 	private javax.swing.JLabel lblPressure2;
+	private javax.swing.JLabel lblTemp1;
+	private javax.swing.JLabel lblTemp2;
+	private javax.swing.JLabel lblWater1;
+	private javax.swing.JLabel lblWater2;
 	private javax.swing.JLabel lblRecharge1;
 	private javax.swing.JLabel lblRecharge2;
+	private javax.swing.JLabel lblAnimal1;
+	private javax.swing.JLabel lblAnimal2;
 
 	
 	public PlanetViewPanel(Planet p, Campaign c) {
@@ -106,8 +112,14 @@ public class PlanetViewPanel extends javax.swing.JPanel {
     	lblGravity2 = new javax.swing.JLabel();
     	lblPressure1 = new javax.swing.JLabel();
     	lblPressure2 = new javax.swing.JLabel();
+    	lblTemp1 = new javax.swing.JLabel();
+    	lblTemp2 = new javax.swing.JLabel();
+    	lblWater1 = new javax.swing.JLabel();
+    	lblWater2 = new javax.swing.JLabel();
     	lblRecharge1 = new javax.swing.JLabel();
     	lblRecharge2 = new javax.swing.JLabel();
+    	lblAnimal1 = new javax.swing.JLabel();
+    	lblAnimal2 = new javax.swing.JLabel();
     	
     	
     	java.awt.GridBagConstraints gridBagConstraints;
@@ -208,11 +220,51 @@ public class PlanetViewPanel extends javax.swing.JPanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblPressure2, gridBagConstraints);
 		
+		lblTemp1.setName("lblTemp1"); // NOI18N
+		lblTemp1.setText(resourceMap.getString("lblTemp1.text"));
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 5;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+		pnlStats.add(lblTemp1, gridBagConstraints);
+		
+		lblTemp2.setName("lblTemp2"); // NOI18N
+		lblTemp2.setText(planet.getTemperature() + "C (" + planet.getClimateName() + ")");
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 1;
+		gridBagConstraints.gridy = 5;
+		gridBagConstraints.weightx = 0.5;
+		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+		pnlStats.add(lblTemp2, gridBagConstraints);
+		
+		lblWater1.setName("lblWater1"); // NOI18N
+		lblWater1.setText(resourceMap.getString("lblWater1.text"));
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 6;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+		pnlStats.add(lblWater1, gridBagConstraints);
+		
+		lblWater2.setName("lblWater2"); // NOI18N
+		lblWater2.setText(planet.getPercentWater() + " percent");
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 1;
+		gridBagConstraints.gridy = 6;
+		gridBagConstraints.weightx = 0.5;
+		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+		pnlStats.add(lblWater2, gridBagConstraints);
+		
 		lblRecharge1.setName("lblRecharge1"); // NOI18N
 		lblRecharge1.setText(resourceMap.getString("lblRecharge1.text"));
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 5;
+		gridBagConstraints.gridy = 7;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblRecharge1, gridBagConstraints);
@@ -221,12 +273,32 @@ public class PlanetViewPanel extends javax.swing.JPanel {
 		lblRecharge2.setText(planet.getRechargeStations());
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 5;
+		gridBagConstraints.gridy = 7;
 		gridBagConstraints.weightx = 0.5;
 		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblRecharge2, gridBagConstraints);
+		
+		lblAnimal1.setName("lblAnimal1"); // NOI18N
+		lblAnimal1.setText(resourceMap.getString("lblAnimal1.text"));
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 8;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+		pnlStats.add(lblAnimal1, gridBagConstraints);
+		
+		lblAnimal2.setName("lblAnimal2"); // NOI18N
+		lblAnimal2.setText(planet.getLifeFormName());
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 1;
+		gridBagConstraints.gridy = 8;
+		gridBagConstraints.weightx = 0.5;
+		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+		pnlStats.add(lblAnimal2, gridBagConstraints);
 		
     }
 }
