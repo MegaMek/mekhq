@@ -101,11 +101,13 @@ import megamek.common.EntityWeightClass;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
+import megamek.common.MiscType;
 import megamek.common.Mounted;
 import megamek.common.Pilot;
 import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
 import megamek.common.UnitType;
+import megamek.common.WeaponType;
 import megamek.common.XMLStreamParser;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.IOption;
@@ -122,7 +124,16 @@ import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.AmmoBin;
+import mekhq.campaign.parts.Armor;
+import mekhq.campaign.parts.EquipmentPart;
+import mekhq.campaign.parts.MekActuator;
+import mekhq.campaign.parts.MekEngine;
+import mekhq.campaign.parts.MekGyro;
+import mekhq.campaign.parts.MekLifeSupport;
+import mekhq.campaign.parts.MekLocation;
+import mekhq.campaign.parts.MekSensor;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.TankLocation;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PilotPerson;
 import mekhq.campaign.personnel.SupportPerson;
@@ -158,6 +169,21 @@ public class MekHQView extends FrameView {
 	private static final int PG_MIA =     11;
 	private static final int PG_KIA =     12;
 	private static final int PG_NUM =     13;
+	
+	//parts filter groups
+	private static final int SG_ALL      = 0;
+	private static final int SG_ARMOR    = 1;
+	private static final int SG_SYSTEM   = 2;
+	private static final int SG_EQUIP    = 3;
+	private static final int SG_LOC      = 4;
+	private static final int SG_WEAP     = 5;
+	private static final int SG_AMMO     = 6;
+	private static final int SG_MISC     = 7;
+	private static final int SG_ENGINE   = 8;
+	private static final int SG_GYRO     = 9;
+	private static final int SG_ACT      = 10;
+	private static final int SG_DAMAGE   = 11;
+	private static final int SG_NUM      = 12;
 	
 	//personnel views
 	private static final int PV_GENERAL = 0;
@@ -448,6 +474,8 @@ public class MekHQView extends FrameView {
 		scrollUnitView = new javax.swing.JScrollPane();
 		scrollForceView = new javax.swing.JScrollPane();
 		scrollPlanetView = new javax.swing.JScrollPane();
+		lblPartsChoice = new javax.swing.JLabel();
+		choiceParts = new javax.swing.JComboBox();
 		
 		org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application
 				.getInstance(mekhq.MekHQApp.class).getContext()
@@ -996,6 +1024,36 @@ public class MekHQView extends FrameView {
 		panSupplies.setFont(resourceMap.getFont("panHangar.font")); // NOI18N
 		panSupplies.setLayout(new java.awt.GridBagLayout());
 		
+		lblPartsChoice.setText(resourceMap.getString("lblPartsChoice.text")); // NOI18N
+		lblPartsChoice.setName("lblPartsChoice"); // NOI18N
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.weightx = 0.0;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+		panSupplies.add(lblPartsChoice, gridBagConstraints);
+		
+		DefaultComboBoxModel partsGroupModel = new DefaultComboBoxModel();
+		for (int i = 0; i < SG_NUM; i++) {
+			partsGroupModel.addElement(getPartsGroupName(i));
+		}
+		choiceParts.setModel(partsGroupModel);
+		choiceParts.setName("choiceParts"); // NOI18N
+		choiceParts.setSelectedIndex(0);
+		choiceParts.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				filterParts();
+			}
+		});
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 1;
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+		gridBagConstraints.weightx = 1.0;
+		gridBagConstraints.weighty = 0.0;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+		panSupplies.add(choiceParts, gridBagConstraints);
+		
 		partsTable.setModel(partsModel);
 		partsTable.setName("partsTable"); // NOI18N
 		partsSorter = new TableRowSorter<PartsTableModel>(partsModel);
@@ -1022,7 +1080,7 @@ public class MekHQView extends FrameView {
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 1;
-		gridBagConstraints.gridwidth = 4;
+		gridBagConstraints.gridwidth = 2;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		gridBagConstraints.weightx = 1.0;
@@ -2143,6 +2201,37 @@ public class MekHQView extends FrameView {
     	}
     }
 	
+	public static String getPartsGroupName(int group) {
+    	switch(group) {
+    	case SG_ALL:
+    		return "All Parts";
+    	case SG_ARMOR:
+    		return "Armor";
+    	case SG_SYSTEM:
+    		return "System Components";
+    	case SG_EQUIP:
+    		return "Equipment";
+    	case SG_LOC:
+    		return "Locations";
+    	case SG_WEAP:
+    		return "Weapons";
+    	case SG_AMMO:
+    		return "Ammunition";
+    	case SG_MISC:
+    		return "Miscellaneous Equipment";
+    	case SG_ENGINE:
+    		return "Engines";
+    	case SG_GYRO:
+    		return "Gyros";
+    	case SG_ACT:
+    		return "Actuators";
+    	case SG_DAMAGE:
+    		return "Damaged Parts";
+    	default:
+    		return "?";
+    	}
+    }
+	
 	public static String getPersonnelViewName(int group) {
     	switch(group) {
     	case PV_GENERAL:
@@ -2782,6 +2871,49 @@ public class MekHQView extends FrameView {
         	}
         };
         personnelSorter.setRowFilter(personTypeFilter);
+    }
+	
+	void filterParts() {
+        RowFilter<PartsTableModel, Integer> partsTypeFilter = null;
+        final int nGroup = choiceParts.getSelectedIndex();
+        partsTypeFilter = new RowFilter<PartsTableModel,Integer>() {
+        	@Override
+        	public boolean include(Entry<? extends PartsTableModel, ? extends Integer> entry) {
+        		PartsTableModel partsModel = entry.getModel();
+        		Part part = partsModel.getPartAt(entry.getIdentifier());
+        		if(nGroup == SG_ALL) {
+        			return true;
+        		} else if(nGroup == SG_ARMOR) {
+        			return part instanceof Armor;
+        		} else if(nGroup == SG_SYSTEM) {
+        			return part instanceof MekGyro 
+        				|| part instanceof MekEngine
+        				|| part instanceof MekActuator
+        				|| part instanceof MekLifeSupport
+        				|| part instanceof MekSensor;
+        		} else if(nGroup == SG_EQUIP) {
+        			return part instanceof EquipmentPart;
+        		} else if(nGroup == SG_LOC) {
+        			return part instanceof MekLocation || part instanceof TankLocation;
+        		} else if(nGroup == SG_WEAP) {
+        			return part instanceof EquipmentPart && ((EquipmentPart)part).getType() instanceof WeaponType;
+        		} else if(nGroup == SG_AMMO) {
+        			return part instanceof EquipmentPart && ((EquipmentPart)part).getType() instanceof AmmoType;
+        		} else if(nGroup == SG_MISC) {
+        			return part instanceof EquipmentPart && ((EquipmentPart)part).getType() instanceof MiscType;
+        		} else if(nGroup == SG_ENGINE) {
+        			return part instanceof MekEngine;
+        		} else if(nGroup == SG_GYRO) {
+        			return part instanceof MekGyro;
+        		} else if(nGroup == SG_ACT) {
+        			return part instanceof MekActuator;
+        		} else if(nGroup == SG_DAMAGE) {
+        			return part.needsFixing();
+        		}
+        		return false;
+        	}
+        };
+        partsSorter.setRowFilter(partsTypeFilter);
     }
 	
 	void filterUnits() {
@@ -7023,6 +7155,8 @@ public class MekHQView extends FrameView {
     private javax.swing.JSplitPane splitBrief;
     private javax.swing.JSplitPane splitMission;
     private javax.swing.JLabel lblMission;
+    private javax.swing.JComboBox choiceParts;
+	private javax.swing.JLabel lblPartsChoice;
 	// End of variables declaration//GEN-END:variables
 
 	private final Timer messageTimer;

@@ -96,6 +96,7 @@ v0.1.6 (SVN)
 + improvements to look of parts table
 + don't load a damaged replacement part if an undamaged one exists
 + SubmitBug.html
++ filter for parts table
 
 v0.1.5 (2011-05-05)
 + refactored Hangar Panel into separate Hangar and Repair Bay panel
