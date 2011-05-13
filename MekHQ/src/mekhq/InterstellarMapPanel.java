@@ -375,14 +375,25 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
 		int size = (int) Math.round(Math.max(5, Math.log(conf.scale) * 15 + 5));
         size = Math.max(Math.min(size, conf.maxdotSize), conf.minDotSize);
         
+        //first get the jump diameter for selected planet
+        if(null != selectedPlanet && conf.scale > conf.showPlanetNamesThreshold) {
+        	int x = map2scrX(selectedPlanet.getX());
+			int y = map2scrY(selectedPlanet.getY());
+			int z = map2scrX(selectedPlanet.getX() + 30);
+			int jumpdiameter = 2 * (z - x);
+			g.setColor(Color.DARK_GRAY);
+			g.fillArc(x-jumpdiameter/2, y-jumpdiameter/2, jumpdiameter, jumpdiameter, 0, 360);	
+			
+        }
+        
 		for(Planet planet : planets) {
 			int x = map2scrX(planet.getX());
 			int y = map2scrY(planet.getY());
 			
-			if(null != selectedPlanet && selectedPlanet.equals(planet)) {
+			if(null != selectedPlanet && selectedPlanet.equals(planet)) {	
 				g.setColor(Color.WHITE);
 				int adjust = size/2;
-				g.fillArc(x-adjust/2, y-adjust/2, size+adjust, size+adjust, 0, 360);	
+				g.fillArc(x-adjust/2, y-adjust/2, size+adjust, size+adjust, 0, 360);
 			}
 			g.setColor(Faction.getFactionColor(planet.getFaction()));
 			g.fillArc(x, y, size, size, 0, 360);	
