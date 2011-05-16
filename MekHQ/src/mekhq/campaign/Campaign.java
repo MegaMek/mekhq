@@ -702,6 +702,7 @@ public class Campaign implements Serializable {
 	}
 	
 	public void fixPart(IPartWork partWork, TechTeam t) {
+		TargetRoll target = t.getTargetFor(partWork);
 		String report = "";
 		String action = " fix ";
 		if(partWork instanceof AmmoBin) {
@@ -739,7 +740,6 @@ public class Campaign implements Serializable {
 		} else {
 			t.setMinutesLeft(t.getMinutesLeft() - minutes);
 		}
-		TargetRoll target = t.getTargetFor(partWork);
 		//check for the type
 		int roll;
 		String wrongType = "";
