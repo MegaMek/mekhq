@@ -115,6 +115,7 @@ v0.1.6 (SVN)
 + Bug: get target number before reducing time in Campaign#fixParts
 + Bug: gyro not fixing the first time
 + Bug: salvage units disappear from unit list sometimes
++ Bug: non-hittable slots remaine critted when location is replaced
 
 v0.1.5 (2011-05-05)
 + refactored Hangar Panel into separate Hangar and Repair Bay panel

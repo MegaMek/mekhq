@@ -27,6 +27,7 @@ import megamek.common.CriticalSlot;
 import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
 import megamek.common.Mech;
+import megamek.common.Mounted;
 import mekhq.campaign.MekHqXmlUtil;
 
 import org.w3c.dom.Node;
@@ -315,6 +316,20 @@ public class MekLocation extends Part {
 			}
 			else if(loc == Mech.LOC_RLEG || loc == Mech.LOC_LLEG) {
 				unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_HIP, loc);
+			}
+			//TODO: we need to cycle through slots and remove crits on non-hittable ones
+			//We shouldn't have to do this, these slots should not be hit in MM
+			for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
+	            CriticalSlot slot = unit.getEntity().getCritical(loc, i);
+	            if ((slot != null) && !slot.isEverHittable()) {
+	                slot.setDestroyed(false);
+	                slot.setHit(false);
+	                slot.setRepairable(true);
+	                Mounted m = slot.getMount();
+	                m.setHit(false);
+	                m.setDestroyed(false);
+	                m.setRepairable(true);
+	            }
 			}
 		}
 	}
