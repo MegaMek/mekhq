@@ -107,6 +107,7 @@ v0.1.6 (SVN)
 + Bug: problems with restoring some equipment parts
 + acuisition list not updating when parts removed
 + separate HeatSink part inheriting from EquipmentPart
++ separate JumpJet part inheriting from EquipmentPart
 
 v0.1.5 (2011-05-05)
 + refactored Hangar Panel into separate Hangar and Repair Bay panel

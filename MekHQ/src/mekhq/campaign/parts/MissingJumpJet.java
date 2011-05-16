@@ -1,5 +1,5 @@
 /*
- * MissingEquipmentPart.java
+ * MissingJumpJet.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -21,41 +21,27 @@
 
 package mekhq.campaign.parts;
 
-import java.io.PrintWriter;
-
-import megamek.common.AmmoType;
-import megamek.common.CriticalSlot;
-import megamek.common.Entity;
 import megamek.common.EquipmentType;
-import megamek.common.MiscType;
-import megamek.common.Mounted;
-import megamek.common.TechConstants;
-import megamek.common.weapons.Weapon;
-import mekhq.campaign.Era;
-import mekhq.campaign.MekHqXmlUtil;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class MissingHeatSink extends MissingEquipmentPart {
+public class MissingJumpJet extends MissingEquipmentPart {
 	private static final long serialVersionUID = 2892728320891712304L;
 
-	public MissingHeatSink() {
+	public MissingJumpJet() {
     	this(0, null, -1);
     }
     
-    public MissingHeatSink(int tonnage, EquipmentType et, int equipNum) {
+    public MissingJumpJet(int tonnage, EquipmentType et, int equipNum) {
         // TODO Memorize all entity attributes needed to calculate cost
         // As it is a part bought with one entity can be used on another entity
         // on which it would have a different price (only tonnage is taken into
         // account for compatibility)
         super(tonnage, et, equipNum);
-        this.time = 90;
-        this.difficulty = -2;
+        this.time = 60;
+        this.difficulty = 0;
     }
     
     /**
@@ -63,16 +49,11 @@ public class MissingHeatSink extends MissingEquipmentPart {
      */
     @Override
     public long getPurchasePrice() {
-    	if(type.hasFlag(MiscType.F_DOUBLE_HEAT_SINK) || type.hasFlag(MiscType.F_LASER_HEAT_SINK)) {
-    		return 6000;
-    	} else {
-    		return 2000;	
-    	}
+    	return 200 * getUnitTonnage();
     }
     
-
-	@Override
+    @Override
 	public Part getNewPart() {
-		return new HeatSink(getUnitTonnage(), type, -1);
+		return new JumpJet(getUnitTonnage(), type, -1);
 	}
 }

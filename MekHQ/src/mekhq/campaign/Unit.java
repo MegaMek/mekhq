@@ -54,6 +54,7 @@ import mekhq.campaign.parts.AmmoBin;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.EquipmentPart;
 import mekhq.campaign.parts.HeatSink;
+import mekhq.campaign.parts.JumpJet;
 import mekhq.campaign.parts.MekActuator;
 import mekhq.campaign.parts.MekEngine;
 import mekhq.campaign.parts.MekGyro;
@@ -63,6 +64,7 @@ import mekhq.campaign.parts.MekSensor;
 import mekhq.campaign.parts.MissingAmmoBin;
 import mekhq.campaign.parts.MissingEquipmentPart;
 import mekhq.campaign.parts.MissingHeatSink;
+import mekhq.campaign.parts.MissingJumpJet;
 import mekhq.campaign.parts.MissingMekActuator;
 import mekhq.campaign.parts.MissingMekEngine;
 import mekhq.campaign.parts.MissingMekGyro;
@@ -2067,7 +2069,8 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     	Hashtable<Integer,Part> equipParts = new Hashtable<Integer,Part>();
     	Hashtable<Integer,Part> ammoParts = new Hashtable<Integer,Part>();
     	Hashtable<Integer,Part> heatSinks = new Hashtable<Integer,Part>();
-    	
+    	Hashtable<Integer,Part> jumpJets = new Hashtable<Integer,Part>();
+
     	for(Part part : parts) {
     		if(part instanceof MekGyro || part instanceof MissingMekGyro) {
     			gyro = part;
@@ -2095,7 +2098,11 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     			heatSinks.put(((HeatSink)part).getEquipmentNum(), part);
     		} else if(part instanceof MissingHeatSink) {
     			heatSinks.put(((MissingHeatSink)part).getEquipmentNum(), part);
-    		} else if(part instanceof EquipmentPart) {
+    		} else if(part instanceof JumpJet) {
+    			jumpJets.put(((JumpJet)part).getEquipmentNum(), part);
+    		} else if(part instanceof MissingJumpJet) {
+    			jumpJets.put(((MissingJumpJet)part).getEquipmentNum(), part);
+    		}  else if(part instanceof EquipmentPart) {
     			equipParts.put(((EquipmentPart)part).getEquipmentNum(), part);
     		} else if(part instanceof MissingEquipmentPart) {
     			equipParts.put(((MissingEquipmentPart)part).getEquipmentNum(), part);
@@ -2197,6 +2204,14 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     				Part epart = equipParts.get(eqnum);
     				if(null == epart) {
     					epart = new HeatSink((int)entity.getWeight(), m.getType(), eqnum);
+    					addPart(epart);
+    					campaign.addPart(epart);
+    				}
+    			} else if(m.getType().hasFlag(MiscType.F_JUMP_JET)) {
+    				int eqnum = entity.getEquipmentNum(m);
+    				Part epart = equipParts.get(eqnum);
+    				if(null == epart) {
+    					epart = new JumpJet((int)entity.getWeight(), m.getType(), eqnum);
     					addPart(epart);
     					campaign.addPart(epart);
     				}

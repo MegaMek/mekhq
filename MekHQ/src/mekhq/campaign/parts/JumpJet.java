@@ -1,5 +1,5 @@
 /*
- * HeatSink.java
+ * JumpJet.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -29,14 +29,14 @@ import megamek.common.Mounted;
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class HeatSink extends EquipmentPart {
+public class JumpJet extends EquipmentPart {
 	private static final long serialVersionUID = 2892728320891712304L;
 
-	public HeatSink() {
+	public JumpJet() {
     	this(0, null, -1);
     }
     
-    public HeatSink(int tonnage, EquipmentType et, int equipNum) {
+    public JumpJet(int tonnage, EquipmentType et, int equipNum) {
         // TODO Memorize all entity attributes needed to calculate cost
         // As it is a part bought with one entity can be used on another entity
         // on which it would have a different price (only tonnage is taken into
@@ -46,7 +46,16 @@ public class HeatSink extends EquipmentPart {
 	
     @Override
     public double getTonnage() {
-    	return 1.0;
+    	double ton = 0.5;
+    	if(getUnitTonnage() >= 90) {
+    		ton = 2.0;
+    	} else if(getUnitTonnage() >= 60) {
+    		ton = 1.0;
+    	}
+    	if(type.hasSubType(MiscType.S_IMPROVED)) {
+    		ton *= 2;
+    	}
+    	return ton;
     }
     
     /**
@@ -54,12 +63,8 @@ public class HeatSink extends EquipmentPart {
      *
      */
     @Override
-    public long getCurrentValue() {		
-    	if(type.hasFlag(MiscType.F_DOUBLE_HEAT_SINK) || type.hasFlag(MiscType.F_LASER_HEAT_SINK)) {
-    		return 6000;
-    	} else {
-    		return 2000;	
-    	}
+    public long getCurrentValue() {
+    	return 200 * getUnitTonnage();	
     }
     
   
@@ -69,13 +74,13 @@ public class HeatSink extends EquipmentPart {
     	if(needsFixing() || part.needsFixing()) {
     		return false;
     	}
-        return part instanceof HeatSink && getType().equals( ((EquipmentPart)part).getType() );
+        return part instanceof JumpJet && getType().equals( ((EquipmentPart)part).getType() );
     }
 
 
 	@Override
 	public Part getMissingPart() {
-		return new MissingHeatSink(getUnitTonnage(), type, equipmentNum);
+		return new MissingJumpJet(getUnitTonnage(), type, equipmentNum);
 	}
 
 	@Override
@@ -100,11 +105,11 @@ public class HeatSink extends EquipmentPart {
 				time = 100;
 				difficulty = -3;
 				if(isSalvaging()) {
-					this.time = 90;
-					this.difficulty = -2;
+					this.time = 60;
+					this.difficulty = 0;
 				} else if(hits > 0) {
-					this.time = 120;
-					this.difficulty = -1;
+					this.time = 90;
+					this.difficulty = 0;
 				}
 			}
 		}
