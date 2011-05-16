@@ -202,7 +202,6 @@ public class MekGyro extends Part {
 	@Override
 	public void fix() {
 		hits = 0;
-		updateConditionFromEntity();
 		if(null != unit) {
 			unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_GYRO, Mech.LOC_CT);
 		}

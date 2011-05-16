@@ -113,6 +113,7 @@ v0.1.6 (SVN)
 + rounding of tonnage in parts table
 + Bug: unit ids not being set in Campaign#addUnit
 + Bug: get target number before reducing time in Campaign#fixParts
++ Bug: gyro not fixing the first time
 
 v0.1.5 (2011-05-05)
 + refactored Hangar Panel into separate Hangar and Repair Bay panel
