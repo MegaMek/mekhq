@@ -108,6 +108,7 @@
 				<include name="README.txt" />
 				<include name="Example.mul" />
 				<include name="FoxsTeeth.xml" />
+				<include name="SubmitBug.html" />
 				<include name="license.txt" />
 			</fileset>
 		</copy>
