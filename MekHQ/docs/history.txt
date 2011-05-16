@@ -100,6 +100,7 @@ v0.1.6 (SVN)
 + very basic Jtextfield with auto-complete for planet searching
 + added temperature, surface water, and life forms to planet view panel
 + 30-light year radius bubble around selected planet when zoomed in
++ only show faction name of planet, when there are duplicates
 
 v0.1.5 (2011-05-05)
 + refactored Hangar Panel into separate Hangar and Repair Bay panel

@@ -1840,12 +1840,16 @@ public class Campaign implements Serializable {
 
 				if (xn.equalsIgnoreCase("planet")) {
 					Planet p = Planet.getPlanetFromXML(wn);
-					String name = p.getName() + " (" + Faction.getFactionName(p.getFaction()) + ")";
+					String name = p.getName();
 					if(null == retVal.get(name)) {
 						retVal.put(name, p);
 					} else {
-						name += " 2";
-						retVal.put(name, p);
+						//for duplicate planets, put a faction name behind them
+						//There could still be duplicates in theory, but I don't think there are in practice
+						Planet oldPlanet = retVal.get(name);
+						retVal.remove(name);
+						retVal.put(oldPlanet.getName() + " (" + Faction.getFactionName(oldPlanet.getFaction()) + ")", oldPlanet);
+						retVal.put(p.getName() + " (" + Faction.getFactionName(p.getFaction()) + ")", p);
 					}
 					
 				}
