@@ -5074,6 +5074,7 @@ public class MekHQView extends FrameView {
             switch(c) {
             case COL_TYPE:
         	case COL_RANK:
+        	case COL_DEPLOY:
         		return 70;
             case COL_CALL:
             case COL_SALARY:
@@ -5119,7 +5120,6 @@ public class MekHQView extends FrameView {
             case COL_NABIL:
             case COL_NIMP:
             case COL_HITS:
-            case COL_DEPLOY:
             	return SwingConstants.CENTER;
             default:
             	return SwingConstants.LEFT;
@@ -5279,9 +5279,9 @@ public class MekHQView extends FrameView {
             }
             if(col == COL_DEPLOY) {
             	if(p.isDeployed()) {
-            		return "Y";
+            		return campaign.getScenario(p.getScenarioId()).getName();
             	} else {
-            		return "N";
+            		return "-";
             	}
             }
             if(col == COL_FORCE) {

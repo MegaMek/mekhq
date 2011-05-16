@@ -101,6 +101,7 @@ v0.1.6 (SVN)
 + added temperature, surface water, and life forms to planet view panel
 + 30-light year radius bubble around selected planet when zoomed in
 + only show faction name of planet, when there are duplicates
++ put name of scenario in personnel deployment column rather than "Y/N"
 
 v0.1.5 (2011-05-05)
 + refactored Hangar Panel into separate Hangar and Repair Bay panel
