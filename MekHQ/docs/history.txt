@@ -105,6 +105,7 @@ v0.1.6 (SVN)
 + Bug: ammo not being used up from supplies when loaded and wrong type being unloaded when swapping
 + improved some parts reporting and refreshing issues
 + Bug: problems with restoring some equipment parts
++ acuisition list not updating when parts removed
 
 v0.1.5 (2011-05-05)
 + refactored Hangar Panel into separate Hangar and Repair Bay panel

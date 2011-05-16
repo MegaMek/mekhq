@@ -5758,6 +5758,8 @@ public class MekHQView extends FrameView {
 					campaign.sellPart(part);
 				}
 				refreshPartsList();
+				refreshTaskList();
+				refreshAcquireList();
 				refreshReport();
 				refreshFunds();
 				refreshFinancialTransactions();
@@ -5766,6 +5768,8 @@ public class MekHQView extends FrameView {
 					campaign.removePart(part);
 				}
 				refreshPartsList();
+				refreshTaskList();
+				refreshAcquireList();
 				refreshReport();
 			}
 		}
