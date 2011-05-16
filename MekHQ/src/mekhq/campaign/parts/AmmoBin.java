@@ -196,11 +196,12 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 					//just a simple reload
 					mounted.setShotsLeft(mounted.getShotsLeft() + shots);
 				} else {
-					//loading a new type of ammo
-					mounted.changeAmmoType((AmmoType)type);
+					//loading a new type of ammo				
 					unload();
+					mounted.changeAmmoType((AmmoType)type);
 					mounted.setShotsLeft(shots);
 				}
+				reduceAmountAvailable(shots);
 			}
 		}
 		shotsNeeded -= shots;
@@ -210,9 +211,11 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 		if(null != unit) {
 			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
 			int shots = 0;
+			AmmoType curType = (AmmoType)type;
 			if(null != mounted) {
 				shots = mounted.getShotsLeft();
 				mounted.setShotsLeft(0);
+				curType = (AmmoType)mounted.getType();
 			}
 			shotsNeeded = ((AmmoType)type).getShots();
 			if(shots > 0) {
@@ -220,14 +223,14 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 				for(Part part : unit.campaign.getSpareParts()) {
 					if(part instanceof AmmoStorage) {
 						AmmoStorage a = (AmmoStorage)part;
-						if(a.getType() == type) {
+						if(a.getType() == curType) {
 							a.addShots(shots);
 							return;
 						}
 					}
 				}
 				//if we are still here then we did not find any ammo, so lets create a new part and stick it in spares
-				AmmoStorage newAmmo = new AmmoStorage(1,type,shots);
+				AmmoStorage newAmmo = new AmmoStorage(1,curType,shots);
 				unit.campaign.addPart(newAmmo);
 			}	
 		}
