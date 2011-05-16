@@ -108,6 +108,9 @@ v0.1.6 (SVN)
 + acuisition list not updating when parts removed
 + separate HeatSink part inheriting from EquipmentPart
 + separate JumpJet part inheriting from EquipmentPart
++ Bug: techs can still do repairs with 0 time left
++ Bug: can't salvage ammo bins
++ rounding of tonnage in parts table
 
 v0.1.5 (2011-05-05)
 + refactored Hangar Panel into separate Hangar and Repair Bay panel

@@ -701,6 +701,18 @@ public class Campaign implements Serializable {
 	}
 	
 	public void fixPart(IPartWork partWork, TechTeam t) {
+		String report = "";
+		String action = " fix ";
+		if(partWork instanceof AmmoBin) {
+			action = " reload ";
+		}
+		if(partWork.isSalvaging()) {
+			action = " salvage ";
+		}
+		if(partWork instanceof MissingPart) {
+			action = " replace ";
+		}
+		report += t.getName() + " attempts to" + action + partWork.getPartName();   
 		int minutes = partWork.getTimeLeft();
 		if(minutes > t.getMinutesLeft()) {
 			minutes -= t.getMinutesLeft();
@@ -719,32 +731,30 @@ public class Campaign implements Serializable {
 				t.setMinutesLeft(0);
 				t.setOvertimeLeft(0);
 				partWork.setTeamId(t.getId());
-				addReport(" - <b>Not enough time, the remainder of the task will be finished tomorrow.</b>");
+				report += " - <b>Not enough time, the remainder of the task will be finished tomorrow.</b>";
+				addReport(report);
 	             return;
 			}     
 		} else {
 			t.setMinutesLeft(t.getMinutesLeft() - minutes);
 		}
-		String report = "";
-		String action = " fix ";
-		if(partWork instanceof AmmoBin) {
-			action = " reload ";
-		}
-		if(partWork.isSalvaging()) {
-			action = " salvage ";
-		}
-		if(partWork instanceof MissingPart) {
-			action = " replace ";
-		}
-		report += t.getName() + " attempts to" + action + partWork.getPartName();   
 		TargetRoll target = t.getTargetFor(partWork);
-		int roll = Compute.d6(2);
+		//check for the type
+		int roll;
+		String wrongType = "";
+		if(t.isRightType(partWork.getUnit())) {
+			roll = Compute.d6(2);
+		} else {
+			roll = Utilities.roll3d6();
+			wrongType = " <b>Warning: wrong tech type for this repair.</b>";
+		}
 		report = report + ",  needs " + target.getValueAsString() + " and rolls " + roll + ":";
 		if(roll >= target.getValue()) {
 			report = report + partWork.succeed();	
 		} else {
 			report = report + partWork.fail(t.getRating());
 		}
+		report += wrongType;
 		partWork.setTeamId(-1);
 		addReport(report);
 	}

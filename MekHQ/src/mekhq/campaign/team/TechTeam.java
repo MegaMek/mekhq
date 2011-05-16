@@ -31,6 +31,7 @@ import megamek.common.Mech;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import mekhq.campaign.MekHqXmlUtil;
+import mekhq.campaign.Unit;
 import mekhq.campaign.Utilities;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.work.IPartWork;
@@ -117,16 +118,6 @@ public class TechTeam extends SupportTeam {
        return base;
     }
    
-   public boolean isRightType(Entity en) {
-       if((type == T_MECH && !(en instanceof Mech)) 
-               || (type == T_MECHANIC && !(en instanceof Tank))
-               || (type == T_AERO && !(en instanceof Aero))
-               || (type == T_BA && !(en instanceof BattleArmor))) {
-           return false;
-       }               
-       return true;
-   }
-   
    @Override
    public String getDescHTML() {
         String toReturn = "<html><font size='2'><b>" + getName() + "</b><br/>";
@@ -153,7 +144,10 @@ public class TechTeam extends SupportTeam {
            return new TargetRoll(TargetRoll.IMPOSSIBLE, "Task is not needed.");
        }
        if(partWork instanceof MissingPart && null == ((MissingPart)partWork).findReplacement()) {
-           return new TargetRoll(TargetRoll.IMPOSSIBLE, "part not available.");
+           return new TargetRoll(TargetRoll.IMPOSSIBLE, "Part not available.");
+       }
+       if(getMinutesLeft() <= 0 && (!campaign.isOvertimeAllowed() || getOvertimeLeft() <= 0)) {
+    	   return new TargetRoll(TargetRoll.IMPOSSIBLE, "No time left.");
        }
        String notFixable = partWork.checkFixable();
        if(null != notFixable) {
@@ -230,5 +224,24 @@ public class TechTeam extends SupportTeam {
 				type = Integer.parseInt(wn2.getTextContent());
 			}
 		}
+	}
+	
+	public boolean isRightType(Unit unit) {
+		if(null == unit) {
+			return true;
+		}
+		if(unit.getEntity() instanceof Mech) {
+			return type == T_MECH;
+		} 
+		else if(unit.getEntity() instanceof Tank) {
+			return type == T_MECHANIC;
+		}
+		else if(unit.getEntity() instanceof Aero) {
+			return type == T_AERO;
+		}
+		else if(unit.getEntity() instanceof BattleArmor) {
+			return type == T_BA;
+		}
+		return false;
 	}
 }

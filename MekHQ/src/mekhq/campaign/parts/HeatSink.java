@@ -43,11 +43,6 @@ public class HeatSink extends EquipmentPart {
         // account for compatibility)
         super(tonnage, et, equipNum);
     }
-	
-    @Override
-    public double getTonnage() {
-    	return 1.0;
-    }
     
     /**
      * Copied from megamek.common.Entity.getWeaponsAndEquipmentCost(StringBuffer detail, boolean ignoreAmmo)

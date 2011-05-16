@@ -5668,7 +5668,7 @@ public class MekHQView extends FrameView {
 				return partInventory.getQuantity();
 			}
 			if(col == COL_TON) {
-				return (double)part.getTonnage();
+				return Math.round(part.getTonnage() * 100) / 100.0;
 			}
 			if(col == COL_STATUS) {
 				return part.getStatus();
