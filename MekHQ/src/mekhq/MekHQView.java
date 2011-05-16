@@ -1741,16 +1741,6 @@ public class MekHQView extends FrameView {
 		setMenuBar(menuBar);
 		setStatusBar(statusPanel);
 	}// </editor-fold>//GEN-END:initComponents
-
-	private void btnRetrieveUnitsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnRetrieveUnitsActionPerformed
-		try {
-			loadListFile(false);
-		}// GEN-LAST:event_btnRetrieveUnitsActionPerformed
-		catch (IOException ex) {
-			Logger.getLogger(MekHQView.class.getName()).log(Level.SEVERE, null,
-					ex);
-		}
-	}
 	
 	private void btnAddMissionActionPerformed(java.awt.event.ActionEvent evt) {
 		CustomizeMissionDialog cmd = new CustomizeMissionDialog(null, true, null, campaign);
@@ -2423,10 +2413,6 @@ public class MekHQView extends FrameView {
 		scrollPlanetView.setViewportView(new PlanetViewPanel(planet, campaign));
 	}
 	
-	private void PartsFilterActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_PartsFilterActionPerformed
-		refreshPartsList();
-	}// GEN-LAST:event_PartsFilterActionPerformed
-
 	private void addFundsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_addFundsActionPerformed
 		AddFundsDialog addFundsDialog = new AddFundsDialog(null, true);
 		addFundsDialog.setVisible(true);

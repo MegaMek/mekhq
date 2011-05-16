@@ -422,6 +422,7 @@ public class Campaign implements Serializable {
 		en.setId(id);
 		en.setExternalId(id);
 		Unit unit = new Unit(en, this);
+		unit.setId(id);
 		units.add(unit);
 		unitIds.put(new Integer(id), unit);
 		lastUnitId = id;

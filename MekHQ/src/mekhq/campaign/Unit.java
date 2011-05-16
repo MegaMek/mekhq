@@ -205,6 +205,10 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 		
 		return getEntity().getId();
 	}
+	
+	public void setId(int i) {
+		this.id = i;
+	}
 
 	public void setPilotId(int inId) {
 		pilotId = inId;
