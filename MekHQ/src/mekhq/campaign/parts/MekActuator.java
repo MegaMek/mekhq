@@ -236,7 +236,7 @@ public class MekActuator extends Part {
 		if(null != unit) {
 			return unit.getEntity().getLocationName(location);
 		}
-		return "";
+		return getUnitTonnage() + " tons";
 	}
 
 	@Override

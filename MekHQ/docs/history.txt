@@ -103,6 +103,7 @@ v0.1.6 (SVN)
 + only show faction name of planet, when there are duplicates
 + put name of scenario in personnel deployment column rather than "Y/N"
 + Bug: ammo not being used up from supplies when loaded and wrong type being unloaded when swapping
++ improved some parts reporting and refreshing issues
 
 v0.1.5 (2011-05-05)
 + refactored Hangar Panel into separate Hangar and Repair Bay panel

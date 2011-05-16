@@ -303,7 +303,7 @@ public class MekLocation extends Part {
 		if(null != unit) {
 			return unit.getEntity().getLocationName(loc) + " (" + Math.round(100*percent) + "%)";
 		}
-		return "";
+		return getUnitTonnage() + " tons" + " (" + Math.round(100*percent) + "%)";
     }
 
 	@Override

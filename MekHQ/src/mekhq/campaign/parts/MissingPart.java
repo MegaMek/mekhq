@@ -159,7 +159,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 	@Override
     public String getDetails() {
 		if(isReplacementAvailable()) {
-			return "Replacement part avaiable";
+			return "Replacement part available";
 		} else {
 			return "Replacement part not available";
 		}

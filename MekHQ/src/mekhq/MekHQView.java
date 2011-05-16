@@ -1823,7 +1823,6 @@ public class MekHQView extends FrameView {
 				}
 			}
 		}
-		//}
 		
 		refreshServicedUnitList();
 		refreshUnitList();
@@ -1956,6 +1955,7 @@ public class MekHQView extends FrameView {
 		refreshAcquireList();
 		refreshTechsList();
 		refreshPatientList();
+		refreshPartsList();
 		refreshDoctorsList();
 		refreshCalendar();
 		refreshReport();
@@ -5668,7 +5668,7 @@ public class MekHQView extends FrameView {
 				return partInventory.getQuantity();
 			}
 			if(col == COL_TON) {
-				return part.getTonnage();
+				return (double)part.getTonnage();
 			}
 			if(col == COL_STATUS) {
 				return part.getStatus();
