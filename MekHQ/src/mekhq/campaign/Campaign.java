@@ -528,8 +528,17 @@ public class Campaign implements Serializable {
 	public ArrayList<Unit> getServiceableUnits() {
 		ArrayList<Unit> service = new ArrayList<Unit>();
 		for(Unit u : getUnits()) {
-			if(u.getPartsNeedingFixing().size() > 0 && !u.isDeployed()) {
-				service.add(u);
+			if(u.isDeployed()) {
+				continue;
+			}		
+			if(u.isSalvage() || !u.isRepairable()) {
+				if(u.getSalvageableParts().size() > 0) {
+					service.add(u);
+				}
+			} else {
+				if(u.getPartsNeedingFixing().size() > 0) {
+					service.add(u);
+				}
 			}
 		}
 		return service;
