@@ -53,6 +53,7 @@ import mekhq.MekHQApp;
 import mekhq.campaign.parts.AmmoBin;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.EquipmentPart;
+import mekhq.campaign.parts.HeatSink;
 import mekhq.campaign.parts.MekActuator;
 import mekhq.campaign.parts.MekEngine;
 import mekhq.campaign.parts.MekGyro;
@@ -61,6 +62,7 @@ import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.MekSensor;
 import mekhq.campaign.parts.MissingAmmoBin;
 import mekhq.campaign.parts.MissingEquipmentPart;
+import mekhq.campaign.parts.MissingHeatSink;
 import mekhq.campaign.parts.MissingMekActuator;
 import mekhq.campaign.parts.MissingMekEngine;
 import mekhq.campaign.parts.MissingMekGyro;
@@ -2064,6 +2066,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     	Armor[] armorRear = new Armor[entity.locations()];
     	Hashtable<Integer,Part> equipParts = new Hashtable<Integer,Part>();
     	Hashtable<Integer,Part> ammoParts = new Hashtable<Integer,Part>();
+    	Hashtable<Integer,Part> heatSinks = new Hashtable<Integer,Part>();
     	
     	for(Part part : parts) {
     		if(part instanceof MekGyro || part instanceof MissingMekGyro) {
@@ -2088,6 +2091,10 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     			ammoParts.put(((AmmoBin)part).getEquipmentNum(), part);
     		} else if(part instanceof MissingAmmoBin) {
     			ammoParts.put(((MissingAmmoBin)part).getEquipmentNum(), part);
+    		} else if(part instanceof HeatSink) {
+    			heatSinks.put(((HeatSink)part).getEquipmentNum(), part);
+    		} else if(part instanceof MissingHeatSink) {
+    			heatSinks.put(((MissingHeatSink)part).getEquipmentNum(), part);
     		} else if(part instanceof EquipmentPart) {
     			equipParts.put(((EquipmentPart)part).getEquipmentNum(), part);
     		} else if(part instanceof MissingEquipmentPart) {
@@ -2180,6 +2187,18 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     					apart = new AmmoBin((int)entity.getWeight(), m.getType(), eqnum, ((AmmoType)m.getType()).getShots() - m.getShotsLeft());
     					addPart(apart);
     					campaign.addPart(apart);
+    				}
+    			} else if(m.getType().hasFlag(MiscType.F_HEAT_SINK) || m.getType().hasFlag(MiscType.F_DOUBLE_HEAT_SINK)) {
+    				if(m.getLocation() == Entity.LOC_NONE) {
+    					//heat sinks located in LOC_NONE are base unhittable heat sinks
+    					continue;
+    				}
+    				int eqnum = entity.getEquipmentNum(m);
+    				Part epart = equipParts.get(eqnum);
+    				if(null == epart) {
+    					epart = new HeatSink((int)entity.getWeight(), m.getType(), eqnum);
+    					addPart(epart);
+    					campaign.addPart(epart);
     				}
     			} else {
     				int eqnum = entity.getEquipmentNum(m);
