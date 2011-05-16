@@ -121,6 +121,14 @@ public class AmmoStorage extends EquipmentPart {
 	public void writeToXml(PrintWriter pw1, int indent, int id) {
 		writeToXmlBegin(pw1, indent, id);		
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<equipmentNum>"
+				+equipmentNum
+				+"</equipmentNum>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<typeName>"
+				+typeName
+				+"</typeName>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<munition>"
 				+munition
 				+"</munition>");
@@ -137,12 +145,17 @@ public class AmmoStorage extends EquipmentPart {
 		
 		for (int x=0; x<nl.getLength(); x++) {
 			Node wn2 = nl.item(x);
-			if (wn2.getNodeName().equalsIgnoreCase("munition")) {
+			if (wn2.getNodeName().equalsIgnoreCase("equipmentNum")) {
+				equipmentNum = Integer.parseInt(wn2.getTextContent());
+			} else if (wn2.getNodeName().equalsIgnoreCase("typeName")) {
+				typeName = wn2.getTextContent();
+			} else if (wn2.getNodeName().equalsIgnoreCase("munition")) {
 				munition = Long.parseLong(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("shots")) {
 				shots = Integer.parseInt(wn2.getTextContent());
 			}
 		}
+		restore();
 	}
 
 	@Override

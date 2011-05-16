@@ -206,6 +206,7 @@ public class EquipmentPart extends Part {
 				typeName = wn2.getTextContent();
 			}
 		}
+		restore();
 	}
 
 	@Override
