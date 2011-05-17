@@ -2040,7 +2040,7 @@ public class MekHQView extends FrameView {
 
 		try {
 			fos = new FileOutputStream(file);
-			pw = new PrintWriter(new OutputStreamWriter(fos, "UTF8"));
+			pw = new PrintWriter(new OutputStreamWriter(fos, "UTF-8"));
 			campaign.writeToXml(pw);
 			pw.flush();
 			pw.close();
