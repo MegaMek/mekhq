@@ -702,10 +702,9 @@ public class Campaign implements Serializable {
 		report += "  needs " + target.getValueAsString();
 		report += " and rolls " + roll + ":";		
 		if(roll >= target.getValue()) {
-			report += " <font color='green'><b>part found.</b></font><br/>";
-			buyPart(acquisition.getNewPart(), acquisition.getPurchasePrice());
+			report = report + acquisition.find();	
 		} else {
-			report += " <font color='red'><b>part not available.</b></font>";
+			report = report + acquisition.failToFind();
 		}
 		addReport(report);
 	}

@@ -109,12 +109,8 @@ public class AmmoStorage extends EquipmentPart {
     
     }
     
-    public void addShots(int s) {
-    	shots += s;
-    }
-    
-    public void reduceShots(int s) {
-    	shots = Math.max(0, shots - s);
+    public void changeShots(int s) {
+    	shots = Math.max(0, shots + s);
     }
     
 	@Override

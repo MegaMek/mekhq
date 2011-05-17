@@ -369,8 +369,22 @@ public class Armor extends Part implements IAcquisitionWork {
 			curAmount = 0;
 		}
 		unit.getEntity().setArmor(amount + curAmount, location, rear);
-		reduceAmountAvailable(amount);
+		changeAmountAvailable(-1 * amount);
 		updateConditionFromEntity();
+	}
+	
+	@Override
+	public String find() {
+		changeAmountAvailable((int)Math.round(5 * getArmorPointsPerTon()));
+		setCheckedToday(true);
+		//TODO: pay cost
+		return "<font color='green'> part found.</font>";
+	}
+	
+	@Override
+	public String failToFind() {
+		setCheckedToday(false);
+		return "<font color='green'> part found.</font>";
 	}
 
 	@Override
@@ -382,21 +396,8 @@ public class Armor extends Part implements IAcquisitionWork {
 	@Override
 	public void remove(boolean salvage) {
 		unit.getEntity().setArmor(IArmorState.ARMOR_DESTROYED, location, rear);
-		//cycle through spare parts and add to existing armor if found
 		if(salvage) {
-			for(Part part : unit.campaign.getSpareParts()) {
-				if(part instanceof Armor) {
-					Armor a = (Armor)part;
-					if(a.getType() == type && a.isClanTechBase() == clan) {
-						a.setAmount(a.getAmount() + amountNeeded);
-						unit.campaign.updateAllArmorForNewSpares();
-						return;
-					}
-				}
-			}
-			//if we are still here then we did not find any armor, so lets create a new part and stick it in spares
-			Armor newArmor = new Armor(getUnitTonnage(),type,amountNeeded,-1,false, isClanTechBase());
-			unit.campaign.addPart(newArmor);
+			changeAmountAvailable(amountNeeded);
 		}
 		updateConditionFromEntity();
 	}
@@ -510,8 +511,7 @@ public class Armor extends Part implements IAcquisitionWork {
         return target;
     }
 
-	@Override
-	public Part getNewPart() {
+	public double getArmorPointsPerTon() {
 		if(null != unit) {
 			// armor is checked for in 5-ton increments
 			int armorType = unit.getEntity().getArmorType(location);
@@ -519,9 +519,13 @@ public class Armor extends Part implements IAcquisitionWork {
 			if (armorType == EquipmentType.T_ARMOR_HARDENED) {
 				armorPerTon = 8.0;
 			}
-			int points = (int) Math.floor(armorPerTon * 5);
-			return new Armor((int) unit.getEntity().getWeight(), armorType, points, -1, false, isClanTechBase());
+			return armorPerTon;
 		}
+		return 0.0;
+	}
+	
+	@Override 
+	public Part getNewPart() {
 		return null;
 	}
 
@@ -554,25 +558,26 @@ public class Armor extends Part implements IAcquisitionWork {
 		return 0;
 	}
 	
-	public void reduceAmountAvailable(int amount) {
+	public void changeAmountAvailable(int amount) {
 		if(null != unit) {
 			Armor a = null;
 			for(Part part : unit.campaign.getSpareParts()) {
 				if(part instanceof Armor) {
 					a = (Armor)part;
 					if(a.getType() == type && a.isClanTechBase() == clan) {
-						a.setAmount(a.getAmount() - amount);
+						a.setAmount(a.getAmount() + amount);
 						break;
 					}
 				}
 			}
 			if(null != a && a.getAmount() <= 0) {
 				unit.campaign.removePart(a);
+			} else if(null == a && amount > 0) {
+				unit.campaign.addPart(new Armor(getUnitTonnage(), type, amount, -1, false, isClanTechBase()));
 			}
 			unit.campaign.updateAllArmorForNewSpares();
 		}
 	}
-	
 
 	@Override
 	public String fail(int rating) {
@@ -587,7 +592,7 @@ public class Armor extends Part implements IAcquisitionWork {
 				remove(false);
 			} else {
 				skillMin = SupportTeam.EXP_GREEN;
-				reduceAmountAvailable(Math.min(amountNeeded, getAmountAvailable()));
+				changeAmountAvailable(-1 * Math.min(amountNeeded, getAmountAvailable()));
 			}
 		}
 		return " <font color='red'><b> failed." + scrap + "</b></font>";

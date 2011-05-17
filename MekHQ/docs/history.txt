@@ -118,6 +118,7 @@ v0.1.6 (SVN)
 + Bug: non-hittable slots remaine critted when location is replaced
 + errors with XML loading of engines and Sensors
 + mul for scenario deployment named after scenario not campaign
++ Bug: sometimes new ammo and armor spare part created when existing one should be increased
 
 v0.1.5 (2011-05-05)
 + refactored Hangar Panel into separate Hangar and Repair Bay panel

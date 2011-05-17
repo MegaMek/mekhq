@@ -251,6 +251,19 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 	}
 	
 	@Override
+	public String find() {
+		unit.campaign.buyPart(getNewPart(),getPurchasePrice());
+		setCheckedToday(true);
+		return "<font color='green'> part found.</font>";
+	}
+	
+	@Override
+	public String failToFind() {
+		setCheckedToday(true);
+		return "<font color='red'> part not found.</font>";
+	}
+	
+	@Override
 	public void writeToXml(PrintWriter pw1, int indent, int id) {
 		writeToXmlBegin(pw1, indent, id);
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)

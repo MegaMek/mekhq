@@ -216,10 +216,24 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 					mounted.changeAmmoType((AmmoType)type);
 					mounted.setShotsLeft(shots);
 				}
-				reduceAmountAvailable(shots);
+				changeAmountAvailable(-1 * shots, (AmmoType)type);
 			}
 		}
 		shotsNeeded -= shots;
+	}
+	
+	@Override
+	public String find() {
+		changeAmountAvailable(((AmmoType)type).getShots(), (AmmoType)type);
+		setCheckedToday(true);
+		//TODO: pay cost
+		return "<font color='green'> part found.</font>";
+	}
+	
+	@Override
+	public String failToFind() {
+		setCheckedToday(false);
+		return "<font color='green'> part found.</font>";
 	}
 	
 	public void unload() {
@@ -234,19 +248,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 			}
 			shotsNeeded = ((AmmoType)type).getShots();
 			if(shots > 0) {
-				//now lets cycle through and add ammo to ammo storage
-				for(Part part : unit.campaign.getSpareParts()) {
-					if(part instanceof AmmoStorage) {
-						AmmoStorage a = (AmmoStorage)part;
-						if(a.getType() == curType) {
-							a.addShots(shots);
-							return;
-						}
-					}
-				}
-				//if we are still here then we did not find any ammo, so lets create a new part and stick it in spares
-				AmmoStorage newAmmo = new AmmoStorage(1,curType,shots);
-				unit.campaign.addPart(newAmmo);
+				changeAmountAvailable(shots, curType);
 			}	
 		}
 	}
@@ -363,20 +365,22 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         return null;
     }
 	
-	public void reduceAmountAvailable(int amount) {
+	public void changeAmountAvailable(int amount, AmmoType curType) {
 		if(null != unit) {
 			AmmoStorage a = null;
 			for(Part part : unit.campaign.getSpareParts()) {
 				if(part instanceof AmmoStorage) {
 					a = (AmmoStorage)part;
-					if(a.getType() == type) {
-						a.reduceShots(amount);
+					if(a.getType() == curType) {
+						a.changeShots(amount);
 						break;
 					}
 				}
 			}
 			if(null != a && a.getShots() <= 0) {
 				unit.campaign.removePart(a);
+			} else if(null == a && amount > 0) {
+				unit.campaign.addPart(new AmmoStorage(1,curType,amount));
 			}
 		}
 	}
