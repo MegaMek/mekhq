@@ -98,6 +98,7 @@ import megamek.common.AmmoType;
 import megamek.common.Entity;
 import megamek.common.EntityListFile;
 import megamek.common.EntityWeightClass;
+import megamek.common.Mech;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
@@ -3851,7 +3852,7 @@ public class MekHQView extends FrameView {
 
 					menu.setEnabled(!unit.isDeployed()
 							&& !unit.isDamaged()
-							&& (unit.getEntity() instanceof megamek.common.Mech));
+							&& (unit.getEntity() instanceof Mech));
 					popup.add(menu);
 				} else if (unit.isCustomized()) {
 					menuItem = new JMenuItem("Cancel Customize");
@@ -6546,6 +6547,31 @@ public class MekHQView extends FrameView {
 				refreshScenarioList();
 			} else if (command.contains("CUSTOMIZE")
 					&& !command.contains("CANCEL")) {
+				if (selectedUnit.getEntity() instanceof Mech) {
+					MechSummary mechSummary = MechSummaryCache
+							.getInstance().getMech(
+									selectedUnit.getEntity()
+											.getShortName());
+					Mech selectedMech = null;
+
+					try {
+						Entity e = (new MechFileParser(
+								mechSummary.getSourceFile(),mechSummary.getEntryName()))
+								.getEntity();
+						if (e instanceof Mech) {
+							selectedMech = (Mech) e;
+						}
+					} catch (EntityLoadingException ex) {
+						Logger.getLogger(MekHQView.class.getName())
+								.log(Level.SEVERE, null, ex);
+					}
+
+					if (selectedMech == null) {
+						return;
+					}
+					panMekLab.loadUnit(selectedMech);
+					panMekLab.refreshAll();
+				}
 				/*if (!selectedUnit.isDeployed() && !selectedUnit.isDamaged()) {
 					Entity targetEntity = null;
 					String targetMechName = command.split(":")[1];
