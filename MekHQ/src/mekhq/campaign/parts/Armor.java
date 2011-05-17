@@ -562,12 +562,10 @@ public class Armor extends Part implements IAcquisitionWork {
 		if(null != unit) {
 			Armor a = null;
 			for(Part part : unit.campaign.getSpareParts()) {
-				if(part instanceof Armor) {
-					a = (Armor)part;
-					if(a.getType() == type && a.isClanTechBase() == clan) {
-						a.setAmount(a.getAmount() + amount);
-						break;
-					}
+				if(part instanceof Armor && ((Armor)part).getType() == type && ((Armor)part).isClanTechBase() == clan) {
+					a = (Armor)part;				
+					a.setAmount(a.getAmount() + amount);
+					break;
 				}
 			}
 			if(null != a && a.getAmount() <= 0) {

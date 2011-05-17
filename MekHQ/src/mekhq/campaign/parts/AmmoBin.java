@@ -369,12 +369,10 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 		if(null != unit) {
 			AmmoStorage a = null;
 			for(Part part : unit.campaign.getSpareParts()) {
-				if(part instanceof AmmoStorage) {
+				if(part instanceof AmmoStorage && ((AmmoStorage)part).getType().equals(curType)) {
 					a = (AmmoStorage)part;
-					if(a.getType() == curType) {
-						a.changeShots(amount);
-						break;
-					}
+					a.changeShots(amount);
+					break;
 				}
 			}
 			if(null != a && a.getShots() <= 0) {
