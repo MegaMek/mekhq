@@ -148,7 +148,7 @@ public class PlanetViewPanel extends javax.swing.JPanel {
 		pnlStats.add(lblStarType1, gridBagConstraints);
 		
 		lblStarType2.setName("lblStarType2"); // NOI18N
-		lblStarType2.setText(planet.getStarType() + " (" + planet.getRechargeTime() + ")");
+		lblStarType2.setText(planet.getStarType() + " (" + planet.getRechargeTime() + " hours)");
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 1;
 		gridBagConstraints.gridy = 1;
@@ -167,9 +167,8 @@ public class PlanetViewPanel extends javax.swing.JPanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblJumpPoint1, gridBagConstraints);
 		
-		/*
 		lblJumpPoint2.setName("lblJumpPoint2"); // NOI18N
-		lblJumpPoint2.setText(Double.toString(planet.getTimeToJumpPoint()));
+		lblJumpPoint2.setText(Double.toString(Math.round(100 * planet.getTimeToJumpPoint(1))/100.0) + " days");
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 1;
 		gridBagConstraints.gridy = 2;
@@ -178,7 +177,6 @@ public class PlanetViewPanel extends javax.swing.JPanel {
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblJumpPoint2, gridBagConstraints);
-		*/
 		
 		lblGravity1.setName("lblGravity1"); // NOI18N
 		lblGravity1.setText(resourceMap.getString("lblGravity1.text"));

@@ -267,6 +267,219 @@ public class Planet {
 		return 141 + 10*spectralClass + subtype;
 	}
 	
+	public double getTimeToJumpPoint(double acceleration) {
+		//based on the formula in StratOps
+		return Math.sqrt((getDistanceToJumpPoint()*1000)/(9.8*acceleration))/43200;
+	}
+	
+	public float getDistanceToJumpPoint() {
+		return getDistanceToJumpPoint(spectralClass, subtype);
+	}
+	
+	/**
+	 * Distance to jump point given a spectral class and subtype
+	 * measured in kilometers
+	 * @param spectral
+	 * @param subtype
+	 * @return
+	 */
+	public static float getDistanceToJumpPoint(int spectral, int subtype) {
+		
+		//taken from Dropships and Jumpships sourcebook, pg. 17
+		switch(spectral) {
+		case SPECTRAL_M:
+			if(subtype == 0) {
+				return 179915179f;
+			} 
+			else if(subtype == 1) {
+				return 162301133f;
+			}
+			else if(subtype == 2) {
+				return 146630374f;
+			}
+			else if(subtype == 3) {
+				return 132668292f;
+			}
+			else if(subtype == 4) {
+				return 120210786f;
+			}
+			else if(subtype == 5) {
+				return 109080037f;
+			}
+			else if(subtype == 6) {
+				return 99120895f;
+			}
+			else if(subtype == 7) {
+				return 90197803f;
+			}
+			else if(subtype == 8) {
+				return 82192147f;
+			}
+			else if(subtype > 8) {
+				return 75000000f;
+			}
+		case SPECTRAL_K:
+			if(subtype == 0) {
+				return 549582283f;
+			} 
+			else if(subtype == 1) {
+				return 487907078f;
+			}
+			else if(subtype == 2) {
+				return 433886958f;
+			}
+			else if(subtype == 3) {
+				return 386493164f;
+			}
+			else if(subtype == 4) {
+				return 344844735f;
+			}
+			else if(subtype == 5) {
+				return 308186014f;
+			}
+			else if(subtype == 6) {
+				return 275867748f;
+			}
+			else if(subtype == 7) {
+				return 247331200f;
+			}
+			else if(subtype == 8) {
+				return 222094749f;
+			}
+			else if(subtype > 8) {
+				return 199742590f;
+			}
+		case SPECTRAL_G:
+			if(subtype == 0) {
+				return 1993403717f;
+			} 
+			else if(subtype == 1) {
+				return 1737789950f;
+			}
+			else if(subtype == 2) {
+				return 1517879732f;
+			}
+			else if(subtype == 3) {
+				return 1328325100f;
+			}
+			else if(subtype == 4) {
+				return 1164628460f;
+			}
+			else if(subtype == 5) {
+				return 1023000099f;
+			}
+			else if(subtype == 6) {
+				return 900240718f;
+			}
+			else if(subtype == 7) {
+				return 793644393f;
+			}
+			else if(subtype == 8) {
+				return 700918272f;
+			}
+			else if(subtype > 8) {
+				return 620115976f;
+			}
+		case SPECTRAL_F:
+			if(subtype == 0) {
+				return 8795520975f;
+			} 
+			else if(subtype == 1) {
+				return 7509758447f;
+			}
+			else if(subtype == 2) {
+				return 6426154651f;
+			}
+			else if(subtype == 3) {
+				return 5510915132f;
+			}
+			else if(subtype == 4) {
+				return 4736208289f;
+			}
+			else if(subtype == 5) {
+				return 4079054583f;
+			}
+			else if(subtype == 6) {
+				return 3520442982f;
+			}
+			else if(subtype == 7) {
+				return 3044611112f;
+			}
+			else if(subtype == 8) {
+				return 2638462416f;
+			}
+			else if(subtype > 8) {
+				return 2291092549f;
+			}
+		case SPECTRAL_A:
+			if(subtype == 0) {
+				return 48590182199f;
+			} 
+			else if(subtype == 1) {
+				return 40506291619f;
+			}
+			else if(subtype == 2) {
+				return 33853487850f;
+			}
+			else if(subtype == 3) {
+				return 28364525294f;
+			}
+			else if(subtype == 4) {
+				return 23824470101f;
+			}
+			else if(subtype == 5) {
+				return 20060019532f;
+			}
+			else if(subtype == 6) {
+				return 16931086050f;
+			}
+			else if(subtype == 7) {
+				return 14324152109f;
+			}
+			else if(subtype == 8) {
+				return 12147004515f;
+			}
+			else if(subtype > 8) {
+				return 10324556364f;
+			}
+		case SPECTRAL_B:
+			if(subtype == 0) {
+				return 347840509855f;
+			} 
+			else if(subtype == 1) {
+				return 282065439915f;
+			}
+			else if(subtype == 2) {
+				return 229404075188f;
+			}
+			else if(subtype == 3) {
+				return 187117766777f;
+			}
+			else if(subtype == 4) {
+				return 153063985045f;
+			}
+			else if(subtype == 5) {
+				return 12556160986f;
+			}
+			else if(subtype == 6) {
+				return 103287722257f;
+			}
+			else if(subtype == 7) {
+				return 85198295036f;
+			}
+			else if(subtype == 8) {
+				return 70467069133f;
+			}
+			else if(subtype > 8) {
+				return 58438309136f;
+			}
+		default:
+			return 0;
+		}
+		
+		
+	}
+	
 	public static Planet getPlanetFromXML(Node wn) {
 		Planet retVal = new Planet();
 		NodeList nl = wn.getChildNodes();

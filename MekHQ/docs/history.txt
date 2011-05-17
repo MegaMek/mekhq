@@ -129,6 +129,7 @@ v0.1.6 (SVN)
 + Bug: armor and ammo for free
 + Balance column for finance table
 + Bug: repairs being allowed on arms and legs with hip and shoulder damage
++ calculate distance and time to jump point in Planet.java
 
 v0.1.5 (2011-05-05)
 + refactored Hangar Panel into separate Hangar and Repair Bay panel
