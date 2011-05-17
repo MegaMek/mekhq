@@ -1170,7 +1170,7 @@ public class Campaign implements Serializable {
 	public void buyPart(Part part, long cost) {
 		addPart(part);
 		if(getCampaignOptions().payForParts()) {
-			finances.debit(cost, Transaction.C_EQUIP, "Sale of " + part.getName(), calendar.getTime());		
+			finances.debit(cost, Transaction.C_EQUIP, "Purchase of " + part.getName(), calendar.getTime());		
 		}
 	}
 

@@ -32,6 +32,7 @@ import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Utilities;
+import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.team.SupportTeam;
 import mekhq.campaign.team.TechTeam;
 import mekhq.campaign.work.IAcquisitionWork;
@@ -378,14 +379,14 @@ public class Armor extends Part implements IAcquisitionWork {
 	public String find() {
 		changeAmountAvailable((int)Math.round(5 * getArmorPointsPerTon()));
 		setCheckedToday(true);
-		//TODO: pay cost
-		return "<font color='green'> part found.</font>";
+		unit.campaign.getFinances().debit(getPurchasePrice(), Transaction.C_EQUIP, "Purchase of " + getName(), unit.campaign.calendar.getTime());
+		return "<font color='green'><b> part found.</b></font>";
 	}
 	
 	@Override
 	public String failToFind() {
 		setCheckedToday(false);
-		return "<font color='red'> part not found.</font>";
+		return "<font color='red'><b> part not found.</b></font>";
 	}
 
 	@Override

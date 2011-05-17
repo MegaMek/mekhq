@@ -126,6 +126,7 @@ v0.1.6 (SVN)
 + Bug: XML not being saved as UTF-8
 + team name not reported correctly in Campaign#acquirePart
 + UTF-8 compliant female names
++ Bug: armor and ammo for free
 
 v0.1.5 (2011-05-05)
 + refactored Hangar Panel into separate Hangar and Repair Bay panel

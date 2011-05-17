@@ -32,6 +32,7 @@ import megamek.common.TargetRoll;
 import mekhq.campaign.Era;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Utilities;
+import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.work.IAcquisitionWork;
 
 import org.w3c.dom.Node;
@@ -226,7 +227,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 	public String find() {
 		changeAmountAvailable(((AmmoType)type).getShots(), (AmmoType)type);
 		setCheckedToday(true);
-		//TODO: pay cost
+		unit.campaign.getFinances().debit(getPurchasePrice(), Transaction.C_EQUIP, "Purchase of " + getName(), unit.campaign.calendar.getTime());
 		return "<font color='green'> part found.</font>";
 	}
 	
