@@ -2584,7 +2584,7 @@ public class MekHQView extends FrameView {
 			}
 		});
 		
-		saveList.setSelectedFile(new File(campaign.getName() + ".mul")); //$NON-NLS-1$
+		saveList.setSelectedFile(new File(scenario.getName() + ".mul")); //$NON-NLS-1$
 		int returnVal = saveList.showSaveDialog(mainPanel);
 		
 		if ((returnVal != JFileChooser.APPROVE_OPTION)
