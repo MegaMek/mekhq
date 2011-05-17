@@ -353,13 +353,13 @@ public class MekLocation extends Part {
 	            }
 	            if(slot.getType() == CriticalSlot.TYPE_SYSTEM 
 	            		&& slot.getIndex() == Mech.ACTUATOR_HIP
-	            		&& !slot.isRepairable()) {
+	            		&& slot.isDestroyed()) {
 	            	return "You cannot repair a leg with a damaged hip. This leg must be scrapped and replaced instead.";
 	            	
 	            }
 	            if(slot.getType() == CriticalSlot.TYPE_SYSTEM 
 	            		&& slot.getIndex() == Mech.ACTUATOR_SHOULDER
-	            		&& !slot.isRepairable()) {
+	            		&& slot.isDestroyed()) {
 	            	return "You cannot repair an arm with a damaged shoulder. This arm must be scrapped and replaced instead.";
 	            	
 	            }
@@ -375,6 +375,26 @@ public class MekLocation extends Part {
 	                return "Repairable parts in " + unit.getEntity().getLocationName(loc) + " must be salvaged or scrapped first.";
 	            } 
 	        }
+		} else {
+			//check for damaged hips and shoulders
+			for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
+	            CriticalSlot slot = unit.getEntity().getCritical(loc, i);
+	            if ((slot == null) || !slot.isEverHittable()) {
+	                continue;
+	            }
+	            if(slot.getType() == CriticalSlot.TYPE_SYSTEM 
+	            		&& slot.getIndex() == Mech.ACTUATOR_HIP
+	            		&& slot.isDestroyed()) {
+	            	return "You cannot repair a leg with a damaged hip. This leg must be scrapped and replaced instead.";
+	            	
+	            }
+	            if(slot.getType() == CriticalSlot.TYPE_SYSTEM 
+	            		&& slot.getIndex() == Mech.ACTUATOR_SHOULDER
+	            		&& slot.isDestroyed()) {
+	            	return "You cannot repair an arm with a damaged shoulder. This arm must be scrapped and replaced instead.";
+	            	
+	            }
+			}
 		}
         return null;
     }

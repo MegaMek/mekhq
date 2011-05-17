@@ -5968,7 +5968,8 @@ public class MekHQView extends FrameView {
         private final static int COL_DESC       = 2;
         private final static int COL_DEBIT     =  3;
         private final static int COL_CREDIT   =   4;
-        private final static int N_COL          = 5;
+        private final static int COL_BALANCE  =   5;
+        private final static int N_COL          = 6;
 		
         private ArrayList<Transaction> data = new ArrayList<Transaction>();
 		
@@ -5993,6 +5994,8 @@ public class MekHQView extends FrameView {
                     return "Debit";
                 case COL_CREDIT:
                     return "Credit";
+                case COL_BALANCE:
+                    return "Balance";
                 default:
                     return "?";
             }
@@ -6001,6 +6004,10 @@ public class MekHQView extends FrameView {
 		public Object getValueAt(int row, int col) {
 			Transaction transaction = data.get(row);
 			long amount = transaction.getAmount();
+			long balance = 0;
+			for(int i = 0; i <= row; i++) {
+				balance += data.get(i).getAmount();
+			}
 			DecimalFormat formatter = new DecimalFormat();
 			if(col == COL_CATEGORY) {
 				return transaction.getCategoryName();
@@ -6021,6 +6028,9 @@ public class MekHQView extends FrameView {
 				} else {
 					return "";
 				}
+			}
+			if(col == COL_BALANCE) {
+				return formatter.format(balance);
 			}
 			if(col == COL_DATE) {
 				SimpleDateFormat shortDateFormat = new SimpleDateFormat("MM/dd/yyyy");
@@ -6044,6 +6054,7 @@ public class MekHQView extends FrameView {
             switch(col) {
             case COL_DEBIT:
             case COL_CREDIT:
+            case COL_BALANCE:
             	return SwingConstants.RIGHT;
             default:
             	return SwingConstants.LEFT;
