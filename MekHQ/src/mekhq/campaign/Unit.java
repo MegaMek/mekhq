@@ -2205,7 +2205,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     					continue;
     				}
     				int eqnum = entity.getEquipmentNum(m);
-    				Part epart = equipParts.get(eqnum);
+    				Part epart = heatSinks.get(eqnum);
     				if(null == epart) {
     					epart = new HeatSink((int)entity.getWeight(), m.getType(), eqnum);
     					addPart(epart);
@@ -2213,7 +2213,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     				}
     			} else if(m.getType().hasFlag(MiscType.F_JUMP_JET)) {
     				int eqnum = entity.getEquipmentNum(m);
-    				Part epart = equipParts.get(eqnum);
+    				Part epart = jumpJets.get(eqnum);
     				if(null == epart) {
     					epart = new JumpJet((int)entity.getWeight(), m.getType(), eqnum);
     					addPart(epart);

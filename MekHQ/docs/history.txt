@@ -121,6 +121,7 @@ v0.1.6 (SVN)
 + Bug: sometimes new ammo and armor spare part created when existing one should be increased
 + color-coding of availability in work descriptions
 + scrap and canScrap methods in Part.java
++ Bug: completely salvaged mech showing up with new parts to be salvaged when game is reloaded
 
 v0.1.5 (2011-05-05)
 + refactored Hangar Panel into separate Hangar and Repair Bay panel
