@@ -49,7 +49,9 @@ public class MissingMekEngine extends MissingPart {
 	public MissingMekEngine(int tonnage, Engine e) {
 		super(tonnage);
 		this.engine = e;
-		this.name = engine.getEngineName() + " Engine";
+		if(null != engine) {
+			this.name = engine.getEngineName() + " Engine";
+		}
 		this.engine = e;
 		this.time = 360;
 		this.difficulty = -1;
@@ -140,6 +142,7 @@ public class MissingMekEngine extends MissingPart {
 		}
 		
 		engine = new Engine(engineType, engineRating, engineFlags);
+		this.name = engine.getEngineName() + " Engine";
 	}
 
 	@Override

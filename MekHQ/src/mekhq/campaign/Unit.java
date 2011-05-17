@@ -2083,7 +2083,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     		} else if(part instanceof MekLifeSupport  || part instanceof MissingMekLifeSupport) {
     			lifeSupport = part;
     		} else if(part instanceof MekSensor || part instanceof MissingMekSensor) {
-    			sensor = (MekSensor)part;
+    			sensor = part;
     		} else if(part instanceof MekLocation) {
     			locations[((MekLocation)part).getLoc()] = part;
     		} else if(part instanceof MissingMekLocation) {
