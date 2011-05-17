@@ -124,6 +124,8 @@ v0.1.6 (SVN)
 + Bug: completely salvaged mech showing up with new parts to be salvaged when game is reloaded
 + Bug: engine rating and type were reversed in constructor
 + Bug: XML not being saved as UTF-8
++ team name not reported correctly in Campaign#acquirePart
++ UTF-8 compliant female names
 
 v0.1.5 (2011-05-05)
 + refactored Hangar Panel into separate Hangar and Repair Bay panel
