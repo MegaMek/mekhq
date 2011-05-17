@@ -51,7 +51,6 @@ public class MekEngine extends Part {
 		super(tonnage);
 		this.engine = e;
 		this.name = engine.getEngineName() + " Engine";
-		this.engine = e;
 	}
 
 	public Engine getEngine() {
@@ -140,7 +139,7 @@ public class MekEngine extends Part {
 			} 
 		}
 		
-		engine = new Engine(engineType, engineRating, engineFlags);
+		engine = new Engine(engineRating, engineType, engineFlags);
 	}
 
 	@Override

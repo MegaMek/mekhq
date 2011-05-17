@@ -141,7 +141,7 @@ public class MissingMekEngine extends MissingPart {
 			} 
 		}
 		
-		engine = new Engine(engineType, engineRating, engineFlags);
+		engine = new Engine(engineRating, engineType, engineFlags);
 		this.name = engine.getEngineName() + " Engine";
 	}
 

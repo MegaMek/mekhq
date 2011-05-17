@@ -122,6 +122,7 @@ v0.1.6 (SVN)
 + color-coding of availability in work descriptions
 + scrap and canScrap methods in Part.java
 + Bug: completely salvaged mech showing up with new parts to be salvaged when game is reloaded
++ Bug: engine rating and type were reversed in constructor
 
 v0.1.5 (2011-05-05)
 + refactored Hangar Panel into separate Hangar and Repair Bay panel
