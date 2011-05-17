@@ -233,7 +233,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 	@Override
 	public String failToFind() {
 		setCheckedToday(false);
-		return "<font color='green'> part found.</font>";
+		return "<font color='red'> part not found.</font>";
 	}
 	
 	public void unload() {
