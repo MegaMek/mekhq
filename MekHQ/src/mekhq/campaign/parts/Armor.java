@@ -133,9 +133,9 @@ public class Armor extends Part implements IAcquisitionWork {
 			int amountAvailable = getAmountAvailable();
 			if(!isSalvaging()) {
 				if(amountAvailable == 0) {
-					availability = "<br>No spare armor available";
+					availability = "<br><font color='red'>No spare armor available</font>";
 				} else if(amountAvailable < amountNeeded) {
-					availability = "<br>Only " + amountAvailable + " points of armor available";
+					availability = "<br><font color='red'>Only " + amountAvailable + " points of armor available</font>";
 				}
 			}
 			return unit.getEntity().getLocationName(location) + rearMount + ", " + amountNeeded + " points" + availability;

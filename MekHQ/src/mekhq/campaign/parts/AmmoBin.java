@@ -333,14 +333,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 		toReturn += ">";
 		toReturn += "<b>Reload " + getName() + "</b><br/>";
 		toReturn += getDetails() + "<br/>";
-		int amountAvailable = getAmountAvailable();
-		if(!salvaging) {
-			if(amountAvailable == 0) {
-				toReturn += "No ammo available";
-			} else {
-				toReturn += "" + getTimeLeft() + " minutes" + scheduled;
-			}
-		}
+		toReturn += "" + getTimeLeft() + " minutes" + scheduled;
 		toReturn += "</font></html>";
 		return toReturn;
 	}
@@ -351,7 +344,14 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     		return super.getDetails();
     	}
     	if(null != unit) {
-    		return ((AmmoType)type).getDesc() + ", " + shotsNeeded + " shots needed";
+    		String availability = "";
+    		int shotsAvailable = getAmountAvailable();		
+    		if(shotsAvailable == 0) {
+    			availability = ", <font color='red'>No ammo available</font>";
+    		} else if(shotsAvailable < shotsNeeded) {
+    			availability = ", <font color='red'>Only " + shotsAvailable + " shots available</font>";
+    		}
+			return ((AmmoType)type).getDesc() + ", " + shotsNeeded + " shots needed" + availability;
     	} else {
     		return "";
     	}

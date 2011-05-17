@@ -155,13 +155,13 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 	public boolean isReplacementAvailable() {
 		return null != findReplacement();
 	}
-	
+
 	@Override
     public String getDetails() {
 		if(isReplacementAvailable()) {
 			return "Replacement part available";
 		} else {
-			return "Replacement part not available";
+			return "<font color='red'>Replacement part not available</font>";
 		}
     }
 	
