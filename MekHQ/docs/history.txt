@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.1.7 (SVN)
++ MekLab tab (no functionality yet, but there it is)
 
 v0.1.6 (2011-05-17)
 + beginning of Briefing Room tab

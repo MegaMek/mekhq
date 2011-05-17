@@ -479,6 +479,8 @@ public class MekHQView extends FrameView {
 		scrollPlanetView = new javax.swing.JScrollPane();
 		lblPartsChoice = new javax.swing.JLabel();
 		choiceParts = new javax.swing.JComboBox();
+		panMekLab = new MekLabPanel();
+		scrollMekLab = new javax.swing.JScrollPane();
 		
 		org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application
 				.getInstance(mekhq.MekHQApp.class).getContext()
@@ -1399,6 +1401,13 @@ public class MekHQView extends FrameView {
 				resourceMap.getString("panInfirmary.TabConstraints.tabTitle"),
 				panInfirmary); // NOI18N
 
+		panMekLab.setName("panMekLab"); // NOI18N
+		scrollMekLab.setName("scrollFinanceTable");
+        scrollMekLab.setViewportView(panMekLab);
+		tabMain.addTab(
+				resourceMap.getString("panMekLab.TabConstraints.tabTitle"),
+				scrollMekLab); // NOI18N
+		
 		panFinances.setName("panFinances"); // NOI18N
 		panFinances.setLayout(new java.awt.GridBagLayout());
 
@@ -3597,7 +3606,7 @@ public class MekHQView extends FrameView {
 				refreshScenarioList();
 			} else if (command.contains("CUSTOMIZE")
 					&& !command.contains("CANCEL")) {
-				if (!selectedUnit.isDeployed() && !selectedUnit.isDamaged()) {
+				/*if (!selectedUnit.isDeployed() && !selectedUnit.isDamaged()) {
 					Entity targetEntity = null;
 					String targetMechName = command.split(":")[1];
 					if (targetMechName.equals("MML")) {
@@ -3644,7 +3653,7 @@ public class MekHQView extends FrameView {
 								targetEntity = mmlEntity;
 							}
 						}
-
+	
 					} else if (targetMechName.equals("CHOOSE_VARIANT")) {
 						UnitSelectorDialog usd = new UnitSelectorDialog(null,
 								true, campaign, null);
@@ -3706,6 +3715,7 @@ public class MekHQView extends FrameView {
 					refreshTaskList();
 					refreshAcquireList();
 				}
+				*/
 			} else if (command.contains("CANCEL_CUSTOMIZE")) {
 				if (selectedUnit.isCustomized()) {
 					selectedUnit.setCustomized(false);
@@ -6536,7 +6546,7 @@ public class MekHQView extends FrameView {
 				refreshScenarioList();
 			} else if (command.contains("CUSTOMIZE")
 					&& !command.contains("CANCEL")) {
-				if (!selectedUnit.isDeployed() && !selectedUnit.isDamaged()) {
+				/*if (!selectedUnit.isDeployed() && !selectedUnit.isDamaged()) {
 					Entity targetEntity = null;
 					String targetMechName = command.split(":")[1];
 					if (targetMechName.equals("MML")) {
@@ -6583,7 +6593,7 @@ public class MekHQView extends FrameView {
 								targetEntity = mmlEntity;
 							}
 						}
-		
+						
 					} else if (targetMechName.equals("CHOOSE_VARIANT")) {
 						UnitSelectorDialog usd = new UnitSelectorDialog(null,
 								true, campaign, null);
@@ -6645,6 +6655,7 @@ public class MekHQView extends FrameView {
 					refreshTaskList();
 					refreshAcquireList();
 				}
+				*/
 			} else if (command.contains("CANCEL_CUSTOMIZE")) {
 				if (selectedUnit.isCustomized()) {
 					selectedUnit.setCustomized(false);
@@ -7197,6 +7208,8 @@ public class MekHQView extends FrameView {
     private javax.swing.JComboBox choiceParts;
 	private javax.swing.JLabel lblPartsChoice;
 	private JSuggestField suggestPlanet;
+	private MekLabPanel panMekLab;
+	private javax.swing.JScrollPane scrollMekLab;
 	// End of variables declaration//GEN-END:variables
 
 	private final Timer messageTimer;
