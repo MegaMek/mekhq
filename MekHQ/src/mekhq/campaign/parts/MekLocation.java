@@ -387,4 +387,14 @@ public class MekLocation extends Part {
 		}
 		return super.isSalvaging();
 	}
+	
+	@Override
+	public boolean canScrap() {
+		//cant scrap a center torso
+		if(loc ==  Mech.LOC_CT) {
+			return false;
+		}
+		return true;
+	}
+	
 }

@@ -33,6 +33,7 @@ import megamek.common.TechConstants;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Utilities;
 import mekhq.campaign.team.SupportTeam;
+import mekhq.campaign.team.TechTeam;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.Modes;
 
@@ -594,5 +595,17 @@ public class Armor extends Part implements IAcquisitionWork {
 			}
 		}
 		return " <font color='red'><b> failed." + scrap + "</b></font>";
+	}
+	
+	@Override
+	public boolean canScrap() {
+		return isEnoughSpareArmorAvailable();
+	}
+	
+	@Override
+	public String scrap() {
+		changeAmountAvailable(-1 * amountNeeded);
+		skillMin = TechTeam.EXP_GREEN;
+		return amountNeeded + " " + EquipmentType.armorNames[type] + " armor points scrapped.";
 	}
 }

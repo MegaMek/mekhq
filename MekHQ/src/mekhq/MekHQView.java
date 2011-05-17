@@ -3215,13 +3215,15 @@ public class MekHQView extends FrameView {
 			if(null == part) {
 				return;
 			}
-			if (command.equalsIgnoreCase("REPLACE")) {
-				part.remove(false);
+			if (command.equalsIgnoreCase("SCRAP")) {
+				campaign.addReport(part.scrap());
 				refreshServicedUnitList();
 				refreshUnitList();
 				refreshTaskList();
 				refreshUnitView();
+				refreshPartsList();
 				refreshAcquireList();
+				refreshReport();
 			} else if (command.contains("SWAP_AMMO")) {
 				/*
 				WorkItem task = taskModel.getTaskAt(TaskTable.getSelectedRow());
@@ -3321,9 +3323,9 @@ public class MekHQView extends FrameView {
 				popup.add(menu);
 				// Scrap component
 				menuItem = new JMenuItem("Scrap component");
-				menuItem.setActionCommand("REPLACE");
+				menuItem.setActionCommand("SCRAP");
 				menuItem.addActionListener(this);
-				menuItem.setEnabled(true);
+				menuItem.setEnabled(part.canScrap());
 				popup.add(menuItem);
 				// Remove assigned team for scheduled tasks
 				/*

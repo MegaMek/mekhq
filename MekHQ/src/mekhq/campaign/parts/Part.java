@@ -553,5 +553,14 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	public void setSalvaging(boolean b) {
 		this.salvaging = b;
 	}
+	
+	public boolean canScrap() {
+		return true;
+	}
+	
+	public String scrap() {
+		remove(false);
+		return getName() + " scrapped.";
+	}
 }
 

@@ -200,6 +200,11 @@ public class TankLocation extends Part {
 	public boolean isSalvaging() {
 		return salvaging && (loc == Tank.LOC_TURRET || loc == Tank.LOC_TURRET_2);
 	}
+	
+	@Override
+	public boolean canScrap() {
+		return loc == Tank.LOC_TURRET || loc == Tank.LOC_TURRET_2;
+	}
 
 	@Override
 	public double getTonnage() {

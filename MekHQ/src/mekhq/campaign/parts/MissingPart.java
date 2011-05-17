@@ -30,6 +30,7 @@ import mekhq.campaign.MekHqXmlSerializable;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Utilities;
 import mekhq.campaign.team.SupportTeam;
+import mekhq.campaign.team.TechTeam;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.Modes;
@@ -288,6 +289,21 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 				}
 			} 
 		}
+	}
+	
+	@Override
+	public boolean canScrap() {
+		return isReplacementAvailable();
+	}
+	
+	@Override
+	public String scrap() {
+		Part replace = findReplacement();
+		if(null != replace && null != unit) {
+			unit.campaign.removePart(replace);
+		}
+		skillMin = TechTeam.EXP_GREEN;
+		return replace.getName() + " scrapped.";
 	}
 	
 }

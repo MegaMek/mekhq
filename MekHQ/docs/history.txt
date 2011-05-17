@@ -120,6 +120,7 @@ v0.1.6 (SVN)
 + mul for scenario deployment named after scenario not campaign
 + Bug: sometimes new ammo and armor spare part created when existing one should be increased
 + color-coding of availability in work descriptions
++ scrap and canScrap methods in Part.java
 
 v0.1.5 (2011-05-05)
 + refactored Hangar Panel into separate Hangar and Repair Bay panel
