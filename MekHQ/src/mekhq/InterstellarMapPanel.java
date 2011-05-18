@@ -8,6 +8,7 @@ package mekhq;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -16,6 +17,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
+import java.awt.geom.Arc2D;
+import java.awt.geom.Line2D;
 import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
@@ -349,16 +352,16 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
         return Math.round((x - getWidth() / 2 - conf.offset.x) / conf.scale);
     }
 
-    private int map2scrX(double x) {
-        return (int) Math.round(getWidth() / 2 + x * conf.scale) + conf.offset.x;
+    private double map2scrX(double x) {
+        return Math.round(getWidth() / 2 + x * conf.scale) + conf.offset.x;
     }
 
     private double scr2mapY(int y) {
         return Math.round((getHeight() / 2 - (y - conf.offset.y)) / conf.scale);
     }
 
-    private int map2scrY(double y) {
-        return (int) Math.round(getHeight() / 2 - y * conf.scale) + conf.offset.y;
+    private double map2scrY(double y) {
+        return Math.round(getHeight() / 2 - y * conf.scale) + conf.offset.y;
     }
     
     public void setSelectedPlanet(Planet p) {
@@ -372,44 +375,52 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
 
 	
 	protected void paintComponent(Graphics g) {
-		g.setColor(Color.BLACK);
-		g.fillRect(0, 0, getWidth(), getHeight());
-		int size = (int) Math.round(Math.max(5, Math.log(conf.scale) * 15 + 5));
+		Graphics2D g2 = (Graphics2D) g;
+		g2.setColor(Color.BLACK);
+		g2.fillRect(0, 0, getWidth(), getHeight());
+		double size = 1 + 5 * Math.log(conf.scale);
         size = Math.max(Math.min(size, conf.maxdotSize), conf.minDotSize);
-        
+        Arc2D.Double arc = new Arc2D.Double();
         //first get the jump diameter for selected planet
         if(null != selectedPlanet && conf.scale > conf.showPlanetNamesThreshold) {
-        	int x = map2scrX(selectedPlanet.getX());
-			int y = map2scrY(selectedPlanet.getY());
-			int z = map2scrX(selectedPlanet.getX() + 30);
-			int jumpdiameter = 2 * (z - x);
-			g.setColor(Color.DARK_GRAY);
-			g.fillArc(x-jumpdiameter/2, y-jumpdiameter/2, jumpdiameter, jumpdiameter, 0, 360);	
-			
+        	double x = map2scrX(selectedPlanet.getX());
+			double y = map2scrY(selectedPlanet.getY());
+			double z = map2scrX(selectedPlanet.getX() + 30);
+			double jumpRadius = (z - x);
+			g2.setPaint(Color.DARK_GRAY);
+			arc.setArcByCenter(x, y, jumpRadius, 0, 360, Arc2D.OPEN);
+			g2.fill(arc);	
         }
-        
+        	
 		for(Planet planet : planets) {
-			int x = map2scrX(planet.getX());
-			int y = map2scrY(planet.getY());
+			double x = map2scrX(planet.getX());
+			double y = map2scrY(planet.getY());
 			
 			if(null != selectedPlanet && selectedPlanet.equals(planet)) {	
-				g.setColor(Color.WHITE);
-				int adjust = size/2;
-				g.fillArc(x-adjust/2, y-adjust/2, size+adjust, size+adjust, 0, 360);
+				g2.setPaint(Color.WHITE);
+				arc.setArcByCenter(x, y, size * 1.5, 0, 360, Arc2D.OPEN);
+				g2.fill(arc);
 			}
-			g.setColor(Faction.getFactionColor(planet.getFaction()));
-			g.fillArc(x, y, size, size, 0, 360);	
-			//name
-			if (conf.showPlanetNamesThreshold == 0 || conf.scale > conf.showPlanetNamesThreshold) {
-                g.drawString(planet.getName(), x + size, y);
-            }
+			g2.setPaint(Faction.getFactionColor(planet.getFaction()));
+			arc.setArcByCenter(x, y, size, 0, 360, Arc2D.OPEN);
+			g2.fill(arc);
+			
 		}
 		//draw a jump path
 		for(int i = 1; i < jumpPath.size(); i++) {
 			Planet planetA = jumpPath.get(i-1);
 			Planet planetB = jumpPath.get(i);
 			g.setColor(Color.WHITE);
-			g.drawLine(map2scrX(planetA.getX()) + size/2, map2scrY(planetA.getY()) + size/2, map2scrX(planetB.getX()) + size/2, map2scrY(planetB.getY()) + size/2);
+			g2.draw(new Line2D.Double(map2scrX(planetA.getX()), map2scrY(planetA.getY()), map2scrX(planetB.getX()), map2scrY(planetB.getY())));
+		}
+
+		//cycle through planets again and assign names - to make sure names go on outside
+		for(Planet planet : planets) {
+			double x = map2scrX(planet.getX());
+			double y = map2scrY(planet.getY());
+			if (conf.showPlanetNamesThreshold == 0 || conf.scale > conf.showPlanetNamesThreshold) {
+	            g2.drawString(planet.getName(), (float)(x+size * 1.5), (float)y);
+	        }
 		}
 		
 	}
@@ -474,7 +485,7 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
         /**
          * Whether to scale planet dots on zoom or not
          */
-        int minDotSize = 2;
+        int minDotSize = 3;
         int maxdotSize = 25;
         /**
          * The scaling maximum dimension

@@ -5,6 +5,7 @@ v0.1.7 (SVN)
 + load a mech into the MekLab via the unit context menu (still doesn't do much)
 + A* pathfinding for finding jump paths
 + updated MegaMekLab.jar
++ use Graphics2D class to draw interstellar map so that coordinates are exact
 
 v0.1.6 (2011-05-17)
 + beginning of Briefing Room tab
