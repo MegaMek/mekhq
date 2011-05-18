@@ -6,6 +6,7 @@ v0.1.7 (SVN)
 + A* pathfinding for finding jump paths
 + updated MegaMekLab.jar
 + use Graphics2D class to draw interstellar map so that coordinates are exact
++ dynamic faction changes to map
 
 v0.1.6 (2011-05-17)
 + beginning of Briefing Room tab

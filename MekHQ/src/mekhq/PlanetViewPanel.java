@@ -126,7 +126,7 @@ public class PlanetViewPanel extends javax.swing.JPanel {
 		pnlStats.setLayout(new java.awt.GridBagLayout());
 		
 		lblOwner.setName("lblOwner"); // NOI18N
-		lblOwner.setText("<html><i>" + Faction.getFactionName(planet.getFaction()) + "</i></html>");
+		lblOwner.setText("<html><i>" + Faction.getFactionName(planet.getCurrentFaction(campaign.getCalendar().getTime())) + "</i></html>");
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 0;

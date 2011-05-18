@@ -20,6 +20,7 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
+import java.util.GregorianCalendar;
 
 import javax.swing.BorderFactory;
 import javax.swing.JMenu;
@@ -44,15 +45,17 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
 
 	private ArrayList<Planet> planets;
 	private ArrayList<Planet> jumpPath;
+	private GregorianCalendar calendar;
 	InnerStellarMapConfig conf = new InnerStellarMapConfig();
 	MekHQView hqview;
 	private Planet selectedPlanet = null;
 	Point lastMousePos = null;
     int mouseMod = 0;
 	
-	public InterstellarMapPanel(ArrayList<Planet> p, MekHQView view) {
+	public InterstellarMapPanel(ArrayList<Planet> p, MekHQView view, GregorianCalendar c) {
 		planets = p;
 		hqview = view;
+		calendar = c;
 		jumpPath = new ArrayList<Planet>();
 		
 		setBorder(BorderFactory.createLineBorder(Color.black));
@@ -176,7 +179,7 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
                 	JMenu zMenu = new JMenu("Z");
                 	for(int i = 0; i < planets.size(); i++) {
                 		Planet p = planets.get(i);
-                		item = new JMenuItem(p.getName() + " (" + Faction.getFactionName(p.getFaction()) + ")");
+                		item = new JMenuItem(p.getName() + " (" + Faction.getFactionName(p.getBaseFaction()) + ")");
     					item.setActionCommand(Integer.toString(i));
             			item.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent ae) {
@@ -401,7 +404,7 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
 				arc.setArcByCenter(x, y, size * 1.5, 0, 360, Arc2D.OPEN);
 				g2.fill(arc);
 			}
-			g2.setPaint(Faction.getFactionColor(planet.getFaction()));
+			g2.setPaint(Faction.getFactionColor(planet.getCurrentFaction(calendar.getTime())));
 			arc.setArcByCenter(x, y, size, 0, 360, Arc2D.OPEN);
 			g2.fill(arc);
 			

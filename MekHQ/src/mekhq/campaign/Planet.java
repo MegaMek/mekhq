@@ -21,8 +21,16 @@
 
 package mekhq.campaign;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.Hashtable;
+import java.util.TreeMap;
+
 import megamek.common.PlanetaryConditions;
 
+import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -74,6 +82,11 @@ public class Planet {
 	
 	private double x; 
 	private double y;
+	
+	/**
+	 * This is the base faction which the program will fall back on if
+	 * no better faction is found in the faction history given the date
+	 */
 	private int faction;
 	private String name;
 	
@@ -92,6 +105,9 @@ public class Planet {
 	private int climate;
 	private int percentWater;
 	private int temperature;
+	
+	//a hash to keep track of dynamic faction changes
+	TreeMap<Date,Integer> factionHistory;
 	
 	public Planet() {
 		this.x = 0;
@@ -112,6 +128,8 @@ public class Planet {
 		this.climate = CLIMATE_WARMTEM;
 		this.percentWater = 70;
 		this.temperature = 20;
+		
+		this.factionHistory = new TreeMap<Date,Integer>();
 	}
 	
 	public static String getLifeFormName(int life) {
@@ -209,8 +227,20 @@ public class Planet {
 		return y;
 	}
 	
-	public int getFaction() {
+	public int getBaseFaction() {
 		return faction;
+	}
+	
+	public int getCurrentFaction(Date date) {
+		int currentFaction = getBaseFaction();
+		for(Date event : factionHistory.keySet()) {
+			if(event.after(date)) {
+				return currentFaction;
+			} else {
+				currentFaction = factionHistory.get(event);
+			}
+		}
+		return currentFaction;
 	}
 	
 	public String getName() {
@@ -484,7 +514,7 @@ public class Planet {
 		return Math.sqrt(Math.pow(x - anotherPlanet.getX(), 2) + Math.pow(y - anotherPlanet.getY(), 2));
 	}
 	
-	public static Planet getPlanetFromXML(Node wn) {
+	public static Planet getPlanetFromXML(Node wn) throws DOMException, ParseException {
 		Planet retVal = new Planet();
 		NodeList nl = wn.getChildNodes();
 		
@@ -526,9 +556,38 @@ public class Planet {
 				retVal.subtype = Integer.parseInt(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("luminosity")) {
 				retVal.luminosity = wn2.getTextContent();
+			} else if (wn2.getNodeName().equalsIgnoreCase("factionChange")) {
+				processFactionChange(retVal, wn2);
 			}
 		}
 		return retVal;
+	}
+	
+	private static void processFactionChange(Planet retVal, Node wni) throws DOMException, ParseException {
+		NodeList nl = wni.getChildNodes();
+
+		Date date = null;
+		int faction = -1;
+		// Okay, lets iterate through the children, eh?
+		for (int x = 0; x < nl.getLength(); x++) {
+			Node wn = nl.item(x);
+			int xc = wn.getNodeType();
+
+			// If it's not an element, again, we're ignoring it.
+			if (xc == Node.ELEMENT_NODE) {
+				String xn = wn.getNodeName();
+
+				if (xn.equalsIgnoreCase("date")) {
+					SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+					date = df.parse(wn.getTextContent().trim());
+				} else if (xn.equalsIgnoreCase("faction")) {
+					faction = Integer.parseInt(wn.getTextContent().trim());
+				}
+			}
+		}
+		if(null != date && faction > -1) {
+			retVal.factionHistory.put(date, faction);
+		}
 	}
 	
 	@Override
