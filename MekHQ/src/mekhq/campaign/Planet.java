@@ -480,6 +480,10 @@ public class Planet {
 		
 	}
 	
+	public double getDistanceTo(Planet anotherPlanet) {
+		return Math.sqrt(Math.pow(x - anotherPlanet.getX(), 2) + Math.pow(y - anotherPlanet.getY(), 2));
+	}
+	
 	public static Planet getPlanetFromXML(Node wn) {
 		Planet retVal = new Planet();
 		NodeList nl = wn.getChildNodes();

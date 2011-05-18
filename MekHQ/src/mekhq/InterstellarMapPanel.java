@@ -40,6 +40,7 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
 	private static final long serialVersionUID = -1110105822399704646L;
 
 	private ArrayList<Planet> planets;
+	private ArrayList<Planet> jumpPath;
 	InnerStellarMapConfig conf = new InnerStellarMapConfig();
 	MekHQView hqview;
 	private Planet selectedPlanet = null;
@@ -49,6 +50,7 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
 	public InterstellarMapPanel(ArrayList<Planet> p, MekHQView view) {
 		planets = p;
 		hqview = view;
+		jumpPath = new ArrayList<Planet>();
 		
 		setBorder(BorderFactory.createLineBorder(Color.black));
         
@@ -402,6 +404,14 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
                 g.drawString(planet.getName(), x + size, y);
             }
 		}
+		//draw a jump path
+		for(int i = 1; i < jumpPath.size(); i++) {
+			Planet planetA = jumpPath.get(i-1);
+			Planet planetB = jumpPath.get(i);
+			g.setColor(Color.WHITE);
+			g.drawLine(map2scrX(planetA.getX()) + size/2, map2scrY(planetA.getY()) + size/2, map2scrX(planetB.getX()) + size/2, map2scrY(planetB.getY()) + size/2);
+		}
+		
 	}
 	
 	 /**
@@ -450,6 +460,10 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
     	hqview.refreshPlanetView();
     }
     
+    public void drawJumpPath(ArrayList<Planet> path) {
+    	jumpPath = path;
+    	repaint();
+    }
     
     /**
      * All configuration behaviour of InterStellarMap are saved here.

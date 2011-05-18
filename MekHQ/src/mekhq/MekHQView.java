@@ -789,6 +789,7 @@ public class MekHQView extends FrameView {
 		panelMapView.add(suggestPlanet, gridBagConstraints);
 		
 		panMap = new InterstellarMapPanel(campaign.getPlanets(), this);
+		panMap.drawJumpPath(campaign.calculateJumpPath("New Avalon", "Luthien"));
 		panMap.setName("panMap"); // NOI18N		
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;

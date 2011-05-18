@@ -2016,4 +2016,101 @@ public class Campaign implements Serializable {
 		return new ArrayList<IAcquisitionWork>();
 	}
 	
+	/**
+	 * Use an A* algorithm to find the best path between two planets
+	 * For right now, we are just going to minimze the number of jumps
+	 * but we could extend this to take advantage of recharge information 
+	 * or other variables as well
+	 * Based on
+	 * http://www.policyalmanac.org/games/aStarTutorial.htm
+	 * @param startKey
+	 * @param endKey
+	 * @return
+	 */
+	public ArrayList<Planet> calculateJumpPath(String startKey, String endKey) {
+		
+		String current = startKey;
+		ArrayList<String> closed = new ArrayList<String>();
+		ArrayList<String> open = new ArrayList<String>();
+		boolean found = false;
+		int jumps = 0;
+		
+		Planet end = planets.get(endKey);
+		
+		//we are going to through and set up some hashes that will make our work easier
+		//hash of parent key
+		Hashtable<String,String> parent = new Hashtable<String,String>();
+		//hash of H for each planet which will not change
+		Hashtable<String,Double> scoreH = new Hashtable<String,Double>();
+		//hash of G for each planet which might change
+		Hashtable<String,Integer> scoreG = new Hashtable<String,Integer>();
+
+		for(String key : planets.keySet()) {
+			scoreH.put(key, end.getDistanceTo(planets.get(key)));
+		}
+		scoreG.put(current, 0);
+		closed.add(current);
+		
+		while(!found && jumps < 5000) {
+			jumps++;
+			int currentG = scoreG.get(current) + 1;
+			ArrayList<String> neighborKeys = getAllReachablePlanetsFrom(planets.get(current));
+			for(String neighborKey : neighborKeys) {
+				if(closed.contains(neighborKey)) {
+					continue;
+				}
+				else if (open.contains(neighborKey)) {
+					//is the current G better than the existing G
+					if(currentG < scoreG.get(neighborKey)) {
+						//then change G and parent
+						scoreG.put(neighborKey, currentG);
+						parent.put(neighborKey, current);
+					}
+				} else {
+					//put the current G for this one in memory
+					scoreG.put(neighborKey, currentG);
+					//put the parent in memory
+					parent.put(neighborKey, current);
+					open.add(neighborKey);
+				}
+			}
+			String bestMatch = null;
+			double bestF = Integer.MAX_VALUE;
+			for(String possible : open) {
+				//calculate F
+				double currentF = scoreG.get(possible) + scoreH.get(possible);
+				if(currentF < bestF) {
+					bestMatch = possible;
+					bestF = currentF;
+				}
+			}
+			current = bestMatch;
+			closed.add(current);
+			if(current.equals(endKey)) {
+				found = true;
+			}
+		}
+		//now we just need to back up from the last current by parents until we hit null
+		ArrayList<Planet> path = new ArrayList<Planet>();
+		String nextKey = current;
+		while(null != nextKey) {
+			path.add(planets.get(nextKey));
+			//MekHQApp.logMessage(nextKey);
+			nextKey = parent.get(nextKey);
+			
+		}
+		return path;
+	}
+	
+	public ArrayList<String> getAllReachablePlanetsFrom(Planet planet) {
+		ArrayList<String> neighbors = new ArrayList<String>();
+		for(String key : planets.keySet()) {
+			Planet p = planets.get(key);
+			if(planet.getDistanceTo(p) <= 30.0) {
+				neighbors.add(key);
+			}
+		}
+		return neighbors;
+	}
+	
 }
