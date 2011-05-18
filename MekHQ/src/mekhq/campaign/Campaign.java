@@ -2075,7 +2075,7 @@ public class Campaign implements Serializable {
 		scoreG.put(current, 0);
 		closed.add(current);
 		
-		while(!found && jumps < 5000) {
+		while(!found && jumps < 10000) {
 			jumps++;
 			int currentG = scoreG.get(current) + 1;
 			ArrayList<String> neighborKeys = getAllReachablePlanetsFrom(planets.get(current));
@@ -2110,6 +2110,7 @@ public class Campaign implements Serializable {
 			}
 			current = bestMatch;
 			closed.add(current);
+			open.remove(current);
 			if(current.equals(endKey)) {
 				found = true;
 			}
