@@ -788,7 +788,7 @@ public class MekHQView extends FrameView {
 		gridBagConstraints.weighty = 0.0;
 		panelMapView.add(suggestPlanet, gridBagConstraints);
 		
-		panMap = new InterstellarMapPanel(campaign.getPlanets(), this, campaign.getCalendar());
+		panMap = new InterstellarMapPanel(campaign, this);
 		panMap.drawJumpPath(campaign.calculateJumpPath("New Avalon", "Luthien"));
 		panMap.setName("panMap"); // NOI18N		
 		gridBagConstraints = new java.awt.GridBagConstraints();
@@ -2313,6 +2313,7 @@ public class MekHQView extends FrameView {
 		refreshCalendar();
 		changePersonnelView();
 		refreshPersonnelList();
+		panMap.repaint();
 	}// GEN-LAST:event_menuOptionsActionPerformed
 
 	private void miLoadForcesActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miLoadForcesActionPerformed

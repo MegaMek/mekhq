@@ -7,6 +7,8 @@ v0.1.7 (SVN)
 + updated MegaMekLab.jar
 + use Graphics2D class to draw interstellar map so that coordinates are exact
 + dynamic faction changes to map
++ new planets database that takes account of faction changes using the PRSC time points
+     (2575,2750,3025,3030,3040,3052,3057,3062)
 
 v0.1.6 (2011-05-17)
 + beginning of Briefing Room tab

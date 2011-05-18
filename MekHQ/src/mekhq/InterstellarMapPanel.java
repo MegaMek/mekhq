@@ -27,6 +27,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
+import mekhq.campaign.Campaign;
 import mekhq.campaign.Faction;
 import mekhq.campaign.Planet;
 
@@ -45,17 +46,17 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
 
 	private ArrayList<Planet> planets;
 	private ArrayList<Planet> jumpPath;
-	private GregorianCalendar calendar;
+	private Campaign campaign;
 	InnerStellarMapConfig conf = new InnerStellarMapConfig();
 	MekHQView hqview;
 	private Planet selectedPlanet = null;
 	Point lastMousePos = null;
     int mouseMod = 0;
 	
-	public InterstellarMapPanel(ArrayList<Planet> p, MekHQView view, GregorianCalendar c) {
-		planets = p;
+	public InterstellarMapPanel(Campaign c, MekHQView view) {
+		campaign = c;
+		planets = campaign.getPlanets();
 		hqview = view;
-		calendar = c;
 		jumpPath = new ArrayList<Planet>();
 		
 		setBorder(BorderFactory.createLineBorder(Color.black));
@@ -404,7 +405,7 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
 				arc.setArcByCenter(x, y, size * 1.5, 0, 360, Arc2D.OPEN);
 				g2.fill(arc);
 			}
-			g2.setPaint(Faction.getFactionColor(planet.getCurrentFaction(calendar.getTime())));
+			g2.setPaint(Faction.getFactionColor(planet.getCurrentFaction(campaign.getCalendar().getTime())));
 			arc.setArcByCenter(x, y, size, 0, 360, Arc2D.OPEN);
 			g2.fill(arc);
 			
