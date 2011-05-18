@@ -111,11 +111,28 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
                 }
                 if(e.isAltDown()) {
                 	Planet destination = nearestNeighbour(scr2mapX(e.getX()), scr2mapY(e.getY()));
-                	if(destination != null) {
+                	if(null == destination) {
+                		return;
+                	}
+                	if(e.isShiftDown()) {
+                		//manually add a planet to an existing jump path
+                		Planet lastPlanet = selectedPlanet;
+                		if(jumpPath.size() > 0) {
+                			lastPlanet = jumpPath.get(0);
+                		}
+                		if(destination.getDistanceTo(lastPlanet) <= 30.0) {
+                			jumpPath.add(0,destination);
+                			repaint();
+                			return;
+                		} else {
+                			return;
+                		}
+                	} else {
+                		//calculate new jump path
                 		jumpPath = campaign.calculateJumpPath(selectedPlanet.getName(), destination.getName());
                 		repaint();
+                		return;
                 	}
-                	return;
                 }
             	changeSelectedPlanet(nearestNeighbour(scr2mapX(e.getX()), scr2mapY(e.getY())));  
             	repaint();
@@ -510,6 +527,7 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
     private void changeSelectedPlanet(Planet p) {
     	selectedPlanet = p;
     	hqview.refreshPlanetView();
+    	jumpPath = new ArrayList<Planet>();
     }
     
     public void drawJumpPath(ArrayList<Planet> path) {

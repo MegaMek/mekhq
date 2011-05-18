@@ -12,6 +12,7 @@ v0.1.7 (SVN)
 + currentPlanet tracked in campaign and on map
 + alt-click on map to calculate jump path between clicked planet and currently selected planet
 + correction to A* pathfinding technique
++ alt+shift click to add a planet manually to the jump path
 
 v0.1.6 (2011-05-17)
 + beginning of Briefing Room tab
