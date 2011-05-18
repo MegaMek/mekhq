@@ -109,6 +109,14 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
                 if (e.isPopupTrigger() || e.getButton() != MouseEvent.BUTTON1) {
                     return;
                 }
+                if(e.isAltDown()) {
+                	Planet destination = nearestNeighbour(scr2mapX(e.getX()), scr2mapY(e.getY()));
+                	if(destination != null) {
+                		jumpPath = campaign.calculateJumpPath(selectedPlanet.getName(), destination.getName());
+                		repaint();
+                	}
+                	return;
+                }
             	changeSelectedPlanet(nearestNeighbour(scr2mapX(e.getX()), scr2mapY(e.getY())));  
             	repaint();
             }          
@@ -452,7 +460,7 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
 			double y = map2scrY(planet.getY());
 			if (conf.showPlanetNamesThreshold == 0 || conf.scale > conf.showPlanetNamesThreshold) {
 				g2.setPaint(Color.WHITE);
-	            g2.drawString(planet.getName(), (float)(x+size * 1.5), (float)y);
+	            g2.drawString(planet.getShortName(), (float)(x+size * 1.5), (float)y);
 	        }
 		}
 		

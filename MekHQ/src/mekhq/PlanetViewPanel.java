@@ -67,7 +67,7 @@ public class PlanetViewPanel extends javax.swing.JPanel {
 		setBackground(Color.WHITE);
 
 		pnlStats.setName("pnlStats");
-		pnlStats.setBorder(BorderFactory.createTitledBorder(planet.getName()));
+		pnlStats.setBorder(BorderFactory.createTitledBorder(planet.getShortName()));
 		pnlStats.setBackground(Color.WHITE);
 		fillStats();
 		gridBagConstraints = new java.awt.GridBagConstraints();

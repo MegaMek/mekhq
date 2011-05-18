@@ -10,6 +10,7 @@ v0.1.7 (SVN)
 + new planets database that takes account of faction changes using the PRSC time points
      (2575,2750,3025,3030,3040,3052,3057,3062)
 + currentPlanet tracked in campaign and on map
++ alt-click on map to calculate jump path between clicked planet and currently selected planet
 
 v0.1.6 (2011-05-17)
 + beginning of Briefing Room tab

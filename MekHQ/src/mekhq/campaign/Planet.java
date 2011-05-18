@@ -89,6 +89,7 @@ public class Planet {
 	 */
 	private int faction;
 	private String name;
+	private String shortName;
 	
 	//star type
 	private int spectralClass;
@@ -114,6 +115,7 @@ public class Planet {
 		this.y = 0;
 		this.faction = Faction.F_COMSTAR;
 		this.name = "Terra";
+		this.shortName = "Terra";
 		
 		this.spectralClass = SPECTRAL_G;
 		this.subtype = 2;
@@ -247,11 +249,19 @@ public class Planet {
 		return name;
 	}
 	
-	/*
-	public double getTimeToJumpPoint() {
-		return jumpPoint;
+	public String getShortName() {
+		return shortName;
 	}
-	*/
+	
+	/**
+	 * Used when there are planets with duplicate names
+	 * @param n
+	 */
+	public void resetName(String n) {
+		this.shortName = name;
+		this.name = n;
+	}
+
 	
 	public double getGravity() {
 		return gravity;
@@ -522,6 +532,7 @@ public class Planet {
 			Node wn2 = nl.item(x);
 			if (wn2.getNodeName().equalsIgnoreCase("name")) {
 				retVal.name = wn2.getTextContent();
+				retVal.shortName = retVal.name;
 			} else if (wn2.getNodeName().equalsIgnoreCase("xcood")) {
 				retVal.x = Double.parseDouble(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("ycood")) {

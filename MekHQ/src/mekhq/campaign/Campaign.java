@@ -1889,8 +1889,10 @@ public class Campaign implements Serializable {
 						//There could still be duplicates in theory, but I don't think there are in practice
 						Planet oldPlanet = retVal.get(name);
 						retVal.remove(name);
-						retVal.put(oldPlanet.getName() + " (" + Faction.getFactionName(oldPlanet.getBaseFaction()) + ")", oldPlanet);
-						retVal.put(p.getName() + " (" + Faction.getFactionName(p.getBaseFaction()) + ")", p);
+						oldPlanet.resetName(oldPlanet.getName() + " (" + Faction.getFactionName(oldPlanet.getBaseFaction()) + ")");
+						retVal.put(oldPlanet.getName(), oldPlanet);
+						p.resetName(p.getName() + " (" + Faction.getFactionName(p.getBaseFaction()) + ")");
+						retVal.put(p.getName(), p);
 					}
 					
 				}
