@@ -27,6 +27,8 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
+import sun.tools.tree.ThisExpression;
+
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Faction;
 import mekhq.campaign.Planet;
@@ -137,6 +139,17 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
                         item.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent ae) {
                                 center(selectedPlanet);
+                            }
+                        });
+                    }
+                    centerM.add(item);
+                    item = new JMenuItem("On Current Location");
+                    item.setEnabled(campaign.getCurrentPlanet() != null);
+                    if (campaign.getCurrentPlanet() != null) {// only add if there is a planet to center on
+                        item.addActionListener(new ActionListener() {
+                            public void actionPerformed(ActionEvent ae) {
+                            	selectedPlanet = campaign.getCurrentPlanet();
+                                center(campaign.getCurrentPlanet());
                             }
                         });
                     }
@@ -349,6 +362,12 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
         });
 	}
 	
+	public void setCampaign(Campaign c) {
+		this.campaign = c;
+		this.planets = campaign.getPlanets();
+		repaint();
+	}
+	
 	/**
      * Computes the map-coordinate from the screen koordinate system
      */
@@ -396,10 +415,26 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
 			g2.fill(arc);	
         }
         	
+      //draw a jump path
+		for(int i = 0; i < jumpPath.size(); i++) {	
+			g2.setPaint(new Color(255,160,122));
+			Planet planetB = jumpPath.get(i);
+			arc.setArcByCenter(map2scrX(planetB.getX()), map2scrY(planetB.getY()), size * 1.5, 0, 360, Arc2D.OPEN);
+			g2.fill(arc);
+			if(i > 0) {
+				Planet planetA = jumpPath.get(i-1);
+				g2.draw(new Line2D.Double(map2scrX(planetA.getX()), map2scrY(planetA.getY()), map2scrX(planetB.getX()), map2scrY(planetB.getY())));
+			}
+		}
+        
 		for(Planet planet : planets) {
 			double x = map2scrX(planet.getX());
-			double y = map2scrY(planet.getY());
-			
+			double y = map2scrY(planet.getY());		
+			if(planet.equals(campaign.getCurrentPlanet())) {
+				g2.setPaint(new Color(255,105,180));
+				arc.setArcByCenter(x, y, size * 1.5, 0, 360, Arc2D.OPEN);
+				g2.fill(arc);
+			}
 			if(null != selectedPlanet && selectedPlanet.equals(planet)) {	
 				g2.setPaint(Color.WHITE);
 				arc.setArcByCenter(x, y, size * 1.5, 0, 360, Arc2D.OPEN);
@@ -410,19 +445,13 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
 			g2.fill(arc);
 			
 		}
-		//draw a jump path
-		for(int i = 1; i < jumpPath.size(); i++) {
-			Planet planetA = jumpPath.get(i-1);
-			Planet planetB = jumpPath.get(i);
-			g.setColor(Color.WHITE);
-			g2.draw(new Line2D.Double(map2scrX(planetA.getX()), map2scrY(planetA.getY()), map2scrX(planetB.getX()), map2scrY(planetB.getY())));
-		}
 
 		//cycle through planets again and assign names - to make sure names go on outside
 		for(Planet planet : planets) {
 			double x = map2scrX(planet.getX());
 			double y = map2scrY(planet.getY());
 			if (conf.showPlanetNamesThreshold == 0 || conf.scale > conf.showPlanetNamesThreshold) {
+				g2.setPaint(Color.WHITE);
 	            g2.drawString(planet.getName(), (float)(x+size * 1.5), (float)y);
 	        }
 		}

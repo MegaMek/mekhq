@@ -2132,7 +2132,8 @@ public class MekHQView extends FrameView {
 		refreshFinancialTransactions();
 		refreshOrganization();
 		refreshMissions();
-
+		panMap.setCampaign(campaign);
+		
 		// Without this, the report scrollbar doesn't seem to load properly
 		// after loading a campaign
 		Dimension size = getFrame().getSize();
@@ -2178,6 +2179,7 @@ public class MekHQView extends FrameView {
 		refreshFunds();
 		refreshFinancialTransactions();
 		refreshMissions();
+		panMap.setCampaign(campaign);
 
 		// Without this, the report scrollbar doesn't seem to load properly
 		// after loading a campaign

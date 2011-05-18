@@ -148,6 +148,8 @@ public class Campaign implements Serializable {
 
 	private transient Hashtable<String, Planet> planets = new Hashtable<String, Planet>();
 
+	private String currentPlanetName;
+	
 	private CampaignOptions campaignOptions = new CampaignOptions();
 
 	public Campaign() {
@@ -177,6 +179,11 @@ public class Campaign implements Serializable {
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+		currentPlanetName = "Outreach";
+		if(null == planets.get(currentPlanetName)) {
+			//fall back to Terra
+			currentPlanetName = "Terra";
 		}
 	}
 
@@ -218,6 +225,18 @@ public class Campaign implements Serializable {
 		this.rng = g;
 	}
 	
+	public String getCurrentPlanetName() {
+		return currentPlanetName;
+	}
+	
+	public void setCurrentPlanetName(String name) {
+		this.currentPlanetName = name;
+	}
+	
+	public Planet getCurrentPlanet() {
+		return planets.get(currentPlanetName);
+	}
+
 	public SkillCosts getSkillCosts() {
 		return skillCosts;
 	}
@@ -1210,6 +1229,7 @@ public class Campaign implements Serializable {
 
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "name", name);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "faction", faction);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "currentPlanetName", currentPlanetName);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "ranks", ranks.getRankSystem());
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "nameGen", rng.getChosenFaction());
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "percentFemale", rng.getPercentFemale());
@@ -1724,6 +1744,8 @@ public class Campaign implements Serializable {
 							.getInstance();
 					retVal.calendar.setTime(df
 							.parse(wn.getTextContent().trim()));
+				} else if (xn.equalsIgnoreCase("currentPlanetName")) {
+					retVal.currentPlanetName = wn.getTextContent().trim();
 				} else if (xn.equalsIgnoreCase("camoCategory")) {
 					String val = wn.getTextContent().trim();
 
