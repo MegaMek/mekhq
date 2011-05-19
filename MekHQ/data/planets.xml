@@ -22912,6 +22912,8 @@
         <satellite>Astrid</satellite>
         <satellite>Lissete</satellite>
         <landMass>Victoria (Barns)</landMass>
+        <hpg>B</hpg>
+        <socioIndustrial>A-A-C-B-D</socioIndustrial>
 	</planet>
 	<planet>
 		<name>Victoria</name>

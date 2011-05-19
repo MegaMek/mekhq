@@ -110,6 +110,13 @@ public class Planet {
 	private int temperature;
 	private int hpg;
 	
+	//socioindustrial levels
+	private int tech;
+	private int industry;
+	private int rawMaterials;
+	private int output;
+	private int agriculture;
+	
 	//keep some string information in arraylists
 	private ArrayList<String> satellites;
 	private ArrayList<String> landMasses;
@@ -138,10 +145,16 @@ public class Planet {
 		this.percentWater = 70;
 		this.temperature = 20;
 		
+		this.tech = EquipmentType.RATING_C;
+		this.industry = EquipmentType.RATING_C;
+		this.rawMaterials = EquipmentType.RATING_C;
+		this.output = EquipmentType.RATING_C;
+		this.agriculture = EquipmentType.RATING_C;
+
 		this.satellites = new ArrayList<String>();
 		this.landMasses = new ArrayList<String>();
 		
-		this.hpg = EquipmentType.RATING_A;
+		this.hpg = EquipmentType.RATING_B;
 		
 		this.factionHistory = new TreeMap<Date,Integer>();
 	}
@@ -207,6 +220,14 @@ public class Planet {
 		default:
 			return "Unknown";
 		}
+	}
+	
+	public String getSocioIndustrialLevel() {
+		return EquipmentType.getRatingName(tech) + "-" + EquipmentType.getRatingName(industry) + "-" + EquipmentType.getRatingName(rawMaterials) + "-" + EquipmentType.getRatingName(output) + "-" + EquipmentType.getRatingName(agriculture);
+	}
+	
+	public String getHPGClass() {
+		return EquipmentType.getRatingName(hpg);
 	}
 	
 	public static int getSpectralClassFrom(String spectral) {
@@ -563,6 +584,28 @@ public class Planet {
 		return Math.sqrt(Math.pow(x - anotherPlanet.getX(), 2) + Math.pow(y - anotherPlanet.getY(), 2));
 	}
 	
+	public static int convertRatingToCode(String rating) {
+		if(rating.equalsIgnoreCase("A")) {
+			return EquipmentType.RATING_A;
+		} 
+		else if(rating.equalsIgnoreCase("B")) {
+			return EquipmentType.RATING_B;
+		}
+		else if(rating.equalsIgnoreCase("C")) {
+			return EquipmentType.RATING_C;
+		}
+		else if(rating.equalsIgnoreCase("D")) {
+			return EquipmentType.RATING_D;
+		}
+		else if(rating.equalsIgnoreCase("E")) {
+			return EquipmentType.RATING_E;
+		}
+		else if(rating.equalsIgnoreCase("F")) {
+			return EquipmentType.RATING_F;
+		}
+		return EquipmentType.RATING_C;
+	}
+	
 	public static Planet getPlanetFromXML(Node wn) throws DOMException, ParseException {
 		Planet retVal = new Planet();
 		NodeList nl = wn.getChildNodes();
@@ -612,6 +655,17 @@ public class Planet {
 				retVal.satellites.add(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("landMass")) {
 				retVal.landMasses.add(wn2.getTextContent());
+			} else if (wn2.getNodeName().equalsIgnoreCase("hpg")) {
+				retVal.hpg = convertRatingToCode(wn2.getTextContent());
+			} else if (wn2.getNodeName().equalsIgnoreCase("socioIndustrial")) {
+				String[] socio = wn2.getTextContent().split("-");
+				if(socio.length >= 5) {
+					retVal.tech = convertRatingToCode(wn2.getTextContent().split("-")[0]);
+					retVal.industry = convertRatingToCode(wn2.getTextContent().split("-")[1]);
+					retVal.rawMaterials = convertRatingToCode(wn2.getTextContent().split("-")[2]);
+					retVal.output = convertRatingToCode(wn2.getTextContent().split("-")[3]);
+					retVal.agriculture = convertRatingToCode(wn2.getTextContent().split("-")[4]);
+				}
 			} 
 		}
 		return retVal;
