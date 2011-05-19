@@ -96,9 +96,10 @@ public class PlanetViewPanel extends javax.swing.JPanel {
 		getNeighbors();
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 1;
+		gridBagConstraints.gridy = 2;
 		gridBagConstraints.gridheight = 1;
 		gridBagConstraints.weightx = 1.0;
+		gridBagConstraints.weighty = 1.0;
 		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;	
@@ -114,9 +115,9 @@ public class PlanetViewPanel extends javax.swing.JPanel {
                 BorderFactory.createEmptyBorder(5,5,5,5)));
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 2;
+		gridBagConstraints.gridy = 1;
 		gridBagConstraints.gridwidth = 1;
-		gridBagConstraints.weighty = 1.0;
+		gridBagConstraints.weighty = 0.0;
 		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -130,6 +131,9 @@ public class PlanetViewPanel extends javax.swing.JPanel {
 		javax.swing.JLabel lblNeighbor;
 		for(String neighborKey : campaign.getAllReachablePlanetsFrom(planet)) {
 			Planet neighbor = campaign.getPlanet(neighborKey);
+			if(neighbor.equals(planet)) {
+				continue;
+			}
 			lblNeighbor = new javax.swing.JLabel(neighbor.getShortName() + " (" + Faction.getFactionName(neighbor.getCurrentFaction(campaign.getCalendar().getTime())) + ")");
 			gridBagConstraints = new java.awt.GridBagConstraints();
 			gridBagConstraints.gridx = 0;
