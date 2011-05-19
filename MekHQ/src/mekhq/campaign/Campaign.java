@@ -2124,7 +2124,12 @@ public class Campaign implements Serializable {
 			nextKey = parent.get(nextKey);
 			
 		}
-		return path;
+		//now reverse the direaction
+		ArrayList<Planet> finalPath = new ArrayList<Planet>();
+		for(int i = (path.size() -1);  i >= 0; i--) {
+			finalPath.add(path.get(i));
+		}		
+		return finalPath;
 	}
 	
 	public ArrayList<String> getAllReachablePlanetsFrom(Planet planet) {

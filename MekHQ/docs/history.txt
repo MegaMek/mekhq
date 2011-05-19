@@ -13,6 +13,9 @@ v0.1.7 (SVN)
 + alt-click on map to calculate jump path between clicked planet and currently selected planet
 + correction to A* pathfinding technique
 + alt+shift click to add a planet manually to the jump path
++ all jump paths calculated starting from current planetary location
++ new functoinality to mousePressed in InterstellarMapPanel: 
+		alt+click - jump path from current planet to clicked planet; shift+click - extend existing jump path to clicked planet
 
 v0.1.6 (2011-05-17)
 + beginning of Briefing Room tab
