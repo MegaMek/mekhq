@@ -1080,8 +1080,8 @@ public class MekHQView extends FrameView {
         
         scrollUnitTable.setViewportView(unitTable);
 
-		scrollUnitView.setMinimumSize(new java.awt.Dimension(500, 600));
-		scrollUnitView.setPreferredSize(new java.awt.Dimension(500, 2000));
+		scrollUnitView.setMinimumSize(new java.awt.Dimension(450, 600));
+		scrollUnitView.setPreferredSize(new java.awt.Dimension(450, 2000));
 		scrollUnitView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollUnitView.setViewportView(null);
 		

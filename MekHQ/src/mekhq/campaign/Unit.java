@@ -1976,19 +1976,25 @@ public class Unit implements Serializable, MekHqXmlSerializable {
      */
     public String getQuirksList() {
     	String quirkString = "";
+        boolean first = true;
     	for (Enumeration<IOptionGroup> i = getEntity().getQuirks().getGroups(); i.hasMoreElements();) {
             IOptionGroup group = i.nextElement();
             for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements();) {
                 IOption quirk = j.nextElement();
                 if (quirk.booleanValue()) {
-                	quirkString = quirkString + quirk.getDisplayableNameWithValue() + "<br>";
+                	if(first) {
+                		first = false;
+                	} else {
+                		quirkString += ", ";
+                	}
+                	quirkString += quirk.getDisplayableNameWithValue();
                 }
             }
         }
         if(quirkString.equals("")) {
         	return null;
         }
-        return "<html>" + quirkString + "</html>";
+        return quirkString;
     }
     
     public void acquireQuirk(String name, Object value) {
