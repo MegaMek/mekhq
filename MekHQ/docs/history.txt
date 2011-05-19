@@ -16,6 +16,8 @@ v0.1.7 (SVN)
 + all jump paths calculated starting from current planetary location
 + new functoinality to mousePressed in InterstellarMapPanel: 
 		alt+click - jump path from current planet to clicked planet; shift+click - extend existing jump path to clicked planet
++ calculate jump path button for InterstellarMap
++ begin transit button for interstellar map (doesn't do anything yet)
 
 v0.1.6 (2011-05-17)
 + beginning of Briefing Room tab

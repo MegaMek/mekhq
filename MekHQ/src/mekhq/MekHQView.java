@@ -389,6 +389,9 @@ public class MekHQView extends FrameView {
 		panBriefing = new javax.swing.JPanel();
 		panelScenario = new javax.swing.JPanel();
 		panelMapView = new javax.swing.JPanel();
+		lblFindPlanet = new javax.swing.JLabel();
+		btnCalculateJumpPath = new javax.swing.JButton();
+		btnBeginTransit = new javax.swing.JButton();
 		scrollScenarioTable = new javax.swing.JScrollPane();
 		scenarioTable = new javax.swing.JTable();
 		scrollMissionView = new javax.swing.JScrollPane();
@@ -769,6 +772,16 @@ public class MekHQView extends FrameView {
 		panelMapView.setName("panelMapView"); // NOI18N
 		panelMapView.setLayout(new java.awt.GridBagLayout());
 		
+		lblFindPlanet.setText(resourceMap.getString("lblFindPlanet.text")); // NOI18N
+		lblFindPlanet.setName("lblFindPlanet"); // NOI18N
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.weightx = 0.0;
+		gridBagConstraints.weighty = 0.0;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+		panelMapView.add(lblFindPlanet, gridBagConstraints);
+		
 		suggestPlanet = new JSuggestField(this.getFrame(), campaign.getPlanetNames());
 		suggestPlanet.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -780,13 +793,49 @@ public class MekHQView extends FrameView {
 			}
 		});
 		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridx = 1;
 		gridBagConstraints.gridy = 0;
-		gridBagConstraints.gridwidth = 0;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+		gridBagConstraints.gridwidth = 1;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 0.0;
 		panelMapView.add(suggestPlanet, gridBagConstraints);
+		
+		btnCalculateJumpPath.setText(resourceMap.getString("btnCalculateJumpPath.text")); // NOI18N
+		btnCalculateJumpPath.setToolTipText(resourceMap
+				.getString("btnCalculateJumpPath.toolTipText")); // NOI18N
+		btnCalculateJumpPath.setName("btnCalculateJumpPath"); // NOI18N
+		btnCalculateJumpPath.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				calculateJumpPath();
+			}
+		});
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 2;
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.gridwidth = 1;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+		gridBagConstraints.weightx = 0.5;
+		gridBagConstraints.weighty = 0.0;
+		panelMapView.add(btnCalculateJumpPath, gridBagConstraints);
+		
+		btnBeginTransit.setText(resourceMap.getString("btnBeginTransit.text")); // NOI18N
+		btnBeginTransit.setToolTipText(resourceMap
+				.getString("btnBeginTransit.toolTipText")); // NOI18N
+		btnBeginTransit.setName("btnBeginTransit"); // NOI18N
+		btnBeginTransit.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				//beginTransit();
+			}
+		});
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 3;
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.gridwidth = 1;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+		gridBagConstraints.weightx = 0.5;
+		gridBagConstraints.weighty = 0.0;
+		panelMapView.add(btnBeginTransit, gridBagConstraints);
 		
 		panMap = new InterstellarMapPanel(campaign, this);
 		panMap.setName("panMap"); // NOI18N		
@@ -1806,6 +1855,12 @@ public class MekHQView extends FrameView {
 		}
 	}
 
+	private void calculateJumpPath() {
+		if(null != panMap.getSelectedPlanet()) {
+			panMap.setJumpPath(campaign.calculateJumpPath(campaign.getCurrentPlanetName(), panMap.getSelectedPlanet().getName()));
+		}
+	}
+	
 	private void btnDoTaskActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnDoTaskActionPerformed
 		
 		SupportTeam team = campaign.getTeam(currentTechId);		
@@ -7237,7 +7292,10 @@ public class MekHQView extends FrameView {
     private javax.swing.JLabel lblMission;
     private javax.swing.JComboBox choiceParts;
 	private javax.swing.JLabel lblPartsChoice;
+    private javax.swing.JLabel lblFindPlanet;
 	private JSuggestField suggestPlanet;
+	private javax.swing.JButton btnCalculateJumpPath;
+	private javax.swing.JButton btnBeginTransit;
 	private MekLabPanel panMekLab;
 	private javax.swing.JScrollPane scrollMekLab;
 	// End of variables declaration//GEN-END:variables

@@ -109,6 +109,7 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
                 if (e.isPopupTrigger() || e.getButton() != MouseEvent.BUTTON1) {
                     return;
                 }
+        
                 Planet target = nearestNeighbour(scr2mapX(e.getX()), scr2mapY(e.getY()));
                 if(null == target) {
             		return;
@@ -357,9 +358,10 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
         	
         	public void mouseDragged(MouseEvent e) {
                 if (mouseMod != MouseEvent.BUTTON1) {
-                    return;
+                   return;
                 }
                 //TODO: dragging is too fast and awkward
+                //TODO: we need to be able to drag without changing the selected planet
                 if (lastMousePos != null) {
                     conf.offset.x -= lastMousePos.x - e.getX();
                     conf.offset.y -= lastMousePos.y - e.getY();
@@ -388,6 +390,11 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
 	public void setCampaign(Campaign c) {
 		this.campaign = c;
 		this.planets = campaign.getPlanets();
+		repaint();
+	}
+	
+	public void setJumpPath(ArrayList<Planet> path) {
+		jumpPath = path;
 		repaint();
 	}
 	
