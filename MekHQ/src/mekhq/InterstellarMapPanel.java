@@ -482,6 +482,9 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
 			double y = map2scrY(planet.getY());
 			if (conf.showPlanetNamesThreshold == 0 || conf.scale > conf.showPlanetNamesThreshold || jumpPath.contains(planet)) {
 				g2.setPaint(Color.WHITE);
+				if(jumpPath.contains(planet)) {
+					g2.setPaint(new Color(255,160,122));
+				}
 	            g2.drawString(planet.getShortName(), (float)(x+size * 1.5), (float)y);
 	        }
 		}
