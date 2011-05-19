@@ -28,6 +28,7 @@ public class PlanetViewPanel extends javax.swing.JPanel {
 	private Planet planet;
 	private Campaign campaign;
 	
+	private javax.swing.JPanel pnlNeighbors;
 	private javax.swing.JPanel pnlStats;
 	private javax.swing.JTextArea txtDesc;
 	
@@ -60,6 +61,7 @@ public class PlanetViewPanel extends javax.swing.JPanel {
 		java.awt.GridBagConstraints gridBagConstraints;
 
 		pnlStats = new javax.swing.JPanel();
+		pnlNeighbors = new javax.swing.JPanel();
 		txtDesc = new javax.swing.JTextArea();
 		       
 		setLayout(new java.awt.GridBagLayout());
@@ -80,6 +82,20 @@ public class PlanetViewPanel extends javax.swing.JPanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;	
 		add(pnlStats, gridBagConstraints);
 		
+		pnlNeighbors.setName("pnlNeighbors");
+		pnlNeighbors.setBorder(BorderFactory.createTitledBorder("Planets within 30 light years"));
+		pnlNeighbors.setBackground(Color.WHITE);
+		getNeighbors();
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 1;
+		gridBagConstraints.gridheight = 1;
+		gridBagConstraints.weightx = 1.0;
+		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
+		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;	
+		add(pnlNeighbors, gridBagConstraints);
+		
 		txtDesc.setName("txtDesc");
 		txtDesc.setText("Nothing here yet. Who wants to volunteer to enter planet data?");
 		txtDesc.setEditable(false);
@@ -90,7 +106,7 @@ public class PlanetViewPanel extends javax.swing.JPanel {
                 BorderFactory.createEmptyBorder(5,5,5,5)));
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 1;
+		gridBagConstraints.gridy = 2;
 		gridBagConstraints.gridwidth = 1;
 		gridBagConstraints.weighty = 1.0;
 		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
@@ -99,6 +115,29 @@ public class PlanetViewPanel extends javax.swing.JPanel {
 		add(txtDesc, gridBagConstraints);
 	}
 
+	private void getNeighbors() {
+		java.awt.GridBagConstraints gridBagConstraints;
+		pnlNeighbors.setLayout(new java.awt.GridBagLayout());
+		int i = 0;
+		javax.swing.JLabel lblNeighbor;
+		for(String neighborKey : campaign.getAllReachablePlanetsFrom(planet)) {
+			Planet neighbor = campaign.getPlanet(neighborKey);
+			lblNeighbor = new javax.swing.JLabel(neighbor.getName() + " (" + Faction.getFactionName(neighbor.getCurrentFaction(campaign.getCalendar().getTime())) + ")");
+			gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints.gridx = 0;
+			gridBagConstraints.gridy = i;
+			gridBagConstraints.gridwidth = 1;
+			gridBagConstraints.weightx = 1.0;
+			gridBagConstraints.weighty = 1.0;
+			gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
+			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			pnlNeighbors.add(lblNeighbor, gridBagConstraints);
+			i++;
+		}
+		
+	}
+	
     private void fillStats() {
     	
     	org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(PlanetViewPanel.class);
