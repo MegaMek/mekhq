@@ -106,35 +106,6 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
             public void mousePressed(MouseEvent e) {
             	maybeShowPopup(e);
             	mouseMod = e.getButton();
-                if (e.isPopupTrigger() || e.getButton() != MouseEvent.BUTTON1) {
-                    return;
-                }
-        
-                Planet target = nearestNeighbour(scr2mapX(e.getX()), scr2mapY(e.getY()));
-                if(null == target) {
-            		return;
-            	}
-                if(e.isAltDown()) {
-                	//calculate a new jump path from the current location
-                	jumpPath = campaign.calculateJumpPath(campaign.getCurrentPlanetName(), target.getName());
-                	selectedPlanet = target;
-            		repaint();
-            		return;
-                	
-                }
-                else if(e.isShiftDown()) {
-                	//add to the existing jump path
-                	Planet lastPlanet = campaign.getCurrentPlanet();
-          			if(jumpPath.size() > 0) {
-          				lastPlanet = jumpPath.get(jumpPath.size() - 1);
-          			}
-          			jumpPath.addAll(campaign.calculateJumpPath(lastPlanet.getName(), target.getName()));
-          			selectedPlanet = target;
-          			repaint();
-          			return;
-                }
-            	changeSelectedPlanet(target);
-            	repaint();
             }          
             
      
@@ -349,6 +320,32 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
             				conf.scale = 4.0;
             			}
             			center(selectedPlanet);             	
+            		} else {
+            			Planet target = nearestNeighbour(scr2mapX(e.getX()), scr2mapY(e.getY()));
+                        if(null == target) {
+                    		return;
+                    	}
+                        if(e.isAltDown()) {
+                        	//calculate a new jump path from the current location
+                        	jumpPath = campaign.calculateJumpPath(campaign.getCurrentPlanetName(), target.getName());
+                        	selectedPlanet = target;
+                    		repaint();
+                    		return;
+                        	
+                        }
+                        else if(e.isShiftDown()) {
+                        	//add to the existing jump path
+                        	Planet lastPlanet = campaign.getCurrentPlanet();
+                  			if(jumpPath.size() > 0) {
+                  				lastPlanet = jumpPath.get(jumpPath.size() - 1);
+                  			}
+                  			jumpPath.addAll(campaign.calculateJumpPath(lastPlanet.getName(), target.getName()));
+                  			selectedPlanet = target;
+                  			repaint();
+                  			return;
+                        }
+                    	changeSelectedPlanet(target);
+                    	repaint();
             		}
             	}
             }
@@ -361,7 +358,6 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
                    return;
                 }
                 //TODO: dragging is too fast and awkward
-                //TODO: we need to be able to drag without changing the selected planet
                 if (lastMousePos != null) {
                     conf.offset.x -= lastMousePos.x - e.getX();
                     conf.offset.y -= lastMousePos.y - e.getY();

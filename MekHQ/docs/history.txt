@@ -19,6 +19,7 @@ v0.1.7 (SVN)
 + calculate jump path button for InterstellarMap
 + begin transit button for interstellar map (doesn't do anything yet)
 + change color of planet names when on jump path
++ dragging on the map doesn't select a planet
 
 v0.1.6 (2011-05-17)
 + beginning of Briefing Room tab
