@@ -1985,7 +1985,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
                 	if(first) {
                 		first = false;
                 	} else {
-                		quirkString += ", ";
+                		quirkString += "\n";
                 	}
                 	quirkString += quirk.getDisplayableNameWithValue();
                 }

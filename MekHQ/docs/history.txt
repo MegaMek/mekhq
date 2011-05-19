@@ -24,6 +24,7 @@ v0.1.7 (SVN)
 + landMass and satellite data and tags for planets
 + use line-wrapping text areas for planetary information instead of labels
 + use line-wrapping text areas for unit information instead of labels
++ some improvements to quirk reporting in UnitViewPanel
 
 v0.1.6 (2011-05-17)
 + beginning of Briefing Room tab
