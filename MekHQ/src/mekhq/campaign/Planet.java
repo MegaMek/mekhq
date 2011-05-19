@@ -307,13 +307,13 @@ public class Planet {
 		if(satellites.isEmpty()) {
 			return "0";
 		}
-		String toReturn = "<html><p>" + satellites.size() + " (";
+		String toReturn = satellites.size() + " (";
 		for(int i = 0; i < satellites.size(); i++) {
 			toReturn += satellites.get(i);
 			if(i < (satellites.size() - 1)) {
 				toReturn += ", ";	
 			} else {
-				toReturn += ")</p></html>";
+				toReturn += ")";
 			}
 		}
 		return toReturn;

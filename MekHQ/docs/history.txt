@@ -22,6 +22,7 @@ v0.1.7 (SVN)
 + dragging on the map doesn't select a planet
 + list of planets within 30 light years to PlanetViewPanel
 + landMass and satellite data and tags for planets
++ use line-wrapping text areas for planetary information instead of labels
 
 v0.1.6 (2011-05-17)
 + beginning of Briefing Room tab

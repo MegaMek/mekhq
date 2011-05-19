@@ -858,8 +858,8 @@ public class MekHQView extends FrameView {
 		splitMap.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent pce) {
-				//this can mess up the unit view panel so refresh it
-				//refreshPlanetView();
+				//this can mess up the planet view panel so refresh it
+				refreshPlanetView();
 			}
 		});
 		tabMain.addTab(
@@ -2479,7 +2479,9 @@ public class MekHQView extends FrameView {
 	
 	protected void refreshPlanetView() {
 		Planet planet = panMap.getSelectedPlanet();
-		scrollPlanetView.setViewportView(new PlanetViewPanel(planet, campaign));
+		if(null != planet) {
+			scrollPlanetView.setViewportView(new PlanetViewPanel(planet, campaign));
+		}
 	}
 	
 	private void addFundsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_addFundsActionPerformed
