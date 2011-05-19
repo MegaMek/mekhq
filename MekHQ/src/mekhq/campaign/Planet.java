@@ -23,11 +23,13 @@ package mekhq.campaign;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.TreeMap;
 
+import megamek.common.EquipmentType;
 import megamek.common.PlanetaryConditions;
 
 import org.w3c.dom.DOMException;
@@ -106,6 +108,11 @@ public class Planet {
 	private int climate;
 	private int percentWater;
 	private int temperature;
+	private int hpg;
+	
+	//keep some string information in arraylists
+	private ArrayList<String> satellites;
+	private ArrayList<String> landMasses;
 	
 	//a hash to keep track of dynamic faction changes
 	TreeMap<Date,Integer> factionHistory;
@@ -130,6 +137,11 @@ public class Planet {
 		this.climate = CLIMATE_WARMTEM;
 		this.percentWater = 70;
 		this.temperature = 20;
+		
+		this.satellites = new ArrayList<String>();
+		this.landMasses = new ArrayList<String>();
+		
+		this.hpg = EquipmentType.RATING_A;
 		
 		this.factionHistory = new TreeMap<Date,Integer>();
 	}
@@ -289,6 +301,33 @@ public class Planet {
 	
 	public String getStarType() {
 		return getSpectralClassName(spectralClass) + subtype + luminosity;
+	}
+	
+	public String getSatelliteDescription() {
+		if(satellites.isEmpty()) {
+			return "0";
+		}
+		String toReturn = "<html><p>" + satellites.size() + " (";
+		for(int i = 0; i < satellites.size(); i++) {
+			toReturn += satellites.get(i);
+			if(i < (satellites.size() - 1)) {
+				toReturn += ", ";	
+			} else {
+				toReturn += ")</p></html>";
+			}
+		}
+		return toReturn;
+	}
+	
+	public String getLandMassDescription() {
+		String toReturn = "";
+		for(int i = 0; i < landMasses.size(); i++) {
+			toReturn += landMasses.get(i);
+			if(i < (landMasses.size() - 1)) {
+				toReturn += ", ";
+			} 
+		}
+		return toReturn;
 	}
 	
 	public String getRechargeStations() {
@@ -569,7 +608,11 @@ public class Planet {
 				retVal.luminosity = wn2.getTextContent();
 			} else if (wn2.getNodeName().equalsIgnoreCase("factionChange")) {
 				processFactionChange(retVal, wn2);
-			}
+			} else if (wn2.getNodeName().equalsIgnoreCase("satellite")) {
+				retVal.satellites.add(wn2.getTextContent());
+			} else if (wn2.getNodeName().equalsIgnoreCase("landMass")) {
+				retVal.landMasses.add(wn2.getTextContent());
+			} 
 		}
 		return retVal;
 	}

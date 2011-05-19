@@ -22897,6 +22897,21 @@
 		<xcood>93.63</xcood>
 		<ycood>-351.04</ycood>
 		<faction>1</faction>
+        <spectralClass>K</spectralClass>
+        <subtype>7</subtype>
+        <luminosity>IV</luminosity>
+        <gravity>1.00</gravity>
+        <pressure>2</pressure>
+        <temperature>2</temperature>
+        <climate>1</climate>
+        <percentWater>9</percentWater>
+        <lifeForm>2</lifeForm>
+        <zenithCharge>true</zenithCharge>
+        <satellite>Jocelyn</satellite>
+        <satellite>Jennifer</satellite>
+        <satellite>Astrid</satellite>
+        <satellite>Lissete</satellite>
+        <landMass>Victoria (Barns)</landMass>
 	</planet>
 	<planet>
 		<name>Victoria</name>
