@@ -841,6 +841,8 @@ public class MekHQView extends FrameView {
 		
 		panMap = new InterstellarMapPanel(campaign, this);
 		panMap.setName("panMap"); // NOI18N		
+		//lets go ahead and zoom in on the current location
+		panMap.setSelectedPlanet(campaign.getLocation().getCurrentPlanet());
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 1;

@@ -37,6 +37,7 @@ v0.1.7 (SVN)
 + distinction between plotted paths and actual paths in map
 + some calculation errors in jump path display
 + when adding to the path by shift+click, planets were counted twice along path
++ center and zoom map initially on current location
 
 v0.1.6 (2011-05-17)
 + beginning of Briefing Room tab
