@@ -21,6 +21,7 @@
 
 package mekhq.campaign;
 
+import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -47,7 +48,12 @@ import org.w3c.dom.NodeList;
  * 
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class CurrentLocation {
+public class CurrentLocation implements Serializable {
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4337642922571022697L;
 	
 	private Planet currentPlanet;
 	//keep track of jump path

@@ -32,6 +32,7 @@ v0.1.7 (SVN)
 + CurrentLocation object
 + radio buttons for status of missing pilots in retrieval wizard
 + ability to move force along jump path
++ made JumpPath and CurrentLocation serializable
 
 v0.1.6 (2011-05-17)
 + beginning of Briefing Room tab

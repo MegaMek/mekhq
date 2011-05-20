@@ -21,6 +21,7 @@
 
 package mekhq.campaign;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
@@ -32,8 +33,12 @@ import java.util.ArrayList;
  * 
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class JumpPath {
+public class JumpPath implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 708430867050359759L;
 	private ArrayList<Planet> path;
 	
 	public JumpPath() {
