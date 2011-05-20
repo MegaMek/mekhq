@@ -2478,6 +2478,11 @@ public class MekHQView extends FrameView {
 	}
 	
 	protected void refreshPlanetView() {
+		ArrayList<Planet> jPath = panMap.getJumpPath();
+		if(null != jPath && !jPath.isEmpty()) {
+			scrollPlanetView.setViewportView(new JumpPathViewPanel(jPath, campaign));
+			return;
+		}
 		Planet planet = panMap.getSelectedPlanet();
 		if(null != planet) {
 			scrollPlanetView.setViewportView(new PlanetViewPanel(planet, campaign));
