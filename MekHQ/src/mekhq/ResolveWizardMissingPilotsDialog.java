@@ -26,7 +26,10 @@ import java.awt.GridBagLayout;
 import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
 import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JRadioButton;
 
 import mekhq.campaign.personnel.PilotPerson;
 /**
@@ -44,7 +47,10 @@ public class ResolveWizardMissingPilotsDialog extends javax.swing.JDialog {
     private javax.swing.JScrollPane scrMissingPilots;
 	private javax.swing.JPanel panMissingPilots;
     private javax.swing.JTextArea txtInstructions;
-    private ArrayList<javax.swing.JCheckBox> boxes;
+    private ArrayList<JRadioButton> activeBtns;
+    private ArrayList<JRadioButton> miaBtns;
+    private ArrayList<JRadioButton> kiaBtns;
+
 	
     /** Creates new form NewTeamDialog */
     public ResolveWizardMissingPilotsDialog(java.awt.Frame parent, boolean modal, ResolveScenarioTracker t) {
@@ -62,8 +68,10 @@ public class ResolveWizardMissingPilotsDialog extends javax.swing.JDialog {
         btnCancel = new javax.swing.JButton();
         scrMissingPilots = new javax.swing.JScrollPane();
         txtInstructions = new javax.swing.JTextArea();
-        boxes = new ArrayList<javax.swing.JCheckBox>();
-
+        activeBtns = new ArrayList<JRadioButton>();
+        miaBtns = new ArrayList<JRadioButton>();
+        kiaBtns = new ArrayList<JRadioButton>();
+       
      
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
@@ -97,19 +105,38 @@ public class ResolveWizardMissingPilotsDialog extends javax.swing.JDialog {
         panMissingPilots.setName("panMissingPilots");
         panMissingPilots.setLayout(new GridBagLayout()); 
         
-        JCheckBox box;
         int i = 1;
+        JLabel nameLbl;
+        JRadioButton activeButton;
+        JRadioButton miaButton;
+        JRadioButton kiaButton; 
+        ButtonGroup group;
         for(PilotPerson pp : tracker.getMissingPilots()) {
-        	box = new JCheckBox(pp.getFullTitle());
-        	box.setSelected(false);
-        	boxes.add(box);
+        	nameLbl = new JLabel(pp.getFullTitle());
+        	activeButton = new JRadioButton("Active");
+        	activeBtns.add(activeButton);
+        	miaButton = new JRadioButton("MIA");
+        	miaButton.setSelected(true);
+        	miaBtns.add(miaButton);
+        	kiaButton = new JRadioButton("KIA"); 
+        	kiaBtns.add(kiaButton);
+        	group = new ButtonGroup();
+        	group.add(activeButton);
+        	group.add(miaButton);
+        	group.add(kiaButton);
         	gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = i;
-            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.gridwidth = 1;
             gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
             gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-            panMissingPilots.add(box, gridBagConstraints);
+            panMissingPilots.add(nameLbl, gridBagConstraints);
+            gridBagConstraints.gridx = 1;
+            panMissingPilots.add(activeButton, gridBagConstraints);
+            gridBagConstraints.gridx = 2;
+            panMissingPilots.add(miaButton, gridBagConstraints);
+            gridBagConstraints.gridx = 3;
+            panMissingPilots.add(kiaButton, gridBagConstraints);
             i++;
         }              
         scrMissingPilots.setViewportView(panMissingPilots);
@@ -174,9 +201,9 @@ public class ResolveWizardMissingPilotsDialog extends javax.swing.JDialog {
     }
 
     private void btnNextActionPerformed(java.awt.event.ActionEvent evt) {
-    	for(int i = 0; i < boxes.size(); i++) {
-    		JCheckBox box = boxes.get(i);
-    		if(box.isSelected()) {
+    	for(int i = 0; i < activeBtns.size(); i++) {
+    		JRadioButton activeBtn = activeBtns.get(i);
+    		if(activeBtn.getModel().isSelected()) {
     			tracker.recoverMissingPilot(i);
     		}
     	}

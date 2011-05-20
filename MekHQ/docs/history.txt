@@ -30,6 +30,7 @@ v0.1.7 (SVN)
 + JumpPathViewPanel
 + JumpPath object
 + CurrentLocation object
++ radio buttons for status of missing pilots in retrieval wizard
 
 v0.1.6 (2011-05-17)
 + beginning of Briefing Room tab
