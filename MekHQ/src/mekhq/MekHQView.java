@@ -116,6 +116,7 @@ import megamek.common.options.PilotOptions;
 import megamek.common.util.DirectoryItems;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Force;
+import mekhq.campaign.JumpPath;
 import mekhq.campaign.PartInventory;
 import mekhq.campaign.Planet;
 import mekhq.campaign.SkillCosts;
@@ -1858,6 +1859,7 @@ public class MekHQView extends FrameView {
 	private void calculateJumpPath() {
 		if(null != panMap.getSelectedPlanet()) {
 			panMap.setJumpPath(campaign.calculateJumpPath(campaign.getCurrentPlanetName(), panMap.getSelectedPlanet().getName()));
+			refreshPlanetView();
 		}
 	}
 	
@@ -2478,9 +2480,9 @@ public class MekHQView extends FrameView {
 	}
 	
 	protected void refreshPlanetView() {
-		ArrayList<Planet> jPath = panMap.getJumpPath();
-		if(null != jPath && !jPath.isEmpty()) {
-			scrollPlanetView.setViewportView(new JumpPathViewPanel(jPath, campaign));
+		JumpPath path = panMap.getJumpPath();
+		if(null != path && !path.isEmpty()) {
+			scrollPlanetView.setViewportView(new JumpPathViewPanel(path, campaign));
 			return;
 		}
 		Planet planet = panMap.getSelectedPlanet();

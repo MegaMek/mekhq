@@ -2051,7 +2051,7 @@ public class Campaign implements Serializable {
 	 * @param endKey
 	 * @return
 	 */
-	public ArrayList<Planet> calculateJumpPath(String startKey, String endKey) {
+	public JumpPath calculateJumpPath(String startKey, String endKey) {
 		
 		String current = startKey;
 		ArrayList<String> closed = new ArrayList<String>();
@@ -2125,10 +2125,10 @@ public class Campaign implements Serializable {
 			
 		}
 		//now reverse the direaction
-		ArrayList<Planet> finalPath = new ArrayList<Planet>();
+		JumpPath finalPath = new JumpPath();
 		for(int i = (path.size() -1);  i >= 0; i--) {
-			finalPath.add(path.get(i));
-		}		
+			finalPath.addPlanet(path.get(i));
+		}
 		return finalPath;
 	}
 	

@@ -28,6 +28,7 @@ v0.1.7 (SVN)
 + socio-industrial levels and HPG class
 + updated planet data so that faction as of 3025 in PRSC goes back to 2900
 + JumpPathViewPanel
++ JumpPath object
 
 v0.1.6 (2011-05-17)
 + beginning of Briefing Room tab

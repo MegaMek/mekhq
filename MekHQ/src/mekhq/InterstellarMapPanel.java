@@ -31,6 +31,7 @@ import sun.tools.tree.ThisExpression;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Faction;
+import mekhq.campaign.JumpPath;
 import mekhq.campaign.Planet;
 
 
@@ -47,7 +48,7 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
 	private static final long serialVersionUID = -1110105822399704646L;
 
 	private ArrayList<Planet> planets;
-	private ArrayList<Planet> jumpPath;
+	private JumpPath jumpPath;
 	private Campaign campaign;
 	InnerStellarMapConfig conf = new InnerStellarMapConfig();
 	MekHQView hqview;
@@ -59,7 +60,7 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
 		campaign = c;
 		planets = campaign.getPlanets();
 		hqview = view;
-		jumpPath = new ArrayList<Planet>();
+		jumpPath = new JumpPath();
 		
 		setBorder(BorderFactory.createLineBorder(Color.black));
         
@@ -336,11 +337,11 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
                         }
                         else if(e.isShiftDown()) {
                         	//add to the existing jump path
-                        	Planet lastPlanet = campaign.getCurrentPlanet();
-                  			if(jumpPath.size() > 0) {
-                  				lastPlanet = jumpPath.get(jumpPath.size() - 1);
-                  			}
-                  			jumpPath.addAll(campaign.calculateJumpPath(lastPlanet.getName(), target.getName()));
+                        	Planet lastPlanet = jumpPath.getLastPlanet();
+                        	if(null == lastPlanet) {
+                        		lastPlanet = campaign.getCurrentPlanet();
+                        	}
+                  			jumpPath.addPlanets(campaign.calculateJumpPath(lastPlanet.getName(), target.getName()).getPlanets());
                   			selectedPlanet = target;
                   			repaint();
                   			hqview.refreshPlanetView();
@@ -391,7 +392,7 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
 		repaint();
 	}
 	
-	public void setJumpPath(ArrayList<Planet> path) {
+	public void setJumpPath(JumpPath path) {
 		jumpPath = path;
 		repaint();
 	}
@@ -530,19 +531,13 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
     	return selectedPlanet;
     }
     
-    public ArrayList<Planet> getJumpPath() {
+    public JumpPath getJumpPath() {
     	return jumpPath;
     }
     
     private void changeSelectedPlanet(Planet p) {
     	selectedPlanet = p;
-    	jumpPath = new ArrayList<Planet>();
-    	hqview.refreshPlanetView();
-    }
-    
-    public void drawJumpPath(ArrayList<Planet> path) {
-    	jumpPath = path;
-    	repaint();
+    	jumpPath = new JumpPath();
     	hqview.refreshPlanetView();
     }
     
