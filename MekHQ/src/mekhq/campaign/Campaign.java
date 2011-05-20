@@ -148,7 +148,7 @@ public class Campaign implements Serializable {
 
 	private transient Hashtable<String, Planet> planets = new Hashtable<String, Planet>();
 
-	private String currentPlanetName;
+	private CurrentLocation location;
 	
 	private CampaignOptions campaignOptions = new CampaignOptions();
 
@@ -180,11 +180,7 @@ public class Campaign implements Serializable {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		currentPlanetName = "Outreach";
-		if(null == planets.get(currentPlanetName)) {
-			//fall back to Terra
-			currentPlanetName = "Terra";
-		}
+		location = new CurrentLocation(planets.get("Outreach"), 0);
 	}
 
 	public String getName() {
@@ -226,15 +222,11 @@ public class Campaign implements Serializable {
 	}
 	
 	public String getCurrentPlanetName() {
-		return currentPlanetName;
-	}
-	
-	public void setCurrentPlanetName(String name) {
-		this.currentPlanetName = name;
+		return location.getCurrentPlanet().getShortName();
 	}
 	
 	public Planet getCurrentPlanet() {
-		return planets.get(currentPlanetName);
+		return location.getCurrentPlanet();
 	}
 
 	public SkillCosts getSkillCosts() {
@@ -403,7 +395,10 @@ public class Campaign implements Serializable {
 	public Scenario getScenario(int id) {
 		return scenarioIds.get(new Integer(id));
 	}
-
+	
+	public CurrentLocation getLocation() {
+		return location;
+	}
 
 	private void addUnit(Unit u) {
 		MekHQApp.logMessage("Adding unit: ("+u.getId()+"):"+u, 5);
@@ -1229,7 +1224,6 @@ public class Campaign implements Serializable {
 
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "name", name);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "faction", faction);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "currentPlanetName", currentPlanetName);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "ranks", ranks.getRankSystem());
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "nameGen", rng.getChosenFaction());
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "percentFemale", rng.getPercentFemale());
@@ -1255,6 +1249,16 @@ public class Campaign implements Serializable {
 			pw1.print(rng.getPercentFemale());
 			pw1.println("</percentFemale>");
 			pw1.println("\t\t</nameGen>");
+		}
+		{
+			pw1.println("\t\t<location>");
+			pw1.print("\t\t\t<currentPlanetName>");
+			pw1.print(location.getCurrentPlanet().getName());
+			pw1.println("</currentPlanetName>");
+			pw1.print("\t\t\t<distance>");
+			pw1.print(location.getDistance());
+			pw1.println("</distance>");
+			pw1.println("\t\t</location>");
 		}
 		
 		{
@@ -1744,8 +1748,6 @@ public class Campaign implements Serializable {
 							.getInstance();
 					retVal.calendar.setTime(df
 							.parse(wn.getTextContent().trim()));
-				} else if (xn.equalsIgnoreCase("currentPlanetName")) {
-					retVal.currentPlanetName = wn.getTextContent().trim();
 				} else if (xn.equalsIgnoreCase("camoCategory")) {
 					String val = wn.getTextContent().trim();
 
@@ -1774,6 +1776,19 @@ public class Campaign implements Serializable {
 							retVal.getRNG().setChosenFaction(wn2.getTextContent().trim());
 						} else if (wn2.getNodeName().equalsIgnoreCase("percentFemale")) {
 							retVal.getRNG().setPerentFemale(Integer.parseInt(wn2.getTextContent().trim()));
+						}
+					}
+				} else if (xn.equalsIgnoreCase("location")) {					
+					// First, get all the child nodes;
+					NodeList nl2 = wn.getChildNodes();	
+					for (int x2 = 0; x2 < nl2.getLength(); x2++) {
+						Node wn2 = nl2.item(x2);
+						if (wn2.getParentNode() != wn)
+							continue;
+						if (wn2.getNodeName().equalsIgnoreCase("currentPlanetName")) {
+							retVal.getLocation().setCurrentPlanet(retVal.planets.get(wn2.getTextContent().trim()));
+						} else if (wn2.getNodeName().equalsIgnoreCase("distance")) {
+							retVal.getLocation().setDistance(Float.parseFloat(wn2.getTextContent().trim()));
 						}
 					}
 				} else if (xn.equalsIgnoreCase("currentReport")) {

@@ -486,6 +486,7 @@ public class MekHQView extends FrameView {
 		choiceParts = new javax.swing.JComboBox();
 		panMekLab = new MekLabPanel();
 		scrollMekLab = new javax.swing.JScrollPane();
+		lblLocation = new javax.swing.JLabel();
 		
 		org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application
 				.getInstance(mekhq.MekHQApp.class).getContext()
@@ -1537,13 +1538,21 @@ public class MekHQView extends FrameView {
 		});
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 1;
+		gridBagConstraints.gridy = 0;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.ipadx = 15;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		gridBagConstraints.insets = new java.awt.Insets(12, 30, 0, 0);
 		panelMasterButtons.add(btnAdvanceDay, gridBagConstraints);
 
+		lblLocation.setText(campaign.getLocation().getReport(campaign.getCalendar().getTime())); // NOI18N
+		lblLocation.setName("lblLocation"); // NOI18N
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 1;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+		gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
+		panelMasterButtons.add(lblLocation, gridBagConstraints);
+		
 		btnOvertime.setText(resourceMap.getString("btnOvertime.text")); // NOI18N
 		btnOvertime.setToolTipText(resourceMap
 				.getString("btnOvertime.toolTipText")); // NOI18N
@@ -1555,11 +1564,9 @@ public class MekHQView extends FrameView {
 		});
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 2;
+		gridBagConstraints.gridy = 3;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.ipadx = 15;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		gridBagConstraints.insets = new java.awt.Insets(20, 30, 0, 0);
 		panelMasterButtons.add(btnOvertime, gridBagConstraints);
 
 		btnGMMode.setText(resourceMap.getString("btnGMMode.text")); // NOI18N
@@ -1575,9 +1582,7 @@ public class MekHQView extends FrameView {
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 4;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.ipadx = 15;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		gridBagConstraints.insets = new java.awt.Insets(0, 30, 42, 0);
 		panelMasterButtons.add(btnGMMode, gridBagConstraints);
 
 		fundsLabel.setFont(resourceMap.getFont("fundsLabel.font")); // NOI18N
@@ -1585,15 +1590,17 @@ public class MekHQView extends FrameView {
 		fundsLabel.setName("fundsLabel"); // NOI18N
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 0;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+		gridBagConstraints.gridy = 2;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+		gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
 		panelMasterButtons.add(fundsLabel, gridBagConstraints);
 
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 0;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHEAST;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		mainPanel.add(panelMasterButtons, gridBagConstraints);
 
 		splitMain = new javax.swing.JSplitPane(javax.swing.JSplitPane.VERTICAL_SPLIT,mainPanel,tabMain);
@@ -7307,6 +7314,7 @@ public class MekHQView extends FrameView {
 	private javax.swing.JButton btnBeginTransit;
 	private MekLabPanel panMekLab;
 	private javax.swing.JScrollPane scrollMekLab;
+    private javax.swing.JLabel lblLocation;
 	// End of variables declaration//GEN-END:variables
 
 	private final Timer messageTimer;
