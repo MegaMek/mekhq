@@ -50,7 +50,8 @@ public class Transaction implements Serializable {
 	public final static int C_UNIT_SALE  = 6;
 	public final static int C_EQUIP_SALE = 7;
 	public final static int C_START      = 8;
-	public final static int C_NUM        = 9;
+	public final static int C_TRANSPORT  = 9;
+	public final static int C_NUM        = 10;
 	
 	public static String getCategoryName(int cat) {
 		switch(cat) {
@@ -72,6 +73,8 @@ public class Transaction implements Serializable {
 			return "Equipment Sales";
 		case C_START:
 			return "Starting Capital";
+		case C_TRANSPORT:
+			return "Transportation";
 		default:
 			return "Unknown category";
 		}

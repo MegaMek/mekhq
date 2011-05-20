@@ -65,6 +65,7 @@ public class CampaignOptions implements Serializable {
     private boolean payForSalaries;
     private boolean payForOverhead;
     private boolean payForMaintain;
+    private boolean payForTransport;
     private boolean sellUnits;
     private boolean sellParts;
 
@@ -88,6 +89,7 @@ public class CampaignOptions implements Serializable {
         payForSalaries = false;
         payForOverhead = false;
         payForMaintain = false;
+        payForTransport = false;
         sellUnits = false;
         sellParts = false;
     }
@@ -232,6 +234,14 @@ public class CampaignOptions implements Serializable {
     	this.payForMaintain = b;
     }
     
+    public boolean payForTransport() {
+    	return payForTransport;
+    }
+    
+    public void setPayForTransport(boolean b) {
+    	this.payForTransport = b;
+    }
+    
     public boolean canSellUnits() {
     	return  sellUnits;
     }
@@ -276,6 +286,7 @@ public class CampaignOptions implements Serializable {
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "payForSalaries", payForSalaries);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "payForOverhead", payForOverhead);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "payForMaintain", payForMaintain);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "payForTransport", payForTransport);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "sellUnits", sellUnits);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "sellParts", sellParts);
 
@@ -385,6 +396,11 @@ public class CampaignOptions implements Serializable {
 					retVal.payForMaintain = true;
 				else
 					retVal.payForMaintain = false;
+			} else if (wn2.getNodeName().equalsIgnoreCase("payForTransport")) {
+				if (wn2.getTextContent().equalsIgnoreCase("true"))
+					retVal.payForTransport = true;
+				else
+					retVal.payForTransport = false;
 			} else if (wn2.getNodeName().equalsIgnoreCase("sellUnits")) {
 				if (wn2.getTextContent().equalsIgnoreCase("true"))
 					retVal.sellUnits = true;

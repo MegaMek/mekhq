@@ -41,16 +41,31 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import megamek.client.RandomNameGenerator;
+import megamek.common.ASFBay;
 import megamek.common.Aero;
+import megamek.common.BattleArmor;
+import megamek.common.BattleArmorBay;
+import megamek.common.Bay;
+import megamek.common.CargoBay;
 import megamek.common.Compute;
+import megamek.common.Dropship;
 import megamek.common.Entity;
+import megamek.common.EntityMovementMode;
 import megamek.common.Game;
+import megamek.common.HeavyVehicleBay;
+import megamek.common.Infantry;
+import megamek.common.InfantryBay;
+import megamek.common.Jumpship;
+import megamek.common.LightVehicleBay;
+import megamek.common.Mech;
+import megamek.common.MechBay;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
 import megamek.common.Pilot;
 import megamek.common.Player;
 import megamek.common.Protomech;
+import megamek.common.SmallCraftBay;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.loaders.EntityLoadingException;
@@ -786,7 +801,7 @@ public class Campaign implements Serializable {
 		calendar.add(Calendar.DAY_OF_MONTH, 1);
 		addReport("<p/><b>" + getDateAsString() + "</b>");
 
-		addReports(location.newDay());
+		location.newDay(this);
 		
 		for (SupportTeam team : getTeams()) {
 			team.resetMinutesLeft();
@@ -2143,6 +2158,144 @@ public class Campaign implements Serializable {
 			}
 		}
 		return neighbors;
+	}
+	
+	/**
+	 * Right now this is going to be a total hack because the rules from FM Merc
+	 * would be a nightmare to calculate and I want to get something up and running
+	 * so we can do contracts. There are two components to figure - the costs of leasing
+	 * dropships for excess units and the cost of leasing jumpships based on the number
+	 * of dropships. Right now, we are just going to calculate average costs per unit
+	 * and then make some guesses about total dropship collar needs.
+	 * 
+	 * Hopefully, StellarOps will clarify all of this.
+	 */
+	public long calculateCostPerJump() {
+		//first we need to get the total number of units by type
+		int nMech = 0;
+		int nVee = 0;
+		int nAero = 0;
+		int nBA = 0;
+		int nMechInf = 0;
+		int nMotorInf = 0;
+		int nFootInf = 0;
+		
+		double cargoSpace = 0.0;
+		
+		int nDropship = 0;
+		int nCollars = 0;
+		
+		for(Unit u : getUnits()) {
+			Entity en = u.getEntity();
+			if(en instanceof Dropship) {
+				nDropship++;
+				//decrement total needs by what this dropship can offer
+				for(Bay bay : en.getTransportBays()) {
+					if(bay instanceof MechBay) {
+						nMech -= bay.getCapacity();
+					}
+					else if(bay instanceof LightVehicleBay) {
+						nVee -= bay.getCapacity();
+					}
+					else if(bay instanceof HeavyVehicleBay) {
+						nVee -= bay.getCapacity();
+					}
+					else if(bay instanceof ASFBay || bay instanceof SmallCraftBay) {
+						nAero -= bay.getCapacity();
+					}
+					else if(bay instanceof BattleArmorBay) {
+						nBA -= bay.getCapacity() * 4;
+					}
+					else if(bay instanceof InfantryBay) {
+						nMechInf -= bay.getCapacity() * 28;
+					}
+					else if(bay instanceof CargoBay) {
+						cargoSpace += bay.getCapacity();
+					}
+				}
+			}
+			else if(en instanceof Jumpship) {
+				nCollars += ((Jumpship)en).getDocks();
+			}
+			else if(en instanceof Mech) {
+				nMech++;
+			}
+			else if(en instanceof Tank) {
+				nVee++;
+			}
+			else if(en instanceof Aero) {
+				nAero++;
+			}
+			else if(en instanceof BattleArmor) {
+				nBA += 4;
+			}
+			else if(en instanceof Infantry) {
+				if(en.getMovementMode() == EntityMovementMode.INF_LEG || en.getMovementMode() == EntityMovementMode.INF_LEG) {
+					nFootInf += ((Infantry)en).getSquadN() * ((Infantry)en).getSquadSize();
+				}
+				else if(en.getMovementMode() == EntityMovementMode.INF_MOTORIZED) {
+					nMotorInf += ((Infantry)en).getSquadN() * ((Infantry)en).getSquadSize();
+				}
+				else {
+					nMechInf += ((Infantry)en).getSquadN() * ((Infantry)en).getSquadSize();
+				}
+			}
+			//if we havent got you yet then you fly free (yay!)
+		}
+		
+		if(nMech < 0) {
+			nMech = 0;
+		}
+		if(nVee < 0) {
+			nVee = 0;
+		}
+		if(nAero < 0) {
+			nAero = 0;
+		}
+		if(nBA < 0) {
+			nBA = 0;
+		}
+		//now lets resort the infantry a bit
+		if(nMechInf < 0) {
+			nMotorInf += nMechInf;
+			nMechInf = 0;
+		}
+		if(nMotorInf < 0) {
+			nFootInf += nMotorInf;
+		}
+		if(nFootInf < 0) {
+			nFootInf = 0;
+		}
+		
+		//Ok, now the costs per unit - this is the dropship fee. I am loosely
+		//basing this on Field Manual Mercs, although I think the costs are f'ed up
+		long dropshipCost = 0;
+		dropshipCost += nMech  * 10000;
+		dropshipCost += nAero  * 15000;
+		dropshipCost += nVee   *  3000;
+		dropshipCost += nBA    *   250;
+		dropshipCost += nMechInf * 100;
+		dropshipCost += nMotorInf * 50;
+		dropshipCost += nFootInf  * 10;
+		
+		//ok, now how many dropship collars do we need for these units? base this on 
+		//some of the canonical designs
+		int collarsNeeded = 0;
+		//for mechs assume a union or smaller
+		collarsNeeded += (int)Math.ceil(nMech / 12.0);
+		//for aeros, they may ride for free on the union, if not assume a leopard cv
+		collarsNeeded += (int)Math.ceil(Math.max(0,nAero-collarsNeeded*2) / 6.0);
+		//for vees, assume a Triumph
+		collarsNeeded += (int)Math.ceil(nVee / 53.0);
+		//for now I am going to let infantry and BA tag along because of cargo space rules
+		
+		//add the existing dropships 
+		collarsNeeded += nDropship;
+		
+		//now factor in owned jumpships
+		collarsNeeded = Math.max(0, collarsNeeded - nCollars);
+		
+		return dropshipCost + collarsNeeded*50000;
 	}
 	
 }

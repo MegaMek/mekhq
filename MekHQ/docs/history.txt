@@ -39,6 +39,8 @@ v0.1.7 (SVN)
 + when adding to the path by shift+click, planets were counted twice along path
 + center and zoom map initially on current location
 + move to planet automagically using GM mode
++ pay for transportation option
++ updated MM.jar
 
 v0.1.6 (2011-05-17)
 + beginning of Briefing Room tab

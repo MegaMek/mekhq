@@ -79,6 +79,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         payForSalariesBox.setSelected(options.payForSalaries());
         payForOverheadBox.setSelected(options.payForOverhead());
         payForMaintainBox.setSelected(options.payForMaintain());
+        payForTransportBox.setSelected(options.payForTransport());
         sellUnitsBox.setSelected(options.canSellUnits());
         sellPartsBox.setSelected(options.canSellParts());
 
@@ -138,6 +139,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         payForSalariesBox = new javax.swing.JCheckBox();
         payForOverheadBox = new javax.swing.JCheckBox();
         payForMaintainBox = new javax.swing.JCheckBox();
+        payForTransportBox = new javax.swing.JCheckBox();
         sellUnitsBox = new javax.swing.JCheckBox();
         sellPartsBox = new javax.swing.JCheckBox();
         useQuirksBox = new javax.swing.JCheckBox();
@@ -490,12 +492,23 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panFinances.add(payForMaintainBox, gridBagConstraints);
         
+        payForTransportBox.setText(resourceMap.getString("payForTransportBox.text")); // NOI18N
+        payForTransportBox.setToolTipText(resourceMap.getString("payForTransportBox.toolTipText")); // NOI18N
+        payForTransportBox.setName("payForTransportBox"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panFinances.add(payForTransportBox, gridBagConstraints);
+        
         sellUnitsBox.setText(resourceMap.getString("sellUnitsBox.text")); // NOI18N
         sellUnitsBox.setToolTipText(resourceMap.getString("sellUnitsBox.toolTipText")); // NOI18N
         sellUnitsBox.setName("sellUnitsBox"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 6;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -506,7 +519,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         sellPartsBox.setName("sellPartsBox"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridy = 7;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -746,6 +759,7 @@ private void btnOkayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
     options.setPayForSalaries(payForSalariesBox.isSelected());
     options.setPayForOverhead(payForOverheadBox.isSelected());
     options.setPayForMaintain(payForMaintainBox.isSelected());
+    options.setPayForTransport(payForTransportBox.isSelected());
     options.setSellUnits(sellUnitsBox.isSelected());
     options.setSellParts(sellPartsBox.isSelected());
 
@@ -875,6 +889,7 @@ public String getDateAsString() {
     private javax.swing.JCheckBox payForSalariesBox;
     private javax.swing.JCheckBox payForOverheadBox;
     private javax.swing.JCheckBox payForMaintainBox;
+    private javax.swing.JCheckBox payForTransportBox;
     private javax.swing.JCheckBox sellUnitsBox;
     private javax.swing.JCheckBox sellPartsBox;
     

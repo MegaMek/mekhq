@@ -7,6 +7,7 @@
 package mekhq;
 
 import java.awt.Color;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
@@ -43,6 +44,8 @@ public class JumpPathViewPanel extends javax.swing.JPanel {
 	private javax.swing.JTextArea txtRechargeTime;
 	private javax.swing.JLabel lblTotalTime;
 	private javax.swing.JTextArea txtTotalTime;
+	private javax.swing.JLabel lblCost;
+	private javax.swing.JTextArea txtCost;
 
 	public JumpPathViewPanel(JumpPath p, Campaign c) {
 		this.path = p;
@@ -128,12 +131,16 @@ public class JumpPathViewPanel extends javax.swing.JPanel {
     	txtRechargeTime = new javax.swing.JTextArea();
     	lblTotalTime = new javax.swing.JLabel();
     	txtTotalTime = new javax.swing.JTextArea();
+    	lblCost = new javax.swing.JLabel();
+    	txtCost = new javax.swing.JTextArea();
     	
     	String startName = (path.getFirstPlanet() == null) ? "?":path.getFirstPlanet().getShortName();
     	String endName = (path.getLastPlanet() == null) ? "?":path.getLastPlanet().getShortName();
     	
     	java.awt.GridBagConstraints gridBagConstraints;
 		pnlStats.setLayout(new java.awt.GridBagLayout());
+		
+		DecimalFormat formatter = new DecimalFormat();
 		
 		lblJumps.setName("lblJumps"); // NOI18N
 		lblJumps.setText(resourceMap.getString("lblJumps1.text"));
@@ -249,6 +256,31 @@ public class JumpPathViewPanel extends javax.swing.JPanel {
 		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(txtTotalTime, gridBagConstraints);
+		
+		if(campaign.getCampaignOptions().payForTransport()) {
+			lblCost.setName("lblCost1"); // NOI18N
+			lblCost.setText(resourceMap.getString("lblCost1.text"));
+			gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints.gridx = 0;
+			gridBagConstraints.gridy = 6;
+			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			pnlStats.add(lblCost, gridBagConstraints);
+			
+			txtCost.setName("lblCost2"); // NOI18N
+			txtCost.setText(formatter.format(path.getJumps() * campaign.calculateCostPerJump()) + " C-bills");
+			txtCost.setEditable(false);
+			txtCost.setLineWrap(true);
+			txtCost.setWrapStyleWord(true);
+			gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints.gridx = 1;
+			gridBagConstraints.gridy = 6;
+			gridBagConstraints.weightx = 0.5;
+			gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+			gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			pnlStats.add(txtCost, gridBagConstraints);
+		}
 	
     }
 }

@@ -35,6 +35,7 @@ import java.util.Vector;
 import megamek.common.EquipmentType;
 import megamek.common.PlanetaryConditions;
 import mekhq.MekHQApp;
+import mekhq.campaign.finances.Transaction;
 
 import org.w3c.dom.DOMException;
 import org.w3c.dom.NamedNodeMap;
@@ -131,21 +132,20 @@ public class CurrentLocation implements Serializable {
 	 * Check for a jump path and if found, do whatever needs to be done to move 
 	 * forward
 	 */
-	public ArrayList<String> newDay() {
-		ArrayList<String> reports = new ArrayList<String>();
+	public void newDay(Campaign campaign) {
 		//recharge even if there is no jump path
 		//because jumpships don't go anywhere
 		double hours = 24.0;
 		double usedRechargeTime = Math.min(hours, currentPlanet.getRechargeTime() - rechargeTime);
 		if(usedRechargeTime > 0) {
-			reports.add("Jumpships spent " + Math.round(100.0 * usedRechargeTime)/100.0 + " hours recharging drives");
+			campaign.addReport("Jumpships spent " + Math.round(100.0 * usedRechargeTime)/100.0 + " hours recharging drives");
 			rechargeTime += usedRechargeTime;
 			if(rechargeTime >= currentPlanet.getRechargeTime()) {
-				reports.add("Jumpship drives full charged");
+				campaign.addReport("Jumpship drives full charged");
 			}
 		}
 		if(null == jumpPath || jumpPath.isEmpty()) {
-			return reports;
+			return;
 		}
 		//if we are not at the final jump point, then check to see if we are transiting
 		//or if we can jump
@@ -154,14 +154,17 @@ public class CurrentLocation implements Serializable {
 			double usedTransitTime = Math.min(hours, 24.0 * (currentPlanet.getTimeToJumpPoint(1.0) - transitTime));
 			if(usedTransitTime > 0) {
 				transitTime += usedTransitTime/24.0;
-				reports.add("Dropships spent " + Math.round(100.0 * usedTransitTime)/100.0 + " hours in transit to jump point");
+				campaign.addReport("Dropships spent " + Math.round(100.0 * usedTransitTime)/100.0 + " hours in transit to jump point");
 				if(isAtJumpPoint()) {
-					reports.add("Jump point reached");
+					campaign.addReport("Jump point reached");
 				}
 			}
 			if(isAtJumpPoint() && rechargeTime >= currentPlanet.getRechargeTime()) {
 				//jump
-				reports.add("Jumping to " + jumpPath.get(1).getShortName());
+				campaign.addReport("Jumping to " + jumpPath.get(1).getShortName());
+				if(campaign.getCampaignOptions().payForTransport()) {
+					campaign.getFinances().debit(campaign.calculateCostPerJump(), Transaction.C_TRANSPORT, "jump from " + currentPlanet.getName() + " to " + jumpPath.get(1).getName(), campaign.getCalendar().getTime());
+				}
 				currentPlanet = jumpPath.get(1);
 				jumpPath.removeFirstPlanet();
 				//reduce remaining hours by usedRechargeTime or usedTransitTime, whichever is greater
@@ -171,10 +174,10 @@ public class CurrentLocation implements Serializable {
 				//if there are hours remaining, then begin recharging jump drive
 				usedRechargeTime = Math.min(hours, currentPlanet.getRechargeTime() - rechargeTime);
 				if(usedRechargeTime > 0) {
-					reports.add("Jumpships spent " + Math.round(100.0 * usedRechargeTime)/100.0 + " hours recharging drives");
+					campaign.addReport("Jumpships spent " + Math.round(100.0 * usedRechargeTime)/100.0 + " hours recharging drives");
 					rechargeTime += usedRechargeTime;
 					if(rechargeTime >= currentPlanet.getRechargeTime()) {
-						reports.add("Jumpship drives full charged");
+						campaign.addReport("Jumpship drives full charged");
 					}
 				}
 			}
@@ -182,16 +185,15 @@ public class CurrentLocation implements Serializable {
 		//if we are now at the final jump point, then lets begin in-system transit
 		if(jumpPath.size() == 1) {
 			double usedTransitTime = Math.min(hours, 24.0 * transitTime);
-			reports.add("Dropships spent " + Math.round(100.0 * usedTransitTime)/100.0 + " hours transiting into system");
+			campaign.addReport("Dropships spent " + Math.round(100.0 * usedTransitTime)/100.0 + " hours transiting into system");
 			transitTime -= usedTransitTime/24.0;
 			if(transitTime <= 0) {
-				reports.add(jumpPath.getLastPlanet().getShortName() + " reached.");
+				campaign.addReport(jumpPath.getLastPlanet().getShortName() + " reached.");
 				//we are here!
 				transitTime = 0;
 				jumpPath = null;
 			}
 		}
-		return reports;
 	}
 	
 	public void writeToXml(PrintWriter pw1, int indent) {
