@@ -455,6 +455,21 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
 				g2.draw(new Line2D.Double(map2scrX(planetA.getX()), map2scrY(planetA.getY()), map2scrX(planetB.getX()), map2scrY(planetB.getY())));
 			}
 		}
+		
+		//check to see if the unit is traveling on a jump path currently and if so
+		//draw this one too, in a different color
+		if(null != campaign.getLocation().getJumpPath()) {
+			for(int i = 0; i < campaign.getLocation().getJumpPath().size(); i++) {	
+				g2.setPaint(new Color(255,192,203));
+				Planet planetB = campaign.getLocation().getJumpPath().get(i);
+				arc.setArcByCenter(map2scrX(planetB.getX()), map2scrY(planetB.getY()), size * 1.5, 0, 360, Arc2D.OPEN);
+				g2.fill(arc);
+				if(i > 0) {
+					Planet planetA = campaign.getLocation().getJumpPath().get(i-1);
+					g2.draw(new Line2D.Double(map2scrX(planetA.getX()), map2scrY(planetA.getY()), map2scrX(planetB.getX()), map2scrY(planetB.getY())));
+				}
+			}
+		}
         
 		for(Planet planet : planets) {
 			double x = map2scrX(planet.getX());

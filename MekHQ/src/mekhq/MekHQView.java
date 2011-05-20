@@ -1873,6 +1873,8 @@ public class MekHQView extends FrameView {
 		campaign.getLocation().setJumpPath(panMap.getJumpPath());
 		refreshPlanetView();
 		refreshLocation();
+		panMap.setJumpPath(new JumpPath());
+		panMap.repaint();
 	}
 	
 	private void btnDoTaskActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnDoTaskActionPerformed

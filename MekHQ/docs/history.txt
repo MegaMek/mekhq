@@ -34,6 +34,7 @@ v0.1.7 (SVN)
 + ability to move force along jump path
 + made JumpPath and CurrentLocation serializable
 + jumpPath and CurrentLocation added to XML serialization
++ distinction between plotted paths and actual paths in map
 
 v0.1.6 (2011-05-17)
 + beginning of Briefing Room tab
