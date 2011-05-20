@@ -827,7 +827,7 @@ public class MekHQView extends FrameView {
 		btnBeginTransit.setName("btnBeginTransit"); // NOI18N
 		btnBeginTransit.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				//beginTransit();
+				beginTransit();
 			}
 		});
 		gridBagConstraints = new java.awt.GridBagConstraints();
@@ -1497,34 +1497,28 @@ public class MekHQView extends FrameView {
 		mainPanel.setName("mainPanel"); // NOI18N
 		mainPanel.setLayout(new java.awt.GridBagLayout());
 
-		txtPaneReportScrollPane
-				.setMinimumSize(new java.awt.Dimension(800, 200));
 		txtPaneReportScrollPane.setName("txtPaneReportScrollPane"); // NOI18N
-		txtPaneReportScrollPane.setPreferredSize(new java.awt.Dimension(800,
-				200));
-
 		txtPaneReport.setContentType(resourceMap
 				.getString("txtPaneReport.contentType")); // NOI18N
 		txtPaneReport.setEditable(false);
 		txtPaneReport.setFont(resourceMap.getFont("txtPaneReport.font")); // NOI18N
 		txtPaneReport.setText(campaign.getCurrentReportHTML());
-		txtPaneReport.setMinimumSize(new java.awt.Dimension(800, 200));
 		txtPaneReport.setName("txtPaneReport"); // NOI18N
-		txtPaneReport.setPreferredSize(new java.awt.Dimension(800, 200));
 		txtPaneReportScrollPane.setViewportView(txtPaneReport);
 
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 1;
 		gridBagConstraints.gridy = 0;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHEAST;
 		gridBagConstraints.weightx = 1.0;
+		gridBagConstraints.weighty = 1.0;
 		gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
 		mainPanel.add(txtPaneReportScrollPane, gridBagConstraints);
 
-		panelMasterButtons.setMinimumSize(new java.awt.Dimension(200, 200));
+		panelMasterButtons.setMinimumSize(new java.awt.Dimension(300, 220));
 		panelMasterButtons.setName("panelMasterButtons"); // NOI18N
-		panelMasterButtons.setPreferredSize(new java.awt.Dimension(200, 220));
+		panelMasterButtons.setPreferredSize(new java.awt.Dimension(300, 220));
 		panelMasterButtons.setLayout(new java.awt.GridBagLayout());
 
 		btnAdvanceDay.setText(resourceMap.getString("btnAdvanceDay.text")); // NOI18N
@@ -1539,6 +1533,7 @@ public class MekHQView extends FrameView {
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 0;
+		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		panelMasterButtons.add(btnAdvanceDay, gridBagConstraints);
@@ -1548,6 +1543,7 @@ public class MekHQView extends FrameView {
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 1;
+		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
@@ -1565,6 +1561,7 @@ public class MekHQView extends FrameView {
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 3;
+		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		panelMasterButtons.add(btnOvertime, gridBagConstraints);
@@ -1581,6 +1578,8 @@ public class MekHQView extends FrameView {
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 4;
+		gridBagConstraints.weightx = 1.0;
+		gridBagConstraints.weighty = 1.0;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		panelMasterButtons.add(btnGMMode, gridBagConstraints);
@@ -1870,6 +1869,12 @@ public class MekHQView extends FrameView {
 		}
 	}
 	
+	private void beginTransit() {
+		campaign.getLocation().setJumpPath(panMap.getJumpPath());
+		refreshPlanetView();
+		refreshLocation();
+	}
+	
 	private void btnDoTaskActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnDoTaskActionPerformed
 		
 		SupportTeam team = campaign.getTeam(currentTechId);		
@@ -2024,6 +2029,7 @@ public class MekHQView extends FrameView {
 		refreshCalendar();
 		refreshReport();
 		refreshFunds();
+		refreshLocation();
 		panMap.repaint();
 		refreshFinancialTransactions();
 	}// GEN-LAST:event_btnAdvanceDayActionPerformed
@@ -2879,6 +2885,10 @@ public class MekHQView extends FrameView {
 		String text = numberFormat.format(funds) + " "
 				+ (funds != 0 ? "CBills" : "CBill");
 		fundsLabel.setText(text);
+	}
+	
+	protected void refreshLocation() {
+		lblLocation.setText(campaign.getLocation().getReport(campaign.getCalendar().getTime()));
 	}
 
 	protected void updateAssignEnabled() {

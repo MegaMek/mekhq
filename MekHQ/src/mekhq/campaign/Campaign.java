@@ -786,6 +786,8 @@ public class Campaign implements Serializable {
 		calendar.add(Calendar.DAY_OF_MONTH, 1);
 		addReport("<p/><b>" + getDateAsString() + "</b>");
 
+		addReports(location.newDay());
+		
 		for (SupportTeam team : getTeams()) {
 			team.resetMinutesLeft();
 		}
@@ -1084,6 +1086,12 @@ public class Campaign implements Serializable {
 		}
 		currentReport.add(0,r);
 	}
+	
+	public void addReports(ArrayList<String> reports) {
+		for(String r : reports) {
+			addReport(r);
+		}
+	}
 
 	public void setCamoCategory(String name) {
 		camoCategory = name;
@@ -1255,9 +1263,9 @@ public class Campaign implements Serializable {
 			pw1.print("\t\t\t<currentPlanetName>");
 			pw1.print(location.getCurrentPlanet().getName());
 			pw1.println("</currentPlanetName>");
-			pw1.print("\t\t\t<distance>");
-			pw1.print(location.getDistance());
-			pw1.println("</distance>");
+			pw1.print("\t\t\t<transitTime>");
+			pw1.print(location.getTransitTime());
+			pw1.println("</transitTime>");
 			pw1.println("\t\t</location>");
 		}
 		
@@ -1787,8 +1795,8 @@ public class Campaign implements Serializable {
 							continue;
 						if (wn2.getNodeName().equalsIgnoreCase("currentPlanetName")) {
 							retVal.getLocation().setCurrentPlanet(retVal.planets.get(wn2.getTextContent().trim()));
-						} else if (wn2.getNodeName().equalsIgnoreCase("distance")) {
-							retVal.getLocation().setDistance(Float.parseFloat(wn2.getTextContent().trim()));
+						} else if (wn2.getNodeName().equalsIgnoreCase("transitTime")) {
+							retVal.getLocation().setTransitTime(Double.parseDouble(wn2.getTextContent().trim()));
 						}
 					}
 				} else if (xn.equalsIgnoreCase("currentReport")) {
