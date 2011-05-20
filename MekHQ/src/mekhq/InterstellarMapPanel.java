@@ -341,7 +341,11 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
                         	if(null == lastPlanet) {
                         		lastPlanet = campaign.getCurrentPlanet();
                         	}
-                  			jumpPath.addPlanets(campaign.calculateJumpPath(lastPlanet.getName(), target.getName()).getPlanets());
+                        	JumpPath addPath = campaign.calculateJumpPath(lastPlanet.getName(), target.getName());
+                  			if(!jumpPath.isEmpty()) {
+                  				addPath.removeFirstPlanet();
+                  			}
+                        	jumpPath.addPlanets(addPath.getPlanets());
                   			selectedPlanet = target;
                   			repaint();
                   			hqview.refreshPlanetView();
