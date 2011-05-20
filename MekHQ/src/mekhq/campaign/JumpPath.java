@@ -79,12 +79,12 @@ public class JumpPath implements Serializable {
 		}
 	}
 	
-	public double getStartTime() {
+	public double getStartTime(double currentTransit) {
 		double startTime = 0.0;
 		if(null != getFirstPlanet()) {
 			startTime = getFirstPlanet().getTimeToJumpPoint(1.0);
 		}
-		return startTime;
+		return startTime - currentTransit;
 	}
 	
 	public double getEndTime() {
@@ -98,18 +98,24 @@ public class JumpPath implements Serializable {
 	public double getTotalRechargeTime() {
 		int rechargeTime = 0;
 		for(Planet planet : path) {
+			if(planet.equals(getFirstPlanet())) {
+				continue;
+			}
+			if(planet.equals(getLastPlanet())) {
+				continue;
+			}
 			rechargeTime += planet.getRechargeTime();
 		}
 		return rechargeTime/24.0;
 	}
-	
+
 	public int getJumps() {
 		return size()-1;
 	}
 	
-	public double getTotalTime(boolean useStartTransit, boolean useEndTransit) {
+	public double getTotalTime(double currentTransit) {
 		
-		return getTotalRechargeTime() + (useStartTransit ? getStartTime():0) + (useEndTransit ? getEndTime():0);
+		return getTotalRechargeTime() + getStartTime(currentTransit) + getEndTime();
 	}
 	
 	public void addPlanet(Planet p) {

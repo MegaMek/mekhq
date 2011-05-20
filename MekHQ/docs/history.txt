@@ -35,6 +35,7 @@ v0.1.7 (SVN)
 + made JumpPath and CurrentLocation serializable
 + jumpPath and CurrentLocation added to XML serialization
 + distinction between plotted paths and actual paths in map
++ some calculation errors in jump path display
 
 v0.1.6 (2011-05-17)
 + beginning of Briefing Room tab
