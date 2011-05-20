@@ -21,8 +21,14 @@
 
 package mekhq.campaign;
 
+import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
+
+import mekhq.MekHQApp;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * This is an array list of planets for a jump path, from which we can derive
@@ -134,5 +140,40 @@ public class JumpPath implements Serializable {
 	
 	public boolean contains(Planet planet) {
 		return path.contains(planet);
+	}
+	
+	public void writeToXml(PrintWriter pw1, int indent) {
+		pw1.println(MekHqXmlUtil.indentStr(indent) + "<jumpPath>");
+		for(Planet p : path) {
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<planetName>"
+				+p.getName()
+				+"</planetName>");
+		}
+		pw1.println(MekHqXmlUtil.indentStr(indent) + "</jumpPath>");
+		
+	}
+	
+	public static JumpPath generateInstanceFromXML(Node wn, Campaign c) {
+		JumpPath retVal = null;
+		
+		try {		
+			retVal = new JumpPath();
+			NodeList nl = wn.getChildNodes();
+			
+			for (int x=0; x<nl.getLength(); x++) {
+				Node wn2 = nl.item(x);
+				if (wn2.getNodeName().equalsIgnoreCase("planetName")) {
+					retVal.addPlanet(c.getPlanet(wn2.getTextContent()));
+				}
+			}
+		} catch (Exception ex) {
+			// Errrr, apparently either the class name was invalid...
+			// Or the listed name doesn't exist.
+			// Doh!
+			MekHQApp.logError(ex);
+		}
+		
+		return retVal;
 	}
 }

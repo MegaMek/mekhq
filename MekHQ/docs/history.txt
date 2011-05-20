@@ -33,6 +33,7 @@ v0.1.7 (SVN)
 + radio buttons for status of missing pilots in retrieval wizard
 + ability to move force along jump path
 + made JumpPath and CurrentLocation serializable
++ jumpPath and CurrentLocation added to XML serialization
 
 v0.1.6 (2011-05-17)
 + beginning of Briefing Room tab

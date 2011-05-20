@@ -1259,17 +1259,6 @@ public class Campaign implements Serializable {
 			pw1.println("\t\t</nameGen>");
 		}
 		{
-			pw1.println("\t\t<location>");
-			pw1.print("\t\t\t<currentPlanetName>");
-			pw1.print(location.getCurrentPlanet().getName());
-			pw1.println("</currentPlanetName>");
-			pw1.print("\t\t\t<transitTime>");
-			pw1.print(location.getTransitTime());
-			pw1.println("</transitTime>");
-			pw1.println("\t\t</location>");
-		}
-		
-		{
 			pw1.println("\t\t<currentReport>");
 
 			for (int x = 0; x < currentReport.size(); x++) {
@@ -1299,6 +1288,7 @@ public class Campaign implements Serializable {
 		forces.writeToXml(pw1, 2);
 		pw1.println("\t</forces>");
 		finances.writeToXml(pw1,1);
+		location.writeToXml(pw1, 1);
 		//parts is the biggest so it goes last
 		writeArrayAndHashToXml(pw1, 1, "parts", parts, partIds); // Parts
 		
@@ -1418,6 +1408,8 @@ public class Campaign implements Serializable {
 					processForces(retVal, wn);
 				} else if (xn.equalsIgnoreCase("finances")) {
 					processFinances(retVal, wn);
+				} else if(xn.equalsIgnoreCase("location")) {
+					retVal.location = CurrentLocation.generateInstanceFromXML(wn, retVal);
 				}
 				
 			} else {
@@ -1784,19 +1776,6 @@ public class Campaign implements Serializable {
 							retVal.getRNG().setChosenFaction(wn2.getTextContent().trim());
 						} else if (wn2.getNodeName().equalsIgnoreCase("percentFemale")) {
 							retVal.getRNG().setPerentFemale(Integer.parseInt(wn2.getTextContent().trim()));
-						}
-					}
-				} else if (xn.equalsIgnoreCase("location")) {					
-					// First, get all the child nodes;
-					NodeList nl2 = wn.getChildNodes();	
-					for (int x2 = 0; x2 < nl2.getLength(); x2++) {
-						Node wn2 = nl2.item(x2);
-						if (wn2.getParentNode() != wn)
-							continue;
-						if (wn2.getNodeName().equalsIgnoreCase("currentPlanetName")) {
-							retVal.getLocation().setCurrentPlanet(retVal.planets.get(wn2.getTextContent().trim()));
-						} else if (wn2.getNodeName().equalsIgnoreCase("transitTime")) {
-							retVal.getLocation().setTransitTime(Double.parseDouble(wn2.getTextContent().trim()));
 						}
 					}
 				} else if (xn.equalsIgnoreCase("currentReport")) {

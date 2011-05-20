@@ -2201,6 +2201,7 @@ public class MekHQView extends FrameView {
 		refreshFinancialTransactions();
 		refreshOrganization();
 		refreshMissions();
+		refreshLocation();
 		panMap.setCampaign(campaign);
 		
 		// Without this, the report scrollbar doesn't seem to load properly
@@ -2248,6 +2249,7 @@ public class MekHQView extends FrameView {
 		refreshFunds();
 		refreshFinancialTransactions();
 		refreshMissions();
+		refreshLocation();
 		panMap.setCampaign(campaign);
 
 		// Without this, the report scrollbar doesn't seem to load properly

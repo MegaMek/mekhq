@@ -21,6 +21,7 @@
 
 package mekhq.campaign;
 
+import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -33,8 +34,10 @@ import java.util.Vector;
 
 import megamek.common.EquipmentType;
 import megamek.common.PlanetaryConditions;
+import mekhq.MekHQApp;
 
 import org.w3c.dom.DOMException;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -62,6 +65,9 @@ public class CurrentLocation implements Serializable {
 	//I would like to keep track of distance, but I ain't too good with fyziks
 	private double transitTime;
 	
+	public CurrentLocation() {
+		this(null,0);
+	}
 	
 	public CurrentLocation(Planet planet, double time) {
 		this.currentPlanet = planet;
@@ -186,5 +192,55 @@ public class CurrentLocation implements Serializable {
 			}
 		}
 		return reports;
+	}
+	
+	public void writeToXml(PrintWriter pw1, int indent) {
+		pw1.println(MekHqXmlUtil.indentStr(indent) + "<location>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<currentPlanetName>"
+				+currentPlanet.getName()
+				+"</currentPlanetName>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<transitTime>"
+				+transitTime
+				+"</transitTime>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<rechargeTime>"
+				+rechargeTime
+				+"</rechargeTime>");
+		if(null != jumpPath) {
+			jumpPath.writeToXml(pw1, indent+1);
+		}
+		pw1.println(MekHqXmlUtil.indentStr(indent) + "</location>");
+		
+	}
+	
+	public static CurrentLocation generateInstanceFromXML(Node wn, Campaign c) {
+		CurrentLocation retVal = null;
+		
+		try {		
+			retVal = new CurrentLocation();
+			NodeList nl = wn.getChildNodes();
+			
+			for (int x=0; x<nl.getLength(); x++) {
+				Node wn2 = nl.item(x);
+				if (wn2.getNodeName().equalsIgnoreCase("currentPlanetName")) {
+					retVal.currentPlanet = c.getPlanet(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("transitTime")) {
+					retVal.transitTime = Double.parseDouble(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("rechargeTime")) {
+					retVal.rechargeTime = Double.parseDouble(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("jumpPath")) {
+					retVal.jumpPath = JumpPath.generateInstanceFromXML(wn2, c);
+				} 
+			}
+		} catch (Exception ex) {
+			// Errrr, apparently either the class name was invalid...
+			// Or the listed name doesn't exist.
+			// Doh!
+			MekHQApp.logError(ex);
+		}
+		
+		return retVal;
 	}
 }
