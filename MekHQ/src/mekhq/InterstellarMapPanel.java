@@ -307,6 +307,23 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
                     selectM.add(zMenu);
                 	MenuScroller.setScrollerFor(zMenu, 30);
                     popup.add(selectM);
+                    JMenu menuGM = new JMenu("GM Mode");
+                    item = new JMenuItem("Move to selected planet");
+                    item.setEnabled(selectedPlanet != null && campaign.isGM());
+                    if (selectedPlanet != null) {// only add if there is a planet to center on
+                        item.addActionListener(new ActionListener() {
+                            public void actionPerformed(ActionEvent ae) {
+                                campaign.getLocation().setCurrentPlanet(selectedPlanet);
+                                campaign.getLocation().setTransitTime(0.0);
+                                campaign.getLocation().setJumpPath(null);                    
+                                jumpPath = new JumpPath();
+                                center(selectedPlanet);
+                                hqview.refreshLocation();
+                            }
+                        });
+                    }
+                    menuGM.add(item);
+                    popup.add(menuGM);
                 	popup.show(e.getComponent(), e.getX() + 10, e.getY() + 10);
                 }
             }
