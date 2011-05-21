@@ -400,6 +400,7 @@ public class MekHQView extends FrameView {
 		lblMission = new javax.swing.JLabel();
 		choiceMission = new javax.swing.JComboBox();
 		btnAddMission = new javax.swing.JButton();
+		btnAddContract = new javax.swing.JButton();
 		btnEditMission = new javax.swing.JButton();
 		btnCompleteMission = new javax.swing.JButton();
 		btnAddScenario = new javax.swing.JButton();
@@ -589,6 +590,24 @@ public class MekHQView extends FrameView {
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 0.0;
 		panBriefing.add(btnAddMission, gridBagConstraints);
+		
+		btnAddContract.setText(resourceMap.getString("btnAddMission.text")); // NOI18N
+		btnAddContract.setToolTipText(resourceMap
+				.getString("btnAddContract.toolTipText")); // NOI18N
+		btnAddContract.setName("btnAddContract"); // NOI18N
+		btnAddContract.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				btnAddContractActionPerformed(evt);
+			}
+		});
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 3;
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.gridwidth = 1;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+		gridBagConstraints.weightx = 1.0;
+		gridBagConstraints.weighty = 0.0;
+		panBriefing.add(btnAddContract, gridBagConstraints);
 		
 		btnAddScenario.setText(resourceMap.getString("btnAddScenario.text")); // NOI18N
 		btnAddScenario.setToolTipText(resourceMap
@@ -1815,6 +1834,15 @@ public class MekHQView extends FrameView {
 		cmd.setVisible(true);
 		if(cmd.getMissionId() != -1) {
 			selectedMission = cmd.getMissionId();
+		}
+		refreshMissions();
+	}
+	
+	private void btnAddContractActionPerformed(java.awt.event.ActionEvent evt) {
+		NewContractDialog ncd = new NewContractDialog(null, true, campaign);
+		ncd.setVisible(true);
+		if(ncd.getContractId() != -1) {
+			selectedMission = ncd.getContractId();
 		}
 		refreshMissions();
 	}
@@ -7314,6 +7342,7 @@ public class MekHQView extends FrameView {
 	private javax.swing.JScrollPane scrollScenarioView;
 	private javax.swing.JButton btnAddScenario;
 	private javax.swing.JButton btnAddMission;
+	private javax.swing.JButton btnAddContract;
 	private javax.swing.JButton btnEditMission;
 	private javax.swing.JButton btnCompleteMission;
 	private javax.swing.JButton btnGetMul;

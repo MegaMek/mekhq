@@ -872,6 +872,16 @@ public class Campaign implements Serializable {
 		return salaries;
 	}
 	
+	public long getSupportPayRoll() {
+		long salaries = 0;
+		for(Person p : personnel) {
+			if(p.isActive() && p instanceof SupportPerson) {
+				salaries += p.getSalary();
+			}
+		}
+		return salaries;
+	}
+	
 	public long getMaintenanceCosts() {
 		long costs = 0;
 		for(Unit u : units) {

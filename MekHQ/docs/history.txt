@@ -41,6 +41,7 @@ v0.1.7 (SVN)
 + move to planet automagically using GM mode
 + pay for transportation option
 + updated MM.jar
++ beginning of Contract.java
 
 v0.1.6 (2011-05-17)
 + beginning of Briefing Room tab
