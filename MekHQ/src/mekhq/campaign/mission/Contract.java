@@ -188,6 +188,15 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 	public void setAdvancePct(int s) {
 		advancePct = s;
 	}
+	
+	public boolean payMRBCFee() {
+		return mrbcFee;
+	}
+	
+	public void setMRBCFee(boolean b) {
+		mrbcFee = b;
+	}
+	
 	public long getTotalAmount() {
 		return baseAmount + supportAmount + overheadAmount + transportAmount + signingAmount;
 	}
@@ -257,6 +266,8 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 		
 		if(mrbcFee) {
 			feeAmount =  (long)(0.05 * (baseAmount + overheadAmount + transportAmount + signingAmount + supportAmount));
+		} else {
+			feeAmount = 0;
 		}
 	}
 	
