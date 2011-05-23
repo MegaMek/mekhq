@@ -20,13 +20,21 @@
  */
 package mekhq.campaign.mission;
 
+import java.io.PrintWriter;
 import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import mekhq.MekHQApp;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlSerializable;
+import mekhq.campaign.MekHqXmlUtil;
 
 
 /**
@@ -81,6 +89,10 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 	private long supportAmount;
 	private long baseAmount;
 	private long feeAmount;
+	
+	public Contract() {
+		this(null,null);
+	}
 	
 	public Contract(String name, String employer) {
 		super(name);
@@ -316,4 +328,154 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 		endDate = cal.getTime();
 	}
 	
+	public void writeToXml(PrintWriter pw1, int indent, int id) {
+		writeToXmlBegin(pw1, indent, id);
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<nMonths>"
+				+nMonths
+				+"</nMonths>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<startDate>"
+				+df.format(startDate)
+				+"</startDate>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<endDate>"
+				+df.format(endDate)
+				+"</endDate>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<employer>"
+				+employer
+				+"</employer>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<paymentMultiplier>"
+				+paymentMultiplier
+				+"</paymentMultiplier>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<commandRights>"
+				+commandRights
+				+"</commandRights>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<overheadComp>"
+				+overheadComp
+				+"</overheadComp>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<straightSupport>"
+				+straightSupport
+				+"</straightSupport>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<battleLossComp>"
+				+battleLossComp
+				+"</battleLossComp>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<transportComp>"
+				+transportComp
+				+"</transportComp>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<mrbcFee>"
+				+mrbcFee
+				+"</mrbcFee>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<advancePct>"
+				+advancePct
+				+"</advancePct>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<signBonus>"
+				+signBonus
+				+"</signBonus>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<advanceAmount>"
+				+advanceAmount
+				+"</advanceAmount>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<signingAmount>"
+				+signingAmount
+				+"</signingAmount>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<transportAmount>"
+				+transportAmount
+				+"</transportAmount>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<overheadAmount>"
+				+overheadAmount
+				+"</overheadAmount>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<supportAmount>"
+				+supportAmount
+				+"</supportAmount>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<baseAmount>"
+				+baseAmount
+				+"</baseAmount>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<feeAmount>"
+				+feeAmount
+				+"</feeAmount>");
+		writeToXmlEnd(pw1, indent, id);
+	}
+	
+	public void loadFieldsFromXmlNode(Node wn) throws ParseException {
+		// Okay, now load mission-specific fields!
+		NodeList nl = wn.getChildNodes();
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+
+		for (int x=0; x<nl.getLength(); x++) {
+			Node wn2 = nl.item(x);
+			
+			if (wn2.getNodeName().equalsIgnoreCase("employer")) {
+				employer = wn2.getTextContent();
+			} 
+			else if (wn2.getNodeName().equalsIgnoreCase("startDate")) {
+				startDate = df.parse(wn2.getTextContent().trim());
+			} 
+			else if (wn2.getNodeName().equalsIgnoreCase("endDate")) {
+				endDate = df.parse(wn2.getTextContent().trim());
+			} 
+			else if (wn2.getNodeName().equalsIgnoreCase("nMonths")) {
+				nMonths = Integer.parseInt(wn2.getTextContent().trim());
+			} else if (wn2.getNodeName().equalsIgnoreCase("paymentMuliplier")) {
+				paymentMultiplier = Double.parseDouble(wn2.getTextContent().trim());
+			} else if (wn2.getNodeName().equalsIgnoreCase("commandRights")) {
+				commandRights = Integer.parseInt(wn2.getTextContent().trim());
+			} else if (wn2.getNodeName().equalsIgnoreCase("overheadComp")) {
+				overheadComp = Integer.parseInt(wn2.getTextContent().trim());
+			} else if (wn2.getNodeName().equalsIgnoreCase("straightSupport")) {
+				straightSupport = Integer.parseInt(wn2.getTextContent().trim());
+			} else if (wn2.getNodeName().equalsIgnoreCase("battleLossComp")) {
+				battleLossComp = Integer.parseInt(wn2.getTextContent().trim());
+			} else if (wn2.getNodeName().equalsIgnoreCase("transportComp")) {
+				transportComp = Integer.parseInt(wn2.getTextContent().trim());
+			} else if (wn2.getNodeName().equalsIgnoreCase("advancePct")) {
+				advancePct = Integer.parseInt(wn2.getTextContent().trim());
+			} else if (wn2.getNodeName().equalsIgnoreCase("signBonus")) {
+				signBonus = Integer.parseInt(wn2.getTextContent().trim());
+			} else if (wn2.getNodeName().equalsIgnoreCase("mrbcFee")) {
+				if (wn2.getTextContent().trim().equals("true"))
+					mrbcFee = true;
+				else
+					mrbcFee = false;
+			} 
+			else if (wn2.getNodeName().equalsIgnoreCase("advanceAmount")) {
+				advanceAmount = Long.parseLong(wn2.getTextContent().trim());
+			}
+			else if (wn2.getNodeName().equalsIgnoreCase("signingAmount")) {
+				signingAmount = Long.parseLong(wn2.getTextContent().trim());
+			}
+			else if (wn2.getNodeName().equalsIgnoreCase("transportAmount")) {
+				transportAmount = Long.parseLong(wn2.getTextContent().trim());
+			}
+			else if (wn2.getNodeName().equalsIgnoreCase("overheadAmount")) {
+				overheadAmount = Long.parseLong(wn2.getTextContent().trim());
+			}
+			else if (wn2.getNodeName().equalsIgnoreCase("supportAmount")) {
+				supportAmount = Long.parseLong(wn2.getTextContent().trim());
+			}
+			else if (wn2.getNodeName().equalsIgnoreCase("baseAmount")) {
+				baseAmount = Long.parseLong(wn2.getTextContent().trim());
+			}
+			else if (wn2.getNodeName().equalsIgnoreCase("feeAmount")) {
+				feeAmount = Long.parseLong(wn2.getTextContent().trim());
+			}
+		}
+	}
 }

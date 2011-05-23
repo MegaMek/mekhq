@@ -22,6 +22,8 @@ package mekhq.campaign.mission;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import mekhq.MekHQApp;
@@ -163,8 +165,12 @@ public class Mission implements Serializable, MekHqXmlSerializable {
 		return false;
 	}
 	
-	@Override
-	public void writeToXml(PrintWriter pw1, int indent, int inId) {
+	public void writeToXml(PrintWriter pw1, int indent, int id) {
+		writeToXmlBegin(pw1, indent, id);
+		writeToXmlEnd(pw1, indent, id);
+	}
+	
+	protected void writeToXmlBegin(PrintWriter pw1, int indent, int id) {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "<mission id=\""
 				+id
 				+"\" type=\""
@@ -191,8 +197,14 @@ public class Mission implements Serializable, MekHqXmlSerializable {
 			s.writeToXml(pw1, indent+2);
 		}
 		pw1.println(MekHqXmlUtil.indentStr(indent+1) + "</scenarios>");
+	}
+	
+	protected void writeToXmlEnd(PrintWriter pw1, int indent, int id) {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "</mission>");
-		
+	}
+	
+	public void loadFieldsFromXmlNode(Node wn) throws ParseException {
+		//do nothing
 	}
 	
 	public static Mission generateInstanceFromXML(Node wn) {
@@ -204,8 +216,9 @@ public class Mission implements Serializable, MekHqXmlSerializable {
 		try {
 			// Instantiate the correct child class, and call its parsing function.
 			retVal = (Mission) Class.forName(className).newInstance();
+			retVal.loadFieldsFromXmlNode(wn);
 			
-			// Okay, now load Part-specific fields!
+			// Okay, now load mission-specific fields!
 			NodeList nl = wn.getChildNodes();
 			
 			for (int x=0; x<nl.getLength(); x++) {

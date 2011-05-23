@@ -52,6 +52,7 @@ v0.1.7 (SVN)
 + employer text field in New Contract Dialog
 + ContractViewPanel
 + Battle Loss Compensation when resolving contract-based scenario
++ added Contract.java to XML serialization
 
 v0.1.6 (2011-05-17)
 + beginning of Briefing Room tab
