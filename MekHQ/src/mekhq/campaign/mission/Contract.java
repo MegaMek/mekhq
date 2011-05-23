@@ -197,8 +197,12 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 		mrbcFee = b;
 	}
 	
+	public long getTotalAmountPlusFeesAndBonuses() {
+		return baseAmount + supportAmount + overheadAmount + transportAmount + signingAmount - feeAmount;
+	}
+	
 	public long getTotalAmount() {
-		return baseAmount + supportAmount + overheadAmount + transportAmount + signingAmount;
+		return baseAmount + supportAmount + overheadAmount + transportAmount;
 	}
 	
 	public long getAdvanceAmount() {
@@ -230,7 +234,11 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 	}
 	
 	public long getMonthlyPayOut() {
-		return (getTotalAmount() - getAdvanceAmount() - getFeeAmount())/getLength();
+		return (getTotalAmountPlusFeesAndBonuses() - getTotalAdvanceMonies())/getLength();
+	}
+	
+	public long getTotalAdvanceMonies() {
+		return getAdvanceAmount() + getSigningBonusAmount();
 	}
 	
 	/**
@@ -262,10 +270,10 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 		//TODO: transport amount
 		transportAmount = 0;
 		
-		advanceAmount = (long)((advancePct/100.0) * (baseAmount + overheadAmount + transportAmount + signingAmount + supportAmount));
+		advanceAmount = (long)((advancePct/100.0) * (baseAmount + overheadAmount + transportAmount + supportAmount));
 		
 		if(mrbcFee) {
-			feeAmount =  (long)(0.05 * (baseAmount + overheadAmount + transportAmount + signingAmount + supportAmount));
+			feeAmount =  (long)(0.05 * (baseAmount + overheadAmount + transportAmount + supportAmount));
 		} else {
 			feeAmount = 0;
 		}

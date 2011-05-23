@@ -46,6 +46,7 @@ v0.1.7 (SVN)
 + additions to NewContractDialog
 + MRBC fee
 + improvements to NewContractDialog layout
++ some accounting adjustments to contract (MRBC fee does not include signing bonus and signing bonus is part of advance)
 
 v0.1.6 (2011-05-17)
 + beginning of Briefing Room tab
