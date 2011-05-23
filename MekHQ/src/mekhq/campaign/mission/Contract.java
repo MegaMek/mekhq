@@ -143,6 +143,10 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 		nMonths = m;
 	}
 	
+	public Date getStartDate() {
+		return startDate;
+	}
+	
 	public Date getEndingDate() {
 		return endDate;
 	}

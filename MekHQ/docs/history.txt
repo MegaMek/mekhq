@@ -50,6 +50,7 @@ v0.1.7 (SVN)
 + getEsimatedTotalProfit in Contract.java
 + advance money and monthly payout transactions
 + employer text field in New Contract Dialog
++ ContractViewPanel
 
 v0.1.6 (2011-05-17)
 + beginning of Briefing Room tab

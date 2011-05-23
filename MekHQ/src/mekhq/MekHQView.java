@@ -123,6 +123,7 @@ import mekhq.campaign.SkillCosts;
 import mekhq.campaign.Unit;
 import mekhq.campaign.Utilities;
 import mekhq.campaign.finances.Transaction;
+import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.AmmoBin;
@@ -2741,7 +2742,11 @@ public class MekHQView extends FrameView {
 			Mission m = campaign.getActiveMissions().get(idx);
 			if(null != m) {
 				selectedMission = m.getId();		
-				scrollMissionView.setViewportView(new MissionViewPanel(m));
+				if(m instanceof Contract) {
+					scrollMissionView.setViewportView(new ContractViewPanel((Contract)m));
+				} else {
+					scrollMissionView.setViewportView(new MissionViewPanel(m));
+				}
 				//This odd code is to make sure that the scrollbar stays at the top
 				//I cant just call it here, because it ends up getting reset somewhere later
 				javax.swing.SwingUtilities.invokeLater(new Runnable() {
