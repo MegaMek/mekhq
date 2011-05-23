@@ -339,7 +339,6 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.gridy = 8;
         gridBagConstraints.gridwidth = 1;       
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
@@ -350,11 +349,33 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.gridy = 8;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHEAST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         totalsPanel.add(lblMonthlyAmount2, gridBagConstraints);
+        
+        lblProfit1 = new JLabel("Estimated Total Profit:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 9;
+        gridBagConstraints.gridwidth = 1;       
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        totalsPanel.add(lblProfit1, gridBagConstraints);
+        lblProfit2 = new JLabel(formatter.format(contract.getEstimatedTotalProfit(campaign)));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 9;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHEAST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        totalsPanel.add(lblProfit2, gridBagConstraints);
         
         lblLength = new JLabel("Congtract Length (months):");
         lblMultiplier = new JLabel("Payment Mulitiplier");
@@ -687,6 +708,7 @@ public class NewContractDialog extends javax.swing.JDialog {
     	lblTotalAmountPlus2.setText(formatter.format(contract.getTotalAmountPlusFeesAndBonuses()));
     	lblAdvanceMoney2.setText(formatter.format(contract.getTotalAdvanceMonies()));
     	lblMonthlyAmount2.setText(formatter.format(contract.getMonthlyPayOut()));
+    	lblProfit2.setText(formatter.format(contract.getEstimatedTotalProfit(campaign)));
     }
 
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
@@ -731,6 +753,7 @@ public class NewContractDialog extends javax.swing.JDialog {
     private javax.swing.JLabel lblTotalAmountPlus1;
     private javax.swing.JLabel lblAdvanceMoney1;
     private javax.swing.JLabel lblMonthlyAmount1;
+    private javax.swing.JLabel lblProfit1;
     
     private javax.swing.JLabel lblBaseAmount2;
     private javax.swing.JLabel lblOverheadAmount2;
@@ -741,6 +764,7 @@ public class NewContractDialog extends javax.swing.JDialog {
     private javax.swing.JLabel lblTotalAmountPlus2;
     private javax.swing.JLabel lblAdvanceMoney2;
     private javax.swing.JLabel lblMonthlyAmount2;
+    private javax.swing.JLabel lblProfit2;
     
     // End of variables declaration//GEN-END:variables
 
