@@ -51,6 +51,7 @@ v0.1.7 (SVN)
 + advance money and monthly payout transactions
 + employer text field in New Contract Dialog
 + ContractViewPanel
++ Battle Loss Compensation when resolving contract-based scenario
 
 v0.1.6 (2011-05-17)
 + beginning of Briefing Room tab

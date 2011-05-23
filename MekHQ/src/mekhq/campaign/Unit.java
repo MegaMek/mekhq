@@ -782,6 +782,22 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 		return missingParts;
 	}
 
+	public long getValueOfAllMissingParts() {
+		long value = 0;
+		for(Part part : parts) {
+			if(part instanceof MissingPart) {
+				value += ((MissingPart)part).getPurchasePrice();
+			}
+			else if(part instanceof Armor) {
+				value += ((Armor)part).getExactPurchasePrice();
+			}
+			else if(part instanceof AmmoBin) {
+				value += ((AmmoBin)part).getExactPurchasePrice();
+			}
+		}
+		return value;
+	}
+	
 	public void removePart(Part part) {
 		parts.remove(part);
 	}

@@ -712,7 +712,7 @@ public class NewContractDialog extends javax.swing.JDialog {
     	contract.setName(txtName.getText());
     	contract.setEmployer(txtEmployer.getText());
     	contract.setDesc(txtDesc.getText());
-    	campaign.getFinances().credit(contract.getTotalAdvanceMonies(), Transaction.C_CONTRACT, "advance monies for " + contract.getName(), campaign.getCalendar().getTime());
+    	campaign.getFinances().credit(contract.getTotalAdvanceMonies(), Transaction.C_CONTRACT, "Advance monies for " + contract.getName(), campaign.getCalendar().getTime());
     	campaign.addMission(contract);
     	this.setVisible(false);
     }

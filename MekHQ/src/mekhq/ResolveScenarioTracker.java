@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import javax.swing.JFileChooser;
@@ -37,6 +38,9 @@ import megamek.common.Pilot;
 import megamek.common.XMLStreamParser;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Unit;
+import mekhq.campaign.finances.Transaction;
+import mekhq.campaign.mission.Contract;
+import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PilotPerson;
@@ -352,9 +356,16 @@ public class ResolveScenarioTracker {
 
 		//ok lets do the whole enchilada and go ahead and update campaign
 		
+		//first figure out if we need any battle loss comp
+		double blc = 0;
+		Mission m = campaign.getMission(scenario.getMissionId());
+		if(m instanceof Contract) {
+			blc = ((Contract)m).getBattleLossComp()/100.0;
+		}
+		
 		//first lets update the entities on all units
 		for(Entity en : entities) {
-			updateUnitWith(en);
+			updateUnitWith(en, blc);
 		}
 		//now lets update pilots
 		for(Pilot p : pilots) {
@@ -381,12 +392,22 @@ public class ResolveScenarioTracker {
 		scenario.clearAllForcesAndPersonnel(campaign);
 	}
 	
-	private void updateUnitWith(Entity en) {
+	private void updateUnitWith(Entity en, double blc) {
 		for(Unit u : campaign.getUnits()) {
 			if(u.getEntity().getExternalId() == en.getExternalId()) {
+				//check the current value of missing parts before updating
+				long currentValue = u.getValueOfAllMissingParts();
 				u.setEntity(en);
 				u.runDiagnostic();
+				//check for BLC
+				long newValue = u.getValueOfAllMissingParts();
 				campaign.addReport(u.getEntity().getDisplayName() + " has been recovered.");
+				if(blc > 0 && newValue > currentValue) {
+					long finalValue = (long)(blc * (newValue - currentValue));
+					campaign.getFinances().credit(finalValue, Transaction.C_BLC, "Battle loss compensation for " + en.getDisplayName(), campaign.getCalendar().getTime());
+					DecimalFormat formatter = new DecimalFormat();
+					campaign.addReport(formatter.format(finalValue) + " in battle loss compensation for " + en.getDisplayName() + " has been credited to your account.");
+				}
 				return;
 			}
 		}

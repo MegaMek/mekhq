@@ -2625,6 +2625,7 @@ public class MekHQView extends FrameView {
 		refreshPersonnelList();
 		refreshPatientList();
 		refreshReport();
+		refreshFinancialTransactions();
 	}
 	
 	protected void deployListFile() {

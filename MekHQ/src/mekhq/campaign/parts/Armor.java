@@ -93,6 +93,10 @@ public class Armor extends Part implements IAcquisitionWork {
     	return (long)(5 * EquipmentType.getArmorCost(type));
     }
     
+    public long getExactPurchasePrice() {
+    	return (long)(((double)amountNeeded)/getArmorPointsPerTon() * EquipmentType.getArmorCost(type));
+    }
+    
     public String getDesc() {
     	if(isSalvaging()) {
     		return super.getDesc();

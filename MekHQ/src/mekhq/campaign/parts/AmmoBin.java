@@ -105,6 +105,10 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         }
         return itemCost;
     }
+    
+    public long getExactPurchasePrice() {
+    	return (long)(getPurchasePrice() * (((double)getShotsNeeded())/((AmmoType)type).getShots()));
+    }
 
     public int getShotsNeeded() {
     	return shotsNeeded;
