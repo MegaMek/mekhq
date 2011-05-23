@@ -39,6 +39,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.mission.Contract;
 
 /**
@@ -50,7 +51,6 @@ public class NewContractDialog extends javax.swing.JDialog {
     private Frame frame;
     private Contract contract;
     private Campaign campaign;
-    private boolean newMission;
     private DecimalFormat formatter;
     
     /** Creates new form NewTeamDialog */
@@ -688,9 +688,8 @@ public class NewContractDialog extends javax.swing.JDialog {
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
     	contract.setName(txtName.getText());
     	contract.setDesc(txtDesc.getText());
-    	if(newMission) {
-    		campaign.addMission(contract);
-    	}
+    	campaign.getFinances().credit(contract.getTotalAdvanceMonies(), Transaction.C_CONTRACT, "advance monies for " + contract.getName(), campaign.getCalendar().getTime());
+    	campaign.addMission(contract);
     	this.setVisible(false);
     }
     

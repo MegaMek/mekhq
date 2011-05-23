@@ -72,6 +72,7 @@ import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHQApp;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Transaction;
+import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.AmmoBin;
@@ -850,6 +851,11 @@ public class Campaign implements Serializable {
 			}
 		}
 		if(calendar.get(Calendar.DAY_OF_MONTH) == 1) {
+			//check for contract payments
+			for(Contract contract : getActiveContracts()) {
+				finances.credit(contract.getMonthlyPayOut(), Transaction.C_CONTRACT, "Monthly payment for " + contract.getName(), calendar.getTime());
+				addReport("Your account has been credited for " + formatter.format(contract.getMonthlyPayOut()) + " C-bills for the monthly payout from contract " + contract.getName());
+			}
 			//Payday!
 			if(campaignOptions.payForSalaries()) {
 				finances.debit(getPayRoll(), Transaction.C_SALARY, "Monthly salaries", calendar.getTime());
@@ -862,6 +868,20 @@ public class Campaign implements Serializable {
 		}
 	}
 	
+	private ArrayList<Contract> getActiveContracts() {
+		ArrayList<Contract> active = new ArrayList<Contract>();
+		for(Mission m : getMissions()) {
+			if(!(m instanceof Contract)) {
+				continue;
+			}
+			Contract c = (Contract)m;
+			if(c.isActive() && !getCalendar().getTime().after(c.getEndingDate())) {
+				active.add(c);
+			}
+		}
+		return active;
+	}
+
 	public long getPayRoll() {
 		long salaries = 0;
 		for(Person p : personnel) {

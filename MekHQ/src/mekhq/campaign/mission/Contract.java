@@ -21,7 +21,9 @@
 package mekhq.campaign.mission;
 
 import java.io.Serializable;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlSerializable;
@@ -131,6 +133,10 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 	
 	public void setLength(int m) {
 		nMonths = m;
+	}
+	
+	public Date getEndingDate() {
+		return endDate;
 	}
 	
 	public double getMultiplier() {
@@ -285,6 +291,17 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 		} else {
 			feeAmount = 0;
 		}
+		
+		//get dates, for now just assume start date is the current date
+		startDate = c.getCalendar().getTime();
+		GregorianCalendar cal = new GregorianCalendar();
+		cal.setTime(startDate);
+		int months = getLength();
+		while(months > 0) {
+			cal.add(Calendar.MONTH, 1);
+			months--;
+		}
+		endDate = cal.getTime();
 	}
 	
 }
