@@ -23,6 +23,7 @@ package mekhq;
 
 import java.awt.Dimension;
 import java.awt.Frame;
+import java.text.DecimalFormat;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
@@ -47,6 +48,7 @@ public class NewContractDialog extends javax.swing.JDialog {
     private Contract contract;
     private Campaign campaign;
     private boolean newMission;
+    private DecimalFormat formatter;
     
     /** Creates new form NewTeamDialog */
     public NewContractDialog(java.awt.Frame parent, boolean modal, Campaign c) {
@@ -55,6 +57,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         campaign = c;
         contract = new Contract("New Contract", "New Employer");
         contract.calculateContract(campaign);
+        formatter = new DecimalFormat();
         initComponents();
     }
 
@@ -153,11 +156,157 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         descPanel.add(scrDesc, gridBagConstraints);
         
+        lblBaseAmount1 = new JLabel("Base Amount:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        totalsPanel.add(lblBaseAmount1, gridBagConstraints);
+        lblBaseAmount2 = new JLabel(formatter.format(contract.getBaseAmount()));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        totalsPanel.add(lblBaseAmount2, gridBagConstraints);
+        
+        lblOverheadAmount1 = new JLabel("Overhead Amount:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        totalsPanel.add(lblOverheadAmount1, gridBagConstraints);
+        lblOverheadAmount2 = new JLabel(formatter.format(contract.getOverheadAmount()));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        totalsPanel.add(lblOverheadAmount2, gridBagConstraints);
+       
+        lblSupportAmount1 = new JLabel("Straight Support Amount:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        totalsPanel.add(lblSupportAmount1, gridBagConstraints);
+        lblSupportAmount2 = new JLabel(formatter.format(contract.getSupportAmount()));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        totalsPanel.add(lblSupportAmount2, gridBagConstraints);
+        
+        lblSignBonusAmount1 = new JLabel("Signing Bonus:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        totalsPanel.add(lblSignBonusAmount1, gridBagConstraints);
+        lblSignBonusAmount2 = new JLabel(formatter.format(contract.getSigningBonusAmount()));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        totalsPanel.add(lblSignBonusAmount2, gridBagConstraints);
+        
+        lblFeeAmount1 = new JLabel("MRBC Fee:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        totalsPanel.add(lblFeeAmount1, gridBagConstraints);
+        lblFeeAmount2 = new JLabel(formatter.format(contract.getFeeAmount()));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        totalsPanel.add(lblFeeAmount2, gridBagConstraints);
+        
+        lblAdvanceMoney1 = new JLabel("Advance Money:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        totalsPanel.add(lblAdvanceMoney1, gridBagConstraints);
+        lblAdvanceMoney2 = new JLabel(formatter.format(contract.getAdvanceAmount()));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        totalsPanel.add(lblAdvanceMoney2, gridBagConstraints);
+        
+        lblMonthlyAmount1 = new JLabel("Monthly Amount:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        totalsPanel.add(lblMonthlyAmount1, gridBagConstraints);
+        lblMonthlyAmount2 = new JLabel(formatter.format(contract.getMonthlyPayOut()));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        totalsPanel.add(lblMonthlyAmount2, gridBagConstraints);
+        
+        lblLength = new JLabel("Congtract Length (months):");
         lblMultiplier = new JLabel("Payment Mulitiplier");
+        lblOverhead = new JLabel("Overhead Compensation:");
+        lblCommandRights = new JLabel("Command Rights:");
         lblStraightSupport = new JLabel("Straight Support %");
+        lblBattleLossComp = new JLabel("Battle Loss Compensation %");
         lblSignBonus = new JLabel("Signing Bonus %");
         lblAdvance = new JLabel("Advance %");
         
+        spnLength = new JSpinner(new SpinnerNumberModel(contract.getLength(), 1, 120, 1));
+        spnLength.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent evt) {
+				contract.setLength((Integer)spnLength.getModel().getValue());
+				contract.calculateContract(campaign);
+				refreshTotals();
+			}
+		});
         
         spnMultiplier = new JSpinner(new SpinnerNumberModel(contract.getMultiplier(), 1.0, 10.0, 0.1));
         spnMultiplier.addChangeListener(new ChangeListener() {
@@ -183,6 +332,18 @@ public class NewContractDialog extends javax.swing.JDialog {
 			}
 		});
         
+        DefaultComboBoxModel commandModel = new DefaultComboBoxModel();
+		for (int i = 0; i < Contract.COM_NUM; i++) {
+			commandModel.addElement(Contract.getCommandRightsName(i));
+		}
+		choiceCommand = new JComboBox(commandModel);
+		choiceCommand.setSelectedIndex(contract.getCommandRights());
+		choiceOverhead.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				contract.setCommandRights(choiceCommand.getSelectedIndex());
+			}
+		});
+		
         spnStraightSupport = new JSpinner(new SpinnerNumberModel(contract.getStraightSupport(), 0, 100, 10));
         spnStraightSupport.addChangeListener(new ChangeListener() {
 			@Override
@@ -192,6 +353,15 @@ public class NewContractDialog extends javax.swing.JDialog {
 				refreshTotals();
 			}
 		});
+        
+        spnBattleLossComp = new JSpinner(new SpinnerNumberModel(contract.getBattleLossComp(), 0, 100, 10));
+        spnBattleLossComp.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent evt) {
+				contract.setBattleLossComp((Integer)spnBattleLossComp.getModel().getValue());
+			}
+		});
+        
         spnSignBonus = new JSpinner(new javax.swing.SpinnerNumberModel(contract.getSigningBonusPct(), 0, 10, 1));
         spnSignBonus.addChangeListener(new ChangeListener() {
 			@Override
@@ -217,7 +387,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        contractPanel.add(lblMultiplier, gridBagConstraints);
+        contractPanel.add(lblLength, gridBagConstraints);
    
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -225,12 +395,51 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        contractPanel.add(spnMultiplier, gridBagConstraints);
+        contractPanel.add(spnLength, gridBagConstraints);
         
-        
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        contractPanel.add(lblMultiplier, gridBagConstraints);
+   
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        contractPanel.add(spnMultiplier, gridBagConstraints);
+        
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        contractPanel.add(lblCommandRights, gridBagConstraints);
+        
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        contractPanel.add(choiceCommand, gridBagConstraints);
+        
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        contractPanel.add(lblOverhead, gridBagConstraints);
+        
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
@@ -238,7 +447,23 @@ public class NewContractDialog extends javax.swing.JDialog {
         
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        contractPanel.add(lblBattleLossComp, gridBagConstraints);
+        
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        contractPanel.add(spnBattleLossComp, gridBagConstraints);
+        
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
@@ -246,7 +471,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
@@ -254,7 +479,7 @@ public class NewContractDialog extends javax.swing.JDialog {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 6;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
@@ -262,7 +487,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 6;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
@@ -270,7 +495,7 @@ public class NewContractDialog extends javax.swing.JDialog {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 7;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
@@ -278,82 +503,13 @@ public class NewContractDialog extends javax.swing.JDialog {
         
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 7;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         contractPanel.add(spnAdvance, gridBagConstraints);
         
-        lblBaseAmount = new JLabel(contract.getBaseAmount() + "");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        totalsPanel.add(lblBaseAmount, gridBagConstraints);
-        
-        lblOverheadAmount = new JLabel(contract.getOverheadAmount() + "");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        totalsPanel.add(lblOverheadAmount, gridBagConstraints);
-       
-        lblSupportAmount = new JLabel(contract.getSupportAmount() + "");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        totalsPanel.add(lblSupportAmount, gridBagConstraints);
-        
-        lblSignBonusAmount = new JLabel(contract.getSigningBonusAmount() + "");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        totalsPanel.add(lblSignBonusAmount, gridBagConstraints);
-        
-        lblFeeAmount = new JLabel(contract.getFeeAmount() + "");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        totalsPanel.add(lblFeeAmount, gridBagConstraints);
-        
-        lblAdvanceMoney = new JLabel(contract.getAdvanceAmount() + "");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        totalsPanel.add(lblAdvanceMoney, gridBagConstraints);
-        
-        lblMonthlyAmount = new JLabel(contract.getMonthlyPayOut() + "");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 6;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        totalsPanel.add(lblMonthlyAmount, gridBagConstraints);
-        
+     
         btnOK.setText(resourceMap.getString("btnOkay.text")); // NOI18N
         btnOK.setName("btnOK"); // NOI18N
         btnOK.addActionListener(new java.awt.event.ActionListener() {
@@ -402,13 +558,13 @@ public class NewContractDialog extends javax.swing.JDialog {
     }
     
     private void refreshTotals() {
-    	lblBaseAmount.setText(contract.getBaseAmount() + "");
-    	lblOverheadAmount.setText(contract.getOverheadAmount() + "");
-    	lblSupportAmount.setText(contract.getSupportAmount() + "");
-    	lblSignBonusAmount.setText(contract.getSigningBonusAmount() + "");
-    	lblFeeAmount.setText(contract.getFeeAmount() + "");
-    	lblAdvanceMoney.setText(contract.getAdvanceAmount() + "");
-    	lblMonthlyAmount.setText(contract.getMonthlyPayOut() + "");
+    	lblBaseAmount2.setText(formatter.format(contract.getBaseAmount()));
+    	lblOverheadAmount2.setText(formatter.format(contract.getOverheadAmount()));
+    	lblSupportAmount2.setText(formatter.format(contract.getSupportAmount()));
+    	lblSignBonusAmount2.setText(formatter.format(contract.getSigningBonusAmount()));
+    	lblFeeAmount2.setText(formatter.format(contract.getFeeAmount()));
+    	lblAdvanceMoney2.setText(formatter.format(contract.getAdvanceAmount()));
+    	lblMonthlyAmount2.setText(formatter.format(contract.getMonthlyPayOut()));
     }
 
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
@@ -427,23 +583,37 @@ public class NewContractDialog extends javax.swing.JDialog {
     private javax.swing.JScrollPane scrDesc;
     
     private JComboBox choiceOverhead;
+    private JComboBox choiceCommand;
+    private JLabel lblLength;
     private JLabel lblMultiplier;
+    private JLabel lblOverhead;
+    private JLabel lblCommandRights;
+    private JLabel lblBattleLossComp;
     private JLabel lblStraightSupport;
     private JLabel lblSignBonus;
     private JLabel lblAdvance;
+    private JSpinner spnLength;
     private JSpinner spnMultiplier;
     private JSpinner spnStraightSupport;
     private JSpinner spnBattleLossComp;
     private JSpinner spnSignBonus;
     private JSpinner spnAdvance;
     
-    private javax.swing.JLabel lblBaseAmount;
-    private javax.swing.JLabel lblOverheadAmount;
-    private javax.swing.JLabel lblSupportAmount;
-    private javax.swing.JLabel lblSignBonusAmount;
-    private javax.swing.JLabel lblFeeAmount;
-    private javax.swing.JLabel lblAdvanceMoney;
-    private javax.swing.JLabel lblMonthlyAmount;
+    private javax.swing.JLabel lblBaseAmount1;
+    private javax.swing.JLabel lblOverheadAmount1;
+    private javax.swing.JLabel lblSupportAmount1;
+    private javax.swing.JLabel lblSignBonusAmount1;
+    private javax.swing.JLabel lblFeeAmount1;
+    private javax.swing.JLabel lblAdvanceMoney1;
+    private javax.swing.JLabel lblMonthlyAmount1;
+    
+    private javax.swing.JLabel lblBaseAmount2;
+    private javax.swing.JLabel lblOverheadAmount2;
+    private javax.swing.JLabel lblSupportAmount2;
+    private javax.swing.JLabel lblSignBonusAmount2;
+    private javax.swing.JLabel lblFeeAmount2;
+    private javax.swing.JLabel lblAdvanceMoney2;
+    private javax.swing.JLabel lblMonthlyAmount2;
     
     // End of variables declaration//GEN-END:variables
 

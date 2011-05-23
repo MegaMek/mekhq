@@ -45,7 +45,14 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 	public final static int OH_HALF = 1;
 	public final static int OH_FULL = 2;
 	public final static int OH_NUM = 3;
-
+	
+	public final static int COM_INTEGRATED = 0;
+	public final static int COM_HOUSE      = 1;
+	public final static int COM_LIAISON    = 2;
+	public final static int COM_INDEP      = 3;
+	public final static int COM_NUM        = 4;
+   
+	
 	
 	private Date startDate;
 	private Date endDate;
@@ -59,7 +66,6 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 	private int straightSupport;
 	private int battleLossComp;
 	private int transportComp;
-	private boolean transportTwoWay;
 	
 	private boolean mrbcFee;
 	private int advancePct;
@@ -79,13 +85,12 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 		this.employer = employer;
 		
 		this.nMonths = 12;
-		this.paymentMultiplier = 4.0;
-		this.commandRights = 0;
+		this.paymentMultiplier = 5.0;
+		this.commandRights = COM_HOUSE;
 		this.overheadComp = OH_NONE;
 		this.straightSupport = 50;
 		this.battleLossComp = 50;
 		this.transportComp = 100;
-		this.transportTwoWay = true;
 		this.mrbcFee = true;
 		this.advancePct = 25;
 		this.signBonus = 0;
@@ -105,8 +110,27 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 		}
 	}
 	
+	public static String getCommandRightsName(int i) {
+		switch(i) {
+		case COM_INTEGRATED:
+			return "Integrated";
+		case COM_HOUSE: 
+			return "House";
+		case COM_LIAISON:
+			return "Liaison";
+		case COM_INDEP:
+			return "Independent";
+		default:
+			return "?";
+		}
+	}
+	
 	public int getLength() {
 		return nMonths;
+	}
+	
+	public void setLength(int m) {
+		nMonths = m;
 	}
 	
 	public double getMultiplier() {
@@ -131,6 +155,14 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 	
 	public void setOverheadComp(int s) {
 		overheadComp = s;
+	}
+	
+	public int getCommandRights() {
+		return commandRights;
+	}
+	
+	public void setCommandRights(int s) {
+		commandRights = s;
 	}
 	
 	public int getBattleLossComp() {
@@ -214,7 +246,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 			overheadAmount = 0;
 		}
 		
-		supportAmount = (long)((straightSupport/100.0) * c.getSupportPayRoll());
+		supportAmount = (long)((straightSupport/100.0) * c.getSupportPayRoll() * getLength());
 		
 		signingAmount = (long)((signBonus/100.0) * (baseAmount + overheadAmount + transportAmount + supportAmount));
 		

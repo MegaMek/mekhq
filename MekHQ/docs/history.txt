@@ -43,6 +43,7 @@ v0.1.7 (SVN)
 + updated MM.jar
 + beginning of Contract.java
 + use concentric rings to indicate selected planet (white), current planet (orange), selected jump path (white), current jump path (yellow)
++ additions to NewContractDialog
 
 v0.1.6 (2011-05-17)
 + beginning of Briefing Room tab
