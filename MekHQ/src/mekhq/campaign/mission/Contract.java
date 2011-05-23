@@ -127,6 +127,14 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 		}
 	}
 	
+	public String getEmployer() {
+		return employer;
+	}
+	
+	public void setEmployer(String s) {
+		this.employer = s;
+	}
+	
 	public int getLength() {
 		return nMonths;
 	}

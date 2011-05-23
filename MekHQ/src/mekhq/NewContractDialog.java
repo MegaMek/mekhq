@@ -70,7 +70,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
 
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(CustomizeMissionDialog.class);
+        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(NewContractDialog.class);
         getContentPane().setLayout(new java.awt.GridBagLayout());
       
     	descPanel = new JPanel();
@@ -118,6 +118,8 @@ public class NewContractDialog extends javax.swing.JDialog {
         
         txtName = new javax.swing.JTextField();
         lblName = new javax.swing.JLabel();
+        txtEmployer = new javax.swing.JTextField();
+        lblEmployer = new javax.swing.JLabel();
         btnOK = new javax.swing.JButton();
         btnClose = new javax.swing.JButton();
         scrDesc = new javax.swing.JScrollPane();
@@ -143,6 +145,27 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         descPanel.add(txtName, gridBagConstraints);
+        
+        lblEmployer.setText(resourceMap.getString("lblEmployer.text")); // NOI18N
+        lblEmployer.setName("lblEmployer"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        descPanel.add(lblEmployer, gridBagConstraints);
+        
+        txtEmployer.setText(contract.getEmployer());
+        txtEmployer.setName("txtEmployer"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        descPanel.add(txtEmployer, gridBagConstraints);
  
         txtDesc.setText(contract.getDescription());
         txtDesc.setName("txtDesc");
@@ -157,7 +180,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         scrDesc.setMinimumSize(new Dimension(400,200));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
@@ -687,6 +710,7 @@ public class NewContractDialog extends javax.swing.JDialog {
     
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
     	contract.setName(txtName.getText());
+    	contract.setEmployer(txtEmployer.getText());
     	contract.setDesc(txtDesc.getText());
     	campaign.getFinances().credit(contract.getTotalAdvanceMonies(), Transaction.C_CONTRACT, "advance monies for " + contract.getName(), campaign.getCalendar().getTime());
     	campaign.addMission(contract);
@@ -722,6 +746,8 @@ public class NewContractDialog extends javax.swing.JDialog {
     private javax.swing.JButton btnOK;
     private javax.swing.JLabel lblName;
     private javax.swing.JTextField txtName;
+    private javax.swing.JLabel lblEmployer;
+    private javax.swing.JTextField txtEmployer;
     private javax.swing.JTextArea txtDesc;
     private javax.swing.JScrollPane scrDesc;
     
