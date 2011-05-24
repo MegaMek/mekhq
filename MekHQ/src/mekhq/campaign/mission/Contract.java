@@ -167,6 +167,10 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 		return startDate;
 	}
 	
+	public void setStartDate(Date d) {
+		startDate = d;
+	}
+	
 	public Date getEndingDate() {
 		return endDate;
 	}
@@ -382,8 +386,9 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 			feeAmount = 0;
 		}
 		
-		//get dates, for now just assume start date is the current date
-		startDate = c.getCalendar().getTime();
+		if(null == startDate) {
+			startDate = c.getCalendar().getTime();
+		}
 		GregorianCalendar cal = new GregorianCalendar();
 		cal.setTime(startDate);
 		int months = getLength();

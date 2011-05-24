@@ -365,7 +365,7 @@ public class ContractViewPanel extends javax.swing.JPanel {
 		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         pnlStats.add(lblSalvagePct2, gridBagConstraints);
-		
+		i++;
 		txtDesc.setName("txtDesc");
 		txtDesc.setText(contract.getDescription());
 		txtDesc.setEditable(false);
