@@ -119,6 +119,7 @@ import mekhq.campaign.Force;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.PartInventory;
 import mekhq.campaign.Planet;
+import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.SkillCosts;
 import mekhq.campaign.Unit;
 import mekhq.campaign.Utilities;
@@ -2625,6 +2626,7 @@ public class MekHQView extends FrameView {
 		refreshPersonnelList();
 		refreshPatientList();
 		refreshReport();
+		changeMission();
 		refreshFinancialTransactions();
 	}
 	
@@ -2829,6 +2831,7 @@ public class MekHQView extends FrameView {
 	
 	protected void refreshFinancialTransactions() {
 		financeModel.setData(campaign.getFinances().getAllTransactions());
+		refreshFunds();
 	}
 
 	protected void refreshCalendar() {

@@ -75,11 +75,17 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 	private int overheadComp;
 	private int straightSupport;
 	private int battleLossComp;
+	private int salvagePct;
+	private boolean salvageExchange;
 	private int transportComp;
 	
 	private boolean mrbcFee;
 	private int advancePct;
 	private int signBonus;
+	
+	//need to keep track of total value salvaged for salvage rights
+	private long salvagedByUnit = 0;
+	private long salvagedByEmployer = 0;
 	
 	//actual amounts
 	private long advanceAmount;
@@ -104,6 +110,8 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 		this.overheadComp = OH_NONE;
 		this.straightSupport = 50;
 		this.battleLossComp = 50;
+		this.salvagePct = 50;
+		this.salvageExchange = false;
 		this.transportComp = 100;
 		this.mrbcFee = true;
 		this.advancePct = 25;
@@ -201,6 +209,50 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 	
 	public void setBattleLossComp(int s) {
 		battleLossComp = s;
+	}
+	
+	public int getSalvagePct() {
+		return salvagePct;
+	}
+	
+	public void setSalvagePct(int s) {
+		salvagePct = s;
+	}
+	
+	public boolean isSalvageExchange() {
+		return salvageExchange;
+	}
+	
+	public void setSalvageExchange(boolean b) {
+		salvageExchange = b;
+	}
+	
+	public boolean canSalvage() {
+		return salvagePct > 0 && !salvageExchange;
+	}
+	
+	public long getSalvagedByUnit() {
+		return salvagedByUnit;
+	}
+
+	public void setSalvagedByUnit(long l) {
+		this.salvagedByUnit = l;
+	}
+	
+	public void addSalvageByUnit(long l) {
+		salvagedByUnit += l;
+	}
+	
+	public long getSalvagedByEmployer() {
+		return salvagedByEmployer;
+	}
+
+	public void setSalvagedByEmployer(long l) {
+		this.salvagedByEmployer = l;
+	}
+	
+	public void addSalvageByEmployer(long l) {
+		salvagedByEmployer += l;
 	}
 	
 	public int getSigningBonusPct() {
@@ -368,6 +420,10 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 				+battleLossComp
 				+"</battleLossComp>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<salvagePct>"
+				+salvagePct
+				+"</salvagePct>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<transportComp>"
 				+transportComp
 				+"</transportComp>");
@@ -443,6 +499,8 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 				straightSupport = Integer.parseInt(wn2.getTextContent().trim());
 			} else if (wn2.getNodeName().equalsIgnoreCase("battleLossComp")) {
 				battleLossComp = Integer.parseInt(wn2.getTextContent().trim());
+			} else if (wn2.getNodeName().equalsIgnoreCase("salvagePct")) {
+				salvagePct = Integer.parseInt(wn2.getTextContent().trim());
 			} else if (wn2.getNodeName().equalsIgnoreCase("transportComp")) {
 				transportComp = Integer.parseInt(wn2.getTextContent().trim());
 			} else if (wn2.getNodeName().equalsIgnoreCase("advancePct")) {

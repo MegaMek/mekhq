@@ -54,6 +54,7 @@ v0.1.7 (SVN)
 + Battle Loss Compensation when resolving contract-based scenario
 + added Contract.java to XML serialization
 + custom ranks in Campaign Options
++ Salvage rights
 
 v0.1.6 (2011-05-17)
 + beginning of Briefing Room tab

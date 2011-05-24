@@ -29,6 +29,8 @@ import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 
 import megamek.common.Pilot;
+import mekhq.campaign.ResolveScenarioTracker;
+import mekhq.campaign.mission.Contract;
 /**
  *
  * @author  Taharqa
@@ -183,7 +185,8 @@ public class ResolveWizardCasualtiesDialog extends javax.swing.JDialog {
     	}
     	tracker.checkForCasualties();
     	this.setVisible(false);  	
-    	if(tracker.getSalvage().size() > 0) {
+    	if(tracker.getPotentialSalvage().size() > 0 
+    			&& (!(tracker.getMission() instanceof Contract) || ((Contract)tracker.getMission()).canSalvage())) {
     		ResolveWizardSalvageDialog resolveDialog = new ResolveWizardSalvageDialog(null, true, tracker);
     		resolveDialog.setVisible(true);
     	} else {

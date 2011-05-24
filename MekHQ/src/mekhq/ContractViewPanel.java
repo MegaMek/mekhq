@@ -11,6 +11,7 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 
 import javax.swing.BorderFactory;
+import javax.swing.JLabel;
 
 import megamek.common.TechConstants;
 import mekhq.campaign.mission.Contract;
@@ -44,7 +45,12 @@ public class ContractViewPanel extends javax.swing.JPanel {
 	private javax.swing.JTextArea txtCommand;
 	private javax.swing.JLabel lblBLC;
 	private javax.swing.JTextArea txtBLC;
-	
+	private javax.swing.JLabel lblSalvageValueMerc;
+	private javax.swing.JTextArea txtSalvageValueMerc;
+	private javax.swing.JLabel lblSalvageValueEmployer;
+	private javax.swing.JTextArea txtSalvageValueEmployer;
+	private javax.swing.JLabel lblSalvagePct1;
+	private javax.swing.JLabel lblSalvagePct2;
 	
 	public ContractViewPanel(Contract c) {
 		this.contract = c;
@@ -252,6 +258,86 @@ public class ContractViewPanel extends javax.swing.JPanel {
 		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(txtBLC, gridBagConstraints);
+		
+		DecimalFormat formatter = new DecimalFormat();
+		int i = 7;
+		if(contract.getSalvagePct() > 0 && !contract.isSalvageExchange()) {
+			lblSalvageValueMerc = new JLabel(resourceMap.getString("lblSalvageValueMerc.text"));   	
+	    	gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 0;
+	        gridBagConstraints.gridy = i;
+	        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+	        pnlStats.add(lblSalvageValueMerc, gridBagConstraints);
+	    	txtSalvageValueMerc = new javax.swing.JTextArea();
+	    	txtSalvageValueMerc.setText(formatter.format(contract.getSalvagedByUnit()) + " C-Bills");   	
+	    	txtSalvageValueMerc.setEditable(false);
+	    	txtSalvageValueMerc.setLineWrap(true);
+	    	txtSalvageValueMerc.setWrapStyleWord(true);
+			gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints.gridx = 1;
+			gridBagConstraints.gridy = i;
+			gridBagConstraints.weightx = 0.5;
+			gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+			gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+	        pnlStats.add(txtSalvageValueMerc, gridBagConstraints);
+	        i++;
+	        lblSalvageValueEmployer = new JLabel(resourceMap.getString("lblSalvageValueEmployer.text"));   	
+	    	gridBagConstraints = new java.awt.GridBagConstraints();
+	        gridBagConstraints.gridx = 0;
+	        gridBagConstraints.gridy = i;
+	        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+	        pnlStats.add(lblSalvageValueEmployer, gridBagConstraints);
+	    	txtSalvageValueEmployer = new javax.swing.JTextArea();
+	    	txtSalvageValueEmployer.setText(formatter.format(contract.getSalvagedByEmployer()) + " C-Bills");   	
+	    	txtSalvageValueEmployer.setEditable(false);
+	    	txtSalvageValueEmployer.setLineWrap(true);
+	    	txtSalvageValueEmployer.setWrapStyleWord(true);
+			gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints.gridx = 1;
+			gridBagConstraints.gridy = i;
+			gridBagConstraints.weightx = 0.5;
+			gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+			gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+	        pnlStats.add(txtSalvageValueEmployer, gridBagConstraints);
+	        i++;
+		}
+		lblSalvagePct1 = new JLabel(resourceMap.getString("lblSalvage.text"));
+		lblSalvagePct2 = new JLabel();
+
+		if(contract.isSalvageExchange()) {
+			lblSalvagePct2.setText("Exchange (" + contract.getSalvagePct() + "%)"); 
+		} else if(contract.getSalvagePct() == 0) {
+			lblSalvagePct2.setText("None"); 
+		} else {
+			lblSalvagePct1.setText(resourceMap.getString("lblSalvagePct.text"));   
+			int maxSalvagePct = contract.getSalvagePct();
+	    	int currentSalvagePct = (int)(100*((double)contract.getSalvagedByUnit())/(contract.getSalvagedByUnit()+contract.getSalvagedByEmployer()));
+	    	String lead = "<html><font color='black'>";
+	        if(currentSalvagePct > maxSalvagePct) {
+	        	lead = "<html><font color='red'>";
+	        }
+	    	lblSalvagePct2.setText(lead + currentSalvagePct + "%</font> <font color='black'>(max " + maxSalvagePct + "%)</font></html>");   	
+		}
+       	
+    	gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = i;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        pnlStats.add(lblSalvagePct1, gridBagConstraints); 
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 1;
+		gridBagConstraints.gridy = i;
+		gridBagConstraints.weightx = 0.5;
+		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        pnlStats.add(lblSalvagePct2, gridBagConstraints);
+		
 		txtDesc.setName("txtDesc");
 		txtDesc.setText(contract.getDescription());
 		txtDesc.setEditable(false);
@@ -259,7 +345,7 @@ public class ContractViewPanel extends javax.swing.JPanel {
 		txtDesc.setWrapStyleWord(true);
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 7;
+		gridBagConstraints.gridy = i;
 		gridBagConstraints.gridwidth = 2;
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 1.0;

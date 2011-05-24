@@ -404,6 +404,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         lblMultiplier = new JLabel("Payment Mulitiplier");
         lblOverhead = new JLabel("Overhead Compensation:");
         lblCommandRights = new JLabel("Command Rights:");
+        lblSalvageRights = new JLabel("Salvage Rights:");
         lblStraightSupport = new JLabel("Straight Support %");
         lblBattleLossComp = new JLabel("Battle Loss Compensation %");
         lblSignBonus = new JLabel("Signing Bonus %");
@@ -417,6 +418,16 @@ public class NewContractDialog extends javax.swing.JDialog {
 				contract.setMRBCFee(checkMRBC.isSelected());
 				contract.calculateContract(campaign);
 				refreshTotals();
+			}
+        });
+        
+
+        checkSalvageExchange = new JCheckBox("Exchange Rights");
+        checkSalvageExchange.setSelected(contract.isSalvageExchange());
+        checkSalvageExchange.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent evt) {
+				contract.setSalvageExchange(checkSalvageExchange.isSelected());
 			}
         });
         
@@ -466,6 +477,14 @@ public class NewContractDialog extends javax.swing.JDialog {
 			}
 		});
 		
+		spnSalvageRights = new JSpinner(new SpinnerNumberModel(contract.getSalvagePct(), 0, 100, 10));
+		spnSalvageRights.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent evt) {
+				contract.setSalvagePct((Integer)spnSalvageRights.getModel().getValue());
+			}
+		});
+        
         spnStraightSupport = new JSpinner(new SpinnerNumberModel(contract.getStraightSupport(), 0, 100, 10));
         spnStraightSupport.addChangeListener(new ChangeListener() {
 			@Override
@@ -599,7 +618,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        contractPanel.add(lblBattleLossComp, gridBagConstraints);
+        contractPanel.add(lblSalvageRights, gridBagConstraints);
         
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -609,11 +628,39 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        contractPanel.add(spnSalvageRights, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        contractPanel.add(checkSalvageExchange, gridBagConstraints);
+        
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        contractPanel.add(lblBattleLossComp, gridBagConstraints);
+        
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         contractPanel.add(spnBattleLossComp, gridBagConstraints);
         
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridy = 8;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
@@ -623,7 +670,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridy = 8;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
@@ -633,7 +680,7 @@ public class NewContractDialog extends javax.swing.JDialog {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridy = 9;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
@@ -643,7 +690,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridy = 9;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
@@ -653,7 +700,7 @@ public class NewContractDialog extends javax.swing.JDialog {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 8;
+        gridBagConstraints.gridy = 10;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 1.0;
@@ -664,7 +711,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 8;
+        gridBagConstraints.gridy = 10;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
@@ -757,12 +804,15 @@ public class NewContractDialog extends javax.swing.JDialog {
     private JLabel lblMultiplier;
     private JLabel lblOverhead;
     private JLabel lblCommandRights;
+    private JLabel lblSalvageRights;
     private JLabel lblBattleLossComp;
     private JLabel lblStraightSupport;
     private JLabel lblSignBonus;
     private JLabel lblAdvance;
     private JSpinner spnLength;
     private JSpinner spnMultiplier;
+    private JSpinner spnSalvageRights;
+    private JCheckBox checkSalvageExchange;
     private JSpinner spnStraightSupport;
     private JSpinner spnBattleLossComp;
     private JSpinner spnSignBonus;

@@ -30,6 +30,7 @@ import javax.swing.DefaultComboBoxModel;
 
 import megamek.common.Entity;
 import megamek.common.Pilot;
+import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.Unit;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.PilotPerson;
@@ -62,8 +63,6 @@ public class ResolveWizardFinalCheckDialog extends javax.swing.JDialog {
     private javax.swing.JTextArea txtDeadPilots;
     private javax.swing.JTextArea txtSalvage;
     private javax.swing.JLabel lblStatus;
-
-    private ArrayList<javax.swing.JCheckBox> boxes;
 	
     /** Creates new form NewTeamDialog */
     public ResolveWizardFinalCheckDialog(java.awt.Frame parent, boolean modal, ResolveScenarioTracker t) {
@@ -95,10 +94,7 @@ public class ResolveWizardFinalCheckDialog extends javax.swing.JDialog {
         txtDeadPilots = new javax.swing.JTextArea();
         txtSalvage = new javax.swing.JTextArea();
         lblStatus = new javax.swing.JLabel();
-        
-        boxes = new ArrayList<javax.swing.JCheckBox>();
-
-     
+    
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
 
@@ -292,9 +288,9 @@ public class ResolveWizardFinalCheckDialog extends javax.swing.JDialog {
         txtSalvage.setName("txtSalvage");
         txtSalvage.setText("None");
         names = "";
-        if(tracker.getSalvage().size() > 0) {
-        	for(Entity e : tracker.getSalvage()) {
-        		names += e.getDisplayName() + "\n";
+        if(tracker.getActualSalvage().size() > 0) {
+        	for(Unit u : tracker.getActualSalvage()) {
+        		names += u.getEntity().getDisplayName() + "\n";
         	}
         	txtSalvage.setText(names);
         }

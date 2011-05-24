@@ -23,12 +23,19 @@ package mekhq;
 
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 
 import megamek.common.Entity;
+import mekhq.campaign.ResolveScenarioTracker;
+import mekhq.campaign.Unit;
+import mekhq.campaign.mission.Contract;
 /**
  *
  * @author  Taharqa
@@ -45,11 +52,34 @@ public class ResolveWizardSalvageDialog extends javax.swing.JDialog {
 	private javax.swing.JPanel panSalvage;
     private javax.swing.JTextArea txtInstructions;
     private ArrayList<javax.swing.JCheckBox> boxes;
+    private ArrayList<Unit> salvageables;
+    
+    private JLabel lblSalvageValueUnit1;
+    private JLabel lblSalvageValueEmployer1;
+    private JLabel lblSalvagePct1;
+    private JLabel lblSalvageValueUnit2;
+    private JLabel lblSalvageValueEmployer2;
+    private JLabel lblSalvagePct2;
 	
+    private long salvageEmployer;
+    private long salvageUnit;
+    private int currentSalvagePct;
+    private int maxSalvagePct;
+    
+    DecimalFormat formatter;
+    
     /** Creates new form NewTeamDialog */
     public ResolveWizardSalvageDialog(java.awt.Frame parent, boolean modal, ResolveScenarioTracker t) {
         super(parent, modal);
         this.tracker = t;
+        salvageables = new ArrayList<Unit>();
+        if(tracker.getMission() instanceof Contract) {
+	        salvageEmployer = ((Contract)tracker.getMission()).getSalvagedByEmployer();
+	    	salvageUnit = ((Contract)tracker.getMission()).getSalvagedByUnit();
+	    	maxSalvagePct = ((Contract)tracker.getMission()).getSalvagePct();
+	    	currentSalvagePct = (int)(100*((double)salvageUnit)/(salvageUnit+salvageEmployer));
+        }
+        formatter = new DecimalFormat();
         initComponents();
     }
 
@@ -97,11 +127,80 @@ public class ResolveWizardSalvageDialog extends javax.swing.JDialog {
         panSalvage.setName("panSalvage");
         panSalvage.setLayout(new GridBagLayout()); 
         
+        int i = 0;
+        if(tracker.getMission() instanceof Contract) {
+        	lblSalvageValueUnit1 = new JLabel(resourceMap.getString("lblSalvageValueUnit1.text"));   	
+        	gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = i;
+            gridBagConstraints.gridwidth = 1;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+            gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+            panSalvage.add(lblSalvageValueUnit1, gridBagConstraints);
+        	lblSalvageValueUnit2 = new JLabel(formatter.format(salvageUnit) + " C-Bills");   	
+        	gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = i;
+            gridBagConstraints.gridwidth = 1;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+            gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+            panSalvage.add(lblSalvageValueUnit2, gridBagConstraints);
+            i++;
+            lblSalvageValueEmployer1 = new JLabel(resourceMap.getString("lblSalvageValueEmployer1.text"));   	
+        	gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = i;
+            gridBagConstraints.gridwidth = 1;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+            gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+            panSalvage.add(lblSalvageValueEmployer1, gridBagConstraints);
+        	lblSalvageValueEmployer2 = new JLabel(formatter.format(salvageEmployer) + " C-Bills");
+        	gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = i;
+            gridBagConstraints.gridwidth = 1;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+            gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+            panSalvage.add(lblSalvageValueEmployer2, gridBagConstraints);
+            i++;
+            String lead = "<html><font color='black'>";
+            if(currentSalvagePct > maxSalvagePct) {
+            	lead = "<html><font color='red'>";
+            }
+            lblSalvagePct1 = new JLabel(resourceMap.getString("lblSalvagePct1.text"));   	
+        	gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = i;
+            gridBagConstraints.gridwidth = 1;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+            gridBagConstraints.insets = new java.awt.Insets(5, 5, 20, 0);
+            panSalvage.add(lblSalvagePct1, gridBagConstraints);
+            lblSalvagePct2 = new JLabel(lead + currentSalvagePct + "%</font> <font color='black'>(max " + maxSalvagePct + "%)</font></html>");
+        	gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = i;
+            gridBagConstraints.gridwidth = 1;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+            gridBagConstraints.insets = new java.awt.Insets(5, 5, 20, 0);
+            panSalvage.add(lblSalvagePct2, gridBagConstraints);
+            i++;
+        }
+        
+        
         JCheckBox box;
-        int i = 1;
-        for(Entity en : tracker.getSalvage()) {
-        	box = new JCheckBox(en.getDisplayName());
+        i++;
+        for(Entity en : tracker.getPotentialSalvage()) {
+        	Unit u = new Unit(en, tracker.getCampaign());
+        	u.runDiagnostic();
+        	salvageables.add(u);
+        	box = new JCheckBox(en.getDisplayName() + " (" + formatter.format(u.getSellValue()) + " C-Bills)");
         	box.setSelected(false);
+        	box.addItemListener(new ItemListener() {
+        		@Override
+        		public void itemStateChanged(ItemEvent evt) {
+     				checkSalvageRights();
+     			}
+        	});
         	boxes.add(box);
         	gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -170,19 +269,52 @@ public class ResolveWizardSalvageDialog extends javax.swing.JDialog {
 	   	 gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
 	   	 getContentPane().add(panButtons, gridBagConstraints);
 	   	 
+	   	 checkSalvageRights();
+	   	 
 	   	 pack();
     }
 
-    
-    private void btnNextActionPerformed(java.awt.event.ActionEvent evt) {
-    	ArrayList<Entity> s = new ArrayList<Entity>();
+    private void checkSalvageRights() {
+    	if(!(tracker.getMission() instanceof Contract)) {
+    		return;
+    	}
+    	salvageEmployer = ((Contract)tracker.getMission()).getSalvagedByEmployer();
+    	salvageUnit = ((Contract)tracker.getMission()).getSalvagedByUnit();
     	for(int i = 0; i < boxes.size(); i++) {
     		JCheckBox box = boxes.get(i);
     		if(box.isSelected()) {
-    			s.add(tracker.getSalvagedUnit(i));
-    		}  		
+    			salvageUnit += salvageables.get(i).getSellValue();
+    		} else {
+    			salvageEmployer += salvageables.get(i).getSellValue();
+    		}
     	}
-    	tracker.setSalvage(s);
+    	currentSalvagePct = (int)(100*((double)salvageUnit)/(salvageUnit+salvageEmployer));
+    	for(JCheckBox box : boxes) {
+    		if(!box.isSelected() && currentSalvagePct >= maxSalvagePct) {
+    			box.setEnabled(false);
+    		} else {
+    			box.setEnabled(true);
+    		}
+    	}
+    	lblSalvageValueUnit2.setText(formatter.format(salvageUnit) + " C-Bills");
+    	lblSalvageValueEmployer2.setText(formatter.format(salvageEmployer) + " C-Bills");
+    	String lead = "<html><font color='black'>";
+        if(currentSalvagePct > maxSalvagePct) {
+        	lead = "<html><font color='red'>";
+        }
+        lblSalvagePct2.setText(lead + currentSalvagePct + "%</font> <font color='black'>(max " + maxSalvagePct + "%)</font></html>");
+
+    }
+    
+    private void btnNextActionPerformed(java.awt.event.ActionEvent evt) {
+    	for(int i = 0; i < boxes.size(); i++) {
+    		JCheckBox box = boxes.get(i);
+    		if(box.isSelected()) {
+    			tracker.salvageUnit(i);
+    		} else {
+    			tracker.dontSalvageUnit(i);
+    		}
+    	}
     	this.setVisible(false);
     	ResolveWizardFinalCheckDialog resolveDialog = new ResolveWizardFinalCheckDialog(null, true, tracker);
     	resolveDialog.setVisible(true);

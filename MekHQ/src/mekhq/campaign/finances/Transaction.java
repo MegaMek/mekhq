@@ -53,7 +53,8 @@ public class Transaction implements Serializable {
 	public final static int C_TRANSPORT  = 9;
 	public final static int C_CONTRACT   = 10;
 	public final static int C_BLC        = 11;
-	public final static int C_NUM        = 12;
+	public final static int C_SALVAGE    = 12;
+	public final static int C_NUM        = 13;
 	
 	public static String getCategoryName(int cat) {
 		switch(cat) {
@@ -77,6 +78,8 @@ public class Transaction implements Serializable {
 			return "Contract payments";
 		case C_BLC:
 			return "Battle Loss Compensation";
+		case C_SALVAGE:
+			return "Salvage Exchange";
 		case C_START:
 			return "Starting Capital";
 		case C_TRANSPORT:

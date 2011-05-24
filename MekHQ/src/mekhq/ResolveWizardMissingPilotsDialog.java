@@ -31,6 +31,8 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JRadioButton;
 
+import mekhq.campaign.ResolveScenarioTracker;
+import mekhq.campaign.mission.Contract;
 import mekhq.campaign.personnel.PilotPerson;
 /**
  *
@@ -213,7 +215,8 @@ public class ResolveWizardMissingPilotsDialog extends javax.swing.JDialog {
     	if(tracker.getDeadPilots().size() > 0) {
     		ResolveWizardCasualtiesDialog resolveDialog = new ResolveWizardCasualtiesDialog(null, true, tracker);
     		resolveDialog.setVisible(true);
-    	} else if(tracker.getSalvage().size() > 0) {
+    	} else if(tracker.getPotentialSalvage().size() > 0 
+    			&& (!(tracker.getMission() instanceof Contract) || ((Contract)tracker.getMission()).canSalvage())) {
     		ResolveWizardSalvageDialog resolveDialog = new ResolveWizardSalvageDialog(null, true, tracker);
     		resolveDialog.setVisible(true);
     	} else {

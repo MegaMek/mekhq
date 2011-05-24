@@ -19,7 +19,7 @@
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq;
+package mekhq.campaign;
 
 import gd.xml.ParseException;
 
@@ -36,8 +36,7 @@ import javax.swing.filechooser.FileFilter;
 import megamek.common.Entity;
 import megamek.common.Pilot;
 import megamek.common.XMLStreamParser;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.Unit;
+import mekhq.MekHQApp;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
@@ -54,7 +53,9 @@ import mekhq.campaign.personnel.PilotPerson;
 public class ResolveScenarioTracker {
 	
 	ArrayList<Entity> entities;
-	ArrayList<Entity> salvage;
+	ArrayList<Entity> potentialSalvage;
+	ArrayList<Unit> actualSalvage;
+	ArrayList<Unit> leftoverSalvage;
 	ArrayList<Pilot> pilots;
 	ArrayList<Unit> units;
 	ArrayList<PilotPerson> people;
@@ -70,7 +71,9 @@ public class ResolveScenarioTracker {
 		this.scenario = s;
 		this.campaign = c;
 		entities = new ArrayList<Entity>();
-		salvage = new ArrayList<Entity>();
+		potentialSalvage = new ArrayList<Entity>();
+		actualSalvage = new ArrayList<Unit>();
+		leftoverSalvage = new ArrayList<Unit>();
 		pilots = new ArrayList<Pilot>();
 		units = new ArrayList<Unit>();
 		people = new ArrayList<PilotPerson>();
@@ -178,7 +181,7 @@ public class ResolveScenarioTracker {
 	public void identifyMissingUnits() {
 		missingUnits = new ArrayList<Unit>();
 		for(Unit u : units) {
-			if(!foundMatch(u.getEntity(), entities) && !foundMatch(u.getEntity(), salvage)) {
+			if(!foundMatch(u.getEntity(), entities) && !foundMatch(u.getEntity(), potentialSalvage)) {
 				missingUnits.add(u);
 			}
 		}
@@ -269,7 +272,7 @@ public class ResolveScenarioTracker {
 			//this
 			for (Entity entity : parser.getEntities()) {
 				if(!foundMatch(entity, entities)) {
-					salvage.add(entity);
+					potentialSalvage.add(entity);
 				}
 			}
 		}
@@ -331,16 +334,20 @@ public class ResolveScenarioTracker {
 		casualty.setDead(false);
 	}
 	
-	public ArrayList<Entity> getSalvage() {
-		return salvage;
+	public ArrayList<Entity> getPotentialSalvage() {
+		return potentialSalvage;
 	}
 	
-	public void setSalvage(ArrayList<Entity> s) {
-		this.salvage = s;
+	public ArrayList<Unit> getActualSalvage() {
+		return actualSalvage;
 	}
 	
-	public Entity getSalvagedUnit(int i) {
-		return salvage.get(i);
+	public void salvageUnit(int i) {
+		actualSalvage.add(new Unit(potentialSalvage.get(i), campaign));	
+	}
+
+	public void dontSalvageUnit(int i) {
+		leftoverSalvage.add(new Unit(potentialSalvage.get(i), campaign));	
 	}
 	
 	public ArrayList<Entity> getRecoveredUnits() {
@@ -349,6 +356,14 @@ public class ResolveScenarioTracker {
 	
 	public ArrayList<Pilot> getRecoveredPilots() {
 		return pilots;
+	}
+	
+	public Campaign getCampaign() {
+		return campaign;
+	}
+	
+	public Mission getMission() {
+		return campaign.getMission(scenario.getMissionId());
 	}
 	
 	
@@ -384,8 +399,31 @@ public class ResolveScenarioTracker {
 			campaign.removeUnit(missUnit.getId());
 		}
 		//now lets take care of salvage
-		for(Entity salvageEn : salvage) {
-			campaign.addUnit(salvageEn, false);
+		for(Unit salvageUnit : actualSalvage) {
+			campaign.addUnit(salvageUnit.getEntity(), false);
+			//if this is a contract, add to th salvaged value
+			if(getMission() instanceof Contract) {
+				((Contract)getMission()).addSalvageByUnit(salvageUnit.getSellValue());
+			}
+		}
+		if(getMission() instanceof Contract) {
+			if(((Contract)getMission()).isSalvageExchange()) {
+				//add exchange value of bank account
+				long value = 0;
+				for(Entity en : potentialSalvage) {
+					Unit salvageUnit= new Unit(en, campaign);
+					salvageUnit.runDiagnostic();
+					value += salvageUnit.getSellValue();
+				}
+				value = (long)(((double)value) * (((Contract)getMission()).getSalvagePct()/100.0));
+				campaign.getFinances().credit(value, Transaction.C_SALVAGE, "salvage exchange for " + scenario.getName(),  campaign.getCalendar().getTime());
+				DecimalFormat formatter = new DecimalFormat();
+				campaign.addReport(formatter.format(value) + " C-Bills have been credited to your account for salvage exchange.");
+			} else {
+				for(Unit salvageUnit : leftoverSalvage) {
+					((Contract)getMission()).addSalvageByEmployer(salvageUnit.getSellValue());
+				}
+			}
 		}
 		scenario.setStatus(resolution);
 		scenario.setReport(report);

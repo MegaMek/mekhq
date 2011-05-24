@@ -26,6 +26,9 @@ import java.awt.GridBagLayout;
 
 import javax.swing.BorderFactory;
 
+import mekhq.campaign.ResolveScenarioTracker;
+import mekhq.campaign.mission.Contract;
+
 /**
  *
  * @author  Taharqa
@@ -215,7 +218,8 @@ public class ResolveWizardChooseFilesDialog extends javax.swing.JDialog {
     	} else if(tracker.getDeadPilots().size() > 0) {
     		ResolveWizardCasualtiesDialog resolveDialog = new ResolveWizardCasualtiesDialog(null, true, tracker);
     		resolveDialog.setVisible(true);
-    	} else if(tracker.getSalvage().size() > 0) {
+    	} else if(tracker.getPotentialSalvage().size() > 0 
+    			&& (!(tracker.getMission() instanceof Contract) || ((Contract)tracker.getMission()).canSalvage())) {
     		ResolveWizardSalvageDialog resolveDialog = new ResolveWizardSalvageDialog(null, true, tracker);
     		resolveDialog.setVisible(true);
     	} else {
