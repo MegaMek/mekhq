@@ -112,7 +112,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 		this.battleLossComp = 50;
 		this.salvagePct = 50;
 		this.salvageExchange = false;
-		this.transportComp = 100;
+		this.transportComp = 50;
 		this.mrbcFee = true;
 		this.advancePct = 25;
 		this.signBonus = 0;
@@ -177,6 +177,14 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 	
 	public void setMultiplier(double s) {
 		paymentMultiplier = s;
+	}
+	
+	public int getTransportComp() {
+		return transportComp;
+	}
+	
+	public void setTransportComp(int s) {
+		transportComp = s;
 	}
 	
 	public int getStraightSupport() {
@@ -328,6 +336,9 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 		profit -= c.getOverheadExpenses() * getLength();
 		profit -= c.getMaintenanceCosts() * getLength();
 		profit -= c.getPayRoll() * getLength();
+		if(null != c.getPlanet(planetName)) {
+			profit -= 2 * c.calculateCostPerJump(true) * c.calculateJumpPath(c.getCurrentPlanetName(), planetName).getJumps();
+		}
 		return profit;
 	}
 	
@@ -353,12 +364,15 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 			overheadAmount = 0;
 		}
 		
+		//calculate support amount
 		supportAmount = (long)((straightSupport/100.0) * c.getSupportPayRoll() * getLength());
 		
-		signingAmount = (long)((signBonus/100.0) * (baseAmount + overheadAmount + transportAmount + supportAmount));
+		//calculate transportation costs
+		if(null != c.getPlanet(planetName)) {
+			transportAmount = (long)((transportComp/100.0) * 2 * c.calculateCostPerJump(false) * c.calculateJumpPath(c.getCurrentPlanetName(), planetName).getJumps());
+		}
 		
-		//TODO: transport amount
-		transportAmount = 0;
+		signingAmount = (long)((signBonus/100.0) * (baseAmount + overheadAmount + transportAmount + supportAmount));
 		
 		advanceAmount = (long)((advancePct/100.0) * (baseAmount + overheadAmount + transportAmount + supportAmount));
 		

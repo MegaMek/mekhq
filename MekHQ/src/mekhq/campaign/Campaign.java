@@ -2211,7 +2211,7 @@ public class Campaign implements Serializable {
 	 * 
 	 * Hopefully, StellarOps will clarify all of this.
 	 */
-	public long calculateCostPerJump() {
+	public long calculateCostPerJump(boolean excludeOwnTransports) {
 		//first we need to get the total number of units by type
 		int nMech = 0;
 		int nVee = 0;
@@ -2228,7 +2228,7 @@ public class Campaign implements Serializable {
 		
 		for(Unit u : getUnits()) {
 			Entity en = u.getEntity();
-			if(en instanceof Dropship) {
+			if(en instanceof Dropship && excludeOwnTransports) {
 				nDropship++;
 				//decrement total needs by what this dropship can offer
 				for(Bay bay : en.getTransportBays()) {
@@ -2255,7 +2255,7 @@ public class Campaign implements Serializable {
 					}
 				}
 			}
-			else if(en instanceof Jumpship) {
+			else if(en instanceof Jumpship && excludeOwnTransports) {
 				nCollars += ((Jumpship)en).getDocks();
 			}
 			else if(en instanceof Mech) {
@@ -2264,7 +2264,7 @@ public class Campaign implements Serializable {
 			else if(en instanceof Tank) {
 				nVee++;
 			}
-			else if(en instanceof Aero) {
+			else if(en instanceof Aero && !(en instanceof Dropship) && !(en instanceof Jumpship)) {
 				nAero++;
 			}
 			else if(en instanceof BattleArmor) {

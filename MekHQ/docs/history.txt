@@ -58,6 +58,7 @@ v0.1.7 (SVN)
 + added salvage fields in Contract to XML serialization
 + removed suggest.jar (added source code instead, thanks RakuDave!)
 + added planetary location fields to contracts and missions
++ Transport terms for contracts
 
 v0.1.6 (2011-05-17)
 + beginning of Briefing Room tab

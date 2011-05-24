@@ -28,6 +28,7 @@ public class MissionTypeDialog extends javax.swing.JDialog {
         this.campaign = c;
         this.hqview = view;
         initComponents();      
+        this.setLocationRelativeTo(parent);
     }
 
     /** This method is called from within the constructor to
