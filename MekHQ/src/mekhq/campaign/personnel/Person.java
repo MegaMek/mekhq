@@ -389,6 +389,10 @@ public abstract class Person implements Serializable, MekHqXmlSerializable, IMed
 				+"<salary>"
 				+salary
 				+"</salary>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<status>"
+				+status
+				+"</status>");
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<birthday>"
@@ -437,6 +441,8 @@ public abstract class Person implements Serializable, MekHqXmlSerializable, IMed
 					retVal.rank = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("forceId")) {
 					retVal.forceId = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("status")) {
+					retVal.status = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("salary")) {
 					retVal.salary = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("birthday")) {

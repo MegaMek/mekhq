@@ -989,6 +989,8 @@ public class MekHQView extends FrameView {
 		gridBagConstraints.weighty = 1.0;
 		panPersonnel.add(splitPersonnel, gridBagConstraints);
 		
+		filterPersonnel();
+		
 		tabMain.addTab(
 				resourceMap.getString("panPersonnel.TabConstraints.tabTitle"),
 				panPersonnel); // NOI18N
