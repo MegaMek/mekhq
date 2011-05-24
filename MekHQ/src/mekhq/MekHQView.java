@@ -5847,11 +5847,13 @@ public class MekHQView extends FrameView {
 
 		public void actionPerformed(ActionEvent action) {
 			String command = action.getActionCommand();
-			Part[] parts = partsModel.getPartstAt(partsTable.getSelectedRows());
+			int row = partsTable.getSelectedRow();
+			if(row < 0) {
+				return;
+			}
+			Part selectedPart = partsModel.getPartAt(partsTable.convertRowIndexToModel(row));
 			if (command.equalsIgnoreCase("SELL")) {
-				for (Part part : parts) {
-					campaign.sellPart(part);
-				}
+				campaign.sellPart(selectedPart);
 				refreshPartsList();
 				refreshTaskList();
 				refreshAcquireList();
@@ -5859,9 +5861,7 @@ public class MekHQView extends FrameView {
 				refreshFunds();
 				refreshFinancialTransactions();
 			} else if (command.equalsIgnoreCase("REMOVE")) {
-				for (Part part : parts) {
-					campaign.removePart(part);
-				}
+				campaign.removePart(selectedPart);
 				refreshPartsList();
 				refreshTaskList();
 				refreshAcquireList();

@@ -64,6 +64,7 @@ v0.1.7 (SVN)
 + removed NetBeans *.form files
 + matching on startWith rather than contains for JSuggestField
 + Bug 3306391: Resurection of pilots
++ Bug 3304919: Selling of  Parts error
 
 v0.1.6 (2011-05-17)
 + beginning of Briefing Room tab
