@@ -392,7 +392,7 @@ public class JSuggestField extends JTextField {
 					// rather than using the entire list, let's rather remove
 					// the words that don't match, thus narrowing
 					// the search and making it faster
-					if (!it.next().toLowerCase().contains(word.toLowerCase())) {
+					if (!it.next().toLowerCase().startsWith(word.toLowerCase())) {
 						it.remove();
 					}
 				}

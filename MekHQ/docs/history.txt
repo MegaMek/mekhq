@@ -62,6 +62,7 @@ v0.1.7 (SVN)
 + contract start date (contracts are done!)
 + set the location of all dialogs so that they center on the main frame
 + removed NetBeans *.form files
++ matching on startWith rather than contains for JSuggestField
 
 v0.1.6 (2011-05-17)
 + beginning of Briefing Room tab
