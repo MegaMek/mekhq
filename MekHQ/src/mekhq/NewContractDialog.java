@@ -124,6 +124,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         btnClose = new javax.swing.JButton();
         scrDesc = new javax.swing.JScrollPane();
         txtDesc = new javax.swing.JTextArea();
+        lblPlanetName = new javax.swing.JLabel();
           
         lblName.setText(resourceMap.getString("lblName.text")); // NOI18N
         lblName.setName("lblName"); // NOI18N
@@ -146,11 +147,31 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         descPanel.add(txtName, gridBagConstraints);
         
+        lblPlanetName.setText(resourceMap.getString("lblPlanetName.text")); // NOI18N
+        lblPlanetName.setName("lblPlanetName"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        descPanel.add(lblPlanetName, gridBagConstraints);
+        
+        suggestPlanet = new JSuggestField(this, campaign.getPlanetNames());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        descPanel.add(suggestPlanet, gridBagConstraints);
+        
         lblEmployer.setText(resourceMap.getString("lblEmployer.text")); // NOI18N
         lblEmployer.setName("lblEmployer"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
@@ -160,7 +181,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         txtEmployer.setName("txtEmployer"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
@@ -180,7 +201,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         scrDesc.setMinimumSize(new Dimension(400,200));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
@@ -757,6 +778,7 @@ public class NewContractDialog extends javax.swing.JDialog {
     
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
     	contract.setName(txtName.getText());
+    	contract.setPlanetName(suggestPlanet.getText());
     	contract.setEmployer(txtEmployer.getText());
     	contract.setDesc(txtDesc.getText());
     	campaign.getFinances().credit(contract.getTotalAdvanceMonies(), Transaction.C_CONTRACT, "Advance monies for " + contract.getName(), campaign.getCalendar().getTime());
@@ -797,6 +819,9 @@ public class NewContractDialog extends javax.swing.JDialog {
     private javax.swing.JTextField txtEmployer;
     private javax.swing.JTextArea txtDesc;
     private javax.swing.JScrollPane scrDesc;
+    private javax.swing.JLabel lblPlanetName;
+	private JSuggestField suggestPlanet;
+
     
     private JComboBox choiceOverhead;
     private JComboBox choiceCommand;

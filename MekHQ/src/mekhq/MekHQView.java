@@ -153,8 +153,6 @@ import org.jdesktop.application.ResourceMap;
 import org.jdesktop.application.SingleFrameApplication;
 import org.jdesktop.application.TaskMonitor;
 
-import ch.rakudave.suggest.JSuggestField;
-
 /**
  * The application's main frame.
  */
@@ -1813,14 +1811,14 @@ public class MekHQView extends FrameView {
 	}// </editor-fold>//GEN-END:initComponents
 	
 	private void btnAddMissionActionPerformed(java.awt.event.ActionEvent evt) {
-		MissionTypeDialog mtd = new MissionTypeDialog(null, true, campaign, this);
+		MissionTypeDialog mtd = new MissionTypeDialog(this.getFrame(), true, campaign, this);
 		mtd.setVisible(true);
 	}
 	
 	private void btnEditMissionActionPerformed(java.awt.event.ActionEvent evt) {
 		Mission mission = campaign.getMission(selectedMission);
 		if(null != mission) {
-			CustomizeMissionDialog cmd = new CustomizeMissionDialog(null, true, mission, campaign);
+			CustomizeMissionDialog cmd = new CustomizeMissionDialog(this.getFrame(), true, mission, campaign);
 			cmd.setVisible(true);
 			if(cmd.getMissionId() != -1) {
 				selectedMission = cmd.getMissionId();

@@ -29,7 +29,8 @@ public class MissionViewPanel extends javax.swing.JPanel {
 	private javax.swing.JTextArea txtDesc;
 	
 	private javax.swing.JLabel lblStatus;
-	
+	private javax.swing.JLabel lblLocation;
+	private javax.swing.JTextArea txtLocation;
 	
 	public MissionViewPanel(Mission m) {
 		this.mission = m;
@@ -65,10 +66,12 @@ public class MissionViewPanel extends javax.swing.JPanel {
 
     private void fillStats() {
     	
-    	//org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(PersonViewPanel.class);
+    	org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(ContractViewPanel.class);
     	
     	lblStatus = new javax.swing.JLabel();
-    	
+    	lblLocation = new javax.swing.JLabel();
+    	txtLocation = new javax.swing.JTextArea();
+
     	java.awt.GridBagConstraints gridBagConstraints;
 		pnlStats.setLayout(new java.awt.GridBagLayout());
 		
@@ -85,6 +88,29 @@ public class MissionViewPanel extends javax.swing.JPanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblStatus, gridBagConstraints);
 		
+		lblLocation.setName("lblLocation"); // NOI18N
+		lblLocation.setText(resourceMap.getString("lblLocation.text"));
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 1;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+		pnlStats.add(lblLocation, gridBagConstraints);
+		
+		txtLocation.setName("txtLocation"); // NOI18N
+		txtLocation.setText(mission.getPlanetName());
+		txtLocation.setEditable(false);
+		txtLocation.setLineWrap(true);
+		txtLocation.setWrapStyleWord(true);
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 1;
+		gridBagConstraints.gridy = 1;
+		gridBagConstraints.weightx = 0.5;
+		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+		pnlStats.add(txtLocation, gridBagConstraints);
+		
 		txtDesc.setName("txtDesc");
 		txtDesc.setText(mission.getDescription());
 		txtDesc.setEditable(false);
@@ -92,7 +118,7 @@ public class MissionViewPanel extends javax.swing.JPanel {
 		txtDesc.setWrapStyleWord(true);
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 1;
+		gridBagConstraints.gridy = 2;
 		gridBagConstraints.gridwidth = 2;
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 1.0;

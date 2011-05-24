@@ -56,6 +56,7 @@ public class Mission implements Serializable, MekHqXmlSerializable {
 	public static final int S_NUM     = 4;
 	
 	private String name;
+	protected String planetName;
 	private int status;
 	private String desc;
 	private ArrayList<Scenario> scenarios;
@@ -67,6 +68,7 @@ public class Mission implements Serializable, MekHqXmlSerializable {
 	
 	public Mission(String n) {
 		this.name = n;
+		this.planetName = "Unknown Planet";
 		this.desc = "";
 		this.status = S_ACTIVE;
 		scenarios = new ArrayList<Scenario>();
@@ -93,6 +95,13 @@ public class Mission implements Serializable, MekHqXmlSerializable {
 	}
 	public void setName(String n) {
 		this.name = n;
+	}
+	
+	public String getPlanetName() {
+		return planetName;
+	}
+	public void setPlanetName(String n) {
+		this.planetName = n;
 	}
 	
 	public String getDescription() {
@@ -181,6 +190,10 @@ public class Mission implements Serializable, MekHqXmlSerializable {
 				+name
 				+"</name>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<planetName>"
+				+planetName
+				+"</planetName>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<status>"
 				+status
 				+"</status>");
@@ -226,6 +239,8 @@ public class Mission implements Serializable, MekHqXmlSerializable {
 				
 				if (wn2.getNodeName().equalsIgnoreCase("name")) {
 					retVal.name = wn2.getTextContent();
+				} else if (wn2.getNodeName().equalsIgnoreCase("planetName")) {
+					retVal.planetName = wn2.getTextContent();
 				} else if (wn2.getNodeName().equalsIgnoreCase("status")) {
 					retVal.status = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("id")) {

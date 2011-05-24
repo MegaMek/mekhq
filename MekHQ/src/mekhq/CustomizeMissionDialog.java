@@ -23,10 +23,12 @@ package mekhq;
 
 import java.awt.Dimension;
 import java.awt.Frame;
+import java.awt.Window;
 
 import javax.swing.BorderFactory;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.Planet;
 import mekhq.campaign.mission.Mission;
 
 /**
@@ -64,6 +66,7 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
         btnClose = new javax.swing.JButton();
         scrDesc = new javax.swing.JScrollPane();
         txtDesc = new javax.swing.JTextArea();
+        lblPlanetName = new javax.swing.JLabel();
         
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
@@ -92,6 +95,29 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(txtName, gridBagConstraints);
  
+        lblPlanetName.setText(resourceMap.getString("lblPlanetName.text")); // NOI18N
+        lblPlanetName.setName("lblPlanetName"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        getContentPane().add(lblPlanetName, gridBagConstraints);
+        
+        suggestPlanet = new JSuggestField(this, campaign.getPlanetNames());
+        if(!newMission) {
+        	suggestPlanet.setText(mission.getPlanetName());
+        }
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        getContentPane().add(suggestPlanet, gridBagConstraints);
+        
         txtDesc.setText(mission.getDescription());
         txtDesc.setName("txtDesc");
         txtDesc.setEditable(true);
@@ -105,7 +131,7 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
         scrDesc.setMinimumSize(new Dimension(400,200));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
@@ -123,9 +149,9 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.CENTER;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(btnOK, gridBagConstraints);
 
@@ -138,9 +164,9 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.CENTER;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(btnClose, gridBagConstraints);
 
@@ -150,6 +176,7 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
     
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
     	mission.setName(txtName.getText());
+    	mission.setPlanetName(suggestPlanet.getText());
     	mission.setDesc(txtDesc.getText());
     	if(newMission) {
     		campaign.addMission(mission);
@@ -171,6 +198,9 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
     private javax.swing.JTextField txtName;
     private javax.swing.JTextArea txtDesc;
     private javax.swing.JScrollPane scrDesc;
+    private javax.swing.JLabel lblPlanetName;
+	private JSuggestField suggestPlanet;
+
 
     // End of variables declaration//GEN-END:variables
 

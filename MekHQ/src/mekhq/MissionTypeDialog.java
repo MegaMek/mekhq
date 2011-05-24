@@ -6,6 +6,8 @@
 
 package mekhq;
 
+import java.awt.Frame;
+
 import mekhq.campaign.Campaign;
 
 /**
@@ -16,11 +18,13 @@ public class MissionTypeDialog extends javax.swing.JDialog {
 
 	private Campaign campaign;
 	private MekHQView hqview;
+	private Frame frame;
 	
 	private static final long serialVersionUID = 8376874926997734492L;
 	/** Creates new form */
     public MissionTypeDialog(java.awt.Frame parent, boolean modal, Campaign c, MekHQView view) {
         super(parent, modal);
+        frame = parent;
         this.campaign = c;
         this.hqview = view;
         initComponents();      
@@ -80,7 +84,7 @@ public class MissionTypeDialog extends javax.swing.JDialog {
     }
     
     private void newMission() {
-    	CustomizeMissionDialog cmd = new CustomizeMissionDialog(null, true, null, campaign);
+    	CustomizeMissionDialog cmd = new CustomizeMissionDialog(frame, true, null, campaign);
 		cmd.setVisible(true);
 		this.setVisible(false);
 		if(cmd.getMissionId() != -1) {
@@ -90,7 +94,7 @@ public class MissionTypeDialog extends javax.swing.JDialog {
     }
     
     private void newContract() {
-    	NewContractDialog ncd = new NewContractDialog(null, true, campaign);
+    	NewContractDialog ncd = new NewContractDialog(frame, true, campaign);
 		ncd.setVisible(true);
 		this.setVisible(false);
 		if(ncd.getContractId() != -1) {

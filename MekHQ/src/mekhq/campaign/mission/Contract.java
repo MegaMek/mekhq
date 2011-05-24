@@ -412,6 +412,14 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 				+overheadComp
 				+"</overheadComp>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<salvagePct>"
+				+salvagePct
+				+"</salvagePct>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<salvageExchange>"
+				+salvageExchange
+				+"</salvageExchange>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<straightSupport>"
 				+straightSupport
 				+"</straightSupport>");
@@ -495,6 +503,13 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 				commandRights = Integer.parseInt(wn2.getTextContent().trim());
 			} else if (wn2.getNodeName().equalsIgnoreCase("overheadComp")) {
 				overheadComp = Integer.parseInt(wn2.getTextContent().trim());
+			} else if (wn2.getNodeName().equalsIgnoreCase("salvagePct")) {
+				salvagePct = Integer.parseInt(wn2.getTextContent().trim());
+			} else if (wn2.getNodeName().equalsIgnoreCase("salvageExchange")) {
+				if (wn2.getTextContent().trim().equals("true"))
+					salvageExchange = true;
+				else
+					salvageExchange = false;
 			} else if (wn2.getNodeName().equalsIgnoreCase("straightSupport")) {
 				straightSupport = Integer.parseInt(wn2.getTextContent().trim());
 			} else if (wn2.getNodeName().equalsIgnoreCase("battleLossComp")) {
