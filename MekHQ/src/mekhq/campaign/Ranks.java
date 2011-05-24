@@ -36,6 +36,7 @@ public class Ranks implements Serializable {
 	private static final long serialVersionUID = -2054016720766034618L;
 
 	//pre-fab rank systems
+	public static final int RS_CUSTOM = -1;
 	public static final int RS_SL =  0;
 	public static final int RS_FS =  1;
 	public static final int RS_LA =  2;
@@ -66,6 +67,8 @@ public class Ranks implements Serializable {
 	
 	public static String getRankSystemName(int system) {
 		switch(system) {
+		case RS_CUSTOM:
+			return "Custom";
 		case RS_SL:
 			return "Star League";
 		case RS_FS:
@@ -112,6 +115,12 @@ public class Ranks implements Serializable {
 		}
 	}
 	
+	public void setCustomRanks(ArrayList<String> customRanks, int offCut) {
+		ranks = customRanks;
+		rankSystem = RS_CUSTOM;
+		officer = offCut;
+	}
+	
 	public String getRank(int r) {
 		if(r >= ranks.size()) {
 			return "Unknown";
@@ -136,6 +145,36 @@ public class Ranks implements Serializable {
 	
 	public boolean isOfficer(int rank) {
 		return rank >= officer;
+	}
+	
+	public int getOfficerCut() {
+		return officer;
+	}
+	
+	public void setOfficerCut(int i) {
+		officer = i;
+	}
+	
+	public String getRankNameList() {
+		String rankNames = "";
+		int i = 0;
+		for(String name : getAllRanks()) {
+			rankNames += name;
+			i++;
+			if(i < getAllRanks().size()) {
+				rankNames += ",";
+			}
+		}
+		return rankNames;
+	}
+	
+	public void setRanksFromList(String names) {
+		ranks = new ArrayList<String>();
+		String[] rankNames = names.split(",");
+		for(String rankName : rankNames) {
+			ranks.add(rankName);
+		}
+		rankSystem = RS_CUSTOM;
 	}
 	
 	

@@ -1278,6 +1278,10 @@ public class Campaign implements Serializable {
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "name", name);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "faction", faction);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "ranks", ranks.getRankSystem());
+		if(ranks.getRankSystem() == Ranks.RS_CUSTOM) {
+			MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "officerCut", ranks.getOfficerCut());
+			MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "rankNames", ranks.getRankNameList());
+		}
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "nameGen", rng.getChosenFaction());
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "percentFemale", rng.getPercentFemale());
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "overtime", overtime);
@@ -1845,7 +1849,14 @@ public class Campaign implements Serializable {
 					retVal.faction = Integer.parseInt(wn.getTextContent()
 							.trim());
 				} else if (xn.equalsIgnoreCase("ranks")) {
-					retVal.ranks = new Ranks(Integer.parseInt(wn.getTextContent().trim()));
+					int rankSystem = Integer.parseInt(wn.getTextContent().trim());
+					if(rankSystem != Ranks.RS_CUSTOM) {
+						retVal.ranks = new Ranks(rankSystem);
+					}
+				} else if (xn.equalsIgnoreCase("officerCut")) {
+					retVal.ranks.setOfficerCut(Integer.parseInt(wn.getTextContent().trim()));
+				} else if (xn.equalsIgnoreCase("rankNames")) {
+					retVal.ranks.setRanksFromList(wn.getTextContent().trim());
 				} else if (xn.equalsIgnoreCase("gmMode")) {
 					if (wn.getTextContent().trim().equals("true"))
 						retVal.gmMode = true;

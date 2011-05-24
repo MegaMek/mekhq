@@ -6,13 +6,18 @@
 
 package mekhq;
 
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.image.BufferedImage;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
 
@@ -151,6 +156,14 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         textRanks = new javax.swing.JTextArea();
         scrRanks = new javax.swing.JScrollPane();
 
+        textCustomRanks = new javax.swing.JTextArea();
+        checkCustomRanks = new javax.swing.JCheckBox();
+        testCustomRanks = new javax.swing.JButton();
+        scrCustomRanks = new javax.swing.JScrollPane();
+        choiceOfficerCut = new javax.swing.JComboBox();
+        lblOfficerCut = new javax.swing.JLabel();
+
+        
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
         getContentPane().setLayout(new java.awt.GridBagLayout());
@@ -535,14 +548,28 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panRank.add(lblRank, gridBagConstraints);      
         
         DefaultComboBoxModel rankModel = new DefaultComboBoxModel();
         for(int i = 0; i < Ranks.RS_NUM; i++) {
             rankModel.addElement(Ranks.getRankSystemName(i));
         }
-        rankModel.setSelectedItem(Ranks.getRankSystemName(campaign.getRanks().getRankSystem()));
+        if(campaign.getRanks().getRankSystem() == Ranks.RS_CUSTOM) {
+        	rankModel.setSelectedItem(Ranks.getRankSystemName(Ranks.RS_SL));
+        	comboRanks.setEnabled(false);
+        	checkCustomRanks.setSelected(true);
+        	testCustomRanks.setEnabled(true);
+			textCustomRanks.setEnabled(true);
+			choiceOfficerCut.setEnabled(true);
+        	textCustomRanks.setText(campaign.getRanks().getRankNameList());
+        } else {
+        	rankModel.setSelectedItem(Ranks.getRankSystemName(campaign.getRanks().getRankSystem()));
+        	checkCustomRanks.setSelected(false);
+           	testCustomRanks.setEnabled(false);
+			textCustomRanks.setEnabled(false);
+			choiceOfficerCut.setEnabled(false);
+        }
         comboRanks.setModel(rankModel);
         comboRanks.setName("comboRanks"); // NOI18N
         comboRanks.addActionListener(new java.awt.event.ActionListener() {
@@ -553,9 +580,84 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panRank.add(comboRanks, gridBagConstraints);
 
+        checkCustomRanks.setText(resourceMap.getString("checkCustomRanks.text"));
+        checkCustomRanks.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent evt) {
+				fillRankInfo();
+				if(checkCustomRanks.isSelected()) {
+					comboRanks.setEnabled(false);
+					textCustomRanks.setEnabled(true);
+					testCustomRanks.setEnabled(true);
+					choiceOfficerCut.setEnabled(true);
+				} else {
+					comboRanks.setEnabled(true);
+					testCustomRanks.setEnabled(false);
+					textCustomRanks.setEnabled(false);
+					choiceOfficerCut.setEnabled(false);
+				}
+			}
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panRank.add(checkCustomRanks, gridBagConstraints);
+        
+        testCustomRanks.setText(resourceMap.getString("testCustomRanks.text"));
+        testCustomRanks.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            	fillRankInfo();
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panRank.add(testCustomRanks, gridBagConstraints);
+        
+        textCustomRanks.setToolTipText(resourceMap.getString("textCustomRanks.toolTipText"));
+        textCustomRanks.setEditable(true);
+        textCustomRanks.setLineWrap(true);
+        textCustomRanks.setWrapStyleWord(true);
+        scrCustomRanks.setViewportView(textCustomRanks);
+        scrCustomRanks.setPreferredSize(new Dimension(150,100));
+        scrCustomRanks.setMinimumSize(new Dimension(150,100));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 2;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+		gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        panRank.add(scrCustomRanks, gridBagConstraints);
+    
+        lblOfficerCut.setText(resourceMap.getString("lblOfficerCut.text"));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+		gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panRank.add(lblOfficerCut, gridBagConstraints);
+        
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+		gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panRank.add(choiceOfficerCut, gridBagConstraints);
+        
         fillRankInfo();
         textRanks.setEditable(false);
         scrRanks.setViewportView(textRanks);
@@ -566,6 +668,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 1.0;
+		gridBagConstraints.gridheight = 4;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
 		panRank.add(scrRanks, gridBagConstraints);
         
         tabOptions.addTab(resourceMap.getString("panRank.TabConstraints.tabTitle"), panRank); // NOI18N
@@ -706,8 +811,24 @@ private void txtNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
 	
 	private void fillRankInfo() {
 		String ranks = "";
-		for(String r : Ranks.getRankSystem(comboRanks.getSelectedIndex())) {
-			ranks = ranks + r + "\n";
+		if(checkCustomRanks.isSelected()) {
+			DefaultComboBoxModel officerModel = new DefaultComboBoxModel();
+			String[] customRanks = textCustomRanks.getText().split(",");
+			for(String r : customRanks) {
+				r = r.trim();
+				ranks = ranks + r + "\n";
+				officerModel.addElement(r);
+			}
+			choiceOfficerCut.setModel(officerModel);
+			if(campaign.getRanks().getOfficerCut() < officerModel.getSize()) {
+				choiceOfficerCut.setSelectedIndex(campaign.getRanks().getOfficerCut());
+			} else if(officerModel.getSize() > 0){
+				choiceOfficerCut.setSelectedIndex(0);
+			}
+		} else {
+			for(String r : Ranks.getRankSystem(comboRanks.getSelectedIndex())) {
+				ranks = ranks + r + "\n";
+			}
 		}
 		textRanks.setText(ranks);
 	}
@@ -732,8 +853,20 @@ private void btnOkayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
     	campaign.getRNG().setChosenFaction((String)comboFactionNames.getSelectedItem());
     }
     campaign.getRNG().setPerentFemale(sldGender.getValue());
-    if(campaign.getRanks().getRankSystem() != comboRanks.getSelectedIndex()) {
-    	campaign.setRankSystem(comboRanks.getSelectedIndex());
+    if(checkCustomRanks.isSelected()) {
+    	ArrayList<String> customRanks = new ArrayList<String>();
+    	String[] customRankNames = textCustomRanks.getText().split(",");
+		for(String name : customRankNames) {
+			name = name.trim();
+			customRanks.add(name);
+		}
+		if(customRanks.size() > 0) {
+			campaign.getRanks().setCustomRanks(customRanks, choiceOfficerCut.getSelectedIndex());
+		}
+    } else {
+    	if(campaign.getRanks().getRankSystem() != comboRanks.getSelectedIndex()) {
+    		campaign.setRankSystem(comboRanks.getSelectedIndex());
+    	}
     }
     campaign.setCamoCategory(camoCategory);
     campaign.setCamoFileName(camoFileName);
@@ -895,6 +1028,15 @@ public String getDateAsString() {
     
     private javax.swing.JTextArea textRanks;
     private javax.swing.JScrollPane scrRanks;
+    
+    private javax.swing.JTextArea textCustomRanks;
+    private javax.swing.JCheckBox checkCustomRanks;
+    private javax.swing.JButton testCustomRanks;
+    private javax.swing.JScrollPane scrCustomRanks;
+    private javax.swing.JComboBox choiceOfficerCut;
+    private javax.swing.JLabel lblOfficerCut;
+
+
     // End of variables declaration//GEN-END:variables
 
 }
