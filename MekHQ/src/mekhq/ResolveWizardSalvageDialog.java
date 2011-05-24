@@ -22,6 +22,7 @@
 package mekhq;
 
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.GridBagLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -81,6 +82,7 @@ public class ResolveWizardSalvageDialog extends javax.swing.JDialog {
         }
         formatter = new DecimalFormat();
         initComponents();
+        setLocationRelativeTo(parent);
     }
 
     private void initComponents() {
@@ -316,7 +318,7 @@ public class ResolveWizardSalvageDialog extends javax.swing.JDialog {
     		}
     	}
     	this.setVisible(false);
-    	ResolveWizardFinalCheckDialog resolveDialog = new ResolveWizardFinalCheckDialog(null, true, tracker);
+    	ResolveWizardFinalCheckDialog resolveDialog = new ResolveWizardFinalCheckDialog((Frame)getParent(), true, tracker);
     	resolveDialog.setVisible(true);
     }
 

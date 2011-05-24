@@ -58,6 +58,7 @@ public class CustomizeSupportTeamDialog extends javax.swing.JDialog {
         this.person = person;
         this.newHire = hire;       
         refreshPerson();
+        setLocationRelativeTo(parent);
     }
 
     private void refreshPerson() {	

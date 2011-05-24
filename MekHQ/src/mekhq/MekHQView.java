@@ -1837,7 +1837,7 @@ public class MekHQView extends FrameView {
 					    "Pending Scenarios",
 					    JOptionPane.WARNING_MESSAGE);
 			} else {
-				CompleteMissionDialog cmd = new CompleteMissionDialog(null, true, mission);
+				CompleteMissionDialog cmd = new CompleteMissionDialog(getFrame(), true, mission);
 				cmd.setVisible(true);
 				if(!mission.isActive()) {
 					if(campaign.getActiveMissions().size() > 0) {
@@ -1854,7 +1854,7 @@ public class MekHQView extends FrameView {
 	private void btnAddScenarioActionPerformed(java.awt.event.ActionEvent evt) {
 		Mission m = campaign.getMission(selectedMission);
 		if(null != m) {
-			CustomizeScenarioDialog csd = new CustomizeScenarioDialog(null, true, null, m, campaign);
+			CustomizeScenarioDialog csd = new CustomizeScenarioDialog(getFrame(), true, null, m, campaign);
 			csd.setVisible(true);
 			refreshScenarioList();
 		}
@@ -2613,7 +2613,7 @@ public class MekHQView extends FrameView {
 		if(null == scenario) {
 			return;
 		}
-		ResolveWizardChooseFilesDialog resolveDialog = new ResolveWizardChooseFilesDialog(null, true, new ResolveScenarioTracker(scenario, campaign));
+		ResolveWizardChooseFilesDialog resolveDialog = new ResolveWizardChooseFilesDialog(this.getFrame(), true, new ResolveScenarioTracker(scenario, campaign));
 		resolveDialog.setVisible(true);
 		
 		refreshScenarioList();
@@ -4128,7 +4128,7 @@ public class MekHQView extends FrameView {
             	refreshServicedUnitList();
             } else if(command.contains("CHANGE_ICON")) {
             	if(null != force) {
-            		PortraitChoiceDialog pcd = new PortraitChoiceDialog(null, true,
+            		PortraitChoiceDialog pcd = new PortraitChoiceDialog(getFrame(), true,
     						force.getIconCategory(),
     						force.getIconFileName(), forceIcons);
     				pcd.setVisible(true);
@@ -4151,7 +4151,7 @@ public class MekHQView extends FrameView {
             	}
             } else if(command.contains("CHANGE_DESC")) {
             	if(null != force) {
-            		TextAreaDialog tad = new TextAreaDialog(null, true,
+            		TextAreaDialog tad = new TextAreaDialog(getFrame(), true,
     						"Edit Force Description",
     						force.getDescription());
     				tad.setVisible(true);
@@ -4672,7 +4672,7 @@ public class MekHQView extends FrameView {
 				refreshPersonnelList();
 				refreshOrganization();
 			} else if (command.equalsIgnoreCase("PORTRAIT")) {
-				PortraitChoiceDialog pcd = new PortraitChoiceDialog(null, true,
+				PortraitChoiceDialog pcd = new PortraitChoiceDialog(getFrame(), true,
 						selectedPerson.getPortraitCategory(),
 						selectedPerson.getPortraitFileName(), portraits);
 				pcd.setVisible(true);
@@ -4682,7 +4682,7 @@ public class MekHQView extends FrameView {
 				refreshPersonnelList();
 				refreshOrganization();
 			} else if (command.equalsIgnoreCase("BIOGRAPHY")) {
-				TextAreaDialog tad = new TextAreaDialog(null, true,
+				TextAreaDialog tad = new TextAreaDialog(getFrame(), true,
 						"Edit Biography",
 						selectedPerson.getBiography());
 				tad.setVisible(true);
@@ -4698,7 +4698,7 @@ public class MekHQView extends FrameView {
 				refreshPersonnelList();
 			} else if (command.equalsIgnoreCase("XP_SET")) {
 				PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(
-						null, true, "XP", selectedPerson.getXp(), 0, Math.max(selectedPerson.getXp()+10,100));
+						getFrame(), true, "XP", selectedPerson.getXp(), 0, Math.max(selectedPerson.getXp()+10,100));
 				pvcd.setVisible(true);
 				int i = pvcd.getValue();
 				selectedPerson.setXp(i);
@@ -4708,7 +4708,7 @@ public class MekHQView extends FrameView {
 				if(selectedPerson instanceof PilotPerson) {
 					PilotPerson pp = (PilotPerson)selectedPerson;
 					PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(
-							null, true, "Edge", pp.getEdge(), 0, 10);
+							getFrame(), true, "Edge", pp.getEdge(), 0, 10);
 					pvcd.setVisible(true);
 					int i = pvcd.getValue();
 					pp.setEdge(i);
@@ -6005,7 +6005,7 @@ public class MekHQView extends FrameView {
 			Mission mission = campaign.getMission(selectedMission);
 			if (command.equalsIgnoreCase("EDIT")) {
 				if(null != mission && null != scenario) {
-					CustomizeScenarioDialog csd = new CustomizeScenarioDialog(null, true, scenario, mission, campaign);
+					CustomizeScenarioDialog csd = new CustomizeScenarioDialog(getFrame(), true, scenario, mission, campaign);
 					csd.setVisible(true);
 					refreshScenarioList();
 				}

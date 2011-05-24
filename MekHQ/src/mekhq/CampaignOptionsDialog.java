@@ -66,6 +66,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         this.camos = camos;
         initComponents();
         setCamoIcon();
+        setLocationRelativeTo(parent);
         
         // Rules panel
         useFactionModifiersCheckBox.setSelected(options.useFactionModifiers());

@@ -64,6 +64,7 @@ public class CustomizePilotDialog extends javax.swing.JDialog implements DialogO
         this.person = person;
         this.newHire = hire;
         initializePilotAndOptions();
+        setLocationRelativeTo(parent);
     }
 
     private void initializePilotAndOptions () {

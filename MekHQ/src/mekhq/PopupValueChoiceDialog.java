@@ -27,6 +27,7 @@ public class PopupValueChoiceDialog extends javax.swing.JDialog {
         model = new javax.swing.SpinnerNumberModel(current, min, max, 1);
         initComponents();      
         label.setText(title);
+        setLocationRelativeTo(parent);
     }
 
     /** This method is called from within the constructor to

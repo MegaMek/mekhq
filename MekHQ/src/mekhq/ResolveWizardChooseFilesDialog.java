@@ -22,6 +22,7 @@
 package mekhq;
 
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.GridBagLayout;
 
 import javax.swing.BorderFactory;
@@ -52,6 +53,7 @@ public class ResolveWizardChooseFilesDialog extends javax.swing.JDialog {
         super(parent, modal);
         this.tracker = t;
         initComponents();
+        setLocationRelativeTo(parent);
     }
 
     private void initComponents() {
@@ -210,20 +212,20 @@ public class ResolveWizardChooseFilesDialog extends javax.swing.JDialog {
     	tracker.processMulFiles();
     	this.setVisible(false);
     	if(tracker.getMissingUnits().size() > 0) {
-    		ResolveWizardMissingUnitsDialog resolveDialog = new ResolveWizardMissingUnitsDialog(null, true, tracker);
+    		ResolveWizardMissingUnitsDialog resolveDialog = new ResolveWizardMissingUnitsDialog((Frame)getParent(), true, tracker);
     		resolveDialog.setVisible(true);
     	} else if(tracker.getMissingPilots().size() > 0) {
-    		ResolveWizardMissingPilotsDialog resolveDialog = new ResolveWizardMissingPilotsDialog(null, true, tracker);
+    		ResolveWizardMissingPilotsDialog resolveDialog = new ResolveWizardMissingPilotsDialog((Frame)getParent(), true, tracker);
     		resolveDialog.setVisible(true);
     	} else if(tracker.getDeadPilots().size() > 0) {
-    		ResolveWizardCasualtiesDialog resolveDialog = new ResolveWizardCasualtiesDialog(null, true, tracker);
+    		ResolveWizardCasualtiesDialog resolveDialog = new ResolveWizardCasualtiesDialog((Frame)getParent(), true, tracker);
     		resolveDialog.setVisible(true);
     	} else if(tracker.getPotentialSalvage().size() > 0 
     			&& (!(tracker.getMission() instanceof Contract) || ((Contract)tracker.getMission()).canSalvage())) {
-    		ResolveWizardSalvageDialog resolveDialog = new ResolveWizardSalvageDialog(null, true, tracker);
+    		ResolveWizardSalvageDialog resolveDialog = new ResolveWizardSalvageDialog((Frame)getParent(), true, tracker);
     		resolveDialog.setVisible(true);
     	} else {
-    		ResolveWizardFinalCheckDialog resolveDialog = new ResolveWizardFinalCheckDialog(null, true, tracker);
+    		ResolveWizardFinalCheckDialog resolveDialog = new ResolveWizardFinalCheckDialog((Frame)getParent(), true, tracker);
     		resolveDialog.setVisible(true);
     	}
     }

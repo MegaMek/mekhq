@@ -23,7 +23,8 @@ public class CompleteMissionDialog extends javax.swing.JDialog {
     public CompleteMissionDialog(java.awt.Frame parent, boolean modal, Mission m) {
         super(parent, modal);  
         this.mission = m;
-        initComponents();      
+        initComponents();     
+        setLocationRelativeTo(parent);
     }
 
     /** This method is called from within the constructor to

@@ -73,6 +73,7 @@ public class UnitSelectorDialog extends JDialog {
         
         MechSummary [] allMechs = MechSummaryCache.getInstance().getAllMechs();
         setMechs(allMechs);
+        setLocationRelativeTo(parent);
     }
 
     /** This method is called from within the constructor to

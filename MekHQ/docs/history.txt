@@ -60,6 +60,7 @@ v0.1.7 (SVN)
 + added planetary location fields to contracts and missions
 + Transport terms for contracts
 + contract start date (contracts are done!)
++ set the location of all dialogs so that they center on the main frame
 
 v0.1.6 (2011-05-17)
 + beginning of Briefing Room tab

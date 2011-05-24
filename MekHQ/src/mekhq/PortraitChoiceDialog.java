@@ -60,6 +60,7 @@ public class PortraitChoiceDialog extends javax.swing.JDialog {
             }
         }
         tablePortrait.setRowSelectionInterval(rowIndex, rowIndex);
+        setLocationRelativeTo(parent);
     }
 
     /** This method is called from within the constructor to

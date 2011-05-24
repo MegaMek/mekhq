@@ -55,6 +55,7 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
         }
         campaign = c;
         initComponents();
+        setLocationRelativeTo(parent);
     }
 
     private void initComponents() {

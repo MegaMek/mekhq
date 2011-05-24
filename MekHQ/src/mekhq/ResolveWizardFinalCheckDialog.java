@@ -69,6 +69,7 @@ public class ResolveWizardFinalCheckDialog extends javax.swing.JDialog {
         super(parent, modal);
         this.tracker = t;
         initComponents();
+        setLocationRelativeTo(parent);
     }
 
     private void initComponents() {

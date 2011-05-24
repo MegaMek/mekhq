@@ -68,6 +68,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         formatter = new DecimalFormat();
         dateFormatter = new SimpleDateFormat("EEEE, MMMM d yyyy");
         initComponents();
+        setLocationRelativeTo(parent);
     }
 
     private void initComponents() {
