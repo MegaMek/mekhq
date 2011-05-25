@@ -162,8 +162,6 @@ public class Campaign implements Serializable {
 
 	private Finances finances;
 
-	private transient Hashtable<String, Planet> planets = new Hashtable<String, Planet>();
-
 	private CurrentLocation location;
 	
 	private CampaignOptions campaignOptions = new CampaignOptions();
@@ -187,16 +185,7 @@ public class Campaign implements Serializable {
 		forceIds.put(new Integer(lastForceId), forces);
 		lastForceId++;
 		finances = new Finances();
-		try {
-			planets = generatePlanets();
-		} catch (DOMException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		location = new CurrentLocation(planets.get("Outreach"), 0);
+		location = new CurrentLocation(Planets.getInstance().get("Outreach"), 0);
 	}
 
 	public String getName() {
@@ -1085,15 +1074,6 @@ public class Campaign implements Serializable {
 				unit.getEntity().restore();
 			}
 		}
-		try {
-			planets = generatePlanets();
-		} catch (DOMException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} 
 	}
 
 	public boolean isOvertimeAllowed() {
@@ -1894,90 +1874,24 @@ public class Campaign implements Serializable {
 		}
 	}
 	
-	public static Hashtable<String,Planet> generatePlanets()
-		throws DOMException, ParseException {
-		MekHQApp.logMessage("Starting load of planetary data from XML...");
-		// Initialize variables.
-		Hashtable<String,Planet> retVal = new Hashtable<String,Planet>();
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		Document xmlDoc = null;
-
-		
-		try {
-			FileInputStream fis = new FileInputStream("data/planets.xml");
-			// Using factory get an instance of document builder
-			DocumentBuilder db = dbf.newDocumentBuilder();
-
-			// Parse using builder to get DOM representation of the XML file
-			xmlDoc = db.parse(fis);
-		} catch (Exception ex) {
-			MekHQApp.logError(ex);
-		}
-
-		Element planetEle = xmlDoc.getDocumentElement();
-		NodeList nl = planetEle.getChildNodes();
-
-		// Get rid of empty text nodes and adjacent text nodes...
-		// Stupid weird parsing of XML.  At least this cleans it up.
-		planetEle.normalize(); 
-
-		// Okay, lets iterate through the children, eh?
-		for (int x = 0; x < nl.getLength(); x++) {
-			Node wn = nl.item(x);
-
-			if (wn.getParentNode() != planetEle)
-				continue;
-
-			int xc = wn.getNodeType();
-
-			if (xc == Node.ELEMENT_NODE) {
-				// This is what we really care about.
-				// All the meat of our document is in this node type, at this
-				// level.
-				// Okay, so what element is it?
-				String xn = wn.getNodeName();
-
-				if (xn.equalsIgnoreCase("planet")) {
-					Planet p = Planet.getPlanetFromXML(wn);
-					String name = p.getName();
-					if(null == retVal.get(name)) {
-						retVal.put(name, p);
-					} else {
-						//for duplicate planets, put a faction name behind them
-						//There could still be duplicates in theory, but I don't think there are in practice
-						Planet oldPlanet = retVal.get(name);
-						retVal.remove(name);
-						oldPlanet.resetName(oldPlanet.getName() + " (" + Faction.getFactionName(oldPlanet.getBaseFaction()) + ")");
-						retVal.put(oldPlanet.getName(), oldPlanet);
-						p.resetName(p.getName() + " (" + Faction.getFactionName(p.getBaseFaction()) + ")");
-						retVal.put(p.getName(), p);
-					}
-					
-				}
-			}
-		}	
-		MekHQApp.logMessage("Loaded a total of " + retVal.size() + " planets");
-		return retVal;
-	}
-	
 	public ArrayList<Planet> getPlanets() {
 		ArrayList<Planet> plnts = new ArrayList<Planet>();
-		for(String key : planets.keySet()) {
-			plnts.add(planets.get(key));
+		for(String key : Planets.getInstance().keySet()) {
+			plnts.add(Planets.getInstance().get(key));
 		}
 		return plnts;
 	}
 	
 	public Vector<String> getPlanetNames() {
 		Vector<String> plntNames = new Vector<String>();
-		for(String key : planets.keySet()) {
+		for(String key : Planets.getInstance().keySet()) {
 			plntNames.add(key);
 		}
 		return plntNames;
 	}
 	
 	public Planet getPlanet(String name) {
-		return planets.get(name);
+		return Planets.getInstance().get(name);
 	}
 	
 	/**
@@ -2117,7 +2031,7 @@ public class Campaign implements Serializable {
 		boolean found = false;
 		int jumps = 0;
 		
-		Planet end = planets.get(endKey);
+		Planet end = Planets.getInstance().get(endKey);
 		
 		//we are going to through and set up some hashes that will make our work easier
 		//hash of parent key
@@ -2127,8 +2041,8 @@ public class Campaign implements Serializable {
 		//hash of G for each planet which might change
 		Hashtable<String,Integer> scoreG = new Hashtable<String,Integer>();
 
-		for(String key : planets.keySet()) {
-			scoreH.put(key, end.getDistanceTo(planets.get(key)));
+		for(String key : Planets.getInstance().keySet()) {
+			scoreH.put(key, end.getDistanceTo(Planets.getInstance().get(key)));
 		}
 		scoreG.put(current, 0);
 		closed.add(current);
@@ -2136,7 +2050,7 @@ public class Campaign implements Serializable {
 		while(!found && jumps < 10000) {
 			jumps++;
 			int currentG = scoreG.get(current) + 1;
-			ArrayList<String> neighborKeys = getAllReachablePlanetsFrom(planets.get(current));
+			ArrayList<String> neighborKeys = getAllReachablePlanetsFrom(Planets.getInstance().get(current));
 			for(String neighborKey : neighborKeys) {
 				if(closed.contains(neighborKey)) {
 					continue;
@@ -2177,7 +2091,7 @@ public class Campaign implements Serializable {
 		ArrayList<Planet> path = new ArrayList<Planet>();
 		String nextKey = current;
 		while(null != nextKey) {
-			path.add(planets.get(nextKey));
+			path.add(Planets.getInstance().get(nextKey));
 			//MekHQApp.logMessage(nextKey);
 			nextKey = parent.get(nextKey);
 			
@@ -2192,8 +2106,8 @@ public class Campaign implements Serializable {
 	
 	public ArrayList<String> getAllReachablePlanetsFrom(Planet planet) {
 		ArrayList<String> neighbors = new ArrayList<String>();
-		for(String key : planets.keySet()) {
-			Planet p = planets.get(key);
+		for(String key : Planets.getInstance().keySet()) {
+			Planet p = Planets.getInstance().get(key);
 			if(planet.getDistanceTo(p) <= 30.0) {
 				neighbors.add(key);
 			}

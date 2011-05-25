@@ -119,6 +119,7 @@ import mekhq.campaign.Force;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.PartInventory;
 import mekhq.campaign.Planet;
+import mekhq.campaign.Planets;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.SkillCosts;
 import mekhq.campaign.Unit;
@@ -222,7 +223,7 @@ public class MekHQView extends FrameView {
 		}
 	}
 
-	private Campaign campaign = new Campaign();
+	private Campaign campaign;
 	private TaskTableModel taskModel = new TaskTableModel();
 	private AcquisitionTableModel acquireModel = new AcquisitionTableModel();
 	private ServicedUnitTableModel servicedUnitModel = new ServicedUnitTableModel();
@@ -264,6 +265,10 @@ public class MekHQView extends FrameView {
 	public MekHQView(SingleFrameApplication app) {
 		super(app);
 
+		//load planets
+		Planets.initialize();
+		
+		campaign = new Campaign();
 		unitMouseAdapter = new UnitTableMouseAdapter();
 		servicedUnitMouseAdapter = new ServicedUnitsTableMouseAdapter();
 		partsMouseAdapter = new PartsTableMouseAdapter();
