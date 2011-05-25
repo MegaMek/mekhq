@@ -171,10 +171,27 @@ public class ResolveScenarioTracker {
 				e.printStackTrace();
 			}
 		}
-		
+		checkSalvageForPilotsAndUnits() ;
 		identifyMissingUnits();
 		identifyMissingPilots();
 		checkForCasualties();
+	}
+	
+	/**
+	 * Sometimes pilots and units from the players own forces will end up in salvage so lets check for
+	 * them and remove them from salvage if we find them there
+	 */
+	public void checkSalvageForPilotsAndUnits() {
+		for(Unit u : units) {
+			Entity match = getMatch(u.getEntity(), potentialSalvage);
+			if(null != match) {
+				entities.add(match);
+				if(null != match.getCrew()) {
+					pilots.add(match.getCrew());
+				}
+				potentialSalvage.remove(match);
+			}
+		}
 	}
 	
 	
@@ -285,6 +302,15 @@ public class ResolveScenarioTracker {
 			}
 		}
 		return false;
+	}
+	
+	private Entity getMatch(Entity en, ArrayList<Entity> ents) {
+		for(Entity otherEntity : ents) {
+			if(otherEntity.getExternalId() == en.getExternalId()) {
+				return otherEntity;
+			}
+		}
+		return null;
 	}
 	
 	private boolean foundMatch(Pilot p, ArrayList<Pilot> pils) {
