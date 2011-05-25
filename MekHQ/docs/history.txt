@@ -67,6 +67,7 @@ v0.1.7 (SVN)
 + Bug 3304919: Selling of  Parts error
 + Bug 3306402: Resolution wizard
 + separate Planets object that keeps a static hash of all planets so it isn't reloaded every time campaign is loaded
++ make Planets.java more like MechSummaryCache.java
 
 v0.1.6 (2011-05-17)
 + beginning of Briefing Room tab

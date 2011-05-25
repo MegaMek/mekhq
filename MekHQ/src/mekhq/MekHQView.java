@@ -265,10 +265,6 @@ public class MekHQView extends FrameView {
 	public MekHQView(SingleFrameApplication app) {
 		super(app);
 
-		//load planets
-		Planets.initialize();
-		
-		campaign = new Campaign();
 		unitMouseAdapter = new UnitTableMouseAdapter();
 		servicedUnitMouseAdapter = new ServicedUnitsTableMouseAdapter();
 		partsMouseAdapter = new PartsTableMouseAdapter();
@@ -276,7 +272,25 @@ public class MekHQView extends FrameView {
 		personnelMouseAdapter = new PersonnelTableMouseAdapter(this);
 		orgMouseAdapter = new OrgTreeMouseAdapter();
 		scenarioMouseAdapter = new ScenarioTableMouseAdapter();
-
+       	
+		//load planets and mech cache
+		Planets.getInstance();
+		MechSummaryCache.getInstance();
+		/*
+		 * TODO: This isnt working for some reason - the dialog pops up, but it wont show
+		 * its contents until everything else here is done initializing
+		DataLoadingDialog dataLoadingDialog = new DataLoadingDialog(getFrame());
+		dataLoadingDialog.setVisible(true);
+		while (!Planets.getInstance().isInitialized() || !MechSummaryCache.getInstance().isInitialized()) {      	
+			dataLoadingDialog.updateProgress();
+			try {
+				Thread.sleep(50);
+			} catch (InterruptedException e) {
+				// not supposed to come here
+			}
+		}
+		dataLoadingDialog.setVisible(false);
+*/
 		//load in directory items and tilesets
 		try {
             portraits = new DirectoryItems(new File("data/images/portraits"), "", //$NON-NLS-1$ //$NON-NLS-2$
@@ -303,10 +317,11 @@ public class MekHQView extends FrameView {
         	MekHQApp.logError(ex);
             //TODO: do something here
         }
-		
+
+        campaign = new Campaign();
 		initComponents();
 		refreshCalendar();
-		
+		       
 		// status bar initialization - message timeout, idle icon and busy
 		// animation, etc
 		ResourceMap resourceMap = getResourceMap();

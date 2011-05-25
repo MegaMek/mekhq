@@ -17,19 +17,36 @@ import mekhq.MekHQApp;
 
 public class Planets {
 	
-	private static Hashtable<String, Planet> planets = new Hashtable<String, Planet>();
+	private boolean initialized = false;
+	private boolean initializing = false;
+	private static Planets planets;
+	private static Hashtable<String, Planet> planetList = new Hashtable<String, Planet>();
+    private Thread loader;
 
-	public static Hashtable<String, Planet> getInstance() {
-		
-		if(null == planets) {
-			initialize();
-		}
+    private Planets() {
+        planetList = new Hashtable<String, Planet>();
+    }
+	
+	public static Planets getInstance() {
+		if (planets == null) {
+            planets = new Planets();
+        }
+        if (!planets.initialized && !planets.initializing) {
+            planets.initializing = true;
+            planets.loader = new Thread(new Runnable() {
+                public void run() {
+                    planets.initialize();
+                }
+            }, "Planet Loader");
+            planets.loader.setPriority(Thread.NORM_PRIORITY - 1);
+            planets.loader.start();
+        }
 		return planets;	
 	}
 	
-	public static void initialize() {
+	private void initialize() {
 		try {
-			planets = generatePlanets();
+			planetList = generatePlanets();
 		} catch (DOMException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -39,7 +56,20 @@ public class Planets {
 		}
 	}
 	
-	public static Hashtable<String,Planet> generatePlanets() throws DOMException, ParseException {
+	public Hashtable<String, Planet> getPlanets() {
+		return planetList;
+	}
+	
+	private void done() {
+        initialized = true;
+        initializing = false;
+	}
+	
+	public boolean isInitialized() {
+        return initialized;
+    }
+	
+	public Hashtable<String,Planet> generatePlanets() throws DOMException, ParseException {
 		MekHQApp.logMessage("Starting load of planetary data from XML...");
 		// Initialize variables.
 		Hashtable<String,Planet> retVal = new Hashtable<String,Planet>();
@@ -101,6 +131,7 @@ public class Planets {
 			}
 		}	
 		MekHQApp.logMessage("Loaded a total of " + retVal.size() + " planets");
+		done();
 		return retVal;
 	}
 	

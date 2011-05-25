@@ -185,7 +185,7 @@ public class Campaign implements Serializable {
 		forceIds.put(new Integer(lastForceId), forces);
 		lastForceId++;
 		finances = new Finances();
-		location = new CurrentLocation(Planets.getInstance().get("Outreach"), 0);
+		location = new CurrentLocation(Planets.getInstance().getPlanets().get("Outreach"), 0);
 	}
 
 	public String getName() {
@@ -1876,22 +1876,22 @@ public class Campaign implements Serializable {
 	
 	public ArrayList<Planet> getPlanets() {
 		ArrayList<Planet> plnts = new ArrayList<Planet>();
-		for(String key : Planets.getInstance().keySet()) {
-			plnts.add(Planets.getInstance().get(key));
+		for(String key : Planets.getInstance().getPlanets().keySet()) {
+			plnts.add(Planets.getInstance().getPlanets().get(key));
 		}
 		return plnts;
 	}
 	
 	public Vector<String> getPlanetNames() {
 		Vector<String> plntNames = new Vector<String>();
-		for(String key : Planets.getInstance().keySet()) {
+		for(String key : Planets.getInstance().getPlanets().keySet()) {
 			plntNames.add(key);
 		}
 		return plntNames;
 	}
 	
 	public Planet getPlanet(String name) {
-		return Planets.getInstance().get(name);
+		return Planets.getInstance().getPlanets().get(name);
 	}
 	
 	/**
@@ -2031,7 +2031,7 @@ public class Campaign implements Serializable {
 		boolean found = false;
 		int jumps = 0;
 		
-		Planet end = Planets.getInstance().get(endKey);
+		Planet end = Planets.getInstance().getPlanets().get(endKey);
 		
 		//we are going to through and set up some hashes that will make our work easier
 		//hash of parent key
@@ -2041,8 +2041,8 @@ public class Campaign implements Serializable {
 		//hash of G for each planet which might change
 		Hashtable<String,Integer> scoreG = new Hashtable<String,Integer>();
 
-		for(String key : Planets.getInstance().keySet()) {
-			scoreH.put(key, end.getDistanceTo(Planets.getInstance().get(key)));
+		for(String key : Planets.getInstance().getPlanets().keySet()) {
+			scoreH.put(key, end.getDistanceTo(Planets.getInstance().getPlanets().get(key)));
 		}
 		scoreG.put(current, 0);
 		closed.add(current);
@@ -2050,7 +2050,7 @@ public class Campaign implements Serializable {
 		while(!found && jumps < 10000) {
 			jumps++;
 			int currentG = scoreG.get(current) + 1;
-			ArrayList<String> neighborKeys = getAllReachablePlanetsFrom(Planets.getInstance().get(current));
+			ArrayList<String> neighborKeys = getAllReachablePlanetsFrom(Planets.getInstance().getPlanets().get(current));
 			for(String neighborKey : neighborKeys) {
 				if(closed.contains(neighborKey)) {
 					continue;
@@ -2091,7 +2091,7 @@ public class Campaign implements Serializable {
 		ArrayList<Planet> path = new ArrayList<Planet>();
 		String nextKey = current;
 		while(null != nextKey) {
-			path.add(Planets.getInstance().get(nextKey));
+			path.add(Planets.getInstance().getPlanets().get(nextKey));
 			//MekHQApp.logMessage(nextKey);
 			nextKey = parent.get(nextKey);
 			
@@ -2106,8 +2106,8 @@ public class Campaign implements Serializable {
 	
 	public ArrayList<String> getAllReachablePlanetsFrom(Planet planet) {
 		ArrayList<String> neighbors = new ArrayList<String>();
-		for(String key : Planets.getInstance().keySet()) {
-			Planet p = Planets.getInstance().get(key);
+		for(String key : Planets.getInstance().getPlanets().keySet()) {
+			Planet p = Planets.getInstance().getPlanets().get(key);
 			if(planet.getDistanceTo(p) <= 30.0) {
 				neighbors.add(key);
 			}
