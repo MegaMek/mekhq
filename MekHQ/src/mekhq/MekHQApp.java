@@ -78,9 +78,6 @@ public class MekHQApp extends SingleFrameApplication {
         
         //redirect output to log file
         redirectOutput();
-        
-        //init the summary cache
-        MechSummaryCache.getInstance();
               
         System.setProperty("apple.laf.useScreenMenuBar", "true");
         
