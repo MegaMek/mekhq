@@ -39,7 +39,7 @@ public class DataLoadingDialog extends JDialog {
     private JProgressBar progressBar;
  
     public DataLoadingDialog(JFrame frame) {
-        super(frame, "Please Wait test"); //$NON-NLS-1$
+        super(frame, "Data Loading"); //$NON-NLS-1$
        
         progressBar = new JProgressBar(0, 2);
         progressBar.setValue(0);

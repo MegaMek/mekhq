@@ -69,6 +69,7 @@ v0.1.7 (SVN)
 + separate Planets object that keeps a static hash of all planets so it isn't reloaded every time campaign is loaded
 + make Planets.java more like MechSummaryCache.java
 + remove MechSummaryCache loading from MekHQApp
++ DataLoadingDialog (not fully working)
 
 v0.1.6 (2011-05-17)
 + beginning of Briefing Room tab

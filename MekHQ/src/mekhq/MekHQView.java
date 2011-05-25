@@ -274,11 +274,10 @@ public class MekHQView extends FrameView {
 		scenarioMouseAdapter = new ScenarioTableMouseAdapter();
        	
 		//load planets and mech cache
-		Planets.getInstance();
-		MechSummaryCache.getInstance();
 		/*
 		 * TODO: This isnt working for some reason - the dialog pops up, but it wont show
-		 * its contents until everything else here is done initializing
+		 * its contents until verything else in the constructor is done initializing
+		*/
 		DataLoadingDialog dataLoadingDialog = new DataLoadingDialog(getFrame());
 		dataLoadingDialog.setVisible(true);
 		while (!Planets.getInstance().isInitialized() || !MechSummaryCache.getInstance().isInitialized()) {      	
@@ -290,7 +289,7 @@ public class MekHQView extends FrameView {
 			}
 		}
 		dataLoadingDialog.setVisible(false);
-*/
+
 		//load in directory items and tilesets
 		try {
             portraits = new DirectoryItems(new File("data/images/portraits"), "", //$NON-NLS-1$ //$NON-NLS-2$
