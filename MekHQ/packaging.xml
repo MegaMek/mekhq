@@ -6,7 +6,7 @@
 
 	<!-- Global properties for this build -->
 
-	<property name="version" value="0.1.7"/>
+	<property name="version" value="0.1.8"/>
 	
 	<property name="srcdir" value="src" />
 	<property name="logdir" value="logs" />
