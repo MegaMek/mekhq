@@ -92,15 +92,12 @@ public class HeatSink extends EquipmentPart {
 				time = 0;
 				difficulty = 0;
 			} else if(hits > 0) {
-				time = 100;
-				difficulty = -3;
-				if(isSalvaging()) {
-					this.time = 90;
-					this.difficulty = -2;
-				} else if(hits > 0) {
-					this.time = 120;
-					this.difficulty = -1;
-				}
+				this.time = 120;
+				this.difficulty = -1;
+			}
+			if(isSalvaging()) {
+				this.time = 90;
+				this.difficulty = -2;
 			}
 		}
 	}

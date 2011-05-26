@@ -104,13 +104,10 @@ public class JumpJet extends EquipmentPart {
 			} else if(hits > 0) {
 				time = 100;
 				difficulty = -3;
-				if(isSalvaging()) {
-					this.time = 60;
-					this.difficulty = 0;
-				} else if(hits > 0) {
-					this.time = 90;
-					this.difficulty = 0;
-				}
+			}
+			if(isSalvaging()) {
+				this.time = 60;
+				this.difficulty = 0;
 			}
 		}
 	}

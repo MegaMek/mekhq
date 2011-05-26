@@ -71,6 +71,7 @@ v0.1.7 (SVN)
 + remove MechSummaryCache loading from MekHQApp
 + DataLoadingDialog (not fully working)
 + Bug: unattached personnel overlapping with last force in ForceViewPanel
++ Bug 3306386: Salvage times for equipment
 
 v0.1.6 (2011-05-17)
 + beginning of Briefing Room tab

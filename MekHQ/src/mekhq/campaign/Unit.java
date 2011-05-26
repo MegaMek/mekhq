@@ -2221,7 +2221,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     					addPart(apart);
     					campaign.addPart(apart);
     				}
-    			} else if(m.getType().hasFlag(MiscType.F_HEAT_SINK) || m.getType().hasFlag(MiscType.F_DOUBLE_HEAT_SINK)) {
+    			} else if(m.getType() instanceof MiscType && (m.getType().hasFlag(MiscType.F_HEAT_SINK) || m.getType().hasFlag(MiscType.F_DOUBLE_HEAT_SINK))) {
     				if(m.getLocation() == Entity.LOC_NONE) {
     					//heat sinks located in LOC_NONE are base unhittable heat sinks
     					continue;
@@ -2233,7 +2233,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     					addPart(epart);
     					campaign.addPart(epart);
     				}
-    			} else if(m.getType().hasFlag(MiscType.F_JUMP_JET)) {
+    			} else if(m.getType() instanceof MiscType && m.getType().hasFlag(MiscType.F_JUMP_JET)) {
     				int eqnum = entity.getEquipmentNum(m);
     				Part epart = jumpJets.get(eqnum);
     				if(null == epart) {
