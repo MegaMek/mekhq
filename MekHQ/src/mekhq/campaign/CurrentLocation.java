@@ -108,6 +108,9 @@ public class CurrentLocation implements Serializable {
 	public String getReport(Date date) {
 		String toReturn = "<b>Current Location</b><br>";
 		toReturn += currentPlanet.getShortName() + " (" + Faction.getFactionName(currentPlanet.getCurrentFaction(date)) + ")<br>";
+		if(null != jumpPath && !jumpPath.isEmpty()) {
+			toReturn += "In transit to " + jumpPath.getLastPlanet().getShortName() + "<br>";
+		}
 		if(isOnPlanet()) {
 			toReturn += "<i>On Planet</i><br>";
 		} 

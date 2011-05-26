@@ -307,6 +307,15 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
                     selectM.add(zMenu);
                 	MenuScroller.setScrollerFor(zMenu, 30);
                     popup.add(selectM);
+                	item = new JMenuItem("Cancel Current Trip");
+                	item.setEnabled(null != campaign.getLocation().getJumpPath());
+                	item.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent ae) {
+                            campaign.getLocation().setJumpPath(null);
+                            repaint();
+                        }
+                    });
+                	popup.add(item);
                     JMenu menuGM = new JMenu("GM Mode");
                     item = new JMenuItem("Move to selected planet");
                     item.setEnabled(selectedPlanet != null && campaign.isGM());

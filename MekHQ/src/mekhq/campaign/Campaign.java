@@ -2025,6 +2025,12 @@ public class Campaign implements Serializable {
 	 */
 	public JumpPath calculateJumpPath(String startKey, String endKey) {
 		
+		if(startKey.equals(endKey)) {
+			JumpPath jpath = new JumpPath();
+			jpath.addPlanet(getPlanet(startKey));
+			return jpath;
+		}
+		
 		String current = startKey;
 		ArrayList<String> closed = new ArrayList<String>();
 		ArrayList<String> open = new ArrayList<String>();

@@ -1889,6 +1889,9 @@ public class MekHQView extends FrameView {
 	}
 	
 	private void beginTransit() {
+		if(panMap.getJumpPath().isEmpty()) {
+			return;
+		}
 		campaign.getLocation().setJumpPath(panMap.getJumpPath());
 		refreshPlanetView();
 		refreshLocation();

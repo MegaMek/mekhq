@@ -75,6 +75,7 @@ v0.1.7 (SVN)
 + better tracking of quad mech parts
 + Structural Integrity part
 + Bug: busted actuators dont show up in repair bay for quad mechs
++ improvements to jump path user interaction
 
 v0.1.6 (2011-05-17)
 + beginning of Briefing Room tab
