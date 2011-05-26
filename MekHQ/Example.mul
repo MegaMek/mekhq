@@ -224,6 +224,7 @@ alse"/>
       <location index="4" isDestroyed="true" /> Front Right Leg
       <location index="5"> Front Left Leg
          <armor points="5"/>
+	 <slot index="4" type="System" isHit="true" isDestroyed="true"/>
       </location>
       <location index="6"> Rear Right Leg
          <armor points="15"/>

@@ -2075,6 +2075,8 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     		return;
     	}
     	
+    	boolean isQuad = entity instanceof QuadMech;
+    	
     	Part gyro = null;
     	Part engine = null;
     	Part lifeSupport = null;
@@ -2091,6 +2093,12 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     	Part leftFoot = null;
     	Part leftLowerLeg = null;
     	Part leftUpperLeg = null;
+    	Part rightFrontFoot = null;
+    	Part rightLowerFrontLeg = null;
+    	Part rightUpperFrontLeg = null;
+    	Part leftFrontFoot = null;
+    	Part leftLowerFrontLeg = null;
+    	Part leftUpperFrontLeg = null;
     	Part structuralIntegrity = null;
     	Part[] locations = new Part[entity.locations()];
     	Armor[] armor = new Armor[entity.locations()];
@@ -2166,19 +2174,31 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     					leftHand = part;
     				}
     			} else if(type == Mech.ACTUATOR_UPPER_LEG) {
-    				if(loc == Mech.LOC_RLEG) {
+    				if(loc == Mech.LOC_LARM) {
+    					leftUpperFrontLeg = part;
+    				} else if(loc == Mech.LOC_RARM) {
+    					rightUpperFrontLeg = part;
+    				} else if(loc == Mech.LOC_RLEG) {
     					rightUpperLeg = part;
     				} else {
     					leftUpperLeg = part;
     				}
     			} else if(type == Mech.ACTUATOR_LOWER_LEG) {
-    				if(loc == Mech.LOC_RLEG) {
+    				if(loc == Mech.LOC_LARM) {
+    					leftLowerFrontLeg = part;
+    				} else if(loc == Mech.LOC_RARM) {
+    					rightLowerFrontLeg = part;
+    				} else if(loc == Mech.LOC_RLEG) {
     					rightLowerLeg = part;
     				} else {
     					leftLowerLeg = part;
     				}
     			} else if(type == Mech.ACTUATOR_FOOT) {
-    				if(loc == Mech.LOC_RLEG) {
+    				if(loc == Mech.LOC_LARM) {
+    					leftFrontFoot = part;
+    				} else if(loc == Mech.LOC_RARM) {
+    					rightFrontFoot = part;
+    				} else if(loc == Mech.LOC_RLEG) {
     					rightFoot = part;
     				} else {
     					leftFoot = part;
@@ -2338,6 +2358,36 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     			leftFoot = new MekActuator((int)entity.getWeight(), Mech.ACTUATOR_FOOT, Mech.LOC_LLEG);
     			addPart(leftFoot);
     			campaign.addPart(leftFoot);
+    		}
+    		if(null == rightUpperFrontLeg && entity.hasSystem(Mech.ACTUATOR_UPPER_LEG, Mech.LOC_RARM)) {
+    			rightUpperFrontLeg = new MekActuator((int)entity.getWeight(), Mech.ACTUATOR_UPPER_LEG, Mech.LOC_RARM);
+    			addPart(rightUpperFrontLeg);
+    			campaign.addPart(rightUpperFrontLeg);
+    		}
+    		if(null == leftUpperFrontLeg && entity.hasSystem(Mech.ACTUATOR_UPPER_LEG, Mech.LOC_LARM)) {
+    			leftUpperFrontLeg = new MekActuator((int)entity.getWeight(), Mech.ACTUATOR_UPPER_LEG, Mech.LOC_LARM);
+    			addPart(leftUpperFrontLeg);
+    			campaign.addPart(leftUpperFrontLeg);
+    		}
+    		if(null == rightLowerFrontLeg && entity.hasSystem(Mech.ACTUATOR_LOWER_LEG, Mech.LOC_RARM)) {
+    			rightLowerFrontLeg = new MekActuator((int)entity.getWeight(), Mech.ACTUATOR_LOWER_LEG, Mech.LOC_RARM);
+    			addPart(rightLowerFrontLeg);
+    			campaign.addPart(rightLowerFrontLeg);
+    		}
+    		if(null == leftLowerFrontLeg && entity.hasSystem(Mech.ACTUATOR_LOWER_LEG, Mech.LOC_LARM)) {
+    			leftLowerFrontLeg = new MekActuator((int)entity.getWeight(), Mech.ACTUATOR_LOWER_LEG, Mech.LOC_LARM);
+    			addPart(leftLowerFrontLeg);
+    			campaign.addPart(leftLowerFrontLeg);
+    		}
+    		if(null == rightFrontFoot && entity.hasSystem(Mech.ACTUATOR_FOOT, Mech.LOC_RARM)) {
+    			rightFrontFoot = new MekActuator((int)entity.getWeight(), Mech.ACTUATOR_FOOT, Mech.LOC_RARM);
+    			addPart(rightFrontFoot);
+    			campaign.addPart(rightFrontFoot);
+    		}
+    		if(null == leftFrontFoot && entity.hasSystem(Mech.ACTUATOR_FOOT, Mech.LOC_LARM)) {
+    			leftFrontFoot = new MekActuator((int)entity.getWeight(), Mech.ACTUATOR_FOOT, Mech.LOC_LARM);
+    			addPart(leftFrontFoot);
+    			campaign.addPart(leftFrontFoot);
     		}
     	}
     	if(entity instanceof Aero) {
