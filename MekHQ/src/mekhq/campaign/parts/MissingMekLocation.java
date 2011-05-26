@@ -39,10 +39,11 @@ public class MissingMekLocation extends MissingPart {
 	protected int loc;
     protected int structureType;
     protected boolean tsm;
-    double percent;
+    protected double percent;
+    protected boolean forQuad;
 
     public MissingMekLocation() {
-    	this(0, 0, 0, false);
+    	this(0, 0, 0, false, false);
     }
     
     public int getLoc() {
@@ -57,12 +58,13 @@ public class MissingMekLocation extends MissingPart {
         return structureType;
     }
     
-    public MissingMekLocation(int loc, int tonnage, int structureType, boolean hasTSM) {
+    public MissingMekLocation(int loc, int tonnage, int structureType, boolean hasTSM, boolean quad) {
         super(tonnage);
         this.loc = loc;
         this.structureType = structureType;
         this.tsm = hasTSM;
         this.percent = 1.0;
+        this.forQuad = quad;
         //TODO: need to account for internal structure and myomer types
         //crap, no static report for location names?
         this.name = "Mech Location";
@@ -81,15 +83,27 @@ public class MissingMekLocation extends MissingPart {
                 break;
             case(Mech.LOC_LARM):
                 this.name = "Mech Left Arm";
+            	if(forQuad) {
+            		this.name = "Mech Front Left Leg";
+            	}
                 break;
             case(Mech.LOC_RARM):
                 this.name = "Mech Right Arm";
+            	if(forQuad) {
+            		this.name = "Mech Front Left Leg";
+        		}
                 break;
             case(Mech.LOC_LLEG):
                 this.name = "Mech Left Leg";
+            	if(forQuad) {
+            		this.name = "Mech Rear Left Leg";
+            	}
                 break;
             case(Mech.LOC_RLEG):
                 this.name = "Mech Right Leg";
+            	if(forQuad) {
+            		this.name = "Mech Rear Right Leg";
+            	}
                 break;
         }
         if(structureType != EquipmentType.T_STRUCTURE_STANDARD) {
@@ -147,6 +161,10 @@ public class MissingMekLocation extends MissingPart {
 				+"<percent>"
 				+percent
 				+"</percent>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<forQuad>"
+				+forQuad
+				+"</forQuad>");
 		writeToXmlEnd(pw1, indent, id);
 	}
 
@@ -168,6 +186,11 @@ public class MissingMekLocation extends MissingPart {
 					tsm = true;
 				else
 					tsm = false;
+			} else if (wn2.getNodeName().equalsIgnoreCase("forQuad")) {
+				if (wn2.getTextContent().equalsIgnoreCase("true"))
+					forQuad = true;
+				else
+					forQuad = false;
 			} 
 		}
 	}
@@ -230,6 +253,14 @@ public class MissingMekLocation extends MissingPart {
 		return T_BOTH;
 	}
 
+	private boolean isArm() {
+		return loc == Mech.LOC_RARM || loc == Mech.LOC_LARM;
+	}
+	
+	public boolean forQuad() {
+		return forQuad;
+	}
+	
 	@Override
 	public boolean isAcceptableReplacement(Part part) {
 		if(loc == Mech.LOC_CT) {
@@ -241,7 +272,8 @@ public class MissingMekLocation extends MissingPart {
 			return mekLoc.getLoc() == loc
 				&& mekLoc.getUnitTonnage() == getUnitTonnage()
 				&& mekLoc.isTsm() == tsm
-				&& mekLoc.getStructureType() == structureType;
+				&& mekLoc.getStructureType() == structureType
+				&& (!isArm() || mekLoc.forQuad() == forQuad);
 		}
 		return false;
 	}
@@ -263,6 +295,6 @@ public class MissingMekLocation extends MissingPart {
 
 	@Override
 	public Part getNewPart() {
-		return new MekLocation(loc, getUnitTonnage(), structureType, tsm);
+		return new MekLocation(loc, getUnitTonnage(), structureType, tsm, forQuad);
 	}
 }

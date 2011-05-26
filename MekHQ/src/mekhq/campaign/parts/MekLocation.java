@@ -43,9 +43,10 @@ public class MekLocation extends Part {
     protected int structureType;
     protected boolean tsm;
     double percent;
+    boolean forQuad;
 
     public MekLocation() {
-    	this(0, 0, 0, false);
+    	this(0, 0, 0, false, false);
     }
     
     public int getLoc() {
@@ -60,40 +61,53 @@ public class MekLocation extends Part {
         return structureType;
     }
     
-    public MekLocation(int loc, int tonnage, int structureType, boolean hasTSM) {
+    public MekLocation(int loc, int tonnage, int structureType, boolean hasTSM, boolean quad) {
         super(tonnage);
         this.loc = loc;
         this.structureType = structureType;
         this.tsm = hasTSM;
         this.percent = 1.0;
+        this.forQuad = quad;
         //TODO: need to account for internal structure and myomer types
         //crap, no static report for location names?
         this.name = "Mech Location";
         switch(loc) {
-            case(Mech.LOC_HEAD):
-                this.name = "Mech Head";
-                break;
-            case(Mech.LOC_CT):
-                this.name = "Mech Center Torso";
-                break;
-            case(Mech.LOC_LT):
-                this.name = "Mech Left Torso";
-                break;
-            case(Mech.LOC_RT):
-                this.name = "Mech Right Torso";
-                break;
-            case(Mech.LOC_LARM):
-                this.name = "Mech Left Arm";
-                break;
-            case(Mech.LOC_RARM):
-                this.name = "Mech Right Arm";
-                break;
-            case(Mech.LOC_LLEG):
-                this.name = "Mech Left Leg";
-                break;
-            case(Mech.LOC_RLEG):
-                this.name = "Mech Right Leg";
-                break;
+        case(Mech.LOC_HEAD):
+            this.name = "Mech Head";
+            break;
+        case(Mech.LOC_CT):
+            this.name = "Mech Center Torso";
+            break;
+        case(Mech.LOC_LT):
+            this.name = "Mech Left Torso";
+            break;
+        case(Mech.LOC_RT):
+            this.name = "Mech Right Torso";
+            break;
+        case(Mech.LOC_LARM):
+            this.name = "Mech Left Arm";
+        	if(forQuad) {
+        		this.name = "Mech Front Left Leg";
+        	}
+            break;
+        case(Mech.LOC_RARM):
+            this.name = "Mech Right Arm";
+        	if(forQuad) {
+        		this.name = "Mech Front Left Leg";
+    		}
+            break;
+        case(Mech.LOC_LLEG):
+            this.name = "Mech Left Leg";
+        	if(forQuad) {
+        		this.name = "Mech Rear Left Leg";
+        	}
+            break;
+        case(Mech.LOC_RLEG):
+            this.name = "Mech Right Leg";
+        	if(forQuad) {
+        		this.name = "Mech Rear Right Leg";
+        	}
+            break;
         }
         if(structureType != EquipmentType.T_STRUCTURE_STANDARD) {
             this.name += " (" + EquipmentType.getStructureTypeName(structureType) + ")";
@@ -123,6 +137,14 @@ public class MekLocation extends Part {
         return (long) Math.round(cost);
     }
 
+    private boolean isArm() {
+		return loc == Mech.LOC_RARM || loc == Mech.LOC_LARM;
+	}
+	
+	public boolean forQuad() {
+		return forQuad;
+	}
+    
     @Override
     public boolean isSamePartTypeAndStatus (Part part) {
     	if(needsFixing() || part.needsFixing()) {
@@ -132,7 +154,8 @@ public class MekLocation extends Part {
                 && getLoc() == ((MekLocation)part).getLoc()
                 && getUnitTonnage() == ((MekLocation)part).getUnitTonnage()
                 && isTsm() == ((MekLocation)part).isTsm()
-                && getStructureType() == ((MekLocation) part).getStructureType();
+                && getStructureType() == ((MekLocation) part).getStructureType()
+                && (!isArm() || forQuad == ((MekLocation)part).forQuad);
     }
 
     @Override
@@ -159,6 +182,10 @@ public class MekLocation extends Part {
 				+"<percent>"
 				+percent
 				+"</percent>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<forQuad>"
+				+forQuad
+				+"</forQuad>");
 		writeToXmlEnd(pw1, indent, id);
 	}
 
@@ -180,6 +207,11 @@ public class MekLocation extends Part {
 					tsm = true;
 				else
 					tsm = false;
+			} else if (wn2.getNodeName().equalsIgnoreCase("forQuad")) {
+				if (wn2.getTextContent().equalsIgnoreCase("true"))
+					forQuad = true;
+				else
+					forQuad = false;
 			} 
 		}
 	}
@@ -247,7 +279,7 @@ public class MekLocation extends Part {
 
 	@Override
 	public Part getMissingPart() {
-		return new MissingMekLocation(loc, getUnitTonnage(), structureType, tsm);
+		return new MissingMekLocation(loc, getUnitTonnage(), structureType, tsm, forQuad);
 	}
 
 	@Override
@@ -312,7 +344,11 @@ public class MekLocation extends Part {
 		if(null != unit) {
 			unit.getEntity().setInternal((int)Math.round(percent * unit.getEntity().getOInternal(loc)), loc);
 			if(loc == Mech.LOC_RARM || loc == Mech.LOC_LARM) {
-				unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_SHOULDER, loc);
+				if(forQuad) {
+					unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_HIP, loc);
+				} else {
+					unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_SHOULDER, loc);
+				}
 			}
 			else if(loc == Mech.LOC_RLEG || loc == Mech.LOC_LLEG) {
 				unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_HIP, loc);
@@ -338,11 +374,15 @@ public class MekLocation extends Part {
     public String checkFixable() {
 		if(isSalvaging()) {
 	         //cant salvage torsos until arms and legs are gone
+			String limbName = " arm ";
+			if(forQuad) {
+				limbName = " front leg ";
+			}
 	        if(unit.getEntity() instanceof Mech && loc == Mech.LOC_RT && !unit.getEntity().isLocationBad(Mech.LOC_RARM)) {
-	            return "must salvage/scrap right arm first";
+	            return "must salvage/scrap right" + limbName + "first";
 	        }
 	        if(unit.getEntity() instanceof Mech && loc == Mech.LOC_LT && !unit.getEntity().isLocationBad(Mech.LOC_LARM)) {
-	            return "must salvage/scrap left arm first";
+	            return "must salvage/scrap left" + limbName + "first";
 	        } 
 	        //you can only salvage a location that has nothing left on it
 	        for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
@@ -351,19 +391,7 @@ public class MekLocation extends Part {
 	            if ((slot == null) || !slot.isEverHittable()) {
 	                continue;
 	            }
-	            if(slot.getType() == CriticalSlot.TYPE_SYSTEM 
-	            		&& slot.getIndex() == Mech.ACTUATOR_HIP
-	            		&& slot.isDestroyed()) {
-	            	return "You cannot repair a leg with a damaged hip. This leg must be scrapped and replaced instead.";
-	            	
-	            }
-	            if(slot.getType() == CriticalSlot.TYPE_SYSTEM 
-	            		&& slot.getIndex() == Mech.ACTUATOR_SHOULDER
-	            		&& slot.isDestroyed()) {
-	            	return "You cannot repair an arm with a damaged shoulder. This arm must be scrapped and replaced instead.";
-	            	
-	            }
-	            
+     
 	            //certain other specific crits need to be left out (uggh, must be a better way to do this!)
 	            if(slot.getType() == CriticalSlot.TYPE_SYSTEM 
 	                    && (slot.getIndex() == Mech.SYSTEM_COCKPIT

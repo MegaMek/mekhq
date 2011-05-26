@@ -203,6 +203,36 @@ alse"/>
       </location>
    </entity>
 
+<entity chassis="Goliath" model="GOL-1H" type="Quad" commander="false" deployment="0">
+      <pilot name="Wangugu Rahim" nick="" gunnery="4" piloting="5" hits="1" ejected="false" autoeject="true"/>
+      The first slot in a location is at index="1".
+      <location index="1"> Center Torso
+         <armor points="Destroyed"/>
+         <armor points="8" type="Internal"/>
+         <slot index="3" type="System" isHit="true" isRepairable="true" isDestroyed="true"/>
+         <slot index="4" type="System" isHit="true" isRepairable="true" isDestroyed="true"/>
+         <slot index="6" type="System" isHit="true" isRepairable="true" isDestroyed="true"/>
+         <slot index="8" type="System" isHit="true" isRepairable="true" isDestroyed="true"/>
+         <slot index="11" type="IS Ammo LRM-10" shots="12"/>
+         <slot index="12" type="IS Ammo LRM-10" shots="12"/>
+      </location>
+      <location index="2" isDestroyed="true" /> Right Torso
+      <location index="3"> Left Torso
+         <armor points="4"/>
+         <slot index="4" type="IS Ammo MG - Full" shots="200"/>
+      </location>
+      <location index="4" isDestroyed="true" /> Front Right Leg
+      <location index="5"> Front Left Leg
+         <armor points="5"/>
+      </location>
+      <location index="6"> Rear Right Leg
+         <armor points="15"/>
+      </location>
+      <location index="7"> Rear Left Leg
+         <armor points="26"/>
+      </location>
+   </entity>
+
    <entity chassis="Burke Defense Tank" model="" type="Tracked">
       <pilot name="Edmund" gunnery="3" piloting="4"/>
       <movement speed="2"/>

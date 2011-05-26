@@ -42,6 +42,7 @@ import megamek.common.Jumpship;
 import megamek.common.Mech;
 import megamek.common.MiscType;
 import megamek.common.Mounted;
+import megamek.common.QuadMech;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
@@ -2185,7 +2186,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     	for(int i = 0; i<locations.length; i++) {
     		if(null == locations[i]) {
     			if(entity instanceof Mech) {
-    				MekLocation mekLocation = new MekLocation(i, (int) getEntity().getWeight(), getEntity().getStructureType(), hasTSM());
+    				MekLocation mekLocation = new MekLocation(i, (int) getEntity().getWeight(), getEntity().getStructureType(), hasTSM(), entity instanceof QuadMech);
     				addPart(mekLocation);
     				campaign.addPart(mekLocation);
     			} else if(entity instanceof Tank && i != Tank.LOC_BODY) {

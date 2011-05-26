@@ -72,6 +72,7 @@ v0.1.7 (SVN)
 + DataLoadingDialog (not fully working)
 + Bug: unattached personnel overlapping with last force in ForceViewPanel
 + Bug 3306386: Salvage times for equipment
++ better tracking of quad mech parts
 
 v0.1.6 (2011-05-17)
 + beginning of Briefing Room tab
