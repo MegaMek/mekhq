@@ -412,6 +412,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
 			lblUnit = new JLabel();
 			lblPerson.setText(getSummaryFor(p));
 			setPortrait(p, lblPerson);
+			nexty++;
 			gridBagConstraints = new java.awt.GridBagConstraints();
 			gridBagConstraints.gridx = 0;
 			gridBagConstraints.gridy = nexty;
@@ -436,7 +437,6 @@ public class ForceViewPanel extends javax.swing.JPanel {
 			gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 			pnlSubUnits.add(lblUnit, gridBagConstraints);
-			nexty++;
 		}
 	}
 	

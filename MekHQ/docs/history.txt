@@ -70,6 +70,7 @@ v0.1.7 (SVN)
 + make Planets.java more like MechSummaryCache.java
 + remove MechSummaryCache loading from MekHQApp
 + DataLoadingDialog (not fully working)
++ Bug: unattached personnel overlapping with last force in ForceViewPanel
 
 v0.1.6 (2011-05-17)
 + beginning of Briefing Room tab
