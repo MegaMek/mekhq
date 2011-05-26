@@ -73,6 +73,7 @@ v0.1.7 (SVN)
 + Bug: unattached personnel overlapping with last force in ForceViewPanel
 + Bug 3306386: Salvage times for equipment
 + better tracking of quad mech parts
++ Structural Integrity part
 
 v0.1.6 (2011-05-17)
 + beginning of Briefing Room tab

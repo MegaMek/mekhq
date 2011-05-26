@@ -74,6 +74,7 @@ import mekhq.campaign.parts.MissingMekLocation;
 import mekhq.campaign.parts.MissingMekSensor;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.StructuralIntegrity;
 import mekhq.campaign.parts.TankLocation;
 import mekhq.campaign.personnel.PilotPerson;
 import mekhq.campaign.work.IAcquisitionWork;
@@ -2090,6 +2091,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     	Part leftFoot = null;
     	Part leftLowerLeg = null;
     	Part leftUpperLeg = null;
+    	Part structuralIntegrity = null;
     	Part[] locations = new Part[entity.locations()];
     	Armor[] armor = new Armor[entity.locations()];
     	Armor[] armorRear = new Armor[entity.locations()];
@@ -2107,6 +2109,8 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     			lifeSupport = part;
     		} else if(part instanceof MekSensor || part instanceof MissingMekSensor) {
     			sensor = part;
+    		} else if(part instanceof StructuralIntegrity) {
+    			structuralIntegrity = part;
     		} else if(part instanceof MekLocation) {
     			locations[((MekLocation)part).getLoc()] = part;
     		} else if(part instanceof MissingMekLocation) {
@@ -2334,6 +2338,13 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     			leftFoot = new MekActuator((int)entity.getWeight(), Mech.ACTUATOR_FOOT, Mech.LOC_LLEG);
     			addPart(leftFoot);
     			campaign.addPart(leftFoot);
+    		}
+    	}
+    	if(entity instanceof Aero) {
+    		if(null == structuralIntegrity) {
+    			structuralIntegrity = new StructuralIntegrity((int)entity.getWeight());
+    			addPart(structuralIntegrity);
+    			campaign.addPart(structuralIntegrity);
     		}
     	}
     	runDiagnostic();

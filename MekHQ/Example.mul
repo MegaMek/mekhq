@@ -233,6 +233,40 @@ alse"/>
       </location>
    </entity>
 
+ <entity chassis="Stingray" model="F-92" type="Aerodyne" commander="false" deployment="0">
+      <pilot name="Khosrovidoukht Browning" nick="" gunnery="4" piloting="0" ejected="false"/>
+      <structural integrity="3"/>
+      <heat sinks="19"/>
+      <fuel left="400"/>
+      <acriticals avionics="1" fcs="1"/>
+      <location index="0"> Nose
+         <armor points="39"/>
+      </location>
+      <location index="1"> Left Wing
+         <armor points="15"/>
+      </location>
+   </entity>
+
+   <entity chassis="Stingray" model="F-92" type="Aerodyne" commander="false" deployment="6">
+      <pilot name="Damaris Lang" nick="" gunnery="3" piloting="5" ejected="false"/>
+      <structural integrity="6"/>
+      <heat sinks="20"/>
+      <fuel left="380"/>
+      <acriticals engine="2"/>
+      <location index="0"> Nose
+         <armor points="41"/>
+      </location>
+      <location index="1"> Left Wing
+         <armor points="7"/>
+      </location>
+      <location index="2"> Right Wing
+         <armor points="36"/>
+      </location>
+      <location index="3"> Aft
+         <armor points="2"/>
+      </location>
+   </entity>
+
    <entity chassis="Burke Defense Tank" model="" type="Tracked">
       <pilot name="Edmund" gunnery="3" piloting="4"/>
       <movement speed="2"/>
