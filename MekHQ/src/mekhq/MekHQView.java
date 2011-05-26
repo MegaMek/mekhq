@@ -1479,9 +1479,11 @@ public class MekHQView extends FrameView {
 		panMekLab.setName("panMekLab"); // NOI18N
 		scrollMekLab.setName("scrollFinanceTable");
         scrollMekLab.setViewportView(panMekLab);
-		tabMain.addTab(
+		/*
+        tabMain.addTab(
 				resourceMap.getString("panMekLab.TabConstraints.tabTitle"),
 				scrollMekLab); // NOI18N
+				*/
 		
 		panFinances.setName("panFinances"); // NOI18N
 		panFinances.setLayout(new java.awt.GridBagLayout());

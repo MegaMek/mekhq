@@ -1,6 +1,6 @@
 VERSION HISTORY
 ----------------------------------
-v0.1.7 (SVN)
+v0.1.7 (2011-05-26)
 + MekLab tab (no functionality yet, but there it is)
 + load a mech into the MekLab via the unit context menu (still doesn't do much)
 + A* pathfinding for finding jump paths
