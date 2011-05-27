@@ -41,6 +41,7 @@ public class SkillCosts implements Serializable {
 	public static final int SK_TAC      = 6;
 	public static final int SK_INIT     = 7;
 	public static final int SK_TOUGH    = 8;
+	public static final int SK_NUM      = 9;
 	
 	public static String getSkillName(int skill) {
 		switch(skill) {
@@ -133,5 +134,24 @@ public class SkillCosts implements Serializable {
 		} else {
 			return abilityCosts.get(ability);
 		}
+	}
+	
+	public String[][] getSkillArray() {
+		String[][] array = new String[7][SK_NUM];
+		for(int i = 0; i < SK_NUM; i++) {
+			Integer[] col = xpCosts.get(i);
+			for(int j = 0; j < 7; j++) {
+				array[j][i] = Integer.toString(col[j]);
+			}
+		}
+		return array;
+	}
+	
+	public String[] getSkillTitles() {
+		String[] titles = new String[SK_NUM];
+		for(int i = 0; i < SK_NUM; i++) {
+			titles[i] = getSkillName(i);
+		}
+		return titles;
 	}
 }

@@ -24,6 +24,7 @@ import java.util.Iterator;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JFormattedTextField;
+import javax.swing.JTable;
 import javax.swing.SwingConstants;
 
 import megamek.client.ui.swing.util.PlayerColors;
@@ -122,6 +123,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panFinances = new javax.swing.JPanel();
         panNameGen = new javax.swing.JPanel();
         panRank = new javax.swing.JPanel();
+        panXP = new javax.swing.JPanel();
         useFactionModifiersCheckBox = new javax.swing.JCheckBox();
         javax.swing.JLabel clanPriceModifierLabel = new javax.swing.JLabel();
         DecimalFormat numberFormat = (DecimalFormat) DecimalFormat.getInstance();
@@ -540,6 +542,17 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panFinances.add(sellPartsBox, gridBagConstraints);
         
         tabOptions.addTab(resourceMap.getString("panFinances.TabConstraints.tabTitle"), panFinances); // NOI18N
+        
+        panXP.setName("panXP"); // NOI18N
+        panXP.setLayout(new java.awt.GridBagLayout());
+        
+        tableXP = new JTable(campaign.getSkillCosts().getSkillArray(), campaign.getSkillCosts().getSkillTitles());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        panXP.add(tableXP, gridBagConstraints);      
+        tabOptions.addTab(resourceMap.getString("panXP.TabConstraints.tabTitle"), panXP); // NOI18N
         
         panRank.setName("panRank"); // NOI18N
         panRank.setLayout(new java.awt.GridBagLayout());
@@ -1003,6 +1016,7 @@ public String getDateAsString() {
     private javax.swing.JPanel panPersonnel;
     private javax.swing.JPanel panFinances;
     private javax.swing.JPanel panNameGen;
+    private javax.swing.JPanel panXP;
     private javax.swing.JPanel panRank;
     private javax.swing.JComboBox repairSystemComboBox;
     private javax.swing.JTabbedPane tabOptions;
@@ -1036,6 +1050,8 @@ public String getDateAsString() {
     private javax.swing.JScrollPane scrCustomRanks;
     private javax.swing.JComboBox choiceOfficerCut;
     private javax.swing.JLabel lblOfficerCut;
+    
+    private javax.swing.JTable tableXP;
 
 
     // End of variables declaration//GEN-END:variables
