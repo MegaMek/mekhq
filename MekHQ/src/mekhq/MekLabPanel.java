@@ -107,6 +107,7 @@ public class MekLabPanel extends JPanel implements RefreshListener {
         new CConfig();
         MekHQApp.logMessage("Staring MegaMekLab version: " + MegaMekLab.VERSION);
 
+        /*
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
@@ -114,6 +115,7 @@ public class MekLabPanel extends JPanel implements RefreshListener {
         	MekHQApp.logError(e);
         }
 
+*/
         // ConfigPane.setMinimumSize(new Dimension(300, 300));
         createNewMech(false);
         this.add(masterPanel);

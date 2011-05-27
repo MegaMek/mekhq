@@ -7,6 +7,7 @@ v0.1.8 (SVN)
 + scenarioXP field in SkillCosts and option in CampaignOptionsDialog
 + apply scenarioXP when resolving scenario
 + BLC for lost units (duh)
++ better default theming of look and feel by system
 
 v0.1.7 (2011-05-26)
 + MekLab tab (no functionality yet, but there it is)

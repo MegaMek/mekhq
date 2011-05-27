@@ -26,6 +26,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.UIManager.LookAndFeelInfo;
+
 import megamek.common.MechSummaryCache;
 
 import org.jdesktop.application.Application;
@@ -78,8 +82,6 @@ public class MekHQApp extends SingleFrameApplication {
         
         //redirect output to log file
         redirectOutput();
-              
-        System.setProperty("apple.laf.useScreenMenuBar", "true");
         
         show(new MekHQView(this));
     }
@@ -104,6 +106,27 @@ public class MekHQApp extends SingleFrameApplication {
      * Main method launching the application.
      */
     public static void main(String[] args) {
+
+    	System.setProperty("apple.laf.useScreenMenuBar", "true");
+        System.setProperty("com.apple.mrj.application.apple.menu.about.name","MekHQ");
+        
+        // this should also help to make MekHQ look more system-specific
+        try {
+        	UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
+        } catch (ClassNotFoundException e) {
+        	// TODO Auto-generated catch block
+        	e.printStackTrace();
+        } catch (InstantiationException e) {
+        	// TODO Auto-generated catch block
+        	e.printStackTrace();
+        } catch (IllegalAccessException e) {
+        	// TODO Auto-generated catch block
+        	e.printStackTrace();
+        } catch (UnsupportedLookAndFeelException e) {
+        	// TODO Auto-generated catch block
+        	e.printStackTrace();
+        }
+
         launch(MekHQApp.class, args);
         
     }
