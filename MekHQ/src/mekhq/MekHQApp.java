@@ -112,7 +112,7 @@ public class MekHQApp extends SingleFrameApplication {
         
         // this should also help to make MekHQ look more system-specific
         try {
-        	UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
+        	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (ClassNotFoundException e) {
         	// TODO Auto-generated catch block
         	e.printStackTrace();
