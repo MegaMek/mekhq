@@ -486,6 +486,8 @@ public class ResolveScenarioTracker {
 			if(pp.getPilot().getExternalId() == pilot.getExternalId()) {
 				pp.setPilot(pilot);
 				pp.undeploy(campaign);
+				//assign XP
+				pp.setXp(pp.getXp() + campaign.getSkillCosts().getScenarioXP());
 				if(null != pp.getAssignedUnit()) {
 					//TODO: this is such a roundabout way of doing this - lets
 					//make it personnel centric
