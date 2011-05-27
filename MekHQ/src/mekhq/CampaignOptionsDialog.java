@@ -6,34 +6,55 @@
 
 package mekhq;
 
-import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.GregorianCalendar;
+import java.util.Hashtable;
 import java.util.Iterator;
 
+import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JFormattedTextField;
+import javax.swing.JLabel;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.JViewport;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableColumn;
 
 import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Player;
+import megamek.common.options.IOption;
+import megamek.common.options.IOptionGroup;
+import megamek.common.options.PilotOptions;
 import megamek.common.util.DirectoryItems;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.Faction;
 import mekhq.campaign.Ranks;
+import mekhq.campaign.SkillCosts;
 
 /**
  *
@@ -50,7 +71,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private String camoFileName;
     private int colorIndex;
     private DirectoryItems camos;
-    
+    private Hashtable<String, JTextField> hashAbilityCosts;
     
     /** Creates new form CampaignOptionsDialog */
     public CampaignOptionsDialog(java.awt.Frame parent, boolean modal, Campaign c, DirectoryItems camos) {
@@ -65,6 +86,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         this.camoFileName = campaign.getCamoFileName();
         this.colorIndex = campaign.getColorIndex();
         this.camos = camos;
+        hashAbilityCosts = new Hashtable<String, JTextField>();
         initComponents();
         setCamoIcon();
         setLocationRelativeTo(parent);
@@ -124,6 +146,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panNameGen = new javax.swing.JPanel();
         panRank = new javax.swing.JPanel();
         panXP = new javax.swing.JPanel();
+        panAbilityXP = new javax.swing.JPanel();
         useFactionModifiersCheckBox = new javax.swing.JCheckBox();
         javax.swing.JLabel clanPriceModifierLabel = new javax.swing.JLabel();
         DecimalFormat numberFormat = (DecimalFormat) DecimalFormat.getInstance();
@@ -546,12 +569,103 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panXP.setName("panXP"); // NOI18N
         panXP.setLayout(new java.awt.GridBagLayout());
         
-        tableXP = new JTable(campaign.getSkillCosts().getSkillArray(), campaign.getSkillCosts().getSkillTitles());
+        txtInstructionsXP = new javax.swing.JTextArea();
+        txtInstructionsXP.setText(resourceMap.getString("txtInstructionsXP.text"));
+        txtInstructionsXP.setName("txtInstructions");
+        txtInstructionsXP.setEditable(false);
+        txtInstructionsXP.setEditable(false);
+        txtInstructionsXP.setLineWrap(true);
+        txtInstructionsXP.setWrapStyleWord(true);
+        txtInstructionsXP.setBorder(BorderFactory.createCompoundBorder(
+	   			 BorderFactory.createTitledBorder("Customizing Skill Costs"),
+	   			 BorderFactory.createEmptyBorder(5,5,5,5)));
+        txtInstructionsXP.setPreferredSize(new Dimension(550,120));
+        txtInstructionsXP.setOpaque(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panXP.add(tableXP, gridBagConstraints);      
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        panXP.add(txtInstructionsXP, gridBagConstraints);
+        
+        tableXP = new JTable(campaign.getSkillCosts().getSkillArray(), campaign.getSkillCosts().getSkillTitles());
+        tableXP.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tableXP.setRowSelectionAllowed(false);
+        tableXP.setColumnSelectionAllowed(false);
+        tableXP.setCellSelectionEnabled(true);
+        scrXP = new JScrollPane(tableXP);
+        scrXP.setMinimumSize(new Dimension(550,140));
+        scrXP.setPreferredSize(new Dimension(550,140));
+        JTable rowTable = new RowNamesTable(tableXP);
+        scrXP.setRowHeaderView(rowTable);
+        scrXP.setCorner(JScrollPane.UPPER_LEFT_CORNER, rowTable.getTableHeader());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        panXP.add(scrXP, gridBagConstraints);      
+        
+        panAbilityXP.setName("panAbilityXP"); // NOI18N
+        panAbilityXP.setLayout(new java.awt.GridBagLayout());
+        //arggh.. cant access pilot options statically?
+        PilotOptions pilotOptions = new PilotOptions();
+        pilotOptions.initialize();
+        JLabel lblOption;
+        JTextField txtCost;
+        int k = 0;
+        for (Enumeration<IOptionGroup> i = pilotOptions.getGroups(); i.hasMoreElements();) {
+            IOptionGroup group = i.nextElement();
+            if (group.getKey().equalsIgnoreCase(PilotOptions.MD_ADVANTAGES)) {
+                continue;
+            }
+            for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements();) {
+                IOption option = j.nextElement();
+                lblOption = new JLabel(option.getDisplayableName());
+                lblOption.setToolTipText(option.getDescription());
+                gridBagConstraints.gridx = 0;
+                gridBagConstraints.gridy = k;
+                gridBagConstraints.weightx = 1.0;
+                gridBagConstraints.weighty = 0.0;
+                gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+                gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+                panAbilityXP.add(lblOption, gridBagConstraints); 
+                txtCost = new JTextField();
+                txtCost.setText(Integer.toString(campaign.getSkillCosts().getAbilityCost(option.getName())));
+                hashAbilityCosts.put(option.getName(), txtCost);
+                gridBagConstraints.gridx = 1;
+                gridBagConstraints.gridy = k++;
+                gridBagConstraints.weightx = 0.0;
+                gridBagConstraints.weighty = 0.0;
+                gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+                gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+                panAbilityXP.add(txtCost, gridBagConstraints); 
+            }
+        }
+        scrAbilityXP = new JScrollPane(panAbilityXP);
+        scrAbilityXP.setMinimumSize(new Dimension(300,140));
+        scrAbilityXP.setPreferredSize(new Dimension(300,140));
+        scrAbilityXP.setBorder(BorderFactory.createCompoundBorder(
+	   			 BorderFactory.createTitledBorder("Ability Costs"),
+	   			 BorderFactory.createEmptyBorder(5,5,5,5)));
+        scrAbilityXP.setOpaque(false);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        panXP.add(scrAbilityXP, gridBagConstraints);      
+        
         tabOptions.addTab(resourceMap.getString("panXP.TabConstraints.tabTitle"), panXP); // NOI18N
         
         panRank.setName("panRank"); // NOI18N
@@ -856,64 +970,89 @@ private void txtNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
 		}
 	}
 
-private void btnOkayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOkayActionPerformed
-    if(txtName.getText().length() > 0) {
-        campaign.setName(txtName.getText());
-        this.setVisible(false);
-    }
-    campaign.calendar = date;
-    campaign.setFaction(comboFaction.getSelectedIndex());
-    if(null != comboFactionNames.getSelectedItem()) {
-    	campaign.getRNG().setChosenFaction((String)comboFactionNames.getSelectedItem());
-    }
-    campaign.getRNG().setPerentFemale(sldGender.getValue());
-    if(checkCustomRanks.isSelected()) {
-    	ArrayList<String> customRanks = new ArrayList<String>();
-    	String[] customRankNames = textCustomRanks.getText().split(",");
-		for(String name : customRankNames) {
-			name = name.trim();
-			customRanks.add(name);
+	private void btnOkayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOkayActionPerformed
+	    if(txtName.getText().length() > 0) {
+	        campaign.setName(txtName.getText());
+	        this.setVisible(false);
+	    }
+	    campaign.calendar = date;
+	    campaign.setFaction(comboFaction.getSelectedIndex());
+	    if(null != comboFactionNames.getSelectedItem()) {
+	    	campaign.getRNG().setChosenFaction((String)comboFactionNames.getSelectedItem());
+	    }
+	    campaign.getRNG().setPerentFemale(sldGender.getValue());
+	    if(checkCustomRanks.isSelected()) {
+	    	ArrayList<String> customRanks = new ArrayList<String>();
+	    	String[] customRankNames = textCustomRanks.getText().split(",");
+			for(String name : customRankNames) {
+				name = name.trim();
+				customRanks.add(name);
+			}
+			if(customRanks.size() > 0) {
+				campaign.getRanks().setCustomRanks(customRanks, choiceOfficerCut.getSelectedIndex());
+			}
+	    } else {
+	    	if(campaign.getRanks().getRankSystem() != comboRanks.getSelectedIndex()) {
+	    		campaign.setRankSystem(comboRanks.getSelectedIndex());
+	    	}
+	    }
+	    campaign.setCamoCategory(camoCategory);
+	    campaign.setCamoFileName(camoFileName);
+	    campaign.setColorIndex(colorIndex);
+	    
+	    updateXPCosts();
+	    
+	    // Rules panel
+	    options.setFactionModifiers(useFactionModifiersCheckBox.isSelected());
+	    String clanPriceModifierString = clanPriceModifierJFormattedTextField.getText();
+	    options.setClanPriceModifier(new Double(clanPriceModifierString));
+	    options.setEasierRefit(useEasierRefitCheckBox.isSelected());
+	    options.setFactionForNames(useFactionForNamesBox.isSelected());
+	    options.setRepairSystem(repairSystemComboBox.getSelectedIndex());
+	    
+	    options.setTactics(useTacticsBox.isSelected());
+	    options.setInitBonus(useInitBonusBox.isSelected());
+	    options.setToughness(useToughnessBox.isSelected());
+	    options.setArtillery(useArtilleryBox.isSelected());
+	    options.setAbilities(useAbilitiesBox.isSelected());
+	    options.setEdge(useEdgeBox.isSelected());
+	    options.setImplants(useImplantsBox.isSelected());
+	    options.setPayForParts(payForPartsBox.isSelected());
+	    options.setPayForUnits(payForUnitsBox.isSelected());
+	    options.setPayForSalaries(payForSalariesBox.isSelected());
+	    options.setPayForOverhead(payForOverheadBox.isSelected());
+	    options.setPayForMaintain(payForMaintainBox.isSelected());
+	    options.setPayForTransport(payForTransportBox.isSelected());
+	    options.setSellUnits(sellUnitsBox.isSelected());
+	    options.setSellParts(sellPartsBox.isSelected());
+	
+	    options.setQuirks(useQuirksBox.isSelected());
+	    
+	    //campaign.refreshAllUnitDiagnostics();
+	}
+	
+	private void updateXPCosts() {
+		for(int i = 0; i < 7; i++) {
+			for(int j = 0; j < SkillCosts.SK_NUM; j++) {
+				try {
+	               int cost = Integer.parseInt((String)tableXP.getValueAt(i, j));
+	               campaign.getSkillCosts().setCost(cost, i, j);
+	            } catch (NumberFormatException e) {
+	            	MekHQApp.logMessage("unreadable value in skill cost table for " + SkillCosts.getSkillName(j));
+	            }
+			}
 		}
-		if(customRanks.size() > 0) {
-			campaign.getRanks().setCustomRanks(customRanks, choiceOfficerCut.getSelectedIndex());
+		for(String optionName : hashAbilityCosts.keySet()) {
+			try {
+				int cost = Integer.parseInt(hashAbilityCosts.get(optionName).getText());
+				campaign.getSkillCosts().setAbilityCost(optionName, cost);
+			} catch (NumberFormatException e) {
+				MekHQApp.logMessage("unreadable value in ability cost table for " + optionName);
+			}
 		}
-    } else {
-    	if(campaign.getRanks().getRankSystem() != comboRanks.getSelectedIndex()) {
-    		campaign.setRankSystem(comboRanks.getSelectedIndex());
-    	}
-    }
-    campaign.setCamoCategory(camoCategory);
-    campaign.setCamoFileName(camoFileName);
-    campaign.setColorIndex(colorIndex);
-    
-    // Rules panel
-    options.setFactionModifiers(useFactionModifiersCheckBox.isSelected());
-    String clanPriceModifierString = clanPriceModifierJFormattedTextField.getText();
-    options.setClanPriceModifier(new Double(clanPriceModifierString));
-    options.setEasierRefit(useEasierRefitCheckBox.isSelected());
-    options.setFactionForNames(useFactionForNamesBox.isSelected());
-    options.setRepairSystem(repairSystemComboBox.getSelectedIndex());
-    
-    options.setTactics(useTacticsBox.isSelected());
-    options.setInitBonus(useInitBonusBox.isSelected());
-    options.setToughness(useToughnessBox.isSelected());
-    options.setArtillery(useArtilleryBox.isSelected());
-    options.setAbilities(useAbilitiesBox.isSelected());
-    options.setEdge(useEdgeBox.isSelected());
-    options.setImplants(useImplantsBox.isSelected());
-    options.setPayForParts(payForPartsBox.isSelected());
-    options.setPayForUnits(payForUnitsBox.isSelected());
-    options.setPayForSalaries(payForSalariesBox.isSelected());
-    options.setPayForOverhead(payForOverheadBox.isSelected());
-    options.setPayForMaintain(payForMaintainBox.isSelected());
-    options.setPayForTransport(payForTransportBox.isSelected());
-    options.setSellUnits(sellUnitsBox.isSelected());
-    options.setSellParts(sellPartsBox.isSelected());
+	}
 
-    options.setQuirks(useQuirksBox.isSelected());
-    
-    //campaign.refreshAllUnitDiagnostics();
-}//GEN-LAST:event_btnOkayActionPerformed
+
 
 private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
     this.setVisible(false);
@@ -976,23 +1115,158 @@ public String getDateAsString() {
         }
     }
 
-    /**
-    * @param args the command line arguments
-    */
-    public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                CampaignOptionsDialog dialog = new CampaignOptionsDialog(new javax.swing.JFrame(), true, null, null);
-                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                    public void windowClosing(java.awt.event.WindowEvent e) {
-                        System.exit(0);
-                    }
-                });
-                dialog.setVisible(true);
-            }
-        });
-    }
+    /*
+     * Taken from:
+     *  http://tips4java.wordpress.com/2008/11/18/row-number-table/
+     *	Use a JTable as a renderer for row numbers of a given main table.
+     *  This table must be added to the row header of the scrollpane that
+     *  contains the main table.
+     */
+    public class RowNamesTable extends JTable
+    	implements ChangeListener, PropertyChangeListener
+    {
+    	/**
+		 * 
+		 */
+		private static final long serialVersionUID = 3151119498072423302L;
+		private JTable main;
 
+    	public RowNamesTable(JTable table)
+    	{
+    		main = table;
+    		main.addPropertyChangeListener( this );
+
+    		setFocusable( false );
+    		setAutoCreateColumnsFromModel( false );
+    		setModel( main.getModel() );
+    		setSelectionModel( main.getSelectionModel() );
+
+    		TableColumn column = new TableColumn();
+    		column.setHeaderValue(" ");
+    		addColumn( column );
+    		column.setCellRenderer(new RowNumberRenderer());
+
+    		getColumnModel().getColumn(0).setPreferredWidth(80);
+    		setPreferredScrollableViewportSize(getPreferredSize());
+    	}
+
+    	@Override
+    	public void addNotify()
+    	{
+    		super.addNotify();
+    		Component c = getParent();
+    		//  Keep scrolling of the row table in sync with the main table.
+    		if (c instanceof JViewport)
+    		{
+    			JViewport viewport = (JViewport)c;
+    			viewport.addChangeListener( this );
+    		}
+    	}
+
+    	/*
+    	 *  Delegate method to main table
+    	 */
+    	@Override
+    	public int getRowCount()
+    	{
+    		return main.getRowCount();
+    	}
+
+    	@Override
+    	public int getRowHeight(int row)
+    	{
+    		return main.getRowHeight(row);
+    	}
+
+    	/*
+    	 *  This table does not use any data from the main TableModel,
+    	 *  so just return a value based on the row parameter.
+    	 */
+    	@Override
+    	public Object getValueAt(int row, int column)
+    	{
+    		return SkillCosts.getLevelNames(row);
+    	}
+
+    	/*
+    	 *  Don't edit data in the main TableModel by mistake
+    	 */
+    	@Override
+    	public boolean isCellEditable(int row, int column)
+    	{
+    		return false;
+    	}
+    //
+    //  Implement the ChangeListener
+    //
+    	public void stateChanged(ChangeEvent e)
+    	{
+    		//  Keep the scrolling of the row table in sync with main table
+    		JViewport viewport = (JViewport) e.getSource();
+    		JScrollPane scrollPane = (JScrollPane)viewport.getParent();
+    		scrollPane.getVerticalScrollBar().setValue(viewport.getViewPosition().y);
+    	}
+    //
+    //  Implement the PropertyChangeListener
+    //
+    	public void propertyChange(PropertyChangeEvent e)
+    	{
+    		//  Keep the row table in sync with the main table
+
+    		if ("selectionModel".equals(e.getPropertyName()))
+    		{
+    			setSelectionModel( main.getSelectionModel() );
+    		}
+
+    		if ("model".equals(e.getPropertyName()))
+    		{
+    			setModel( main.getModel() );
+    		}
+    	}
+
+    	/*
+    	 *  Borrow the renderer from JDK1.4.2 table header
+    	 */
+    	private class RowNumberRenderer extends DefaultTableCellRenderer
+    	{
+    		/**
+			 * 
+			 */
+			private static final long serialVersionUID = -5430873664301394767L;
+
+			public RowNumberRenderer()
+    		{
+    			setHorizontalAlignment(JLabel.LEFT);
+    		}
+
+    		public Component getTableCellRendererComponent(
+    			JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column)
+    		{
+    			if (table != null)
+    			{
+    				JTableHeader header = table.getTableHeader();
+
+    				if (header != null)
+    				{
+    					setForeground(header.getForeground());
+    					setBackground(header.getBackground());
+    					setFont(header.getFont());
+    				}
+    			}
+
+    			if (isSelected)
+    			{
+    				setFont( getFont().deriveFont(Font.BOLD) );
+    			}
+
+    			setText((value == null) ? "" : value.toString());
+    			setBorder(UIManager.getBorder("TableHeader.cellBorder"));
+
+    			return this;
+    		}
+    	}
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCamo;
     private javax.swing.JButton btnCancel;
@@ -1051,9 +1325,12 @@ public String getDateAsString() {
     private javax.swing.JComboBox choiceOfficerCut;
     private javax.swing.JLabel lblOfficerCut;
     
+    private javax.swing.JTextArea txtInstructionsXP;
+    private javax.swing.JScrollPane scrXP;
     private javax.swing.JTable tableXP;
-
-
+    private javax.swing.JScrollPane scrAbilityXP;
+    private javax.swing.JPanel panAbilityXP;
+    
     // End of variables declaration//GEN-END:variables
 
 }

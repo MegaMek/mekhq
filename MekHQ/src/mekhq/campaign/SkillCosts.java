@@ -32,6 +32,11 @@ import java.util.Map;
  */
 public class SkillCosts implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5723522838337157640L;
+	
 	public static final int SK_GUN      = 0;
 	public static final int SK_PILOT    = 1;
 	public static final int SK_AMECH    = 2;
@@ -50,7 +55,7 @@ public class SkillCosts implements Serializable {
 		case SK_PILOT:
 			return "Piloting";
 		case SK_AMECH:
-			return "Anti-Mech";
+			return "Anti-Mek";
 		case SK_TECH:
 			return "Tech";
 		case SK_MED:
@@ -60,9 +65,9 @@ public class SkillCosts implements Serializable {
 		case SK_TAC:
 			return "Tactics";
 		case SK_INIT:
-			return "Init Bonus";
+			return "Init B";
 		case SK_TOUGH:
-			return "Toughness";
+			return "Tough";
 		default:
 			return "?";
 		}
@@ -153,5 +158,39 @@ public class SkillCosts implements Serializable {
 			titles[i] = getSkillName(i);
 		}
 		return titles;
+	}
+	
+	public void setCost(int cost, int level, int type) {
+		xpCosts.get(type)[level] = cost;
+	}
+	
+	public void setAbilityCost(String name, int cost) {
+		abilityCosts.put(name, cost);
+	}
+	
+	public static String getLevelNames(int i) {
+		String skill = "";
+		if(i == 6) {
+			skill = "/Novice";
+		}
+		else if(i == 5) {
+			skill = "/Green";
+		}
+		else if(i == 4) {
+			skill ="/Regular";
+		}
+		else if(i == 3) {
+			skill = "/Veteran";
+		}
+		else if(i == 2) {
+			skill = "/Elite";
+		}
+		else if(i == 1) {
+			skill = "/Heroic";
+		}
+		else if(i == 0) {
+			skill = "/Legend";
+		}
+		return i + skill;
 	}
 }
