@@ -96,9 +96,12 @@ public class SkillCosts implements Serializable {
 	Map<String, Integer> abilityCosts = new HashMap<String, Integer>();
 	private int defaultAbilityCost;
 	
+	private int scenarioXP;
+	
 	public SkillCosts() {
 		initializeCosts();
 		defaultAbilityCost = 8;
+		scenarioXP = 1;
 	}
 	
 	private void initializeCosts() {
@@ -201,6 +204,14 @@ public class SkillCosts implements Serializable {
 		return i + skill;
 	}
 	
+	public int getScenarioXP() {
+		return scenarioXP;
+	}
+	
+	public void setScenarioXP(int xp) {
+		scenarioXP = xp;
+	}
+	
 	private String printValues(int type) {
 		String values = "";
 		Integer[] costs = xpCosts.get(type);
@@ -221,7 +232,10 @@ public class SkillCosts implements Serializable {
 	}
 	
 	public void writeToXml(PrintWriter pw1, int indent) {
-	
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<scenarioXP>"
+				+scenarioXP
+				+"</scenarioXP>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<gunnery>"
 				+printValues(SK_GUN)
@@ -276,7 +290,9 @@ public class SkillCosts implements Serializable {
 			
 			for (int x=0; x<nl.getLength(); x++) {
 				Node wn2 = nl.item(x);
-				if (wn2.getNodeName().equalsIgnoreCase("gunnery")) {
+				if (wn2.getNodeName().equalsIgnoreCase("scenarioXP")) {
+					retVal.scenarioXP = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("gunnery")) {
 					retVal.readValuesFromXML(wn2.getTextContent(), SK_GUN);
 				} 
 				else if (wn2.getNodeName().equalsIgnoreCase("piloting")) {

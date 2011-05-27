@@ -32,10 +32,12 @@ import javax.swing.ImageIcon;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JViewport;
 import javax.swing.ListSelectionModel;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
@@ -569,6 +571,25 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panXP.setName("panXP"); // NOI18N
         panXP.setLayout(new java.awt.GridBagLayout());
         
+        lblScenarioXP = new JLabel(resourceMap.getString("lblScenarioXP.text"));
+        spnScenarioXP = new JSpinner(new SpinnerNumberModel(campaign.getSkillCosts().getScenarioXP(), 0, 10, 1));
+        
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        panXP.add(lblScenarioXP, gridBagConstraints);
+        
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        panXP.add(spnScenarioXP, gridBagConstraints);
+        
         txtInstructionsXP = new javax.swing.JTextArea();
         txtInstructionsXP.setText(resourceMap.getString("txtInstructionsXP.text"));
         txtInstructionsXP.setName("txtInstructions");
@@ -583,8 +604,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         txtInstructionsXP.setOpaque(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
@@ -605,9 +626,10 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         scrXP.setCorner(JScrollPane.UPPER_LEFT_CORNER, rowTable.getTableHeader());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
@@ -626,26 +648,31 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             if (group.getKey().equalsIgnoreCase(PilotOptions.MD_ADVANTAGES)) {
                 continue;
             }
+            if (group.getKey().equalsIgnoreCase(PilotOptions.EDGE_ADVANTAGES)) {
+                continue;
+            }
             for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements();) {
                 IOption option = j.nextElement();
                 lblOption = new JLabel(option.getDisplayableName());
                 lblOption.setToolTipText(option.getDescription());
+                gridBagConstraints = new java.awt.GridBagConstraints();
                 gridBagConstraints.gridx = 0;
                 gridBagConstraints.gridy = k;
                 gridBagConstraints.weightx = 1.0;
                 gridBagConstraints.weighty = 0.0;
                 gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-                gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+                gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
                 panAbilityXP.add(lblOption, gridBagConstraints); 
                 txtCost = new JTextField();
                 txtCost.setText(Integer.toString(campaign.getSkillCosts().getAbilityCost(option.getName())));
                 hashAbilityCosts.put(option.getName(), txtCost);
+                gridBagConstraints = new java.awt.GridBagConstraints();
                 gridBagConstraints.gridx = 1;
                 gridBagConstraints.gridy = k++;
                 gridBagConstraints.weightx = 0.0;
                 gridBagConstraints.weighty = 0.0;
                 gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-                gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+                gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
                 panAbilityXP.add(txtCost, gridBagConstraints); 
             }
         }
@@ -657,8 +684,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 	   			 BorderFactory.createEmptyBorder(5,5,5,5)));
         scrAbilityXP.setOpaque(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -1050,6 +1077,7 @@ private void txtNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
 				MekHQApp.logMessage("unreadable value in ability cost table for " + optionName);
 			}
 		}
+		campaign.getSkillCosts().setScenarioXP((Integer)spnScenarioXP.getModel().getValue());
 	}
 
 
@@ -1330,6 +1358,8 @@ public String getDateAsString() {
     private javax.swing.JTable tableXP;
     private javax.swing.JScrollPane scrAbilityXP;
     private javax.swing.JPanel panAbilityXP;
+    private JLabel lblScenarioXP;
+    private JSpinner spnScenarioXP;
     
     // End of variables declaration//GEN-END:variables
 
