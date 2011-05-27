@@ -422,6 +422,12 @@ public class ResolveScenarioTracker {
 		}
 		//now lets take care of missing units
 		for(Unit missUnit : missingUnits) {
+			if(blc > 0) {
+				long value = (long)(blc * missUnit.getSellValue());
+				campaign.getFinances().credit(value, Transaction.C_BLC, "Battle loss compensation for " + missUnit.getEntity().getDisplayName(), campaign.getCalendar().getTime());
+				DecimalFormat formatter = new DecimalFormat();
+				campaign.addReport(formatter.format(value) + " in battle loss compensation for " + missUnit.getEntity().getDisplayName() + " has been credited to your account.");
+			}
 			campaign.removeUnit(missUnit.getId());
 		}
 		//now lets take care of salvage
@@ -468,9 +474,9 @@ public class ResolveScenarioTracker {
 				campaign.addReport(u.getEntity().getDisplayName() + " has been recovered.");
 				if(blc > 0 && newValue > currentValue) {
 					long finalValue = (long)(blc * (newValue - currentValue));
-					campaign.getFinances().credit(finalValue, Transaction.C_BLC, "Battle loss compensation for " + en.getDisplayName(), campaign.getCalendar().getTime());
+					campaign.getFinances().credit(finalValue, Transaction.C_BLC, "Battle loss compensation (parts) for " + en.getDisplayName(), campaign.getCalendar().getTime());
 					DecimalFormat formatter = new DecimalFormat();
-					campaign.addReport(formatter.format(finalValue) + " in battle loss compensation for " + en.getDisplayName() + " has been credited to your account.");
+					campaign.addReport(formatter.format(finalValue) + " in battle loss compensation for parts for " + en.getDisplayName() + " has been credited to your account.");
 				}
 				return;
 			}

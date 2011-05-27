@@ -6,6 +6,7 @@ v0.1.8 (SVN)
 + SkillCosts added to XML serialization
 + scenarioXP field in SkillCosts and option in CampaignOptionsDialog
 + apply scenarioXP when resolving scenario
++ BLC for lost units (duh)
 
 v0.1.7 (2011-05-26)
 + MekLab tab (no functionality yet, but there it is)
