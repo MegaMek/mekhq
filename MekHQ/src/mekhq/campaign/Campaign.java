@@ -1318,6 +1318,9 @@ public class Campaign implements Serializable {
 		pw1.println("\t</forces>");
 		finances.writeToXml(pw1,1);
 		location.writeToXml(pw1, 1);
+		pw1.println("\t<skillCosts>");
+		skillCosts.writeToXml(pw1, 2);
+		pw1.println("\t</skillCosts>");
 		//parts is the biggest so it goes last
 		writeArrayAndHashToXml(pw1, 1, "parts", parts, partIds); // Parts
 		
@@ -1439,6 +1442,8 @@ public class Campaign implements Serializable {
 					processFinances(retVal, wn);
 				} else if(xn.equalsIgnoreCase("location")) {
 					retVal.location = CurrentLocation.generateInstanceFromXML(wn, retVal);
+				} else if(xn.equalsIgnoreCase("skillCosts")) {
+					retVal.skillCosts = SkillCosts.generateInstanceFromXML(wn);
 				}
 				
 			} else {

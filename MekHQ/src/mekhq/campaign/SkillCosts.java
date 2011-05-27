@@ -21,9 +21,16 @@
 
 package mekhq.campaign;
 
+import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+
+import mekhq.MekHQApp;
+
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * This object will keep track of all the various skill types and their associated experience point costs to advance
@@ -192,5 +199,121 @@ public class SkillCosts implements Serializable {
 			skill = "/Legend";
 		}
 		return i + skill;
+	}
+	
+	private String printValues(int type) {
+		String values = "";
+		Integer[] costs = xpCosts.get(type);
+		for(int i = 0; i < costs.length; i++) {
+			values += Integer.toString(costs[i]);
+			if(i < 6) {
+				values += ",";
+			}
+		}
+		return values;
+	}
+	
+	private void readValuesFromXML(String text, int type) {
+		String[] values = text.split(",");
+		for(int i = 0; i < values.length; i++) {
+			xpCosts.get(type)[i] = Integer.parseInt(values[i]);
+		}
+	}
+	
+	public void writeToXml(PrintWriter pw1, int indent) {
+	
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<gunnery>"
+				+printValues(SK_GUN)
+				+"</gunnery>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<piloting>"
+				+printValues(SK_PILOT)
+				+"</piloting>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<antiMek>"
+				+printValues(SK_AMECH)
+				+"</antiMek>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<tech>"
+				+printValues(SK_TECH)
+				+"</tech>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<medical>"
+				+printValues(SK_MED)
+				+"</medical>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<artillery>"
+				+printValues(SK_ARTY)
+				+"</artillery>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<tactics>"
+				+printValues(SK_TAC)
+				+"</tactics>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<init>"
+				+printValues(SK_INIT)
+				+"</init>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<tough>"
+				+printValues(SK_TOUGH)
+				+"</tough>");
+		for(String optionName : abilityCosts.keySet()) {
+			pw1.println(MekHqXmlUtil.indentStr(indent+1)
+					+"<ability-" + optionName + ">"
+					+abilityCosts.get(optionName)
+					+"</ability-" + optionName + ">");
+		}
+		
+	}
+	
+	public static SkillCosts generateInstanceFromXML(Node wn) {
+		SkillCosts retVal = null;
+	
+		try {		
+			retVal = new SkillCosts();
+			NodeList nl = wn.getChildNodes();
+			
+			for (int x=0; x<nl.getLength(); x++) {
+				Node wn2 = nl.item(x);
+				if (wn2.getNodeName().equalsIgnoreCase("gunnery")) {
+					retVal.readValuesFromXML(wn2.getTextContent(), SK_GUN);
+				} 
+				else if (wn2.getNodeName().equalsIgnoreCase("piloting")) {
+					retVal.readValuesFromXML(wn2.getTextContent(), SK_PILOT);
+				} 
+				else if (wn2.getNodeName().equalsIgnoreCase("antiMek")) {
+					retVal.readValuesFromXML(wn2.getTextContent(), SK_AMECH);
+				} 
+				else if (wn2.getNodeName().equalsIgnoreCase("tech")) {
+					retVal.readValuesFromXML(wn2.getTextContent(), SK_TECH);
+				} 
+				else if (wn2.getNodeName().equalsIgnoreCase("medical")) {
+					retVal.readValuesFromXML(wn2.getTextContent(), SK_MED);
+				} 
+				else if (wn2.getNodeName().equalsIgnoreCase("artillery")) {
+					retVal.readValuesFromXML(wn2.getTextContent(), SK_ARTY);
+				} 
+				else if (wn2.getNodeName().equalsIgnoreCase("tactics")) {
+					retVal.readValuesFromXML(wn2.getTextContent(), SK_TAC);
+				} 
+				else if (wn2.getNodeName().equalsIgnoreCase("init")) {
+					retVal.readValuesFromXML(wn2.getTextContent(), SK_INIT);
+				} 
+				else if (wn2.getNodeName().equalsIgnoreCase("tough")) {
+					retVal.readValuesFromXML(wn2.getTextContent(), SK_TOUGH);
+				} 
+				else if (wn2.getNodeName().startsWith("ability-")) {
+					retVal.setAbilityCost(wn2.getNodeName().split("-")[1], Integer.parseInt(wn2.getTextContent()));
+				} 
+			}		
+		} catch (Exception ex) {
+			// Errrr, apparently either the class name was invalid...
+			// Or the listed name doesn't exist.
+			// Doh!
+			MekHQApp.logError(ex);
+		}
+		
+		return retVal;
 	}
 }
