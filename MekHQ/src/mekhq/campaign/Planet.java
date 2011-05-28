@@ -25,8 +25,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Hashtable;
 import java.util.TreeMap;
 
 import megamek.common.EquipmentType;

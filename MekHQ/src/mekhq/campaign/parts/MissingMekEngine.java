@@ -28,7 +28,6 @@ import megamek.common.Engine;
 import megamek.common.EquipmentType;
 import megamek.common.Mech;
 import megamek.common.TechConstants;
-import mekhq.campaign.Faction;
 import mekhq.campaign.MekHqXmlUtil;
 
 import org.w3c.dom.Node;

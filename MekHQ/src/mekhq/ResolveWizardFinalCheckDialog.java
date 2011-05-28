@@ -23,7 +23,6 @@ package mekhq;
 
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
-import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;

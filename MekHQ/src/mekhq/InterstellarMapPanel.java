@@ -20,14 +20,11 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
-import java.util.GregorianCalendar;
 
 import javax.swing.BorderFactory;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-
-import sun.tools.tree.ThisExpression;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Faction;

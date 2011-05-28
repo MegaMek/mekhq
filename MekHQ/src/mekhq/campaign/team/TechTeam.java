@@ -25,14 +25,11 @@ import java.io.PrintWriter;
 
 import megamek.common.Aero;
 import megamek.common.BattleArmor;
-import megamek.common.Compute;
-import megamek.common.Entity;
 import megamek.common.Mech;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
-import mekhq.campaign.Utilities;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.work.IPartWork;
 

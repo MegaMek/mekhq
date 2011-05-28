@@ -41,7 +41,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Planet;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.mission.Contract;
 

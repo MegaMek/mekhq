@@ -23,7 +23,6 @@ package mekhq.campaign.team;
 
 import java.io.PrintWriter;
 
-import megamek.common.Compute;
 import megamek.common.TargetRoll;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.work.IMedicalWork;

@@ -28,13 +28,12 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import mekhq.MekHQApp;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlSerializable;
 import mekhq.campaign.MekHqXmlUtil;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 
 /**

@@ -28,9 +28,6 @@ import java.io.PrintStream;
 
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.UIManager.LookAndFeelInfo;
-
-import megamek.common.MechSummaryCache;
 
 import org.jdesktop.application.Application;
 import org.jdesktop.application.SingleFrameApplication;

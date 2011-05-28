@@ -23,8 +23,6 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 
 import megamek.common.EquipmentType;
 import megamek.common.TargetRoll;

@@ -25,7 +25,6 @@ import java.io.PrintWriter;
 
 import megamek.common.EquipmentType;
 import megamek.common.Tank;
-import megamek.common.VTOL;
 
 import org.w3c.dom.Node;
 

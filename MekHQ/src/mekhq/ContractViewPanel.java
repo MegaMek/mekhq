@@ -13,7 +13,6 @@ import java.text.SimpleDateFormat;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 
-import megamek.common.TechConstants;
 import mekhq.campaign.mission.Contract;
 
 /**

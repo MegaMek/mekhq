@@ -23,12 +23,10 @@ package mekhq;
 
 import java.awt.Dimension;
 import java.awt.Frame;
-import java.awt.Window;
 
 import javax.swing.BorderFactory;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Planet;
 import mekhq.campaign.mission.Mission;
 
 /**

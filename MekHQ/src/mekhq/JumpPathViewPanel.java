@@ -8,12 +8,10 @@ package mekhq;
 
 import java.awt.Color;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Faction;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.Planet;
 

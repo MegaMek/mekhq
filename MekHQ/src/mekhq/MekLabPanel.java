@@ -21,53 +21,19 @@
 
 package mekhq;
 
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.FileDialog;
-import java.awt.Point;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
 
-import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
-import javax.swing.JDialog;
-import javax.swing.JEditorPane;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
-import javax.swing.KeyStroke;
-import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
-import javax.swing.UIManager;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.text.DefaultCaret;
-import javax.swing.text.html.HTMLEditorKit;
 
-import megamek.MegaMek;
-import megamek.client.ui.swing.MechView;
-import megamek.client.ui.swing.UnitLoadingDialog;
 import megamek.common.BipedMech;
 import megamek.common.Engine;
-import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Mech;
-import megamek.common.MechFileParser;
 import megamek.common.QuadMech;
 import megamek.common.TechConstants;
-import megamek.common.UnitType;
 import megamek.common.verifier.EntityVerifier;
 import megamek.common.verifier.TestEntity;
 import megamek.common.verifier.TestMech;
@@ -79,11 +45,8 @@ import megameklab.com.ui.Mek.tabs.BuildTab;
 import megameklab.com.ui.Mek.tabs.EquipmentTab;
 import megameklab.com.ui.Mek.tabs.StructureTab;
 import megameklab.com.ui.Mek.tabs.WeaponTab;
-import megameklab.com.ui.dialog.UnitViewerDialog;
 import megameklab.com.util.CConfig;
-import megameklab.com.util.ConfigurationDialog;
 import megameklab.com.util.RefreshListener;
-import megameklab.com.util.UnitPrintManager;
 import megameklab.com.util.UnitUtil;
 
 public class MekLabPanel extends JPanel implements RefreshListener {

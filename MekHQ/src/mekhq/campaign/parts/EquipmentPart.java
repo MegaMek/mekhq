@@ -22,13 +22,11 @@
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
-import java.text.NumberFormat;
 
 import megamek.common.AmmoType;
 import megamek.common.CriticalSlot;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
-import megamek.common.MiscType;
 import megamek.common.Mounted;
 import megamek.common.TechConstants;
 import megamek.common.weapons.Weapon;
