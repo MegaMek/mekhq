@@ -21,6 +21,7 @@
 
 package mekhq.campaign;
 
+import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -37,14 +38,17 @@ import org.w3c.dom.NodeList;
 
 /**
  * This is the start of a planet object that will keep lots of information about 
- * planets that can be displayed on the interstellar map. Planet objects will 
- * *NOT* be serialized. The arraylist of planets in campaign will be loaded
- * from scratch on start up.
+ * planets that can be displayed on the interstellar map.
  * 
  * 
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class Planet {
+public class Planet implements Serializable {
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8699502165157515099L;
 	
 	private static final int SPECTRAL_O = 0;
 	private static final int SPECTRAL_B = 1;
