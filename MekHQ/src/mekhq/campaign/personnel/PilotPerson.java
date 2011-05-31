@@ -23,6 +23,7 @@ package mekhq.campaign.personnel;
 
 import java.io.PrintWriter;
 import java.util.Enumeration;
+import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -35,6 +36,7 @@ import megamek.common.Protomech;
 import megamek.common.Tank;
 import megamek.common.options.IOption;
 import megamek.common.options.PilotOptions;
+import mekhq.MekHQApp;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Ranks;
 import mekhq.campaign.SkillCosts;
@@ -273,6 +275,24 @@ public class PilotPerson extends Person implements IMedicalWork {
 					+"<pilotNickname>"
 					+pilot.getNickname()
 					+"</pilotNickname>");
+			if (pilot.countOptions(PilotOptions.LVL3_ADVANTAGES) > 0) {
+				pw1.println(MekHqXmlUtil.indentStr(indent+1)
+						+"<advantages>"
+						+String.valueOf(pilot.getOptionList("::", PilotOptions.LVL3_ADVANTAGES))
+						+"</advantages>");
+			}
+			if (pilot.countOptions(PilotOptions.EDGE_ADVANTAGES) > 0) {
+				pw1.println(MekHqXmlUtil.indentStr(indent+1)
+						+"<edge>"
+						+String.valueOf(pilot.getOptionList("::", PilotOptions.EDGE_ADVANTAGES))
+						+"</edge>");
+			}
+			if (pilot.countOptions(PilotOptions.MD_ADVANTAGES) > 0) {
+				pw1.println(MekHqXmlUtil.indentStr(indent+1)
+						+"<implants>"
+						+String.valueOf(pilot.getOptionList("::", PilotOptions.MD_ADVANTAGES))
+						+"</implants>");
+			}
 		}
 		
 		writeToXmlEnd(pw1, indent, id);
@@ -288,6 +308,9 @@ public class PilotPerson extends Person implements IMedicalWork {
 		int pilotCommandBonus = -1;
 		int pilotInitBonus = -1;
 		String pilotNickname = null;
+		String advantages = null;
+		String edge = null;
+		String implants = null;
 		
 		for (int x=0; x<nl.getLength(); x++) {
 			Node wn2 = nl.item(x);
@@ -306,6 +329,12 @@ public class PilotPerson extends Person implements IMedicalWork {
 				pilotCommandBonus = Integer.parseInt(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("pilotInitBonus")) {
 				pilotInitBonus = Integer.parseInt(wn2.getTextContent());
+			} else if (wn2.getNodeName().equalsIgnoreCase("advantages")) {
+				advantages = wn2.getTextContent();
+			} else if (wn2.getNodeName().equalsIgnoreCase("edge")) {
+				edge = wn2.getTextContent();
+			} else if (wn2.getNodeName().equalsIgnoreCase("implants")) {
+				implants = wn2.getTextContent();
 			} else if (wn2.getNodeName().equalsIgnoreCase("type")) {
 				setType(Integer.parseInt(wn2.getTextContent()));
 			} else if (wn2.getNodeName().equalsIgnoreCase("unitId")) {
@@ -326,6 +355,50 @@ public class PilotPerson extends Person implements IMedicalWork {
 
 		if (pilotCommandBonus >= 0)
 			pilot.setCommandBonus(pilotCommandBonus);
+		
+		if ((null != advantages) && (advantages.trim().length() > 0)) {
+            StringTokenizer st = new StringTokenizer(advantages,"::");
+            while (st.hasMoreTokens()) {
+                String adv = st.nextToken();
+                String advName = Pilot.parseAdvantageName(adv);
+                Object value = Pilot.parseAdvantageValue(adv);
+
+                try {
+                    pilot.getOptions().getOption(advName).setValue(value);
+                } catch (Exception e) {
+                    MekHQApp.logMessage("Error restoring advantage: " +  adv);
+                }
+            }
+        }
+		if ((null != edge) && (edge.trim().length() > 0)) {
+            StringTokenizer st = new StringTokenizer(edge,"::");
+            while (st.hasMoreTokens()) {
+                String adv = st.nextToken();
+                String advName = Pilot.parseAdvantageName(adv);
+                Object value = Pilot.parseAdvantageValue(adv);
+
+                try {
+                    pilot.getOptions().getOption(advName).setValue(value);
+                } catch (Exception e) {
+                    MekHQApp.logMessage("Error restoring edge: " +  adv);
+                }
+            }
+        }
+		if ((null != implants) && (implants.trim().length() > 0)) {
+            StringTokenizer st = new StringTokenizer(implants,"::");
+            while (st.hasMoreTokens()) {
+                String adv = st.nextToken();
+                String advName = Pilot.parseAdvantageName(adv);
+                Object value = Pilot.parseAdvantageValue(adv);
+
+                try {
+                    pilot.getOptions().getOption(advName).setValue(value);
+                } catch (Exception e) {
+                    MekHQApp.logMessage("Error restoring implants: " +  adv);
+                }
+            }
+        }
+		
 	}
 
 	public int getUnitId() {
