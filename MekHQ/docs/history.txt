@@ -9,6 +9,7 @@ v0.1.8 (SVN)
 + BLC for lost units (duh)
 + better default theming of look and feel by system
 + Bug 3308725: All SPA's broken
++ new MM.jar
 
 v0.1.7 (2011-05-26)
 + MekLab tab (no functionality yet, but there it is)
