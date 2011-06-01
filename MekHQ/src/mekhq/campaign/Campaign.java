@@ -798,7 +798,7 @@ public class Campaign implements Serializable {
 		}
 		for (Person p : getPersonnel()) {
 			if(p.needsFixing()) {
-				SupportTeam t = getTeam(p.getTeamId());
+				SupportTeam t = getTeam(p.getAssignedTeamId());
 				if(null != t && t instanceof MedicalTeam) {
 					addReport(healPerson(p, (MedicalTeam)t));
 				} else if(p.checkNaturalHealing()) {
@@ -810,7 +810,7 @@ public class Campaign implements Serializable {
 		//concurrent mod problems
 		ArrayList<Integer> assignedPartIds = new ArrayList<Integer>();
 		for(Part part : getParts()) {
-			if(null != part.getUnit() && part.getTeamId() != -1) {
+			if(null != part.getUnit() && part.getAssignedTeamId() != -1) {
 				assignedPartIds.add(part.getId());
 			}
 			if(part instanceof IAcquisitionWork) {
@@ -820,7 +820,7 @@ public class Campaign implements Serializable {
 		for(int pid : assignedPartIds) {
 			Part part = getPart(pid);
 			if(null != part) {
-				SupportTeam t = getTeam(part.getTeamId());
+				SupportTeam t = getTeam(part.getAssignedTeamId());
 				if(null != t && t instanceof TechTeam) {
 					fixPart(part, (TechTeam)t);
 				}

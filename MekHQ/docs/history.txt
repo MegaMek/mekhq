@@ -13,6 +13,8 @@ v0.1.8 (SVN)
 + Bug 3309501: Campaign Loading
 + Bug 3309012: Command rights not updating
 + Bug 3309015: Pilots marked KIA show up MIA
++ Bug 3309014: Doctor always has 1 patient
++ Bug: structuralIntegrity has no default constructor
 
 v0.1.7 (2011-05-26)
 + MekLab tab (no functionality yet, but there it is)

@@ -75,7 +75,7 @@ public class MedicalTeam extends SupportTeam {
     public int getPatients() {
        int patients = 0;
         for(Person person : campaign.getPersonnel()) {
-        	if(person.getTeamId() == getId()) {
+        	if(person.getAssignedTeamId() == getId()) {
         		patients++;
         	}
         }
@@ -97,7 +97,7 @@ public class MedicalTeam extends SupportTeam {
    }
     
     public TargetRoll getTargetFor(IMedicalWork medWork) {
-        if(medWork.getTeamId() != getId() ) {
+        if(medWork.getAssignedTeamId() != getId() ) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, medWork.getPatientName() + " is already being tended by another doctor");
         }      
         if(!medWork.needsFixing()) {

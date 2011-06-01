@@ -87,7 +87,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		bonus = "(" + bonus + ")";
 		String toReturn = "<html><font size='2'";
 		String scheduled = "";
-		if (getTeamId() != -1) {
+		if (getAssignedTeamId() != -1) {
 			scheduled = " (scheduled) ";
 		}
 	

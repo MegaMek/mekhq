@@ -195,7 +195,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 			action = "Salvage ";
 		}
 		String scheduled = "";
-		if (getTeamId() != -1) {
+		if (getAssignedTeamId() != -1) {
 			scheduled = " (scheduled) ";
 		}
 	
@@ -500,7 +500,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	}
 	
 	@Override
-	public int getTeamId() {
+	public int getAssignedTeamId() {
 		return teamId;
 	}
 	

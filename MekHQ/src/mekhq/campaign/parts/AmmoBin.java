@@ -331,7 +331,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 		}
 		String toReturn = "<html><font size='2'";
 		String scheduled = "";
-		if (getTeamId() != -1) {
+		if (getAssignedTeamId() != -1) {
 			scheduled = " (scheduled) ";
 		}
 	

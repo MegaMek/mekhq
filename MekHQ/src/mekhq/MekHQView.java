@@ -2956,7 +2956,7 @@ public class MekHQView extends FrameView {
 		// must have a valid doctor and an unassigned task
 		Person curPerson = campaign.getPerson(currentPatientId);
 		SupportTeam team = campaign.getTeam(currentDoctorId);
-		if (null != curPerson && curPerson.getTeamId() == -1 && null != team && curPerson.canFix(team)) {
+		if (null != curPerson && curPerson.getAssignedTeamId() == -1 && null != team && curPerson.canFix(team)) {
 			btnAssignDoc.setEnabled(true);
 		} else {
 			btnAssignDoc.setEnabled(false);

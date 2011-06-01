@@ -46,6 +46,10 @@ public class StructuralIntegrity extends Part {
 
 	private int pointsNeeded;
 	
+	public StructuralIntegrity() {
+		this(0);
+	}
+	
 	public StructuralIntegrity(int entityWeight) {
 		super(entityWeight);
 		pointsNeeded = 0;

@@ -48,7 +48,7 @@ public abstract interface IWork {
 	
 	public abstract String fail(int rating);
 	
-	public abstract int getTeamId();
+	public abstract int getAssignedTeamId();
 	
 	public abstract boolean canFix(SupportTeam team);
 	

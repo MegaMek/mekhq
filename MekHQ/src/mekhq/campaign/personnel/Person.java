@@ -277,7 +277,7 @@ public abstract class Person implements Serializable, MekHqXmlSerializable, IMed
         this.xp = xp;
     }
     
-    public int getTeamId() {
+    public int getAssignedTeamId() {
         return medicalTeamId;
     }
     
@@ -386,6 +386,10 @@ public abstract class Person implements Serializable, MekHqXmlSerializable, IMed
 				+forceId
 				+"</forceId>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<medicalTeamId>"
+				+medicalTeamId
+				+"</medicalTeamId>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<salary>"
 				+salary
 				+"</salary>");
@@ -441,6 +445,8 @@ public abstract class Person implements Serializable, MekHqXmlSerializable, IMed
 					retVal.rank = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("forceId")) {
 					retVal.forceId = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("medicalTeamId")) {
+					retVal.medicalTeamId = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("status")) {
 					retVal.status = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("salary")) {

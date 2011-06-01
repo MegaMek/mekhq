@@ -207,7 +207,7 @@ public class AmmoStorage extends EquipmentPart {
 	public String getDesc() {
 		String toReturn = "<html><font size='2'";
 		String scheduled = "";
-		if (getTeamId() != -1) {
+		if (getAssignedTeamId() != -1) {
 			scheduled = " (scheduled) ";
 		}
 	
