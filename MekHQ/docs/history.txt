@@ -11,6 +11,7 @@ v0.1.8 (SVN)
 + Bug 3308725: All SPA's broken
 + new MM.jar
 + Bug 3309501: Campaign Loading
++ Bug 3309012: Command rights not updating
 
 v0.1.7 (2011-05-26)
 + MekLab tab (no functionality yet, but there it is)
