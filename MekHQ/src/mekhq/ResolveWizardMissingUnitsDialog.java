@@ -187,11 +187,8 @@ public class ResolveWizardMissingUnitsDialog extends javax.swing.JDialog {
     	}
     	tracker.identifyMissingUnits();
     	this.setVisible(false);
-    	if(tracker.getMissingPilots().size() > 0) {
-    		ResolveWizardMissingPilotsDialog resolveDialog = new ResolveWizardMissingPilotsDialog((Frame)getParent(), true, tracker);
-    		resolveDialog.setVisible(true);
-    	} else if(tracker.getDeadPilots().size() > 0) {
-    		ResolveWizardCasualtiesDialog resolveDialog = new ResolveWizardCasualtiesDialog((Frame)getParent(), true, tracker);
+    	if(tracker.getPeople().size() > 0) {
+    		ResolveWizardPilotStatusDialog resolveDialog = new ResolveWizardPilotStatusDialog((Frame)getParent(), true, tracker);
     		resolveDialog.setVisible(true);
     	} else if(tracker.getPotentialSalvage().size() > 0 
     			&& (!(tracker.getMission() instanceof Contract) || ((Contract)tracker.getMission()).canSalvage())) {

@@ -209,7 +209,9 @@ public class ResolveWizardFinalCheckDialog extends javax.swing.JDialog {
         names = "";
         if(tracker.getRecoveredPilots().size() > 0) {
         	for(Pilot p : tracker.getRecoveredPilots()) {
-        		names += p.getName() + "\n";
+        		if(!tracker.foundMatch(p, tracker.getDeadPilots())) {
+        			names += p.getName() + "\n";
+        		}
         	}
         	txtRecoveredPilots.setText(names);
         }

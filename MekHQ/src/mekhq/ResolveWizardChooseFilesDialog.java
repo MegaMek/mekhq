@@ -214,11 +214,8 @@ public class ResolveWizardChooseFilesDialog extends javax.swing.JDialog {
     	if(tracker.getMissingUnits().size() > 0) {
     		ResolveWizardMissingUnitsDialog resolveDialog = new ResolveWizardMissingUnitsDialog((Frame)getParent(), true, tracker);
     		resolveDialog.setVisible(true);
-    	} else if(tracker.getMissingPilots().size() > 0) {
-    		ResolveWizardMissingPilotsDialog resolveDialog = new ResolveWizardMissingPilotsDialog((Frame)getParent(), true, tracker);
-    		resolveDialog.setVisible(true);
-    	} else if(tracker.getDeadPilots().size() > 0) {
-    		ResolveWizardCasualtiesDialog resolveDialog = new ResolveWizardCasualtiesDialog((Frame)getParent(), true, tracker);
+    	} else if(tracker.getPeople().size() > 0) {
+    		ResolveWizardPilotStatusDialog resolveDialog = new ResolveWizardPilotStatusDialog((Frame)getParent(), true, tracker);
     		resolveDialog.setVisible(true);
     	} else if(tracker.getPotentialSalvage().size() > 0 
     			&& (!(tracker.getMission() instanceof Contract) || ((Contract)tracker.getMission()).canSalvage())) {

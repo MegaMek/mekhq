@@ -38,7 +38,7 @@ import mekhq.campaign.personnel.PilotPerson;
  *
  * @author  Taharqa
  */
-public class ResolveWizardMissingPilotsDialog extends javax.swing.JDialog {
+public class ResolveWizardPilotStatusDialog extends javax.swing.JDialog {
 	private static final long serialVersionUID = -8038099101234445018L;
     
 	private ResolveScenarioTracker tracker;
@@ -55,7 +55,7 @@ public class ResolveWizardMissingPilotsDialog extends javax.swing.JDialog {
 
 	
     /** Creates new form NewTeamDialog */
-    public ResolveWizardMissingPilotsDialog(java.awt.Frame parent, boolean modal, ResolveScenarioTracker t) {
+    public ResolveWizardPilotStatusDialog(java.awt.Frame parent, boolean modal, ResolveScenarioTracker t) {
         super(parent, modal);
         this.tracker = t;
         initComponents();
@@ -79,7 +79,7 @@ public class ResolveWizardMissingPilotsDialog extends javax.swing.JDialog {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
 
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(ResolveWizardMissingPilotsDialog.class);
+        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(ResolveWizardPilotStatusDialog.class);
         getContentPane().setLayout(new java.awt.GridBagLayout());
         
         setTitle(resourceMap.getString("title"));
@@ -114,15 +114,21 @@ public class ResolveWizardMissingPilotsDialog extends javax.swing.JDialog {
         JRadioButton miaButton;
         JRadioButton kiaButton; 
         ButtonGroup group;
-        for(PilotPerson pp : tracker.getMissingPilots()) {
+        for(PilotPerson pp : tracker.getPeople()) {
         	nameLbl = new JLabel(pp.getFullTitle());
         	activeButton = new JRadioButton("Active");
         	activeBtns.add(activeButton);
         	miaButton = new JRadioButton("MIA");
-        	miaButton.setSelected(true);
         	miaBtns.add(miaButton);
         	kiaButton = new JRadioButton("KIA"); 
         	kiaBtns.add(kiaButton);
+        	if(tracker.foundMatch(pp.getPilot(), tracker.getDeadPilots())) {
+        		kiaButton.setSelected(true);
+        	} else if(tracker.foundMatch(pp.getPilot(), tracker.getRecoveredPilots())) {
+        		activeButton.setSelected(true);
+        	} else {
+        		miaButton.setSelected(true);
+        	}
         	group = new ButtonGroup();
         	group.add(activeButton);
         	group.add(miaButton);
@@ -206,17 +212,19 @@ public class ResolveWizardMissingPilotsDialog extends javax.swing.JDialog {
     private void btnNextActionPerformed(java.awt.event.ActionEvent evt) {
     	for(int i = 0; i < activeBtns.size(); i++) {
     		JRadioButton activeBtn = activeBtns.get(i);
+    		JRadioButton kiaBtn = kiaBtns.get(i);
     		if(activeBtn.getModel().isSelected()) {
-    			tracker.recoverMissingPilot(i);
+    			tracker.makeActive(tracker.getPeople().get(i).getPilot());
+    		}
+    		else if(kiaBtn.getModel().isSelected()) {
+    			tracker.makeCasualty(tracker.getPeople().get(i).getPilot());
+    		} else {
+    			tracker.makeMissing(tracker.getPeople().get(i).getPilot());
     		}
     	}
     	tracker.identifyMissingPilots();
     	this.setVisible(false);
-    	tracker.checkForCasualties();
-    	if(tracker.getDeadPilots().size() > 0) {
-    		ResolveWizardCasualtiesDialog resolveDialog = new ResolveWizardCasualtiesDialog((Frame)getParent(), true, tracker);
-    		resolveDialog.setVisible(true);
-    	} else if(tracker.getPotentialSalvage().size() > 0 
+    	if(tracker.getPotentialSalvage().size() > 0 
     			&& (!(tracker.getMission() instanceof Contract) || ((Contract)tracker.getMission()).canSalvage())) {
     		ResolveWizardSalvageDialog resolveDialog = new ResolveWizardSalvageDialog((Frame)getParent(), true, tracker);
     		resolveDialog.setVisible(true);

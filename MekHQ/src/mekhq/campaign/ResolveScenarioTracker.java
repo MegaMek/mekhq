@@ -172,9 +172,9 @@ public class ResolveScenarioTracker {
 			}
 		}
 		checkSalvageForPilotsAndUnits() ;
+		checkForCasualties();
 		identifyMissingUnits();
 		identifyMissingPilots();
-		checkForCasualties();
 	}
 	
 	/**
@@ -207,7 +207,7 @@ public class ResolveScenarioTracker {
 	public void identifyMissingPilots() {
 		missingPilots = new ArrayList<PilotPerson>();
 		for(PilotPerson person : people) {
-			if(!foundMatch(person.getPilot(), pilots)) {
+			if(!foundMatch(person.getPilot(), pilots) && !foundMatch(person.getPilot(), deadPilots)) {
 				missingPilots.add(person);
 			}
 		}
@@ -313,13 +313,22 @@ public class ResolveScenarioTracker {
 		return null;
 	}
 	
-	private boolean foundMatch(Pilot p, ArrayList<Pilot> pils) {
+	public boolean foundMatch(Pilot p, ArrayList<Pilot> pils) {
 		for(Pilot otherPilots : pils) {
 			if(otherPilots.getExternalId() == p.getExternalId()) {
 				return true;
 			}
 		}
 		return false;
+	}
+	
+	private Pilot getMatch(Pilot p, ArrayList<Pilot> pils) {
+		for(Pilot otherPilot : pils) {
+			if(otherPilot.getExternalId() == p.getExternalId()) {
+				return otherPilot;
+			}
+		}
+		return null;
 	}
 	
 	
@@ -339,12 +348,49 @@ public class ResolveScenarioTracker {
 		return missingPilots;
 	}
 	
-	public void recoverMissingPilot(int i) {
-		if(i < 0 || i > missingPilots.size()) {
-			return;
+	public void makeActive(Pilot pilot) {
+		if(!foundMatch(pilot, pilots)) {
+			pilots.add(pilot);
+		}	
+		int idx = -1;
+		for(int i = 0; i < deadPilots.size(); i++) {
+			if(deadPilots.get(i).getExternalId() == pilot.getExternalId()) {
+				idx = i;
+				break;
+			}
 		}
-		PilotPerson pp = missingPilots.get(i);
-		pilots.add(pp.getPilot());
+		if(idx > -1) {
+			deadPilots.remove(idx);
+		}
+	}
+	
+	public void makeCasualty(Pilot pilot) {
+		if(!foundMatch(pilot, deadPilots)) {
+			deadPilots.add(pilot);
+		}	
+	}
+	
+	public void makeMissing(Pilot pilot) {
+		int idx = -1;
+		for(int i = 0; i < pilots.size(); i++) {
+			if(pilots.get(i).getExternalId() == pilot.getExternalId()) {
+				idx = i;
+				break;
+			}
+		}
+		if(idx > -1) {
+			pilots.remove(idx);
+		}
+		idx = -1;
+		for(int i = 0; i < deadPilots.size(); i++) {
+			if(deadPilots.get(i).getExternalId() == pilot.getExternalId()) {
+				idx = i;
+				break;
+			}
+		}
+		if(idx > -1) {
+			deadPilots.remove(idx);
+		}	
 	}
 	
 	public ArrayList<Pilot> getDeadPilots() {
@@ -358,6 +404,10 @@ public class ResolveScenarioTracker {
 		Pilot casualty = deadPilots.get(i);
 		casualty.setHits(5);
 		casualty.setDead(false);
+	}
+	
+	public ArrayList<PilotPerson> getPeople() {
+		return people;
 	}
 	
 	public ArrayList<Entity> getPotentialSalvage() {
@@ -412,13 +462,13 @@ public class ResolveScenarioTracker {
 		for(Pilot p : pilots) {
 			updatePilotWith(p);
 		}
-		//now lets take care of dead pilots
-		for(Pilot dead : deadPilots) {
-			killPilot(dead);
-		}
 		//now lets take take care of missing pilots
 		for(PilotPerson miss : missingPilots) {
 			setMIA(miss);
+		}
+		//now lets take care of dead pilots
+		for(Pilot dead : deadPilots) {
+			killPilot(dead);
 		}
 		//now lets take care of missing units
 		for(Unit missUnit : missingUnits) {
@@ -490,6 +540,10 @@ public class ResolveScenarioTracker {
 			}
 			PilotPerson pp = (PilotPerson)person;
 			if(pp.getPilot().getExternalId() == pilot.getExternalId()) {
+				if(pilot.isDead()) {
+					pilot.setDead(false);
+					pilot.setHits(0);
+				}
 				pp.setPilot(pilot);
 				pp.undeploy(campaign);
 				//assign XP
@@ -512,6 +566,8 @@ public class ResolveScenarioTracker {
 			}
 			PilotPerson pp = (PilotPerson)person;
 			if(pp.getPilot().getExternalId() == pilot.getExternalId()) {
+				pp.getPilot().setDead(true);
+				pp.getPilot().setHits(6);
 				pp.setStatus(Person.S_KIA);
 				campaign.removePersonFromForce(pp);
 				campaign.addReport(pp.getFullTitle() + " has been killed in action.");
