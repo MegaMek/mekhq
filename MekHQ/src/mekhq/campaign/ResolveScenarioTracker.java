@@ -545,6 +545,8 @@ public class ResolveScenarioTracker {
 					pilot.setHits(0);
 				}
 				pp.setPilot(pilot);
+				//don't use the MM pilot name
+				pp.resetPilotName();
 				pp.undeploy(campaign);
 				//assign XP
 				pp.setXp(pp.getXp() + campaign.getSkillCosts().getScenarioXP());

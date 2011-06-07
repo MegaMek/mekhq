@@ -226,7 +226,7 @@ public class CustomizePilotDialog extends javax.swing.JDialog implements DialogO
         gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        textName.setText(pilot.getName());
+        textName.setText(person.getName());
         getContentPane().add(textName, gridBagConstraints);
 
         btnRandomName.setText(resourceMap.getString("btnRandomName.text")); // NOI18N
@@ -512,8 +512,9 @@ public class CustomizePilotDialog extends javax.swing.JDialog implements DialogO
         	person = campaign.newPilotPerson(PilotPerson.T_MECHWARRIOR);
         	refreshPilotAndOptions();
         } else {
+        	person.setName(name);
+        	person.resetPilotName();
         	Pilot p = person.getPilot();
-        	p.setName(name);
         	p.setGunnery(gunnery);
         	p.setPiloting(piloting);
         	p.setNickname(nick);

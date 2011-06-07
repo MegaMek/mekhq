@@ -58,6 +58,9 @@ public class PilotPerson extends Person implements IMedicalWork {
     private Pilot pilot;
     private Unit unit;
     private int unitId;
+    
+    //track name separately in MHQ
+    private String name;
    
     public PilotPerson() {
     	this(null, 0, null);
@@ -66,6 +69,9 @@ public class PilotPerson extends Person implements IMedicalWork {
     public PilotPerson(Pilot p, int t, Ranks r) {
         super(r);
         this.pilot = p;
+        if(null != p) {
+        	this.name = p.getName();
+        }
         setType(t);
         reCalc();
     }
@@ -149,6 +155,30 @@ public class PilotPerson extends Person implements IMedicalWork {
         this.pilot = p;
     }
 
+    @Override
+    public String getName() {
+    	return name;
+    }
+    
+    public void setName(String n) {
+    	this.name = n;
+    	resetPilotName();
+    }
+    
+    /**This sets the MM pilot name from the name and rank in PilotPerson
+     * Doing it this way gives us some flexibility in how names are reported
+     * in MM vs. MHQ
+     */
+    public void resetPilotName() {
+    	pilot.setName(getFullTitle());
+    }
+    
+    @Override
+    public void setRank(int r) {
+    	super.setRank(r);
+    	resetPilotName();
+    }
+    
     @Override
     public String getDesc() {
         String care = "";
@@ -248,9 +278,9 @@ public class PilotPerson extends Person implements IMedicalWork {
 		//TODO: Handle pilot special abilities
 		if (pilot != null) {
 			pw1.println(MekHqXmlUtil.indentStr(indent+1)
-					+"<pilotName>"
-					+pilot.getName()
-					+"</pilotName>");
+					+"<name>"
+					+name
+					+"</name>");
 			pw1.println(MekHqXmlUtil.indentStr(indent+1)
 					+"<pilotGunnery>"
 					+pilot.getGunnery()
@@ -319,6 +349,8 @@ public class PilotPerson extends Person implements IMedicalWork {
 				pilotNickname = wn2.getTextContent();
 			} else if (wn2.getNodeName().equalsIgnoreCase("pilotName")) {
 				pilotName = wn2.getTextContent();
+			} else if (wn2.getNodeName().equalsIgnoreCase("name")) {
+				name = wn2.getTextContent();
 			} else if (wn2.getNodeName().equalsIgnoreCase("pilotGunnery")) {
 				pilotGunnery = Integer.parseInt(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("pilotPiloting")) {
@@ -340,6 +372,11 @@ public class PilotPerson extends Person implements IMedicalWork {
 			} else if (wn2.getNodeName().equalsIgnoreCase("unitId")) {
 				unitId = Integer.parseInt(wn2.getTextContent());
 			}
+		}
+		
+		//handle backwards compatability for pilot names
+		if(null == name) {
+			name = pilotName;
 		}
 		
 		pilot = new Pilot(pilotName, pilotGunnery, pilotPiloting);
@@ -404,16 +441,7 @@ public class PilotPerson extends Person implements IMedicalWork {
 	public int getUnitId() {
 		return unitId;
 	}
-	
-	@Override
-	public String getName() {
-		if(null != pilot) {
-			return pilot.getName();
-		} else {
-			return "Unknown";
-		}
-	}
-	
+
 	@Override
 	public String getCallsign() {
 		if(null != pilot) {

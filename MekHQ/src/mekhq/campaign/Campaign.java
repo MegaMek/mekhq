@@ -1511,6 +1511,9 @@ public class Campaign implements Serializable {
 			Person psn = retVal.personnel.get(x);
 			
 			psn.setRankSystem(retVal.ranks);
+			if(psn instanceof PilotPerson) {
+				((PilotPerson)psn).resetPilotName();
+			}
 			
 			Scenario s = retVal.getScenario(psn.getScenarioId());
 			if(null != s) {
@@ -1983,6 +1986,7 @@ public class Campaign implements Serializable {
 		for(Person p : getPersonnel()) {
 			p.setRank(0);
 		}
+		resetAllPilotNames();
 	}
 	
 	public ArrayList<Force> getAllForces() {
@@ -2262,6 +2266,14 @@ public class Campaign implements Serializable {
 		collarsNeeded = Math.max(0, collarsNeeded - nCollars);
 		
 		return dropshipCost + collarsNeeded*50000;
+	}
+	
+	public void resetAllPilotNames() {
+		for(Person p : getPersonnel()) {
+			if(p instanceof PilotPerson) {
+				((PilotPerson)p).resetPilotName();
+			}
+		}
 	}
 	
 }
