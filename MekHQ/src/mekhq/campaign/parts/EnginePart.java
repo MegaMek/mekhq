@@ -1,5 +1,5 @@
 /*
- * MekEngine.java
+ * EnginePart.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -23,11 +23,13 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import megamek.common.Aero;
 import megamek.common.CriticalSlot;
 import megamek.common.Engine;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Mech;
+import megamek.common.Tank;
 import megamek.common.TechConstants;
 import mekhq.campaign.MekHqXmlUtil;
 
@@ -38,15 +40,15 @@ import org.w3c.dom.NodeList;
  * 
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class MekEngine extends Part {
+public class EnginePart extends Part {
 	private static final long serialVersionUID = -6961398614705924172L;
 	protected Engine engine;
 
-	public MekEngine() {
+	public EnginePart() {
 		this(0, new Engine(0, 0, -1));
 	}
 
-	public MekEngine(int tonnage, Engine e) {
+	public EnginePart(int tonnage, Engine e) {
 		super(tonnage);
 		this.engine = e;
 		this.name = engine.getEngineName() + " Engine";
@@ -74,13 +76,13 @@ public class MekEngine extends Part {
 		if(needsFixing() || part.needsFixing()) {
     		return false;
     	}
-		return part instanceof MekEngine
+		return part instanceof EnginePart
 				&& getName().equals(part.getName())
-				&& getEngine().getEngineType() == ((MekEngine) part)
+				&& getEngine().getEngineType() == ((EnginePart) part)
 						.getEngine().getEngineType()
-				&& getEngine().getRating() == ((MekEngine) part).getEngine()
+				&& getEngine().getRating() == ((EnginePart) part).getEngine()
 						.getRating()
-				&& getEngine().getTechType() == ((MekEngine) part).getEngine()
+				&& getEngine().getTechType() == ((EnginePart) part).getEngine()
 						.getTechType();
 	}
 
@@ -228,18 +230,30 @@ public class MekEngine extends Part {
 		hits = 0;
 		if(null != unit) {
 			unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE);
+			if(unit.getEntity() instanceof Aero) {
+				((Aero)unit.getEntity()).setEngineHits(0);
+			}
+			if(unit.getEntity() instanceof Tank) {
+				((Tank)unit.getEntity()).engineFix();
+			}
 		}
 	}
 
 	@Override
 	public Part getMissingPart() {
-		return new MissingMekEngine(getUnitTonnage(), getEngine());
+		return new MissingEnginePart(getUnitTonnage(), getEngine());
 	}
 
 	@Override
 	public void remove(boolean salvage) {
 		if(null != unit) {
 			unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE);
+			if(unit.getEntity() instanceof Aero) {
+				((Aero)unit.getEntity()).setEngineHits(((Aero)unit.getEntity()).getMaxEngineHits());
+			}
+			if(unit.getEntity() instanceof Tank) {
+				((Tank)unit.getEntity()).engineHit();
+			}
 			if(!salvage) {
 				unit.campaign.removePart(this);
 			}
@@ -263,7 +277,17 @@ public class MekEngine extends Part {
 				engineCrits += entity.getNumberOfCriticals(
 						CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE, i);
 			}
-			if(engineHits > engineCrits) {
+			if(unit.getEntity() instanceof Aero) {
+				engineHits = ((Aero)unit.getEntity()).getEngineHits();
+				engineCrits = 3;
+			}
+			if(unit.getEntity() instanceof Tank) {
+				engineCrits = 2;
+				if(((Tank)unit.getEntity()).isEngineHit()) {
+					engineHits = 1;
+				}
+			}
+			if(engineHits >= engineCrits) {
 				remove(false);
 				return;
 			} 
@@ -284,6 +308,10 @@ public class MekEngine extends Part {
 	            this.time = 300;
 	            this.difficulty = 2;
 	        }
+	        if(unit.getEntity() instanceof Aero && hits > 0) {
+	        	this.time = 300;
+	        	this.difficulty = 1;
+	        }
 			if(isSalvaging()) {
 				this.time = 360;
 				this.difficulty = -1;
@@ -301,9 +329,21 @@ public class MekEngine extends Part {
 		if(null != unit) {
 			if(hits == 0) {
 				unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE);
+				if(unit.getEntity() instanceof Aero) {
+					((Aero)unit.getEntity()).setEngineHits(0);
+				}
+				if(unit.getEntity() instanceof Tank) {
+					((Tank)unit.getEntity()).engineFix();
+				}
 			} else {
 				for(int i = 0; i < hits; i++) {
 					unit.hitSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE);
+				}
+				if(unit.getEntity() instanceof Aero) {
+					((Aero)unit.getEntity()).setEngineHits(hits);
+				}
+				if(unit.getEntity() instanceof Tank) {
+					((Tank)unit.getEntity()).engineHit();
 				}
 			}
 		}

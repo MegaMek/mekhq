@@ -37,15 +37,15 @@ import org.w3c.dom.NodeList;
  * 
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class MissingMekEngine extends MissingPart {
+public class MissingEnginePart extends MissingPart {
 	private static final long serialVersionUID = -6961398614705924172L;
 	protected Engine engine;
 
-	public MissingMekEngine() {
+	public MissingEnginePart() {
 		this(0, null);
 	}
 
-	public MissingMekEngine(int tonnage, Engine e) {
+	public MissingEnginePart(int tonnage, Engine e) {
 		super(tonnage);
 		this.engine = e;
 		if(null != engine) {
@@ -228,8 +228,8 @@ public class MissingMekEngine extends MissingPart {
 
 	@Override
 	public boolean isAcceptableReplacement(Part part) {
-		if(part instanceof MekEngine) {
-			Engine eng = ((MekEngine)part).getEngine();
+		if(part instanceof EnginePart) {
+			Engine eng = ((EnginePart)part).getEngine();
 			if (null != eng) {
 				return getEngine().getEngineType() == eng.getEngineType()
 						&& getEngine().getRating() == eng.getRating()
@@ -252,7 +252,7 @@ public class MissingMekEngine extends MissingPart {
 
 	@Override
 	public Part getNewPart() {
-		return new MekEngine(getUnitTonnage(), getEngine());
+		return new EnginePart(getUnitTonnage(), getEngine());
 	}
 
 

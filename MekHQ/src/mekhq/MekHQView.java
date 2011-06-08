@@ -132,7 +132,7 @@ import mekhq.campaign.parts.AmmoBin;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.EquipmentPart;
 import mekhq.campaign.parts.MekActuator;
-import mekhq.campaign.parts.MekEngine;
+import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.MekGyro;
 import mekhq.campaign.parts.MekLifeSupport;
 import mekhq.campaign.parts.MekLocation;
@@ -3038,7 +3038,7 @@ public class MekHQView extends FrameView {
         			return part instanceof Armor;
         		} else if(nGroup == SG_SYSTEM) {
         			return part instanceof MekGyro 
-        				|| part instanceof MekEngine
+        				|| part instanceof EnginePart
         				|| part instanceof MekActuator
         				|| part instanceof MekLifeSupport
         				|| part instanceof MekSensor;
@@ -3053,7 +3053,7 @@ public class MekHQView extends FrameView {
         		} else if(nGroup == SG_MISC) {
         			return part instanceof EquipmentPart && ((EquipmentPart)part).getType() instanceof MiscType;
         		} else if(nGroup == SG_ENGINE) {
-        			return part instanceof MekEngine;
+        			return part instanceof EnginePart;
         		} else if(nGroup == SG_GYRO) {
         			return part instanceof MekGyro;
         		} else if(nGroup == SG_ACT) {

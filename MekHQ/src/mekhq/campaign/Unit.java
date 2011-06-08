@@ -59,7 +59,7 @@ import mekhq.campaign.parts.FireControlSystem;
 import mekhq.campaign.parts.HeatSink;
 import mekhq.campaign.parts.JumpJet;
 import mekhq.campaign.parts.MekActuator;
-import mekhq.campaign.parts.MekEngine;
+import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.MekGyro;
 import mekhq.campaign.parts.MekLifeSupport;
 import mekhq.campaign.parts.MekLocation;
@@ -69,7 +69,7 @@ import mekhq.campaign.parts.MissingEquipmentPart;
 import mekhq.campaign.parts.MissingHeatSink;
 import mekhq.campaign.parts.MissingJumpJet;
 import mekhq.campaign.parts.MissingMekActuator;
-import mekhq.campaign.parts.MissingMekEngine;
+import mekhq.campaign.parts.MissingEnginePart;
 import mekhq.campaign.parts.MissingMekGyro;
 import mekhq.campaign.parts.MissingMekLifeSupport;
 import mekhq.campaign.parts.MissingMekLocation;
@@ -2116,7 +2116,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     	for(Part part : parts) {
     		if(part instanceof MekGyro || part instanceof MissingMekGyro) {
     			gyro = part;
-    		} else if(part instanceof MekEngine || part instanceof MissingMekEngine) {
+    		} else if(part instanceof EnginePart || part instanceof MissingEnginePart) {
     			engine = part;
     		} else if(part instanceof MekLifeSupport  || part instanceof MissingMekLifeSupport) {
     			lifeSupport = part;
@@ -2288,7 +2288,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     	}
     	
     	if(null == engine && !(entity instanceof BattleArmor)) {
-    		engine = new MekEngine((int) entity.getWeight(), entity.getEngine());
+    		engine = new EnginePart((int) entity.getWeight(), entity.getEngine());
     		addPart(engine);
     		campaign.addPart(engine);
     	}
