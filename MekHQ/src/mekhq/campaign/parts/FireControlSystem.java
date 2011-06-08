@@ -26,6 +26,7 @@ import java.io.PrintWriter;
 import megamek.common.Aero;
 import megamek.common.EquipmentType;
 import megamek.common.TechConstants;
+import mekhq.campaign.MekHqXmlUtil;
 
 import org.w3c.dom.Node;
 
@@ -154,7 +155,8 @@ public class FireControlSystem extends Part {
 
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent, int id) {
-		//nothing to write
+		writeToXmlBegin(pw1, indent, id);
+		writeToXmlEnd(pw1, indent, id);
 	}
 
 	@Override

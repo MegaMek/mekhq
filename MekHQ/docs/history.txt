@@ -19,6 +19,7 @@ v0.1.8 (SVN)
 + avionics part
 + fcs part
 + engine repair/replacement for aeros and vees
++ motive system part
 
 v0.1.7 (2011-05-26)
 + MekLab tab (no functionality yet, but there it is)

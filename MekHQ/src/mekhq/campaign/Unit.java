@@ -75,6 +75,7 @@ import mekhq.campaign.parts.MissingMekLifeSupport;
 import mekhq.campaign.parts.MissingMekLocation;
 import mekhq.campaign.parts.MissingMekSensor;
 import mekhq.campaign.parts.MissingPart;
+import mekhq.campaign.parts.MotiveSystem;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.StructuralIntegrity;
 import mekhq.campaign.parts.TankLocation;
@@ -2109,6 +2110,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     	Hashtable<Integer,Part> ammoParts = new Hashtable<Integer,Part>();
     	Hashtable<Integer,Part> heatSinks = new Hashtable<Integer,Part>();
     	Hashtable<Integer,Part> jumpJets = new Hashtable<Integer,Part>();
+    	Part motiveSystem = null;
     	Part avionics = null;
     	Part fcs = null;
     	
@@ -2213,6 +2215,8 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     			avionics = part;
     		} else if(part instanceof FireControlSystem) {
     			fcs = part;
+    		} else if(part instanceof MotiveSystem) {
+    			motiveSystem = part;
     		}
     	}
     	//now check to see what is null
@@ -2416,6 +2420,13 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     			campaign.addPart(fcs);
     		}
      	}
+    	if(entity instanceof Tank) {
+    		if(null == motiveSystem) {
+    			motiveSystem = new MotiveSystem((int)entity.getWeight());
+    			addPart(motiveSystem);
+    			campaign.addPart(motiveSystem);
+    		}
+    	}
     	runDiagnostic();
     }
     

@@ -270,7 +270,7 @@ alse"/>
 
    <entity chassis="Burke Defense Tank" model="" type="Tracked">
       <pilot name="Edmund" gunnery="3" piloting="4"/>
-      <movement speed="2"/>
+      <motive damage="1" penalty="2"/>
       <turretlock direction="1"/>
       Tanks have special needs, so don't delete any ammo slots.
       The first slot in a location is at index="1".
@@ -307,7 +307,6 @@ alse"/>
 
    <entity chassis="Rhino" model="" type="Tracked">
       <pilot name="Harry Butts" gunnery="3" piloting="4"/>
-      <movement speed="3"/>
       Tanks have special needs, so don't delete any ammo slots.
       The first slot in a location is at index="1".
       <location index="0"> Body
@@ -324,7 +323,6 @@ alse"/>
 
    <entity chassis="Regulator Hovertank" model="" type="Hover">
       <pilot name="Regular Joe" gunnery="3" piloting="4"/>
-      <movement speed="9"/>
       Tanks have special needs, so don't delete any ammo slots.
       The first slot in a location is at index="1".
       <location index="0"> Body
@@ -337,7 +335,6 @@ alse"/>
 
    <entity chassis="Saladin Assault Hover Tank" model="" type="Hover">
       <pilot name="Billy Kidd" gunnery="3" piloting="4"/>
-      <movement speed="8"/>
       Tanks have special needs, so don't delete any ammo slots.
       The first slot in a location is at index="1".
       <location index="0"> Body
