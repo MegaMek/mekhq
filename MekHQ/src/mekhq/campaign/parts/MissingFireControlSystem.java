@@ -1,5 +1,5 @@
 /*
- * MissingAvionics.java
+ * MissingFireControlSystem.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -27,22 +27,22 @@ import megamek.common.EquipmentType;
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class MissingAvionics extends MissingPart {
+public class MissingFireControlSystem extends MissingPart {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 2806921577150714477L;
 
-	public MissingAvionics() {
+	public MissingFireControlSystem() {
     	this(0);
     }
     
-    public MissingAvionics(int tonnage) {
+    public MissingFireControlSystem(int tonnage) {
     	super(0);
-    	this.time = 4800;
-    	this.difficulty = 1;
-    	this.name = "Avionics";
+    	this.time = 4320;
+    	this.difficulty = 0;
+    	this.name = "Fire Control System";
     }
     
 	@Override
@@ -52,7 +52,7 @@ public class MissingAvionics extends MissingPart {
 
 	@Override
 	public Part getNewPart() {
-		return new Avionics(getUnitTonnage());
+		return new FireControlSystem(getUnitTonnage());
 	}
 
 	@Override
@@ -62,7 +62,7 @@ public class MissingAvionics extends MissingPart {
 
 	@Override
 	public boolean isAcceptableReplacement(Part part) {
-		return part instanceof Avionics;
+		return part instanceof FireControlSystem;
 	}
 
 	@Override
@@ -72,20 +72,12 @@ public class MissingAvionics extends MissingPart {
 
 	@Override
 	public int getTechRating() {
-		//go with conventional fighter avionics
-		return EquipmentType.RATING_B;
+		return EquipmentType.RATING_C;
 	}
 
 	@Override
 	public int getAvailability(int era) {
-		//go with conventional fighter avionics
-		if(era == EquipmentType.ERA_SL) {
-			return EquipmentType.RATING_C;
-		} else if(era == EquipmentType.ERA_SW) {
-			return EquipmentType.RATING_D;
-		} else {
-			return EquipmentType.RATING_C;
-		}
+		return EquipmentType.RATING_C;
 	}
 	
 }

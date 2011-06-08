@@ -1,5 +1,5 @@
 /*
- * Avionics.java
+ * FireControlSystem.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -33,44 +33,44 @@ import org.w3c.dom.Node;
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class Avionics extends Part {
+public class FireControlSystem extends Part {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -717866644605314883L;
 
-	public Avionics() {
+	public FireControlSystem() {
     	this(0);
     }
     
-    public Avionics(int tonnage) {
+    public FireControlSystem(int tonnage) {
         super(tonnage);
-        this.name = "Avionics";
+        this.name = "Fire Control System";
     }
         
 	@Override
 	public void updateConditionFromEntity() {
 		if(null != unit && unit.getEntity() instanceof Aero) {
-			hits = ((Aero)unit.getEntity()).getAvionicsHits();
+			hits = ((Aero)unit.getEntity()).getFCSHits();
 		}
 		if(hits > 0) {
-			time = 480;
-			difficulty = 0;
+			time = 120;
+			difficulty = 1;
 		} else {
 			time = 0;
 			difficulty = 0;
 		}
 		if(isSalvaging()) {
-			time = 4800;
-			difficulty = 1;
+			time = 4320;
+			difficulty = 0;
 		}
 	}
 
 	@Override
 	public void updateConditionFromPart() {
 		if(null != unit && unit.getEntity() instanceof Aero) {
-			((Aero)unit.getEntity()).setAvionicsHits(hits);
+			((Aero)unit.getEntity()).setFCSHits(hits);
 		}
 		
 	}
@@ -79,14 +79,14 @@ public class Avionics extends Part {
 	public void fix() {
 		hits = 0;
 		if(null != unit && unit.getEntity() instanceof Aero) {
-			((Aero)unit.getEntity()).setAvionicsHits(0);
+			((Aero)unit.getEntity()).setFCSHits(0);
 		}
 	}
 
 	@Override
 	public void remove(boolean salvage) {
 		if(null != unit && unit.getEntity() instanceof Aero) {
-			((Aero)unit.getEntity()).setAvionicsHits(3);
+			((Aero)unit.getEntity()).setFCSHits(3);
 			if(!salvage) {
 				unit.campaign.removePart(this);
 			}
@@ -100,7 +100,7 @@ public class Avionics extends Part {
 
 	@Override
 	public Part getMissingPart() {
-		return new MissingAvionics(getUnitTonnage());
+		return new MissingFireControlSystem(getUnitTonnage());
 	}
 
 	@Override
@@ -115,7 +115,7 @@ public class Avionics extends Part {
 
 	@Override
 	public long getCurrentValue() {
-		//TODO: table in TechManual makes no sense - where are control systems for ASFs?
+		//TODO: table in TechManual makes no sense - I only see FCS for dropships
 		return 0;
 	}
 
@@ -126,20 +126,12 @@ public class Avionics extends Part {
 
 	@Override
 	public int getTechRating() {
-		//go with conventional fighter avionics
-		return EquipmentType.RATING_B;
+		return EquipmentType.RATING_C;
 	}
 
 	@Override
 	public int getAvailability(int era) {
-		//go with conventional fighter avionics
-		if(era == EquipmentType.ERA_SL) {
-			return EquipmentType.RATING_C;
-		} else if(era == EquipmentType.ERA_SW) {
-			return EquipmentType.RATING_D;
-		} else {
-			return EquipmentType.RATING_C;
-		}
+		return EquipmentType.RATING_C;
 	}
 	
 	@Override
@@ -157,7 +149,7 @@ public class Avionics extends Part {
 		if(needsFixing() || part.needsFixing()) {
     		return false;
     	}
-		return part instanceof Avionics;
+		return part instanceof FireControlSystem;
 	}
 
 	@Override

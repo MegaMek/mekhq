@@ -17,6 +17,7 @@ v0.1.8 (SVN)
 + Bug: structuralIntegrity has no default constructor
 + track name in PilotPerson not MM pilot (this should resolve save/load issues for pilots with special characters in their names)
 + avionics part
++ fcs part
 
 v0.1.7 (2011-05-26)
 + MekLab tab (no functionality yet, but there it is)

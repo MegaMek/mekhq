@@ -55,6 +55,7 @@ import mekhq.campaign.parts.AmmoBin;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Avionics;
 import mekhq.campaign.parts.EquipmentPart;
+import mekhq.campaign.parts.FireControlSystem;
 import mekhq.campaign.parts.HeatSink;
 import mekhq.campaign.parts.JumpJet;
 import mekhq.campaign.parts.MekActuator;
@@ -2109,6 +2110,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     	Hashtable<Integer,Part> heatSinks = new Hashtable<Integer,Part>();
     	Hashtable<Integer,Part> jumpJets = new Hashtable<Integer,Part>();
     	Part avionics = null;
+    	Part fcs = null;
     	
     	
     	for(Part part : parts) {
@@ -2209,6 +2211,8 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     			}
     		} else if(part instanceof Avionics) {
     			avionics = part;
+    		} else if(part instanceof FireControlSystem) {
+    			fcs = part;
     		}
     	}
     	//now check to see what is null
@@ -2405,6 +2409,11 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     			avionics = new Avionics((int)entity.getWeight());
     			addPart(avionics);
     			campaign.addPart(avionics);
+    		}
+    		if(null == fcs && !(entity instanceof Jumpship)) {
+    			fcs = new FireControlSystem((int)entity.getWeight());
+    			addPart(fcs);
+    			campaign.addPart(fcs);
     		}
      	}
     	runDiagnostic();
