@@ -53,6 +53,7 @@ import megamek.common.options.IOptionGroup;
 import mekhq.MekHQApp;
 import mekhq.campaign.parts.AmmoBin;
 import mekhq.campaign.parts.Armor;
+import mekhq.campaign.parts.Avionics;
 import mekhq.campaign.parts.EquipmentPart;
 import mekhq.campaign.parts.HeatSink;
 import mekhq.campaign.parts.JumpJet;
@@ -2107,7 +2108,9 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     	Hashtable<Integer,Part> ammoParts = new Hashtable<Integer,Part>();
     	Hashtable<Integer,Part> heatSinks = new Hashtable<Integer,Part>();
     	Hashtable<Integer,Part> jumpJets = new Hashtable<Integer,Part>();
-
+    	Part avionics = null;
+    	
+    	
     	for(Part part : parts) {
     		if(part instanceof MekGyro || part instanceof MissingMekGyro) {
     			gyro = part;
@@ -2204,6 +2207,8 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     					leftFoot = part;
     				}
     			}
+    		} else if(part instanceof Avionics) {
+    			avionics = part;
     		}
     	}
     	//now check to see what is null
@@ -2396,7 +2401,12 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     			addPart(structuralIntegrity);
     			campaign.addPart(structuralIntegrity);
     		}
-    	}
+    		if(null == avionics) {
+    			avionics = new Avionics((int)entity.getWeight());
+    			addPart(avionics);
+    			campaign.addPart(avionics);
+    		}
+     	}
     	runDiagnostic();
     }
     
