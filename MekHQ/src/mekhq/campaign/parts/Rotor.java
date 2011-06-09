@@ -21,31 +21,23 @@
 
 package mekhq.campaign.parts;
 
-import java.io.PrintWriter;
-
 import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
 import megamek.common.VTOL;
-import mekhq.campaign.MekHqXmlUtil;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class Rotor extends Part {
+public class Rotor extends TankLocation {
 	private static final long serialVersionUID = -122291037522319765L;
 
-	private int damage;
-	
     public Rotor() {
     	this(0);
     }
     
     public Rotor(int tonnage) {
-        super(tonnage);
+        super(VTOL.LOC_TURRET, tonnage);
         this.name = "Rotor";
         this.damage = 0;
         this.time = 120;
@@ -59,29 +51,6 @@ public class Rotor extends Part {
     	}
         return part instanceof Rotor && getUnitTonnage() == part.getUnitTonnage();
     }
-
-	@Override
-	public void writeToXml(PrintWriter pw1, int indent, int id) {
-		writeToXmlBegin(pw1, indent, id);
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<damage>"
-				+damage
-				+"</damage>");
-		writeToXmlEnd(pw1, indent, id);
-	}
-
-	@Override
-	protected void loadFieldsFromXmlNode(Node wn) {
-		NodeList nl = wn.getChildNodes();
-		
-		for (int x=0; x<nl.getLength(); x++) {
-			Node wn2 = nl.item(x);
-			
-			if (wn2.getNodeName().equalsIgnoreCase("damage")) {
-				damage = Integer.parseInt(wn2.getTextContent());
-			}
-		}
-	}
 
 	@Override
 	public int getAvailability(int era) {
@@ -130,28 +99,12 @@ public class Rotor extends Part {
 
 	@Override
 	public void updateConditionFromEntity() {
-		if(null != unit && unit.getEntity() instanceof VTOL) {
-			if(IArmorState.ARMOR_DESTROYED == unit.getEntity().getInternal(VTOL.LOC_TURRET)) {
-				remove(false);
-			} else {
-				damage = unit.getEntity().getOInternal(VTOL.LOC_TURRET) - unit.getEntity().getInternal(VTOL.LOC_TURRET);			
-			}
-		}
+		super.updateConditionFromEntity();
 		if(isSalvaging()) {
 			this.time = 300;
 			this.difficulty = 2;
 		}
 	}
-
-	@Override
-	public boolean needsFixing() {
-		return damage > 0;
-	}
-	
-	@Override
-    public String getDetails() {
-		return damage + " points of damage";
-    }
 	
 	@Override
 	public void updateConditionFromPart() {
@@ -161,10 +114,15 @@ public class Rotor extends Part {
 	}
 	
 	@Override
-    public String checkFixable() {
-        return null;
-    }
-
+	public boolean isSalvaging() {
+		return salvaging;
+	}
+	
+	@Override
+	public boolean canScrap() {
+		return true;
+	}
+	
 	@Override
 	public double getTonnage() {
 		return 0.1 * getUnitTonnage();

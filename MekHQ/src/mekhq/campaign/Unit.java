@@ -84,6 +84,7 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Rotor;
 import mekhq.campaign.parts.StructuralIntegrity;
 import mekhq.campaign.parts.TankLocation;
+import mekhq.campaign.parts.Turret;
 import mekhq.campaign.parts.VeeSensor;
 import mekhq.campaign.parts.VeeStabiliser;
 import mekhq.campaign.personnel.PilotPerson;
@@ -2087,9 +2088,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     	if(entity instanceof Infantry && !(entity instanceof BattleArmor)) {
     		return;
     	}
-    	
-    	boolean isQuad = entity instanceof QuadMech;
-    	
+  	
     	Part gyro = null;
     	Part engine = null;
     	Part lifeSupport = null;
@@ -2247,10 +2246,20 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     					Rotor rotor = new Rotor((int)getEntity().getWeight());
     					addPart(rotor);
     					campaign.addPart(rotor);
-    				} else if(i == Tank.LOC_TURRET && ((Tank)entity).hasNoTurret()) {
-    					continue;
-    				} else if(i == Tank.LOC_TURRET_2 && ((Tank)entity).hasNoDualTurret()) {
-    					continue;
+    				} else if(i == Tank.LOC_TURRET) {
+    					 if(((Tank)entity).hasNoTurret()) {
+    						 continue;
+    					 }
+    					 Turret turret = new Turret(i, (int)getEntity().getWeight());
+    					 addPart(turret);
+    					 campaign.addPart(turret);
+    				} else if(i == Tank.LOC_TURRET_2) {
+    					 if(((Tank)entity).hasNoDualTurret()) {
+    						 continue;
+    					 }
+    					 Turret turret = new Turret(i, (int)getEntity().getWeight());
+    					 addPart(turret);
+    					 campaign.addPart(turret);
     				} else {
 	    				TankLocation tankLocation = new TankLocation(i, (int) getEntity().getWeight());
 	    				addPart(tankLocation);

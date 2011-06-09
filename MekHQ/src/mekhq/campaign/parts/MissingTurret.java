@@ -25,8 +25,10 @@ import java.io.PrintWriter;
 
 import megamek.common.EquipmentType;
 import megamek.common.Tank;
+import mekhq.campaign.MekHqXmlUtil;
 
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  *
@@ -35,12 +37,15 @@ import org.w3c.dom.Node;
 public class MissingTurret extends MissingPart {
 	private static final long serialVersionUID = 719267861685599789L;
 
+	double weight;
+	
 	public MissingTurret() {
-		this(0);
+		this(0,0);
 	}
 	
-	public MissingTurret(int tonnage) {
+	public MissingTurret(int tonnage, double weight) {
         super(tonnage);
+        this.weight = weight;
         this.name = "Turret";
         this.time = 160;
         this.difficulty = -1;
@@ -49,12 +54,24 @@ public class MissingTurret extends MissingPart {
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent, int id) {
 		writeToXmlBegin(pw1, indent, id);
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<weight>"
+				+weight
+				+"</weight>");
 		writeToXmlEnd(pw1, indent, id);
 	}
 
 	@Override
 	protected void loadFieldsFromXmlNode(Node wn) {
-		// Do nothing - no fields to load.
+		NodeList nl = wn.getChildNodes();
+		
+		for (int x=0; x<nl.getLength(); x++) {
+			Node wn2 = nl.item(x);
+			
+			if (wn2.getNodeName().equalsIgnoreCase("weight")) {
+				weight = Integer.parseInt(wn2.getTextContent());
+			} 
+		}
 	}
 
 	@Override
@@ -82,7 +99,7 @@ public class MissingTurret extends MissingPart {
 	@Override
 	public Part getNewPart() {
 		//TODO: how to get second turret location?
-		return new TankLocation(Tank.LOC_TURRET, getUnitTonnage());
+		return new Turret(Tank.LOC_TURRET, getUnitTonnage(), weight);
 	}
 
 	@Override

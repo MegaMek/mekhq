@@ -1,5 +1,5 @@
 /*
- * TankLocation.java
+ * Turret.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -25,8 +25,8 @@ import java.io.PrintWriter;
 
 import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
-import megamek.common.Tank;
-import megamek.common.VTOL;
+import megamek.common.Mounted;
+import megamek.common.WeaponType;
 import mekhq.campaign.MekHqXmlUtil;
 
 import org.w3c.dom.Node;
@@ -36,12 +36,11 @@ import org.w3c.dom.NodeList;
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class TankLocation extends Part {
+public class Turret extends TankLocation {
 	private static final long serialVersionUID = -122291037522319765L;
-	protected int loc;
-	protected int damage;
+	protected double weight;
 
-    public TankLocation() {
+    public Turret() {
     	this(0, 0);
     }
     
@@ -49,32 +48,24 @@ public class TankLocation extends Part {
         return loc;
     }
     
-    public TankLocation(int loc, int tonnage) {
-        super(tonnage);
-        this.loc = loc;
-        this.damage = 0;
-        this.time = 60;
-        this.difficulty = 0;
-        this.name = "Tank Location";
-        switch(loc) {
-            case(Tank.LOC_FRONT):
-                this.name = "Vehicle Front";
-                break;
-            case(Tank.LOC_LEFT):
-                this.name = "Vehicle Left Side";
-                break;
-            case(Tank.LOC_RIGHT):
-                this.name = "Vehicle Right Side";
-                break;
-            case(Tank.LOC_REAR):
-                this.name = "Vehicle Rear";
-                break;
-        }
-        computeCost();
+    public Turret(int loc, int tonnage) {
+    	super(loc, tonnage);
+    	weight = 0;
+    	if(null != unit) {
+            for (Mounted m : unit.getEntity().getWeaponList()) {
+                WeaponType wt = (WeaponType) m.getType();
+                if (m.getLocation() == this.loc) {
+                    weight += wt.getTonnage(unit.getEntity()) / 10.0;
+                }
+            }
+            weight = Math.ceil(weight * 2) / 2;
+    	}
+    	this.name = "Turret";
     }
     
-    protected void computeCost () {
-    	//TODO: implement
+    public Turret(int loc, int tonnage, double weight) {
+        super(loc, tonnage);
+        this.weight = weight;
     }
 
     @Override
@@ -82,20 +73,16 @@ public class TankLocation extends Part {
     	if(needsFixing() || part.needsFixing()) {
     		return false;
     	}
-        return part instanceof TankLocation && getLoc() == ((TankLocation)part).getLoc() && getUnitTonnage() == ((TankLocation)part).getUnitTonnage();
+        return part instanceof Turret && getTonnage() == part.getTonnage();
     }
 
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent, int id) {
 		writeToXmlBegin(pw1, indent, id);
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<loc>"
-				+loc
-				+"</loc>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<damage>"
-				+damage
-				+"</damage>");
+				+"<weight>"
+				+weight
+				+"</weight>");
 		writeToXmlEnd(pw1, indent, id);
 	}
 
@@ -106,17 +93,15 @@ public class TankLocation extends Part {
 		for (int x=0; x<nl.getLength(); x++) {
 			Node wn2 = nl.item(x);
 			
-			if (wn2.getNodeName().equalsIgnoreCase("loc")) {
-				loc = Integer.parseInt(wn2.getTextContent());
-			} else if (wn2.getNodeName().equalsIgnoreCase("damage")) {
-				damage = Integer.parseInt(wn2.getTextContent());
-			}
+			if (wn2.getNodeName().equalsIgnoreCase("weight")) {
+				weight = Integer.parseInt(wn2.getTextContent());
+			} 
 		}
 	}
 
 	@Override
 	public int getAvailability(int era) {
-		return EquipmentType.RATING_A;
+		return EquipmentType.RATING_C;
 	}
 
 	@Override
@@ -125,17 +110,8 @@ public class TankLocation extends Part {
 	}
 
 	@Override
-	public void fix() {
-		damage = 0;
-		if(null != unit) {
-			unit.getEntity().setInternal(unit.getEntity().getOInternal(loc), loc);
-		}
-	}
-
-	@Override
 	public Part getMissingPart() {
-		//cant replace locations
-		return null;
+		return new MissingTurret(getUnitTonnage(), weight);
 	}
 
 	@Override
@@ -146,60 +122,51 @@ public class TankLocation extends Part {
 				unit.campaign.removePart(this);
 			}
 			unit.removePart(this);
+			Part missing = getMissingPart();
+			unit.campaign.addPart(missing);
+			unit.addPart(missing);
 		}
 		setUnit(null);
 	}
 
 	@Override
 	public void updateConditionFromEntity() {
-		if(null != unit) {
-			if(IArmorState.ARMOR_DESTROYED == unit.getEntity().getInternal(loc)) {
-				remove(false);
-			} else {
-				damage = unit.getEntity().getOInternal(loc) - unit.getEntity().getInternal(loc);			
-			}
+		super.updateConditionFromEntity();
+		if(isSalvaging()) {
+			this.time = 160;
+			this.difficulty = -1;
 		}
 	}
 
 	@Override
-	public boolean needsFixing() {
-		return damage > 0;
-	}
-	
-	@Override
-    public String getDetails() {
-		return damage + " point(s) of damage";
-    }
-
-	@Override
 	public void updateConditionFromPart() {
-		//shouldn't get here
+		if(null != unit) {
+			unit.getEntity().setInternal(unit.getEntity().getOInternal(loc) - damage, loc);
+		}
 	}
-	
-	@Override
-    public String checkFixable() {
-        return null;
-    }
 	
 	@Override
 	public boolean isSalvaging() {
-		return false;
+		return salvaging;
 	}
 	
 	@Override
 	public boolean canScrap() {
-		return false;
+		return true;
 	}
+	
+	@Override
+    public String getDetails() {
+		return Math.round(weight) + " tons, " + damage + " point(s) of damage";
+    }
 
 	@Override
 	public double getTonnage() {
-		// TODO Auto-generated method stub
-		return 0;
+		return weight;
 	}
-
+	
 	@Override
 	public long getCurrentValue() {
-		// TODO Auto-generated method stub
-		return 0;
+		return (long)(5000 * weight);
 	}
 }
