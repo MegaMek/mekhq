@@ -38,23 +38,21 @@ import org.w3c.dom.NodeList;
 public class TankLocation extends Part {
 	private static final long serialVersionUID = -122291037522319765L;
 	protected int loc;
-	protected boolean isVTOL;
 
     public TankLocation() {
-    	this(0, 0, false);
+    	this(0, 0);
     }
     
     public int getLoc() {
         return loc;
     }
     
-    public TankLocation(int loc, int tonnage, boolean vtol) {
+    public TankLocation(int loc, int tonnage) {
         super(tonnage);
         this.loc = loc;
         this.time = 60;
         this.difficulty = 0;
         this.name = "Tank Location";
-        this.isVTOL = vtol;
         switch(loc) {
             case(Tank.LOC_FRONT):
                 this.name = "Vehicle Front";
@@ -70,9 +68,6 @@ public class TankLocation extends Part {
                 break;
             case(Tank.LOC_TURRET):
             case(Tank.LOC_TURRET_2):
-            	if(isVTOL) {
-            		this.name = "VTOL Rotor";
-            	}
                 this.name = "Vehicle Turret";
                 break;
         }
@@ -133,12 +128,8 @@ public class TankLocation extends Part {
 
 	@Override
 	public Part getMissingPart() {
-		if(isVTOL) {
-			return new MissingRotor(getUnitTonnage());
-		} else {
-			//this can only be a turret
-			return new MissingTurret(getUnitTonnage());
-		}
+		//this can only be a turret
+		return new MissingTurret(getUnitTonnage());
 	}
 
 	@Override
@@ -149,7 +140,7 @@ public class TankLocation extends Part {
 				unit.campaign.removePart(this);
 			}
 			unit.removePart(this);
-			if(loc == Tank.LOC_TURRET && loc == Tank.LOC_TURRET_2) {
+			if(loc == Tank.LOC_TURRET || loc == Tank.LOC_TURRET_2) {
 				Part missing = getMissingPart();
 				unit.campaign.addPart(missing);
 				unit.addPart(missing);

@@ -81,7 +81,7 @@ public class MissingTurret extends MissingPart {
 	@Override
 	public Part getNewPart() {
 		//TODO: how to get second turret location?
-		return new TankLocation(Tank.LOC_TURRET, getUnitTonnage(), false);
+		return new TankLocation(Tank.LOC_TURRET, getUnitTonnage());
 	}
 
 	@Override

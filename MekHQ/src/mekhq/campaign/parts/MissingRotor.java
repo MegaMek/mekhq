@@ -25,6 +25,7 @@ import java.io.PrintWriter;
 
 import megamek.common.EquipmentType;
 import megamek.common.Tank;
+import mekhq.campaign.MekHqXmlUtil;
 
 import org.w3c.dom.Node;
 
@@ -41,6 +42,9 @@ public class MissingRotor extends MissingPart {
 	
 	public MissingRotor(int tonnage) {
         super(tonnage);
+        this.name = "Rotor";
+        this.time = 300;
+        this.difficulty = 0;
     }
 	
 	@Override
@@ -70,8 +74,7 @@ public class MissingRotor extends MissingPart {
 
 	@Override
 	public boolean isAcceptableReplacement(Part part) {
-		return part instanceof TankLocation 
-			&& ((TankLocation)part).getLoc() == Tank.LOC_TURRET;
+		return part instanceof Rotor && part.getUnitTonnage() == getUnitTonnage();
 	}
 	
 	@Override
@@ -82,7 +85,7 @@ public class MissingRotor extends MissingPart {
 	@Override
 	public Part getNewPart() {
 		//TODO: how to get second turret location?
-		return new TankLocation(Tank.LOC_TURRET, getUnitTonnage(), true);
+		return new Rotor(getUnitTonnage());
 	}
 
 	@Override

@@ -355,4 +355,12 @@ alse"/>
       </location> 
    </entity>
 
+   <entity chassis="Karnov UR Transport" model="" type="Vtol">
+     <pilot name="Bob Smith" gunnery="3" piloting="4"/>
+     <location index="5"> Rotor
+         <armor points="Destroyed"/>
+         <armor points="1" type="Internal"/>
+     </location>
+   </entity>
+
 </unit>

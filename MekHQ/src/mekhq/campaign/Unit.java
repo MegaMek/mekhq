@@ -81,6 +81,7 @@ import mekhq.campaign.parts.MissingVeeSensor;
 import mekhq.campaign.parts.MissingVeeStabiliser;
 import mekhq.campaign.parts.MotiveSystem;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.Rotor;
 import mekhq.campaign.parts.StructuralIntegrity;
 import mekhq.campaign.parts.TankLocation;
 import mekhq.campaign.parts.VeeSensor;
@@ -297,13 +298,13 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 		}
 		if (entity instanceof Tank) {
 			for (int i = 0; i < entity.locations(); i++) {
+				if(i == Tank.LOC_TURRET || i == Tank.LOC_TURRET_2) {
+					continue;
+				}
 				if (entity.isLocationBad(i)) {
 					return false;
 				}
 			}
-
-			// TODO: we need an isEngineHit() function in Tank
-			// Tank t = (Tank)entity;
 		}
 		return true;
 	}
@@ -318,6 +319,9 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 		if (entity instanceof Tank) {
 			// can't repair a tank with a destroyed location
 			for (int i = 0; i < entity.locations(); i++) {
+				if(i == Tank.LOC_TURRET || i == Tank.LOC_TURRET_2) {
+					continue;
+				}
 				if (entity.isLocationBad(i)) {
 					return false;
 				}
@@ -2239,15 +2243,19 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     				addPart(mekLocation);
     				campaign.addPart(mekLocation);
     			} else if(entity instanceof Tank && i != Tank.LOC_BODY) {
-    				if(i == Tank.LOC_TURRET_2 && ((Tank)entity).hasNoDualTurret()) {
+    				if(i == Tank.LOC_TURRET && entity instanceof VTOL) {
+    					Rotor rotor = new Rotor((int)getEntity().getWeight());
+    					addPart(rotor);
+    					campaign.addPart(rotor);
+    				} else if(i == Tank.LOC_TURRET && ((Tank)entity).hasNoTurret()) {
     					continue;
-    				}
-    				if(i == Tank.LOC_TURRET && ((Tank)entity).hasNoTurret() && !(entity instanceof VTOL)) {
+    				} else if(i == Tank.LOC_TURRET_2 && ((Tank)entity).hasNoDualTurret()) {
     					continue;
+    				} else {
+	    				TankLocation tankLocation = new TankLocation(i, (int) getEntity().getWeight());
+	    				addPart(tankLocation);
+	    				campaign.addPart(tankLocation);
     				}
-    				TankLocation tankLocation = new TankLocation(i, (int) getEntity().getWeight(), entity instanceof VTOL);
-    				addPart(tankLocation);
-    				campaign.addPart(tankLocation);
     			}
     		}
     		if(null == armor[i]) {
