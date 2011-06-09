@@ -28,6 +28,7 @@ import megamek.common.IArmorState;
 import megamek.common.Mounted;
 import megamek.common.WeaponType;
 import mekhq.campaign.MekHqXmlUtil;
+import mekhq.campaign.Unit;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -51,7 +52,19 @@ public class Turret extends TankLocation {
     public Turret(int loc, int tonnage) {
     	super(loc, tonnage);
     	weight = 0;
+    	this.name = "Turret";
+    }
+    
+    public Turret(int loc, int tonnage, double weight) {
+        super(loc, tonnage);
+        this.weight = weight;
+    }
+    
+    @Override
+    public void setUnit(Unit u) {
+    	super.setUnit(u);
     	if(null != unit) {
+    		weight = 0;
             for (Mounted m : unit.getEntity().getWeaponList()) {
                 WeaponType wt = (WeaponType) m.getType();
                 if (m.getLocation() == this.loc) {
@@ -60,12 +73,6 @@ public class Turret extends TankLocation {
             }
             weight = Math.ceil(weight * 2) / 2;
     	}
-    	this.name = "Turret";
-    }
-    
-    public Turret(int loc, int tonnage, double weight) {
-        super(loc, tonnage);
-        this.weight = weight;
     }
 
     @Override
