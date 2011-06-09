@@ -37,7 +37,7 @@ public class Rotor extends TankLocation {
     }
     
     public Rotor(int tonnage) {
-        super(VTOL.LOC_TURRET, tonnage);
+        super(VTOL.LOC_ROTOR, tonnage);
         this.name = "Rotor";
         this.damage = 0;
         this.time = 120;
@@ -73,7 +73,7 @@ public class Rotor extends TankLocation {
 	public void fix() {
 		damage--;
 		if(null != unit && unit.getEntity() instanceof VTOL) {
-			unit.getEntity().setInternal(unit.getEntity().getInternal(VTOL.LOC_TURRET)+1, VTOL.LOC_TURRET);
+			unit.getEntity().setInternal(unit.getEntity().getInternal(VTOL.LOC_ROTOR)+1, VTOL.LOC_ROTOR);
 		}
 	}
 
@@ -85,7 +85,7 @@ public class Rotor extends TankLocation {
 	@Override
 	public void remove(boolean salvage) {
 		if(null != unit && unit.getEntity() instanceof VTOL) {
-			unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, VTOL.LOC_TURRET);
+			unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, VTOL.LOC_ROTOR);
 			if(!salvage) {
 				unit.campaign.removePart(this);
 			}
@@ -93,6 +93,12 @@ public class Rotor extends TankLocation {
 			Part missing = getMissingPart();
 			unit.campaign.addPart(missing);
 			unit.addPart(missing);
+			((VTOL)unit.getEntity()).resetMovementDamage();
+			for(Part part : unit.getParts()) {
+				if(part instanceof MotiveSystem) {
+					part.updateConditionFromEntity();
+				}
+			}
 		}
 		setUnit(null);
 	}
@@ -109,7 +115,7 @@ public class Rotor extends TankLocation {
 	@Override
 	public void updateConditionFromPart() {
 		if(null != unit && unit.getEntity() instanceof VTOL) {
-			unit.getEntity().setInternal(unit.getEntity().getOInternal(VTOL.LOC_TURRET) - damage, VTOL.LOC_TURRET);
+			unit.getEntity().setInternal(unit.getEntity().getOInternal(VTOL.LOC_ROTOR) - damage, VTOL.LOC_ROTOR);
 		}
 	}
 	
