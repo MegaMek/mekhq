@@ -118,8 +118,23 @@ public class Rotor extends TankLocation {
 		return salvaging;
 	}
 	
+	@Override 
+	public String checkFixable() {
+		if(isSalvaging()) {
+			//check for armor
+	        if(unit.getEntity().getArmor(loc, false) != IArmorState.ARMOR_DESTROYED) {
+	        	return "must salvage armor in this location first";
+	        }
+		}
+		return null;
+	}
+	
 	@Override
 	public boolean canScrap() {
+		//check for armor
+        if(unit.getEntity().getArmor(loc, false) != IArmorState.ARMOR_DESTROYED) {
+        	return false;
+        }
 		return true;
 	}
 	

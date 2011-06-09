@@ -604,13 +604,13 @@ public class Armor extends Part implements IAcquisitionWork {
 	
 	@Override
 	public boolean canScrap() {
-		return isEnoughSpareArmorAvailable();
+		return true;
 	}
 	
 	@Override
 	public String scrap() {
-		changeAmountAvailable(-1 * amountNeeded);
+		remove(false);
 		skillMin = TechTeam.EXP_GREEN;
-		return amountNeeded + " " + EquipmentType.armorNames[type] + " armor points scrapped.";
+		return EquipmentType.armorNames[type] + " armor scrapped.";
 	}
 }

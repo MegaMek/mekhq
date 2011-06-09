@@ -23,8 +23,10 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import megamek.common.CriticalSlot;
 import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
+import megamek.common.Mech;
 import megamek.common.Mounted;
 import megamek.common.WeaponType;
 import mekhq.campaign.MekHqXmlUtil;
@@ -157,8 +159,45 @@ public class Turret extends TankLocation {
 		return salvaging;
 	}
 	
+	@Override 
+	public String checkFixable() {
+		if(isSalvaging()) {
+			//check for armor
+	        if(unit.getEntity().getArmor(loc, false) != IArmorState.ARMOR_DESTROYED) {
+	        	return "must salvage armor in this location first";
+	        }
+	        //you can only salvage a location that has nothing left on it
+	        for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
+	            CriticalSlot slot = unit.getEntity().getCritical(loc, i);
+	            // ignore empty & non-hittable slots
+	            if ((slot == null) || !slot.isEverHittable()) {
+	                continue;
+	            }
+	            if (slot.isRepairable()) {
+	                return "Repairable parts in " + unit.getEntity().getLocationName(loc) + " must be salvaged or scrapped first.";
+	            } 
+	        }
+		}
+		return null;
+	}
+	
 	@Override
 	public boolean canScrap() {
+		//check for armor
+        if(unit.getEntity().getArmor(loc, false) != IArmorState.ARMOR_DESTROYED) {
+        	return false;
+        }
+		//you can only scrap a location that has nothing left on it
+        for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
+            CriticalSlot slot = unit.getEntity().getCritical(loc, i);
+            // ignore empty & non-hittable slots
+            if ((slot == null) || !slot.isEverHittable()) {
+                continue;
+            }
+            if (slot.isRepairable()) {
+                return false;
+            } 
+        }
 		return true;
 	}
 	

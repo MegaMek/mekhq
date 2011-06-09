@@ -384,6 +384,11 @@ public class MekLocation extends Part {
 	        if(unit.getEntity() instanceof Mech && loc == Mech.LOC_LT && !unit.getEntity().isLocationBad(Mech.LOC_LARM)) {
 	            return "must salvage/scrap left" + limbName + "first";
 	        } 
+	        //check for armor
+	        if(unit.getEntity().getArmor(loc, false) != IArmorState.ARMOR_DESTROYED
+	        		|| (unit.getEntity().hasRearArmor(loc) && unit.getEntity().getArmor(loc, true) != IArmorState.ARMOR_DESTROYED )) {
+	        	return "must salvage armor in this location first";
+	        }
 	        //you can only salvage a location that has nothing left on it
 	        for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
 	            CriticalSlot slot = unit.getEntity().getCritical(loc, i);
@@ -442,6 +447,40 @@ public class MekLocation extends Part {
 		if(loc ==  Mech.LOC_CT) {
 			return false;
 		}
+		//only allow scrapping of locations with nothing on them
+		//otherwise you will get weirdness where armor and actuators are 
+		//still attached but everything else is scrapped
+	    //cant salvage torsos until arms and legs are gone
+        if(unit.getEntity() instanceof Mech && loc == Mech.LOC_RT && !unit.getEntity().isLocationBad(Mech.LOC_RARM)) {
+            return false;
+        }
+        if(unit.getEntity() instanceof Mech && loc == Mech.LOC_LT && !unit.getEntity().isLocationBad(Mech.LOC_LARM)) {
+            return false;
+        } 
+        //check for armor
+        if(unit.getEntity().getArmor(loc, false) != IArmorState.ARMOR_DESTROYED
+        		|| (unit.getEntity().hasRearArmor(loc) && unit.getEntity().getArmor(loc, true) != IArmorState.ARMOR_DESTROYED )) {
+        	return false;
+        }
+        //you can only salvage a location that has nothing left on it
+        for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
+            CriticalSlot slot = unit.getEntity().getCritical(loc, i);
+            // ignore empty & non-hittable slots
+            if ((slot == null) || !slot.isEverHittable()) {
+                continue;
+            }
+ 
+            //certain other specific crits need to be left out (uggh, must be a better way to do this!)
+            if(slot.getType() == CriticalSlot.TYPE_SYSTEM 
+                    && (slot.getIndex() == Mech.SYSTEM_COCKPIT
+                          || slot.getIndex() == Mech.ACTUATOR_HIP
+                          || slot.getIndex() == Mech.ACTUATOR_SHOULDER)) {
+                continue;
+            }
+            if (slot.isRepairable()) {
+                return false;
+            } 
+        }
 		return true;
 	}
 	

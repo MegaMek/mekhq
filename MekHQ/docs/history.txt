@@ -26,6 +26,7 @@ v0.1.8 (SVN)
 + some fixes for turrets
 + made rotor and turret parts a subclass of TankLocation part
 + fix weight and cost for turrets
++ don't allow scrapping of locations that still have stuff on them
 
 v0.1.7 (2011-05-26)
 + MekLab tab (no functionality yet, but there it is)
