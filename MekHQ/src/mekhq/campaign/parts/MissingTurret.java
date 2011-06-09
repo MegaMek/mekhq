@@ -41,6 +41,7 @@ public class MissingTurret extends MissingPart {
 	
 	public MissingTurret(int tonnage) {
         super(tonnage);
+        this.name = "Turret";
         this.time = 160;
         this.difficulty = -1;
     }

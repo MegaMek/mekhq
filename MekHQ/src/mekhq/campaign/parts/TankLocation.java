@@ -26,6 +26,7 @@ import java.io.PrintWriter;
 import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
 import megamek.common.Tank;
+import megamek.common.VTOL;
 import mekhq.campaign.MekHqXmlUtil;
 
 import org.w3c.dom.Node;
@@ -38,6 +39,7 @@ import org.w3c.dom.NodeList;
 public class TankLocation extends Part {
 	private static final long serialVersionUID = -122291037522319765L;
 	protected int loc;
+	protected int damage;
 
     public TankLocation() {
     	this(0, 0);
@@ -50,6 +52,7 @@ public class TankLocation extends Part {
     public TankLocation(int loc, int tonnage) {
         super(tonnage);
         this.loc = loc;
+        this.damage = 0;
         this.time = 60;
         this.difficulty = 0;
         this.name = "Tank Location";
@@ -58,10 +61,10 @@ public class TankLocation extends Part {
                 this.name = "Vehicle Front";
                 break;
             case(Tank.LOC_LEFT):
-                this.name = "Vehicle Left";
+                this.name = "Vehicle Left Side";
                 break;
             case(Tank.LOC_RIGHT):
-                this.name = "Vehicle Right";
+                this.name = "Vehicle Right Side";
                 break;
             case(Tank.LOC_REAR):
                 this.name = "Vehicle Rear";
@@ -80,10 +83,10 @@ public class TankLocation extends Part {
 
     @Override
     public boolean isSamePartTypeAndStatus (Part part) {
-        return part instanceof TankLocation
-                && getName().equals(part.getName())
-                && getLoc() == ((TankLocation)part).getLoc()
-                && getUnitTonnage() == ((TankLocation)part).getUnitTonnage();
+    	if(needsFixing() || part.needsFixing()) {
+    		return false;
+    	}
+        return part instanceof TankLocation && getLoc() == ((TankLocation)part).getLoc() && getUnitTonnage() == ((TankLocation)part).getUnitTonnage();
     }
 
 	@Override
@@ -93,6 +96,10 @@ public class TankLocation extends Part {
 				+"<loc>"
 				+loc
 				+"</loc>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<damage>"
+				+damage
+				+"</damage>");
 		writeToXmlEnd(pw1, indent, id);
 	}
 
@@ -105,6 +112,8 @@ public class TankLocation extends Part {
 			
 			if (wn2.getNodeName().equalsIgnoreCase("loc")) {
 				loc = Integer.parseInt(wn2.getTextContent());
+			} else if (wn2.getNodeName().equalsIgnoreCase("damage")) {
+				damage = Integer.parseInt(wn2.getTextContent());
 			}
 		}
 	}
@@ -121,6 +130,7 @@ public class TankLocation extends Part {
 
 	@Override
 	public void fix() {
+		damage = 0;
 		if(null != unit) {
 			unit.getEntity().setInternal(unit.getEntity().getOInternal(loc), loc);
 		}
@@ -154,31 +164,31 @@ public class TankLocation extends Part {
 		if(null != unit) {
 			if(IArmorState.ARMOR_DESTROYED == unit.getEntity().getInternal(loc)) {
 				remove(false);
+			} else {
+				damage = unit.getEntity().getOInternal(loc) - unit.getEntity().getInternal(loc);			
 			}
-			
-		}		
+		}
+		if(isSalvaging()) {
+			this.time = 160;
+			this.difficulty = -1;
+		}
 	}
 
 	@Override
 	public boolean needsFixing() {
-		if(null != unit) {
-			return unit.getEntity().getInternal(loc) < unit.getEntity().getOInternal(loc);
-		} 
-		return false;
+		return damage > 0;
 	}
 	
 	@Override
     public String getDetails() {
-		if(null != unit) {
-			return unit.getEntity().getLocationName(loc);
-		}
-		return "";
+		return damage + " point(s) of damage";
     }
 
 	@Override
 	public void updateConditionFromPart() {
-		//do nothing
-		return;
+		if(null != unit) {
+			unit.getEntity().setInternal(unit.getEntity().getOInternal(loc) - damage, loc);
+		}
 	}
 	
 	@Override
