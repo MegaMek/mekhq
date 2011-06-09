@@ -2277,7 +2277,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     			addPart(a);
     			campaign.addPart(a);
     		}
-    		if(entity instanceof Tank && null == stabilisers[i]) {
+    		if(entity instanceof Tank && null == stabilisers[i] && i != Tank.LOC_BODY) {
     			VeeStabiliser s = new VeeStabiliser((int)getEntity().getWeight(),i);
     			addPart(s);
     			campaign.addPart(s);
