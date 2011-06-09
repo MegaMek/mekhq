@@ -288,7 +288,7 @@ alse"/>
 
    <entity chassis="Fury Command Tank" model="" type="Tracked">
       <pilot name="Tommy Paine" gunnery="3" piloting="4"/>
-      <movement speed="4"/>
+      <tcriticals sensors="2" engine="hit"/>
       Tanks have special needs, so don't delete any ammo slots.
       The first slot in a location is at index="1".
       <location index="0"> Body
@@ -348,6 +348,7 @@ alse"/>
       <location index="3"> Left
          <armor points="Destroyed"/>
          <armor points="3" type="Internal"/>
+	 <stabilizier isHit="true"/>
       </location>
    </entity>
 

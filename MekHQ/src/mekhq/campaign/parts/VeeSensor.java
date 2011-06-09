@@ -24,6 +24,7 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 
 import megamek.common.EquipmentType;
+import megamek.common.Tank;
 
 import org.w3c.dom.Node;
 
@@ -45,8 +46,7 @@ public class VeeSensor extends Part {
 
     @Override
     public boolean isSamePartTypeAndStatus (Part part) {
-        return part instanceof VeeSensor
-                && getName().equals(part.getName());
+        return part instanceof VeeSensor;
     }
 
 	@Override
@@ -72,38 +72,60 @@ public class VeeSensor extends Part {
 
 	@Override
 	public void fix() {
-		// TODO Auto-generated method stub
-		
+		hits = 0;
+		if(null != unit && unit.getEntity() instanceof Tank) {
+			((Tank)unit.getEntity()).setSensorHits(0);
+		}
 	}
 
 	@Override
 	public Part getMissingPart() {
-		// TODO Auto-generated method stub
-		return null;
+		return new MissingVeeSensor(getUnitTonnage());
 	}
 
 	@Override
 	public void remove(boolean salvage) {
-		// TODO Auto-generated method stub
-		
+		if(null != unit && unit.getEntity() instanceof Tank) {
+			((Tank)unit.getEntity()).setSensorHits(4);
+			if(!salvage) {
+				unit.campaign.removePart(this);
+			}
+			unit.removePart(this);
+			Part missing = getMissingPart();
+			unit.campaign.addPart(missing);
+			unit.addPart(missing);
+		}
+		setUnit(null);
 	}
 
 	@Override
 	public void updateConditionFromEntity() {
-		// TODO Auto-generated method stub
-		
+		if(null != unit && unit.getEntity() instanceof Tank) {
+			hits = ((Tank)unit.getEntity()).getSensorHits();
+		}
+		if(hits > 0) {
+			time = 75;
+			difficulty = 0;
+		} else {
+			time = 0;
+			difficulty = 0;
+		}
+		if(isSalvaging()) {
+			time = 260;
+			difficulty = 0;
+		}
 	}
 
 	@Override
 	public boolean needsFixing() {
-		// TODO Auto-generated method stub
-		return false;
+		return hits > 0;
 	}
 
 	@Override
 	public void updateConditionFromPart() {
-		// TODO Auto-generated method stub
-		
+		if(null != unit && unit.getEntity() instanceof Tank) {
+			((Tank)unit.getEntity()).setSensorHits(hits);
+		}
 	}
 
 	@Override

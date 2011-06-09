@@ -65,7 +65,9 @@ import mekhq.campaign.parts.MekLifeSupport;
 import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.MekSensor;
 import mekhq.campaign.parts.MissingAmmoBin;
+import mekhq.campaign.parts.MissingAvionics;
 import mekhq.campaign.parts.MissingEquipmentPart;
+import mekhq.campaign.parts.MissingFireControlSystem;
 import mekhq.campaign.parts.MissingHeatSink;
 import mekhq.campaign.parts.MissingJumpJet;
 import mekhq.campaign.parts.MissingMekActuator;
@@ -75,10 +77,12 @@ import mekhq.campaign.parts.MissingMekLifeSupport;
 import mekhq.campaign.parts.MissingMekLocation;
 import mekhq.campaign.parts.MissingMekSensor;
 import mekhq.campaign.parts.MissingPart;
+import mekhq.campaign.parts.MissingVeeSensor;
 import mekhq.campaign.parts.MotiveSystem;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.StructuralIntegrity;
 import mekhq.campaign.parts.TankLocation;
+import mekhq.campaign.parts.VeeSensor;
 import mekhq.campaign.personnel.PilotPerson;
 import mekhq.campaign.work.IAcquisitionWork;
 
@@ -2113,8 +2117,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     	Part motiveSystem = null;
     	Part avionics = null;
     	Part fcs = null;
-    	
-    	
+   	
     	for(Part part : parts) {
     		if(part instanceof MekGyro || part instanceof MissingMekGyro) {
     			gyro = part;
@@ -2124,7 +2127,9 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     			lifeSupport = part;
     		} else if(part instanceof MekSensor || part instanceof MissingMekSensor) {
     			sensor = part;
-    		} else if(part instanceof StructuralIntegrity) {
+    		} else if(part instanceof VeeSensor || part instanceof MissingVeeSensor) {
+    			sensor = part;
+    		}  else if(part instanceof StructuralIntegrity) {
     			structuralIntegrity = part;
     		} else if(part instanceof MekLocation) {
     			locations[((MekLocation)part).getLoc()] = part;
@@ -2211,9 +2216,9 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     					leftFoot = part;
     				}
     			}
-    		} else if(part instanceof Avionics) {
+    		} else if(part instanceof Avionics || part instanceof MissingAvionics) {
     			avionics = part;
-    		} else if(part instanceof FireControlSystem) {
+    		} else if(part instanceof FireControlSystem || part instanceof MissingFireControlSystem) {
     			fcs = part;
     		} else if(part instanceof MotiveSystem) {
     			motiveSystem = part;
@@ -2425,6 +2430,11 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     			motiveSystem = new MotiveSystem((int)entity.getWeight());
     			addPart(motiveSystem);
     			campaign.addPart(motiveSystem);
+    		}
+    		if(null == sensor) {
+    			sensor = new VeeSensor((int) entity.getWeight());
+    			addPart(sensor);
+    			campaign.addPart(sensor);
     		}
     	}
     	runDiagnostic();
