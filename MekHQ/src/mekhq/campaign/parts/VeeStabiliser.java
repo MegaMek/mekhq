@@ -24,8 +24,11 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 
 import megamek.common.EquipmentType;
+import megamek.common.Tank;
+import mekhq.campaign.MekHqXmlUtil;
 
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  *
@@ -34,31 +37,44 @@ import org.w3c.dom.Node;
 public class VeeStabiliser extends Part {
 	private static final long serialVersionUID = 6708245721569856817L;
 
+	private int loc;
+	
 	public VeeStabiliser() {
-		this(0);
+		this(0, 0);
 	}
 	
-	public VeeStabiliser(int tonnage) {
+	public VeeStabiliser(int tonnage, int loc) {
         super(tonnage);
+        this.loc = loc;
         this.name = "Vehicle Stabiliser";
     }
 
     @Override
     public boolean isSamePartTypeAndStatus (Part part) {
-        return part instanceof VeeStabiliser
-                && getName().equals(part.getName())
-                && false;
+        return part instanceof VeeStabiliser;
     }
 
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent, int id) {
 		writeToXmlBegin(pw1, indent, id);
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<loc>"
+				+loc
+				+"</loc>");
 		writeToXmlEnd(pw1, indent, id);
 	}
 
 	@Override
 	protected void loadFieldsFromXmlNode(Node wn) {
-		// Do nothing.  There are no class-specific fields here.
+		NodeList nl = wn.getChildNodes();
+		
+		for (int x=0; x<nl.getLength(); x++) {
+			Node wn2 = nl.item(x);
+			
+			if (wn2.getNodeName().equalsIgnoreCase("loc")) {
+				loc = Integer.parseInt(wn2.getTextContent());
+			}
+		}
 	}
 
 	@Override
@@ -73,8 +89,10 @@ public class VeeStabiliser extends Part {
 
 	@Override
 	public void fix() {
-		// TODO Auto-generated method stub
-		
+		hits = 0;
+		if(null != unit && unit.getEntity() instanceof Tank) {
+			((Tank)unit.getEntity()).setStabiliserHit(loc);
+		}
 	}
 
 	@Override
@@ -85,26 +103,55 @@ public class VeeStabiliser extends Part {
 
 	@Override
 	public void remove(boolean salvage) {
-		// TODO Auto-generated method stub
-		
+		if(null != unit && unit.getEntity() instanceof Tank) {
+			((Tank)unit.getEntity()).setStabiliserHit(loc);
+			if(!salvage) {
+				unit.campaign.removePart(this);
+			}
+			unit.removePart(this);
+			Part missing = getMissingPart();
+			unit.campaign.addPart(missing);
+			unit.addPart(missing);
+		}
+		setUnit(null);
 	}
 
 	@Override
 	public void updateConditionFromEntity() {
-		// TODO Auto-generated method stub
-		
+		if(null != unit && unit.getEntity() instanceof Tank) {
+			if(((Tank)unit.getEntity()).isStabiliserHit(loc)) {
+				hits = 1;
+			} else {
+				hits = 0;
+			}
+		}
+		if(hits > 0) {
+			time = 60;
+			difficulty = 1;
+		} else {
+			time = 0;
+			difficulty = 0;
+		}
+		if(isSalvaging()) {
+			time = 60;
+			difficulty = 0;
+		}
 	}
 
 	@Override
 	public boolean needsFixing() {
-		// TODO Auto-generated method stub
-		return false;
+		return hits > 0;
 	}
 
 	@Override
 	public void updateConditionFromPart() {
-		// TODO Auto-generated method stub
-		
+		if(null != unit && unit.getEntity() instanceof Tank) {
+			if(hits > 0) {
+				((Tank)unit.getEntity()).setStabiliserHit(loc);
+			} else {
+				
+			}
+		}
 	}
 
 	@Override
@@ -124,4 +171,12 @@ public class VeeStabiliser extends Part {
 		// TODO Auto-generated method stub
 		return 0;
 	}
+	
+	@Override
+    public String getDetails() {
+		if(null != unit) {
+			return unit.getEntity().getLocationName(loc);
+		}
+		return "";
+    }
 }
