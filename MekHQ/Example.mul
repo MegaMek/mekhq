@@ -363,4 +363,27 @@ alse"/>
      </location>
    </entity>
 
+   <entity chassis="Cavalry Attack Helicopter" model="(SRM)" type="VTOL" commander="false" deployment="0">
+      <pilot name="Bahusasta Samudra" nick="" gunnery="4" piloting="5" ejected="false"/>
+      <motive damage="5" penalty="0"/>
+      Tanks have special needs, so don't delete any ammo slots.
+      The first slot in a location is at index="1".
+      <location index="0"> Body
+         <slot index="1" type="IS Ammo SRM-6" shots="14"/>
+         <slot index="2" type="IS Ammo SRM-2" shots="48"/>
+         <slot index="N/A" type="IS Ammo SRM-6" shots="14" isDestroyed="false"/>
+         <slot index="N/A" type="IS Ammo SRM-2" shots="48" isDestroyed="false"/>
+      </location>
+      <location index="1"> Front
+         <armor points="10"/>
+      </location>
+      <location index="2"> Right
+         <armor points="8"/>
+      </location>
+      <location index="5"> Rotor
+         <armor points="0"/>
+         <armor points="2" type="Internal"/>
+      </location>
+   </entity>
+
 </unit>
