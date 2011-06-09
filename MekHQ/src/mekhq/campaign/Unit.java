@@ -307,6 +307,19 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 					return false;
 				}
 			}
+			if(entity instanceof VTOL) {
+				if(entity.getWalkMP() <= 0) {
+					return false;
+				}
+			}
+		}
+		if(entity instanceof Aero) {
+			if(entity.getWalkMP() <= 0) {
+				return false;
+			}
+			if(((Aero)entity).getSI() <= 0) {
+				return false;
+			}
 		}
 		return true;
 	}
@@ -327,6 +340,11 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 				if (entity.isLocationBad(i)) {
 					return false;
 				}
+			}
+		}
+		if(entity instanceof Aero) {
+			if(((Aero)entity).getSI() <= 0) {
+				return false;
 			}
 		}
 		return true;

@@ -386,4 +386,28 @@ alse"/>
       </location>
    </entity>
 
+   <entity chassis="Transgressor" model="TR-16" type="Aerodyne" commander="false" deployment="0">
+      <pilot name="Lieutenant Eric MacGachan" nick="" gunnery="3" piloting="4" commandB="1" hits="1" ejected="false"/>
+      <structural integrity="0"/>
+      <heat sinks="2"/>
+      <fuel left="394"/>
+      <acriticals avionics="7" fcs="2"/>
+      The first slot in a location is at index="1".
+      <location index="0"> Nose
+         <armor points="Destroyed"/>
+         <slot index="3" type="IS Gauss Ammo" shots="6"/>
+         <slot index="4" type="IS Gauss Ammo" shots="8"/>
+         <slot index="5" type="IS Gauss Ammo" shots="8"/>
+      </location>
+      <location index="1"> Left Wing
+         <armor points="Destroyed"/>
+      </location>
+      <location index="2"> Right Wing
+         <armor points="Destroyed"/>
+      </location>
+      <location index="3"> Aft
+         <armor points="Destroyed"/>
+      </location>
+   </entity>
+
 </unit>
