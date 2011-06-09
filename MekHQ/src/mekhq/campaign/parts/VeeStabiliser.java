@@ -23,6 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Tank;
 import mekhq.campaign.MekHqXmlUtil;
@@ -91,14 +92,13 @@ public class VeeStabiliser extends Part {
 	public void fix() {
 		hits = 0;
 		if(null != unit && unit.getEntity() instanceof Tank) {
-			((Tank)unit.getEntity()).setStabiliserHit(loc);
+			((Tank)unit.getEntity()).clearStabiliserHit(loc);
 		}
 	}
 
 	@Override
 	public Part getMissingPart() {
-		// TODO Auto-generated method stub
-		return null;
+		return new MissingVeeStabiliser(getUnitTonnage(), loc);
 	}
 
 	@Override
@@ -109,6 +109,7 @@ public class VeeStabiliser extends Part {
 				unit.campaign.removePart(this);
 			}
 			unit.removePart(this);
+			setLocation(Entity.LOC_NONE);
 			Part missing = getMissingPart();
 			unit.campaign.addPart(missing);
 			unit.addPart(missing);
@@ -146,10 +147,11 @@ public class VeeStabiliser extends Part {
 	@Override
 	public void updateConditionFromPart() {
 		if(null != unit && unit.getEntity() instanceof Tank) {
-			if(hits > 0) {
+			if(hits > 0 && !((Tank)unit.getEntity()).isStabiliserHit(loc)) {
 				((Tank)unit.getEntity()).setStabiliserHit(loc);
-			} else {
-				
+			}
+			else if(hits == 0 && ((Tank)unit.getEntity()).isStabiliserHit(loc)) {
+				((Tank)unit.getEntity()).clearStabiliserHit(loc);
 			}
 		}
 	}
@@ -179,4 +181,12 @@ public class VeeStabiliser extends Part {
 		}
 		return "";
     }
+	
+	public int getLocation() {
+		return loc;
+	}
+	
+	public void setLocation(int l) {
+		this.loc = l;
+	}
 }

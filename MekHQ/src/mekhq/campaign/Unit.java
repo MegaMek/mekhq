@@ -78,11 +78,13 @@ import mekhq.campaign.parts.MissingMekLocation;
 import mekhq.campaign.parts.MissingMekSensor;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.MissingVeeSensor;
+import mekhq.campaign.parts.MissingVeeStabiliser;
 import mekhq.campaign.parts.MotiveSystem;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.StructuralIntegrity;
 import mekhq.campaign.parts.TankLocation;
 import mekhq.campaign.parts.VeeSensor;
+import mekhq.campaign.parts.VeeStabiliser;
 import mekhq.campaign.personnel.PilotPerson;
 import mekhq.campaign.work.IAcquisitionWork;
 
@@ -2110,6 +2112,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     	Part[] locations = new Part[entity.locations()];
     	Armor[] armor = new Armor[entity.locations()];
     	Armor[] armorRear = new Armor[entity.locations()];
+    	Part[] stabilisers = new Part[entity.locations()];
     	Hashtable<Integer,Part> equipParts = new Hashtable<Integer,Part>();
     	Hashtable<Integer,Part> ammoParts = new Hashtable<Integer,Part>();
     	Hashtable<Integer,Part> heatSinks = new Hashtable<Integer,Part>();
@@ -2141,6 +2144,10 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     			} else {
     				armor[((Armor)part).getLocation()] = (Armor)part;
     			}
+    		} else if(part instanceof VeeStabiliser) {
+    			stabilisers[((VeeStabiliser)part).getLocation()] = part;
+    		} else if(part instanceof MissingVeeStabiliser) {
+    			stabilisers[((MissingVeeStabiliser)part).getLocation()] = part;
     		} else if(part instanceof AmmoBin) {
     			ammoParts.put(((AmmoBin)part).getEquipmentNum(), part);
     		} else if(part instanceof MissingAmmoBin) {
@@ -2252,6 +2259,11 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     			Armor a = new Armor((int) getEntity().getWeight(), getEntity().getArmorType(i), getEntity().getOArmor(i, false), i, true, entity.isClanArmor(i));
     			addPart(a);
     			campaign.addPart(a);
+    		}
+    		if(entity instanceof Tank && null == stabilisers[i]) {
+    			VeeStabiliser s = new VeeStabiliser((int)getEntity().getWeight(),i);
+    			addPart(s);
+    			campaign.addPart(s);
     		}
     	}
     	for(Mounted m : entity.getEquipment()) {

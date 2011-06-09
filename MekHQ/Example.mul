@@ -345,11 +345,14 @@ alse"/>
          <slot index="N/A" type="IS Ammo AC/20" shots="5" isDestroyed="false"/>
          <slot index="N/A" type="IS Ammo AC/20" shots="5" isDestroyed="false"/>
       </location>
+      <location index="2"> Right
+         <stabilizer isHit="true"/>
+      </location>
       <location index="3"> Left
          <armor points="Destroyed"/>
          <armor points="3" type="Internal"/>
-	 <stabilizier isHit="true"/>
-      </location>
+	 <stabilizer isHit="true"/>
+      </location> 
    </entity>
 
 </unit>
