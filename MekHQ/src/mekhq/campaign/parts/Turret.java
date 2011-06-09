@@ -28,6 +28,7 @@ import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
 import megamek.common.Mech;
 import megamek.common.Mounted;
+import megamek.common.Tank;
 import megamek.common.WeaponType;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
@@ -134,6 +135,7 @@ public class Turret extends TankLocation {
 			Part missing = getMissingPart();
 			unit.campaign.addPart(missing);
 			unit.addPart(missing);
+			((Tank)unit.getEntity()).unlockTurret();
 		}
 		setUnit(null);
 	}

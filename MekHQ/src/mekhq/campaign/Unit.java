@@ -85,6 +85,7 @@ import mekhq.campaign.parts.Rotor;
 import mekhq.campaign.parts.StructuralIntegrity;
 import mekhq.campaign.parts.TankLocation;
 import mekhq.campaign.parts.Turret;
+import mekhq.campaign.parts.TurretLock;
 import mekhq.campaign.parts.VeeSensor;
 import mekhq.campaign.parts.VeeStabiliser;
 import mekhq.campaign.personnel.PilotPerson;
@@ -2123,7 +2124,8 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     	Part motiveSystem = null;
     	Part avionics = null;
     	Part fcs = null;
-   	
+    	Part turretLock = null;
+
     	for(Part part : parts) {
     		if(part instanceof MekGyro || part instanceof MissingMekGyro) {
     			gyro = part;
@@ -2232,6 +2234,8 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     			fcs = part;
     		} else if(part instanceof MotiveSystem) {
     			motiveSystem = part;
+    		} else if(part instanceof TurretLock) {
+    			turretLock = part;
     		}
     	}
     	//now check to see what is null
@@ -2464,6 +2468,11 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     			sensor = new VeeSensor((int) entity.getWeight());
     			addPart(sensor);
     			campaign.addPart(sensor);
+    		}
+    		if(!(entity instanceof VTOL) && !((Tank)entity).hasNoTurret() && null == turretLock) {
+    			turretLock = new TurretLock();
+    			addPart(turretLock);
+    			campaign.addPart(turretLock);
     		}
     	}
     	runDiagnostic();
