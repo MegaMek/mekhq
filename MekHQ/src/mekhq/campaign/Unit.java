@@ -59,6 +59,7 @@ import mekhq.campaign.parts.EquipmentPart;
 import mekhq.campaign.parts.FireControlSystem;
 import mekhq.campaign.parts.HeatSink;
 import mekhq.campaign.parts.JumpJet;
+import mekhq.campaign.parts.LandingGear;
 import mekhq.campaign.parts.MekActuator;
 import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.MekGyro;
@@ -72,6 +73,7 @@ import mekhq.campaign.parts.MissingEquipmentPart;
 import mekhq.campaign.parts.MissingFireControlSystem;
 import mekhq.campaign.parts.MissingHeatSink;
 import mekhq.campaign.parts.MissingJumpJet;
+import mekhq.campaign.parts.MissingLandingGear;
 import mekhq.campaign.parts.MissingMekActuator;
 import mekhq.campaign.parts.MissingEnginePart;
 import mekhq.campaign.parts.MissingMekGyro;
@@ -2144,6 +2146,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     	Part motiveSystem = null;
     	Part avionics = null;
     	Part fcs = null;
+    	Part landingGear = null;
     	Part turretLock = null;
 
     	for(Part part : parts) {
@@ -2254,6 +2257,8 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     			fcs = part;
     		} else if(part instanceof AeroSensor || part instanceof MissingAeroSensor) {
     			sensor = part;
+    		} else if(part instanceof LandingGear || part instanceof MissingLandingGear) {
+    			landingGear = part;
     		} else if(part instanceof MotiveSystem) {
     			motiveSystem = part;
     		} else if(part instanceof TurretLock) {
@@ -2483,6 +2488,11 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     			sensor = new AeroSensor((int) entity.getWeight(), entity instanceof Dropship);
     			addPart(sensor);
     			campaign.addPart(sensor);
+    		}
+    		if(null == landingGear) {
+    			landingGear = new LandingGear((int) entity.getWeight());
+    			addPart(landingGear);
+    			campaign.addPart(landingGear);
     		}
      	}
     	if(entity instanceof Tank) {

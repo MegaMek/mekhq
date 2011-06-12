@@ -32,6 +32,7 @@ v0.1.8 (SVN)
 + vtol motive system repairs
 + functional and repairable conditions for aeros
 + aero sensors part
++ landing gear part
 
 v0.1.7 (2011-05-26)
 + MekLab tab (no functionality yet, but there it is)
