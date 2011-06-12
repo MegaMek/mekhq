@@ -51,6 +51,7 @@ import megamek.common.Warship;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import mekhq.MekHQApp;
+import mekhq.campaign.parts.AeroSensor;
 import mekhq.campaign.parts.AmmoBin;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Avionics;
@@ -64,6 +65,7 @@ import mekhq.campaign.parts.MekGyro;
 import mekhq.campaign.parts.MekLifeSupport;
 import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.MekSensor;
+import mekhq.campaign.parts.MissingAeroSensor;
 import mekhq.campaign.parts.MissingAmmoBin;
 import mekhq.campaign.parts.MissingAvionics;
 import mekhq.campaign.parts.MissingEquipmentPart;
@@ -2250,6 +2252,8 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     			avionics = part;
     		} else if(part instanceof FireControlSystem || part instanceof MissingFireControlSystem) {
     			fcs = part;
+    		} else if(part instanceof AeroSensor || part instanceof MissingAeroSensor) {
+    			sensor = part;
     		} else if(part instanceof MotiveSystem) {
     			motiveSystem = part;
     		} else if(part instanceof TurretLock) {
@@ -2474,6 +2478,11 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     			fcs = new FireControlSystem((int)entity.getWeight());
     			addPart(fcs);
     			campaign.addPart(fcs);
+    		}
+    		if(null == sensor) {
+    			sensor = new AeroSensor((int) entity.getWeight(), entity instanceof Dropship);
+    			addPart(sensor);
+    			campaign.addPart(sensor);
     		}
      	}
     	if(entity instanceof Tank) {

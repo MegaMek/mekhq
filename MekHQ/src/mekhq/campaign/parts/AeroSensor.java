@@ -1,5 +1,5 @@
 /*
- * Avionics.java
+ * AeroSensor.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -26,51 +26,56 @@ import java.io.PrintWriter;
 import megamek.common.Aero;
 import megamek.common.EquipmentType;
 import megamek.common.TechConstants;
+import mekhq.campaign.MekHqXmlUtil;
 
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class Avionics extends Part {
+public class AeroSensor extends Part {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -717866644605314883L;
 
-	public Avionics() {
-    	this(0);
+	private boolean dropship;
+	
+	public AeroSensor() {
+    	this(0, false);
     }
     
-    public Avionics(int tonnage) {
+    public AeroSensor(int tonnage, boolean drop) {
         super(tonnage);
-        this.name = "Avionics";
+        this.name = "Aerospace Sensors";
+        this.dropship = drop;
     }
         
 	@Override
 	public void updateConditionFromEntity() {
 		if(null != unit && unit.getEntity() instanceof Aero) {
-			hits = ((Aero)unit.getEntity()).getAvionicsHits();
+			hits = ((Aero)unit.getEntity()).getSensorHits();
 		}
 		if(hits > 0) {
-			time = 480;
-			difficulty = 0;
+			time = 120;
+			difficulty = -1;
 		} else {
 			time = 0;
 			difficulty = 0;
 		}
 		if(isSalvaging()) {
-			time = 4800;
-			difficulty = 1;
+			time = 1200;
+			difficulty = -2;
 		}
 	}
 
 	@Override
 	public void updateConditionFromPart() {
 		if(null != unit && unit.getEntity() instanceof Aero) {
-			((Aero)unit.getEntity()).setAvionicsHits(hits);
+			((Aero)unit.getEntity()).setSensorHits(hits);
 		}
 		
 	}
@@ -79,14 +84,14 @@ public class Avionics extends Part {
 	public void fix() {
 		hits = 0;
 		if(null != unit && unit.getEntity() instanceof Aero) {
-			((Aero)unit.getEntity()).setAvionicsHits(0);
+			((Aero)unit.getEntity()).setSensorHits(0);
 		}
 	}
 
 	@Override
 	public void remove(boolean salvage) {
 		if(null != unit && unit.getEntity() instanceof Aero) {
-			((Aero)unit.getEntity()).setAvionicsHits(3);
+			((Aero)unit.getEntity()).setSensorHits(3);
 			if(!salvage) {
 				unit.campaign.removePart(this);
 			}
@@ -100,7 +105,7 @@ public class Avionics extends Part {
 
 	@Override
 	public Part getMissingPart() {
-		return new MissingAvionics(getUnitTonnage());
+		return new MissingAeroSensor(getUnitTonnage(), dropship);
 	}
 
 	@Override
@@ -115,8 +120,10 @@ public class Avionics extends Part {
 
 	@Override
 	public long getCurrentValue() {
-		//TODO: table in TechManual makes no sense - where are control systems for ASFs?
-		return 0;
+		if(dropship) {
+			return 80000;
+		}
+		return 2000 * getUnitTonnage();
 	}
 
 	@Override
@@ -126,20 +133,14 @@ public class Avionics extends Part {
 
 	@Override
 	public int getTechRating() {
-		//go with conventional fighter avionics
-		return EquipmentType.RATING_B;
+		//go with ASF sensors
+		return EquipmentType.RATING_C;
 	}
 
 	@Override
 	public int getAvailability(int era) {
-		//go with conventional fighter avionics
-		if(era == EquipmentType.ERA_SL) {
-			return EquipmentType.RATING_C;
-		} else if(era == EquipmentType.ERA_SW) {
-			return EquipmentType.RATING_D;
-		} else {
-			return EquipmentType.RATING_C;
-		}
+		//go with ASF sensors
+		return EquipmentType.RATING_C;
 	}
 	
 	@Override
@@ -157,18 +158,37 @@ public class Avionics extends Part {
 		if(needsFixing() || part.needsFixing()) {
     		return false;
     	}
-		return part instanceof Avionics;
+		return part instanceof AeroSensor && dropship == ((AeroSensor)part).isForDropShip();
 	}
 
+	public boolean isForDropShip() {
+		return dropship;
+	}
+	
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent, int id) {
 		writeToXmlBegin(pw1, indent, id);
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<dropship>"
+				+dropship
+				+"</dropship>");
 		writeToXmlEnd(pw1, indent, id);
 	}
 
 	@Override
 	protected void loadFieldsFromXmlNode(Node wn) {
-		//nothing to load
+		NodeList nl = wn.getChildNodes();
+		
+		for (int x=0; x<nl.getLength(); x++) {
+			Node wn2 = nl.item(x);		
+			if (wn2.getNodeName().equalsIgnoreCase("dropship")) {
+				if(wn2.getTextContent().trim().equalsIgnoreCase("true")) {
+					dropship = true;
+				} else {
+					dropship = false;
+				}
+			}
+		}
 	}
 	
 }
