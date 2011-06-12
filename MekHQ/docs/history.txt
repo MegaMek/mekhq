@@ -33,6 +33,7 @@ v0.1.8 (SVN)
 + functional and repairable conditions for aeros
 + aero sensors part
 + landing gear part
++ updated MM.jar
 
 v0.1.7 (2011-05-26)
 + MekLab tab (no functionality yet, but there it is)
