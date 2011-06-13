@@ -1,6 +1,6 @@
 VERSION HISTORY
 ----------------------------------
-v0.1.8 (SVN)
+v0.1.8 (2011-06-13)
 + beginning of custom XP costs
 + custom XP costs
 + SkillCosts added to XML serialization

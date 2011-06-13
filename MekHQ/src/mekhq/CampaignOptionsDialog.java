@@ -682,7 +682,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         panXP.add(scrAbilityXP, gridBagConstraints);      
         
-        tabOptions.addTab(resourceMap.getString("panXP.TabConstraints.tabTitle"), panXP); // NOI18N
+        //tabOptions.addTab(resourceMap.getString("panXP.TabConstraints.tabTitle"), panXP); // NOI18N
         
         panRank.setName("panRank"); // NOI18N
         panRank.setLayout(new java.awt.GridBagLayout());
