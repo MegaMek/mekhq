@@ -109,7 +109,6 @@ public class VeeStabiliser extends Part {
 				unit.campaign.removePart(this);
 			}
 			unit.removePart(this);
-			setLocation(Entity.LOC_NONE);
 			Part missing = getMissingPart();
 			unit.campaign.addPart(missing);
 			unit.addPart(missing);

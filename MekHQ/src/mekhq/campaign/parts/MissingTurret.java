@@ -69,7 +69,7 @@ public class MissingTurret extends MissingPart {
 			Node wn2 = nl.item(x);
 			
 			if (wn2.getNodeName().equalsIgnoreCase("weight")) {
-				weight = Integer.parseInt(wn2.getTextContent());
+				weight = Double.parseDouble(wn2.getTextContent());
 			} 
 		}
 	}

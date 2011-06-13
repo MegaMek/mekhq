@@ -90,6 +90,14 @@ public class Turret extends TankLocation {
 	public void writeToXml(PrintWriter pw1, int indent, int id) {
 		writeToXmlBegin(pw1, indent, id);
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<loc>"
+				+loc
+				+"</loc>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<damage>"
+				+damage
+				+"</damage>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<weight>"
 				+weight
 				+"</weight>");
@@ -104,8 +112,12 @@ public class Turret extends TankLocation {
 			Node wn2 = nl.item(x);
 			
 			if (wn2.getNodeName().equalsIgnoreCase("weight")) {
-				weight = Integer.parseInt(wn2.getTextContent());
-			} 
+				weight = Double.parseDouble(wn2.getTextContent());
+			} else if (wn2.getNodeName().equalsIgnoreCase("loc")) {
+				loc = Integer.parseInt(wn2.getTextContent());
+			} else if (wn2.getNodeName().equalsIgnoreCase("damage")) {
+				damage = Integer.parseInt(wn2.getTextContent());
+			}
 		}
 	}
 

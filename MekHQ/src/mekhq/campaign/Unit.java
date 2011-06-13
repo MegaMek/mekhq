@@ -83,6 +83,8 @@ import mekhq.campaign.parts.MissingMekLifeSupport;
 import mekhq.campaign.parts.MissingMekLocation;
 import mekhq.campaign.parts.MissingMekSensor;
 import mekhq.campaign.parts.MissingPart;
+import mekhq.campaign.parts.MissingRotor;
+import mekhq.campaign.parts.MissingTurret;
 import mekhq.campaign.parts.MissingVeeSensor;
 import mekhq.campaign.parts.MissingVeeStabiliser;
 import mekhq.campaign.parts.MotiveSystem;
@@ -2169,6 +2171,16 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     			locations[((MekLocation)part).getLoc()] = part;
     		} else if(part instanceof MissingMekLocation) {
     			locations[((MissingMekLocation)part).getLoc()] = part;	
+    		} else if(part instanceof TankLocation) {
+    			locations[((TankLocation)part).getLoc()] = part;
+    		} else if(part instanceof Rotor) {
+    			locations[((Rotor)part).getLoc()] = part;	
+    		} else if(part instanceof MissingRotor) {
+    			locations[VTOL.LOC_ROTOR] = part;	
+    		} else if(part instanceof Turret) {
+    			locations[((Turret)part).getLoc()] = part;	
+    		} else if(part instanceof MissingTurret) {
+    			locations[Tank.LOC_TURRET] = part;	
     		} else if(part instanceof Armor) {
     			if(((Armor)part).isRearMounted()) {
     				armorRear[((Armor)part).getLocation()] = (Armor)part;

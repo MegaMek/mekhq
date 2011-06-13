@@ -61,7 +61,7 @@ public class MissingVeeStabiliser extends MissingPart {
 
 	@Override
 	public Part getNewPart() {
-		return new VeeStabiliser(getUnitTonnage(), Entity.LOC_NONE);
+		return new VeeStabiliser(getUnitTonnage(), loc);
 	}
 
 	@Override
