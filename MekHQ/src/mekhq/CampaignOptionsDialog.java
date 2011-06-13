@@ -178,7 +178,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         useQuirksBox = new javax.swing.JCheckBox();
         repairSystemComboBox = new javax.swing.JComboBox();
         javax.swing.JLabel repairSystemComboBoxLabel = new javax.swing.JLabel();
-        chkUseFinances = new javax.swing.JCheckBox();
         btnOkay = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
         textRanks = new javax.swing.JTextArea();
@@ -368,16 +367,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panRepair.add(repairSystemComboBoxLabel, gridBagConstraints);
-
-        chkUseFinances.setText(resourceMap.getString("chkUseFinances.text")); // NOI18N
-        chkUseFinances.setName("chkUseFinances"); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panRepair.add(chkUseFinances, gridBagConstraints);
 
         useQuirksBox.setText(resourceMap.getString("useQuirksBox.text")); // NOI18N
         useQuirksBox.setToolTipText(resourceMap.getString("useQuirksBox.toolTipText")); // NOI18N
@@ -1300,7 +1289,6 @@ public String getDateAsString() {
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnDate;
     private javax.swing.JButton btnOkay;
-    private javax.swing.JCheckBox chkUseFinances;
     private javax.swing.JFormattedTextField clanPriceModifierJFormattedTextField;
     private javax.swing.JComboBox comboFaction;
     private javax.swing.JComboBox comboFactionNames;

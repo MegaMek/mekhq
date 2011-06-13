@@ -35,6 +35,7 @@ v0.1.8 (SVN)
 + landing gear part
 + updated MM.jar
 + aero heat sink part
++ Bug 3314180: Campaign Options
 
 v0.1.7 (2011-05-26)
 + MekLab tab (no functionality yet, but there it is)
