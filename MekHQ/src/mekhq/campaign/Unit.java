@@ -51,6 +51,7 @@ import megamek.common.Warship;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import mekhq.MekHQApp;
+import mekhq.campaign.parts.AeroHeatSink;
 import mekhq.campaign.parts.AeroSensor;
 import mekhq.campaign.parts.AmmoBin;
 import mekhq.campaign.parts.Armor;
@@ -66,6 +67,7 @@ import mekhq.campaign.parts.MekGyro;
 import mekhq.campaign.parts.MekLifeSupport;
 import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.MekSensor;
+import mekhq.campaign.parts.MissingAeroHeatSink;
 import mekhq.campaign.parts.MissingAeroSensor;
 import mekhq.campaign.parts.MissingAmmoBin;
 import mekhq.campaign.parts.MissingAvionics;
@@ -2148,6 +2150,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     	Part fcs = null;
     	Part landingGear = null;
     	Part turretLock = null;
+    	ArrayList<Part> aeroHeatSinks = new ArrayList<Part>();
 
     	for(Part part : parts) {
     		if(part instanceof MekGyro || part instanceof MissingMekGyro) {
@@ -2259,6 +2262,8 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     			sensor = part;
     		} else if(part instanceof LandingGear || part instanceof MissingLandingGear) {
     			landingGear = part;
+    		} else if(part instanceof AeroHeatSink || part instanceof MissingAeroHeatSink) {
+    			aeroHeatSinks.add(part);
     		} else if(part instanceof MotiveSystem) {
     			motiveSystem = part;
     		} else if(part instanceof TurretLock) {
@@ -2493,6 +2498,13 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     			landingGear = new LandingGear((int) entity.getWeight());
     			addPart(landingGear);
     			campaign.addPart(landingGear);
+    		}
+    		int hsinks = ((Aero)entity).getOHeatSinks() - aeroHeatSinks.size();
+    		while(hsinks > 0) {
+    			AeroHeatSink aHeatSink = new AeroHeatSink((int)entity.getWeight(), ((Aero)entity).getHeatType());
+    			addPart(aHeatSink);
+    			campaign.addPart(aHeatSink);
+    			hsinks--;
     		}
      	}
     	if(entity instanceof Tank) {
