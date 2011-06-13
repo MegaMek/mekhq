@@ -1,5 +1,7 @@
 VERSION HISTORY
 ----------------------------------
+v0.1.9 (SVN)
+
 v0.1.8 (2011-06-13)
 + beginning of custom XP costs
 + custom XP costs
