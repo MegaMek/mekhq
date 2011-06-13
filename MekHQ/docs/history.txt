@@ -38,6 +38,7 @@ v0.1.8 (SVN)
 + Bug 3314180: Campaign Options
 + Bug 3308346: Typo in mission interface
 + Bug 3309013: Contract start date not working (payment starts too soon)
++ by default, start contract on the estimated date of arrival
 
 v0.1.7 (2011-05-26)
 + MekLab tab (no functionality yet, but there it is)

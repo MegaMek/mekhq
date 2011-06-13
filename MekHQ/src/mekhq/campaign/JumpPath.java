@@ -113,8 +113,7 @@ public class JumpPath implements Serializable {
 		return size()-1;
 	}
 	
-	public double getTotalTime(double currentTransit) {
-		
+	public double getTotalTime(double currentTransit) {	
 		return getTotalRechargeTime() + getStartTime(currentTransit) + getEndTime();
 	}
 	

@@ -168,6 +168,7 @@ public class NewContractDialog extends javax.swing.JDialog {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				contract.setPlanetName(suggestPlanet.getText());	
 				contract.calculateContract(campaign);
+				btnDate.setText(dateFormatter.format(contract.getStartDate()));
 				refreshTotals();
 			}
 		});

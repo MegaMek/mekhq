@@ -390,6 +390,14 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 		}
 		GregorianCalendar cal = new GregorianCalendar();
 		cal.setTime(startDate);
+		if(null != c.getPlanet(planetName)) {
+			int days = (int)Math.ceil(c.calculateJumpPath(c.getCurrentPlanetName(), planetName).getTotalTime(c.getLocation().getTransitTime()));
+			while(days > 0) {
+				cal.add(Calendar.DAY_OF_YEAR, 1);
+				days--;
+			}
+		}
+		startDate = cal.getTime();
 		int months = getLength();
 		while(months > 0) {
 			cal.add(Calendar.MONTH, 1);
