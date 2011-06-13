@@ -256,6 +256,7 @@ alse"/>
       <acriticals engine="2"/>
       <location index="0"> Nose
          <armor points="41"/>
+         <slot index="1" type="IS ERPPC" isHit="true" isDestroyed="true"/>
       </location>
       <location index="1"> Left Wing
          <armor points="7"/>
@@ -319,6 +320,7 @@ alse"/>
          <slot index="N/A" type="IS Ammo LRM-20" shots="0" isDestroyed="false"/>
          <slot index="N/A" type="IS Ammo LRM-10" shots="8" isDestroyed="false"/>
       </location>
+      <location index="1" isDestroyed="true" /> Front
    </entity>
 
    <entity chassis="Regulator Hovertank" model="" type="Hover">
