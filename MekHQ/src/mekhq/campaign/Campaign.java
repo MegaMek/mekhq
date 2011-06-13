@@ -864,7 +864,9 @@ public class Campaign implements Serializable {
 				continue;
 			}
 			Contract c = (Contract)m;
-			if(c.isActive() && !getCalendar().getTime().after(c.getEndingDate())) {
+			if(c.isActive() 
+					&& !getCalendar().getTime().after(c.getEndingDate())
+					&& !getCalendar().getTime().before(c.getStartDate())) {
 				active.add(c);
 			}
 		}
