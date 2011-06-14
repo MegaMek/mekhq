@@ -25,16 +25,32 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Enumeration;
 import java.util.GregorianCalendar;
+import java.util.Hashtable;
+import java.util.StringTokenizer;
+import java.util.Vector;
 
+import megamek.common.Aero;
+import megamek.common.ConvFighter;
+import megamek.common.Entity;
+import megamek.common.Mech;
 import megamek.common.Pilot;
+import megamek.common.Tank;
 import megamek.common.TargetRoll;
+import megamek.common.VTOL;
+import megamek.common.options.IOption;
+import megamek.common.options.IOptionGroup;
+import megamek.common.options.PilotOptions;
 import mekhq.MekHQApp;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlSerializable;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Ranks;
+import mekhq.campaign.Unit;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.team.MedicalTeam;
+import mekhq.campaign.team.SupportTeam;
 import mekhq.campaign.work.IMedicalWork;
 import mekhq.campaign.work.IWork;
 
@@ -43,16 +59,10 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * This is an abstract class for verious types of personnel
- * The personnel types themselves will be various wrappers for 
- * 1) pilots (including tank crews)
- * 2) large aero crews (because they can double as teams)
- * 3) support teams
- * 4) infantry squads/platoons (including BA)
- * 5) Administrators/other staff?
+ * 
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public abstract class Person implements Serializable, MekHqXmlSerializable, IMedicalWork {
+public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork {
 	private static final long serialVersionUID = -847642980395311152L;
 	
 	public static final int G_MALE = 0;
@@ -80,40 +90,52 @@ public abstract class Person implements Serializable, MekHqXmlSerializable, IMed
 	public static final int EXP_REGULAR = 1;
 	public static final int EXP_VETERAN = 2;
 	public static final int EXP_ELITE = 3;
-    
+	
     protected int id;
+    
+    private String name;
+    private String callsign;
     private int type;
- 
-    //days of rest
-    protected int daysRest;
-    protected String biography;
-    protected String portraitCategory;
-    protected String portraitFile;
     protected int gender;
-    protected GregorianCalendar birthday;
 
-    //need to pass in the rank system
-    private Ranks ranks;
+    protected String biography;
+    protected GregorianCalendar birthday;
+    
+    private Hashtable<String,Skill> skills;
+    
+    private PilotOptions options = new PilotOptions();
     
     private int rank;
     private int status;
     protected int xp;
+    protected int salary;
+    private int hits;
     
-    protected int forceId;
-    
+    //assignments
+    private Unit unit;
+    private int unitId;
+    protected int forceId; 
     protected int scenarioId;
-    
-    //team id for the MedicalTeam
     protected int medicalTeamId;
     
-    protected int salary;
+    //days of rest
+    protected int daysRest;
+    
+    //portrait
+    protected String portraitCategory;
+    protected String portraitFile;
+    
+    //need to pass in the rank system
+    private Ranks ranks;
     
     //default constructor
     public Person() {
-    	this(null);
+    	this("Biff the Understudy", null);
     }
     
-    public Person(Ranks r) {
+    public Person(String name, Ranks r) {
+    	this.name = name;
+    	callsign = "";
         daysRest = 0;
         portraitCategory = Pilot.ROOT_PORTRAIT;
         portraitFile = Pilot.PORTRAIT_NONE;
@@ -122,11 +144,13 @@ public abstract class Person implements Serializable, MekHqXmlSerializable, IMed
         birthday = new GregorianCalendar(3042, Calendar.JANUARY, 1);
         rank = 0;
         status = S_ACTIVE;
+        skills = new Hashtable<String,Skill>();
         salary = -1;
         ranks = r;
         scenarioId = -1;
         forceId = -1;
         medicalTeamId = -1;
+        unitId = -1;
     }
     
     public static String getGenderName(int gender) {
@@ -162,11 +186,25 @@ public abstract class Person implements Serializable, MekHqXmlSerializable, IMed
     public String getStatusName() {
     	return getStatusName(status);
     }
-    
-    public abstract void reCalc();
-    public abstract String getDesc();
-    public abstract String getDescHTML();
 
+    public String getName() {
+    	return name;
+    }
+    
+    public void setName(String n) {
+    	this.name = n;
+    	//TODO: fix this
+    	//resetPilotName();
+    }
+    
+    public String getCallsign() {
+    	return callsign;
+    }
+    
+    public void setCallsign(String n) {
+    	this.callsign = n;
+    }
+    
     public String getPortraitCategory() {
         return portraitCategory;
     }
@@ -336,15 +374,18 @@ public abstract class Person implements Serializable, MekHqXmlSerializable, IMed
     public boolean isActive() {
     	return getStatus() == S_ACTIVE;
     }
-     
-	public abstract void writeToXml(PrintWriter pw1, int indent, int id);
-	
-	protected void writeToXmlBegin(PrintWriter pw1, int indent, int id) {
+ 
+    @Override
+	public void writeToXml(PrintWriter pw1, int indent, int id) {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "<person id=\""
 				+id
 				+"\" type=\""
 				+this.getClass().getName()
 				+"\">");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<name>"
+				+biography
+				+"</name>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<biography>"
 				+biography
@@ -390,6 +431,10 @@ public abstract class Person implements Serializable, MekHqXmlSerializable, IMed
 				+medicalTeamId
 				+"</medicalTeamId>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<unitId>"
+				+unitId
+				+"</unitId>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<salary>"
 				+salary
 				+"</salary>");
@@ -402,9 +447,24 @@ public abstract class Person implements Serializable, MekHqXmlSerializable, IMed
 				+"<birthday>"
 				+df.format(birthday.getTime())
 				+"</birthday>");
-	}
-	
-	protected void writeToXmlEnd(PrintWriter pw1, int indent, int id) {
+		if (countOptions(PilotOptions.LVL3_ADVANTAGES) > 0) {
+			pw1.println(MekHqXmlUtil.indentStr(indent+1)
+					+"<advantages>"
+					+String.valueOf(getOptionList("::", PilotOptions.LVL3_ADVANTAGES))
+					+"</advantages>");
+		}
+		if (countOptions(PilotOptions.EDGE_ADVANTAGES) > 0) {
+			pw1.println(MekHqXmlUtil.indentStr(indent+1)
+					+"<edge>"
+					+String.valueOf(getOptionList("::", PilotOptions.EDGE_ADVANTAGES))
+					+"</edge>");
+		}
+		if (countOptions(PilotOptions.MD_ADVANTAGES) > 0) {
+			pw1.println(MekHqXmlUtil.indentStr(indent+1)
+					+"<implants>"
+					+String.valueOf(getOptionList("::", PilotOptions.MD_ADVANTAGES))
+					+"</implants>");
+		}
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "</person>");
 	}
 
@@ -416,17 +476,31 @@ public abstract class Person implements Serializable, MekHqXmlSerializable, IMed
 
 		try {
 			// Instantiate the correct child class, and call its parsing function.
-			retVal = (Person) Class.forName(className).newInstance();
-			retVal.loadFieldsFromXmlNode(wn);
+			retVal = new Person();
 			
 			// Okay, now load Part-specific fields!
 			NodeList nl = wn.getChildNodes();
 			
+			String advantages = null;
+			String edge = null;
+			String implants = null;
+			
+			//backwards compatability
+			String pilotName = null;
+			int pilotGunnery = -1;
+			int pilotPiloting = -1;
+			int pilotCommandBonus = -1;
+			int pilotInitBonus = -1;
+			
 			for (int x=0; x<nl.getLength(); x++) {
 				Node wn2 = nl.item(x);
 				
-				if (wn2.getNodeName().equalsIgnoreCase("biography")) {
+				if (wn2.getNodeName().equalsIgnoreCase("name")) {
+					retVal.name = wn2.getTextContent();
+				} else if (wn2.getNodeName().equalsIgnoreCase("biography")) {
 					retVal.biography = wn2.getTextContent();
+				} else if (wn2.getNodeName().equalsIgnoreCase("type")) {
+					retVal.type = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("daysRest")) {
 					retVal.daysRest = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("scenarioId")) {
@@ -447,6 +521,8 @@ public abstract class Person implements Serializable, MekHqXmlSerializable, IMed
 					retVal.forceId = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("medicalTeamId")) {
 					retVal.medicalTeamId = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("unitId")) {
+					retVal.unitId = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("status")) {
 					retVal.status = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("salary")) {
@@ -455,11 +531,95 @@ public abstract class Person implements Serializable, MekHqXmlSerializable, IMed
 					SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 					retVal.birthday = (GregorianCalendar) GregorianCalendar.getInstance();
 					retVal.birthday.setTime(df.parse(wn2.getTextContent().trim()));
-				}
+				} else if (wn2.getNodeName().equalsIgnoreCase("advantages")) {
+					advantages = wn2.getTextContent();
+				} else if (wn2.getNodeName().equalsIgnoreCase("edge")) {
+					edge = wn2.getTextContent();
+				} else if (wn2.getNodeName().equalsIgnoreCase("implants")) {
+					implants = wn2.getTextContent();
+				} else if (wn2.getNodeName().equalsIgnoreCase("pilotGunnery")) {
+					pilotGunnery = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("pilotPiloting")) {
+					pilotPiloting = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("pilotHits")) {
+					retVal.hits = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("pilotCommandBonus")) {
+					pilotCommandBonus = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("pilotInitBonus")) {
+					pilotInitBonus = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("pilotName")) {
+					pilotName = wn2.getTextContent();
+				} 
 			}
-			//pilots do not have external ids set
-			if(retVal instanceof PilotPerson) {
-				((PilotPerson) retVal).getPilot().setExternalId(retVal.id);
+			
+			if ((null != advantages) && (advantages.trim().length() > 0)) {
+	            StringTokenizer st = new StringTokenizer(advantages,"::");
+	            while (st.hasMoreTokens()) {
+	                String adv = st.nextToken();
+	                String advName = Pilot.parseAdvantageName(adv);
+	                Object value = Pilot.parseAdvantageValue(adv);
+
+	                try {
+	                    retVal.getOptions().getOption(advName).setValue(value);
+	                } catch (Exception e) {
+	                    MekHQApp.logMessage("Error restoring advantage: " +  adv);
+	                }
+	            }
+	        }
+			if ((null != edge) && (edge.trim().length() > 0)) {
+	            StringTokenizer st = new StringTokenizer(edge,"::");
+	            while (st.hasMoreTokens()) {
+	                String adv = st.nextToken();
+	                String advName = Pilot.parseAdvantageName(adv);
+	                Object value = Pilot.parseAdvantageValue(adv);
+
+	                try {
+	                    retVal.getOptions().getOption(advName).setValue(value);
+	                } catch (Exception e) {
+	                    MekHQApp.logMessage("Error restoring edge: " +  adv);
+	                }
+	            }
+	        }
+			if ((null != implants) && (implants.trim().length() > 0)) {
+	            StringTokenizer st = new StringTokenizer(implants,"::");
+	            while (st.hasMoreTokens()) {
+	                String adv = st.nextToken();
+	                String advName = Pilot.parseAdvantageName(adv);
+	                Object value = Pilot.parseAdvantageValue(adv);
+
+	                try {
+	                    retVal.getOptions().getOption(advName).setValue(value);
+	                } catch (Exception e) {
+	                    MekHQApp.logMessage("Error restoring implants: " +  adv);
+	                }
+	            }
+	        }
+			//check to see if we are dealing with a PilotPerson from 0.1.8 or earlier
+			if(pilotGunnery != -1) {
+				switch(retVal.type) {
+				case T_MECHWARRIOR:
+					retVal.addSkill(Skill.S_GUN_MECH,7-pilotGunnery);
+					retVal.addSkill(Skill.S_PILOT_MECH,8-pilotPiloting);
+					break;
+				case T_VEE_CREW:
+					retVal.addSkill(Skill.S_GUN_VEE,7-pilotGunnery);
+					retVal.addSkill(Skill.S_PILOT_GVEE,8-pilotPiloting);
+					break;
+				case T_AERO_PILOT:
+					retVal.addSkill(Skill.S_GUN_AERO,7-pilotGunnery);
+					retVal.addSkill(Skill.S_PILOT_AERO,8-pilotPiloting);
+					break;
+				case T_BA:
+					retVal.addSkill(Skill.S_GUN_BA,7-pilotGunnery);
+					retVal.addSkill(Skill.S_ANTI_MECH,8-pilotPiloting);
+					break;
+
+				}
+				retVal.addSkill(Skill.S_TAC_GROUND,pilotCommandBonus);
+				retVal.addSkill(Skill.S_INIT,pilotInitBonus);
+			}
+			if(null != pilotName) {
+				retVal.setName(pilotName);
 			}
 		} catch (Exception ex) {
 			// Errrr, apparently either the class name was invalid...
@@ -560,17 +720,12 @@ public abstract class Person implements Serializable, MekHqXmlSerializable, IMed
 	public void setRank(int r) {
 		this.rank = r;
 	}
-	
-	public abstract String getName();
-	
-	public abstract String getCallsign();
 
-	public abstract String getSkillSummary();
-	
-	public abstract void improveSkill(int type);
+	public String getSkillSummary() {
+    	//return getExperienceLevelName(getExperienceLevel()) + " (" + pilot.getGunnery() + "/" + pilot.getPiloting() + ")";
+		return "";
+	}
 
-	protected abstract void loadFieldsFromXmlNode(Node wn);
-	
 	public String toString() {
 		return getDesc();
 	}
@@ -598,8 +753,39 @@ public abstract class Person implements Serializable, MekHqXmlSerializable, IMed
     	}
     }
 	
-	public abstract int getExperienceLevel();
+	public int getExperienceLevel() {
+    	//double average = (pilot.getGunnery() + pilot.getPiloting())/2.0;
+    	int level = EXP_GREEN;;
+    	/*
+    	if(average<=2.5) {
+    		level = EXP_ELITE;
+    	} else if (average <=3.5) {
+    		level = EXP_VETERAN;
+    	} else if (average<=4.5) {
+    		level = EXP_REGULAR;
+    	}*/
+    	return level;
+    }
+	public String getDesc() {
+		//String care = "";
+		//String status = "";
+		//if(pilot.getHits() > 0) {
+		//	status = " (" + pilot.getStatusDesc() + ")";
+		//}
+		//return care + pilot.getName() + " [" + pilot.getGunnery() + "/" + pilot.getPiloting() + " " + getTypeDesc() + "]" + status;
+		return "";
+	}
 	
+	public String getDescHTML() {
+        String toReturn = "<html><font size='2'><b>" + getName() + "</b><br/>";
+        //toReturn += getTypeDesc() + " (" + pilot.getGunnery() + "/" + pilot.getPiloting() + ")<br/>";
+        //toReturn += pilot.getStatusDesc();
+        if(isDeployed()) {
+            toReturn += " (DEPLOYED)";
+        }
+        toReturn += "</font></html>";
+        return toReturn;
+    }
 	
 	public String getFullTitle() {
 		String rank = ranks.getRank(getRank());
@@ -639,4 +825,248 @@ public abstract class Person implements Serializable, MekHqXmlSerializable, IMed
 		return getName();
 	}
 	
+	public boolean hasSkill(String skillName) {
+		return null != skills.get(skillName);
+	}
+	
+	public Skill getSkill(String skillName) {
+		return skills.get(skillName);
+	}
+	
+	public void addSkill(String skillName, int lvl) {
+		if(!hasSkill(skillName)) {
+			skills.put(skillName, new Skill(skillName, lvl));
+		}
+	}
+	
+	public int getHits() {
+		return hits;
+	}
+	
+	public void setHits(int h) {
+		this.hits = h;
+	}
+
+	@Override
+	public void heal() {
+		hits = Math.max(hits - 1, 0);
+		if(!needsFixing()) {
+			medicalTeamId = -1;
+		}
+	}
+
+	@Override
+	public boolean canFix(SupportTeam team) {
+		return team instanceof MedicalTeam && ((MedicalTeam)team).getPatients() < 25;
+	}
+
+	@Override
+	public boolean needsFixing() {
+		return hits > 0;
+	}
+
+	@Override
+	public String succeed() {
+		heal();
+		return " <font color='green'><b>Successfully healed one hit.</b></font>";
+	}
+	
+	public PilotOptions getOptions() {
+        return options;
+    }
+	
+	/**
+     * Returns the options of the given category that this pilot has
+     */
+    public Enumeration<IOption> getOptions(String grpKey) {
+        for (Enumeration<IOptionGroup> i = options.getGroups(); i.hasMoreElements();) {
+            IOptionGroup group = i.nextElement();
+
+            if (group.getKey().equalsIgnoreCase(grpKey)) {
+                return group.getOptions();
+            }
+        }
+
+        // no pilot advantages -- return an empty Enumeration
+        return new Vector<IOption>().elements();
+    }
+
+    public int countOptions() {
+        int count = 0;
+
+        for (Enumeration<IOptionGroup> i = options.getGroups(); i.hasMoreElements();) {
+            IOptionGroup group = i.nextElement();
+            for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements();) {
+                IOption option = j.nextElement();
+
+                if (option.booleanValue()) {
+                    count++;
+                }
+            }
+        }
+
+        return count;
+    }
+
+    public int countOptions(String grpKey) {
+        int count = 0;
+
+        for (Enumeration<IOptionGroup> i = options.getGroups(); i.hasMoreElements();) {
+            IOptionGroup group = i.nextElement();
+
+            if (!group.getKey().equalsIgnoreCase(grpKey)) {
+                continue;
+            }
+
+            for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements();) {
+                IOption option = j.nextElement();
+
+                if (option.booleanValue()) {
+                    count++;
+                }
+            }
+        }
+
+        return count;
+    }
+	
+    /**
+     * Returns a string of all the option "codes" for this pilot, for a given
+     * group, using sep as the separator
+     */
+    public String getOptionList(String sep, String grpKey) {
+        StringBuffer adv = new StringBuffer();
+
+        if (null == sep) {
+            sep = "";
+        }
+
+        for (Enumeration<IOptionGroup> i = options.getGroups(); i.hasMoreElements();) {
+            IOptionGroup group = i.nextElement();
+            if (!group.getKey().equalsIgnoreCase(grpKey)) {
+                continue;
+            }
+            for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements();) {
+                IOption option = j.nextElement();
+
+                if (option.booleanValue()) {
+                    if (adv.length() > 0) {
+                        adv.append(sep);
+                    }
+
+                    adv.append(option.getName());
+                    if ((option.getType() == IOption.STRING) || (option.getType() == IOption.CHOICE) || (option.getType() == IOption.INTEGER)) {
+                        adv.append(" ").append(option.stringValue());
+                    }
+                }
+            }
+        }
+
+        return adv.toString();
+    }
+    
+	public int getEdge() {
+    	return getOptions().intOption("edge");
+    }
+    
+    public void setEdge(int e) {
+    	for (Enumeration<IOption> i = getOptions(PilotOptions.EDGE_ADVANTAGES); i.hasMoreElements();) {
+        	IOption ability = i.nextElement();
+        	if(ability.getName().equals("edge")) {
+        		ability.setValue(e);
+        	}
+        }
+    }
+    
+    /**
+     * This will flip the boolean status of the current edge trigger
+     * @param name
+     */
+    public void changeEdgeTrigger(String name) {
+    	for (Enumeration<IOption> i = getOptions(PilotOptions.EDGE_ADVANTAGES); i.hasMoreElements();) {
+        	IOption ability = i.nextElement();
+        	if(ability.getName().equals(name)) {
+        		ability.setValue(!ability.booleanValue());
+        	}
+        }
+    }
+    
+    /**
+     * This function returns an html-coded tooltip that says what 
+     * edge will be used
+     * @return
+     */
+    public String getEdgeTooltip() {
+    	String edgett = "";
+    	for (Enumeration<IOption> i = getOptions(PilotOptions.EDGE_ADVANTAGES); i.hasMoreElements();) {
+        	IOption ability = i.nextElement();
+        	//yuck, it would be nice to have a more fool-proof way of identifying edge triggers
+        	if(ability.getName().contains("edge_when") && ability.booleanValue()) {
+        		edgett = edgett + ability.getDescription() + "<br>";
+        	}
+        }
+    	if(edgett.equals("")) {
+    		return "No triggers set";
+    	}
+    	return "<html>" + edgett + "</html>";
+    }
+    
+    /**
+     * This function returns an html-coded list that says what 
+     * abilities are enabled for this pilot
+     * @return
+     */
+    public String getAbilityList(String type) {
+    	String abilityString = "";
+        for (Enumeration<IOption> i = getOptions(type); i.hasMoreElements();) {
+        	IOption ability = i.nextElement();
+        	if(ability.booleanValue()) {
+        		abilityString = abilityString + ability.getDisplayableNameWithValue() + "<br>";
+        	}
+        }
+        if(abilityString.equals("")) {
+        	return null;
+        }
+        return "<html>" + abilityString + "</html>";
+    }
+    
+    public void acquireAbility(String type, String name, Object value) {
+    	for (Enumeration<IOption> i = getOptions(type); i.hasMoreElements();) {
+        	IOption ability = i.nextElement();
+        	if(ability.getName().equals(name)) {
+        		ability.setValue(value);
+        	}
+    	}
+    }
+    
+    public boolean isSupport() {
+    	return type >= T_MECH_TECH;
+    }
+    
+    public boolean canPilot(Entity ent) {
+    	if(ent instanceof Mech) {
+    		return hasSkill(Skill.S_GUN_MECH) && hasSkill(Skill.S_PILOT_MECH);
+    	}
+    	else if(ent instanceof VTOL) {
+    		return hasSkill(Skill.S_PILOT_VTOL);
+    	}
+    	else if(ent instanceof Tank) {
+    		return hasSkill(Skill.S_PILOT_GVEE);
+    	}
+    	else if(ent instanceof ConvFighter) {
+    		return hasSkill(Skill.S_PILOT_JET) || hasSkill(Skill.S_PILOT_AERO);
+    	}
+    	else if(ent instanceof Aero) {
+    		return hasSkill(Skill.S_PILOT_AERO);
+    	}
+    	return false;
+    }
+    
+    public Unit getAssignedUnit() {
+    	return unit;
+    }
+    
+    public int getUnitId() {
+    	return unitId;
+    }
 }

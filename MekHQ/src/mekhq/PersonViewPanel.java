@@ -17,7 +17,6 @@ import megamek.common.options.PilotOptions;
 import megamek.common.util.DirectoryItems;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.PilotPerson;
 
 /**
  * A custom panel that gets filled in with goodies from a Person record
@@ -311,8 +310,7 @@ public class PersonViewPanel extends javax.swing.JPanel {
 		pnlStats.add(lblStatus2, gridBagConstraints);
 		
 		int secondy = 0;
-		if(person instanceof PilotPerson) {
-			PilotPerson pp = (PilotPerson)person;
+		/*
 			secondy++;
 			lblGun1.setName("lblGun1"); // NOI18N
 			lblGun1.setText(resourceMap.getString("lblGun1.text"));
@@ -524,8 +522,7 @@ public class PersonViewPanel extends javax.swing.JPanel {
 				gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 				pnlStats.add(lblImplants2, gridBagConstraints);
 			}
-			
-		}
+			*/
 
     	
     }

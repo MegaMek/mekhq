@@ -83,8 +83,6 @@ import mekhq.campaign.parts.MissingEquipmentPart;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.PilotPerson;
-import mekhq.campaign.personnel.SupportPerson;
 import mekhq.campaign.team.MedicalTeam;
 import mekhq.campaign.team.SupportTeam;
 import mekhq.campaign.team.TechTeam;
@@ -427,16 +425,6 @@ public class Campaign implements Serializable {
 		//reset the game object
 		en.setGame(game);
 		
-		//figure out type for pilot addition
-		int type = PilotPerson.T_MECHWARRIOR;
-		if (en instanceof Tank) {
-			type = PilotPerson.T_VEE_CREW;
-		} else if (en instanceof Protomech) {
-			type = PilotPerson.T_PROTO_PILOT;
-		} else if (en instanceof Aero) {
-			type = PilotPerson.T_AERO_PILOT;
-		}
-		
 		int id = lastUnitId + 1;
 		en.setId(id);
 		en.setExternalId(id);
@@ -445,48 +433,11 @@ public class Campaign implements Serializable {
 		units.add(unit);
 		unitIds.put(new Integer(id), unit);
 		lastUnitId = id;
-		
-		if (null != en.getCrew() && !en.getCrew().isDead()
-				&& !en.getCrew().isEjected()) {
-			PilotPerson pp = addPilot(en.getCrew(), type, allowNewPilots);
-			if (pp != null) {
-				unit.setPilot(pp);
-			}
-		}
 			
 		// collect all the work items outstanding on this unit and add them
 		// to the workitem vector
 		unit.initializeParts();
 		addReport(unit.getEntity().getDisplayName() + " has been added to the unit roster.");
-	}
-
-	/**
-	 * Add a pilot to the campaign
-	 * 
-	 * @param en
-	 *            An <code>Entity</code> object that the new unit will be
-	 *            wrapped around
-	 */
-	public PilotPerson addPilot(Pilot pilot, int type, boolean allowNewPilots) {
-		// check to see if the externalId of this pilot matches any personnel we
-		// already have
-		Person priorPilot = personnelIds
-				.get(new Integer(pilot.getExternalId()));
-		if (null != priorPilot && priorPilot instanceof PilotPerson) {
-			if (pilot.isEjected()) {
-				((PilotPerson) priorPilot).getAssignedUnit().removePilot();
-			}
-			pilot.setEjected(false);
-			((PilotPerson) priorPilot).setPilot(pilot);
-			priorPilot.setScenarioId(-1);
-			addReport(priorPilot.getDesc() + " has been recovered");
-			return (PilotPerson) priorPilot;
-		} else if (allowNewPilots) {
-			PilotPerson pp = new PilotPerson(pilot, type, ranks);
-			addPerson(pp);
-			return pp;
-		}
-		return null;
 	}
 
 	public ArrayList<Unit> getUnits() {
@@ -508,16 +459,10 @@ public class Campaign implements Serializable {
 	public void addPerson(Person p) {
 		int id = lastPersonId + 1;
 		p.setId(id);
-		if (p instanceof PilotPerson) {
-			((PilotPerson) p).getPilot().setExternalId(id);
-		}
 		personnel.add(p);
 		personnelIds.put(new Integer(id), p);
 		lastPersonId = id;
 		addReport(p.getDesc() + " has been added to the personnel roster.");
-		if(p instanceof SupportPerson) {
-			addTeam(((SupportPerson)p).getTeam());
-		}
 	}
 	
 	private void addPersonWithoutId(Person p) {
@@ -886,7 +831,7 @@ public class Campaign implements Serializable {
 	public long getSupportPayRoll() {
 		long salaries = 0;
 		for(Person p : personnel) {
-			if(p.isActive() && p instanceof SupportPerson) {
+			if(p.isActive() && p.isSupport()) {
 				salaries += p.getSalary();
 			}
 		}
@@ -934,6 +879,7 @@ public class Campaign implements Serializable {
 	public void removePerson(int id) {
 		Person person = getPerson(id);
 
+		/*
 		if (person instanceof PilotPerson
 				&& ((PilotPerson) person).isAssigned()) {
 			((PilotPerson) person).getAssignedUnit().removePilot();
@@ -941,6 +887,7 @@ public class Campaign implements Serializable {
 				&& null != ((SupportPerson) person).getTeam()) {
 			removeTeam(((SupportPerson) person).getTeam().getId());
 		}
+		*/
 
 		addReport(person.getDesc()
 				+ " has been removed from the personnel roster.");
@@ -1025,9 +972,10 @@ public class Campaign implements Serializable {
 		return shortDateFormat.format(calendar.getTime());
 	}
 
-	public ArrayList<PilotPerson> getEligiblePilotsFor(Unit unit) {
-		ArrayList<PilotPerson> pilots = new ArrayList<PilotPerson>();
+	public ArrayList<Person> getEligiblePilotsFor(Unit unit) {
+		ArrayList<Person> pilots = new ArrayList<Person>();
 		for (Person p : getPersonnel()) {
+			/*
 			if (!(p instanceof PilotPerson)) {
 				continue;
 			}
@@ -1035,30 +983,29 @@ public class Campaign implements Serializable {
 			if (pp.canPilot(unit.getEntity())) {
 				pilots.add(pp);
 			}
+			*/
 		}
 		return pilots;
 	}
 	
 	public ArrayList<Unit> getEligibleUnitsFor(Person person) {
 		ArrayList<Unit> units = new ArrayList<Unit>();
-		if(!(person instanceof PilotPerson)) {
-			return units;
-		}
-		PilotPerson pp = (PilotPerson)person;
 		for (Unit u : this.getUnits()) {
-			if (pp.canPilot(u.getEntity())) {
+			if (person.canPilot(u.getEntity())) {
 				units.add(u);
 			}
 		}
 		return units;
 	}
 
+	/*
 	public void changePilot(Unit unit, PilotPerson pilot) {
 		if (null != pilot.getAssignedUnit()) {
 			pilot.getAssignedUnit().removePilot();
 		}
 		unit.setPilot(pilot);
 	}
+	*/
 
 	public void restore() {
 		for (Part part : getParts()) {
@@ -1494,7 +1441,7 @@ public class Campaign implements Serializable {
 			Unit unit = retVal.units.get(x);
 			
 			if (unit.getPilotId() >= 0)
-				unit.setPilot((PilotPerson) retVal.personnelIds.get(unit.getPilotId()));
+				//unit.setPilot((PilotPerson) retVal.personnelIds.get(unit.getPilotId()));
 			
 			// Also, the unit should have its campaign set.
 			unit.campaign = retVal;
@@ -1513,9 +1460,11 @@ public class Campaign implements Serializable {
 			Person psn = retVal.personnel.get(x);
 			
 			psn.setRankSystem(retVal.ranks);
+			/*
 			if(psn instanceof PilotPerson) {
 				((PilotPerson)psn).resetPilotName();
 			}
+			*/
 			
 			Scenario s = retVal.getScenario(psn.getScenarioId());
 			if(null != s) {
@@ -1526,6 +1475,7 @@ public class Campaign implements Serializable {
 				}
 			}
 			
+			/*
 			if (psn instanceof SupportPerson) {
 				SupportPerson psn2 = (SupportPerson)psn;
 
@@ -1540,10 +1490,11 @@ public class Campaign implements Serializable {
 					
 				}
 			}
+			*/
 			
 			// Okay, last trigger a reCalc.
 			// This should fix some holes in the data.
-			psn.reCalc();
+			//psn.reCalc();
 		}
 
 		MekHQApp.logMessage("Load of campaign file complete!");
@@ -1911,10 +1862,9 @@ public class Campaign implements Serializable {
 	 * @param type
 	 * @return
 	 */
-	public PilotPerson newPilotPerson(int type) {
+	public Person newPerson(int type) {
 		boolean isFemale = getRNG().isFemale();
-		Pilot pilot = new Pilot(getRNG().generate(isFemale),4,5);
-		PilotPerson person = new PilotPerson(pilot, type, ranks);
+		Person person = new Person();
 		if(isFemale) {
 			person.setGender(Person.G_FEMALE);
 		}
@@ -1923,51 +1873,6 @@ public class Campaign implements Serializable {
 		//TODO: let user specify age distribution
 		GregorianCalendar birthdate = (GregorianCalendar)getCalendar().clone();
 		//lets set age to be 14 + 4d6 by default		
-		birthdate.set(Calendar.YEAR, birthdate.get(Calendar.YEAR) - (13 + Compute.d6(4)));
-		//choose a random day and month
-		int randomDay = Compute.randomInt(365)+1;
-		if(birthdate.isLeapYear(birthdate.get(Calendar.YEAR))) {
-			randomDay = Compute.randomInt(366)+1;
-		}
-		birthdate.set(Calendar.DAY_OF_YEAR, randomDay);
-		person.setBirthday(birthdate);
-		return person;
-	}
-	
-	public SupportPerson newTechPerson(int type) {
-		boolean isFemale = getRNG().isFemale();
-		TechTeam team = new TechTeam(getRNG().generate(isFemale), SupportTeam.EXP_REGULAR, type);
-		SupportPerson person = new SupportPerson(team, ranks);
-		if(isFemale) {
-			person.setGender(Person.G_FEMALE);
-		}
-		//now lets get a random birthdate, such that the person
-		//is age 13+4d6 by default
-		//TODO: let user specify age distribution
-		GregorianCalendar birthdate = (GregorianCalendar)getCalendar().clone();
-		//lets set age to be 14 + 4d6 by default		
-		birthdate.set(Calendar.YEAR, birthdate.get(Calendar.YEAR) - (13 + Compute.d6(4)));
-		//choose a random day and month
-		int randomDay = Compute.randomInt(365)+1;
-		if(birthdate.isLeapYear(birthdate.get(Calendar.YEAR))) {
-			randomDay = Compute.randomInt(366)+1;
-		}
-		birthdate.set(Calendar.DAY_OF_YEAR, randomDay);
-		person.setBirthday(birthdate);
-		return person;
-	}
-	
-	public SupportPerson newDoctorPerson() {
-		boolean isFemale = getRNG().isFemale();
-		MedicalTeam team = new MedicalTeam(getRNG().generate(isFemale), SupportTeam.EXP_REGULAR);
-		SupportPerson person = new SupportPerson(team, ranks);
-		if(isFemale) {
-			person.setGender(Person.G_FEMALE);
-		}
-		//now lets get a random birthdate, such that the person
-		//is age 13+4d6 by default
-		//TODO: let user specify age distribution
-		GregorianCalendar birthdate = (GregorianCalendar)getCalendar().clone();	
 		birthdate.set(Calendar.YEAR, birthdate.get(Calendar.YEAR) - (13 + Compute.d6(4)));
 		//choose a random day and month
 		int randomDay = Compute.randomInt(365)+1;
@@ -1988,7 +1893,7 @@ public class Campaign implements Serializable {
 		for(Person p : getPersonnel()) {
 			p.setRank(0);
 		}
-		resetAllPilotNames();
+		//resetAllPilotNames();
 	}
 	
 	public ArrayList<Force> getAllForces() {
@@ -2270,6 +2175,7 @@ public class Campaign implements Serializable {
 		return dropshipCost + collarsNeeded*50000;
 	}
 	
+	/*
 	public void resetAllPilotNames() {
 		for(Person p : getPersonnel()) {
 			if(p instanceof PilotPerson) {
@@ -2277,5 +2183,6 @@ public class Campaign implements Serializable {
 			}
 		}
 	}
+	*/
 	
 }

@@ -140,8 +140,7 @@ import mekhq.campaign.parts.MekSensor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.TankLocation;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.PilotPerson;
-import mekhq.campaign.personnel.SupportPerson;
+import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.team.MedicalTeam;
 import mekhq.campaign.team.SupportTeam;
 import mekhq.campaign.team.TechTeam;
@@ -2084,8 +2083,8 @@ public class MekHQView extends FrameView {
 	}// GEN-LAST:event_btnAssignDocActionPerformed
 
 	private void miHirePilotActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miHirePilotActionPerformed
-		CustomizePilotDialog npd = new CustomizePilotDialog(getFrame(), true, 
-				campaign.newPilotPerson(PilotPerson.T_MECHWARRIOR), 
+		CustomizePersonDialog npd = new CustomizePersonDialog(getFrame(), true, 
+				campaign.newPerson(Person.T_MECHWARRIOR), 
 				true,
 				campaign,
 				this);
@@ -2093,16 +2092,16 @@ public class MekHQView extends FrameView {
 	}// GEN-LAST:event_miHirePilotActionPerformed
 
 	private void miHireTechActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miHireTechActionPerformed
-		CustomizeSupportTeamDialog ntd = new CustomizeSupportTeamDialog(getFrame(), true, 
-				campaign.newTechPerson(TechTeam.T_MECH),
+		CustomizePersonDialog ntd = new CustomizePersonDialog(getFrame(), true, 
+				campaign.newPerson(Person.T_MECH_TECH),
 				true,
 				campaign, this);
 		ntd.setVisible(true);
 	}// GEN-LAST:event_miHireTechActionPerformed
 
 	private void miHireDoctorActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miHireDoctorActionPerformed
-		CustomizeSupportTeamDialog ntd = new CustomizeSupportTeamDialog(getFrame(), true, 
-				campaign.newDoctorPerson(),
+		CustomizePersonDialog ntd = new CustomizePersonDialog(getFrame(), true, 
+				campaign.newPerson(Person.T_DOCTOR),
 				true,
 				campaign, this);
 		ntd.setVisible(true);
@@ -2604,7 +2603,7 @@ public class MekHQView extends FrameView {
 			// add any ejected pilots
 			for (Pilot pilot : parser.getPilots()) {
 				if (pilot.isEjected()) {
-					campaign.addPilot(pilot, PilotPerson.T_MECHWARRIOR, false);
+					//campaign.addPilot(pilot, PilotPerson.T_MECHWARRIOR, false);
 				}
 			}
 		}
@@ -2672,17 +2671,15 @@ public class MekHQView extends FrameView {
 		
 		for(int pid : pids) {
 			Person p = campaign.getPerson(pid);
-			if(p instanceof PilotPerson) {
-				Unit u = ((PilotPerson)p).getAssignedUnit();
-				if (null != u.getEntity()) {
-					if (null == u.checkDeployment()) {
-						chosen.add(u.getEntity());
-					} else {
-						undeployed.append("\n")
-						.append(u.getEntity().getDisplayName())
-						.append(" (").append(u.checkDeployment())
-						.append(")");
-					}
+			Unit u = p.getAssignedUnit();
+			if (null != u.getEntity()) {
+				if (null == u.checkDeployment()) {
+					chosen.add(u.getEntity());
+				} else {
+					undeployed.append("\n")
+					.append(u.getEntity().getDisplayName())
+					.append(" (").append(u.checkDeployment())
+					.append(")");
 				}
 			}
 		}
@@ -3715,9 +3712,11 @@ public class MekHQView extends FrameView {
 			} else if (command.equalsIgnoreCase("UNDEPLOY")) {
 				for (Unit unit : units) {
 					if (unit.isDeployed()) {
+						/*
 						if (null != unit.getPilot()) {
 							unit.getPilot().undeploy(campaign);
 						}
+						*/
 					}
 				}
 				refreshServicedUnitList();
@@ -4124,7 +4123,7 @@ public class MekHQView extends FrameView {
             } if(command.contains("ADD_PERSON")) {
             	if(null != force) {
                     Person p = campaign.getPerson(Integer.parseInt(st.nextToken()));
-                    if(null != p && p instanceof PilotPerson) {
+                    if(null != p) {
                     	campaign.addPersonToForce(p, force.getId());
                     	refreshOrganization();
                     	refreshScenarioList();
@@ -4243,12 +4242,12 @@ public class MekHQView extends FrameView {
                 tree.setSelectionPath(path);
                 DefaultMutableTreeNode node = (DefaultMutableTreeNode)path.getLastPathComponent();
                 Force force = null;
-                PilotPerson person = null;
+                Person person = null;
                 if(node.getUserObject() instanceof Force) {
                 	force = (Force)node.getUserObject();
                 }
-                if(node.getUserObject() instanceof PilotPerson) {
-                	person = (PilotPerson)node.getUserObject();
+                if(node.getUserObject() instanceof Person) {
+                	person = (Person)node.getUserObject();
                 }
                 if(null != force) {
                 	int forceId = force.getId();
@@ -4269,7 +4268,7 @@ public class MekHQView extends FrameView {
 	                popup.add(menuItem);
 	                menu = new JMenu("Add Personnel");
 	                for(Person p : campaign.getPersonnel()) {
-	                	if(p instanceof PilotPerson && p.isActive() && p.getForceId() < 1) {
+	                	if(p.isActive() && p.getForceId() < 1) {
 			                menuItem = new JMenuItem(p.getDesc());
 		                	menuItem.setActionCommand("ADD_PERSON|" + forceId + "|" + p.getId());
 		                	menuItem.addActionListener(this);
@@ -4381,14 +4380,14 @@ public class MekHQView extends FrameView {
             }
             
             DefaultMutableTreeNode node = (DefaultMutableTreeNode)value;
-            if(node.getUserObject() instanceof PilotPerson) {
+            if(node.getUserObject() instanceof Person) {
             	//need to set the string here so I can add rank from campaign
-            	PilotPerson pp = (PilotPerson)node.getUserObject();
+            	Person pp = (Person)node.getUserObject();
             	String rank = campaign.getRanks().getRank(pp.getRank());
             	if(pp.getRank() == 0) {
             		rank = "";
             	}
-            	String name = pp.getName() + " (" + pp.getPilot().getGunnery() + "/" + pp.getPilot().getPiloting() + ")";
+            	String name = pp.getName();// + " (" + pp.getPilot().getGunnery() + "/" + pp.getPilot().getPiloting() + ")";
             	if(pp.needsFixing()) {
             		name = "<font color='red'>" + name + "</font>";
             	}
@@ -4521,19 +4520,16 @@ public class MekHQView extends FrameView {
 				refreshDoctorsList();
 				refreshOrganization();
 			} else if (command.contains("CHANGE_UNIT")) {
-				int selected = Integer.parseInt(st.nextToken());
-				if(selectedPerson instanceof PilotPerson) {
-					PilotPerson pp = (PilotPerson)selectedPerson;			
-					if(selected == -1) {
-						Unit u = pp.getAssignedUnit();
-						if(null != u) {
-							u.removePilot();
-						}
-					} else {
-						Unit u = campaign.getUnit(selected);
-						if(null != u) {
-							campaign.changePilot(u, pp);
-						}
+				int selected = Integer.parseInt(st.nextToken());		
+				if(selected == -1) {
+					Unit u = selectedPerson.getAssignedUnit();
+					if(null != u) {
+						u.removePilot();
+					}
+				} else {
+					Unit u = campaign.getUnit(selected);
+					if(null != u) {
+						//campaign.changePilot(u, selectedPerson);
 					}
 				}
 				refreshServicedUnitList();
@@ -4554,7 +4550,7 @@ public class MekHQView extends FrameView {
 			} else if (command.contains("IMPROVE")) {
 				int selected = Integer.parseInt(st.nextToken());
 				int cost =  Integer.parseInt(st.nextToken());
-				selectedPerson.improveSkill(selected);
+				//selectedPerson.improveSkill(selected);
 				selectedPerson.setXp(selectedPerson.getXp() - cost);
 				campaign.addReport(selectedPerson.getName() + " improved " + SkillCosts.getSkillName(selected) + "!");
 				refreshServicedUnitList();
@@ -4567,45 +4563,39 @@ public class MekHQView extends FrameView {
 			} else if (command.contains("ABILITY")) {
 				String selected = st.nextToken();
 				int cost =  Integer.parseInt(st.nextToken());
-				if(selectedPerson instanceof PilotPerson) {
-					((PilotPerson)selectedPerson).acquireAbility(PilotOptions.LVL3_ADVANTAGES, selected, true);
-					selectedPerson.setXp(selectedPerson.getXp() - cost);
-					//TODO: add campaign report
-					refreshServicedUnitList();
-					refreshUnitList();
-					refreshPersonnelList();
-					refreshTechsList();
-					refreshDoctorsList();
-					refreshReport();
-				}
+				selectedPerson.acquireAbility(PilotOptions.LVL3_ADVANTAGES, selected, true);
+				selectedPerson.setXp(selectedPerson.getXp() - cost);
+				//TODO: add campaign report
+				refreshServicedUnitList();
+				refreshUnitList();
+				refreshPersonnelList();
+				refreshTechsList();
+				refreshDoctorsList();
+				refreshReport();
 			} else if (command.contains("WSPECIALIST")) {
 				String selected = st.nextToken();
 				int cost =  Integer.parseInt(st.nextToken());
-				if(selectedPerson instanceof PilotPerson) {
-					((PilotPerson)selectedPerson).acquireAbility(PilotOptions.LVL3_ADVANTAGES, "weapon_specialist", selected);
-					selectedPerson.setXp(selectedPerson.getXp() - cost);
-					//TODO: add campaign report
-					refreshServicedUnitList();
-					refreshUnitList();
-					refreshPersonnelList();
-					refreshTechsList();
-					refreshDoctorsList();
-					refreshReport();
-				}
+				selectedPerson.acquireAbility(PilotOptions.LVL3_ADVANTAGES, "weapon_specialist", selected);
+				selectedPerson.setXp(selectedPerson.getXp() - cost);
+				//TODO: add campaign report
+				refreshServicedUnitList();
+				refreshUnitList();
+				refreshPersonnelList();
+				refreshTechsList();
+				refreshDoctorsList();
+				refreshReport();
 			} else if (command.contains("SPECIALIST")) {
 				String selected = st.nextToken();
 				int cost =  Integer.parseInt(st.nextToken());
-				if(selectedPerson instanceof PilotPerson) {
-					((PilotPerson)selectedPerson).acquireAbility(PilotOptions.LVL3_ADVANTAGES, "specialist", selected);
-					selectedPerson.setXp(selectedPerson.getXp() - cost);
-					//TODO: add campaign report
-					refreshServicedUnitList();
-					refreshUnitList();
-					refreshPersonnelList();
-					refreshTechsList();
-					refreshDoctorsList();
-					refreshReport();
-				}
+				selectedPerson.acquireAbility(PilotOptions.LVL3_ADVANTAGES, "specialist", selected);
+				selectedPerson.setXp(selectedPerson.getXp() - cost);
+				//TODO: add campaign report
+				refreshServicedUnitList();
+				refreshUnitList();
+				refreshPersonnelList();
+				refreshTechsList();
+				refreshDoctorsList();
+				refreshReport();
 			} else if (command.equalsIgnoreCase("STATUS")) {
 				int selected = Integer.parseInt(st.nextToken());
 				for(Person person : people) {				
@@ -4630,9 +4620,7 @@ public class MekHQView extends FrameView {
 				refreshOrganization();
 			} else if (command.equalsIgnoreCase("EDGE")) {
 				String trigger = st.nextToken();
-				if(selectedPerson instanceof PilotPerson) {
-					((PilotPerson)selectedPerson).changeEdgeTrigger(trigger);
-				}
+				selectedPerson.changeEdgeTrigger(trigger);
 				refreshPersonnelList();
 				refreshPersonnelView();
 			} else if (command.equalsIgnoreCase("REMOVE")) {
@@ -4662,21 +4650,12 @@ public class MekHQView extends FrameView {
 				refreshPersonnelList();
 				refreshScenarioList();
 			} else if (command.equalsIgnoreCase("EDIT")) {
-				if(selectedPerson instanceof PilotPerson) {
-					CustomizePilotDialog npd = new CustomizePilotDialog(getFrame(), true, 
-							(PilotPerson)selectedPerson, 
-							false,
-							campaign,
-							view);
-					npd.setVisible(true);
-				} else if(selectedPerson instanceof SupportPerson) {			
-					CustomizeSupportTeamDialog ntd = new CustomizeSupportTeamDialog(getFrame(), true, 
-							(SupportPerson)selectedPerson, 
-							false,
-							campaign,
-							view);
-					ntd.setVisible(true);		
-				}
+				CustomizePersonDialog npd = new CustomizePersonDialog(getFrame(), true, 
+						selectedPerson, 
+						false,
+						campaign,
+						view);
+				npd.setVisible(true);
 				refreshPatientList();
 				refreshDoctorsList();
 				refreshServicedUnitList();
@@ -4685,11 +4664,8 @@ public class MekHQView extends FrameView {
 				refreshOrganization();
 			} else if (command.equalsIgnoreCase("HEAL")) {
 				for(Person person : people) {
-					if (person instanceof PilotPerson) {
-						Pilot pilot = ((PilotPerson) person).getPilot();
-						pilot.setHits(0);
-						person.setTeamId(-1);
-					}
+					person.setHits(0);
+					person.setTeamId(-1);
 				}
 				refreshPatientList();
 				refreshDoctorsList();
@@ -4731,15 +4707,12 @@ public class MekHQView extends FrameView {
 				refreshPatientList();
 				refreshPersonnelList();
 			} else if (command.equalsIgnoreCase("EDGE_SET")) {
-				if(selectedPerson instanceof PilotPerson) {
-					PilotPerson pp = (PilotPerson)selectedPerson;
-					PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(
-							getFrame(), true, "Edge", pp.getEdge(), 0, 10);
-					pvcd.setVisible(true);
-					int i = pvcd.getValue();
-					pp.setEdge(i);
-					refreshPersonnelList();
-				}
+				PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(
+						getFrame(), true, "Edge", selectedPerson.getEdge(), 0, 10);
+				pvcd.setVisible(true);
+				int i = pvcd.getValue();
+				selectedPerson.setEdge(i);
+				refreshPersonnelList();
 			} 
 		}
 
@@ -4799,6 +4772,7 @@ public class MekHQView extends FrameView {
 				popup.add(menu);
 				// switch pilot
 				if(oneSelected) {
+					/*
 					if(person instanceof PilotPerson) {
 						PilotPerson pp = (PilotPerson)person;
 						menu = new JMenu("Assign to Unit");
@@ -4840,7 +4814,7 @@ public class MekHQView extends FrameView {
 		                	MenuScroller.setScrollerFor(menu, 20);
 		                }
 						popup.add(menu);
-					}
+					}*/
 				}
 				menuItem = new JMenuItem("Add XP");
 				menuItem.setActionCommand("XP_ADD");
@@ -4849,6 +4823,7 @@ public class MekHQView extends FrameView {
 				popup.add(menuItem);
 				if(oneSelected) {
 					menu = new JMenu("Spend XP");
+					/*
 					if(person instanceof PilotPerson) {
 						PilotPerson pp = (PilotPerson)person;
 						//Gunnery
@@ -5000,10 +4975,11 @@ public class MekHQView extends FrameView {
 						menuItem.addActionListener(this);
 						menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
 						menu.add(menuItem);
-					}
+					}*/
 					popup.add(menu);
 				}
 				if(oneSelected) {
+					/*
 					if(person instanceof PilotPerson && campaign.getCampaignOptions().useEdge()) {
 						menu = new JMenu("Set Edge Triggers");
 						cbMenuItem = new JCheckBoxMenuItem("Head Hits");
@@ -5036,6 +5012,7 @@ public class MekHQView extends FrameView {
 						menu.add(cbMenuItem);
 						popup.add(menu);
 					}
+					*/
 				}
 				if(oneSelected) {
 					// change portrait
@@ -5063,13 +5040,14 @@ public class MekHQView extends FrameView {
 				menuItem.setEnabled(campaign.isGM());
 				menu.add(menuItem);
 				if(oneSelected) {
+					/*
 					if (person instanceof PilotPerson) {
 						menuItem = new JMenuItem("Undeploy Pilot");
 						menuItem.setActionCommand("UNDEPLOY");
 						menuItem.addActionListener(this);
 						menuItem.setEnabled(campaign.isGM() && person.isDeployed());
 						menu.add(menuItem);
-					}		
+					}*/		
 					menuItem = new JMenuItem("Edit...");
 					menuItem.setActionCommand("EDIT");
 					menuItem.addActionListener(this);
@@ -5081,7 +5059,7 @@ public class MekHQView extends FrameView {
 					menuItem.setEnabled(campaign.isGM());
 					menu.add(menuItem);
 				}
-				if(campaign.getCampaignOptions().useEdge() && person instanceof PilotPerson) {
+				if(campaign.getCampaignOptions().useEdge()) {
 					menuItem = new JMenuItem("Set Edge");
 					menuItem.setActionCommand("EDGE_SET");
 					menuItem.addActionListener(this);
@@ -5249,13 +5227,9 @@ public class MekHQView extends FrameView {
         	Person p = data.get(row);
         	switch(col) {
         	case COL_NABIL:
-        		if(p instanceof PilotPerson) {
-        			return ((PilotPerson)p).getAbilityList(PilotOptions.LVL3_ADVANTAGES);
-        		}
+        		return p.getAbilityList(PilotOptions.LVL3_ADVANTAGES);
         	case COL_NIMP:
-        		if(p instanceof PilotPerson) {
-        			return ((PilotPerson)p).getAbilityList(PilotOptions.MD_ADVANTAGES);
-        		}
+        		return p.getAbilityList(PilotOptions.MD_ADVANTAGES);
             default:
             	return null;
             }
@@ -5312,84 +5286,63 @@ public class MekHQView extends FrameView {
                 return p.getTypeDesc();
             }
             if(col == COL_GUN) {
-            	if(p instanceof PilotPerson) {
-            		return Integer.toString(((PilotPerson)p).getPilot().getGunnery());
+            	if(p.hasSkill(Skill.S_GUN_MECH)) {
+            		return Integer.toString(p.getSkill(Skill.S_GUN_MECH).getFinalSkillValue());
             	} else {
             		return "-";
             	}
             }
             if(col == COL_ARTY) {
-            	if(p instanceof PilotPerson) {
-            		return Integer.toString(((PilotPerson)p).getPilot().getArtillery());
+            	if(p.hasSkill(Skill.S_ARTILLERY)) {
+            		return Integer.toString(p.getSkill(Skill.S_ARTILLERY).getFinalSkillValue());
             	} else {
             		return "-";
             	}
             }
             if(col == COL_TACTICS) {
-            	if(p instanceof PilotPerson) {
-            		return Integer.toString(((PilotPerson)p).getPilot().getCommandBonus());
+            	if(p.hasSkill(Skill.S_TAC_GROUND)) {
+            		return Integer.toString(p.getSkill(Skill.S_TAC_GROUND).getFinalSkillValue());
             	} else {
             		return "-";
             	}
             }
             if(col == COL_INIT) {
-            	if(p instanceof PilotPerson) {
-            		return Integer.toString(((PilotPerson)p).getPilot().getInitBonus());
+            	if(p.hasSkill(Skill.S_INIT)) {
+            		return Integer.toString(p.getSkill(Skill.S_INIT).getFinalSkillValue());
             	} else {
             		return "-";
             	}
             }
             if(col == COL_TOUGH) {
-            	if(p instanceof PilotPerson) {
-            		return Integer.toString(((PilotPerson)p).getPilot().getToughness());
-            	} else {
-            		return "-";
-            	}
+            	return "?";
             }
             if(col == COL_PILOT) {
-            	if(p instanceof PilotPerson) {
-            		return Integer.toString(((PilotPerson)p).getPilot().getPiloting());
+            	if(p.hasSkill(Skill.S_PILOT_MECH)) {
+            		return Integer.toString(p.getSkill(Skill.S_PILOT_MECH).getFinalSkillValue());
             	} else {
             		return "-";
             	}
             }
             if(col == COL_EDGE) {
-            	if(p instanceof PilotPerson) {
-            		return Integer.toString(((PilotPerson)p).getEdge());
-            	} else {
-            		return "-";
-            	}
+            	return Integer.toString(p.getEdge());
             }
             if(col == COL_NABIL) {
-            	if(p instanceof PilotPerson) {
-            		return Integer.toString(((PilotPerson)p).getPilot().countOptions(PilotOptions.LVL3_ADVANTAGES));
-            	} else {
-            		return 0;
-            	}
+            	return Integer.toString(p.countOptions(PilotOptions.LVL3_ADVANTAGES));
             }
             if(col == COL_NIMP) {
-            	if(p instanceof PilotPerson) {
-            		return Integer.toString(((PilotPerson)p).getPilot().countOptions(PilotOptions.MD_ADVANTAGES));
-            	} else {
-            		return 0;
-            	}
+            	return Integer.toString(p.countOptions(PilotOptions.MD_ADVANTAGES));
+
             }
             if(col == COL_HITS) {
-            	if(p instanceof PilotPerson) {
-            		return ((PilotPerson)p).getPilot().getHits();
-            	} else {
-            		return 0;
-            	}
+            	return p.getHits();
             }
             if(col == COL_SKILL) {
             	return p.getSkillSummary();
             }
             if(col == COL_ASSIGN) {
-            	if(p instanceof PilotPerson) {
-            		Unit u = ((PilotPerson)p).getAssignedUnit();
-            		if(null != u) {
-            			return u.getEntity().getDisplayName();
-            		}
+            	Unit u = p.getAssignedUnit();
+            	if(null != u) {
+            		return u.getEntity().getDisplayName();
             	}
             	return "-";
             }
@@ -6399,7 +6352,7 @@ public class MekHQView extends FrameView {
         		u = data.get(row);
         	}
             Entity e = u.getEntity();
-            PilotPerson pp = u.getPilot();
+            //PilotPerson pp = u.getPilot();
             DecimalFormat format = new DecimalFormat();
             if(null == e) {
             	return "?";
@@ -6435,18 +6388,21 @@ public class MekHQView extends FrameView {
                 return u.getStatus();
             }
             if(col == COL_PILOT) {
+            	return "?";
+            	/*
             	if(null == pp) {
             		return "-";
             	} else {
             		return pp.getFullTitle();
             	}
+            	*/
             }
             if(col == COL_BV) {
-            	if(null == pp) {
+            	//if(null == pp) {
             		return e.calculateBattleValue(true, true);
-            	} else {
-            		return e.calculateBattleValue(true, false);
-            	}
+            	//} else {
+            		//return e.calculateBattleValue(true, false);
+            	//}
             }
             if(col == COL_REPAIR) {
                 return u.getPartsNeedingFixing().size();
@@ -6535,9 +6491,9 @@ public class MekHQView extends FrameView {
 				String sel = command.split(":")[1];
 				int selected = Integer.parseInt(sel);
 				Person p = campaign.getPerson(selected);
-				if (null != p && p instanceof PilotPerson) {
-					campaign.changePilot(selectedUnit, (PilotPerson)p);
-				}
+				//if (null != p && p instanceof PilotPerson) {
+					//campaign.changePilot(selectedUnit, (PilotPerson)p);
+				//}
 				refreshServicedUnitList();
 				refreshUnitList();
 				refreshPersonnelList();
@@ -6655,9 +6611,9 @@ public class MekHQView extends FrameView {
 			} else if (command.equalsIgnoreCase("UNDEPLOY")) {
 				for (Unit unit : units) {
 					if (unit.isDeployed()) {
-						if (null != unit.getPilot()) {
-							unit.getPilot().undeploy(campaign);
-						}
+						//if (null != unit.getPilot()) {
+							//unit.getPilot().undeploy(campaign);
+						//}
 					}
 				}
 				refreshServicedUnitList();
@@ -6962,6 +6918,7 @@ public class MekHQView extends FrameView {
 				}
 				// switch pilot
 				if(oneSelected) {
+					/*
 					menu = new JMenu("Change pilot");
 					for (PilotPerson pp : campaign.getEligiblePilotsFor(unit)) {
 						menuItem = new JMenuItem(pp.getDesc());
@@ -6978,6 +6935,7 @@ public class MekHQView extends FrameView {
 	                	MenuScroller.setScrollerFor(menu, 20);
 	                }
 					popup.add(menu);
+					*/
 				}
 				popup.addSeparator();
 				// sell unit

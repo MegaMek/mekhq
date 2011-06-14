@@ -28,21 +28,20 @@ import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.PilotPerson;
+import mekhq.campaign.personnel.Skill;
 
 /**
  *
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class CustomizePilotDialog extends javax.swing.JDialog implements DialogOptionListener {
+public class CustomizePersonDialog extends javax.swing.JDialog implements DialogOptionListener {
 
     /**
 	 * This dialog is used to both hire new pilots and to edit existing ones
 	 * 
 	 */
 	private static final long serialVersionUID = -6265589976779860566L;
-	private Pilot pilot;
-	private PilotPerson person;
+	private Person person;
     private ArrayList<DialogOptionComponent> optionComps = new ArrayList<DialogOptionComponent>();
     private PilotOptions options;
     private GregorianCalendar birthdate;
@@ -55,7 +54,7 @@ public class CustomizePilotDialog extends javax.swing.JDialog implements DialogO
     private MekHQView hqView;
 
     /** Creates new form CustomizePilotDialog */
-    public CustomizePilotDialog(java.awt.Frame parent, boolean modal, PilotPerson person, boolean hire, Campaign campaign, MekHQView view) {
+    public CustomizePersonDialog(java.awt.Frame parent, boolean modal, Person person, boolean hire, Campaign campaign, MekHQView view) {
         super(parent, modal);
         this.campaign = campaign;
         this.hqView = view;
@@ -72,9 +71,8 @@ public class CustomizePilotDialog extends javax.swing.JDialog implements DialogO
     }
 
     private void refreshPilotAndOptions () {
-    	this.pilot = person.getPilot();
     	this.birthdate = (GregorianCalendar)person.getBirthday().clone();
-    	this.options = pilot.getOptions();		
+    	this.options = person.getOptions();		
     	getContentPane().removeAll();
     	initComponents();
     	refreshOptions();
@@ -119,17 +117,17 @@ public class CustomizePilotDialog extends javax.swing.JDialog implements DialogO
         btnDate = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(CustomizePilotDialog.class);
+        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(CustomizePersonDialog.class);
         setTitle(resourceMap.getString("Form.title")); // NOI18N
         setName("Form"); // NOI18N
         getContentPane().setLayout(new java.awt.GridBagLayout());
 
         DefaultComboBoxModel pilotTypeModel = new DefaultComboBoxModel();
-        pilotTypeModel.addElement(PilotPerson.getTypeDesc(Person.T_MECHWARRIOR));
-        pilotTypeModel.addElement(PilotPerson.getTypeDesc(Person.T_VEE_CREW));
-        pilotTypeModel.addElement(PilotPerson.getTypeDesc(Person.T_AERO_PILOT));
-        pilotTypeModel.addElement(PilotPerson.getTypeDesc(Person.T_PROTO_PILOT));
-        pilotTypeModel.addElement(PilotPerson.getTypeDesc(Person.T_BA));
+        pilotTypeModel.addElement(Person.getTypeDesc(Person.T_MECHWARRIOR));
+        pilotTypeModel.addElement(Person.getTypeDesc(Person.T_VEE_CREW));
+        pilotTypeModel.addElement(Person.getTypeDesc(Person.T_AERO_PILOT));
+        pilotTypeModel.addElement(Person.getTypeDesc(Person.T_PROTO_PILOT));
+        pilotTypeModel.addElement(Person.getTypeDesc(Person.T_BA));
         choiceType.setModel(pilotTypeModel);
         choiceType.setMinimumSize(new java.awt.Dimension(200, 27));
         choiceType.setName("choiceType"); // NOI18N
@@ -243,7 +241,7 @@ public class CustomizePilotDialog extends javax.swing.JDialog implements DialogO
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         getContentPane().add(btnRandomName, gridBagConstraints);
         
-        textNickname.setText(pilot.getNickname());
+        textNickname.setText(person.getCallsign());
         textNickname.setMinimumSize(new java.awt.Dimension(250, 28));
         textNickname.setName("textNickname"); // NOI18N
         textNickname.setPreferredSize(new java.awt.Dimension(250, 28));
@@ -254,7 +252,7 @@ public class CustomizePilotDialog extends javax.swing.JDialog implements DialogO
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         getContentPane().add(textNickname, gridBagConstraints);
 
-        textGunnery.setText(Integer.toString(pilot.getGunnery()));
+        textGunnery.setText(Integer.toString(person.getSkill(Skill.S_GUN_MECH).getLevel()));
         textGunnery.setMinimumSize(new java.awt.Dimension(50, 28));
         textGunnery.setName("textGunnery"); // NOI18N
         textGunnery.setPreferredSize(new java.awt.Dimension(50, 28));
@@ -264,7 +262,7 @@ public class CustomizePilotDialog extends javax.swing.JDialog implements DialogO
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         getContentPane().add(textGunnery, gridBagConstraints);
 
-        textPiloting.setText(Integer.toString(pilot.getPiloting()));
+        textPiloting.setText(Integer.toString(person.getSkill(Skill.S_PILOT_MECH).getLevel()));
         textPiloting.setMinimumSize(new java.awt.Dimension(50, 28));
         textPiloting.setName("textPiloting"); // NOI18N
         textPiloting.setPreferredSize(new java.awt.Dimension(50, 28));
@@ -303,7 +301,7 @@ public class CustomizePilotDialog extends javax.swing.JDialog implements DialogO
             gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
             getContentPane().add(lblArtillery, gridBagConstraints);
         
-            textArtillery.setText(Integer.toString(pilot.getArtillery()));
+            textArtillery.setText(Integer.toString(person.getSkill(Skill.S_ARTILLERY).getLevel()));
             textArtillery.setMinimumSize(new java.awt.Dimension(50, 28));
             textArtillery.setName("textArtillery"); // NOI18N
             textArtillery.setPreferredSize(new java.awt.Dimension(50, 28));
@@ -324,7 +322,7 @@ public class CustomizePilotDialog extends javax.swing.JDialog implements DialogO
             gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
             getContentPane().add(lblInitB, gridBagConstraints);
         
-            textInitB.setText(Integer.toString(pilot.getInitBonus()));
+            textInitB.setText("");
             textInitB.setMinimumSize(new java.awt.Dimension(50, 28));
             textInitB.setName("textInitB"); // NOI18N
             textInitB.setPreferredSize(new java.awt.Dimension(50, 28));
@@ -345,7 +343,7 @@ public class CustomizePilotDialog extends javax.swing.JDialog implements DialogO
             gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
             getContentPane().add(lblCommandB, gridBagConstraints);
 
-        	textCommandB.setText(Integer.toString(pilot.getCommandBonus()));
+        	textCommandB.setText("");
         	textCommandB.setMinimumSize(new java.awt.Dimension(50, 28));
         	textCommandB.setName("textCommandB"); // NOI18N
         	textCommandB.setPreferredSize(new java.awt.Dimension(50, 28));
@@ -366,7 +364,7 @@ public class CustomizePilotDialog extends javax.swing.JDialog implements DialogO
             gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
             getContentPane().add(lblToughness, gridBagConstraints);
         
-            textToughness.setText(Integer.toString(pilot.getToughness()));
+            textToughness.setText("");
             textToughness.setMinimumSize(new java.awt.Dimension(50, 28));
             textToughness.setName("textToughness"); // NOI18N
             textToughness.setPreferredSize(new java.awt.Dimension(50, 28));
@@ -475,66 +473,26 @@ public class CustomizePilotDialog extends javax.swing.JDialog implements DialogO
     }//GEN-LAST:event_btnCloseActionPerformed
 
     private void btnOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOkActionPerformed
-        int piloting = Integer.parseInt(textPiloting.getText());
-        int gunnery = Integer.parseInt(textGunnery.getText());
-        String name = textName.getText();
-        String nick = textNickname.getText();      
-        person.setPilot(pilot);
+        
+        person.setName(textName.getText());
         person.setType(choiceType.getSelectedIndex());
+        person.setCallsign(textNickname.getText());   
         person.setBiography(txtBio.getText());
         person.setGender(choiceGender.getSelectedIndex());
-        person.setBirthday(birthdate);              
+        int piloting = Integer.parseInt(textPiloting.getText());
+        int gunnery = Integer.parseInt(textGunnery.getText());
+        person.addSkill(Skill.S_GUN_MECH, piloting);
+        person.addSkill(Skill.S_PILOT_MECH, gunnery);
+        person.setBirthday(birthdate);  
+        setOptions();
         if(isNewHire()) {
-        	pilot = new Pilot(name, gunnery, piloting);
-            if(campaign.getCampaignOptions().useInitBonus()) {
-            	int initb = Integer.parseInt(textInitB.getText());
-            	pilot.setInitBonus(initb);
-            }
-            if(campaign.getCampaignOptions().useTactics()) {
-            	int commandb = Integer.parseInt(textCommandB.getText());
-            	pilot.setCommandBonus(commandb);
-            }
-            if(campaign.getCampaignOptions().useToughness()) {
-            	int tough = Integer.parseInt(textToughness.getText());
-            	pilot.setToughness(tough);
-            }
-            if(campaign.getCampaignOptions().useArtillery()) {
-            	int artillery = Integer.parseInt(textArtillery.getText());
-            	pilot.setArtillery(artillery);
-            }
-            pilot.setNickname(nick);
-            setOptions(pilot);
-            person.setPilot(pilot);
             campaign.addPerson(person);
         	hqView.refreshPersonnelList();
         	hqView.refreshPatientList();
     		hqView.refreshReport();
-        	person = campaign.newPilotPerson(PilotPerson.T_MECHWARRIOR);
+        	person = campaign.newPerson(Person.T_MECHWARRIOR);
         	refreshPilotAndOptions();
         } else {
-        	person.setName(name);
-        	person.resetPilotName();
-        	Pilot p = person.getPilot();
-        	p.setGunnery(gunnery);
-        	p.setPiloting(piloting);
-        	p.setNickname(nick);
-        	if(campaign.getCampaignOptions().useInitBonus()) {
-            	int initb = Integer.parseInt(textInitB.getText());
-            	p.setInitBonus(initb);
-            }
-            if(campaign.getCampaignOptions().useTactics()) {
-            	int commandb = Integer.parseInt(textCommandB.getText());
-            	p.setCommandBonus(commandb);
-            }
-            if(campaign.getCampaignOptions().useToughness()) {
-            	int tough = Integer.parseInt(textToughness.getText());
-            	p.setToughness(tough);
-            }
-            if(campaign.getCampaignOptions().useArtillery()) {
-            	int artillery = Integer.parseInt(textArtillery.getText());
-            	p.setArtillery(artillery);
-            }
-            setOptions(p);
         	hqView.refreshPersonnelList();
         	hqView.refreshPatientList();
         	hqView.refreshServicedUnitList();
@@ -556,7 +514,7 @@ public class CustomizePilotDialog extends javax.swing.JDialog implements DialogO
     public static void main(String args[]) {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                CustomizePilotDialog dialog = new CustomizePilotDialog(new javax.swing.JFrame(), true, null, false, null, null);
+                CustomizePersonDialog dialog = new CustomizePersonDialog(new javax.swing.JFrame(), true, null, false, null, null);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {
@@ -645,16 +603,16 @@ public class CustomizePilotDialog extends javax.swing.JDialog implements DialogO
         optionComps.add(optionComp);
     }
 
-    private void setOptions(Pilot p) {
+    private void setOptions() {
         IOption option;
         for (final Object newVar : optionComps) {
             DialogOptionComponent comp = (DialogOptionComponent) newVar;
             option = comp.getOption();
             if ((comp.getValue().equals("None"))) { // NON-NLS-$1
-                p.getOptions().getOption(option.getName())
+                person.getOptions().getOption(option.getName())
                 .setValue("None"); // NON-NLS-$1
             } else {
-                p.getOptions().getOption(option.getName())
+                person.getOptions().getOption(option.getName())
                 .setValue(comp.getValue());
             }
         }

@@ -96,7 +96,6 @@ import mekhq.campaign.parts.Turret;
 import mekhq.campaign.parts.TurretLock;
 import mekhq.campaign.parts.VeeSensor;
 import mekhq.campaign.parts.VeeStabiliser;
-import mekhq.campaign.personnel.PilotPerson;
 import mekhq.campaign.work.IAcquisitionWork;
 
 import org.w3c.dom.NamedNodeMap;
@@ -132,7 +131,6 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 
 	private Entity entity;
 	private int site;
-	private PilotPerson pilot;
 	private int pilotId = -1;
 	private boolean salvaged;
 	private boolean customized;
@@ -248,6 +246,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 		this.site = i;
 	}
 
+	/*
 	public PilotPerson getPilot() {
 		return pilot;
 	}
@@ -264,6 +263,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 			entity.setCrew(pp.getPilot());
 		}
 	}
+	*/
 
 	public int getQuality() {
 		return quality;
@@ -871,14 +871,14 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 	}
 
 	public boolean hasPilot() {
-		return null != pilot;
+		return false;//null != pilot;
 	}
 
-	public void removePilot() {
-		if (hasPilot()) {
+	public void removePilot() {	
+		/*if (hasPilot()) {
 			getPilot().setAssignedUnit(null);
 			setPilot(null);
-		}
+		}*/
 	}
 
 	public String getPilotDesc() {
@@ -943,7 +943,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 	}
 
 	public boolean isDeployed() {
-		return (pilot != null && pilot.isDeployed());
+		return false;//(pilot != null && pilot.isDeployed());
 	}
 
 	public String checkDeployment() {
@@ -1965,13 +1965,13 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 				+ customized + "</customized>");
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<quality>"
 				+ quality + "</quality>");
-		
+		/*
 		// Units may not have a pilot!
 		if (pilot != null) {
 			pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<pilotId>"
 					+ pilot.getId() + "</pilotId>");
 		}
-		
+		*/
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<salvaged>"
 				+ salvaged + "</salvaged>");
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<site>" + site

@@ -42,7 +42,6 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.PilotPerson;
 
 /**
  * This object will be the main workforce for the scenario
@@ -58,9 +57,9 @@ public class ResolveScenarioTracker {
 	ArrayList<Unit> leftoverSalvage;
 	ArrayList<Pilot> pilots;
 	ArrayList<Unit> units;
-	ArrayList<PilotPerson> people;
+	ArrayList<Person> people;
 	ArrayList<Unit> missingUnits;
-	ArrayList<PilotPerson> missingPilots;
+	ArrayList<Person> missingPilots;
 	ArrayList<Pilot> deadPilots;
 	Campaign campaign;
 	Scenario scenario;
@@ -76,17 +75,14 @@ public class ResolveScenarioTracker {
 		leftoverSalvage = new ArrayList<Unit>();
 		pilots = new ArrayList<Pilot>();
 		units = new ArrayList<Unit>();
-		people = new ArrayList<PilotPerson>();
+		people = new ArrayList<Person>();
 		missingUnits = new ArrayList<Unit>();
-		missingPilots = new ArrayList<PilotPerson>();
+		missingPilots = new ArrayList<Person>();
 		for(int pid : scenario.getForces(campaign).getAllPersonnel()) {
 			Person p = campaign.getPerson(pid);
-			if(p instanceof PilotPerson) {
-				PilotPerson pp = (PilotPerson)p;
-				people.add(pp);
-				if(null != pp.getAssignedUnit()) {
-					units.add(pp.getAssignedUnit());
-				}
+			people.add(p);
+			if(null != p.getAssignedUnit()) {
+				units.add(p.getAssignedUnit());
 			}
 		}
 		unitList = new JFileChooser(".");
@@ -205,11 +201,11 @@ public class ResolveScenarioTracker {
 	}
 	
 	public void identifyMissingPilots() {
-		missingPilots = new ArrayList<PilotPerson>();
-		for(PilotPerson person : people) {
-			if(!foundMatch(person.getPilot(), pilots) && !foundMatch(person.getPilot(), deadPilots)) {
-				missingPilots.add(person);
-			}
+		missingPilots = new ArrayList<Person>();
+		for(Person person : people) {
+			//if(!foundMatch(person.getPilot(), pilots) && !foundMatch(person.getPilot(), deadPilots)) {
+				//missingPilots.add(person);
+			//}
 		}
 	}
 	
@@ -344,7 +340,7 @@ public class ResolveScenarioTracker {
 		entities.add(u.getEntity());
 	}
 	
-	public ArrayList<PilotPerson> getMissingPilots() {
+	public ArrayList<Person> getMissingPilots() {
 		return missingPilots;
 	}
 	
@@ -406,7 +402,7 @@ public class ResolveScenarioTracker {
 		casualty.setDead(false);
 	}
 	
-	public ArrayList<PilotPerson> getPeople() {
+	public ArrayList<Person> getPeople() {
 		return people;
 	}
 	
@@ -463,7 +459,7 @@ public class ResolveScenarioTracker {
 			updatePilotWith(p);
 		}
 		//now lets take take care of missing pilots
-		for(PilotPerson miss : missingPilots) {
+		for(Person miss : missingPilots) {
 			setMIA(miss);
 		}
 		//now lets take care of dead pilots
@@ -535,10 +531,7 @@ public class ResolveScenarioTracker {
 	
 	private void updatePilotWith(Pilot pilot) {
 		for(Person person : campaign.getPersonnel()) {
-			if(!(person instanceof PilotPerson)) {
-				continue;
-			}
-			PilotPerson pp = (PilotPerson)person;
+/*
 			if(pp.getPilot().getExternalId() == pilot.getExternalId()) {
 				if(pilot.isDead()) {
 					pilot.setDead(false);
@@ -558,15 +551,13 @@ public class ResolveScenarioTracker {
 				}
 				return;
 			}
+			*/
 		}
 	}
 	
 	private void killPilot(Pilot pilot) {
 		for(Person person : campaign.getPersonnel()) {
-			if(!(person instanceof PilotPerson)) {
-				continue;
-			}
-			PilotPerson pp = (PilotPerson)person;
+			/*
 			if(pp.getPilot().getExternalId() == pilot.getExternalId()) {
 				pp.getPilot().setDead(true);
 				pp.getPilot().setHits(6);
@@ -575,11 +566,11 @@ public class ResolveScenarioTracker {
 				campaign.addReport(pp.getFullTitle() + " has been killed in action.");
 				return;
 			}
+			*/
 		}
 	}
 	
-	private void setMIA(PilotPerson pilot) {
-		Person person = campaign.getPerson(pilot.getId());
+	private void setMIA(Person person) {
 		if(null != person) {
 			person.setStatus(Person.S_MIA);
 			person.undeploy(campaign);

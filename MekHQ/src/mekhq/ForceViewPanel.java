@@ -28,7 +28,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.Force;
 import mekhq.campaign.Unit;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.PilotPerson;
 
 /**
  * A custom panel that gets filled in with goodies from a Force record
@@ -203,8 +202,8 @@ public class ForceViewPanel extends javax.swing.JPanel {
     	ArrayList<Person> people = new ArrayList<Person>();
     	for(int pid : force.getAllPersonnel()) {
     		Person p = campaign.getPerson(pid);
-    		if(null != p && p instanceof PilotPerson) {
-    			Unit u = campaign.getUnit(((PilotPerson)p).getUnitId());
+    		if(null != p) {
+    			Unit u = campaign.getUnit(p.getUnitId());
     			if(null != u) {
     				number++;
     				bv += u.getEntity().calculateBattleValue(true, false);
@@ -421,12 +420,10 @@ public class ForceViewPanel extends javax.swing.JPanel {
 			gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 			pnlSubUnits.add(lblPerson, gridBagConstraints);
-			if(p instanceof PilotPerson) {
-				Unit u = campaign.getUnit(((PilotPerson)p).getUnitId());
-				if(null != u) {
-					lblUnit.setText(getSummaryFor(u));
-					lblUnit.setIcon(new ImageIcon(getImageFor(u, lblUnit)));			
-				}
+			Unit u = campaign.getUnit(p.getUnitId());
+			if(null != u) {
+				lblUnit.setText(getSummaryFor(u));
+				lblUnit.setIcon(new ImageIcon(getImageFor(u, lblUnit)));			
 			}
 			gridBagConstraints = new java.awt.GridBagConstraints();
 			gridBagConstraints.gridx = 1;
@@ -513,11 +510,9 @@ public class ForceViewPanel extends javax.swing.JPanel {
     public String getSummaryFor(Person person) {
         String toReturn = "<html><font size='2'><b>" + person.getFullTitle() + "</b><br/>";
         toReturn += person.getTypeDesc();
-        if(person instanceof PilotPerson) {
-        	Pilot pilot = ((PilotPerson)person).getPilot();
-        	toReturn += " (" + pilot.getGunnery() + "/" + pilot.getPiloting() + ")<br/>";
-        	toReturn += pilot.getStatusDesc();
-        }
+       // Pilot pilot = ((PilotPerson)person).getPilot();
+        //toReturn += " (" + pilot.getGunnery() + "/" + pilot.getPiloting() + ")<br/>";
+        //toReturn += pilot.getStatusDesc();
         toReturn += "</font></html>";
         return toReturn;
     }
@@ -541,8 +536,8 @@ public class ForceViewPanel extends javax.swing.JPanel {
     	ArrayList<Person> people = new ArrayList<Person>();
     	for(int pid : f.getAllPersonnel()) {
     		Person p = campaign.getPerson(pid);
-    		if(null != p && p instanceof PilotPerson) {
-    			Unit u = campaign.getUnit(((PilotPerson)p).getUnitId());
+    		if(null != p) {
+    			Unit u = campaign.getUnit(p.getUnitId());
     			if(null != u) {
     				number++;
     				bv += u.getEntity().calculateBattleValue(true, false);

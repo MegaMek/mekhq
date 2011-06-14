@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.1.9 (SVN)
++ beginning of personnel switch (hold on to your hats!)
 
 v0.1.8 (2011-06-13)
 + beginning of custom XP costs

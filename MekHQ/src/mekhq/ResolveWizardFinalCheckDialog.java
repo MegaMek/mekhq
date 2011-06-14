@@ -32,7 +32,8 @@ import megamek.common.Pilot;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.Unit;
 import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.personnel.PilotPerson;
+import mekhq.campaign.personnel.Person;
+
 /**
  *
  * @author  Taharqa
@@ -264,7 +265,7 @@ public class ResolveWizardFinalCheckDialog extends javax.swing.JDialog {
         txtMissingPilots.setText("None");
         names = "";
         if(tracker.getMissingPilots().size() > 0) {
-        	for(PilotPerson p : tracker.getMissingPilots()) {
+        	for(Person p : tracker.getMissingPilots()) {
         		names += p.getName() + "\n";
         	}
         	txtMissingPilots.setText(names);

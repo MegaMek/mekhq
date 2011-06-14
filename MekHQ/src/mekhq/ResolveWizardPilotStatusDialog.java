@@ -33,7 +33,8 @@ import javax.swing.JRadioButton;
 
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.mission.Contract;
-import mekhq.campaign.personnel.PilotPerson;
+import mekhq.campaign.personnel.Person;
+
 /**
  *
  * @author  Taharqa
@@ -114,7 +115,7 @@ public class ResolveWizardPilotStatusDialog extends javax.swing.JDialog {
         JRadioButton miaButton;
         JRadioButton kiaButton; 
         ButtonGroup group;
-        for(PilotPerson pp : tracker.getPeople()) {
+        for(Person pp : tracker.getPeople()) {
         	nameLbl = new JLabel(pp.getFullTitle());
         	activeButton = new JRadioButton("Active");
         	activeBtns.add(activeButton);
@@ -122,13 +123,13 @@ public class ResolveWizardPilotStatusDialog extends javax.swing.JDialog {
         	miaBtns.add(miaButton);
         	kiaButton = new JRadioButton("KIA"); 
         	kiaBtns.add(kiaButton);
-        	if(tracker.foundMatch(pp.getPilot(), tracker.getDeadPilots())) {
-        		kiaButton.setSelected(true);
-        	} else if(tracker.foundMatch(pp.getPilot(), tracker.getRecoveredPilots())) {
-        		activeButton.setSelected(true);
-        	} else {
+        	//if(tracker.foundMatch(pp.getPilot(), tracker.getDeadPilots())) {
+        		//kiaButton.setSelected(true);
+        	//} else if(tracker.foundMatch(pp.getPilot(), tracker.getRecoveredPilots())) {
+        	//	activeButton.setSelected(true);
+        	//} else {
         		miaButton.setSelected(true);
-        	}
+        	//}
         	group = new ButtonGroup();
         	group.add(activeButton);
         	group.add(miaButton);
@@ -213,6 +214,7 @@ public class ResolveWizardPilotStatusDialog extends javax.swing.JDialog {
     	for(int i = 0; i < activeBtns.size(); i++) {
     		JRadioButton activeBtn = activeBtns.get(i);
     		JRadioButton kiaBtn = kiaBtns.get(i);
+    		/*
     		if(activeBtn.getModel().isSelected()) {
     			tracker.makeActive(tracker.getPeople().get(i).getPilot());
     		}
@@ -221,6 +223,7 @@ public class ResolveWizardPilotStatusDialog extends javax.swing.JDialog {
     		} else {
     			tracker.makeMissing(tracker.getPeople().get(i).getPilot());
     		}
+    		*/
     	}
     	tracker.identifyMissingPilots();
     	this.setVisible(false);
