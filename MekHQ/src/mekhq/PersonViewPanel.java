@@ -11,12 +11,14 @@ import java.awt.Image;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 
 import megamek.common.Pilot;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.DirectoryItems;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.Skill;
 
 /**
  * A custom panel that gets filled in with goodies from a Person record
@@ -48,16 +50,6 @@ public class PersonViewPanel extends javax.swing.JPanel {
 	private javax.swing.JLabel lblGender2;
 	private javax.swing.JLabel lblStatus1;
 	private javax.swing.JLabel lblStatus2;
-	private javax.swing.JLabel lblGun1;
-	private javax.swing.JLabel lblGun2;
-	private javax.swing.JLabel lblPilot1;
-	private javax.swing.JLabel lblPilot2;
-	private javax.swing.JLabel lblArty1;
-	private javax.swing.JLabel lblArty2;
-	private javax.swing.JLabel lblTactics1;
-	private javax.swing.JLabel lblTactics2;
-	private javax.swing.JLabel lblInit1;
-	private javax.swing.JLabel lblInit2;
 	private javax.swing.JLabel lblTough1;
 	private javax.swing.JLabel lblTough2;
 	private javax.swing.JLabel lblEdge1;
@@ -186,16 +178,6 @@ public class PersonViewPanel extends javax.swing.JPanel {
 		lblGender2 = new javax.swing.JLabel();
 		lblStatus1 = new javax.swing.JLabel();
 		lblStatus2 = new javax.swing.JLabel();
-		lblGun1 = new javax.swing.JLabel();
-		lblGun2 = new javax.swing.JLabel();
-		lblPilot1 = new javax.swing.JLabel();
-		lblPilot2 = new javax.swing.JLabel();
-		lblArty1 = new javax.swing.JLabel();
-		lblArty2 = new javax.swing.JLabel();
-		lblTactics1 = new javax.swing.JLabel();
-		lblTactics2 = new javax.swing.JLabel();
-		lblInit1 = new javax.swing.JLabel();
-		lblInit2 = new javax.swing.JLabel();
 		lblTough1 = new javax.swing.JLabel();
 		lblTough2 = new javax.swing.JLabel();
 		lblEdge1 = new javax.swing.JLabel();
@@ -310,62 +292,20 @@ public class PersonViewPanel extends javax.swing.JPanel {
 		pnlStats.add(lblStatus2, gridBagConstraints);
 		
 		int secondy = 0;
-		/*
-			secondy++;
-			lblGun1.setName("lblGun1"); // NOI18N
-			lblGun1.setText(resourceMap.getString("lblGun1.text"));
-			gridBagConstraints = new java.awt.GridBagConstraints();
-			gridBagConstraints.gridx = 2;
-			gridBagConstraints.gridy = secondy;
-			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-			pnlStats.add(lblGun1, gridBagConstraints);
-			
-			lblGun2.setName("lblGun2"); // NOI18N
-			lblGun2.setText(Integer.toString(pp.getPilot().getGunnery()));
-			gridBagConstraints = new java.awt.GridBagConstraints();
-			gridBagConstraints.gridx = 3;
-			gridBagConstraints.gridy = secondy;
-			gridBagConstraints.weightx = 0.5;
-			gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-			pnlStats.add(lblGun2, gridBagConstraints);
-			
-			secondy++;
-			lblPilot1.setName("lblPilot1"); // NOI18N
-			lblPilot1.setText(resourceMap.getString("lblPilot1.text"));
-			gridBagConstraints = new java.awt.GridBagConstraints();
-			gridBagConstraints.gridx = 2;
-			gridBagConstraints.gridy = secondy;
-			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-			pnlStats.add(lblPilot1, gridBagConstraints);
-			
-			lblPilot2.setName("lblPilot2"); // NOI18N
-			lblPilot2.setText(Integer.toString(pp.getPilot().getPiloting()));
-			gridBagConstraints = new java.awt.GridBagConstraints();
-			gridBagConstraints.gridx = 3;
-			gridBagConstraints.gridy = secondy;
-			gridBagConstraints.weightx = 0.5;
-			gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-			pnlStats.add(lblPilot2, gridBagConstraints);
-			
-			if(campaign.getCampaignOptions().useArtillery()) {
+		JLabel lblName;
+		JLabel lblValue;
+		
+		for(int i = 0; i < Skill.getSkillList().length; i++) {
+			if(person.hasSkill(Skill.getSkillList()[i])) {
 				secondy++;
-				lblArty1.setName("lblArty1"); // NOI18N
-				lblArty1.setText(resourceMap.getString("lblArty1.text"));
+				lblName = new JLabel("<html><b>" + Skill.getSkillList()[i] + ":</b></html>");
+				lblValue = new JLabel(person.getSkill(Skill.getSkillList()[i]).toString());
 				gridBagConstraints = new java.awt.GridBagConstraints();
 				gridBagConstraints.gridx = 2;
 				gridBagConstraints.gridy = secondy;
 				gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 				gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-				pnlStats.add(lblArty1, gridBagConstraints);
-				
-				lblArty2.setName("lblArty2"); // NOI18N
-				lblArty2.setText(Integer.toString(pp.getPilot().getArtillery()));
+				pnlStats.add(lblName, gridBagConstraints);
 				gridBagConstraints = new java.awt.GridBagConstraints();
 				gridBagConstraints.gridx = 3;
 				gridBagConstraints.gridy = secondy;
@@ -373,55 +313,10 @@ public class PersonViewPanel extends javax.swing.JPanel {
 				gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
 				gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 				gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-				pnlStats.add(lblArty2, gridBagConstraints);
+				pnlStats.add(lblValue, gridBagConstraints);
 			}
-			
-			if(campaign.getCampaignOptions().useTactics()) {
-				secondy++;
-				lblTactics1.setName("lblTactics1"); // NOI18N
-				lblTactics1.setText(resourceMap.getString("lblTactics1.text"));
-				gridBagConstraints = new java.awt.GridBagConstraints();
-				gridBagConstraints.gridx = 2;
-				gridBagConstraints.gridy = secondy;
-				gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-				gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-				pnlStats.add(lblTactics1, gridBagConstraints);
-				
-				lblTactics2.setName("lblTactics2"); // NOI18N
-				lblTactics2.setText(Integer.toString(pp.getPilot().getCommandBonus()));
-				gridBagConstraints = new java.awt.GridBagConstraints();
-				gridBagConstraints.gridx = 3;
-				gridBagConstraints.gridy = secondy;
-				gridBagConstraints.weightx = 0.5;
-				gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-				gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-				gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-				pnlStats.add(lblTactics2, gridBagConstraints);
-			}
-			
-			if(campaign.getCampaignOptions().useInitBonus()) {
-				secondy++;
-				lblInit1.setName("lblInit1"); // NOI18N
-				lblInit1.setText(resourceMap.getString("lblInit1.text"));
-				gridBagConstraints = new java.awt.GridBagConstraints();
-				gridBagConstraints.gridx = 2;
-				gridBagConstraints.gridy = secondy;
-				gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-				gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-				pnlStats.add(lblInit1, gridBagConstraints);
-				
-				lblInit2.setName("lblInit2"); // NOI18N
-				lblInit2.setText(Integer.toString(pp.getPilot().getInitBonus()));
-				gridBagConstraints = new java.awt.GridBagConstraints();
-				gridBagConstraints.gridx = 3;
-				gridBagConstraints.gridy = secondy;
-				gridBagConstraints.weightx = 0.5;
-				gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-				gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-				gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-				pnlStats.add(lblInit2, gridBagConstraints);
-			}
-			
+		}
+		/*	
 			if(campaign.getCampaignOptions().useToughness()) {
 				secondy++;
 				lblTough1.setName("lblTough1"); // NOI18N
@@ -444,86 +339,82 @@ public class PersonViewPanel extends javax.swing.JPanel {
 				gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 				pnlStats.add(lblTough2, gridBagConstraints);
 			}		
-			
-			if(campaign.getCampaignOptions().useEdge()) {
-				secondy++;
-				lblEdge1.setName("lblEdge1"); // NOI18N
-				lblEdge1.setText(resourceMap.getString("lblEdge1.text"));
-				gridBagConstraints = new java.awt.GridBagConstraints();
-				gridBagConstraints.gridx = 2;
-				gridBagConstraints.gridy = secondy;
-				gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-				gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-				pnlStats.add(lblEdge1, gridBagConstraints);
-				
-				lblEdge2.setName("lblEdge2"); // NOI18N
-				lblEdge2.setText(Integer.toString(pp.getEdge()));
-				lblEdge2.setToolTipText(pp.getEdgeTooltip());
-				gridBagConstraints = new java.awt.GridBagConstraints();
-				gridBagConstraints.gridx = 3;
-				gridBagConstraints.gridy = secondy;
-				gridBagConstraints.weightx = 0.5;
-				gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-				gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-				gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-				pnlStats.add(lblEdge2, gridBagConstraints);
-			}
-			
-			//special abilities and implants need to be three columns wide to handle their large width
-			if(firsty > secondy) {
-				secondy = firsty;
-			}
-			
-			if(campaign.getCampaignOptions().useAbilities() && pp.getPilot().countOptions(PilotOptions.LVL3_ADVANTAGES) > 0) {
-				//TODO: Do edge separately
-				secondy++;
-				lblAbility1.setName("lblAbility1"); // NOI18N
-				lblAbility1.setText(resourceMap.getString("lblAbility1.text"));
-				gridBagConstraints = new java.awt.GridBagConstraints();
-				gridBagConstraints.gridx = 0;
-				gridBagConstraints.gridy = secondy;
-				gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-				gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-				pnlStats.add(lblAbility1, gridBagConstraints);
-				
-				lblAbility2.setName("lblAbility2"); // NOI18N
-				lblAbility2.setText(pp.getAbilityList(PilotOptions.LVL3_ADVANTAGES));
-				gridBagConstraints = new java.awt.GridBagConstraints();
-				gridBagConstraints.gridx = 1;
-				gridBagConstraints.gridy = secondy;
-				gridBagConstraints.gridwidth = 3;
-				gridBagConstraints.weightx = 1.0;
-				gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-				gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-				gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-				pnlStats.add(lblAbility2, gridBagConstraints);
-			}
-			
-			if(campaign.getCampaignOptions().useImplants() && pp.getPilot().countOptions(PilotOptions.MD_ADVANTAGES) > 0) {
-				secondy++;
-				lblImplants1.setName("lblImplants1"); // NOI18N
-				lblImplants1.setText(resourceMap.getString("lblImplants1.text"));
-				gridBagConstraints = new java.awt.GridBagConstraints();
-				gridBagConstraints.gridx = 0;
-				gridBagConstraints.gridy = secondy;
-				gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-				gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-				pnlStats.add(lblImplants1, gridBagConstraints);
-				
-				lblImplants2.setName("lblImplants2"); // NOI18N
-				lblImplants2.setText(pp.getAbilityList(PilotOptions.MD_ADVANTAGES));
-				gridBagConstraints = new java.awt.GridBagConstraints();
-				gridBagConstraints.gridx = 1;
-				gridBagConstraints.gridy = secondy;
-				gridBagConstraints.gridwidth = 3;
-				gridBagConstraints.weightx = 1.0;
-				gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-				gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-				gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-				pnlStats.add(lblImplants2, gridBagConstraints);
-			}
 			*/
-
-    	
+		if(campaign.getCampaignOptions().useEdge()) {
+			secondy++;
+			lblEdge1.setName("lblEdge1"); // NOI18N
+			lblEdge1.setText(resourceMap.getString("lblEdge1.text"));
+			gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints.gridx = 2;
+			gridBagConstraints.gridy = secondy;
+			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			pnlStats.add(lblEdge1, gridBagConstraints);
+				
+			lblEdge2.setName("lblEdge2"); // NOI18N
+			lblEdge2.setText(Integer.toString(person.getEdge()));
+			lblEdge2.setToolTipText(person.getEdgeTooltip());
+			gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints.gridx = 3;
+			gridBagConstraints.gridy = secondy;
+			gridBagConstraints.weightx = 0.5;
+			gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			pnlStats.add(lblEdge2, gridBagConstraints);
+		}
+			
+		//special abilities and implants need to be three columns wide to handle their large width
+		if(firsty > secondy) {
+			secondy = firsty;
+		}
+			
+		if(campaign.getCampaignOptions().useAbilities() && person.countOptions(PilotOptions.LVL3_ADVANTAGES) > 0) {
+			secondy++;
+			lblAbility1.setName("lblAbility1"); // NOI18N
+			lblAbility1.setText(resourceMap.getString("lblAbility1.text"));
+			gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints.gridx = 0;
+			gridBagConstraints.gridy = secondy;
+			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			pnlStats.add(lblAbility1, gridBagConstraints);
+				
+			lblAbility2.setName("lblAbility2"); // NOI18N
+			lblAbility2.setText(person.getAbilityList(PilotOptions.LVL3_ADVANTAGES));
+			gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints.gridx = 1;
+			gridBagConstraints.gridy = secondy;
+			gridBagConstraints.gridwidth = 3;
+			gridBagConstraints.weightx = 1.0;
+			gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			pnlStats.add(lblAbility2, gridBagConstraints);
+		}
+			
+		if(campaign.getCampaignOptions().useImplants() && person.countOptions(PilotOptions.MD_ADVANTAGES) > 0) {
+			secondy++;
+			lblImplants1.setName("lblImplants1"); // NOI18N
+			lblImplants1.setText(resourceMap.getString("lblImplants1.text"));
+			gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints.gridx = 0;
+			gridBagConstraints.gridy = secondy;
+			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			pnlStats.add(lblImplants1, gridBagConstraints);
+				
+			lblImplants2.setName("lblImplants2"); // NOI18N
+			lblImplants2.setText(person.getAbilityList(PilotOptions.MD_ADVANTAGES));
+			gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints.gridx = 1;
+			gridBagConstraints.gridy = secondy;
+			gridBagConstraints.gridwidth = 3;
+			gridBagConstraints.weightx = 1.0;
+			gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			pnlStats.add(lblImplants2, gridBagConstraints);
+		}    	
     }
 }

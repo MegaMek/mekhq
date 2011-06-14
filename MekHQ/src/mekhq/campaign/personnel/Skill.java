@@ -99,12 +99,24 @@ public class Skill implements Serializable {
 	public static final String S_SCROUNGE      = "Scrounge";
 	public static final String S_STRATEGY      = "Strategy";
 	
+	private static final String[] skillList = {S_PILOT_MECH,S_GUN_MECH,S_PILOT_AERO,S_GUN_AERO,
+											  S_PILOT_GVEE,S_PILOT_VTOL,S_PILOT_NVEE,S_GUN_VEE,
+						                      S_PILOT_JET,S_GUN_JET,S_PILOT_SPACE,S_GUN_SPACE,S_ARTILLERY,
+						                      S_GUN_BA,S_SMALL_ARMS,S_ANTI_MECH,
+						                      S_TECH_MECH,S_TECH_MECHANIC,S_TECH_AERO,S_TECH_BA,S_MEDICAL,
+						                      S_TAC_GROUND,S_TAC_SPACE,S_STRATEGY,S_INIT,
+						                      S_ADMIN,S_NEG,S_LEADER,S_SCROUNGE};
+	
 	private String type;
 	private int level;
 	private int bonus;
 	private int target;
 	private boolean countUp;
 
+	public static String[] getSkillList() {
+		return skillList;
+	}
+	
 	public Skill(String t) {
 		this.type = t;
 		this.level = 0;
@@ -158,6 +170,20 @@ public class Skill implements Serializable {
 			return target - level - bonus;
 		}	
 	}
+	
+	@Override
+	public String toString() {
+		if(countUp) {
+			return "+" + getFinalSkillValue();
+		} else {
+			return getFinalSkillValue() + "+";
+		}
+	}
+	
+	public String getType() {
+		return type;
+	}
+	
 	
 	
 	
