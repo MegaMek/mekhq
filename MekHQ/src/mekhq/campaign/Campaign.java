@@ -83,6 +83,7 @@ import mekhq.campaign.parts.MissingEquipmentPart;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.team.MedicalTeam;
 import mekhq.campaign.team.SupportTeam;
 import mekhq.campaign.team.TechTeam;
@@ -184,6 +185,7 @@ public class Campaign implements Serializable {
 		lastForceId++;
 		finances = new Finances();
 		location = new CurrentLocation(Planets.getInstance().getPlanets().get("Outreach"), 0);
+		SkillType.initializeTypes();
 	}
 
 	public String getName() {

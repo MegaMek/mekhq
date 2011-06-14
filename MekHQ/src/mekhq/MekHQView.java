@@ -141,6 +141,7 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.TankLocation;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
+import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.team.MedicalTeam;
 import mekhq.campaign.team.SupportTeam;
 import mekhq.campaign.team.TechTeam;
@@ -5600,190 +5601,190 @@ public class MekHQView extends FrameView {
                 return p.getTypeDesc();
             }
             if(col == COL_GUN_MECH) {
-            	if(p.hasSkill(Skill.S_GUN_MECH)) {
-            		return Integer.toString(p.getSkill(Skill.S_GUN_MECH).getFinalSkillValue());
+            	if(p.hasSkill(SkillType.S_GUN_MECH)) {
+            		return Integer.toString(p.getSkill(SkillType.S_GUN_MECH).getFinalSkillValue());
             	} else {
             		return "-";
             	}
             }
             if(col == COL_PILOT_MECH) {
-            	if(p.hasSkill(Skill.S_PILOT_MECH)) {
-            		return Integer.toString(p.getSkill(Skill.S_PILOT_MECH).getFinalSkillValue());
+            	if(p.hasSkill(SkillType.S_PILOT_MECH)) {
+            		return Integer.toString(p.getSkill(SkillType.S_PILOT_MECH).getFinalSkillValue());
             	} else {
             		return "-";
             	}
             }
             if(col == COL_GUN_AERO) {
-            	if(p.hasSkill(Skill.S_GUN_AERO)) {
-            		return Integer.toString(p.getSkill(Skill.S_GUN_AERO).getFinalSkillValue());
+            	if(p.hasSkill(SkillType.S_GUN_AERO)) {
+            		return Integer.toString(p.getSkill(SkillType.S_GUN_AERO).getFinalSkillValue());
             	} else {
             		return "-";
             	}
             }
             if(col == COL_PILOT_AERO) {
-            	if(p.hasSkill(Skill.S_PILOT_AERO)) {
-            		return Integer.toString(p.getSkill(Skill.S_PILOT_AERO).getFinalSkillValue());
+            	if(p.hasSkill(SkillType.S_PILOT_AERO)) {
+            		return Integer.toString(p.getSkill(SkillType.S_PILOT_AERO).getFinalSkillValue());
             	} else {
             		return "-";
             	}
             }
             if(col == COL_GUN_JET) {
-            	if(p.hasSkill(Skill.S_GUN_JET)) {
-            		return Integer.toString(p.getSkill(Skill.S_GUN_JET).getFinalSkillValue());
+            	if(p.hasSkill(SkillType.S_GUN_JET)) {
+            		return Integer.toString(p.getSkill(SkillType.S_GUN_JET).getFinalSkillValue());
             	} else {
             		return "-";
             	}
             }
             if(col == COL_PILOT_JET) {
-            	if(p.hasSkill(Skill.S_PILOT_JET)) {
-            		return Integer.toString(p.getSkill(Skill.S_PILOT_JET).getFinalSkillValue());
+            	if(p.hasSkill(SkillType.S_PILOT_JET)) {
+            		return Integer.toString(p.getSkill(SkillType.S_PILOT_JET).getFinalSkillValue());
             	} else {
             		return "-";
             	}
             }
             if(col == COL_GUN_SPACE) {
-            	if(p.hasSkill(Skill.S_GUN_SPACE)) {
-            		return Integer.toString(p.getSkill(Skill.S_GUN_SPACE).getFinalSkillValue());
+            	if(p.hasSkill(SkillType.S_GUN_SPACE)) {
+            		return Integer.toString(p.getSkill(SkillType.S_GUN_SPACE).getFinalSkillValue());
             	} else {
             		return "-";
             	}
             }
             if(col == COL_PILOT_SPACE) {
-            	if(p.hasSkill(Skill.S_PILOT_SPACE)) {
-            		return Integer.toString(p.getSkill(Skill.S_PILOT_AERO).getFinalSkillValue());
+            	if(p.hasSkill(SkillType.S_PILOT_SPACE)) {
+            		return Integer.toString(p.getSkill(SkillType.S_PILOT_AERO).getFinalSkillValue());
             	} else {
             		return "-";
             	}
             }
             if(col == COL_GUN_VEE) {
-            	if(p.hasSkill(Skill.S_GUN_VEE)) {
-            		return Integer.toString(p.getSkill(Skill.S_GUN_VEE).getFinalSkillValue());
+            	if(p.hasSkill(SkillType.S_GUN_VEE)) {
+            		return Integer.toString(p.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue());
             	} else {
             		return "-";
             	}
             }
             if(col == COL_PILOT_GVEE) {
-            	if(p.hasSkill(Skill.S_PILOT_GVEE)) {
-            		return Integer.toString(p.getSkill(Skill.S_PILOT_GVEE).getFinalSkillValue());
+            	if(p.hasSkill(SkillType.S_PILOT_GVEE)) {
+            		return Integer.toString(p.getSkill(SkillType.S_PILOT_GVEE).getFinalSkillValue());
             	} else {
             		return "-";
             	}
             }
             if(col == COL_PILOT_NVEE) {
-            	if(p.hasSkill(Skill.S_PILOT_NVEE)) {
-            		return Integer.toString(p.getSkill(Skill.S_PILOT_NVEE).getFinalSkillValue());
+            	if(p.hasSkill(SkillType.S_PILOT_NVEE)) {
+            		return Integer.toString(p.getSkill(SkillType.S_PILOT_NVEE).getFinalSkillValue());
             	} else {
             		return "-";
             	}
             }
             if(col == COL_PILOT_VTOL) {
-            	if(p.hasSkill(Skill.S_PILOT_VTOL)) {
-            		return Integer.toString(p.getSkill(Skill.S_PILOT_VTOL).getFinalSkillValue());
+            	if(p.hasSkill(SkillType.S_PILOT_VTOL)) {
+            		return Integer.toString(p.getSkill(SkillType.S_PILOT_VTOL).getFinalSkillValue());
             	} else {
             		return "-";
             	}
             }
             if(col == COL_GUN_BA) {
-            	if(p.hasSkill(Skill.S_GUN_BA)) {
-            		return Integer.toString(p.getSkill(Skill.S_GUN_BA).getFinalSkillValue());
+            	if(p.hasSkill(SkillType.S_GUN_BA)) {
+            		return Integer.toString(p.getSkill(SkillType.S_GUN_BA).getFinalSkillValue());
             	} else {
             		return "-";
             	}
             }
             if(col == COL_ANTI_MECH) {
-            	if(p.hasSkill(Skill.S_ANTI_MECH)) {
-            		return Integer.toString(p.getSkill(Skill.S_ANTI_MECH).getFinalSkillValue());
+            	if(p.hasSkill(SkillType.S_ANTI_MECH)) {
+            		return Integer.toString(p.getSkill(SkillType.S_ANTI_MECH).getFinalSkillValue());
             	} else {
             		return "-";
             	}
             }
             if(col == COL_SMALL_ARMS) {
-            	if(p.hasSkill(Skill.S_SMALL_ARMS)) {
-            		return Integer.toString(p.getSkill(Skill.S_SMALL_ARMS).getFinalSkillValue());
+            	if(p.hasSkill(SkillType.S_SMALL_ARMS)) {
+            		return Integer.toString(p.getSkill(SkillType.S_SMALL_ARMS).getFinalSkillValue());
             	} else {
             		return "-";
             	}
             }
             if(col == COL_ARTY) {
-            	if(p.hasSkill(Skill.S_ARTILLERY)) {
-            		return Integer.toString(p.getSkill(Skill.S_ARTILLERY).getFinalSkillValue());
+            	if(p.hasSkill(SkillType.S_ARTILLERY)) {
+            		return Integer.toString(p.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue());
             	} else {
             		return "-";
             	}
             }
             if(col == COL_TAC_GROUND) {
-            	if(p.hasSkill(Skill.S_TAC_GROUND)) {
-            		return Integer.toString(p.getSkill(Skill.S_TAC_GROUND).getFinalSkillValue());
+            	if(p.hasSkill(SkillType.S_TAC_GROUND)) {
+            		return Integer.toString(p.getSkill(SkillType.S_TAC_GROUND).getFinalSkillValue());
             	} else {
             		return "-";
             	}
             }
             if(col == COL_TAC_SPACE) {
-            	if(p.hasSkill(Skill.S_TAC_SPACE)) {
-            		return Integer.toString(p.getSkill(Skill.S_TAC_SPACE).getFinalSkillValue());
+            	if(p.hasSkill(SkillType.S_TAC_SPACE)) {
+            		return Integer.toString(p.getSkill(SkillType.S_TAC_SPACE).getFinalSkillValue());
             	} else {
             		return "-";
             	}
             }
             if(col == COL_STRATEGY) {
-            	if(p.hasSkill(Skill.S_STRATEGY)) {
-            		return Integer.toString(p.getSkill(Skill.S_STRATEGY).getFinalSkillValue());
+            	if(p.hasSkill(SkillType.S_STRATEGY)) {
+            		return Integer.toString(p.getSkill(SkillType.S_STRATEGY).getFinalSkillValue());
             	} else {
             		return "-";
             	}
             }
             if(col == COL_INIT) {
-            	if(p.hasSkill(Skill.S_INIT)) {
-            		return Integer.toString(p.getSkill(Skill.S_INIT).getFinalSkillValue());
+            	if(p.hasSkill(SkillType.S_INIT)) {
+            		return Integer.toString(p.getSkill(SkillType.S_INIT).getFinalSkillValue());
             	} else {
             		return "-";
             	}
             }
             if(col == COL_TECH_MECH) {
-            	if(p.hasSkill(Skill.S_TECH_MECH)) {
-            		return Integer.toString(p.getSkill(Skill.S_TECH_MECH).getFinalSkillValue());
+            	if(p.hasSkill(SkillType.S_TECH_MECH)) {
+            		return Integer.toString(p.getSkill(SkillType.S_TECH_MECH).getFinalSkillValue());
             	} else {
             		return "-";
             	}
             }
             if(col == COL_TECH_AERO) {
-            	if(p.hasSkill(Skill.S_TECH_AERO)) {
-            		return Integer.toString(p.getSkill(Skill.S_TECH_AERO).getFinalSkillValue());
+            	if(p.hasSkill(SkillType.S_TECH_AERO)) {
+            		return Integer.toString(p.getSkill(SkillType.S_TECH_AERO).getFinalSkillValue());
             	} else {
             		return "-";
             	}
             }
             if(col == COL_TECH_VEE) {
-            	if(p.hasSkill(Skill.S_TECH_MECHANIC)) {
-            		return Integer.toString(p.getSkill(Skill.S_TECH_MECHANIC).getFinalSkillValue());
+            	if(p.hasSkill(SkillType.S_TECH_MECHANIC)) {
+            		return Integer.toString(p.getSkill(SkillType.S_TECH_MECHANIC).getFinalSkillValue());
             	} else {
             		return "-";
             	}
             }
             if(col == COL_TECH_BA) {
-            	if(p.hasSkill(Skill.S_TECH_BA)) {
-            		return Integer.toString(p.getSkill(Skill.S_TECH_BA).getFinalSkillValue());
+            	if(p.hasSkill(SkillType.S_TECH_BA)) {
+            		return Integer.toString(p.getSkill(SkillType.S_TECH_BA).getFinalSkillValue());
             	} else {
             		return "-";
             	}
             }
             if(col == COL_ADMIN) {
-            	if(p.hasSkill(Skill.S_ADMIN)) {
-            		return Integer.toString(p.getSkill(Skill.S_ADMIN).getFinalSkillValue());
+            	if(p.hasSkill(SkillType.S_ADMIN)) {
+            		return Integer.toString(p.getSkill(SkillType.S_ADMIN).getFinalSkillValue());
             	} else {
             		return "-";
             	}
             }
             if(col == COL_NEG) {
-            	if(p.hasSkill(Skill.S_NEG)) {
-            		return Integer.toString(p.getSkill(Skill.S_NEG).getFinalSkillValue());
+            	if(p.hasSkill(SkillType.S_NEG)) {
+            		return Integer.toString(p.getSkill(SkillType.S_NEG).getFinalSkillValue());
             	} else {
             		return "-";
             	}
             }
             if(col == COL_SCROUNGE) {
-            	if(p.hasSkill(Skill.S_SCROUNGE)) {
-            		return Integer.toString(p.getSkill(Skill.S_SCROUNGE).getFinalSkillValue());
+            	if(p.hasSkill(SkillType.S_SCROUNGE)) {
+            		return Integer.toString(p.getSkill(SkillType.S_SCROUNGE).getFinalSkillValue());
             	} else {
             		return "-";
             	}

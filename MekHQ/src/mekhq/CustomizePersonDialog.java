@@ -29,6 +29,7 @@ import megamek.common.options.PilotOptions;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
+import mekhq.campaign.personnel.SkillType;
 
 /**
  *
@@ -252,7 +253,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         getContentPane().add(textNickname, gridBagConstraints);
 
-        textGunnery.setText(Integer.toString(person.getSkill(Skill.S_GUN_MECH).getLevel()));
+        textGunnery.setText(Integer.toString(person.getSkill(SkillType.S_GUN_MECH).getLevel()));
         textGunnery.setMinimumSize(new java.awt.Dimension(50, 28));
         textGunnery.setName("textGunnery"); // NOI18N
         textGunnery.setPreferredSize(new java.awt.Dimension(50, 28));
@@ -262,7 +263,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         getContentPane().add(textGunnery, gridBagConstraints);
 
-        textPiloting.setText(Integer.toString(person.getSkill(Skill.S_PILOT_MECH).getLevel()));
+        textPiloting.setText(Integer.toString(person.getSkill(SkillType.S_PILOT_MECH).getLevel()));
         textPiloting.setMinimumSize(new java.awt.Dimension(50, 28));
         textPiloting.setName("textPiloting"); // NOI18N
         textPiloting.setPreferredSize(new java.awt.Dimension(50, 28));
@@ -301,7 +302,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
             gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
             getContentPane().add(lblArtillery, gridBagConstraints);
         
-            textArtillery.setText(Integer.toString(person.getSkill(Skill.S_ARTILLERY).getLevel()));
+            textArtillery.setText(Integer.toString(person.getSkill(SkillType.S_ARTILLERY).getLevel()));
             textArtillery.setMinimumSize(new java.awt.Dimension(50, 28));
             textArtillery.setName("textArtillery"); // NOI18N
             textArtillery.setPreferredSize(new java.awt.Dimension(50, 28));
@@ -481,8 +482,8 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         person.setGender(choiceGender.getSelectedIndex());
         int piloting = Integer.parseInt(textPiloting.getText());
         int gunnery = Integer.parseInt(textGunnery.getText());
-        person.addSkill(Skill.S_GUN_MECH, piloting);
-        person.addSkill(Skill.S_PILOT_MECH, gunnery);
+        person.addSkill(SkillType.S_GUN_MECH, piloting,0);
+        person.addSkill(SkillType.S_PILOT_MECH, gunnery,0);
         person.setBirthday(birthdate);  
         setOptions();
         if(isNewHire()) {

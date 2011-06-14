@@ -66,69 +66,24 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class Skill implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2470620816562038469L;
 	
-	//combat skills
-	public static final String S_PILOT_MECH  = "Piloting/Mech";
-	public static final String S_PILOT_AERO  = "Piloting/Aerospace";
-	public static final String S_PILOT_JET   = "Piloting/Aircraft";
-	public static final String S_PILOT_GVEE  = "Piloting/Ground Vehicle";
-	public static final String S_PILOT_VTOL  = "Piloting/VTOL";
-	public static final String S_PILOT_NVEE  = "Piloting/Naval";
-	public static final String S_PILOT_SPACE = "Piloting/Spacecraft";
-	public static final String S_GUN_MECH    = "Gunnery/Mech";
-	public static final String S_GUN_AERO    = "Gunnery/Aerospace";
-	public static final String S_GUN_JET     = "Gunnery/Aircraft";
-	public static final String S_GUN_VEE     = "Gunnery/Vehicle";
-	public static final String S_GUN_SPACE   = "Gunnery/Spacecract";
-	public static final String S_GUN_BA      = "Gunnery/Battlesuit";
-	public static final String S_ARTILLERY   = "Artillery";
-	public static final String S_SMALL_ARMS  = "Small Arms";
-	public static final String S_ANTI_MECH   = "Anti-Mech";
-	public static final String S_TAC_GROUND  = "Tactics/Ground";
-	public static final String S_TAC_SPACE   = "Tactics/Space";
-	public static final String S_INIT        = "Initiative";
-	//non-combat skills
-	public static final String S_TECH_MECH     = "Tech/Mech";
-	public static final String S_TECH_MECHANIC = "Tech/Mechanic";
-	public static final String S_TECH_AERO     = "Tech/Aero";
-	public static final String S_TECH_BA       = "Tech/BA";
-	public static final String S_MEDICAL       = "Medical";
-	public static final String S_ADMIN         = "Administation";
-	public static final String S_NEG           = "Negotiation";
-	public static final String S_LEADER        = "Leadership";
-	public static final String S_SCROUNGE      = "Scrounge";
-	public static final String S_STRATEGY      = "Strategy";
-	
-	private static final String[] skillList = {S_PILOT_MECH,S_GUN_MECH,S_PILOT_AERO,S_GUN_AERO,
-											  S_PILOT_GVEE,S_PILOT_VTOL,S_PILOT_NVEE,S_GUN_VEE,
-						                      S_PILOT_JET,S_GUN_JET,S_PILOT_SPACE,S_GUN_SPACE,S_ARTILLERY,
-						                      S_GUN_BA,S_SMALL_ARMS,S_ANTI_MECH,
-						                      S_TECH_MECH,S_TECH_MECHANIC,S_TECH_AERO,S_TECH_BA,S_MEDICAL,
-						                      S_TAC_GROUND,S_TAC_SPACE,S_STRATEGY,S_INIT,
-						                      S_ADMIN,S_NEG,S_LEADER,S_SCROUNGE};
-	
-	private String type;
+	private SkillType type;
 	private int level;
 	private int bonus;
-	private int target;
-	private boolean countUp;
-
-	public static String[] getSkillList() {
-		return skillList;
-	}
 	
 	public Skill(String t) {
-		this.type = t;
-		this.level = 0;
-		this.bonus = 0;
-		//TODO: base this on skill type
-		this.target = 7;
-		this.countUp = false;
+		this(t, 0, 0);
 	}
 	
-	public Skill(String t, int lvl) {
-		this(t);
+	public Skill(String t, int lvl, int bns) {
+		this.type = SkillType.getType(t);
 		this.level = lvl;
+		this.bonus = bns;
 	}
 
 	public int getLevel() {
@@ -147,44 +102,24 @@ public class Skill implements Serializable {
 		this.bonus = b;
 	}
 	
-	public int getTarget() {
-		return target;
-	}
-	
-	public void setTarget(int t) {
-		this.target = t;
-	}
-	
-	public boolean countUp() {
-		return countUp;
-	}
-	
-	public void setCountUp(boolean b) {
-		this.countUp = b;
+	public SkillType getType() {
+		return type;
 	}
 	
 	public int getFinalSkillValue() {
-		if(countUp) {
-			return target + level + bonus;
+		if(type.countUp()) {
+			return type.getTarget() + level + bonus;
 		} else {
-			return target - level - bonus;
+			return type.getTarget() - level - bonus;
 		}	
 	}
 	
 	@Override
 	public String toString() {
-		if(countUp) {
+		if(type.countUp()) {
 			return "+" + getFinalSkillValue();
 		} else {
 			return getFinalSkillValue() + "+";
 		}
-	}
-	
-	public String getType() {
-		return type;
-	}
-	
-	
-	
-	
+	}	
 }

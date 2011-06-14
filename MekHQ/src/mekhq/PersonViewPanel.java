@@ -19,6 +19,7 @@ import megamek.common.util.DirectoryItems;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
+import mekhq.campaign.personnel.SkillType;
 
 /**
  * A custom panel that gets filled in with goodies from a Person record
@@ -295,11 +296,11 @@ public class PersonViewPanel extends javax.swing.JPanel {
 		JLabel lblName;
 		JLabel lblValue;
 		
-		for(int i = 0; i < Skill.getSkillList().length; i++) {
-			if(person.hasSkill(Skill.getSkillList()[i])) {
+		for(int i = 0; i < SkillType.getSkillList().length; i++) {
+			if(person.hasSkill(SkillType.getSkillList()[i])) {
 				secondy++;
-				lblName = new JLabel("<html><b>" + Skill.getSkillList()[i] + ":</b></html>");
-				lblValue = new JLabel(person.getSkill(Skill.getSkillList()[i]).toString());
+				lblName = new JLabel("<html><b>" + SkillType.getSkillList()[i] + ":</b></html>");
+				lblValue = new JLabel(person.getSkill(SkillType.getSkillList()[i]).toString());
 				gridBagConstraints = new java.awt.GridBagConstraints();
 				gridBagConstraints.gridx = 2;
 				gridBagConstraints.gridy = secondy;

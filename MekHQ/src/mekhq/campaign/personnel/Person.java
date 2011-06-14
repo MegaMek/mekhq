@@ -598,25 +598,25 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 			if(pilotGunnery != -1) {
 				switch(retVal.type) {
 				case T_MECHWARRIOR:
-					retVal.addSkill(Skill.S_GUN_MECH,7-pilotGunnery);
-					retVal.addSkill(Skill.S_PILOT_MECH,8-pilotPiloting);
+					retVal.addSkill(SkillType.S_GUN_MECH,7-pilotGunnery,0);
+					retVal.addSkill(SkillType.S_PILOT_MECH,8-pilotPiloting,0);
 					break;
 				case T_VEE_CREW:
-					retVal.addSkill(Skill.S_GUN_VEE,7-pilotGunnery);
-					retVal.addSkill(Skill.S_PILOT_GVEE,8-pilotPiloting);
+					retVal.addSkill(SkillType.S_GUN_VEE,7-pilotGunnery,0);
+					retVal.addSkill(SkillType.S_PILOT_GVEE,8-pilotPiloting,0);
 					break;
 				case T_AERO_PILOT:
-					retVal.addSkill(Skill.S_GUN_AERO,7-pilotGunnery);
-					retVal.addSkill(Skill.S_PILOT_AERO,8-pilotPiloting);
+					retVal.addSkill(SkillType.S_GUN_AERO,7-pilotGunnery,0);
+					retVal.addSkill(SkillType.S_PILOT_AERO,8-pilotPiloting,0);
 					break;
 				case T_BA:
-					retVal.addSkill(Skill.S_GUN_BA,7-pilotGunnery);
-					retVal.addSkill(Skill.S_ANTI_MECH,8-pilotPiloting);
+					retVal.addSkill(SkillType.S_GUN_BA,7-pilotGunnery,0);
+					retVal.addSkill(SkillType.S_ANTI_MECH,8-pilotPiloting,0);
 					break;
 
 				}
-				retVal.addSkill(Skill.S_TAC_GROUND,pilotCommandBonus);
-				retVal.addSkill(Skill.S_INIT,pilotInitBonus);
+				retVal.addSkill(SkillType.S_TAC_GROUND,pilotCommandBonus,0);
+				retVal.addSkill(SkillType.S_INIT,pilotInitBonus,0);
 			}
 			if(null != pilotName) {
 				retVal.setName(pilotName);
@@ -833,9 +833,9 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 		return skills.get(skillName);
 	}
 	
-	public void addSkill(String skillName, int lvl) {
+	public void addSkill(String skillName, int lvl, int bonus) {
 		if(!hasSkill(skillName)) {
-			skills.put(skillName, new Skill(skillName, lvl));
+			skills.put(skillName, new Skill(skillName, lvl, bonus));
 		}
 	}
 	
@@ -1045,19 +1045,19 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     
     public boolean canPilot(Entity ent) {
     	if(ent instanceof Mech) {
-    		return hasSkill(Skill.S_GUN_MECH) && hasSkill(Skill.S_PILOT_MECH);
+    		return hasSkill(SkillType.S_GUN_MECH) && hasSkill(SkillType.S_PILOT_MECH);
     	}
     	else if(ent instanceof VTOL) {
-    		return hasSkill(Skill.S_PILOT_VTOL);
+    		return hasSkill(SkillType.S_PILOT_VTOL);
     	}
     	else if(ent instanceof Tank) {
-    		return hasSkill(Skill.S_PILOT_GVEE);
+    		return hasSkill(SkillType.S_PILOT_GVEE);
     	}
     	else if(ent instanceof ConvFighter) {
-    		return hasSkill(Skill.S_PILOT_JET) || hasSkill(Skill.S_PILOT_AERO);
+    		return hasSkill(SkillType.S_PILOT_JET) || hasSkill(SkillType.S_PILOT_AERO);
     	}
     	else if(ent instanceof Aero) {
-    		return hasSkill(Skill.S_PILOT_AERO);
+    		return hasSkill(SkillType.S_PILOT_AERO);
     	}
     	return false;
     }
