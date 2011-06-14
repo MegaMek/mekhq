@@ -191,9 +191,13 @@ public class MekHQView extends FrameView {
 	
 	//personnel views
 	private static final int PV_GENERAL = 0;
-	private static final int PV_COMBAT  = 1;
-	private static final int PV_FLUFF   = 2;
-	private static final int PV_NUM     = 3;
+	private static final int PV_PILOT   = 1;
+	private static final int PV_INF     = 2;
+	private static final int PV_TACTIC  = 3;
+	private static final int PV_TECH    = 4;
+	private static final int PV_ADMIN   = 5;
+	private static final int PV_FLUFF   = 6;
+	private static final int PV_NUM     = 7;
 	
 	//unit views
 	private static final int UV_GENERAL = 0;
@@ -959,11 +963,11 @@ public class MekHQView extends FrameView {
         personnelTable.createDefaultColumnsFromModel();
         personnelSorter = new TableRowSorter<PersonnelTableModel>(personModel);
         personnelSorter.setComparator(PersonnelTableModel.COL_RANK, new RankSorter());
-        personnelSorter.setComparator(PersonnelTableModel.COL_GUN, new SkillSorter());
-        personnelSorter.setComparator(PersonnelTableModel.COL_PILOT, new SkillSorter());
+        personnelSorter.setComparator(PersonnelTableModel.COL_GUN_MECH, new SkillSorter());
+        personnelSorter.setComparator(PersonnelTableModel.COL_PILOT_MECH, new SkillSorter());
         personnelSorter.setComparator(PersonnelTableModel.COL_ARTY, new SkillSorter());
         personnelSorter.setComparator(PersonnelTableModel.COL_SKILL, new LevelSorter());
-        personnelSorter.setComparator(PersonnelTableModel.COL_TACTICS, new BonusSorter());
+        personnelSorter.setComparator(PersonnelTableModel.COL_TAC_GROUND, new BonusSorter());
         personnelSorter.setComparator(PersonnelTableModel.COL_INIT, new BonusSorter());
         personnelSorter.setComparator(PersonnelTableModel.COL_TOUGH, new BonusSorter());
         personnelTable.setRowSorter(personnelSorter);
@@ -2371,8 +2375,16 @@ public class MekHQView extends FrameView {
     	switch(group) {
     	case PV_GENERAL:
     		return "General";
-    	case PV_COMBAT:
-    		return "Combat Skills";
+    	case PV_PILOT:
+    		return "Piloting/Gunnery Skills";
+    	case PV_INF:
+    		return "Infantry Skills";
+    	case PV_TACTIC:
+    		return "Tactical Skills";
+    	case PV_TECH:
+    		return "Tech Skills";
+    	case PV_ADMIN:
+    		return "Admin Skills";
     	case PV_FLUFF:
     		return "Fluff Information";
     	default:
@@ -3101,19 +3113,42 @@ public class MekHQView extends FrameView {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ASSIGN), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_FORCE), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_DEPLOY), true);
-			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN), false);
-			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN_MECH), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT_MECH), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN_AERO), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT_AERO), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN_JET), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT_JET), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN_SPACE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT_SPACE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN_VEE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT_GVEE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT_NVEE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT_VTOL), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN_BA), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SMALL_ARMS), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ANTI_MECH), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ARTY), false);
-			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TACTICS), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TAC_GROUND), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TAC_SPACE), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_INIT), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_STRATEGY), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TECH_MECH), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TECH_AERO), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TECH_VEE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TECH_BA), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_MEDICAL), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ADMIN), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NEG), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SCROUNGE), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TOUGH), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_EDGE), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NABIL), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NIMP), false);
-			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_HITS), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_HITS), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SALARY), campaign.getCampaignOptions().payForSalaries());
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), true);	
-		} else if(view == PV_COMBAT) {
+		} else if(view == PV_PILOT) {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NAME), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_CALL), false);
@@ -3121,19 +3156,226 @@ public class MekHQView extends FrameView {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GENDER), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TYPE), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SKILL), false);
-			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ASSIGN), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ASSIGN), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_FORCE), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_DEPLOY), false);
-			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN), true);
-			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT), true);
-			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ARTY), campaign.getCampaignOptions().useArtillery());
-			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TACTICS), campaign.getCampaignOptions().useTactics());
-			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_INIT), campaign.getCampaignOptions().useInitBonus());
-			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TOUGH), campaign.getCampaignOptions().useToughness());
-			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_EDGE), campaign.getCampaignOptions().useEdge());
-			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NABIL), campaign.getCampaignOptions().useAbilities());
-			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NIMP), campaign.getCampaignOptions().useImplants());
-			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_HITS), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN_MECH), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT_MECH), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN_AERO), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT_AERO), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN_JET), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT_JET), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN_SPACE), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT_SPACE), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN_VEE), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT_GVEE), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT_NVEE), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT_VTOL), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN_BA), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SMALL_ARMS), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ANTI_MECH), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ARTY), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TAC_GROUND), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TAC_SPACE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_INIT), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_STRATEGY), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TECH_MECH), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TECH_AERO), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TECH_VEE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TECH_BA), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_MEDICAL), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ADMIN), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NEG), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SCROUNGE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TOUGH), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_EDGE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NABIL), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NIMP), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_HITS), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SALARY), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), false);	
+		} else if(view == PV_INF) {
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NAME), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_CALL), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_AGE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GENDER), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TYPE), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SKILL), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ASSIGN), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_FORCE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_DEPLOY), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN_MECH), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT_MECH), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN_AERO), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT_AERO), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN_JET), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT_JET), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN_SPACE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT_SPACE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN_VEE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT_GVEE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT_NVEE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT_VTOL), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN_BA), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SMALL_ARMS), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ANTI_MECH), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ARTY), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TAC_GROUND), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TAC_SPACE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_INIT), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_STRATEGY), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TECH_MECH), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TECH_AERO), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TECH_VEE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TECH_BA), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_MEDICAL), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ADMIN), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NEG), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SCROUNGE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TOUGH), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_EDGE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NABIL), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NIMP), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_HITS), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SALARY), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), false);	
+		} else if(view == PV_TACTIC) {
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NAME), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_CALL), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_AGE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GENDER), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TYPE), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SKILL), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ASSIGN), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_FORCE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_DEPLOY), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN_MECH), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT_MECH), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN_AERO), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT_AERO), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN_JET), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT_JET), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN_SPACE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT_SPACE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN_VEE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT_GVEE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT_NVEE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT_VTOL), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN_BA), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SMALL_ARMS), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ANTI_MECH), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ARTY), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TAC_GROUND), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TAC_SPACE), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_INIT), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_STRATEGY), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TECH_MECH), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TECH_AERO), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TECH_VEE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TECH_BA), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_MEDICAL), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ADMIN), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NEG), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SCROUNGE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TOUGH), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_EDGE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NABIL), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NIMP), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_HITS), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SALARY), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), false);	
+		} else if(view == PV_TECH) {
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NAME), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_CALL), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_AGE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GENDER), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TYPE), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SKILL), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ASSIGN), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_FORCE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_DEPLOY), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN_MECH), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT_MECH), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN_AERO), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT_AERO), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN_JET), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT_JET), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN_SPACE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT_SPACE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN_VEE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT_GVEE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT_NVEE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT_VTOL), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN_BA), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SMALL_ARMS), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ANTI_MECH), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ARTY), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TAC_GROUND), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TAC_SPACE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_INIT), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_STRATEGY), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TECH_MECH), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TECH_AERO), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TECH_VEE), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TECH_BA), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_MEDICAL), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ADMIN), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NEG), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SCROUNGE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TOUGH), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_EDGE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NABIL), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NIMP), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_HITS), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SALARY), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), false);	
+		} else if(view == PV_ADMIN) {
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NAME), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_CALL), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_AGE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GENDER), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TYPE), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SKILL), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ASSIGN), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_FORCE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_DEPLOY), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN_MECH), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT_MECH), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN_AERO), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT_AERO), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN_JET), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT_JET), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN_SPACE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT_SPACE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN_VEE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT_GVEE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT_NVEE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT_VTOL), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN_BA), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SMALL_ARMS), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ANTI_MECH), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ARTY), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TAC_GROUND), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TAC_SPACE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_INIT), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_STRATEGY), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TECH_MECH), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TECH_AERO), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TECH_VEE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TECH_BA), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_MEDICAL), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ADMIN), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NEG), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SCROUNGE), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TOUGH), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_EDGE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NABIL), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NIMP), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_HITS), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SALARY), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), false);	
 		} else if(view == PV_FLUFF) {
@@ -3147,11 +3389,34 @@ public class MekHQView extends FrameView {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ASSIGN), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_FORCE), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_DEPLOY), false);
-			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN), false);
-			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN_MECH), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT_MECH), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN_AERO), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT_AERO), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN_JET), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT_JET), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN_SPACE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT_SPACE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN_VEE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT_GVEE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT_NVEE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_PILOT_VTOL), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_GUN_BA), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SMALL_ARMS), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ANTI_MECH), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ARTY), false);
-			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TACTICS), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TAC_GROUND), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TAC_SPACE), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_INIT), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_STRATEGY), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TECH_MECH), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TECH_AERO), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TECH_VEE), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TECH_BA), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_MEDICAL), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_ADMIN), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NEG), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SCROUNGE), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_TOUGH), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_EDGE), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NABIL), false);
@@ -5091,19 +5356,42 @@ public class MekHQView extends FrameView {
         private final static int COL_ASSIGN =  7;
         private final static int COL_FORCE  =  8;
         private final static int COL_DEPLOY =  9;
-        private final static int COL_GUN =     10;
-        private final static int COL_PILOT =   11;
-        private final static int COL_ARTY  =   12;
-        private final static int COL_TACTICS = 13;
-        private final static int COL_INIT    = 14;
-        private final static int COL_TOUGH =   15;
-        private final static int COL_EDGE  =   16;
-        private final static int COL_NABIL =   17;
-        private final static int COL_NIMP  =   18;
-        private final static int COL_HITS  =   19;
-        private final static int COL_SALARY =  20;
-        private final static int COL_XP =      21;
-        private final static int N_COL =       22;
+        private final static int COL_GUN_MECH =   10;
+        private final static int COL_PILOT_MECH = 11;
+        private final static int COL_GUN_AERO =   12;
+        private final static int COL_PILOT_AERO = 13;
+        private final static int COL_GUN_JET =    14;
+        private final static int COL_PILOT_JET =  15;
+        private final static int COL_GUN_VEE =    16;
+        private final static int COL_PILOT_GVEE = 17;
+        private final static int COL_PILOT_VTOL = 18;
+        private final static int COL_PILOT_NVEE = 19;
+        private final static int COL_GUN_SPACE =  20;
+        private final static int COL_PILOT_SPACE= 21;
+        private final static int COL_ARTY     =   22;
+        private final static int COL_GUN_BA     = 23;
+        private final static int COL_SMALL_ARMS = 24;
+        private final static int COL_ANTI_MECH  = 25;
+        private final static int COL_TAC_GROUND = 26;
+        private final static int COL_TAC_SPACE  = 27;
+        private final static int COL_INIT       = 28;
+        private final static int COL_STRATEGY   = 29;
+        private final static int COL_TECH_MECH  = 30;
+        private final static int COL_TECH_AERO  = 31;
+        private final static int COL_TECH_VEE   = 32;
+        private final static int COL_TECH_BA    = 33;
+        private final static int COL_MEDICAL    = 34;
+        private final static int COL_ADMIN      = 35;
+        private final static int COL_NEG        = 36;
+        private final static int COL_SCROUNGE   = 37;     
+        private final static int COL_TOUGH =   38;
+        private final static int COL_EDGE  =   39;
+        private final static int COL_NABIL =   40;
+        private final static int COL_NIMP  =   41;
+        private final static int COL_HITS  =   42;
+        private final static int COL_SALARY =  43;
+        private final static int COL_XP =      44;
+        private final static int N_COL =       45;
         
         private ArrayList<Person> data = new ArrayList<Person>();
         
@@ -5130,16 +5418,62 @@ public class MekHQView extends FrameView {
                     return "Gender";
                 case COL_TYPE:
                     return "Type";
-                case COL_GUN:
-                    return "Gunnery";
-                case COL_PILOT:
-                    return "Piloting";
+                case COL_GUN_MECH:
+                    return "G/Mech";
+                case COL_PILOT_MECH:
+                    return "P/Mech";
+                case COL_GUN_AERO:
+                    return "G/Aero";
+                case COL_PILOT_AERO:
+                    return "P/Aero";
+                case COL_GUN_JET:
+                    return "G/Aircraft";
+                case COL_PILOT_JET:
+                    return "P/Aircract";
+                case COL_GUN_VEE:
+                    return "G/Vehicle";
+                case COL_PILOT_GVEE:
+                    return "P/Ground Vehicle";
+                case COL_PILOT_VTOL:
+                    return "P/VTOL";
+                case COL_PILOT_NVEE:
+                    return "P/Naval Vehicle";
+                case COL_GUN_SPACE:
+                    return "G/Spacecraft";
+                case COL_PILOT_SPACE:
+                    return "P/Spacecraft";
                 case COL_ARTY:
                     return "Artillery";
-                case COL_TACTICS:
-                    return "Tactics";
+                case COL_GUN_BA:
+                    return "G/Battlesuit";
+                case COL_SMALL_ARMS:
+                    return "Small Arms";
+                case COL_ANTI_MECH:
+                    return "Anti-Mech";
+                case COL_TAC_GROUND:
+                    return "Tactics/Ground";
+                case COL_TAC_SPACE:
+                    return "Tactics/Space";
                 case COL_INIT:
                     return "Init Bonus";
+                case COL_STRATEGY:
+                    return "Strategy";
+                case COL_TECH_MECH:
+                    return "Tech/Mech";
+                case COL_TECH_AERO:
+                    return "Tech/Aero";
+                case COL_TECH_VEE:
+                    return "Mechanic";
+                case COL_TECH_BA:
+                    return "Tech/BA";
+                case COL_MEDICAL:
+                    return "Medical";
+                case COL_ADMIN:
+                    return "Admin";
+                case COL_NEG:
+                    return "Negotiation";
+                case COL_SCROUNGE:
+                    return "Scrounge";
                 case COL_TOUGH:
                     return "Toughness";
                 case COL_SKILL:
@@ -5179,20 +5513,6 @@ public class MekHQView extends FrameView {
             case COL_SKILL:
             case COL_FORCE:
                 return 100;
-            case COL_GENDER:
-            case COL_AGE:
-            case COL_GUN:
-            case COL_PILOT:
-            case COL_ARTY:
-            case COL_TOUGH:
-            case COL_TACTICS:
-            case COL_INIT:
-            case COL_XP:
-            case COL_EDGE:
-            case COL_NABIL:
-            case COL_NIMP:
-            case COL_HITS:
-                return 20;
             case COL_NAME:
             case COL_ASSIGN:
                 return 125;
@@ -5205,21 +5525,15 @@ public class MekHQView extends FrameView {
             switch(col) {
             case COL_SALARY:
             	return SwingConstants.RIGHT;
-            case COL_AGE:
-            case COL_GUN:
-            case COL_PILOT:
-            case COL_ARTY:
-            case COL_TOUGH:
-            case COL_TACTICS:
-            case COL_INIT:
-            case COL_XP:
-            case COL_EDGE:
-            case COL_NABIL:
-            case COL_NIMP:
-            case COL_HITS:
-            	return SwingConstants.CENTER;
-            default:
+            case COL_RANK:
+            case COL_NAME:
+            case COL_GENDER:
+            case COL_TYPE:
+            case COL_DEPLOY:
+            case COL_FORCE:
             	return SwingConstants.LEFT;
+            default:
+            	return SwingConstants.CENTER;
             }
         }
 
@@ -5285,9 +5599,107 @@ public class MekHQView extends FrameView {
             if(col == COL_TYPE) {
                 return p.getTypeDesc();
             }
-            if(col == COL_GUN) {
+            if(col == COL_GUN_MECH) {
             	if(p.hasSkill(Skill.S_GUN_MECH)) {
             		return Integer.toString(p.getSkill(Skill.S_GUN_MECH).getFinalSkillValue());
+            	} else {
+            		return "-";
+            	}
+            }
+            if(col == COL_PILOT_MECH) {
+            	if(p.hasSkill(Skill.S_PILOT_MECH)) {
+            		return Integer.toString(p.getSkill(Skill.S_PILOT_MECH).getFinalSkillValue());
+            	} else {
+            		return "-";
+            	}
+            }
+            if(col == COL_GUN_AERO) {
+            	if(p.hasSkill(Skill.S_GUN_AERO)) {
+            		return Integer.toString(p.getSkill(Skill.S_GUN_AERO).getFinalSkillValue());
+            	} else {
+            		return "-";
+            	}
+            }
+            if(col == COL_PILOT_AERO) {
+            	if(p.hasSkill(Skill.S_PILOT_AERO)) {
+            		return Integer.toString(p.getSkill(Skill.S_PILOT_AERO).getFinalSkillValue());
+            	} else {
+            		return "-";
+            	}
+            }
+            if(col == COL_GUN_JET) {
+            	if(p.hasSkill(Skill.S_GUN_JET)) {
+            		return Integer.toString(p.getSkill(Skill.S_GUN_JET).getFinalSkillValue());
+            	} else {
+            		return "-";
+            	}
+            }
+            if(col == COL_PILOT_JET) {
+            	if(p.hasSkill(Skill.S_PILOT_JET)) {
+            		return Integer.toString(p.getSkill(Skill.S_PILOT_JET).getFinalSkillValue());
+            	} else {
+            		return "-";
+            	}
+            }
+            if(col == COL_GUN_SPACE) {
+            	if(p.hasSkill(Skill.S_GUN_SPACE)) {
+            		return Integer.toString(p.getSkill(Skill.S_GUN_SPACE).getFinalSkillValue());
+            	} else {
+            		return "-";
+            	}
+            }
+            if(col == COL_PILOT_SPACE) {
+            	if(p.hasSkill(Skill.S_PILOT_SPACE)) {
+            		return Integer.toString(p.getSkill(Skill.S_PILOT_AERO).getFinalSkillValue());
+            	} else {
+            		return "-";
+            	}
+            }
+            if(col == COL_GUN_VEE) {
+            	if(p.hasSkill(Skill.S_GUN_VEE)) {
+            		return Integer.toString(p.getSkill(Skill.S_GUN_VEE).getFinalSkillValue());
+            	} else {
+            		return "-";
+            	}
+            }
+            if(col == COL_PILOT_GVEE) {
+            	if(p.hasSkill(Skill.S_PILOT_GVEE)) {
+            		return Integer.toString(p.getSkill(Skill.S_PILOT_GVEE).getFinalSkillValue());
+            	} else {
+            		return "-";
+            	}
+            }
+            if(col == COL_PILOT_NVEE) {
+            	if(p.hasSkill(Skill.S_PILOT_NVEE)) {
+            		return Integer.toString(p.getSkill(Skill.S_PILOT_NVEE).getFinalSkillValue());
+            	} else {
+            		return "-";
+            	}
+            }
+            if(col == COL_PILOT_VTOL) {
+            	if(p.hasSkill(Skill.S_PILOT_VTOL)) {
+            		return Integer.toString(p.getSkill(Skill.S_PILOT_VTOL).getFinalSkillValue());
+            	} else {
+            		return "-";
+            	}
+            }
+            if(col == COL_GUN_BA) {
+            	if(p.hasSkill(Skill.S_GUN_BA)) {
+            		return Integer.toString(p.getSkill(Skill.S_GUN_BA).getFinalSkillValue());
+            	} else {
+            		return "-";
+            	}
+            }
+            if(col == COL_ANTI_MECH) {
+            	if(p.hasSkill(Skill.S_ANTI_MECH)) {
+            		return Integer.toString(p.getSkill(Skill.S_ANTI_MECH).getFinalSkillValue());
+            	} else {
+            		return "-";
+            	}
+            }
+            if(col == COL_SMALL_ARMS) {
+            	if(p.hasSkill(Skill.S_SMALL_ARMS)) {
+            		return Integer.toString(p.getSkill(Skill.S_SMALL_ARMS).getFinalSkillValue());
             	} else {
             		return "-";
             	}
@@ -5299,9 +5711,23 @@ public class MekHQView extends FrameView {
             		return "-";
             	}
             }
-            if(col == COL_TACTICS) {
+            if(col == COL_TAC_GROUND) {
             	if(p.hasSkill(Skill.S_TAC_GROUND)) {
             		return Integer.toString(p.getSkill(Skill.S_TAC_GROUND).getFinalSkillValue());
+            	} else {
+            		return "-";
+            	}
+            }
+            if(col == COL_TAC_SPACE) {
+            	if(p.hasSkill(Skill.S_TAC_SPACE)) {
+            		return Integer.toString(p.getSkill(Skill.S_TAC_SPACE).getFinalSkillValue());
+            	} else {
+            		return "-";
+            	}
+            }
+            if(col == COL_STRATEGY) {
+            	if(p.hasSkill(Skill.S_STRATEGY)) {
+            		return Integer.toString(p.getSkill(Skill.S_STRATEGY).getFinalSkillValue());
             	} else {
             		return "-";
             	}
@@ -5313,15 +5739,57 @@ public class MekHQView extends FrameView {
             		return "-";
             	}
             }
-            if(col == COL_TOUGH) {
-            	return "?";
-            }
-            if(col == COL_PILOT) {
-            	if(p.hasSkill(Skill.S_PILOT_MECH)) {
-            		return Integer.toString(p.getSkill(Skill.S_PILOT_MECH).getFinalSkillValue());
+            if(col == COL_TECH_MECH) {
+            	if(p.hasSkill(Skill.S_TECH_MECH)) {
+            		return Integer.toString(p.getSkill(Skill.S_TECH_MECH).getFinalSkillValue());
             	} else {
             		return "-";
             	}
+            }
+            if(col == COL_TECH_AERO) {
+            	if(p.hasSkill(Skill.S_TECH_AERO)) {
+            		return Integer.toString(p.getSkill(Skill.S_TECH_AERO).getFinalSkillValue());
+            	} else {
+            		return "-";
+            	}
+            }
+            if(col == COL_TECH_VEE) {
+            	if(p.hasSkill(Skill.S_TECH_MECHANIC)) {
+            		return Integer.toString(p.getSkill(Skill.S_TECH_MECHANIC).getFinalSkillValue());
+            	} else {
+            		return "-";
+            	}
+            }
+            if(col == COL_TECH_BA) {
+            	if(p.hasSkill(Skill.S_TECH_BA)) {
+            		return Integer.toString(p.getSkill(Skill.S_TECH_BA).getFinalSkillValue());
+            	} else {
+            		return "-";
+            	}
+            }
+            if(col == COL_ADMIN) {
+            	if(p.hasSkill(Skill.S_ADMIN)) {
+            		return Integer.toString(p.getSkill(Skill.S_ADMIN).getFinalSkillValue());
+            	} else {
+            		return "-";
+            	}
+            }
+            if(col == COL_NEG) {
+            	if(p.hasSkill(Skill.S_NEG)) {
+            		return Integer.toString(p.getSkill(Skill.S_NEG).getFinalSkillValue());
+            	} else {
+            		return "-";
+            	}
+            }
+            if(col == COL_SCROUNGE) {
+            	if(p.hasSkill(Skill.S_SCROUNGE)) {
+            		return Integer.toString(p.getSkill(Skill.S_SCROUNGE).getFinalSkillValue());
+            	} else {
+            		return "-";
+            	}
+            }
+            if(col == COL_TOUGH) {
+            	return "?";
             }
             if(col == COL_EDGE) {
             	return Integer.toString(p.getEdge());
