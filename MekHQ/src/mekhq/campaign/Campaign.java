@@ -464,7 +464,7 @@ public class Campaign implements Serializable {
 		personnel.add(p);
 		personnelIds.put(new Integer(id), p);
 		lastPersonId = id;
-		addReport(p.getDesc() + " has been added to the personnel roster.");
+		addReport(p.getName() + " has been added to the personnel roster.");
 	}
 	
 	private void addPersonWithoutId(Person p) {
@@ -1870,11 +1870,11 @@ public class Campaign implements Serializable {
 		if(isFemale) {
 			person.setGender(Person.G_FEMALE);
 		}
+		person.setName(getRNG().generate(isFemale));
 		//now lets get a random birthdate, such that the person
 		//is age 13+4d6 by default
 		//TODO: let user specify age distribution
-		GregorianCalendar birthdate = (GregorianCalendar)getCalendar().clone();
-		//lets set age to be 14 + 4d6 by default		
+		GregorianCalendar birthdate = (GregorianCalendar)getCalendar().clone();	
 		birthdate.set(Calendar.YEAR, birthdate.get(Calendar.YEAR) - (13 + Compute.d6(4)));
 		//choose a random day and month
 		int randomDay = Compute.randomInt(365)+1;
@@ -1883,6 +1883,45 @@ public class Campaign implements Serializable {
 		}
 		birthdate.set(Calendar.DAY_OF_YEAR, randomDay);
 		person.setBirthday(birthdate);
+		person.setType(type);
+		//set default skills
+		switch(type) {
+		case(Person.T_MECHWARRIOR):
+	        person.addSkill(SkillType.S_PILOT_MECH);
+        	person.addSkill(SkillType.S_GUN_MECH);
+        	break;
+	    case(Person.T_VEE_CREW):
+	    	person.addSkill(SkillType.S_PILOT_GVEE);
+    		person.addSkill(SkillType.S_GUN_VEE);
+    		break;
+	    case(Person.T_AERO_PILOT):
+	    	person.addSkill(SkillType.S_PILOT_AERO);
+    		person.addSkill(SkillType.S_GUN_AERO);
+    		break;
+	    case(Person.T_PROTO_PILOT):
+	    	break;
+	    case(Person.T_BA):
+	    	person.addSkill(SkillType.S_GUN_BA);
+			person.addSkill(SkillType.S_ANTI_MECH);
+			person.addSkill(SkillType.S_SMALL_ARMS);
+			break;
+	    case(Person.T_MECH_TECH):
+	    	person.addSkill(SkillType.S_TECH_MECH);
+			break;
+	    case(Person.T_MECHANIC):
+	    	person.addSkill(SkillType.S_TECH_MECHANIC);
+			break;
+	    case(Person.T_AERO_TECH):
+	    	person.addSkill(SkillType.S_TECH_AERO);
+			break;
+	    case(Person.T_BA_TECH):
+	    	person.addSkill(SkillType.S_TECH_BA);
+			break;
+	    case(Person.T_DOCTOR):
+	    	person.addSkill(SkillType.S_MEDICAL);
+			break;
+		}
+		person.setRankSystem(ranks);
 		return person;
 	}
 	

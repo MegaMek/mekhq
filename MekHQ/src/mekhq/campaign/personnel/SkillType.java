@@ -81,6 +81,7 @@ public class SkillType implements Serializable {
 	private String name;
 	private int target;
 	private boolean countUp;
+	private int defaultLvl;
 	
 	public static String[] getSkillList() {
 		return skillList;
@@ -88,7 +89,7 @@ public class SkillType implements Serializable {
 	
 	/** Creates new SkillType */
     public SkillType() {
-        // default constructor
+        defaultLvl = 3;
     }
     
     public String getName() {
@@ -101,6 +102,14 @@ public class SkillType implements Serializable {
 	
 	public boolean countUp() {
 		return countUp;
+	}
+	
+	public int getDefaultLevel() {
+		return defaultLvl;
+	}
+	
+	public void setDefaultLevel(int lvl) {
+		this.defaultLvl = lvl;
 	}
 	
 	public static void initializeTypes() {

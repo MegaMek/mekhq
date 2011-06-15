@@ -837,6 +837,10 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 		skills.put(skillName, new Skill(skillName, lvl, bonus));
 	}
 	
+	public void addSkill(String skillName) {
+		skills.put(skillName, new Skill(skillName));
+	}
+	
 	public void removeSkill(String skillName) {
 		if(hasSkill(skillName)) {
 			skills.remove(skillName);

@@ -77,7 +77,9 @@ public class Skill implements Serializable {
 	private int bonus;
 	
 	public Skill(String t) {
-		this(t, 0, 0);
+		this.type = SkillType.getType(t);
+		this.level = type.getDefaultLevel();
+		this.bonus = 0;
 	}
 	
 	public Skill(String t, int lvl, int bns) {

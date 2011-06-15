@@ -1731,33 +1731,18 @@ public class MekHQView extends FrameView {
 
 		menuHire.setText(resourceMap.getString("menuHire.text")); // NOI18N
 		menuHire.setName("menuHire"); // NOI18N
-
-		miHirePilot.setText(resourceMap.getString("miHirePilot.text")); // NOI18N
-		miHirePilot.setName("miHirePilot"); // NOI18N
-		miHirePilot.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				miHirePilotActionPerformed(evt);
-			}
-		});
-		menuHire.add(miHirePilot);
-
-		miHireTech.setText(resourceMap.getString("miHireTech.text")); // NOI18N
-		miHireTech.setName("miHireTech"); // NOI18N
-		miHireTech.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				miHireTechActionPerformed(evt);
-			}
-		});
-		menuHire.add(miHireTech);
-
-		miHireDoctor.setText(resourceMap.getString("miHireDoctor.text")); // NOI18N
-		miHireDoctor.setName("miHireDoctor"); // NOI18N
-		miHireDoctor.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				miHireDoctorActionPerformed(evt);
-			}
-		});
-		menuHire.add(miHireDoctor);
+		JMenuItem miHire;
+		for(int i = 0; i < Person.T_NUM; i++) {		
+			miHire = new JMenuItem();
+			miHire.setText(Person.getTypeDesc(i)); // NOI18N
+			miHire.setActionCommand(Integer.toString(i));
+			miHire.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent evt) {
+					hirePerson(evt);
+				}
+			});
+			menuHire.add(miHire);
+		}
 		menuMarket.add(menuHire);
 		menuBar.add(menuMarket);
 		helpMenu.setText(resourceMap.getString("helpMenu.text")); // NOI18N
@@ -2087,30 +2072,15 @@ public class MekHQView extends FrameView {
 		patientTable.setRowSelectionInterval(row, row);	
 	}// GEN-LAST:event_btnAssignDocActionPerformed
 
-	private void miHirePilotActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miHirePilotActionPerformed
+	private void hirePerson(java.awt.event.ActionEvent evt) {
+		int type = Integer.parseInt(evt.getActionCommand());
 		CustomizePersonDialog npd = new CustomizePersonDialog(getFrame(), true, 
-				campaign.newPerson(Person.T_MECHWARRIOR), 
+				campaign.newPerson(type), 
 				true,
 				campaign,
 				this);
 		npd.setVisible(true);
-	}// GEN-LAST:event_miHirePilotActionPerformed
-
-	private void miHireTechActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miHireTechActionPerformed
-		CustomizePersonDialog ntd = new CustomizePersonDialog(getFrame(), true, 
-				campaign.newPerson(Person.T_MECH_TECH),
-				true,
-				campaign, this);
-		ntd.setVisible(true);
-	}// GEN-LAST:event_miHireTechActionPerformed
-
-	private void miHireDoctorActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miHireDoctorActionPerformed
-		CustomizePersonDialog ntd = new CustomizePersonDialog(getFrame(), true, 
-				campaign.newPerson(Person.T_DOCTOR),
-				true,
-				campaign, this);
-		ntd.setVisible(true);
-	}// GEN-LAST:event_miHireDoctorActionPerformed
+	}
 
 	private void menuSaveActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuSaveActionPerformed
 		MekHQApp.logMessage("Saving campaign...");
