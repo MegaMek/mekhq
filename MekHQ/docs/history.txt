@@ -5,6 +5,7 @@ v0.1.9 (SVN)
 + updated personnel views with new skills
 + updated PersonViewPanel with new skills
 + SkillType object
++ improvements to CustomizePersonDialog
 
 v0.1.8 (2011-06-13)
 + beginning of custom XP costs

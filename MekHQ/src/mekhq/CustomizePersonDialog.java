@@ -10,13 +10,22 @@ import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
+import java.util.Hashtable;
 
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import megamek.client.ui.swing.DialogOptionComponent;
 import megamek.client.ui.swing.DialogOptionListener;
@@ -44,6 +53,10 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
 	private static final long serialVersionUID = -6265589976779860566L;
 	private Person person;
     private ArrayList<DialogOptionComponent> optionComps = new ArrayList<DialogOptionComponent>();
+    private Hashtable<String, JSpinner> skillLvls = new Hashtable<String, JSpinner>();
+    private Hashtable<String, JSpinner> skillBonus = new Hashtable<String, JSpinner>();
+    private Hashtable<String, JLabel> skillValues = new Hashtable<String, JLabel>();
+    private Hashtable<String, JCheckBox> skillChks = new Hashtable<String, JCheckBox>();
     private PilotOptions options;
     private GregorianCalendar birthdate;
     private SimpleDateFormat dateFormat;
@@ -77,6 +90,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     	getContentPane().removeAll();
     	initComponents();
     	refreshOptions();
+    	refreshSkills();
     }
 
     /** This method is called from within the constructor to
@@ -109,6 +123,8 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         choiceGender = new javax.swing.JComboBox();
         jScrollPane1 = new javax.swing.JScrollPane();
         panOptions = new javax.swing.JPanel();
+        scrSkills = new javax.swing.JScrollPane();
+        panSkills = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         txtBio = new javax.swing.JTextPane();
         panButtons = new javax.swing.JPanel();
@@ -253,7 +269,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         getContentPane().add(textNickname, gridBagConstraints);
 
-        textGunnery.setText(Integer.toString(person.getSkill(SkillType.S_GUN_MECH).getLevel()));
+        //textGunnery.setText(Integer.toString(person.getSkill(SkillType.S_GUN_MECH).getLevel()));
         textGunnery.setMinimumSize(new java.awt.Dimension(50, 28));
         textGunnery.setName("textGunnery"); // NOI18N
         textGunnery.setPreferredSize(new java.awt.Dimension(50, 28));
@@ -263,7 +279,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         getContentPane().add(textGunnery, gridBagConstraints);
 
-        textPiloting.setText(Integer.toString(person.getSkill(SkillType.S_PILOT_MECH).getLevel()));
+        //textPiloting.setText(Integer.toString(person.getSkill(SkillType.S_PILOT_MECH).getLevel()));
         textPiloting.setMinimumSize(new java.awt.Dimension(50, 28));
         textPiloting.setName("textPiloting"); // NOI18N
         textPiloting.setPreferredSize(new java.awt.Dimension(50, 28));
@@ -394,6 +410,23 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         getContentPane().add(jScrollPane2, gridBagConstraints);
 
         
+        scrSkills.setMinimumSize(new java.awt.Dimension(300, 500));
+        scrSkills.setName("scrSkills"); // NOI18N
+        scrSkills.setPreferredSize(new java.awt.Dimension(300, 500));
+
+        panSkills.setName("panSkills"); // NOI18N
+        scrSkills.setViewportView(panSkills);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+    	gridBagConstraints.gridx = 5;
+    	gridBagConstraints.gridy = 0;
+    	gridBagConstraints.gridheight = 9;
+    	gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+    	gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+    	gridBagConstraints.weightx = 1.0;
+    	gridBagConstraints.weighty = 1.0;
+    	gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 0);
+    	getContentPane().add(scrSkills, gridBagConstraints);
+    	
         jScrollPane1.setMinimumSize(new java.awt.Dimension(300, 500));
         jScrollPane1.setName("jScrollPane1"); // NOI18N
         jScrollPane1.setPreferredSize(new java.awt.Dimension(300, 500));
@@ -416,7 +449,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         if(campaign.getCampaignOptions().useAbilities() 
         		|| campaign.getCampaignOptions().useImplants()) {
         	gridBagConstraints = new java.awt.GridBagConstraints();
-        	gridBagConstraints.gridx = 5;
+        	gridBagConstraints.gridx = 6;
         	gridBagConstraints.gridy = 0;
         	gridBagConstraints.gridheight = 9;
         	gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
@@ -480,11 +513,8 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         person.setCallsign(textNickname.getText());   
         person.setBiography(txtBio.getText());
         person.setGender(choiceGender.getSelectedIndex());
-        int piloting = Integer.parseInt(textPiloting.getText());
-        int gunnery = Integer.parseInt(textGunnery.getText());
-        person.addSkill(SkillType.S_GUN_MECH, piloting,0);
-        person.addSkill(SkillType.S_PILOT_MECH, gunnery,0);
         person.setBirthday(birthdate);  
+        setSkills();
         setOptions();
         if(isNewHire()) {
             campaign.addPerson(person);
@@ -508,25 +538,129 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     private boolean isNewHire() {
     	return newHire;
     }
-    
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                CustomizePersonDialog dialog = new CustomizePersonDialog(new javax.swing.JFrame(), true, null, false, null, null);
-                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                    @Override
-                    public void windowClosing(java.awt.event.WindowEvent e) {
-                        System.exit(0);
-                    }
-                });
-                dialog.setVisible(true);
-            }
-        });
-    }
 
+    public void refreshSkills() {
+        panSkills.removeAll();
+        
+        JCheckBox chkSkill;
+        JLabel lblName;
+	    JLabel lblValue;
+	    JLabel lblLevel;
+	    JLabel lblBonus;
+	    JSpinner spnLevel;
+	    JSpinner spnBonus;
+
+        GridBagLayout gridbag = new GridBagLayout();
+        GridBagConstraints c = new GridBagConstraints();
+        panSkills.setLayout(gridbag);
+
+        c.gridwidth = 1;
+        c.fill = GridBagConstraints.NONE;
+        c.insets = new java.awt.Insets(10, 10, 0, 0);
+        c.gridx = 0;
+
+        for(int i = 0; i < SkillType.getSkillList().length; i++) {
+        	c.gridy = i;
+        	c.gridx = 0;
+        	final String type = SkillType.getSkillList()[i];
+        	chkSkill = new JCheckBox();
+        	chkSkill.setSelected(person.hasSkill(type));
+        	skillChks.put(type, chkSkill);
+        	chkSkill.addItemListener(new ItemListener() {
+				@Override
+				public void itemStateChanged(ItemEvent e) {
+					changeSkillValue(type);
+				}
+    		});
+        	lblName = new JLabel(type);
+        	lblValue = new JLabel();
+    		if(person.hasSkill(type)) {
+    			lblValue.setText(person.getSkill(type).toString());
+    		} else {
+    			lblValue.setText("-");
+    		}
+    		skillValues.put(type, lblValue);
+    		lblLevel = new JLabel("Level:");
+    		lblBonus = new JLabel("Bonus:");
+    		int level = 0;
+    		int bonus = 0;
+    		if(person.hasSkill(type)) {
+    			level = person.getSkill(type).getLevel();
+    			bonus = person.getSkill(type).getBonus();
+    		}
+    		spnLevel = new JSpinner(new SpinnerNumberModel(level, 0, 10, 1));
+    		spnLevel.addChangeListener(new ChangeListener() {
+    			@Override
+    			public void stateChanged(ChangeEvent evt) {
+    				changeSkillValue(type);
+    			}
+    		});
+    		spnBonus = new JSpinner(new SpinnerNumberModel(bonus, -8, 8, 1));
+    		spnBonus.addChangeListener(new ChangeListener() {
+    			@Override
+    			public void stateChanged(ChangeEvent evt) {
+    				changeSkillValue(type);
+    			}
+    		});
+            skillLvls.put(type, spnLevel);
+            skillBonus.put(type, spnBonus);
+    		
+            c.anchor = java.awt.GridBagConstraints.WEST;    
+    		c.weightx = 0;
+            panSkills.add(chkSkill, c);
+            
+            c.gridx = 1;
+    		c.anchor = java.awt.GridBagConstraints.WEST;    
+            panSkills.add(lblName, c);
+            
+            c.gridx = 2;
+            c.anchor = java.awt.GridBagConstraints.CENTER;
+            panSkills.add(lblValue, c);
+    		
+            c.gridx = 3;
+            c.anchor = java.awt.GridBagConstraints.WEST;
+            panSkills.add(lblLevel, c);
+            
+            c.gridx = 4;
+            c.anchor = java.awt.GridBagConstraints.WEST;
+            panSkills.add(spnLevel, c);
+            
+            c.gridx = 5;
+            c.anchor = java.awt.GridBagConstraints.WEST;
+            panSkills.add(lblBonus, c);
+            
+            c.gridx = 6;
+            c.anchor = java.awt.GridBagConstraints.WEST;
+            c.weightx = 1.0;
+            panSkills.add(spnBonus, c);
+        }
+    }
+    
+    private void setSkills() {
+    	for(int i = 0; i < SkillType.getSkillList().length; i++) {
+        	final String type = SkillType.getSkillList()[i];
+    		if(skillChks.get(type).isSelected()) {
+    			int lvl = (Integer)skillLvls.get(type).getModel().getValue();
+    			int b = (Integer)skillBonus.get(type).getModel().getValue();
+    			person.addSkill(type, lvl, b);
+    		} else {
+    			person.removeSkill(type);
+    		}
+    	}
+        IOption option;
+        for (final Object newVar : optionComps) {
+            DialogOptionComponent comp = (DialogOptionComponent) newVar;
+            option = comp.getOption();
+            if ((comp.getValue().equals("None"))) { // NON-NLS-$1
+                person.getOptions().getOption(option.getName())
+                .setValue("None"); // NON-NLS-$1
+            } else {
+                person.getOptions().getOption(option.getName())
+                .setValue(comp.getValue());
+            }
+        }
+    }
+    
     public void refreshOptions() {
         panOptions.removeAll();
         optionComps = new ArrayList<DialogOptionComponent>();
@@ -623,6 +757,24 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         return dateFormat.format(birthdate.getTime());
     }
     
+    private void changeSkillValue(String type) {
+    	if(!skillChks.get(type).isSelected()) {
+    		skillValues.get(type).setText("-");
+    		return;
+    	}
+		SkillType stype = SkillType.getType(type);
+		int lvl = (Integer)skillLvls.get(type).getModel().getValue();
+		int b = (Integer)skillBonus.get(type).getModel().getValue();
+		int target = stype.getTarget() - lvl - b;
+		if(stype.countUp()) {
+			target = stype.getTarget() + lvl + b;
+			skillValues.get(type).setText("+" + target);
+		} else {
+			skillValues.get(type).setText(target + "+");
+		}
+		
+	}
+    
     private void btnDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDateActionPerformed
         // show the date chooser
         DateChooser dc = new DateChooser(frame, birthdate);
@@ -642,6 +794,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     private javax.swing.JComboBox choiceGender;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane scrSkills;
     private javax.swing.JLabel lblCommandB;
     private javax.swing.JLabel lblGunnery;
     private javax.swing.JLabel lblArtillery;
@@ -653,6 +806,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     private javax.swing.JLabel lblNickname;
     private javax.swing.JLabel lblPiloting;
     private javax.swing.JPanel panButtons;
+    private javax.swing.JPanel panSkills;
     private javax.swing.JPanel panOptions;
     private javax.swing.JTextField textCommandB;
     private javax.swing.JTextField textGunnery;

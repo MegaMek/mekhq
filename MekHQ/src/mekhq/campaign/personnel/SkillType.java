@@ -117,6 +117,7 @@ public class SkillType implements Serializable {
 		lookupHash.put(S_PILOT_NVEE, createPilotingNavalVee());
 		lookupHash.put(S_PILOT_VTOL, createPilotingVTOL());
 		lookupHash.put(S_GUN_VEE, createGunneryVehicle());
+		lookupHash.put(S_ARTILLERY, createArtillery());
 		lookupHash.put(S_GUN_BA, createGunneryBA());
 		lookupHash.put(S_SMALL_ARMS, createSmallArms());
 		lookupHash.put(S_ANTI_MECH, createAntiMech());
@@ -243,6 +244,15 @@ public class SkillType implements Serializable {
 	public static SkillType createGunneryVehicle() {
         SkillType skill = new SkillType();
         skill.name = S_GUN_VEE;
+        skill.target = 7;
+        skill.countUp = false;
+     
+        return skill;
+    }
+	
+	public static SkillType createArtillery() {
+        SkillType skill = new SkillType();
+        skill.name = S_ARTILLERY;
         skill.target = 7;
         skill.countUp = false;
      
