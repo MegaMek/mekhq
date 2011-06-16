@@ -4784,11 +4784,15 @@ public class MekHQView extends FrameView {
 				refreshUnitList();
 				refreshPersonnelList();
 			} else if (command.contains("IMPROVE")) {
-				int selected = Integer.parseInt(st.nextToken());
+				String type = st.nextToken();
 				int cost =  Integer.parseInt(st.nextToken());
-				//selectedPerson.improveSkill(selected);
+				if(selectedPerson.hasSkill(type)) {
+					selectedPerson.getSkill(type).improve();
+				} else {
+					selectedPerson.addSkill(type, 0, 0);
+				}
 				selectedPerson.setXp(selectedPerson.getXp() - cost);
-				campaign.addReport(selectedPerson.getName() + " improved " + SkillCosts.getSkillName(selected) + "!");
+				campaign.addReport(selectedPerson.getName() + " improved " + type + "!");
 				refreshServicedUnitList();
 				refreshUnitList();
 				refreshPersonnelList();
@@ -5059,159 +5063,96 @@ public class MekHQView extends FrameView {
 				popup.add(menuItem);
 				if(oneSelected) {
 					menu = new JMenu("Spend XP");
-					/*
-					if(person instanceof PilotPerson) {
-						PilotPerson pp = (PilotPerson)person;
-						//Gunnery
-						int cost = campaign.getSkillCosts().getCost(SkillCosts.SK_GUN, pp.getPilot().getGunnery() - 1, false);
-						String costDesc = " (" + cost + "XP)";
-						if(cost < 0) {
-							costDesc = " (Not Possible)";
-						}
-						menuItem = new JMenuItem(SkillCosts.getSkillName(SkillCosts.SK_GUN)   + costDesc);
-						menuItem.setActionCommand("IMPROVE|" + SkillCosts.SK_GUN + "|" + cost);
-						menuItem.addActionListener(this);
-						menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
-						menu.add(menuItem);
-						//Piloting
-						cost = campaign.getSkillCosts().getCost(SkillCosts.SK_PILOT, pp.getPilot().getPiloting() - 1, false);
-						costDesc = " (" + cost + "XP)";
-						if(cost < 0) {
-							costDesc = " (Not Possible)";
-						}
-						menuItem = new JMenuItem(SkillCosts.getSkillName(SkillCosts.SK_PILOT)   + costDesc);
-						menuItem.setActionCommand("IMPROVE|" + SkillCosts.SK_PILOT + "|" + cost);
-						menuItem.addActionListener(this);
-						menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
-						menu.add(menuItem);
-						//Artillery
-						if(campaign.getCampaignOptions().useArtillery()) {
-							cost = campaign.getSkillCosts().getCost(SkillCosts.SK_ARTY, pp.getPilot().getArtillery() - 1, false);
-							costDesc = " (" + cost + "XP)";
-							if(cost < 0) {
-								costDesc = " (Not Possible)";
+					JMenu currentMenu = new JMenu("Current Skills");
+					JMenu newMenu = new JMenu("New Skills");
+					for(int i = 0; i < SkillType.getSkillList().length; i++) {
+						String type = SkillType.getSkillList()[i];
+						if(person.hasSkill(type)) {
+							int lvl = person.getSkill(type).getLevel();
+							int cost = SkillType.getType(type).getCost(lvl+1);
+							if(cost >= 0) {
+								String costDesc = " (" + cost + "XP)";
+								menuItem = new JMenuItem(type + costDesc);
+								menuItem.setActionCommand("IMPROVE|" + type + "|" + cost);
+								menuItem.addActionListener(this);
+								menuItem.setEnabled(person.getXp() >= cost);
+								currentMenu.add(menuItem);
 							}
-							menuItem = new JMenuItem(SkillCosts.getSkillName(SkillCosts.SK_ARTY)   + costDesc);
-							menuItem.setActionCommand("IMPROVE|" + SkillCosts.SK_ARTY + "|" + cost);
-							menuItem.addActionListener(this);
-							menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
-							menu.add(menuItem);
-						}
-						//Tactics
-						if(campaign.getCampaignOptions().useTactics()) {
-							cost = campaign.getSkillCosts().getCost(SkillCosts.SK_TAC, pp.getPilot().getCommandBonus() + 1, false);
-							costDesc = " (" + cost + "XP)";
-							if(cost < 0) {
-								costDesc = " (Not Possible)";
+						} else {
+							int cost = SkillType.getType(type).getCost(0);
+							if(cost >= 0) {
+								String costDesc = " (" + cost + "XP)";
+								menuItem = new JMenuItem(type + costDesc);
+								menuItem.setActionCommand("IMPROVE|" + type + "|" + cost);
+								menuItem.addActionListener(this);
+								menuItem.setEnabled(person.getXp() >= cost);
+								newMenu.add(menuItem);
 							}
-							menuItem = new JMenuItem(SkillCosts.getSkillName(SkillCosts.SK_TAC)   + costDesc);
-							menuItem.setActionCommand("IMPROVE|" + SkillCosts.SK_TAC + "|" + cost);
-							menuItem.addActionListener(this);
-							menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
-							menu.add(menuItem);
 						}
-						//Init Bonus
-						if(campaign.getCampaignOptions().useInitBonus()) {
-							cost = campaign.getSkillCosts().getCost(SkillCosts.SK_INIT, pp.getPilot().getInitBonus() + 1, false);
-							costDesc = " (" + cost + "XP)";
-							if(cost < 0) {
-								costDesc = " (Not Possible)";
-							}
-							menuItem = new JMenuItem(SkillCosts.getSkillName(SkillCosts.SK_INIT)   + costDesc);
-							menuItem.setActionCommand("IMPROVE|" + SkillCosts.SK_INIT + "|" + cost);
-							menuItem.addActionListener(this);
-							menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
-							menu.add(menuItem);
-						}
-						//Toughness
-						if(campaign.getCampaignOptions().useToughness()) {
-							cost = campaign.getSkillCosts().getCost(SkillCosts.SK_TOUGH, pp.getPilot().getToughness() + 1, false);
-							costDesc = " (" + cost + "XP)";
-							if(cost < 0) {
-								costDesc = " (Not Possible)";
-							}
-							menuItem = new JMenuItem(SkillCosts.getSkillName(SkillCosts.SK_TOUGH)   + costDesc);
-							menuItem.setActionCommand("IMPROVE|" + SkillCosts.SK_TOUGH + "|" + cost);
-							menuItem.addActionListener(this);
-							menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
-							menu.add(menuItem);
-						}
-						if(campaign.getCampaignOptions().useAbilities()) {
-							JMenu abMenu = new JMenu("Special Abilities");
-							for (Enumeration<IOption> i = pp.getPilot().getOptions(PilotOptions.LVL3_ADVANTAGES); i.hasMoreElements();) {
-					        	IOption ability = i.nextElement();
-					        	if(!ability.booleanValue()) {
-					        		cost = campaign.getSkillCosts().getAbilityCost(ability.getName());
-					        		costDesc = " (" + cost + "XP)";
-									if(cost < 0) {
-										costDesc = " (Not Possible)";
-									}
-									if(ability.getName().equals("weapon_specialist")) {
-										if(null != pp.getAssignedUnit()) {
-											JMenu specialistMenu = new JMenu("Weapon Specialist");
-											TreeSet<String> uniqueWeapons = new TreeSet<String>();
-											for (int j = 0; j < pp.getAssignedUnit().getEntity().getWeaponList().size(); j++) {
-								                Mounted m = pp.getAssignedUnit().getEntity().getWeaponList().get(j);
-								                uniqueWeapons.add(m.getName());
-								            }
-								            for (String name : uniqueWeapons) {
-								            	menuItem = new JMenuItem(name + costDesc);
-												menuItem.setActionCommand("WSPECIALIST|" + name + "|" + cost);
-												menuItem.addActionListener(this);
-												menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
-												specialistMenu.add(menuItem);
-								            }
-								            abMenu.add(specialistMenu);
+					}
+					menu.add(currentMenu);
+					menu.add(newMenu);
+					if(campaign.getCampaignOptions().useAbilities()) {
+						JMenu abMenu = new JMenu("Special Abilities");
+						int cost = -1;
+						String costDesc = "";
+						for (Enumeration<IOption> i = person.getOptions(PilotOptions.LVL3_ADVANTAGES); i.hasMoreElements();) {
+							IOption ability = i.nextElement();
+							if(!ability.booleanValue()) {
+								cost = campaign.getSkillCosts().getAbilityCost(ability.getName());
+								costDesc = " (" + cost + "XP)";
+								if(cost < 0) {
+									costDesc = " (Not Possible)";
+								}
+								if(ability.getName().equals("weapon_specialist")) {
+									if(null != person.getAssignedUnit()) {
+										JMenu specialistMenu = new JMenu("Weapon Specialist");
+										TreeSet<String> uniqueWeapons = new TreeSet<String>();
+										for (int j = 0; j < person.getAssignedUnit().getEntity().getWeaponList().size(); j++) {
+											Mounted m = person.getAssignedUnit().getEntity().getWeaponList().get(j);
+											uniqueWeapons.add(m.getName());
 										}
-						        	} else if(ability.getName().equals("specialist")) {
-					        			JMenu specialistMenu = new JMenu("Specialist");
-					        			menuItem = new JMenuItem("Laser Specialist" + costDesc);
-										menuItem.setActionCommand("SPECIALIST|" + Pilot.SPECIAL_LASER + "|" + cost);
-										menuItem.addActionListener(this);
-										menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
-										specialistMenu.add(menuItem);
-										menuItem = new JMenuItem("Missile Specialist" + costDesc);
-										menuItem.setActionCommand("SPECIALIST|" + Pilot.SPECIAL_MISSILE + "|" + cost);
-										menuItem.addActionListener(this);
-										menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
-										specialistMenu.add(menuItem);
-										menuItem = new JMenuItem("Ballistic Specialist" + costDesc);
-										menuItem.setActionCommand("SPECIALIST|" + Pilot.SPECIAL_BALLISTIC + "|" + cost);
-										menuItem.addActionListener(this);
-										menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
-										specialistMenu.add(menuItem);
+										for (String name : uniqueWeapons) {
+											menuItem = new JMenuItem(name + costDesc);
+											menuItem.setActionCommand("WSPECIALIST|" + name + "|" + cost);
+											menuItem.addActionListener(this);
+											menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
+											specialistMenu.add(menuItem);
+										}
 										abMenu.add(specialistMenu);
-					        		} else {
-										menuItem = new JMenuItem(ability.getDisplayableName() + costDesc);
-										menuItem.setActionCommand("ABILITY|" + ability.getName() + "|" + cost);
-										menuItem.addActionListener(this);
-										menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
-										abMenu.add(menuItem);
-					        		}
-					        	}
+									}
+								} else if(ability.getName().equals("specialist")) {
+									JMenu specialistMenu = new JMenu("Specialist");
+									menuItem = new JMenuItem("Laser Specialist" + costDesc);
+									menuItem.setActionCommand("SPECIALIST|" + Pilot.SPECIAL_LASER + "|" + cost);
+									menuItem.addActionListener(this);
+									menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
+									specialistMenu.add(menuItem);
+									menuItem = new JMenuItem("Missile Specialist" + costDesc);
+									menuItem.setActionCommand("SPECIALIST|" + Pilot.SPECIAL_MISSILE + "|" + cost);
+									menuItem.addActionListener(this);
+									menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
+									specialistMenu.add(menuItem);
+									menuItem = new JMenuItem("Ballistic Specialist" + costDesc);
+									menuItem.setActionCommand("SPECIALIST|" + Pilot.SPECIAL_BALLISTIC + "|" + cost);
+									menuItem.addActionListener(this);
+									menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
+									specialistMenu.add(menuItem);
+									abMenu.add(specialistMenu);
+								} else {
+									menuItem = new JMenuItem(ability.getDisplayableName() + costDesc);
+									menuItem.setActionCommand("ABILITY|" + ability.getName() + "|" + cost);
+									menuItem.addActionListener(this);
+									menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
+									abMenu.add(menuItem);
+								}
 							}
-							if(abMenu.getItemCount() > 20) {
-			                	MenuScroller.setScrollerFor(abMenu, 20);
-			                }
-							menu.add(abMenu);
 						}
-					} else if(person instanceof SupportPerson) {
-						SupportTeam team = ((SupportPerson)person).getTeam();
-						int type = SkillCosts.SK_TECH;
-						if(team instanceof MedicalTeam) {
-							type = SkillCosts.SK_MED;
+						if(abMenu.getItemCount() > 20) {
+							MenuScroller.setScrollerFor(abMenu, 20);
 						}
-						int cost = campaign.getSkillCosts().getCost(type, team.getRating() + 1, true);
-						String costDesc = " (" + cost + "XP)";
-						if(cost < 0) {
-							costDesc = " (Not Possible)";
-						}
-						menuItem = new JMenuItem(SkillCosts.getSkillName(type)   + costDesc);
-						menuItem.setActionCommand("IMPROVE|" + type + "|" + cost);
-						menuItem.addActionListener(this);
-						menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
-						menu.add(menuItem);
-					}*/
+						menu.add(abMenu);
+					}
 					popup.add(menu);
 				}
 				if(oneSelected) {

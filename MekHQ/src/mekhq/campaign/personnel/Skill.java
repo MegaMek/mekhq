@@ -116,6 +116,10 @@ public class Skill implements Serializable {
 		}	
 	}
 	
+	public void improve() {
+		level = level + 1;
+	}
+	
 	@Override
 	public String toString() {
 		if(type.countUp()) {

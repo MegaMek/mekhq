@@ -7,6 +7,7 @@ v0.1.9 (SVN)
 + SkillType object
 + improvements to CustomizePersonDialog
 + more improvements to CustomizePersonDialog
++ re-added spending XP on skills and special abilities
 
 v0.1.8 (2011-06-13)
 + beginning of custom XP costs
