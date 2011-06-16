@@ -337,6 +337,14 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		Node classNameNode = attrs.getNamedItem("type");
 		String className = classNameNode.getTextContent();
 		
+		//reverse compatability checks
+		if(className.equalsIgnoreCase("mekhq.campaign.parts.MekEngine")) {
+			className = "mekhq.campaign.parts.EnginePart";
+		} 
+		else if(className.equalsIgnoreCase("mekhq.campaign.parts.MissingMekEngine")) {
+			className = "mekhq.campaign.parts.MissingEnginePart";
+		}
+		
 		try {
 			// Instantiate the correct child class, and call its parsing function.
 			retVal = (Part) Class.forName(className).newInstance();
