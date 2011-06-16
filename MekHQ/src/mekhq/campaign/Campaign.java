@@ -1442,9 +1442,6 @@ public class Campaign implements Serializable {
 		for (int x=0; x<retVal.units.size(); x++) {
 			Unit unit = retVal.units.get(x);
 			
-			if (unit.getPilotId() >= 0)
-				//unit.setPilot((PilotPerson) retVal.personnelIds.get(unit.getPilotId()));
-			
 			// Also, the unit should have its campaign set.
 			unit.campaign = retVal;
 			
