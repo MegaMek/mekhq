@@ -8,6 +8,7 @@ v0.1.9 (SVN)
 + improvements to CustomizePersonDialog
 + more improvements to CustomizePersonDialog
 + re-added spending XP on skills and special abilities
++ re-added setting of edge triggers
 
 v0.1.8 (2011-06-13)
 + beginning of custom XP costs

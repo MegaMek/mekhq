@@ -5156,32 +5156,31 @@ public class MekHQView extends FrameView {
 					popup.add(menu);
 				}
 				if(oneSelected) {
-					/*
-					if(person instanceof PilotPerson && campaign.getCampaignOptions().useEdge()) {
+					if(campaign.getCampaignOptions().useEdge()) {
 						menu = new JMenu("Set Edge Triggers");
 						cbMenuItem = new JCheckBoxMenuItem("Head Hits");
-						if (((PilotPerson)person).getPilot().getOptions().booleanOption("edge_when_headhit")) {
+						if (person.getOptions().booleanOption("edge_when_headhit")) {
 							cbMenuItem.setSelected(true);
 						}
 						cbMenuItem.setActionCommand("EDGE|edge_when_headhit");
 						cbMenuItem.addActionListener(this);
 						menu.add(cbMenuItem);
 						cbMenuItem = new JCheckBoxMenuItem("Through Armor Crits");
-						if (((PilotPerson)person).getPilot().getOptions().booleanOption("edge_when_tac")) {
+						if (person.getOptions().booleanOption("edge_when_tac")) {
 							cbMenuItem.setSelected(true);
 						}
 						cbMenuItem.setActionCommand("EDGE|edge_when_tac");
 						cbMenuItem.addActionListener(this);
 						menu.add(cbMenuItem);
 						cbMenuItem = new JCheckBoxMenuItem("Fail KO check");
-						if (((PilotPerson)person).getPilot().getOptions().booleanOption("edge_when_ko")) {
+						if (person.getOptions().booleanOption("edge_when_ko")) {
 							cbMenuItem.setSelected(true);
 						}
 						cbMenuItem.setActionCommand("EDGE|edge_when_ko");
 						cbMenuItem.addActionListener(this);
 						menu.add(cbMenuItem);
 						cbMenuItem = new JCheckBoxMenuItem("Ammo Explosion");
-						if (((PilotPerson)person).getPilot().getOptions().booleanOption("edge_when_explosion")) {
+						if (person.getOptions().booleanOption("edge_when_explosion")) {
 							cbMenuItem.setSelected(true);
 						}
 						cbMenuItem.setActionCommand("EDGE|edge_when_explosion");
@@ -5189,7 +5188,6 @@ public class MekHQView extends FrameView {
 						menu.add(cbMenuItem);
 						popup.add(menu);
 					}
-					*/
 				}
 				if(oneSelected) {
 					// change portrait
