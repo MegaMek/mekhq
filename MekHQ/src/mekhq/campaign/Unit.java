@@ -2591,7 +2591,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     	int nGunners = 0;
     	for(int pid : drivers) {
     		Person p = campaign.getPerson(pid);
-    		if(p.getHits() > 0 && !(entity instanceof Mech)) {
+    		if(p.getHits() > 0 && !(entity instanceof Mech || entity instanceof Aero)) {
     			continue;
     		}
     		if(p.hasSkill(driveType)) {
@@ -2601,7 +2601,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     	}
     	for(int pid : gunners) {
     		Person p = campaign.getPerson(pid);
-    		if(p.getHits() > 0 && !(entity instanceof Mech)) {
+    		if(p.getHits() > 0 && !(entity instanceof Mech || entity instanceof Aero)) {
     			continue;
     		}
     		if(p.hasSkill(gunType)) {
@@ -2639,6 +2639,12 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     	Pilot pilot = new Pilot(commander.getFullTitle(), gunnery, piloting);
     	pilot.setPortraitCategory(commander.getPortraitCategory());
     	pilot.setPortraitFileName(commander.getPortraitFileName());
+    	//TODO: record hits (as well as commander hit, driver hit, etc.) 
+    	//TODO: set edge and triggers
+    	//TODO: set toughness
+    	//TODO: set artillery
+    	//TODO: set advantages and implants
+    	//TODO: use single tactics skill with option to use as command and ind init bonus
     	if(commander.hasSkill(SkillType.S_TAC_GROUND)) {
     		pilot.setCommandBonus(commander.getSkill(SkillType.S_TAC_GROUND).getFinalSkillValue());
     	}
