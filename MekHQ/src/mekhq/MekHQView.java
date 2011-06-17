@@ -4754,6 +4754,7 @@ public class MekHQView extends FrameView {
 				int rank = Integer.parseInt(st.nextToken());
 				for(Person person : people) {
 					person.setRank(rank);
+					campaign.personUpdated(person);
 				}
 				refreshServicedUnitList();
 				refreshUnitList();
@@ -4820,6 +4821,7 @@ public class MekHQView extends FrameView {
 				} else {
 					selectedPerson.addSkill(type, 0, 0);
 				}
+				campaign.personUpdated(selectedPerson);
 				selectedPerson.setXp(selectedPerson.getXp() - cost);
 				campaign.addReport(selectedPerson.getName() + " improved " + type + "!");
 				refreshServicedUnitList();
@@ -4833,6 +4835,7 @@ public class MekHQView extends FrameView {
 				String selected = st.nextToken();
 				int cost =  Integer.parseInt(st.nextToken());
 				selectedPerson.acquireAbility(PilotOptions.LVL3_ADVANTAGES, selected, true);
+				campaign.personUpdated(selectedPerson);
 				selectedPerson.setXp(selectedPerson.getXp() - cost);
 				//TODO: add campaign report
 				refreshServicedUnitList();
@@ -4845,6 +4848,7 @@ public class MekHQView extends FrameView {
 				String selected = st.nextToken();
 				int cost =  Integer.parseInt(st.nextToken());
 				selectedPerson.acquireAbility(PilotOptions.LVL3_ADVANTAGES, "weapon_specialist", selected);
+				campaign.personUpdated(selectedPerson);
 				selectedPerson.setXp(selectedPerson.getXp() - cost);
 				//TODO: add campaign report
 				refreshServicedUnitList();
@@ -4857,6 +4861,7 @@ public class MekHQView extends FrameView {
 				String selected = st.nextToken();
 				int cost =  Integer.parseInt(st.nextToken());
 				selectedPerson.acquireAbility(PilotOptions.LVL3_ADVANTAGES, "specialist", selected);
+				campaign.personUpdated(selectedPerson);
 				selectedPerson.setXp(selectedPerson.getXp() - cost);
 				//TODO: add campaign report
 				refreshServicedUnitList();
@@ -4890,6 +4895,7 @@ public class MekHQView extends FrameView {
 			} else if (command.equalsIgnoreCase("EDGE")) {
 				String trigger = st.nextToken();
 				selectedPerson.changeEdgeTrigger(trigger);
+				campaign.personUpdated(selectedPerson);
 				refreshPersonnelList();
 				refreshPersonnelView();
 			} else if (command.equalsIgnoreCase("REMOVE")) {
@@ -4925,6 +4931,7 @@ public class MekHQView extends FrameView {
 						campaign,
 						view);
 				npd.setVisible(true);
+				campaign.personUpdated(selectedPerson);
 				refreshPatientList();
 				refreshDoctorsList();
 				refreshServicedUnitList();
@@ -4936,6 +4943,7 @@ public class MekHQView extends FrameView {
 					person.setHits(0);
 					person.setTeamId(-1);
 				}
+				campaign.personUpdated(selectedPerson);
 				refreshPatientList();
 				refreshDoctorsList();
 				refreshServicedUnitList();
@@ -4949,6 +4957,7 @@ public class MekHQView extends FrameView {
 				pcd.setVisible(true);
 				selectedPerson.setPortraitCategory(pcd.getCategory());
 				selectedPerson.setPortraitFileName(pcd.getFileName());
+				campaign.personUpdated(selectedPerson);
 				refreshPatientList();
 				refreshPersonnelList();
 				refreshOrganization();
@@ -4981,6 +4990,7 @@ public class MekHQView extends FrameView {
 				pvcd.setVisible(true);
 				int i = pvcd.getValue();
 				selectedPerson.setEdge(i);
+				campaign.personUpdated(selectedPerson);
 				refreshPersonnelList();
 			} 
 		}

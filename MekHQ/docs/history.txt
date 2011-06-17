@@ -17,6 +17,7 @@ v0.1.9 (SVN)
 + skill summary for personnel by primary type (using FM: Mercs Supplemental Update)
 + backwards compatability for reading in techs and doctor personnel
 + resetPilotandEntity on unit when loading in XML
++ update entity pilot when personnel characteristics are changed
 
 v0.1.8 (2011-06-13)
 + beginning of custom XP costs

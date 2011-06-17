@@ -2247,4 +2247,12 @@ public class Campaign implements Serializable {
 	}
 	*/
 	
+	public void personUpdated(Person p) {
+		Unit u = getUnit(p.getUnitId());
+		if(null != u) {
+			u.resetPilotAndEntity();
+			
+		}
+	}
+	
 }
