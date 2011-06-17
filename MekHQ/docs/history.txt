@@ -13,6 +13,7 @@ v0.1.9 (SVN)
 + Bug: campaign not being set for units in xml loading
 + assignment of personnel to units (allowing for the assignment of pilots, drivers, gunners, and soldiers)
 + when buying units, don't include default pilot or soldiers (so BA and infantry is just the equipment)
++ reverse compatability in assigning pilots to units for XML loading
 
 v0.1.8 (2011-06-13)
 + beginning of custom XP costs

@@ -1446,6 +1446,9 @@ public class Campaign implements Serializable {
 			// Also, the unit should have its campaign set.
 			unit.campaign = retVal;
 			
+			//for reverse compatability check pilotId
+			unit.reassignPilotReverseCompatabilityCheck();
+			
 			// Okay, last trigger a reCalc.
 			// This should fix some holes in the data.
 			unit.reCalc();

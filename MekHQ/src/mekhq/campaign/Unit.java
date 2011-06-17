@@ -147,6 +147,9 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 
 	private ArrayList<Part> parts;
 
+	//for backwards compatability with 0.1.8, but otherwise is no longer used 
+	private int pilotId = -1;
+	
 	public Unit() {
 		this(null, null);
 	}
@@ -1996,6 +1999,8 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 					retVal.quality = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("site")) {
 					retVal.site = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("pilotId")) {
+					retVal.pilotId = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("salvaged")) {
 					if (wn2.getTextContent().equalsIgnoreCase("true"))
 						retVal.salvaged = true;
@@ -2703,4 +2708,30 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     public boolean isUnmanned() {
     	return drivers.isEmpty() && gunners.isEmpty();
     }
+    
+    /**
+     * This is only used for reverse compatability when loading in from 0.1.8 or before
+     */
+    public void reassignPilotReverseCompatabilityCheck() {
+    	if(pilotId > 0) {
+    		if(usesSoloPilot() || usesSoldiers()) {
+    			if(canTakeMoreDrivers()) {
+    				drivers.add(pilotId);
+    			}
+    			if(canTakeMoreGunners()) {
+    				gunners.add(pilotId);
+    			}
+    		} else {
+    			if(canTakeMoreDrivers()) {
+    				drivers.add(pilotId);
+    			}
+    			else if(canTakeMoreGunners()) {
+    				gunners.add(pilotId);
+    			}
+    		}
+    		pilotId = -1;
+    	}
+    }
+    
+    
 }
