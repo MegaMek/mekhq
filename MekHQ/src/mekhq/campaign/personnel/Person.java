@@ -115,6 +115,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     protected int forceId; 
     protected int scenarioId;
     protected int medicalTeamId;
+    //for reverse compatability v0.1.8 and earlier
+    protected int teamId = -1;
     
     //days of rest
     protected int daysRest;
@@ -505,6 +507,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 					retVal.scenarioId = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("id")) {
 					retVal.id = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("teamId")) {
+					retVal.teamId = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("portraitCategory")) {
 					retVal.setPortraitCategory(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("portraitFile")) {
@@ -1144,5 +1148,9 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     
     public void setUnitId(int i) {
     	unitId = i;
+    }
+    
+    public int getOldSupportTeamId() {
+    	return teamId;
     }
 }

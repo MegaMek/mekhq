@@ -1478,22 +1478,50 @@ public class Campaign implements Serializable {
 				}
 			}
 			
-			/*
-			if (psn instanceof SupportPerson) {
-				SupportPerson psn2 = (SupportPerson)psn;
-
-				if (psn2.getTeamId() >= 0) {
-					SupportTeam t = retVal.teamIds.get(psn2.getTeamId());
-					psn2.setTeam(t);
-					//lets just do a double-check and set the person's
-					//type based on the team
-					if(null != t) {
-						psn2.setType(SupportPerson.getTypeBy(t));
+			//reverse compatability check for assigning support personnel
+			//characteristics from their support team
+			if (psn.getOldSupportTeamId() >= 0) {
+				SupportTeam t = retVal.teamIds.get(psn.getOldSupportTeamId());
+				psn.setName(t.getName());
+				int lvl = 0;
+				switch(t.getRating()) {
+				case SupportTeam.EXP_GREEN:
+					lvl = 1;
+					break;
+				case SupportTeam.EXP_REGULAR:
+					lvl = 3;
+					break;
+				case SupportTeam.EXP_VETERAN:
+					lvl = 4;
+					break;
+				case SupportTeam.EXP_ELITE:
+					lvl = 5;
+					break;
+				}
+				if(t instanceof TechTeam) {
+					switch(((TechTeam) t).getType()) {
+					case TechTeam.T_MECH:
+						psn.setType(Person.T_MECH_TECH);
+						psn.addSkill(SkillType.S_TECH_MECH, lvl, 0);
+						break;
+					case TechTeam.T_MECHANIC:
+						psn.setType(Person.T_MECHANIC);
+						psn.addSkill(SkillType.S_TECH_MECHANIC, lvl, 0);
+						break;
+					case TechTeam.T_AERO:
+						psn.setType(Person.T_AERO_TECH);
+						psn.addSkill(SkillType.S_TECH_AERO, lvl, 0);
+						break;
+					case TechTeam.T_BA:
+						psn.setType(Person.T_BA_TECH);
+						psn.addSkill(SkillType.S_TECH_BA, lvl, 0);
+						break;
 					}
-					
+				} else {
+					psn.setType(Person.T_DOCTOR);
+					psn.addSkill(SkillType.S_MEDICAL, lvl, 0);
 				}
 			}
-			*/
 			
 			// Okay, last trigger a reCalc.
 			// This should fix some holes in the data.

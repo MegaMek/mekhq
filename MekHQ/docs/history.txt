@@ -15,6 +15,7 @@ v0.1.9 (SVN)
 + when buying units, don't include default pilot or soldiers (so BA and infantry is just the equipment)
 + reverse compatability in assigning pilots to units for XML loading
 + skill summary for personnel by primary type (using FM: Mercs Supplemental Update)
++ backwards compatability for reading in techs and doctor personnel
 
 v0.1.8 (2011-06-13)
 + beginning of custom XP costs
