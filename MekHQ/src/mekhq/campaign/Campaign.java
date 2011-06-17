@@ -1439,35 +1439,12 @@ public class Campaign implements Serializable {
 			}
 		}
 		
-		// Okay, Units, need their pilot references fixed.
-		for (int x=0; x<retVal.units.size(); x++) {
-			Unit unit = retVal.units.get(x);
-			
-			// Also, the unit should have its campaign set.
-			unit.campaign = retVal;
-			
-			//for reverse compatability check pilotId
-			unit.reassignPilotReverseCompatabilityCheck();
-			
-			// Okay, last trigger a reCalc.
-			// This should fix some holes in the data.
-			unit.reCalc();
-			//just in case parts are missing (i.e. because they weren't tracked in previous versions)
-			unit.initializeParts();
-		}
-		
-		// Some personnel need their task references fixed.
 		// All personnel need the rank reference fixed
 		// some personnel may need to be assigned to scenarios
 		for (int x=0; x<retVal.personnel.size(); x++) {
 			Person psn = retVal.personnel.get(x);
 			
 			psn.setRankSystem(retVal.ranks);
-			/*
-			if(psn instanceof PilotPerson) {
-				((PilotPerson)psn).resetPilotName();
-			}
-			*/
 			
 			Scenario s = retVal.getScenario(psn.getScenarioId());
 			if(null != s) {
@@ -1522,11 +1499,26 @@ public class Campaign implements Serializable {
 					psn.addSkill(SkillType.S_MEDICAL, lvl, 0);
 				}
 			}
-			
-			// Okay, last trigger a reCalc.
-			// This should fix some holes in the data.
-			//psn.reCalc();
 		}
+		
+		// Okay, Units, need their pilot references fixed.
+		for (int x=0; x<retVal.units.size(); x++) {
+			Unit unit = retVal.units.get(x);
+			
+			// Also, the unit should have its campaign set.
+			unit.campaign = retVal;
+			
+			//for reverse compatability check pilotId
+			unit.reassignPilotReverseCompatabilityCheck();
+	
+			//reset the pilot and entity, to reflect newly assigned personnel
+			unit.resetPilotAndEntity();
+			
+			//just in case parts are missing (i.e. because they weren't tracked in previous versions)
+			unit.initializeParts();
+		}
+		
+		
 
 		MekHQApp.logMessage("Load of campaign file complete!");
 
