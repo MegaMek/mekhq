@@ -24,6 +24,16 @@ package mekhq.campaign.personnel;
 import java.io.Serializable;
 import java.util.Hashtable;
 
+import megamek.common.Aero;
+import megamek.common.BattleArmor;
+import megamek.common.ConvFighter;
+import megamek.common.Entity;
+import megamek.common.Infantry;
+import megamek.common.Jumpship;
+import megamek.common.SmallCraft;
+import megamek.common.Tank;
+import megamek.common.VTOL;
+
 /**
  * Skill type will hold static information for each skill type like base target number,
  * whether to count up, and XP costs for advancement.
@@ -157,6 +167,51 @@ public class SkillType implements Serializable {
 	
 	public static SkillType getType(String t) {
 		return lookupHash.get(t);
+	}
+	
+	public static String getDrivingSkillFor(Entity en) {
+		if(en instanceof Tank) {
+			if(en instanceof VTOL) {
+				return S_PILOT_VTOL;
+			}
+			//TODO: identify naval vessel
+			return S_PILOT_GVEE;
+		}
+		else if(en instanceof SmallCraft || en instanceof Jumpship) {
+			return S_PILOT_SPACE;
+		}
+		else if(en instanceof ConvFighter) {
+			return S_PILOT_JET;
+		}
+		else if(en instanceof Aero) {
+			return S_PILOT_AERO;
+		}
+		else if(en instanceof Infantry) {
+			return S_ANTI_MECH;
+		}
+		return S_PILOT_MECH;
+	}
+	
+	public static String getGunnerySkillFor(Entity en) {
+		if(en instanceof Tank) {
+			return S_GUN_VEE;
+		}
+		else if(en instanceof SmallCraft || en instanceof Jumpship) {
+			return S_GUN_SPACE;
+		}
+		else if(en instanceof ConvFighter) {
+			return S_GUN_JET;
+		}
+		else if(en instanceof Aero) {
+			return S_GUN_AERO;
+		}
+		else if(en instanceof Infantry) {
+			if(en instanceof BattleArmor) {
+				return S_GUN_BA;
+			}
+			return S_SMALL_ARMS;
+		}
+		return S_GUN_MECH;
 	}
 	
 	public static SkillType createPilotingMech() {

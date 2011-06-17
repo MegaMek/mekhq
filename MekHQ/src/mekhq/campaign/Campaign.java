@@ -990,12 +990,12 @@ public class Campaign implements Serializable {
 		return pilots;
 	}
 	
-	public ArrayList<Unit> getEligibleUnitsFor(Person person) {
+	public ArrayList<Unit> getEligibleUnitsFor2(Person person) {
 		ArrayList<Unit> units = new ArrayList<Unit>();
 		for (Unit u : this.getUnits()) {
-			if (person.canPilot(u.getEntity())) {
+			//if (person.canPilot(u.getEntity())) {
 				units.add(u);
-			}
+			//}
 		}
 		return units;
 	}

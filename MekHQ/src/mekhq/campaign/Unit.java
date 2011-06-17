@@ -37,11 +37,13 @@ import megamek.common.CriticalSlot;
 import megamek.common.Dropship;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
+import megamek.common.IArmorState;
 import megamek.common.Infantry;
 import megamek.common.Jumpship;
 import megamek.common.Mech;
 import megamek.common.MiscType;
 import megamek.common.Mounted;
+import megamek.common.Pilot;
 import megamek.common.QuadMech;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
@@ -96,6 +98,8 @@ import mekhq.campaign.parts.Turret;
 import mekhq.campaign.parts.TurretLock;
 import mekhq.campaign.parts.VeeSensor;
 import mekhq.campaign.parts.VeeStabiliser;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.work.IAcquisitionWork;
 
 import org.w3c.dom.NamedNodeMap;
@@ -131,12 +135,14 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 
 	private Entity entity;
 	private int site;
-	private int pilotId = -1;
 	private boolean salvaged;
 	private boolean customized;
 	private int id = -1;
 	private int quality;
 
+	private ArrayList<Integer> drivers;
+	private ArrayList<Integer> gunners;
+	
 	public Campaign campaign;
 
 	private ArrayList<Part> parts;
@@ -153,6 +159,8 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 		this.customized = false;
 		this.quality = QUALITY_D;
 		this.parts = new ArrayList<Part>();
+		this.drivers = new ArrayList<Integer>();
+		this.gunners = new ArrayList<Integer>();
 		reCalc();
 	}
 	
@@ -228,14 +236,6 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 	
 	public void setId(int i) {
 		this.id = i;
-	}
-
-	public void setPilotId(int inId) {
-		pilotId = inId;
-	}
-
-	public int getPilotId() {
-		return pilotId;
 	}
 
 	public int getSite() {
@@ -1992,9 +1992,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 			for (int x=0; x<nl.getLength(); x++) {
 				Node wn2 = nl.item(x);
 				
-				if (wn2.getNodeName().equalsIgnoreCase("pilotId")) {
-					retVal.pilotId = Integer.parseInt(wn2.getTextContent());
-				} else if (wn2.getNodeName().equalsIgnoreCase("quality")) {
+				if (wn2.getNodeName().equalsIgnoreCase("quality")) {
 					retVal.quality = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("site")) {
 					retVal.site = Integer.parseInt(wn2.getTextContent());
@@ -2551,5 +2549,159 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     		}
     	}
     	return ammo;
+    }
+    
+    public Person getCommander() {
+    	//take first by rank
+    	//if rank is tied, take gunners over drivers
+    	//if two of the same type are tie rank, take the first one
+    	int bestRank = -1;
+    	Person commander = null;
+    	for(int pid : gunners) {
+    		Person p = campaign.getPerson(pid);
+    		if(p.getRank() > bestRank) {
+    			commander = p;
+    			bestRank = p.getRank();
+    		}
+    	}
+    	for(int pid : drivers) {
+    		Person p = campaign.getPerson(pid);
+    		if(p.getRank() > bestRank) {
+    			commander = p;
+    			bestRank = p.getRank();
+    		}
+    	}
+    	return commander;
+    }
+ 
+    public void resetPilotAndEntity() {
+    	
+    	if(drivers.isEmpty() && gunners.isEmpty()) {
+    		entity.setCrew(null);
+    		return;
+    	}
+    		
+    	int piloting = 13;
+    	int gunnery = 13;	
+    	String driveType = SkillType.getDrivingSkillFor(entity);
+    	String gunType = SkillType.getGunnerySkillFor(entity);
+    	int sumPiloting = 0;
+    	int nDrivers = 0;
+    	int sumGunnery = 0;
+    	int nGunners = 0;
+    	for(int pid : drivers) {
+    		Person p = campaign.getPerson(pid);
+    		if(p.getHits() > 0 && !(entity instanceof Mech)) {
+    			continue;
+    		}
+    		if(p.hasSkill(driveType)) {
+    			sumPiloting += p.getSkill(driveType).getFinalSkillValue();
+    			nDrivers++;
+    		}
+    	}
+    	for(int pid : gunners) {
+    		Person p = campaign.getPerson(pid);
+    		if(p.getHits() > 0 && !(entity instanceof Mech)) {
+    			continue;
+    		}
+    		if(p.hasSkill(gunType)) {
+    			sumGunnery += p.getSkill(gunType).getFinalSkillValue();
+    			nGunners++;
+    		}
+    	}
+    	if(nDrivers > 0) {
+    		piloting = (int)Math.round(sumPiloting/nDrivers);
+    	}
+    	if(nGunners > 0) {
+    		gunnery = (int)Math.round(sumGunnery/nGunners);
+    	}
+    	Person commander = getCommander();
+    	if(null == commander) {
+    		entity.setCrew(null);
+    		return;
+    	}
+    	Pilot pilot = new Pilot(commander.getFullTitle(), gunnery, piloting);
+    	if(commander.hasSkill(SkillType.S_TAC_GROUND)) {
+    		pilot.setCommandBonus(commander.getSkill(SkillType.S_TAC_GROUND).getFinalSkillValue());
+    	}
+    	if(entity instanceof Infantry) {
+    		if(entity instanceof BattleArmor) {
+    			for(int i = BattleArmor.LOC_TROOPER_1; i <= BattleArmor.LOC_TROOPER_6; i++) {
+    				if(i <= nDrivers) {
+    		    		entity.setInternal(1, i);
+    				} else {
+    		    		entity.setInternal(IArmorState.ARMOR_DESTROYED, i);
+    				}
+    			}
+    		}
+    		entity.setInternal(nDrivers, Infantry.LOC_INFANTRY);
+    	}
+    	entity.setCrew(pilot);  		
+    }   
+    
+    public boolean canTakeMoreDrivers() {
+    	int nDrivers = drivers.size();
+    	if(entity instanceof Mech || entity instanceof Tank || entity instanceof Aero) {
+    		//only one driver please
+    		return nDrivers == 0;
+    	}
+    	else if(entity instanceof Infantry) {
+    		return nDrivers < (((Infantry)entity).getSquadN() * ((Infantry)entity).getSquadSize());
+    	}
+    	return false;
+    }
+    
+    public boolean canTakeMoreGunners() {
+    	int nGunners = gunners.size();
+    	if(entity instanceof Mech || entity instanceof Aero) {
+    		//only one gunner please
+    		return nGunners == 0;
+    	}
+    	else if(entity instanceof Tank) {
+    		return nGunners < ((int)Math.ceil(entity.getWeight() / 15.0) - 1);
+    	}
+    	else if(entity instanceof Infantry) {
+    		return nGunners < (((Infantry)entity).getSquadN() * ((Infantry)entity).getSquadSize());
+    	}
+    	return false;
+    }
+    
+    public boolean usesSoloPilot() {
+    	return entity instanceof Mech || entity instanceof Aero 
+    				|| (entity instanceof Tank && entity.getWeight() <= 15);
+    }
+    
+    public boolean usesSoldiers() {
+    	return entity instanceof Infantry;
+    }
+    
+    public void addDriver(Person p) {
+    	drivers.add(p.getId());
+    	p.setUnitId(getId());
+    	resetPilotAndEntity();
+    }
+    
+    public void addGunner(Person p) {
+    	gunners.add(p.getId());
+    	p.setUnitId(getId());
+    	resetPilotAndEntity();
+    }
+    
+    public void addPilotOrSoldier(Person p) {
+    	drivers.add(p.getId());
+    	gunners.add(p.getId());
+    	p.setUnitId(getId());
+    	resetPilotAndEntity();
+    }
+    
+    public void remove(Person p) {
+    	p.setUnitId(-1);
+    	drivers.remove(new Integer(p.getId()));
+    	gunners.remove(new Integer(p.getId()));
+    	resetPilotAndEntity();
+    }
+    
+    public boolean isUnmanned() {
+    	return drivers.isEmpty() && gunners.isEmpty();
     }
 }

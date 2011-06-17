@@ -11,6 +11,7 @@ v0.1.9 (SVN)
 + re-added setting of edge triggers
 + Bug: MekEngine and MissingMekEngine xml loading
 + Bug: campaign not being set for units in xml loading
++ assignment of personnel to units (allowing for the assignment of pilots, drivers, gunners, and soldiers)
 
 v0.1.8 (2011-06-13)
 + beginning of custom XP costs

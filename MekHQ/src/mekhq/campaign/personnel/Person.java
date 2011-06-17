@@ -32,10 +32,14 @@ import java.util.StringTokenizer;
 import java.util.Vector;
 
 import megamek.common.Aero;
+import megamek.common.BattleArmor;
 import megamek.common.ConvFighter;
 import megamek.common.Entity;
+import megamek.common.Infantry;
+import megamek.common.Jumpship;
 import megamek.common.Mech;
 import megamek.common.Pilot;
+import megamek.common.SmallCraft;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.VTOL;
@@ -112,7 +116,6 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     private int hits;
     
     //assignments
-    private Unit unit;
     private int unitId;
     protected int forceId; 
     protected int scenarioId;
@@ -766,6 +769,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     	}*/
     	return level;
     }
+	
 	public String getDesc() {
 		//String care = "";
 		//String status = "";
@@ -1051,9 +1055,9 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     	return type >= T_MECH_TECH;
     }
     
-    public boolean canPilot(Entity ent) {
+    public boolean canDrive(Entity ent) {
     	if(ent instanceof Mech) {
-    		return hasSkill(SkillType.S_GUN_MECH) && hasSkill(SkillType.S_PILOT_MECH);
+    		return hasSkill(SkillType.S_PILOT_MECH);
     	}
     	else if(ent instanceof VTOL) {
     		return hasSkill(SkillType.S_PILOT_VTOL);
@@ -1064,17 +1068,48 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     	else if(ent instanceof ConvFighter) {
     		return hasSkill(SkillType.S_PILOT_JET) || hasSkill(SkillType.S_PILOT_AERO);
     	}
+    	else if(ent instanceof SmallCraft || ent instanceof Jumpship) {
+    		return hasSkill(SkillType.S_PILOT_SPACE);
+    	}
     	else if(ent instanceof Aero) {
     		return hasSkill(SkillType.S_PILOT_AERO);
+    	}
+    	else if(ent instanceof Infantry) {
+    		return true;
     	}
     	return false;
     }
     
-    public Unit getAssignedUnit() {
-    	return unit;
+    public boolean canGun(Entity ent) {
+    	if(ent instanceof Mech) {
+    		return hasSkill(SkillType.S_GUN_MECH);
+    	}
+    	else if(ent instanceof Tank) {
+    		return hasSkill(SkillType.S_GUN_VEE);
+    	}
+    	else if(ent instanceof ConvFighter) {
+    		return hasSkill(SkillType.S_GUN_JET) || hasSkill(SkillType.S_GUN_AERO);
+    	}
+    	else if(ent instanceof SmallCraft || ent instanceof Jumpship) {
+    		return hasSkill(SkillType.S_GUN_SPACE);
+    	}
+    	else if(ent instanceof Aero) {
+    		return hasSkill(SkillType.S_GUN_AERO);
+    	}
+    	else if(ent instanceof BattleArmor) {
+    		return hasSkill(SkillType.S_GUN_BA);
+    	}
+    	else if(ent instanceof Infantry) {
+    		return hasSkill(SkillType.S_SMALL_ARMS);
+    	}
+    	return false;
     }
     
     public int getUnitId() {
     	return unitId;
+    }
+    
+    public void setUnitId(int i) {
+    	unitId = i;
     }
 }

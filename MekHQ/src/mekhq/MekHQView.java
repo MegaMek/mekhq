@@ -2654,7 +2654,7 @@ public class MekHQView extends FrameView {
 		
 		for(int pid : pids) {
 			Person p = campaign.getPerson(pid);
-			Unit u = p.getAssignedUnit();
+			Unit u = campaign.getUnit(p.getUnitId());
 			if (null != u.getEntity()) {
 				if (null == u.checkDeployment()) {
 					chosen.add(u.getEntity());
@@ -4503,13 +4503,17 @@ public class MekHQView extends FrameView {
 					menuItem.setEnabled(true);
 	                popup.add(menuItem);
 	                menu = new JMenu("Add Personnel");
-	                for(Person p : campaign.getPersonnel()) {
-	                	if(p.isActive() && p.getForceId() < 1) {
-			                menuItem = new JMenuItem(p.getDesc());
-		                	menuItem.setActionCommand("ADD_PERSON|" + forceId + "|" + p.getId());
-		                	menuItem.addActionListener(this);
-		                	menuItem.setEnabled(!p.isDeployed());
-		                	menu.add(menuItem);
+	                //only add personnel that are serving as commanders of units
+	                for(Unit u : campaign.getUnits()) {
+	                	if(null != u.getCommander()) {
+	                		Person p = u.getCommander();
+	                		if(p.isActive() && p.getForceId() < 1) {
+				                menuItem = new JMenuItem(p.getFullTitle() + ", " + u.getEntity().getDisplayName());
+			                	menuItem.setActionCommand("ADD_PERSON|" + forceId + "|" + p.getId());
+			                	menuItem.addActionListener(this);
+			                	menuItem.setEnabled(!p.isDeployed());
+			                	menu.add(menuItem);
+		                	}
 	                	}
 	                }
 	                if(menu.getItemCount() > 30) {
@@ -4623,7 +4627,7 @@ public class MekHQView extends FrameView {
             	if(pp.getRank() == 0) {
             		rank = "";
             	}
-            	String name = pp.getName();// + " (" + pp.getPilot().getGunnery() + "/" + pp.getPilot().getPiloting() + ")";
+            	String name = pp.getName();
             	if(pp.needsFixing()) {
             		name = "<font color='red'>" + name + "</font>";
             	}
@@ -4631,7 +4635,10 @@ public class MekHQView extends FrameView {
             	String uname = "";
             	if(null != u) {
             		uname = "<i>" + u.getEntity().getDisplayName() + "</i>";
-            		name = name + ",";
+            		if(null != u.getEntity().getCrew()) {
+            			uname += " (" + u.getEntity().getCrew().getGunnery() + "/" + u.getEntity().getCrew().getPiloting() + ")";
+            		}
+            		name += ",";
             		if(u.isDamaged()) {
                 		uname = "<font color='red'>" + uname + "</font>";
                 	}
@@ -4755,18 +4762,40 @@ public class MekHQView extends FrameView {
 				refreshTechsList();
 				refreshDoctorsList();
 				refreshOrganization();
-			} else if (command.contains("CHANGE_UNIT")) {
+			}  else if (command.contains("REMOVE_UNIT")) {	
+				Unit u = campaign.getUnit(selectedPerson.getUnitId());
+				if(null != u) {
+					u.remove(selectedPerson);
+				}
+				refreshServicedUnitList();
+				refreshUnitList();
+				refreshPersonnelList();
+				refreshOrganization();
+			} else if (command.contains("ADD_PILOT") || command.contains("ADD_SOLDIER")) {
 				int selected = Integer.parseInt(st.nextToken());		
-				if(selected == -1) {
-					Unit u = selectedPerson.getAssignedUnit();
-					if(null != u) {
-						u.removePilot();
-					}
-				} else {
-					Unit u = campaign.getUnit(selected);
-					if(null != u) {
-						//campaign.changePilot(u, selectedPerson);
-					}
+				Unit u = campaign.getUnit(selected);
+				if(null != u) {
+					u.addPilotOrSoldier(selectedPerson);
+				}
+				refreshServicedUnitList();
+				refreshUnitList();
+				refreshPersonnelList();
+				refreshOrganization();
+			} else if (command.contains("ADD_DRIVER")) {
+				int selected = Integer.parseInt(st.nextToken());		
+				Unit u = campaign.getUnit(selected);
+				if(null != u) {
+					u.addDriver(selectedPerson);
+				}
+				refreshServicedUnitList();
+				refreshUnitList();
+				refreshPersonnelList();
+				refreshOrganization();
+			} else if (command.contains("ADD_GUNNER")) {
+				int selected = Integer.parseInt(st.nextToken());		
+				Unit u = campaign.getUnit(selected);
+				if(null != u) {
+					u.addGunner(selectedPerson);
 				}
 				refreshServicedUnitList();
 				refreshUnitList();
@@ -5012,33 +5041,81 @@ public class MekHQView extends FrameView {
 				popup.add(menu);
 				// switch pilot
 				if(oneSelected) {
-					/*
-					if(person instanceof PilotPerson) {
-						PilotPerson pp = (PilotPerson)person;
 						menu = new JMenu("Assign to Unit");
+						JMenu pilotMenu = new JMenu("As Pilot");
+						JMenu driverMenu = new JMenu("As Driver");
+						JMenu gunnerMenu = new JMenu("As Gunner");
+						JMenu soldierMenu = new JMenu("As Soldier");					
 						cbMenuItem = new JCheckBoxMenuItem("None");
-						if(!pp.isAssigned()) {
+						/*if(!person.isAssigned()) {
 							cbMenuItem.setSelected(true);
-						}
-						cbMenuItem.setActionCommand("CHANGE_UNIT|" + -1);
+						}*/
+						cbMenuItem.setActionCommand("REMOVE_UNIT|" + -1);
 						cbMenuItem.addActionListener(this);
 						menu.add(cbMenuItem);
-						for (Unit unit : campaign.getEligibleUnitsFor(person)) {
-							cbMenuItem = new JCheckBoxMenuItem(unit.getEntity().getDisplayName());
-							if (unit.hasPilot()
-									&& (unit.getPilot().getId() == person.getId())) {
-								cbMenuItem.setSelected(true);
+						for (Unit unit : campaign.getUnits()) {
+							if(unit.usesSoloPilot()) {
+								if(unit.canTakeMoreDrivers() && person.canDrive(unit.getEntity()) && person.canGun(unit.getEntity())) {
+									cbMenuItem = new JCheckBoxMenuItem(unit.getEntity().getDisplayName());
+									//TODO: check the box
+									cbMenuItem.setActionCommand("ADD_PILOT|" + unit.getId());
+									cbMenuItem.addActionListener(this);
+									pilotMenu.add(cbMenuItem);
+								}
 							}
-							cbMenuItem.setActionCommand("CHANGE_UNIT|" + unit.getId());
-							cbMenuItem.addActionListener(this);
-							menu.add(cbMenuItem);
+							else if(unit.usesSoldiers()) {
+								if(unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
+									cbMenuItem = new JCheckBoxMenuItem(unit.getEntity().getDisplayName());
+									//TODO: check the box
+									cbMenuItem.setActionCommand("ADD_SOLDIER|" + unit.getId());
+									cbMenuItem.addActionListener(this);
+									soldierMenu.add(cbMenuItem);
+								}
+							} else {
+								if(unit.canTakeMoreDrivers() && person.canDrive(unit.getEntity())) {
+									cbMenuItem = new JCheckBoxMenuItem(unit.getEntity().getDisplayName());
+									//TODO: check the box
+									cbMenuItem.setActionCommand("ADD_DRIVER|" + unit.getId());
+									cbMenuItem.addActionListener(this);
+									driverMenu.add(cbMenuItem);
+								}
+								if(unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
+									cbMenuItem = new JCheckBoxMenuItem(unit.getEntity().getDisplayName());
+									//TODO: check the box
+									cbMenuItem.setActionCommand("ADD_GUNNER|" + unit.getId());
+									cbMenuItem.addActionListener(this);
+									gunnerMenu.add(cbMenuItem);
+								}
+							}
 						}
-						menu.setEnabled(!person.isDeployed());
-						if(menu.getItemCount() > 20) {
-		                	MenuScroller.setScrollerFor(menu, 20);
-		                }
+						if(pilotMenu.getItemCount() > 0) {
+							menu.add(pilotMenu);
+							if(pilotMenu.getItemCount() > 20) {
+			                	MenuScroller.setScrollerFor(pilotMenu, 20);
+			                }
+						}
+						if(driverMenu.getItemCount() > 0) {
+							menu.add(driverMenu);
+							if(driverMenu.getItemCount() > 20) {
+			                	MenuScroller.setScrollerFor(driverMenu, 20);
+			                }
+						}
+						if(gunnerMenu.getItemCount() > 0) {
+							menu.add(gunnerMenu);
+							if(gunnerMenu.getItemCount() > 20) {
+			                	MenuScroller.setScrollerFor(gunnerMenu, 20);
+			                }
+						}
+						if(soldierMenu.getItemCount() > 0) {
+							menu.add(soldierMenu);
+							if(soldierMenu.getItemCount() > 20) {
+			                	MenuScroller.setScrollerFor(soldierMenu, 20);
+			                }
+						}
+						menu.setEnabled(!person.isDeployed());					
 						popup.add(menu);
 						//Assign to Force
+						/*
 						menu = new JMenu("Assign to Force");
 						cbMenuItem = new JCheckBoxMenuItem("None");
 						cbMenuItem.setActionCommand("CHANGE_FORCE|" + -1);
@@ -5054,7 +5131,7 @@ public class MekHQView extends FrameView {
 		                	MenuScroller.setScrollerFor(menu, 20);
 		                }
 						popup.add(menu);
-					}*/
+						*/
 				}
 				menuItem = new JMenuItem("Add XP");
 				menuItem.setActionCommand("XP_ADD");
@@ -5105,11 +5182,12 @@ public class MekHQView extends FrameView {
 									costDesc = " (Not Possible)";
 								}
 								if(ability.getName().equals("weapon_specialist")) {
-									if(null != person.getAssignedUnit()) {
+									Unit u = campaign.getUnit(person.getUnitId());
+									if(null != u) {
 										JMenu specialistMenu = new JMenu("Weapon Specialist");
 										TreeSet<String> uniqueWeapons = new TreeSet<String>();
-										for (int j = 0; j < person.getAssignedUnit().getEntity().getWeaponList().size(); j++) {
-											Mounted m = person.getAssignedUnit().getEntity().getWeaponList().get(j);
+										for (int j = 0; j < u.getEntity().getWeaponList().size(); j++) {
+											Mounted m = u.getEntity().getWeaponList().get(j);
 											uniqueWeapons.add(m.getName());
 										}
 										for (String name : uniqueWeapons) {
@@ -5718,7 +5796,7 @@ public class MekHQView extends FrameView {
             	return p.getSkillSummary();
             }
             if(col == COL_ASSIGN) {
-            	Unit u = p.getAssignedUnit();
+            	Unit u = campaign.getUnit(p.getUnitId());
             	if(null != u) {
             		return u.getEntity().getDisplayName();
             	}
@@ -6766,21 +6844,18 @@ public class MekHQView extends FrameView {
                 return u.getStatus();
             }
             if(col == COL_PILOT) {
-            	return "?";
-            	/*
-            	if(null == pp) {
+            	if(null == u.getCommander()) {
             		return "-";
             	} else {
-            		return pp.getFullTitle();
+            		return u.getCommander().getFullTitle();
             	}
-            	*/
             }
             if(col == COL_BV) {
-            	//if(null == pp) {
+            	if(null == u.getEntity().getCrew()) {
             		return e.calculateBattleValue(true, true);
-            	//} else {
-            		//return e.calculateBattleValue(true, false);
-            	//}
+            	} else {
+            		return e.calculateBattleValue(true, false);
+            	}
             }
             if(col == COL_REPAIR) {
                 return u.getPartsNeedingFixing().size();

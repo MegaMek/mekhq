@@ -80,9 +80,10 @@ public class ResolveScenarioTracker {
 		missingPilots = new ArrayList<Person>();
 		for(int pid : scenario.getForces(campaign).getAllPersonnel()) {
 			Person p = campaign.getPerson(pid);
+			Unit u = campaign.getUnit(p.getUnitId());
 			people.add(p);
-			if(null != p.getAssignedUnit()) {
-				units.add(p.getAssignedUnit());
+			if(null != u) {
+				units.add(u);
 			}
 		}
 		unitList = new JFileChooser(".");
