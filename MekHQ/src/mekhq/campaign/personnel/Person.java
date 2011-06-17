@@ -90,11 +90,6 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     public static final int S_MIA = 3;
     public static final int S_NUM = 4;
 	
-    public static final int EXP_GREEN = 0;
-	public static final int EXP_REGULAR = 1;
-	public static final int EXP_VETERAN = 2;
-	public static final int EXP_ELITE = 3;
-	
     protected int id;
     
     private String name;
@@ -683,13 +678,16 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 
 		double expMult = 1.0;
 		switch(getExperienceLevel()) {
-		case EXP_GREEN:
+		case SkillType.EXP_ULTRA_GREEN:
+			expMult = 0.5;
+			break;
+		case SkillType.EXP_GREEN:
 			expMult = 0.6;
 			break;
-		case EXP_VETERAN:
+		case SkillType.EXP_VETERAN:
 			expMult = 1.6;
 			break;
-		case EXP_ELITE:
+		case SkillType.EXP_ELITE:
 			expMult =3.2;
 			break;
 		default:
@@ -725,8 +723,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 	}
 
 	public String getSkillSummary() {
-    	//return getExperienceLevelName(getExperienceLevel()) + " (" + pilot.getGunnery() + "/" + pilot.getPiloting() + ")";
-		return "";
+    	return SkillType.getExperienceLevelName(getExperienceLevel());
 	}
 
 	public String toString() {
@@ -741,33 +738,69 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 		this.forceId = id;
 	}
 	
-	public static String getExperienceLevelName(int level) {
-    	switch(level) {
-    	case EXP_GREEN:
-    		return "Green";
-    	case EXP_REGULAR:
-    		return "Regular";
-    	case EXP_VETERAN:
-    		return "Veteran";
-    	case EXP_ELITE:
-    		return "Elite";
-    	default:
-    		return "Unknown";
-    	}
-    }
-	
 	public int getExperienceLevel() {
-    	//double average = (pilot.getGunnery() + pilot.getPiloting())/2.0;
-    	int level = EXP_GREEN;;
-    	/*
-    	if(average<=2.5) {
-    		level = EXP_ELITE;
-    	} else if (average <=3.5) {
-    		level = EXP_VETERAN;
-    	} else if (average<=4.5) {
-    		level = EXP_REGULAR;
-    	}*/
-    	return level;
+		switch(type) {
+		case T_MECHWARRIOR:
+			if(hasSkill(SkillType.S_GUN_MECH) && hasSkill(SkillType.S_PILOT_MECH)) {
+				return (int)Math.floor((getSkill(SkillType.S_GUN_MECH).getExperienceLevel() 
+						+ getSkill(SkillType.S_PILOT_MECH).getExperienceLevel()) / 2.0);
+			} else {
+				return -1;
+			}
+		case T_VEE_CREW:
+			if(hasSkill(SkillType.S_GUN_VEE) && hasSkill(SkillType.S_PILOT_GVEE)) {
+				return (int)Math.floor((getSkill(SkillType.S_GUN_VEE).getExperienceLevel() 
+						+ getSkill(SkillType.S_PILOT_GVEE).getExperienceLevel()) / 2.0);
+			} else {
+				return -1;
+			}
+		case T_AERO_PILOT:
+			if(hasSkill(SkillType.S_GUN_AERO) && hasSkill(SkillType.S_PILOT_AERO)) {
+				return (int)Math.floor((getSkill(SkillType.S_GUN_AERO).getExperienceLevel() 
+						+ getSkill(SkillType.S_PILOT_AERO).getExperienceLevel()) / 2.0);
+			} else {
+				return -1;
+			}
+		case T_BA:
+			if(hasSkill(SkillType.S_GUN_BA) && hasSkill(SkillType.S_ANTI_MECH)) {
+				return (int)Math.floor((getSkill(SkillType.S_GUN_BA).getExperienceLevel() 
+						+ getSkill(SkillType.S_ANTI_MECH).getExperienceLevel()) / 2.0);
+			} else {
+				return -1;
+			}
+		case T_MECH_TECH:
+			if(hasSkill(SkillType.S_TECH_MECH)) {
+				return getSkill(SkillType.S_TECH_MECH).getExperienceLevel();
+			} else {
+				return -1;
+			}
+		case T_MECHANIC:
+			if(hasSkill(SkillType.S_TECH_MECHANIC)) {
+				return getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel();
+			} else {
+				return -1;
+			}
+		case T_AERO_TECH:
+			if(hasSkill(SkillType.S_TECH_AERO)) {
+				return getSkill(SkillType.S_TECH_AERO).getExperienceLevel();
+			} else {
+				return -1;
+			}
+		case T_BA_TECH:
+			if(hasSkill(SkillType.S_TECH_BA)) {
+				return getSkill(SkillType.S_TECH_BA).getExperienceLevel();
+			} else {
+				return -1;
+			}
+		case T_DOCTOR:
+			if(hasSkill(SkillType.S_MEDICAL)) {
+				return getSkill(SkillType.S_MEDICAL).getExperienceLevel();
+			} else {
+				return -1;
+			}
+		default:
+			return -1;
+		}
     }
 	
 	public String getDesc() {

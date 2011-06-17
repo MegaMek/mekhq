@@ -5339,8 +5339,8 @@ public class MekHQView extends FrameView {
         private final static int COL_CALL =    2;
         private final static int COL_AGE =     3;
         private final static int COL_GENDER =  4;
-        private final static int COL_TYPE =    5;
-        private final static int COL_SKILL =   6;
+        private final static int COL_SKILL =   5;
+        private final static int COL_TYPE =    6;
         private final static int COL_ASSIGN =  7;
         private final static int COL_FORCE  =  8;
         private final static int COL_DEPLOY =  9;
@@ -5491,14 +5491,14 @@ public class MekHQView extends FrameView {
         
         public int getColumnWidth(int c) {
             switch(c) {
-            case COL_TYPE:
         	case COL_RANK:
         	case COL_DEPLOY:
         		return 70;
             case COL_CALL:
             case COL_SALARY:
-                return 50;        
             case COL_SKILL:
+                return 50;        
+            case COL_TYPE:
             case COL_FORCE:
                 return 100;
             case COL_NAME:
@@ -5520,6 +5520,7 @@ public class MekHQView extends FrameView {
             case COL_DEPLOY:
             case COL_FORCE:
             case COL_ASSIGN:
+            case COL_SKILL:
             	return SwingConstants.LEFT;
             default:
             	return SwingConstants.CENTER;
@@ -5952,24 +5953,29 @@ public class MekHQView extends FrameView {
 				//probably easiest to turn into numbers and then sort that way
 				int l0 = 0;
 				int l1 = 0;
-				//TODO: use the information on skill levels in SupportPerson
-				if(s0.contains("Regular")) {
+				if(s0.contains("Green")) {
 					l0 = 1;
 				}
-				if(s1.contains("Regular")) {
+				if(s1.contains("Green")) {
 					l1 = 1;
 				}
-				if(s0.contains("Veteran")) {
+				if(s0.contains("Regular")) {
 					l0 = 2;
 				}
-				if(s1.contains("Veteran")) {
+				if(s1.contains("Regular")) {
 					l1 = 2;
 				}
-				if(s0.contains("Elite")) {
+				if(s0.contains("Veteran")) {
 					l0 = 3;
 				}
-				if(s1.contains("Elite")) {
+				if(s1.contains("Veteran")) {
 					l1 = 3;
+				}
+				if(s0.contains("Elite")) {
+					l0 = 4;
+				}
+				if(s1.contains("Elite")) {
+					l1 = 4;
 				}
 				return ((Comparable<Integer>)l0).compareTo(l1);
 			}			

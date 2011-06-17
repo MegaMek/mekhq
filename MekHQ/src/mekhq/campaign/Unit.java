@@ -2637,6 +2637,8 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     		return;
     	}
     	Pilot pilot = new Pilot(commander.getFullTitle(), gunnery, piloting);
+    	pilot.setPortraitCategory(commander.getPortraitCategory());
+    	pilot.setPortraitFileName(commander.getPortraitFileName());
     	if(commander.hasSkill(SkillType.S_TAC_GROUND)) {
     		pilot.setCommandBonus(commander.getSkill(SkillType.S_TAC_GROUND).getFinalSkillValue());
     	}

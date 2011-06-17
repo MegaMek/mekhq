@@ -120,6 +120,10 @@ public class Skill implements Serializable {
 		level = level + 1;
 	}
 	
+	public int getExperienceLevel() {
+		return type.getExperienceLevel(getFinalSkillValue());
+	}
+	
 	@Override
 	public String toString() {
 		if(type.countUp()) {

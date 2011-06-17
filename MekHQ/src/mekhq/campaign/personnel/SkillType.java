@@ -88,6 +88,12 @@ public class SkillType implements Serializable {
 	
     private static Hashtable<String, SkillType> lookupHash;
 
+    public static final int EXP_ULTRA_GREEN = 0;
+    public static final int EXP_GREEN = 1;
+	public static final int EXP_REGULAR = 2;
+	public static final int EXP_VETERAN = 3;
+	public static final int EXP_ELITE = 4;
+    
 	private String name;
 	private int target;
 	private boolean countUp;
@@ -130,6 +136,108 @@ public class SkillType implements Serializable {
 		return costs[lvl];
 	}
 	
+	public boolean isPiloting() {
+		return name.equals(S_PILOT_MECH) || name.equals(S_PILOT_AERO)
+					|| name.equals(S_PILOT_GVEE) || name.equals(S_PILOT_VTOL)
+					|| name.equals(S_PILOT_NVEE) || name.equals(S_PILOT_JET)
+					|| name.equals(S_PILOT_SPACE);
+	}
+	
+	public boolean isGunnery() {
+		return name.equals(S_GUN_MECH) || name.equals(S_GUN_AERO)
+					|| name.equals(S_GUN_VEE) || name.equals(S_GUN_BA)
+					|| name.equals(S_SMALL_ARMS) || name.equals(S_GUN_JET)
+					|| name.equals(S_GUN_SPACE) || name.equals(S_ARTILLERY);
+	}
+	
+	public int getExperienceLevel(int value) {
+		if(countUp()) {
+			if(value <= 0) {
+				return EXP_ULTRA_GREEN;
+			}
+			else if(value == 1) {
+				return EXP_GREEN;
+			}
+			else if(value == 2) {
+				return EXP_REGULAR;
+			}
+			else if(value <= 5) {
+				return EXP_VETERAN;
+			}
+			else {
+				return EXP_ELITE;
+			}
+		}
+		else if(isPiloting() || name.equals(S_ANTI_MECH)) {
+			if(value >= 8) {
+				return EXP_ULTRA_GREEN;
+			}
+			else if(value >= 6) {
+				return EXP_GREEN;
+			}
+			else if(value == 5) {
+				return EXP_REGULAR;
+			}
+			else if(value == 4) {
+				return EXP_VETERAN;
+			}
+			else {
+				return EXP_ELITE;
+			}
+		}
+		else if(isGunnery()) {
+			if(value >= 7) {
+				return EXP_ULTRA_GREEN;
+			}
+			else if(value >= 5) {
+				return EXP_GREEN;
+			}
+			else if(value == 4) {
+				return EXP_REGULAR;
+			}
+			else if(value >= 3) {
+				return EXP_VETERAN;
+			}
+			else {
+				return EXP_ELITE;
+			}
+		}
+		else if(name.equals(S_MEDICAL)) {
+			if(value >= 11) {
+				return EXP_ULTRA_GREEN;
+			}
+			else if(value == 10) {
+				return EXP_GREEN;
+			}
+			else if(value == 8) {
+				return EXP_REGULAR;
+			}
+			else if(value >= 7) {
+				return EXP_VETERAN;
+			}
+			else {
+				return EXP_ELITE;
+			}
+		}
+		else {
+			if(value >= 10) {
+				return EXP_ULTRA_GREEN;
+			}
+			else if(value >= 8) {
+				return EXP_GREEN;
+			}
+			else if(value == 7) {
+				return EXP_REGULAR;
+			}
+			else if(value >= 6) {
+				return EXP_VETERAN;
+			}
+			else {
+				return EXP_ELITE;
+			}
+		}
+	}
+	
 	public static void initializeTypes() {
 		lookupHash = new Hashtable<String, SkillType>();
 		lookupHash.put(S_PILOT_MECH, createPilotingMech());
@@ -168,6 +276,23 @@ public class SkillType implements Serializable {
 	public static SkillType getType(String t) {
 		return lookupHash.get(t);
 	}
+	
+	public static String getExperienceLevelName(int level) {
+    	switch(level) {
+    	case EXP_ULTRA_GREEN:
+    		return "Ultra-Green";
+    	case EXP_GREEN:
+    		return "Green";
+    	case EXP_REGULAR:
+    		return "Regular";
+    	case EXP_VETERAN:
+    		return "Veteran";
+    	case EXP_ELITE:
+    		return "Elite";
+    	default:
+    		return "Unknown";
+    	}
+    }
 	
 	public static String getDrivingSkillFor(Entity en) {
 		if(en instanceof Tank) {
