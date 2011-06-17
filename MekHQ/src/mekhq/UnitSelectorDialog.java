@@ -379,6 +379,7 @@ private void btnBuyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:
             //separate button
             campaign.addUnit(en, false);
         } else if (campaign.buyUnit(en, false)) {
+        	hqView.refreshUnitList();
             hqView.refreshServicedUnitList();
         } else {
             ResourceMap resourceMap = MekHQApp.getApplication().getContext().getResourceMap(UnitSelectorDialog.class);

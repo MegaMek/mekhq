@@ -439,6 +439,7 @@ public class Campaign implements Serializable {
 		// collect all the work items outstanding on this unit and add them
 		// to the workitem vector
 		unit.initializeParts();
+		unit.resetPilotAndEntity();
 		addReport(unit.getEntity().getDisplayName() + " has been added to the unit roster.");
 	}
 

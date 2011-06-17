@@ -5519,6 +5519,7 @@ public class MekHQView extends FrameView {
             case COL_TYPE:
             case COL_DEPLOY:
             case COL_FORCE:
+            case COL_ASSIGN:
             	return SwingConstants.LEFT;
             default:
             	return SwingConstants.CENTER;

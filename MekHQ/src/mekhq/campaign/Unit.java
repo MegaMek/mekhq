@@ -2575,11 +2575,6 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     }
  
     public void resetPilotAndEntity() {
-    	
-    	if(drivers.isEmpty() && gunners.isEmpty()) {
-    		entity.setCrew(null);
-    		return;
-    	}
     		
     	int piloting = 13;
     	int gunnery = 13;	
@@ -2615,18 +2610,9 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     	if(nGunners > 0) {
     		gunnery = (int)Math.round(sumGunnery/nGunners);
     	}
-    	Person commander = getCommander();
-    	if(null == commander) {
-    		entity.setCrew(null);
-    		return;
-    	}
-    	Pilot pilot = new Pilot(commander.getFullTitle(), gunnery, piloting);
-    	if(commander.hasSkill(SkillType.S_TAC_GROUND)) {
-    		pilot.setCommandBonus(commander.getSkill(SkillType.S_TAC_GROUND).getFinalSkillValue());
-    	}
     	if(entity instanceof Infantry) {
     		if(entity instanceof BattleArmor) {
-    			for(int i = BattleArmor.LOC_TROOPER_1; i <= BattleArmor.LOC_TROOPER_6; i++) {
+    			for(int i = BattleArmor.LOC_TROOPER_1; i <= ((BattleArmor)entity).getTroopers(); i++) {
     				if(i <= nDrivers) {
     		    		entity.setInternal(1, i);
     				} else {
@@ -2635,6 +2621,19 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     			}
     		}
     		entity.setInternal(nDrivers, Infantry.LOC_INFANTRY);
+    	}
+    	if(drivers.isEmpty() && gunners.isEmpty()) {
+    		entity.setCrew(null);
+    		return;
+    	}
+    	Person commander = getCommander();
+    	if(null == commander) {
+    		entity.setCrew(null);
+    		return;
+    	}
+    	Pilot pilot = new Pilot(commander.getFullTitle(), gunnery, piloting);
+    	if(commander.hasSkill(SkillType.S_TAC_GROUND)) {
+    		pilot.setCommandBonus(commander.getSkill(SkillType.S_TAC_GROUND).getFinalSkillValue());
     	}
     	entity.setCrew(pilot);  		
     }   
