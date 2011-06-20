@@ -200,23 +200,23 @@ public class ForceViewPanel extends javax.swing.JPanel {
     	String assigned = "";
     	String type = null;
     	ArrayList<Person> people = new ArrayList<Person>();
-    	for(int pid : force.getAllPersonnel()) {
-    		Person p = campaign.getPerson(pid);
-    		if(null != p) {
-    			Unit u = campaign.getUnit(p.getUnitId());
-    			if(null != u) {
-    				number++;
-    				bv += u.getEntity().calculateBattleValue(true, false);
-    				cost += u.getEntity().getCost(true);
-    				ton += u.getEntity().getWeight();
-    				String utype = UnitType.getTypeDisplayableName(UnitType.determineUnitTypeCode(u.getEntity()));
-    				if(null == type) {
-    					type = utype;
-    				} else if(!utype.equals(type)) {
-    					type = "Mixed";
-    				}
+    	for(int uid : force.getAllUnits()) {
+    		Unit u = campaign.getUnit(uid);
+    		if(null != u) {
+    			Person p = u.getCommander();
+    			number++;
+    			bv += u.getEntity().calculateBattleValue(true, null == p);
+    			cost += u.getEntity().getCost(true);
+    			ton += u.getEntity().getWeight();
+    			String utype = UnitType.getTypeDisplayableName(UnitType.determineUnitTypeCode(u.getEntity()));
+    			if(null == type) {
+    				type = utype;
+    			} else if(!utype.equals(type)) {
+    				type = "Mixed";
     			}
-    			people.add(p);
+    			if(null != p) {
+    				people.add(p);
+    			}
     		}
     	}
  		//sort person vector by rank
@@ -392,25 +392,36 @@ public class ForceViewPanel extends javax.swing.JPanel {
 		}
 		JLabel lblPerson;
 		JLabel lblUnit;		
-		ArrayList<Person> people = new ArrayList<Person>();
- 		for(int pid : force.getPersonnel()) {
-			Person p = campaign.getPerson(pid);
-			if(null == p) {
+		ArrayList<Unit> units = new ArrayList<Unit>();
+		ArrayList<Unit> unmannedUnits = new ArrayList<Unit>();
+ 		for(int uid : force.getUnits()) {
+			Unit u = campaign.getUnit(uid);
+			if(null == u) {
 				continue;
 			}
-			people.add(p);
+			if(null == u.getCommander()) {
+				unmannedUnits.add(u);
+			} else {
+				units.add(u);
+			}
  		}
  		//sort person vector by rank
- 		Collections.sort(people, new Comparator<Person>(){		 
-            public int compare(final Person p1, final Person p2) {
-               return ((Comparable<Integer>)p2.getRank()).compareTo(p1.getRank());
+ 		Collections.sort(units, new Comparator<Unit>(){		 
+            public int compare(final Unit u1, final Unit u2) {
+               return ((Comparable<Integer>)u2.getCommander().getRank()).compareTo(u1.getCommander().getRank());
             }
         });
- 		for(Person p : people) {
+ 		for(Unit u : unmannedUnits) {
+ 			units.add(u);
+ 		}
+ 		for(Unit u : units) {
+ 			Person p = u.getCommander();
  			lblPerson = new JLabel();
 			lblUnit = new JLabel();
-			lblPerson.setText(getSummaryFor(p));
-			setPortrait(p, lblPerson);
+			if(null != p) {
+				lblPerson.setText(getSummaryFor(p));
+				setPortrait(p, lblPerson);
+			}
 			nexty++;
 			gridBagConstraints = new java.awt.GridBagConstraints();
 			gridBagConstraints.gridx = 0;
@@ -420,7 +431,6 @@ public class ForceViewPanel extends javax.swing.JPanel {
 			gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 			pnlSubUnits.add(lblPerson, gridBagConstraints);
-			Unit u = campaign.getUnit(p.getUnitId());
 			if(null != u) {
 				lblUnit.setText(getSummaryFor(u));
 				lblUnit.setIcon(new ImageIcon(getImageFor(u, lblUnit)));			
@@ -534,17 +544,17 @@ public class ForceViewPanel extends javax.swing.JPanel {
     	int number = 0;
     	String commander = "No personnel found";
     	ArrayList<Person> people = new ArrayList<Person>();
-    	for(int pid : f.getAllPersonnel()) {
-    		Person p = campaign.getPerson(pid);
-    		if(null != p) {
-    			Unit u = campaign.getUnit(p.getUnitId());
-    			if(null != u) {
-    				number++;
-    				bv += u.getEntity().calculateBattleValue(true, false);
-    				cost += u.getEntity().getCost(true);
-    				ton += u.getEntity().getWeight();
+    	for(int uid : f.getAllUnits()) {
+    		Unit u = campaign.getUnit(uid);
+    		if(null != u) {
+    			Person p = u.getCommander();
+    			number++;
+    			bv += u.getEntity().calculateBattleValue(true, false);
+    			cost += u.getEntity().getCost(true);
+    			ton += u.getEntity().getWeight();
+    			if(null != p) {
+    				people.add(p);
     			}
-    			people.add(p);
     		}
     	}
  		//sort person vector by rank

@@ -113,7 +113,6 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     
     //assignments
     private int unitId;
-    protected int forceId; 
     protected int scenarioId;
     protected int medicalTeamId;
     //for reverse compatability v0.1.8 and earlier
@@ -149,7 +148,6 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         salary = -1;
         ranks = r;
         scenarioId = -1;
-        forceId = -1;
         medicalTeamId = -1;
         unitId = -1;
     }
@@ -361,7 +359,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     	//there is a hiccup
     	if(s.isCurrent()) {
     		//TODO: this doesn't work right
-    		s.removePersonnel(id);
+    		//s.removePersonnel(id);
     	}
     	scenarioId = -1;
     }
@@ -425,10 +423,6 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 				+"<rank>"
 				+rank
 				+"</rank>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<forceId>"
-				+forceId
-				+"</forceId>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<medicalTeamId>"
 				+medicalTeamId
@@ -522,8 +516,6 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 					retVal.gender = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("rank")) {
 					retVal.rank = Integer.parseInt(wn2.getTextContent());
-				} else if (wn2.getNodeName().equalsIgnoreCase("forceId")) {
-					retVal.forceId = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("medicalTeamId")) {
 					retVal.medicalTeamId = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("unitId")) {
@@ -743,14 +735,6 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 
 	public String toString() {
 		return getDesc();
-	}
-	
-	public int getForceId() {
-		return forceId;
-	}
-	
-	public void setForceId(int id) {
-		this.forceId = id;
 	}
 	
 	public int getExperienceLevel() {

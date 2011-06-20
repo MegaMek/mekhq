@@ -26,6 +26,7 @@ import java.io.Serializable;
 import java.util.Vector;
 
 import mekhq.MekHQApp;
+import mekhq.campaign.personnel.Person;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -56,7 +57,7 @@ public class Force implements Serializable {
 	private String desc;
 	private Force parentForce;
 	private Vector<Force> subForces;
-	private Vector<Integer> personnel;
+	private Vector<Integer> units;
 	private int scenarioId;
 
 	//an ID so that forces can be tracked in Campaign hash
@@ -67,7 +68,7 @@ public class Force implements Serializable {
 		this.desc = "";
 		this.parentForce = null;
 		this.subForces = new Vector<Force>();
-		this.personnel = new Vector<Integer>();
+		this.units = new Vector<Integer>();
 		this.scenarioId = -1;
 	}
 	
@@ -148,71 +149,71 @@ public class Force implements Serializable {
 		subForces.add(sub);
 	}
 	
-	public Vector<Integer> getPersonnel() {
-		return personnel;
+	public Vector<Integer> getUnits() {
+		return units;
 	}
 	
 	/**
-	 * This returns all the personnel ids in this force and all of its subforces
+	 * This returns all the unit ids in this force and all of its subforces
 	 * @return
 	 */
-	public Vector<Integer> getAllPersonnel() {
-		Vector<Integer> people = new Vector<Integer>();
-		for(int pid : personnel) {
-			people.add(pid);
+	public Vector<Integer> getAllUnits() {
+		Vector<Integer> allUnits = new Vector<Integer>();
+		for(int uid : units) {
+			allUnits.add(uid);
 		}
 		for(Force f : subForces) {
-			people.addAll(f.getAllPersonnel());
+			allUnits.addAll(f.getAllUnits());
 		}
-		return people;	
+		return allUnits;	
 	}
 	
 	/**
-	 * Add a person id to the personnel vector. In general, this 
-	 * should not be called directly to add personnel because they will
-	 * not be assigned a force id. Use {@link Campaign#addPersonToForce(mekhq.campaign.personnel.Person, int)}
+	 * Add a unit id to the units vector. In general, this 
+	 * should not be called directly to add unid because they will
+	 * not be assigned a force id. Use {@link Campaign#addUnitToForce(mekhq.campaign.Unit, int)}
 	 * instead
-	 * @param pid
+	 * @param uid
 	 */
-	public void addPerson(int pid) {
-		personnel.add(pid);
+	public void addUnit(int uid) {
+		units.add(uid);
 	}
 	
 	/**
-	 * This should not be directly called except by {@link Campaign#RemovePersonFromForce(mekhq.campaign.personnel.Person)}
+	 * This should not be directly called except by {@link Campaign#RemoveUnitFromForce(mekhq.campaign.Unit)}
 	 * instead
 	 * @param id
 	 */
-	public void removePerson(int id) {
+	public void removeUnit(int id) {
 		int idx = 0;
 		boolean found = false;
-		for(int pid : getPersonnel()) {
-			if(pid == id) {
+		for(int uid : getUnits()) {
+			if(uid == id) {
 				found = true;
 				break;
 			}
 			idx++;
 		}
 		if(found) {
-			personnel.remove(idx);
+			units.remove(idx);
 		}
 	}
 	
-	public boolean removePersonFromAllForces(int id) {
+	public boolean removeUnitFromAllForces(int id) {
 		int idx = 0;
 		boolean found = false;
-		for(int pid : getPersonnel()) {
-			if(pid == id) {
+		for(int uid : getUnits()) {
+			if(uid == id) {
 				found = true;
 				break;
 			}
 			idx++;
 		}
 		if(found) {
-			personnel.remove(idx);
+			units.remove(idx);
 		} else {
 			for(Force sub : getSubForces()) {
-				found = sub.removePersonFromAllForces(id);
+				found = sub.removeUnitFromAllForces(id);
 				if(found) {
 					break;
 				}
@@ -290,17 +291,15 @@ public class Force implements Serializable {
 				+"<scenarioId>"
 				+scenarioId
 				+"</scenarioId>");
-		if(personnel.size() > 0) {
-			//for now I am just going to print person ids to xml
-			//TODO: change personnel to a vector of ids rather than persons
+		if(units.size() > 0) {
 			pw1.println(MekHqXmlUtil.indentStr(indent+1)
-					+"<personnel>");
-			for(int pid : personnel) {
+					+"<units>");
+			for(int uid : units) {
 				pw1.println(MekHqXmlUtil.indentStr(indent+2)
-						+"<person id=\"" + pid + "\"/>");
+						+"<unit id=\"" + uid + "\"/>");
 			}
 			pw1.println(MekHqXmlUtil.indentStr(indent+1)
-					+"</personnel>");
+					+"</units>");
 		}
 		if(subForces.size() > 0) {
 			pw1.println(MekHqXmlUtil.indentStr(indent+1)
@@ -338,8 +337,10 @@ public class Force implements Serializable {
 					retVal.iconFileName = wn2.getTextContent();
 				} else if (wn2.getNodeName().equalsIgnoreCase("scenarioId")) {
 					retVal.scenarioId = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("units")) {
+						processUnitNodes(retVal, wn2);
 				} else if (wn2.getNodeName().equalsIgnoreCase("personnel")) {
-						processPersonnelNodes(retVal, wn2);
+						processPersonnelNodes(retVal, wn2, c);
 				} else if (wn2.getNodeName().equalsIgnoreCase("subforces")) {
 					NodeList nl2 = wn2.getChildNodes();
 					for (int y=0; y<nl2.getLength(); y++) {
@@ -370,7 +371,7 @@ public class Force implements Serializable {
 		return retVal;
 	}
 	
-	private static void processPersonnelNodes(Force retVal, Node wn) {
+	private static void processUnitNodes(Force retVal, Node wn) {
 	
 		NodeList nl = wn.getChildNodes();
 		for (int x=0; x<nl.getLength(); x++) {
@@ -380,7 +381,32 @@ public class Force implements Serializable {
 			NamedNodeMap attrs = wn2.getAttributes();
 			Node classNameNode = attrs.getNamedItem("id");
 			String idString = classNameNode.getTextContent();
-			retVal.addPerson(Integer.parseInt(idString));			
+			retVal.addUnit(Integer.parseInt(idString));			
+		}
+	}
+	
+	/**
+	 * for backwards compatability
+	 * @param retVal
+	 * @param wn
+	 */
+	private static void processPersonnelNodes(Force retVal, Node wn, Campaign c) {
+		
+		NodeList nl = wn.getChildNodes();
+		for (int x=0; x<nl.getLength(); x++) {
+			Node wn2 = nl.item(x);
+			if (wn2.getNodeType() != Node.ELEMENT_NODE)
+				continue;
+			NamedNodeMap attrs = wn2.getAttributes();
+			Node classNameNode = attrs.getNamedItem("id");
+			int id = Integer.parseInt(classNameNode.getTextContent());
+			Person p = c.getPerson(id);
+			if(null != p) {
+				Unit u = c.getUnit(p.getUnitId());
+				if(null != u) {
+					retVal.addUnit(u.getId());		
+				}
+			}
 		}
 	}
 	

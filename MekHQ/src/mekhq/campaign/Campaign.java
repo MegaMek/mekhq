@@ -280,17 +280,17 @@ public class Campaign implements Serializable {
 	}
 	
 	/**
-	 * Add person to an existing force. This method will also
-	 * assign that force's id to the person.
+	 * Add unit to an existing force. This method will also
+	 * assign that force's id to the unit.
 	 * @param p
 	 * @param id
 	 */
-	public void addPersonToForce(Person p, int id) {
+	public void addUnitToForce(Unit u, int id) {
 		Force force = forceIds.get(id);
 		if(null != force) {
-			p.setForceId(id);
-			force.addPerson(p.getId());
-			p.setScenarioId(force.getScenarioId());
+			u.setForceId(id);
+			force.addUnit(u.getId());
+			//p.setScenarioId(force.getScenarioId());
 		}
 	}
 	
@@ -926,11 +926,11 @@ public class Campaign implements Serializable {
 		int fid = force.getId();
 		forceIds.remove(new Integer(fid));
 		//clear forceIds of all personnel with this force
-		for(Person p : personnel) {
-			if(p.getForceId() == fid) {
-				p.setForceId(-1);
+		for(Unit u : units) {
+			if(u.getForceId() == fid) {
+				u.setForceId(-1);
 				if(force.isDeployed()) {
-					p.setScenarioId(-1);
+					//p.setScenarioId(-1);
 				}
 			}
 		}
@@ -944,17 +944,26 @@ public class Campaign implements Serializable {
 		}	
 	}
 	
-	public void removePersonFromForce(Person p) {
-		Force force = getForce(p.getForceId());
+	public void removeUnitFromForce(Unit u) {
+		Force force = getForce(u.getForceId());
 		if(null != force) {
-			force.removePerson(p.getId());
-			p.setForceId(-1);
-			p.setScenarioId(-1);
+			force.removeUnit(u.getId());
+			u.setForceId(-1);
+			//p.setScenarioId(-1);
 		}
 	}
 	 
+	public Force getForceFor(Unit u) {
+		return getForce(u.getForceId());
+	}
+	
 	public Force getForceFor(Person p) {
-		return getForce(p.getForceId());
+		Unit u = getUnit(p.getUnitId());
+		if(null == u) {
+			return null;
+		} else {
+			return getForceFor(u);
+		}
 	}
 
 	/**
@@ -1429,6 +1438,13 @@ public class Campaign implements Serializable {
 			if(null != s) {
 				s.addForces(fid);
 			}
+			//some units may need force id set for backwards compatability
+			for(int uid : f.getUnits()) {
+				Unit u = retVal.getUnit(uid);
+				if(null != u) {
+					u.setForceId(f.getId());
+				}
+			}
 		}
 		
 		// Process parts...
@@ -1452,9 +1468,9 @@ public class Campaign implements Serializable {
 			if(null != s) {
 				//most personnel will be properly assigned through their
 				//force, so check to make sure they aren't already here
-				if(!s.isAssigned(psn, retVal)) {
-					s.addPersonnel(psn.getId());
-				}
+				//if(!s.isAssigned(psn, retVal)) {
+					//s.addPersonnel(psn.getId());
+				//}
 			}
 			
 			//reverse compatability check for assigning support personnel

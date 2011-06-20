@@ -29,6 +29,7 @@ import mekhq.MekHQApp;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Force;
 import mekhq.campaign.MekHqXmlUtil;
+import mekhq.campaign.Unit;
 import mekhq.campaign.personnel.Person;
 
 import org.w3c.dom.NamedNodeMap;
@@ -61,7 +62,7 @@ public class Scenario implements Serializable {
 	private int status;
 	private Date date;
 	private ArrayList<Integer> subForceIds;
-	private ArrayList<Integer> personnelIds;
+	private ArrayList<Integer> unitIds;
 	private int id = -1;
 	private int missionId;
 	
@@ -76,7 +77,7 @@ public class Scenario implements Serializable {
 		this.status = S_CURRENT;
 		this.date = null;
 		this.subForceIds = new ArrayList<Integer>();
-		this.personnelIds = new ArrayList<Integer>();
+		this.unitIds = new ArrayList<Integer>();
 	}
 	
 	public static String getStatusName(int s) {
@@ -165,8 +166,8 @@ public class Scenario implements Serializable {
 				force.addSubForce(sub, false);
 			}
 		}
-		for(int pid : personnelIds) {
-			force.addPerson(pid);
+		for(int uid : unitIds) {
+			force.addUnit(uid);
 		}
 		return force;
 	}
@@ -175,20 +176,20 @@ public class Scenario implements Serializable {
 		subForceIds.add(fid);
 	}
 	
-	public void addPersonnel(int pid) {
-		personnelIds.add(pid);
+	public void addUnit(int uid) {
+		unitIds.add(uid);
 	}
 	
-	public void removePersonnel(int pid) {
+	public void removeUnit(int uid) {
 		int idx = -1;
-		for(int i = 0; i < personnelIds.size(); i++) {
-			if(pid == personnelIds.get(i)) {
+		for(int i = 0; i < unitIds.size(); i++) {
+			if(uid == unitIds.get(i)) {
 				idx = i;
 				break;
 			}
 		}
 		if(idx > -1) {
-			personnelIds.remove(idx);
+			unitIds.remove(idx);
 		}
 	}
 	
@@ -216,19 +217,19 @@ public class Scenario implements Serializable {
 				f.setScenarioId(-1);
 			}	
 		}
-		for(int pid : getForces(campaign).getAllPersonnel()) {
-			Person p = campaign.getPerson(pid);
-			if(null != p) {
-				p.setScenarioId(-1);
+		for(int uid : getForces(campaign).getAllUnits()) {
+			Unit u = campaign.getUnit(uid);
+			if(null != u) {
+				//u.setScenarioId(-1);
 			}	
 		}
 		subForceIds = new ArrayList<Integer>();
-		personnelIds = new ArrayList<Integer>();
+		unitIds = new ArrayList<Integer>();
 	}
 	
-	public boolean isAssigned(Person person, Campaign campaign) {
-		for(int pid : getForces(campaign).getAllPersonnel()) {
-			if(pid == person.getId()) {
+	public boolean isAssigned(Unit unit, Campaign campaign) {
+		for(int uid : getForces(campaign).getAllUnits()) {
+			if(uid == unit.getId()) {
 				return true;
 			}
 		}

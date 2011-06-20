@@ -139,6 +139,8 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 	private boolean customized;
 	private int id = -1;
 	private int quality;
+	
+	private int forceId;
 
 	private ArrayList<Integer> drivers;
 	private ArrayList<Integer> gunners;
@@ -1979,6 +1981,10 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 				+ salvaged + "</salvaged>");
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<site>" + site
 				+ "</site>");
+		pw1.println(MekHqXmlUtil.indentStr(indentLvl+1)
+				+"<forceId>"
+				+forceId
+				+"</forceId>");
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl) + "</unit>");
 	}
 
@@ -2001,6 +2007,8 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 					retVal.site = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("pilotId")) {
 					retVal.pilotId = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("forceId")) {
+					retVal.forceId = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("salvaged")) {
 					if (wn2.getTextContent().equalsIgnoreCase("true"))
 						retVal.salvaged = true;
@@ -2740,6 +2748,15 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     		pilotId = -1;
     	}
     }
+    
+
+	public int getForceId() {
+		return forceId;
+	}
+	
+	public void setForceId(int id) {
+		this.forceId = id;
+	}
     
     
 }

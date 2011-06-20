@@ -78,12 +78,14 @@ public class ResolveScenarioTracker {
 		people = new ArrayList<Person>();
 		missingUnits = new ArrayList<Unit>();
 		missingPilots = new ArrayList<Person>();
-		for(int pid : scenario.getForces(campaign).getAllPersonnel()) {
-			Person p = campaign.getPerson(pid);
-			Unit u = campaign.getUnit(p.getUnitId());
-			people.add(p);
+		for(int uid : scenario.getForces(campaign).getAllUnits()) {
+			Unit u = campaign.getUnit(uid);
 			if(null != u) {
 				units.add(u);
+				Person p = u.getCommander();
+				if(null != p) {
+					people.add(p);
+				}
 			}
 		}
 		unitList = new JFileChooser(".");
@@ -575,7 +577,7 @@ public class ResolveScenarioTracker {
 		if(null != person) {
 			person.setStatus(Person.S_MIA);
 			person.undeploy(campaign);
-			campaign.removePersonFromForce(person);
+			//campaign.removePersonFromForce(person);
 			campaign.addReport(person.getFullTitle() + " is missing in action.");
 		}
 	}

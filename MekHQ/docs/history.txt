@@ -20,6 +20,7 @@ v0.1.9 (SVN)
 + update entity pilot when personnel characteristics are changed
 + Bug 3313715 and 3316912: Reloading game problem/destroyed parts in warehouse
 + infantry personnel type
++ change Force to unit-specific rather than person-specific (to accomodate multi-person crews)
 
 v0.1.8 (2011-06-13)
 + beginning of custom XP costs

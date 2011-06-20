@@ -18,6 +18,7 @@ import javax.swing.tree.DefaultTreeModel;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Force;
+import mekhq.campaign.Unit;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
 
@@ -79,7 +80,7 @@ public class ScenarioViewPanel extends javax.swing.JPanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;	
 		add(pnlStats, gridBagConstraints);
 		
-		if(forces.getAllPersonnel().size() > 0) {
+		if(forces.getAllUnits().size() > 0) {
 			makeTree();
 			forceTree.setModel(forceModel);
 			//forceTree.addMouseListener(orgMouseAdapter);
@@ -168,22 +169,30 @@ public class ScenarioViewPanel extends javax.swing.JPanel {
 			addForce(subforce, top);
 		}
 		//add any personnel
-		Enumeration<Integer> personnel = forces.getPersonnel().elements();
+		Enumeration<Integer> uids = forces.getUnits().elements();
 		//put them into a temporary array so I can sort it by rank
-		ArrayList<Person> people = new ArrayList<Person>();
-		while(personnel.hasMoreElements()) {
-			Person p = campaign.getPerson(personnel.nextElement());
-			if(p != null) {
-				people.add(p);
+		ArrayList<Unit> units = new ArrayList<Unit>();
+		ArrayList<Unit> unmannedUnits = new ArrayList<Unit>();
+		while(uids.hasMoreElements()) {
+			Unit u = campaign.getUnit(uids.nextElement());
+			if(null != u) {
+				if(null == u.getCommander()) {
+					unmannedUnits.add(u);
+				} else {
+					units.add(u);
+				}
 			}
 		}
-		Collections.sort(people, new Comparator<Person>(){		 
-            public int compare(final Person p1, final Person p2) {
-               return ((Comparable<Integer>)p2.getRank()).compareTo(p1.getRank());
+		Collections.sort(units, new Comparator<Unit>(){		 
+            public int compare(final Unit u1, final Unit u2) {
+               return ((Comparable<Integer>)u2.getCommander().getRank()).compareTo(u1.getCommander().getRank());
             }
         });
-		for(Person person : people) {
-			top.add(new DefaultMutableTreeNode(person));
+		for(Unit u : unmannedUnits) {
+			units.add(u);
+		}
+		for(Unit u : units) {
+			top.add(new DefaultMutableTreeNode(u));
 		}
 		if(null == forceModel) {
 			forceModel = new DefaultTreeModel(top);
@@ -201,22 +210,30 @@ public class ScenarioViewPanel extends javax.swing.JPanel {
 			addForce(subforce, category);
 		}
 		//add any personnel
-		Enumeration<Integer> personnel = force.getPersonnel().elements();
+		Enumeration<Integer> uids = force.getUnits().elements();
 		//put them into a temporary array so I can sort it by rank
-		ArrayList<Person> people = new ArrayList<Person>();
-		while(personnel.hasMoreElements()) {
-			Person p = campaign.getPerson(personnel.nextElement());
-			if(p != null) {
-				people.add(p);
+		ArrayList<Unit> units = new ArrayList<Unit>();
+		ArrayList<Unit> unmannedUnits = new ArrayList<Unit>();
+		while(uids.hasMoreElements()) {
+			Unit u = campaign.getUnit(uids.nextElement());
+			if(null != u) {
+				if(null == u.getCommander()) {
+					unmannedUnits.add(u);
+				} else {
+					units.add(u);
+				}
 			}
 		}
-		Collections.sort(people, new Comparator<Person>(){		 
-            public int compare(final Person p1, final Person p2) {
-               return ((Comparable<Integer>)p2.getRank()).compareTo(p1.getRank());
+		Collections.sort(units, new Comparator<Unit>(){		 
+            public int compare(final Unit u1, final Unit u2) {
+               return ((Comparable<Integer>)u2.getCommander().getRank()).compareTo(u1.getCommander().getRank());
             }
         });
-		for(Person person : people) {
-			category.add(new DefaultMutableTreeNode(person));
+		for(Unit u : units) {
+			category.add(new DefaultMutableTreeNode(u));
 		}
-    }
+		for(Unit u : unmannedUnits) {
+			category.add(new DefaultMutableTreeNode(u));
+		}
+	}
 }
