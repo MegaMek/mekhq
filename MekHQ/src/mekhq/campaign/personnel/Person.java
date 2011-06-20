@@ -77,12 +77,13 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 	public static final int T_AERO_PILOT = 2;
 	public static final int T_PROTO_PILOT = 3;
 	public static final int T_BA = 4;
-	public static final int T_MECH_TECH = 5;
-    public static final int T_MECHANIC = 6;
-    public static final int T_AERO_TECH = 7;
-    public static final int T_BA_TECH = 8;
-    public static final int T_DOCTOR = 9;
-    public static final int T_NUM = 10;
+	public static final int T_INFANTRY = 5;
+	public static final int T_MECH_TECH = 6;
+    public static final int T_MECHANIC = 7;
+    public static final int T_AERO_TECH = 8;
+    public static final int T_BA_TECH = 9;
+    public static final int T_DOCTOR = 10;
+    public static final int T_NUM = 11;
     
     public static final int S_ACTIVE = 0;
     public static final int S_RETIRED = 1;
@@ -249,6 +250,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
                 return "Proto Pilot";
             case(T_BA):
                 return "Battle armor Pilot";
+            case(T_INFANTRY):
+                return "Infantry";
             case(T_MECH_TECH):
                 return "Mech Tech";
             case(T_MECHANIC):
@@ -659,6 +662,9 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 			case T_BA:
 				base = 960;
 				break;
+			case T_INFANTRY:
+				base = 750;
+				break;
 			case T_MECH_TECH:
 				base = 800;
 				break;
@@ -703,7 +709,12 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 			offMult = 1.2;
 		}
 		
-		return (int)(base * expMult * offMult);
+		double antiMekMult = 1.0;
+		if(hasSkill(SkillType.S_ANTI_MECH)) {
+			antiMekMult = 1.5;
+		}
+		
+		return (int)(base * expMult * offMult * antiMekMult);
 		//TODO: Add conventional aircraft pilots.
 		//TODO: Add regular infantry.
 		//TODO: Add specialist/Anti-Mech infantry.
@@ -769,6 +780,12 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 			if(hasSkill(SkillType.S_GUN_BA) && hasSkill(SkillType.S_ANTI_MECH)) {
 				return (int)Math.floor((getSkill(SkillType.S_GUN_BA).getExperienceLevel() 
 						+ getSkill(SkillType.S_ANTI_MECH).getExperienceLevel()) / 2.0);
+			} else {
+				return -1;
+			}
+		case T_INFANTRY:
+			if(hasSkill(SkillType.S_SMALL_ARMS)) {
+				return getSkill(SkillType.S_SMALL_ARMS).getExperienceLevel();
 			} else {
 				return -1;
 			}

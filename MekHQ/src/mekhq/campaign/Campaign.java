@@ -1928,6 +1928,10 @@ public class Campaign implements Serializable {
 			person.addSkill(SkillType.S_ANTI_MECH);
 			person.addSkill(SkillType.S_SMALL_ARMS);
 			break;
+	    case(Person.T_INFANTRY):
+			person.addSkill(SkillType.S_ANTI_MECH);
+			person.addSkill(SkillType.S_SMALL_ARMS);
+			break;
 	    case(Person.T_MECH_TECH):
 	    	person.addSkill(SkillType.S_TECH_MECH);
 			break;
