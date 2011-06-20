@@ -4335,7 +4335,7 @@ public class MekHQView extends FrameView {
 					unselect();
 				}
 
-				if ((null != p) && p.isDeployed()) {
+				if ((null != p) && p.isDeployed(campaign)) {
 					c.setBackground(Color.GRAY);
 				} else if ((null != p) && p.needsFixing()) {
 					c.setBackground(new Color(205, 92, 92));
@@ -4390,14 +4390,12 @@ public class MekHQView extends FrameView {
                     scenario.addForces(force.getId());
                     force.setScenarioId(scenario.getId());
                     refreshScenarioList();
-                    /*
-                    for(int pid : force.getAllPersonnel()) {
-                    	Person p = campaign.getPerson(pid);
-                    	if(null != p) {
-                    		p.setScenarioId(scenario.getId());
+                    for(int uid : force.getAllUnits()) {
+                    	Unit u = campaign.getUnit(uid);
+                    	if(null != u) {
+                    		u.setScenarioId(scenario.getId());
                     	}
                     }
-                    */
             	}
             	refreshScenarioList();
             	refreshOrganization();
@@ -4460,7 +4458,7 @@ public class MekHQView extends FrameView {
             	Scenario scenario = campaign.getScenario(sid);
             	if(null != unit && null != scenario) {
                     scenario.addUnit(unit.getId());
-                    //unit.setScenarioId(scenario.getId());
+                    unit.setScenarioId(scenario.getId());
                     refreshScenarioList();
                     refreshOrganization();
                     refreshPersonnelList();
@@ -4528,7 +4526,7 @@ public class MekHQView extends FrameView {
 				                menuItem = new JMenuItem(p.getFullTitle() + ", " + u.getEntity().getDisplayName());
 			                	menuItem.setActionCommand("ADD_UNIT|" + forceId + "|" + u.getId());
 			                	menuItem.addActionListener(this);
-			                	menuItem.setEnabled(!p.isDeployed());
+			                	menuItem.setEnabled(!u.isDeployed());
 			                	menu.add(menuItem);
 		                	}
 	                	}
@@ -4816,18 +4814,6 @@ public class MekHQView extends FrameView {
 				refreshUnitList();
 				refreshPersonnelList();
 				refreshOrganization();
-			/*} else if (command.contains("CHANGE_FORCE")) {
-				int selected = Integer.parseInt(st.nextToken());
-				campaign.removePersonFromForce(selectedPerson);
-				if(selected != -1) {
-					campaign.addPersonToForce(selectedPerson, selected);
-				}
-				refreshOrganization();
-				refreshForceView();
-				refreshServicedUnitList();
-				refreshUnitList();
-				refreshPersonnelList();
-				*/
 			} else if (command.contains("IMPROVE")) {
 				String type = st.nextToken();
 				int cost =  Integer.parseInt(st.nextToken());
@@ -4932,13 +4918,6 @@ public class MekHQView extends FrameView {
 				refreshDoctorsList();
 				refreshOrganization();
 				refreshReport();
-			} else if (command.equalsIgnoreCase("UNDEPLOY")) {
-				if (selectedPerson.isDeployed()) {
-					selectedPerson.undeploy(campaign);
-				}
-				refreshPatientList();
-				refreshPersonnelList();
-				refreshScenarioList();
 			} else if (command.equalsIgnoreCase("EDIT")) {
 				CustomizePersonDialog npd = new CustomizePersonDialog(getFrame(), true, 
 						selectedPerson, 
@@ -5137,26 +5116,8 @@ public class MekHQView extends FrameView {
 			                	MenuScroller.setScrollerFor(soldierMenu, 20);
 			                }
 						}
-						menu.setEnabled(!person.isDeployed());					
+						menu.setEnabled(!person.isDeployed(campaign));					
 						popup.add(menu);
-						//Assign to Force
-						/*
-						menu = new JMenu("Assign to Force");
-						cbMenuItem = new JCheckBoxMenuItem("None");
-						cbMenuItem.setActionCommand("CHANGE_FORCE|" + -1);
-						cbMenuItem.addActionListener(this);
-						menu.add(cbMenuItem);
-						for(Force f : campaign.getAllForces()) {
-							cbMenuItem = new JCheckBoxMenuItem(f.getFullName());
-							cbMenuItem.setActionCommand("CHANGE_FORCE|" + f.getId());
-							cbMenuItem.addActionListener(this);
-							menu.add(cbMenuItem);
-						}
-						if(menu.getItemCount() > 20) {
-		                	MenuScroller.setScrollerFor(menu, 20);
-		                }
-						popup.add(menu);
-						*/
 				}
 				menuItem = new JMenuItem("Add XP");
 				menuItem.setActionCommand("XP_ADD");
@@ -5585,7 +5546,7 @@ public class MekHQView extends FrameView {
         }
         
         public boolean isDeployed(int row) {
-        	return getPerson(row).isDeployed();
+        	return getPerson(row).isDeployed(campaign);
         }
 
         public Object getValueAt(int row, int col) {
@@ -5833,8 +5794,9 @@ public class MekHQView extends FrameView {
                 return p.getXp();
             }
             if(col == COL_DEPLOY) {
-            	if(p.isDeployed()) {
-            		return campaign.getScenario(p.getScenarioId()).getName();
+            	Unit u = campaign.getUnit(p.getUnitId());
+            	if(null != u && u.isDeployed()) {
+            		return campaign.getScenario(u.getScenarioId()).getName();
             	} else {
             		return "-";
             	}

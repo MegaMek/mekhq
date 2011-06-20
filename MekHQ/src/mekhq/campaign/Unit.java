@@ -140,7 +140,9 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 	private int id = -1;
 	private int quality;
 	
+	//assignments
 	private int forceId;
+    protected int scenarioId;
 
 	private ArrayList<Integer> drivers;
 	private ArrayList<Integer> gunners;
@@ -165,7 +167,8 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 		this.quality = QUALITY_D;
 		this.parts = new ArrayList<Part>();
 		this.drivers = new ArrayList<Integer>();
-		this.gunners = new ArrayList<Integer>();
+		this.gunners = new ArrayList<Integer>();     
+		scenarioId = -1;
 		reCalc();
 	}
 	
@@ -948,7 +951,11 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 	}
 
 	public boolean isDeployed() {
-		return false;//(pilot != null && pilot.isDeployed());
+		return scenarioId != -1;
+	}
+	
+	public void undeploy() {
+		scenarioId = -1;
 	}
 
 	public String checkDeployment() {
@@ -1985,6 +1992,10 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 				+"<forceId>"
 				+forceId
 				+"</forceId>");
+		pw1.println(MekHqXmlUtil.indentStr(indentLvl+1)
+				+"<scenarioId>"
+				+scenarioId
+				+"</scenarioId>");
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl) + "</unit>");
 	}
 
@@ -2009,6 +2020,8 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 					retVal.pilotId = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("forceId")) {
 					retVal.forceId = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("scenarioId")) {
+					retVal.scenarioId = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("salvaged")) {
 					if (wn2.getTextContent().equalsIgnoreCase("true"))
 						retVal.salvaged = true;
@@ -2758,5 +2771,12 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 		this.forceId = id;
 	}
     
+    public int getScenarioId() {
+    	return scenarioId;
+    }
+    
+    public void setScenarioId(int i) {
+    	this.scenarioId = i;
+    }
     
 }

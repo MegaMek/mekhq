@@ -1439,10 +1439,14 @@ public class Campaign implements Serializable {
 				s.addForces(fid);
 			}
 			//some units may need force id set for backwards compatability
+			//some may also need scenario id set
 			for(int uid : f.getUnits()) {
 				Unit u = retVal.getUnit(uid);
 				if(null != u) {
 					u.setForceId(f.getId());
+					if(f.isDeployed()) {
+						u.setScenarioId(f.getScenarioId());
+					}
 				}
 			}
 		}
@@ -1458,20 +1462,10 @@ public class Campaign implements Serializable {
 		}
 		
 		// All personnel need the rank reference fixed
-		// some personnel may need to be assigned to scenarios
 		for (int x=0; x<retVal.personnel.size(); x++) {
 			Person psn = retVal.personnel.get(x);
 			
 			psn.setRankSystem(retVal.ranks);
-			
-			Scenario s = retVal.getScenario(psn.getScenarioId());
-			if(null != s) {
-				//most personnel will be properly assigned through their
-				//force, so check to make sure they aren't already here
-				//if(!s.isAssigned(psn, retVal)) {
-					//s.addPersonnel(psn.getId());
-				//}
-			}
 			
 			//reverse compatability check for assigning support personnel
 			//characteristics from their support team
@@ -1534,10 +1528,18 @@ public class Campaign implements Serializable {
 			
 			//just in case parts are missing (i.e. because they weren't tracked in previous versions)
 			unit.initializeParts();
+			
+			//some units might need to be assigned to scenarios
+			Scenario s = retVal.getScenario(unit.getScenarioId());
+			if(null != s) {
+				//most units will be properly assigned through their
+				//force, so check to make sure they aren't already here
+				if(!s.isAssigned(unit, retVal)) {
+					s.addUnit(unit.getId());
+				}
+			}
 		}
 		
-		
-
 		MekHQApp.logMessage("Load of campaign file complete!");
 
 		return retVal;

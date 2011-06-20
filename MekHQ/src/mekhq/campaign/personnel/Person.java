@@ -113,7 +113,6 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     
     //assignments
     private int unitId;
-    protected int scenarioId;
     protected int medicalTeamId;
     //for reverse compatability v0.1.8 and earlier
     protected int teamId = -1;
@@ -147,7 +146,6 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         skills = new Hashtable<String,Skill>();
         salary = -1;
         ranks = r;
-        scenarioId = -1;
         medicalTeamId = -1;
         unitId = -1;
     }
@@ -336,32 +334,12 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         return false;
     }
     
-    public int getScenarioId() {
-    	return scenarioId;
-    }
-    
-    public void setScenarioId(int i) {
-    	this.scenarioId = i;
-    }
-    
-    public boolean isDeployed() {
-        return scenarioId != -1;
-    }
-    
-    public void undeploy(Campaign campaign) {
-    	Scenario s = campaign.getScenario(scenarioId);
-    	if(null == s) {
-    		return;
+    public boolean isDeployed(Campaign c) {
+    	Unit u = c.getUnit(unitId);
+    	if(null != u) {
+    		return u.getScenarioId() != -1;
     	}
-    	//only remove pilots from current scenarios
-    	//that allows for us to keep an accurate history 
-    	//of forces deployed in engagements, even when 
-    	//there is a hiccup
-    	if(s.isCurrent()) {
-    		//TODO: this doesn't work right
-    		//s.removePersonnel(id);
-    	}
-    	scenarioId = -1;
+        return false;
     }
   
     public String getBiography() {
@@ -395,10 +373,6 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 				+"<daysRest>"
 				+daysRest
 				+"</daysRest>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<scenarioId>"
-				+scenarioId
-				+"</scenarioId>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<id>"
 				+this.id
@@ -500,8 +474,6 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 					retVal.type = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("daysRest")) {
 					retVal.daysRest = Integer.parseInt(wn2.getTextContent());
-				} else if (wn2.getNodeName().equalsIgnoreCase("scenarioId")) {
-					retVal.scenarioId = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("id")) {
 					retVal.id = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("teamId")) {
@@ -822,9 +794,6 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         String toReturn = "<html><font size='2'><b>" + getName() + "</b><br/>";
         //toReturn += getTypeDesc() + " (" + pilot.getGunnery() + "/" + pilot.getPiloting() + ")<br/>";
         //toReturn += pilot.getStatusDesc();
-        if(isDeployed()) {
-            toReturn += " (DEPLOYED)";
-        }
         toReturn += "</font></html>";
         return toReturn;
     }

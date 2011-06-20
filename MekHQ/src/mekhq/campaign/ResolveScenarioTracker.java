@@ -576,7 +576,7 @@ public class ResolveScenarioTracker {
 	private void setMIA(Person person) {
 		if(null != person) {
 			person.setStatus(Person.S_MIA);
-			person.undeploy(campaign);
+			//person.undeploy(campaign);
 			//campaign.removePersonFromForce(person);
 			campaign.addReport(person.getFullTitle() + " is missing in action.");
 		}
