@@ -18,6 +18,7 @@ v0.1.9 (SVN)
 + backwards compatability for reading in techs and doctor personnel
 + resetPilotandEntity on unit when loading in XML
 + update entity pilot when personnel characteristics are changed
++ Bug 3313715 and 3316912: Reloading game problem/destroyed parts in warehouse
 
 v0.1.8 (2011-06-13)
 + beginning of custom XP costs

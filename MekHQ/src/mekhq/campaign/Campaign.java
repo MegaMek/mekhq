@@ -865,9 +865,11 @@ public class Campaign implements Serializable {
 
 	public void removeUnit(int id) {
 		Unit unit = getUnit(id);
-		// remove any tasks associated with this unit
 
-		//TODO: remove all parts for this unit as well
+		//remove all parts for this unit as well
+		for(Part p : unit.getParts()) {
+			removePart(p);
+		}
 
 		// remove the pilot from this unit
 		unit.removePilot();
