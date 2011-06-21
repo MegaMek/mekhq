@@ -73,17 +73,19 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 	public static final int G_FEMALE = 1;
 	
 	public static final int T_MECHWARRIOR = 0;
-	public static final int T_VEE_CREW = 1;
-	public static final int T_AERO_PILOT = 2;
+	public static final int T_VEE_CREW    = 1;
+	public static final int T_AERO_PILOT  = 2;
 	public static final int T_PROTO_PILOT = 3;
-	public static final int T_BA = 4;
-	public static final int T_INFANTRY = 5;
-	public static final int T_MECH_TECH = 6;
-    public static final int T_MECHANIC = 7;
-    public static final int T_AERO_TECH = 8;
-    public static final int T_BA_TECH = 9;
-    public static final int T_DOCTOR = 10;
-    public static final int T_NUM = 11;
+	public static final int T_BA          = 4;
+	public static final int T_INFANTRY    = 5;
+	public static final int T_MECH_TECH   = 6;
+    public static final int T_MECHANIC    = 7;
+    public static final int T_AERO_TECH   = 8;
+    public static final int T_BA_TECH     = 9;
+    public static final int T_ASTECH      = 10;
+    public static final int T_DOCTOR      = 11;
+    public static final int T_MEDIC       = 12;
+    public static final int T_NUM         = 13;
     
     public static final int S_ACTIVE = 0;
     public static final int S_RETIRED = 1;
@@ -256,8 +258,12 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
             	return "Aero Tech";
             case(T_BA_TECH):
                 return "Battle Armor Tech";
+            case(T_ASTECH):
+                return "Astech";
             case(T_DOCTOR):
                 return "Doctor";
+            case(T_MEDIC):
+                return "Medic";
             default:
                 return "??";
         }
@@ -584,8 +590,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 					break;
 
 				}
-				retVal.addSkill(SkillType.S_TAC_GROUND,pilotCommandBonus,0);
-				retVal.addSkill(SkillType.S_INIT,pilotInitBonus,0);
+				retVal.addSkill(SkillType.S_TACTICS,pilotCommandBonus,0);
 			}
 			if(null != pilotName) {
 				retVal.setName(pilotName);
@@ -641,8 +646,14 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 			case T_BA_TECH:
 				base = 800;
 				break;
+			case T_ASTECH:
+				base = 640;
+				break;
 			case T_DOCTOR:
 				base = 1500;
+				break;
+			case T_MEDIC:
+				base = 640;
 				break;
 			case T_NUM:
 				// Not a real pilot type. If someone has this, they don't get paid!
@@ -668,6 +679,10 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 			expMult = 1.0;
 		}
 		
+		if(getType() == T_ASTECH || getType() == T_MEDIC) {
+			expMult = 0.5;
+		}
+		
 		double offMult = 0.6;
 		if(ranks.isOfficer(getRank())) {
 			offMult = 1.2;
@@ -680,16 +695,12 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 		
 		return (int)(base * expMult * offMult * antiMekMult);
 		//TODO: Add conventional aircraft pilots.
-		//TODO: Add regular infantry.
-		//TODO: Add specialist/Anti-Mech infantry.
 		//TODO: Add vessel crewmen (DropShip).
 		//TODO: Add vessel crewmen (JumpShip).
 		//TODO: Add vessel crewmen (WarShip).
 		
-		//TODO: Properly pay vehicle crews for actual size.
 		//TODO: Properly pay large ship crews for actual size.
 		
-		//TODO: Add quality mod to salary calc..
 		//TODO: Add era mod to salary calc..
 	}
 	
@@ -769,9 +780,21 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 			} else {
 				return -1;
 			}
+		case T_ASTECH:
+			if(hasSkill(SkillType.S_ASTECH)) {
+				return getSkill(SkillType.S_ASTECH).getExperienceLevel();
+			} else {
+				return -1;
+			}
 		case T_DOCTOR:
-			if(hasSkill(SkillType.S_MEDICAL)) {
-				return getSkill(SkillType.S_MEDICAL).getExperienceLevel();
+			if(hasSkill(SkillType.S_DOCTOR)) {
+				return getSkill(SkillType.S_DOCTOR).getExperienceLevel();
+			} else {
+				return -1;
+			}
+		case T_MEDIC:
+			if(hasSkill(SkillType.S_MEDTECH)) {
+				return getSkill(SkillType.S_MEDTECH).getExperienceLevel();
 			} else {
 				return -1;
 			}

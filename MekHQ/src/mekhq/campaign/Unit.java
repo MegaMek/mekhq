@@ -2665,9 +2665,9 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     	//TODO: set toughness
     	//TODO: set artillery
     	//TODO: set advantages and implants
-    	//TODO: use single tactics skill with option to use as command and ind init bonus
-    	if(commander.hasSkill(SkillType.S_TAC_GROUND)) {
-    		pilot.setCommandBonus(commander.getSkill(SkillType.S_TAC_GROUND).getFinalSkillValue());
+    	//TODO: game option to use tactics as command and ind init bonus
+    	if(commander.hasSkill(SkillType.S_TACTICS)) {
+    		pilot.setCommandBonus(commander.getSkill(SkillType.S_TACTICS).getFinalSkillValue());
     	}
     	entity.setCrew(pilot);  		
     }   

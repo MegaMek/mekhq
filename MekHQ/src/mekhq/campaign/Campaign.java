@@ -1508,7 +1508,7 @@ public class Campaign implements Serializable {
 					}
 				} else {
 					psn.setType(Person.T_DOCTOR);
-					psn.addSkill(SkillType.S_MEDICAL, lvl, 0);
+					psn.addSkill(SkillType.S_DOCTOR, lvl, 0);
 				}
 			}
 		}
@@ -1962,8 +1962,14 @@ public class Campaign implements Serializable {
 	    case(Person.T_BA_TECH):
 	    	person.addSkill(SkillType.S_TECH_BA);
 			break;
+	    case(Person.T_ASTECH):
+	    	person.addSkill(SkillType.S_ASTECH,0,0);
+			break;
 	    case(Person.T_DOCTOR):
-	    	person.addSkill(SkillType.S_MEDICAL);
+	    	person.addSkill(SkillType.S_DOCTOR);
+			break;
+	    case(Person.T_MEDIC):
+	    	person.addSkill(SkillType.S_MEDTECH,0,0);
 			break;
 		}
 		person.setRankSystem(ranks);

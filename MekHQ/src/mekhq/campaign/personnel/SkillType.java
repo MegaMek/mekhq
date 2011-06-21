@@ -63,15 +63,15 @@ public class SkillType implements Serializable {
 	public static final String S_ARTILLERY   = "Artillery";
 	public static final String S_SMALL_ARMS  = "Small Arms";
 	public static final String S_ANTI_MECH   = "Anti-Mech";
-	public static final String S_TAC_GROUND  = "Tactics/Ground";
-	public static final String S_TAC_SPACE   = "Tactics/Space";
-	public static final String S_INIT        = "Initiative";
+	public static final String S_TACTICS     = "Tactics";
 	//non-combat skills
 	public static final String S_TECH_MECH     = "Tech/Mech";
 	public static final String S_TECH_MECHANIC = "Tech/Mechanic";
 	public static final String S_TECH_AERO     = "Tech/Aero";
 	public static final String S_TECH_BA       = "Tech/BA";
-	public static final String S_MEDICAL       = "Medical";
+	public static final String S_ASTECH        = "Astech";
+	public static final String S_DOCTOR        = "Doctor";
+	public static final String S_MEDTECH       = "Medtech";
 	public static final String S_ADMIN         = "Administation";
 	public static final String S_NEG           = "Negotiation";
 	public static final String S_LEADER        = "Leadership";
@@ -82,8 +82,9 @@ public class SkillType implements Serializable {
 											  S_PILOT_GVEE,S_PILOT_VTOL,S_PILOT_NVEE,S_GUN_VEE,
 						                      S_PILOT_JET,S_GUN_JET,S_PILOT_SPACE,S_GUN_SPACE,S_ARTILLERY,
 						                      S_GUN_BA,S_SMALL_ARMS,S_ANTI_MECH,
-						                      S_TECH_MECH,S_TECH_MECHANIC,S_TECH_AERO,S_TECH_BA,S_MEDICAL,
-						                      S_TAC_GROUND,S_TAC_SPACE,S_STRATEGY,S_INIT,
+						                      S_TECH_MECH,S_TECH_MECHANIC,S_TECH_AERO,S_TECH_BA,S_ASTECH,
+						                      S_DOCTOR,S_MEDTECH,
+						                      S_TACTICS,S_STRATEGY,
 						                      S_ADMIN,S_NEG,S_LEADER,S_SCROUNGE};
 	
     private static Hashtable<String, SkillType> lookupHash;
@@ -202,7 +203,7 @@ public class SkillType implements Serializable {
 				return EXP_ELITE;
 			}
 		}
-		else if(name.equals(S_MEDICAL)) {
+		else if(name.equals(S_DOCTOR) || name.equals(S_MEDTECH)) {
 			if(value >= 11) {
 				return EXP_ULTRA_GREEN;
 			}
@@ -260,10 +261,10 @@ public class SkillType implements Serializable {
 		lookupHash.put(S_TECH_MECHANIC, createTechMechanic());
 		lookupHash.put(S_TECH_AERO, createTechAero());
 		lookupHash.put(S_TECH_BA, createTechBA());
-		lookupHash.put(S_MEDICAL, createMedical());
-		lookupHash.put(S_TAC_GROUND, createTacticsGround());
-		lookupHash.put(S_TAC_SPACE, createTacticsSpace());
-		lookupHash.put(S_INIT, createInit());
+		lookupHash.put(S_ASTECH, createAstech());
+		lookupHash.put(S_DOCTOR, createDoctor());
+		lookupHash.put(S_MEDTECH, createMedtech());
+		lookupHash.put(S_TACTICS, createTactics());
 		lookupHash.put(S_STRATEGY, createStrategy());
 		lookupHash.put(S_ADMIN, createAdmin());
 		lookupHash.put(S_LEADER, createLeadership());
@@ -538,10 +539,20 @@ public class SkillType implements Serializable {
      
         return skill;
     }
-
-	public static SkillType createMedical() {
+	
+	public static SkillType createAstech() {
         SkillType skill = new SkillType();
-        skill.name = S_MEDICAL;
+        skill.name = S_ASTECH;
+        skill.target = 10;
+        skill.countUp = false;
+        skill.costs = new Integer[]{12,6,6,6,6,6,6,6,6,6,6};
+     
+        return skill;
+    }
+
+	public static SkillType createDoctor() {
+        SkillType skill = new SkillType();
+        skill.name = S_DOCTOR;
         skill.target = 11;
         skill.countUp = false;
         skill.costs = new Integer[]{16,8,8,8,8,8,8,8,8,8,8};
@@ -549,19 +560,19 @@ public class SkillType implements Serializable {
         return skill;
     }
 	
-	public static SkillType createTacticsGround() {
+	public static SkillType createMedtech() {
         SkillType skill = new SkillType();
-        skill.name = S_TAC_GROUND;
-        skill.target = 0;
-        skill.countUp = true;
-        skill.costs = new Integer[]{12,6,6,6,6,6,6,6,6,6,6};
+        skill.name = S_MEDTECH;
+        skill.target = 11;
+        skill.countUp = false;
+        skill.costs = new Integer[]{16,8,8,8,8,8,8,8,8,8,8};
      
         return skill;
     }
 	
-	public static SkillType createTacticsSpace() {
+	public static SkillType createTactics() {
         SkillType skill = new SkillType();
-        skill.name = S_TAC_SPACE;
+        skill.name = S_TACTICS;
         skill.target = 0;
         skill.countUp = true;
         skill.costs = new Integer[]{12,6,6,6,6,6,6,6,6,6,6};
@@ -575,16 +586,6 @@ public class SkillType implements Serializable {
         skill.target = 0;
         skill.countUp = true;
         skill.costs = new Integer[]{12,6,6,6,6,6,6,6,6,6,6};
-     
-        return skill;
-    }
-	
-	public static SkillType createInit() {
-        SkillType skill = new SkillType();
-        skill.name = S_INIT;
-        skill.target = 0;
-        skill.countUp = true;
-        skill.costs = new Integer[]{8,4,4,4,4,4,4,4,4,4,4};
      
         return skill;
     }
