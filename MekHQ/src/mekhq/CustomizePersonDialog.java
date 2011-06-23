@@ -409,6 +409,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         if(isNewHire()) {
             campaign.addPerson(person);  
             hqView.refreshPersonnelList();
+    		hqView.refreshTechsList();
         	hqView.refreshPatientList();
     		hqView.refreshReport();
         	person = campaign.newPerson(choiceType.getSelectedIndex());
@@ -416,6 +417,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         } else {
         	hqView.refreshPersonnelList();
         	hqView.refreshPatientList();
+    		hqView.refreshTechsList();
     		hqView.refreshReport();
         	setVisible(false);
         }

@@ -600,11 +600,11 @@ public class Campaign implements Serializable {
 		return docs;
 	}
 
-	public ArrayList<SupportTeam> getTechTeams() {
-		ArrayList<SupportTeam> techs = new ArrayList<SupportTeam>();
-		for (SupportTeam team : getTeams()) {
-			if (team instanceof TechTeam) {
-				techs.add(team);
+	public ArrayList<Person> getTechs() {
+		ArrayList<Person> techs = new ArrayList<Person>();
+		for (Person p: personnel) {
+			if (p.isTech()) {
+				techs.add(p);
 			}
 		}
 		return techs;

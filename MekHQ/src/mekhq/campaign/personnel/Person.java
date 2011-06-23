@@ -129,6 +129,11 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     //need to pass in the rank system
     private Ranks ranks;
     
+    //stuff to track for support teams
+    protected int hours;
+    protected int minutesLeft;
+    protected int overtimeLeft;
+    
     //default constructor
     public Person() {
     	this("Biff the Understudy", null);
@@ -151,6 +156,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         ranks = r;
         medicalTeamId = -1;
         unitId = -1;
+        hours = 8;
+        resetMinutesLeft();
     }
     
     public static String getGenderName(int gender) {
@@ -1167,5 +1174,38 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     
     public int getOldSupportTeamId() {
     	return teamId;
+    }
+    
+    public int getHours() {
+        return hours;
+    }
+    
+    public void setHours(int i) {
+        this.hours = i;
+    }
+    
+    public int getMinutesLeft() {
+        return minutesLeft;
+    }
+    
+    public void setMinutesLeft(int m) {
+        this.minutesLeft = m;
+    }
+    
+    public int getOvertimeLeft() {
+        return overtimeLeft;
+    }
+    
+    public void setOvertimeLeft(int m) {
+        this.overtimeLeft = m;
+    }
+    
+    public void resetMinutesLeft() {
+        this.minutesLeft = 60 * getHours();
+        this.overtimeLeft = 60 * 4;
+    }
+    
+    public boolean isTech() {
+    	return type == T_MECH_TECH ||  type == T_AERO_TECH ||  type == T_MECHANIC ||  type == T_BA_TECH;
     }
 }

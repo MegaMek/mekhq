@@ -1923,8 +1923,8 @@ public class MekHQView extends FrameView {
 	private void TechTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
 		int selected = TechTable.getSelectedRow();
 		
-		if ((selected > -1) && (selected < campaign.getTechTeams().size())) {
-			currentTechId = campaign.getTechTeams().get(selected).getId();
+		if ((selected > -1) && (selected < campaign.getTechs().size())) {
+			currentTechId = campaign.getTechs().get(selected).getId();
 		} else if (selected < 0) {
 			currentTechId = -1;
 		}
@@ -2814,8 +2814,8 @@ public class MekHQView extends FrameView {
 
 	protected void refreshTechsList() {
 		int selected = TechTable.getSelectedRow();
-		techsModel.setData(campaign.getTechTeams());
-		if ((selected > -1) && (selected < campaign.getTechTeams().size())) {
+		techsModel.setData(campaign.getTechs());
+		if ((selected > -1) && (selected < campaign.getTechs().size())) {
 			TechTable.setRowSelectionInterval(selected, selected);
 		}
 	}
@@ -4144,7 +4144,7 @@ public class MekHQView extends FrameView {
 				// assign all tasks to a certain tech
 				menu = new JMenu("Assign all tasks");
 				i = 0;
-				for (SupportTeam tech : campaign.getTechTeams()) {
+				for (Person tech : campaign.getTechs()) {
 					menuItem = new JMenuItem(tech.getDesc());
 					menuItem.setActionCommand("ASSIGN_TECH:" + i);
 					menuItem.addActionListener(this);
@@ -4237,15 +4237,15 @@ public class MekHQView extends FrameView {
 
 		public TechTableModel() {
 			columnNames = new String[] { "Techs" };
-			data = new ArrayList<TechTeam>();
+			data = new ArrayList<Person>();
 		}
 
 		public Object getValueAt(int row, int col) {
-			return ((TechTeam) data.get(row)).getDescHTML();
+			return ((Person) data.get(row)).getDescHTML();
 		}
 
-		public TechTeam getTechAt(int row) {
-			return (TechTeam) data.get(row);
+		public Person getTechAt(int row) {
+			return (Person) data.get(row);
 		}
 
 		public TechTableModel.Renderer getRenderer() {
