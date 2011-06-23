@@ -30,6 +30,7 @@ import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Random;
 
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
@@ -168,18 +169,19 @@ public class ResolveScenarioTracker {
 		}
 		checkStatusOfPersonnel();
 	}
+	
+	private ArrayList<Person> shuffleCrew(ArrayList<Person> source) {
+	    ArrayList<Person> sortedList = new ArrayList<Person>();
+	    Random generator = new Random();
 
-	private ArrayList<Person> randomlySortArray(ArrayList<Person> array) {
-		int[] idx = new int[array.size()];
-		for(int i = (array.size()-1); i >= 0; i--) {
-			int j = Compute.randomInt(i);
-			idx[i] = j;
-		}
-		ArrayList<Person> newArray =  new ArrayList<Person>();
-		for(int i : idx) {
-			newArray.add(array.get(i));
-		}
-		return newArray;
+	    while (source.size() > 0)
+	    {
+	        int position = generator.nextInt(source.size());
+	        sortedList.add(source.get(position));
+	        source.remove(position);
+	    }
+
+	    return sortedList;
 	}
 	
 	public void checkStatusOfPersonnel() {
@@ -187,15 +189,19 @@ public class ResolveScenarioTracker {
 		//the unit and associated entity
 		
 		//lets cycle through units and get their crew
+		PersonStatus status;
 		for(Unit u : units) {
-			ArrayList<Person> crew = u.getCrew();//randomlySortArray(u.getCrew());
+			//shuffling the crew ensures that casualties are randomly assigned in multi-crew units
+			ArrayList<Person> crew = shuffleCrew(u.getCrew());
+			Entity en = entities.get(u.getId());
 			int casualties = 0;
 			int casualtiesAssigned = 0;
-			if(u.getEntity() instanceof Infantry) {
-				casualties = ((Infantry)u.getEntity()).getInternal(Infantry.LOC_INFANTRY);
+			if(null != en && en instanceof Infantry && u.getEntity() instanceof Infantry) {
+				en.applyDamage();
+				casualties = ((Infantry)u.getEntity()).getShootingStrength() - ((Infantry)en).getShootingStrength();
 			}
 			for(Person p : crew) {
-				PersonStatus status = new PersonStatus(p.getName(), p.getHits());			
+				status = new PersonStatus(p.getName(), p.getHits());			
 				if(u.usesSoloPilot()) {
 					Pilot pilot = pilots.get(p.getId());
 					if(null == pilot) {
@@ -204,8 +210,7 @@ public class ResolveScenarioTracker {
 						status.setHits(pilot.getHits());
 					}
 				} else {
-					//we have a multi-crewed vee
-					Entity en = entities.get(u.getId());
+					//we have a multi-crewed vee				
 					if(null == en) {
 						status.setMissing(true);				
 					} else {

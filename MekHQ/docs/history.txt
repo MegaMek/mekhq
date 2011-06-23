@@ -26,6 +26,7 @@ v0.1.9 (SVN)
 + changes to resolveScenarioTracker to allow for more diverse units
 + fixed missing fields in Person for save/load XML
 + added Skill to XML serialization
++ assign casualties to infantry in ResolveScenarioTracker
 
 v0.1.8 (2011-06-13)
 + beginning of custom XP costs

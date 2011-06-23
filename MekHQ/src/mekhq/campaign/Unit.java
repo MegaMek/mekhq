@@ -2793,11 +2793,13 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     			crew.add(p);
     		}
     	}
-    	for(int id : gunners) {
-    		Person p = campaign.getPerson(id);
-    		if(null != p) {
-    			crew.add(p);
-    		}
+    	if(!usesSoloPilot() && !usesSoldiers()) {
+	    	for(int id : gunners) {
+	    		Person p = campaign.getPerson(id);
+	    		if(null != p) {
+	    			crew.add(p);
+	    		}
+	    	}
     	}
     	return crew;
     }
