@@ -2804,4 +2804,17 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     	return crew;
     }
     
+    public boolean isDriver(Person person) {
+    	for(int id : drivers) {
+    		if(person.getId() == id) {
+    			return true;
+    		}
+    	}
+    	return false;
+    }
+    
+    public boolean isCommander(Person person) {
+    	return person.getId() == getCommander().getId();
+    }
+    
 }

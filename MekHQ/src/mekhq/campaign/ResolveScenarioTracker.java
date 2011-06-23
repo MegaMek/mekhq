@@ -214,13 +214,27 @@ public class ResolveScenarioTracker {
 					if(null == en) {
 						status.setMissing(true);				
 					} else {
-						//TODO: crew hits are not being kept in MUL for tank crews
 						if(en instanceof Tank) {
-							if(((Tank)en).isDriverHit()) {
-								//TODO: how to check if this is driver?
+							if(null == en.getCrew() || en.getCrew().isDead()) {
+								if(Compute.d6(2) >= 7) {
+									status.setHits(1);
+								} else {
+									status.setHits(6);
+								}
 							}
-							else if(((Tank)en).isCommanderHit()) {
-								//TODO: how to check if this is commander?
+							else if(((Tank)en).isDriverHit() && u.isDriver(p)) {
+								if(Compute.d6(2) >= 7) {
+									status.setHits(1);
+								} else {
+									status.setHits(6);
+								}
+							}
+							else if(((Tank)en).isCommanderHit() && u.isCommander(p)) {
+								if(Compute.d6(2) >= 7) {
+									status.setHits(1);
+								} else {
+									status.setHits(6);
+								}
 							}
 						}
 						else if(en instanceof Infantry) {
