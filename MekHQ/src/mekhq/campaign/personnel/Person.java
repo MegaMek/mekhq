@@ -145,6 +145,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         birthday = new GregorianCalendar(3042, Calendar.JANUARY, 1);
         rank = 0;
         status = S_ACTIVE;
+        hits = 0;
         skills = new Hashtable<String,Skill>();
         salary = -1;
         ranks = r;
@@ -369,8 +370,12 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 				+"\">");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<name>"
-				+biography
+				+name
 				+"</name>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<callsign>"
+				+callsign
+				+"</callsign>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<biography>"
 				+biography
@@ -419,11 +424,19 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 				+"<status>"
 				+status
 				+"</status>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<hits>"
+				+hits
+				+"</hits>");
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<birthday>"
 				+df.format(birthday.getTime())
 				+"</birthday>");
+		for(String skName : skills.keySet()) {
+			Skill skill = skills.get(skName);
+			skill.writeToXml(pw1, indent+1, id);
+		}
 		if (countOptions(PilotOptions.LVL3_ADVANTAGES) > 0) {
 			pw1.println(MekHqXmlUtil.indentStr(indent+1)
 					+"<advantages>"
@@ -474,6 +487,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 				
 				if (wn2.getNodeName().equalsIgnoreCase("name")) {
 					retVal.name = wn2.getTextContent();
+				} else if(wn2.getNodeName().equalsIgnoreCase("callsign")) {
+					retVal.callsign = wn2.getTextContent();
 				} else if (wn2.getNodeName().equalsIgnoreCase("biography")) {
 					retVal.biography = wn2.getTextContent();
 				} else if (wn2.getNodeName().equalsIgnoreCase("type")) {
@@ -490,6 +505,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 					retVal.setPortraitFileName(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("xp")) {
 					retVal.xp = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("hits")) {
+					retVal.hits = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("gender")) {
 					retVal.gender = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("rank")) {
@@ -524,7 +541,12 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 					pilotInitBonus = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("pilotName")) {
 					pilotName = wn2.getTextContent();
-				} 
+				} else if(wn2.getNodeName().equalsIgnoreCase("skill")) {
+					Skill s = Skill.generateInstanceFromXML(wn2);
+					if(null != s) {
+						retVal.skills.put(s.getType().getName(), s);
+					}
+				}
 			}
 			
 			if ((null != advantages) && (advantages.trim().length() > 0)) {

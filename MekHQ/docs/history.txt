@@ -24,6 +24,8 @@ v0.1.9 (SVN)
 + corrected scenario Ids
 + Astech and medic personnel types (they don't do anything yet)
 + changes to resolveScenarioTracker to allow for more diverse units
++ fixed missing fields in Person for save/load XML
++ added Skill to XML serialization
 
 v0.1.8 (2011-06-13)
 + beginning of custom XP costs

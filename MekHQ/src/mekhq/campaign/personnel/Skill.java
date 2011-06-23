@@ -26,9 +26,11 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.StringTokenizer;
 
 import megamek.common.Pilot;
 import megamek.common.TargetRoll;
+import megamek.common.options.PilotOptions;
 import mekhq.MekHQApp;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlSerializable;
@@ -65,7 +67,7 @@ import org.w3c.dom.NodeList;
  * will follow the core rulebooks (not aToW).
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class Skill implements Serializable {
+public class Skill implements Serializable, MekHqXmlSerializable {
 
 	/**
 	 * 
@@ -75,6 +77,10 @@ public class Skill implements Serializable {
 	private SkillType type;
 	private int level;
 	private int bonus;
+	
+	public Skill() {
+
+	}
 	
 	public Skill(String t) {
 		this.type = SkillType.getType(t);
@@ -132,4 +138,51 @@ public class Skill implements Serializable {
 			return getFinalSkillValue() + "+";
 		}
 	}	
+	
+	public void writeToXml(PrintWriter pw1, int indent, int id) {
+		pw1.println(MekHqXmlUtil.indentStr(indent) + "<skill>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<type>"
+				+type.getName()
+				+"</type>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<level>"
+				+level
+				+"</level>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<bonus>"
+				+bonus
+				+"</bonus>");
+		pw1.println(MekHqXmlUtil.indentStr(indent) + "</skill>");
+	}
+	
+	public static Skill generateInstanceFromXML(Node wn) {
+		Skill retVal = null;
+		
+		try {
+			retVal = new Skill();
+			
+			// Okay, now load Skill-specific fields!
+			NodeList nl = wn.getChildNodes();
+			
+			for (int x=0; x<nl.getLength(); x++) {
+				Node wn2 = nl.item(x);
+				
+				if (wn2.getNodeName().equalsIgnoreCase("type")) {
+					retVal.type = SkillType.getType(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("level")) {
+					retVal.level = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("bonus")) {
+					retVal.bonus = Integer.parseInt(wn2.getTextContent());
+				}
+			}
+		} catch (Exception ex) {
+			// Errrr, apparently either the class name was invalid...
+			// Or the listed name doesn't exist.
+			// Doh!
+			MekHQApp.logError(ex);
+		}
+		
+		return retVal;
+	}
 }
