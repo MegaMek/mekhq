@@ -214,7 +214,7 @@ public class ResolveWizardChooseFilesDialog extends javax.swing.JDialog {
     	if(tracker.getMissingUnits().size() > 0) {
     		ResolveWizardMissingUnitsDialog resolveDialog = new ResolveWizardMissingUnitsDialog((Frame)getParent(), true, tracker);
     		resolveDialog.setVisible(true);
-    	} else if(tracker.getPeople().size() > 0) {
+    	} else if(!tracker.getPeopleStatus().isEmpty()) {
     		ResolveWizardPilotStatusDialog resolveDialog = new ResolveWizardPilotStatusDialog((Frame)getParent(), true, tracker);
     		resolveDialog.setVisible(true);
     	} else if(tracker.getPotentialSalvage().size() > 0 

@@ -182,8 +182,8 @@ public class ResolveWizardFinalCheckDialog extends javax.swing.JDialog {
         txtRecoveredUnits.setText("None");
         String names = "";
         if(tracker.getRecoveredUnits().size() > 0) {
-        	for(Entity e : tracker.getRecoveredUnits()) {
-        		names += e.getDisplayName() + "\n";
+        	for(Unit u : tracker.getRecoveredUnits()) {
+        		names += u.getEntity().getDisplayName() + "\n";
         	}
         	txtRecoveredUnits.setText(names);
         }
@@ -208,11 +208,9 @@ public class ResolveWizardFinalCheckDialog extends javax.swing.JDialog {
         txtRecoveredPilots.setName("txtRecoveredPilots");
         txtRecoveredPilots.setText("None");
         names = "";
-        if(tracker.getRecoveredPilots().size() > 0) {
-        	for(Pilot p : tracker.getRecoveredPilots()) {
-        		if(!tracker.foundMatch(p, tracker.getDeadPilots())) {
-        			names += p.getName() + "\n";
-        		}
+        if(tracker.getRecoveredPersonnel().size() > 0) {
+        	for(Person p : tracker.getRecoveredPersonnel()) {
+        		names += p.getName() + "\n";
         	}
         	txtRecoveredPilots.setText(names);
         }
@@ -264,8 +262,8 @@ public class ResolveWizardFinalCheckDialog extends javax.swing.JDialog {
         txtMissingPilots.setName("txtMissingPilots");
         txtMissingPilots.setText("None");
         names = "";
-        if(tracker.getMissingPilots().size() > 0) {
-        	for(Person p : tracker.getMissingPilots()) {
+        if(tracker.getMissingPersonnel().size() > 0) {
+        	for(Person p : tracker.getMissingPersonnel()) {
         		names += p.getName() + "\n";
         	}
         	txtMissingPilots.setText(names);
@@ -318,8 +316,8 @@ public class ResolveWizardFinalCheckDialog extends javax.swing.JDialog {
         txtDeadPilots.setName("txtDeadPilots");
         txtDeadPilots.setText("None");
         names = "";
-        if(tracker.getDeadPilots().size() > 0) {
-        	for(Pilot p : tracker.getDeadPilots()) {
+        if(tracker.getDeadPersonnel().size() > 0) {
+        	for(Person p : tracker.getDeadPersonnel()) {
         		names += p.getName() + "\n";
         	}
         	txtDeadPilots.setText(names);

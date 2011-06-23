@@ -23,6 +23,7 @@ v0.1.9 (SVN)
 + change Force to unit-specific rather than person-specific (to accomodate multi-person crews)
 + corrected scenario Ids
 + Astech and medic personnel types (they don't do anything yet)
++ changes to resolveScenarioTracker to allow for more diverse units
 
 v0.1.8 (2011-06-13)
 + beginning of custom XP costs

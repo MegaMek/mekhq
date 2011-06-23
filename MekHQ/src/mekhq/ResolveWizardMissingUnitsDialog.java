@@ -182,12 +182,12 @@ public class ResolveWizardMissingUnitsDialog extends javax.swing.JDialog {
     	for(int i = 0; i < boxes.size(); i++) {
     		JCheckBox box = boxes.get(i);
     		if(box.isSelected()) {
-    			tracker.recoverMissingEntity(i);
+    			//tracker.recoverMissingEntity(i);
     		}
     	}
-    	tracker.identifyMissingUnits();
+    	//tracker.identifyMissingUnits();
     	this.setVisible(false);
-    	if(tracker.getPeople().size() > 0) {
+    	if(!tracker.getPeopleStatus().isEmpty()) {
     		ResolveWizardPilotStatusDialog resolveDialog = new ResolveWizardPilotStatusDialog((Frame)getParent(), true, tracker);
     		resolveDialog.setVisible(true);
     	} else if(tracker.getPotentialSalvage().size() > 0 

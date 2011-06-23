@@ -32,6 +32,7 @@ import javax.swing.JLabel;
 import javax.swing.JRadioButton;
 
 import mekhq.campaign.ResolveScenarioTracker;
+import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.personnel.Person;
 
@@ -53,6 +54,7 @@ public class ResolveWizardPilotStatusDialog extends javax.swing.JDialog {
     private ArrayList<JRadioButton> activeBtns;
     private ArrayList<JRadioButton> miaBtns;
     private ArrayList<JRadioButton> kiaBtns;
+    private ArrayList<PersonStatus> statuses;
 
 	
     /** Creates new form NewTeamDialog */
@@ -75,7 +77,7 @@ public class ResolveWizardPilotStatusDialog extends javax.swing.JDialog {
         activeBtns = new ArrayList<JRadioButton>();
         miaBtns = new ArrayList<JRadioButton>();
         kiaBtns = new ArrayList<JRadioButton>();
-       
+        statuses = new ArrayList<PersonStatus>();
      
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
@@ -115,21 +117,23 @@ public class ResolveWizardPilotStatusDialog extends javax.swing.JDialog {
         JRadioButton miaButton;
         JRadioButton kiaButton; 
         ButtonGroup group;
-        for(Person pp : tracker.getPeople()) {
-        	nameLbl = new JLabel(pp.getFullTitle());
+        for(int pid : tracker.getPeopleStatus().keySet()) {
+        	PersonStatus status = tracker.getPeopleStatus().get(pid);
+        	statuses.add(status);
+        	nameLbl = new JLabel(status.getName());
         	activeButton = new JRadioButton("Active");
         	activeBtns.add(activeButton);
         	miaButton = new JRadioButton("MIA");
         	miaBtns.add(miaButton);
         	kiaButton = new JRadioButton("KIA"); 
         	kiaBtns.add(kiaButton);
-        	//if(tracker.foundMatch(pp.getPilot(), tracker.getDeadPilots())) {
-        		//kiaButton.setSelected(true);
-        	//} else if(tracker.foundMatch(pp.getPilot(), tracker.getRecoveredPilots())) {
-        	//	activeButton.setSelected(true);
-        	//} else {
+        	if(status.isDead()) {
+        		kiaButton.setSelected(true);
+        	} else if(status.isMissing()) {
         		miaButton.setSelected(true);
-        	//}
+        	} else {
+        		activeButton.setSelected(true);
+        	}
         	group = new ButtonGroup();
         	group.add(activeButton);
         	group.add(miaButton);
@@ -212,20 +216,27 @@ public class ResolveWizardPilotStatusDialog extends javax.swing.JDialog {
 
     private void btnNextActionPerformed(java.awt.event.ActionEvent evt) {
     	for(int i = 0; i < activeBtns.size(); i++) {
+    		PersonStatus status = statuses.get(i);
     		JRadioButton activeBtn = activeBtns.get(i);
     		JRadioButton kiaBtn = kiaBtns.get(i);
-    		/*
     		if(activeBtn.getModel().isSelected()) {
-    			tracker.makeActive(tracker.getPeople().get(i).getPilot());
+    			if(status.isMissing()) {
+    				status.setMissing(false);
+    			}
+    			if(status.isDead()) {
+    				status.setHits(5);
+    			}
     		}
     		else if(kiaBtn.getModel().isSelected()) {
-    			tracker.makeCasualty(tracker.getPeople().get(i).getPilot());
+    			status.setMissing(false);
+    			status.setHits(6);
     		} else {
-    			tracker.makeMissing(tracker.getPeople().get(i).getPilot());
+    			if(status.isDead()) {
+    				status.setHits(5);
+    			}
+    			status.setMissing(true);
     		}
-    		*/
     	}
-    	tracker.identifyMissingPilots();
     	this.setVisible(false);
     	if(tracker.getPotentialSalvage().size() > 0 
     			&& (!(tracker.getMission() instanceof Contract) || ((Contract)tracker.getMission()).canSalvage())) {

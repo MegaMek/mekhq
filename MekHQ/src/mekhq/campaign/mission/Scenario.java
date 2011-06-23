@@ -220,7 +220,7 @@ public class Scenario implements Serializable {
 		for(int uid : getForces(campaign).getAllUnits()) {
 			Unit u = campaign.getUnit(uid);
 			if(null != u) {
-				//u.setScenarioId(-1);
+				u.setScenarioId(-1);
 			}	
 		}
 		subForceIds = new ArrayList<Integer>();

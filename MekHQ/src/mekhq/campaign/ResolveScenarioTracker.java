@@ -29,12 +29,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Hashtable;
 
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 
+import megamek.common.BattleArmor;
+import megamek.common.Compute;
 import megamek.common.Entity;
+import megamek.common.Infantry;
 import megamek.common.Pilot;
+import megamek.common.Tank;
 import megamek.common.XMLStreamParser;
 import mekhq.MekHQApp;
 import mekhq.campaign.finances.Transaction;
@@ -51,16 +56,13 @@ import mekhq.campaign.personnel.Person;
  */
 public class ResolveScenarioTracker {
 	
-	ArrayList<Entity> entities;
+	Hashtable<Integer, Entity> entities;
+	Hashtable<Integer, Pilot> pilots;
 	ArrayList<Entity> potentialSalvage;
 	ArrayList<Unit> actualSalvage;
 	ArrayList<Unit> leftoverSalvage;
-	ArrayList<Pilot> pilots;
 	ArrayList<Unit> units;
-	ArrayList<Person> people;
-	ArrayList<Unit> missingUnits;
-	ArrayList<Person> missingPilots;
-	ArrayList<Pilot> deadPilots;
+	Hashtable<Integer, PersonStatus> peopleStatus;
 	Campaign campaign;
 	Scenario scenario;
 	JFileChooser unitList;
@@ -69,23 +71,17 @@ public class ResolveScenarioTracker {
 	public ResolveScenarioTracker(Scenario s, Campaign c) {
 		this.scenario = s;
 		this.campaign = c;
-		entities = new ArrayList<Entity>();
+		entities = new Hashtable<Integer, Entity>();
 		potentialSalvage = new ArrayList<Entity>();
 		actualSalvage = new ArrayList<Unit>();
 		leftoverSalvage = new ArrayList<Unit>();
-		pilots = new ArrayList<Pilot>();
+		pilots = new Hashtable<Integer, Pilot>();
 		units = new ArrayList<Unit>();
-		people = new ArrayList<Person>();
-		missingUnits = new ArrayList<Unit>();
-		missingPilots = new ArrayList<Person>();
+		peopleStatus = new Hashtable<Integer, PersonStatus>();
 		for(int uid : scenario.getForces(campaign).getAllUnits()) {
 			Unit u = campaign.getUnit(uid);
 			if(null != u) {
 				units.add(u);
-				Person p = u.getCommander();
-				if(null != p) {
-					people.add(p);
-				}
 			}
 		}
 		unitList = new JFileChooser(".");
@@ -170,53 +166,72 @@ public class ResolveScenarioTracker {
 				e.printStackTrace();
 			}
 		}
-		checkSalvageForPilotsAndUnits() ;
-		checkForCasualties();
-		identifyMissingUnits();
-		identifyMissingPilots();
+		checkStatusOfPersonnel();
+	}
+
+	private ArrayList<Person> randomlySortArray(ArrayList<Person> array) {
+		int[] idx = new int[array.size()];
+		for(int i = (array.size()-1); i >= 0; i--) {
+			int j = Compute.randomInt(i);
+			idx[i] = j;
+		}
+		ArrayList<Person> newArray =  new ArrayList<Person>();
+		for(int i : idx) {
+			newArray.add(array.get(i));
+		}
+		return newArray;
 	}
 	
-	/**
-	 * Sometimes pilots and units from the players own forces will end up in salvage so lets check for
-	 * them and remove them from salvage if we find them there
-	 */
-	public void checkSalvageForPilotsAndUnits() {
+	public void checkStatusOfPersonnel() {
+		//for single-crewed units, we can check pilot directly, otherwise we need to check
+		//the unit and associated entity
+		
+		//lets cycle through units and get their crew
 		for(Unit u : units) {
-			Entity match = getMatch(u.getEntity(), potentialSalvage);
-			if(null != match) {
-				entities.add(match);
-				if(null != match.getCrew()) {
-					pilots.add(match.getCrew());
+			ArrayList<Person> crew = u.getCrew();//randomlySortArray(u.getCrew());
+			int casualties = 0;
+			int casualtiesAssigned = 0;
+			if(u.getEntity() instanceof Infantry) {
+				casualties = ((Infantry)u.getEntity()).getInternal(Infantry.LOC_INFANTRY);
+			}
+			for(Person p : crew) {
+				PersonStatus status = new PersonStatus(p.getName(), p.getHits());			
+				if(u.usesSoloPilot()) {
+					Pilot pilot = pilots.get(p.getId());
+					if(null == pilot) {
+						status.setMissing(true);
+					} else {
+						status.setHits(pilot.getHits());
+					}
+				} else {
+					//we have a multi-crewed vee
+					Entity en = entities.get(u.getId());
+					if(null == en) {
+						status.setMissing(true);				
+					} else {
+						//TODO: crew hits are not being kept in MUL for tank crews
+						if(en instanceof Tank) {
+							if(((Tank)en).isDriverHit()) {
+								//TODO: how to check if this is driver?
+							}
+							else if(((Tank)en).isCommanderHit()) {
+								//TODO: how to check if this is commander?
+							}
+						}
+						else if(en instanceof Infantry) {
+							if(casualtiesAssigned < casualties) {
+								casualtiesAssigned++;
+								if(Compute.d6(2) >= 7) {
+									status.setHits(1);
+								} else {
+									status.setHits(6);
+								}
+							}
+						}
+					}
 				}
-				potentialSalvage.remove(match);
-			}
-		}
-	}
-	
-	
-	public void identifyMissingUnits() {
-		missingUnits = new ArrayList<Unit>();
-		for(Unit u : units) {
-			if(!foundMatch(u.getEntity(), entities) && !foundMatch(u.getEntity(), potentialSalvage)) {
-				missingUnits.add(u);
-			}
-		}
-	}
-	
-	public void identifyMissingPilots() {
-		missingPilots = new ArrayList<Person>();
-		for(Person person : people) {
-			//if(!foundMatch(person.getPilot(), pilots) && !foundMatch(person.getPilot(), deadPilots)) {
-				//missingPilots.add(person);
-			//}
-		}
-	}
-	
-	public void checkForCasualties() {
-		deadPilots = new ArrayList<Pilot>();
-		for(Pilot p : pilots) {
-			if(p.isDead()) {
-				deadPilots.add(p);
+				status.setXP(1);
+				peopleStatus.put(p.getId(), status);
 			}
 		}
 	}
@@ -249,12 +264,12 @@ public class ResolveScenarioTracker {
 
 			// Add the units from the file.
 			for (Entity entity : parser.getEntities()) {
-				entities.add(entity);
+				entities.put(entity.getExternalId(), entity);
 			}
 			
 			// add any ejected pilots
 			for (Pilot pilot : parser.getPilots()) {
-				pilots.add(pilot);
+				pilots.put(pilot.getExternalId(), pilot);
 			}
 		}
 	}
@@ -283,33 +298,29 @@ public class ResolveScenarioTracker {
 				MekHQApp.logMessage(parser.getWarningMessage());
 			}
 
-			// Add the units from the file.
-			//there may be duplicates of the saved unit mul in salvage, so check
-			//this
+			// Add the units from the file.		
 			for (Entity entity : parser.getEntities()) {
-				if(!foundMatch(entity, entities)) {
+				//some of the players units and personnel may be in the salvage pile, so 
+				//lets check for these first
+				if(foundMatch(entity, units)) {
+					entities.put(entity.getExternalId(), entity);
+					if(null != entity.getCrew()) {
+						pilots.put(entity.getCrew().getExternalId(), entity.getCrew());
+					}
+				} else {		
 					potentialSalvage.add(entity);
 				}
 			}
 		}
 	}
 	
-	private boolean foundMatch(Entity en, ArrayList<Entity> ents) {
-		for(Entity otherEntity : ents) {
-			if(otherEntity.getExternalId() == en.getExternalId()) {
+	private boolean foundMatch(Entity en, ArrayList<Unit> units) {
+		for(Unit u : units) {
+			if(u.getId() == en.getExternalId()) {
 				return true;
 			}
 		}
 		return false;
-	}
-	
-	private Entity getMatch(Entity en, ArrayList<Entity> ents) {
-		for(Entity otherEntity : ents) {
-			if(otherEntity.getExternalId() == en.getExternalId()) {
-				return otherEntity;
-			}
-		}
-		return null;
 	}
 	
 	public boolean foundMatch(Pilot p, ArrayList<Pilot> pils) {
@@ -319,94 +330,6 @@ public class ResolveScenarioTracker {
 			}
 		}
 		return false;
-	}
-	
-	private Pilot getMatch(Pilot p, ArrayList<Pilot> pils) {
-		for(Pilot otherPilot : pils) {
-			if(otherPilot.getExternalId() == p.getExternalId()) {
-				return otherPilot;
-			}
-		}
-		return null;
-	}
-	
-	
-	public ArrayList<Unit> getMissingUnits() {
-		return missingUnits;
-	}
-	
-	public void recoverMissingEntity(int i) {
-		if(i < 0 || i > missingUnits.size()) {
-			return;
-		}
-		Unit u = missingUnits.get(i);
-		entities.add(u.getEntity());
-	}
-	
-	public ArrayList<Person> getMissingPilots() {
-		return missingPilots;
-	}
-	
-	public void makeActive(Pilot pilot) {
-		if(!foundMatch(pilot, pilots)) {
-			pilots.add(pilot);
-		}	
-		int idx = -1;
-		for(int i = 0; i < deadPilots.size(); i++) {
-			if(deadPilots.get(i).getExternalId() == pilot.getExternalId()) {
-				idx = i;
-				break;
-			}
-		}
-		if(idx > -1) {
-			deadPilots.remove(idx);
-		}
-	}
-	
-	public void makeCasualty(Pilot pilot) {
-		if(!foundMatch(pilot, deadPilots)) {
-			deadPilots.add(pilot);
-		}	
-	}
-	
-	public void makeMissing(Pilot pilot) {
-		int idx = -1;
-		for(int i = 0; i < pilots.size(); i++) {
-			if(pilots.get(i).getExternalId() == pilot.getExternalId()) {
-				idx = i;
-				break;
-			}
-		}
-		if(idx > -1) {
-			pilots.remove(idx);
-		}
-		idx = -1;
-		for(int i = 0; i < deadPilots.size(); i++) {
-			if(deadPilots.get(i).getExternalId() == pilot.getExternalId()) {
-				idx = i;
-				break;
-			}
-		}
-		if(idx > -1) {
-			deadPilots.remove(idx);
-		}	
-	}
-	
-	public ArrayList<Pilot> getDeadPilots() {
-		return deadPilots;
-	}
-	
-	public void removeCasaulty(int i) {
-		if(i < 0 || i > deadPilots.size()) {
-			return;
-		}
-		Pilot casualty = deadPilots.get(i);
-		casualty.setHits(5);
-		casualty.setDead(false);
-	}
-	
-	public ArrayList<Person> getPeople() {
-		return people;
 	}
 	
 	public ArrayList<Entity> getPotentialSalvage() {
@@ -423,14 +346,6 @@ public class ResolveScenarioTracker {
 
 	public void dontSalvageUnit(int i) {
 		leftoverSalvage.add(new Unit(potentialSalvage.get(i), campaign));	
-	}
-	
-	public ArrayList<Entity> getRecoveredUnits() {
-		return entities;
-	}
-	
-	public ArrayList<Pilot> getRecoveredPilots() {
-		return pilots;
 	}
 	
 	public Campaign getCampaign() {
@@ -453,32 +368,51 @@ public class ResolveScenarioTracker {
 			blc = ((Contract)m).getBattleLossComp()/100.0;
 		}
 		
-		//first lets update the entities on all units
-		for(Entity en : entities) {
-			updateUnitWith(en, blc);
-		}
-		//now lets update pilots
-		for(Pilot p : pilots) {
-			updatePilotWith(p);
-		}
-		//now lets take take care of missing pilots
-		for(Person miss : missingPilots) {
-			setMIA(miss);
-		}
-		//now lets take care of dead pilots
-		for(Pilot dead : deadPilots) {
-			killPilot(dead);
-		}
-		//now lets take care of missing units
-		for(Unit missUnit : missingUnits) {
-			if(blc > 0) {
-				long value = (long)(blc * missUnit.getSellValue());
-				campaign.getFinances().credit(value, Transaction.C_BLC, "Battle loss compensation for " + missUnit.getEntity().getDisplayName(), campaign.getCalendar().getTime());
-				DecimalFormat formatter = new DecimalFormat();
-				campaign.addReport(formatter.format(value) + " in battle loss compensation for " + missUnit.getEntity().getDisplayName() + " has been credited to your account.");
+		//now lets update all units
+		for(Unit unit : units) {
+			Entity en = entities.get(unit.getId());
+			if(null == en) {
+				//missing unit
+				if(blc > 0) {
+					long value = (long)(blc * unit.getSellValue());
+					campaign.getFinances().credit(value, Transaction.C_BLC, "Battle loss compensation for " + unit.getEntity().getDisplayName(), campaign.getCalendar().getTime());
+					DecimalFormat formatter = new DecimalFormat();
+					campaign.addReport(formatter.format(value) + " in battle loss compensation for " + unit.getEntity().getDisplayName() + " has been credited to your account.");
+				}
+				campaign.removeUnit(unit.getId());
+			} else {
+				long currentValue = unit.getValueOfAllMissingParts();
+				unit.setEntity(en);
+				unit.runDiagnostic();
+				//check for BLC
+				long newValue = unit.getValueOfAllMissingParts();
+				campaign.addReport(unit.getEntity().getDisplayName() + " has been recovered.");
+				if(blc > 0 && newValue > currentValue) {
+					long finalValue = (long)(blc * (newValue - currentValue));
+					campaign.getFinances().credit(finalValue, Transaction.C_BLC, "Battle loss compensation (parts) for " + en.getDisplayName(), campaign.getCalendar().getTime());
+					DecimalFormat formatter = new DecimalFormat();
+					campaign.addReport(formatter.format(finalValue) + " in battle loss compensation for parts for " + en.getDisplayName() + " has been credited to your account.");
+				}
 			}
-			campaign.removeUnit(missUnit.getId());
 		}
+	
+		//now lets update personnel
+		for(int pid : peopleStatus.keySet()) {
+			Person person = campaign.getPerson(pid);
+			PersonStatus status = peopleStatus.get(pid);
+			if(null == person || null == status) {
+				continue;
+			}
+			person.setXp(person.getXp() + status.xp);
+			person.setHits(status.getHits());
+			if(status.isMissing()) {
+				person.setStatus(Person.S_MIA);
+			}
+			if(status.isDead()) {
+				person.setStatus(Person.S_KIA);
+			}
+		}
+		
 		//now lets take care of salvage
 		for(Unit salvageUnit : actualSalvage) {
 			campaign.addUnit(salvageUnit.getEntity(), false);
@@ -511,74 +445,128 @@ public class ResolveScenarioTracker {
 		scenario.clearAllForcesAndPersonnel(campaign);
 	}
 	
-	private void updateUnitWith(Entity en, double blc) {
-		for(Unit u : campaign.getUnits()) {
-			if(u.getEntity().getExternalId() == en.getExternalId()) {
-				//check the current value of missing parts before updating
-				long currentValue = u.getValueOfAllMissingParts();
-				u.setEntity(en);
-				u.runDiagnostic();
-				//check for BLC
-				long newValue = u.getValueOfAllMissingParts();
-				campaign.addReport(u.getEntity().getDisplayName() + " has been recovered.");
-				if(blc > 0 && newValue > currentValue) {
-					long finalValue = (long)(blc * (newValue - currentValue));
-					campaign.getFinances().credit(finalValue, Transaction.C_BLC, "Battle loss compensation (parts) for " + en.getDisplayName(), campaign.getCalendar().getTime());
-					DecimalFormat formatter = new DecimalFormat();
-					campaign.addReport(formatter.format(finalValue) + " in battle loss compensation for parts for " + en.getDisplayName() + " has been credited to your account.");
+	public ArrayList<Person> getMissingPersonnel() {
+		ArrayList<Person> mia = new ArrayList<Person>();
+		for(int pid : peopleStatus.keySet()) {
+			PersonStatus status = peopleStatus.get(pid);
+			if(status.isMissing()) {
+				Person p = campaign.getPerson(pid);
+				if(null != p) {
+					mia.add(p);
 				}
-				return;
 			}
 		}
+		return mia;
 	}
 	
-	private void updatePilotWith(Pilot pilot) {
-		for(Person person : campaign.getPersonnel()) {
-/*
-			if(pp.getPilot().getExternalId() == pilot.getExternalId()) {
-				if(pilot.isDead()) {
-					pilot.setDead(false);
-					pilot.setHits(0);
+	public ArrayList<Person> getDeadPersonnel() {
+		ArrayList<Person> kia = new ArrayList<Person>();
+		for(int pid : peopleStatus.keySet()) {
+			PersonStatus status = peopleStatus.get(pid);
+			if(status.isDead()) {
+				Person p = campaign.getPerson(pid);
+				if(null != p) {
+					kia.add(p);
 				}
-				pp.setPilot(pilot);
-				//don't use the MM pilot name
-				pp.resetPilotName();
-				pp.undeploy(campaign);
-				//assign XP
-				pp.setXp(pp.getXp() + campaign.getSkillCosts().getScenarioXP());
-				if(null != pp.getAssignedUnit()) {
-					//TODO: this is such a roundabout way of doing this - lets
-					//make it personnel centric
-					pp.getAssignedUnit().setPilot(pp);
-					campaign.addReport(pp.getFullTitle() + " has been recovered.");
+			}
+		}
+		return kia;
+	}
+	
+	public ArrayList<Person> getRecoveredPersonnel() {
+		ArrayList<Person> recovered = new ArrayList<Person>();
+		for(int pid : peopleStatus.keySet()) {
+			PersonStatus status = peopleStatus.get(pid);
+			if(!status.isDead() && !status.isMissing()) {
+				Person p = campaign.getPerson(pid);
+				if(null != p) {
+					recovered.add(p);
 				}
-				return;
 			}
-			*/
 		}
+		return recovered;
 	}
 	
-	private void killPilot(Pilot pilot) {
-		for(Person person : campaign.getPersonnel()) {
-			/*
-			if(pp.getPilot().getExternalId() == pilot.getExternalId()) {
-				pp.getPilot().setDead(true);
-				pp.getPilot().setHits(6);
-				pp.setStatus(Person.S_KIA);
-				campaign.removePersonFromForce(pp);
-				campaign.addReport(pp.getFullTitle() + " has been killed in action.");
-				return;
-			}
-			*/
-		}
+	public Hashtable<Integer, PersonStatus> getPeopleStatus() {
+		return peopleStatus;
 	}
 	
-	private void setMIA(Person person) {
-		if(null != person) {
-			person.setStatus(Person.S_MIA);
-			//person.undeploy(campaign);
-			//campaign.removePersonFromForce(person);
-			campaign.addReport(person.getFullTitle() + " is missing in action.");
+	public ArrayList<Unit> getMissingUnits() {
+		ArrayList<Unit> missing = new ArrayList<Unit>();
+		for(Unit u : units) {
+			if(null == entities.get(u.getId())) {
+				missing.add(u);
+			}
+		}
+		return missing;
+	}
+	
+	public ArrayList<Unit> getRecoveredUnits() {
+		ArrayList<Unit> recovered = new ArrayList<Unit>();
+		for(Unit u : units) {
+			if(null != entities.get(u.getId())) {
+				recovered.add(u);
+			}
+		}
+		return recovered;
+	}
+	
+	
+	
+
+	/**
+	 * This object is used to track the status of a particular personnel. At the present, 
+	 * we track the person's missing status, hits, and XP
+	 * @author Jay Lawson
+	 *
+	 */
+	public class PersonStatus {
+		
+		private String name;
+		private int hits;
+		private boolean missing;
+		private int xp;
+		
+		public PersonStatus(String n, int h) {
+			name = n;
+			hits = h;
+			missing = false;
+			xp = 0;
+		}
+		
+		public String getName() {
+			return name;
+		}
+		
+		public int getHits() {
+			return hits;
+		}
+		
+		public void setHits(int h) {
+			hits = h;
+		}
+		
+		public boolean isDead() {
+			return hits >= 6;
+		}
+		
+		public boolean isMissing() {
+			return missing && !isDead();
+		}
+		
+		public void setMissing(boolean b) {
+			missing = b;
+		}
+		
+		public int getXP() {
+			if(isDead()) {
+				return 0;
+			}
+			return xp;
+		}
+		
+		public void setXP(int x) {
+			xp = x;
 		}
 	}
 }

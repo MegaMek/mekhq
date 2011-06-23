@@ -879,7 +879,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 	}
 
 	public boolean hasPilot() {
-		return false;//null != pilot;
+		return null != entity.getCrew();
 	}
 
 	public void removePilot() {	
@@ -1977,13 +1977,14 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 				+ customized + "</customized>");
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<quality>"
 				+ quality + "</quality>");
-		/*
-		// Units may not have a pilot!
-		if (pilot != null) {
-			pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<pilotId>"
-					+ pilot.getId() + "</pilotId>");
+		for(int did : drivers) {
+			pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<driverId>"
+					+ did + "</driverId>");
 		}
-		*/
+		for(int gid : gunners) {
+			pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<gunnerId>"
+					+ gid + "</gunnerId>");
+		}
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<salvaged>"
 				+ salvaged + "</salvaged>");
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<site>" + site
@@ -2018,6 +2019,10 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 					retVal.site = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("pilotId")) {
 					retVal.pilotId = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("driverId")) {
+					retVal.drivers.add(Integer.parseInt(wn2.getTextContent()));
+				} else if (wn2.getNodeName().equalsIgnoreCase("gunnerId")) {
+					retVal.gunners.add(Integer.parseInt(wn2.getTextContent()));
 				} else if (wn2.getNodeName().equalsIgnoreCase("forceId")) {
 					retVal.forceId = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("scenarioId")) {
@@ -2660,6 +2665,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     	Pilot pilot = new Pilot(commander.getFullTitle(), gunnery, piloting);
     	pilot.setPortraitCategory(commander.getPortraitCategory());
     	pilot.setPortraitFileName(commander.getPortraitFileName());
+    	pilot.setExternalId(commander.getId());
     	//TODO: record hits (as well as commander hit, driver hit, etc.) 
     	//TODO: set edge and triggers
     	//TODO: set toughness
@@ -2777,6 +2783,23 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     
     public void setScenarioId(int i) {
     	this.scenarioId = i;
+    }
+    
+    public ArrayList<Person> getCrew() {
+    	ArrayList<Person> crew = new ArrayList<Person>();
+    	for(int id : drivers) {
+    		Person p = campaign.getPerson(id);
+    		if(null != p) {
+    			crew.add(p);
+    		}
+    	}
+    	for(int id : gunners) {
+    		Person p = campaign.getPerson(id);
+    		if(null != p) {
+    			crew.add(p);
+    		}
+    	}
+    	return crew;
     }
     
 }
