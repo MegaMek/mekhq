@@ -32,6 +32,7 @@ v0.1.9 (SVN)
 + adjust modifiers for overtime and shorthanded when carrying tasks over from day to day
 + removing and adding astechs changes astech pool time
 + astech pool menu items
++ report overtime in tech description
 
 v0.1.8 (2011-06-13)
 + beginning of custom XP costs

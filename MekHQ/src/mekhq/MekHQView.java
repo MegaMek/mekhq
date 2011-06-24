@@ -4292,7 +4292,7 @@ public class MekHQView extends FrameView {
 		}
 
 		public Object getValueAt(int row, int col) {
-			return ((Person) data.get(row)).getTechDesc();
+			return ((Person) data.get(row)).getTechDesc(campaign.isOvertimeAllowed());
 		}
 
 		public Person getTechAt(int row) {

@@ -1254,7 +1254,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     	return skill;
     }
     
-    public String getTechDesc() {
+    public String getTechDesc(boolean overtimeAllowed) {
          String toReturn = "<html><font size='2'><b>" + getName() + "</b><br/>";
          Skill mechSkill = getSkill(SkillType.S_TECH_MECH);
          Skill mechanicSkill = getSkill(SkillType.S_TECH_MECHANIC);
@@ -1291,11 +1291,9 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
          }
          toReturn += "<br/>";
          toReturn += getMinutesLeft() + " minutes left";
-         /*
-         if(campaign.isOvertimeAllowed()) {
+         if(overtimeAllowed) {
              toReturn += " + (" + getOvertimeLeft() + " overtime)";
          }
-         */
          toReturn += "</font></html>";
          return toReturn;
     }
