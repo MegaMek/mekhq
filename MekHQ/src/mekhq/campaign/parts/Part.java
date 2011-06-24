@@ -31,6 +31,7 @@ import mekhq.MekHQApp;
 import mekhq.campaign.MekHqXmlSerializable;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
+import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.team.SupportTeam;
 import mekhq.campaign.work.IPartWork;
 
@@ -118,7 +119,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		this.name = "Unknown";
 		this.unitTonnage = tonnage;
 		this.hits = 0;
-		this.skillMin = SupportTeam.EXP_GREEN;
+		this.skillMin = SkillType.EXP_GREEN;
 		this.mode = MODE_NORMAL;
 		this.timeSpent = 0;
 		this.teamId = -1;
@@ -203,7 +204,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		toReturn += "<b>" + action + getName() + "</b><br/>";
 		toReturn += getDetails() + "<br/>";
 		toReturn += "" + getTimeLeft() + " minutes" + scheduled;
-		toReturn += ", " + SupportTeam.getRatingName(getSkillMin());
+		toReturn += ", " + SkillType.getExperienceLevelName(getSkillMin());
 		toReturn += " " + bonus;
 		if (getMode() != MODE_NORMAL) {
 			toReturn += "<br/><i>" + getCurrentModeName() + "</i>";

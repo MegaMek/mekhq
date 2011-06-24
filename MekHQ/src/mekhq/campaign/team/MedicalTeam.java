@@ -103,7 +103,7 @@ public class MedicalTeam extends SupportTeam {
         if(!medWork.needsFixing()) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, medWork.getPatientName() + " does not require healing.");
         }
-        TargetRoll target = getTarget(medWork.getMode());
+        TargetRoll target = new TargetRoll(4,"fix this");//getTarget(medWork.getMode());
         if(target.getValue() == TargetRoll.IMPOSSIBLE) {
             return target;
         }

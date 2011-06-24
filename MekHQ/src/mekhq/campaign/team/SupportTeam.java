@@ -164,33 +164,6 @@ public abstract class SupportTeam implements Serializable, MekHqXmlSerializable 
         return getFullStrength() - getCurrentStrength();
     }
     
-    public TargetRoll getTarget(int mode) {    
-        int effRating = getRating();
-        switch(mode) {
-            case Modes.MODE_RUSH_THREE:
-                effRating--;
-            case Modes.MODE_RUSH_TWO:
-                effRating--;
-            case Modes.MODE_RUSH_ONE:
-                effRating--;
-                break;
-        }
-        if(effRating < EXP_GREEN) {
-            return new TargetRoll(TargetRoll.IMPOSSIBLE, "the current team cannot perform this level of rush job");
-        }
-        TargetRoll target = new TargetRoll(getSkillBase(effRating), getRatingName(effRating));
-        if(getCasualtyMods() > 0) {
-            target.addModifier(getCasualtyMods(), "understaffed");
-        }
-        /*
-         * TODO: need an option for era mods
-        if(this instanceof TechTeam) {
-            target.addModifier(campaign.getEraMod(), "era mod");
-        }
-         * */
-        return target;
-    }
-    
    public abstract int getSkillBase(int effectiveRating);   
    
    public int getCasualtyMods() {
@@ -223,25 +196,6 @@ public abstract class SupportTeam implements Serializable, MekHqXmlSerializable 
   // public abstract String getTasksDesc();
    
    public abstract String getTypeDesc();
-   
-   public boolean isTaskOvertime(IPartWork partWork) {
-       return partWork.getTimeLeft() > getMinutesLeft()
-                && (campaign.isOvertimeAllowed()  
-                    && (partWork.getTimeLeft() - getMinutesLeft()) <= getOvertimeLeft());
-   }
-   
-   public TargetRoll getTargetForAcquisition(IAcquisitionWork acquisition) {
-	   if(null == acquisition) {
-           return new TargetRoll(TargetRoll.IMPOSSIBLE, "no task?");
-       }
-	   if(acquisition.hasCheckedToday()) {
-           return new TargetRoll(TargetRoll.IMPOSSIBLE, "Already checked for this part in this cycle");
-	   }
-	   
-	   TargetRoll target = getTarget(Modes.MODE_NORMAL);
-	   target.append(acquisition.getAllAcquisitionMods());
-	   return target;
-   }
 
 	public abstract void writeToXml(PrintWriter pw1, int indent, int id);
 	

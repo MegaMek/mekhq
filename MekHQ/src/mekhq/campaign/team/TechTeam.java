@@ -127,78 +127,7 @@ public class TechTeam extends SupportTeam {
         return toReturn;
    }
    
-   public TargetRoll getTargetFor(IPartWork partWork) {
-       if(null == partWork) {
-           return new TargetRoll(TargetRoll.IMPOSSIBLE, "no task?");
-       }
-       if(null != partWork.getUnit() && partWork.getUnit().isDeployed()) {
-           return new TargetRoll(TargetRoll.IMPOSSIBLE, "This unit is currently deployed!");
-       } 
-       if(partWork.getSkillMin() > getRating()) {
-           return new TargetRoll(TargetRoll.IMPOSSIBLE, "Task is beyond this team's skill level");
-       }
-       if(!partWork.needsFixing() && !partWork.isSalvaging()) {
-           return new TargetRoll(TargetRoll.IMPOSSIBLE, "Task is not needed.");
-       }
-       if(partWork instanceof MissingPart && null == ((MissingPart)partWork).findReplacement()) {
-           return new TargetRoll(TargetRoll.IMPOSSIBLE, "Part not available.");
-       }
-       if(getMinutesLeft() <= 0 && (!campaign.isOvertimeAllowed() || getOvertimeLeft() <= 0)) {
-    	   return new TargetRoll(TargetRoll.IMPOSSIBLE, "No time left.");
-       }
-       String notFixable = partWork.checkFixable();
-       if(null != notFixable) {
-    	   return new TargetRoll(TargetRoll.IMPOSSIBLE, notFixable);
-       }
-       TargetRoll target = getTarget(partWork.getMode());
-       if(target.getValue() == TargetRoll.IMPOSSIBLE) {
-           return target;
-       }
-
-       if(isTaskOvertime(partWork)) {
-           target.addModifier(3, "overtime");
-       }
-       
-       /*
-       // Generic spare parts
-       if (task instanceof ReplacementItem
-               && ((ReplacementItem) task).partNeeded() instanceof GenericSparePart
-               && !((ReplacementItem) task).hasPart()) {
-           return new TargetRoll(TargetRoll.IMPOSSIBLE, "Not enough spare parts");
-       } else if (task instanceof ReplacementItem
-               && ((ReplacementItem) task).hasPart()
-               && ((ReplacementItem) task).partNeeded() instanceof GenericSparePart
-               && !((ReplacementItem) task).hasEnoughGenericSpareParts()) {
-           /*
-           GenericSparePart partNeeded = (GenericSparePart) ((ReplacementItem) task).partNeeded();
-           GenericSparePart part = (GenericSparePart) ((ReplacementItem) task).getPart();
-           if (campaign.getFunds() < new GenericSparePart(part.getTech(), partNeeded.getAmount()-part.getAmount()).getCost()) {
-               return new TargetRoll(TargetRoll.IMPOSSIBLE, "Not enough funds");
-           }
-           */
-           //return new TargetRoll(TargetRoll.IMPOSSIBLE, "Not enough spare parts");
-       //}
-       // check funds
-       /*
-       if (campaign.getCampaignOptions().payForParts()
-    		   && task instanceof ReplacementItem
-               && !((ReplacementItem) task).hasPart()
-               && !campaign.hasEnoughFunds(((ReplacementItem) task).partNeeded().getCost())) {
-           return new TargetRoll(TargetRoll.IMPOSSIBLE, "Not enough funds");
-       } else if (campaign.getCampaignOptions().payForParts()
-    		   && task instanceof ReloadItem
-               && !campaign.hasEnoughFunds(((ReloadItem) task).getCost())) {
-           return new TargetRoll(TargetRoll.IMPOSSIBLE, "Not enough funds");
-       } else if (campaign.getCampaignOptions().payForParts()
-    		   && task instanceof FullRepairWarchest
-               && !campaign.hasEnoughFunds(((FullRepairWarchest) task).getCost())) {
-           return new TargetRoll(TargetRoll.IMPOSSIBLE, "Not enough funds");
-       }
-       */
-
-       target.append(partWork.getAllMods());
-       return target;
-   }
+   
 
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent, int id) {

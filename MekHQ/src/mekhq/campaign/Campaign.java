@@ -83,6 +83,7 @@ import mekhq.campaign.parts.MissingEquipmentPart;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.team.MedicalTeam;
 import mekhq.campaign.team.SupportTeam;
@@ -90,6 +91,7 @@ import mekhq.campaign.team.TechTeam;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IMedicalWork;
 import mekhq.campaign.work.IPartWork;
+import mekhq.campaign.work.Modes;
 
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
@@ -315,22 +317,6 @@ public class Campaign implements Serializable {
 		
 		if (t.getId() > lastTeamId)
 			lastTeamId = t.getId();
-	}
-	
-	/**
-	 * @return an <code>ArrayList</code> of SupportTeams in the campaign
-	 */
-	public ArrayList<SupportTeam> getTeams() {
-		return teams;
-	}
-
-	/**
-	 * @param id
-	 *            the <code>int</code> id of the support team
-	 * @return a <code>Support Team</code> object
-	 */
-	public SupportTeam getTeam(int id) {
-		return teamIds.get(new Integer(id));
 	}
 	
 	/**
@@ -590,16 +576,6 @@ public class Campaign implements Serializable {
 		return toReturn;
 	}
 
-	public ArrayList<SupportTeam> getDoctors() {
-		ArrayList<SupportTeam> docs = new ArrayList<SupportTeam>();
-		for (SupportTeam team : getTeams()) {
-			if (team instanceof MedicalTeam) {
-				docs.add(team);
-			}
-		}
-		return docs;
-	}
-
 	public ArrayList<Person> getTechs() {
 		ArrayList<Person> techs = new ArrayList<Person>();
 		for (Person p: personnel) {
@@ -660,10 +636,10 @@ public class Campaign implements Serializable {
 		return report;
 	}
 	
-	public void acquirePart(IAcquisitionWork acquisition, SupportTeam t) {
+	public void acquirePart(IAcquisitionWork acquisition, Person person) {
 		String report = "";
-		report += t.getName() + " attempts to find " + acquisition.getPartName();          
-		TargetRoll target = t.getTargetForAcquisition(acquisition);     
+		report += person.getName() + " attempts to find " + acquisition.getPartName();          
+		TargetRoll target = getTargetForAcquisition(acquisition, person);     
 		acquisition.setCheckedToday(true);
 		int roll = Compute.d6(2);
 		report += "  needs " + target.getValueAsString();
@@ -676,8 +652,8 @@ public class Campaign implements Serializable {
 		addReport(report);
 	}
 	
-	public void fixPart(IPartWork partWork, TechTeam t) {
-		TargetRoll target = t.getTargetFor(partWork);
+	public void fixPart(IPartWork partWork, Person tech) {
+		TargetRoll target = getTargetFor(partWork, tech);
 		String report = "";
 		String action = " fix ";
 		if(partWork instanceof AmmoBin) {
@@ -689,46 +665,46 @@ public class Campaign implements Serializable {
 		if(partWork instanceof MissingPart) {
 			action = " replace ";
 		}
-		report += t.getName() + " attempts to" + action + partWork.getPartName();   
+		report += tech.getName() + " attempts to" + action + partWork.getPartName();   
 		int minutes = partWork.getTimeLeft();
-		if(minutes > t.getMinutesLeft()) {
-			minutes -= t.getMinutesLeft();
+		if(minutes > tech.getMinutesLeft()) {
+			minutes -= tech.getMinutesLeft();
 			//check for overtime first
-			if(isOvertimeAllowed() && minutes <= t.getOvertimeLeft()) {
+			if(isOvertimeAllowed() && minutes <= tech.getOvertimeLeft()) {
 	               //we are working overtime
-	               t.setMinutesLeft(0);
-	               t.setOvertimeLeft(t.getOvertimeLeft() - minutes);
+	               tech.setMinutesLeft(0);
+	               tech.setOvertimeLeft(tech.getOvertimeLeft() - minutes);
 			} else {
 				//we need to finish the task tomorrow
-				int minutesUsed = t.getMinutesLeft();
+				int minutesUsed = tech.getMinutesLeft();
 				if(isOvertimeAllowed()) {
-					minutesUsed += t.getOvertimeLeft();
+					minutesUsed += tech.getOvertimeLeft();
 				}
 				partWork.addTimeSpent(minutesUsed);
-				t.setMinutesLeft(0);
-				t.setOvertimeLeft(0);
-				partWork.setTeamId(t.getId());
+				tech.setMinutesLeft(0);
+				tech.setOvertimeLeft(0);
+				partWork.setTeamId(tech.getId());
 				report += " - <b>Not enough time, the remainder of the task will be finished tomorrow.</b>";
 				addReport(report);
 	             return;
 			}     
 		} else {
-			t.setMinutesLeft(t.getMinutesLeft() - minutes);
+			tech.setMinutesLeft(tech.getMinutesLeft() - minutes);
 		}
 		//check for the type
 		int roll;
 		String wrongType = "";
-		if(t.isRightType(partWork.getUnit())) {
+		//if(t.isRightType(partWork.getUnit())) {
 			roll = Compute.d6(2);
-		} else {
-			roll = Utilities.roll3d6();
-			wrongType = " <b>Warning: wrong tech type for this repair.</b>";
-		}
+		//} else {
+		//	roll = Utilities.roll3d6();
+		//	wrongType = " <b>Warning: wrong tech type for this repair.</b>";
+		//}
 		report = report + ",  needs " + target.getValueAsString() + " and rolls " + roll + ":";
 		if(roll >= target.getValue()) {
 			report = report + partWork.succeed();	
 		} else {
-			report = report + partWork.fail(t.getRating());
+			report = report + partWork.fail(tech.getSkillForWorkingOn(partWork.getUnit()).getExperienceLevel());
 		}
 		report += wrongType;
 		partWork.setTeamId(-1);
@@ -740,18 +716,18 @@ public class Campaign implements Serializable {
 		addReport("<p/><b>" + getDateAsString() + "</b>");
 
 		location.newDay(this);
-		
-		for (SupportTeam team : getTeams()) {
-			team.resetMinutesLeft();
-		}
+	
 		for (Person p : getPersonnel()) {
+			p.resetMinutesLeft();
 			if(p.needsFixing()) {
+				/*
 				SupportTeam t = getTeam(p.getAssignedTeamId());
 				if(null != t && t instanceof MedicalTeam) {
 					addReport(healPerson(p, (MedicalTeam)t));
 				} else if(p.checkNaturalHealing()) {
 					addReport(p.getDesc() + " heals naturally!");
 				}
+				*/
 			} 
 		}
 		//need to check for assigned tasks in two steps to avoid
@@ -768,9 +744,9 @@ public class Campaign implements Serializable {
 		for(int pid : assignedPartIds) {
 			Part part = getPart(pid);
 			if(null != part) {
-				SupportTeam t = getTeam(part.getAssignedTeamId());
-				if(null != t && t instanceof TechTeam) {
-					fixPart(part, (TechTeam)t);
+				Person tech = getPerson(part.getAssignedTeamId());
+				if(null != tech) {
+					fixPart(part, tech);
 				}
 			}
 		}
@@ -898,13 +874,6 @@ public class Campaign implements Serializable {
 				+ " has been removed from the personnel roster.");
 		personnel.remove(person);
 		personnelIds.remove(new Integer(id));
-	}
-
-	public void removeTeam(int id) {
-		SupportTeam team = getTeam(id);
-
-		teams.remove(team);
-		teamIds.remove(new Integer(id));
 	}
 	
 	public void removeScenario(int id) {
@@ -2283,6 +2252,54 @@ public class Campaign implements Serializable {
 			u.resetPilotAndEntity();
 			
 		}
+	}
+	
+	public TargetRoll getTargetFor(IPartWork partWork, Person tech) {		
+		Skill skill = tech.getSkillForWorkingOn(partWork.getUnit());
+        if(null != partWork.getUnit() && partWork.getUnit().isDeployed()) {
+            return new TargetRoll(TargetRoll.IMPOSSIBLE, "This unit is currently deployed!");
+        } 
+        if(null == skill) {
+        	return new TargetRoll(TargetRoll.IMPOSSIBLE, "Assigned tech does not have the right skills");
+        }
+        if(partWork.getSkillMin() > skill.getExperienceLevel()) {
+            return new TargetRoll(TargetRoll.IMPOSSIBLE, "Task is beyond this team's skill level");
+        }
+        if(!partWork.needsFixing() && !partWork.isSalvaging()) {
+            return new TargetRoll(TargetRoll.IMPOSSIBLE, "Task is not needed.");
+        }
+        if(partWork instanceof MissingPart && null == ((MissingPart)partWork).findReplacement()) {
+            return new TargetRoll(TargetRoll.IMPOSSIBLE, "Part not available.");
+        }
+        if(tech.getMinutesLeft() <= 0 && (!isOvertimeAllowed() || tech.getOvertimeLeft() <= 0)) {
+     	   return new TargetRoll(TargetRoll.IMPOSSIBLE, "No time left.");
+        }
+        String notFixable = partWork.checkFixable();
+        if(null != notFixable) {
+     	   return new TargetRoll(TargetRoll.IMPOSSIBLE, notFixable);
+        }
+        //TODO: adjust for modes
+        TargetRoll target = new TargetRoll(skill.getFinalSkillValue(), SkillType.getExperienceLevelName(skill.getExperienceLevel()));//tech.getTarget(partWork.getMode());
+        if(target.getValue() == TargetRoll.IMPOSSIBLE) {
+            return target;
+        }
+
+        if(tech.isTaskOvertime(partWork)) {
+            target.addModifier(3, "overtime");
+        }
+
+        target.append(partWork.getAllMods());
+        return target;
+    }
+	
+	public TargetRoll getTargetForAcquisition(IAcquisitionWork acquisition, Person person) {
+		Skill skill = person.getSkillForWorkingOn(acquisition.getUnit());	
+		if(acquisition.hasCheckedToday()) {
+			return new TargetRoll(TargetRoll.IMPOSSIBLE, "Already checked for this part in this cycle");
+		}	
+		TargetRoll target = new TargetRoll(skill.getFinalSkillValue(), SkillType.getExperienceLevelName(skill.getExperienceLevel()));//person.getTarget(Modes.MODE_NORMAL);
+		target.append(acquisition.getAllAcquisitionMods());
+		return target;
 	}
 	
 }

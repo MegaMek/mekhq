@@ -53,10 +53,13 @@ import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Ranks;
 import mekhq.campaign.Unit;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.team.MedicalTeam;
 import mekhq.campaign.team.SupportTeam;
 import mekhq.campaign.work.IMedicalWork;
+import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.IWork;
+import mekhq.campaign.work.Modes;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -1207,5 +1210,93 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     
     public boolean isTech() {
     	return type == T_MECH_TECH ||  type == T_AERO_TECH ||  type == T_MECHANIC ||  type == T_BA_TECH;
+    }
+   
+    public boolean isTaskOvertime(IPartWork partWork) {
+        return partWork.getTimeLeft() > getMinutesLeft()
+                 && (partWork.getTimeLeft() - getMinutesLeft()) <= getOvertimeLeft();
+    }
+    
+    public Skill getSkillForWorkingOn(Unit unit) {
+    	if(unit.getEntity() instanceof Mech && hasSkill(SkillType.S_TECH_MECH)) {
+    		return getSkill(SkillType.S_TECH_MECH);
+    	}
+    	if(unit.getEntity() instanceof BattleArmor && hasSkill(SkillType.S_TECH_BA)) {
+    		return getSkill(SkillType.S_TECH_BA);
+    	}
+    	if(unit.getEntity() instanceof Tank && hasSkill(SkillType.S_TECH_MECHANIC)) {
+    		return getSkill(SkillType.S_TECH_MECHANIC);
+    	}
+    	if(unit.getEntity() instanceof Aero && hasSkill(SkillType.S_TECH_AERO)) {
+    		return getSkill(SkillType.S_TECH_AERO);
+    	}
+    	//if we are still here then we didn't have the right tech skill, so return the highest
+    	//of any tech skills that we do have
+    	Skill skill = null;
+    	if(hasSkill(SkillType.S_TECH_MECH)) {
+    		skill = getSkill(SkillType.S_TECH_MECH);
+    	}
+    	if(hasSkill(SkillType.S_TECH_BA)) {
+    		if(null == skill || skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_BA).getFinalSkillValue()) {
+    			skill = getSkill(SkillType.S_TECH_BA);
+    		}
+    	}
+    	if(hasSkill(SkillType.S_TECH_MECHANIC)) {
+    		if(null == skill || skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_MECHANIC).getFinalSkillValue()) {
+    			skill = getSkill(SkillType.S_TECH_MECHANIC);
+    		}
+    	}
+    	if(hasSkill(SkillType.S_TECH_AERO)) {
+    		if(null == skill || skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_AERO).getFinalSkillValue()) {
+    			skill = getSkill(SkillType.S_TECH_AERO);
+    		}
+    	}
+    	return skill;
+    }
+    
+    public String getTechDesc() {
+         String toReturn = "<html><font size='2'><b>" + getName() + "</b><br/>";
+         Skill mechSkill = getSkill(SkillType.S_TECH_MECH);
+         Skill mechanicSkill = getSkill(SkillType.S_TECH_MECHANIC);
+         Skill baSkill = getSkill(SkillType.S_TECH_BA);
+         Skill aeroSkill = getSkill(SkillType.S_TECH_AERO);
+         boolean first = true;
+         if(null != mechSkill) {
+        	 if(!first) {
+        		 toReturn += "; ";
+        	 }
+        	 toReturn += SkillType.getExperienceLevelName(mechSkill.getExperienceLevel()) + " " + SkillType.S_TECH_MECH;
+        	 first = false;
+         }
+         if(null != mechanicSkill) {
+        	 if(!first) {
+        		 toReturn += "; ";
+        	 }
+        	 toReturn += SkillType.getExperienceLevelName(mechanicSkill.getExperienceLevel()) + " " + SkillType.S_TECH_MECHANIC;
+        	 first = false;
+         }
+         if(null != baSkill) {
+        	 if(!first) {
+        		 toReturn += "; ";
+        	 }
+        	 toReturn += SkillType.getExperienceLevelName(baSkill.getExperienceLevel()) + " " + SkillType.S_TECH_BA;
+        	 first = false;
+         }
+         if(null != aeroSkill) {
+        	 if(!first) {
+        		 toReturn += "; ";
+        	 }
+        	 toReturn += SkillType.getExperienceLevelName(aeroSkill.getExperienceLevel()) + " " + SkillType.S_TECH_AERO;
+        	 first = false;
+         }
+         toReturn += "<br/>";
+         toReturn += getMinutesLeft() + " minutes left";
+         /*
+         if(campaign.isOvertimeAllowed()) {
+             toReturn += " + (" + getOvertimeLeft() + " overtime)";
+         }
+         */
+         toReturn += "</font></html>";
+         return toReturn;
     }
 }

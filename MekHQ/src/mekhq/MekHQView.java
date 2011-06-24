@@ -1892,18 +1892,18 @@ public class MekHQView extends FrameView {
 	
 	private void btnDoTaskActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnDoTaskActionPerformed
 		
-		SupportTeam team = campaign.getTeam(currentTechId);		
+		Person tech = campaign.getPerson(currentTechId);		
 	
-		if (null != team && team instanceof TechTeam) {
+		if (null != tech) {
 			if(acquireSelected()) {
 				Part part = campaign.getPart(currentAcquisitionId);
 				if(null != part && part instanceof IAcquisitionWork) {
-					campaign.acquirePart((IAcquisitionWork)part, team);
+					campaign.acquirePart((IAcquisitionWork)part, tech);
 				}
 			} else if(repairsSelected()) {
 				Part part = campaign.getPart(currentServiceablePartsId);
 				if(null != part) {
-					campaign.fixPart(part, (TechTeam)team);
+					campaign.fixPart(part, tech);
 				}
 			}
 		}
@@ -2010,7 +2010,7 @@ public class MekHQView extends FrameView {
 
 	private void DocTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
 		int selected = DocTable.getSelectedRow();
-		
+		/*
 		if ((selected > -1) && (selected < campaign.getDoctors().size())) {
 			currentDoctorId = campaign.getDoctors().get(selected).getId();
 		} else if (selected < 0) {
@@ -2018,6 +2018,7 @@ public class MekHQView extends FrameView {
 		}
 		
 		updateAssignDoctorEnabled();
+		*/
 	}
 
 	private void PartsTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
@@ -2821,11 +2822,13 @@ public class MekHQView extends FrameView {
 	}
 
 	protected void refreshDoctorsList() {
+		/*
 		int selected = DocTable.getSelectedRow();
 		doctorsModel.setData(campaign.getDoctors());
 		if ((selected > -1) && (selected < campaign.getDoctors().size())) {
 			DocTable.setRowSelectionInterval(selected, selected);
 		}
+		*/
 	}
 
 	protected void refreshPatientList() {
@@ -2922,20 +2925,20 @@ public class MekHQView extends FrameView {
 	}
 
 	protected void updateAssignEnabled() {
-		// must have a valid team and an unassigned task	
-		SupportTeam team = campaign.getTeam(currentTechId);
-		if (null != team && team instanceof TechTeam) {
+		// must have a valid tech and an unassigned task	
+		Person tech = campaign.getPerson(currentTechId);
+		if (null != tech) {
 			if(repairsSelected()) {
 				Part part = campaign.getPart(currentServiceablePartsId);
 				if(null != part) {
-					btnDoTask.setEnabled(((TechTeam)team).getTargetFor(part).getValue() != TargetRoll.IMPOSSIBLE);
+					btnDoTask.setEnabled(campaign.getTargetFor(part, tech).getValue() != TargetRoll.IMPOSSIBLE);
 				} else {
 					btnDoTask.setEnabled(false);
 				}
 			} else if(acquireSelected()) {
 				Part part = campaign.getPart(currentAcquisitionId);
 				if(null != part && part instanceof IAcquisitionWork) {
-					btnDoTask.setEnabled(((TechTeam)team).getTargetForAcquisition((IAcquisitionWork)part).getValue() != TargetRoll.IMPOSSIBLE);
+					btnDoTask.setEnabled(campaign.getTargetForAcquisition((IAcquisitionWork)part, tech).getValue() != TargetRoll.IMPOSSIBLE);
 				} else {
 					btnDoTask.setEnabled(false);
 				}
@@ -2949,6 +2952,7 @@ public class MekHQView extends FrameView {
 
 	protected void updateAssignDoctorEnabled() {
 		// must have a valid doctor and an unassigned task
+		/*
 		Person curPerson = campaign.getPerson(currentPatientId);
 		SupportTeam team = campaign.getTeam(currentDoctorId);
 		if (null != curPerson && curPerson.getAssignedTeamId() == -1 && null != team && curPerson.canFix(team)) {
@@ -2956,21 +2960,22 @@ public class MekHQView extends FrameView {
 		} else {
 			btnAssignDoc.setEnabled(false);
 		}
+		*/
 	}
 
 	protected void updateTargetText() {
 		// must have a valid team and an unassigned task
-		SupportTeam team = campaign.getTeam(currentTechId);
-		if (null != team && team instanceof TechTeam) {
+		Person tech = campaign.getPerson(currentTechId);
+		if (null != tech) {
 			TargetRoll target = null;
 			if(acquireSelected()) {
 				Part part = campaign.getPart(currentAcquisitionId);
 				if(null != part && part instanceof IAcquisitionWork)
-				target = team.getTargetForAcquisition((IAcquisitionWork)part);
+				target = campaign.getTargetForAcquisition((IAcquisitionWork)part, tech);
 			} else {
 				Part part = campaign.getPart(currentServiceablePartsId);
 				if(null != part) {
-					target = ((TechTeam)team).getTargetFor(part);
+					target = campaign.getTargetFor(part, tech);
 				}
 			}
 			if(null != target) {
@@ -4241,7 +4246,7 @@ public class MekHQView extends FrameView {
 		}
 
 		public Object getValueAt(int row, int col) {
-			return ((Person) data.get(row)).getDescHTML();
+			return ((Person) data.get(row)).getTechDesc();
 		}
 
 		public Person getTechAt(int row) {
