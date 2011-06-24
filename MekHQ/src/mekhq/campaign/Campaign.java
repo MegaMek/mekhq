@@ -122,6 +122,8 @@ public class Campaign implements Serializable {
 	private Hashtable<Integer, Mission> missionIds = new Hashtable<Integer, Mission>();
 	private Hashtable<Integer, Scenario> scenarioIds = new Hashtable<Integer, Scenario>();
 
+	private int astechPool;
+	private int astechPoolMinutes;
 	
 	private int lastTeamId;
 	private int lastUnitId;
@@ -188,6 +190,8 @@ public class Campaign implements Serializable {
 		finances = new Finances();
 		location = new CurrentLocation(Planets.getInstance().getPlanets().get("Outreach"), 0);
 		SkillType.initializeTypes();
+		astechPool = 0;
+		resetAstechMinutes();
 	}
 
 	public String getName() {
@@ -691,6 +695,7 @@ public class Campaign implements Serializable {
 		} else {
 			tech.setMinutesLeft(tech.getMinutesLeft() - minutes);
 		}
+		astechPoolMinutes -= (minutes * getAvailableAstechs(minutes));
 		//check for the type
 		int roll;
 		String wrongType = "";
@@ -730,6 +735,7 @@ public class Campaign implements Serializable {
 				*/
 			} 
 		}
+		resetAstechMinutes();
 		//need to check for assigned tasks in two steps to avoid
 		//concurrent mod problems
 		ArrayList<Integer> assignedPartIds = new ArrayList<Integer>();
@@ -2289,6 +2295,20 @@ public class Campaign implements Serializable {
         }
 
         target.append(partWork.getAllMods());
+        //TODO: adjust time left for astech assignment by overtime and carry-over tasks
+        int availableHelp = getAvailableAstechs(partWork.getTimeLeft());
+        if(availableHelp == 0) {
+        	target.addModifier(4, "shorthanded");
+        }
+        else if(availableHelp == 1) {
+        	target.addModifier(3, "shorthanded");
+        }
+        else if(availableHelp < 4) {
+        	target.addModifier(2, "shorthanded");
+        }
+        else if(availableHelp < 6) {
+        	target.addModifier(1, "shorthanded");
+        }
         return target;
     }
 	
@@ -2300,6 +2320,52 @@ public class Campaign implements Serializable {
 		TargetRoll target = new TargetRoll(skill.getFinalSkillValue(), SkillType.getExperienceLevelName(skill.getExperienceLevel()));//person.getTarget(Modes.MODE_NORMAL);
 		target.append(acquisition.getAllAcquisitionMods());
 		return target;
+	}
+	
+	public void resetAstechMinutes() {
+		int minutes = 60 * 8 * getNumberAstechs();
+		astechPoolMinutes = minutes;
+	}
+	
+	public int getAstechPoolMinutes() {
+		return astechPoolMinutes;
+	}
+	
+	public int getAstechPool() {
+		return astechPool;
+	}
+	
+	public void setAstechPool(int i) {
+		astechPool = i;
+	}
+	
+	public void increaseAstechPool(int i) {
+		astechPool += i;
+	}
+	
+	public void decreaseAstechPool(int i) {
+		astechPool = Math.max(0, astechPool - i);
+	}
+	
+	public int getNumberAstechs() {
+		int astechs = astechPool;
+		for(Person p : personnel) {
+			if(p.getType() == Person.T_ASTECH && p.isActive() && !p.isDeployed(this)) {
+				astechs++;
+			}
+		}
+		return astechs;
+	}
+	
+	public int getAvailableAstechs(int minutes) {
+        int availableHelp = (int)Math.floor(((double)astechPoolMinutes) / minutes);
+        if(availableHelp > 6) {
+        	availableHelp = 6;
+        }
+        if(availableHelp > getNumberAstechs()) {
+        	availableHelp = getNumberAstechs();
+        }
+        return availableHelp;
 	}
 	
 }

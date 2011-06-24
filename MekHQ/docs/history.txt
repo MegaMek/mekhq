@@ -28,6 +28,7 @@ v0.1.9 (SVN)
 + added Skill to XML serialization
 + assign casualties to infantry in ResolveScenarioTracker
 + assign casualties to vehicle crews in ResolveScenarioTracker
++ beginning of Astech Pool
 
 v0.1.8 (2011-06-13)
 + beginning of custom XP costs

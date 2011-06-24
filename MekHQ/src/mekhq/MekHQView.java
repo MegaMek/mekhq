@@ -448,6 +448,7 @@ public class MekHQView extends FrameView {
 		btnDoTask = new javax.swing.JButton();
 		lblTarget = new javax.swing.JLabel();
 		lblTargetNum = new javax.swing.JLabel();
+		astechPoolLabel = new javax.swing.JLabel();
 		jScrollPane6 = new javax.swing.JScrollPane();
 		textTarget = new javax.swing.JTextArea();
 		panSupplies = new javax.swing.JPanel();
@@ -1301,6 +1302,16 @@ public class MekHQView extends FrameView {
 		gridBagConstraints.weighty = 1.0;
 		panRepairBay.add(scrollServicedUnitTable, gridBagConstraints);
 
+		astechPoolLabel.setFont(resourceMap.getFont("lblTargetNum.font")); // NOI18N
+		astechPoolLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+		astechPoolLabel.setText("<html><b>Astech Pool Minutes:</> " + campaign.getAstechPoolMinutes() + " (" + campaign.getNumberAstechs() + " Astechs)</html>"); // NOI18N
+		astechPoolLabel.setName("astechPoolLabel"); // NOI18N
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 2;
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+		panRepairBay.add(astechPoolLabel, gridBagConstraints);
+		
 		scrollTechTable.setMinimumSize(new java.awt.Dimension(200, 200));
 		scrollTechTable.setName("scrollTechTable"); // NOI18N
 		scrollTechTable.setPreferredSize(new java.awt.Dimension(300, 300));
@@ -1321,7 +1332,7 @@ public class MekHQView extends FrameView {
 
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 2;
-		gridBagConstraints.gridy = 0;
+		gridBagConstraints.gridy = 1;
 		gridBagConstraints.gridheight = 3;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 		gridBagConstraints.weightx = 0.5;
@@ -2819,6 +2830,7 @@ public class MekHQView extends FrameView {
 		if ((selected > -1) && (selected < campaign.getTechs().size())) {
 			TechTable.setRowSelectionInterval(selected, selected);
 		}
+		astechPoolLabel.setText("<html><b>Astech Pool Minutes:</> " + campaign.getAstechPoolMinutes() + " (" + campaign.getNumberAstechs() + " Astechs)</html>"); // NOI18N
 	}
 
 	protected void refreshDoctorsList() {
@@ -7703,6 +7715,7 @@ public class MekHQView extends FrameView {
 	private javax.swing.JTabbedPane tabMain;
 	private javax.swing.JTabbedPane tabTasks;
 	private javax.swing.JTextArea textTarget;
+	private javax.swing.JLabel astechPoolLabel;
 	private javax.swing.JTextPane txtPaneReport;
 	private javax.swing.JScrollPane txtPaneReportScrollPane;
 	private javax.swing.JComboBox choicePerson;
