@@ -586,7 +586,7 @@ public class Campaign implements Serializable {
 	public ArrayList<Person> getTechs() {
 		ArrayList<Person> techs = new ArrayList<Person>();
 		for (Person p: personnel) {
-			if (p.isTech()) {
+			if (p.isTech() && p.isActive()) {
 				techs.add(p);
 			}
 		}
@@ -830,6 +830,10 @@ public class Campaign implements Serializable {
 				salaries += p.getSalary();
 			}
 		}
+		//add in astechs from the astech pool
+		//we will assume vee mechanic * able-bodied * enlisted
+		//640 * 0.5 * 0.6 = 192
+		salaries += (192 * astechPool);
 		return salaries;
 	}
 	
@@ -2378,7 +2382,7 @@ public class Campaign implements Serializable {
 	
 	public void increaseAstechPool(int i) {
 		astechPool += i;
-		astechPoolMinutes += 480;
+		astechPoolMinutes += (480 * i);
 	}
 	
 	public void decreaseAstechPool(int i) {
@@ -2407,5 +2411,4 @@ public class Campaign implements Serializable {
         }
         return availableHelp;
 	}
-	
 }

@@ -484,9 +484,10 @@ public class MekHQView extends FrameView {
 		menuMarket = new javax.swing.JMenu();
 		miPurchaseUnit = new javax.swing.JMenuItem();
 		menuHire = new javax.swing.JMenu();
-		miHirePilot = new javax.swing.JMenuItem();
-		miHireTech = new javax.swing.JMenuItem();
-		miHireDoctor = new javax.swing.JMenuItem();
+		miHireAstechs = new javax.swing.JMenuItem();
+		miFireAstechs = new javax.swing.JMenuItem();
+		menuAstechPool = new javax.swing.JMenu();
+		miFullStrengthAstechs = new javax.swing.JMenuItem();
 		javax.swing.JMenu helpMenu = new javax.swing.JMenu();
 		javax.swing.JMenuItem aboutMenuItem = new javax.swing.JMenuItem();
 		statusPanel = new javax.swing.JPanel();
@@ -1755,6 +1756,39 @@ public class MekHQView extends FrameView {
 			menuHire.add(miHire);
 		}
 		menuMarket.add(menuHire);
+		menuAstechPool.setText("Astech Pool");
+		miHireAstechs.setText("Hire Astechs");
+		miHireAstechs.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(getFrame(), true, "Hire How Many Astechs?", 1, 0, 100);
+				pvcd.setVisible(true);
+				campaign.increaseAstechPool(pvcd.getValue());
+				refreshTechsList();
+			}
+		});
+		menuAstechPool.add(miHireAstechs);
+		miFireAstechs.setText("Release Astechs");
+		miFireAstechs.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(getFrame(), true, "Release How Many Astechs?", 1, 0, campaign.getAstechPool());
+				pvcd.setVisible(true);
+				campaign.decreaseAstechPool(pvcd.getValue());
+				refreshTechsList();
+			}
+		});
+		menuAstechPool.add(miFireAstechs);
+		miFullStrengthAstechs.setText("Bring All Tech Teams to Full Strength");
+		miFullStrengthAstechs.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				int need = (campaign.getTechs().size() * 6) - campaign.getNumberAstechs();
+				if(need > 0) {
+					campaign.increaseAstechPool(need);
+				}
+				refreshTechsList();
+			}
+		});
+		menuAstechPool.add(miFullStrengthAstechs);
+		menuMarket.add(menuAstechPool);
 		menuBar.add(menuMarket);
 		helpMenu.setText(resourceMap.getString("helpMenu.text")); // NOI18N
 		helpMenu.setName("helpMenu"); // NOI18N
@@ -7680,9 +7714,10 @@ public class MekHQView extends FrameView {
 	private javax.swing.JMenuItem menuOptions;
 	private javax.swing.JMenuItem menuSave;
 	private javax.swing.JMenuItem menuSaveXml;
-	private javax.swing.JMenuItem miHireDoctor;
-	private javax.swing.JMenuItem miHirePilot;
-	private javax.swing.JMenuItem miHireTech;
+	private javax.swing.JMenuItem miHireAstechs;
+	private javax.swing.JMenuItem miFireAstechs;
+	private javax.swing.JMenuItem miFullStrengthAstechs;
+	private javax.swing.JMenu menuAstechPool;
 	private javax.swing.JMenuItem miLoadForces;
 	private javax.swing.JMenuItem miPurchaseUnit;
 	private javax.swing.JPanel panFinances;
