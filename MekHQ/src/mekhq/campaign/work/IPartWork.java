@@ -41,6 +41,10 @@ public interface IPartWork extends IWork {
 	
 	public int getAssignedTeamId();
 	public void setTeamId(int id);
+	public boolean hasWorkedOvertime();
+	public void setWorkedOvertime(boolean b);
+	public int getShorthandedMod();
+	public void setShorthandedMod(int i);
 	
 	public void updateConditionFromEntity();
 	public void updateConditionFromPart();

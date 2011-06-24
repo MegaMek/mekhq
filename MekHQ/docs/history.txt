@@ -29,6 +29,7 @@ v0.1.9 (SVN)
 + assign casualties to infantry in ResolveScenarioTracker
 + assign casualties to vehicle crews in ResolveScenarioTracker
 + beginning of Astech Pool
++ adjust modifiers for overtime and shorthanded when carrying tasks over from day to day
 
 v0.1.8 (2011-06-13)
 + beginning of custom XP costs

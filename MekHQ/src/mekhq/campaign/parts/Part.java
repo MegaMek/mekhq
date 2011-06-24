@@ -111,6 +111,11 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	//to repair
 	protected boolean salvaging;
 	
+	//we need to keep track of a couple of potential mods that result from carrying
+	//over a task, otherwise people can get away with working over time with no consequence
+	protected boolean workingOvertime;
+	protected int shorthandedMod;
+	
 	public Part() {
 		this(0);
 	}
@@ -127,6 +132,8 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		this.difficulty = 0;
 		this.salvaging = false;
 		this.unitId = -1;
+		this.workingOvertime = false;
+		this.shorthandedMod = 0;
 	}
 
 	public void setId(int id) {
@@ -326,6 +333,14 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 				+"<unitId>"
 				+unitId
 				+"</unitId>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<workingOvertime>"
+				+workingOvertime
+				+"</workingOvertime>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<shorthandedMod>"
+				+shorthandedMod
+				+"</shorthandedMod>");
 	}
 	
 	protected void writeToXmlEnd(PrintWriter pw1, int indent, int id) {
@@ -379,6 +394,14 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 					retVal.teamId = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("unitId")) {
 					retVal.unitId = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("shorthandedMod")) {
+					retVal.shorthandedMod = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("workingOvertime")) {
+					if(wn2.getTextContent().equalsIgnoreCase("true")) {
+						retVal.workingOvertime = true;
+					} else {
+						retVal.workingOvertime = false;
+					}
 				}
 			}
 		} catch (Exception ex) {
@@ -568,6 +591,26 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	public String scrap() {
 		remove(false);
 		return getName() + " scrapped.";
+	}
+	
+	@Override
+	public boolean hasWorkedOvertime() {
+		return workingOvertime;
+	}
+	
+	@Override
+	public void setWorkedOvertime(boolean b) {
+		workingOvertime = b;
+	}
+	
+	@Override
+	public int getShorthandedMod() {
+		return shorthandedMod;
+	}
+	
+	@Override
+	public void setShorthandedMod(int i) {
+		shorthandedMod = i;
 	}
 }
 

@@ -671,6 +671,7 @@ public class Campaign implements Serializable {
 		}
 		report += tech.getName() + " attempts to" + action + partWork.getPartName();   
 		int minutes = partWork.getTimeLeft();
+		int minutesUsed = minutes;
 		if(minutes > tech.getMinutesLeft()) {
 			minutes -= tech.getMinutesLeft();
 			//check for overtime first
@@ -680,13 +681,29 @@ public class Campaign implements Serializable {
 	               tech.setOvertimeLeft(tech.getOvertimeLeft() - minutes);
 			} else {
 				//we need to finish the task tomorrow
-				int minutesUsed = tech.getMinutesLeft();
+				minutesUsed = tech.getMinutesLeft();
 				if(isOvertimeAllowed()) {
 					minutesUsed += tech.getOvertimeLeft();
+					partWork.setWorkedOvertime(true);
 				}
 				partWork.addTimeSpent(minutesUsed);
 				tech.setMinutesLeft(0);
 				tech.setOvertimeLeft(0);
+				int helpMod = 0;
+				int availableHelp = getAvailableAstechs(minutesUsed);
+		        if(availableHelp == 0) {
+		        	helpMod = 4;
+		        }
+		        else if(availableHelp == 1) {
+		        	helpMod = 3;
+		        }
+		        else if(availableHelp < 4) {
+		        	helpMod = 2;
+		        }
+		        else if(availableHelp < 6) {
+		        	helpMod = 1;
+		        }
+		        partWork.setShorthandedMod(helpMod);
 				partWork.setTeamId(tech.getId());
 				report += " - <b>Not enough time, the remainder of the task will be finished tomorrow.</b>";
 				addReport(report);
@@ -695,7 +712,7 @@ public class Campaign implements Serializable {
 		} else {
 			tech.setMinutesLeft(tech.getMinutesLeft() - minutes);
 		}
-		astechPoolMinutes -= (minutes * getAvailableAstechs(minutes));
+		astechPoolMinutes -= (minutesUsed * getAvailableAstechs(minutesUsed));
 		//check for the type
 		int roll;
 		String wrongType = "";
@@ -2269,7 +2286,7 @@ public class Campaign implements Serializable {
         	return new TargetRoll(TargetRoll.IMPOSSIBLE, "Assigned tech does not have the right skills");
         }
         if(partWork.getSkillMin() > skill.getExperienceLevel()) {
-            return new TargetRoll(TargetRoll.IMPOSSIBLE, "Task is beyond this team's skill level");
+            return new TargetRoll(TargetRoll.IMPOSSIBLE, "Task is beyond this tech's skill level");
         }
         if(!partWork.needsFixing() && !partWork.isSalvaging()) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Task is not needed.");
@@ -2290,25 +2307,43 @@ public class Campaign implements Serializable {
             return target;
         }
 
-        if(tech.isTaskOvertime(partWork)) {
+        target.append(partWork.getAllMods());
+       
+        if(isOvertimeAllowed() && (tech.isTaskOvertime(partWork) || partWork.hasWorkedOvertime())) {
             target.addModifier(3, "overtime");
         }
-
-        target.append(partWork.getAllMods());
-        //TODO: adjust time left for astech assignment by overtime and carry-over tasks
-        int availableHelp = getAvailableAstechs(partWork.getTimeLeft());
+      
+        
+        int minutes = partWork.getTimeLeft();
+        if(minutes > tech.getMinutesLeft()) {
+        	if(isOvertimeAllowed()) {
+        		if(minutes > (tech.getMinutesLeft() + tech.getOvertimeLeft())) {
+        			minutes = tech.getMinutesLeft() + tech.getOvertimeLeft();
+        		} 
+        	} else {
+        		minutes = tech.getMinutesLeft();
+        	}
+        }
+        
+        //TODO: adjust time left for astech assignment by overtime
+        int availableHelp = getAvailableAstechs(minutes);
+        int helpMod = 0;
         if(availableHelp == 0) {
-        	target.addModifier(4, "shorthanded");
+        	helpMod = 4;
         }
         else if(availableHelp == 1) {
-        	target.addModifier(3, "shorthanded");
+        	helpMod = 3;
         }
         else if(availableHelp < 4) {
-        	target.addModifier(2, "shorthanded");
+        	helpMod = 2;
         }
         else if(availableHelp < 6) {
-        	target.addModifier(1, "shorthanded");
+        	helpMod = 1;
         }
+        if(partWork.getShorthandedMod() > helpMod) {
+        	helpMod = partWork.getShorthandedMod();
+        }
+        target.addModifier(helpMod, "shorthanded");
         return target;
     }
 	
