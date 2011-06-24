@@ -692,21 +692,10 @@ public class Campaign implements Serializable {
 				partWork.addTimeSpent(minutesUsed);
 				tech.setMinutesLeft(0);
 				tech.setOvertimeLeft(0);
-				int helpMod = 0;
-				int availableHelp = getAvailableAstechs(minutesUsed);
-		        if(availableHelp == 0) {
-		        	helpMod = 4;
+				int helpMod = getShorthandedMod(minutesUsed);
+		        if(partWork.getShorthandedMod() < helpMod) {
+		        	partWork.setShorthandedMod(helpMod);
 		        }
-		        else if(availableHelp == 1) {
-		        	helpMod = 3;
-		        }
-		        else if(availableHelp < 4) {
-		        	helpMod = 2;
-		        }
-		        else if(availableHelp < 6) {
-		        	helpMod = 1;
-		        }
-		        partWork.setShorthandedMod(helpMod);
 				partWork.setTeamId(tech.getId());
 				report += " - <b>Not enough time, the remainder of the task will be finished tomorrow.</b>";
 				addReport(report);
@@ -2322,8 +2311,7 @@ public class Campaign implements Serializable {
         if(isOvertimeAllowed() && (tech.isTaskOvertime(partWork) || partWork.hasWorkedOvertime())) {
             target.addModifier(3, "overtime");
         }
-      
-        
+             
         int minutes = partWork.getTimeLeft();
         if(minutes > tech.getMinutesLeft()) {
         	if(isOvertimeAllowed()) {
@@ -2333,23 +2321,9 @@ public class Campaign implements Serializable {
         	} else {
         		minutes = tech.getMinutesLeft();
         	}
-        }
-        
+        }      
         //TODO: adjust time left for astech assignment by overtime
-        int availableHelp = getAvailableAstechs(minutes);
-        int helpMod = 0;
-        if(availableHelp == 0) {
-        	helpMod = 4;
-        }
-        else if(availableHelp == 1) {
-        	helpMod = 3;
-        }
-        else if(availableHelp < 4) {
-        	helpMod = 2;
-        }
-        else if(availableHelp < 6) {
-        	helpMod = 1;
-        }
+        int helpMod = getShorthandedMod(minutes);
         if(partWork.getShorthandedMod() > helpMod) {
         	helpMod = partWork.getShorthandedMod();
         }
@@ -2410,5 +2384,23 @@ public class Campaign implements Serializable {
         	availableHelp = getNumberAstechs();
         }
         return availableHelp;
+	}
+	
+	public int getShorthandedMod(int minutes) {
+        int availableHelp = getAvailableAstechs(minutes);
+        int helpMod = 0;
+        if(availableHelp == 0) {
+        	helpMod = 4;
+        }
+        else if(availableHelp == 1) {
+        	helpMod = 3;
+        }
+        else if(availableHelp < 4) {
+        	helpMod = 2;
+        }
+        else if(availableHelp < 6) {
+        	helpMod = 1;
+        }
+        return helpMod;
 	}
 }
