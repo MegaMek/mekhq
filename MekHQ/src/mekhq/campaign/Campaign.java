@@ -456,6 +456,9 @@ public class Campaign implements Serializable {
 		personnelIds.put(new Integer(id), p);
 		lastPersonId = id;
 		addReport(p.getName() + " has been added to the personnel roster.");
+		if(p.getType() == Person.T_ASTECH) {
+			astechPoolMinutes += 480;
+		}
 	}
 	
 	private void addPersonWithoutId(Person p) {
@@ -897,6 +900,9 @@ public class Campaign implements Serializable {
 				+ " has been removed from the personnel roster.");
 		personnel.remove(person);
 		personnelIds.remove(new Integer(id));
+		if(person.getType() == Person.T_ASTECH) {
+			astechPoolMinutes = Math.max(0, astechPoolMinutes - 480);
+		}
 	}
 	
 	public void removeScenario(int id) {
@@ -2358,7 +2364,7 @@ public class Campaign implements Serializable {
 	}
 	
 	public void resetAstechMinutes() {
-		int minutes = 60 * 8 * getNumberAstechs();
+		int minutes = 480 * getNumberAstechs();
 		astechPoolMinutes = minutes;
 	}
 	
@@ -2370,16 +2376,15 @@ public class Campaign implements Serializable {
 		return astechPool;
 	}
 	
-	public void setAstechPool(int i) {
-		astechPool = i;
-	}
-	
 	public void increaseAstechPool(int i) {
 		astechPool += i;
+		astechPoolMinutes += 480;
 	}
 	
 	public void decreaseAstechPool(int i) {
 		astechPool = Math.max(0, astechPool - i);
+		//always assume that we fire the ones who have not yet worked
+		astechPoolMinutes = Math.max(0, astechPoolMinutes - 480*i);
 	}
 	
 	public int getNumberAstechs() {
