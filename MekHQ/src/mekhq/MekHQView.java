@@ -6113,7 +6113,7 @@ public class MekHQView extends FrameView {
 		}
 
 		public Object getValueAt(int row, int col) {
-			return ((MedicalTeam) data.get(row)).getDescHTML();
+			return ((MedicalTeam) data.get(row)).getName();
 		}
 
 		public MedicalTeam getDoctorAt(int row) {

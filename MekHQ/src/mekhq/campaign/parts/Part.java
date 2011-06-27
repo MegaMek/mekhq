@@ -31,6 +31,7 @@ import mekhq.MekHQApp;
 import mekhq.campaign.MekHqXmlSerializable;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.team.SupportTeam;
 import mekhq.campaign.work.IPartWork;
@@ -547,13 +548,8 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	}
 	
 	@Override
-	public boolean canFix(SupportTeam team) {
-		return team.getRating() >= skillMin; 
-	}
-	
-	@Override
 	public String fail(int rating) {
-		skillMin = ++rating;
+		skillMin = rating++;
 		timeSpent = 0;
 		return " <font color='red'><b> failed.</b></font>";
 	}

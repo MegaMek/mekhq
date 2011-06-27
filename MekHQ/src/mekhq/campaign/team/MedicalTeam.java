@@ -51,27 +51,7 @@ public class MedicalTeam extends SupportTeam {
 	public void reCalc() {
 		// Do nothing.
 	}
-    
-    @Override
-    public int getSkillBase(int effectiveRating) {
-        int base = 11;
-         switch(effectiveRating) {
-           case SupportTeam.EXP_GREEN:
-               base = 10;
-               break;
-           case SupportTeam.EXP_REGULAR:
-               base = 8;
-               break;
-           case SupportTeam.EXP_VETERAN:
-               base = 7;
-               break;
-           case SupportTeam.EXP_ELITE:
-               base = 6;
-               break;
-       }
-       return base;
-    }
-
+  
     public int getPatients() {
        int patients = 0;
         for(Person person : campaign.getPersonnel()) {
@@ -81,20 +61,6 @@ public class MedicalTeam extends SupportTeam {
         }
        return patients;
     }
-
-    @Override
-    public String getTypeDesc() {
-        return "Doctor";
-    }
-   
-    @Override
-   public String getDescHTML() {
-        String toReturn = "<html><font size='2'><b>" + getName() + "</b><br/>";
-        toReturn += getRatingName() + " " + getTypeDesc() + "<br/>";
-        toReturn += getPatients() + " patient(s)";
-        toReturn += "</font></html>";
-        return toReturn;
-   }
     
     public TargetRoll getTargetFor(IMedicalWork medWork) {
         if(medWork.getAssignedTeamId() != getId() ) {

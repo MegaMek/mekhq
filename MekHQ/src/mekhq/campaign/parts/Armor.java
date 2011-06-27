@@ -33,6 +33,7 @@ import megamek.common.TechConstants;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Utilities;
 import mekhq.campaign.finances.Transaction;
+import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.team.SupportTeam;
 import mekhq.campaign.team.TechTeam;
 import mekhq.campaign.work.IAcquisitionWork;
@@ -118,7 +119,7 @@ public class Armor extends Part implements IAcquisitionWork {
 		toReturn += getDetails() + "<br/>";
 		if(getAmountAvailable() > 0) {
 			toReturn += "" + getTimeLeft() + " minutes" + scheduled;
-			toReturn += ", " + SupportTeam.getRatingName(getSkillMin());
+			toReturn += ", " + SkillType.getExperienceLevelName(getSkillMin());
 			toReturn += " " + bonus;
 		}
 		if (getMode() != Modes.MODE_NORMAL) {

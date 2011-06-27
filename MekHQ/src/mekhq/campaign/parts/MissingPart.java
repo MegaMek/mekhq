@@ -29,6 +29,7 @@ import megamek.common.TargetRoll;
 import mekhq.campaign.MekHqXmlSerializable;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Utilities;
+import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.team.SupportTeam;
 import mekhq.campaign.team.TechTeam;
 import mekhq.campaign.work.IAcquisitionWork;
@@ -99,7 +100,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		toReturn += "<b>Replace " + getName() + "</b><br/>";
 		toReturn += getDetails() + "<br/>";
 		toReturn += "" + getTimeLeft() + " minutes" + scheduled;
-		toReturn += ", " + SupportTeam.getRatingName(getSkillMin());
+		toReturn += ", " + SkillType.getExperienceLevelName(getSkillMin());
 		toReturn += " " + bonus;
 		if (getMode() != Modes.MODE_NORMAL) {
 			toReturn += "<br/><i>" + getCurrentModeName() + "</i>";

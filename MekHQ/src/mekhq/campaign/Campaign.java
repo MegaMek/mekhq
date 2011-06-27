@@ -307,7 +307,6 @@ public class Campaign implements Serializable {
 	 *            The support team to be added
 	 */
 	public void addTeam(SupportTeam t) {
-		t.setCampaign(this);
 		int id = lastTeamId + 1;
 		t.setId(id);
 		teams.add(t);
@@ -638,7 +637,7 @@ public class Campaign implements Serializable {
 		if(roll >= target.getValue()) {
 			report = report + medWork.succeed();	
 		} else {
-			report = report + medWork.fail(t.getRating());
+			report = report + medWork.fail(0);
 		}
 		return report;
 	}
@@ -1415,7 +1414,6 @@ public class Campaign implements Serializable {
 		// they have a reference to the Campaign object.
 		for (int x=0; x<retVal.teams.size(); x++) {
 			SupportTeam st = retVal.teams.get(x);
-			st.setCampaign(retVal);
 			
 			// Okay, last trigger a reCalc.
 			// This should fix some holes in the data.

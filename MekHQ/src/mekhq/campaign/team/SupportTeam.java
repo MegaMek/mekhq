@@ -58,51 +58,17 @@ public abstract class SupportTeam implements Serializable, MekHqXmlSerializable 
     protected int hours;
     protected int minutesLeft;
     protected int overtimeLeft;
-    
-//    protected ArrayList<WorkItem> assignedTasks;
-    
+   
     protected Campaign campaign;
-    
-    //private Vector<WorkItem> tasksAssigned;
-    
-    public static String getRatingName(int rating) {
-        switch(rating) {
-           case SupportTeam.EXP_GREEN:
-               return "Green";
-           case SupportTeam.EXP_REGULAR:
-               return "Regular";
-           case SupportTeam.EXP_VETERAN:
-               return "Veteran";
-           case SupportTeam.EXP_ELITE:
-               return "Elite";
-            case SupportTeam.EXP_NUM:
-                return "Impossible";
-       }
-       return "Unknown";
-    }
     
     public SupportTeam(String name, int rating) {
         this.name = name;
         this.rating = rating;
         this.hours = 8;
-    //    this.assignedTasks = new ArrayList<WorkItem>();
-        resetMinutesLeft();
     }
     
     public abstract void reCalc();
-    
-    public void setCampaign(Campaign c) {
-        this.campaign = c;
-    }
-    
-    public int getRating() {
-        return rating;
-    }
-    
-    public void setRating(int i) {
-        this.rating = i;
-    }
-    
+  
     public String getName() {
         return name;
     }
@@ -119,84 +85,10 @@ public abstract class SupportTeam implements Serializable, MekHqXmlSerializable 
         this.id = i;
     } 
     
-    public int getFullStrength() {
-        return fullSize;
+    public int getRating() {
+    	return rating;
     }
-    
-    public int getCurrentStrength() {
-        return currentSize;
-    }
-    
-    public void setCurrentStrength(int i) {
-        this.currentSize = i;
-    }
-    
-    public int getHours() {
-        return hours;
-    }
-    
-    public void setHours(int i) {
-        this.hours = i;
-    }
-    
-    public int getMinutesLeft() {
-        return minutesLeft;
-    }
-    
-    public void setMinutesLeft(int m) {
-        this.minutesLeft = m;
-    }
-    
-    public int getOvertimeLeft() {
-        return overtimeLeft;
-    }
-    
-    public void setOvertimeLeft(int m) {
-        this.overtimeLeft = m;
-    }
-    
-    public void resetMinutesLeft() {
-        this.minutesLeft = 60 * getHours();
-        this.overtimeLeft = 60 * 4;
-    }
-    
-    public int getCasualties() {
-        return getFullStrength() - getCurrentStrength();
-    }
-    
-   public abstract int getSkillBase(int effectiveRating);   
-   
-   public int getCasualtyMods() {
-       int casualties = getCasualties();
-       if(casualties > 0 && casualties < 3) {
-           return 1;
-       } 
-       else if(casualties > 2 && casualties < 5) {
-           return 2;
-       }
-       else if(casualties == 5) {
-           return 3;
-       }
-       else if(casualties == 6) {
-           return 4;
-       }
-       return 0;
-   }
-   
-   public String getRatingName() {
-       return getRatingName(rating);
-   }
-   
-   public String getDesc() {
-       return getName() + " (" + getRatingName() + " " + getTypeDesc() + ") ";
-   }
-   
-   public abstract String getDescHTML();
-   
-  // public abstract String getTasksDesc();
-   
-   public abstract String getTypeDesc();
-
+  
 	public abstract void writeToXml(PrintWriter pw1, int indent, int id);
 	
 	protected void writeToXmlBegin(PrintWriter pw1, int indent, int id) {

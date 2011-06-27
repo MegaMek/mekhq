@@ -66,12 +66,7 @@ public class TechTeam extends SupportTeam {
     public void reCalc() {
     	// Do nothing.
     }
-    
-    @Override
-    public String getTypeDesc() {
-        return getTypeDesc(type);
-    }
-    
+ 
     public static String getTypeDesc(int type) {
         switch(type) {
             case T_MECH:
@@ -94,40 +89,6 @@ public class TechTeam extends SupportTeam {
     public void setType(int t) {
     	this.type = t;
     }
-    
-    @Override
-    public int getSkillBase(int effectiveRating) {
-        int base = 11;
-         switch(effectiveRating) {
-           case SupportTeam.EXP_GREEN:
-               base = 9;
-               break;
-           case SupportTeam.EXP_REGULAR:
-               base = 7;
-               break;
-           case SupportTeam.EXP_VETERAN:
-               base = 6;
-               break;
-           case SupportTeam.EXP_ELITE:
-               base = 5;
-               break;
-       }
-       return base;
-    }
-   
-   @Override
-   public String getDescHTML() {
-        String toReturn = "<html><font size='2'><b>" + getName() + "</b><br/>";
-        toReturn += getRatingName() + " " + getTypeDesc() + "<br/>";
-        toReturn += getMinutesLeft() + " minutes left";
-        if(campaign.isOvertimeAllowed()) {
-            toReturn += " + (" + getOvertimeLeft() + " overtime)";
-        }
-        toReturn += "</font></html>";
-        return toReturn;
-   }
-   
-   
 
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent, int id) {

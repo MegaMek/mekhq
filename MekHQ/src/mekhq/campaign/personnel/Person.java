@@ -928,12 +928,12 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 			medicalTeamId = -1;
 		}
 	}
-
+/*
 	@Override
-	public boolean canFix(SupportTeam team) {
-		return team instanceof MedicalTeam && ((MedicalTeam)team).getPatients() < 25;
+	public boolean canFix(Person person) {
+		return false;//team instanceof MedicalTeam && ((MedicalTeam)team).getPatients() < 25;
 	}
-
+*/
 	@Override
 	public boolean needsFixing() {
 		return hits > 0;

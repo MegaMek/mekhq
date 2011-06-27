@@ -21,6 +21,7 @@
 package mekhq.campaign.work;
 
 import megamek.common.TargetRoll;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.team.SupportTeam;
 
 
@@ -49,9 +50,7 @@ public abstract interface IWork {
 	public abstract String fail(int rating);
 	
 	public abstract int getAssignedTeamId();
-	
-	public abstract boolean canFix(SupportTeam team);
-	
+
 	public abstract int getMode();
 	
 }
