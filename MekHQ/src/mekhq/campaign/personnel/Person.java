@@ -1297,4 +1297,20 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
          toReturn += "</font></html>";
          return toReturn;
     }
+    
+    public boolean isRightTechTypeFor(Unit unit) {
+    	if(unit.getEntity() instanceof Mech) {
+    		return hasSkill(SkillType.S_TECH_MECH);
+    	}
+    	if(unit.getEntity() instanceof BattleArmor) {
+    		return hasSkill(SkillType.S_TECH_BA);
+    	}
+    	if(unit.getEntity() instanceof Tank) {
+    		return hasSkill(SkillType.S_TECH_MECHANIC);
+    	}
+    	if(unit.getEntity() instanceof Aero) {
+    		return hasSkill(SkillType.S_TECH_AERO);
+    	}
+    	return false;
+    }
 }

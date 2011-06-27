@@ -34,6 +34,7 @@ v0.1.9 (SVN)
 + astech pool menu items
 + report overtime in tech description
 + make sure shorthanded mod carries over on multiple day assignments
++ check tech type
 
 v0.1.8 (2011-06-13)
 + beginning of custom XP costs

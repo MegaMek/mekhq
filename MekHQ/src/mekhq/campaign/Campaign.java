@@ -708,12 +708,12 @@ public class Campaign implements Serializable {
 		//check for the type
 		int roll;
 		String wrongType = "";
-		//if(t.isRightType(partWork.getUnit())) {
+		if(tech.isRightTechTypeFor(partWork.getUnit())) {	
 			roll = Compute.d6(2);
-		//} else {
-		//	roll = Utilities.roll3d6();
-		//	wrongType = " <b>Warning: wrong tech type for this repair.</b>";
-		//}
+		} else {
+			roll = Utilities.roll3d6();
+			wrongType = " <b>Warning: wrong tech type for this repair.</b>";
+		}
 		report = report + ",  needs " + target.getValueAsString() + " and rolls " + roll + ":";
 		if(roll >= target.getValue()) {
 			report = report + partWork.succeed();	
