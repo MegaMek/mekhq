@@ -145,6 +145,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         choiceType.setSelectedIndex(person.getType());
+        choiceType.setEnabled(isNewHire());
         choiceType.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
             	person = campaign.newPerson(choiceType.getSelectedIndex());
