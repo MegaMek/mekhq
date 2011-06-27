@@ -1219,6 +1219,8 @@ public class Campaign implements Serializable {
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "percentFemale", rng.getPercentFemale());
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "overtime", overtime);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "gmMode", gmMode);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "astechPool", astechPool);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "astechPoolMinutes", astechPoolMinutes);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "camoCategory", camoCategory);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "camoFileName", camoFileName);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "colorIndex", colorIndex);
@@ -1862,6 +1864,12 @@ public class Campaign implements Serializable {
 						retVal.overtime = true;
 					else
 						retVal.overtime = false;
+				} else if (xn.equalsIgnoreCase("astechPool")) {
+					retVal.astechPool = Integer.parseInt(wn.getTextContent()
+							.trim());
+				} else if (xn.equalsIgnoreCase("astechPoolMinutes")) {
+					retVal.astechPoolMinutes = Integer.parseInt(wn.getTextContent()
+							.trim());
 				}
 			}
 		}

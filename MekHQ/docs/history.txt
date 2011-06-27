@@ -37,6 +37,7 @@ v0.1.9 (SVN)
 + check tech type
 + removed outdated methods from SupportTeam
 + incorrect skill levels on Armor part
++ added tech and astech variables to XML serialization
 
 v0.1.8 (2011-06-13)
 + beginning of custom XP costs

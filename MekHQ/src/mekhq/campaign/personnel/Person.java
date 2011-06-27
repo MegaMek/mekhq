@@ -438,6 +438,18 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 				+"<hits>"
 				+hits
 				+"</hits>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<hours>"
+				+hours
+				+"</hours>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<minutesLeft>"
+				+minutesLeft
+				+"</minutesLeft>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<overtimeLeft>"
+				+overtimeLeft
+				+"</overtimeLeft>");
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<birthday>"
@@ -529,6 +541,12 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 					retVal.status = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("salary")) {
 					retVal.salary = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("hours")) {
+					retVal.hours = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("minutesLeft")) {
+					retVal.minutesLeft = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("overtimeLeft")) {
+					retVal.overtimeLeft = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("birthday")) {
 					SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 					retVal.birthday = (GregorianCalendar) GregorianCalendar.getInstance();
