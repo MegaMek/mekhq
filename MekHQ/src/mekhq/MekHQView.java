@@ -6965,7 +6965,9 @@ public class MekHQView extends FrameView {
 			}
 			if (command.equalsIgnoreCase("REMOVE_PILOT")) {
 				for (Unit unit : units) {
-					unit.removePilot();
+					for(Person p : unit.getCrew()) {
+						unit.remove(p);
+					}
 				}
 				refreshServicedUnitList();
 				refreshUnitList();
@@ -7393,10 +7395,10 @@ public class MekHQView extends FrameView {
 				if(oneSelected) {
 					// remove pilot
 					popup.addSeparator();
-					menuItem = new JMenuItem("Remove pilot");
+					menuItem = new JMenuItem("Remove all personnel");
 					menuItem.setActionCommand("REMOVE_PILOT");
 					menuItem.addActionListener(this);
-					menuItem.setEnabled(unit.hasPilot() && !unit.isDeployed());
+					menuItem.setEnabled(!unit.isUnmanned() && !unit.isDeployed());
 					popup.add(menuItem);
 				}
 				// switch pilot

@@ -866,8 +866,10 @@ public class Campaign implements Serializable {
 			removePart(p);
 		}
 
-		// remove the pilot from this unit
-		unit.removePilot();
+		// remove any personnel from this unit
+		for(Person p : unit.getCrew()) {
+			unit.remove(p);
+		}
 
 		// finally remove the unit
 		units.remove(unit);
@@ -879,15 +881,10 @@ public class Campaign implements Serializable {
 	public void removePerson(int id) {
 		Person person = getPerson(id);
 
-		/*
-		if (person instanceof PilotPerson
-				&& ((PilotPerson) person).isAssigned()) {
-			((PilotPerson) person).getAssignedUnit().removePilot();
-		} else if (person instanceof SupportPerson
-				&& null != ((SupportPerson) person).getTeam()) {
-			removeTeam(((SupportPerson) person).getTeam().getId());
+		Unit u = getUnit(person.getUnitId());
+		if(null != u) {
+			u.remove(person);
 		}
-		*/
 
 		addReport(person.getDesc()
 				+ " has been removed from the personnel roster.");

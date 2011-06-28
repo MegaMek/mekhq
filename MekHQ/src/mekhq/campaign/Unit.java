@@ -882,13 +882,6 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 		return null != entity.getCrew();
 	}
 
-	public void removePilot() {	
-		/*if (hasPilot()) {
-			getPilot().setAssignedUnit(null);
-			setPilot(null);
-		}*/
-	}
-
 	public String getPilotDesc() {
 		if (hasPilot()) {
 			return entity.getCrew().getName() + " "
