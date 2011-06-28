@@ -1227,7 +1227,13 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     }
     
     public boolean isTech() {
-    	return type == T_MECH_TECH ||  type == T_AERO_TECH ||  type == T_MECHANIC ||  type == T_BA_TECH;
+    	//type must be correct and you must be more than ultra-green in the skill
+    	boolean hasType = type == T_MECH_TECH ||  type == T_AERO_TECH ||  type == T_MECHANIC ||  type == T_BA_TECH;
+    	boolean isMechTech = hasSkill(SkillType.S_TECH_MECH) && getSkill(SkillType.S_TECH_MECH).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
+    	boolean isAeroTech = hasSkill(SkillType.S_TECH_AERO) && getSkill(SkillType.S_TECH_AERO).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
+    	boolean isMechanic = hasSkill(SkillType.S_TECH_MECHANIC) && getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
+    	boolean isBATech = hasSkill(SkillType.S_TECH_BA) && getSkill(SkillType.S_TECH_BA).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
+    	return hasType && (isMechTech || isAeroTech || isMechanic || isBATech);
     }
    
     public boolean isTaskOvertime(IPartWork partWork) {

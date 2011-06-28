@@ -43,6 +43,7 @@ v0.1.9 (SVN)
 + release all techs from pool menu item
 + updated MM.jar
 + updated unit and image files to current MegaMek status
++ better checking in Person#isTech
 
 v0.1.8 (2011-06-13)
 + beginning of custom XP costs
