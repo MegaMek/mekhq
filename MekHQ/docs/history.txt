@@ -48,6 +48,7 @@ v0.1.9 (SVN)
 + removed repair system option from CampaignOptionDialog (outdated)
 + astech overtime
 + Bug: skill min not updating correctly when repairs fail
++ customizable XP cost for skills and abilities campaign options
 
 v0.1.8 (2011-06-13)
 + beginning of custom XP costs

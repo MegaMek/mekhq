@@ -57,6 +57,7 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.Faction;
 import mekhq.campaign.Ranks;
 import mekhq.campaign.SkillCosts;
+import mekhq.campaign.personnel.SkillType;
 
 /**
  *
@@ -604,7 +605,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         panXP.add(txtInstructionsXP, gridBagConstraints);
         
-        tableXP = new JTable(campaign.getSkillCosts().getSkillArray(), campaign.getSkillCosts().getSkillTitles());
+        String[] colNames = {"+0","+1","+2","+3","+4","+5","+6","+7","+8","+9","+10"};
+        tableXP = new JTable(SkillType.getSkillCostsArray(), colNames);
         tableXP.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tableXP.setRowSelectionAllowed(false);
         tableXP.setColumnSelectionAllowed(false);
@@ -684,7 +686,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         panXP.add(scrAbilityXP, gridBagConstraints);      
         
-        //tabOptions.addTab(resourceMap.getString("panXP.TabConstraints.tabTitle"), panXP); // NOI18N
+        tabOptions.addTab(resourceMap.getString("panXP.TabConstraints.tabTitle"), panXP); // NOI18N
         
         panRank.setName("panRank"); // NOI18N
         panRank.setLayout(new java.awt.GridBagLayout());
@@ -1050,14 +1052,14 @@ private void txtNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
 	}
 	
 	private void updateXPCosts() {
-		for(int i = 0; i < 7; i++) {
-			for(int j = 0; j < SkillCosts.SK_NUM; j++) {
+		for(int i = 0; i < SkillType.skillList.length; i++) {
+			for(int j = 0; j < 11; j++) {
 				try {
-	               int cost = Integer.parseInt((String)tableXP.getValueAt(i, j));
-	               campaign.getSkillCosts().setCost(cost, i, j);
-	            } catch (NumberFormatException e) {
-	            	MekHQApp.logMessage("unreadable value in skill cost table for " + SkillCosts.getSkillName(j));
-	            }
+					int cost = Integer.parseInt((String)tableXP.getValueAt(i, j));
+					SkillType.setCost(SkillType.skillList[i],cost,j);
+				} catch (NumberFormatException e) {
+					MekHQApp.logMessage("unreadable value in skill cost table for " + SkillCosts.getSkillName(j));
+				}
 			}
 		}
 		for(String optionName : hashAbilityCosts.keySet()) {
@@ -1165,7 +1167,7 @@ public String getDateAsString() {
     		addColumn( column );
     		column.setCellRenderer(new RowNumberRenderer());
 
-    		getColumnModel().getColumn(0).setPreferredWidth(80);
+    		getColumnModel().getColumn(0).setPreferredWidth(120);
     		setPreferredScrollableViewportSize(getPreferredSize());
     	}
 
@@ -1204,7 +1206,7 @@ public String getDateAsString() {
     	@Override
     	public Object getValueAt(int row, int column)
     	{
-    		return SkillCosts.getLevelNames(row);
+    		return SkillType.skillList[row];
     	}
 
     	/*

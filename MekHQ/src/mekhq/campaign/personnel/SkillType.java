@@ -58,7 +58,7 @@ public class SkillType implements Serializable {
 	public static final String S_GUN_AERO    = "Gunnery/Aerospace";
 	public static final String S_GUN_JET     = "Gunnery/Aircraft";
 	public static final String S_GUN_VEE     = "Gunnery/Vehicle";
-	public static final String S_GUN_SPACE   = "Gunnery/Spacecract";
+	public static final String S_GUN_SPACE   = "Gunnery/Spacecraft";
 	public static final String S_GUN_BA      = "Gunnery/Battlesuit";
 	public static final String S_ARTILLERY   = "Artillery";
 	public static final String S_SMALL_ARMS  = "Small Arms";
@@ -78,7 +78,7 @@ public class SkillType implements Serializable {
 	public static final String S_SCROUNGE      = "Scrounge";
 	public static final String S_STRATEGY      = "Strategy";
 	
-	private static final String[] skillList = {S_PILOT_MECH,S_GUN_MECH,S_PILOT_AERO,S_GUN_AERO,
+	public static final String[] skillList = {S_PILOT_MECH,S_GUN_MECH,S_PILOT_AERO,S_GUN_AERO,
 											  S_PILOT_GVEE,S_PILOT_VTOL,S_PILOT_NVEE,S_GUN_VEE,
 						                      S_PILOT_JET,S_GUN_JET,S_PILOT_SPACE,S_GUN_SPACE,S_ARTILLERY,
 						                      S_GUN_BA,S_SMALL_ARMS,S_ANTI_MECH,
@@ -117,6 +117,10 @@ public class SkillType implements Serializable {
     public int getTarget() {
 		return target;
 	}
+    
+    public void setTarget(int t) {
+    	target = t;
+    }
 	
 	public boolean countUp() {
 		return countUp;
@@ -135,6 +139,13 @@ public class SkillType implements Serializable {
 			return -1;
 		}
 		return costs[lvl];
+	}
+	
+	public static void setCost(String name, int cost, int lvl) {
+		SkillType type = lookupHash.get(name);
+		if(null != name && lvl < 11) {
+			type.costs[lvl] = cost;
+		}
 	}
 	
 	public boolean isPiloting() {
@@ -338,6 +349,19 @@ public class SkillType implements Serializable {
 			return S_SMALL_ARMS;
 		}
 		return S_GUN_MECH;
+	}
+	
+	public static String[][] getSkillCostsArray() {
+		String[][] array = new String[skillList.length][11];
+		int i = 0;
+		for(String name : skillList) {
+			SkillType type = lookupHash.get(name);
+			for(int j = 0; j< 11; j++) {
+				array[i][j] = Integer.toString(type.getCost(j));
+			}
+			i++;
+		}
+		return array;
 	}
 	
 	public static SkillType createPilotingMech() {
