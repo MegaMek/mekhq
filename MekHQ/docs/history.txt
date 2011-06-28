@@ -41,6 +41,7 @@ v0.1.9 (SVN)
 + only allow personnel type changing for new hires in CustomizePersonDialog
 + modifiers for rush jobs
 + release all techs from pool menu item
++ updated MM.jar
 
 v0.1.8 (2011-06-13)
 + beginning of custom XP costs
