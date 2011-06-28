@@ -124,6 +124,7 @@ public class Campaign implements Serializable {
 
 	private int astechPool;
 	private int astechPoolMinutes;
+	private int astechPoolOvertime;
 	
 	private int lastTeamId;
 	private int lastUnitId;
@@ -457,6 +458,7 @@ public class Campaign implements Serializable {
 		addReport(p.getName() + " has been added to the personnel roster.");
 		if(p.getType() == Person.T_ASTECH) {
 			astechPoolMinutes += 480;
+			astechPoolOvertime += 240;
 		}
 	}
 	
@@ -674,11 +676,13 @@ public class Campaign implements Serializable {
 		report += tech.getName() + " attempts to" + action + partWork.getPartName();   
 		int minutes = partWork.getTimeLeft();
 		int minutesUsed = minutes;
+		boolean usedOvertime = false;
 		if(minutes > tech.getMinutesLeft()) {
 			minutes -= tech.getMinutesLeft();
 			//check for overtime first
 			if(isOvertimeAllowed() && minutes <= tech.getOvertimeLeft()) {
 	               //we are working overtime
+				   usedOvertime = true;
 	               tech.setMinutesLeft(0);
 	               tech.setOvertimeLeft(tech.getOvertimeLeft() - minutes);
 			} else {
@@ -687,11 +691,12 @@ public class Campaign implements Serializable {
 				if(isOvertimeAllowed()) {
 					minutesUsed += tech.getOvertimeLeft();
 					partWork.setWorkedOvertime(true);
+					usedOvertime = false;
 				}
 				partWork.addTimeSpent(minutesUsed);
 				tech.setMinutesLeft(0);
 				tech.setOvertimeLeft(0);
-				int helpMod = getShorthandedMod(minutesUsed);
+				int helpMod = getShorthandedMod(getAvailableAstechs(minutesUsed,usedOvertime), false);
 		        if(partWork.getShorthandedMod() < helpMod) {
 		        	partWork.setShorthandedMod(helpMod);
 		        }
@@ -703,7 +708,14 @@ public class Campaign implements Serializable {
 		} else {
 			tech.setMinutesLeft(tech.getMinutesLeft() - minutes);
 		}
-		astechPoolMinutes -= (minutesUsed * getAvailableAstechs(minutesUsed));
+		int astechMinutesUsed = minutesUsed * getAvailableAstechs(minutesUsed, usedOvertime);
+		if(astechPoolMinutes < astechMinutesUsed) {
+			astechMinutesUsed -= astechPoolMinutes;
+			astechPoolMinutes = 0;
+			astechPoolOvertime -= astechMinutesUsed;
+		} else {
+			astechPoolMinutes -= astechMinutesUsed;
+		}
 		//check for the type
 		int roll;
 		String wrongType = "";
@@ -892,6 +904,7 @@ public class Campaign implements Serializable {
 		personnelIds.remove(new Integer(id));
 		if(person.getType() == Person.T_ASTECH) {
 			astechPoolMinutes = Math.max(0, astechPoolMinutes - 480);
+			astechPoolOvertime = Math.max(0, astechPoolOvertime - 240);
 		}
 	}
 	
@@ -1219,6 +1232,7 @@ public class Campaign implements Serializable {
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "gmMode", gmMode);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "astechPool", astechPool);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "astechPoolMinutes", astechPoolMinutes);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "astechPoolOvertime", astechPoolOvertime);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "camoCategory", camoCategory);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "camoFileName", camoFileName);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "colorIndex", colorIndex);
@@ -1868,6 +1882,9 @@ public class Campaign implements Serializable {
 				} else if (xn.equalsIgnoreCase("astechPoolMinutes")) {
 					retVal.astechPoolMinutes = Integer.parseInt(wn.getTextContent()
 							.trim());
+				} else if (xn.equalsIgnoreCase("astechPoolOvertime")) {
+					retVal.astechPoolOvertime = Integer.parseInt(wn.getTextContent()
+							.trim());
 				}
 			}
 		}
@@ -2317,8 +2334,10 @@ public class Campaign implements Serializable {
 
         target.append(partWork.getAllMods());
        
+        boolean isOvertime = false;
         if(isOvertimeAllowed() && (tech.isTaskOvertime(partWork) || partWork.hasWorkedOvertime())) {
             target.addModifier(3, "overtime");
+            isOvertime = true;
         }
              
         int minutes = partWork.getTimeLeft();
@@ -2331,12 +2350,18 @@ public class Campaign implements Serializable {
         		minutes = tech.getMinutesLeft();
         	}
         }      
-        //TODO: adjust time left for astech assignment by overtime
-        int helpMod = getShorthandedMod(minutes);
+        int helpers = getAvailableAstechs(minutes, isOvertime);
+        int helpMod = getShorthandedMod(helpers, false);
         if(partWork.getShorthandedMod() > helpMod) {
         	helpMod = partWork.getShorthandedMod();
         }
-        target.addModifier(helpMod, "shorthanded");
+        if(helpMod > 0) {
+        	target.addModifier(helpMod, "shorthanded");
+        }
+        //we may have just gone overtime with our helpers
+        if(!isOvertime && astechPoolMinutes < (minutes * helpers)) {
+        	target.addModifier(3, "overtime astechs");
+        }
         return target;
     }
 	
@@ -2351,12 +2376,16 @@ public class Campaign implements Serializable {
 	}
 	
 	public void resetAstechMinutes() {
-		int minutes = 480 * getNumberAstechs();
-		astechPoolMinutes = minutes;
+		astechPoolMinutes = 480 * getNumberAstechs();
+		astechPoolOvertime = 240 * getNumberAstechs();
 	}
 	
 	public int getAstechPoolMinutes() {
 		return astechPoolMinutes;
+	}
+	
+	public int getAstechPoolOvertime() {
+		return astechPoolOvertime;
 	}
 	
 	public int getAstechPool() {
@@ -2366,12 +2395,14 @@ public class Campaign implements Serializable {
 	public void increaseAstechPool(int i) {
 		astechPool += i;
 		astechPoolMinutes += (480 * i);
+		astechPoolOvertime += (240 * i);
 	}
 	
 	public void decreaseAstechPool(int i) {
 		astechPool = Math.max(0, astechPool - i);
 		//always assume that we fire the ones who have not yet worked
 		astechPoolMinutes = Math.max(0, astechPoolMinutes - 480*i);
+		astechPoolOvertime = Math.max(0, astechPoolOvertime - 240*i);
 	}
 	
 	public int getNumberAstechs() {
@@ -2384,19 +2415,39 @@ public class Campaign implements Serializable {
 		return astechs;
 	}
 	
-	public int getAvailableAstechs(int minutes) {
-        int availableHelp = (int)Math.floor(((double)astechPoolMinutes) / minutes);
+	public int getAvailableAstechs(int minutes, boolean alreadyOvertime) {
+        int availableHelp = (int)Math.floor(((double)astechPoolMinutes) / minutes);   
+	        if(isOvertimeAllowed() && availableHelp < 6) {
+	        //if we are less than fully staffed, then determine whether 
+	        //we should dip into overtime or just continue as short-staffed
+	        int shortMod = getShorthandedMod(availableHelp, false);
+	        int remainingMinutes = astechPoolMinutes - availableHelp * minutes;
+	        int extraHelp = (remainingMinutes + astechPoolOvertime)/minutes;
+	        int helpNeeded = 6 - availableHelp;
+	        if(alreadyOvertime && shortMod > 0) {
+	        	//then add whatever we can
+	        	availableHelp += extraHelp;
+	        }
+	        else if(shortMod > 3) {
+	        	//only dip in if we can bring ourselves up to full
+	        	if(extraHelp >= helpNeeded) {
+	        		availableHelp = 6;
+	        	}
+	        }
+        }
         if(availableHelp > 6) {
         	availableHelp = 6;
-        }
+        }  
         if(availableHelp > getNumberAstechs()) {
-        	availableHelp = getNumberAstechs();
+        	return getNumberAstechs();
         }
         return availableHelp;
 	}
 	
-	public int getShorthandedMod(int minutes) {
-        int availableHelp = getAvailableAstechs(minutes);
+	public int getShorthandedMod(int availableHelp, boolean medicalStaff) {
+		if(medicalStaff) {
+			availableHelp += 2;
+		}
         int helpMod = 0;
         if(availableHelp == 0) {
         	helpMod = 4;

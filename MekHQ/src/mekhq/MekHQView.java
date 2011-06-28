@@ -2873,7 +2873,12 @@ public class MekHQView extends FrameView {
 		if ((selected > -1) && (selected < campaign.getTechs().size())) {
 			TechTable.setRowSelectionInterval(selected, selected);
 		}
-		astechPoolLabel.setText("<html><b>Astech Pool Minutes:</> " + campaign.getAstechPoolMinutes() + " (" + campaign.getNumberAstechs() + " Astechs)</html>"); // NOI18N
+		String astechString = "<html><b>Astech Pool Minutes:</> " + campaign.getAstechPoolMinutes();
+		if(campaign.isOvertimeAllowed()) {
+			astechString += " [" + campaign.getAstechPoolOvertime() + " overtime]";
+		}
+		astechString += " (" + campaign.getNumberAstechs() + " Astechs)</html>";
+		astechPoolLabel.setText(astechString); // NOI18N
 	}
 
 	protected void refreshDoctorsList() {
@@ -7401,30 +7406,9 @@ public class MekHQView extends FrameView {
 					menuItem.setEnabled(!unit.isUnmanned() && !unit.isDeployed());
 					popup.add(menuItem);
 				}
-				// switch pilot
-				if(oneSelected) {
-					/*
-					menu = new JMenu("Change pilot");
-					for (PilotPerson pp : campaign.getEligiblePilotsFor(unit)) {
-						menuItem = new JMenuItem(pp.getDesc());
-						if (pp.isAssigned() || (unit.hasPilot()
-								&& (unit.getPilot().getId() == pp.getId()))) {
-							continue;
-						}
-						menuItem.setActionCommand("CHANGE_PILOT:" + pp.getId());
-						menuItem.addActionListener(this);
-						menu.add(menuItem);
-					}
-					menu.setEnabled(!unit.isDeployed());
-					if(menu.getItemCount() > 20) {
-	                	MenuScroller.setScrollerFor(menu, 20);
-	                }
-					popup.add(menu);
-					*/
-				}
-				popup.addSeparator();
 				// sell unit
 				if(campaign.getCampaignOptions().canSellUnits()) {
+					popup.addSeparator();
 					menuItem = new JMenuItem("Sell Unit");
 					menuItem.setActionCommand("SELL");
 					menuItem.addActionListener(this);
