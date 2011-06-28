@@ -352,12 +352,14 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         repairSystemComboBox.setToolTipText(resourceMap.getString("repairSystemComboBox.toolTipText")); // NOI18N
         repairSystemComboBox.setName("repairSystemComboBox"); // NOI18N
         repairSystemComboBox.setSelectedIndex(options.getRepairSystem());
+        /*
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 4;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panRepair.add(repairSystemComboBox, gridBagConstraints);
+        */
 
         repairSystemComboBoxLabel.setText(resourceMap.getString("repairSystemComboBoxLabel.text")); // NOI18N
         repairSystemComboBoxLabel.setName("repairSystemComboBoxLabel"); // NOI18N

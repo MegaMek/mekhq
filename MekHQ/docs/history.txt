@@ -45,6 +45,7 @@ v0.1.9 (SVN)
 + updated unit and image files to current MegaMek status
 + better checking in Person#isTech
 + remove personnel from unit when removed from game
++ removed repair system option from CampaignOptionDialog (outdated)
 
 v0.1.8 (2011-06-13)
 + beginning of custom XP costs
