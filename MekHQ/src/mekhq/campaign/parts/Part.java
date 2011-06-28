@@ -549,7 +549,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	
 	@Override
 	public String fail(int rating) {
-		skillMin = rating++;
+		skillMin = ++rating;
 		timeSpent = 0;
 		return " <font color='red'><b> failed.</b></font>";
 	}

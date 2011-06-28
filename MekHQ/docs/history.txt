@@ -47,6 +47,7 @@ v0.1.9 (SVN)
 + remove personnel from unit when removed from game
 + removed repair system option from CampaignOptionDialog (outdated)
 + astech overtime
++ Bug: skill min not updating correctly when repairs fail
 
 v0.1.8 (2011-06-13)
 + beginning of custom XP costs
