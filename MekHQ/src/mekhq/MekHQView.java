@@ -486,6 +486,7 @@ public class MekHQView extends FrameView {
 		menuHire = new javax.swing.JMenu();
 		miHireAstechs = new javax.swing.JMenuItem();
 		miFireAstechs = new javax.swing.JMenuItem();
+		miFireAllAstechs = new javax.swing.JMenuItem();
 		menuAstechPool = new javax.swing.JMenu();
 		miFullStrengthAstechs = new javax.swing.JMenuItem();
 		javax.swing.JMenu helpMenu = new javax.swing.JMenu();
@@ -1788,6 +1789,14 @@ public class MekHQView extends FrameView {
 			}
 		});
 		menuAstechPool.add(miFullStrengthAstechs);
+		miFireAllAstechs.setText("Release All Astechs from Pool");
+		miFireAllAstechs.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				campaign.decreaseAstechPool(campaign.getAstechPool());
+				refreshTechsList();
+			}
+		});
+		menuAstechPool.add(miFireAllAstechs);
 		menuMarket.add(menuAstechPool);
 		menuBar.add(menuMarket);
 		helpMenu.setText(resourceMap.getString("helpMenu.text")); // NOI18N
@@ -7716,6 +7725,7 @@ public class MekHQView extends FrameView {
 	private javax.swing.JMenuItem menuSaveXml;
 	private javax.swing.JMenuItem miHireAstechs;
 	private javax.swing.JMenuItem miFireAstechs;
+	private javax.swing.JMenuItem miFireAllAstechs;
 	private javax.swing.JMenuItem miFullStrengthAstechs;
 	private javax.swing.JMenu menuAstechPool;
 	private javax.swing.JMenuItem miLoadForces;
