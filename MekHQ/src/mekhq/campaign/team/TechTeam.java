@@ -51,7 +51,7 @@ public class TechTeam extends SupportTeam {
     private int type;
     
     public TechTeam() {
-    	this(null, EXP_GREEN, T_MECH);
+    	this(null, 0, T_MECH);
     }
     
     public TechTeam(String name, int rating, int type) {

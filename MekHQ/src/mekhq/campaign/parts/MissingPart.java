@@ -196,11 +196,11 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 	public String fail(int rating) {
 		skillMin = ++rating;
 		timeSpent = 0;
-		if(skillMin >= SupportTeam.EXP_NUM) {
+		if(skillMin > SkillType.EXP_ELITE) {
 			Part part = findReplacement();
 			if(null != part && null != unit) {
 				unit.campaign.removePart(part);
-				skillMin = SupportTeam.EXP_GREEN;
+				skillMin = SkillType.EXP_GREEN;
 			}
 			return " <font color='red'><b> failed and part destroyed.</b></font>";
 		} else {
@@ -303,7 +303,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		if(null != replace && null != unit) {
 			unit.campaign.removePart(replace);
 		}
-		skillMin = TechTeam.EXP_GREEN;
+		skillMin = SkillType.EXP_GREEN;
 		return replace.getName() + " scrapped.";
 	}
 	

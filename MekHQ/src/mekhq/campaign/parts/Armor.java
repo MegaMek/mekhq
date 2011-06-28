@@ -591,12 +591,12 @@ public class Armor extends Part implements IAcquisitionWork {
 		//if we are impossible to fix now, we should scrap this amount of armor
 		//from spares and start over
 		String scrap = "";
-		if(skillMin > SupportTeam.EXP_ELITE) {
+		if(skillMin > SkillType.EXP_ELITE) {
 			scrap = " Armor supplies lost!";
 			if(isSalvaging()) {
 				remove(false);
 			} else {
-				skillMin = SupportTeam.EXP_GREEN;
+				skillMin = SkillType.EXP_GREEN;
 				changeAmountAvailable(-1 * Math.min(amountNeeded, getAmountAvailable()));
 			}
 		}
@@ -611,7 +611,7 @@ public class Armor extends Part implements IAcquisitionWork {
 	@Override
 	public String scrap() {
 		remove(false);
-		skillMin = TechTeam.EXP_GREEN;
+		skillMin = SkillType.EXP_GREEN;
 		return EquipmentType.armorNames[type] + " armor scrapped.";
 	}
 }

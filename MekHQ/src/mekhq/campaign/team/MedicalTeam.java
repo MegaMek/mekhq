@@ -37,7 +37,7 @@ public class MedicalTeam extends SupportTeam {
 	private static final long serialVersionUID = -1809295642059806908L;
 
     public MedicalTeam() {
-    	this(null, EXP_GREEN);
+    	this(null, 0);
     }
     
 	public MedicalTeam(String name, int rating) {

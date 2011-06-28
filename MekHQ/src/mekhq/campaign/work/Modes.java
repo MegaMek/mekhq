@@ -41,6 +41,19 @@ public class Modes {
 			return 0;
 		}
 	}
+	
+	public static int getModeExperienceReduction(int mode) {
+		switch (mode) {
+		case MODE_RUSH_ONE:
+			return 1;
+		case MODE_RUSH_TWO:
+			return 2;
+		case MODE_RUSH_THREE:
+			return 3;
+		default:
+			return 0;
+		}
+	}
 
 	public static String getModeName(int mode) {
 		switch (mode) {

@@ -717,7 +717,8 @@ public class Campaign implements Serializable {
 		if(roll >= target.getValue()) {
 			report = report + partWork.succeed();	
 		} else {
-			report = report + partWork.fail(tech.getSkillForWorkingOn(partWork.getUnit()).getExperienceLevel());
+			int modePenalty = Modes.getModeExperienceReduction(partWork.getMode());
+			report = report + partWork.fail(tech.getSkillForWorkingOn(partWork.getUnit()).getExperienceLevel()-modePenalty);
 		}
 		report += wrongType;
 		partWork.setTeamId(-1);
@@ -1465,16 +1466,16 @@ public class Campaign implements Serializable {
 				psn.setName(t.getName());
 				int lvl = 0;
 				switch(t.getRating()) {
-				case SupportTeam.EXP_GREEN:
+				case 0:
 					lvl = 1;
 					break;
-				case SupportTeam.EXP_REGULAR:
+				case 1:
 					lvl = 3;
 					break;
-				case SupportTeam.EXP_VETERAN:
+				case 2:
 					lvl = 4;
 					break;
-				case SupportTeam.EXP_ELITE:
+				case 3:
 					lvl = 5;
 					break;
 				}
@@ -2284,13 +2285,14 @@ public class Campaign implements Serializable {
 	
 	public TargetRoll getTargetFor(IPartWork partWork, Person tech) {		
 		Skill skill = tech.getSkillForWorkingOn(partWork.getUnit());
+		int modePenalty = Modes.getModeExperienceReduction(partWork.getMode());
         if(null != partWork.getUnit() && partWork.getUnit().isDeployed()) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "This unit is currently deployed!");
         } 
         if(null == skill) {
         	return new TargetRoll(TargetRoll.IMPOSSIBLE, "Assigned tech does not have the right skills");
         }
-        if(partWork.getSkillMin() > skill.getExperienceLevel()) {
+        if(partWork.getSkillMin() > (skill.getExperienceLevel()-modePenalty)) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Task is beyond this tech's skill level");
         }
         if(!partWork.needsFixing() && !partWork.isSalvaging()) {
@@ -2306,8 +2308,12 @@ public class Campaign implements Serializable {
         if(null != notFixable) {
      	   return new TargetRoll(TargetRoll.IMPOSSIBLE, notFixable);
         }
-        //TODO: adjust for modes
-        TargetRoll target = new TargetRoll(skill.getFinalSkillValue(), SkillType.getExperienceLevelName(skill.getExperienceLevel()));//tech.getTarget(partWork.getMode());
+        //this is ugly, if the mode penalty drops you to green, you drop two levels instead of two
+        int value = skill.getFinalSkillValue() + modePenalty;
+        if(SkillType.EXP_GREEN == (skill.getExperienceLevel()-modePenalty)) {
+        	value++;
+        }
+        TargetRoll target = new TargetRoll(value, SkillType.getExperienceLevelName(skill.getExperienceLevel()-modePenalty));
         if(target.getValue() == TargetRoll.IMPOSSIBLE) {
             return target;
         }

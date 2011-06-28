@@ -44,11 +44,6 @@ import org.w3c.dom.NodeList;
  */
 public abstract class SupportTeam implements Serializable, MekHqXmlSerializable {
 	private static final long serialVersionUID = 2842840638600274021L;
-	public static final int EXP_GREEN = 0;
-    public static final int EXP_REGULAR = 1;
-    public static final int EXP_VETERAN = 2;
-    public static final int EXP_ELITE = 3;
-    public static final int EXP_NUM = 4;
     
     protected String name;
     protected int rating; 
