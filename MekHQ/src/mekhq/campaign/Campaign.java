@@ -777,7 +777,7 @@ public class Campaign implements Serializable {
 			//clear the ledger
 			finances.newFiscalYear(calendar.getTime());
 		}
-		if(calendar.get(Calendar.DAY_OF_WEEK) == 0) {
+		if(calendar.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
 			//maintenance costs
 			if(campaignOptions.payForMaintain()) {
 				finances.debit(getMaintenanceCosts(), Transaction.C_MAINTAIN, "Weekly Maintenance", calendar.getTime());
