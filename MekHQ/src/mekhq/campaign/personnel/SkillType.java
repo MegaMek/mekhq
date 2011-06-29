@@ -369,7 +369,7 @@ public class SkillType implements Serializable {
         skill.name = S_PILOT_MECH;
         skill.target = 8;
         skill.countUp = false;
-        skill.costs = new Integer[]{8,4,4,4,4,4,4,4,4,4,4};
+        skill.costs = new Integer[]{8,4,4,4,4,4,4,4,4,-1,-1};
         
         return skill;
     }
@@ -379,7 +379,7 @@ public class SkillType implements Serializable {
         skill.name = S_GUN_MECH;
         skill.target = 7;
         skill.countUp = false;
-        skill.costs = new Integer[]{16,8,8,8,8,8,8,8,8,8,8};
+        skill.costs = new Integer[]{16,8,8,8,8,8,8,8,-1,-1,-1};
      
         return skill;
     }
@@ -389,7 +389,7 @@ public class SkillType implements Serializable {
         skill.name = S_PILOT_AERO;
         skill.target = 8;
         skill.countUp = false;
-        skill.costs = new Integer[]{8,4,4,4,4,4,4,4,4,4,4};
+        skill.costs = new Integer[]{8,4,4,4,4,4,4,4,4,-1,-1};
 
         return skill;
     }
@@ -399,7 +399,7 @@ public class SkillType implements Serializable {
         skill.name = S_GUN_AERO;
         skill.target = 7;
         skill.countUp = false;
-        skill.costs = new Integer[]{16,8,8,8,8,8,8,8,8,8,8};
+        skill.costs = new Integer[]{16,8,8,8,8,8,8,8,-1,-1,-1};
      
         return skill;
     }
@@ -409,7 +409,7 @@ public class SkillType implements Serializable {
         skill.name = S_PILOT_JET;
         skill.target = 8;
         skill.countUp = false;
-        skill.costs = new Integer[]{8,4,4,4,4,4,4,4,4,4,4};
+        skill.costs = new Integer[]{8,4,4,4,4,4,4,4,4,-1,-1};
      
         return skill;
     }
@@ -419,7 +419,7 @@ public class SkillType implements Serializable {
         skill.name = S_GUN_JET;
         skill.target = 7;
         skill.countUp = false;
-        skill.costs = new Integer[]{16,8,8,8,8,8,8,8,8,8,8};
+        skill.costs = new Integer[]{16,8,8,8,8,8,8,8,-1,-1,-1};
      
         return skill;
     }
@@ -429,7 +429,7 @@ public class SkillType implements Serializable {
         skill.name = S_PILOT_SPACE;
         skill.target = 8;
         skill.countUp = false;
-        skill.costs = new Integer[]{8,4,4,4,4,4,4,4,4,4,4};
+        skill.costs = new Integer[]{8,4,4,4,4,4,4,4,4,-1,-1};
      
         return skill;
     }
@@ -439,7 +439,7 @@ public class SkillType implements Serializable {
         skill.name = S_GUN_SPACE;
         skill.target = 7;
         skill.countUp = false;
-        skill.costs = new Integer[]{16,8,8,8,8,8,8,8,8,8,8};
+        skill.costs = new Integer[]{16,8,8,8,8,8,8,8,-1,-1,-1};
      
         return skill;
     }
@@ -449,7 +449,7 @@ public class SkillType implements Serializable {
         skill.name = S_PILOT_GVEE;
         skill.target = 8;
         skill.countUp = false;
-        skill.costs = new Integer[]{8,4,4,4,4,4,4,4,4,4,4};
+        skill.costs = new Integer[]{8,4,4,4,4,4,4,4,4,-1,-1};
      
         return skill;
     }
@@ -459,7 +459,7 @@ public class SkillType implements Serializable {
         skill.name = S_PILOT_NVEE;
         skill.target = 8;
         skill.countUp = false;
-        skill.costs = new Integer[]{8,4,4,4,4,4,4,4,4,4,4};
+        skill.costs = new Integer[]{8,4,4,4,4,4,4,4,4,-1,-1};
      
         return skill;
     }
@@ -469,7 +469,7 @@ public class SkillType implements Serializable {
         skill.name = S_PILOT_VTOL;
         skill.target = 8;
         skill.countUp = false;
-        skill.costs = new Integer[]{8,4,4,4,4,4,4,4,4,4,4};
+        skill.costs = new Integer[]{8,4,4,4,4,4,4,4,4,-1,-1};
      
         return skill;
     }
@@ -479,7 +479,7 @@ public class SkillType implements Serializable {
         skill.name = S_GUN_VEE;
         skill.target = 7;
         skill.countUp = false;
-        skill.costs = new Integer[]{16,8,8,8,8,8,8,8,8,8,8};
+        skill.costs = new Integer[]{16,8,8,8,8,8,8,8,-1,-1,-1};
      
         return skill;
     }
@@ -489,7 +489,7 @@ public class SkillType implements Serializable {
         skill.name = S_ARTILLERY;
         skill.target = 7;
         skill.countUp = false;
-        skill.costs = new Integer[]{16,8,8,8,8,8,8,8,8,8,8};
+        skill.costs = new Integer[]{16,8,8,8,8,8,8,8,-1,-1,-1};
      
         return skill;
     }
@@ -499,7 +499,7 @@ public class SkillType implements Serializable {
         skill.name = S_GUN_BA;
         skill.target = 7;
         skill.countUp = false;
-        skill.costs = new Integer[]{16,8,8,8,8,8,8,8,8,8,8};
+        skill.costs = new Integer[]{16,8,8,8,8,8,8,8,-1,-1,-1};
      
         return skill;
     }
@@ -509,7 +509,7 @@ public class SkillType implements Serializable {
         skill.name = S_SMALL_ARMS;
         skill.target = 7;
         skill.countUp = false;
-        skill.costs = new Integer[]{8,4,4,4,4,4,4,4,4,4,4};
+        skill.costs = new Integer[]{8,4,4,4,4,4,4,4,4,-1,-1};
      
         return skill;
     }
@@ -519,7 +519,7 @@ public class SkillType implements Serializable {
         skill.name = S_ANTI_MECH;
         skill.target = 8;
         skill.countUp = false;
-        skill.costs = new Integer[]{12,6,6,6,6,6,6,6,6,6,6};
+        skill.costs = new Integer[]{12,6,6,6,6,6,6,6,6,-1,-1};
      
         return skill;
     }
@@ -529,7 +529,7 @@ public class SkillType implements Serializable {
         skill.name = S_TECH_MECH;
         skill.target = 10;
         skill.countUp = false;
-        skill.costs = new Integer[]{12,6,6,6,6,6,6,6,6,6,6};
+        skill.costs = new Integer[]{12,6,0,6,6,6,-1,-1,-1,-1,-1};
      
         return skill;
     }
@@ -539,7 +539,7 @@ public class SkillType implements Serializable {
         skill.name = S_TECH_MECHANIC;
         skill.target = 10;
         skill.countUp = false;
-        skill.costs = new Integer[]{12,6,6,6,6,6,6,6,6,6,6};
+        skill.costs = new Integer[]{12,6,0,6,6,6,-1,-1,-1,-1,-1};
      
         return skill;
     }
@@ -549,7 +549,7 @@ public class SkillType implements Serializable {
         skill.name = S_TECH_AERO;
         skill.target = 10;
         skill.countUp = false;
-        skill.costs = new Integer[]{12,6,6,6,6,6,6,6,6,6,6};
+        skill.costs = new Integer[]{12,6,0,6,6,6,-1,-1,-1,-1,-1};
      
         return skill;
     }
@@ -559,7 +559,7 @@ public class SkillType implements Serializable {
         skill.name = S_TECH_BA;
         skill.target = 10;
         skill.countUp = false;
-        skill.costs = new Integer[]{12,6,6,6,6,6,6,6,6,6,6};
+        skill.costs = new Integer[]{12,6,0,6,6,6,-1,-1,-1,-1,-1};
      
         return skill;
     }
@@ -569,7 +569,7 @@ public class SkillType implements Serializable {
         skill.name = S_ASTECH;
         skill.target = 10;
         skill.countUp = false;
-        skill.costs = new Integer[]{12,6,6,6,6,6,6,6,6,6,6};
+        skill.costs = new Integer[]{12,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
      
         return skill;
     }
@@ -579,7 +579,7 @@ public class SkillType implements Serializable {
         skill.name = S_DOCTOR;
         skill.target = 11;
         skill.countUp = false;
-        skill.costs = new Integer[]{16,8,8,8,8,8,8,8,8,8,8};
+        skill.costs = new Integer[]{16,0,8,8,8,-1,-1,-1,-1,-1,-1};
      
         return skill;
     }
@@ -589,7 +589,7 @@ public class SkillType implements Serializable {
         skill.name = S_MEDTECH;
         skill.target = 11;
         skill.countUp = false;
-        skill.costs = new Integer[]{16,8,8,8,8,8,8,8,8,8,8};
+        skill.costs = new Integer[]{16,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
      
         return skill;
     }
