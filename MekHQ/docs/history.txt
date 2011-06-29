@@ -55,6 +55,7 @@ v0.1.9 (SVN)
 + Skill costs added to XML serialization
 + ability costs moved from SkillCosts to SkillType
 + SkillCosts.java removed (costs now kept in SkillType)
++ jump over levels with XP costs of zero when improving skills
 
 v0.1.8 (2011-06-13)
 + beginning of custom XP costs

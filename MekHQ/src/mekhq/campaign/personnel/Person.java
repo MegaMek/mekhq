@@ -958,6 +958,22 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 		}
 	}
 	
+	public void improveSkill(String skillName) {
+		if(hasSkill(skillName)) {
+			getSkill(skillName).improve();
+		} else {
+			addSkill(skillName, 0, 0);
+		}
+	}
+	
+	public int getCostToImprove(String skillName) {
+		if(hasSkill(skillName)) {
+			return getSkill(skillName).getCostToImprove();
+		} else {
+			return -1;
+		}
+	}
+	
 	public int getHits() {
 		return hits;
 	}

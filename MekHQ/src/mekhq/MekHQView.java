@@ -4874,11 +4874,7 @@ public class MekHQView extends FrameView {
 			} else if (command.contains("IMPROVE")) {
 				String type = st.nextToken();
 				int cost =  Integer.parseInt(st.nextToken());
-				if(selectedPerson.hasSkill(type)) {
-					selectedPerson.getSkill(type).improve();
-				} else {
-					selectedPerson.addSkill(type, 0, 0);
-				}
+				selectedPerson.improveSkill(type);
 				campaign.personUpdated(selectedPerson);
 				selectedPerson.setXp(selectedPerson.getXp() - cost);
 				campaign.addReport(selectedPerson.getName() + " improved " + type + "!");
@@ -5188,8 +5184,7 @@ public class MekHQView extends FrameView {
 					for(int i = 0; i < SkillType.getSkillList().length; i++) {
 						String type = SkillType.getSkillList()[i];
 						if(person.hasSkill(type)) {
-							int lvl = person.getSkill(type).getLevel();
-							int cost = SkillType.getType(type).getCost(lvl+1);
+							int cost = person.getSkill(type).getCostToImprove();
 							if(cost >= 0) {
 								String costDesc = " (" + cost + "XP)";
 								menuItem = new JMenuItem(type + costDesc);
