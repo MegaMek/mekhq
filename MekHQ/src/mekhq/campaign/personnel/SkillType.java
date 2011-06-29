@@ -84,8 +84,9 @@ public class SkillType implements Serializable {
 						                      S_GUN_BA,S_SMALL_ARMS,S_ANTI_MECH,
 						                      S_TECH_MECH,S_TECH_MECHANIC,S_TECH_AERO,S_TECH_BA,S_ASTECH,
 						                      S_DOCTOR,S_MEDTECH,
+						                      S_ADMIN,
 						                      S_TACTICS,S_STRATEGY,
-						                      S_ADMIN,S_NEG,S_LEADER,S_SCROUNGE};
+						                      S_NEG,S_LEADER,S_SCROUNGE};
 	
     private static Hashtable<String, SkillType> lookupHash;
 
@@ -579,7 +580,7 @@ public class SkillType implements Serializable {
         skill.name = S_DOCTOR;
         skill.target = 11;
         skill.countUp = false;
-        skill.costs = new Integer[]{16,0,8,8,8,-1,-1,-1,-1,-1,-1};
+        skill.costs = new Integer[]{16,8,0,8,8,8,-1,-1,-1,-1,-1};
      
         return skill;
     }
@@ -617,9 +618,9 @@ public class SkillType implements Serializable {
 	public static SkillType createAdmin() {
         SkillType skill = new SkillType();
         skill.name = S_ADMIN;
-        skill.target = 0;
-        skill.countUp = true;
-        skill.costs = new Integer[]{8,4,4,4,4,4,4,4,4,4,4};
+        skill.target = 10;
+        skill.countUp = false;
+        skill.costs = new Integer[]{8,4,0,4,4,4,-1,-1,-1,-1,-1};
      
         return skill;
     }

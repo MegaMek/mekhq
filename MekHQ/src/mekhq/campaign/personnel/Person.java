@@ -88,7 +88,11 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     public static final int T_ASTECH      = 10;
     public static final int T_DOCTOR      = 11;
     public static final int T_MEDIC       = 12;
-    public static final int T_NUM         = 13;
+    public static final int T_ADMIN_COM   = 13;
+    public static final int T_ADMIN_LOG   = 14;
+    public static final int T_ADMIN_TRA   = 15;
+    public static final int T_ADMIN_HR    = 16;
+    public static final int T_NUM         = 17;
     
     public static final int S_ACTIVE = 0;
     public static final int S_RETIRED = 1;
@@ -275,6 +279,14 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
                 return "Doctor";
             case(T_MEDIC):
                 return "Medic";
+            case(T_ADMIN_COM):
+                return "Admin/Command";
+            case(T_ADMIN_LOG):
+                return "Admin/Logistical";
+            case(T_ADMIN_TRA):
+                return "Admin/Transport";
+            case(T_ADMIN_HR):
+                return "Admin/HR";
             default:
                 return "??";
         }
@@ -705,6 +717,12 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 			case T_MEDIC:
 				base = 640;
 				break;
+			case T_ADMIN_COM:
+			case T_ADMIN_LOG:
+			case T_ADMIN_TRA:
+			case T_ADMIN_HR:
+				base = 320;
+				break;
 			case T_NUM:
 				// Not a real pilot type. If someone has this, they don't get paid!
 				base = 0;
@@ -845,6 +863,15 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 		case T_MEDIC:
 			if(hasSkill(SkillType.S_MEDTECH)) {
 				return getSkill(SkillType.S_MEDTECH).getExperienceLevel();
+			} else {
+				return -1;
+			}
+		case T_ADMIN_COM:
+		case T_ADMIN_LOG:
+		case T_ADMIN_TRA:
+		case T_ADMIN_HR:
+			if(hasSkill(SkillType.S_ADMIN)) {
+				return getSkill(SkillType.S_ADMIN).getExperienceLevel();
 			} else {
 				return -1;
 			}

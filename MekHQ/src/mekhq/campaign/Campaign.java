@@ -1983,6 +1983,12 @@ public class Campaign implements Serializable {
 	    case(Person.T_MEDIC):
 	    	person.addSkill(SkillType.S_MEDTECH,0,0);
 			break;
+	    case(Person.T_ADMIN_COM):
+	    case(Person.T_ADMIN_LOG):
+	    case(Person.T_ADMIN_TRA):
+	    case(Person.T_ADMIN_HR):
+	    	person.addSkill(SkillType.S_ADMIN);
+			break;
 		}
 		person.setRankSystem(ranks);
 		return person;

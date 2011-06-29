@@ -50,6 +50,8 @@ v0.1.9 (SVN)
 + Bug: skill min not updating correctly when repairs fail
 + customizable XP cost for skills and abilities campaign options
 + changed default XP to be consistent with TW and SO defaults
++ adjustments to admin skill
++ added Admin personnel type
 
 v0.1.8 (2011-06-13)
 + beginning of custom XP costs
