@@ -21,8 +21,12 @@
 
 package mekhq.campaign.personnel;
 
+import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.Hashtable;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import megamek.common.Aero;
 import megamek.common.BattleArmor;
@@ -33,6 +37,9 @@ import megamek.common.Jumpship;
 import megamek.common.SmallCraft;
 import megamek.common.Tank;
 import megamek.common.VTOL;
+import mekhq.MekHQApp;
+import mekhq.campaign.MekHqXmlUtil;
+import mekhq.campaign.SkillCosts;
 
 /**
  * Skill type will hold static information for each skill type like base target number,
@@ -109,6 +116,7 @@ public class SkillType implements Serializable {
 	/** Creates new SkillType */
     public SkillType() {
         defaultLvl = 3;
+        costs = new Integer[]{0,0,0,0,0,0,0,0,0,0,0};
     }
     
     public String getName() {
@@ -363,6 +371,79 @@ public class SkillType implements Serializable {
 			i++;
 		}
 		return array;
+	}
+	
+	public void writeToXml(PrintWriter pw1, int indent) {
+		pw1.println(MekHqXmlUtil.indentStr(indent) + "<skillType>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<name>"
+				+name
+				+"</name>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<target>"
+				+target
+				+"</target>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<countUp>"
+				+countUp
+				+"</countUp>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<defaultLvl>"
+				+defaultLvl
+				+"</defaultLvl>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<costs>"
+				+printCosts()
+				+"</costs>");
+		pw1.println(MekHqXmlUtil.indentStr(indent) + "</skillType>");
+	}
+	
+	public static void generateInstanceFromXML(Node wn) {
+		SkillType retVal = null;
+	
+		try {		
+			retVal = new SkillType();
+			NodeList nl = wn.getChildNodes();
+			
+			for (int x=0; x<nl.getLength(); x++) {
+				Node wn2 = nl.item(x);
+				if (wn2.getNodeName().equalsIgnoreCase("name")) {
+					retVal.name = wn2.getTextContent();
+				} else if (wn2.getNodeName().equalsIgnoreCase("target")) {
+					retVal.target = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("defaultLvl")) {
+					retVal.defaultLvl = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("countUp")) {
+					if(wn2.getTextContent().equalsIgnoreCase(("true"))) {
+						retVal.countUp = true;
+					} else {
+						retVal.countUp = false;
+					}
+				} else if (wn2.getNodeName().equalsIgnoreCase("costs")) {
+					String[] values = wn2.getTextContent().split(",");
+					for(int i = 0; i < values.length; i++) {
+						retVal.costs[i] = Integer.parseInt(values[i]);
+					}
+				} 
+			}		
+		} catch (Exception ex) {
+			// Errrr, apparently either the class name was invalid...
+			// Or the listed name doesn't exist.
+			// Doh!
+			MekHQApp.logError(ex);
+		}
+		lookupHash.put(retVal.name, retVal);
+	}
+	
+	private String printCosts() {
+		String values = "";
+		for(int i = 0; i < costs.length; i++) {
+			values += Integer.toString(costs[i]);
+			if(i < 10) {
+				values += ",";
+			}
+		}
+		return values;
 	}
 	
 	public static SkillType createPilotingMech() {

@@ -1285,9 +1285,14 @@ public class Campaign implements Serializable {
 		pw1.println("\t</forces>");
 		finances.writeToXml(pw1,1);
 		location.writeToXml(pw1, 1);
-		pw1.println("\t<skillCosts>");
-		skillCosts.writeToXml(pw1, 2);
-		pw1.println("\t</skillCosts>");
+		pw1.println("\t<skillTypes>");
+		for(String name : SkillType.skillList) {
+			SkillType type = SkillType.getType(name);
+			if(null != type) {
+				type.writeToXml(pw1, 2);
+			}
+		}
+		pw1.println("\t</skillTypes>");
 		//parts is the biggest so it goes last
 		writeArrayAndHashToXml(pw1, 1, "parts", parts, partIds); // Parts
 		
@@ -1409,8 +1414,8 @@ public class Campaign implements Serializable {
 					processFinances(retVal, wn);
 				} else if(xn.equalsIgnoreCase("location")) {
 					retVal.location = CurrentLocation.generateInstanceFromXML(wn, retVal);
-				} else if(xn.equalsIgnoreCase("skillCosts")) {
-					retVal.skillCosts = SkillCosts.generateInstanceFromXML(wn);
+				} else if(xn.equalsIgnoreCase("skillTypes")) {
+					processSkillTypeNodes(retVal, wn);
 				}
 				
 			} else {
@@ -1620,6 +1625,33 @@ public class Campaign implements Serializable {
 		}
 
 		MekHQApp.logMessage("Load Personnel Nodes Complete!", 4);
+	}
+	
+	private static void processSkillTypeNodes(Campaign retVal, Node wn) {
+		MekHQApp.logMessage("Loading Skill Type Nodes from XML...", 4);
+
+		NodeList wList = wn.getChildNodes();
+		
+		// Okay, lets iterate through the children, eh?
+		for (int x = 0; x < wList.getLength(); x++) {
+			Node wn2 = wList.item(x);
+
+			// If it's not an element node, we ignore it.
+			if (wn2.getNodeType() != Node.ELEMENT_NODE)
+				continue;
+			
+			if (!wn2.getNodeName().equalsIgnoreCase("skillType")) {
+				// Error condition of sorts!
+				// Errr, what should we do here?
+				MekHQApp.logMessage("Unknown node type not loaded in Skill Type nodes: "+wn2.getNodeName());
+
+				continue;
+			}
+
+			SkillType.generateInstanceFromXML(wn2);
+		}
+
+		MekHQApp.logMessage("Load Skill Type Nodes Complete!", 4);
 	}
 	
 	private static void processMissionNodes(Campaign retVal, Node wn) {

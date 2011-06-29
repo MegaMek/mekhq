@@ -52,6 +52,7 @@ v0.1.9 (SVN)
 + changed default XP to be consistent with TW and SO defaults
 + adjustments to admin skill
 + added Admin personnel type
++ Skill costs added to XML serialization
 
 v0.1.8 (2011-06-13)
 + beginning of custom XP costs

@@ -276,8 +276,7 @@ public class SkillCosts implements Serializable {
 					+"<ability-" + optionName + ">"
 					+abilityCosts.get(optionName)
 					+"</ability-" + optionName + ">");
-		}
-		
+		}	
 	}
 	
 	public static SkillCosts generateInstanceFromXML(Node wn) {
