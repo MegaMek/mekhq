@@ -56,6 +56,7 @@ v0.1.9 (SVN)
 + ability costs moved from SkillCosts to SkillType
 + SkillCosts.java removed (costs now kept in SkillType)
 + jump over levels with XP costs of zero when improving skills
++ Bug 3317567: Inactive personnel show up in lists
 
 v0.1.8 (2011-06-13)
 + beginning of custom XP costs

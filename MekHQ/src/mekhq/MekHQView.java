@@ -5097,7 +5097,7 @@ public class MekHQView extends FrameView {
 				}
 				popup.add(menu);
 				// switch pilot
-				if(oneSelected) {
+				if(oneSelected && person.isActive()) {
 						menu = new JMenu("Assign to Unit");
 						JMenu pilotMenu = new JMenu("As Pilot");
 						JMenu driverMenu = new JMenu("As Driver");

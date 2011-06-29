@@ -997,7 +997,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 */
 	@Override
 	public boolean needsFixing() {
-		return hits > 0;
+		return hits > 0 && status != S_KIA && status == S_ACTIVE;
 	}
 
 	@Override
