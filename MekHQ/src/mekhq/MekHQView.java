@@ -121,7 +121,6 @@ import mekhq.campaign.PartInventory;
 import mekhq.campaign.Planet;
 import mekhq.campaign.Planets;
 import mekhq.campaign.ResolveScenarioTracker;
-import mekhq.campaign.SkillCosts;
 import mekhq.campaign.Unit;
 import mekhq.campaign.Utilities;
 import mekhq.campaign.finances.Transaction;
@@ -5220,7 +5219,7 @@ public class MekHQView extends FrameView {
 						for (Enumeration<IOption> i = person.getOptions(PilotOptions.LVL3_ADVANTAGES); i.hasMoreElements();) {
 							IOption ability = i.nextElement();
 							if(!ability.booleanValue()) {
-								cost = campaign.getSkillCosts().getAbilityCost(ability.getName());
+								cost = SkillType.getAbilityCost(ability.getName());
 								costDesc = " (" + cost + "XP)";
 								if(cost < 0) {
 									costDesc = " (Not Possible)";

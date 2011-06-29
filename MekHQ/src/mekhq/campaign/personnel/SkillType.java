@@ -23,7 +23,9 @@ package mekhq.campaign.personnel;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Map;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -39,7 +41,6 @@ import megamek.common.Tank;
 import megamek.common.VTOL;
 import mekhq.MekHQApp;
 import mekhq.campaign.MekHqXmlUtil;
-import mekhq.campaign.SkillCosts;
 
 /**
  * Skill type will hold static information for each skill type like base target number,
@@ -96,6 +97,9 @@ public class SkillType implements Serializable {
 						                      S_NEG,S_LEADER,S_SCROUNGE};
 	
     private static Hashtable<String, SkillType> lookupHash;
+    private static Map<String, Integer> abilityCosts;
+	private static int defaultAbilityCost = 8;
+	
 
     public static final int EXP_ULTRA_GREEN = 0;
     public static final int EXP_GREEN = 1;
@@ -291,7 +295,22 @@ public class SkillType implements Serializable {
 		lookupHash.put(S_NEG, createNegotiation());
 		lookupHash.put(S_SCROUNGE, createScrounge());
 
-
+		abilityCosts = new HashMap<String, Integer>();
+		abilityCosts.put("hot_dog", 4);
+		abilityCosts.put("jumping_jack", 12);
+		abilityCosts.put("multi_tasker", 4);
+		abilityCosts.put("oblique_attacker", 4);
+		abilityCosts.put("pain_resistance", 4);
+		abilityCosts.put("sniper", 12);
+		abilityCosts.put("weapon_specialist", 12);
+		abilityCosts.put("specialist", 4);
+		abilityCosts.put("tactical_genius", 12);
+		abilityCosts.put("aptitude_gunnery", 40);
+		abilityCosts.put("gunnery_laser", 4);
+		abilityCosts.put("gunnery_ballistic", 4);
+		abilityCosts.put("gunnery_missile", 4);
+		abilityCosts.put("ei_implant", 0);
+		abilityCosts.put("clan_pilot_training", 0);
 	}
 	
 	public static SkillType getType(String t) {
@@ -360,6 +379,18 @@ public class SkillType implements Serializable {
 		return S_GUN_MECH;
 	}
 	
+	public static int getAbilityCost(String ability) {
+		if(null == abilityCosts.get(ability)) {
+			return defaultAbilityCost;
+		} else {
+			return abilityCosts.get(ability);
+		}
+	}
+	
+	public static void setAbilityCost(String name, int cost) {
+		abilityCosts.put(name, cost);
+	}
+	
 	public static String[][] getSkillCostsArray() {
 		String[][] array = new String[skillList.length][11];
 		int i = 0;
@@ -395,16 +426,25 @@ public class SkillType implements Serializable {
 				+"<costs>"
 				+printCosts()
 				+"</costs>");
-		pw1.println(MekHqXmlUtil.indentStr(indent) + "</skillType>");
+		pw1.println(MekHqXmlUtil.indentStr(indent) + "</skillType>");	
+	}
+	
+	public static void writeAbilityCostsToXML(PrintWriter pw1, int indent) {
+		for(String optionName : abilityCosts.keySet()) {
+			pw1.println(MekHqXmlUtil.indentStr(indent)
+					+"<ability-" + optionName + ">"
+					+abilityCosts.get(optionName)
+					+"</ability-" + optionName + ">");
+		}
 	}
 	
 	public static void generateInstanceFromXML(Node wn) {
 		SkillType retVal = null;
-	
+			
 		try {		
 			retVal = new SkillType();
 			NodeList nl = wn.getChildNodes();
-			
+				
 			for (int x=0; x<nl.getLength(); x++) {
 				Node wn2 = nl.item(x);
 				if (wn2.getNodeName().equalsIgnoreCase("name")) {
@@ -433,6 +473,12 @@ public class SkillType implements Serializable {
 			MekHQApp.logError(ex);
 		}
 		lookupHash.put(retVal.name, retVal);
+	}
+	
+	public static void readAbilityCostFromXML(Node wn) {
+		if (wn.getNodeName().startsWith("ability-")) {
+			abilityCosts.put(wn.getNodeName().split("-")[1], Integer.parseInt(wn.getTextContent()));
+		}
 	}
 	
 	private String printCosts() {

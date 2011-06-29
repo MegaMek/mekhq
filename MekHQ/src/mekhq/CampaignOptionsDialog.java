@@ -56,7 +56,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.Faction;
 import mekhq.campaign.Ranks;
-import mekhq.campaign.SkillCosts;
 import mekhq.campaign.personnel.SkillType;
 
 /**
@@ -564,7 +563,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panXP.setLayout(new java.awt.GridBagLayout());
         
         lblScenarioXP = new JLabel(resourceMap.getString("lblScenarioXP.text"));
-        spnScenarioXP = new JSpinner(new SpinnerNumberModel(campaign.getSkillCosts().getScenarioXP(), 0, 10, 1));
+        spnScenarioXP = new JSpinner(new SpinnerNumberModel(1, 0, 10, 1));
         
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -657,7 +656,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
                 gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
                 panAbilityXP.add(lblOption, gridBagConstraints); 
                 txtCost = new JTextField();
-                txtCost.setText(Integer.toString(campaign.getSkillCosts().getAbilityCost(option.getName())));
+                txtCost.setText(Integer.toString(SkillType.getAbilityCost(option.getName())));
                 hashAbilityCosts.put(option.getName(), txtCost);
                 gridBagConstraints = new java.awt.GridBagConstraints();
                 gridBagConstraints.gridx = 1;
@@ -1058,19 +1057,19 @@ private void txtNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
 					int cost = Integer.parseInt((String)tableXP.getValueAt(i, j));
 					SkillType.setCost(SkillType.skillList[i],cost,j);
 				} catch (NumberFormatException e) {
-					MekHQApp.logMessage("unreadable value in skill cost table for " + SkillCosts.getSkillName(j));
+					MekHQApp.logMessage("unreadable value in skill cost table for " + SkillType.skillList[i]);
 				}
 			}
 		}
 		for(String optionName : hashAbilityCosts.keySet()) {
 			try {
 				int cost = Integer.parseInt(hashAbilityCosts.get(optionName).getText());
-				campaign.getSkillCosts().setAbilityCost(optionName, cost);
+				SkillType.setAbilityCost(optionName, cost);
 			} catch (NumberFormatException e) {
 				MekHQApp.logMessage("unreadable value in ability cost table for " + optionName);
 			}
 		}
-		campaign.getSkillCosts().setScenarioXP((Integer)spnScenarioXP.getModel().getValue());
+		//campaign.getSkillCosts().setScenarioXP((Integer)spnScenarioXP.getModel().getValue());
 	}
 
 

@@ -53,6 +53,8 @@ v0.1.9 (SVN)
 + adjustments to admin skill
 + added Admin personnel type
 + Skill costs added to XML serialization
++ ability costs moved from SkillCosts to SkillType
++ SkillCosts.java removed (costs now kept in SkillType)
 
 v0.1.8 (2011-06-13)
 + beginning of custom XP costs

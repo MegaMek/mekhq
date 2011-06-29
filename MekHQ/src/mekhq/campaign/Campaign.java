@@ -153,7 +153,6 @@ public class Campaign implements Serializable {
 
 	private int faction;
 	private Ranks ranks;
-	private SkillCosts skillCosts;
 
 	private ArrayList<String> currentReport;
 
@@ -184,7 +183,6 @@ public class Campaign implements Serializable {
 		gmMode = false;
 		faction = Faction.F_MERC;
 		ranks = new Ranks();
-		skillCosts = new SkillCosts();
 		forces = new Force(name);
 		forceIds.put(new Integer(lastForceId), forces);
 		lastForceId++;
@@ -239,10 +237,6 @@ public class Campaign implements Serializable {
 	
 	public Planet getCurrentPlanet() {
 		return location.getCurrentPlanet();
-	}
-
-	public SkillCosts getSkillCosts() {
-		return skillCosts;
 	}
 	
 	public long getFunds() {
@@ -1292,6 +1286,7 @@ public class Campaign implements Serializable {
 				type.writeToXml(pw1, 2);
 			}
 		}
+		SkillType.writeAbilityCostsToXML(pw1, 2);
 		pw1.println("\t</skillTypes>");
 		//parts is the biggest so it goes last
 		writeArrayAndHashToXml(pw1, 1, "parts", parts, partIds); // Parts
@@ -1640,7 +1635,11 @@ public class Campaign implements Serializable {
 			if (wn2.getNodeType() != Node.ELEMENT_NODE)
 				continue;
 			
-			if (!wn2.getNodeName().equalsIgnoreCase("skillType")) {
+			if (wn2.getNodeName().startsWith("ability-")) {
+				SkillType.readAbilityCostFromXML(wn2);
+				continue;
+			}
+			else if (!wn2.getNodeName().equalsIgnoreCase("skillType")) {
 				// Error condition of sorts!
 				// Errr, what should we do here?
 				MekHQApp.logMessage("Unknown node type not loaded in Skill Type nodes: "+wn2.getNodeName());
