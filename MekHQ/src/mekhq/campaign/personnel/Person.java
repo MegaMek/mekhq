@@ -313,6 +313,46 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         return getRoleDesc(secondaryRole);
     }
     
+    public boolean canPerformRole(int role) {
+    	switch(role) {
+    	case(T_NONE):
+    		return true;
+        case(T_MECHWARRIOR):
+            return hasSkill(SkillType.S_GUN_MECH) && hasSkill(SkillType.S_PILOT_MECH);
+        case(T_VEE_CREW):
+            return hasSkill(SkillType.S_GUN_VEE) && (hasSkill(SkillType.S_PILOT_GVEE) || hasSkill(SkillType.S_PILOT_VTOL) || hasSkill(SkillType.S_PILOT_NVEE));
+        case(T_AERO_PILOT):
+            return hasSkill(SkillType.S_GUN_AERO) && hasSkill(SkillType.S_PILOT_AERO);
+        case(T_PROTO_PILOT):
+            return false;
+        case(T_BA):
+            return hasSkill(SkillType.S_GUN_BA);
+        case(T_INFANTRY):
+            return hasSkill(SkillType.S_SMALL_ARMS);
+        case(T_MECH_TECH):
+            return hasSkill(SkillType.S_TECH_MECH) && getSkill(SkillType.S_TECH_MECH).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
+        case(T_MECHANIC):
+            return hasSkill(SkillType.S_TECH_MECHANIC) && getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
+        case(T_AERO_TECH):
+            return hasSkill(SkillType.S_TECH_AERO) && getSkill(SkillType.S_TECH_AERO).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
+        case(T_BA_TECH):
+            return hasSkill(SkillType.S_TECH_BA) && getSkill(SkillType.S_TECH_BA).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
+        case(T_ASTECH):
+            return hasSkill(SkillType.S_ASTECH);
+        case(T_DOCTOR):
+            return hasSkill(SkillType.S_DOCTOR) && getSkill(SkillType.S_DOCTOR).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
+        case(T_MEDIC):
+            return hasSkill(SkillType.S_MEDTECH);
+        case(T_ADMIN_COM):
+        case(T_ADMIN_LOG):
+        case(T_ADMIN_TRA):
+        case(T_ADMIN_HR):
+            return hasSkill(SkillType.S_ADMIN);
+        default:
+            return false;
+    }
+    }
+    
     public void setGender(int g) {
     	this.gender = g;
     }

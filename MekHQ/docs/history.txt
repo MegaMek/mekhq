@@ -62,6 +62,7 @@ v0.1.9 (SVN)
 + default green, regular, veteran, and elite skill levels in SkillType
 + removed NameGen.java
 + changed personnel type to primaryRole and added secondaryRole variable
++ Person#canPerformRole
 
 v0.1.8 (2011-06-13)
 + beginning of custom XP costs
