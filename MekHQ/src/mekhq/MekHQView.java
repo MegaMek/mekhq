@@ -4832,7 +4832,33 @@ public class MekHQView extends FrameView {
 				refreshTechsList();
 				refreshDoctorsList();
 				refreshOrganization();
-			}  else if (command.contains("REMOVE_UNIT")) {	
+			} else if(command.contains("PROLE")) {
+				int role = Integer.parseInt(st.nextToken());
+				for(Person person : people) {
+					person.setPrimaryRole(role);
+					campaign.personUpdated(person);
+				}
+				refreshServicedUnitList();
+				refreshUnitList();
+				refreshPatientList();
+				refreshPersonnelList();
+				refreshTechsList();
+				refreshDoctorsList();
+				refreshOrganization();
+			} else if(command.contains("SROLE")) {
+				int role = Integer.parseInt(st.nextToken());
+				for(Person person : people) {
+					person.setSecondaryRole(role);
+					campaign.personUpdated(person);
+				}
+				refreshServicedUnitList();
+				refreshUnitList();
+				refreshPatientList();
+				refreshPersonnelList();
+				refreshTechsList();
+				refreshDoctorsList();
+				refreshOrganization();
+			} else if (command.contains("REMOVE_UNIT")) {	
 				Unit u = campaign.getUnit(selectedPerson.getUnitId());
 				if(null != u) {
 					u.remove(selectedPerson);
@@ -5095,6 +5121,40 @@ public class MekHQView extends FrameView {
 					cbMenuItem.setEnabled(true);
 					menu.add(cbMenuItem);
 				}
+				popup.add(menu);
+				menu = new JMenu("Change Primary Role");
+				for(int i = 0; i < Person.T_NUM; i++) {
+					if(person.canPerformRole(i) && person.getSecondaryRole() != i) {
+						cbMenuItem = new JCheckBoxMenuItem(Person.getRoleDesc(i));
+						cbMenuItem.setActionCommand("PROLE|" + i);
+						if(person.getPrimaryRole() == i) {
+							cbMenuItem.setSelected(true);
+						}
+						cbMenuItem.addActionListener(this);
+						cbMenuItem.setEnabled(true);
+						menu.add(cbMenuItem);
+					}
+				}
+				if(menu.getItemCount() > 20) {
+                	MenuScroller.setScrollerFor(menu, 20);
+                }
+				popup.add(menu);
+				menu = new JMenu("Change Secondary Role");
+				for(int i = 0; i < Person.T_NUM; i++) {
+					if(person.canPerformRole(i) && person.getPrimaryRole() != i) {
+						cbMenuItem = new JCheckBoxMenuItem(Person.getRoleDesc(i));
+						cbMenuItem.setActionCommand("SROLE|" + i);
+						if(person.getSecondaryRole() == i) {
+							cbMenuItem.setSelected(true);
+						}
+						cbMenuItem.addActionListener(this);
+						cbMenuItem.setEnabled(true);
+						menu.add(cbMenuItem);
+					}
+				}
+				if(menu.getItemCount() > 20) {
+                	MenuScroller.setScrollerFor(menu, 20);
+                }
 				popup.add(menu);
 				// switch pilot
 				if(oneSelected && person.isActive()) {

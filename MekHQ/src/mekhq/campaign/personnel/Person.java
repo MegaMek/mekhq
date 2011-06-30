@@ -247,11 +247,11 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     }
     
     public int getSecondaryRole() {
-        return primaryRole;
+        return secondaryRole;
     }
     
     public void setSecondaryRole(int t) {
-    	this.primaryRole = t;
+    	this.secondaryRole = t;
     }
     
     public int getStatus() {
@@ -700,7 +700,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 	        }
 			//check to see if we are dealing with a PilotPerson from 0.1.8 or earlier
 			if(pilotGunnery != -1) {
-				switch(retVal.primaryRole) {
+				switch(retVal.primaryRole+1) {
 				case T_MECHWARRIOR:
 					retVal.addSkill(SkillType.S_GUN_MECH,7-pilotGunnery,0);
 					retVal.addSkill(SkillType.S_PILOT_MECH,8-pilotPiloting,0);
