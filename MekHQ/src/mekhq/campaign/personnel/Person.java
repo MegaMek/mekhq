@@ -75,24 +75,25 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 	public static final int G_MALE = 0;
 	public static final int G_FEMALE = 1;
 	
-	public static final int T_MECHWARRIOR = 0;
-	public static final int T_VEE_CREW    = 1;
-	public static final int T_AERO_PILOT  = 2;
-	public static final int T_PROTO_PILOT = 3;
-	public static final int T_BA          = 4;
-	public static final int T_INFANTRY    = 5;
-	public static final int T_MECH_TECH   = 6;
-    public static final int T_MECHANIC    = 7;
-    public static final int T_AERO_TECH   = 8;
-    public static final int T_BA_TECH     = 9;
-    public static final int T_ASTECH      = 10;
-    public static final int T_DOCTOR      = 11;
-    public static final int T_MEDIC       = 12;
-    public static final int T_ADMIN_COM   = 13;
-    public static final int T_ADMIN_LOG   = 14;
-    public static final int T_ADMIN_TRA   = 15;
-    public static final int T_ADMIN_HR    = 16;
-    public static final int T_NUM         = 17;
+	public static final int T_NONE        = 0;
+	public static final int T_MECHWARRIOR = 1;
+	public static final int T_VEE_CREW    = 2;
+	public static final int T_AERO_PILOT  = 3;
+	public static final int T_PROTO_PILOT = 4;
+	public static final int T_BA          = 5;
+	public static final int T_INFANTRY    = 6;
+	public static final int T_MECH_TECH   = 7;
+    public static final int T_MECHANIC    = 8;
+    public static final int T_AERO_TECH   = 9;
+    public static final int T_BA_TECH     = 10;
+    public static final int T_ASTECH      = 11;
+    public static final int T_DOCTOR      = 12;
+    public static final int T_MEDIC       = 13;
+    public static final int T_ADMIN_COM   = 14;
+    public static final int T_ADMIN_LOG   = 15;
+    public static final int T_ADMIN_TRA   = 16;
+    public static final int T_ADMIN_HR    = 17;
+    public static final int T_NUM         = 18;
     
     public static final int S_ACTIVE = 0;
     public static final int S_RETIRED = 1;
@@ -104,9 +105,11 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     
     private String name;
     private String callsign;
-    private int type;
     protected int gender;
 
+    private int primaryRole;
+    private int secondaryRole;
+    
     protected String biography;
     protected GregorianCalendar birthday;
     
@@ -235,12 +238,20 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         this.portraitFile = s;
     }
     
-    public int getType() {
-        return type;
+    public int getPrimaryRole() {
+        return primaryRole;
     }
     
-    public void setType(int t) {
-    	this.type = t;
+    public void setPrimaryRole(int t) {
+    	this.primaryRole = t;
+    }
+    
+    public int getSecondaryRole() {
+        return primaryRole;
+    }
+    
+    public void setSecondaryRole(int t) {
+    	this.primaryRole = t;
     }
     
     public int getStatus() {
@@ -251,8 +262,10 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     	this.status = s;
     }
 
-    public static String getTypeDesc(int type) {
+    public static String getRoleDesc(int type) {
         switch(type) {
+        	case(T_NONE):
+        		return "None";
             case(T_MECHWARRIOR):
                 return "Mechwarrior";
             case(T_VEE_CREW):
@@ -292,8 +305,12 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         }
     }
     
-    public String getTypeDesc() {
-        return getTypeDesc(type);
+    public String getPrimaryRoleDesc() {
+        return getRoleDesc(primaryRole);
+    }
+    
+    public String getSecondaryRoleDesc() {
+        return getRoleDesc(secondaryRole);
     }
     
     public void setGender(int g) {
@@ -398,6 +415,14 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 				+"<callsign>"
 				+callsign
 				+"</callsign>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<primaryRole>"
+				+primaryRole
+				+"</primaryRole>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<secondaryRole>"
+				+secondaryRole
+				+"</secondaryRole>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<biography>"
 				+biography
@@ -525,8 +550,10 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 					retVal.callsign = wn2.getTextContent();
 				} else if (wn2.getNodeName().equalsIgnoreCase("biography")) {
 					retVal.biography = wn2.getTextContent();
-				} else if (wn2.getNodeName().equalsIgnoreCase("type")) {
-					retVal.type = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("primaryRole")) {
+					retVal.primaryRole = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("secondaryRole")) {
+					retVal.secondaryRole = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("daysRest")) {
 					retVal.daysRest = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("id")) {
@@ -633,7 +660,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 	        }
 			//check to see if we are dealing with a PilotPerson from 0.1.8 or earlier
 			if(pilotGunnery != -1) {
-				switch(retVal.type) {
+				switch(retVal.primaryRole) {
 				case T_MECHWARRIOR:
 					retVal.addSkill(SkillType.S_GUN_MECH,7-pilotGunnery,0);
 					retVal.addSkill(SkillType.S_PILOT_MECH,8-pilotPiloting,0);
@@ -676,7 +703,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 		//if salary is -1, then use the standard amounts
 		int base = 0;
 		
-		switch (getType()) {
+		switch (getPrimaryRole()) {
 	    	case T_MECHWARRIOR:
 				base = 1500;
 				break;
@@ -747,7 +774,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 			expMult = 1.0;
 		}
 		
-		if(getType() == T_ASTECH || getType() == T_MEDIC) {
+		if(getPrimaryRole() == T_ASTECH || getPrimaryRole() == T_MEDIC) {
 			expMult = 0.5;
 		}
 		
@@ -789,7 +816,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 	}
 	
 	public int getExperienceLevel() {
-		switch(type) {
+		switch(primaryRole) {
 		case T_MECHWARRIOR:
 			if(hasSkill(SkillType.S_GUN_MECH) && hasSkill(SkillType.S_PILOT_MECH)) {
 				return (int)Math.floor((getSkill(SkillType.S_GUN_MECH).getExperienceLevel() 
@@ -1175,7 +1202,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     }
     
     public boolean isSupport() {
-    	return type >= T_MECH_TECH;
+    	return primaryRole >= T_MECH_TECH;
     }
     
     public boolean canDrive(Entity ent) {
@@ -1271,7 +1298,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     
     public boolean isTech() {
     	//type must be correct and you must be more than ultra-green in the skill
-    	boolean hasType = type == T_MECH_TECH ||  type == T_AERO_TECH ||  type == T_MECHANIC ||  type == T_BA_TECH;
+    	boolean hasType = primaryRole == T_MECH_TECH ||  primaryRole == T_AERO_TECH ||  primaryRole == T_MECHANIC ||  primaryRole == T_BA_TECH;
     	boolean isMechTech = hasSkill(SkillType.S_TECH_MECH) && getSkill(SkillType.S_TECH_MECH).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
     	boolean isAeroTech = hasSkill(SkillType.S_TECH_AERO) && getSkill(SkillType.S_TECH_AERO).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
     	boolean isMechanic = hasSkill(SkillType.S_TECH_MECHANIC) && getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;

@@ -259,6 +259,8 @@ public class SkillType implements Serializable {
     		return "Veteran";
     	case EXP_ELITE:
     		return "Elite";
+    	case -1:
+    		return "Unknown";
     	default:
     		return "Impossible";
     	}

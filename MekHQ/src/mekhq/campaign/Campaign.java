@@ -450,7 +450,7 @@ public class Campaign implements Serializable {
 		personnelIds.put(new Integer(id), p);
 		lastPersonId = id;
 		addReport(p.getName() + " has been added to the personnel roster.");
-		if(p.getType() == Person.T_ASTECH) {
+		if(p.getPrimaryRole() == Person.T_ASTECH) {
 			astechPoolMinutes += 480;
 			astechPoolOvertime += 240;
 		}
@@ -896,7 +896,7 @@ public class Campaign implements Serializable {
 				+ " has been removed from the personnel roster.");
 		personnel.remove(person);
 		personnelIds.remove(new Integer(id));
-		if(person.getType() == Person.T_ASTECH) {
+		if(person.getPrimaryRole() == Person.T_ASTECH) {
 			astechPoolMinutes = Math.max(0, astechPoolMinutes - 480);
 			astechPoolOvertime = Math.max(0, astechPoolOvertime - 240);
 		}
@@ -1493,24 +1493,24 @@ public class Campaign implements Serializable {
 				if(t instanceof TechTeam) {
 					switch(((TechTeam) t).getType()) {
 					case TechTeam.T_MECH:
-						psn.setType(Person.T_MECH_TECH);
+						psn.setPrimaryRole(Person.T_MECH_TECH);
 						psn.addSkill(SkillType.S_TECH_MECH, lvl, 0);
 						break;
 					case TechTeam.T_MECHANIC:
-						psn.setType(Person.T_MECHANIC);
+						psn.setPrimaryRole(Person.T_MECHANIC);
 						psn.addSkill(SkillType.S_TECH_MECHANIC, lvl, 0);
 						break;
 					case TechTeam.T_AERO:
-						psn.setType(Person.T_AERO_TECH);
+						psn.setPrimaryRole(Person.T_AERO_TECH);
 						psn.addSkill(SkillType.S_TECH_AERO, lvl, 0);
 						break;
 					case TechTeam.T_BA:
-						psn.setType(Person.T_BA_TECH);
+						psn.setPrimaryRole(Person.T_BA_TECH);
 						psn.addSkill(SkillType.S_TECH_BA, lvl, 0);
 						break;
 					}
 				} else {
-					psn.setType(Person.T_DOCTOR);
+					psn.setPrimaryRole(Person.T_DOCTOR);
 					psn.addSkill(SkillType.S_DOCTOR, lvl, 0);
 				}
 			}
@@ -1967,7 +1967,7 @@ public class Campaign implements Serializable {
 		}
 		birthdate.set(Calendar.DAY_OF_YEAR, randomDay);
 		person.setBirthday(birthdate);
-		person.setType(type);
+		person.setPrimaryRole(type);
 		//set default skills
 		switch(type) {
 		case(Person.T_MECHWARRIOR):
@@ -2445,7 +2445,7 @@ public class Campaign implements Serializable {
 	public int getNumberAstechs() {
 		int astechs = astechPool;
 		for(Person p : personnel) {
-			if(p.getType() == Person.T_ASTECH && p.isActive() && !p.isDeployed(this)) {
+			if(p.getPrimaryRole() == Person.T_ASTECH && p.isActive() && !p.isDeployed(this)) {
 				astechs++;
 			}
 		}

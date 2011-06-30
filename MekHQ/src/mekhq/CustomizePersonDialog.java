@@ -131,7 +131,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         panDemog.setLayout(new java.awt.GridBagLayout());
         DefaultComboBoxModel personTypeModel = new DefaultComboBoxModel();
         for(int i = 0; i < Person.T_NUM; i++) {
-        	personTypeModel.addElement(Person.getTypeDesc(i));
+        	personTypeModel.addElement(Person.getRoleDesc(i));
         }
         choiceType.setModel(personTypeModel);
         choiceType.setMinimumSize(new java.awt.Dimension(200, 27));
@@ -144,7 +144,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        choiceType.setSelectedIndex(person.getType());
+        choiceType.setSelectedIndex(person.getPrimaryRole());
         choiceType.setEnabled(isNewHire());
         choiceType.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -400,7 +400,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     private void btnOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOkActionPerformed
         
         person.setName(textName.getText());
-        person.setType(choiceType.getSelectedIndex());
+        person.setPrimaryRole(choiceType.getSelectedIndex());
         person.setCallsign(textNickname.getText());   
         person.setBiography(txtBio.getText());
         person.setGender(choiceGender.getSelectedIndex());

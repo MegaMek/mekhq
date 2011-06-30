@@ -60,6 +60,8 @@ v0.1.9 (SVN)
 + Bug 3317565: Costs not paid
 + Bug 3317554: Salvage value not saved/loaded
 + default green, regular, veteran, and elite skill levels in SkillType
++ removed NameGen.java
++ changed personnel type to primaryRole and added secondaryRole variable
 
 v0.1.8 (2011-06-13)
 + beginning of custom XP costs

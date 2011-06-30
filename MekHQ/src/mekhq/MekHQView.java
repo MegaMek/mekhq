@@ -1746,7 +1746,7 @@ public class MekHQView extends FrameView {
 		JMenuItem miHire;
 		for(int i = 0; i < Person.T_NUM; i++) {		
 			miHire = new JMenuItem();
-			miHire.setText(Person.getTypeDesc(i)); // NOI18N
+			miHire.setText(Person.getRoleDesc(i)); // NOI18N
 			miHire.setActionCommand(Integer.toString(i));
 			miHire.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -3058,7 +3058,7 @@ public class MekHQView extends FrameView {
         	public boolean include(Entry<? extends PersonnelTableModel, ? extends Integer> entry) {
         		PersonnelTableModel personModel = entry.getModel();
         		Person person = personModel.getPerson(entry.getIdentifier());
-        		int type = person.getType();
+        		int type = person.getPrimaryRole();
         		if ((nGroup == PG_ACTIVE) ||
         				(nGroup == PG_COMBAT && type <= Person.T_BA) ||
         				(nGroup == PG_SUPPORT && type > Person.T_BA) ||
@@ -5442,7 +5442,7 @@ public class MekHQView extends FrameView {
                 case COL_GENDER:
                     return "Gender";
                 case COL_TYPE:
-                    return "Type";
+                    return "Role";
                 case COL_GUN_MECH:
                     return "G/Mech";
                 case COL_PILOT_MECH:
@@ -5622,7 +5622,7 @@ public class MekHQView extends FrameView {
                 return p.getAge(campaign.getCalendar());
             }
             if(col == COL_TYPE) {
-                return p.getTypeDesc();
+                return p.getPrimaryRoleDesc();
             }
             if(col == COL_GUN_MECH) {
             	if(p.hasSkill(SkillType.S_GUN_MECH)) {
