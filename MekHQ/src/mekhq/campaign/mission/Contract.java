@@ -454,10 +454,6 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 				+battleLossComp
 				+"</battleLossComp>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<salvagePct>"
-				+salvagePct
-				+"</salvagePct>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<transportComp>"
 				+transportComp
 				+"</transportComp>");
@@ -501,6 +497,14 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 				+"<feeAmount>"
 				+feeAmount
 				+"</feeAmount>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<salvagedByUnit>"
+				+salvagedByUnit
+				+"</salvagedByUnit>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<salvagedByEmployer>"
+				+salvagedByEmployer
+				+"</salvagedByEmployer>");
 		writeToXmlEnd(pw1, indent, id);
 	}
 	
@@ -574,6 +578,12 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 			}
 			else if (wn2.getNodeName().equalsIgnoreCase("feeAmount")) {
 				feeAmount = Long.parseLong(wn2.getTextContent().trim());
+			}
+			else if (wn2.getNodeName().equalsIgnoreCase("salvagedByUnit")) {
+				salvagedByUnit = Long.parseLong(wn2.getTextContent().trim());
+			}
+			else if (wn2.getNodeName().equalsIgnoreCase("salvagedByEmployer")) {
+				salvagedByEmployer = Long.parseLong(wn2.getTextContent().trim());
 			}
 		}
 	}
