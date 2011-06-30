@@ -59,6 +59,7 @@ v0.1.9 (SVN)
 + Bug 3317567: Inactive personnel show up in lists
 + Bug 3317565: Costs not paid
 + Bug 3317554: Salvage value not saved/loaded
++ default green, regular, veteran, and elite skill levels in SkillType
 
 v0.1.8 (2011-06-13)
 + beginning of custom XP costs

@@ -110,7 +110,10 @@ public class SkillType implements Serializable {
 	private String name;
 	private int target;
 	private boolean countUp;
-	private int defaultLvl;
+	private int greenLvl;
+	private int regLvl;
+	private int vetLvl;
+	private int eliteLvl;	
 	private Integer[] costs;
 	
 	public static String[] getSkillList() {
@@ -119,7 +122,10 @@ public class SkillType implements Serializable {
 	
 	/** Creates new SkillType */
     public SkillType() {
-        defaultLvl = 3;
+        greenLvl = 1;
+        regLvl = 3;
+        vetLvl = 4;
+        eliteLvl = 5;
         costs = new Integer[]{0,0,0,0,0,0,0,0,0,0,0};
     }
     
@@ -140,11 +146,7 @@ public class SkillType implements Serializable {
 	}
 	
 	public int getDefaultLevel() {
-		return defaultLvl;
-	}
-	
-	public void setDefaultLevel(int lvl) {
-		this.defaultLvl = lvl;
+		return regLvl;
 	}
 	
 	public int getCost(int lvl) {
@@ -175,92 +177,20 @@ public class SkillType implements Serializable {
 					|| name.equals(S_GUN_SPACE) || name.equals(S_ARTILLERY);
 	}
 	
-	public int getExperienceLevel(int value) {
-		if(countUp()) {
-			if(value <= 0) {
-				return EXP_ULTRA_GREEN;
-			}
-			else if(value == 1) {
-				return EXP_GREEN;
-			}
-			else if(value == 2) {
-				return EXP_REGULAR;
-			}
-			else if(value <= 5) {
-				return EXP_VETERAN;
-			}
-			else {
-				return EXP_ELITE;
-			}
+	public int getExperienceLevel(int lvl) {
+		if(lvl >= eliteLvl) {
+			return EXP_ELITE;
 		}
-		else if(isPiloting() || name.equals(S_ANTI_MECH)) {
-			if(value >= 8) {
-				return EXP_ULTRA_GREEN;
-			}
-			else if(value >= 6) {
-				return EXP_GREEN;
-			}
-			else if(value == 5) {
-				return EXP_REGULAR;
-			}
-			else if(value == 4) {
-				return EXP_VETERAN;
-			}
-			else {
-				return EXP_ELITE;
-			}
+		else if(lvl >= vetLvl) {
+			return EXP_VETERAN;
 		}
-		else if(isGunnery()) {
-			if(value >= 7) {
-				return EXP_ULTRA_GREEN;
-			}
-			else if(value >= 5) {
-				return EXP_GREEN;
-			}
-			else if(value == 4) {
-				return EXP_REGULAR;
-			}
-			else if(value >= 3) {
-				return EXP_VETERAN;
-			}
-			else {
-				return EXP_ELITE;
-			}
+		else if(lvl >= regLvl) {
+			return EXP_REGULAR;
 		}
-		else if(name.equals(S_DOCTOR) || name.equals(S_MEDTECH)) {
-			if(value >= 11) {
-				return EXP_ULTRA_GREEN;
-			}
-			else if(value == 10) {
-				return EXP_GREEN;
-			}
-			else if(value == 8) {
-				return EXP_REGULAR;
-			}
-			else if(value >= 7) {
-				return EXP_VETERAN;
-			}
-			else {
-				return EXP_ELITE;
-			}
+		else if(lvl >= greenLvl) {
+			return EXP_GREEN;
 		}
-		else {
-			if(value >= 10) {
-				return EXP_ULTRA_GREEN;
-			}
-			else if(value >= 8) {
-				return EXP_GREEN;
-			}
-			else if(value == 7) {
-				return EXP_REGULAR;
-			}
-			else if(value >= 6) {
-				return EXP_VETERAN;
-			}
-			else {
-				return EXP_ELITE;
-			}
-		}
+		return EXP_ULTRA_GREEN;
 	}
 	
 	public static void initializeTypes() {
@@ -419,9 +349,21 @@ public class SkillType implements Serializable {
 				+countUp
 				+"</countUp>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<defaultLvl>"
-				+defaultLvl
-				+"</defaultLvl>");
+				+"<greenLvl>"
+				+greenLvl
+				+"</greenLvl>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<regLvl>"
+				+regLvl
+				+"</regLvl>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<vetLvl>"
+				+vetLvl
+				+"</vetLvl>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<eliteLvl>"
+				+eliteLvl
+				+"</eliteLvl>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<costs>"
 				+printCosts()
@@ -451,8 +393,14 @@ public class SkillType implements Serializable {
 					retVal.name = wn2.getTextContent();
 				} else if (wn2.getNodeName().equalsIgnoreCase("target")) {
 					retVal.target = Integer.parseInt(wn2.getTextContent());
-				} else if (wn2.getNodeName().equalsIgnoreCase("defaultLvl")) {
-					retVal.defaultLvl = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("greenLvl")) {
+					retVal.greenLvl = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("regLvl")) {
+					retVal.regLvl = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("vetLvl")) {
+					retVal.vetLvl = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("eliteLvl")) {
+					retVal.eliteLvl = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("countUp")) {
 					if(wn2.getTextContent().equalsIgnoreCase(("true"))) {
 						retVal.countUp = true;

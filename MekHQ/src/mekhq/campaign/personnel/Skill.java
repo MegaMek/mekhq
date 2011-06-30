@@ -142,7 +142,7 @@ public class Skill implements Serializable, MekHqXmlSerializable {
 	}
 	
 	public int getExperienceLevel() {
-		return type.getExperienceLevel(getFinalSkillValue());
+		return type.getExperienceLevel(getLevel());
 	}
 	
 	@Override
