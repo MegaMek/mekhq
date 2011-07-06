@@ -227,7 +227,7 @@ public class EnginePart extends Part {
 
 	@Override
 	public void fix() {
-		hits = 0;
+		super.fix();
 		if(null != unit) {
 			unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE);
 			if(unit.getEntity() instanceof Aero) {

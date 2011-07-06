@@ -548,6 +548,12 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	}
 	
 	@Override
+	public void fix() {
+		hits = 0;
+		skillMin = SkillType.EXP_GREEN;
+	}
+	
+	@Override
 	public String fail(int rating) {
 		skillMin = ++rating;
 		timeSpent = 0;

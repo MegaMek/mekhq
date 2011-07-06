@@ -271,6 +271,7 @@ public class MekLocation extends Part {
 
 	@Override
 	public void fix() {
+		super.fix();
 		percent = 1.0;
 		if(null != unit) {
 			unit.getEntity().setInternal(unit.getEntity().getOInternal(loc), loc);

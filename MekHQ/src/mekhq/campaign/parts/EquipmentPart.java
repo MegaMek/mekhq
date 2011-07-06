@@ -219,7 +219,7 @@ public class EquipmentPart extends Part {
 
 	@Override
 	public void fix() {
-		hits = 0;
+		super.fix();
 		if(null != unit) {
 			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
 			if(null != mounted) {

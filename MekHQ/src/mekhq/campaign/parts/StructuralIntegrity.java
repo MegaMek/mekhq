@@ -149,6 +149,7 @@ public class StructuralIntegrity extends Part {
 
 	@Override
 	public void fix() {
+		super.fix();
 		pointsNeeded = 0;
 		if(null != unit && unit.getEntity() instanceof Aero) {
 			((Aero)unit.getEntity()).setSI(((Aero)unit.getEntity()).get0SI());

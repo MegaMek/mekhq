@@ -90,7 +90,7 @@ public class VeeStabiliser extends Part {
 
 	@Override
 	public void fix() {
-		hits = 0;
+		super.fix();
 		if(null != unit && unit.getEntity() instanceof Tank) {
 			((Tank)unit.getEntity()).clearStabiliserHit(loc);
 		}

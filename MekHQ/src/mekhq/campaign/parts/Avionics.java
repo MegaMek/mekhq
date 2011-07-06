@@ -77,7 +77,7 @@ public class Avionics extends Part {
 
 	@Override
 	public void fix() {
-		hits = 0;
+		super.fix();
 		if(null != unit && unit.getEntity() instanceof Aero) {
 			((Aero)unit.getEntity()).setAvionicsHits(0);
 		}

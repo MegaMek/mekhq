@@ -126,6 +126,7 @@ public class TankLocation extends Part {
 
 	@Override
 	public void fix() {
+		super.fix();
 		damage = 0;
 		if(null != unit) {
 			unit.getEntity().setInternal(unit.getEntity().getOInternal(loc), loc);

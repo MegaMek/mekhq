@@ -91,6 +91,7 @@ public class TurretLock extends Part {
 
 	@Override
 	public void fix() {
+		super.fix();
 		if(null != unit && unit.getEntity() instanceof Tank) {
 			((Tank)unit.getEntity()).unlockTurret();
 		}

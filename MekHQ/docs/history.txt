@@ -64,6 +64,7 @@ v0.1.9 (SVN)
 + changed personnel type to primaryRole and added secondaryRole variable
 + Person#canPerformRole
 + Personnel menu item to change primary and secondary role
++ Bug: the tech level of repaired parts does not reset to green
 
 v0.1.8 (2011-06-13)
 + beginning of custom XP costs

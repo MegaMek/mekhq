@@ -98,7 +98,7 @@ public class MekLifeSupport extends Part {
 
 	@Override
 	public void fix() {
-		hits = 0;
+		super.fix();
 		if(null != unit) {
 			unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_LIFE_SUPPORT);
 		}
