@@ -5142,6 +5142,13 @@ public class MekHQView extends FrameView {
 				menu = new JMenu("Change Secondary Role");
 				for(int i = 0; i < Person.T_NUM; i++) {
 					if(person.canPerformRole(i) && person.getPrimaryRole() != i) {
+						//you cant be an astech if you are a tech, or a medic if you are a doctor
+						if(person.isTechPrimary() && i == Person.T_ASTECH) {
+							continue;
+						}
+						if(person.getPrimaryRole() == Person.T_DOCTOR && i == Person.T_MEDIC) {
+							continue;
+						}
 						cbMenuItem = new JCheckBoxMenuItem(Person.getRoleDesc(i));
 						cbMenuItem.setActionCommand("SROLE|" + i);
 						if(person.getSecondaryRole() == i) {

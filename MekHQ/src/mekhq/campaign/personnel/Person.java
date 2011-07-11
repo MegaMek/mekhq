@@ -242,6 +242,16 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     
     public void setPrimaryRole(int t) {
     	this.primaryRole = t;
+    	//you cant be primary tech and a secondary astech
+    	//you cant be a primary astech and a secondary tech
+    	if((isTechPrimary() && secondaryRole == T_ASTECH)
+    			|| (isTechSecondary() && primaryRole == T_ASTECH)) {
+    		secondaryRole = T_NONE;
+    	}
+    	if((primaryRole == T_DOCTOR && secondaryRole == T_MEDIC)
+    			|| (secondaryRole == T_DOCTOR && primaryRole == T_MEDIC)) {
+    		secondaryRole = T_NONE;
+    	}  	
     }
     
     public int getSecondaryRole() {
