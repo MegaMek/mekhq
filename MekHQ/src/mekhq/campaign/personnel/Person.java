@@ -140,7 +140,6 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     private Ranks ranks;
     
     //stuff to track for support teams
-    protected int hours;
     protected int minutesLeft;
     protected int overtimeLeft;
     
@@ -166,7 +165,6 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         ranks = r;
         medicalTeamId = -1;
         unitId = -1;
-        hours = 8;
         resetMinutesLeft();
     }
     
@@ -516,10 +514,6 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 				+hits
 				+"</hits>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<hours>"
-				+hours
-				+"</hours>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<minutesLeft>"
 				+minutesLeft
 				+"</minutesLeft>");
@@ -620,8 +614,6 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 					retVal.status = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("salary")) {
 					retVal.salary = Integer.parseInt(wn2.getTextContent());
-				} else if (wn2.getNodeName().equalsIgnoreCase("hours")) {
-					retVal.hours = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("minutesLeft")) {
 					retVal.minutesLeft = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("overtimeLeft")) {
@@ -1307,14 +1299,6 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     	return teamId;
     }
     
-    public int getHours() {
-        return hours;
-    }
-    
-    public void setHours(int i) {
-        this.hours = i;
-    }
-    
     public int getMinutesLeft() {
         return minutesLeft;
     }
@@ -1332,18 +1316,31 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     }
     
     public void resetMinutesLeft() {
-        this.minutesLeft = 60 * getHours();
-        this.overtimeLeft = 60 * 4;
+    	if(isTechPrimary() || getPrimaryRole() == T_DOCTOR) {
+	        this.minutesLeft = 480;
+	        this.overtimeLeft = 240;
+    	}
+    	if(isTechSecondary() || getSecondaryRole() == T_DOCTOR) {
+        	this.minutesLeft /= 2;
+        	this.overtimeLeft /= 2;
+        }
     }
     
     public boolean isTech() {
     	//type must be correct and you must be more than ultra-green in the skill
-    	boolean hasType = primaryRole == T_MECH_TECH ||  primaryRole == T_AERO_TECH ||  primaryRole == T_MECHANIC ||  primaryRole == T_BA_TECH;
     	boolean isMechTech = hasSkill(SkillType.S_TECH_MECH) && getSkill(SkillType.S_TECH_MECH).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
     	boolean isAeroTech = hasSkill(SkillType.S_TECH_AERO) && getSkill(SkillType.S_TECH_AERO).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
     	boolean isMechanic = hasSkill(SkillType.S_TECH_MECHANIC) && getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
     	boolean isBATech = hasSkill(SkillType.S_TECH_BA) && getSkill(SkillType.S_TECH_BA).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
-    	return hasType && (isMechTech || isAeroTech || isMechanic || isBATech);
+    	return (isTechPrimary() || isTechSecondary()) && (isMechTech || isAeroTech || isMechanic || isBATech);
+    }
+    
+    public boolean isTechPrimary() {
+    	return primaryRole == T_MECH_TECH ||  primaryRole == T_AERO_TECH ||  primaryRole == T_MECHANIC ||  primaryRole == T_BA_TECH;
+    }
+    
+    public boolean isTechSecondary() {
+    	return secondaryRole == T_MECH_TECH ||  secondaryRole == T_AERO_TECH ||  secondaryRole == T_MECHANIC ||  secondaryRole == T_BA_TECH;
     }
    
     public boolean isTaskOvertime(IPartWork partWork) {

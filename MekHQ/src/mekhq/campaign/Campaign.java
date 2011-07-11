@@ -454,6 +454,10 @@ public class Campaign implements Serializable {
 			astechPoolMinutes += 480;
 			astechPoolOvertime += 240;
 		}
+		if(p.getSecondaryRole() == Person.T_ASTECH) {
+			astechPoolMinutes += 240;
+			astechPoolOvertime += 120;
+		}
 	}
 	
 	private void addPersonWithoutId(Person p) {
@@ -899,6 +903,10 @@ public class Campaign implements Serializable {
 		if(person.getPrimaryRole() == Person.T_ASTECH) {
 			astechPoolMinutes = Math.max(0, astechPoolMinutes - 480);
 			astechPoolOvertime = Math.max(0, astechPoolOvertime - 240);
+		}
+		if(person.getSecondaryRole() == Person.T_ASTECH) {
+			astechPoolMinutes = Math.max(0, astechPoolMinutes - 240);
+			astechPoolOvertime = Math.max(0, astechPoolOvertime - 120);
 		}
 	}
 	
@@ -2413,8 +2421,8 @@ public class Campaign implements Serializable {
 	}
 	
 	public void resetAstechMinutes() {
-		astechPoolMinutes = 480 * getNumberAstechs();
-		astechPoolOvertime = 240 * getNumberAstechs();
+		astechPoolMinutes = 480 * getNumberPrimaryAstechs() + 240 * getNumberSecondaryAstechs();
+		astechPoolOvertime = 240 * getNumberPrimaryAstechs() + 120 * getNumberSecondaryAstechs();
 	}
 	
 	public int getAstechPoolMinutes() {
@@ -2443,9 +2451,25 @@ public class Campaign implements Serializable {
 	}
 	
 	public int getNumberAstechs() {
+		return getNumberPrimaryAstechs() + getNumberSecondaryAstechs();
+	}
+	
+	public int getNumberPrimaryAstechs() {
 		int astechs = astechPool;
 		for(Person p : personnel) {
-			if(p.getPrimaryRole() == Person.T_ASTECH && p.isActive() && !p.isDeployed(this)) {
+			if((p.getPrimaryRole() == Person.T_ASTECH)
+					&& p.isActive() && !p.isDeployed(this)) {
+				astechs++;
+			}
+		}
+		return astechs;
+	}
+	
+	public int getNumberSecondaryAstechs() {
+		int astechs = astechPool;
+		for(Person p : personnel) {
+			if((p.getSecondaryRole() == Person.T_ASTECH)
+					&& p.isActive() && !p.isDeployed(this)) {
 				astechs++;
 			}
 		}
@@ -2499,5 +2523,12 @@ public class Campaign implements Serializable {
         	helpMod = 1;
         }
         return helpMod;
+	}
+	
+	public void switchPrimaryRole(Person p, int role) {
+		int currentRole = p.getPrimaryRole();
+		//if the current primary role is an astech, then remove minutes from astech
+		//determine how many minutes have been used so that these can be subtracted from minutes left
+		//after resetting
 	}
 }
