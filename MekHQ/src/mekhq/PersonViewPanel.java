@@ -192,7 +192,7 @@ public class PersonViewPanel extends javax.swing.JPanel {
 		pnlStats.setLayout(new java.awt.GridBagLayout());
 		
 		lblType.setName("lblType"); // NOI18N
-		lblType.setText("<html><i>" + person.getPrimaryRoleDesc() + "</i></html>");
+		lblType.setText("<html><i>" + person.getRoleDesc() + "</i></html>");
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 0;

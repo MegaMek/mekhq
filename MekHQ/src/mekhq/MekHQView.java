@@ -5689,7 +5689,7 @@ public class MekHQView extends FrameView {
                 return p.getAge(campaign.getCalendar());
             }
             if(col == COL_TYPE) {
-                return p.getPrimaryRoleDesc();
+                return p.getRoleDesc();
             }
             if(col == COL_GUN_MECH) {
             	if(p.hasSkill(SkillType.S_GUN_MECH)) {

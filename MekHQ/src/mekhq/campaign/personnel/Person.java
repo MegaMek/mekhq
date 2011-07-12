@@ -313,6 +313,14 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         }
     }
     
+    public String getRoleDesc() {
+    	String role = getPrimaryRoleDesc();
+    	if(secondaryRole != T_NONE && secondaryRole != -1) {
+    		role += "/" + getSecondaryRoleDesc();
+    	}
+    	return role;
+    }
+    
     public String getPrimaryRoleDesc() {
         return getRoleDesc(primaryRole);
     }
@@ -736,6 +744,63 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 		return retVal;
 	}
 	
+	public static int getSalary(int role) {
+		int base = 0;
+		switch (role) {
+    	case T_MECHWARRIOR:
+			base = 1500;
+			break;
+		case T_VEE_CREW:
+			base = 900;
+			break;
+		case T_AERO_PILOT:
+			base = 1500;
+			break;
+		case T_PROTO_PILOT:
+			//TODO: Confirm ProtoMech pilots should be paid as BA pilots?
+			base = 960;
+			break;
+		case T_BA:
+			base = 960;
+			break;
+		case T_INFANTRY:
+			base = 750;
+			break;
+		case T_MECH_TECH:
+			base = 800;
+			break;
+		case T_MECHANIC:
+			base = 640;
+			break;
+		case T_AERO_TECH:
+			base = 800;
+			break;
+		case T_BA_TECH:
+			base = 800;
+			break;
+		case T_ASTECH:
+			base = 640;
+			break;
+		case T_DOCTOR:
+			base = 1500;
+			break;
+		case T_MEDIC:
+			base = 640;
+			break;
+		case T_ADMIN_COM:
+		case T_ADMIN_LOG:
+		case T_ADMIN_TRA:
+		case T_ADMIN_HR:
+			base = 320;
+			break;
+		case T_NUM:
+			// Not a real pilot type. If someone has this, they don't get paid!
+			base = 0;
+			break;
+		}
+		return base;
+	}
+	
 	public int getSalary() {
 		
 		if(salary > -1) {
@@ -743,81 +808,48 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 		}
 		
 		//if salary is -1, then use the standard amounts
-		int base = 0;
+		int primaryBase = getSalary(getPrimaryRole());
 		
-		switch (getPrimaryRole()) {
-	    	case T_MECHWARRIOR:
-				base = 1500;
-				break;
-			case T_VEE_CREW:
-				base = 900;
-				break;
-			case T_AERO_PILOT:
-				base = 1500;
-				break;
-			case T_PROTO_PILOT:
-				//TODO: Confirm ProtoMech pilots should be paid as BA pilots?
-				base = 960;
-				break;
-			case T_BA:
-				base = 960;
-				break;
-			case T_INFANTRY:
-				base = 750;
-				break;
-			case T_MECH_TECH:
-				base = 800;
-				break;
-			case T_MECHANIC:
-				base = 640;
-				break;
-			case T_AERO_TECH:
-				base = 800;
-				break;
-			case T_BA_TECH:
-				base = 800;
-				break;
-			case T_ASTECH:
-				base = 640;
-				break;
-			case T_DOCTOR:
-				base = 1500;
-				break;
-			case T_MEDIC:
-				base = 640;
-				break;
-			case T_ADMIN_COM:
-			case T_ADMIN_LOG:
-			case T_ADMIN_TRA:
-			case T_ADMIN_HR:
-				base = 320;
-				break;
-			case T_NUM:
-				// Not a real pilot type. If someone has this, they don't get paid!
-				base = 0;
-				break;
-		}
-
-		double expMult = 1.0;
-		switch(getExperienceLevel()) {
+		switch(getExperienceLevel(false)) {
 		case SkillType.EXP_ULTRA_GREEN:
-			expMult = 0.5;
+			primaryBase *= 0.5;
 			break;
 		case SkillType.EXP_GREEN:
-			expMult = 0.6;
+			primaryBase *= 0.6;
 			break;
 		case SkillType.EXP_VETERAN:
-			expMult = 1.6;
+			primaryBase *= 1.6;
 			break;
 		case SkillType.EXP_ELITE:
-			expMult =3.2;
+			primaryBase *= 3.2;
 			break;
 		default:
-			expMult = 1.0;
 		}
 		
 		if(getPrimaryRole() == T_ASTECH || getPrimaryRole() == T_MEDIC) {
-			expMult = 0.5;
+			primaryBase *= 0.5;
+		}
+		
+		int secondaryBase = getSalary(getSecondaryRole())/2 ;
+
+		switch(getExperienceLevel(true)) {
+		case SkillType.EXP_ULTRA_GREEN:
+			secondaryBase *= 0.5;
+			break;
+		case SkillType.EXP_GREEN:
+			secondaryBase *= 0.6;
+			break;
+		case SkillType.EXP_VETERAN:
+			secondaryBase *= 1.6;
+			break;
+		case SkillType.EXP_ELITE:
+			secondaryBase *= 3.2;
+			break;
+		default:
+		}
+		
+		if(getSecondaryRole() == T_ASTECH || getSecondaryRole() == T_MEDIC) {
+			secondaryBase *= 0.5;
 		}
 		
 		double offMult = 0.6;
@@ -830,7 +862,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 			antiMekMult = 1.5;
 		}
 		
-		return (int)(base * expMult * offMult * antiMekMult);
+		return (int)((primaryBase+secondaryBase)  * offMult * antiMekMult);
 		//TODO: Add conventional aircraft pilots.
 		//TODO: Add vessel crewmen (DropShip).
 		//TODO: Add vessel crewmen (JumpShip).
@@ -850,15 +882,19 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 	}
 
 	public String getSkillSummary() {
-    	return SkillType.getExperienceLevelName(getExperienceLevel());
+    	return SkillType.getExperienceLevelName(getExperienceLevel(false));
 	}
 
 	public String toString() {
 		return getDesc();
 	}
 	
-	public int getExperienceLevel() {
-		switch(primaryRole) {
+	public int getExperienceLevel(boolean secondary) {
+		int role = primaryRole;
+		if(secondary) {
+			role = secondaryRole;
+		}
+		switch(role) {
 		case T_MECHWARRIOR:
 			if(hasSkill(SkillType.S_GUN_MECH) && hasSkill(SkillType.S_PILOT_MECH)) {
 				return (int)Math.floor((getSkill(SkillType.S_GUN_MECH).getExperienceLevel() 
