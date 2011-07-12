@@ -67,6 +67,8 @@ v0.1.9 (SVN)
 + Bug: the tech level of repaired parts does not reset to green
 + Add tech time for secondary role
 + cant be an astech and tech at the same time
++ Patch 3357529: Fix for 3352712: XML Escaping of Entities (Thanks, Josh Street!)
++ Bug 3352712: Program won't load saved xml
 
 v0.1.8 (2011-06-13)
 + beginning of custom XP costs

@@ -457,11 +457,11 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 				+"\">");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<name>"
-				+name
+				+MekHqXmlUtil.escape(name)
 				+"</name>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<callsign>"
-				+callsign
+				+MekHqXmlUtil.escape(callsign)
 				+"</callsign>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<primaryRole>"
@@ -473,7 +473,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 				+"</secondaryRole>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<biography>"
-				+biography
+				+MekHqXmlUtil.escape(biography)
 				+"</biography>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<daysRest>"
