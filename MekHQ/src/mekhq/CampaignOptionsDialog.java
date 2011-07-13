@@ -11,6 +11,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Graphics2D;
+import java.awt.GridBagConstraints;
 import java.awt.Image;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -31,6 +32,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
@@ -74,6 +76,12 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private int colorIndex;
     private DirectoryItems camos;
     private Hashtable<String, JTextField> hashAbilityCosts;
+    private Hashtable<String, JSpinner> hashSkillTargets;
+    private Hashtable<String, JSpinner> hashGreenSkill;
+    private Hashtable<String, JSpinner> hashRegSkill;
+    private Hashtable<String, JSpinner> hashVetSkill;
+    private Hashtable<String, JSpinner> hashEliteSkill;
+
     
     /** Creates new form CampaignOptionsDialog */
     public CampaignOptionsDialog(java.awt.Frame parent, boolean modal, Campaign c, DirectoryItems camos) {
@@ -89,6 +97,12 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         this.colorIndex = campaign.getColorIndex();
         this.camos = camos;
         hashAbilityCosts = new Hashtable<String, JTextField>();
+        hashSkillTargets = new Hashtable<String, JSpinner>();
+        hashGreenSkill = new Hashtable<String, JSpinner>();
+        hashRegSkill = new Hashtable<String, JSpinner>();
+        hashVetSkill = new Hashtable<String, JSpinner>();
+        hashEliteSkill = new Hashtable<String, JSpinner>();
+
         initComponents();
         setCamoIcon();
         setLocationRelativeTo(parent);
@@ -148,6 +162,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panNameGen = new javax.swing.JPanel();
         panRank = new javax.swing.JPanel();
         panXP = new javax.swing.JPanel();
+        panSkill = new javax.swing.JPanel();
         panAbilityXP = new javax.swing.JPanel();
         useFactionModifiersCheckBox = new javax.swing.JCheckBox();
         javax.swing.JLabel clanPriceModifierLabel = new javax.swing.JLabel();
@@ -686,7 +701,86 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panXP.add(scrAbilityXP, gridBagConstraints);      
         
         tabOptions.addTab(resourceMap.getString("panXP.TabConstraints.tabTitle"), panXP); // NOI18N
+    
+        panSkill.setName("panSkill"); // NOI18N
+        panSkill.setLayout(new java.awt.GridBagLayout());
+       
+        JPanel skPanel;
         
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        
+        GridBagConstraints c;
+        JSpinner spnTarget;
+        JSpinner spnGreen;
+        JSpinner spnReg;
+        JSpinner spnVet;
+        JSpinner spnElite;
+        SkillType type;
+        JLabel lblSkill;
+        for(String skillName : SkillType.getSkillList()) {
+        	type = SkillType.getType(skillName);
+        	skPanel = new JPanel();
+        	c = new java.awt.GridBagConstraints();
+        	c.gridx = 0;
+            c.gridy = 0;
+            c.weightx = 1.0;
+            c.weighty = 1.0;
+            c.fill = java.awt.GridBagConstraints.BOTH;
+            c.anchor = java.awt.GridBagConstraints.WEST;
+            c.insets = new java.awt.Insets(5, 5, 5, 5);
+            lblSkill = new JLabel("Target Number:");
+            skPanel.add(lblSkill, c);
+            c.gridx++;
+            spnTarget = new JSpinner(new SpinnerNumberModel(type.getTarget(), 0, 12, 1));
+            hashSkillTargets.put(skillName, spnTarget);
+            skPanel.add(spnTarget, c);
+            c.gridx++;
+            lblSkill = new JLabel("Green Level:");
+            skPanel.add(lblSkill, c);
+            c.gridx++;
+            spnGreen = new JSpinner(new SpinnerNumberModel(type.getGreenLevel(), 0, 10, 1));
+            hashGreenSkill.put(skillName, spnGreen);
+            skPanel.add(spnGreen, c);
+            c.gridx++;
+            lblSkill = new JLabel("Regular Level:");
+            skPanel.add(lblSkill, c);
+            c.gridx++;
+            spnReg = new JSpinner(new SpinnerNumberModel(type.getRegularLevel(), 0, 10, 1));
+            hashRegSkill.put(skillName, spnReg);
+            skPanel.add(spnReg, c);
+            c.gridx++;
+            lblSkill = new JLabel("Veteran Level:");
+            skPanel.add(lblSkill, c);
+            c.gridx++;
+            spnVet = new JSpinner(new SpinnerNumberModel(type.getVeteranLevel(), 0, 10, 1));
+            hashVetSkill.put(skillName, spnVet);
+            skPanel.add(spnVet, c);
+            c.gridx++;
+            lblSkill = new JLabel("Elite Level:");
+            skPanel.add(lblSkill, c);
+            c.gridx++;
+            spnElite = new JSpinner(new SpinnerNumberModel(type.getEliteLevel(), 0, 10, 1));
+            hashEliteSkill.put(skillName, spnElite);
+            skPanel.add(spnElite, c);
+            c.gridx++;
+
+        	skPanel.setBorder(BorderFactory.createTitledBorder(skillName));
+        	panSkill.add(skPanel, gridBagConstraints);
+        	gridBagConstraints.gridy++;
+        }
+        
+        JScrollPane scrSkill = new JScrollPane(panSkill);
+        scrSkill.setPreferredSize(new java.awt.Dimension(500, 400));
+        
+        tabOptions.addTab(resourceMap.getString("panSkill.TabConstraints.tabTitle"), scrSkill); // NOI18N
+
         panRank.setName("panRank"); // NOI18N
         panRank.setLayout(new java.awt.GridBagLayout());
         
@@ -1019,6 +1113,7 @@ private void txtNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
 	    campaign.setCamoFileName(camoFileName);
 	    campaign.setColorIndex(colorIndex);
 	    
+	    updateSkillTypes();
 	    updateXPCosts();
 	    
 	    // Rules panel
@@ -1070,6 +1165,27 @@ private void txtNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
 			}
 		}
 		//campaign.getSkillCosts().setScenarioXP((Integer)spnScenarioXP.getModel().getValue());
+	}
+	
+	private void updateSkillTypes() {
+		for(String skillName : SkillType.getSkillList()) {
+			SkillType type = SkillType.getType(skillName);
+			if(null != hashSkillTargets.get(skillName)) {
+				type.setTarget((Integer)hashSkillTargets.get(skillName).getModel().getValue());
+			}
+			if(null != hashGreenSkill.get(skillName)) {
+				type.setGreenLevel((Integer)hashGreenSkill.get(skillName).getModel().getValue());
+			}
+			if(null != hashRegSkill.get(skillName)) {
+				type.setRegularLevel((Integer)hashRegSkill.get(skillName).getModel().getValue());
+			}
+			if(null != hashVetSkill.get(skillName)) {
+				type.setVeteranLevel((Integer)hashVetSkill.get(skillName).getModel().getValue());
+			}
+			if(null != hashEliteSkill.get(skillName)) {
+				type.setEliteLevel((Integer)hashEliteSkill.get(skillName).getModel().getValue());
+			}
+		}
 	}
 
 
@@ -1311,6 +1427,7 @@ public String getDateAsString() {
     private javax.swing.JPanel panNameGen;
     private javax.swing.JPanel panXP;
     private javax.swing.JPanel panRank;
+    private javax.swing.JPanel panSkill;
     private javax.swing.JComboBox repairSystemComboBox;
     private javax.swing.JTabbedPane tabOptions;
     private javax.swing.JTextField txtName;

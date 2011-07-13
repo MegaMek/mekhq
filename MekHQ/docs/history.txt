@@ -75,6 +75,7 @@ v0.1.9 (SVN)
 + shorthanded mods for doctors
 + reverse compatability for primary role of combat personnel when loading XML
 + menu item for medic pools
++ customize skill targets and levels in campaign options dialog
 
 v0.1.8 (2011-06-13)
 + beginning of custom XP costs

@@ -149,6 +149,38 @@ public class SkillType implements Serializable {
 		return regLvl;
 	}
 	
+	public int getGreenLevel() {
+		return greenLvl;
+	}
+	
+	public void setGreenLevel(int l) {
+		greenLvl = l;
+	}
+	
+	public int getRegularLevel() {
+		return regLvl;
+	}
+	
+	public void setRegularLevel(int l) {
+		regLvl = l;
+	}
+	
+	public int getVeteranLevel() {
+		return vetLvl;
+	}
+	
+	public void setVeteranLevel(int l) {
+		vetLvl = l;
+	}
+	
+	public int getEliteLevel() {
+		return eliteLvl;
+	}
+	
+	public void setEliteLevel(int l) {
+		eliteLvl = l;
+	}
+	
 	public int getCost(int lvl) {
 		if(lvl > 10 || lvl < 0) {
 			return -1;
