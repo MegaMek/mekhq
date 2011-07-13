@@ -76,6 +76,7 @@ v0.1.9 (SVN)
 + reverse compatability for primary role of combat personnel when loading XML
 + menu item for medic pools
 + customize skill targets and levels in campaign options dialog
++ separate VEE_CREW role into ground vee drivers, naval vessel drivers, VTOL pilots, and gunners
 
 v0.1.8 (2011-06-13)
 + beginning of custom XP costs

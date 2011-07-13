@@ -35,6 +35,7 @@ import megamek.common.Aero;
 import megamek.common.BattleArmor;
 import megamek.common.ConvFighter;
 import megamek.common.Entity;
+import megamek.common.EntityMovementMode;
 import megamek.common.Infantry;
 import megamek.common.Jumpship;
 import megamek.common.Mech;
@@ -77,23 +78,26 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 	
 	public static final int T_NONE        = 0;
 	public static final int T_MECHWARRIOR = 1;
-	public static final int T_VEE_CREW    = 2;
-	public static final int T_AERO_PILOT  = 3;
-	public static final int T_PROTO_PILOT = 4;
-	public static final int T_BA          = 5;
-	public static final int T_INFANTRY    = 6;
-	public static final int T_MECH_TECH   = 7;
-    public static final int T_MECHANIC    = 8;
-    public static final int T_AERO_TECH   = 9;
-    public static final int T_BA_TECH     = 10;
-    public static final int T_ASTECH      = 11;
-    public static final int T_DOCTOR      = 12;
-    public static final int T_MEDIC       = 13;
-    public static final int T_ADMIN_COM   = 14;
-    public static final int T_ADMIN_LOG   = 15;
-    public static final int T_ADMIN_TRA   = 16;
-    public static final int T_ADMIN_HR    = 17;
-    public static final int T_NUM         = 18;
+	public static final int T_AERO_PILOT  = 2;
+	public static final int T_GVEE_DRIVER = 3;
+	public static final int T_NVEE_DRIVER = 4;
+	public static final int T_VTOL_PILOT  = 5;
+	public static final int T_VEE_GUNNER  = 6;
+	public static final int T_BA          = 7;
+	public static final int T_INFANTRY    = 8;
+	public static final int T_PROTO_PILOT = 9;
+	public static final int T_MECH_TECH   = 10;
+    public static final int T_MECHANIC    = 11;
+    public static final int T_AERO_TECH   = 12;
+    public static final int T_BA_TECH     = 13;
+    public static final int T_ASTECH      = 14;
+    public static final int T_DOCTOR      = 15;
+    public static final int T_MEDIC       = 16;
+    public static final int T_ADMIN_COM   = 17;
+    public static final int T_ADMIN_LOG   = 18;
+    public static final int T_ADMIN_TRA   = 19;
+    public static final int T_ADMIN_HR    = 20;
+    public static final int T_NUM         = 21;
     
     public static final int S_ACTIVE = 0;
     public static final int S_RETIRED = 1;
@@ -279,16 +283,22 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         		return "None";
             case(T_MECHWARRIOR):
                 return "Mechwarrior";
-            case(T_VEE_CREW):
-                return "Vehicle crew";
+            case(T_GVEE_DRIVER):
+                return "Vehicle Driver";
+            case(T_NVEE_DRIVER):
+                return "Naval Driver";
+            case(T_VTOL_PILOT):
+                return "VTOL Pilot";
+            case(T_VEE_GUNNER):
+                return "Vehicle Gunner";
             case(T_AERO_PILOT):
                 return "Aero Pilot";
             case(T_PROTO_PILOT):
                 return "Proto Pilot";
             case(T_BA):
-                return "Battle armor Pilot";
+                return "Battle Armor Pilot";
             case(T_INFANTRY):
-                return "Infantry";
+                return "Soldier";
             case(T_MECH_TECH):
                 return "Mech Tech";
             case(T_MECHANIC):
@@ -338,8 +348,14 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     		return true;
         case(T_MECHWARRIOR):
             return hasSkill(SkillType.S_GUN_MECH) && hasSkill(SkillType.S_PILOT_MECH);
-        case(T_VEE_CREW):
-            return hasSkill(SkillType.S_GUN_VEE) && (hasSkill(SkillType.S_PILOT_GVEE) || hasSkill(SkillType.S_PILOT_VTOL) || hasSkill(SkillType.S_PILOT_NVEE));
+        case(T_GVEE_DRIVER):
+            return hasSkill(SkillType.S_PILOT_GVEE);
+        case(T_NVEE_DRIVER):
+            return hasSkill(SkillType.S_PILOT_NVEE);
+        case(T_VTOL_PILOT):
+            return hasSkill(SkillType.S_PILOT_VTOL);
+        case(T_VEE_GUNNER):
+            return hasSkill(SkillType.S_GUN_VEE);
         case(T_AERO_PILOT):
             return hasSkill(SkillType.S_GUN_AERO) && hasSkill(SkillType.S_PILOT_AERO);
         case(T_PROTO_PILOT):
@@ -710,23 +726,23 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 	        }
 			//check to see if we are dealing with a PilotPerson from 0.1.8 or earlier
 			if(pilotGunnery != -1) {
-				switch(type+1) {
-				case T_MECHWARRIOR:
+				switch(type) {
+				case 0:
 					retVal.addSkill(SkillType.S_GUN_MECH,7-pilotGunnery,0);
 					retVal.addSkill(SkillType.S_PILOT_MECH,8-pilotPiloting,0);
 					retVal.primaryRole = T_MECHWARRIOR;
 					break;
-				case T_VEE_CREW:
+				case 1:
 					retVal.addSkill(SkillType.S_GUN_VEE,7-pilotGunnery,0);
 					retVal.addSkill(SkillType.S_PILOT_GVEE,8-pilotPiloting,0);
-					retVal.primaryRole = T_VEE_CREW;
+					retVal.primaryRole = T_GVEE_DRIVER;
 					break;
-				case T_AERO_PILOT:
+				case 2:
 					retVal.addSkill(SkillType.S_GUN_AERO,7-pilotGunnery,0);
 					retVal.addSkill(SkillType.S_PILOT_AERO,8-pilotPiloting,0);
 					retVal.primaryRole = T_AERO_PILOT;
 					break;
-				case T_BA:
+				case 4:
 					retVal.addSkill(SkillType.S_GUN_BA,7-pilotGunnery,0);
 					retVal.addSkill(SkillType.S_ANTI_MECH,8-pilotPiloting,0);
 					retVal.primaryRole = T_BA;
@@ -754,7 +770,10 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     	case T_MECHWARRIOR:
 			base = 1500;
 			break;
-		case T_VEE_CREW:
+		case T_GVEE_DRIVER:
+		case T_NVEE_DRIVER:
+		case T_VTOL_PILOT:
+		case T_VEE_GUNNER:
 			base = 900;
 			break;
 		case T_AERO_PILOT:
@@ -906,10 +925,27 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 			} else {
 				return -1;
 			}
-		case T_VEE_CREW:
-			if(hasSkill(SkillType.S_GUN_VEE) && hasSkill(SkillType.S_PILOT_GVEE)) {
-				return (int)Math.floor((getSkill(SkillType.S_GUN_VEE).getExperienceLevel() 
-						+ getSkill(SkillType.S_PILOT_GVEE).getExperienceLevel()) / 2.0);
+		case T_GVEE_DRIVER:
+			if(hasSkill(SkillType.S_PILOT_GVEE)) {
+				return getSkill(SkillType.S_PILOT_GVEE).getExperienceLevel();
+			} else {
+				return -1;
+			}
+		case T_NVEE_DRIVER:
+			if(hasSkill(SkillType.S_PILOT_NVEE)) {
+				return getSkill(SkillType.S_PILOT_NVEE).getExperienceLevel();
+			} else {
+				return -1;
+			}
+		case T_VTOL_PILOT:
+			if(hasSkill(SkillType.S_PILOT_VTOL)) {
+				return getSkill(SkillType.S_PILOT_VTOL).getExperienceLevel();
+			} else {
+				return -1;
+			}
+		case T_VEE_GUNNER:
+			if(hasSkill(SkillType.S_GUN_VEE)) {
+				return getSkill(SkillType.S_GUN_VEE).getExperienceLevel();
 			} else {
 				return -1;
 			}
@@ -1293,7 +1329,13 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     		return hasSkill(SkillType.S_PILOT_VTOL);
     	}
     	else if(ent instanceof Tank) {
-    		return hasSkill(SkillType.S_PILOT_GVEE);
+    		if(ent.getMovementMode() == EntityMovementMode.NAVAL 
+    				|| ent.getMovementMode() == EntityMovementMode.HYDROFOIL
+    				|| ent.getMovementMode() == EntityMovementMode.SUBMARINE) {
+    			return hasSkill(SkillType.S_PILOT_NVEE);
+    		} else {
+    			return hasSkill(SkillType.S_PILOT_GVEE);
+    		}
     	}
     	else if(ent instanceof ConvFighter) {
     		return hasSkill(SkillType.S_PILOT_JET) || hasSkill(SkillType.S_PILOT_AERO);

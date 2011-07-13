@@ -3103,7 +3103,7 @@ public class MekHQView extends FrameView {
         				(nGroup == PG_COMBAT && type <= Person.T_BA) ||
         				(nGroup == PG_SUPPORT && type > Person.T_BA) ||
         				(nGroup == PG_MW && type == Person.T_MECHWARRIOR) ||
-        				(nGroup == PG_CREW && type == Person.T_VEE_CREW) ||
+        				(nGroup == PG_CREW && (type == Person.T_GVEE_DRIVER || type == Person.T_NVEE_DRIVER || type == Person.T_VTOL_PILOT || type == Person.T_VEE_GUNNER)) ||
         				(nGroup == PG_PILOT && type == Person.T_AERO_PILOT) ||
         				(nGroup == PG_PROTO && type == Person.T_PROTO_PILOT) ||
         				(nGroup == PG_BA && type == Person.T_BA) ||

@@ -2032,8 +2032,19 @@ public class Campaign implements Serializable {
 	        person.addSkill(SkillType.S_PILOT_MECH);
         	person.addSkill(SkillType.S_GUN_MECH);
         	break;
-	    case(Person.T_VEE_CREW):
+	    case(Person.T_GVEE_DRIVER):
 	    	person.addSkill(SkillType.S_PILOT_GVEE);
+			person.addSkill(SkillType.S_GUN_VEE);
+			break;
+	    case(Person.T_NVEE_DRIVER):
+	    	person.addSkill(SkillType.S_PILOT_NVEE);
+	    	person.addSkill(SkillType.S_GUN_VEE);
+	    	break;
+	    case(Person.T_VTOL_PILOT):
+	    	person.addSkill(SkillType.S_PILOT_VTOL);
+			person.addSkill(SkillType.S_GUN_VEE);
+			break;
+	    case(Person.T_VEE_GUNNER):
     		person.addSkill(SkillType.S_GUN_VEE);
     		break;
 	    case(Person.T_AERO_PILOT):
