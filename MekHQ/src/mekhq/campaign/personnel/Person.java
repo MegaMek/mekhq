@@ -574,10 +574,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 
 	public static Person generateInstanceFromXML(Node wn) {
 		Person retVal = null;
-		NamedNodeMap attrs = wn.getAttributes();
-		Node classNameNode = attrs.getNamedItem("type");
-		String className = classNameNode.getTextContent();
-
+		
 		try {
 			// Instantiate the correct child class, and call its parsing function.
 			retVal = new Person();
@@ -594,7 +591,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 			int pilotGunnery = -1;
 			int pilotPiloting = -1;
 			int pilotCommandBonus = -1;
-			int pilotInitBonus = -1;
+			int type = 0;
 			
 			for (int x=0; x<nl.getLength(); x++) {
 				Node wn2 = nl.item(x);
@@ -657,10 +654,10 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 					retVal.hits = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("pilotCommandBonus")) {
 					pilotCommandBonus = Integer.parseInt(wn2.getTextContent());
-				} else if (wn2.getNodeName().equalsIgnoreCase("pilotInitBonus")) {
-					pilotInitBonus = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("pilotName")) {
 					pilotName = wn2.getTextContent();
+				} else if (wn2.getNodeName().equalsIgnoreCase("type")) {
+					type = Integer.parseInt(wn2.getTextContent());
 				} else if(wn2.getNodeName().equalsIgnoreCase("skill")) {
 					Skill s = Skill.generateInstanceFromXML(wn2);
 					if(null != s) {
@@ -713,22 +710,26 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 	        }
 			//check to see if we are dealing with a PilotPerson from 0.1.8 or earlier
 			if(pilotGunnery != -1) {
-				switch(retVal.primaryRole+1) {
+				switch(type+1) {
 				case T_MECHWARRIOR:
 					retVal.addSkill(SkillType.S_GUN_MECH,7-pilotGunnery,0);
 					retVal.addSkill(SkillType.S_PILOT_MECH,8-pilotPiloting,0);
+					retVal.primaryRole = T_MECHWARRIOR;
 					break;
 				case T_VEE_CREW:
 					retVal.addSkill(SkillType.S_GUN_VEE,7-pilotGunnery,0);
 					retVal.addSkill(SkillType.S_PILOT_GVEE,8-pilotPiloting,0);
+					retVal.primaryRole = T_VEE_CREW;
 					break;
 				case T_AERO_PILOT:
 					retVal.addSkill(SkillType.S_GUN_AERO,7-pilotGunnery,0);
 					retVal.addSkill(SkillType.S_PILOT_AERO,8-pilotPiloting,0);
+					retVal.primaryRole = T_AERO_PILOT;
 					break;
 				case T_BA:
 					retVal.addSkill(SkillType.S_GUN_BA,7-pilotGunnery,0);
 					retVal.addSkill(SkillType.S_ANTI_MECH,8-pilotPiloting,0);
+					retVal.primaryRole = T_BA;
 					break;
 
 				}
