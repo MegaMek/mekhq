@@ -61,21 +61,6 @@ public class MedicalTeam extends SupportTeam {
         }
        return patients;
     }
-    
-    public TargetRoll getTargetFor(IMedicalWork medWork) {
-        if(medWork.getAssignedTeamId() != getId() ) {
-            return new TargetRoll(TargetRoll.IMPOSSIBLE, medWork.getPatientName() + " is already being tended by another doctor");
-        }      
-        if(!medWork.needsFixing()) {
-            return new TargetRoll(TargetRoll.IMPOSSIBLE, medWork.getPatientName() + " does not require healing.");
-        }
-        TargetRoll target = new TargetRoll(4,"fix this");//getTarget(medWork.getMode());
-        if(target.getValue() == TargetRoll.IMPOSSIBLE) {
-            return target;
-        }
-        target.append(medWork.getAllMods());
-        return target;
-    }
 
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent, int id) {

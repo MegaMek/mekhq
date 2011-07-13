@@ -412,6 +412,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
             hqView.refreshPersonnelList();
     		hqView.refreshTechsList();
         	hqView.refreshPatientList();
+        	hqView.refreshDoctorsList();
     		hqView.refreshReport();
         	person = campaign.newPerson(choiceType.getSelectedIndex());
         	refreshPilotAndOptions();
@@ -419,6 +420,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         	hqView.refreshPersonnelList();
         	hqView.refreshPatientList();
     		hqView.refreshTechsList();
+        	hqView.refreshDoctorsList();
     		hqView.refreshReport();
         	setVisible(false);
         }

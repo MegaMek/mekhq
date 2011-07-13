@@ -71,6 +71,7 @@ v0.1.9 (SVN)
 + Bug 3352712: Program won't load saved xml
 + adjust salary for secondary role
 + report secondary role in GUI displays
++ restored infirmary functionality
 
 v0.1.8 (2011-06-13)
 + beginning of custom XP costs

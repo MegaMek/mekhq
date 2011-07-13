@@ -139,11 +139,7 @@ import mekhq.campaign.parts.MekSensor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.TankLocation;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.team.MedicalTeam;
-import mekhq.campaign.team.SupportTeam;
-import mekhq.campaign.team.TechTeam;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.Modes;
 
@@ -2063,7 +2059,7 @@ public class MekHQView extends FrameView {
 
 	private void DocTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
 		int selected = DocTable.getSelectedRow();
-		/*
+		
 		if ((selected > -1) && (selected < campaign.getDoctors().size())) {
 			currentDoctorId = campaign.getDoctors().get(selected).getId();
 		} else if (selected < 0) {
@@ -2071,7 +2067,7 @@ public class MekHQView extends FrameView {
 		}
 		
 		updateAssignDoctorEnabled();
-		*/
+		
 	}
 
 	private void PartsTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
@@ -2112,7 +2108,7 @@ public class MekHQView extends FrameView {
 		Person p = campaign.getPerson(currentPatientId);
 		
 		if ((null != p) && (p.needsFixing())) {
-			p.setTeamId(currentDoctorId);
+			p.setDoctorId(currentDoctorId);
 			row++;
 		}
 		
@@ -2881,13 +2877,11 @@ public class MekHQView extends FrameView {
 	}
 
 	protected void refreshDoctorsList() {
-		/*
 		int selected = DocTable.getSelectedRow();
 		doctorsModel.setData(campaign.getDoctors());
 		if ((selected > -1) && (selected < campaign.getDoctors().size())) {
 			DocTable.setRowSelectionInterval(selected, selected);
 		}
-		*/
 	}
 
 	protected void refreshPatientList() {
@@ -3011,15 +3005,15 @@ public class MekHQView extends FrameView {
 
 	protected void updateAssignDoctorEnabled() {
 		// must have a valid doctor and an unassigned task
-		/*
+		
 		Person curPerson = campaign.getPerson(currentPatientId);
-		SupportTeam team = campaign.getTeam(currentDoctorId);
-		if (null != curPerson && curPerson.getAssignedTeamId() == -1 && null != team && curPerson.canFix(team)) {
+		Person doctor = campaign.getPerson(currentDoctorId);
+		if (null != curPerson && curPerson.getAssignedTeamId() == -1 && null != doctor 
+				&& campaign.getTargetFor(curPerson, doctor).getValue() != TargetRoll.IMPOSSIBLE) {
 			btnAssignDoc.setEnabled(true);
 		} else {
 			btnAssignDoc.setEnabled(false);
 		}
-		*/
 	}
 
 	protected void updateTargetText() {
@@ -4352,7 +4346,7 @@ public class MekHQView extends FrameView {
 		public Object getValueAt(int row, int col) {
 			Person psn = ((Person) data.get(row));
 
-			return psn.getDescHTML();
+			return psn.getPatientDesc(campaign);
 		}
 
 		public Person getPersonAt(int row) {
@@ -5014,7 +5008,7 @@ public class MekHQView extends FrameView {
 			} else if (command.equalsIgnoreCase("HEAL")) {
 				for(Person person : people) {
 					person.setHits(0);
-					person.setTeamId(-1);
+					person.setDoctorId(-1);
 				}
 				campaign.personUpdated(selectedPerson);
 				refreshPatientList();
@@ -6184,15 +6178,15 @@ public class MekHQView extends FrameView {
 
 		public DocTableModel() {
 			columnNames = new String[] { "Doctors" };
-			data = new ArrayList<MedicalTeam>();
+			data = new ArrayList<Person>();
 		}
 
 		public Object getValueAt(int row, int col) {
-			return ((MedicalTeam) data.get(row)).getName();
+			return ((Person) data.get(row)).getDocDesc(campaign);
 		}
 
-		public MedicalTeam getDoctorAt(int row) {
-			return (MedicalTeam) data.get(row);
+		public Person getDoctorAt(int row) {
+			return (Person) data.get(row);
 		}
 
 		public DocTableModel.Renderer getRenderer() {
@@ -6208,7 +6202,7 @@ public class MekHQView extends FrameView {
 				Component c = this;
 				setOpaque(true);
 				setText(getValueAt(row, column).toString());
-				setToolTipText(campaign.getToolTipFor(getDoctorAt(row)));
+				//setToolTipText(campaign.getToolTipFor(getDoctorAt(row)));
 				if (isSelected) {
 					select();
 				} else {

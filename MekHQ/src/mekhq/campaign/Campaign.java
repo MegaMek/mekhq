@@ -125,6 +125,7 @@ public class Campaign implements Serializable {
 	private int astechPool;
 	private int astechPoolMinutes;
 	private int astechPoolOvertime;
+	private int medicPool;	
 	
 	private int lastTeamId;
 	private int lastUnitId;
@@ -190,6 +191,7 @@ public class Campaign implements Serializable {
 		location = new CurrentLocation(Planets.getInstance().getPlanets().get("Outreach"), 0);
 		SkillType.initializeTypes();
 		astechPool = 0;
+		medicPool = 0;
 		resetAstechMinutes();
 	}
 
@@ -592,6 +594,27 @@ public class Campaign implements Serializable {
 		return techs;
 	}
 
+	public ArrayList<Person> getDoctors() {
+		ArrayList<Person> docs = new ArrayList<Person>();
+		for (Person p: personnel) {
+			if (p.isDoctor() && p.isActive()) {
+				docs.add(p);
+			}
+		}
+		return docs;
+	}
+	
+	   
+    public int getPatientsFor(Person doctor) {
+    	int patients = 0;
+         for(Person person : getPersonnel()) {
+         	if(person.getAssignedTeamId() == doctor.getId()) {
+         		patients++;
+         	}
+         }
+        return patients;
+    }
+
 	/**
 	 * return an html report on this unit. This will go in MekInfo
 	 * 
@@ -628,10 +651,10 @@ public class Campaign implements Serializable {
 		return toReturn;
 	}
 	
-	public String healPerson(IMedicalWork medWork, MedicalTeam t) {
+	public String healPerson(IMedicalWork medWork, Person doctor) {
 		String report = "";
-		report += t.getName() + " attempts to heal " + medWork.getPatientName();   
-		TargetRoll target = t.getTargetFor(medWork);
+		report += doctor.getName() + " attempts to heal " + medWork.getPatientName();   
+		TargetRoll target = getTargetFor(medWork, doctor);
 		int roll = Compute.d6(2);
 		report = report + ",  needs " + target.getValueAsString() + " and rolls " + roll + ":";
 		if(roll >= target.getValue()) {
@@ -641,6 +664,28 @@ public class Campaign implements Serializable {
 		}
 		return report;
 	}
+	
+	public TargetRoll getTargetFor(IMedicalWork medWork, Person doctor) {
+		Skill skill = doctor.getSkill(SkillType.S_DOCTOR);
+		if(null == skill) {
+            return new TargetRoll(TargetRoll.IMPOSSIBLE, doctor.getName( )+ " isn't a doctor, he just plays one on TV.");
+		}
+        if(medWork.getAssignedTeamId() != -1 && medWork.getAssignedTeamId() != doctor.getId() ) {
+            return new TargetRoll(TargetRoll.IMPOSSIBLE, medWork.getPatientName() + " is already being tended by another doctor");
+        }      
+        if(!medWork.needsFixing()) {
+            return new TargetRoll(TargetRoll.IMPOSSIBLE, medWork.getPatientName() + " does not require healing.");
+        }
+        if(getPatientsFor(doctor)>=25) {
+            return new TargetRoll(TargetRoll.IMPOSSIBLE, doctor.getName() + " already has 25 patients.");
+        }
+        TargetRoll target = new TargetRoll(skill.getFinalSkillValue(),SkillType.getExperienceLevelName(skill.getExperienceLevel()));
+        if(target.getValue() == TargetRoll.IMPOSSIBLE) {
+            return target;
+        }
+        target.append(medWork.getAllMods());
+        return target;
+    }
 	
 	public void acquirePart(IAcquisitionWork acquisition, Person person) {
 		String report = "";
@@ -744,14 +789,12 @@ public class Campaign implements Serializable {
 		for (Person p : getPersonnel()) {
 			p.resetMinutesLeft();
 			if(p.needsFixing()) {
-				/*
-				SupportTeam t = getTeam(p.getAssignedTeamId());
-				if(null != t && t instanceof MedicalTeam) {
-					addReport(healPerson(p, (MedicalTeam)t));
+				Person doctor = getPerson(p.getDoctorId());
+				if(null != doctor && doctor.isDoctor()) {
+					addReport(healPerson(p, doctor));
 				} else if(p.checkNaturalHealing()) {
 					addReport(p.getDesc() + " heals naturally!");
 				}
-				*/
 			} 
 		}
 		resetAstechMinutes();
@@ -833,6 +876,7 @@ public class Campaign implements Serializable {
 		//we will assume vee mechanic * able-bodied * enlisted
 		//640 * 0.5 * 0.6 = 192
 		salaries += (192 * astechPool);
+		salaries += (320 * medicPool);
 		return salaries;
 	}
 	
@@ -895,7 +939,8 @@ public class Campaign implements Serializable {
 		if(null != u) {
 			u.remove(person);
 		}
-
+		removeAllPatientsFor(person);
+		
 		addReport(person.getDesc()
 				+ " has been removed from the personnel roster.");
 		personnel.remove(person);
@@ -907,6 +952,14 @@ public class Campaign implements Serializable {
 		if(person.getSecondaryRole() == Person.T_ASTECH) {
 			astechPoolMinutes = Math.max(0, astechPoolMinutes - 240);
 			astechPoolOvertime = Math.max(0, astechPoolOvertime - 120);
+		}
+	}
+	
+	public void removeAllPatientsFor(Person doctor) {
+		for(Person p : personnel) {
+			if(p.getAssignedTeamId() == doctor.getId()) {
+				p.setDoctorId(-1);
+			}
 		}
 	}
 	
@@ -1235,6 +1288,7 @@ public class Campaign implements Serializable {
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "astechPool", astechPool);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "astechPoolMinutes", astechPoolMinutes);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "astechPoolOvertime", astechPoolOvertime);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "medicPool", medicPool);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "camoCategory", camoCategory);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "camoFileName", camoFileName);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "colorIndex", colorIndex);
@@ -1924,6 +1978,9 @@ public class Campaign implements Serializable {
 				} else if (xn.equalsIgnoreCase("astechPoolOvertime")) {
 					retVal.astechPoolOvertime = Integer.parseInt(wn.getTextContent()
 							.trim());
+				} else if (xn.equalsIgnoreCase("medicPool")) {
+					retVal.medicPool = Integer.parseInt(wn.getTextContent()
+							.trim());
 				}
 			}
 		}
@@ -2435,6 +2492,10 @@ public class Campaign implements Serializable {
 	
 	public int getAstechPool() {
 		return astechPool;
+	}
+	
+	public int getMedicPool() {
+		return medicPool;
 	}
 	
 	public void increaseAstechPool(int i) {

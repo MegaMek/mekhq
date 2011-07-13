@@ -125,7 +125,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     
     //assignments
     private int unitId;
-    protected int medicalTeamId;
+    protected int doctorId;
     //for reverse compatability v0.1.8 and earlier
     protected int teamId = -1;
     
@@ -163,7 +163,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         skills = new Hashtable<String,Skill>();
         salary = -1;
         ranks = r;
-        medicalTeamId = -1;
+        doctorId = -1;
         unitId = -1;
         resetMinutesLeft();
     }
@@ -268,6 +268,9 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     
     public void setStatus(int s) {
     	this.status = s;
+    	if(status != S_ACTIVE) {
+    		doctorId = -1;
+    	}
     }
 
     public static String getRoleDesc(int type) {
@@ -417,15 +420,15 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     }
     
     public int getAssignedTeamId() {
-        return medicalTeamId;
+        return doctorId;
     }
     
-    public void setTeamId(int t) {
-    	this.medicalTeamId = t;
+    public void setDoctorId(int t) {
+    	this.doctorId = t;
     }
   
     public boolean checkNaturalHealing() {
-        if(needsFixing() && medicalTeamId == -1) {
+        if(needsFixing() && doctorId == -1) {
             daysRest++;
             if(daysRest >= 15) {
                 heal();
@@ -512,9 +515,9 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 				+rank
 				+"</rank>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<medicalTeamId>"
-				+medicalTeamId
-				+"</medicalTeamId>");
+				+"<doctorId>"
+				+doctorId
+				+"</doctorId>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<unitId>"
 				+unitId
@@ -624,8 +627,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 					retVal.gender = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("rank")) {
 					retVal.rank = Integer.parseInt(wn2.getTextContent());
-				} else if (wn2.getNodeName().equalsIgnoreCase("medicalTeamId")) {
-					retVal.medicalTeamId = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("doctorId")) {
+					retVal.doctorId = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("unitId")) {
 					retVal.unitId = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("status")) {
@@ -995,10 +998,13 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 		return "";
 	}
 	
-	public String getDescHTML() {
-        String toReturn = "<html><font size='2'><b>" + getName() + "</b><br/>";
-        //toReturn += getTypeDesc() + " (" + pilot.getGunnery() + "/" + pilot.getPiloting() + ")<br/>";
-        //toReturn += pilot.getStatusDesc();
+	public String getPatientDesc(Campaign c) {
+        String toReturn = "<html><font size='2'><b>" + getFullTitle() + "</b><br/>";
+        Person doctor = c.getPerson(doctorId);
+        if(null != doctor) {
+        	toReturn += "assigned to " + doctor.getName() + "<br>";
+        }
+        toReturn += getHits() + " hit(s)";
         toReturn += "</font></html>";
         return toReturn;
     }
@@ -1091,15 +1097,10 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 	public void heal() {
 		hits = Math.max(hits - 1, 0);
 		if(!needsFixing()) {
-			medicalTeamId = -1;
+			doctorId = -1;
 		}
 	}
-/*
-	@Override
-	public boolean canFix(Person person) {
-		return false;//team instanceof MedicalTeam && ((MedicalTeam)team).getPatients() < 25;
-	}
-*/
+
 	@Override
 	public boolean needsFixing() {
 		return hits > 0 && status != S_KIA && status == S_ACTIVE;
@@ -1431,6 +1432,16 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     	return skill;
     }
     
+    public String getDocDesc(Campaign c) {
+        String toReturn = "<html><font size='2'><b>" + getName() + "</b><br/>";
+        Skill skill = getSkill(SkillType.S_DOCTOR);
+        if(null != skill) {
+        	toReturn += SkillType.getExperienceLevelName(skill.getExperienceLevel()) + " " + SkillType.S_DOCTOR + " ";
+        }
+        toReturn += "(" + c.getPatientsFor(this) + " patient(s))";
+        return toReturn;
+    }
+    
     public String getTechDesc(boolean overtimeAllowed) {
          String toReturn = "<html><font size='2'><b>" + getName() + "</b><br/>";
          Skill mechSkill = getSkill(SkillType.S_TECH_MECH);
@@ -1489,5 +1500,13 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     		return hasSkill(SkillType.S_TECH_AERO);
     	}
     	return false;
+    }
+    
+    public int getDoctorId() {
+    	return doctorId;
+    }
+    
+    public boolean isDoctor() {
+    	return primaryRole == T_DOCTOR && hasSkill(SkillType.S_DOCTOR);
     }
 }
