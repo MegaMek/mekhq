@@ -683,6 +683,11 @@ public class Campaign implements Serializable {
         if(target.getValue() == TargetRoll.IMPOSSIBLE) {
             return target;
         }
+        //understaffed mods
+        int helpMod = getShorthandedMod(getMedicsPerDoctor(), true);
+        if(helpMod > 0) {
+        	target.addModifier(helpMod, "shorthanded");
+        }
         target.append(medWork.getAllMods());
         return target;
     }
@@ -1020,18 +1025,6 @@ public class Campaign implements Serializable {
 		} else {
 			return getForceFor(u);
 		}
-	}
-
-	/**
-	 * return a string (HTML formatted) of tasks for this doctor
-	 * 
-	 * @param unit
-	 * @return
-	 */
-	public String getToolTipFor(MedicalTeam doctor) {
-		String toReturn = "<html><b>Tasks:</b><br/>";
-		toReturn += "</html>";
-		return toReturn;
 	}
 
 	public String getDateAsString() {
@@ -2591,5 +2584,26 @@ public class Campaign implements Serializable {
 		//if the current primary role is an astech, then remove minutes from astech
 		//determine how many minutes have been used so that these can be subtracted from minutes left
 		//after resetting
+	}
+	
+	public int getMedicsPerDoctor() {
+		int ndocs = getDoctors().size();
+		int nmedics = getNumberMedics();
+		if(ndocs == 0) {
+			return 0;
+		}
+		//TODO: figure out what to do with fractions
+		return Math.min(nmedics / ndocs, 4);
+	}
+	
+	public int getNumberMedics() {
+		int medics = medicPool;
+		for(Person p : personnel) {
+			if((p.getPrimaryRole() == Person.T_MEDIC || p.getSecondaryRole() == Person.T_MEDIC)
+					&& p.isActive() && !p.isDeployed(this)) {
+				medics++;
+			}
+		}
+		return medics;
 	}
 }

@@ -1436,9 +1436,15 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         String toReturn = "<html><font size='2'><b>" + getName() + "</b><br/>";
         Skill skill = getSkill(SkillType.S_DOCTOR);
         if(null != skill) {
-        	toReturn += SkillType.getExperienceLevelName(skill.getExperienceLevel()) + " " + SkillType.S_DOCTOR + " ";
+        	toReturn += SkillType.getExperienceLevelName(skill.getExperienceLevel()) + " " + SkillType.S_DOCTOR;
         }
-        toReturn += "(" + c.getPatientsFor(this) + " patient(s))";
+        if(c.getMedicsPerDoctor() < 4) {
+        	toReturn += "</font><font size='2' color='red'>" + ", " + c.getMedicsPerDoctor() + " medics</font><font size='2'><br>";
+        } else {
+        	toReturn += ", " + c.getMedicsPerDoctor() + " medics<br>";
+        }
+        toReturn += c.getPatientsFor(this) + " patient(s)";
+        toReturn += "</font></html>";
         return toReturn;
     }
     

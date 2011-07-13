@@ -6202,7 +6202,7 @@ public class MekHQView extends FrameView {
 				Component c = this;
 				setOpaque(true);
 				setText(getValueAt(row, column).toString());
-				//setToolTipText(campaign.getToolTipFor(getDoctorAt(row)));
+				//setToolTipText(campaign.getTargetFor(getDoctorAt(row), getDoctorAt(row)).getDesc());
 				if (isSelected) {
 					select();
 				} else {

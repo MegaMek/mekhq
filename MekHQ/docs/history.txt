@@ -72,6 +72,7 @@ v0.1.9 (SVN)
 + adjust salary for secondary role
 + report secondary role in GUI displays
 + restored infirmary functionality
++ shorthanded mods for doctors
 
 v0.1.8 (2011-06-13)
 + beginning of custom XP costs
