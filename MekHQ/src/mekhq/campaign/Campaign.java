@@ -2606,4 +2606,12 @@ public class Campaign implements Serializable {
 		}
 		return medics;
 	}
+	
+	public void increaseMedicPool(int i) {
+		medicPool += i;
+	}
+	
+	public void decreaseMedicPool(int i) {
+		medicPool = Math.max(0, medicPool - i);
+	}
 }

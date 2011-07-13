@@ -484,6 +484,11 @@ public class MekHQView extends FrameView {
 		miFireAllAstechs = new javax.swing.JMenuItem();
 		menuAstechPool = new javax.swing.JMenu();
 		miFullStrengthAstechs = new javax.swing.JMenuItem();
+		miHireMedics = new javax.swing.JMenuItem();
+		miFireMedics = new javax.swing.JMenuItem();
+		miFireAllMedics = new javax.swing.JMenuItem();
+		menuMedicPool = new javax.swing.JMenu();
+		miFullStrengthMedics = new javax.swing.JMenuItem();
 		javax.swing.JMenu helpMenu = new javax.swing.JMenu();
 		javax.swing.JMenuItem aboutMenuItem = new javax.swing.JMenuItem();
 		statusPanel = new javax.swing.JPanel();
@@ -1780,7 +1785,7 @@ public class MekHQView extends FrameView {
 				if(need > 0) {
 					campaign.increaseAstechPool(need);
 				}
-				refreshTechsList();
+				refreshDoctorsList();
 			}
 		});
 		menuAstechPool.add(miFullStrengthAstechs);
@@ -1793,6 +1798,47 @@ public class MekHQView extends FrameView {
 		});
 		menuAstechPool.add(miFireAllAstechs);
 		menuMarket.add(menuAstechPool);
+		menuMedicPool.setText("Medic Pool");
+		miHireMedics.setText("Hire Medics");
+		miHireMedics.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(getFrame(), true, "Hire How Many Medics?", 1, 0, 100);
+				pvcd.setVisible(true);
+				campaign.increaseMedicPool(pvcd.getValue());
+				refreshDoctorsList();
+			}
+		});
+		menuMedicPool.add(miHireMedics);
+		miFireMedics.setText("Release Medics");
+		miFireMedics.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(getFrame(), true, "Release How Many Medics?", 1, 0, campaign.getMedicPool());
+				pvcd.setVisible(true);
+				campaign.decreaseMedicPool(pvcd.getValue());
+				refreshDoctorsList();
+			}
+		});
+		menuMedicPool.add(miFireMedics);
+		miFullStrengthMedics.setText("Bring All Medical Teams to Full Strength");
+		miFullStrengthMedics.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				int need = (campaign.getDoctors().size() * 4) - campaign.getNumberMedics();
+				if(need > 0) {
+					campaign.increaseMedicPool(need);
+				}
+				refreshDoctorsList();
+			}
+		});
+		menuMedicPool.add(miFullStrengthMedics);
+		miFireAllMedics.setText("Release All Medics from Pool");
+		miFireAllMedics.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				campaign.decreaseMedicPool(campaign.getMedicPool());
+				refreshDoctorsList();
+			}
+		});
+		menuMedicPool.add(miFireAllMedics);
+		menuMarket.add(menuMedicPool);
 		menuBar.add(menuMarket);
 		helpMenu.setText(resourceMap.getString("helpMenu.text")); // NOI18N
 		helpMenu.setName("helpMenu"); // NOI18N
@@ -7769,6 +7815,11 @@ public class MekHQView extends FrameView {
 	private javax.swing.JMenuItem miFireAllAstechs;
 	private javax.swing.JMenuItem miFullStrengthAstechs;
 	private javax.swing.JMenu menuAstechPool;
+	private javax.swing.JMenuItem miHireMedics;
+	private javax.swing.JMenuItem miFireMedics;
+	private javax.swing.JMenuItem miFireAllMedics;
+	private javax.swing.JMenuItem miFullStrengthMedics;
+	private javax.swing.JMenu menuMedicPool;
 	private javax.swing.JMenuItem miLoadForces;
 	private javax.swing.JMenuItem miPurchaseUnit;
 	private javax.swing.JPanel panFinances;

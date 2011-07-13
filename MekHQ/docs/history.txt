@@ -74,6 +74,7 @@ v0.1.9 (SVN)
 + restored infirmary functionality
 + shorthanded mods for doctors
 + reverse compatability for primary role of combat personnel when loading XML
++ menu item for medic pools
 
 v0.1.8 (2011-06-13)
 + beginning of custom XP costs
