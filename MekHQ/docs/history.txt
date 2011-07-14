@@ -82,6 +82,7 @@ v0.1.9 (SVN)
 + resized personnel view panel to account for longer skill names
 + load callsigns from XML
 + improvements to personnel table
++ better instructions in XP tab
 
 v0.1.8 (2011-06-13)
 + beginning of custom XP costs
