@@ -14,6 +14,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
@@ -100,9 +101,11 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         java.awt.GridBagConstraints gridBagConstraints;
 
         panDemog = new javax.swing.JPanel();
+        tabStats = new javax.swing.JTabbedPane();
         lblName = new javax.swing.JLabel();
         lblGender = new javax.swing.JLabel();
         lblBday = new javax.swing.JLabel();
+        lblAge = new javax.swing.JLabel();
         lblNickname = new javax.swing.JLabel();
         textName = new javax.swing.JTextField();
         textNickname = new javax.swing.JTextField();
@@ -140,7 +143,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 4;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
@@ -154,11 +157,65 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         });
         panDemog.add(choiceType, gridBagConstraints);
     
+        lblName.setText(resourceMap.getString("lblName.text")); // NOI18N
+        lblName.setName("lblName"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+        panDemog.add(lblName, gridBagConstraints);
+
+        textName.setMinimumSize(new java.awt.Dimension(150, 28));
+        textName.setName("textName"); // NOI18N
+        textName.setPreferredSize(new java.awt.Dimension(150, 28));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        textName.setText(person.getName());
+        panDemog.add(textName, gridBagConstraints);
+
+        btnRandomName.setText(resourceMap.getString("btnRandomName.text")); // NOI18N
+        btnRandomName.setName("btnRandomName"); // NOI18N
+        btnRandomName.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            	randomName();
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        panDemog.add(btnRandomName, gridBagConstraints);
+        
+        lblNickname.setText(resourceMap.getString("lblNickname.text")); // NOI18N
+        lblNickname.setName("lblNickname"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+        panDemog.add(lblNickname, gridBagConstraints);
+        
+        textNickname.setText(person.getCallsign());
+        textNickname.setMinimumSize(new java.awt.Dimension(150, 28));
+        textNickname.setName("textNickname"); // NOI18N
+        textNickname.setPreferredSize(new java.awt.Dimension(150, 28));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        panDemog.add(textNickname, gridBagConstraints);
+        
         lblGender.setText(resourceMap.getString("lblGender.text")); // NOI18N
         lblGender.setName("lblGender"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
         panDemog.add(lblGender, gridBagConstraints);
@@ -177,8 +234,8 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
@@ -188,12 +245,12 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         lblBday.setText(resourceMap.getString("lblBday.text")); // NOI18N
         lblBday.setName("lblBday"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
         panDemog.add(lblBday, gridBagConstraints);
-    
+
         btnDate.setText(getDateAsString());
         btnDate.setName("btnDate"); // NOI18N
         btnDate.addActionListener(new java.awt.event.ActionListener() {
@@ -202,72 +259,26 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panDemog.add(btnDate, gridBagConstraints);
-
         
-        lblName.setText(resourceMap.getString("lblName.text")); // NOI18N
-        lblName.setName("lblName"); // NOI18N
+        lblAge.setText(person.getAge(campaign.getCalendar()) + " years old"); // NOI18N
+        lblAge.setName("lblAge"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
-        panDemog.add(lblName, gridBagConstraints);
-
-        textName.setMinimumSize(new java.awt.Dimension(250, 28));
-        textName.setName("textName"); // NOI18N
-        textName.setPreferredSize(new java.awt.Dimension(250, 28));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        textName.setText(person.getName());
-        panDemog.add(textName, gridBagConstraints);
-
-        btnRandomName.setText(resourceMap.getString("btnRandomName.text")); // NOI18N
-        btnRandomName.setName("btnRandomName"); // NOI18N
-        btnRandomName.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-            	randomName();
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.gridwidth = 4;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panDemog.add(btnRandomName, gridBagConstraints);
-        
-        lblNickname.setText(resourceMap.getString("lblNickname.text")); // NOI18N
-        lblNickname.setName("lblNickname"); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 4;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
-        panDemog.add(lblNickname, gridBagConstraints);
-
-        textNickname.setText(person.getCallsign());
-        textNickname.setMinimumSize(new java.awt.Dimension(250, 28));
-        textNickname.setName("textNickname"); // NOI18N
-        textNickname.setPreferredSize(new java.awt.Dimension(250, 28));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panDemog.add(textNickname, gridBagConstraints);
+        panDemog.add(lblAge, gridBagConstraints);
         
         if(campaign.getCampaignOptions().useToughness()) {
         	lblToughness.setText(resourceMap.getString("lblToughness.text")); // NOI18N
         	lblToughness.setName("lblToughness"); // NOI18N
             gridBagConstraints = new java.awt.GridBagConstraints();
-            gridBagConstraints.gridx = 2;
-            gridBagConstraints.gridy = 7;
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = 5;
             gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
             gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
             getContentPane().add(lblToughness, gridBagConstraints);
@@ -277,8 +288,8 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
             textToughness.setName("textToughness"); // NOI18N
             textToughness.setPreferredSize(new java.awt.Dimension(50, 28));
             gridBagConstraints = new java.awt.GridBagConstraints();
-            gridBagConstraints.gridx = 3;
-            gridBagConstraints.gridy = 7;
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = 5;
             gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
             getContentPane().add(textToughness, gridBagConstraints);
         }
@@ -287,23 +298,19 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
 
         txtBio.setName("txtBio"); // NOI18N
         txtBio.setText(person.getBiography());
+		txtBio.setBorder(BorderFactory.createTitledBorder("Biography"));
         jScrollPane2.setViewportView(txtBio);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 8;
-        gridBagConstraints.gridwidth = 4;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         panDemog.add(jScrollPane2, gridBagConstraints);
-
-        
-        scrSkills.setMinimumSize(new java.awt.Dimension(300, 500));
-        scrSkills.setName("scrSkills"); // NOI18N
-        scrSkills.setPreferredSize(new java.awt.Dimension(300, 500));
 
         gridBagConstraints = new java.awt.GridBagConstraints();
     	gridBagConstraints.gridx = 0;
@@ -313,43 +320,33 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     	gridBagConstraints.weightx = 0.0;
     	gridBagConstraints.weighty = 1.0;
     	getContentPane().add(panDemog, gridBagConstraints);
-    	
+       
         panSkills.setName("panSkills"); // NOI18N
-		panSkills.setBorder(BorderFactory.createTitledBorder("Skills"));
         refreshSkills();
         scrSkills.setViewportView(panSkills);
         scrSkills.setMinimumSize(new java.awt.Dimension(500, 500));
         scrSkills.setPreferredSize(new java.awt.Dimension(500, 500));
     	  
         panOptions.setName("panOptions"); // NOI18N
-		panOptions.setBorder(BorderFactory.createTitledBorder("Special Abilities"));
         refreshOptions();
         scrOptions.setViewportView(panOptions);
+        scrOptions.setMinimumSize(new java.awt.Dimension(500, 500));
+        scrOptions.setPreferredSize(new java.awt.Dimension(500, 500));
 
+        tabStats.addTab(resourceMap.getString("scrSkills.TabConstraints.tabTitle"),scrSkills); // NOI18N
         if(campaign.getCampaignOptions().useAbilities() 
         		|| campaign.getCampaignOptions().useEdge()
         		|| campaign.getCampaignOptions().useImplants()) {
-			splitAbilities = new javax.swing.JSplitPane(javax.swing.JSplitPane.VERTICAL_SPLIT,scrSkills, scrOptions);
-			splitAbilities.setOneTouchExpandable(true);
-			splitAbilities.setResizeWeight(1.0);
-			gridBagConstraints = new java.awt.GridBagConstraints();
-	    	gridBagConstraints.gridx = 1;
-	    	gridBagConstraints.gridy = 0;
-	    	gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-	    	gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-	    	gridBagConstraints.weightx = 1.0;
-	    	gridBagConstraints.weighty = 1.0;
-	    	getContentPane().add(splitAbilities, gridBagConstraints);
-        } else {
-        	gridBagConstraints = new java.awt.GridBagConstraints();
-	    	gridBagConstraints.gridx = 1;
-	    	gridBagConstraints.gridy = 0;
-	    	gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-	    	gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-	    	gridBagConstraints.weightx = 1.0;
-	    	gridBagConstraints.weighty = 1.0;
-	    	getContentPane().add(scrSkills, gridBagConstraints);
+        	tabStats.addTab(resourceMap.getString("scrOptions.TabConstraints.tabTitle"),scrOptions); // NOI18N
         }
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        getContentPane().add(tabStats, gridBagConstraints);
         
         panButtons.setName("panButtons"); // NOI18N
         panButtons.setLayout(new java.awt.GridBagLayout());
@@ -689,9 +686,25 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
             birthdate = dc.getDate();
             btnDate.setText(getDateAsString());
+            lblAge.setText(getAge() + " years old"); // NOI18N
         }
     }
 
+    public int getAge() {
+    	// Get age based on year
+    	int age = campaign.getCalendar().get(Calendar.YEAR) - birthdate.get(Calendar.YEAR);
+
+    	// Add the tentative age to the date of birth to get this year's birthday
+    	GregorianCalendar tmpDate = (GregorianCalendar) birthdate.clone();
+    	tmpDate.add(Calendar.YEAR, age);
+
+    	// If this year's birthday has not happened yet, subtract one from age
+    	if (campaign.getCalendar().before(tmpDate)) {
+    	    age--;
+    	}
+    	return age;
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClose;
     private javax.swing.JButton btnOk;
@@ -706,12 +719,13 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     private javax.swing.JLabel lblName;
     private javax.swing.JLabel lblGender;
     private javax.swing.JLabel lblBday;
+    private javax.swing.JLabel lblAge;
     private javax.swing.JLabel lblNickname;
     private javax.swing.JPanel panButtons;
     private javax.swing.JPanel panDemog;
+    private javax.swing.JTabbedPane tabStats;
     private javax.swing.JPanel panSkills;
     private javax.swing.JPanel panOptions;
-    private javax.swing.JSplitPane splitAbilities;
     private javax.swing.JTextField textToughness;
     private javax.swing.JTextField textName;
     private javax.swing.JTextField textNickname;
