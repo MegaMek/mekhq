@@ -66,6 +66,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTree;
 import javax.swing.ListSelectionModel;
@@ -540,7 +541,7 @@ public class MekHQView extends FrameView {
 		scrollOrgTree.setViewportView(orgTree);
 		
 		scrollForceView.setMinimumSize(new java.awt.Dimension(550, 600));
-		scrollForceView.setPreferredSize(new java.awt.Dimension(550, 2000));
+		scrollForceView.setPreferredSize(new java.awt.Dimension(550, 600));
 		scrollForceView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollForceView.setViewportView(null);
 		
@@ -770,7 +771,7 @@ public class MekHQView extends FrameView {
 		
 		scrollScenarioView.setViewportView(null);
 		scrollScenarioView.setMinimumSize(new java.awt.Dimension(550, 600));
-		scrollScenarioView.setPreferredSize(new java.awt.Dimension(550, 2000));
+		scrollScenarioView.setPreferredSize(new java.awt.Dimension(550, 600));
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 1;
@@ -879,7 +880,7 @@ public class MekHQView extends FrameView {
 		panelMapView.add(panMap, gridBagConstraints);
 		
 		scrollPlanetView.setMinimumSize(new java.awt.Dimension(400, 600));
-		scrollPlanetView.setPreferredSize(new java.awt.Dimension(400, 2000));
+		scrollPlanetView.setPreferredSize(new java.awt.Dimension(400, 600));
 		scrollPlanetView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPlanetView.setViewportView(null);
 		splitMap = new javax.swing.JSplitPane(javax.swing.JSplitPane.HORIZONTAL_SPLIT,panelMapView, scrollPlanetView);
@@ -989,7 +990,7 @@ public class MekHQView extends FrameView {
         scrollPersonnelTable.setViewportView(personnelTable);
 	
 		scrollPersonnelView.setMinimumSize(new java.awt.Dimension(500, 600));
-		scrollPersonnelView.setPreferredSize(new java.awt.Dimension(500, 2000));
+		scrollPersonnelView.setPreferredSize(new java.awt.Dimension(500, 600));
 		scrollPersonnelView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPersonnelView.setViewportView(null);
 		
@@ -1109,7 +1110,7 @@ public class MekHQView extends FrameView {
         scrollUnitTable.setViewportView(unitTable);
 
 		scrollUnitView.setMinimumSize(new java.awt.Dimension(450, 600));
-		scrollUnitView.setPreferredSize(new java.awt.Dimension(450, 2000));
+		scrollUnitView.setPreferredSize(new java.awt.Dimension(450, 600));
 		scrollUnitView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollUnitView.setViewportView(null);
 		
@@ -2576,11 +2577,21 @@ public class MekHQView extends FrameView {
 			return;
 		}
 		if(node.getUserObject() instanceof Unit) {
-			Person p = ((Unit)node.getUserObject()).getCommander();
-			if(p == null) {
+			Unit u = ((Unit)node.getUserObject());
+			if(u == null) {
 				scrollForceView.setViewportView(null);
 			} else {
-				scrollForceView.setViewportView(new PersonViewPanel(p, campaign, portraits));
+				JTabbedPane tabUnit = new JTabbedPane();
+				Person p = ((Unit)node.getUserObject()).getCommander();
+				if(p != null) {
+					String name = "Commander";
+					if(u.usesSoloPilot()) {
+						name = "Pilot";
+					}
+					tabUnit.add(name, new PersonViewPanel(p, campaign, portraits));
+				}
+				tabUnit.add("Unit", new UnitViewPanel(u, campaign, camos, mt));
+				scrollForceView.setViewportView(tabUnit);
 			}
 			//This odd code is to make sure that the scrollbar stays at the top
 			//I cant just call it here, because it ends up getting reset somewhere later

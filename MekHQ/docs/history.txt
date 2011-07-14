@@ -84,6 +84,7 @@ v0.1.9 (SVN)
 + improvements to personnel table
 + better instructions in XP tab
 + only support roles can be secondary
++ use a tabbed pane in force view to display pilot and unit
 
 v0.1.8 (2011-06-13)
 + beginning of custom XP costs
