@@ -25,6 +25,7 @@ import gd.xml.ParseException;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -465,7 +466,9 @@ public class MekHQView extends FrameView {
 		btnAdvanceDay = new javax.swing.JButton();
 		btnOvertime = new javax.swing.JToggleButton();
 		btnGMMode = new javax.swing.JToggleButton();
-		fundsLabel = new javax.swing.JLabel();
+		lblFunds = new javax.swing.JLabel();
+		lblTempAstechs = new javax.swing.JLabel();
+		lblTempMedics = new javax.swing.JLabel();
 		menuBar = new javax.swing.JMenuBar();
 		javax.swing.JMenu fileMenu = new javax.swing.JMenu();
 		menuLoad = new javax.swing.JMenuItem();
@@ -514,7 +517,7 @@ public class MekHQView extends FrameView {
 		panMekLab = new MekLabPanel();
 		scrollMekLab = new javax.swing.JScrollPane();
 		lblLocation = new javax.swing.JLabel();
-		
+
 		org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application
 				.getInstance(mekhq.MekHQApp.class).getContext()
 				.getResourceMap(MekHQView.class);
@@ -1599,7 +1602,7 @@ public class MekHQView extends FrameView {
 		});
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 3;
+		gridBagConstraints.gridy = 2;
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -1616,23 +1619,12 @@ public class MekHQView extends FrameView {
 		});
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 4;
+		gridBagConstraints.gridy = 3;
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 1.0;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		panelMasterButtons.add(btnGMMode, gridBagConstraints);
-
-		fundsLabel.setFont(resourceMap.getFont("fundsLabel.font")); // NOI18N
-		fundsLabel.setText(resourceMap.getString("fundsLabel.text")); // NOI18N
-		fundsLabel.setName("fundsLabel"); // NOI18N
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 2;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
-		panelMasterButtons.add(fundsLabel, gridBagConstraints);
 
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
@@ -1762,6 +1754,7 @@ public class MekHQView extends FrameView {
 				pvcd.setVisible(true);
 				campaign.increaseAstechPool(pvcd.getValue());
 				refreshTechsList();
+				refreshTempAstechs();
 			}
 		});
 		menuAstechPool.add(miHireAstechs);
@@ -1772,6 +1765,7 @@ public class MekHQView extends FrameView {
 				pvcd.setVisible(true);
 				campaign.decreaseAstechPool(pvcd.getValue());
 				refreshTechsList();
+				refreshTempAstechs();
 			}
 		});
 		menuAstechPool.add(miFireAstechs);
@@ -1782,7 +1776,8 @@ public class MekHQView extends FrameView {
 				if(need > 0) {
 					campaign.increaseAstechPool(need);
 				}
-				refreshDoctorsList();
+				refreshTechsList();
+				refreshTempAstechs();
 			}
 		});
 		menuAstechPool.add(miFullStrengthAstechs);
@@ -1791,6 +1786,7 @@ public class MekHQView extends FrameView {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				campaign.decreaseAstechPool(campaign.getAstechPool());
 				refreshTechsList();
+				refreshTempAstechs();
 			}
 		});
 		menuAstechPool.add(miFireAllAstechs);
@@ -1803,6 +1799,7 @@ public class MekHQView extends FrameView {
 				pvcd.setVisible(true);
 				campaign.increaseMedicPool(pvcd.getValue());
 				refreshDoctorsList();
+				refreshTempMedics();
 			}
 		});
 		menuMedicPool.add(miHireMedics);
@@ -1812,7 +1809,8 @@ public class MekHQView extends FrameView {
 				PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(getFrame(), true, "Release How Many Medics?", 1, 0, campaign.getMedicPool());
 				pvcd.setVisible(true);
 				campaign.decreaseMedicPool(pvcd.getValue());
-				refreshDoctorsList();
+				refreshDoctorsList();				
+				refreshTempMedics();
 			}
 		});
 		menuMedicPool.add(miFireMedics);
@@ -1824,6 +1822,7 @@ public class MekHQView extends FrameView {
 					campaign.increaseMedicPool(need);
 				}
 				refreshDoctorsList();
+				refreshTempMedics();
 			}
 		});
 		menuMedicPool.add(miFullStrengthMedics);
@@ -1844,7 +1843,15 @@ public class MekHQView extends FrameView {
 		helpMenu.add(aboutMenuItem);
 		menuBar.add(helpMenu);
 		statusPanel.setName("statusPanel"); // NOI18N
-		statusPanelSeparator.setName("statusPanelSeparator"); // NOI18N
+		statusPanel.setLayout(new FlowLayout(FlowLayout.LEADING, 20, 5));
+		
+		refreshFunds();
+		statusPanel.add(lblFunds);
+		refreshTempAstechs();
+		statusPanel.add(lblTempAstechs);
+		refreshTempMedics();
+		statusPanel.add(lblTempMedics);
+	/*	statusPanelSeparator.setName("statusPanelSeparator"); // NOI18N
 		statusMessageLabel.setName("statusMessageLabel"); // NOI18N
 		statusAnimationLabel
 				.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
@@ -1908,7 +1915,7 @@ public class MekHQView extends FrameView {
 												org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
 												org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
 								.add(3, 3, 3)));
-
+		*/
 		setComponent(splitMain);
 		setMenuBar(menuBar);
 		setStatusBar(statusPanel);
@@ -2295,6 +2302,8 @@ public class MekHQView extends FrameView {
 		refreshOrganization();
 		refreshMissions();
 		refreshLocation();
+		refreshTempAstechs();
+		refreshTempMedics();
 		panMap.setCampaign(campaign);
 		
 		// Without this, the report scrollbar doesn't seem to load properly
@@ -2343,6 +2352,8 @@ public class MekHQView extends FrameView {
 		refreshFinancialTransactions();
 		refreshMissions();
 		refreshLocation();
+		refreshTempAstechs();
+		refreshTempMedics();
 		panMap.setCampaign(campaign);
 
 		// Without this, the report scrollbar doesn't seem to load properly
@@ -3021,10 +3032,20 @@ public class MekHQView extends FrameView {
 	protected void refreshFunds() {
 		long funds = campaign.getFunds();
 		NumberFormat numberFormat = NumberFormat.getIntegerInstance();
-		String text = numberFormat.format(funds) + " "
-				+ (funds != 0 ? "CBills" : "CBill");
-		fundsLabel.setText(text);
+		String text = "<html><b>Balance:</b> " + numberFormat.format(funds) + " C-Bills</html>";
+		lblFunds.setText(text);
 	}
+	
+	protected void refreshTempAstechs() {
+		String text = "<html><b>Temp Astechs:</b> " +campaign.getAstechPool() + "</html>";
+		lblTempAstechs.setText(text);
+	}
+	
+	protected void refreshTempMedics() {
+		String text = "<html><b>Temp Medics:</b> " +campaign.getAstechPool() + "</html>";
+		lblTempMedics.setText(text);
+	}
+	
 	
 	protected void refreshLocation() {
 		lblLocation.setText(campaign.getLocation().getReport(campaign.getCalendar().getTime()));
@@ -7776,7 +7797,6 @@ public class MekHQView extends FrameView {
 	private javax.swing.JButton btnDoTask;
 	private javax.swing.JToggleButton btnGMMode;
 	private javax.swing.JToggleButton btnOvertime;
-	private javax.swing.JLabel fundsLabel;
 	private javax.swing.JScrollPane jScrollPane6;
 	private javax.swing.JScrollPane scrollPartsTable;
 	private javax.swing.JLabel lblTarget;
@@ -7879,6 +7899,11 @@ public class MekHQView extends FrameView {
     private javax.swing.JLabel lblLocation;
 	// End of variables declaration//GEN-END:variables
 
+	private javax.swing.JLabel lblFunds;
+	private javax.swing.JLabel lblTempAstechs;
+	private javax.swing.JLabel lblTempMedics;
+
+	
 	private final Timer messageTimer;
 	private final Timer busyIconTimer;
 	private final Icon idleIcon;
