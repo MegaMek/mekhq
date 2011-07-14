@@ -117,7 +117,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         panOptions = new javax.swing.JPanel();
         scrSkills = new javax.swing.JScrollPane();
         panSkills = new javax.swing.JPanel();
-        jScrollPane2 = new javax.swing.JScrollPane();
+        scrBio = new javax.swing.JScrollPane();
         txtBio = new javax.swing.JTextPane();
         panButtons = new javax.swing.JPanel();
         btnOk = new javax.swing.JButton();
@@ -174,6 +174,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         textName.setText(person.getName());
         panDemog.add(textName, gridBagConstraints);
 
@@ -201,14 +202,13 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         panDemog.add(lblNickname, gridBagConstraints);
         
         textNickname.setText(person.getCallsign());
-        textNickname.setMinimumSize(new java.awt.Dimension(150, 28));
         textNickname.setName("textNickname"); // NOI18N
-        textNickname.setPreferredSize(new java.awt.Dimension(150, 28));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         panDemog.add(textNickname, gridBagConstraints);
         
         lblGender.setText(resourceMap.getString("lblGender.text")); // NOI18N
@@ -235,9 +235,10 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 3;
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridwidth = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         choiceGender.setSelectedIndex(person.getGender());
         panDemog.add(choiceGender, gridBagConstraints);
@@ -284,9 +285,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
             getContentPane().add(lblToughness, gridBagConstraints);
         
             textToughness.setText("");
-            textToughness.setMinimumSize(new java.awt.Dimension(50, 28));
             textToughness.setName("textToughness"); // NOI18N
-            textToughness.setPreferredSize(new java.awt.Dimension(50, 28));
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = 5;
@@ -294,12 +293,14 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
             getContentPane().add(textToughness, gridBagConstraints);
         }
         
-        jScrollPane2.setName("jScrollPane2"); // NOI18N
+        scrBio.setName("jScrollPane2"); // NOI18N
 
         txtBio.setName("txtBio"); // NOI18N
         txtBio.setText(person.getBiography());
 		txtBio.setBorder(BorderFactory.createTitledBorder("Biography"));
-        jScrollPane2.setViewportView(txtBio);
+		scrBio.setMinimumSize(new java.awt.Dimension(300, 300));
+		scrBio.setPreferredSize(new java.awt.Dimension(300, 300));
+        scrBio.setViewportView(txtBio);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -310,7 +311,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        panDemog.add(jScrollPane2, gridBagConstraints);
+        panDemog.add(scrBio, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
     	gridBagConstraints.gridx = 0;
@@ -412,6 +413,8 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         	hqView.refreshDoctorsList();
     		hqView.refreshReport();
         	person = campaign.newPerson(choiceType.getSelectedIndex());
+        	//set the skills based on current so we stay at those levels
+        	setSkills();
         	refreshPilotAndOptions();
         } else {
         	hqView.refreshPersonnelList();
@@ -713,7 +716,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     private javax.swing.JComboBox choiceType;
     private javax.swing.JComboBox choiceGender;
     private javax.swing.JScrollPane scrOptions;
-    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane scrBio;
     private javax.swing.JScrollPane scrSkills;
     private javax.swing.JLabel lblToughness;
     private javax.swing.JLabel lblName;

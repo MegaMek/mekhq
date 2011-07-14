@@ -78,6 +78,7 @@ v0.1.9 (SVN)
 + customize skill targets and levels in campaign options dialog
 + separate VEE_CREW role into ground vee drivers, naval vessel drivers, VTOL pilots, and gunners
 + improvements to CustomizePersonDialog
++ maintain selected skill levels between hires in CustomizePersonDialog
 
 v0.1.8 (2011-06-13)
 + beginning of custom XP costs
