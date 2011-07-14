@@ -6,6 +6,9 @@
 
 package mekhq;
 
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+
 /**
  *
  * @author natit
@@ -25,8 +28,8 @@ public class PopupValueChoiceDialog extends javax.swing.JDialog {
     public PopupValueChoiceDialog(java.awt.Frame parent, boolean modal, String title, int current, int min, int max) {
         super(parent, modal);
         model = new javax.swing.SpinnerNumberModel(current, min, max, 1);
+        label = new javax.swing.JLabel(title);
         initComponents();      
-        label.setText(title);
         setLocationRelativeTo(parent);
     }
 
@@ -39,7 +42,6 @@ public class PopupValueChoiceDialog extends javax.swing.JDialog {
 
         btnDone = new javax.swing.JButton();
         value = new javax.swing.JSpinner(model);
-        label = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
@@ -54,38 +56,22 @@ public class PopupValueChoiceDialog extends javax.swing.JDialog {
         });
 
         value.setName("value"); // NOI18N
-
-        label.setText("Label"); // NOI18N
         label.setName("label"); // NOI18N
 
-        org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(layout.createSequentialGroup()
-                        .add(64, 64, 64)
-                        .add(btnDone))
-                    .add(layout.createSequentialGroup()
-                        .add(14, 14, 14)
-                        .add(label)
-                        .add(18, 18, 18)
-                        .add(value, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 105, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(46, Short.MAX_VALUE))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
-                .add(29, 29, 29)
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(label)
-                    .add(value, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 20, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .add(18, 18, 18)
-                .add(btnDone)
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-
+        getContentPane().setLayout(new GridBagLayout());
+        
+        GridBagConstraints c= new GridBagConstraints();
+        c.gridx = 0;
+        c.fill = java.awt.GridBagConstraints.BOTH;
+		c.anchor = java.awt.GridBagConstraints.WEST;
+        getContentPane().add(label,c);
+        c.gridx = 1;
+        getContentPane().add(value, c);
+        c.gridx = 0;
+        c.gridy = 1;
+        c.gridwidth = 2;
+		c.anchor = java.awt.GridBagConstraints.CENTER;
+        getContentPane().add(btnDone, c);
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
