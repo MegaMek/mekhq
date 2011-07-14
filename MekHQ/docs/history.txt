@@ -79,6 +79,8 @@ v0.1.9 (SVN)
 + separate VEE_CREW role into ground vee drivers, naval vessel drivers, VTOL pilots, and gunners
 + improvements to CustomizePersonDialog
 + maintain selected skill levels between hires in CustomizePersonDialog
++ resized personnel view panel to account for longer skill names
++ load callsigns from XML
 
 v0.1.8 (2011-06-13)
 + beginning of custom XP costs

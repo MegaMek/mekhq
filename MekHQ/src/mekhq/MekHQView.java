@@ -992,8 +992,8 @@ public class MekHQView extends FrameView {
         });
         scrollPersonnelTable.setViewportView(personnelTable);
 	
-		scrollPersonnelView.setMinimumSize(new java.awt.Dimension(450, 600));
-		scrollPersonnelView.setPreferredSize(new java.awt.Dimension(450, 2000));
+		scrollPersonnelView.setMinimumSize(new java.awt.Dimension(500, 600));
+		scrollPersonnelView.setPreferredSize(new java.awt.Dimension(500, 2000));
 		scrollPersonnelView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPersonnelView.setViewportView(null);
 		

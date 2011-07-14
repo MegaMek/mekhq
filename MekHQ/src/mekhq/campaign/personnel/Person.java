@@ -604,6 +604,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 			
 			//backwards compatability
 			String pilotName = null;
+			String pilotNickname = null;
 			int pilotGunnery = -1;
 			int pilotPiloting = -1;
 			int pilotCommandBonus = -1;
@@ -672,6 +673,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 					pilotCommandBonus = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("pilotName")) {
 					pilotName = wn2.getTextContent();
+				} else if (wn2.getNodeName().equalsIgnoreCase("pilotNickname")) {
+					pilotNickname = wn2.getTextContent();
 				} else if (wn2.getNodeName().equalsIgnoreCase("type")) {
 					type = Integer.parseInt(wn2.getTextContent());
 				} else if(wn2.getNodeName().equalsIgnoreCase("skill")) {
@@ -753,6 +756,9 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 			}
 			if(null != pilotName) {
 				retVal.setName(pilotName);
+			}
+			if(null != pilotNickname) {
+				retVal.setCallsign(pilotNickname);
 			}
 		} catch (Exception ex) {
 			// Errrr, apparently either the class name was invalid...
