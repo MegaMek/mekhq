@@ -8,6 +8,7 @@ package mekhq;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 
 /**
  *
@@ -40,7 +41,9 @@ public class PopupValueChoiceDialog extends javax.swing.JDialog {
      */
     private void initComponents() {
 
+    	pnlButton = new javax.swing.JPanel();
         btnDone = new javax.swing.JButton();
+        btnCancel = new javax.swing.JButton();
         value = new javax.swing.JSpinner(model);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -54,7 +57,19 @@ public class PopupValueChoiceDialog extends javax.swing.JDialog {
                 btnDoneActionPerformed(evt);
             }
         });
+        
+        btnCancel.setText(resourceMap.getString("btnCancel.text")); // NOI18N
+        btnCancel.setName("btnCancel"); // NOI18N
+        btnCancel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCancelActionPerformed(evt);
+            }
+        });
 
+        pnlButton.setLayout(new GridLayout(0,2));
+        pnlButton.add(btnDone);
+        pnlButton.add(btnCancel);
+        
         value.setName("value"); // NOI18N
         label.setName("label"); // NOI18N
 
@@ -71,14 +86,19 @@ public class PopupValueChoiceDialog extends javax.swing.JDialog {
         c.gridy = 1;
         c.gridwidth = 2;
 		c.anchor = java.awt.GridBagConstraints.CENTER;
-        getContentPane().add(btnDone, c);
+        getContentPane().add(pnlButton, c);
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnDoneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDoneActionPerformed
         this.setVisible(false);
-}//GEN-LAST:event_btnDoneActionPerformed
+    }//GEN-LAST:event_btnDoneActionPerformed
 
+    private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDoneActionPerformed
+        value.getModel().setValue(0);
+    	this.setVisible(false);
+    }
+    
     /**
     * @param args the command line arguments
     */
@@ -103,6 +123,8 @@ public class PopupValueChoiceDialog extends javax.swing.JDialog {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnDone;
+    private javax.swing.JButton btnCancel;
+    private javax.swing.JPanel pnlButton;
     private javax.swing.JLabel label;
     private javax.swing.JSpinner value;
     private javax.swing.SpinnerNumberModel model;

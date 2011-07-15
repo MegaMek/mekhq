@@ -87,6 +87,7 @@ v0.1.9 (SVN)
 + use a tabbed pane in force view to display pilot and unit
 + stats bar on the bottom
 + better PopupValueChoiceDialog layout
++ cancel button for PopupValueChoiceDialog
 
 v0.1.8 (2011-06-13)
 + beginning of custom XP costs
