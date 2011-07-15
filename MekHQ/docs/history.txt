@@ -88,6 +88,8 @@ v0.1.9 (SVN)
 + stats bar on the bottom
 + better PopupValueChoiceDialog layout
 + cancel button for PopupValueChoiceDialog
++ add commander special abilities to unit pilot
++ set hits for pilot from personnel
 
 v0.1.8 (2011-06-13)
 + beginning of custom XP costs

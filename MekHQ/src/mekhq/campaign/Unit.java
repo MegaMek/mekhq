@@ -52,6 +52,7 @@ import megamek.common.VTOL;
 import megamek.common.Warship;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
+import megamek.common.options.PilotOptions;
 import mekhq.MekHQApp;
 import mekhq.campaign.parts.AeroHeatSink;
 import mekhq.campaign.parts.AeroSensor;
@@ -2602,6 +2603,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     		
     	int piloting = 13;
     	int gunnery = 13;	
+    	int artillery = 13;
     	String driveType = SkillType.getDrivingSkillFor(entity);
     	String gunType = SkillType.getGunnerySkillFor(entity);
     	int sumPiloting = 0;
@@ -2626,6 +2628,10 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     		if(p.hasSkill(gunType)) {
     			sumGunnery += p.getSkill(gunType).getFinalSkillValue();
     			nGunners++;
+    		}
+    		if(p.hasSkill(SkillType.S_ARTILLERY) 
+    				&& p.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue() < artillery) {
+    			artillery = p.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue();
     		}
     	}
     	if(nDrivers > 0) {
@@ -2659,11 +2665,52 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     	pilot.setPortraitCategory(commander.getPortraitCategory());
     	pilot.setPortraitFileName(commander.getPortraitFileName());
     	pilot.setExternalId(commander.getId());
-    	//TODO: record hits (as well as commander hit, driver hit, etc.) 
-    	//TODO: set edge and triggers
+    	pilot.setArtillery(artillery);
+    	//create a new set of options. For now we will just assign based on commander, but
+    	//we really should be more detailed about this.
+    	PilotOptions options = new PilotOptions();
+    	for (Enumeration<IOptionGroup> i = options.getGroups(); i.hasMoreElements();) {
+             IOptionGroup group = i.nextElement();
+             for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements();) {
+                 IOption option = j.nextElement();         
+                 option.setValue(commander.getOptions().getOption(option.getName()).getValue());
+             }
+    	}
+    	pilot.setOptions(options);
+    	//TODO: record hits (as well as commander hit, driver hit, etc.)
+    	if(usesSoloPilot()) {
+    		if(!commander.isActive()) {
+    			entity.setCrew(null);
+    			return;
+    		}
+    		pilot.setHits(commander.getHits());
+    	}
+    	else if(entity instanceof Tank) {
+    		if(nDrivers == 0 && nGunners == 0) {
+    			//nobody is healthy
+    			entity.setCrew(null);
+    			return;
+    		}
+    		if(commander.getHits() > 0) {
+    			((Tank)entity).setCommanderHit(true);
+    		} else {
+    			((Tank)entity).setCommanderHit(false);
+
+    		}	
+    		if(nDrivers == 0) {
+    			((Tank)entity).setDriverHit(true);
+    		} else {
+    			((Tank)entity).setDriverHit(false);
+    		} 		
+    	}
+    	else if(entity instanceof Infantry) {
+    		if(nDrivers == 0 && nGunners == 0) {
+    			//nobody is healthy
+    			entity.setCrew(null);
+    			return;
+    		}
+    	}
     	//TODO: set toughness
-    	//TODO: set artillery
-    	//TODO: set advantages and implants
     	//TODO: game option to use tactics as command and ind init bonus
     	if(commander.hasSkill(SkillType.S_TACTICS)) {
     		pilot.setCommandBonus(commander.getSkill(SkillType.S_TACTICS).getFinalSkillValue());
