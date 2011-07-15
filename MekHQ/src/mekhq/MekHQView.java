@@ -5149,7 +5149,7 @@ public class MekHQView extends FrameView {
 				}
 				popup.add(menu);
 				menu = new JMenu("Change Primary Role");
-				for(int i = 0; i < Person.T_NUM; i++) {
+				for(int i = Person.T_MECHWARRIOR; i < Person.T_NUM; i++) {
 					if(person.canPerformRole(i) && person.getSecondaryRole() != i) {
 						cbMenuItem = new JCheckBoxMenuItem(Person.getRoleDesc(i));
 						cbMenuItem.setActionCommand("PROLE|" + i);
@@ -5167,7 +5167,7 @@ public class MekHQView extends FrameView {
 				popup.add(menu);
 				menu = new JMenu("Change Secondary Role");
 				for(int i = 0; i < Person.T_NUM; i++) {
-					if((i == 0 || i >= Person.T_MECH_TECH) && person.canPerformRole(i) && person.getPrimaryRole() != i) {
+					if(i == Person.T_NONE || (i >= Person.T_MECH_TECH && person.canPerformRole(i) && person.getPrimaryRole() != i)) {
 						//you cant be an astech if you are a tech, or a medic if you are a doctor
 						if(person.isTechPrimary() && i == Person.T_ASTECH) {
 							continue;

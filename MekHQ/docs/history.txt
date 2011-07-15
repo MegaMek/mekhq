@@ -94,6 +94,7 @@ v0.1.9 (SVN)
 + re-assign personnel to infantry and tank units when healed
 + Bug: infantry casualties not calculated correctly
 + Bug: temp medic number not showing
++ can't choose none as primary role and can always choose none as secondary role
 
 v0.1.8 (2011-06-13)
 + beginning of custom XP costs
