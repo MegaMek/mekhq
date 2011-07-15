@@ -236,7 +236,6 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 3;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
@@ -282,15 +281,16 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
             gridBagConstraints.gridy = 5;
             gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
             gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
-            getContentPane().add(lblToughness, gridBagConstraints);
+            panDemog.add(lblToughness, gridBagConstraints);
         
-            textToughness.setText("");
+            textToughness.setText(Integer.toString(person.getToughness()));
             textToughness.setName("textToughness"); // NOI18N
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = 5;
             gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-            getContentPane().add(textToughness, gridBagConstraints);
+            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+            panDemog.add(textToughness, gridBagConstraints);
         }
         
         scrBio.setName("jScrollPane2"); // NOI18N
@@ -403,6 +403,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         person.setBiography(txtBio.getText());
         person.setGender(choiceGender.getSelectedIndex());
         person.setBirthday(birthdate);  
+        person.setToughness(Integer.parseInt(textToughness.getText()));
         setSkills();
         setOptions();       
         if(isNewHire()) {

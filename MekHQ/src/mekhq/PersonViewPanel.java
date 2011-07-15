@@ -317,30 +317,29 @@ public class PersonViewPanel extends javax.swing.JPanel {
 				pnlStats.add(lblValue, gridBagConstraints);
 			}
 		}
-		/*	
-			if(campaign.getCampaignOptions().useToughness()) {
-				secondy++;
-				lblTough1.setName("lblTough1"); // NOI18N
-				lblTough1.setText(resourceMap.getString("lblTough1.text"));
-				gridBagConstraints = new java.awt.GridBagConstraints();
-				gridBagConstraints.gridx = 2;
-				gridBagConstraints.gridy = secondy;
-				gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-				gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-				pnlStats.add(lblTough1, gridBagConstraints);
+		
+		if(campaign.getCampaignOptions().useToughness()) {
+			secondy++;
+			lblTough1.setName("lblTough1"); // NOI18N
+			lblTough1.setText(resourceMap.getString("lblTough1.text"));
+			gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints.gridx = 2;
+			gridBagConstraints.gridy = secondy;
+			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			pnlStats.add(lblTough1, gridBagConstraints);
 				
-				lblTough2.setName("lblTough2"); // NOI18N
-				lblTough2.setText(Integer.toString(pp.getPilot().getToughness()));
-				gridBagConstraints = new java.awt.GridBagConstraints();
-				gridBagConstraints.gridx = 3;
-				gridBagConstraints.gridy = secondy;
-				gridBagConstraints.weightx = 0.5;
-				gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-				gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-				gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-				pnlStats.add(lblTough2, gridBagConstraints);
-			}		
-			*/
+			lblTough2.setName("lblTough2"); // NOI18N
+			lblTough2.setText("+" + Integer.toString(person.getToughness()));
+			gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints.gridx = 3;
+			gridBagConstraints.gridy = secondy;
+			gridBagConstraints.weightx = 0.5;
+			gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			pnlStats.add(lblTough2, gridBagConstraints);
+		}		
 		if(campaign.getCampaignOptions().useEdge()) {
 			secondy++;
 			lblEdge1.setName("lblEdge1"); // NOI18N

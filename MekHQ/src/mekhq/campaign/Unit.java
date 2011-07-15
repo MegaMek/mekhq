@@ -2670,7 +2670,6 @@ public class Unit implements Serializable, MekHqXmlSerializable {
              }
     	}
     	pilot.setOptions(options);
-    	//TODO: record hits (as well as commander hit, driver hit, etc.)
     	if(usesSoloPilot()) {
     		if(!commander.isActive()) {
     			entity.setCrew(null);
@@ -2703,7 +2702,9 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     			return;
     		}
     	}
-    	//TODO: set toughness
+    	if(!usesSoloPilot()) {
+    		pilot.setToughness(commander.getToughness());
+    	}
     	//TODO: game option to use tactics as command and ind init bonus
     	if(commander.hasSkill(SkillType.S_TACTICS)) {
     		pilot.setCommandBonus(commander.getSkill(SkillType.S_TACTICS).getFinalSkillValue());

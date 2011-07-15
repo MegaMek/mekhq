@@ -118,8 +118,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     protected GregorianCalendar birthday;
     
     private Hashtable<String,Skill> skills;
-    
     private PilotOptions options = new PilotOptions();
+    private int toughness;
     
     private int rank;
     private int status;
@@ -169,6 +169,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         ranks = r;
         doctorId = -1;
         unitId = -1;
+        toughness = 0;
         resetMinutesLeft();
     }
     
@@ -1560,5 +1561,13 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     
     public boolean isDoctor() {
     	return primaryRole == T_DOCTOR && hasSkill(SkillType.S_DOCTOR);
+    }
+    
+    public int getToughness() {
+    	return toughness;
+    }
+    
+    public void setToughness(int t) {
+    	toughness = t;
     }
 }
