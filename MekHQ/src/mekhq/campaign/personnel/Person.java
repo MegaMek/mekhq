@@ -272,9 +272,6 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     
     public void setStatus(int s) {
     	this.status = s;
-    	if(status != S_ACTIVE) {
-    		doctorId = -1;
-    	}
     }
 
     public static String getRoleDesc(int type) {

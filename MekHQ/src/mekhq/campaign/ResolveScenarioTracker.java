@@ -425,10 +425,10 @@ public class ResolveScenarioTracker {
 			person.setXp(person.getXp() + status.xp);
 			person.setHits(status.getHits());
 			if(status.isMissing()) {
-				person.setStatus(Person.S_MIA);
+				campaign.changeStatus(person, Person.S_MIA);
 			}
 			if(status.isDead()) {
-				person.setStatus(Person.S_KIA);
+				campaign.changeStatus(person, Person.S_KIA);
 			}
 		}
 		

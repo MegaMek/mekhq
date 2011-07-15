@@ -4986,7 +4986,7 @@ public class MekHQView extends FrameView {
 									+ person.getDesc()
 									+ " to a non-active status?", "KIA?",
 									JOptionPane.YES_NO_OPTION))) {
-						person.setStatus(selected);
+						campaign.changeStatus(person, selected);
 					}
 				}
 				refreshServicedUnitList();

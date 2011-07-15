@@ -2625,4 +2625,15 @@ public class Campaign implements Serializable {
 	public void decreaseMedicPool(int i) {
 		medicPool = Math.max(0, medicPool - i);
 	}
+	
+	public void changeStatus(Person person, int status) {
+		Unit u = getUnit(person.getUnitId());
+		person.setStatus(status);
+		if(status != Person.S_ACTIVE) {
+    		person.setDoctorId(-1);
+    		if(null != u) {
+    			u.remove(person);
+    		}
+    	}
+	}
 }
