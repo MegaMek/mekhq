@@ -91,6 +91,7 @@ v0.1.9 (SVN)
 + add commander special abilities to unit pilot
 + set hits for pilot from personnel
 + remove unit and doctor assignments when personnel changed to non-active status
++ re-assign personnel to infantry and tank units when healed
 
 v0.1.8 (2011-06-13)
 + beginning of custom XP costs

@@ -192,7 +192,7 @@ public class ResolveScenarioTracker {
 		PersonStatus status;
 		for(Unit u : units) {
 			//shuffling the crew ensures that casualties are randomly assigned in multi-crew units
-			ArrayList<Person> crew = shuffleCrew(u.getCrew());
+			ArrayList<Person> crew = shuffleCrew(u.getActiveCrew());
 			Entity en = entities.get(u.getId());
 			int casualties = 0;
 			int casualtiesAssigned = 0;
@@ -386,6 +386,23 @@ public class ResolveScenarioTracker {
 		if(m instanceof Contract) {
 			blc = ((Contract)m).getBattleLossComp()/100.0;
 		}
+			
+		//now lets update personnel
+		for(int pid : peopleStatus.keySet()) {
+			Person person = campaign.getPerson(pid);
+			PersonStatus status = peopleStatus.get(pid);
+			if(null == person || null == status) {
+				continue;
+			}
+			person.setXp(person.getXp() + status.xp);
+			person.setHits(status.getHits());
+			if(status.isMissing()) {
+				campaign.changeStatus(person, Person.S_MIA);
+			}
+			if(status.isDead()) {
+				campaign.changeStatus(person, Person.S_KIA);
+			}
+		}
 		
 		//now lets update all units
 		for(Unit unit : units) {
@@ -403,6 +420,7 @@ public class ResolveScenarioTracker {
 				long currentValue = unit.getValueOfAllMissingParts();
 				unit.setEntity(en);
 				unit.runDiagnostic();
+				unit.resetPilotAndEntity();
 				//check for BLC
 				long newValue = unit.getValueOfAllMissingParts();
 				campaign.addReport(unit.getEntity().getDisplayName() + " has been recovered.");
@@ -412,23 +430,6 @@ public class ResolveScenarioTracker {
 					DecimalFormat formatter = new DecimalFormat();
 					campaign.addReport(formatter.format(finalValue) + " in battle loss compensation for parts for " + en.getDisplayName() + " has been credited to your account.");
 				}
-			}
-		}
-	
-		//now lets update personnel
-		for(int pid : peopleStatus.keySet()) {
-			Person person = campaign.getPerson(pid);
-			PersonStatus status = peopleStatus.get(pid);
-			if(null == person || null == status) {
-				continue;
-			}
-			person.setXp(person.getXp() + status.xp);
-			person.setHits(status.getHits());
-			if(status.isMissing()) {
-				campaign.changeStatus(person, Person.S_MIA);
-			}
-			if(status.isDead()) {
-				campaign.changeStatus(person, Person.S_KIA);
 			}
 		}
 		

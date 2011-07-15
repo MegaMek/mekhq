@@ -651,14 +651,18 @@ public class Campaign implements Serializable {
 		return toReturn;
 	}
 	
-	public String healPerson(IMedicalWork medWork, Person doctor) {
+	public String healPerson(Person medWork, Person doctor) {
 		String report = "";
 		report += doctor.getName() + " attempts to heal " + medWork.getPatientName();   
 		TargetRoll target = getTargetFor(medWork, doctor);
 		int roll = Compute.d6(2);
 		report = report + ",  needs " + target.getValueAsString() + " and rolls " + roll + ":";
 		if(roll >= target.getValue()) {
-			report = report + medWork.succeed();	
+			report = report + medWork.succeed();
+			Unit u = getUnit(medWork.getUnitId());
+			if(null != u) {
+				u.resetPilotAndEntity();
+			}
 		} else {
 			report = report + medWork.fail(0);
 		}
@@ -799,6 +803,10 @@ public class Campaign implements Serializable {
 					addReport(healPerson(p, doctor));
 				} else if(p.checkNaturalHealing()) {
 					addReport(p.getDesc() + " heals naturally!");
+					Unit u = getUnit(p.getUnitId());
+					if(null != u) {
+						u.resetPilotAndEntity();
+					}
 				}
 			} 
 		}
