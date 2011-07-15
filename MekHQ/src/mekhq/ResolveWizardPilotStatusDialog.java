@@ -25,11 +25,14 @@ import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagLayout;
 import java.util.ArrayList;
+import java.util.Hashtable;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JRadioButton;
+import javax.swing.JSlider;
 
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
@@ -51,9 +54,8 @@ public class ResolveWizardPilotStatusDialog extends javax.swing.JDialog {
     private javax.swing.JScrollPane scrMissingPilots;
 	private javax.swing.JPanel panMissingPilots;
     private javax.swing.JTextArea txtInstructions;
-    private ArrayList<JRadioButton> activeBtns;
-    private ArrayList<JRadioButton> miaBtns;
-    private ArrayList<JRadioButton> kiaBtns;
+    private ArrayList<JCheckBox> miaBtns;
+    private ArrayList<JSlider> hitSliders;
     private ArrayList<PersonStatus> statuses;
 
 	
@@ -74,9 +76,8 @@ public class ResolveWizardPilotStatusDialog extends javax.swing.JDialog {
         btnCancel = new javax.swing.JButton();
         scrMissingPilots = new javax.swing.JScrollPane();
         txtInstructions = new javax.swing.JTextArea();
-        activeBtns = new ArrayList<JRadioButton>();
-        miaBtns = new ArrayList<JRadioButton>();
-        kiaBtns = new ArrayList<JRadioButton>();
+        miaBtns = new ArrayList<JCheckBox>();
+        hitSliders = new ArrayList<JSlider>();
         statuses = new ArrayList<PersonStatus>();
      
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -111,33 +112,49 @@ public class ResolveWizardPilotStatusDialog extends javax.swing.JDialog {
         panMissingPilots.setName("panMissingPilots");
         panMissingPilots.setLayout(new GridBagLayout()); 
         
-        int i = 1;
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.CENTER;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        panMissingPilots.add(new JLabel("Hits"), gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.CENTER;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        panMissingPilots.add(new JLabel("MIA"), gridBagConstraints);
+        
+        int i = 2;
         JLabel nameLbl;
-        JRadioButton activeButton;
-        JRadioButton miaButton;
-        JRadioButton kiaButton; 
-        ButtonGroup group;
+        JCheckBox miaCheck;
+        JSlider hitSlider; 
+        Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
+        labelTable.put( new Integer( 0 ), new JLabel("0") );
+        labelTable.put( new Integer( 1 ), new JLabel("1") );
+        labelTable.put( new Integer( 2 ), new JLabel("2") );
+        labelTable.put( new Integer( 3 ), new JLabel("3") );
+        labelTable.put( new Integer( 4 ), new JLabel("4") );
+        labelTable.put( new Integer( 5 ), new JLabel("5") );
+        labelTable.put( new Integer( 6 ), new JLabel("Dead") );
         for(int pid : tracker.getPeopleStatus().keySet()) {
         	PersonStatus status = tracker.getPeopleStatus().get(pid);
         	statuses.add(status);
         	nameLbl = new JLabel(status.getName());
-        	activeButton = new JRadioButton("Active");
-        	activeBtns.add(activeButton);
-        	miaButton = new JRadioButton("MIA");
-        	miaBtns.add(miaButton);
-        	kiaButton = new JRadioButton("KIA"); 
-        	kiaBtns.add(kiaButton);
-        	if(status.isDead()) {
-        		kiaButton.setSelected(true);
-        	} else if(status.isMissing()) {
-        		miaButton.setSelected(true);
-        	} else {
-        		activeButton.setSelected(true);
-        	}
-        	group = new ButtonGroup();
-        	group.add(activeButton);
-        	group.add(miaButton);
-        	group.add(kiaButton);
+        	miaCheck = new JCheckBox("");
+        	miaBtns.add(miaCheck);
+        	hitSlider = new JSlider(JSlider.HORIZONTAL, 0, 6, status.getHits());
+        	hitSlider.setMajorTickSpacing(1);
+        	hitSlider.setPaintTicks(true);
+        	hitSlider.setLabelTable(labelTable);
+        	hitSlider.setPaintLabels(true);
+        	hitSlider.setSnapToTicks(true);
+        	hitSliders.add(hitSlider);
+        	if(status.isMissing()) {
+        		miaCheck.setSelected(true);
+        	} 
         	gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = i;
@@ -146,11 +163,9 @@ public class ResolveWizardPilotStatusDialog extends javax.swing.JDialog {
             gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
             panMissingPilots.add(nameLbl, gridBagConstraints);
             gridBagConstraints.gridx = 1;
-            panMissingPilots.add(activeButton, gridBagConstraints);
+            panMissingPilots.add(hitSlider, gridBagConstraints);
             gridBagConstraints.gridx = 2;
-            panMissingPilots.add(miaButton, gridBagConstraints);
-            gridBagConstraints.gridx = 3;
-            panMissingPilots.add(kiaButton, gridBagConstraints);
+            panMissingPilots.add(miaCheck, gridBagConstraints);
             i++;
         }              
         scrMissingPilots.setViewportView(panMissingPilots);
@@ -215,27 +230,10 @@ public class ResolveWizardPilotStatusDialog extends javax.swing.JDialog {
     }
 
     private void btnNextActionPerformed(java.awt.event.ActionEvent evt) {
-    	for(int i = 0; i < activeBtns.size(); i++) {
+    	for(int i = 0; i < statuses.size(); i++) {
     		PersonStatus status = statuses.get(i);
-    		JRadioButton activeBtn = activeBtns.get(i);
-    		JRadioButton kiaBtn = kiaBtns.get(i);
-    		if(activeBtn.getModel().isSelected()) {
-    			if(status.isMissing()) {
-    				status.setMissing(false);
-    			}
-    			if(status.isDead()) {
-    				status.setHits(5);
-    			}
-    		}
-    		else if(kiaBtn.getModel().isSelected()) {
-    			status.setMissing(false);
-    			status.setHits(6);
-    		} else {
-    			if(status.isDead()) {
-    				status.setHits(5);
-    			}
-    			status.setMissing(true);
-    		}
+    		status.setMissing(miaBtns.get(i).isSelected());
+    		status.setHits(hitSliders.get(i).getValue());
     	}
     	this.setVisible(false);
     	if(tracker.getPotentialSalvage().size() > 0 

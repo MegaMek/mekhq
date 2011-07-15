@@ -96,6 +96,7 @@ v0.1.9 (SVN)
 + Bug: temp medic number not showing
 + can't choose none as primary role and can always choose none as secondary role
 + customizable XP bonus for scenario completion
++ improvements to ResolveWizardPilotStatus to allow hit editing
 
 v0.1.8 (2011-06-13)
 + beginning of custom XP costs
