@@ -201,7 +201,7 @@ public class ResolveScenarioTracker {
 				casualties = crew.size() - ((Infantry)en).getShootingStrength();
 			}
 			for(Person p : crew) {
-				status = new PersonStatus(p.getName(), p.getHits());			
+				status = new PersonStatus(p.getName(), u.getEntity().getDisplayName(), p.getHits());			
 				if(u.usesSoloPilot()) {
 					Pilot pilot = pilots.get(p.getId());
 					if(null == pilot) {
@@ -543,12 +543,14 @@ public class ResolveScenarioTracker {
 	public class PersonStatus {
 		
 		private String name;
+		private String unitName;
 		private int hits;
 		private boolean missing;
 		private int xp;
 		
-		public PersonStatus(String n, int h) {
+		public PersonStatus(String n, String u, int h) {
 			name = n;
+			unitName = u;
 			hits = h;
 			missing = false;
 			xp = 0;
@@ -556,6 +558,10 @@ public class ResolveScenarioTracker {
 		
 		public String getName() {
 			return name;
+		}
+		
+		public String getUnitName() {
+			return unitName;
 		}
 		
 		public int getHits() {

@@ -255,25 +255,6 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 		this.site = i;
 	}
 
-	/*
-	public PilotPerson getPilot() {
-		return pilot;
-	}
-
-	public void setPilot(PilotPerson pp) {
-		if (hasPilot()) {
-			pilot.setAssignedUnit(null);
-		}
-		this.pilot = pp;
-		if (null == pp) {
-			entity.setCrew(null);
-		} else {
-			pp.setAssignedUnit(this);
-			entity.setCrew(pp.getPilot());
-		}
-	}
-	*/
-
 	public int getQuality() {
 		return quality;
 	}
@@ -956,12 +937,16 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 		if (!isFunctional()) {
 			return "unit is not functional";
 		}
-		if (!hasPilot()) {
+		if (isUnmanned()) {
 			return "unit has no pilot";
+		}
+		if(entity instanceof Tank 
+				&& getActiveCrew().size() < getFullCrewSize()) {
+			return "This vehicle requires a crew of " + getFullCrewSize();
 		}
 		return null;
 	}
-
+	
 	/**
 	 * Have to make one here because the one in MegaMek only returns true if
 	 * operable
@@ -2577,6 +2562,9 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     	Person commander = null;
     	for(int pid : gunners) {
     		Person p = campaign.getPerson(pid);
+    		if((entity instanceof Tank || entity instanceof Infantry) && p.getHits() > 0) { 
+    			continue;
+    		}
     		if(p.getRank() > bestRank) {
     			commander = p;
     			bestRank = p.getRank();
@@ -2584,6 +2572,9 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     	}
     	for(int pid : drivers) {
     		Person p = campaign.getPerson(pid);
+    		if((entity instanceof Tank || entity instanceof Infantry) && p.getHits() > 0) { 
+    			continue;
+    		}
     		if(p.getRank() > bestRank) {
     			commander = p;
     			bestRank = p.getRank();
@@ -2702,15 +2693,26 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     			return;
     		}
     	}
-    	if(!usesSoloPilot()) {
-    		pilot.setToughness(commander.getToughness());
-    	}
+    	pilot.setToughness(commander.getToughness());
     	//TODO: game option to use tactics as command and ind init bonus
     	if(commander.hasSkill(SkillType.S_TACTICS)) {
     		pilot.setCommandBonus(commander.getSkill(SkillType.S_TACTICS).getFinalSkillValue());
     	}
     	entity.setCrew(pilot);  		
     }   
+    
+
+	public int getFullCrewSize() {
+		if(entity instanceof Tank) {
+			return (int)Math.ceil(entity.getWeight() / 15.0);
+		}
+		else if(entity instanceof Infantry) {
+			return ((Infantry)entity).getSquadN() * ((Infantry)entity).getSquadSize();
+		}
+		else {
+			return 1;
+		}
+	}
     
     public boolean canTakeMoreDrivers() {
     	int nDrivers = drivers.size();
@@ -2719,7 +2721,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     		return nDrivers == 0;
     	}
     	else if(entity instanceof Infantry) {
-    		return nDrivers < (((Infantry)entity).getSquadN() * ((Infantry)entity).getSquadSize());
+    		return nDrivers < getFullCrewSize();
     	}
     	return false;
     }
@@ -2731,17 +2733,16 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     		return nGunners == 0;
     	}
     	else if(entity instanceof Tank) {
-    		return nGunners < ((int)Math.ceil(entity.getWeight() / 15.0) - 1);
+    		return nGunners < (getFullCrewSize() - 1);
     	}
     	else if(entity instanceof Infantry) {
-    		return nGunners < (((Infantry)entity).getSquadN() * ((Infantry)entity).getSquadSize());
+    		return nGunners < getFullCrewSize();
     	}
     	return false;
     }
     
     public boolean usesSoloPilot() {
-    	return entity instanceof Mech || entity instanceof Aero 
-    				|| (entity instanceof Tank && entity.getWeight() <= 15);
+    	return getFullCrewSize() == 1;
     }
     
     public boolean usesSoldiers() {
@@ -2775,7 +2776,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     }
     
     public boolean isUnmanned() {
-    	return drivers.isEmpty() && gunners.isEmpty();
+    	return (null == getCommander());
     }
     
     /**
@@ -2843,7 +2844,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     	for(int id : drivers) {
     		Person p = campaign.getPerson(id);
     		if(null != p) {
-    			if(p.getHits() > 0 && !usesSoloPilot()) {
+    			if(p.getHits() > 0 && (entity instanceof Tank || entity instanceof Infantry)) {
     				continue;
     			}
     			crew.add(p);
@@ -2853,7 +2854,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 	    	for(int id : gunners) {
 	    		Person p = campaign.getPerson(id);
 	    		if(null != p) {
-	    			if(p.getHits() > 0 && !usesSoloPilot()) {
+	    			if(p.getHits() > 0 && (entity instanceof Tank || entity instanceof Infantry)) {
 	    				continue;
 	    			}
 	    			crew.add(p);
@@ -2874,6 +2875,5 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     
     public boolean isCommander(Person person) {
     	return person.getId() == getCommander().getId();
-    }
-    
+    }    
 }

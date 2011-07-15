@@ -97,7 +97,8 @@ public class ResolveWizardPilotStatusDialog extends javax.swing.JDialog {
         txtInstructions.setBorder(BorderFactory.createCompoundBorder(
 	   			 BorderFactory.createTitledBorder("Instructions"),
 	   			 BorderFactory.createEmptyBorder(5,5,5,5)));
-        txtInstructions.setPreferredSize(new Dimension(400,200));
+        txtInstructions.setMinimumSize(new Dimension(500,125));
+        txtInstructions.setPreferredSize(new Dimension(500,125));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -142,7 +143,7 @@ public class ResolveWizardPilotStatusDialog extends javax.swing.JDialog {
         for(int pid : tracker.getPeopleStatus().keySet()) {
         	PersonStatus status = tracker.getPeopleStatus().get(pid);
         	statuses.add(status);
-        	nameLbl = new JLabel(status.getName());
+        	nameLbl = new JLabel("<html>" + status.getName() + "<br><i> " + status.getUnitName() + "</i></html>");
         	miaCheck = new JCheckBox("");
         	miaBtns.add(miaCheck);
         	hitSlider = new JSlider(JSlider.HORIZONTAL, 0, 6, status.getHits());
@@ -169,7 +170,9 @@ public class ResolveWizardPilotStatusDialog extends javax.swing.JDialog {
             i++;
         }              
         scrMissingPilots.setViewportView(panMissingPilots);
-        
+        scrMissingPilots.setMinimumSize(new Dimension(500,400));
+        scrMissingPilots.setPreferredSize(new Dimension(500,400));
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;

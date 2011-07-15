@@ -273,18 +273,20 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
         panDemog.add(lblAge, gridBagConstraints);
         
+        
+        lblToughness.setText(resourceMap.getString("lblToughness.text")); // NOI18N
+        lblToughness.setName("lblToughness"); // NOI18N
+        
+        textToughness.setText(Integer.toString(person.getToughness()));
+        textToughness.setName("textToughness"); // NOI18N
+             
         if(campaign.getCampaignOptions().useToughness()) {
-        	lblToughness.setText(resourceMap.getString("lblToughness.text")); // NOI18N
-        	lblToughness.setName("lblToughness"); // NOI18N
-            gridBagConstraints = new java.awt.GridBagConstraints();
+        	gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = 5;
             gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
             gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
             panDemog.add(lblToughness, gridBagConstraints);
-        
-            textToughness.setText(Integer.toString(person.getToughness()));
-            textToughness.setName("textToughness"); // NOI18N
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = 5;
@@ -403,7 +405,11 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         person.setBiography(txtBio.getText());
         person.setGender(choiceGender.getSelectedIndex());
         person.setBirthday(birthdate);  
-        person.setToughness(Integer.parseInt(textToughness.getText()));
+        try {
+        	person.setToughness(Integer.parseInt(textToughness.getText()));
+        } catch(NumberFormatException e) {
+        	//dont do anything
+        }
         setSkills();
         setOptions();       
         if(isNewHire()) {

@@ -2146,6 +2146,7 @@ public class MekHQView extends FrameView {
 		refreshReport();
 		refreshFunds();
 		refreshLocation();
+		refreshOrganization();
 		panMap.repaint();
 		refreshFinancialTransactions();
 	}// GEN-LAST:event_btnAdvanceDayActionPerformed
@@ -3513,6 +3514,7 @@ public class MekHQView extends FrameView {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_QUALITY), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_STATUS), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_PILOT), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_CREW), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_DEPLOY), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_BV), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_REPAIR), false);
@@ -3530,6 +3532,7 @@ public class MekHQView extends FrameView {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_QUALITY), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_STATUS), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_PILOT), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_CREW), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_DEPLOY), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_BV), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_REPAIR), false);
@@ -3547,6 +3550,7 @@ public class MekHQView extends FrameView {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_QUALITY), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_STATUS), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_PILOT), false);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_CREW), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_DEPLOY), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_BV), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_REPAIR), true);
@@ -6821,12 +6825,13 @@ public class MekHQView extends FrameView {
         private final static int COL_QUALITY  =   8;
         private final static int COL_STATUS   =   9;
         private final static int COL_PILOT    =   10;
-        private final static int COL_DEPLOY   =   11;
-        private final static int COL_BV        =  12;
-        private final static int COL_REPAIR  =    13;
-        private final static int COL_PARTS    =   14;
-        private final static int COL_QUIRKS   =   15;
-        private final static int N_COL =          16;
+        private final static int COL_CREW     =   11;
+        private final static int COL_DEPLOY   =   12;
+        private final static int COL_BV        =  13;
+        private final static int COL_REPAIR  =    14;
+        private final static int COL_PARTS    =   15;
+        private final static int COL_QUIRKS   =   16;
+        private final static int N_COL =          17;
         
         private ArrayList<Unit> data = new ArrayList<Unit>();
         
@@ -6861,6 +6866,8 @@ public class MekHQView extends FrameView {
                     return "Status";
                 case COL_PILOT:
                     return "Assigned to";
+                case COL_CREW:
+                    return "Crew";
                 case COL_BV:
                     return "BV";
                 case COL_REPAIR:
@@ -6902,6 +6909,7 @@ public class MekHQView extends FrameView {
             case COL_QUALITY:
             case COL_QUIRKS:
             case COL_DEPLOY:
+            case COL_CREW:
             	return SwingConstants.CENTER;
             case COL_WEIGHT:
             case COL_COST:
@@ -7019,6 +7027,9 @@ public class MekHQView extends FrameView {
             	} else {
             		return "N";
             	}
+            }
+            if(col == COL_CREW) {
+            	return u.getActiveCrew().size() + "/" + u.getFullCrewSize();
             }
             return "?";
         }
