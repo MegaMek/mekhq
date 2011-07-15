@@ -2636,14 +2636,14 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     	if(entity instanceof Infantry) {
     		if(entity instanceof BattleArmor) {
     			for(int i = BattleArmor.LOC_TROOPER_1; i <= ((BattleArmor)entity).getTroopers(); i++) {
-    				if(i <= nDrivers) {
+    				if(i <= nGunners) {
     		    		entity.setInternal(1, i);
     				} else {
     		    		entity.setInternal(IArmorState.ARMOR_DESTROYED, i);
     				}
     			}
     		}
-    		entity.setInternal(nDrivers, Infantry.LOC_INFANTRY);
+    		entity.setInternal(nGunners, Infantry.LOC_INFANTRY);
     	}
     	if(drivers.isEmpty() && gunners.isEmpty()) {
     		entity.setCrew(null);

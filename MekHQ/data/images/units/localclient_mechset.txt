@@ -16,3 +16,15 @@
 # The tinting process is subtractive, so make images light.
 
 # As of v0.29.61, mechset files can include other mechset files.
+
+exact "Dragon Fire Monk" "customs/dragonfire_monk.gif"
+exact "Summoner Playboy-O" "customs/summoner_playboyO.gif"
+exact "Hellion DJ" "customs/hellion_DJ.gif"
+exact "Marauder FDM" "mechs/marauder_mad9s.gif"
+exact "Marauder Caveman" "mechs/marauder_mad9s.gif"
+exact "Black Hawk-KU Bandit O" "mechs/blackhawk_e.gif"
+exact "Black Hawk-KU Bandit A" "customs/blackhawk_bandit_a.gif"
+exact "Black Hawk-KU Bandit B" "customs/blackhawk_bandit_b.gif"
+exact "Black Hawk-KU Bandit C" "customs/blackhawk_bandit_c.gif"
+exact "Black Hawk-KU Bandit D" "customs/blackhawk_bandit_d.gif"
+exact "Penetrator Scar" "customs/penetrator_scar.gif"
