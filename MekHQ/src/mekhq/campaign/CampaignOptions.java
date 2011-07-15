@@ -69,6 +69,8 @@ public class CampaignOptions implements Serializable {
     private boolean sellUnits;
     private boolean sellParts;
 
+    //xp related
+    private int scenarioXP;
 
     public CampaignOptions () {
         useFactionModifiers = false;
@@ -92,6 +94,7 @@ public class CampaignOptions implements Serializable {
         payForTransport = false;
         sellUnits = false;
         sellParts = false;
+        scenarioXP = 1;
     }
 
     public static String getRepairSystemName (int repairSystem) {
@@ -265,6 +268,14 @@ public class CampaignOptions implements Serializable {
     public void setQuirks(boolean b) {
     	this.useQuirks = b;
     }
+    
+    public int getScenarioXP() {
+    	return scenarioXP;
+    }
+    
+    public void setScenarioXP(int xp) {
+    	scenarioXP = xp;
+    }
 
 	public void writeToXml(PrintWriter pw1, int indent) {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "<campaignOptions>");
@@ -289,6 +300,7 @@ public class CampaignOptions implements Serializable {
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "payForTransport", payForTransport);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "sellUnits", sellUnits);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "sellParts", sellParts);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "scenarioXP", scenarioXP);
 
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "</campaignOptions>");
 	}
@@ -411,6 +423,8 @@ public class CampaignOptions implements Serializable {
 					retVal.sellParts = true;
 				else
 					retVal.sellParts = false;
+			} else if (wn2.getNodeName().equalsIgnoreCase("scenarioXP")) {
+				retVal.scenarioXP = Integer.parseInt(wn2.getTextContent().trim());
 			} 
 		}
 

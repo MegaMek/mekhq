@@ -578,7 +578,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panXP.setLayout(new java.awt.GridBagLayout());
         
         lblScenarioXP = new JLabel(resourceMap.getString("lblScenarioXP.text"));
-        spnScenarioXP = new JSpinner(new SpinnerNumberModel(1, 0, 10, 1));
+        spnScenarioXP = new JSpinner(new SpinnerNumberModel(options.getScenarioXP(), 0, 10, 1));
         
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -1141,6 +1141,8 @@ private void txtNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
 	    options.setSellParts(sellPartsBox.isSelected());
 	
 	    options.setQuirks(useQuirksBox.isSelected());
+	    
+	    options.setScenarioXP((Integer)spnScenarioXP.getModel().getValue());
 	    
 	    //campaign.refreshAllUnitDiagnostics();
 	}

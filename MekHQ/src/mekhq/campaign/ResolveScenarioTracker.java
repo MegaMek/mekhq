@@ -249,7 +249,7 @@ public class ResolveScenarioTracker {
 						}
 					}
 				}
-				status.setXP(1);
+				status.setXP(campaign.getCampaignOptions().getScenarioXP());
 				peopleStatus.put(p.getId(), status);
 			}
 		}
