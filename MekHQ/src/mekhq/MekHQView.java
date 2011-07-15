@@ -3042,7 +3042,7 @@ public class MekHQView extends FrameView {
 	}
 	
 	protected void refreshTempMedics() {
-		String text = "<html><b>Temp Medics:</b> " +campaign.getAstechPool() + "</html>";
+		String text = "<html><b>Temp Medics:</b> " +campaign.getMedicPool() + "</html>";
 		lblTempMedics.setText(text);
 	}
 	
