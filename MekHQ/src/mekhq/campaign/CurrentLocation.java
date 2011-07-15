@@ -161,8 +161,8 @@ public class CurrentLocation implements Serializable {
 				jumpPath.removeFirstPlanet();
 				//reduce remaining hours by usedRechargeTime or usedTransitTime, whichever is greater
 				hours -= Math.max(usedRechargeTime, usedTransitTime);
-				rechargeTime = hours;
 				transitTime = currentPlanet.getTimeToJumpPoint(1.0);
+				rechargeTime = 0;
 				//if there are hours remaining, then begin recharging jump drive
 				usedRechargeTime = Math.min(hours, currentPlanet.getRechargeTime() - rechargeTime);
 				if(usedRechargeTime > 0) {

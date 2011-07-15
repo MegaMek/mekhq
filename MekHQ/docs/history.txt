@@ -102,6 +102,7 @@ v0.1.9 (SVN)
 + toughness back in
 + don't allow deployment of undermanned vees
 + Bug: astechs being counted twice
++ Bug 3317564: Bug in jumpship recharge
 
 v0.1.8 (2011-06-13)
 + beginning of custom XP costs
