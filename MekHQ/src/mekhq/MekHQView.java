@@ -107,6 +107,7 @@ import megamek.common.MechSummaryCache;
 import megamek.common.MiscType;
 import megamek.common.Mounted;
 import megamek.common.Pilot;
+import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
 import megamek.common.UnitType;
@@ -5930,7 +5931,15 @@ public class MekHQView extends FrameView {
             if(col == COL_ASSIGN) {
             	Unit u = campaign.getUnit(p.getUnitId());
             	if(null != u) {
-            		return u.getEntity().getDisplayName();
+            		String name = u.getEntity().getDisplayName();
+            		if(u.getEntity() instanceof Tank) {
+            			if(u.isDriver(p)) {
+            				name = "[Driver] " + name;
+            			} else {
+            				name = "[Gunner] " + name;
+            			}
+            		}
+            		return name;
             	}
             	return "-";
             }

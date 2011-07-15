@@ -98,6 +98,7 @@ v0.1.9 (SVN)
 + customizable XP bonus for scenario completion
 + improvements to ResolveWizardPilotStatus to allow hit editing
 + not counting soldiers without anti-mech skills
++ list whether driver or gunner in unit assignment for vee crewmembers
 
 v0.1.8 (2011-06-13)
 + beginning of custom XP costs
