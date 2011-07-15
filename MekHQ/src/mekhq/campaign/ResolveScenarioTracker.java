@@ -198,7 +198,7 @@ public class ResolveScenarioTracker {
 			int casualtiesAssigned = 0;
 			if(null != en && en instanceof Infantry && u.getEntity() instanceof Infantry) {
 				en.applyDamage();
-				casualties = ((Infantry)u.getEntity()).getShootingStrength() - ((Infantry)en).getShootingStrength();
+				casualties = crew.size() - ((Infantry)en).getShootingStrength();
 			}
 			for(Person p : crew) {
 				status = new PersonStatus(p.getName(), p.getHits());			
