@@ -101,6 +101,7 @@ v0.1.9 (SVN)
 + list whether driver or gunner in unit assignment for vee crewmembers
 + toughness back in
 + don't allow deployment of undermanned vees
++ Bug: astechs being counted twice
 
 v0.1.8 (2011-06-13)
 + beginning of custom XP costs

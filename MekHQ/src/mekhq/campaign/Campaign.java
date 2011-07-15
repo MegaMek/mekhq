@@ -2539,7 +2539,7 @@ public class Campaign implements Serializable {
 	}
 	
 	public int getNumberSecondaryAstechs() {
-		int astechs = astechPool;
+		int astechs = 0;
 		for(Person p : personnel) {
 			if((p.getSecondaryRole() == Person.T_ASTECH)
 					&& p.isActive() && !p.isDeployed(this)) {
