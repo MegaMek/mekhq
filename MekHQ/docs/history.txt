@@ -103,7 +103,8 @@ v0.1.9 (SVN)
 + don't allow deployment of undermanned vees
 + Bug: astechs being counted twice
 + Bug 3317564: Bug in jumpship recharge
-+ Bug 3359083: Extra time errata 
++ updated MM.jar
++ updated Fox's Teeth campaign
 
 v0.1.8 (2011-06-13)
 + beginning of custom XP costs
