@@ -30,7 +30,7 @@ import mekhq.campaign.team.SupportTeam;
  * @author Jay
  */
 public abstract interface IWork {
-	
+	/*
 	public static final int MODE_NORMAL = 0;
 	public static final int MODE_EXTRA_ONE = 1;
 	public static final int MODE_EXTRA_TWO = 2;
@@ -38,7 +38,7 @@ public abstract interface IWork {
 	public static final int MODE_RUSH_TWO = 4;
 	public static final int MODE_RUSH_THREE = 5;
 	public static final int MODE_N = 6;
-	
+	*/
 	public abstract boolean needsFixing();
 	
 	public abstract int getDifficulty();

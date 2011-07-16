@@ -1063,7 +1063,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 	}
 	
 	@Override public int getMode() {
-		return IWork.MODE_NORMAL;
+		return Modes.MODE_NORMAL;
 	}
 	
 

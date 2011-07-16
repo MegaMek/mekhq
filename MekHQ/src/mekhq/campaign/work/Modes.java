@@ -24,19 +24,22 @@ package mekhq.campaign.work;
 public class Modes {
 	
 	public static final int MODE_NORMAL = 0;
-	public static final int MODE_EXTRA_ONE = 1;
-	public static final int MODE_EXTRA_TWO = 2;
-	public static final int MODE_RUSH_ONE = 3;
-	public static final int MODE_RUSH_TWO = 4;
-	public static final int MODE_RUSH_THREE = 5;
-	public static final int MODE_N = 6;
+	public static final int MODE_EXTRA_DOUBLE = 1;
+	public static final int MODE_EXTRA_TRIPLE = 2;
+	public static final int MODE_EXTRA_QUAD = 3;
+	public static final int MODE_RUSH_ONE = 4;
+	public static final int MODE_RUSH_TWO = 5;
+	public static final int MODE_RUSH_THREE = 6;
+	public static final int MODE_N = 7;
 	
-	public int getModeMod(int mode) {
+	public static int getModeMod(int mode) {
 		switch (mode) {
-		case MODE_EXTRA_ONE:
+		case MODE_EXTRA_DOUBLE:
 			return -1;
-		case MODE_EXTRA_TWO:
+		case MODE_EXTRA_TRIPLE:
 			return -2;
+		case MODE_EXTRA_QUAD:
+			return -3;
 		default:
 			return 0;
 		}
@@ -57,10 +60,12 @@ public class Modes {
 
 	public static String getModeName(int mode) {
 		switch (mode) {
-		case MODE_EXTRA_ONE:
-			return "Extra time";
-		case MODE_EXTRA_TWO:
+		case MODE_EXTRA_DOUBLE:
 			return "Extra time (x2)";
+		case MODE_EXTRA_TRIPLE:
+			return "Extra time (x3)";
+		case MODE_EXTRA_QUAD:
+			return "Extra time (x4)";
 		case MODE_RUSH_ONE:
 			return "Rush Job (1/2)";
 		case MODE_RUSH_TWO:

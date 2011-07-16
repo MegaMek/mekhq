@@ -3775,7 +3775,7 @@ public class MekHQView extends FrameView {
 				JCheckBoxMenuItem cbMenuItem = null;
 				// Mode (extra time, rush job, ...
 				menu = new JMenu("Mode");
-				for (int i = 0; i < Part.MODE_N; i++) {
+				for (int i = 0; i < Modes.MODE_N; i++) {
 					cbMenuItem = new JCheckBoxMenuItem(
 							Modes.getModeName(i));
 					if (part.getMode() == i) {

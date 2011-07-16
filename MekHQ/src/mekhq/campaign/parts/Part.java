@@ -35,6 +35,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.team.SupportTeam;
 import mekhq.campaign.work.IPartWork;
+import mekhq.campaign.work.Modes;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -126,7 +127,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		this.unitTonnage = tonnage;
 		this.hits = 0;
 		this.skillMin = SkillType.EXP_GREEN;
-		this.mode = MODE_NORMAL;
+		this.mode = Modes.MODE_NORMAL;
 		this.timeSpent = 0;
 		this.teamId = -1;
 		this.time = 0;
@@ -214,7 +215,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		toReturn += "" + getTimeLeft() + " minutes" + scheduled;
 		toReturn += ", " + SkillType.getExperienceLevelName(getSkillMin());
 		toReturn += " " + bonus;
-		if (getMode() != MODE_NORMAL) {
+		if (getMode() != Modes.MODE_NORMAL) {
 			toReturn += "<br/><i>" + getCurrentModeName() + "</i>";
 		}
 		toReturn += "</font></html>";
@@ -430,15 +431,17 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	@Override
 	public int getActualTime() {
 		switch (mode) {
-		case MODE_EXTRA_ONE:
+		case Modes.MODE_EXTRA_DOUBLE:
 			return 2 * time;
-		case MODE_EXTRA_TWO:
+		case Modes.MODE_EXTRA_TRIPLE:
+			return 3 * time;
+		case Modes.MODE_EXTRA_QUAD:
 			return 4 * time;
-		case MODE_RUSH_ONE:
+		case Modes.MODE_RUSH_ONE:
 			return (int) Math.ceil(time / 2.0);
-		case MODE_RUSH_TWO:
+		case Modes.MODE_RUSH_TWO:
 			return (int) Math.ceil(time / 4.0);
-		case MODE_RUSH_THREE:
+		case Modes.MODE_RUSH_THREE:
 			return (int) Math.ceil(time / 8.0);
 		default:
 			return time;
@@ -483,8 +486,8 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	@Override
 	public TargetRoll getAllMods() {
 		TargetRoll mods = new TargetRoll(getDifficulty(), "difficulty");
-		if (getModeMod() != 0) {
-			mods.addModifier(getModeMod(), getCurrentModeName());
+		if (Modes.getModeMod(mode) != 0) {
+			mods.addModifier(Modes.getModeMod(mode), getCurrentModeName());
 		}
 		if(null != unit) {
 			mods.append(unit.getSiteMod());
@@ -498,38 +501,9 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         mods.addModifier(Availability.getTechModifier(getTechRating()), "tech rating " + EquipmentType.getRatingName(getTechRating()));
 		return mods;
 	}
-	
-
-	public int getModeMod() {
-		switch (mode) {
-		case MODE_EXTRA_ONE:
-			return -1;
-		case MODE_EXTRA_TWO:
-			return -2;
-		default:
-			return 0;
-		}
-	}
-
-	public static String getModeName(int mode) {
-		switch (mode) {
-		case MODE_EXTRA_ONE:
-			return "Extra time";
-		case MODE_EXTRA_TWO:
-			return "Extra time (x2)";
-		case MODE_RUSH_ONE:
-			return "Rush Job (1/2)";
-		case MODE_RUSH_TWO:
-			return "Rush Job (1/4)";
-		case MODE_RUSH_THREE:
-			return "Rush Job (1/8)";
-		default:
-			return "Normal";
-		}
-	}
 
 	public String getCurrentModeName() {
-		return getModeName(mode);
+		return Modes.getModeName(mode);
 	}
 	
 	@Override
