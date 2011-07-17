@@ -1,5 +1,7 @@
 VERSION HISTORY
 ----------------------------------
+v0.1.10 (SVN)
+
 v0.1.9 (2011-07-17)
 + beginning of personnel switch (hold on to your hats!)
 + updated personnel views with new skills
