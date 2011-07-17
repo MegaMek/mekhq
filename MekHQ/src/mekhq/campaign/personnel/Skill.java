@@ -200,4 +200,8 @@ public class Skill implements Serializable, MekHqXmlSerializable {
 		
 		return retVal;
 	}
+	
+	public void updateType() {
+		type = SkillType.getType(type.getName());
+	}
 }

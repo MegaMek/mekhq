@@ -1533,6 +1533,9 @@ public class Campaign implements Serializable {
 			
 			psn.setRankSystem(retVal.ranks);
 			
+			//skill types might need resetting
+			psn.resetSkillTypes();
+			
 			//reverse compatability check for assigning support personnel
 			//characteristics from their support team
 			if (psn.getOldSupportTeamId() >= 0) {

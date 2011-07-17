@@ -1570,4 +1570,11 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     public void setToughness(int t) {
     	toughness = t;
     }
+    
+    public void resetSkillTypes() {
+    	for(String skillName : skills.keySet()) {
+    		Skill s = skills.get(skillName);
+    		s.updateType();
+    	}
+    }
 }

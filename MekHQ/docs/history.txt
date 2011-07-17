@@ -105,6 +105,7 @@ v0.1.9 (SVN)
 + Bug 3317564: Bug in jumpship recharge
 + updated MM.jar
 + updated Fox's Teeth campaign
++ need to reset skill types during XML load
 
 v0.1.8 (2011-06-13)
 + beginning of custom XP costs
