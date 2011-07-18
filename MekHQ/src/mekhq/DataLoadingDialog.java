@@ -21,51 +21,111 @@ package mekhq;
 
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JProgressBar;
+import javax.swing.SwingWorker;
+
+import org.jdesktop.application.SingleFrameApplication;
 
 import megamek.common.MechSummaryCache;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.Planets;
 
-public class DataLoadingDialog extends JDialog {
+public class DataLoadingDialog extends JDialog implements PropertyChangeListener {
 
     /**
      * 
      */
     private static final long serialVersionUID = -3454307876761238915L;
     private JProgressBar progressBar;
+    private JLabel progressLbl;
+    Task task;
+    SingleFrameApplication app;
+    Campaign campaign;
  
-    public DataLoadingDialog(JFrame frame) {
-        super(frame, "Data Loading"); //$NON-NLS-1$
-       
-        progressBar = new JProgressBar(0, 2);
+    public DataLoadingDialog(SingleFrameApplication app) {
+        super(app.getMainFrame(), "Data Loading"); //$NON-NLS-1$
+        this.app = app;
+        
+        progressBar = new JProgressBar(0, 3);
         progressBar.setValue(0);
         progressBar.setStringPainted(true);
 
         progressBar.setVisible(true);
-        JLabel testLabel = new JLabel("Loading Data, Please Wait");
-        getContentPane().setLayout(new GridLayout(1, 2));
-        getContentPane().add(testLabel);
-        //getContentPane().add(progressBar);
+        progressLbl = new JLabel("Loading Planetary Data...");
+        getContentPane().setLayout(new GridLayout(2, 1));
+        getContentPane().add(progressLbl);
+        getContentPane().add(progressBar);
         
         setSize(250, 130);
         // move to middle of screen
-        Dimension screenSize = frame.getToolkit().getScreenSize();
+        Dimension screenSize = app.getMainFrame().getToolkit().getScreenSize();
         setLocation(screenSize.width / 2 - getSize().width / 2,
                 screenSize.height / 2 - getSize().height / 2);
+        
+        task = new Task();
+        task.addPropertyChangeListener(this);
+        task.execute();
+    }
+    
+    class Task extends SwingWorker<Void, Void> {
+        /*
+         * Main task. Executed in background thread.
+         */
+        @Override
+        public Void doInBackground() {
+            //Initialize progress property.
+            setProgress(0);
+            while (!Planets.getInstance().isInitialized()) {
+                //Sleep for up to one second.
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException ignore) {
+                	
+                }
+            }
+            setProgress(1);
+            while (!MechSummaryCache.getInstance().isInitialized()) {
+                //Sleep for up to one second.
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException ignore) {
+                	
+                }
+            }
+            setProgress(2);
+            campaign = new Campaign();
+            setProgress(3);
+            return null;
+        }
+
+        /*
+         * Executed in event dispatching thread
+         */
+        @Override
+        public void done() {
+            //Toolkit.getDefaultToolkit().beep();
+        	setVisible(false);
+        	app.show(new MekHQView(app, campaign));
+        }
     }
 
-    public void updateProgress() {
-    	int value = 0;
-    	if(Planets.getInstance().isInitialized()) {
-    		value++;
-    	}
-    	if(MechSummaryCache.getInstance().isInitialized()) {
-    		value++;
-    	}
-    	progressBar.setValue(value);
-    }
+	@Override
+	public void propertyChange(PropertyChangeEvent arg0) {
+	     progressBar.setValue(task.getProgress());
+	     if(Planets.getInstance().isInitialized()) {
+	    	 if(MechSummaryCache.getInstance().isInitialized()) {
+		    	 progressLbl.setText("Loading Campaign...");
+		     } else {
+		    	 progressLbl.setText("Loading Unit Data...");
+		     }
+	     }
+	     
+	}
+    
 }

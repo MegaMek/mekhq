@@ -264,7 +264,7 @@ public class MekHQView extends FrameView {
     private DirectoryItems forceIcons;
 	protected static MechTileset mt;
 	
-	public MekHQView(SingleFrameApplication app) {
+	public MekHQView(SingleFrameApplication app, Campaign c) {
 		super(app);
 
 		unitMouseAdapter = new UnitTableMouseAdapter();
@@ -275,23 +275,6 @@ public class MekHQView extends FrameView {
 		orgMouseAdapter = new OrgTreeMouseAdapter();
 		scenarioMouseAdapter = new ScenarioTableMouseAdapter();
        	
-		//load planets and mech cache
-		/*
-		 * TODO: This isnt working for some reason - the dialog pops up, but it wont show
-		 * its contents until verything else in the constructor is done initializing
-		*/
-		DataLoadingDialog dataLoadingDialog = new DataLoadingDialog(getFrame());
-		dataLoadingDialog.setVisible(true);
-		while (!Planets.getInstance().isInitialized() || !MechSummaryCache.getInstance().isInitialized()) {      	
-			dataLoadingDialog.updateProgress();
-			try {
-				Thread.sleep(50);
-			} catch (InterruptedException e) {
-				// not supposed to come here
-			}
-		}
-		dataLoadingDialog.setVisible(false);
-
 		//load in directory items and tilesets
 		try {
             portraits = new DirectoryItems(new File("data/images/portraits"), "", //$NON-NLS-1$ //$NON-NLS-2$
@@ -319,7 +302,7 @@ public class MekHQView extends FrameView {
             //TODO: do something here
         }
 
-        campaign = new Campaign();
+        campaign = c;
 		initComponents();
 		refreshCalendar();
 		       

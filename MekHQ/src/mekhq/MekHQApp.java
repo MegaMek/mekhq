@@ -80,7 +80,8 @@ public class MekHQApp extends SingleFrameApplication {
         //redirect output to log file
         redirectOutput();
         
-        show(new MekHQView(this));
+        show(new StartUpDialog(this));
+
     }
 
     /**
