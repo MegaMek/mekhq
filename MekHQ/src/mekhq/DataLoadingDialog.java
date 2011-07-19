@@ -80,7 +80,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         progressBar.setString("Loading Planetary Data...");
         
         // initialize splash image
-        Image imgSplash = app.getMainFrame().getToolkit().getImage("data/images/misc/megamek-splash.jpg"); //$NON-NLS-1$
+        Image imgSplash = app.getMainFrame().getToolkit().getImage("data/images/misc/mekhq-load.png"); //$NON-NLS-1$
 
         // wait for splash image to load completely
         MediaTracker tracker = new MediaTracker(app.getMainFrame());
