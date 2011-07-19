@@ -23,6 +23,8 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.io.FileInputStream;
 
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -47,10 +49,12 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
     Task task;
     SingleFrameApplication app;
     Campaign campaign;
+    File fileCampaign;
  
-    public DataLoadingDialog(SingleFrameApplication app) {
+    public DataLoadingDialog(SingleFrameApplication app, File f) {
         super(app.getMainFrame(), "Data Loading"); //$NON-NLS-1$
         this.app = app;
+        this.fileCampaign = f;
         
         progressBar = new JProgressBar(0, 3);
         progressBar.setValue(0);
@@ -99,7 +103,24 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                 }
             }
             setProgress(2);
-            campaign = new Campaign();
+            if(null == fileCampaign) {
+            	campaign = new Campaign();
+            } else {
+            	MekHQApp.logMessage("Loading campaign file from XML...");
+
+        		// And then load the campaign object from it.
+        		FileInputStream fis = null;
+
+        		try {
+        			fis = new FileInputStream(fileCampaign);
+        			campaign = Campaign.createCampaignFromXMLFileInputStream(fis);
+        			// Restores all transient attributes from serialized objects
+        			campaign.restore();
+        			fis.close();
+        		} catch (Exception ex) {
+        			ex.printStackTrace();
+        		}
+            }
             setProgress(3);
             return null;
         }

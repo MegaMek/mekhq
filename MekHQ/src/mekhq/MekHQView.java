@@ -1835,6 +1835,28 @@ public class MekHQView extends FrameView {
 		statusPanel.add(lblTempAstechs);
 		refreshTempMedics();
 		statusPanel.add(lblTempMedics);
+		
+		refreshServicedUnitList();
+		refreshUnitList();
+		refreshPersonnelList();
+		changePersonnelView();
+		refreshTaskList();
+		refreshAcquireList();
+		refreshTechsList();
+		refreshPatientList();
+		refreshDoctorsList();
+		refreshPartsList();
+		refreshCalendar();
+		refreshReport();
+		refreshFunds();
+		refreshFinancialTransactions();
+		refreshOrganization();
+		refreshMissions();
+		refreshLocation();
+		refreshTempAstechs();
+		refreshTempMedics();
+		panMap.setCampaign(campaign);
+		
 	/*	statusPanelSeparator.setName("statusPanelSeparator"); // NOI18N
 		statusMessageLabel.setName("statusMessageLabel"); // NOI18N
 		statusAnimationLabel

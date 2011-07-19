@@ -7,6 +7,12 @@
 package mekhq;
 
 import java.awt.Frame;
+import java.awt.GridLayout;
+import java.io.File;
+import java.io.FileInputStream;
+
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileFilter;
 
 import org.jdesktop.application.SingleFrameApplication;
 
@@ -41,37 +47,89 @@ public class StartUpDialog extends javax.swing.JDialog {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
 
-        java.awt.GridBagConstraints gridBagConstraints;
-        getContentPane().setLayout(new java.awt.GridBagLayout());
-
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(StartUpDialog.class);
         
-        btnNewGame = new javax.swing.JButton("Start a New Game");
+        btnNewGame = new javax.swing.JButton("Start a New Campaign");
         btnNewGame.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
             	setVisible(false);
-            	loadNewCampaign();  	
+            	loadCampaign(false);  	
             }
         });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        getContentPane().add(btnNewGame, gridBagConstraints);
+        btnLoadGame = new javax.swing.JButton("Load a Campaign");
+        btnLoadGame.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            	setVisible(false);
+            	loadCampaign(true);  	
+            }
+        });
+        btnQuit = new javax.swing.JButton("Quit");
+        btnQuit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                System.exit(0);
+            }
+        });
+        
+        getContentPane().setLayout(new GridLayout(3, 0));
+        getContentPane().add(btnNewGame);
+        getContentPane().add(btnLoadGame);
+        getContentPane().add(btnQuit);
+
      
         pack();
     }
 
-    private void loadNewCampaign() {
-    	DataLoadingDialog dataLoadingDialog = new DataLoadingDialog(app);   	
+    private void loadCampaign(boolean loadCampaign) {
+    	File f = null;
+    	if(loadCampaign) {
+    		f = selectLoadCampaignFile();
+    	}
+    	DataLoadingDialog dataLoadingDialog = new DataLoadingDialog(app, f);   	
     	dataLoadingDialog.setVisible(true);
     }
     
+    private File selectLoadCampaignFile() {
+		JFileChooser loadCpgn = new JFileChooser(".");
+		loadCpgn.setDialogTitle("Load Campaign");
+		loadCpgn.setFileFilter(new ExtFileFilter(".xml"));
+		int returnVal = loadCpgn.showOpenDialog(app.getMainFrame());
+
+		if ((returnVal != JFileChooser.APPROVE_OPTION)
+				|| (loadCpgn.getSelectedFile() == null)) {
+			// I want a file, y'know!
+			return null;
+		}
+		
+		File file = loadCpgn.getSelectedFile();
+
+		return file;
+	}
+    
+    class ExtFileFilter extends FileFilter {
+		private String useExt = null;
+
+		public ExtFileFilter(String ext) {
+			useExt = ext;
+		}
+
+		@Override
+		public boolean accept(File dir) {
+			if (dir.isDirectory()) {
+				return true;
+			}
+			return dir.getName().endsWith(useExt);
+		}
+
+		@Override
+		public String getDescription() {
+			return "campaign file (" + useExt + ")";
+		}
+	}
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnNewGame;
+    private javax.swing.JButton btnLoadGame;
+    private javax.swing.JButton btnQuit;
     // End of variables declaration//GEN-END:variables
 
 }

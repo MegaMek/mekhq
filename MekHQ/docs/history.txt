@@ -2,6 +2,7 @@ VERSION HISTORY
 ----------------------------------
 v0.1.10 (SVN)
 + beginnings of a proper splash and loading screen
++ added load campaign and quit options to splash screen
 
 v0.1.9 (2011-07-17)
 + beginning of personnel switch (hold on to your hats!)
