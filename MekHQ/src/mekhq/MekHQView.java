@@ -264,9 +264,15 @@ public class MekHQView extends FrameView {
     private DirectoryItems forceIcons;
 	protected static MechTileset mt;
 	
-	public MekHQView(SingleFrameApplication app, Campaign c) {
+	public MekHQView(SingleFrameApplication app, Campaign c, DirectoryItems portraits, DirectoryItems camos, DirectoryItems forceIcons, MechTileset tiles) {
 		super(app);
 
+		this.portraits = portraits;
+		this.camos = camos;
+		this.forceIcons = forceIcons;
+		this.mt = tiles;
+        campaign = c;
+        
 		unitMouseAdapter = new UnitTableMouseAdapter();
 		servicedUnitMouseAdapter = new ServicedUnitsTableMouseAdapter();
 		partsMouseAdapter = new PartsTableMouseAdapter();
@@ -274,35 +280,7 @@ public class MekHQView extends FrameView {
 		personnelMouseAdapter = new PersonnelTableMouseAdapter(this);
 		orgMouseAdapter = new OrgTreeMouseAdapter();
 		scenarioMouseAdapter = new ScenarioTableMouseAdapter();
-       	
-		//load in directory items and tilesets
-		try {
-            portraits = new DirectoryItems(new File("data/images/portraits"), "", //$NON-NLS-1$ //$NON-NLS-2$
-                    PortraitFileFactory.getInstance());
-        } catch (Exception e) {
-            portraits = null;
-        }
-        try {
-            camos = new DirectoryItems(new File("data/images/camo"), "", //$NON-NLS-1$ //$NON-NLS-2$
-                    ImageFileFactory.getInstance());
-        } catch (Exception e) {
-            camos = null;
-        }
-        try {
-            forceIcons = new DirectoryItems(new File("data/images/force"), "", //$NON-NLS-1$ //$NON-NLS-2$
-                    PortraitFileFactory.getInstance());
-        } catch (Exception e) {
-            forceIcons = null;
-        }
-        mt = new MechTileset("data/images/units/");
-        try {
-            mt.loadFromFile("mechset.txt");
-        } catch (IOException ex) {
-        	MekHQApp.logError(ex);
-            //TODO: do something here
-        }
-
-        campaign = c;
+       
 		initComponents();
 		refreshCalendar();
 		       

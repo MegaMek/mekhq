@@ -19,22 +19,34 @@
 
 package mekhq;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.Image;
+import java.awt.Insets;
+import java.awt.MediaTracker;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 
+import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
 
 import org.jdesktop.application.SingleFrameApplication;
 
+import megamek.client.ui.swing.MechTileset;
+import megamek.client.ui.swing.util.ImageFileFactory;
 import megamek.common.MechSummaryCache;
+import megamek.common.util.DirectoryItems;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Planets;
 
@@ -45,28 +57,47 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
      */
     private static final long serialVersionUID = -3454307876761238915L;
     private JProgressBar progressBar;
-    private JLabel progressLbl;
     Task task;
     SingleFrameApplication app;
     Campaign campaign;
     File fileCampaign;
+    //the various directory items we need to access
+	private DirectoryItems portraits;
+    private DirectoryItems camos;
+    private DirectoryItems forceIcons;
+	protected static MechTileset mt;
  
     public DataLoadingDialog(SingleFrameApplication app, File f) {
         super(app.getMainFrame(), "Data Loading"); //$NON-NLS-1$
         this.app = app;
         this.fileCampaign = f;
         
-        progressBar = new JProgressBar(0, 3);
+        progressBar = new JProgressBar(0, 4);
         progressBar.setValue(0);
         progressBar.setStringPainted(true);
 
         progressBar.setVisible(true);
-        progressLbl = new JLabel("Loading Planetary Data...");
-        getContentPane().setLayout(new GridLayout(2, 1));
-        getContentPane().add(progressLbl);
-        getContentPane().add(progressBar);
+        progressBar.setString("Loading Planetary Data...");
         
-        setSize(250, 130);
+        // initialize splash image
+        Image imgSplash = app.getMainFrame().getToolkit().getImage("data/images/misc/megamek-splash.jpg"); //$NON-NLS-1$
+
+        // wait for splash image to load completely
+        MediaTracker tracker = new MediaTracker(app.getMainFrame());
+        tracker.addImage(imgSplash, 0);
+        try {
+            tracker.waitForID(0);
+        } catch (InterruptedException e) {
+            // really should never come here
+        }
+        // make splash image panel
+        ImageIcon icon = new ImageIcon(imgSplash);
+        JLabel splash = new JLabel(icon);      
+        getContentPane().setLayout(new BorderLayout());
+        getContentPane().add(splash, BorderLayout.CENTER);
+        getContentPane().add(progressBar, BorderLayout.PAGE_END);
+        
+        setSize(250, 400);
         // move to middle of screen
         Dimension screenSize = app.getMainFrame().getToolkit().getScreenSize();
         setLocation(screenSize.width / 2 - getSize().width / 2,
@@ -103,7 +134,36 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                 }
             }
             setProgress(2);
+    		//load in directory items and tilesets
+    		try {
+                portraits = new DirectoryItems(new File("data/images/portraits"), "", //$NON-NLS-1$ //$NON-NLS-2$
+                        PortraitFileFactory.getInstance());
+            } catch (Exception e) {
+                portraits = null;
+            }
+            try {
+                camos = new DirectoryItems(new File("data/images/camo"), "", //$NON-NLS-1$ //$NON-NLS-2$
+                        ImageFileFactory.getInstance());
+            } catch (Exception e) {
+                camos = null;
+            }
+            try {
+                forceIcons = new DirectoryItems(new File("data/images/force"), "", //$NON-NLS-1$ //$NON-NLS-2$
+                        PortraitFileFactory.getInstance());
+            } catch (Exception e) {
+                forceIcons = null;
+            }
+            mt = new MechTileset("data/images/units/");
+            try {
+                mt.loadFromFile("mechset.txt");
+            } catch (IOException ex) {
+            	MekHQApp.logError(ex);
+                //TODO: do something here
+            }
+            setProgress(3);
+            boolean newCampaign = false;
             if(null == fileCampaign) {
+            	newCampaign = true;
             	campaign = new Campaign();
             } else {
             	MekHQApp.logMessage("Loading campaign file from XML...");
@@ -119,9 +179,20 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         			fis.close();
         		} catch (Exception ex) {
         			ex.printStackTrace();
+        			JOptionPane.showMessageDialog(app.getMainFrame(), 
+        					"The campaign file could not be loaded.\nPlease check the log file for details.",
+        					"Campaign Loading Error",
+        				    JOptionPane.ERROR_MESSAGE);
+        			campaign = new Campaign();
         		}
             }
-            setProgress(3);
+            setProgress(4);
+            if(newCampaign) {
+            	setVisible(false);
+            	CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(app.getMainFrame(), true, campaign, camos);
+            	optionsDialog.setVisible(true);
+        		campaign.addReport("<b>" + campaign.getDateAsString() + "</b>");
+            }
             return null;
         }
 
@@ -132,21 +203,28 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         public void done() {
             //Toolkit.getDefaultToolkit().beep();
         	setVisible(false);
-        	app.show(new MekHQView(app, campaign));
+        	app.show(new MekHQView(app, campaign, portraits, camos, forceIcons, mt));
         }
     }
 
 	@Override
 	public void propertyChange(PropertyChangeEvent arg0) {
-	     progressBar.setValue(task.getProgress());
-	     if(Planets.getInstance().isInitialized()) {
-	    	 if(MechSummaryCache.getInstance().isInitialized()) {
-		    	 progressLbl.setText("Loading Campaign...");
-		     } else {
-		    	 progressLbl.setText("Loading Unit Data...");
-		     }
-	     }
-	     
+		int progress = task.getProgress();
+		progressBar.setValue(progress);
+		switch(progress) {
+		case(0):
+			progressBar.setString("Loading Planetary Data...");
+			break;
+		case(1):
+			progressBar.setString("Loading Unit Data...");
+			break;
+		case(2):
+			progressBar.setString("Loading Image Data...");
+			break;
+		case(3):
+			progressBar.setString("Loading Campaign...");
+			break;
+		}
 	}
     
 }

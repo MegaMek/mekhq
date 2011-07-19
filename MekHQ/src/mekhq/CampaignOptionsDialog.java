@@ -208,6 +208,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
+        setTitle("Campaign Options");
         getContentPane().setLayout(new java.awt.GridBagLayout());
 
         tabOptions.setName("tabOptions"); // NOI18N

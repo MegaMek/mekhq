@@ -176,7 +176,6 @@ public class Campaign implements Serializable {
 		calendar = new GregorianCalendar(3067, Calendar.JANUARY, 1);
 		dateFormat = new SimpleDateFormat("EEEE, MMMM d yyyy");
 		shortDateFormat = new SimpleDateFormat("MMddyyyy");
-		addReport("<b>" + getDateAsString() + "</b>");
 		name = "My Campaign";
 		rng = new RandomNameGenerator();
 		rng.populateNames();
