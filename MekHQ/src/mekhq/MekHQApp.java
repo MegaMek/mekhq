@@ -21,11 +21,14 @@
 
 package mekhq;
 
+import java.awt.Component;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
+import java.util.EventObject;
 
+import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
@@ -79,6 +82,25 @@ public class MekHQApp extends SingleFrameApplication {
         
         //redirect output to log file
         redirectOutput();
+        
+        addExitListener(new ExitListener() {
+        	@Override
+            public boolean canExit(EventObject e) {
+                boolean bOkToExit = false;
+                Component source = (Component) e.getSource();
+                bOkToExit = JOptionPane.showConfirmDialog(source,
+                                "Do you really want to quit MekHQ?",
+                                "Quit?",
+                                JOptionPane.YES_NO_OPTION,
+                                JOptionPane.QUESTION_MESSAGE) ==
+                                JOptionPane.YES_OPTION;
+                return bOkToExit;
+            }
+        	@Override
+            public void willExit(EventObject event) {
+
+            }
+        });
         
         show(new StartUpDialog(this));
 

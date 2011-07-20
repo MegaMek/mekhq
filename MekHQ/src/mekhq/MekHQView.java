@@ -1635,7 +1635,7 @@ public class MekHQView extends FrameView {
 		exitMenuItem.setAction(actionMap.get("quit")); // NOI18N
 		exitMenuItem.setName("exitMenuItem"); // NOI18N
 		fileMenu.add(exitMenuItem);
-
+		
 		menuBar.add(fileMenu);
 
 		menuManage.setText(resourceMap.getString("menuManage.text")); // NOI18N
