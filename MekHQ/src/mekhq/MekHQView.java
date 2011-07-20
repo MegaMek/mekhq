@@ -435,8 +435,6 @@ public class MekHQView extends FrameView {
 		javax.swing.JMenu fileMenu = new javax.swing.JMenu();
 		menuLoad = new javax.swing.JMenuItem();
 		menuSave = new javax.swing.JMenuItem();
-		menuLoadXml = new javax.swing.JMenuItem();
-		menuSaveXml = new javax.swing.JMenuItem();
 		menuOptions = new javax.swing.JMenuItem();
 		javax.swing.JMenuItem exitMenuItem = new javax.swing.JMenuItem();
 		menuManage = new javax.swing.JMenu();
@@ -1605,40 +1603,22 @@ public class MekHQView extends FrameView {
 		fileMenu.setName("fileMenu"); // NOI18N
 
 		menuLoad.setText(resourceMap.getString("menuLoad.text")); // NOI18N
-		menuLoad.setName("menuLoad"); // NOI18N
+		menuLoad.setName("menuLoadXml"); // NOI18N
 		menuLoad.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				menuLoadActionPerformed(evt);
+				menuLoadXmlActionPerformed(evt);
 			}
 		});
 		fileMenu.add(menuLoad);
 
 		menuSave.setText(resourceMap.getString("menuSave.text")); // NOI18N
-		menuSave.setName("menuSave"); // NOI18N
+		menuSave.setName("menuSaveXml"); // NOI18N
 		menuSave.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				menuSaveActionPerformed(evt);
-			}
-		});
-		fileMenu.add(menuSave);
-
-		menuLoadXml.setText(resourceMap.getString("menuLoadXml.text")); // NOI18N
-		menuLoadXml.setName("menuLoadXml"); // NOI18N
-		menuLoadXml.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				menuLoadXmlActionPerformed(evt);
-			}
-		});
-		fileMenu.add(menuLoadXml);
-
-		menuSaveXml.setText(resourceMap.getString("menuSaveXml.text")); // NOI18N
-		menuSaveXml.setName("menuSaveXml"); // NOI18N
-		menuSaveXml.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				menuSaveXmlActionPerformed(evt);
 			}
 		});
-		fileMenu.add(menuSaveXml);
+		fileMenu.add(menuSave);
 
 		menuOptions.setText(resourceMap.getString("menuOptions.text")); // NOI18N
 		menuOptions.setName("menuOptions"); // NOI18N
@@ -2167,29 +2147,6 @@ public class MekHQView extends FrameView {
 		npd.setVisible(true);
 	}
 
-	private void menuSaveActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuSaveActionPerformed
-		MekHQApp.logMessage("Saving campaign...");
-		File file = selectSaveCampaignFile(".cpn");
-
-		if (file == null) {
-			// I want a file, y'know!
-			return;
-		}
-
-		FileOutputStream fos = null;
-		ObjectOutputStream out = null;
-
-		try {
-			fos = new FileOutputStream(file);
-			out = new ObjectOutputStream(fos);
-			out.writeObject(campaign);
-			out.close();
-			MekHQApp.logMessage("Campaign saved to " + file);
-		} catch (IOException ex) {
-			MekHQApp.logError(ex);
-		}
-	}// GEN-LAST:event_menuSaveActionPerformed
-
 	private void menuSaveXmlActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuSaveActionPerformed
 		MekHQApp.logMessage("Saving campaign...");
 		// Choose a file...
@@ -2237,118 +2194,15 @@ public class MekHQView extends FrameView {
 	}
 
 	private void menuLoadXmlActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuLoadActionPerformed
-		MekHQApp.logMessage("Loading campaign file from XML...");
-
-		// First select the file...
-		File file = selectLoadCampaignFile(".xml");
-
-		if(null == file) {
+		File f = selectLoadCampaignFile(".xml");
+		if(null == f) {
 			return;
 		}
-		
-		// And then load the campaign object from it.
-		FileInputStream fis = null;
-
-		try {
-			fis = new FileInputStream(file);
-			Campaign tmpCampaign = Campaign
-					.createCampaignFromXMLFileInputStream(fis);
-
-			if (tmpCampaign == null) {
-				// We're really expecting something here.
-				// If we don't get it, fail out and do *not* replace the
-				// existing one.
-				return;
-			}
-
-			campaign = tmpCampaign;
-
-			// Restores all transient attributes from serialized objects
-			campaign.restore();
-			fis.close();
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-
-		refreshServicedUnitList();
-		refreshUnitList();
-		refreshPersonnelList();
-		changePersonnelView();
-		refreshTaskList();
-		refreshAcquireList();
-		refreshTechsList();
-		refreshPatientList();
-		refreshDoctorsList();
-		refreshPartsList();
-		refreshCalendar();
-		refreshReport();
-		refreshFunds();
-		refreshFinancialTransactions();
-		refreshOrganization();
-		refreshMissions();
-		refreshLocation();
-		refreshTempAstechs();
-		refreshTempMedics();
-		panMap.setCampaign(campaign);
-		
-		// Without this, the report scrollbar doesn't seem to load properly
-		// after loading a campaign
-		Dimension size = getFrame().getSize();
-		getFrame().pack();
-		getFrame().setSize(size);
-
-		MekHQApp.logMessage("Finished loading campaign!");
+		DataLoadingDialog dataLoadingDialog = new DataLoadingDialog((SingleFrameApplication)getApplication(), f);   	
+		//TODO: does this effectively deal with memory management issues?
+		getApplication().hide(this);
+		dataLoadingDialog.setVisible(true);
 	}
-
-	private void menuLoadActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuLoadActionPerformed
-		MekHQApp.logMessage("Loading Campaign from binary...");
-
-		File file = selectLoadCampaignFile(".cpn");
-		FileInputStream fis = null;
-		ObjectInputStream in = null;
-
-		try {
-			fis = new FileInputStream(file);
-			in = new ObjectInputStream(fis);
-			campaign = (Campaign) in.readObject();
-
-			// Restores all transient attributes from serialized objects
-			campaign.restore();
-			in.close();
-		} catch (IOException ex) {
-			ex.printStackTrace();
-		} catch (ClassNotFoundException ex) {
-			ex.printStackTrace();
-		}
-
-		refreshServicedUnitList();
-		refreshUnitList();
-		refreshPersonnelList();
-		changePersonnelView();
-		refreshTaskList();
-		refreshAcquireList();
-		refreshTechsList();
-		refreshPatientList();
-		refreshDoctorsList();
-		refreshPartsList();
-		refreshCalendar();
-		refreshReport();
-		refreshFunds();
-		refreshFinancialTransactions();
-		refreshMissions();
-		refreshLocation();
-		refreshTempAstechs();
-		refreshTempMedics();
-		panMap.setCampaign(campaign);
-
-		// Without this, the report scrollbar doesn't seem to load properly
-		// after loading a campaign
-		Dimension size = getFrame().getSize();
-		getFrame().pack();
-		getFrame().setSize(size);
-
-		MekHQApp.logMessage("Finished loading campaign!");
-	}// GEN-LAST:event_menuLoadActionPerformed
 
 	private File selectLoadCampaignFile(String fileExt) {
 		JFileChooser loadCpgn = new JFileChooser(".");
@@ -7808,12 +7662,10 @@ public class MekHQView extends FrameView {
 	private javax.swing.JMenuBar menuBar;
 	private javax.swing.JMenu menuHire;
 	private javax.swing.JMenuItem menuLoad;
-	private javax.swing.JMenuItem menuLoadXml;
 	private javax.swing.JMenu menuManage;
 	private javax.swing.JMenu menuMarket;
 	private javax.swing.JMenuItem menuOptions;
 	private javax.swing.JMenuItem menuSave;
-	private javax.swing.JMenuItem menuSaveXml;
 	private javax.swing.JMenuItem miHireAstechs;
 	private javax.swing.JMenuItem miFireAstechs;
 	private javax.swing.JMenuItem miFireAllAstechs;

@@ -72,6 +72,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         this.app = app;
         this.fileCampaign = f;
         
+        setUndecorated(true);
         progressBar = new JProgressBar(0, 4);
         progressBar.setValue(0);
         progressBar.setStringPainted(true);
@@ -80,7 +81,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         progressBar.setString("Loading Planetary Data...");
         
         // initialize splash image
-        Image imgSplash = app.getMainFrame().getToolkit().getImage("data/images/misc/mekhq-load.png"); //$NON-NLS-1$
+        Image imgSplash = app.getMainFrame().getToolkit().getImage("data/images/misc/mekhq-load.jpg"); //$NON-NLS-1$
 
         // wait for splash image to load completely
         MediaTracker tracker = new MediaTracker(app.getMainFrame());
@@ -97,7 +98,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         getContentPane().add(splash, BorderLayout.CENTER);
         getContentPane().add(progressBar, BorderLayout.PAGE_END);
         
-        setSize(250, 400);
+        setSize(500, 300);
         // move to middle of screen
         Dimension screenSize = app.getMainFrame().getToolkit().getScreenSize();
         setLocation(screenSize.width / 2 - getSize().width / 2,
@@ -202,8 +203,8 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         @Override
         public void done() {
             //Toolkit.getDefaultToolkit().beep();
-        	setVisible(false);
         	app.show(new MekHQView(app, campaign, portraits, camos, forceIcons, mt));
+        	setVisible(false);
         }
     }
 
