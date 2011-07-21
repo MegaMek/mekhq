@@ -6,6 +6,7 @@ v0.1.10 (SVN)
 + improvements to splash and load screen operations
 + save and loading XML is the default (no more binary saves!)
 + RFE 3304267: EXIT
++ improvements to layout of top and bottom panels
 
 v0.1.9 (2011-07-17)
 + beginning of personnel switch (hold on to your hats!)
