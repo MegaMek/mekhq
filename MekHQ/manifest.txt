@@ -1,0 +1,3 @@
+Manifest-Version: 1.0
+Main-Class: mekhq.MekHQApp
+Class-Path: . lib/TinyXML.jar lib/appframework-1.0.3.jar lib/swing-layout-1.0.3.jar lib/swing-worker-1.1.jar MegaMek.jar MegaMekLab.jar
