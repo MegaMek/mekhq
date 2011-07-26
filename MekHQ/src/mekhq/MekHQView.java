@@ -256,21 +256,10 @@ public class MekHQView extends FrameView {
 	private int[] selectedTasksIds;
 	
 	public int selectedMission = -1;
-
-	//the various directory items we need to access
-	private DirectoryItems portraits;
-    private DirectoryItems camos;
-    private DirectoryItems forceIcons;
-	protected static MechTileset mt;
 	
-	public MekHQView(SingleFrameApplication app, DirectoryItems portraits, DirectoryItems camos, DirectoryItems forceIcons, MechTileset tiles) {
+	public MekHQView(SingleFrameApplication app) {
 		super(app);
 
-		this.portraits = portraits;
-		this.camos = camos;
-		this.forceIcons = forceIcons;
-		this.mt = tiles;
-        
 		unitMouseAdapter = new UnitTableMouseAdapter();
 		servicedUnitMouseAdapter = new ServicedUnitsTableMouseAdapter();
 		partsMouseAdapter = new PartsTableMouseAdapter();
@@ -2391,7 +2380,7 @@ public class MekHQView extends FrameView {
 
 	private void menuOptionsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuOptionsActionPerformed
 		CampaignOptionsDialog cod = new CampaignOptionsDialog(getFrame(), true,
-				getCampaign(), camos);
+				getCampaign(), getCamos());
 		cod.setVisible(true);
 		refreshCalendar();
 		changePersonnelView();
@@ -2445,7 +2434,7 @@ public class MekHQView extends FrameView {
 			return;
 		}
 		Person selectedPerson = personModel.getPerson(personnelTable.convertRowIndexToModel(row));
-		scrollPersonnelView.setViewportView(new PersonViewPanel(selectedPerson, getCampaign(), portraits));
+		scrollPersonnelView.setViewportView(new PersonViewPanel(selectedPerson, getCampaign(), getPortraits()));
 		//This odd code is to make sure that the scrollbar stays at the top
 		//I cant just call it here, because it ends up getting reset somewhere later
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -2463,7 +2452,7 @@ public class MekHQView extends FrameView {
 			return;
 		}
 		Unit selectedUnit = unitModel.getUnit(unitTable.convertRowIndexToModel(row));
-		scrollUnitView.setViewportView(new UnitViewPanel(selectedUnit, getCampaign(), camos, mt));
+		scrollUnitView.setViewportView(new UnitViewPanel(selectedUnit, getCampaign(), getCamos(), getMechTiles()));
 		//This odd code is to make sure that the scrollbar stays at the top
 		//I cant just call it here, because it ends up getting reset somewhere later
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -2510,9 +2499,9 @@ public class MekHQView extends FrameView {
 					if(u.usesSoloPilot()) {
 						name = "Pilot";
 					}
-					tabUnit.add(name, new PersonViewPanel(p, getCampaign(), portraits));
+					tabUnit.add(name, new PersonViewPanel(p, getCampaign(), getPortraits()));
 				}
-				tabUnit.add("Unit", new UnitViewPanel(u, getCampaign(), camos, mt));
+				tabUnit.add("Unit", new UnitViewPanel(u, getCampaign(), getCamos(), getMechTiles()));
 				scrollForceView.setViewportView(tabUnit);
 			}
 			//This odd code is to make sure that the scrollbar stays at the top
@@ -2523,7 +2512,7 @@ public class MekHQView extends FrameView {
 				}
 			});
 		} else if (node.getUserObject() instanceof Force) {
-			scrollForceView.setViewportView(new ForceViewPanel((Force)node.getUserObject(), getCampaign(), portraits, forceIcons, camos, mt));
+			scrollForceView.setViewportView(new ForceViewPanel((Force)node.getUserObject(), getCampaign(), getPortraits(), getForceIcons(), getCamos(), getMechTiles()));
 			javax.swing.SwingUtilities.invokeLater(new Runnable() {
 				public void run() { 
 					scrollForceView.getVerticalScrollBar().setValue(0);
@@ -3529,6 +3518,22 @@ public class MekHQView extends FrameView {
 		return ((MekHQApp)getApplication()).getCampaign();
 	}
 	
+	protected DirectoryItems getPortraits() {
+		return ((MekHQApp)getApplication()).getPortraits();
+	}
+	
+	protected DirectoryItems getCamos() {
+		return ((MekHQApp)getApplication()).getCamos();
+	}
+	
+	protected DirectoryItems getForceIcons() {
+		return ((MekHQApp)getApplication()).getForceIcons();
+	}
+	
+	protected MechTileset getMechTiles() {
+		return ((MekHQApp)getApplication()).getMechTiles();
+	}
+	
 	protected int getSelectedTaskId() {
 		if(repairsSelected()) {
 			return currentServiceablePartsId;
@@ -3890,7 +3895,7 @@ public class MekHQView extends FrameView {
 		}
 
 		public ServicedUnitTableModel.Renderer getRenderer() {
-			return new ServicedUnitTableModel.Renderer(camos, mt);
+			return new ServicedUnitTableModel.Renderer(getCamos(), getMechTiles());
 		}
 
 		public class Renderer extends MekInfo implements TableCellRenderer {
@@ -4463,7 +4468,7 @@ public class MekHQView extends FrameView {
             	if(null != force) {
             		PortraitChoiceDialog pcd = new PortraitChoiceDialog(getFrame(), true,
     						force.getIconCategory(),
-    						force.getIconFileName(), forceIcons);
+    						force.getIconFileName(), getForceIcons());
     				pcd.setVisible(true);
     				force.setIconCategory(pcd.getCategory());
     				force.setIconFileName(pcd.getFileName());
@@ -4756,7 +4761,7 @@ public class MekHQView extends FrameView {
         	// Try to get the player's portrait file.
         	Image portrait = null;
         	try {
-        		portrait = (Image) portraits.getItem(category, file);
+        		portrait = (Image) getPortraits().getItem(category, file);
         		//make sure no images are longer than 50 pixels
             	 if(null != portrait && portrait.getHeight(this) > 50) {
             		 portrait = portrait.getScaledInstance(-1, 50, Image.SCALE_DEFAULT);               
@@ -4784,7 +4789,7 @@ public class MekHQView extends FrameView {
             // Try to get the player's portrait file.
             Image portrait = null;
             try {
-           	 portrait = (Image) forceIcons.getItem(category, file);
+           	 portrait = (Image) getForceIcons().getItem(category, file);
            	 //make sure no images are longer than 50 pixels
            	 if(null != portrait && portrait.getHeight(this) > 50) {
            		 portrait = portrait.getScaledInstance(-1, 50, Image.SCALE_DEFAULT);               
@@ -5026,7 +5031,7 @@ public class MekHQView extends FrameView {
 			} else if (command.equalsIgnoreCase("PORTRAIT")) {
 				PortraitChoiceDialog pcd = new PortraitChoiceDialog(getFrame(), true,
 						selectedPerson.getPortraitCategory(),
-						selectedPerson.getPortraitFileName(), portraits);
+						selectedPerson.getPortraitFileName(), getPortraits());
 				pcd.setVisible(true);
 				selectedPerson.setPortraitCategory(pcd.getCategory());
 				selectedPerson.setPortraitFileName(pcd.getFileName());

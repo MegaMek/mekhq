@@ -136,31 +136,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
             }
             setProgress(2);
     		//load in directory items and tilesets
-    		try {
-                portraits = new DirectoryItems(new File("data/images/portraits"), "", //$NON-NLS-1$ //$NON-NLS-2$
-                        PortraitFileFactory.getInstance());
-            } catch (Exception e) {
-                portraits = null;
-            }
-            try {
-                camos = new DirectoryItems(new File("data/images/camo"), "", //$NON-NLS-1$ //$NON-NLS-2$
-                        ImageFileFactory.getInstance());
-            } catch (Exception e) {
-                camos = null;
-            }
-            try {
-                forceIcons = new DirectoryItems(new File("data/images/force"), "", //$NON-NLS-1$ //$NON-NLS-2$
-                        PortraitFileFactory.getInstance());
-            } catch (Exception e) {
-                forceIcons = null;
-            }
-            mt = new MechTileset("data/images/units/");
-            try {
-                mt.loadFromFile("mechset.txt");
-            } catch (IOException ex) {
-            	MekHQApp.logError(ex);
-                //TODO: do something here
-            }
+    		app.loadDirectories();
             setProgress(3);
             boolean newCampaign = false;
             if(null == fileCampaign) {
@@ -204,7 +180,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         public void done() {
             //Toolkit.getDefaultToolkit().beep();
         	app.setCampaign(campaign);
-        	app.show(new MekHQView(app, portraits, camos, forceIcons, mt));
+        	app.show(new MekHQView(app));
         	setVisible(false);
         }
     }

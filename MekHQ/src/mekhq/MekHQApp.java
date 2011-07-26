@@ -27,6 +27,7 @@ import java.awt.Frame;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.EventObject;
@@ -38,6 +39,8 @@ import javax.swing.UnsupportedLookAndFeelException;
 import org.jdesktop.application.Application;
 import org.jdesktop.application.SingleFrameApplication;
 
+import megamek.client.ui.swing.MechTileset;
+import megamek.client.ui.swing.util.ImageFileFactory;
 import megamek.common.IGame;
 import megamek.common.event.GameBoardChangeEvent;
 import megamek.common.event.GameBoardNewEvent;
@@ -57,6 +60,7 @@ import megamek.common.event.GamePlayerDisconnectedEvent;
 import megamek.common.event.GameReportEvent;
 import megamek.common.event.GameSettingsChangeEvent;
 import megamek.common.event.GameTurnChangeEvent;
+import megamek.common.util.DirectoryItems;
 import megamek.server.Server;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ResolveScenarioTracker;
@@ -77,6 +81,11 @@ public class MekHQApp extends SingleFrameApplication implements GameListener {
     
     private Campaign campaign;
     
+    //the various directory items we need to access
+	private DirectoryItems portraits;
+    private DirectoryItems camos;
+    private DirectoryItems forceIcons;
+	protected static MechTileset mt;
 	
 	/**
 	 * Designed to centralize output and logging.
@@ -217,6 +226,58 @@ public class MekHQApp extends SingleFrameApplication implements GameListener {
     
     public void setCampaign(Campaign c) {
     	campaign = c;
+    }
+    
+    public void loadDirectories() {
+    	if(null == portraits) {
+		    try {
+		        portraits = new DirectoryItems(new File("data/images/portraits"), "", //$NON-NLS-1$ //$NON-NLS-2$
+		                PortraitFileFactory.getInstance());
+		    } catch (Exception e) {
+		        portraits = null;
+		    }
+    	}
+    	if(null == camos) {
+		    try {
+		        camos = new DirectoryItems(new File("data/images/camo"), "", //$NON-NLS-1$ //$NON-NLS-2$
+		                ImageFileFactory.getInstance());
+		    } catch (Exception e) {
+		        camos = null;
+		    }
+    	}
+    	if(null == forceIcons) {
+		    try {
+		        forceIcons = new DirectoryItems(new File("data/images/force"), "", //$NON-NLS-1$ //$NON-NLS-2$
+		                PortraitFileFactory.getInstance());
+		    } catch (Exception e) {
+		        forceIcons = null;
+		    }
+    	}
+    	if(null == mt) {
+		    mt = new MechTileset("data/images/units/");
+		    try {
+		        mt.loadFromFile("mechset.txt");
+		    } catch (IOException ex) {
+		    	MekHQApp.logError(ex);
+		        //TODO: do something here
+		    }
+    	}
+    }
+    
+    public DirectoryItems getPortraits() {
+    	return portraits;
+    }
+    
+    public DirectoryItems getCamos() {
+    	return camos;
+    }
+    
+    public DirectoryItems getForceIcons() {
+    	return forceIcons;
+    }
+    
+    public MechTileset getMechTiles() {
+    	return mt;
     }
     
     public void startHost(Scenario scenario, boolean loadSavegame, ArrayList<Unit> meks) {
