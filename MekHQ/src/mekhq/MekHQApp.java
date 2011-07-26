@@ -22,10 +22,13 @@
 package mekhq;
 
 import java.awt.Component;
+import java.awt.FileDialog;
+import java.awt.Frame;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.EventObject;
 
 import javax.swing.JOptionPane;
@@ -35,14 +38,45 @@ import javax.swing.UnsupportedLookAndFeelException;
 import org.jdesktop.application.Application;
 import org.jdesktop.application.SingleFrameApplication;
 
+import megamek.common.IGame;
+import megamek.common.event.GameBoardChangeEvent;
+import megamek.common.event.GameBoardNewEvent;
+import megamek.common.event.GameEndEvent;
+import megamek.common.event.GameEntityChangeEvent;
+import megamek.common.event.GameEntityNewEvent;
+import megamek.common.event.GameEntityNewOffboardEvent;
+import megamek.common.event.GameEntityRemoveEvent;
+import megamek.common.event.GameListener;
+import megamek.common.event.GameMapQueryEvent;
+import megamek.common.event.GameNewActionEvent;
+import megamek.common.event.GamePhaseChangeEvent;
+import megamek.common.event.GamePlayerChangeEvent;
+import megamek.common.event.GamePlayerChatEvent;
+import megamek.common.event.GamePlayerConnectedEvent;
+import megamek.common.event.GamePlayerDisconnectedEvent;
+import megamek.common.event.GameReportEvent;
+import megamek.common.event.GameSettingsChangeEvent;
+import megamek.common.event.GameTurnChangeEvent;
+import megamek.server.Server;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.ResolveScenarioTracker;
+import mekhq.campaign.Unit;
+import mekhq.campaign.mission.Scenario;
+
 /**
  * The main class of the application.
  */
-public class MekHQApp extends SingleFrameApplication {
+public class MekHQApp extends SingleFrameApplication implements GameListener {
 	//TODO: This is intended as a debug/production type thing.
 	// So it should be backed down to 1 for releases...
 	// It's intended for 1 to be critical, 3 to be typical, and 5 to be debug/informational.
 	public static int VERBOSITY_LEVEL = 5;
+	
+    private Server myServer = null;
+    private Scenario currentScenario = null;
+    
+    private Campaign campaign;
+    
 	
 	/**
 	 * Designed to centralize output and logging.
@@ -172,4 +206,167 @@ public class MekHQApp extends SingleFrameApplication {
             e.printStackTrace();
         }
     }
+    
+    public Server getMyServer() {
+    	return myServer;
+    }
+    
+    public Campaign getCampaign() {
+    	return campaign;
+    }
+    
+    public void setCampaign(Campaign c) {
+    	campaign = c;
+    }
+    
+    public void startHost(Scenario scenario, boolean loadSavegame, ArrayList<Unit> meks) {
+
+        try {
+            myServer = new Server("", 2346);
+            if (loadSavegame) {
+                FileDialog f = new FileDialog(getMainFrame(), "Load Savegame");
+                f.setDirectory(System.getProperty("user.dir") + "/savegames");
+                f.setVisible(true);
+                myServer.loadGame(new File(f.getDirectory(), f.getFile()));
+            }
+        } catch (Exception ex) {
+        	MekHQApp.logMessage("Failed to start up server properly");
+			MekHQApp.logError(ex);
+            return;
+        }
+
+        myServer.getGame().addGameListener(this);
+        currentScenario = scenario;
+        //Start the game thread
+        GameThread MMGameThread = new GameThread(campaign.getName(), "", "127.0.0.1", 2346, campaign, meks);
+        MMGameThread.start();
+    }
+
+    // Stop & send the close game event to the Server
+    public void stopHost() {
+
+       /* serverSend("CG");// send close game to server
+        try {
+            myServer.die();
+        } catch (Exception ex) {
+            CampaignData.mwlog.errLog(ex);
+            CampaignData.mwlog.errLog("Megamek Error:");
+        }
+        */
+        myServer = null;
+        currentScenario = null;
+    }
+
+	@Override
+	public void gameBoardChanged(GameBoardChangeEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void gameBoardNew(GameBoardNewEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void gameEnd(GameEndEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void gameEntityChange(GameEntityChangeEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void gameEntityNew(GameEntityNewEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void gameEntityNewOffboard(GameEntityNewOffboardEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void gameEntityRemove(GameEntityRemoveEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void gameMapQuery(GameMapQueryEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void gameNewAction(GameNewActionEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void gamePhaseChange(GamePhaseChangeEvent e) {
+		try {
+
+            if (myServer.getGame().getPhase() == IGame.Phase.PHASE_VICTORY) {
+            	ResolveScenarioTracker tracker = new ResolveScenarioTracker(currentScenario, campaign);
+            	tracker.processGame(myServer.getGame());
+            	ResolveWizardMissingUnitsDialog resolveDialog = new ResolveWizardMissingUnitsDialog(getMainFrame(), true, tracker);
+            	show(resolveDialog);
+            }
+
+        }// end try
+        catch (Exception ex) {
+            
+        }
+	}
+
+	@Override
+	public void gamePlayerChange(GamePlayerChangeEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void gamePlayerChat(GamePlayerChatEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void gamePlayerConnected(GamePlayerConnectedEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void gamePlayerDisconnected(GamePlayerDisconnectedEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void gameReport(GameReportEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void gameSettingsChange(GameSettingsChangeEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void gameTurnChange(GameTurnChangeEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
 }

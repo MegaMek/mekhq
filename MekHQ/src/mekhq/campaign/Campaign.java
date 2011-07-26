@@ -30,6 +30,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -69,6 +70,10 @@ import megamek.common.SmallCraftBay;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.options.GameOptions;
+import megamek.common.options.IBasicOption;
+import megamek.common.options.IOption;
+import megamek.common.options.IOptionGroup;
 import mekhq.MekHQApp;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Transaction;
@@ -140,6 +145,8 @@ public class Campaign implements Serializable {
 	// if they try to call up game options
 	private Game game;
 
+	private GameOptions gameOptions;
+
 	private String name;
 
 	private RandomNameGenerator rng;
@@ -192,6 +199,8 @@ public class Campaign implements Serializable {
 		astechPool = 0;
 		medicPool = 0;
 		resetAstechMinutes();
+		gameOptions = new GameOptions();
+		gameOptions.initialize();
 	}
 
 	public String getName() {
@@ -2646,4 +2655,28 @@ public class Campaign implements Serializable {
     		}
     	}
 	}
+	
+	public GameOptions getGameOptions() {
+		return gameOptions;
+	}
+	
+	public Vector<IBasicOption> getGameOptionsVector() {
+		Vector<IBasicOption> options = new Vector<IBasicOption>();
+		 for (Enumeration<IOptionGroup> i = gameOptions.getGroups(); i.hasMoreElements();) {
+			 IOptionGroup group = i.nextElement();  
+			 for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements();) {
+				 IOption option = j.nextElement();
+				 options.add((IBasicOption)option);
+			 }
+		 }
+		 return options;
+	}
+	
+	public void setGameOptions(Vector<IBasicOption> options) {
+		for(IBasicOption option : options) {
+			gameOptions.getOption(option.getName()).setValue(option.getValue());
+		}
+	}
+	
+	
 }

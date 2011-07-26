@@ -38,6 +38,7 @@ import javax.swing.filechooser.FileFilter;
 import megamek.common.BattleArmor;
 import megamek.common.Compute;
 import megamek.common.Entity;
+import megamek.common.IGame;
 import megamek.common.Infantry;
 import megamek.common.Pilot;
 import megamek.common.Tank;
@@ -168,6 +169,12 @@ public class ResolveScenarioTracker {
 			}
 		}
 		checkStatusOfPersonnel();
+	}
+	
+	public void processGame(IGame game) {
+		for(Entity entity : game.getEntitiesVector()) {
+			entities.put(entity.getExternalId(), entity);
+		}
 	}
 	
 	private ArrayList<Person> shuffleCrew(ArrayList<Person> source) {

@@ -225,7 +225,6 @@ public class MekHQView extends FrameView {
 		}
 	}
 
-	private Campaign campaign;
 	private TaskTableModel taskModel = new TaskTableModel();
 	private AcquisitionTableModel acquireModel = new AcquisitionTableModel();
 	private ServicedUnitTableModel servicedUnitModel = new ServicedUnitTableModel();
@@ -264,14 +263,13 @@ public class MekHQView extends FrameView {
     private DirectoryItems forceIcons;
 	protected static MechTileset mt;
 	
-	public MekHQView(SingleFrameApplication app, Campaign c, DirectoryItems portraits, DirectoryItems camos, DirectoryItems forceIcons, MechTileset tiles) {
+	public MekHQView(SingleFrameApplication app, DirectoryItems portraits, DirectoryItems camos, DirectoryItems forceIcons, MechTileset tiles) {
 		super(app);
 
 		this.portraits = portraits;
 		this.camos = camos;
 		this.forceIcons = forceIcons;
 		this.mt = tiles;
-        campaign = c;
         
 		unitMouseAdapter = new UnitTableMouseAdapter();
 		servicedUnitMouseAdapter = new ServicedUnitsTableMouseAdapter();
@@ -385,6 +383,9 @@ public class MekHQView extends FrameView {
 		btnEditMission = new javax.swing.JButton();
 		btnCompleteMission = new javax.swing.JButton();
 		btnAddScenario = new javax.swing.JButton();
+		btnStartGame = new javax.swing.JButton();
+		btnLoadGame = new javax.swing.JButton();
+		btnPrintRS = new javax.swing.JButton();
 		btnGetMul = new javax.swing.JButton();
 		btnClearAssignedUnits = new javax.swing.JButton();
 		btnResolveScenario = new javax.swing.JButton();
@@ -424,7 +425,6 @@ public class MekHQView extends FrameView {
 		financeTable = new javax.swing.JTable();
 		txtPaneReportScrollPane = new javax.swing.JScrollPane();
 		txtPaneReport = new javax.swing.JTextPane();
-		panelMasterButtons = new javax.swing.JPanel();
 		btnAdvanceDay = new javax.swing.JButton();
 		btnOvertime = new javax.swing.JToggleButton();
 		btnGMMode = new javax.swing.JToggleButton();
@@ -436,6 +436,7 @@ public class MekHQView extends FrameView {
 		menuLoad = new javax.swing.JMenuItem();
 		menuSave = new javax.swing.JMenuItem();
 		menuOptions = new javax.swing.JMenuItem();
+		menuOptionsMM = new javax.swing.JMenuItem();
 		javax.swing.JMenuItem exitMenuItem = new javax.swing.JMenuItem();
 		menuManage = new javax.swing.JMenu();
 		miLoadForces = new javax.swing.JMenuItem();
@@ -678,6 +679,60 @@ public class MekHQView extends FrameView {
 		panelScenario.setName("panelScenario"); // NOI18N
 		panelScenario.setLayout(new java.awt.GridBagLayout());
 		
+		btnStartGame.setText(resourceMap.getString("btnStartGame.text")); // NOI18N
+		btnStartGame.setToolTipText(resourceMap
+				.getString("btnStartGame.toolTipText")); // NOI18N
+		btnStartGame.setName("btnStartGame"); // NOI18N
+		btnStartGame.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				startScenario();
+			}
+		});
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.gridwidth = 1;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+		gridBagConstraints.weightx = 1.0;
+		gridBagConstraints.weighty = 0.0;
+		panelScenario.add(btnStartGame, gridBagConstraints);
+		
+		btnLoadGame.setText(resourceMap.getString("btnLoadGame.text")); // NOI18N
+		btnLoadGame.setToolTipText(resourceMap
+				.getString("btnLoadGame.toolTipText")); // NOI18N
+		btnLoadGame.setName("btnLoadGame"); // NOI18N
+		btnLoadGame.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				loadScenario();
+			}
+		});
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 1;
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.gridwidth = 1;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+		gridBagConstraints.weightx = 1.0;
+		gridBagConstraints.weighty = 0.0;
+		panelScenario.add(btnLoadGame, gridBagConstraints);
+		
+		btnPrintRS.setText(resourceMap.getString("btnPrintRS.text")); // NOI18N
+		btnPrintRS.setToolTipText(resourceMap
+				.getString("btnPrintRS.toolTipText")); // NOI18N
+		btnPrintRS.setName("btnPrintRS"); // NOI18N
+		btnPrintRS.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				//TODO: implement this
+			}
+		});
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 2;
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.gridwidth = 1;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+		gridBagConstraints.weightx = 1.0;
+		gridBagConstraints.weighty = 0.0;
+		panelScenario.add(btnPrintRS, gridBagConstraints);
+		
 		btnGetMul.setText(resourceMap.getString("btnGetMul.text")); // NOI18N
 		btnGetMul.setToolTipText(resourceMap
 				.getString("btnGetMul.toolTipText")); // NOI18N
@@ -689,30 +744,12 @@ public class MekHQView extends FrameView {
 		});
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 0;
+		gridBagConstraints.gridy = 1;
 		gridBagConstraints.gridwidth = 1;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 0.0;
 		panelScenario.add(btnGetMul, gridBagConstraints);
-		
-		btnClearAssignedUnits.setText(resourceMap.getString("btnClearAssignedUnits.text")); // NOI18N
-		btnClearAssignedUnits.setToolTipText(resourceMap
-				.getString("btnClearAssignedUnits.toolTipText")); // NOI18N
-		btnClearAssignedUnits.setName("btnClearAssignedUnits"); // NOI18N
-		btnClearAssignedUnits.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				clearAssignedUnits();
-			}
-		});
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 0;
-		gridBagConstraints.gridwidth = 1;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.weightx = 1.0;
-		gridBagConstraints.weighty = 0.0;
-		panelScenario.add(btnClearAssignedUnits, gridBagConstraints);
 		
 		btnResolveScenario.setText(resourceMap.getString("btnResolveScenario.text")); // NOI18N
 		btnResolveScenario.setToolTipText(resourceMap
@@ -724,20 +761,38 @@ public class MekHQView extends FrameView {
 			}
 		});
 		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 2;
-		gridBagConstraints.gridy = 0;
+		gridBagConstraints.gridx = 1;
+		gridBagConstraints.gridy = 1;
 		gridBagConstraints.gridwidth = 1;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 0.0;
 		panelScenario.add(btnResolveScenario, gridBagConstraints);
 		
+		btnClearAssignedUnits.setText(resourceMap.getString("btnClearAssignedUnits.text")); // NOI18N
+		btnClearAssignedUnits.setToolTipText(resourceMap
+				.getString("btnClearAssignedUnits.toolTipText")); // NOI18N
+		btnClearAssignedUnits.setName("btnClearAssignedUnits"); // NOI18N
+		btnClearAssignedUnits.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				clearAssignedUnits();
+			}
+		});
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 2;
+		gridBagConstraints.gridy = 1;
+		gridBagConstraints.gridwidth = 1;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+		gridBagConstraints.weightx = 1.0;
+		gridBagConstraints.weighty = 0.0;
+		panelScenario.add(btnClearAssignedUnits, gridBagConstraints);
+		
 		scrollScenarioView.setViewportView(null);
 		scrollScenarioView.setMinimumSize(new java.awt.Dimension(550, 600));
 		scrollScenarioView.setPreferredSize(new java.awt.Dimension(550, 600));
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 1;
+		gridBagConstraints.gridy = 2;
 		gridBagConstraints.gridwidth = 3;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 		gridBagConstraints.weightx = 1.0;
@@ -774,10 +829,10 @@ public class MekHQView extends FrameView {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
 		panelMapView.add(lblFindPlanet, gridBagConstraints);
 		
-		suggestPlanet = new JSuggestField(this.getFrame(), campaign.getPlanetNames());
+		suggestPlanet = new JSuggestField(this.getFrame(), getCampaign().getPlanetNames());
 		suggestPlanet.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				Planet p = campaign.getPlanet(suggestPlanet.getText());
+				Planet p = getCampaign().getPlanet(suggestPlanet.getText());
 				if(null != p) {
 					panMap.setSelectedPlanet(p);
 					refreshPlanetView();
@@ -829,10 +884,10 @@ public class MekHQView extends FrameView {
 		gridBagConstraints.weighty = 0.0;
 		panelMapView.add(btnBeginTransit, gridBagConstraints);
 		
-		panMap = new InterstellarMapPanel(campaign, this);
+		panMap = new InterstellarMapPanel(getCampaign(), this);
 		panMap.setName("panMap"); // NOI18N		
 		//lets go ahead and zoom in on the current location
-		panMap.setSelectedPlanet(campaign.getLocation().getCurrentPlanet());
+		panMap.setSelectedPlanet(getCampaign().getLocation().getCurrentPlanet());
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 1;
@@ -1281,7 +1336,7 @@ public class MekHQView extends FrameView {
 		
 		astechPoolLabel.setFont(resourceMap.getFont("lblTargetNum.font")); // NOI18N
 		astechPoolLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-		astechPoolLabel.setText("<html><b>Astech Pool Minutes:</> " + campaign.getAstechPoolMinutes() + " (" + campaign.getNumberAstechs() + " Astechs)</html>"); // NOI18N
+		astechPoolLabel.setText("<html><b>Astech Pool Minutes:</> " + getCampaign().getAstechPoolMinutes() + " (" + getCampaign().getNumberAstechs() + " Astechs)</html>"); // NOI18N
 		astechPoolLabel.setName("astechPoolLabel"); // NOI18N
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 2;
@@ -1516,7 +1571,7 @@ public class MekHQView extends FrameView {
 
 		lblLocation.setMinimumSize(new java.awt.Dimension(250,100));
 		lblLocation.setPreferredSize(new java.awt.Dimension(250, 100));
-		lblLocation.setText(campaign.getLocation().getReport(campaign.getCalendar().getTime())); // NOI18N
+		lblLocation.setText(getCampaign().getLocation().getReport(getCampaign().getCalendar().getTime())); // NOI18N
 		lblLocation.setName("lblLocation"); // NOI18N
 		lblLocation.setVerticalAlignment(SwingConstants.TOP);
 		gridBagConstraints = new java.awt.GridBagConstraints();
@@ -1535,7 +1590,7 @@ public class MekHQView extends FrameView {
 				.getString("txtPaneReport.contentType")); // NOI18N
 		txtPaneReport.setEditable(false);
 		txtPaneReport.setFont(resourceMap.getFont("txtPaneReport.font")); // NOI18N
-		txtPaneReport.setText(campaign.getCurrentReportHTML());
+		txtPaneReport.setText(getCampaign().getCurrentReportHTML());
 		txtPaneReport.setName("txtPaneReport"); // NOI18N
 		txtPaneReportScrollPane.setViewportView(txtPaneReport);
 
@@ -1621,6 +1676,15 @@ public class MekHQView extends FrameView {
 			}
 		});
 		fileMenu.add(menuOptions);
+		
+		menuOptionsMM.setText(resourceMap.getString("menuOptionsMM.text")); // NOI18N
+		menuOptionsMM.setName("menuOptionsMM"); // NOI18N
+		menuOptionsMM.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				menuOptionsMMActionPerformed(evt);
+			}
+		});
+		fileMenu.add(menuOptionsMM);
 
 		javax.swing.ActionMap actionMap = org.jdesktop.application.Application
 				.getInstance(mekhq.MekHQApp.class).getContext()
@@ -1687,7 +1751,7 @@ public class MekHQView extends FrameView {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(getFrame(), true, "Hire How Many Astechs?", 1, 0, 100);
 				pvcd.setVisible(true);
-				campaign.increaseAstechPool(pvcd.getValue());
+				getCampaign().increaseAstechPool(pvcd.getValue());
 				refreshTechsList();
 				refreshTempAstechs();
 			}
@@ -1696,9 +1760,9 @@ public class MekHQView extends FrameView {
 		miFireAstechs.setText("Release Astechs");
 		miFireAstechs.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(getFrame(), true, "Release How Many Astechs?", 1, 0, campaign.getAstechPool());
+				PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(getFrame(), true, "Release How Many Astechs?", 1, 0, getCampaign().getAstechPool());
 				pvcd.setVisible(true);
-				campaign.decreaseAstechPool(pvcd.getValue());
+				getCampaign().decreaseAstechPool(pvcd.getValue());
 				refreshTechsList();
 				refreshTempAstechs();
 			}
@@ -1707,9 +1771,9 @@ public class MekHQView extends FrameView {
 		miFullStrengthAstechs.setText("Bring All Tech Teams to Full Strength");
 		miFullStrengthAstechs.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				int need = (campaign.getTechs().size() * 6) - campaign.getNumberAstechs();
+				int need = (getCampaign().getTechs().size() * 6) - getCampaign().getNumberAstechs();
 				if(need > 0) {
-					campaign.increaseAstechPool(need);
+					getCampaign().increaseAstechPool(need);
 				}
 				refreshTechsList();
 				refreshTempAstechs();
@@ -1719,7 +1783,7 @@ public class MekHQView extends FrameView {
 		miFireAllAstechs.setText("Release All Astechs from Pool");
 		miFireAllAstechs.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				campaign.decreaseAstechPool(campaign.getAstechPool());
+				getCampaign().decreaseAstechPool(getCampaign().getAstechPool());
 				refreshTechsList();
 				refreshTempAstechs();
 			}
@@ -1732,7 +1796,7 @@ public class MekHQView extends FrameView {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(getFrame(), true, "Hire How Many Medics?", 1, 0, 100);
 				pvcd.setVisible(true);
-				campaign.increaseMedicPool(pvcd.getValue());
+				getCampaign().increaseMedicPool(pvcd.getValue());
 				refreshDoctorsList();
 				refreshTempMedics();
 			}
@@ -1741,9 +1805,9 @@ public class MekHQView extends FrameView {
 		miFireMedics.setText("Release Medics");
 		miFireMedics.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(getFrame(), true, "Release How Many Medics?", 1, 0, campaign.getMedicPool());
+				PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(getFrame(), true, "Release How Many Medics?", 1, 0, getCampaign().getMedicPool());
 				pvcd.setVisible(true);
-				campaign.decreaseMedicPool(pvcd.getValue());
+				getCampaign().decreaseMedicPool(pvcd.getValue());
 				refreshDoctorsList();				
 				refreshTempMedics();
 			}
@@ -1752,9 +1816,9 @@ public class MekHQView extends FrameView {
 		miFullStrengthMedics.setText("Bring All Medical Teams to Full Strength");
 		miFullStrengthMedics.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				int need = (campaign.getDoctors().size() * 4) - campaign.getNumberMedics();
+				int need = (getCampaign().getDoctors().size() * 4) - getCampaign().getNumberMedics();
 				if(need > 0) {
-					campaign.increaseMedicPool(need);
+					getCampaign().increaseMedicPool(need);
 				}
 				refreshDoctorsList();
 				refreshTempMedics();
@@ -1764,7 +1828,7 @@ public class MekHQView extends FrameView {
 		miFireAllMedics.setText("Release All Medics from Pool");
 		miFireAllMedics.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				campaign.decreaseMedicPool(campaign.getMedicPool());
+				getCampaign().decreaseMedicPool(getCampaign().getMedicPool());
 				refreshDoctorsList();
 			}
 		});
@@ -1808,7 +1872,7 @@ public class MekHQView extends FrameView {
 		refreshLocation();
 		refreshTempAstechs();
 		refreshTempMedics();
-		panMap.setCampaign(campaign);
+		panMap.setCampaign(getCampaign());
 		
 	/*	statusPanelSeparator.setName("statusPanelSeparator"); // NOI18N
 		statusMessageLabel.setName("statusMessageLabel"); // NOI18N
@@ -1881,14 +1945,14 @@ public class MekHQView extends FrameView {
 	}// </editor-fold>//GEN-END:initComponents
 	
 	private void btnAddMissionActionPerformed(java.awt.event.ActionEvent evt) {
-		MissionTypeDialog mtd = new MissionTypeDialog(this.getFrame(), true, campaign, this);
+		MissionTypeDialog mtd = new MissionTypeDialog(this.getFrame(), true, getCampaign(), this);
 		mtd.setVisible(true);
 	}
 	
 	private void btnEditMissionActionPerformed(java.awt.event.ActionEvent evt) {
-		Mission mission = campaign.getMission(selectedMission);
+		Mission mission = getCampaign().getMission(selectedMission);
 		if(null != mission) {
-			CustomizeMissionDialog cmd = new CustomizeMissionDialog(this.getFrame(), true, mission, campaign);
+			CustomizeMissionDialog cmd = new CustomizeMissionDialog(this.getFrame(), true, mission, getCampaign());
 			cmd.setVisible(true);
 			if(cmd.getMissionId() != -1) {
 				selectedMission = cmd.getMissionId();
@@ -1899,7 +1963,7 @@ public class MekHQView extends FrameView {
 	}
 	
 	private void btnCompleteMissionActionPerformed(java.awt.event.ActionEvent evt) {
-		Mission mission = campaign.getMission(selectedMission);
+		Mission mission = getCampaign().getMission(selectedMission);
 		if(null != mission) {
 			if(mission.hasPendingScenarios()) {
 				JOptionPane.showMessageDialog(this.getFrame(),
@@ -1910,8 +1974,8 @@ public class MekHQView extends FrameView {
 				CompleteMissionDialog cmd = new CompleteMissionDialog(getFrame(), true, mission);
 				cmd.setVisible(true);
 				if(!mission.isActive()) {
-					if(campaign.getActiveMissions().size() > 0) {
-						selectedMission = campaign.getActiveMissions().get(0).getId();
+					if(getCampaign().getActiveMissions().size() > 0) {
+						selectedMission = getCampaign().getActiveMissions().get(0).getId();
 					} else {
 						selectedMission = -1;
 					}
@@ -1922,9 +1986,9 @@ public class MekHQView extends FrameView {
 	}
 	
 	private void btnAddScenarioActionPerformed(java.awt.event.ActionEvent evt) {
-		Mission m = campaign.getMission(selectedMission);
+		Mission m = getCampaign().getMission(selectedMission);
 		if(null != m) {
-			CustomizeScenarioDialog csd = new CustomizeScenarioDialog(getFrame(), true, null, m, campaign);
+			CustomizeScenarioDialog csd = new CustomizeScenarioDialog(getFrame(), true, null, m, getCampaign());
 			csd.setVisible(true);
 			refreshScenarioList();
 		}
@@ -1932,7 +1996,7 @@ public class MekHQView extends FrameView {
 
 	private void calculateJumpPath() {
 		if(null != panMap.getSelectedPlanet()) {
-			panMap.setJumpPath(campaign.calculateJumpPath(campaign.getCurrentPlanetName(), panMap.getSelectedPlanet().getName()));
+			panMap.setJumpPath(getCampaign().calculateJumpPath(getCampaign().getCurrentPlanetName(), panMap.getSelectedPlanet().getName()));
 			refreshPlanetView();
 		}
 	}
@@ -1941,7 +2005,7 @@ public class MekHQView extends FrameView {
 		if(panMap.getJumpPath().isEmpty()) {
 			return;
 		}
-		campaign.getLocation().setJumpPath(panMap.getJumpPath());
+		getCampaign().getLocation().setJumpPath(panMap.getJumpPath());
 		refreshPlanetView();
 		refreshLocation();
 		panMap.setJumpPath(new JumpPath());
@@ -1950,18 +2014,18 @@ public class MekHQView extends FrameView {
 	
 	private void btnDoTaskActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnDoTaskActionPerformed
 		
-		Person tech = campaign.getPerson(currentTechId);		
+		Person tech = getCampaign().getPerson(currentTechId);		
 	
 		if (null != tech) {
 			if(acquireSelected()) {
-				Part part = campaign.getPart(currentAcquisitionId);
+				Part part = getCampaign().getPart(currentAcquisitionId);
 				if(null != part && part instanceof IAcquisitionWork) {
-					campaign.acquirePart((IAcquisitionWork)part, tech);
+					getCampaign().acquirePart((IAcquisitionWork)part, tech);
 				}
 			} else if(repairsSelected()) {
-				Part part = campaign.getPart(currentServiceablePartsId);
+				Part part = getCampaign().getPart(currentServiceablePartsId);
 				if(null != part) {
-					campaign.fixPart(part, tech);
+					getCampaign().fixPart(part, tech);
 				}
 			}
 		}
@@ -1981,8 +2045,8 @@ public class MekHQView extends FrameView {
 	private void TechTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
 		int selected = TechTable.getSelectedRow();
 		
-		if ((selected > -1) && (selected < campaign.getTechs().size())) {
-			currentTechId = campaign.getTechs().get(selected).getId();
+		if ((selected > -1) && (selected < getCampaign().getTechs().size())) {
+			currentTechId = getCampaign().getTechs().get(selected).getId();
 		} else if (selected < 0) {
 			currentTechId = -1;
 		}
@@ -1995,8 +2059,8 @@ public class MekHQView extends FrameView {
 		int selected = TaskTable.getSelectedRow();
 		
 		if ((selected > -1)
-				&& (selected < campaign.getPartsNeedingServiceFor(currentServicedUnitId).size())) {
-			currentServiceablePartsId = campaign.getPartsNeedingServiceFor(currentServicedUnitId)
+				&& (selected < getCampaign().getPartsNeedingServiceFor(currentServicedUnitId).size())) {
+			currentServiceablePartsId = getCampaign().getPartsNeedingServiceFor(currentServicedUnitId)
 					.get(selected).getId();
 		} else {
 			currentServiceablePartsId = -1;
@@ -2008,8 +2072,8 @@ public class MekHQView extends FrameView {
 			int sel = TaskTable.getSelectedRows()[i];
 			
 			if ((sel > -1)
-					&& (sel < campaign.getPartsNeedingServiceFor(currentServicedUnitId).size())) {
-				selectedTasksIds[i] = campaign.getPartsNeedingServiceFor(currentServicedUnitId)
+					&& (sel < getCampaign().getPartsNeedingServiceFor(currentServicedUnitId).size())) {
+				selectedTasksIds[i] = getCampaign().getPartsNeedingServiceFor(currentServicedUnitId)
 						.get(sel).getId();
 			} else {
 				selectedTasksIds[i] = -1;
@@ -2024,8 +2088,8 @@ public class MekHQView extends FrameView {
 		int selected = AcquisitionTable.getSelectedRow();
 		
 		if ((selected > -1)
-				&& (selected < campaign.getAcquisitionsForUnit(currentServicedUnitId).size())) {
-			currentAcquisitionId = campaign.getAcquisitionsForUnit(currentServicedUnitId)
+				&& (selected < getCampaign().getAcquisitionsForUnit(currentServicedUnitId).size())) {
+			currentAcquisitionId = getCampaign().getAcquisitionsForUnit(currentServicedUnitId)
 					.get(selected).getId();
 		} else {
 			currentAcquisitionId = -1;
@@ -2038,8 +2102,8 @@ public class MekHQView extends FrameView {
 	private void servicedUnitTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
 		int selected = servicedUnitTable.getSelectedRow();
 		
-		if ((selected > -1) && (selected < campaign.getServiceableUnits().size())) {
-			currentServicedUnitId = campaign.getServiceableUnits().get(selected).getId();
+		if ((selected > -1) && (selected < getCampaign().getServiceableUnits().size())) {
+			currentServicedUnitId = getCampaign().getServiceableUnits().get(selected).getId();
 		} else if (selected < 0) {
 			currentServicedUnitId = -1;
 		}
@@ -2057,8 +2121,8 @@ public class MekHQView extends FrameView {
 			javax.swing.event.ListSelectionEvent evt) {
 		int selected = patientTable.getSelectedRow();
 		
-		if ((selected > -1) && (selected < campaign.getPatients().size())) {
-			currentPatientId = campaign.getPatients().get(selected).getId();
+		if ((selected > -1) && (selected < getCampaign().getPatients().size())) {
+			currentPatientId = getCampaign().getPatients().get(selected).getId();
 		} else if (selected < 0) {
 			currentPatientId = -1;
 		}
@@ -2069,8 +2133,8 @@ public class MekHQView extends FrameView {
 	private void DocTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
 		int selected = DocTable.getSelectedRow();
 		
-		if ((selected > -1) && (selected < campaign.getDoctors().size())) {
-			currentDoctorId = campaign.getDoctors().get(selected).getId();
+		if ((selected > -1) && (selected < getCampaign().getDoctors().size())) {
+			currentDoctorId = getCampaign().getDoctors().get(selected).getId();
 		} else if (selected < 0) {
 			currentDoctorId = -1;
 		}
@@ -2082,15 +2146,15 @@ public class MekHQView extends FrameView {
 	private void PartsTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
 		int selected = partsTable.getSelectedRow();
 		
-		if ((selected > -1) && (selected < campaign.getParts().size())) {
-		//	currentPartsId = campaign.getParts().get(selected).getId();
+		if ((selected > -1) && (selected < getCampaign().getParts().size())) {
+		//	currentPartsId = getCampaign().getParts().get(selected).getId();
 		} else if (selected < 0) {
 			//currentPartsId = -1;
 		}
 	}
 
 	private void btnAdvanceDayActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnAdvanceDayActionPerformed
-		campaign.newDay();
+		getCampaign().newDay();
 		refreshServicedUnitList();
 		refreshUnitList();
 		refreshPersonnelList();
@@ -2115,7 +2179,7 @@ public class MekHQView extends FrameView {
 		}
 		
 		int row = patientTable.getSelectedRow();
-		Person p = campaign.getPerson(currentPatientId);
+		Person p = getCampaign().getPerson(currentPatientId);
 		
 		if ((null != p) && (p.needsFixing())) {
 			p.setDoctorId(currentDoctorId);
@@ -2135,9 +2199,9 @@ public class MekHQView extends FrameView {
 	private void hirePerson(java.awt.event.ActionEvent evt) {
 		int type = Integer.parseInt(evt.getActionCommand());
 		CustomizePersonDialog npd = new CustomizePersonDialog(getFrame(), true, 
-				campaign.newPerson(type), 
+				getCampaign().newPerson(type), 
 				true,
-				campaign,
+				getCampaign(),
 				this);
 		npd.setVisible(true);
 	}
@@ -2159,7 +2223,7 @@ public class MekHQView extends FrameView {
 		try {
 			fos = new FileOutputStream(file);
 			pw = new PrintWriter(new OutputStreamWriter(fos, "UTF-8"));
-			campaign.writeToXml(pw);
+			getCampaign().writeToXml(pw);
 			pw.flush();
 			pw.close();
 			fos.close();
@@ -2173,8 +2237,8 @@ public class MekHQView extends FrameView {
 		JFileChooser saveCpgn = new JFileChooser(".");
 		saveCpgn.setDialogTitle("Save Campaign");
 		saveCpgn.setFileFilter(new ExtFileFilter(fileExt));
-		saveCpgn.setSelectedFile(new File(campaign.getName()
-				+ campaign.getShortDateAsString() + fileExt)); //$NON-NLS-1$
+		saveCpgn.setSelectedFile(new File(getCampaign().getName()
+				+ getCampaign().getShortDateAsString() + fileExt)); //$NON-NLS-1$
 		int returnVal = saveCpgn.showSaveDialog(mainPanel);
 
 		if ((returnVal != JFileChooser.APPROVE_OPTION)
@@ -2193,7 +2257,7 @@ public class MekHQView extends FrameView {
 		if(null == f) {
 			return;
 		}
-		DataLoadingDialog dataLoadingDialog = new DataLoadingDialog((SingleFrameApplication)getApplication(), f);   	
+		DataLoadingDialog dataLoadingDialog = new DataLoadingDialog((MekHQApp)getApplication(), f);   	
 		//TODO: does this effectively deal with memory management issues?
 		getApplication().hide(this);
 		dataLoadingDialog.setVisible(true);
@@ -2315,19 +2379,19 @@ public class MekHQView extends FrameView {
     }
 
 	private void btnOvertimeActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnOvertimeActionPerformed
-		campaign.setOvertime(btnOvertime.isSelected());
+		getCampaign().setOvertime(btnOvertime.isSelected());
 		refreshTechsList();
 		refreshTaskList();
 		refreshAcquireList();
 	}// GEN-LAST:event_btnOvertimeActionPerformed
 
 	private void btnGMModeActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnGMModeActionPerformed
-		campaign.setGMMode(btnGMMode.isSelected());
+		getCampaign().setGMMode(btnGMMode.isSelected());
 	}// GEN-LAST:event_btnGMModeActionPerformed
 
 	private void menuOptionsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuOptionsActionPerformed
 		CampaignOptionsDialog cod = new CampaignOptionsDialog(getFrame(), true,
-				campaign, camos);
+				getCampaign(), camos);
 		cod.setVisible(true);
 		refreshCalendar();
 		changePersonnelView();
@@ -2335,6 +2399,19 @@ public class MekHQView extends FrameView {
 		panMap.repaint();
 	}// GEN-LAST:event_menuOptionsActionPerformed
 
+	private void menuOptionsMMActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuOptionsActionPerformed
+		GameOptionsDialog god = new GameOptionsDialog(getFrame(), getCampaign().getGameOptions());
+		god.refreshOptions();
+		god.setVisible(true);
+		if(!god.wasCancelled()) {
+			getCampaign().setGameOptions(god.getOptions());
+			refreshCalendar();
+			changePersonnelView();
+			refreshPersonnelList();
+		}
+	}// GEN-LAST:event_menuOptionsActionPerformed
+
+	
 	private void miLoadForcesActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miLoadForcesActionPerformed
 		try {
 			loadListFile(true);
@@ -2346,10 +2423,10 @@ public class MekHQView extends FrameView {
 
 	private void miPurchaseUnitActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miPurchaseUnitActionPerformed
 		UnitSelectorDialog usd = new UnitSelectorDialog(getFrame(), true,
-				campaign, this);
+				getCampaign(), this);
 
-		if (!campaign.isGM()) {
-			usd.restrictToYear(campaign.getCalendar().get(Calendar.YEAR));
+		if (!getCampaign().isGM()) {
+			usd.restrictToYear(getCampaign().getCalendar().get(Calendar.YEAR));
 		}
 
 		usd.setVisible(true);
@@ -2368,7 +2445,7 @@ public class MekHQView extends FrameView {
 			return;
 		}
 		Person selectedPerson = personModel.getPerson(personnelTable.convertRowIndexToModel(row));
-		scrollPersonnelView.setViewportView(new PersonViewPanel(selectedPerson, campaign, portraits));
+		scrollPersonnelView.setViewportView(new PersonViewPanel(selectedPerson, getCampaign(), portraits));
 		//This odd code is to make sure that the scrollbar stays at the top
 		//I cant just call it here, because it ends up getting reset somewhere later
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -2386,7 +2463,7 @@ public class MekHQView extends FrameView {
 			return;
 		}
 		Unit selectedUnit = unitModel.getUnit(unitTable.convertRowIndexToModel(row));
-		scrollUnitView.setViewportView(new UnitViewPanel(selectedUnit, campaign, camos, mt));
+		scrollUnitView.setViewportView(new UnitViewPanel(selectedUnit, getCampaign(), camos, mt));
 		//This odd code is to make sure that the scrollbar stays at the top
 		//I cant just call it here, because it ends up getting reset somewhere later
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -2404,7 +2481,7 @@ public class MekHQView extends FrameView {
 			return;
 		}
 		Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
-		scrollScenarioView.setViewportView(new ScenarioViewPanel(scenario, campaign, this));
+		scrollScenarioView.setViewportView(new ScenarioViewPanel(scenario, getCampaign(), this));
 		//This odd code is to make sure that the scrollbar stays at the top
 		//I cant just call it here, because it ends up getting reset somewhere later
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -2433,9 +2510,9 @@ public class MekHQView extends FrameView {
 					if(u.usesSoloPilot()) {
 						name = "Pilot";
 					}
-					tabUnit.add(name, new PersonViewPanel(p, campaign, portraits));
+					tabUnit.add(name, new PersonViewPanel(p, getCampaign(), portraits));
 				}
-				tabUnit.add("Unit", new UnitViewPanel(u, campaign, camos, mt));
+				tabUnit.add("Unit", new UnitViewPanel(u, getCampaign(), camos, mt));
 				scrollForceView.setViewportView(tabUnit);
 			}
 			//This odd code is to make sure that the scrollbar stays at the top
@@ -2446,7 +2523,7 @@ public class MekHQView extends FrameView {
 				}
 			});
 		} else if (node.getUserObject() instanceof Force) {
-			scrollForceView.setViewportView(new ForceViewPanel((Force)node.getUserObject(), campaign, portraits, forceIcons, camos, mt));
+			scrollForceView.setViewportView(new ForceViewPanel((Force)node.getUserObject(), getCampaign(), portraits, forceIcons, camos, mt));
 			javax.swing.SwingUtilities.invokeLater(new Runnable() {
 				public void run() { 
 					scrollForceView.getVerticalScrollBar().setValue(0);
@@ -2458,12 +2535,12 @@ public class MekHQView extends FrameView {
 	protected void refreshPlanetView() {
 		JumpPath path = panMap.getJumpPath();
 		if(null != path && !path.isEmpty()) {
-			scrollPlanetView.setViewportView(new JumpPathViewPanel(path, campaign));
+			scrollPlanetView.setViewportView(new JumpPathViewPanel(path, getCampaign()));
 			return;
 		}
 		Planet planet = panMap.getSelectedPlanet();
 		if(null != planet) {
-			scrollPlanetView.setViewportView(new PlanetViewPanel(planet, campaign));
+			scrollPlanetView.setViewportView(new PlanetViewPanel(planet, getCampaign()));
 		}
 	}
 	
@@ -2471,7 +2548,7 @@ public class MekHQView extends FrameView {
 		AddFundsDialog addFundsDialog = new AddFundsDialog(null, true);
 		addFundsDialog.setVisible(true);
 		long funds = addFundsDialog.getFundsQuantity();
-		campaign.addFunds(funds);
+		getCampaign().addFunds(funds);
 		refreshReport();
 		refreshFunds();
 		refreshFinancialTransactions();
@@ -2533,13 +2610,13 @@ public class MekHQView extends FrameView {
 
 			// Add the units from the file.
 			for (Entity entity : parser.getEntities()) {
-				campaign.addUnit(entity, allowNewPilots);
+				getCampaign().addUnit(entity, allowNewPilots);
 			}
 			
 			// add any ejected pilots
 			for (Pilot pilot : parser.getPilots()) {
 				if (pilot.isEjected()) {
-					//campaign.addPilot(pilot, PilotPerson.T_MECHWARRIOR, false);
+					//getCampaign().addPilot(pilot, PilotPerson.T_MECHWARRIOR, false);
 				}
 			}
 		}
@@ -2560,7 +2637,7 @@ public class MekHQView extends FrameView {
 			if(null == scenario) {
 				return;
 			}
-			scenario.clearAllForcesAndPersonnel(campaign);
+			scenario.clearAllForcesAndPersonnel(getCampaign());
 			refreshScenarioList();
 			refreshPersonnelList();
 			refreshUnitList();
@@ -2574,7 +2651,7 @@ public class MekHQView extends FrameView {
 		if(null == scenario) {
 			return;
 		}
-		ResolveWizardChooseFilesDialog resolveDialog = new ResolveWizardChooseFilesDialog(this.getFrame(), true, new ResolveScenarioTracker(scenario, campaign));
+		ResolveWizardChooseFilesDialog resolveDialog = new ResolveWizardChooseFilesDialog(this.getFrame(), true, new ResolveScenarioTracker(scenario, getCampaign()));
 		resolveDialog.setVisible(true);
 		
 		refreshScenarioList();
@@ -2589,13 +2666,70 @@ public class MekHQView extends FrameView {
 		refreshFinancialTransactions();
 	}
 	
+	protected void loadScenario() {
+		int row = scenarioTable.getSelectedRow();
+		if(row < 0) {
+			return;
+		}
+		Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
+		if(null != scenario) {
+			((MekHQApp)getApplication()).startHost(scenario, true, null);
+		}
+	}
+	
+	protected void startScenario() {
+		int row = scenarioTable.getSelectedRow();
+		if(row < 0) {
+			return;
+		}
+		Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
+		Vector<Integer> uids = scenario.getForces(getCampaign()).getAllUnits();
+		
+		if(uids.size() == 0) {
+			return;
+		}
+		
+		ArrayList<Unit> chosen = new ArrayList<Unit>();
+		//ArrayList<Unit> toDeploy = new ArrayList<Unit>();
+		StringBuffer undeployed = new StringBuffer();
+		
+		for(int uid : uids) {
+			Unit u = getCampaign().getUnit(uid);
+			if(u.isUnmanned()) {
+				continue;
+			}
+			if (null != u.getEntity()) {
+				if (null == u.checkDeployment()) {
+					chosen.add(u);
+				} else {
+					undeployed.append("\n")
+					.append(u.getEntity().getDisplayName())
+					.append(" (").append(u.checkDeployment())
+					.append(")");
+				}
+			}
+		}
+		
+		if (undeployed.length() > 0) {
+			JOptionPane.showMessageDialog(
+					getFrame(),
+					"The following units could not be deployed:"
+							+ undeployed.toString(),
+					"Could not deploy some units", JOptionPane.WARNING_MESSAGE);
+		}
+	
+		if(chosen.size() > 0) {
+			((MekHQApp)getApplication()).startHost(scenario, false, chosen);
+		}
+	}
+	
 	protected void deployListFile() {
 		int row = scenarioTable.getSelectedRow();
 		if(row < 0) {
 			return;
 		}
 		Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
-		Vector<Integer> uids = scenario.getForces(campaign).getAllUnits();
+		Vector<Integer> uids = scenario.getForces(getCampaign()).getAllUnits();
 		
 		if(uids.size() == 0) {
 			return;
@@ -2606,7 +2740,7 @@ public class MekHQView extends FrameView {
 		StringBuffer undeployed = new StringBuffer();
 		
 		for(int uid : uids) {
-			Unit u = campaign.getUnit(uid);
+			Unit u = getCampaign().getUnit(uid);
 			if(u.isUnmanned()) {
 				continue;
 			}
@@ -2671,7 +2805,7 @@ public class MekHQView extends FrameView {
 				excep.printStackTrace(System.err);
 			}
 		}
-
+		
 		refreshServicedUnitList();
 		refreshUnitList();
 		refreshPatientList();
@@ -2688,20 +2822,20 @@ public class MekHQView extends FrameView {
 
 	protected void refreshServicedUnitList() {
 		int selected = servicedUnitTable.getSelectedRow();
-		servicedUnitModel.setData(campaign.getServiceableUnits());
-		if ((selected > -1) && (selected < campaign.getServiceableUnits().size())) {
+		servicedUnitModel.setData(getCampaign().getServiceableUnits());
+		if ((selected > -1) && (selected < getCampaign().getServiceableUnits().size())) {
 			servicedUnitTable.setRowSelectionInterval(selected, selected);
 		}
 	}
 	
 	protected void refreshPersonnelList() {
-		personModel.setData(campaign.getPersonnel());
+		personModel.setData(getCampaign().getPersonnel());
 	}
 	
 	protected void changeMission() {
 		int idx = choiceMission.getSelectedIndex();
-		if(idx >= 0 && idx < campaign.getActiveMissions().size()) {
-			Mission m = campaign.getActiveMissions().get(idx);
+		if(idx >= 0 && idx < getCampaign().getActiveMissions().size()) {
+			Mission m = getCampaign().getActiveMissions().get(idx);
 			if(null != m) {
 				selectedMission = m.getId();		
 				if(m instanceof Contract) {
@@ -2725,7 +2859,7 @@ public class MekHQView extends FrameView {
 	}
 	
 	protected void refreshScenarioList() {
-		Mission m = campaign.getMission(selectedMission);
+		Mission m = getCampaign().getMission(selectedMission);
 		if(null != m) {
 			scenarioModel.setData(m.getScenarios());
 		} else {
@@ -2734,27 +2868,27 @@ public class MekHQView extends FrameView {
 	}
 	
 	protected void refreshUnitList() {
-		unitModel.setData(campaign.getUnits());
+		unitModel.setData(getCampaign().getUnits());
 	}
 
 	protected void refreshTaskList() {
-		taskModel.setData(campaign.getPartsNeedingServiceFor(currentServicedUnitId));
+		taskModel.setData(getCampaign().getPartsNeedingServiceFor(currentServicedUnitId));
 	}
 	
 	protected void refreshAcquireList() {
-		acquireModel.setData(campaign.getAcquisitionsForUnit(currentServicedUnitId));
+		acquireModel.setData(getCampaign().getAcquisitionsForUnit(currentServicedUnitId));
 	}
 	
 	protected void refreshMissions() {
 		choiceMission.removeAllItems();
-		for(Mission m : campaign.getActiveMissions()) {
+		for(Mission m : getCampaign().getActiveMissions()) {
 			choiceMission.addItem(m.getName());
 			if(m.getId() == selectedMission) {
 				choiceMission.setSelectedItem(m.getName());
 			}
 		}
-		if(choiceMission.getSelectedIndex() == -1 && campaign.getActiveMissions().size() > 0) {
-			selectedMission = campaign.getActiveMissions().get(0).getId();
+		if(choiceMission.getSelectedIndex() == -1 && getCampaign().getActiveMissions().size() > 0) {
+			selectedMission = getCampaign().getActiveMissions().get(0).getId();
 			choiceMission.setSelectedIndex(0);
 		}
 		changeMission();
@@ -2762,56 +2896,56 @@ public class MekHQView extends FrameView {
 
 	protected void refreshTechsList() {
 		int selected = TechTable.getSelectedRow();
-		techsModel.setData(campaign.getTechs());
-		if ((selected > -1) && (selected < campaign.getTechs().size())) {
+		techsModel.setData(getCampaign().getTechs());
+		if ((selected > -1) && (selected < getCampaign().getTechs().size())) {
 			TechTable.setRowSelectionInterval(selected, selected);
 		}
-		String astechString = "<html><b>Astech Pool Minutes:</> " + campaign.getAstechPoolMinutes();
-		if(campaign.isOvertimeAllowed()) {
-			astechString += " [" + campaign.getAstechPoolOvertime() + " overtime]";
+		String astechString = "<html><b>Astech Pool Minutes:</> " + getCampaign().getAstechPoolMinutes();
+		if(getCampaign().isOvertimeAllowed()) {
+			astechString += " [" + getCampaign().getAstechPoolOvertime() + " overtime]";
 		}
-		astechString += " (" + campaign.getNumberAstechs() + " Astechs)</html>";
+		astechString += " (" + getCampaign().getNumberAstechs() + " Astechs)</html>";
 		astechPoolLabel.setText(astechString); // NOI18N
 	}
 
 	protected void refreshDoctorsList() {
 		int selected = DocTable.getSelectedRow();
-		doctorsModel.setData(campaign.getDoctors());
-		if ((selected > -1) && (selected < campaign.getDoctors().size())) {
+		doctorsModel.setData(getCampaign().getDoctors());
+		if ((selected > -1) && (selected < getCampaign().getDoctors().size())) {
 			DocTable.setRowSelectionInterval(selected, selected);
 		}
 	}
 
 	protected void refreshPatientList() {
 		int selected = patientTable.getSelectedRow();
-		patientModel.setData(campaign.getPatients());
-		if ((selected > -1) && (selected < campaign.getPatients().size())) {
+		patientModel.setData(getCampaign().getPatients());
+		if ((selected > -1) && (selected < getCampaign().getPatients().size())) {
 			patientTable.setRowSelectionInterval(selected, selected);
 		}
 	}
 
 	protected void refreshPartsList() {
-		partsModel.setData(campaign.getPartsInventory());
+		partsModel.setData(getCampaign().getPartsInventory());
 	}
 	
 	protected void refreshFinancialTransactions() {
-		financeModel.setData(campaign.getFinances().getAllTransactions());
+		financeModel.setData(getCampaign().getFinances().getAllTransactions());
 		refreshFunds();
 	}
 
 	protected void refreshCalendar() {
-		getFrame().setTitle(campaign.getTitle());
+		getFrame().setTitle(getCampaign().getTitle());
 	}
 
 	protected void refreshReport() {
-		txtPaneReport.setText(campaign.getCurrentReportHTML());
+		txtPaneReport.setText(getCampaign().getCurrentReportHTML());
 		txtPaneReport.setCaretPosition(0);
 	}
 	
 	protected void refreshOrganization() {
 		//traverse the force object and assign TreeNodes
-		Force force = campaign.getForces();
-		DefaultMutableTreeNode top = new DefaultMutableTreeNode(campaign.getForces());
+		Force force = getCampaign().getForces();
+		DefaultMutableTreeNode top = new DefaultMutableTreeNode(getCampaign().getForces());
 		Enumeration<Force> subforces = force.getSubForces().elements();
 		while(subforces.hasMoreElements()) {
 			Force subforce = subforces.nextElement();
@@ -2841,7 +2975,7 @@ public class MekHQView extends FrameView {
 		ArrayList<Unit> units = new ArrayList<Unit>();
 		ArrayList<Unit> unmannedUnits = new ArrayList<Unit>();
 		while(uids.hasMoreElements()) {
-			Unit u = campaign.getUnit(uids.nextElement());
+			Unit u = getCampaign().getUnit(uids.nextElement());
 			if(null != u) {
 				if(null == u.getCommander()) {
 					unmannedUnits.add(u);
@@ -2864,42 +2998,42 @@ public class MekHQView extends FrameView {
 	}
 
 	protected void refreshFunds() {
-		long funds = campaign.getFunds();
+		long funds = getCampaign().getFunds();
 		NumberFormat numberFormat = NumberFormat.getIntegerInstance();
 		String text = "<html><b>Balance:</b> " + numberFormat.format(funds) + " C-Bills</html>";
 		lblFunds.setText(text);
 	}
 	
 	protected void refreshTempAstechs() {
-		String text = "<html><b>Temp Astechs:</b> " +campaign.getAstechPool() + "</html>";
+		String text = "<html><b>Temp Astechs:</b> " +getCampaign().getAstechPool() + "</html>";
 		lblTempAstechs.setText(text);
 	}
 	
 	protected void refreshTempMedics() {
-		String text = "<html><b>Temp Medics:</b> " +campaign.getMedicPool() + "</html>";
+		String text = "<html><b>Temp Medics:</b> " +getCampaign().getMedicPool() + "</html>";
 		lblTempMedics.setText(text);
 	}
 	
 	
 	protected void refreshLocation() {
-		lblLocation.setText(campaign.getLocation().getReport(campaign.getCalendar().getTime()));
+		lblLocation.setText(getCampaign().getLocation().getReport(getCampaign().getCalendar().getTime()));
 	}
 
 	protected void updateAssignEnabled() {
 		// must have a valid tech and an unassigned task	
-		Person tech = campaign.getPerson(currentTechId);
+		Person tech = getCampaign().getPerson(currentTechId);
 		if (null != tech) {
 			if(repairsSelected()) {
-				Part part = campaign.getPart(currentServiceablePartsId);
+				Part part = getCampaign().getPart(currentServiceablePartsId);
 				if(null != part) {
-					btnDoTask.setEnabled(campaign.getTargetFor(part, tech).getValue() != TargetRoll.IMPOSSIBLE);
+					btnDoTask.setEnabled(getCampaign().getTargetFor(part, tech).getValue() != TargetRoll.IMPOSSIBLE);
 				} else {
 					btnDoTask.setEnabled(false);
 				}
 			} else if(acquireSelected()) {
-				Part part = campaign.getPart(currentAcquisitionId);
+				Part part = getCampaign().getPart(currentAcquisitionId);
 				if(null != part && part instanceof IAcquisitionWork) {
-					btnDoTask.setEnabled(campaign.getTargetForAcquisition((IAcquisitionWork)part, tech).getValue() != TargetRoll.IMPOSSIBLE);
+					btnDoTask.setEnabled(getCampaign().getTargetForAcquisition((IAcquisitionWork)part, tech).getValue() != TargetRoll.IMPOSSIBLE);
 				} else {
 					btnDoTask.setEnabled(false);
 				}
@@ -2914,10 +3048,10 @@ public class MekHQView extends FrameView {
 	protected void updateAssignDoctorEnabled() {
 		// must have a valid doctor and an unassigned task
 		
-		Person curPerson = campaign.getPerson(currentPatientId);
-		Person doctor = campaign.getPerson(currentDoctorId);
+		Person curPerson = getCampaign().getPerson(currentPatientId);
+		Person doctor = getCampaign().getPerson(currentDoctorId);
 		if (null != curPerson && curPerson.getAssignedTeamId() == -1 && null != doctor 
-				&& campaign.getTargetFor(curPerson, doctor).getValue() != TargetRoll.IMPOSSIBLE) {
+				&& getCampaign().getTargetFor(curPerson, doctor).getValue() != TargetRoll.IMPOSSIBLE) {
 			btnAssignDoc.setEnabled(true);
 		} else {
 			btnAssignDoc.setEnabled(false);
@@ -2926,17 +3060,17 @@ public class MekHQView extends FrameView {
 
 	protected void updateTargetText() {
 		// must have a valid team and an unassigned task
-		Person tech = campaign.getPerson(currentTechId);
+		Person tech = getCampaign().getPerson(currentTechId);
 		if (null != tech) {
 			TargetRoll target = null;
 			if(acquireSelected()) {
-				Part part = campaign.getPart(currentAcquisitionId);
+				Part part = getCampaign().getPart(currentAcquisitionId);
 				if(null != part && part instanceof IAcquisitionWork)
-				target = campaign.getTargetForAcquisition((IAcquisitionWork)part, tech);
+				target = getCampaign().getTargetForAcquisition((IAcquisitionWork)part, tech);
 			} else {
-				Part part = campaign.getPart(currentServiceablePartsId);
+				Part part = getCampaign().getPart(currentServiceablePartsId);
 				if(null != part) {
-					target = campaign.getTargetFor(part, tech);
+					target = getCampaign().getTargetFor(part, tech);
 				}
 			}
 			if(null != target) {
@@ -3091,7 +3225,7 @@ public class MekHQView extends FrameView {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NABIL), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NIMP), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_HITS), true);
-			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SALARY), campaign.getCampaignOptions().payForSalaries());
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SALARY), getCampaign().getCampaignOptions().payForSalaries());
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), true);	
 		} else if(view == PV_PILOT) {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
@@ -3360,7 +3494,7 @@ public class MekHQView extends FrameView {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TECH), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_WEIGHT), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_COST), true);
-			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_MAINTAIN), campaign.getCampaignOptions().payForMaintain());
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_MAINTAIN), getCampaign().getCampaignOptions().payForMaintain());
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_QUALITY), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_STATUS), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_PILOT), false);
@@ -3391,6 +3525,9 @@ public class MekHQView extends FrameView {
 		}
 	}
 	
+	protected Campaign getCampaign() {
+		return ((MekHQApp)getApplication()).getCampaign();
+	}
 	
 	protected int getSelectedTaskId() {
 		if(repairsSelected()) {
@@ -3514,7 +3651,7 @@ public class MekHQView extends FrameView {
 				return;
 			}
 			if (command.equalsIgnoreCase("SCRAP")) {
-				campaign.addReport(part.scrap());
+				getCampaign().addReport(part.scrap());
 				refreshServicedUnitList();
 				refreshUnitList();
 				refreshTaskList();
@@ -3568,11 +3705,11 @@ public class MekHQView extends FrameView {
 							ReplacementItem replace = (ReplacementItem) task;
 							Part part = replace.partNeeded();
 							replace.setPart(part);
-							campaign.addPart(part);
+							getCampaign().addPart(part);
 						}
 						task.succeed();
 						if (task.isCompleted()) {
-							campaign.removeTask(task);
+							getCampaign().removeTask(task);
 						}
 					}
 					refreshServicedUnitList();
@@ -3667,7 +3804,7 @@ public class MekHQView extends FrameView {
 				menuItem = new JMenuItem("Complete Task");
 				menuItem.setActionCommand("FIX");
 				menuItem.addActionListener(this);
-				menuItem.setEnabled(campaign.isGM()
+				menuItem.setEnabled(getCampaign().isGM()
 						&& (null == task.checkFixable()));
 				menu.add(menuItem);
 				*/
@@ -3736,7 +3873,7 @@ public class MekHQView extends FrameView {
 		}
 
 		public Object getValueAt(int row, int col) {
-			return campaign.getUnitDesc(((Unit) data.get(row)).getId());
+			return getCampaign().getUnitDesc(((Unit) data.get(row)).getId());
 		}
 
 		public Unit getUnitAt(int row) {
@@ -3773,7 +3910,7 @@ public class MekHQView extends FrameView {
 				setOpaque(true);
 				setUnit(u);
 				setText(getValueAt(row, column).toString());
-				//setToolTipText(campaign.getTaskListFor(u));
+				//setToolTipText(getCampaign().getTaskListFor(u));
 				if (isSelected) {
 					select();
 				} else {
@@ -3799,13 +3936,13 @@ public class MekHQView extends FrameView {
 				String sel = command.split(":")[1];
 				int selected = Integer.parseInt(sel);
 				if ((selected > -1)
-						&& (selected < campaign.getTechTeams().size())) {
-					SupportTeam team = campaign.getTechTeams().get(selected);
+						&& (selected < getCampaign().getTechTeams().size())) {
+					SupportTeam team = getCampaign().getTechTeams().get(selected);
 					if (null != team) {
-						for (WorkItem task : campaign
+						for (WorkItem task : getCampaign()
 								.getTasksForUnit(selectedUnit.getId())) {
 							if (team.getTargetFor(task).getValue() != TargetRoll.IMPOSSIBLE) {
-								campaign.processTask(task, team);
+								getCampaign().processTask(task, team);
 							}
 						}
 					}
@@ -3821,7 +3958,7 @@ public class MekHQView extends FrameView {
 			} else if (command.contains("SWAP_AMMO")) {
 				String sel = command.split(":")[1];
 				int selAmmoId = Integer.parseInt(sel);
-				Part part = campaign.getPart(selAmmoId);
+				Part part = getCampaign().getPart(selAmmoId);
 				if (null == part || !(part instanceof AmmoBin)) {
 					return;
 				}
@@ -3873,7 +4010,7 @@ public class MekHQView extends FrameView {
 										+ unit.getEntity().getDisplayName()
 										+ "?", "Remove Unit?",
 								JOptionPane.YES_NO_OPTION)) {
-							campaign.removeUnit(unit.getId());
+							getCampaign().removeUnit(unit.getId());
 						}
 					}
 				}
@@ -3885,7 +4022,7 @@ public class MekHQView extends FrameView {
 					if (unit.isDeployed()) {
 						/*
 						if (null != unit.getPilot()) {
-							unit.getPilot().undeploy(campaign);
+							unit.getPilot().undeploy(getCampaign());
 						}
 						*/
 					}
@@ -3947,7 +4084,7 @@ public class MekHQView extends FrameView {
 	
 					} else if (targetMechName.equals("CHOOSE_VARIANT")) {
 						UnitSelectorDialog usd = new UnitSelectorDialog(null,
-								true, campaign, null);
+								true, getCampaign(), null);
 						usd.restrictToChassis(selectedUnit.getEntity()
 								.getChassis());
 						usd.getComboUnitType().setSelectedIndex(UnitType.MEK);
@@ -3957,8 +4094,8 @@ public class MekHQView extends FrameView {
 								selectedUnit.getEntity().getWeightClass());
 						usd.changeBuyBtnToSelectBtn();
 
-						if (!campaign.isGM()) {
-							usd.restrictToYear(campaign.getCalendar().get(
+						if (!getCampaign().isGM()) {
+							usd.restrictToYear(getCampaign().getCalendar().get(
 									Calendar.YEAR));
 						}
 
@@ -3998,7 +4135,7 @@ public class MekHQView extends FrameView {
 
 					if (targetEntity != null) {
 						selectedUnit.setCustomized(true);
-						selectedUnit.customize(targetEntity, campaign);
+						selectedUnit.customize(targetEntity, getCampaign());
 					}
 
 					refreshServicedUnitList();
@@ -4010,7 +4147,7 @@ public class MekHQView extends FrameView {
 			} else if (command.contains("CANCEL_CUSTOMIZE")) {
 				if (selectedUnit.isCustomized()) {
 					selectedUnit.setCustomized(false);
-					selectedUnit.cancelCustomize(campaign);
+					selectedUnit.cancelCustomize(getCampaign());
 
 					refreshServicedUnitList();
 					refreshUnitList();
@@ -4071,7 +4208,7 @@ public class MekHQView extends FrameView {
 				// assign all tasks to a certain tech
 				menu = new JMenu("Assign all tasks");
 				i = 0;
-				for (Person tech : campaign.getTechs()) {
+				for (Person tech : getCampaign().getTechs()) {
 					menuItem = new JMenuItem(tech.getDesc());
 					menuItem.setActionCommand("ASSIGN_TECH:" + i);
 					menuItem.addActionListener(this);
@@ -4168,7 +4305,7 @@ public class MekHQView extends FrameView {
 		}
 
 		public Object getValueAt(int row, int col) {
-			return ((Person) data.get(row)).getTechDesc(campaign.isOvertimeAllowed());
+			return ((Person) data.get(row)).getTechDesc(getCampaign().isOvertimeAllowed());
 		}
 
 		public Person getTechAt(int row) {
@@ -4188,7 +4325,7 @@ public class MekHQView extends FrameView {
 				Component c = this;
 				setOpaque(true);
 				setText(getValueAt(row, column).toString());
-				// setToolTipText(campaign.getToolTipFor(u));
+				// setToolTipText(getCampaign().getToolTipFor(u));
 				if (isSelected) {
 					select();
 				} else {
@@ -4215,7 +4352,7 @@ public class MekHQView extends FrameView {
 		public Object getValueAt(int row, int col) {
 			Person psn = ((Person) data.get(row));
 
-			return psn.getPatientDesc(campaign);
+			return psn.getPatientDesc(getCampaign());
 		}
 
 		public Person getPersonAt(int row) {
@@ -4247,7 +4384,7 @@ public class MekHQView extends FrameView {
 				setText(getValueAt(row, column).toString());
 				Person p = getPersonAt(row);
 				setPortrait(p);
-				// setToolTipText(campaign.getToolTipFor(u));
+				// setToolTipText(getCampaign().getToolTipFor(u));
 
 				if (isSelected) {
 					select();
@@ -4255,7 +4392,7 @@ public class MekHQView extends FrameView {
 					unselect();
 				}
 
-				if ((null != p) && p.isDeployed(campaign)) {
+				if ((null != p) && p.isDeployed(getCampaign())) {
 					c.setBackground(Color.GRAY);
 				} else if ((null != p) && p.needsFixing()) {
 					c.setBackground(new Color(205, 92, 92));
@@ -4276,8 +4413,8 @@ public class MekHQView extends FrameView {
 			StringTokenizer st = new StringTokenizer(action.getActionCommand(), "|");
             String command = st.nextToken();
             int id = Integer.parseInt(st.nextToken());
-            Force force = campaign.getForce(id);
-            Unit unit = campaign.getUnit(id);
+            Force force = getCampaign().getForce(id);
+            Unit unit = getCampaign().getUnit(id);
             if(command.contains("ADD_FORCE")) {
             	if(null != force) {
 	            	String name = (String)JOptionPane.showInputDialog(
@@ -4288,14 +4425,14 @@ public class MekHQView extends FrameView {
 	                        null,
 	                        null,
 	                        "My Lance");
-	            	campaign.addForce(new Force(name), force);
+	            	getCampaign().addForce(new Force(name), force);
 	            	refreshOrganization();
             	}
             } if(command.contains("ADD_UNIT")) {
             	if(null != force) {
-                    Unit u = campaign.getUnit(Integer.parseInt(st.nextToken()));
+                    Unit u = getCampaign().getUnit(Integer.parseInt(st.nextToken()));
                     if(null != u) {
-                    	campaign.addUnitToForce(u, force.getId());
+                    	getCampaign().addUnitToForce(u, force.getId());
                     	refreshOrganization();
                     	refreshScenarioList();
                     	refreshPersonnelList();
@@ -4305,13 +4442,13 @@ public class MekHQView extends FrameView {
             	}
             } else if(command.contains("DEPLOY_FORCE")) {
                 int sid = Integer.parseInt(st.nextToken());
-            	Scenario scenario = campaign.getScenario(sid);
+            	Scenario scenario = getCampaign().getScenario(sid);
             	if(null != force && null != scenario) {
                     scenario.addForces(force.getId());
                     force.setScenarioId(scenario.getId());
                     refreshScenarioList();
                     for(int uid : force.getAllUnits()) {
-                    	Unit u = campaign.getUnit(uid);
+                    	Unit u = getCampaign().getUnit(uid);
                     	if(null != u) {
                     		u.setScenarioId(scenario.getId());
                     	}
@@ -4358,16 +4495,16 @@ public class MekHQView extends FrameView {
             	}
             } else if(command.contains("REMOVE_FORCE")) {
             	if(null != force) {
-            		campaign.removeForce(force);
+            		getCampaign().removeForce(force);
             		refreshOrganization();   
             		refreshPersonnelList();
             		refreshScenarioList();
             	}
             } else if(command.contains("REMOVE_UNIT")) {
             	if(null != unit) {
-            		Force parentForce = campaign.getForceFor(unit);
+            		Force parentForce = getCampaign().getForceFor(unit);
             		if(null != parentForce) {
-            			campaign.removeUnitFromForce(unit);
+            			getCampaign().removeUnitFromForce(unit);
             			refreshOrganization();
             			refreshPersonnelList();
             			refreshScenarioList();
@@ -4375,7 +4512,7 @@ public class MekHQView extends FrameView {
             	}
             } else if(command.contains("DEPLOY_UNIT")) {
                 int sid = Integer.parseInt(st.nextToken());
-            	Scenario scenario = campaign.getScenario(sid);
+            	Scenario scenario = getCampaign().getScenario(sid);
             	if(null != unit && null != scenario) {
                     scenario.addUnit(unit.getId());
                     unit.setScenarioId(scenario.getId());
@@ -4439,7 +4576,7 @@ public class MekHQView extends FrameView {
 	                popup.add(menuItem);
 	                menu = new JMenu("Add Unit");
 	                //only add units that have commanders
-	                for(Unit u : campaign.getUnits()) {
+	                for(Unit u : getCampaign().getUnits()) {
 	                	if(null != u.getCommander()) {
 	                		Person p = u.getCommander();
 	                		if(p.isActive() && u.getForceId() < 1) {
@@ -4458,7 +4595,7 @@ public class MekHQView extends FrameView {
 	                if(!force.isDeployed() && force.getAllUnits().size()>0) {
 	                	menu = new JMenu("Deploy Force");
 	                	JMenu missionMenu;
-	                	for(Mission m : campaign.getActiveMissions()) {
+	                	for(Mission m : getCampaign().getActiveMissions()) {
 	                		missionMenu = new JMenu(m.getName());
 	                		for(Scenario s : m.getScenarios()) {
 	                			if(s.isCurrent()) {
@@ -4486,7 +4623,7 @@ public class MekHQView extends FrameView {
                 }
                 else if(null != unit) {
                 	int uid = unit.getId();
-                	Force parentForce = campaign.getForceFor(unit);
+                	Force parentForce = getCampaign().getForceFor(unit);
                 	if(null != parentForce) {
 	                	menuItem = new JMenuItem("Remove Unit from " + parentForce.getName());
 		                menuItem.setActionCommand("REMOVE_UNIT|" + uid);
@@ -4497,7 +4634,7 @@ public class MekHQView extends FrameView {
                 	if(!unit.isDeployed()) {
                 		menu = new JMenu("Deploy Unit");
 	                	JMenu missionMenu;
-	                	for(Mission m : campaign.getActiveMissions()) {
+	                	for(Mission m : getCampaign().getActiveMissions()) {
 	                		missionMenu = new JMenu(m.getName());
 	                		for(Scenario s : m.getScenarios()) {
 	                			if(s.isCurrent()) {
@@ -4686,7 +4823,7 @@ public class MekHQView extends FrameView {
 				int rank = Integer.parseInt(st.nextToken());
 				for(Person person : people) {
 					person.setRank(rank);
-					campaign.personUpdated(person);
+					getCampaign().personUpdated(person);
 				}
 				refreshServicedUnitList();
 				refreshUnitList();
@@ -4699,7 +4836,7 @@ public class MekHQView extends FrameView {
 				int role = Integer.parseInt(st.nextToken());
 				for(Person person : people) {
 					person.setPrimaryRole(role);
-					campaign.personUpdated(person);
+					getCampaign().personUpdated(person);
 				}
 				refreshServicedUnitList();
 				refreshUnitList();
@@ -4712,7 +4849,7 @@ public class MekHQView extends FrameView {
 				int role = Integer.parseInt(st.nextToken());
 				for(Person person : people) {
 					person.setSecondaryRole(role);
-					campaign.personUpdated(person);
+					getCampaign().personUpdated(person);
 				}
 				refreshServicedUnitList();
 				refreshUnitList();
@@ -4722,7 +4859,7 @@ public class MekHQView extends FrameView {
 				refreshDoctorsList();
 				refreshOrganization();
 			} else if (command.contains("REMOVE_UNIT")) {	
-				Unit u = campaign.getUnit(selectedPerson.getUnitId());
+				Unit u = getCampaign().getUnit(selectedPerson.getUnitId());
 				if(null != u) {
 					u.remove(selectedPerson);
 				}
@@ -4732,7 +4869,7 @@ public class MekHQView extends FrameView {
 				refreshOrganization();
 			} else if (command.contains("ADD_PILOT") || command.contains("ADD_SOLDIER")) {
 				int selected = Integer.parseInt(st.nextToken());		
-				Unit u = campaign.getUnit(selected);
+				Unit u = getCampaign().getUnit(selected);
 				if(null != u) {
 					u.addPilotOrSoldier(selectedPerson);
 				}
@@ -4742,7 +4879,7 @@ public class MekHQView extends FrameView {
 				refreshOrganization();
 			} else if (command.contains("ADD_DRIVER")) {
 				int selected = Integer.parseInt(st.nextToken());		
-				Unit u = campaign.getUnit(selected);
+				Unit u = getCampaign().getUnit(selected);
 				if(null != u) {
 					u.addDriver(selectedPerson);
 				}
@@ -4752,7 +4889,7 @@ public class MekHQView extends FrameView {
 				refreshOrganization();
 			} else if (command.contains("ADD_GUNNER")) {
 				int selected = Integer.parseInt(st.nextToken());		
-				Unit u = campaign.getUnit(selected);
+				Unit u = getCampaign().getUnit(selected);
 				if(null != u) {
 					u.addGunner(selectedPerson);
 				}
@@ -4764,9 +4901,9 @@ public class MekHQView extends FrameView {
 				String type = st.nextToken();
 				int cost =  Integer.parseInt(st.nextToken());
 				selectedPerson.improveSkill(type);
-				campaign.personUpdated(selectedPerson);
+				getCampaign().personUpdated(selectedPerson);
 				selectedPerson.setXp(selectedPerson.getXp() - cost);
-				campaign.addReport(selectedPerson.getName() + " improved " + type + "!");
+				getCampaign().addReport(selectedPerson.getName() + " improved " + type + "!");
 				refreshServicedUnitList();
 				refreshUnitList();
 				refreshPersonnelList();
@@ -4778,9 +4915,9 @@ public class MekHQView extends FrameView {
 				String selected = st.nextToken();
 				int cost =  Integer.parseInt(st.nextToken());
 				selectedPerson.acquireAbility(PilotOptions.LVL3_ADVANTAGES, selected, true);
-				campaign.personUpdated(selectedPerson);
+				getCampaign().personUpdated(selectedPerson);
 				selectedPerson.setXp(selectedPerson.getXp() - cost);
-				//TODO: add campaign report
+				//TODO: add getCampaign() report
 				refreshServicedUnitList();
 				refreshUnitList();
 				refreshPersonnelList();
@@ -4791,7 +4928,7 @@ public class MekHQView extends FrameView {
 				String selected = st.nextToken();
 				int cost =  Integer.parseInt(st.nextToken());
 				selectedPerson.acquireAbility(PilotOptions.LVL3_ADVANTAGES, "weapon_specialist", selected);
-				campaign.personUpdated(selectedPerson);
+				getCampaign().personUpdated(selectedPerson);
 				selectedPerson.setXp(selectedPerson.getXp() - cost);
 				//TODO: add campaign report
 				refreshServicedUnitList();
@@ -4804,7 +4941,7 @@ public class MekHQView extends FrameView {
 				String selected = st.nextToken();
 				int cost =  Integer.parseInt(st.nextToken());
 				selectedPerson.acquireAbility(PilotOptions.LVL3_ADVANTAGES, "specialist", selected);
-				campaign.personUpdated(selectedPerson);
+				getCampaign().personUpdated(selectedPerson);
 				selectedPerson.setXp(selectedPerson.getXp() - cost);
 				//TODO: add campaign report
 				refreshServicedUnitList();
@@ -4823,7 +4960,7 @@ public class MekHQView extends FrameView {
 									+ person.getDesc()
 									+ " to a non-active status?", "KIA?",
 									JOptionPane.YES_NO_OPTION))) {
-						campaign.changeStatus(person, selected);
+						getCampaign().changeStatus(person, selected);
 					}
 				}
 				refreshServicedUnitList();
@@ -4838,7 +4975,7 @@ public class MekHQView extends FrameView {
 			} else if (command.equalsIgnoreCase("EDGE")) {
 				String trigger = st.nextToken();
 				selectedPerson.changeEdgeTrigger(trigger);
-				campaign.personUpdated(selectedPerson);
+				getCampaign().personUpdated(selectedPerson);
 				refreshPersonnelList();
 				refreshPersonnelView();
 			} else if (command.equalsIgnoreCase("REMOVE")) {
@@ -4849,7 +4986,7 @@ public class MekHQView extends FrameView {
 									"Do you really want to remove "
 									+ person.getDesc() + "?",
 									"Remove?", JOptionPane.YES_NO_OPTION)) {
-						campaign.removePerson(person.getId());
+						getCampaign().removePerson(person.getId());
 					}
 				}
 				refreshServicedUnitList();
@@ -4864,10 +5001,10 @@ public class MekHQView extends FrameView {
 				CustomizePersonDialog npd = new CustomizePersonDialog(getFrame(), true, 
 						selectedPerson, 
 						false,
-						campaign,
+						getCampaign(),
 						view);
 				npd.setVisible(true);
-				campaign.personUpdated(selectedPerson);
+				getCampaign().personUpdated(selectedPerson);
 				refreshPatientList();
 				refreshDoctorsList();
 				refreshServicedUnitList();
@@ -4879,7 +5016,7 @@ public class MekHQView extends FrameView {
 					person.setHits(0);
 					person.setDoctorId(-1);
 				}
-				campaign.personUpdated(selectedPerson);
+				getCampaign().personUpdated(selectedPerson);
 				refreshPatientList();
 				refreshDoctorsList();
 				refreshServicedUnitList();
@@ -4893,7 +5030,7 @@ public class MekHQView extends FrameView {
 				pcd.setVisible(true);
 				selectedPerson.setPortraitCategory(pcd.getCategory());
 				selectedPerson.setPortraitFileName(pcd.getFileName());
-				campaign.personUpdated(selectedPerson);
+				getCampaign().personUpdated(selectedPerson);
 				refreshPatientList();
 				refreshPersonnelList();
 				refreshOrganization();
@@ -4926,7 +5063,7 @@ public class MekHQView extends FrameView {
 				pvcd.setVisible(true);
 				int i = pvcd.getValue();
 				selectedPerson.setEdge(i);
-				campaign.personUpdated(selectedPerson);
+				getCampaign().personUpdated(selectedPerson);
 				refreshPersonnelList();
 			} 
 		}
@@ -4958,7 +5095,7 @@ public class MekHQView extends FrameView {
 				// **lets fill the pop up menu**//
 				menu = new JMenu("Change Rank");
 				int rankOrder = 0;
-				for(String rank : campaign.getRanks().getAllRanks()) {
+				for(String rank : getCampaign().getRanks().getAllRanks()) {
 					cbMenuItem = new JCheckBoxMenuItem(rank);
 					cbMenuItem.setActionCommand("RANK|" + rankOrder);
 					if(person.getRank() == rankOrder) {
@@ -5040,7 +5177,7 @@ public class MekHQView extends FrameView {
 						cbMenuItem.setActionCommand("REMOVE_UNIT|" + -1);
 						cbMenuItem.addActionListener(this);
 						menu.add(cbMenuItem);
-						for (Unit unit : campaign.getUnits()) {
+						for (Unit unit : getCampaign().getUnits()) {
 							if(unit.usesSoloPilot()) {
 								if(unit.canTakeMoreDrivers() && person.canDrive(unit.getEntity()) && person.canGun(unit.getEntity())) {
 									cbMenuItem = new JCheckBoxMenuItem(unit.getEntity().getDisplayName());
@@ -5099,7 +5236,7 @@ public class MekHQView extends FrameView {
 			                	MenuScroller.setScrollerFor(soldierMenu, 20);
 			                }
 						}
-						menu.setEnabled(!person.isDeployed(campaign));					
+						menu.setEnabled(!person.isDeployed(getCampaign()));					
 						popup.add(menu);
 				}
 				menuItem = new JMenuItem("Add XP");
@@ -5137,7 +5274,7 @@ public class MekHQView extends FrameView {
 					}
 					menu.add(currentMenu);
 					menu.add(newMenu);
-					if(campaign.getCampaignOptions().useAbilities()) {
+					if(getCampaign().getCampaignOptions().useAbilities()) {
 						JMenu abMenu = new JMenu("Special Abilities");
 						int cost = -1;
 						String costDesc = "";
@@ -5150,7 +5287,7 @@ public class MekHQView extends FrameView {
 									costDesc = " (Not Possible)";
 								}
 								if(ability.getName().equals("weapon_specialist")) {
-									Unit u = campaign.getUnit(person.getUnitId());
+									Unit u = getCampaign().getUnit(person.getUnitId());
 									if(null != u) {
 										JMenu specialistMenu = new JMenu("Weapon Specialist");
 										TreeSet<String> uniqueWeapons = new TreeSet<String>();
@@ -5202,7 +5339,7 @@ public class MekHQView extends FrameView {
 					popup.add(menu);
 				}
 				if(oneSelected) {
-					if(campaign.getCampaignOptions().useEdge()) {
+					if(getCampaign().getCampaignOptions().useEdge()) {
 						menu = new JMenu("Set Edge Triggers");
 						cbMenuItem = new JCheckBoxMenuItem("Head Hits");
 						if (person.getOptions().booleanOption("edge_when_headhit")) {
@@ -5253,12 +5390,12 @@ public class MekHQView extends FrameView {
 				menuItem = new JMenuItem("Remove Person");
 				menuItem.setActionCommand("REMOVE");
 				menuItem.addActionListener(this);
-				menuItem.setEnabled(campaign.isGM());
+				menuItem.setEnabled(getCampaign().isGM());
 				menu.add(menuItem);
 				menuItem = new JMenuItem("Heal Person");
 				menuItem.setActionCommand("HEAL");
 				menuItem.addActionListener(this);
-				menuItem.setEnabled(campaign.isGM());
+				menuItem.setEnabled(getCampaign().isGM());
 				menu.add(menuItem);
 				if(oneSelected) {
 					/*
@@ -5266,25 +5403,25 @@ public class MekHQView extends FrameView {
 						menuItem = new JMenuItem("Undeploy Pilot");
 						menuItem.setActionCommand("UNDEPLOY");
 						menuItem.addActionListener(this);
-						menuItem.setEnabled(campaign.isGM() && person.isDeployed());
+						menuItem.setEnabled(getCampaign().isGM() && person.isDeployed());
 						menu.add(menuItem);
 					}*/		
 					menuItem = new JMenuItem("Edit...");
 					menuItem.setActionCommand("EDIT");
 					menuItem.addActionListener(this);
-					menuItem.setEnabled(campaign.isGM());
+					menuItem.setEnabled(getCampaign().isGM());
 					menu.add(menuItem);
 					menuItem = new JMenuItem("Set XP");
 					menuItem.setActionCommand("XP_SET");
 					menuItem.addActionListener(this);
-					menuItem.setEnabled(campaign.isGM());
+					menuItem.setEnabled(getCampaign().isGM());
 					menu.add(menuItem);
 				}
-				if(campaign.getCampaignOptions().useEdge()) {
+				if(getCampaign().getCampaignOptions().useEdge()) {
 					menuItem = new JMenuItem("Set Edge");
 					menuItem.setActionCommand("EDGE_SET");
 					menuItem.addActionListener(this);
-					menuItem.setEnabled(campaign.isGM());
+					menuItem.setEnabled(getCampaign().isGM());
 					menu.add(menuItem);
 				}
 				popup.addSeparator();
@@ -5507,7 +5644,7 @@ public class MekHQView extends FrameView {
         }
         
         public boolean isDeployed(int row) {
-        	return getPerson(row).isDeployed(campaign);
+        	return getPerson(row).isDeployed(getCampaign());
         }
 
         public Object getValueAt(int row, int col) {
@@ -5519,7 +5656,7 @@ public class MekHQView extends FrameView {
         		p = data.get(row);
         	}
             if(col == COL_RANK) {
-                return campaign.getRanks().getRank(p.getRank());
+                return getCampaign().getRanks().getRank(p.getRank());
             }
             if(col == COL_NAME) {
                 return p.getName();
@@ -5531,7 +5668,7 @@ public class MekHQView extends FrameView {
                 return p.getGenderName();
             }
             if(col == COL_AGE) {
-                return p.getAge(campaign.getCalendar());
+                return p.getAge(getCampaign().getCalendar());
             }
             if(col == COL_TYPE) {
                 return p.getRoleDesc();
@@ -5765,7 +5902,7 @@ public class MekHQView extends FrameView {
             	return p.getSkillSummary();
             }
             if(col == COL_ASSIGN) {
-            	Unit u = campaign.getUnit(p.getUnitId());
+            	Unit u = getCampaign().getUnit(p.getUnitId());
             	if(null != u) {
             		String name = u.getEntity().getDisplayName();
             		if(u.getEntity() instanceof Tank) {
@@ -5783,15 +5920,15 @@ public class MekHQView extends FrameView {
                 return p.getXp();
             }
             if(col == COL_DEPLOY) {
-            	Unit u = campaign.getUnit(p.getUnitId());
+            	Unit u = getCampaign().getUnit(p.getUnitId());
             	if(null != u && u.isDeployed()) {
-            		return campaign.getScenario(u.getScenarioId()).getName();
+            		return getCampaign().getScenario(u.getScenarioId()).getName();
             	} else {
             		return "-";
             	}
             }
             if(col == COL_FORCE) {
-            	Force force = campaign.getForceFor(p);
+            	Force force = getCampaign().getForceFor(p);
             	if(null != force) {
             		return force.getName();
             	} else {
@@ -5861,8 +5998,8 @@ public class MekHQView extends FrameView {
 				return -1;
 			} else {
 				//get the numbers associated with each rank string
-				int r0 = campaign.getRanks().getRankOrder(s0);
-				int r1 = campaign.getRanks().getRankOrder(s1);
+				int r0 = getCampaign().getRanks().getRankOrder(s0);
+				int r1 = getCampaign().getRanks().getRankOrder(s1);
 				return ((Comparable<Integer>)r0).compareTo(r1);
 			}			
 		}
@@ -6075,7 +6212,7 @@ public class MekHQView extends FrameView {
 		}
 
 		public Object getValueAt(int row, int col) {
-			return ((Person) data.get(row)).getDocDesc(campaign);
+			return ((Person) data.get(row)).getDocDesc(getCampaign());
 		}
 
 		public Person getDoctorAt(int row) {
@@ -6095,7 +6232,7 @@ public class MekHQView extends FrameView {
 				Component c = this;
 				setOpaque(true);
 				setText(getValueAt(row, column).toString());
-				//setToolTipText(campaign.getTargetFor(getDoctorAt(row), getDoctorAt(row)).getDesc());
+				//setToolTipText(getCampaign().getTargetFor(getDoctorAt(row), getDoctorAt(row)).getDesc());
 				if (isSelected) {
 					select();
 				} else {
@@ -6269,7 +6406,7 @@ public class MekHQView extends FrameView {
 			}
 			Part selectedPart = partsModel.getPartAt(partsTable.convertRowIndexToModel(row));
 			if (command.equalsIgnoreCase("SELL")) {
-				campaign.sellPart(selectedPart);
+				getCampaign().sellPart(selectedPart);
 				refreshPartsList();
 				refreshTaskList();
 				refreshAcquireList();
@@ -6277,7 +6414,7 @@ public class MekHQView extends FrameView {
 				refreshFunds();
 				refreshFinancialTransactions();
 			} else if (command.equalsIgnoreCase("REMOVE")) {
-				campaign.removePart(selectedPart);
+				getCampaign().removePart(selectedPart);
 				refreshPartsList();
 				refreshTaskList();
 				refreshAcquireList();
@@ -6305,7 +6442,7 @@ public class MekHQView extends FrameView {
 				JCheckBoxMenuItem cbMenuItem = null;
 				// **lets fill the pop up menu**//
 				// sell part
-				if(campaign.getCampaignOptions().canSellParts()) {
+				if(getCampaign().getCampaignOptions().canSellParts()) {
 					menuItem = new JMenuItem("Sell Part");
 					menuItem.setActionCommand("SELL");
 					menuItem.addActionListener(this);
@@ -6317,7 +6454,7 @@ public class MekHQView extends FrameView {
 				menuItem = new JMenuItem("Remove Part");
 				menuItem.setActionCommand("REMOVE");
 				menuItem.addActionListener(this);
-				menuItem.setEnabled(campaign.isGM());
+				menuItem.setEnabled(getCampaign().isGM());
 				menu.add(menuItem);
 				// end
 				popup.addSeparator();
@@ -6371,7 +6508,7 @@ public class MekHQView extends FrameView {
 				return scenario.getStatusName();
 			}
 			if(col == COL_ASSIGN) {
-				return scenario.getForces(campaign).getAllUnits().size();
+				return scenario.getForces(getCampaign()).getAllUnits().size();
 			}
 			return "?";
 		}
@@ -6420,15 +6557,15 @@ public class MekHQView extends FrameView {
 		public void actionPerformed(ActionEvent action) {
 			String command = action.getActionCommand();
 			Scenario scenario = scenarioModel.getScenario(scenarioTable.getSelectedRow());
-			Mission mission = campaign.getMission(selectedMission);
+			Mission mission = getCampaign().getMission(selectedMission);
 			if (command.equalsIgnoreCase("EDIT")) {
 				if(null != mission && null != scenario) {
-					CustomizeScenarioDialog csd = new CustomizeScenarioDialog(getFrame(), true, scenario, mission, campaign);
+					CustomizeScenarioDialog csd = new CustomizeScenarioDialog(getFrame(), true, scenario, mission, getCampaign());
 					csd.setVisible(true);
 					refreshScenarioList();
 				}
 			} else if (command.equalsIgnoreCase("REMOVE")) {
-				campaign.removeScenario(scenario.getId());
+				getCampaign().removeScenario(scenario.getId());
 				refreshScenarioList();
 				refreshOrganization();
 				refreshPersonnelList();
@@ -6469,7 +6606,7 @@ public class MekHQView extends FrameView {
 					menuItem = new JMenuItem("Remove Scenario");
 					menuItem.setActionCommand("REMOVE");
 					menuItem.addActionListener(this);
-					menuItem.setEnabled(campaign.isGM());
+					menuItem.setEnabled(getCampaign().isGM());
 					menu.add(menuItem);
 				}
 				// end
@@ -6759,7 +6896,7 @@ public class MekHQView extends FrameView {
         	Unit u = data.get(row);
         	switch(col) {
         	//case COL_REPAIR:
-        		//return campaign.getTaskListFor(u);
+        		//return getCampaign().getTaskListFor(u);
         	case COL_QUIRKS:
         		return u.getQuirksList();
             default:		
@@ -6935,7 +7072,7 @@ public class MekHQView extends FrameView {
 			} else if (command.contains("CHANGE_PILOT")) {
 				String sel = command.split(":")[1];
 				int selected = Integer.parseInt(sel);
-				Person p = campaign.getPerson(selected);
+				Person p = getCampaign().getPerson(selected);
 				//if (null != p && p instanceof PilotPerson) {
 					//campaign.changePilot(selectedUnit, (PilotPerson)p);
 				//}
@@ -6963,7 +7100,7 @@ public class MekHQView extends FrameView {
 										+ unit.getEntity().getDisplayName()
 										+ " for " + text, "Sell Unit?",
 								JOptionPane.YES_NO_OPTION)) {
-							campaign.sellUnit(unit.getId());
+							getCampaign().sellUnit(unit.getId());
 						}
 					}
 				}
@@ -6981,7 +7118,7 @@ public class MekHQView extends FrameView {
 									+ unit.getEntity().getDisplayName()
 									+ " a combat loss?", "Remove Unit?",
 							JOptionPane.YES_NO_OPTION)) {
-						campaign.removeUnit(unit.getId());
+						getCampaign().removeUnit(unit.getId());
 					}
 				}
 				refreshServicedUnitList();
@@ -6992,7 +7129,7 @@ public class MekHQView extends FrameView {
 			} else if (command.contains("SWAP_AMMO")) {
 				String sel = command.split(":")[1];
 				int selAmmoId = Integer.parseInt(sel);
-				Part part = campaign.getPart(selAmmoId);
+				Part part = getCampaign().getPart(selAmmoId);
 				if (null == part || !(part instanceof AmmoBin)) {
 					return;
 				}
@@ -7044,7 +7181,7 @@ public class MekHQView extends FrameView {
 										+ unit.getEntity().getDisplayName()
 										+ "?", "Remove Unit?",
 								JOptionPane.YES_NO_OPTION)) {
-							campaign.removeUnit(unit.getId());
+							getCampaign().removeUnit(unit.getId());
 						}
 					}
 				}
@@ -7057,7 +7194,7 @@ public class MekHQView extends FrameView {
 				for (Unit unit : units) {
 					if (unit.isDeployed()) {
 						//if (null != unit.getPilot()) {
-							//unit.getPilot().undeploy(campaign);
+							//unit.getPilot().undeploy(getCampaign());
 						//}
 					}
 				}
@@ -7143,7 +7280,7 @@ public class MekHQView extends FrameView {
 						
 					} else if (targetMechName.equals("CHOOSE_VARIANT")) {
 						UnitSelectorDialog usd = new UnitSelectorDialog(null,
-								true, campaign, null);
+								true, getCampaign(), null);
 						usd.restrictToChassis(selectedUnit.getEntity()
 								.getChassis());
 						usd.getComboUnitType().setSelectedIndex(UnitType.MEK);
@@ -7153,8 +7290,8 @@ public class MekHQView extends FrameView {
 								selectedUnit.getEntity().getWeightClass());
 						usd.changeBuyBtnToSelectBtn();
 		
-						if (!campaign.isGM()) {
-							usd.restrictToYear(campaign.getCalendar().get(
+						if (!getCampaign().isGM()) {
+							usd.restrictToYear(getCampaign().getCalendar().get(
 									Calendar.YEAR));
 						}
 		
@@ -7194,7 +7331,7 @@ public class MekHQView extends FrameView {
 		
 					if (targetEntity != null) {
 						selectedUnit.setCustomized(true);
-						selectedUnit.customize(targetEntity, campaign);
+						selectedUnit.customize(targetEntity, getCampaign());
 					}
 		
 					refreshServicedUnitList();
@@ -7206,7 +7343,7 @@ public class MekHQView extends FrameView {
 			} else if (command.contains("CANCEL_CUSTOMIZE")) {
 				if (selectedUnit.isCustomized()) {
 					selectedUnit.setCustomized(false);
-					selectedUnit.cancelCustomize(campaign);
+					selectedUnit.cancelCustomize(getCampaign());
 		
 					refreshServicedUnitList();
 					refreshUnitList();
@@ -7335,7 +7472,7 @@ public class MekHQView extends FrameView {
 						popup.add(menuItem);
 					}
 				}
-				if(oneSelected && campaign.getCampaignOptions().useQuirks()) {
+				if(oneSelected && getCampaign().getCampaignOptions().useQuirks()) {
 					menu = new JMenu("Add Quirk");			
 					for (Enumeration<IOption> q = unit.getEntity().getQuirks().getOptions(); q.hasMoreElements();) {
 			        	IOption quirk = q.nextElement();
@@ -7362,7 +7499,7 @@ public class MekHQView extends FrameView {
 					popup.add(menuItem);
 				}
 				// sell unit
-				if(campaign.getCampaignOptions().canSellUnits()) {
+				if(getCampaign().getCampaignOptions().canSellUnits()) {
 					popup.addSeparator();
 					menuItem = new JMenuItem("Sell Unit");
 					menuItem.setActionCommand("SELL");
@@ -7375,12 +7512,12 @@ public class MekHQView extends FrameView {
 				menuItem = new JMenuItem("Remove Unit");
 				menuItem.setActionCommand("REMOVE");
 				menuItem.addActionListener(this);
-				menuItem.setEnabled(campaign.isGM());
+				menuItem.setEnabled(getCampaign().isGM());
 				menu.add(menuItem);
 				menuItem = new JMenuItem("Undeploy Unit");
 				menuItem.setActionCommand("UNDEPLOY");
 				menuItem.addActionListener(this);
-				menuItem.setEnabled(campaign.isGM() && unit.isDeployed());
+				menuItem.setEnabled(getCampaign().isGM() && unit.isDeployed());
 				menu.add(menuItem);
 				popup.addSeparator();
 				popup.add(menu);
@@ -7660,6 +7797,7 @@ public class MekHQView extends FrameView {
 	private javax.swing.JMenu menuManage;
 	private javax.swing.JMenu menuMarket;
 	private javax.swing.JMenuItem menuOptions;
+	private javax.swing.JMenuItem menuOptionsMM;
 	private javax.swing.JMenuItem menuSave;
 	private javax.swing.JMenuItem miHireAstechs;
 	private javax.swing.JMenuItem miFireAstechs;
@@ -7683,9 +7821,7 @@ public class MekHQView extends FrameView {
 	private javax.swing.JPanel panelScenario;
 	private javax.swing.JPanel panSupplies;
 	private javax.swing.JPanel panelDoTask;
-	private javax.swing.JPanel panelMasterButtons;
 	private javax.swing.JPanel panelMapView;
-    private javax.swing.JSplitPane splitMain;
 	private javax.swing.JProgressBar progressBar;
 	private javax.swing.JScrollPane scrollDocTable;
 	private javax.swing.JScrollPane scrollPatientTable;
@@ -7732,6 +7868,9 @@ public class MekHQView extends FrameView {
 	private javax.swing.JButton btnAddMission;
 	private javax.swing.JButton btnEditMission;
 	private javax.swing.JButton btnCompleteMission;
+	private javax.swing.JButton btnStartGame;
+	private javax.swing.JButton btnLoadGame;
+	private javax.swing.JButton btnPrintRS;
 	private javax.swing.JButton btnGetMul;
 	private javax.swing.JButton btnClearAssignedUnits;
 	private javax.swing.JButton btnResolveScenario;

@@ -36,9 +36,9 @@ public class StartUpDialog extends javax.swing.JDialog {
 
 	
 	private static final long serialVersionUID = 8376874926997734492L;
-	SingleFrameApplication app;
+	MekHQApp app;
 	/** Creates new form */
-    public StartUpDialog(SingleFrameApplication app) {
+    public StartUpDialog(MekHQApp app) {
         super(app.getMainFrame(), true);
         this.app = app;
         initComponents();      

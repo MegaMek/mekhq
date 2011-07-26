@@ -58,7 +58,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
     private static final long serialVersionUID = -3454307876761238915L;
     private JProgressBar progressBar;
     Task task;
-    SingleFrameApplication app;
+    MekHQApp app;
     Campaign campaign;
     File fileCampaign;
     //the various directory items we need to access
@@ -67,7 +67,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
     private DirectoryItems forceIcons;
 	protected static MechTileset mt;
  
-    public DataLoadingDialog(SingleFrameApplication app, File f) {
+    public DataLoadingDialog(MekHQApp app, File f) {
         super(app.getMainFrame(), "Data Loading"); //$NON-NLS-1$
         this.app = app;
         this.fileCampaign = f;
@@ -203,7 +203,8 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         @Override
         public void done() {
             //Toolkit.getDefaultToolkit().beep();
-        	app.show(new MekHQView(app, campaign, portraits, camos, forceIcons, mt));
+        	app.setCampaign(campaign);
+        	app.show(new MekHQView(app, portraits, camos, forceIcons, mt));
         	setVisible(false);
         }
     }
