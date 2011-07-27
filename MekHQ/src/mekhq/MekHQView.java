@@ -117,6 +117,7 @@ import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.IOption;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.DirectoryItems;
+import megameklab.com.util.UnitPrintManager;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Force;
 import mekhq.campaign.JumpPath;
@@ -710,7 +711,7 @@ public class MekHQView extends FrameView {
 		btnPrintRS.setName("btnPrintRS"); // NOI18N
 		btnPrintRS.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				//TODO: implement this
+				printRecordSheets();
 			}
 		});
 		gridBagConstraints = new java.awt.GridBagConstraints();
@@ -1515,11 +1516,11 @@ public class MekHQView extends FrameView {
 		panMekLab.setName("panMekLab"); // NOI18N
 		scrollMekLab.setName("scrollFinanceTable");
         scrollMekLab.setViewportView(panMekLab);
-		/*
+		
         tabMain.addTab(
 				resourceMap.getString("panMekLab.TabConstraints.tabTitle"),
 				scrollMekLab); // NOI18N
-				*/
+				
 		
 		panFinances.setName("panFinances"); // NOI18N
 		panFinances.setLayout(new java.awt.GridBagLayout());
@@ -2653,6 +2654,52 @@ public class MekHQView extends FrameView {
 		refreshReport();
 		changeMission();
 		refreshFinancialTransactions();
+	}
+	
+	protected void printRecordSheets() {
+		int row = scenarioTable.getSelectedRow();
+		if(row < 0) {
+			return;
+		}
+		Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
+		Vector<Integer> uids = scenario.getForces(getCampaign()).getAllUnits();
+		
+		if(uids.size() == 0) {
+			return;
+		}
+		
+		Vector<Entity> chosen = new Vector<Entity>();
+		//ArrayList<Unit> toDeploy = new ArrayList<Unit>();
+		StringBuffer undeployed = new StringBuffer();
+		
+		for(int uid : uids) {
+			Unit u = getCampaign().getUnit(uid);
+			if(u.isUnmanned()) {
+				continue;
+			}
+			if (null != u.getEntity()) {
+				if (null == u.checkDeployment()) {
+					chosen.add(u.getEntity());
+				} else {
+					undeployed.append("\n")
+					.append(u.getEntity().getDisplayName())
+					.append(" (").append(u.checkDeployment())
+					.append(")");
+				}
+			}
+		}
+		
+		if (undeployed.length() > 0) {
+			JOptionPane.showMessageDialog(
+					getFrame(),
+					"The following units could not be deployed:"
+							+ undeployed.toString(),
+					"Could not deploy some units", JOptionPane.WARNING_MESSAGE);
+		}
+	
+		if(chosen.size() > 0) {
+			UnitPrintManager.printAllUnits(chosen, true);
+		}
 	}
 	
 	protected void loadScenario() {

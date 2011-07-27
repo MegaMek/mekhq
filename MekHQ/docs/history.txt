@@ -10,6 +10,7 @@ v0.1.10 (SVN)
 + added missing data from MM data folders
 + beginning of MM game threading
 + moved directory items and mech tileset from MekHQView to MekHQApp
++ print record sheets for scenario
 
 v0.1.9 (2011-07-17)
 + beginning of personnel switch (hold on to your hats!)
