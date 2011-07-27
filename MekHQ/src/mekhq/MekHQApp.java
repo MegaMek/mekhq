@@ -84,6 +84,8 @@ public class MekHQApp extends SingleFrameApplication implements GameListener {
     //the actual campaign - this is where the good stuff is
     private Campaign campaign;
     
+    private MekHQView hqView;
+    
     //the various directory items we need to access
 	private DirectoryItems portraits;
     private DirectoryItems camos;
@@ -150,6 +152,11 @@ public class MekHQApp extends SingleFrameApplication implements GameListener {
         
         show(new StartUpDialog(this));
 
+    }
+    
+    public void showNewView() {
+    	hqView = new MekHQView(this);
+    	show(hqView);
     }
 
     /**
@@ -302,23 +309,27 @@ public class MekHQApp extends SingleFrameApplication implements GameListener {
         myServer.getGame().addGameListener(this);
         currentScenario = scenario;
         //Start the game thread
-        gameThread = new GameThread(campaign.getName(), "", "127.0.0.1", 2346, campaign, meks);
+        gameThread = new GameThread(campaign.getName(), "", "127.0.0.1", 2346, this, meks);
         gameThread.start();
     }
 
     // Stop & send the close game event to the Server
     public void stopHost() {
-
-       /* serverSend("CG");// send close game to server
-        try {
-            myServer.die();
-        } catch (Exception ex) {
-            CampaignData.mwlog.errLog(ex);
-            CampaignData.mwlog.errLog("Megamek Error:");
-        }
-        */
-        myServer = null;
-        currentScenario = null;
+       if(null != myServer) {
+    	   myServer.die();
+    	   myServer = null;
+       }
+       currentScenario = null;
+       hqView.refreshScenarioList();
+       hqView.refreshOrganization();
+       hqView.refreshServicedUnitList();
+       hqView.refreshUnitList();
+       hqView.filterPersonnel();
+       hqView.refreshPersonnelList();
+       hqView.refreshPatientList();
+       hqView.refreshReport();
+       hqView.changeMission();
+       hqView.refreshFinancialTransactions();
     }
 
 	@Override
@@ -335,8 +346,7 @@ public class MekHQApp extends SingleFrameApplication implements GameListener {
 
 	@Override
 	public void gameEnd(GameEndEvent e) {
-		// TODO Auto-generated method stub
-		
+			
 	}
 
 	@Override
@@ -382,7 +392,7 @@ public class MekHQApp extends SingleFrameApplication implements GameListener {
             	ResolveScenarioTracker tracker = new ResolveScenarioTracker(currentScenario, campaign);
             	tracker.setClient(gameThread.getClient());
             	ResolveWizardControlBattlefieldDialog resolveDialog = new ResolveWizardControlBattlefieldDialog(getMainFrame(), true, tracker);
-            	show(resolveDialog);
+            	show(resolveDialog);            	
             }
 
         }// end try

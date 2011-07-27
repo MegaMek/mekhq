@@ -20,7 +20,6 @@ import megamek.client.ui.swing.ClientGUI;
 import megamek.common.Entity;
 import megamek.common.IGame;
 import megamek.common.preference.PreferenceManager;
-import mekhq.campaign.Campaign;
 import mekhq.campaign.Unit;
 
 class GameThread extends Thread implements CloseClientListener {
@@ -32,18 +31,18 @@ class GameThread extends Thread implements CloseClientListener {
     private int serverport;
     private Client client;
     private ClientGUI swingGui;
-    private Campaign campaign;
+    private MekHQApp app;
 
     private ArrayList<Unit> mechs = new ArrayList<Unit>();
 
     // CONSTRUCTOR
-    public GameThread(String name, String servername, String ip, int port, Campaign c, ArrayList<Unit> mechs) {
+    public GameThread(String name, String servername, String ip, int port, MekHQApp app, ArrayList<Unit> mechs) {
         super(name);
         myname = name.trim();
         serverName = servername;
         serverip = ip;
         serverport = port;
-        campaign = c;
+        this.app = app;
         this.mechs = mechs;
         if (serverip.indexOf("127.0.0.1") != -1) {
             serverip = "127.0.0.1";
@@ -90,11 +89,11 @@ class GameThread extends Thread implements CloseClientListener {
 
             if (((client.game != null) && (client.game.getPhase() == IGame.Phase.PHASE_LOUNGE))) {
             	
-            	client.getLocalPlayer().setCamoCategory(campaign.getCamoCategory());
-                client.getLocalPlayer().setCamoFileName(campaign.getCamoFileName());
+            	client.getLocalPlayer().setCamoCategory(app.getCampaign().getCamoCategory());
+                client.getLocalPlayer().setCamoFileName(app.getCampaign().getCamoFileName());
             	
                 client.game.getOptions().loadOptions();
-                client.sendGameOptions("", campaign.getGameOptionsVector());
+                client.sendGameOptions("", app.getCampaign().getGameOptionsVector());
                 for (Unit unit : mechs) {
                     // Get the Entity
                     Entity entity = unit.getEntity();
@@ -125,17 +124,9 @@ class GameThread extends Thread implements CloseClientListener {
 
         PreferenceManager.getInstance().save();
 
-        /*
-        if (bot != null) {
-            bot.die();
-            bot = null;
-        }
-        */
-
-       // client.die();
         client = null;// explicit null of the MM client. Wasn't/isn't being
         // GC'ed.
-       // mwclient.closingGame(serverName);
+        app.stopHost();
         System.gc();
 
     }

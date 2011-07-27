@@ -61,11 +61,6 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
     MekHQApp app;
     Campaign campaign;
     File fileCampaign;
-    //the various directory items we need to access
-	private DirectoryItems portraits;
-    private DirectoryItems camos;
-    private DirectoryItems forceIcons;
-	protected static MechTileset mt;
  
     public DataLoadingDialog(MekHQApp app, File f) {
         super(app.getMainFrame(), "Data Loading"); //$NON-NLS-1$
@@ -166,7 +161,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
             setProgress(4);
             if(newCampaign) {
             	setVisible(false);
-            	CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(app.getMainFrame(), true, campaign, camos);
+            	CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(app.getMainFrame(), true, campaign, app.getCamos());
             	optionsDialog.setVisible(true);
         		campaign.addReport("<b>" + campaign.getDateAsString() + "</b>");
             }
@@ -180,7 +175,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         public void done() {
             //Toolkit.getDefaultToolkit().beep();
         	app.setCampaign(campaign);
-        	app.show(new MekHQView(app));
+        	app.showNewView();
         	setVisible(false);
         }
     }
