@@ -76,9 +76,12 @@ public class MekHQApp extends SingleFrameApplication implements GameListener {
 	// It's intended for 1 to be critical, 3 to be typical, and 5 to be debug/informational.
 	public static int VERBOSITY_LEVEL = 5;
 	
+	//stuff related to MM games
     private Server myServer = null;
+    private GameThread gameThread = null;
     private Scenario currentScenario = null;
     
+    //the actual campaign - this is where the good stuff is
     private Campaign campaign;
     
     //the various directory items we need to access
@@ -299,8 +302,8 @@ public class MekHQApp extends SingleFrameApplication implements GameListener {
         myServer.getGame().addGameListener(this);
         currentScenario = scenario;
         //Start the game thread
-        GameThread MMGameThread = new GameThread(campaign.getName(), "", "127.0.0.1", 2346, campaign, meks);
-        MMGameThread.start();
+        gameThread = new GameThread(campaign.getName(), "", "127.0.0.1", 2346, campaign, meks);
+        gameThread.start();
     }
 
     // Stop & send the close game event to the Server
@@ -375,11 +378,10 @@ public class MekHQApp extends SingleFrameApplication implements GameListener {
 	@Override
 	public void gamePhaseChange(GamePhaseChangeEvent e) {
 		try {
-
             if (myServer.getGame().getPhase() == IGame.Phase.PHASE_VICTORY) {
             	ResolveScenarioTracker tracker = new ResolveScenarioTracker(currentScenario, campaign);
-            	tracker.processGame(myServer.getGame());
-            	ResolveWizardMissingUnitsDialog resolveDialog = new ResolveWizardMissingUnitsDialog(getMainFrame(), true, tracker);
+            	tracker.setClient(gameThread.getClient());
+            	ResolveWizardControlBattlefieldDialog resolveDialog = new ResolveWizardControlBattlefieldDialog(getMainFrame(), true, tracker);
             	show(resolveDialog);
             }
 

@@ -95,7 +95,6 @@ class GameThread extends Thread implements CloseClientListener {
             	
                 client.game.getOptions().loadOptions();
                 client.sendGameOptions("", campaign.getGameOptionsVector());
-
                 for (Unit unit : mechs) {
                     // Get the Entity
                     Entity entity = unit.getEntity();

@@ -11,6 +11,7 @@ v0.1.10 (SVN)
 + beginning of MM game threading
 + moved directory items and mech tileset from MekHQView to MekHQApp
 + print record sheets for scenario
++ resolution of MM games from within MHQ
 
 v0.1.9 (2011-07-17)
 + beginning of personnel switch (hold on to your hats!)

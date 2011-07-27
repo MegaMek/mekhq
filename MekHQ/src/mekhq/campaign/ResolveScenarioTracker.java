@@ -29,18 +29,21 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Random;
 
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 
+import megamek.client.Client;
 import megamek.common.BattleArmor;
 import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.IGame;
 import megamek.common.Infantry;
 import megamek.common.Pilot;
+import megamek.common.Player;
 import megamek.common.Tank;
 import megamek.common.XMLStreamParser;
 import mekhq.MekHQApp;
@@ -69,6 +72,7 @@ public class ResolveScenarioTracker {
 	Scenario scenario;
 	JFileChooser unitList;
 	JFileChooser salvageList;
+	Client client;
 	
 	public ResolveScenarioTracker(Scenario s, Campaign c) {
 		this.scenario = s;
@@ -149,6 +153,10 @@ public class ResolveScenarioTracker {
 		}
 	}
 	
+	public void setClient(Client c) {
+		client = c;
+	}
+	
 	public void processMulFiles() {
 		File unitFile = unitList.getSelectedFile();
 		File salvageFile = salvageList.getSelectedFile();
@@ -171,10 +179,55 @@ public class ResolveScenarioTracker {
 		checkStatusOfPersonnel();
 	}
 	
-	public void processGame(IGame game) {
-		for(Entity entity : game.getEntitiesVector()) {
-			entities.put(entity.getExternalId(), entity);
+	public void processGame(boolean controlsField) {
+
+		int pid = client.getLocalPlayer().getId();
+		
+		for (Enumeration<Entity> iter = client.game.getEntities(); iter.hasMoreElements();) {
+			Entity e = iter.nextElement();
+			if(e.getOwnerId() == pid) {
+				if(e.canEscape() || controlsField) {
+					entities.put(e.getExternalId(), e);
+					if(null != e.getCrew()) {
+						pilots.put(e.getCrew().getExternalId(), e.getCrew());
+					}
+				}			
+			} else if(e.getOwner().isEnemyOf(client.getLocalPlayer())) {
+				if(!e.canEscape() && controlsField) {
+					potentialSalvage.add(e);
+				}
+			}
 		}
+		//add retreated units
+		for (Enumeration<Entity> iter = client.game.getRetreatedEntities(); iter.hasMoreElements();) {
+            Entity e = iter.nextElement();
+            if(e.getOwnerId() == pid) {
+            	entities.put(e.getExternalId(), e);
+				if(null != e.getCrew()) {
+					pilots.put(e.getCrew().getExternalId(), e.getCrew());
+				}
+            }
+        }
+		
+
+        Enumeration<Entity> graveyard = client.game.getGraveyardEntities();
+        if(controlsField) {
+	        while (graveyard.hasMoreElements()) {
+	            Entity e = graveyard.nextElement();
+	            if(!e.isSalvage()) {
+	            	continue;
+	            }
+	            if(e.getOwnerId() == pid && controlsField) {
+					entities.put(e.getExternalId(), e);
+					if(null != e.getCrew()) {
+						pilots.put(e.getCrew().getExternalId(), e.getCrew());
+					}
+				} else if(e.getOwner().isEnemyOf(client.getLocalPlayer())) {
+					potentialSalvage.add(e);
+				}
+	        }       
+        }
+        checkStatusOfPersonnel();
 	}
 	
 	private ArrayList<Person> shuffleCrew(ArrayList<Person> source) {
@@ -349,9 +402,9 @@ public class ResolveScenarioTracker {
 		return false;
 	}
 	
-	public boolean foundMatch(Pilot p, ArrayList<Pilot> pils) {
-		for(Pilot otherPilots : pils) {
-			if(otherPilots.getExternalId() == p.getExternalId()) {
+	private boolean foundMatch(Pilot p, ArrayList<Unit> units) {
+		for(Unit u : units) {
+			if(u.getEntity().getCrew().getExternalId() == p.getExternalId()) {
 				return true;
 			}
 		}
