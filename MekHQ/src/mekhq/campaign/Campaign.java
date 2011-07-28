@@ -48,6 +48,7 @@ import megamek.common.BattleArmor;
 import megamek.common.BattleArmorBay;
 import megamek.common.Bay;
 import megamek.common.CargoBay;
+import megamek.common.CommonConstants;
 import megamek.common.Compute;
 import megamek.common.Dropship;
 import megamek.common.Entity;
@@ -1362,9 +1363,22 @@ public class Campaign implements Serializable {
 		//parts is the biggest so it goes last
 		writeArrayAndHashToXml(pw1, 1, "parts", parts, partIds); // Parts
 		
+		writeGameOptions(pw1);
+		
 		// Okay, we're done.
 		// Close everything out and be done with it.
 		pw1.println("</campaign>");
+	}
+	
+	public void writeGameOptions(PrintWriter pw1) {
+		pw1.println("\t\t<gameOptions>");
+		for(IBasicOption option : getGameOptionsVector()) {
+			pw1.println("\t\t\t<gameoption>"); //$NON-NLS-1$
+			MekHqXmlUtil.writeSimpleXmlTag(pw1, 4, "name", option.getName());
+			MekHqXmlUtil.writeSimpleXmlTag(pw1, 4, "value", option.getValue().toString());
+			pw1.println("\t\t\t</gameoption>"); //$NON-NLS-1$
+		}
+		pw1.println("\t\t</gameOptions>");
 	}
 
 	/**
@@ -1482,6 +1496,8 @@ public class Campaign implements Serializable {
 					retVal.location = CurrentLocation.generateInstanceFromXML(wn, retVal);
 				} else if(xn.equalsIgnoreCase("skillTypes")) {
 					processSkillTypeNodes(retVal, wn);
+				} else if(xn.equalsIgnoreCase("gameOptions")) {
+					processGameOptionNodes(retVal, wn);
 				}
 				
 			} else {
@@ -1725,6 +1741,73 @@ public class Campaign implements Serializable {
 		}
 
 		MekHQApp.logMessage("Load Skill Type Nodes Complete!", 4);
+	}
+	
+	private static void processGameOptionNodes(Campaign retVal, Node wn) {
+		MekHQApp.logMessage("Loading GameOption Nodes from XML...", 4);
+
+		NodeList wList = wn.getChildNodes();
+		
+		// Okay, lets iterate through the children, eh?
+		for (int x = 0; x < wList.getLength(); x++) {
+			Node wn2 = wList.item(x);
+
+			// If it's not an element node, we ignore it.
+			if (wn2.getNodeType() != Node.ELEMENT_NODE)
+				continue;
+			
+			else if (!wn2.getNodeName().equalsIgnoreCase("gameoption")) {
+				// Error condition of sorts!
+				// Errr, what should we do here?
+				MekHQApp.logMessage("Unknown node type not loaded in Game Option nodes: "+wn2.getNodeName());
+
+				continue;
+			}
+			NodeList nl = wn2.getChildNodes();
+
+			String name = null;
+            Object value = null;
+			for (int y=0; y<nl.getLength(); y++) {
+				Node wn3 = nl.item(y);	
+				if (wn3.getNodeName().equalsIgnoreCase("name")) {
+					name = wn3.getTextContent();
+				} else if (wn3.getNodeName().equalsIgnoreCase("value")) {
+					value = wn3.getTextContent();
+				}
+			}
+			if ((null != name) && (null != value)) {
+				IOption option = retVal.gameOptions.getOption(name);
+				if (null != option) {
+                    if (!option.getValue().toString().equals(value.toString())) {
+                        try {
+                            switch (option.getType()) {
+                                case IOption.STRING:
+                                    option.setValue((String) value);
+                                    break;
+
+                                case IOption.BOOLEAN:
+                                    option.setValue(new Boolean(value.toString()));
+                                    break;
+
+                                case IOption.INTEGER:
+                                    option.setValue(new Integer(value.toString()));
+                                    break;
+
+                                case IOption.FLOAT:
+                                    option.setValue(new Float(value.toString()));
+                                    break;
+                            }
+                        } catch (IllegalArgumentException iaEx) {
+                        	MekHQApp.logMessage("Error trying to load option '" + name + "' with a value of '" + value + "'."); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                        }
+                    }
+                } else {
+                	MekHQApp.logMessage("Invalid option '" + name + "' when trying to load options file."); //$NON-NLS-1$ //$NON-NLS-2$
+                }
+			}
+		}
+
+		MekHQApp.logMessage("Load Game Option Nodes Complete!", 4);
 	}
 	
 	private static void processMissionNodes(Campaign retVal, Node wn) {
