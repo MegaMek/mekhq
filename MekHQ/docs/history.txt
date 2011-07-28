@@ -15,6 +15,7 @@ v0.1.10 (SVN)
 + proper starting and stopping of MM host within MHQ
 + added images for record sheet printing
 + gridlayout for scenario buttons
++ grey out scenario buttons when no scenario selected, selected scenario is completed, or scenario has no units assigned
 
 v0.1.9 (2011-07-17)
 + beginning of personnel switch (hold on to your hats!)

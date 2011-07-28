@@ -686,6 +686,7 @@ public class MekHQView extends FrameView {
 				startScenario();
 			}
 		});
+		btnStartGame.setEnabled(false);
 		panelScenarioButtons.add(btnStartGame);
 		
 		btnLoadGame.setText(resourceMap.getString("btnLoadGame.text")); // NOI18N
@@ -697,6 +698,7 @@ public class MekHQView extends FrameView {
 				loadScenario();
 			}
 		});
+		btnLoadGame.setEnabled(false);
 		panelScenarioButtons.add(btnLoadGame);
 		
 		btnPrintRS.setText(resourceMap.getString("btnPrintRS.text")); // NOI18N
@@ -708,6 +710,7 @@ public class MekHQView extends FrameView {
 				printRecordSheets();
 			}
 		});
+		btnPrintRS.setEnabled(false);
 		panelScenarioButtons.add(btnPrintRS);
 		
 		btnGetMul.setText(resourceMap.getString("btnGetMul.text")); // NOI18N
@@ -719,6 +722,7 @@ public class MekHQView extends FrameView {
 				deployListFile();
 			}
 		});
+		btnGetMul.setEnabled(false);
 		panelScenarioButtons.add(btnGetMul);
 		
 		btnResolveScenario.setText(resourceMap.getString("btnResolveScenario.text")); // NOI18N
@@ -729,7 +733,8 @@ public class MekHQView extends FrameView {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				resolveScenario();
 			}
-		});
+		});	
+		btnResolveScenario.setEnabled(false);
 		panelScenarioButtons.add(btnResolveScenario);
 		
 		btnClearAssignedUnits.setText(resourceMap.getString("btnClearAssignedUnits.text")); // NOI18N
@@ -741,6 +746,7 @@ public class MekHQView extends FrameView {
 				clearAssignedUnits();
 			}
 		});
+		btnClearAssignedUnits.setEnabled(false);
 		panelScenarioButtons.add(btnClearAssignedUnits);
 		
 		scrollScenarioView.setViewportView(null);
@@ -2434,6 +2440,12 @@ public class MekHQView extends FrameView {
 		int row = scenarioTable.getSelectedRow();
 		if(row < 0) {
 			scrollScenarioView.setViewportView(null);
+			btnStartGame.setEnabled(false);
+			btnLoadGame.setEnabled(false);
+			btnGetMul.setEnabled(false);
+			btnClearAssignedUnits.setEnabled(false);
+			btnResolveScenario.setEnabled(false);
+			btnPrintRS.setEnabled(false);
 			return;
 		}
 		Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
@@ -2445,6 +2457,13 @@ public class MekHQView extends FrameView {
 				scrollScenarioView.getVerticalScrollBar().setValue(0);
 			}
 		});
+		boolean unitsAssigned = scenario.getForces(getCampaign()).getAllUnits().size() > 0;
+		btnStartGame.setEnabled(scenario.isCurrent() && unitsAssigned);
+		btnLoadGame.setEnabled(scenario.isCurrent() && unitsAssigned);
+		btnGetMul.setEnabled(scenario.isCurrent() && unitsAssigned);
+		btnClearAssignedUnits.setEnabled(scenario.isCurrent() && unitsAssigned);
+		btnResolveScenario.setEnabled(scenario.isCurrent() && unitsAssigned);
+		btnPrintRS.setEnabled(scenario.isCurrent() && unitsAssigned);
 		
 	}
 	
