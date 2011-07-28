@@ -368,6 +368,7 @@ public class MekHQView extends FrameView {
 		btnAddMission = new javax.swing.JButton();
 		btnEditMission = new javax.swing.JButton();
 		btnCompleteMission = new javax.swing.JButton();
+		panelScenarioButtons = new javax.swing.JPanel();
 		btnAddScenario = new javax.swing.JButton();
 		btnStartGame = new javax.swing.JButton();
 		btnLoadGame = new javax.swing.JButton();
@@ -665,6 +666,17 @@ public class MekHQView extends FrameView {
 		panelScenario.setName("panelScenario"); // NOI18N
 		panelScenario.setLayout(new java.awt.GridBagLayout());
 		
+		panelScenarioButtons.setFont(resourceMap.getFont("panHangar.font")); // NOI18N
+		panelScenarioButtons.setLayout(new java.awt.GridLayout(2,3));
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.gridwidth = 1;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+		gridBagConstraints.weightx = 1.0;
+		gridBagConstraints.weighty = 0.0;
+		panelScenario.add(panelScenarioButtons, gridBagConstraints);
+		
 		btnStartGame.setText(resourceMap.getString("btnStartGame.text")); // NOI18N
 		btnStartGame.setToolTipText(resourceMap
 				.getString("btnStartGame.toolTipText")); // NOI18N
@@ -674,14 +686,7 @@ public class MekHQView extends FrameView {
 				startScenario();
 			}
 		});
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 0;
-		gridBagConstraints.gridwidth = 1;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.weightx = 1.0;
-		gridBagConstraints.weighty = 0.0;
-		panelScenario.add(btnStartGame, gridBagConstraints);
+		panelScenarioButtons.add(btnStartGame);
 		
 		btnLoadGame.setText(resourceMap.getString("btnLoadGame.text")); // NOI18N
 		btnLoadGame.setToolTipText(resourceMap
@@ -692,14 +697,7 @@ public class MekHQView extends FrameView {
 				loadScenario();
 			}
 		});
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 0;
-		gridBagConstraints.gridwidth = 1;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.weightx = 1.0;
-		gridBagConstraints.weighty = 0.0;
-		panelScenario.add(btnLoadGame, gridBagConstraints);
+		panelScenarioButtons.add(btnLoadGame);
 		
 		btnPrintRS.setText(resourceMap.getString("btnPrintRS.text")); // NOI18N
 		btnPrintRS.setToolTipText(resourceMap
@@ -710,14 +708,7 @@ public class MekHQView extends FrameView {
 				printRecordSheets();
 			}
 		});
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 2;
-		gridBagConstraints.gridy = 0;
-		gridBagConstraints.gridwidth = 1;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.weightx = 1.0;
-		gridBagConstraints.weighty = 0.0;
-		panelScenario.add(btnPrintRS, gridBagConstraints);
+		panelScenarioButtons.add(btnPrintRS);
 		
 		btnGetMul.setText(resourceMap.getString("btnGetMul.text")); // NOI18N
 		btnGetMul.setToolTipText(resourceMap
@@ -728,14 +719,7 @@ public class MekHQView extends FrameView {
 				deployListFile();
 			}
 		});
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 1;
-		gridBagConstraints.gridwidth = 1;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.weightx = 1.0;
-		gridBagConstraints.weighty = 0.0;
-		panelScenario.add(btnGetMul, gridBagConstraints);
+		panelScenarioButtons.add(btnGetMul);
 		
 		btnResolveScenario.setText(resourceMap.getString("btnResolveScenario.text")); // NOI18N
 		btnResolveScenario.setToolTipText(resourceMap
@@ -746,14 +730,7 @@ public class MekHQView extends FrameView {
 				resolveScenario();
 			}
 		});
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 1;
-		gridBagConstraints.gridwidth = 1;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.weightx = 1.0;
-		gridBagConstraints.weighty = 0.0;
-		panelScenario.add(btnResolveScenario, gridBagConstraints);
+		panelScenarioButtons.add(btnResolveScenario);
 		
 		btnClearAssignedUnits.setText(resourceMap.getString("btnClearAssignedUnits.text")); // NOI18N
 		btnClearAssignedUnits.setToolTipText(resourceMap
@@ -764,22 +741,14 @@ public class MekHQView extends FrameView {
 				clearAssignedUnits();
 			}
 		});
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 2;
-		gridBagConstraints.gridy = 1;
-		gridBagConstraints.gridwidth = 1;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.weightx = 1.0;
-		gridBagConstraints.weighty = 0.0;
-		panelScenario.add(btnClearAssignedUnits, gridBagConstraints);
+		panelScenarioButtons.add(btnClearAssignedUnits);
 		
 		scrollScenarioView.setViewportView(null);
 		scrollScenarioView.setMinimumSize(new java.awt.Dimension(550, 600));
 		scrollScenarioView.setPreferredSize(new java.awt.Dimension(550, 600));
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 2;
-		gridBagConstraints.gridwidth = 3;
+		gridBagConstraints.gridy = 1;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 1.0;
@@ -7913,6 +7882,7 @@ public class MekHQView extends FrameView {
     private javax.swing.JComboBox choiceMission;
 	private javax.swing.JScrollPane scrollMissionView;
 	private javax.swing.JScrollPane scrollScenarioView;
+	private javax.swing.JPanel panelScenarioButtons;
 	private javax.swing.JButton btnAddScenario;
 	private javax.swing.JButton btnAddMission;
 	private javax.swing.JButton btnEditMission;
