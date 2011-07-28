@@ -13,6 +13,7 @@ v0.1.10 (SVN)
 + print record sheets for scenario
 + resolution of MM games from within MHQ
 + proper starting and stopping of MM host within MHQ
++ added images for record sheet printing
 
 v0.1.9 (2011-07-17)
 + beginning of personnel switch (hold on to your hats!)

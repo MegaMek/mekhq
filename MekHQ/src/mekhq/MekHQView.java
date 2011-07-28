@@ -37,8 +37,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.text.DecimalFormat;
@@ -95,7 +93,6 @@ import javax.swing.tree.TreeSelectionModel;
 
 import megamek.client.ui.swing.MechTileset;
 import megamek.client.ui.swing.MechView;
-import megamek.client.ui.swing.util.ImageFileFactory;
 import megamek.common.AmmoType;
 import megamek.common.Entity;
 import megamek.common.EntityListFile;
@@ -123,7 +120,6 @@ import mekhq.campaign.Force;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.PartInventory;
 import mekhq.campaign.Planet;
-import mekhq.campaign.Planets;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.Unit;
 import mekhq.campaign.Utilities;
@@ -465,7 +461,7 @@ public class MekHQView extends FrameView {
 		scrollPlanetView = new javax.swing.JScrollPane();
 		lblPartsChoice = new javax.swing.JLabel();
 		choiceParts = new javax.swing.JComboBox();
-		panMekLab = new MekLabPanel();
+		//panMekLab = new MekLabPanel();
 		scrollMekLab = new javax.swing.JScrollPane();
 		lblLocation = new javax.swing.JLabel();
 
@@ -1513,6 +1509,7 @@ public class MekHQView extends FrameView {
 				resourceMap.getString("panInfirmary.TabConstraints.tabTitle"),
 				panInfirmary); // NOI18N
 
+		/*
 		panMekLab.setName("panMekLab"); // NOI18N
 		scrollMekLab.setName("scrollFinanceTable");
         scrollMekLab.setViewportView(panMekLab);
@@ -1520,7 +1517,7 @@ public class MekHQView extends FrameView {
         tabMain.addTab(
 				resourceMap.getString("panMekLab.TabConstraints.tabTitle"),
 				scrollMekLab); // NOI18N
-				
+				*/
 		
 		panFinances.setName("panFinances"); // NOI18N
 		panFinances.setLayout(new java.awt.GridBagLayout());
