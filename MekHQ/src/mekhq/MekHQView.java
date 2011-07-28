@@ -5102,7 +5102,11 @@ public class MekHQView extends FrameView {
 				selectedPerson.setEdge(i);
 				getCampaign().personUpdated(selectedPerson);
 				refreshPersonnelList();
-			} 
+			} else if (command.equalsIgnoreCase("KILL")) {
+				NewKillDialog nkd = new NewKillDialog(getFrame(), true, getCampaign(), selectedPerson);
+				nkd.setVisible(true);
+				refreshPersonnelList();
+			}
 		}
 
 		@Override
@@ -5419,6 +5423,11 @@ public class MekHQView extends FrameView {
 					// change Biography
 					menuItem = new JMenuItem("Change Biography...");
 					menuItem.setActionCommand("BIOGRAPHY");
+					menuItem.addActionListener(this);
+					menuItem.setEnabled(true);
+					popup.add(menuItem);
+					menuItem = new JMenuItem("Assign Kill...");
+					menuItem.setActionCommand("KILL");
 					menuItem.addActionListener(this);
 					menuItem.setEnabled(true);
 					popup.add(menuItem);

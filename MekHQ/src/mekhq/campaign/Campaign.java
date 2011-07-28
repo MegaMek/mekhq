@@ -30,6 +30,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
@@ -127,7 +129,9 @@ public class Campaign implements Serializable {
 	private ArrayList<Mission> missions = new ArrayList<Mission>();
 	private Hashtable<Integer, Mission> missionIds = new Hashtable<Integer, Mission>();
 	private Hashtable<Integer, Scenario> scenarioIds = new Hashtable<Integer, Scenario>();
-
+	private ArrayList<Kill> kills = new ArrayList<Kill>();
+	
+	
 	private int astechPool;
 	private int astechPoolMinutes;
 	private int astechPoolOvertime;
@@ -1351,6 +1355,11 @@ public class Campaign implements Serializable {
 		pw1.println("\t</forces>");
 		finances.writeToXml(pw1,1);
 		location.writeToXml(pw1, 1);
+		pw1.println("\t<kills>");
+		for(Kill k : kills) {
+			k.writeToXml(pw1, 2);
+		}
+		pw1.println("\t</kills>");
 		pw1.println("\t<skillTypes>");
 		for(String name : SkillType.skillList) {
 			SkillType type = SkillType.getType(name);
@@ -1371,14 +1380,14 @@ public class Campaign implements Serializable {
 	}
 	
 	public void writeGameOptions(PrintWriter pw1) {
-		pw1.println("\t\t<gameOptions>");
+		pw1.println("\t<gameOptions>");
 		for(IBasicOption option : getGameOptionsVector()) {
-			pw1.println("\t\t\t<gameoption>"); //$NON-NLS-1$
-			MekHqXmlUtil.writeSimpleXmlTag(pw1, 4, "name", option.getName());
-			MekHqXmlUtil.writeSimpleXmlTag(pw1, 4, "value", option.getValue().toString());
-			pw1.println("\t\t\t</gameoption>"); //$NON-NLS-1$
+			pw1.println("\t\t<gameoption>"); //$NON-NLS-1$
+			MekHqXmlUtil.writeSimpleXmlTag(pw1, 3, "name", option.getName());
+			MekHqXmlUtil.writeSimpleXmlTag(pw1, 3, "value", option.getValue().toString());
+			pw1.println("\t\t</gameoption>"); //$NON-NLS-1$
 		}
-		pw1.println("\t\t</gameOptions>");
+		pw1.println("\t</gameOptions>");
 	}
 
 	/**
@@ -1498,6 +1507,8 @@ public class Campaign implements Serializable {
 					processSkillTypeNodes(retVal, wn);
 				} else if(xn.equalsIgnoreCase("gameOptions")) {
 					processGameOptionNodes(retVal, wn);
+				} else if(xn.equalsIgnoreCase("kills")) {
+					processKillNodes(retVal, wn);
 				}
 				
 			} else {
@@ -1741,6 +1752,33 @@ public class Campaign implements Serializable {
 		}
 
 		MekHQApp.logMessage("Load Skill Type Nodes Complete!", 4);
+	}
+	
+	private static void processKillNodes(Campaign retVal, Node wn) {
+		MekHQApp.logMessage("Loading Kill Nodes from XML...", 4);
+
+		NodeList wList = wn.getChildNodes();
+		
+		// Okay, lets iterate through the children, eh?
+		for (int x = 0; x < wList.getLength(); x++) {
+			Node wn2 = wList.item(x);
+
+			// If it's not an element node, we ignore it.
+			if (wn2.getNodeType() != Node.ELEMENT_NODE)
+				continue;
+			
+			else if (!wn2.getNodeName().equalsIgnoreCase("kill")) {
+				// Error condition of sorts!
+				// Errr, what should we do here?
+				MekHQApp.logMessage("Unknown node type not loaded in Kill nodes: "+wn2.getNodeName());
+
+				continue;
+			}
+
+			retVal.kills.add(Kill.generateInstanceFromXML(wn2));
+		}
+
+		MekHQApp.logMessage("Load Kill Nodes Complete!", 4);
 	}
 	
 	private static void processGameOptionNodes(Campaign retVal, Node wn) {
@@ -2761,5 +2799,23 @@ public class Campaign implements Serializable {
 		}
 	}
 	
+	public void addKill(Kill k) {
+		kills.add(k);
+	}
+	
+	public ArrayList<Kill> getKillsFor(int pid) {
+		ArrayList<Kill> personalKills = new ArrayList<Kill>();
+		for(Kill k : kills) {
+			if(k.getPilotId() == pid) {
+				personalKills.add(k);
+			}
+		}
+		Collections.sort(personalKills, new Comparator<Kill>(){		 
+            public int compare(final Kill u1, final Kill u2) {
+            	return u1.getDate().compareTo(u2.getDate());
+            }
+        });
+		return personalKills;
+	}
 	
 }
