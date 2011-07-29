@@ -4,11 +4,12 @@
  * Created on July 26, 2009, 11:32 PM
  */
 
-package mekhq;
+package mekhq.gui;
 
 import java.awt.Color;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -87,8 +88,6 @@ public class ContractViewPanel extends javax.swing.JPanel {
 
     private void fillStats() {
     	
-    	org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(ContractViewPanel.class);
-    	
     	lblStatus = new javax.swing.JLabel();
     	lblLocation = new javax.swing.JLabel();
 		txtLocation = new javax.swing.JTextArea();
@@ -104,7 +103,8 @@ public class ContractViewPanel extends javax.swing.JPanel {
 		txtCommand = new javax.swing.JTextArea();
 		lblBLC = new javax.swing.JLabel();
 		txtBLC = new javax.swing.JTextArea();
-		
+    	ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractViewPanel");
+
     	java.awt.GridBagConstraints gridBagConstraints;
 		pnlStats.setLayout(new java.awt.GridBagLayout());
 		
@@ -336,9 +336,9 @@ public class ContractViewPanel extends javax.swing.JPanel {
 		lblSalvagePct2 = new JLabel();
 
 		if(contract.isSalvageExchange()) {
-			lblSalvagePct2.setText("Exchange (" + contract.getSalvagePct() + "%)"); 
+			lblSalvagePct2.setText(resourceMap.getString("exchange") + " (" + contract.getSalvagePct() + "%)"); 
 		} else if(contract.getSalvagePct() == 0) {
-			lblSalvagePct2.setText("None"); 
+			lblSalvagePct2.setText(resourceMap.getString("none")); 
 		} else {
 			lblSalvagePct1.setText(resourceMap.getString("lblSalvagePct.text"));   
 			int maxSalvagePct = contract.getSalvagePct();

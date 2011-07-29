@@ -149,22 +149,32 @@ import mekhq.campaign.work.Modes;
 import mekhq.gui.AddFundsDialog;
 import mekhq.gui.CampaignOptionsDialog;
 import mekhq.gui.CompleteMissionDialog;
+import mekhq.gui.ContractViewPanel;
 import mekhq.gui.CustomizeMissionDialog;
 import mekhq.gui.CustomizePersonDialog;
 import mekhq.gui.CustomizeScenarioDialog;
 import mekhq.gui.DataLoadingDialog;
 import mekhq.gui.EntityImage;
+import mekhq.gui.ForceViewPanel;
 import mekhq.gui.GameOptionsDialog;
+import mekhq.gui.InterstellarMapPanel;
 import mekhq.gui.JSuggestField;
+import mekhq.gui.JumpPathViewPanel;
+import mekhq.gui.MekLabPanel;
 import mekhq.gui.MekViewDialog;
 import mekhq.gui.MenuScroller;
 import mekhq.gui.MissionTypeDialog;
+import mekhq.gui.MissionViewPanel;
 import mekhq.gui.NewKillDialog;
+import mekhq.gui.PersonViewPanel;
+import mekhq.gui.PlanetViewPanel;
 import mekhq.gui.PopupValueChoiceDialog;
 import mekhq.gui.PortraitChoiceDialog;
 import mekhq.gui.ResolveWizardChooseFilesDialog;
+import mekhq.gui.ScenarioViewPanel;
 import mekhq.gui.TextAreaDialog;
 import mekhq.gui.UnitSelectorDialog;
+import mekhq.gui.UnitViewPanel;
 
 import org.jdesktop.application.Action;
 import org.jdesktop.application.FrameView;
@@ -2465,7 +2475,7 @@ public class MekHQView extends FrameView {
 		}
 	}
 	
-	protected void refreshPlanetView() {
+	public void refreshPlanetView() {
 		JumpPath path = panMap.getJumpPath();
 		if(null != path && !path.isEmpty()) {
 			scrollPlanetView.setViewportView(new JumpPathViewPanel(path, getCampaign()));
@@ -2994,7 +3004,7 @@ public class MekHQView extends FrameView {
 	}
 	
 	
-	protected void refreshLocation() {
+	public void refreshLocation() {
 		lblLocation.setText(getCampaign().getLocation().getReport(getCampaign().getCalendar().getTime()));
 	}
 

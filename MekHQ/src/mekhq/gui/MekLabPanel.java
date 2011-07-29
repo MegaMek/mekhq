@@ -19,7 +19,7 @@
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq;
+package mekhq.gui;
 
 import java.io.File;
 
@@ -48,6 +48,7 @@ import megameklab.com.ui.Mek.tabs.WeaponTab;
 import megameklab.com.util.CConfig;
 import megameklab.com.util.RefreshListener;
 import megameklab.com.util.UnitUtil;
+import mekhq.MekHQApp;
 
 public class MekLabPanel extends JPanel implements RefreshListener {
 

@@ -4,12 +4,14 @@
  * Created on April 28, 2011, 11:32 PM
  */
 
-package mekhq;
+package mekhq.gui;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.Image;
 import java.text.DecimalFormat;
+import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
@@ -26,7 +28,6 @@ import megamek.common.UnitType;
 import megamek.common.util.DirectoryItems;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Unit;
-import mekhq.gui.EntityImage;
 /**
  * A custom panel that gets filled in with goodies from a unit record
  * @author  Jay Lawson <jaylawson39 at yahoo.com>
@@ -81,7 +82,7 @@ public class UnitViewPanel extends javax.swing.JPanel {
 		txtFluff = new javax.swing.JTextPane();
 		pnlStats = new javax.swing.JPanel();
 		
-    	org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(UnitViewPanel.class);
+    	ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.UnitViewPanel");
 
 		setLayout(new java.awt.GridBagLayout());
 
@@ -126,7 +127,7 @@ public class UnitViewPanel extends javax.swing.JPanel {
 		txtReadout.setName("txtReadout");
 		txtReadout.setContentType(resourceMap.getString("txtReadout.contentType")); // NOI18N
 		txtReadout.setEditable(false);
-		txtReadout.setFont(resourceMap.getFont("txtReadout.font")); // NOI18N
+		txtReadout.setFont(Font.decode(resourceMap.getString("txtReadout.font"))); // NOI18N
 		txtReadout.setText("<div style='font: 12pt monospaced'>" + mview.getMechReadoutBasic() + "<br>" + mview.getMechReadoutLoadout() + "</div>");
 		txtReadout.setBorder(BorderFactory.createCompoundBorder(
 				BorderFactory.createTitledBorder("Technical Readout"),
@@ -145,7 +146,7 @@ public class UnitViewPanel extends javax.swing.JPanel {
 		txtFluff.setName("txtFluff");
 		txtFluff.setContentType(resourceMap.getString("txtFluff.contentType")); // NOI18N
 		txtFluff.setEditable(false);
-		txtFluff.setFont(resourceMap.getFont("txtFluff.font")); // NOI18N
+		txtFluff.setFont(Font.decode(resourceMap.getString("txtFluff.font"))); // NOI18N
 		txtFluff.setText(mview.getMechReadoutFluff());
 		txtFluff.setBorder(BorderFactory.createCompoundBorder(
 				BorderFactory.createTitledBorder("Unit History"),
@@ -162,7 +163,7 @@ public class UnitViewPanel extends javax.swing.JPanel {
 		add(txtFluff, gridBagConstraints);
 	}
 	
-	private void fillStats(org.jdesktop.application.ResourceMap resourceMap) {
+	private void fillStats(ResourceBundle resourceMap) {
 		
 		lblType = new javax.swing.JLabel();
     	lblTech = new javax.swing.JLabel();

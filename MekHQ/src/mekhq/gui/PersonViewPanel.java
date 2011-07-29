@@ -4,12 +4,13 @@
  * Created on July 26, 2009, 11:32 PM
  */
 
-package mekhq;
+package mekhq.gui;
 
 import java.awt.Color;
 import java.awt.Image;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -199,7 +200,7 @@ public class PersonViewPanel extends javax.swing.JPanel {
     
     private void fillStats() {
     	
-    	org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(PersonViewPanel.class);
+    	ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonViewPanel");
     	
     	lblType = new javax.swing.JLabel();
     	lblCall1 = new javax.swing.JLabel();

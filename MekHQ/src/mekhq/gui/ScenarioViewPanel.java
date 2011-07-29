@@ -4,18 +4,21 @@
  * Created on July 26, 2009, 11:32 PM
  */
 
-package mekhq;
+package mekhq.gui;
 
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
+import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
+import mekhq.MekHQView;
+import mekhq.MekHQView.ForceRenderer;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Force;
 import mekhq.campaign.Unit;
@@ -120,9 +123,7 @@ public class ScenarioViewPanel extends javax.swing.JPanel {
 	}
 
     private void fillStats() {
-    	
-    	//org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(PersonViewPanel.class);
-    	
+    	    	
     	lblStatus = new javax.swing.JLabel();
     	
     	java.awt.GridBagConstraints gridBagConstraints;

@@ -4,9 +4,10 @@
  * Created on July 26, 2009, 11:32 PM
  */
 
-package mekhq;
+package mekhq.gui;
 
 import java.awt.Color;
+import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
 
@@ -66,7 +67,7 @@ public class MissionViewPanel extends javax.swing.JPanel {
 
     private void fillStats() {
     	
-    	org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(ContractViewPanel.class);
+    	ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractViewPanel");
     	
     	lblStatus = new javax.swing.JLabel();
     	lblLocation = new javax.swing.JLabel();

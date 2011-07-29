@@ -4,7 +4,7 @@
  * Created on May 3, 2011
  */
 
-package mekhq;
+package mekhq.gui;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -26,11 +26,11 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
+import mekhq.MekHQView;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Faction;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.Planet;
-import mekhq.gui.MenuScroller;
 
 
 /**

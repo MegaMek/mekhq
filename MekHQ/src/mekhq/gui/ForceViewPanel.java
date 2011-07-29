@@ -4,7 +4,7 @@
  * Created on May 2, 2011
  */
 
-package mekhq;
+package mekhq.gui;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -13,6 +13,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -28,7 +29,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.Force;
 import mekhq.campaign.Unit;
 import mekhq.campaign.personnel.Person;
-import mekhq.gui.EntityImage;
 
 /**
  * A custom panel that gets filled in with goodies from a Force record
@@ -177,7 +177,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
 	
 	private void fillStats() {
 		
-    	org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(ForceViewPanel.class);
+    	ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ForceViewPanel");
 
     	lblType = new javax.swing.JLabel();
     	lblAssign1 = new javax.swing.JLabel();
@@ -213,7 +213,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
     			if(null == type) {
     				type = utype;
     			} else if(!utype.equals(type)) {
-    				type = "Mixed";
+    				type = resourceMap.getString("mixed");
     			}
     			if(null != p) {
     				people.add(p);
@@ -238,7 +238,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
     	
     	if(null != type) {
     		lblType.setName("lblCommander2"); // NOI18N
-			lblType.setText("<html><i>" + type + " Unit</i></html>");
+			lblType.setText("<html><i>" + type + " " + resourceMap.getString("unit")+ "</i></html>");
 			gridBagConstraints = new java.awt.GridBagConstraints();
 			gridBagConstraints.gridx = 0;
 			gridBagConstraints.gridy = nexty;

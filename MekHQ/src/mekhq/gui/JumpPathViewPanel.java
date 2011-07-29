@@ -4,10 +4,11 @@
  * Created on July 26, 2009, 11:32 PM
  */
 
-package mekhq;
+package mekhq.gui;
 
 import java.awt.Color;
 import java.text.DecimalFormat;
+import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
 
@@ -117,7 +118,7 @@ public class JumpPathViewPanel extends javax.swing.JPanel {
 	
     private void fillStats() {
     	
-    	org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(JumpPathViewPanel.class);
+    	ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.JumpPathViewPanel");
     	
     	lblJumps = new javax.swing.JLabel();
     	txtJumps = new javax.swing.JTextArea();

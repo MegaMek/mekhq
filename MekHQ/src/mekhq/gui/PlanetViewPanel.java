@@ -4,9 +4,10 @@
  * Created on July 26, 2009, 11:32 PM
  */
 
-package mekhq;
+package mekhq.gui;
 
 import java.awt.Color;
+import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
 
@@ -152,7 +153,7 @@ public class PlanetViewPanel extends javax.swing.JPanel {
 	
     private void fillStats() {
     	
-    	org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(PlanetViewPanel.class);
+    	ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PlanetViewPanel");
     	
     	lblOwner = new javax.swing.JLabel();
     	lblStarType = new javax.swing.JLabel();
