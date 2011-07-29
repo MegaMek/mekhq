@@ -26,6 +26,7 @@ v0.1.10 (SVN)
 + customizable XP awards for kills
 + switched from ResourceMap to ResourceBundle and moved most dialogs to mekhq.gui
 + remainder of dialogs updated
++ removed swing-layout and swing-worker libs (yay! - only one more left)
 
 v0.1.9 (2011-07-17)
 + beginning of personnel switch (hold on to your hats!)

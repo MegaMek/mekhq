@@ -1853,72 +1853,7 @@ public class MekHQView extends FrameView {
 		refreshTempAstechs();
 		refreshTempMedics();
 		panMap.setCampaign(getCampaign());
-		
-	/*	statusPanelSeparator.setName("statusPanelSeparator"); // NOI18N
-		statusMessageLabel.setName("statusMessageLabel"); // NOI18N
-		statusAnimationLabel
-				.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-		statusAnimationLabel.setName("statusAnimationLabel"); // NOI18N
-		progressBar.setName("progressBar"); // NOI18N
-
-		org.jdesktop.layout.GroupLayout statusPanelLayout = new org.jdesktop.layout.GroupLayout(
-				statusPanel);
-		statusPanel.setLayout(statusPanelLayout);
-
-		// Holy shit, that's a function call!!!
-		statusPanelLayout
-				.setHorizontalGroup(statusPanelLayout
-						.createParallelGroup(
-								org.jdesktop.layout.GroupLayout.LEADING)
-						.add(statusPanelLayout
-								.createSequentialGroup()
-								.add(1104, 1104, 1104)
-								.add(statusPanelLayout
-										.createParallelGroup(
-												org.jdesktop.layout.GroupLayout.LEADING)
-										.add(statusPanelSeparator,
-												org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
-												164, Short.MAX_VALUE)
-										.add(statusPanelLayout
-												.createSequentialGroup()
-												.add(statusMessageLabel)
-												.addPreferredGap(
-														org.jdesktop.layout.LayoutStyle.RELATED,
-														org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
-														Short.MAX_VALUE)
-												.add(progressBar,
-														org.jdesktop.layout.GroupLayout.PREFERRED_SIZE,
-														org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
-														org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-												.addPreferredGap(
-														org.jdesktop.layout.LayoutStyle.RELATED)
-												.add(statusAnimationLabel)
-												.addContainerGap()))));
-		statusPanelLayout
-				.setVerticalGroup(statusPanelLayout
-						.createParallelGroup(
-								org.jdesktop.layout.GroupLayout.LEADING)
-						.add(statusPanelLayout
-								.createSequentialGroup()
-								.add(statusPanelSeparator,
-										org.jdesktop.layout.GroupLayout.PREFERRED_SIZE,
-										2,
-										org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-								.addPreferredGap(
-										org.jdesktop.layout.LayoutStyle.RELATED,
-										org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
-										Short.MAX_VALUE)
-								.add(statusPanelLayout
-										.createParallelGroup(
-												org.jdesktop.layout.GroupLayout.BASELINE)
-										.add(statusMessageLabel)
-										.add(statusAnimationLabel)
-										.add(progressBar,
-												org.jdesktop.layout.GroupLayout.PREFERRED_SIZE,
-												org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
-												org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-								.add(3, 3, 3)));
-		*/
+	
 		setComponent(mainPanel);
 		setMenuBar(menuBar);
 		setStatusBar(statusPanel);
