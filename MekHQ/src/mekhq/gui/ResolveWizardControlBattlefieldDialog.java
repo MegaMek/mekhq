@@ -19,10 +19,11 @@
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq;
+package mekhq.gui;
 
 import java.awt.Frame;
 import java.awt.GridBagLayout;
+import java.util.ResourceBundle;
 
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.mission.Contract;
@@ -58,10 +59,10 @@ public class ResolveWizardControlBattlefieldDialog extends javax.swing.JDialog {
         btnNo = new javax.swing.JButton();
         lblQuestion = new javax.swing.JLabel();
      
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ResolveWizardControlBattlefieldDialog");
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
 
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(ResolveWizardControlBattlefieldDialog.class);
         getContentPane().setLayout(new java.awt.GridBagLayout());
         
         setTitle(resourceMap.getString("title"));

@@ -19,31 +19,25 @@
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq;
+package mekhq.gui;
 
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagLayout;
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
 import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JRadioButton;
-import javax.swing.JSlider;
 
 import mekhq.campaign.ResolveScenarioTracker;
-import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
+import mekhq.campaign.Unit;
 import mekhq.campaign.mission.Contract;
-import mekhq.campaign.personnel.Person;
-
 /**
  *
  * @author  Taharqa
  */
-public class ResolveWizardPilotStatusDialog extends javax.swing.JDialog {
+public class ResolveWizardMissingUnitsDialog extends javax.swing.JDialog {
 	private static final long serialVersionUID = -8038099101234445018L;
     
 	private ResolveScenarioTracker tracker;
@@ -51,16 +45,13 @@ public class ResolveWizardPilotStatusDialog extends javax.swing.JDialog {
 	private javax.swing.JPanel panButtons;
 	private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnNext;
-    private javax.swing.JScrollPane scrMissingPilots;
-	private javax.swing.JPanel panMissingPilots;
+    private javax.swing.JScrollPane scrMissingUnits;
+	private javax.swing.JPanel panMissingUnits;
     private javax.swing.JTextArea txtInstructions;
-    private ArrayList<JCheckBox> miaBtns;
-    private ArrayList<JSlider> hitSliders;
-    private ArrayList<PersonStatus> statuses;
-
+    private ArrayList<javax.swing.JCheckBox> boxes;
 	
     /** Creates new form NewTeamDialog */
-    public ResolveWizardPilotStatusDialog(java.awt.Frame parent, boolean modal, ResolveScenarioTracker t) {
+    public ResolveWizardMissingUnitsDialog(java.awt.Frame parent, boolean modal, ResolveScenarioTracker t) {
         super(parent, modal);
         this.tracker = t;
         initComponents();
@@ -71,19 +62,17 @@ public class ResolveWizardPilotStatusDialog extends javax.swing.JDialog {
     	java.awt.GridBagConstraints gridBagConstraints;
 
     	panButtons = new javax.swing.JPanel();
-    	panMissingPilots = new javax.swing.JPanel();
+    	panMissingUnits = new javax.swing.JPanel();
     	btnNext = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
-        scrMissingPilots = new javax.swing.JScrollPane();
+        scrMissingUnits = new javax.swing.JScrollPane();
         txtInstructions = new javax.swing.JTextArea();
-        miaBtns = new ArrayList<JCheckBox>();
-        hitSliders = new ArrayList<JSlider>();
-        statuses = new ArrayList<PersonStatus>();
-     
+        boxes = new ArrayList<javax.swing.JCheckBox>();
+
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ResolveWizardMissingUnitsDialog");
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
 
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(ResolveWizardPilotStatusDialog.class);
         getContentPane().setLayout(new java.awt.GridBagLayout());
         
         setTitle(resourceMap.getString("title"));
@@ -95,10 +84,9 @@ public class ResolveWizardPilotStatusDialog extends javax.swing.JDialog {
         txtInstructions.setLineWrap(true);
         txtInstructions.setWrapStyleWord(true);
         txtInstructions.setBorder(BorderFactory.createCompoundBorder(
-	   			 BorderFactory.createTitledBorder("Instructions"),
+	   			 BorderFactory.createTitledBorder(resourceMap.getString("txtInstructions.title")),
 	   			 BorderFactory.createEmptyBorder(5,5,5,5)));
-        txtInstructions.setMinimumSize(new Dimension(500,125));
-        txtInstructions.setPreferredSize(new Dimension(500,125));
+        txtInstructions.setPreferredSize(new Dimension(400,200));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -110,69 +98,26 @@ public class ResolveWizardPilotStatusDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         getContentPane().add(txtInstructions, gridBagConstraints);
 	
-        panMissingPilots.setName("panMissingPilots");
-        panMissingPilots.setLayout(new GridBagLayout()); 
+        panMissingUnits.setName("panMissingUnits");
+        panMissingUnits.setLayout(new GridBagLayout()); 
         
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.CENTER;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        panMissingPilots.add(new JLabel("Hits"), gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.CENTER;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        panMissingPilots.add(new JLabel("MIA"), gridBagConstraints);
-        
-        int i = 2;
-        JLabel nameLbl;
-        JCheckBox miaCheck;
-        JSlider hitSlider; 
-        Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
-        labelTable.put( new Integer( 0 ), new JLabel("0") );
-        labelTable.put( new Integer( 1 ), new JLabel("1") );
-        labelTable.put( new Integer( 2 ), new JLabel("2") );
-        labelTable.put( new Integer( 3 ), new JLabel("3") );
-        labelTable.put( new Integer( 4 ), new JLabel("4") );
-        labelTable.put( new Integer( 5 ), new JLabel("5") );
-        labelTable.put( new Integer( 6 ), new JLabel("Dead") );
-        for(int pid : tracker.getPeopleStatus().keySet()) {
-        	PersonStatus status = tracker.getPeopleStatus().get(pid);
-        	statuses.add(status);
-        	nameLbl = new JLabel("<html>" + status.getName() + "<br><i> " + status.getUnitName() + "</i></html>");
-        	miaCheck = new JCheckBox("");
-        	miaBtns.add(miaCheck);
-        	hitSlider = new JSlider(JSlider.HORIZONTAL, 0, 6, status.getHits());
-        	hitSlider.setMajorTickSpacing(1);
-        	hitSlider.setPaintTicks(true);
-        	hitSlider.setLabelTable(labelTable);
-        	hitSlider.setPaintLabels(true);
-        	hitSlider.setSnapToTicks(true);
-        	hitSliders.add(hitSlider);
-        	if(status.isMissing()) {
-        		miaCheck.setSelected(true);
-        	} 
+        JCheckBox box;
+        int i = 1;
+        for(Unit u : tracker.getMissingUnits()) {
+        	box = new JCheckBox(u.getEntity().getDisplayName());
+        	box.setSelected(false);
+        	boxes.add(box);
         	gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = i;
-            gridBagConstraints.gridwidth = 1;
+            gridBagConstraints.gridwidth = 2;
             gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
             gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-            panMissingPilots.add(nameLbl, gridBagConstraints);
-            gridBagConstraints.gridx = 1;
-            panMissingPilots.add(hitSlider, gridBagConstraints);
-            gridBagConstraints.gridx = 2;
-            panMissingPilots.add(miaCheck, gridBagConstraints);
+            panMissingUnits.add(box, gridBagConstraints);
             i++;
         }              
-        scrMissingPilots.setViewportView(panMissingPilots);
-        scrMissingPilots.setMinimumSize(new Dimension(500,400));
-        scrMissingPilots.setPreferredSize(new Dimension(500,400));
-
+        scrMissingUnits.setViewportView(panMissingUnits);
+        
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -182,7 +127,7 @@ public class ResolveWizardPilotStatusDialog extends javax.swing.JDialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        getContentPane().add(scrMissingPilots, gridBagConstraints);
+        getContentPane().add(scrMissingUnits, gridBagConstraints);
         
         panButtons.setName("panButtons");
         panButtons.setLayout(new GridBagLayout());  
@@ -232,14 +177,20 @@ public class ResolveWizardPilotStatusDialog extends javax.swing.JDialog {
 	   	 pack();
     }
 
+    
     private void btnNextActionPerformed(java.awt.event.ActionEvent evt) {
-    	for(int i = 0; i < statuses.size(); i++) {
-    		PersonStatus status = statuses.get(i);
-    		status.setMissing(miaBtns.get(i).isSelected());
-    		status.setHits(hitSliders.get(i).getValue());
+    	for(int i = 0; i < boxes.size(); i++) {
+    		JCheckBox box = boxes.get(i);
+    		if(box.isSelected()) {
+    			//tracker.recoverMissingEntity(i);
+    		}
     	}
+    	//tracker.identifyMissingUnits();
     	this.setVisible(false);
-    	if(tracker.getPotentialSalvage().size() > 0 
+    	if(!tracker.getPeopleStatus().isEmpty()) {
+    		ResolveWizardPilotStatusDialog resolveDialog = new ResolveWizardPilotStatusDialog((Frame)getParent(), true, tracker);
+    		resolveDialog.setVisible(true);
+    	} else if(tracker.getPotentialSalvage().size() > 0 
     			&& (!(tracker.getMission() instanceof Contract) || ((Contract)tracker.getMission()).canSalvage())) {
     		ResolveWizardSalvageDialog resolveDialog = new ResolveWizardSalvageDialog((Frame)getParent(), true, tracker);
     		resolveDialog.setVisible(true);

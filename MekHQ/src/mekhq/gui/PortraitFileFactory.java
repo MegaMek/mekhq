@@ -12,7 +12,7 @@
  *  for more details.
  */
 
-package mekhq;
+package mekhq.gui;
 
 import java.awt.Image;
 import java.awt.Toolkit;

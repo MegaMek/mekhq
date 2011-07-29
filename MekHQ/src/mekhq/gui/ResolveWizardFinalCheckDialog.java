@@ -19,10 +19,11 @@
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq;
+package mekhq.gui;
 
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
+import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
@@ -95,11 +96,11 @@ public class ResolveWizardFinalCheckDialog extends javax.swing.JDialog {
         txtDeadPilots = new javax.swing.JTextArea();
         txtSalvage = new javax.swing.JTextArea();
         lblStatus = new javax.swing.JLabel();
-    
+        
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ResolveWizardFinalCheckDialog");
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
 
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(ResolveWizardFinalCheckDialog.class);
         getContentPane().setLayout(new java.awt.GridBagLayout());
         
         setTitle(resourceMap.getString("title"));
@@ -111,7 +112,7 @@ public class ResolveWizardFinalCheckDialog extends javax.swing.JDialog {
         txtInstructions.setLineWrap(true);
         txtInstructions.setWrapStyleWord(true);
         txtInstructions.setBorder(BorderFactory.createCompoundBorder(
-	   			 BorderFactory.createTitledBorder("Instructions"),
+	   			 BorderFactory.createTitledBorder(resourceMap.getString("txtInstructions.title")),
 	   			 BorderFactory.createEmptyBorder(5,5,5,5)));
         txtInstructions.setPreferredSize(new Dimension(400,100));
         txtInstructions.setMinimumSize(new Dimension(400,100));
@@ -162,7 +163,7 @@ public class ResolveWizardFinalCheckDialog extends javax.swing.JDialog {
         txtReport.setLineWrap(true);
         txtReport.setWrapStyleWord(true);
         txtReport.setBorder(BorderFactory.createCompoundBorder(
-	   			 BorderFactory.createTitledBorder("After-Action Report"),
+	   			 BorderFactory.createTitledBorder(resourceMap.getString("txtReport.title")),
 	   			 BorderFactory.createEmptyBorder(5,5,5,5)));
         scrReport.setViewportView(txtReport);
         scrReport.setPreferredSize(new Dimension(400,200));
@@ -179,7 +180,7 @@ public class ResolveWizardFinalCheckDialog extends javax.swing.JDialog {
         getContentPane().add(scrReport, gridBagConstraints);
 	         
         txtRecoveredUnits.setName("txtRecoveredUnits");
-        txtRecoveredUnits.setText("None");
+        txtRecoveredUnits.setText(resourceMap.getString("none"));
         String names = "";
         if(tracker.getRecoveredUnits().size() > 0) {
         	for(Unit u : tracker.getRecoveredUnits()) {
@@ -191,7 +192,7 @@ public class ResolveWizardFinalCheckDialog extends javax.swing.JDialog {
         txtRecoveredUnits.setLineWrap(true);
         txtRecoveredUnits.setWrapStyleWord(true);
         txtRecoveredUnits.setBorder(BorderFactory.createCompoundBorder(
-				BorderFactory.createTitledBorder("Recovered Units"),
+				BorderFactory.createTitledBorder(resourceMap.getString("txtRecoveredUnits.title")),
                 BorderFactory.createEmptyBorder(5,5,5,5)));
         scrRecoveredUnits.setViewportView(txtRecoveredUnits);
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -206,7 +207,7 @@ public class ResolveWizardFinalCheckDialog extends javax.swing.JDialog {
         getContentPane().add(scrRecoveredUnits, gridBagConstraints);
         
         txtRecoveredPilots.setName("txtRecoveredPilots");
-        txtRecoveredPilots.setText("None");
+        txtRecoveredPilots.setText(resourceMap.getString("none"));
         names = "";
         if(tracker.getRecoveredPersonnel().size() > 0) {
         	for(Person p : tracker.getRecoveredPersonnel()) {
@@ -218,7 +219,7 @@ public class ResolveWizardFinalCheckDialog extends javax.swing.JDialog {
         txtRecoveredPilots.setLineWrap(true);
         txtRecoveredPilots.setWrapStyleWord(true);
         txtRecoveredPilots.setBorder(BorderFactory.createCompoundBorder(
-				BorderFactory.createTitledBorder("Recovered Pilots"),
+				BorderFactory.createTitledBorder(resourceMap.getString("txtRecoveredPilots.title")),
                 BorderFactory.createEmptyBorder(5,5,5,5)));
         scrRecoveredPilots.setViewportView(txtRecoveredPilots);
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -233,7 +234,7 @@ public class ResolveWizardFinalCheckDialog extends javax.swing.JDialog {
         getContentPane().add(scrRecoveredPilots, gridBagConstraints);
         
         txtMissingUnits.setName("txtMissingUnits");
-        txtMissingUnits.setText("None");
+        txtMissingUnits.setText(resourceMap.getString("none"));
         names = "";
         if(tracker.getMissingUnits().size() > 0) {
         	for(Unit u : tracker.getMissingUnits()) {
@@ -245,7 +246,7 @@ public class ResolveWizardFinalCheckDialog extends javax.swing.JDialog {
         txtMissingUnits.setLineWrap(true);
         txtMissingUnits.setWrapStyleWord(true);
         txtMissingUnits.setBorder(BorderFactory.createCompoundBorder(
-				BorderFactory.createTitledBorder("Missing Units"),
+				BorderFactory.createTitledBorder(resourceMap.getString("txtMissingUnits.title")),
                 BorderFactory.createEmptyBorder(5,5,5,5)));
         scrMissingUnits.setViewportView(txtMissingUnits);
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -260,7 +261,7 @@ public class ResolveWizardFinalCheckDialog extends javax.swing.JDialog {
         getContentPane().add(scrMissingUnits, gridBagConstraints);
         
         txtMissingPilots.setName("txtMissingPilots");
-        txtMissingPilots.setText("None");
+        txtMissingPilots.setText(resourceMap.getString("none"));
         names = "";
         if(tracker.getMissingPersonnel().size() > 0) {
         	for(Person p : tracker.getMissingPersonnel()) {
@@ -272,7 +273,7 @@ public class ResolveWizardFinalCheckDialog extends javax.swing.JDialog {
         txtMissingPilots.setLineWrap(true);
         txtMissingPilots.setWrapStyleWord(true);
         txtMissingPilots.setBorder(BorderFactory.createCompoundBorder(
-				BorderFactory.createTitledBorder("Missing Pilots"),
+				BorderFactory.createTitledBorder(resourceMap.getString("txtMissingPilots.title")),
                 BorderFactory.createEmptyBorder(5,5,5,5)));
         scrMissingPilots.setViewportView(txtMissingPilots);
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -299,7 +300,7 @@ public class ResolveWizardFinalCheckDialog extends javax.swing.JDialog {
         txtSalvage.setLineWrap(true);
         txtSalvage.setWrapStyleWord(true);
         txtSalvage.setBorder(BorderFactory.createCompoundBorder(
-				BorderFactory.createTitledBorder("Salvaged Units"),
+				BorderFactory.createTitledBorder(resourceMap.getString("txtSalvagedUnits.title")),
                 BorderFactory.createEmptyBorder(5,5,5,5)));
         scrSalvage.setViewportView(txtSalvage);
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -314,7 +315,7 @@ public class ResolveWizardFinalCheckDialog extends javax.swing.JDialog {
         getContentPane().add(scrSalvage, gridBagConstraints);
         
         txtDeadPilots.setName("txtDeadPilots");
-        txtDeadPilots.setText("None");
+        txtDeadPilots.setText(resourceMap.getString("none"));
         names = "";
         if(tracker.getDeadPersonnel().size() > 0) {
         	for(Person p : tracker.getDeadPersonnel()) {
@@ -326,7 +327,7 @@ public class ResolveWizardFinalCheckDialog extends javax.swing.JDialog {
         txtDeadPilots.setLineWrap(true);
         txtDeadPilots.setWrapStyleWord(true);
         txtDeadPilots.setBorder(BorderFactory.createCompoundBorder(
-				BorderFactory.createTitledBorder("Dead Pilots"),
+				BorderFactory.createTitledBorder(resourceMap.getString("txtDeadPilots.title")),
                 BorderFactory.createEmptyBorder(5,5,5,5)));
         scrDeadPilots.setViewportView(txtDeadPilots);
         gridBagConstraints = new java.awt.GridBagConstraints();

@@ -28,6 +28,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.Force;
 import mekhq.campaign.Unit;
 import mekhq.campaign.personnel.Person;
+import mekhq.gui.EntityImage;
 
 /**
  * A custom panel that gets filled in with goodies from a Force record

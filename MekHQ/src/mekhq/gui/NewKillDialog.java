@@ -27,7 +27,6 @@ import java.util.Date;
 import java.util.ResourceBundle;
 
 
-import mekhq.DateChooser;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
 import mekhq.campaign.Unit;

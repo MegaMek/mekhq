@@ -1,5 +1,5 @@
 /*
- * ResolveWizardMissingUnitsDialog.java
+ * ResolveWizardAssignKillsDialog.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -19,24 +19,36 @@
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq;
+package mekhq.gui;
 
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagLayout;
 import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JRadioButton;
+import javax.swing.JSlider;
 
+import megamek.common.Entity;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.Unit;
+import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
 import mekhq.campaign.mission.Contract;
+import mekhq.campaign.personnel.Person;
+
 /**
  *
  * @author  Taharqa
  */
-public class ResolveWizardMissingUnitsDialog extends javax.swing.JDialog {
+public class ResolveWizardAssignKillsDialog extends javax.swing.JDialog {
 	private static final long serialVersionUID = -8038099101234445018L;
     
 	private ResolveScenarioTracker tracker;
@@ -44,13 +56,14 @@ public class ResolveWizardMissingUnitsDialog extends javax.swing.JDialog {
 	private javax.swing.JPanel panButtons;
 	private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnNext;
-    private javax.swing.JScrollPane scrMissingUnits;
-	private javax.swing.JPanel panMissingUnits;
+    private javax.swing.JScrollPane scrAssignKills;
+	private javax.swing.JPanel panAssignKills;
     private javax.swing.JTextArea txtInstructions;
-    private ArrayList<javax.swing.JCheckBox> boxes;
+    private Hashtable<String, JComboBox> choices;
+
 	
     /** Creates new form NewTeamDialog */
-    public ResolveWizardMissingUnitsDialog(java.awt.Frame parent, boolean modal, ResolveScenarioTracker t) {
+    public ResolveWizardAssignKillsDialog(java.awt.Frame parent, boolean modal, ResolveScenarioTracker t) {
         super(parent, modal);
         this.tracker = t;
         initComponents();
@@ -61,18 +74,16 @@ public class ResolveWizardMissingUnitsDialog extends javax.swing.JDialog {
     	java.awt.GridBagConstraints gridBagConstraints;
 
     	panButtons = new javax.swing.JPanel();
-    	panMissingUnits = new javax.swing.JPanel();
+    	panAssignKills = new javax.swing.JPanel();
     	btnNext = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
-        scrMissingUnits = new javax.swing.JScrollPane();
+        scrAssignKills = new javax.swing.JScrollPane();
         txtInstructions = new javax.swing.JTextArea();
-        boxes = new ArrayList<javax.swing.JCheckBox>();
-
-     
+        choices = new Hashtable<String, JComboBox>();
+        
+		ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ResolveWizardAssignKillsDialog");
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
-
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(ResolveWizardMissingUnitsDialog.class);
         getContentPane().setLayout(new java.awt.GridBagLayout());
         
         setTitle(resourceMap.getString("title"));
@@ -84,9 +95,10 @@ public class ResolveWizardMissingUnitsDialog extends javax.swing.JDialog {
         txtInstructions.setLineWrap(true);
         txtInstructions.setWrapStyleWord(true);
         txtInstructions.setBorder(BorderFactory.createCompoundBorder(
-	   			 BorderFactory.createTitledBorder("Instructions"),
+	   			 BorderFactory.createTitledBorder(resourceMap.getString("txtInstructions.title")),
 	   			 BorderFactory.createEmptyBorder(5,5,5,5)));
-        txtInstructions.setPreferredSize(new Dimension(400,200));
+        txtInstructions.setMinimumSize(new Dimension(500,125));
+        txtInstructions.setPreferredSize(new Dimension(500,125));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -98,26 +110,58 @@ public class ResolveWizardMissingUnitsDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         getContentPane().add(txtInstructions, gridBagConstraints);
 	
-        panMissingUnits.setName("panMissingUnits");
-        panMissingUnits.setLayout(new GridBagLayout()); 
+        panAssignKills.setName("panAssignKills");
+        panAssignKills.setLayout(new GridBagLayout()); 
         
-        JCheckBox box;
-        int i = 1;
-        for(Unit u : tracker.getMissingUnits()) {
-        	box = new JCheckBox(u.getEntity().getDisplayName());
-        	box.setSelected(false);
-        	boxes.add(box);
-        	gridBagConstraints = new java.awt.GridBagConstraints();
-            gridBagConstraints.gridx = 0;
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.CENTER;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        panAssignKills.add(new JLabel(resourceMap.getString("kill")), gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.CENTER;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        panAssignKills.add(new JLabel(resourceMap.getString("claim")), gridBagConstraints);
+        
+        int i = 2;
+        JLabel nameLbl;
+        JComboBox comboAssign;
+        DefaultComboBoxModel assignModel; 
+        for(String killName : tracker.getKillCredits().keySet()) {
+        	nameLbl = new JLabel(killName);
+        	assignModel = new DefaultComboBoxModel();
+        	assignModel.addElement(resourceMap.getString("none"));
+        	int idx = 0;
+        	int selected = 0;
+    		for(Unit u : tracker.getUnits()) {	
+    			idx++;
+    			assignModel.addElement(u.getCommander().getFullTitle() + ", " + u.getEntity().getDisplayName());
+    			if(u.getId() == tracker.getKillCredits().get(killName)) {
+    				selected = idx;
+    			}
+    		}
+        	comboAssign = new JComboBox(assignModel);
+        	comboAssign.setSelectedIndex(selected);
+        	choices.put(killName, comboAssign);
+        	gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = i;
-            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.gridwidth = 1;
             gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
             gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-            panMissingUnits.add(box, gridBagConstraints);
+            panAssignKills.add(nameLbl, gridBagConstraints);
+            gridBagConstraints.gridx = 1;
+            panAssignKills.add(comboAssign, gridBagConstraints);
             i++;
-        }              
-        scrMissingUnits.setViewportView(panMissingUnits);
-        
+        }        
+        scrAssignKills.setViewportView(panAssignKills);
+        scrAssignKills.setMinimumSize(new Dimension(600,400));
+        scrAssignKills.setPreferredSize(new Dimension(600,400));
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -127,7 +171,7 @@ public class ResolveWizardMissingUnitsDialog extends javax.swing.JDialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        getContentPane().add(scrMissingUnits, gridBagConstraints);
+        getContentPane().add(scrAssignKills, gridBagConstraints);
         
         panButtons.setName("panButtons");
         panButtons.setLayout(new GridBagLayout());  
@@ -177,30 +221,21 @@ public class ResolveWizardMissingUnitsDialog extends javax.swing.JDialog {
 	   	 pack();
     }
 
-    
     private void btnNextActionPerformed(java.awt.event.ActionEvent evt) {
-    	for(int i = 0; i < boxes.size(); i++) {
-    		JCheckBox box = boxes.get(i);
-    		if(box.isSelected()) {
-    			//tracker.recoverMissingEntity(i);
+    	this.setVisible(false);
+    	for(String killName : tracker.getKillCredits().keySet()) {
+    		if(choices.get(killName).getSelectedIndex() == 0) {
+    			tracker.getKillCredits().put(killName, Entity.NONE);
+    		} else {
+	    		Unit u = tracker.getUnits().get(choices.get(killName).getSelectedIndex()-1);
+	    		if(null != u) {
+	    			tracker.getKillCredits().put(killName, u.getId());
+	    		}
     		}
     	}
-    	//tracker.identifyMissingUnits();
-    	this.setVisible(false);
-    	if(!tracker.getPeopleStatus().isEmpty()) {
-    		ResolveWizardPilotStatusDialog resolveDialog = new ResolveWizardPilotStatusDialog((Frame)getParent(), true, tracker);
-    		resolveDialog.setVisible(true);
-    	} else if(tracker.getPotentialSalvage().size() > 0 
-    			&& (!(tracker.getMission() instanceof Contract) || ((Contract)tracker.getMission()).canSalvage())) {
-    		ResolveWizardSalvageDialog resolveDialog = new ResolveWizardSalvageDialog((Frame)getParent(), true, tracker);
-    		resolveDialog.setVisible(true);
-    	} else if(!tracker.getKillCredits().isEmpty()) {
-    		ResolveWizardAssignKillsDialog resolveDialog = new ResolveWizardAssignKillsDialog((Frame)getParent(), true, tracker);
-    		resolveDialog.setVisible(true);
-    	} else {
-    		ResolveWizardFinalCheckDialog resolveDialog = new ResolveWizardFinalCheckDialog((Frame)getParent(), true, tracker);
-    		resolveDialog.setVisible(true);
-    	}
+    	tracker.assignKills();
+    	ResolveWizardFinalCheckDialog resolveDialog = new ResolveWizardFinalCheckDialog((Frame)getParent(), true, tracker);
+    	resolveDialog.setVisible(true);
     }
 
 

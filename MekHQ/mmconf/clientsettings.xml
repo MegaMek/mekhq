@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <MegaMekSettings>
 	<store name="ClientSettings">
-		<preference name="LastPlayerCamoName" value="Wood1.jpg"/>
-		<preference name="LastPlayerCategory" value=""/>
+		<preference name="LastPlayerCamoName" value="Sky.jpg"/>
+		<preference name="LastPlayerCategory" value="-- General --"/>
+		<preference name="LastPlayerColor" value="1"/>
 		<preference name="megamek.megamek.goalplayers" value="2"/>
-		<preference name="LastPlayerColor" value="0"/>
 		<preference name="LastPlayerName" value="bob"/>
 		<preference name="megamek.megamek.metaservername" value="http://www.damour.info/cgi-bin/james/metaserver"/>
 	</store>
@@ -12,8 +12,8 @@
 	</store>
 	<store name="megamek.client.ui.swing.GUIPreferences">
 		<preference name="MinimapPosY" value="22"/>
-		<preference name="DisplayPosY" value="22"/>
 		<preference name="MinimapPosX" value="50"/>
+		<preference name="DisplayPosY" value="22"/>
 		<preference name="DisplayPosX" value="50"/>
 		<preference name="NagForNoAction" value="false"/>
 		<preference name="WindowSizeHeight" value="785"/>

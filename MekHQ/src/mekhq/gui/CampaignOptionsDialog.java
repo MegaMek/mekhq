@@ -55,7 +55,6 @@ import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.DirectoryItems;
-import mekhq.DateChooser;
 import mekhq.MekHQApp;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;

@@ -4,7 +4,11 @@
  * Created on July 15, 2009, 9:30 PM
  */
 
-package mekhq;
+package mekhq.gui;
+
+import java.awt.BorderLayout;
+import java.awt.Font;
+import java.util.ResourceBundle;
 
 import megamek.client.ui.swing.MechView;
 
@@ -37,16 +41,16 @@ public class MekViewDialog extends javax.swing.JDialog {
         jScrollPane2 = new javax.swing.JScrollPane();
         txtMek = new javax.swing.JTextPane();
         btnOkay = new javax.swing.JButton();
-
+        
+		ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekViewDialog");
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Unit View"); // NOI18N
 
         jScrollPane2.setName("jScrollPane2"); // NOI18N
 
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(MekViewDialog.class);
         txtMek.setContentType(resourceMap.getString("txtMek.contentType")); // NOI18N
         txtMek.setEditable(false);
-        txtMek.setFont(resourceMap.getFont("txtMek.font")); // NOI18N
+        txtMek.setFont(Font.decode(resourceMap.getString("txtMek.font"))); // NOI18N
         txtMek.setName("txtMek"); // NOI18N
         txtMek.setText(mview.getMechReadout());
         jScrollPane2.setViewportView(txtMek);
@@ -58,48 +62,17 @@ public class MekViewDialog extends javax.swing.JDialog {
                 btnOkayActionPerformed(evt);
             }
         });
-
-        org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
-                .add(131, 131, 131)
-                .add(btnOkay)
-                .addContainerGap(153, Short.MAX_VALUE))
-            .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 360, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                .add(jScrollPane2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 544, Short.MAX_VALUE)
-                .add(18, 18, 18)
-                .add(btnOkay))
-        );
+        
+        getContentPane().add(jScrollPane2, BorderLayout.CENTER);
+        getContentPane().add(btnOkay, BorderLayout.PAGE_END);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-private void btnOkayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOkayActionPerformed
-    this.setVisible(false);
-}//GEN-LAST:event_btnOkayActionPerformed
+	private void btnOkayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOkayActionPerformed
+	    this.setVisible(false);
+	}//GEN-LAST:event_btnOkayActionPerformed
 
-    /**
-    * @param args the command line arguments
-    */
-    public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                MekViewDialog dialog = new MekViewDialog(new javax.swing.JFrame(), true, null);
-                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                    public void windowClosing(java.awt.event.WindowEvent e) {
-                        System.exit(0);
-                    }
-                });
-                dialog.setVisible(true);
-            }
-        });
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnOkay;

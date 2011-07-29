@@ -1,6 +1,6 @@
 /*********************  DateChooser.java **************************/
 
-package mekhq;
+package mekhq.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

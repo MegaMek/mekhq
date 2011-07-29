@@ -37,7 +37,6 @@ import megamek.common.WeaponType;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
-import mekhq.DateChooser;
 import mekhq.MekHQView;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;

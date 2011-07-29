@@ -19,6 +19,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 import javax.swing.RowFilter;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -36,7 +37,6 @@ import megamek.common.MechSummaryCache;
 import megamek.common.TechConstants;
 import megamek.common.UnitType;
 import megamek.common.loaders.EntityLoadingException;
-import mekhq.AlertPopup;
 import mekhq.MekHQApp;
 import mekhq.MekHQView;
 import mekhq.campaign.Campaign;
@@ -397,8 +397,7 @@ public class UnitSelectorDialog extends JDialog {
 	            
 	            text += System.getProperty("line.separator");
 	            text += "(Cost : " + unitCostString + ", Funds : " + fundsString + ")";
-	            AlertPopup popup = new AlertPopup(null, true, text);
-	            popup.setVisible(true);
+	            JOptionPane.showMessageDialog(null, text);
 	        }
 	    }
 	

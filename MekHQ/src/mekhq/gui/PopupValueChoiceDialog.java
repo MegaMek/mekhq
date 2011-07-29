@@ -4,11 +4,13 @@
  * Created on Jan 6, 2010, 10:46:02 PM
  */
 
-package mekhq;
+package mekhq.gui;
 
+import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.util.ResourceBundle;
 
 /**
  *
@@ -29,7 +31,7 @@ public class PopupValueChoiceDialog extends javax.swing.JDialog {
     public PopupValueChoiceDialog(java.awt.Frame parent, boolean modal, String title, int current, int min, int max) {
         super(parent, modal);
         model = new javax.swing.SpinnerNumberModel(current, min, max, 1);
-        label = new javax.swing.JLabel(title);
+        setTitle(title);
         initComponents();      
         setLocationRelativeTo(parent);
     }
@@ -46,10 +48,10 @@ public class PopupValueChoiceDialog extends javax.swing.JDialog {
         btnCancel = new javax.swing.JButton();
         value = new javax.swing.JSpinner(model);
 
+		ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PopupValueChoiceDialog");
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
 
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(PopupValueChoiceDialog.class);
         btnDone.setText(resourceMap.getString("btnDone.text")); // NOI18N
         btnDone.setName("btnDone"); // NOI18N
         btnDone.addActionListener(new java.awt.event.ActionListener() {
@@ -71,22 +73,11 @@ public class PopupValueChoiceDialog extends javax.swing.JDialog {
         pnlButton.add(btnCancel);
         
         value.setName("value"); // NOI18N
-        label.setName("label"); // NOI18N
 
-        getContentPane().setLayout(new GridBagLayout());
+        getContentPane().setLayout(new BorderLayout());
         
-        GridBagConstraints c= new GridBagConstraints();
-        c.gridx = 0;
-        c.fill = java.awt.GridBagConstraints.BOTH;
-		c.anchor = java.awt.GridBagConstraints.WEST;
-        getContentPane().add(label,c);
-        c.gridx = 1;
-        getContentPane().add(value, c);
-        c.gridx = 0;
-        c.gridy = 1;
-        c.gridwidth = 2;
-		c.anchor = java.awt.GridBagConstraints.CENTER;
-        getContentPane().add(pnlButton, c);
+        getContentPane().add(value,BorderLayout.CENTER);
+        getContentPane().add(pnlButton, BorderLayout.PAGE_END);
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
@@ -125,7 +116,6 @@ public class PopupValueChoiceDialog extends javax.swing.JDialog {
     private javax.swing.JButton btnDone;
     private javax.swing.JButton btnCancel;
     private javax.swing.JPanel pnlButton;
-    private javax.swing.JLabel label;
     private javax.swing.JSpinner value;
     private javax.swing.SpinnerNumberModel model;
     // End of variables declaration//GEN-END:variables

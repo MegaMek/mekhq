@@ -30,6 +30,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.Faction;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.Planet;
+import mekhq.gui.MenuScroller;
 
 
 /**

@@ -19,11 +19,12 @@
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq;
+package mekhq.gui;
 
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagLayout;
+import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
 
@@ -68,11 +69,10 @@ public class ResolveWizardChooseFilesDialog extends javax.swing.JDialog {
     	 txtSalvageFile = new javax.swing.JTextField();
     	 txtInstructions = new javax.swing.JTextArea();
 
-    	 
+    	 ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ResolveWizardChooseFilesDialog");
     	 setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
     	 setName("Form"); // NOI18N
     	 
-    	 org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(ResolveWizardChooseFilesDialog.class);
     	 getContentPane().setLayout(new java.awt.GridBagLayout());
     	 setTitle(resourceMap.getString("title"));
     	 
@@ -83,7 +83,7 @@ public class ResolveWizardChooseFilesDialog extends javax.swing.JDialog {
     	 txtInstructions.setLineWrap(true);
     	 txtInstructions.setWrapStyleWord(true);
     	 txtInstructions.setBorder(BorderFactory.createCompoundBorder(
-    			 BorderFactory.createTitledBorder("Instructions"),
+    			 BorderFactory.createTitledBorder(resourceMap.getString("txtInstructions.title")),
     			 BorderFactory.createEmptyBorder(5,5,5,5)));
     	 txtInstructions.setPreferredSize(new Dimension(400,200));
     	 gridBagConstraints = new java.awt.GridBagConstraints();

@@ -27,7 +27,6 @@ import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
 
-import mekhq.JSuggestField;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Mission;
 

@@ -1,4 +1,4 @@
-package mekhq;
+package mekhq.gui;
 
 import java.awt.Component;
 import java.awt.Image;

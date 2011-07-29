@@ -68,6 +68,8 @@ import mekhq.campaign.Planets;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.Unit;
 import mekhq.campaign.mission.Scenario;
+import mekhq.gui.PortraitFileFactory;
+import mekhq.gui.ResolveWizardControlBattlefieldDialog;
 import mekhq.gui.StartUpDialog;
 
 /**

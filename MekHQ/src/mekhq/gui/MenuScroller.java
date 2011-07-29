@@ -2,7 +2,7 @@
  * @(#)MenuScroller.java	1.4.0 14/09/10
  */
 
-package mekhq;
+package mekhq.gui;
 
 import java.awt.Color;
 import java.awt.Component;
