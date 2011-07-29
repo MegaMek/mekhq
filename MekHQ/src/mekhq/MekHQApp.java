@@ -68,6 +68,7 @@ import mekhq.campaign.Planets;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.Unit;
 import mekhq.campaign.mission.Scenario;
+import mekhq.gui.StartUpDialog;
 
 /**
  * The main class of the application.

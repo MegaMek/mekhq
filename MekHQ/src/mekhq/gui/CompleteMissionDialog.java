@@ -4,7 +4,9 @@
  * Created on Jan 6, 2010, 10:46:02 PM
  */
 
-package mekhq;
+package mekhq.gui;
+
+import java.util.ResourceBundle;
 
 import javax.swing.DefaultComboBoxModel;
 
@@ -39,11 +41,12 @@ public class CompleteMissionDialog extends javax.swing.JDialog {
         btnCancel = new javax.swing.JButton();
         choiceOutcome = new javax.swing.JComboBox();
         lblOutcome = new javax.swing.JLabel();
-
+        
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CompleteMissionDialog");
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
+        setTitle(resourceMap.getString("title.text"));
         
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(CompleteMissionDialog.class);
         getContentPane().setLayout(new java.awt.GridBagLayout());
         
         lblOutcome.setText(resourceMap.getString("lblOutcome.text")); // NOI18N

@@ -142,6 +142,18 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.Modes;
+import mekhq.gui.CampaignOptionsDialog;
+import mekhq.gui.CompleteMissionDialog;
+import mekhq.gui.CustomizeMissionDialog;
+import mekhq.gui.CustomizePersonDialog;
+import mekhq.gui.CustomizeScenarioDialog;
+import mekhq.gui.DataLoadingDialog;
+import mekhq.gui.GameOptionsDialog;
+import mekhq.gui.MissionTypeDialog;
+import mekhq.gui.NewKillDialog;
+import mekhq.gui.PortraitChoiceDialog;
+import mekhq.gui.TextAreaDialog;
+import mekhq.gui.UnitSelectorDialog;
 
 import org.jdesktop.application.Action;
 import org.jdesktop.application.FrameView;
@@ -2841,7 +2853,7 @@ public class MekHQView extends FrameView {
 		}
 	}
 
-	protected void refreshServicedUnitList() {
+	public void refreshServicedUnitList() {
 		int selected = servicedUnitTable.getSelectedRow();
 		servicedUnitModel.setData(getCampaign().getServiceableUnits());
 		if ((selected > -1) && (selected < getCampaign().getServiceableUnits().size())) {
@@ -2849,11 +2861,11 @@ public class MekHQView extends FrameView {
 		}
 	}
 	
-	protected void refreshPersonnelList() {
+	public void refreshPersonnelList() {
 		personModel.setData(getCampaign().getPersonnel());
 	}
 	
-	protected void changeMission() {
+	public void changeMission() {
 		int idx = choiceMission.getSelectedIndex();
 		if(idx >= 0 && idx < getCampaign().getActiveMissions().size()) {
 			Mission m = getCampaign().getActiveMissions().get(idx);
@@ -2879,7 +2891,7 @@ public class MekHQView extends FrameView {
 		refreshScenarioList();
 	}
 	
-	protected void refreshScenarioList() {
+	public void refreshScenarioList() {
 		Mission m = getCampaign().getMission(selectedMission);
 		if(null != m) {
 			scenarioModel.setData(m.getScenarios());
@@ -2888,19 +2900,19 @@ public class MekHQView extends FrameView {
 		}
 	}
 	
-	protected void refreshUnitList() {
+	public void refreshUnitList() {
 		unitModel.setData(getCampaign().getUnits());
 	}
 
-	protected void refreshTaskList() {
+	public void refreshTaskList() {
 		taskModel.setData(getCampaign().getPartsNeedingServiceFor(currentServicedUnitId));
 	}
 	
-	protected void refreshAcquireList() {
+	public void refreshAcquireList() {
 		acquireModel.setData(getCampaign().getAcquisitionsForUnit(currentServicedUnitId));
 	}
 	
-	protected void refreshMissions() {
+	public void refreshMissions() {
 		choiceMission.removeAllItems();
 		for(Mission m : getCampaign().getActiveMissions()) {
 			choiceMission.addItem(m.getName());
@@ -2915,7 +2927,7 @@ public class MekHQView extends FrameView {
 		changeMission();
 	}
 
-	protected void refreshTechsList() {
+	public void refreshTechsList() {
 		int selected = TechTable.getSelectedRow();
 		techsModel.setData(getCampaign().getTechs());
 		if ((selected > -1) && (selected < getCampaign().getTechs().size())) {
@@ -2929,7 +2941,7 @@ public class MekHQView extends FrameView {
 		astechPoolLabel.setText(astechString); // NOI18N
 	}
 
-	protected void refreshDoctorsList() {
+	public void refreshDoctorsList() {
 		int selected = DocTable.getSelectedRow();
 		doctorsModel.setData(getCampaign().getDoctors());
 		if ((selected > -1) && (selected < getCampaign().getDoctors().size())) {
@@ -2937,7 +2949,7 @@ public class MekHQView extends FrameView {
 		}
 	}
 
-	protected void refreshPatientList() {
+	public void refreshPatientList() {
 		int selected = patientTable.getSelectedRow();
 		patientModel.setData(getCampaign().getPatients());
 		if ((selected > -1) && (selected < getCampaign().getPatients().size())) {
@@ -2945,25 +2957,25 @@ public class MekHQView extends FrameView {
 		}
 	}
 
-	protected void refreshPartsList() {
+	public void refreshPartsList() {
 		partsModel.setData(getCampaign().getPartsInventory());
 	}
 	
-	protected void refreshFinancialTransactions() {
+	public void refreshFinancialTransactions() {
 		financeModel.setData(getCampaign().getFinances().getAllTransactions());
 		refreshFunds();
 	}
 
-	protected void refreshCalendar() {
+	public void refreshCalendar() {
 		getFrame().setTitle(getCampaign().getTitle());
 	}
 
-	protected void refreshReport() {
+	public void refreshReport() {
 		txtPaneReport.setText(getCampaign().getCurrentReportHTML());
 		txtPaneReport.setCaretPosition(0);
 	}
 	
-	protected void refreshOrganization() {
+	public void refreshOrganization() {
 		//traverse the force object and assign TreeNodes
 		Force force = getCampaign().getForces();
 		DefaultMutableTreeNode top = new DefaultMutableTreeNode(getCampaign().getForces());

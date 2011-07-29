@@ -4,14 +4,16 @@
  * Created on August 21, 2009, 4:26 PM
  */
 
-package mekhq;
+package mekhq.gui;
 
+import java.awt.Font;
 import java.awt.Image;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.ResourceBundle;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
@@ -34,6 +36,9 @@ import megamek.common.MechSummaryCache;
 import megamek.common.TechConstants;
 import megamek.common.UnitType;
 import megamek.common.loaders.EntityLoadingException;
+import mekhq.AlertPopup;
+import mekhq.MekHQApp;
+import mekhq.MekHQView;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Unit;
 
@@ -103,8 +108,8 @@ public class UnitSelectorDialog extends JDialog {
         btnBuy = new javax.swing.JButton();
         btnClose = new javax.swing.JButton();
 
+		ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.UnitSelectorDialog");
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(UnitSelectorDialog.class);
         setTitle(resourceMap.getString("Form.title")); // NOI18N
         setName("Form"); // NOI18N
         getContentPane().setLayout(new java.awt.GridBagLayout());
@@ -113,7 +118,7 @@ public class UnitSelectorDialog extends JDialog {
         scrTableUnits.setName("scrTableUnits"); // NOI18N
         scrTableUnits.setPreferredSize(new java.awt.Dimension(500, 400));
 
-        tableUnits.setFont(resourceMap.getFont("tableUnits.font")); // NOI18N
+        tableUnits.setFont(Font.decode(resourceMap.getString("tableUnits.font"))); // NOI18N
         tableUnits.setModel(unitModel);
         tableUnits.setName("tableUnits"); // NOI18N
         tableUnits.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
@@ -158,7 +163,7 @@ public class UnitSelectorDialog extends JDialog {
         txtUnitView.setBorder(null);
         txtUnitView.setContentType(resourceMap.getString("txtUnitView.contentType")); // NOI18N
         txtUnitView.setEditable(false);
-        txtUnitView.setFont(resourceMap.getFont("txtUnitView.font")); // NOI18N
+        txtUnitView.setFont(Font.decode(resourceMap.getString("txtUnitView.font"))); // NOI18N
         txtUnitView.setMinimumSize(new java.awt.Dimension(300, 500));
         txtUnitView.setName("txtUnitView"); // NOI18N
         txtUnitView.setPreferredSize(new java.awt.Dimension(300, 500));
@@ -358,61 +363,61 @@ public class UnitSelectorDialog extends JDialog {
             pack();
         }// </editor-fold>//GEN-END:initComponents
 
-private void comboUnitTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboUnitTypeActionPerformed
-    filterUnits();
-}//GEN-LAST:event_comboUnitTypeActionPerformed
-
-private void comboWeightActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboWeightActionPerformed
-    filterUnits();
-}//GEN-LAST:event_comboWeightActionPerformed
-
-private void comboTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboTypeActionPerformed
-    filterUnits();
-}//GEN-LAST:event_comboTypeActionPerformed
-
-private void btnBuyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuyActionPerformed
-    Entity en = getSelectedEntity();
-    if(null != en) {
-        if (campaign.isGM()) {
-            //FIXME: we should not do this here or players will accidently
-            //buy units for free with GM mode turned on. It should be a
-            //separate button
-            campaign.addUnit(en, false);
-        } else if (campaign.buyUnit(en, false)) {
-        	hqView.refreshUnitList();
-            hqView.refreshServicedUnitList();
-        } else {
-            ResourceMap resourceMap = MekHQApp.getApplication().getContext().getResourceMap(UnitSelectorDialog.class);
-            String text = resourceMap.getString("NotEnoughMoneyText.text");
-
-            NumberFormat numberFormat = DecimalFormat.getIntegerInstance();
-            int unitCost = (new Unit(en, campaign)).getBuyCost();
-            String unitCostString = numberFormat.format(unitCost) + " " + (unitCost!=0?"CBills":"CBill");
-            String fundsString = numberFormat.format(campaign.getFunds()) + " " + (campaign.getFunds()!=0?"CBills":"CBill");
-            
-            text += System.getProperty("line.separator");
-            text += "(Cost : " + unitCostString + ", Funds : " + fundsString + ")";
-            AlertPopup popup = new AlertPopup(null, true, text);
-            popup.setVisible(true);
-        }
-    }
-
-    // Necessary if the used wants to buy the same unit twice without reselecting it
-    UnitChanged(null);
-}//GEN-LAST:event_btnBuyActionPerformed
-
-private void btnBuySelectActionPerformed(java.awt.event.ActionEvent evt) {                                       
-    setVisible(false);
-}
-
-private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
-    selectedUnit = null;
-    setVisible(false);
-}//GEN-LAST:event_btnCloseActionPerformed
-
-private void checkCanonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkCanonActionPerformed
-    filterUnits();
-}//GEN-LAST:event_checkCanonActionPerformed
+	private void comboUnitTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboUnitTypeActionPerformed
+	    filterUnits();
+	}//GEN-LAST:event_comboUnitTypeActionPerformed
+	
+	private void comboWeightActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboWeightActionPerformed
+	    filterUnits();
+	}//GEN-LAST:event_comboWeightActionPerformed
+	
+	private void comboTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboTypeActionPerformed
+	    filterUnits();
+	}//GEN-LAST:event_comboTypeActionPerformed
+	
+	private void btnBuyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuyActionPerformed
+	    Entity en = getSelectedEntity();
+	    if(null != en) {
+	        if (campaign.isGM()) {
+	            //FIXME: we should not do this here or players will accidently
+	            //buy units for free with GM mode turned on. It should be a
+	            //separate button
+	            campaign.addUnit(en, false);
+	        } else if (campaign.buyUnit(en, false)) {
+	        	hqView.refreshUnitList();
+	            hqView.refreshServicedUnitList();
+	        } else {
+	            ResourceMap resourceMap = MekHQApp.getApplication().getContext().getResourceMap(UnitSelectorDialog.class);
+	            String text = resourceMap.getString("NotEnoughMoneyText.text");
+	
+	            NumberFormat numberFormat = DecimalFormat.getIntegerInstance();
+	            int unitCost = (new Unit(en, campaign)).getBuyCost();
+	            String unitCostString = numberFormat.format(unitCost) + " " + (unitCost!=0?"CBills":"CBill");
+	            String fundsString = numberFormat.format(campaign.getFunds()) + " " + (campaign.getFunds()!=0?"CBills":"CBill");
+	            
+	            text += System.getProperty("line.separator");
+	            text += "(Cost : " + unitCostString + ", Funds : " + fundsString + ")";
+	            AlertPopup popup = new AlertPopup(null, true, text);
+	            popup.setVisible(true);
+	        }
+	    }
+	
+	    // Necessary if the used wants to buy the same unit twice without reselecting it
+	    UnitChanged(null);
+	}//GEN-LAST:event_btnBuyActionPerformed
+	
+	private void btnBuySelectActionPerformed(java.awt.event.ActionEvent evt) {                                       
+	    setVisible(false);
+	}
+	
+	private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
+	    selectedUnit = null;
+	    setVisible(false);
+	}//GEN-LAST:event_btnCloseActionPerformed
+	
+	private void checkCanonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkCanonActionPerformed
+	    filterUnits();
+	}//GEN-LAST:event_checkCanonActionPerformed
 
     /**
     * @param args the command line arguments
@@ -634,98 +639,98 @@ private void checkCanonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FI
 
 
     /**
- * A table model for displaying work items
- */
-public class MechTableModel extends AbstractTableModel {
-		private static final long serialVersionUID = 8472587304279640434L;
-		private final static int COL_MODEL = 0;
-        private final static int COL_CHASSIS = 1;
-        private final static int COL_WEIGHT = 2;
-        private final static int COL_BV = 3;
-        private final static int COL_YEAR = 4;
-        private final static int COL_COST = 5;
-        private final static int N_COL = 6;
-
-        private MechSummary[] data = new MechSummary[0];
-
-        public MechTableModel() {
-            //this.columnNames = new String[] {"Model", "Chassis"};
-            //this.data = new MechSummary[0];
-        }
-
-        public int getRowCount() {
-            return data.length;
-        }
-
-        public int getColumnCount() {
-            return N_COL;
-        }
-
-        @Override
-        public String getColumnName(int column) {
-            switch(column) {
-                case COL_MODEL:
-                    return "Model";
-                case COL_CHASSIS:
-                    return "Chassis";
-                case COL_WEIGHT:
-                    return "Weight";
-                case COL_BV:
-                    return "BV";
-                case COL_YEAR:
-                    return "Year";
-                case COL_COST:
-                    return "Price";
-                default:
-                    return "?";
-            }
-        }
-
-        @Override
-        public Class<? extends Object> getColumnClass(int c) {
-            return getValueAt(0, c).getClass();
-        }
-
-        @Override
-        public boolean isCellEditable(int row, int col) {
-            return false;
-        }
-
-        public MechSummary getMechSummary(int i) {
-            return data[i];
-        }
-
-        //fill table with values
-        public void setData(MechSummary[] ms) {
-            data = ms;
-            fireTableDataChanged();
-        }
-
-        public Object getValueAt(int row, int col) {
-            MechSummary ms = data[row];
-            if(col == COL_MODEL) {
-                return ms.getModel();
-            }
-            if(col == COL_CHASSIS) {
-                return ms.getChassis();
-            }
-            if(col == COL_WEIGHT) {
-                return ms.getTons();
-            }
-            if(col == COL_BV) {
-                return ms.getBV();
-            }
-            if(col == COL_YEAR) {
-                return ms.getYear();
-            }
-            if(col == COL_COST) {
-                //return NumberFormat.getInstance().format(ms.getCost());
-                return ms.getCost();
-            }
-            return "?";
-        }
-
-}
+	 * A table model for displaying work items
+	 */
+	public class MechTableModel extends AbstractTableModel {
+			private static final long serialVersionUID = 8472587304279640434L;
+			private final static int COL_MODEL = 0;
+	        private final static int COL_CHASSIS = 1;
+	        private final static int COL_WEIGHT = 2;
+	        private final static int COL_BV = 3;
+	        private final static int COL_YEAR = 4;
+	        private final static int COL_COST = 5;
+	        private final static int N_COL = 6;
+	
+	        private MechSummary[] data = new MechSummary[0];
+	
+	        public MechTableModel() {
+	            //this.columnNames = new String[] {"Model", "Chassis"};
+	            //this.data = new MechSummary[0];
+	        }
+	
+	        public int getRowCount() {
+	            return data.length;
+	        }
+	
+	        public int getColumnCount() {
+	            return N_COL;
+	        }
+	
+	        @Override
+	        public String getColumnName(int column) {
+	            switch(column) {
+	                case COL_MODEL:
+	                    return "Model";
+	                case COL_CHASSIS:
+	                    return "Chassis";
+	                case COL_WEIGHT:
+	                    return "Weight";
+	                case COL_BV:
+	                    return "BV";
+	                case COL_YEAR:
+	                    return "Year";
+	                case COL_COST:
+	                    return "Price";
+	                default:
+	                    return "?";
+	            }
+	        }
+	
+	        @Override
+	        public Class<? extends Object> getColumnClass(int c) {
+	            return getValueAt(0, c).getClass();
+	        }
+	
+	        @Override
+	        public boolean isCellEditable(int row, int col) {
+	            return false;
+	        }
+	
+	        public MechSummary getMechSummary(int i) {
+	            return data[i];
+	        }
+	
+	        //fill table with values
+	        public void setData(MechSummary[] ms) {
+	            data = ms;
+	            fireTableDataChanged();
+	        }
+	
+	        public Object getValueAt(int row, int col) {
+	            MechSummary ms = data[row];
+	            if(col == COL_MODEL) {
+	                return ms.getModel();
+	            }
+	            if(col == COL_CHASSIS) {
+	                return ms.getChassis();
+	            }
+	            if(col == COL_WEIGHT) {
+	                return ms.getTons();
+	            }
+	            if(col == COL_BV) {
+	                return ms.getBV();
+	            }
+	            if(col == COL_YEAR) {
+	                return ms.getYear();
+	            }
+	            if(col == COL_COST) {
+	                //return NumberFormat.getInstance().format(ms.getCost());
+	                return ms.getCost();
+	            }
+	            return "?";
+	        }
+	
+	}
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBuy;

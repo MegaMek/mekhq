@@ -4,10 +4,12 @@
  * Created on Jan 6, 2010, 10:46:02 PM
  */
 
-package mekhq;
+package mekhq.gui;
 
 import java.awt.Frame;
+import java.util.ResourceBundle;
 
+import mekhq.MekHQView;
 import mekhq.campaign.Campaign;
 
 /**
@@ -38,15 +40,14 @@ public class MissionTypeDialog extends javax.swing.JDialog {
      */
     private void initComponents() {
 
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MissionTypeDialog");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
-
-        java.awt.GridBagConstraints gridBagConstraints;
-        getContentPane().setLayout(new java.awt.GridBagLayout());
-
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(MissionTypeDialog.class);
+        setTitle(resourceMap.getString("Form.title"));
         
+        getContentPane().setLayout(new java.awt.GridLayout(2,1));
+      
         btnMission = new javax.swing.JButton(resourceMap.getString("btnMission.text"));
         btnMission.setToolTipText(resourceMap.getString("btnMission.tooltip"));
         btnMission.setName("btnMission"); // NOI18N
@@ -55,33 +56,19 @@ public class MissionTypeDialog extends javax.swing.JDialog {
                 newMission();
             }
         });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        getContentPane().add(btnMission, gridBagConstraints);
+        getContentPane().add(btnMission);
         
         btnContract = new javax.swing.JButton(resourceMap.getString("btnContract.text"));
-        btnMission.setToolTipText(resourceMap.getString("btnContract.tooltip"));
+        btnContract.setToolTipText(resourceMap.getString("btnContract.tooltip"));
         btnContract.setName("btnContract"); // NOI18N
         btnContract.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 newContract();
             }
         });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        getContentPane().add(btnContract, gridBagConstraints);
+        getContentPane().add(btnContract);
 
-        pack();
+        setSize(250, 150);
     }
     
     private void newMission() {

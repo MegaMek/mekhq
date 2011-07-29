@@ -1,5 +1,5 @@
 /*
- * NewKillDialog.java
+ * NewMissionDialog.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -19,36 +19,41 @@
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq;
+package mekhq.gui;
 
+import java.awt.Dimension;
 import java.awt.Frame;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.ResourceBundle;
 
+import javax.swing.BorderFactory;
 
+import mekhq.JSuggestField;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Kill;
-import mekhq.campaign.Unit;
-import mekhq.campaign.personnel.Person;
+import mekhq.campaign.mission.Mission;
 
 /**
  *
  * @author  Taharqa
  */
-public class NewKillDialog extends javax.swing.JDialog {
+public class CustomizeMissionDialog extends javax.swing.JDialog {
 	private static final long serialVersionUID = -8038099101234445018L;
     private Frame frame;
+    private Mission mission;
     private Campaign campaign;
-    private Date date;
-    private Person person;
+    private boolean newMission;
     
     /** Creates new form NewTeamDialog */
-    public NewKillDialog(java.awt.Frame parent, boolean modal, Campaign c, Person p) {
+    public CustomizeMissionDialog(java.awt.Frame parent, boolean modal, Mission m, Campaign c) {
         super(parent, modal);
         this.frame = parent;
+        if(null == m) {
+        	mission = new Mission("New Mission");
+        	newMission = true;
+        } else {
+        	mission = m;
+        	newMission = false;
+        }
         campaign = c;
-        date = campaign.getCalendar().getTime();
-        person = p;
         initComponents();
         setLocationRelativeTo(parent);
     }
@@ -56,81 +61,90 @@ public class NewKillDialog extends javax.swing.JDialog {
     private void initComponents() {
     	 java.awt.GridBagConstraints gridBagConstraints;
 
-        txtKill = new javax.swing.JTextField();
-        lblKill = new javax.swing.JLabel();
-        txtKiller = new javax.swing.JTextField();
-        lblKiller = new javax.swing.JLabel();
+        txtName = new javax.swing.JTextField();
+        lblName = new javax.swing.JLabel();
         btnOK = new javax.swing.JButton();
         btnClose = new javax.swing.JButton();
-        btnDate = new javax.swing.JButton();
-
+        scrDesc = new javax.swing.JScrollPane();
+        txtDesc = new javax.swing.JTextArea();
+        lblPlanetName = new javax.swing.JLabel();
+     
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizeMissionDialog");
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
-        setTitle("Kill Record For " + person.getName());
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(CustomizeMissionDialog.class);
+        setTitle(resourceMap.getString("title"));
+        if(newMission) {
+            setTitle(resourceMap.getString("title.new"));
+
+        }
+        
         getContentPane().setLayout(new java.awt.GridBagLayout());
         
-        lblKill.setText("Killed What:"); // NOI18N
+        lblName.setText(resourceMap.getString("lblName.text")); // NOI18N
+        lblName.setName("lblName"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        getContentPane().add(lblKill, gridBagConstraints);
+        getContentPane().add(lblName, gridBagConstraints);
         
-        txtKill.setText("");
-        txtKill.setMinimumSize(new java.awt.Dimension(150, 28));
+        txtName.setText(mission.getName());
+        txtName.setName("txtName"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        getContentPane().add(txtKill, gridBagConstraints);
-        
-        lblKiller.setText("Killed With:"); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        getContentPane().add(lblKiller, gridBagConstraints);
-        
-        Unit u = campaign.getUnit(person.getUnitId());
-        if(null != u) {
-        	txtKiller.setText(u.getEntity().getDisplayName());
-        } else {
-        	txtKiller.setText("Bare hands?");
-        }
-        txtKiller.setMinimumSize(new java.awt.Dimension(150, 28));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        getContentPane().add(txtKiller, gridBagConstraints);
+        getContentPane().add(txtName, gridBagConstraints);
  
-        btnDate.setText(getDateAsString());
-        btnDate.setName("btnDate"); // NOI18N
-        btnDate.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-            	btnDateActionPerformed(evt);
-            }
-        });
+        lblPlanetName.setText(resourceMap.getString("lblPlanetName.text")); // NOI18N
+        lblPlanetName.setName("lblPlanetName"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        getContentPane().add(lblPlanetName, gridBagConstraints);
+        
+        suggestPlanet = new JSuggestField(this, campaign.getPlanetNames());
+        if(!newMission) {
+        	suggestPlanet.setText(mission.getPlanetName());
+        }
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        getContentPane().add(suggestPlanet, gridBagConstraints);
+        
+        txtDesc.setText(mission.getDescription());
+        txtDesc.setName("txtDesc");
+        txtDesc.setEditable(true);
+        txtDesc.setLineWrap(true);
+        txtDesc.setWrapStyleWord(true);
+        txtDesc.setBorder(BorderFactory.createCompoundBorder(
+	   			 BorderFactory.createTitledBorder("Description"),
+	   			 BorderFactory.createEmptyBorder(5,5,5,5)));
+        scrDesc.setViewportView(txtDesc);
+        scrDesc.setPreferredSize(new Dimension(400,200));
+        scrDesc.setMinimumSize(new Dimension(400,200));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        getContentPane().add(btnDate, gridBagConstraints);
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        getContentPane().add(scrDesc, gridBagConstraints);
         
         btnOK.setText(resourceMap.getString("btnOkay.text")); // NOI18N
         btnOK.setName("btnOK"); // NOI18N
@@ -167,37 +181,31 @@ public class NewKillDialog extends javax.swing.JDialog {
 
     
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
-    	campaign.addKill(new Kill(person.getId(), txtKill.getText(), txtKiller.getText(), date));  	
+    	mission.setName(txtName.getText());
+    	mission.setPlanetName(suggestPlanet.getText());
+    	mission.setDesc(txtDesc.getText());
+    	if(newMission) {
+    		campaign.addMission(mission);
+    	}
     	this.setVisible(false);
+    }
+    
+    public int getMissionId() {
+    	return mission.getId();
     }
 
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
     	this.setVisible(false);
     }
-    
-    private void btnDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDateActionPerformed
-        // show the date chooser
-        DateChooser dc = new DateChooser(frame, campaign.getCalendar());
-        // user can eiter choose a date or cancel by closing
-        if (dc.showDateChooser() == DateChooser.OK_OPTION) {
-            date = dc.getDate().getTime();
-            btnDate.setText(getDateAsString());
-        }
-    }
-    
-    private String getDateAsString() {
-    	SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d yyyy");
-        return dateFormat.format(date);
-    }
-    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClose;
     private javax.swing.JButton btnOK;
-    private javax.swing.JLabel lblKill;
-    private javax.swing.JTextField txtKill;
-    private javax.swing.JLabel lblKiller;
-    private javax.swing.JTextField txtKiller;
-    private javax.swing.JButton btnDate;
+    private javax.swing.JLabel lblName;
+    private javax.swing.JTextField txtName;
+    private javax.swing.JTextArea txtDesc;
+    private javax.swing.JScrollPane scrDesc;
+    private javax.swing.JLabel lblPlanetName;
+	private JSuggestField suggestPlanet;
 
 
     // End of variables declaration//GEN-END:variables

@@ -19,7 +19,7 @@
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq;
+package mekhq.gui;
 
 import java.awt.Dimension;
 import java.awt.Frame;
@@ -28,6 +28,7 @@ import java.awt.event.ItemListener;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
+import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
@@ -40,6 +41,8 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import mekhq.DateChooser;
+import mekhq.JSuggestField;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.mission.Contract;
@@ -73,10 +76,11 @@ public class NewContractDialog extends javax.swing.JDialog {
     private void initComponents() {
     	java.awt.GridBagConstraints gridBagConstraints;
 
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.NewContractDialog");
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
-
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(NewContractDialog.class);
+        setTitle(resourceMap.getString("Form.title"));
+        
         getContentPane().setLayout(new java.awt.GridBagLayout());
       
     	descPanel = new JPanel();
@@ -95,7 +99,7 @@ public class NewContractDialog extends javax.swing.JDialog {
 		contractPanel = new JPanel();
 		contractPanel.setLayout(new java.awt.GridBagLayout());
 		contractPanel.setBorder(BorderFactory.createCompoundBorder(
-	   			 BorderFactory.createTitledBorder("Contract Parameters"),
+	   			 BorderFactory.createTitledBorder(resourceMap.getString("contractPanel.title")),
 	   			 BorderFactory.createEmptyBorder(5,5,5,5)));
 		gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -110,7 +114,7 @@ public class NewContractDialog extends javax.swing.JDialog {
 		totalsPanel = new JPanel();
 		totalsPanel.setLayout(new java.awt.GridBagLayout());
 		totalsPanel.setBorder(BorderFactory.createCompoundBorder(
-	   			 BorderFactory.createTitledBorder("Calculated Totals"),
+	   			 BorderFactory.createTitledBorder(resourceMap.getString("totalsPanel.title")),
 	   			 BorderFactory.createEmptyBorder(5,5,5,5)));
 		gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -208,7 +212,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         txtDesc.setLineWrap(true);
         txtDesc.setWrapStyleWord(true);
         txtDesc.setBorder(BorderFactory.createCompoundBorder(
-	   			 BorderFactory.createTitledBorder("Description"),
+	   			 BorderFactory.createTitledBorder(resourceMap.getString("txtDesc.title")),
 	   			 BorderFactory.createEmptyBorder(5,5,5,5)));
         scrDesc.setViewportView(txtDesc);
         scrDesc.setPreferredSize(new Dimension(400,200));
@@ -224,7 +228,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
         descPanel.add(scrDesc, gridBagConstraints);
         
-        lblBaseAmount1 = new JLabel("Base Amount:");
+        lblBaseAmount1 = new JLabel(resourceMap.getString("lblBaseAmount1.text"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -245,7 +249,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         totalsPanel.add(lblBaseAmount2, gridBagConstraints);
         
-        lblOverheadAmount1 = new JLabel("Overhead Amount:");
+        lblOverheadAmount1 = new JLabel(resourceMap.getString("lblOverheadAmount1.text"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -265,7 +269,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         totalsPanel.add(lblOverheadAmount2, gridBagConstraints);
        
-        lblSupportAmount1 = new JLabel("Straight Support Amount:");
+        lblSupportAmount1 = new JLabel(resourceMap.getString("lblSupportAmount1.text"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
@@ -286,7 +290,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         totalsPanel.add(lblSupportAmount2, gridBagConstraints);
         
-        lblTransportAmount1 = new JLabel("Transportation Amount:");
+        lblTransportAmount1 = new JLabel(resourceMap.getString("lblTransportAmount1.text"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
@@ -307,7 +311,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         totalsPanel.add(lblTransportAmount2, gridBagConstraints);
         
-        lblTotalAmount1 = new JLabel("Total Contract Amount:");
+        lblTotalAmount1 = new JLabel(resourceMap.getString("lblTotalAmount1.text"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
@@ -328,7 +332,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         totalsPanel.add(lblTotalAmount2, gridBagConstraints);
         
-        lblSignBonusAmount1 = new JLabel("Signing Bonus:");
+        lblSignBonusAmount1 = new JLabel(resourceMap.getString("lblSignBonusAmount1.text"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 5;
@@ -349,7 +353,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         totalsPanel.add(lblSignBonusAmount2, gridBagConstraints);
         
-        lblFeeAmount1 = new JLabel("MRBC Fee:");
+        lblFeeAmount1 = new JLabel(resourceMap.getString("lblFeeAmount1.text"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 6;
@@ -370,7 +374,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         totalsPanel.add(lblFeeAmount2, gridBagConstraints);
         
-        lblTotalAmountPlus1 = new JLabel("Net Contract Amount:");
+        lblTotalAmountPlus1 = new JLabel(resourceMap.getString("lblTotalAmountPlus1.text"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 7;
@@ -391,7 +395,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         totalsPanel.add(lblTotalAmountPlus2, gridBagConstraints);
         
-        lblAdvanceMoney1 = new JLabel("Advance Money:");
+        lblAdvanceMoney1 = new JLabel(resourceMap.getString("lblAdvanceMoney1.text"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 8;
@@ -412,7 +416,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         totalsPanel.add(lblAdvanceMoney2, gridBagConstraints);
         
-        lblMonthlyAmount1 = new JLabel("Monthly Amount:");
+        lblMonthlyAmount1 = new JLabel(resourceMap.getString("lblMonthlyAmount1.text"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 9;
@@ -433,7 +437,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         totalsPanel.add(lblMonthlyAmount2, gridBagConstraints);
         
-        lblProfit1 = new JLabel("Estimated Total Profit:");
+        lblProfit1 = new JLabel(resourceMap.getString("lblProfit1.text"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 10;
@@ -456,17 +460,17 @@ public class NewContractDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
         totalsPanel.add(lblProfit2, gridBagConstraints);
         
-        lblDate = new JLabel("Start Date:");
-        lblLength = new JLabel("Contract Length (months):");
-        lblMultiplier = new JLabel("Payment Mulitiplier");
-        lblOverhead = new JLabel("Overhead Compensation:");
-        lblCommandRights = new JLabel("Command Rights:");
-        lblTransport = new JLabel("Transport Terms:");
-        lblSalvageRights = new JLabel("Salvage Rights:");
-        lblStraightSupport = new JLabel("Straight Support %");
-        lblBattleLossComp = new JLabel("Battle Loss Compensation %");
-        lblSignBonus = new JLabel("Signing Bonus %");
-        lblAdvance = new JLabel("Advance %");
+        lblDate = new JLabel(resourceMap.getString("lblDate.text"));
+        lblLength = new JLabel(resourceMap.getString("lblLength.text"));
+        lblMultiplier = new JLabel(resourceMap.getString("lblMultiplier.text"));
+        lblOverhead = new JLabel(resourceMap.getString("lblOverhead.text"));
+        lblCommandRights = new JLabel(resourceMap.getString("lblCommand.text"));
+        lblTransport = new JLabel(resourceMap.getString("lblTransport.text"));
+        lblSalvageRights = new JLabel(resourceMap.getString("lblSalvageRights.text"));
+        lblStraightSupport = new JLabel(resourceMap.getString("lblStraightSupport.text"));
+        lblBattleLossComp = new JLabel(resourceMap.getString("lblBattleLossComp.text"));
+        lblSignBonus = new JLabel(resourceMap.getString("lblSignBonus.text"));
+        lblAdvance = new JLabel(resourceMap.getString("lblAdvance.text"));
         
         
         btnDate = new javax.swing.JButton();
@@ -480,7 +484,7 @@ public class NewContractDialog extends javax.swing.JDialog {
             }
         });
 
-        checkMRBC = new JCheckBox("Pay MRBC Fee");
+        checkMRBC = new JCheckBox(resourceMap.getString("checkMRBC.text"));
         checkMRBC.setSelected(contract.payMRBCFee());
         checkMRBC.addItemListener(new ItemListener() {
 			@Override
@@ -492,7 +496,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         });
         
 
-        checkSalvageExchange = new JCheckBox("Exchange Rights");
+        checkSalvageExchange = new JCheckBox(resourceMap.getString("checkSalvageExchange.text"));
         checkSalvageExchange.setSelected(contract.isSalvageExchange());
         checkSalvageExchange.addItemListener(new ItemListener() {
 			@Override

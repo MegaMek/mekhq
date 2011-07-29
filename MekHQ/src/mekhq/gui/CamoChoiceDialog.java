@@ -4,22 +4,27 @@
  * Created on October 1, 2009, 3:10 PM
  */
 
-package mekhq;
+package mekhq.gui;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.event.ItemEvent;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.ResourceBundle;
 
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.ImageIcon;
 import javax.swing.JTable;
 import javax.swing.event.MouseInputAdapter;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
 
+import megamek.client.ui.AWT.util.PlayerColors;
 import megamek.common.Player;
 import megamek.common.util.DirectoryItems;
 
@@ -68,17 +73,20 @@ public class CamoChoiceDialog extends javax.swing.JDialog {
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        jScrollPane1 = new javax.swing.JScrollPane();
+        scrCamo = new javax.swing.JScrollPane();
         tableCamo = new javax.swing.JTable();
         comboCategories = new javax.swing.JComboBox();
         btnSelect = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
 
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CamoChoiceDialog");
+
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
+        setTitle(resourceMap.getString("title.text"));
         getContentPane().setLayout(new java.awt.GridBagLayout());
 
-        jScrollPane1.setName("jScrollPane1"); // NOI18N
+        scrCamo.setName("scrCamo"); // NOI18N
 
         tableCamo.setModel(camoModel);
         tableCamo.setName("tableCamo"); // NOI18N
@@ -86,7 +94,7 @@ public class CamoChoiceDialog extends javax.swing.JDialog {
         tableCamo.setRowHeight(76);
         tableCamo.getColumnModel().getColumn(0).setCellRenderer(camoModel.getRenderer());
         tableCamo.addMouseListener(camoMouseAdapter);
-        jScrollPane1.setViewportView(tableCamo);
+        scrCamo.setViewportView(tableCamo);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -96,7 +104,7 @@ public class CamoChoiceDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        getContentPane().add(jScrollPane1, gridBagConstraints);
+        getContentPane().add(scrCamo, gridBagConstraints);
 
         DefaultComboBoxModel categoryModel = new DefaultComboBoxModel();
         categoryModel.addElement(Player.NO_CAMO);
@@ -138,8 +146,7 @@ public class CamoChoiceDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
         getContentPane().add(comboCategories, gridBagConstraints);
-
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(CamoChoiceDialog.class);
+        
         btnSelect.setText(resourceMap.getString("btnSelect.text")); // NOI18N
         btnSelect.setName("btnSelect"); // NOI18N
         btnSelect.addActionListener(new java.awt.event.ActionListener() {
@@ -169,27 +176,27 @@ public class CamoChoiceDialog extends javax.swing.JDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
-    setVisible(false);
-}//GEN-LAST:event_btnCancelActionPerformed
+	private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
+	    setVisible(false);
+	}//GEN-LAST:event_btnCancelActionPerformed
 
-private void btnSelectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectActionPerformed
-    category = camoModel.getCategory();
-    if(category.equals(Player.NO_CAMO)) {
-        colorIndex = tableCamo.getSelectedRow();
-        filename = null;
-    }
-    else if(tableCamo.getSelectedRow() != -1) {
-        filename = (String) camoModel.getValueAt(tableCamo.getSelectedRow(), 0);
-    }
-    setVisible(false);
-}//GEN-LAST:event_btnSelectActionPerformed
+	private void btnSelectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectActionPerformed
+	    category = camoModel.getCategory();
+	    if(category.equals(Player.NO_CAMO)) {
+	        colorIndex = tableCamo.getSelectedRow();
+	        filename = null;
+	    }
+	    else if(tableCamo.getSelectedRow() != -1) {
+	        filename = (String) camoModel.getValueAt(tableCamo.getSelectedRow(), 0);
+	    }
+	    setVisible(false);
+	}//GEN-LAST:event_btnSelectActionPerformed
 
-private void comboCategoriesItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_comboCategoriesItemStateChanged
-    if (evt.getStateChange() == ItemEvent.SELECTED) {
-        fillTable((String) evt.getItem());
-    }
-}//GEN-LAST:event_comboCategoriesItemStateChanged
+	private void comboCategoriesItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_comboCategoriesItemStateChanged
+	    if (evt.getStateChange() == ItemEvent.SELECTED) {
+	        fillTable((String) evt.getItem());
+	    }
+	}//GEN-LAST:event_comboCategoriesItemStateChanged
 
     public String getCategory() {
         return category;
@@ -227,24 +234,6 @@ private void comboCategoriesItemStateChanged(java.awt.event.ItemEvent evt) {//GE
         if(camoModel.getRowCount() > 0) {
             tableCamo.setRowSelectionInterval(0, 0);
         }
-    }
-
-    /**
-    * @param args the command line arguments
-    */
-    public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                CamoChoiceDialog dialog = new CamoChoiceDialog(new javax.swing.JFrame(), true, Player.NO_CAMO, null, -1, null);
-                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                    @Override
-                    public void windowClosing(java.awt.event.WindowEvent e) {
-                        System.exit(0);
-                    }
-                });
-                dialog.setVisible(true);
-            }
-        });
     }
 
      /**
@@ -363,14 +352,94 @@ private void comboCategoriesItemStateChanged(java.awt.event.ItemEvent evt) {//GE
             }
         }
     }
+    
+    public class CamoPanel extends javax.swing.JPanel {
+    	private static final long serialVersionUID = -4106360800407452822L;
+    	private DirectoryItems camos;
+        
+        /** Creates new form CamoPanel */
+        public CamoPanel(DirectoryItems camos) {
+            this.camos = camos;
+            initComponents();
+        }
+
+        /** This method is called from within the constructor to
+         * initialize the form.
+         * WARNING: Do NOT modify this code. The content of this method is
+         * always regenerated by the Form Editor.
+         */
+        private void initComponents() {
+            java.awt.GridBagConstraints gridBagConstraints;
+
+            lblImage = new javax.swing.JLabel();
+
+            setName("Form"); // NOI18N
+            setLayout(new java.awt.GridBagLayout());
+
+            lblImage.setText(""); // NOI18N
+            lblImage.setName("lblImage"); // NOI18N
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = 0;
+            gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.weighty = 1.0;
+            add(lblImage, gridBagConstraints);
+        }// </editor-fold>//GEN-END:initComponents
+
+        public void setText(String text) {
+            lblImage.setText(text);
+        }
+        
+        //public void setImage(Image image) {
+          //  lblImage.setIcon(new ImageIcon(image));
+        //}
+        
+        public void setImage(String category, String name, int colorInd) {
+
+            if (null == category) {
+                return;
+            }
+            
+            if(Player.NO_CAMO.equals(category)) {
+                if (colorInd == -1) {
+                    colorInd = 0;
+                }
+                BufferedImage tempImage = new BufferedImage(84, 72,
+                        BufferedImage.TYPE_INT_RGB);
+                Graphics2D graphics = tempImage.createGraphics();
+                graphics.setColor(PlayerColors.getColor(colorInd));
+                graphics.fillRect(0, 0, 84, 72);
+                lblImage.setIcon(new ImageIcon(tempImage));
+                return;
+            }
+
+            // Try to get the camo file.
+            try {
+
+                // Translate the root camo directory name.
+                if (Player.ROOT_CAMO.equals(category))
+                    category = ""; //$NON-NLS-1$
+                Image camo = (Image) camos.getItem(category, name);
+                lblImage.setIcon(new ImageIcon(camo));
+            } catch (Exception err) {
+                err.printStackTrace();
+            }
+        }
+        // Variables declaration - do not modify//GEN-BEGIN:variables
+        private javax.swing.JLabel lblImage;
+        // End of variables declaration//GEN-END:variables
+    }
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnSelect;
     private javax.swing.JComboBox comboCategories;
-    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane scrCamo;
     private javax.swing.JTable tableCamo;
     // End of variables declaration//GEN-END:variables
 
+    
+    
 }

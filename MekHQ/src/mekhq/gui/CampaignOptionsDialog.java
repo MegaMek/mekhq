@@ -4,7 +4,7 @@
  * Created on August 19, 2009, 11:22 AM
  */
 
-package mekhq;
+package mekhq.gui;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -26,6 +26,7 @@ import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
@@ -54,6 +55,8 @@ import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.DirectoryItems;
+import mekhq.DateChooser;
+import mekhq.MekHQApp;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.Faction;
@@ -205,10 +208,10 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         choiceOfficerCut = new javax.swing.JComboBox();
         lblOfficerCut = new javax.swing.JLabel();
 
-        
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignOptionsDialog");
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
-        setTitle("Campaign Options");
+        setTitle(resourceMap.getString("title.text"));
         getContentPane().setLayout(new java.awt.GridBagLayout());
 
         tabOptions.setName("tabOptions"); // NOI18N
@@ -231,7 +234,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panGeneral.add(txtName, gridBagConstraints);
 
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(CampaignOptionsDialog.class);
         lblName.setText(resourceMap.getString("lblName.text")); // NOI18N
         lblName.setName("lblName"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -644,7 +646,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         txtInstructionsXP.setLineWrap(true);
         txtInstructionsXP.setWrapStyleWord(true);
         txtInstructionsXP.setBorder(BorderFactory.createCompoundBorder(
-	   			 BorderFactory.createTitledBorder("Customizing Skill Costs"),
+	   			 BorderFactory.createTitledBorder(resourceMap.getString("txtInstructionsXP.title")),
 	   			 BorderFactory.createEmptyBorder(5,5,5,5)));
         txtInstructionsXP.setPreferredSize(new Dimension(550,120));
         txtInstructionsXP.setOpaque(false);
@@ -727,7 +729,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         scrAbilityXP.setMinimumSize(new Dimension(300,140));
         scrAbilityXP.setPreferredSize(new Dimension(300,140));
         scrAbilityXP.setBorder(BorderFactory.createCompoundBorder(
-	   			 BorderFactory.createTitledBorder("Ability Costs"),
+	   			 BorderFactory.createTitledBorder(resourceMap.getString("scrAbilityXP.title")),
 	   			 BorderFactory.createEmptyBorder(5,5,5,5)));
         scrAbilityXP.setOpaque(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -775,35 +777,35 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             c.fill = java.awt.GridBagConstraints.BOTH;
             c.anchor = java.awt.GridBagConstraints.WEST;
             c.insets = new java.awt.Insets(5, 5, 5, 5);
-            lblSkill = new JLabel("Target Number:");
+            lblSkill = new JLabel(resourceMap.getString("lblSkillTarget.text"));
             skPanel.add(lblSkill, c);
             c.gridx++;
             spnTarget = new JSpinner(new SpinnerNumberModel(type.getTarget(), 0, 12, 1));
             hashSkillTargets.put(skillName, spnTarget);
             skPanel.add(spnTarget, c);
             c.gridx++;
-            lblSkill = new JLabel("Green Level:");
+            lblSkill = new JLabel(resourceMap.getString("lblSkillGreen.text"));
             skPanel.add(lblSkill, c);
             c.gridx++;
             spnGreen = new JSpinner(new SpinnerNumberModel(type.getGreenLevel(), 0, 10, 1));
             hashGreenSkill.put(skillName, spnGreen);
             skPanel.add(spnGreen, c);
             c.gridx++;
-            lblSkill = new JLabel("Regular Level:");
+            lblSkill = new JLabel(resourceMap.getString("lblSkillRegular.text"));
             skPanel.add(lblSkill, c);
             c.gridx++;
             spnReg = new JSpinner(new SpinnerNumberModel(type.getRegularLevel(), 0, 10, 1));
             hashRegSkill.put(skillName, spnReg);
             skPanel.add(spnReg, c);
             c.gridx++;
-            lblSkill = new JLabel("Veteran Level:");
+            lblSkill = new JLabel(resourceMap.getString("lblSkillVeteran.text"));
             skPanel.add(lblSkill, c);
             c.gridx++;
             spnVet = new JSpinner(new SpinnerNumberModel(type.getVeteranLevel(), 0, 10, 1));
             hashVetSkill.put(skillName, spnVet);
             skPanel.add(spnVet, c);
             c.gridx++;
-            lblSkill = new JLabel("Elite Level:");
+            lblSkill = new JLabel(resourceMap.getString("lblSkillElite.text"));
             skPanel.add(lblSkill, c);
             c.gridx++;
             spnElite = new JSpinner(new SpinnerNumberModel(type.getEliteLevel(), 0, 10, 1));
@@ -1235,34 +1237,34 @@ private void txtNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
 
 
 
-private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
-    this.setVisible(false);
-}//GEN-LAST:event_btnCancelActionPerformed
+	private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
+	    this.setVisible(false);
+	}//GEN-LAST:event_btnCancelActionPerformed
 
-private void btnDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDateActionPerformed
-    // show the date chooser
-    DateChooser dc = new DateChooser(frame, date);
-    // user can eiter choose a date or cancel by closing
-    if (dc.showDateChooser() == DateChooser.OK_OPTION) {
-        date = dc.getDate();
-        btnDate.setText(getDateAsString());
-    }
-}//GEN-LAST:event_btnDateActionPerformed
+	private void btnDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDateActionPerformed
+	    // show the date chooser
+	    DateChooser dc = new DateChooser(frame, date);
+	    // user can eiter choose a date or cancel by closing
+	    if (dc.showDateChooser() == DateChooser.OK_OPTION) {
+	        date = dc.getDate();
+	        btnDate.setText(getDateAsString());
+	    }
+	}//GEN-LAST:event_btnDateActionPerformed
 
-private void btnCamoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCamoActionPerformed
-    CamoChoiceDialog ccd = new CamoChoiceDialog(frame, true, camoCategory, camoFileName, colorIndex, camos);
-    ccd.setVisible(true);
-    camoCategory = ccd.getCategory();
-    camoFileName = ccd.getFileName();
-    if(ccd.getColorIndex() != -1) {
-        colorIndex = ccd.getColorIndex();
-    }
-    setCamoIcon();
-}//GEN-LAST:event_btnCamoActionPerformed
-
-public String getDateAsString() {
-    return dateFormat.format(date.getTime());
-}
+	private void btnCamoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCamoActionPerformed
+	    CamoChoiceDialog ccd = new CamoChoiceDialog(frame, true, camoCategory, camoFileName, colorIndex, camos);
+	    ccd.setVisible(true);
+	    camoCategory = ccd.getCategory();
+	    camoFileName = ccd.getFileName();
+	    if(ccd.getColorIndex() != -1) {
+	        colorIndex = ccd.getColorIndex();
+	    }
+	    setCamoIcon();
+	}//GEN-LAST:event_btnCamoActionPerformed
+	
+	public String getDateAsString() {
+	    return dateFormat.format(date.getTime());
+	}
 
     public void setCamoIcon() {
         if (null == camoCategory) {

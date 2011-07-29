@@ -4,7 +4,7 @@
  * Created on July 16, 2009, 5:30 PM
  */
 
-package mekhq;
+package mekhq.gui;
 
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
@@ -18,6 +18,7 @@ import java.util.Calendar;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
+import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
@@ -36,6 +37,8 @@ import megamek.common.WeaponType;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
+import mekhq.DateChooser;
+import mekhq.MekHQView;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
@@ -124,9 +127,13 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         btnRandomName = new javax.swing.JButton();
         btnDate = new javax.swing.JButton();
 
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizePersonDialog");
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(CustomizePersonDialog.class);
+
         setTitle(resourceMap.getString("Form.title")); // NOI18N
+        if(newHire) {
+            setTitle(resourceMap.getString("Form.title.new")); // NOI18N
+        }
         setName("Form"); // NOI18N
         getContentPane().setLayout(new java.awt.GridBagLayout());
 
@@ -263,7 +270,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panDemog.add(btnDate, gridBagConstraints);
         
-        lblAge.setText(person.getAge(campaign.getCalendar()) + " years old"); // NOI18N
+        lblAge.setText(person.getAge(campaign.getCalendar()) + " " + resourceMap.getString("age")); // NOI18N
         lblAge.setName("lblAge"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
@@ -294,7 +301,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
             panDemog.add(textToughness, gridBagConstraints);
         }
         
-        scrBio.setName("jScrollPane2"); // NOI18N
+        scrBio.setName("scrBio"); // NOI18N
 
         txtBio.setName("txtBio"); // NOI18N
         txtBio.setText(person.getBiography());
@@ -441,6 +448,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     }
 
     public void refreshSkills() {
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizePersonDialog");
         panSkills.removeAll();
         
         JCheckBox chkSkill;
@@ -482,8 +490,8 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     			lblValue.setText("-");
     		}
     		skillValues.put(type, lblValue);
-    		lblLevel = new JLabel("Level:");
-    		lblBonus = new JLabel("Bonus:");
+    		lblLevel = new JLabel(resourceMap.getString("lblLevel.text"));
+    		lblBonus = new JLabel(resourceMap.getString("lblBonus.text"));
     		int level = 0;
     		int bonus = 0;
     		if(person.hasSkill(type)) {
@@ -689,13 +697,14 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     }
     
     private void btnDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDateActionPerformed
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizePersonDialog");
         // show the date chooser
         DateChooser dc = new DateChooser(frame, birthdate);
         // user can eiter choose a date or cancel by closing
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
             birthdate = dc.getDate();
             btnDate.setText(getDateAsString());
-            lblAge.setText(getAge() + " years old"); // NOI18N
+            lblAge.setText(getAge() + " " + resourceMap.getString("age")); // NOI18N
         }
     }
 

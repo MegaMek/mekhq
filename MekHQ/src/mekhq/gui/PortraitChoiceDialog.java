@@ -4,7 +4,7 @@
  * Created on October 1, 2009, 3:10 PM
  */
 
-package mekhq;
+package mekhq.gui;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -13,8 +13,10 @@ import java.awt.event.ItemEvent;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.ResourceBundle;
 
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.ImageIcon;
 import javax.swing.JTable;
 import javax.swing.event.MouseInputAdapter;
 import javax.swing.table.AbstractTableModel;
@@ -71,17 +73,19 @@ public class PortraitChoiceDialog extends javax.swing.JDialog {
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        jScrollPane1 = new javax.swing.JScrollPane();
+        scrPortrait = new javax.swing.JScrollPane();
         tablePortrait = new javax.swing.JTable();
         comboCategories = new javax.swing.JComboBox();
         btnSelect = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
 
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PortraitChoiceDialog");
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
+        setTitle(resourceMap.getString("Form.title"));
         getContentPane().setLayout(new java.awt.GridBagLayout());
 
-        jScrollPane1.setName("jScrollPane1"); // NOI18N
+        scrPortrait.setName("jScrollPane1"); // NOI18N
 
         tablePortrait.setModel(portraitModel);
         tablePortrait.setName("tablePortrait"); // NOI18N
@@ -89,7 +93,7 @@ public class PortraitChoiceDialog extends javax.swing.JDialog {
         tablePortrait.setRowHeight(76);
         tablePortrait.getColumnModel().getColumn(0).setCellRenderer(portraitModel.getRenderer());
         tablePortrait.addMouseListener(portraitMouseAdapter);
-        jScrollPane1.setViewportView(tablePortrait);
+        scrPortrait.setViewportView(tablePortrait);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -99,7 +103,7 @@ public class PortraitChoiceDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        getContentPane().add(jScrollPane1, gridBagConstraints);
+        getContentPane().add(scrPortrait, gridBagConstraints);
 
         DefaultComboBoxModel categoryModel = new DefaultComboBoxModel();
         String match = null;
@@ -136,7 +140,6 @@ public class PortraitChoiceDialog extends javax.swing.JDialog {
         gridBagConstraints.weightx = 1.0;
         getContentPane().add(comboCategories, gridBagConstraints);
 
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(PortraitChoiceDialog.class);
         btnSelect.setText(resourceMap.getString("btnSelect.text")); // NOI18N
         btnSelect.setName("btnSelect"); // NOI18N
         btnSelect.addActionListener(new java.awt.event.ActionListener() {
@@ -166,25 +169,25 @@ public class PortraitChoiceDialog extends javax.swing.JDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
-    setVisible(false);
-}//GEN-LAST:event_btnCancelActionPerformed
+	private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
+	    setVisible(false);
+	}//GEN-LAST:event_btnCancelActionPerformed
+	
+	private void btnSelectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectActionPerformed
+	    category = portraitModel.getCategory();
+	    if(tablePortrait.getSelectedRow() != -1) {
+	        filename = (String) portraitModel.getValueAt(tablePortrait.getSelectedRow(), 0);
+	    } else {
+	        filename = Pilot.PORTRAIT_NONE;
+	    }
+	    setVisible(false);
+	}//GEN-LAST:event_btnSelectActionPerformed
 
-private void btnSelectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSelectActionPerformed
-    category = portraitModel.getCategory();
-    if(tablePortrait.getSelectedRow() != -1) {
-        filename = (String) portraitModel.getValueAt(tablePortrait.getSelectedRow(), 0);
-    } else {
-        filename = Pilot.PORTRAIT_NONE;
-    }
-    setVisible(false);
-}//GEN-LAST:event_btnSelectActionPerformed
-
-private void comboCategoriesItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_comboCategoriesItemStateChanged
-    if (evt.getStateChange() == ItemEvent.SELECTED) {
-        fillTable((String) evt.getItem());
-    }
-}//GEN-LAST:event_comboCategoriesItemStateChanged
+	private void comboCategoriesItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_comboCategoriesItemStateChanged
+	    if (evt.getStateChange() == ItemEvent.SELECTED) {
+	        fillTable((String) evt.getItem());
+	    }
+	}//GEN-LAST:event_comboCategoriesItemStateChanged
 
     public String getCategory() {
         return category;
@@ -213,24 +216,6 @@ private void comboCategoriesItemStateChanged(java.awt.event.ItemEvent evt) {//GE
         if(portraitModel.getRowCount() > 0) {
             tablePortrait.setRowSelectionInterval(0, 0);
         }
-    }
-
-    /**
-    * @param args the command line arguments
-    */
-    public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                PortraitChoiceDialog dialog = new PortraitChoiceDialog(new javax.swing.JFrame(), true, Pilot.ROOT_PORTRAIT, Pilot.PORTRAIT_NONE, null);
-                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                    @Override
-                    public void windowClosing(java.awt.event.WindowEvent e) {
-                        System.exit(0);
-                    }
-                });
-                dialog.setVisible(true);
-            }
-        });
     }
 
      /**
@@ -349,13 +334,87 @@ private void comboCategoriesItemStateChanged(java.awt.event.ItemEvent evt) {//GE
             }
         }
     }
+    
+    public class PortraitPanel extends javax.swing.JPanel {
+
+        /**
+    	 * 
+    	 */
+    	private static final long serialVersionUID = -3724175393116586310L;
+    	private DirectoryItems portraits;
+        
+        /** Creates new form CamoPanel */
+        public PortraitPanel(DirectoryItems portraits) {
+            this.portraits = portraits;
+            initComponents();
+        }
+
+        /** This method is called from within the constructor to
+         * initialize the form.
+         * WARNING: Do NOT modify this code. The content of this method is
+         * always regenerated by the Form Editor.
+         */
+        private void initComponents() {
+            java.awt.GridBagConstraints gridBagConstraints;
+
+            lblImage = new javax.swing.JLabel();
+
+            setName("Form"); // NOI18N
+            setLayout(new java.awt.GridBagLayout());
+
+            lblImage.setText(""); // NOI18N
+            lblImage.setName("lblImage"); // NOI18N
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = 0;
+            gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.weighty = 1.0;
+            add(lblImage, gridBagConstraints);
+        }// </editor-fold>//GEN-END:initComponents
+
+        public void setText(String text) {
+            lblImage.setText(text);
+        }
+        
+        //public void setImage(Image image) {
+          //  lblImage.setIcon(new ImageIcon(image));
+        //}
+        
+        public void setImage(String category, String name) {
+
+            if (null == category
+                    || name.equals(Pilot.PORTRAIT_NONE)) {
+                return;
+            }
+
+            // Try to get the portrait file.
+            try {
+
+                // Translate the root portrait directory name.
+                if (Pilot.ROOT_PORTRAIT.equals(category))
+                    category = ""; //$NON-NLS-1$
+                Image portrait = (Image) portraits.getItem(category, name);
+                if(null != portrait && portrait.getHeight(this) > 76) {
+                	portrait = portrait.getScaledInstance(-1, 76, Image.SCALE_DEFAULT);               
+                }
+                lblImage.setIcon(new ImageIcon(portrait));
+            } catch (Exception err) {
+                err.printStackTrace();
+            }
+        }
+        // Variables declaration - do not modify//GEN-BEGIN:variables
+        private javax.swing.JLabel lblImage;
+        // End of variables declaration//GEN-END:variables
+
+    }
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnSelect;
     private javax.swing.JComboBox comboCategories;
-    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane scrPortrait;
     private javax.swing.JTable tablePortrait;
     // End of variables declaration//GEN-END:variables
 

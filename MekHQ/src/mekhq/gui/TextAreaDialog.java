@@ -3,9 +3,10 @@
  *
  */
 
-package mekhq;
+package mekhq.gui;
 
 import java.awt.Dimension;
+import java.util.ResourceBundle;
 
 /**
  *
@@ -40,6 +41,8 @@ public class TextAreaDialog extends javax.swing.JDialog {
 		btnOK = new javax.swing.JButton();
 		btnCancel = new javax.swing.JButton();
 
+		ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.TextAreaDialog");
+
 		setLayout(new java.awt.GridBagLayout());
 		
 		txtDesc.setName("txtDesc");
@@ -58,7 +61,7 @@ public class TextAreaDialog extends javax.swing.JDialog {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		add(scrText, gridBagConstraints);
 		
-		btnOK.setText("OK");
+		btnOK.setText(resourceMap.getString("btnOK.text"));
 		btnOK.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnOKActionPerformed();
@@ -73,7 +76,7 @@ public class TextAreaDialog extends javax.swing.JDialog {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.CENTER;
 		add(btnOK, gridBagConstraints);
 		
-		btnCancel.setText("Cancel");
+		btnCancel.setText(resourceMap.getString("btnCancel.text"));
 		btnCancel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 setVisible(false);

@@ -19,7 +19,7 @@
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq;
+package mekhq.gui;
 
 import java.awt.Dimension;
 import java.awt.Frame;
@@ -70,13 +70,14 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
         btnClose = new javax.swing.JButton();
         scrDesc = new javax.swing.JScrollPane();
   
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setName("Form"); // NOI18N
-
-        getContentPane().setLayout(new java.awt.GridBagLayout());
         
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizeScenarioDialog");
-        
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setName("Form"); // NOI18N
+        setTitle(resourceMap.getString("title.new"));
+
+        getContentPane().setLayout(new java.awt.GridBagLayout());
+       
         lblName.setText(resourceMap.getString("lblName.text")); // NOI18N
         lblName.setName("lblName"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();

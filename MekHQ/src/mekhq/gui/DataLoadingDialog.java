@@ -17,7 +17,7 @@
  *  based on the one in MegaMek
  */
 
-package mekhq;
+package mekhq.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -32,6 +32,7 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ResourceBundle;
 
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
@@ -47,6 +48,7 @@ import megamek.client.ui.swing.MechTileset;
 import megamek.client.ui.swing.util.ImageFileFactory;
 import megamek.common.MechSummaryCache;
 import megamek.common.util.DirectoryItems;
+import mekhq.MekHQApp;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Planets;
 
@@ -61,19 +63,22 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
     MekHQApp app;
     Campaign campaign;
     File fileCampaign;
+    ResourceBundle resourceMap;
  
     public DataLoadingDialog(MekHQApp app, File f) {
         super(app.getMainFrame(), "Data Loading"); //$NON-NLS-1$
         this.app = app;
         this.fileCampaign = f;
         
+        resourceMap = ResourceBundle.getBundle("mekhq.resources.DataLoadingDialog");
+
         setUndecorated(true);
         progressBar = new JProgressBar(0, 4);
         progressBar.setValue(0);
         progressBar.setStringPainted(true);
 
         progressBar.setVisible(true);
-        progressBar.setString("Loading Planetary Data...");
+        progressBar.setString(resourceMap.getString("loadPlanet.text"));
         
         // initialize splash image
         Image imgSplash = app.getMainFrame().getToolkit().getImage("data/images/misc/mekhq-load.jpg"); //$NON-NLS-1$
@@ -186,16 +191,16 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
 		progressBar.setValue(progress);
 		switch(progress) {
 		case(0):
-			progressBar.setString("Loading Planetary Data...");
+			progressBar.setString(resourceMap.getString("loadPlanet.text"));
 			break;
 		case(1):
-			progressBar.setString("Loading Unit Data...");
+			progressBar.setString(resourceMap.getString("loadUnits.text"));
 			break;
 		case(2):
-			progressBar.setString("Loading Image Data...");
+			progressBar.setString(resourceMap.getString("loadImages.text"));
 			break;
 		case(3):
-			progressBar.setString("Loading Campaign...");
+			progressBar.setString(resourceMap.getString("loadCampaign.text"));
 			break;
 		}
 	}

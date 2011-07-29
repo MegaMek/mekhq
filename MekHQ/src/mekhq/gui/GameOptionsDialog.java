@@ -18,7 +18,7 @@
  * Created on April 26, 2002, 2:14 PM
  */
 
-package mekhq;
+package mekhq.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;

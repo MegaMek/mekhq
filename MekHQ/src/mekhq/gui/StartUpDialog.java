@@ -4,7 +4,7 @@
  * Created on Jan 6, 2010, 10:46:02 PM
  */
 
-package mekhq;
+package mekhq.gui;
 
 import java.awt.Dimension;
 import java.awt.Frame;
@@ -16,6 +16,7 @@ import java.awt.Insets;
 import java.awt.MediaTracker;
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.ResourceBundle;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
@@ -25,6 +26,7 @@ import javax.swing.filechooser.FileFilter;
 import org.jdesktop.application.SingleFrameApplication;
 
 import megamek.common.MechSummaryCache;
+import mekhq.MekHQApp;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Planets;
 
@@ -57,21 +59,21 @@ public class StartUpDialog extends javax.swing.JDialog {
 
         setTitle("MekHQ");
         
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(StartUpDialog.class);
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.StartUpDialog");
         
-        btnNewGame = new javax.swing.JButton("Start a New Campaign");
+        btnNewGame = new javax.swing.JButton(resourceMap.getString("btnNewGame.text"));
         btnNewGame.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
             	loadCampaign(false);  	
             }
         });
-        btnLoadGame = new javax.swing.JButton("Load a Campaign");
+        btnLoadGame = new javax.swing.JButton(resourceMap.getString("btnLoadGame.text"));
         btnLoadGame.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
             	loadCampaign(true);  	
             }
         });
-        btnQuit = new javax.swing.JButton("Quit");
+        btnQuit = new javax.swing.JButton(resourceMap.getString("btnQuit.text"));
         btnQuit.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 System.exit(0);
