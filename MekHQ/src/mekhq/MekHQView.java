@@ -47,6 +47,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
+import java.util.ResourceBundle;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
 import java.util.Vector;
@@ -93,6 +94,7 @@ import javax.swing.tree.TreeSelectionModel;
 
 import megamek.client.ui.swing.MechTileset;
 import megamek.client.ui.swing.MechView;
+import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.AmmoType;
 import megamek.common.Entity;
 import megamek.common.EntityListFile;
@@ -104,6 +106,7 @@ import megamek.common.MechSummaryCache;
 import megamek.common.MiscType;
 import megamek.common.Mounted;
 import megamek.common.Pilot;
+import megamek.common.Player;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
@@ -115,6 +118,7 @@ import megamek.common.options.IOption;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.DirectoryItems;
 import megameklab.com.util.UnitPrintManager;
+
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Force;
 import mekhq.campaign.JumpPath;
@@ -149,6 +153,7 @@ import mekhq.gui.CustomizeMissionDialog;
 import mekhq.gui.CustomizePersonDialog;
 import mekhq.gui.CustomizeScenarioDialog;
 import mekhq.gui.DataLoadingDialog;
+import mekhq.gui.EntityImage;
 import mekhq.gui.GameOptionsDialog;
 import mekhq.gui.JSuggestField;
 import mekhq.gui.MekViewDialog;
@@ -3605,17 +3610,24 @@ public class MekHQView extends FrameView {
 		}
 
 		public TaskTableModel.Renderer getRenderer() {
-			return new TaskTableModel.Renderer();
+			return new TaskTableModel.Renderer(getCamos(), getPortraits(), getMechTiles());
 		}
 
-		public class Renderer extends TaskInfo implements TableCellRenderer {
+		public class Renderer extends BasicInfo implements TableCellRenderer {
+			
+			public Renderer(DirectoryItems camos, DirectoryItems portraits,
+					MechTileset mt) {
+				super(camos, portraits, mt);
+			}
+
 			private static final long serialVersionUID = -3052618135259621130L;
 
 			public Component getTableCellRendererComponent(JTable table,
 					Object value, boolean isSelected, boolean hasFocus,
 					int row, int column) {
 				Component c = this;
-				Part task = getTaskAt(row);
+		        Image imgTool = getToolkit().getImage("data/images/misc/tools.png"); //$NON-NLS-1$
+		        this.setImage(imgTool);
 				setOpaque(true);
 				setText("<html>" + getValueAt(row, column).toString() + "</html>");
 				//setToolTipText(task.getToolTip());
@@ -3824,10 +3836,15 @@ public class MekHQView extends FrameView {
 		}
 
 		public AcquisitionTableModel.Renderer getRenderer() {
-			return new AcquisitionTableModel.Renderer();
+			return new AcquisitionTableModel.Renderer(getCamos(), getPortraits(), getMechTiles());
 		}
 
-		public class Renderer extends TaskInfo implements TableCellRenderer {
+		public class Renderer extends BasicInfo implements TableCellRenderer {
+			public Renderer(DirectoryItems camos, DirectoryItems portraits,
+					MechTileset mt) {
+				super(camos, portraits, mt);
+			}
+
 			private static final long serialVersionUID = -3052618135259621130L;
 
 			public Component getTableCellRendererComponent(JTable table,
@@ -3835,6 +3852,8 @@ public class MekHQView extends FrameView {
 					int row, int column) {
 				Component c = this;
 				//MissingPart task = getAcquisitionAt(row);
+		        Image imgTool = getToolkit().getImage("data/images/misc/tools.png"); //$NON-NLS-1$
+		        this.setImage(imgTool);
 				setOpaque(true);
 				setText(getValueAt(row, column).toString());
 				//setToolTipText(task.getToolTip());
@@ -3880,14 +3899,14 @@ public class MekHQView extends FrameView {
 		}
 
 		public ServicedUnitTableModel.Renderer getRenderer() {
-			return new ServicedUnitTableModel.Renderer(getCamos(), getMechTiles());
+			return new ServicedUnitTableModel.Renderer(getCamos(), getPortraits(), getMechTiles());
 		}
 
-		public class Renderer extends MekInfo implements TableCellRenderer {
-			
-			public Renderer(DirectoryItems camo, MechTileset mt) {
-				super(camo, mt);
-				// TODO Auto-generated constructor stub
+		public class Renderer extends BasicInfo implements TableCellRenderer {
+
+			public Renderer(DirectoryItems camos, DirectoryItems portraits,
+					MechTileset mt) {
+				super(camos, portraits, mt);
 			}
 
 			private static final long serialVersionUID = 6767431355690868748L;
@@ -4303,10 +4322,15 @@ public class MekHQView extends FrameView {
 		}
 
 		public TechTableModel.Renderer getRenderer() {
-			return new TechTableModel.Renderer();
+			return new TechTableModel.Renderer(getCamos(), getPortraits(), getMechTiles());
 		}
 
-		public class Renderer extends TechInfo implements TableCellRenderer {
+		public class Renderer extends BasicInfo implements TableCellRenderer {
+			public Renderer(DirectoryItems camos, DirectoryItems portraits,
+					MechTileset mt) {
+				super(camos, portraits, mt);
+			}
+
 			private static final long serialVersionUID = -4951696376098422679L;
 
 			public Component getTableCellRendererComponent(JTable table,
@@ -4314,6 +4338,7 @@ public class MekHQView extends FrameView {
 					int row, int column) {
 				Component c = this;
 				setOpaque(true);
+				setPortrait(getTechAt(row));
 				setText(getValueAt(row, column).toString());
 				// setToolTipText(getCampaign().getToolTipFor(u));
 				if (isSelected) {
@@ -4360,10 +4385,15 @@ public class MekHQView extends FrameView {
 		}
 
 		public PatientTableModel.Renderer getRenderer() {
-			return new PatientTableModel.Renderer();
+			return new PatientTableModel.Renderer(getCamos(), getPortraits(), getMechTiles());
 		}
 
-		public class Renderer extends PersonInfo implements TableCellRenderer {
+		public class Renderer extends BasicInfo implements TableCellRenderer {
+			public Renderer(DirectoryItems camos, DirectoryItems portraits,
+					MechTileset mt) {
+				super(camos, portraits, mt);
+			}
+
 			private static final long serialVersionUID = -406535109900807837L;
 
 			public Component getTableCellRendererComponent(JTable table,
@@ -4371,6 +4401,7 @@ public class MekHQView extends FrameView {
 					int row, int column) {
 				Component c = this;
 				setOpaque(true);
+				setPortrait(getPersonAt(row));
 				setText(getValueAt(row, column).toString());
 				Person p = getPersonAt(row);
 				setPortrait(p);
@@ -6219,10 +6250,15 @@ public class MekHQView extends FrameView {
 		}
 
 		public DocTableModel.Renderer getRenderer() {
-			return new DocTableModel.Renderer();
+			return new DocTableModel.Renderer(getCamos(), getPortraits(), getMechTiles());
 		}
 
-		public class Renderer extends DoctorInfo implements TableCellRenderer {
+		public class Renderer extends BasicInfo implements TableCellRenderer {
+			public Renderer(DirectoryItems camos, DirectoryItems portraits,
+					MechTileset mt) {
+				super(camos, portraits, mt);
+			}
+
 			private static final long serialVersionUID = -818080358678474607L;
 
 			public Component getTableCellRendererComponent(JTable table,
@@ -6230,6 +6266,7 @@ public class MekHQView extends FrameView {
 					int row, int column) {
 				Component c = this;
 				setOpaque(true);
+				setPortrait(getDoctorAt(row));
 				setText(getValueAt(row, column).toString());
 				//setToolTipText(getCampaign().getTargetFor(getDoctorAt(row), getDoctorAt(row)).getDesc());
 				if (isSelected) {
@@ -7524,6 +7561,123 @@ public class MekHQView extends FrameView {
 			}
 		}
 	}
+	
+	public class BasicInfo extends javax.swing.JPanel {
+		private static final long serialVersionUID = -2890605770494694319L;
+		DirectoryItems camos;
+		DirectoryItems portraits;
+		MechTileset mt;
+		
+	    public BasicInfo(DirectoryItems camos, DirectoryItems portraits, MechTileset mt) {
+	    	this.camos = camos;
+	    	this.portraits = portraits;
+	    	this.mt = mt;
+	        initComponents();
+	    }
+
+	    private void initComponents() {
+	        lblImage = new javax.swing.JLabel();
+	        setName("Form"); // NOI18N
+	        setLayout(new java.awt.GridLayout(1, 0));        
+	        lblImage.setText(""); // NOI18N
+	        lblImage.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+	        lblImage.setName("lblImage"); // NOI18N
+	        add(lblImage);
+	    }// </editor-fold>//GEN-END:initComponents
+
+	    public void setText(String text) {
+	        lblImage.setText(text);
+	    }
+	    
+	    public void setImage(Image img) {
+	        lblImage.setIcon(new ImageIcon(img));
+	    }
+
+	    public void select() {
+	        lblImage.setBorder(new javax.swing.border.LineBorder(Color.BLACK, 5, true));
+	    }
+	    
+	    public void unselect() {
+	        lblImage.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+	    }
+	    
+	    /**
+	     * sets the image as a portrait for the given person.
+	     */
+	    public void setPortrait(Person person) {
+
+	        String category = person.getPortraitCategory();
+	        String file = person.getPortraitFileName();
+
+	        if(Pilot.ROOT_PORTRAIT.equals(category)) {
+	            category = "";
+	        }
+
+	        // Return a null if the player has selected no portrait file.
+	        if ((null == category) || (null == file) || Pilot.PORTRAIT_NONE.equals(file)) {
+	        	file = "default.gif";
+	        }
+
+	        // Try to get the player's portrait file.
+	        Image portrait = null;
+	        try {
+	            portrait = (Image) portraits.getItem(category, file);
+	            //make sure no images are longer than 72 pixels
+	            if(null != portrait) {
+	                portrait = portrait.getScaledInstance(-1, 65, Image.SCALE_DEFAULT);
+	                this.setImage(portrait);
+	            }
+	        } catch (Exception err) {
+	            err.printStackTrace();
+	        }
+	    }
+	    
+	    public void setUnit(Unit u) {
+	        Image unit = getImageFor(u, lblImage);     
+	        setImage(unit);
+	    }
+	    
+	    public Image getImageFor(Unit u, Component c) {
+	        
+	    	if(null == mt) {
+	    		return null;
+	    	}
+	        Image base = mt.imageFor(u.getEntity(), c, -1);
+	        int tint = PlayerColors.getColorRGB(u.campaign.getColorIndex());
+	        EntityImage entityImage = new EntityImage(base, tint, getCamo(u.campaign), c);
+	        return entityImage.loadPreviewImage();
+	    }
+	    
+	    public Image getCamo(Campaign c) {
+
+	        // Return a null if the campaign has selected no camo file.
+	        if (null == c.getCamoCategory()
+	                || Player.NO_CAMO.equals(c.getCamoCategory())) {
+	            return null;
+	        }
+
+	        // Try to get the player's camo file.
+	        Image camo = null;
+	        try {
+
+	            // Translate the root camo directory name.
+	            String category = c.getCamoCategory();
+	            if (Player.ROOT_CAMO.equals(category))
+	                category = ""; //$NON-NLS-1$
+	            camo = (Image) camos.getItem(category, c.getCamoFileName());
+
+	        } catch (Exception err) {
+	            err.printStackTrace();
+	        }
+	        return camo;
+	    }
+	    
+	    // Variables declaration - do not modify//GEN-BEGIN:variables
+	    private javax.swing.JLabel lblImage;
+	    // End of variables declaration//GEN-END:variables
+
+	}
+
 
 	/**
 	 * <code>XTableColumnModel</code> extends the DefaultTableColumnModel .

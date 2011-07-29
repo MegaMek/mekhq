@@ -27,6 +27,8 @@ v0.1.10 (SVN)
 + switched from ResourceMap to ResourceBundle and moved most dialogs to mekhq.gui
 + remainder of dialogs updated
 + removed swing-layout and swing-worker libs (yay! - only one more left)
++ consolidated all the *Info classes into a single BasicInfo class
++ show portraits of techs and doctors in repair bay and infirmary
 
 v0.1.9 (2011-07-17)
 + beginning of personnel switch (hold on to your hats!)
