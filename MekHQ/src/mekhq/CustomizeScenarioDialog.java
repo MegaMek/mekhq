@@ -23,6 +23,7 @@ package mekhq;
 
 import java.awt.Dimension;
 import java.awt.Frame;
+import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
 
@@ -72,8 +73,9 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
 
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(CustomizeScenarioDialog.class);
         getContentPane().setLayout(new java.awt.GridBagLayout());
+        
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizeScenarioDialog");
         
         lblName.setText(resourceMap.getString("lblName.text")); // NOI18N
         lblName.setName("lblName"); // NOI18N
