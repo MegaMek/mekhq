@@ -236,7 +236,6 @@ public class ResolveScenarioTracker {
         	}
         }       
         checkStatusOfPersonnel();
-        assignKills();
 	}
 	
 	private ArrayList<Person> shuffleCrew(ArrayList<Person> source) {
@@ -458,6 +457,13 @@ public class ResolveScenarioTracker {
 		return campaign.getMission(scenario.getMissionId());
 	}
 	
+	public Hashtable<String, Integer> getKillCredits() {
+		return killCredits;
+	}
+	
+	public ArrayList<Unit> getUnits() {
+		return units;
+	}
 	
 	public void resolveScenario(int resolution, String report) {
 

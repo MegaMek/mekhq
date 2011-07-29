@@ -19,6 +19,7 @@ v0.1.10 (SVN)
 + load/save MM game options in xml serialization
 + Kill object and kills record for personnel
 + beginning of kill assignment from scenario resolution
++ ResolveWizard for kill assignment
 
 v0.1.9 (2011-07-17)
 + beginning of personnel switch (hold on to your hats!)

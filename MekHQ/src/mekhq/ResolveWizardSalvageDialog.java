@@ -318,8 +318,13 @@ public class ResolveWizardSalvageDialog extends javax.swing.JDialog {
     		}
     	}
     	this.setVisible(false);
-    	ResolveWizardFinalCheckDialog resolveDialog = new ResolveWizardFinalCheckDialog((Frame)getParent(), true, tracker);
-    	resolveDialog.setVisible(true);
+    	if(!tracker.getKillCredits().isEmpty()) {
+    		ResolveWizardAssignKillsDialog resolveDialog = new ResolveWizardAssignKillsDialog((Frame)getParent(), true, tracker);
+    		resolveDialog.setVisible(true);
+    	} else {
+	    	ResolveWizardFinalCheckDialog resolveDialog = new ResolveWizardFinalCheckDialog((Frame)getParent(), true, tracker);
+	    	resolveDialog.setVisible(true);
+    	}
     }
 
 

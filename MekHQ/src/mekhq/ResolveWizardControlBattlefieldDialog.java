@@ -140,6 +140,9 @@ public class ResolveWizardControlBattlefieldDialog extends javax.swing.JDialog {
     			&& (!(tracker.getMission() instanceof Contract) || ((Contract)tracker.getMission()).canSalvage())) {
     		ResolveWizardSalvageDialog resolveDialog = new ResolveWizardSalvageDialog((Frame)getParent(), true, tracker);
     		resolveDialog.setVisible(true);
+    	} else if(!tracker.getKillCredits().isEmpty()) {
+    		ResolveWizardAssignKillsDialog resolveDialog = new ResolveWizardAssignKillsDialog((Frame)getParent(), true, tracker);
+    		resolveDialog.setVisible(true);
     	} else {
     		ResolveWizardFinalCheckDialog resolveDialog = new ResolveWizardFinalCheckDialog((Frame)getParent(), true, tracker);
     		resolveDialog.setVisible(true);
