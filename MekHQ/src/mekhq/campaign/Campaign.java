@@ -2801,6 +2801,14 @@ public class Campaign implements Serializable {
 	
 	public void addKill(Kill k) {
 		kills.add(k);
+		if(getCampaignOptions().getKillsForXP() > 0 && getCampaignOptions().getKillXPAward() > 0) {
+			if((getKillsFor(k.getPilotId()).size() % getCampaignOptions().getKillsForXP()) == 0) {
+				Person p = getPerson(k.getPilotId());
+				if(null != p) {
+					p.setXp(p.getXp() + getCampaignOptions().getKillXPAward()); 
+				}
+			}
+		}
 	}
 	
 	public ArrayList<Kill> getKillsFor(int pid) {

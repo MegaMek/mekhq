@@ -36,6 +36,7 @@ import javax.swing.JLabel;
 import javax.swing.JRadioButton;
 import javax.swing.JSlider;
 
+import megamek.common.Entity;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.Unit;
 import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
@@ -223,9 +224,13 @@ public class ResolveWizardAssignKillsDialog extends javax.swing.JDialog {
     private void btnNextActionPerformed(java.awt.event.ActionEvent evt) {
     	this.setVisible(false);
     	for(String killName : tracker.getKillCredits().keySet()) {
-    		Unit u = tracker.getUnits().get(choices.get(killName).getSelectedIndex()-1);
-    		if(null != u) {
-    			tracker.getKillCredits().put(killName, u.getId());
+    		if(choices.get(killName).getSelectedIndex() == 0) {
+    			tracker.getKillCredits().put(killName, Entity.NONE);
+    		} else {
+	    		Unit u = tracker.getUnits().get(choices.get(killName).getSelectedIndex()-1);
+	    		if(null != u) {
+	    			tracker.getKillCredits().put(killName, u.getId());
+	    		}
     		}
     	}
     	tracker.assignKills();

@@ -71,6 +71,8 @@ public class CampaignOptions implements Serializable {
 
     //xp related
     private int scenarioXP;
+    private int killsForXP;
+    private int killXPAward;
 
     public CampaignOptions () {
         useFactionModifiers = false;
@@ -95,6 +97,8 @@ public class CampaignOptions implements Serializable {
         sellUnits = false;
         sellParts = false;
         scenarioXP = 1;
+        killsForXP = 0;
+        killXPAward = 0;
     }
 
     public static String getRepairSystemName (int repairSystem) {
@@ -276,6 +280,22 @@ public class CampaignOptions implements Serializable {
     public void setScenarioXP(int xp) {
     	scenarioXP = xp;
     }
+    
+    public int getKillsForXP() {
+    	return killsForXP;
+    }
+    
+    public void setKillsForXP(int k) {
+    	killsForXP = k;
+    }
+    
+    public int getKillXPAward() {
+    	return killXPAward;
+    }
+    
+    public void setKillXPAward(int xp) {
+    	killXPAward = xp;
+    }
 
 	public void writeToXml(PrintWriter pw1, int indent) {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "<campaignOptions>");
@@ -301,6 +321,8 @@ public class CampaignOptions implements Serializable {
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "sellUnits", sellUnits);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "sellParts", sellParts);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "scenarioXP", scenarioXP);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "killsForXP", killsForXP);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "killXPAward", killXPAward);
 
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "</campaignOptions>");
 	}
@@ -425,6 +447,10 @@ public class CampaignOptions implements Serializable {
 					retVal.sellParts = false;
 			} else if (wn2.getNodeName().equalsIgnoreCase("scenarioXP")) {
 				retVal.scenarioXP = Integer.parseInt(wn2.getTextContent().trim());
+			} else if (wn2.getNodeName().equalsIgnoreCase("killsForXP")) {
+				retVal.killsForXP = Integer.parseInt(wn2.getTextContent().trim());
+			} else if (wn2.getNodeName().equalsIgnoreCase("killXPAward")) {
+				retVal.killXPAward = Integer.parseInt(wn2.getTextContent().trim());
 			} 
 		}
 

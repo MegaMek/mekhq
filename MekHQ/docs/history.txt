@@ -23,6 +23,7 @@ v0.1.10 (SVN)
 + look and feel setting done in MekHQApp#initialize
 + replaced jdesktop.ResourceMap with ResourceBundle in CustomizeScenarioDialog as an example
      this will eventually be done for all gui objects in anticipation of removing the SingleFrameApplication framework
++ customizable XP awards for kills
 
 v0.1.9 (2011-07-17)
 + beginning of personnel switch (hold on to your hats!)
