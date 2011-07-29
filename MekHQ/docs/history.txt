@@ -20,6 +20,7 @@ v0.1.10 (SVN)
 + Kill object and kills record for personnel
 + beginning of kill assignment from scenario resolution
 + ResolveWizard for kill assignment
++ look and feel setting done in MekHQApp#initialize
 
 v0.1.9 (2011-07-17)
 + beginning of personnel switch (hold on to your hats!)

@@ -42,6 +42,7 @@ import org.jdesktop.application.SingleFrameApplication;
 import megamek.client.ui.swing.MechTileset;
 import megamek.client.ui.swing.util.ImageFileFactory;
 import megamek.common.IGame;
+import megamek.common.MechSummaryCache;
 import megamek.common.event.GameBoardChangeEvent;
 import megamek.common.event.GameBoardNewEvent;
 import megamek.common.event.GameEndEvent;
@@ -63,6 +64,7 @@ import megamek.common.event.GameTurnChangeEvent;
 import megamek.common.util.DirectoryItems;
 import megamek.server.Server;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.Planets;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.Unit;
 import mekhq.campaign.mission.Scenario;
@@ -149,9 +151,9 @@ public class MekHQApp extends SingleFrameApplication implements GameListener {
 
             }
         });
-        
+        //TODO: when dialogs are called up first, the frame view is not being set 
+        //correctly which means that closing the main frame window does not exit the app
         show(new StartUpDialog(this));
-
     }
     
     public void showNewView() {
@@ -179,11 +181,16 @@ public class MekHQApp extends SingleFrameApplication implements GameListener {
      * Main method launching the application.
      */
     public static void main(String[] args) {
-
     	System.setProperty("apple.laf.useScreenMenuBar", "true");
         System.setProperty("com.apple.mrj.application.apple.menu.about.name","MekHQ");
         
-        // this should also help to make MekHQ look more system-specific
+        launch(MekHQApp.class, args);       
+    }
+    
+    @Override
+    protected void initialize(String[] args) {
+
+    	//TODO: we can extend this with other look and feel options
         try {
         	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (ClassNotFoundException e) {
@@ -199,9 +206,6 @@ public class MekHQApp extends SingleFrameApplication implements GameListener {
         	// TODO Auto-generated catch block
         	e.printStackTrace();
         }
-
-        launch(MekHQApp.class, args);
-        
     }
     
     /**
