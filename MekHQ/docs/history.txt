@@ -18,6 +18,7 @@ v0.1.10 (SVN)
 + grey out scenario buttons when no scenario selected, selected scenario is completed, or scenario has no units assigned
 + load/save MM game options in xml serialization
 + Kill object and kills record for personnel
++ beginning of kill assignment from scenario resolution
 
 v0.1.9 (2011-07-17)
 + beginning of personnel switch (hold on to your hats!)

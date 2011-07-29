@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Random;
@@ -68,6 +69,7 @@ public class ResolveScenarioTracker {
 	ArrayList<Unit> leftoverSalvage;
 	ArrayList<Unit> units;
 	Hashtable<Integer, PersonStatus> peopleStatus;
+	Hashtable<String, Integer> killCredits;
 	Campaign campaign;
 	Scenario scenario;
 	JFileChooser unitList;
@@ -84,6 +86,7 @@ public class ResolveScenarioTracker {
 		pilots = new Hashtable<Integer, Pilot>();
 		units = new ArrayList<Unit>();
 		peopleStatus = new Hashtable<Integer, PersonStatus>();
+		killCredits = new Hashtable<String, Integer>();
 		for(int uid : scenario.getForces(campaign).getAllUnits()) {
 			Unit u = campaign.getUnit(uid);
 			if(null != u) {
@@ -194,10 +197,11 @@ public class ResolveScenarioTracker {
 				}			
 			} else if(e.getOwner().isEnemyOf(client.getLocalPlayer())) {
 				if(!e.canEscape() && controlsField) {
+					killCredits.put(e.getDisplayName(), Entity.NONE);
 					potentialSalvage.add(e);
 				}
 			}
-		}
+		}	
 		//add retreated units
 		for (Enumeration<Entity> iter = client.game.getRetreatedEntities(); iter.hasMoreElements();) {
             Entity e = iter.nextElement();
@@ -210,24 +214,29 @@ public class ResolveScenarioTracker {
         }
 		
 
-        Enumeration<Entity> graveyard = client.game.getGraveyardEntities();
-        if(controlsField) {
-	        while (graveyard.hasMoreElements()) {
-	            Entity e = graveyard.nextElement();
-	            if(!e.isSalvage()) {
-	            	continue;
-	            }
-	            if(e.getOwnerId() == pid && controlsField) {
-					entities.put(e.getExternalId(), e);
-					if(null != e.getCrew()) {
-						pilots.put(e.getCrew().getExternalId(), e.getCrew());
-					}
-				} else if(e.getOwner().isEnemyOf(client.getLocalPlayer())) {
-					potentialSalvage.add(e);
-				}
-	        }       
-        }
+        Enumeration<Entity> wrecks = client.game.getWreckedEntities();
+        while (wrecks.hasMoreElements()) {
+        	Entity e = wrecks.nextElement();
+        	if(e.getOwnerId() == pid && controlsField && e.isSalvage()) {
+        		entities.put(e.getExternalId(), e);
+        		if(null != e.getCrew()) {
+        			pilots.put(e.getCrew().getExternalId(), e.getCrew());
+        		}
+        	} else if(e.getOwner().isEnemyOf(client.getLocalPlayer())) {
+        		Entity killer = client.game.getEntity(e.getKillerId());
+        		if(killer.getOwnerId() == pid) {
+        			//the killer is one of your units, congrats!
+        			killCredits.put(e.getDisplayName(), killer.getExternalId());
+        		} else {
+        			killCredits.put(e.getDisplayName(), Entity.NONE);
+        		}
+        		if(e.isSalvage()) {
+        			potentialSalvage.add(e);
+        		}
+        	}
+        }       
         checkStatusOfPersonnel();
+        assignKills();
 	}
 	
 	private ArrayList<Person> shuffleCrew(ArrayList<Person> source) {
@@ -242,6 +251,20 @@ public class ResolveScenarioTracker {
 	    }
 
 	    return sortedList;
+	}
+	
+	public void assignKills() {
+		for(Unit u : units) {
+			for(String killed : killCredits.keySet()) {
+				if(u.getId() == killCredits.get(killed)) {
+					for(Person p : u.getActiveCrew()) {
+						PersonStatus status = peopleStatus.get(p.getId());
+						status.addKill(new Kill(p.getId(), killed, u.getEntity().getDisplayName(), campaign.getCalendar().getTime()));
+					}
+				}
+			}
+			
+		}
 	}
 	
 	public void checkStatusOfPersonnel() {
@@ -456,6 +479,9 @@ public class ResolveScenarioTracker {
 			}
 			person.setXp(person.getXp() + status.xp);
 			person.setHits(status.getHits());
+			for(Kill k : status.getKills()) {
+				campaign.addKill(k);
+			}
 			if(status.isMissing()) {
 				campaign.changeStatus(person, Person.S_MIA);
 			}
@@ -607,6 +633,7 @@ public class ResolveScenarioTracker {
 		private int hits;
 		private boolean missing;
 		private int xp;
+		private ArrayList<Kill> kills;
 		
 		public PersonStatus(String n, String u, int h) {
 			name = n;
@@ -614,6 +641,7 @@ public class ResolveScenarioTracker {
 			hits = h;
 			missing = false;
 			xp = 0;
+			kills = new ArrayList<Kill>();
 		}
 		
 		public String getName() {
@@ -653,6 +681,14 @@ public class ResolveScenarioTracker {
 		
 		public void setXP(int x) {
 			xp = x;
+		}
+		
+		public void addKill(Kill k) {
+			kills.add(k);
+		}
+		
+		public ArrayList<Kill> getKills() {
+			return kills;
 		}
 	}
 }
