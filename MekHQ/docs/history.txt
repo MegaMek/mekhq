@@ -33,6 +33,7 @@ v0.1.10 (SVN)
 + converted MekHQView to CampaignGUI and removed FrameView
 + MekHQApp renamed MekHQ and no longer inherits from SingleFrameApplication
 + nag when quitting
++ created gui subfolders for dialogs and views
 
 v0.1.9 (2011-07-17)
 + beginning of personnel switch (hold on to your hats!)

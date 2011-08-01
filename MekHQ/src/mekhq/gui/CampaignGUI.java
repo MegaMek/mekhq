@@ -151,6 +151,30 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.Modes;
+import mekhq.gui.dialog.AddFundsDialog;
+import mekhq.gui.dialog.CampaignOptionsDialog;
+import mekhq.gui.dialog.CompleteMissionDialog;
+import mekhq.gui.dialog.CustomizeMissionDialog;
+import mekhq.gui.dialog.CustomizePersonDialog;
+import mekhq.gui.dialog.CustomizeScenarioDialog;
+import mekhq.gui.dialog.DataLoadingDialog;
+import mekhq.gui.dialog.GameOptionsDialog;
+import mekhq.gui.dialog.MekViewDialog;
+import mekhq.gui.dialog.MissionTypeDialog;
+import mekhq.gui.dialog.NewKillDialog;
+import mekhq.gui.dialog.PopupValueChoiceDialog;
+import mekhq.gui.dialog.PortraitChoiceDialog;
+import mekhq.gui.dialog.ResolveWizardChooseFilesDialog;
+import mekhq.gui.dialog.TextAreaDialog;
+import mekhq.gui.dialog.UnitSelectorDialog;
+import mekhq.gui.view.ContractViewPanel;
+import mekhq.gui.view.ForceViewPanel;
+import mekhq.gui.view.JumpPathViewPanel;
+import mekhq.gui.view.MissionViewPanel;
+import mekhq.gui.view.PersonViewPanel;
+import mekhq.gui.view.PlanetViewPanel;
+import mekhq.gui.view.ScenarioViewPanel;
+import mekhq.gui.view.UnitViewPanel;
 
 /**
  * The application's main frame.

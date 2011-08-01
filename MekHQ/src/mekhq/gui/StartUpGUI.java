@@ -26,6 +26,7 @@ import javax.swing.JLabel;
 import javax.swing.filechooser.FileFilter;
 
 import mekhq.MekHQ;
+import mekhq.gui.dialog.DataLoadingDialog;
 /**
  *
  * @author Jay

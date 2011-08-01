@@ -1,0 +1,208 @@
+/*
+ * MegaMek - Copyright (C) 2000-2002 Ben Mazur (bmazur@sev.org)
+ *
+ *  This program is free software; you can redistribute it and/or modify it
+ *  under the terms of the GNU General Public License as published by the Free
+ *  Software Foundation; either version 2 of the License, or (at your option)
+ *  any later version.
+ *
+ *  This program is distributed in the hope that it will be useful, but
+ *  WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ *  or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ *  for more details.
+ */
+
+/*
+ * My own version of a UnitLoadingDialog using a progress bar
+ *  based on the one in MegaMek
+ */
+
+package mekhq.gui.dialog;
+
+import java.awt.BorderLayout;
+import java.awt.Image;
+import java.awt.MediaTracker;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.ResourceBundle;
+
+import javax.swing.ImageIcon;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JProgressBar;
+import javax.swing.SwingWorker;
+
+import megamek.common.MechSummaryCache;
+import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.Planets;
+
+public class DataLoadingDialog extends JDialog implements PropertyChangeListener {
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -3454307876761238915L;
+    private JProgressBar progressBar;
+    Task task;
+    MekHQ app;
+    JFrame frame;
+    Campaign campaign;
+    File fileCampaign;
+    ResourceBundle resourceMap;
+ 
+    public DataLoadingDialog(MekHQ app, JFrame frame, File f) {
+        super(frame, "Data Loading"); //$NON-NLS-1$
+        this.frame = frame;
+        this.app = app;
+        this.fileCampaign = f;
+        
+        resourceMap = ResourceBundle.getBundle("mekhq.resources.DataLoadingDialog");
+
+        setUndecorated(true);
+        progressBar = new JProgressBar(0, 4);
+        progressBar.setValue(0);
+        progressBar.setStringPainted(true);
+
+        progressBar.setVisible(true);
+        progressBar.setString(resourceMap.getString("loadPlanet.text"));
+        
+        // initialize splash image
+        Image imgSplash = getToolkit().getImage("data/images/misc/mekhq-load.jpg"); //$NON-NLS-1$
+
+        // wait for splash image to load completely
+        MediaTracker tracker = new MediaTracker(frame);
+        tracker.addImage(imgSplash, 0);
+        try {
+            tracker.waitForID(0);
+        } catch (InterruptedException e) {
+            // really should never come here
+        }
+        // make splash image panel
+        ImageIcon icon = new ImageIcon(imgSplash);
+        JLabel splash = new JLabel(icon);      
+        getContentPane().setLayout(new BorderLayout());
+        getContentPane().add(splash, BorderLayout.CENTER);
+        getContentPane().add(progressBar, BorderLayout.PAGE_END);
+        
+        setSize(500, 300);
+        this.setLocationRelativeTo(frame);
+       
+        task = new Task();
+        task.addPropertyChangeListener(this);
+        task.execute();
+    }
+    
+    class Task extends SwingWorker<Void, Void> {
+        /*
+         * Main task. Executed in background thread.
+         */    	
+    	private boolean cancelled = false;
+    	
+        @Override
+        public Void doInBackground() {
+            //Initialize progress property.
+            setProgress(0);
+            while (!Planets.getInstance().isInitialized()) {
+                //Sleep for up to one second.
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException ignore) {
+                	
+                }
+            }
+            setProgress(1);
+            while (!MechSummaryCache.getInstance().isInitialized()) {
+                //Sleep for up to one second.
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException ignore) {
+                	
+                }
+            }
+            setProgress(2);
+    		//load in directory items and tilesets
+    		app.loadDirectories();
+            setProgress(3);
+            boolean newCampaign = false;
+            if(null == fileCampaign) {
+            	newCampaign = true;
+            	campaign = new Campaign();
+            } else {
+            	MekHQ.logMessage("Loading campaign file from XML...");
+
+        		// And then load the campaign object from it.
+        		FileInputStream fis = null;
+
+        		try {
+        			fis = new FileInputStream(fileCampaign);
+        			campaign = Campaign.createCampaignFromXMLFileInputStream(fis);
+        			// Restores all transient attributes from serialized objects
+        			campaign.restore();
+        			fis.close();
+        		} catch (Exception ex) {
+        			ex.printStackTrace();
+        			JOptionPane.showMessageDialog(null, 
+        					"The campaign file could not be loaded.\nPlease check the log file for details.",
+        					"Campaign Loading Error",
+        				    JOptionPane.ERROR_MESSAGE);
+        			//setVisible(false);
+        			cancelled = true;
+        			cancel(true);
+        		}
+            }
+            setProgress(4);
+            if(newCampaign) {
+            	setVisible(false);
+            	CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(frame, true, campaign, app.getCamos());
+            	optionsDialog.setVisible(true);
+        		if(optionsDialog.wasCancelled()) {
+        			cancelled = true;
+        			cancel(true);
+        		} else {
+        			campaign.addReport("<b>" + campaign.getDateAsString() + "</b>");
+        		}
+            }
+            return null;
+        }
+
+        /*
+         * Executed in event dispatching thread
+         */
+        @Override
+        public void done() {
+        	setVisible(false);
+        	if(!cancelled) {
+        		app.setCampaign(campaign);
+        		frame.setVisible(false);
+        		frame.dispose();
+        		app.showNewView();
+        	}	
+        }
+    }
+
+	@Override
+	public void propertyChange(PropertyChangeEvent arg0) {
+		int progress = task.getProgress();
+		progressBar.setValue(progress);
+		switch(progress) {
+		case(0):
+			progressBar.setString(resourceMap.getString("loadPlanet.text"));
+			break;
+		case(1):
+			progressBar.setString(resourceMap.getString("loadUnits.text"));
+			break;
+		case(2):
+			progressBar.setString(resourceMap.getString("loadImages.text"));
+			break;
+		case(3):
+			progressBar.setString(resourceMap.getString("loadCampaign.text"));
+			break;
+		}
+	}
+    
+}

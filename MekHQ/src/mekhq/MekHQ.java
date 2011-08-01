@@ -62,8 +62,8 @@ import mekhq.campaign.Unit;
 import mekhq.campaign.mission.Scenario;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.PortraitFileFactory;
-import mekhq.gui.ResolveWizardControlBattlefieldDialog;
 import mekhq.gui.StartUpGUI;
+import mekhq.gui.dialog.ResolveWizardControlBattlefieldDialog;
 
 /**
  * The main class of the application.
