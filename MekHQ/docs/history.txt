@@ -35,6 +35,7 @@ v0.1.10 (SVN)
 + nag when quitting
 + created gui subfolders for dialogs and views
 + really crappy about box
++ updated MM.jar and MML.jar
 
 v0.1.9 (2011-07-17)
 + beginning of personnel switch (hold on to your hats!)

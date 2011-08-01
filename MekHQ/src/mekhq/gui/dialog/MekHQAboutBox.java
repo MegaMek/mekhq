@@ -19,7 +19,7 @@
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq;
+package mekhq.gui.dialog;
 
 import java.awt.GridBagLayout;
 import java.util.ResourceBundle;
