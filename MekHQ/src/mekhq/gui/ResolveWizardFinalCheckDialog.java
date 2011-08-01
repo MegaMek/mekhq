@@ -28,8 +28,6 @@ import java.util.ResourceBundle;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 
-import megamek.common.Entity;
-import megamek.common.Pilot;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.Unit;
 import mekhq.campaign.mission.Scenario;

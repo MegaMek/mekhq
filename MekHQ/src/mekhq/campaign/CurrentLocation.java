@@ -25,7 +25,7 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.Date;
 
-import mekhq.MekHQApp;
+import mekhq.MekHQ;
 import mekhq.campaign.finances.Transaction;
 
 import org.w3c.dom.Node;
@@ -232,7 +232,7 @@ public class CurrentLocation implements Serializable {
 			// Errrr, apparently either the class name was invalid...
 			// Or the listed name doesn't exist.
 			// Doh!
-			MekHQApp.logError(ex);
+			MekHQ.logError(ex);
 		}
 		
 		return retVal;

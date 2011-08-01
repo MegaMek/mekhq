@@ -21,8 +21,6 @@
 
 package mekhq;
 
-import org.jdesktop.application.Action;
-
 public class MekHQAboutBox extends javax.swing.JDialog {
 	private static final long serialVersionUID = -8514528257894201641L;
 
@@ -30,10 +28,6 @@ public class MekHQAboutBox extends javax.swing.JDialog {
         super(parent);
         initComponents();
         getRootPane().setDefaultButton(closeButton);
-    }
-
-    @Action public void closeAboutBox() {
-        setVisible(false);
     }
 
     /** This method is called from within the constructor to
@@ -53,15 +47,13 @@ public class MekHQAboutBox extends javax.swing.JDialog {
         javax.swing.JLabel appHomepageLabel = new javax.swing.JLabel();
         javax.swing.JLabel appDescLabel = new javax.swing.JLabel();
         javax.swing.JLabel imageLabel = new javax.swing.JLabel();
-
+/*
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getResourceMap(MekHQAboutBox.class);
         setTitle(resourceMap.getString("title")); // NOI18N
         setModal(true);
         setName("aboutBox"); // NOI18N
         setResizable(false);
 
-        javax.swing.ActionMap actionMap = org.jdesktop.application.Application.getInstance(mekhq.MekHQApp.class).getContext().getActionMap(MekHQAboutBox.class, this);
         closeButton.setAction(actionMap.get("closeAboutBox")); // NOI18N
         closeButton.setName("closeButton"); // NOI18N
 
@@ -91,7 +83,7 @@ public class MekHQAboutBox extends javax.swing.JDialog {
 
         imageLabel.setIcon(resourceMap.getIcon("imageLabel.icon")); // NOI18N
         imageLabel.setName("imageLabel"); // NOI18N
-
+*/
 
         pack();
     }// </editor-fold>//GEN-END:initComponents

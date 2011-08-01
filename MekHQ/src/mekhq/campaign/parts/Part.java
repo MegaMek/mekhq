@@ -27,13 +27,11 @@ import java.io.Serializable;
 import megamek.common.EquipmentType;
 import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
-import mekhq.MekHQApp;
+import mekhq.MekHQ;
 import mekhq.campaign.MekHqXmlSerializable;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
-import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.team.SupportTeam;
 import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.Modes;
 
@@ -410,7 +408,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 			// Errrr, apparently either the class name was invalid...
 			// Or the listed name doesn't exist.
 			// Doh!
-			MekHQApp.logError(ex);
+			MekHQ.logError(ex);
 		}
 		
 		return retVal;

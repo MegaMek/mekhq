@@ -34,8 +34,6 @@ import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Utilities;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.team.SupportTeam;
-import mekhq.campaign.team.TechTeam;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.Modes;
 

@@ -27,7 +27,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -123,9 +122,8 @@ import megamek.common.options.IOption;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.DirectoryItems;
 import megameklab.com.util.UnitPrintManager;
-
+import mekhq.MekHQ;
 import mekhq.MekHQAboutBox;
-import mekhq.MekHQApp;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Force;
 import mekhq.campaign.JumpPath;
@@ -140,9 +138,9 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.AmmoBin;
 import mekhq.campaign.parts.Armor;
+import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.EquipmentPart;
 import mekhq.campaign.parts.MekActuator;
-import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.MekGyro;
 import mekhq.campaign.parts.MekLifeSupport;
 import mekhq.campaign.parts.MekLocation;
@@ -234,7 +232,7 @@ public class CampaignGUI extends JPanel {
 
 	private JFrame frame;
 	
-	private MekHQApp app;
+	private MekHQ app;
 	
 	private TaskTableModel taskModel = new TaskTableModel();
 	private AcquisitionTableModel acquireModel = new AcquisitionTableModel();
@@ -268,7 +266,7 @@ public class CampaignGUI extends JPanel {
 	
 	public int selectedMission = -1;
 	
-	public CampaignGUI(MekHQApp app) {
+	public CampaignGUI(MekHQ app) {
 		
 		this.app = app;
 
@@ -285,11 +283,11 @@ public class CampaignGUI extends JPanel {
 
 	public void showAboutBox() {
 		if (aboutBox == null) {
-			JFrame mainFrame = MekHQApp.getApplication().getMainFrame();
+			JFrame mainFrame = getFrame();
 			aboutBox = new MekHQAboutBox(mainFrame);
 			aboutBox.setLocationRelativeTo(mainFrame);
 		}
-		MekHQApp.getApplication().show(aboutBox);
+		aboutBox.setVisible(true);
 	}
 
 	/**
@@ -299,7 +297,6 @@ public class CampaignGUI extends JPanel {
 	 */
 	private void initComponents() {
 		java.awt.GridBagConstraints gridBagConstraints;
-
 
 		frame = new JFrame("MekHQ"); //$NON-NLS-1$
 		
@@ -400,10 +397,6 @@ public class CampaignGUI extends JPanel {
 		javax.swing.JMenu helpMenu = new javax.swing.JMenu();
 		javax.swing.JMenuItem aboutMenuItem = new javax.swing.JMenuItem();
 		statusPanel = new javax.swing.JPanel();
-		javax.swing.JSeparator statusPanelSeparator = new javax.swing.JSeparator();
-		statusMessageLabel = new javax.swing.JLabel();
-		statusAnimationLabel = new javax.swing.JLabel();
-		progressBar = new javax.swing.JProgressBar();
 		lblPersonChoice = new javax.swing.JLabel();
 		choicePerson = new javax.swing.JComboBox();
 		choicePersonView = new javax.swing.JComboBox();
@@ -428,7 +421,6 @@ public class CampaignGUI extends JPanel {
 		tabMain.setName("tabMain"); // NOI18N
 		tabMain.setPreferredSize(new java.awt.Dimension(900, 300));
 
-		panOrganization.setFont(Font.decode(resourceMap.getString("panHangar.font"))); // NOI18N
 		panOrganization.setName("panOrganization"); // NOI18N
 		panOrganization.setLayout(new java.awt.GridBagLayout());
 		
@@ -475,7 +467,6 @@ public class CampaignGUI extends JPanel {
 				resourceMap.getString("panOrganization.TabConstraints.tabTitle"),
 				panOrganization); // NOI18N
 		
-		//panBriefing.setFont(resourceMap.getFont("panHangar.font")); // NOI18N
 		panBriefing.setName("panBriefing"); // NOI18N
 		panBriefing.setLayout(new java.awt.GridBagLayout());
 		
@@ -616,11 +607,9 @@ public class CampaignGUI extends JPanel {
 		splitMission.setOneTouchExpandable(true);
 		splitMission.setResizeWeight(1.0);
 		
-		//panelScenario.setFont(resourceMap.getFont("panHangar.font")); // NOI18N
 		panelScenario.setName("panelScenario"); // NOI18N
 		panelScenario.setLayout(new java.awt.GridBagLayout());
 		
-		//panelScenarioButtons.setFont(resourceMap.getFont("panHangar.font")); // NOI18N
 		panelScenarioButtons.setLayout(new java.awt.GridLayout(2,3));
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
@@ -730,7 +719,6 @@ public class CampaignGUI extends JPanel {
 				resourceMap.getString("panBriefing.TabConstraints.tabTitle"),
 				splitBrief); // NOI18N
 		
-		//panelMapView.setFont(resourceMap.getFont("panHangar.font")); // NOI18N
 		panelMapView.setName("panelMapView"); // NOI18N
 		panelMapView.setLayout(new java.awt.GridBagLayout());
 		
@@ -830,7 +818,6 @@ public class CampaignGUI extends JPanel {
 				resourceMap.getString("panMap.TabConstraints.tabTitle"),
 				splitMap); // NOI18N
 		
-		//panPersonnel.setFont(resourceMap.getFont("panHangar.font")); // NOI18N
 		panPersonnel.setName("panPersonnel"); // NOI18N
 		panPersonnel.setLayout(new java.awt.GridBagLayout());
 		
@@ -951,7 +938,6 @@ public class CampaignGUI extends JPanel {
 				resourceMap.getString("panPersonnel.TabConstraints.tabTitle"),
 				panPersonnel); // NOI18N
 		
-		//panHangar.setFont(resourceMap.getFont("panHangar.font")); // NOI18N
 		panHangar.setName("panHangar"); // NOI18N
 		panHangar.setLayout(new java.awt.GridBagLayout());
 		
@@ -1070,7 +1056,6 @@ public class CampaignGUI extends JPanel {
 				panHangar); // NOI18N
 	
 		panSupplies.setName("panSupplies"); // NOI18N
-		//panSupplies.setFont(resourceMap.getFont("panHangar.font")); // NOI18N
 		panSupplies.setLayout(new java.awt.GridBagLayout());
 		
 		lblPartsChoice.setText(resourceMap.getString("lblPartsChoice.text")); // NOI18N
@@ -1141,11 +1126,9 @@ public class CampaignGUI extends JPanel {
 				panSupplies); // NOI18N
 
 		
-		//panRepairBay.setFont(resourceMap.getFont("panHangar.font")); // NOI18N
 		panRepairBay.setName("panRepairBay"); // NOI18N
 		panRepairBay.setLayout(new java.awt.GridBagLayout());
 		
-		//tabTasks.setToolTipText(resourceMap.getString("tabTasks.toolTipText")); // NOI18N
 		tabTasks.setMinimumSize(new java.awt.Dimension(600, 200));
 		tabTasks.setName("tabTasks"); // NOI18N
 		tabTasks.setPreferredSize(new java.awt.Dimension(300, 300));
@@ -1249,7 +1232,6 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
 		panRepairBay.add(btnOvertime, gridBagConstraints);
 		
-		//astechPoolLabel.setFont(resourceMap.getFont("lblTargetNum.font")); // NOI18N
 		astechPoolLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 		astechPoolLabel.setText("<html><b>Astech Pool Minutes:</> " + getCampaign().getAstechPoolMinutes() + " (" + getCampaign().getNumberAstechs() + " Astechs)</html>"); // NOI18N
 		astechPoolLabel.setName("astechPoolLabel"); // NOI18N
@@ -1314,7 +1296,6 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.SOUTH;
 		panelDoTask.add(lblTarget, gridBagConstraints);
 
-		//lblTargetNum.setFont(resourceMap.getFont("lblTargetNum.font")); // NOI18N
 		lblTargetNum.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 		lblTargetNum.setText(resourceMap.getString("lblTargetNum.text")); // NOI18N
 		lblTargetNum.setName("lblTargetNum"); // NOI18N
@@ -1326,10 +1307,8 @@ public class CampaignGUI extends JPanel {
 
 		jScrollPane6.setName("jScrollPane6"); // NOI18N
 
-		//textTarget.setBackground(resourceMap.getColor("textTarget.background")); // NOI18N
 		textTarget.setColumns(20);
 		textTarget.setEditable(false);
-		//textTarget.setFont(resourceMap.getFont("textTarget.font")); // NOI18N
 		textTarget.setLineWrap(true);
 		textTarget.setRows(5);
 		textTarget.setText(resourceMap.getString("textTarget.text")); // NOI18N
@@ -1505,7 +1484,6 @@ public class CampaignGUI extends JPanel {
 		txtPaneReport.setContentType(resourceMap
 				.getString("txtPaneReport.contentType")); // NOI18N
 		txtPaneReport.setEditable(false);
-		//txtPaneReport.setFont(resourceMap.getFont("txtPaneReport.font")); // NOI18N
 		txtPaneReport.setText(getCampaign().getCurrentReportHTML());
 		txtPaneReport.setName("txtPaneReport"); // NOI18N
 		txtPaneReportScrollPane.setViewportView(txtPaneReport);
@@ -1602,12 +1580,14 @@ public class CampaignGUI extends JPanel {
 		});
 		fileMenu.add(menuOptionsMM);
 
+		/*
 		javax.swing.ActionMap actionMap = org.jdesktop.application.Application
-				.getInstance(mekhq.MekHQApp.class).getContext()
+				.getInstance(mekhq.MekHQ.class).getContext()
 				.getActionMap(CampaignGUI.class, this);
 		exitMenuItem.setAction(actionMap.get("quit")); // NOI18N
 		exitMenuItem.setName("exitMenuItem"); // NOI18N
 		fileMenu.add(exitMenuItem);
+		*/
 		
 		menuBar.add(fileMenu);
 
@@ -1753,9 +1733,9 @@ public class CampaignGUI extends JPanel {
 		menuBar.add(menuMarket);
 		helpMenu.setText(resourceMap.getString("helpMenu.text")); // NOI18N
 		helpMenu.setName("helpMenu"); // NOI18N
-		aboutMenuItem.setAction(actionMap.get("showAboutBox")); // NOI18N
-		aboutMenuItem.setName("aboutMenuItem"); // NOI18N
-		helpMenu.add(aboutMenuItem);
+		//aboutMenuItem.setAction(actionMap.get("showAboutBox")); // NOI18N
+		//aboutMenuItem.setName("aboutMenuItem"); // NOI18N
+		//helpMenu.add(aboutMenuItem);
 		menuBar.add(helpMenu);
 		
 		statusPanel.setName("statusPanel"); // NOI18N
@@ -2085,7 +2065,7 @@ public class CampaignGUI extends JPanel {
 	}
 
 	private void menuSaveXmlActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuSaveActionPerformed
-		MekHQApp.logMessage("Saving campaign...");
+		MekHQ.logMessage("Saving campaign...");
 		// Choose a file...
 		File file = selectSaveCampaignFile(".xml");
 
@@ -2105,9 +2085,9 @@ public class CampaignGUI extends JPanel {
 			pw.flush();
 			pw.close();
 			fos.close();
-			MekHQApp.logMessage("Campaign saved to " + file);
+			MekHQ.logMessage("Campaign saved to " + file);
 		} catch (IOException ex) {
-			MekHQApp.logError(ex);
+			MekHQ.logError(ex);
 		}
 	}
 
@@ -2135,9 +2115,8 @@ public class CampaignGUI extends JPanel {
 		if(null == f) {
 			return;
 		}
-		DataLoadingDialog dataLoadingDialog = new DataLoadingDialog(getApplication(), f);   	
+		DataLoadingDialog dataLoadingDialog = new DataLoadingDialog(getApplication(), getFrame(), f);   	
 		//TODO: does this effectively deal with memory management issues?
-		setVisible(false);
 		dataLoadingDialog.setVisible(true);
 	}
 
@@ -2496,7 +2475,7 @@ public class CampaignGUI extends JPanel {
 
 			// Was there any error in parsing?
 			if (parser.hasWarningMessage()) {
-				MekHQApp.logMessage(parser.getWarningMessage());
+				MekHQ.logMessage(parser.getWarningMessage());
 			}
 
 			// Add the units from the file.
@@ -2610,7 +2589,7 @@ public class CampaignGUI extends JPanel {
 		}
 		Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
 		if(null != scenario) {
-			((MekHQApp)getApplication()).startHost(scenario, true, null);
+			((MekHQ)getApplication()).startHost(scenario, true, null);
 		}
 	}
 	
@@ -2656,7 +2635,7 @@ public class CampaignGUI extends JPanel {
 		}
 	
 		if(chosen.size() > 0) {
-			((MekHQApp)getApplication()).startHost(scenario, false, chosen);
+			((MekHQ)getApplication()).startHost(scenario, false, chosen);
 		}
 	}
 	
@@ -3462,6 +3441,10 @@ public class CampaignGUI extends JPanel {
 		}
 	}
 	
+	protected MekHQ getApplication() {
+		return app;
+	}
+	
 	protected Campaign getCampaign() {
 		return getApplication().getCampaign();
 	}
@@ -3482,12 +3465,8 @@ public class CampaignGUI extends JPanel {
 		return getApplication().getMechTiles();
 	}
 	
-	protected JFrame getFrame() {
+	public JFrame getFrame() {
 		return frame;
-	}
-	
-	protected MekHQApp getApplication() {
-		return app;
 	}
 	
 	protected int getSelectedTaskId() {

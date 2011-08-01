@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
-import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -21,8 +20,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.Force;
 import mekhq.campaign.Unit;
 import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.personnel.Person;
-import mekhq.gui.CampaignGUI.ForceRenderer;
 
 /**
  * A custom panel that gets filled in with goodies from a scenario object

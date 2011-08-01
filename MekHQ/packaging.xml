@@ -31,7 +31,7 @@
 
 	<!-- Name of the target jarfile and the class containing the main-Method -->
 	<property name="jarfile" value="MekHQ.jar" />
-	<property name="jarmainclass" value="mekhq.MekHQApp" />
+	<property name="jarmainclass" value="mekhq.MekHQ" />
 
 	<!-- This is the relative path to the 'data' directory -->
 	<property name="dataclasspath" value="." />

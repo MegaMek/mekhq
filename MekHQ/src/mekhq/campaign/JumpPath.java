@@ -25,7 +25,7 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import mekhq.MekHQApp;
+import mekhq.MekHQ;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -176,7 +176,7 @@ public class JumpPath implements Serializable {
 			// Errrr, apparently either the class name was invalid...
 			// Or the listed name doesn't exist.
 			// Doh!
-			MekHQApp.logError(ex);
+			MekHQ.logError(ex);
 		}
 		
 		return retVal;

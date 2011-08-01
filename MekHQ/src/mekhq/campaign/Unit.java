@@ -53,19 +53,19 @@ import megamek.common.Warship;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
-import mekhq.MekHQApp;
+import mekhq.MekHQ;
 import mekhq.campaign.parts.AeroHeatSink;
 import mekhq.campaign.parts.AeroSensor;
 import mekhq.campaign.parts.AmmoBin;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Avionics;
+import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.EquipmentPart;
 import mekhq.campaign.parts.FireControlSystem;
 import mekhq.campaign.parts.HeatSink;
 import mekhq.campaign.parts.JumpJet;
 import mekhq.campaign.parts.LandingGear;
 import mekhq.campaign.parts.MekActuator;
-import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.MekGyro;
 import mekhq.campaign.parts.MekLifeSupport;
 import mekhq.campaign.parts.MekLocation;
@@ -74,13 +74,13 @@ import mekhq.campaign.parts.MissingAeroHeatSink;
 import mekhq.campaign.parts.MissingAeroSensor;
 import mekhq.campaign.parts.MissingAmmoBin;
 import mekhq.campaign.parts.MissingAvionics;
+import mekhq.campaign.parts.MissingEnginePart;
 import mekhq.campaign.parts.MissingEquipmentPart;
 import mekhq.campaign.parts.MissingFireControlSystem;
 import mekhq.campaign.parts.MissingHeatSink;
 import mekhq.campaign.parts.MissingJumpJet;
 import mekhq.campaign.parts.MissingLandingGear;
 import mekhq.campaign.parts.MissingMekActuator;
-import mekhq.campaign.parts.MissingEnginePart;
 import mekhq.campaign.parts.MissingMekGyro;
 import mekhq.campaign.parts.MissingMekLifeSupport;
 import mekhq.campaign.parts.MissingMekLocation;
@@ -2013,17 +2013,17 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 					retVal.entity = MekHqXmlUtil.getEntityFromXmlString(wn2);
 
 					if ((retVal.id >= 0) && (retVal.entity != null)) {
-						MekHQApp.logMessage("ID pre-defined and entity not null; setting entity's ID.", 5);
+						MekHQ.logMessage("ID pre-defined and entity not null; setting entity's ID.", 5);
 						retVal.entity.setId(retVal.id);
 					} else if (retVal.entity != null) {
-						MekHQApp.logMessage("ID not pre-defined and entity not null; setting unit's ID.", 5);
+						MekHQ.logMessage("ID not pre-defined and entity not null; setting unit's ID.", 5);
 						retVal.id = retVal.entity.getId();
 					}
 				}
 			}
 		} catch (Exception ex) {
 			// Doh!
-			MekHQApp.logError(ex);
+			MekHQ.logError(ex);
 		}
 		
 		return retVal;

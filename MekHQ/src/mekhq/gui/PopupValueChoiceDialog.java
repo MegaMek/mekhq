@@ -7,8 +7,6 @@
 package mekhq.gui;
 
 import java.awt.BorderLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.util.ResourceBundle;
 

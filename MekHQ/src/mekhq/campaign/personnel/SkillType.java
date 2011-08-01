@@ -27,9 +27,6 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.common.Aero;
 import megamek.common.BattleArmor;
 import megamek.common.ConvFighter;
@@ -39,8 +36,11 @@ import megamek.common.Jumpship;
 import megamek.common.SmallCraft;
 import megamek.common.Tank;
 import megamek.common.VTOL;
-import mekhq.MekHQApp;
+import mekhq.MekHQ;
 import mekhq.campaign.MekHqXmlUtil;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * Skill type will hold static information for each skill type like base target number,
@@ -452,7 +452,7 @@ public class SkillType implements Serializable {
 			// Errrr, apparently either the class name was invalid...
 			// Or the listed name doesn't exist.
 			// Doh!
-			MekHQApp.logError(ex);
+			MekHQ.logError(ex);
 		}
 		lookupHash.put(retVal.name, retVal);
 	}

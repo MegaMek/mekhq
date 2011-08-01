@@ -7,7 +7,7 @@ import java.util.Hashtable;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import mekhq.MekHQApp;
+import mekhq.MekHQ;
 
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
@@ -70,7 +70,7 @@ public class Planets {
     }
 	
 	public Hashtable<String,Planet> generatePlanets() throws DOMException, ParseException {
-		MekHQApp.logMessage("Starting load of planetary data from XML...");
+		MekHQ.logMessage("Starting load of planetary data from XML...");
 		// Initialize variables.
 		Hashtable<String,Planet> retVal = new Hashtable<String,Planet>();
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -85,7 +85,7 @@ public class Planets {
 			// Parse using builder to get DOM representation of the XML file
 			xmlDoc = db.parse(fis);
 		} catch (Exception ex) {
-			MekHQApp.logError(ex);
+			MekHQ.logError(ex);
 		}
 	
 		Element planetEle = xmlDoc.getDocumentElement();
@@ -130,7 +130,7 @@ public class Planets {
 				}
 			}
 		}	
-		MekHQApp.logMessage("Loaded a total of " + retVal.size() + " planets");
+		MekHQ.logMessage("Loaded a total of " + retVal.size() + " planets");
 		done();
 		return retVal;
 	}

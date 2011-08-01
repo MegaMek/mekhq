@@ -55,7 +55,7 @@ import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.DirectoryItems;
-import mekhq.MekHQApp;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.Faction;
@@ -83,6 +83,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private Hashtable<String, JSpinner> hashRegSkill;
     private Hashtable<String, JSpinner> hashVetSkill;
     private Hashtable<String, JSpinner> hashEliteSkill;
+    private boolean cancelled;
 
     
     /** Creates new form CampaignOptionsDialog */
@@ -104,6 +105,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         hashRegSkill = new Hashtable<String, JSpinner>();
         hashVetSkill = new Hashtable<String, JSpinner>();
         hashEliteSkill = new Hashtable<String, JSpinner>();
+        cancelled = false;
 
         initComponents();
         setCamoIcon();
@@ -1198,7 +1200,7 @@ private void txtNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
 					int cost = Integer.parseInt((String)tableXP.getValueAt(i, j));
 					SkillType.setCost(SkillType.skillList[i],cost,j);
 				} catch (NumberFormatException e) {
-					MekHQApp.logMessage("unreadable value in skill cost table for " + SkillType.skillList[i]);
+					MekHQ.logMessage("unreadable value in skill cost table for " + SkillType.skillList[i]);
 				}
 			}
 		}
@@ -1207,7 +1209,7 @@ private void txtNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
 				int cost = Integer.parseInt(hashAbilityCosts.get(optionName).getText());
 				SkillType.setAbilityCost(optionName, cost);
 			} catch (NumberFormatException e) {
-				MekHQApp.logMessage("unreadable value in ability cost table for " + optionName);
+				MekHQ.logMessage("unreadable value in ability cost table for " + optionName);
 			}
 		}
 		//campaign.getSkillCosts().setScenarioXP((Integer)spnScenarioXP.getModel().getValue());
@@ -1237,9 +1239,14 @@ private void txtNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
 
 
 	private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
-	    this.setVisible(false);
+	    cancelled = true;
+		this.setVisible(false);
 	}//GEN-LAST:event_btnCancelActionPerformed
 
+	public boolean wasCancelled() {
+		return cancelled;
+	}
+	
 	private void btnDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDateActionPerformed
 	    // show the date chooser
 	    DateChooser dc = new DateChooser(frame, date);

@@ -29,7 +29,7 @@ import megamek.common.Protomech;
 import megamek.common.Tank;
 import megamek.common.WeaponType;
 import megamek.common.XMLStreamParser;
-import mekhq.MekHQApp;
+import mekhq.MekHQ;
 
 import org.w3c.dom.Node;
 
@@ -673,14 +673,14 @@ public class MekHqXmlUtil {
 	public static Entity getEntityFromXmlString(Node xml)
 			throws UnsupportedEncodingException, ParseException,
 			TransformerException {
-		MekHQApp.logMessage("Executing getEntityFromXmlString(Node)...", 4);
+		MekHQ.logMessage("Executing getEntityFromXmlString(Node)...", 4);
 
 		return getEntityFromXmlString(MekHqXmlUtil.xmlToString(xml));
 	}
 
 	public static Entity getEntityFromXmlString(String xml)
 			throws UnsupportedEncodingException, ParseException {
-		MekHQApp.logMessage("Executing getEntityFromXmlString(String)...", 4);
+		MekHQ.logMessage("Executing getEntityFromXmlString(String)...", 4);
 
 		Entity retVal = null;
 
@@ -694,7 +694,7 @@ public class MekHqXmlUtil {
 		else if (ents.size() != 0)
 			retVal = ents.get(0);
 		
-		MekHQApp.logMessage("Returning "+retVal+" from getEntityFromXmlString(String)...", 4);
+		MekHQ.logMessage("Returning "+retVal+" from getEntityFromXmlString(String)...", 4);
 
 		return retVal;
 	}

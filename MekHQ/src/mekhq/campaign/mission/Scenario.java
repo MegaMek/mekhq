@@ -25,12 +25,11 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 
-import mekhq.MekHQApp;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Force;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
-import mekhq.campaign.personnel.Person;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -298,7 +297,7 @@ public class Scenario implements Serializable {
 			// Errrr, apparently either the class name was invalid...
 			// Or the listed name doesn't exist.
 			// Doh!
-			MekHQApp.logError(ex);
+			MekHQ.logError(ex);
 		}
 		
 		return retVal;

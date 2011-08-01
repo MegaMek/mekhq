@@ -50,7 +50,6 @@ import megamek.common.BattleArmor;
 import megamek.common.BattleArmorBay;
 import megamek.common.Bay;
 import megamek.common.CargoBay;
-import megamek.common.CommonConstants;
 import megamek.common.Compute;
 import megamek.common.Dropship;
 import megamek.common.Entity;
@@ -66,9 +65,7 @@ import megamek.common.MechBay;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
-import megamek.common.Pilot;
 import megamek.common.Player;
-import megamek.common.Protomech;
 import megamek.common.SmallCraftBay;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
@@ -77,7 +74,7 @@ import megamek.common.options.GameOptions;
 import megamek.common.options.IBasicOption;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
-import mekhq.MekHQApp;
+import mekhq.MekHQ;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.mission.Contract;
@@ -93,7 +90,6 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.team.MedicalTeam;
 import mekhq.campaign.team.SupportTeam;
 import mekhq.campaign.team.TechTeam;
 import mekhq.campaign.work.IAcquisitionWork;
@@ -405,7 +401,7 @@ public class Campaign implements Serializable {
 	}
 
 	private void addUnit(Unit u) {
-		MekHQApp.logMessage("Adding unit: ("+u.getId()+"):"+u, 5);
+		MekHQ.logMessage("Adding unit: ("+u.getId()+"):"+u, 5);
 		units.add(u);
 		unitIds.put(new Integer(u.getId()), u);
 		
@@ -1443,7 +1439,7 @@ public class Campaign implements Serializable {
 	 */
 	public static Campaign createCampaignFromXMLFileInputStream(FileInputStream fis)
 			throws DOMException, ParseException {
-		MekHQApp.logMessage("Starting load of campaign file from XML...");
+		MekHQ.logMessage("Starting load of campaign file from XML...");
 		// Initialize variables.
 		Campaign retVal = new Campaign();
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -1456,7 +1452,7 @@ public class Campaign implements Serializable {
 			// Parse using builder to get DOM representation of the XML file
 			xmlDoc = db.parse(fis);
 		} catch (Exception ex) {
-			MekHQApp.logError(ex);
+			MekHQ.logError(ex);
 		}
 
 		Element campaignEle = xmlDoc.getDocumentElement();
@@ -1644,20 +1640,20 @@ public class Campaign implements Serializable {
 			}
 		}
 		
-		MekHQApp.logMessage("Load of campaign file complete!");
+		MekHQ.logMessage("Load of campaign file complete!");
 
 		return retVal;
 	}
 
 	private static void processFinances(Campaign retVal, Node wn) {
-		MekHQApp.logMessage("Loading Finances from XML...", 4);
+		MekHQ.logMessage("Loading Finances from XML...", 4);
 		retVal.finances = Finances.generateInstanceFromXML(wn);
-		MekHQApp.logMessage("Load of Finances complete!");
+		MekHQ.logMessage("Load of Finances complete!");
 	}
 
 	
 	private static void processForces(Campaign retVal, Node wn) {
-		MekHQApp.logMessage("Loading Force Organization from XML...", 4);
+		MekHQ.logMessage("Loading Force Organization from XML...", 4);
 
 		NodeList wList = wn.getChildNodes();
 		
@@ -1673,7 +1669,7 @@ public class Campaign implements Serializable {
 			if (!wn2.getNodeName().equalsIgnoreCase("force")) {
 				// Error condition of sorts!
 				// Errr, what should we do here?
-				MekHQApp.logMessage("Unknown node type not loaded in Forces nodes: "+wn2.getNodeName());
+				MekHQ.logMessage("Unknown node type not loaded in Forces nodes: "+wn2.getNodeName());
 
 				continue;
 			}
@@ -1685,15 +1681,15 @@ public class Campaign implements Serializable {
 					foundForceAlready = true;
 				}
 			} else {
-				MekHQApp.logMessage("More than one type-level force found", 5);
+				MekHQ.logMessage("More than one type-level force found", 5);
 			}
 		}
 		
-		MekHQApp.logMessage("Load of Force Organization complete!");
+		MekHQ.logMessage("Load of Force Organization complete!");
 	}
 	
 	private static void processPersonnelNodes(Campaign retVal, Node wn) {
-		MekHQApp.logMessage("Loading Personnel Nodes from XML...", 4);
+		MekHQ.logMessage("Loading Personnel Nodes from XML...", 4);
 
 		NodeList wList = wn.getChildNodes();
 		
@@ -1708,7 +1704,7 @@ public class Campaign implements Serializable {
 			if (!wn2.getNodeName().equalsIgnoreCase("person")) {
 				// Error condition of sorts!
 				// Errr, what should we do here?
-				MekHQApp.logMessage("Unknown node type not loaded in Personnel nodes: "+wn2.getNodeName());
+				MekHQ.logMessage("Unknown node type not loaded in Personnel nodes: "+wn2.getNodeName());
 
 				continue;
 			}
@@ -1720,11 +1716,11 @@ public class Campaign implements Serializable {
 			}
 		}
 
-		MekHQApp.logMessage("Load Personnel Nodes Complete!", 4);
+		MekHQ.logMessage("Load Personnel Nodes Complete!", 4);
 	}
 	
 	private static void processSkillTypeNodes(Campaign retVal, Node wn) {
-		MekHQApp.logMessage("Loading Skill Type Nodes from XML...", 4);
+		MekHQ.logMessage("Loading Skill Type Nodes from XML...", 4);
 
 		NodeList wList = wn.getChildNodes();
 		
@@ -1743,7 +1739,7 @@ public class Campaign implements Serializable {
 			else if (!wn2.getNodeName().equalsIgnoreCase("skillType")) {
 				// Error condition of sorts!
 				// Errr, what should we do here?
-				MekHQApp.logMessage("Unknown node type not loaded in Skill Type nodes: "+wn2.getNodeName());
+				MekHQ.logMessage("Unknown node type not loaded in Skill Type nodes: "+wn2.getNodeName());
 
 				continue;
 			}
@@ -1751,11 +1747,11 @@ public class Campaign implements Serializable {
 			SkillType.generateInstanceFromXML(wn2);
 		}
 
-		MekHQApp.logMessage("Load Skill Type Nodes Complete!", 4);
+		MekHQ.logMessage("Load Skill Type Nodes Complete!", 4);
 	}
 	
 	private static void processKillNodes(Campaign retVal, Node wn) {
-		MekHQApp.logMessage("Loading Kill Nodes from XML...", 4);
+		MekHQ.logMessage("Loading Kill Nodes from XML...", 4);
 
 		NodeList wList = wn.getChildNodes();
 		
@@ -1770,7 +1766,7 @@ public class Campaign implements Serializable {
 			else if (!wn2.getNodeName().equalsIgnoreCase("kill")) {
 				// Error condition of sorts!
 				// Errr, what should we do here?
-				MekHQApp.logMessage("Unknown node type not loaded in Kill nodes: "+wn2.getNodeName());
+				MekHQ.logMessage("Unknown node type not loaded in Kill nodes: "+wn2.getNodeName());
 
 				continue;
 			}
@@ -1778,11 +1774,11 @@ public class Campaign implements Serializable {
 			retVal.kills.add(Kill.generateInstanceFromXML(wn2));
 		}
 
-		MekHQApp.logMessage("Load Kill Nodes Complete!", 4);
+		MekHQ.logMessage("Load Kill Nodes Complete!", 4);
 	}
 	
 	private static void processGameOptionNodes(Campaign retVal, Node wn) {
-		MekHQApp.logMessage("Loading GameOption Nodes from XML...", 4);
+		MekHQ.logMessage("Loading GameOption Nodes from XML...", 4);
 
 		NodeList wList = wn.getChildNodes();
 		
@@ -1797,7 +1793,7 @@ public class Campaign implements Serializable {
 			else if (!wn2.getNodeName().equalsIgnoreCase("gameoption")) {
 				// Error condition of sorts!
 				// Errr, what should we do here?
-				MekHQApp.logMessage("Unknown node type not loaded in Game Option nodes: "+wn2.getNodeName());
+				MekHQ.logMessage("Unknown node type not loaded in Game Option nodes: "+wn2.getNodeName());
 
 				continue;
 			}
@@ -1836,20 +1832,20 @@ public class Campaign implements Serializable {
                                     break;
                             }
                         } catch (IllegalArgumentException iaEx) {
-                        	MekHQApp.logMessage("Error trying to load option '" + name + "' with a value of '" + value + "'."); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                        	MekHQ.logMessage("Error trying to load option '" + name + "' with a value of '" + value + "'."); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                         }
                     }
                 } else {
-                	MekHQApp.logMessage("Invalid option '" + name + "' when trying to load options file."); //$NON-NLS-1$ //$NON-NLS-2$
+                	MekHQ.logMessage("Invalid option '" + name + "' when trying to load options file."); //$NON-NLS-1$ //$NON-NLS-2$
                 }
 			}
 		}
 
-		MekHQApp.logMessage("Load Game Option Nodes Complete!", 4);
+		MekHQ.logMessage("Load Game Option Nodes Complete!", 4);
 	}
 	
 	private static void processMissionNodes(Campaign retVal, Node wn) {
-		MekHQApp.logMessage("Loading Mission Nodes from XML...", 4);
+		MekHQ.logMessage("Loading Mission Nodes from XML...", 4);
 
 		NodeList wList = wn.getChildNodes();
 		
@@ -1864,7 +1860,7 @@ public class Campaign implements Serializable {
 			if (!wn2.getNodeName().equalsIgnoreCase("mission")) {
 				// Error condition of sorts!
 				// Errr, what should we do here?
-				MekHQApp.logMessage("Unknown node type not loaded in Mission nodes: "+wn2.getNodeName());
+				MekHQ.logMessage("Unknown node type not loaded in Mission nodes: "+wn2.getNodeName());
 
 				continue;
 			}
@@ -1880,11 +1876,11 @@ public class Campaign implements Serializable {
 			}
 		}
 
-		MekHQApp.logMessage("Load Mission Nodes Complete!", 4);
+		MekHQ.logMessage("Load Mission Nodes Complete!", 4);
 	}
 
 	private static void processTeamNodes(Campaign retVal, Node wn) {
-		MekHQApp.logMessage("Loading Team Nodes from XML...", 4);
+		MekHQ.logMessage("Loading Team Nodes from XML...", 4);
 
 		NodeList wList = wn.getChildNodes();
 		
@@ -1899,7 +1895,7 @@ public class Campaign implements Serializable {
 			if (!wn2.getNodeName().equalsIgnoreCase("supportTeam")) {
 				// Error condition of sorts!
 				// Errr, what should we do here?
-				MekHQApp.logMessage("Unknown node type not loaded in Team nodes: "+wn2.getNodeName());
+				MekHQ.logMessage("Unknown node type not loaded in Team nodes: "+wn2.getNodeName());
 
 				continue;
 			}
@@ -1911,11 +1907,11 @@ public class Campaign implements Serializable {
 			}
 		}
 
-		MekHQApp.logMessage("Load Team Nodes Complete!", 4);
+		MekHQ.logMessage("Load Team Nodes Complete!", 4);
 	}
 
 	private static void processUnitNodes(Campaign retVal, Node wn) {
-		MekHQApp.logMessage("Loading Unit Nodes from XML...", 4);
+		MekHQ.logMessage("Loading Unit Nodes from XML...", 4);
 
 		NodeList wList = wn.getChildNodes();
 		
@@ -1930,7 +1926,7 @@ public class Campaign implements Serializable {
 			if (!wn2.getNodeName().equalsIgnoreCase("unit")) {
 				// Error condition of sorts!
 				// Errr, what should we do here?
-				MekHQApp.logMessage("Unknown node type not loaded in Unit nodes: "+wn2.getNodeName());
+				MekHQ.logMessage("Unknown node type not loaded in Unit nodes: "+wn2.getNodeName());
 
 				continue;
 			}
@@ -1942,11 +1938,11 @@ public class Campaign implements Serializable {
 			}
 		}
 
-		MekHQApp.logMessage("Load Unit Nodes Complete!", 4);
+		MekHQ.logMessage("Load Unit Nodes Complete!", 4);
 	}
 
 	private static void processPartNodes(Campaign retVal, Node wn) {
-		MekHQApp.logMessage("Loading Part Nodes from XML...", 4);
+		MekHQ.logMessage("Loading Part Nodes from XML...", 4);
 
 		NodeList wList = wn.getChildNodes();
 		
@@ -1961,7 +1957,7 @@ public class Campaign implements Serializable {
 			if (!wn2.getNodeName().equalsIgnoreCase("part")) {
 				// Error condition of sorts!
 				// Errr, what should we do here?
-				MekHQApp.logMessage("Unknown node type not loaded in Part nodes: "+wn2.getNodeName());
+				MekHQ.logMessage("Unknown node type not loaded in Part nodes: "+wn2.getNodeName());
 
 				continue;
 			}
@@ -1972,7 +1968,7 @@ public class Campaign implements Serializable {
 				retVal.addPartWithoutId(p);
 		}
 
-		MekHQApp.logMessage("Load Part Nodes Complete!", 4);
+		MekHQ.logMessage("Load Part Nodes Complete!", 4);
 	}
 
 	/**

@@ -21,28 +21,20 @@
 
 package mekhq;
 
-import java.awt.Component;
 import java.awt.FileDialog;
-import java.awt.Frame;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.EventObject;
 
-import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
-
-import org.jdesktop.application.Application;
-import org.jdesktop.application.SingleFrameApplication;
 
 import megamek.client.ui.swing.MechTileset;
 import megamek.client.ui.swing.util.ImageFileFactory;
 import megamek.common.IGame;
-import megamek.common.MechSummaryCache;
 import megamek.common.event.GameBoardChangeEvent;
 import megamek.common.event.GameBoardNewEvent;
 import megamek.common.event.GameEndEvent;
@@ -64,19 +56,18 @@ import megamek.common.event.GameTurnChangeEvent;
 import megamek.common.util.DirectoryItems;
 import megamek.server.Server;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Planets;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.Unit;
 import mekhq.campaign.mission.Scenario;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.PortraitFileFactory;
 import mekhq.gui.ResolveWizardControlBattlefieldDialog;
-import mekhq.gui.StartUpDialog;
+import mekhq.gui.StartUpGUI;
 
 /**
  * The main class of the application.
  */
-public class MekHQApp extends SingleFrameApplication implements GameListener {
+public class MekHQ implements GameListener {
 	//TODO: This is intended as a debug/production type thing.
 	// So it should be backed down to 1 for releases...
 	// It's intended for 1 to be critical, 3 to be typical, and 5 to be debug/informational.
@@ -87,10 +78,9 @@ public class MekHQApp extends SingleFrameApplication implements GameListener {
     private GameThread gameThread = null;
     private Scenario currentScenario = null;
     
-    //the actual campaign - this is where the good stuff is
+    //the actual campaign - this is where the good stuff is  
     private Campaign campaign;
-    
-    private CampaignGUI hqView;
+    private CampaignGUI campaigngui;
     
     //the various directory items we need to access
 	private DirectoryItems portraits;
@@ -129,14 +119,19 @@ public class MekHQApp extends SingleFrameApplication implements GameListener {
 		ex.printStackTrace();
 	}
     
+	protected static MekHQ getInstance() {
+		return new MekHQ();
+	}
+	
     /**
      * At startup create and show the main frame of the application.
      */
-    @Override protected void startup() {
+    protected void startup() {
         
         //redirect output to log file
         redirectOutput();
         
+        /*
         addExitListener(new ExitListener() {
         	@Override
             public boolean canExit(EventObject e) {
@@ -155,29 +150,15 @@ public class MekHQApp extends SingleFrameApplication implements GameListener {
 
             }
         });
+        */
         //TODO: when dialogs are called up first, the frame view is not being set 
         //correctly which means that closing the main frame window does not exit the app
-        show(new StartUpDialog(this));
+        StartUpGUI sud = new StartUpGUI(this);
+        sud.setVisible(true);
     }
     
     public void showNewView() {
-    	hqView = new CampaignGUI(this);
-    }
-
-    /**
-     * This method is to initialize the specified window by injecting resources.
-     * Windows shown in our application come fully initialized from the GUI
-     * builder, so this additional configuration is not needed.
-     */
-    @Override protected void configureWindow(java.awt.Window root) {
-    }
-
-    /**
-     * A convenient static getter for the application instance.
-     * @return the instance of MekBayApp
-     */
-    public static MekHQApp getApplication() {
-        return Application.getInstance(MekHQApp.class);
+    	campaigngui = new CampaignGUI(this);
     }
 
     /**
@@ -187,11 +168,12 @@ public class MekHQApp extends SingleFrameApplication implements GameListener {
     	System.setProperty("apple.laf.useScreenMenuBar", "true");
         System.setProperty("com.apple.mrj.application.apple.menu.about.name","MekHQ");
         
-        launch(MekHQApp.class, args);       
+        MekHQ.initialize();
+        MekHQ.getInstance().startup();
+        
     }
     
-    @Override
-    protected void initialize(String[] args) {
+    protected static void initialize() {
 
     	//TODO: we can extend this with other look and feel options
         try {
@@ -275,7 +257,7 @@ public class MekHQApp extends SingleFrameApplication implements GameListener {
 		    try {
 		        mt.loadFromFile("mechset.txt");
 		    } catch (IOException ex) {
-		    	MekHQApp.logError(ex);
+		    	MekHQ.logError(ex);
 		        //TODO: do something here
 		    }
     	}
@@ -302,14 +284,14 @@ public class MekHQApp extends SingleFrameApplication implements GameListener {
         try {
             myServer = new Server("", 2346);
             if (loadSavegame) {
-                FileDialog f = new FileDialog(getMainFrame(), "Load Savegame");
+                FileDialog f = new FileDialog(campaigngui.getFrame(), "Load Savegame");
                 f.setDirectory(System.getProperty("user.dir") + "/savegames");
                 f.setVisible(true);
                 myServer.loadGame(new File(f.getDirectory(), f.getFile()));
             }
         } catch (Exception ex) {
-        	MekHQApp.logMessage("Failed to start up server properly");
-			MekHQApp.logError(ex);
+        	MekHQ.logMessage("Failed to start up server properly");
+			MekHQ.logError(ex);
             return;
         }
 
@@ -327,16 +309,16 @@ public class MekHQApp extends SingleFrameApplication implements GameListener {
     	   myServer = null;
        }
        currentScenario = null;
-       hqView.refreshScenarioList();
-       hqView.refreshOrganization();
-       hqView.refreshServicedUnitList();
-       hqView.refreshUnitList();
-       hqView.filterPersonnel();
-       hqView.refreshPersonnelList();
-       hqView.refreshPatientList();
-       hqView.refreshReport();
-       hqView.changeMission();
-       hqView.refreshFinancialTransactions();
+       campaigngui.refreshScenarioList();
+       campaigngui.refreshOrganization();
+       campaigngui.refreshServicedUnitList();
+       campaigngui.refreshUnitList();
+       campaigngui.filterPersonnel();
+       campaigngui.refreshPersonnelList();
+       campaigngui.refreshPatientList();
+       campaigngui.refreshReport();
+       campaigngui.changeMission();
+       campaigngui.refreshFinancialTransactions();
     }
 
 	@Override
@@ -398,8 +380,8 @@ public class MekHQApp extends SingleFrameApplication implements GameListener {
             if (myServer.getGame().getPhase() == IGame.Phase.PHASE_VICTORY) {
             	ResolveScenarioTracker tracker = new ResolveScenarioTracker(currentScenario, campaign);
             	tracker.setClient(gameThread.getClient());
-            	ResolveWizardControlBattlefieldDialog resolveDialog = new ResolveWizardControlBattlefieldDialog(getMainFrame(), true, tracker);
-            	show(resolveDialog);            	
+            	ResolveWizardControlBattlefieldDialog resolveDialog = new ResolveWizardControlBattlefieldDialog(campaigngui.getFrame(), true, tracker);
+            	resolveDialog.setVisible(true);            	
             }
 
         }// end try

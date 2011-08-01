@@ -23,18 +23,11 @@ package mekhq.campaign;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.TreeMap;
 
-import megamek.common.EquipmentType;
-import megamek.common.PlanetaryConditions;
-import mekhq.MekHQApp;
+import mekhq.MekHQ;
 
-import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -106,7 +99,7 @@ public class Kill implements Serializable {
 			// Errrr, apparently either the class name was invalid...
 			// Or the listed name doesn't exist.
 			// Doh!
-			MekHQApp.logError(ex);
+			MekHQ.logError(ex);
 		}
 		return retVal;
 	}

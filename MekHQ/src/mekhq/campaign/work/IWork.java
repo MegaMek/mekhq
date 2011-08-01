@@ -21,8 +21,6 @@
 package mekhq.campaign.work;
 
 import megamek.common.TargetRoll;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.team.SupportTeam;
 
 
 /**

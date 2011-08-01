@@ -24,25 +24,17 @@ package mekhq.gui;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagLayout;
-import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JRadioButton;
-import javax.swing.JSlider;
 
 import megamek.common.Entity;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.Unit;
-import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
-import mekhq.campaign.mission.Contract;
-import mekhq.campaign.personnel.Person;
 
 /**
  *

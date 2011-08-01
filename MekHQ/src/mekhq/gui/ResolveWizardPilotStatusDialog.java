@@ -29,16 +29,13 @@ import java.util.Hashtable;
 import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
-import javax.swing.JRadioButton;
 import javax.swing.JSlider;
 
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
 import mekhq.campaign.mission.Contract;
-import mekhq.campaign.personnel.Person;
 
 /**
  *

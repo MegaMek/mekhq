@@ -24,8 +24,6 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 
 import megamek.common.EquipmentType;
-import megamek.common.Tank;
-import mekhq.campaign.MekHqXmlUtil;
 
 import org.w3c.dom.Node;
 

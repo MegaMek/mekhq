@@ -20,18 +20,12 @@
 package mekhq.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.Image;
-import java.awt.Insets;
 import java.awt.MediaTracker;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.ResourceBundle;
 
 import javax.swing.ImageIcon;
@@ -42,13 +36,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
 
-import org.jdesktop.application.SingleFrameApplication;
-
-import megamek.client.ui.swing.MechTileset;
-import megamek.client.ui.swing.util.ImageFileFactory;
 import megamek.common.MechSummaryCache;
-import megamek.common.util.DirectoryItems;
-import mekhq.MekHQApp;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Planets;
 
@@ -60,13 +49,15 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
     private static final long serialVersionUID = -3454307876761238915L;
     private JProgressBar progressBar;
     Task task;
-    MekHQApp app;
+    MekHQ app;
+    JFrame frame;
     Campaign campaign;
     File fileCampaign;
     ResourceBundle resourceMap;
  
-    public DataLoadingDialog(MekHQApp app, File f) {
-        super(app.getMainFrame(), "Data Loading"); //$NON-NLS-1$
+    public DataLoadingDialog(MekHQ app, JFrame frame, File f) {
+        super(frame, "Data Loading"); //$NON-NLS-1$
+        this.frame = frame;
         this.app = app;
         this.fileCampaign = f;
         
@@ -81,10 +72,10 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         progressBar.setString(resourceMap.getString("loadPlanet.text"));
         
         // initialize splash image
-        Image imgSplash = app.getMainFrame().getToolkit().getImage("data/images/misc/mekhq-load.jpg"); //$NON-NLS-1$
+        Image imgSplash = getToolkit().getImage("data/images/misc/mekhq-load.jpg"); //$NON-NLS-1$
 
         // wait for splash image to load completely
-        MediaTracker tracker = new MediaTracker(app.getMainFrame());
+        MediaTracker tracker = new MediaTracker(frame);
         tracker.addImage(imgSplash, 0);
         try {
             tracker.waitForID(0);
@@ -99,11 +90,8 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         getContentPane().add(progressBar, BorderLayout.PAGE_END);
         
         setSize(500, 300);
-        // move to middle of screen
-        Dimension screenSize = app.getMainFrame().getToolkit().getScreenSize();
-        setLocation(screenSize.width / 2 - getSize().width / 2,
-                screenSize.height / 2 - getSize().height / 2);
-        
+        this.setLocationRelativeTo(frame);
+       
         task = new Task();
         task.addPropertyChangeListener(this);
         task.execute();
@@ -112,7 +100,9 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
     class Task extends SwingWorker<Void, Void> {
         /*
          * Main task. Executed in background thread.
-         */
+         */    	
+    	private boolean cancelled = false;
+    	
         @Override
         public Void doInBackground() {
             //Initialize progress property.
@@ -143,7 +133,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
             	newCampaign = true;
             	campaign = new Campaign();
             } else {
-            	MekHQApp.logMessage("Loading campaign file from XML...");
+            	MekHQ.logMessage("Loading campaign file from XML...");
 
         		// And then load the campaign object from it.
         		FileInputStream fis = null;
@@ -156,19 +146,26 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         			fis.close();
         		} catch (Exception ex) {
         			ex.printStackTrace();
-        			JOptionPane.showMessageDialog(app.getMainFrame(), 
+        			JOptionPane.showMessageDialog(null, 
         					"The campaign file could not be loaded.\nPlease check the log file for details.",
         					"Campaign Loading Error",
         				    JOptionPane.ERROR_MESSAGE);
-        			campaign = new Campaign();
+        			//setVisible(false);
+        			cancelled = true;
+        			cancel(true);
         		}
             }
             setProgress(4);
             if(newCampaign) {
             	setVisible(false);
-            	CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(app.getMainFrame(), true, campaign, app.getCamos());
+            	CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(frame, true, campaign, app.getCamos());
             	optionsDialog.setVisible(true);
-        		campaign.addReport("<b>" + campaign.getDateAsString() + "</b>");
+        		if(optionsDialog.wasCancelled()) {
+        			cancelled = true;
+        			cancel(true);
+        		} else {
+        			campaign.addReport("<b>" + campaign.getDateAsString() + "</b>");
+        		}
             }
             return null;
         }
@@ -178,10 +175,12 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
          */
         @Override
         public void done() {
-            //Toolkit.getDefaultToolkit().beep();
-        	app.setCampaign(campaign);
-        	app.showNewView();
         	setVisible(false);
+        	if(!cancelled) {
+        		app.setCampaign(campaign);
+        		frame.setVisible(false);
+        		app.showNewView();
+        	}	
         }
     }
 

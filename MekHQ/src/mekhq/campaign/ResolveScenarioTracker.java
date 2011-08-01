@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Random;
@@ -38,16 +37,13 @@ import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 
 import megamek.client.Client;
-import megamek.common.BattleArmor;
 import megamek.common.Compute;
 import megamek.common.Entity;
-import megamek.common.IGame;
 import megamek.common.Infantry;
 import megamek.common.Pilot;
-import megamek.common.Player;
 import megamek.common.Tank;
 import megamek.common.XMLStreamParser;
-import mekhq.MekHQApp;
+import mekhq.MekHQ;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
@@ -360,7 +356,7 @@ public class ResolveScenarioTracker {
 
 			// Was there any error in parsing?
 			if (parser.hasWarningMessage()) {
-				MekHQApp.logMessage(parser.getWarningMessage());
+				MekHQ.logMessage(parser.getWarningMessage());
 			}
 
 			// Add the units from the file.
@@ -396,7 +392,7 @@ public class ResolveScenarioTracker {
 
 			// Was there any error in parsing?
 			if (parser.hasWarningMessage()) {
-				MekHQApp.logMessage(parser.getWarningMessage());
+				MekHQ.logMessage(parser.getWarningMessage());
 			}
 
 			// Add the units from the file.		

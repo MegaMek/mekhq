@@ -48,7 +48,7 @@ import megameklab.com.ui.Mek.tabs.WeaponTab;
 import megameklab.com.util.CConfig;
 import megameklab.com.util.RefreshListener;
 import megameklab.com.util.UnitUtil;
-import mekhq.MekHQApp;
+import mekhq.MekHQ;
 
 public class MekLabPanel extends JPanel implements RefreshListener {
 
@@ -69,7 +69,7 @@ public class MekLabPanel extends JPanel implements RefreshListener {
     public MekLabPanel() {
         UnitUtil.loadFonts();
         new CConfig();
-        MekHQApp.logMessage("Staring MegaMekLab version: " + MegaMekLab.VERSION);
+        MekHQ.logMessage("Staring MegaMekLab version: " + MegaMekLab.VERSION);
 
         /*
         try {

@@ -24,14 +24,10 @@ package mekhq.campaign.team;
 import java.io.PrintWriter;
 import java.io.Serializable;
 
-import megamek.common.TargetRoll;
-import mekhq.MekHQApp;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlSerializable;
 import mekhq.campaign.MekHqXmlUtil;
-import mekhq.campaign.work.IAcquisitionWork;
-import mekhq.campaign.work.IPartWork;
-import mekhq.campaign.work.Modes;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -174,7 +170,7 @@ public abstract class SupportTeam implements Serializable, MekHqXmlSerializable 
 			// Errrr, apparently either the class name was invalid...
 			// Or the listed name doesn't exist.
 			// Doh!
-			MekHQApp.logError(ex);
+			MekHQ.logError(ex);
 		}
 		
 		return retVal;

@@ -30,8 +30,6 @@ import mekhq.campaign.MekHqXmlSerializable;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Utilities;
 import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.team.SupportTeam;
-import mekhq.campaign.team.TechTeam;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.Modes;

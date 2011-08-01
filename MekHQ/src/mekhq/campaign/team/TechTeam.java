@@ -27,11 +27,8 @@ import megamek.common.Aero;
 import megamek.common.BattleArmor;
 import megamek.common.Mech;
 import megamek.common.Tank;
-import megamek.common.TargetRoll;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
-import mekhq.campaign.parts.MissingPart;
-import mekhq.campaign.work.IPartWork;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

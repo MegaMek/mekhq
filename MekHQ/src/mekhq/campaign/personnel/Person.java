@@ -47,22 +47,16 @@ import megamek.common.VTOL;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
-import mekhq.MekHQApp;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlSerializable;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Ranks;
 import mekhq.campaign.Unit;
-import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.parts.MissingPart;
-import mekhq.campaign.team.MedicalTeam;
-import mekhq.campaign.team.SupportTeam;
 import mekhq.campaign.work.IMedicalWork;
 import mekhq.campaign.work.IPartWork;
-import mekhq.campaign.work.IWork;
 import mekhq.campaign.work.Modes;
 
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -693,7 +687,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 	                try {
 	                    retVal.getOptions().getOption(advName).setValue(value);
 	                } catch (Exception e) {
-	                    MekHQApp.logMessage("Error restoring advantage: " +  adv);
+	                    MekHQ.logMessage("Error restoring advantage: " +  adv);
 	                }
 	            }
 	        }
@@ -707,7 +701,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 	                try {
 	                    retVal.getOptions().getOption(advName).setValue(value);
 	                } catch (Exception e) {
-	                    MekHQApp.logMessage("Error restoring edge: " +  adv);
+	                    MekHQ.logMessage("Error restoring edge: " +  adv);
 	                }
 	            }
 	        }
@@ -721,7 +715,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 	                try {
 	                    retVal.getOptions().getOption(advName).setValue(value);
 	                } catch (Exception e) {
-	                    MekHQApp.logMessage("Error restoring implants: " +  adv);
+	                    MekHQ.logMessage("Error restoring implants: " +  adv);
 	                }
 	            }
 	        }
@@ -762,7 +756,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 			// Errrr, apparently either the class name was invalid...
 			// Or the listed name doesn't exist.
 			// Doh!
-			MekHQApp.logError(ex);
+			MekHQ.logError(ex);
 		}
 		
 		return retVal;

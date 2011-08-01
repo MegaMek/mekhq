@@ -25,7 +25,7 @@ import java.io.Serializable;
 import java.text.ParseException;
 import java.util.ArrayList;
 
-import mekhq.MekHQApp;
+import mekhq.MekHQ;
 import mekhq.campaign.MekHqXmlSerializable;
 import mekhq.campaign.MekHqXmlUtil;
 
@@ -257,7 +257,7 @@ public class Mission implements Serializable, MekHqXmlSerializable {
 						if (!wn3.getNodeName().equalsIgnoreCase("scenario")) {
 							// Error condition of sorts!
 							// Errr, what should we do here?
-							MekHQApp.logMessage("Unknown node type not loaded in Scenario nodes: "+wn3.getNodeName());
+							MekHQ.logMessage("Unknown node type not loaded in Scenario nodes: "+wn3.getNodeName());
 
 							continue;
 						}
@@ -270,7 +270,7 @@ public class Mission implements Serializable, MekHqXmlSerializable {
 			// Errrr, apparently either the class name was invalid...
 			// Or the listed name doesn't exist.
 			// Doh!
-			MekHQApp.logError(ex);
+			MekHQ.logError(ex);
 		}
 		
 		return retVal;

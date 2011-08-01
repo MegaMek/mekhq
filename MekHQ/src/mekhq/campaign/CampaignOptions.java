@@ -24,7 +24,7 @@ package mekhq.campaign;
 import java.io.PrintWriter;
 import java.io.Serializable;
 
-import mekhq.MekHQApp;
+import mekhq.MekHQ;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -328,7 +328,7 @@ public class CampaignOptions implements Serializable {
 	}
 
 	public static CampaignOptions generateCampaignOptionsFromXml(Node wn) {
-		MekHQApp.logMessage("Loading Campaign Options from XML...", 4);
+		MekHQ.logMessage("Loading Campaign Options from XML...", 4);
 
 		wn.normalize();
 		CampaignOptions retVal = new CampaignOptions();
@@ -342,9 +342,9 @@ public class CampaignOptions implements Serializable {
 			if (wn2.getNodeType() != Node.ELEMENT_NODE)
 				continue;
 			
-			MekHQApp.logMessage("---",5);
-			MekHQApp.logMessage(wn2.getNodeName(),5);
-			MekHQApp.logMessage("\t"+wn2.getTextContent(),5);
+			MekHQ.logMessage("---",5);
+			MekHQ.logMessage(wn2.getNodeName(),5);
+			MekHQ.logMessage("\t"+wn2.getTextContent(),5);
 
 			if (wn2.getNodeName().equalsIgnoreCase("useFactionModifiers")) {
 				if (wn2.getTextContent().equalsIgnoreCase("true"))
@@ -454,7 +454,7 @@ public class CampaignOptions implements Serializable {
 			} 
 		}
 
-		MekHQApp.logMessage("Load Campaign Options Complete!", 4);
+		MekHQ.logMessage("Load Campaign Options Complete!", 4);
 
 		return retVal;
 	}

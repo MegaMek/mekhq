@@ -10,8 +10,6 @@ import java.awt.Font;
 import java.awt.Image;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
@@ -19,7 +17,6 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
-import javax.swing.JOptionPane;
 import javax.swing.RowFilter;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -37,11 +34,8 @@ import megamek.common.MechSummaryCache;
 import megamek.common.TechConstants;
 import megamek.common.UnitType;
 import megamek.common.loaders.EntityLoadingException;
-import mekhq.MekHQApp;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Unit;
-
-import org.jdesktop.application.ResourceMap;
 
 /**
  *
@@ -386,7 +380,8 @@ public class UnitSelectorDialog extends JDialog {
 	        	hqView.refreshUnitList();
 	            hqView.refreshServicedUnitList();
 	        } else {
-	            ResourceMap resourceMap = MekHQApp.getApplication().getContext().getResourceMap(UnitSelectorDialog.class);
+	            /*
+	        	ResourceMap resourceMap = MekHQ.getApplication().getContext().getResourceMap(UnitSelectorDialog.class);
 	            String text = resourceMap.getString("NotEnoughMoneyText.text");
 	
 	            NumberFormat numberFormat = DecimalFormat.getIntegerInstance();
@@ -397,6 +392,7 @@ public class UnitSelectorDialog extends JDialog {
 	            text += System.getProperty("line.separator");
 	            text += "(Cost : " + unitCostString + ", Funds : " + fundsString + ")";
 	            JOptionPane.showMessageDialog(null, text);
+	            */
 	        }
 	    }
 	
@@ -524,8 +520,8 @@ public class UnitSelectorDialog extends JDialog {
              refreshUnitView();
         } catch (EntityLoadingException ex) {
             selectedUnit = null;
-            MekHQApp.logError("Unable to load mech: " + ms.getSourceFile() + ": " + ms.getEntryName() + ": " + ex.getMessage());
-            MekHQApp.logError(ex);
+            MekHQ.logError("Unable to load mech: " + ms.getSourceFile() + ": " + ms.getEntryName() + ": " + ex.getMessage());
+            MekHQ.logError(ex);
             refreshUnitView();
             return;
        }
@@ -562,7 +558,7 @@ public class UnitSelectorDialog extends JDialog {
             try {
                 mt.loadFromFile("mechset.txt");
             } catch (IOException ex) {
-            	MekHQApp.logError(ex);
+            	MekHQ.logError(ex);
                 //TODO: do something here
                 return;
             }
@@ -613,7 +609,7 @@ public class UnitSelectorDialog extends JDialog {
             btnBuy.removeActionListener(actionListener);
         }
 
-        ResourceMap resourceMap = MekHQApp.getInstance().getContext().getResourceMap(UnitSelectorDialog.class);
+        ResourceBundle resourceMap = ResourceBundle.getBundle("UnitSelectorDialog");
         btnBuy.setText(resourceMap.getString("btnBuy.textSelect")); // NOI18N
 
         btnBuy.addActionListener(new java.awt.event.ActionListener() {

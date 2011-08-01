@@ -26,7 +26,6 @@ import java.io.PrintWriter;
 import megamek.common.Aero;
 import megamek.common.EquipmentType;
 import megamek.common.TechConstants;
-import mekhq.campaign.MekHqXmlUtil;
 
 import org.w3c.dom.Node;
 

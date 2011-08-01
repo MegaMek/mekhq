@@ -6,42 +6,38 @@
 
 package mekhq.gui;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.MediaTracker;
+import java.awt.Toolkit;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
-import java.io.FileInputStream;
 import java.util.ResourceBundle;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.filechooser.FileFilter;
 
-import org.jdesktop.application.SingleFrameApplication;
-
-import megamek.common.MechSummaryCache;
-import mekhq.MekHQApp;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.Planets;
-
+import mekhq.MekHQ;
 /**
  *
  * @author Jay
  */
-public class StartUpDialog extends javax.swing.JDialog {
+public class StartUpGUI extends javax.swing.JPanel {
 
 	
 	private static final long serialVersionUID = 8376874926997734492L;
-	MekHQApp app;
-	/** Creates new form */
-    public StartUpDialog(MekHQApp app) {
-        super(app.getMainFrame(), true);
+	MekHQ app;
+	JFrame frame;
+    
+	public StartUpGUI(MekHQ app) {
         this.app = app;
         initComponents();      
     }
@@ -53,11 +49,7 @@ public class StartUpDialog extends javax.swing.JDialog {
      */
     private void initComponents() {
 
-
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setName("Form"); // NOI18N
-
-        setTitle("MekHQ");
+    	frame = new JFrame("MekHQ");
         
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.StartUpDialog");
         
@@ -81,10 +73,10 @@ public class StartUpDialog extends javax.swing.JDialog {
         });
         
         // initialize splash image
-        Image imgSplash = app.getMainFrame().getToolkit().getImage("data/images/misc/mekhq-splash.jpg"); //$NON-NLS-1$
+        Image imgSplash = getToolkit().getImage("data/images/misc/mekhq-splash.jpg"); //$NON-NLS-1$
 
         // wait for splash image to load completely
-        MediaTracker tracker = new MediaTracker(app.getMainFrame());
+        MediaTracker tracker = new MediaTracker(frame);
         tracker.addImage(imgSplash, 0);
         try {
             tracker.waitForID(0);
@@ -95,7 +87,7 @@ public class StartUpDialog extends javax.swing.JDialog {
         ImageIcon icon = new ImageIcon(imgSplash);
         GridBagLayout gridbag = new GridBagLayout();
         GridBagConstraints c = new GridBagConstraints();
-        getContentPane().setLayout(gridbag);
+        setLayout(gridbag);
         c.anchor = GridBagConstraints.NORTHWEST;
         c.insets = new Insets(5, 5, 5, 5);
         c.gridx = 0;
@@ -105,7 +97,7 @@ public class StartUpDialog extends javax.swing.JDialog {
         c.weighty = 0.0;
         c.gridwidth = 1;
         c.gridheight = 3;
-        getContentPane().add(new JLabel(icon), c);
+        add(new JLabel(icon), c);
         c.gridx = 1;
         c.gridheight = 1;
         c.weightx = 1.0;
@@ -113,13 +105,37 @@ public class StartUpDialog extends javax.swing.JDialog {
         c.fill = GridBagConstraints.BOTH;
         c.anchor = GridBagConstraints.NORTHWEST;
         c.gridy = 0;
-        getContentPane().add(btnNewGame,c);
+        add(btnNewGame,c);
         c.gridy++;
-        getContentPane().add(btnLoadGame,c);
+        add(btnLoadGame,c);
         c.gridy++;
-        getContentPane().add(btnQuit,c);
+        add(btnQuit,c);
         
-        pack();
+        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+	    
+        frame.setSize(600, 300);
+        
+	    // Determine the new location of the window
+	    int w = frame.getSize().width;
+	    int h = frame.getSize().height;
+	    int x = (dim.width-w)/2;
+	    int y = (dim.height-h)/2;
+	    
+	    // Move the window
+	    frame.setLocation(x, y);
+	    
+        frame.getContentPane().setLayout(new BorderLayout());
+        frame.getContentPane().add(this, BorderLayout.CENTER);
+        frame.validate();
+        
+        frame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                frame.setVisible(false);
+                System.exit(0);
+            }
+        });
+        frame.setVisible(true);
     }
 
     private void loadCampaign(boolean loadCampaign) {
@@ -130,8 +146,7 @@ public class StartUpDialog extends javax.swing.JDialog {
     			return;
     		}
     	}
-    	setVisible(false);
-    	DataLoadingDialog dataLoadingDialog = new DataLoadingDialog(app, f);   	
+    	DataLoadingDialog dataLoadingDialog = new DataLoadingDialog(app, frame, f);   	
     	dataLoadingDialog.setVisible(true);
     }
     
@@ -139,7 +154,7 @@ public class StartUpDialog extends javax.swing.JDialog {
 		JFileChooser loadCpgn = new JFileChooser(".");
 		loadCpgn.setDialogTitle("Load Campaign");
 		loadCpgn.setFileFilter(new ExtFileFilter(".xml"));
-		int returnVal = loadCpgn.showOpenDialog(app.getMainFrame());
+		int returnVal = loadCpgn.showOpenDialog(frame);
 
 		if ((returnVal != JFileChooser.APPROVE_OPTION)
 				|| (loadCpgn.getSelectedFile() == null)) {
@@ -178,5 +193,4 @@ public class StartUpDialog extends javax.swing.JDialog {
     private javax.swing.JButton btnLoadGame;
     private javax.swing.JButton btnQuit;
     // End of variables declaration//GEN-END:variables
-
 }

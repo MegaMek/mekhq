@@ -25,7 +25,7 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.Vector;
 
-import mekhq.MekHQApp;
+import mekhq.MekHQ;
 import mekhq.campaign.personnel.Person;
 
 import org.w3c.dom.NamedNodeMap;
@@ -352,7 +352,7 @@ public class Force implements Serializable {
 						if (!wn3.getNodeName().equalsIgnoreCase("force")) {
 							// Error condition of sorts!
 							// Errr, what should we do here?
-							MekHQApp.logMessage("Unknown node type not loaded in Forces nodes: "+wn3.getNodeName());
+							MekHQ.logMessage("Unknown node type not loaded in Forces nodes: "+wn3.getNodeName());
 							continue;
 						}
 						
@@ -365,7 +365,7 @@ public class Force implements Serializable {
 			// Errrr, apparently either the class name was invalid...
 			// Or the listed name doesn't exist.
 			// Doh!
-			MekHQApp.logError(ex);
+			MekHQ.logError(ex);
 		}
 		
 		return retVal;

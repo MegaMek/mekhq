@@ -23,24 +23,11 @@ package mekhq.campaign.personnel;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.StringTokenizer;
 
-import megamek.common.Pilot;
-import megamek.common.TargetRoll;
-import megamek.common.options.PilotOptions;
-import mekhq.MekHQApp;
-import mekhq.campaign.Campaign;
+import mekhq.MekHQ;
 import mekhq.campaign.MekHqXmlSerializable;
 import mekhq.campaign.MekHqXmlUtil;
-import mekhq.campaign.Ranks;
-import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.work.IMedicalWork;
-import mekhq.campaign.work.IWork;
 
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -195,7 +182,7 @@ public class Skill implements Serializable, MekHqXmlSerializable {
 			// Errrr, apparently either the class name was invalid...
 			// Or the listed name doesn't exist.
 			// Doh!
-			MekHQApp.logError(ex);
+			MekHQ.logError(ex);
 		}
 		
 		return retVal;
