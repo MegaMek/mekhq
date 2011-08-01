@@ -307,9 +307,8 @@ public class CampaignGUI extends JPanel {
 
 	public void showAboutBox() {
 		if (aboutBox == null) {
-			JFrame mainFrame = getFrame();
-			aboutBox = new MekHQAboutBox(mainFrame);
-			aboutBox.setLocationRelativeTo(mainFrame);
+			aboutBox = new MekHQAboutBox(getFrame());
+			aboutBox.setLocationRelativeTo(getFrame());
 		}
 		aboutBox.setVisible(true);
 	}
@@ -1758,9 +1757,14 @@ public class CampaignGUI extends JPanel {
 		menuBar.add(menuMarket);
 		helpMenu.setText(resourceMap.getString("helpMenu.text")); // NOI18N
 		helpMenu.setName("helpMenu"); // NOI18N
-		//aboutMenuItem.setAction(actionMap.get("showAboutBox")); // NOI18N
-		//aboutMenuItem.setName("aboutMenuItem"); // NOI18N
-		//helpMenu.add(aboutMenuItem);
+		aboutMenuItem.setName("aboutMenuItem"); // NOI18N
+		aboutMenuItem.setText("About");
+		aboutMenuItem.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				showAboutBox();
+			}
+		});
+		helpMenu.add(aboutMenuItem);
 		menuBar.add(helpMenu);
 		
 		statusPanel.setName("statusPanel"); // NOI18N

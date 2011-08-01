@@ -21,13 +21,17 @@
 
 package mekhq;
 
+import java.awt.GridBagLayout;
+import java.util.ResourceBundle;
+
+import javax.swing.JFrame;
+
 public class MekHQAboutBox extends javax.swing.JDialog {
 	private static final long serialVersionUID = -8514528257894201641L;
 
-	public MekHQAboutBox(java.awt.Frame parent) {
+	public MekHQAboutBox(JFrame parent) {
         super(parent);
         initComponents();
-        getRootPane().setDefaultButton(closeButton);
     }
 
     /** This method is called from within the constructor to
@@ -37,59 +41,74 @@ public class MekHQAboutBox extends javax.swing.JDialog {
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+		java.awt.GridBagConstraints gridBagConstraints;
 
-        closeButton = new javax.swing.JButton();
         javax.swing.JLabel appTitleLabel = new javax.swing.JLabel();
         javax.swing.JLabel versionLabel = new javax.swing.JLabel();
         javax.swing.JLabel appVersionLabel = new javax.swing.JLabel();
-        javax.swing.JLabel appVendorLabel = new javax.swing.JLabel();
         javax.swing.JLabel homepageLabel = new javax.swing.JLabel();
         javax.swing.JLabel appHomepageLabel = new javax.swing.JLabel();
         javax.swing.JLabel appDescLabel = new javax.swing.JLabel();
-        javax.swing.JLabel imageLabel = new javax.swing.JLabel();
-/*
+
+        ResourceBundle mekhqProperties = ResourceBundle.getBundle("mekhq.resources.MekHQ");
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekHQAboutBox");
+
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle(resourceMap.getString("title")); // NOI18N
-        setModal(true);
+        setTitle("MekHQ"); // NOI18N
+        setModal(false);
         setName("aboutBox"); // NOI18N
         setResizable(false);
-
-        closeButton.setAction(actionMap.get("closeAboutBox")); // NOI18N
-        closeButton.setName("closeButton"); // NOI18N
-
-        appTitleLabel.setFont(appTitleLabel.getFont().deriveFont(appTitleLabel.getFont().getStyle() | java.awt.Font.BOLD, appTitleLabel.getFont().getSize()+4));
-        appTitleLabel.setText(resourceMap.getString("Application.title")); // NOI18N
+        getContentPane().setLayout(new GridBagLayout());
+        
+        appTitleLabel.setText(mekhqProperties.getString("Application.title")); // NOI18N
         appTitleLabel.setName("appTitleLabel"); // NOI18N
-
-        versionLabel.setFont(versionLabel.getFont().deriveFont(versionLabel.getFont().getStyle() | java.awt.Font.BOLD));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.gridwidth = 2;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+		gridBagConstraints.weightx = 0.0;
+		gridBagConstraints.weighty = 0.0;
+        getContentPane().add(appTitleLabel, gridBagConstraints);
+        
         versionLabel.setText(resourceMap.getString("versionLabel.text")); // NOI18N
         versionLabel.setName("versionLabel"); // NOI18N
-
-        appVersionLabel.setText(resourceMap.getString("Application.version")); // NOI18N
+        gridBagConstraints.gridy = 1;
+		gridBagConstraints.gridwidth = 1;
+        getContentPane().add(versionLabel, gridBagConstraints);
+        
+        appVersionLabel.setText(mekhqProperties.getString("Application.version")); // NOI18N
         appVersionLabel.setName("appVersionLabel"); // NOI18N
-
-        appVendorLabel.setText(resourceMap.getString("Application.vendor")); // NOI18N
-        appVendorLabel.setName("appVendorLabel"); // NOI18N
-
-        homepageLabel.setFont(homepageLabel.getFont().deriveFont(homepageLabel.getFont().getStyle() | java.awt.Font.BOLD));
+        gridBagConstraints.gridx = 1;
+        getContentPane().add(appVersionLabel, gridBagConstraints);
+        
         homepageLabel.setText(resourceMap.getString("homepageLabel.text")); // NOI18N
         homepageLabel.setName("homepageLabel"); // NOI18N
-
-        appHomepageLabel.setText(resourceMap.getString("Application.homepage")); // NOI18N
+        gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 2;
+        getContentPane().add(homepageLabel, gridBagConstraints);
+        
+        appHomepageLabel.setText(mekhqProperties.getString("Application.homepage")); // NOI18N
         appHomepageLabel.setName("appHomepageLabel"); // NOI18N
+        gridBagConstraints.gridx = 1;
+        getContentPane().add(appHomepageLabel, gridBagConstraints);
 
-        appDescLabel.setText(resourceMap.getString("appDescLabel.text")); // NOI18N
+        
+        appDescLabel.setText(mekhqProperties.getString("Application.description")); // NOI18N
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+
         appDescLabel.setName("appDescLabel"); // NOI18N
 
-        imageLabel.setIcon(resourceMap.getIcon("imageLabel.icon")); // NOI18N
-        imageLabel.setName("imageLabel"); // NOI18N
-*/
-
+        getContentPane().add(appDescLabel, gridBagConstraints);
+        
+        setSize(200,200);
+        
         pack();
-    }// </editor-fold>//GEN-END:initComponents
-    
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton closeButton;
-    // End of variables declaration//GEN-END:variables
-    
+    }
+  
 }

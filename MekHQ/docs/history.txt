@@ -34,6 +34,7 @@ v0.1.10 (SVN)
 + MekHQApp renamed MekHQ and no longer inherits from SingleFrameApplication
 + nag when quitting
 + created gui subfolders for dialogs and views
++ really crappy about box
 
 v0.1.9 (2011-07-17)
 + beginning of personnel switch (hold on to your hats!)
