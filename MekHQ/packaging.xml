@@ -86,14 +86,6 @@
 		<!-- jar -->
 		<jar basedir="${svnbuilddir}" jarfile="${svndir}/${jarfile}" manifest="manifest.txt">
 			<fileset dir="${svndir}/${srcdir}" includes="**/*.properties"/>
-			<fileset dir="${svndir}/${srcdir}" includes="**/*.png"/>
-			<!--
-			<manifest>
-				<attribute name="Built-By" value="${user.name}" />
-				<attribute name="Class-Path" value=". ${jarclasspath}" />
-				<attribute name="Main-Class" value="${jarmainclass}" />
-			</manifest>
-			-->
 		</jar>
 
 		<!-- Ensure that the log directory exists. -->

@@ -1,3 +1,3 @@
 Manifest-Version: 1.0
-Main-Class: mekhq.MekHQApp
+Main-Class: mekhq.MekHQ
 Class-Path: . lib/TinyXML.jar MegaMek.jar MegaMekLab.jar
