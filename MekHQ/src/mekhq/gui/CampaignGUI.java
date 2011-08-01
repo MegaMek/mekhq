@@ -299,6 +299,7 @@ public class CampaignGUI extends JPanel {
 		java.awt.GridBagConstraints gridBagConstraints;
 
 		frame = new JFrame("MekHQ"); //$NON-NLS-1$
+		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		
 		mainPanel = new javax.swing.JPanel();
 		tabMain = new javax.swing.JTabbedPane();
@@ -1580,14 +1581,14 @@ public class CampaignGUI extends JPanel {
 		});
 		fileMenu.add(menuOptionsMM);
 
-		/*
-		javax.swing.ActionMap actionMap = org.jdesktop.application.Application
-				.getInstance(mekhq.MekHQ.class).getContext()
-				.getActionMap(CampaignGUI.class, this);
-		exitMenuItem.setAction(actionMap.get("quit")); // NOI18N
 		exitMenuItem.setName("exitMenuItem"); // NOI18N
+		exitMenuItem.setText("Exit");
+		exitMenuItem.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				getApplication().exit();
+			}
+		});
 		fileMenu.add(exitMenuItem);
-		*/
 		
 		menuBar.add(fileMenu);
 
@@ -1796,8 +1797,7 @@ public class CampaignGUI extends JPanel {
         frame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                frame.setVisible(false);
-                System.exit(0);
+                getApplication().exit();
             }
         });
 	}

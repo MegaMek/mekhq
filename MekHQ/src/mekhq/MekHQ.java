@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 
+import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
@@ -130,31 +131,23 @@ public class MekHQ implements GameListener {
         
         //redirect output to log file
         redirectOutput();
-        
-        /*
-        addExitListener(new ExitListener() {
-        	@Override
-            public boolean canExit(EventObject e) {
-                boolean bOkToExit = false;
-                Component source = (Component) e.getSource();
-                bOkToExit = JOptionPane.showConfirmDialog(source,
-                                "Do you really want to quit MekHQ?",
-                                "Quit?",
-                                JOptionPane.YES_NO_OPTION,
-                                JOptionPane.QUESTION_MESSAGE) ==
-                                JOptionPane.YES_OPTION;
-                return bOkToExit;
-            }
-        	@Override
-            public void willExit(EventObject event) {
-
-            }
-        });
-        */
-        //TODO: when dialogs are called up first, the frame view is not being set 
-        //correctly which means that closing the main frame window does not exit the app
+        //create a start up frame and display it
         StartUpGUI sud = new StartUpGUI(this);
         sud.setVisible(true);
+    }
+    
+    public void exit() {
+    	if(JOptionPane.showConfirmDialog(null,
+                "Do you really want to quit MekHQ?",
+                "Quit?",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE) ==
+                JOptionPane.YES_OPTION) {
+    		if(null != campaigngui) {
+        		campaigngui.getFrame().dispose();
+        	}
+        	System.exit(0);
+    	} 	
     }
     
     public void showNewView() {

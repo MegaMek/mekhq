@@ -179,6 +179,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         	if(!cancelled) {
         		app.setCampaign(campaign);
         		frame.setVisible(false);
+        		frame.dispose();
         		app.showNewView();
         	}	
         }

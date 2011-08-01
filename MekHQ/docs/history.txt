@@ -32,6 +32,7 @@ v0.1.10 (SVN)
 + replaced resourceMap with ResourceBundle in all panels and moved to mekhq.gui
 + converted MekHQView to CampaignGUI and removed FrameView
 + MekHQApp renamed MekHQ and no longer inherits from SingleFrameApplication
++ nag when quitting
 
 v0.1.9 (2011-07-17)
 + beginning of personnel switch (hold on to your hats!)
