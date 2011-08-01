@@ -9,7 +9,6 @@ package mekhq.gui;
 import java.awt.Frame;
 import java.util.ResourceBundle;
 
-import mekhq.MekHQView;
 import mekhq.campaign.Campaign;
 
 /**
@@ -19,12 +18,12 @@ import mekhq.campaign.Campaign;
 public class MissionTypeDialog extends javax.swing.JDialog {
 
 	private Campaign campaign;
-	private MekHQView hqview;
+	private CampaignGUI hqview;
 	private Frame frame;
 	
 	private static final long serialVersionUID = 8376874926997734492L;
 	/** Creates new form */
-    public MissionTypeDialog(java.awt.Frame parent, boolean modal, Campaign c, MekHQView view) {
+    public MissionTypeDialog(java.awt.Frame parent, boolean modal, Campaign c, CampaignGUI view) {
         super(parent, modal);
         frame = parent;
         this.campaign = c;

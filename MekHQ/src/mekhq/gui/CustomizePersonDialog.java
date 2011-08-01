@@ -37,7 +37,6 @@ import megamek.common.WeaponType;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
-import mekhq.MekHQView;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
@@ -67,10 +66,10 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     
     private Campaign campaign;
     
-    private MekHQView hqView;
+    private CampaignGUI hqView;
 
     /** Creates new form CustomizePilotDialog */
-    public CustomizePersonDialog(java.awt.Frame parent, boolean modal, Person person, boolean hire, Campaign campaign, MekHQView view) {
+    public CustomizePersonDialog(java.awt.Frame parent, boolean modal, Person person, boolean hire, Campaign campaign, CampaignGUI view) {
         super(parent, modal);
         this.campaign = campaign;
         this.hqView = view;

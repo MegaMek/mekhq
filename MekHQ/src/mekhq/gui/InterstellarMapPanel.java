@@ -26,7 +26,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
-import mekhq.MekHQView;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Faction;
 import mekhq.campaign.JumpPath;
@@ -49,12 +48,12 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
 	private JumpPath jumpPath;
 	private Campaign campaign;
 	InnerStellarMapConfig conf = new InnerStellarMapConfig();
-	MekHQView hqview;
+	CampaignGUI hqview;
 	private Planet selectedPlanet = null;
 	Point lastMousePos = null;
     int mouseMod = 0;
 	
-	public InterstellarMapPanel(Campaign c, MekHQView view) {
+	public InterstellarMapPanel(Campaign c, CampaignGUI view) {
 		campaign = c;
 		planets = campaign.getPlanets();
 		hqview = view;

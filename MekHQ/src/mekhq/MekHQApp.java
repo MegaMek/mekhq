@@ -68,6 +68,7 @@ import mekhq.campaign.Planets;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.Unit;
 import mekhq.campaign.mission.Scenario;
+import mekhq.gui.CampaignGUI;
 import mekhq.gui.PortraitFileFactory;
 import mekhq.gui.ResolveWizardControlBattlefieldDialog;
 import mekhq.gui.StartUpDialog;
@@ -89,7 +90,7 @@ public class MekHQApp extends SingleFrameApplication implements GameListener {
     //the actual campaign - this is where the good stuff is
     private Campaign campaign;
     
-    private MekHQView hqView;
+    private CampaignGUI hqView;
     
     //the various directory items we need to access
 	private DirectoryItems portraits;
@@ -160,8 +161,7 @@ public class MekHQApp extends SingleFrameApplication implements GameListener {
     }
     
     public void showNewView() {
-    	hqView = new MekHQView(this);
-    	show(hqView);
+    	hqView = new CampaignGUI(this);
     }
 
     /**

@@ -30,6 +30,7 @@ v0.1.10 (SVN)
 + consolidated all the *Info classes into a single BasicInfo class
 + show portraits of techs and doctors in repair bay and infirmary
 + replaced resourceMap with ResourceBundle in all panels and moved to mekhq.gui
++ converted MekHQView to CampaignGUI and removed FrameView
 
 v0.1.9 (2011-07-17)
 + beginning of personnel switch (hold on to your hats!)

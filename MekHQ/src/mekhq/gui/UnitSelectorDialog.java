@@ -38,7 +38,6 @@ import megamek.common.TechConstants;
 import megamek.common.UnitType;
 import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHQApp;
-import mekhq.MekHQView;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Unit;
 
@@ -64,10 +63,10 @@ public class UnitSelectorDialog extends JDialog {
 
     private Campaign campaign;
     
-    private MekHQView hqView;
+    private CampaignGUI hqView;
 
     /** Creates new form UnitSelectorDialog */
-    public UnitSelectorDialog(java.awt.Frame parent, boolean modal, Campaign campaign, MekHQView view) {
+    public UnitSelectorDialog(java.awt.Frame parent, boolean modal, Campaign campaign, CampaignGUI view) {
         super(parent, modal);
         unitModel = new MechTableModel();
         initComponents();

@@ -17,13 +17,12 @@ import javax.swing.BorderFactory;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
-import mekhq.MekHQView;
-import mekhq.MekHQView.ForceRenderer;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Force;
 import mekhq.campaign.Unit;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
+import mekhq.gui.CampaignGUI.ForceRenderer;
 
 /**
  * A custom panel that gets filled in with goodies from a scenario object
@@ -39,7 +38,7 @@ public class ScenarioViewPanel extends javax.swing.JPanel {
 	private Scenario scenario;
 	private Campaign campaign;
 	private Force forces;
-	private MekHQView view;
+	private CampaignGUI view;
 	
 	private javax.swing.JPanel pnlStats;
 	private javax.swing.JTextArea txtDesc;
@@ -49,7 +48,7 @@ public class ScenarioViewPanel extends javax.swing.JPanel {
 	
 	private DefaultTreeModel forceModel;
 	
-	public ScenarioViewPanel(Scenario s, Campaign c, MekHQView v) {
+	public ScenarioViewPanel(Scenario s, Campaign c, CampaignGUI v) {
 		this.scenario = s;
 		this.campaign = c;
 		this.forces = s.getForces(campaign);

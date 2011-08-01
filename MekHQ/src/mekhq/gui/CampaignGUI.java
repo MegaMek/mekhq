@@ -1,5 +1,5 @@
 /*
- * MekBayView.java
+ * MekHQView.java
  *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  *
@@ -18,18 +18,23 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq;
+package mekhq.gui;
 
 import gd.xml.ParseException;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -64,6 +69,7 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
@@ -73,7 +79,6 @@ import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
-import javax.swing.Timer;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.MouseInputAdapter;
@@ -119,6 +124,8 @@ import megamek.common.options.PilotOptions;
 import megamek.common.util.DirectoryItems;
 import megameklab.com.util.UnitPrintManager;
 
+import mekhq.MekHQAboutBox;
+import mekhq.MekHQApp;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Force;
 import mekhq.campaign.JumpPath;
@@ -146,46 +153,16 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.Modes;
-import mekhq.gui.AddFundsDialog;
-import mekhq.gui.CampaignOptionsDialog;
-import mekhq.gui.CompleteMissionDialog;
-import mekhq.gui.ContractViewPanel;
-import mekhq.gui.CustomizeMissionDialog;
-import mekhq.gui.CustomizePersonDialog;
-import mekhq.gui.CustomizeScenarioDialog;
-import mekhq.gui.DataLoadingDialog;
-import mekhq.gui.EntityImage;
-import mekhq.gui.ForceViewPanel;
-import mekhq.gui.GameOptionsDialog;
-import mekhq.gui.InterstellarMapPanel;
-import mekhq.gui.JSuggestField;
-import mekhq.gui.JumpPathViewPanel;
-import mekhq.gui.MekLabPanel;
-import mekhq.gui.MekViewDialog;
-import mekhq.gui.MenuScroller;
-import mekhq.gui.MissionTypeDialog;
-import mekhq.gui.MissionViewPanel;
-import mekhq.gui.NewKillDialog;
-import mekhq.gui.PersonViewPanel;
-import mekhq.gui.PlanetViewPanel;
-import mekhq.gui.PopupValueChoiceDialog;
-import mekhq.gui.PortraitChoiceDialog;
-import mekhq.gui.ResolveWizardChooseFilesDialog;
-import mekhq.gui.ScenarioViewPanel;
-import mekhq.gui.TextAreaDialog;
-import mekhq.gui.UnitSelectorDialog;
-import mekhq.gui.UnitViewPanel;
-
-import org.jdesktop.application.Action;
-import org.jdesktop.application.FrameView;
-import org.jdesktop.application.ResourceMap;
-import org.jdesktop.application.SingleFrameApplication;
-import org.jdesktop.application.TaskMonitor;
 
 /**
  * The application's main frame.
  */
-public class MekHQView extends FrameView {
+public class CampaignGUI extends JPanel {
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -687162569841072579L;
 	
 	//personnel filter groups
 	private static final int PG_ACTIVE =  0;
@@ -255,6 +232,10 @@ public class MekHQView extends FrameView {
 		}
 	}
 
+	private JFrame frame;
+	
+	private MekHQApp app;
+	
 	private TaskTableModel taskModel = new TaskTableModel();
 	private AcquisitionTableModel acquireModel = new AcquisitionTableModel();
 	private ServicedUnitTableModel servicedUnitModel = new ServicedUnitTableModel();
@@ -287,8 +268,9 @@ public class MekHQView extends FrameView {
 	
 	public int selectedMission = -1;
 	
-	public MekHQView(SingleFrameApplication app) {
-		super(app);
+	public CampaignGUI(MekHQApp app) {
+		
+		this.app = app;
 
 		unitMouseAdapter = new UnitTableMouseAdapter();
 		servicedUnitMouseAdapter = new ServicedUnitsTableMouseAdapter();
@@ -299,70 +281,8 @@ public class MekHQView extends FrameView {
 		scenarioMouseAdapter = new ScenarioTableMouseAdapter();
        
 		initComponents();
-		refreshCalendar();
-		       
-		// status bar initialization - message timeout, idle icon and busy
-		// animation, etc
-		ResourceMap resourceMap = getResourceMap();
-		int messageTimeout = resourceMap.getInteger("StatusBar.messageTimeout");
-		messageTimer = new Timer(messageTimeout, new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				statusMessageLabel.setText("");
-			}
-		});
-		messageTimer.setRepeats(false);
-		int busyAnimationRate = resourceMap
-				.getInteger("StatusBar.busyAnimationRate");
-		for (int i = 0; i < busyIcons.length; i++) {
-			busyIcons[i] = resourceMap
-					.getIcon("StatusBar.busyIcons[" + i + "]");
-		}
-		busyIconTimer = new Timer(busyAnimationRate, new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				busyIconIndex = (busyIconIndex + 1) % busyIcons.length;
-				statusAnimationLabel.setIcon(busyIcons[busyIconIndex]);
-			}
-		});
-		idleIcon = resourceMap.getIcon("StatusBar.idleIcon");
-		statusAnimationLabel.setIcon(idleIcon);
-		progressBar.setVisible(false);
-
-		// connecting action tasks to status bar via TaskMonitor
-		TaskMonitor taskMonitor = new TaskMonitor(getApplication().getContext());
-		taskMonitor
-				.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-					public void propertyChange(
-							java.beans.PropertyChangeEvent evt) {
-						String propertyName = evt.getPropertyName();
-						if ("started".equals(propertyName)) {
-							if (!busyIconTimer.isRunning()) {
-								statusAnimationLabel.setIcon(busyIcons[0]);
-								busyIconIndex = 0;
-								busyIconTimer.start();
-							}
-							progressBar.setVisible(true);
-							progressBar.setIndeterminate(true);
-						} else if ("done".equals(propertyName)) {
-							busyIconTimer.stop();
-							statusAnimationLabel.setIcon(idleIcon);
-							progressBar.setVisible(false);
-							progressBar.setValue(0);
-						} else if ("message".equals(propertyName)) {
-							String text = (String) (evt.getNewValue());
-							statusMessageLabel.setText((text == null) ? ""
-									: text);
-							messageTimer.restart();
-						} else if ("progress".equals(propertyName)) {
-							int value = (Integer) (evt.getNewValue());
-							progressBar.setVisible(true);
-							progressBar.setIndeterminate(false);
-							progressBar.setValue(value);
-						}
-					}
-				});
 	}
 
-	@Action
 	public void showAboutBox() {
 		if (aboutBox == null) {
 			JFrame mainFrame = MekHQApp.getApplication().getMainFrame();
@@ -380,6 +300,9 @@ public class MekHQView extends FrameView {
 	private void initComponents() {
 		java.awt.GridBagConstraints gridBagConstraints;
 
+
+		frame = new JFrame("MekHQ"); //$NON-NLS-1$
+		
 		mainPanel = new javax.swing.JPanel();
 		tabMain = new javax.swing.JTabbedPane();
 		tabTasks = new javax.swing.JTabbedPane();
@@ -499,15 +422,13 @@ public class MekHQView extends FrameView {
 		scrollMekLab = new javax.swing.JScrollPane();
 		lblLocation = new javax.swing.JLabel();
 
-		org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application
-				.getInstance(mekhq.MekHQApp.class).getContext()
-				.getResourceMap(MekHQView.class);
+		ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI");
 		tabMain.setToolTipText(resourceMap.getString("tabMain.toolTipText")); // NOI18N
 		tabMain.setMinimumSize(new java.awt.Dimension(600, 200));
 		tabMain.setName("tabMain"); // NOI18N
 		tabMain.setPreferredSize(new java.awt.Dimension(900, 300));
 
-		panOrganization.setFont(resourceMap.getFont("panHangar.font")); // NOI18N
+		panOrganization.setFont(Font.decode(resourceMap.getString("panHangar.font"))); // NOI18N
 		panOrganization.setName("panOrganization"); // NOI18N
 		panOrganization.setLayout(new java.awt.GridBagLayout());
 		
@@ -554,7 +475,7 @@ public class MekHQView extends FrameView {
 				resourceMap.getString("panOrganization.TabConstraints.tabTitle"),
 				panOrganization); // NOI18N
 		
-		panBriefing.setFont(resourceMap.getFont("panHangar.font")); // NOI18N
+		//panBriefing.setFont(resourceMap.getFont("panHangar.font")); // NOI18N
 		panBriefing.setName("panBriefing"); // NOI18N
 		panBriefing.setLayout(new java.awt.GridBagLayout());
 		
@@ -695,11 +616,11 @@ public class MekHQView extends FrameView {
 		splitMission.setOneTouchExpandable(true);
 		splitMission.setResizeWeight(1.0);
 		
-		panelScenario.setFont(resourceMap.getFont("panHangar.font")); // NOI18N
+		//panelScenario.setFont(resourceMap.getFont("panHangar.font")); // NOI18N
 		panelScenario.setName("panelScenario"); // NOI18N
 		panelScenario.setLayout(new java.awt.GridBagLayout());
 		
-		panelScenarioButtons.setFont(resourceMap.getFont("panHangar.font")); // NOI18N
+		//panelScenarioButtons.setFont(resourceMap.getFont("panHangar.font")); // NOI18N
 		panelScenarioButtons.setLayout(new java.awt.GridLayout(2,3));
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
@@ -809,7 +730,7 @@ public class MekHQView extends FrameView {
 				resourceMap.getString("panBriefing.TabConstraints.tabTitle"),
 				splitBrief); // NOI18N
 		
-		panelMapView.setFont(resourceMap.getFont("panHangar.font")); // NOI18N
+		//panelMapView.setFont(resourceMap.getFont("panHangar.font")); // NOI18N
 		panelMapView.setName("panelMapView"); // NOI18N
 		panelMapView.setLayout(new java.awt.GridBagLayout());
 		
@@ -823,7 +744,7 @@ public class MekHQView extends FrameView {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
 		panelMapView.add(lblFindPlanet, gridBagConstraints);
 		
-		suggestPlanet = new JSuggestField(this.getFrame(), getCampaign().getPlanetNames());
+		suggestPlanet = new JSuggestField(getFrame(), getCampaign().getPlanetNames());
 		suggestPlanet.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				Planet p = getCampaign().getPlanet(suggestPlanet.getText());
@@ -909,7 +830,7 @@ public class MekHQView extends FrameView {
 				resourceMap.getString("panMap.TabConstraints.tabTitle"),
 				splitMap); // NOI18N
 		
-		panPersonnel.setFont(resourceMap.getFont("panHangar.font")); // NOI18N
+		//panPersonnel.setFont(resourceMap.getFont("panHangar.font")); // NOI18N
 		panPersonnel.setName("panPersonnel"); // NOI18N
 		panPersonnel.setLayout(new java.awt.GridBagLayout());
 		
@@ -1030,7 +951,7 @@ public class MekHQView extends FrameView {
 				resourceMap.getString("panPersonnel.TabConstraints.tabTitle"),
 				panPersonnel); // NOI18N
 		
-		panHangar.setFont(resourceMap.getFont("panHangar.font")); // NOI18N
+		//panHangar.setFont(resourceMap.getFont("panHangar.font")); // NOI18N
 		panHangar.setName("panHangar"); // NOI18N
 		panHangar.setLayout(new java.awt.GridBagLayout());
 		
@@ -1149,7 +1070,7 @@ public class MekHQView extends FrameView {
 				panHangar); // NOI18N
 	
 		panSupplies.setName("panSupplies"); // NOI18N
-		panSupplies.setFont(resourceMap.getFont("panHangar.font")); // NOI18N
+		//panSupplies.setFont(resourceMap.getFont("panHangar.font")); // NOI18N
 		panSupplies.setLayout(new java.awt.GridBagLayout());
 		
 		lblPartsChoice.setText(resourceMap.getString("lblPartsChoice.text")); // NOI18N
@@ -1220,11 +1141,11 @@ public class MekHQView extends FrameView {
 				panSupplies); // NOI18N
 
 		
-		panRepairBay.setFont(resourceMap.getFont("panHangar.font")); // NOI18N
+		//panRepairBay.setFont(resourceMap.getFont("panHangar.font")); // NOI18N
 		panRepairBay.setName("panRepairBay"); // NOI18N
 		panRepairBay.setLayout(new java.awt.GridBagLayout());
 		
-		tabTasks.setToolTipText(resourceMap.getString("tabTasks.toolTipText")); // NOI18N
+		//tabTasks.setToolTipText(resourceMap.getString("tabTasks.toolTipText")); // NOI18N
 		tabTasks.setMinimumSize(new java.awt.Dimension(600, 200));
 		tabTasks.setName("tabTasks"); // NOI18N
 		tabTasks.setPreferredSize(new java.awt.Dimension(300, 300));
@@ -1328,7 +1249,7 @@ public class MekHQView extends FrameView {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
 		panRepairBay.add(btnOvertime, gridBagConstraints);
 		
-		astechPoolLabel.setFont(resourceMap.getFont("lblTargetNum.font")); // NOI18N
+		//astechPoolLabel.setFont(resourceMap.getFont("lblTargetNum.font")); // NOI18N
 		astechPoolLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 		astechPoolLabel.setText("<html><b>Astech Pool Minutes:</> " + getCampaign().getAstechPoolMinutes() + " (" + getCampaign().getNumberAstechs() + " Astechs)</html>"); // NOI18N
 		astechPoolLabel.setName("astechPoolLabel"); // NOI18N
@@ -1393,7 +1314,7 @@ public class MekHQView extends FrameView {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.SOUTH;
 		panelDoTask.add(lblTarget, gridBagConstraints);
 
-		lblTargetNum.setFont(resourceMap.getFont("lblTargetNum.font")); // NOI18N
+		//lblTargetNum.setFont(resourceMap.getFont("lblTargetNum.font")); // NOI18N
 		lblTargetNum.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 		lblTargetNum.setText(resourceMap.getString("lblTargetNum.text")); // NOI18N
 		lblTargetNum.setName("lblTargetNum"); // NOI18N
@@ -1405,10 +1326,10 @@ public class MekHQView extends FrameView {
 
 		jScrollPane6.setName("jScrollPane6"); // NOI18N
 
-		textTarget.setBackground(resourceMap.getColor("textTarget.background")); // NOI18N
+		//textTarget.setBackground(resourceMap.getColor("textTarget.background")); // NOI18N
 		textTarget.setColumns(20);
 		textTarget.setEditable(false);
-		textTarget.setFont(resourceMap.getFont("textTarget.font")); // NOI18N
+		//textTarget.setFont(resourceMap.getFont("textTarget.font")); // NOI18N
 		textTarget.setLineWrap(true);
 		textTarget.setRows(5);
 		textTarget.setText(resourceMap.getString("textTarget.text")); // NOI18N
@@ -1584,7 +1505,7 @@ public class MekHQView extends FrameView {
 		txtPaneReport.setContentType(resourceMap
 				.getString("txtPaneReport.contentType")); // NOI18N
 		txtPaneReport.setEditable(false);
-		txtPaneReport.setFont(resourceMap.getFont("txtPaneReport.font")); // NOI18N
+		//txtPaneReport.setFont(resourceMap.getFont("txtPaneReport.font")); // NOI18N
 		txtPaneReport.setText(getCampaign().getCurrentReportHTML());
 		txtPaneReport.setName("txtPaneReport"); // NOI18N
 		txtPaneReportScrollPane.setViewportView(txtPaneReport);
@@ -1683,7 +1604,7 @@ public class MekHQView extends FrameView {
 
 		javax.swing.ActionMap actionMap = org.jdesktop.application.Application
 				.getInstance(mekhq.MekHQApp.class).getContext()
-				.getActionMap(MekHQView.class, this);
+				.getActionMap(CampaignGUI.class, this);
 		exitMenuItem.setAction(actionMap.get("quit")); // NOI18N
 		exitMenuItem.setName("exitMenuItem"); // NOI18N
 		fileMenu.add(exitMenuItem);
@@ -1869,20 +1790,47 @@ public class MekHQView extends FrameView {
 		refreshTempMedics();
 		panMap.setCampaign(getCampaign());
 	
-		setComponent(mainPanel);
-		setMenuBar(menuBar);
-		setStatusBar(statusPanel);
-	}// </editor-fold>//GEN-END:initComponents
+		setLayout(new BorderLayout());
+		add(mainPanel, BorderLayout.CENTER);
+		add(statusPanel, BorderLayout.PAGE_END);
+	
+		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+	    
+        frame.setSize(1000, 800);
+        
+	    // Determine the new location of the window
+	    int w = frame.getSize().width;
+	    int h = frame.getSize().height;
+	    int x = (dim.width-w)/2;
+	    int y = (dim.height-h)/2;
+	    
+	    // Move the window
+	    frame.setLocation(x, y);
+		
+        frame.setJMenuBar(menuBar);
+        frame.getContentPane().setLayout(new BorderLayout());
+        frame.getContentPane().add(this, BorderLayout.CENTER);
+        frame.validate();
+        
+        frame.setVisible(true);
+        frame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                frame.setVisible(false);
+                System.exit(0);
+            }
+        });
+	}
 	
 	private void btnAddMissionActionPerformed(java.awt.event.ActionEvent evt) {
-		MissionTypeDialog mtd = new MissionTypeDialog(this.getFrame(), true, getCampaign(), this);
+		MissionTypeDialog mtd = new MissionTypeDialog(getFrame(), true, getCampaign(), this);
 		mtd.setVisible(true);
 	}
 	
 	private void btnEditMissionActionPerformed(java.awt.event.ActionEvent evt) {
 		Mission mission = getCampaign().getMission(selectedMission);
 		if(null != mission) {
-			CustomizeMissionDialog cmd = new CustomizeMissionDialog(this.getFrame(), true, mission, getCampaign());
+			CustomizeMissionDialog cmd = new CustomizeMissionDialog(getFrame(), true, mission, getCampaign());
 			cmd.setVisible(true);
 			if(cmd.getMissionId() != -1) {
 				selectedMission = cmd.getMissionId();
@@ -1896,7 +1844,7 @@ public class MekHQView extends FrameView {
 		Mission mission = getCampaign().getMission(selectedMission);
 		if(null != mission) {
 			if(mission.hasPendingScenarios()) {
-				JOptionPane.showMessageDialog(this.getFrame(),
+				JOptionPane.showMessageDialog(getFrame(),
 					    "You cannot complete a mission that has pending scenarios",
 					    "Pending Scenarios",
 					    JOptionPane.WARNING_MESSAGE);
@@ -2187,9 +2135,9 @@ public class MekHQView extends FrameView {
 		if(null == f) {
 			return;
 		}
-		DataLoadingDialog dataLoadingDialog = new DataLoadingDialog((MekHQApp)getApplication(), f);   	
+		DataLoadingDialog dataLoadingDialog = new DataLoadingDialog(getApplication(), f);   	
 		//TODO: does this effectively deal with memory management issues?
-		getApplication().hide(this);
+		setVisible(false);
 		dataLoadingDialog.setVisible(true);
 	}
 
@@ -2346,7 +2294,7 @@ public class MekHQView extends FrameView {
 		try {
 			loadListFile(true);
 		} catch (IOException ex) {
-			Logger.getLogger(MekHQView.class.getName()).log(Level.SEVERE, null,
+			Logger.getLogger(CampaignGUI.class.getName()).log(Level.SEVERE, null,
 					ex);
 		}
 	}// GEN-LAST:event_miLoadForcesActionPerformed
@@ -2594,7 +2542,7 @@ public class MekHQView extends FrameView {
 		if(null == scenario) {
 			return;
 		}
-		ResolveWizardChooseFilesDialog resolveDialog = new ResolveWizardChooseFilesDialog(this.getFrame(), true, new ResolveScenarioTracker(scenario, getCampaign()));
+		ResolveWizardChooseFilesDialog resolveDialog = new ResolveWizardChooseFilesDialog(getFrame(), true, new ResolveScenarioTracker(scenario, getCampaign()));
 		resolveDialog.setVisible(true);
 		
 		refreshScenarioList();
@@ -3075,7 +3023,7 @@ public class MekHQView extends FrameView {
 		}
 	}
 	
-	void filterPersonnel() {
+	public void filterPersonnel() {
         RowFilter<PersonnelTableModel, Integer> personTypeFilter = null;
         final int nGroup = choicePerson.getSelectedIndex();
         personTypeFilter = new RowFilter<PersonnelTableModel,Integer>() {
@@ -3108,7 +3056,7 @@ public class MekHQView extends FrameView {
         personnelSorter.setRowFilter(personTypeFilter);
     }
 	
-	void filterParts() {
+	public void filterParts() {
         RowFilter<PartsTableModel, Integer> partsTypeFilter = null;
         final int nGroup = choiceParts.getSelectedIndex();
         partsTypeFilter = new RowFilter<PartsTableModel,Integer>() {
@@ -3151,7 +3099,7 @@ public class MekHQView extends FrameView {
         partsSorter.setRowFilter(partsTypeFilter);
     }
 	
-	void filterUnits() {
+	public void filterUnits() {
 		RowFilter<UnitTableModel, Integer> unitTypeFilter = null;
 		final int nGroup = choiceUnit.getSelectedIndex() - 1;
         unitTypeFilter = new RowFilter<UnitTableModel,Integer>() {
@@ -3515,23 +3463,31 @@ public class MekHQView extends FrameView {
 	}
 	
 	protected Campaign getCampaign() {
-		return ((MekHQApp)getApplication()).getCampaign();
+		return getApplication().getCampaign();
 	}
 	
 	protected DirectoryItems getPortraits() {
-		return ((MekHQApp)getApplication()).getPortraits();
+		return getApplication().getPortraits();
 	}
 	
 	protected DirectoryItems getCamos() {
-		return ((MekHQApp)getApplication()).getCamos();
+		return getApplication().getCamos();
 	}
 	
 	protected DirectoryItems getForceIcons() {
-		return ((MekHQApp)getApplication()).getForceIcons();
+		return getApplication().getForceIcons();
 	}
 	
 	protected MechTileset getMechTiles() {
-		return ((MekHQApp)getApplication()).getMechTiles();
+		return getApplication().getMechTiles();
+	}
+	
+	protected JFrame getFrame() {
+		return frame;
+	}
+	
+	protected MekHQApp getApplication() {
+		return app;
 	}
 	
 	protected int getSelectedTaskId() {
@@ -4830,9 +4786,9 @@ public class MekHQView extends FrameView {
 	public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
 			ActionListener {
 		
-		private MekHQView view;
+		private CampaignGUI view;
 		
-		public PersonnelTableMouseAdapter(MekHQView view) {
+		public PersonnelTableMouseAdapter(CampaignGUI view) {
 			super();
 			this.view = view;
 		}
@@ -7266,7 +7222,7 @@ public class MekHQView extends FrameView {
 							selectedMech = (Mech) e;
 						}
 					} catch (EntityLoadingException ex) {
-						Logger.getLogger(MekHQView.class.getName())
+						Logger.getLogger(CampaignGUI.class.getName())
 								.log(Level.SEVERE, null, ex);
 					}
 
@@ -8055,13 +8011,6 @@ public class MekHQView extends FrameView {
 	private javax.swing.JLabel lblFunds;
 	private javax.swing.JLabel lblTempAstechs;
 	private javax.swing.JLabel lblTempMedics;
-
-	
-	private final Timer messageTimer;
-	private final Timer busyIconTimer;
-	private final Icon idleIcon;
-	private final Icon[] busyIcons = new Icon[15];
-	private int busyIconIndex = 0;
 
 	private JDialog aboutBox;
 }
