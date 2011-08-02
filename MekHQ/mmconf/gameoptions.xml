@@ -2,7 +2,7 @@
 <options>
    <gameoption>
       <optionname>friendly_fire</optionname>
-      <optionvalue>false</optionvalue>
+      <optionvalue>true</optionvalue>
    </gameoption>
    <gameoption>
       <optionname>skip_ineligable_movement</optionname>
@@ -30,7 +30,7 @@
    </gameoption>
    <gameoption>
       <optionname>paranoid_autosave</optionname>
-      <optionvalue>true</optionvalue>
+      <optionvalue>false</optionvalue>
    </gameoption>
    <gameoption>
       <optionname>no_force_size_mod</optionname>
@@ -38,11 +38,11 @@
    </gameoption>
    <gameoption>
       <optionname>exclusive_db_deployment</optionname>
-      <optionvalue>true</optionvalue>
+      <optionvalue>false</optionvalue>
    </gameoption>
    <gameoption>
       <optionname>deep_deployment</optionname>
-      <optionvalue>true</optionvalue>
+      <optionvalue>false</optionvalue>
    </gameoption>
    <gameoption>
       <optionname>blind_drop</optionname>
@@ -106,7 +106,7 @@
    </gameoption>
    <gameoption>
       <optionname>check_victory</optionname>
-      <optionvalue>true</optionvalue>
+      <optionvalue>false</optionvalue>
    </gameoption>
    <gameoption>
       <optionname>achieve_conditions</optionname>
@@ -182,15 +182,15 @@
    </gameoption>
    <gameoption>
       <optionname>double_blind</optionname>
-      <optionvalue>false</optionvalue>
+      <optionvalue>true</optionvalue>
    </gameoption>
    <gameoption>
       <optionname>tacops_sensors</optionname>
-      <optionvalue>false</optionvalue>
+      <optionvalue>true</optionvalue>
    </gameoption>
    <gameoption>
       <optionname>supress_all_double_blind_messages</optionname>
-      <optionvalue>false</optionvalue>
+      <optionvalue>true</optionvalue>
    </gameoption>
    <gameoption>
       <optionname>team_vision</optionname>
@@ -582,7 +582,7 @@
    </gameoption>
    <gameoption>
       <optionname>stratops_aa_fire</optionname>
-      <optionvalue>false</optionvalue>
+      <optionvalue>true</optionvalue>
    </gameoption>
    <gameoption>
       <optionname>stratops_aaa_laser</optionname>
@@ -626,7 +626,7 @@
    </gameoption>
    <gameoption>
       <optionname>aa_move_mod</optionname>
-      <optionvalue>false</optionvalue>
+      <optionvalue>true</optionvalue>
    </gameoption>
    <gameoption>
       <optionname>inf_move_even</optionname>
