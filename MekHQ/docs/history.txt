@@ -41,6 +41,8 @@ v0.1.10 (SVN)
 + added a default campaigns folder for saved campaigns
 + added PngEncoder library and source code for TinyXML
 + corrected mmconf files to default
++ trying out Nimbus look and feel
++ forgot to set default loading directory to campaigns in CampaignGUI
 
 v0.1.9 (2011-07-17)
 + beginning of personnel switch (hold on to your hats!)

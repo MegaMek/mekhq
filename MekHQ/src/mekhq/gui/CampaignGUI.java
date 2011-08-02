@@ -2128,7 +2128,7 @@ public class CampaignGUI extends JPanel {
 	}
 
 	private File selectLoadCampaignFile() {
-		JFileChooser loadCpgn = new JFileChooser(".");
+		JFileChooser loadCpgn = new JFileChooser("./campaigns/");
 		loadCpgn.setDialogTitle("Load Campaign");
 		loadCpgn.setFileFilter(new CampaignFileFilter());
 		int returnVal = loadCpgn.showOpenDialog(mainPanel);

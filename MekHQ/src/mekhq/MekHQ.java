@@ -32,6 +32,10 @@ import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.plaf.metal.MetalLookAndFeel;
+import javax.swing.plaf.multi.MultiLookAndFeel;
+
+import com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel;
 
 import megamek.client.ui.swing.MechTileset;
 import megamek.client.ui.swing.util.ImageFileFactory;
@@ -170,8 +174,9 @@ public class MekHQ implements GameListener {
 
     	//TODO: we can extend this with other look and feel options
         try {
-        	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (ClassNotFoundException e) {
+        	//UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        	UIManager.setLookAndFeel(new NimbusLookAndFeel());
+       /* } catch (ClassNotFoundException e) {
         	// TODO Auto-generated catch block
         	e.printStackTrace();
         } catch (InstantiationException e) {
@@ -179,7 +184,7 @@ public class MekHQ implements GameListener {
         	e.printStackTrace();
         } catch (IllegalAccessException e) {
         	// TODO Auto-generated catch block
-        	e.printStackTrace();
+        	e.printStackTrace();*/
         } catch (UnsupportedLookAndFeelException e) {
         	// TODO Auto-generated catch block
         	e.printStackTrace();

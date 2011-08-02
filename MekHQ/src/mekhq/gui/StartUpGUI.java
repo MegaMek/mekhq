@@ -74,7 +74,7 @@ public class StartUpGUI extends javax.swing.JPanel {
         });
         
         // initialize splash image
-        Image imgSplash = getToolkit().getImage("data/images/misc/mekhq-splash.jpg"); //$NON-NLS-1$
+        Image imgSplash = getToolkit().getImage("data/images/misc/mekhq-splash.png"); //$NON-NLS-1$
 
         // wait for splash image to load completely
         MediaTracker tracker = new MediaTracker(frame);
@@ -114,7 +114,7 @@ public class StartUpGUI extends javax.swing.JPanel {
         
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 	    
-        frame.setSize(600, 300);
+        frame.setSize(500, 350);
         
 	    // Determine the new location of the window
 	    int w = frame.getSize().width;

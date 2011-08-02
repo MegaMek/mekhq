@@ -72,7 +72,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         progressBar.setString(resourceMap.getString("loadPlanet.text"));
         
         // initialize splash image
-        Image imgSplash = getToolkit().getImage("data/images/misc/mekhq-load.jpg"); //$NON-NLS-1$
+        Image imgSplash = getToolkit().getImage("data/images/misc/mekhq-load.png"); //$NON-NLS-1$
 
         // wait for splash image to load completely
         MediaTracker tracker = new MediaTracker(frame);
