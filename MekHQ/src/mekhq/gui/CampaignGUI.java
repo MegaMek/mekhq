@@ -78,6 +78,9 @@ import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.MouseInputAdapter;
@@ -380,6 +383,7 @@ public class CampaignGUI extends JPanel {
 		menuSave = new javax.swing.JMenuItem();
 		menuOptions = new javax.swing.JMenuItem();
 		menuOptionsMM = new javax.swing.JMenuItem();
+		menuThemes = new javax.swing.JMenu();
 		javax.swing.JMenuItem exitMenuItem = new javax.swing.JMenuItem();
 		menuManage = new javax.swing.JMenu();
 		miLoadForces = new javax.swing.JMenuItem();
@@ -1583,6 +1587,10 @@ public class CampaignGUI extends JPanel {
 		});
 		fileMenu.add(menuOptionsMM);
 
+		menuThemes =new JMenu("Themes");
+		refreshThemeChoices();
+		fileMenu.add(menuThemes);
+		
 		exitMenuItem.setName("exitMenuItem"); // NOI18N
 		exitMenuItem.setText("Exit");
 		exitMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -1825,6 +1833,43 @@ public class CampaignGUI extends JPanel {
 			refreshMissions();
 		}
 		
+	}
+	
+	private void changeTheme(java.awt.event.ActionEvent evt) {
+		final String lafClassName = evt.getActionCommand();
+		Runnable runnable = new Runnable() {
+			public void run() {
+				try {
+					UIManager.setLookAndFeel(lafClassName);
+					SwingUtilities.updateComponentTreeUI(frame);
+					refreshThemeChoices();
+				} catch (Exception exception) {
+					JOptionPane.showMessageDialog(frame,
+							"Can't change look and feel",
+							"Invalid PLAF",
+							JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		};
+		SwingUtilities.invokeLater(runnable);
+	}
+	
+	private void refreshThemeChoices() {
+		menuThemes.removeAll();
+		JCheckBoxMenuItem miPlaf;
+		for(LookAndFeelInfo plaf : UIManager.getInstalledLookAndFeels()) {
+			miPlaf = new JCheckBoxMenuItem(plaf.getName());
+			if(plaf.getName().equalsIgnoreCase(UIManager.getLookAndFeel().getName())) {
+				miPlaf.setSelected(true);
+			}
+			menuThemes.add(miPlaf);
+			miPlaf.setActionCommand(plaf.getClassName());
+			miPlaf.addActionListener(new java.awt.event.ActionListener() {
+				public void actionPerformed(java.awt.event.ActionEvent evt) {
+					changeTheme(evt);
+				}
+			});
+		}
 	}
 	
 	private void btnCompleteMissionActionPerformed(java.awt.event.ActionEvent evt) {
@@ -7903,6 +7948,7 @@ public class CampaignGUI extends JPanel {
 	private javax.swing.JMenu menuMarket;
 	private javax.swing.JMenuItem menuOptions;
 	private javax.swing.JMenuItem menuOptionsMM;
+	private javax.swing.JMenu menuThemes;
 	private javax.swing.JMenuItem menuSave;
 	private javax.swing.JMenuItem miHireAstechs;
 	private javax.swing.JMenuItem miFireAstechs;
@@ -7927,7 +7973,6 @@ public class CampaignGUI extends JPanel {
 	private javax.swing.JPanel panSupplies;
 	private javax.swing.JPanel panelDoTask;
 	private javax.swing.JPanel panelMapView;
-	private javax.swing.JProgressBar progressBar;
 	private javax.swing.JScrollPane scrollDocTable;
 	private javax.swing.JScrollPane scrollPatientTable;
 	private javax.swing.JScrollPane scrollTaskTable;
@@ -7938,8 +7983,6 @@ public class CampaignGUI extends JPanel {
 	private javax.swing.JScrollPane scrollScenarioTable;
 	private javax.swing.JScrollPane scrollUnitTable;
 	private javax.swing.JScrollPane scrollFinanceTable;
-	private javax.swing.JLabel statusAnimationLabel;
-	private javax.swing.JLabel statusMessageLabel;
 	private javax.swing.JPanel statusPanel;
 	private javax.swing.JTabbedPane tabMain;
 	private javax.swing.JTabbedPane tabTasks;

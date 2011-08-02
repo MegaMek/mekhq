@@ -174,9 +174,8 @@ public class MekHQ implements GameListener {
 
     	//TODO: we can extend this with other look and feel options
         try {
-        	//UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        	UIManager.setLookAndFeel(new NimbusLookAndFeel());
-       /* } catch (ClassNotFoundException e) {
+        	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+       } catch (ClassNotFoundException e) {
         	// TODO Auto-generated catch block
         	e.printStackTrace();
         } catch (InstantiationException e) {
@@ -184,7 +183,7 @@ public class MekHQ implements GameListener {
         	e.printStackTrace();
         } catch (IllegalAccessException e) {
         	// TODO Auto-generated catch block
-        	e.printStackTrace();*/
+        	e.printStackTrace();
         } catch (UnsupportedLookAndFeelException e) {
         	// TODO Auto-generated catch block
         	e.printStackTrace();
