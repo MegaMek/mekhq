@@ -106,11 +106,11 @@
 				<include name="${logdir}/" />
 				<include name="${datadir}/" />
 				<include name="${docdir}/" />
+				<include name="campaigns/" />
+				<include name="campaigns/FoxsTeeth.cpnx" />
 				<include name="MegaMek.jar" />
 				<include name="MegaMekLab.jar" />
 				<include name="README.txt" />
-				<include name="Example.mul" />
-				<include name="FoxsTeeth.xml" />
 				<include name="SubmitBug.html" />
 				<include name="license.txt" />
 			</fileset>

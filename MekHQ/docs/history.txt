@@ -37,6 +37,8 @@ v0.1.10 (SVN)
 + really crappy about box
 + updated MM.jar and MML.jar
 + new build.xml (this one works)
++ changed xml save suffix to cpnx (and updated FoxsTeeth to it)
++ added a default campaigns folder for saved campaigns
 
 v0.1.9 (2011-07-17)
 + beginning of personnel switch (hold on to your hats!)

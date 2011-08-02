@@ -232,27 +232,6 @@ public class CampaignGUI extends JPanel {
 	private static final int UV_DETAILS = 1;
 	private static final int UV_STATUS  = 2;
 	private static final int UV_NUM     = 3;
-	
-	class ExtFileFilter extends FileFilter {
-		private String useExt = null;
-
-		public ExtFileFilter(String ext) {
-			useExt = ext;
-		}
-
-		@Override
-		public boolean accept(File dir) {
-			if (dir.isDirectory()) {
-				return true;
-			}
-			return dir.getName().endsWith(useExt);
-		}
-
-		@Override
-		public String getDescription() {
-			return "campaign file (" + useExt + ")";
-		}
-	}
 
 	private JFrame frame;
 	
@@ -2095,7 +2074,7 @@ public class CampaignGUI extends JPanel {
 	private void menuSaveXmlActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuSaveActionPerformed
 		MekHQ.logMessage("Saving campaign...");
 		// Choose a file...
-		File file = selectSaveCampaignFile(".xml");
+		File file = selectSaveCampaignFile();
 
 		if (file == null) {
 			// I want a file, y'know!
@@ -2119,12 +2098,12 @@ public class CampaignGUI extends JPanel {
 		}
 	}
 
-	private File selectSaveCampaignFile(String fileExt) {
-		JFileChooser saveCpgn = new JFileChooser(".");
+	private File selectSaveCampaignFile() {
+		JFileChooser saveCpgn = new JFileChooser("./campaigns/");
 		saveCpgn.setDialogTitle("Save Campaign");
-		saveCpgn.setFileFilter(new ExtFileFilter(fileExt));
+		saveCpgn.setFileFilter(new CampaignFileFilter());
 		saveCpgn.setSelectedFile(new File(getCampaign().getName()
-				+ getCampaign().getShortDateAsString() + fileExt)); //$NON-NLS-1$
+				+ getCampaign().getShortDateAsString() + ".cpnx")); //$NON-NLS-1$
 		int returnVal = saveCpgn.showSaveDialog(mainPanel);
 
 		if ((returnVal != JFileChooser.APPROVE_OPTION)
@@ -2139,7 +2118,7 @@ public class CampaignGUI extends JPanel {
 	}
 
 	private void menuLoadXmlActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuLoadActionPerformed
-		File f = selectLoadCampaignFile(".xml");
+		File f = selectLoadCampaignFile();
 		if(null == f) {
 			return;
 		}
@@ -2148,10 +2127,10 @@ public class CampaignGUI extends JPanel {
 		dataLoadingDialog.setVisible(true);
 	}
 
-	private File selectLoadCampaignFile(String fileExt) {
+	private File selectLoadCampaignFile() {
 		JFileChooser loadCpgn = new JFileChooser(".");
 		loadCpgn.setDialogTitle("Load Campaign");
-		loadCpgn.setFileFilter(new ExtFileFilter(fileExt));
+		loadCpgn.setFileFilter(new CampaignFileFilter());
 		int returnVal = loadCpgn.showOpenDialog(mainPanel);
 
 		if ((returnVal != JFileChooser.APPROVE_OPTION)

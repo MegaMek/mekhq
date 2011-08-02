@@ -152,9 +152,9 @@ public class StartUpGUI extends javax.swing.JPanel {
     }
     
     private File selectLoadCampaignFile() {
-		JFileChooser loadCpgn = new JFileChooser(".");
+		JFileChooser loadCpgn = new JFileChooser("./campaigns/");
 		loadCpgn.setDialogTitle("Load Campaign");
-		loadCpgn.setFileFilter(new ExtFileFilter(".xml"));
+		loadCpgn.setFileFilter(new CampaignFileFilter());
 		int returnVal = loadCpgn.showOpenDialog(frame);
 
 		if ((returnVal != JFileChooser.APPROVE_OPTION)
@@ -166,27 +166,6 @@ public class StartUpGUI extends javax.swing.JPanel {
 		File file = loadCpgn.getSelectedFile();
 
 		return file;
-	}
-    
-    class ExtFileFilter extends FileFilter {
-		private String useExt = null;
-
-		public ExtFileFilter(String ext) {
-			useExt = ext;
-		}
-
-		@Override
-		public boolean accept(File dir) {
-			if (dir.isDirectory()) {
-				return true;
-			}
-			return dir.getName().endsWith(useExt);
-		}
-
-		@Override
-		public String getDescription() {
-			return "campaign file (" + useExt + ")";
-		}
 	}
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
