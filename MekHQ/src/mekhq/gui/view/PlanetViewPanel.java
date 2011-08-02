@@ -217,7 +217,7 @@ public class PlanetViewPanel extends javax.swing.JPanel {
 		gridBagConstraints.weightx = 0.5;
 		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
 		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
 		pnlStats.add(txtStarType, gridBagConstraints);
 		
 		lblJumpPoint.setName("lblJumpPoint"); // NOI18N

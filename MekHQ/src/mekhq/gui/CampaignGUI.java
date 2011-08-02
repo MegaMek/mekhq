@@ -587,6 +587,7 @@ public class CampaignGUI extends JPanel {
 		
 		scenarioTable.setModel(scenarioModel);
 		scenarioTable.setName("scenarioTable"); // NOI18N
+		scenarioTable.setShowGrid(false);
 		scenarioTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         //scenarioTable.setRowSorter(new TableRowSorter<ScenarioTableModel>(scenarioModel));
 		scenarioTable.addMouseListener(scenarioMouseAdapter);
@@ -908,6 +909,7 @@ public class CampaignGUI extends JPanel {
             column.setCellRenderer(personModel.getRenderer());
         }
         personnelTable.setIntercellSpacing(new Dimension(0, 0));
+		personnelTable.setShowGrid(false);
         changePersonnelView();
         personnelTable.getSelectionModel().addListSelectionListener(new javax.swing.event.ListSelectionListener() {
             public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
@@ -1026,6 +1028,7 @@ public class CampaignGUI extends JPanel {
             column.setCellRenderer(unitModel.getRenderer());
         }
         unitTable.setIntercellSpacing(new Dimension(0, 0));
+		unitTable.setShowGrid(false);
         changeUnitView();
         unitTable.getSelectionModel().addListSelectionListener(new javax.swing.event.ListSelectionListener() {
             public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
@@ -1107,6 +1110,7 @@ public class CampaignGUI extends JPanel {
             column.setCellRenderer(partsModel.getRenderer());
         }
         partsTable.setIntercellSpacing(new Dimension(0, 0));
+		partsTable.setShowGrid(false);
 		partsTable.getSelectionModel().addListSelectionListener(
 				new javax.swing.event.ListSelectionListener() {
 					public void valueChanged(
@@ -1450,6 +1454,7 @@ public class CampaignGUI extends JPanel {
 			column.setCellRenderer(financeModel.getRenderer());
 		}
         financeTable.setIntercellSpacing(new Dimension(0, 0));
+		financeTable.setShowGrid(false);
         scrollFinanceTable.setName("scrollFinanceTable");
         scrollFinanceTable.setViewportView(financeTable);
         

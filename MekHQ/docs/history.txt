@@ -44,6 +44,7 @@ v0.1.10 (SVN)
 + trying out Nimbus look and feel
 + forgot to set default loading directory to campaigns in CampaignGUI
 + menu items to choose look and feel from available L&F
++ get rid of grid lines in Tables
 
 v0.1.9 (2011-07-17)
 + beginning of personnel switch (hold on to your hats!)
