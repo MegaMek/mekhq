@@ -824,6 +824,7 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.gridy = 0;
 		gridBagConstraints.weightx = 0.0;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+		gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
 		panPersonnel.add(lblPersonChoice, gridBagConstraints);
 		
 		DefaultComboBoxModel personGroupModel = new DefaultComboBoxModel();
@@ -845,6 +846,7 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.weightx = 0.0;
 		gridBagConstraints.weighty = 0.0;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+		gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
 		panPersonnel.add(choicePerson, gridBagConstraints);
 			
 		lblPersonView.setText(resourceMap.getString("lblPersonView.text")); // NOI18N
@@ -853,6 +855,7 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.gridx = 2;
 		gridBagConstraints.gridy = 0;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+		gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
 		panPersonnel.add(lblPersonView, gridBagConstraints);
 		
 		DefaultComboBoxModel personViewModel = new DefaultComboBoxModel();
@@ -874,6 +877,7 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 0.0;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+		gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
 		panPersonnel.add(choicePersonView, gridBagConstraints);
 		
 		personnelTable.setModel(personModel);
@@ -945,6 +949,7 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.gridy = 0;
 		gridBagConstraints.weightx = 0.0;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+		gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
 		panHangar.add(lblUnitChoice, gridBagConstraints);
 		
 		DefaultComboBoxModel unitGroupModel = new DefaultComboBoxModel();
@@ -966,6 +971,7 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 		gridBagConstraints.weightx = 0.0;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+		gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
 		panHangar.add(choiceUnit, gridBagConstraints);
 			
 		lblUnitView.setText(resourceMap.getString("lblUnitView.text")); // NOI18N
@@ -974,6 +980,7 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.gridx = 2;
 		gridBagConstraints.gridy = 0;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+		gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
 		panHangar.add(lblUnitView, gridBagConstraints);
 		
 		DefaultComboBoxModel unitViewModel = new DefaultComboBoxModel();
@@ -994,6 +1001,7 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+		gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
 		panHangar.add(choiceUnitView, gridBagConstraints);
 		
 		unitTable.setModel(unitModel);
@@ -1063,6 +1071,7 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.gridy = 0;
 		gridBagConstraints.weightx = 0.0;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 0);
 		panSupplies.add(lblPartsChoice, gridBagConstraints);
 		
 		DefaultComboBoxModel partsGroupModel = new DefaultComboBoxModel();
@@ -1084,6 +1093,7 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 0.0;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 0);
 		panSupplies.add(choiceParts, gridBagConstraints);
 		
 		partsTable.setModel(partsModel);

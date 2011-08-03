@@ -48,6 +48,7 @@ v0.1.10 (SVN)
 + beginning of a parts store dialog
 + gridlayout for mission buttons
 + better display of planetary neighbors in PlanetViewPanel
++ insets for view objects in Personnel, Unit, and Parts tab
 
 v0.1.9 (2011-07-17)
 + beginning of personnel switch (hold on to your hats!)
