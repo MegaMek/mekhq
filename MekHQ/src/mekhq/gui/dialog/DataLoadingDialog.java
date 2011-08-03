@@ -89,7 +89,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         getContentPane().add(splash, BorderLayout.CENTER);
         getContentPane().add(progressBar, BorderLayout.PAGE_END);
         
-        setSize(500, 300);
+        setSize(500, 350);
         this.setLocationRelativeTo(frame);
        
         task = new Task();

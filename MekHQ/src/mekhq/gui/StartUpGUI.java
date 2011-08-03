@@ -41,7 +41,7 @@ public class StartUpGUI extends javax.swing.JPanel {
     
 	public StartUpGUI(MekHQ app) {
         this.app = app;
-        lastSave = Utilities.lastFileModified("./campaigns/", new FilenameFilter() {
+        lastSave = Utilities.lastFileModified(MekHQ.CAMPAIGN_DIRECTORY, new FilenameFilter() {
             public boolean accept(File dir, String name) {
                 return name.toLowerCase().endsWith(".cpnx") || name.toLowerCase().endsWith(".xml");
             }
@@ -168,7 +168,7 @@ public class StartUpGUI extends javax.swing.JPanel {
     }
     
     private File selectLoadCampaignFile() {
-		JFileChooser loadCpgn = new JFileChooser("./campaigns/");
+		JFileChooser loadCpgn = new JFileChooser(MekHQ.CAMPAIGN_DIRECTORY);
 		loadCpgn.setDialogTitle("Load Campaign");
 		loadCpgn.setFileFilter(new CampaignFileFilter());
 		int returnVal = loadCpgn.showOpenDialog(frame);
@@ -188,5 +188,4 @@ public class StartUpGUI extends javax.swing.JPanel {
     private javax.swing.JButton btnLoadGame;
     private javax.swing.JButton btnLastSave;
     private javax.swing.JButton btnQuit;
-    private javax.swing.JPanel panBtns;
 }

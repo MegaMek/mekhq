@@ -24,10 +24,13 @@ package mekhq;
 import java.awt.FileDialog;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Properties;
 
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
@@ -73,6 +76,8 @@ public class MekHQ implements GameListener {
 	// So it should be backed down to 1 for releases...
 	// It's intended for 1 to be critical, 3 to be typical, and 5 to be debug/informational.
 	public static int VERBOSITY_LEVEL = 5;
+	public static String CAMPAIGN_DIRECTORY = "./campaigns/";
+	public static String PROPERTIES_FILE = "mmconf/mekhq.properties";
 	
 	//stuff related to MM games
     private Server myServer = null;
@@ -88,6 +93,8 @@ public class MekHQ implements GameListener {
     private DirectoryItems camos;
     private DirectoryItems forceIcons;
 	protected static MechTileset mt;
+	
+	private Properties preferences;
 	
 	/**
 	 * Designed to centralize output and logging.
@@ -128,9 +135,9 @@ public class MekHQ implements GameListener {
      * At startup create and show the main frame of the application.
      */
     protected void startup() {
-        
-        //redirect output to log file
-        redirectOutput();
+        //read in preferences
+    	readPreferences();
+    	setLookAndFeel();
         //create a start up frame and display it
         StartUpGUI sud = new StartUpGUI(this);
         sud.setVisible(true);
@@ -146,6 +153,7 @@ public class MekHQ implements GameListener {
     		if(null != campaigngui) {
         		campaigngui.getFrame().dispose();
         	}
+    		savePreferences();
         	System.exit(0);
     	} 	
     }
@@ -159,32 +167,55 @@ public class MekHQ implements GameListener {
      */
     public static void main(String[] args) {
     	System.setProperty("apple.laf.useScreenMenuBar", "true");
-        System.setProperty("com.apple.mrj.application.apple.menu.about.name","MekHQ");
-        
-        MekHQ.initialize();
-        MekHQ.getInstance().startup();
-        
+        System.setProperty("com.apple.mrj.application.apple.menu.about.name","MekHQ");  
+        //redirect output to log file
+        redirectOutput();
+        MekHQ.getInstance().startup();      
     }
     
-    protected static void initialize() {
-
-    	//TODO: we can extend this with other look and feel options
+    protected static Properties setDefaultPreferences() {
+    	Properties defaults = new Properties();
+    	defaults.setProperty("laf", UIManager.getSystemLookAndFeelClassName());
+    	return defaults;
+    }
+    
+    protected void readPreferences() {
+    	preferences = new Properties(setDefaultPreferences());
         try {
-        	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-       } catch (ClassNotFoundException e) {
-        	// TODO Auto-generated catch block
-        	e.printStackTrace();
-        } catch (InstantiationException e) {
-        	// TODO Auto-generated catch block
-        	e.printStackTrace();
-        } catch (IllegalAccessException e) {
-        	// TODO Auto-generated catch block
-        	e.printStackTrace();
-        } catch (UnsupportedLookAndFeelException e) {
-        	// TODO Auto-generated catch block
-        	e.printStackTrace();
+            preferences.load(new FileInputStream(PROPERTIES_FILE));
+            MekHQ.logMessage("loading mekhq properties from " + PROPERTIES_FILE);
+        } catch (FileNotFoundException e) {
+            MekHQ.logMessage("No mekhq properties file found. Reverting to defaults.");
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-		
+    }
+    
+    protected void savePreferences() {
+    	preferences.setProperty("laf", UIManager.getLookAndFeel().getClass().getName());
+    	try {
+			preferences.store(new FileOutputStream(PROPERTIES_FILE), "MekHQ Preferences");
+		} catch (FileNotFoundException e) {
+			MekHQ.logMessage("could not save preferences to " + PROPERTIES_FILE);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
+    
+    protected void setLookAndFeel() {
+    	//TODO: we can extend this with other look and feel options
+    	try {
+    		UIManager.setLookAndFeel(preferences.getProperty("laf"));
+    	} catch (ClassNotFoundException e) {
+    		e.printStackTrace();
+    	} catch (InstantiationException e) {
+    		e.printStackTrace();
+    	} catch (IllegalAccessException e) {
+    		e.printStackTrace();
+    	} catch (UnsupportedLookAndFeelException e) {
+        	e.printStackTrace();
+        }		
     }
     
     /**
