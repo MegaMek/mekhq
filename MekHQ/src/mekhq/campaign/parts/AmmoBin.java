@@ -29,9 +29,9 @@ import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Mounted;
 import megamek.common.TargetRoll;
+import mekhq.Utilities;
 import mekhq.campaign.Era;
 import mekhq.campaign.MekHqXmlUtil;
-import mekhq.campaign.Utilities;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.work.IAcquisitionWork;
 

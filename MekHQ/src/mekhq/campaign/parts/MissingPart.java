@@ -26,9 +26,9 @@ import java.io.Serializable;
 
 import megamek.common.EquipmentType;
 import megamek.common.TargetRoll;
+import mekhq.Utilities;
 import mekhq.campaign.MekHqXmlSerializable;
 import mekhq.campaign.MekHqXmlUtil;
-import mekhq.campaign.Utilities;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;

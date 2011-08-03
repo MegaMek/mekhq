@@ -19,8 +19,10 @@
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq.campaign;
+package mekhq;
 
+import java.io.File;
+import java.io.FilenameFilter;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -157,4 +159,19 @@ public class Utilities {
 		String text = numberFormat.format(value) + " C-Bills";
 		return text;
 	}
+	
+	public static File lastFileModified(String dir, FilenameFilter filter) {
+        File fl = new File(dir);
+        File[] files = fl.listFiles(filter);
+        //File[] files = fl.listFiles();
+        long lastMod = Long.MIN_VALUE;
+        File choice = null;
+        for (File file : files) {
+                if (file.lastModified() > lastMod) {
+                        choice = file;
+                        lastMod = file.lastModified();
+                }
+        }
+        return choice;
+    }
 }
