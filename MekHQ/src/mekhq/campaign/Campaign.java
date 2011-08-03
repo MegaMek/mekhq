@@ -953,6 +953,9 @@ public class Campaign implements Serializable {
 			unit.remove(p);
 		}
 
+		//remove unit from any forces
+		removeUnitFromForce(unit);
+		
 		// finally remove the unit
 		units.remove(unit);
 		unitIds.remove(new Integer(unit.getId()));
