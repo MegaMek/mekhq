@@ -113,6 +113,9 @@ public class Campaign implements Serializable {
 	// we will use the same basic system (borrowed from MegaMek) for tracking
 	// all three
 	// OK now we have more, parts, personnel, forces, missions, and scenarios.
+	//TODO: do we really need to track this in an array and hashtable? 
+	//It seems like we could track in a hashtable and then iterate through the keys of the hash
+	//to create an arraylist on demand
 	private ArrayList<SupportTeam> teams = new ArrayList<SupportTeam>();
 	private Hashtable<Integer, SupportTeam> teamIds = new Hashtable<Integer, SupportTeam>();
 	private ArrayList<Unit> units = new ArrayList<Unit>();
@@ -176,6 +179,8 @@ public class Campaign implements Serializable {
 
 	private CurrentLocation location;
 	
+	private PartsStore partsStore;
+	
 	private CampaignOptions campaignOptions = new CampaignOptions();
 
 	public Campaign() {
@@ -200,6 +205,7 @@ public class Campaign implements Serializable {
 		astechPool = 0;
 		medicPool = 0;
 		resetAstechMinutes();
+		partsStore = new PartsStore();
 		gameOptions = new GameOptions();
 		gameOptions.initialize();
 	}
@@ -2820,6 +2826,10 @@ public class Campaign implements Serializable {
             }
         });
 		return personalKills;
+	}
+	
+	public PartsStore getPartsStore() {
+		return partsStore;
 	}
 	
 }
