@@ -322,6 +322,7 @@ public class CampaignGUI extends JPanel {
 		scenarioTable = new javax.swing.JTable();
 		scrollMissionView = new javax.swing.JScrollPane();
 		scrollScenarioView = new javax.swing.JScrollPane();
+		panelMissionButtons = new javax.swing.JPanel();
 		lblMission = new javax.swing.JLabel();
 		choiceMission = new javax.swing.JComboBox();
 		btnAddMission = new javax.swing.JButton();
@@ -483,9 +484,10 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 0;
-		gridBagConstraints.weightx = 1.0;
-		gridBagConstraints.weighty = 0.0;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.CENTER;
+		gridBagConstraints.weightx = 0.0;
+		gridBagConstraints.weighty = 0.0;
 		panBriefing.add(lblMission, gridBagConstraints);
 		
 		refreshMissions();
@@ -497,11 +499,22 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 1;
-		gridBagConstraints.gridwidth = 1;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+		gridBagConstraints.weightx = 1.0;
+		gridBagConstraints.weighty = 0.0;
+		panBriefing.add(choiceMission, gridBagConstraints);	
+		
+		
+		panelMissionButtons.setLayout(new java.awt.GridLayout(2,3));
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 1;
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.gridheight = 2;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 0.0;
-		panBriefing.add(choiceMission, gridBagConstraints);
+		panBriefing.add(panelMissionButtons, gridBagConstraints);	
 		
 		btnAddMission.setText(resourceMap.getString("btnAddMission.text")); // NOI18N
 		btnAddMission.setToolTipText(resourceMap
@@ -512,14 +525,7 @@ public class CampaignGUI extends JPanel {
 				btnAddMissionActionPerformed(evt);
 			}
 		});
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 0;
-		gridBagConstraints.gridwidth = 1;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.weightx = 1.0;
-		gridBagConstraints.weighty = 0.0;
-		panBriefing.add(btnAddMission, gridBagConstraints);
+		panelMissionButtons.add(btnAddMission);
 		
 		btnAddScenario.setText(resourceMap.getString("btnAddScenario.text")); // NOI18N
 		btnAddScenario.setToolTipText(resourceMap
@@ -530,14 +536,9 @@ public class CampaignGUI extends JPanel {
 				btnAddScenarioActionPerformed(evt);
 			}
 		});
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 2;
-		gridBagConstraints.gridy = 0;
-		gridBagConstraints.gridwidth = 1;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.weightx = 1.0;
-		gridBagConstraints.weighty = 0.0;
-		panBriefing.add(btnAddScenario, gridBagConstraints);
+		panelMissionButtons.add(btnAddScenario);
+		
+		
 		
 		btnEditMission.setText(resourceMap.getString("btnEditMission.text")); // NOI18N
 		btnEditMission.setToolTipText(resourceMap
@@ -548,14 +549,7 @@ public class CampaignGUI extends JPanel {
 				btnEditMissionActionPerformed(evt);
 			}
 		});
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 1;
-		gridBagConstraints.gridwidth = 1;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.weightx = 1.0;
-		gridBagConstraints.weighty = 0.0;
-		panBriefing.add(btnEditMission, gridBagConstraints);
+		panelMissionButtons.add(btnEditMission);
 		
 		btnCompleteMission.setText(resourceMap.getString("btnCompleteMission.text")); // NOI18N
 		btnCompleteMission.setToolTipText(resourceMap
@@ -566,21 +560,14 @@ public class CampaignGUI extends JPanel {
 				btnCompleteMissionActionPerformed(evt);
 			}
 		});
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 2;
-		gridBagConstraints.gridy = 1;
-		gridBagConstraints.gridwidth = 1;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-		gridBagConstraints.weightx = 1.0;
-		gridBagConstraints.weighty = 0.0;
-		panBriefing.add(btnCompleteMission, gridBagConstraints);
+		panelMissionButtons.add(btnCompleteMission);
 		
 		scrollMissionView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollMissionView.setViewportView(null);
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 2;
-		gridBagConstraints.gridwidth = 3;
+		gridBagConstraints.gridwidth = 2;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 1.0;
@@ -702,8 +689,8 @@ public class CampaignGUI extends JPanel {
 		panelScenarioButtons.add(btnClearAssignedUnits);
 		
 		scrollScenarioView.setViewportView(null);
-		scrollScenarioView.setMinimumSize(new java.awt.Dimension(550, 600));
-		scrollScenarioView.setPreferredSize(new java.awt.Dimension(550, 600));
+		scrollScenarioView.setMinimumSize(new java.awt.Dimension(450, 600));
+		scrollScenarioView.setPreferredSize(new java.awt.Dimension(450, 600));
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 1;
@@ -714,7 +701,7 @@ public class CampaignGUI extends JPanel {
 		
 		splitBrief = new javax.swing.JSplitPane(javax.swing.JSplitPane.HORIZONTAL_SPLIT, splitMission, panelScenario);
 		splitBrief.setOneTouchExpandable(true);
-		splitBrief.setResizeWeight(1.0);
+		splitBrief.setResizeWeight(0.5);
 		splitBrief.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent pce) {
@@ -7793,6 +7780,7 @@ public class CampaignGUI extends JPanel {
     private javax.swing.JComboBox choiceMission;
 	private javax.swing.JScrollPane scrollMissionView;
 	private javax.swing.JScrollPane scrollScenarioView;
+	private javax.swing.JPanel panelMissionButtons;
 	private javax.swing.JPanel panelScenarioButtons;
 	private javax.swing.JButton btnAddScenario;
 	private javax.swing.JButton btnAddMission;

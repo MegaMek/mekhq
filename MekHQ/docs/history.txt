@@ -46,6 +46,8 @@ v0.1.10 (SVN)
 + menu items to choose look and feel from available L&F
 + get rid of grid lines in Tables
 + beginning of a parts store dialog
++ gridlayout for mission buttons
++ better display of planetary neighbors in PlanetViewPanel
 
 v0.1.9 (2011-07-17)
 + beginning of personnel switch (hold on to your hats!)
