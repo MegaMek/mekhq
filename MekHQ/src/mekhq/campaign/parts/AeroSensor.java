@@ -53,6 +53,10 @@ public class AeroSensor extends Part {
         this.name = "Aerospace Sensors";
         this.dropship = drop;
     }
+    
+    public AeroSensor clone() {
+    	return new AeroSensor(getUnitTonnage(), dropship);
+    }
         
 	@Override
 	public void updateConditionFromEntity() {

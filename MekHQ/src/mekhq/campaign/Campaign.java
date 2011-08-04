@@ -1227,17 +1227,12 @@ public class Campaign implements Serializable {
 		return getFunds() >= cost;
 	}
 	
-	public boolean buyUnit(Entity en, boolean allowNewPilots) {
+	public void buyUnit(Entity en) {
 		int cost = new Unit(en, this).getBuyCost();
-
-		if (hasEnoughFunds(cost) || !campaignOptions.payForUnits()) {
-			addUnit(en, allowNewPilots);
-			if(campaignOptions.payForUnits()) {
-				finances.debit(cost, Transaction.C_UNIT, "Purchased " + en.getDisplayName(), calendar.getTime());
-			}
-			return true;
-		} else
-			return false;
+		addUnit(en, false);	
+		if(campaignOptions.payForUnits()) {
+			finances.debit(cost, Transaction.C_UNIT, "Purchased " + en.getDisplayName(), calendar.getTime());
+		}
 	}
 
 	public void sellUnit(int id) {

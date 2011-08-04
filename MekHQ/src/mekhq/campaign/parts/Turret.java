@@ -57,6 +57,10 @@ public class Turret extends TankLocation {
     	this.name = "Turret";
     }
     
+    public Turret clone() {
+    	return new Turret(0, getUnitTonnage());
+    }
+    
     public Turret(int loc, int tonnage, double weight) {
         super(loc, tonnage);
         this.weight = weight;

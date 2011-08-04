@@ -43,6 +43,10 @@ public class Rotor extends TankLocation {
         this.time = 120;
         this.difficulty = 2;
     }
+    
+    public Rotor clone() {
+    	return new Rotor(getUnitTonnage());
+    }
  
     @Override
     public boolean isSamePartTypeAndStatus (Part part) {

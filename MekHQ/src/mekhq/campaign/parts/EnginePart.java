@@ -53,6 +53,10 @@ public class EnginePart extends Part {
 		this.engine = e;
 		this.name = engine.getEngineName() + " Engine";
 	}
+	
+	public EnginePart clone() {
+		return new EnginePart(0, engine);
+	}
 
 	public Engine getEngine() {
 		return engine;

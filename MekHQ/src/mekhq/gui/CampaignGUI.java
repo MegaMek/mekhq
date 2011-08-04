@@ -2344,8 +2344,7 @@ public class CampaignGUI extends JPanel {
 	}// GEN-LAST:event_miLoadForcesActionPerformed
 
 	private void miPurchaseUnitActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miPurchaseUnitActionPerformed
-		UnitSelectorDialog usd = new UnitSelectorDialog(getFrame(), true,
-				getCampaign(), this);
+		UnitSelectorDialog usd = new UnitSelectorDialog(true, this);
 
 		if (!getCampaign().isGM()) {
 			usd.restrictToYear(getCampaign().getCalendar().get(Calendar.YEAR));
@@ -2361,7 +2360,7 @@ public class CampaignGUI extends JPanel {
 	}// GEN-LAST:event_miPurchaseUnitActionPerformed
 
 	private void buyParts() {
-		PartsStoreDialog psd = new PartsStoreDialog(getFrame(), true, getCampaign());
+		PartsStoreDialog psd = new PartsStoreDialog(true, this);
 		psd.setVisible(true);
 		refreshPartsList();
 		refreshAcquireList();
@@ -3517,7 +3516,7 @@ public class CampaignGUI extends JPanel {
 		return app;
 	}
 	
-	protected Campaign getCampaign() {
+	public Campaign getCampaign() {
 		return getApplication().getCampaign();
 	}
 	

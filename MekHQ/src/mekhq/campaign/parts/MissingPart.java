@@ -56,6 +56,11 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		this.checkedToday = false;
 	}
 	
+	public MissingPart clone() {
+		//should never be called
+		return null;
+	}
+	
 	@Override
 	public long getCurrentValue() {
 		//missing parts aren't worth a thing

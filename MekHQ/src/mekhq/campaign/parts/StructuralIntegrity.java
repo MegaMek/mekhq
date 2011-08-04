@@ -56,6 +56,10 @@ public class StructuralIntegrity extends Part {
 		this.name = "Structural Integrity";
 	}
 	
+	public StructuralIntegrity clone() {
+		return new StructuralIntegrity(getUnitTonnage());
+	}
+	
 	
 	@Override
 	public int getAvailability(int era) {

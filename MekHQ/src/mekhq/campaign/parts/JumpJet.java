@@ -43,6 +43,10 @@ public class JumpJet extends EquipmentPart {
         // account for compatibility)
         super(tonnage, et, equipNum);
     }
+    
+    public JumpJet clone() {
+    	return new JumpJet(getUnitTonnage(), getType(), getEquipmentNum());
+    }
 	
     @Override
     public double getTonnage() {

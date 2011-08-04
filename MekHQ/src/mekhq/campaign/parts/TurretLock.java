@@ -46,6 +46,10 @@ public class TurretLock extends Part {
 		this.difficulty = -1;
 	}
 	
+	public TurretLock clone() {
+		return new TurretLock();
+	}
+	
 	@Override
 	public int getAvailability(int era) {
 		return 0;

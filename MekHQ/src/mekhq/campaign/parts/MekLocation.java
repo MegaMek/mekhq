@@ -49,6 +49,10 @@ public class MekLocation extends Part {
     	this(0, 0, 0, false, false);
     }
     
+    public MekLocation clone() {
+    	return new MekLocation(loc, getUnitTonnage(), structureType, tsm, forQuad);
+    }
+    
     public int getLoc() {
         return loc;
     }

@@ -48,6 +48,10 @@ public class VeeStabiliser extends Part {
         this.loc = loc;
         this.name = "Vehicle Stabiliser";
     }
+	
+	public VeeStabiliser clone() {
+		return new VeeStabiliser(getUnitTonnage(), 0);
+	}
 
     @Override
     public boolean isSamePartTypeAndStatus (Part part) {

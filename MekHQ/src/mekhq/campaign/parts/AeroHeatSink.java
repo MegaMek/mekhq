@@ -56,6 +56,10 @@ public class AeroHeatSink extends Part {
             this.name = "Aero Double Heat Sink";
         }
     }
+    
+    public AeroHeatSink clone() {
+    	return new AeroHeatSink(getUnitTonnage(), type);
+    }
         
 	@Override
 	public void updateConditionFromEntity() {

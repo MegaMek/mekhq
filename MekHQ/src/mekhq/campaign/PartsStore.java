@@ -78,6 +78,7 @@ public class PartsStore implements Serializable {
         for (Enumeration<EquipmentType> e = EquipmentType.getAllTypes(); e.hasMoreElements();) {
             EquipmentType et = e.nextElement();
             parts.add(new EquipmentPart(0, et, -1));
+            //TODO: ammo, heat sinks, and jump jets needed to use their own constructors
             /*
             if ((et instanceof WeaponType)) {
                 weapons.add(et.getName());

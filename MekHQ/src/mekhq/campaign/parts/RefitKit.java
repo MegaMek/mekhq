@@ -42,6 +42,10 @@ public class RefitKit extends Part {
     	this(0, null, null, 0);
     }
     
+    public RefitKit clone() {
+    	return new RefitKit();
+    }
+    
     public RefitKit (int tonnage, String sourceName, String targetName, long cost) {
         super(tonnage);
         this.sourceName = sourceName;

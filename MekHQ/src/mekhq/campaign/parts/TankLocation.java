@@ -44,6 +44,10 @@ public class TankLocation extends Part {
     	this(0, 0);
     }
     
+    public TankLocation clone() {
+    	return new TankLocation(loc, getUnitTonnage());
+    }
+    
     public int getLoc() {
         return loc;
     }

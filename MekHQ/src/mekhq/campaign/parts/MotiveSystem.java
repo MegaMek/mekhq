@@ -57,6 +57,10 @@ public class MotiveSystem extends Part {
 		this.difficulty = -1;
 	}
 	
+	public MotiveSystem clone() {
+		return new MotiveSystem();
+	}
+	
 	@Override
 	public int getAvailability(int era) {
 		// TODO Auto-generated method stub

@@ -44,6 +44,10 @@ public class HeatSink extends EquipmentPart {
         super(tonnage, et, equipNum);
     }
     
+    public HeatSink clone() {
+    	return new HeatSink(getUnitTonnage(), getType(), getEquipmentNum());
+    }
+    
     /**
      * Copied from megamek.common.Entity.getWeaponsAndEquipmentCost(StringBuffer detail, boolean ignoreAmmo)
      *

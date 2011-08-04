@@ -46,6 +46,10 @@ public class MekLifeSupport extends Part {
         this.name = "Mech Life Support System";
     }
 	
+	public MekLifeSupport clone() {
+		return new MekLifeSupport(getUnitTonnage());
+	}
+	
 	@Override
 	public double getTonnage() {
 		//TODO: what should this tonnage be?

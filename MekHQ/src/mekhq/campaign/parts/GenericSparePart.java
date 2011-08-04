@@ -50,6 +50,10 @@ public class GenericSparePart extends Part {
         this.tech = tech;
         this.amount = amount;
     }
+    
+    public GenericSparePart clone() {
+    	return new GenericSparePart(tech, amount);
+    }
 
     public int getAmount() {
         return amount;

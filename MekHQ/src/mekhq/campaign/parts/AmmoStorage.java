@@ -59,6 +59,10 @@ public class AmmoStorage extends EquipmentPart {
 
     }
     
+    public AmmoStorage clone() {
+    	return new AmmoStorage();
+    }
+    
     @Override
     public double getTonnage() {
     	return ((double)shots / ((AmmoType)type).getShots());

@@ -61,18 +61,17 @@ public class UnitSelectorDialog extends JDialog {
     private CampaignGUI hqView;
 
     /** Creates new form UnitSelectorDialog */
-    public UnitSelectorDialog(java.awt.Frame parent, boolean modal, Campaign campaign, CampaignGUI view) {
-        super(parent, modal);
+    public UnitSelectorDialog(boolean modal, CampaignGUI view) {
+        super(view.getFrame(), modal);
         unitModel = new MechTableModel();
         initComponents();
 
-        this.campaign = campaign;
-
         this.hqView = view;
+        this.campaign = hqView.getCampaign();
         
         MechSummary [] allMechs = MechSummaryCache.getInstance().getAllMechs();
         setMechs(allMechs);
-        setLocationRelativeTo(parent);
+        setLocationRelativeTo(view.getFrame());
     }
 
     /** This method is called from within the constructor to
@@ -372,31 +371,12 @@ public class UnitSelectorDialog extends JDialog {
 	private void btnBuyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuyActionPerformed
 	    Entity en = getSelectedEntity();
 	    if(null != en) {
-	        if (campaign.isGM()) {
-	            //FIXME: we should not do this here or players will accidently
-	            //buy units for free with GM mode turned on. It should be a
-	            //separate button
-	            campaign.addUnit(en, false);
-	        } else if (campaign.buyUnit(en, false)) {
-	        	hqView.refreshUnitList();
-	            hqView.refreshServicedUnitList();
-	        } else {
-	            /*
-	        	ResourceMap resourceMap = MekHQ.getApplication().getContext().getResourceMap(UnitSelectorDialog.class);
-	            String text = resourceMap.getString("NotEnoughMoneyText.text");
-	
-	            NumberFormat numberFormat = DecimalFormat.getIntegerInstance();
-	            int unitCost = (new Unit(en, campaign)).getBuyCost();
-	            String unitCostString = numberFormat.format(unitCost) + " " + (unitCost!=0?"CBills":"CBill");
-	            String fundsString = numberFormat.format(campaign.getFunds()) + " " + (campaign.getFunds()!=0?"CBills":"CBill");
-	            
-	            text += System.getProperty("line.separator");
-	            text += "(Cost : " + unitCostString + ", Funds : " + fundsString + ")";
-	            JOptionPane.showMessageDialog(null, text);
-	            */
-	        }
+	        campaign.buyUnit(en);
+	        hqView.refreshUnitList();
+	        hqView.refreshServicedUnitList();
+	        hqView.refreshFinancialTransactions();
+	        hqView.refreshReport();
 	    }
-	
 	    // Necessary if the used wants to buy the same unit twice without reselecting it
 	    UnitChanged(null);
 	}//GEN-LAST:event_btnBuyActionPerformed
@@ -413,24 +393,6 @@ public class UnitSelectorDialog extends JDialog {
 	private void checkCanonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkCanonActionPerformed
 	    filterUnits();
 	}//GEN-LAST:event_checkCanonActionPerformed
-
-    /**
-    * @param args the command line arguments
-    */
-    public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                UnitSelectorDialog dialog = new UnitSelectorDialog(new javax.swing.JFrame(), true, null, null);
-                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                    @Override
-                    public void windowClosing(java.awt.event.WindowEvent e) {
-                        System.exit(0);
-                    }
-                });
-                dialog.setVisible(true);
-            }
-        });
-    }
 
     private void filterUnits() {
         RowFilter<MechTableModel, Integer> unitTypeFilter = null;

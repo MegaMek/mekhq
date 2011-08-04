@@ -72,6 +72,10 @@ public class Armor extends Part implements IAcquisitionWork {
         }
     }
     
+    public Armor clone() {
+    	return new Armor();
+    }
+    
     @Override
     public double getTonnage() {
     	double armorPerTon = 16.0 * EquipmentType.getArmorPointMultiplier(type, isClanTechBase());

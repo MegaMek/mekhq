@@ -60,6 +60,7 @@ import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.MekSensor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.TankLocation;
+import mekhq.gui.CampaignGUI;
 
 /**
  *
@@ -84,6 +85,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 	
     private Frame frame;
     private Campaign campaign;
+    private CampaignGUI campaignGUI;
     private DecimalFormat formatter;
     private PartsTableModel partsModel;
 	private TableRowSorter<PartsTableModel> partsSorter;
@@ -94,18 +96,21 @@ public class PartsStoreDialog extends javax.swing.JDialog {
     private JComboBox choiceParts;
 	private JLabel lblPartsChoice;
     private JPanel panButtons;
+    private JButton btnAdd;
+    private JButton btnBuyBulk;
     private JButton btnBuy;
     private JButton btnClose;
     
     /** Creates new form NewTeamDialog */
-    public PartsStoreDialog(java.awt.Frame parent, boolean modal, Campaign c) {
-        super(parent, modal);
-        this.frame = parent;  
-        campaign = c;
+    public PartsStoreDialog(boolean modal, CampaignGUI gui) {
+        super(gui.getFrame(), modal);
+        this.frame = gui.getFrame();  
+        this.campaignGUI = gui;
+        campaign = campaignGUI.getCampaign();
         formatter = new DecimalFormat();
         partsModel = new PartsTableModel(campaign.getPartsStore().getInventory());
         initComponents();
-        setLocationRelativeTo(parent);
+        setLocationRelativeTo(frame);
     }
 
     private void initComponents() {
@@ -161,10 +166,23 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 		getContentPane().add(panFilter, BorderLayout.PAGE_START);
 		
 		panButtons = new JPanel();
+		btnAdd = new JButton(resourceMap.getString("btnAdd.text"));
+		btnAdd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addPart(false, false);
+            }
+        });
+		btnAdd.setEnabled(campaignGUI.getCampaign().isGM());
+		btnBuyBulk = new JButton(resourceMap.getString("btnBuyBulk.text"));
+		btnBuyBulk.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            	addPart(true, true);
+            }
+        });
 		btnBuy = new JButton(resourceMap.getString("btnBuy.text"));
 		btnBuy.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                buyPart();
+                addPart(true, false);
             }
         });
 		btnClose = new JButton(resourceMap.getString("btnClose.text"));
@@ -174,7 +192,9 @@ public class PartsStoreDialog extends javax.swing.JDialog {
             }
         });
 		panButtons.setLayout(new GridBagLayout());
+		panButtons.add(btnBuyBulk, new GridBagConstraints());
 		panButtons.add(btnBuy, new GridBagConstraints());
+		panButtons.add(btnAdd, new GridBagConstraints());
 		panButtons.add(btnClose, new GridBagConstraints());
 		getContentPane().add(panButtons, BorderLayout.PAGE_END);
         pack();
@@ -222,8 +242,29 @@ public class PartsStoreDialog extends javax.swing.JDialog {
     }
 
     
-    private void buyPart() {
-    	//IMPLEMENT ME
+    private void addPart(boolean purchase, boolean bulk) {
+    	int row = partsTable.getSelectedRow();
+		if(row < 0) {
+			return;
+		}
+		Part selectedPart = partsModel.getPartAt(partsTable.convertRowIndexToModel(row));
+		int quantity = 1;
+		if(bulk) {
+			PopupValueChoiceDialog pcd = new PopupValueChoiceDialog(campaignGUI.getFrame(), true, "How Many " + selectedPart.getName(), quantity, 1, 100);
+			pcd.setVisible(true);
+			quantity = pcd.getValue();
+		}
+		while(quantity > 0) {
+			if(purchase) {
+				campaign.buyPart(selectedPart.clone(), selectedPart.getCurrentValue());
+			} else {
+				campaign.addPart(selectedPart.clone());
+			}
+			quantity--;
+		}
+		campaignGUI.refreshAcquireList();
+		campaignGUI.refreshPartsList();
+		campaignGUI.refreshFinancialTransactions();
     }
     
     public static String getPartsGroupName(int group) {

@@ -78,6 +78,10 @@ public class EquipmentPart extends Part {
         this.equipmentNum = equipNum;
     }
 
+    public EquipmentPart clone() {
+    	return new EquipmentPart(getUnitTonnage(), type, equipmentNum);
+    }
+    
     @Override
     public double getTonnage() {
     	Entity en = null;

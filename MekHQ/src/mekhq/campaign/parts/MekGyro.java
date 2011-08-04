@@ -52,6 +52,10 @@ public class MekGyro extends Part {
         this.walkMP = walkMP;
     }
     
+    public MekGyro clone() {
+    	return new MekGyro(getUnitTonnage(), type, walkMP);
+    }
+    
     public int getType() {
         return type;
     }

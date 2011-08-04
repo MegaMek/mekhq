@@ -586,5 +586,8 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	public void setShorthandedMod(int i) {
 		shorthandedMod = i;
 	}
+	
+	@Override
+	public abstract Part clone();
 }
 

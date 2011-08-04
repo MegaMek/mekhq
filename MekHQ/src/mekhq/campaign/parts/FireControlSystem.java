@@ -49,6 +49,10 @@ public class FireControlSystem extends Part {
         this.name = "Fire Control System";
     }
         
+    public FireControlSystem clone() {
+    	return new FireControlSystem(0);
+    }
+    
 	@Override
 	public void updateConditionFromEntity() {
 		if(null != unit && unit.getEntity() instanceof Aero) {

@@ -46,6 +46,10 @@ public class MekSensor extends Part {
         this.name = "Mech Sensors";
     }
 	
+	public MekSensor clone() {
+		return new MekSensor(getUnitTonnage());
+	}
+	
 	@Override
 	public double getTonnage() {
 		//TODO: what should this tonnage be?

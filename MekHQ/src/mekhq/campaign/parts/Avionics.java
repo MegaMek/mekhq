@@ -48,6 +48,10 @@ public class Avionics extends Part {
         super(tonnage);
         this.name = "Avionics";
     }
+    
+    public Avionics clone() {
+    	return new Avionics();
+    }
         
 	@Override
 	public void updateConditionFromEntity() {

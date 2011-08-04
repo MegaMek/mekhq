@@ -44,6 +44,10 @@ public class VeeSensor extends Part {
         this.name = "Vehicle Sensors";
     }
 
+	public VeeSensor clone() {
+		return new VeeSensor(getUnitTonnage());
+	}
+	
     @Override
     public boolean isSamePartTypeAndStatus (Part part) {
         return part instanceof VeeSensor;

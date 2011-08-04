@@ -45,6 +45,10 @@ public class MekActuator extends Part {
 		this(0, 0);
 	}
 	
+	public MekActuator clone() {
+		return new MekActuator(getUnitTonnage(), type, location);
+	}
+	
     public int getType() {
         return type;
     }
