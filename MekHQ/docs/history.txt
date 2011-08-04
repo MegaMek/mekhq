@@ -54,6 +54,7 @@ v0.1.10 (SVN)
 + changed the layout of StartUpGUI so that the splash image is the background
 + use static string for campaign directory
 + mekhq.properties file (contains only L&F feel preferences for now, but expandable)
++ check campaigns subdirectories for last save
 
 v0.1.9 (2011-07-17)
 + beginning of personnel switch (hold on to your hats!)

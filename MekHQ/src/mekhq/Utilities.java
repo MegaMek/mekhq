@@ -160,18 +160,37 @@ public class Utilities {
 		return text;
 	}
 	
+	/**
+	 * Returns the last file modified in a directory and all subdirectories
+	 * that conforms to a FilenameFilter 
+	 * @param dir
+	 * @param filter
+	 * @return
+	 */
 	public static File lastFileModified(String dir, FilenameFilter filter) {
         File fl = new File(dir);
         File[] files = fl.listFiles(filter);
-        //File[] files = fl.listFiles();
         long lastMod = Long.MIN_VALUE;
         File choice = null;
         for (File file : files) {
-                if (file.lastModified() > lastMod) {
-                        choice = file;
-                        lastMod = file.lastModified();
-                }
+        	if (file.lastModified() > lastMod) {
+        		choice = file;
+        		lastMod = file.lastModified();
+        	}
         }
+        //ok now we need to recursively search any subdirectories, so see if they
+        //contain more recent files
+        files = fl.listFiles();
+        for(File file : files) {
+        	if(!file.isDirectory()) {
+        		continue;
+        	}
+        	File subFile =  lastFileModified(file.getPath(), filter);
+        	if (null != subFile && subFile.lastModified() > lastMod) {
+        		choice = subFile;
+        		lastMod = subFile.lastModified();
+        	}
+        }       
         return choice;
     }
 }
