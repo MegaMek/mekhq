@@ -73,7 +73,7 @@ public class Armor extends Part implements IAcquisitionWork {
     }
     
     public Armor clone() {
-    	return new Armor();
+    	return new Armor(0, type, amount, -1, false, clan);
     }
     
     @Override

@@ -39,7 +39,7 @@ import org.w3c.dom.NodeList;
 public class MekGyro extends Part {
 	private static final long serialVersionUID = 3420475726506139139L;
 	protected int type;
-    protected int walkMP;
+	protected double gyroTonnage;
 
     public MekGyro() {
     	this(0, 0, 0);
@@ -49,32 +49,30 @@ public class MekGyro extends Part {
         super(tonnage);
         this.type = type;
         this.name = Mech.getGyroTypeString(type);
-        this.walkMP = walkMP;
+        this.gyroTonnage = MekGyro.getGyroTonnage(walkMP, type, getUnitTonnage());
+    }
+    
+    public MekGyro(int tonnage, int type, double gyroTonnage) {
+    	super(tonnage);
+        this.type = type;
+        this.name = Mech.getGyroTypeString(type);
+        this.gyroTonnage = gyroTonnage;
     }
     
     public MekGyro clone() {
-    	return new MekGyro(getUnitTonnage(), type, walkMP);
+    	return new MekGyro(getUnitTonnage(), type, gyroTonnage);
     }
     
     public int getType() {
         return type;
     }
 
-    public int getWalkMP() {
-        return walkMP;
-    }
-    
-   
-
     public static int getGyroBaseTonnage(int walkMP, int unitTonnage) {
     	return (int) Math.ceil(walkMP * unitTonnage / 100f);
     }
     
-    private int getGyroBaseTonnage() {
-    	return MekGyro.getGyroBaseTonnage(getWalkMP(), getUnitTonnage());
-    }
-    
-    public static double getGyroTonnage(double gyroBaseTonnage, int gyroType) {
+    public static double getGyroTonnage(int walkMP, int gyroType, int unitTonnage) {
+    	int gyroBaseTonnage = MekGyro.getGyroBaseTonnage(walkMP, unitTonnage);
         if (gyroType == Mech.GYRO_XL) {
             return gyroBaseTonnage * 0.5;
         } else if (gyroType == Mech.GYRO_COMPACT) {
@@ -86,13 +84,9 @@ public class MekGyro extends Part {
         return gyroBaseTonnage;
     }
     
-    public static double getGyroTonnage(int walkMP, int unitTonnage, int gyroType) {
-    	return MekGyro.getGyroTonnage(MekGyro.getGyroBaseTonnage(walkMP, unitTonnage), gyroType);
-    }
-    
     @Override
     public double getTonnage() {
-    	return MekGyro.getGyroTonnage(getGyroBaseTonnage(), getType());
+    	return gyroTonnage;
     }
     
     @Override
@@ -135,9 +129,9 @@ public class MekGyro extends Part {
 				+type
 				+"</type>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<walkMP>"
-				+walkMP
-				+"</walkMP>");
+				+"<gyroTonnage>"
+				+gyroTonnage
+				+"</gyroTonnage>");
 		writeToXmlEnd(pw1, indent, id);
 	}
 
@@ -148,11 +142,19 @@ public class MekGyro extends Part {
 		for (int x=0; x<nl.getLength(); x++) {
 			Node wn2 = nl.item(x);
 			
+			int walkMP = -1;
 			if (wn2.getNodeName().equalsIgnoreCase("type")) {
 				type = Integer.parseInt(wn2.getTextContent());
-			} else if (wn2.getNodeName().equalsIgnoreCase("walkMP")) {
+			} else if (wn2.getNodeName().equalsIgnoreCase("gyroTonnage")) {
+				gyroTonnage = Double.parseDouble(wn2.getTextContent());
+			}else if (wn2.getNodeName().equalsIgnoreCase("walkMP")) {
 				walkMP = Integer.parseInt(wn2.getTextContent());
 			} 
+			
+			if(walkMP > -1) {
+				//need to calculate gyroTonnage for reverse compatability
+		        gyroTonnage = MekGyro.getGyroTonnage(walkMP, type, getUnitTonnage());
+			}
 		}
 	}
 
@@ -214,7 +216,7 @@ public class MekGyro extends Part {
 
 	@Override
 	public Part getMissingPart() {
-		return new MissingMekGyro(getUnitTonnage(), getType(), getWalkMP());
+		return new MissingMekGyro(getUnitTonnage(), getType(), getTonnage());
 	}
 
 	@Override

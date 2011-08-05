@@ -56,6 +56,7 @@ v0.1.10 (SVN)
 + mekhq.properties file (contains only L&F feel preferences for now, but expandable)
 + check campaigns subdirectories for last save
 + parts store dialog actually allows you to buy parts
++ more parts for the parts store
 
 v0.1.9 (2011-07-17)
 + beginning of personnel switch (hold on to your hats!)

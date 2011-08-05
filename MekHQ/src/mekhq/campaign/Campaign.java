@@ -82,6 +82,7 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.AmmoBin;
+import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.EquipmentPart;
 import mekhq.campaign.parts.GenericSparePart;
@@ -527,13 +528,25 @@ public class Campaign implements Serializable {
 
 	public void addPart(Part p) {
 
-		if (p instanceof GenericSparePart) {
-			for (Part part : getParts()) {
-				if (part instanceof GenericSparePart
-						&& p.isSamePartTypeAndStatus(part)) {
-					((GenericSparePart) part)
-							.setAmount(((GenericSparePart) part).getAmount()
-									+ ((GenericSparePart) p).getAmount());
+		if(p instanceof Armor) {
+			for(Part part : getParts()) {
+				if(null != part.getUnit()) {
+					continue;
+				}
+				if(part.isSamePartTypeAndStatus(p)) {
+					((Armor)part).setAmount(((Armor)part).getAmount() + ((Armor)p).getAmount());
+					updateAllArmorForNewSpares();
+					return;
+				}
+			}
+		}
+		if(p instanceof AmmoStorage) {
+			for(Part part : getParts()) {
+				if(null != part.getUnit()) {
+					continue;
+				}
+				if(part.isSamePartTypeAndStatus(p)) {
+					((AmmoStorage)part).changeShots(((AmmoStorage)p).getShots());
 					return;
 				}
 			}
