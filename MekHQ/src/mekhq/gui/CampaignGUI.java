@@ -98,6 +98,8 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
+import chat.ChatClient;
+
 import megamek.client.ui.swing.MechTileset;
 import megamek.client.ui.swing.MechView;
 import megamek.client.ui.swing.util.PlayerColors;
@@ -403,6 +405,8 @@ public class CampaignGUI extends JPanel {
 		miFireAllMedics = new javax.swing.JMenuItem();
 		menuMedicPool = new javax.swing.JMenu();
 		miFullStrengthMedics = new javax.swing.JMenuItem();
+		menuCommunity = new javax.swing.JMenu();
+		miChat = new javax.swing.JMenuItem();
 		javax.swing.JMenu helpMenu = new javax.swing.JMenu();
 		javax.swing.JMenuItem aboutMenuItem = new javax.swing.JMenuItem();
 		statusPanel = new javax.swing.JPanel();
@@ -420,7 +424,7 @@ public class CampaignGUI extends JPanel {
 		scrollPlanetView = new javax.swing.JScrollPane();
 		lblPartsChoice = new javax.swing.JLabel();
 		choiceParts = new javax.swing.JComboBox();
-		//panMekLab = new MekLabPanel();
+		panMekLab = new MekLabPanel();
 		scrollMekLab = new javax.swing.JScrollPane();
 		lblLocation = new javax.swing.JLabel();
 
@@ -1426,7 +1430,7 @@ public class CampaignGUI extends JPanel {
 				resourceMap.getString("panInfirmary.TabConstraints.tabTitle"),
 				panInfirmary); // NOI18N
 
-		/*
+		
 		panMekLab.setName("panMekLab"); // NOI18N
 		scrollMekLab.setName("scrollFinanceTable");
         scrollMekLab.setViewportView(panMekLab);
@@ -1434,7 +1438,6 @@ public class CampaignGUI extends JPanel {
         tabMain.addTab(
 				resourceMap.getString("panMekLab.TabConstraints.tabTitle"),
 				scrollMekLab); // NOI18N
-				*/
 		
 		panFinances.setName("panFinances"); // NOI18N
 		panFinances.setLayout(new java.awt.GridBagLayout());
@@ -1755,6 +1758,21 @@ public class CampaignGUI extends JPanel {
 		menuMedicPool.add(miFireAllMedics);
 		menuMarket.add(menuMedicPool);
 		menuBar.add(menuMarket);
+		
+		menuCommunity.setText(resourceMap.getString("menuCommunity.text")); // NOI18N
+		menuCommunity.setName("menuCommunity"); // NOI18N
+
+		miChat.setText(resourceMap.getString("miChat.text")); // NOI18N
+		miChat.setName("miChat"); // NOI18N
+		miChat.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				miChatActionPerformed(evt);
+			}
+		});
+		menuCommunity.add(miChat);
+
+		menuBar.add(menuCommunity);
+		
 		helpMenu.setText(resourceMap.getString("helpMenu.text")); // NOI18N
 		helpMenu.setName("helpMenu"); // NOI18N
 		aboutMenuItem.setName("aboutMenuItem"); // NOI18N
@@ -1830,6 +1848,11 @@ public class CampaignGUI extends JPanel {
         });
 	}
 	
+	private void miChatActionPerformed(ActionEvent evt) {
+		ChatClient client = new ChatClient("test", "localhost");
+        client.listen();
+	}
+
 	private void btnAddMissionActionPerformed(java.awt.event.ActionEvent evt) {
 		MissionTypeDialog mtd = new MissionTypeDialog(getFrame(), true, getCampaign(), this);
 		mtd.setVisible(true);
@@ -7739,6 +7762,8 @@ public class CampaignGUI extends JPanel {
 	private javax.swing.JMenuItem miLoadForces;
 	private javax.swing.JMenuItem miPurchaseUnit;
 	private javax.swing.JMenuItem miBuyParts;
+	private javax.swing.JMenu menuCommunity;
+	private javax.swing.JMenuItem miChat;
 	private javax.swing.JPanel panFinances;
 	private javax.swing.JPanel panHangar;
 	private javax.swing.JPanel panOrganization;
