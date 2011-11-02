@@ -65,6 +65,7 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -100,6 +101,8 @@ import javax.swing.tree.TreeSelectionModel;
 
 import chat.ChatClient;
 
+import megamek.client.ui.Messages;
+import megamek.client.ui.swing.MechDisplay;
 import megamek.client.ui.swing.MechTileset;
 import megamek.client.ui.swing.MechView;
 import megamek.client.ui.swing.util.PlayerColors;
@@ -271,6 +274,8 @@ public class CampaignGUI extends JPanel {
 	private int currentDoctorId;
 	private int currentServiceablePartsId;
 	private int[] selectedTasksIds;
+	
+	private int mekLabId = -1;
 	
 	public int selectedMission = -1;
 	
@@ -1445,7 +1450,6 @@ public class CampaignGUI extends JPanel {
 		financeTable.setModel(financeModel);
 		financeTable.setName("financeTable"); // NOI18N
 		financeTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		personnelTable.setColumnModel(personColumnModel);
 //		financeTable.addMouseListener(personnelMouseAdapter);
 		financeTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 		column = null;
@@ -1849,8 +1853,14 @@ public class CampaignGUI extends JPanel {
 	}
 	
 	private void miChatActionPerformed(ActionEvent evt) {
+        JDialog chatDialog = new JDialog(getFrame(), "MekHQ Chat", false); //$NON-NLS-1$
+
 		ChatClient client = new ChatClient("test", "localhost");
         client.listen();
+        //chatDialog.add(client);
+        chatDialog.add(new JLabel("Testing"));
+        chatDialog.setResizable(true);
+        chatDialog.setVisible(true);
 	}
 
 	private void btnAddMissionActionPerformed(java.awt.event.ActionEvent evt) {
@@ -7281,29 +7291,14 @@ public class CampaignGUI extends JPanel {
 			} else if (command.contains("CUSTOMIZE")
 					&& !command.contains("CANCEL")) {
 				if (selectedUnit.getEntity() instanceof Mech) {
-					MechSummary mechSummary = MechSummaryCache
-							.getInstance().getMech(
-									selectedUnit.getEntity()
-											.getShortName());
-					Mech selectedMech = null;
-
-					try {
-						Entity e = (new MechFileParser(
-								mechSummary.getSourceFile(),mechSummary.getEntryName()))
-								.getEntity();
-						if (e instanceof Mech) {
-							selectedMech = (Mech) e;
-						}
-					} catch (EntityLoadingException ex) {
-						Logger.getLogger(CampaignGUI.class.getName())
-								.log(Level.SEVERE, null, ex);
-					}
-
-					if (selectedMech == null) {
+					if (mekLabId != -1 && 0 != JOptionPane.showConfirmDialog(null,
+							"Sending this unit to the Mek Lab will remove any unit currently being worked on in the Mek Lab."
+						, "Proceed?",
+							JOptionPane.YES_NO_OPTION)) {
 						return;
 					}
-					panMekLab.loadUnit(selectedMech);
-					panMekLab.refreshAll();
+					panMekLab.loadUnit(selectedUnit);
+					//TODO: should we switch tabs?
 				}
 				/*if (!selectedUnit.isDeployed() && !selectedUnit.isDamaged()) {
 					Entity targetEntity = null;
@@ -7528,9 +7523,9 @@ public class CampaignGUI extends JPanel {
 						menuItem = new JMenuItem("To existing variant");
 						menuItem.setActionCommand("CUSTOMIZE:" + "CHOOSE_VARIANT");
 						menuItem.addActionListener(this);
-						menu.add(menuItem);
+						//menu.add(menuItem);
 			
-						menuItem = new JMenuItem("MegaMekLab");
+						menuItem = new JMenuItem("Send to Mek Lab");
 						menuItem.setActionCommand("CUSTOMIZE:" + "MML");
 						menuItem.addActionListener(this);
 						menu.add(menuItem);
