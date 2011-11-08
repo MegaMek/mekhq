@@ -143,15 +143,13 @@ public class Refit {
 			boolean partFound = false;
 			int i = 0;
 			for(Part oPart : oldUnitParts) {
-				if(oPart instanceof Armor) {
-					int bob = 1;
-				}
 				if((oPart instanceof MissingPart && ((MissingPart)oPart).isAcceptableReplacement(part)) 
 						|| oPart.isSamePartTypeAndStatus(part)) {
-					//need a special check for location and armor amount for armo
+					//need a special check for location and armor amount for armor
 					if(oPart instanceof Armor 
 							&& (((Armor)oPart).getLocation() != ((Armor)part).getLocation()
 									|| ((Armor)oPart).getTotalAmount() != ((Armor)part).getTotalAmount())) {
+						i++;
 						continue;
 					}
 					//TODO: check location of EquipmentPart and MissingEquipmentPart

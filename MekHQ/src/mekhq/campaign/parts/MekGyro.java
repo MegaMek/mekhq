@@ -139,22 +139,24 @@ public class MekGyro extends Part {
 	protected void loadFieldsFromXmlNode(Node wn) {
 		NodeList nl = wn.getChildNodes();
 		
+		int walkMP = -1;
+		int uTonnage = 0;
 		for (int x=0; x<nl.getLength(); x++) {
 			Node wn2 = nl.item(x);
-			
-			int walkMP = -1;
+					
 			if (wn2.getNodeName().equalsIgnoreCase("type")) {
 				type = Integer.parseInt(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("gyroTonnage")) {
 				gyroTonnage = Double.parseDouble(wn2.getTextContent());
-			}else if (wn2.getNodeName().equalsIgnoreCase("walkMP")) {
+			} else if (wn2.getNodeName().equalsIgnoreCase("walkMP")) {
 				walkMP = Integer.parseInt(wn2.getTextContent());
-			} 
-			
-			if(walkMP > -1) {
-				//need to calculate gyroTonnage for reverse compatability
-		        gyroTonnage = MekGyro.getGyroTonnage(walkMP, type, getUnitTonnage());
+			} else if(wn2.getNodeName().equalsIgnoreCase("unitTonnage")) {
+				uTonnage = Integer.parseInt(wn2.getTextContent());
 			}
+		}
+		if(gyroTonnage == 0) {
+			//need to calculate gyroTonnage for reverse compatability
+	        gyroTonnage = MekGyro.getGyroTonnage(walkMP, type, uTonnage);
 		}
 	}
 

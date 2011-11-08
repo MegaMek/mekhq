@@ -86,6 +86,7 @@ import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.EquipmentPart;
 import mekhq.campaign.parts.GenericSparePart;
+import mekhq.campaign.parts.HeatSink;
 import mekhq.campaign.parts.MissingEquipmentPart;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
@@ -1981,6 +1982,11 @@ public class Campaign implements Serializable {
 			}
 
 			Part p = Part.generateInstanceFromXML(wn2);
+			
+			//deal with the Weapon as Heat Sink problem from earlier versions
+			if(p instanceof HeatSink && !p.getName().contains("Heat Sink")) {
+				continue;
+			}
 			
 			if (p != null)
 				retVal.addPartWithoutId(p);
