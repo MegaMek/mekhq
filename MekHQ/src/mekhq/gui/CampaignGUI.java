@@ -7298,7 +7298,7 @@ public class CampaignGUI extends JPanel {
 						return;
 					}
 					panMekLab.loadUnit(selectedUnit);
-					//TODO: should we switch tabs?
+					tabMain.setSelectedIndex(8);
 				}
 				/*if (!selectedUnit.isDeployed() && !selectedUnit.isDamaged()) {
 					Entity targetEntity = null;

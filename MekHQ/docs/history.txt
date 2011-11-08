@@ -61,6 +61,7 @@ v0.1.10 (SVN)
 + beginning of MegaMekLab integration
 + a partially functional Refit object
 + Bug: phantom parts
++ improvements to refit calculation
 
 v0.1.9 (2011-07-17)
 + beginning of personnel switch (hold on to your hats!)

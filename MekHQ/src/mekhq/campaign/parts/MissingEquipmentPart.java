@@ -279,4 +279,14 @@ public class MissingEquipmentPart extends MissingPart {
 		}
 		return super.hasCheckedToday();
 	}
+	
+	public int getLocation() {
+    	if(null != unit) {
+    		Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
+			if(null != mounted) {
+				return mounted.getLocation();
+			}
+    	}
+    	return -1;
+    }
 }
