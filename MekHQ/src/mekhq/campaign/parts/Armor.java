@@ -160,6 +160,10 @@ public class Armor extends Part implements IAcquisitionWork {
         return amount;
     }
     
+    public int getTotalAmount() {
+    	return amount + amountNeeded;
+    }
+    
     public int getLocation() {
     	return location;
     }

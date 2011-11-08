@@ -439,9 +439,8 @@ public class Campaign implements Serializable {
 		unitIds.put(new Integer(id), unit);
 		lastUnitId = id;
 			
-		// collect all the work items outstanding on this unit and add them
-		// to the workitem vector
-		unit.initializeParts();
+		unit.initializeParts(true);
+		unit.runDiagnostic();
 		unit.resetPilotAndEntity();
 		addReport(unit.getEntity().getDisplayName() + " has been added to the unit roster.");
 	}
@@ -1645,7 +1644,8 @@ public class Campaign implements Serializable {
 			unit.resetPilotAndEntity();
 			
 			//just in case parts are missing (i.e. because they weren't tracked in previous versions)
-			unit.initializeParts();
+			unit.initializeParts(true);
+			unit.runDiagnostic();
 			
 			//some units might need to be assigned to scenarios
 			Scenario s = retVal.getScenario(unit.getScenarioId());

@@ -22,19 +22,29 @@
 package mekhq.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.GregorianCalendar;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 import megamek.common.BipedMech;
@@ -63,6 +73,7 @@ import megameklab.com.util.CConfig;
 import megameklab.com.util.RefreshListener;
 import megameklab.com.util.UnitUtil;
 import mekhq.MekHQ;
+import mekhq.campaign.Refit;
 import mekhq.campaign.Unit;
 
 public class MekLabPanel extends JPanel implements RefreshListener {
@@ -71,6 +82,7 @@ public class MekLabPanel extends JPanel implements RefreshListener {
 
     Unit unit;
     Mech entity;
+    Refit refit;
     JTabbedPane ConfigPane = new JTabbedPane(SwingConstants.TOP);
     JPanel summaryPane = new JPanel();
     private StructureTab structureTab;
@@ -96,10 +108,7 @@ public class MekLabPanel extends JPanel implements RefreshListener {
         btnRefit = new JButton("Begin Refit");
         btnRefit.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				//TODO: implement this
-				//check to see if user really wants to do it
-				//select a model name
-				//select a tech to work on the unit
+				refitUnit();
 			}
 		});
         btnClear = new JButton("Clear Changes");
@@ -163,6 +172,31 @@ public class MekLabPanel extends JPanel implements RefreshListener {
         UnitUtil.updateLoadedMech(entity);
         reloadTabs();
         this.repaint();
+    }
+    
+    public void refitUnit() {
+    	//TODO: implement this
+    	//select a model name
+    	String s = (String)JOptionPane.showInputDialog(
+                null,
+                "Choose a new model name",
+                "Designate Model",
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                null,
+                entity.getModel() + " Mk II");
+    	entity.setModel(s);
+    	//equipment check?
+		//check to see if user really wants to do it - give some info on what will be done
+    	if(0 != JOptionPane.showConfirmDialog(null,
+				"Are you sure you want to refit this unit?"
+			, "Proceed?",
+				JOptionPane.YES_NO_OPTION)) {
+    		return;
+    	}
+		refit.complete();
+		clearUnit();
+		//select a tech to work on the unit
     }
     
     public void reloadTabs() {
@@ -271,20 +305,16 @@ public class MekLabPanel extends JPanel implements RefreshListener {
 	}
 	
 	public void refreshSummary() {
+		refit = new Refit(unit, entity);
 		btnRefit.setEnabled(isEntityValid(entity));
 		
 		summaryPane.removeAll();
 		summaryPane.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		lblName = new JLabel("<html><b>" + unit.getEntity().getDisplayName() + "</b></html>");
-		lblRefit = new JLabel("Refit Class C");
-		lblTime = new JLabel("10 hours");
-		//for testing
-		if(entity.getWalkMP() < 5) {
-			lblTime = new JLabel("2 hours");
-
-		}
-		lblCost = new JLabel("10 C-Bills");
+		lblRefit = new JLabel(refit.getRefitClassName());
+		lblTime = new JLabel(refit.getTime() + " minutes");
+		lblCost = new JLabel(refit.getCost() + " C-Bills");
 		c.gridx = 0;
 		c.gridy = 0;
 		c.anchor = GridBagConstraints.NORTHWEST;
@@ -308,4 +338,5 @@ public class MekLabPanel extends JPanel implements RefreshListener {
 		//TODO: choose tech to work on refit
 		//TODO: compare units dialog that pops up mech views back-to-back
 	}
+	
 }

@@ -314,6 +314,16 @@ public class EquipmentPart extends Part {
     	}
     	return super.getDetails();
     }
+    
+    public int getLocation() {
+    	if(null != unit) {
+    		Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
+			if(null != mounted) {
+				return mounted.getLocation();
+			}
+    	}
+    	return -1;
+    }
 
 	@Override
 	public void updateConditionFromPart() {
