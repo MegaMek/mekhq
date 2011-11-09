@@ -51,6 +51,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.ResourceBundle;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
@@ -152,6 +153,7 @@ import mekhq.campaign.parts.MekLifeSupport;
 import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.MekSensor;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.TankLocation;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
@@ -429,7 +431,7 @@ public class CampaignGUI extends JPanel {
 		scrollPlanetView = new javax.swing.JScrollPane();
 		lblPartsChoice = new javax.swing.JLabel();
 		choiceParts = new javax.swing.JComboBox();
-		panMekLab = new MekLabPanel();
+		panMekLab = new MekLabPanel(this);
 		scrollMekLab = new javax.swing.JScrollPane();
 		lblLocation = new javax.swing.JLabel();
 
@@ -2399,6 +2401,59 @@ public class CampaignGUI extends JPanel {
 		refreshAcquireList();
 	}
 	
+    public void refitUnit(Refit r, boolean selectModelName) {
+    	if(getCampaign().getTechs().size() > 0) {
+	    	String[] techNames = new String[getCampaign().getTechs().size()];
+	    	HashMap<String,Person> techHash = new HashMap<String,Person>();
+	    	int i = 0;
+	    	for(Person tech : getCampaign().getTechs()) {
+	    		techNames[i] = tech.getName();
+	    		techHash.put(techNames[i], tech);
+	    		i++;
+	    	}
+	    	String s = (String)JOptionPane.showInputDialog(
+	                frame,
+	                "Which tech should work on the refit?",
+	                "Select Tech",
+	                JOptionPane.PLAIN_MESSAGE,
+	                null,
+	                techNames,
+	                techNames[0]);
+	    	r.setTeamId(techHash.get(s).getId());
+    	} else {
+    		//TODO: warning message
+    		return;
+    	}
+    	if(selectModelName) {
+	    	//select a model name
+	    	String s = (String)JOptionPane.showInputDialog(
+	                null,
+	                "Choose a new model name",
+	                "Designate Model",
+	                JOptionPane.PLAIN_MESSAGE,
+	                null,
+	                null,
+	                r.getOriginalEntity().getModel() + " Mk II");
+	    	r.getNewEntity().setModel(s);
+    	}
+		//check to see if user really wants to do it - give some info on what will be done
+    	//TODO: better information
+    	if(0 != JOptionPane.showConfirmDialog(null,
+				"Are you sure you want to refit this unit?"
+			, "Proceed?",
+				JOptionPane.YES_NO_OPTION)) {
+    		return;
+    	}    	
+    	r.begin();
+    	getCampaign().refit(r);
+    	refreshReport();
+    	refreshFunds();
+    	refreshFinancialTransactions();
+    	refreshUnitList();
+    	refreshServicedUnitList();
+    	refreshOrganization();
+    }
+	
 	private void refreshPersonnelView() {
 		int row = personnelTable.getSelectedRow();
 		if(row < 0) {
@@ -4205,7 +4260,6 @@ public class CampaignGUI extends JPanel {
 			} else if (command.contains("CANCEL_CUSTOMIZE")) {
 				if (selectedUnit.isCustomized()) {
 					selectedUnit.setCustomized(false);
-					selectedUnit.cancelCustomize(getCampaign());
 
 					refreshServicedUnitList();
 					refreshUnitList();
@@ -7116,6 +7170,9 @@ public class CampaignGUI extends JPanel {
                 	if (u.isDeployed()) {
                 		setBackground(Color.LIGHT_GRAY);
                 	}
+                	if(u.isRefitting()) {
+                		setBackground(Color.CYAN);
+                	}
                 	else if (null != u && !u.isRepairable()) {
     					setBackground(new Color(190, 150, 55));
     				} else if ((null != u) && !u.isFunctional()) {
@@ -7300,120 +7357,9 @@ public class CampaignGUI extends JPanel {
 					panMekLab.loadUnit(selectedUnit);
 					tabMain.setSelectedIndex(8);
 				}
-				/*if (!selectedUnit.isDeployed() && !selectedUnit.isDamaged()) {
-					Entity targetEntity = null;
-					String targetMechName = command.split(":")[1];
-					if (targetMechName.equals("MML")) {
-						if (selectedUnit.getEntity() instanceof megamek.common.Mech) {
-							MechSummary mechSummary = MechSummaryCache
-									.getInstance().getMech(
-											selectedUnit.getEntity()
-													.getShortName());
-							megamek.common.Mech selectedMech = null;
-		
-							try {
-								Entity e = (new MechFileParser(
-										mechSummary.getSourceFile()))
-										.getEntity();
-								if (e instanceof megamek.common.Mech) {
-									selectedMech = (megamek.common.Mech) e;
-								}
-							} catch (EntityLoadingException ex) {
-								Logger.getLogger(MekHQView.class.getName())
-										.log(Level.SEVERE, null, ex);
-							}
-		
-							if (selectedMech == null) {
-								return;
-							}
-		
-							String modelTmp = "CST01";
-							selectedMech.setModel(modelTmp);
-		
-							MMLMekUICustom megamekLabMekUI = new MMLMekUICustom();
-							megamekLabMekUI.setVisible(false);
-							megamekLabMekUI.setModal(true);
-		
-							megamekLabMekUI.loadUnit(selectedMech);
-							megamekLabMekUI.setVisible(true);
-		
-							megamek.common.Mech mmlEntity = megamekLabMekUI
-									.getEntity();
-							if (MMLMekUICustom.isEntityValid(mmlEntity)
-									&& mmlEntity.getChassis().equals(
-											selectedMech.getChassis())
-									&& (mmlEntity.getWeight() == selectedMech
-											.getWeight())) {
-								targetEntity = mmlEntity;
-							}
-						}
-						
-					} else if (targetMechName.equals("CHOOSE_VARIANT")) {
-						UnitSelectorDialog usd = new UnitSelectorDialog(null,
-								true, getCampaign(), null);
-						usd.restrictToChassis(selectedUnit.getEntity()
-								.getChassis());
-						usd.getComboUnitType().setSelectedIndex(UnitType.MEK);
-						usd.getComboType()
-								.setSelectedIndex(TechConstants.T_ALL);
-						usd.getComboWeight().setSelectedIndex(
-								selectedUnit.getEntity().getWeightClass());
-						usd.changeBuyBtnToSelectBtn();
-		
-						if (!getCampaign().isGM()) {
-							usd.restrictToYear(getCampaign().getCalendar().get(
-									Calendar.YEAR));
-						}
-		
-						usd.setVisible(true);
-		
-						megamek.common.Mech selectedMech = null;
-		
-						MechSummary mechSummary = MechSummaryCache
-								.getInstance()
-								.getMech(
-										selectedUnit.getEntity().getShortName());
-						try {
-							Entity e = (new MechFileParser(
-									mechSummary.getSourceFile())).getEntity();
-							if (e instanceof megamek.common.Mech) {
-								selectedMech = (megamek.common.Mech) e;
-							}
-						} catch (EntityLoadingException ex) {
-							Logger.getLogger(MekHQView.class.getName()).log(
-									Level.SEVERE, null, ex);
-						}
-		
-						if (selectedMech == null) {
-							return;
-						}
-		
-						Entity chosenTarget = usd.getSelectedEntity();
-						if ((chosenTarget instanceof megamek.common.Mech)
-								&& chosenTarget.getChassis().equals(
-										selectedMech.getChassis())
-								&& (chosenTarget.getWeight() == selectedMech
-										.getWeight())) {
-							targetEntity = chosenTarget;
-						}
-		
-					}
-		
-					if (targetEntity != null) {
-						selectedUnit.setCustomized(true);
-						selectedUnit.customize(targetEntity, getCampaign());
-					}
-		
-					refreshServicedUnitList();
-					refreshUnitList();
-					refreshTaskList();
-					refreshAcquireList();
-				}
-				*/
 			} else if (command.contains("CANCEL_CUSTOMIZE")) {
 				if (selectedUnit.isCustomized()) {
 					selectedUnit.setCustomized(false);
-					selectedUnit.cancelCustomize(getCampaign());
 		
 					refreshServicedUnitList();
 					refreshUnitList();
@@ -7460,7 +7406,7 @@ public class CampaignGUI extends JPanel {
 					}
 					menu.add(cbMenuItem);
 				}
-				menu.setEnabled(!unit.isDeployed());
+				menu.setEnabled(!unit.isDeployed() && !unit.isRefitting());
 				popup.add(menu);
 				// swap ammo
 				if(oneSelected) {			
@@ -7486,7 +7432,7 @@ public class CampaignGUI extends JPanel {
 		                }
 						menu.add(ammoMenu);
 					}
-					menu.setEnabled(!unit.isDeployed());
+					menu.setEnabled(!unit.isDeployed() && !unit.isRefitting());
 					if(menu.getItemCount() > 20) {
 	                	MenuScroller.setScrollerFor(menu, 20);
 	                }
@@ -7502,8 +7448,8 @@ public class CampaignGUI extends JPanel {
 					}
 					cbMenuItem.setActionCommand("REPAIR");
 					cbMenuItem.addActionListener(this);
-					cbMenuItem.setEnabled(!unit.isDeployed()
-							&& unit.isRepairable() && !unit.isCustomized());
+					cbMenuItem.setEnabled(!unit.isDeployed()  && !unit.isRefitting()
+							&& unit.isRepairable());
 					menu.add(cbMenuItem);
 					cbMenuItem = new JCheckBoxMenuItem("Salvage");
 					if(unit.isSalvage()) {
@@ -7511,7 +7457,7 @@ public class CampaignGUI extends JPanel {
 					}
 					cbMenuItem.setActionCommand("SALVAGE");
 					cbMenuItem.addActionListener(this);
-					cbMenuItem.setEnabled(!unit.isDeployed() && !unit.isCustomized());
+					cbMenuItem.setEnabled(!unit.isDeployed() && !unit.isRefitting());
 					menu.add(cbMenuItem);
 					popup.add(menu);
 				}
@@ -7531,7 +7477,7 @@ public class CampaignGUI extends JPanel {
 						menu.add(menuItem);
 			
 						menu.setEnabled(!unit.isDeployed()
-								&& !unit.isDamaged()
+								&& unit.isRepairable() && !unit.isRefitting()
 								&& (unit.getEntity() instanceof megamek.common.Mech));
 						popup.add(menu);
 					} else if (unit.isCustomized()) {

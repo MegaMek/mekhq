@@ -19,23 +19,19 @@
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq.campaign;
+package mekhq.campaign.parts;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
-import mekhq.campaign.parts.AmmoBin;
-import mekhq.campaign.parts.Armor;
-import mekhq.campaign.parts.EnginePart;
-import mekhq.campaign.parts.EquipmentPart;
-import mekhq.campaign.parts.HeatSink;
-import mekhq.campaign.parts.MekGyro;
-import mekhq.campaign.parts.MekLocation;
-import mekhq.campaign.parts.MissingEquipmentPart;
-import mekhq.campaign.parts.MissingPart;
-import mekhq.campaign.parts.Part;
+import mekhq.campaign.Unit;
+import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.work.IPartWork;
+import mekhq.campaign.work.Modes;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Mech;
+import megamek.common.TargetRoll;
 import megamek.common.WeaponType;
 
 /**
@@ -48,7 +44,7 @@ import megamek.common.WeaponType;
  * 
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class Refit {
+public class Refit implements IPartWork {
 	
 	public static final int NO_CHANGE = 0;
 	public static final int CLASS_A = 1;
@@ -63,11 +59,17 @@ public class Refit {
 	
 	private int refitClass;
 	private int time;
+	private int timeSpent;
 	private long cost;
+	private boolean failedCheck;
 	
 	private ArrayList<Part> oldUnitParts;
 	private ArrayList<Part> newUnitParts;
 	private ArrayList<Part> newEquipment;
+		
+	private HashMap<Integer, Integer> equipNumTracker;
+	
+	private int assignedTechId;
 	
 	public Refit(Unit oUnit, Entity newEn) {
 		oldUnit = oUnit;
@@ -76,7 +78,11 @@ public class Refit {
 		oldUnitParts = new ArrayList<Part>();
 		newUnitParts = new ArrayList<Part>();
 		newEquipment = new ArrayList<Part>();
+		equipNumTracker = new HashMap<Integer, Integer>();
 		calculate();
+		assignedTechId = -1;
+		failedCheck = false;
+		timeSpent = 0;
 	}
 	
 	public static String getRefitClassName(int refitClass) {
@@ -135,6 +141,7 @@ public class Refit {
 		//c) We dont find the part in the oldunit part list.  That means this is a new part.  Add
 		//this to the newequipment arraylist from step 3.  Don't change anything in terms of refit 
 		//stats yet, that will happen later.
+		//TODO: need to keep track of equipment numbers
 		for(Part part : newUnit.getParts()) {
 			boolean partFound = false;
 			Part movedPart = null;
@@ -159,6 +166,8 @@ public class Refit {
 							movedPart = oPart;
 							moveIndex = i;
 							continue;
+						} else {
+							equipNumTracker.put(oPart.getId(), ((EquipmentPart)part).getEquipmentNum());
 						}
 					}
 					newUnitParts.add(oPart);
@@ -173,6 +182,7 @@ public class Refit {
 				oldUnitParts.remove(moveIndex);
 				updateRefitClass(CLASS_C);
 				if(movedPart instanceof EquipmentPart) {
+					equipNumTracker.put(movedPart.getId(), ((EquipmentPart)part).getEquipmentNum());
 					boolean isSalvaging = movedPart.isSalvaging();
 					movedPart.setSalvaging(true);
 					movedPart.updateConditionFromEntity();
@@ -228,7 +238,7 @@ public class Refit {
 					int i = -1;
 					boolean matchFound = false;
 					int matchIndex = -1;
-					int rClass = CLASS_C;
+					int rClass = CLASS_D;
 					for(Part oPart : tempParts) {
 						i++;
 						int oLoc = -1;
@@ -247,9 +257,6 @@ public class Refit {
 						if(loc != oLoc) {
 							continue;
 						}
-						if(crits > oCrits) {
-							continue;
-						}
 						if(crits == oCrits 
 								&& (type.hasFlag(WeaponType.F_LASER) && oType.hasFlag(WeaponType.F_LASER))
 								&& (type.hasFlag(WeaponType.F_MISSILE) && oType.hasFlag(WeaponType.F_MISSILE))
@@ -259,8 +266,13 @@ public class Refit {
 							matchFound = true;
 							matchIndex = i;
 							break;
-						} else {
+						} else if (crits <= oCrits) {
 							rClass = CLASS_B;
+							matchFound = true;
+							matchIndex = i;
+							//don't break because we may find something better
+						} else {
+							rClass = CLASS_C;
 							matchFound = true;
 							matchIndex = i;
 							//don't break because we may find something better
@@ -287,12 +299,24 @@ public class Refit {
 			oPart.updateConditionFromEntity();
 		}
 		
-		//TODO: heat sink type change?
-		//TODO: install CASE
+		//TODO: heat sink type change - Class D
+		//TODO: install CASE - Class E
+		//TODO: double time for custom jobs
 		
 		//multiply time by refit class
 		time *= getTimeMultiplier();
-
+	}
+	
+	public void begin() {
+		oldUnit.setRefit(this);
+		orderParts();
+	}
+	
+	private void orderParts() {
+		//TODO: should have to make an acquisition roll
+		for(Part part : newEquipment) {
+			oldUnit.campaign.buyPart(part, part.getCurrentValue());
+		}
 	}
 	
 	private void updateRefitClass(int rClass) {
@@ -301,26 +325,88 @@ public class Refit {
 		}
 	}
 	
-	public void complete() {
+	public void cancel() {
+		oldUnit.setRefit(null);
+	}
+	
+	private void complete() {
+		oldUnit.setEntity(newUnit.getEntity());
 		//add old parts to the warehouse
 		for(Part part : oldUnitParts) {
 			part.setUnit(null);
 		}
+		//change equipment number of equipment part new unit parts
+		for(Part part : newUnitParts) {
+			if(part instanceof EquipmentPart) {
+				((EquipmentPart)part).setEquipmentNum(equipNumTracker.get(part.getId()));
+			}
+			else if(part instanceof EquipmentPart) {
+				((MissingEquipmentPart)part).setEquipmentNum(equipNumTracker.get(part.getId()));
+			}
+		}
 		//add new parts to the unit
 		for(Part part : newEquipment) {
+			part.setUnit(oldUnit);
 			newUnitParts.add(part);
 			oldUnit.campaign.addPart(part);
 		}
-		oldUnit.setEntity(newUnit.getEntity());
 		oldUnit.setParts(newUnitParts);
 		oldUnit.runDiagnostic();
+		oldUnit.setRefit(null);
 		
 		//TODO: I should save a copy of this unit to the mechfiles and I should
-		//also have a boolean that indicates this as a custom unit, so that when 
-		//the xml file is saved, I can also save a copy of the mtf file into the xml.
+		//also decide on a way to save this to the XML save file, so that MekHQ save files
+		//are fully transportable.
 	}
 	
 	private int getTimeMultiplier() {
+		switch(refitClass) {
+		case NO_CHANGE:
+			return 0;
+		case CLASS_A:
+			return 1;
+		case CLASS_B:
+			return 1;
+		case CLASS_C:
+			return 2;
+		case CLASS_D:
+			return 3;
+		case CLASS_E:
+			return 4;
+		case CLASS_F:
+			return 5;
+		default:	
+			return 1;	
+		}
+	}
+	
+	public void reduceTime(int minutes) {
+		time -= minutes;
+	}
+	
+	public Entity getOriginalEntity() {
+		return oldUnit.getEntity();
+	}
+	
+	public Entity getNewEntity() {
+		return newUnit.getEntity();
+	}
+	
+	public Unit getOriginalUnit() {
+		return oldUnit;
+	}
+	
+	public boolean hasFailedCheck() {
+		return failedCheck;
+	}
+
+	@Override
+	public boolean needsFixing() {
+		return true;
+	}
+
+	@Override
+	public int getDifficulty() {
 		switch(refitClass) {
 		case NO_CHANGE:
 			return 0;
@@ -341,5 +427,146 @@ public class Refit {
 				
 		}
 	}
-	
+
+	@Override
+	public TargetRoll getAllMods() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String succeed() {
+		complete();
+		return "The customization of "+ oldUnit.getEntity().getDisplayName() + " is complete.";
+	}
+
+	@Override
+	public String fail(int rating) {
+		timeSpent = 0;
+		failedCheck = true;
+		return "The customization of " + oldUnit.getEntity().getDisplayName() + " will take " + getTimeLeft() + " additional minutes to complete.";
+	}
+
+	@Override
+	public int getMode() {
+		return Modes.MODE_NORMAL;
+	}
+
+	@Override
+	public String getPartName() {
+		return newUnit.getEntity().getDisplayName() + " Customization";
+	}
+
+	@Override
+	public int getSkillMin() {
+		return SkillType.EXP_GREEN;
+	}
+
+	@Override
+	public int getBaseTime() {
+		return time;
+	}
+
+	@Override
+	public int getActualTime() {
+		return time;
+	}
+
+	@Override
+	public int getTimeSpent() {
+		return timeSpent;
+	}
+
+	@Override
+	public int getTimeLeft() {
+		return time - timeSpent;
+	}
+
+	@Override
+	public void addTimeSpent(int time) {
+		timeSpent += time;
+	}
+
+	@Override
+	public int getAssignedTeamId() {
+		return assignedTechId;
+	}
+
+	@Override
+	public void setTeamId(int id) {
+		assignedTechId = id;
+	}
+
+	@Override
+	public boolean hasWorkedOvertime() {
+		return false;
+	}
+
+	@Override
+	public void setWorkedOvertime(boolean b) {
+		//do nothing
+	}
+
+	@Override
+	public int getShorthandedMod() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void setShorthandedMod(int i) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void updateConditionFromEntity() {
+		//do nothing
+	}
+
+	@Override
+	public void updateConditionFromPart() {
+		//do nothing
+	}
+
+	@Override
+	public void fix() {
+		//do nothing
+	}
+
+	@Override
+	public void remove(boolean salvage) {
+		//do nothing
+	}
+
+	@Override
+	public Part getMissingPart() {
+		//not applicable
+		return null;
+	}
+
+	@Override
+	public String getDesc() {
+		return "Fill this in";
+	}
+
+	@Override
+	public String getDetails() {
+		return "Fill this in";
+	}
+
+	@Override
+	public Unit getUnit() {
+		return oldUnit;
+	}
+
+	@Override
+	public boolean isSalvaging() {
+		return false;
+	}
+
+	@Override
+	public String checkFixable() {
+		return null;
+	}
 }

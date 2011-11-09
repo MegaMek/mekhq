@@ -90,6 +90,7 @@ import mekhq.campaign.parts.HeatSink;
 import mekhq.campaign.parts.MissingEquipmentPart;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.Refit;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
@@ -506,7 +507,7 @@ public class Campaign implements Serializable {
 	public ArrayList<Unit> getServiceableUnits() {
 		ArrayList<Unit> service = new ArrayList<Unit>();
 		for(Unit u : getUnits()) {
-			if(u.isDeployed()) {
+			if(u.isDeployed() || u.isRefitting()) {
 				continue;
 			}		
 			if(u.isSalvage() || !u.isRepairable()) {
@@ -741,6 +742,49 @@ public class Campaign implements Serializable {
 		addReport(report);
 	}
 	
+	public void refit(Refit r) {
+		//TODO: roll to see if time is doubled
+		Person tech = getPerson(r.getAssignedTeamId());
+		TargetRoll target = getTargetFor(r, tech);
+		if(null == tech) {
+			addReport("No tech is assigned to refit " + r.getOriginalEntity().getDisplayName() + ". Refit cancelled.");
+			r.cancel();
+			return;
+		}
+		String report = tech.getName() + " works on " + r.getPartName();   
+		int minutes = r.getTimeLeft();
+		if(minutes > tech.getMinutesLeft()) {
+			r.addTimeSpent(tech.getMinutesLeft());
+			tech.setMinutesLeft(0);
+			report = report + ", " + r.getTimeLeft() + " minutes left.";
+		} else {
+			tech.setMinutesLeft(tech.getMinutesLeft() - minutes);
+			r.addTimeSpent(minutes);
+			if(r.hasFailedCheck()) {
+				report = report + ", " + r.succeed();
+			} else {
+				int roll;
+				String wrongType = "";
+				if(tech.isRightTechTypeFor(r.getOriginalUnit())) {	
+					roll = Compute.d6(2);
+				} else {
+					roll = Utilities.roll3d6();
+					wrongType = " <b>Warning: wrong tech type for this refit.</b>";
+				}
+				report = report + ",  needs " + target.getValueAsString() + " and rolls " + roll + ": ";
+				if(roll >= target.getValue()) {
+					report += r.succeed();
+				} else {
+					report += r.fail(SkillType.EXP_GREEN);
+					//try to refit again in case the tech has any time left
+					refit(r);
+				}
+				report += wrongType;
+			}
+		}
+		addReport(report);
+	}
+	
 	public void fixPart(IPartWork partWork, Person tech) {
 		TargetRoll target = getTargetFor(partWork, tech);
 		String report = "";
@@ -840,6 +884,14 @@ public class Campaign implements Serializable {
 			} 
 		}
 		resetAstechMinutes();
+		
+		//check for refits first
+		for(Unit u : getUnits()) {
+			if(u.isRefitting()) {
+				refit(u.getRefit());
+			}
+		}
+		
 		//need to check for assigned tasks in two steps to avoid
 		//concurrent mod problems
 		ArrayList<Integer> assignedPartIds = new ArrayList<Integer>();

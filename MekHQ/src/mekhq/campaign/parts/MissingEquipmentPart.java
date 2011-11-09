@@ -56,6 +56,10 @@ public class MissingEquipmentPart extends MissingPart {
     	return equipmentNum;
     }
     
+    public void setEquipmentNum(int num) {
+    	equipmentNum = num;
+    }
+    
     public MissingEquipmentPart() {
     	this(0, null, -1);
     }

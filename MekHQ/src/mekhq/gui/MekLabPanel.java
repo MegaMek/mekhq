@@ -73,13 +73,15 @@ import megameklab.com.util.CConfig;
 import megameklab.com.util.RefreshListener;
 import megameklab.com.util.UnitUtil;
 import mekhq.MekHQ;
-import mekhq.campaign.Refit;
 import mekhq.campaign.Unit;
+import mekhq.campaign.parts.Refit;
 
 public class MekLabPanel extends JPanel implements RefreshListener {
 
     private static final long serialVersionUID = -5836932822468918198L;
 
+    CampaignGUI campaignGUI;
+    
     Unit unit;
     Mech entity;
     Refit refit;
@@ -101,14 +103,16 @@ public class MekLabPanel extends JPanel implements RefreshListener {
     private JButton btnClear;
     private JButton btnRemove;
     
-    public MekLabPanel() {
+    public MekLabPanel(CampaignGUI gui) {
+    	campaignGUI = gui;
         UnitUtil.loadFonts();
         new CConfig();
         MekHQ.logMessage("Staring MegaMekLab version: " + MegaMekLab.VERSION);
         btnRefit = new JButton("Begin Refit");
         btnRefit.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				refitUnit();
+				campaignGUI.refitUnit(refit, true);
+				clearUnit();
 			}
 		});
         btnClear = new JButton("Clear Changes");
@@ -174,30 +178,7 @@ public class MekLabPanel extends JPanel implements RefreshListener {
         this.repaint();
     }
     
-    public void refitUnit() {
-    	//TODO: implement this
-    	//select a model name
-    	String s = (String)JOptionPane.showInputDialog(
-                null,
-                "Choose a new model name",
-                "Designate Model",
-                JOptionPane.PLAIN_MESSAGE,
-                null,
-                null,
-                entity.getModel() + " Mk II");
-    	entity.setModel(s);
-    	//equipment check?
-		//check to see if user really wants to do it - give some info on what will be done
-    	if(0 != JOptionPane.showConfirmDialog(null,
-				"Are you sure you want to refit this unit?"
-			, "Proceed?",
-				JOptionPane.YES_NO_OPTION)) {
-    		return;
-    	}
-		refit.complete();
-		clearUnit();
-		//select a tech to work on the unit
-    }
+    
     
     public void reloadTabs() {
         removeAll();
