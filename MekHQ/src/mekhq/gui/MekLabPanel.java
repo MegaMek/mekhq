@@ -73,6 +73,7 @@ import megameklab.com.util.CConfig;
 import megameklab.com.util.RefreshListener;
 import megameklab.com.util.UnitUtil;
 import mekhq.MekHQ;
+import mekhq.Utilities;
 import mekhq.campaign.Unit;
 import mekhq.campaign.parts.Refit;
 
@@ -286,7 +287,7 @@ public class MekLabPanel extends JPanel implements RefreshListener {
 	}
 	
 	public void refreshSummary() {
-		refit = new Refit(unit, entity);
+		refit = new Refit(unit, entity, true);
 		btnRefit.setEnabled(isEntityValid(entity));
 		
 		summaryPane.removeAll();
@@ -295,7 +296,7 @@ public class MekLabPanel extends JPanel implements RefreshListener {
 		lblName = new JLabel("<html><b>" + unit.getEntity().getDisplayName() + "</b></html>");
 		lblRefit = new JLabel(refit.getRefitClassName());
 		lblTime = new JLabel(refit.getTime() + " minutes");
-		lblCost = new JLabel(refit.getCost() + " C-Bills");
+		lblCost = new JLabel(Utilities.getCurrencyString(refit.getCost()));
 		c.gridx = 0;
 		c.gridy = 0;
 		c.anchor = GridBagConstraints.NORTHWEST;

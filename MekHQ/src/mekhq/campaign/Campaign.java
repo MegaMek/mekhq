@@ -2633,7 +2633,7 @@ public class Campaign implements Serializable {
         if(partWork instanceof MissingPart && null == ((MissingPart)partWork).findReplacement()) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Part not available.");
         }
-        if(tech.getMinutesLeft() <= 0 && (!isOvertimeAllowed() || tech.getOvertimeLeft() <= 0)) {
+        if(!(partWork instanceof Refit) && tech.getMinutesLeft() <= 0 && (!isOvertimeAllowed() || tech.getOvertimeLeft() <= 0)) {
      	   return new TargetRoll(TargetRoll.IMPOSSIBLE, "No time left.");
         }
         String notFixable = partWork.checkFixable();

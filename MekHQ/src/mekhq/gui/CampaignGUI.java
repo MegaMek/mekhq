@@ -102,8 +102,6 @@ import javax.swing.tree.TreeSelectionModel;
 
 import chat.ChatClient;
 
-import megamek.client.ui.Messages;
-import megamek.client.ui.swing.MechDisplay;
 import megamek.client.ui.swing.MechTileset;
 import megamek.client.ui.swing.MechView;
 import megamek.client.ui.swing.util.PlayerColors;
@@ -276,9 +274,7 @@ public class CampaignGUI extends JPanel {
 	private int currentDoctorId;
 	private int currentServiceablePartsId;
 	private int[] selectedTasksIds;
-	
-	private int mekLabId = -1;
-	
+		
 	public int selectedMission = -1;
 	
 	public CampaignGUI(MekHQ app) {
@@ -2407,7 +2403,7 @@ public class CampaignGUI extends JPanel {
 	    	HashMap<String,Person> techHash = new HashMap<String,Person>();
 	    	int i = 0;
 	    	for(Person tech : getCampaign().getTechs()) {
-	    		techNames[i] = tech.getName();
+	    		techNames[i] = tech.getName() + ", " + tech.getPrimaryRoleDesc() + " (" + getCampaign().getTargetFor(r, tech).getValueAsString() + "+)";
 	    		techHash.put(techNames[i], tech);
 	    		i++;
 	    	}
@@ -2421,7 +2417,10 @@ public class CampaignGUI extends JPanel {
 	                techNames[0]);
 	    	r.setTeamId(techHash.get(s).getId());
     	} else {
-    		//TODO: warning message
+    		JOptionPane.showMessageDialog(frame,
+    			    "You have no techs available to work on this refit.",
+    			    "No Techs",
+    			    JOptionPane.WARNING_MESSAGE);
     		return;
     	}
     	if(selectModelName) {
@@ -2436,6 +2435,7 @@ public class CampaignGUI extends JPanel {
 	                r.getOriginalEntity().getModel() + " Mk II");
 	    	r.getNewEntity().setModel(s);
     	}
+    	//TODO: allow overtime work?
 		//check to see if user really wants to do it - give some info on what will be done
     	//TODO: better information
     	if(0 != JOptionPane.showConfirmDialog(null,
@@ -7348,24 +7348,27 @@ public class CampaignGUI extends JPanel {
 			} else if (command.contains("CUSTOMIZE")
 					&& !command.contains("CANCEL")) {
 				if (selectedUnit.getEntity() instanceof Mech) {
-					if (mekLabId != -1 && 0 != JOptionPane.showConfirmDialog(null,
-							"Sending this unit to the Mek Lab will remove any unit currently being worked on in the Mek Lab."
-						, "Proceed?",
-							JOptionPane.YES_NO_OPTION)) {
-						return;
-					}
 					panMekLab.loadUnit(selectedUnit);
 					tabMain.setSelectedIndex(8);
 				}
 			} else if (command.contains("CANCEL_CUSTOMIZE")) {
-				if (selectedUnit.isCustomized()) {
-					selectedUnit.setCustomized(false);
-		
-					refreshServicedUnitList();
-					refreshUnitList();
-					refreshTaskList();
-					refreshAcquireList();
+				if(selectedUnit.isRefitting()) {
+					selectedUnit.getRefit().cancel();
 				}
+				refreshServicedUnitList();
+				refreshUnitList();
+			} else if(command.contains("REFIT")) {
+				String model = command.split(":")[1];
+				MechSummary summary = MechSummaryCache.getInstance().getMech(selectedUnit.getEntity().getChassis() + " " + model);
+				try {
+                    Entity refitEn = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
+					if(null != refitEn) {
+						refitUnit(new Refit(selectedUnit, refitEn, false), false);						
+					}
+				} catch (EntityLoadingException ex) {
+					Logger.getLogger(CampaignGUI.class.getName())
+							.log(Level.SEVERE, null, ex);
+				}	
 			}
 		}
 		
@@ -7441,7 +7444,7 @@ public class CampaignGUI extends JPanel {
 				// Salvage / Repair
 				if(oneSelected) {
 					menu = new JMenu("Repair Status");
-					menu.setEnabled(!unit.isDeployed() && !unit.isCustomized());
+					menu.setEnabled(!unit.isDeployed() && !unit.isRefitting());
 					cbMenuItem = new JCheckBoxMenuItem("Repair");
 					if(!unit.isSalvage()) {
 						cbMenuItem.setSelected(true);
@@ -7463,30 +7466,44 @@ public class CampaignGUI extends JPanel {
 				}
 				// Customize
 				if(oneSelected) {
-					if (!unit.isCustomized()) {
-						menu = new JMenu("Customize");
+					menu = new JMenu("Customize");
 			
-						menuItem = new JMenuItem("To existing variant");
-						menuItem.setActionCommand("CUSTOMIZE:" + "CHOOSE_VARIANT");
-						menuItem.addActionListener(this);
-						//menu.add(menuItem);
+					JMenu refitMenu = new JMenu("Refit Kit");
+					for(String model : Utilities.getAllVariants(unit.getEntity())) {
+						MechSummary summary = MechSummaryCache.getInstance().getMech(unit.getEntity().getChassis() + " " + model);
+						try {
+                            Entity refitEn = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
+							if(null != refitEn) {
+								Refit r = new Refit(unit, refitEn, false);
+								menuItem = new JMenuItem(model + " (" + r.getRefitClassName() + "/" + r.getTimeLeft() + " minutes/" + Utilities.getCurrencyString(r.getCost()) + ")");
+								menuItem.setActionCommand("REFIT:" + model);
+								menuItem.addActionListener(this);
+								menuItem.setEnabled(!unit.isRefitting());
+								refitMenu.add(menuItem);
+							}
+						} catch (EntityLoadingException ex) {
+							Logger.getLogger(CampaignGUI.class.getName())
+									.log(Level.SEVERE, null, ex);
+						}		
+					}
+					menu.add(refitMenu);
 			
-						menuItem = new JMenuItem("Send to Mek Lab");
-						menuItem.setActionCommand("CUSTOMIZE:" + "MML");
-						menuItem.addActionListener(this);
-						menu.add(menuItem);
-			
-						menu.setEnabled(!unit.isDeployed()
-								&& unit.isRepairable() && !unit.isRefitting()
-								&& (unit.getEntity() instanceof megamek.common.Mech));
-						popup.add(menu);
-					} else if (unit.isCustomized()) {
-						menuItem = new JMenuItem("Cancel Customize");
+					menuItem = new JMenuItem("Customize in Mek Lab");
+					menuItem.setActionCommand("CUSTOMIZE");
+					menuItem.addActionListener(this);
+					menuItem.setEnabled(!unit.isRefitting()
+							&& (unit.getEntity() instanceof megamek.common.Mech));
+					menu.add(menuItem);		
+					if (unit.isRefitting()) {
+						menuItem = new JMenuItem("Cancel Customization");
 						menuItem.setActionCommand("CANCEL_CUSTOMIZE");
 						menuItem.addActionListener(this);
-						menuItem.setEnabled(unit.isCustomized());
-						popup.add(menuItem);
+						menuItem.setEnabled(true);
+						menu.add(menuItem);
 					}
+					menu.setEnabled(!unit.isDeployed() && unit.isRepairable());
+					popup.add(menu);
+					
 				}
 				if(oneSelected && getCampaign().getCampaignOptions().useQuirks()) {
 					menu = new JMenu("Add Quirk");			

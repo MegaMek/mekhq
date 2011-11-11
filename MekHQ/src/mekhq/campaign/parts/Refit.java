@@ -21,6 +21,11 @@
 
 package mekhq.campaign.parts;
 
+import java.awt.FileDialog;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -33,6 +38,11 @@ import megamek.common.EquipmentType;
 import megamek.common.Mech;
 import megamek.common.TargetRoll;
 import megamek.common.WeaponType;
+import megamek.common.loaders.BLKFile;
+import megamek.common.preference.PreferenceManager;
+import megamek.common.util.StringUtil;
+import megameklab.com.util.CConfig;
+import megameklab.com.util.UnitUtil;
 
 /**
  * This object tracks the refit of a given unit into a new unit.
@@ -62,6 +72,7 @@ public class Refit implements IPartWork {
 	private int timeSpent;
 	private long cost;
 	private boolean failedCheck;
+	private boolean customJob;
 	
 	private ArrayList<Part> oldUnitParts;
 	private ArrayList<Part> newUnitParts;
@@ -71,7 +82,8 @@ public class Refit implements IPartWork {
 	
 	private int assignedTechId;
 	
-	public Refit(Unit oUnit, Entity newEn) {
+	public Refit(Unit oUnit, Entity newEn, boolean custom) {
+		customJob = custom;
 		oldUnit = oUnit;
 		newUnit = new Unit(newEn, oldUnit.campaign);
 		newUnit.initializeParts(false);
@@ -258,10 +270,10 @@ public class Refit implements IPartWork {
 							continue;
 						}
 						if(crits == oCrits 
-								&& (type.hasFlag(WeaponType.F_LASER) && oType.hasFlag(WeaponType.F_LASER))
-								&& (type.hasFlag(WeaponType.F_MISSILE) && oType.hasFlag(WeaponType.F_MISSILE))
-								&& (type.hasFlag(WeaponType.F_BALLISTIC) && oType.hasFlag(WeaponType.F_BALLISTIC))
-								&& (type.hasFlag(WeaponType.F_ARTILLERY) && oType.hasFlag(WeaponType.F_ARTILLERY))) {
+								&& (type.hasFlag(WeaponType.F_LASER) == oType.hasFlag(WeaponType.F_LASER))
+								&& (type.hasFlag(WeaponType.F_MISSILE) == oType.hasFlag(WeaponType.F_MISSILE))
+								&& (type.hasFlag(WeaponType.F_BALLISTIC) == oType.hasFlag(WeaponType.F_BALLISTIC))
+								&& (type.hasFlag(WeaponType.F_ARTILLERY) == oType.hasFlag(WeaponType.F_ARTILLERY))) {
 							rClass = CLASS_A;
 							matchFound = true;
 							matchIndex = i;
@@ -301,7 +313,6 @@ public class Refit implements IPartWork {
 		
 		//TODO: heat sink type change - Class D
 		//TODO: install CASE - Class E
-		//TODO: double time for custom jobs
 		
 		//multiply time by refit class
 		time *= getTimeMultiplier();
@@ -310,6 +321,9 @@ public class Refit implements IPartWork {
 	public void begin() {
 		oldUnit.setRefit(this);
 		orderParts();
+		if(customJob) {
+			saveCustomization();
+		}
 	}
 	
 	private void orderParts() {
@@ -353,35 +367,57 @@ public class Refit implements IPartWork {
 		oldUnit.setParts(newUnitParts);
 		oldUnit.runDiagnostic();
 		oldUnit.setRefit(null);
-		
-		//TODO: I should save a copy of this unit to the mechfiles and I should
-		//also decide on a way to save this to the XML save file, so that MekHQ save files
-		//are fully transportable.
+	}
+	
+	public void saveCustomization() {
+		UnitUtil.compactCriticals(newUnit.getEntity());
+	    UnitUtil.reIndexCrits(newUnit.getEntity());
+	
+		String fileName = newUnit.getEntity().getChassis() + " " + newUnit.getEntity().getModel();    
+	    String sCustomsDir = "data/mechfiles/customs/";
+	    File customsDir = new File(sCustomsDir);
+	    if(!customsDir.exists()) {
+	    	customsDir.mkdir();
+	    }
+	    try {
+	        if (newUnit.getEntity() instanceof Mech) {
+	            FileOutputStream out = new FileOutputStream(sCustomsDir + File.separator + fileName + ".mtf");
+	            PrintStream p = new PrintStream(out);
+	
+	            p.println(((Mech) newUnit.getEntity()).getMtf());
+	            p.close();
+	            out.close();
+	        } else {
+	            BLKFile.encode(sCustomsDir + File.separator + fileName + ".blk", newUnit.getEntity());
+	        }
+	    } catch (Exception ex) {
+	        ex.printStackTrace();
+	    }
 	}
 	
 	private int getTimeMultiplier() {
+		int mult = 0;
 		switch(refitClass) {
 		case NO_CHANGE:
-			return 0;
+			mult = 0;
 		case CLASS_A:
-			return 1;
 		case CLASS_B:
-			return 1;
+			mult = 1;
 		case CLASS_C:
-			return 2;
+			mult = 2;
 		case CLASS_D:
-			return 3;
+			mult = 3;
 		case CLASS_E:
-			return 4;
+			mult = 4;
 		case CLASS_F:
-			return 5;
+			mult = 5;
 		default:	
-			return 1;	
+			mult = 1;	
 		}
-	}
-	
-	public void reduceTime(int minutes) {
-		time -= minutes;
+		if(customJob) {
+			mult *= 2;
+		}
+		return mult;
 	}
 	
 	public Entity getOriginalEntity() {
@@ -424,14 +460,23 @@ public class Refit implements IPartWork {
 			return 4;
 		default:	
 			return 1;
-				
 		}
 	}
 
 	@Override
 	public TargetRoll getAllMods() {
-		// TODO Auto-generated method stub
-		return null;
+		TargetRoll mods = new TargetRoll(getDifficulty(), "difficulty");
+		mods.append(oldUnit.getSiteMod());
+		if(oldUnit.getEntity().getQuirks().booleanOption("easy_maintain")) {
+			mods.addModifier(-1, "easy to maintain");
+		}
+		else if(oldUnit.getEntity().getQuirks().booleanOption("difficult_maintain")) {
+			mods.addModifier(1, "difficult to maintain");
+		}
+		if(customJob) {
+			mods.addModifier(2, "custom job");
+		}
+		return mods;
 	}
 
 	@Override

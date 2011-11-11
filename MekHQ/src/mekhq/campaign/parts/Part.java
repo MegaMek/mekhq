@@ -81,6 +81,12 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	public static String[] getPartTypeLabels() {
 		return partTypeLabels;
 	}
+	
+	//TODO: I need a part status code that is separate from damaged or functional
+	//AVAILABLE
+	//ENROUTE - ordered but not yet received 
+	//REFIT - being used in a refit and so not available
+	//OMNI - used in an omnipod configuration and so not available
 
 	// TODO: how to track clan vs. inner sphere
 	protected String name;

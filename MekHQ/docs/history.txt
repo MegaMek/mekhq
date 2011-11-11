@@ -63,6 +63,7 @@ v0.1.10 (SVN)
 + Bug: phantom parts
 + improvements to refit calculation
 + refit tech assignment and rolls
++ improvements to refit/customization process
 
 v0.1.9 (2011-07-17)
 + beginning of personnel switch (hold on to your hats!)

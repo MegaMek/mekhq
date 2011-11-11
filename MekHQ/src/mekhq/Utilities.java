@@ -33,6 +33,8 @@ import megamek.common.Aero;
 import megamek.common.AmmoType;
 import megamek.common.Compute;
 import megamek.common.Entity;
+import megamek.common.MechSummary;
+import megamek.common.MechSummaryCache;
 import megamek.common.Mounted;
 import megamek.common.Protomech;
 import megamek.common.TechConstants;
@@ -193,4 +195,19 @@ public class Utilities {
         }       
         return choice;
     }
+	
+	public static ArrayList<String> getAllVariants(Entity en) {
+		ArrayList<String> variants = new ArrayList<String>();
+		for(MechSummary summary : MechSummaryCache.getInstance().getAllMechs()) {
+			if(!summary.isCanon()) {
+				continue;
+			}
+			if(en.getChassis().equalsIgnoreCase(summary.getChassis())
+					&& !en.getModel().equalsIgnoreCase(summary.getModel())
+					&& summary.getTons() == en.getWeight()) {
+				variants.add(summary.getModel());
+			}
+		}
+		return variants;
+	}
 }
