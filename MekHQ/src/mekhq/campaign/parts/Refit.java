@@ -21,14 +21,19 @@
 
 package mekhq.campaign.parts;
 
-import java.awt.FileDialog;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import mekhq.MekHQ;
+import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.work.IPartWork;
@@ -36,12 +41,10 @@ import mekhq.campaign.work.Modes;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Mech;
+import megamek.common.Mounted;
 import megamek.common.TargetRoll;
 import megamek.common.WeaponType;
 import megamek.common.loaders.BLKFile;
-import megamek.common.preference.PreferenceManager;
-import megamek.common.util.StringUtil;
-import megameklab.com.util.CConfig;
 import megameklab.com.util.UnitUtil;
 
 /**
@@ -65,7 +68,7 @@ public class Refit implements IPartWork {
 	public static final int CLASS_F = 6;
 	
 	private Unit oldUnit;
-	private Unit newUnit;
+	private Entity newEntity;
 	
 	private int refitClass;
 	private int time;
@@ -74,23 +77,25 @@ public class Refit implements IPartWork {
 	private boolean failedCheck;
 	private boolean customJob;
 	
-	private ArrayList<Part> oldUnitParts;
-	private ArrayList<Part> newUnitParts;
-	private ArrayList<Part> newEquipment;
-		
-	private HashMap<Integer, Integer> equipNumTracker;
-	
+	private ArrayList<Integer> oldUnitParts;
+	private ArrayList<Integer> newUnitParts;
+	private ArrayList<Part> newPartsList;
+			
 	private int assignedTechId;
+	
+	public Refit() {
+		oldUnitParts = new ArrayList<Integer>();
+		newUnitParts = new ArrayList<Integer>();
+		newPartsList = new ArrayList<Part>();
+	}
 	
 	public Refit(Unit oUnit, Entity newEn, boolean custom) {
 		customJob = custom;
 		oldUnit = oUnit;
-		newUnit = new Unit(newEn, oldUnit.campaign);
-		newUnit.initializeParts(false);
-		oldUnitParts = new ArrayList<Part>();
-		newUnitParts = new ArrayList<Part>();
-		newEquipment = new ArrayList<Part>();
-		equipNumTracker = new HashMap<Integer, Integer>();
+		newEntity = newEn;
+		oldUnitParts = new ArrayList<Integer>();
+		newUnitParts = new ArrayList<Integer>();
+		newPartsList = new ArrayList<Part>();
 		calculate();
 		assignedTechId = -1;
 		failedCheck = false;
@@ -132,6 +137,8 @@ public class Refit implements IPartWork {
 	}
 	
 	public void calculate() {
+		Unit newUnit = new Unit(newEntity, oldUnit.campaign);
+		newUnit.initializeParts(false);
 		refitClass = NO_CHANGE;
 		time = 0;
 		
@@ -139,7 +146,7 @@ public class Refit implements IPartWork {
 		//Step 1: put all of the parts from the current unit into a new arraylist so they can
 		//be removed when we find a match.
 		for(Part p : oldUnit.getParts()) {
-			oldUnitParts.add(p);
+			oldUnitParts.add(p.getId());
 		}
 		
 		//Step 2: loop through the parts arraylist in the newUnit and attempt to find the 
@@ -153,13 +160,13 @@ public class Refit implements IPartWork {
 		//c) We dont find the part in the oldunit part list.  That means this is a new part.  Add
 		//this to the newequipment arraylist from step 3.  Don't change anything in terms of refit 
 		//stats yet, that will happen later.
-		//TODO: need to keep track of equipment numbers
 		for(Part part : newUnit.getParts()) {
 			boolean partFound = false;
 			Part movedPart = null;
 			int moveIndex = 0;
 			int i = -1;
-			for(Part oPart : oldUnitParts) {
+			for(int pid : oldUnitParts) {
+				Part oPart = oldUnit.campaign.getPart(pid);
 				i++;
 				if((oPart instanceof MissingPart && ((MissingPart)oPart).isAcceptableReplacement(part)) 
 						|| oPart.isSamePartTypeAndStatus(part)) {
@@ -178,11 +185,9 @@ public class Refit implements IPartWork {
 							movedPart = oPart;
 							moveIndex = i;
 							continue;
-						} else {
-							equipNumTracker.put(oPart.getId(), ((EquipmentPart)part).getEquipmentNum());
-						}
+						} 
 					}
-					newUnitParts.add(oPart);
+					newUnitParts.add(pid);
 					partFound = true;
 					break;
 				}
@@ -190,11 +195,10 @@ public class Refit implements IPartWork {
 			if(partFound) {
 				oldUnitParts.remove(i);
 			} else if(null != movedPart) {
-				newUnitParts.add(movedPart);
+				newUnitParts.add(movedPart.getId());
 				oldUnitParts.remove(moveIndex);
 				updateRefitClass(CLASS_C);
 				if(movedPart instanceof EquipmentPart) {
-					equipNumTracker.put(movedPart.getId(), ((EquipmentPart)part).getEquipmentNum());
 					boolean isSalvaging = movedPart.isSalvaging();
 					movedPart.setSalvaging(true);
 					movedPart.updateConditionFromEntity();
@@ -203,7 +207,7 @@ public class Refit implements IPartWork {
 				}
 			} else {
 				//its a new part
-				newEquipment.add(part);
+				newPartsList.add(part);
 			}		
 		}
 		
@@ -214,10 +218,10 @@ public class Refit implements IPartWork {
 		//TODO: check the parts store for new equipment
 		
 		//first put oldUnitParts in a new arraylist so they can be removed as we find them
-		ArrayList<Part> tempParts = new ArrayList<Part>();
+		ArrayList<Integer> tempParts = new ArrayList<Integer>();
 		tempParts.addAll(oldUnitParts);
 		
-		for(Part nPart : newEquipment) {
+		for(Part nPart : newPartsList) {
 			cost += nPart.getCurrentValue();
 			if(nPart instanceof Armor) {
 				time += nPart.getBaseTime();
@@ -251,7 +255,8 @@ public class Refit implements IPartWork {
 					boolean matchFound = false;
 					int matchIndex = -1;
 					int rClass = CLASS_D;
-					for(Part oPart : tempParts) {
+					for(int pid : tempParts) {
+						Part oPart = oldUnit.campaign.getPart(pid);
 						i++;
 						int oLoc = -1;
 						int oCrits = -1;
@@ -299,7 +304,8 @@ public class Refit implements IPartWork {
 		}
 		
 		//Step 4: loop through remaining equipment on oldunit parts and add time for removing.
-		for(Part oPart : oldUnitParts) {
+		for(int pid : oldUnitParts) {
+			Part oPart = oldUnit.campaign.getPart(pid);
 			if(oPart instanceof MissingPart) {
 				continue;
 			}
@@ -320,16 +326,17 @@ public class Refit implements IPartWork {
 	
 	public void begin() {
 		oldUnit.setRefit(this);
-		orderParts();
+		acquireParts();
 		if(customJob) {
 			saveCustomization();
 		}
 	}
 	
-	private void orderParts() {
+	private void acquireParts() {
 		//TODO: should have to make an acquisition roll
-		for(Part part : newEquipment) {
+		for(Part part : newPartsList) {
 			oldUnit.campaign.buyPart(part, part.getCurrentValue());
+			newUnitParts.add(part.getId());
 		}
 	}
 	
@@ -344,55 +351,80 @@ public class Refit implements IPartWork {
 	}
 	
 	private void complete() {
-		oldUnit.setEntity(newUnit.getEntity());
+		oldUnit.setEntity(newEntity);
 		//add old parts to the warehouse
-		for(Part part : oldUnitParts) {
+		for(int pid : oldUnitParts) {
+			Part part = oldUnit.campaign.getPart(pid);
 			part.setUnit(null);
 		}
-		//change equipment number of equipment part new unit parts
-		for(Part part : newUnitParts) {
-			if(part instanceof EquipmentPart) {
-				((EquipmentPart)part).setEquipmentNum(equipNumTracker.get(part.getId()));
+		//set up new parts
+		ArrayList<Part> newParts = new ArrayList<Part>();
+		for(int pid : newUnitParts) {
+			Part part = oldUnit.campaign.getPart(pid);
+			if(null == part) {
+				MekHQ.logMessage("part with id " + pid + " not found for refit of " + getDesc());
+				return;
 			}
-			else if(part instanceof EquipmentPart) {
-				((MissingEquipmentPart)part).setEquipmentNum(equipNumTracker.get(part.getId()));
-			}
-		}
-		//add new parts to the unit
-		for(Part part : newEquipment) {
 			part.setUnit(oldUnit);
-			newUnitParts.add(part);
-			oldUnit.campaign.addPart(part);
+			newParts.add(part);
 		}
-		oldUnit.setParts(newUnitParts);
+		oldUnit.setParts(newParts);
+		unscrambleEquipmentNumbers();	
 		oldUnit.runDiagnostic();
 		oldUnit.setRefit(null);
 	}
 	
-	public void saveCustomization() {
-		UnitUtil.compactCriticals(newUnit.getEntity());
-	    UnitUtil.reIndexCrits(newUnit.getEntity());
+	private void unscrambleEquipmentNumbers() {
+		//TODO: deal with missingEquipmentParts too
+		ArrayList<Integer> equipNums = new ArrayList<Integer>();
+		for(Mounted m : oldUnit.getEntity().getEquipment()) {
+			equipNums.add(oldUnit.getEntity().getEquipmentNum(m));
+		}
+		for(Part part : oldUnit.getParts()) {
+			if(part instanceof EquipmentPart) {
+				EquipmentPart epart = (EquipmentPart)part;
+				int i = -1;
+				boolean found = false;
+				for(int equipNum : equipNums) {
+					i++;
+					Mounted m = oldUnit.getEntity().getEquipment(equipNum);
+					if(m.getType().equals(epart.getType())) {
+						epart.setEquipmentNum(equipNum);
+						found = true;
+						break;
+					}
+				}
+				if(found) {
+					equipNums.remove(i);
+				}
+			}
+		}
+	}
 	
-		String fileName = newUnit.getEntity().getChassis() + " " + newUnit.getEntity().getModel();    
+	public void saveCustomization() {
+		UnitUtil.compactCriticals(newEntity);
+	    UnitUtil.reIndexCrits(newEntity);
+	
+		String fileName = newEntity.getChassis() + " " + newEntity.getModel();    
 	    String sCustomsDir = "data/mechfiles/customs/";
 	    File customsDir = new File(sCustomsDir);
 	    if(!customsDir.exists()) {
 	    	customsDir.mkdir();
 	    }
 	    try {
-	        if (newUnit.getEntity() instanceof Mech) {
+	        if (newEntity instanceof Mech) {
 	            FileOutputStream out = new FileOutputStream(sCustomsDir + File.separator + fileName + ".mtf");
 	            PrintStream p = new PrintStream(out);
-	
-	            p.println(((Mech) newUnit.getEntity()).getMtf());
+	            p.println(((Mech) newEntity).getMtf());
 	            p.close();
 	            out.close();
 	        } else {
-	            BLKFile.encode(sCustomsDir + File.separator + fileName + ".blk", newUnit.getEntity());
+	            BLKFile.encode(sCustomsDir + File.separator + fileName + ".blk", newEntity);
 	        }
 	    } catch (Exception ex) {
 	        ex.printStackTrace();
 	    }
+	    //TODO: update the mech summary cache
 	}
 	
 	private int getTimeMultiplier() {
@@ -425,7 +457,7 @@ public class Refit implements IPartWork {
 	}
 	
 	public Entity getNewEntity() {
-		return newUnit.getEntity();
+		return newEntity;
 	}
 	
 	public Unit getOriginalUnit() {
@@ -499,7 +531,7 @@ public class Refit implements IPartWork {
 
 	@Override
 	public String getPartName() {
-		return newUnit.getEntity().getDisplayName() + " Customization";
+		return newEntity.getDisplayName() + " Customization";
 	}
 
 	@Override
@@ -613,5 +645,91 @@ public class Refit implements IPartWork {
 	@Override
 	public String checkFixable() {
 		return null;
+	}
+	
+	public void writeToXml(PrintWriter pw1, int indentLvl, int id) {
+		pw1.println(MekHqXmlUtil.indentStr(indentLvl) + "<refit>");
+		pw1.println(MekHqXmlUtil.writeEntityToXmlString(newEntity, indentLvl+1));
+		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<time>"
+				+ time + "</time>");
+		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<timeSpent>" + timeSpent
+				+ "</timeSpent>");
+		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<cost>" + cost
+				+ "</cost>");
+		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<failedCheck>" + failedCheck
+				+ "</failedCheck>");
+		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<customJob>" + customJob
+				+ "</customJob>");
+		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<assignedTechId>" + assignedTechId
+				+ "</assignedTechId>");
+		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<oldUnitParts>");
+		for(int pid : oldUnitParts) {
+			pw1.println(MekHqXmlUtil.indentStr(indentLvl + 2) + "<pid>" + pid
+					+ "</pid>");
+		}
+		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "</oldUnitParts>");
+		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<newUnitParts>");
+		for(int pid : newUnitParts) {
+			pw1.println(MekHqXmlUtil.indentStr(indentLvl + 2) + "<pid>" + pid
+					+ "</pid>");
+		}
+		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "</newUnitParts>");
+		pw1.println(MekHqXmlUtil.indentStr(indentLvl) + "</refit>");
+	}
+	
+	public static Refit generateInstanceFromXML(Node wn, Unit u) {
+		Refit retVal = new Refit();
+		retVal.oldUnit = u;
+		
+		NodeList nl = wn.getChildNodes();
+		
+		try {
+			for (int x=0; x<nl.getLength(); x++) {
+				Node wn2 = nl.item(x);
+				
+				if (wn2.getNodeName().equalsIgnoreCase("time")) {
+					retVal.time = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("timeSpent")) {
+					retVal.timeSpent = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("cost")) {
+					retVal.cost = Long.parseLong(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("assignedTechId")) {
+					retVal.assignedTechId = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("failedCheck")) {
+					if (wn2.getTextContent().equalsIgnoreCase("true"))
+						retVal.failedCheck = true;
+					else
+						retVal.failedCheck = false;
+				} else if (wn2.getNodeName().equalsIgnoreCase("customJob")) {
+					if (wn2.getTextContent().equalsIgnoreCase("true"))
+						retVal.customJob = true;
+					else
+						retVal.customJob = false;
+				} else if (wn2.getNodeName().equalsIgnoreCase("entity")) {
+					retVal.newEntity = MekHqXmlUtil.getEntityFromXmlString(wn2);
+				} else if (wn2.getNodeName().equalsIgnoreCase("oldUnitParts")) {
+					NodeList nl2 = wn2.getChildNodes();
+					for (int y=0; y<nl2.getLength(); y++) {
+						Node wn3 = nl2.item(y);
+						if (wn3.getNodeName().equalsIgnoreCase("pid")) {
+							retVal.oldUnitParts.add(Integer.parseInt(wn3.getTextContent()));
+						}
+					}
+				} else if (wn2.getNodeName().equalsIgnoreCase("newUnitParts")) {
+					NodeList nl2 = wn2.getChildNodes();
+					for (int y=0; y<nl2.getLength(); y++) {
+						Node wn3 = nl2.item(y);
+						if (wn3.getNodeName().equalsIgnoreCase("pid")) {
+							retVal.newUnitParts.add(Integer.parseInt(wn3.getTextContent()));
+						}
+					}
+				} 
+			}
+		} catch (Exception ex) {
+			// Doh!
+			MekHQ.logError(ex);
+		}
+		
+		return retVal;
 	}
 }

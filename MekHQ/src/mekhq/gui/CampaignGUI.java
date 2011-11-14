@@ -2452,6 +2452,7 @@ public class CampaignGUI extends JPanel {
     	refreshUnitList();
     	refreshServicedUnitList();
     	refreshOrganization();
+    	refreshPartsList();
     }
 	
 	private void refreshPersonnelView() {
@@ -4145,128 +4146,7 @@ public class CampaignGUI extends JPanel {
 				refreshPatientList();
 				refreshPersonnelList();
 				refreshScenarioList();
-			} else if (command.contains("CUSTOMIZE")
-					&& !command.contains("CANCEL")) {
-				/*if (!selectedUnit.isDeployed() && !selectedUnit.isDamaged()) {
-					Entity targetEntity = null;
-					String targetMechName = command.split(":")[1];
-					if (targetMechName.equals("MML")) {
-						if (selectedUnit.getEntity() instanceof megamek.common.Mech) {
-							MechSummary mechSummary = MechSummaryCache
-									.getInstance().getMech(
-											selectedUnit.getEntity()
-													.getShortName());
-							megamek.common.Mech selectedMech = null;
-
-							try {
-								Entity e = (new MechFileParser(
-										mechSummary.getSourceFile()))
-										.getEntity();
-								if (e instanceof megamek.common.Mech) {
-									selectedMech = (megamek.common.Mech) e;
-								}
-							} catch (EntityLoadingException ex) {
-								Logger.getLogger(MekHQView.class.getName())
-										.log(Level.SEVERE, null, ex);
-							}
-
-							if (selectedMech == null) {
-								return;
-							}
-
-							String modelTmp = "CST01";
-							selectedMech.setModel(modelTmp);
-
-							MMLMekUICustom megamekLabMekUI = new MMLMekUICustom();
-							megamekLabMekUI.setVisible(false);
-							megamekLabMekUI.setModal(true);
-
-							megamekLabMekUI.loadUnit(selectedMech);
-							megamekLabMekUI.setVisible(true);
-
-							megamek.common.Mech mmlEntity = megamekLabMekUI
-									.getEntity();
-							if (MMLMekUICustom.isEntityValid(mmlEntity)
-									&& mmlEntity.getChassis().equals(
-											selectedMech.getChassis())
-									&& (mmlEntity.getWeight() == selectedMech
-											.getWeight())) {
-								targetEntity = mmlEntity;
-							}
-						}
-	
-					} else if (targetMechName.equals("CHOOSE_VARIANT")) {
-						UnitSelectorDialog usd = new UnitSelectorDialog(null,
-								true, getCampaign(), null);
-						usd.restrictToChassis(selectedUnit.getEntity()
-								.getChassis());
-						usd.getComboUnitType().setSelectedIndex(UnitType.MEK);
-						usd.getComboType()
-								.setSelectedIndex(TechConstants.T_ALL);
-						usd.getComboWeight().setSelectedIndex(
-								selectedUnit.getEntity().getWeightClass());
-						usd.changeBuyBtnToSelectBtn();
-
-						if (!getCampaign().isGM()) {
-							usd.restrictToYear(getCampaign().getCalendar().get(
-									Calendar.YEAR));
-						}
-
-						usd.setVisible(true);
-
-						megamek.common.Mech selectedMech = null;
-
-						MechSummary mechSummary = MechSummaryCache
-								.getInstance()
-								.getMech(
-										selectedUnit.getEntity().getShortName());
-						try {
-							Entity e = (new MechFileParser(
-									mechSummary.getSourceFile())).getEntity();
-							if (e instanceof megamek.common.Mech) {
-								selectedMech = (megamek.common.Mech) e;
-							}
-						} catch (EntityLoadingException ex) {
-							Logger.getLogger(MekHQView.class.getName()).log(
-									Level.SEVERE, null, ex);
-						}
-
-						if (selectedMech == null) {
-							return;
-						}
-
-						Entity chosenTarget = usd.getSelectedEntity();
-						if ((chosenTarget instanceof megamek.common.Mech)
-								&& chosenTarget.getChassis().equals(
-										selectedMech.getChassis())
-								&& (chosenTarget.getWeight() == selectedMech
-										.getWeight())) {
-							targetEntity = chosenTarget;
-						}
-
-					}
-
-					if (targetEntity != null) {
-						selectedUnit.setCustomized(true);
-						selectedUnit.customize(targetEntity, getCampaign());
-					}
-
-					refreshServicedUnitList();
-					refreshUnitList();
-					refreshTaskList();
-					refreshAcquireList();
-				}
-				*/
-			} else if (command.contains("CANCEL_CUSTOMIZE")) {
-				if (selectedUnit.isCustomized()) {
-					selectedUnit.setCustomized(false);
-
-					refreshServicedUnitList();
-					refreshUnitList();
-					refreshTaskList();
-					refreshAcquireList();
-				}
-			}
+			} 
 		}
 
 		@Override
@@ -4365,39 +4245,14 @@ public class CampaignGUI extends JPanel {
 					menuItem.setActionCommand("REPAIR");
 					menuItem.addActionListener(this);
 					menuItem.setEnabled(!unit.isDeployed()
-							&& unit.isRepairable() && !unit.isCustomized());
+							&& unit.isRepairable() && !unit.isRefitting());
 					popup.add(menuItem);
 				} else if (!unit.isSalvage()) {
 					menuItem = new JMenuItem("Salvage");
 					menuItem.setActionCommand("SALVAGE");
 					menuItem.addActionListener(this);
 					menuItem.setEnabled(!unit.isDeployed()
-							&& !unit.isCustomized());
-					popup.add(menuItem);
-				}
-				// Customize
-				if (!unit.isCustomized()) {
-					menu = new JMenu("Customize");
-
-					menuItem = new JMenuItem("To existing variant");
-					menuItem.setActionCommand("CUSTOMIZE:" + "CHOOSE_VARIANT");
-					menuItem.addActionListener(this);
-					menu.add(menuItem);
-
-					menuItem = new JMenuItem("MegaMekLab");
-					menuItem.setActionCommand("CUSTOMIZE:" + "MML");
-					menuItem.addActionListener(this);
-					menu.add(menuItem);
-
-					menu.setEnabled(!unit.isDeployed()
-							&& !unit.isDamaged()
-							&& (unit.getEntity() instanceof Mech));
-					popup.add(menu);
-				} else if (unit.isCustomized()) {
-					menuItem = new JMenuItem("Cancel Customize");
-					menuItem.setActionCommand("CANCEL_CUSTOMIZE");
-					menuItem.addActionListener(this);
-					menuItem.setEnabled(unit.isCustomized());
+							&& !unit.isRefitting());
 					popup.add(menuItem);
 				}
 				popup.show(e.getComponent(), e.getX(), e.getY());

@@ -138,7 +138,6 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 	private Entity entity;
 	private int site;
 	private boolean salvaged;
-	private boolean customized;
 	private int id = -1;
 	private int quality;
 	
@@ -167,7 +166,6 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 		this.site = SITE_BAY;
 		this.salvaged = false;
 		this.campaign = c;
-		this.customized = false;
 		this.quality = QUALITY_D;
 		this.parts = new ArrayList<Part>();
 		this.drivers = new ArrayList<Integer>();
@@ -273,14 +271,6 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 
 	public void setSalvage(boolean b) {
 		this.salvaged = b;
-	}
-
-	public void setCustomized(boolean customized) {
-		this.customized = customized;
-	}
-
-	public boolean isCustomized() {
-		return customized;
 	}
 
 	public boolean isFunctional() {
@@ -1004,8 +994,6 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 				+ "\" type=\"" + this.getClass().getName() + "\">");
 
 		pw1.println(MekHqXmlUtil.writeEntityToXmlString(entity, indentLvl+1));
-		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<customized>"
-				+ customized + "</customized>");
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<quality>"
 				+ quality + "</quality>");
 		for(int did : drivers) {
@@ -1028,6 +1016,9 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 				+"<scenarioId>"
 				+scenarioId
 				+"</scenarioId>");
+		if(null != refit) {
+			refit.writeToXml(pw1, indentLvl+1, id);
+		}
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl) + "</unit>");
 	}
 
@@ -1063,11 +1054,6 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 						retVal.salvaged = true;
 					else
 						retVal.salvaged = false;
-				} else if (wn2.getNodeName().equalsIgnoreCase("customized")) {
-					if (wn2.getTextContent().equalsIgnoreCase("true"))
-						retVal.customized = true;
-					else
-						retVal.customized = false;
 				} else if (wn2.getNodeName().equalsIgnoreCase("entity")) {
 					retVal.entity = MekHqXmlUtil.getEntityFromXmlString(wn2);
 
@@ -1078,6 +1064,8 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 						MekHQ.logMessage("ID not pre-defined and entity not null; setting unit's ID.", 5);
 						retVal.id = retVal.entity.getId();
 					}
+				} else if (wn2.getNodeName().equalsIgnoreCase("refit")) {
+					retVal.refit = Refit.generateInstanceFromXML(wn2, retVal);
 				}
 			}
 		} catch (Exception ex) {
