@@ -108,7 +108,7 @@ public class PlanetViewPanel extends javax.swing.JPanel {
 		add(pnlNeighbors, gridBagConstraints);
 		
 		txtDesc.setName("txtDesc");
-		txtDesc.setText("Nothing here yet. Who wants to volunteer to enter planet data?");
+		txtDesc.setText(planet.getDescription());
 		txtDesc.setEditable(false);
 		txtDesc.setLineWrap(true);
 		txtDesc.setWrapStyleWord(true);

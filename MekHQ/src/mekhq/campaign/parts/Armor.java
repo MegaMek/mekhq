@@ -160,6 +160,10 @@ public class Armor extends Part implements IAcquisitionWork {
         return amount;
     }
     
+    public int getAmountNeeded() {
+    	return amountNeeded;
+    }
+    
     public int getTotalAmount() {
     	return amount + amountNeeded;
     }
@@ -174,6 +178,10 @@ public class Armor extends Part implements IAcquisitionWork {
 
     public void setAmount(int amount) {
         this.amount = amount;
+    }
+    
+    public void setAmountNeeded(int needed) {
+    	this.amountNeeded = needed;
     }
 
     @Override
@@ -415,7 +423,7 @@ public class Armor extends Part implements IAcquisitionWork {
 		updateConditionFromEntity();
 	}
 
-	private int getBaseTimeFor(Entity entity) {
+	public int getBaseTimeFor(Entity entity) {
 		if(entity instanceof Tank) {
 			return 3;
 		} 
@@ -435,19 +443,15 @@ public class Armor extends Part implements IAcquisitionWork {
 			amountNeeded = currentArmor;
 		} else {			
 			amountNeeded = unit.getEntity().getOArmor(location, rear) - currentArmor;
+			amount = currentArmor;
 		}
 		//time should be based on amount available if less than amount needed
-		if(amountNeeded > 0) {
-			if(salvaging) {
-				time = getBaseTimeFor(unit.getEntity()) * amountNeeded;
-			} else {
-				time = getBaseTimeFor(unit.getEntity()) * Math.min(amountNeeded, getAmountAvailable());
-			}
-			difficulty = -2;
+		if(salvaging) {
+			time = getBaseTimeFor(unit.getEntity()) * amountNeeded;
 		} else {
-			time = 0;
-			difficulty = 0;
+			time = getBaseTimeFor(unit.getEntity()) * Math.min(amountNeeded, getAmountAvailable());
 		}
+		difficulty = -2;
 	}
 	
 	@Override

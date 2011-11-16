@@ -111,6 +111,7 @@ public class Planet implements Serializable {
 	private int percentWater;
 	private int temperature;
 	private int hpg;
+	private String desc;
 	
 	//socioindustrial levels
 	private int tech;
@@ -146,6 +147,7 @@ public class Planet implements Serializable {
 		this.climate = CLIMATE_WARMTEM;
 		this.percentWater = 70;
 		this.temperature = 20;
+		this.desc = "Nothing here yet. Who wants to volunteer to enter planet data?";
 		
 		this.tech = EquipmentType.RATING_C;
 		this.industry = EquipmentType.RATING_C;
@@ -586,6 +588,10 @@ public class Planet implements Serializable {
 		return Math.sqrt(Math.pow(x - anotherPlanet.getX(), 2) + Math.pow(y - anotherPlanet.getY(), 2));
 	}
 	
+	public String getDescription() {
+		return desc;
+	}
+	
 	public static int convertRatingToCode(String rating) {
 		if(rating.equalsIgnoreCase("A")) {
 			return EquipmentType.RATING_A;
@@ -668,7 +674,9 @@ public class Planet implements Serializable {
 					retVal.output = convertRatingToCode(wn2.getTextContent().split("-")[3]);
 					retVal.agriculture = convertRatingToCode(wn2.getTextContent().split("-")[4]);
 				}
-			} 
+			} else if (wn2.getNodeName().equalsIgnoreCase("desc")) {
+				retVal.desc = wn2.getTextContent();
+			}
 		}
 		return retVal;
 	}

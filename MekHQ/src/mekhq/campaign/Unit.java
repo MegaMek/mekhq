@@ -1371,7 +1371,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     			partsToAdd.add(a);
     		}
     		if(null == armorRear[i] && entity.hasRearArmor(i)) {
-    			Armor a = new Armor((int) getEntity().getWeight(), getEntity().getArmorType(i), getEntity().getOArmor(i, false), i, true, entity.isClanArmor(i));
+    			Armor a = new Armor((int) getEntity().getWeight(), getEntity().getArmorType(i), getEntity().getOArmor(i, true), i, true, entity.isClanArmor(i));
     			addPart(a);
     			partsToAdd.add(a);
     		}

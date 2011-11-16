@@ -529,7 +529,7 @@ public class Campaign implements Serializable {
 
 	public void addPart(Part p) {
 
-		if(p instanceof Armor) {
+		if(p instanceof Armor && null == p.getUnit()) {
 			for(Part part : getParts()) {
 				if(null != part.getUnit()) {
 					continue;
@@ -541,7 +541,7 @@ public class Campaign implements Serializable {
 				}
 			}
 		}
-		if(p instanceof AmmoStorage) {
+		if(p instanceof AmmoStorage && null == p.getUnit()) {
 			for(Part part : getParts()) {
 				if(null != part.getUnit()) {
 					continue;
@@ -726,7 +726,8 @@ public class Campaign implements Serializable {
         return target;
     }
 	
-	public void acquirePart(IAcquisitionWork acquisition, Person person) {
+	public boolean acquirePart(IAcquisitionWork acquisition, Person person) {
+		boolean found = false;
 		String report = "";
 		report += person.getName() + " attempts to find " + acquisition.getPartName();          
 		TargetRoll target = getTargetForAcquisition(acquisition, person);     
@@ -736,10 +737,12 @@ public class Campaign implements Serializable {
 		report += " and rolls " + roll + ":";		
 		if(roll >= target.getValue()) {
 			report = report + acquisition.find();	
+			found = true;
 		} else {
 			report = report + acquisition.failToFind();
 		}
 		addReport(report);
+		return found;
 	}
 	
 	public void refit(Refit r) {
@@ -749,6 +752,9 @@ public class Campaign implements Serializable {
 		if(null == tech) {
 			addReport("No tech is assigned to refit " + r.getOriginalEntity().getDisplayName() + ". Refit cancelled.");
 			r.cancel();
+			return;
+		}
+		if(!r.acquireParts()) {
 			return;
 		}
 		String report = tech.getName() + " works on " + r.getPartName();   
@@ -888,6 +894,7 @@ public class Campaign implements Serializable {
 		//check for refits first
 		for(Unit u : getUnits()) {
 			if(u.isRefitting()) {
+				u.getRefit().resetCheckedToday();
 				refit(u.getRefit());
 			}
 		}
