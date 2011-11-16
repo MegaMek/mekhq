@@ -99,6 +99,7 @@ public class Planet implements Serializable {
 	private int spectralClass;
 	private int subtype;
 	private String luminosity;
+	private int sysPos;
 	
 	private int pressure;
 	private double gravity;
@@ -137,6 +138,7 @@ public class Planet implements Serializable {
 		this.spectralClass = SPECTRAL_G;
 		this.subtype = 2;
 		this.luminosity = LUM_V;
+		this.sysPos = 1;
 		
 		this.pressure = PlanetaryConditions.ATMO_STANDARD;
 		this.gravity = 1.0;
@@ -268,6 +270,10 @@ public class Planet implements Serializable {
 	
 	public int getBaseFaction() {
 		return faction;
+	}
+	
+	public int getSystemPosition() {
+		return sysPos;
 	}
 	
 	public int getCurrentFaction(Date date) {
@@ -633,6 +639,8 @@ public class Planet implements Serializable {
 				retVal.pressure = Integer.parseInt(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("gravity")) {
 				retVal.gravity = Double.parseDouble(wn2.getTextContent());
+			} else if (wn2.getNodeName().equalsIgnoreCase("sysPos")) {
+				retVal.sysPos = Integer.parseInt(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("nadirCharge")) {
 				if (wn2.getTextContent().equalsIgnoreCase("true"))
 					retVal.nadirCharge = true;

@@ -66,6 +66,7 @@ v0.1.10 (SVN)
 + improvements to refit/customization process
 + xml load/save for Refit object
 + armor refits processed properly
++ added system position to planet data
 
 v0.1.9 (2011-07-17)
 + beginning of personnel switch (hold on to your hats!)

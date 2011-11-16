@@ -36,6 +36,8 @@ public class PlanetViewPanel extends javax.swing.JPanel {
 	private javax.swing.JLabel lblOwner;
 	private javax.swing.JLabel lblStarType;
 	private javax.swing.JTextArea txtStarType;
+	private javax.swing.JLabel lblPosition;
+	private javax.swing.JTextArea txtPosition;
 	private javax.swing.JLabel lblJumpPoint;
 	private javax.swing.JTextArea txtJumpPoint;
 	private javax.swing.JLabel lblSatellite;
@@ -160,6 +162,8 @@ public class PlanetViewPanel extends javax.swing.JPanel {
     	lblOwner = new javax.swing.JLabel();
     	lblStarType = new javax.swing.JLabel();
     	txtStarType = new javax.swing.JTextArea();
+    	lblPosition = new javax.swing.JLabel();
+    	txtPosition = new javax.swing.JTextArea();
     	lblSatellite = new javax.swing.JLabel();
     	txtSatellite = new javax.swing.JTextArea();
     	lblJumpPoint = new javax.swing.JLabel();
@@ -222,11 +226,34 @@ public class PlanetViewPanel extends javax.swing.JPanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
 		pnlStats.add(txtStarType, gridBagConstraints);
 		
+		lblPosition.setName("lblPosition"); // NOI18N
+		lblPosition.setText(resourceMap.getString("lblPosition.text"));
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 2;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+		pnlStats.add(lblPosition, gridBagConstraints);
+		
+		txtPosition.setName("txtPosition"); // NOI18N
+		txtPosition.setText(Integer.toString(planet.getSystemPosition()));
+		txtPosition.setEditable(false);
+		txtPosition.setLineWrap(true);
+		txtPosition.setWrapStyleWord(true);
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 1;
+		gridBagConstraints.gridy = 2;
+		gridBagConstraints.weightx = 0.5;
+		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+		pnlStats.add(txtPosition, gridBagConstraints);
+		
 		lblJumpPoint.setName("lblJumpPoint"); // NOI18N
 		lblJumpPoint.setText(resourceMap.getString("lblJumpPoint1.text"));
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 2;
+		gridBagConstraints.gridy = 3;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblJumpPoint, gridBagConstraints);
@@ -238,7 +265,7 @@ public class PlanetViewPanel extends javax.swing.JPanel {
 		txtJumpPoint.setWrapStyleWord(true);
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 2;
+		gridBagConstraints.gridy = 3;
 		gridBagConstraints.weightx = 0.5;
 		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
 		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
@@ -249,7 +276,7 @@ public class PlanetViewPanel extends javax.swing.JPanel {
 		lblSatellite.setText(resourceMap.getString("lblSatellite1.text"));
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 3;
+		gridBagConstraints.gridy = 4;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblSatellite, gridBagConstraints);
@@ -261,7 +288,7 @@ public class PlanetViewPanel extends javax.swing.JPanel {
 		txtSatellite.setWrapStyleWord(true);
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 3;
+		gridBagConstraints.gridy = 4;
 		gridBagConstraints.weightx = 0.5;
 		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
 		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
@@ -272,7 +299,7 @@ public class PlanetViewPanel extends javax.swing.JPanel {
 		lblGravity.setText(resourceMap.getString("lblGravity1.text"));
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 4;
+		gridBagConstraints.gridy = 5;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblGravity, gridBagConstraints);
@@ -284,7 +311,7 @@ public class PlanetViewPanel extends javax.swing.JPanel {
 		txtGravity.setWrapStyleWord(true);
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 4;
+		gridBagConstraints.gridy = 5;
 		gridBagConstraints.weightx = 0.5;
 		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
 		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
@@ -295,7 +322,7 @@ public class PlanetViewPanel extends javax.swing.JPanel {
 		lblPressure.setText(resourceMap.getString("lblPressure1.text"));
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 5;
+		gridBagConstraints.gridy = 6;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblPressure, gridBagConstraints);
@@ -307,7 +334,7 @@ public class PlanetViewPanel extends javax.swing.JPanel {
 		txtPressure.setWrapStyleWord(true);
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 5;
+		gridBagConstraints.gridy = 6;
 		gridBagConstraints.weightx = 0.5;
 		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
 		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
@@ -318,7 +345,7 @@ public class PlanetViewPanel extends javax.swing.JPanel {
 		lblTemp.setText(resourceMap.getString("lblTemp1.text"));
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 6;
+		gridBagConstraints.gridy = 7;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblTemp, gridBagConstraints);
@@ -330,7 +357,7 @@ public class PlanetViewPanel extends javax.swing.JPanel {
 		txtTemp.setWrapStyleWord(true);
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 6;
+		gridBagConstraints.gridy = 7;
 		gridBagConstraints.weightx = 0.5;
 		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
 		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
@@ -341,7 +368,7 @@ public class PlanetViewPanel extends javax.swing.JPanel {
 		lblWater.setText(resourceMap.getString("lblWater1.text"));
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 7;
+		gridBagConstraints.gridy = 8;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblWater, gridBagConstraints);
@@ -353,7 +380,7 @@ public class PlanetViewPanel extends javax.swing.JPanel {
 		txtWater.setWrapStyleWord(true);
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 7;
+		gridBagConstraints.gridy = 8;
 		gridBagConstraints.weightx = 0.5;
 		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
 		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
@@ -364,7 +391,7 @@ public class PlanetViewPanel extends javax.swing.JPanel {
 		lblRecharge.setText(resourceMap.getString("lblRecharge1.text"));
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 8;
+		gridBagConstraints.gridy = 9;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblRecharge, gridBagConstraints);
@@ -376,7 +403,7 @@ public class PlanetViewPanel extends javax.swing.JPanel {
 		txtRecharge.setWrapStyleWord(true);
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 8;
+		gridBagConstraints.gridy = 9;
 		gridBagConstraints.weightx = 0.5;
 		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
 		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
@@ -387,7 +414,7 @@ public class PlanetViewPanel extends javax.swing.JPanel {
 		lblHPG.setText(resourceMap.getString("lblHPG1.text"));
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 9;
+		gridBagConstraints.gridy = 10;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblHPG, gridBagConstraints);
@@ -399,7 +426,7 @@ public class PlanetViewPanel extends javax.swing.JPanel {
 		txtHPG.setWrapStyleWord(true);
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 9;
+		gridBagConstraints.gridy = 10;
 		gridBagConstraints.weightx = 0.5;
 		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
 		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
@@ -410,7 +437,7 @@ public class PlanetViewPanel extends javax.swing.JPanel {
 		lblAnimal.setText(resourceMap.getString("lblAnimal1.text"));
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 10;
+		gridBagConstraints.gridy = 11;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblAnimal, gridBagConstraints);
@@ -422,7 +449,7 @@ public class PlanetViewPanel extends javax.swing.JPanel {
 		txtAnimal.setWrapStyleWord(true);
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 10;
+		gridBagConstraints.gridy = 11;
 		gridBagConstraints.weightx = 0.5;
 		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
 		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
@@ -433,7 +460,7 @@ public class PlanetViewPanel extends javax.swing.JPanel {
 		lblSocioIndustrial.setText(resourceMap.getString("lblSocioIndustrial1.text"));
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 11;
+		gridBagConstraints.gridy = 12;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblSocioIndustrial, gridBagConstraints);
@@ -445,7 +472,7 @@ public class PlanetViewPanel extends javax.swing.JPanel {
 		txtSocioIndustrial.setWrapStyleWord(true);
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 11;
+		gridBagConstraints.gridy = 12;
 		gridBagConstraints.weightx = 0.5;
 		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
 		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
@@ -456,7 +483,7 @@ public class PlanetViewPanel extends javax.swing.JPanel {
 		lblLandMass.setText(resourceMap.getString("lblLandMass1.text"));
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 12;
+		gridBagConstraints.gridy = 13;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(lblLandMass, gridBagConstraints);
@@ -468,7 +495,7 @@ public class PlanetViewPanel extends javax.swing.JPanel {
 		txtLandMass.setWrapStyleWord(true);
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 1;
-		gridBagConstraints.gridy = 12;
+		gridBagConstraints.gridy = 13;
 		gridBagConstraints.weightx = 0.5;
 		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
 		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
