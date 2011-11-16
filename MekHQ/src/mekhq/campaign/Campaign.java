@@ -21,7 +21,10 @@
 
 package mekhq.campaign;
 
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.DecimalFormat;
@@ -185,6 +188,8 @@ public class Campaign implements Serializable {
 	
 	private PartsStore partsStore;
 	
+	private ArrayList<String> customs;
+	
 	private CampaignOptions campaignOptions = new CampaignOptions();
 
 	public Campaign() {
@@ -212,6 +217,7 @@ public class Campaign implements Serializable {
 		partsStore = new PartsStore();
 		gameOptions = new GameOptions();
 		gameOptions.initialize();
+		customs = new ArrayList<String>();
 	}
 
 	public String getName() {
@@ -1447,6 +1453,7 @@ public class Campaign implements Serializable {
 		
 		writeGameOptions(pw1);
 		
+		writeCustoms(pw1);
 		// Okay, we're done.
 		// Close everything out and be done with it.
 		pw1.println("</campaign>");
@@ -1501,6 +1508,36 @@ public class Campaign implements Serializable {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "</" + tag + ">");
 	}
 	
+	private void writeCustoms(PrintWriter pw1) {
+		for(String name : customs) {
+			MechSummary ms = MechSummaryCache.getInstance().getMech(name);
+			if (ms == null)
+				continue;
+
+			MechFileParser mechFileParser = null;
+			try {
+				mechFileParser = new MechFileParser(ms.getSourceFile());
+			} catch (EntityLoadingException ex) {
+				Logger.getLogger(Campaign.class.getName()).log(Level.SEVERE,
+						"MechFileParse exception : " + name, ex);
+			}
+			if (mechFileParser == null) {
+				continue;
+			}
+			Entity en = mechFileParser.getEntity();
+			pw1.println("\t<custom>");
+			pw1.println("\t\t<name>" + name + "</name>");
+			if(en instanceof Mech) {
+				pw1.print("\t\t<mtf>");
+				pw1.print(((Mech)en).getMtf());
+				pw1.print("\t\t</mtf>\n");
+			} else {
+				//TODO: ??
+			}
+			pw1.println("\t</custom>");
+		}
+	}
+	
 	 
 
 	/**
@@ -1539,6 +1576,35 @@ public class Campaign implements Serializable {
 		// Stupid weird parsing of XML.  At least this cleans it up.
 		campaignEle.normalize(); 
 
+		//we need to iterate through twice, the first time to collect
+		//any custom units that might not be written yet
+		for (int x = 0; x < nl.getLength(); x++) {
+			Node wn = nl.item(x);
+
+			if (wn.getParentNode() != campaignEle)
+				continue;
+
+			int xc = wn.getNodeType();
+
+			if (xc == Node.ELEMENT_NODE) {
+				// This is what we really care about.
+				// All the meat of our document is in this node type, at this
+				// level.
+				// Okay, so what element is it?
+				String xn = wn.getNodeName();
+
+				if (xn.equalsIgnoreCase("custom")) {
+					processCustom(retVal, wn);
+				} 
+			} else {
+				// If it's a text node or attribute or whatever at this level,
+				// it's probably white-space.
+				// We can safely ignore it even if it isn't, for now.
+				continue;
+			}
+		}
+	    MechSummaryCache.getInstance().loadMechData();
+		
 		// Okay, lets iterate through the children, eh?
 		for (int x = 0; x < nl.getLength(); x++) {
 			Node wn = nl.item(x);
@@ -1920,6 +1986,48 @@ public class Campaign implements Serializable {
 		}
 
 		MekHQ.logMessage("Load Game Option Nodes Complete!", 4);
+	}
+	
+	private static void processCustom(Campaign retVal, Node wn) {
+		String sCustomsDir = "data/mechfiles/customs/";
+	    File customsDir = new File(sCustomsDir);
+	    if(!customsDir.exists()) {
+	    	customsDir.mkdir();
+	    }
+		
+		NodeList wList = wn.getChildNodes();
+		
+		String name = null;
+		String mtf = null;
+		
+		// Okay, lets iterate through the children, eh?
+		for (int x = 0; x < wList.getLength(); x++) {
+			Node wn2 = wList.item(x);
+
+			// If it's not an element node, we ignore it.
+			if (wn2.getNodeType() != Node.ELEMENT_NODE)
+				continue;
+			
+			if (wn2.getNodeName().equalsIgnoreCase("name")) {
+				name = wn2.getTextContent();
+			} else if (wn2.getNodeName().equalsIgnoreCase("mtf")) {
+				mtf = wn2.getTextContent();
+			}
+		}
+		if(null != name && null != mtf) {
+			try {
+				MekHQ.logMessage("Loading Custom unit from XML...", 4);
+				FileOutputStream out = new FileOutputStream(sCustomsDir + File.separator + name + ".mtf");
+				PrintStream p = new PrintStream(out);
+				p.println(mtf);
+				p.close();
+				out.close();
+				retVal.addCustom(name);
+				MekHQ.logMessage("Loaded Custom Unit!", 4);
+			} catch (Exception ex) {
+		        ex.printStackTrace();
+		    }
+		}
 	}
 	
 	private static void processMissionNodes(Campaign retVal, Node wn) {
@@ -2907,6 +3015,10 @@ public class Campaign implements Serializable {
 	
 	public PartsStore getPartsStore() {
 		return partsStore;
+	}
+	
+	public void addCustom(String name) {
+		customs.add(name);
 	}
 	
 }

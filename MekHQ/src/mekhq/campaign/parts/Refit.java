@@ -44,6 +44,7 @@ import mekhq.campaign.work.Modes;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Mech;
+import megamek.common.MechSummaryCache;
 import megamek.common.Mounted;
 import megamek.common.TargetRoll;
 import megamek.common.WeaponType;
@@ -527,7 +528,9 @@ public class Refit implements IPartWork {
 	    } catch (Exception ex) {
 	        ex.printStackTrace();
 	    }
-	    //TODO: update the mech summary cache
+	    oldUnit.campaign.addCustom(newEntity.getChassis() + " " + newEntity.getModel());
+	    MechSummaryCache.getInstance().loadMechData();
+	    //TODO: we need to somehow update the MechSummaryCache with the new unit
 	}
 	
 	private int getTimeMultiplier() {
