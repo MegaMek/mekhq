@@ -2446,6 +2446,7 @@ public class CampaignGUI extends JPanel {
     	}    	
     	r.begin();
     	getCampaign().refit(r);
+    	panMekLab.clearUnit();
     	refreshReport();
     	refreshFunds();
     	refreshFinancialTransactions();

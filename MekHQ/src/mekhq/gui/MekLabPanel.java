@@ -113,7 +113,6 @@ public class MekLabPanel extends JPanel implements RefreshListener {
         btnRefit.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				campaignGUI.refitUnit(refit, true);
-				clearUnit();
 			}
 		});
         btnClear = new JButton("Clear Changes");

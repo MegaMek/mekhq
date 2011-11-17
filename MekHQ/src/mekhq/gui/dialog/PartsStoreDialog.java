@@ -306,10 +306,11 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 		protected ArrayList<PartInventory> data;
 
 		public final static int COL_NAME    =    0;
-		public final static int COL_TECH_BASE  = 1;
-		public final static int COL_COST     =   2;
-		public final static int COL_TON       =  3;
-        public final static int N_COL          = 4;
+		public final static int COL_DETAIL   =   1;
+		public final static int COL_TECH_BASE  = 2;
+		public final static int COL_COST     =   3;
+		public final static int COL_TON       =  4;
+        public final static int N_COL          = 5;
 		
 		public PartsTableModel(ArrayList<PartInventory> inventory) {
 			data = inventory;
@@ -328,6 +329,8 @@ public class PartsStoreDialog extends javax.swing.JDialog {
             switch(column) {
             	case COL_NAME:
             		return "Name";
+            	case COL_DETAIL:
+                    return "Detail";
                 case COL_COST:
                     return "Cost";
                 case COL_TON:
@@ -349,6 +352,9 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 			Part part = partInventory.getPart();
 			if(col == COL_NAME) {
 				return part.getName();
+			}
+			if(col == COL_DETAIL) {
+				return part.getDetails();
 			}
 			if(col == COL_COST) {
 				return formatter.format(part.getCurrentValue());
@@ -383,6 +389,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 		 public int getColumnWidth(int c) {
 	            switch(c) {
 	            case COL_NAME:
+	            case COL_DETAIL:
 	        		return 100;
 	            case COL_TECH_BASE:
 	                return 40;        

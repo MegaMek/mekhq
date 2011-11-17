@@ -68,6 +68,8 @@ v0.1.10 (SVN)
 + armor refits processed properly
 + added system position to planet data
 + custom unit info is saved within xml so that cpnx are transportable without accompanying custom data
++ dont remove unit from lab when tech is missing on refit
++ add detail column to parts store
 
 v0.1.9 (2011-07-17)
 + beginning of personnel switch (hold on to your hats!)
