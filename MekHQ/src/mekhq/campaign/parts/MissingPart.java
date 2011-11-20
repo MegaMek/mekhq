@@ -186,11 +186,6 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 	}
 	
 	@Override
-	public void updateConditionFromPart() {
-		//do nothing
-	}
-	
-	@Override
 	public void updateConditionFromEntity() {
 		//do nothing
 	}

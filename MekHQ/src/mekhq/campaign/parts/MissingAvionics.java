@@ -21,6 +21,7 @@
 
 package mekhq.campaign.parts;
 
+import megamek.common.Aero;
 import megamek.common.EquipmentType;
 
 /**
@@ -85,6 +86,13 @@ public class MissingAvionics extends MissingPart {
 			return EquipmentType.RATING_D;
 		} else {
 			return EquipmentType.RATING_C;
+		}
+	}
+
+	@Override
+	public void updateConditionFromPart() {
+		if(null != unit && unit.getEntity() instanceof Aero) {
+			((Aero)unit.getEntity()).setAvionicsHits(3);
 		}
 	}
 	

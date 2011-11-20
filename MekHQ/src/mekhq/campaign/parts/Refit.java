@@ -474,7 +474,10 @@ public class Refit implements IPartWork {
 		oldUnit.setParts(newParts);
 		unscrambleEquipmentNumbers();	
 		reduceArmorAvailable();
-		oldUnit.runDiagnostic();
+		for(Part part : oldUnit.getParts()) {
+			part.updateConditionFromPart();
+		}
+		oldUnit.resetPilotAndEntity();
 		oldUnit.setRefit(null);
 	}
 	

@@ -101,5 +101,14 @@ public class MissingAeroHeatSink extends MissingPart {
 			return EquipmentType.RATING_B;
 		}
 	}
+
+	@Override
+	public void updateConditionFromPart() {
+		if(null != unit && unit.getEntity() instanceof Aero) {
+			if(hits == 0) {
+				((Aero)unit.getEntity()).setHeatSinks(((Aero)unit.getEntity()).getHeatSinks()-1);
+			}
+		}
+	}
 	
 }

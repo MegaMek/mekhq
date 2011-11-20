@@ -23,6 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import megamek.common.Aero;
 import megamek.common.EquipmentType;
 import mekhq.campaign.MekHqXmlUtil;
 
@@ -115,6 +116,14 @@ public class MissingAeroSensor extends MissingPart {
 				}
 			}
 		}
+	}
+
+	@Override
+	public void updateConditionFromPart() {
+		if(null != unit && unit.getEntity() instanceof Aero) {
+			((Aero)unit.getEntity()).setSensorHits(3);
+		}
+		
 	}
 	
 }

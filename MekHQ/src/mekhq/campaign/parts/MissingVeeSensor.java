@@ -22,6 +22,7 @@
 package mekhq.campaign.parts;
 
 import megamek.common.EquipmentType;
+import megamek.common.Tank;
 
 /**
  *
@@ -78,6 +79,13 @@ public class MissingVeeSensor extends MissingPart {
 	@Override
 	public int getAvailability(int era) {
 		return EquipmentType.RATING_C;
+	}
+
+	@Override
+	public void updateConditionFromPart() {
+		if(null != unit && unit.getEntity() instanceof Tank) {
+			((Tank)unit.getEntity()).setSensorHits(4);
+		}
 	}
 	
 }

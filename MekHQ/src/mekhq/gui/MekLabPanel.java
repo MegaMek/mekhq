@@ -85,6 +85,8 @@ public class MekLabPanel extends JPanel implements RefreshListener {
     
     Unit unit;
     Mech entity;
+    TestEntity testEntity;
+    EntityVerifier entityVerifier;
     Refit refit;
     JTabbedPane ConfigPane = new JTabbedPane(SwingConstants.TOP);
     JPanel summaryPane = new JPanel();
@@ -106,6 +108,7 @@ public class MekLabPanel extends JPanel implements RefreshListener {
     
     public MekLabPanel(CampaignGUI gui) {
     	campaignGUI = gui;
+		entityVerifier = new EntityVerifier(new File("data/mechfiles/UnitVerifierOptions.xml"));
         UnitUtil.loadFonts();
         new CConfig();
         MekHQ.logMessage("Staring MegaMekLab version: " + MegaMekLab.VERSION);
@@ -267,18 +270,6 @@ public class MekLabPanel extends JPanel implements RefreshListener {
         return entity;
     }
 
-    public static boolean isEntityValid (Mech entity) {
-        EntityVerifier entityVerifier = new EntityVerifier(new File("data/mechfiles/UnitVerifierOptions.xml"));
-        StringBuffer sb = new StringBuffer();
-        TestEntity testEntity = null;
-
-        testEntity = new TestMech(entity, entityVerifier.mechOption, null);
-
-        testEntity.correctEntity(sb, true);
-
-        return (sb.length() == 0);
-    }
-
 	@Override
 	public void refreshHeader() {
 		// TODO Auto-generated method stub
@@ -286,8 +277,24 @@ public class MekLabPanel extends JPanel implements RefreshListener {
 	}
 	
 	public void refreshSummary() {
-		refit = new Refit(unit, entity, true);
-		btnRefit.setEnabled(isEntityValid(entity));
+		refit = new Refit(unit, entity, true); 
+        testEntity = new TestMech(entity, entityVerifier.mechOption, null);
+        StringBuffer sb = new StringBuffer();
+        testEntity.correctEntity(sb, true);
+		
+		if(entity.getWeight() < testEntity.calculateWeight()) {
+			btnRefit.setEnabled(false);
+			btnRefit.setToolTipText("Unit is overweight.");
+		} else if(sb.length() > 0) {
+			btnRefit.setEnabled(false);
+			btnRefit.setToolTipText(sb.toString());	
+		} else if (entity.getWeight() > testEntity.calculateWeight()) {
+			btnRefit.setEnabled(false);
+			btnRefit.setToolTipText("Unit is underweight.");	
+		} else {
+			btnRefit.setEnabled(true);
+			btnRefit.setToolTipText(null);
+		}
 		
 		summaryPane.removeAll();
 		summaryPane.setLayout(new GridBagLayout());
@@ -316,8 +323,6 @@ public class MekLabPanel extends JPanel implements RefreshListener {
 		c.gridy = 6;
 		c.weighty = 1.0;
 		summaryPane.add(btnRemove,c);
-		//TODO: choose tech to work on refit
 		//TODO: compare units dialog that pops up mech views back-to-back
 	}
-	
 }

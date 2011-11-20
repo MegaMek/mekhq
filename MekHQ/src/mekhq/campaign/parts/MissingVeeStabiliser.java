@@ -24,6 +24,7 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 
 import megamek.common.EquipmentType;
+import megamek.common.Tank;
 import mekhq.campaign.MekHqXmlUtil;
 
 import org.w3c.dom.Node;
@@ -125,6 +126,13 @@ public class MissingVeeStabiliser extends MissingPart {
 	
 	public int getLocation() {
 		return loc;
+	}
+
+	@Override
+	public void updateConditionFromPart() {
+		if(null != unit && unit.getEntity() instanceof Tank) {
+			((Tank)unit.getEntity()).setStabiliserHit(loc);
+		}
 	}
 	
 }

@@ -24,6 +24,8 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 
 import megamek.common.EquipmentType;
+import megamek.common.IArmorState;
+import megamek.common.VTOL;
 
 import org.w3c.dom.Node;
 
@@ -96,5 +98,12 @@ public class MissingRotor extends MissingPart {
 	public long getPurchasePrice() {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+
+	@Override
+	public void updateConditionFromPart() {
+		if(null != unit && unit.getEntity() instanceof VTOL) {
+			unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, VTOL.LOC_ROTOR);
+		}
 	}
 }

@@ -21,6 +21,7 @@
 
 package mekhq.campaign.parts;
 
+import megamek.common.Aero;
 import megamek.common.EquipmentType;
 
 /**
@@ -78,6 +79,13 @@ public class MissingFireControlSystem extends MissingPart {
 	@Override
 	public int getAvailability(int era) {
 		return EquipmentType.RATING_C;
+	}
+
+	@Override
+	public void updateConditionFromPart() {
+		if(null != unit && unit.getEntity() instanceof Aero) {
+			((Aero)unit.getEntity()).setFCSHits(3);
+		}
 	}
 	
 }

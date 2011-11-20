@@ -23,6 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import megamek.common.CriticalSlot;
 import megamek.common.EquipmentType;
 import megamek.common.Mech;
 import mekhq.campaign.MekHqXmlUtil;
@@ -161,5 +162,12 @@ public class MissingMekGyro extends MissingPart {
 	@Override
 	public Part getNewPart() {
 		return new MekGyro(getUnitTonnage(), getType(), getTonnage());
+	}
+
+	@Override
+	public void updateConditionFromPart() {
+		if(null != unit) {
+			unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_GYRO, Mech.LOC_CT);
+		}
 	}
 }

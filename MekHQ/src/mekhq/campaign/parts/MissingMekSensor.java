@@ -105,4 +105,11 @@ public class MissingMekSensor extends MissingPart {
 		return new MekSensor(getUnitTonnage());
 	}
 
+	@Override
+	public void updateConditionFromPart() {
+		if(null != unit) {
+			unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS);
+		}
+	}
+
 }

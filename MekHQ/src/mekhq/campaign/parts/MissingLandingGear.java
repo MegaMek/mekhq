@@ -21,6 +21,7 @@
 
 package mekhq.campaign.parts;
 
+import megamek.common.Aero;
 import megamek.common.EquipmentType;
 
 /**
@@ -80,6 +81,13 @@ public class MissingLandingGear extends MissingPart {
 	public int getAvailability(int era) {
 		//go with conventional fighter avionics
 		return EquipmentType.RATING_C;
+	}
+
+	@Override
+	public void updateConditionFromPart() {
+		if(null != unit && unit.getEntity() instanceof Aero) {
+			((Aero)unit.getEntity()).setGearHit(true);
+		}
 	}
 	
 }

@@ -24,6 +24,7 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 
 import megamek.common.EquipmentType;
+import megamek.common.IArmorState;
 import megamek.common.Mech;
 import mekhq.campaign.MekHqXmlUtil;
 
@@ -296,5 +297,12 @@ public class MissingMekLocation extends MissingPart {
 	@Override
 	public Part getNewPart() {
 		return new MekLocation(loc, getUnitTonnage(), structureType, tsm, forQuad);
+	}
+	
+	@Override
+	public void updateConditionFromPart() {
+		if(null != unit) {
+			unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, loc);
+		}
 	}
 }

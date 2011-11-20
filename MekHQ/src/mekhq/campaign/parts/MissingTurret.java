@@ -24,6 +24,7 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 
 import megamek.common.EquipmentType;
+import megamek.common.IArmorState;
 import megamek.common.Tank;
 import mekhq.campaign.MekHqXmlUtil;
 
@@ -112,5 +113,12 @@ public class MissingTurret extends MissingPart {
 	public long getPurchasePrice() {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+
+	@Override
+	public void updateConditionFromPart() {
+		if(null != unit) {
+			unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, Tank.LOC_TURRET);
+		}
 	}
 }

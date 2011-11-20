@@ -24,6 +24,7 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 
 import megamek.common.BipedMech;
+import megamek.common.CriticalSlot;
 import megamek.common.EquipmentType;
 import megamek.common.Mech;
 import mekhq.campaign.MekHqXmlUtil;
@@ -215,5 +216,12 @@ public class MissingMekActuator extends MissingPart {
 			}
 		}
 		return super.hasCheckedToday();
+	}
+
+	@Override
+	public void updateConditionFromPart() {
+		if(null != unit) {
+			unit.destroySystem(CriticalSlot.TYPE_SYSTEM, type, location);
+		}
 	}
 }

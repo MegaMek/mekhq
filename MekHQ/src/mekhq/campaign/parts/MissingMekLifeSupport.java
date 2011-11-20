@@ -105,4 +105,11 @@ public class MissingMekLifeSupport extends MissingPart {
 	public Part getNewPart() {
 		return new MekLifeSupport(getUnitTonnage());
 	}
+
+	@Override
+	public void updateConditionFromPart() {
+		if(null != unit) {
+			unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_LIFE_SUPPORT);
+		}
+	}
 }

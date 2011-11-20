@@ -23,10 +23,12 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import megamek.common.Aero;
 import megamek.common.CriticalSlot;
 import megamek.common.Engine;
 import megamek.common.EquipmentType;
 import megamek.common.Mech;
+import megamek.common.Tank;
 import megamek.common.TechConstants;
 import mekhq.campaign.MekHqXmlUtil;
 
@@ -253,6 +255,19 @@ public class MissingEnginePart extends MissingPart {
 	@Override
 	public Part getNewPart() {
 		return new EnginePart(getUnitTonnage(), getEngine());
+	}
+
+	@Override
+	public void updateConditionFromPart() {
+		if(null != unit) {
+			unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE);
+			if(unit.getEntity() instanceof Aero) {
+				((Aero)unit.getEntity()).setEngineHits(((Aero)unit.getEntity()).getMaxEngineHits());
+			}
+			if(unit.getEntity() instanceof Tank) {
+				((Tank)unit.getEntity()).engineHit();
+			}
+		}
 	}
 
 

@@ -293,4 +293,16 @@ public class MissingEquipmentPart extends MissingPart {
     	}
     	return -1;
     }
+
+	@Override
+	public void updateConditionFromPart() {
+		if(null != unit) {
+			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
+			if(null != mounted) {
+				mounted.setHit(true);
+		        mounted.setDestroyed(true);
+		        unit.destroySystem(CriticalSlot.TYPE_EQUIPMENT, unit.getEntity().getEquipmentNum(mounted));	
+			}
+		}
+	}
 }
