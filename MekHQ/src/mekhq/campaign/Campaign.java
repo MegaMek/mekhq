@@ -1698,6 +1698,9 @@ public class Campaign implements Serializable {
 			prt.setUnit(u);
 			if(null != u) {
 				u.addPart(prt);
+				if(prt instanceof AmmoBin) {
+					((AmmoBin)prt).restoreMunitionType();
+				}
 			}
 		}
 		
