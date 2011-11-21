@@ -72,6 +72,7 @@ v0.1.10 (SVN)
 + add detail column to parts store
 + updateConditionFromPart method for MissingParts for refits
 + Bug: total armor amount for Armor part incorrect when salvaging
++ Bug: field refits showing up as Class D
 
 v0.1.9 (2011-07-17)
 + beginning of personnel switch (hold on to your hats!)

@@ -288,9 +288,11 @@ public class Refit implements IPartWork {
 			} else { 
 				//determine whether this is A, B, or C
 				if(nPart instanceof MissingEquipmentPart) {
+					nPart.setUnit(newUnit);
 					int loc = ((MissingEquipmentPart)nPart).getLocation();
 					EquipmentType type = ((MissingEquipmentPart)nPart).getType();
 					int crits = type.getCriticals(newUnit.getEntity());
+					nPart.setUnit(null);
 					int i = -1;
 					boolean matchFound = false;
 					int matchIndex = -1;
