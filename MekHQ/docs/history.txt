@@ -71,6 +71,7 @@ v0.1.10 (SVN)
 + dont remove unit from lab when tech is missing on refit
 + add detail column to parts store
 + updateConditionFromPart method for MissingParts for refits
++ Bug: total armor amount for Armor part incorrect when salvaging
 
 v0.1.9 (2011-07-17)
 + beginning of personnel switch (hold on to your hats!)

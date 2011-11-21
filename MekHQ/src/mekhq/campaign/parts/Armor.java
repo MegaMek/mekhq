@@ -441,6 +441,7 @@ public class Armor extends Part implements IAcquisitionWork {
 		}
 		if(salvaging) {
 			amountNeeded = currentArmor;
+			amount = unit.getEntity().getOArmor(location, rear) - amountNeeded;
 		} else {			
 			amountNeeded = unit.getEntity().getOArmor(location, rear) - currentArmor;
 			amount = currentArmor;

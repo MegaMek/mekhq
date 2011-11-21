@@ -80,6 +80,7 @@ public class Refit implements IPartWork {
 	private long cost;
 	private boolean failedCheck;
 	private boolean customJob;
+	private String fixableString;
 	
 	private ArrayList<Integer> oldUnitParts;
 	private ArrayList<Integer> newUnitParts;
@@ -95,6 +96,7 @@ public class Refit implements IPartWork {
 		oldUnitParts = new ArrayList<Integer>();
 		newUnitParts = new ArrayList<Integer>();
 		shoppingList = new ArrayList<Part>();
+		fixableString = null;
 	}
 	
 	public Refit(Unit oUnit, Entity newEn, boolean custom) {
@@ -108,6 +110,7 @@ public class Refit implements IPartWork {
 		assignedTechId = -1;
 		failedCheck = false;
 		timeSpent = 0;
+		fixableString = null;
 	}
 	
 	public static String getRefitClassName(int refitClass) {
@@ -134,6 +137,10 @@ public class Refit implements IPartWork {
 	
 	public String getRefitClassName() {
 		return getRefitClassName(refitClass);
+	}
+	
+	public int getRefitClass() {
+		return refitClass;
 	}
 	
 	public long getCost() {
@@ -243,7 +250,6 @@ public class Refit implements IPartWork {
 		for(Part nPart : newPartList) {
 			if(nPart instanceof MissingPart) {
 				time += nPart.getBaseTime();
-				nPart.setUnit(oldUnit);
 				Part replacement = ((MissingPart)nPart).findReplacement();
 				if(null != replacement) {
 					newUnitParts.add(replacement.getId());
@@ -261,6 +267,7 @@ public class Refit implements IPartWork {
 				//armor always gets added to the shopping list - it will be checked for differently
 				shoppingList.add(nPart);
 			}
+			nPart.setUnit(null);
 			if(nPart instanceof MissingEnginePart) {
 				if(oldUnit.getEntity().getEngine().getRating() != newUnit.getEntity().getEngine().getRating()) {
 					updateRefitClass(CLASS_D);
@@ -753,7 +760,7 @@ public class Refit implements IPartWork {
 
 	@Override
 	public String checkFixable() {
-		return null;
+		return fixableString;
 	}
 	
 	public void writeToXml(PrintWriter pw1, int indentLvl, int id) {

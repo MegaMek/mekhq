@@ -282,7 +282,11 @@ public class MekLabPanel extends JPanel implements RefreshListener {
         StringBuffer sb = new StringBuffer();
         testEntity.correctEntity(sb, true);
 		
-		if(entity.getWeight() < testEntity.calculateWeight()) {
+        if(refit.getRefitClass() == Refit.NO_CHANGE) {
+        	btnRefit.setEnabled(false);
+			btnRefit.setToolTipText("nothing to change");
+        }
+        else if(entity.getWeight() < testEntity.calculateWeight()) {
 			btnRefit.setEnabled(false);
 			btnRefit.setToolTipText("Unit is overweight.");
 		} else if(sb.length() > 0) {
