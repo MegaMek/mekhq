@@ -145,7 +145,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		if(null != unit) {	
 			//dont just return with the first part if it is damaged
 			for(Part part : unit.campaign.getSpareParts()) {
-				if(!refit && part.isReservedForRefit()) {
+				if(part.isReservedForRefit()) {
 					continue;
 				}
 				//TODO: check for being present
