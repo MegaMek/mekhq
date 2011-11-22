@@ -260,6 +260,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 				time += nPart.getBaseTime();
 				Part replacement = ((MissingPart)nPart).findReplacement(true);
 				if(null != replacement) {
+					replacement.setRefitId(oldUnit.getId());
 					newUnitParts.add(replacement.getId());
 				} else {
 					cost += ((MissingPart)nPart).getNewPart().getCurrentValue();
@@ -431,6 +432,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 				if(oldUnit.campaign.acquirePart((IAcquisitionWork)part, tech)) {
 					Part replacement = ((MissingPart)part).findReplacement(true);
 					if(null != replacement) {
+						replacement.setRefitId(oldUnit.getId());
 						newUnitParts.add(replacement.getId());
 					} else {
 						//shouldnt happen, but just to be sure
@@ -486,6 +488,13 @@ public class Refit implements IPartWork, IAcquisitionWork {
 	}
 	
 	public void cancel() {
+		for(int pid : newUnitParts) {
+			Part part = oldUnit.campaign.getPart(pid);
+			part.setRefitId(-1);
+		}
+		for(Part part : shoppingList) {
+			part.setRefitId(-1);
+		}
 		oldUnit.setRefit(null);
 	}
 	
@@ -515,14 +524,16 @@ public class Refit implements IPartWork, IAcquisitionWork {
 				return;
 			}
 			part.setUnit(oldUnit);
+			part.setRefitId(-1);
 			newParts.add(part);
 		}
 		//now check the shopping list for armor parts and deal with them
 		for(Part part : shoppingList) {
 			if(part instanceof Armor) {
 				part.setUnit(oldUnit);
+				part.setRefitId(-1);
 				oldUnit.campaign.addPart(part);
-				newParts.add(part);		
+				newParts.add(part);	
 			}
 		}
 		oldUnit.setParts(newParts);
@@ -1020,6 +1031,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 				oldUnit.campaign.buyPart(((IAcquisitionWork)part).getNewPart(),(long)(((IAcquisitionWork)part).getPurchasePrice() * 1.1));
 				Part replacement = ((MissingPart)part).findReplacement(true);
 				if(null != replacement) {
+					replacement.setRefitId(oldUnit.getId());
 					newUnitParts.add(replacement.getId());
 				} 
 			}

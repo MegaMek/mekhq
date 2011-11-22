@@ -765,6 +765,7 @@ public class Campaign implements Serializable {
 		if(!r.acquireParts()) {
 			return;
 		}
+		//check that all parts have arrived
 		String report = tech.getName() + " works on " + r.getPartName();   
 		int minutes = r.getTimeLeft();
 		if(minutes > tech.getMinutesLeft()) {

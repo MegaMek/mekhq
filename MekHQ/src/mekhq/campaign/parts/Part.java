@@ -81,13 +81,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	public static String[] getPartTypeLabels() {
 		return partTypeLabels;
 	}
-	
-	//TODO: I need a part status code that is separate from damaged or functional
-	//AVAILABLE
-	//ENROUTE - ordered but not yet received 
-	//REFIT - being used in a refit and so not available
-	//OMNI - used in an omnipod configuration and so not available
-
+		
 	// TODO: how to track clan vs. inner sphere
 	protected String name;
 	protected int id;
@@ -122,6 +116,11 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	protected boolean workingOvertime;
 	protected int shorthandedMod;
 	
+	//this tracks whether the part is reserved for a refit
+	protected int refitId;
+	protected int daysToArrival;
+	
+	
 	public Part() {
 		this(0);
 	}
@@ -140,6 +139,8 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		this.unitId = -1;
 		this.workingOvertime = false;
 		this.shorthandedMod = 0;
+		this.refitId = -1;
+		this.daysToArrival = 0;
 	}
 
 	public void setId(int id) {
@@ -189,6 +190,9 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		String toReturn = "Functional";
 		if(needsFixing()) {
 			toReturn = "Damaged";
+		}
+		if(isReservedForRefit()) {
+			toReturn = "Reserved for Refit";
 		}
 		return toReturn;
 	}
@@ -347,6 +351,14 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 				+"<shorthandedMod>"
 				+shorthandedMod
 				+"</shorthandedMod>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<refitId>"
+				+refitId
+				+"</refitId>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<daysToArrival>"
+				+daysToArrival
+				+"</daysToArrival>");
 	}
 	
 	protected void writeToXmlEnd(PrintWriter pw1, int indent, int id) {
@@ -402,6 +414,10 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 					retVal.unitId = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("shorthandedMod")) {
 					retVal.shorthandedMod = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("refitId")) {
+					retVal.refitId = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("daysToArrival")) {
+					retVal.daysToArrival = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("workingOvertime")) {
 					if(wn2.getTextContent().equalsIgnoreCase("true")) {
 						retVal.workingOvertime = true;
@@ -595,5 +611,35 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	
 	@Override
 	public abstract Part clone();
+	
+	public void setRefitId(int rid) {
+		refitId = rid;
+	}
+	
+	public int getRefitId() {
+		return refitId;
+	}
+	
+	public boolean isReservedForRefit() {
+		return refitId != -1;
+	}
+	
+	public void setDaysToArrival(int days) {
+		daysToArrival = days;
+	}
+	
+	public int getDaysToArrival() { 
+		return daysToArrival;
+	}
+	
+	public void newDay() {
+		if(daysToArrival > 0) {
+			daysToArrival--;
+		}
+	}
+	
+	public boolean isPresent() {
+		return daysToArrival == 0;
+	}
 }
 

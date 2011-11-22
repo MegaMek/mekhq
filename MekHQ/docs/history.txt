@@ -81,6 +81,7 @@ v0.1.10 (SVN)
 + Bug: no refit kits for non-mech units
 + properly sourced refit kits
 + Bug: Center Torso not being replaced when internal structure changed
++ reserved status for refit kit parts (still need to include armor and ammo here)
 
 v0.1.9 (2011-07-17)
 + beginning of personnel switch (hold on to your hats!)
