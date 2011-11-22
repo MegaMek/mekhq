@@ -77,6 +77,7 @@ v0.1.10 (SVN)
 + improvements to look of MekLabPanel
 + Bug: NPE when refitting
 + don't refit for a change in munition type
++ add in heat sink type changes and CASE changes
 
 v0.1.9 (2011-07-17)
 + beginning of personnel switch (hold on to your hats!)

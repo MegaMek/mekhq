@@ -366,8 +366,27 @@ public class Refit implements IPartWork {
 			oPart.updateConditionFromEntity();
 		}
 		
-		//TODO: heat sink type change - Class D
-		//TODO: install CASE - Class E
+		//deal with integral heat sinks
+		//TODO: compact heat sinks
+		//TODO: heat sinks on other units?
+		if(newEntity instanceof Mech 
+				&& (((Mech)newEntity).hasDoubleHeatSinks() != ((Mech)oldUnit.getEntity()).hasDoubleHeatSinks()
+						|| ((Mech)newEntity).hasLaserHeatSinks() != ((Mech)oldUnit.getEntity()).hasLaserHeatSinks())) {
+			time += newEntity.getEngine().integralHeatSinkCapacity() * 90;
+			time += oldUnit.getEntity().getEngine().integralHeatSinkCapacity() * 90;
+			updateRefitClass(CLASS_D);
+		}
+		
+		//check for CASE
+		//TODO: we still dont have to order the part, we need to get the CASE issues sorted out
+		for(int loc = 0; loc < newEntity.locations(); loc++) {
+			if(newEntity.locationHasCase(loc) != oldUnit.getEntity().locationHasCase(loc)
+					|| (newEntity instanceof Mech 
+							&& ((Mech)newEntity).hasCASEII(loc) != ((Mech)oldUnit.getEntity()).hasCASEII(loc))) {
+				time += 60;
+				updateRefitClass(CLASS_E);
+			}
+		}
 		
 		//multiply time by refit class
 		time *= getTimeMultiplier();
@@ -496,7 +515,6 @@ public class Refit implements IPartWork {
 	}
 	
 	private void unscrambleEquipmentNumbers() {
-		//TODO: deal with missingEquipmentParts too
 		ArrayList<Integer> equipNums = new ArrayList<Integer>();
 		for(Mounted m : oldUnit.getEntity().getEquipment()) {
 			equipNums.add(oldUnit.getEntity().getEquipmentNum(m));
@@ -504,6 +522,23 @@ public class Refit implements IPartWork {
 		for(Part part : oldUnit.getParts()) {
 			if(part instanceof EquipmentPart) {
 				EquipmentPart epart = (EquipmentPart)part;
+				int i = -1;
+				boolean found = false;
+				for(int equipNum : equipNums) {
+					i++;
+					Mounted m = oldUnit.getEntity().getEquipment(equipNum);
+					if(m.getType().equals(epart.getType())) {
+						epart.setEquipmentNum(equipNum);
+						found = true;
+						break;
+					}
+				}
+				if(found) {
+					equipNums.remove(i);
+				}
+			}
+			else if(part instanceof MissingEquipmentPart) {
+				MissingEquipmentPart epart = (MissingEquipmentPart)part;
 				int i = -1;
 				boolean found = false;
 				for(int equipNum : equipNums) {
@@ -547,7 +582,6 @@ public class Refit implements IPartWork {
 	    }
 	    oldUnit.campaign.addCustom(newEntity.getChassis() + " " + newEntity.getModel());
 	    MechSummaryCache.getInstance().loadMechData();
-	    //TODO: we need to somehow update the MechSummaryCache with the new unit
 	}
 	
 	private int getTimeMultiplier() {
@@ -555,17 +589,23 @@ public class Refit implements IPartWork {
 		switch(refitClass) {
 		case NO_CHANGE:
 			mult = 0;
+			break;
 		case CLASS_A:
 		case CLASS_B:
 			mult = 1;
+			break;
 		case CLASS_C:
 			mult = 2;
+			break;
 		case CLASS_D:
 			mult = 3;
+			break;
 		case CLASS_E:
 			mult = 4;
+			break;
 		case CLASS_F:
 			mult = 5;
+			break;
 		default:	
 			mult = 1;	
 		}
