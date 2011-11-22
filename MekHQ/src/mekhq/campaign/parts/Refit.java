@@ -41,6 +41,7 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.Modes;
+import megamek.common.AmmoType;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Mech;
@@ -183,14 +184,18 @@ public class Refit implements IPartWork {
 			for(int pid : oldUnitParts) {
 				Part oPart = oldUnit.campaign.getPart(pid);
 				i++;
-				if((oPart instanceof MissingPart && ((MissingPart)oPart).isAcceptableReplacement(part)) 
-						|| oPart.isSamePartTypeAndStatus(part)) {
+				if(((oPart instanceof MissingPart && ((MissingPart)oPart).isAcceptableReplacement(part)) 
+						|| oPart.isSamePartTypeAndStatus(part))
+						|| (part instanceof AmmoBin && oPart instanceof AmmoBin && 
+								!((AmmoType)((AmmoBin)part).getType()).equals((AmmoType)((AmmoBin)oPart).getType()))
+						|| (part instanceof AmmoBin && oPart instanceof MissingAmmoBin && 
+								!((AmmoType)((AmmoBin)part).getType()).equals((AmmoType)((MissingAmmoBin)oPart).getType()))) {
 					//need a special check for location and armor amount for armor
 					if(oPart instanceof Armor 
 							&& (((Armor)oPart).getLocation() != ((Armor)part).getLocation()
 									|| ((Armor)oPart).getTotalAmount() != ((Armor)part).getTotalAmount())) {
 						continue;
-					}
+					}				
 					if(part instanceof EquipmentPart) {
 						//check the location to see if this moved. If so, then don't break, but 
 						//save this in case we fail to find equipment in the same location.
@@ -205,7 +210,7 @@ public class Refit implements IPartWork {
 					newUnitParts.add(pid);
 					partFound = true;
 					break;
-				}
+				} 
 			}
 			if(partFound) {
 				oldUnitParts.remove(i);
@@ -226,7 +231,7 @@ public class Refit implements IPartWork {
 				//except in the case of armor
 				if(part instanceof Armor) {
 					newPartList.add(part);
-				} else{
+				} else {
 					newPartList.add(part.getMissingPart());
 				}
 			}		
@@ -248,6 +253,7 @@ public class Refit implements IPartWork {
 		aclan = false;
 		
 		for(Part nPart : newPartList) {
+			nPart.setUnit(oldUnit);
 			if(nPart instanceof MissingPart) {
 				time += nPart.getBaseTime();
 				Part replacement = ((MissingPart)nPart).findReplacement();
@@ -267,7 +273,6 @@ public class Refit implements IPartWork {
 				//armor always gets added to the shopping list - it will be checked for differently
 				shoppingList.add(nPart);
 			}
-			nPart.setUnit(null);
 			if(nPart instanceof MissingEnginePart) {
 				if(oldUnit.getEntity().getEngine().getRating() != newUnit.getEntity().getEngine().getRating()) {
 					updateRefitClass(CLASS_D);
@@ -292,7 +297,7 @@ public class Refit implements IPartWork {
 					int loc = ((MissingEquipmentPart)nPart).getLocation();
 					EquipmentType type = ((MissingEquipmentPart)nPart).getType();
 					int crits = type.getCriticals(newUnit.getEntity());
-					nPart.setUnit(null);
+					nPart.setUnit(oldUnit);
 					int i = -1;
 					boolean matchFound = false;
 					int matchIndex = -1;

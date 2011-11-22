@@ -75,6 +75,8 @@ v0.1.10 (SVN)
 + Bug: field refits showing up as Class D
 + Bug: alternate munition ammo type not properly loaded with xml
 + improvements to look of MekLabPanel
++ Bug: NPE when refitting
++ don't refit for a change in munition type
 
 v0.1.9 (2011-07-17)
 + beginning of personnel switch (hold on to your hats!)

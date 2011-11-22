@@ -283,8 +283,7 @@ public class MekLabPanel extends JPanel implements RefreshListener {
 
 	@Override
 	public void refreshHeader() {
-		// TODO Auto-generated method stub
-		
+		//do nothing
 	}
 	
 	public void refreshSummary() {
