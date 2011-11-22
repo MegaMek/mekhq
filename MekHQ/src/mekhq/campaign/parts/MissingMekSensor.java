@@ -85,7 +85,7 @@ public class MissingMekSensor extends MissingPart {
 	}
 
 	@Override
-	public boolean isAcceptableReplacement(Part part) {
+	public boolean isAcceptableReplacement(Part part, boolean refit) {
 		return part instanceof MekSensor && getUnitTonnage() == part.getUnitTonnage();
 	}
 	

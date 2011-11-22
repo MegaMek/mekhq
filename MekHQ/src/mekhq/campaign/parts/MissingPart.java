@@ -120,7 +120,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 	
 	@Override 
 	public void fix() {
-		Part replacement = findReplacement();
+		Part replacement = findReplacement(false);
 		if(null != replacement) {
 			unit.addPart(replacement);
 			remove(false);
@@ -138,14 +138,14 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		setUnit(null);
 	}
 	
-	public abstract boolean isAcceptableReplacement(Part part);
+	public abstract boolean isAcceptableReplacement(Part part, boolean refit);
 	
-	public Part findReplacement() {
+	public Part findReplacement(boolean refit) {
 		Part bestPart = null;
 		if(null != unit) {	
 			//dont just return with the first part if it is damaged
 			for(Part part : unit.campaign.getSpareParts()) {
-				if(isAcceptableReplacement(part)) {
+				if(isAcceptableReplacement(part, refit)) {
 					if(null == bestPart) {
 						bestPart = part;
 					} else if(bestPart.needsFixing() && !part.needsFixing()) {
@@ -158,7 +158,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 	}
 	
 	public boolean isReplacementAvailable() {
-		return null != findReplacement();
+		return null != findReplacement(false);
 	}
 
 	@Override
@@ -195,7 +195,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		skillMin = ++rating;
 		timeSpent = 0;
 		if(skillMin > SkillType.EXP_ELITE) {
-			Part part = findReplacement();
+			Part part = findReplacement(false);
 			if(null != part && null != unit) {
 				unit.campaign.removePart(part);
 				skillMin = SkillType.EXP_GREEN;
@@ -297,7 +297,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 	
 	@Override
 	public String scrap() {
-		Part replace = findReplacement();
+		Part replace = findReplacement(false);
 		if(null != replace && null != unit) {
 			unit.campaign.removePart(replace);
 		}

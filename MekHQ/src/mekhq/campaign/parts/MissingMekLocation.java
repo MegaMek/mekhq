@@ -263,8 +263,8 @@ public class MissingMekLocation extends MissingPart {
 	}
 	
 	@Override
-	public boolean isAcceptableReplacement(Part part) {
-		if(loc == Mech.LOC_CT) {
+	public boolean isAcceptableReplacement(Part part, boolean refit) {
+		if(loc == Mech.LOC_CT && !refit) {
 			//you can't replace a center torso
 			return false;
 		}

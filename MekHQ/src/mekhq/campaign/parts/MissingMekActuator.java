@@ -162,7 +162,7 @@ public class MissingMekActuator extends MissingPart {
 
 	@Override 
 	public void fix() {
-		Part replacement = findReplacement();
+		Part replacement = findReplacement(false);
 		if(null != replacement) {
 			unit.addPart(replacement);
 			((MekActuator)replacement).setLocation(location);
@@ -173,7 +173,7 @@ public class MissingMekActuator extends MissingPart {
 	}
 	
 	@Override
-	public boolean isAcceptableReplacement(Part part) {
+	public boolean isAcceptableReplacement(Part part, boolean refit) {
 		if(part instanceof MekActuator) {
 			MekActuator actuator = (MekActuator)part;
 			return actuator.getType() == type && getUnitTonnage() == actuator.getUnitTonnage();

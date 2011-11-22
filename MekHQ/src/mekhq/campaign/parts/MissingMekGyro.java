@@ -146,7 +146,7 @@ public class MissingMekGyro extends MissingPart {
 	}
 
 	@Override
-	public boolean isAcceptableReplacement(Part part) {
+	public boolean isAcceptableReplacement(Part part, boolean refit) {
 		if(part instanceof MekGyro) {
 			MekGyro gyro = (MekGyro)part;
 			return getType() == gyro.getType() && getTonnage() == gyro.getTonnage();

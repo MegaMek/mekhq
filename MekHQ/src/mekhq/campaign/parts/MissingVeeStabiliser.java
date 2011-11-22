@@ -70,7 +70,7 @@ public class MissingVeeStabiliser extends MissingPart {
 	}
 
 	@Override
-	public boolean isAcceptableReplacement(Part part) {
+	public boolean isAcceptableReplacement(Part part, boolean refit) {
 		return part instanceof VeeStabiliser;
 	}
 
@@ -114,7 +114,7 @@ public class MissingVeeStabiliser extends MissingPart {
 	
 	@Override 
 	public void fix() {
-		VeeStabiliser replacement = (VeeStabiliser)findReplacement();
+		VeeStabiliser replacement = (VeeStabiliser)findReplacement(false);
 		replacement.setLocation(loc);
 		if(null != replacement) {
 			unit.addPart(replacement);

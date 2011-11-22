@@ -73,7 +73,7 @@ public class MissingRotor extends MissingPart {
 
 
 	@Override
-	public boolean isAcceptableReplacement(Part part) {
+	public boolean isAcceptableReplacement(Part part, boolean refit) {
 		return part instanceof Rotor && part.getUnitTonnage() == getUnitTonnage();
 	}
 	

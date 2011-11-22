@@ -44,7 +44,7 @@ public class MissingAmmoBin extends MissingEquipmentPart {
     }
 	
 	@Override
-	public boolean isAcceptableReplacement(Part part) {
+	public boolean isAcceptableReplacement(Part part, boolean refit) {
 		if(part instanceof AmmoBin) {
 			EquipmentPart eqpart = (EquipmentPart)part;
 			EquipmentType et = eqpart.getType();

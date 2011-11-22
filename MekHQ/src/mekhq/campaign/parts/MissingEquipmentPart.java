@@ -208,7 +208,7 @@ public class MissingEquipmentPart extends MissingPart {
 
 	@Override 
 	public void fix() {
-		Part replacement = findReplacement();
+		Part replacement = findReplacement(false);
 		if(null != replacement) {
 			unit.addPart(replacement);
 			((EquipmentPart)replacement).setEquipmentNum(equipmentNum);
@@ -219,7 +219,7 @@ public class MissingEquipmentPart extends MissingPart {
 	}
 	
 	@Override
-	public boolean isAcceptableReplacement(Part part) {
+	public boolean isAcceptableReplacement(Part part, boolean refit) {
 		if(part instanceof EquipmentPart) {
 			EquipmentPart eqpart = (EquipmentPart)part;
 			EquipmentType et = eqpart.getType();

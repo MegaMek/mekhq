@@ -2750,7 +2750,7 @@ public class Campaign implements Serializable {
         if(!partWork.needsFixing() && !partWork.isSalvaging()) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Task is not needed.");
         }
-        if(partWork instanceof MissingPart && null == ((MissingPart)partWork).findReplacement()) {
+        if(partWork instanceof MissingPart && null == ((MissingPart)partWork).findReplacement(false)) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Part not available.");
         }
         if(!(partWork instanceof Refit) && tech.getMinutesLeft() <= 0 && (!isOvertimeAllowed() || tech.getOvertimeLeft() <= 0)) {

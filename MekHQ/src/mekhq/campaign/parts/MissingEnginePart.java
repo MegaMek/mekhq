@@ -229,7 +229,7 @@ public class MissingEnginePart extends MissingPart {
 	}
 
 	@Override
-	public boolean isAcceptableReplacement(Part part) {
+	public boolean isAcceptableReplacement(Part part, boolean refit) {
 		if(part instanceof EnginePart) {
 			Engine eng = ((EnginePart)part).getEngine();
 			if (null != eng) {

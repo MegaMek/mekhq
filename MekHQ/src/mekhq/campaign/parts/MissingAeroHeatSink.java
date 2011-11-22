@@ -69,7 +69,7 @@ public class MissingAeroHeatSink extends MissingPart {
 	}
 
 	@Override
-	public boolean isAcceptableReplacement(Part part) {
+	public boolean isAcceptableReplacement(Part part, boolean refit) {
 		return part instanceof AeroHeatSink && type == ((AeroHeatSink)part).getType();
 	}
 

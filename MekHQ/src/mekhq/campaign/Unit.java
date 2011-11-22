@@ -414,7 +414,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 		}
 		boolean armorFound = false;
 		for(Part part: parts) {
-			if(part instanceof MissingPart && null == ((MissingPart)part).findReplacement()) {
+			if(part instanceof MissingPart && null == ((MissingPart)part).findReplacement(false)) {
 				missingParts.add((MissingPart)part);
 			}
 			//we need to check for armor as well, but this one is funny because we dont want to

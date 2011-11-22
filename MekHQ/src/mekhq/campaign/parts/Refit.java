@@ -62,7 +62,7 @@ import megameklab.com.util.UnitUtil;
  * 
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class Refit implements IPartWork {
+public class Refit implements IPartWork, IAcquisitionWork {
 	
 	public static final int NO_CHANGE = 0;
 	public static final int CLASS_A = 1;
@@ -81,6 +81,7 @@ public class Refit implements IPartWork {
 	private long cost;
 	private boolean failedCheck;
 	private boolean customJob;
+	private boolean kitFound;
 	private String fixableString;
 	
 	private ArrayList<Integer> oldUnitParts;
@@ -112,6 +113,7 @@ public class Refit implements IPartWork {
 		failedCheck = false;
 		timeSpent = 0;
 		fixableString = null;
+		kitFound = false;
 	}
 	
 	public static String getRefitClassName(int refitClass) {
@@ -184,7 +186,7 @@ public class Refit implements IPartWork {
 			for(int pid : oldUnitParts) {
 				Part oPart = oldUnit.campaign.getPart(pid);
 				i++;
-				if(((oPart instanceof MissingPart && ((MissingPart)oPart).isAcceptableReplacement(part)) 
+				if(((oPart instanceof MissingPart && ((MissingPart)oPart).isAcceptableReplacement(part, true)) 
 						|| oPart.isSamePartTypeAndStatus(part))
 						|| (part instanceof AmmoBin && oPart instanceof AmmoBin && 
 								!((AmmoType)((AmmoBin)part).getType()).equals((AmmoType)((AmmoBin)oPart).getType()))
@@ -256,7 +258,7 @@ public class Refit implements IPartWork {
 			nPart.setUnit(oldUnit);
 			if(nPart instanceof MissingPart) {
 				time += nPart.getBaseTime();
-				Part replacement = ((MissingPart)nPart).findReplacement();
+				Part replacement = ((MissingPart)nPart).findReplacement(true);
 				if(null != replacement) {
 					newUnitParts.add(replacement.getId());
 				} else {
@@ -390,6 +392,9 @@ public class Refit implements IPartWork {
 		
 		//multiply time by refit class
 		time *= getTimeMultiplier();
+		if(!customJob) {
+			cost *= 1.1;
+		}
 	}
 	
 	public void begin() {
@@ -408,6 +413,9 @@ public class Refit implements IPartWork {
 	}
 	
 	public boolean acquireParts() {
+		if(!customJob) {
+			return acquireRefitKit();
+		}
 		ArrayList<Part> newShoppingList = new ArrayList<Part>();
 		ArrayList<Armor> tempArmorList = new ArrayList<Armor>();
 		Person tech = oldUnit.campaign.getPerson(assignedTechId);
@@ -421,7 +429,7 @@ public class Refit implements IPartWork {
 			}
 			else if(part instanceof IAcquisitionWork) {
 				if(oldUnit.campaign.acquirePart((IAcquisitionWork)part, tech)) {
-					Part replacement = ((MissingPart)part).findReplacement();
+					Part replacement = ((MissingPart)part).findReplacement(true);
 					if(null != replacement) {
 						newUnitParts.add(replacement.getId());
 					} else {
@@ -438,6 +446,14 @@ public class Refit implements IPartWork {
 		//add armor back on the shopping list either way, because we need to track it differently
 		shoppingList.addAll(tempArmorList);
 		return allPartsAcquired;
+	}
+	
+	public boolean acquireRefitKit() {
+		if(kitFound) {
+			return true;
+		}
+		Person tech = oldUnit.campaign.getPerson(assignedTechId);
+		return oldUnit.campaign.acquirePart((IAcquisitionWork)this, tech);
 	}
 	
 	public int getArmorAvailable() {
@@ -478,6 +494,11 @@ public class Refit implements IPartWork {
 		//add old parts to the warehouse
 		for(int pid : oldUnitParts) {
 			Part part = oldUnit.campaign.getPart(pid);
+			if(part instanceof MekLocation && ((MekLocation)part).getLoc() == Mech.LOC_CT) {
+				part.setUnit(null);
+				oldUnit.campaign.removePart(part);
+				continue;
+			}
 			if(part instanceof Armor) {
 				Armor a = (Armor)part;
 				a.changeAmountAvailable(a.getAmount());
@@ -694,7 +715,11 @@ public class Refit implements IPartWork {
 
 	@Override
 	public String getPartName() {
-		return newEntity.getDisplayName() + " Customization";
+		if(customJob) {
+			return newEntity.getDisplayName() + " Customization";
+		} else {
+			return newEntity.getDisplayName() + " Refit Kit";
+		}
 	}
 
 	@Override
@@ -823,6 +848,8 @@ public class Refit implements IPartWork {
 				+ "</failedCheck>");
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<customJob>" + customJob
 				+ "</customJob>");
+		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<kitFound>" + kitFound
+				+ "</kitFound>");
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<armorNeeded>" + armorNeeded
 				+ "</armorNeeded>");
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<atype>" + atype
@@ -879,6 +906,11 @@ public class Refit implements IPartWork {
 						retVal.customJob = true;
 					else
 						retVal.customJob = false;
+				} else if (wn2.getNodeName().equalsIgnoreCase("kitFound")) {
+					if (wn2.getTextContent().equalsIgnoreCase("true"))
+						retVal.kitFound = true;
+					else
+						retVal.kitFound = false;
 				} else if (wn2.getNodeName().equalsIgnoreCase("armorNeeded")) {
 					retVal.armorNeeded = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("atype")) {
@@ -944,5 +976,75 @@ public class Refit implements IPartWork {
 				retVal.shoppingList.add(p);
 			}
 		}
+	}
+
+	@Override
+	public Part getNewPart() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getAcquisitionDesc() {
+		return "Fill this in";
+	}
+
+	@Override
+	public long getPurchasePrice() {
+		return cost;
+	}
+
+	@Override
+	public boolean hasCheckedToday() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void setCheckedToday(boolean b) {
+		//don't do anything
+	}
+
+	@Override
+	public int getId() {
+		return 0;
+	}
+
+	@Override
+	public String find() {
+		ArrayList<Part> newShoppingList = new ArrayList<Part>();
+		for(Part part : shoppingList) {
+			if(part instanceof Armor) {
+				newShoppingList.add(part);
+			} else if(part instanceof MissingPart) {
+				oldUnit.campaign.buyPart(((IAcquisitionWork)part).getNewPart(),(long)(((IAcquisitionWork)part).getPurchasePrice() * 1.1));
+				Part replacement = ((MissingPart)part).findReplacement(true);
+				if(null != replacement) {
+					newUnitParts.add(replacement.getId());
+				} 
+			}
+		}
+		Armor a = new Armor(0, atype, armorNeeded, -1, false, aclan);
+		oldUnit.campaign.buyPart(a,(long)(a.getPurchasePrice() * 1.1));
+		shoppingList = newShoppingList;
+		kitFound = true;
+		return "<font color='green'> refit kit found.</font>";
+	}
+
+	@Override
+	public String failToFind() {
+		return "<font color='red'> refit kit not found.</font>";
+
+	}
+
+	@Override
+	public TargetRoll getAllAcquisitionMods() {
+		TargetRoll roll = new TargetRoll();
+		for(Part part : shoppingList) {
+			if(((IAcquisitionWork)part).getAllAcquisitionMods().getValue() > roll.getValue()) {
+				roll = ((IAcquisitionWork)part).getAllAcquisitionMods();
+			}
+		}
+		return roll;
 	}
 }
