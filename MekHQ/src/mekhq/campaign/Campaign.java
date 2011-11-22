@@ -3027,4 +3027,8 @@ public class Campaign implements Serializable {
 		customs.add(name);
 	}
 	
+	public boolean isCustom(Unit u) {
+		return customs.contains(u.getEntity().getChassis() + " " + u.getEntity().getModel());
+	}
+	
 }

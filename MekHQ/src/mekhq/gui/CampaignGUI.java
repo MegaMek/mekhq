@@ -42,6 +42,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -123,6 +124,7 @@ import megamek.common.TechConstants;
 import megamek.common.UnitType;
 import megamek.common.WeaponType;
 import megamek.common.XMLStreamParser;
+import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.IOption;
 import megamek.common.options.PilotOptions;
@@ -7171,7 +7173,31 @@ public class CampaignGUI extends JPanel {
 				}
 				refreshServicedUnitList();
 				refreshUnitList();
-			} else if (command.equalsIgnoreCase("REMOVE")) {
+			} else if (command.equalsIgnoreCase("TAG_CUSTOM")) {		    
+			    String sCustomsDir = "data/mechfiles/customs/";
+			    File customsDir = new File(sCustomsDir);
+			    if(!customsDir.exists()) {
+			    	customsDir.mkdir();
+			    }
+				for (Unit unit : units) {
+					String fileName = unit.getEntity().getChassis() + " " + unit.getEntity().getModel();
+					try {
+				        if (unit.getEntity() instanceof Mech) {
+				            FileOutputStream out = new FileOutputStream(sCustomsDir + File.separator + fileName + ".mtf");
+				            PrintStream p = new PrintStream(out);
+				            p.println(((Mech) unit.getEntity()).getMtf());
+				            p.close();
+				            out.close();
+				        } else {
+				            BLKFile.encode(sCustomsDir + File.separator + fileName + ".blk", unit.getEntity());
+				        }
+				    } catch (Exception ex) {
+				        ex.printStackTrace();
+				    }
+					getCampaign().addCustom(unit.getEntity().getChassis() + " " + unit.getEntity().getModel());
+				}
+			    MechSummaryCache.getInstance().loadMechData();
+			}  else if (command.equalsIgnoreCase("REMOVE")) {
 				for (Unit unit : units) {
 					if (!unit.isDeployed()) {
 						if (0 == JOptionPane.showConfirmDialog(null,
@@ -7360,6 +7386,13 @@ public class CampaignGUI extends JPanel {
 					menu.setEnabled(!unit.isDeployed() && unit.isRepairable());
 					popup.add(menu);
 					
+				}
+				if(oneSelected && !getCampaign().isCustom(unit)) {
+					menuItem = new JMenuItem("Tag as a custom unit");
+					menuItem.setActionCommand("TAG_CUSTOM");
+					menuItem.addActionListener(this);
+					menuItem.setEnabled(true);
+					popup.add(menuItem);
 				}
 				if(oneSelected && getCampaign().getCampaignOptions().useQuirks()) {
 					menu = new JMenu("Add Quirk");			

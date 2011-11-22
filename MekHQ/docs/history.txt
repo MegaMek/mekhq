@@ -82,6 +82,7 @@ v0.1.10 (SVN)
 + properly sourced refit kits
 + Bug: Center Torso not being replaced when internal structure changed
 + reserved status for refit kit parts (still need to include armor and ammo here)
++ tag unit as a custom unit menu option
 
 v0.1.9 (2011-07-17)
 + beginning of personnel switch (hold on to your hats!)
