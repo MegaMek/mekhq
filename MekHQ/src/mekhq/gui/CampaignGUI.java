@@ -7321,7 +7321,7 @@ public class CampaignGUI extends JPanel {
 					popup.add(menu);
 				}
 				// Customize
-				if(oneSelected) {
+				if(oneSelected && unit.getEntity() instanceof Mech) {
 					menu = new JMenu("Customize");
 			
 					JMenu refitMenu = new JMenu("Refit Kit");

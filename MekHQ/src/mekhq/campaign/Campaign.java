@@ -68,6 +68,7 @@ import megamek.common.MechBay;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
+import megamek.common.Mounted;
 import megamek.common.Player;
 import megamek.common.SmallCraftBay;
 import megamek.common.Tank;
@@ -450,6 +451,7 @@ public class Campaign implements Serializable {
 		unit.initializeParts(true);
 		unit.runDiagnostic();
 		unit.resetPilotAndEntity();
+		
 		addReport(unit.getEntity().getDisplayName() + " has been added to the unit roster.");
 	}
 

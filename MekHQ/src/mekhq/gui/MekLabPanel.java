@@ -305,11 +305,7 @@ public class MekLabPanel extends JPanel implements RefreshListener {
         currentTonnage += UnitUtil.getUnallocatedAmmoTonnage(entity);
         float tonnage = entity.getWeight();
 
-        if(refit.getRefitClass() == Refit.NO_CHANGE) {
-        	btnRefit.setEnabled(false);
-			btnRefit.setToolTipText("Nothing to change.");
-        }
-        else if(entity.getWeight() < testEntity.calculateWeight()) {
+        if(entity.getWeight() < testEntity.calculateWeight()) {
 			btnRefit.setEnabled(false);
 			btnRefit.setToolTipText("Unit is overweight.");
 		} else if (entity.getWeight() > testEntity.calculateWeight()) {
@@ -318,7 +314,10 @@ public class MekLabPanel extends JPanel implements RefreshListener {
 		} else if(sb.length() > 0) {
 			btnRefit.setEnabled(false);
 			btnRefit.setToolTipText(sb.toString());	
-		} else {
+		} else if(refit.getRefitClass() == Refit.NO_CHANGE) {
+        	btnRefit.setEnabled(false);
+			btnRefit.setToolTipText("Nothing to change.");
+        } else {
 			btnRefit.setEnabled(true);
 			btnRefit.setToolTipText(null);
 		}
