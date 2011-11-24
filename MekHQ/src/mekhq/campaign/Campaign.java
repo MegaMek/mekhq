@@ -1779,6 +1779,12 @@ public class Campaign implements Serializable {
 			unit.initializeParts(true);
 			unit.runDiagnostic();
 			
+			if(null != unit.getRefit()) {
+				if(null == unit.getRefit().getNewArmorSupplies() && unit.getRefit().getNewArmorSuppliesId() > 0) {
+					unit.getRefit().setNewArmorSupplies((Armor)retVal.getPart(unit.getRefit().getNewArmorSuppliesId()));
+				}
+			}
+			
 			//some units might need to be assigned to scenarios
 			Scenario s = retVal.getScenario(unit.getScenarioId());
 			if(null != s) {

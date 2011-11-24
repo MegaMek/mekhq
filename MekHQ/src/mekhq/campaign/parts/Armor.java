@@ -187,7 +187,9 @@ public class Armor extends Part implements IAcquisitionWork {
     @Override
     public boolean isSamePartTypeAndStatus (Part part) {
         return part instanceof Armor
-                && getType() == ((Armor)part).getType() && isClanTechBase() == ((Armor)part).isClanTechBase();
+                && getType() == ((Armor)part).getType() 
+                && isClanTechBase() == ((Armor)part).isClanTechBase()
+                && getRefitId() == part.getRefitId();
     }
 
     @Override
@@ -566,7 +568,7 @@ public class Armor extends Part implements IAcquisitionWork {
 			for(Part part : unit.campaign.getSpareParts()) {
 				if(part instanceof Armor) {
 					Armor a = (Armor)part;
-					if(a.getType() == type && a.isClanTechBase() == clan) {
+					if(a.getType() == type && a.isClanTechBase() == clan && !a.isReservedForRefit()) {
 						return a.getAmount();
 					}
 				}
@@ -580,7 +582,9 @@ public class Armor extends Part implements IAcquisitionWork {
 		if(null != unit) {
 			Armor a = null;
 			for(Part part : unit.campaign.getSpareParts()) {
-				if(part instanceof Armor && ((Armor)part).getType() == type && ((Armor)part).isClanTechBase() == clan) {
+				if(part instanceof Armor && ((Armor)part).getType() == type 
+						&& ((Armor)part).isClanTechBase() == clan 
+						&& getRefitId() == part.getRefitId()) {
 					a = (Armor)part;				
 					a.setAmount(a.getAmount() + amount);
 					break;
@@ -588,7 +592,7 @@ public class Armor extends Part implements IAcquisitionWork {
 			}
 			if(null != a && a.getAmount() <= 0) {
 				unit.campaign.removePart(a);
-			} else if(null == a && amount > 0) {
+			} else if(null == a && amount > 0) {			
 				unit.campaign.addPart(new Armor(getUnitTonnage(), type, amount, -1, false, isClanTechBase()));
 			}
 			unit.campaign.updateAllArmorForNewSpares();

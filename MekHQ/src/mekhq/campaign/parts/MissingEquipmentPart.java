@@ -194,6 +194,7 @@ public class MissingEquipmentPart extends MissingPart {
 				typeName = wn2.getTextContent();
 			}
 		}
+		restore();
 	}
 
 	@Override

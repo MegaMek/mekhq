@@ -89,8 +89,8 @@ public class Refit implements IPartWork, IAcquisitionWork {
 	private ArrayList<Part> shoppingList;
 	
 	private int armorNeeded;
-	private int atype;
-	private boolean aclan;
+	private Armor newArmorSupplies;
+	private int newArmorSuppliesId;
 	
 	private int assignedTechId;
 	
@@ -108,12 +108,12 @@ public class Refit implements IPartWork, IAcquisitionWork {
 		oldUnitParts = new ArrayList<Integer>();
 		newUnitParts = new ArrayList<Integer>();
 		shoppingList = new ArrayList<Part>();
-		calculate();
 		assignedTechId = -1;
 		failedCheck = false;
 		timeSpent = 0;
 		fixableString = null;
 		kitFound = false;
+		calculate();
 	}
 	
 	public static String getRefitClassName(int refitClass) {
@@ -250,9 +250,8 @@ public class Refit implements IPartWork, IAcquisitionWork {
 		tempParts.addAll(oldUnitParts);
 		
 		armorNeeded = 0;
-		double pointsPerTon = 0.0;
-		atype = 0;
-		aclan = false;
+		int atype = 0;
+		boolean aclan = false;
 		
 		for(Part nPart : newPartList) {
 			nPart.setUnit(oldUnit);
@@ -270,7 +269,6 @@ public class Refit implements IPartWork, IAcquisitionWork {
 				int totalAmount = ((Armor)nPart).getTotalAmount();
 				time += totalAmount * ((Armor)nPart).getBaseTimeFor(newEntity);
 				armorNeeded += totalAmount;
-				pointsPerTon = ((Armor)nPart).getArmorPointsPerTon();
 				atype = ((Armor)nPart).getType();
 				aclan = ((Armor)nPart).isClanTechBase();
 				//armor always gets added to the shopping list - it will be checked for differently
@@ -352,8 +350,20 @@ public class Refit implements IPartWork, IAcquisitionWork {
 				}
 			}
 		}
-		//add costs for armor needed
-		cost += (long)(((double)Math.max(0,armorNeeded-getArmorAvailable()))/pointsPerTon * EquipmentType.getArmorCost(atype));
+		if(armorNeeded > 0) {		
+			newArmorSupplies = new Armor(0, atype, 0, 0, false, aclan);
+			newArmorSupplies.setAmountNeeded(armorNeeded);
+			newArmorSupplies.setRefitId(oldUnit.getId());
+			//check existing supplies before determining cost
+			Armor existingArmorSupplies = getExistingArmorSupplies();
+			int amountNeeded = armorNeeded;
+			if(null != existingArmorSupplies) {
+				amountNeeded = Math.max(0, armorNeeded - existingArmorSupplies.getAmount());
+			}
+			newArmorSupplies.setUnit(oldUnit);
+			cost += (long)(Math.ceil(((double)amountNeeded)/(5*newArmorSupplies.getArmorPointsPerTon())) * 5 * EquipmentType.getArmorCost(atype));
+			newArmorSupplies.setUnit(null);
+		}
 		
 		//Step 4: loop through remaining equipment on oldunit parts and add time for removing.
 		for(int pid : oldUnitParts) {
@@ -418,15 +428,14 @@ public class Refit implements IPartWork, IAcquisitionWork {
 			return acquireRefitKit();
 		}
 		ArrayList<Part> newShoppingList = new ArrayList<Part>();
-		ArrayList<Armor> tempArmorList = new ArrayList<Armor>();
 		Person tech = oldUnit.campaign.getPerson(assignedTechId);
 		for(Part part : shoppingList) {
 			if(part instanceof Armor) {
-				Armor a = (Armor)part;
-				if(armorNeeded > getArmorAvailable()) {
-					oldUnit.campaign.acquirePart((IAcquisitionWork)part, tech);
-				}
-				tempArmorList.add(a);
+				//automatically add armor by location, we will check for the lump sum of
+				//armor using newArmorSupplies
+				oldUnit.campaign.addPart(part);
+				part.setUnit(oldUnit);
+				newUnitParts.add(part.getId());
 			}
 			else if(part instanceof IAcquisitionWork) {
 				if(oldUnit.campaign.acquirePart((IAcquisitionWork)part, tech)) {
@@ -443,42 +452,60 @@ public class Refit implements IPartWork, IAcquisitionWork {
 				}
 			}
 		}
+		if(null != newArmorSupplies) {
+			if(newArmorSupplies.getId() <= 0) {
+				checkForArmorSupplies();
+				oldUnit.campaign.addPart(newArmorSupplies);
+			}
+			if(newArmorSupplies.getAmount() <= armorNeeded) {
+				Armor a = new Armor(0, newArmorSupplies.getType(), 0, 0, false, newArmorSupplies.isClanTechBase());
+				a.setRefitId(oldUnit.getId());
+				a.setUnit(oldUnit);
+				a.setAmountNeeded(armorNeeded);
+				oldUnit.campaign.acquirePart((IAcquisitionWork)a, tech);
+			}
+		}
 		shoppingList = newShoppingList;
-		boolean allPartsAcquired = shoppingList.size() == 0 && armorNeeded <= getArmorAvailable();
-		//add armor back on the shopping list either way, because we need to track it differently
-		shoppingList.addAll(tempArmorList);
-		return allPartsAcquired;
+		return shoppingList.size() == 0 && (null == newArmorSupplies || newArmorSupplies.getAmount() >= armorNeeded);
+	}
+	
+	public void checkForArmorSupplies() {
+		Armor existingArmorSupplies = getExistingArmorSupplies();	
+		if(null != existingArmorSupplies) {
+			if(existingArmorSupplies.getAmount() > armorNeeded) {
+				newArmorSupplies.setAmount(armorNeeded);
+				existingArmorSupplies.setAmount(existingArmorSupplies.getAmount() - armorNeeded);
+			} else {
+				newArmorSupplies.setAmount(newArmorSupplies.getAmount() + existingArmorSupplies.getAmount());
+				oldUnit.campaign.removePart(existingArmorSupplies);
+			}
+			oldUnit.campaign.updateAllArmorForNewSpares();
+		}
+	}
+	
+	public Armor getExistingArmorSupplies() {
+		Armor existingArmorSupplies = null;
+		if(null == newArmorSupplies) {
+			return null;
+		}
+		for(Part part : oldUnit.campaign.getSpareParts()) {
+			if(part instanceof Armor && ((Armor)part).getType() == newArmorSupplies.getType() 
+					&& ((Armor)part).isClanTechBase() == newArmorSupplies.isClanTechBase() 
+					&& !part.isReservedForRefit()) {
+				existingArmorSupplies = (Armor)part;				
+				break;
+			}
+		}
+		return existingArmorSupplies;
 	}
 	
 	public boolean acquireRefitKit() {
 		if(kitFound) {
 			return true;
 		}
+		checkForArmorSupplies();
 		Person tech = oldUnit.campaign.getPerson(assignedTechId);
 		return oldUnit.campaign.acquirePart((IAcquisitionWork)this, tech);
-	}
-	
-	public int getArmorAvailable() {
-		for(Part part : oldUnit.campaign.getSpareParts()) {
-			if(part instanceof Armor) {
-				Armor a = (Armor)part;
-				if(a.getType() == atype && a.isClanTechBase() == aclan) {
-					return a.getAmount();
-				}
-			}
-		}
-		return 0;
-	}
-	
-	public void reduceArmorAvailable() {
-		for(Part part : oldUnit.campaign.getSpareParts()) {
-			if(part instanceof Armor) {
-				Armor a = (Armor)part;
-				if(a.getType() == atype && a.isClanTechBase() == aclan) {
-					a.setAmount(a.getAmount() - armorNeeded);
-				}
-			}
-		}
 	}
 	
 	private void updateRefitClass(int rClass) {
@@ -488,14 +515,20 @@ public class Refit implements IPartWork, IAcquisitionWork {
 	}
 	
 	public void cancel() {
+		oldUnit.setRefit(null);
 		for(int pid : newUnitParts) {
 			Part part = oldUnit.campaign.getPart(pid);
 			part.setRefitId(-1);
+			if(part instanceof Armor) {
+				oldUnit.campaign.removePart(part);
+			}
+		}	
+		if(null != newArmorSupplies) {
+			newArmorSupplies.setRefitId(-1);
+			newArmorSupplies.setUnit(oldUnit);
+			oldUnit.campaign.removePart(newArmorSupplies);
+			newArmorSupplies.changeAmountAvailable(newArmorSupplies.getAmount());
 		}
-		for(Part part : shoppingList) {
-			part.setRefitId(-1);
-		}
-		oldUnit.setRefit(null);
 	}
 	
 	private void complete() {
@@ -527,18 +560,11 @@ public class Refit implements IPartWork, IAcquisitionWork {
 			part.setRefitId(-1);
 			newParts.add(part);
 		}
-		//now check the shopping list for armor parts and deal with them
-		for(Part part : shoppingList) {
-			if(part instanceof Armor) {
-				part.setUnit(oldUnit);
-				part.setRefitId(-1);
-				oldUnit.campaign.addPart(part);
-				newParts.add(part);	
-			}
-		}
 		oldUnit.setParts(newParts);
 		unscrambleEquipmentNumbers();	
-		reduceArmorAvailable();
+		if(null != newArmorSupplies) {
+			oldUnit.campaign.removePart(newArmorSupplies);
+		}
 		for(Part part : oldUnit.getParts()) {
 			part.updateConditionFromPart();
 		}
@@ -863,10 +889,6 @@ public class Refit implements IPartWork, IAcquisitionWork {
 				+ "</kitFound>");
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<armorNeeded>" + armorNeeded
 				+ "</armorNeeded>");
-		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<atype>" + atype
-				+ "</atype>");
-		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<aclan>" + aclan
-				+ "</aclan>");
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<assignedTechId>" + assignedTechId
 				+ "</assignedTechId>");
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<oldUnitParts>");
@@ -886,6 +908,16 @@ public class Refit implements IPartWork, IAcquisitionWork {
 			p.writeToXml(pw1, indentLvl+2, id);
 		}
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "</shoppingList>");
+		if(null != newArmorSupplies) {
+			if(newArmorSupplies.getId() == 0) {
+				pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<newArmorSupplies>");
+				newArmorSupplies.writeToXml(pw1, indentLvl+2, id);
+				pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "</newArmorSupplies>");
+			} else {
+				pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<newArmorSuppliesId>" + newArmorSupplies.getId()
+						+ "</newArmorSuppliesId>");
+			}
+		}
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl) + "</refit>");
 	}
 	
@@ -905,6 +937,8 @@ public class Refit implements IPartWork, IAcquisitionWork {
 					retVal.timeSpent = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("cost")) {
 					retVal.cost = Long.parseLong(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("newArmorSuppliesId")) {
+					retVal.newArmorSuppliesId = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("assignedTechId")) {
 					retVal.assignedTechId = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("failedCheck")) {
@@ -924,13 +958,6 @@ public class Refit implements IPartWork, IAcquisitionWork {
 						retVal.kitFound = false;
 				} else if (wn2.getNodeName().equalsIgnoreCase("armorNeeded")) {
 					retVal.armorNeeded = Integer.parseInt(wn2.getTextContent());
-				} else if (wn2.getNodeName().equalsIgnoreCase("atype")) {
-					retVal.atype = Integer.parseInt(wn2.getTextContent());
-				} else if (wn2.getNodeName().equalsIgnoreCase("aclan")) {
-					if (wn2.getTextContent().equalsIgnoreCase("true"))
-						retVal.aclan = true;
-					else
-						retVal.aclan = false;
 				} else if (wn2.getNodeName().equalsIgnoreCase("entity")) {
 					retVal.newEntity = MekHqXmlUtil.getEntityFromXmlString(wn2);
 				} else if (wn2.getNodeName().equalsIgnoreCase("oldUnitParts")) {
@@ -951,6 +978,8 @@ public class Refit implements IPartWork, IAcquisitionWork {
 					}
 				} else if (wn2.getNodeName().equalsIgnoreCase("shoppingList")) {
 					processShoppingList(retVal, wn2, retVal.oldUnit);
+				} else if (wn2.getNodeName().equalsIgnoreCase("newArmorSupplies")) {
+					processArmorSupplies(retVal, wn2);
 				}
 			}
 		} catch (Exception ex) {
@@ -985,6 +1014,34 @@ public class Refit implements IPartWork, IAcquisitionWork {
 			
 			if (p != null) {
 				retVal.shoppingList.add(p);
+			}
+		}
+	}
+	
+	private static void processArmorSupplies(Refit retVal, Node wn) {
+
+		NodeList wList = wn.getChildNodes();
+		
+		// Okay, lets iterate through the children, eh?
+		for (int x = 0; x < wList.getLength(); x++) {
+			Node wn2 = wList.item(x);
+
+			// If it's not an element node, we ignore it.
+			if (wn2.getNodeType() != Node.ELEMENT_NODE)
+				continue;
+			
+			if (!wn2.getNodeName().equalsIgnoreCase("part")) {
+				// Error condition of sorts!
+				// Errr, what should we do here?
+				MekHQ.logMessage("Unknown node type not loaded in Part nodes: "+wn2.getNodeName());
+
+				continue;
+			}
+			Part p = Part.generateInstanceFromXML(wn2);
+			
+			if (p != null && p instanceof Armor) {
+				retVal.newArmorSupplies = (Armor)p;
+				break;
 			}
 		}
 	}
@@ -1023,10 +1080,11 @@ public class Refit implements IPartWork, IAcquisitionWork {
 
 	@Override
 	public String find() {
-		ArrayList<Part> newShoppingList = new ArrayList<Part>();
 		for(Part part : shoppingList) {
 			if(part instanceof Armor) {
-				newShoppingList.add(part);
+				oldUnit.campaign.addPart(part);
+				part.setUnit(oldUnit);
+				newUnitParts.add(part.getId());
 			} else if(part instanceof MissingPart) {
 				oldUnit.campaign.buyPart(((IAcquisitionWork)part).getNewPart(),(long)(((IAcquisitionWork)part).getPurchasePrice() * 1.1));
 				Part replacement = ((MissingPart)part).findReplacement(true);
@@ -1036,9 +1094,11 @@ public class Refit implements IPartWork, IAcquisitionWork {
 				} 
 			}
 		}
-		Armor a = new Armor(0, atype, armorNeeded, -1, false, aclan);
-		oldUnit.campaign.buyPart(a,(long)(a.getPurchasePrice() * 1.1));
-		shoppingList = newShoppingList;
+		if(null != newArmorSupplies) {
+			newArmorSupplies.setAmount(armorNeeded);
+			oldUnit.campaign.buyPart(newArmorSupplies,(long)(newArmorSupplies.getPurchasePrice() * 1.1));
+		}
+		shoppingList = new ArrayList<Part>();
 		kitFound = true;
 		return "<font color='green'> refit kit found.</font>";
 	}
@@ -1058,5 +1118,17 @@ public class Refit implements IPartWork, IAcquisitionWork {
 			}
 		}
 		return roll;
+	}
+	
+	public Armor getNewArmorSupplies() {
+		return newArmorSupplies;
+	}
+	
+	public void setNewArmorSupplies(Armor a) {
+		newArmorSupplies = a;
+	}
+	
+	public int getNewArmorSuppliesId() {
+		return newArmorSuppliesId;
 	}
 }
