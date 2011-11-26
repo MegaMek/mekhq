@@ -84,6 +84,7 @@ v0.1.10 (SVN)
 + reserved status for refit kit parts (still need to include armor and ammo here)
 + tag unit as a custom unit menu option
 + proper reservation of armor for refitting
++ Bug 3403515: Negative Fix times
 
 v0.1.9 (2011-07-17)
 + beginning of personnel switch (hold on to your hats!)

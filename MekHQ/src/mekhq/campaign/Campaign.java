@@ -873,6 +873,7 @@ public class Campaign implements Serializable {
 			report = report + partWork.fail(tech.getSkillForWorkingOn(partWork.getUnit()).getExperienceLevel()-modePenalty);
 		}
 		report += wrongType;
+		partWork.resetTimeSpent();
 		partWork.setTeamId(-1);
 		addReport(report);
 	}

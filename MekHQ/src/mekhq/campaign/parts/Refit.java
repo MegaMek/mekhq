@@ -749,6 +749,11 @@ public class Refit implements IPartWork, IAcquisitionWork {
 	public int getMode() {
 		return Modes.MODE_NORMAL;
 	}
+	
+	@Override
+	public void resetTimeSpent() {
+		timeSpent = 0;
+	}
 
 	@Override
 	public String getPartName() {

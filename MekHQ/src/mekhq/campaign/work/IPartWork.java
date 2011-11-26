@@ -38,6 +38,7 @@ public interface IPartWork extends IWork {
 	public int getTimeSpent();
 	public int getTimeLeft();
 	public void addTimeSpent(int time);
+	public void resetTimeSpent();
 	
 	public int getAssignedTeamId();
 	public void setTeamId(int id);
