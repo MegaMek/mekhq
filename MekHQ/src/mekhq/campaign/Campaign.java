@@ -218,6 +218,7 @@ public class Campaign implements Serializable {
 		partsStore = new PartsStore();
 		gameOptions = new GameOptions();
 		gameOptions.initialize();
+		game.setOptions(gameOptions);
 		customs = new ArrayList<String>();
 	}
 

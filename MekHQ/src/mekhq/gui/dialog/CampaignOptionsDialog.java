@@ -1165,15 +1165,49 @@ private void txtNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
 	    options.setClanPriceModifier(new Double(clanPriceModifierString));
 	    options.setEasierRefit(useEasierRefitCheckBox.isSelected());
 	    options.setFactionForNames(useFactionForNamesBox.isSelected());
-	    options.setRepairSystem(repairSystemComboBox.getSelectedIndex());
-	    
+	    options.setRepairSystem(repairSystemComboBox.getSelectedIndex());   
 	    options.setTactics(useTacticsBox.isSelected());
+	    if(useTacticsBox.isSelected()) {
+	    	campaign.getGameOptions().getOption("command_init").setValue(true);
+	    } else {
+	    	campaign.getGameOptions().getOption("command_init").setValue(false);
+	    }
 	    options.setInitBonus(useInitBonusBox.isSelected());
+	    if(useInitBonusBox.isSelected()) {
+	    	campaign.getGameOptions().getOption("individual_initiative").setValue(true);
+	    } else {
+	    	campaign.getGameOptions().getOption("individual_initiative").setValue(false);
+	    }
 	    options.setToughness(useToughnessBox.isSelected());
+	    if(useToughnessBox.isSelected()) {
+	    	campaign.getGameOptions().getOption("toughness").setValue(true);
+	    } else {
+	    	campaign.getGameOptions().getOption("toughness").setValue(false);
+	    }
 	    options.setArtillery(useArtilleryBox.isSelected());
+	    if(useArtilleryBox.isSelected()) {
+	    	campaign.getGameOptions().getOption("artillery_skill").setValue(true);
+	    } else {
+	    	campaign.getGameOptions().getOption("artillery_skill").setValue(false);
+	    }
 	    options.setAbilities(useAbilitiesBox.isSelected());
+	    if(useAbilitiesBox.isSelected()) {
+	    	campaign.getGameOptions().getOption("pilot_advantages").setValue(true);
+	    } else {
+	    	campaign.getGameOptions().getOption("pilot_advantages").setValue(false);
+	    }
 	    options.setEdge(useEdgeBox.isSelected());
+	    if(useEdgeBox.isSelected()) {
+	    	campaign.getGameOptions().getOption("edge").setValue(true);
+	    } else {
+	    	campaign.getGameOptions().getOption("edge").setValue(false);
+	    }
 	    options.setImplants(useImplantsBox.isSelected());
+	    if(useImplantsBox.isSelected()) {
+	    	campaign.getGameOptions().getOption("manei_domini").setValue(true);
+	    } else {
+	    	campaign.getGameOptions().getOption("manei_domini").setValue(false);
+	    }
 	    options.setPayForParts(payForPartsBox.isSelected());
 	    options.setPayForUnits(payForUnitsBox.isSelected());
 	    options.setPayForSalaries(payForSalariesBox.isSelected());
