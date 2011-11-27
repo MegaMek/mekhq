@@ -1395,6 +1395,8 @@ public class Campaign implements Serializable {
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "lastPersonId", lastPersonId);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "lastPartId", lastPartId);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "lastForceId", lastForceId);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "lastMissionId", lastMissionId);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "lastScenarioId", lastScenarioId);
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "calendar",
 				df.format(calendar.getTime()));
@@ -2290,6 +2292,12 @@ public class Campaign implements Serializable {
 							.trim());
 				} else if (xn.equalsIgnoreCase("lastUnitId")) {
 					retVal.lastUnitId = Integer.parseInt(wn.getTextContent()
+							.trim());
+				} else if (xn.equalsIgnoreCase("lastMissionId")) {
+					retVal.lastMissionId = Integer.parseInt(wn.getTextContent()
+							.trim());
+				} else if (xn.equalsIgnoreCase("lastScenarioId")) {
+					retVal.lastScenarioId = Integer.parseInt(wn.getTextContent()
 							.trim());
 				} else if (xn.equalsIgnoreCase("name")) {
 					String val = wn.getTextContent().trim();

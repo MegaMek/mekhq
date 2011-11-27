@@ -619,7 +619,9 @@ public class ResolveScenarioTracker {
 		return recovered;
 	}
 	
-	
+	public void recoverUnit(Unit u) {
+		entities.put(u.getId(), u.getEntity());
+	}
 	
 
 	/**

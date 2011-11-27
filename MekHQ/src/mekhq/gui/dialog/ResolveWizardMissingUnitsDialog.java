@@ -32,6 +32,7 @@ import javax.swing.JCheckBox;
 
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.Unit;
+import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
 import mekhq.campaign.mission.Contract;
 /**
  *
@@ -49,11 +50,13 @@ public class ResolveWizardMissingUnitsDialog extends javax.swing.JDialog {
 	private javax.swing.JPanel panMissingUnits;
     private javax.swing.JTextArea txtInstructions;
     private ArrayList<javax.swing.JCheckBox> boxes;
+    private ArrayList<Unit> units;
 	
     /** Creates new form NewTeamDialog */
     public ResolveWizardMissingUnitsDialog(java.awt.Frame parent, boolean modal, ResolveScenarioTracker t) {
         super(parent, modal);
         this.tracker = t;
+        units = tracker.getMissingUnits();
         initComponents();
         setLocationRelativeTo(parent);
     }
@@ -103,7 +106,7 @@ public class ResolveWizardMissingUnitsDialog extends javax.swing.JDialog {
         
         JCheckBox box;
         int i = 1;
-        for(Unit u : tracker.getMissingUnits()) {
+        for(Unit u : units) {
         	box = new JCheckBox(u.getEntity().getDisplayName());
         	box.setSelected(false);
         	boxes.add(box);
@@ -182,10 +185,9 @@ public class ResolveWizardMissingUnitsDialog extends javax.swing.JDialog {
     	for(int i = 0; i < boxes.size(); i++) {
     		JCheckBox box = boxes.get(i);
     		if(box.isSelected()) {
-    			//tracker.recoverMissingEntity(i);
+    			tracker.recoverUnit(units.get(i));
     		}
     	}
-    	//tracker.identifyMissingUnits();
     	this.setVisible(false);
     	if(!tracker.getPeopleStatus().isEmpty()) {
     		ResolveWizardPilotStatusDialog resolveDialog = new ResolveWizardPilotStatusDialog((Frame)getParent(), true, tracker);

@@ -87,6 +87,8 @@ v0.1.10 (SVN)
 + Bug 3403515: Negative Fix times
 + Bug 3430084: Artillery skill does not get saved in MUL file
 + personnel options affect corresponding megamek options
++ Bug 3413047: 0.1.9 Deplyed Units Issue
++ Bug: checked units not recovered in resolvemissingunitsdialog
 
 v0.1.9 (2011-07-17)
 + beginning of personnel switch (hold on to your hats!)
