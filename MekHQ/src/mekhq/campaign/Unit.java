@@ -1946,4 +1946,13 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     public boolean isRefitting() {
     	return null != refit;
     }
+    
+    public String getName() {
+    	return entity.getChassis() + " " + entity.getModel();
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+    	return o instanceof Unit && ((Unit)o).getId() == id && ((Unit)o).getName().equals(getName());
+    }
 }

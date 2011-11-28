@@ -286,6 +286,7 @@ public class Campaign implements Serializable {
 		int id = lastForceId + 1;
 		force.setId(id);
 		superForce.addSubForce(force, true);
+		force.setScenarioId(superForce.getScenarioId());
 		forceIds.put(new Integer(id), force);
 		lastForceId = id;
 		
@@ -320,7 +321,7 @@ public class Campaign implements Serializable {
 		if(null != force) {
 			u.setForceId(id);
 			force.addUnit(u.getId());
-			//p.setScenarioId(force.getScenarioId());
+			u.setScenarioId(force.getScenarioId());
 		}
 	}
 	
@@ -1101,7 +1102,7 @@ public class Campaign implements Serializable {
 			if(u.getForceId() == fid) {
 				u.setForceId(-1);
 				if(force.isDeployed()) {
-					//p.setScenarioId(-1);
+					u.setScenarioId(-1);
 				}
 			}
 		}
@@ -1120,7 +1121,7 @@ public class Campaign implements Serializable {
 		if(null != force) {
 			force.removeUnit(u.getId());
 			u.setForceId(-1);
-			//p.setScenarioId(-1);
+			u.setScenarioId(-1);
 		}
 	}
 	 

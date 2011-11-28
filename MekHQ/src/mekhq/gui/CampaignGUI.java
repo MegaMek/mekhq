@@ -87,6 +87,8 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.MouseInputAdapter;
+import javax.swing.event.TreeModelEvent;
+import javax.swing.event.TreeModelListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.filechooser.FileFilter;
@@ -98,6 +100,7 @@ import javax.swing.table.TableRowSorter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
@@ -258,7 +261,7 @@ public class CampaignGUI extends JPanel {
 	private PartsTableModel partsModel = new PartsTableModel();
 	private FinanceTableModel financeModel = new FinanceTableModel();
 	private ScenarioTableModel scenarioModel = new ScenarioTableModel();
-	private DefaultTreeModel orgModel;
+	private OrgTreeModel orgModel;
 	private UnitTableMouseAdapter unitMouseAdapter;
 	private ServicedUnitsTableMouseAdapter servicedUnitMouseAdapter;
 	private PartsTableMouseAdapter partsMouseAdapter;
@@ -442,7 +445,8 @@ public class CampaignGUI extends JPanel {
 		panOrganization.setName("panOrganization"); // NOI18N
 		panOrganization.setLayout(new java.awt.GridBagLayout());
 		
-		refreshOrganization();
+		//refreshOrganization();
+		orgModel = new OrgTreeModel(getCampaign().getForces());
 		orgTree.setModel(orgModel);
 		orgTree.addMouseListener(orgMouseAdapter);
         orgTree.setCellRenderer(new ForceRenderer());
@@ -450,7 +454,7 @@ public class CampaignGUI extends JPanel {
         orgTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         orgTree.addTreeSelectionListener(new TreeSelectionListener() {
             public void valueChanged(TreeSelectionEvent e) {
-                refreshForceView();
+               refreshForceView();
             }
         });
 		scrollOrgTree.setViewportView(orgTree);
@@ -2526,28 +2530,24 @@ public class CampaignGUI extends JPanel {
 	}
 	
 	protected void refreshForceView() {
-		DefaultMutableTreeNode node = (DefaultMutableTreeNode)orgTree.getLastSelectedPathComponent();
-		if(null == node) {
+		Object node = orgTree.getLastSelectedPathComponent();
+		if(null == node || -1 == orgTree.getRowForPath(orgTree.getSelectionPath())) {
 			scrollForceView.setViewportView(null);
 			return;
 		}
-		if(node.getUserObject() instanceof Unit) {
-			Unit u = ((Unit)node.getUserObject());
-			if(u == null) {
-				scrollForceView.setViewportView(null);
-			} else {
-				JTabbedPane tabUnit = new JTabbedPane();
-				Person p = ((Unit)node.getUserObject()).getCommander();
-				if(p != null) {
-					String name = "Commander";
-					if(u.usesSoloPilot()) {
-						name = "Pilot";
-					}
-					tabUnit.add(name, new PersonViewPanel(p, getCampaign(), getPortraits()));
+		if(node instanceof Unit) {
+			Unit u = ((Unit)node);
+			JTabbedPane tabUnit = new JTabbedPane();
+			Person p = u.getCommander();
+			if(p != null) {
+				String name = "Commander";
+				if(u.usesSoloPilot()) {
+					name = "Pilot";
 				}
-				tabUnit.add("Unit", new UnitViewPanel(u, getCampaign(), getCamos(), getMechTiles()));
-				scrollForceView.setViewportView(tabUnit);
+				tabUnit.add(name, new PersonViewPanel(p, getCampaign(), getPortraits()));
 			}
+			tabUnit.add("Unit", new UnitViewPanel(u, getCampaign(), getCamos(), getMechTiles()));
+			scrollForceView.setViewportView(tabUnit);
 			//This odd code is to make sure that the scrollbar stays at the top
 			//I cant just call it here, because it ends up getting reset somewhere later
 			javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -2555,8 +2555,8 @@ public class CampaignGUI extends JPanel {
 					scrollForceView.getVerticalScrollBar().setValue(0);
 				}
 			});
-		} else if (node.getUserObject() instanceof Force) {
-			scrollForceView.setViewportView(new ForceViewPanel((Force)node.getUserObject(), getCampaign(), getPortraits(), getForceIcons(), getCamos(), getMechTiles()));
+		} else if (node instanceof Force) {
+			scrollForceView.setViewportView(new ForceViewPanel((Force)node, getCampaign(), getPortraits(), getForceIcons(), getCamos(), getMechTiles()));
 			javax.swing.SwingUtilities.invokeLater(new Runnable() {
 				public void run() { 
 					scrollForceView.getVerticalScrollBar().setValue(0);
@@ -3022,58 +3022,12 @@ public class CampaignGUI extends JPanel {
 	}
 	
 	public void refreshOrganization() {
-		//traverse the force object and assign TreeNodes
-		Force force = getCampaign().getForces();
-		DefaultMutableTreeNode top = new DefaultMutableTreeNode(getCampaign().getForces());
-		Enumeration<Force> subforces = force.getSubForces().elements();
-		while(subforces.hasMoreElements()) {
-			Force subforce = subforces.nextElement();
-			addForce(subforce, top);
-		}
-		if(null == orgModel) {
-			orgModel = new DefaultTreeModel(top);
-		} else {
-			orgModel.setRoot(top);
-		}
-		//scrollOrgTree.setViewportView(orgTree);	
-		refreshForceView();
-		
-	}
-	
-	private void addForce(Force force, DefaultMutableTreeNode top) {
-		DefaultMutableTreeNode category = new DefaultMutableTreeNode(force);
-		top.add(category);
-		Enumeration<Force> subforces = force.getSubForces().elements();
-		while(subforces.hasMoreElements()) {
-			Force subforce = subforces.nextElement();
-			addForce(subforce, category);
-		}
-		//add any personnel
-		Enumeration<Integer> uids = force.getUnits().elements();
-		//put them into a temporary array so I can sort it by rank
-		ArrayList<Unit> units = new ArrayList<Unit>();
-		ArrayList<Unit> unmannedUnits = new ArrayList<Unit>();
-		while(uids.hasMoreElements()) {
-			Unit u = getCampaign().getUnit(uids.nextElement());
-			if(null != u) {
-				if(null == u.getCommander()) {
-					unmannedUnits.add(u);
-				} else {
-					units.add(u);
-				}
+		javax.swing.SwingUtilities.invokeLater(new Runnable() {
+			public void run() { 
+				orgTree.updateUI();
+				refreshForceView();
 			}
-		}
-		Collections.sort(units, new Comparator<Unit>(){		 
-            public int compare(final Unit u1, final Unit u2) {
-               return ((Comparable<Integer>)u2.getCommander().getRank()).compareTo(u1.getCommander().getRank());
-            }
-        });
-		for(Unit u : units) {
-			category.add(new DefaultMutableTreeNode(u));
-		}
-		for(Unit u : unmannedUnits) {
-			category.add(new DefaultMutableTreeNode(u));
-		}
+		});
 	}
 
 	protected void refreshFunds() {
@@ -4387,6 +4341,101 @@ public class CampaignGUI extends JPanel {
 		}
 	}
 
+	public class OrgTreeModel implements TreeModel {
+
+		private Force rootForce;
+		private Vector<TreeModelListener> listeners = new Vector<TreeModelListener>();
+		
+		public OrgTreeModel(Force root) {
+	        rootForce = root;
+	    }
+	
+		@Override
+		public Object getChild(Object parent, int index) {
+			if(parent instanceof Force) {
+				return ((Force)parent).getAllChildren(getCampaign()).get(index);
+			} 
+			return null;
+		}
+
+		@Override
+		public int getChildCount(Object parent) {
+			if(parent instanceof Force) {
+				return ((Force)parent).getAllChildren(getCampaign()).size();
+			}
+			return 0;
+		}
+
+		@Override
+		public int getIndexOfChild(Object parent, Object child) {
+			if(parent instanceof Force) {
+				return ((Force)parent).getAllChildren(getCampaign()).indexOf(child);
+			}
+			return 0;
+		}
+
+		@Override
+		public Object getRoot() {
+			return rootForce;
+		}
+
+		@Override
+		public boolean isLeaf(Object node) {
+			return node instanceof Unit || (node instanceof Force && ((Force)node).getAllChildren(getCampaign()).size() == 0);
+		}
+
+		@Override
+		public void valueForPathChanged(TreePath arg0, Object arg1) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		public void addTreeModelListener( TreeModelListener listener ) {
+		      if ( listener != null && !listeners.contains( listener ) ) {
+		         listeners.addElement( listener );
+		      }
+		   }
+
+		   public void removeTreeModelListener( TreeModelListener listener ) {
+		      if ( listener != null ) {
+		         listeners.removeElement( listener );
+		      }
+		   }
+/*
+		   public void fireTreeNodesChanged( TreeModelEvent e ) {
+		      Enumeration<TreeModelListener> listeners = listeners.elements();
+		      while ( listeners.hasMoreElements() ) {
+		         TreeModelListener listener = (TreeModelListener)listeners.nextElement();
+		         listener.treeNodesChanged( e );
+		      }
+		   }
+
+		   public void fireTreeNodesInserted( TreeModelEvent e ) {
+		      Enumeration listeners = vector.elements();
+		      while ( listeners.hasMoreElements() ) {
+		         TreeModelListener listener = (TreeModelListener)listeners.nextElement();
+		         listener.treeNodesInserted( e );
+		      }
+		   }
+
+		   public void fireTreeNodesRemoved( TreeModelEvent e ) {
+		      Enumeration listeners = vector.elements();
+		      while ( listeners.hasMoreElements() ) {
+		         TreeModelListener listener = (TreeModelListener)listeners.nextElement();
+		         listener.treeNodesRemoved( e );
+		      }
+		   }
+
+		   public void fireTreeStructureChanged( TreeModelEvent e ) {
+		      Enumeration listeners = vector.elements();
+		      while ( listeners.hasMoreElements() ) {
+		         TreeModelListener listener = (TreeModelListener)listeners.nextElement();
+		         listener.treeStructureChanged( e );
+		      }
+		   }
+	*/	
+	}
+	
 	public class OrgTreeMouseAdapter extends MouseInputAdapter implements
 	ActionListener {
 
@@ -4530,14 +4579,14 @@ public class CampaignGUI extends JPanel {
                 if (path == null)
                         return; 
                 tree.setSelectionPath(path);
-                DefaultMutableTreeNode node = (DefaultMutableTreeNode)path.getLastPathComponent();
+                Object node = path.getLastPathComponent();
                 Force force = null;
                 Unit unit = null;
-                if(node.getUserObject() instanceof Force) {
-                	force = (Force)node.getUserObject();
+                if(node instanceof Force) {
+                	force = (Force)node;
                 }
-                if(node.getUserObject() instanceof Unit) {
-                	unit = (Unit)node.getUserObject();
+                if(node instanceof Unit) {
+                	unit = (Unit)node;
                 }
                 if(null != force) {
                 	int forceId = force.getId();
@@ -4673,11 +4722,10 @@ public class CampaignGUI extends JPanel {
                 setForeground(Color.WHITE);
             }
             
-            DefaultMutableTreeNode node = (DefaultMutableTreeNode)value;
-            if(node.getUserObject() instanceof Unit) {
+            if(value instanceof Unit) {
             	String name = "<font color='red'>No Crew</font>";
             	String uname = "";
-            	Unit u = (Unit)node.getUserObject();
+            	Unit u = (Unit)value;
             	Person pp = u.getCommander();
             	if(null != pp) {
             		name = pp.getFullTitle();
@@ -4695,24 +4743,24 @@ public class CampaignGUI extends JPanel {
             		setBackground(Color.LIGHT_GRAY);
             	} 
             }
-            if(node.getUserObject() instanceof Force) {
-            	if(!hasFocus && ((Force)node.getUserObject()).isDeployed()) {
+            if(value instanceof Force) {
+            	if(!hasFocus && ((Force)value).isDeployed()) {
             		setBackground(Color.LIGHT_GRAY);
             	}
             }
-            setIcon(getIcon(node));
+            setIcon(getIcon(value));
 
             
             
             return this;
         }
         
-        protected Icon getIcon(DefaultMutableTreeNode node) {
+        protected Icon getIcon(Object node) {
         	
-        	if(node.getUserObject() instanceof Unit) {
-        		return getIconFrom((Unit)node.getUserObject());
-        	} else if(node.getUserObject() instanceof Force) {
-        		return getIconFrom((Force)node.getUserObject());
+        	if(node instanceof Unit) {
+        		return getIconFrom((Unit)node);
+        	} else if(node instanceof Force) {
+        		return getIconFrom((Force)node);
         	} else {
         		return null;
         	}

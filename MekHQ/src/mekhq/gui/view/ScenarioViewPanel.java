@@ -22,6 +22,7 @@ import mekhq.campaign.Unit;
 import mekhq.campaign.mission.Scenario;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.CampaignGUI.ForceRenderer;
+import mekhq.gui.CampaignGUI.OrgTreeModel;
 
 /**
  * A custom panel that gets filled in with goodies from a scenario object
@@ -45,13 +46,14 @@ public class ScenarioViewPanel extends javax.swing.JPanel {
 	private javax.swing.JTree forceTree;
 	private javax.swing.JLabel lblStatus;
 	
-	private DefaultTreeModel forceModel;
+	private OrgTreeModel forceModel;
 	
 	public ScenarioViewPanel(Scenario s, Campaign c, CampaignGUI v) {
 		this.scenario = s;
 		this.campaign = c;
 		this.forces = s.getForces(campaign);
 		this.view = v;
+		forceModel = view.new OrgTreeModel(forces);
 		initComponents();
 	}
 	
@@ -82,7 +84,6 @@ public class ScenarioViewPanel extends javax.swing.JPanel {
 		add(pnlStats, gridBagConstraints);
 		
 		if(forces.getAllUnits().size() > 0) {
-			makeTree();
 			forceTree.setModel(forceModel);
 			//forceTree.addMouseListener(orgMouseAdapter);
 			forceTree.setCellRenderer(view.new ForceRenderer());
@@ -158,81 +159,4 @@ public class ScenarioViewPanel extends javax.swing.JPanel {
 		
 		
     }
-    
-    private void makeTree() {
-    	//traverse the force object and assign TreeNodes
-		DefaultMutableTreeNode top = new DefaultMutableTreeNode(forces);
-		Enumeration<Force> subforces = forces.getSubForces().elements();
-		while(subforces.hasMoreElements()) {
-			Force subforce = subforces.nextElement();
-			addForce(subforce, top);
-		}
-		//add any personnel
-		Enumeration<Integer> uids = forces.getUnits().elements();
-		//put them into a temporary array so I can sort it by rank
-		ArrayList<Unit> units = new ArrayList<Unit>();
-		ArrayList<Unit> unmannedUnits = new ArrayList<Unit>();
-		while(uids.hasMoreElements()) {
-			Unit u = campaign.getUnit(uids.nextElement());
-			if(null != u) {
-				if(null == u.getCommander()) {
-					unmannedUnits.add(u);
-				} else {
-					units.add(u);
-				}
-			}
-		}
-		Collections.sort(units, new Comparator<Unit>(){		 
-            public int compare(final Unit u1, final Unit u2) {
-               return ((Comparable<Integer>)u2.getCommander().getRank()).compareTo(u1.getCommander().getRank());
-            }
-        });
-		for(Unit u : unmannedUnits) {
-			units.add(u);
-		}
-		for(Unit u : units) {
-			top.add(new DefaultMutableTreeNode(u));
-		}
-		if(null == forceModel) {
-			forceModel = new DefaultTreeModel(top);
-		} else {
-			forceModel.setRoot(top);
-		}
-    }
-    
-    private void addForce(Force force, DefaultMutableTreeNode top) {
-		DefaultMutableTreeNode category = new DefaultMutableTreeNode(force);
-		top.add(category);
-		Enumeration<Force> subforces = force.getSubForces().elements();
-		while(subforces.hasMoreElements()) {
-			Force subforce = subforces.nextElement();
-			addForce(subforce, category);
-		}
-		//add any personnel
-		Enumeration<Integer> uids = force.getUnits().elements();
-		//put them into a temporary array so I can sort it by rank
-		ArrayList<Unit> units = new ArrayList<Unit>();
-		ArrayList<Unit> unmannedUnits = new ArrayList<Unit>();
-		while(uids.hasMoreElements()) {
-			Unit u = campaign.getUnit(uids.nextElement());
-			if(null != u) {
-				if(null == u.getCommander()) {
-					unmannedUnits.add(u);
-				} else {
-					units.add(u);
-				}
-			}
-		}
-		Collections.sort(units, new Comparator<Unit>(){		 
-            public int compare(final Unit u1, final Unit u2) {
-               return ((Comparable<Integer>)u2.getCommander().getRank()).compareTo(u1.getCommander().getRank());
-            }
-        });
-		for(Unit u : units) {
-			category.add(new DefaultMutableTreeNode(u));
-		}
-		for(Unit u : unmannedUnits) {
-			category.add(new DefaultMutableTreeNode(u));
-		}
-	}
 }

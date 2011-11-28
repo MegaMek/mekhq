@@ -23,7 +23,13 @@ package mekhq.campaign;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Enumeration;
 import java.util.Vector;
+
+import javax.swing.tree.DefaultMutableTreeNode;
 
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.Person;
@@ -409,5 +415,38 @@ public class Force implements Serializable {
 			}
 		}
 	}
+	
+	public Vector<Object> getAllChildren(Campaign campaign) {
+		Vector<Object> children = new Vector<Object>();
+		children.addAll(subForces);
+		//add any units
+		Enumeration<Integer> uids = getUnits().elements();
+		//put them into a temporary array so I can sort it by rank
+		ArrayList<Unit> units = new ArrayList<Unit>();
+		ArrayList<Unit> unmannedUnits = new ArrayList<Unit>();
+		while(uids.hasMoreElements()) {
+			Unit u = campaign.getUnit(uids.nextElement());
+			if(null != u) {
+				if(null == u.getCommander()) {
+					unmannedUnits.add(u);
+				} else {
+					units.add(u);
+				}
+			}
+		}
+		Collections.sort(units, new Comparator<Unit>(){		 
+            public int compare(final Unit u1, final Unit u2) {
+               return ((Comparable<Integer>)u2.getCommander().getRank()).compareTo(u1.getCommander().getRank());
+            }
+        });
+		children.addAll(units);
+		children.addAll(unmannedUnits);
+		return children;
+	}
+	
+	@Override
+    public boolean equals(Object o) {
+    	return o instanceof Force && ((Force)o).getId() == id && ((Force)o).getFullName().equals(getFullName());
+    }
 	
 }
