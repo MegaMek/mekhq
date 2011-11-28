@@ -66,6 +66,7 @@ import mekhq.campaign.parts.HeatSink;
 import mekhq.campaign.parts.JumpJet;
 import mekhq.campaign.parts.LandingGear;
 import mekhq.campaign.parts.MekActuator;
+import mekhq.campaign.parts.MekCockpit;
 import mekhq.campaign.parts.MekGyro;
 import mekhq.campaign.parts.MekLifeSupport;
 import mekhq.campaign.parts.MekLocation;
@@ -81,6 +82,7 @@ import mekhq.campaign.parts.MissingHeatSink;
 import mekhq.campaign.parts.MissingJumpJet;
 import mekhq.campaign.parts.MissingLandingGear;
 import mekhq.campaign.parts.MissingMekActuator;
+import mekhq.campaign.parts.MissingMekCockpit;
 import mekhq.campaign.parts.MissingMekGyro;
 import mekhq.campaign.parts.MissingMekLifeSupport;
 import mekhq.campaign.parts.MissingMekLocation;
@@ -281,12 +283,19 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 				return false;
 			}
 			// engine destruction?
+			//cockpit hits
 			int engineHits = 0;
+			int cockpitHits = 0;
 			for (int i = 0; i < entity.locations(); i++) {
 				engineHits += entity.getHitCriticals(CriticalSlot.TYPE_SYSTEM,
 						Mech.SYSTEM_ENGINE, i);
+				cockpitHits += entity.getHitCriticals(CriticalSlot.TYPE_SYSTEM,
+						Mech.SYSTEM_COCKPIT, i);
 			}
 			if (engineHits > 2) {
+				return false;
+			}
+			if(cockpitHits > 0) {
 				return false;
 			}
 		}
@@ -1170,6 +1179,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     	Part engine = null;
     	Part lifeSupport = null;
     	Part sensor = null;
+    	Part cockpit = null;
     	Part rightHand = null;
     	Part rightLowerArm = null;
     	Part rightUpperArm = null;
@@ -1213,7 +1223,9 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     			lifeSupport = part;
     		} else if(part instanceof MekSensor || part instanceof MissingMekSensor) {
     			sensor = part;
-    		} else if(part instanceof VeeSensor || part instanceof MissingVeeSensor) {
+    		} else if(part instanceof MekCockpit || part instanceof MissingMekCockpit) {
+    			cockpit = part;
+    		}  else if(part instanceof VeeSensor || part instanceof MissingVeeSensor) {
     			sensor = part;
     		}  else if(part instanceof StructuralIntegrity) {
     			structuralIntegrity = part;
@@ -1443,6 +1455,11 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     			sensor = new MekSensor((int) entity.getWeight());
     			addPart(sensor);
     			partsToAdd.add(sensor);
+    		}
+    		if(null == cockpit) {
+    			cockpit = new MekCockpit((int) entity.getWeight(), ((Mech)entity).getCockpitType());
+    			addPart(cockpit);
+    			partsToAdd.add(cockpit);
     		}
     		if(null == rightUpperArm && entity.hasSystem(Mech.ACTUATOR_UPPER_ARM, Mech.LOC_RARM)) {
     			rightUpperArm = new MekActuator((int)entity.getWeight(), Mech.ACTUATOR_UPPER_ARM, Mech.LOC_RARM);

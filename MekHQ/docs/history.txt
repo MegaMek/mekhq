@@ -90,6 +90,9 @@ v0.1.10 (SVN)
 + Bug 3413047: 0.1.9 Deplyed Units Issue
 + Bug: checked units not recovered in resolvemissingunitsdialog
 + OrgTreeModel: no more TO&E collapsing
++ Cockpit part type (made up values until next errata)
++ Bug 3402178: Mechs with destoyed cockpit still useable
++ Bug 3380632: Mechs with Destroyed Head never Usable
 
 v0.1.9 (2011-07-17)
 + beginning of personnel switch (hold on to your hats!)

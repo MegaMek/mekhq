@@ -68,6 +68,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	public static final int PART_TYPE_MEK_SENSOR = 9;
 	public static final int PART_TYPE_GENERIC_SPARE_PART = 10;
 	public static final int PART_TYPE_OTHER = 11;
+	public static final int PART_TYPE_MEK_COCKPIT = 12;
 	
 	public static final int T_BOTH = 0;
 	public static final int T_IS   = 1;

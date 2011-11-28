@@ -7401,6 +7401,9 @@ public class CampaignGUI extends JPanel {
 					JMenu refitMenu = new JMenu("Refit Kit");
 					for(String model : Utilities.getAllVariants(unit.getEntity())) {
 						MechSummary summary = MechSummaryCache.getInstance().getMech(unit.getEntity().getChassis() + " " + model);
+						if(null == summary) {
+							continue;
+						}
 						try {
                             Entity refitEn = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
 							if(null != refitEn) {

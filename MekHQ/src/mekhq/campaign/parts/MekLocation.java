@@ -134,9 +134,7 @@ public class MekLocation extends Part {
         double cost = 0.1 * (totalStructureCost + totalMuscleCost);
 
         if (loc == Mech.LOC_HEAD) {
-            // Add cockpit cost
-            // TODO create a class for cockpit or memorize cockpit type
-            cost += 200000;
+        	//TODO: make potential adjustments for cockpit, life support, and sensors
         }
         return (long) Math.round(cost);
     }
@@ -404,8 +402,7 @@ public class MekLocation extends Part {
      
 	            //certain other specific crits need to be left out (uggh, must be a better way to do this!)
 	            if(slot.getType() == CriticalSlot.TYPE_SYSTEM 
-	                    && (slot.getIndex() == Mech.SYSTEM_COCKPIT
-	                          || slot.getIndex() == Mech.ACTUATOR_HIP
+	                    && (slot.getIndex() == Mech.ACTUATOR_HIP
 	                          || slot.getIndex() == Mech.ACTUATOR_SHOULDER)) {
 	                continue;
 	            }
