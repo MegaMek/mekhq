@@ -35,6 +35,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
@@ -65,7 +66,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         this.frame = parent;  
         campaign = c;
         contract = new Contract("New Contract", "New Employer");
-        contract.calculateContract(campaign);
+        contract.calculateContract(campaign, true);
         formatter = new DecimalFormat();
         dateFormatter = new SimpleDateFormat("EEEE, MMMM d yyyy");
         initComponents();
@@ -170,7 +171,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         suggestPlanet.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				contract.setPlanetName(suggestPlanet.getText());	
-				contract.calculateContract(campaign);
+				contract.calculateContract(campaign, true);
 				btnDate.setText(dateFormatter.format(contract.getStartDate()));
 				refreshTotals();
 			}
@@ -489,7 +490,7 @@ public class NewContractDialog extends javax.swing.JDialog {
 			@Override
 			public void itemStateChanged(ItemEvent evt) {
 				contract.setMRBCFee(checkMRBC.isSelected());
-				contract.calculateContract(campaign);
+				contract.calculateContract(campaign, false);
 				refreshTotals();
 			}
         });
@@ -509,7 +510,7 @@ public class NewContractDialog extends javax.swing.JDialog {
 			@Override
 			public void stateChanged(ChangeEvent evt) {
 				contract.setLength((Integer)spnLength.getModel().getValue());
-				contract.calculateContract(campaign);
+				contract.calculateContract(campaign, false);
 				refreshTotals();
 			}
 		});
@@ -519,7 +520,7 @@ public class NewContractDialog extends javax.swing.JDialog {
 			@Override
 			public void stateChanged(ChangeEvent evt) {
 				contract.setMultiplier((Double)spnMultiplier.getModel().getValue());
-				contract.calculateContract(campaign);
+				contract.calculateContract(campaign, false);
 				refreshTotals();
 			}
 		});
@@ -533,7 +534,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         choiceOverhead.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				contract.setOverheadComp(choiceOverhead.getSelectedIndex());
-				contract.calculateContract(campaign);
+				contract.calculateContract(campaign, false);
 				refreshTotals();
 			}
 		});
@@ -555,7 +556,7 @@ public class NewContractDialog extends javax.swing.JDialog {
 			@Override
 			public void stateChanged(ChangeEvent evt) {
 				contract.setTransportComp((Integer)spnTransport.getModel().getValue());
-				contract.calculateContract(campaign);
+				contract.calculateContract(campaign, false);
 				refreshTotals();
 			}
 		});
@@ -573,7 +574,7 @@ public class NewContractDialog extends javax.swing.JDialog {
 			@Override
 			public void stateChanged(ChangeEvent evt) {
 				contract.setStraightSupport((Integer)spnStraightSupport.getModel().getValue());
-				contract.calculateContract(campaign);
+				contract.calculateContract(campaign, false);
 				refreshTotals();
 			}
 		});
@@ -591,7 +592,7 @@ public class NewContractDialog extends javax.swing.JDialog {
 			@Override
 			public void stateChanged(ChangeEvent evt) {
 				contract.setSigningBonusPct((Integer)spnSignBonus.getModel().getValue());
-				contract.calculateContract(campaign);
+				contract.calculateContract(campaign, false);
 				refreshTotals();
 			}
 		});
@@ -600,7 +601,7 @@ public class NewContractDialog extends javax.swing.JDialog {
 			@Override
 			public void stateChanged(ChangeEvent evt) {
 				contract.setAdvancePct((Integer)spnAdvance.getModel().getValue());
-				contract.calculateContract(campaign);
+				contract.calculateContract(campaign, false);
 				refreshTotals();
 			}
 		});
@@ -894,8 +895,15 @@ public class NewContractDialog extends javax.swing.JDialog {
         DateChooser dc = new DateChooser(frame, cal);
         // user can eiter choose a date or cancel by closing
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
+        	if(campaign.getCalendar().getTime().after(dc.getDate().getTime())) {
+        		JOptionPane.showMessageDialog(frame,
+        			    "You cannot choose a start date before the current date.",
+        			    "Invalid date",
+        			    JOptionPane.ERROR_MESSAGE);
+        		return;
+        	}
             contract.setStartDate(dc.getDate().getTime());
-            contract.calculateContract(campaign);
+            contract.calculateContract(campaign, false);
             btnDate.setText(dateFormatter.format(contract.getStartDate()));
         }
     }

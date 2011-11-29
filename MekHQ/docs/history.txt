@@ -106,6 +106,7 @@ v0.1.10 (SVN)
 + Bug 3376390: Cannot Scrap Arm
 + Bug: GM Mode not properly set on button when campaign loaded
 + Bug 3288072: Search query is case-sensitive
++ Bug 3440335: Contract Transportation Bug
 
 v0.1.9 (2011-07-17)
 + beginning of personnel switch (hold on to your hats!)
