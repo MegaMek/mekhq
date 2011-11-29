@@ -110,6 +110,7 @@ v0.1.10 (SVN)
 + Patch 3411830: Patch for 3288090 (Date Chooser), thanks derikpage!
 + Bug 3317572: Salvaged units bug
 + Bug 3388419: Destroyed Units Repairable
++ Bug 3323097: Clan tech price modifier bug
 
 v0.1.9 (2011-07-17)
 + beginning of personnel switch (hold on to your hats!)

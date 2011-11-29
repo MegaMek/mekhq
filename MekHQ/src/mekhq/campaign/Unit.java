@@ -818,7 +818,9 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 		 */
 		
 		int cost = (int) Math.round(getEntity().getCost(false));
-		cost *= campaign.getCampaignOptions().getClanPriceModifier();
+		if(entity.isClan()) {
+			cost *= campaign.getCampaignOptions().getClanPriceModifier();
+		}
 		if(!isDamaged()) {
 			return cost / 2;
 		} else if(isFunctional()) {
