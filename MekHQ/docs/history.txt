@@ -98,6 +98,8 @@ v0.1.10 (SVN)
 + Bug 3401092: Loading a save with "MechWarrior" units crashes MekHQ
 + Bug 3398514: Jumpships inoperable
 + Bug 3371755: Medic Count
++ Bug 3369530: Infantry
++ Bug 3371759: Vehicle Crews
 
 v0.1.9 (2011-07-17)
 + beginning of personnel switch (hold on to your hats!)

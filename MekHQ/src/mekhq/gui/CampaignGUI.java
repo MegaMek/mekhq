@@ -4899,11 +4899,15 @@ public class CampaignGUI extends JPanel {
 				refreshPersonnelList();
 				refreshOrganization();
 			} else if (command.contains("ADD_PILOT") || command.contains("ADD_SOLDIER")) {
-				int selected = Integer.parseInt(st.nextToken());		
+				int selected = Integer.parseInt(st.nextToken());
 				Unit u = getCampaign().getUnit(selected);
+				Unit oldUnit = getCampaign().getUnit(selectedPerson.getUnitId());
+				if(null != oldUnit) {
+					oldUnit.remove(selectedPerson);
+				}
 				if(null != u) {
 					u.addPilotOrSoldier(selectedPerson);
-				}
+				}				
 				refreshServicedUnitList();
 				refreshUnitList();
 				refreshPersonnelList();
@@ -4911,6 +4915,10 @@ public class CampaignGUI extends JPanel {
 			} else if (command.contains("ADD_DRIVER")) {
 				int selected = Integer.parseInt(st.nextToken());		
 				Unit u = getCampaign().getUnit(selected);
+				Unit oldUnit = getCampaign().getUnit(selectedPerson.getUnitId());
+				if(null != oldUnit) {
+					oldUnit.remove(selectedPerson);
+				} 
 				if(null != u) {
 					u.addDriver(selectedPerson);
 				}
@@ -4921,6 +4929,10 @@ public class CampaignGUI extends JPanel {
 			} else if (command.contains("ADD_GUNNER")) {
 				int selected = Integer.parseInt(st.nextToken());		
 				Unit u = getCampaign().getUnit(selected);
+				Unit oldUnit = getCampaign().getUnit(selectedPerson.getUnitId());
+				if(null != oldUnit) {
+					oldUnit.remove(selectedPerson);
+				}
 				if(null != u) {
 					u.addGunner(selectedPerson);
 				}
