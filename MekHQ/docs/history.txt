@@ -101,6 +101,7 @@ v0.1.10 (SVN)
 + Bug 3369530: Infantry
 + Bug 3371759: Vehicle Crews
 + Bug 3380630: Warehouse Fields All Sort as strings
++ Bug 3373302: Able to salvage or repair components in a destroyed location
 
 v0.1.9 (2011-07-17)
 + beginning of personnel switch (hold on to your hats!)

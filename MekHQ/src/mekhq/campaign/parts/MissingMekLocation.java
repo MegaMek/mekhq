@@ -23,6 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import megamek.common.CriticalSlot;
 import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
 import megamek.common.Mech;
@@ -291,6 +292,25 @@ public class MissingMekLocation extends MissingPart {
 				return "must replace right torso first";
 			}
 		}
+		//there must be no usable equipment currently in the location
+		//you can only salvage a location that has nothing left on it
+        for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
+            CriticalSlot slot = unit.getEntity().getCritical(loc, i);
+            // ignore empty & non-hittable slots
+            if ((slot == null) || !slot.isEverHittable()) {
+                continue;
+            }
+ 
+            //certain other specific crits need to be left out (uggh, must be a better way to do this!)
+            if(slot.getType() == CriticalSlot.TYPE_SYSTEM 
+                    && (slot.getIndex() == Mech.ACTUATOR_HIP
+                          || slot.getIndex() == Mech.ACTUATOR_SHOULDER)) {
+                continue;
+            }
+            if (slot.isRepairable()) {
+                return "Repairable parts in " + unit.getEntity().getLocationName(loc) + " must be salvaged or scrapped first. They can then be re-installed.";
+            } 
+        }
 		return null;
 	}
 
