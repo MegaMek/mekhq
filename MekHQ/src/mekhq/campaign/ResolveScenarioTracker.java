@@ -37,6 +37,7 @@ import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 
 import megamek.client.Client;
+import megamek.common.BattleArmor;
 import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.Infantry;
@@ -397,6 +398,10 @@ public class ResolveScenarioTracker {
 
 			// Add the units from the file.		
 			for (Entity entity : parser.getEntities()) {
+				//dont allow the salvaging of conventional infantry
+				if(entity instanceof Infantry && !(entity instanceof BattleArmor)) {
+					continue;
+				}
 				//some of the players units and personnel may be in the salvage pile, so 
 				//lets check for these first
 				if(foundMatch(entity, units)) {
