@@ -514,6 +514,9 @@ public class ResolveScenarioTracker {
 				unit.setEntity(en);
 				unit.runDiagnostic();
 				unit.resetPilotAndEntity();
+				if(!unit.isRepairable()) {
+					unit.setSalvage(true);
+				}
 				//check for BLC
 				long newValue = unit.getValueOfAllMissingParts();
 				campaign.addReport(unit.getEntity().getDisplayName() + " has been recovered.");

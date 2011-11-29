@@ -453,6 +453,9 @@ public class Campaign implements Serializable {
 		unit.initializeParts(true);
 		unit.runDiagnostic();
 		unit.resetPilotAndEntity();
+		if(!unit.isRepairable()) {
+			unit.setSalvage(true);
+		}
 		
 		addReport(unit.getEntity().getDisplayName() + " has been added to the unit roster.");
 	}
@@ -1805,6 +1808,9 @@ public class Campaign implements Serializable {
 			//just in case parts are missing (i.e. because they weren't tracked in previous versions)
 			unit.initializeParts(true);
 			unit.runDiagnostic();
+			if(!unit.isRepairable()) {
+				unit.setSalvage(true);
+			}
 		}
 			
 		MekHQ.logMessage("Load of campaign file complete!");

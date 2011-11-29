@@ -1988,8 +1988,12 @@ public class CampaignGUI extends JPanel {
 				}
 			} else if(repairsSelected()) {
 				Part part = getCampaign().getPart(currentServiceablePartsId);
+				Unit u = part.getUnit();
 				if(null != part) {
 					getCampaign().fixPart(part, tech);
+				}
+				if(null !=  u && !u.isRepairable() && u.getSalvageableParts().size() == 0) {
+					getCampaign().removeUnit(u.getId());
 				}
 			}
 		}
@@ -3719,7 +3723,11 @@ public class CampaignGUI extends JPanel {
 				return;
 			}
 			if (command.equalsIgnoreCase("SCRAP")) {
+				Unit u = part.getUnit();
 				getCampaign().addReport(part.scrap());
+				if(null !=  u && !u.isRepairable() && u.getSalvageableParts().size() == 0) {
+					getCampaign().removeUnit(u.getId());
+				}
 				refreshServicedUnitList();
 				refreshUnitList();
 				refreshTaskList();
