@@ -25,7 +25,11 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
+import java.util.Vector;
 
 import mekhq.campaign.MekHqXmlUtil;
 
@@ -55,6 +59,17 @@ public class Transaction implements Serializable {
 	public final static int C_BLC        = 11;
 	public final static int C_SALVAGE    = 12;
 	public final static int C_NUM        = 13;
+
+    public static Vector<String> getCategoryList() {
+        Vector<String> out = new Vector<String>();
+        int max = 13;
+
+        for (int i = 0; i < max; i++) {
+            out.add(Transaction.getCategoryName(i));
+        }
+        Collections.sort(out);
+        return out;
+    }
 	
 	public static String getCategoryName(int cat) {
 		switch(cat) {
@@ -88,7 +103,7 @@ public class Transaction implements Serializable {
 			return "Unknown category";
 		}
 	}
-	
+
 	private long amount;
 	private String description;
 	private Date date;
@@ -105,7 +120,16 @@ public class Transaction implements Serializable {
 		date = dt;
 	}
 	
-	public long getAmount() {
+    public static int getCategoryIndex(String name) {
+        for (int i = 0; i < getCategoryList().size(); i++) {
+            if (getCategoryName(i).equalsIgnoreCase(name)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+	public Long getAmount() {
 		return amount;
 	}
 	
@@ -136,7 +160,11 @@ public class Transaction implements Serializable {
 	public Date getDate() {
 		return date;
 	}
-	
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
 	protected void writeToXml(PrintWriter pw1, int indent) {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "<transaction>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
@@ -186,4 +214,18 @@ public class Transaction implements Serializable {
 		}
 		return retVal;
 	}
+
+    public String updateTransaction(Transaction previousTransaction) {
+        return  "Edited Transaction: {" +
+                "Previous = " + previousTransaction.toText() +
+                "} -> {New = " + toText() + "}";
+    }
+
+    public String voidTransaction() {
+        return "Deleted Transaction: " + toText();
+    }
+
+    public String toText() {
+        return new SimpleDateFormat("MM/dd/yyyy").format(getDate()) + ", " + getCategoryName() + ", " + getDescription() + ", " + getAmount();
+    }
 }

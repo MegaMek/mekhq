@@ -6,15 +6,32 @@
 
 package mekhq.gui.dialog;
 
+import mekhq.campaign.finances.Transaction;
+
+import javax.swing.JComboBox;
+import javax.swing.JFormattedTextField;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+import javax.swing.text.DefaultFormatterFactory;
+import javax.swing.text.NumberFormatter;
 import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.util.ResourceBundle;
 
 /**
  *
  * @author natit
  */
-public class AddFundsDialog extends javax.swing.JDialog {
+public class AddFundsDialog extends javax.swing.JDialog implements FocusListener {
 	private static final long serialVersionUID = -6946480787293179307L;
+
+    private JFormattedTextField descriptionField;
+    private JComboBox categoryCombo;
+    private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AddFundsDialog");
+
 	/** Creates new form AlertPopup */
     public AddFundsDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
@@ -29,12 +46,10 @@ public class AddFundsDialog extends javax.swing.JDialog {
     private void initComponents() {
 
         btnAddFunds = new javax.swing.JButton();
-        jFormattedTextFieldFundsQuantity = new javax.swing.JFormattedTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
 
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AddFundsDialog");
         setTitle(resourceMap.getString("Form.title"));
 
         btnAddFunds.setText(resourceMap.getString("btnAddFunds.text")); // NOI18N
@@ -46,16 +61,41 @@ public class AddFundsDialog extends javax.swing.JDialog {
             }
         });
 
+        getContentPane().add(buildFieldsPanel(), BorderLayout.NORTH);
+        getContentPane().add(btnAddFunds, BorderLayout.PAGE_END);
+
+        setLocationRelativeTo(getParent());
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+    private JPanel buildFieldsPanel() {
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 2, 2));
+
+        
+        jFormattedTextFieldFundsQuantity = new javax.swing.JFormattedTextField();
+        jFormattedTextFieldFundsQuantity.addFocusListener(this);
         jFormattedTextFieldFundsQuantity.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.NumberFormatter(java.text.NumberFormat.getIntegerInstance())));
         jFormattedTextFieldFundsQuantity.setText(resourceMap.getString("jFormattedTextFieldFundsQuantity.text")); // NOI18N
         jFormattedTextFieldFundsQuantity.setToolTipText(resourceMap.getString("jFormattedTextFieldFundsQuantity.toolTipText")); // NOI18N
         jFormattedTextFieldFundsQuantity.setName("jFormattedTextFieldFundsQuantity"); // NOI18N
+        jFormattedTextFieldFundsQuantity.setColumns(10);
+        panel.add(jFormattedTextFieldFundsQuantity);
 
-        getContentPane().add(jFormattedTextFieldFundsQuantity, BorderLayout.NORTH);
-        getContentPane().add(btnAddFunds, BorderLayout.PAGE_END);
+        categoryCombo = new JComboBox(Transaction.getCategoryList());
+        categoryCombo.setSelectedItem(Transaction.getCategoryName(Transaction.C_MISC));
+        categoryCombo.setToolTipText("The category the transaction falls into.");
+        categoryCombo.setName("categoryCombo");
+        panel.add(categoryCombo);
 
-        pack();
-    }// </editor-fold>//GEN-END:initComponents
+        descriptionField = new JFormattedTextField("Rich Uncle");
+        descriptionField.addFocusListener(this);
+        descriptionField.setToolTipText("Description of the transaction.");
+        descriptionField.setName("descriptionField");
+        descriptionField.setColumns(20);
+        panel.add(descriptionField);
+
+        return panel;
+    }
 
     private void btnAddFundsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddFundsActionPerformed
         this.setVisible(false);
@@ -83,7 +123,37 @@ public class AddFundsDialog extends javax.swing.JDialog {
         return fundsQuantity;
     }
 
+    public String getFundsDescription() {
+        return descriptionField.getText();
+    }
+
+    public int getCategory() {
+        return Transaction.getCategoryIndex((String)categoryCombo.getSelectedItem());
+    }
+
     private javax.swing.JButton btnAddFunds;
     private javax.swing.JFormattedTextField jFormattedTextFieldFundsQuantity;
 
+    @Override
+    public void focusGained(FocusEvent e) {
+        if (jFormattedTextFieldFundsQuantity.equals(e.getSource())) {
+            selectAllTextInField(jFormattedTextFieldFundsQuantity);
+        } else if (descriptionField.equals(e.getSource())) {
+            selectAllTextInField(descriptionField);
+        }
+    }
+
+    private void selectAllTextInField(final JFormattedTextField field) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                field.selectAll();
+            }
+        });
+    }
+
+    @Override
+    public void focusLost(FocusEvent e) {
+        //not used
+    }
 }

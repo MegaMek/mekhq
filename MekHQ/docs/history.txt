@@ -112,6 +112,7 @@ v0.1.10 (SVN)
 + Bug 3388419: Destroyed Units Repairable
 + Bug 3323097: Clan tech price modifier bug
 + Bug 3371756: One-Shot Ammo
++ Patch 3411833: GM Edit & Delete Financial Transactions
 
 v0.1.9 (2011-07-17)
 + beginning of personnel switch (hold on to your hats!)

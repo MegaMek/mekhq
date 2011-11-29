@@ -222,7 +222,6 @@ public class MekHQ implements GameListener {
      * This function redirects the standard error and output streams to the
      * given File name.
      *
-     * @param logFileName The file name to redirect to.
      */
     private static void redirectOutput() {
         try {

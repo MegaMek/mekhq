@@ -169,6 +169,7 @@ import mekhq.gui.dialog.CustomizeMissionDialog;
 import mekhq.gui.dialog.CustomizePersonDialog;
 import mekhq.gui.dialog.CustomizeScenarioDialog;
 import mekhq.gui.dialog.DataLoadingDialog;
+import mekhq.gui.dialog.EditTransactionDialog;
 import mekhq.gui.dialog.GameOptionsDialog;
 import mekhq.gui.dialog.MekHQAboutBox;
 import mekhq.gui.dialog.MekViewDialog;
@@ -260,6 +261,7 @@ public class CampaignGUI extends JPanel {
 	private UnitTableModel unitModel = new UnitTableModel();
 	private PartsTableModel partsModel = new PartsTableModel();
 	private FinanceTableModel financeModel = new FinanceTableModel();
+    private FinanceTableMouseAdapter financeMouseAdapter;
 	private ScenarioTableModel scenarioModel = new ScenarioTableModel();
 	private OrgTreeModel orgModel;
 	private UnitTableMouseAdapter unitMouseAdapter;
@@ -293,6 +295,7 @@ public class CampaignGUI extends JPanel {
 		personnelMouseAdapter = new PersonnelTableMouseAdapter(this);
 		orgMouseAdapter = new OrgTreeMouseAdapter();
 		scenarioMouseAdapter = new ScenarioTableMouseAdapter();
+        financeMouseAdapter = new FinanceTableMouseAdapter();
        
 		initComponents();
 	}
@@ -1456,7 +1459,7 @@ public class CampaignGUI extends JPanel {
 		financeTable.setModel(financeModel);
 		financeTable.setName("financeTable"); // NOI18N
 		financeTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-//		financeTable.addMouseListener(personnelMouseAdapter);
+		financeTable.addMouseListener(financeMouseAdapter);
 		financeTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 		column = null;
 		for (int i = 0; i < FinanceTableModel.N_COL; i++) {
@@ -2589,7 +2592,9 @@ public class CampaignGUI extends JPanel {
 		AddFundsDialog addFundsDialog = new AddFundsDialog(null, true);
 		addFundsDialog.setVisible(true);
 		long funds = addFundsDialog.getFundsQuantity();
-		getCampaign().addFunds(funds);
+        String description = addFundsDialog.getFundsDescription();
+        int category = addFundsDialog.getCategory();
+		getCampaign().addFunds(funds, description, category);
 		refreshReport();
 		refreshFunds();
 		refreshFinancialTransactions();
@@ -6809,6 +6814,14 @@ public class CampaignGUI extends JPanel {
 		public Transaction getTransaction(int row) {
 			return data.get(row);
 		}
+
+        public void setTransaction(int row, Transaction transaction) {
+            data.set(row, transaction);
+        }
+
+        public void deleteTransaction(int row) {
+            data.remove(row);
+        }
 		
 		public FinanceTableModel.Renderer getRenderer() {
 			return new FinanceTableModel.Renderer();
@@ -6841,6 +6854,71 @@ public class CampaignGUI extends JPanel {
 				return this;
 			}
 
+		}
+	}
+
+    public class FinanceTableMouseAdapter extends MouseInputAdapter implements
+			ActionListener {
+
+		public void actionPerformed(ActionEvent action) {
+			String command = action.getActionCommand();
+            FinanceTableModel financeModel = (FinanceTableModel)financeTable.getModel();
+            Transaction transaction = financeModel.getTransaction(financeTable.getSelectedRow());
+            int row = financeTable.getSelectedRow();
+			if(null == transaction) {
+				return;
+			}
+			if (command.equalsIgnoreCase("DELETE")) {
+				getCampaign().addReport(transaction.voidTransaction());
+                financeModel.deleteTransaction(row);
+                refreshFinancialTransactions();
+				refreshReport();
+			} else if (command.contains("EDIT")) {
+                EditTransactionDialog dialog = new EditTransactionDialog(transaction, getFrame(), true);
+                dialog.setVisible(true);
+                transaction = dialog.getNewTransaction();
+                financeModel.setTransaction(row, transaction);
+                getCampaign().addReport(transaction.updateTransaction(dialog.getOldTransaction()));
+                refreshFinancialTransactions();
+				refreshReport();
+			}
+		}
+
+		@Override
+		public void mousePressed(MouseEvent e) {
+			maybeShowPopup(e);
+		}
+
+		@Override
+		public void mouseReleased(MouseEvent e) {
+			maybeShowPopup(e);
+		}
+
+		private void maybeShowPopup(MouseEvent e) {
+			JPopupMenu popup = new JPopupMenu();
+            FinanceTableModel financeModel = (FinanceTableModel)financeTable.getModel();
+            if (e.isPopupTrigger()) {
+				int row = financeTable.getSelectedRow();
+				if(row < 0) {
+					return;
+				}
+				JMenu menu = new JMenu("GM Mode");
+				popup.add(menu);
+
+                JMenuItem deleteItem = new JMenuItem("Delete Transaction");
+                deleteItem.setActionCommand("DELETE");
+                deleteItem.addActionListener(this);
+                deleteItem.setEnabled(getCampaign().isGM());
+                menu.add(deleteItem);
+
+                JMenuItem editItem = new JMenuItem("Edit Transaction");
+                editItem.setActionCommand("EDIT");
+                editItem.addActionListener(this);
+                editItem.setEnabled(getCampaign().isGM());
+                menu.add(editItem);
+
+				popup.show(e.getComponent(), e.getX(), e.getY());
+			}
 		}
 	}
 	

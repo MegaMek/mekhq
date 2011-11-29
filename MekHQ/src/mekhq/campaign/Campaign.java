@@ -304,7 +304,7 @@ public class Campaign implements Serializable {
 	/**
 	 * This is used by the XML loader. The id should already be
 	 * set for this scenario so dont increment
-	 * @param force
+	 * @param scenario
 	 */
 	public void addScenarioToHash(Scenario scenario) {
 		scenarioIds.put(scenario.getId(), scenario);
@@ -313,7 +313,7 @@ public class Campaign implements Serializable {
 	/**
 	 * Add unit to an existing force. This method will also
 	 * assign that force's id to the unit.
-	 * @param p
+	 * @param u
 	 * @param id
 	 */
 	public void addUnitToForce(Unit u, int id) {
@@ -350,8 +350,7 @@ public class Campaign implements Serializable {
 	/**
 	 * Add a mission to the campaign
 	 * 
-	 * @param 
-	 *            The mission to be added
+	 * @param m The mission to be added
 	 */
 	public int addMission(Mission m) {
 		int id = lastMissionId + 1;
@@ -1280,7 +1279,7 @@ public class Campaign implements Serializable {
 	
 	/**
 	 * Creates an {@link ArrayList} containing a {@link PartInventory} for each
-	 * part owned ({@link parts})
+	 * part owned
 	 * 
 	 */
 	// TODO : Add some kind of caching method to speed things up when lots of
@@ -1304,11 +1303,21 @@ public class Campaign implements Serializable {
 	}
 
 	public void addFunds(long quantity) {
-		finances.credit(quantity, Transaction.C_MISC, "Rich Uncle", calendar.getTime());
-		NumberFormat numberFormat = DecimalFormat.getIntegerInstance();
-		String quantityString = numberFormat.format(quantity);
-		addReport("Funds added : " + quantityString);
+        addFunds(quantity, "Rich Uncle", Transaction.C_MISC);
 	}
+
+    public void addFunds(long quantity, String description, int category) {
+        if (description == null || description.isEmpty()) {
+            description = "Rich Uncle";
+        }
+        if (category == -1) {
+            category = Transaction.C_MISC;
+        }
+        finances.credit(quantity, category, description, calendar.getTime());
+        NumberFormat numberFormat = DecimalFormat.getIntegerInstance();
+        String quantityString = numberFormat.format(quantity);
+        addReport("Funds added : " + quantityString + " (" + description + ")");
+    }
 
 	public boolean hasEnoughFunds(long cost) {
 		return getFunds() >= cost;
@@ -2197,7 +2206,7 @@ public class Campaign implements Serializable {
 	 * 
 	 * @param retVal
 	 *            The Campaign object that is being populated.
-	 * @param wn
+	 * @param wni
 	 *            The XML node we're working from.
 	 * @throws ParseException
 	 * @throws DOMException
