@@ -1545,6 +1545,7 @@ public class CampaignGUI extends JPanel {
 		btnGMMode
 				.setToolTipText(resourceMap.getString("btnGMMode.toolTipText")); // NOI18N
 		btnGMMode.setName("btnGMMode"); // NOI18N
+		btnGMMode.setSelected(getCampaign().isGM());
 		btnGMMode.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				btnGMModeActionPerformed(evt);
