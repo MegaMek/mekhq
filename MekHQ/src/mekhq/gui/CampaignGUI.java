@@ -1761,6 +1761,7 @@ public class CampaignGUI extends JPanel {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				getCampaign().decreaseMedicPool(getCampaign().getMedicPool());
 				refreshDoctorsList();
+				refreshTempMedics();
 			}
 		});
 		menuMedicPool.add(miFireAllMedics);
