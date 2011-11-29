@@ -111,6 +111,7 @@ v0.1.10 (SVN)
 + Bug 3317572: Salvaged units bug
 + Bug 3388419: Destroyed Units Repairable
 + Bug 3323097: Clan tech price modifier bug
++ Bug 3371756: One-Shot Ammo
 
 v0.1.9 (2011-07-17)
 + beginning of personnel switch (hold on to your hats!)

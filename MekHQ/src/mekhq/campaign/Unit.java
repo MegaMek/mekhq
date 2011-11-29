@@ -1400,8 +1400,14 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     			if(m.getType() instanceof AmmoType) {
     				int eqnum = entity.getEquipmentNum(m);
     				Part apart = ammoParts.get(eqnum);
+    				int fullShots = ((AmmoType)m.getType()).getShots();
+    				boolean oneShot = false;
+    				if(m.getLocation() == Entity.LOC_NONE) {
+    					fullShots = 1;
+    					oneShot = true;
+    				}
     				if(null == apart) {
-    					apart = new AmmoBin((int)entity.getWeight(), m.getType(), eqnum, ((AmmoType)m.getType()).getShots() - m.getShotsLeft());
+    					apart = new AmmoBin((int)entity.getWeight(), m.getType(), eqnum, fullShots - m.getShotsLeft(), oneShot);
     					addPart(apart);
     					partsToAdd.add(apart);
     				}
