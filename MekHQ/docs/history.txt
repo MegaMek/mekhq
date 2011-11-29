@@ -93,6 +93,7 @@ v0.1.10 (SVN)
 + Cockpit part type (made up values until next errata)
 + Bug 3402178: Mechs with destoyed cockpit still useable
 + Bug 3380632: Mechs with Destroyed Head never Usable
++ Bug 3430515: Cannot Load Campaign
 
 v0.1.9 (2011-07-17)
 + beginning of personnel switch (hold on to your hats!)

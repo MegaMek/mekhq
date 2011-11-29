@@ -1780,10 +1780,6 @@ public class Campaign implements Serializable {
 			//reset the pilot and entity, to reflect newly assigned personnel
 			unit.resetPilotAndEntity();
 			
-			//just in case parts are missing (i.e. because they weren't tracked in previous versions)
-			unit.initializeParts(true);
-			unit.runDiagnostic();
-			
 			if(null != unit.getRefit()) {
 				if(null == unit.getRefit().getNewArmorSupplies() && unit.getRefit().getNewArmorSuppliesId() > 0) {
 					unit.getRefit().setNewArmorSupplies((Armor)retVal.getPart(unit.getRefit().getNewArmorSuppliesId()));
@@ -1801,6 +1797,16 @@ public class Campaign implements Serializable {
 			}
 		}
 		
+
+		//ok, once we are sure that campaign has been set for all units, we can now go
+		//through and initializeParts and run diagnostics
+		for (int x=0; x<retVal.units.size(); x++) {
+			Unit unit = retVal.units.get(x);
+			//just in case parts are missing (i.e. because they weren't tracked in previous versions)
+			unit.initializeParts(true);
+			unit.runDiagnostic();
+		}
+			
 		MekHQ.logMessage("Load of campaign file complete!");
 
 		return retVal;
