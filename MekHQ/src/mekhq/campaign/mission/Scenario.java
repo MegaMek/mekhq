@@ -243,15 +243,15 @@ public class Scenario implements Serializable {
 				+"\">");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<name>"
-				+name
+				+MekHqXmlUtil.escape(name)
 				+"</name>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<desc>"
-				+desc
+				+MekHqXmlUtil.escape(desc)
 				+"</desc>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<report>"
-				+report
+				+MekHqXmlUtil.escape(report)
 				+"</report>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<status>"
