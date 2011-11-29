@@ -1112,6 +1112,8 @@ public class CampaignGUI extends JPanel {
 		partsTable.setModel(partsModel);
 		partsTable.setName("partsTable"); // NOI18N
 		partsSorter = new TableRowSorter<PartsTableModel>(partsModel);
+        partsSorter.setComparator(PartsTableModel.COL_COST, new FormattedNumberSorter());
+        unitTable.setRowSorter(unitSorter);
         //personnelSorter.setComparator(PersonnelTableModel.COL_GUN, new SkillSorter());
         partsTable.setRowSorter(partsSorter);
 		column = null;
