@@ -315,7 +315,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 			}
 		}
 		if(entity instanceof Aero) {
-			if(entity.getWalkMP() <= 0) {
+			if(entity.getWalkMP() <= 0 && !(entity instanceof Jumpship)) {
 				return false;
 			}
 			if(((Aero)entity).getSI() <= 0) {
