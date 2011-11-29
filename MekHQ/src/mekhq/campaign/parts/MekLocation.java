@@ -460,8 +460,8 @@ public class MekLocation extends Part {
             return false;
         } 
         //check for armor
-        if(unit.getEntity().getArmor(loc, false) != IArmorState.ARMOR_DESTROYED
-        		|| (unit.getEntity().hasRearArmor(loc) && unit.getEntity().getArmor(loc, true) != IArmorState.ARMOR_DESTROYED )) {
+        if(unit.getEntity().getArmor(loc, false) > 0
+        		|| (unit.getEntity().hasRearArmor(loc) && unit.getEntity().getArmor(loc, true) > 0 )) {
         	return false;
         }
         //you can only salvage a location that has nothing left on it
