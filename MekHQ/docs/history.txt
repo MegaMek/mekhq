@@ -105,6 +105,7 @@ v0.1.10 (SVN)
 + Bug 3401029: Non-Salvagable Torso
 + Bug 3376390: Cannot Scrap Arm
 + Bug: GM Mode not properly set on button when campaign loaded
++ Bug 3288072: Search query is case-sensitive
 
 v0.1.9 (2011-07-17)
 + beginning of personnel switch (hold on to your hats!)

@@ -451,7 +451,7 @@ public class UnitSelectorDialog extends JDialog {
                         }
                         return match;
                         */
-                        return mech.getName().contains(text);
+                        return mech.getName().toLowerCase().contains(text.toLowerCase());
                     }
                     return true;
                 }
