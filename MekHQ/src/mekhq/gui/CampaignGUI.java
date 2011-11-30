@@ -29,6 +29,10 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -61,9 +65,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.DropMode;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -82,6 +88,7 @@ import javax.swing.RowFilter;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.TransferHandler;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.event.ChangeEvent;
@@ -460,6 +467,9 @@ public class CampaignGUI extends JPanel {
                refreshForceView();
             }
         });
+        orgTree.setDragEnabled(true);
+        orgTree.setDropMode(DropMode.ON);
+        orgTree.setTransferHandler(new OrgTreeTransferHandler());
 		scrollOrgTree.setViewportView(orgTree);
 		
 		scrollForceView.setMinimumSize(new java.awt.Dimension(550, 600));
@@ -7813,6 +7823,111 @@ public class CampaignGUI extends JPanel {
 	    private javax.swing.JLabel lblImage;
 	    // End of variables declaration//GEN-END:variables
 
+	}
+	
+	public class OrgTreeTransferHandler extends TransferHandler {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -1276891849078287710L;
+		
+		@Override
+		public int getSourceActions(JComponent c) {
+		    return MOVE;
+		}
+		
+		@Override
+		public void exportDone(JComponent c, Transferable t, int action) {
+		    if (action == MOVE) {
+		        refreshOrganization();
+		    }
+		}
+		
+		@Override
+		protected Transferable createTransferable(JComponent c) {  
+	        JTree tree = (JTree)c;
+	        Object node = tree.getLastSelectedPathComponent();
+	        if(node instanceof Unit) {
+	        	return new StringSelection("UNIT|" + Integer.toString(((Unit)node).getId()));
+	        }
+	        else if(node instanceof Force) {
+	        	return new StringSelection("FORCE|" + Integer.toString(((Force)node).getId()));
+	        }
+	        return null;
+		}
+		
+		public boolean canImport(TransferHandler.TransferSupport support) {  
+	        if(!support.isDrop()) {  
+	            return false;  
+	        }  
+	        support.setShowDropLocation(true);  
+	        if (!support.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+	            return false;
+	        }
+	        // Do not allow a drop on the drag source selections.  
+	        JTree.DropLocation dl =  
+	                (JTree.DropLocation)support.getDropLocation();  
+	        JTree tree = (JTree)support.getComponent();  
+	        int dropRow = tree.getRowForPath(dl.getPath());  
+	        int[] selRows = tree.getSelectionRows();  
+	        for(int i = 0; i < selRows.length; i++) {  
+	            if(selRows[i] == dropRow) {  
+	                return false;  
+	            }  
+	        }  
+	        TreePath dest = dl.getPath();  
+	        Object parent = dest.getLastPathComponent();  
+	       
+	        return parent instanceof Force || parent instanceof Unit;  
+	    }  
+		
+		public boolean importData(TransferHandler.TransferSupport support) {  
+	        if(!canImport(support)) {  
+	            return false;  
+	        }  
+	        // Extract transfer data.  
+	        Unit unit = null; 
+	        Force force = null;
+            Transferable t = support.getTransferable();         
+	        try {  
+	        	StringTokenizer st = new StringTokenizer((String) t.getTransferData(DataFlavor.stringFlavor), "|");
+	            String type = st.nextToken();
+	            int id = Integer.parseInt(st.nextToken());
+	            if(type.equals("UNIT")) {
+	            	unit = getCampaign().getUnit(id);
+	            }
+	            if(type.equals("FORCE")) {
+	            	force = getCampaign().getForce(id);
+	            }
+	        } catch(UnsupportedFlavorException ufe) {  
+	            System.out.println("UnsupportedFlavor: " + ufe.getMessage());  
+	        } catch(java.io.IOException ioe) {  
+	            System.out.println("I/O error: " + ioe.getMessage());  
+	        }  
+	        // Get drop location info.  
+	        JTree.DropLocation dl = (JTree.DropLocation)support.getDropLocation();  
+	        TreePath dest = dl.getPath();  
+	        Force superForce = null;
+	        Object parent = dest.getLastPathComponent();
+	        if(parent instanceof Force) {
+	        	superForce = (Force)parent;
+	        }
+	        else if(parent instanceof Unit) {
+	        	superForce = getCampaign().getForce(((Unit)parent).getForceId());
+	        }
+	        if(null != superForce) {
+		        if(null != unit) {
+		        	getCampaign().addUnitToForce(unit, superForce.getId());
+		        	return true;
+		        }
+		        if(null != force) {
+		        	getCampaign().moveForce(force, superForce);
+		        	return true;
+		        }
+	        }
+	        return false;  
+	    }  
 	}
 
 	// Variables declaration - do not modify//GEN-BEGIN:variables

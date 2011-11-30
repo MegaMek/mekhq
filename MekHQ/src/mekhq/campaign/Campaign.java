@@ -283,7 +283,7 @@ public class Campaign implements Serializable {
 	 * @param force - the Force to add
 	 * @param superForce - the superforce to add the new force to
 	 */
-	public void addForce(Force force, Force superForce) {
+	public void addForce(Force force, Force superForce) {	
 		int id = lastForceId + 1;
 		force.setId(id);
 		superForce.addSubForce(force, true);
@@ -291,6 +291,23 @@ public class Campaign implements Serializable {
 		forceIds.put(new Integer(id), force);
 		lastForceId = id;
 		
+	}
+	
+	public void moveForce(Force force, Force superForce) {
+		Force parentForce = force.getParentForce();
+		if(null != parentForce) {
+			parentForce.removeSubForce(force.getId());
+		}
+		superForce.addSubForce(force, true);
+		force.setScenarioId(superForce.getScenarioId());	
+		for(Object o : force.getAllChildren(this)) {
+			if(o instanceof Unit) {
+				((Unit)o).setScenarioId(superForce.getScenarioId());
+			}
+			else if(o instanceof Force) {
+				((Force)o).setScenarioId(superForce.getScenarioId());
+			}
+		}
 	}
 	
 	/**
@@ -318,6 +335,10 @@ public class Campaign implements Serializable {
 	 * @param id
 	 */
 	public void addUnitToForce(Unit u, int id) {
+		Force prevForce = forceIds.get(u.getForceId());
+		if(null != prevForce) {
+			prevForce.removeUnit(u.getId());
+		}
 		Force force = forceIds.get(id);
 		if(null != force) {
 			u.setForceId(id);

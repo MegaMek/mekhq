@@ -213,13 +213,7 @@ public class Scenario implements Serializable {
 		for(int fid : subForceIds) {
 			Force f = campaign.getForce(fid);
 			if(null != f) {
-				f.setScenarioId(-1);
-			}	
-		}
-		for(int uid : getForces(campaign).getAllUnits()) {
-			Unit u = campaign.getUnit(uid);
-			if(null != u) {
-				u.setScenarioId(-1);
+				f.clearScenarioIds(campaign);
 			}	
 		}
 		subForceIds = new ArrayList<Integer>();

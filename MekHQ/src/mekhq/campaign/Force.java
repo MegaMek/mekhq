@@ -228,6 +228,19 @@ public class Force implements Serializable {
 		return found;
 	}
 	
+	public void clearScenarioIds(Campaign c) {
+		setScenarioId(-1);
+		for(int uid : getUnits()) {
+			Unit u = c.getUnit(uid);
+			if(null != u) {
+				u.setScenarioId(-1);
+			}
+		}
+		for(Force sub : getSubForces()) {
+			sub.clearScenarioIds(c);
+		}
+	}
+	
 	public String toString() {
 		return name;
 	}

@@ -116,6 +116,7 @@ v0.1.10 (SVN)
 + Patch 3413431: Hire/Add Multiple Infantry (Feature Request 3391637)
 + increment display name for multiple units of the same type
 + added cockpits, more armor, and mek locations to the parts store
++ Drag-n-Drop functionality for OrgTree
 
 v0.1.9 (2011-07-17)
 + beginning of personnel switch (hold on to your hats!)
