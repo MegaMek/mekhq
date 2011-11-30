@@ -507,7 +507,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 	 * produce a string in HTML that can be embedded in larger reports
 	 */
 	public String getDescHTML() {
-		String toReturn = "<b>" + entity.getDisplayName() + "</b><br/>";
+		String toReturn = "<b>" + getName() + "</b><br/>";
 		toReturn += getPilotDesc() + "<br/>";
 		if (isDeployed()) {
 			toReturn += "DEPLOYED!<br/>";
@@ -1973,7 +1973,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     }
     
     public String getName() {
-    	return entity.getChassis() + " " + entity.getModel();
+    	return entity.getShortName();
     }
     
     @Override

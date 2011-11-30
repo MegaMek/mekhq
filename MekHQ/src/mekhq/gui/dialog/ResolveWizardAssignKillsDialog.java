@@ -132,7 +132,7 @@ public class ResolveWizardAssignKillsDialog extends javax.swing.JDialog {
         	int selected = 0;
     		for(Unit u : tracker.getUnits()) {	
     			idx++;
-    			assignModel.addElement(u.getCommander().getFullTitle() + ", " + u.getEntity().getDisplayName());
+    			assignModel.addElement(u.getCommander().getFullTitle() + ", " + u.getName());
     			if(u.getId() == tracker.getKillCredits().get(killName)) {
     				selected = idx;
     			}

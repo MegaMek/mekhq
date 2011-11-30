@@ -2738,7 +2738,7 @@ public class CampaignGUI extends JPanel {
 					chosen.add(u.getEntity());
 				} else {
 					undeployed.append("\n")
-					.append(u.getEntity().getDisplayName())
+					.append(u.getName())
 					.append(" (").append(u.checkDeployment())
 					.append(")");
 				}
@@ -2795,7 +2795,7 @@ public class CampaignGUI extends JPanel {
 					chosen.add(u);
 				} else {
 					undeployed.append("\n")
-					.append(u.getEntity().getDisplayName())
+					.append(u.getName())
 					.append(" (").append(u.checkDeployment())
 					.append(")");
 				}
@@ -2841,7 +2841,7 @@ public class CampaignGUI extends JPanel {
 					chosen.add(u.getEntity());
 				} else {
 					undeployed.append("\n")
-					.append(u.getEntity().getDisplayName())
+					.append(u.getName())
 					.append(" (").append(u.checkDeployment())
 					.append(")");
 				}
@@ -3515,8 +3515,7 @@ public class CampaignGUI extends JPanel {
 		int view = choiceUnitView.getSelectedIndex();
 		XTableColumnModel columnModel = (XTableColumnModel)unitTable.getColumnModel();
 		if(view == PV_GENERAL) {
-			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_CHASSIS), true);
-			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_MODEL), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_NAME), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TYPE), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_WCLASS), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TECH), false);
@@ -3533,8 +3532,7 @@ public class CampaignGUI extends JPanel {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_PARTS), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_QUIRKS), false);
 		} else if(view == UV_DETAILS) {
-			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_CHASSIS), true);
-			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_MODEL), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_NAME), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TYPE), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_WCLASS), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TECH), true);
@@ -3551,8 +3549,7 @@ public class CampaignGUI extends JPanel {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_PARTS), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_QUIRKS), true);
 		} else if(view == UV_STATUS) {
-			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_CHASSIS), true);
-			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_MODEL), true);
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_NAME), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TYPE), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_WCLASS), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TECH), false);
@@ -4095,7 +4092,7 @@ public class CampaignGUI extends JPanel {
 					if (!unit.isDeployed()) {
 						if (0 == JOptionPane.showConfirmDialog(null,
 								"Do you really want to remove "
-										+ unit.getEntity().getDisplayName()
+										+ unit.getName()
 										+ "?", "Remove Unit?",
 								JOptionPane.YES_NO_OPTION)) {
 							getCampaign().removeUnit(unit.getId());
@@ -4628,7 +4625,7 @@ public class CampaignGUI extends JPanel {
 	                	if(null != u.getCommander()) {
 	                		Person p = u.getCommander();
 	                		if(p.isActive() && u.getForceId() < 1) {
-				                menuItem = new JMenuItem(p.getFullTitle() + ", " + u.getEntity().getDisplayName());
+				                menuItem = new JMenuItem(p.getFullTitle() + ", " + u.getName());
 			                	menuItem.setActionCommand("ADD_UNIT|" + forceId + "|" + u.getId());
 			                	menuItem.addActionListener(this);
 			                	menuItem.setEnabled(!u.isDeployed());
@@ -4751,7 +4748,7 @@ public class CampaignGUI extends JPanel {
             			name = "<font color='red'>" + name + "</font>";
             		}     
             	}
-            	uname = "<i>" + u.getEntity().getDisplayName() + "</i>";
+            	uname = "<i>" + u.getName() + "</i>";
             	if(u.isDamaged()) {
             		uname = "<font color='red'>" + uname + "</font>";
             	}          	
@@ -5305,7 +5302,7 @@ public class CampaignGUI extends JPanel {
 						for (Unit unit : getCampaign().getUnits()) {
 							if(unit.usesSoloPilot()) {
 								if(unit.canTakeMoreDrivers() && person.canDrive(unit.getEntity()) && person.canGun(unit.getEntity())) {
-									cbMenuItem = new JCheckBoxMenuItem(unit.getEntity().getDisplayName());
+									cbMenuItem = new JCheckBoxMenuItem(unit.getName());
 									//TODO: check the box
 									cbMenuItem.setActionCommand("ADD_PILOT|" + unit.getId());
 									cbMenuItem.addActionListener(this);
@@ -5314,7 +5311,7 @@ public class CampaignGUI extends JPanel {
 							}
 							else if(unit.usesSoldiers()) {
 								if(unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
-									cbMenuItem = new JCheckBoxMenuItem(unit.getEntity().getDisplayName());
+									cbMenuItem = new JCheckBoxMenuItem(unit.getName());
 									//TODO: check the box
 									cbMenuItem.setActionCommand("ADD_SOLDIER|" + unit.getId());
 									cbMenuItem.addActionListener(this);
@@ -5322,14 +5319,14 @@ public class CampaignGUI extends JPanel {
 								}
 							} else {
 								if(unit.canTakeMoreDrivers() && person.canDrive(unit.getEntity())) {
-									cbMenuItem = new JCheckBoxMenuItem(unit.getEntity().getDisplayName());
+									cbMenuItem = new JCheckBoxMenuItem(unit.getName());
 									//TODO: check the box
 									cbMenuItem.setActionCommand("ADD_DRIVER|" + unit.getId());
 									cbMenuItem.addActionListener(this);
 									driverMenu.add(cbMenuItem);
 								}
 								if(unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
-									cbMenuItem = new JCheckBoxMenuItem(unit.getEntity().getDisplayName());
+									cbMenuItem = new JCheckBoxMenuItem(unit.getName());
 									//TODO: check the box
 									cbMenuItem.setActionCommand("ADD_GUNNER|" + unit.getId());
 									cbMenuItem.addActionListener(this);
@@ -5370,7 +5367,7 @@ public class CampaignGUI extends JPanel {
                         menu = new JMenu("Assign to Unit");
                         for (Unit unit : getCampaign().getUnits()) {
                             if(unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
-                                cbMenuItem = new JCheckBoxMenuItem(unit.getEntity().getDisplayName());
+                                cbMenuItem = new JCheckBoxMenuItem(unit.getName());
                                 //TODO: check the box
                                 cbMenuItem.setActionCommand("ADD_SOLDIER|" + unit.getId());
                                 cbMenuItem.addActionListener(this);
@@ -5389,7 +5386,7 @@ public class CampaignGUI extends JPanel {
                         menu = new JMenu("Assign to Unit");
                         for (Unit unit : getCampaign().getUnits()) {
                             if(unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
-                                cbMenuItem = new JCheckBoxMenuItem(unit.getEntity().getDisplayName());
+                                cbMenuItem = new JCheckBoxMenuItem(unit.getName());
                                 //TODO: check the box
                                 cbMenuItem.setActionCommand("ADD_GUNNER|" + unit.getId());
                                 cbMenuItem.addActionListener(this);
@@ -6082,7 +6079,7 @@ public class CampaignGUI extends JPanel {
             if(col == COL_ASSIGN) {
             	Unit u = getCampaign().getUnit(p.getUnitId());
             	if(null != u) {
-            		String name = u.getEntity().getDisplayName();
+            		String name = u.getName();
             		if(u.getEntity() instanceof Tank) {
             			if(u.isDriver(p)) {
             				name = "[Driver] " + name;
@@ -7039,24 +7036,23 @@ public class CampaignGUI extends JPanel {
 	
 		private static final long serialVersionUID = -5207167419079014157L;
 		
-		private final static int COL_CHASSIS =    0;
-		private final static int COL_MODEL   =    1;
-        private final static int COL_TYPE    =    2;
-        private final static int COL_WCLASS    =  3;
-        private final static int COL_TECH     =   4;
-        private final static int COL_WEIGHT =     5;    
-        private final static int COL_COST    =    6;
-        private final static int COL_MAINTAIN  =  7;
-        private final static int COL_QUALITY  =   8;
-        private final static int COL_STATUS   =   9;
-        private final static int COL_PILOT    =   10;
-        private final static int COL_CREW     =   11;
-        private final static int COL_DEPLOY   =   12;
-        private final static int COL_BV        =  13;
-        private final static int COL_REPAIR  =    14;
-        private final static int COL_PARTS    =   15;
-        private final static int COL_QUIRKS   =   16;
-        private final static int N_COL =          17;
+		private final static int COL_NAME    =    0;
+        private final static int COL_TYPE    =    1;
+        private final static int COL_WCLASS    =  2;
+        private final static int COL_TECH     =   3;
+        private final static int COL_WEIGHT =     4;    
+        private final static int COL_COST    =    5;
+        private final static int COL_MAINTAIN  =  6;
+        private final static int COL_QUALITY  =   7;
+        private final static int COL_STATUS   =   8;
+        private final static int COL_PILOT    =   9;
+        private final static int COL_CREW     =   10;
+        private final static int COL_DEPLOY   =   11;
+        private final static int COL_BV        =  12;
+        private final static int COL_REPAIR  =    13;
+        private final static int COL_PARTS    =   14;
+        private final static int COL_QUIRKS   =   15;
+        private final static int N_COL =          16;
         
         private ArrayList<Unit> data = new ArrayList<Unit>();
         
@@ -7071,10 +7067,8 @@ public class CampaignGUI extends JPanel {
         @Override
         public String getColumnName(int column) {
             switch(column) {
-            	case COL_CHASSIS:
-            		return "Chassis";
-                case COL_MODEL:
-                    return "Model";
+            	case COL_NAME:
+            		return "Name";
                 case COL_TYPE:
                     return "Type";
                 case COL_WEIGHT:
@@ -7112,9 +7106,6 @@ public class CampaignGUI extends JPanel {
         
         public int getColumnWidth(int c) {
             switch(c) {
-        	case COL_CHASSIS:
-        		return 100;
-            case COL_MODEL:
             case COL_WCLASS:
             case COL_TYPE:
             	return 50;
@@ -7123,6 +7114,7 @@ public class CampaignGUI extends JPanel {
                 return 80;        
             case COL_PILOT:          
             case COL_TECH:
+        	case COL_NAME:
             	return 150;
             default:
                 return 20;
@@ -7193,12 +7185,9 @@ public class CampaignGUI extends JPanel {
             if(null == e) {
             	return "?";
             }
-            if(col == COL_CHASSIS) {
-                return e.getChassis();
+            if(col == COL_NAME) {
+                return u.getName();
             }  
-            if(col == COL_MODEL) {
-                return e.getModel();
-            }
             if(col == COL_TYPE) {
             	return UnitType.getTypeDisplayableName(UnitType.determineUnitTypeCode(e));
             }
@@ -7356,7 +7345,7 @@ public class CampaignGUI extends JPanel {
 								+ (sellValue != 0 ? "CBills" : "CBill");
 						if (0 == JOptionPane.showConfirmDialog(null,
 								"Do you really want to sell "
-										+ unit.getEntity().getDisplayName()
+										+ unit.getName()
 										+ " for " + text, "Sell Unit?",
 								JOptionPane.YES_NO_OPTION)) {
 							getCampaign().sellUnit(unit.getId());
@@ -7374,7 +7363,7 @@ public class CampaignGUI extends JPanel {
 				for (Unit unit : units) {
 					if (0 == JOptionPane.showConfirmDialog(null,
 							"Do you really want to consider "
-									+ unit.getEntity().getDisplayName()
+									+ unit.getName()
 									+ " a combat loss?", "Remove Unit?",
 							JOptionPane.YES_NO_OPTION)) {
 						getCampaign().removeUnit(unit.getId());
@@ -7461,7 +7450,7 @@ public class CampaignGUI extends JPanel {
 					if (!unit.isDeployed()) {
 						if (0 == JOptionPane.showConfirmDialog(null,
 								"Do you really want to remove "
-										+ unit.getEntity().getDisplayName()
+										+ unit.getName()
 										+ "?", "Remove Unit?",
 								JOptionPane.YES_NO_OPTION)) {
 							getCampaign().removeUnit(unit.getId());

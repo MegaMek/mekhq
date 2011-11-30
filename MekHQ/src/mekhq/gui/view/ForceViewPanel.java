@@ -530,7 +530,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
     }
     
     public String getSummaryFor(Unit unit) {
-        String toReturn = "<html><font size='2'><b>" + unit.getEntity().getDisplayName() + "</b><br/>";
+        String toReturn = "<html><font size='2'><b>" + unit.getName() + "</b><br/>";
         toReturn += "<b>BV:</b> " + unit.getEntity().calculateBattleValue(true, null == unit.getEntity().getCrew()) + "<br/>";
         toReturn += unit.getStatus();
         toReturn += "</font></html>";

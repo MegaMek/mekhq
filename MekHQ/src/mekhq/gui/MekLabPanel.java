@@ -325,7 +325,7 @@ public class MekLabPanel extends JPanel implements RefreshListener {
 		summaryPane.removeAll();
 		summaryPane.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
-		lblName = new JLabel("<html><b>" + unit.getEntity().getDisplayName() + "</b></html>");
+		lblName = new JLabel("<html><b>" + unit.getName() + "</b></html>");
 		lblRefit = new JLabel(refit.getRefitClassName());
 		lblTime = new JLabel(refit.getTime() + " minutes");
 		lblCost = new JLabel(Utilities.getCurrencyString(refit.getCost()));

@@ -735,14 +735,14 @@ public class Refit implements IPartWork, IAcquisitionWork {
 	@Override
 	public String succeed() {
 		complete();
-		return "The customization of "+ oldUnit.getEntity().getDisplayName() + " is complete.";
+		return "The customization of "+ oldUnit.getEntity().getShortName() + " is complete.";
 	}
 
 	@Override
 	public String fail(int rating) {
 		timeSpent = 0;
 		failedCheck = true;
-		return "The customization of " + oldUnit.getEntity().getDisplayName() + " will take " + getTimeLeft() + " additional minutes to complete.";
+		return "The customization of " + oldUnit.getEntity().getShortName() + " will take " + getTimeLeft() + " additional minutes to complete.";
 	}
 
 	@Override
@@ -758,9 +758,9 @@ public class Refit implements IPartWork, IAcquisitionWork {
 	@Override
 	public String getPartName() {
 		if(customJob) {
-			return newEntity.getDisplayName() + " Customization";
+			return newEntity.getShortName() + " Customization";
 		} else {
-			return newEntity.getDisplayName() + " Refit Kit";
+			return newEntity.getShortName() + " Refit Kit";
 		}
 	}
 

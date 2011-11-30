@@ -138,6 +138,7 @@ public class Campaign implements Serializable {
 	private Hashtable<Integer, Scenario> scenarioIds = new Hashtable<Integer, Scenario>();
 	private ArrayList<Kill> kills = new ArrayList<Kill>();
 	
+    private Hashtable<String, Integer> duplicateNameHash = new Hashtable<String, Integer>();
 	
 	private int astechPool;
 	private int astechPoolMinutes;
@@ -425,6 +426,8 @@ public class Campaign implements Serializable {
 		
 		if (u.getId() > lastUnitId)
 			lastUnitId = u.getId();
+		
+		checkDuplicateNamesDuringAdd(u.getEntity());
 	}
 	
 	/**
@@ -435,8 +438,6 @@ public class Campaign implements Serializable {
 	 *            wrapped around
 	 */
 	public void addUnit(Entity en, boolean allowNewPilots) {
-		// TODO: check for duplicate display names
-
 		//reset the game object
 		en.setGame(game);
 		
@@ -456,7 +457,8 @@ public class Campaign implements Serializable {
 			unit.setSalvage(true);
 		}
 		
-		addReport(unit.getEntity().getDisplayName() + " has been added to the unit roster.");
+		checkDuplicateNamesDuringAdd(en);
+		addReport(unit.getName() + " has been added to the unit roster.");
 	}
 
 	public ArrayList<Unit> getUnits() {
@@ -762,7 +764,7 @@ public class Campaign implements Serializable {
 		Person tech = getPerson(r.getAssignedTeamId());
 		TargetRoll target = getTargetFor(r, tech);
 		if(null == tech) {
-			addReport("No tech is assigned to refit " + r.getOriginalEntity().getDisplayName() + ". Refit cancelled.");
+			addReport("No tech is assigned to refit " + r.getOriginalEntity().getShortName() + ". Refit cancelled.");
 			r.cancel();
 			return;
 		}
@@ -1046,7 +1048,8 @@ public class Campaign implements Serializable {
 		// finally remove the unit
 		units.remove(unit);
 		unitIds.remove(new Integer(unit.getId()));
-		addReport(unit.getEntity().getDisplayName()
+		checkDuplicateNamesDuringDelete(unit.getEntity());
+		addReport(unit.getName()
 				+ " has been removed from the unit roster.");
 	}
 
@@ -1327,14 +1330,14 @@ public class Campaign implements Serializable {
 		int cost = new Unit(en, this).getBuyCost();
 		addUnit(en, false);	
 		if(campaignOptions.payForUnits()) {
-			finances.debit(cost, Transaction.C_UNIT, "Purchased " + en.getDisplayName(), calendar.getTime());
+			finances.debit(cost, Transaction.C_UNIT, "Purchased " + en.getShortName(), calendar.getTime());
 		}
 	}
 
 	public void sellUnit(int id) {
 		Unit unit = getUnit(id);
 		int sellValue = unit.getSellValue();
-		finances.credit(sellValue, Transaction.C_UNIT_SALE, "Sale of " + unit.getEntity().getDisplayName(), calendar.getTime());
+		finances.credit(sellValue, Transaction.C_UNIT_SALE, "Sale of " + unit.getName(), calendar.getTime());
 		removeUnit(id);
 	}
 
@@ -3068,5 +3071,50 @@ public class Campaign implements Serializable {
 	public boolean isCustom(Unit u) {
 		return customs.contains(u.getEntity().getChassis() + " " + u.getEntity().getModel());
 	}
+	
+	 /**
+     * borrowed from megamek.client
+     */
+    private void checkDuplicateNamesDuringAdd(Entity entity) {
+        if (duplicateNameHash.get(entity.getShortName()) == null) {
+            duplicateNameHash.put(entity.getShortName(), new Integer(1));
+        } else {
+            int count = duplicateNameHash.get(entity.getShortName()).intValue();
+            count++;
+            duplicateNameHash.put(entity.getShortName(), new Integer(count));
+            entity.duplicateMarker = count;
+            entity.generateShortName();
+            entity.generateDisplayName();
+
+        }
+    }
+
+    /**
+     * If we remove a unit, we may need to update the duplicate identifier.
+     * TODO: This function is super slow :(
+     *
+     * @param id
+     */
+    private void checkDuplicateNamesDuringDelete(Entity entity) {
+        Object o = duplicateNameHash.get(entity.getShortNameRaw());
+        if (o != null) {
+            int count = ((Integer) o).intValue();
+            if (count > 1) {
+                for (Unit u : getUnits()) {
+                    Entity e = u.getEntity();
+                    if (e.getShortNameRaw().equals(entity.getShortNameRaw())
+                            && (e.duplicateMarker > entity.duplicateMarker)) {
+                        e.duplicateMarker--;
+                        e.generateShortName();
+                        e.generateDisplayName();
+                    }
+                }
+                duplicateNameHash.put(entity.getShortNameRaw(), new Integer(
+                        count - 1));
+            } else {
+                duplicateNameHash.remove(entity.getShortNameRaw());
+            }
+        }
+    }
 	
 }

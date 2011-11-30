@@ -114,6 +114,7 @@ v0.1.10 (SVN)
 + Bug 3371756: One-Shot Ammo
 + Patch 3411833: GM Edit & Delete Financial Transactions
 + Patch 3413431: Hire/Add Multiple Infantry (Feature Request 3391637)
++ increment display name for multiple units of the same type
 
 v0.1.9 (2011-07-17)
 + beginning of personnel switch (hold on to your hats!)

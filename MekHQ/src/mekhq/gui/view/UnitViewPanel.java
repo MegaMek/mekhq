@@ -111,7 +111,7 @@ public class UnitViewPanel extends javax.swing.JPanel {
 		add(lblImage, gridBagConstraints);
 	
 		pnlStats.setName("pnlBasic");
-		pnlStats.setBorder(BorderFactory.createTitledBorder(entity.getDisplayName()));
+		pnlStats.setBorder(BorderFactory.createTitledBorder(unit.getName()));
 		pnlStats.setBackground(Color.WHITE);
 		fillStats(resourceMap);
 		gridBagConstraints = new java.awt.GridBagConstraints();

@@ -107,7 +107,7 @@ public class ResolveWizardMissingUnitsDialog extends javax.swing.JDialog {
         JCheckBox box;
         int i = 1;
         for(Unit u : units) {
-        	box = new JCheckBox(u.getEntity().getDisplayName());
+        	box = new JCheckBox(u.getName());
         	box.setSelected(false);
         	boxes.add(box);
         	gridBagConstraints = new java.awt.GridBagConstraints();

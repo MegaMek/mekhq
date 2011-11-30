@@ -102,7 +102,7 @@ public class NewKillDialog extends javax.swing.JDialog {
         
         Unit u = campaign.getUnit(person.getUnitId());
         if(null != u) {
-        	txtKiller.setText(u.getEntity().getDisplayName());
+        	txtKiller.setText(u.getName());
         } else {
         	txtKiller.setText("Bare hands?");
         }

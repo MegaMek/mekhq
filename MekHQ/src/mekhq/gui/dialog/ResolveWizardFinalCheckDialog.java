@@ -182,7 +182,7 @@ public class ResolveWizardFinalCheckDialog extends javax.swing.JDialog {
         String names = "";
         if(tracker.getRecoveredUnits().size() > 0) {
         	for(Unit u : tracker.getRecoveredUnits()) {
-        		names += u.getEntity().getDisplayName() + "\n";
+        		names += u.getName() + "\n";
         	}
         	txtRecoveredUnits.setText(names);
         }
@@ -236,7 +236,7 @@ public class ResolveWizardFinalCheckDialog extends javax.swing.JDialog {
         names = "";
         if(tracker.getMissingUnits().size() > 0) {
         	for(Unit u : tracker.getMissingUnits()) {
-        		names += u.getEntity().getDisplayName() + "\n";
+        		names += u.getName() + "\n";
         	}
         	txtMissingUnits.setText(names);
         }
@@ -290,7 +290,7 @@ public class ResolveWizardFinalCheckDialog extends javax.swing.JDialog {
         names = "";
         if(tracker.getActualSalvage().size() > 0) {
         	for(Unit u : tracker.getActualSalvage()) {
-        		names += u.getEntity().getDisplayName() + "\n";
+        		names += u.getName() + "\n";
         	}
         	txtSalvage.setText(names);
         }
