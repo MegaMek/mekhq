@@ -314,6 +314,9 @@ public class MekLabPanel extends JPanel implements RefreshListener {
 		} else if(sb.length() > 0) {
 			btnRefit.setEnabled(false);
 			btnRefit.setToolTipText(sb.toString());	
+		} else if(null != refit.checkFixable()) {
+			btnRefit.setEnabled(false);
+			btnRefit.setToolTipText(refit.checkFixable());	
 		} else if(refit.getRefitClass() == Refit.NO_CHANGE) {
         	btnRefit.setEnabled(false);
 			btnRefit.setToolTipText("Nothing to change.");

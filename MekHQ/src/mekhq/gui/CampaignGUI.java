@@ -7618,11 +7618,13 @@ public class CampaignGUI extends JPanel {
                             Entity refitEn = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
 							if(null != refitEn) {
 								Refit r = new Refit(unit, refitEn, false);
-								menuItem = new JMenuItem(model + " (" + r.getRefitClassName() + "/" + r.getTimeLeft() + " minutes/" + Utilities.getCurrencyString(r.getCost()) + ")");
-								menuItem.setActionCommand("REFIT:" + model);
-								menuItem.addActionListener(this);
-								menuItem.setEnabled(!unit.isRefitting());
-								refitMenu.add(menuItem);
+								if(null == r.checkFixable()) {
+									menuItem = new JMenuItem(model + " (" + r.getRefitClassName() + "/" + r.getTimeLeft() + " minutes/" + Utilities.getCurrencyString(r.getCost()) + ")");
+									menuItem.setActionCommand("REFIT:" + model);
+									menuItem.addActionListener(this);
+									menuItem.setEnabled(!unit.isRefitting());
+									refitMenu.add(menuItem);
+								}
 							}
 						} catch (EntityLoadingException ex) {
 							Logger.getLogger(CampaignGUI.class.getName())

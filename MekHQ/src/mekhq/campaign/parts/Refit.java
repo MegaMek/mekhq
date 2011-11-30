@@ -26,6 +26,7 @@ import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 import org.w3c.dom.NamedNodeMap;
@@ -159,6 +160,9 @@ public class Refit implements IPartWork, IAcquisitionWork {
 		newUnit.initializeParts(false);
 		refitClass = NO_CHANGE;
 		time = 0;
+		boolean replacingLocations = false;
+		boolean[] locationHasNewStuff = new boolean[newEntity.locations()];
+		Arrays.fill(locationHasNewStuff, Boolean.FALSE);
 		ArrayList<Part> newPartList = new ArrayList<Part>();
 		
 		//Step 1: put all of the parts from the current unit into a new arraylist so they can
@@ -281,9 +285,14 @@ public class Refit implements IPartWork, IAcquisitionWork {
 				if(newUnit.getEntity().getEngine().getEngineType() != oldUnit.getEntity().getEngine().getEngineType()) {
 					updateRefitClass(CLASS_F);
 				}
+				if(((MissingEnginePart)nPart).getEngine().getSideTorsoCriticalSlots().length > 0) {
+					locationHasNewStuff[Mech.LOC_LT] = true;
+					locationHasNewStuff[Mech.LOC_RT] = true;
+				}
 			} else if(nPart instanceof MissingMekGyro) {
 				updateRefitClass(CLASS_F);
 			} else if(nPart instanceof MissingMekLocation) {
+				replacingLocations = true;
 				if(((Mech)newUnit.getEntity()).hasTSM() != ((Mech)oldUnit.getEntity()).hasTSM()) {
 					updateRefitClass(CLASS_E);
 				} else {
@@ -291,11 +300,21 @@ public class Refit implements IPartWork, IAcquisitionWork {
 				}
 			} else if(nPart instanceof Armor) {
 				updateRefitClass(CLASS_C);
-			} else { 
+				locationHasNewStuff[((Armor)nPart).getLocation()] = true;
+			} else if(nPart instanceof MissingMekCockpit) {
+				updateRefitClass(CLASS_F);
+				locationHasNewStuff[Mech.LOC_HEAD] = true;
+			}else if(nPart instanceof MissingMekActuator) {
+					updateRefitClass(CLASS_D);
+					locationHasNewStuff[((MissingMekActuator)nPart).getLocation()] = true;
+			} else {
 				//determine whether this is A, B, or C
 				if(nPart instanceof MissingEquipmentPart) {
 					nPart.setUnit(newUnit);
 					int loc = ((MissingEquipmentPart)nPart).getLocation();
+					if(loc > -1 && loc < newEntity.locations()) {
+						locationHasNewStuff[loc] = true;
+					}
 					EquipmentType type = ((MissingEquipmentPart)nPart).getType();
 					int crits = type.getCriticals(newUnit.getEntity());
 					nPart.setUnit(oldUnit);
@@ -405,6 +424,20 @@ public class Refit implements IPartWork, IAcquisitionWork {
 		time *= getTimeMultiplier();
 		if(!customJob) {
 			cost *= 1.1;
+		}
+		
+		//figure out if we are putting new stuff on a missing location
+		if(!replacingLocations) {
+			for(int loc = 0; loc < newEntity.locations(); loc++) {
+				if(locationHasNewStuff[loc] && oldUnit.isLocationDestroyed(loc)) {
+					String problem = "Can't add new equipment to a missing " + newEntity.getLocationAbbr(loc); 
+					if(null == fixableString) {
+						fixableString = problem;
+					} else {
+						fixableString += "\n" + problem;
+					}
+				}
+			}
 		}
 	}
 	
