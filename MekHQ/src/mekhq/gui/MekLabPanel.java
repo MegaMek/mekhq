@@ -280,6 +280,10 @@ public class MekLabPanel extends JPanel implements RefreshListener {
     public Mech getEntity() {
         return entity;
     }
+    
+    public Unit getUnit() {
+    	return unit;
+    }
 
 	@Override
 	public void refreshHeader() {

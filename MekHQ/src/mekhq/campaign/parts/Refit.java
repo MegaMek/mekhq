@@ -34,6 +34,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import mekhq.MekHQ;
+import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
@@ -887,12 +888,12 @@ public class Refit implements IPartWork, IAcquisitionWork {
 
 	@Override
 	public String getDesc() {
-		return "Fill this in";
+		return newEntity.getModel() + " " + getDetails();
 	}
 
 	@Override
 	public String getDetails() {
-		return "Fill this in";
+		return "(" + getRefitClassName() + "/" + getTimeLeft() + " minutes/" + Utilities.getCurrencyString(getCost()) + ")";
 	}
 
 	@Override

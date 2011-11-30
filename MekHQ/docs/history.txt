@@ -119,6 +119,7 @@ v0.1.10 (SVN)
 + Drag-n-Drop functionality for OrgTree
 + don't allow customization that adds new equipment to missing locations
 + Bug: armor not set to actual amount when customization complete
++ various gui checks and notifications when unit is being customized or is in Lab
 
 v0.1.9 (2011-07-17)
 + beginning of personnel switch (hold on to your hats!)

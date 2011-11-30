@@ -216,6 +216,9 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 	}
 	
 	public String getStatus() {
+		if(isRefitting()) {
+			return "Refitting";
+		}
 		if(!isRepairable()) {
 			return "Salvage";
 		}

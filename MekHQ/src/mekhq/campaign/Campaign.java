@@ -781,14 +781,13 @@ public class Campaign implements Serializable {
 	}
 	
 	public void refit(Refit r) {
-		//TODO: roll to see if time is doubled
 		Person tech = getPerson(r.getAssignedTeamId());
-		TargetRoll target = getTargetFor(r, tech);
 		if(null == tech) {
 			addReport("No tech is assigned to refit " + r.getOriginalEntity().getShortName() + ". Refit cancelled.");
 			r.cancel();
 			return;
 		}
+		TargetRoll target = getTargetFor(r, tech);
 		if(!r.acquireParts()) {
 			return;
 		}

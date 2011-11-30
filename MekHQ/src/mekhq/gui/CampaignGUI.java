@@ -2971,6 +2971,7 @@ public class CampaignGUI extends JPanel {
 	
 	public void refreshUnitList() {
 		unitModel.setData(getCampaign().getUnits());
+		refreshLab();
 	}
 
 	public void refreshTaskList() {
@@ -2994,6 +2995,22 @@ public class CampaignGUI extends JPanel {
 			choiceMission.setSelectedIndex(0);
 		}
 		changeMission();
+	}
+	
+	public void refreshLab() {
+		if(null == panMekLab) {
+			return;
+		}
+		Unit u = panMekLab.getUnit();
+		if(null == u) {
+			return;
+		}
+		if(null == getCampaign().getUnit(u.getId())) {
+			//this unit has been removed so clear the mek lab
+			panMekLab.clearUnit();
+		} else {
+			panMekLab.refreshSummary();
+		}
 	}
 
 	public void refreshTechsList() {
@@ -7153,8 +7170,11 @@ public class CampaignGUI extends JPanel {
         public String getTooltip(int row, int col) {
         	Unit u = data.get(row);
         	switch(col) {
-        	//case COL_REPAIR:
-        		//return getCampaign().getTaskListFor(u);
+        	case COL_STATUS:
+        		if(u.isRefitting()) {
+        			return u.getRefit().getDesc();
+        		}
+        		return null;		
         	case COL_QUIRKS:
         		return u.getQuirksList();
             default:		
@@ -7619,7 +7639,7 @@ public class CampaignGUI extends JPanel {
 							if(null != refitEn) {
 								Refit r = new Refit(unit, refitEn, false);
 								if(null == r.checkFixable()) {
-									menuItem = new JMenuItem(model + " (" + r.getRefitClassName() + "/" + r.getTimeLeft() + " minutes/" + Utilities.getCurrencyString(r.getCost()) + ")");
+									menuItem = new JMenuItem(r.getDesc());
 									menuItem.setActionCommand("REFIT:" + model);
 									menuItem.addActionListener(this);
 									menuItem.setEnabled(!unit.isRefitting());
