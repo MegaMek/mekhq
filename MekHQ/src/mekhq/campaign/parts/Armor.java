@@ -480,7 +480,13 @@ public class Armor extends Part implements IAcquisitionWork {
 
 	@Override
 	public void updateConditionFromPart() {
-		//this should never happen for armor
+		if(null != unit) {
+			int armor = amount;
+			if(salvaging) {
+				armor = amountNeeded;
+			}
+			unit.getEntity().setArmor(armor, location, rear);
+		}
 	}
 	
 	@Override
