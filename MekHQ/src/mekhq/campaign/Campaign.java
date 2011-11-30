@@ -880,6 +880,7 @@ public class Campaign implements Serializable {
 		}
 		report += wrongType;
 		partWork.resetTimeSpent();
+		partWork.resetOvertime();
 		partWork.setTeamId(-1);
 		addReport(report);
 	}

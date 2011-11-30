@@ -486,6 +486,10 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	public void resetTimeSpent() {
 		this.timeSpent = 0;
 	}
+	
+	public void resetOvertime() {
+		this.workingOvertime = false;
+	}
 
 	@Override
 	public int getSkillMin() {

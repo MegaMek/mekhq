@@ -44,8 +44,10 @@ import mekhq.campaign.parts.EquipmentPart;
 import mekhq.campaign.parts.HeatSink;
 import mekhq.campaign.parts.JumpJet;
 import mekhq.campaign.parts.MekActuator;
+import mekhq.campaign.parts.MekCockpit;
 import mekhq.campaign.parts.MekGyro;
 import mekhq.campaign.parts.MekLifeSupport;
+import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.MekSensor;
 import mekhq.campaign.parts.Part;
 
@@ -178,6 +180,9 @@ public class PartsStore implements Serializable {
 		for(int ton = 20; ton <= 100; ton += 5) {
 			parts.add(new MekSensor(ton));
 		}
+		for(int type = Mech.COCKPIT_STANDARD; type < Mech.COCKPIT_STRING.length; type++) {
+			parts.add(new MekCockpit(0, type));
+		}
 	}
 	
 	private void stockAeroComponents() {
@@ -222,31 +227,48 @@ public class PartsStore implements Serializable {
 		//Stealth
 		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_STEALTH, false));
 		parts.add(new Armor(0, EquipmentType.T_ARMOR_STEALTH, amount, -1, false, false));
-		//TODO: finish this 
-	/*	
-		public static final int T_ARMOR_STANDARD = 0;
-	    public static final int T_ARMOR_FERRO_FIBROUS = 1;
-	    public static final int T_ARMOR_REACTIVE = 2;
-	    public static final int T_ARMOR_REFLECTIVE = 3;
-	    public static final int T_ARMOR_HARDENED = 4;
-	    public static final int T_ARMOR_LIGHT_FERRO = 5;
-	    public static final int T_ARMOR_HEAVY_FERRO = 6;
-	    public static final int T_ARMOR_PATCHWORK = 7;
-	    public static final int T_ARMOR_STEALTH = 8;
-	    public static final int T_ARMOR_FERRO_FIBROUS_PROTO = 9;
-	    public static final int T_ARMOR_COMMERCIAL = 10;
-	    public static final int T_ARMOR_FERRO_CARBIDE = 11;
-	    public static final int T_ARMOR_LAMELLOR_FERRO_CARBIDE = 12;
-	    public static final int T_ARMOR_FERRO_IMP = 13;
-	    public static final int T_ARMOR_INDUSTRIAL = 14;
-	    public static final int T_ARMOR_HEAVY_INDUSTRIAL = 15;
-	    public static final int T_ARMOR_FERRO_LAMELLOR = 16;
-	    public static final int T_ARMOR_PRIMITIVE = 17;
-	    */
+		//Commercial
+		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_COMMERCIAL, false));
+		parts.add(new Armor(0, EquipmentType.T_ARMOR_COMMERCIAL, amount, -1, false, false));
+		//Industrial
+		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_INDUSTRIAL, false));
+		parts.add(new Armor(0, EquipmentType.T_ARMOR_INDUSTRIAL, amount, -1, false, false));
+		//Heavy Industrial
+		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_HEAVY_INDUSTRIAL, false));
+		parts.add(new Armor(0, EquipmentType.T_ARMOR_HEAVY_INDUSTRIAL, amount, -1, false, false));
+		//Ferro-Lamellor
+		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_FERRO_LAMELLOR, false));
+		parts.add(new Armor(0, EquipmentType.T_ARMOR_FERRO_LAMELLOR, amount, -1, false, true));
+		//Primitive
+		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_PRIMITIVE, false));
+		parts.add(new Armor(0, EquipmentType.T_ARMOR_PRIMITIVE, amount, -1, false, false));
+		/*
+		 * These are all warship armors
+		//Ferro-Carbide
+		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_FERRO_CARBIDE, false));
+		parts.add(new Armor(0, EquipmentType.T_ARMOR_FERRO_CARBIDE, amount, -1, false, false));
+		//Lemellor Ferro Carbide
+		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_LAMELLOR_FERRO_CARBIDE, false));
+		parts.add(new Armor(0, EquipmentType.T_ARMOR_LAMELLOR_FERRO_CARBIDE, amount, -1, false, false));
+		//Ferro Improved
+		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_FERRO_IMP, false));
+		parts.add(new Armor(0, EquipmentType.T_ARMOR_FERRO_IMP, amount, -1, false, false));
+		*/
 	}
 	
 	private void stockMekLocations() {
-		//TODO: implement me
+		for(int loc = Mech.LOC_HEAD; loc <= Mech.LOC_LLEG; loc++) {
+			for(int ton = 20; ton <= 100; ton=ton+5) {
+				for(int type = 0; type < EquipmentType.structureNames.length; type++) {
+					parts.add(new MekLocation(loc, ton, type, false, false));
+					parts.add(new MekLocation(loc, ton, type, true, false));
+					if(loc > Mech.LOC_LT) {
+						parts.add(new MekLocation(loc, ton, type, false, true));
+						parts.add(new MekLocation(loc, ton, type, true, true));
+					}
+				}
+			}
+		}
 	}
 	
 	private void stockVeeLocations() {

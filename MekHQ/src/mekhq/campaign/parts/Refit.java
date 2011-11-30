@@ -1136,4 +1136,10 @@ public class Refit implements IPartWork, IAcquisitionWork {
 	public int getNewArmorSuppliesId() {
 		return newArmorSuppliesId;
 	}
+
+	@Override
+	public void resetOvertime() {
+		// TODO Auto-generated method stub
+		
+	}
 }

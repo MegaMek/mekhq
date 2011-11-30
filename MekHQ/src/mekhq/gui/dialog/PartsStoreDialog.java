@@ -54,6 +54,7 @@ import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.EquipmentPart;
 import mekhq.campaign.parts.MekActuator;
+import mekhq.campaign.parts.MekCockpit;
 import mekhq.campaign.parts.MekGyro;
 import mekhq.campaign.parts.MekLifeSupport;
 import mekhq.campaign.parts.MekLocation;
@@ -81,7 +82,8 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 	private static final int SG_ENGINE   = 8;
 	private static final int SG_GYRO     = 9;
 	private static final int SG_ACT      = 10;
-	private static final int SG_NUM      = 11;
+	private static final int SG_COCKPIT  = 11;
+	private static final int SG_NUM      = 12;
 	
     private Frame frame;
     private Campaign campaign;
@@ -217,7 +219,8 @@ public class PartsStoreDialog extends javax.swing.JDialog {
         				|| part instanceof EnginePart
         				|| part instanceof MekActuator
         				|| part instanceof MekLifeSupport
-        				|| part instanceof MekSensor;
+        				|| part instanceof MekSensor
+        				|| part instanceof MekCockpit;
         		} else if(nGroup == SG_EQUIP) {
         			return part instanceof EquipmentPart;
         		} else if(nGroup == SG_LOC) {
@@ -234,6 +237,8 @@ public class PartsStoreDialog extends javax.swing.JDialog {
         			return part instanceof MekGyro;
         		} else if(nGroup == SG_ACT) {
         			return part instanceof MekActuator;
+        		} else if(nGroup == SG_COCKPIT) {
+        			return part instanceof MekCockpit;
         		} 
         		return false;
         	}
@@ -291,6 +296,8 @@ public class PartsStoreDialog extends javax.swing.JDialog {
     		return "Gyros";
     	case SG_ACT:
     		return "Actuators";
+    	case SG_COCKPIT:
+    		return "Cockpits";
     	default:
     		return "?";
     	}
