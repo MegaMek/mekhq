@@ -122,6 +122,7 @@ v0.1.10 (SVN)
 + various gui checks and notifications when unit is being customized or is in Lab
 + various fixes to new ammo in customizations
 + Bug: customization not handled right when armor type remains same but amount changes
++ updated MM.jar and MML.jar
 
 v0.1.9 (2011-07-17)
 + beginning of personnel switch (hold on to your hats!)
