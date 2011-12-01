@@ -309,5 +309,9 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		return replace.getName() + " scrapped.";
 	}
 	
+	@Override
+	public String getAcquisitionName() {
+		return getPartName();
+	}
 }
 

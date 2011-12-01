@@ -764,7 +764,7 @@ public class Campaign implements Serializable {
 	public boolean acquirePart(IAcquisitionWork acquisition, Person person) {
 		boolean found = false;
 		String report = "";
-		report += person.getName() + " attempts to find " + acquisition.getPartName();          
+		report += person.getName() + " attempts to find " + acquisition.getAcquisitionName();          
 		TargetRoll target = getTargetForAcquisition(acquisition, person);     
 		acquisition.setCheckedToday(true);
 		int roll = Compute.d6(2);

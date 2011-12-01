@@ -76,7 +76,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     	return 1.0;
     }
     
-    private int getFullShots() {
+    public int getFullShots() {
     	int fullShots = ((AmmoType)type).getShots();
 		if(oneShot) {
 			fullShots = 1;
@@ -87,7 +87,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     @Override
     public long getCurrentValue() {
     	//multiply full value of ammo ton by the percent of shots remaining  	
-    	return (long)(getPurchasePrice() * ((double)shotsNeeded / getFullShots()));
+    	return (long)(getPurchasePrice() * (1.0 - (double)shotsNeeded / getFullShots()));
     }
     
     @Override
@@ -236,13 +236,20 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 				toReturn = "Partially Loaded";
 			}
 		}
+		if(isReservedForRefit()) {
+			toReturn += " (Reserved for Refit)";
+		}
 		return toReturn;
 	}
 	
 	@Override
 	public void fix() {
+		loadBin(true);
+	}
+	
+	public void loadBin(boolean changeEntity) {
 		int shots = Math.min(getAmountAvailable(), shotsNeeded);
-		if(null != unit) {
+		if(null != unit && changeEntity) {
 			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
 			if(null != mounted) {
 				if(mounted.getType().equals(type)) {
@@ -250,21 +257,27 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 					mounted.setShotsLeft(mounted.getShotsLeft() + shots);
 				} else {
 					//loading a new type of ammo				
-					unload();
+					unload(true);
 					mounted.changeAmmoType((AmmoType)type);
 					mounted.setShotsLeft(shots);
 				}
-				changeAmountAvailable(-1 * shots, (AmmoType)type);
 			}
 		}
+		changeAmountAvailable(-1 * shots, (AmmoType)type);
 		shotsNeeded -= shots;
+	}
+	
+	public void setShotsNeeded(int shots) {
+		this.shotsNeeded = shots;
 	}
 	
 	@Override
 	public String find() {
 		changeAmountAvailable(getFullShots(), (AmmoType)type);
 		setCheckedToday(true);
-		unit.campaign.getFinances().debit(getPurchasePrice(), Transaction.C_EQUIP, "Purchase of " + getName(), unit.campaign.calendar.getTime());
+		if(unit.campaign.getCampaignOptions().payForParts()) {
+			unit.campaign.getFinances().debit(getPurchasePrice(), Transaction.C_EQUIP, "Purchase of " + getAcquisitionName(), unit.campaign.calendar.getTime());
+		}
 		return "<font color='green'> part found.</font>";
 	}
 	
@@ -274,27 +287,27 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 		return "<font color='red'> part not found.</font>";
 	}
 	
-	public void unload() {
-		if(null != unit) {
-			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
-			int shots = 0;
-			AmmoType curType = (AmmoType)type;
+	public void unload(boolean changeEntity) {
+		int shots = getFullShots() - shotsNeeded;
+		AmmoType curType = (AmmoType)type;
+		if(null != unit && changeEntity) {
+			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);		
 			if(null != mounted) {
 				shots = mounted.getShotsLeft();
 				mounted.setShotsLeft(0);
 				curType = (AmmoType)mounted.getType();
-			}
-			shotsNeeded = getFullShots();
-			if(shots > 0) {
-				changeAmountAvailable(shots, curType);
-			}	
+			}		
 		}
+		shotsNeeded = getFullShots();
+		if(shots > 0) {
+			changeAmountAvailable(shots, curType);
+		}	
 	}
 	
 	@Override
 	public void remove(boolean salvage) {
 		if(salvage) {
-			unload();
+			unload(true);
 		}
 		super.remove(salvage);
 	}
@@ -469,6 +482,11 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 		toReturn += Utilities.getCurrencyString(getPurchasePrice()) + "<br/>";
 		toReturn += "</font></html>";
 		return toReturn;
+	}
+	
+	@Override
+	public String getAcquisitionName() {
+		return type.getDesc();
 	}
 
 	@Override

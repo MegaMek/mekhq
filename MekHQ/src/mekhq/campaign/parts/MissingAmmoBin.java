@@ -80,6 +80,11 @@ public class MissingAmmoBin extends MissingEquipmentPart {
 	}
 	
 	@Override
+    public long getPurchasePrice() {
+		return 0; 
+	}
+	
+	@Override
 	public void writeToXml(PrintWriter pw1, int indent, int id) {
 		writeToXmlBegin(pw1, indent, id);		
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)

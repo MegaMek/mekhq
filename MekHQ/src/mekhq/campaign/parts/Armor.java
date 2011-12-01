@@ -520,6 +520,11 @@ public class Armor extends Part implements IAcquisitionWork {
 	}
 	
 	@Override
+	public String getAcquisitionName() {
+		return getName();
+	}
+	
+	@Override
 	public TargetRoll getAllAcquisitionMods() {
         TargetRoll target = new TargetRoll();
         // Faction and Tech mod

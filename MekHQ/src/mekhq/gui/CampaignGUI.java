@@ -7517,6 +7517,7 @@ public class CampaignGUI extends JPanel {
 				}
 				refreshServicedUnitList();
 				refreshUnitList();
+				refreshPartsList();
 			} else if(command.contains("REFIT")) {
 				String model = command.split(":")[1];
 				MechSummary summary = MechSummaryCache.getInstance().getMech(selectedUnit.getEntity().getChassis() + " " + model);

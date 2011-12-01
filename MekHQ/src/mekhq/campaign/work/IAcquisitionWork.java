@@ -32,7 +32,7 @@ public interface IAcquisitionWork extends IWork {
 	
 	
 	
-	public String getPartName();
+	public String getAcquisitionName();
 	
 	public Part getNewPart();
 	
