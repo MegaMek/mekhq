@@ -437,6 +437,9 @@ public class Armor extends Part implements IAcquisitionWork {
 	
 	@Override
 	public void updateConditionFromEntity() {
+		if(isReservedForRefit()) {
+			return;
+		}
 		int currentArmor = unit.getEntity().getArmor(location, rear);
 		if(currentArmor < 0) {
 			currentArmor = 0;

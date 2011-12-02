@@ -123,6 +123,9 @@ v0.1.10 (SVN)
 + various fixes to new ammo in customizations
 + Bug: customization not handled right when armor type remains same but amount changes
 + updated MM.jar and MML.jar
++ Bug: ammo munitions getting switched in Refit#unscrambleEquipmentNumbers
++ Bug: refit armor amounts reverting to old unit values when refit is loaded from save
++ Bug: refitClass not being saved to XML
 
 v0.1.9 (2011-07-17)
 + beginning of personnel switch (hold on to your hats!)

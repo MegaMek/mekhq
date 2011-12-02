@@ -21,13 +21,18 @@
 
 package mekhq.campaign.parts;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -43,15 +48,20 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.Modes;
+import mekhq.gui.CampaignGUI;
 import megamek.common.AmmoType;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Mech;
+import megamek.common.MechFileParser;
+import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
 import megamek.common.Mounted;
 import megamek.common.TargetRoll;
 import megamek.common.WeaponType;
 import megamek.common.loaders.BLKFile;
+import megamek.common.loaders.EntityLoadingException;
+import megamek.common.loaders.MtfFile;
 import megameklab.com.util.UnitUtil;
 
 /**
@@ -511,6 +521,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 				//armor using newArmorSupplies
 				oldUnit.campaign.addPart(part);
 				part.setUnit(oldUnit);
+				part.setRefitId(oldUnit.getId());
 				newUnitParts.add(part.getId());
 			}
 			else if(part instanceof AmmoBin) {
@@ -727,7 +738,8 @@ public class Refit implements IPartWork, IAcquisitionWork {
 				for(int equipNum : equipNums) {
 					i++;
 					Mounted m = oldUnit.getEntity().getEquipment(equipNum);
-					if(m.getType().equals(epart.getType())) {
+					if(m.getType().getInternalName().equals(epart.getType().getInternalName())
+							&& !m.isDestroyed()) {
 						epart.setEquipmentNum(equipNum);
 						found = true;
 						break;
@@ -744,7 +756,8 @@ public class Refit implements IPartWork, IAcquisitionWork {
 				for(int equipNum : equipNums) {
 					i++;
 					Mounted m = oldUnit.getEntity().getEquipment(equipNum);
-					if(m.getType().equals(epart.getType())) {
+					if(m.getType().getInternalName().equals(epart.getType().getInternalName())
+							&& m.isDestroyed()) {
 						epart.setEquipmentNum(equipNum);
 						found = true;
 						break;
@@ -782,6 +795,16 @@ public class Refit implements IPartWork, IAcquisitionWork {
 	    }
 	    oldUnit.campaign.addCustom(newEntity.getChassis() + " " + newEntity.getModel());
 	    MechSummaryCache.getInstance().loadMechData();
+	    //I need to change the new entity to the one from the mtf file now, so that equip
+	    //nums will match
+	    MechSummary summary = MechSummaryCache.getInstance().getMech(newEntity.getChassis() + " " + newEntity.getModel());
+		try {
+            newEntity = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
+		} catch (EntityLoadingException ex) {
+			Logger.getLogger(CampaignGUI.class.getName())
+					.log(Level.SEVERE, null, ex);
+		}	
+	    
 	}
 	
 	private int getTimeMultiplier() {
@@ -1031,6 +1054,8 @@ public class Refit implements IPartWork, IAcquisitionWork {
 				+ time + "</time>");
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<timeSpent>" + timeSpent
 				+ "</timeSpent>");
+		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<refitClass>" + refitClass
+				+ "</refitClass>");
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<cost>" + cost
 				+ "</cost>");
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<failedCheck>" + failedCheck
@@ -1087,6 +1112,8 @@ public class Refit implements IPartWork, IAcquisitionWork {
 				
 				if (wn2.getNodeName().equalsIgnoreCase("time")) {
 					retVal.time = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("refitClass")) {
+					retVal.refitClass = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("timeSpent")) {
 					retVal.timeSpent = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("cost")) {
@@ -1243,6 +1270,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 			if(part instanceof Armor) {
 				oldUnit.campaign.addPart(part);
 				part.setUnit(oldUnit);
+				part.setRefitId(oldUnit.getId());
 				newUnitParts.add(part.getId());
 			} 
 			else if(part instanceof AmmoBin) {
