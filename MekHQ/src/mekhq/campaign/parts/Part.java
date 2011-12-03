@@ -618,6 +618,9 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	public abstract Part clone();
 	
 	public void setRefitId(int rid) {
+		if(this.id == 1427) {
+			int bob = 1;
+		}
 		refitId = rid;
 	}
 	

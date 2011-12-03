@@ -126,6 +126,8 @@ v0.1.10 (SVN)
 + Bug: ammo munitions getting switched in Refit#unscrambleEquipmentNumbers
 + Bug: refit armor amounts reverting to old unit values when refit is loaded from save
 + Bug: refitClass not being saved to XML
++ Bug: canceling at tech selection and model name does not stop refit
++ Bug: don't include techs for selection of refit who are already working on a refit
 
 v0.1.9 (2011-07-17)
 + beginning of personnel switch (hold on to your hats!)

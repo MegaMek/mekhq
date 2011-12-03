@@ -152,7 +152,7 @@ public class MekLabPanel extends JPanel implements RefreshListener {
     public void loadUnit(Unit u) {
     	unit = u;
     	
-    	MechSummary mechSummary = MechSummaryCache.getInstance().getMech(unit.getEntity().getShortName());
+    	MechSummary mechSummary = MechSummaryCache.getInstance().getMech(unit.getEntity().getShortNameRaw());
 		Mech mech = null;
 		try {
 			Entity e = (new MechFileParser(mechSummary.getSourceFile(),mechSummary.getEntryName())).getEntity();

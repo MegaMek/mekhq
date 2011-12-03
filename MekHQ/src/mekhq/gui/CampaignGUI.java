@@ -2430,6 +2430,9 @@ public class CampaignGUI extends JPanel {
 	    	HashMap<String,Person> techHash = new HashMap<String,Person>();
 	    	int i = 0;
 	    	for(Person tech : getCampaign().getTechs()) {
+	    		if(getCampaign().isWorkingOnRefit(tech)) {
+	    			continue;
+	    		}
 	    		techNames[i] = tech.getName() + ", " + tech.getPrimaryRoleDesc() + " (" + getCampaign().getTargetFor(r, tech).getValueAsString() + "+)";
 	    		techHash.put(techNames[i], tech);
 	    		i++;
@@ -2442,6 +2445,9 @@ public class CampaignGUI extends JPanel {
 	                null,
 	                techNames,
 	                techNames[0]);
+	    	if(null == s) {
+	    		return;
+	    	}
 	    	r.setTeamId(techHash.get(s).getId());
     	} else {
     		JOptionPane.showMessageDialog(frame,
@@ -2460,6 +2466,9 @@ public class CampaignGUI extends JPanel {
 	                null,
 	                null,
 	                r.getOriginalEntity().getModel() + " Mk II");
+	    	if(null == s) {
+	    		return;
+	    	}
 	    	r.getNewEntity().setModel(s);
     	}
     	//TODO: allow overtime work?

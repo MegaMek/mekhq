@@ -21,7 +21,6 @@
 
 package mekhq.campaign.parts;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -274,7 +273,6 @@ public class Refit implements IPartWork, IAcquisitionWork {
 				time += nPart.getBaseTime();
 				Part replacement = ((MissingPart)nPart).findReplacement(true);
 				if(null != replacement) {
-					replacement.setRefitId(oldUnit.getId());
 					newUnitParts.add(replacement.getId());
 				} else {
 					cost += ((MissingPart)nPart).getNewPart().getCurrentValue();
@@ -551,6 +549,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 		boolean missingAmmo = false;
 		for(int pid : newUnitParts) {
 			Part part = oldUnit.campaign.getPart(pid);
+			part.setRefitId(oldUnit.getId());
 			if(part instanceof AmmoBin && null == part.getUnit()) {
 				AmmoBin bin = (AmmoBin)part;
 				bin.setUnit(oldUnit);

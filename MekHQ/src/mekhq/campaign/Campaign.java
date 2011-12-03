@@ -659,6 +659,17 @@ public class Campaign implements Serializable {
 		return techs;
 	}
 
+	public boolean isWorkingOnRefit(Person p) {
+		for(Unit u : units) {
+			if(u.isRefitting()) {
+				if(u.getRefit().getAssignedTeamId() == p.getId()) {
+					return true;
+				}					
+			}
+		}
+		return false;
+	}
+	
 	public ArrayList<Person> getDoctors() {
 		ArrayList<Person> docs = new ArrayList<Person>();
 		for (Person p: personnel) {
