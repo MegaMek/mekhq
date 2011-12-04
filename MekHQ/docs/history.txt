@@ -129,6 +129,7 @@ v0.1.10 (SVN)
 + Bug: canceling at tech selection and model name does not stop refit
 + Bug: don't include techs for selection of refit who are already working on a refit
 + Bug: variable cost equipmentparts screwing up equipment cost calculation
++ aero and vehicle parts for parts store
 
 v0.1.9 (2011-07-17)
 + beginning of personnel switch (hold on to your hats!)

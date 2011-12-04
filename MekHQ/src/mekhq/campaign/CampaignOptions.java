@@ -43,7 +43,6 @@ public class CampaignOptions implements Serializable {
 
     private boolean useFactionModifiers;
     private double clanPriceModifier;
-    private boolean useEasierRefit;
     private boolean useFactionForNames;
     private int repairSystem;
     
@@ -77,7 +76,6 @@ public class CampaignOptions implements Serializable {
     public CampaignOptions () {
         useFactionModifiers = false;
         clanPriceModifier = 1.0;
-        useEasierRefit = false;
         useFactionForNames = true;
         repairSystem = REPAIR_SYSTEM_STRATOPS;    
         useTactics = false;
@@ -112,15 +110,7 @@ public class CampaignOptions implements Serializable {
     public void setFactionModifiers(boolean b) {
         this.useFactionModifiers = b;
     }
-    
-    public boolean useEasierRefit() {
-        return useEasierRefit;
-    }
-    
-    public void setEasierRefit(boolean b) {
-        this.useEasierRefit = b;
-    }
-    
+  
     public double getClanPriceModifier() {
         return clanPriceModifier;
     }
@@ -301,7 +291,6 @@ public class CampaignOptions implements Serializable {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "<campaignOptions>");
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useFactionModifiers", useFactionModifiers); //private boolean useFactionModifiers;
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "clanPriceModifier", clanPriceModifier); //private double clanPriceModifier;
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useEasierRefit", useEasierRefit); //private boolean useEasierRefit;
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useFactionForNames", useFactionForNames); //private boolean useFinances;
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "repairSystem", repairSystem); //private int repairSystem;
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useTactics", useTactics);
@@ -353,11 +342,6 @@ public class CampaignOptions implements Serializable {
 					retVal.useFactionModifiers = false;
 			} else if (wn2.getNodeName().equalsIgnoreCase("clanPriceModifier")) {
 				retVal.clanPriceModifier = Double.parseDouble(wn2.getTextContent());
-			} else if (wn2.getNodeName().equalsIgnoreCase("useEasierRefit")) {
-				if (wn2.getTextContent().equalsIgnoreCase("true"))
-					retVal.useEasierRefit = true;
-				else
-					retVal.useEasierRefit = false;
 			} else if (wn2.getNodeName().equalsIgnoreCase("useFactionForNames")) {
 				if (wn2.getTextContent().equalsIgnoreCase("true"))
 					retVal.useFactionForNames = true;

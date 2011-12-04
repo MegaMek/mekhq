@@ -114,7 +114,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         // Rules panel
         useFactionModifiersCheckBox.setSelected(options.useFactionModifiers());
         clanPriceModifierJFormattedTextField.setValue(options.getClanPriceModifier());
-        useEasierRefitCheckBox.setSelected(options.useEasierRefit());
         useFactionForNamesBox.setSelected(options.useFactionForNames());
         useTacticsBox.setSelected(options.useTactics());
         useInitBonusBox.setSelected(options.useInitBonus());
@@ -177,7 +176,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         decimalFormatSymbols.setDecimalSeparator('.');
         numberFormat.setDecimalFormatSymbols(decimalFormatSymbols);
         clanPriceModifierJFormattedTextField = new JFormattedTextField(numberFormat);
-        useEasierRefitCheckBox = new javax.swing.JCheckBox();
         useFactionForNamesBox = new javax.swing.JCheckBox();
         useTacticsBox = new javax.swing.JCheckBox();
         useInitBonusBox = new javax.swing.JCheckBox();
@@ -351,17 +349,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panRepair.add(clanPriceModifierJFormattedTextField, gridBagConstraints);
-
-        useEasierRefitCheckBox.setText(resourceMap.getString("useEasierRefitCheckBox.text")); // NOI18N
-        useEasierRefitCheckBox.setToolTipText(resourceMap.getString("useEasierRefitCheckBox.toolTipText")); // NOI18N
-        useEasierRefitCheckBox.setName("useEasierRefitCheckBox"); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panRepair.add(useEasierRefitCheckBox, gridBagConstraints);
 
         DefaultComboBoxModel repairSystemComboBoxModel = new DefaultComboBoxModel();
         for (int i=0;i<CampaignOptions.REPAIR_SYSTEM_NAMES.length; i++) {
@@ -1163,7 +1150,6 @@ private void txtNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
 	    options.setFactionModifiers(useFactionModifiersCheckBox.isSelected());
 	    String clanPriceModifierString = clanPriceModifierJFormattedTextField.getText();
 	    options.setClanPriceModifier(new Double(clanPriceModifierString));
-	    options.setEasierRefit(useEasierRefitCheckBox.isSelected());
 	    options.setFactionForNames(useFactionForNamesBox.isSelected());
 	    options.setRepairSystem(repairSystemComboBox.getSelectedIndex());   
 	    options.setTactics(useTacticsBox.isSelected());
@@ -1518,7 +1504,6 @@ private void txtNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
     private javax.swing.JComboBox repairSystemComboBox;
     private javax.swing.JTabbedPane tabOptions;
     private javax.swing.JTextField txtName;
-    private javax.swing.JCheckBox useEasierRefitCheckBox;
     private javax.swing.JCheckBox useFactionModifiersCheckBox;
     private javax.swing.JCheckBox useFactionForNamesBox;
     private javax.swing.JCheckBox useTacticsBox;

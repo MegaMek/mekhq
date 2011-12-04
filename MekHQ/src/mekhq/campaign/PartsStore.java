@@ -36,13 +36,17 @@ import megamek.common.Mech;
 import megamek.common.MiscType;
 import megamek.common.WeaponType;
 import mekhq.campaign.parts.AeroHeatSink;
+import mekhq.campaign.parts.AeroSensor;
 import mekhq.campaign.parts.AmmoBin;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
+import mekhq.campaign.parts.Avionics;
 import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.EquipmentPart;
+import mekhq.campaign.parts.FireControlSystem;
 import mekhq.campaign.parts.HeatSink;
 import mekhq.campaign.parts.JumpJet;
+import mekhq.campaign.parts.LandingGear;
 import mekhq.campaign.parts.MekActuator;
 import mekhq.campaign.parts.MekCockpit;
 import mekhq.campaign.parts.MekGyro;
@@ -50,6 +54,10 @@ import mekhq.campaign.parts.MekLifeSupport;
 import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.MekSensor;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.Rotor;
+import mekhq.campaign.parts.Turret;
+import mekhq.campaign.parts.VeeSensor;
+import mekhq.campaign.parts.VeeStabiliser;
 
 
 /**
@@ -186,11 +194,22 @@ public class PartsStore implements Serializable {
 	}
 	
 	private void stockAeroComponents() {
-		//TODO: implement me
+		parts.add(new AeroHeatSink(0, Aero.HEAT_SINGLE));
+		parts.add(new AeroHeatSink(0, Aero.HEAT_DOUBLE));
+		parts.add(new AeroSensor(0, false));
+		parts.add(new AeroSensor(0, true));
+		parts.add(new Avionics(0));
+		parts.add(new FireControlSystem(0));
+		parts.add(new LandingGear(0));
 	}
 	
 	private void stockVeeComponents() {
-		//TODO: implement me
+		parts.add(new VeeSensor(0));
+		parts.add(new VeeStabiliser(0,-1));
+		for(int ton = 5; ton <= 100; ton=ton+5) {
+			parts.add(new Rotor(ton));
+			parts.add(new Turret(ton, -1));
+		}
 	}
 	
 	private void stockArmor() {
