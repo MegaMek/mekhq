@@ -221,7 +221,7 @@ public class ResolveScenarioTracker {
         		}
         	} else if(e.getOwner().isEnemyOf(client.getLocalPlayer())) {
         		Entity killer = client.game.getEntity(e.getKillerId());
-        		if(killer.getOwnerId() == pid) {
+        		if(null != killer && killer.getOwnerId() == pid) {
         			//the killer is one of your units, congrats!
         			killCredits.put(e.getDisplayName(), killer.getExternalId());
         		} else {
