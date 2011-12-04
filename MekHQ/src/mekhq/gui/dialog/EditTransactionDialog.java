@@ -1,22 +1,7 @@
 package mekhq.gui.dialog;
 
-import mekhq.MekHQ;
-import mekhq.campaign.finances.Transaction;
-
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JFormattedTextField;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
-import javax.swing.text.DefaultFormatterFactory;
-import javax.swing.text.NumberFormatter;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
-import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -31,6 +16,21 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
+
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JFormattedTextField;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+import javax.swing.text.DefaultFormatterFactory;
+import javax.swing.text.NumberFormatter;
+
+import mekhq.MekHQ;
+import mekhq.campaign.finances.Transaction;
 
 public class EditTransactionDialog extends JDialog implements ActionListener, FocusListener, MouseListener {
 

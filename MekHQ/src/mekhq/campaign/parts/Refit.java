@@ -23,31 +23,14 @@ package mekhq.campaign.parts;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import mekhq.MekHQ;
-import mekhq.Utilities;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.MekHqXmlUtil;
-import mekhq.campaign.Unit;
-import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.work.IAcquisitionWork;
-import mekhq.campaign.work.IPartWork;
-import mekhq.campaign.work.Modes;
-import mekhq.gui.CampaignGUI;
 import megamek.common.AmmoType;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
@@ -60,8 +43,20 @@ import megamek.common.TargetRoll;
 import megamek.common.WeaponType;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
-import megamek.common.loaders.MtfFile;
 import megameklab.com.util.UnitUtil;
+import mekhq.MekHQ;
+import mekhq.Utilities;
+import mekhq.campaign.MekHqXmlUtil;
+import mekhq.campaign.Unit;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.work.IAcquisitionWork;
+import mekhq.campaign.work.IPartWork;
+import mekhq.campaign.work.Modes;
+import mekhq.gui.CampaignGUI;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * This object tracks the refit of a given unit into a new unit.

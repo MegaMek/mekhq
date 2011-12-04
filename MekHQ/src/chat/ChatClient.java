@@ -4,16 +4,16 @@ package chat;
  * Code taken from http://introcs.cs.princeton.edu/java/84network/
  */
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.net.Socket;
 
-import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import java.net.Socket;
 
 public class ChatClient extends JPanel implements ActionListener {
 

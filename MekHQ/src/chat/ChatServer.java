@@ -4,8 +4,8 @@ package chat;
  * Code taken from http://introcs.cs.princeton.edu/java/84network/
  */
 
-import java.net.Socket;
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.Vector;
 
 public class ChatServer {

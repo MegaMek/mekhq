@@ -7,21 +7,13 @@
 package mekhq.gui.view;
 
 import java.awt.Color;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Enumeration;
 
 import javax.swing.BorderFactory;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Force;
-import mekhq.campaign.Unit;
 import mekhq.campaign.mission.Scenario;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.CampaignGUI.ForceRenderer;
 import mekhq.gui.CampaignGUI.OrgTreeModel;
 
 /**

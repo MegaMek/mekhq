@@ -29,8 +29,6 @@ import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.Vector;
 
-import javax.swing.tree.DefaultMutableTreeNode;
-
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.Person;
 

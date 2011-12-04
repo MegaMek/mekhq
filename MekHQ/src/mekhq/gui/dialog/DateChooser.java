@@ -2,9 +2,6 @@
 
 package mekhq.gui.dialog;
 
-import mekhq.MekHQ;
-import org.omg.CORBA.PRIVATE_MEMBER;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
@@ -37,6 +34,8 @@ import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.text.DateFormatter;
 import javax.swing.text.DefaultFormatterFactory;
+
+import mekhq.MekHQ;
 
 /**
  * Hovanes Gambaryan Henry Demirchian CSUN, CS 585 Professor Mike Barnes

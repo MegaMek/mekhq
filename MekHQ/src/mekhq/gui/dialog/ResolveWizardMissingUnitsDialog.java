@@ -32,7 +32,6 @@ import javax.swing.JCheckBox;
 
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.Unit;
-import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
 import mekhq.campaign.mission.Contract;
 /**
  *
