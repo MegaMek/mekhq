@@ -1796,7 +1796,7 @@ public class CampaignGUI extends JPanel {
 		});
 		menuCommunity.add(miChat);
 
-		menuBar.add(menuCommunity);
+		//menuBar.add(menuCommunity);
 		
 		helpMenu.setText(resourceMap.getString("helpMenu.text")); // NOI18N
 		helpMenu.setName("helpMenu"); // NOI18N
