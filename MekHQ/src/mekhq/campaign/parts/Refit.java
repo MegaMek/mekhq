@@ -733,13 +733,38 @@ public class Refit implements IPartWork, IAcquisitionWork {
 			equipNums.add(oldUnit.getEntity().getEquipmentNum(m));
 		}
 		for(Part part : oldUnit.getParts()) {
-			if(part instanceof EquipmentPart) {
+			if(part instanceof AmmoBin) {
+				AmmoBin bin = (AmmoBin)part;
+				int i = -1;
+				boolean found = false;
+				for(int equipNum : equipNums) {
+					i++;
+					Mounted m = oldUnit.getEntity().getEquipment(equipNum);
+					if(!(m.getType() instanceof AmmoType)) {
+						continue;
+					}
+					if(m.getType().getInternalName().equals(bin.getType().getInternalName())
+							&& ((AmmoType)m.getType()).getMunitionType() == bin.getMunitionType()
+							&& !m.isDestroyed()) {
+						bin.setEquipmentNum(equipNum);
+						found = true;
+						break;
+					}
+				}
+				if(found) {
+					equipNums.remove(i);
+				}
+			}
+			else if(part instanceof EquipmentPart) {
 				EquipmentPart epart = (EquipmentPart)part;
 				int i = -1;
 				boolean found = false;
 				for(int equipNum : equipNums) {
 					i++;
 					Mounted m = oldUnit.getEntity().getEquipment(equipNum);
+					if(m.getType() instanceof AmmoType) {
+						continue;
+					}
 					if(m.getType().getInternalName().equals(epart.getType().getInternalName())
 							&& !m.isDestroyed()) {
 						epart.setEquipmentNum(equipNum);

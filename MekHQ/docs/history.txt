@@ -131,6 +131,7 @@ v0.1.10 (SVN)
 + Bug: variable cost equipmentparts screwing up equipment cost calculation
 + aero and vehicle parts for parts store
 + new MM.jar
++ check for internal name and munition type when restoring type in AmmoBin (MML problem)
 
 v0.1.9 (2011-07-17)
 + beginning of personnel switch (hold on to your hats!)

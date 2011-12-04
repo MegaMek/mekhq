@@ -204,11 +204,15 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
 	public void restoreMunitionType() {
 		for (AmmoType atype : Utilities.getMunitionsFor(unit.getEntity(),(AmmoType)type)) {
-    		if (atype.getMunitionType() == munition) {
+    		if (atype.getMunitionType() == munition && atype.getInternalName().equals(type.getInternalName())) {
     			type = atype;
     			break;
     		}
     	}
+	}
+	
+	public long getMunitionType() {
+		return munition;
 	}
 	
 	@Override
@@ -337,6 +341,9 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 				if(!mounted.isRepairable() || mounted.isDestroyed()) {
 					remove(false);
 					return;
+				}
+				if(type.getInternalName().equals("IS Ammo MML-9 LRM")) {
+					int bob = 1;
 				}
 				if(type.equals(mounted.getType())) {
 					shotsNeeded = getFullShots() - mounted.getShotsLeft();	
