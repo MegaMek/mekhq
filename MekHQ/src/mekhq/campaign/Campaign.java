@@ -1755,6 +1755,11 @@ public class Campaign implements Serializable {
 					((AmmoBin)prt).restoreMunitionType();
 				}
 			}
+			if(prt instanceof MissingPart) {
+				//run this to make sure that slots for missing parts are set as unrepairable
+				//because they will not be in missing locations
+				prt.updateConditionFromPart();
+			}
 		}
 		
 		// All personnel need the rank reference fixed

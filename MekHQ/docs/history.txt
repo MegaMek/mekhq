@@ -133,6 +133,7 @@ v0.1.10 (SVN)
 + new MM.jar
 + check for internal name and munition type when restoring type in AmmoBin (MML problem)
 + Bug: NPE on game resolution when no killer
++ Bug: slots in destroyed locations are set as repairable when loading even if they have been scrapped
 
 v0.1.9 (2011-07-17)
 + beginning of personnel switch (hold on to your hats!)
