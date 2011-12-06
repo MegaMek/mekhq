@@ -4,6 +4,7 @@ v0.1.11 (SVN)
 + options to limit unit purchases by year, canonicity and type (Clan/IS)
 + changed layout of UnitSelectorDialog
 + "All" weight class option in UnitSelectorDialog
++ Bug: mmconf not being included with release
 
 v0.1.10 (2011-12-05)
 + beginnings of a proper splash and loading screen

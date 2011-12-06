@@ -15,6 +15,7 @@
 	<property name="datadir" value="data" />
 	<property name="apidocsdir" value="apidocs" />
 	<property name="docdir" value="docs" />
+	<property name="confdir" value="mmconf" />
 	<property name="svndir" value="svndev" />
 	
 	<!-- Version and packaging properties -->
@@ -106,6 +107,7 @@
 				<include name="${logdir}/" />
 				<include name="${datadir}/" />
 				<include name="${docdir}/" />
+				<include name="${confdir}/" />
 				<include name="campaigns/" />
 				<include name="campaigns/FoxsTeeth.cpnx" />
 				<include name="MegaMek.jar" />
