@@ -164,6 +164,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         doctorId = -1;
         unitId = -1;
         toughness = 0;
+        biography = "";
         resetMinutesLeft();
     }
     

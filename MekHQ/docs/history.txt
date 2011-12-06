@@ -5,6 +5,7 @@ v0.1.11 (SVN)
 + changed layout of UnitSelectorDialog
 + "All" weight class option in UnitSelectorDialog
 + Bug: mmconf not being included with release
++ Bug: campaigns with personnel hired using the multiple hire option are not saveable
 
 v0.1.10 (2011-12-05)
 + beginnings of a proper splash and loading screen
