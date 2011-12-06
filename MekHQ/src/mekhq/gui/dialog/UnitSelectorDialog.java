@@ -6,11 +6,13 @@
 
 package mekhq.gui.dialog;
 
+import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.Image;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
 
 import javax.swing.DefaultComboBoxModel;
@@ -87,8 +89,7 @@ public class UnitSelectorDialog extends JDialog {
         scrTxtUnitView = new javax.swing.JScrollPane();
         txtUnitView = new javax.swing.JTextPane();
         panelFilterBtns = new javax.swing.JPanel();
-        lblType = new javax.swing.JLabel();
-        comboType = new javax.swing.JComboBox();
+        panelLeft = new javax.swing.JPanel();
         lblWeight = new javax.swing.JLabel();
         comboWeight = new javax.swing.JComboBox();
         lblUnitType = new javax.swing.JLabel();
@@ -96,7 +97,6 @@ public class UnitSelectorDialog extends JDialog {
         txtFilter = new javax.swing.JTextField();
         lblFilter = new javax.swing.JLabel();
         lblImage = new javax.swing.JLabel();
-        checkCanon = new javax.swing.JCheckBox();
         panelOKBtns = new javax.swing.JPanel();
         btnBuy = new javax.swing.JButton();
         btnClose = new javax.swing.JButton();
@@ -105,8 +105,113 @@ public class UnitSelectorDialog extends JDialog {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle(resourceMap.getString("Form.title")); // NOI18N
         setName("Form"); // NOI18N
-        getContentPane().setLayout(new java.awt.GridBagLayout());
+        getContentPane().setLayout(new BorderLayout());
 
+        panelFilterBtns.setName("panelFilterBtns"); // NOI18N
+        panelFilterBtns.setLayout(new java.awt.GridBagLayout());
+
+        lblUnitType.setText(resourceMap.getString("lblUnitType.text")); // NOI18N
+        lblUnitType.setName("lblUnitType"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        panelFilterBtns.add(lblUnitType, gridBagConstraints);
+
+        DefaultComboBoxModel unitTypeModel = new DefaultComboBoxModel();
+        for (int i = 0; i < UnitType.SIZE; i++) {
+            unitTypeModel.addElement(UnitType.getTypeDisplayableName(i));
+        }
+        unitTypeModel.setSelectedItem(UnitType.getTypeName(UnitType.MEK));
+        comboUnitType.setModel(unitTypeModel);
+        comboUnitType.setMinimumSize(new java.awt.Dimension(200, 27));
+        comboUnitType.setName("comboUnitType"); // NOI18N
+        comboUnitType.setPreferredSize(new java.awt.Dimension(200, 27));
+        comboUnitType.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                comboUnitTypeActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        panelFilterBtns.add(comboUnitType, gridBagConstraints);
+
+        lblWeight.setText(resourceMap.getString("lblWeight.text")); // NOI18N
+        lblWeight.setName("lblWeight"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        panelFilterBtns.add(lblWeight, gridBagConstraints);
+
+        DefaultComboBoxModel weightModel = new DefaultComboBoxModel();
+        for (int i = 0; i < EntityWeightClass.SIZE; i++) {
+            weightModel.addElement(EntityWeightClass.getClassName(i));
+        }
+        weightModel.addElement("All");
+        weightModel.setSelectedItem(EntityWeightClass.getClassName(EntityWeightClass.WEIGHT_LIGHT));
+        comboWeight.setModel(weightModel);
+        comboWeight.setMinimumSize(new java.awt.Dimension(200, 27));
+        comboWeight.setName("comboWeight"); // NOI18N
+        comboWeight.setPreferredSize(new java.awt.Dimension(200, 27));
+        comboWeight.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                comboWeightActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        panelFilterBtns.add(comboWeight, gridBagConstraints);
+
+        txtFilter.setText(resourceMap.getString("txtFilter.text")); // NOI18N
+        txtFilter.setMinimumSize(new java.awt.Dimension(200, 28));
+        txtFilter.setName("txtFilter"); // NOI18N
+        txtFilter.setPreferredSize(new java.awt.Dimension(200, 28));
+        txtFilter.getDocument().addDocumentListener(
+            new DocumentListener() {
+                public void changedUpdate(DocumentEvent e) {
+                    filterUnits();
+                }
+                public void insertUpdate(DocumentEvent e) {
+                    filterUnits();
+                }
+                public void removeUpdate(DocumentEvent e) {
+                    filterUnits();
+                }
+            });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        panelFilterBtns.add(txtFilter, gridBagConstraints);
+        
+        lblFilter.setText(resourceMap.getString("lblFilter.text")); // NOI18N
+        lblFilter.setName("lblFilter"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        panelFilterBtns.add(lblFilter, gridBagConstraints);
+        
+        lblImage.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblImage.setText(resourceMap.getString("lblImage.text")); // NOI18N
+        lblImage.setName("lblImage"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridheight = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        panelFilterBtns.add(lblImage, gridBagConstraints);
+      
         scrTableUnits.setMinimumSize(new java.awt.Dimension(500, 400));
         scrTableUnits.setName("scrTableUnits"); // NOI18N
         scrTableUnits.setPreferredSize(new java.awt.Dimension(500, 400));
@@ -142,17 +247,7 @@ public class UnitSelectorDialog extends JDialog {
         }
         scrTableUnits.setViewportView(tableUnits);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        getContentPane().add(scrTableUnits, gridBagConstraints);
-
         scrTxtUnitView.setName("scrTxtUnitView"); // NOI18N
-
         txtUnitView.setBorder(null);
         txtUnitView.setContentType(resourceMap.getString("txtUnitView.contentType")); // NOI18N
         txtUnitView.setEditable(false);
@@ -161,213 +256,50 @@ public class UnitSelectorDialog extends JDialog {
         txtUnitView.setName("txtUnitView"); // NOI18N
         txtUnitView.setPreferredSize(new java.awt.Dimension(300, 500));
         scrTxtUnitView.setViewportView(txtUnitView);
+ 
+        panelLeft.setLayout(new BorderLayout());
+        panelLeft.add(panelFilterBtns, BorderLayout.PAGE_START);
+        panelLeft.add(scrTableUnits, BorderLayout.CENTER);
+        
+        splitMain = new javax.swing.JSplitPane(javax.swing.JSplitPane.HORIZONTAL_SPLIT,panelLeft, scrTxtUnitView);
+        splitMain.setOneTouchExpandable(true);
+        splitMain.setResizeWeight(0.0);
+        getContentPane().add(splitMain, BorderLayout.CENTER);
+          
+        panelOKBtns.setName("panelOKBtns"); // NOI18N
+        panelOKBtns.setLayout(new java.awt.GridBagLayout());
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridheight = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weighty = 1.0;
-        getContentPane().add(scrTxtUnitView, gridBagConstraints);
-
-        panelFilterBtns.setMinimumSize(new java.awt.Dimension(300, 120));
-        panelFilterBtns.setName("panelFilterBtns"); // NOI18N
-        panelFilterBtns.setPreferredSize(new java.awt.Dimension(300, 120));
-        panelFilterBtns.setLayout(new java.awt.GridBagLayout());
-
-        lblType.setText(resourceMap.getString("lblType.text")); // NOI18N
-        lblType.setName("lblType"); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panelFilterBtns.add(lblType, gridBagConstraints);
-
-        DefaultComboBoxModel techModel = new DefaultComboBoxModel();
-        for (int i = 0; i < TechConstants.SIZE; i++) {
-            techModel.addElement(TechConstants.getLevelDisplayableName(i));
-        }
-        techModel.setSelectedItem(TechConstants.getLevelDisplayableName(TechConstants.T_INTRO_BOXSET));
-        comboType.setModel(techModel);
-        comboType.setMinimumSize(new java.awt.Dimension(200, 27));
-        comboType.setName("comboType"); // NOI18N
-        comboType.setPreferredSize(new java.awt.Dimension(200, 27));
-        comboType.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                comboTypeActionPerformed(evt);
-            }
+        btnBuy.setText(resourceMap.getString("btnBuy.text")); // NOI18N
+        btnBuy.setName("btnBuy"); // NOI18N
+        btnBuy.addActionListener(new java.awt.event.ActionListener() {
+        	public void actionPerformed(java.awt.event.ActionEvent evt) {
+        		btnBuyActionPerformed(evt);
+        	}
         });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panelFilterBtns.add(comboType, gridBagConstraints);
+        panelOKBtns.add(btnBuy, new java.awt.GridBagConstraints());
 
-        lblWeight.setText(resourceMap.getString("lblWeight.text")); // NOI18N
-        lblWeight.setName("lblWeight"); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panelFilterBtns.add(lblWeight, gridBagConstraints);
-
-        DefaultComboBoxModel weightModel = new DefaultComboBoxModel();
-        for (int i = 0; i < EntityWeightClass.SIZE; i++) {
-            weightModel.addElement(EntityWeightClass.getClassName(i));
-        }
-        weightModel.setSelectedItem(EntityWeightClass.getClassName(EntityWeightClass.WEIGHT_LIGHT));
-        comboWeight.setModel(weightModel);
-        comboWeight.setMinimumSize(new java.awt.Dimension(200, 27));
-        comboWeight.setName("comboWeight"); // NOI18N
-        comboWeight.setPreferredSize(new java.awt.Dimension(200, 27));
-        comboWeight.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                comboWeightActionPerformed(evt);
-            }
+        btnClose.setText(resourceMap.getString("btnClose.text")); // NOI18N
+        btnClose.setName("btnClose"); // NOI18N
+        btnClose.addActionListener(new java.awt.event.ActionListener() {
+        	public void actionPerformed(java.awt.event.ActionEvent evt) {
+        		btnCloseActionPerformed(evt);
+        	}
         });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panelFilterBtns.add(comboWeight, gridBagConstraints);
+        panelOKBtns.add(btnClose, new java.awt.GridBagConstraints());
 
-        lblUnitType.setText(resourceMap.getString("lblUnitType.text")); // NOI18N
-        lblUnitType.setName("lblUnitType"); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panelFilterBtns.add(lblUnitType, gridBagConstraints);
+        getContentPane().add(panelOKBtns, BorderLayout.PAGE_END);
 
-        DefaultComboBoxModel unitTypeModel = new DefaultComboBoxModel();
-        for (int i = 0; i < UnitType.SIZE; i++) {
-            unitTypeModel.addElement(UnitType.getTypeDisplayableName(i));
-        }
-        unitTypeModel.setSelectedItem(UnitType.getTypeName(UnitType.MEK));
-        comboUnitType.setModel(unitTypeModel);
-        comboUnitType.setMinimumSize(new java.awt.Dimension(200, 27));
-        comboUnitType.setName("comboUnitType"); // NOI18N
-        comboUnitType.setPreferredSize(new java.awt.Dimension(200, 27));
-        comboUnitType.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                comboUnitTypeActionPerformed(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panelFilterBtns.add(comboUnitType, gridBagConstraints);
-
-        txtFilter.setText(resourceMap.getString("txtFilter.text")); // NOI18N
-        txtFilter.setMinimumSize(new java.awt.Dimension(200, 28));
-        txtFilter.setName("txtFilter"); // NOI18N
-        txtFilter.setPreferredSize(new java.awt.Dimension(200, 28));
-        txtFilter.getDocument().addDocumentListener(
-            new DocumentListener() {
-                public void changedUpdate(DocumentEvent e) {
-                    filterUnits();
-                }
-                public void insertUpdate(DocumentEvent e) {
-                    filterUnits();
-                }
-                public void removeUpdate(DocumentEvent e) {
-                    filterUnits();
-                }
-            });
-            gridBagConstraints = new java.awt.GridBagConstraints();
-            gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = 3;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-            panelFilterBtns.add(txtFilter, gridBagConstraints);
-
-            lblFilter.setText(resourceMap.getString("lblFilter.text")); // NOI18N
-            lblFilter.setName("lblFilter"); // NOI18N
-            gridBagConstraints = new java.awt.GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = 3;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-            panelFilterBtns.add(lblFilter, gridBagConstraints);
-
-            lblImage.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-            lblImage.setText(resourceMap.getString("lblImage.text")); // NOI18N
-            lblImage.setName("lblImage"); // NOI18N
-            gridBagConstraints = new java.awt.GridBagConstraints();
-            gridBagConstraints.gridx = 3;
-            gridBagConstraints.gridy = 0;
-            gridBagConstraints.gridheight = 4;
-            gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-            gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.weighty = 1.0;
-            panelFilterBtns.add(lblImage, gridBagConstraints);
-
-            checkCanon.setSelected(true);
-            checkCanon.setText(resourceMap.getString("checkCanon.text")); // NOI18N
-            checkCanon.setName("checkCanon"); // NOI18N
-            checkCanon.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    checkCanonActionPerformed(evt);
-                }
-            });
-            gridBagConstraints = new java.awt.GridBagConstraints();
-            gridBagConstraints.gridx = 2;
-            gridBagConstraints.gridy = 0;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-            panelFilterBtns.add(checkCanon, gridBagConstraints);
-
-            gridBagConstraints = new java.awt.GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = 0;
-            gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-            gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 0);
-            getContentPane().add(panelFilterBtns, gridBagConstraints);
-
-            panelOKBtns.setName("panelOKBtns"); // NOI18N
-            panelOKBtns.setLayout(new java.awt.GridBagLayout());
-
-            btnBuy.setText(resourceMap.getString("btnBuy.text")); // NOI18N
-            btnBuy.setName("btnBuy"); // NOI18N
-            btnBuy.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    btnBuyActionPerformed(evt);
-                }
-            });
-            panelOKBtns.add(btnBuy, new java.awt.GridBagConstraints());
-
-            btnClose.setText(resourceMap.getString("btnClose.text")); // NOI18N
-            btnClose.setName("btnClose"); // NOI18N
-            btnClose.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    btnCloseActionPerformed(evt);
-                }
-            });
-            panelOKBtns.add(btnClose, new java.awt.GridBagConstraints());
-
-            gridBagConstraints = new java.awt.GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = 2;
-            gridBagConstraints.gridwidth = 2;
-            gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-            getContentPane().add(panelOKBtns, gridBagConstraints);
-
-            pack();
-        }// </editor-fold>//GEN-END:initComponents
+        pack();
+    }
 
 	private void comboUnitTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboUnitTypeActionPerformed
 	    filterUnits();
-	}//GEN-LAST:event_comboUnitTypeActionPerformed
+	}
 	
 	private void comboWeightActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboWeightActionPerformed
 	    filterUnits();
-	}//GEN-LAST:event_comboWeightActionPerformed
-	
-	private void comboTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboTypeActionPerformed
-	    filterUnits();
-	}//GEN-LAST:event_comboTypeActionPerformed
-	
+	}
+
 	private void btnBuyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuyActionPerformed
 	    Entity en = getSelectedEntity();
 	    if(null != en) {
@@ -390,15 +322,11 @@ public class UnitSelectorDialog extends JDialog {
 	    setVisible(false);
 	}//GEN-LAST:event_btnCloseActionPerformed
 	
-	private void checkCanonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkCanonActionPerformed
-	    filterUnits();
-	}//GEN-LAST:event_checkCanonActionPerformed
-
     private void filterUnits() {
         RowFilter<MechTableModel, Integer> unitTypeFilter = null;
-        final int nType = comboType.getSelectedIndex();
         final int nClass = comboWeight.getSelectedIndex();
         final int nUnit = comboUnitType.getSelectedIndex();
+        final int year = campaign.getCalendar().get(GregorianCalendar.YEAR);
         //If current expression doesn't parse, don't update.
         try {
             unitTypeFilter = new RowFilter<MechTableModel,Integer>() {
@@ -406,51 +334,22 @@ public class UnitSelectorDialog extends JDialog {
                 public boolean include(Entry<? extends MechTableModel, ? extends Integer> entry) {
                     MechTableModel mechModel = entry.getModel();
                     MechSummary mech = mechModel.getMechSummary(entry.getIdentifier());
-                if (/* Weight */
-                    (mech.getWeightClass() == nClass) &&
-                            (mech.isCanon() || !checkCanon.isSelected()) &&
-                /*
-                 * Technology Level
-                 */
-                ((nType == TechConstants.T_ALL)
-                            || (nType == mech.getType())
-                            || ((nType == TechConstants.T_IS_TW_ALL)
-                                && ((mech.getType() <= TechConstants.T_IS_TW_NON_BOX) || (mech.getType() == TechConstants.T_INTRO_BOXSET)))
-                            || ((nType == TechConstants.T_TW_ALL) && ((mech.getType() <= TechConstants.T_IS_TW_NON_BOX)
-                                || (mech.getType() <= TechConstants.T_INTRO_BOXSET) || (mech.getType() <= TechConstants.T_CLAN_TW))))
-                                && ((nUnit == UnitType.SIZE) || mech.getUnitType().equals(UnitType.getTypeName(nUnit)))) {
-                    //yuck, I have to pull up a full Entity to get MechView to search in
-                    //TODO: why not put mechview into the mech summary itself?
-                    if(txtFilter.getText().length() > 0) {
-                        //TODO: this search routine is too slow
-                        //I think putting a copy of the mechreadout in
-                        //the mechsummary would speed things up enormously
-                        //NOTE: now getting weirdness on txtFilter when I do this
-
+                if (
+                /*year limits*/
+                (!campaign.getCampaignOptions().limitByYear() || mech.getYear() <= year) &&
+                /*Clan/IS limits*/
+                (campaign.getCampaignOptions().allowClanPurchases() || !TechConstants.isClan(mech.getType())) &&
+                (campaign.getCampaignOptions().allowISPurchases() || TechConstants.isClan(mech.getType())) &&
+                /* Canon */
+                (mech.isCanon() || !campaign.getCampaignOptions().allowCanonOnly()) &&
+                /* Weight */
+                (mech.getWeightClass() == nClass || nClass == EntityWeightClass.SIZE) &&             
+                /* Technology Level */
+                campaign.getCampaignOptions().getTechLevel() >= (Integer.parseInt(TechConstants.T_SIMPLE_LEVEL[mech.getType()])-2) &&        
+                /*Unit type*/
+                 ((nUnit == UnitType.SIZE) || mech.getUnitType().equals(UnitType.getTypeName(nUnit)))) {
+                	if(txtFilter.getText().length() > 0) {
                         String text = txtFilter.getText();
-                        //String [] ind_words = text.split(" "); //split with regex as space
-                        /*
-                        MechView mv = null;
-                        try {
-                                Entity entity = new MechFileParser(mech.getSourceFile(), mech.getEntryName()).getEntity();
-                                mv = new MechView(entity, true);
-                        } catch (EntityLoadingException ex) {
-                            // do nothing, I guess
-                        }
-                        if(null == mv) {
-                            return false;
-                        }
-                         * */
-                        /**
-                        boolean match = true;
-                        for(int i = 0; i < ind_words.length; i++) {
-                            if(!mv.getMechReadout().contains(ind_words[i])) {
-                                match = false;
-                                break;
-                            }
-                        }
-                        return match;
-                        */
                         return mech.getName().toLowerCase().contains(text.toLowerCase());
                     }
                     return true;
@@ -582,10 +481,6 @@ public class UnitSelectorDialog extends JDialog {
         });
     }
 
-    public JComboBox getComboType() {
-        return comboType;
-    }
-
     public JComboBox getComboUnitType() {
         return comboUnitType;
     }
@@ -692,22 +587,21 @@ public class UnitSelectorDialog extends JDialog {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBuy;
     private javax.swing.JButton btnClose;
-    private javax.swing.JCheckBox checkCanon;
-    private javax.swing.JComboBox comboType;
     private javax.swing.JComboBox comboUnitType;
     private javax.swing.JComboBox comboWeight;
     private javax.swing.JLabel lblFilter;
     private javax.swing.JLabel lblImage;
-    private javax.swing.JLabel lblType;
     private javax.swing.JLabel lblUnitType;
     private javax.swing.JLabel lblWeight;
     private javax.swing.JPanel panelFilterBtns;
     private javax.swing.JPanel panelOKBtns;
+    private javax.swing.JPanel panelLeft;
     private javax.swing.JScrollPane scrTableUnits;
     private javax.swing.JScrollPane scrTxtUnitView;
     private javax.swing.JTable tableUnits;
     private javax.swing.JTextField txtFilter;
     private javax.swing.JTextPane txtUnitView;
+    private javax.swing.JSplitPane splitMain;
     // End of variables declaration//GEN-END:variables
 
 }

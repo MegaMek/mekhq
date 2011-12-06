@@ -35,6 +35,11 @@ import org.w3c.dom.NodeList;
  */
 public class CampaignOptions implements Serializable {
 	private static final long serialVersionUID = 5698008431749303602L;
+	
+	public final static int TECH_STANDARD     = 0;
+	public final static int TECH_ADVANCED     = 1;
+	public final static int TECH_EXPERIMENTAL = 2;
+	
 	public final static int REPAIR_SYSTEM_STRATOPS = 0;
     public final static int REPAIR_SYSTEM_WARCHEST_CUSTOM = 1;
     public final static int REPAIR_SYSTEM_GENERIC_PARTS = 2;
@@ -57,6 +62,13 @@ public class CampaignOptions implements Serializable {
     
     //unit related
     private boolean useQuirks;
+    
+    //tech and unit limits
+    private boolean limitByYear;
+    private boolean allowClanPurchases;
+    private boolean allowISPurchases;
+    private boolean allowCanonOnly;
+    private int techLevel;
     
     //finance related
     private boolean payForParts;
@@ -94,6 +106,11 @@ public class CampaignOptions implements Serializable {
         payForTransport = false;
         sellUnits = false;
         sellParts = false;
+        limitByYear = true;
+        allowClanPurchases = true;
+        allowISPurchases = true;
+        allowCanonOnly = true;
+        techLevel = TECH_EXPERIMENTAL;
         scenarioXP = 1;
         killsForXP = 0;
         killXPAward = 0;
@@ -101,6 +118,19 @@ public class CampaignOptions implements Serializable {
 
     public static String getRepairSystemName (int repairSystem) {
         return REPAIR_SYSTEM_NAMES[repairSystem];
+    }
+    
+    public static String getTechLevelName(int lvl) {
+    	switch(lvl) {
+    	case TECH_STANDARD:
+    		return "Standard";
+    	case TECH_ADVANCED:
+    		return "Advanced";
+    	case TECH_EXPERIMENTAL:
+    		return "Experimental";
+    	default:
+    		return "Unknown";	
+    	}
     }
     
     public boolean useFactionModifiers() {
@@ -286,7 +316,47 @@ public class CampaignOptions implements Serializable {
     public void setKillXPAward(int xp) {
     	killXPAward = xp;
     }
-
+    
+    public boolean limitByYear() {
+    	return limitByYear;
+    }
+    
+    public void setLimitByYear(boolean b) {
+    	limitByYear = b;
+    }
+    
+    public boolean allowClanPurchases() {
+    	return allowClanPurchases;
+    }
+    
+    public void setAllowClanPurchases(boolean b) {
+    	allowClanPurchases = b;
+    }
+    
+    public boolean allowISPurchases() {
+    	return allowISPurchases;
+    }
+    
+    public void setAllowISPurchases(boolean b) {
+    	allowISPurchases = b;
+    }
+    
+    public boolean allowCanonOnly() {
+    	return allowCanonOnly;
+    }
+    
+    public void setAllowCanonOnly(boolean b) {
+    	allowCanonOnly = b;
+    }
+    
+    public int getTechLevel() {
+    	return techLevel;
+    }
+    
+    public void setTechLevel(int lvl) {
+    	techLevel = lvl;
+    }
+   
 	public void writeToXml(PrintWriter pw1, int indent) {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "<campaignOptions>");
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useFactionModifiers", useFactionModifiers); //private boolean useFactionModifiers;
@@ -312,6 +382,11 @@ public class CampaignOptions implements Serializable {
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "scenarioXP", scenarioXP);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "killsForXP", killsForXP);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "killXPAward", killXPAward);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "limitByYear", limitByYear);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "allowClanPurchases", allowClanPurchases);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "allowISPurchases", allowISPurchases);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "allowCanonOnly", allowCanonOnly);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "techLevel", techLevel);
 
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "</campaignOptions>");
 	}
@@ -435,6 +510,28 @@ public class CampaignOptions implements Serializable {
 				retVal.killsForXP = Integer.parseInt(wn2.getTextContent().trim());
 			} else if (wn2.getNodeName().equalsIgnoreCase("killXPAward")) {
 				retVal.killXPAward = Integer.parseInt(wn2.getTextContent().trim());
+			} else if (wn2.getNodeName().equalsIgnoreCase("limitByYear")) {
+				if (wn2.getTextContent().equalsIgnoreCase("true"))
+					retVal.limitByYear = true;
+				else
+					retVal.limitByYear = false;
+			} else if (wn2.getNodeName().equalsIgnoreCase("allowClanPurchases")) {
+				if (wn2.getTextContent().equalsIgnoreCase("true"))
+					retVal.allowClanPurchases = true;
+				else
+					retVal.allowClanPurchases = false;
+			} else if (wn2.getNodeName().equalsIgnoreCase("allowISPurchases")) {
+				if (wn2.getTextContent().equalsIgnoreCase("true"))
+					retVal.allowISPurchases = true;
+				else
+					retVal.allowISPurchases = false;
+			} else if (wn2.getNodeName().equalsIgnoreCase("allowCanonOnly")) {
+				if (wn2.getTextContent().equalsIgnoreCase("true"))
+					retVal.allowCanonOnly = true;
+				else
+					retVal.allowCanonOnly = false;
+			} else if (wn2.getNodeName().equalsIgnoreCase("techLevel")) {
+				retVal.techLevel = Integer.parseInt(wn2.getTextContent().trim());
 			} 
 		}
 

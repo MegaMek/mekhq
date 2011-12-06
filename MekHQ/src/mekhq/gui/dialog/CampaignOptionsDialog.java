@@ -130,6 +130,11 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         payForTransportBox.setSelected(options.payForTransport());
         sellUnitsBox.setSelected(options.canSellUnits());
         sellPartsBox.setSelected(options.canSellParts());
+        
+        limitByYearBox.setSelected(options.limitByYear());
+        allowClanPurchasesBox.setSelected(options.allowClanPurchases());
+        allowISPurchasesBox.setSelected(options.allowISPurchases());
+        allowCanonOnlyBox.setSelected(options.allowCanonOnly());
 
         useQuirksBox.setSelected(options.useQuirks());
 
@@ -167,6 +172,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panXP = new javax.swing.JPanel();
         panSkill = new javax.swing.JPanel();
         panAbilityXP = new javax.swing.JPanel();
+        panTech = new javax.swing.JPanel();
         useFactionModifiersCheckBox = new javax.swing.JCheckBox();
         javax.swing.JLabel clanPriceModifierLabel = new javax.swing.JLabel();
         DecimalFormat numberFormat = (DecimalFormat) DecimalFormat.getInstance();
@@ -193,6 +199,11 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         sellUnitsBox = new javax.swing.JCheckBox();
         sellPartsBox = new javax.swing.JCheckBox();
         useQuirksBox = new javax.swing.JCheckBox();
+        limitByYearBox = new javax.swing.JCheckBox();
+        allowClanPurchasesBox = new javax.swing.JCheckBox();
+        allowISPurchasesBox = new javax.swing.JCheckBox();
+        allowCanonOnlyBox = new javax.swing.JCheckBox();
+        choiceTechLevel = new javax.swing.JComboBox();
         repairSystemComboBox = new javax.swing.JComboBox();
         javax.swing.JLabel repairSystemComboBoxLabel = new javax.swing.JLabel();
         btnOkay = new javax.swing.JButton();
@@ -386,10 +397,82 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panRepair.add(useQuirksBox, gridBagConstraints);
-
-        
+    
         tabOptions.addTab(resourceMap.getString("panRepair.TabConstraints.tabTitle"), panRepair); // NOI18N
 
+        panTech.setName("panTech"); // NOI18N
+        panTech.setLayout(new java.awt.GridBagLayout());
+
+        limitByYearBox.setText(resourceMap.getString("limitByYearBox.text")); // NOI18N
+        limitByYearBox.setToolTipText(resourceMap.getString("limitByYearBox.toolTipText")); // NOI18N
+        limitByYearBox.setName("limitByYearBox"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panTech.add(limitByYearBox, gridBagConstraints);
+        
+        allowClanPurchasesBox.setText(resourceMap.getString("allowClanPurchasesBox.text")); // NOI18N
+        allowClanPurchasesBox.setToolTipText(resourceMap.getString("allowClanPurchasesBox.toolTipText")); // NOI18N
+        allowClanPurchasesBox.setName("allowClanPurchasesBox"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panTech.add(allowClanPurchasesBox, gridBagConstraints);
+        
+        allowISPurchasesBox.setText(resourceMap.getString("allowISPurchasesBox.text")); // NOI18N
+        allowISPurchasesBox.setToolTipText(resourceMap.getString("allowISPurchasesBox.toolTipText")); // NOI18N
+        allowISPurchasesBox.setName("allowISPurchasesBox"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panTech.add(allowISPurchasesBox, gridBagConstraints);
+        
+        allowCanonOnlyBox.setText(resourceMap.getString("allowCanonOnlyBox.text")); // NOI18N
+        allowCanonOnlyBox.setToolTipText(resourceMap.getString("allowCanonOnlyBox.toolTipText")); // NOI18N
+        allowCanonOnlyBox.setName("allowCanonOnlyBox"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panTech.add(allowCanonOnlyBox, gridBagConstraints);
+        
+        DefaultComboBoxModel techLevelComboBoxModel = new DefaultComboBoxModel();
+        for (int i=0;i<3; i++) {
+            techLevelComboBoxModel.addElement(CampaignOptions.getTechLevelName(i));
+        }
+        choiceTechLevel.setModel(techLevelComboBoxModel);
+        //choiceTechLevel.setToolTipText(resourceMap.getString("choiceTechLevel.toolTipText")); // NOI18N
+        choiceTechLevel.setName("choiceTechLevel"); // NOI18N
+        choiceTechLevel.setSelectedIndex(options.getTechLevel());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panTech.add(choiceTechLevel, gridBagConstraints);
+
+        lblTechLevel = new JLabel(resourceMap.getString("lblTechLevel.text")); // NOI18N
+        lblTechLevel.setName("lblTechLevel"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        panTech.add(lblTechLevel, gridBagConstraints);
+
+        tabOptions.addTab(resourceMap.getString("panTech.TabConstraints.tabTitle"), panTech); // NOI18N
+        
         panPersonnel.setName("panPersonnel"); // NOI18N
         panPersonnel.setLayout(new java.awt.GridBagLayout());
         
@@ -1055,9 +1138,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-private void txtNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNameActionPerformed
-// TODO add your handling code here:
-}//GEN-LAST:event_txtNameActionPerformed
+    private void txtNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNameActionPerformed
+    	// TODO add your handling code here:
+    }//GEN-LAST:event_txtNameActionPerformed
 
 	private void factionSelected() {
 		if(useFactionForNamesBox.isSelected()) {
@@ -1209,8 +1292,12 @@ private void txtNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
 	    options.setKillsForXP((Integer)spnKills.getModel().getValue());
 	    options.setKillXPAward((Integer)spnKillXP.getModel().getValue());
 
+	    options.setLimitByYear(limitByYearBox.isSelected());
+	    options.setAllowClanPurchases(allowClanPurchasesBox.isSelected());
+	    options.setAllowISPurchases(allowISPurchasesBox.isSelected());
+	    options.setAllowCanonOnly(allowCanonOnlyBox.isSelected());
+	    options.setTechLevel(choiceTechLevel.getSelectedIndex());
 	    
-	    //campaign.refreshAllUnitDiagnostics();
 	}
 	
 	private void updateXPCosts() {
@@ -1495,6 +1582,7 @@ private void txtNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
     private javax.swing.JLabel lblName;
     private javax.swing.JPanel panGeneral;
     private javax.swing.JPanel panRepair;
+    private javax.swing.JPanel panTech;
     private javax.swing.JPanel panPersonnel;
     private javax.swing.JPanel panFinances;
     private javax.swing.JPanel panNameGen;
@@ -1544,6 +1632,13 @@ private void txtNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST
     private JSpinner spnKillXP;
     private JLabel lblKills;
     private JSpinner spnKills;
+    
+    private javax.swing.JCheckBox limitByYearBox;
+    private javax.swing.JCheckBox allowClanPurchasesBox;
+    private javax.swing.JCheckBox allowISPurchasesBox;
+    private javax.swing.JCheckBox allowCanonOnlyBox;
+    private javax.swing.JLabel lblTechLevel;
+    private javax.swing.JComboBox choiceTechLevel;
     
     // End of variables declaration//GEN-END:variables
 
