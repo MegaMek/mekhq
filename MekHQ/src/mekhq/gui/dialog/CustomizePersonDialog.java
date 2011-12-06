@@ -460,24 +460,25 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         setOptions();       
         if(isNewHire()) {
             int num = Integer.parseInt(numberToHireField.getText());
-            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-            for (int i = 0; i < num; i++) {
-                doNewHire();
-            }
-            setCursor(Cursor.getDefaultCursor());
+            doNewHires(num);
         } else {
             refreshHqView();
         	setVisible(false);
         }
     }//GEN-LAST:event_btnOkActionPerformed
 
-    private void doNewHire() {
+    private void doNewHires(int num) {
         campaign.addPerson(person);
-        refreshHqView();
-        person = campaign.newPerson(choiceType.getSelectedIndex());
-        //set the skills based on current so we stay at those levels
-        setSkills();
+        num--;
+        while(num > 0) {
+        	person = campaign.newPerson(choiceType.getSelectedIndex());
+        	//set the skills based on current so we stay at those levels
+        	setSkills();
+        	campaign.addPerson(person);
+        	num--;
+        }
         refreshPilotAndOptions();
+        refreshHqView();
     }
 
     private void refreshHqView() {
