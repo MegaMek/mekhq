@@ -10,6 +10,7 @@ v0.1.11 (SVN)
 + Bug: memory problems in PortraitChoiceDialog with lots of images
 + Bug: person hired twice
 + updated force icons (thanks Urban Kufahl!)
++ no NPE when portrait or force image is missing - replace with default
 
 v0.1.10 (2011-12-05)
 + beginnings of a proper splash and loading screen

@@ -99,6 +99,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
 		gridBagConstraints.gridy = 0;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+		gridBagConstraints.insets = new java.awt.Insets(10,10,0,0);
 		add(lblIcon, gridBagConstraints);
 		
 		pnlStats.setName("pnlStats");
@@ -116,7 +117,6 @@ public class ForceViewPanel extends javax.swing.JPanel {
 		add(pnlStats, gridBagConstraints);
 		
 		pnlSubUnits.setName("pnlSubUnits");
-		//pnlSubUnits.setBorder(BorderFactory.createTitledBorder("Contents"));
 		pnlSubUnits.setBackground(Color.WHITE);
 		fillSubUnits();
 		gridBagConstraints = new java.awt.GridBagConstraints();
@@ -165,9 +165,8 @@ public class ForceViewPanel extends javax.swing.JPanel {
         Image portrait = null;
         try {
             portrait = (Image) forceIcons.getItem(category, file);
-            //make sure no images are longer than 150 pixels
-            if(null != portrait && portrait.getWidth(lbl) > 150) {
-                portrait = portrait.getScaledInstance(150, -1, Image.SCALE_DEFAULT);               
+            if(null == portrait) {
+            	portrait = (Image) forceIcons.getItem("", "empty.png");
             }
             lbl.setIcon(new ImageIcon(portrait));
         } catch (Exception err) {

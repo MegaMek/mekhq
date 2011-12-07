@@ -8,6 +8,7 @@ package mekhq.gui.view;
 
 import java.awt.Color;
 import java.awt.Image;
+import java.awt.Insets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
@@ -76,7 +77,6 @@ public class PersonViewPanel extends javax.swing.JPanel {
 		java.awt.GridBagConstraints gridBagConstraints;
 
 		lblPortrait = new javax.swing.JLabel();
-		lblUnit = new javax.swing.JLabel();
 		pnlStats = new javax.swing.JPanel();
 		txtDesc = new javax.swing.JTextArea();
 		txtKills = new javax.swing.JTextArea();
@@ -93,16 +93,9 @@ public class PersonViewPanel extends javax.swing.JPanel {
 		gridBagConstraints.gridy = 0;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+		gridBagConstraints.insets = new Insets(10,10,0,0);
 		add(lblPortrait, gridBagConstraints);
 	
-		lblUnit.setName("lblUnit"); // NOI18N
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 1;
-		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		add(lblUnit, gridBagConstraints);
-		
 		pnlStats.setName("pnlStats");
 		pnlStats.setBorder(BorderFactory.createTitledBorder(person.getFullTitle()));
 		pnlStats.setBackground(Color.WHITE);
@@ -110,7 +103,6 @@ public class PersonViewPanel extends javax.swing.JPanel {
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 1;
 		gridBagConstraints.gridy = 0;
-		gridBagConstraints.gridheight = 2;
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
@@ -127,7 +119,7 @@ public class PersonViewPanel extends javax.swing.JPanel {
                 BorderFactory.createEmptyBorder(5,5,5,5)));
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 2;
+		gridBagConstraints.gridy = 1;
 		gridBagConstraints.gridwidth = 2;
 		gridBagConstraints.weighty = 1.0;
 		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
@@ -152,7 +144,7 @@ public class PersonViewPanel extends javax.swing.JPanel {
 	                BorderFactory.createEmptyBorder(5,5,5,5)));
 			gridBagConstraints = new java.awt.GridBagConstraints();
 			gridBagConstraints.gridx = 0;
-			gridBagConstraints.gridy = 3;
+			gridBagConstraints.gridy = 2;
 			gridBagConstraints.gridwidth = 2;
 			gridBagConstraints.weighty = 1.0;
 			gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
@@ -188,7 +180,12 @@ public class PersonViewPanel extends javax.swing.JPanel {
         try {
             portrait = (Image) portraits.getItem(category, file);
             if(null != portrait) {
-                portrait = portrait.getScaledInstance(150, -1, Image.SCALE_DEFAULT);               
+                portrait = portrait.getScaledInstance(100, -1, Image.SCALE_DEFAULT);               
+            } else {
+            	portrait = (Image) portraits.getItem("", "default.gif");
+            	if(null != portrait) {
+                    portrait = portrait.getScaledInstance(100, -1, Image.SCALE_DEFAULT);               
+            	}
             }
             lblPortrait.setIcon(new ImageIcon(portrait));
         } catch (Exception err) {

@@ -4860,9 +4860,8 @@ public class CampaignGUI extends JPanel {
             Image portrait = null;
             try {
            	 portrait = (Image) getForceIcons().getItem(category, file);
-           	 //make sure no images are longer than 50 pixels
-           	 if(null != portrait && portrait.getHeight(this) > 50) {
-           		 portrait = portrait.getScaledInstance(-1, 50, Image.SCALE_DEFAULT);               
+           	 if(null == portrait) {
+           		portrait = (Image) getForceIcons().getItem("", "empty.png");
            	 }
            	 return new ImageIcon(portrait);
             } catch (Exception err) {
