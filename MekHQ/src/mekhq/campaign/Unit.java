@@ -1701,10 +1701,10 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     		}
     	}
     	if(nDrivers > 0) {
-    		piloting = (int)Math.round(sumPiloting/nDrivers);
+    		piloting = (int)Math.round(((double)sumPiloting)/nDrivers);
     	}
     	if(nGunners > 0) {
-    		gunnery = (int)Math.round(sumGunnery/nGunners);
+    		gunnery = (int)Math.round(((double)sumGunnery)/nGunners);
     	}
     	if(entity instanceof Infantry) {
     		if(entity instanceof BattleArmor) {

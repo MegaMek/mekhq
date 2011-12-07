@@ -17,6 +17,7 @@ v0.1.11 (SVN)
 + adjust parts value by clan modifier
 + limit parts in parts store by IS/Clan depending on options
 + Bug: armor being charged even if parts not paid for
++ Bug: gunnery and piloting not rounding correctly for multiple personnel units
 
 v0.1.10 (2011-12-05)
 + beginnings of a proper splash and loading screen
