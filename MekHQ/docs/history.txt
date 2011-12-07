@@ -7,6 +7,7 @@ v0.1.11 (SVN)
 + Bug: mmconf not being included with release
 + Bug: campaigns with personnel hired using the multiple hire option are not saveable
 + no refreshing hire dialog on multiple hires
++ Bug: memory problems in PortraitChoiceDialog with lots of images
 
 v0.1.10 (2011-12-05)
 + beginnings of a proper splash and loading screen

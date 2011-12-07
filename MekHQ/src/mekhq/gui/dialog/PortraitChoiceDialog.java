@@ -11,6 +11,7 @@ import java.awt.Component;
 import java.awt.Image;
 import java.awt.event.ItemEvent;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.ResourceBundle;
@@ -22,8 +23,10 @@ import javax.swing.event.MouseInputAdapter;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
 
+import megamek.client.ui.swing.util.ImageFileFactory;
 import megamek.common.Pilot;
 import megamek.common.util.DirectoryItems;
+import mekhq.gui.PortraitFileFactory;
 
 /**
  *
@@ -377,10 +380,6 @@ public class PortraitChoiceDialog extends javax.swing.JDialog {
             lblImage.setText(text);
         }
         
-        //public void setImage(Image image) {
-          //  lblImage.setIcon(new ImageIcon(image));
-        //}
-        
         public void setImage(String category, String name) {
 
             if (null == category
@@ -390,13 +389,12 @@ public class PortraitChoiceDialog extends javax.swing.JDialog {
 
             // Try to get the portrait file.
             try {
-
                 // Translate the root portrait directory name.
                 if (Pilot.ROOT_PORTRAIT.equals(category))
                     category = ""; //$NON-NLS-1$
                 Image portrait = (Image) portraits.getItem(category, name);
-                if(null != portrait && portrait.getHeight(this) > 76) {
-                	portrait = portrait.getScaledInstance(-1, 76, Image.SCALE_DEFAULT);               
+                if(null != portrait) {
+                    portrait = portrait.getScaledInstance(-1, 76, Image.SCALE_DEFAULT);               
                 }
                 lblImage.setIcon(new ImageIcon(portrait));
             } catch (Exception err) {

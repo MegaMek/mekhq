@@ -90,6 +90,7 @@ public class PortraitFileFactory implements ItemFileFactory {
                     image = Toolkit.getDefaultToolkit().getImage(name);
                 }
                 // Return a copy of the image.
+                //return image.getScaledInstance(150, -1, Image.SCALE_DEFAULT);
                 return image;
             } // End getItem()
         };
@@ -166,7 +167,7 @@ public class PortraitFileFactory implements ItemFileFactory {
                 } // End get-image
 
                 // Return a copy of the image.
-                return image;
+                return image.getScaledInstance(150, 150, Image.SCALE_FAST);
 
             } // End getItem()
         };
