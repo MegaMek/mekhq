@@ -27,6 +27,7 @@ import java.io.Serializable;
 import megamek.common.EquipmentType;
 import megamek.common.TargetRoll;
 import mekhq.Utilities;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlSerializable;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.personnel.SkillType;
@@ -62,7 +63,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 	}
 	
 	@Override
-	public long getCurrentValue() {
+	public long getStickerPrice() {
 		//missing parts aren't worth a thing
 		return 0;
 	}
@@ -249,14 +250,15 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		
 		toReturn += ">";
 		toReturn += "<b>" + getName() + "</b> " + bonus + "<br/>";
-		toReturn += Utilities.getCurrencyString(getPurchasePrice()) + "<br/>";
+		toReturn += Utilities.getCurrencyString(getNewPart().getActualValue(unit.campaign)) + "<br/>";
 		toReturn += "</font></html>";
 		return toReturn;
 	}
 	
 	@Override
 	public String find() {
-		unit.campaign.buyPart(getNewPart(),getPurchasePrice());
+		Part newPart = getNewPart();
+		unit.campaign.buyPart(newPart,newPart.getActualValue(unit.campaign));
 		setCheckedToday(true);
 		return "<font color='green'> part found.</font>";
 	}

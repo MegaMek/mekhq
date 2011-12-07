@@ -57,11 +57,6 @@ public class MissingLandingGear extends MissingPart {
 	}
 
 	@Override
-	public long getPurchasePrice() {
-		return 0;
-	}
-
-	@Override
 	public boolean isAcceptableReplacement(Part part, boolean refit) {
 		return part instanceof LandingGear;
 	}

@@ -118,7 +118,7 @@ public class Avionics extends Part {
 	}
 
 	@Override
-	public long getCurrentValue() {
+	public long getStickerPrice() {
 		//TODO: table in TechManual makes no sense - where are control systems for ASFs?
 		return 0;
 	}

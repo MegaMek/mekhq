@@ -63,24 +63,6 @@ public class MissingMekCockpit extends MissingPart {
             return 3;
 		}
 	}
-	
-	@Override
-	public long getPurchasePrice() {
-		switch (type) {
-        case Mech.COCKPIT_COMMAND_CONSOLE:
-            return 500000;
-        case Mech.COCKPIT_SMALL:
-            return 175000;
-        case Mech.COCKPIT_TORSO_MOUNTED:
-            return 750000;
-        case Mech.COCKPIT_STANDARD:
-            return 200000;
-        case Mech.COCKPIT_INDUSTRIAL:
-            return 100000;
-        default:
-            return 200000;
-		}
-	}
 
     @Override
     public int getPartType() {

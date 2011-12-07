@@ -145,7 +145,7 @@ public class AeroHeatSink extends Part {
 	}
 
 	@Override
-	public long getCurrentValue() {
+	public long getStickerPrice() {
 		if(type == Aero.HEAT_DOUBLE) {
 			return 6000;
 		} else {

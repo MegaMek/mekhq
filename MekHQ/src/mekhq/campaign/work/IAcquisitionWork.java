@@ -40,8 +40,6 @@ public interface IAcquisitionWork extends IWork {
 	
 	public Unit getUnit();
 	
-	public long getPurchasePrice();
-
 	public boolean hasCheckedToday();
 	public void setCheckedToday(boolean b);
 	

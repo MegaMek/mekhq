@@ -28,6 +28,7 @@ import megamek.common.EquipmentType;
 import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
 import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlSerializable;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
@@ -161,13 +162,38 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	}
 
 	/**
-	 * Determine the current value of the part - This 
-	 * can be tricky in the case of some parts that need
-	 * entity information to determine price
+	 * Sticker price is the value of the part according to the rulebooks
 	 * @return
 	 */
-	public abstract long getCurrentValue();
-
+	public abstract long getStickerPrice();
+	
+	/**
+	 * This is the actual value of the part as affected by any characteristics
+	 * of the part itself (such as damage)
+	 * @return
+	 */
+	public long getCurrentValue() {
+		return getStickerPrice();
+	}
+	
+	/**
+	 * This is the value of the part that may be affected by campaign options
+	 * @param c
+	 * @return
+	 */
+	public long getActualValue(Campaign c) {
+		return adjustCostsForCampaignOptions(getCurrentValue(), c);
+	}
+	
+	protected long adjustCostsForCampaignOptions(long cost, Campaign c) {
+		if(null != c) {
+			if(isClanTechBase()) {
+				cost *= c.getCampaignOptions().getClanPriceModifier();
+			}
+		}
+		return cost;
+	}
+	
 	public int getUnitTonnage() {
 		return unitTonnage;
 	}

@@ -261,7 +261,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 		}
 		while(quantity > 0) {
 			if(purchase) {
-				campaign.buyPart(selectedPart.clone(), selectedPart.getCurrentValue());
+				campaign.buyPart(selectedPart.clone());
 			} else {
 				campaign.addPart(selectedPart.clone());
 			}
@@ -364,7 +364,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 				return part.getDetails();
 			}
 			if(col == COL_COST) {
-				return formatter.format(part.getCurrentValue());
+				return formatter.format(part.getActualValue(campaign));
 			}
 			if(col == COL_TON) {
 				return Math.round(part.getTonnage() * 100) / 100.0;

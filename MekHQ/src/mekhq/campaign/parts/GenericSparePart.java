@@ -174,7 +174,7 @@ public class GenericSparePart extends Part {
 	}
 
 	@Override
-	public long getCurrentValue() {
+	public long getStickerPrice() {
 		// TODO Auto-generated method stub
 		return 0;
 	}

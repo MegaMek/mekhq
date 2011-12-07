@@ -30,6 +30,7 @@ import megamek.common.EquipmentType;
 import megamek.common.Mounted;
 import megamek.common.TargetRoll;
 import mekhq.Utilities;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.Era;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.finances.Transaction;
@@ -87,11 +88,11 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     @Override
     public long getCurrentValue() {
     	//multiply full value of ammo ton by the percent of shots remaining  	
-    	return (long)(getPurchasePrice() * (1.0 - (double)shotsNeeded / getFullShots()));
+    	return (long)(getStickerPrice() * (1.0 - (double)shotsNeeded / getFullShots()));
     }
     
     @Override
-    public long getPurchasePrice() {
+    public long getStickerPrice() {
     	//costs are a total nightmare
         //some costs depend on entity, but we can't do it that way
         //because spare parts don't have entities. If parts start on an entity
@@ -118,10 +119,6 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         	System.out.println("Found a null entity while calculating cost for " + name);
         }
         return itemCost;
-    }
-    
-    public long getExactPurchasePrice() {
-    	return (long)(getPurchasePrice() * (((double)getShotsNeeded())/getFullShots()));
     }
 
     public int getShotsNeeded() {
@@ -280,7 +277,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 		changeAmountAvailable(getFullShots(), (AmmoType)type);
 		setCheckedToday(true);
 		if(unit.campaign.getCampaignOptions().payForParts()) {
-			unit.campaign.getFinances().debit(getPurchasePrice(), Transaction.C_EQUIP, "Purchase of " + getAcquisitionName(), unit.campaign.calendar.getTime());
+			unit.campaign.getFinances().debit(adjustCostsForCampaignOptions(getStickerPrice(), unit.campaign), Transaction.C_EQUIP, "Purchase of " + getAcquisitionName(), unit.campaign.calendar.getTime());
 		}
 		return "<font color='green'> part found.</font>";
 	}
@@ -486,7 +483,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 		toReturn += ">";
 		toReturn += "<b>" + type.getDesc() + "</b> " + bonus + "<br/>";
 		toReturn += ((AmmoType)type).getShots() + " shots (1 ton)<br/>";
-		toReturn += Utilities.getCurrencyString(getPurchasePrice()) + "<br/>";
+		toReturn += Utilities.getCurrencyString(getStickerPrice()) + "<br/>";
 		toReturn += "</font></html>";
 		return toReturn;
 	}

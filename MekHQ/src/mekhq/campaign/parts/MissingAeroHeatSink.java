@@ -60,15 +60,6 @@ public class MissingAeroHeatSink extends MissingPart {
 	}
 
 	@Override
-	public long getPurchasePrice() {
-		if(type == Aero.HEAT_DOUBLE) {
-			return 6000;
-		} else {
-			return 2000;
-		}
-	}
-
-	@Override
 	public boolean isAcceptableReplacement(Part part, boolean refit) {
 		return part instanceof AeroHeatSink && type == ((AeroHeatSink)part).getType();
 	}

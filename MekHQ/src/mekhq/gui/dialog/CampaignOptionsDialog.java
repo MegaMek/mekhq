@@ -204,8 +204,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         allowISPurchasesBox = new javax.swing.JCheckBox();
         allowCanonOnlyBox = new javax.swing.JCheckBox();
         choiceTechLevel = new javax.swing.JComboBox();
-        repairSystemComboBox = new javax.swing.JComboBox();
-        javax.swing.JLabel repairSystemComboBoxLabel = new javax.swing.JLabel();
         btnOkay = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
         textRanks = new javax.swing.JTextArea();
@@ -341,51 +339,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panRepair.add(useFactionModifiersCheckBox, gridBagConstraints);
-
-        clanPriceModifierLabel.setText(resourceMap.getString("clanPriceModifierLabel.text")); // NOI18N
-        clanPriceModifierLabel.setName("clanPriceModifierLabel"); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panRepair.add(clanPriceModifierLabel, gridBagConstraints);
-
-        clanPriceModifierJFormattedTextField.setColumns(4);
-        clanPriceModifierJFormattedTextField.setToolTipText(resourceMap.getString("clanPriceModifierJFormattedTextField.toolTipText")); // NOI18N
-        clanPriceModifierJFormattedTextField.setName("clanPriceModifierJFormattedTextField"); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panRepair.add(clanPriceModifierJFormattedTextField, gridBagConstraints);
-
-        DefaultComboBoxModel repairSystemComboBoxModel = new DefaultComboBoxModel();
-        for (int i=0;i<CampaignOptions.REPAIR_SYSTEM_NAMES.length; i++) {
-            repairSystemComboBoxModel.addElement(CampaignOptions.getRepairSystemName(i));
-        }
-        repairSystemComboBox.setModel(repairSystemComboBoxModel);
-        repairSystemComboBox.setToolTipText(resourceMap.getString("repairSystemComboBox.toolTipText")); // NOI18N
-        repairSystemComboBox.setName("repairSystemComboBox"); // NOI18N
-        repairSystemComboBox.setSelectedIndex(options.getRepairSystem());
-        /*
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panRepair.add(repairSystemComboBox, gridBagConstraints);
-        */
-
-        repairSystemComboBoxLabel.setText(resourceMap.getString("repairSystemComboBoxLabel.text")); // NOI18N
-        repairSystemComboBoxLabel.setName("repairSystemComboBoxLabel"); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panRepair.add(repairSystemComboBoxLabel, gridBagConstraints);
 
         useQuirksBox.setText(resourceMap.getString("useQuirksBox.text")); // NOI18N
         useQuirksBox.setToolTipText(resourceMap.getString("useQuirksBox.toolTipText")); // NOI18N
@@ -564,7 +517,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panFinances.add(payForPartsBox, gridBagConstraints);
@@ -575,7 +528,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panFinances.add(payForUnitsBox, gridBagConstraints);
@@ -586,7 +539,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panFinances.add(payForSalariesBox, gridBagConstraints);
@@ -597,7 +550,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
-        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panFinances.add(payForOverheadBox, gridBagConstraints);
@@ -608,7 +561,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
-        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panFinances.add(payForMaintainBox, gridBagConstraints);
@@ -619,7 +572,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 5;
-        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panFinances.add(payForTransportBox, gridBagConstraints);
@@ -630,7 +583,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 6;
-        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panFinances.add(sellUnitsBox, gridBagConstraints);
@@ -641,10 +594,29 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 7;
-        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panFinances.add(sellPartsBox, gridBagConstraints);
+        
+        clanPriceModifierLabel.setText(resourceMap.getString("clanPriceModifierLabel.text")); // NOI18N
+        clanPriceModifierLabel.setName("clanPriceModifierLabel"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 8;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        panFinances.add(clanPriceModifierLabel, gridBagConstraints);
+        
+        clanPriceModifierJFormattedTextField.setColumns(4);
+        clanPriceModifierJFormattedTextField.setToolTipText(resourceMap.getString("clanPriceModifierJFormattedTextField.toolTipText")); // NOI18N
+        clanPriceModifierJFormattedTextField.setName("clanPriceModifierJFormattedTextField"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 8;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panFinances.add(clanPriceModifierJFormattedTextField, gridBagConstraints);
         
         tabOptions.addTab(resourceMap.getString("panFinances.TabConstraints.tabTitle"), panFinances); // NOI18N
         
@@ -1234,7 +1206,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 	    String clanPriceModifierString = clanPriceModifierJFormattedTextField.getText();
 	    options.setClanPriceModifier(new Double(clanPriceModifierString));
 	    options.setFactionForNames(useFactionForNamesBox.isSelected());
-	    options.setRepairSystem(repairSystemComboBox.getSelectedIndex());   
 	    options.setTactics(useTacticsBox.isSelected());
 	    if(useTacticsBox.isSelected()) {
 	    	campaign.getGameOptions().getOption("command_init").setValue(true);
@@ -1601,7 +1572,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private javax.swing.JPanel panXP;
     private javax.swing.JPanel panRank;
     private javax.swing.JPanel panSkill;
-    private javax.swing.JComboBox repairSystemComboBox;
     private javax.swing.JTabbedPane tabOptions;
     private javax.swing.JTextField txtName;
     private javax.swing.JCheckBox useFactionModifiersCheckBox;

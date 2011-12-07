@@ -14,6 +14,7 @@ v0.1.11 (SVN)
 + Y/N dialog on force deletion
 + change MM options based on tech limits selected
 + multiple part selection
++ adjust parts value by clan modifier
 
 v0.1.10 (2011-12-05)
 + beginnings of a proper splash and loading screen

@@ -35,21 +35,9 @@ public class MissingJumpJet extends MissingEquipmentPart {
     }
     
     public MissingJumpJet(int tonnage, EquipmentType et, int equipNum) {
-        // TODO Memorize all entity attributes needed to calculate cost
-        // As it is a part bought with one entity can be used on another entity
-        // on which it would have a different price (only tonnage is taken into
-        // account for compatibility)
         super(tonnage, et, equipNum);
         this.time = 60;
         this.difficulty = 0;
-    }
-    
-    /**
-     * Copied from megamek.common.Entity.getWeaponsAndEquipmentCost(StringBuffer detail, boolean ignoreAmmo)
-     */
-    @Override
-    public long getPurchasePrice() {
-    	return 200 * getUnitTonnage();
     }
     
     @Override

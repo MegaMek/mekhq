@@ -272,7 +272,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 				} else {
 					//set entity for variable cost items
 					nPart.setUnit(newUnit);
-					cost += ((MissingPart)nPart).getPurchasePrice();
+					cost += ((MissingPart)nPart).getActualValue(oldUnit.campaign);
 					nPart.setUnit(null);
 					shoppingList.add(nPart);
 				}
@@ -1265,8 +1265,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 		return "Fill this in";
 	}
 
-	@Override
-	public long getPurchasePrice() {
+	public long getStickerPrice() {
 		return cost;
 	}
 
@@ -1310,7 +1309,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 				part.setUnit(null);
 			}
 			else if(part instanceof MissingPart) {
-				oldUnit.campaign.buyPart(((IAcquisitionWork)part).getNewPart(),(long)(((IAcquisitionWork)part).getPurchasePrice() * 1.1));
+				oldUnit.campaign.buyPart(((IAcquisitionWork)part).getNewPart(), 1.1);
 				Part replacement = ((MissingPart)part).findReplacement(true);
 				if(null != replacement) {
 					replacement.setRefitId(oldUnit.getId());
@@ -1320,7 +1319,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 		}
 		if(null != newArmorSupplies) {
 			newArmorSupplies.setAmount(armorNeeded);
-			oldUnit.campaign.buyPart(newArmorSupplies,(long)(newArmorSupplies.getPurchasePrice() * 1.1));
+			oldUnit.campaign.buyPart(newArmorSupplies, 1.1);
 		}
 		shoppingList = new ArrayList<Part>();
 		kitFound = true;

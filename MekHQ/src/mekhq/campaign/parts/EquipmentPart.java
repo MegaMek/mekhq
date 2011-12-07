@@ -102,7 +102,7 @@ public class EquipmentPart extends Part {
      *
      */
     @Override
-    public long getCurrentValue() {
+    public long getStickerPrice() {
     	//costs are a total nightmare
         //some costs depend on entity, but we can't do it that way
         //because spare parts don't have entities. If parts start on an entity

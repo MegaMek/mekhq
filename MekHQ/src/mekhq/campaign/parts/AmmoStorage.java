@@ -71,7 +71,7 @@ public class AmmoStorage extends EquipmentPart {
     }
     
     @Override
-    public long getCurrentValue() {
+    public long getStickerPrice() {
     	//costs are a total nightmare
         //some costs depend on entity, but we can't do it that way
         //because spare parts don't have entities. If parts start on an entity
@@ -97,7 +97,12 @@ public class AmmoStorage extends EquipmentPart {
         } catch(NullPointerException ex) {
         	System.out.println("Found a null entity while calculating cost for " + name);
         }
-    	return (long)(itemCost * ((double)shots / ((AmmoType)type).getShots()));
+    	return itemCost;
+    }
+    
+    @Override
+    public long getCurrentValue() {
+    	return (long)(getStickerPrice() * ((double)shots / ((AmmoType)type).getShots()));
     }
 
     public int getShots() {

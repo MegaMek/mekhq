@@ -77,7 +77,7 @@ public class MekActuator extends Part {
     }
     
     @Override
-    public long getCurrentValue() {
+    public long getStickerPrice() {
         long unitCost = 0;
         switch (getType()) {
             case (Mech.ACTUATOR_UPPER_ARM) : {

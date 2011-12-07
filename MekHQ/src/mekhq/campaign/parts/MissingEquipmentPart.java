@@ -104,39 +104,6 @@ public class MissingEquipmentPart extends MissingPart {
     	}
     	return 0;
     }
-    
-    /**
-     * Copied from megamek.common.Entity.getWeaponsAndEquipmentCost(StringBuffer detail, boolean ignoreAmmo)
-     */
-    @Override
-    public long getPurchasePrice() {
-    	//costs are a total nightmare
-        //some costs depend on entity, but we can't do it that way
-        //because spare parts don't have entities. If parts start on an entity
-        //thats fine, but this will become problematic when we set up a parts
-        //store. For now I am just going to pass in a null entity and attempt
-    	//to catch any resulting NPEs
-    	Entity en = null;
-    	boolean isArmored = false;
-    	if (unit != null) {
-            en = unit.getEntity();
-            Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
-            if(null != mounted) {
-            	isArmored = mounted.isArmored();
-            }
-    	}
-
-        int itemCost = 0;      
-        try {
-        	itemCost = (int) type.getCost(en, isArmored);
-        	if (itemCost == EquipmentType.COST_VARIABLE) {
-        		itemCost = type.resolveVariableCost(en, isArmored);
-        	}
-        } catch(NullPointerException ex) {
-        	System.out.println("Found a null entity while calculating cost for " + name);
-        }
-        return itemCost;
-    }
 
     @Override
     public int getPartType() {

@@ -91,13 +91,9 @@ public class Armor extends Part implements IAcquisitionWork {
     }
     
     @Override
-    public long getPurchasePrice() {
+    public long getStickerPrice() {
     	//always in 5-ton increments
     	return (long)(5 * EquipmentType.getArmorCost(type));
-    }
-    
-    public long getExactPurchasePrice() {
-    	return (long)(((double)amountNeeded)/getArmorPointsPerTon() * EquipmentType.getArmorCost(type));
     }
     
     public String getDesc() {
@@ -400,7 +396,7 @@ public class Armor extends Part implements IAcquisitionWork {
 	public String find() {
 		changeAmountAvailable((int)Math.round(5 * getArmorPointsPerTon()));
 		setCheckedToday(true);
-		unit.campaign.getFinances().debit(getPurchasePrice(), Transaction.C_EQUIP, "Purchase of " + getName(), unit.campaign.calendar.getTime());
+		unit.campaign.getFinances().debit(adjustCostsForCampaignOptions(getStickerPrice(), unit.campaign), Transaction.C_EQUIP, "Purchase of " + getName(), unit.campaign.calendar.getTime());
 		return "<font color='green'><b> part found.</b></font>";
 	}
 	
@@ -517,7 +513,7 @@ public class Armor extends Part implements IAcquisitionWork {
 		
 		toReturn += ">";
 		toReturn += "<b>" + getName() + "</b> " + bonus + "<br/>";
-		toReturn += Utilities.getCurrencyString(getPurchasePrice()) + "<br/>";
+		toReturn += Utilities.getCurrencyString(adjustCostsForCampaignOptions(getStickerPrice(), unit.campaign)) + "<br/>";
 		toReturn += "</font></html>";
 		return toReturn;
 	}

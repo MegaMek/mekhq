@@ -452,13 +452,13 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 		long value = 0;
 		for(Part part : parts) {
 			if(part instanceof MissingPart) {
-				value += ((MissingPart)part).getPurchasePrice();
+				value += ((MissingPart)part).getActualValue(campaign);
 			}
 			else if(part instanceof Armor) {
-				value += ((Armor)part).getExactPurchasePrice();
+				value += ((Armor)part).getActualValue(campaign);
 			}
 			else if(part instanceof AmmoBin) {
-				value += ((AmmoBin)part).getExactPurchasePrice();
+				value += ((AmmoBin)part).getActualValue(campaign);
 			}
 		}
 		return value;
@@ -835,13 +835,9 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 
 	public int getBuyCost() {
 		int cost = (int) Math.round(getEntity().getCost(false));
-
-		// Increase cost for IS players buying Clan mechs
-		if (TechConstants.getTechName(getEntity().getTechLevel())
-				.equals("Clan")
-				&& !Faction.isClanFaction(campaign.getFaction()))
+		if(entity.isClan()) {
 			cost *= campaign.getCampaignOptions().getClanPriceModifier();
-
+		}
 		return cost;
 	}
 

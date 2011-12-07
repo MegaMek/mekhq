@@ -123,7 +123,7 @@ public class AeroSensor extends Part {
 	}
 
 	@Override
-	public long getCurrentValue() {
+	public long getStickerPrice() {
 		if(dropship) {
 			return 80000;
 		}

@@ -120,7 +120,7 @@ public class LandingGear extends Part {
 	}
 
 	@Override
-	public long getCurrentValue() {
+	public long getStickerPrice() {
 		return 10 * getUnitTonnage();
 	}
 

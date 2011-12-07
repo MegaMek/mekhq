@@ -56,7 +56,7 @@ public class TurretLock extends Part {
 	}
 
 	@Override
-	public long getCurrentValue() {
+	public long getStickerPrice() {
 		return 0;
 	}
 

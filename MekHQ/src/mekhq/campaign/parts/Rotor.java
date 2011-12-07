@@ -155,7 +155,7 @@ public class Rotor extends TankLocation {
 	}
 
 	@Override
-	public long getCurrentValue() {
+	public long getStickerPrice() {
 		return (long)(40000 * getTonnage());
 	}
 }

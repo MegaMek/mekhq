@@ -122,22 +122,6 @@ public class MissingMekLocation extends MissingPart {
     	//TODO: how much should this weigh?
     	return 0;
     }
-    
-    @Override
-    public long getPurchasePrice() {
-        double totalStructureCost = EquipmentType.getStructureCost(getStructureType()) * getUnitTonnage();
-        int muscCost = isTsm() ? 16000 : 2000;
-        double totalMuscleCost = muscCost * getUnitTonnage();
-        double cost = 0.1 * (totalStructureCost + totalMuscleCost);
-
-        if (loc == Mech.LOC_HEAD) {
-            // Add cockpit cost
-            // TODO create a class for cockpit or memorize cockpit type
-            cost += 200000;
-        }
-
-        return (long) Math.round(cost);
-    }
 
     @Override
     public int getPartType() {

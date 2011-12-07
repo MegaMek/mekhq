@@ -52,11 +52,6 @@ public class MissingMekLifeSupport extends MissingPart {
 		//TODO: what should this tonnage be?
 		return 0;
 	}
-	
-	@Override
-	public long getPurchasePrice() {
-		return 50000;
-	}
 
     @Override
     public int getPartType() {

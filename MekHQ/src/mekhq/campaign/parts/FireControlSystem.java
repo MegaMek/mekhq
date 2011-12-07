@@ -118,7 +118,7 @@ public class FireControlSystem extends Part {
 	}
 
 	@Override
-	public long getCurrentValue() {
+	public long getStickerPrice() {
 		//TODO: table in TechManual makes no sense - I only see FCS for dropships
 		return 0;
 	}

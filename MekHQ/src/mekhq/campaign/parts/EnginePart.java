@@ -71,7 +71,7 @@ public class EnginePart extends Part {
 	}
 	
 	@Override 
-	public long getCurrentValue() {
+	public long getStickerPrice() {
 		return (long)Math.round(getEngine().getBaseCost() * getEngine().getRating() * getUnitTonnage() / 75.0);
 	}
 

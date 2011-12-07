@@ -52,11 +52,6 @@ public class MissingMekSensor extends MissingPart {
 		//TODO: what should this tonnage be?
 		return 0;
 	}
-	
-	@Override
-	public long getPurchasePrice() {
-		return 2000 * getUnitTonnage();
-	}
 
     @Override
     public int getPartType() {

@@ -1372,15 +1372,19 @@ public class Campaign implements Serializable {
 	}
 
 	public void sellPart(Part part) {
-		long cost = part.getCurrentValue();
+		long cost = part.getActualValue(this);
 		finances.credit(cost, Transaction.C_EQUIP_SALE, "Sale of " + part.getName(), calendar.getTime());
 		removePart(part);
 	}
 
-	public void buyPart(Part part, long cost) {
+	public void buyPart(Part part) {
+		buyPart(part, 1);
+	}
+	
+	public void buyPart(Part part, double multiplier) {
 		addPart(part);
 		if(getCampaignOptions().payForParts()) {
-			finances.debit(cost, Transaction.C_EQUIP, "Purchase of " + part.getName(), calendar.getTime());		
+			finances.debit((long)(multiplier * part.getActualValue(this)), Transaction.C_EQUIP, "Purchase of " + part.getName(), calendar.getTime());		
 		}
 	}
 

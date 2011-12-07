@@ -68,7 +68,7 @@ public class MekCockpit extends Part {
 	}
 	
 	@Override
-	public long getCurrentValue() {
+	public long getStickerPrice() {
 		switch (type) {
         case Mech.COCKPIT_COMMAND_CONSOLE:
             return 500000;

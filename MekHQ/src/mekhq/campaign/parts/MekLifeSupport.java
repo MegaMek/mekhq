@@ -57,7 +57,7 @@ public class MekLifeSupport extends Part {
 	}
 	
 	@Override
-	public long getCurrentValue() {
+	public long getStickerPrice() {
 		return 50000;
 	}
 

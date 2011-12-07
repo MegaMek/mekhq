@@ -7,10 +7,12 @@
 package mekhq.gui.dialog;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Font;
 import java.awt.Image;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
@@ -19,10 +21,13 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JTable;
 import javax.swing.RowFilter;
+import javax.swing.SwingConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
@@ -39,6 +44,7 @@ import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.gui.CampaignGUI;
+import mekhq.gui.dialog.PartsStoreDialog.PartsTableModel;
 
 /**
  *
@@ -61,15 +67,18 @@ public class UnitSelectorDialog extends JDialog {
     private Campaign campaign;
     
     private CampaignGUI hqView;
+    
+    private DecimalFormat formatter;
 
     /** Creates new form UnitSelectorDialog */
     public UnitSelectorDialog(boolean modal, CampaignGUI view) {
         super(view.getFrame(), modal);
         unitModel = new MechTableModel();
         initComponents();
-
         this.hqView = view;
         this.campaign = hqView.getCampaign();
+        formatter = new DecimalFormat();
+
         
         MechSummary [] allMechs = MechSummaryCache.getInstance().getAllMechs();
         setMechs(allMechs);
@@ -244,6 +253,8 @@ public class UnitSelectorDialog extends JDialog {
             else {
                 column.setPreferredWidth(25);
             }
+            column.setCellRenderer(unitModel.getRenderer());
+
         }
         scrTableUnits.setViewportView(tableUnits);
 
@@ -518,6 +529,16 @@ public class UnitSelectorDialog extends JDialog {
 	            return N_COL;
 	        }
 	
+	        public int getAlignment(int col) {
+	            switch(col) {
+	            case COL_MODEL:
+	            case COL_CHASSIS:
+	            	return SwingConstants.LEFT;
+	            default:
+	            	return SwingConstants.RIGHT;
+	            }
+	        }
+	        
 	        @Override
 	        public String getColumnName(int column) {
 	            switch(column) {
@@ -576,11 +597,40 @@ public class UnitSelectorDialog extends JDialog {
 	                return ms.getYear();
 	            }
 	            if(col == COL_COST) {
-	                //return NumberFormat.getInstance().format(ms.getCost());
-	                return ms.getCost();
+	                return formatter.format(getPurchasePrice(ms));
 	            }
 	            return "?";
 	        }
+	        
+	        private int getPurchasePrice(MechSummary ms) {
+	        	int cost = ms.getCost();
+	        	if(TechConstants.isClan(ms.getType())) {
+	        		cost *= campaign.getCampaignOptions().getClanPriceModifier();
+	        	}
+	        	return cost;
+	        }
+	        
+	        public MechTableModel.Renderer getRenderer() {
+				return new MechTableModel.Renderer();
+			}
+
+			public class Renderer extends DefaultTableCellRenderer {
+
+				private static final long serialVersionUID = 9054581142945717303L;
+
+				public Component getTableCellRendererComponent(JTable table,
+						Object value, boolean isSelected, boolean hasFocus,
+						int row, int column) {
+					super.getTableCellRendererComponent(table, value, isSelected,
+							hasFocus, row, column);
+					setOpaque(true);
+					int actualCol = table.convertColumnIndexToModel(column);
+					setHorizontalAlignment(getAlignment(actualCol));
+					
+					return this;
+				}
+
+			}
 	
 	}
 

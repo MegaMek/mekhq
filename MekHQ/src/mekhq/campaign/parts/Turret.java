@@ -229,7 +229,7 @@ public class Turret extends TankLocation {
 	}
 	
 	@Override
-	public long getCurrentValue() {
+	public long getStickerPrice() {
 		return (long)(5000 * weight);
 	}
 }

@@ -56,23 +56,6 @@ public class MissingMekGyro extends MissingPart {
     public int getType() {
         return type;
     }
-    
-    @Override
-    public long getPurchasePrice() {
-        double c = 0;
-        
-        if (getType() == Mech.GYRO_XL) {
-            c = 750000 * getTonnage();
-        } else if (getType() == Mech.GYRO_COMPACT) {
-            c = 400000 * getTonnage();
-        } else if (getType() == Mech.GYRO_HEAVY_DUTY) {
-            c = 500000 * getTonnage();
-        } else {
-            c = 300000 * getTonnage();
-        }
-        
-        return (long) Math.round(c);
-    }
   
     @Override
     public double getTonnage() {

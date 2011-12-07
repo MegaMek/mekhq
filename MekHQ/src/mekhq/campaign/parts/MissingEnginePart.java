@@ -69,12 +69,6 @@ public class MissingEnginePart extends MissingPart {
 		}
 		return 0;
 	}
-	
-	@Override 
-	public long getPurchasePrice() {
-		double c = getEngine().getBaseCost() * getEngine().getRating() * getUnitTonnage() / 75.0;
-		return (long) Math.round(c);
-	}
 
 	@Override
 	public int getPartType() {

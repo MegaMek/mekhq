@@ -67,7 +67,7 @@ public class JumpJet extends EquipmentPart {
      *
      */
     @Override
-    public long getCurrentValue() {
+    public long getStickerPrice() {
     	return 200 * getUnitTonnage();	
     }
     

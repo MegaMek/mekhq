@@ -95,12 +95,6 @@ public class MissingRotor extends MissingPart {
 	}
 
 	@Override
-	public long getPurchasePrice() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
 	public void updateConditionFromPart() {
 		if(null != unit && unit.getEntity() instanceof VTOL) {
 			unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, VTOL.LOC_ROTOR);

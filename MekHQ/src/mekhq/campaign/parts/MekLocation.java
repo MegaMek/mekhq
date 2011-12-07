@@ -127,7 +127,7 @@ public class MekLocation extends Part {
     }
     
     @Override
-    public long getCurrentValue() {
+    public long getStickerPrice() {
         double totalStructureCost = EquipmentType.getStructureCost(getStructureType()) * getUnitTonnage();
         int muscCost = isTsm() ? 16000 : 2000;
         double totalMuscleCost = muscCost * getUnitTonnage();

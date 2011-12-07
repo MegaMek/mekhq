@@ -83,7 +83,7 @@ public class StructuralIntegrity extends Part {
 	}
 
 	@Override
-	public long getCurrentValue() {
+	public long getStickerPrice() {
 		if(null != unit && unit.getEntity() instanceof Aero) {
 			if(unit.getEntity() instanceof Dropship || unit.getEntity() instanceof SmallCraft) {
 				return ((Aero)unit.getEntity()).get0SI() * 100000;

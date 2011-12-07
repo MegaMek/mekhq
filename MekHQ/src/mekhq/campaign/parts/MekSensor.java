@@ -57,7 +57,7 @@ public class MekSensor extends Part {
 	}
 	
 	@Override
-	public long getCurrentValue() {
+	public long getStickerPrice() {
 		return 2000 * getUnitTonnage();
 	}
 

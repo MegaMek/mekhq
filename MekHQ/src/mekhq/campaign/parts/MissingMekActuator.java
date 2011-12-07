@@ -69,48 +69,6 @@ public class MissingMekActuator extends MissingPart {
     	//apparently nothing
     	return 0;
     }
-    
-    @Override
-    public long getPurchasePrice() {
-        long unitCost = 0;
-        switch (getType()) {
-            case (Mech.ACTUATOR_UPPER_ARM) : {
-                unitCost = 100;
-                break;
-            }
-            case (Mech.ACTUATOR_LOWER_ARM) : {
-                unitCost = 50;
-                break;
-            }
-            case (Mech.ACTUATOR_HAND) : {
-                unitCost = 80;
-                break;
-            }
-            case (Mech.ACTUATOR_UPPER_LEG) : {
-                unitCost = 150;
-                break;
-            }
-            case (Mech.ACTUATOR_LOWER_LEG) : {
-                unitCost = 80;
-                break;
-            }
-            case (Mech.ACTUATOR_FOOT) : {
-                unitCost = 120;
-                break;
-            }
-            case (Mech.ACTUATOR_HIP) : {
-                // not used
-                unitCost = 0;
-                break;
-            }
-            case (Mech.ACTUATOR_SHOULDER) : {
-                // not used
-                unitCost = 0;
-                break;
-            }
-        }
-       return getUnitTonnage() * unitCost;
-    }
 
     @Override
     public int getPartType() {
