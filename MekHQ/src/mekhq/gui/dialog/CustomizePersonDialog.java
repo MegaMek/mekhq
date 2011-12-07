@@ -477,6 +477,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         	campaign.addPerson(person);
         	num--;
         }
+    	person = campaign.newPerson(choiceType.getSelectedIndex());
         refreshPilotAndOptions();
         refreshHqView();
     }
