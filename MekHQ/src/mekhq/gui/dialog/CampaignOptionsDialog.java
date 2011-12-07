@@ -1293,10 +1293,22 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 	    options.setKillXPAward((Integer)spnKillXP.getModel().getValue());
 
 	    options.setLimitByYear(limitByYearBox.isSelected());
+	    if(limitByYearBox.isSelected()) {
+	    	campaign.getGameOptions().getOption("is_eq_limits").setValue(true);
+	    } else {
+	    	campaign.getGameOptions().getOption("is_eq_limits").setValue(false);
+	    }
 	    options.setAllowClanPurchases(allowClanPurchasesBox.isSelected());
 	    options.setAllowISPurchases(allowISPurchasesBox.isSelected());
 	    options.setAllowCanonOnly(allowCanonOnlyBox.isSelected());
+	    if(!allowCanonOnlyBox.isSelected()) {
+	    	campaign.getGameOptions().getOption("canon_only").setValue(false);
+	    }
 	    options.setTechLevel(choiceTechLevel.getSelectedIndex());
+	    if(choiceTechLevel.getSelectedIndex() > 0) {
+	    	campaign.getGameOptions().getOption("allow_advanced_units").setValue(true);
+	    	campaign.getGameOptions().getOption("allow_advanced_ammo").setValue(true);
+	    } 
 	    
 	}
 	
