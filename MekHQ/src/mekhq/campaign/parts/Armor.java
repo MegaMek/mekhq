@@ -396,7 +396,9 @@ public class Armor extends Part implements IAcquisitionWork {
 	public String find() {
 		changeAmountAvailable((int)Math.round(5 * getArmorPointsPerTon()));
 		setCheckedToday(true);
-		unit.campaign.getFinances().debit(adjustCostsForCampaignOptions(getStickerPrice(), unit.campaign), Transaction.C_EQUIP, "Purchase of " + getName(), unit.campaign.calendar.getTime());
+		if(unit.campaign.getCampaignOptions().payForParts()) {
+			unit.campaign.getFinances().debit(adjustCostsForCampaignOptions(getStickerPrice(), unit.campaign), Transaction.C_EQUIP, "Purchase of " + getName(), unit.campaign.calendar.getTime());
+		}
 		return "<font color='green'><b> part found.</b></font>";
 	}
 	

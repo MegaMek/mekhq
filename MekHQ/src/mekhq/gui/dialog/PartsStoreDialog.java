@@ -110,7 +110,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
         this.campaignGUI = gui;
         campaign = campaignGUI.getCampaign();
         formatter = new DecimalFormat();
-        partsModel = new PartsTableModel(campaign.getPartsStore().getInventory());
+        partsModel = new PartsTableModel(campaign.getPartsStore().getInventory(campaign));
         initComponents();
         setLocationRelativeTo(frame);
     }
