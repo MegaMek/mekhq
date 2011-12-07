@@ -4571,6 +4571,12 @@ public class CampaignGUI extends JPanel {
             	}
             } else if(command.contains("REMOVE_FORCE")) {
             	if(null != force) {
+            		if(0 != JOptionPane.showConfirmDialog(null,
+            				"Are you sure you want to delete " + force.getFullName() + "?"
+            			, "Delete Force?",
+            				JOptionPane.YES_NO_OPTION)) {
+                		return;
+                	}  
             		getCampaign().removeForce(force);
             		refreshOrganization();   
             		refreshPersonnelList();
