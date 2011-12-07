@@ -6547,6 +6547,15 @@ public class CampaignGUI extends JPanel {
 		public Part getPartAt(int row) {
 			return ((PartInventory) data.get(row)).getPart();
 		}
+		
+		public PartInventory[] getPartInventoriesAt(int[] rows) {
+			PartInventory[] inventories = new PartInventory[rows.length];
+			for (int i = 0; i < rows.length; i++) {
+				int row = rows[i];
+				inventories[i] = (PartInventory) data.get(row);
+			}
+			return inventories;
+		}
 
 		public Part[] getPartstAt(int[] rows) {
 			Part[] parts = new Part[rows.length];
@@ -6622,16 +6631,25 @@ public class CampaignGUI extends JPanel {
 				return;
 			}
 			Part selectedPart = partsModel.getPartAt(partsTable.convertRowIndexToModel(row));
+			int[] rows = partsTable.getSelectedRows();
+			Part[] parts = partsModel.getPartstAt(rows);
+			PartInventory[] inventories = partsModel.getPartInventoriesAt(rows);
 			if (command.equalsIgnoreCase("SELL")) {
-				getCampaign().sellPart(selectedPart);
+				for(Part p : parts) {
+					getCampaign().sellPart(p);
+				}
 				refreshPartsList();
 				refreshTaskList();
 				refreshAcquireList();
 				refreshReport();
 				refreshFunds();
 				refreshFinancialTransactions();
+			} else if (command.equalsIgnoreCase("SELL_ALL")) {
+				//TODO: implement me
 			} else if (command.equalsIgnoreCase("REMOVE")) {
-				getCampaign().removePart(selectedPart);
+				for(Part p : parts) {
+					getCampaign().removePart(p);
+				}
 				refreshPartsList();
 				refreshTaskList();
 				refreshAcquireList();
@@ -6660,10 +6678,16 @@ public class CampaignGUI extends JPanel {
 				// **lets fill the pop up menu**//
 				// sell part
 				if(getCampaign().getCampaignOptions().canSellParts()) {
-					menuItem = new JMenuItem("Sell Part");
+					menu = new JMenu("Sell");
+					menuItem = new JMenuItem("Sell Single Part of This Type");
 					menuItem.setActionCommand("SELL");
 					menuItem.addActionListener(this);
-					popup.add(menuItem);
+					menu.add(menuItem);
+					menuItem = new JMenuItem("Sell All Parts of This Type");
+					menuItem.setActionCommand("SELL_ALL");
+					menuItem.addActionListener(this);
+					//menu.add(menuItem);
+					popup.add(menu);
 				}
 				// GM mode
 				menu = new JMenu("GM Mode");

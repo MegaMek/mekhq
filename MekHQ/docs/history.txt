@@ -13,6 +13,7 @@ v0.1.11 (SVN)
 + no NPE when portrait or force image is missing - replace with default
 + Y/N dialog on force deletion
 + change MM options based on tech limits selected
++ multiple part selection
 
 v0.1.10 (2011-12-05)
 + beginnings of a proper splash and loading screen
