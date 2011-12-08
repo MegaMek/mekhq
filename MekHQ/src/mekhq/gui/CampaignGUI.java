@@ -7538,7 +7538,16 @@ public class CampaignGUI extends JPanel {
 				refreshPatientList();
 				refreshPersonnelList();
 				refreshScenarioList();
-			} else if (command.contains("CUSTOMIZE")
+			} else if(command.contains("HIRE_FULL")) {
+				for(Unit unit : units) {
+					getCampaign().hirePersonnelFor(unit.getId());
+				}
+				refreshServicedUnitList();
+				refreshUnitList();
+				refreshPersonnelList();
+				refreshOrganization();
+				refreshReport();
+			} else if (command.contains("CUSTOMIZE") 
 					&& !command.contains("CANCEL")) {
 				if (selectedUnit.getEntity() instanceof Mech) {
 					panMekLab.loadUnit(selectedUnit);
@@ -7703,6 +7712,14 @@ public class CampaignGUI extends JPanel {
 					menu.setEnabled(!unit.isDeployed() && unit.isRepairable());
 					popup.add(menu);
 					
+				}
+				//fill with personnel
+				if(unit.getCrew().size() < unit.getFullCrewSize()) {
+					menuItem = new JMenuItem("Hire full complement");
+					menuItem.setActionCommand("HIRE_FULL");
+					menuItem.addActionListener(this);
+					menuItem.setEnabled(!unit.isDeployed());
+					popup.add(menuItem);
 				}
 				if(oneSelected && !getCampaign().isCustom(unit)) {
 					menuItem = new JMenuItem("Tag as a custom unit");

@@ -69,9 +69,11 @@ import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
 import megamek.common.Player;
+import megamek.common.Protomech;
 import megamek.common.SmallCraftBay;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
+import megamek.common.VTOL;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.GameOptions;
 import megamek.common.options.IBasicOption;
@@ -3154,6 +3156,55 @@ public class Campaign implements Serializable {
                 duplicateNameHash.remove(entity.getShortNameRaw());
             }
         }
+    }
+    
+    public void hirePersonnelFor(int uid) {
+    	Unit unit = getUnit(uid);
+    	if(null == unit) {
+    		return;
+    	}
+    	while(unit.canTakeMoreDrivers()) {
+    		Person p = null;
+    		if(unit.getEntity() instanceof Mech) {
+    			p = newPerson(Person.T_MECHWARRIOR);
+    		}
+    		else if(unit.getEntity() instanceof Aero) {
+    			p = newPerson(Person.T_AERO_PILOT);
+    		}
+    		else if(unit.getEntity() instanceof VTOL) {
+    			p = newPerson(Person.T_VTOL_PILOT);
+    		}
+    		else if(unit.getEntity() instanceof Tank) {
+    			p = newPerson(Person.T_GVEE_DRIVER);
+    		}
+    		else if(unit.getEntity() instanceof Protomech) {
+    			p = newPerson(Person.T_PROTO_PILOT);
+    		}
+    		else if(unit.getEntity() instanceof BattleArmor) {
+    			p = newPerson(Person.T_BA);
+    		}
+    		else if(unit.getEntity() instanceof Infantry) {
+    			p = newPerson(Person.T_INFANTRY);
+    		}
+    		if(null == p) {
+    			break;
+    		}
+    		addPerson(p);
+    		if(unit.usesSoloPilot() || unit.usesSoldiers()) {
+    			unit.addPilotOrSoldier(p);
+    		} else {
+    			unit.addDriver(p);
+    		}
+    	}
+    	while(unit.canTakeMoreGunners()) {
+    		Person p = null;
+    		if(unit.getEntity() instanceof Tank) {
+    			p = newPerson(Person.T_VEE_GUNNER);
+    		}
+    		addPerson(p);
+    		unit.addGunner(p);
+    	}
+    	
     }
 	
 }
