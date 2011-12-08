@@ -73,7 +73,10 @@ import megamek.common.Protomech;
 import megamek.common.SmallCraftBay;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
+import megamek.common.TechConstants;
+import megamek.common.UnitType;
 import megamek.common.VTOL;
+import megamek.common.Warship;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.GameOptions;
 import megamek.common.options.IBasicOption;
@@ -117,6 +120,15 @@ import org.w3c.dom.NodeList;
  */
 public class Campaign implements Serializable {
 	private static final long serialVersionUID = -6312434701389973056L;
+	
+	
+	public static final int DRAGOON_F = 0;
+	public static final int DRAGOON_D = 1;
+	public static final int DRAGOON_C = 2;
+	public static final int DRAGOON_B = 3;
+	public static final int DRAGOON_A = 4;
+	public static final int DRAGOON_ASTAR = 5;
+	
 	// we have three things to track: (1) teams, (2) units, (3) repair tasks
 	// we will use the same basic system (borrowed from MegaMek) for tracking
 	// all three
@@ -3206,5 +3218,240 @@ public class Campaign implements Serializable {
     	}
     	
     }
+    
+    public int calculateDragoonRating() {
+    	
+    	int score = 0;
+    	
+    	double nUnits = 0;
+    	double nUnitsIS2 = 0;
+    	double nUnitsClan = 0;
+    	
+    	double nSkillLvl = 0;
+    	
+    	double value;
+    	int tLevel;
+    	
+    	int nMech = 0;
+		int nVee = 0;
+		int nAero = 0;
+		int nBA = 0;
+		int nInfantry = 0;
+    	
+    	ArrayList<Person> commanders = new ArrayList<Person>();
+    	
+    	for(int uid : forces.getAllUnits()) {
+    		Unit u = getUnit(uid);
+    		if(null == u) {
+    			continue;
+    		}
+			Person p = u.getCommander();
+			if(null != p) {
+				commanders.add(p);
+			}
+			if(!u.isRepairable()) {
+				continue;
+			}
+    		value = 1;
+    		if(u.getEntity() instanceof Infantry 
+    				&& !(u.getEntity() instanceof BattleArmor)
+    				&& ((Infantry)u.getEntity()).getSquadN() == 1) {
+    			value = 0.25;
+    		}
+    		nUnits += value;
+    		tLevel = u.getEntity().getTechLevel();
+    		if(tLevel > TechConstants.T_INTRO_BOXSET) {
+    			if(TechConstants.isClan(tLevel)) {
+    				nUnitsClan += value;
+    			} else {
+    				nUnitsIS2 += value;
+    			}
+    		}
+    		if(null != u.getEntity().getCrew()) {
+	    		if(u.getEntity() instanceof Infantry || u.getEntity() instanceof Protomech) {
+	    			nSkillLvl += value * u.getEntity().getCrew().getGunnery();
+	    		} else {
+	    			nSkillLvl += value * (u.getEntity().getCrew().getGunnery() + u.getEntity().getCrew().getPiloting())/2.0;
+	    		}
+    		}
+    		Entity en = u.getEntity();
+    		if(en instanceof Mech) {
+				nMech++;
+			}
+			else if(en instanceof Tank) {
+				nVee++;
+			}
+			else if(en instanceof Aero && !(en instanceof Dropship) && !(en instanceof Jumpship)) {
+				nAero++;
+			}
+			else if(en instanceof BattleArmor) {
+				nBA += ((Infantry)en).getSquadSize();
+			}
+			else if(en instanceof Infantry) {
+				nInfantry += ((Infantry)en).getSquadN() * ((Infantry)en).getSquadSize();
+			}
+    	}
+    	
+    	//experience rating
+    	//TODO: this should only be for the "main" body (e.g. mechwarriors for mech unit)
+    	double expRating = nSkillLvl/nUnits;
+    	if(expRating >= 5.50) {
+    		score += 5;
+    	}
+    	else if(expRating >= 4.00) {
+    		score += 10;
+    	}
+    	else if(expRating >= 2.50) {
+    		score += 20;
+    	}
+    	else {
+    		score += 40;
+    	}
+    	
+    	//commander rating
+
+ 		//sort person vector by rank
+ 		Collections.sort(commanders, new Comparator<Person>(){		 
+            public int compare(final Person p1, final Person p2) {
+               return ((Comparable<Integer>)p2.getRank()).compareTo(p1.getRank());
+            }
+        });
+ 		Person commander = null;
+    	if(commanders.size() > 0) {
+    		commander = commanders.get(0);
+    	}
+    	if(null != commander) {
+    		Skill tactics = commander.getSkill(SkillType.S_TACTICS);
+    		if(null != tactics) {
+    			score += tactics.getExperienceLevel();
+    		}
+    		Skill leader = commander.getSkill(SkillType.S_LEADER);
+    		if(null != leader) {
+    			score += leader.getExperienceLevel();
+    		}
+    		Skill strategy =commander.getSkill(SkillType.S_STRATEGY);
+    		if(null != strategy) {
+    			score += strategy.getExperienceLevel();
+    		}
+    		Skill negotiate =commander.getSkill(SkillType.S_NEG);
+    		if(null != negotiate) {
+    			score += negotiate.getExperienceLevel();
+    		}
+
+    	}
+    	
+    	//combat record
+    	for(Mission m : getMissions()) {
+    		if(m.isActive()) {
+    			continue;
+    		}
+    		if(m.getStatus() == Mission.S_SUCCESS) {
+    			score += 5;
+    		}
+    		else if(m.getStatus() == Mission.S_FAILED) {
+    			score -= 10;
+    		}
+    		else if(m.getStatus() == Mission.S_BREACH) {
+    			score -= 25;
+    		}
+    	}
+    	
+    	//TODO: transportation rating		
+		for(Unit u : getUnits()) {
+			if(!u.isRepairable()) {
+				continue;
+			}
+			if(u.getEntity() instanceof Dropship) {
+				//decrement total needs by what this dropship can offer
+				for(Bay bay : u.getEntity().getTransportBays()) {
+					if(bay instanceof MechBay) {
+						nMech -= bay.getCapacity();
+					}
+					else if(bay instanceof LightVehicleBay) {
+						nVee -= bay.getCapacity();
+					}
+					else if(bay instanceof HeavyVehicleBay) {
+						nVee -= bay.getCapacity();
+					}
+					else if(bay instanceof ASFBay || bay instanceof SmallCraftBay) {
+						nAero -= bay.getCapacity();
+					}
+					else if(bay instanceof BattleArmorBay) {
+						nBA -= bay.getCapacity() * 4;
+					}
+					else if(bay instanceof InfantryBay) {
+						nInfantry -= bay.getCapacity() * 28;
+					}
+				}
+			}
+			else if(u.getEntity() instanceof Warship) {
+				if(((Warship)u.getEntity()).getDocks() > 0) {
+					score += 30;
+				} else {
+					score += 20;
+				}
+			} 
+			else if(u.getEntity() instanceof Jumpship) {
+				score += 10;
+			}
+		}
+		double transportNeeded = Math.max(0, nMech) + Math.max(0, nVee) + Math.max(0, nAero) + Math.max(0, nBA) + Math.max(0, nInfantry/28); 
+		double pctTransport = 100 * Math.min(1.0, 1.0 - transportNeeded/nUnits);
+    	score += 5 * Math.floor(Math.max(0, pctTransport-50)/10.0);
+
+    	//Technology rating
+    	double pctTech = 100 * (nUnitsIS2 + 2 * nUnitsClan)/nUnits;
+    	score += 5 * Math.floor(Math.max(0, pctTech-30)/10.0);
+    	
+    	//TODO: support rating
+    	
+    	//financial rating
+    	//TODO: account for years in debt
+    	if(getFinances().isInDebt()) {
+    		score -= 10;
+    	}
+    	
+    	if(score < 0) {
+    		return DRAGOON_F;
+    	}
+    	else if(score < 46) {
+    		return DRAGOON_D;
+    	}
+    	else if(score < 86) {
+    		return DRAGOON_C;
+    	}
+    	else if(score < 121) {
+    		return DRAGOON_B;
+    	}
+    	else if(score < 151) {
+    		return DRAGOON_A;
+    	}
+    	else {
+    		return DRAGOON_ASTAR;
+    	}
+    }
 	
+    public static String getDragoonRatingName(int rating) {
+    	switch(rating) {
+    	case DRAGOON_F:
+    		return "F";
+    	case DRAGOON_D:
+    		return "D";
+    	case DRAGOON_C:
+    		return "C";
+    	case DRAGOON_B:
+    		return "B";
+    	case DRAGOON_A:
+    		return "A";
+    	case DRAGOON_ASTAR:
+    		return "A*";
+    	default:
+    		return "Unrated";
+    	}
+    }
+    
+    public String getDragoonRating() {
+    	return getDragoonRatingName(calculateDragoonRating());
+    }
+    
 }

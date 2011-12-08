@@ -390,6 +390,7 @@ public class CampaignGUI extends JPanel {
 		btnAdvanceDay = new javax.swing.JButton();
 		btnOvertime = new javax.swing.JToggleButton();
 		btnGMMode = new javax.swing.JToggleButton();
+		lblRating = new javax.swing.JLabel();
 		lblFunds = new javax.swing.JLabel();
 		lblTempAstechs = new javax.swing.JLabel();
 		lblTempMedics = new javax.swing.JLabel();
@@ -1809,6 +1810,8 @@ public class CampaignGUI extends JPanel {
 		statusPanel.setLayout(new FlowLayout(FlowLayout.LEADING, 20, 5));
 		
 		statusPanel.add(btnGMMode);
+		refreshRating();
+		statusPanel.add(lblRating);
 		refreshFunds();
 		statusPanel.add(lblFunds);
 		refreshTempAstechs();
@@ -2932,10 +2935,12 @@ public class CampaignGUI extends JPanel {
 		if ((selected > -1) && (selected < getCampaign().getServiceableUnits().size())) {
 			servicedUnitTable.setRowSelectionInterval(selected, selected);
 		}
+		refreshRating();
 	}
 	
 	public void refreshPersonnelList() {
 		personModel.setData(getCampaign().getPersonnel());
+		refreshRating();
 	}
 	
 	public void changeMission() {
@@ -2976,6 +2981,7 @@ public class CampaignGUI extends JPanel {
 	public void refreshUnitList() {
 		unitModel.setData(getCampaign().getUnits());
 		refreshLab();
+		refreshRating();
 	}
 
 	public void refreshTaskList() {
@@ -2999,6 +3005,7 @@ public class CampaignGUI extends JPanel {
 			choiceMission.setSelectedIndex(0);
 		}
 		changeMission();
+		refreshRating();
 	}
 	
 	public void refreshLab() {
@@ -3054,6 +3061,7 @@ public class CampaignGUI extends JPanel {
 	public void refreshFinancialTransactions() {
 		financeModel.setData(getCampaign().getFinances().getAllTransactions());
 		refreshFunds();
+		refreshRating();
 	}
 
 	public void refreshCalendar() {
@@ -3072,6 +3080,7 @@ public class CampaignGUI extends JPanel {
 				refreshForceView();
 			}
 		});
+		refreshRating();
 	}
 
 	protected void refreshFunds() {
@@ -3079,6 +3088,15 @@ public class CampaignGUI extends JPanel {
 		NumberFormat numberFormat = NumberFormat.getIntegerInstance();
 		String text = "<html><b>Balance:</b> " + numberFormat.format(funds) + " C-Bills</html>";
 		lblFunds.setText(text);
+	}
+	
+	protected void refreshRating() {
+		if(getCampaign().getCampaignOptions().useDragoonRating()) {
+			String text = "<html><b>Dragoons Rating:</b> " + getCampaign().getDragoonRating() + "</html>";
+			lblRating.setText(text);
+		} else {
+			lblRating.setText("");
+		}
 	}
 	
 	protected void refreshTempAstechs() {
@@ -8126,9 +8144,11 @@ public class CampaignGUI extends JPanel {
     private javax.swing.JLabel lblLocation;
 	// End of variables declaration//GEN-END:variables
 
+    private javax.swing.JLabel lblRating;
 	private javax.swing.JLabel lblFunds;
 	private javax.swing.JLabel lblTempAstechs;
 	private javax.swing.JLabel lblTempMedics;
+	
 
 	private JDialog aboutBox;
 }

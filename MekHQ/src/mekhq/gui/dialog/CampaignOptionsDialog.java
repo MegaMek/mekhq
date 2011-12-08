@@ -113,6 +113,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         
         // Rules panel
         useFactionModifiersCheckBox.setSelected(options.useFactionModifiers());
+        useDragoonRatingCheckBox.setSelected(options.useDragoonRating());
         clanPriceModifierJFormattedTextField.setValue(options.getClanPriceModifier());
         useFactionForNamesBox.setSelected(options.useFactionForNames());
         useTacticsBox.setSelected(options.useTactics());
@@ -174,6 +175,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panAbilityXP = new javax.swing.JPanel();
         panTech = new javax.swing.JPanel();
         useFactionModifiersCheckBox = new javax.swing.JCheckBox();
+        useDragoonRatingCheckBox = new javax.swing.JCheckBox();
         javax.swing.JLabel clanPriceModifierLabel = new javax.swing.JLabel();
         DecimalFormat numberFormat = (DecimalFormat) DecimalFormat.getInstance();
         numberFormat.setMaximumFractionDigits(2);
@@ -262,7 +264,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         lblDate.setName("lblDate"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panGeneral.add(lblDate, gridBagConstraints);
 
@@ -277,7 +279,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panGeneral.add(btnDate, gridBagConstraints);
 
@@ -301,6 +303,16 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panGeneral.add(comboFaction, gridBagConstraints);
 
+        useDragoonRatingCheckBox.setText(resourceMap.getString("useDragoonRatingCheckBox.text")); // NOI18N
+        useDragoonRatingCheckBox.setName("useDragoonRatingCheckBox"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panGeneral.add(useDragoonRatingCheckBox, gridBagConstraints);
+        
         btnCamo.setMaximumSize(new java.awt.Dimension(84, 72));
         btnCamo.setMinimumSize(new java.awt.Dimension(84, 72));
         btnCamo.setName("btnCamo"); // NOI18N
@@ -312,7 +324,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panGeneral.add(btnCamo, gridBagConstraints);
 
@@ -320,7 +332,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         lblCamo.setName("lblCamo"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panGeneral.add(lblCamo, gridBagConstraints);
 
@@ -1205,6 +1217,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 	    options.setFactionModifiers(useFactionModifiersCheckBox.isSelected());
 	    String clanPriceModifierString = clanPriceModifierJFormattedTextField.getText();
 	    options.setClanPriceModifier(new Double(clanPriceModifierString));
+	    options.setDragoonRating(useDragoonRatingCheckBox.isSelected());
 	    options.setFactionForNames(useFactionForNamesBox.isSelected());
 	    options.setTactics(useTacticsBox.isSelected());
 	    if(useTacticsBox.isSelected()) {
@@ -1575,6 +1588,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private javax.swing.JTabbedPane tabOptions;
     private javax.swing.JTextField txtName;
     private javax.swing.JCheckBox useFactionModifiersCheckBox;
+    private javax.swing.JCheckBox useDragoonRatingCheckBox;
     private javax.swing.JCheckBox useFactionForNamesBox;
     private javax.swing.JCheckBox useTacticsBox;
     private javax.swing.JCheckBox useInitBonusBox;

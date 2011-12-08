@@ -225,6 +225,11 @@ public class SkillType implements Serializable {
 		return EXP_ULTRA_GREEN;
 	}
 	
+	public int getExperienceLevelFromTarget(int tgt) {
+		int level = target - tgt;
+		return getExperienceLevel(level);
+	}
+	
 	public static void initializeTypes() {
 		lookupHash = new Hashtable<String, SkillType>();
 		lookupHash.put(S_PILOT_MECH, createPilotingMech());

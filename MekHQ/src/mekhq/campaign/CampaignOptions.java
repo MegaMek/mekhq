@@ -50,6 +50,7 @@ public class CampaignOptions implements Serializable {
     private double clanPriceModifier;
     private boolean useFactionForNames;
     private int repairSystem;
+    private boolean useDragoonRating;
     
     //personnel related
     private boolean useTactics;
@@ -90,6 +91,7 @@ public class CampaignOptions implements Serializable {
         clanPriceModifier = 1.0;
         useFactionForNames = true;
         repairSystem = REPAIR_SYSTEM_STRATOPS;    
+        useDragoonRating = true;
         useTactics = false;
         useInitBonus = false;
         useToughness = false;
@@ -139,6 +141,14 @@ public class CampaignOptions implements Serializable {
     
     public void setFactionModifiers(boolean b) {
         this.useFactionModifiers = b;
+    }
+    
+    public boolean useDragoonRating() {
+        return useDragoonRating;
+    }
+    
+    public void setDragoonRating(boolean b) {
+        this.useDragoonRating = b;
     }
   
     public double getClanPriceModifier() {
@@ -363,6 +373,7 @@ public class CampaignOptions implements Serializable {
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "clanPriceModifier", clanPriceModifier); //private double clanPriceModifier;
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useFactionForNames", useFactionForNames); //private boolean useFinances;
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "repairSystem", repairSystem); //private int repairSystem;
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useDragoonRating", useDragoonRating); 
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useTactics", useTactics);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useInitBonus", useInitBonus);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useToughness", useToughness);
@@ -532,7 +543,12 @@ public class CampaignOptions implements Serializable {
 					retVal.allowCanonOnly = false;
 			} else if (wn2.getNodeName().equalsIgnoreCase("techLevel")) {
 				retVal.techLevel = Integer.parseInt(wn2.getTextContent().trim());
-			} 
+			} else if (wn2.getNodeName().equalsIgnoreCase("useDragoonRating")) {
+				if (wn2.getTextContent().equalsIgnoreCase("true"))
+					retVal.useDragoonRating = true;
+				else
+					retVal.useDragoonRating = false;
+			}
 		}
 
 		MekHQ.logMessage("Load Campaign Options Complete!", 4);

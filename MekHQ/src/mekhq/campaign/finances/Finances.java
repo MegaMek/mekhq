@@ -55,6 +55,10 @@ public class Finances implements Serializable {
 		return balance;
 	}
 	
+	public boolean isInDebt() {
+		return getBalance() < 0;
+	}
+	
 	public void debit(long amount, int category, String reason, Date date) {
 		transactions.add(new Transaction(-1 * amount, category, reason, date));
 	}
