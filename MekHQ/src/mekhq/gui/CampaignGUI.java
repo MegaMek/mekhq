@@ -447,7 +447,7 @@ public class CampaignGUI extends JPanel {
 		tabMain.setMinimumSize(new java.awt.Dimension(600, 200));
 		tabMain.setName("tabMain"); // NOI18N
 		tabMain.setPreferredSize(new java.awt.Dimension(900, 300));
-
+		
 		panOrganization.setName("panOrganization"); // NOI18N
 		panOrganization.setLayout(new java.awt.GridBagLayout());
 		

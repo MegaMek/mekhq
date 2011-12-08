@@ -162,7 +162,7 @@ public class JSuggestField extends JTextField {
 					setText("");
 				}
 				
-				showSuggest();
+				//showSuggest();
 			}
 		});
 		d = new JDialog(owner);
