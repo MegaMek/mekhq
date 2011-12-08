@@ -111,7 +111,7 @@ public class CampaignOptions implements Serializable {
         limitByYear = true;
         allowClanPurchases = true;
         allowISPurchases = true;
-        allowCanonOnly = true;
+        allowCanonOnly = false;
         techLevel = TECH_EXPERIMENTAL;
         scenarioXP = 1;
         killsForXP = 0;
