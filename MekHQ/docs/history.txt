@@ -21,6 +21,7 @@ v0.1.11 (SVN)
 + new unit right-menu item to hire all missing personnel
 + Bug: not able to customize units in MM because artillery skill outside 0-8 range by default
 + Dragoons Rating (no support rating though)
++ approximation to support rating for Dragoons rating (waiting on StellarOps for final word)
 
 v0.1.10 (2011-12-05)
 + beginnings of a proper splash and loading screen

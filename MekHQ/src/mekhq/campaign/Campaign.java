@@ -3309,8 +3309,6 @@ public class Campaign implements Serializable {
     	}
     	
     	//commander rating
-
- 		//sort person vector by rank
  		Collections.sort(commanders, new Comparator<Person>(){		 
             public int compare(final Person p1, final Person p2) {
                return ((Comparable<Integer>)p2.getRank()).compareTo(p1.getRank());
@@ -3356,6 +3354,46 @@ public class Campaign implements Serializable {
     		}
     	}
     	
+    	//support rating
+    	//TODO: this is a bit tricky because the role of astechs changed and we 
+    	//dont know what the role of admins will be in the StellarOps
+    	//for now just look at the percentage of units that could have a dedicated 
+    	//tech
+    	double tMech = 0;
+    	double tAero = 0;
+    	double tVee = 0;
+    	double tBA = 0;
+    	for(Person p : getTechs()) {
+    		if(p.getPrimaryRole() == Person.T_MECH_TECH) {
+    			tMech++;
+    		}
+    		if(p.getPrimaryRole() == Person.T_AERO_TECH) {
+    			tAero++;
+    		}
+    		if(p.getPrimaryRole() == Person.T_MECHANIC) {
+    			tVee++;
+    		}
+    		if(p.getPrimaryRole() == Person.T_BA_TECH) {
+    			tBA++;
+    		}
+    		if(p.getSecondaryRole() == Person.T_MECH_TECH) {
+    			tMech += 0.5;
+    		}
+    		if(p.getSecondaryRole() == Person.T_AERO_TECH) {
+    			tAero += 0.5;
+    		}
+    		if(p.getSecondaryRole() == Person.T_MECHANIC) {
+    			tVee += 0.5;
+    		}
+    		if(p.getSecondaryRole() == Person.T_BA_TECH) {
+    			tBA += 0.5;
+    		}
+    	}
+    	
+    	double supportNeeds = Math.max(nMech-tMech,0)+Math.max(nAero-tAero, 0)+Math.max(nVee-tVee, 0)+Math.max(nBA, tBA); 
+		double pctSupport = 100 * Math.min(1.0, 1.0 - supportNeeds/(nMech+nAero+nVee+nBA));
+    	score += 5 * Math.floor(Math.max(0, pctSupport-60)/10.0);
+
     	//TODO: transportation rating		
 		for(Unit u : getUnits()) {
 			if(!u.isRepairable()) {
@@ -3402,8 +3440,6 @@ public class Campaign implements Serializable {
     	//Technology rating
     	double pctTech = 100 * (nUnitsIS2 + 2 * nUnitsClan)/nUnits;
     	score += 5 * Math.floor(Math.max(0, pctTech-30)/10.0);
-    	
-    	//TODO: support rating
     	
     	//financial rating
     	//TODO: account for years in debt
