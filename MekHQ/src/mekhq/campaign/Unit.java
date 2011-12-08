@@ -1727,6 +1727,12 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     		entity.setCrew(null);
     		return;
     	}
+    	//TODO: For the moment we need to max these out at 8 so people don't get errors
+    	//when the customize in MM but we should put an option in MM to ignore those limits
+    	//and set it to true when we start up through MHQ
+    	gunnery = Math.min(gunnery, 8);
+    	piloting = Math.min(piloting, 8);
+    	artillery = Math.min(artillery, 8);
     	Pilot pilot = new Pilot(commander.getFullTitle(), gunnery, piloting);
     	pilot.setPortraitCategory(commander.getPortraitCategory());
     	pilot.setPortraitFileName(commander.getPortraitFileName());

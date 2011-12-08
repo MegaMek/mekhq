@@ -19,6 +19,7 @@ v0.1.11 (SVN)
 + Bug: armor being charged even if parts not paid for
 + Bug: gunnery and piloting not rounding correctly for multiple personnel units
 + new unit right-menu item to hire all missing personnel
++ Bug: not able to customize units in MM because artillery skill outside 0-8 range by default
 
 v0.1.10 (2011-12-05)
 + beginnings of a proper splash and loading screen
