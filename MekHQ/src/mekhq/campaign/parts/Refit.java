@@ -1360,4 +1360,16 @@ public class Refit implements IPartWork, IAcquisitionWork {
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public boolean isClanTechBase() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public int getTechLevel() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 }

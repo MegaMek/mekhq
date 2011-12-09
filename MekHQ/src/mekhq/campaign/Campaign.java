@@ -2903,6 +2903,15 @@ public class Campaign implements Serializable {
 		if(acquisition.hasCheckedToday()) {
 			return new TargetRoll(TargetRoll.IMPOSSIBLE, "Already checked for this part in this cycle");
 		}	
+		if(acquisition.isClanTechBase() && !getCampaignOptions().allowClanPurchases()) {
+			return new TargetRoll(TargetRoll.IMPOSSIBLE, "You cannot acquire clan parts");
+		}
+		if(!acquisition.isClanTechBase() && !getCampaignOptions().allowISPurchases()) {
+			return new TargetRoll(TargetRoll.IMPOSSIBLE, "You cannot acquire inner sphere parts");
+		}
+		if(getCampaignOptions().getTechLevel() < (Integer.parseInt(TechConstants.T_SIMPLE_LEVEL[acquisition.getTechLevel()])-2)) {
+			return new TargetRoll(TargetRoll.IMPOSSIBLE, "You cannot acquire parts of this tech level");
+		}
 		TargetRoll target = new TargetRoll(skill.getFinalSkillValue(), SkillType.getExperienceLevelName(skill.getExperienceLevel()));//person.getTarget(Modes.MODE_NORMAL);
 		target.append(acquisition.getAllAcquisitionMods());
 		return target;

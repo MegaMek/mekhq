@@ -51,4 +51,8 @@ public interface IAcquisitionWork extends IWork {
 	
 	public TargetRoll getAllAcquisitionMods();
 	
+	public boolean isClanTechBase();
+	
+	public int getTechLevel();
+	
 }

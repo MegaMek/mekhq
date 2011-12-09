@@ -212,7 +212,6 @@ public class PartsStoreDialog extends javax.swing.JDialog {
         	public boolean include(Entry<? extends PartsTableModel, ? extends Integer> entry) {
         		PartsTableModel partsModel = entry.getModel();
         		Part part = partsModel.getPartAt(entry.getIdentifier());
-        		//TODO: this should be in the partsstoredialog filter, not here
     			if(part.isClanTechBase() && !campaign.getCampaignOptions().allowClanPurchases()) {
     				return false;
     			}
