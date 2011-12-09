@@ -96,7 +96,7 @@ public class EnginePart extends Part {
 	}
 
 	@Override
-	public int getTech() {
+	public int getTechLevel() {
 		if (getEngine().getTechType() < 0
 				|| getEngine().getTechType() >= TechConstants.SIZE)
 			return TechConstants.T_IS_TW_NON_BOX;

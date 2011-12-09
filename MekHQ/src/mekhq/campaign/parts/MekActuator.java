@@ -27,6 +27,7 @@ import megamek.common.BipedMech;
 import megamek.common.CriticalSlot;
 import megamek.common.EquipmentType;
 import megamek.common.Mech;
+import megamek.common.TechConstants;
 import mekhq.campaign.MekHqXmlUtil;
 
 import org.w3c.dom.Node;
@@ -187,6 +188,11 @@ public class MekActuator extends Part {
 	@Override
 	public int getTechBase() {
 		return T_BOTH;
+	}
+	
+	@Override
+	public int getTechLevel() {
+		return TechConstants.T_INTRO_BOXSET;
 	}
 
 	@Override

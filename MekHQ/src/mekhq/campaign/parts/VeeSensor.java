@@ -25,6 +25,7 @@ import java.io.PrintWriter;
 
 import megamek.common.EquipmentType;
 import megamek.common.Tank;
+import megamek.common.TechConstants;
 
 import org.w3c.dom.Node;
 
@@ -72,6 +73,11 @@ public class VeeSensor extends Part {
 	@Override
 	public int getTechRating() {
 		return EquipmentType.RATING_C;
+	}
+
+    @Override
+	public int getTechLevel() {
+		return TechConstants.T_INTRO_BOXSET;
 	}
 
 	@Override

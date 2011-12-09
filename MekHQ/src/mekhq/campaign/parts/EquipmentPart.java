@@ -18,7 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
@@ -174,7 +173,7 @@ public class EquipmentPart extends Part {
     }
 
     @Override
-    public int getTech() {
+    public int getTechLevel() {
         if (getType().getTechLevel() < 0 || getType().getTechLevel() >= TechConstants.SIZE)
             return TechConstants.T_IS_TW_NON_BOX;
         else

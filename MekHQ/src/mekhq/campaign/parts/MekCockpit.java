@@ -27,6 +27,7 @@ import megamek.common.CriticalSlot;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Mech;
+import megamek.common.TechConstants;
 import mekhq.campaign.MekHqXmlUtil;
 
 import org.w3c.dom.Node;
@@ -85,6 +86,18 @@ public class MekCockpit extends Part {
 		}
 	}
 
+	@Override
+	public int getTechLevel() {
+		switch (type) {
+        case Mech.COCKPIT_COMMAND_CONSOLE:
+            return TechConstants.T_IS_ADVANCED;
+        case Mech.COCKPIT_TORSO_MOUNTED:
+            return TechConstants.T_IS_EXPERIMENTAL;
+        default:
+            return TechConstants.T_IS_TW_NON_BOX;
+		}
+	}
+	
     @Override
     public boolean isSamePartTypeAndStatus (Part part) {
     	if(needsFixing() || part.needsFixing()) {

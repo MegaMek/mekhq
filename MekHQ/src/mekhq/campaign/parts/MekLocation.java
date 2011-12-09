@@ -28,6 +28,7 @@ import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
 import megamek.common.Mech;
 import megamek.common.Mounted;
+import megamek.common.TechConstants;
 import mekhq.campaign.MekHqXmlUtil;
 
 import org.w3c.dom.Node;
@@ -267,6 +268,29 @@ public class MekLocation extends Part {
 			return EquipmentType.RATING_C;
 		default:
 			return EquipmentType.RATING_D;
+		}
+		
+	}
+	
+	@Override
+	public int getTechLevel() {
+		switch(structureType) {
+		case EquipmentType.T_STRUCTURE_ENDO_COMPOSITE:
+		case EquipmentType.T_STRUCTURE_REINFORCED:
+		case EquipmentType.T_STRUCTURE_COMPOSITE:
+			return TechConstants.T_IS_EXPERIMENTAL;
+		default:
+			return TechConstants.T_IS_TW_NON_BOX;
+		}
+	}
+	
+	@Override
+	public int getTechBase() {
+		switch(structureType) {
+		case EquipmentType.T_STRUCTURE_COMPOSITE:
+			return T_IS;
+		default:
+			return T_BOTH;
 		}
 		
 	}

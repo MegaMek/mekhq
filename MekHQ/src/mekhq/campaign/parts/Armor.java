@@ -199,7 +199,7 @@ public class Armor extends Part implements IAcquisitionWork {
     }
     
     @Override
-    public int getTech () {
+    public int getTechLevel() {
         // Armor tech base is not used (Clan/IS can use each other's armor for now)
         // TODO Set Tech base correctly for armor
         // Clan FF and IS FF do not have the same armor points per ton

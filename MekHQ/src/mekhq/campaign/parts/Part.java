@@ -288,6 +288,9 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 			return "??";
 		}
 	}
+	
+	abstract public int getTechLevel();
+	
 	/**
 	 * Checks if the current part is exactly the "same kind" of part as the part
 	 * given in argument. It only returns true for undamaged parts. Damaged parts
@@ -310,13 +313,8 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	}
 
     public boolean isClanTechBase() {
-        return TechConstants.isClan(getTech());
+        return TechConstants.isClan(getTechLevel());
     }
-
-	public int getTech() {
-		// By default : IS intro box
-		return TechConstants.T_INTRO_BOXSET;
-	}
 
 	public abstract void writeToXml(PrintWriter pw1, int indent, int id);
 	

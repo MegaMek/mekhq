@@ -64,7 +64,7 @@ public class GenericSparePart extends Part {
     }
 
     @Override
-    public int getTech () {
+    public int getTechLevel() {
         return this.tech;
     }
 
@@ -72,7 +72,7 @@ public class GenericSparePart extends Part {
     public boolean isSamePartTypeAndStatus (Part part) {
         return part instanceof GenericSparePart
                 && getName().equals(part.getName())
-                && ((GenericSparePart) part).getTech() == getTech();
+                && ((GenericSparePart) part).getTechLevel() == getTechLevel();
     }
 
     @Override

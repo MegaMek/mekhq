@@ -25,6 +25,7 @@ import java.io.PrintWriter;
 
 import megamek.common.EquipmentType;
 import megamek.common.Tank;
+import megamek.common.TechConstants;
 import mekhq.campaign.MekHqXmlUtil;
 
 import org.w3c.dom.Node;
@@ -71,6 +72,11 @@ public class MotiveSystem extends Part {
 	public long getStickerPrice() {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+	
+    @Override
+	public int getTechLevel() {
+		return TechConstants.T_INTRO_BOXSET;
 	}
 
 	@Override

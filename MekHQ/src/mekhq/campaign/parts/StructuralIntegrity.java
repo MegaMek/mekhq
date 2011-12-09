@@ -28,6 +28,7 @@ import megamek.common.ConvFighter;
 import megamek.common.Dropship;
 import megamek.common.EquipmentType;
 import megamek.common.SmallCraft;
+import megamek.common.TechConstants;
 import mekhq.campaign.MekHqXmlUtil;
 
 import org.w3c.dom.Node;
@@ -95,6 +96,11 @@ public class StructuralIntegrity extends Part {
 			}
 		}
 		return 0;
+	}
+	
+    @Override
+	public int getTechLevel() {
+		return TechConstants.T_INTRO_BOXSET;
 	}
 
 	@Override

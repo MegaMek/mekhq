@@ -25,6 +25,7 @@ import java.io.PrintWriter;
 
 import megamek.common.EquipmentType;
 import megamek.common.Tank;
+import megamek.common.TechConstants;
 
 import org.w3c.dom.Node;
 
@@ -58,6 +59,11 @@ public class TurretLock extends Part {
 	@Override
 	public long getStickerPrice() {
 		return 0;
+	}
+	
+    @Override
+	public int getTechLevel() {
+		return TechConstants.T_INTRO_BOXSET;
 	}
 
 	@Override

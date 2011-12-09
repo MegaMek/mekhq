@@ -128,14 +128,6 @@ public class MissingEquipmentPart extends MissingPart {
     }
 
     @Override
-    public int getTech () {
-        if (getType().getTechLevel() < 0 || getType().getTechLevel() >= TechConstants.SIZE)
-            return TechConstants.T_IS_TW_NON_BOX;
-        else
-            return getType().getTechLevel();
-    }
-
-    @Override
 	public void writeToXml(PrintWriter pw1, int indent, int id) {
 		writeToXmlBegin(pw1, indent, id);		
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)

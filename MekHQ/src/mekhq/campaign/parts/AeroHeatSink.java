@@ -183,7 +183,7 @@ public class AeroHeatSink extends Part {
 	}
 	
 	@Override
-	public int getTech() {
+	public int getTechLevel() {
 		return TechConstants.T_IS_TW_ALL;
 	}
 	

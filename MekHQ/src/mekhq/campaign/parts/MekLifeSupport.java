@@ -27,6 +27,7 @@ import megamek.common.CriticalSlot;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Mech;
+import megamek.common.TechConstants;
 
 import org.w3c.dom.Node;
 
@@ -100,6 +101,11 @@ public class MekLifeSupport extends Part {
 		return EquipmentType.RATING_C;
 	}
 
+	@Override
+	public int getTechLevel() {
+		return TechConstants.T_INTRO_BOXSET;
+	}
+	
 	@Override
 	public void fix() {
 		super.fix();

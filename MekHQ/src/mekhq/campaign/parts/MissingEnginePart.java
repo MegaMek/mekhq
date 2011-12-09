@@ -88,15 +88,6 @@ public class MissingEnginePart extends MissingPart {
 	}
 
 	@Override
-	public int getTech() {
-		if (getEngine().getTechType() < 0
-				|| getEngine().getTechType() >= TechConstants.SIZE)
-			return TechConstants.T_IS_TW_NON_BOX;
-		else
-			return getEngine().getTechType();
-	}
-
-	@Override
 	public void writeToXml(PrintWriter pw1, int indent, int id) {
 		writeToXmlBegin(pw1, indent, id);
 		// The engine is a MM object...

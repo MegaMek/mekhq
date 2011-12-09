@@ -47,6 +47,7 @@ import javax.swing.table.TableRowSorter;
 
 import megamek.common.AmmoType;
 import megamek.common.MiscType;
+import megamek.common.TechConstants;
 import megamek.common.WeaponType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.PartInventory;
@@ -112,6 +113,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
         formatter = new DecimalFormat();
         partsModel = new PartsTableModel(campaign.getPartsStore().getInventory(campaign));
         initComponents();
+        filterParts();
         setLocationRelativeTo(frame);
     }
 
@@ -210,6 +212,17 @@ public class PartsStoreDialog extends javax.swing.JDialog {
         	public boolean include(Entry<? extends PartsTableModel, ? extends Integer> entry) {
         		PartsTableModel partsModel = entry.getModel();
         		Part part = partsModel.getPartAt(entry.getIdentifier());
+        		//TODO: this should be in the partsstoredialog filter, not here
+    			if(part.isClanTechBase() && !campaign.getCampaignOptions().allowClanPurchases()) {
+    				return false;
+    			}
+    			if(!part.isClanTechBase() && !campaign.getCampaignOptions().allowISPurchases()) {
+    				return false;
+    			}
+    			if(campaign.getCampaignOptions().getTechLevel() < (Integer.parseInt(TechConstants.T_SIMPLE_LEVEL[part.getTechLevel()])-2)) {
+    				return false;
+    			}
+    			//TODO: limit by year
         		if(nGroup == SG_ALL) {
         			return true;
         		} else if(nGroup == SG_ARMOR) {

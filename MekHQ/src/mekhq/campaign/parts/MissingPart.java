@@ -315,5 +315,10 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 	public String getAcquisitionName() {
 		return getPartName();
 	}
+	
+	@Override
+	public int getTechLevel() {
+		return getNewPart().getTechLevel();
+	}
 }
 

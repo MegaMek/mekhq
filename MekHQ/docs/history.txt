@@ -1,6 +1,9 @@
 VERSION HISTORY
 ----------------------------------
-v0.1.11 (SVN)
+v0.1.12 (SVN)
++ restrict parts store by tech limits
+
+v0.1.11 (2011-12-09)
 + options to limit unit purchases by year, canonicity and type (Clan/IS)
 + changed layout of UnitSelectorDialog
 + "All" weight class option in UnitSelectorDialog

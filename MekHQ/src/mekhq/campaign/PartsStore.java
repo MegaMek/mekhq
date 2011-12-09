@@ -86,14 +86,6 @@ public class PartsStore implements Serializable {
 		Iterator<Part> itParts = parts.iterator();
 		while (itParts.hasNext()) {
 			Part part = itParts.next();
-			if(part.isClanTechBase() && !c.getCampaignOptions().allowClanPurchases()) {
-				continue;
-			}
-			if(!part.isClanTechBase() && !c.getCampaignOptions().allowISPurchases()) {
-				continue;
-			}
-			//TODO: limit by tech class (experimental, advanced)
-			//TODO: limit by year
 			partsInventory.add(new PartInventory(part, 1));
 		}
 
