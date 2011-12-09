@@ -1398,7 +1398,7 @@ public class CampaignGUI extends JPanel {
 
 		patientTable.setModel(patientModel);
 		patientTable.setName("PersonTable"); // NOI18N
-		patientTable.setRowHeight(80);
+		patientTable.setRowHeight(60);
 		patientTable.getColumnModel().getColumn(0)
 				.setCellRenderer(patientModel.getRenderer());
 		patientTable.getSelectionModel().addListSelectionListener(
@@ -4464,39 +4464,6 @@ public class CampaignGUI extends JPanel {
 		         listeners.removeElement( listener );
 		      }
 		   }
-/*
-		   public void fireTreeNodesChanged( TreeModelEvent e ) {
-		      Enumeration<TreeModelListener> listeners = listeners.elements();
-		      while ( listeners.hasMoreElements() ) {
-		         TreeModelListener listener = (TreeModelListener)listeners.nextElement();
-		         listener.treeNodesChanged( e );
-		      }
-		   }
-
-		   public void fireTreeNodesInserted( TreeModelEvent e ) {
-		      Enumeration listeners = vector.elements();
-		      while ( listeners.hasMoreElements() ) {
-		         TreeModelListener listener = (TreeModelListener)listeners.nextElement();
-		         listener.treeNodesInserted( e );
-		      }
-		   }
-
-		   public void fireTreeNodesRemoved( TreeModelEvent e ) {
-		      Enumeration listeners = vector.elements();
-		      while ( listeners.hasMoreElements() ) {
-		         TreeModelListener listener = (TreeModelListener)listeners.nextElement();
-		         listener.treeNodesRemoved( e );
-		      }
-		   }
-
-		   public void fireTreeStructureChanged( TreeModelEvent e ) {
-		      Enumeration listeners = vector.elements();
-		      while ( listeners.hasMoreElements() ) {
-		         TreeModelListener listener = (TreeModelListener)listeners.nextElement();
-		         listener.treeStructureChanged( e );
-		      }
-		   }
-	*/	
 	}
 	
 	public class OrgTreeMouseAdapter extends MouseInputAdapter implements
@@ -4851,20 +4818,23 @@ public class CampaignGUI extends JPanel {
         	if ((null == category) || (null == file) || Pilot.PORTRAIT_NONE.equals(file)) {
         		file = "default.gif";
         	}
-
         	// Try to get the player's portrait file.
-        	Image portrait = null;
-        	try {
-        		portrait = (Image) getPortraits().getItem(category, file);
-        		//make sure no images are longer than 50 pixels
-            	 if(null != portrait && portrait.getHeight(this) > 50) {
-            		 portrait = portrait.getScaledInstance(-1, 50, Image.SCALE_DEFAULT);               
-            	 }
-            	 return new ImageIcon(portrait);
-             } catch (Exception err) {
-            	 err.printStackTrace();
-            	 return null;     	
-             }
+            Image portrait = null;
+            try {
+                portrait = (Image) getPortraits().getItem(category, file);
+                if(null != portrait) {
+                    portrait = portrait.getScaledInstance(50, -1, Image.SCALE_DEFAULT);               
+                } else {
+                	portrait = (Image) getPortraits().getItem("", "default.gif");
+                	if(null != portrait) {
+                        portrait = portrait.getScaledInstance(50, -1, Image.SCALE_DEFAULT);               
+                	}
+                }
+                return new ImageIcon(portrait);
+            } catch (Exception err) {
+                err.printStackTrace();
+                return null;
+            }
         }
         
         protected Icon getIconFrom(Force force) {
@@ -7860,11 +7830,15 @@ public class CampaignGUI extends JPanel {
 	        Image portrait = null;
 	        try {
 	            portrait = (Image) portraits.getItem(category, file);
-	            //make sure no images are longer than 72 pixels
 	            if(null != portrait) {
-	                portrait = portrait.getScaledInstance(-1, 65, Image.SCALE_DEFAULT);
-	                this.setImage(portrait);
+	                portrait = portrait.getScaledInstance(60, -1, Image.SCALE_DEFAULT);               
+	            } else {
+	            	portrait = (Image) portraits.getItem("", "default.gif");
+	            	if(null != portrait) {
+	                    portrait = portrait.getScaledInstance(60, -1, Image.SCALE_DEFAULT);               
+	            	}
 	            }
+                this.setImage(portrait);
 	        } catch (Exception err) {
 	            err.printStackTrace();
 	        }

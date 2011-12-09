@@ -473,9 +473,13 @@ public class ForceViewPanel extends javax.swing.JPanel {
         Image portrait = null;
         try {
             portrait = (Image) portraits.getItem(category, file);
-            //make sure no images are longer than 72 pixels
             if(null != portrait) {
                 portrait = portrait.getScaledInstance(72, -1, Image.SCALE_DEFAULT);               
+            } else {
+            	portrait = (Image) portraits.getItem("", "default.gif");
+            	if(null != portrait) {
+                    portrait = portrait.getScaledInstance(72, -1, Image.SCALE_DEFAULT);               
+            	}
             }
             lbl.setIcon(new ImageIcon(portrait));
         } catch (Exception err) {
