@@ -40,6 +40,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.RowFilter;
 import javax.swing.SwingConstants;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
@@ -100,6 +102,8 @@ public class PartsStoreDialog extends javax.swing.JDialog {
     private JTable partsTable;
     private JScrollPane scrollPartsTable;
     private JPanel panFilter;
+    private JLabel lblFilter;
+    private javax.swing.JTextField txtFilter;
     private JComboBox choiceParts;
 	private JLabel lblPartsChoice;
     private JPanel panButtons;
@@ -172,8 +176,36 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 		c.gridx = 1;
 		c.weightx = 1.0;
 		panFilter.add(choiceParts, c);
-		getContentPane().add(panFilter, BorderLayout.PAGE_START);
 		
+		lblFilter = new JLabel(resourceMap.getString("lblFilter.text")); // NOI18N
+        lblFilter.setName("lblFilter"); // NOI18N
+        c.gridx = 0;
+        c.gridy = 1;
+		c.weightx = 0.0;
+		panFilter.add(lblFilter, c);
+        txtFilter = new javax.swing.JTextField();
+        txtFilter.setText(""); // NOI18N
+        txtFilter.setMinimumSize(new java.awt.Dimension(200, 28));
+        txtFilter.setName("txtFilter"); // NOI18N
+        txtFilter.setPreferredSize(new java.awt.Dimension(200, 28));
+        txtFilter.getDocument().addDocumentListener(
+            new DocumentListener() {
+                public void changedUpdate(DocumentEvent e) {
+                    filterParts();
+                }
+                public void insertUpdate(DocumentEvent e) {
+                    filterParts();
+                }
+                public void removeUpdate(DocumentEvent e) {
+                    filterParts();
+                }
+            });
+        c.gridx = 1;
+        c.gridy = 1;
+		c.weightx = 1.0;
+		panFilter.add(txtFilter, c);
+		getContentPane().add(panFilter, BorderLayout.PAGE_START);
+
 		panButtons = new JPanel();
 		btnAdd = new JButton(resourceMap.getString("btnAdd.text"));
 		btnAdd.addActionListener(new java.awt.event.ActionListener() {
@@ -217,6 +249,9 @@ public class PartsStoreDialog extends javax.swing.JDialog {
         	public boolean include(Entry<? extends PartsTableModel, ? extends Integer> entry) {
         		PartsTableModel partsModel = entry.getModel();
         		Part part = partsModel.getPartAt(entry.getIdentifier());
+        		if(txtFilter.getText().length() > 0 && !part.getName().toLowerCase().contains(txtFilter.getText().toLowerCase())) {
+                    return false;
+                }
     			if(part.isClanTechBase() && !campaign.getCampaignOptions().allowClanPurchases()) {
     				return false;
     			}
