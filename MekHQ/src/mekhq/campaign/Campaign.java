@@ -3228,7 +3228,7 @@ public class Campaign implements Serializable {
     	
     }
     
-    public int calculateDragoonRating() {
+    private int calculateDragoonRatingScore() {
     	
     	int score = 0;
     	
@@ -3455,7 +3455,10 @@ public class Campaign implements Serializable {
     	if(getFinances().isInDebt()) {
     		score -= 10;
     	}
-    	
+    	return score;
+    }
+    
+    public static int getDragoonRating(int score) {
     	if(score < 0) {
     		return DRAGOON_F;
     	}
@@ -3496,7 +3499,8 @@ public class Campaign implements Serializable {
     }
     
     public String getDragoonRating() {
-    	return getDragoonRatingName(calculateDragoonRating());
+    	int score = calculateDragoonRatingScore();
+    	return getDragoonRatingName(getDragoonRating(score)) + " (" + score + ")";
     }
     
 }

@@ -63,6 +63,10 @@ import mekhq.campaign.parts.MekSensor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.TankLocation;
 import mekhq.gui.CampaignGUI;
+import mekhq.gui.CampaignGUI.FormattedNumberSorter;
+import mekhq.gui.CampaignGUI.UnitStatusSorter;
+import mekhq.gui.CampaignGUI.UnitTableModel;
+import mekhq.gui.CampaignGUI.WeightClassSorter;
 
 /**
  *
@@ -130,6 +134,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 		partsTable.setName("partsTable"); // NOI18N
 		partsSorter = new TableRowSorter<PartsTableModel>(partsModel);
         partsTable.setRowSorter(partsSorter);
+        partsSorter.setComparator(PartsTableModel.COL_COST, campaignGUI.new FormattedNumberSorter());
 		TableColumn column = null;
         for (int i = 0; i < PartsTableModel.N_COL; i++) {
             column = partsTable.getColumnModel().getColumn(i);
@@ -390,6 +395,11 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 		@Override
 		public boolean isCellEditable(int row, int col) {
 			return false;
+		}
+		
+		@Override
+		public Class<? extends Object> getColumnClass(int c) {
+			return getValueAt(0, c).getClass();
 		}
 
 		public Part getPartAt(int row) {

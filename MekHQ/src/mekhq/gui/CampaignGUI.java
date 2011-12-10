@@ -913,6 +913,7 @@ public class CampaignGUI extends JPanel {
         personnelSorter.setComparator(PersonnelTableModel.COL_SKILL, new LevelSorter());
         personnelSorter.setComparator(PersonnelTableModel.COL_TACTICS, new BonusSorter());
         personnelSorter.setComparator(PersonnelTableModel.COL_TOUGH, new BonusSorter());
+        personnelSorter.setComparator(PersonnelTableModel.COL_SALARY, new FormattedNumberSorter());
         personnelTable.setRowSorter(personnelSorter);
 		personnelTable.addMouseListener(personnelMouseAdapter);
 		personnelTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
@@ -1122,8 +1123,6 @@ public class CampaignGUI extends JPanel {
 		partsTable.setName("partsTable"); // NOI18N
 		partsSorter = new TableRowSorter<PartsTableModel>(partsModel);
         partsSorter.setComparator(PartsTableModel.COL_COST, new FormattedNumberSorter());
-        unitTable.setRowSorter(unitSorter);
-        //personnelSorter.setComparator(PersonnelTableModel.COL_GUN, new SkillSorter());
         partsTable.setRowSorter(partsSorter);
 		column = null;
         for (int i = 0; i < PartsTableModel.N_COL; i++) {
