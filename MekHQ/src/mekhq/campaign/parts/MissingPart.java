@@ -258,7 +258,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 	@Override
 	public String find() {
 		Part newPart = getNewPart();
-		unit.campaign.buyPart(newPart,newPart.getActualValue(unit.campaign));
+		unit.campaign.buyPart(newPart);
 		setCheckedToday(true);
 		return "<font color='green'> part found.</font>";
 	}

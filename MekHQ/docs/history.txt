@@ -7,6 +7,7 @@ v0.1.12 (SVN)
 + type name not being changed on ammo change, leading to a reload item for unit when loading game
 + text filter in parts store
 + no infantry weapons in parts store
++ Bug 3456424: Prices in repair bay
 
 v0.1.11 (2011-12-09)
 + options to limit unit purchases by year, canonicity and type (Clan/IS)
