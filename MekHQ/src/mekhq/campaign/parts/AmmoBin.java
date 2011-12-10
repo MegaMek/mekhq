@@ -145,7 +145,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 				+"</equipmentNum>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<typeName>"
-				+typeName
+				+type.getInternalName()
 				+"</typeName>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<munition>"

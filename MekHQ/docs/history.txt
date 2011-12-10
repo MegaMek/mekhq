@@ -4,6 +4,7 @@ v0.1.12 (SVN)
 + restrict parts store by tech limits
 + restrict acqusitions from repair bay by tech limits
 + fixed sorting issues on some tables (salary on personnel, cost and weight on parts store)
++ type name not being changed on ammo change, leading to a reload item for unit when loading game
 
 v0.1.11 (2011-12-09)
 + options to limit unit purchases by year, canonicity and type (Clan/IS)

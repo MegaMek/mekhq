@@ -189,7 +189,7 @@ public class EquipmentPart extends Part {
 				+"</equipmentNum>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<typeName>"
-				+typeName
+				+type.getInternalName()
 				+"</typeName>");
 		writeToXmlEnd(pw1, indent, id);
 	}
