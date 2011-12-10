@@ -32,6 +32,7 @@ import megamek.common.Engine;
 import megamek.common.EquipmentType;
 import megamek.common.Mech;
 import megamek.common.MiscType;
+import megamek.common.weapons.infantry.InfantryWeapon;
 import mekhq.campaign.parts.AeroHeatSink;
 import mekhq.campaign.parts.AeroSensor;
 import mekhq.campaign.parts.AmmoStorage;
@@ -118,6 +119,8 @@ public class PartsStore implements Serializable {
             	parts.add(new HeatSink(0, et, -1));
 			} else if(et instanceof MiscType && et.hasFlag(MiscType.F_JUMP_JET)) {
 				parts.add(new JumpJet(0, et, -1));
+			} else if (et instanceof InfantryWeapon) {
+				continue;
 			} else {
 				parts.add(new EquipmentPart(0, et, -1));
 			}
