@@ -8,6 +8,7 @@ v0.1.12 (SVN)
 + text filter in parts store
 + no infantry weapons in parts store
 + Bug 3456424: Prices in repair bay
++ Bug: doctor with 25 patients cannot heal them
 
 v0.1.11 (2011-12-09)
 + options to limit unit purchases by year, canonicity and type (Clan/IS)

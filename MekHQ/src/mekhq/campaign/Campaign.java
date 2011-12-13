@@ -768,7 +768,7 @@ public class Campaign implements Serializable {
         if(!medWork.needsFixing()) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, medWork.getPatientName() + " does not require healing.");
         }
-        if(getPatientsFor(doctor)>=25) {
+        if(getPatientsFor(doctor)>25) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, doctor.getName() + " already has 25 patients.");
         }
         TargetRoll target = new TargetRoll(skill.getFinalSkillValue(),SkillType.getExperienceLevelName(skill.getExperienceLevel()));

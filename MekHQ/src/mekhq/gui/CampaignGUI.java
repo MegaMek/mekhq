@@ -3145,6 +3145,7 @@ public class CampaignGUI extends JPanel {
 		Person curPerson = getCampaign().getPerson(currentPatientId);
 		Person doctor = getCampaign().getPerson(currentDoctorId);
 		if (null != curPerson && curPerson.getAssignedTeamId() == -1 && null != doctor 
+				&& getCampaign().getPatientsFor(doctor)<25
 				&& getCampaign().getTargetFor(curPerson, doctor).getValue() != TargetRoll.IMPOSSIBLE) {
 			btnAssignDoc.setEnabled(true);
 		} else {
