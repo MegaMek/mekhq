@@ -1949,8 +1949,8 @@ public class CampaignGUI extends JPanel {
 				CompleteMissionDialog cmd = new CompleteMissionDialog(getFrame(), true, mission);
 				cmd.setVisible(true);
 				if(!mission.isActive()) {
-					if(getCampaign().getActiveMissions().size() > 0) {
-						selectedMission = getCampaign().getActiveMissions().get(0).getId();
+					if(getCampaign().getSortedMissions().size() > 0) {
+						selectedMission = getCampaign().getSortedMissions().get(0).getId();
 					} else {
 						selectedMission = -1;
 					}
@@ -2947,8 +2947,11 @@ public class CampaignGUI extends JPanel {
 	
 	public void changeMission() {
 		int idx = choiceMission.getSelectedIndex();
-		if(idx >= 0 && idx < getCampaign().getActiveMissions().size()) {
-			Mission m = getCampaign().getActiveMissions().get(idx);
+		btnEditMission.setEnabled(false);
+		btnCompleteMission.setEnabled(false);
+		btnAddScenario.setEnabled(false);
+		if(idx >= 0 && idx < getCampaign().getSortedMissions().size()) {
+			Mission m = getCampaign().getSortedMissions().get(idx);
 			if(null != m) {
 				selectedMission = m.getId();		
 				if(m instanceof Contract) {
@@ -2963,7 +2966,11 @@ public class CampaignGUI extends JPanel {
 						scrollMissionView.getVerticalScrollBar().setValue(0);
 					}
 				});
+				btnEditMission.setEnabled(true);
+				btnCompleteMission.setEnabled(m.isActive());
+				btnAddScenario.setEnabled(m.isActive());
 			}
+			
 		} else {
 			selectedMission = -1;
 			scrollMissionView.setViewportView(null);
@@ -2996,14 +3003,18 @@ public class CampaignGUI extends JPanel {
 	
 	public void refreshMissions() {
 		choiceMission.removeAllItems();
-		for(Mission m : getCampaign().getActiveMissions()) {
-			choiceMission.addItem(m.getName());
+		for(Mission m : getCampaign().getSortedMissions()) {
+			String desc = m.getName();
+			if(!m.isActive()) {
+				desc += " (Complete)";
+			}
+			choiceMission.addItem(desc);
 			if(m.getId() == selectedMission) {
 				choiceMission.setSelectedItem(m.getName());
 			}
 		}
-		if(choiceMission.getSelectedIndex() == -1 && getCampaign().getActiveMissions().size() > 0) {
-			selectedMission = getCampaign().getActiveMissions().get(0).getId();
+		if(choiceMission.getSelectedIndex() == -1 && getCampaign().getSortedMissions().size() > 0) {
+			selectedMission = getCampaign().getSortedMissions().get(0).getId();
 			choiceMission.setSelectedIndex(0);
 		}
 		changeMission();
@@ -4666,7 +4677,10 @@ public class CampaignGUI extends JPanel {
 	                if(!force.isDeployed() && force.getAllUnits().size()>0) {
 	                	menu = new JMenu("Deploy Force");
 	                	JMenu missionMenu;
-	                	for(Mission m : getCampaign().getActiveMissions()) {
+	                	for(Mission m : getCampaign().getMissions()) {
+	                		if(!m.isActive()) {
+	                			continue;
+	                		}
 	                		missionMenu = new JMenu(m.getName());
 	                		for(Scenario s : m.getScenarios()) {
 	                			if(s.isCurrent()) {
@@ -4705,7 +4719,10 @@ public class CampaignGUI extends JPanel {
                 	if(!unit.isDeployed()) {
                 		menu = new JMenu("Deploy Unit");
 	                	JMenu missionMenu;
-	                	for(Mission m : getCampaign().getActiveMissions()) {
+	                	for(Mission m : getCampaign().getMissions()) {
+	                		if(!m.isActive()) {
+	                			continue;
+	                		}
 	                		missionMenu = new JMenu(m.getName());
 	                		for(Scenario s : m.getScenarios()) {
 	                			if(s.isCurrent()) {

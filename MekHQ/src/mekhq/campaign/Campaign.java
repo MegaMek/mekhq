@@ -425,14 +425,21 @@ public class Campaign implements Serializable {
 		
 	}
 
-	public ArrayList<Mission> getActiveMissions() {
-		ArrayList<Mission> active = new ArrayList<Mission>();
+	/**
+	 * 
+	 * @return missions arraylist sorted with complete missions at the bottom
+	 */
+	public ArrayList<Mission> getSortedMissions() {
+		ArrayList<Mission> msns = new ArrayList<Mission>();
 		for(Mission m : getMissions()) {
-			if(m.isActive()) {
-				active.add(m);
-			}
+			msns.add(m);
 		}
-		return active;
+		Collections.sort(msns, new Comparator<Mission>(){		 
+            public int compare(final Mission m1, final Mission m2) {
+               return ((Comparable<Boolean>)m2.isActive()).compareTo(m1.isActive());
+            }
+        });
+		return msns;
 	}
 	
 	/**
