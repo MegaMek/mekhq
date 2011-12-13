@@ -27,9 +27,10 @@ import java.util.Date;
 
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Force;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
+import mekhq.campaign.force.Force;
+import mekhq.campaign.force.ForceStub;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -64,6 +65,7 @@ public class Scenario implements Serializable {
 	private ArrayList<Integer> unitIds;
 	private int id = -1;
 	private int missionId;
+	private ForceStub stub;
 	
 	public Scenario() {
 		this(null);
@@ -220,6 +222,14 @@ public class Scenario implements Serializable {
 		unitIds = new ArrayList<Integer>();
 	}
 	
+	public void generateStub(Campaign c) {
+		stub = new ForceStub(getForces(c), c);
+	}
+	
+	public ForceStub getForceStub() {
+		return stub;
+	}
+	
 	public boolean isAssigned(Unit unit, Campaign campaign) {
 		for(int uid : getForces(campaign).getAllUnits()) {
 			if(uid == unit.getId()) {
@@ -255,6 +265,9 @@ public class Scenario implements Serializable {
 				+"<id>"
 				+id
 				+"</id>");
+		if(null != stub) {
+			stub.writeToXml(pw1, indent+1);
+		}
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "</scenario>");
 		
 	}
@@ -285,6 +298,8 @@ public class Scenario implements Serializable {
 					retVal.setDesc(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("report")) {
 					retVal.setReport(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("forceStub")) {
+					retVal.stub = ForceStub.generateInstanceFromXML(wn2);
 				} 
 			}
 		} catch (Exception ex) {

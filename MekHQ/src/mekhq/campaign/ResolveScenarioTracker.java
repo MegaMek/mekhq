@@ -478,6 +478,9 @@ public class ResolveScenarioTracker {
 	
 	public void resolveScenario(int resolution, String report) {
 
+		//lets start by generating a stub file for our records
+		scenario.generateStub(campaign);
+
 		//ok lets do the whole enchilada and go ahead and update campaign
 		
 		//first figure out if we need any battle loss comp

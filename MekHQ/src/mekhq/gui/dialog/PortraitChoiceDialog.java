@@ -11,7 +11,6 @@ import java.awt.Component;
 import java.awt.Image;
 import java.awt.event.ItemEvent;
 import java.awt.event.MouseEvent;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.ResourceBundle;
@@ -23,10 +22,8 @@ import javax.swing.event.MouseInputAdapter;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
 
-import megamek.client.ui.swing.util.ImageFileFactory;
 import megamek.common.Pilot;
 import megamek.common.util.DirectoryItems;
-import mekhq.gui.PortraitFileFactory;
 
 /**
  *

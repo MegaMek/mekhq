@@ -25,7 +25,6 @@ import java.io.PrintWriter;
 
 import megamek.common.AmmoType;
 import megamek.common.CriticalSlot;
-import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Mounted;
 import megamek.common.TechConstants;

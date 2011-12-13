@@ -19,7 +19,7 @@
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq.campaign;
+package mekhq.campaign.force;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
@@ -30,6 +30,9 @@ import java.util.Enumeration;
 import java.util.Vector;
 
 import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.MekHqXmlUtil;
+import mekhq.campaign.Unit;
 import mekhq.campaign.personnel.Person;
 
 import org.w3c.dom.NamedNodeMap;

@@ -137,13 +137,13 @@ import megameklab.com.util.UnitPrintManager;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Force;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.PartInventory;
 import mekhq.campaign.Planet;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.Unit;
 import mekhq.campaign.finances.Transaction;
+import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
@@ -3629,7 +3629,7 @@ public class CampaignGUI extends JPanel {
 		return getApplication().getCampaign();
 	}
 	
-	protected DirectoryItems getPortraits() {
+	public DirectoryItems getPortraits() {
 		return getApplication().getPortraits();
 	}
 	
@@ -3637,7 +3637,7 @@ public class CampaignGUI extends JPanel {
 		return getApplication().getCamos();
 	}
 	
-	protected DirectoryItems getForceIcons() {
+	public DirectoryItems getForceIcons() {
 		return getApplication().getForceIcons();
 	}
 	
@@ -4407,7 +4407,7 @@ public class CampaignGUI extends JPanel {
 			}
 		}
 	}
-
+	
 	public class OrgTreeModel implements TreeModel {
 
 		private Force rootForce;
@@ -4868,6 +4868,7 @@ public class CampaignGUI extends JPanel {
             }
        }
     }	
+	
 	public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
 			ActionListener {
 		

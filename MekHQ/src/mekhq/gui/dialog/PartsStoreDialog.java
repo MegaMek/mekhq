@@ -65,10 +65,6 @@ import mekhq.campaign.parts.MekSensor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.TankLocation;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.CampaignGUI.FormattedNumberSorter;
-import mekhq.gui.CampaignGUI.UnitStatusSorter;
-import mekhq.gui.CampaignGUI.UnitTableModel;
-import mekhq.gui.CampaignGUI.WeightClassSorter;
 
 /**
  *

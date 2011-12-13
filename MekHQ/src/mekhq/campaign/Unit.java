@@ -44,7 +44,6 @@ import megamek.common.Mech;
 import megamek.common.MiscType;
 import megamek.common.Mounted;
 import megamek.common.Pilot;
-import megamek.common.Protomech;
 import megamek.common.QuadMech;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;

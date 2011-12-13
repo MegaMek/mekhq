@@ -26,8 +26,8 @@ import megamek.common.Player;
 import megamek.common.UnitType;
 import megamek.common.util.DirectoryItems;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Force;
 import mekhq.campaign.Unit;
+import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.EntityImage;
 

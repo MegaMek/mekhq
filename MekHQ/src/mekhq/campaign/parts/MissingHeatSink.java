@@ -22,7 +22,6 @@
 package mekhq.campaign.parts;
 
 import megamek.common.EquipmentType;
-import megamek.common.MiscType;
 
 /**
  *

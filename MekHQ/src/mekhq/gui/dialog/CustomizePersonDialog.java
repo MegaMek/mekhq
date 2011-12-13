@@ -6,7 +6,6 @@
 
 package mekhq.gui.dialog;
 
-import java.awt.Cursor;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;

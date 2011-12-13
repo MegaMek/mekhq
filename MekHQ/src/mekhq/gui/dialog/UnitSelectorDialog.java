@@ -44,7 +44,6 @@ import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.dialog.PartsStoreDialog.PartsTableModel;
 
 /**
  *
