@@ -332,17 +332,17 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 	public boolean isRepairable() {
 		if (entity instanceof Mech) {
 			// you can repair anything so long as one point of CT is left
-			if (entity.isLocationBad(Mech.LOC_CT)) {
+			if (entity.getInternal(Mech.LOC_CT) <= 0) {
 				return false;
 			}
 		}
 		if (entity instanceof Tank) {
 			// can't repair a tank with a destroyed location
 			for (int i = 0; i < entity.locations(); i++) {
-				if(i == Tank.LOC_TURRET || i == Tank.LOC_TURRET_2) {
+				if(i == Tank.LOC_TURRET || i == Tank.LOC_TURRET_2 || i == Tank.LOC_BODY) {
 					continue;
 				}
-				if (entity.isLocationBad(i)) {
+				if (entity.getInternal(i) <= 0) {
 					return false;
 				}
 			}
