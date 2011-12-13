@@ -10,6 +10,9 @@ v0.1.12 (SVN)
 + Bug 3456424: Prices in repair bay
 + Bug: doctor with 25 patients cannot heal them
 + Bug: units that should not be repairable sometimes are immediately after scenario
++ personnel in destroyed vees should be wounded or dead
++ personnel filter for conventional infantry
++ allow editing of after action report and status for completed scenarios
 
 v0.1.11 (2011-12-09)
 + options to limit unit purchases by year, canonicity and type (Clan/IS)

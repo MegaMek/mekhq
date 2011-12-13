@@ -211,12 +211,13 @@ public class CampaignGUI extends JPanel {
 	private static final int PG_PILOT =   5;
 	private static final int PG_PROTO =   6;
 	private static final int PG_BA =      7;
-	private static final int PG_TECH =    8;
-	private static final int PG_DOC =     9;
-	private static final int PG_RETIRE =  10;
-	private static final int PG_MIA =     11;
-	private static final int PG_KIA =     12;
-	private static final int PG_NUM =     13;
+	private static final int PG_SOLDIER = 8;
+	private static final int PG_TECH =    9;
+	private static final int PG_DOC =     10;
+	private static final int PG_RETIRE =  11;
+	private static final int PG_MIA =     12;
+	private static final int PG_KIA =     13;
+	private static final int PG_NUM =     14;
 	
 	//parts filter groups
 	private static final int SG_ALL      = 0;
@@ -2273,6 +2274,8 @@ public class CampaignGUI extends JPanel {
     		return "Protomech Pilots";
     	case PG_BA:
     		return "Battle Armor Infantry";
+    	case PG_SOLDIER:
+    		return "Conventional Infantry";
     	case PG_SUPPORT:
     		return "Support Personnel";
     	case PG_TECH:
@@ -3191,14 +3194,15 @@ public class CampaignGUI extends JPanel {
         		Person person = personModel.getPerson(entry.getIdentifier());
         		int type = person.getPrimaryRole();
         		if ((nGroup == PG_ACTIVE) ||
-        				(nGroup == PG_COMBAT && type <= Person.T_BA) ||
-        				(nGroup == PG_SUPPORT && type > Person.T_BA) ||
+        				(nGroup == PG_COMBAT && type <= Person.T_INFANTRY) ||
+        				(nGroup == PG_SUPPORT && type > Person.T_INFANTRY) ||
         				(nGroup == PG_MW && type == Person.T_MECHWARRIOR) ||
         				(nGroup == PG_CREW && (type == Person.T_GVEE_DRIVER || type == Person.T_NVEE_DRIVER || type == Person.T_VTOL_PILOT || type == Person.T_VEE_GUNNER)) ||
         				(nGroup == PG_PILOT && type == Person.T_AERO_PILOT) ||
         				(nGroup == PG_PROTO && type == Person.T_PROTO_PILOT) ||
         				(nGroup == PG_BA && type == Person.T_BA) ||
-        				(nGroup == PG_TECH && type > Person.T_BA && type != Person.T_DOCTOR) ||
+        				(nGroup == PG_SOLDIER && type == Person.T_INFANTRY) ||
+        				(nGroup == PG_TECH && type > Person.T_INFANTRY && type != Person.T_DOCTOR) ||
         				(nGroup == PG_DOC && type == Person.T_DOCTOR)) {
         			return person.isActive();
         		} else if(nGroup == PG_RETIRE) {

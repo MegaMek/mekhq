@@ -294,7 +294,17 @@ public class ResolveScenarioTracker {
 						status.setMissing(true);				
 					} else {
 						if(en instanceof Tank) {
-							if(null == en.getCrew() || en.getCrew().isDead()) {
+							boolean destroyed = false;
+							for(int loc = 0; loc < en.locations(); loc++) {
+								if(loc == Tank.LOC_TURRET || loc == Tank.LOC_TURRET_2 || loc == Tank.LOC_BODY) {
+									continue;
+								}
+								if(en.getInternal(loc) <= 0) {
+									destroyed = true;
+									break;
+								} 
+							}
+							if(destroyed || null == en.getCrew() || en.getCrew().isDead()) {
 								if(Compute.d6(2) >= 7) {
 									status.setHits(1);
 								} else {
