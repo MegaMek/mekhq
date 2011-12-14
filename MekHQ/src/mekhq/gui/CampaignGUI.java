@@ -214,10 +214,11 @@ public class CampaignGUI extends JPanel {
 	private static final int PG_SOLDIER = 8;
 	private static final int PG_TECH =    9;
 	private static final int PG_DOC =     10;
-	private static final int PG_RETIRE =  11;
-	private static final int PG_MIA =     12;
-	private static final int PG_KIA =     13;
-	private static final int PG_NUM =     14;
+	private static final int PG_ADMIN =   11;
+	private static final int PG_RETIRE =  12;
+	private static final int PG_MIA =     13;
+	private static final int PG_KIA =     14;
+	private static final int PG_NUM =     15;
 	
 	//parts filter groups
 	private static final int SG_ALL      = 0;
@@ -2281,7 +2282,9 @@ public class CampaignGUI extends JPanel {
     	case PG_TECH:
     		return "Techs";
     	case PG_DOC:
-    		return "Doctors";
+    		return "Medical Staff";
+    	case PG_ADMIN:
+    		return "Administrators";
     	case PG_RETIRE:
     		return "Retired Personnel";
     	case PG_MIA:
@@ -3213,8 +3216,10 @@ public class CampaignGUI extends JPanel {
         				(nGroup == PG_PROTO && type == Person.T_PROTO_PILOT) ||
         				(nGroup == PG_BA && type == Person.T_BA) ||
         				(nGroup == PG_SOLDIER && type == Person.T_INFANTRY) ||
-        				(nGroup == PG_TECH && type > Person.T_INFANTRY && type != Person.T_DOCTOR) ||
-        				(nGroup == PG_DOC && type == Person.T_DOCTOR)) {
+        				(nGroup == PG_TECH && type > Person.T_INFANTRY && type < Person.T_DOCTOR) ||
+        				(nGroup == PG_DOC && ((type == Person.T_DOCTOR) || (type == Person.T_MEDIC))) ||
+        				(nGroup == PG_ADMIN && type > Person.T_MEDIC)
+        				) {
         			return person.isActive();
         		} else if(nGroup == PG_RETIRE) {
         			return person.getStatus() == Person.S_RETIRED;

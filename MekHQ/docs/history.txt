@@ -16,6 +16,7 @@ v0.1.12 (SVN)
 + ForceStub object to keep a record of forces used in completed scenarios
 + cleaned up imports
 + keep completed missions visible for historical record
++ get all personnel filtering correct
 
 v0.1.11 (2011-12-09)
 + options to limit unit purchases by year, canonicity and type (Clan/IS)
