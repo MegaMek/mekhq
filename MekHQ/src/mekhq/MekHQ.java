@@ -36,6 +36,7 @@ import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
+import megamek.client.Client;
 import megamek.client.ui.swing.MechTileset;
 import megamek.client.ui.swing.util.ImageFileFactory;
 import megamek.common.IGame;
@@ -83,6 +84,7 @@ public class MekHQ implements GameListener {
     private Server myServer = null;
     private GameThread gameThread = null;
     private Scenario currentScenario = null;
+    private Client client = null;
     
     //the actual campaign - this is where the good stuff is  
     private Campaign campaign;
@@ -322,7 +324,8 @@ public class MekHQ implements GameListener {
         myServer.getGame().addGameListener(this);
         currentScenario = scenario;
         //Start the game thread
-        gameThread = new GameThread(campaign.getName(), "", "127.0.0.1", 2346, this, meks);
+        client = new Client(campaign.getName(), "127.0.0.1", 2346);
+        gameThread = new GameThread(campaign.getName(), client, this, meks);
         gameThread.start();
     }
 

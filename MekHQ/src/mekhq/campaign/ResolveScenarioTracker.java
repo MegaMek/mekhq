@@ -572,6 +572,7 @@ public class ResolveScenarioTracker {
 		scenario.setStatus(resolution);
 		scenario.setReport(report);
 		scenario.clearAllForcesAndPersonnel(campaign);
+		client = null;
 	}
 	
 	public ArrayList<Person> getMissingPersonnel() {

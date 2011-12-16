@@ -26,9 +26,6 @@ class GameThread extends Thread implements CloseClientListener {
 
     // VARIABLES
     private String myname;
-    private String serverip;
-    private String serverName;
-    private int serverport;
     private Client client;
     private ClientGUI swingGui;
     private MekHQ app;
@@ -38,17 +35,12 @@ class GameThread extends Thread implements CloseClientListener {
     private volatile boolean stop = false;
     
     // CONSTRUCTOR
-    public GameThread(String name, String servername, String ip, int port, MekHQ app, ArrayList<Unit> mechs) {
+    public GameThread(String name, Client c, MekHQ app, ArrayList<Unit> mechs) {
         super(name);
         myname = name.trim();
-        serverName = servername;
-        serverip = ip;
-        serverport = port;
+        this.client = c;
         this.app = app;
         this.mechs = mechs;
-        if (serverip.indexOf("127.0.0.1") != -1) {
-            serverip = "127.0.0.1";
-        }
     }
 
     public Client getClient() {
@@ -57,7 +49,6 @@ class GameThread extends Thread implements CloseClientListener {
 
     @Override
     public void run() {
-        client = new Client(myname, serverip, serverport);
         client.addCloseClientListener(this);
 
         if (swingGui != null) {
@@ -72,8 +63,6 @@ class GameThread extends Thread implements CloseClientListener {
         try {
             client.connect();
         } catch (Exception ex) {
-            client = null;
-            swingGui = null;
 			MekHQ.logMessage("MegaMek client failed to connect to server");
 			MekHQ.logError(ex);
             return;
@@ -121,9 +110,11 @@ class GameThread extends Thread implements CloseClientListener {
         } catch (Exception e) {
 			MekHQ.logError(e);
         }
-        client.die();
-        client = null;
-        swingGui = null;
+        finally {
+	        client.die();
+	        client = null;
+	        swingGui = null;
+        }
     }
 
     /*
