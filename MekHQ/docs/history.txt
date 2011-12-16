@@ -19,6 +19,7 @@ v0.1.12 (SVN)
 + get all personnel filtering correct
 + updated RATs
 + Bug: main gui refreshing before resolve wizard done
++ better stopping of game thread (didnt fix memory problems)
 
 v0.1.11 (2011-12-09)
 + options to limit unit purchases by year, canonicity and type (Clan/IS)

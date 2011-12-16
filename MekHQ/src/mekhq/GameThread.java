@@ -73,6 +73,7 @@ class GameThread extends Thread implements CloseClientListener {
             client.connect();
         } catch (Exception ex) {
             client = null;
+            swingGui = null;
 			MekHQ.logMessage("MegaMek client failed to connect to server");
 			MekHQ.logError(ex);
             return;
@@ -87,10 +88,11 @@ class GameThread extends Thread implements CloseClientListener {
             // phase
             for (int i = 0; (i < 1000) && (client.game.getPhase() == IGame.Phase.PHASE_UNKNOWN); i++) {
                 Thread.sleep(50);
+            	System.out.println("Thread in unknown stage" );
             }
 
             if (((client.game != null) && (client.game.getPhase() == IGame.Phase.PHASE_LOUNGE))) {
-            	
+            	System.out.println("Thread in lounge" );
             	client.getLocalPlayer().setCamoCategory(app.getCampaign().getCamoCategory());
                 client.getLocalPlayer().setCamoFileName(app.getCampaign().getCamoFileName());
             	
@@ -113,13 +115,15 @@ class GameThread extends Thread implements CloseClientListener {
 
             }
             
-            if (((client.game != null) && (client.game.getLastPhase() == IGame.Phase.PHASE_VICTORY))) {
-            	return;
+            while(!stop) {
+            	Thread.sleep(50);
             }
-
         } catch (Exception e) {
 			MekHQ.logError(e);
         }
+        client.die();
+        client = null;
+        swingGui = null;
     }
 
     /*
@@ -127,14 +131,15 @@ class GameThread extends Thread implements CloseClientListener {
      * adding the listener. And to MMNet for the poorly documented code change.
      */
     public void clientClosed() {
+    	requestStop();
+    }
+    
+    public void requestStop() {
     	PreferenceManager.getInstance().save();
-        client = null;// explicit null of the MM client. Wasn't/isn't being
-        // GC'ed.
-        System.gc();
+    	stop = true;
     }
     
     public void quit() {
-    	PreferenceManager.getInstance().save();
     	client.die();
         client = null;// explicit null of the MM client. Wasn't/isn't being
         // GC'ed.

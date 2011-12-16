@@ -305,7 +305,7 @@ public class MekHQ implements GameListener {
     
     public void startHost(Scenario scenario, boolean loadSavegame, ArrayList<Unit> meks) {
 
-        try {
+    	try {
             myServer = new Server("", 2346);
             if (loadSavegame) {
                 FileDialog f = new FileDialog(campaigngui.getFrame(), "Load Savegame");
@@ -329,20 +329,11 @@ public class MekHQ implements GameListener {
     // Stop & send the close game event to the Server
     public void stopHost() {
        if(null != myServer) {
+    	   myServer.getGame().removeGameListener(this);
     	   myServer.die();
     	   myServer = null;
        }
        currentScenario = null;
-       campaigngui.refreshScenarioList();
-       campaigngui.refreshOrganization();
-       campaigngui.refreshServicedUnitList();
-       campaigngui.refreshUnitList();
-       campaigngui.filterPersonnel();
-       campaigngui.refreshPersonnelList();
-       campaigngui.refreshPatientList();
-       campaigngui.refreshReport();
-       campaigngui.changeMission();
-       campaigngui.refreshFinancialTransactions();
     }
 
 	@Override
@@ -406,8 +397,18 @@ public class MekHQ implements GameListener {
             	tracker.setClient(gameThread.getClient());
             	ResolveWizardControlBattlefieldDialog resolveDialog = new ResolveWizardControlBattlefieldDialog(campaigngui.getFrame(), true, tracker);
             	resolveDialog.setVisible(true);
-            	gameThread.quit();
+            	gameThread.requestStop();
             	stopHost();
+            	campaigngui.refreshScenarioList();
+                campaigngui.refreshOrganization();
+                campaigngui.refreshServicedUnitList();
+                campaigngui.refreshUnitList();
+                campaigngui.filterPersonnel();
+                campaigngui.refreshPersonnelList();
+                campaigngui.refreshPatientList();
+                campaigngui.refreshReport();
+                campaigngui.changeMission();
+                campaigngui.refreshFinancialTransactions();
             }
 
         }// end try
