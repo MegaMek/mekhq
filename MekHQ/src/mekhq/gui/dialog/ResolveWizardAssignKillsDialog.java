@@ -52,12 +52,14 @@ public class ResolveWizardAssignKillsDialog extends javax.swing.JDialog {
 	private javax.swing.JPanel panAssignKills;
     private javax.swing.JTextArea txtInstructions;
     private Hashtable<String, JComboBox> choices;
+    private ResolveWizardControlBattlefieldDialog controlDialog;
 
 	
     /** Creates new form NewTeamDialog */
-    public ResolveWizardAssignKillsDialog(java.awt.Frame parent, boolean modal, ResolveScenarioTracker t) {
+    public ResolveWizardAssignKillsDialog(java.awt.Frame parent, boolean modal, ResolveScenarioTracker t, ResolveWizardControlBattlefieldDialog control) {
         super(parent, modal);
         this.tracker = t;
+        this.controlDialog = control;
         initComponents();
         setLocationRelativeTo(parent);
     }
@@ -226,12 +228,15 @@ public class ResolveWizardAssignKillsDialog extends javax.swing.JDialog {
     		}
     	}
     	tracker.assignKills();
-    	ResolveWizardFinalCheckDialog resolveDialog = new ResolveWizardFinalCheckDialog((Frame)getParent(), true, tracker);
+    	ResolveWizardFinalCheckDialog resolveDialog = new ResolveWizardFinalCheckDialog((Frame)getParent(), true, tracker, controlDialog);
     	resolveDialog.setVisible(true);
     }
 
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {
     	this.setVisible(false);
+    	if(null != controlDialog) {
+    		controlDialog.setVisible(false);
+    	}
     }
 }

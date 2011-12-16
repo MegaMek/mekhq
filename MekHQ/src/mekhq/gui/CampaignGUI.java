@@ -2719,7 +2719,7 @@ public class CampaignGUI extends JPanel {
 		if(null == scenario) {
 			return;
 		}
-		ResolveWizardChooseFilesDialog resolveDialog = new ResolveWizardChooseFilesDialog(getFrame(), true, new ResolveScenarioTracker(scenario, getCampaign()));
+		ResolveWizardChooseFilesDialog resolveDialog = new ResolveWizardChooseFilesDialog(getFrame(), true, new ResolveScenarioTracker(scenario, getCampaign()), null);
 		resolveDialog.setVisible(true);
 		
 		refreshScenarioList();

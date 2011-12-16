@@ -41,6 +41,7 @@ public class ResolveWizardMissingUnitsDialog extends javax.swing.JDialog {
 	private static final long serialVersionUID = -8038099101234445018L;
     
 	private ResolveScenarioTracker tracker;
+    private ResolveWizardControlBattlefieldDialog controlDialog;
     
 	private javax.swing.JPanel panButtons;
 	private javax.swing.JButton btnCancel;
@@ -52,9 +53,10 @@ public class ResolveWizardMissingUnitsDialog extends javax.swing.JDialog {
     private ArrayList<Unit> units;
 	
     /** Creates new form NewTeamDialog */
-    public ResolveWizardMissingUnitsDialog(java.awt.Frame parent, boolean modal, ResolveScenarioTracker t) {
+    public ResolveWizardMissingUnitsDialog(java.awt.Frame parent, boolean modal, ResolveScenarioTracker t, ResolveWizardControlBattlefieldDialog control) {
         super(parent, modal);
         this.tracker = t;
+        this.controlDialog = control;
         units = tracker.getMissingUnits();
         initComponents();
         setLocationRelativeTo(parent);
@@ -189,17 +191,17 @@ public class ResolveWizardMissingUnitsDialog extends javax.swing.JDialog {
     	}
     	this.setVisible(false);
     	if(!tracker.getPeopleStatus().isEmpty()) {
-    		ResolveWizardPilotStatusDialog resolveDialog = new ResolveWizardPilotStatusDialog((Frame)getParent(), true, tracker);
+    		ResolveWizardPilotStatusDialog resolveDialog = new ResolveWizardPilotStatusDialog((Frame)getParent(), true, tracker, controlDialog);
     		resolveDialog.setVisible(true);
     	} else if(tracker.getPotentialSalvage().size() > 0 
     			&& (!(tracker.getMission() instanceof Contract) || ((Contract)tracker.getMission()).canSalvage())) {
-    		ResolveWizardSalvageDialog resolveDialog = new ResolveWizardSalvageDialog((Frame)getParent(), true, tracker);
+    		ResolveWizardSalvageDialog resolveDialog = new ResolveWizardSalvageDialog((Frame)getParent(), true, tracker, controlDialog);
     		resolveDialog.setVisible(true);
     	} else if(!tracker.getKillCredits().isEmpty()) {
-    		ResolveWizardAssignKillsDialog resolveDialog = new ResolveWizardAssignKillsDialog((Frame)getParent(), true, tracker);
+    		ResolveWizardAssignKillsDialog resolveDialog = new ResolveWizardAssignKillsDialog((Frame)getParent(), true, tracker, controlDialog);
     		resolveDialog.setVisible(true);
     	} else {
-    		ResolveWizardFinalCheckDialog resolveDialog = new ResolveWizardFinalCheckDialog((Frame)getParent(), true, tracker);
+    		ResolveWizardFinalCheckDialog resolveDialog = new ResolveWizardFinalCheckDialog((Frame)getParent(), true, tracker, controlDialog);
     		resolveDialog.setVisible(true);
     	}
     }
@@ -207,5 +209,8 @@ public class ResolveWizardMissingUnitsDialog extends javax.swing.JDialog {
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {
     	this.setVisible(false);
+    	if(null != controlDialog) {
+    		controlDialog.setVisible(false);
+    	}
     }
 }

@@ -41,6 +41,7 @@ public class ResolveWizardFinalCheckDialog extends javax.swing.JDialog {
 	private static final long serialVersionUID = -8038099101234445018L;
     
 	private ResolveScenarioTracker tracker;
+    private ResolveWizardControlBattlefieldDialog controlDialog;
     
 	private javax.swing.JPanel panButtons;
 	private javax.swing.JButton btnCancel;
@@ -64,9 +65,10 @@ public class ResolveWizardFinalCheckDialog extends javax.swing.JDialog {
     private javax.swing.JLabel lblStatus;
 	
     /** Creates new form NewTeamDialog */
-    public ResolveWizardFinalCheckDialog(java.awt.Frame parent, boolean modal, ResolveScenarioTracker t) {
+    public ResolveWizardFinalCheckDialog(java.awt.Frame parent, boolean modal, ResolveScenarioTracker t, ResolveWizardControlBattlefieldDialog control) {
         super(parent, modal);
         this.tracker = t;
+        this.controlDialog = control;
         initComponents();
         setLocationRelativeTo(parent);
     }
@@ -391,10 +393,16 @@ public class ResolveWizardFinalCheckDialog extends javax.swing.JDialog {
     private void btnNextActionPerformed(java.awt.event.ActionEvent evt) {
     	tracker.resolveScenario(choiceStatus.getSelectedIndex()+1,txtReport.getText());
     	this.setVisible(false);  	
+    	if(null != controlDialog) {
+    		controlDialog.setVisible(false);
+    	}
     }
 
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {
     	this.setVisible(false);
+    	if(null != controlDialog) {
+    		controlDialog.setVisible(false);
+    	}
     }
 }

@@ -48,11 +48,13 @@ public class ResolveWizardChooseFilesDialog extends javax.swing.JDialog {
     private javax.swing.JButton btnSalvageFile;
     private javax.swing.JTextField txtSalvageFile;
     private javax.swing.JTextArea txtInstructions;
+    private ResolveWizardControlBattlefieldDialog controlDialog;
 	
     /** Creates new form NewTeamDialog */
-    public ResolveWizardChooseFilesDialog(java.awt.Frame parent, boolean modal, ResolveScenarioTracker t) {
+    public ResolveWizardChooseFilesDialog(java.awt.Frame parent, boolean modal, ResolveScenarioTracker t, ResolveWizardControlBattlefieldDialog control) {
         super(parent, modal);
         this.tracker = t;
+        this.controlDialog = control;
         initComponents();
         setLocationRelativeTo(parent);
     }
@@ -212,20 +214,20 @@ public class ResolveWizardChooseFilesDialog extends javax.swing.JDialog {
     	tracker.processMulFiles();
     	this.setVisible(false);
     	if(tracker.getMissingUnits().size() > 0) {
-    		ResolveWizardMissingUnitsDialog resolveDialog = new ResolveWizardMissingUnitsDialog((Frame)getParent(), true, tracker);
+    		ResolveWizardMissingUnitsDialog resolveDialog = new ResolveWizardMissingUnitsDialog((Frame)getParent(), true, tracker, controlDialog);
     		resolveDialog.setVisible(true);
     	} else if(!tracker.getPeopleStatus().isEmpty()) {
-    		ResolveWizardPilotStatusDialog resolveDialog = new ResolveWizardPilotStatusDialog((Frame)getParent(), true, tracker);
+    		ResolveWizardPilotStatusDialog resolveDialog = new ResolveWizardPilotStatusDialog((Frame)getParent(), true, tracker, controlDialog);
     		resolveDialog.setVisible(true);
     	} else if(tracker.getPotentialSalvage().size() > 0 
     			&& (!(tracker.getMission() instanceof Contract) || ((Contract)tracker.getMission()).canSalvage())) {
-    		ResolveWizardSalvageDialog resolveDialog = new ResolveWizardSalvageDialog((Frame)getParent(), true, tracker);
+    		ResolveWizardSalvageDialog resolveDialog = new ResolveWizardSalvageDialog((Frame)getParent(), true, tracker, controlDialog);
     		resolveDialog.setVisible(true);
     	} else if(!tracker.getKillCredits().isEmpty()) {
-    		ResolveWizardAssignKillsDialog resolveDialog = new ResolveWizardAssignKillsDialog((Frame)getParent(), true, tracker);
+    		ResolveWizardAssignKillsDialog resolveDialog = new ResolveWizardAssignKillsDialog((Frame)getParent(), true, tracker, controlDialog);
     		resolveDialog.setVisible(true);
     	} else {
-    		ResolveWizardFinalCheckDialog resolveDialog = new ResolveWizardFinalCheckDialog((Frame)getParent(), true, tracker);
+    		ResolveWizardFinalCheckDialog resolveDialog = new ResolveWizardFinalCheckDialog((Frame)getParent(), true, tracker, controlDialog);
     		resolveDialog.setVisible(true);
     	}
     }

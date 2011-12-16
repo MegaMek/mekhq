@@ -35,6 +35,8 @@ class GameThread extends Thread implements CloseClientListener {
 
     private ArrayList<Unit> mechs = new ArrayList<Unit>();
 
+    private volatile boolean stop = false;
+    
     // CONSTRUCTOR
     public GameThread(String name, String servername, String ip, int port, MekHQ app, ArrayList<Unit> mechs) {
         super(name);
@@ -110,6 +112,10 @@ class GameThread extends Thread implements CloseClientListener {
                 client.sendPlayerInfo();
 
             }
+            
+            if (((client.game != null) && (client.game.getLastPhase() == IGame.Phase.PHASE_VICTORY))) {
+            	return;
+            }
 
         } catch (Exception e) {
 			MekHQ.logError(e);
@@ -121,14 +127,18 @@ class GameThread extends Thread implements CloseClientListener {
      * adding the listener. And to MMNet for the poorly documented code change.
      */
     public void clientClosed() {
-
-        PreferenceManager.getInstance().save();
-
+    	PreferenceManager.getInstance().save();
         client = null;// explicit null of the MM client. Wasn't/isn't being
         // GC'ed.
-        app.stopHost();
         System.gc();
-
+    }
+    
+    public void quit() {
+    	PreferenceManager.getInstance().save();
+    	client.die();
+        client = null;// explicit null of the MM client. Wasn't/isn't being
+        // GC'ed.
+        System.gc();
     }
 
 }

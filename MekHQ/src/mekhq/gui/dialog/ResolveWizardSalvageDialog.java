@@ -46,6 +46,7 @@ public class ResolveWizardSalvageDialog extends javax.swing.JDialog {
 	private static final long serialVersionUID = -8038099101234445018L;
     
 	private ResolveScenarioTracker tracker;
+    private ResolveWizardControlBattlefieldDialog controlDialog;
     
 	private javax.swing.JPanel panButtons;
 	private javax.swing.JButton btnCancel;
@@ -71,9 +72,10 @@ public class ResolveWizardSalvageDialog extends javax.swing.JDialog {
     DecimalFormat formatter;
     
     /** Creates new form NewTeamDialog */
-    public ResolveWizardSalvageDialog(java.awt.Frame parent, boolean modal, ResolveScenarioTracker t) {
+    public ResolveWizardSalvageDialog(java.awt.Frame parent, boolean modal, ResolveScenarioTracker t, ResolveWizardControlBattlefieldDialog control) {
         super(parent, modal);
         this.tracker = t;
+        this.controlDialog = control;
         salvageables = new ArrayList<Unit>();
         if(tracker.getMission() instanceof Contract) {
 	        salvageEmployer = ((Contract)tracker.getMission()).getSalvagedByEmployer();
@@ -319,10 +321,10 @@ public class ResolveWizardSalvageDialog extends javax.swing.JDialog {
     	}
     	this.setVisible(false);
     	if(!tracker.getKillCredits().isEmpty()) {
-    		ResolveWizardAssignKillsDialog resolveDialog = new ResolveWizardAssignKillsDialog((Frame)getParent(), true, tracker);
+    		ResolveWizardAssignKillsDialog resolveDialog = new ResolveWizardAssignKillsDialog((Frame)getParent(), true, tracker, controlDialog);
     		resolveDialog.setVisible(true);
     	} else {
-	    	ResolveWizardFinalCheckDialog resolveDialog = new ResolveWizardFinalCheckDialog((Frame)getParent(), true, tracker);
+	    	ResolveWizardFinalCheckDialog resolveDialog = new ResolveWizardFinalCheckDialog((Frame)getParent(), true, tracker, controlDialog);
 	    	resolveDialog.setVisible(true);
     	}
     }
@@ -330,5 +332,8 @@ public class ResolveWizardSalvageDialog extends javax.swing.JDialog {
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {
     	this.setVisible(false);
+    	if(null != controlDialog) {
+    		controlDialog.setVisible(false);
+    	}
     }
 }

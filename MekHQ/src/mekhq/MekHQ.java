@@ -401,11 +401,13 @@ public class MekHQ implements GameListener {
 	@Override
 	public void gamePhaseChange(GamePhaseChangeEvent e) {
 		try {
-            if (myServer.getGame().getPhase() == IGame.Phase.PHASE_VICTORY) {
+            if (e.getOldPhase() == IGame.Phase.PHASE_VICTORY) {
             	ResolveScenarioTracker tracker = new ResolveScenarioTracker(currentScenario, campaign);
             	tracker.setClient(gameThread.getClient());
             	ResolveWizardControlBattlefieldDialog resolveDialog = new ResolveWizardControlBattlefieldDialog(campaigngui.getFrame(), true, tracker);
             	resolveDialog.setVisible(true);
+            	gameThread.quit();
+            	stopHost();
             }
 
         }// end try

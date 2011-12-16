@@ -35,6 +35,9 @@ import mekhq.campaign.mission.Contract;
 public class ResolveWizardControlBattlefieldDialog extends javax.swing.JDialog {
 	private static final long serialVersionUID = -8038099101234445018L;
     
+	//TODO: I want to implement the wizard as a single dialog with a card layout as per this:
+	//http://java.sun.com/developer/technicalArticles/GUI/swing/wizard/
+	
 	private ResolveScenarioTracker tracker;
     
 	private javax.swing.JPanel panButtons;
@@ -130,22 +133,22 @@ public class ResolveWizardControlBattlefieldDialog extends javax.swing.JDialog {
     
     private void resolve(boolean control) {
     	tracker.processGame(control);
-    	this.setVisible(false);
+    	//this.setVisible(false);
     	if(tracker.getMissingUnits().size() > 0) {
-    		ResolveWizardMissingUnitsDialog resolveDialog = new ResolveWizardMissingUnitsDialog((Frame)getParent(), true, tracker);
+    		ResolveWizardMissingUnitsDialog resolveDialog = new ResolveWizardMissingUnitsDialog((Frame)getParent(), true, tracker, this);
     		resolveDialog.setVisible(true);
     	} else if(!tracker.getPeopleStatus().isEmpty()) {
-    		ResolveWizardPilotStatusDialog resolveDialog = new ResolveWizardPilotStatusDialog((Frame)getParent(), true, tracker);
+    		ResolveWizardPilotStatusDialog resolveDialog = new ResolveWizardPilotStatusDialog((Frame)getParent(), true, tracker, this);
     		resolveDialog.setVisible(true);
     	} else if(tracker.getPotentialSalvage().size() > 0 
     			&& (!(tracker.getMission() instanceof Contract) || ((Contract)tracker.getMission()).canSalvage())) {
-    		ResolveWizardSalvageDialog resolveDialog = new ResolveWizardSalvageDialog((Frame)getParent(), true, tracker);
+    		ResolveWizardSalvageDialog resolveDialog = new ResolveWizardSalvageDialog((Frame)getParent(), true, tracker, this);
     		resolveDialog.setVisible(true);
     	} else if(!tracker.getKillCredits().isEmpty()) {
-    		ResolveWizardAssignKillsDialog resolveDialog = new ResolveWizardAssignKillsDialog((Frame)getParent(), true, tracker);
+    		ResolveWizardAssignKillsDialog resolveDialog = new ResolveWizardAssignKillsDialog((Frame)getParent(), true, tracker, this);
     		resolveDialog.setVisible(true);
     	} else {
-    		ResolveWizardFinalCheckDialog resolveDialog = new ResolveWizardFinalCheckDialog((Frame)getParent(), true, tracker);
+    		ResolveWizardFinalCheckDialog resolveDialog = new ResolveWizardFinalCheckDialog((Frame)getParent(), true, tracker, this);
     		resolveDialog.setVisible(true);
     	}
     }

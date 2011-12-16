@@ -55,12 +55,14 @@ public class ResolveWizardPilotStatusDialog extends javax.swing.JDialog {
     private ArrayList<JCheckBox> miaBtns;
     private ArrayList<JSlider> hitSliders;
     private ArrayList<PersonStatus> statuses;
+    private ResolveWizardControlBattlefieldDialog controlDialog;
 
 	
     /** Creates new form NewTeamDialog */
-    public ResolveWizardPilotStatusDialog(java.awt.Frame parent, boolean modal, ResolveScenarioTracker t) {
+    public ResolveWizardPilotStatusDialog(java.awt.Frame parent, boolean modal, ResolveScenarioTracker t, ResolveWizardControlBattlefieldDialog control) {
         super(parent, modal);
         this.tracker = t;
+        this.controlDialog = control;
         initComponents();
         setLocationRelativeTo(parent);
     }
@@ -238,13 +240,13 @@ public class ResolveWizardPilotStatusDialog extends javax.swing.JDialog {
     	this.setVisible(false);
     	if(tracker.getPotentialSalvage().size() > 0 
     			&& (!(tracker.getMission() instanceof Contract) || ((Contract)tracker.getMission()).canSalvage())) {
-    		ResolveWizardSalvageDialog resolveDialog = new ResolveWizardSalvageDialog((Frame)getParent(), true, tracker);
+    		ResolveWizardSalvageDialog resolveDialog = new ResolveWizardSalvageDialog((Frame)getParent(), true, tracker, controlDialog);
     		resolveDialog.setVisible(true);
     	} else if(!tracker.getKillCredits().isEmpty()) {
-    		ResolveWizardAssignKillsDialog resolveDialog = new ResolveWizardAssignKillsDialog((Frame)getParent(), true, tracker);
+    		ResolveWizardAssignKillsDialog resolveDialog = new ResolveWizardAssignKillsDialog((Frame)getParent(), true, tracker, controlDialog);
     		resolveDialog.setVisible(true);
     	} else {
-    		ResolveWizardFinalCheckDialog resolveDialog = new ResolveWizardFinalCheckDialog((Frame)getParent(), true, tracker);
+    		ResolveWizardFinalCheckDialog resolveDialog = new ResolveWizardFinalCheckDialog((Frame)getParent(), true, tracker, controlDialog);
     		resolveDialog.setVisible(true);
     	}
     }
@@ -252,5 +254,8 @@ public class ResolveWizardPilotStatusDialog extends javax.swing.JDialog {
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {
     	this.setVisible(false);
+    	if(null != controlDialog) {
+    		controlDialog.setVisible(false);
+    	}
     }
 }
