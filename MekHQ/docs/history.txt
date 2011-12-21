@@ -22,6 +22,7 @@ v0.1.12 (SVN)
 + better stopping of game thread (didnt fix memory problems)
 + attempts to fix memory leak
 + new MM.jar (should deal with various LRM problems)
++ use a single dialog with CardLayout to resolve scenarios
 
 v0.1.11 (2011-12-09)
 + options to limit unit purchases by year, canonicity and type (Clan/IS)

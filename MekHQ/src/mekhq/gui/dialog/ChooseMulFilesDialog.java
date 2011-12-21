@@ -35,7 +35,7 @@ import mekhq.campaign.mission.Contract;
  *
  * @author  Taharqa
  */
-public class ResolveWizardChooseFilesDialog extends javax.swing.JDialog {
+public class ChooseMulFilesDialog extends javax.swing.JDialog {
 	private static final long serialVersionUID = -8038099101234445018L;
     
 	private ResolveScenarioTracker tracker;
@@ -48,13 +48,13 @@ public class ResolveWizardChooseFilesDialog extends javax.swing.JDialog {
     private javax.swing.JButton btnSalvageFile;
     private javax.swing.JTextField txtSalvageFile;
     private javax.swing.JTextArea txtInstructions;
-    private ResolveWizardControlBattlefieldDialog controlDialog;
+    private boolean cancelled;
 	
     /** Creates new form NewTeamDialog */
-    public ResolveWizardChooseFilesDialog(java.awt.Frame parent, boolean modal, ResolveScenarioTracker t, ResolveWizardControlBattlefieldDialog control) {
+    public ChooseMulFilesDialog(java.awt.Frame parent, boolean modal, ResolveScenarioTracker t) {
         super(parent, modal);
         this.tracker = t;
-        this.controlDialog = control;
+        cancelled = false;
         initComponents();
         setLocationRelativeTo(parent);
     }
@@ -71,7 +71,7 @@ public class ResolveWizardChooseFilesDialog extends javax.swing.JDialog {
     	 txtSalvageFile = new javax.swing.JTextField();
     	 txtInstructions = new javax.swing.JTextArea();
 
-    	 ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ResolveWizardChooseFilesDialog");
+    	 ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ChooseMulFilesDialog");
     	 setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
     	 setName("Form"); // NOI18N
     	 
@@ -213,27 +213,15 @@ public class ResolveWizardChooseFilesDialog extends javax.swing.JDialog {
     private void btnNextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
     	tracker.processMulFiles();
     	this.setVisible(false);
-    	if(tracker.getMissingUnits().size() > 0) {
-    		ResolveWizardMissingUnitsDialog resolveDialog = new ResolveWizardMissingUnitsDialog((Frame)getParent(), true, tracker, controlDialog);
-    		resolveDialog.setVisible(true);
-    	} else if(!tracker.getPeopleStatus().isEmpty()) {
-    		ResolveWizardPilotStatusDialog resolveDialog = new ResolveWizardPilotStatusDialog((Frame)getParent(), true, tracker, controlDialog);
-    		resolveDialog.setVisible(true);
-    	} else if(tracker.getPotentialSalvage().size() > 0 
-    			&& (!(tracker.getMission() instanceof Contract) || ((Contract)tracker.getMission()).canSalvage())) {
-    		ResolveWizardSalvageDialog resolveDialog = new ResolveWizardSalvageDialog((Frame)getParent(), true, tracker, controlDialog);
-    		resolveDialog.setVisible(true);
-    	} else if(!tracker.getKillCredits().isEmpty()) {
-    		ResolveWizardAssignKillsDialog resolveDialog = new ResolveWizardAssignKillsDialog((Frame)getParent(), true, tracker, controlDialog);
-    		resolveDialog.setVisible(true);
-    	} else {
-    		ResolveWizardFinalCheckDialog resolveDialog = new ResolveWizardFinalCheckDialog((Frame)getParent(), true, tracker, controlDialog);
-    		resolveDialog.setVisible(true);
-    	}
     }
 
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
+    	cancelled = true;
     	this.setVisible(false);
+    }
+    
+    public boolean wasCancelled() {
+    	return cancelled;
     }
 }

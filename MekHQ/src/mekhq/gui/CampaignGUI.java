@@ -179,7 +179,8 @@ import mekhq.gui.dialog.NewKillDialog;
 import mekhq.gui.dialog.PartsStoreDialog;
 import mekhq.gui.dialog.PopupValueChoiceDialog;
 import mekhq.gui.dialog.PortraitChoiceDialog;
-import mekhq.gui.dialog.ResolveWizardChooseFilesDialog;
+import mekhq.gui.dialog.ResolveScenarioWizardDialog;
+import mekhq.gui.dialog.ChooseMulFilesDialog;
 import mekhq.gui.dialog.TextAreaDialog;
 import mekhq.gui.dialog.UnitSelectorDialog;
 import mekhq.gui.view.ContractViewPanel;
@@ -2719,7 +2720,13 @@ public class CampaignGUI extends JPanel {
 		if(null == scenario) {
 			return;
 		}
-		ResolveWizardChooseFilesDialog resolveDialog = new ResolveWizardChooseFilesDialog(getFrame(), true, new ResolveScenarioTracker(scenario, getCampaign()), null);
+		ResolveScenarioTracker tracker = new ResolveScenarioTracker(scenario, getCampaign());
+		ChooseMulFilesDialog chooseFilesDialog = new ChooseMulFilesDialog(getFrame(), true, tracker);
+		chooseFilesDialog.setVisible(true);
+		if(chooseFilesDialog.wasCancelled()) {
+			return;
+		}
+		ResolveScenarioWizardDialog resolveDialog = new ResolveScenarioWizardDialog(getFrame(), true, tracker);
 		resolveDialog.setVisible(true);
 		
 		refreshScenarioList();

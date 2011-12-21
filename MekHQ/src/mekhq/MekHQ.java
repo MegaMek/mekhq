@@ -67,7 +67,7 @@ import mekhq.campaign.mission.Scenario;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.PortraitFileFactory;
 import mekhq.gui.StartUpGUI;
-import mekhq.gui.dialog.ResolveWizardControlBattlefieldDialog;
+import mekhq.gui.dialog.ResolveScenarioWizardDialog;
 
 /**
  * The main class of the application.
@@ -332,7 +332,7 @@ public class MekHQ implements GameListener {
     // Stop & send the close game event to the Server
     public void stopHost() {
        if(null != myServer) {
-    	   myServer.getGame().removeGameListener(this);
+    	   //myServer.getGame().removeGameListener(this);
     	   myServer.die();
     	   myServer = null;
        }
@@ -395,10 +395,18 @@ public class MekHQ implements GameListener {
 	@Override
 	public void gamePhaseChange(GamePhaseChangeEvent e) {
 		try {
-            if (e.getOldPhase() == IGame.Phase.PHASE_VICTORY) {
+			//FIXME: I would prefer to check on the old victory phase but for some reason
+			//it wont progress to that stage with the test bot
+            if (e.getNewPhase() == IGame.Phase.PHASE_VICTORY) {
             	ResolveScenarioTracker tracker = new ResolveScenarioTracker(currentScenario, campaign);
             	tracker.setClient(gameThread.getClient());
-            	ResolveWizardControlBattlefieldDialog resolveDialog = new ResolveWizardControlBattlefieldDialog(campaigngui.getFrame(), true, tracker);
+            	tracker.processGame(JOptionPane.showConfirmDialog(campaigngui.getFrame(),
+                        "Did your side control the battlefield at the end of the scenario?",
+                        "Control of Battlefield?",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.QUESTION_MESSAGE) ==
+                        JOptionPane.YES_OPTION);
+            	ResolveScenarioWizardDialog resolveDialog = new ResolveScenarioWizardDialog(campaigngui.getFrame(), true, tracker);
             	resolveDialog.setVisible(true);
             	gameThread.requestStop();
             	stopHost();
@@ -416,7 +424,7 @@ public class MekHQ implements GameListener {
 
         }// end try
         catch (Exception ex) {
-            
+            logError(ex);
         }
 	}
 
