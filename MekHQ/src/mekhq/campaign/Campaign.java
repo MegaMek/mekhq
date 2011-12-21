@@ -1154,7 +1154,11 @@ public class Campaign implements Serializable {
 		int fid = force.getId();
 		forceIds.remove(new Integer(fid));
 		//clear forceIds of all personnel with this force
-		for(Unit u : units) {
+		for(int uid : force.getUnits()) {
+			Unit u = getUnit(uid);
+			if(null == u) {
+				 continue;
+			}
 			if(u.getForceId() == fid) {
 				u.setForceId(-1);
 				if(force.isDeployed()) {
@@ -1169,7 +1173,14 @@ public class Campaign implements Serializable {
 		}
 		if(null != force.getParentForce()) {
 			force.getParentForce().removeSubForce(fid);
-		}	
+		}
+		ArrayList<Force> subs = new ArrayList<Force>();
+		for(Force sub : force.getSubForces()) {
+			subs.add(sub);
+		}
+		for(Force sub : subs) {
+			removeForce(sub);
+		}
 	}
 	
 	public void removeUnitFromForce(Unit u) {

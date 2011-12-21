@@ -24,6 +24,7 @@ v0.1.12 (SVN)
 + new MM.jar (should deal with various LRM problems)
 + use a single dialog with CardLayout to resolve scenarios
 + max gunnery and artillery should be 7 for it to read in MULs correctly
++ Bug: units in subforces not removed when super force removed
 
 v0.1.11 (2011-12-09)
 + options to limit unit purchases by year, canonicity and type (Clan/IS)
