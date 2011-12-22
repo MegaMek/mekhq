@@ -25,6 +25,8 @@ v0.1.12 (SVN)
 + use a single dialog with CardLayout to resolve scenarios
 + max gunnery and artillery should be 7 for it to read in MULs correctly
 + Bug: units in subforces not removed when super force removed
++ Bug 3462195: Typo in Administration skill
++ Bug 3461993: Callsigns do not carry over
 
 v0.1.11 (2011-12-09)
 + options to limit unit purchases by year, canonicity and type (Clan/IS)

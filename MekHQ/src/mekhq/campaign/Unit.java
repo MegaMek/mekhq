@@ -1728,7 +1728,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     		return;
     	}
     	//TODO: For the moment we need to max these out at 8 so people don't get errors
-    	//when the customize in MM but we should put an option in MM to ignore those limits
+    	//when they customize in MM but we should put an option in MM to ignore those limits
     	//and set it to true when we start up through MHQ
     	gunnery = Math.min(gunnery, 7);
     	piloting = Math.min(piloting, 8);
@@ -1736,6 +1736,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     	Pilot pilot = new Pilot(commander.getFullTitle(), gunnery, piloting);
     	pilot.setPortraitCategory(commander.getPortraitCategory());
     	pilot.setPortraitFileName(commander.getPortraitFileName());
+    	pilot.setNickname(commander.getCallsign());
     	pilot.setExternalId(commander.getId());
     	pilot.setArtillery(artillery);
     	//create a new set of options. For now we will just assign based on commander, but

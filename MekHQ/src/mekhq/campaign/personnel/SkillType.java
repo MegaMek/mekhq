@@ -80,7 +80,7 @@ public class SkillType implements Serializable {
 	public static final String S_ASTECH        = "Astech";
 	public static final String S_DOCTOR        = "Doctor";
 	public static final String S_MEDTECH       = "Medtech";
-	public static final String S_ADMIN         = "Administation";
+	public static final String S_ADMIN         = "Administration";
 	public static final String S_NEG           = "Negotiation";
 	public static final String S_LEADER        = "Leadership";
 	public static final String S_SCROUNGE      = "Scrounge";
