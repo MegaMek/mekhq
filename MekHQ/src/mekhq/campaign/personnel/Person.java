@@ -672,7 +672,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 					type = Integer.parseInt(wn2.getTextContent());
 				} else if(wn2.getNodeName().equalsIgnoreCase("skill")) {
 					Skill s = Skill.generateInstanceFromXML(wn2);
-					if(null != s) {
+					if(null != s && null != s.getType()) {
 						retVal.skills.put(s.getType().getName(), s);
 					}
 				}
