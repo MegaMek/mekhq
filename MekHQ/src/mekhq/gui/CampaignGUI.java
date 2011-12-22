@@ -6565,27 +6565,14 @@ public class CampaignGUI extends JPanel {
 			}
 			return "?";
 		}
-
-		public Part getPartAt(int row) {
-			return ((PartInventory) data.get(row)).getPart();
+	
+		public PartInventory getPartInventory(int row) {		
+			return (PartInventory) data.get(row);
 		}
 		
-		public PartInventory[] getPartInventoriesAt(int[] rows) {
-			PartInventory[] inventories = new PartInventory[rows.length];
-			for (int i = 0; i < rows.length; i++) {
-				int row = rows[i];
-				inventories[i] = (PartInventory) data.get(row);
-			}
-			return inventories;
-		}
+		public Part getPartAt(int row) {
+			return ((PartInventory) data.get(row)).getPart();
 
-		public Part[] getPartstAt(int[] rows) {
-			Part[] parts = new Part[rows.length];
-			for (int i = 0; i < rows.length; i++) {
-				int row = rows[i];
-				parts[i] = ((PartInventory) data.get(row)).getPart();
-			}
-			return parts;
 		}
 		
 		 public int getColumnWidth(int c) {
@@ -6652,13 +6639,17 @@ public class CampaignGUI extends JPanel {
 			if(row < 0) {
 				return;
 			}
-			Part selectedPart = partsModel.getPartAt(partsTable.convertRowIndexToModel(row));
 			int[] rows = partsTable.getSelectedRows();
-			Part[] parts = partsModel.getPartstAt(rows);
-			PartInventory[] inventories = partsModel.getPartInventoriesAt(rows);
+			PartInventory[] inventories = new PartInventory[rows.length];
+			for(int i=0; i<rows.length; i++) {
+				inventories[i] = partsModel.getPartInventory(partsTable.convertRowIndexToModel(rows[i]));
+			}
 			if (command.equalsIgnoreCase("SELL")) {
-				for(Part p : parts) {
-					getCampaign().sellPart(p);
+				for(PartInventory inventory : inventories) {
+					Part p = inventory.getPart();
+					if(null != p) {
+						getCampaign().sellPart(p);
+					}
 				}
 				refreshPartsList();
 				refreshTaskList();
@@ -6669,8 +6660,11 @@ public class CampaignGUI extends JPanel {
 			} else if (command.equalsIgnoreCase("SELL_ALL")) {
 				//TODO: implement me
 			} else if (command.equalsIgnoreCase("REMOVE")) {
-				for(Part p : parts) {
-					getCampaign().removePart(p);
+				for(PartInventory inventory : inventories) {
+					Part p = inventory.getPart();
+					if(null != p) {
+						getCampaign().removePart(p);
+					}
 				}
 				refreshPartsList();
 				refreshTaskList();
@@ -6693,7 +6687,6 @@ public class CampaignGUI extends JPanel {
 			JPopupMenu popup = new JPopupMenu();
 			if (e.isPopupTrigger()) {
 				int row = partsTable.rowAtPoint(e.getPoint());
-				Part part = partsModel.getPartAt(row);
 				JMenuItem menuItem = null;
 				JMenu menu = null;
 				JCheckBoxMenuItem cbMenuItem = null;
