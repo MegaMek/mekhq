@@ -1,6 +1,6 @@
 VERSION HISTORY
 ----------------------------------
-v0.1.12 (SVN)
+v0.1.12 (2011-12-22)
 + restrict parts store by tech limits
 + restrict acqusitions from repair bay by tech limits
 + fixed sorting issues on some tables (salary on personnel, cost and weight on parts store)
