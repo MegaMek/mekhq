@@ -30,6 +30,7 @@ v0.1.12 (SVN)
 + added version information to XML input/output
 + Bug: wrong parts being sold when warehouse list is sorted
 + Bug: personnel with admin skill are losing all skill
++ Bug 3457522: no BLC bug
 
 v0.1.11 (2011-12-09)
 + options to limit unit purchases by year, canonicity and type (Clan/IS)

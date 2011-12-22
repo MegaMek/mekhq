@@ -30,6 +30,7 @@ import megamek.common.EquipmentType;
 import megamek.common.Mounted;
 import megamek.common.TargetRoll;
 import mekhq.Utilities;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.Era;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.finances.Transaction;
@@ -88,6 +89,10 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     public long getCurrentValue() {
     	//multiply full value of ammo ton by the percent of shots remaining  	
     	return (long)(getStickerPrice() * (1.0 - (double)shotsNeeded / getFullShots()));
+    }
+    
+    public long getValueNeeded(Campaign c) {
+    	return adjustCostsForCampaignOptions((long)(getStickerPrice() * ((double)shotsNeeded / getFullShots())), c);
     }
     
     @Override

@@ -31,6 +31,7 @@ import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
 import mekhq.Utilities;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.personnel.SkillType;
@@ -88,6 +89,18 @@ public class Armor extends Part implements IAcquisitionWork {
     @Override
     public long getCurrentValue() {
     	return (long)(getTonnage() * EquipmentType.getArmorCost(type));
+    }
+    
+    public double getTonnageNeeded() {
+    	double armorPerTon = 16.0 * EquipmentType.getArmorPointMultiplier(type, isClanTechBase());
+        if (type == EquipmentType.T_ARMOR_HARDENED) {
+            armorPerTon = 8.0;
+        }
+        return amountNeeded / armorPerTon;
+    }
+    
+    public long getValueNeeded(Campaign c) {
+    	return adjustCostsForCampaignOptions((long)(getTonnageNeeded() * EquipmentType.getArmorCost(type)), c);
     }
     
     @Override

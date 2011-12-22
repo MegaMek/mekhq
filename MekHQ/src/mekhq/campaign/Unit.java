@@ -452,13 +452,13 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 		long value = 0;
 		for(Part part : parts) {
 			if(part instanceof MissingPart) {
-				value += ((MissingPart)part).getActualValue(campaign);
+				value += ((MissingPart)part).getNewPart().getActualValue(campaign);
 			}
 			else if(part instanceof Armor) {
-				value += ((Armor)part).getActualValue(campaign);
+				value += ((Armor)part).getValueNeeded(campaign);
 			}
 			else if(part instanceof AmmoBin) {
-				value += ((AmmoBin)part).getActualValue(campaign);
+				value += ((AmmoBin)part).getValueNeeded(campaign);
 			}
 		}
 		return value;
