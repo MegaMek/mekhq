@@ -39,6 +39,7 @@ import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.ResourceBundle;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -1448,8 +1449,11 @@ public class Campaign implements Serializable {
 		// File header
 		pw1.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 
+    	ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekHQ");
 		// Start the XML root.
-		pw1.println("<campaign>");
+		pw1.println("<campaign version=\""
+				+resourceMap.getString("Application.version")
+				+"\">");
 
 		// Basic Campaign Info
 		pw1.println("\t<info>");
@@ -1660,11 +1664,13 @@ public class Campaign implements Serializable {
 
 		Element campaignEle = xmlDoc.getDocumentElement();
 		NodeList nl = campaignEle.getChildNodes();
-
+				
 		// Get rid of empty text nodes and adjacent text nodes...
 		// Stupid weird parsing of XML.  At least this cleans it up.
 		campaignEle.normalize(); 
 
+		String version = campaignEle.getAttribute("version");
+		
 		//we need to iterate through twice, the first time to collect
 		//any custom units that might not be written yet
 		for (int x = 0; x < nl.getLength(); x++) {

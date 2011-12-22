@@ -27,6 +27,7 @@ v0.1.12 (SVN)
 + Bug: units in subforces not removed when super force removed
 + Bug 3462195: Typo in Administration skill
 + Bug 3461993: Callsigns do not carry over
++ added version information to XML input/output
 
 v0.1.11 (2011-12-09)
 + options to limit unit purchases by year, canonicity and type (Clan/IS)
