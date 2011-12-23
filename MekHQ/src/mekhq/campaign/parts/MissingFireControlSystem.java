@@ -23,6 +23,7 @@ package mekhq.campaign.parts;
 
 import megamek.common.Aero;
 import megamek.common.EquipmentType;
+import mekhq.campaign.Campaign;
 
 /**
  *
@@ -36,11 +37,11 @@ public class MissingFireControlSystem extends MissingPart {
 	private static final long serialVersionUID = 2806921577150714477L;
 
 	public MissingFireControlSystem() {
-    	this(0);
+    	this(0, null);
     }
     
-    public MissingFireControlSystem(int tonnage) {
-    	super(0);
+    public MissingFireControlSystem(int tonnage, Campaign c) {
+    	super(0, c);
     	this.time = 4320;
     	this.difficulty = 0;
     	this.name = "Fire Control System";
@@ -53,7 +54,7 @@ public class MissingFireControlSystem extends MissingPart {
 
 	@Override
 	public Part getNewPart() {
-		return new FireControlSystem(getUnitTonnage());
+		return new FireControlSystem(getUnitTonnage(), campaign);
 	}
 
 	@Override

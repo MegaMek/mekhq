@@ -28,6 +28,7 @@ import megamek.common.CriticalSlot;
 import megamek.common.EquipmentType;
 import megamek.common.Mech;
 import megamek.common.TechConstants;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
 
 import org.w3c.dom.Node;
@@ -43,11 +44,11 @@ public class MekActuator extends Part {
 	protected int location;
 
 	public MekActuator() {
-		this(0, 0);
+		this(0, 0, null);
 	}
 	
 	public MekActuator clone() {
-		return new MekActuator(getUnitTonnage(), type, location);
+		return new MekActuator(getUnitTonnage(), type, location, campaign);
 	}
 	
     public int getType() {
@@ -58,12 +59,12 @@ public class MekActuator extends Part {
     	this.location = loc;
     }
     
-    public MekActuator(int tonnage, int type) {
-        this(tonnage, type, -1);
+    public MekActuator(int tonnage, int type, Campaign c) {
+        this(tonnage, type, -1, c);
     }
     
-    public MekActuator(int tonnage, int type, int loc) {
-    	super(tonnage);
+    public MekActuator(int tonnage, int type, int loc, Campaign c) {
+    	super(tonnage, c);
         this.type = type;
         Mech m = new BipedMech();
         this.name = m.getSystemName(type) + " Actuator" ;
@@ -197,7 +198,7 @@ public class MekActuator extends Part {
 
 	@Override
 	public Part getMissingPart() {
-		return new MissingMekActuator(getUnitTonnage(), type, location);
+		return new MissingMekActuator(getUnitTonnage(), type, location, campaign);
 	}
 
 	@Override
@@ -205,11 +206,11 @@ public class MekActuator extends Part {
 		if(null != unit) {
 			unit.destroySystem(CriticalSlot.TYPE_SYSTEM, type, location);
 			if(!salvage) {
-				unit.campaign.removePart(this);
+				campaign.removePart(this);
 			}
 			unit.removePart(this);
 			Part missing = getMissingPart();
-			unit.campaign.addPart(missing);
+			campaign.addPart(missing);
 			unit.addPart(missing);
 		}	
 		setUnit(null);

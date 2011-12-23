@@ -29,6 +29,7 @@ import megamek.common.EquipmentType;
 import megamek.common.Mounted;
 import megamek.common.TechConstants;
 import megamek.common.weapons.Weapon;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.Era;
 import mekhq.campaign.MekHqXmlUtil;
 
@@ -60,15 +61,15 @@ public class MissingEquipmentPart extends MissingPart {
     }
     
     public MissingEquipmentPart() {
-    	this(0, null, -1);
+    	this(0, null, -1, null);
     }
     
-    public MissingEquipmentPart(int tonnage, EquipmentType et, int equipNum) {
+    public MissingEquipmentPart(int tonnage, EquipmentType et, int equipNum, Campaign c) {
         // TODO Memorize all entity attributes needed to calculate cost
         // As it is a part bought with one entity can be used on another entity
         // on which it would have a different price (only tonnage is taken into
         // account for compatibility)
-        super(tonnage);
+        super(tonnage, c);
         this.type =et;
         if(null != type) {
         	this.name = type.getName();
@@ -217,7 +218,7 @@ public class MissingEquipmentPart extends MissingPart {
 
 	@Override
 	public Part getNewPart() {
-		return new EquipmentPart(getUnitTonnage(), type, -1);
+		return new EquipmentPart(getUnitTonnage(), type, -1, campaign);
 	}
 	
 	private boolean hasReallyCheckedToday() {

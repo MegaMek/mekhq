@@ -52,11 +52,11 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 	protected boolean oneShot;
 	
     public AmmoBin() {
-    	this(0, null, -1, 0, false);
+    	this(0, null, -1, 0, false, null);
     }
     
-    public AmmoBin(int tonnage, EquipmentType et, int equipNum, int shots, boolean singleShot) {
-        super(tonnage, et, equipNum);
+    public AmmoBin(int tonnage, EquipmentType et, int equipNum, int shots, boolean singleShot, Campaign c) {
+        super(tonnage, et, equipNum, c);
         this.shotsNeeded = shots;
         this.oneShot = singleShot;
         this.checkedToday = false;
@@ -69,7 +69,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     }
     
     public AmmoBin clone() {
-    	return new AmmoBin(getUnitTonnage(), getType(), getEquipmentNum(), shotsNeeded, oneShot);
+    	return new AmmoBin(getUnitTonnage(), getType(), getEquipmentNum(), shotsNeeded, oneShot, campaign);
     }
     
     @Override
@@ -91,8 +91,8 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     	return (long)(getStickerPrice() * (1.0 - (double)shotsNeeded / getFullShots()));
     }
     
-    public long getValueNeeded(Campaign c) {
-    	return adjustCostsForCampaignOptions((long)(getStickerPrice() * ((double)shotsNeeded / getFullShots())), c);
+    public long getValueNeeded() {
+    	return adjustCostsForCampaignOptions((long)(getStickerPrice() * ((double)shotsNeeded / getFullShots())));
     }
     
     @Override
@@ -280,8 +280,8 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 	public String find() {
 		changeAmountAvailable(getFullShots(), (AmmoType)type);
 		setCheckedToday(true);
-		if(unit.campaign.getCampaignOptions().payForParts()) {
-			unit.campaign.getFinances().debit(adjustCostsForCampaignOptions(getStickerPrice(), unit.campaign), Transaction.C_EQUIP, "Purchase of " + getAcquisitionName(), unit.campaign.calendar.getTime());
+		if(campaign.getCampaignOptions().payForParts()) {
+			campaign.getFinances().debit(adjustCostsForCampaignOptions(getStickerPrice()), Transaction.C_EQUIP, "Purchase of " + getAcquisitionName(), campaign.calendar.getTime());
 		}
 		return "<font color='green'> part found.</font>";
 	}
@@ -319,7 +319,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
 	@Override
 	public Part getMissingPart() {
-		return new MissingAmmoBin(getUnitTonnage(), type, equipmentNum, oneShot);
+		return new MissingAmmoBin(getUnitTonnage(), type, equipmentNum, oneShot, campaign);
 	}
 	
 	public boolean isOneShot() {
@@ -439,34 +439,29 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     }
 	
 	public void changeAmountAvailable(int amount, AmmoType curType) {
-		if(null != unit) {
-			AmmoStorage a = null;
-			for(Part part : unit.campaign.getSpareParts()) {
-				if(part instanceof AmmoStorage && ((AmmoStorage)part).getType().equals(curType)) {
-					a = (AmmoStorage)part;
-					a.changeShots(amount);
-					break;
-				}
+		AmmoStorage a = null;
+		for(Part part : campaign.getSpareParts()) {
+			if(part instanceof AmmoStorage && ((AmmoStorage)part).getType().equals(curType)) {
+				a = (AmmoStorage)part;
+				a.changeShots(amount);
+				break;
 			}
-			if(null != a && a.getShots() <= 0) {
-				unit.campaign.removePart(a);
-			} else if(null == a && amount > 0) {
-				unit.campaign.addPart(new AmmoStorage(1,curType,amount));
-			}
+		}
+		if(null != a && a.getShots() <= 0) {
+			campaign.removePart(a);
+		} else if(null == a && amount > 0) {
+			campaign.addPart(new AmmoStorage(1,curType,amount,campaign));
 		}
 	}
 	
 	public int getAmountAvailable() {
-		if(null != unit) {
-			for(Part part : unit.campaign.getSpareParts()) {
-				if(part instanceof AmmoStorage) {
-					AmmoStorage a = (AmmoStorage)part;
-					if(a.getType() == type) {
-						return a.getShots();
-					}
+		for(Part part : campaign.getSpareParts()) {
+			if(part instanceof AmmoStorage) {
+				AmmoStorage a = (AmmoStorage)part;
+				if(a.getType() == type) {
+					return a.getShots();
 				}
 			}
-			return 0;
 		}
 		return 0;
 	}
@@ -502,11 +497,11 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         TargetRoll target = new TargetRoll();
         // Faction and Tech mod
         int factionMod = 0;
-        if (null != unit && unit.campaign.getCampaignOptions().useFactionModifiers()) {
-        	factionMod = Availability.getFactionAndTechMod(this, unit.campaign);
+        if (campaign.getCampaignOptions().useFactionModifiers()) {
+        	factionMod = Availability.getFactionAndTechMod(this, campaign);
         }   
         //availability mod
-        int avail = getAvailability(unit.campaign.getEra());
+        int avail = getAvailability(campaign.getEra());
         int availabilityMod = Availability.getAvailabilityModifier(avail);
         target.addModifier(availabilityMod, "availability (" + EquipmentType.getRatingName(avail) + ")");
         if(factionMod != 0) {
@@ -517,7 +512,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
 	@Override
 	public Part getNewPart() {
-		return new AmmoStorage(1,type,((AmmoType)type).getShots());
+		return new AmmoStorage(1,type,((AmmoType)type).getShots(),campaign);
 	}
 
 	@Override

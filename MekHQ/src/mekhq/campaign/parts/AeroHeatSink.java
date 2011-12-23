@@ -26,6 +26,7 @@ import java.io.PrintWriter;
 import megamek.common.Aero;
 import megamek.common.EquipmentType;
 import megamek.common.TechConstants;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
 
 import org.w3c.dom.Node;
@@ -45,11 +46,11 @@ public class AeroHeatSink extends Part {
 	private int type;
 	
 	public AeroHeatSink() {
-    	this(0, Aero.HEAT_SINGLE);
+    	this(0, Aero.HEAT_SINGLE, null);
     }
     
-    public AeroHeatSink(int tonnage, int type) {
-        super(tonnage);
+    public AeroHeatSink(int tonnage, int type, Campaign c) {
+        super(tonnage, c);
         this.name = "Aero Heat Sink";
         this.type = type;
         if(type == Aero.HEAT_DOUBLE) {
@@ -58,7 +59,7 @@ public class AeroHeatSink extends Part {
     }
     
     public AeroHeatSink clone() {
-    	return new AeroHeatSink(getUnitTonnage(), type);
+    	return new AeroHeatSink(getUnitTonnage(), type, campaign);
     }
         
 	@Override
@@ -119,11 +120,11 @@ public class AeroHeatSink extends Part {
 				((Aero)unit.getEntity()).setHeatSinks(((Aero)unit.getEntity()).getHeatSinks()-1);
 			}
 			if(!salvage) {
-				unit.campaign.removePart(this);
+				campaign.removePart(this);
 			}
 			unit.removePart(this);
 			Part missing = getMissingPart();
-			unit.campaign.addPart(missing);
+			campaign.addPart(missing);
 			unit.addPart(missing);
 		}
 		setUnit(null);
@@ -131,7 +132,7 @@ public class AeroHeatSink extends Part {
 
 	@Override
 	public Part getMissingPart() {
-		return new MissingAeroHeatSink(getUnitTonnage(), type);
+		return new MissingAeroHeatSink(getUnitTonnage(), type, campaign);
 	}
 
 	@Override

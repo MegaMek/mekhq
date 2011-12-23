@@ -26,6 +26,7 @@ import java.io.PrintWriter;
 import megamek.common.CriticalSlot;
 import megamek.common.EquipmentType;
 import megamek.common.Mech;
+import mekhq.campaign.Campaign;
 
 import org.w3c.dom.Node;
 
@@ -37,11 +38,11 @@ public class MissingMekLifeSupport extends MissingPart {
 	private static final long serialVersionUID = -1989526319692474127L;
 
 	public MissingMekLifeSupport() {
-		this(0);
+		this(0, null);
 	}
 	
-	public MissingMekLifeSupport(int tonnage) {
-        super(tonnage);
+	public MissingMekLifeSupport(int tonnage, Campaign c) {
+        super(tonnage, c);
         this.name = "Mech Life Support System";
         this.time = 180;
         this.difficulty = -1;
@@ -98,7 +99,7 @@ public class MissingMekLifeSupport extends MissingPart {
 
 	@Override
 	public Part getNewPart() {
-		return new MekLifeSupport(getUnitTonnage());
+		return new MekLifeSupport(getUnitTonnage(), campaign);
 	}
 
 	@Override

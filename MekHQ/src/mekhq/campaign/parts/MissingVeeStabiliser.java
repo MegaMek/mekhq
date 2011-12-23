@@ -25,6 +25,7 @@ import java.io.PrintWriter;
 
 import megamek.common.EquipmentType;
 import megamek.common.Tank;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
 
 import org.w3c.dom.Node;
@@ -43,11 +44,11 @@ public class MissingVeeStabiliser extends MissingPart {
 	private int loc;
 	
 	public MissingVeeStabiliser() {
-    	this(0, 0);
+    	this(0, 0, null);
     }
     
-    public MissingVeeStabiliser(int tonnage, int loc) {
-    	super(0);
+    public MissingVeeStabiliser(int tonnage, int loc, Campaign c) {
+    	super(0, c);
     	this.time = 60;
     	this.difficulty = 0;
     	this.name = "Vehicle Stabiliser";
@@ -61,7 +62,7 @@ public class MissingVeeStabiliser extends MissingPart {
 
 	@Override
 	public Part getNewPart() {
-		return new VeeStabiliser(getUnitTonnage(), loc);
+		return new VeeStabiliser(getUnitTonnage(), loc, campaign);
 	}
 
 	@Override

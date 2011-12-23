@@ -76,9 +76,9 @@ public class PartsStore implements Serializable {
 	
 	private ArrayList<Part> parts;
 	
-	public PartsStore() {
+	public PartsStore(Campaign c) {
 		parts = new ArrayList<Part>();
-		stock();
+		stock(c);
 	}
 	
 	public ArrayList<PartInventory> getInventory(Campaign c) {
@@ -93,173 +93,173 @@ public class PartsStore implements Serializable {
 		return partsInventory;
 	}
 	
-	public void stock() {
-		stockWeaponsAmmoAndEquipment();	
-		stockMekActuators();
-		stockEngines();
-		stockGyros();
-		stockMekComponents();
-		stockAeroComponents();
-		stockVeeComponents();
-		stockArmor();
-		stockMekLocations();
-		stockVeeLocations();
+	public void stock(Campaign c) {
+		stockWeaponsAmmoAndEquipment(c);	
+		stockMekActuators(c);
+		stockEngines(c);
+		stockGyros(c);
+		stockMekComponents(c);
+		stockAeroComponents(c);
+		stockVeeComponents(c);
+		stockArmor(c);
+		stockMekLocations(c);
+		stockVeeLocations(c);
 	}
 	
-	private void stockWeaponsAmmoAndEquipment() {
+	private void stockWeaponsAmmoAndEquipment(Campaign c) {
         for (Enumeration<EquipmentType> e = EquipmentType.getAllTypes(); e.hasMoreElements();) {
             EquipmentType et = e.nextElement();
             if(!et.isHittable()) {
             	continue;
             }
 			if(et instanceof AmmoType) {
-				parts.add(new AmmoStorage(0, et, ((AmmoType)et).getShots()));
+				parts.add(new AmmoStorage(0, et, ((AmmoType)et).getShots(), c));
 			}
 			else if(et instanceof MiscType && (et.hasFlag(MiscType.F_HEAT_SINK) || et.hasFlag(MiscType.F_DOUBLE_HEAT_SINK))) {
-            	parts.add(new HeatSink(0, et, -1));
+            	parts.add(new HeatSink(0, et, -1, c));
 			} else if(et instanceof MiscType && et.hasFlag(MiscType.F_JUMP_JET)) {
-				parts.add(new JumpJet(0, et, -1));
+				parts.add(new JumpJet(0, et, -1, c));
 			} else if (et instanceof InfantryWeapon) {
 				continue;
 			} else {
-				parts.add(new EquipmentPart(0, et, -1));
+				parts.add(new EquipmentPart(0, et, -1, c));
 			}
         }
         //lets throw aero heat sinks in here as well
-        parts.add(new AeroHeatSink(0, Aero.HEAT_SINGLE));
-        parts.add(new AeroHeatSink(0, Aero.HEAT_DOUBLE));
+        parts.add(new AeroHeatSink(0, Aero.HEAT_SINGLE, c));
+        parts.add(new AeroHeatSink(0, Aero.HEAT_DOUBLE, c));
 	}
 	
-	private void stockMekActuators() {
+	private void stockMekActuators(Campaign c) {
 		for(int i = Mech.ACTUATOR_UPPER_ARM; i <= Mech.ACTUATOR_FOOT; i++) {
 			if(i == Mech.ACTUATOR_HIP) {
 				continue;
 			}
 			int ton = 20;
 			while(ton <= 100) {
-				parts.add(new MekActuator(ton, i, -1));
+				parts.add(new MekActuator(ton, i, -1, c));
 				ton += 5;
 			}
 		}
 	}
 	
-	private void stockEngines() {
+	private void stockEngines(Campaign c) {
 		int rating = 5;
 		while(rating <= 400) {
 			for(int i = 0; i <= Engine.FISSION; i++) {
 				Engine engine = new Engine(rating, i, 0);
 				if(engine.engineValid) {
-					parts.add(new EnginePart(0, engine));
+					parts.add(new EnginePart(0, engine, c));
 				}
 				engine = new Engine(rating, i, Engine.CLAN_ENGINE);
 				if(engine.engineValid) {
-					parts.add(new EnginePart(0, engine));
+					parts.add(new EnginePart(0, engine, c));
 				}
 			}
 			rating += 5;
 		}
 	}
 	
-	private void stockGyros() {
+	private void stockGyros(Campaign c) {
 		for(double i = 0.5; i <= 8.0; i += 0.5) {
 			//standard at intervals of 1.0, up to 4
 			if(i % 1.0 == 0 && i <= 4.0) {
-				parts.add(new MekGyro(0, Mech.GYRO_STANDARD, i));
+				parts.add(new MekGyro(0, Mech.GYRO_STANDARD, i, c));
 			}
 			//compact at intervals of 1.5, up to 6
 			if(i % 1.5 == 0 && i <= 6.0) {
-				parts.add(new MekGyro(0, Mech.GYRO_COMPACT, i));
+				parts.add(new MekGyro(0, Mech.GYRO_COMPACT, i, c));
 			}
 			//XL at 0.5 intervals up to 2
 			if(i % 0.5 == 0 && i <= 2.0) {
-				parts.add(new MekGyro(0, Mech.GYRO_XL, i));
+				parts.add(new MekGyro(0, Mech.GYRO_XL, i, c));
 			}
 			//Heavy duty at 2.0 intervals
 			if(i % 2.0 == 0) {
-				parts.add(new MekGyro(0, Mech.GYRO_HEAVY_DUTY, i));
+				parts.add(new MekGyro(0, Mech.GYRO_HEAVY_DUTY, i, c));
 			}
 			
 		}
 	}
 	
-	private void stockMekComponents() {
-		parts.add(new MekLifeSupport(0));
+	private void stockMekComponents(Campaign c) {
+		parts.add(new MekLifeSupport(0, c));
 		for(int ton = 20; ton <= 100; ton += 5) {
-			parts.add(new MekSensor(ton));
+			parts.add(new MekSensor(ton, c));
 		}
 		for(int type = Mech.COCKPIT_STANDARD; type < Mech.COCKPIT_STRING.length; type++) {
-			parts.add(new MekCockpit(0, type));
+			parts.add(new MekCockpit(0, type, c));
 		}
 	}
 	
-	private void stockAeroComponents() {
-		parts.add(new AeroHeatSink(0, Aero.HEAT_SINGLE));
-		parts.add(new AeroHeatSink(0, Aero.HEAT_DOUBLE));
-		parts.add(new AeroSensor(0, false));
-		parts.add(new AeroSensor(0, true));
-		parts.add(new Avionics(0));
-		parts.add(new FireControlSystem(0));
-		parts.add(new LandingGear(0));
+	private void stockAeroComponents(Campaign c) {
+		parts.add(new AeroHeatSink(0, Aero.HEAT_SINGLE, c));
+		parts.add(new AeroHeatSink(0, Aero.HEAT_DOUBLE, c));
+		parts.add(new AeroSensor(0, false, c));
+		parts.add(new AeroSensor(0, true, c));
+		parts.add(new Avionics(0, c));
+		parts.add(new FireControlSystem(0, c));
+		parts.add(new LandingGear(0, c));
 	}
 	
-	private void stockVeeComponents() {
-		parts.add(new VeeSensor(0));
-		parts.add(new VeeStabiliser(0,-1));
+	private void stockVeeComponents(Campaign c) {
+		parts.add(new VeeSensor(0, c));
+		parts.add(new VeeStabiliser(0,-1, c));
 		for(int ton = 5; ton <= 100; ton=ton+5) {
-			parts.add(new Rotor(ton));
-			parts.add(new Turret(ton, -1));
+			parts.add(new Rotor(ton, c));
+			parts.add(new Turret(ton, -1, c));
 		}
 	}
 	
-	private void stockArmor() {
+	private void stockArmor(Campaign c) {
 		//Standard armor
 		int amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_STANDARD, false));
-		parts.add(new Armor(0, EquipmentType.T_ARMOR_STANDARD, amount, -1, false, false));
+		parts.add(new Armor(0, EquipmentType.T_ARMOR_STANDARD, amount, -1, false, false, c));
 		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_STANDARD, true));
-		parts.add(new Armor(0, EquipmentType.T_ARMOR_STANDARD, amount, -1, false, true));
+		parts.add(new Armor(0, EquipmentType.T_ARMOR_STANDARD, amount, -1, false, true, c));
 		//Ferro-Fibrous
 		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_FERRO_FIBROUS, false));
-		parts.add(new Armor(0, EquipmentType.T_ARMOR_FERRO_FIBROUS, amount, -1, false, false));
+		parts.add(new Armor(0, EquipmentType.T_ARMOR_FERRO_FIBROUS, amount, -1, false, false, c));
 		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_FERRO_FIBROUS, true));
-		parts.add(new Armor(0, EquipmentType.T_ARMOR_FERRO_FIBROUS, amount, -1, false, true));
+		parts.add(new Armor(0, EquipmentType.T_ARMOR_FERRO_FIBROUS, amount, -1, false, true, c));
 		//Reactive
 		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_REACTIVE, false));
-		parts.add(new Armor(0, EquipmentType.T_ARMOR_REACTIVE, amount, -1, false, false));
+		parts.add(new Armor(0, EquipmentType.T_ARMOR_REACTIVE, amount, -1, false, false, c));
 		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_REACTIVE, true));
-		parts.add(new Armor(0, EquipmentType.T_ARMOR_REACTIVE, amount, -1, false, true));
+		parts.add(new Armor(0, EquipmentType.T_ARMOR_REACTIVE, amount, -1, false, true, c));
 		//Reflective
 		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_REFLECTIVE, false));
-		parts.add(new Armor(0, EquipmentType.T_ARMOR_REFLECTIVE, amount, -1, false, false));
+		parts.add(new Armor(0, EquipmentType.T_ARMOR_REFLECTIVE, amount, -1, false, false, c));
 		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_REFLECTIVE, true));
-		parts.add(new Armor(0, EquipmentType.T_ARMOR_REFLECTIVE, amount, -1, false, true));
+		parts.add(new Armor(0, EquipmentType.T_ARMOR_REFLECTIVE, amount, -1, false, true, c));
 		//Hardened
 		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_HARDENED, false));
-		parts.add(new Armor(0, EquipmentType.T_ARMOR_HARDENED, amount, -1, false, false));
+		parts.add(new Armor(0, EquipmentType.T_ARMOR_HARDENED, amount, -1, false, false, c));
 		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_HARDENED, true));
-		parts.add(new Armor(0, EquipmentType.T_ARMOR_HARDENED, amount, -1, false, true));
+		parts.add(new Armor(0, EquipmentType.T_ARMOR_HARDENED, amount, -1, false, true, c));
 		//Light/Heavy FF
 		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_LIGHT_FERRO, false));
-		parts.add(new Armor(0, EquipmentType.T_ARMOR_LIGHT_FERRO, amount, -1, false, false));
+		parts.add(new Armor(0, EquipmentType.T_ARMOR_LIGHT_FERRO, amount, -1, false, false, c));
 		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_HEAVY_FERRO, false));
-		parts.add(new Armor(0, EquipmentType.T_ARMOR_HEAVY_FERRO, amount, -1, false, false));
+		parts.add(new Armor(0, EquipmentType.T_ARMOR_HEAVY_FERRO, amount, -1, false, false, c));
 		//Stealth
 		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_STEALTH, false));
-		parts.add(new Armor(0, EquipmentType.T_ARMOR_STEALTH, amount, -1, false, false));
+		parts.add(new Armor(0, EquipmentType.T_ARMOR_STEALTH, amount, -1, false, false, c));
 		//Commercial
 		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_COMMERCIAL, false));
-		parts.add(new Armor(0, EquipmentType.T_ARMOR_COMMERCIAL, amount, -1, false, false));
+		parts.add(new Armor(0, EquipmentType.T_ARMOR_COMMERCIAL, amount, -1, false, false, c));
 		//Industrial
 		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_INDUSTRIAL, false));
-		parts.add(new Armor(0, EquipmentType.T_ARMOR_INDUSTRIAL, amount, -1, false, false));
+		parts.add(new Armor(0, EquipmentType.T_ARMOR_INDUSTRIAL, amount, -1, false, false, c));
 		//Heavy Industrial
 		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_HEAVY_INDUSTRIAL, false));
-		parts.add(new Armor(0, EquipmentType.T_ARMOR_HEAVY_INDUSTRIAL, amount, -1, false, false));
+		parts.add(new Armor(0, EquipmentType.T_ARMOR_HEAVY_INDUSTRIAL, amount, -1, false, false, c));
 		//Ferro-Lamellor
 		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_FERRO_LAMELLOR, false));
-		parts.add(new Armor(0, EquipmentType.T_ARMOR_FERRO_LAMELLOR, amount, -1, false, true));
+		parts.add(new Armor(0, EquipmentType.T_ARMOR_FERRO_LAMELLOR, amount, -1, false, true, c));
 		//Primitive
 		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_PRIMITIVE, false));
-		parts.add(new Armor(0, EquipmentType.T_ARMOR_PRIMITIVE, amount, -1, false, false));
+		parts.add(new Armor(0, EquipmentType.T_ARMOR_PRIMITIVE, amount, -1, false, false, c));
 		/*
 		 * These are all warship armors
 		//Ferro-Carbide
@@ -274,22 +274,22 @@ public class PartsStore implements Serializable {
 		*/
 	}
 	
-	private void stockMekLocations() {
+	private void stockMekLocations(Campaign c) {
 		for(int loc = Mech.LOC_HEAD; loc <= Mech.LOC_LLEG; loc++) {
 			for(int ton = 20; ton <= 100; ton=ton+5) {
 				for(int type = 0; type < EquipmentType.structureNames.length; type++) {
-					parts.add(new MekLocation(loc, ton, type, false, false));
-					parts.add(new MekLocation(loc, ton, type, true, false));
+					parts.add(new MekLocation(loc, ton, type, false, false, c));
+					parts.add(new MekLocation(loc, ton, type, true, false, c));
 					if(loc > Mech.LOC_LT) {
-						parts.add(new MekLocation(loc, ton, type, false, true));
-						parts.add(new MekLocation(loc, ton, type, true, true));
+						parts.add(new MekLocation(loc, ton, type, false, true, c));
+						parts.add(new MekLocation(loc, ton, type, true, true, c));
 					}
 				}
 			}
 		}
 	}
 	
-	private void stockVeeLocations() {
+	private void stockVeeLocations(Campaign c) {
 		//TODO: implement me
 	}
 	

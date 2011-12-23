@@ -56,12 +56,12 @@ public class Armor extends Part implements IAcquisitionWork {
     private boolean clan;
     
     public Armor() {
-    	this(0, 0, 0, -1, false, false);
+    	this(0, 0, 0, -1, false, false, null);
     }
     
-    public Armor(int tonnage, int t, int points, int loc, boolean r, boolean clan) {
+    public Armor(int tonnage, int t, int points, int loc, boolean r, boolean clan, Campaign c) {
         // Amount is used for armor quantity, not tonnage
-        super(tonnage);
+        super(tonnage, c);
         this.type = t;
         this.amount = points;
         this.location = loc;
@@ -74,7 +74,7 @@ public class Armor extends Part implements IAcquisitionWork {
     }
     
     public Armor clone() {
-    	return new Armor(0, type, amount, -1, false, clan);
+    	return new Armor(0, type, amount, -1, false, clan, campaign);
     }
     
     @Override
@@ -99,8 +99,8 @@ public class Armor extends Part implements IAcquisitionWork {
         return amountNeeded / armorPerTon;
     }
     
-    public long getValueNeeded(Campaign c) {
-    	return adjustCostsForCampaignOptions((long)(getTonnageNeeded() * EquipmentType.getArmorCost(type)), c);
+    public long getValueNeeded() {
+    	return adjustCostsForCampaignOptions((long)(getTonnageNeeded() * EquipmentType.getArmorCost(type)));
     }
     
     @Override
@@ -409,8 +409,8 @@ public class Armor extends Part implements IAcquisitionWork {
 	public String find() {
 		changeAmountAvailable((int)Math.round(5 * getArmorPointsPerTon()));
 		setCheckedToday(true);
-		if(unit.campaign.getCampaignOptions().payForParts()) {
-			unit.campaign.getFinances().debit(adjustCostsForCampaignOptions(getStickerPrice(), unit.campaign), Transaction.C_EQUIP, "Purchase of " + getName(), unit.campaign.calendar.getTime());
+		if(campaign.getCampaignOptions().payForParts()) {
+			campaign.getFinances().debit(adjustCostsForCampaignOptions(getStickerPrice()), Transaction.C_EQUIP, "Purchase of " + getName(), campaign.calendar.getTime());
 		}
 		return "<font color='green'><b> part found.</b></font>";
 	}
@@ -528,7 +528,7 @@ public class Armor extends Part implements IAcquisitionWork {
 		
 		toReturn += ">";
 		toReturn += "<b>" + getName() + "</b> " + bonus + "<br/>";
-		toReturn += Utilities.getCurrencyString(adjustCostsForCampaignOptions(getStickerPrice(), unit.campaign)) + "<br/>";
+		toReturn += Utilities.getCurrencyString(adjustCostsForCampaignOptions(getStickerPrice())) + "<br/>";
 		toReturn += "</font></html>";
 		return toReturn;
 	}
@@ -543,11 +543,11 @@ public class Armor extends Part implements IAcquisitionWork {
         TargetRoll target = new TargetRoll();
         // Faction and Tech mod
         int factionMod = 0;
-        if (null != unit && unit.campaign.getCampaignOptions().useFactionModifiers()) {
-        	factionMod = Availability.getFactionAndTechMod(this, unit.campaign);
+        if (campaign.getCampaignOptions().useFactionModifiers()) {
+        	factionMod = Availability.getFactionAndTechMod(this, campaign);
         }   
         //availability mod
-        int avail = getAvailability(unit.campaign.getEra());
+        int avail = getAvailability(campaign.getEra());
         int availabilityMod = Availability.getAvailabilityModifier(avail);
         target.addModifier(availabilityMod, "availability (" + EquipmentType.getRatingName(avail) + ")");
         if(factionMod != 0) {
@@ -589,39 +589,34 @@ public class Armor extends Part implements IAcquisitionWork {
 	}
 	
 	public int getAmountAvailable() {
-		if(null != unit) {
-			for(Part part : unit.campaign.getSpareParts()) {
-				if(part instanceof Armor) {
-					Armor a = (Armor)part;
-					if(a.getType() == type && a.isClanTechBase() == clan && !a.isReservedForRefit()) {
-						return a.getAmount();
-					}
+		for(Part part : campaign.getSpareParts()) {
+			if(part instanceof Armor) {
+				Armor a = (Armor)part;
+				if(a.getType() == type && a.isClanTechBase() == clan && !a.isReservedForRefit()) {
+					return a.getAmount();
 				}
 			}
-			return 0;
 		}
 		return 0;
 	}
 	
 	public void changeAmountAvailable(int amount) {
-		if(null != unit) {
-			Armor a = null;
-			for(Part part : unit.campaign.getSpareParts()) {
-				if(part instanceof Armor && ((Armor)part).getType() == type 
-						&& ((Armor)part).isClanTechBase() == clan 
-						&& getRefitId() == part.getRefitId()) {
-					a = (Armor)part;				
-					a.setAmount(a.getAmount() + amount);
-					break;
-				}
+		Armor a = null;
+		for(Part part : campaign.getSpareParts()) {
+			if(part instanceof Armor && ((Armor)part).getType() == type 
+					&& ((Armor)part).isClanTechBase() == clan 
+					&& getRefitId() == part.getRefitId()) {
+				a = (Armor)part;				
+				a.setAmount(a.getAmount() + amount);
+				break;
 			}
-			if(null != a && a.getAmount() <= 0) {
-				unit.campaign.removePart(a);
-			} else if(null == a && amount > 0) {			
-				unit.campaign.addPart(new Armor(getUnitTonnage(), type, amount, -1, false, isClanTechBase()));
-			}
-			unit.campaign.updateAllArmorForNewSpares();
 		}
+		if(null != a && a.getAmount() <= 0) {
+			campaign.removePart(a);
+		} else if(null == a && amount > 0) {			
+			campaign.addPart(new Armor(getUnitTonnage(), type, amount, -1, false, isClanTechBase(), campaign));
+		}
+		campaign.updateAllArmorForNewSpares();
 	}
 
 	@Override

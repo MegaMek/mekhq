@@ -24,6 +24,7 @@ package mekhq.campaign.parts;
 import megamek.common.EquipmentType;
 import megamek.common.MiscType;
 import megamek.common.Mounted;
+import mekhq.campaign.Campaign;
 
 /**
  *
@@ -33,19 +34,15 @@ public class HeatSink extends EquipmentPart {
 	private static final long serialVersionUID = 2892728320891712304L;
 
 	public HeatSink() {
-    	this(0, null, -1);
+    	this(0, null, -1, null);
     }
     
-    public HeatSink(int tonnage, EquipmentType et, int equipNum) {
-        // TODO Memorize all entity attributes needed to calculate cost
-        // As it is a part bought with one entity can be used on another entity
-        // on which it would have a different price (only tonnage is taken into
-        // account for compatibility)
-        super(tonnage, et, equipNum);
+    public HeatSink(int tonnage, EquipmentType et, int equipNum, Campaign c) {
+        super(tonnage, et, equipNum, c);
     }
     
     public HeatSink clone() {
-    	return new HeatSink(getUnitTonnage(), getType(), getEquipmentNum());
+    	return new HeatSink(getUnitTonnage(), getType(), getEquipmentNum(), campaign);
     }
     
     /**
@@ -74,7 +71,7 @@ public class HeatSink extends EquipmentPart {
 
 	@Override
 	public Part getMissingPart() {
-		return new MissingHeatSink(getUnitTonnage(), type, equipmentNum);
+		return new MissingHeatSink(getUnitTonnage(), type, equipmentNum, campaign);
 	}
 
 	@Override

@@ -25,6 +25,7 @@ import java.io.PrintWriter;
 
 import megamek.common.AmmoType;
 import megamek.common.EquipmentType;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
 
 import org.w3c.dom.Node;
@@ -40,11 +41,11 @@ public class MissingAmmoBin extends MissingEquipmentPart {
 	protected boolean oneShot;
 	
     public MissingAmmoBin() {
-    	this(0, null, -1, false);
+    	this(0, null, -1, false, null);
     }
     
-    public MissingAmmoBin(int tonnage, EquipmentType et, int equipNum, boolean singleShot) {
-        super(tonnage, et, equipNum);
+    public MissingAmmoBin(int tonnage, EquipmentType et, int equipNum, boolean singleShot, Campaign c) {
+        super(tonnage, et, equipNum, c);
         this.oneShot = singleShot;
         this.difficulty = -2;
         if(null != name) {
@@ -76,7 +77,7 @@ public class MissingAmmoBin extends MissingEquipmentPart {
 	
 	@Override
 	public Part getNewPart() {
-		return new AmmoBin(getUnitTonnage(), type, -1, getFullShots(), oneShot);
+		return new AmmoBin(getUnitTonnage(), type, -1, getFullShots(), oneShot, campaign);
 	}
 	
 	@Override

@@ -27,6 +27,7 @@ import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
 import megamek.common.Tank;
 import megamek.common.TechConstants;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
 
 import org.w3c.dom.Node;
@@ -42,19 +43,19 @@ public class TankLocation extends Part {
 	protected int damage;
 
     public TankLocation() {
-    	this(0, 0);
+    	this(0, 0, null);
     }
     
     public TankLocation clone() {
-    	return new TankLocation(loc, getUnitTonnage());
+    	return new TankLocation(loc, getUnitTonnage(), campaign);
     }
     
     public int getLoc() {
         return loc;
     }
     
-    public TankLocation(int loc, int tonnage) {
-        super(tonnage);
+    public TankLocation(int loc, int tonnage, Campaign c) {
+        super(tonnage, c);
         this.loc = loc;
         this.damage = 0;
         this.time = 60;
@@ -153,7 +154,7 @@ public class TankLocation extends Part {
 		if(null != unit) {
 			unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, loc);
 			if(!salvage) {
-				unit.campaign.removePart(this);
+				campaign.removePart(this);
 			}
 			unit.removePart(this);
 		}

@@ -27,6 +27,7 @@ import megamek.common.CriticalSlot;
 import megamek.common.EquipmentType;
 import megamek.common.Mech;
 import megamek.common.TechConstants;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
 
 import org.w3c.dom.Node;
@@ -42,25 +43,25 @@ public class MekGyro extends Part {
 	protected double gyroTonnage;
 
     public MekGyro() {
-    	this(0, 0, 0);
+    	this(0, 0, 0, null);
     }
     
-    public MekGyro(int tonnage, int type, int walkMP) {
-        super(tonnage);
+    public MekGyro(int tonnage, int type, int walkMP, Campaign c) {
+        super(tonnage, c);
         this.type = type;
         this.name = Mech.getGyroTypeString(type);
         this.gyroTonnage = MekGyro.getGyroTonnage(walkMP, type, getUnitTonnage());
     }
     
-    public MekGyro(int tonnage, int type, double gyroTonnage) {
-    	super(tonnage);
+    public MekGyro(int tonnage, int type, double gyroTonnage, Campaign c) {
+    	super(tonnage, c);
         this.type = type;
         this.name = Mech.getGyroTypeString(type);
         this.gyroTonnage = gyroTonnage;
     }
     
     public MekGyro clone() {
-    	return new MekGyro(getUnitTonnage(), type, gyroTonnage);
+    	return new MekGyro(getUnitTonnage(), type, gyroTonnage, campaign);
     }
     
     public int getType() {
@@ -218,7 +219,7 @@ public class MekGyro extends Part {
 
 	@Override
 	public Part getMissingPart() {
-		return new MissingMekGyro(getUnitTonnage(), getType(), getTonnage());
+		return new MissingMekGyro(getUnitTonnage(), getType(), getTonnage(), campaign);
 	}
 
 	@Override
@@ -226,11 +227,11 @@ public class MekGyro extends Part {
 		if(null != unit) {
 			unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_GYRO, Mech.LOC_CT);
 			if(!salvage) {
-				unit.campaign.removePart(this);
+				campaign.removePart(this);
 			}
 			unit.removePart(this);
 			Part missing = getMissingPart();
-			unit.campaign.addPart(missing);
+			campaign.addPart(missing);
 			unit.addPart(missing);
 		}	
 		setUnit(null);

@@ -27,6 +27,7 @@ import java.io.Serializable;
 import megamek.common.EquipmentType;
 import megamek.common.TargetRoll;
 import mekhq.Utilities;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlSerializable;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.personnel.SkillType;
@@ -51,8 +52,8 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 	
 	protected boolean checkedToday;
 	
-	public MissingPart(int tonnage) {
-		super(tonnage);
+	public MissingPart(int tonnage, Campaign c) {
+		super(tonnage, c);
 		this.checkedToday = false;
 	}
 	
@@ -131,8 +132,8 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 	
 	@Override
 	public void remove(boolean salvage) {
+		campaign.removePart(this);
 		if(null != unit) {
-			unit.campaign.removePart(this);
 			unit.removePart(this);
 		}	
 		setUnit(null);
@@ -141,20 +142,18 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 	public abstract boolean isAcceptableReplacement(Part part, boolean refit);
 	
 	public Part findReplacement(boolean refit) {
-		Part bestPart = null;
-		if(null != unit) {	
-			//dont just return with the first part if it is damaged
-			for(Part part : unit.campaign.getSpareParts()) {
-				if(part.isReservedForRefit()) {
-					continue;
-				}
-				//TODO: check for being present
-				if(isAcceptableReplacement(part, refit)) {
-					if(null == bestPart) {
-						bestPart = part;
-					} else if(bestPart.needsFixing() && !part.needsFixing()) {
-						bestPart = part;
-					}
+		Part bestPart = null;	
+		//dont just return with the first part if it is damaged
+		for(Part part : campaign.getSpareParts()) {
+			if(part.isReservedForRefit()) {
+				continue;
+			}
+			//TODO: check for being present
+			if(isAcceptableReplacement(part, refit)) {
+				if(null == bestPart) {
+					bestPart = part;
+				} else if(bestPart.needsFixing() && !part.needsFixing()) {
+					bestPart = part;
 				}
 			}
 		}
@@ -200,8 +199,8 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		timeSpent = 0;
 		if(skillMin > SkillType.EXP_ELITE) {
 			Part part = findReplacement(false);
-			if(null != part && null != unit) {
-				unit.campaign.removePart(part);
+			if(null != part) {
+				campaign.removePart(part);
 				skillMin = SkillType.EXP_GREEN;
 			}
 			return " <font color='red'><b> failed and part destroyed.</b></font>";
@@ -215,11 +214,11 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
         TargetRoll target = new TargetRoll();
         // Faction and Tech mod
         int factionMod = 0;
-        if (null != unit && unit.campaign.getCampaignOptions().useFactionModifiers()) {
-        	factionMod = Availability.getFactionAndTechMod(this, unit.campaign);
+        if (campaign.getCampaignOptions().useFactionModifiers()) {
+        	factionMod = Availability.getFactionAndTechMod(this, campaign);
         }   
         //availability mod
-        int avail = getAvailability(unit.campaign.getEra());
+        int avail = getAvailability(campaign.getEra());
         int availabilityMod = Availability.getAvailabilityModifier(avail);
         target.addModifier(availabilityMod, "availability (" + EquipmentType.getRatingName(avail) + ")");
         if(factionMod != 0) {
@@ -249,7 +248,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		
 		toReturn += ">";
 		toReturn += "<b>" + getName() + "</b> " + bonus + "<br/>";
-		toReturn += Utilities.getCurrencyString(getNewPart().getActualValue(unit.campaign)) + "<br/>";
+		toReturn += Utilities.getCurrencyString(getNewPart().getActualValue()) + "<br/>";
 		toReturn += "</font></html>";
 		return toReturn;
 	}
@@ -257,7 +256,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 	@Override
 	public String find() {
 		Part newPart = getNewPart();
-		unit.campaign.buyPart(newPart);
+		campaign.buyPart(newPart);
 		setCheckedToday(true);
 		return "<font color='green'> part found.</font>";
 	}
@@ -303,8 +302,8 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 	@Override
 	public String scrap() {
 		Part replace = findReplacement(false);
-		if(null != replace && null != unit) {
-			unit.campaign.removePart(replace);
+		if(null != replace) {
+			campaign.removePart(replace);
 		}
 		skillMin = SkillType.EXP_GREEN;
 		return replace.getName() + " scrapped.";

@@ -24,6 +24,7 @@ package mekhq.campaign.parts;
 import megamek.common.EquipmentType;
 import megamek.common.MiscType;
 import megamek.common.Mounted;
+import mekhq.campaign.Campaign;
 
 /**
  *
@@ -33,19 +34,19 @@ public class JumpJet extends EquipmentPart {
 	private static final long serialVersionUID = 2892728320891712304L;
 
 	public JumpJet() {
-    	this(0, null, -1);
+    	this(0, null, -1, null);
     }
     
-    public JumpJet(int tonnage, EquipmentType et, int equipNum) {
+    public JumpJet(int tonnage, EquipmentType et, int equipNum, Campaign c) {
         // TODO Memorize all entity attributes needed to calculate cost
         // As it is a part bought with one entity can be used on another entity
         // on which it would have a different price (only tonnage is taken into
         // account for compatibility)
-        super(tonnage, et, equipNum);
+        super(tonnage, et, equipNum, c);
     }
     
     public JumpJet clone() {
-    	return new JumpJet(getUnitTonnage(), getType(), getEquipmentNum());
+    	return new JumpJet(getUnitTonnage(), getType(), getEquipmentNum(), campaign);
     }
 	
     @Override
@@ -84,7 +85,7 @@ public class JumpJet extends EquipmentPart {
 
 	@Override
 	public Part getMissingPart() {
-		return new MissingJumpJet(getUnitTonnage(), type, equipmentNum);
+		return new MissingJumpJet(getUnitTonnage(), type, equipmentNum, campaign);
 	}
 
 	@Override

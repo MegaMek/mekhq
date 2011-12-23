@@ -25,7 +25,6 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
 import mekhq.campaign.parts.Armor;
-import mekhq.campaign.parts.GenericSparePart;
 import mekhq.campaign.parts.Part;
 
 /**
@@ -56,15 +55,12 @@ public class PartInventory {
         toReturn += part.getName();
         toReturn += "<font size='2'>";
 
-        if (part instanceof Armor)
+        if (part instanceof Armor) {
             toReturn += "Quantity : " +  ((Armor)getPart()).getAmount() + "<br/>";
-        else if (part instanceof GenericSparePart) {
-            NumberFormat numberFormat = DecimalFormat.getIntegerInstance();
-            String text = numberFormat.format(((GenericSparePart)getPart()).getAmount());
-            toReturn += "Quantity : " +  text + "<br/>";
         }
-        else
+        else {
             toReturn += "Quantity : " +  getQuantity() + "<br/>";
+        }
 
         toReturn += "</font>";
         toReturn += "</html>";

@@ -122,12 +122,14 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	protected int refitId;
 	protected int daysToArrival;
 	
+	//all parts need a reference to campaign
+	protected Campaign campaign;
 	
 	public Part() {
-		this(0);
+		this(0, null);
 	}
 	
-	public Part(int tonnage) {
+	public Part(int tonnage, Campaign c) {
 		this.name = "Unknown";
 		this.unitTonnage = tonnage;
 		this.hits = 0;
@@ -143,6 +145,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		this.shorthandedMod = 0;
 		this.refitId = -1;
 		this.daysToArrival = 0;
+		this.campaign = c;
 	}
 
 	public void setId(int id) {
@@ -157,6 +160,10 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		return unitId;
 	}
 
+	public void setCampaign(Campaign c) {
+		this.campaign = c;
+	}
+	
 	public String getName() {
 		return name;
 	}
@@ -181,15 +188,13 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	 * @param c
 	 * @return
 	 */
-	public long getActualValue(Campaign c) {
-		return adjustCostsForCampaignOptions(getCurrentValue(), c);
+	public long getActualValue() {
+		return adjustCostsForCampaignOptions(getCurrentValue());
 	}
 	
-	protected long adjustCostsForCampaignOptions(long cost, Campaign c) {
-		if(null != c) {
-			if(isClanTechBase()) {
-				cost *= c.getCampaignOptions().getClanPriceModifier();
-			}
+	protected long adjustCostsForCampaignOptions(long cost) {
+		if(isClanTechBase()) {
+			cost *= campaign.getCampaignOptions().getClanPriceModifier();
 		}
 		return cost;
 	}

@@ -29,6 +29,7 @@ import megamek.common.Dropship;
 import megamek.common.EquipmentType;
 import megamek.common.SmallCraft;
 import megamek.common.TechConstants;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
 
 import org.w3c.dom.Node;
@@ -48,17 +49,17 @@ public class StructuralIntegrity extends Part {
 	private int pointsNeeded;
 	
 	public StructuralIntegrity() {
-		this(0);
+		this(0, null);
 	}
 	
-	public StructuralIntegrity(int entityWeight) {
-		super(entityWeight);
+	public StructuralIntegrity(int entityWeight, Campaign c) {
+		super(entityWeight, c);
 		pointsNeeded = 0;
 		this.name = "Structural Integrity";
 	}
 	
 	public StructuralIntegrity clone() {
-		return new StructuralIntegrity(getUnitTonnage());
+		return new StructuralIntegrity(getUnitTonnage(), campaign);
 	}
 	
 	

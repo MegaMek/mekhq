@@ -26,6 +26,7 @@ import java.io.PrintWriter;
 import megamek.common.EquipmentType;
 import megamek.common.Tank;
 import megamek.common.TechConstants;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
 
 import org.w3c.dom.Node;
@@ -41,17 +42,17 @@ public class VeeStabiliser extends Part {
 	private int loc;
 	
 	public VeeStabiliser() {
-		this(0, 0);
+		this(0, 0, null);
 	}
 	
-	public VeeStabiliser(int tonnage, int loc) {
-        super(tonnage);
+	public VeeStabiliser(int tonnage, int loc, Campaign c) {
+        super(tonnage, c);
         this.loc = loc;
         this.name = "Vehicle Stabiliser";
     }
 	
 	public VeeStabiliser clone() {
-		return new VeeStabiliser(getUnitTonnage(), 0);
+		return new VeeStabiliser(getUnitTonnage(), 0, campaign);
 	}
 
     @Override
@@ -107,7 +108,7 @@ public class VeeStabiliser extends Part {
 
 	@Override
 	public Part getMissingPart() {
-		return new MissingVeeStabiliser(getUnitTonnage(), loc);
+		return new MissingVeeStabiliser(getUnitTonnage(), loc, campaign);
 	}
 
 	@Override
@@ -115,11 +116,11 @@ public class VeeStabiliser extends Part {
 		if(null != unit && unit.getEntity() instanceof Tank) {
 			((Tank)unit.getEntity()).setStabiliserHit(loc);
 			if(!salvage) {
-				unit.campaign.removePart(this);
+				campaign.removePart(this);
 			}
 			unit.removePart(this);
 			Part missing = getMissingPart();
-			unit.campaign.addPart(missing);
+			campaign.addPart(missing);
 			unit.addPart(missing);
 		}
 		setUnit(null);

@@ -23,6 +23,7 @@ package mekhq.campaign.parts;
 
 import megamek.common.Aero;
 import megamek.common.EquipmentType;
+import mekhq.campaign.Campaign;
 
 /**
  *
@@ -36,11 +37,11 @@ public class MissingAvionics extends MissingPart {
 	private static final long serialVersionUID = 2806921577150714477L;
 
 	public MissingAvionics() {
-    	this(0);
+    	this(0, null);
     }
     
-    public MissingAvionics(int tonnage) {
-    	super(0);
+    public MissingAvionics(int tonnage, Campaign c) {
+    	super(0, c);
     	this.time = 4800;
     	this.difficulty = 1;
     	this.name = "Avionics";
@@ -53,7 +54,7 @@ public class MissingAvionics extends MissingPart {
 
 	@Override
 	public Part getNewPart() {
-		return new Avionics(getUnitTonnage());
+		return new Avionics(getUnitTonnage(), campaign);
 	}
 
 	@Override

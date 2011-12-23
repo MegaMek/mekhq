@@ -28,6 +28,7 @@ import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Mech;
 import megamek.common.TechConstants;
+import mekhq.campaign.Campaign;
 
 import org.w3c.dom.Node;
 
@@ -39,16 +40,16 @@ public class MekLifeSupport extends Part {
 	private static final long serialVersionUID = -1989526319692474127L;
 
 	public MekLifeSupport() {
-		this(0);
+		this(0, null);
 	}
 	
-	public MekLifeSupport(int tonnage) {
-        super(tonnage);
+	public MekLifeSupport(int tonnage, Campaign c) {
+        super(tonnage, c);
         this.name = "Mech Life Support System";
     }
 	
 	public MekLifeSupport clone() {
-		return new MekLifeSupport(getUnitTonnage());
+		return new MekLifeSupport(getUnitTonnage(), campaign);
 	}
 	
 	@Override
@@ -116,7 +117,7 @@ public class MekLifeSupport extends Part {
 
 	@Override
 	public Part getMissingPart() {
-		return new MissingMekLifeSupport(getUnitTonnage());
+		return new MissingMekLifeSupport(getUnitTonnage(), campaign);
 	}
 
 	@Override
@@ -124,11 +125,11 @@ public class MekLifeSupport extends Part {
 		if(null != unit) {
 			unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_LIFE_SUPPORT);
 			if(!salvage) {
-				unit.campaign.removePart(this);
+				campaign.removePart(this);
 			}
 			unit.removePart(this);
 			Part missing = getMissingPart();
-			unit.campaign.addPart(missing);
+			campaign.addPart(missing);
 			unit.addPart(missing);
 		}
 		setUnit(null);	

@@ -26,6 +26,7 @@ import java.io.PrintWriter;
 import megamek.common.CriticalSlot;
 import megamek.common.EquipmentType;
 import megamek.common.Mech;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
 
 import org.w3c.dom.Node;
@@ -41,11 +42,11 @@ public class MissingMekCockpit extends MissingPart {
 	private int type;
 	
 	public MissingMekCockpit() {
-		this(0, Mech.COCKPIT_STANDARD);
+		this(0, Mech.COCKPIT_STANDARD, null);
 	}
 	
-	public MissingMekCockpit(int tonnage, int t) {
-        super(tonnage);
+	public MissingMekCockpit(int tonnage, int t, Campaign c) {
+        super(tonnage, c);
         this.type = t;
         this.name = Mech.getCockpitDisplayString(type);
         this.time = 300;
@@ -167,7 +168,7 @@ public class MissingMekCockpit extends MissingPart {
 
 	@Override
 	public Part getNewPart() {
-		return new MekCockpit(getUnitTonnage(), type);
+		return new MekCockpit(getUnitTonnage(), type, campaign);
 	}
 
 	@Override

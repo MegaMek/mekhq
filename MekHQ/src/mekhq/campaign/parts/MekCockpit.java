@@ -28,6 +28,7 @@ import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Mech;
 import megamek.common.TechConstants;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
 
 import org.w3c.dom.Node;
@@ -43,17 +44,17 @@ public class MekCockpit extends Part {
 	private int type;
 	
 	public MekCockpit() {
-		this(0, Mech.COCKPIT_STANDARD);
+		this(0, Mech.COCKPIT_STANDARD, null);
 	}
 	
-	public MekCockpit(int tonnage, int t) {
-        super(tonnage);
+	public MekCockpit(int tonnage, int t, Campaign c) {
+        super(tonnage, c);
         this.type = t;
         this.name = Mech.getCockpitDisplayString(type);
     }
 	
 	public MekCockpit clone() {
-		return new MekCockpit(getUnitTonnage(), type);
+		return new MekCockpit(getUnitTonnage(), type, campaign);
 	}
 	
 	@Override
@@ -206,7 +207,7 @@ public class MekCockpit extends Part {
 
 	@Override
 	public Part getMissingPart() {
-		return new MissingMekCockpit(getUnitTonnage(), type);
+		return new MissingMekCockpit(getUnitTonnage(), type, campaign);
 	}
 
 	@Override
@@ -214,11 +215,11 @@ public class MekCockpit extends Part {
 		if(null != unit) {
 			unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_COCKPIT);
 			if(!salvage) {
-				unit.campaign.removePart(this);
+				campaign.removePart(this);
 			}
 			unit.removePart(this);
 			Part missing = getMissingPart();
-			unit.campaign.addPart(missing);
+			campaign.addPart(missing);
 			unit.addPart(missing);
 		}
 		setUnit(null);	

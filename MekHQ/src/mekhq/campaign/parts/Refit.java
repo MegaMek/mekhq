@@ -272,7 +272,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 				} else {
 					//set entity for variable cost items
 					nPart.setUnit(newUnit);
-					cost += ((MissingPart)nPart).getActualValue(oldUnit.campaign);
+					cost += ((MissingPart)nPart).getActualValue();
 					nPart.setUnit(null);
 					shoppingList.add(nPart);
 				}
@@ -427,7 +427,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 			armorNeeded -= recycledArmorPoints;
 		}
 		if(armorNeeded > 0) {		
-			newArmorSupplies = new Armor(0, atype, 0, 0, false, aclan);
+			newArmorSupplies = new Armor(0, atype, 0, 0, false, aclan, oldUnit.campaign);
 			newArmorSupplies.setAmountNeeded(armorNeeded);
 			newArmorSupplies.setRefitId(oldUnit.getId());
 			//check existing supplies before determining cost
@@ -567,7 +567,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 				oldUnit.campaign.addPart(newArmorSupplies);
 			}
 			if(newArmorSupplies.getAmount() <= armorNeeded) {
-				Armor a = new Armor(0, newArmorSupplies.getType(), 0, 0, false, newArmorSupplies.isClanTechBase());
+				Armor a = new Armor(0, newArmorSupplies.getType(), 0, 0, false, newArmorSupplies.isClanTechBase(), oldUnit.campaign);
 				a.setRefitId(oldUnit.getId());
 				a.setUnit(oldUnit);
 				a.setAmountNeeded(armorNeeded);
@@ -711,7 +711,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 		//in some cases we may have had more armor on the original unit and so we may add more
 		//back then we received
 		if(sameArmorType && armorNeeded < 0) {
-			Armor a = new Armor(0, atype, -1 * armorNeeded, -1, false, aclan);
+			Armor a = new Armor(0, atype, -1 * armorNeeded, -1, false, aclan, oldUnit.campaign);
 			a.setUnit(oldUnit);
 			a.changeAmountAvailable(a.getAmount());
 		}

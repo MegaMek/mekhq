@@ -23,6 +23,7 @@ package mekhq.campaign.parts;
 
 import megamek.common.EquipmentType;
 import megamek.common.Tank;
+import mekhq.campaign.Campaign;
 
 /**
  *
@@ -36,11 +37,11 @@ public class MissingVeeSensor extends MissingPart {
 	private static final long serialVersionUID = 2806921577150714477L;
 
 	public MissingVeeSensor() {
-    	this(0);
+    	this(0, null);
     }
     
-    public MissingVeeSensor(int tonnage) {
-    	super(0);
+    public MissingVeeSensor(int tonnage, Campaign c) {
+    	super(0, c);
     	this.time = 260;
     	this.difficulty = 0;
     	this.name = "Vehicle Sensors";
@@ -53,7 +54,7 @@ public class MissingVeeSensor extends MissingPart {
 
 	@Override
 	public Part getNewPart() {
-		return new VeeSensor(getUnitTonnage());
+		return new VeeSensor(getUnitTonnage(), campaign);
 	}
 
 	@Override

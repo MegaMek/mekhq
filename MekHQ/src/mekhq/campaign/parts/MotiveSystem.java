@@ -26,6 +26,7 @@ import java.io.PrintWriter;
 import megamek.common.EquipmentType;
 import megamek.common.Tank;
 import megamek.common.TechConstants;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
 
 import org.w3c.dom.Node;
@@ -46,11 +47,11 @@ public class MotiveSystem extends Part {
 	int penalty;
 	
 	public MotiveSystem() {
-		this(0);
+		this(0, null);
 	}
 	
-	public MotiveSystem(int ton) {
-		super(ton);
+	public MotiveSystem(int ton, Campaign c) {
+		super(ton, c);
 		this.name = "Motive System";
 		this.damage = 0;
 		this.penalty = 0;
@@ -59,7 +60,7 @@ public class MotiveSystem extends Part {
 	}
 	
 	public MotiveSystem clone() {
-		return new MotiveSystem();
+		return new MotiveSystem(getUnitTonnage(), campaign);
 	}
 	
 	@Override

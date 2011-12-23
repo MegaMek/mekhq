@@ -26,6 +26,7 @@ import java.io.PrintWriter;
 import megamek.common.EquipmentType;
 import megamek.common.Tank;
 import megamek.common.TechConstants;
+import mekhq.campaign.Campaign;
 
 import org.w3c.dom.Node;
 
@@ -37,16 +38,16 @@ public class VeeSensor extends Part {
 	private static final long serialVersionUID = 4101969895094531892L;
 
 	public VeeSensor() {
-		this(0);
+		this(0, null);
 	}
 	
-	public VeeSensor(int tonnage) {
-        super(tonnage);
+	public VeeSensor(int tonnage, Campaign c) {
+        super(tonnage, c);
         this.name = "Vehicle Sensors";
     }
 
 	public VeeSensor clone() {
-		return new VeeSensor(getUnitTonnage());
+		return new VeeSensor(getUnitTonnage(), campaign);
 	}
 	
     @Override
@@ -90,7 +91,7 @@ public class VeeSensor extends Part {
 
 	@Override
 	public Part getMissingPart() {
-		return new MissingVeeSensor(getUnitTonnage());
+		return new MissingVeeSensor(getUnitTonnage(), campaign);
 	}
 
 	@Override
@@ -98,11 +99,11 @@ public class VeeSensor extends Part {
 		if(null != unit && unit.getEntity() instanceof Tank) {
 			((Tank)unit.getEntity()).setSensorHits(4);
 			if(!salvage) {
-				unit.campaign.removePart(this);
+				campaign.removePart(this);
 			}
 			unit.removePart(this);
 			Part missing = getMissingPart();
-			unit.campaign.addPart(missing);
+			campaign.addPart(missing);
 			unit.addPart(missing);
 		}
 		setUnit(null);

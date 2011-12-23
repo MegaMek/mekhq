@@ -27,6 +27,7 @@ import megamek.common.CriticalSlot;
 import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
 import megamek.common.Mech;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
 
 import org.w3c.dom.Node;
@@ -45,7 +46,7 @@ public class MissingMekLocation extends MissingPart {
     protected boolean forQuad;
 
     public MissingMekLocation() {
-    	this(0, 0, 0, false, false);
+    	this(0, 0, 0, false, false, null);
     }
     
     public int getLoc() {
@@ -60,8 +61,8 @@ public class MissingMekLocation extends MissingPart {
         return structureType;
     }
     
-    public MissingMekLocation(int loc, int tonnage, int structureType, boolean hasTSM, boolean quad) {
-        super(tonnage);
+    public MissingMekLocation(int loc, int tonnage, int structureType, boolean hasTSM, boolean quad, Campaign c) {
+        super(tonnage, c);
         this.loc = loc;
         this.structureType = structureType;
         this.tsm = hasTSM;
@@ -300,7 +301,7 @@ public class MissingMekLocation extends MissingPart {
 
 	@Override
 	public Part getNewPart() {
-		return new MekLocation(loc, getUnitTonnage(), structureType, tsm, forQuad);
+		return new MekLocation(loc, getUnitTonnage(), structureType, tsm, forQuad, campaign);
 	}
 	
 	@Override

@@ -22,6 +22,7 @@
 package mekhq.campaign.parts;
 
 import megamek.common.EquipmentType;
+import mekhq.campaign.Campaign;
 
 /**
  *
@@ -31,17 +32,17 @@ public class MissingJumpJet extends MissingEquipmentPart {
 	private static final long serialVersionUID = 2892728320891712304L;
 
 	public MissingJumpJet() {
-    	this(0, null, -1);
+    	this(0, null, -1, null);
     }
     
-    public MissingJumpJet(int tonnage, EquipmentType et, int equipNum) {
-        super(tonnage, et, equipNum);
+    public MissingJumpJet(int tonnage, EquipmentType et, int equipNum, Campaign c) {
+        super(tonnage, et, equipNum, c);
         this.time = 60;
         this.difficulty = 0;
     }
     
     @Override
 	public Part getNewPart() {
-		return new JumpJet(getUnitTonnage(), type, -1);
+		return new JumpJet(getUnitTonnage(), type, -1, campaign);
 	}
 }

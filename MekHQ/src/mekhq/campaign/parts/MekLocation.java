@@ -29,6 +29,7 @@ import megamek.common.IArmorState;
 import megamek.common.Mech;
 import megamek.common.Mounted;
 import megamek.common.TechConstants;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
 
 import org.w3c.dom.Node;
@@ -47,11 +48,11 @@ public class MekLocation extends Part {
     boolean forQuad;
 
     public MekLocation() {
-    	this(0, 0, 0, false, false);
+    	this(0, 0, 0, false, false, null);
     }
     
     public MekLocation clone() {
-    	return new MekLocation(loc, getUnitTonnage(), structureType, tsm, forQuad);
+    	return new MekLocation(loc, getUnitTonnage(), structureType, tsm, forQuad, campaign);
     }
     
     public int getLoc() {
@@ -66,8 +67,8 @@ public class MekLocation extends Part {
         return structureType;
     }
     
-    public MekLocation(int loc, int tonnage, int structureType, boolean hasTSM, boolean quad) {
-        super(tonnage);
+    public MekLocation(int loc, int tonnage, int structureType, boolean hasTSM, boolean quad, Campaign c) {
+        super(tonnage, c);
         this.loc = loc;
         this.structureType = structureType;
         this.tsm = hasTSM;
@@ -306,7 +307,7 @@ public class MekLocation extends Part {
 
 	@Override
 	public Part getMissingPart() {
-		return new MissingMekLocation(loc, getUnitTonnage(), structureType, tsm, forQuad);
+		return new MissingMekLocation(loc, getUnitTonnage(), structureType, tsm, forQuad, campaign);
 	}
 
 	@Override
@@ -314,12 +315,12 @@ public class MekLocation extends Part {
 		if(null != unit) {
 			unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, loc);
 			if(!salvage) {
-				unit.campaign.removePart(this);
+				campaign.removePart(this);
 			}
 			unit.removePart(this);
 			if(loc != Mech.LOC_CT) {
 				Part missing = getMissingPart();
-				unit.campaign.addPart(missing);
+				campaign.addPart(missing);
 				unit.addPart(missing);
 			}
 		}

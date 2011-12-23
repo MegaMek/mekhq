@@ -26,6 +26,7 @@ import java.io.PrintWriter;
 import megamek.common.EquipmentType;
 import megamek.common.Tank;
 import megamek.common.TechConstants;
+import mekhq.campaign.Campaign;
 
 import org.w3c.dom.Node;
 
@@ -40,15 +41,15 @@ public class TurretLock extends Part {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public TurretLock() {
-		super(0);
+	public TurretLock(Campaign c) {
+		super(0, c);
 		this.name = "Turret Lock";
 		this.time = 90;
 		this.difficulty = -1;
 	}
 	
 	public TurretLock clone() {
-		return new TurretLock();
+		return new TurretLock(campaign);
 	}
 	
 	@Override

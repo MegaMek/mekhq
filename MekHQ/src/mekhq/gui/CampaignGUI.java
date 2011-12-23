@@ -6549,7 +6549,7 @@ public class CampaignGUI extends JPanel {
 				return part.getDetails();
 			}
 			if(col == COL_COST) {
-				return format.format(part.getActualValue(getCampaign()));
+				return format.format(part.getActualValue());
 			}
 			if(col == COL_QUANTITY) {
 				return partInventory.getQuantity();

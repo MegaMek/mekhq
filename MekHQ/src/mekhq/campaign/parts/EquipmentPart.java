@@ -29,6 +29,7 @@ import megamek.common.EquipmentType;
 import megamek.common.Mounted;
 import megamek.common.TechConstants;
 import megamek.common.weapons.Weapon;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.Era;
 import mekhq.campaign.MekHqXmlUtil;
 
@@ -60,15 +61,15 @@ public class EquipmentPart extends Part {
     }
     
     public EquipmentPart() {
-    	this(0, null, -1);
+    	this(0, null, -1, null);
     }
     
-    public EquipmentPart(int tonnage, EquipmentType et, int equipNum) {
+    public EquipmentPart(int tonnage, EquipmentType et, int equipNum, Campaign c) {
         // TODO Memorize all entity attributes needed to calculate cost
         // As it is a part bought with one entity can be used on another entity
         // on which it would have a different price (only tonnage is taken into
         // account for compatibility)
-        super(tonnage);
+        super(tonnage, c);
         this.type =et;
         if(null != type) {
         	this.name = type.getName();
@@ -78,7 +79,7 @@ public class EquipmentPart extends Part {
     }
 
     public EquipmentPart clone() {
-    	return new EquipmentPart(getUnitTonnage(), type, equipmentNum);
+    	return new EquipmentPart(getUnitTonnage(), type, equipmentNum, campaign);
     }
     
     @Override
@@ -235,7 +236,7 @@ public class EquipmentPart extends Part {
 
 	@Override
 	public Part getMissingPart() {
-		return new MissingEquipmentPart(getUnitTonnage(), type, equipmentNum);
+		return new MissingEquipmentPart(getUnitTonnage(), type, equipmentNum, campaign);
 	}
 
 	@Override
@@ -248,11 +249,11 @@ public class EquipmentPart extends Part {
 		        unit.destroySystem(CriticalSlot.TYPE_EQUIPMENT, unit.getEntity().getEquipmentNum(mounted));	
 			}
 	        if(!salvage) {
-				unit.campaign.removePart(this);
+				campaign.removePart(this);
 			}
 	        unit.removePart(this);
 	        Part missing = getMissingPart();
-			unit.campaign.addPart(missing);
+			campaign.addPart(missing);
 			unit.addPart(missing);
 		}
 		setUnit(null);

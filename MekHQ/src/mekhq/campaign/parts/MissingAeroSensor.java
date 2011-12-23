@@ -25,6 +25,7 @@ import java.io.PrintWriter;
 
 import megamek.common.Aero;
 import megamek.common.EquipmentType;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
 
 import org.w3c.dom.Node;
@@ -44,11 +45,11 @@ public class MissingAeroSensor extends MissingPart {
 	private boolean dropship;
 	
 	public MissingAeroSensor() {
-    	this(0, false);
+    	this(0, false, null);
     }
     
-    public MissingAeroSensor(int tonnage, boolean drop) {
-    	super(0);
+    public MissingAeroSensor(int tonnage, boolean drop, Campaign c) {
+    	super(0, c);
     	this.time = 1200;
     	this.difficulty = -2;
     	this.name = "Aero Sensors";
@@ -62,7 +63,7 @@ public class MissingAeroSensor extends MissingPart {
 
 	@Override
 	public Part getNewPart() {
-		return new AeroSensor(getUnitTonnage(), dropship);
+		return new AeroSensor(getUnitTonnage(), dropship, campaign);
 	}
 
 	@Override

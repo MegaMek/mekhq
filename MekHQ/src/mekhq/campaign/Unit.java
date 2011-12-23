@@ -452,13 +452,13 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 		long value = 0;
 		for(Part part : parts) {
 			if(part instanceof MissingPart) {
-				value += ((MissingPart)part).getNewPart().getActualValue(campaign);
+				value += ((MissingPart)part).getNewPart().getActualValue();
 			}
 			else if(part instanceof Armor) {
-				value += ((Armor)part).getValueNeeded(campaign);
+				value += ((Armor)part).getValueNeeded();
 			}
 			else if(part instanceof AmmoBin) {
-				value += ((AmmoBin)part).getValueNeeded(campaign);
+				value += ((AmmoBin)part).getValueNeeded();
 			}
 		}
 		return value;
@@ -1349,47 +1349,47 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     	for(int i = 0; i<locations.length; i++) {
     		if(null == locations[i]) {
     			if(entity instanceof Mech) {
-    				MekLocation mekLocation = new MekLocation(i, (int) getEntity().getWeight(), getEntity().getStructureType(), hasTSM(), entity instanceof QuadMech);
+    				MekLocation mekLocation = new MekLocation(i, (int) getEntity().getWeight(), getEntity().getStructureType(), hasTSM(), entity instanceof QuadMech, campaign);
     				addPart(mekLocation);
     				partsToAdd.add(mekLocation);
     			} else if(entity instanceof Tank && i != Tank.LOC_BODY) {
     				if(i == Tank.LOC_TURRET && entity instanceof VTOL) {
-    					Rotor rotor = new Rotor((int)getEntity().getWeight());
+    					Rotor rotor = new Rotor((int)getEntity().getWeight(), campaign);
     					addPart(rotor);
     					partsToAdd.add(rotor);
     				} else if(i == Tank.LOC_TURRET) {
     					 if(((Tank)entity).hasNoTurret()) {
     						 continue;
     					 }
-    					 Turret turret = new Turret(i, (int)getEntity().getWeight());
+    					 Turret turret = new Turret(i, (int)getEntity().getWeight(), campaign);
     					 addPart(turret);
     					 partsToAdd.add(turret);
     				} else if(i == Tank.LOC_TURRET_2) {
     					 if(((Tank)entity).hasNoDualTurret()) {
     						 continue;
     					 }
-    					 Turret turret = new Turret(i, (int)getEntity().getWeight());
+    					 Turret turret = new Turret(i, (int)getEntity().getWeight(), campaign);
     					 addPart(turret);
     					 partsToAdd.add(turret);
     				} else {
-	    				TankLocation tankLocation = new TankLocation(i, (int) getEntity().getWeight());
+	    				TankLocation tankLocation = new TankLocation(i, (int) getEntity().getWeight(), campaign);
 	    				addPart(tankLocation);
 	    				partsToAdd.add(tankLocation);
     				}
     			}
     		}
     		if(null == armor[i]) {
-    			Armor a = new Armor((int) getEntity().getWeight(), getEntity().getArmorType(i), getEntity().getOArmor(i, false), i, false, entity.isClanArmor(i));
+    			Armor a = new Armor((int) getEntity().getWeight(), getEntity().getArmorType(i), getEntity().getOArmor(i, false), i, false, entity.isClanArmor(i), campaign);
     			addPart(a);
     			partsToAdd.add(a);
     		}
     		if(null == armorRear[i] && entity.hasRearArmor(i)) {
-    			Armor a = new Armor((int) getEntity().getWeight(), getEntity().getArmorType(i), getEntity().getOArmor(i, true), i, true, entity.isClanArmor(i));
+    			Armor a = new Armor((int) getEntity().getWeight(), getEntity().getArmorType(i), getEntity().getOArmor(i, true), i, true, entity.isClanArmor(i), campaign);
     			addPart(a);
     			partsToAdd.add(a);
     		}
     		if(entity instanceof Tank && null == stabilisers[i] && i != Tank.LOC_BODY) {
-    			VeeStabiliser s = new VeeStabiliser((int)getEntity().getWeight(),i);
+    			VeeStabiliser s = new VeeStabiliser((int)getEntity().getWeight(),i, campaign);
     			addPart(s);
     			partsToAdd.add(s);
     		}
@@ -1406,7 +1406,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     					oneShot = true;
     				}
     				if(null == apart) {
-    					apart = new AmmoBin((int)entity.getWeight(), m.getType(), eqnum, fullShots - m.getShotsLeft(), oneShot);
+    					apart = new AmmoBin((int)entity.getWeight(), m.getType(), eqnum, fullShots - m.getShotsLeft(), oneShot, campaign);
     					addPart(apart);
     					partsToAdd.add(apart);
     				}
@@ -1418,7 +1418,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     				int eqnum = entity.getEquipmentNum(m);
     				Part epart = heatSinks.get(eqnum);
     				if(null == epart) {
-    					epart = new HeatSink((int)entity.getWeight(), m.getType(), eqnum);
+    					epart = new HeatSink((int)entity.getWeight(), m.getType(), eqnum, campaign);
     					addPart(epart);
     					partsToAdd.add(epart);
     				}
@@ -1426,7 +1426,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     				int eqnum = entity.getEquipmentNum(m);
     				Part epart = jumpJets.get(eqnum);
     				if(null == epart) {
-    					epart = new JumpJet((int)entity.getWeight(), m.getType(), eqnum);
+    					epart = new JumpJet((int)entity.getWeight(), m.getType(), eqnum, campaign);
     					addPart(epart);
     					partsToAdd.add(epart);
     				}
@@ -1434,7 +1434,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     				int eqnum = entity.getEquipmentNum(m);
     				Part epart = equipParts.get(eqnum);
     				if(null == epart) {
-    					epart = new EquipmentPart((int)entity.getWeight(), m.getType(), eqnum);
+    					epart = new EquipmentPart((int)entity.getWeight(), m.getType(), eqnum, campaign);
     					addPart(epart);
     					partsToAdd.add(epart);
     				}
@@ -1443,151 +1443,151 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     	}
     	
     	if(null == engine && !(entity instanceof BattleArmor)) {
-    		engine = new EnginePart((int) entity.getWeight(), entity.getEngine());
+    		engine = new EnginePart((int) entity.getWeight(), entity.getEngine(), campaign);
     		addPart(engine);
     		partsToAdd.add(engine);
     	}
     	if(entity instanceof Mech) {
     		if(null == gyro) {
-    			gyro =  new MekGyro((int) entity.getWeight(), entity.getGyroType(), entity.getOriginalWalkMP());
+    			gyro =  new MekGyro((int) entity.getWeight(), entity.getGyroType(), entity.getOriginalWalkMP(), campaign);
     			addPart(gyro);
     			partsToAdd.add(gyro);
     		}
     		if(null == lifeSupport) {
-    			lifeSupport = new MekLifeSupport((int) entity.getWeight());
+    			lifeSupport = new MekLifeSupport((int) entity.getWeight(), campaign);
     			addPart(lifeSupport);
     			partsToAdd.add(lifeSupport);
     		}
     		if(null == sensor) {
-    			sensor = new MekSensor((int) entity.getWeight());
+    			sensor = new MekSensor((int) entity.getWeight(), campaign);
     			addPart(sensor);
     			partsToAdd.add(sensor);
     		}
     		if(null == cockpit) {
-    			cockpit = new MekCockpit((int) entity.getWeight(), ((Mech)entity).getCockpitType());
+    			cockpit = new MekCockpit((int) entity.getWeight(), ((Mech)entity).getCockpitType(), campaign);
     			addPart(cockpit);
     			partsToAdd.add(cockpit);
     		}
     		if(null == rightUpperArm && entity.hasSystem(Mech.ACTUATOR_UPPER_ARM, Mech.LOC_RARM)) {
-    			rightUpperArm = new MekActuator((int)entity.getWeight(), Mech.ACTUATOR_UPPER_ARM, Mech.LOC_RARM);
+    			rightUpperArm = new MekActuator((int)entity.getWeight(), Mech.ACTUATOR_UPPER_ARM, Mech.LOC_RARM, campaign);
     			addPart(rightUpperArm);
     			partsToAdd.add(rightUpperArm);
     		}
     		if(null == leftUpperArm && entity.hasSystem(Mech.ACTUATOR_UPPER_ARM, Mech.LOC_LARM)) {
-    			leftUpperArm = new MekActuator((int)entity.getWeight(), Mech.ACTUATOR_UPPER_ARM, Mech.LOC_LARM);
+    			leftUpperArm = new MekActuator((int)entity.getWeight(), Mech.ACTUATOR_UPPER_ARM, Mech.LOC_LARM, campaign);
     			addPart(leftUpperArm);
     			partsToAdd.add(leftUpperArm);
     		}
     		if(null == rightLowerArm && entity.hasSystem(Mech.ACTUATOR_LOWER_ARM, Mech.LOC_RARM)) {
-    			rightLowerArm = new MekActuator((int)entity.getWeight(), Mech.ACTUATOR_LOWER_ARM, Mech.LOC_RARM);
+    			rightLowerArm = new MekActuator((int)entity.getWeight(), Mech.ACTUATOR_LOWER_ARM, Mech.LOC_RARM, campaign);
     			addPart(rightLowerArm);
     			partsToAdd.add(rightLowerArm);
     		}
     		if(null == leftLowerArm && entity.hasSystem(Mech.ACTUATOR_LOWER_ARM, Mech.LOC_LARM)) {
-    			leftLowerArm = new MekActuator((int)entity.getWeight(), Mech.ACTUATOR_LOWER_ARM, Mech.LOC_LARM);
+    			leftLowerArm = new MekActuator((int)entity.getWeight(), Mech.ACTUATOR_LOWER_ARM, Mech.LOC_LARM, campaign);
     			addPart(leftLowerArm);
     			partsToAdd.add(leftLowerArm);
     		}
     		if(null == rightHand && entity.hasSystem(Mech.ACTUATOR_HAND, Mech.LOC_RARM)) {
-    			rightHand = new MekActuator((int)entity.getWeight(), Mech.ACTUATOR_HAND, Mech.LOC_RARM);
+    			rightHand = new MekActuator((int)entity.getWeight(), Mech.ACTUATOR_HAND, Mech.LOC_RARM, campaign);
     			addPart(rightHand);
     			partsToAdd.add(rightHand);
     		}
     		if(null == leftHand && entity.hasSystem(Mech.ACTUATOR_HAND, Mech.LOC_LARM)) {
-    			leftHand = new MekActuator((int)entity.getWeight(), Mech.ACTUATOR_HAND, Mech.LOC_LARM);
+    			leftHand = new MekActuator((int)entity.getWeight(), Mech.ACTUATOR_HAND, Mech.LOC_LARM, campaign);
     			addPart(leftHand);
     			partsToAdd.add(leftHand);
     		}
     		if(null == rightUpperLeg && entity.hasSystem(Mech.ACTUATOR_UPPER_LEG, Mech.LOC_RLEG)) {
-    			rightUpperLeg = new MekActuator((int)entity.getWeight(), Mech.ACTUATOR_UPPER_LEG, Mech.LOC_RLEG);
+    			rightUpperLeg = new MekActuator((int)entity.getWeight(), Mech.ACTUATOR_UPPER_LEG, Mech.LOC_RLEG, campaign);
     			addPart(rightUpperLeg);
     			partsToAdd.add(rightUpperLeg);
     		}
     		if(null == leftUpperLeg && entity.hasSystem(Mech.ACTUATOR_UPPER_LEG, Mech.LOC_LLEG)) {
-    			leftUpperLeg = new MekActuator((int)entity.getWeight(), Mech.ACTUATOR_UPPER_LEG, Mech.LOC_LLEG);
+    			leftUpperLeg = new MekActuator((int)entity.getWeight(), Mech.ACTUATOR_UPPER_LEG, Mech.LOC_LLEG, campaign);
     			addPart(leftUpperLeg);
     			partsToAdd.add(leftUpperLeg);
     		}
     		if(null == rightLowerLeg && entity.hasSystem(Mech.ACTUATOR_LOWER_LEG, Mech.LOC_RLEG)) {
-    			rightLowerLeg = new MekActuator((int)entity.getWeight(), Mech.ACTUATOR_LOWER_LEG, Mech.LOC_RLEG);
+    			rightLowerLeg = new MekActuator((int)entity.getWeight(), Mech.ACTUATOR_LOWER_LEG, Mech.LOC_RLEG, campaign);
     			addPart(rightLowerLeg);
     			partsToAdd.add(rightLowerLeg);
     		}
     		if(null == leftLowerLeg && entity.hasSystem(Mech.ACTUATOR_LOWER_LEG, Mech.LOC_LLEG)) {
-    			leftLowerLeg = new MekActuator((int)entity.getWeight(), Mech.ACTUATOR_LOWER_LEG, Mech.LOC_LLEG);
+    			leftLowerLeg = new MekActuator((int)entity.getWeight(), Mech.ACTUATOR_LOWER_LEG, Mech.LOC_LLEG, campaign);
     			addPart(leftLowerLeg);
     			partsToAdd.add(leftLowerLeg);
     		}
     		if(null == rightFoot && entity.hasSystem(Mech.ACTUATOR_FOOT, Mech.LOC_RLEG)) {
-    			rightFoot = new MekActuator((int)entity.getWeight(), Mech.ACTUATOR_FOOT, Mech.LOC_RLEG);
+    			rightFoot = new MekActuator((int)entity.getWeight(), Mech.ACTUATOR_FOOT, Mech.LOC_RLEG, campaign);
     			addPart(rightFoot);
     			partsToAdd.add(rightFoot);
     		}
     		if(null == leftFoot && entity.hasSystem(Mech.ACTUATOR_FOOT, Mech.LOC_LLEG)) {
-    			leftFoot = new MekActuator((int)entity.getWeight(), Mech.ACTUATOR_FOOT, Mech.LOC_LLEG);
+    			leftFoot = new MekActuator((int)entity.getWeight(), Mech.ACTUATOR_FOOT, Mech.LOC_LLEG, campaign);
     			addPart(leftFoot);
     			partsToAdd.add(leftFoot);
     		}
     		if(null == rightUpperFrontLeg && entity.hasSystem(Mech.ACTUATOR_UPPER_LEG, Mech.LOC_RARM)) {
-    			rightUpperFrontLeg = new MekActuator((int)entity.getWeight(), Mech.ACTUATOR_UPPER_LEG, Mech.LOC_RARM);
+    			rightUpperFrontLeg = new MekActuator((int)entity.getWeight(), Mech.ACTUATOR_UPPER_LEG, Mech.LOC_RARM, campaign);
     			addPart(rightUpperFrontLeg);
     			partsToAdd.add(rightUpperFrontLeg);
     		}
     		if(null == leftUpperFrontLeg && entity.hasSystem(Mech.ACTUATOR_UPPER_LEG, Mech.LOC_LARM)) {
-    			leftUpperFrontLeg = new MekActuator((int)entity.getWeight(), Mech.ACTUATOR_UPPER_LEG, Mech.LOC_LARM);
+    			leftUpperFrontLeg = new MekActuator((int)entity.getWeight(), Mech.ACTUATOR_UPPER_LEG, Mech.LOC_LARM, campaign);
     			addPart(leftUpperFrontLeg);
     			partsToAdd.add(leftUpperFrontLeg);
     		}
     		if(null == rightLowerFrontLeg && entity.hasSystem(Mech.ACTUATOR_LOWER_LEG, Mech.LOC_RARM)) {
-    			rightLowerFrontLeg = new MekActuator((int)entity.getWeight(), Mech.ACTUATOR_LOWER_LEG, Mech.LOC_RARM);
+    			rightLowerFrontLeg = new MekActuator((int)entity.getWeight(), Mech.ACTUATOR_LOWER_LEG, Mech.LOC_RARM, campaign);
     			addPart(rightLowerFrontLeg);
     			partsToAdd.add(rightLowerFrontLeg);
     		}
     		if(null == leftLowerFrontLeg && entity.hasSystem(Mech.ACTUATOR_LOWER_LEG, Mech.LOC_LARM)) {
-    			leftLowerFrontLeg = new MekActuator((int)entity.getWeight(), Mech.ACTUATOR_LOWER_LEG, Mech.LOC_LARM);
+    			leftLowerFrontLeg = new MekActuator((int)entity.getWeight(), Mech.ACTUATOR_LOWER_LEG, Mech.LOC_LARM, campaign);
     			addPart(leftLowerFrontLeg);
     			partsToAdd.add(leftLowerFrontLeg);
     		}
     		if(null == rightFrontFoot && entity.hasSystem(Mech.ACTUATOR_FOOT, Mech.LOC_RARM)) {
-    			rightFrontFoot = new MekActuator((int)entity.getWeight(), Mech.ACTUATOR_FOOT, Mech.LOC_RARM);
+    			rightFrontFoot = new MekActuator((int)entity.getWeight(), Mech.ACTUATOR_FOOT, Mech.LOC_RARM, campaign);
     			addPart(rightFrontFoot);
     			partsToAdd.add(rightFrontFoot);
     		}
     		if(null == leftFrontFoot && entity.hasSystem(Mech.ACTUATOR_FOOT, Mech.LOC_LARM)) {
-    			leftFrontFoot = new MekActuator((int)entity.getWeight(), Mech.ACTUATOR_FOOT, Mech.LOC_LARM);
+    			leftFrontFoot = new MekActuator((int)entity.getWeight(), Mech.ACTUATOR_FOOT, Mech.LOC_LARM, campaign);
     			addPart(leftFrontFoot);
     			partsToAdd.add(leftFrontFoot);
     		}
     	}
     	if(entity instanceof Aero) {
     		if(null == structuralIntegrity) {
-    			structuralIntegrity = new StructuralIntegrity((int)entity.getWeight());
+    			structuralIntegrity = new StructuralIntegrity((int)entity.getWeight(), campaign);
     			addPart(structuralIntegrity);
     			partsToAdd.add(structuralIntegrity);
     		}
     		if(null == avionics) {
-    			avionics = new Avionics((int)entity.getWeight());
+    			avionics = new Avionics((int)entity.getWeight(), campaign);
     			addPart(avionics);
     			partsToAdd.add(avionics);
     		}
     		if(null == fcs && !(entity instanceof Jumpship)) {
-    			fcs = new FireControlSystem((int)entity.getWeight());
+    			fcs = new FireControlSystem((int)entity.getWeight(), campaign);
     			addPart(fcs);
     			partsToAdd.add(fcs);
     		}
     		if(null == sensor) {
-    			sensor = new AeroSensor((int) entity.getWeight(), entity instanceof Dropship);
+    			sensor = new AeroSensor((int) entity.getWeight(), entity instanceof Dropship, campaign);
     			addPart(sensor);
     			partsToAdd.add(sensor);
     		}
     		if(null == landingGear) {
-    			landingGear = new LandingGear((int) entity.getWeight());
+    			landingGear = new LandingGear((int) entity.getWeight(), campaign);
     			addPart(landingGear);
     			partsToAdd.add(landingGear);
     		}
     		int hsinks = ((Aero)entity).getOHeatSinks() - aeroHeatSinks.size();
     		while(hsinks > 0) {
-    			AeroHeatSink aHeatSink = new AeroHeatSink((int)entity.getWeight(), ((Aero)entity).getHeatType());
+    			AeroHeatSink aHeatSink = new AeroHeatSink((int)entity.getWeight(), ((Aero)entity).getHeatType(), campaign);
     			addPart(aHeatSink);
     			partsToAdd.add(aHeatSink);
     			hsinks--;
@@ -1595,17 +1595,17 @@ public class Unit implements Serializable, MekHqXmlSerializable {
      	}
     	if(entity instanceof Tank) {
     		if(null == motiveSystem) {
-    			motiveSystem = new MotiveSystem((int)entity.getWeight());
+    			motiveSystem = new MotiveSystem((int)entity.getWeight(), campaign);
     			addPart(motiveSystem);
     			partsToAdd.add(motiveSystem);
     		}
     		if(null == sensor) {
-    			sensor = new VeeSensor((int) entity.getWeight());
+    			sensor = new VeeSensor((int) entity.getWeight(), campaign);
     			addPart(sensor);
     			partsToAdd.add(sensor);
     		}
     		if(!(entity instanceof VTOL) && !((Tank)entity).hasNoTurret() && null == turretLock) {
-    			turretLock = new TurretLock();
+    			turretLock = new TurretLock(campaign);
     			addPart(turretLock);
     			partsToAdd.add(turretLock);
     		}

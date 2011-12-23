@@ -29,6 +29,7 @@ import megamek.common.IArmorState;
 import megamek.common.Mounted;
 import megamek.common.Tank;
 import megamek.common.WeaponType;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
 
@@ -44,25 +45,25 @@ public class Turret extends TankLocation {
 	protected double weight;
 
     public Turret() {
-    	this(0, 0);
+    	this(0, 0, null);
     }
     
     public int getLoc() {
         return loc;
     }
     
-    public Turret(int loc, int tonnage) {
-    	super(loc, tonnage);
+    public Turret(int loc, int tonnage, Campaign c) {
+    	super(loc, tonnage, c);
     	weight = 0;
     	this.name = "Turret";
     }
     
     public Turret clone() {
-    	return new Turret(0, getUnitTonnage());
+    	return new Turret(0, getUnitTonnage(), campaign);
     }
     
-    public Turret(int loc, int tonnage, double weight) {
-        super(loc, tonnage);
+    public Turret(int loc, int tonnage, double weight, Campaign c) {
+        super(loc, tonnage, c);
         this.weight = weight;
     }
     
@@ -136,7 +137,7 @@ public class Turret extends TankLocation {
 
 	@Override
 	public Part getMissingPart() {
-		return new MissingTurret(getUnitTonnage(), weight);
+		return new MissingTurret(getUnitTonnage(), weight, campaign);
 	}
 
 	@Override
@@ -144,11 +145,11 @@ public class Turret extends TankLocation {
 		if(null != unit) {
 			unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, loc);
 			if(!salvage) {
-				unit.campaign.removePart(this);
+				campaign.removePart(this);
 			}
 			unit.removePart(this);
 			Part missing = getMissingPart();
-			unit.campaign.addPart(missing);
+			campaign.addPart(missing);
 			unit.addPart(missing);
 			((Tank)unit.getEntity()).unlockTurret();
 		}

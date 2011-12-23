@@ -26,6 +26,7 @@ import java.io.PrintWriter;
 import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
 import megamek.common.Tank;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
 
 import org.w3c.dom.Node;
@@ -41,11 +42,11 @@ public class MissingTurret extends MissingPart {
 	double weight;
 	
 	public MissingTurret() {
-		this(0,0);
+		this(0,0, null);
 	}
 	
-	public MissingTurret(int tonnage, double weight) {
-        super(tonnage);
+	public MissingTurret(int tonnage, double weight, Campaign c) {
+        super(tonnage, c);
         this.weight = weight;
         this.name = "Turret";
         this.time = 160;
@@ -100,7 +101,7 @@ public class MissingTurret extends MissingPart {
 	@Override
 	public Part getNewPart() {
 		//TODO: how to get second turret location?
-		return new Turret(Tank.LOC_TURRET, getUnitTonnage(), weight);
+		return new Turret(Tank.LOC_TURRET, getUnitTonnage(), weight, campaign);
 	}
 
 	@Override

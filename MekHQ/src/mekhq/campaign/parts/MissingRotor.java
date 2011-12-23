@@ -26,6 +26,7 @@ import java.io.PrintWriter;
 import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
 import megamek.common.VTOL;
+import mekhq.campaign.Campaign;
 
 import org.w3c.dom.Node;
 
@@ -37,11 +38,11 @@ public class MissingRotor extends MissingPart {
 	private static final long serialVersionUID = -3277611762625095964L;
 
 	public MissingRotor() {
-		this(0);
+		this(0, null);
 	}
 	
-	public MissingRotor(int tonnage) {
-        super(tonnage);
+	public MissingRotor(int tonnage, Campaign c) {
+        super(tonnage, c);
         this.name = "Rotor";
         this.time = 300;
         this.difficulty = 0;
@@ -85,7 +86,7 @@ public class MissingRotor extends MissingPart {
 	@Override
 	public Part getNewPart() {
 		//TODO: how to get second turret location?
-		return new Rotor(getUnitTonnage());
+		return new Rotor(getUnitTonnage(), campaign);
 	}
 
 	@Override

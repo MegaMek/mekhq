@@ -26,6 +26,7 @@ import java.io.PrintWriter;
 import megamek.common.CriticalSlot;
 import megamek.common.EquipmentType;
 import megamek.common.Mech;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
 
 import org.w3c.dom.Node;
@@ -41,11 +42,11 @@ public class MissingMekGyro extends MissingPart {
     protected double gyroTonnage;
 
     public MissingMekGyro() {
-    	this(0, 0, 0);
+    	this(0, 0, 0, null);
     }
     
-    public MissingMekGyro(int tonnage, int type, double gyroTonnage) {
-        super(tonnage);
+    public MissingMekGyro(int tonnage, int type, double gyroTonnage, Campaign c) {
+        super(tonnage, c);
         this.type = type;
         this.name = Mech.getGyroTypeString(type);
         this.gyroTonnage = gyroTonnage;
@@ -144,7 +145,7 @@ public class MissingMekGyro extends MissingPart {
 
 	@Override
 	public Part getNewPart() {
-		return new MekGyro(getUnitTonnage(), getType(), getTonnage());
+		return new MekGyro(getUnitTonnage(), getType(), getTonnage(), campaign);
 	}
 
 	@Override

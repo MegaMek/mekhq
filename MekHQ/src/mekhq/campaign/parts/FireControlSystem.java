@@ -26,6 +26,7 @@ import java.io.PrintWriter;
 import megamek.common.Aero;
 import megamek.common.EquipmentType;
 import megamek.common.TechConstants;
+import mekhq.campaign.Campaign;
 
 import org.w3c.dom.Node;
 
@@ -41,16 +42,16 @@ public class FireControlSystem extends Part {
 	private static final long serialVersionUID = -717866644605314883L;
 
 	public FireControlSystem() {
-    	this(0);
+    	this(0, null);
     }
     
-    public FireControlSystem(int tonnage) {
-        super(tonnage);
+    public FireControlSystem(int tonnage, Campaign c) {
+        super(tonnage, c);
         this.name = "Fire Control System";
     }
         
     public FireControlSystem clone() {
-    	return new FireControlSystem(0);
+    	return new FireControlSystem(0, campaign);
     }
     
 	@Override
@@ -92,11 +93,11 @@ public class FireControlSystem extends Part {
 		if(null != unit && unit.getEntity() instanceof Aero) {
 			((Aero)unit.getEntity()).setFCSHits(3);
 			if(!salvage) {
-				unit.campaign.removePart(this);
+				campaign.removePart(this);
 			}
 			unit.removePart(this);
 			Part missing = getMissingPart();
-			unit.campaign.addPart(missing);
+			campaign.addPart(missing);
 			unit.addPart(missing);
 		}
 		setUnit(null);
@@ -104,7 +105,7 @@ public class FireControlSystem extends Part {
 
 	@Override
 	public Part getMissingPart() {
-		return new MissingFireControlSystem(getUnitTonnage());
+		return new MissingFireControlSystem(getUnitTonnage(), campaign);
 	}
 
 	@Override

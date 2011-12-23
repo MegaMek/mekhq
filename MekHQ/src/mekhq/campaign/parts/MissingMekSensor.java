@@ -26,6 +26,7 @@ import java.io.PrintWriter;
 import megamek.common.CriticalSlot;
 import megamek.common.EquipmentType;
 import megamek.common.Mech;
+import mekhq.campaign.Campaign;
 
 import org.w3c.dom.Node;
 
@@ -37,11 +38,11 @@ public class MissingMekSensor extends MissingPart {
 	private static final long serialVersionUID = 931907976883324097L;
 
 	public MissingMekSensor() {
-		this(0);
+		this(0, null);
 	}
 	
-	public MissingMekSensor(int tonnage) {
-        super(tonnage);
+	public MissingMekSensor(int tonnage, Campaign c) {
+        super(tonnage, c);
         this.name = "Mech Sensors";
         this.time = 260;
         this.difficulty = 0;
@@ -97,7 +98,7 @@ public class MissingMekSensor extends MissingPart {
 
 	@Override
 	public Part getNewPart() {
-		return new MekSensor(getUnitTonnage());
+		return new MekSensor(getUnitTonnage(), campaign);
 	}
 
 	@Override

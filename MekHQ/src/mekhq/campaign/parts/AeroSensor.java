@@ -26,6 +26,7 @@ import java.io.PrintWriter;
 import megamek.common.Aero;
 import megamek.common.EquipmentType;
 import megamek.common.TechConstants;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
 
 import org.w3c.dom.Node;
@@ -45,17 +46,17 @@ public class AeroSensor extends Part {
 	private boolean dropship;
 	
 	public AeroSensor() {
-    	this(0, false);
+    	this(0, false, null);
     }
     
-    public AeroSensor(int tonnage, boolean drop) {
-        super(tonnage);
+    public AeroSensor(int tonnage, boolean drop, Campaign c) {
+        super(tonnage, c);
         this.name = "Aerospace Sensors";
         this.dropship = drop;
     }
     
     public AeroSensor clone() {
-    	return new AeroSensor(getUnitTonnage(), dropship);
+    	return new AeroSensor(getUnitTonnage(), dropship, campaign);
     }
         
 	@Override
@@ -97,11 +98,11 @@ public class AeroSensor extends Part {
 		if(null != unit && unit.getEntity() instanceof Aero) {
 			((Aero)unit.getEntity()).setSensorHits(3);
 			if(!salvage) {
-				unit.campaign.removePart(this);
+				campaign.removePart(this);
 			}
 			unit.removePart(this);
 			Part missing = getMissingPart();
-			unit.campaign.addPart(missing);
+			campaign.addPart(missing);
 			unit.addPart(missing);
 		}
 		setUnit(null);
@@ -109,7 +110,7 @@ public class AeroSensor extends Part {
 
 	@Override
 	public Part getMissingPart() {
-		return new MissingAeroSensor(getUnitTonnage(), dropship);
+		return new MissingAeroSensor(getUnitTonnage(), dropship, campaign);
 	}
 
 	@Override

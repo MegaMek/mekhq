@@ -27,6 +27,7 @@ import megamek.common.BipedMech;
 import megamek.common.CriticalSlot;
 import megamek.common.EquipmentType;
 import megamek.common.Mech;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
 
 import org.w3c.dom.Node;
@@ -42,19 +43,19 @@ public class MissingMekActuator extends MissingPart {
 	protected int location;
 
 	public MissingMekActuator() {
-		this(0, 0);
+		this(0, 0, null);
 	}
 	
     public int getType() {
         return type;
     }
     
-    public MissingMekActuator(int tonnage, int type) {
-        this(tonnage, type, -1);
+    public MissingMekActuator(int tonnage, int type, Campaign c) {
+        this(tonnage, type, -1, c);
     }
     
-    public MissingMekActuator(int tonnage, int type, int loc) {
-    	super(tonnage);
+    public MissingMekActuator(int tonnage, int type, int loc, Campaign c) {
+    	super(tonnage, c);
         this.type = type;
         Mech m = new BipedMech();
         this.name = m.getSystemName(type) + " Actuator" ;
@@ -149,7 +150,7 @@ public class MissingMekActuator extends MissingPart {
 
 	@Override
 	public Part getNewPart() {
-		return new MekActuator(getUnitTonnage(), type, -1);
+		return new MekActuator(getUnitTonnage(), type, -1, campaign);
 	}
 	
 	

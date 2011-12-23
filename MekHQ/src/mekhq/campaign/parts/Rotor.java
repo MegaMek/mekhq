@@ -24,6 +24,7 @@ package mekhq.campaign.parts;
 import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
 import megamek.common.VTOL;
+import mekhq.campaign.Campaign;
 
 /**
  *
@@ -33,11 +34,11 @@ public class Rotor extends TankLocation {
 	private static final long serialVersionUID = -122291037522319765L;
 
     public Rotor() {
-    	this(0);
+    	this(0, null);
     }
     
-    public Rotor(int tonnage) {
-        super(VTOL.LOC_ROTOR, tonnage);
+    public Rotor(int tonnage, Campaign c) {
+        super(VTOL.LOC_ROTOR, tonnage, c);
         this.name = "Rotor";
         this.damage = 0;
         this.time = 120;
@@ -45,7 +46,7 @@ public class Rotor extends TankLocation {
     }
     
     public Rotor clone() {
-    	return new Rotor(getUnitTonnage());
+    	return new Rotor(getUnitTonnage(), campaign);
     }
  
     @Override
@@ -84,7 +85,7 @@ public class Rotor extends TankLocation {
 
 	@Override
 	public Part getMissingPart() {
-		return new MissingRotor(getUnitTonnage());
+		return new MissingRotor(getUnitTonnage(), campaign);
 	}
 
 	@Override
@@ -92,11 +93,11 @@ public class Rotor extends TankLocation {
 		if(null != unit && unit.getEntity() instanceof VTOL) {
 			unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, VTOL.LOC_ROTOR);
 			if(!salvage) {
-				unit.campaign.removePart(this);
+				campaign.removePart(this);
 			}
 			unit.removePart(this);
 			Part missing = getMissingPart();
-			unit.campaign.addPart(missing);
+			campaign.addPart(missing);
 			unit.addPart(missing);
 			((VTOL)unit.getEntity()).resetMovementDamage();
 			for(Part part : unit.getParts()) {

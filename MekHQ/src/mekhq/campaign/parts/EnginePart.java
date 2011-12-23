@@ -31,6 +31,7 @@ import megamek.common.EquipmentType;
 import megamek.common.Mech;
 import megamek.common.Tank;
 import megamek.common.TechConstants;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
 
 import org.w3c.dom.Node;
@@ -45,17 +46,17 @@ public class EnginePart extends Part {
 	protected Engine engine;
 
 	public EnginePart() {
-		this(0, new Engine(0, 0, -1));
+		this(0, new Engine(0, 0, -1), null);
 	}
 
-	public EnginePart(int tonnage, Engine e) {
-		super(tonnage);
+	public EnginePart(int tonnage, Engine e, Campaign c) {
+		super(tonnage, c);
 		this.engine = e;
 		this.name = engine.getEngineName() + " Engine";
 	}
 	
 	public EnginePart clone() {
-		return new EnginePart(0, engine);
+		return new EnginePart(0, engine, campaign);
 	}
 
 	public Engine getEngine() {
@@ -245,7 +246,7 @@ public class EnginePart extends Part {
 
 	@Override
 	public Part getMissingPart() {
-		return new MissingEnginePart(getUnitTonnage(), getEngine());
+		return new MissingEnginePart(getUnitTonnage(), getEngine(), campaign);
 	}
 
 	@Override
@@ -259,11 +260,11 @@ public class EnginePart extends Part {
 				((Tank)unit.getEntity()).engineHit();
 			}
 			if(!salvage) {
-				unit.campaign.removePart(this);
+				campaign.removePart(this);
 			}
 			unit.removePart(this);
 			Part missing = getMissingPart();
-			unit.campaign.addPart(missing);
+			campaign.addPart(missing);
 			unit.addPart(missing);
 		}
 		setUnit(null);	

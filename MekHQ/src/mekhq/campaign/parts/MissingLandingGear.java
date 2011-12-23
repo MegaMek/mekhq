@@ -23,6 +23,7 @@ package mekhq.campaign.parts;
 
 import megamek.common.Aero;
 import megamek.common.EquipmentType;
+import mekhq.campaign.Campaign;
 
 /**
  *
@@ -36,11 +37,11 @@ public class MissingLandingGear extends MissingPart {
 	private static final long serialVersionUID = 2806921577150714477L;
 
 	public MissingLandingGear() {
-    	this(0);
+    	this(0, null);
     }
     
-    public MissingLandingGear(int tonnage) {
-    	super(0);
+    public MissingLandingGear(int tonnage, Campaign c) {
+    	super(0, c);
     	this.time = 1200;
     	this.difficulty = 2;
     	this.name = "Landing Gear";
@@ -53,7 +54,7 @@ public class MissingLandingGear extends MissingPart {
 
 	@Override
 	public Part getNewPart() {
-		return new LandingGear(getUnitTonnage());
+		return new LandingGear(getUnitTonnage(), campaign);
 	}
 
 	@Override

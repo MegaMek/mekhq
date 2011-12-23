@@ -28,6 +28,7 @@ import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Mounted;
 import megamek.common.TargetRoll;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.Era;
 import mekhq.campaign.MekHqXmlUtil;
 
@@ -47,11 +48,11 @@ public class AmmoStorage extends EquipmentPart {
 	protected int shots;
 	
     public AmmoStorage() {
-    	this(0, null, 0);
+    	this(0, null, 0, null);
     }
     
-    public AmmoStorage(int tonnage, EquipmentType et, int shots) {
-        super(tonnage, et, -1);
+    public AmmoStorage(int tonnage, EquipmentType et, int shots, Campaign c) {
+        super(tonnage, et, -1, c);
         this.shots = shots;
         if(null != type && type instanceof AmmoType) {
         	this.munition = ((AmmoType)type).getMunitionType();
@@ -60,7 +61,7 @@ public class AmmoStorage extends EquipmentPart {
     }
     
     public AmmoStorage clone() {
-    	AmmoStorage storage = new AmmoStorage(0, getType(), shots);
+    	AmmoStorage storage = new AmmoStorage(0, getType(), shots, campaign);
     	storage.munition = this.munition;
     	return storage;
     }

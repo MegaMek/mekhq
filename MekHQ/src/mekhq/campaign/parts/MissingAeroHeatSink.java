@@ -23,6 +23,7 @@ package mekhq.campaign.parts;
 
 import megamek.common.Aero;
 import megamek.common.EquipmentType;
+import mekhq.campaign.Campaign;
 
 /**
  *
@@ -38,11 +39,11 @@ public class MissingAeroHeatSink extends MissingPart {
 	private int type;
 	
 	public MissingAeroHeatSink() {
-    	this(0, Aero.HEAT_SINGLE);
+    	this(0, Aero.HEAT_SINGLE, null);
     }
     
-    public MissingAeroHeatSink(int tonnage, int type) {
-    	super(0);
+    public MissingAeroHeatSink(int tonnage, int type, Campaign c) {
+    	super(0, c);
     	this.time = 90;
     	this.difficulty = -2;
     	this.type = type;
@@ -56,7 +57,7 @@ public class MissingAeroHeatSink extends MissingPart {
 
 	@Override
 	public Part getNewPart() {
-		return new AeroHeatSink(getUnitTonnage(), type);
+		return new AeroHeatSink(getUnitTonnage(), type, campaign);
 	}
 
 	@Override

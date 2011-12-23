@@ -28,6 +28,7 @@ import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Mech;
 import megamek.common.TechConstants;
+import mekhq.campaign.Campaign;
 
 import org.w3c.dom.Node;
 
@@ -39,16 +40,16 @@ public class MekSensor extends Part {
 	private static final long serialVersionUID = 931907976883324097L;
 
 	public MekSensor() {
-		this(0);
+		this(0, null);
 	}
 	
-	public MekSensor(int tonnage) {
-        super(tonnage);
+	public MekSensor(int tonnage, Campaign c) {
+        super(tonnage, c);
         this.name = "Mech Sensors";
     }
 	
 	public MekSensor clone() {
-		return new MekSensor(getUnitTonnage());
+		return new MekSensor(getUnitTonnage(), campaign);
 	}
 	
 	@Override
@@ -120,7 +121,7 @@ public class MekSensor extends Part {
 
 	@Override
 	public Part getMissingPart() {
-		return new MissingMekSensor(getUnitTonnage());
+		return new MissingMekSensor(getUnitTonnage(), campaign);
 	}
 
 	@Override
@@ -128,11 +129,11 @@ public class MekSensor extends Part {
 		if(null != unit) {
 			unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS);
 			if(!salvage) {
-				unit.campaign.removePart(this);
+				campaign.removePart(this);
 			}
 			unit.removePart(this);
 			Part missing = getMissingPart();
-			unit.campaign.addPart(missing);
+			campaign.addPart(missing);
 			unit.addPart(missing);
 		}
 		setUnit(null);

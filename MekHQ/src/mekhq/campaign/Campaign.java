@@ -229,7 +229,7 @@ public class Campaign implements Serializable {
 		astechPool = 0;
 		medicPool = 0;
 		resetAstechMinutes();
-		partsStore = new PartsStore();
+		partsStore = new PartsStore(this);
 		gameOptions = new GameOptions();
 		gameOptions.initialize();
 		game.setOptions(gameOptions);
@@ -1405,7 +1405,7 @@ public class Campaign implements Serializable {
 	}
 
 	public void sellPart(Part part) {
-		long cost = part.getActualValue(this);
+		long cost = part.getActualValue();
 		finances.credit(cost, Transaction.C_EQUIP_SALE, "Sale of " + part.getName(), calendar.getTime());
 		removePart(part);
 	}
@@ -1417,7 +1417,7 @@ public class Campaign implements Serializable {
 	public void buyPart(Part part, double multiplier) {
 		addPart(part);
 		if(getCampaignOptions().payForParts()) {
-			finances.debit((long)(multiplier * part.getActualValue(this)), Transaction.C_EQUIP, "Purchase of " + part.getName(), calendar.getTime());		
+			finances.debit((long)(multiplier * part.getActualValue()), Transaction.C_EQUIP, "Purchase of " + part.getName(), calendar.getTime());		
 		}
 	}
 
@@ -2274,6 +2274,7 @@ public class Campaign implements Serializable {
 			}
 			
 			if (p != null)
+				p.setCampaign(retVal);
 				retVal.addPartWithoutId(p);
 		}
 

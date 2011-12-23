@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.1.13 (SVN)
++ added campaign reference to all parts (should fix NPE refit bug)
 
 v0.1.12 (2011-12-22)
 + restrict parts store by tech limits

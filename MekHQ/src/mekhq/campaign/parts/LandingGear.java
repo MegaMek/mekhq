@@ -26,6 +26,7 @@ import java.io.PrintWriter;
 import megamek.common.Aero;
 import megamek.common.EquipmentType;
 import megamek.common.TechConstants;
+import mekhq.campaign.Campaign;
 
 import org.w3c.dom.Node;
 
@@ -41,16 +42,16 @@ public class LandingGear extends Part {
 	private static final long serialVersionUID = -717866644605314883L;
 
 	public LandingGear() {
-    	this(0);
+    	this(0, null);
     }
     
-    public LandingGear(int tonnage) {
-        super(tonnage);
+    public LandingGear(int tonnage, Campaign c) {
+        super(tonnage, c);
         this.name = "Landing Gear";
     }
         
     public LandingGear clone() {
-    	return new LandingGear(0);
+    	return new LandingGear(0, campaign);
     }
     
 	@Override
@@ -94,11 +95,11 @@ public class LandingGear extends Part {
 		if(null != unit && unit.getEntity() instanceof Aero) {
 			((Aero)unit.getEntity()).setGearHit(true);
 			if(!salvage) {
-				unit.campaign.removePart(this);
+				campaign.removePart(this);
 			}
 			unit.removePart(this);
 			Part missing = getMissingPart();
-			unit.campaign.addPart(missing);
+			campaign.addPart(missing);
 			unit.addPart(missing);
 		}
 		setUnit(null);
@@ -106,7 +107,7 @@ public class LandingGear extends Part {
 
 	@Override
 	public Part getMissingPart() {
-		return new MissingLandingGear(getUnitTonnage());
+		return new MissingLandingGear(getUnitTonnage(), campaign);
 	}
 
 	@Override
