@@ -3,6 +3,7 @@ VERSION HISTORY
 v0.1.13 (SVN)
 + added campaign reference to all parts (should fix NPE refit bug)
 + bug: campaign reference not set for refit shoppingList on load
++ limit refit kits by tech limits
 
 v0.1.12 (2011-12-22)
 + restrict parts store by tech limits

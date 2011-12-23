@@ -55,6 +55,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Enumeration;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.ResourceBundle;
 import java.util.StringTokenizer;
@@ -7687,7 +7688,7 @@ public class CampaignGUI extends JPanel {
 					menu = new JMenu("Customize");
 			
 					JMenu refitMenu = new JMenu("Refit Kit");
-					for(String model : Utilities.getAllVariants(unit.getEntity())) {
+					for(String model : Utilities.getAllVariants(unit.getEntity(), getCampaign().getCalendar().get(GregorianCalendar.YEAR), getCampaign().getCampaignOptions())) {
 						MechSummary summary = MechSummaryCache.getInstance().getMech(unit.getEntity().getChassis() + " " + model);
 						if(null == summary) {
 							continue;

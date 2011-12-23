@@ -38,6 +38,7 @@ import megamek.common.MechSummaryCache;
 import megamek.common.Mounted;
 import megamek.common.Protomech;
 import megamek.common.TechConstants;
+import mekhq.campaign.CampaignOptions;
 
 /**
  *
@@ -196,10 +197,16 @@ public class Utilities {
         return choice;
     }
 	
-	public static ArrayList<String> getAllVariants(Entity en) {
+	public static ArrayList<String> getAllVariants(Entity en, int year, CampaignOptions options) {
 		ArrayList<String> variants = new ArrayList<String>();
 		for(MechSummary summary : MechSummaryCache.getInstance().getAllMechs()) {
-			if(!summary.isCanon()) {
+			if(!summary.isCanon() && options.allowCanonOnly()) {
+				continue;
+			}
+			if(options.limitByYear() && summary.getYear() > year) {
+				continue;
+			}
+			if(options.getTechLevel() < (Integer.parseInt(TechConstants.T_SIMPLE_LEVEL[summary.getType()])-2)) {
 				continue;
 			}
 			if(en.getChassis().equalsIgnoreCase(summary.getChassis())
