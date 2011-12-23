@@ -1873,6 +1873,7 @@ public class Campaign implements Serializable {
 			unit.resetPilotAndEntity();
 			
 			if(null != unit.getRefit()) {
+				unit.getRefit().reCalc();
 				if(null == unit.getRefit().getNewArmorSupplies() && unit.getRefit().getNewArmorSuppliesId() > 0) {
 					unit.getRefit().setNewArmorSupplies((Armor)retVal.getPart(unit.getRefit().getNewArmorSuppliesId()));
 				}

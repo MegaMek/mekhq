@@ -1253,6 +1253,13 @@ public class Refit implements IPartWork, IAcquisitionWork {
 			}
 		}
 	}
+	
+	public void reCalc() {
+		for(Part p : shoppingList) {
+			p.setCampaign(oldUnit.campaign);
+		}
+		newArmorSupplies.setCampaign(oldUnit.campaign);
+	}
 
 	@Override
 	public Part getNewPart() {
