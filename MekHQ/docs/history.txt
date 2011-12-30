@@ -6,6 +6,7 @@ v0.1.13 (SVN)
 + limit refit kits by tech limits
 + correct calculation of engine tonnage and costs
 + updated MM.jar
++ Bug 3466916: Damaged Mech does not appear in Repair Bay
 
 v0.1.12 (2011-12-22)
 + restrict parts store by tech limits

@@ -218,6 +218,12 @@ public class Scenario implements Serializable {
 				f.clearScenarioIds(campaign);
 			}	
 		}
+		for(int uid : unitIds) {
+			Unit u = campaign.getUnit(uid);
+			if(null != u) {
+				u.undeploy();
+			}
+		}
 		subForceIds = new ArrayList<Integer>();
 		unitIds = new ArrayList<Integer>();
 	}

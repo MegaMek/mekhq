@@ -234,7 +234,7 @@ public class Force implements Serializable {
 		for(int uid : getUnits()) {
 			Unit u = c.getUnit(uid);
 			if(null != u) {
-				u.setScenarioId(-1);
+				u.undeploy();
 			}
 		}
 		for(Force sub : getSubForces()) {
