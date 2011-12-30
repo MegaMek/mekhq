@@ -24,10 +24,14 @@ import java.io.PrintWriter;
 
 import megamek.common.AmmoType;
 import megamek.common.CriticalSlot;
+import megamek.common.Engine;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
+import megamek.common.MiscType;
 import megamek.common.Mounted;
+import megamek.common.Protomech;
 import megamek.common.TechConstants;
+import megamek.common.WeaponType;
 import megamek.common.weapons.Weapon;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Era;
@@ -84,6 +88,8 @@ public class EquipmentPart extends Part {
     
     @Override
     public double getTonnage() {
+    	//TODO: we need to copy the code from EquipmentType to generate item tonnage and
+    	//calculate it from the entity or feed it in from the parts store
     	Entity en = null;
     	if(null != unit) {
     		en = unit.getEntity();
@@ -95,40 +101,6 @@ public class EquipmentPart extends Part {
         	System.out.println("Found a null entity while calculating weight for " + name);
         }
     	return ton;
-    }
-    
-    /**
-     * Copied from megamek.common.Entity.getWeaponsAndEquipmentCost(StringBuffer detail, boolean ignoreAmmo)
-     *
-     */
-    @Override
-    public long getStickerPrice() {
-    	//costs are a total nightmare
-        //some costs depend on entity, but we can't do it that way
-        //because spare parts don't have entities. If parts start on an entity
-        //thats fine, but this will become problematic when we set up a parts
-        //store. For now I am just going to pass in a null entity and attempt
-    	//to catch any resulting NPEs
-    	Entity en = null;
-    	boolean isArmored = false;
-    	if (unit != null) {
-            en = unit.getEntity();
-            Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
-            if(null != mounted) {
-            	isArmored = mounted.isArmored();
-            }
-    	}
-
-        int itemCost = 0;      
-        try {
-        	itemCost = (int) type.getCost(en, isArmored);
-        	if (itemCost == EquipmentType.COST_VARIABLE) {
-        		itemCost = type.resolveVariableCost(en, isArmored);
-        	}
-        } catch(NullPointerException ex) {
-        	System.out.println("Found a null entity while calculating cost for " + name);
-        }
-        return itemCost;
     }
     
     /**
@@ -369,5 +341,116 @@ public class EquipmentPart extends Part {
             }
         }       
         return null;
+    }
+	
+	/**
+     * Copied from megamek.common.Entity.getWeaponsAndEquipmentCost(StringBuffer detail, boolean ignoreAmmo)
+     *
+     */
+    @Override
+    public long getStickerPrice() {
+    	//OK, we cant use the resolveVariableCost methods from megamek, because they
+    	//rely on entity which may be null if this is a spare part. So we use our 
+    	//own resolveVariableCost method
+    	//TODO: we need a static method that returns whether this equipment type depends upon
+    	// - unit tonnage
+    	// - item tonnage
+    	// - engine
+    	// use that to determine how to add things to the parts store and to 
+    	// determine whether what can be used as a replacement
+    	//why does all the proto ammo have no cost?
+    	Entity en = null;
+    	boolean isArmored = false;
+    	if (unit != null) {
+            en = unit.getEntity();
+            Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
+            if(null != mounted) {
+            	isArmored = mounted.isArmored();
+            }
+    	}
+
+        int itemCost = 0;      
+        try {
+        	itemCost = (int) type.getCost(en, isArmored);
+        	if (itemCost == EquipmentType.COST_VARIABLE) {
+        		itemCost = resolveVariableCost(isArmored);
+        	}
+        } catch(NullPointerException ex) {
+        	System.out.println("Found a null entity while calculating cost for " + name);
+        }
+        return itemCost;
+    }
+    
+    private int resolveVariableCost(boolean isArmored) {
+    	int varCost = 0;
+        if (type instanceof MiscType) {
+            if (type.hasFlag(MiscType.F_MASC)) {
+            	//TODO: account for protomechs
+               /* if (entity instanceof Protomech) {
+                    varCost = Math.round(entity.getEngine().getRating() * 1000 * entity.getWeight() * 0.025f);
+                } else */
+            	if (type.hasSubType(MiscType.S_SUPERCHARGER)) {
+            		//TODO: need an engine rating
+                    //Engine e = entity.getEngine();
+            		Engine e = null;
+                    if (e == null) {
+                        varCost = 0;
+                    } else {
+                        varCost = e.getRating() * 10000;
+                    }
+                } else {
+                    int mascTonnage = 0;
+                    if (type.getInternalName().equals("ISMASC")) {
+                        mascTonnage = Math.round(getUnitTonnage() / 20.0f);
+                    } else if (type.getInternalName().equals("CLMASC")) {
+                        mascTonnage = Math.round(getUnitTonnage() / 25.0f);
+                    }
+                    //varCost = entity.getEngine().getRating() * mascTonnage * 1000;
+                }
+            } else if (type.hasFlag(MiscType.F_TARGCOMP)) {
+                int tCompTons = 0;
+                //TODO: need to track equipment tonnage
+                /*
+                for (Mounted mo : entity.getWeaponList()) {
+                    WeaponType wt = (WeaponType) mo.getType();
+                    if (wt.hasFlag(WeaponType.F_DIRECT_FIRE)) {
+                        fTons += wt.getTonnage(entity);
+                    }
+                }
+                */
+                if (type.getInternalName().equals("ISTargeting Computer")) {
+                    tCompTons = (int) Math.ceil(getTonnage() / 4.0f);
+                } else if (type.getInternalName().equals("CLTargeting Computer")) {
+                    tCompTons = (int) Math.ceil(getTonnage() / 5.0f);
+                }
+                varCost = tCompTons * 10000;
+            } else if (type.hasFlag(MiscType.F_CLUB) && (type.hasSubType(MiscType.S_HATCHET) || type.hasSubType(MiscType.S_MACE_THB))) {
+                int hatchetTons = (int) Math.ceil(getUnitTonnage() / 15.0);
+                varCost = hatchetTons * 5000;
+            } else if (type.hasFlag(MiscType.F_CLUB) && type.hasSubType(MiscType.S_SWORD)) {
+                int swordTons = (int) Math.ceil(getUnitTonnage() / 15.0);
+                varCost = swordTons * 10000;
+            } else if (type.hasFlag(MiscType.F_CLUB) && type.hasSubType(MiscType.S_RETRACTABLE_BLADE)) {
+                int bladeTons = (int) Math.ceil(0.5f + Math.ceil(getUnitTonnage() / 20.0));
+                varCost = (1 + bladeTons) * 10000;
+            } else if (type.hasFlag(MiscType.F_TRACKS)) {
+            	//TODO: need engine
+                //varCost = (int) Math.ceil((500 * entity.getEngine().getRating() * entity.getWeight()) / 75);
+            } else if (type.hasFlag(MiscType.F_TALON)) {
+                varCost = (int) Math.ceil(getUnitTonnage() * 300);
+            }
+
+        } else {
+            if (varCost == 0) {
+                // if we don't know what it is...
+                System.out.println("I don't know how much " + name + " costs.");
+            }
+        }
+
+        if (isArmored) {
+        	//need a getCriticals command - but how does this work?
+            //varCost += 150000 * getCriticals(entity);
+        }
+        return varCost;
     }
 }

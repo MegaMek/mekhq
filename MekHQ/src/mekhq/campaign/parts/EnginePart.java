@@ -27,10 +27,12 @@ import megamek.common.Aero;
 import megamek.common.CriticalSlot;
 import megamek.common.Engine;
 import megamek.common.Entity;
+import megamek.common.EntityMovementMode;
 import megamek.common.EquipmentType;
 import megamek.common.Mech;
 import megamek.common.Tank;
 import megamek.common.TechConstants;
+import megamek.common.verifier.TestEntity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
 
@@ -44,19 +46,21 @@ import org.w3c.dom.NodeList;
 public class EnginePart extends Part {
 	private static final long serialVersionUID = -6961398614705924172L;
 	protected Engine engine;
+	protected boolean forHover;
 
 	public EnginePart() {
-		this(0, new Engine(0, 0, -1), null);
+		this(0, new Engine(0, 0, -1), null, false);
 	}
 
-	public EnginePart(int tonnage, Engine e, Campaign c) {
+	public EnginePart(int tonnage, Engine e, Campaign c, boolean hover) {
 		super(tonnage, c);
 		this.engine = e;
+		this.forHover = hover;
 		this.name = engine.getEngineName() + " Engine";
 	}
 	
 	public EnginePart clone() {
-		return new EnginePart(0, engine, campaign);
+		return new EnginePart(0, new Engine(engine.getRating(), engine.getEngineType(), engine.getFlags()), campaign, forHover);
 	}
 
 	public Engine getEngine() {
@@ -65,15 +69,61 @@ public class EnginePart extends Part {
 	
 	@Override
 	public double getTonnage() {
-		if(null != unit) {
-			return engine.getWeightEngine(unit.getEntity());
-		}
-		return 0;
+		float weight = Engine.ENGINE_RATINGS[(int) Math.ceil(engine.getRating() / 5.0)];
+        switch (engine.getEngineType()) {
+            case Engine.COMBUSTION_ENGINE:
+                weight *= 2.0f;
+                break;
+            case Engine.NORMAL_ENGINE:
+                break;
+            case Engine.XL_ENGINE:
+                weight *= 0.5f;
+                break;
+            case Engine.LIGHT_ENGINE:
+                weight *= 0.75f;
+                break;
+            case Engine.XXL_ENGINE:
+                weight /= 3f;
+                break;
+            case Engine.COMPACT_ENGINE:
+                weight *= 1.5f;
+                break;
+            case Engine.FISSION:
+                weight *= 1.75;
+                weight = Math.max(5, weight);
+                break;
+            case Engine.FUEL_CELL:
+                weight *= 1.2;
+                break;
+            case Engine.NONE:
+                return 0;
+        }
+        weight = TestEntity.ceilMaxHalf(weight, TestEntity.CEIL_HALFTON);
+
+        if (engine.hasFlag(Engine.TANK_ENGINE) && engine.isFusion()) {
+            weight *= 1.5f;
+        }
+        float toReturn = TestEntity.ceilMaxHalf(weight, TestEntity.CEIL_HALFTON);
+        // hover have a minimum weight of 20%
+        if (forHover) {
+            return Math.max(TestEntity.ceilMaxHalf(getUnitTonnage()/5, TestEntity.CEIL_HALFTON), toReturn);
+        }
+        return toReturn;
 	}
 	
 	@Override 
 	public long getStickerPrice() {
 		return (long)Math.round(getEngine().getBaseCost() * getEngine().getRating() * getUnitTonnage() / 75.0);
+	}
+	
+	public void fixTankFlag(boolean hover) {
+		int flags = engine.getFlags();
+		if(!engine.hasFlag(Engine.TANK_ENGINE)) {
+			flags |= Engine.TANK_ENGINE;
+		}
+		engine = new Engine(engine.getRating(), engine.getEngineType(), flags);
+		this.name = engine.getEngineName() + " Engine";
+		this.forHover = hover;
 	}
 
 	@Override
@@ -88,7 +138,10 @@ public class EnginePart extends Part {
 				&& getEngine().getRating() == ((EnginePart) part).getEngine()
 						.getRating()
 				&& getEngine().getTechType() == ((EnginePart) part).getEngine()
-						.getTechType();
+						.getTechType()
+				&& getEngine().hasFlag(Engine.TANK_ENGINE) == ((EnginePart) part).getEngine().hasFlag(Engine.TANK_ENGINE)
+				&& getUnitTonnage() == ((EnginePart) part).getUnitTonnage()
+				&& getTonnage() == ((EnginePart)part).getTonnage();
 	}
 
 	@Override
@@ -115,14 +168,14 @@ public class EnginePart extends Part {
 				+ engine.getEngineType() + "</engineType>");
 		pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<engineRating>"
 				+ engine.getRating() + "</engineRating>");
-		// TODO: Modify MM to get access to engine flags.
-		// Without those flags, the engine has a good chance of being loaded wrong!
-		/*
-		 * pw1.println(MekHqXmlUtil.indentStr(indent+1)
-		 * +"<engineFlags>"
-		 * +engine.getFlags()
-		 * +"</engineFlags>");
-		 */
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<engineFlags>"
+				+engine.getFlags()
+				+"</engineFlags>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<forHover>"
+				+forHover
+				+"</forHover>");
 		writeToXmlEnd(pw1, indent, id);
 	}
 
@@ -142,6 +195,12 @@ public class EnginePart extends Part {
 				engineRating = Integer.parseInt(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("engineFlags")) {
 				engineFlags = Integer.parseInt(wn2.getTextContent());
+			} else if (wn2.getNodeName().equalsIgnoreCase("forHover")) {
+				if(wn2.getTextContent().equalsIgnoreCase("true")) {
+					forHover = true;
+				} else {
+					forHover = false;
+				}
 			} 
 		}
 		
@@ -246,7 +305,7 @@ public class EnginePart extends Part {
 
 	@Override
 	public Part getMissingPart() {
-		return new MissingEnginePart(getUnitTonnage(), getEngine(), campaign);
+		return new MissingEnginePart(getUnitTonnage(), new Engine(engine.getRating(), engine.getEngineType(), engine.getFlags()), campaign, forHover);
 	}
 
 	@Override
@@ -366,5 +425,17 @@ public class EnginePart extends Part {
 			 }
 		 }
 		 return null;
+	 }
+	
+	 @Override
+	 public String getDetails() {
+		 if(null != unit) {
+			 return super.getDetails();
+		 }
+		 String hvrString = "";
+		 if(forHover) {
+			 hvrString = " (hover)";
+		 }
+		 return super.getDetails() + ", " + getUnitTonnage() + " tons" + hvrString;
 	 }
 }

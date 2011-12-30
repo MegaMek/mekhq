@@ -32,6 +32,9 @@ import megamek.common.Engine;
 import megamek.common.EquipmentType;
 import megamek.common.Mech;
 import megamek.common.MiscType;
+import megamek.common.verifier.TestEntity;
+import megamek.common.weapons.BayWeapon;
+import megamek.common.weapons.InfantryAttack;
 import megamek.common.weapons.infantry.InfantryWeapon;
 import mekhq.campaign.parts.AeroHeatSink;
 import mekhq.campaign.parts.AeroSensor;
@@ -112,6 +115,7 @@ public class PartsStore implements Serializable {
             if(!et.isHittable()) {
             	continue;
             }
+            //TODO: we are still adding a lot of non-hittable equipment
 			if(et instanceof AmmoType) {
 				parts.add(new AmmoStorage(0, et, ((AmmoType)et).getShots(), c));
 			}
@@ -119,7 +123,10 @@ public class PartsStore implements Serializable {
             	parts.add(new HeatSink(0, et, -1, c));
 			} else if(et instanceof MiscType && et.hasFlag(MiscType.F_JUMP_JET)) {
 				parts.add(new JumpJet(0, et, -1, c));
-			} else if (et instanceof InfantryWeapon) {
+			} else if (et instanceof InfantryWeapon 
+					|| et instanceof BayWeapon
+					|| et instanceof InfantryAttack) {
+				//TODO: need to also get rid of infantry attacks (like Swarm Mek)
 				continue;
 			} else {
 				parts.add(new EquipmentPart(0, et, -1, c));
@@ -143,20 +150,81 @@ public class PartsStore implements Serializable {
 		}
 	}
 	
-	private void stockEngines(Campaign c) {
-		int rating = 5;
-		while(rating <= 400) {
-			for(int i = 0; i <= Engine.FISSION; i++) {
-				Engine engine = new Engine(rating, i, 0);
-				if(engine.engineValid) {
-					parts.add(new EnginePart(0, engine, c));
-				}
-				engine = new Engine(rating, i, Engine.CLAN_ENGINE);
-				if(engine.engineValid) {
-					parts.add(new EnginePart(0, engine, c));
+	private double getEngineTonnage(Engine engine) {
+		float weight = Engine.ENGINE_RATINGS[(int) Math.ceil(engine.getRating() / 5.0)];
+        switch (engine.getEngineType()) {
+            case Engine.COMBUSTION_ENGINE:
+                weight *= 2.0f;
+                break;
+            case Engine.NORMAL_ENGINE:
+                break;
+            case Engine.XL_ENGINE:
+                weight *= 0.5f;
+                break;
+            case Engine.LIGHT_ENGINE:
+                weight *= 0.75f;
+                break;
+            case Engine.XXL_ENGINE:
+                weight /= 3f;
+                break;
+            case Engine.COMPACT_ENGINE:
+                weight *= 1.5f;
+                break;
+            case Engine.FISSION:
+                weight *= 1.75;
+                weight = Math.max(5, weight);
+                break;
+            case Engine.FUEL_CELL:
+                weight *= 1.2;
+                break;
+            case Engine.NONE:
+                return 0;
+        }
+        weight = TestEntity.ceilMaxHalf(weight, TestEntity.CEIL_HALFTON);
+        if (engine.hasFlag(Engine.TANK_ENGINE) && engine.isFusion()) {
+            weight *= 1.5f;
+        }
+        float toReturn = TestEntity.ceilMaxHalf(weight, TestEntity.CEIL_HALFTON);
+        return toReturn;
+	}
+	
+	private void stockEngines(Campaign c) {					
+		Engine engine;
+		for(int rating = 10; rating <= 400; rating += 5) {
+			for(int ton = 5; ton <= 100; ton += 5) {
+				for(int i = 0; i <= Engine.FISSION; i++) {
+					if(rating >= ton && rating % ton == 0) {
+						engine = new Engine(rating, i, 0);
+						if(engine.engineValid) {
+							parts.add(new EnginePart(ton, engine, c, false));
+						}
+						engine = new Engine(rating, i, Engine.CLAN_ENGINE);
+						if(engine.engineValid) {
+							parts.add(new EnginePart(ton, engine, c, false));
+						}
+					}
+					engine = new Engine(rating, i, Engine.TANK_ENGINE);
+					if(engine.engineValid) {
+						parts.add(new EnginePart(ton, engine, c, false));
+					}
+					if((ton/5) > getEngineTonnage(engine)) {
+						engine = new Engine(rating, i, Engine.TANK_ENGINE);
+						if(engine.engineValid) {
+							parts.add(new EnginePart(ton, engine, c, true));
+						}
+					}
+					engine = new Engine(rating, i, Engine.TANK_ENGINE | Engine.CLAN_ENGINE);
+					if(engine.engineValid) {
+						parts.add(new EnginePart(ton, engine, c, false));
+					}
+					if((ton/5) > getEngineTonnage(engine)) {
+						engine = new Engine(rating, i, Engine.TANK_ENGINE | Engine.CLAN_ENGINE);
+						if(engine.engineValid) {
+							parts.add(new EnginePart(ton, engine, c, true));
+						}
+					}				
 				}
 			}
-			rating += 5;
 		}
 	}
 	

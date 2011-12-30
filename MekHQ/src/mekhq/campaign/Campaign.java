@@ -93,8 +93,10 @@ import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.AmmoBin;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
+import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.EquipmentPart;
 import mekhq.campaign.parts.HeatSink;
+import mekhq.campaign.parts.MissingEnginePart;
 import mekhq.campaign.parts.MissingEquipmentPart;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
@@ -1802,6 +1804,16 @@ public class Campaign implements Serializable {
 				//because they will not be in missing locations
 				prt.updateConditionFromPart();
 			}
+			//old versions didnt distinguish tank engines
+			if(prt instanceof EnginePart && prt.getName().contains("Vehicle")) {
+				boolean isHover = null != u && u.getEntity().getMovementMode() == EntityMovementMode.HOVER && u.getEntity() instanceof Tank;
+				((EnginePart)prt).fixTankFlag(isHover);
+			}
+			if(prt instanceof MissingEnginePart && null != u && u.getEntity() instanceof Tank) {
+				boolean isHover = null != u && u.getEntity().getMovementMode() == EntityMovementMode.HOVER && u.getEntity() instanceof Tank;
+				((MissingEnginePart)prt).fixTankFlag(isHover);
+			}		
+					
 		}
 		
 		// All personnel need the rank reference fixed

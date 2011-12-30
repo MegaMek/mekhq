@@ -247,7 +247,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		String toReturn = "<html><font size='2'";
 		
 		toReturn += ">";
-		toReturn += "<b>" + getName() + "</b> " + bonus + "<br/>";
+		toReturn += "<b>" + getAcquisitionName() + "</b> " + bonus + "<br/>";
 		toReturn += Utilities.getCurrencyString(getNewPart().getActualValue()) + "<br/>";
 		toReturn += "</font></html>";
 		return toReturn;

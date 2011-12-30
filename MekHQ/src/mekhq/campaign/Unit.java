@@ -35,7 +35,9 @@ import megamek.common.BattleArmor;
 import megamek.common.ConvFighter;
 import megamek.common.CriticalSlot;
 import megamek.common.Dropship;
+import megamek.common.Engine;
 import megamek.common.Entity;
+import megamek.common.EntityMovementMode;
 import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
 import megamek.common.Infantry;
@@ -1443,7 +1445,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     	}
     	
     	if(null == engine && !(entity instanceof BattleArmor)) {
-    		engine = new EnginePart((int) entity.getWeight(), entity.getEngine(), campaign);
+    		engine = new EnginePart((int) entity.getWeight(), new Engine(entity.getEngine().getRating(), entity.getEngine().getEngineType(), entity.getEngine().getFlags()), campaign, entity.getMovementMode() == EntityMovementMode.HOVER && entity instanceof Tank);
     		addPart(engine);
     		partsToAdd.add(engine);
     	}
