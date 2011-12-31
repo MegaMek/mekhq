@@ -113,7 +113,7 @@ public class EnginePart extends Part {
 	
 	@Override 
 	public long getStickerPrice() {
-		return (long)Math.round(getEngine().getBaseCost() * getEngine().getRating() * getUnitTonnage() / 75.0);
+		return (long)Math.round((getEngine().getBaseCost()/75.0) * getEngine().getRating() * getUnitTonnage());
 	}
 	
 	public void fixTankFlag(boolean hover) {

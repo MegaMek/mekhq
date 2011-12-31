@@ -9,6 +9,7 @@ v0.1.13 (SVN)
 + Bug 3466916: Damaged Mech does not appear in Repair Bay
 + mekhq-load.png
 + correct costs and tonnage for physical weapons, MASC, and targeting computers and EquipmentPart set-up to make further additions easier
++ Bug: negative engine costs
 
 v0.1.12 (2011-12-22)
 + restrict parts store by tech limits

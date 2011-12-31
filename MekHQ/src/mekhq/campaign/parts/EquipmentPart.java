@@ -85,7 +85,7 @@ public class EquipmentPart extends Part {
         try {
         	equipTonnage = type.getTonnage(null);
         } catch(NullPointerException ex) {
-        	System.out.println("Found a null entity while calculating tonnage for " + name);
+        	//System.out.println("Found a null entity while calculating tonnage for " + name);
         }
     }
     
@@ -450,7 +450,8 @@ public class EquipmentPart extends Part {
     	return type.hasFlag(MiscType.F_TARGCOMP) ||
     			type.hasFlag(MiscType.F_MASC) ||
     			type.hasFlag(MiscType.F_CLUB) ||
-    			type.hasFlag(MiscType.F_TALON);
+    			type.hasFlag(MiscType.F_TALON) ||
+    			type.hasFlag(MiscType.F_ACTUATOR_ENHANCEMENT_SYSTEM);
     			
     }
     
@@ -480,13 +481,16 @@ public class EquipmentPart extends Part {
         } else if (type.hasFlag(MiscType.F_TARGCOMP)) {
         	//direct fire weapon weight divided by 4  - what is reasonably the highest - 15 tons?
         	return 15;
+        } else if(type.hasFlag(MiscType.F_ACTUATOR_ENHANCEMENT_SYSTEM)) {
+        	return 3;
         }
     	return 1;
     }
     
     public static double getTonnageIncrement(EquipmentType type) {
     	if((type.hasFlag(MiscType.F_CLUB) && type.hasSubType(MiscType.S_RETRACTABLE_BLADE))
-    			|| (type.hasFlag(MiscType.F_MASC) && type.hasSubType(MiscType.S_SUPERCHARGER))) {
+    			|| (type.hasFlag(MiscType.F_MASC) && type.hasSubType(MiscType.S_SUPERCHARGER))
+    			|| type.hasFlag(MiscType.F_ACTUATOR_ENHANCEMENT_SYSTEM)) {
     		return 0.5;
     	}
     	return 1;
