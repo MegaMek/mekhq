@@ -32,6 +32,7 @@ import megamek.common.weapons.Weapon;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Era;
 import mekhq.campaign.MekHqXmlUtil;
+import mekhq.campaign.Unit;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -47,6 +48,8 @@ public class MissingEquipmentPart extends MissingPart {
     protected transient EquipmentType type;
     protected String typeName;
 	protected int equipmentNum = -1;
+	protected double equipTonnage;
+	protected int engineRating;
 
     public EquipmentType getType() {
         return type;
@@ -61,10 +64,10 @@ public class MissingEquipmentPart extends MissingPart {
     }
     
     public MissingEquipmentPart() {
-    	this(0, null, -1, null);
+    	this(0, null, -1, null, 0, 0);
     }
     
-    public MissingEquipmentPart(int tonnage, EquipmentType et, int equipNum, Campaign c) {
+    public MissingEquipmentPart(int tonnage, EquipmentType et, int equipNum, Campaign c, double eTonnage, int rating) {
         // TODO Memorize all entity attributes needed to calculate cost
         // As it is a part bought with one entity can be used on another entity
         // on which it would have a different price (only tonnage is taken into
@@ -78,6 +81,8 @@ public class MissingEquipmentPart extends MissingPart {
         this.equipmentNum = equipNum;
         this.time = 120;
         this.difficulty = 0;
+        this.equipTonnage = eTonnage;
+        this.engineRating = rating;
     }
     
     /**
@@ -99,10 +104,7 @@ public class MissingEquipmentPart extends MissingPart {
     
     @Override
     public double getTonnage() {
-    	if(null != unit) {
-    		return type.getTonnage(unit.getEntity());
-    	}
-    	return 0;
+    	return equipTonnage;
     }
 
     @Override
@@ -138,6 +140,14 @@ public class MissingEquipmentPart extends MissingPart {
 				+"<equipmentNum>"
 				+equipmentNum
 				+"</equipmentNum>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<equipTonnage>"
+				+equipTonnage
+				+"</equipTonnage>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<engineRating>"
+				+engineRating
+				+"</engineRating>");
 		writeToXmlEnd(pw1, indent, id);
 	}
 
@@ -151,6 +161,10 @@ public class MissingEquipmentPart extends MissingPart {
 				equipmentNum = Integer.parseInt(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("typeName")) {
 				typeName = wn2.getTextContent();
+			} else if (wn2.getNodeName().equalsIgnoreCase("equipTonnage")) {
+				equipTonnage = Integer.parseInt(wn2.getTextContent());
+			} else if (wn2.getNodeName().equalsIgnoreCase("engineRating")) {
+				engineRating = Integer.parseInt(wn2.getTextContent());
 			}
 		}
 		restore();
@@ -183,12 +197,7 @@ public class MissingEquipmentPart extends MissingPart {
 		if(part instanceof EquipmentPart) {
 			EquipmentPart eqpart = (EquipmentPart)part;
 			EquipmentType et = eqpart.getType();
-            if (et.getCost(null, false) == EquipmentType.COST_VARIABLE) {
-                // In this case tonnage matters (ex. : hartchet, sword, ...
-                return type.equals(et) && getUnitTonnage() == part.getUnitTonnage();
-            } else {
-                return type.equals(et);
-            }
+			return type.equals(et) && getTonnage() == part.getTonnage();
 		}
 		return false;
 	}
@@ -217,8 +226,22 @@ public class MissingEquipmentPart extends MissingPart {
     }
 
 	@Override
+    public void setUnit(Unit u) {
+    	super.setUnit(u);
+    	if(null != unit) {
+    		equipTonnage = type.getTonnage(unit.getEntity());
+    		if(null != unit.getEntity().getEngine()) {
+    			engineRating = unit.getEntity().getEngine().getRating();
+    		}
+    	}
+    }
+	
+	@Override
 	public Part getNewPart() {
-		return new EquipmentPart(getUnitTonnage(), type, -1, campaign);
+		EquipmentPart epart = new EquipmentPart(getUnitTonnage(), type, -1, campaign);
+		epart.setEquipTonnage(equipTonnage);
+		epart.setEngineRating(engineRating);
+		return epart;
 	}
 	
 	private boolean hasReallyCheckedToday() {

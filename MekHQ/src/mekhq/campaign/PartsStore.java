@@ -129,7 +129,17 @@ public class PartsStore implements Serializable {
 				//TODO: need to also get rid of infantry attacks (like Swarm Mek)
 				continue;
 			} else {
-				parts.add(new EquipmentPart(0, et, -1, c));
+				if(EquipmentPart.hasVariableTonnage(et)) {
+					EquipmentPart epart;
+					for(double ton = EquipmentPart.getStartingTonnage(et); ton <= EquipmentPart.getMaxTonnage(et); ton += EquipmentPart.getTonnageIncrement(et)) {
+						epart = new EquipmentPart(0, et, -1, c);
+						epart.setEquipTonnage(ton);
+						parts.add(epart);
+						//TODO: still need to deal with talons (unit tonnage) and masc (engine rating)
+					}
+				} else {
+					parts.add(new EquipmentPart(0, et, -1, c));
+				}
 			}
         }
         //lets throw aero heat sinks in here as well

@@ -71,17 +71,6 @@ public class JumpJet extends EquipmentPart {
     public long getStickerPrice() {
     	return 200 * getUnitTonnage();	
     }
-    
-  
-
-    @Override
-    public boolean isSamePartTypeAndStatus (Part part) {
-    	if(needsFixing() || part.needsFixing()) {
-    		return false;
-    	}
-        return part instanceof JumpJet && getType().equals( ((EquipmentPart)part).getType() );
-    }
-
 
 	@Override
 	public Part getMissingPart() {

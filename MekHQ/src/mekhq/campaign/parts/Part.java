@@ -213,6 +213,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		this.unit = u;
 		if(null != unit) {
 			unitId = unit.getId();
+			unitTonnage = (int) u.getEntity().getWeight();
 		} else {
 			unitId = -1;
 		}
@@ -647,9 +648,6 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	public abstract Part clone();
 	
 	public void setRefitId(int rid) {
-		if(this.id == 1427) {
-			int bob = 1;
-		}
 		refitId = rid;
 	}
 	

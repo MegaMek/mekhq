@@ -57,17 +57,6 @@ public class HeatSink extends EquipmentPart {
     		return 2000;	
     	}
     }
-    
-  
-
-    @Override
-    public boolean isSamePartTypeAndStatus (Part part) {
-    	if(needsFixing() || part.needsFixing()) {
-    		return false;
-    	}
-        return part instanceof HeatSink && getType().equals( ((EquipmentPart)part).getType() );
-    }
-
 
 	@Override
 	public Part getMissingPart() {

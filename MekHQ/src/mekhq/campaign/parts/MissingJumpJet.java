@@ -22,6 +22,7 @@
 package mekhq.campaign.parts;
 
 import megamek.common.EquipmentType;
+import megamek.common.MiscType;
 import mekhq.campaign.Campaign;
 
 /**
@@ -36,7 +37,7 @@ public class MissingJumpJet extends MissingEquipmentPart {
     }
     
     public MissingJumpJet(int tonnage, EquipmentType et, int equipNum, Campaign c) {
-        super(tonnage, et, equipNum, c);
+        super(tonnage, et, equipNum, c, 1, 0);
         this.time = 60;
         this.difficulty = 0;
     }
@@ -45,4 +46,18 @@ public class MissingJumpJet extends MissingEquipmentPart {
 	public Part getNewPart() {
 		return new JumpJet(getUnitTonnage(), type, -1, campaign);
 	}
+    
+    @Override
+    public double getTonnage() {
+    	double ton = 0.5;
+    	if(getUnitTonnage() >= 90) {
+    		ton = 2.0;
+    	} else if(getUnitTonnage() >= 60) {
+    		ton = 1.0;
+    	}
+    	if(type.hasSubType(MiscType.S_IMPROVED)) {
+    		ton *= 2;
+    	}
+    	return ton;
+    }
 }

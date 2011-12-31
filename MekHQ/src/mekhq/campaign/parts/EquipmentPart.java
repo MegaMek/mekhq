@@ -23,19 +23,23 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 
 import megamek.common.AmmoType;
+import megamek.common.BipedMech;
 import megamek.common.CriticalSlot;
 import megamek.common.Engine;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
+import megamek.common.Mech;
 import megamek.common.MiscType;
 import megamek.common.Mounted;
 import megamek.common.Protomech;
+import megamek.common.Tank;
 import megamek.common.TechConstants;
 import megamek.common.WeaponType;
 import megamek.common.weapons.Weapon;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Era;
 import mekhq.campaign.MekHqXmlUtil;
+import mekhq.campaign.Unit;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -51,6 +55,8 @@ public class EquipmentPart extends Part {
     protected transient EquipmentType type;
     protected String typeName;
 	protected int equipmentNum = -1;
+	protected double equipTonnage;
+	protected int engineRating;
 
     public EquipmentType getType() {
         return type;
@@ -69,10 +75,6 @@ public class EquipmentPart extends Part {
     }
     
     public EquipmentPart(int tonnage, EquipmentType et, int equipNum, Campaign c) {
-        // TODO Memorize all entity attributes needed to calculate cost
-        // As it is a part bought with one entity can be used on another entity
-        // on which it would have a different price (only tonnage is taken into
-        // account for compatibility)
         super(tonnage, c);
         this.type =et;
         if(null != type) {
@@ -80,6 +82,30 @@ public class EquipmentPart extends Part {
         	this.typeName = type.getInternalName();
         }
         this.equipmentNum = equipNum;
+        try {
+        	equipTonnage = type.getTonnage(null);
+        } catch(NullPointerException ex) {
+        	System.out.println("Found a null entity while calculating tonnage for " + name);
+        }
+    }
+    
+    @Override
+    public void setUnit(Unit u) {
+    	super.setUnit(u);
+    	if(null != unit) {
+    		equipTonnage = type.getTonnage(unit.getEntity());
+    		if(null != unit.getEntity().getEngine()) {
+    			engineRating = unit.getEntity().getEngine().getRating();
+    		}
+    	}
+    }
+    
+    public void setEquipTonnage(double ton) {
+    	equipTonnage = ton;
+    }
+    
+    public void setEngineRating(int rating) {
+    	this.engineRating = rating;
     }
 
     public EquipmentPart clone() {
@@ -88,19 +114,7 @@ public class EquipmentPart extends Part {
     
     @Override
     public double getTonnage() {
-    	//TODO: we need to copy the code from EquipmentType to generate item tonnage and
-    	//calculate it from the entity or feed it in from the parts store
-    	Entity en = null;
-    	if(null != unit) {
-    		en = unit.getEntity();
-    	}
-    	double ton = 0;
-    	try {
-    		ton = type.getTonnage(en);
-    	} catch(NullPointerException ex) {
-        	System.out.println("Found a null entity while calculating weight for " + name);
-        }
-    	return ton;
+        return equipTonnage;
     }
     
     /**
@@ -125,14 +139,9 @@ public class EquipmentPart extends Part {
     	if(needsFixing() || part.needsFixing()) {
     		return false;
     	}
-        boolean b =  part instanceof EquipmentPart
-                        && getType().equals( ((EquipmentPart)part).getType() );
-        if (getType().getCost(null, false) == EquipmentType.COST_VARIABLE) {
-        	//TODO: this needs a lot of work. There are other potential conditions here, I think
-            return b && getUnitTonnage() == part.getUnitTonnage();
-        }
-        else
-            return b;
+        return part instanceof EquipmentPart
+        		&& getType().equals(((EquipmentPart)part).getType())
+        		&& getTonnage() == part.getTonnage();
     }
 
     @Override
@@ -164,6 +173,14 @@ public class EquipmentPart extends Part {
 				+"<typeName>"
 				+type.getInternalName()
 				+"</typeName>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<equipTonnage>"
+				+equipTonnage
+				+"</equipTonnage>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<engineRating>"
+				+engineRating
+				+"</engineRating>");
 		writeToXmlEnd(pw1, indent, id);
 	}
 
@@ -178,6 +195,12 @@ public class EquipmentPart extends Part {
 			}
 			else if (wn2.getNodeName().equalsIgnoreCase("typeName")) {
 				typeName = wn2.getTextContent();
+			}
+			else if (wn2.getNodeName().equalsIgnoreCase("equipTonnage")) {
+				equipTonnage = Integer.parseInt(wn2.getTextContent());
+			}
+			else if (wn2.getNodeName().equalsIgnoreCase("engineRating")) {
+				engineRating = Integer.parseInt(wn2.getTextContent());
 			}
 		}
 		restore();
@@ -208,7 +231,7 @@ public class EquipmentPart extends Part {
 
 	@Override
 	public Part getMissingPart() {
-		return new MissingEquipmentPart(getUnitTonnage(), type, equipmentNum, campaign);
+		return new MissingEquipmentPart(getUnitTonnage(), type, equipmentNum, campaign, equipTonnage, engineRating);
 	}
 
 	@Override
@@ -342,7 +365,7 @@ public class EquipmentPart extends Part {
         }       
         return null;
     }
-	
+
 	/**
      * Copied from megamek.common.Entity.getWeaponsAndEquipmentCost(StringBuffer detail, boolean ignoreAmmo)
      *
@@ -390,49 +413,18 @@ public class EquipmentPart extends Part {
                     varCost = Math.round(entity.getEngine().getRating() * 1000 * entity.getWeight() * 0.025f);
                 } else */
             	if (type.hasSubType(MiscType.S_SUPERCHARGER)) {
-            		//TODO: need an engine rating
-                    //Engine e = entity.getEngine();
-            		Engine e = null;
-                    if (e == null) {
-                        varCost = 0;
-                    } else {
-                        varCost = e.getRating() * 10000;
-                    }
+            		varCost = engineRating * 10000;
                 } else {
-                    int mascTonnage = 0;
-                    if (type.getInternalName().equals("ISMASC")) {
-                        mascTonnage = Math.round(getUnitTonnage() / 20.0f);
-                    } else if (type.getInternalName().equals("CLMASC")) {
-                        mascTonnage = Math.round(getUnitTonnage() / 25.0f);
-                    }
-                    //varCost = entity.getEngine().getRating() * mascTonnage * 1000;
+                    varCost = (int) (engineRating * getTonnage() * 1000);
                 }
             } else if (type.hasFlag(MiscType.F_TARGCOMP)) {
-                int tCompTons = 0;
-                //TODO: need to track equipment tonnage
-                /*
-                for (Mounted mo : entity.getWeaponList()) {
-                    WeaponType wt = (WeaponType) mo.getType();
-                    if (wt.hasFlag(WeaponType.F_DIRECT_FIRE)) {
-                        fTons += wt.getTonnage(entity);
-                    }
-                }
-                */
-                if (type.getInternalName().equals("ISTargeting Computer")) {
-                    tCompTons = (int) Math.ceil(getTonnage() / 4.0f);
-                } else if (type.getInternalName().equals("CLTargeting Computer")) {
-                    tCompTons = (int) Math.ceil(getTonnage() / 5.0f);
-                }
-                varCost = tCompTons * 10000;
+                varCost = (int) Math.ceil(getTonnage() * 10000);
             } else if (type.hasFlag(MiscType.F_CLUB) && (type.hasSubType(MiscType.S_HATCHET) || type.hasSubType(MiscType.S_MACE_THB))) {
-                int hatchetTons = (int) Math.ceil(getUnitTonnage() / 15.0);
-                varCost = hatchetTons * 5000;
+                varCost = (int) Math.ceil(getTonnage() * 5000);
             } else if (type.hasFlag(MiscType.F_CLUB) && type.hasSubType(MiscType.S_SWORD)) {
-                int swordTons = (int) Math.ceil(getUnitTonnage() / 15.0);
-                varCost = swordTons * 10000;
+                varCost = (int) Math.ceil(getTonnage() * 10000);
             } else if (type.hasFlag(MiscType.F_CLUB) && type.hasSubType(MiscType.S_RETRACTABLE_BLADE)) {
-                int bladeTons = (int) Math.ceil(0.5f + Math.ceil(getUnitTonnage() / 20.0));
-                varCost = (1 + bladeTons) * 10000;
+                varCost = (int) Math.ceil((1+getTonnage()) * 10000);
             } else if (type.hasFlag(MiscType.F_TRACKS)) {
             	//TODO: need engine
                 //varCost = (int) Math.ceil((500 * entity.getEngine().getRating() * entity.getWeight()) / 75);
@@ -452,5 +444,51 @@ public class EquipmentPart extends Part {
             //varCost += 150000 * getCriticals(entity);
         }
         return varCost;
+    }
+    
+    public static boolean hasVariableTonnage(EquipmentType type) {
+    	return type.hasFlag(MiscType.F_TARGCOMP) ||
+    			type.hasFlag(MiscType.F_MASC) ||
+    			type.hasFlag(MiscType.F_CLUB) ||
+    			type.hasFlag(MiscType.F_TALON);
+    			
+    }
+    
+    public static double getStartingTonnage(EquipmentType type) {
+    	return 1;
+    }
+    
+    public static double getMaxTonnage(EquipmentType type) {
+    	if (type.hasFlag(MiscType.F_TALON)|| (type.hasFlag(MiscType.F_CLUB) && (type.hasSubType(MiscType.S_HATCHET) || type.hasSubType(MiscType.S_MACE_THB)))) {
+            return 7;
+        } else if (type.hasFlag(MiscType.F_CLUB) && (type.hasSubType(MiscType.S_LANCE) || type.hasSubType(MiscType.S_SWORD))) {
+            return 5;
+        } else if (type.hasFlag(MiscType.F_CLUB) && type.hasSubType(MiscType.S_MACE)) {
+            return 10;
+        } else if (type.hasFlag(MiscType.F_CLUB) && type.hasSubType(MiscType.S_RETRACTABLE_BLADE)) {
+            return 5.5;
+        } else if (type.hasFlag(MiscType.F_MASC)) {
+        	if(type.hasSubType(MiscType.S_SUPERCHARGER)) {
+        		return 10.5;
+        	} else {
+        		if(TechConstants.isClan(type.getTechLevel())) {
+        			return 4;
+        		} else {
+        			return 5;
+        		}
+        	}
+        } else if (type.hasFlag(MiscType.F_TARGCOMP)) {
+        	//direct fire weapon weight divided by 4  - what is reasonably the highest - 15 tons?
+        	return 15;
+        }
+    	return 1;
+    }
+    
+    public static double getTonnageIncrement(EquipmentType type) {
+    	if((type.hasFlag(MiscType.F_CLUB) && type.hasSubType(MiscType.S_RETRACTABLE_BLADE))
+    			|| (type.hasFlag(MiscType.F_MASC) && type.hasSubType(MiscType.S_SUPERCHARGER))) {
+    		return 0.5;
+    	}
+    	return 1;
     }
 }
