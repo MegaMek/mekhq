@@ -31,6 +31,7 @@ import megamek.common.TargetRoll;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Era;
 import mekhq.campaign.MekHqXmlUtil;
+import mekhq.campaign.parts.equipment.EquipmentPart;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

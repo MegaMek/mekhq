@@ -19,10 +19,11 @@
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq.campaign.parts;
+package mekhq.campaign.parts.equipment;
 
 import megamek.common.EquipmentType;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.parts.Part;
 
 /**
  *
@@ -36,7 +37,7 @@ public class MissingHeatSink extends MissingEquipmentPart {
     }
     
     public MissingHeatSink(int tonnage, EquipmentType et, int equipNum, Campaign c) {
-        super(tonnage, et, equipNum, c, 1, 0);
+        super(tonnage, et, equipNum, c, 1);
         this.time = 90;
         this.difficulty = -2;
     }

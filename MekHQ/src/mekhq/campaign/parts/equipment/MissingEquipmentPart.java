@@ -19,7 +19,7 @@
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq.campaign.parts;
+package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
 
@@ -33,6 +33,8 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.Era;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
+import mekhq.campaign.parts.MissingPart;
+import mekhq.campaign.parts.Part;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -49,7 +51,6 @@ public class MissingEquipmentPart extends MissingPart {
     protected String typeName;
 	protected int equipmentNum = -1;
 	protected double equipTonnage;
-	protected int engineRating;
 
     public EquipmentType getType() {
         return type;
@@ -64,10 +65,10 @@ public class MissingEquipmentPart extends MissingPart {
     }
     
     public MissingEquipmentPart() {
-    	this(0, null, -1, null, 0, 0);
+    	this(0, null, -1, null, 0);
     }
     
-    public MissingEquipmentPart(int tonnage, EquipmentType et, int equipNum, Campaign c, double eTonnage, int rating) {
+    public MissingEquipmentPart(int tonnage, EquipmentType et, int equipNum, Campaign c, double eTonnage) {
         // TODO Memorize all entity attributes needed to calculate cost
         // As it is a part bought with one entity can be used on another entity
         // on which it would have a different price (only tonnage is taken into
@@ -82,7 +83,6 @@ public class MissingEquipmentPart extends MissingPart {
         this.time = 120;
         this.difficulty = 0;
         this.equipTonnage = eTonnage;
-        this.engineRating = rating;
     }
     
     /**
@@ -144,10 +144,6 @@ public class MissingEquipmentPart extends MissingPart {
 				+"<equipTonnage>"
 				+equipTonnage
 				+"</equipTonnage>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<engineRating>"
-				+engineRating
-				+"</engineRating>");
 		writeToXmlEnd(pw1, indent, id);
 	}
 
@@ -163,9 +159,7 @@ public class MissingEquipmentPart extends MissingPart {
 				typeName = wn2.getTextContent();
 			} else if (wn2.getNodeName().equalsIgnoreCase("equipTonnage")) {
 				equipTonnage = Integer.parseInt(wn2.getTextContent());
-			} else if (wn2.getNodeName().equalsIgnoreCase("engineRating")) {
-				engineRating = Integer.parseInt(wn2.getTextContent());
-			}
+			} 
 		}
 		restore();
 	}
@@ -230,9 +224,6 @@ public class MissingEquipmentPart extends MissingPart {
     	super.setUnit(u);
     	if(null != unit) {
     		equipTonnage = type.getTonnage(unit.getEntity());
-    		if(null != unit.getEntity().getEngine()) {
-    			engineRating = unit.getEntity().getEngine().getRating();
-    		}
     	}
     }
 	
@@ -240,7 +231,6 @@ public class MissingEquipmentPart extends MissingPart {
 	public Part getNewPart() {
 		EquipmentPart epart = new EquipmentPart(getUnitTonnage(), type, -1, campaign);
 		epart.setEquipTonnage(equipTonnage);
-		epart.setEngineRating(engineRating);
 		return epart;
 	}
 	

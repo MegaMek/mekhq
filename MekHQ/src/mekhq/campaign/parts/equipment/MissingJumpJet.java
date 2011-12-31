@@ -19,11 +19,12 @@
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq.campaign.parts;
+package mekhq.campaign.parts.equipment;
 
 import megamek.common.EquipmentType;
 import megamek.common.MiscType;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.parts.Part;
 
 /**
  *
@@ -37,7 +38,7 @@ public class MissingJumpJet extends MissingEquipmentPart {
     }
     
     public MissingJumpJet(int tonnage, EquipmentType et, int equipNum, Campaign c) {
-        super(tonnage, et, equipNum, c, 1, 0);
+        super(tonnage, et, equipNum, c, 1);
         this.time = 60;
         this.difficulty = 0;
     }

@@ -1,5 +1,5 @@
 /*
- * HeatSink.java
+ * JumpJet.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -19,30 +19,49 @@
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq.campaign.parts;
+package mekhq.campaign.parts.equipment;
 
 import megamek.common.EquipmentType;
 import megamek.common.MiscType;
 import megamek.common.Mounted;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.parts.Part;
 
 /**
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class HeatSink extends EquipmentPart {
+public class JumpJet extends EquipmentPart {
 	private static final long serialVersionUID = 2892728320891712304L;
 
-	public HeatSink() {
+	public JumpJet() {
     	this(0, null, -1, null);
     }
     
-    public HeatSink(int tonnage, EquipmentType et, int equipNum, Campaign c) {
+    public JumpJet(int tonnage, EquipmentType et, int equipNum, Campaign c) {
+        // TODO Memorize all entity attributes needed to calculate cost
+        // As it is a part bought with one entity can be used on another entity
+        // on which it would have a different price (only tonnage is taken into
+        // account for compatibility)
         super(tonnage, et, equipNum, c);
     }
     
-    public HeatSink clone() {
-    	return new HeatSink(getUnitTonnage(), getType(), getEquipmentNum(), campaign);
+    public JumpJet clone() {
+    	return new JumpJet(getUnitTonnage(), getType(), getEquipmentNum(), campaign);
+    }
+	
+    @Override
+    public double getTonnage() {
+    	double ton = 0.5;
+    	if(getUnitTonnage() >= 90) {
+    		ton = 2.0;
+    	} else if(getUnitTonnage() >= 60) {
+    		ton = 1.0;
+    	}
+    	if(type.hasSubType(MiscType.S_IMPROVED)) {
+    		ton *= 2;
+    	}
+    	return ton;
     }
     
     /**
@@ -50,17 +69,13 @@ public class HeatSink extends EquipmentPart {
      *
      */
     @Override
-    public long getStickerPrice() {		
-    	if(type.hasFlag(MiscType.F_DOUBLE_HEAT_SINK) || type.hasFlag(MiscType.F_LASER_HEAT_SINK)) {
-    		return 6000;
-    	} else {
-    		return 2000;	
-    	}
+    public long getStickerPrice() {
+    	return 200 * getUnitTonnage();	
     }
 
 	@Override
 	public Part getMissingPart() {
-		return new MissingHeatSink(getUnitTonnage(), type, equipmentNum, campaign);
+		return new MissingJumpJet(getUnitTonnage(), type, equipmentNum, campaign);
 	}
 
 	@Override
@@ -82,12 +97,12 @@ public class HeatSink extends EquipmentPart {
 				time = 0;
 				difficulty = 0;
 			} else if(hits > 0) {
-				this.time = 120;
-				this.difficulty = -1;
+				time = 100;
+				difficulty = -3;
 			}
 			if(isSalvaging()) {
-				this.time = 90;
-				this.difficulty = -2;
+				this.time = 60;
+				this.difficulty = 0;
 			}
 		}
 	}

@@ -55,7 +55,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.PartInventory;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.EnginePart;
-import mekhq.campaign.parts.EquipmentPart;
 import mekhq.campaign.parts.MekActuator;
 import mekhq.campaign.parts.MekCockpit;
 import mekhq.campaign.parts.MekGyro;
@@ -64,6 +63,7 @@ import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.MekSensor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.TankLocation;
+import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.gui.CampaignGUI;
 
 /**

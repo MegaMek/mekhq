@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.parts;
+package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
 
@@ -40,12 +40,19 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.Era;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
+import mekhq.campaign.parts.Part;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- *
+ * This part covers most of the equipment types in WeaponType, AmmoType, and MiscType
+ * It can robustly handle all equipment with static weights and costs. It can also
+ * handle equipment whose only variability in terms of cost is the equipment tonnage itself.
+ * More complicated variable weight/cost equipment needs to be subclassed.
+ * Some examples of equipment that needs to be subclasses:
+ * 	- MASC (depends on engine rating)
+ *  - AES (depends on location and cost is by unit tonnage)
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class EquipmentPart extends Part {
@@ -56,7 +63,6 @@ public class EquipmentPart extends Part {
     protected String typeName;
 	protected int equipmentNum = -1;
 	protected double equipTonnage;
-	protected int engineRating;
 
     public EquipmentType getType() {
         return type;
@@ -94,18 +100,11 @@ public class EquipmentPart extends Part {
     	super.setUnit(u);
     	if(null != unit) {
     		equipTonnage = type.getTonnage(unit.getEntity());
-    		if(null != unit.getEntity().getEngine()) {
-    			engineRating = unit.getEntity().getEngine().getRating();
-    		}
     	}
     }
     
     public void setEquipTonnage(double ton) {
     	equipTonnage = ton;
-    }
-    
-    public void setEngineRating(int rating) {
-    	this.engineRating = rating;
     }
 
     public EquipmentPart clone() {
@@ -177,10 +176,6 @@ public class EquipmentPart extends Part {
 				+"<equipTonnage>"
 				+equipTonnage
 				+"</equipTonnage>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<engineRating>"
-				+engineRating
-				+"</engineRating>");
 		writeToXmlEnd(pw1, indent, id);
 	}
 
@@ -198,9 +193,6 @@ public class EquipmentPart extends Part {
 			}
 			else if (wn2.getNodeName().equalsIgnoreCase("equipTonnage")) {
 				equipTonnage = Integer.parseInt(wn2.getTextContent());
-			}
-			else if (wn2.getNodeName().equalsIgnoreCase("engineRating")) {
-				engineRating = Integer.parseInt(wn2.getTextContent());
 			}
 		}
 		restore();
@@ -231,7 +223,7 @@ public class EquipmentPart extends Part {
 
 	@Override
 	public Part getMissingPart() {
-		return new MissingEquipmentPart(getUnitTonnage(), type, equipmentNum, campaign, equipTonnage, engineRating);
+		return new MissingEquipmentPart(getUnitTonnage(), type, equipmentNum, campaign, equipTonnage);
 	}
 
 	@Override
@@ -407,17 +399,7 @@ public class EquipmentPart extends Part {
     private int resolveVariableCost(boolean isArmored) {
     	int varCost = 0;
         if (type instanceof MiscType) {
-            if (type.hasFlag(MiscType.F_MASC)) {
-            	//TODO: account for protomechs
-               /* if (entity instanceof Protomech) {
-                    varCost = Math.round(entity.getEngine().getRating() * 1000 * entity.getWeight() * 0.025f);
-                } else */
-            	if (type.hasSubType(MiscType.S_SUPERCHARGER)) {
-            		varCost = engineRating * 10000;
-                } else {
-                    varCost = (int) (engineRating * getTonnage() * 1000);
-                }
-            } else if (type.hasFlag(MiscType.F_TARGCOMP)) {
+            if (type.hasFlag(MiscType.F_TARGCOMP)) {
                 varCost = (int) Math.ceil(getTonnage() * 10000);
             } else if (type.hasFlag(MiscType.F_CLUB) && (type.hasSubType(MiscType.S_HATCHET) || type.hasSubType(MiscType.S_MACE_THB))) {
                 varCost = (int) Math.ceil(getTonnage() * 5000);
@@ -429,6 +411,7 @@ public class EquipmentPart extends Part {
             	//TODO: need engine
                 //varCost = (int) Math.ceil((500 * entity.getEngine().getRating() * entity.getWeight()) / 75);
             } else if (type.hasFlag(MiscType.F_TALON)) {
+            	//TODO: I dont know if I can do talons here as they depend on unit weight
                 varCost = (int) Math.ceil(getUnitTonnage() * 300);
             }
 
@@ -446,13 +429,17 @@ public class EquipmentPart extends Part {
         return varCost;
     }
     
+    /*
+     * The following static functions help the parts store determine how to handle 
+     * variable weight equipment. If the type returns true to hasVariableTonnage
+     * then the parts store will use a for loop to create equipment of the given tonnage
+     * using the other helper functions. Note that this should not be used for supclassed
+     * equipment parts whose "uniqueness" depends on more than the item tonnage
+     */
     public static boolean hasVariableTonnage(EquipmentType type) {
     	return type.hasFlag(MiscType.F_TARGCOMP) ||
-    			type.hasFlag(MiscType.F_MASC) ||
     			type.hasFlag(MiscType.F_CLUB) ||
-    			type.hasFlag(MiscType.F_TALON) ||
-    			type.hasFlag(MiscType.F_ACTUATOR_ENHANCEMENT_SYSTEM);
-    			
+    			type.hasFlag(MiscType.F_TALON);    			
     }
     
     public static double getStartingTonnage(EquipmentType type) {
@@ -468,29 +455,15 @@ public class EquipmentPart extends Part {
             return 10;
         } else if (type.hasFlag(MiscType.F_CLUB) && type.hasSubType(MiscType.S_RETRACTABLE_BLADE)) {
             return 5.5;
-        } else if (type.hasFlag(MiscType.F_MASC)) {
-        	if(type.hasSubType(MiscType.S_SUPERCHARGER)) {
-        		return 10.5;
-        	} else {
-        		if(TechConstants.isClan(type.getTechLevel())) {
-        			return 4;
-        		} else {
-        			return 5;
-        		}
-        	}
         } else if (type.hasFlag(MiscType.F_TARGCOMP)) {
         	//direct fire weapon weight divided by 4  - what is reasonably the highest - 15 tons?
         	return 15;
-        } else if(type.hasFlag(MiscType.F_ACTUATOR_ENHANCEMENT_SYSTEM)) {
-        	return 3;
         }
     	return 1;
     }
     
     public static double getTonnageIncrement(EquipmentType type) {
-    	if((type.hasFlag(MiscType.F_CLUB) && type.hasSubType(MiscType.S_RETRACTABLE_BLADE))
-    			|| (type.hasFlag(MiscType.F_MASC) && type.hasSubType(MiscType.S_SUPERCHARGER))
-    			|| type.hasFlag(MiscType.F_ACTUATOR_ENHANCEMENT_SYSTEM)) {
+    	if((type.hasFlag(MiscType.F_CLUB) && type.hasSubType(MiscType.S_RETRACTABLE_BLADE))) {
     		return 0.5;
     	}
     	return 1;

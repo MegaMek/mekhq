@@ -19,7 +19,7 @@
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq.campaign.parts;
+package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
 
@@ -27,6 +27,7 @@ import megamek.common.AmmoType;
 import megamek.common.EquipmentType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
+import mekhq.campaign.parts.Part;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -45,7 +46,7 @@ public class MissingAmmoBin extends MissingEquipmentPart {
     }
     
     public MissingAmmoBin(int tonnage, EquipmentType et, int equipNum, boolean singleShot, Campaign c) {
-        super(tonnage, et, equipNum, c, 1, 0);
+        super(tonnage, et, equipNum, c, 1);
         this.oneShot = singleShot;
         this.difficulty = -2;
         if(null != name) {

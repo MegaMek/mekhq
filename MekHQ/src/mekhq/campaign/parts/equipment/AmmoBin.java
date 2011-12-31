@@ -19,7 +19,7 @@
  * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package mekhq.campaign.parts;
+package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
 
@@ -34,6 +34,9 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.Era;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.finances.Transaction;
+import mekhq.campaign.parts.AmmoStorage;
+import mekhq.campaign.parts.Availability;
+import mekhq.campaign.parts.Part;
 import mekhq.campaign.work.IAcquisitionWork;
 
 import org.w3c.dom.Node;

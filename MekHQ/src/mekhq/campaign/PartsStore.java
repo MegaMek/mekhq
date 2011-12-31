@@ -42,10 +42,7 @@ import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Avionics;
 import mekhq.campaign.parts.EnginePart;
-import mekhq.campaign.parts.EquipmentPart;
 import mekhq.campaign.parts.FireControlSystem;
-import mekhq.campaign.parts.HeatSink;
-import mekhq.campaign.parts.JumpJet;
 import mekhq.campaign.parts.LandingGear;
 import mekhq.campaign.parts.MekActuator;
 import mekhq.campaign.parts.MekCockpit;
@@ -58,6 +55,9 @@ import mekhq.campaign.parts.Rotor;
 import mekhq.campaign.parts.Turret;
 import mekhq.campaign.parts.VeeSensor;
 import mekhq.campaign.parts.VeeStabiliser;
+import mekhq.campaign.parts.equipment.EquipmentPart;
+import mekhq.campaign.parts.equipment.HeatSink;
+import mekhq.campaign.parts.equipment.JumpJet;
 
 
 /**
@@ -122,7 +122,9 @@ public class PartsStore implements Serializable {
 			else if(et instanceof MiscType && (et.hasFlag(MiscType.F_HEAT_SINK) || et.hasFlag(MiscType.F_DOUBLE_HEAT_SINK))) {
             	parts.add(new HeatSink(0, et, -1, c));
 			} else if(et instanceof MiscType && et.hasFlag(MiscType.F_JUMP_JET)) {
-				parts.add(new JumpJet(0, et, -1, c));
+				parts.add(new JumpJet(55, et, -1, c));
+				parts.add(new JumpJet(85, et, -1, c));
+				parts.add(new JumpJet(100, et, -1, c));
 			} else if (et instanceof InfantryWeapon 
 					|| et instanceof BayWeapon
 					|| et instanceof InfantryAttack) {
