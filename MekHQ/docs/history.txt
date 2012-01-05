@@ -11,6 +11,7 @@ v0.1.13 (SVN)
 + correct costs and tonnage for physical weapons, MASC, and targeting computers and EquipmentPart set-up to make further additions easier
 + Bug: negative engine costs
 + subfolder for equipment parts in preparation for subclassing of variable ton/cost equipment
++ MASC suptype for EquipmentPart
 
 v0.1.12 (2011-12-22)
 + restrict parts store by tech limits

@@ -58,6 +58,7 @@ import mekhq.campaign.parts.VeeStabiliser;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.HeatSink;
 import mekhq.campaign.parts.equipment.JumpJet;
+import mekhq.campaign.parts.equipment.MASC;
 
 
 /**
@@ -130,6 +131,34 @@ public class PartsStore implements Serializable {
 					|| et instanceof InfantryAttack) {
 				//TODO: need to also get rid of infantry attacks (like Swarm Mek)
 				continue;
+			} else if(et.hasFlag(MiscType.F_MASC)) {
+				if(et.hasSubType(MiscType.S_SUPERCHARGER)) {
+					for(int rating = 10; rating <= 400; rating += 5) {
+						for(double eton = 0.5; eton <= 10.5; eton += 0.5) {
+							float weight = Engine.ENGINE_RATINGS[(int) Math.ceil(rating / 5.0)];
+							float minweight = weight * 0.5f;
+							minweight = (float) (Math.ceil((TestEntity.ceilMaxHalf(minweight, TestEntity.CEIL_HALFTON) / 10.0) * 2.0) / 2.0);
+							float maxweight = weight * 2.0f;
+							maxweight = (float) (Math.ceil((TestEntity.ceilMaxHalf(maxweight, TestEntity.CEIL_HALFTON) / 10.0) * 2.0) / 2.0);
+							if(eton < minweight || eton > maxweight) {
+								continue;
+							}
+							MASC sp = new MASC(0, et, -1 , c, rating);
+							sp.setEquipTonnage(eton);
+							parts.add(sp);
+						}
+					}
+				} else {
+					//need to do it by rating and unit tonnage
+					for(int ton = 20; ton <= 100; ton += 5) {
+						for(int rating = 10; rating <= 400; rating += 5) {
+							if(rating < ton || (rating % ton) != 0) {
+								continue;
+							}
+							parts.add(new MASC(ton, et, -1, c, rating));
+						}
+					}
+				}
 			} else {
 				if(EquipmentPart.hasVariableTonnage(et)) {
 					EquipmentPart epart;

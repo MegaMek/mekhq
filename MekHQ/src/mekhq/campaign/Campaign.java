@@ -69,6 +69,7 @@ import megamek.common.MechBay;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
+import megamek.common.MiscType;
 import megamek.common.Player;
 import megamek.common.Protomech;
 import megamek.common.SmallCraftBay;
@@ -100,7 +101,9 @@ import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.HeatSink;
+import mekhq.campaign.parts.equipment.MASC;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
+import mekhq.campaign.parts.equipment.MissingMASC;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
@@ -2285,6 +2288,22 @@ public class Campaign implements Serializable {
 			if(p instanceof HeatSink && !p.getName().contains("Heat Sink")) {
 				continue;
 			}
+			
+			//deal with equipmentparts that are now subtyped
+			int pid = p.getId();
+			if(p instanceof EquipmentPart 
+					&& ((EquipmentPart)p).getType().hasFlag(MiscType.F_MASC)
+					&& !(p instanceof MASC)) {
+				p = new MASC(p.getUnitTonnage(), ((EquipmentPart)p).getType(), ((EquipmentPart)p).getEquipmentNum(), retVal, 0);
+				p.setId(pid);
+			}
+			if(p instanceof MissingEquipmentPart 
+					&& ((MissingEquipmentPart)p).getType().hasFlag(MiscType.F_MASC)
+					&& !(p instanceof MASC)) {
+				p = new MissingMASC(p.getUnitTonnage(), ((EquipmentPart)p).getType(), ((EquipmentPart)p).getEquipmentNum(), retVal, ((EquipmentPart)p).getTonnage(), 0);
+				p.setId(pid);
+			}
+			
 			
 			if (p != null)
 				p.setCampaign(retVal);

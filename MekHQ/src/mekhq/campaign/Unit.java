@@ -100,6 +100,7 @@ import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.HeatSink;
 import mekhq.campaign.parts.equipment.JumpJet;
+import mekhq.campaign.parts.equipment.MASC;
 import mekhq.campaign.parts.equipment.MissingAmmoBin;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.parts.equipment.MissingHeatSink;
@@ -1176,6 +1177,11 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     		return;
     	}
   	
+    	int erating = 0;
+    	if(null != entity.getEngine()) {
+    		erating = entity.getEngine().getRating();
+    	}
+    	
     	ArrayList<Part> partsToAdd = new ArrayList<Part>();
     	
     	Part gyro = null;
@@ -1436,7 +1442,11 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     				int eqnum = entity.getEquipmentNum(m);
     				Part epart = equipParts.get(eqnum);
     				if(null == epart) {
-    					epart = new EquipmentPart((int)entity.getWeight(), m.getType(), eqnum, campaign);
+    					EquipmentType type = m.getType();
+    					epart = new EquipmentPart((int)entity.getWeight(), type, eqnum, campaign);
+    					if(type.hasFlag(MiscType.F_MASC)) {
+        					epart = new MASC((int)entity.getWeight(), type, eqnum, campaign, erating);
+    					}
     					addPart(epart);
     					partsToAdd.add(epart);
     				}
