@@ -1261,7 +1261,9 @@ public class Refit implements IPartWork, IAcquisitionWork {
 		for(Part p : shoppingList) {
 			p.setCampaign(oldUnit.campaign);
 		}
-		newArmorSupplies.setCampaign(oldUnit.campaign);
+		if(null != newArmorSupplies) {
+			newArmorSupplies.setCampaign(oldUnit.campaign);
+		}
 	}
 
 	@Override

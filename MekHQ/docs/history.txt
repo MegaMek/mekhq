@@ -14,6 +14,7 @@ v0.1.13 (SVN)
 + MASC suptype for EquipmentPart
 + Bug: equipTonnage is double when loading XML 
 + Bug: need flag for MiscType when checking whether equipment type is MASC
++ Bug: NPE when loading refit and newArmorSupplies are null
 
 v0.1.12 (2011-12-22)
 + restrict parts store by tech limits
