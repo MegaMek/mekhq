@@ -158,7 +158,7 @@ public class MissingEquipmentPart extends MissingPart {
 			} else if (wn2.getNodeName().equalsIgnoreCase("typeName")) {
 				typeName = wn2.getTextContent();
 			} else if (wn2.getNodeName().equalsIgnoreCase("equipTonnage")) {
-				equipTonnage = Integer.parseInt(wn2.getTextContent());
+				equipTonnage = Double.parseDouble(wn2.getTextContent());
 			} 
 		}
 		restore();

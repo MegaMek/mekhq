@@ -131,7 +131,7 @@ public class PartsStore implements Serializable {
 					|| et instanceof InfantryAttack) {
 				//TODO: need to also get rid of infantry attacks (like Swarm Mek)
 				continue;
-			} else if(et.hasFlag(MiscType.F_MASC)) {
+			} else if(et instanceof MiscType && et.hasFlag(MiscType.F_MASC)) {
 				if(et.hasSubType(MiscType.S_SUPERCHARGER)) {
 					for(int rating = 10; rating <= 400; rating += 5) {
 						for(double eton = 0.5; eton <= 10.5; eton += 0.5) {

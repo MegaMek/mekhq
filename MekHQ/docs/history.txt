@@ -12,6 +12,8 @@ v0.1.13 (SVN)
 + Bug: negative engine costs
 + subfolder for equipment parts in preparation for subclassing of variable ton/cost equipment
 + MASC suptype for EquipmentPart
++ Bug: equipTonnage is double when loading XML 
++ Bug: need flag for MiscType when checking whether equipment type is MASC
 
 v0.1.12 (2011-12-22)
 + restrict parts store by tech limits

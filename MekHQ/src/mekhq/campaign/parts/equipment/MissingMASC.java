@@ -106,7 +106,7 @@ public class MissingMASC extends MissingEquipmentPart {
 				typeName = wn2.getTextContent();
 			}
 			else if (wn2.getNodeName().equalsIgnoreCase("equipTonnage")) {
-				equipTonnage = Integer.parseInt(wn2.getTextContent());
+				equipTonnage = Double.parseDouble(wn2.getTextContent());
 			}
 			else if (wn2.getNodeName().equalsIgnoreCase("engineRating")) {
 				engineRating = Integer.parseInt(wn2.getTextContent());

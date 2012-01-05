@@ -2292,6 +2292,7 @@ public class Campaign implements Serializable {
 			//deal with equipmentparts that are now subtyped
 			int pid = p.getId();
 			if(p instanceof EquipmentPart 
+					&& ((EquipmentPart)p).getType() instanceof MiscType
 					&& ((EquipmentPart)p).getType().hasFlag(MiscType.F_MASC)
 					&& !(p instanceof MASC)) {
 				p = new MASC(p.getUnitTonnage(), ((EquipmentPart)p).getType(), ((EquipmentPart)p).getEquipmentNum(), retVal, 0);

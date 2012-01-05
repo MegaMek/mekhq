@@ -1444,7 +1444,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     				if(null == epart) {
     					EquipmentType type = m.getType();
     					epart = new EquipmentPart((int)entity.getWeight(), type, eqnum, campaign);
-    					if(type.hasFlag(MiscType.F_MASC)) {
+    					if(type instanceof MiscType && type.hasFlag(MiscType.F_MASC)) {
         					epart = new MASC((int)entity.getWeight(), type, eqnum, campaign, erating);
     					}
     					addPart(epart);

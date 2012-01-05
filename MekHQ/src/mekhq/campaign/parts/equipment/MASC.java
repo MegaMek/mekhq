@@ -67,6 +67,9 @@ public class MASC extends EquipmentPart {
     }
     
     private double calculateTonnage() {
+    	if(null == type) {
+    		return 0;
+    	}
     	//supercharger tonnage will need to be set by hand in parts store
         if (TechConstants.isClan(type.getTechLevel())) {
             return Math.round(getUnitTonnage() / 25.0f);
@@ -139,7 +142,7 @@ public class MASC extends EquipmentPart {
 				typeName = wn2.getTextContent();
 			}
 			else if (wn2.getNodeName().equalsIgnoreCase("equipTonnage")) {
-				equipTonnage = Integer.parseInt(wn2.getTextContent());
+				equipTonnage = Double.parseDouble(wn2.getTextContent());
 			}
 			else if (wn2.getNodeName().equalsIgnoreCase("engineRating")) {
 				engineRating = Integer.parseInt(wn2.getTextContent());
