@@ -15,6 +15,7 @@ v0.1.13 (SVN)
 + Bug: equipTonnage is double when loading XML 
 + Bug: need flag for MiscType when checking whether equipment type is MASC
 + Bug: NPE when loading refit and newArmorSupplies are null
++ don't add BA equipment and tank chassis modifications to parts store
 
 v0.1.12 (2011-12-22)
 + restrict parts store by tech limits
