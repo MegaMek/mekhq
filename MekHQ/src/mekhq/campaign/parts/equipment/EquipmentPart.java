@@ -88,10 +88,12 @@ public class EquipmentPart extends Part {
         	this.typeName = type.getInternalName();
         }
         this.equipmentNum = equipNum;
-        try {
-        	equipTonnage = type.getTonnage(null);
-        } catch(NullPointerException ex) {
-        	//System.out.println("Found a null entity while calculating tonnage for " + name);
+        if(null != type) {
+	        try {
+	        	equipTonnage = type.getTonnage(null);
+	        } catch(NullPointerException ex) {
+	        	//System.out.println("Found a null entity while calculating tonnage for " + name);
+	        }
         }
     }
     
@@ -130,6 +132,12 @@ public class EquipmentPart extends Part {
             System.err
             .println("Mounted.restore: could not restore equipment type \""
                     + typeName + "\"");
+            return;
+        }
+        try {
+        	equipTonnage = type.getTonnage(null);
+        } catch(NullPointerException ex) {
+        	//System.out.println("Found a null entity while calculating tonnage for " + name);
         }
     }
 
