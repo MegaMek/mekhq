@@ -18,6 +18,7 @@ v0.1.13 (SVN)
 + don't add BA equipment and tank chassis modifications to parts store
 + Bug 3470231: Campaign refuses to advance day.
 + Bug: spare equipment parts all had zero tonnage
++ mission type field
 
 v0.1.12 (2011-12-22)
 + restrict parts store by tech limits

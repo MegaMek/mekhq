@@ -32,6 +32,8 @@ public class MissionViewPanel extends javax.swing.JPanel {
 	private javax.swing.JLabel lblStatus;
 	private javax.swing.JLabel lblLocation;
 	private javax.swing.JTextArea txtLocation;
+	private javax.swing.JLabel lblType;
+	private javax.swing.JTextArea txtType;
 	
 	public MissionViewPanel(Mission m) {
 		this.mission = m;
@@ -72,6 +74,8 @@ public class MissionViewPanel extends javax.swing.JPanel {
     	lblStatus = new javax.swing.JLabel();
     	lblLocation = new javax.swing.JLabel();
     	txtLocation = new javax.swing.JTextArea();
+    	lblType = new javax.swing.JLabel();
+    	txtType = new javax.swing.JTextArea();
 
     	java.awt.GridBagConstraints gridBagConstraints;
 		pnlStats.setLayout(new java.awt.GridBagLayout());
@@ -111,6 +115,29 @@ public class MissionViewPanel extends javax.swing.JPanel {
 		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		pnlStats.add(txtLocation, gridBagConstraints);
+		
+		lblType.setName("lblType"); // NOI18N
+		lblType.setText(resourceMap.getString("lblType.text"));
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 2;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+		pnlStats.add(lblType, gridBagConstraints);
+		
+		txtType.setName("txtType"); // NOI18N
+		txtType.setText(mission.getType());
+		txtType.setEditable(false);
+		txtType.setLineWrap(true);
+		txtType.setWrapStyleWord(true);
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 1;
+		gridBagConstraints.gridy = 2;
+		gridBagConstraints.weightx = 0.5;
+		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+		pnlStats.add(txtType, gridBagConstraints);
 		
 		txtDesc.setName("txtDesc");
 		txtDesc.setText(mission.getDescription());

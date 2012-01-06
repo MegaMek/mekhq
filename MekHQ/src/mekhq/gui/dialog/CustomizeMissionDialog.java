@@ -63,6 +63,8 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
 
         txtName = new javax.swing.JTextField();
         lblName = new javax.swing.JLabel();
+        txtType = new javax.swing.JTextField();
+        lblType = new javax.swing.JLabel();
         btnOK = new javax.swing.JButton();
         btnClose = new javax.swing.JButton();
         scrDesc = new javax.swing.JScrollPane();
@@ -101,11 +103,32 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(txtName, gridBagConstraints);
  
+        lblType.setText(resourceMap.getString("lblType.text")); // NOI18N
+        lblType.setName("lblType"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        getContentPane().add(lblType, gridBagConstraints);
+        
+        txtType.setText(mission.getType());
+        txtType.setName("txtType"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        getContentPane().add(txtType, gridBagConstraints);       
+        
         lblPlanetName.setText(resourceMap.getString("lblPlanetName.text")); // NOI18N
         lblPlanetName.setName("lblPlanetName"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
@@ -117,7 +140,7 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
         }
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
@@ -137,7 +160,7 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
         scrDesc.setMinimumSize(new Dimension(400,200));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
@@ -155,7 +178,7 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
@@ -170,7 +193,7 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
@@ -182,6 +205,7 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
     
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
     	mission.setName(txtName.getText());
+    	mission.setType(txtType.getText());
     	mission.setPlanetName(suggestPlanet.getText());
     	mission.setDesc(txtDesc.getText());
     	if(newMission) {
@@ -202,6 +226,8 @@ public class CustomizeMissionDialog extends javax.swing.JDialog {
     private javax.swing.JButton btnOK;
     private javax.swing.JLabel lblName;
     private javax.swing.JTextField txtName;
+    private javax.swing.JLabel lblType;
+    private javax.swing.JTextField txtType;
     private javax.swing.JTextArea txtDesc;
     private javax.swing.JScrollPane scrDesc;
     private javax.swing.JLabel lblPlanetName;
