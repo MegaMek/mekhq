@@ -668,6 +668,9 @@ public class Refit implements IPartWork, IAcquisitionWork {
 		//add old parts to the warehouse
 		for(int pid : oldUnitParts) {
 			Part part = oldUnit.campaign.getPart(pid);
+			if(null == part) {
+				continue;
+			}
 			if(part instanceof MekLocation && ((MekLocation)part).getLoc() == Mech.LOC_CT) {
 				part.setUnit(null);
 				oldUnit.campaign.removePart(part);
