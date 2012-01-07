@@ -389,9 +389,11 @@ public class MekLocation extends Part {
 	                slot.setDestroyed(false);
 	                slot.setHit(false);
 	                slot.setRepairable(true);
+	                slot.setMissing(false);
 	                Mounted m = slot.getMount();
 	                m.setHit(false);
 	                m.setDestroyed(false);
+	                m.setMissing(false);
 	                m.setRepairable(true);
 	            }
 			}

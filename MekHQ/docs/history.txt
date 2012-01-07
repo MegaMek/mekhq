@@ -21,6 +21,7 @@ v0.1.13 (SVN)
 + mission type field
 + crew assignments for large craft
 + Bug 3469928: Cannot repair damaged limbs after replacing
++ set missing status of critical slot and mounted to false for non-hittable items when replacing locations
 
 v0.1.12 (2011-12-22)
 + restrict parts store by tech limits
