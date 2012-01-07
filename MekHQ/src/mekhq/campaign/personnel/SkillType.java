@@ -77,9 +77,11 @@ public class SkillType implements Serializable {
 	public static final String S_TECH_MECHANIC = "Tech/Mechanic";
 	public static final String S_TECH_AERO     = "Tech/Aero";
 	public static final String S_TECH_BA       = "Tech/BA";
+	public static final String S_TECH_VESSEL   = "Tech/Vessel";
 	public static final String S_ASTECH        = "Astech";
 	public static final String S_DOCTOR        = "Doctor";
 	public static final String S_MEDTECH       = "Medtech";
+	public static final String S_NAV           = "Hyperspace Navigation";
 	public static final String S_ADMIN         = "Administration";
 	public static final String S_NEG           = "Negotiation";
 	public static final String S_LEADER        = "Leadership";
@@ -90,8 +92,8 @@ public class SkillType implements Serializable {
 											  S_PILOT_GVEE,S_PILOT_VTOL,S_PILOT_NVEE,S_GUN_VEE,
 						                      S_PILOT_JET,S_GUN_JET,S_PILOT_SPACE,S_GUN_SPACE,S_ARTILLERY,
 						                      S_GUN_BA,S_SMALL_ARMS,S_ANTI_MECH,
-						                      S_TECH_MECH,S_TECH_MECHANIC,S_TECH_AERO,S_TECH_BA,S_ASTECH,
-						                      S_DOCTOR,S_MEDTECH,
+						                      S_TECH_MECH,S_TECH_MECHANIC,S_TECH_AERO,S_TECH_BA,S_TECH_VESSEL,S_ASTECH,
+						                      S_DOCTOR,S_MEDTECH,S_NAV,
 						                      S_ADMIN,
 						                      S_TACTICS,S_STRATEGY,
 						                      S_NEG,S_LEADER,S_SCROUNGE};
@@ -252,9 +254,11 @@ public class SkillType implements Serializable {
 		lookupHash.put(S_TECH_MECHANIC, createTechMechanic());
 		lookupHash.put(S_TECH_AERO, createTechAero());
 		lookupHash.put(S_TECH_BA, createTechBA());
+		lookupHash.put(S_TECH_VESSEL, createTechVessel());
 		lookupHash.put(S_ASTECH, createAstech());
 		lookupHash.put(S_DOCTOR, createDoctor());
 		lookupHash.put(S_MEDTECH, createMedtech());
+		lookupHash.put(S_NAV, createNav());
 		lookupHash.put(S_TACTICS, createTactics());
 		lookupHash.put(S_STRATEGY, createStrategy());
 		lookupHash.put(S_ADMIN, createAdmin());
@@ -683,6 +687,16 @@ public class SkillType implements Serializable {
         return skill;
     }
 	
+	public static SkillType createTechVessel() {
+        SkillType skill = new SkillType();
+        skill.name = S_TECH_VESSEL;
+        skill.target = 10;
+        skill.countUp = false;
+        skill.costs = new Integer[]{12,6,0,6,6,6,-1,-1,-1,-1,-1};
+     
+        return skill;
+    }
+	
 	public static SkillType createAstech() {
         SkillType skill = new SkillType();
         skill.name = S_ASTECH;
@@ -709,6 +723,16 @@ public class SkillType implements Serializable {
         skill.target = 11;
         skill.countUp = false;
         skill.costs = new Integer[]{16,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
+     
+        return skill;
+    }
+	
+	public static SkillType createNav() {
+        SkillType skill = new SkillType();
+        skill.name = S_NAV;
+        skill.target = 8;
+        skill.countUp = false;
+        skill.costs = new Integer[]{8,4,4,4,4,4,4,4,4,-1,-1};
      
         return skill;
     }

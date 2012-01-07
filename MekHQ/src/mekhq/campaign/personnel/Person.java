@@ -80,18 +80,22 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 	public static final int T_BA          = 7;
 	public static final int T_INFANTRY    = 8;
 	public static final int T_PROTO_PILOT = 9;
-	public static final int T_MECH_TECH   = 10;
-    public static final int T_MECHANIC    = 11;
-    public static final int T_AERO_TECH   = 12;
-    public static final int T_BA_TECH     = 13;
-    public static final int T_ASTECH      = 14;
-    public static final int T_DOCTOR      = 15;
-    public static final int T_MEDIC       = 16;
-    public static final int T_ADMIN_COM   = 17;
-    public static final int T_ADMIN_LOG   = 18;
-    public static final int T_ADMIN_TRA   = 19;
-    public static final int T_ADMIN_HR    = 20;
-    public static final int T_NUM         = 21;
+	public static final int T_SPACE_PILOT = 10;
+	public static final int T_SPACE_CREW  = 11;
+	public static final int T_SPACE_GUNNER= 12;
+	public static final int T_NAVIGATOR   = 13;
+	public static final int T_MECH_TECH   = 14;
+    public static final int T_MECHANIC    = 15;
+    public static final int T_AERO_TECH   = 16;
+    public static final int T_BA_TECH     = 17;
+    public static final int T_ASTECH      = 18;
+    public static final int T_DOCTOR      = 19;
+    public static final int T_MEDIC       = 20;
+    public static final int T_ADMIN_COM   = 21;
+    public static final int T_ADMIN_LOG   = 22;
+    public static final int T_ADMIN_TRA   = 23;
+    public static final int T_ADMIN_HR    = 24;
+    public static final int T_NUM         = 25;
     
     public static final int S_ACTIVE = 0;
     public static final int S_RETIRED = 1;
@@ -292,6 +296,14 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
                 return "Battle Armor Pilot";
             case(T_INFANTRY):
                 return "Soldier";
+            case(T_SPACE_PILOT):
+                return "Vessel Pilot";
+            case(T_SPACE_CREW):
+                return "Vessel Crewmember";
+            case(T_SPACE_GUNNER):
+                    return "Vessel Gunner";
+            case(T_NAVIGATOR):
+                return "Hyperspace Navigator";
             case(T_MECH_TECH):
                 return "Mech Tech";
             case(T_MECHANIC):
@@ -357,6 +369,14 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
             return hasSkill(SkillType.S_GUN_BA);
         case(T_INFANTRY):
             return hasSkill(SkillType.S_SMALL_ARMS);
+        case(T_SPACE_PILOT):
+            return hasSkill(SkillType.S_PILOT_SPACE);
+        case(T_SPACE_CREW):
+            return hasSkill(SkillType.S_TECH_VESSEL);
+        case(T_SPACE_GUNNER):
+            return hasSkill(SkillType.S_GUN_SPACE);
+        case(T_NAVIGATOR):
+            return hasSkill(SkillType.S_NAV);
         case(T_MECH_TECH):
             return hasSkill(SkillType.S_TECH_MECH) && getSkill(SkillType.S_TECH_MECH).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
         case(T_MECHANIC):
@@ -581,7 +601,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "</person>");
 	}
 
-	public static Person generateInstanceFromXML(Node wn) {
+	public static Person generateInstanceFromXML(Node wn, int version) {
 		Person retVal = null;
 		
 		try {
@@ -675,6 +695,16 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 					if(null != s && null != s.getType()) {
 						retVal.skills.put(s.getType().getName(), s);
 					}
+				}
+			}
+			
+			if(version < 13) {
+				if(retVal.primaryRole > T_INFANTRY) {
+					retVal.primaryRole += 4;
+
+				}
+				if(retVal.secondaryRole > T_INFANTRY) {
+					retVal.secondaryRole += 4;
 				}
 			}
 			
@@ -787,6 +817,12 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 			break;
 		case T_INFANTRY:
 			base = 750;
+			break;
+		case T_SPACE_PILOT:
+		case T_SPACE_CREW:
+		case T_SPACE_GUNNER:
+		case T_NAVIGATOR:
+			base = 1000;
 			break;
 		case T_MECH_TECH:
 			base = 800;
@@ -965,6 +1001,30 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 		case T_INFANTRY:
 			if(hasSkill(SkillType.S_SMALL_ARMS)) {
 				return getSkill(SkillType.S_SMALL_ARMS).getExperienceLevel();
+			} else {
+				return -1;
+			}
+		case T_SPACE_PILOT:
+			if(hasSkill(SkillType.S_PILOT_SPACE)) {
+				return getSkill(SkillType.S_PILOT_SPACE).getExperienceLevel();
+			} else {
+				return -1;
+			}
+		case T_SPACE_CREW:
+			if(hasSkill(SkillType.S_TECH_VESSEL)) {
+				return getSkill(SkillType.S_TECH_VESSEL).getExperienceLevel();
+			} else {
+				return -1;
+			}
+		case T_SPACE_GUNNER:
+			if(hasSkill(SkillType.S_GUN_SPACE)) {
+				return getSkill(SkillType.S_GUN_SPACE).getExperienceLevel();
+			} else {
+				return -1;
+			}
+		case T_NAVIGATOR:
+			if(hasSkill(SkillType.S_NAV)) {
+				return getSkill(SkillType.S_NAV).getExperienceLevel();
 			} else {
 				return -1;
 			}
@@ -1447,7 +1507,10 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     	if(unit.getEntity() instanceof Tank && hasSkill(SkillType.S_TECH_MECHANIC)) {
     		return getSkill(SkillType.S_TECH_MECHANIC);
     	}
-    	if(unit.getEntity() instanceof Aero && hasSkill(SkillType.S_TECH_AERO)) {
+    	if(unit.getEntity() instanceof Aero 
+    			&& !(unit.getEntity() instanceof SmallCraft) 
+    			&& !(unit.getEntity() instanceof Jumpship) 
+    			&& hasSkill(SkillType.S_TECH_AERO)) {
     		return getSkill(SkillType.S_TECH_AERO);
     	}
     	//if we are still here then we didn't have the right tech skill, so return the highest

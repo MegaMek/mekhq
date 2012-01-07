@@ -72,6 +72,7 @@ import megamek.common.MechSummaryCache;
 import megamek.common.MiscType;
 import megamek.common.Player;
 import megamek.common.Protomech;
+import megamek.common.SmallCraft;
 import megamek.common.SmallCraftBay;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
@@ -1675,6 +1676,12 @@ public class Campaign implements Serializable {
 		campaignEle.normalize(); 
 
 		String version = campaignEle.getAttribute("version");
+		int v = 0;
+		if(null != version && version.length() > 0) {
+			String[] temp = version.split("\\.");
+			String tv = temp[2].replace("-dev", "");
+			v = Integer.parseInt(tv);
+		}
 		
 		//we need to iterate through twice, the first time to collect
 		//any custom units that might not be written yet
@@ -1729,7 +1736,7 @@ public class Campaign implements Serializable {
 				} else if (xn.equalsIgnoreCase("parts")) {
 					processPartNodes(retVal, wn);
 				} else if (xn.equalsIgnoreCase("personnel")) {
-					processPersonnelNodes(retVal, wn);
+					processPersonnelNodes(retVal, wn, v);
 				} else if (xn.equalsIgnoreCase("teams")) {
 					processTeamNodes(retVal, wn);
 				} else if (xn.equalsIgnoreCase("units")) {
@@ -1966,7 +1973,7 @@ public class Campaign implements Serializable {
 		MekHQ.logMessage("Load of Force Organization complete!");
 	}
 	
-	private static void processPersonnelNodes(Campaign retVal, Node wn) {
+	private static void processPersonnelNodes(Campaign retVal, Node wn, int version) {
 		MekHQ.logMessage("Loading Personnel Nodes from XML...", 4);
 
 		NodeList wList = wn.getChildNodes();
@@ -1987,7 +1994,7 @@ public class Campaign implements Serializable {
 				continue;
 			}
 
-			Person p = Person.generateInstanceFromXML(wn2);
+			Person p = Person.generateInstanceFromXML(wn2, version);
 			
 			if (p != null) {
 				retVal.addPersonWithoutId(p);
@@ -2546,6 +2553,18 @@ public class Campaign implements Serializable {
 	    case(Person.T_INFANTRY):
 			person.addSkill(SkillType.S_ANTI_MECH);
 			person.addSkill(SkillType.S_SMALL_ARMS);
+			break;
+	    case(Person.T_SPACE_PILOT):
+			person.addSkill(SkillType.S_PILOT_SPACE);
+			break;
+	    case(Person.T_SPACE_CREW):
+			person.addSkill(SkillType.S_TECH_VESSEL);
+			break;
+	    case(Person.T_SPACE_GUNNER):
+			person.addSkill(SkillType.S_GUN_SPACE);
+			break;
+	    case(Person.T_NAVIGATOR):
+			person.addSkill(SkillType.S_NAV);
 			break;
 	    case(Person.T_MECH_TECH):
 	    	person.addSkill(SkillType.S_TECH_MECH);
@@ -3247,6 +3266,9 @@ public class Campaign implements Serializable {
     		if(unit.getEntity() instanceof Mech) {
     			p = newPerson(Person.T_MECHWARRIOR);
     		}
+    		else if(unit.getEntity() instanceof SmallCraft || unit.getEntity() instanceof Jumpship) {
+    			p = newPerson(Person.T_SPACE_PILOT);
+    		}
     		else if(unit.getEntity() instanceof Aero) {
     			p = newPerson(Person.T_AERO_PILOT);
     		}
@@ -3280,8 +3302,21 @@ public class Campaign implements Serializable {
     		if(unit.getEntity() instanceof Tank) {
     			p = newPerson(Person.T_VEE_GUNNER);
     		}
+    		else if(unit.getEntity() instanceof SmallCraft || unit.getEntity() instanceof Jumpship) {
+    			p = newPerson(Person.T_SPACE_GUNNER);
+    		}
     		addPerson(p);
     		unit.addGunner(p);
+    	}
+    	while(unit.canTakeMoreVesselCrew()) {
+    		Person p = newPerson(Person.T_SPACE_CREW);
+    		addPerson(p);
+    		unit.addVesselCrew(p);
+    	}
+    	if(unit.canTakeNavigator()) {
+    		Person p = newPerson(Person.T_NAVIGATOR);
+    		addPerson(p);
+    		unit.setNavigator(p);
     	}
     	
     }

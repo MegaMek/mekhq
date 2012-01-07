@@ -111,10 +111,12 @@ import javax.swing.tree.TreeSelectionModel;
 import megamek.client.ui.swing.MechTileset;
 import megamek.client.ui.swing.MechView;
 import megamek.client.ui.swing.util.PlayerColors;
+import megamek.common.Aero;
 import megamek.common.AmmoType;
 import megamek.common.Entity;
 import megamek.common.EntityListFile;
 import megamek.common.EntityWeightClass;
+import megamek.common.Jumpship;
 import megamek.common.Mech;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
@@ -123,6 +125,7 @@ import megamek.common.MiscType;
 import megamek.common.Mounted;
 import megamek.common.Pilot;
 import megamek.common.Player;
+import megamek.common.SmallCraft;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
@@ -5034,6 +5037,42 @@ public class CampaignGUI extends JPanel {
 				refreshUnitList();
 				refreshPersonnelList();
 				refreshOrganization();
+			} else if (command.contains("ADD_CREW")) {
+				int selected = Integer.parseInt(st.nextToken());		
+				Unit u = getCampaign().getUnit(selected);
+				if(null != u) {
+                    for (Person p : people) {
+                    	if (u.canTakeMoreVesselCrew()) {
+                    		Unit oldUnit = getCampaign().getUnit(p.getUnitId());
+                    		if(null != oldUnit) {
+                    			oldUnit.remove(p);
+                    		}     
+                            u.addVesselCrew(p);
+                        }
+                    }
+				}
+				refreshServicedUnitList();
+				refreshUnitList();
+				refreshPersonnelList();
+				refreshOrganization();
+			} else if (command.contains("ADD_NAV")) {
+				int selected = Integer.parseInt(st.nextToken());		
+				Unit u = getCampaign().getUnit(selected);
+				if(null != u) {
+                    for (Person p : people) {
+                    	if (u.canTakeNavigator()) {
+                    		Unit oldUnit = getCampaign().getUnit(p.getUnitId());
+                    		if(null != oldUnit) {
+                    			oldUnit.remove(p);
+                    		}     
+                            u.setNavigator(p);
+                        }
+                    }
+				}
+				refreshServicedUnitList();
+				refreshUnitList();
+				refreshPersonnelList();
+				refreshOrganization();
 			} else if (command.contains("IMPROVE")) {
 				String type = st.nextToken();
 				int cost =  Integer.parseInt(st.nextToken());
@@ -5348,9 +5387,11 @@ public class CampaignGUI extends JPanel {
 				if(oneSelected && person.isActive()) {
 						menu = new JMenu("Assign to Unit");
 						JMenu pilotMenu = new JMenu("As Pilot");
+						JMenu crewMenu = new JMenu("As Crewmember");
 						JMenu driverMenu = new JMenu("As Driver");
 						JMenu gunnerMenu = new JMenu("As Gunner");
-						JMenu soldierMenu = new JMenu("As Soldier");					
+						JMenu soldierMenu = new JMenu("As Soldier");	
+						JMenu navMenu = new JMenu("As Navigator");
 						cbMenuItem = new JCheckBoxMenuItem("None");
 						/*if(!person.isAssigned()) {
 							cbMenuItem.setSelected(true);
@@ -5382,7 +5423,11 @@ public class CampaignGUI extends JPanel {
 									//TODO: check the box
 									cbMenuItem.setActionCommand("ADD_DRIVER|" + unit.getId());
 									cbMenuItem.addActionListener(this);
-									driverMenu.add(cbMenuItem);
+									if(unit.getEntity() instanceof Aero) {
+										pilotMenu.add(cbMenuItem);
+									} else {
+										driverMenu.add(cbMenuItem);
+									}
 								}
 								if(unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
 									cbMenuItem = new JCheckBoxMenuItem(unit.getName());
@@ -5390,6 +5435,20 @@ public class CampaignGUI extends JPanel {
 									cbMenuItem.setActionCommand("ADD_GUNNER|" + unit.getId());
 									cbMenuItem.addActionListener(this);
 									gunnerMenu.add(cbMenuItem);
+								}
+								if(unit.canTakeMoreVesselCrew() && person.hasSkill(SkillType.S_TECH_VESSEL)) {
+									cbMenuItem = new JCheckBoxMenuItem(unit.getName());
+									//TODO: check the box
+									cbMenuItem.setActionCommand("ADD_CREW|" + unit.getId());
+									cbMenuItem.addActionListener(this);
+									crewMenu.add(cbMenuItem);
+								}
+								if(unit.canTakeNavigator() && person.hasSkill(SkillType.S_NAV)) {
+									cbMenuItem = new JCheckBoxMenuItem(unit.getName());
+									//TODO: check the box
+									cbMenuItem.setActionCommand("ADD_NAV|" + unit.getId());
+									cbMenuItem.addActionListener(this);
+									navMenu.add(cbMenuItem);
 								}
 							}
 						}
@@ -5403,6 +5462,18 @@ public class CampaignGUI extends JPanel {
 							menu.add(driverMenu);
 							if(driverMenu.getItemCount() > 20) {
 			                	MenuScroller.setScrollerFor(driverMenu, 20);
+			                }
+						}
+						if(crewMenu.getItemCount() > 0) {
+							menu.add(crewMenu);
+							if(crewMenu.getItemCount() > 20) {
+			                	MenuScroller.setScrollerFor(crewMenu, 20);
+			                }
+						}
+						if(navMenu.getItemCount() > 0) {
+							menu.add(navMenu);
+							if(navMenu.getItemCount() > 20) {
+			                	MenuScroller.setScrollerFor(navMenu, 20);
 			                }
 						}
 						if(gunnerMenu.getItemCount() > 0) {
@@ -6144,6 +6215,19 @@ public class CampaignGUI extends JPanel {
             				name = "[Driver] " + name;
             			} else {
             				name = "[Gunner] " + name;
+            			}
+            		}
+            		if(u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship) {
+            			if(u.isNavigator(p)) {
+            				name = "[Navigator] " + name;
+            			}
+            			else if(u.isDriver(p)) {
+            				name = "[Pilot] " + name;
+            			} 
+            			else if(u.isGunner(p)) {
+            				name = "[Gunner] " + name;
+            			} else {
+            				name = "[Crew] " + name; 
             			}
             		}
             		return name;

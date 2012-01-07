@@ -47,14 +47,18 @@ import megamek.common.MiscType;
 import megamek.common.Mounted;
 import megamek.common.Pilot;
 import megamek.common.QuadMech;
+import megamek.common.SmallCraft;
+import megamek.common.SpaceStation;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
 import megamek.common.VTOL;
 import megamek.common.Warship;
+import megamek.common.WeaponType;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
+import megamek.common.weapons.BayWeapon;
 import mekhq.MekHQ;
 import mekhq.campaign.parts.AeroHeatSink;
 import mekhq.campaign.parts.AeroSensor;
@@ -106,6 +110,7 @@ import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.parts.equipment.MissingHeatSink;
 import mekhq.campaign.parts.equipment.MissingJumpJet;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.work.IAcquisitionWork;
 
@@ -152,6 +157,8 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 
 	private ArrayList<Integer> drivers;
 	private ArrayList<Integer> gunners;
+	private ArrayList<Integer> vesselCrew;
+	private int navigator;
 	
 	public Campaign campaign;
 
@@ -174,7 +181,9 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 		this.quality = QUALITY_D;
 		this.parts = new ArrayList<Part>();
 		this.drivers = new ArrayList<Integer>();
-		this.gunners = new ArrayList<Integer>();     
+		this.gunners = new ArrayList<Integer>();  
+		this.vesselCrew = new ArrayList<Integer>();    
+		this.navigator = -1;
 		scenarioId = -1;
 		this.refit = null;
 		reCalc();
@@ -1017,6 +1026,14 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 			pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<gunnerId>"
 					+ gid + "</gunnerId>");
 		}
+		for(int gid : vesselCrew) {
+			pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<vesselCrewId>"
+					+ gid + "</vesselCrewId>");
+		}
+		pw1.println(MekHqXmlUtil.indentStr(indentLvl+1)
+				+"<navigatorId>"
+				+navigator
+				+"</navigatorId>");
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<salvaged>"
 				+ salvaged + "</salvaged>");
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<site>" + site
@@ -1058,6 +1075,10 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 					retVal.drivers.add(Integer.parseInt(wn2.getTextContent()));
 				} else if (wn2.getNodeName().equalsIgnoreCase("gunnerId")) {
 					retVal.gunners.add(Integer.parseInt(wn2.getTextContent()));
+				} else if (wn2.getNodeName().equalsIgnoreCase("vesselCrewId")) {
+					retVal.vesselCrew.add(Integer.parseInt(wn2.getTextContent()));
+				} else if (wn2.getNodeName().equalsIgnoreCase("navigatorId")) {
+					retVal.navigator = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("forceId")) {
 					retVal.forceId = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("scenarioId")) {
@@ -1654,6 +1675,13 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     	//if two of the same type are tie rank, take the first one
     	int bestRank = -1;
     	Person commander = null;
+    	for(int id : vesselCrew) {
+    		Person p = campaign.getPerson(id);
+    		if(null != p && p.getRank() > bestRank) {
+    			commander = p;
+    			bestRank = p.getRank();
+    		}
+    	}
     	for(int pid : gunners) {
     		Person p = campaign.getPerson(pid);
     		if((entity instanceof Tank || entity instanceof Infantry) && p.getHits() > 0) { 
@@ -1670,6 +1698,13 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     			continue;
     		}
     		if(p.getRank() > bestRank) {
+    			commander = p;
+    			bestRank = p.getRank();
+    		}
+    	}
+    	if(navigator != -1) {
+    		Person p = campaign.getPerson(navigator);
+    		if(null != p && p.getRank() > bestRank) {
     			commander = p;
     			bestRank = p.getRank();
     		}
@@ -1803,6 +1838,26 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     }   
     
 
+    private int getAeroCrewNeeds() {
+    	if(entity instanceof Dropship) {
+    		if(((Dropship)entity).isMilitary()) {
+    			return 4 + (int)Math.ceil(entity.getWeight()/5000.0);
+    		} else {
+    			return 3 + (int)Math.ceil(entity.getWeight()/5000.0);
+    		}
+    	}
+    	else if(entity instanceof SmallCraft) {
+    		return 3;
+    	}
+    	else if(entity instanceof Warship || entity instanceof SpaceStation) {
+			return 45 + (int)Math.ceil(entity.getWeight()/5000.0);
+    	}
+    	else if(entity instanceof Jumpship) {
+			return 6 + (int)Math.ceil(entity.getWeight()/20000.0);
+    	}
+    	return 0;
+    }
+    
 	public int getFullCrewSize() {
 		if(entity instanceof Tank) {
 			return (int)Math.ceil(entity.getWeight() / 15.0);
@@ -1810,36 +1865,90 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 		else if(entity instanceof Infantry) {
 			return ((Infantry)entity).getSquadN() * ((Infantry)entity).getSquadSize();
 		}
+		else if(entity instanceof Jumpship || entity instanceof SmallCraft) {
+			return getAeroCrewNeeds() + getTotalGunnerNeeds();
+		}
 		else {
 			return 1;
 		}
 	}
-    
-    public boolean canTakeMoreDrivers() {
-    	int nDrivers = drivers.size();
+	
+	private int getTotalDriverNeeds() {
+		if(entity instanceof SpaceStation) {
+    		return 0;
+    	}
+    	if(entity instanceof SmallCraft || entity instanceof Jumpship) {
+    		//its not at all clear how many pilots dropships and jumpships 
+    		//should have, but the old BattleSpace book suggests they should
+    		//be able to get by with 2. For warships, lets go with 2 per shift 
+    		// so 6.
+    		if(entity instanceof Warship) {
+    			return 6;
+    		}
+    		return 2;
+    	}
     	if(entity instanceof Mech || entity instanceof Tank || entity instanceof Aero) {
     		//only one driver please
-    		return nDrivers == 0;
+    		return 1;
     	}
     	else if(entity instanceof Infantry) {
-    		return nDrivers < getFullCrewSize();
+    		return getFullCrewSize();
+    	}
+    	return 0;
+	}
+	    
+    public boolean canTakeMoreDrivers() {
+    	int nDrivers = drivers.size();
+    	return nDrivers < getTotalDriverNeeds();
+    }
+    
+    public boolean canTakeMoreVesselCrew() {
+    	int nCrew = vesselCrew.size();
+    	int nav = 0;
+    	if(entity instanceof SmallCraft || entity instanceof Jumpship) {
+    		if(entity instanceof Jumpship && !(entity instanceof SpaceStation)) {
+    			nav = 1;
+    		}
+    		return nCrew < (getAeroCrewNeeds() - getTotalDriverNeeds() - nav);
     	}
     	return false;
     }
     
+    public boolean canTakeNavigator() {
+    	return entity instanceof Jumpship && !(entity instanceof SpaceStation) && navigator == -1;
+    }
+    
     public boolean canTakeMoreGunners() {
     	int nGunners = gunners.size();
-    	if(entity instanceof Mech || entity instanceof Aero) {
-    		//only one gunner please
-    		return nGunners == 0;
+    	return nGunners < getTotalGunnerNeeds();
+    }
+    
+    public int getTotalGunnerNeeds() {
+    	if(entity instanceof SmallCraft || entity instanceof Jumpship) {
+    		int nStandardW = 0;
+    		int nCapitalW = 0;
+    		for(Mounted m : entity.getTotalWeaponList()) {
+    			EquipmentType type = m.getType();
+    			if(type instanceof BayWeapon) {
+    				continue;
+    			}
+    			if(type instanceof WeaponType) {
+    				if(((WeaponType)type).isCapital()) {
+    					nCapitalW++;
+    				} else {
+    					nStandardW++;
+    				}
+    			}
+    		}
+    		return nCapitalW + (int)Math.ceil(nStandardW/6.0);
     	}
     	else if(entity instanceof Tank) {
-    		return nGunners < (getFullCrewSize() - 1);
+    		return  (getFullCrewSize() - 1);
     	}
     	else if(entity instanceof Infantry) {
-    		return nGunners < getFullCrewSize();
+    		return getFullCrewSize();
     	}
-    	return false;
+    	return 0;
     }
     
     public boolean usesSoloPilot() {
@@ -1862,6 +1971,18 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     	resetPilotAndEntity();
     }
     
+    public void addVesselCrew(Person p) {
+    	vesselCrew.add(p.getId());
+    	p.setUnitId(getId());
+    	resetPilotAndEntity();
+    }
+    
+    public void setNavigator(Person p) {
+    	navigator = p.getId();
+    	p.setUnitId(getId());
+    	resetPilotAndEntity();
+    }
+    
     public void addPilotOrSoldier(Person p) {
     	drivers.add(p.getId());
     	gunners.add(p.getId());
@@ -1873,6 +1994,10 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     	p.setUnitId(-1);
     	drivers.remove(new Integer(p.getId()));
     	gunners.remove(new Integer(p.getId()));
+    	vesselCrew.remove(new Integer(p.getId()));
+    	if(p.getId() == navigator) {
+    		navigator = -1;
+    	}
     	resetPilotAndEntity();
     }
     
@@ -1937,6 +2062,18 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 	    		}
 	    	}
     	}
+    	for(int id : vesselCrew) {
+    		Person p = campaign.getPerson(id);
+    		if(null != p) {
+    			crew.add(p);
+    		}
+    	}
+    	if(navigator != -1) {
+    		Person p = campaign.getPerson(navigator);
+    		if(null != p) {
+    			crew.add(p);
+    		}
+    	}
     	return crew;
     }
     
@@ -1962,6 +2099,18 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 	    		}
 	    	}
     	}
+    	for(int id : vesselCrew) {
+    		Person p = campaign.getPerson(id);
+    		if(null != p) {
+    			crew.add(p);
+    		}
+    	}
+    	if(navigator != -1) {
+    		Person p = campaign.getPerson(navigator);
+    		if(null != p) {
+    			crew.add(p);
+    		}
+    	}
     	return crew;
     }
     
@@ -1974,9 +2123,22 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     	return false;
     }
     
+    public boolean isGunner(Person person) {
+    	for(int id : gunners) {
+    		if(person.getId() == id) {
+    			return true;
+    		}
+    	}
+    	return false;
+    }
+    
     public boolean isCommander(Person person) {
     	return person.getId() == getCommander().getId();
     }    
+    
+    public boolean isNavigator(Person person) {
+    	return person.getId() == navigator;
+    }
     
     public void setRefit(Refit r) {
     	refit = r;
@@ -1998,4 +2160,28 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     public boolean equals(Object o) {
     	return o instanceof Unit && ((Unit)o).getId() == id && ((Unit)o).getName().equals(getName());
     }
+    
+    private Skill getVesselCrewSkillLevel() {
+    	//TODO: method to create a chief engineer person called up in resetPilotAndEntity
+    	int nCrew = 0;
+    	int sumSkill = 0;
+    	int sumBonus = 0;
+    	for(int pid : vesselCrew) {
+    		Person p = campaign.getPerson(pid);
+    		if(null == p) {
+    			continue;
+    		}
+    		if(p.hasSkill(SkillType.S_TECH_VESSEL)) {
+    			sumSkill += p.getSkill(SkillType.S_TECH_VESSEL).getLevel();
+    			sumBonus += p.getSkill(SkillType.S_TECH_VESSEL).getBonus();
+    			nCrew++;
+    		}
+    	}
+    	if(nCrew == 0) {
+    		return null;
+    	} else {
+    		return new Skill(SkillType.S_TECH_VESSEL, sumSkill / nCrew, sumBonus / nCrew);
+    	}
+    }
+ 
 }

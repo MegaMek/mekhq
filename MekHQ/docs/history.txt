@@ -19,6 +19,7 @@ v0.1.13 (SVN)
 + Bug 3470231: Campaign refuses to advance day.
 + Bug: spare equipment parts all had zero tonnage
 + mission type field
++ crew assignments for large craft
 
 v0.1.12 (2011-12-22)
 + restrict parts store by tech limits
