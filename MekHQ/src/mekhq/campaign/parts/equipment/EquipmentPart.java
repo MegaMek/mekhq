@@ -223,6 +223,7 @@ public class EquipmentPart extends Part {
 			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
 			if(null != mounted) {
 				mounted.setHit(false);
+				mounted.setMissing(false);
 		        mounted.setDestroyed(false);
 		        unit.repairSystem(CriticalSlot.TYPE_EQUIPMENT, unit.getEntity().getEquipmentNum(mounted));
 			}
@@ -325,6 +326,7 @@ public class EquipmentPart extends Part {
 		if(null != unit) {
 			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
 			if(null != mounted) {
+				mounted.setMissing(false);
 				if(hits >= 1) {
 					mounted.setDestroyed(true);
 					mounted.setHit(true);
