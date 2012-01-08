@@ -113,9 +113,11 @@ import megamek.client.ui.swing.MechView;
 import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Aero;
 import megamek.common.AmmoType;
+import megamek.common.BattleArmor;
 import megamek.common.Entity;
 import megamek.common.EntityListFile;
 import megamek.common.EntityWeightClass;
+import megamek.common.Infantry;
 import megamek.common.Jumpship;
 import megamek.common.Mech;
 import megamek.common.MechFileParser;
@@ -7449,7 +7451,11 @@ public class CampaignGUI extends JPanel {
     				} else if ((null != u)
     						&& (u.getPartsNeedingFixing().size() > 0)) {
     					setBackground(new Color(238, 238, 0));
-                    } else {
+                    } else if (u.getEntity() instanceof Infantry 
+                    		&& u.getActiveCrew().size() < u.getFullCrewSize()) {
+                		setBackground(Color.RED);
+                    }
+                    else {
                         setBackground(Color.WHITE);
                     }
                 }
