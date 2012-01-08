@@ -24,6 +24,7 @@ v0.1.13 (SVN)
 + set missing status of critical slot and mounted to false for non-hittable items when replacing locations
 + set missing status of equipment parts to false when fixing and replacing
 + color understrength infantry units red in unit table
++ record date of scenario resolution
 
 v0.1.12 (2011-12-22)
 + restrict parts store by tech limits

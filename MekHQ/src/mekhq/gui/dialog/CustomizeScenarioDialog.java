@@ -26,10 +26,14 @@ import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JOptionPane;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Mission;
@@ -46,7 +50,9 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
     private Mission mission;
     private Campaign campaign;
     private boolean newScenario;
-    
+    private Date date;
+    private SimpleDateFormat dateFormatter;
+
     /** Creates new form NewTeamDialog */
     public CustomizeScenarioDialog(java.awt.Frame parent, boolean modal, Scenario s, Mission m, Campaign c) {
         super(parent, modal);
@@ -60,6 +66,11 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
         	newScenario = false;
         }
         campaign = c;
+        date = scenario.getDate();
+        if(null == date) {
+        	date = campaign.getCalendar().getTime();
+        }
+        dateFormatter = new SimpleDateFormat("MM/dd/yyyy");
         initComponents();
         setLocationRelativeTo(parent);
     }
@@ -128,6 +139,24 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
 	        gridBagConstraints.gridx = 1;
 	        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
 	        panMain.add(choiceStatus, gridBagConstraints);
+	        
+	        btnDate = new javax.swing.JButton();
+	        btnDate.setText(dateFormatter.format(date));
+	        btnDate.addActionListener(new java.awt.event.ActionListener() {
+	            public void actionPerformed(java.awt.event.ActionEvent evt) {
+	                changeDate();
+	            }
+	        });
+	        gridBagConstraints.gridx = 0;
+	        gridBagConstraints.gridy++;
+	        gridBagConstraints.gridwidth = 2;
+	        gridBagConstraints.weightx = 1.0;
+	        gridBagConstraints.weighty = 0.0;
+	        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+	        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+	        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+	        panMain.add(btnDate, gridBagConstraints);
+
         }
         
         txtDesc.setText(scenario.getDescription());
@@ -209,6 +238,7 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
     	if(!scenario.isCurrent()) {
     		scenario.setReport(txtReport.getText());
     		scenario.setStatus(choiceStatus.getSelectedIndex()+1);
+    		scenario.setDate(date);
     	}
     	if(newScenario) {
     		campaign.addScenario(scenario, mission);
@@ -223,6 +253,26 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
     	this.setVisible(false);
     }
+    
+    private void changeDate() {
+        // show the date chooser
+    	GregorianCalendar cal = new GregorianCalendar();
+    	cal.setTime(date);
+        DateChooser dc = new DateChooser(frame, cal);
+        // user can eiter choose a date or cancel by closing
+        if (dc.showDateChooser() == DateChooser.OK_OPTION) {
+        	if(campaign.getCalendar().getTime().after(campaign.getCalendar().getTime())) {
+        		JOptionPane.showMessageDialog(frame,
+        			    "You cannot choose a date after the current date.",
+        			    "Invalid date",
+        			    JOptionPane.ERROR_MESSAGE);
+        		return;
+        	}
+            date = dc.getDate().getTime();
+            btnDate.setText(dateFormatter.format(date));
+        }
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel panMain;
     private javax.swing.JPanel panBtn;
@@ -236,6 +286,8 @@ public class CustomizeScenarioDialog extends javax.swing.JDialog {
     private javax.swing.JScrollPane scrReport;
     private javax.swing.JComboBox choiceStatus;
     private javax.swing.JLabel lblStatus;
+    private javax.swing.JButton btnDate;
+
 
 
 

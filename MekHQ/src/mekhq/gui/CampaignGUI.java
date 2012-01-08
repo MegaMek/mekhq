@@ -6815,8 +6815,9 @@ public class CampaignGUI extends JPanel {
 
 		private final static int COL_NAME       = 0;
 		private final static int COL_STATUS     = 1;
-        private final static int COL_ASSIGN     = 2;
-        private final static int N_COL          = 3;
+		private final static int COL_DATE       = 2;
+        private final static int COL_ASSIGN     = 3;
+        private final static int N_COL          = 4;
 		
         private ArrayList<Scenario> data = new ArrayList<Scenario>();
 		
@@ -6835,6 +6836,8 @@ public class CampaignGUI extends JPanel {
             		return "Scenario Name";
                 case COL_STATUS:
                     return "Resolution";
+                case COL_DATE:
+                	return "Date";
                 case COL_ASSIGN:
                     return "# Units";
                 default:
@@ -6849,6 +6852,14 @@ public class CampaignGUI extends JPanel {
 			}
 			if(col == COL_STATUS) {
 				return scenario.getStatusName();
+			}
+			if(col == COL_DATE) {
+				if(null == scenario.getDate()) {
+					return "-";
+				} else {
+					SimpleDateFormat shortDateFormat = new SimpleDateFormat("MM/dd/yyyy");
+					return shortDateFormat.format(scenario.getDate());
+				}
 			}
 			if(col == COL_ASSIGN) {
 				return scenario.getForces(getCampaign()).getAllUnits().size();

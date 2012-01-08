@@ -572,6 +572,7 @@ public class ResolveScenarioTracker {
 		scenario.setStatus(resolution);
 		scenario.setReport(report);
 		scenario.clearAllForcesAndPersonnel(campaign);
+		scenario.setDate(campaign.getCalendar().getTime());
 		client = null;
 	}
 	
