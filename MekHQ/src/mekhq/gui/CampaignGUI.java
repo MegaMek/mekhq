@@ -2009,6 +2009,9 @@ public class CampaignGUI extends JPanel {
 		}
 		Unit u = part.getUnit();
 		Person tech = getCampaign().getPerson(currentTechId);
+		if(u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship) {
+			tech = u.getEngineer();
+		}
 		if(null == tech) {
 			return;
 		}
@@ -3175,6 +3178,9 @@ public class CampaignGUI extends JPanel {
 		}
 		Unit u = part.getUnit();
 		Person tech = getCampaign().getPerson(currentTechId);
+		if(u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship) {
+			tech = u.getEngineer();
+		}
 		if(null == tech) {
 			btnDoTask.setEnabled(false);
 			textTarget.setText("");

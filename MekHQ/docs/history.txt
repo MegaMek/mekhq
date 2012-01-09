@@ -26,6 +26,7 @@ v0.1.13 (SVN)
 + color understrength infantry units red in unit table
 + record date of scenario resolution
 + simplified gui code for tech task targets
++ large crafts fix themselves (sort of)
 
 v0.1.12 (2011-12-22)
 + restrict parts store by tech limits

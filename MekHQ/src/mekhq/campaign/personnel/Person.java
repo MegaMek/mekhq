@@ -1485,7 +1485,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     }
     
     public boolean isTechPrimary() {
-    	return primaryRole == T_MECH_TECH ||  primaryRole == T_AERO_TECH ||  primaryRole == T_MECHANIC ||  primaryRole == T_BA_TECH;
+    	return primaryRole == T_MECH_TECH ||  primaryRole == T_AERO_TECH ||  primaryRole == T_MECHANIC ||  primaryRole == T_BA_TECH ||  primaryRole == T_SPACE_CREW;
     }
     
     public boolean isTechSecondary() {
@@ -1506,6 +1506,10 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     	}
     	if(unit.getEntity() instanceof Tank && hasSkill(SkillType.S_TECH_MECHANIC)) {
     		return getSkill(SkillType.S_TECH_MECHANIC);
+    	}
+    	if((unit.getEntity() instanceof SmallCraft || unit.getEntity() instanceof Jumpship)
+    			&& hasSkill(SkillType.S_TECH_VESSEL)) {
+    		return getSkill(SkillType.S_TECH_VESSEL);
     	}
     	if(unit.getEntity() instanceof Aero 
     			&& !(unit.getEntity() instanceof SmallCraft) 
@@ -1606,6 +1610,9 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     	}
     	if(unit.getEntity() instanceof Tank) {
     		return hasSkill(SkillType.S_TECH_MECHANIC);
+    	}
+    	if(unit.getEntity() instanceof SmallCraft || unit.getEntity() instanceof Jumpship) {
+    		return hasSkill(SkillType.S_TECH_VESSEL);
     	}
     	if(unit.getEntity() instanceof Aero) {
     		return hasSkill(SkillType.S_TECH_AERO);

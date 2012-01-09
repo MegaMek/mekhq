@@ -166,6 +166,9 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 
 	private Refit refit;
 	
+	//a made-up person to handle repairs on Large Craft
+	private Person engineer;
+	
 	//for backwards compatability with 0.1.8, but otherwise is no longer used 
 	private int pilotId = -1;
 	
@@ -186,6 +189,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 		this.navigator = -1;
 		scenarioId = -1;
 		this.refit = null;
+		this.engineer = null;
 		reCalc();
 	}
 	
@@ -1669,7 +1673,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     }
  
     public void resetPilotAndEntity() {
-    		
+    		    	
     	int piloting = 13;
     	int gunnery = 13;	
     	int artillery = 13;
@@ -1784,6 +1788,35 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     			entity.setCrew(null);
     			return;
     		}
+    	}
+    	int minutesLeft = 480;
+    	int overtimeLeft = 240;
+    	if(null != engineer) {
+    		minutesLeft = engineer.getMinutesLeft();
+    		overtimeLeft = engineer.getOvertimeLeft();    		
+    	}
+    	if(entity instanceof SmallCraft || entity instanceof Jumpship) {
+    		int nCrew = 0;
+        	int sumSkill = 0;
+        	int sumBonus = 0;
+        	for(int pid : vesselCrew) {
+        		Person p = campaign.getPerson(pid);
+        		if(null == p) {
+        			continue;
+        		}
+        		if(p.hasSkill(SkillType.S_TECH_VESSEL)) {
+        			sumSkill += p.getSkill(SkillType.S_TECH_VESSEL).getLevel();
+        			sumBonus += p.getSkill(SkillType.S_TECH_VESSEL).getBonus();
+        			nCrew++;
+        		}
+        	}
+    		engineer = new Person(commander.getName(), campaign.getRanks());
+    		engineer.setMinutesLeft(minutesLeft);
+    		engineer.setOvertimeLeft(overtimeLeft);
+    		engineer.setPrimaryRole(Person.T_SPACE_CREW);
+        	if(nCrew > 0) {
+        		engineer.addSkill(SkillType.S_TECH_VESSEL, sumSkill/nCrew, sumBonus/nCrew);
+        	}
     	}
     	pilot.setToughness(commander.getToughness());
     	//TODO: game option to use tactics as command and ind init bonus
@@ -2117,27 +2150,8 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     	return o instanceof Unit && ((Unit)o).getId() == id && ((Unit)o).getName().equals(getName());
     }
     
-    private Skill getVesselCrewSkillLevel() {
-    	//TODO: method to create a chief engineer person called up in resetPilotAndEntity
-    	int nCrew = 0;
-    	int sumSkill = 0;
-    	int sumBonus = 0;
-    	for(int pid : vesselCrew) {
-    		Person p = campaign.getPerson(pid);
-    		if(null == p) {
-    			continue;
-    		}
-    		if(p.hasSkill(SkillType.S_TECH_VESSEL)) {
-    			sumSkill += p.getSkill(SkillType.S_TECH_VESSEL).getLevel();
-    			sumBonus += p.getSkill(SkillType.S_TECH_VESSEL).getBonus();
-    			nCrew++;
-    		}
-    	}
-    	if(nCrew == 0) {
-    		return null;
-    	} else {
-    		return new Skill(SkillType.S_TECH_VESSEL, sumSkill / nCrew, sumBonus / nCrew);
-    	}
+    public Person getEngineer() {
+    	return engineer;
     }
  
 }

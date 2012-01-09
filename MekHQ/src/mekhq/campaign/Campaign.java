@@ -965,11 +965,13 @@ public class Campaign implements Serializable {
 		}
 		resetAstechMinutes();
 		
-		//check for refits first
 		for(Unit u : getUnits()) {
 			if(u.isRefitting()) {
 				u.getRefit().resetCheckedToday();
 				refit(u.getRefit());
+			}
+			if(null != u.getEngineer()) {
+				u.getEngineer().resetMinutesLeft();
 			}
 		}
 		
@@ -988,6 +990,11 @@ public class Campaign implements Serializable {
 			Part part = getPart(pid);
 			if(null != part) {
 				Person tech = getPerson(part.getAssignedTeamId());
+				if(null != part.getUnit() 
+						&& (part.getUnit().getEntity() instanceof SmallCraft 
+								|| part.getUnit().getEntity() instanceof Jumpship)) {
+					tech = part.getUnit().getEngineer();
+				}
 				if(null != tech) {
 					fixPart(part, tech);
 				}
