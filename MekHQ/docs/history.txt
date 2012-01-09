@@ -25,6 +25,7 @@ v0.1.13 (SVN)
 + set missing status of equipment parts to false when fixing and replacing
 + color understrength infantry units red in unit table
 + record date of scenario resolution
++ simplified gui code for tech task targets
 
 v0.1.12 (2011-12-22)
 + restrict parts store by tech limits

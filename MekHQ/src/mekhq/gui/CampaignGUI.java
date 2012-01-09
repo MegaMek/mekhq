@@ -1997,23 +1997,28 @@ public class CampaignGUI extends JPanel {
 	
 	private void btnDoTaskActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnDoTaskActionPerformed
 		
-		Person tech = getCampaign().getPerson(currentTechId);		
-	
-		if (null != tech) {
-			if(acquireSelected()) {
-				Part part = getCampaign().getPart(currentAcquisitionId);
-				if(null != part && part instanceof IAcquisitionWork) {
-					getCampaign().acquirePart((IAcquisitionWork)part, tech);
-				}
-			} else if(repairsSelected()) {
-				Part part = getCampaign().getPart(currentServiceablePartsId);
-				Unit u = part.getUnit();
-				if(null != part) {
-					getCampaign().fixPart(part, tech);
-				}
-				if(null !=  u && !u.isRepairable() && u.getSalvageableParts().size() == 0) {
-					getCampaign().removeUnit(u.getId());
-				}
+		Part part = null;
+		if(acquireSelected()) {
+			part = getCampaign().getPart(currentAcquisitionId);
+		}
+		else if(repairsSelected()) {
+			part = getCampaign().getPart(currentServiceablePartsId);
+		}
+		if(null == part) {
+			return;
+		}
+		Unit u = part.getUnit();
+		Person tech = getCampaign().getPerson(currentTechId);
+		if(null == tech) {
+			return;
+		}
+		if(acquireSelected() && part instanceof IAcquisitionWork) {
+			getCampaign().acquirePart((IAcquisitionWork)part, tech);
+		}
+		else if(repairsSelected()) {
+			getCampaign().fixPart(part, tech);
+			if(null !=  u && !u.isRepairable() && u.getSalvageableParts().size() == 0) {
+				getCampaign().removeUnit(u.getId());
 			}
 		}
 		
@@ -2038,8 +2043,7 @@ public class CampaignGUI extends JPanel {
 			currentTechId = -1;
 		}
 		
-		updateAssignEnabled();
-		updateTargetText();
+		updateTechTarget();
 	}
 
 	private void TaskTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
@@ -2067,8 +2071,7 @@ public class CampaignGUI extends JPanel {
 			}
 		}
 
-		updateAssignEnabled();
-		updateTargetText();
+		updateTechTarget();
 	}
 	
 	private void AcquisitionTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
@@ -2082,8 +2085,7 @@ public class CampaignGUI extends JPanel {
 			currentAcquisitionId = -1;
 		}
 
-		updateAssignEnabled();
-		updateTargetText();
+		updateTechTarget();
 	}
 
 	private void servicedUnitTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
@@ -2100,8 +2102,7 @@ public class CampaignGUI extends JPanel {
 	}
 	
 	private void taskTabChanged() {
-		updateAssignEnabled();
-		updateTargetText();
+		updateTechTarget();
 	}
 
 	private void patientTableValueChanged(
@@ -3143,32 +3144,6 @@ public class CampaignGUI extends JPanel {
 		lblLocation.setText(getCampaign().getLocation().getReport(getCampaign().getCalendar().getTime()));
 	}
 
-	protected void updateAssignEnabled() {
-		// must have a valid tech and an unassigned task	
-		Person tech = getCampaign().getPerson(currentTechId);
-		if (null != tech) {
-			if(repairsSelected()) {
-				Part part = getCampaign().getPart(currentServiceablePartsId);
-				if(null != part) {
-					btnDoTask.setEnabled(getCampaign().getTargetFor(part, tech).getValue() != TargetRoll.IMPOSSIBLE);
-				} else {
-					btnDoTask.setEnabled(false);
-				}
-			} else if(acquireSelected()) {
-				Part part = getCampaign().getPart(currentAcquisitionId);
-				if(null != part && part instanceof IAcquisitionWork) {
-					btnDoTask.setEnabled(getCampaign().getTargetForAcquisition((IAcquisitionWork)part, tech).getValue() != TargetRoll.IMPOSSIBLE);
-				} else {
-					btnDoTask.setEnabled(false);
-				}
-			} else {
-				btnDoTask.setEnabled(false);
-			}
-		} else {
-			btnDoTask.setEnabled(false);
-		}
-	}
-
 	protected void updateAssignDoctorEnabled() {
 		// must have a valid doctor and an unassigned task
 		
@@ -3183,29 +3158,41 @@ public class CampaignGUI extends JPanel {
 		}
 	}
 
-	protected void updateTargetText() {
+	protected void updateTechTarget() {
 		// must have a valid team and an unassigned task
+		Part part = null;
+		if(acquireSelected()) {
+			part = getCampaign().getPart(currentAcquisitionId);
+		}
+		else if(repairsSelected()) {
+			part = getCampaign().getPart(currentServiceablePartsId);
+		}
+		if(null == part) {			
+			btnDoTask.setEnabled(false);
+			textTarget.setText("");
+			lblTargetNum.setText("-");
+			return;
+		}
+		Unit u = part.getUnit();
 		Person tech = getCampaign().getPerson(currentTechId);
-		if (null != tech) {
-			TargetRoll target = null;
-			if(acquireSelected()) {
-				Part part = getCampaign().getPart(currentAcquisitionId);
-				if(null != part && part instanceof IAcquisitionWork)
+		if(null == tech) {
+			btnDoTask.setEnabled(false);
+			textTarget.setText("");
+			lblTargetNum.setText("-");
+			return;
+		}
+		TargetRoll target = null;
+		if(acquireSelected() && part instanceof IAcquisitionWork) {
 				target = getCampaign().getTargetForAcquisition((IAcquisitionWork)part, tech);
-			} else {
-				Part part = getCampaign().getPart(currentServiceablePartsId);
-				if(null != part) {
-					target = getCampaign().getTargetFor(part, tech);
-				}
-			}
-			if(null != target) {
-				textTarget.setText(target.getDesc());
-				lblTargetNum.setText(target.getValueAsString());
-			} else {
-				textTarget.setText("");
-				lblTargetNum.setText("-");
-			}
+		} else if(repairsSelected()) {
+			target = getCampaign().getTargetFor(part, tech);
+		}
+		if(null != target) {
+			btnDoTask.setEnabled(target.getValue() != TargetRoll.IMPOSSIBLE);
+			textTarget.setText(target.getDesc());
+			lblTargetNum.setText(target.getValueAsString());
 		} else {
+			btnDoTask.setEnabled(false);
 			textTarget.setText("");
 			lblTargetNum.setText("-");
 		}
