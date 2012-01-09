@@ -205,4 +205,9 @@ public class MekSensor extends Part {
         }
         return null;
     }
+	
+	@Override
+    public String getDetails() {
+		return super.getDetails() + ", " + getUnitTonnage() + " tons";
+    }
 }

@@ -29,6 +29,8 @@ v0.1.13 (SVN)
 + large crafts fix themselves (sort of)
 + Bug 3470457: Negative time destroys Astech mins
 + Bug 3470662: Actuators listed in system components in warehouse
++ Bug 3469248: Mech sensors in warehouse - No Tonnage
++ Bug: aero sensors must be matched to unit tonnage since cost is variable by tonnage
 
 v0.1.12 (2011-12-22)
 + restrict parts store by tech limits

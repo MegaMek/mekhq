@@ -163,7 +163,8 @@ public class AeroSensor extends Part {
 		if(needsFixing() || part.needsFixing()) {
     		return false;
     	}
-		return part instanceof AeroSensor && dropship == ((AeroSensor)part).isForDropShip();
+		return part instanceof AeroSensor && dropship == ((AeroSensor)part).isForDropShip()
+				&& (dropship || getUnitTonnage() == part.getUnitTonnage());
 	}
 
 	public boolean isForDropShip() {
@@ -195,5 +196,14 @@ public class AeroSensor extends Part {
 			}
 		}
 	}
+	
+	@Override
+    public String getDetails() {
+		String dropper = "";
+		if(dropship) {
+			dropper = " (dropship)";
+		}
+		return super.getDetails() + ", " + getUnitTonnage() + " tons" + dropper;
+    }
 	
 }
