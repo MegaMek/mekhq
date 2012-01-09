@@ -397,7 +397,7 @@ public class MekHQ implements GameListener {
 		try {
 			//FIXME: I would prefer to check on the old victory phase but for some reason
 			//it wont progress to that stage with the test bot
-            if (e.getNewPhase() == IGame.Phase.PHASE_VICTORY) {
+            if (e.getOldPhase() == IGame.Phase.PHASE_VICTORY) {
             	ResolveScenarioTracker tracker = new ResolveScenarioTracker(currentScenario, campaign);
             	tracker.setClient(gameThread.getClient());
             	tracker.processGame(JOptionPane.showConfirmDialog(campaigngui.getFrame(),

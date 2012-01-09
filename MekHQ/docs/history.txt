@@ -34,6 +34,8 @@ v0.1.13 (SVN)
 + Bug 3468357: Setting Edge to Multiple People
 + Bug 3468387: FRR Faction Typo
 + Bug 3468374: Green Techs roll like Astechs
++ MM listener starts resolution after victory screen not before
++ Bug: mission description getting cut off in missionviewpanel
 
 v0.1.12 (2011-12-22)
 + restrict parts store by tech limits

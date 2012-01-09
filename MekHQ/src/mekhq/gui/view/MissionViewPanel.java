@@ -146,7 +146,7 @@ public class MissionViewPanel extends javax.swing.JPanel {
 		txtDesc.setWrapStyleWord(true);
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 2;
+		gridBagConstraints.gridy = 3;
 		gridBagConstraints.gridwidth = 2;
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 1.0;
