@@ -2941,7 +2941,7 @@ public class Campaign implements Serializable {
         }
         //this is ugly, if the mode penalty drops you to green, you drop two levels instead of two
         int value = skill.getFinalSkillValue() + modePenalty;
-        if(SkillType.EXP_GREEN == (skill.getExperienceLevel()-modePenalty)) {
+        if(modePenalty > 0 && SkillType.EXP_GREEN == (skill.getExperienceLevel()-modePenalty)) {
         	value++;
         }
         TargetRoll target = new TargetRoll(value, SkillType.getExperienceLevelName(skill.getExperienceLevel()-modePenalty));
