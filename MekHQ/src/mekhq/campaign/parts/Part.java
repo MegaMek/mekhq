@@ -700,5 +700,9 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	public boolean isPresent() {
 		return daysToArrival == 0;
 	}
+	
+	public boolean isBeingWorkedOn() {
+		return teamId != -1;
+	}
 }
 

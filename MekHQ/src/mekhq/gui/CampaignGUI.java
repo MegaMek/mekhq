@@ -3906,6 +3906,7 @@ public class CampaignGUI extends JPanel {
 						cbMenuItem.setActionCommand("CHANGE_MODE:" + i);
 						cbMenuItem.addActionListener(this);
 					}
+					cbMenuItem.setEnabled(!part.isBeingWorkedOn());
 					menu.add(cbMenuItem);
 				}		
 				popup.add(menu);
@@ -3913,7 +3914,7 @@ public class CampaignGUI extends JPanel {
 				menuItem = new JMenuItem("Scrap component");
 				menuItem.setActionCommand("SCRAP");
 				menuItem.addActionListener(this);
-				menuItem.setEnabled(part.canScrap());
+				menuItem.setEnabled(part.canScrap() && !part.isBeingWorkedOn());
 				popup.add(menuItem);
 				// Remove assigned team for scheduled tasks
 				/*

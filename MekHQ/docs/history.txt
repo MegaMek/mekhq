@@ -27,6 +27,7 @@ v0.1.13 (SVN)
 + record date of scenario resolution
 + simplified gui code for tech task targets
 + large crafts fix themselves (sort of)
++ Bug 3470457: Negative time destroys Astech mins
 
 v0.1.12 (2011-12-22)
 + restrict parts store by tech limits
