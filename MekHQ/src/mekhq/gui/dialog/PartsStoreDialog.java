@@ -53,8 +53,12 @@ import megamek.common.TechConstants;
 import megamek.common.WeaponType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.PartInventory;
+import mekhq.campaign.parts.AeroSensor;
 import mekhq.campaign.parts.Armor;
+import mekhq.campaign.parts.Avionics;
 import mekhq.campaign.parts.EnginePart;
+import mekhq.campaign.parts.FireControlSystem;
+import mekhq.campaign.parts.LandingGear;
 import mekhq.campaign.parts.MekActuator;
 import mekhq.campaign.parts.MekCockpit;
 import mekhq.campaign.parts.MekGyro;
@@ -63,6 +67,8 @@ import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.MekSensor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.TankLocation;
+import mekhq.campaign.parts.VeeSensor;
+import mekhq.campaign.parts.VeeStabiliser;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.gui.CampaignGUI;
 
@@ -263,12 +269,14 @@ public class PartsStoreDialog extends javax.swing.JDialog {
         		} else if(nGroup == SG_ARMOR) {
         			return part instanceof Armor;
         		} else if(nGroup == SG_SYSTEM) {
-        			return part instanceof MekGyro 
-        				|| part instanceof EnginePart
-        				|| part instanceof MekActuator
-        				|| part instanceof MekLifeSupport
+        			return part instanceof MekLifeSupport
         				|| part instanceof MekSensor
-        				|| part instanceof MekCockpit;
+        				|| part instanceof LandingGear
+        				|| part instanceof Avionics
+        				|| part instanceof FireControlSystem
+        				|| part instanceof AeroSensor
+        				|| part instanceof VeeSensor
+        				|| part instanceof VeeStabiliser;
         		} else if(nGroup == SG_EQUIP) {
         			return part instanceof EquipmentPart;
         		} else if(nGroup == SG_LOC) {
