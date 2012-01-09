@@ -87,7 +87,7 @@ public class Faction {
             case F_WOB:
                 return "Word of Blake";
             case F_FRR:
-                return "Free Rassalhague Republic";
+                return "Free Rasalhague Republic";
             case F_SIC:
                 return "St. Ives Compact";
             case F_CANOPUS:
