@@ -31,6 +31,7 @@ v0.1.13 (SVN)
 + Bug 3470662: Actuators listed in system components in warehouse
 + Bug 3469248: Mech sensors in warehouse - No Tonnage
 + Bug: aero sensors must be matched to unit tonnage since cost is variable by tonnage
++ Bug 3468357: Setting Edge to Multiple People
 
 v0.1.12 (2011-12-22)
 + restrict parts store by tech limits

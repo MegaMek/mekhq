@@ -5234,8 +5234,10 @@ public class CampaignGUI extends JPanel {
 						getFrame(), true, "Edge", selectedPerson.getEdge(), 0, 10);
 				pvcd.setVisible(true);
 				int i = pvcd.getValue();
-				selectedPerson.setEdge(i);
-				getCampaign().personUpdated(selectedPerson);
+				for(Person person : people) {
+					person.setEdge(i);
+					getCampaign().personUpdated(person);
+				}
 				refreshPersonnelList();
 			} else if (command.equalsIgnoreCase("KILL")) {
 				NewKillDialog nkd = new NewKillDialog(getFrame(), true, getCampaign(), selectedPerson);
