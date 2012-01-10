@@ -114,6 +114,7 @@ import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Aero;
 import megamek.common.AmmoType;
 import megamek.common.BattleArmor;
+import megamek.common.Dropship;
 import megamek.common.Entity;
 import megamek.common.EntityListFile;
 import megamek.common.EntityWeightClass;
@@ -2009,7 +2010,7 @@ public class CampaignGUI extends JPanel {
 		}
 		Unit u = part.getUnit();
 		Person tech = getCampaign().getPerson(currentTechId);
-		if(u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship) {
+		if(u.getEntity() instanceof Dropship || u.getEntity() instanceof Jumpship) {
 			tech = u.getEngineer();
 		}
 		if(null == tech) {
@@ -3178,7 +3179,7 @@ public class CampaignGUI extends JPanel {
 		}
 		Unit u = part.getUnit();
 		Person tech = getCampaign().getPerson(currentTechId);
-		if(u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship) {
+		if(u.getEntity() instanceof Dropship || u.getEntity() instanceof Jumpship) {
 			tech = u.getEngineer();
 		}
 		if(null == tech) {

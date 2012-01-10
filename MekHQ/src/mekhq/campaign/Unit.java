@@ -1795,7 +1795,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     		minutesLeft = engineer.getMinutesLeft();
     		overtimeLeft = engineer.getOvertimeLeft();    		
     	}
-    	if(entity instanceof SmallCraft || entity instanceof Jumpship) {
+    	if(entity instanceof Dropship || entity instanceof Jumpship) {
     		int nCrew = 0;
         	int sumSkill = 0;
         	int sumBonus = 0;
@@ -1873,6 +1873,9 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     		// so 6.
     		if(entity instanceof Warship) {
     			return 6;
+    		}
+    		if(entity instanceof SmallCraft) {
+    			return 3;
     		}
     		return 2;
     	}
