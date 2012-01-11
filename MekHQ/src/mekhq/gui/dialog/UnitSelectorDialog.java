@@ -39,6 +39,7 @@ import megamek.client.ui.Messages;
 import megamek.client.ui.swing.AdvancedSearchDialog;
 import megamek.client.ui.swing.MechTileset;
 import megamek.client.ui.swing.MechView;
+import megamek.client.ui.swing.MechViewPanel;
 import megamek.common.Entity;
 import megamek.common.EntityWeightClass;
 import megamek.common.MechFileParser;
@@ -106,8 +107,7 @@ public class UnitSelectorDialog extends JDialog {
 
         scrTableUnits = new javax.swing.JScrollPane();
         tableUnits = new javax.swing.JTable();
-        scrTxtUnitView = new javax.swing.JScrollPane();
-        txtUnitView = new javax.swing.JTextPane();
+        panelMekView = new MechViewPanel();
         panelFilterBtns = new javax.swing.JPanel();
         panelLeft = new javax.swing.JPanel();
         lblWeight = new javax.swing.JLabel();
@@ -316,22 +316,12 @@ public class UnitSelectorDialog extends JDialog {
 
         }
         scrTableUnits.setViewportView(tableUnits);
-
-        scrTxtUnitView.setName("scrTxtUnitView"); // NOI18N
-        txtUnitView.setBorder(null);
-        txtUnitView.setContentType(resourceMap.getString("txtUnitView.contentType")); // NOI18N
-        txtUnitView.setEditable(false);
-        txtUnitView.setFont(Font.decode(resourceMap.getString("txtUnitView.font"))); // NOI18N
-        txtUnitView.setMinimumSize(new java.awt.Dimension(300, 500));
-        txtUnitView.setName("txtUnitView"); // NOI18N
-        txtUnitView.setPreferredSize(new java.awt.Dimension(300, 500));
-        scrTxtUnitView.setViewportView(txtUnitView);
  
         panelLeft.setLayout(new BorderLayout());
         panelLeft.add(panelFilterBtns, BorderLayout.PAGE_START);
         panelLeft.add(scrTableUnits, BorderLayout.CENTER);
         
-        splitMain = new javax.swing.JSplitPane(javax.swing.JSplitPane.HORIZONTAL_SPLIT,panelLeft, scrTxtUnitView);
+        splitMain = new javax.swing.JSplitPane(javax.swing.JSplitPane.HORIZONTAL_SPLIT,panelLeft, panelMekView);
         splitMain.setOneTouchExpandable(true);
         splitMain.setResizeWeight(0.0);
         getContentPane().add(splitMain, BorderLayout.CENTER);
@@ -466,25 +456,23 @@ public class UnitSelectorDialog extends JDialog {
 
         // null entity, so load a default unit.
         if (selectedUnit == null) {
-            txtUnitView.setText("");
+            panelMekView.reset();
             lblImage.setIcon(null);
             return;
         }
-
         MechView mechView = null;
         try {
-            mechView = new MechView(selectedUnit, true);
+            mechView = new MechView(selectedUnit, false);
         } catch (Exception e) {
+            e.printStackTrace();
             // error unit didn't load right. this is bad news.
             populateTextFields = false;
         }
-        txtUnitView.setEditable(false);
         if (populateTextFields && (mechView != null)) {
-            txtUnitView.setText(mechView.getMechReadout());
+            panelMekView.setMech(selectedUnit);
         } else {
-            txtUnitView.setText("No Unit Selected");
+            panelMekView.reset();
         }
-        txtUnitView.setCaretPosition(0);
 
         if (mt == null) {
             mt = new MechTileset("data/images/units/");
@@ -715,10 +703,9 @@ public class UnitSelectorDialog extends JDialog {
     private javax.swing.JPanel panelOKBtns;
     private javax.swing.JPanel panelLeft;
     private javax.swing.JScrollPane scrTableUnits;
-    private javax.swing.JScrollPane scrTxtUnitView;
+    private MechViewPanel panelMekView;
     private javax.swing.JTable tableUnits;
     private javax.swing.JTextField txtFilter;
-    private javax.swing.JTextPane txtUnitView;
     private javax.swing.JSplitPane splitMain;
     private JButton btnAdvSearch;
     private JButton btnResetSearch;
