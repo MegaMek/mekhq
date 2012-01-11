@@ -9,6 +9,8 @@ package mekhq.gui.dialog;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -19,8 +21,10 @@ import java.util.ResourceBundle;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.RowFilter;
 import javax.swing.SwingConstants;
@@ -31,11 +35,14 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
+import megamek.client.ui.Messages;
+import megamek.client.ui.swing.AdvancedSearchDialog;
 import megamek.client.ui.swing.MechTileset;
 import megamek.client.ui.swing.MechView;
 import megamek.common.Entity;
 import megamek.common.EntityWeightClass;
 import megamek.common.MechFileParser;
+import megamek.common.MechSearchFilter;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
 import megamek.common.TechConstants;
@@ -68,6 +75,10 @@ public class UnitSelectorDialog extends JDialog {
     private CampaignGUI hqView;
     
     private DecimalFormat formatter;
+    
+    private MechSearchFilter searchFilter;
+    AdvancedSearchDialog asd;
+
 
     /** Creates new form UnitSelectorDialog */
     public UnitSelectorDialog(boolean modal, CampaignGUI view) {
@@ -77,6 +88,7 @@ public class UnitSelectorDialog extends JDialog {
         this.hqView = view;
         this.campaign = hqView.getCampaign();
         formatter = new DecimalFormat();
+        asd = new AdvancedSearchDialog(view.getFrame());
 
         
         MechSummary [] allMechs = MechSummaryCache.getInstance().getAllMechs();
@@ -108,6 +120,9 @@ public class UnitSelectorDialog extends JDialog {
         panelOKBtns = new javax.swing.JPanel();
         btnBuy = new javax.swing.JButton();
         btnClose = new javax.swing.JButton();
+        btnAdvSearch = new JButton();
+        btnResetSearch = new JButton();
+        panelSearchBtns = new JPanel();
 
 		ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.UnitSelectorDialog");
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -220,6 +235,51 @@ public class UnitSelectorDialog extends JDialog {
         gridBagConstraints.weighty = 1.0;
         panelFilterBtns.add(lblImage, gridBagConstraints);
       
+        panelSearchBtns.setLayout(new GridBagLayout());
+
+        btnAdvSearch.setText(Messages.getString("MechSelectorDialog.AdvSearch")); //$NON-NLS-1$
+        btnAdvSearch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            	searchFilter = asd.showDialog();
+                btnResetSearch.setEnabled(searchFilter!=null);
+                filterUnits();
+            }
+        });
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        panelSearchBtns.add(btnAdvSearch, gridBagConstraints);
+
+        btnResetSearch.setText(Messages.getString("MechSelectorDialog.Reset")); //$NON-NLS-1$
+        btnResetSearch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            	asd.clearValues();
+                searchFilter=null;
+                btnResetSearch.setEnabled(false);
+                filterUnits();
+            }
+        });
+        btnResetSearch.setEnabled(false);
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        panelSearchBtns.add(btnResetSearch, gridBagConstraints);
+
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 0);
+        panelFilterBtns.add(panelSearchBtns, gridBagConstraints);
+
+        
         scrTableUnits.setMinimumSize(new java.awt.Dimension(500, 400));
         scrTableUnits.setName("scrTableUnits"); // NOI18N
         scrTableUnits.setPreferredSize(new java.awt.Dimension(500, 400));
@@ -357,7 +417,8 @@ public class UnitSelectorDialog extends JDialog {
                 /* Technology Level */
                 campaign.getCampaignOptions().getTechLevel() >= (Integer.parseInt(TechConstants.T_SIMPLE_LEVEL[mech.getType()])-2) &&        
                 /*Unit type*/
-                 ((nUnit == UnitType.SIZE) || mech.getUnitType().equals(UnitType.getTypeName(nUnit)))) {
+                 ((nUnit == UnitType.SIZE) || mech.getUnitType().equals(UnitType.getTypeName(nUnit))) &&
+                 ((searchFilter==null) || MechSearchFilter.isMatch(mech, searchFilter))) {
                 	if(txtFilter.getText().length() > 0) {
                         String text = txtFilter.getText();
                         return mech.getName().toLowerCase().contains(text.toLowerCase());
@@ -632,6 +693,14 @@ public class UnitSelectorDialog extends JDialog {
 			}
 	
 	}
+	
+	@Override
+    public void setVisible(boolean visible) {
+        asd.clearValues();
+        searchFilter=null;
+        filterUnits();
+        super.setVisible(visible);
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBuy;
@@ -651,6 +720,9 @@ public class UnitSelectorDialog extends JDialog {
     private javax.swing.JTextField txtFilter;
     private javax.swing.JTextPane txtUnitView;
     private javax.swing.JSplitPane splitMain;
+    private JButton btnAdvSearch;
+    private JButton btnResetSearch;
+    private JPanel panelSearchBtns;
     // End of variables declaration//GEN-END:variables
 
 }

@@ -42,6 +42,7 @@ v0.1.13 (SVN)
 + contributors doc
 + update MM.jar to 0.35.27
 + mekhq-splash.png
++ advanced search in unit selector
 
 v0.1.12 (2011-12-22)
 + restrict parts store by tech limits
