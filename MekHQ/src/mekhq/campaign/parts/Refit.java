@@ -273,10 +273,10 @@ public class Refit implements IPartWork, IAcquisitionWork {
 				if(null != replacement) {
 					newUnitParts.add(replacement.getId());
 				} else {
+					replacement = ((MissingPart)nPart).getNewPart();
 					//set entity for variable cost items
-					nPart.setUnit(newUnit);
-					cost += ((MissingPart)nPart).getActualValue();
-					nPart.setUnit(null);
+					replacement.setUnit(newUnit);
+					cost += replacement.getActualValue();
 					shoppingList.add(nPart);
 				}
 			} 

@@ -44,6 +44,7 @@ v0.1.13 (SVN)
 + mekhq-splash.png
 + advanced search in unit selector
 + fluff images in unit selector
++ Bug: refits shown as costing nothing
 
 v0.1.12 (2011-12-22)
 + restrict parts store by tech limits
