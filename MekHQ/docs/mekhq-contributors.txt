@@ -1,0 +1,30 @@
+    
+  Current maintainer:
+     Jay Lawson <jaylawson39@yahoo.com>
+
+  Developers:
+     Sebastian Brocks <beerockxs@users.sourceforge.net>
+  	 Frederic Morel <natitf@users.sourceforge.net>
+  	 Robin Toll <fastsammy@users.sourceforge.net>
+
+  Unit Updates:
+     DarkISI
+
+  Splash Screen Images:
+  	 Anthony Scroggins (http://shimmering-sword.deviantart.com)
+
+  Patch Submitters:
+  	 Daniel Vystrcil
+  	 Longinus00
+  	 Josh Street
+  	 Neyah Peterson
+  	 Deric Page
+  
+  And Of Course...
+     FASA, WizKids, FanPro and Catalyst Game Labs for creating and publishing the original game of 
+     BattleTech, a source of fun and inspiration to us all.
+
+
+  If I've missed anyone or details have changed, please accept apologies and
+  contact the current maintainer (above.)
+

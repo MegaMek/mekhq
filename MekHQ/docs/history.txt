@@ -39,6 +39,7 @@ v0.1.13 (SVN)
 + updated MM.jar and MML.jar
 + Bug: small craft aren't repaired by own crew
 + set number of pilots on small craft and dropships to be 3
++ contributors doc
 
 v0.1.12 (2011-12-22)
 + restrict parts store by tech limits
