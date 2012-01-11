@@ -41,6 +41,7 @@ v0.1.13 (SVN)
 + set number of pilots on small craft and dropships to be 3
 + contributors doc
 + update MM.jar to 0.35.27
++ mekhq-splash.png
 
 v0.1.12 (2011-12-22)
 + restrict parts store by tech limits
