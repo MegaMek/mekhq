@@ -212,6 +212,7 @@ public class Campaign implements Serializable {
 	private ArrayList<String> customs;
 	
 	private CampaignOptions campaignOptions = new CampaignOptions();
+	private RandomSkillPreferences rskillPrefs = new RandomSkillPreferences();
 
 	public Campaign() {
 		game = new Game();
@@ -1554,6 +1555,7 @@ public class Campaign implements Serializable {
 		}
 		SkillType.writeAbilityCostsToXML(pw1, 2);
 		pw1.println("\t</skillTypes>");
+		rskillPrefs.writeToXml(pw1, 1);
 		//parts is the biggest so it goes last
 		writeArrayAndHashToXml(pw1, 1, "parts", parts, partIds); // Parts
 		
@@ -1738,6 +1740,8 @@ public class Campaign implements Serializable {
 				if (xn.equalsIgnoreCase("campaignOptions")) {
 					retVal.campaignOptions = CampaignOptions
 							.generateCampaignOptionsFromXml(wn);
+				} else if (xn.equalsIgnoreCase("randomSkillPreferences")) {
+					retVal.rskillPrefs = RandomSkillPreferences.generateRandomSkillPreferencesFromXml(wn);
 				} else if (xn.equalsIgnoreCase("info")) {
 					processInfoNode(retVal, wn);
 				} else if (xn.equalsIgnoreCase("parts")) {
@@ -2512,11 +2516,9 @@ public class Campaign implements Serializable {
 			person.setGender(Person.G_FEMALE);
 		}
 		person.setName(getRNG().generate(isFemale));
-		//now lets get a random birthdate, such that the person
-		//is age 13+4d6 by default
-		//TODO: let user specify age distribution
+		int expLvl = Utilities.generateExpLevel(rskillPrefs.getOverallRecruitBonus() + rskillPrefs.getRecruitBonus(type));
 		GregorianCalendar birthdate = (GregorianCalendar)getCalendar().clone();	
-		birthdate.set(Calendar.YEAR, birthdate.get(Calendar.YEAR) - (13 + Compute.d6(4)));
+		birthdate.set(Calendar.YEAR, birthdate.get(Calendar.YEAR) - Utilities.getAgeByExpLevel(expLvl));
 		//choose a random day and month
 		int randomDay = Compute.randomInt(365)+1;
 		if(birthdate.isLeapYear(birthdate.get(Calendar.YEAR))) {
@@ -2528,68 +2530,68 @@ public class Campaign implements Serializable {
 		//set default skills
 		switch(type) {
 		case(Person.T_MECHWARRIOR):
-	        person.addSkill(SkillType.S_PILOT_MECH);
-        	person.addSkill(SkillType.S_GUN_MECH);
+	        person.addSkill(SkillType.S_PILOT_MECH, expLvl, rskillPrefs.randomizeSkill());
+        	person.addSkill(SkillType.S_GUN_MECH, expLvl, rskillPrefs.randomizeSkill());
         	break;
 	    case(Person.T_GVEE_DRIVER):
-	    	person.addSkill(SkillType.S_PILOT_GVEE);
-			person.addSkill(SkillType.S_GUN_VEE);
+	    	person.addSkill(SkillType.S_PILOT_GVEE, expLvl, rskillPrefs.randomizeSkill());
+			person.addSkill(SkillType.S_GUN_VEE, expLvl, rskillPrefs.randomizeSkill());
 			break;
 	    case(Person.T_NVEE_DRIVER):
-	    	person.addSkill(SkillType.S_PILOT_NVEE);
-	    	person.addSkill(SkillType.S_GUN_VEE);
+	    	person.addSkill(SkillType.S_PILOT_NVEE, expLvl, rskillPrefs.randomizeSkill());
+	    	person.addSkill(SkillType.S_GUN_VEE, expLvl, rskillPrefs.randomizeSkill());
 	    	break;
 	    case(Person.T_VTOL_PILOT):
-	    	person.addSkill(SkillType.S_PILOT_VTOL);
-			person.addSkill(SkillType.S_GUN_VEE);
+	    	person.addSkill(SkillType.S_PILOT_VTOL, expLvl, rskillPrefs.randomizeSkill());
+			person.addSkill(SkillType.S_GUN_VEE, expLvl, rskillPrefs.randomizeSkill());
 			break;
 	    case(Person.T_VEE_GUNNER):
-    		person.addSkill(SkillType.S_GUN_VEE);
+    		person.addSkill(SkillType.S_GUN_VEE, expLvl, rskillPrefs.randomizeSkill());
     		break;
 	    case(Person.T_AERO_PILOT):
-	    	person.addSkill(SkillType.S_PILOT_AERO);
-    		person.addSkill(SkillType.S_GUN_AERO);
+	    	person.addSkill(SkillType.S_PILOT_AERO, expLvl, rskillPrefs.randomizeSkill());
+    		person.addSkill(SkillType.S_GUN_AERO, expLvl, rskillPrefs.randomizeSkill());
     		break;
 	    case(Person.T_PROTO_PILOT):
 	    	break;
 	    case(Person.T_BA):
-	    	person.addSkill(SkillType.S_GUN_BA);
-			person.addSkill(SkillType.S_ANTI_MECH);
-			person.addSkill(SkillType.S_SMALL_ARMS);
+	    	person.addSkill(SkillType.S_GUN_BA, expLvl, rskillPrefs.randomizeSkill());
+			person.addSkill(SkillType.S_ANTI_MECH, expLvl, rskillPrefs.randomizeSkill());
+			person.addSkill(SkillType.S_SMALL_ARMS, expLvl, rskillPrefs.randomizeSkill());
 			break;
 	    case(Person.T_INFANTRY):
-			person.addSkill(SkillType.S_ANTI_MECH);
-			person.addSkill(SkillType.S_SMALL_ARMS);
+			person.addSkill(SkillType.S_ANTI_MECH, expLvl, rskillPrefs.randomizeSkill());
+			person.addSkill(SkillType.S_SMALL_ARMS, expLvl, rskillPrefs.randomizeSkill());
 			break;
 	    case(Person.T_SPACE_PILOT):
-			person.addSkill(SkillType.S_PILOT_SPACE);
+			person.addSkill(SkillType.S_PILOT_SPACE, expLvl, rskillPrefs.randomizeSkill());
 			break;
 	    case(Person.T_SPACE_CREW):
-			person.addSkill(SkillType.S_TECH_VESSEL);
+			person.addSkill(SkillType.S_TECH_VESSEL, expLvl, rskillPrefs.randomizeSkill());
 			break;
 	    case(Person.T_SPACE_GUNNER):
-			person.addSkill(SkillType.S_GUN_SPACE);
+			person.addSkill(SkillType.S_GUN_SPACE, expLvl, rskillPrefs.randomizeSkill());
 			break;
 	    case(Person.T_NAVIGATOR):
-			person.addSkill(SkillType.S_NAV);
+			person.addSkill(SkillType.S_NAV, expLvl, rskillPrefs.randomizeSkill());
 			break;
 	    case(Person.T_MECH_TECH):
-	    	person.addSkill(SkillType.S_TECH_MECH);
+	    	person.addSkill(SkillType.S_TECH_MECH, expLvl, rskillPrefs.randomizeSkill());
 			break;
 	    case(Person.T_MECHANIC):
-	    	person.addSkill(SkillType.S_TECH_MECHANIC);
+	    	person.addSkill(SkillType.S_TECH_MECHANIC, expLvl, rskillPrefs.randomizeSkill());
 			break;
 	    case(Person.T_AERO_TECH):
-	    	person.addSkill(SkillType.S_TECH_AERO);
+	    	person.addSkill(SkillType.S_TECH_AERO, expLvl, rskillPrefs.randomizeSkill());
 			break;
 	    case(Person.T_BA_TECH):
-	    	person.addSkill(SkillType.S_TECH_BA);
+	    	person.addSkill(SkillType.S_TECH_BA, expLvl, rskillPrefs.randomizeSkill());
 			break;
 	    case(Person.T_ASTECH):
 	    	person.addSkill(SkillType.S_ASTECH,0,0);
 			break;
 	    case(Person.T_DOCTOR):
-	    	person.addSkill(SkillType.S_DOCTOR);
+	    	person.addSkill(SkillType.S_DOCTOR, expLvl, rskillPrefs.randomizeSkill());
 			break;
 	    case(Person.T_MEDIC):
 	    	person.addSkill(SkillType.S_MEDTECH,0,0);
@@ -2598,7 +2600,7 @@ public class Campaign implements Serializable {
 	    case(Person.T_ADMIN_LOG):
 	    case(Person.T_ADMIN_TRA):
 	    case(Person.T_ADMIN_HR):
-	    	person.addSkill(SkillType.S_ADMIN);
+	    	person.addSkill(SkillType.S_ADMIN, expLvl, rskillPrefs.randomizeSkill());
 			break;
 		}
 		person.setRankSystem(ranks);
@@ -3601,6 +3603,10 @@ public class Campaign implements Serializable {
     public String getDragoonRating() {
     	int score = calculateDragoonRatingScore();
     	return getDragoonRatingName(getDragoonRating(score)) + " (" + score + ")";
+    }
+    
+    public RandomSkillPreferences getRandomSkillPreferences() {
+    	return rskillPrefs;
     }
     
 }

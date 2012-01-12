@@ -59,6 +59,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.Faction;
+import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.Ranks;
 import mekhq.campaign.personnel.SkillType;
 
@@ -70,6 +71,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 	private static final long serialVersionUID = 1935043247792962964L;
 	private Campaign campaign;
     private CampaignOptions options;
+    private RandomSkillPreferences rskillPrefs;
     private GregorianCalendar date;
     private SimpleDateFormat dateFormat;
     private Frame frame;
@@ -91,6 +93,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         super(parent, modal);
         this.campaign = c;
         this.options = c.getCampaignOptions();
+        this.rskillPrefs = c.getRandomSkillPreferences();
         //this is a hack but I have no idea what is going on here
         this.frame = parent;
         this.date = campaign.calendar;
@@ -174,6 +177,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panSkill = new javax.swing.JPanel();
         panAbilityXP = new javax.swing.JPanel();
         panTech = new javax.swing.JPanel();
+        panRandomSkill = new javax.swing.JPanel();
         useFactionModifiersCheckBox = new javax.swing.JCheckBox();
         useDragoonRatingCheckBox = new javax.swing.JCheckBox();
         javax.swing.JLabel clanPriceModifierLabel = new javax.swing.JLabel();
@@ -878,6 +882,35 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         
         tabOptions.addTab(resourceMap.getString("panSkill.TabConstraints.tabTitle"), scrSkill); // NOI18N
 
+        
+        panRandomSkill.setName("panRandomSkill"); // NOI18N
+        panRandomSkill.setLayout(new java.awt.GridBagLayout());
+        
+        lblOverallRecruitBonus = new JLabel(resourceMap.getString("lblOverallRecruitBonus.text"));
+        spnOverallRecruitBonus = new JSpinner(new SpinnerNumberModel(rskillPrefs.getOverallRecruitBonus(), 0, 8, 1));
+        
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        panRandomSkill.add(lblOverallRecruitBonus, gridBagConstraints);
+        
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        panRandomSkill.add(spnOverallRecruitBonus, gridBagConstraints);
+        
+        
+        JScrollPane scrRandomSkill = new JScrollPane(panRandomSkill);
+        scrRandomSkill.setPreferredSize(new java.awt.Dimension(500, 400));
+        
+        tabOptions.addTab(resourceMap.getString("panRandomSkill.TabConstraints.tabTitle"), scrRandomSkill); // NOI18N
+
         panRank.setName("panRank"); // NOI18N
         panRank.setLayout(new java.awt.GridBagLayout());
         
@@ -1294,6 +1327,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 	    	campaign.getGameOptions().getOption("allow_advanced_ammo").setValue(true);
 	    } 
 	    
+	    rskillPrefs.setOverallRecruitBonus((Integer)spnOverallRecruitBonus.getModel().getValue());	    
 	}
 	
 	private void updateXPCosts() {
@@ -1585,6 +1619,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private javax.swing.JPanel panXP;
     private javax.swing.JPanel panRank;
     private javax.swing.JPanel panSkill;
+    private javax.swing.JPanel panRandomSkill;
     private javax.swing.JTabbedPane tabOptions;
     private javax.swing.JTextField txtName;
     private javax.swing.JCheckBox useFactionModifiersCheckBox;
@@ -1635,6 +1670,10 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private javax.swing.JCheckBox allowCanonOnlyBox;
     private javax.swing.JLabel lblTechLevel;
     private javax.swing.JComboBox choiceTechLevel;
+    
+    private javax.swing.JTable tableRecruitBonus;
+    private JLabel lblOverallRecruitBonus;
+    private JSpinner spnOverallRecruitBonus;
     
     // End of variables declaration//GEN-END:variables
 

@@ -471,8 +471,6 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         num--;
         while(num > 0) {
         	person = campaign.newPerson(choiceType.getSelectedIndex());
-        	//set the skills based on current so we stay at those levels
-        	setSkills();
         	campaign.addPerson(person);
         	num--;
         }

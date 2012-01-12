@@ -24,6 +24,7 @@ package mekhq.campaign.personnel;
 import java.io.PrintWriter;
 import java.io.Serializable;
 
+import megamek.common.Compute;
 import mekhq.MekHQ;
 import mekhq.campaign.MekHqXmlSerializable;
 import mekhq.campaign.MekHqXmlUtil;
@@ -70,8 +71,22 @@ public class Skill implements Serializable, MekHqXmlSerializable {
 	}
 	
 	public Skill(String t) {
+		this(t, SkillType.EXP_REGULAR, false);
+	}
+	
+	public Skill(String t, int exp,boolean random) {
 		this.type = SkillType.getType(t);
-		this.level = type.getDefaultLevel();
+		this.level = type.getLevelFromExperience(exp);
+		//check to see if we should randomize
+		if(random) {
+			int roll = Compute.d6();
+			if(roll < 2) {
+				this.level--;
+			}
+			else if(roll > 5) {
+				this.level++;
+			}
+		}
 		this.bonus = 0;
 	}
 	

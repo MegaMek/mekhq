@@ -195,6 +195,9 @@ public class ResolveScenarioTracker {
 			} else if(e.getOwner().isEnemyOf(client.getLocalPlayer())) {
 				if(!e.canEscape() && controlsField) {
 					killCredits.put(e.getDisplayName(), Entity.NONE);
+					if(e instanceof Infantry && !(e instanceof BattleArmor)) {
+						continue;
+					}
 					potentialSalvage.add(e);
 				}
 			}
@@ -228,6 +231,9 @@ public class ResolveScenarioTracker {
         			killCredits.put(e.getDisplayName(), Entity.NONE);
         		}
         		if(e.isSalvage()) {
+        			if(e instanceof Infantry && !(e instanceof BattleArmor)) {
+						continue;
+					}
         			potentialSalvage.add(e);
         		}
         	}

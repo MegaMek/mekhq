@@ -39,6 +39,7 @@ import megamek.common.Mounted;
 import megamek.common.Protomech;
 import megamek.common.TechConstants;
 import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.personnel.SkillType;
 
 /**
  *
@@ -216,5 +217,51 @@ public class Utilities {
 			}
 		}
 		return variants;
+	}
+	
+	public static int generateExpLevel(int bonus) {
+		int roll = Compute.d6(2) + bonus;
+		if(roll < 6) {
+			return SkillType.EXP_GREEN;
+		}
+		else if(roll < 10) {
+			return SkillType.EXP_REGULAR;
+		}
+		else if(roll < 12) {
+			return SkillType.EXP_VETERAN;
+		}
+		else {
+			return SkillType.EXP_ELITE;
+		}
+	}
+	
+	public static int getAgeByExpLevel(int expLevel) {
+		int baseage = 18;
+		int ndice = 1;
+		switch(expLevel) {
+		case(SkillType.EXP_REGULAR):
+			baseage = 20;
+			break;
+		case(SkillType.EXP_VETERAN):
+			baseage = 20;
+			ndice = 2;
+			break;
+		case(SkillType.EXP_ELITE):
+			baseage = 20;
+			ndice = 3;
+			break;
+		}
+		
+		int age = baseage;
+		while(ndice > 0) {
+			int roll = Compute.d6();
+			age += roll;
+			//reroll all sixes once
+			if(roll == 6) {
+				age += Compute.d6();
+			}
+			ndice--;
+		}
+		return age;
 	}
 }
