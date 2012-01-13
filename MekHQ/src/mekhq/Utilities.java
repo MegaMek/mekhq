@@ -236,19 +236,17 @@ public class Utilities {
 	}
 	
 	public static int getAgeByExpLevel(int expLevel) {
-		int baseage = 18;
+		int baseage = 19;
 		int ndice = 1;
 		switch(expLevel) {
 		case(SkillType.EXP_REGULAR):
-			baseage = 20;
-			break;
-		case(SkillType.EXP_VETERAN):
-			baseage = 20;
 			ndice = 2;
 			break;
-		case(SkillType.EXP_ELITE):
-			baseage = 20;
+		case(SkillType.EXP_VETERAN):
 			ndice = 3;
+			break;
+		case(SkillType.EXP_ELITE):
+			ndice = 4;
 			break;
 		}
 		
@@ -258,7 +256,7 @@ public class Utilities {
 			age += roll;
 			//reroll all sixes once
 			if(roll == 6) {
-				age += Compute.d6();
+				age += (Compute.d6()-1);
 			}
 			ndice--;
 		}
