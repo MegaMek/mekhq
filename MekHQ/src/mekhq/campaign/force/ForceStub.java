@@ -23,6 +23,7 @@ package mekhq.campaign.force;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.util.UUID;
 import java.util.Vector;
 
 import org.w3c.dom.NamedNodeMap;
@@ -79,7 +80,7 @@ public class ForceStub implements Serializable {
 			stub.setParentForce(this);
 			subForces.add(stub);
 		}
-		for(int uid : f.getUnits()) {
+		for(UUID uid : f.getUnits()) {
 			Unit u = c.getUnit(uid);
 			if(null != u) {
 				units.add(new UnitStub(u));

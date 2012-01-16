@@ -182,12 +182,12 @@ public class Mission implements Serializable, MekHqXmlSerializable {
 		return false;
 	}
 	
-	public void writeToXml(PrintWriter pw1, int indent, int id) {
-		writeToXmlBegin(pw1, indent, id);
-		writeToXmlEnd(pw1, indent, id);
+	public void writeToXml(PrintWriter pw1, int indent) {
+		writeToXmlBegin(pw1, indent);
+		writeToXmlEnd(pw1, indent);
 	}
 	
-	protected void writeToXmlBegin(PrintWriter pw1, int indent, int id) {
+	protected void writeToXmlBegin(PrintWriter pw1, int indent) {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "<mission id=\""
 				+id
 				+"\" type=\""
@@ -224,7 +224,7 @@ public class Mission implements Serializable, MekHqXmlSerializable {
 		pw1.println(MekHqXmlUtil.indentStr(indent+1) + "</scenarios>");
 	}
 	
-	protected void writeToXmlEnd(PrintWriter pw1, int indent, int id) {
+	protected void writeToXmlEnd(PrintWriter pw1, int indent) {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "</mission>");
 	}
 	

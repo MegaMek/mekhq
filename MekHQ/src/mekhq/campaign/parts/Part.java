@@ -23,6 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.util.UUID;
 
 import megamek.common.EquipmentType;
 import megamek.common.TargetRoll;
@@ -105,10 +106,10 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	protected int skillMin;
 	//current repair mode for part
 	protected int mode;
-	protected int teamId;
+	protected UUID teamId;
 	//null is valid. It indicates parts that are not attached to units.
 	protected Unit unit;
-	protected int unitId;
+	protected UUID unitId;
 	//boolean to indicate whether the repair status on this part is set to salvage or 
 	//to repair
 	protected boolean salvaging;
@@ -119,7 +120,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	protected int shorthandedMod;
 	
 	//this tracks whether the part is reserved for a refit
-	protected int refitId;
+	protected UUID refitId;
 	protected int daysToArrival;
 	
 	//all parts need a reference to campaign
@@ -136,14 +137,13 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		this.skillMin = SkillType.EXP_GREEN;
 		this.mode = Modes.MODE_NORMAL;
 		this.timeSpent = 0;
-		this.teamId = -1;
 		this.time = 0;
 		this.difficulty = 0;
 		this.salvaging = false;
-		this.unitId = -1;
+		this.unitId = null;
 		this.workingOvertime = false;
 		this.shorthandedMod = 0;
-		this.refitId = -1;
+		this.refitId = null;
 		this.daysToArrival = 0;
 		this.campaign = c;
 	}
@@ -156,7 +156,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		return id;
 	}
 	
-	public int getUnitId() {
+	public UUID getUnitId() {
 		return unitId;
 	}
 
@@ -215,7 +215,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 			unitId = unit.getId();
 			unitTonnage = (int) u.getEntity().getWeight();
 		} else {
-			unitId = -1;
+			unitId = null;
 		}
 	}
 	
@@ -246,7 +246,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 			action = "Salvage ";
 		}
 		String scheduled = "";
-		if (getAssignedTeamId() != -1) {
+		if (getAssignedTeamId() != null) {
 			scheduled = " (scheduled) ";
 		}
 	
@@ -322,9 +322,9 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         return TechConstants.isClan(getTechLevel());
     }
 
-	public abstract void writeToXml(PrintWriter pw1, int indent, int id);
+	public abstract void writeToXml(PrintWriter pw1, int indent);
 	
-	protected void writeToXmlBegin(PrintWriter pw1, int indent, int id) {
+	protected void writeToXmlBegin(PrintWriter pw1, int indent) {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "<part id=\""
 				+id
 				+"\" type=\""
@@ -362,18 +362,22 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 				+"<mode>"
 				+mode
 				+"</mode>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<teamId>"
-				+teamId
-				+"</teamId>");
+		if(null != teamId) {
+			pw1.println(MekHqXmlUtil.indentStr(indent+1)
+					+"<teamId>"
+					+teamId.toString()
+					+"</teamId>");
+		}
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<skillMin>"
 				+skillMin
 				+"</skillMin>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<unitId>"
-				+unitId
-				+"</unitId>");
+		if(null != unitId) {
+			pw1.println(MekHqXmlUtil.indentStr(indent+1)
+					+"<unitId>"
+					+unitId
+					+"</unitId>");
+		}
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<workingOvertime>"
 				+workingOvertime
@@ -392,7 +396,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 				+"</daysToArrival>");
 	}
 	
-	protected void writeToXmlEnd(PrintWriter pw1, int indent, int id) {
+	protected void writeToXmlEnd(PrintWriter pw1, int indent) {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "</part>");
 	}
 
@@ -464,13 +468,19 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 				} else if (wn2.getNodeName().equalsIgnoreCase("mode")) {
 					retVal.mode = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("teamId")) {
-					retVal.teamId = Integer.parseInt(wn2.getTextContent());
+					if(!wn2.getTextContent().equals("null")) {
+						retVal.teamId = UUID.fromString(wn2.getTextContent());
+					}
 				} else if (wn2.getNodeName().equalsIgnoreCase("unitId")) {
-					retVal.unitId = Integer.parseInt(wn2.getTextContent());
+					if(!wn2.getTextContent().equals("null")) {
+						retVal.unitId = UUID.fromString(wn2.getTextContent());
+					}
 				} else if (wn2.getNodeName().equalsIgnoreCase("shorthandedMod")) {
 					retVal.shorthandedMod = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("refitId")) {
-					retVal.refitId = Integer.parseInt(wn2.getTextContent());
+					if(!wn2.getTextContent().equals("null")) {
+						retVal.refitId = UUID.fromString(wn2.getTextContent());
+					}				
 				} else if (wn2.getNodeName().equalsIgnoreCase("daysToArrival")) {
 					retVal.daysToArrival = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("workingOvertime")) {
@@ -586,12 +596,12 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	}
 	
 	@Override
-	public int getAssignedTeamId() {
+	public UUID getAssignedTeamId() {
 		return teamId;
 	}
 	
 	@Override
-	public void setTeamId(int i) {
+	public void setTeamId(UUID i) {
 		this.teamId = i;
 	}
 	
@@ -671,16 +681,16 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	@Override
 	public abstract Part clone();
 	
-	public void setRefitId(int rid) {
+	public void setRefitId(UUID rid) {
 		refitId = rid;
 	}
 	
-	public int getRefitId() {
+	public UUID getRefitId() {
 		return refitId;
 	}
 	
 	public boolean isReservedForRefit() {
-		return refitId != -1;
+		return refitId != null;
 	}
 	
 	public void setDaysToArrival(int days) {
@@ -702,7 +712,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	}
 	
 	public boolean isBeingWorkedOn() {
-		return teamId != -1;
+		return teamId != null;
 	}
 }
 

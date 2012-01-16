@@ -60,6 +60,7 @@ import java.util.HashMap;
 import java.util.ResourceBundle;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
+import java.util.UUID;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -286,11 +287,11 @@ public class CampaignGUI extends JPanel {
 	private TableRowSorter<PersonnelTableModel> personnelSorter;
 	private TableRowSorter<PartsTableModel> partsSorter;
 	private TableRowSorter<UnitTableModel> unitSorter;
-	private int currentServicedUnitId;
+	private UUID currentServicedUnitId;
 	private int currentAcquisitionId;
-	private int currentTechId;
-	private int currentPatientId;
-	private int currentDoctorId;
+	private UUID currentTechId;
+	private UUID currentPatientId;
+	private UUID currentDoctorId;
 	private int currentServiceablePartsId;
 	private int[] selectedTasksIds;
 		
@@ -2044,7 +2045,7 @@ public class CampaignGUI extends JPanel {
 		if ((selected > -1) && (selected < getCampaign().getTechs().size())) {
 			currentTechId = getCampaign().getTechs().get(selected).getId();
 		} else if (selected < 0) {
-			currentTechId = -1;
+			currentTechId = null;
 		}
 		
 		updateTechTarget();
@@ -2083,8 +2084,7 @@ public class CampaignGUI extends JPanel {
 		
 		if ((selected > -1)
 				&& (selected < getCampaign().getAcquisitionsForUnit(currentServicedUnitId).size())) {
-			currentAcquisitionId = getCampaign().getAcquisitionsForUnit(currentServicedUnitId)
-					.get(selected).getId();
+			currentAcquisitionId = getCampaign().getAcquisitionsForUnit(currentServicedUnitId).get(selected).getId();
 		} else {
 			currentAcquisitionId = -1;
 		}
@@ -2098,7 +2098,7 @@ public class CampaignGUI extends JPanel {
 		if ((selected > -1) && (selected < getCampaign().getServiceableUnits().size())) {
 			currentServicedUnitId = getCampaign().getServiceableUnits().get(selected).getId();
 		} else if (selected < 0) {
-			currentServicedUnitId = -1;
+			currentServicedUnitId = null;
 		}
 		
 		refreshTaskList();
@@ -2116,7 +2116,7 @@ public class CampaignGUI extends JPanel {
 		if ((selected > -1) && (selected < getCampaign().getPatients().size())) {
 			currentPatientId = getCampaign().getPatients().get(selected).getId();
 		} else if (selected < 0) {
-			currentPatientId = -1;
+			currentPatientId = null;
 		}
 		
 		updateAssignDoctorEnabled();
@@ -2128,7 +2128,7 @@ public class CampaignGUI extends JPanel {
 		if ((selected > -1) && (selected < getCampaign().getDoctors().size())) {
 			currentDoctorId = getCampaign().getDoctors().get(selected).getId();
 		} else if (selected < 0) {
-			currentDoctorId = -1;
+			currentDoctorId = null;
 		}
 		
 		updateAssignDoctorEnabled();
@@ -2166,7 +2166,7 @@ public class CampaignGUI extends JPanel {
 	}// GEN-LAST:event_btnAdvanceDayActionPerformed
 
 	private void btnAssignDocActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnAssignDocActionPerformed
-		if (currentPatientId == -1) {
+		if (currentPatientId == null) {
 			return;
 		}
 		
@@ -2758,7 +2758,7 @@ public class CampaignGUI extends JPanel {
 			return;
 		}
 		Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
-		Vector<Integer> uids = scenario.getForces(getCampaign()).getAllUnits();
+		Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits();
 		
 		if(uids.size() == 0) {
 			return;
@@ -2768,7 +2768,7 @@ public class CampaignGUI extends JPanel {
 		//ArrayList<Unit> toDeploy = new ArrayList<Unit>();
 		StringBuffer undeployed = new StringBuffer();
 		
-		for(int uid : uids) {
+		for(UUID uid : uids) {
 			Unit u = getCampaign().getUnit(uid);
 			if(u.isUnmanned()) {
 				continue;
@@ -2815,7 +2815,7 @@ public class CampaignGUI extends JPanel {
 			return;
 		}
 		Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
-		Vector<Integer> uids = scenario.getForces(getCampaign()).getAllUnits();
+		Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits();
 		
 		if(uids.size() == 0) {
 			return;
@@ -2825,7 +2825,7 @@ public class CampaignGUI extends JPanel {
 		//ArrayList<Unit> toDeploy = new ArrayList<Unit>();
 		StringBuffer undeployed = new StringBuffer();
 		
-		for(int uid : uids) {
+		for(UUID uid : uids) {
 			Unit u = getCampaign().getUnit(uid);
 			if(u.isUnmanned()) {
 				continue;
@@ -2861,7 +2861,7 @@ public class CampaignGUI extends JPanel {
 			return;
 		}
 		Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
-		Vector<Integer> uids = scenario.getForces(getCampaign()).getAllUnits();
+		Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits();
 		
 		if(uids.size() == 0) {
 			return;
@@ -2871,7 +2871,7 @@ public class CampaignGUI extends JPanel {
 		//ArrayList<Unit> toDeploy = new ArrayList<Unit>();
 		StringBuffer undeployed = new StringBuffer();
 		
-		for(int uid : uids) {
+		for(UUID uid : uids) {
 			Unit u = getCampaign().getUnit(uid);
 			if(u.isUnmanned()) {
 				continue;
@@ -3153,7 +3153,7 @@ public class CampaignGUI extends JPanel {
 		
 		Person curPerson = getCampaign().getPerson(currentPatientId);
 		Person doctor = getCampaign().getPerson(currentDoctorId);
-		if (null != curPerson && curPerson.getAssignedTeamId() == -1 && null != doctor 
+		if (null != curPerson && curPerson.getAssignedTeamId() == null && null != doctor 
 				&& getCampaign().getPatientsFor(doctor)<25
 				&& getCampaign().getTargetFor(curPerson, doctor).getValue() != TargetRoll.IMPOSSIBLE) {
 			btnAssignDoc.setEnabled(true);
@@ -4501,9 +4501,8 @@ public class CampaignGUI extends JPanel {
 		public void actionPerformed(ActionEvent action) {
 			StringTokenizer st = new StringTokenizer(action.getActionCommand(), "|");
             String command = st.nextToken();
-            int id = Integer.parseInt(st.nextToken());
-            Force force = getCampaign().getForce(id);
-            Unit unit = getCampaign().getUnit(id);
+            String id = st.nextToken();
+            Force force = getCampaign().getForce(Integer.parseInt(id));
             if(command.contains("ADD_FORCE")) {
             	if(null != force) {
 	            	String name = (String)JOptionPane.showInputDialog(
@@ -4519,7 +4518,7 @@ public class CampaignGUI extends JPanel {
             	}
             } if(command.contains("ADD_UNIT")) {
             	if(null != force) {
-                    Unit u = getCampaign().getUnit(Integer.parseInt(st.nextToken()));
+                    Unit u = getCampaign().getUnit(UUID.fromString(st.nextToken()));
                     if(null != u) {
                     	getCampaign().addUnitToForce(u, force.getId());
                     	refreshOrganization();
@@ -4536,7 +4535,7 @@ public class CampaignGUI extends JPanel {
                     scenario.addForces(force.getId());
                     force.setScenarioId(scenario.getId());
                     refreshScenarioList();
-                    for(int uid : force.getAllUnits()) {
+                    for(UUID uid : force.getAllUnits()) {
                     	Unit u = getCampaign().getUnit(uid);
                     	if(null != u) {
                     		u.setScenarioId(scenario.getId());
@@ -4596,6 +4595,7 @@ public class CampaignGUI extends JPanel {
             		refreshScenarioList();
             	}
             } else if(command.contains("REMOVE_UNIT")) {
+                Unit unit = getCampaign().getUnit(UUID.fromString(st.nextToken()));
             	if(null != unit) {
             		Force parentForce = getCampaign().getForceFor(unit);
             		if(null != parentForce) {
@@ -4606,6 +4606,7 @@ public class CampaignGUI extends JPanel {
             		}
             	}
             } else if(command.contains("DEPLOY_UNIT")) {
+                Unit unit = getCampaign().getUnit(UUID.fromString(st.nextToken()));
                 int sid = Integer.parseInt(st.nextToken());
             	Scenario scenario = getCampaign().getScenario(sid);
             	if(null != unit && null != scenario) {
@@ -4720,11 +4721,11 @@ public class CampaignGUI extends JPanel {
 	                popup.add(menuItem);
                 }
                 else if(null != unit) {
-                	int uid = unit.getId();
+                	UUID uid = unit.getId();
                 	Force parentForce = getCampaign().getForceFor(unit);
                 	if(null != parentForce) {
 	                	menuItem = new JMenuItem("Remove Unit from " + parentForce.getName());
-		                menuItem.setActionCommand("REMOVE_UNIT|" + uid);
+		                menuItem.setActionCommand("REMOVE_UNIT|" + parentForce.getId() + "|" + uid.toString());
 						menuItem.addActionListener(this);
 						menuItem.setEnabled(true);
 		                popup.add(menuItem);
@@ -4740,7 +4741,7 @@ public class CampaignGUI extends JPanel {
 	                		for(Scenario s : m.getScenarios()) {
 	                			if(s.isCurrent()) {
 	                				menuItem = new JMenuItem(s.getName());
-		                			menuItem.setActionCommand("DEPLOY_UNIT|" + uid + "|" + s.getId());
+		                			menuItem.setActionCommand("DEPLOY_UNIT|-1|" + uid + "|" + s.getId());
 		    						menuItem.addActionListener(this);
 		    						menuItem.setEnabled(true);
 		    		                missionMenu.add(menuItem);
@@ -4971,7 +4972,7 @@ public class CampaignGUI extends JPanel {
 				refreshPersonnelList();
 				refreshOrganization();
 			} else if (command.contains("ADD_PILOT")) {
-				int selected = Integer.parseInt(st.nextToken());
+				UUID selected = UUID.fromString(st.nextToken());
 				Unit u = getCampaign().getUnit(selected);
 				Unit oldUnit = getCampaign().getUnit(selectedPerson.getUnitId());
 				if(null != oldUnit) {
@@ -4985,7 +4986,7 @@ public class CampaignGUI extends JPanel {
 				refreshPersonnelList();
 				refreshOrganization();
 			} else if (command.contains("ADD_SOLDIER")) {
-				int selected = Integer.parseInt(st.nextToken());
+				UUID selected = UUID.fromString(st.nextToken());
 				Unit u = getCampaign().getUnit(selected);
 				if(null != u) {
                     for (Person p : people) {
@@ -5003,7 +5004,7 @@ public class CampaignGUI extends JPanel {
 				refreshPersonnelList();
 				refreshOrganization();
 			} else if (command.contains("ADD_DRIVER")) {
-				int selected = Integer.parseInt(st.nextToken());		
+				UUID selected = UUID.fromString(st.nextToken());		
 				Unit u = getCampaign().getUnit(selected);
 				Unit oldUnit = getCampaign().getUnit(selectedPerson.getUnitId());
 				if(null != oldUnit) {
@@ -5017,7 +5018,7 @@ public class CampaignGUI extends JPanel {
 				refreshPersonnelList();
 				refreshOrganization();
 			} else if (command.contains("ADD_GUNNER")) {
-				int selected = Integer.parseInt(st.nextToken());		
+				UUID selected = UUID.fromString(st.nextToken());		
 				Unit u = getCampaign().getUnit(selected);
 				if(null != u) {
                     for (Person p : people) {
@@ -5035,7 +5036,7 @@ public class CampaignGUI extends JPanel {
 				refreshPersonnelList();
 				refreshOrganization();
 			} else if (command.contains("ADD_CREW")) {
-				int selected = Integer.parseInt(st.nextToken());		
+				UUID selected = UUID.fromString(st.nextToken());		
 				Unit u = getCampaign().getUnit(selected);
 				if(null != u) {
                     for (Person p : people) {
@@ -5053,7 +5054,7 @@ public class CampaignGUI extends JPanel {
 				refreshPersonnelList();
 				refreshOrganization();
 			} else if (command.contains("ADD_NAV")) {
-				int selected = Integer.parseInt(st.nextToken());		
+				UUID selected = UUID.fromString(st.nextToken());		
 				Unit u = getCampaign().getUnit(selected);
 				if(null != u) {
                     for (Person p : people) {
@@ -5187,7 +5188,7 @@ public class CampaignGUI extends JPanel {
 			} else if (command.equalsIgnoreCase("HEAL")) {
 				for(Person person : people) {
 					person.setHits(0);
-					person.setDoctorId(-1);
+					person.setDoctorId(null);
 				}
 				getCampaign().personUpdated(selectedPerson);
 				refreshPatientList();
@@ -7494,17 +7495,6 @@ public class CampaignGUI extends JPanel {
 				refreshServicedUnitList();
 				refreshUnitList();
 				refreshOrganization();
-			} else if (command.contains("CHANGE_PILOT")) {
-				String sel = command.split(":")[1];
-				int selected = Integer.parseInt(sel);
-				Person p = getCampaign().getPerson(selected);
-				//if (null != p && p instanceof PilotPerson) {
-					//campaign.changePilot(selectedUnit, (PilotPerson)p);
-				//}
-				refreshServicedUnitList();
-				refreshUnitList();
-				refreshPersonnelList();
-				refreshOrganization();
 			} else if (command.contains("QUIRK")) {
 				String sel = command.split(":")[1];
 					selectedUnit.acquireQuirk(sel, true);
@@ -8040,7 +8030,7 @@ public class CampaignGUI extends JPanel {
 	        JTree tree = (JTree)c;
 	        Object node = tree.getLastSelectedPathComponent();
 	        if(node instanceof Unit) {
-	        	return new StringSelection("UNIT|" + Integer.toString(((Unit)node).getId()));
+	        	return new StringSelection("UNIT|" + ((Unit)node).getId().toString());
 	        }
 	        else if(node instanceof Force) {
 	        	return new StringSelection("FORCE|" + Integer.toString(((Force)node).getId()));
@@ -8084,12 +8074,12 @@ public class CampaignGUI extends JPanel {
 	        try {  
 	        	StringTokenizer st = new StringTokenizer((String) t.getTransferData(DataFlavor.stringFlavor), "|");
 	            String type = st.nextToken();
-	            int id = Integer.parseInt(st.nextToken());
+	            String id = st.nextToken();
 	            if(type.equals("UNIT")) {
-	            	unit = getCampaign().getUnit(id);
+	            	unit = getCampaign().getUnit(UUID.fromString(id));
 	            }
 	            if(type.equals("FORCE")) {
-	            	force = getCampaign().getForce(id);
+	            	force = getCampaign().getForce(Integer.parseInt(id));
 	            }
 	        } catch(UnsupportedFlavorException ufe) {  
 	            System.out.println("UnsupportedFlavor: " + ufe.getMessage());  

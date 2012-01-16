@@ -156,7 +156,7 @@ public class Skill implements Serializable, MekHqXmlSerializable {
 		}
 	}	
 	
-	public void writeToXml(PrintWriter pw1, int indent, int id) {
+	public void writeToXml(PrintWriter pw1, int indent) {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "<skill>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<type>"

@@ -125,10 +125,8 @@ public class MekHqXmlUtil {
 				+ "\" type=\"" + tgtEnt.getMovementModeAsString()
 				+ "\" commander=\"" + String.valueOf(tgtEnt.isCommander());
 
-		if (tgtEnt.getExternalId() != Entity.NONE) {
-			retVal += "\" externalId=\"";
-			retVal += String.valueOf(tgtEnt.getExternalId());
-		}
+		retVal += "\" externalId=\"";
+		retVal += tgtEnt.getExternalId();
 
 		if (tgtEnt.countQuirks() > 0) {
 			retVal += "\" quirks=\"";

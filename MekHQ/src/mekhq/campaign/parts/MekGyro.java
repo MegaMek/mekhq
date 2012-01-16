@@ -123,8 +123,8 @@ public class MekGyro extends Part {
     }
 
 	@Override
-	public void writeToXml(PrintWriter pw1, int indent, int id) {
-		writeToXmlBegin(pw1, indent, id);
+	public void writeToXml(PrintWriter pw1, int indent) {
+		writeToXmlBegin(pw1, indent);
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<type>"
 				+type
@@ -133,7 +133,7 @@ public class MekGyro extends Part {
 				+"<gyroTonnage>"
 				+gyroTonnage
 				+"</gyroTonnage>");
-		writeToXmlEnd(pw1, indent, id);
+		writeToXmlEnd(pw1, indent);
 	}
 
 	@Override

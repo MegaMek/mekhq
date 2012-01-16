@@ -20,6 +20,8 @@
  */
 package mekhq.campaign.work;
 
+import java.util.UUID;
+
 import megamek.common.TargetRoll;
 
 
@@ -47,7 +49,7 @@ public abstract interface IWork {
 	
 	public abstract String fail(int rating);
 	
-	public abstract int getAssignedTeamId();
+	public abstract UUID getAssignedTeamId();
 
 	public abstract int getMode();
 	

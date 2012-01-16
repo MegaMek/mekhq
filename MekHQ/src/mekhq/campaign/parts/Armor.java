@@ -121,7 +121,7 @@ public class Armor extends Part implements IAcquisitionWork {
 		String toReturn = "<html><font size='2'";
 	
 		String scheduled = "";
-		if (getAssignedTeamId() != -1) {
+		if (getAssignedTeamId() != null) {
 			scheduled = " (scheduled) ";
 		}
 	
@@ -236,8 +236,8 @@ public class Armor extends Part implements IAcquisitionWork {
     }
 
 	@Override
-	public void writeToXml(PrintWriter pw1, int indent, int id) {
-		writeToXmlBegin(pw1, indent, id);
+	public void writeToXml(PrintWriter pw1, int indent) {
+		writeToXmlBegin(pw1, indent);
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<amount>"
 				+amount
@@ -266,7 +266,7 @@ public class Armor extends Part implements IAcquisitionWork {
 				+"<clan>"
 				+clan
 				+"</clan>");
-		writeToXmlEnd(pw1, indent, id);
+		writeToXmlEnd(pw1, indent);
 	}
 
 	@Override

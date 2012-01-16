@@ -159,8 +159,8 @@ public class EnginePart extends Part {
 	}
 
 	@Override
-	public void writeToXml(PrintWriter pw1, int indent, int id) {
-		writeToXmlBegin(pw1, indent, id);
+	public void writeToXml(PrintWriter pw1, int indent) {
+		writeToXmlBegin(pw1, indent);
 		// The engine is a MM object...
 		// And doesn't support XML serialization...
 		// But it's defined by 3 ints. So we'll save those here.
@@ -176,7 +176,7 @@ public class EnginePart extends Part {
 				+"<forHover>"
 				+forHover
 				+"</forHover>");
-		writeToXmlEnd(pw1, indent, id);
+		writeToXmlEnd(pw1, indent);
 	}
 
 	@Override

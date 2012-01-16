@@ -408,8 +408,8 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 		endDate = cal.getTime();
 	}
 	
-	public void writeToXml(PrintWriter pw1, int indent, int id) {
-		writeToXmlBegin(pw1, indent, id);
+	public void writeToXml(PrintWriter pw1, int indent) {
+		writeToXmlBegin(pw1, indent);
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<nMonths>"
@@ -507,7 +507,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 				+"<salvagedByEmployer>"
 				+salvagedByEmployer
 				+"</salvagedByEmployer>");
-		writeToXmlEnd(pw1, indent, id);
+		writeToXmlEnd(pw1, indent);
 	}
 	
 	public void loadFieldsFromXmlNode(Node wn) throws ParseException {

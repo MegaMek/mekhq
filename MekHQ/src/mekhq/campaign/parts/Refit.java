@@ -28,6 +28,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -102,7 +103,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 	private int newArmorSuppliesId;
 	private boolean sameArmorType;
 		
-	private int assignedTechId;
+	private UUID assignedTechId;
 	
 	public Refit() {
 		oldUnitParts = new ArrayList<Integer>();
@@ -118,7 +119,6 @@ public class Refit implements IPartWork, IAcquisitionWork {
 		oldUnitParts = new ArrayList<Integer>();
 		newUnitParts = new ArrayList<Integer>();
 		shoppingList = new ArrayList<Part>();
-		assignedTechId = -1;
 		failedCheck = false;
 		timeSpent = 0;
 		fixableString = null;
@@ -642,7 +642,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 		oldUnit.setRefit(null);
 		for(int pid : newUnitParts) {
 			Part part = oldUnit.campaign.getPart(pid);
-			part.setRefitId(-1);
+			part.setRefitId(null);
 			if(part instanceof Armor) {
 				oldUnit.campaign.removePart(part);
 			}
@@ -654,7 +654,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 			}
 		}	
 		if(null != newArmorSupplies) {
-			newArmorSupplies.setRefitId(-1);
+			newArmorSupplies.setRefitId(null);
 			newArmorSupplies.setUnit(oldUnit);
 			oldUnit.campaign.removePart(newArmorSupplies);
 			newArmorSupplies.changeAmountAvailable(newArmorSupplies.getAmount());
@@ -700,7 +700,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 				return;
 			}
 			part.setUnit(oldUnit);
-			part.setRefitId(-1);
+			part.setRefitId(null);
 			newParts.add(part);
 		}
 		oldUnit.setParts(newParts);
@@ -708,7 +708,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 		if(null != newArmorSupplies) {
 			newArmorSupplies.setAmount(newArmorSupplies.getAmount() - armorNeeded);
 			if(newArmorSupplies.getAmount() > 0) {
-				newArmorSupplies.setRefitId(-1);
+				newArmorSupplies.setRefitId(null);
 				newArmorSupplies.setUnit(oldUnit);
 				newArmorSupplies.changeAmountAvailable(newArmorSupplies.getAmount());
 			}
@@ -993,12 +993,12 @@ public class Refit implements IPartWork, IAcquisitionWork {
 	}
 
 	@Override
-	public int getAssignedTeamId() {
+	public UUID getAssignedTeamId() {
 		return assignedTechId;
 	}
 
 	@Override
-	public void setTeamId(int id) {
+	public void setTeamId(UUID id) {
 		assignedTechId = id;
 	}
 
@@ -1075,7 +1075,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 		return fixableString;
 	}
 	
-	public void writeToXml(PrintWriter pw1, int indentLvl, int id) {
+	public void writeToXml(PrintWriter pw1, int indentLvl) {
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl) + "<refit>");
 		pw1.println(MekHqXmlUtil.writeEntityToXmlString(newEntity, indentLvl+1));
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<time>"
@@ -1096,8 +1096,10 @@ public class Refit implements IPartWork, IAcquisitionWork {
 				+ "</armorNeeded>");
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<sameArmorType>" + sameArmorType
 				+ "</sameArmorType>");
-		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<assignedTechId>" + assignedTechId
-				+ "</assignedTechId>");
+		if(null != assignedTechId) {
+			pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<assignedTechId>" + assignedTechId.toString()
+					+ "</assignedTechId>");
+		}
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<oldUnitParts>");
 		for(int pid : oldUnitParts) {
 			pw1.println(MekHqXmlUtil.indentStr(indentLvl + 2) + "<pid>" + pid
@@ -1112,13 +1114,13 @@ public class Refit implements IPartWork, IAcquisitionWork {
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "</newUnitParts>");
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<shoppingList>");
 		for(Part p : shoppingList) {
-			p.writeToXml(pw1, indentLvl+2, id);
+			p.writeToXml(pw1, indentLvl+2);
 		}
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "</shoppingList>");
 		if(null != newArmorSupplies) {
 			if(newArmorSupplies.getId() == 0) {
 				pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<newArmorSupplies>");
-				newArmorSupplies.writeToXml(pw1, indentLvl+2, id);
+				newArmorSupplies.writeToXml(pw1, indentLvl+2);
 				pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "</newArmorSupplies>");
 			} else {
 				pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<newArmorSuppliesId>" + newArmorSupplies.getId()
@@ -1149,7 +1151,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 				} else if (wn2.getNodeName().equalsIgnoreCase("newArmorSuppliesId")) {
 					retVal.newArmorSuppliesId = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("assignedTechId")) {
-					retVal.assignedTechId = Integer.parseInt(wn2.getTextContent());
+					retVal.assignedTechId = UUID.fromString(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("failedCheck")) {
 					if (wn2.getTextContent().equalsIgnoreCase("true"))
 						retVal.failedCheck = true;

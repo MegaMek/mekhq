@@ -24,6 +24,7 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.UUID;
 
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -62,7 +63,7 @@ public class Scenario implements Serializable {
 	private int status;
 	private Date date;
 	private ArrayList<Integer> subForceIds;
-	private ArrayList<Integer> unitIds;
+	private ArrayList<UUID> unitIds;
 	private int id = -1;
 	private int missionId;
 	private ForceStub stub;
@@ -78,7 +79,7 @@ public class Scenario implements Serializable {
 		this.status = S_CURRENT;
 		this.date = null;
 		this.subForceIds = new ArrayList<Integer>();
-		this.unitIds = new ArrayList<Integer>();
+		this.unitIds = new ArrayList<UUID>();
 	}
 	
 	public static String getStatusName(int s) {
@@ -167,7 +168,7 @@ public class Scenario implements Serializable {
 				force.addSubForce(sub, false);
 			}
 		}
-		for(int uid : unitIds) {
+		for(UUID uid : unitIds) {
 			force.addUnit(uid);
 		}
 		return force;
@@ -177,14 +178,14 @@ public class Scenario implements Serializable {
 		subForceIds.add(fid);
 	}
 	
-	public void addUnit(int uid) {
+	public void addUnit(UUID uid) {
 		unitIds.add(uid);
 	}
 	
-	public void removeUnit(int uid) {
+	public void removeUnit(UUID uid) {
 		int idx = -1;
 		for(int i = 0; i < unitIds.size(); i++) {
-			if(uid == unitIds.get(i)) {
+			if(uid.equals(unitIds.get(i))) {
 				idx = i;
 				break;
 			}
@@ -218,14 +219,14 @@ public class Scenario implements Serializable {
 				f.clearScenarioIds(campaign);
 			}	
 		}
-		for(int uid : unitIds) {
+		for(UUID uid : unitIds) {
 			Unit u = campaign.getUnit(uid);
 			if(null != u) {
 				u.undeploy();
 			}
 		}
 		subForceIds = new ArrayList<Integer>();
-		unitIds = new ArrayList<Integer>();
+		unitIds = new ArrayList<UUID>();
 	}
 	
 	public void generateStub(Campaign c) {
@@ -237,8 +238,8 @@ public class Scenario implements Serializable {
 	}
 	
 	public boolean isAssigned(Unit unit, Campaign campaign) {
-		for(int uid : getForces(campaign).getAllUnits()) {
-			if(uid == unit.getId()) {
+		for(UUID uid : getForces(campaign).getAllUnits()) {
+			if(uid.equals(unit.getId())) {
 				return true;
 			}
 		}

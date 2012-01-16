@@ -92,7 +92,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		bonus = "(" + bonus + ")";
 		String toReturn = "<html><font size='2'";
 		String scheduled = "";
-		if (getAssignedTeamId() != -1) {
+		if (getAssignedTeamId() != null) {
 			scheduled = " (scheduled) ";
 		}
 	
@@ -268,13 +268,18 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 	}
 	
 	@Override
-	public void writeToXml(PrintWriter pw1, int indent, int id) {
-		writeToXmlBegin(pw1, indent, id);
+	public void writeToXmlBegin(PrintWriter pw1, int indent) {
+		super.writeToXmlBegin(pw1, indent);
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<checkedToday>"
 				+checkedToday
 				+"</checkedToday>");
-		writeToXmlEnd(pw1, indent, id);
+	}
+	
+	@Override
+	public void writeToXml(PrintWriter pw1, int indent) {
+		writeToXmlBegin(pw1, indent);
+		writeToXmlEnd(pw1, indent);
 	}
 
 	@Override

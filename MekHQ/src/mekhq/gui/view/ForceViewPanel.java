@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.ResourceBundle;
+import java.util.UUID;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -201,7 +202,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
     	String assigned = "";
     	String type = null;
     	ArrayList<Person> people = new ArrayList<Person>();
-    	for(int uid : force.getAllUnits()) {
+    	for(UUID uid : force.getAllUnits()) {
     		Unit u = campaign.getUnit(uid);
     		if(null != u) {
     			Person p = u.getCommander();
@@ -395,7 +396,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
 		JLabel lblUnit;		
 		ArrayList<Unit> units = new ArrayList<Unit>();
 		ArrayList<Unit> unmannedUnits = new ArrayList<Unit>();
- 		for(int uid : force.getUnits()) {
+ 		for(UUID uid : force.getUnits()) {
 			Unit u = campaign.getUnit(uid);
 			if(null == u) {
 				continue;
@@ -549,7 +550,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
     	int number = 0;
     	String commander = "No personnel found";
     	ArrayList<Person> people = new ArrayList<Person>();
-    	for(int uid : f.getAllUnits()) {
+    	for(UUID uid : f.getAllUnits()) {
     		Unit u = campaign.getUnit(uid);
     		if(null != u) {
     			Person p = u.getCommander();

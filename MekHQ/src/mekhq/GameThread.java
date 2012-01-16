@@ -91,7 +91,7 @@ class GameThread extends Thread implements CloseClientListener {
                     // Get the Entity
                     Entity entity = unit.getEntity();
                     // Set the TempID for autoreporting
-                    entity.setExternalId(unit.getId());
+                    entity.setExternalId(unit.getId().toString());
                     // Set the owner
                     entity.setOwner(client.getLocalPlayer()); 
                     // Add Mek to game

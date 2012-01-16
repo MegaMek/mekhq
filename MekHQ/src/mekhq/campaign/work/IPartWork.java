@@ -20,6 +20,8 @@
  */
 package mekhq.campaign.work;
 
+import java.util.UUID;
+
 import mekhq.campaign.Unit;
 import mekhq.campaign.parts.Part;
 
@@ -41,8 +43,8 @@ public interface IPartWork extends IWork {
 	public void resetTimeSpent();
 	public void resetOvertime();
 	
-	public int getAssignedTeamId();
-	public void setTeamId(int id);
+	public UUID getAssignedTeamId();
+	public void setTeamId(UUID id);
 	public boolean hasWorkedOvertime();
 	public void setWorkedOvertime(boolean b);
 	public int getShorthandedMod();

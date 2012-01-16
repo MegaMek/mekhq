@@ -47,12 +47,6 @@ public class MissingRotor extends MissingPart {
         this.time = 300;
         this.difficulty = 0;
     }
-	
-	@Override
-	public void writeToXml(PrintWriter pw1, int indent, int id) {
-		writeToXmlBegin(pw1, indent, id);
-		writeToXmlEnd(pw1, indent, id);
-	}
 
 	@Override
 	protected void loadFieldsFromXmlNode(Node wn) {

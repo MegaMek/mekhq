@@ -36,6 +36,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.ResourceBundle;
+import java.util.UUID;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
@@ -265,7 +266,7 @@ public class ResolveScenarioWizardDialog extends javax.swing.JDialog {
         labelTable.put( new Integer( 5 ), new JLabel("5") );
         labelTable.put( new Integer( 6 ), new JLabel(resourceMap.getString("dead")) );
         j = 0;
-        for(int pid : tracker.getPeopleStatus().keySet()) {
+        for(UUID pid : tracker.getPeopleStatus().keySet()) {
         	j++;
         	PersonStatus status = tracker.getPeopleStatus().get(pid);
         	statuses.add(status);
@@ -446,10 +447,13 @@ public class ResolveScenarioWizardDialog extends javax.swing.JDialog {
         	assignModel.addElement(resourceMap.getString("none"));
         	int idx = 0;
         	int selected = 0;
+        	if(null == tracker.getKillCredits().get(killName)) {
+        		continue;
+        	}
     		for(Unit u : tracker.getUnits()) {	
     			idx++;
     			assignModel.addElement(u.getCommander().getFullTitle() + ", " + u.getName());
-    			if(u.getId() == tracker.getKillCredits().get(killName)) {
+    			if(u.getId().equals(tracker.getKillCredits().get(killName))) {
     				selected = idx;
     			}
     		}
@@ -890,7 +894,7 @@ public class ResolveScenarioWizardDialog extends javax.swing.JDialog {
     	//now assign kills
     	for(String killName : tracker.getKillCredits().keySet()) {
     		if(killChoices.get(killName).getSelectedIndex() == 0) {
-    			tracker.getKillCredits().put(killName, Entity.NONE);
+    			tracker.getKillCredits().put(killName, null);
     		} else {
 	    		Unit u = tracker.getUnits().get(killChoices.get(killName).getSelectedIndex()-1);
 	    		if(null != u) {

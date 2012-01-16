@@ -25,6 +25,7 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.UUID;
 
 import mekhq.MekHQ;
 
@@ -43,7 +44,7 @@ public class Kill implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 4680018605784351078L;
-	private int pilotId;
+	private UUID pilotId;
 	private Date date;
 	private String killed;
 	private String killer;
@@ -52,14 +53,14 @@ public class Kill implements Serializable {
 	
 	}
 	
-	public Kill(int id, String kill, String killer, Date d) {
+	public Kill(UUID id, String kill, String killer, Date d) {
 		pilotId = id;
 		this.killed = kill;
 		this.killer = killer;
 		date = d;
 	}
 	
-	public int getPilotId() {
+	public UUID getPilotId() {
 		return pilotId;
 	}
 	
@@ -87,7 +88,7 @@ public class Kill implements Serializable {
 				if (wn2.getNodeName().equalsIgnoreCase("killed")) {
 					retVal.killed = wn2.getTextContent();
 				} else if (wn2.getNodeName().equalsIgnoreCase("pilotId")) {
-					retVal.pilotId = Integer.parseInt(wn2.getTextContent());
+					retVal.pilotId = UUID.fromString(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("killer")) {
 					retVal.killer = (wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("date")) {
@@ -108,7 +109,7 @@ public class Kill implements Serializable {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "<kill>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<pilotId>"
-				+pilotId
+				+pilotId.toString()
 				+"</pilotId>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<killed>"

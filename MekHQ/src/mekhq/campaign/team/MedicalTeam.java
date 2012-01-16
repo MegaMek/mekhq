@@ -52,18 +52,13 @@ public class MedicalTeam extends SupportTeam {
   
     public int getPatients() {
        int patients = 0;
-        for(Person person : campaign.getPersonnel()) {
-        	if(person.getAssignedTeamId() == getId()) {
-        		patients++;
-        	}
-        }
        return patients;
     }
 
 	@Override
-	public void writeToXml(PrintWriter pw1, int indent, int id) {
-		writeToXmlBegin(pw1, indent, id);
-		writeToXmlEnd(pw1, indent, id);
+	public void writeToXml(PrintWriter pw1, int indent) {
+		writeToXmlBegin(pw1, indent);
+		writeToXmlEnd(pw1, indent);
 	}
 	
 	@Override

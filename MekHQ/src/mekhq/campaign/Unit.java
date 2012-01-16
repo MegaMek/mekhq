@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.UUID;
 
 import megamek.common.Aero;
 import megamek.common.AmmoType;
@@ -148,17 +149,17 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 	private Entity entity;
 	private int site;
 	private boolean salvaged;
-	private int id = -1;
+	private UUID id;
 	private int quality;
 	
 	//assignments
 	private int forceId;
     protected int scenarioId;
 
-	private ArrayList<Integer> drivers;
-	private ArrayList<Integer> gunners;
-	private ArrayList<Integer> vesselCrew;
-	private int navigator;
+	private ArrayList<UUID> drivers;
+	private ArrayList<UUID> gunners;
+	private ArrayList<UUID> vesselCrew;
+	private UUID navigator;
 	
 	public Campaign campaign;
 
@@ -183,10 +184,10 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 		this.campaign = c;
 		this.quality = QUALITY_D;
 		this.parts = new ArrayList<Part>();
-		this.drivers = new ArrayList<Integer>();
-		this.gunners = new ArrayList<Integer>();  
-		this.vesselCrew = new ArrayList<Integer>();    
-		this.navigator = -1;
+		this.drivers = new ArrayList<UUID>();
+		this.gunners = new ArrayList<UUID>();  
+		this.vesselCrew = new ArrayList<UUID>();    
+		this.navigator = null;
 		scenarioId = -1;
 		this.refit = null;
 		this.engineer = null;
@@ -259,14 +260,11 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 		return entity;
 	}
 
-	public int getId() {
-		if (id >= 0)
-			return id;
-		
-		return getEntity().getId();
+	public UUID getId() {
+		return id;
 	}
 	
-	public void setId(int i) {
+	public void setId(UUID i) {
 		this.id = i;
 	}
 
@@ -971,29 +969,31 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 		return cost;
 	}
 
-	public void writeToXml(PrintWriter pw1, int indentLvl, int id) {
-		pw1.println(MekHqXmlUtil.indentStr(indentLvl) + "<unit id=\"" + id
+	public void writeToXml(PrintWriter pw1, int indentLvl) {
+		pw1.println(MekHqXmlUtil.indentStr(indentLvl) + "<unit id=\"" + id.toString()
 				+ "\" type=\"" + this.getClass().getName() + "\">");
 
 		pw1.println(MekHqXmlUtil.writeEntityToXmlString(entity, indentLvl+1));
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<quality>"
 				+ quality + "</quality>");
-		for(int did : drivers) {
+		for(UUID did : drivers) {
 			pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<driverId>"
-					+ did + "</driverId>");
+					+ did.toString() + "</driverId>");
 		}
-		for(int gid : gunners) {
+		for(UUID gid : gunners) {
 			pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<gunnerId>"
-					+ gid + "</gunnerId>");
+					+ gid.toString() + "</gunnerId>");
 		}
-		for(int gid : vesselCrew) {
+		for(UUID vid : vesselCrew) {
 			pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<vesselCrewId>"
-					+ gid + "</vesselCrewId>");
+					+ vid.toString() + "</vesselCrewId>");
 		}
-		pw1.println(MekHqXmlUtil.indentStr(indentLvl+1)
-				+"<navigatorId>"
-				+navigator
-				+"</navigatorId>");
+		if(null != navigator) {
+			pw1.println(MekHqXmlUtil.indentStr(indentLvl+1)
+					+"<navigatorId>"
+					+navigator.toString()
+					+"</navigatorId>");
+		}
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<salvaged>"
 				+ salvaged + "</salvaged>");
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<site>" + site
@@ -1007,7 +1007,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 				+scenarioId
 				+"</scenarioId>");
 		if(null != refit) {
-			refit.writeToXml(pw1, indentLvl+1, id);
+			refit.writeToXml(pw1, indentLvl+1);
 		}
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl) + "</unit>");
 	}
@@ -1016,7 +1016,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 		Unit retVal = new Unit();
 		NamedNodeMap attrs = wn.getAttributes();
 		Node idNode = attrs.getNamedItem("id");
-		retVal.id = Integer.parseInt(idNode.getTextContent());
+		retVal.id = UUID.fromString(idNode.getTextContent());
 		
 		// Okay, now load Part-specific fields!
 		NodeList nl = wn.getChildNodes();
@@ -1032,13 +1032,15 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 				} else if (wn2.getNodeName().equalsIgnoreCase("pilotId")) {
 					retVal.pilotId = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("driverId")) {
-					retVal.drivers.add(Integer.parseInt(wn2.getTextContent()));
+					retVal.drivers.add(UUID.fromString(wn2.getTextContent()));
 				} else if (wn2.getNodeName().equalsIgnoreCase("gunnerId")) {
-					retVal.gunners.add(Integer.parseInt(wn2.getTextContent()));
+					retVal.gunners.add(UUID.fromString(wn2.getTextContent()));
 				} else if (wn2.getNodeName().equalsIgnoreCase("vesselCrewId")) {
-					retVal.vesselCrew.add(Integer.parseInt(wn2.getTextContent()));
+					retVal.vesselCrew.add(UUID.fromString(wn2.getTextContent()));
 				} else if (wn2.getNodeName().equalsIgnoreCase("navigatorId")) {
-					retVal.navigator = Integer.parseInt(wn2.getTextContent());
+					if(!wn2.getTextContent().equals("null")) {
+						retVal.navigator = UUID.fromString(wn2.getTextContent());
+					}
 				} else if (wn2.getNodeName().equalsIgnoreCase("forceId")) {
 					retVal.forceId = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("scenarioId")) {
@@ -1050,13 +1052,9 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 						retVal.salvaged = false;
 				} else if (wn2.getNodeName().equalsIgnoreCase("entity")) {
 					retVal.entity = MekHqXmlUtil.getEntityFromXmlString(wn2);
-
-					if ((retVal.id >= 0) && (retVal.entity != null)) {
-						MekHQ.logMessage("ID pre-defined and entity not null; setting entity's ID.", 5);
-						retVal.entity.setId(retVal.id);
-					} else if (retVal.entity != null) {
+					if (retVal.id == null && retVal.entity != null) {
 						MekHQ.logMessage("ID not pre-defined and entity not null; setting unit's ID.", 5);
-						retVal.id = retVal.entity.getId();
+						retVal.id = UUID.randomUUID();
 					}
 				} else if (wn2.getNodeName().equalsIgnoreCase("refit")) {
 					retVal.refit = Refit.generateInstanceFromXML(wn2, retVal);
@@ -1635,14 +1633,14 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     	//if two of the same type are tie rank, take the first one
     	int bestRank = -1;
     	Person commander = null;
-    	for(int id : vesselCrew) {
+    	for(UUID id : vesselCrew) {
     		Person p = campaign.getPerson(id);
     		if(null != p && p.getRank() > bestRank) {
     			commander = p;
     			bestRank = p.getRank();
     		}
     	}
-    	for(int pid : gunners) {
+    	for(UUID pid : gunners) {
     		Person p = campaign.getPerson(pid);
     		if((entity instanceof Tank || entity instanceof Infantry) && p.getHits() > 0) { 
     			continue;
@@ -1652,7 +1650,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     			bestRank = p.getRank();
     		}
     	}
-    	for(int pid : drivers) {
+    	for(UUID pid : drivers) {
     		Person p = campaign.getPerson(pid);
     		if((entity instanceof Tank || entity instanceof Infantry) && p.getHits() > 0) { 
     			continue;
@@ -1662,7 +1660,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     			bestRank = p.getRank();
     		}
     	}
-    	if(navigator != -1) {
+    	if(navigator != null) {
     		Person p = campaign.getPerson(navigator);
     		if(null != p && p.getRank() > bestRank) {
     			commander = p;
@@ -1683,7 +1681,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     	int nDrivers = 0;
     	int sumGunnery = 0;
     	int nGunners = 0;
-    	for(int pid : drivers) {
+    	for(UUID pid : drivers) {
     		Person p = campaign.getPerson(pid);
     		if(p.getHits() > 0 && !(entity instanceof Mech || entity instanceof Aero)) {
     			continue;
@@ -1693,7 +1691,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     			nDrivers++;
     		}
     	}
-    	for(int pid : gunners) {
+    	for(UUID pid : gunners) {
     		Person p = campaign.getPerson(pid);
     		if(p.getHits() > 0 && !(entity instanceof Mech || entity instanceof Aero)) {
     			continue;
@@ -1744,7 +1742,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     	pilot.setPortraitCategory(commander.getPortraitCategory());
     	pilot.setPortraitFileName(commander.getPortraitFileName());
     	pilot.setNickname(commander.getCallsign());
-    	pilot.setExternalId(commander.getId());
+    	pilot.setExternalId(commander.getId().toString());
     	pilot.setArtillery(artillery);
     	//create a new set of options. For now we will just assign based on commander, but
     	//we really should be more detailed about this.
@@ -1799,7 +1797,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     		int nCrew = 0;
         	int sumSkill = 0;
         	int sumBonus = 0;
-        	for(int pid : vesselCrew) {
+        	for(UUID pid : vesselCrew) {
         		Person p = campaign.getPerson(pid);
         		if(null == p) {
         			continue;
@@ -1907,7 +1905,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     }
     
     public boolean canTakeNavigator() {
-    	return entity instanceof Jumpship && !(entity instanceof SpaceStation) && navigator == -1;
+    	return entity instanceof Jumpship && !(entity instanceof SpaceStation) && navigator == null;
     }
     
     public boolean canTakeMoreGunners() {
@@ -1983,44 +1981,19 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     }
     
     public void remove(Person p) {
-    	p.setUnitId(-1);
-    	drivers.remove(new Integer(p.getId()));
-    	gunners.remove(new Integer(p.getId()));
-    	vesselCrew.remove(new Integer(p.getId()));
+    	p.setUnitId(null);
+    	drivers.remove(p.getId());
+    	gunners.remove(p.getId());
+    	vesselCrew.remove(p.getId());
     	if(p.getId() == navigator) {
-    		navigator = -1;
+    		navigator = null;
     	}
     	resetPilotAndEntity();
     }
     
     public boolean isUnmanned() {
     	return (null == getCommander());
-    }
-    
-    /**
-     * This is only used for reverse compatability when loading in from 0.1.8 or before
-     */
-    public void reassignPilotReverseCompatabilityCheck() {
-    	if(pilotId > 0) {
-    		if(usesSoloPilot() || usesSoldiers()) {
-    			if(canTakeMoreDrivers()) {
-    				drivers.add(pilotId);
-    			}
-    			if(canTakeMoreGunners()) {
-    				gunners.add(pilotId);
-    			}
-    		} else {
-    			if(canTakeMoreDrivers()) {
-    				drivers.add(pilotId);
-    			}
-    			else if(canTakeMoreGunners()) {
-    				gunners.add(pilotId);
-    			}
-    		}
-    		pilotId = -1;
-    	}
-    }
-    
+    }  
 
 	public int getForceId() {
 		return forceId;
@@ -2040,27 +2013,27 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     
     public ArrayList<Person> getCrew() {
     	ArrayList<Person> crew = new ArrayList<Person>();
-    	for(int id : drivers) {
+    	for(UUID id : drivers) {
     		Person p = campaign.getPerson(id);
     		if(null != p) {
     			crew.add(p);
     		}
     	}
     	if(!usesSoloPilot() && !usesSoldiers()) {
-	    	for(int id : gunners) {
+	    	for(UUID id : gunners) {
 	    		Person p = campaign.getPerson(id);
 	    		if(null != p) {
 	    			crew.add(p);
 	    		}
 	    	}
     	}
-    	for(int id : vesselCrew) {
+    	for(UUID id : vesselCrew) {
     		Person p = campaign.getPerson(id);
     		if(null != p) {
     			crew.add(p);
     		}
     	}
-    	if(navigator != -1) {
+    	if(navigator != null) {
     		Person p = campaign.getPerson(navigator);
     		if(null != p) {
     			crew.add(p);
@@ -2071,7 +2044,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     
     public ArrayList<Person> getActiveCrew() {
     	ArrayList<Person> crew = new ArrayList<Person>();
-    	for(int id : drivers) {
+    	for(UUID id : drivers) {
     		Person p = campaign.getPerson(id);
     		if(null != p) {
     			if(p.getHits() > 0 && (entity instanceof Tank || entity instanceof Infantry)) {
@@ -2081,7 +2054,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     		}
     	}
     	if(!usesSoloPilot() && !usesSoldiers()) {
-	    	for(int id : gunners) {
+	    	for(UUID id : gunners) {
 	    		Person p = campaign.getPerson(id);
 	    		if(null != p) {
 	    			if(p.getHits() > 0 && (entity instanceof Tank || entity instanceof Infantry)) {
@@ -2091,13 +2064,13 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 	    		}
 	    	}
     	}
-    	for(int id : vesselCrew) {
+    	for(UUID id : vesselCrew) {
     		Person p = campaign.getPerson(id);
     		if(null != p) {
     			crew.add(p);
     		}
     	}
-    	if(navigator != -1) {
+    	if(navigator != null) {
     		Person p = campaign.getPerson(navigator);
     		if(null != p) {
     			crew.add(p);
@@ -2107,8 +2080,8 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     }
     
     public boolean isDriver(Person person) {
-    	for(int id : drivers) {
-    		if(person.getId() == id) {
+    	for(UUID id : drivers) {
+    		if(person.getId().equals(id)) {
     			return true;
     		}
     	}
@@ -2116,8 +2089,8 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     }
     
     public boolean isGunner(Person person) {
-    	for(int id : gunners) {
-    		if(person.getId() == id) {
+    	for(UUID id : gunners) {
+    		if(person.getId().equals(id)) {
     			return true;
     		}
     	}
@@ -2150,7 +2123,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     
     @Override
     public boolean equals(Object o) {
-    	return o instanceof Unit && ((Unit)o).getId() == id && ((Unit)o).getName().equals(getName());
+    	return o instanceof Unit && ((Unit)o).getId().equals(id) && ((Unit)o).getName().equals(getName());
     }
     
     public Person getEngineer() {

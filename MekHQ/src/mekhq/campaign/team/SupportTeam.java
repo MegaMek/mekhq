@@ -80,9 +80,9 @@ public abstract class SupportTeam implements Serializable, MekHqXmlSerializable 
     	return rating;
     }
   
-	public abstract void writeToXml(PrintWriter pw1, int indent, int id);
+	public abstract void writeToXml(PrintWriter pw1, int indent);
 	
-	protected void writeToXmlBegin(PrintWriter pw1, int indent, int id) {
+	protected void writeToXmlBegin(PrintWriter pw1, int indent) {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "<supportTeam id=\""
 				+id
 				+"\" type=\""
@@ -127,7 +127,7 @@ public abstract class SupportTeam implements Serializable, MekHqXmlSerializable 
 				+"</rating>");
 	}
 	
-	protected void writeToXmlEnd(PrintWriter pw1, int indent, int id) {
+	protected void writeToXmlEnd(PrintWriter pw1, int indent) {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "</supportTeam>");
 	}
 

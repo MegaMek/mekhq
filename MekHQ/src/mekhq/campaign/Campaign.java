@@ -40,6 +40,7 @@ import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.ResourceBundle;
+import java.util.UUID;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -146,9 +147,9 @@ public class Campaign implements Serializable {
 	private ArrayList<SupportTeam> teams = new ArrayList<SupportTeam>();
 	private Hashtable<Integer, SupportTeam> teamIds = new Hashtable<Integer, SupportTeam>();
 	private ArrayList<Unit> units = new ArrayList<Unit>();
-	private Hashtable<Integer, Unit> unitIds = new Hashtable<Integer, Unit>();
+	private Hashtable<UUID, Unit> unitIds = new Hashtable<UUID, Unit>();
 	private ArrayList<Person> personnel = new ArrayList<Person>();
-	private Hashtable<Integer, Person> personnelIds = new Hashtable<Integer, Person>();
+	private Hashtable<UUID, Person> personnelIds = new Hashtable<UUID, Person>();
 	private ArrayList<Part> parts = new ArrayList<Part>();
 	private Hashtable<Integer, Part> partIds = new Hashtable<Integer, Part>();
 	private Hashtable<Integer, Force> forceIds = new Hashtable<Integer, Force>();
@@ -165,8 +166,6 @@ public class Campaign implements Serializable {
 	private int medicPool;	
 	
 	private int lastTeamId;
-	private int lastUnitId;
-	private int lastPersonId;
 	private int lastPartId;
 	private int lastForceId;
 	private int lastMissionId;
@@ -470,11 +469,7 @@ public class Campaign implements Serializable {
 	private void addUnit(Unit u) {
 		MekHQ.logMessage("Adding unit: ("+u.getId()+"):"+u, 5);
 		units.add(u);
-		unitIds.put(new Integer(u.getId()), u);
-		
-		if (u.getId() > lastUnitId)
-			lastUnitId = u.getId();
-		
+		unitIds.put(u.getId(), u);	
 		checkDuplicateNamesDuringAdd(u.getEntity());
 	}
 	
@@ -489,14 +484,16 @@ public class Campaign implements Serializable {
 		//reset the game object
 		en.setGame(game);
 		
-		int id = lastUnitId + 1;
-		en.setId(id);
-		en.setExternalId(id);
+		UUID id = UUID.randomUUID();
+		//check for the very rare chance of getting same id
+		while(null != unitIds.get(id)) {
+			id = UUID.randomUUID();
+		}
+		en.setExternalId(id.toString());
 		Unit unit = new Unit(en, this);
 		unit.setId(id);
 		units.add(unit);
-		unitIds.put(new Integer(id), unit);
-		lastUnitId = id;
+		unitIds.put(id, unit);
 			
 		unit.initializeParts(true);
 		unit.runDiagnostic();
@@ -521,16 +518,21 @@ public class Campaign implements Serializable {
 		return entities;
 	}
 
-	public Unit getUnit(int id) {
-		return unitIds.get(new Integer(id));
+	public Unit getUnit(UUID id) {
+		if(null == id) {
+			return null;
+		}
+		return unitIds.get(id);
 	}
 
 	public void addPerson(Person p) {
-		int id = lastPersonId + 1;
+		UUID id = UUID.randomUUID();
+		while(null != personnelIds.get(id)) {
+			id = UUID.randomUUID();
+		}
 		p.setId(id);
 		personnel.add(p);
-		personnelIds.put(new Integer(id), p);
-		lastPersonId = id;
+		personnelIds.put(id, p);
 		addReport(p.getName() + " has been added to the personnel roster.");
 		if(p.getPrimaryRole() == Person.T_ASTECH) {
 			astechPoolMinutes += 480;
@@ -545,11 +547,6 @@ public class Campaign implements Serializable {
 	private void addPersonWithoutId(Person p) {
 		personnel.add(p);
 		personnelIds.put(p.getId(), p);
-		
-		if (p.getId() > lastPersonId)
-			lastPersonId = p.getId();
-		
-		//TODO: Should this have runDiagnostic on the person here?...
 	}
 
 	public ArrayList<Person> getPersonnel() {
@@ -585,8 +582,11 @@ public class Campaign implements Serializable {
 		return service;
 	}
 
-	public Person getPerson(int id) {
-		return personnelIds.get(new Integer(id));
+	public Person getPerson(UUID id) {
+		if(null == id) {
+			return null;
+		}
+		return personnelIds.get(id);
 	}
 
 	public void addPart(Part p) {
@@ -724,7 +724,7 @@ public class Campaign implements Serializable {
 	 * @param unitId
 	 * @return
 	 */
-	public String getUnitDesc(int unitId) {
+	public String getUnitDesc(UUID unitId) {
 		Unit unit = getUnit(unitId);
 		String toReturn = "<html><font size='2'";
 		if (unit.isDeployed()) {
@@ -777,7 +777,7 @@ public class Campaign implements Serializable {
 		if(null == skill) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, doctor.getName( )+ " isn't a doctor, he just plays one on TV.");
 		}
-        if(medWork.getAssignedTeamId() != -1 && medWork.getAssignedTeamId() != doctor.getId() ) {
+        if(medWork.getAssignedTeamId() != null && medWork.getAssignedTeamId() != doctor.getId() ) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, medWork.getPatientName() + " is already being tended by another doctor");
         }      
         if(!medWork.needsFixing()) {
@@ -939,7 +939,7 @@ public class Campaign implements Serializable {
 		report += wrongType;
 		partWork.resetTimeSpent();
 		partWork.resetOvertime();
-		partWork.setTeamId(-1);
+		partWork.setTeamId(null);
 		addReport(report);
 	}
 
@@ -980,7 +980,7 @@ public class Campaign implements Serializable {
 		//concurrent mod problems
 		ArrayList<Integer> assignedPartIds = new ArrayList<Integer>();
 		for(Part part : getParts()) {
-			if(null != part.getUnit() && part.getAssignedTeamId() != -1) {
+			if(null != part.getUnit() && part.getAssignedTeamId() != null) {
 				assignedPartIds.add(part.getId());
 			}
 			if(part instanceof IAcquisitionWork) {
@@ -1089,13 +1089,12 @@ public class Campaign implements Serializable {
 
 	public void clearAllUnits() {
 		this.units = new ArrayList<Unit>();
-		this.unitIds = new Hashtable<Integer, Unit>();
-		this.lastUnitId = 0;
+		this.unitIds = new Hashtable<UUID, Unit>();
 		//TODO: clear parts associated with unit
 
 	}
 
-	public void removeUnit(int id) {
+	public void removeUnit(UUID id) {
 		Unit unit = getUnit(id);
 
 		//remove all parts for this unit as well
@@ -1113,13 +1112,13 @@ public class Campaign implements Serializable {
 		
 		// finally remove the unit
 		units.remove(unit);
-		unitIds.remove(new Integer(unit.getId()));
+		unitIds.remove(unit.getId());
 		checkDuplicateNamesDuringDelete(unit.getEntity());
 		addReport(unit.getName()
 				+ " has been removed from the unit roster.");
 	}
 
-	public void removePerson(int id) {
+	public void removePerson(UUID id) {
 		Person person = getPerson(id);
 
 		Unit u = getUnit(person.getUnitId());
@@ -1131,7 +1130,7 @@ public class Campaign implements Serializable {
 		addReport(person.getDesc()
 				+ " has been removed from the personnel roster.");
 		personnel.remove(person);
-		personnelIds.remove(new Integer(id));
+		personnelIds.remove(id);
 		if(person.getPrimaryRole() == Person.T_ASTECH) {
 			astechPoolMinutes = Math.max(0, astechPoolMinutes - 480);
 			astechPoolOvertime = Math.max(0, astechPoolOvertime - 240);
@@ -1145,7 +1144,7 @@ public class Campaign implements Serializable {
 	public void removeAllPatientsFor(Person doctor) {
 		for(Person p : personnel) {
 			if(p.getAssignedTeamId() == doctor.getId()) {
-				p.setDoctorId(-1);
+				p.setDoctorId(null);
 			}
 		}
 	}
@@ -1169,7 +1168,7 @@ public class Campaign implements Serializable {
 		int fid = force.getId();
 		forceIds.remove(new Integer(fid));
 		//clear forceIds of all personnel with this force
-		for(int uid : force.getUnits()) {
+		for(UUID uid : force.getUnits()) {
 			Unit u = getUnit(uid);
 			if(null == u) {
 				 continue;
@@ -1411,7 +1410,7 @@ public class Campaign implements Serializable {
 		}
 	}
 
-	public void sellUnit(int id) {
+	public void sellUnit(UUID id) {
 		Unit unit = getUnit(id);
 		int sellValue = unit.getSellValue();
 		finances.credit(sellValue, Transaction.C_UNIT_SALE, "Sale of " + unit.getName(), calendar.getTime());
@@ -1491,8 +1490,6 @@ public class Campaign implements Serializable {
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "camoFileName", camoFileName);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "colorIndex", colorIndex);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "lastTeamId", lastTeamId);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "lastUnitId", lastUnitId);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "lastPersonId", lastPersonId);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "lastPartId", lastPartId);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "lastForceId", lastForceId);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "lastMissionId", lastMissionId);
@@ -1531,8 +1528,8 @@ public class Campaign implements Serializable {
 
 		// Lists of objects:
 		writeArrayAndHashToXml(pw1, 1, "teams", teams, teamIds); // Teams
-		writeArrayAndHashToXml(pw1, 1, "units", units, unitIds); // Units
-		writeArrayAndHashToXml(pw1, 1, "personnel", personnel, personnelIds); // Personnel
+		writeArrayAndHashToXmlforUUID(pw1, 1, "units", units, unitIds); // Units
+		writeArrayAndHashToXmlforUUID(pw1, 1, "personnel", personnel, personnelIds); // Personnel
 		writeArrayAndHashToXml(pw1, 1, "missions", missions, missionIds); // Missions
 		//the forces structure is hierarchical, but that should be handled internally
 		//from with writeToXML function for Force
@@ -1608,9 +1605,45 @@ public class Campaign implements Serializable {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "<" + tag + ">");
 
 		// Enumeration<Integer> = hashtab.keys
-		for (int x : hashtab.keySet()) {
-			((MekHqXmlSerializable) (hashtab.get(x))).writeToXml(pw1,
-					indent + 1, x);
+		for (Integer x : hashtab.keySet()) {
+			((MekHqXmlSerializable) (hashtab.get(x))).writeToXml(pw1, indent + 1);
+		}
+
+		pw1.println(MekHqXmlUtil.indentStr(indent) + "</" + tag + ">");
+	}
+	
+	/**
+	 * A helper function to encapsulate writing the array/hash pairs out to XML.
+	 * Each of the types requires a different XML structure, but is in an
+	 * identical holding structure. Thus, genericized function and interface to
+	 * cleanly wrap it up. God, I love 3rd-generation programming languages.
+	 * 
+	 * @param <arrType>
+	 *            The object type in the list. Must implement
+	 *            MekHqXmlSerializable.
+	 * @param pw1
+	 *            The PrintWriter to output XML to.
+	 * @param indent
+	 *            The indentation level to use for writing XML (purely for
+	 *            neatness).
+	 * @param tag
+	 *            The name of the tag to use to encapsulate it.
+	 * @param array
+	 *            The list of objects to write out.
+	 * @param hashtab
+	 *            The lookup hashtable for the associated array.
+	 */
+	private <arrType> void writeArrayAndHashToXmlforUUID(PrintWriter pw1, int indent,
+			String tag, ArrayList<arrType> array,
+			Hashtable<UUID, arrType> hashtab) {
+		// Hooray for implicitly-type-detected genericized functions!
+		// However, I still ended up making an interface to handle this.
+		// That way, I can cast it and call "writeToXml" to make it cleaner.
+		pw1.println(MekHqXmlUtil.indentStr(indent) + "<" + tag + ">");
+
+		// Enumeration<Integer> = hashtab.keys
+		for (UUID x : hashtab.keySet()) {
+			((MekHqXmlSerializable) (hashtab.get(x))).writeToXml(pw1, indent + 1);
 		}
 
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "</" + tag + ">");
@@ -1798,7 +1831,7 @@ public class Campaign implements Serializable {
 			}
 			//some units may need force id set for backwards compatability
 			//some may also need scenario id set
-			for(int uid : f.getUnits()) {
+			for(UUID uid : f.getUnits()) {
 				Unit u = retVal.getUnit(uid);
 				if(null != u) {
 					u.setForceId(f.getId());
@@ -1899,9 +1932,6 @@ public class Campaign implements Serializable {
 			// Also, the unit should have its campaign set.
 			unit.campaign = retVal;
 			
-			//for reverse compatability check pilotId
-			unit.reassignPilotReverseCompatabilityCheck();
-	
 			//reset the pilot and entity, to reflect newly assigned personnel
 			unit.resetPilotAndEntity();
 			
@@ -2438,14 +2468,8 @@ public class Campaign implements Serializable {
 				} else if (xn.equalsIgnoreCase("lastForceId")) {
 					retVal.lastForceId = Integer.parseInt(wn.getTextContent()
 							.trim());
-				} else if (xn.equalsIgnoreCase("lastPersonId")) {
-					retVal.lastPersonId = Integer.parseInt(wn.getTextContent()
-							.trim());
 				} else if (xn.equalsIgnoreCase("lastTeamId")) {
 					retVal.lastTeamId = Integer.parseInt(wn.getTextContent()
-							.trim());
-				} else if (xn.equalsIgnoreCase("lastUnitId")) {
-					retVal.lastUnitId = Integer.parseInt(wn.getTextContent()
 							.trim());
 				} else if (xn.equalsIgnoreCase("lastMissionId")) {
 					retVal.lastMissionId = Integer.parseInt(wn.getTextContent()
@@ -2631,7 +2655,10 @@ public class Campaign implements Serializable {
 		return finances;
 	}
 	
-	public ArrayList<Part> getPartsNeedingServiceFor(int uid) {
+	public ArrayList<Part> getPartsNeedingServiceFor(UUID uid) {
+		if(null == uid) {
+			return new ArrayList<Part>();
+		}
 		Unit u = getUnit(uid);
 		if(u != null) {
 			if(u.isSalvage() || !u.isRepairable()) {
@@ -2643,7 +2670,10 @@ public class Campaign implements Serializable {
 		return new ArrayList<Part>();
 	}
 	
-	public ArrayList<IAcquisitionWork> getAcquisitionsForUnit(int uid) {
+	public ArrayList<IAcquisitionWork> getAcquisitionsForUnit(UUID uid) {
+		if(null == uid) {
+			return new ArrayList<IAcquisitionWork>();
+		}
 		Unit u = getUnit(uid);
 		if(u != null) {
 			return u.getPartsNeeded();
@@ -3152,7 +3182,7 @@ public class Campaign implements Serializable {
 		Unit u = getUnit(person.getUnitId());
 		person.setStatus(status);
 		if(status != Person.S_ACTIVE) {
-    		person.setDoctorId(-1);
+    		person.setDoctorId(null);
     		if(null != u) {
     			u.remove(person);
     		}
@@ -3193,10 +3223,10 @@ public class Campaign implements Serializable {
 		}
 	}
 	
-	public ArrayList<Kill> getKillsFor(int pid) {
+	public ArrayList<Kill> getKillsFor(UUID pid) {
 		ArrayList<Kill> personalKills = new ArrayList<Kill>();
 		for(Kill k : kills) {
-			if(k.getPilotId() == pid) {
+			if(k.getPilotId().equals(pid)) {
 				personalKills.add(k);
 			}
 		}
@@ -3265,7 +3295,7 @@ public class Campaign implements Serializable {
         }
     }
     
-    public void hirePersonnelFor(int uid) {
+    public void hirePersonnelFor(UUID uid) {
     	Unit unit = getUnit(uid);
     	if(null == unit) {
     		return;
@@ -3351,7 +3381,7 @@ public class Campaign implements Serializable {
     	
     	ArrayList<Person> commanders = new ArrayList<Person>();
     	
-    	for(int uid : forces.getAllUnits()) {
+    	for(UUID uid : forces.getAllUnits()) {
     		Unit u = getUnit(uid);
     		if(null == u) {
     			continue;

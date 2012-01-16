@@ -29,6 +29,7 @@ import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.StringTokenizer;
+import java.util.UUID;
 import java.util.Vector;
 
 import megamek.common.Aero;
@@ -103,7 +104,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     public static final int S_MIA = 3;
     public static final int S_NUM = 4;
 	
-    protected int id;
+    protected UUID id;
     
     private String name;
     private String callsign;
@@ -126,8 +127,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     private int hits;
     
     //assignments
-    private int unitId;
-    protected int doctorId;
+    private UUID unitId;
+    protected UUID doctorId;
     //for reverse compatability v0.1.8 and earlier
     protected int teamId = -1;
     
@@ -165,8 +166,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         skills = new Hashtable<String,Skill>();
         salary = -1;
         ranks = r;
-        doctorId = -1;
-        unitId = -1;
+        doctorId = null;
+        unitId = null;
         toughness = 0;
         biography = "";
         resetMinutesLeft();
@@ -432,11 +433,11 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     	return age;
     }
 
-    public void setId(int id) {
+    public void setId(UUID id) {
         this.id = id;
     }
     
-    public int getId() {
+    public UUID getId() {
         return id;
     }
 
@@ -448,16 +449,16 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         this.xp = xp;
     }
     
-    public int getAssignedTeamId() {
+    public UUID getAssignedTeamId() {
         return doctorId;
     }
     
-    public void setDoctorId(int t) {
+    public void setDoctorId(UUID t) {
     	this.doctorId = t;
     }
   
     public boolean checkNaturalHealing() {
-        if(needsFixing() && doctorId == -1) {
+        if(needsFixing() && doctorId == null) {
             daysRest++;
             if(daysRest >= 15) {
                 heal();
@@ -489,9 +490,9 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     }
  
     @Override
-	public void writeToXml(PrintWriter pw1, int indent, int id) {
+	public void writeToXml(PrintWriter pw1, int indent) {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "<person id=\""
-				+id
+				+id.toString()
 				+"\" type=\""
 				+this.getClass().getName()
 				+"\">");
@@ -521,7 +522,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 				+"</daysRest>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<id>"
-				+this.id
+				+this.id.toString()
 				+"</id>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<portraitCategory>"
@@ -543,14 +544,18 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 				+"<rank>"
 				+rank
 				+"</rank>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<doctorId>"
-				+doctorId
-				+"</doctorId>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<unitId>"
-				+unitId
-				+"</unitId>");
+		if(null != doctorId) {
+			pw1.println(MekHqXmlUtil.indentStr(indent+1)
+					+"<doctorId>"
+					+doctorId.toString()
+					+"</doctorId>");
+		}
+		if(null != unitId) {
+			pw1.println(MekHqXmlUtil.indentStr(indent+1)
+					+"<unitId>"
+					+unitId.toString()
+					+"</unitId>");
+		}
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<salary>"
 				+salary
@@ -578,7 +583,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 				+"</birthday>");
 		for(String skName : skills.keySet()) {
 			Skill skill = skills.get(skName);
-			skill.writeToXml(pw1, indent+1, id);
+			skill.writeToXml(pw1, indent+1);
 		}
 		if (countOptions(PilotOptions.LVL3_ADVANTAGES) > 0) {
 			pw1.println(MekHqXmlUtil.indentStr(indent+1)
@@ -639,7 +644,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 				} else if (wn2.getNodeName().equalsIgnoreCase("daysRest")) {
 					retVal.daysRest = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("id")) {
-					retVal.id = Integer.parseInt(wn2.getTextContent());
+					retVal.id = UUID.fromString(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("teamId")) {
 					retVal.teamId = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("portraitCategory")) {
@@ -655,9 +660,13 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 				} else if (wn2.getNodeName().equalsIgnoreCase("rank")) {
 					retVal.rank = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("doctorId")) {
-					retVal.doctorId = Integer.parseInt(wn2.getTextContent());
+					if(!wn2.getTextContent().equals("null")) {
+						retVal.doctorId = UUID.fromString(wn2.getTextContent());
+					}
 				} else if (wn2.getNodeName().equalsIgnoreCase("unitId")) {
-					retVal.unitId = Integer.parseInt(wn2.getTextContent());
+					if(!wn2.getTextContent().equals("null")) {
+						retVal.unitId = UUID.fromString(wn2.getTextContent());
+					}
 				} else if (wn2.getNodeName().equalsIgnoreCase("status")) {
 					retVal.status = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("salary")) {
@@ -1193,7 +1202,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 	public void heal() {
 		hits = Math.max(hits - 1, 0);
 		if(!needsFixing()) {
-			doctorId = -1;
+			doctorId = null;
 		}
 	}
 
@@ -1436,11 +1445,11 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     	return false;
     }
     
-    public int getUnitId() {
+    public UUID getUnitId() {
     	return unitId;
     }
     
-    public void setUnitId(int i) {
+    public void setUnitId(UUID i) {
     	unitId = i;
     }
     
@@ -1620,7 +1629,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     	return false;
     }
     
-    public int getDoctorId() {
+    public UUID getDoctorId() {
     	return doctorId;
     }
     

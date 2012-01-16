@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Random;
+import java.util.UUID;
 
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
@@ -59,14 +60,14 @@ import mekhq.campaign.personnel.Person;
  */
 public class ResolveScenarioTracker {
 	
-	Hashtable<Integer, Entity> entities;
-	Hashtable<Integer, Pilot> pilots;
+	Hashtable<UUID, Entity> entities;
+	Hashtable<UUID, Pilot> pilots;
 	ArrayList<Entity> potentialSalvage;
 	ArrayList<Unit> actualSalvage;
 	ArrayList<Unit> leftoverSalvage;
 	ArrayList<Unit> units;
-	Hashtable<Integer, PersonStatus> peopleStatus;
-	Hashtable<String, Integer> killCredits;
+	Hashtable<UUID, PersonStatus> peopleStatus;
+	Hashtable<String, UUID> killCredits;
 	Campaign campaign;
 	Scenario scenario;
 	JFileChooser unitList;
@@ -76,15 +77,15 @@ public class ResolveScenarioTracker {
 	public ResolveScenarioTracker(Scenario s, Campaign c) {
 		this.scenario = s;
 		this.campaign = c;
-		entities = new Hashtable<Integer, Entity>();
+		entities = new Hashtable<UUID, Entity>();
 		potentialSalvage = new ArrayList<Entity>();
 		actualSalvage = new ArrayList<Unit>();
 		leftoverSalvage = new ArrayList<Unit>();
-		pilots = new Hashtable<Integer, Pilot>();
+		pilots = new Hashtable<UUID, Pilot>();
 		units = new ArrayList<Unit>();
-		peopleStatus = new Hashtable<Integer, PersonStatus>();
-		killCredits = new Hashtable<String, Integer>();
-		for(int uid : scenario.getForces(campaign).getAllUnits()) {
+		peopleStatus = new Hashtable<UUID, PersonStatus>();
+		killCredits = new Hashtable<String, UUID>();
+		for(UUID uid : scenario.getForces(campaign).getAllUnits()) {
 			Unit u = campaign.getUnit(uid);
 			if(null != u) {
 				units.add(u);
@@ -187,14 +188,14 @@ public class ResolveScenarioTracker {
 			Entity e = iter.nextElement();
 			if(e.getOwnerId() == pid) {
 				if(e.canEscape() || controlsField) {
-					entities.put(e.getExternalId(), e);
+					entities.put(UUID.fromString(e.getExternalId()), e);
 					if(null != e.getCrew()) {
-						pilots.put(e.getCrew().getExternalId(), e.getCrew());
+						pilots.put(UUID.fromString(e.getCrew().getExternalId()), e.getCrew());
 					}
 				}			
 			} else if(e.getOwner().isEnemyOf(client.getLocalPlayer())) {
 				if(!e.canEscape() && controlsField) {
-					killCredits.put(e.getDisplayName(), Entity.NONE);
+					killCredits.put(e.getDisplayName(), null);
 					if(e instanceof Infantry && !(e instanceof BattleArmor)) {
 						continue;
 					}
@@ -206,9 +207,9 @@ public class ResolveScenarioTracker {
 		for (Enumeration<Entity> iter = client.game.getRetreatedEntities(); iter.hasMoreElements();) {
             Entity e = iter.nextElement();
             if(e.getOwnerId() == pid) {
-            	entities.put(e.getExternalId(), e);
+            	entities.put(UUID.fromString(e.getExternalId()), e);
 				if(null != e.getCrew()) {
-					pilots.put(e.getCrew().getExternalId(), e.getCrew());
+					pilots.put(UUID.fromString(e.getCrew().getExternalId()), e.getCrew());
 				}
             }
         }
@@ -218,17 +219,17 @@ public class ResolveScenarioTracker {
         while (wrecks.hasMoreElements()) {
         	Entity e = wrecks.nextElement();
         	if(e.getOwnerId() == pid && controlsField && e.isSalvage()) {
-        		entities.put(e.getExternalId(), e);
+        		entities.put(UUID.fromString(e.getExternalId()), e);
         		if(null != e.getCrew()) {
-        			pilots.put(e.getCrew().getExternalId(), e.getCrew());
+        			pilots.put(UUID.fromString(e.getCrew().getExternalId()), e.getCrew());
         		}
         	} else if(e.getOwner().isEnemyOf(client.getLocalPlayer())) {
         		Entity killer = client.game.getEntity(e.getKillerId());
         		if(null != killer && killer.getOwnerId() == pid) {
         			//the killer is one of your units, congrats!
-        			killCredits.put(e.getDisplayName(), killer.getExternalId());
+        			killCredits.put(e.getDisplayName(), UUID.fromString(killer.getExternalId()));
         		} else {
-        			killCredits.put(e.getDisplayName(), Entity.NONE);
+        			killCredits.put(e.getDisplayName(), null);
         		}
         		if(e.isSalvage()) {
         			if(e instanceof Infantry && !(e instanceof BattleArmor)) {
@@ -258,7 +259,10 @@ public class ResolveScenarioTracker {
 	public void assignKills() {
 		for(Unit u : units) {
 			for(String killed : killCredits.keySet()) {
-				if(u.getId() == killCredits.get(killed)) {
+				if(null == killCredits.get(killed)) {
+					continue;
+				}
+				if(u.getId().equals(killCredits.get(killed))) {
 					for(Person p : u.getActiveCrew()) {
 						PersonStatus status = peopleStatus.get(p.getId());
 						status.addKill(new Kill(p.getId(), killed, u.getEntity().getShortNameRaw(), campaign.getCalendar().getTime()));
@@ -378,12 +382,12 @@ public class ResolveScenarioTracker {
 
 			// Add the units from the file.
 			for (Entity entity : parser.getEntities()) {
-				entities.put(entity.getExternalId(), entity);
+				entities.put(UUID.fromString(entity.getExternalId()), entity);
 			}
 			
 			// add any ejected pilots
 			for (Pilot pilot : parser.getPilots()) {
-				pilots.put(pilot.getExternalId(), pilot);
+				pilots.put(UUID.fromString(pilot.getExternalId()), pilot);
 			}
 		}
 	}
@@ -420,10 +424,10 @@ public class ResolveScenarioTracker {
 				}
 				//some of the players units and personnel may be in the salvage pile, so 
 				//lets check for these first
-				if(foundMatch(entity, units)) {
-					entities.put(entity.getExternalId(), entity);
+				if(!entity.getExternalId().equals("-1") && foundMatch(entity, units)) {
+					entities.put(UUID.fromString(entity.getExternalId()), entity);
 					if(null != entity.getCrew()) {
-						pilots.put(entity.getCrew().getExternalId(), entity.getCrew());
+						pilots.put(UUID.fromString(entity.getCrew().getExternalId()), entity.getCrew());
 					}
 				} else {		
 					potentialSalvage.add(entity);
@@ -434,7 +438,7 @@ public class ResolveScenarioTracker {
 	
 	private boolean foundMatch(Entity en, ArrayList<Unit> units) {
 		for(Unit u : units) {
-			if(u.getId() == en.getExternalId()) {
+			if(u.getId().equals(UUID.fromString(en.getExternalId()))) {
 				return true;
 			}
 		}
@@ -474,7 +478,7 @@ public class ResolveScenarioTracker {
 		return campaign.getMission(scenario.getMissionId());
 	}
 	
-	public Hashtable<String, Integer> getKillCredits() {
+	public Hashtable<String, UUID> getKillCredits() {
 		return killCredits;
 	}
 	
@@ -497,7 +501,7 @@ public class ResolveScenarioTracker {
 		}
 			
 		//now lets update personnel
-		for(int pid : peopleStatus.keySet()) {
+		for(UUID pid : peopleStatus.keySet()) {
 			Person person = campaign.getPerson(pid);
 			PersonStatus status = peopleStatus.get(pid);
 			if(null == person || null == status) {
@@ -584,7 +588,7 @@ public class ResolveScenarioTracker {
 	
 	public ArrayList<Person> getMissingPersonnel() {
 		ArrayList<Person> mia = new ArrayList<Person>();
-		for(int pid : peopleStatus.keySet()) {
+		for(UUID pid : peopleStatus.keySet()) {
 			PersonStatus status = peopleStatus.get(pid);
 			if(status.isMissing()) {
 				Person p = campaign.getPerson(pid);
@@ -598,7 +602,7 @@ public class ResolveScenarioTracker {
 	
 	public ArrayList<Person> getDeadPersonnel() {
 		ArrayList<Person> kia = new ArrayList<Person>();
-		for(int pid : peopleStatus.keySet()) {
+		for(UUID pid : peopleStatus.keySet()) {
 			PersonStatus status = peopleStatus.get(pid);
 			if(status.isDead()) {
 				Person p = campaign.getPerson(pid);
@@ -612,7 +616,7 @@ public class ResolveScenarioTracker {
 	
 	public ArrayList<Person> getRecoveredPersonnel() {
 		ArrayList<Person> recovered = new ArrayList<Person>();
-		for(int pid : peopleStatus.keySet()) {
+		for(UUID pid : peopleStatus.keySet()) {
 			PersonStatus status = peopleStatus.get(pid);
 			if(!status.isDead() && !status.isMissing()) {
 				Person p = campaign.getPerson(pid);
@@ -624,7 +628,7 @@ public class ResolveScenarioTracker {
 		return recovered;
 	}
 	
-	public Hashtable<Integer, PersonStatus> getPeopleStatus() {
+	public Hashtable<UUID, PersonStatus> getPeopleStatus() {
 		return peopleStatus;
 	}
 	

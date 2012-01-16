@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
+import java.util.UUID;
 import java.util.Vector;
 
 import mekhq.MekHQ;
@@ -64,7 +65,7 @@ public class Force implements Serializable {
 	private String desc;
 	private Force parentForce;
 	private Vector<Force> subForces;
-	private Vector<Integer> units;
+	private Vector<UUID> units;
 	private int scenarioId;
 
 	//an ID so that forces can be tracked in Campaign hash
@@ -75,7 +76,7 @@ public class Force implements Serializable {
 		this.desc = "";
 		this.parentForce = null;
 		this.subForces = new Vector<Force>();
-		this.units = new Vector<Integer>();
+		this.units = new Vector<UUID>();
 		this.scenarioId = -1;
 	}
 	
@@ -156,7 +157,7 @@ public class Force implements Serializable {
 		subForces.add(sub);
 	}
 	
-	public Vector<Integer> getUnits() {
+	public Vector<UUID> getUnits() {
 		return units;
 	}
 	
@@ -164,9 +165,9 @@ public class Force implements Serializable {
 	 * This returns all the unit ids in this force and all of its subforces
 	 * @return
 	 */
-	public Vector<Integer> getAllUnits() {
-		Vector<Integer> allUnits = new Vector<Integer>();
-		for(int uid : units) {
+	public Vector<UUID> getAllUnits() {
+		Vector<UUID> allUnits = new Vector<UUID>();
+		for(UUID uid : units) {
 			allUnits.add(uid);
 		}
 		for(Force f : subForces) {
@@ -182,7 +183,7 @@ public class Force implements Serializable {
 	 * instead
 	 * @param uid
 	 */
-	public void addUnit(int uid) {
+	public void addUnit(UUID uid) {
 		units.add(uid);
 	}
 	
@@ -191,11 +192,11 @@ public class Force implements Serializable {
 	 * instead
 	 * @param id
 	 */
-	public void removeUnit(int id) {
+	public void removeUnit(UUID id) {
 		int idx = 0;
 		boolean found = false;
-		for(int uid : getUnits()) {
-			if(uid == id) {
+		for(UUID uid : getUnits()) {
+			if(uid.equals(id)) {
 				found = true;
 				break;
 			}
@@ -206,11 +207,11 @@ public class Force implements Serializable {
 		}
 	}
 	
-	public boolean removeUnitFromAllForces(int id) {
+	public boolean removeUnitFromAllForces(UUID id) {
 		int idx = 0;
 		boolean found = false;
-		for(int uid : getUnits()) {
-			if(uid == id) {
+		for(UUID uid : getUnits()) {
+			if(uid.equals(id)) {
 				found = true;
 				break;
 			}
@@ -231,7 +232,7 @@ public class Force implements Serializable {
 	
 	public void clearScenarioIds(Campaign c) {
 		setScenarioId(-1);
-		for(int uid : getUnits()) {
+		for(UUID uid : getUnits()) {
 			Unit u = c.getUnit(uid);
 			if(null != u) {
 				u.undeploy();
@@ -314,7 +315,7 @@ public class Force implements Serializable {
 		if(units.size() > 0) {
 			pw1.println(MekHqXmlUtil.indentStr(indent+1)
 					+"<units>");
-			for(int uid : units) {
+			for(UUID uid : units) {
 				pw1.println(MekHqXmlUtil.indentStr(indent+2)
 						+"<unit id=\"" + uid + "\"/>");
 			}
@@ -359,8 +360,6 @@ public class Force implements Serializable {
 					retVal.scenarioId = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("units")) {
 						processUnitNodes(retVal, wn2);
-				} else if (wn2.getNodeName().equalsIgnoreCase("personnel")) {
-						processPersonnelNodes(retVal, wn2, c);
 				} else if (wn2.getNodeName().equalsIgnoreCase("subforces")) {
 					NodeList nl2 = wn2.getChildNodes();
 					for (int y=0; y<nl2.getLength(); y++) {
@@ -401,32 +400,7 @@ public class Force implements Serializable {
 			NamedNodeMap attrs = wn2.getAttributes();
 			Node classNameNode = attrs.getNamedItem("id");
 			String idString = classNameNode.getTextContent();
-			retVal.addUnit(Integer.parseInt(idString));			
-		}
-	}
-	
-	/**
-	 * for backwards compatability
-	 * @param retVal
-	 * @param wn
-	 */
-	private static void processPersonnelNodes(Force retVal, Node wn, Campaign c) {
-		
-		NodeList nl = wn.getChildNodes();
-		for (int x=0; x<nl.getLength(); x++) {
-			Node wn2 = nl.item(x);
-			if (wn2.getNodeType() != Node.ELEMENT_NODE)
-				continue;
-			NamedNodeMap attrs = wn2.getAttributes();
-			Node classNameNode = attrs.getNamedItem("id");
-			int id = Integer.parseInt(classNameNode.getTextContent());
-			Person p = c.getPerson(id);
-			if(null != p) {
-				Unit u = c.getUnit(p.getUnitId());
-				if(null != u) {
-					retVal.addUnit(u.getId());		
-				}
-			}
+			retVal.addUnit(UUID.fromString(idString));			
 		}
 	}
 	
@@ -434,7 +408,7 @@ public class Force implements Serializable {
 		Vector<Object> children = new Vector<Object>();
 		children.addAll(subForces);
 		//add any units
-		Enumeration<Integer> uids = getUnits().elements();
+		Enumeration<UUID> uids = getUnits().elements();
 		//put them into a temporary array so I can sort it by rank
 		ArrayList<Unit> units = new ArrayList<Unit>();
 		ArrayList<Unit> unmannedUnits = new ArrayList<Unit>();

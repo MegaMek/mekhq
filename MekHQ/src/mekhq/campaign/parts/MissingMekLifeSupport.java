@@ -60,12 +60,6 @@ public class MissingMekLifeSupport extends MissingPart {
     }
 
 	@Override
-	public void writeToXml(PrintWriter pw1, int indent, int id) {
-		writeToXmlBegin(pw1, indent, id);
-		writeToXmlEnd(pw1, indent, id);
-	}
-
-	@Override
 	protected void loadFieldsFromXmlNode(Node wn) {
 		// Do nothing - no fields to load.
 	}
