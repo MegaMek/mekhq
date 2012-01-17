@@ -8,6 +8,7 @@ v0.1.14 (SVN)
 + use UUID to identify personnel
 + assign UUIDs to pilots and units and fix all references when loading older campaigns
 + Bug 3472687: External ID Conflict when managing both players with HQ
++ updated MM.jar for string external ids
 
 
 v0.1.13 (2012-01-11)

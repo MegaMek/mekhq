@@ -188,9 +188,9 @@ public class ResolveScenarioTracker {
 			Entity e = iter.nextElement();
 			if(e.getOwnerId() == pid) {
 				if(e.canEscape() || controlsField) {
-					entities.put(UUID.fromString(e.getExternalId()), e);
+					entities.put(UUID.fromString(e.getExternalIdAsString()), e);
 					if(null != e.getCrew()) {
-						pilots.put(UUID.fromString(e.getCrew().getExternalId()), e.getCrew());
+						pilots.put(UUID.fromString(e.getCrew().getExternalIdAsString()), e.getCrew());
 					}
 				}			
 			} else if(e.getOwner().isEnemyOf(client.getLocalPlayer())) {
@@ -207,9 +207,9 @@ public class ResolveScenarioTracker {
 		for (Enumeration<Entity> iter = client.game.getRetreatedEntities(); iter.hasMoreElements();) {
             Entity e = iter.nextElement();
             if(e.getOwnerId() == pid) {
-            	entities.put(UUID.fromString(e.getExternalId()), e);
+            	entities.put(UUID.fromString(e.getExternalIdAsString()), e);
 				if(null != e.getCrew()) {
-					pilots.put(UUID.fromString(e.getCrew().getExternalId()), e.getCrew());
+					pilots.put(UUID.fromString(e.getCrew().getExternalIdAsString()), e.getCrew());
 				}
             }
         }
@@ -219,15 +219,15 @@ public class ResolveScenarioTracker {
         while (wrecks.hasMoreElements()) {
         	Entity e = wrecks.nextElement();
         	if(e.getOwnerId() == pid && controlsField && e.isSalvage()) {
-        		entities.put(UUID.fromString(e.getExternalId()), e);
+        		entities.put(UUID.fromString(e.getExternalIdAsString()), e);
         		if(null != e.getCrew()) {
-        			pilots.put(UUID.fromString(e.getCrew().getExternalId()), e.getCrew());
+        			pilots.put(UUID.fromString(e.getCrew().getExternalIdAsString()), e.getCrew());
         		}
         	} else if(e.getOwner().isEnemyOf(client.getLocalPlayer())) {
         		Entity killer = client.game.getEntity(e.getKillerId());
         		if(null != killer && killer.getOwnerId() == pid) {
         			//the killer is one of your units, congrats!
-        			killCredits.put(e.getDisplayName(), UUID.fromString(killer.getExternalId()));
+        			killCredits.put(e.getDisplayName(), UUID.fromString(killer.getExternalIdAsString()));
         		} else {
         			killCredits.put(e.getDisplayName(), null);
         		}
@@ -382,12 +382,12 @@ public class ResolveScenarioTracker {
 
 			// Add the units from the file.
 			for (Entity entity : parser.getEntities()) {
-				entities.put(UUID.fromString(entity.getExternalId()), entity);
+				entities.put(UUID.fromString(entity.getExternalIdAsString()), entity);
 			}
 			
 			// add any ejected pilots
 			for (Pilot pilot : parser.getPilots()) {
-				pilots.put(UUID.fromString(pilot.getExternalId()), pilot);
+				pilots.put(UUID.fromString(pilot.getExternalIdAsString()), pilot);
 			}
 		}
 	}
@@ -424,10 +424,10 @@ public class ResolveScenarioTracker {
 				}
 				//some of the players units and personnel may be in the salvage pile, so 
 				//lets check for these first
-				if(!entity.getExternalId().equals("-1") && foundMatch(entity, units)) {
-					entities.put(UUID.fromString(entity.getExternalId()), entity);
+				if(!entity.getExternalIdAsString().equals("-1") && foundMatch(entity, units)) {
+					entities.put(UUID.fromString(entity.getExternalIdAsString()), entity);
 					if(null != entity.getCrew()) {
-						pilots.put(UUID.fromString(entity.getCrew().getExternalId()), entity.getCrew());
+						pilots.put(UUID.fromString(entity.getCrew().getExternalIdAsString()), entity.getCrew());
 					}
 				} else {		
 					potentialSalvage.add(entity);
@@ -438,16 +438,7 @@ public class ResolveScenarioTracker {
 	
 	private boolean foundMatch(Entity en, ArrayList<Unit> units) {
 		for(Unit u : units) {
-			if(u.getId().equals(UUID.fromString(en.getExternalId()))) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	private boolean foundMatch(Pilot p, ArrayList<Unit> units) {
-		for(Unit u : units) {
-			if(u.getEntity().getCrew().getExternalId() == p.getExternalId()) {
+			if(u.getId().equals(UUID.fromString(en.getExternalIdAsString()))) {
 				return true;
 			}
 		}

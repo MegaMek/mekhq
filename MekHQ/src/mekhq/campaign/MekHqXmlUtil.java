@@ -126,7 +126,7 @@ public class MekHqXmlUtil {
 				+ "\" commander=\"" + String.valueOf(tgtEnt.isCommander());
 
 		retVal += "\" externalId=\"";
-		retVal += tgtEnt.getExternalId();
+		retVal += tgtEnt.getExternalIdAsString();
 
 		if (tgtEnt.countQuirks() > 0) {
 			retVal += "\" quirks=\"";
