@@ -23,6 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.util.Hashtable;
 import java.util.UUID;
 
 import megamek.common.EquipmentType;
@@ -125,6 +126,11 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	
 	//all parts need a reference to campaign
 	protected Campaign campaign;
+	
+	//reverse-compatability
+	protected int oldUnitId = -1;
+	protected int oldTeamId = -1;
+	protected int oldRefitId = -1;
 	
 	public Part() {
 		this(0, null);
@@ -400,7 +406,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "</part>");
 	}
 
-	public static Part generateInstanceFromXML(Node wn) {
+	public static Part generateInstanceFromXML(Node wn, int version) {
 		Part retVal = null;
 		NamedNodeMap attrs = wn.getAttributes();
 		Node classNameNode = attrs.getNamedItem("type");
@@ -468,19 +474,31 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 				} else if (wn2.getNodeName().equalsIgnoreCase("mode")) {
 					retVal.mode = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("teamId")) {
-					if(!wn2.getTextContent().equals("null")) {
-						retVal.teamId = UUID.fromString(wn2.getTextContent());
+					if(version < 14) {
+						retVal.oldTeamId = Integer.parseInt(wn2.getTextContent());
+					} else {
+						if(!wn2.getTextContent().equals("null")) {
+							retVal.teamId = UUID.fromString(wn2.getTextContent());
+						}
 					}
 				} else if (wn2.getNodeName().equalsIgnoreCase("unitId")) {
-					if(!wn2.getTextContent().equals("null")) {
-						retVal.unitId = UUID.fromString(wn2.getTextContent());
+					if(version < 14) {
+						retVal.oldUnitId = Integer.parseInt(wn2.getTextContent());
+					} else {
+						if(!wn2.getTextContent().equals("null")) {
+							retVal.unitId = UUID.fromString(wn2.getTextContent());
+						}
 					}
 				} else if (wn2.getNodeName().equalsIgnoreCase("shorthandedMod")) {
 					retVal.shorthandedMod = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("refitId")) {
-					if(!wn2.getTextContent().equals("null")) {
-						retVal.refitId = UUID.fromString(wn2.getTextContent());
-					}				
+					if(version < 14) {
+						retVal.oldRefitId = Integer.parseInt(wn2.getTextContent());
+					} else {
+						if(!wn2.getTextContent().equals("null")) {
+							retVal.refitId = UUID.fromString(wn2.getTextContent());
+						}	
+					}
 				} else if (wn2.getNodeName().equalsIgnoreCase("daysToArrival")) {
 					retVal.daysToArrival = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("workingOvertime")) {
@@ -714,5 +732,11 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	public boolean isBeingWorkedOn() {
 		return teamId != null;
 	}
+	
+	public void fixIdReferences(Hashtable<Integer, UUID> uHash, Hashtable<Integer, UUID> pHash) {
+    	unitId = uHash.get(oldUnitId);
+    	refitId = uHash.get(oldRefitId);
+    	teamId = pHash.get(oldTeamId);
+    }
 }
 

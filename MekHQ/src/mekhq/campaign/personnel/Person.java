@@ -105,6 +105,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     public static final int S_NUM = 4;
 	
     protected UUID id;
+    protected int oldId;
     
     private String name;
     private String callsign;
@@ -131,6 +132,10 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     protected UUID doctorId;
     //for reverse compatability v0.1.8 and earlier
     protected int teamId = -1;
+    
+    //for reverse compatability
+    private int oldUnitId;
+    private int oldDoctorId;
     
     //days of rest
     protected int daysRest;
@@ -168,6 +173,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         ranks = r;
         doctorId = null;
         unitId = null;
+        oldDoctorId = -1;
+        oldUnitId = -1;
         toughness = 0;
         biography = "";
         resetMinutesLeft();
@@ -644,7 +651,11 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 				} else if (wn2.getNodeName().equalsIgnoreCase("daysRest")) {
 					retVal.daysRest = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("id")) {
-					retVal.id = UUID.fromString(wn2.getTextContent());
+					if(version < 14) {
+						retVal.oldId = Integer.parseInt(wn2.getTextContent());
+					} else {
+						retVal.id = UUID.fromString(wn2.getTextContent());
+					}
 				} else if (wn2.getNodeName().equalsIgnoreCase("teamId")) {
 					retVal.teamId = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("portraitCategory")) {
@@ -660,12 +671,20 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 				} else if (wn2.getNodeName().equalsIgnoreCase("rank")) {
 					retVal.rank = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("doctorId")) {
-					if(!wn2.getTextContent().equals("null")) {
-						retVal.doctorId = UUID.fromString(wn2.getTextContent());
+					if(version < 14) {
+						retVal.oldDoctorId = Integer.parseInt(wn2.getTextContent());
+					} else {
+						if(!wn2.getTextContent().equals("null")) {
+							retVal.doctorId = UUID.fromString(wn2.getTextContent());
+						}
 					}
 				} else if (wn2.getNodeName().equalsIgnoreCase("unitId")) {
-					if(!wn2.getTextContent().equals("null")) {
-						retVal.unitId = UUID.fromString(wn2.getTextContent());
+					if(version < 14) {
+						retVal.oldUnitId = Integer.parseInt(wn2.getTextContent());
+					} else {
+						if(!wn2.getTextContent().equals("null")) {
+							retVal.unitId = UUID.fromString(wn2.getTextContent());
+						}
 					}
 				} else if (wn2.getNodeName().equalsIgnoreCase("status")) {
 					retVal.status = Integer.parseInt(wn2.getTextContent());
@@ -797,6 +816,11 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 			// Or the listed name doesn't exist.
 			// Doh!
 			MekHQ.logError(ex);
+		}
+		
+		if (retVal.id == null) {
+			MekHQ.logMessage("ID not pre-defined; generating person's ID.", 5);
+			retVal.id = UUID.randomUUID();
 		}
 		
 		return retVal;
@@ -1650,5 +1674,14 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     		Skill s = skills.get(skillName);
     		s.updateType();
     	}
+    }
+    
+    public int getOldId() {
+    	return oldId;
+    }
+    
+    public void fixIdReferences(Hashtable<Integer, UUID> uHash, Hashtable<Integer, UUID> pHash) {
+    	unitId = uHash.get(oldUnitId);
+    	doctorId = pHash.get(oldDoctorId);
     }
 }

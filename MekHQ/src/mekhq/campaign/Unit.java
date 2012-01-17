@@ -150,6 +150,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 	private int site;
 	private boolean salvaged;
 	private UUID id;
+	private int oldId;
 	private int quality;
 	
 	//assignments
@@ -160,6 +161,13 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 	private ArrayList<UUID> gunners;
 	private ArrayList<UUID> vesselCrew;
 	private UUID navigator;
+	
+	//old ids for reverse compatability
+	private ArrayList<Integer> oldDrivers;
+	private ArrayList<Integer> oldGunners;
+	private ArrayList<Integer> oldVesselCrew;
+	private Integer oldNavigator;
+	
 	
 	public Campaign campaign;
 
@@ -188,6 +196,10 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 		this.gunners = new ArrayList<UUID>();  
 		this.vesselCrew = new ArrayList<UUID>();    
 		this.navigator = null;
+		this.oldDrivers = new ArrayList<Integer>();
+		this.oldGunners = new ArrayList<Integer>();  
+		this.oldVesselCrew = new ArrayList<Integer>();    
+		this.oldNavigator = -1;
 		scenarioId = -1;
 		this.refit = null;
 		this.engineer = null;
@@ -1012,11 +1024,15 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl) + "</unit>");
 	}
 
-	public static Unit generateInstanceFromXML(Node wn) {
+	public static Unit generateInstanceFromXML(Node wn, int version) {
 		Unit retVal = new Unit();
 		NamedNodeMap attrs = wn.getAttributes();
 		Node idNode = attrs.getNamedItem("id");
-		retVal.id = UUID.fromString(idNode.getTextContent());
+		if(version < 14) {
+			retVal.oldId = Integer.parseInt(idNode.getTextContent());
+		} else {
+			retVal.id = UUID.fromString(idNode.getTextContent());
+		}
 		
 		// Okay, now load Part-specific fields!
 		NodeList nl = wn.getChildNodes();
@@ -1032,14 +1048,30 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 				} else if (wn2.getNodeName().equalsIgnoreCase("pilotId")) {
 					retVal.pilotId = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("driverId")) {
-					retVal.drivers.add(UUID.fromString(wn2.getTextContent()));
+					if(version < 14) {
+						retVal.oldDrivers.add(Integer.parseInt(wn2.getTextContent()));
+					} else {
+						retVal.drivers.add(UUID.fromString(wn2.getTextContent()));
+					}
 				} else if (wn2.getNodeName().equalsIgnoreCase("gunnerId")) {
-					retVal.gunners.add(UUID.fromString(wn2.getTextContent()));
+					if(version < 14) {
+						retVal.oldGunners.add(Integer.parseInt(wn2.getTextContent()));
+					} else {
+						retVal.gunners.add(UUID.fromString(wn2.getTextContent()));
+					}
 				} else if (wn2.getNodeName().equalsIgnoreCase("vesselCrewId")) {
-					retVal.vesselCrew.add(UUID.fromString(wn2.getTextContent()));
+					if(version < 14) {
+						retVal.oldVesselCrew.add(Integer.parseInt(wn2.getTextContent()));
+					} else {
+						retVal.vesselCrew.add(UUID.fromString(wn2.getTextContent()));
+					}
 				} else if (wn2.getNodeName().equalsIgnoreCase("navigatorId")) {
-					if(!wn2.getTextContent().equals("null")) {
-						retVal.navigator = UUID.fromString(wn2.getTextContent());
+					if(version < 14) {
+						retVal.oldNavigator = Integer.parseInt(wn2.getTextContent());
+					} else {
+						if(!wn2.getTextContent().equals("null")) {
+							retVal.navigator = UUID.fromString(wn2.getTextContent());
+						}
 					}
 				} else if (wn2.getNodeName().equalsIgnoreCase("forceId")) {
 					retVal.forceId = Integer.parseInt(wn2.getTextContent());
@@ -1052,17 +1084,18 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 						retVal.salvaged = false;
 				} else if (wn2.getNodeName().equalsIgnoreCase("entity")) {
 					retVal.entity = MekHqXmlUtil.getEntityFromXmlString(wn2);
-					if (retVal.id == null && retVal.entity != null) {
-						MekHQ.logMessage("ID not pre-defined and entity not null; setting unit's ID.", 5);
-						retVal.id = UUID.randomUUID();
-					}
 				} else if (wn2.getNodeName().equalsIgnoreCase("refit")) {
-					retVal.refit = Refit.generateInstanceFromXML(wn2, retVal);
+					retVal.refit = Refit.generateInstanceFromXML(wn2, retVal, version);
 				}
 			}
 		} catch (Exception ex) {
 			// Doh!
 			MekHQ.logError(ex);
+		}
+		
+		if (retVal.id == null) {
+			MekHQ.logMessage("ID not pre-defined; generating unit's ID.", 5);
+			retVal.id = UUID.randomUUID();
 		}
 		
 		return retVal;
@@ -2129,5 +2162,36 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     public Person getEngineer() {
     	return engineer;
     }
+    
+    public int getOldId() {
+    	return oldId;
+    }
  
+    public void fixIdReferences(Hashtable<Integer, UUID> uHash, Hashtable<Integer, UUID> peopleHash) {
+    	for(int oid : oldDrivers) {
+    		UUID nid = peopleHash.get(oid);
+    		if(null != nid) {
+    			drivers.add(peopleHash.get(oid));
+    		}
+    	}
+    	if(!usesSoloPilot()) {
+    		for(int oid : oldGunners) {
+        		UUID nid = peopleHash.get(oid);
+        		if(null != nid) {
+        			gunners.add(peopleHash.get(oid));
+        		}
+        	}
+    		for(int oid : oldVesselCrew) {
+        		UUID nid = peopleHash.get(oid);
+        		if(null != nid) {
+        			vesselCrew.add(peopleHash.get(oid));
+        		}
+        	}
+    		navigator = peopleHash.get(oldNavigator);		
+    	}
+    	if(null != refit) {
+    		refit.fixIdReferences(uHash, peopleHash);
+    	}
+    }
+     
 }

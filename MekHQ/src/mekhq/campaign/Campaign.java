@@ -1778,17 +1778,17 @@ public class Campaign implements Serializable {
 				} else if (xn.equalsIgnoreCase("info")) {
 					processInfoNode(retVal, wn);
 				} else if (xn.equalsIgnoreCase("parts")) {
-					processPartNodes(retVal, wn);
+					processPartNodes(retVal, wn, v);
 				} else if (xn.equalsIgnoreCase("personnel")) {
 					processPersonnelNodes(retVal, wn, v);
 				} else if (xn.equalsIgnoreCase("teams")) {
 					processTeamNodes(retVal, wn);
 				} else if (xn.equalsIgnoreCase("units")) {
-					processUnitNodes(retVal, wn);
+					processUnitNodes(retVal, wn, v);
 				} else if (xn.equalsIgnoreCase("missions")) {
 					processMissionNodes(retVal, wn);
 				} else if (xn.equalsIgnoreCase("forces")) {
-					processForces(retVal, wn);
+					processForces(retVal, wn, v);
 				} else if (xn.equalsIgnoreCase("finances")) {
 					processFinances(retVal, wn);
 				} else if(xn.equalsIgnoreCase("location")) {
@@ -1798,7 +1798,7 @@ public class Campaign implements Serializable {
 				} else if(xn.equalsIgnoreCase("gameOptions")) {
 					processGameOptionNodes(retVal, wn);
 				} else if(xn.equalsIgnoreCase("kills")) {
-					processKillNodes(retVal, wn);
+					processKillNodes(retVal, wn, v);
 				}
 				
 			} else {
@@ -1812,6 +1812,12 @@ public class Campaign implements Serializable {
 		// Okay, after we've gone through all the nodes and constructed the Campaign object...
 		// We need to do a post-process pass to restore a number of references.
 
+		//if the version is earlier than 0.1.14, then we need to replace all the old integer
+		//ids of units and personnel with their UUIDs where they are referenced. 
+		if(v < 14) {
+			fixIdReferences(retVal);
+		}
+		
 		// First, iterate through Support Teams;
 		// they have a reference to the Campaign object.
 		for (int x=0; x<retVal.teams.size(); x++) {
@@ -1971,6 +1977,32 @@ public class Campaign implements Serializable {
 		return retVal;
 	}
 
+	private static void fixIdReferences(Campaign retVal) {
+		//set up translation hashes
+		Hashtable<Integer, UUID> uHash = new Hashtable<Integer, UUID>();
+		Hashtable<Integer, UUID> pHash = new Hashtable<Integer, UUID>();
+		for(Unit u : retVal.units) {
+			uHash.put(u.getOldId(), u.getId());
+		}
+		for(Person p : retVal.personnel) {
+			pHash.put(p.getOldId(), p.getId());
+		}
+		//ok now go through and fix
+		for(Unit u : retVal.units) {
+			u.fixIdReferences(uHash, pHash);
+		}
+		for(Person p : retVal.personnel) {
+			p.fixIdReferences(uHash, pHash);
+		}
+		retVal.forces.fixIdReferences(uHash);
+		for(Part p : retVal.parts) {
+			p.fixIdReferences(uHash, pHash);
+		}
+		for(Kill k : retVal.kills) {
+			k.fixIdReferences(pHash);
+		}
+	}
+	
 	private static void processFinances(Campaign retVal, Node wn) {
 		MekHQ.logMessage("Loading Finances from XML...", 4);
 		retVal.finances = Finances.generateInstanceFromXML(wn);
@@ -1978,7 +2010,7 @@ public class Campaign implements Serializable {
 	}
 
 	
-	private static void processForces(Campaign retVal, Node wn) {
+	private static void processForces(Campaign retVal, Node wn, int version) {
 		MekHQ.logMessage("Loading Force Organization from XML...", 4);
 
 		NodeList wList = wn.getChildNodes();
@@ -2001,7 +2033,7 @@ public class Campaign implements Serializable {
 			}
 			
 			if(!foundForceAlready)  {
-				Force f = Force.generateInstanceFromXML(wn2, retVal);
+				Force f = Force.generateInstanceFromXML(wn2, retVal, version);
 				if(null != f) {
 					retVal.forces = f;
 					foundForceAlready = true;
@@ -2076,7 +2108,7 @@ public class Campaign implements Serializable {
 		MekHQ.logMessage("Load Skill Type Nodes Complete!", 4);
 	}
 	
-	private static void processKillNodes(Campaign retVal, Node wn) {
+	private static void processKillNodes(Campaign retVal, Node wn, int version) {
 		MekHQ.logMessage("Loading Kill Nodes from XML...", 4);
 
 		NodeList wList = wn.getChildNodes();
@@ -2097,7 +2129,7 @@ public class Campaign implements Serializable {
 				continue;
 			}
 
-			retVal.kills.add(Kill.generateInstanceFromXML(wn2));
+			retVal.kills.add(Kill.generateInstanceFromXML(wn2, version));
 		}
 
 		MekHQ.logMessage("Load Kill Nodes Complete!", 4);
@@ -2278,7 +2310,7 @@ public class Campaign implements Serializable {
 		MekHQ.logMessage("Load Team Nodes Complete!", 4);
 	}
 
-	private static void processUnitNodes(Campaign retVal, Node wn) {
+	private static void processUnitNodes(Campaign retVal, Node wn, int version) {
 		MekHQ.logMessage("Loading Unit Nodes from XML...", 4);
 
 		NodeList wList = wn.getChildNodes();
@@ -2299,7 +2331,7 @@ public class Campaign implements Serializable {
 				continue;
 			}
 
-			Unit u = Unit.generateInstanceFromXML(wn2);
+			Unit u = Unit.generateInstanceFromXML(wn2, version);
 			
 			if (u != null) {
 				retVal.addUnit(u);
@@ -2309,7 +2341,7 @@ public class Campaign implements Serializable {
 		MekHQ.logMessage("Load Unit Nodes Complete!", 4);
 	}
 
-	private static void processPartNodes(Campaign retVal, Node wn) {
+	private static void processPartNodes(Campaign retVal, Node wn, int version) {
 		MekHQ.logMessage("Loading Part Nodes from XML...", 4);
 
 		NodeList wList = wn.getChildNodes();
@@ -2330,7 +2362,7 @@ public class Campaign implements Serializable {
 				continue;
 			}
 
-			Part p = Part.generateInstanceFromXML(wn2);
+			Part p = Part.generateInstanceFromXML(wn2, version);
 			
 			//deal with the Weapon as Heat Sink problem from earlier versions
 			if(p instanceof HeatSink && !p.getName().contains("Heat Sink")) {

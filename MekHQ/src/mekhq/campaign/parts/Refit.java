@@ -28,6 +28,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -104,6 +105,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 	private boolean sameArmorType;
 		
 	private UUID assignedTechId;
+	private int oldTechId = -1;
 	
 	public Refit() {
 		oldUnitParts = new ArrayList<Integer>();
@@ -1130,7 +1132,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl) + "</refit>");
 	}
 	
-	public static Refit generateInstanceFromXML(Node wn, Unit u) {
+	public static Refit generateInstanceFromXML(Node wn, Unit u, int version) {
 		Refit retVal = new Refit();
 		retVal.oldUnit = u;
 		
@@ -1151,7 +1153,11 @@ public class Refit implements IPartWork, IAcquisitionWork {
 				} else if (wn2.getNodeName().equalsIgnoreCase("newArmorSuppliesId")) {
 					retVal.newArmorSuppliesId = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("assignedTechId")) {
-					retVal.assignedTechId = UUID.fromString(wn2.getTextContent());
+					if(version < 14) {
+						retVal.oldTechId = Integer.parseInt(wn2.getTextContent());
+					} else {
+						retVal.assignedTechId = UUID.fromString(wn2.getTextContent());
+					}
 				} else if (wn2.getNodeName().equalsIgnoreCase("failedCheck")) {
 					if (wn2.getTextContent().equalsIgnoreCase("true"))
 						retVal.failedCheck = true;
@@ -1193,9 +1199,9 @@ public class Refit implements IPartWork, IAcquisitionWork {
 						}
 					}
 				} else if (wn2.getNodeName().equalsIgnoreCase("shoppingList")) {
-					processShoppingList(retVal, wn2, retVal.oldUnit);
+					processShoppingList(retVal, wn2, retVal.oldUnit, version);
 				} else if (wn2.getNodeName().equalsIgnoreCase("newArmorSupplies")) {
-					processArmorSupplies(retVal, wn2);
+					processArmorSupplies(retVal, wn2, version);
 				}
 			}
 		} catch (Exception ex) {
@@ -1206,7 +1212,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 		return retVal;
 	}
 	
-	private static void processShoppingList(Refit retVal, Node wn, Unit u) {
+	private static void processShoppingList(Refit retVal, Node wn, Unit u, int version) {
 
 		NodeList wList = wn.getChildNodes();
 		
@@ -1225,7 +1231,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 
 				continue;
 			}
-			Part p = Part.generateInstanceFromXML(wn2);
+			Part p = Part.generateInstanceFromXML(wn2, version);
 			p.setUnit(u);
 			
 			if (p != null) {
@@ -1234,7 +1240,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 		}
 	}
 	
-	private static void processArmorSupplies(Refit retVal, Node wn) {
+	private static void processArmorSupplies(Refit retVal, Node wn, int version) {
 
 		NodeList wList = wn.getChildNodes();
 		
@@ -1253,7 +1259,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 
 				continue;
 			}
-			Part p = Part.generateInstanceFromXML(wn2);
+			Part p = Part.generateInstanceFromXML(wn2, version);
 			
 			if (p != null && p instanceof Armor) {
 				retVal.newArmorSupplies = (Armor)p;
@@ -1388,5 +1394,15 @@ public class Refit implements IPartWork, IAcquisitionWork {
 	public int getTechLevel() {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+	
+	public void fixIdReferences(Hashtable<Integer, UUID> uHash, Hashtable<Integer, UUID> pHash) {
+		assignedTechId = pHash.get(oldTechId);
+		if(null != newArmorSupplies) {
+			newArmorSupplies.fixIdReferences(uHash, pHash);
+		}
+		for(Part p : shoppingList) {
+			p.fixIdReferences(uHash, pHash);
+		}
 	}
 }

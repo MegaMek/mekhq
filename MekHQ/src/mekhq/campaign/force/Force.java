@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.UUID;
 import java.util.Vector;
 
@@ -66,6 +67,7 @@ public class Force implements Serializable {
 	private Force parentForce;
 	private Vector<Force> subForces;
 	private Vector<UUID> units;
+	private Vector<Integer> oldUnits;
 	private int scenarioId;
 
 	//an ID so that forces can be tracked in Campaign hash
@@ -77,6 +79,7 @@ public class Force implements Serializable {
 		this.parentForce = null;
 		this.subForces = new Vector<Force>();
 		this.units = new Vector<UUID>();
+		this.oldUnits = new Vector<Integer>();
 		this.scenarioId = -1;
 	}
 	
@@ -335,7 +338,7 @@ public class Force implements Serializable {
 		
 	}
 	
-	public static Force generateInstanceFromXML(Node wn, Campaign c) {
+	public static Force generateInstanceFromXML(Node wn, Campaign c, int version) {
 		Force retVal = null;
 		NamedNodeMap attrs = wn.getAttributes();
 		Node idNameNode = attrs.getNamedItem("id");
@@ -359,7 +362,7 @@ public class Force implements Serializable {
 				} else if (wn2.getNodeName().equalsIgnoreCase("scenarioId")) {
 					retVal.scenarioId = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("units")) {
-						processUnitNodes(retVal, wn2);
+						processUnitNodes(retVal, wn2, version);
 				} else if (wn2.getNodeName().equalsIgnoreCase("subforces")) {
 					NodeList nl2 = wn2.getChildNodes();
 					for (int y=0; y<nl2.getLength(); y++) {
@@ -375,7 +378,7 @@ public class Force implements Serializable {
 							continue;
 						}
 						
-						retVal.addSubForce(generateInstanceFromXML(wn3, c), true);
+						retVal.addSubForce(generateInstanceFromXML(wn3, c, version), true);
 					}
 				}
 			}	
@@ -390,7 +393,7 @@ public class Force implements Serializable {
 		return retVal;
 	}
 	
-	private static void processUnitNodes(Force retVal, Node wn) {
+	private static void processUnitNodes(Force retVal, Node wn, int version) {
 	
 		NodeList nl = wn.getChildNodes();
 		for (int x=0; x<nl.getLength(); x++) {
@@ -400,7 +403,11 @@ public class Force implements Serializable {
 			NamedNodeMap attrs = wn2.getAttributes();
 			Node classNameNode = attrs.getNamedItem("id");
 			String idString = classNameNode.getTextContent();
-			retVal.addUnit(UUID.fromString(idString));			
+			if(version < 14) {
+				retVal.oldUnits.add(Integer.parseInt(idString));
+			} else {
+				retVal.addUnit(UUID.fromString(idString));	
+			}
 		}
 	}
 	
@@ -436,5 +443,17 @@ public class Force implements Serializable {
     public boolean equals(Object o) {
     	return o instanceof Force && ((Force)o).getId() == id && ((Force)o).getFullName().equals(getFullName());
     }
+	
+	public void fixIdReferences(Hashtable<Integer, UUID> uHash) {
+		for(int oid : oldUnits) {
+			UUID nid = uHash.get(oid);
+			if(null != nid) {
+				units.add(nid);
+			}
+		}
+		for(Force sub : subForces) {
+			sub.fixIdReferences(uHash);
+		}
+	}
 	
 }

@@ -25,6 +25,7 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Hashtable;
 import java.util.UUID;
 
 import mekhq.MekHQ;
@@ -48,6 +49,9 @@ public class Kill implements Serializable {
 	private Date date;
 	private String killed;
 	private String killer;
+	
+	//reverse compatability
+	private int oldPilotId = -1;
 	
 	public Kill() {
 	
@@ -76,7 +80,7 @@ public class Kill implements Serializable {
 		return killer;
 	}
 	
-	public static Kill generateInstanceFromXML(Node wn) {
+	public static Kill generateInstanceFromXML(Node wn, int version) {
 	
 		Kill retVal = null;
 		try {
@@ -88,7 +92,11 @@ public class Kill implements Serializable {
 				if (wn2.getNodeName().equalsIgnoreCase("killed")) {
 					retVal.killed = wn2.getTextContent();
 				} else if (wn2.getNodeName().equalsIgnoreCase("pilotId")) {
-					retVal.pilotId = UUID.fromString(wn2.getTextContent());
+					if(version < 14) {
+						retVal.oldPilotId = Integer.parseInt(wn2.getTextContent());
+					} else {
+						retVal.pilotId = UUID.fromString(wn2.getTextContent());
+					}
 				} else if (wn2.getNodeName().equalsIgnoreCase("killer")) {
 					retVal.killer = (wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("date")) {
@@ -127,5 +135,9 @@ public class Kill implements Serializable {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "</kill>");
 		
 	}
+	
+	public void fixIdReferences(Hashtable<Integer, UUID> pHash) {
+    	pilotId = pHash.get(oldPilotId);
+    }
 	
 }
