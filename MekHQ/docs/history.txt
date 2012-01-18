@@ -10,6 +10,7 @@ v0.1.14 (SVN)
 + Bug 3472687: External ID Conflict when managing both players with HQ
 + updated MM.jar for string external ids
 + proper faction object, indexed by string
++ option to disallow the purchase of star league era mechs
 
 
 v0.1.13 (2012-01-11)

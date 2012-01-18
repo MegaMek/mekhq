@@ -138,6 +138,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         allowClanPurchasesBox.setSelected(options.allowClanPurchases());
         allowISPurchasesBox.setSelected(options.allowISPurchases());
         allowCanonOnlyBox.setSelected(options.allowCanonOnly());
+        disallowSLUnitsBox.setSelected(options.disallowStarLeagueUnits());
+
 
         useQuirksBox.setSelected(options.useQuirks());
 
@@ -208,6 +210,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         allowClanPurchasesBox = new javax.swing.JCheckBox();
         allowISPurchasesBox = new javax.swing.JCheckBox();
         allowCanonOnlyBox = new javax.swing.JCheckBox();
+        disallowSLUnitsBox = new javax.swing.JCheckBox();
         choiceTechLevel = new javax.swing.JComboBox();
         btnOkay = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
@@ -415,6 +418,17 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panTech.add(allowCanonOnlyBox, gridBagConstraints);
         
+        disallowSLUnitsBox.setText(resourceMap.getString("disallowSLUnitsBox.text")); // NOI18N
+        disallowSLUnitsBox.setToolTipText(resourceMap.getString("disallowSLUnitsBox.toolTipText")); // NOI18N
+        disallowSLUnitsBox.setName("disallowSLUnitsBox"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panTech.add(disallowSLUnitsBox, gridBagConstraints);
+        
         DefaultComboBoxModel techLevelComboBoxModel = new DefaultComboBoxModel();
         for (int i=0;i<3; i++) {
             techLevelComboBoxModel.addElement(CampaignOptions.getTechLevelName(i));
@@ -425,7 +439,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         choiceTechLevel.setSelectedIndex(options.getTechLevel());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panTech.add(choiceTechLevel, gridBagConstraints);
@@ -434,7 +448,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         lblTechLevel.setName("lblTechLevel"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panTech.add(lblTechLevel, gridBagConstraints);
@@ -1317,6 +1331,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 	    options.setAllowClanPurchases(allowClanPurchasesBox.isSelected());
 	    options.setAllowISPurchases(allowISPurchasesBox.isSelected());
 	    options.setAllowCanonOnly(allowCanonOnlyBox.isSelected());
+	    options.setDisallowStarLeagueUnits(disallowSLUnitsBox.isSelected());
 	    if(!allowCanonOnlyBox.isSelected()) {
 	    	campaign.getGameOptions().getOption("canon_only").setValue(false);
 	    }
@@ -1667,6 +1682,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private javax.swing.JCheckBox allowClanPurchasesBox;
     private javax.swing.JCheckBox allowISPurchasesBox;
     private javax.swing.JCheckBox allowCanonOnlyBox;
+    private javax.swing.JCheckBox disallowSLUnitsBox;
     private javax.swing.JLabel lblTechLevel;
     private javax.swing.JComboBox choiceTechLevel;
     
