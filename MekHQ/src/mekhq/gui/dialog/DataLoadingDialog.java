@@ -39,6 +39,7 @@ import javax.swing.SwingWorker;
 import megamek.common.MechSummaryCache;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.Faction;
 import mekhq.campaign.Planets;
 
 public class DataLoadingDialog extends JDialog implements PropertyChangeListener {
@@ -107,6 +108,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         public Void doInBackground() {
             //Initialize progress property.
             setProgress(0);
+            Faction.generateFactions();
             while (!Planets.getInstance().isInitialized()) {
                 //Sleep for up to one second.
                 try {
@@ -164,6 +166,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         			cancelled = true;
         			cancel(true);
         		} else {
+        			campaign.setStartingPlanet();
         			campaign.addReport("<b>" + campaign.getDateAsString() + "</b>");
         		}
             }

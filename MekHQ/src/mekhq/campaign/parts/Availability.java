@@ -64,62 +64,6 @@ public class Availability {
         
         return modifier;
     }
-	
-	 /**
-     * This method genereates an availability modifier based on the tech base / tech rating of the part used relative to the faction / location of the player
-     *
-     * @param part
-     * @param availableCodeHelper
-     * @param campaign
-     * @return
-     */
-    public static int getFactionAndTechMod (Part part, Campaign campaign) {
-
-        int currentFaction = campaign.getFaction();
-        int currentYear = campaign.getCalendar().get(Calendar.YEAR);
-        
-        int techRating = part.getTechRating();
-        
-        // Change to reflect current location
-        // NO, NO, NO - we are not ready to assign a location to the campaign
-        // and assuming faction=location is not an acceptable substitute
-        //int currentLocation = currentFaction;
-
-        int factionMod = 0;
-        if (part.isClanTechBase() && !Faction.isClanFaction(currentFaction)) {
-            // Availability of clan tech for IS
-            if (currentYear<3050)
-                // Impossible to buy before clan invasion
-                factionMod = 12;
-            else if (currentYear<=3052)
-                // Between begining of clan invasiuon and tukayyid, very very hard to buy
-                factionMod = 5;
-            else if (currentYear<=3060)
-                // Between tukayyid and great refusal, very hard to buy
-                factionMod = 4;
-            else
-                // After great refusal, hard to buy
-                factionMod = 3;
-        }
-        
-        /*
-        if (!part.isClanTechBase()) {
-            // Availability of high tech rating equipment in low tech areas (periphery)
-            switch (techRating) {
-                case(EquipmentType.RATING_E) :
-                    if (Faction.isPeripheryFaction(currentLocation))
-                        factionMod += 1;
-                    break;
-                case(EquipmentType.RATING_F) :
-                    if (Faction.isPeripheryFaction(currentLocation))
-                        factionMod += 2;
-                    break;
-            }
-        }
-        */
-
-        return factionMod;
-    }
     
 	public static int getTechModifier(int tech) {
         int modifier = 999;

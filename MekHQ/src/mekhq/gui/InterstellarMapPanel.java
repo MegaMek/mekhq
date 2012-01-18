@@ -186,7 +186,7 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
                 	JMenu zMenu = new JMenu("Z");
                 	for(int i = 0; i < planets.size(); i++) {
                 		Planet p = planets.get(i);
-                		item = new JMenuItem(p.getName() + " (" + Faction.getFactionName(p.getBaseFaction()) + ")");
+                		item = new JMenuItem(p.getName() + " (" + p.getBaseFaction().getFullName() + ")");
     					item.setActionCommand(Integer.toString(i));
             			item.addActionListener(new ActionListener() {
                             public void actionPerformed(ActionEvent ae) {
@@ -557,7 +557,14 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
 				arc.setArcByCenter(x, y, size * 1.2, 0, 360, Arc2D.OPEN);
 				g2.fill(arc);
 			}
-			g2.setPaint(Faction.getFactionColor(planet.getCurrentFaction(campaign.getCalendar().getTime())));
+			if(planet.getName().equals("St. Loris")) {
+				int bob = 1;
+			}
+			Faction faction = planet.getCurrentFaction(campaign.getCalendar().getTime());
+			if(null == faction) {
+				int bob = 1;
+			}
+			g2.setPaint(faction.getColor());
 			arc.setArcByCenter(x, y, size, 0, 360, Arc2D.OPEN);
 			g2.fill(arc);
 			

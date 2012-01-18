@@ -86,7 +86,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private Hashtable<String, JSpinner> hashVetSkill;
     private Hashtable<String, JSpinner> hashEliteSkill;
     private boolean cancelled;
-
     
     /** Creates new form CampaignOptionsDialog */
     public CampaignOptionsDialog(java.awt.Frame parent, boolean modal, Campaign c, DirectoryItems camos) {
@@ -288,10 +287,10 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panGeneral.add(btnDate, gridBagConstraints);
 
         DefaultComboBoxModel factionModel = new DefaultComboBoxModel();
-        for(int i = 0; i < Faction.F_NUM; i++) {
-            factionModel.addElement(Faction.getFactionName(i));
+        for(String sname : Faction.choosableFactionCodes) {
+            factionModel.addElement(Faction.getFaction(sname).getFullName());
         }
-        factionModel.setSelectedItem(campaign.getFactionName());
+        factionModel.setSelectedItem(campaign.getFaction().getFullName());
         comboFaction.setModel(factionModel);
         comboFaction.setMinimumSize(new java.awt.Dimension(400, 30));
         comboFaction.setName("comboFaction"); // NOI18N
@@ -1166,7 +1165,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 	}
 
 	private void switchFaction() {
-		String factionCode = Faction.getFactionCodeForNameGenerator(comboFaction.getSelectedIndex());
+		String factionCode = Faction.getFaction(Faction.choosableFactionCodes[comboFaction.getSelectedIndex()]).getNameGenerator();
 		boolean found = false;
 		for (Iterator<String> i = campaign.getRNG().getFactions(); i.hasNext(); ) {
             String nextFaction = (String) i.next();
@@ -1219,7 +1218,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 	        this.setVisible(false);
 	    }
 	    campaign.calendar = date;
-	    campaign.setFaction(comboFaction.getSelectedIndex());
+	    campaign.setFactionCode(Faction.choosableFactionCodes[comboFaction.getSelectedIndex()]);
 	    if(null != comboFactionNames.getSelectedItem()) {
 	    	campaign.getRNG().setChosenFaction((String)comboFactionNames.getSelectedItem());
 	    }

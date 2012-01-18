@@ -38,6 +38,7 @@ public class Era {
     public static final int E_4SW   = 6;
     public static final int E_CLAN  = 7;
     public static final int E_JIHAD = 8;
+    public static final int E_NUM   = 9;
     
     public static int getEra(int year) {
         if(year < 2570) {
@@ -121,90 +122,6 @@ public class Era {
         default:
             return -1;
     	}
-    }
-    
-    public static int getEraMod(int era, int faction) {
-        if(faction == Faction.F_COMSTAR || Faction.isClanFaction(faction) || faction == Faction.F_WOB) {
-            return 0;
-        }
-        switch(era) {
-            case E_AOW:
-            case E_RW:
-                if(faction == Faction.F_CAPCON
-                        || faction == Faction.F_OA 
-                        || faction == Faction.F_CANOPUS
-                        || faction == Faction.F_RWR
-                        || faction == Faction.F_PERIPHERY
-                        || faction == Faction.F_MERC) {
-                    return 1;
-                }
-                else if(faction == Faction.F_TERRAN) {
-                    return -1;
-                }
-                else {
-                    return 0;
-                }        
-            case E_SL:
-                if(faction == Faction.F_TC
-                        || faction == Faction.F_OA 
-                        || faction == Faction.F_CANOPUS
-                        || faction == Faction.F_RWR
-                        || faction == Faction.F_PERIPHERY
-                        || faction == Faction.F_MERC) {
-                    return 1;
-                }
-                else if(faction == Faction.F_TERRAN) {
-                    return -1;
-                }
-                else {
-                    return 0;
-                }     
-            case E_1SW:
-                return 1;
-            case E_2SW:
-                return 2;
-            case E_3SW:
-                if(faction == Faction.F_DRAC
-                        || faction == Faction.F_FEDSUN) {
-                    return 2;
-                }
-                else {
-                    return 3;
-                }
-            case E_4SW:
-                if(faction == Faction.F_DRAC
-                        || faction == Faction.F_FEDSUN
-                        || faction == Faction.F_FWL) {
-                    return 1;
-                }
-                else {
-                    return 2;
-                }
-            case E_CLAN:
-                if(faction == Faction.F_DRAC
-                        || faction == Faction.F_FEDSUN
-                        || faction == Faction.F_FWL
-                        || faction == Faction.F_LYRAN) {
-                    return 0;
-                }
-                else if(faction == Faction.F_PERIPHERY) {
-                    return 2;
-                }
-                else {
-                    return 1;
-                }
-            case E_JIHAD:
-                if(faction == Faction.F_CANOPUS
-                        || faction == Faction.F_PERIPHERY) {
-                    return 1;
-                }
-                else {
-                    return 0;
-                }
-            default:
-                return 0;
-        } 
-        
     }
     
 }

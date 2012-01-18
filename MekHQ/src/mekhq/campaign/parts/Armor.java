@@ -544,7 +544,7 @@ public class Armor extends Part implements IAcquisitionWork {
         // Faction and Tech mod
         int factionMod = 0;
         if (campaign.getCampaignOptions().useFactionModifiers()) {
-        	factionMod = Availability.getFactionAndTechMod(this, campaign);
+        	factionMod = campaign.getFaction().getTechMod(this, campaign);
         }   
         //availability mod
         int avail = getAvailability(campaign.getEra());

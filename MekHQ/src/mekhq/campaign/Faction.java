@@ -22,241 +22,396 @@
 package mekhq.campaign;
 
 import java.awt.Color;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Hashtable;
+
+import mekhq.campaign.parts.Part;
 
 /**
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class Faction {
+	
+	public static Hashtable<String, Faction> factions;
+	public static final String[] choosableFactionCodes = {"MERC","CC","DC","FS","FWL","LA","FC","ROS","CS","WOB","FRR","SIC","MOC","MH","OA","TC","CDS","CGB","CHH","CJF","CNC","CSJ","CSV","CW","TH","RWR"};
+	
+	//I am no longer using ints to define factions, but I am keeping 
+	//this stuff for reference
+	public static final int F_MERC      = 0;
+	public static final int F_CAPCON    = 1;
+	public static final int F_DRAC      = 2;
+	public static final int F_FEDSUN    = 3;
+	public static final int F_FWL       = 4;
+	public static final int F_LYRAN     = 5;
+	public static final int F_FEDCOM    = 6;
+	public static final int F_ROS       = 7;
+	public static final int F_COMSTAR   = 8;
+	public static final int F_WOB       = 9;
+	public static final int F_FRR       = 10;
+	public static final int F_SIC       = 11;
+	public static final int F_CANOPUS   = 12;
+	public static final int F_OA        = 13;
+	public static final int F_TC        = 14;
+	public static final int F_MH        = 15;
+	public static final int F_CHAOS     = 16;
+	public static final int F_ARDC      = 17;
+	public static final int F_TERRAN    = 18;
+	public static final int F_RWR       = 19;
+	public static final int F_PERIPHERY = 20;
+	public static final int F_C_WOLF    = 21;
+	public static final int F_C_JF      = 22;
+	public static final int F_C_GB      = 23;
+	public static final int F_C_SJ      = 24;
+	public static final int F_C_NC      = 25;
+	public static final int F_C_DS      = 26;
+	public static final int F_C_SV      = 27;
+	public static final int F_C_HH      = 28;
+	public static final int F_C_OTHER   = 29;
+	public static final int F_NUM       = 30;    
+	
+	private String shortname;
+	private String fullname;
+	private Color color;
+	private String nameGenerator;
+	private boolean clan;
+	private boolean periphery;
+	private String[] startingPlanet;
+	private int[] eraMods;
+	
+	public Faction() {
+		this("???", "Unknown");
+	}
+	
+	public Faction(String sname, String fname) {
+		shortname = sname;
+		fullname = fname;
+		nameGenerator = "General";
+		clan = false;
+		periphery = false;
+		color = Color.LIGHT_GRAY;
+		startingPlanet = new String[]{"Terra","Terra","Terra","Terra","Terra","Terra","Terra","Terra","Terra"};
+		eraMods = new int[]{0,0,0,0,0,0,0,0,0};
+	}
 
-	//5/4/2011 - I am changing factions so that they line 
-	//up with all the possible factions identifiable on the 
-	//Interstellar Map
-    public static final int F_MERC      = 0;
-    public static final int F_CAPCON    = 1;
-    public static final int F_DRAC      = 2;
-    public static final int F_FEDSUN    = 3;
-    public static final int F_FWL       = 4;
-    public static final int F_LYRAN     = 5;
-    public static final int F_FEDCOM    = 6;
-    public static final int F_ROS       = 7;
-    public static final int F_COMSTAR   = 8;
-    public static final int F_WOB       = 9;
-    public static final int F_FRR       = 10;
-    public static final int F_SIC       = 11;
-    public static final int F_CANOPUS   = 12;
-    public static final int F_OA        = 13;
-    public static final int F_TC        = 14;
-    public static final int F_MH        = 15;
-    public static final int F_CHAOS     = 16;
-    public static final int F_ARDC      = 17;
-    public static final int F_TERRAN    = 18;
-    public static final int F_RWR       = 19;
-    public static final int F_PERIPHERY = 20;
-    public static final int F_C_WOLF    = 21;
-    public static final int F_C_JF      = 22;
-    public static final int F_C_GB      = 23;
-    public static final int F_C_SJ      = 24;
-    public static final int F_C_NC      = 25;
-    public static final int F_C_DS      = 26;
-    public static final int F_C_SV      = 27;
-    public static final int F_C_HH      = 28;
-    public static final int F_C_OTHER   = 29;
-    public static final int F_NUM       = 30;
-    
-    public static String getFactionName(int faction) {
+	public String getShortName() {
+		return shortname;
+	}
+	
+	public String getFullName() {
+		return fullname;
+	}
+	
+	public Color getColor() {
+		return color;
+	}
+	
+	public boolean isClan() {
+		return clan;
+	}
+	
+	public boolean isPeriphery() {
+		return periphery;
+	}
+	
+	public String getNameGenerator() {
+		return nameGenerator;
+	}
+	
+	public String getStartingPlanet(int era) {
+		return startingPlanet[era];
+	}
+	
+	public int getEraMod(int era) {
+		return eraMods[era];
+	}
+	
+	public int getTechMod(Part part, Campaign campaign) {
+		int currentYear = campaign.getCalendar().get(Calendar.YEAR);
+        
+        // Change to reflect current location
+        // NO, NO, NO - we are not ready to assign a location to the campaign
+        // and assuming faction=location is not an acceptable substitute
+        //int currentLocation = currentFaction;
+
+        int factionMod = 0;
+        if (part.isClanTechBase() && !isClan()) {
+            // Availability of clan tech for IS
+            if (currentYear<3050)
+                // Impossible to buy before clan invasion
+                factionMod = 12;
+            else if (currentYear<=3052)
+                // Between begining of clan invasiuon and tukayyid, very very hard to buy
+                factionMod = 5;
+            else if (currentYear<=3060)
+                // Between tukayyid and great refusal, very hard to buy
+                factionMod = 4;
+            else
+                // After great refusal, hard to buy
+                factionMod = 3;
+        }
+        
+        /*
+        if (!part.isClanTechBase()) {
+            // Availability of high tech rating equipment in low tech areas (periphery)
+            switch (techRating) {
+                case(EquipmentType.RATING_E) :
+                    if (Faction.isPeripheryFaction(currentLocation))
+                        factionMod += 1;
+                    break;
+                case(EquipmentType.RATING_F) :
+                    if (Faction.isPeripheryFaction(currentLocation))
+                        factionMod += 2;
+                    break;
+            }
+        }
+        */
+
+        return factionMod;
+	}
+	
+	public static void generateFactions() {
+		//TODO: I should put factions in an editable XML file
+		factions = new Hashtable<String, Faction>();
+		Faction faction;
+		faction = new Faction("MERC", "Mercenary");
+		faction.startingPlanet = new String[]{"Galatea","Solaris VII","Galatea","Galatea","Galatea","Galatea","Outreach","Outreach","Outreach"};
+		faction.eraMods = new int[]{1,1,1,1,2,3,2,1,0};
+		addFaction(faction);
+		faction = new Faction("CC", "Cappellan Confederation");
+		faction.color = Color.GREEN;
+		faction.nameGenerator = "CC";
+		faction.startingPlanet = new String[]{"Sian","Sian","Sian","Sian","Sian","Sian","Sian","Sian","Sian"};
+		faction.eraMods = new int[]{1,0,0,1,2,3,2,1,0};
+		addFaction(faction);
+		faction = new Faction("DC", "Draconis Combine");
+		faction.color = Color.red;
+		faction.nameGenerator = "DC";
+		faction.startingPlanet = new String[]{"New Samarkand","Luthien","Luthien","Luthien","Luthien","Luthien","Luthien","Luthien","Luthien"};
+		faction.eraMods = new int[]{0,0,0,1,2,2,1,0,0};
+		addFaction(faction);
+		faction = new Faction("FS", "Federated Suns");
+		faction.color = Color.yellow;
+		faction.nameGenerator = "FS";
+		faction.startingPlanet = new String[]{"New Avalon","New Avalon","New Avalon","New Avalon","New Avalon","New Avalon","New Avalon","New Avalon","New Avalon"};
+		faction.eraMods = new int[]{0,0,0,1,2,2,1,0,0};
+		addFaction(faction);
+		faction = new Faction("FWL", "Free Worlds League");
+		faction.color = new Color(160,32,240);
+		faction.nameGenerator = "FWL";
+		faction.startingPlanet = new String[]{"Atreus (Free Worlds League)","Atreus (Free Worlds League)","Atreus (Free Worlds League)","Atreus (Free Worlds League)","Atreus (Free Worlds League)","Atreus (Free Worlds League)","Atreus (Free Worlds League)","Atreus (Free Worlds League)","Atreus (Free Worlds League)"};
+		faction.eraMods = new int[]{0,0,0,1,2,3,1,1,0};
+		addFaction(faction);
+		faction = new Faction("LA", "Lyran Alliance/Commonwealth");
+		faction.color = Color.blue;
+		faction.nameGenerator = "LA";
+		faction.startingPlanet = new String[]{"Tharkad","Tharkad","Tharkad","Tharkad","Tharkad","Tharkad","Tharkad","Tharkad","Tharkad"};
+		faction.eraMods = new int[]{0,0,0,1,2,3,2,0,0};
+		addFaction(faction);
+		faction = new Faction("FC", "Federated Commonwealth");
+		faction.color = new Color(255,215,0);
+		faction.startingPlanet = new String[]{"New Avalon","New Avalon","New Avalon","New Avalon","New Avalon","New Avalon","New Avalon","New Avalon","New Avalon"};
+		faction.eraMods = new int[]{0,0,0,1,2,2,1,0,0};
+		addFaction(faction);
+		faction = new Faction("ROS", "Republic of the Sphere");
+		faction.color = Color.ORANGE;
+		addFaction(faction);
+		faction = new Faction("CS", "Comstar");
+		faction.color = Color.WHITE;
+		faction.startingPlanet = new String[]{"Terra","Terra","Terra","Terra","Terra","Terra","Terra","Tukayyid","Tukayyid"};
+		addFaction(faction);
+		faction = new Faction("WOB", "Word of Blake");
+		faction.color = new Color(205,192,176);
+		addFaction(faction);
+		faction = new Faction("FRR", "Free Rasalhague Republic");
+		faction.color = new Color(148,0,11);
+		faction.nameGenerator = "FRR";
+		faction.startingPlanet = new String[]{"Rasalhague","Rasalhague","Rasalhague","Rasalhague","Rasalhague","Rasalhague","Rasalhague","Tukayyid","Tukayyid"};
+		faction.eraMods = new int[]{0,0,0,0,0,0,2,1,0};
+		addFaction(faction);
+		faction = new Faction("SIC", "St. Ives Compact");
+		faction.color = new Color(0,250,154);
+		faction.startingPlanet = new String[]{"St. Ives","St. Ives","St. Ives","St. Ives","St. Ives","St. Ives","St. Ives","St. Ives","St. Ives"};
+		faction.eraMods = new int[]{1,0,0,1,2,3,2,1,0};
+		addFaction(faction);
+		faction = new Faction("MOC", "Magistracy of Canopus");
+		faction.color = new Color(34,139,34);
+		faction.periphery = true;
+		faction.startingPlanet = new String[]{"Canopus IV","Canopus IV","Canopus IV","Canopus IV","Canopus IV","Canopus IV","Canopus IV","Canopus IV","Canopus IV"};
+		faction.eraMods = new int[]{1,1,1,1,2,3,2,1,1};
+		addFaction(faction);
+		faction = new Faction("OA", "Outworlds Alliance");
+		faction.color = Color.CYAN;
+		faction.periphery = true;
+		faction.startingPlanet = new String[]{"Alpheratz","Alpheratz","Alpheratz","Alpheratz","Alpheratz","Alpheratz","Alpheratz","Alpheratz","Alpheratz"};
+		faction.eraMods = new int[]{1,1,1,1,2,3,2,1,0};
+		addFaction(faction);
+		faction = new Faction("TC", "Taurian Concordat");
+		faction.color = new Color(205,133,63);
+		faction.startingPlanet = new String[]{"Taurus","Taurus","Taurus","Taurus","Taurus","Taurus","Taurus","Taurus","Taurus"};
+		faction.periphery = true;
+		faction.eraMods = new int[]{1,1,1,1,2,3,2,1,0};
+		addFaction(faction);
+		faction = new Faction("MH", "Marian Hegemony");
+		faction.color = new Color(0,206,209);
+		faction.periphery = true;
+		faction.startingPlanet = new String[]{"Alphard (Independent)","Alphard (Independent)","Alphard (Independent)","Alphard (Independent)","Alphard (Independent)","Alphard (Independent)","Alphard (Independent)","Alphard (Independent)","Alphard (Independent)"};
+		faction.eraMods = new int[]{1,1,1,1,2,3,2,2,1};
+		addFaction(faction);
+		faction = new Faction("PIND", "Independent (Periphery)");
+		faction.color = Color.GRAY;
+		faction.periphery = true;
+		faction.eraMods = new int[]{1,1,1,1,2,3,2,2,1};
+		addFaction(faction);
+		faction = new Faction("ARDC", "Arc-Royal Defense Cordon");
+		faction.color = new Color(218,165,32);
+		faction.startingPlanet = new String[]{"Arc-Royal","Arc-Royal","Arc-Royal","Arc-Royal","Arc-Royal","Arc-Royal","Arc-Royal","Arc-Royal","Arc-Royal"};
+		faction.eraMods = new int[]{0,0,0,1,2,3,2,0,0};
+		addFaction(faction);
+		faction = new Faction("IND", "Independent");
+		faction.color = Color.GRAY;
+		faction.eraMods = new int[]{1,1,1,1,2,3,2,2,1};
+		addFaction(faction);
+		faction = new Faction("TH", "Terran Hegemony");
+		faction.color = Color.WHITE;
+		faction.eraMods = new int[]{-1,-1,-1,0,0,0,0,0,0};
+		addFaction(faction);
+		faction = new Faction("RWR", "Rim Worlds Republic");
+		faction.color = new Color(205,192,176);
+		faction.eraMods = new int[]{1,1,1,0,0,0,0,0,0};
+		addFaction(faction);
+		faction = new Faction("CW", "Clan Wolf");
+		faction.color = new Color(139,69,19);
+		faction.clan = true;
+		faction.nameGenerator = "Clan";
+		faction.startingPlanet = new String[]{"Tamar","Tamar","Tamar","Tamar","Tamar","Tamar","Tamar","Tamar","Tamar"};
+		addFaction(faction);
+		faction = new Faction("CJF", "Clan Jade Falcon");
+		faction.color = new Color(154, 205, 50);
+		faction.clan = true;
+		faction.nameGenerator = "Clan";
+		faction.startingPlanet = new String[]{"Sudeten","Sudeten","Sudeten","Sudeten","Sudeten","Sudeten","Sudeten","Sudeten","Sudeten"};
+		addFaction(faction);
+		faction = new Faction("CGB", "Clan Ghost Bear");
+		faction.color = new Color(135,206,250);
+		faction.clan = true;
+		faction.nameGenerator = "Clan";
+		faction.startingPlanet = new String[]{"Alshain","Alshain","Alshain","Alshain","Alshain","Alshain","Alshain","Alshain","Alshain"};
+		addFaction(faction);
+		faction = new Faction("CSJ", "Clan Smoke Jaguar");
+		faction.color = new Color(119,136,153);
+		faction.clan = true;
+		faction.nameGenerator = "Clan";
+		addFaction(faction);
+		faction = new Faction("CNC", "Clan Nova Cat");
+		faction.color = new Color(238,221,130);
+		faction.clan = true;
+		faction.nameGenerator = "Clan";
+		faction.startingPlanet = new String[]{"Irece","Irece","Irece","Irece","Irece","Irece","Irece","Irece","Irece"};
+		addFaction(faction);
+		faction = new Faction("CDS", "Clan Diamond Shark");
+		faction.color = new Color(250,128,114);
+		faction.clan = true;
+		faction.nameGenerator = "Clan";
+		faction.startingPlanet = new String[]{"Twycross","Twycross","Twycross","Twycross","Twycross","Twycross","Twycross","Twycross","Twycross"};
+		addFaction(faction);
+		faction = new Faction("CSV", "Clan Steel Viper");
+		faction.color = new Color(188,143,143);
+		faction.clan = true;
+		faction.nameGenerator = "Clan";
+		addFaction(faction);
+		faction = new Faction("CHH", "Clan Hells Horses");
+		faction.color = new Color(178,34,34);
+		faction.clan = true;
+		faction.nameGenerator = "Clan";
+		faction.startingPlanet = new String[]{"Csesztreg","Csesztreg","Csesztreg","Csesztreg","Csesztreg","Csesztreg","Csesztreg","Csesztreg","Csesztreg"};
+		addFaction(faction);
+	}
+	
+	
+	public static void addFaction(Faction f) {
+		factions.put(f.getShortName(), f);
+	}
+	
+	public static ArrayList<String> getFactionList() {
+		ArrayList<String> flist = new ArrayList<String>();
+		for(String sname : factions.keySet()) {
+			flist.add(sname);
+		}
+		return flist;
+	}
+	
+	public static Faction getFaction(String sname) {
+		return factions.get(sname);
+	}
+	
+    public static String getFactionCode(int faction) {
         switch(faction) {
             case F_MERC:
-                return "Mercenary";
+                return "MERC";
             case F_CAPCON:
-                return "Cappellan Confederation";
+                return "CC";
             case F_DRAC:
-                return "Draconis Combine";
+                return "DC";
             case F_FEDSUN:
-                return "Federated Suns";
+                return "FS";
             case F_FWL:
-                return "Free Worlds League";
+                return "FWL";
             case F_LYRAN:
-                return "Lyran Commonwealth/Alliance";
+                return "LA";
             case F_FEDCOM:
-                return "Federated Commonwealth"; 
+                return "FC"; 
             case F_ROS:
-                    return "Republic of the Sphere";
+            	return "ROS";
             case F_COMSTAR:
-                return "Comstar";
+                return "CS";
             case F_WOB:
-                return "Word of Blake";
+                return "WOB";
             case F_FRR:
-                return "Free Rasalhague Republic";
+                return "FRR";
             case F_SIC:
-                return "St. Ives Compact";
+                return "SIC";
             case F_CANOPUS:
-                return "Magistracy of Canopus";
+                return "MOC";
             case F_OA:
-                return "Outworlds Alliance";
+                return "OA";
             case F_TC:
-                return "Taurian Concordat";
+                return "TC";
             case F_MH:
-                return "Marian Hegemony";
+                return "MH";
             case F_PERIPHERY:
-                return "Periphery (Other)";
+                return "PIND";
             case F_ARDC:
-                return "Arc-Royal Defense Cordon";          
+                return "ARDC";          
             case F_CHAOS:
-                return "Chaos March";
+                return "IND";
             case F_TERRAN:
-                return "Terran Hegemony";
+                return "TH";
             case F_RWR:
-                return "Rim Worlds Republic";
+                return "RWR";
             case F_C_WOLF:
-                return "Clan Wolf";
+                return "CW";
             case F_C_JF:
-                return "Clan Jade Falcon";
+                return "CJF";
             case F_C_GB:
-            	return "Clan Ghost Bear";
+            	return "CGB";
             case F_C_SJ:
-            	return "Clan Smoke Jaguar";
+            	return "CSJ";
             case F_C_NC:
-                return "Clan Nova Cat";
+                return "CNC";
             case F_C_DS:
-                return "Clan Diamond Shark";
+                return "CDS";
             case F_C_SV:
-                return "Clan Steel Viper";
+                return "CSV";
             case F_C_HH:
-                return "Clan Hell's Horses";
             case F_C_OTHER:
-                return "Clan (Other)";
+                return "CHH";
             default:
-                return "Unknown";
-        }
-    }
-
-    public static boolean isPeripheryFaction (int faction) {
-        return (faction==F_CANOPUS 
-        		|| faction==F_OA 
-        		|| faction==F_PERIPHERY 
-        		|| faction==F_RWR 
-        		|| faction==F_TC
-        		|| faction==F_MH);
-    }
-    public static boolean isClanFaction (int faction) {
-       switch(faction) {
-       case F_C_WOLF:
-       case F_C_JF:
-       case F_C_GB:
-       case F_C_SJ:
-       case F_C_NC:
-       case F_C_DS:
-       case F_C_SV:
-       case F_C_HH:
-       case F_C_OTHER:
-    	   return true;
-       default:
-    	   return false;
-       }
-    }
-    
-    public static String getFactionCodeForNameGenerator(int faction) {
-        switch(faction) {
-        
-        case F_CAPCON:
-            return "CC";
-        case F_DRAC:
-            return "DC";
-        case F_FEDSUN:
-            return "FS";
-        case F_FWL:
-            return "FWL";
-        case F_LYRAN:
-            return "LA";
-        case F_C_WOLF:
-        case F_C_JF:
-        case F_C_GB:
-        case F_C_SJ:
-        case F_C_NC:
-        case F_C_DS:
-        case F_C_SV:
-        case F_C_HH:
-        case F_C_OTHER:
-            return "Clan";
-        case F_FRR:
-            return "FRR";    
-        case F_MERC:
-        case F_COMSTAR:
-        case F_WOB:
-        case F_CANOPUS:
-        case F_OA:
-        case F_TC:
-        case F_PERIPHERY:
-        case F_CHAOS:
-        case F_TERRAN:
-        case F_RWR:
-        default:
-            return "General";
+                return "IND";
         }
     }
     
-    public static Color getFactionColor(int faction) {
-        switch(faction) {
-        
-        case F_CAPCON:
-            return Color.GREEN;
-        case F_DRAC:
-            return Color.RED;
-        case F_FEDSUN:
-        	return Color.YELLOW;
-        case F_FEDCOM:
-            return new Color(255,215,0);
-        case F_FWL:
-            return new Color(160,32,240);
-        case F_LYRAN:
-            return Color.BLUE;
-        case F_ROS:
-            return Color.ORANGE;
-        case F_C_WOLF:
-        	return new Color(139,69,19);
-        case F_C_JF:
-        	return new Color(154, 205, 50);
-        case F_C_GB:
-        	return new Color(135,206,250);
-        case F_C_SJ:
-        	return new Color(119,136,153);
-        case F_C_NC:
-        	return new Color(238,221,130);
-        case F_C_DS:
-        	return new Color(250,128,114);
-        case F_C_SV:
-        	return new Color(188,143,143);
-        case F_C_HH:
-        	return new Color(178,34,34);
-        case F_C_OTHER:
-            return new Color(210,180,140);
-        case F_FRR:    
-        	return new Color(148,0,11);
-        case F_SIC:
-        	return new Color(0,250,154);
-        case F_TERRAN:
-        case F_COMSTAR:
-        	return Color.WHITE;
-        case F_RWR:
-        case F_WOB:
-        	return new Color(205,192,176);
-        case F_CANOPUS:
-        	return new Color(34,139,34);
-        case F_OA:
-        	return Color.CYAN;
-        case F_TC:
-        	return new Color(205,133,63);
-        case F_MH:
-        	return new Color(0,206,209);
-        case F_ARDC:
-        	return new Color(218,165,32);
-        case F_CHAOS:
-        	return Color.GRAY;
-        default:
-            return Color.LIGHT_GRAY;
-        }
-    }
 
     
 }

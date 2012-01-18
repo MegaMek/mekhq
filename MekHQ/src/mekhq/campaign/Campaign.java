@@ -190,7 +190,7 @@ public class Campaign implements Serializable {
 	private SimpleDateFormat dateFormat;
 	private SimpleDateFormat shortDateFormat;
 
-	private int faction;
+	private String factionCode;
 	private Ranks ranks;
 
 	private ArrayList<String> currentReport;
@@ -224,7 +224,7 @@ public class Campaign implements Serializable {
 		rng.populateNames();
 		overtime = false;
 		gmMode = false;
-		faction = Faction.F_MERC;
+		factionCode = "MERC";
 		ranks = new Ranks();
 		forces = new Force(name);
 		forceIds.put(new Integer(lastForceId), forces);
@@ -252,11 +252,6 @@ public class Campaign implements Serializable {
 
 	public String getEraName() {
 		return Era.getEraNameFromYear(calendar.get(Calendar.YEAR));
-	}
-
-	public int getEraMod() {
-		return Era.getEraMod(getEra(),
-				getFaction());
 	}
 	
 	public int getEra() {
@@ -1296,16 +1291,20 @@ public class Campaign implements Serializable {
 		this.gmMode = b;
 	}
 
-	public int getFaction() {
-		return faction;
+	public Faction getFaction() {
+		return Faction.getFaction(factionCode);
 	}
-
-	public void setFaction(int i) {
-		this.faction = i;
-	}
-
+	
 	public String getFactionName() {
-		return Faction.getFactionName(faction);
+		return getFaction().getFullName();
+	}
+
+	public void setFactionCode(String i) {
+		this.factionCode = i;
+	}
+	
+	public String getFactionCode() {
+		return factionCode;
 	}
 
 	public void addReport(String r) {
@@ -1472,7 +1471,7 @@ public class Campaign implements Serializable {
 		pw1.println("\t<info>");
 
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "name", name);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "faction", faction);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "faction", factionCode);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "ranks", ranks.getRankSystem());
 		if(ranks.getRankSystem() == Ranks.RS_CUSTOM) {
 			MekHqXmlUtil.writeSimpleXmlTag(pw1, 2, "officerCut", ranks.getOfficerCut());
@@ -1776,7 +1775,7 @@ public class Campaign implements Serializable {
 				} else if (xn.equalsIgnoreCase("randomSkillPreferences")) {
 					retVal.rskillPrefs = RandomSkillPreferences.generateRandomSkillPreferencesFromXml(wn);
 				} else if (xn.equalsIgnoreCase("info")) {
-					processInfoNode(retVal, wn);
+					processInfoNode(retVal, wn, v);
 				} else if (xn.equalsIgnoreCase("parts")) {
 					processPartNodes(retVal, wn, v);
 				} else if (xn.equalsIgnoreCase("personnel")) {
@@ -2405,7 +2404,7 @@ public class Campaign implements Serializable {
 	 * @throws ParseException
 	 * @throws DOMException
 	 */
-	private static void processInfoNode(Campaign retVal, Node wni)
+	private static void processInfoNode(Campaign retVal, Node wni, int version)
 			throws DOMException, ParseException {
 		NodeList nl = wni.getChildNodes();
 
@@ -2478,8 +2477,11 @@ public class Campaign implements Serializable {
 							retVal.currentReport.add(wn2.getTextContent());
 					}
 				} else if (xn.equalsIgnoreCase("faction")) {
-					retVal.faction = Integer.parseInt(wn.getTextContent()
-							.trim());
+					if(version < 14) {
+						retVal.factionCode = Faction.getFactionCode(Integer.parseInt(wn.getTextContent()));
+					} else {
+						retVal.factionCode = wn.getTextContent();
+					}
 				} else if (xn.equalsIgnoreCase("ranks")) {
 					int rankSystem = Integer.parseInt(wn.getTextContent().trim());
 					if(rankSystem != Ranks.RS_CUSTOM) {
@@ -3669,6 +3671,10 @@ public class Campaign implements Serializable {
     
     public RandomSkillPreferences getRandomSkillPreferences() {
     	return rskillPrefs;
+    }
+    
+    public void setStartingPlanet() {
+    	location = new CurrentLocation(Planets.getInstance().getPlanets().get(getFaction().getStartingPlanet(getEra())), 0);
     }
     
 }

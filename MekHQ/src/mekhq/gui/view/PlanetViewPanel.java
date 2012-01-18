@@ -139,7 +139,7 @@ public class PlanetViewPanel extends javax.swing.JPanel {
 			if(neighbor.equals(planet)) {
 				continue;
 			}
-			lblNeighbor = new javax.swing.JLabel(neighbor.getShortName() + " (" + Faction.getFactionName(neighbor.getCurrentFaction(campaign.getCalendar().getTime())) + ")");
+			lblNeighbor = new javax.swing.JLabel(neighbor.getShortName() + " (" + neighbor.getCurrentFaction(campaign.getCalendar().getTime()).getFullName() + ")");
 			gridBagConstraints = new java.awt.GridBagConstraints();
 			gridBagConstraints.gridx = 0;
 			gridBagConstraints.gridy = i;
@@ -191,7 +191,7 @@ public class PlanetViewPanel extends javax.swing.JPanel {
 		pnlStats.setLayout(new java.awt.GridBagLayout());
 		
 		lblOwner.setName("lblOwner"); // NOI18N
-		lblOwner.setText("<html><i>" + Faction.getFactionName(planet.getCurrentFaction(campaign.getCalendar().getTime())) + "</i></html>");
+		lblOwner.setText("<html><i>" + planet.getCurrentFaction(campaign.getCalendar().getTime()).getFullName() + "</i></html>");
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 0;
