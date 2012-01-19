@@ -51,6 +51,7 @@ public class CampaignOptions implements Serializable {
     private boolean useFactionForNames;
     private int repairSystem;
     private boolean useDragoonRating;
+    private boolean useEraMods;
     
     //personnel related
     private boolean useTactics;
@@ -91,7 +92,8 @@ public class CampaignOptions implements Serializable {
         useFactionModifiers = false;
         clanPriceModifier = 1.0;
         useFactionForNames = true;
-        repairSystem = REPAIR_SYSTEM_STRATOPS;    
+        repairSystem = REPAIR_SYSTEM_STRATOPS; 
+        useEraMods = false;
         useDragoonRating = true;
         useTactics = false;
         useInitBonus = false;
@@ -143,6 +145,14 @@ public class CampaignOptions implements Serializable {
     
     public void setFactionModifiers(boolean b) {
         this.useFactionModifiers = b;
+    }
+    
+    public boolean useEraMods() {
+        return useEraMods;
+    }
+    
+    public void setEraMods(boolean b) {
+        this.useEraMods = b;
     }
     
     public boolean useDragoonRating() {
@@ -384,6 +394,7 @@ public class CampaignOptions implements Serializable {
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useFactionForNames", useFactionForNames); //private boolean useFinances;
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "repairSystem", repairSystem); //private int repairSystem;
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useDragoonRating", useDragoonRating); 
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useEraMods", useEraMods); 
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useTactics", useTactics);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useInitBonus", useInitBonus);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useToughness", useToughness);
@@ -446,6 +457,11 @@ public class CampaignOptions implements Serializable {
 					retVal.useFactionForNames = false;
 			} else if (wn2.getNodeName().equalsIgnoreCase("repairSystem")) {
 				retVal.repairSystem = Integer.parseInt(wn2.getTextContent());
+			} else if (wn2.getNodeName().equalsIgnoreCase("useEraMods")) {
+				if (wn2.getTextContent().equalsIgnoreCase("true"))
+					retVal.useEraMods = true;
+				else
+					retVal.useEraMods = false;
 			} else if (wn2.getNodeName().equalsIgnoreCase("useTactics")) {
 				if (wn2.getTextContent().equalsIgnoreCase("true"))
 					retVal.useTactics = true;

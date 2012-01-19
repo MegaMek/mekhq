@@ -115,6 +115,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         
         // Rules panel
         useFactionModifiersCheckBox.setSelected(options.useFactionModifiers());
+        useEraModsCheckBox.setSelected(options.useEraMods());
         useDragoonRatingCheckBox.setSelected(options.useDragoonRating());
         clanPriceModifierJFormattedTextField.setValue(options.getClanPriceModifier());
         useFactionForNamesBox.setSelected(options.useFactionForNames());
@@ -180,6 +181,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panTech = new javax.swing.JPanel();
         panRandomSkill = new javax.swing.JPanel();
         useFactionModifiersCheckBox = new javax.swing.JCheckBox();
+        useEraModsCheckBox = new javax.swing.JCheckBox();
         useDragoonRatingCheckBox = new javax.swing.JCheckBox();
         javax.swing.JLabel clanPriceModifierLabel = new javax.swing.JLabel();
         DecimalFormat numberFormat = (DecimalFormat) DecimalFormat.getInstance();
@@ -347,13 +349,22 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panRepair.setName("panRules"); // NOI18N
         panRepair.setLayout(new java.awt.GridBagLayout());
 
+        useEraModsCheckBox.setText(resourceMap.getString("useEraModsCheckBox.text")); // NOI18N
+        useEraModsCheckBox.setToolTipText(resourceMap.getString("useEraModsCheckBox.toolTipText")); // NOI18N
+        useEraModsCheckBox.setName("useEraModsCheckBox"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panRepair.add(useEraModsCheckBox, gridBagConstraints);
+
         useFactionModifiersCheckBox.setText(resourceMap.getString("useFactionModifiersCheckBox.text")); // NOI18N
         useFactionModifiersCheckBox.setToolTipText(resourceMap.getString("useFactionModifiersCheckBox.toolTipText")); // NOI18N
         useFactionModifiersCheckBox.setName("useFactionModifiersCheckBox"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panRepair.add(useFactionModifiersCheckBox, gridBagConstraints);
@@ -363,8 +374,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         useQuirksBox.setName("useQuirksBox"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panRepair.add(useQuirksBox, gridBagConstraints);
@@ -1637,6 +1647,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private javax.swing.JTabbedPane tabOptions;
     private javax.swing.JTextField txtName;
     private javax.swing.JCheckBox useFactionModifiersCheckBox;
+    private javax.swing.JCheckBox useEraModsCheckBox;
     private javax.swing.JCheckBox useDragoonRatingCheckBox;
     private javax.swing.JCheckBox useFactionForNamesBox;
     private javax.swing.JCheckBox useTacticsBox;

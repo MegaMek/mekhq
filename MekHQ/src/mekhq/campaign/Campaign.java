@@ -3017,6 +3017,10 @@ public class Campaign implements Serializable {
 
         target.append(partWork.getAllMods());
        
+        if(getCampaignOptions().useEraMods()) {
+        	target.addModifier(getFaction().getEraMod(getEra()), "era");
+        }
+        
         boolean isOvertime = false;
         if(isOvertimeAllowed() && (tech.isTaskOvertime(partWork) || partWork.hasWorkedOvertime())) {
             target.addModifier(3, "overtime");

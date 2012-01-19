@@ -37,6 +37,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import megamek.common.EquipmentType;
 import mekhq.MekHQ;
 import mekhq.campaign.parts.Part;
 
@@ -141,12 +142,9 @@ public class Faction {
 	
 	public int getTechMod(Part part, Campaign campaign) {
 		int currentYear = campaign.getCalendar().get(Calendar.YEAR);
-        
-        // Change to reflect current location
-        // NO, NO, NO - we are not ready to assign a location to the campaign
-        // and assuming faction=location is not an acceptable substitute
-        //int currentLocation = currentFaction;
 
+		//TODO: This seems hacky - we shouldn't hardcode in universe details
+		//like this
         int factionMod = 0;
         if (part.isClanTechBase() && !isClan()) {
             // Availability of clan tech for IS
@@ -163,22 +161,17 @@ public class Faction {
                 // After great refusal, hard to buy
                 factionMod = 3;
         }
-        
-        /*
-        if (!part.isClanTechBase()) {
+        if (!part.isClanTechBase() && isPeriphery()) {
             // Availability of high tech rating equipment in low tech areas (periphery)
-            switch (techRating) {
+            switch (part.getTechRating()) {
                 case(EquipmentType.RATING_E) :
-                    if (Faction.isPeripheryFaction(currentLocation))
-                        factionMod += 1;
+                	factionMod += 1;
                     break;
                 case(EquipmentType.RATING_F) :
-                    if (Faction.isPeripheryFaction(currentLocation))
-                        factionMod += 2;
+                	factionMod += 2;
                     break;
             }
         }
-        */
 
         return factionMod;
 	}
