@@ -156,154 +156,6 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
                     });
                     centerM.add(item);
                     popup.add(centerM);
-                    //set up a series of menus by alphabet and allow user to select
-                	JMenu selectM = new JMenu("Select Planet");
-                	JMenu aMenu = new JMenu("A");
-                	JMenu bMenu = new JMenu("B");
-                	JMenu cMenu = new JMenu("C");
-                	JMenu dMenu = new JMenu("D");
-                	JMenu eMenu = new JMenu("E");
-                	JMenu fMenu = new JMenu("F");
-                	JMenu gMenu = new JMenu("G");
-                	JMenu hMenu = new JMenu("H");
-                	JMenu iMenu = new JMenu("I");
-                	JMenu jMenu = new JMenu("J");
-                	JMenu kMenu = new JMenu("K");
-                	JMenu lMenu = new JMenu("L");
-                	JMenu mMenu = new JMenu("M");
-                	JMenu nMenu = new JMenu("N");
-                	JMenu oMenu = new JMenu("O");
-                	JMenu pMenu = new JMenu("P");
-                	JMenu qMenu = new JMenu("Q");
-                	JMenu rMenu = new JMenu("R");
-                	JMenu sMenu = new JMenu("S");
-                	JMenu tMenu = new JMenu("T");
-                	JMenu uMenu = new JMenu("U");
-                	JMenu vMenu = new JMenu("V");
-                	JMenu wMenu = new JMenu("W");
-                	JMenu xMenu = new JMenu("X");
-                	JMenu yMenu = new JMenu("Y");
-                	JMenu zMenu = new JMenu("Z");
-                	for(int i = 0; i < planets.size(); i++) {
-                		Planet p = planets.get(i);
-                		item = new JMenuItem(p.getName() + " (" + p.getBaseFaction().getFullName() + ")");
-    					item.setActionCommand(Integer.toString(i));
-            			item.addActionListener(new ActionListener() {
-                            public void actionPerformed(ActionEvent ae) {
-                            	int pos = Integer.parseInt(ae.getActionCommand());
-                                changeSelectedPlanet(planets.get(pos));
-                                center(selectedPlanet);
-                            }
-                        });
-                		if(p.getName().toLowerCase().startsWith("a")) {
-                			aMenu.add(item);
-                		} else if(p.getName().toLowerCase().startsWith("b")) {
-                			bMenu.add(item);
-                		} else if(p.getName().toLowerCase().startsWith("c")) {
-                			cMenu.add(item);
-                		} else if(p.getName().toLowerCase().startsWith("d")) {
-                			dMenu.add(item);
-                		} else if(p.getName().toLowerCase().startsWith("e")) {
-                			eMenu.add(item);
-                		} else if(p.getName().toLowerCase().startsWith("f")) {
-                			fMenu.add(item);
-                		} else if(p.getName().toLowerCase().startsWith("g")) {
-                			gMenu.add(item);
-                		} else if(p.getName().toLowerCase().startsWith("h")) {
-                			hMenu.add(item);
-                		} else if(p.getName().toLowerCase().startsWith("i")) {
-                			iMenu.add(item);
-                		} else if(p.getName().toLowerCase().startsWith("j")) {
-                			jMenu.add(item);
-                		} else if(p.getName().toLowerCase().startsWith("k")) {
-                			kMenu.add(item);
-                		} else if(p.getName().toLowerCase().startsWith("l")) {
-                			lMenu.add(item);
-                		} else if(p.getName().toLowerCase().startsWith("m")) {
-                			mMenu.add(item);
-                		} else if(p.getName().toLowerCase().startsWith("n")) {
-                			nMenu.add(item);
-                		} else if(p.getName().toLowerCase().startsWith("o")) {
-                			oMenu.add(item);
-                		} else if(p.getName().toLowerCase().startsWith("p")) {
-                			pMenu.add(item);
-                		} else if(p.getName().toLowerCase().startsWith("q")) {
-                			qMenu.add(item);
-                		} else if(p.getName().toLowerCase().startsWith("r")) {
-                			rMenu.add(item);
-                		} else if(p.getName().toLowerCase().startsWith("s")) {
-                			sMenu.add(item);
-                		} else if(p.getName().toLowerCase().startsWith("t")) {
-                			tMenu.add(item);
-                		} else if(p.getName().toLowerCase().startsWith("u")) {
-                			uMenu.add(item);
-                		} else if(p.getName().toLowerCase().startsWith("v")) {
-                			vMenu.add(item);
-                		} else if(p.getName().toLowerCase().startsWith("w")) {
-                			wMenu.add(item);
-                		} else if(p.getName().toLowerCase().startsWith("x")) {
-                			xMenu.add(item);
-                		} else if(p.getName().toLowerCase().startsWith("y")) {
-                			yMenu.add(item);
-                		} else if(p.getName().toLowerCase().startsWith("z")) {
-                			zMenu.add(item);
-                		}
-                		
-                	}
-                	MenuScroller.setScrollerFor(aMenu, 30);
-                    selectM.add(aMenu);
-                	MenuScroller.setScrollerFor(aMenu, 30);
-                    selectM.add(bMenu);
-                	MenuScroller.setScrollerFor(bMenu, 30);
-                    selectM.add(cMenu);
-                	MenuScroller.setScrollerFor(cMenu, 30);
-                    selectM.add(dMenu);
-                	MenuScroller.setScrollerFor(dMenu, 30);
-                    selectM.add(eMenu);
-                	MenuScroller.setScrollerFor(eMenu, 30);
-                    selectM.add(fMenu);
-                	MenuScroller.setScrollerFor(fMenu, 30);
-                    selectM.add(gMenu);
-                	MenuScroller.setScrollerFor(gMenu, 30);
-                    selectM.add(hMenu);
-                	MenuScroller.setScrollerFor(hMenu, 30);
-                    selectM.add(iMenu);
-                	MenuScroller.setScrollerFor(iMenu, 30);
-                    selectM.add(jMenu);
-                	MenuScroller.setScrollerFor(jMenu, 30);
-                    selectM.add(kMenu);
-                	MenuScroller.setScrollerFor(kMenu, 30);
-                    selectM.add(lMenu);
-                	MenuScroller.setScrollerFor(lMenu, 30);
-                    selectM.add(mMenu);
-                	MenuScroller.setScrollerFor(mMenu, 30);
-                    selectM.add(nMenu);
-                	MenuScroller.setScrollerFor(nMenu, 30);
-                    selectM.add(oMenu);
-                	MenuScroller.setScrollerFor(oMenu, 30);
-                    selectM.add(pMenu);
-                	MenuScroller.setScrollerFor(pMenu, 30);
-                    selectM.add(qMenu);
-                	MenuScroller.setScrollerFor(qMenu, 30);
-                    selectM.add(rMenu);
-                	MenuScroller.setScrollerFor(rMenu, 30);
-                    selectM.add(sMenu);
-                	MenuScroller.setScrollerFor(sMenu, 30);
-                    selectM.add(tMenu);
-                	MenuScroller.setScrollerFor(tMenu, 30);
-                    selectM.add(uMenu);
-                	MenuScroller.setScrollerFor(uMenu, 30);
-                    selectM.add(vMenu);
-                	MenuScroller.setScrollerFor(vMenu, 30);
-                    selectM.add(wMenu);
-                	MenuScroller.setScrollerFor(wMenu, 30);
-                    selectM.add(xMenu);
-                	MenuScroller.setScrollerFor(xMenu, 30);
-                    selectM.add(yMenu);
-                	MenuScroller.setScrollerFor(yMenu, 30);
-                    selectM.add(zMenu);
-                	MenuScroller.setScrollerFor(zMenu, 30);
-                    popup.add(selectM);
                 	item = new JMenuItem("Cancel Current Trip");
                 	item.setEnabled(null != campaign.getLocation().getJumpPath());
                 	item.addActionListener(new ActionListener() {
@@ -557,16 +409,14 @@ public class InterstellarMapPanel extends javax.swing.JPanel {
 				arc.setArcByCenter(x, y, size * 1.2, 0, 360, Arc2D.OPEN);
 				g2.fill(arc);
 			}
-			if(planet.getName().equals("St. Loris")) {
-				int bob = 1;
+			ArrayList<Faction> factions = planet.getCurrentFactions(campaign.getCalendar().getTime());
+			for(int i = 0; i < factions.size(); i++) {
+				Faction faction = factions.get(i);
+				g2.setPaint(faction.getColor());
+				arc.setArcByCenter(x, y, size, 0, 360.0 * (1-((double)i)/factions.size()), Arc2D.PIE);
+				g2.fill(arc);
 			}
-			Faction faction = planet.getCurrentFaction(campaign.getCalendar().getTime());
-			if(null == faction) {
-				int bob = 1;
-			}
-			g2.setPaint(faction.getColor());
-			arc.setArcByCenter(x, y, size, 0, 360, Arc2D.OPEN);
-			g2.fill(arc);
+			
 			
 		}
 

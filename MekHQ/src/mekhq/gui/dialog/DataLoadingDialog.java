@@ -108,7 +108,11 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         public Void doInBackground() {
             //Initialize progress property.
             setProgress(0);
-            Faction.generateFactions();
+            try {
+            	Faction.generateFactions();
+            } catch (Exception ex) {
+    			ex.printStackTrace();
+            }
             while (!Planets.getInstance().isInitialized()) {
                 //Sleep for up to one second.
                 try {

@@ -26,6 +26,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.TreeMap;
 
 import megamek.common.EquipmentType;
@@ -91,7 +93,7 @@ public class Planet implements Serializable {
 	 * This is the base faction which the program will fall back on if
 	 * no better faction is found in the faction history given the date
 	 */
-	private String factionCode;
+	private ArrayList<String> factionCodes;
 	private String name;
 	private String shortName;
 	
@@ -126,12 +128,13 @@ public class Planet implements Serializable {
 	private ArrayList<String> landMasses;
 	
 	//a hash to keep track of dynamic faction changes
-	TreeMap<Date,String> factionHistory;
+	TreeMap<Date,ArrayList<String>> factionHistory;
 	
 	public Planet() {
 		this.x = 0;
 		this.y = 0;
-		this.factionCode = "CS";
+		this.factionCodes = new ArrayList<String>();
+		this.factionCodes.add("CS");
 		this.name = "Terra";
 		this.shortName = "Terra";
 		
@@ -162,7 +165,7 @@ public class Planet implements Serializable {
 		
 		this.hpg = EquipmentType.RATING_B;
 		
-		this.factionHistory = new TreeMap<Date,String>();
+		this.factionHistory = new TreeMap<Date,ArrayList<String>>();
 	}
 	
 	public static String getLifeFormName(int life) {
@@ -268,20 +271,28 @@ public class Planet implements Serializable {
 		return y;
 	}
 	
-	public String getBaseFactionCode() {
-		return factionCode;
+	public ArrayList<String> getBaseFactionCodes() {
+		return factionCodes;
 	}
 	
-	public Faction getBaseFaction() {
-		return Faction.getFaction(factionCode);
+	public ArrayList<Faction> getBaseFactions() {
+		return getFactionsFrom(factionCodes);
+	}
+	
+	private static ArrayList<Faction> getFactionsFrom(ArrayList<String> codes) {
+		ArrayList<Faction> factions = new ArrayList<Faction>();
+		for(String code : codes) {
+			factions.add(Faction.getFaction(code));
+		}
+		return factions;
 	}
 	
 	public int getSystemPosition() {
 		return sysPos;
 	}
 	
-	public Faction getCurrentFaction(Date date) {
-		String currentFactionCode = getBaseFactionCode();
+	public ArrayList<Faction> getCurrentFactions(Date date) {
+		ArrayList<String> currentFactionCode = getBaseFactionCodes();
 		for(Date event : factionHistory.keySet()) {
 			if(event.after(date)) {
 				break;
@@ -289,7 +300,7 @@ public class Planet implements Serializable {
 				currentFactionCode = factionHistory.get(event);
 			}
 		}
-		return Faction.getFaction(currentFactionCode);
+		return getFactionsFrom(currentFactionCode);
 	}
 	
 	public String getName() {
@@ -298,6 +309,23 @@ public class Planet implements Serializable {
 	
 	public String getShortName() {
 		return shortName;
+	}
+	
+	public String getShortDesc(Date date) {
+		return getShortName() + " (" + getFactionDesc(date) + ")";
+	}
+	
+	public String getFactionDesc(Date date) {
+		String desc = "";
+		Iterator<Faction> factions = getCurrentFactions(date).iterator();
+		while(factions.hasNext()) {
+			Faction f = factions.next();
+			desc += f.getFullName();
+			if(factions.hasNext()) {
+				desc += "/";
+			}
+		}
+		return desc;
 	}
 	
 	/**
@@ -638,7 +666,7 @@ public class Planet implements Serializable {
 			} else if (wn2.getNodeName().equalsIgnoreCase("ycood")) {
 				retVal.y = Double.parseDouble(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("faction")) {
-				retVal.factionCode = Faction.getFactionCode(Integer.parseInt(wn2.getTextContent()));
+				retVal.factionCodes = processFactionCodes(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("pressure")) {
 				retVal.pressure = Integer.parseInt(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("gravity")) {
@@ -697,7 +725,7 @@ public class Planet implements Serializable {
 		NodeList nl = wni.getChildNodes();
 
 		Date date = null;
-		String faction = "NONE";
+		ArrayList<String> factions = new ArrayList<String>();
 		// Okay, lets iterate through the children, eh?
 		for (int x = 0; x < nl.getLength(); x++) {
 			Node wn = nl.item(x);
@@ -711,12 +739,12 @@ public class Planet implements Serializable {
 					SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 					date = df.parse(wn.getTextContent().trim());
 				} else if (xn.equalsIgnoreCase("faction")) {
-					faction = Faction.getFactionCode(Integer.parseInt(wn.getTextContent().trim()));
+					factions = processFactionCodes(wn.getTextContent().trim());
 				}
 			}
 		}
-		if(null != date && !faction.equals("NONE")) {
-			retVal.factionHistory.put(date, faction);
+		if(null != date && factions.size() > 0) {
+			retVal.factionHistory.put(date, factions);
 		}
 	}
 	
@@ -731,5 +759,14 @@ public class Planet implements Serializable {
 			}
 		}
 		return false;
+	}
+	
+	private static ArrayList<String> processFactionCodes(String codeList) {
+		ArrayList<String> factions = new ArrayList<String>();
+		String[] codes = codeList.split(",");
+		for(String code : codes) {
+			factions.add(Faction.getFactionCode(Integer.parseInt(code)));
+		}
+		return factions;
 	}
 }

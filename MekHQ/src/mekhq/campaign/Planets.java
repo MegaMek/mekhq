@@ -121,9 +121,9 @@ public class Planets {
 						//There could still be duplicates in theory, but I don't think there are in practice
 						Planet oldPlanet = retVal.get(name);
 						retVal.remove(name);
-						oldPlanet.resetName(oldPlanet.getName() + " (" + oldPlanet.getBaseFaction().getFullName() + ")");
+						oldPlanet.resetName(oldPlanet.getName() + " (" + oldPlanet.getBaseFactions().get(0).getFullName() + ")");
 						retVal.put(oldPlanet.getName(), oldPlanet);
-						p.resetName(p.getName() + " (" + p.getBaseFaction().getFullName() + ")");
+						p.resetName(p.getName() + " (" + p.getBaseFactions().get(0).getFullName() + ")");
 						retVal.put(p.getName(), p);
 					}
 					

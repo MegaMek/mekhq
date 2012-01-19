@@ -22,10 +22,22 @@
 package mekhq.campaign;
 
 import java.awt.Color;
+import java.io.FileInputStream;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Hashtable;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.w3c.dom.DOMException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import mekhq.MekHQ;
 import mekhq.campaign.parts.Part;
 
 /**
@@ -35,7 +47,7 @@ import mekhq.campaign.parts.Part;
 public class Faction {
 	
 	public static Hashtable<String, Faction> factions;
-	public static final String[] choosableFactionCodes = {"MERC","CC","DC","FS","FWL","LA","FC","ROS","CS","WOB","FRR","SIC","MOC","MH","OA","TC","CDS","CGB","CHH","CJF","CNC","CSJ","CSV","CW","TH","RWR"};
+	public static String[] choosableFactionCodes = {"MERC","CC","DC","FS","FWL","LA","FC","ROS","CS","WOB","FRR","SIC","MOC","MH","OA","TC","CDS","CGB","CHH","CJF","CNC","CSJ","CSV","CW","TH","RWR"};
 	
 	//I am no longer using ints to define factions, but I am keeping 
 	//this stuff for reference
@@ -171,169 +183,6 @@ public class Faction {
         return factionMod;
 	}
 	
-	public static void generateFactions() {
-		//TODO: I should put factions in an editable XML file
-		factions = new Hashtable<String, Faction>();
-		Faction faction;
-		faction = new Faction("MERC", "Mercenary");
-		faction.startingPlanet = new String[]{"Galatea","Solaris VII","Galatea","Galatea","Galatea","Galatea","Outreach","Outreach","Outreach"};
-		faction.eraMods = new int[]{1,1,1,1,2,3,2,1,0};
-		addFaction(faction);
-		faction = new Faction("CC", "Cappellan Confederation");
-		faction.color = Color.GREEN;
-		faction.nameGenerator = "CC";
-		faction.startingPlanet = new String[]{"Sian","Sian","Sian","Sian","Sian","Sian","Sian","Sian","Sian"};
-		faction.eraMods = new int[]{1,0,0,1,2,3,2,1,0};
-		addFaction(faction);
-		faction = new Faction("DC", "Draconis Combine");
-		faction.color = Color.red;
-		faction.nameGenerator = "DC";
-		faction.startingPlanet = new String[]{"New Samarkand","Luthien","Luthien","Luthien","Luthien","Luthien","Luthien","Luthien","Luthien"};
-		faction.eraMods = new int[]{0,0,0,1,2,2,1,0,0};
-		addFaction(faction);
-		faction = new Faction("FS", "Federated Suns");
-		faction.color = Color.yellow;
-		faction.nameGenerator = "FS";
-		faction.startingPlanet = new String[]{"New Avalon","New Avalon","New Avalon","New Avalon","New Avalon","New Avalon","New Avalon","New Avalon","New Avalon"};
-		faction.eraMods = new int[]{0,0,0,1,2,2,1,0,0};
-		addFaction(faction);
-		faction = new Faction("FWL", "Free Worlds League");
-		faction.color = new Color(160,32,240);
-		faction.nameGenerator = "FWL";
-		faction.startingPlanet = new String[]{"Atreus (Free Worlds League)","Atreus (Free Worlds League)","Atreus (Free Worlds League)","Atreus (Free Worlds League)","Atreus (Free Worlds League)","Atreus (Free Worlds League)","Atreus (Free Worlds League)","Atreus (Free Worlds League)","Atreus (Free Worlds League)"};
-		faction.eraMods = new int[]{0,0,0,1,2,3,1,1,0};
-		addFaction(faction);
-		faction = new Faction("LA", "Lyran Alliance/Commonwealth");
-		faction.color = Color.blue;
-		faction.nameGenerator = "LA";
-		faction.startingPlanet = new String[]{"Tharkad","Tharkad","Tharkad","Tharkad","Tharkad","Tharkad","Tharkad","Tharkad","Tharkad"};
-		faction.eraMods = new int[]{0,0,0,1,2,3,2,0,0};
-		addFaction(faction);
-		faction = new Faction("FC", "Federated Commonwealth");
-		faction.color = new Color(255,215,0);
-		faction.startingPlanet = new String[]{"New Avalon","New Avalon","New Avalon","New Avalon","New Avalon","New Avalon","New Avalon","New Avalon","New Avalon"};
-		faction.eraMods = new int[]{0,0,0,1,2,2,1,0,0};
-		addFaction(faction);
-		faction = new Faction("ROS", "Republic of the Sphere");
-		faction.color = Color.ORANGE;
-		addFaction(faction);
-		faction = new Faction("CS", "Comstar");
-		faction.color = Color.WHITE;
-		faction.startingPlanet = new String[]{"Terra","Terra","Terra","Terra","Terra","Terra","Terra","Tukayyid","Tukayyid"};
-		addFaction(faction);
-		faction = new Faction("WOB", "Word of Blake");
-		faction.color = new Color(205,192,176);
-		addFaction(faction);
-		faction = new Faction("FRR", "Free Rasalhague Republic");
-		faction.color = new Color(148,0,11);
-		faction.nameGenerator = "FRR";
-		faction.startingPlanet = new String[]{"Rasalhague","Rasalhague","Rasalhague","Rasalhague","Rasalhague","Rasalhague","Rasalhague","Tukayyid","Tukayyid"};
-		faction.eraMods = new int[]{0,0,0,0,0,0,2,1,0};
-		addFaction(faction);
-		faction = new Faction("SIC", "St. Ives Compact");
-		faction.color = new Color(0,250,154);
-		faction.startingPlanet = new String[]{"St. Ives","St. Ives","St. Ives","St. Ives","St. Ives","St. Ives","St. Ives","St. Ives","St. Ives"};
-		faction.eraMods = new int[]{1,0,0,1,2,3,2,1,0};
-		addFaction(faction);
-		faction = new Faction("MOC", "Magistracy of Canopus");
-		faction.color = new Color(34,139,34);
-		faction.periphery = true;
-		faction.startingPlanet = new String[]{"Canopus IV","Canopus IV","Canopus IV","Canopus IV","Canopus IV","Canopus IV","Canopus IV","Canopus IV","Canopus IV"};
-		faction.eraMods = new int[]{1,1,1,1,2,3,2,1,1};
-		addFaction(faction);
-		faction = new Faction("OA", "Outworlds Alliance");
-		faction.color = Color.CYAN;
-		faction.periphery = true;
-		faction.startingPlanet = new String[]{"Alpheratz","Alpheratz","Alpheratz","Alpheratz","Alpheratz","Alpheratz","Alpheratz","Alpheratz","Alpheratz"};
-		faction.eraMods = new int[]{1,1,1,1,2,3,2,1,0};
-		addFaction(faction);
-		faction = new Faction("TC", "Taurian Concordat");
-		faction.color = new Color(205,133,63);
-		faction.startingPlanet = new String[]{"Taurus","Taurus","Taurus","Taurus","Taurus","Taurus","Taurus","Taurus","Taurus"};
-		faction.periphery = true;
-		faction.eraMods = new int[]{1,1,1,1,2,3,2,1,0};
-		addFaction(faction);
-		faction = new Faction("MH", "Marian Hegemony");
-		faction.color = new Color(0,206,209);
-		faction.periphery = true;
-		faction.startingPlanet = new String[]{"Alphard (Independent)","Alphard (Independent)","Alphard (Independent)","Alphard (Independent)","Alphard (Independent)","Alphard (Independent)","Alphard (Independent)","Alphard (Independent)","Alphard (Independent)"};
-		faction.eraMods = new int[]{1,1,1,1,2,3,2,2,1};
-		addFaction(faction);
-		faction = new Faction("PIND", "Independent (Periphery)");
-		faction.color = Color.GRAY;
-		faction.periphery = true;
-		faction.eraMods = new int[]{1,1,1,1,2,3,2,2,1};
-		addFaction(faction);
-		faction = new Faction("ARDC", "Arc-Royal Defense Cordon");
-		faction.color = new Color(218,165,32);
-		faction.startingPlanet = new String[]{"Arc-Royal","Arc-Royal","Arc-Royal","Arc-Royal","Arc-Royal","Arc-Royal","Arc-Royal","Arc-Royal","Arc-Royal"};
-		faction.eraMods = new int[]{0,0,0,1,2,3,2,0,0};
-		addFaction(faction);
-		faction = new Faction("IND", "Independent");
-		faction.color = Color.GRAY;
-		faction.eraMods = new int[]{1,1,1,1,2,3,2,2,1};
-		addFaction(faction);
-		faction = new Faction("TH", "Terran Hegemony");
-		faction.color = Color.WHITE;
-		faction.eraMods = new int[]{-1,-1,-1,0,0,0,0,0,0};
-		addFaction(faction);
-		faction = new Faction("RWR", "Rim Worlds Republic");
-		faction.color = new Color(205,192,176);
-		faction.eraMods = new int[]{1,1,1,0,0,0,0,0,0};
-		addFaction(faction);
-		faction = new Faction("CW", "Clan Wolf");
-		faction.color = new Color(139,69,19);
-		faction.clan = true;
-		faction.nameGenerator = "Clan";
-		faction.startingPlanet = new String[]{"Tamar","Tamar","Tamar","Tamar","Tamar","Tamar","Tamar","Tamar","Tamar"};
-		addFaction(faction);
-		faction = new Faction("CJF", "Clan Jade Falcon");
-		faction.color = new Color(154, 205, 50);
-		faction.clan = true;
-		faction.nameGenerator = "Clan";
-		faction.startingPlanet = new String[]{"Sudeten","Sudeten","Sudeten","Sudeten","Sudeten","Sudeten","Sudeten","Sudeten","Sudeten"};
-		addFaction(faction);
-		faction = new Faction("CGB", "Clan Ghost Bear");
-		faction.color = new Color(135,206,250);
-		faction.clan = true;
-		faction.nameGenerator = "Clan";
-		faction.startingPlanet = new String[]{"Alshain","Alshain","Alshain","Alshain","Alshain","Alshain","Alshain","Alshain","Alshain"};
-		addFaction(faction);
-		faction = new Faction("CSJ", "Clan Smoke Jaguar");
-		faction.color = new Color(119,136,153);
-		faction.clan = true;
-		faction.nameGenerator = "Clan";
-		addFaction(faction);
-		faction = new Faction("CNC", "Clan Nova Cat");
-		faction.color = new Color(238,221,130);
-		faction.clan = true;
-		faction.nameGenerator = "Clan";
-		faction.startingPlanet = new String[]{"Irece","Irece","Irece","Irece","Irece","Irece","Irece","Irece","Irece"};
-		addFaction(faction);
-		faction = new Faction("CDS", "Clan Diamond Shark");
-		faction.color = new Color(250,128,114);
-		faction.clan = true;
-		faction.nameGenerator = "Clan";
-		faction.startingPlanet = new String[]{"Twycross","Twycross","Twycross","Twycross","Twycross","Twycross","Twycross","Twycross","Twycross"};
-		addFaction(faction);
-		faction = new Faction("CSV", "Clan Steel Viper");
-		faction.color = new Color(188,143,143);
-		faction.clan = true;
-		faction.nameGenerator = "Clan";
-		addFaction(faction);
-		faction = new Faction("CHH", "Clan Hells Horses");
-		faction.color = new Color(178,34,34);
-		faction.clan = true;
-		faction.nameGenerator = "Clan";
-		faction.startingPlanet = new String[]{"Csesztreg","Csesztreg","Csesztreg","Csesztreg","Csesztreg","Csesztreg","Csesztreg","Csesztreg","Csesztreg"};
-		addFaction(faction);
-	}
-	
-	
-	public static void addFaction(Faction f) {
-		factions.put(f.getShortName(), f);
-	}
-	
 	public static ArrayList<String> getFactionList() {
 		ArrayList<String> flist = new ArrayList<String>();
 		for(String sname : factions.keySet()) {
@@ -412,6 +261,100 @@ public class Faction {
         }
     }
     
+    public static Faction getFactionFromXML(Node wn) throws DOMException, ParseException {
+		Faction retVal = new Faction();
+		NodeList nl = wn.getChildNodes();
+		
+		for (int x=0; x<nl.getLength(); x++) {
+			Node wn2 = nl.item(x);
+			if (wn2.getNodeName().equalsIgnoreCase("shortname")) {
+				retVal.shortname = wn2.getTextContent();
+			} else if (wn2.getNodeName().equalsIgnoreCase("fullname")) {
+				retVal.fullname = wn2.getTextContent();
+			} else if (wn2.getNodeName().equalsIgnoreCase("nameGenerator")) {
+				retVal.nameGenerator = wn2.getTextContent();
+			} else if (wn2.getNodeName().equalsIgnoreCase("clan")) {
+				if (wn2.getTextContent().equalsIgnoreCase("true"))
+					retVal.clan = true;
+				else
+					retVal.clan = false;
+			} else if (wn2.getNodeName().equalsIgnoreCase("periphery")) {
+				if (wn2.getTextContent().equalsIgnoreCase("true"))
+					retVal.periphery = true;
+				else
+					retVal.periphery = false;
+			} else if (wn2.getNodeName().equalsIgnoreCase("startingPlanet")) {
+				retVal.startingPlanet = wn2.getTextContent().split(",");
+			} else if (wn2.getNodeName().equalsIgnoreCase("eraMods")) {
+				String[] values = wn2.getTextContent().split(",");
+				for(int i = 0; i < values.length; i++) {
+					retVal.eraMods[i] = Integer.parseInt(values[i]);
+				}
+			} else if (wn2.getNodeName().equalsIgnoreCase("colorRGB")) {
+				String[] values = wn2.getTextContent().split(",");
+				if(values.length == 3) {
+					int colorRed = Integer.parseInt(values[0]);
+					int colorGreen = Integer.parseInt(values[1]);
+					int colorBlue = Integer.parseInt(values[2]);
+					retVal.color = new Color(colorRed, colorGreen, colorBlue);
+				}
+			} 
+		}
+		return retVal;
+	}
+    
+    public static void generateFactions() throws DOMException, ParseException {
+		MekHQ.logMessage("Starting load of faction data from XML...");
+		// Initialize variables.
+		factions = new Hashtable<String, Faction>();
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		Document xmlDoc = null;
+	
+		
+		try {
+			FileInputStream fis = new FileInputStream("data/factions.xml");
+			// Using factory get an instance of document builder
+			DocumentBuilder db = dbf.newDocumentBuilder();
+	
+			// Parse using builder to get DOM representation of the XML file
+			xmlDoc = db.parse(fis);
+		} catch (Exception ex) {
+			MekHQ.logError(ex);
+		}
+	
+		Element factionEle = xmlDoc.getDocumentElement();
+		NodeList nl = factionEle.getChildNodes();
+	
+		// Get rid of empty text nodes and adjacent text nodes...
+		// Stupid weird parsing of XML.  At least this cleans it up.
+		factionEle.normalize(); 
+	
+		// Okay, lets iterate through the children, eh?
+		for (int x = 0; x < nl.getLength(); x++) {
+			Node wn = nl.item(x);
+	
+			if (wn.getParentNode() != factionEle)
+				continue;
+	
+			int xc = wn.getNodeType();
+	
+			if (xc == Node.ELEMENT_NODE) {
+				// This is what we really care about.
+				// All the meat of our document is in this node type, at this
+				// level.
+				// Okay, so what element is it?
+				String xn = wn.getNodeName();
+	
+				if (xn.equalsIgnoreCase("faction")) {
+					Faction f = getFactionFromXML(wn);
+					factions.put(f.getShortName(), f);
+				} else if (xn.equalsIgnoreCase("choosableFactionCodes")) {
+					choosableFactionCodes = wn.getTextContent().split(",");
+				}
+			}
+		}	
+		MekHQ.logMessage("Loaded a total of " + factions.keySet().size() + " factions");
+	}
 
     
 }
