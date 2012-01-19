@@ -14,6 +14,7 @@ v0.1.14 (SVN)
 + factions loaded from xml
 + ability for multiple factions to control a planet
 + added remaining clan factions and some other minor powers
++ Bug: scenario data not getting saved
 
 v0.1.13 (2012-01-11)
 + added campaign reference to all parts (should fix NPE refit bug)

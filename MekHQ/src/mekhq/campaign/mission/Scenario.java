@@ -22,6 +22,7 @@ package mekhq.campaign.mission;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.UUID;
@@ -247,6 +248,7 @@ public class Scenario implements Serializable {
 	}
 	
 	public void writeToXml(PrintWriter pw1, int indent) {
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "<scenario id=\""
 				+id
 				+"\" type=\""
@@ -275,6 +277,10 @@ public class Scenario implements Serializable {
 		if(null != stub) {
 			stub.writeToXml(pw1, indent+1);
 		}
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<date>"
+				+df.format(date)
+				+"</date>");
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "</scenario>");
 		
 	}
@@ -284,7 +290,8 @@ public class Scenario implements Serializable {
 		NamedNodeMap attrs = wn.getAttributes();
 		Node classNameNode = attrs.getNamedItem("type");
 		String className = classNameNode.getTextContent();
-
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+		
 		try {
 			// Instantiate the correct child class, and call its parsing function.
 			retVal = (Scenario) Class.forName(className).newInstance();
@@ -307,7 +314,9 @@ public class Scenario implements Serializable {
 					retVal.setReport(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("forceStub")) {
 					retVal.stub = ForceStub.generateInstanceFromXML(wn2);
-				} 
+				} else if (wn2.getNodeName().equalsIgnoreCase("date")) {
+					retVal.date = df.parse(wn2.getTextContent().trim());
+				}
 			}
 		} catch (Exception ex) {
 			// Errrr, apparently either the class name was invalid...
