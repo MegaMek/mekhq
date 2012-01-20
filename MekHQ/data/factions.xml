@@ -12,9 +12,9 @@ top of this xml file.
 Here is a description of what goes in each faction tag
 shortname - this is the abbreviation that is used to identify each faction in planets.xml and within
             MekHQ itself. This code must be unique.
-fullname  - the full display name for the faction. In the future, we may add the possibility of 
-            display names that can change across eras to capture factions like the 
-            Lyran Alliance/Commonwealth and Clan Sea Fox/Diamond Shark
+fullname  - the full display name for the faction. 
+altNames - a comma-separated 9-item list that identifies alternate names for a given era. Use a single
+	       space between commas to indicate that the regular fullname should be used.
 startingPlanet - A comma-separated 9-item list that identifies the starting planet if you 
 			     begin a new campaign with this faction. The name of the planet must be the name
 			     as it is recognized in MekHQ. Each item corresponds to a different era as follows:
@@ -72,10 +72,11 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 	</faction>
 	<faction>
 		<shortname>LA</shortname>
-		<fullname>Lyran Alliance/Commonwealth</fullname>
+		<fullname>Lyran Commonwealth</fullname>
 		<nameGenerator>LA</nameGenerator>
 		<startingPlanet>Tharkad,Tharkad,Tharkad,Tharkad,Tharkad,Tharkad,Tharkad,Tharkad,Tharkad</startingPlanet>
 		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
+		<altNames> , , , , , , ,Lyran Alliance,Lyran Alliance</altNames>
 		<colorRGB>0,0,255</colorRGB>
 	</faction>
 	<faction>
@@ -141,6 +142,7 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 		<shortname>TFR</shortname>
 		<fullname>Tikonov Free Republic</fullname>
 		<startingPlanet>Tikonov,Tikonov,Tikonov,Tikonov,Tikonov,Tikonov,Tikonov,Tikonov,Tikonov</startingPlanet>
+		<altNames>Tikonov Grand Union, , , , , , , , </altNames>
 		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
 		<colorRGB>255,165,0</colorRGB>
 	</faction>
@@ -267,6 +269,7 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 		<shortname>CDS</shortname>
 		<fullname>Clan Diamond Shark</fullname>
 		<startingPlanet>Babylon,Babylon,Babylon,Babylon,Babylon,Babylon,Babylon,Babylon,Twycross</startingPlanet>
+		<altNames> , , ,Clan Sea Fox, Clan Sea Fox, , , , </altNames>
 		<clan>true</clan>
 		<nameGenerator>Clan</nameGenerator>
 		<colorRGB>250,128,114</colorRGB>

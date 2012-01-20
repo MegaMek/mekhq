@@ -25,8 +25,10 @@ import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.TreeMap;
 
@@ -316,11 +318,13 @@ public class Planet implements Serializable {
 	}
 	
 	public String getFactionDesc(Date date) {
+		GregorianCalendar cal = new GregorianCalendar();
+		cal.setTime(date);
 		String desc = "";
 		Iterator<Faction> factions = getCurrentFactions(date).iterator();
 		while(factions.hasNext()) {
 			Faction f = factions.next();
-			desc += f.getFullName();
+			desc += f.getFullName(Era.getEra(cal.get(Calendar.YEAR)));
 			if(factions.hasNext()) {
 				desc += "/";
 			}

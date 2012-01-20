@@ -86,6 +86,7 @@ public class Faction {
 	
 	private String shortname;
 	private String fullname;
+	private String[] altNames;
 	private Color color;
 	private String nameGenerator;
 	private boolean clan;
@@ -105,6 +106,7 @@ public class Faction {
 		periphery = false;
 		color = Color.LIGHT_GRAY;
 		startingPlanet = new String[]{"Terra","Terra","Terra","Terra","Terra","Terra","Terra","Terra","Terra"};
+		altNames = new String[]{"","","","","","","","",""};
 		eraMods = new int[]{0,0,0,0,0,0,0,0,0};
 	}
 
@@ -112,8 +114,13 @@ public class Faction {
 		return shortname;
 	}
 	
-	public String getFullName() {
-		return fullname;
+	public String getFullName(int era) {
+		String alt = altNames[era];
+		if(alt.trim().length() == 0) {
+			return fullname;
+		} else {
+			return alt;
+		}
 	}
 	
 	public Color getColor() {
@@ -278,6 +285,8 @@ public class Faction {
 					retVal.periphery = false;
 			} else if (wn2.getNodeName().equalsIgnoreCase("startingPlanet")) {
 				retVal.startingPlanet = wn2.getTextContent().split(",");
+			} else if (wn2.getNodeName().equalsIgnoreCase("altNames")) {
+				retVal.altNames = wn2.getTextContent().split(",");
 			} else if (wn2.getNodeName().equalsIgnoreCase("eraMods")) {
 				String[] values = wn2.getTextContent().split(",");
 				for(int i = 0; i < values.length; i++) {

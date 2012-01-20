@@ -17,6 +17,7 @@ v0.1.14 (SVN)
 + Bug: scenario data not getting saved
 + era mods option
 + inner sphere team working on clan-tech modifier
++ altNames field in factions for name changes (e.g. Diamond Shark/Sea Fox)
 
 v0.1.13 (2012-01-11)
 + added campaign reference to all parts (should fix NPE refit bug)

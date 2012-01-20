@@ -58,6 +58,7 @@ import megamek.common.util.DirectoryItems;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.Era;
 import mekhq.campaign.Faction;
 import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.Ranks;
@@ -293,9 +294,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 
         DefaultComboBoxModel factionModel = new DefaultComboBoxModel();
         for(String sname : Faction.choosableFactionCodes) {
-            factionModel.addElement(Faction.getFaction(sname).getFullName());
+            factionModel.addElement(Faction.getFaction(sname).getFullName(Era.E_JIHAD));
         }
-        factionModel.setSelectedItem(campaign.getFaction().getFullName());
+        factionModel.setSelectedItem(campaign.getFaction().getFullName(Era.E_JIHAD));
         comboFaction.setModel(factionModel);
         comboFaction.setMinimumSize(new java.awt.Dimension(400, 30));
         comboFaction.setName("comboFaction"); // NOI18N

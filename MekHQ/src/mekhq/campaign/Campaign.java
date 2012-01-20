@@ -1296,7 +1296,7 @@ public class Campaign implements Serializable {
 	}
 	
 	public String getFactionName() {
-		return getFaction().getFullName();
+		return getFaction().getFullName(getEra());
 	}
 
 	public void setFactionCode(String i) {
