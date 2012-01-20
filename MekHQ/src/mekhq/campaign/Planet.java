@@ -34,6 +34,7 @@ import java.util.TreeMap;
 
 import megamek.common.EquipmentType;
 import megamek.common.PlanetaryConditions;
+import mekhq.MekHQ;
 
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
@@ -769,7 +770,10 @@ public class Planet implements Serializable {
 		ArrayList<String> factions = new ArrayList<String>();
 		String[] codes = codeList.split(",");
 		for(String code : codes) {
-			factions.add(Faction.getFactionCode(Integer.parseInt(code)));
+			if(null == Faction.getFaction(code)) {
+				MekHQ.logMessage("Unknown faction code: " + code);
+			}
+			factions.add(code);
 		}
 		return factions;
 	}

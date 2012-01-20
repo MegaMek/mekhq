@@ -18,6 +18,7 @@ v0.1.14 (SVN)
 + era mods option
 + inner sphere team working on clan-tech modifier
 + altNames field in factions for name changes (e.g. Diamond Shark/Sea Fox)
++ updated planets.xml to new string based faction codes
 
 v0.1.13 (2012-01-11)
 + added campaign reference to all parts (should fix NPE refit bug)

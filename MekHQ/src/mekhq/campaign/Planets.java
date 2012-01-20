@@ -113,6 +113,9 @@ public class Planets {
 	
 				if (xn.equalsIgnoreCase("planet")) {
 					Planet p = Planet.getPlanetFromXML(wn);
+					if(null == p.getBaseFactions().get(0)) {
+						MekHQ.logMessage("The base factions are null for planet " + p.getName());
+					}
 					String name = p.getName();
 					if(null == retVal.get(name)) {
 						retVal.put(name, p);
