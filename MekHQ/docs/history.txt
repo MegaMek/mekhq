@@ -21,6 +21,8 @@ v0.1.14 (SVN)
 + updated planets.xml to new string based faction codes
 + FRR faction change on 3/13/3034
 + Lyran Alliance faction change on 09/13/3057
++ Ghost Bear/Smoke Jag/Nova Cat invasion corridor
++ Operation Bulldog map changes
 
 v0.1.13 (2012-01-11)
 + added campaign reference to all parts (should fix NPE refit bug)

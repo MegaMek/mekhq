@@ -456,11 +456,15 @@
 		<ycood>359.9</ycood>
 		<faction>DC</faction>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-07-01</date>
 			<faction>CSJ</faction>
 		</factionChange>
 		<factionChange>
-			<date>3062-01-01</date>
+			<date>3059-09-15</date>
+			<faction>DC,CSJ</faction>
+		</factionChange>
+		<factionChange>
+			<date>3059-09-18</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -790,11 +794,11 @@
 		<ycood>400.59</ycood>
 		<faction>DC</faction>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-04-01</date>
 			<faction>CSJ</faction>
 		</factionChange>
 		<factionChange>
-			<date>3062-01-01</date>
+			<date>3059-06-26</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -898,7 +902,7 @@
 		<ycood>281.14</ycood>
 		<faction>DC</faction>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3051-12-05</date>
 			<faction>CGB</faction>
 		</factionChange>
 	</planet>
@@ -1482,7 +1486,7 @@
 		<ycood>248.02</ycood>
 		<faction>DC</faction>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3052-02-01</date>
 			<faction>CGB</faction>
 		</factionChange>
 	</planet>
@@ -1644,11 +1648,15 @@
 		<ycood>268.62</ycood>
 		<faction>DC</faction>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3052-02-01</date>
+			<faction>CSJ,DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3052-02-25</date>
 			<faction>CSJ</faction>
 		</factionChange>
 		<factionChange>
-			<date>3062-01-01</date>
+			<date>3059-05-29</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -1986,11 +1994,19 @@
 		<ycood>254.28</ycood>
 		<faction>DC</faction>
 		<factionChange>
-			<date>3052-01-01</date>
-			<faction>CNC</faction>
+			<date>3051-11-01</date>
+			<faction>CSJ,CNC,DC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3062-01-01</date>
+			<date>3051-11-08</date>
+			<faction>CSJ,CNC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3059-06-02</date>
+			<faction>CSJ,DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3059-06-26</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -2226,11 +2242,15 @@
 		<ycood>352.86</ycood>
 		<faction>DC</faction>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-09-01</date>
 			<faction>CSJ</faction>
 		</factionChange>
 		<factionChange>
-			<date>3062-01-01</date>
+			<date>3059-08-01</date>
+			<faction>DC,CSJ</faction>
+		</factionChange>
+		<factionChange>
+			<date>3059-08-13</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -2924,11 +2944,15 @@
 		<ycood>411.8</ycood>
 		<faction>DC</faction>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-03-01</date>
+			<faction>CSJ</faction>
+		</factionChange>
+		<factionChange>
+			<date>3051-11-01</date>
 			<faction>CNC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3062-01-01</date>
+			<date>3059-06-26</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -3391,14 +3415,6 @@
 		<xcood>162.22</xcood>
 		<ycood>391.2</ycood>
 		<faction>DC</faction>
-		<factionChange>
-			<date>3052-01-01</date>
-			<faction>CSJ</faction>
-		</factionChange>
-		<factionChange>
-			<date>3062-01-01</date>
-			<faction>DC</faction>
-		</factionChange>
 	</planet>
 	<planet>
 		<name>Brockton</name>
@@ -3668,11 +3684,11 @@
 		<ycood>338.78</ycood>
 		<faction>DC</faction>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-10-01</date>
 			<faction>CSJ</faction>
 		</factionChange>
 		<factionChange>
-			<date>3062-01-01</date>
+			<date>3059-06-29</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -4088,11 +4104,15 @@
 		<ycood>293.92</ycood>
 		<faction>DC</faction>
 		<factionChange>
-			<date>3052-01-01</date>
-			<faction>CNC</faction>
+			<date>3052-02-01</date>
+			<faction>CNC,CSJ</faction>
 		</factionChange>
 		<factionChange>
-			<date>3062-01-01</date>
+			<date>3059-06-02</date>
+			<faction>DC,CSJ</faction>
+		</factionChange>
+		<factionChange>
+			<date>3059-06-26</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -4278,7 +4298,7 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-09-15</date>
 			<faction>CGB</faction>
 		</factionChange>
 	</planet>
@@ -4728,11 +4748,15 @@
 		<ycood>382.85</ycood>
 		<faction>DC</faction>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-05-01</date>
+			<faction>CSJ</faction>
+		</factionChange>
+		<factionChange>
+			<date>3051-11-01</date>
 			<faction>CNC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3062-01-01</date>
+			<date>3059-06-02</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -5094,7 +5118,11 @@
 		<ycood>432.93</ycood>
 		<faction>DC</faction>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-04-01</date>
+			<faction>CGB,DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-04-06</date>
 			<faction>CGB</faction>
 		</factionChange>
 	</planet>
@@ -5234,11 +5262,11 @@
 		<ycood>386.24</ycood>
 		<faction>DC</faction>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-05-01</date>
 			<faction>CSJ</faction>
 		</factionChange>
 		<factionChange>
-			<date>3062-01-01</date>
+			<date>3059-08-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -5262,11 +5290,19 @@
 		<ycood>347.91</ycood>
 		<faction>DC</faction>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-09-01</date>
+			<faction>CSJ,DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-09-02</date>
+			<faction>CSJ</faction>
+		</factionChange>
+		<factionChange>
+			<date>3051-12-01</date>
 			<faction>CNC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3062-01-01</date>
+			<date>3059-06-26</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -5522,11 +5558,11 @@
 		<ycood>280.36</ycood>
 		<faction>DC</faction>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3052-02-01</date>
 			<faction>CNC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3062-01-01</date>
+			<date>3059-06-02</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -5622,7 +5658,11 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-03-04</date>
+			<faction>CGB,FRR</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-05-27</date>
 			<faction>CGB</faction>
 		</factionChange>
 	</planet>
@@ -6610,7 +6650,7 @@
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3052-03-01</date>
 			<faction>CGB</faction>
 		</factionChange>
 	</planet>
@@ -8054,11 +8094,11 @@
 		<ycood>385.46</ycood>
 		<faction>DC</faction>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-05-01</date>
 			<faction>CSJ</faction>
 		</factionChange>
 		<factionChange>
-			<date>3062-01-01</date>
+			<date>3059-08-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -8374,7 +8414,7 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-10-01</date>
 			<faction>CGB</faction>
 		</factionChange>
 	</planet>
@@ -9050,11 +9090,15 @@
 		<ycood>367.47</ycood>
 		<faction>DC</faction>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-07-01</date>
+			<faction>CSJ,DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-07-10</date>
 			<faction>CSJ</faction>
 		</factionChange>
 		<factionChange>
-			<date>3062-01-01</date>
+			<date>3059-06-29</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -9620,7 +9664,7 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-03-15</date>
 			<faction>CGB</faction>
 		</factionChange>
 	</planet>
@@ -9964,11 +10008,15 @@
 		<ycood>330.96</ycood>
 		<faction>DC</faction>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3051-11-01</date>
 			<faction>CSJ</faction>
 		</factionChange>
 		<factionChange>
-			<date>3062-01-01</date>
+			<date>3059-05-26</date>
+			<faction>DC,CSJ</faction>
+		</factionChange>
+		<factionChange>
+			<date>3059-05-29</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -10036,11 +10084,11 @@
 		<ycood>432.93</ycood>
 		<faction>DC</faction>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-03-01</date>
 			<faction>CSJ</faction>
 		</factionChange>
 		<factionChange>
-			<date>3062-01-01</date>
+			<date>3059-09-18</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -10314,11 +10362,15 @@
 		<ycood>296.79</ycood>
 		<faction>DC</faction>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3051-12-22</date>
+			<faction>CNC,DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3051-12-27</date>
 			<faction>CNC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3062-01-01</date>
+			<date>3059-06-02</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -10406,7 +10458,7 @@
 			<faction>CNC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3062-01-01</date>
+			<date>3059-06-26</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -10510,7 +10562,11 @@
 		<ycood>471.79</ycood>
 		<faction>DC</faction>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-05-01</date>
+			<faction>CGB,DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-05-10</date>
 			<faction>CGB</faction>
 		</factionChange>
 	</planet>
@@ -10554,11 +10610,15 @@
 		<ycood>370.6</ycood>
 		<faction>DC</faction>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-06-01</date>
+			<faction>CSJ</faction>
+		</factionChange>
+		<factionChange>
+			<date>3051-12-01</date>
 			<faction>CNC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3062-01-01</date>
+			<date>3059-06-02</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -10582,11 +10642,15 @@
 		<ycood>343.73</ycood>
 		<faction>DC</faction>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-09-01</date>
 			<faction>CSJ</faction>
 		</factionChange>
 		<factionChange>
-			<date>3062-01-01</date>
+			<date>3059-09-15</date>
+			<faction>DC,CSJ</faction>
+		</factionChange>
+		<factionChange>
+			<date>3059-09-18</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -10624,7 +10688,7 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-09-01</date>
 			<faction>CGB</faction>
 		</factionChange>
 	</planet>
@@ -10708,7 +10772,7 @@
 			<faction>CNC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3062-01-01</date>
+			<date>3059-06-26</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -10750,11 +10814,11 @@
 		<ycood>372.94</ycood>
 		<faction>DC</faction>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-06-01</date>
 			<faction>CSJ</faction>
 		</factionChange>
 		<factionChange>
-			<date>3062-01-01</date>
+			<date>3059-09-15</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -10764,7 +10828,7 @@
 		<ycood>299.4</ycood>
 		<faction>DC</faction>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3051-12-01</date>
 			<faction>CGB</faction>
 		</factionChange>
 	</planet>
@@ -10930,11 +10994,11 @@
 		<ycood>242.54</ycood>
 		<faction>DC</faction>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3052-03-01</date>
 			<faction>CNC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3062-01-01</date>
+			<date>3059-06-02</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -11206,7 +11270,7 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3051-12-01</date>
 			<faction>CGB</faction>
 		</factionChange>
 	</planet>
@@ -11368,11 +11432,11 @@
 		<ycood>242.02</ycood>
 		<faction>DC</faction>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3052-03-01</date>
 			<faction>CSJ</faction>
 		</factionChange>
 		<factionChange>
-			<date>3062-01-01</date>
+			<date>3059-05-29</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -11876,7 +11940,7 @@
 		<ycood>232.37</ycood>
 		<faction>DC</faction>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3052-03-01</date>
 			<faction>CGB</faction>
 		</factionChange>
 	</planet>
@@ -12090,11 +12154,19 @@
 		<ycood>328.35</ycood>
 		<faction>DC</faction>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3051-11-01</date>
+			<faction>CSJ,DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3051-11-08</date>
 			<faction>CSJ</faction>
 		</factionChange>
 		<factionChange>
-			<date>3062-01-01</date>
+			<date>3059-06-26</date>
+			<faction>CSJ,DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3059-06-29</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -12282,7 +12354,11 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-06-23</date>
+			<faction>CGB,FRR</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-06-27</date>
 			<faction>CGB</faction>
 		</factionChange>
 	</planet>
@@ -12767,6 +12843,14 @@
 		<xcood>260.28</xcood>
 		<ycood>377.9</ycood>
 		<faction>DC</faction>
+		<factionChange>
+			<date>3059-07-27</date>
+			<faction>DC,CSJ</faction>
+		</factionChange>
+		<factionChange>
+			<date>3059-08-13</date>
+			<faction>DC</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Londerholm</name>
@@ -13031,6 +13115,14 @@
 		<xcood>169.26</xcood>
 		<ycood>252.72</ycood>
 		<faction>DC</faction>
+		<factionChange>
+			<date>3052-01-04</date>
+			<faction>CSJ,CNC,DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3052-01-07</date>
+			<faction>DC</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Luxen</name>
@@ -13044,11 +13136,15 @@
 		<ycood>354.95</ycood>
 		<faction>DC</faction>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-08-01</date>
 			<faction>CSJ</faction>
 		</factionChange>
 		<factionChange>
-			<date>3062-01-01</date>
+			<date>3059-06-29</date>
+			<faction>DC,CSJ</faction>
+		</factionChange>
+		<factionChange>
+			<date>3059-08-08</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -13434,7 +13530,7 @@
 		<ycood>228.98</ycood>
 		<faction>DC</faction>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3052-03-01</date>
 			<faction>CGB</faction>
 		</factionChange>
 	</planet>
@@ -13662,11 +13758,15 @@
 		<ycood>333.04</ycood>
 		<faction>DC</faction>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3051-11-01</date>
 			<faction>CSJ</faction>
 		</factionChange>
 		<factionChange>
-			<date>3062-01-01</date>
+			<date>3059-08-01</date>
+			<faction>DC,CSJ</faction>
+		</factionChange>
+		<factionChange>
+			<date>3059-08-12</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -13681,6 +13781,14 @@
 		<xcood>254.8</xcood>
 		<ycood>352.34</ycood>
 		<faction>DC</faction>
+		<factionChange>
+			<date>3059-07-27</date>
+			<faction>DC,CSJ</faction>
+		</factionChange>
+		<factionChange>
+			<date>3059-08-13</date>
+			<faction>DC</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Matar</name>
@@ -13746,7 +13854,7 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3052-02-01</date>
 			<faction>CGB</faction>
 		</factionChange>
 	</planet>
@@ -13821,6 +13929,14 @@
 		<xcood>215.16</xcood>
 		<ycood>346.34</ycood>
 		<faction>DC</faction>
+		<factionChange>
+			<date>3059-07-27</date>
+			<faction>DC,CSJ</faction>
+		</factionChange>
+		<factionChange>
+			<date>3059-08-02</date>
+			<faction>DC</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>McComb</name>
@@ -13947,6 +14063,14 @@
 		<xcood>202.9</xcood>
 		<ycood>297.83</ycood>
 		<faction>DC</faction>
+		<factionChange>
+			<date>3059-07-27</date>
+			<faction>DC,CSJ</faction>
+		</factionChange>
+		<factionChange>
+			<date>3059-08-13</date>
+			<faction>DC</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Meinrad</name>
@@ -14908,7 +15032,7 @@
 			<faction>CNC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3062-01-01</date>
+			<date>3059-06-26</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -16050,11 +16174,11 @@
 		<ycood>392.24</ycood>
 		<faction>DC</faction>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-05-01</date>
 			<faction>CSJ</faction>
 		</factionChange>
 		<factionChange>
-			<date>3062-01-01</date>
+			<date>3059-06-29</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -16416,11 +16540,15 @@
 		<ycood>320.78</ycood>
 		<faction>DC</faction>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3051-11-01</date>
 			<faction>CSJ</faction>
 		</factionChange>
 		<factionChange>
-			<date>3062-01-01</date>
+			<date>3059-08-01</date>
+			<faction>DC,CSJ</faction>
+		</factionChange>
+		<factionChange>
+			<date>3059-08-05</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -16893,6 +17021,14 @@
 		<xcood>207.86</xcood>
 		<ycood>312.7</ycood>
 		<faction>DC</faction>
+		<factionChange>
+			<date>3059-07-27</date>
+			<faction>CSJ,DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3059-08-04</date>
+			<faction>DC</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Petrolia</name>
@@ -17042,7 +17178,7 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-03-15</date>
 			<faction>CGB</faction>
 		</factionChange>
 	</planet>
@@ -17196,7 +17332,7 @@
 		<ycood>378.16</ycood>
 		<faction>DC</faction>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-07-05</date>
 			<faction>CGB</faction>
 		</factionChange>
 	</planet>
@@ -17232,7 +17368,7 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-09-01</date>
 			<faction>CGB</faction>
 		</factionChange>
 	</planet>
@@ -17272,11 +17408,19 @@
 		<ycood>257.67</ycood>
 		<faction>DC</faction>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3052-03-01</date>
+			<faction>CSJ,DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3052-03-08</date>
 			<faction>CSJ</faction>
 		</factionChange>
 		<factionChange>
-			<date>3062-01-01</date>
+			<date>3059-05-26</date>
+			<faction>DC,CSJ</faction>
+		</factionChange>
+		<factionChange>
+			<date>3059-06-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -17304,7 +17448,7 @@
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3049-09-01</date>
 			<faction>CGB</faction>
 		</factionChange>
 	</planet>
@@ -17386,7 +17530,7 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-09-01</date>
 			<faction>CGB</faction>
 		</factionChange>
 	</planet>
@@ -17715,7 +17859,7 @@
 		</factionChange>
 	</planet>
 	<planet>
-		<name>Radlje</name>
+		<name>Radije</name>
 		<xcood>58.16</xcood>
 		<ycood>380.25</ycood>
 		<faction>DC</faction>
@@ -17724,7 +17868,7 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-07-08</date>
 			<faction>CGB</faction>
 		</factionChange>
 	</planet>
@@ -18136,11 +18280,15 @@
 		<ycood>459.53</ycood>
 		<faction>DC</faction>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-03-01</date>
+			<faction>CSJ,DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-03-05</date>
 			<faction>CSJ</faction>
 		</factionChange>
 		<factionChange>
-			<date>3062-01-01</date>
+			<date>3059-09-18</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -18316,11 +18464,11 @@
 		<ycood>423.02</ycood>
 		<faction>DC</faction>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-03-01</date>
 			<faction>CSJ</faction>
 		</factionChange>
 		<factionChange>
-			<date>3062-01-01</date>
+			<date>3059-08-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -18500,7 +18648,11 @@
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3052-04-01</date>
+			<faction>CGB,DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3052-04-22</date>
 			<faction>CGB</faction>
 		</factionChange>
 	</planet>
@@ -18858,7 +19010,15 @@
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3049-08-01</date>
+			<faction>PIND,CSJ</faction>
+		</factionChange>
+		<factionChange>
+			<date>3049-08-07</date>
+			<faction>CSJ</faction>
+		</factionChange>
+		<factionChange>
+			<date>3052-07-15</date>
 			<faction>CGB</faction>
 		</factionChange>
 	</planet>
@@ -19060,11 +19220,11 @@
 		<ycood>359.38</ycood>
 		<faction>DC</faction>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-07-01</date>
 			<faction>CSJ</faction>
 		</factionChange>
 		<factionChange>
-			<date>3062-01-01</date>
+			<date>3059-09-15</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -19084,11 +19244,15 @@
 		<ycood>396.16</ycood>
 		<faction>DC</faction>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-05-02</date>
+			<faction>CSJ</faction>
+		</factionChange>
+		<factionChange>
+			<date>3051-11-01</date>
 			<faction>CNC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3062-01-01</date>
+			<date>3059-06-02</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -19170,11 +19334,19 @@
 		<ycood>370.34</ycood>
 		<faction>DC</faction>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-06-01</date>
+			<faction>CSJ,DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-06-07</date>
 			<faction>CSJ</faction>
 		</factionChange>
 		<factionChange>
-			<date>3062-01-01</date>
+			<date>3059-08-01</date>
+			<faction>DC,CSJ</faction>
+		</factionChange>
+		<factionChange>
+			<date>3059-08-13</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -19184,11 +19356,11 @@
 		<ycood>430.58</ycood>
 		<faction>DC</faction>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-03-01</date>
 			<faction>CSJ</faction>
 		</factionChange>
 		<factionChange>
-			<date>3062-01-01</date>
+			<date>3059-08-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -19340,7 +19512,7 @@
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3052-02-01</date>
 			<faction>CGB</faction>
 		</factionChange>
 	</planet>
@@ -19458,7 +19630,7 @@
 		<ycood>292.62</ycood>
 		<faction>DC</faction>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3051-12-01</date>
 			<faction>CGB</faction>
 		</factionChange>
 	</planet>
@@ -20152,7 +20324,7 @@
 		<ycood>320</ycood>
 		<faction>DC</faction>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-10-01</date>
 			<faction>CGB</faction>
 		</factionChange>
 	</planet>
@@ -20196,7 +20368,7 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-09-01</date>
 			<faction>CGB</faction>
 		</factionChange>
 	</planet>
@@ -20356,11 +20528,11 @@
 		<ycood>396.68</ycood>
 		<faction>DC</faction>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-04-01</date>
 			<faction>CSJ</faction>
 		</factionChange>
 		<factionChange>
-			<date>3062-01-01</date>
+			<date>3059-09-15</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -20452,7 +20624,7 @@
 		<ycood>250.89</ycood>
 		<faction>DC</faction>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3052-01-15</date>
 			<faction>CGB</faction>
 		</factionChange>
 	</planet>
@@ -20738,7 +20910,7 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-05-01</date>
 			<faction>CGB</faction>
 		</factionChange>
 	</planet>
@@ -21138,11 +21310,15 @@
 		<ycood>253.76</ycood>
 		<faction>DC</faction>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3052-04-01</date>
 			<faction>CSJ</faction>
 		</factionChange>
 		<factionChange>
-			<date>3062-01-01</date>
+			<date>3059-05-27</date>
+			<faction>DC,CSJ</faction>
+		</factionChange>
+		<factionChange>
+			<date>3059-06-02</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -21162,11 +21338,15 @@
 		<ycood>432.93</ycood>
 		<faction>DC</faction>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-03-01</date>
+			<faction>CSJ</faction>
+		</factionChange>
+		<factionChange>
+			<date>3051-11-01</date>
 			<faction>CNC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3062-01-01</date>
+			<date>3059-06-26</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -21305,10 +21485,14 @@
 		<faction>DC</faction>
 		<factionChange>
 			<date>3052-01-01</date>
+			<faction>CNC,DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3052-05-01</date>
 			<faction>CNC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3062-01-01</date>
+			<date>3059-06-02</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -21510,7 +21694,11 @@
 		<ycood>307.48</ycood>
 		<faction>DC</faction>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3051-11-01</date>
+			<faction>CGB,DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3051-11-08</date>
 			<faction>CGB</faction>
 		</factionChange>
 	</planet>
@@ -21592,7 +21780,12 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-03-01</date>
+			<faction>FRR</faction>
+			<faction>CGB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-03-03</date>
 			<faction>CGB</faction>
 		</factionChange>
 	</planet>
@@ -21806,7 +21999,7 @@
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3052-03-01</date>
 			<faction>CGB</faction>
 		</factionChange>
 	</planet>
@@ -22074,7 +22267,11 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-05-01</date>
+			<faction>CGB,FRR</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-05-06</date>
 			<faction>CGB</faction>
 		</factionChange>
 	</planet>
@@ -22260,11 +22457,11 @@
 		<ycood>404.5</ycood>
 		<faction>DC</faction>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-03-15</date>
 			<faction>CSJ</faction>
 		</factionChange>
 		<factionChange>
-			<date>3062-01-01</date>
+			<date>3059-06-26</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -22518,7 +22715,7 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3052-03-01</date>
 			<faction>CGB</faction>
 		</factionChange>
 	</planet>
@@ -22968,7 +23165,7 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-08-01</date>
 			<faction>CGB</faction>
 		</factionChange>
 	</planet>
@@ -22978,11 +23175,11 @@
 		<ycood>403.72</ycood>
 		<faction>DC</faction>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-04-01</date>
 			<faction>CSJ</faction>
 		</factionChange>
 		<factionChange>
-			<date>3062-01-01</date>
+			<date>3059-06-29</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -23659,6 +23856,14 @@
 		<xcood>148.4</xcood>
 		<ycood>340.34</ycood>
 		<faction>DC</faction>
+		<factionChange>
+			<date>3050-10-01</date>
+			<faction>CSJ,DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-10-02</date>
+			<faction>DC</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Wolf_82</name>
@@ -23834,11 +24039,11 @@
 		<ycood>276.97</ycood>
 		<faction>DC</faction>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3052-02-01</date>
 			<faction>CSJ</faction>
 		</factionChange>
 		<factionChange>
-			<date>3062-01-01</date>
+			<date>3059-06-29</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>

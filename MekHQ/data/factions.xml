@@ -120,7 +120,7 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 		<startingPlanet>Rasalhague,Rasalhague,Rasalhague,Rasalhague,Rasalhague,Rasalhague,Rasalhague,Orestes,Orestes</startingPlanet>
 		<nameGenerator>FRR</nameGenerator>
 		<eraMods>0,0,0,0,0,0,2,1,0</eraMods>
-		<colorRGB>135,206,250</colorRGB>
+		<colorRGB>132,112,255</colorRGB>
 	</faction>
 	<faction>
 		<shortname>SIC</shortname>
