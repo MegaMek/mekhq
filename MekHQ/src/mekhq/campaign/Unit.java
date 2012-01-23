@@ -2174,21 +2174,19 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     			drivers.add(peopleHash.get(oid));
     		}
     	}
-    	if(!usesSoloPilot()) {
-    		for(int oid : oldGunners) {
-        		UUID nid = peopleHash.get(oid);
-        		if(null != nid) {
-        			gunners.add(peopleHash.get(oid));
-        		}
-        	}
-    		for(int oid : oldVesselCrew) {
-        		UUID nid = peopleHash.get(oid);
-        		if(null != nid) {
-        			vesselCrew.add(peopleHash.get(oid));
-        		}
-        	}
-    		navigator = peopleHash.get(oldNavigator);		
+    	for(int oid : oldGunners) {
+    		UUID nid = peopleHash.get(oid);
+    		if(null != nid) {
+    			gunners.add(peopleHash.get(oid));
+    		}
     	}
+    	for(int oid : oldVesselCrew) {
+    		UUID nid = peopleHash.get(oid);
+    		if(null != nid) {
+    			vesselCrew.add(peopleHash.get(oid));
+    		}
+    	}
+    	navigator = peopleHash.get(oldNavigator);		
     	if(null != refit) {
     		refit.fixIdReferences(uHash, peopleHash);
     	}

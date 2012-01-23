@@ -24,6 +24,7 @@ v0.1.14 (SVN)
 + Ghost Bear/Smoke Jag/Nova Cat invasion corridor
 + Operation Bulldog map changes
 + Bug: NPE when saving scenario date if pending
++ Bug: solo pilot units not getting gunnery assigned correctly
 
 v0.1.13 (2012-01-11)
 + added campaign reference to all parts (should fix NPE refit bug)
