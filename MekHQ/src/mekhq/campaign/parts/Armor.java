@@ -403,6 +403,7 @@ public class Armor extends Part implements IAcquisitionWork {
 		unit.getEntity().setArmor(amount + curAmount, location, rear);
 		changeAmountAvailable(-1 * amount);
 		updateConditionFromEntity();
+		skillMin = SkillType.EXP_GREEN;
 	}
 	
 	@Override
