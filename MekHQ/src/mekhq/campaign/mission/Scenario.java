@@ -277,10 +277,12 @@ public class Scenario implements Serializable {
 		if(null != stub) {
 			stub.writeToXml(pw1, indent+1);
 		}
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<date>"
-				+df.format(date)
-				+"</date>");
+		if(null != date) {
+			pw1.println(MekHqXmlUtil.indentStr(indent+1)
+					+"<date>"
+					+df.format(date)
+					+"</date>");
+		}
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "</scenario>");
 		
 	}
