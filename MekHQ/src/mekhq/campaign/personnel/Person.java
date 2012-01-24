@@ -1590,6 +1590,27 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         return toReturn;
     }
     
+    public int getBestTechLevel() {
+    	int lvl = -1;
+    	Skill mechSkill = getSkill(SkillType.S_TECH_MECH);
+        Skill mechanicSkill = getSkill(SkillType.S_TECH_MECHANIC);
+        Skill baSkill = getSkill(SkillType.S_TECH_BA);
+        Skill aeroSkill = getSkill(SkillType.S_TECH_AERO);
+        if(null != mechSkill && mechSkill.getLevel() > lvl) {
+        	lvl = mechSkill.getLevel();
+        }
+        if(null != mechanicSkill && mechanicSkill.getLevel() > lvl) {
+        	lvl = mechanicSkill.getLevel();
+        }
+        if(null != baSkill && baSkill.getLevel() > lvl) {
+        	lvl = baSkill.getLevel();
+        }
+        if(null != aeroSkill && aeroSkill.getLevel() > lvl) {
+        	lvl = aeroSkill.getLevel();
+        }
+        return lvl;
+    }
+    
     public String getTechDesc(boolean overtimeAllowed) {
          String toReturn = "<html><font size='2'><b>" + getName() + "</b><br/>";
          Skill mechSkill = getSkill(SkillType.S_TECH_MECH);
