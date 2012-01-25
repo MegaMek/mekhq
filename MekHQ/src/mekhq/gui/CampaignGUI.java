@@ -58,6 +58,7 @@ import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
@@ -87,7 +88,9 @@ import javax.swing.JTable;
 import javax.swing.JTree;
 import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
+import javax.swing.RowSorter;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SortOrder;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
@@ -454,6 +457,8 @@ public class CampaignGUI extends JPanel {
 		scrollMekLab = new javax.swing.JScrollPane();
 		lblLocation = new javax.swing.JLabel();
 
+        ArrayList <RowSorter.SortKey> sortKeys;
+		
 		ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI");
 		tabMain.setToolTipText(resourceMap.getString("tabMain.toolTipText")); // NOI18N
 		tabMain.setMinimumSize(new java.awt.Dimension(600, 200));
@@ -927,6 +932,10 @@ public class CampaignGUI extends JPanel {
         personnelSorter.setComparator(PersonnelTableModel.COL_TOUGH, new BonusSorter());
         personnelSorter.setComparator(PersonnelTableModel.COL_SALARY, new FormattedNumberSorter());
         personnelTable.setRowSorter(personnelSorter);
+        sortKeys = new ArrayList<RowSorter.SortKey>();
+        sortKeys.add(new RowSorter.SortKey(PersonnelTableModel.COL_RANK, SortOrder.DESCENDING));
+        sortKeys.add(new RowSorter.SortKey(PersonnelTableModel.COL_SKILL, SortOrder.DESCENDING));
+        personnelSorter.setSortKeys(sortKeys);
 		personnelTable.addMouseListener(personnelMouseAdapter);
 		personnelTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 		TableColumn column = null;
@@ -1047,9 +1056,14 @@ public class CampaignGUI extends JPanel {
         unitTable.createDefaultColumnsFromModel();
         unitSorter = new TableRowSorter<UnitTableModel>(unitModel);
         unitSorter.setComparator(UnitTableModel.COL_STATUS, new UnitStatusSorter());
+        unitSorter.setComparator(UnitTableModel.COL_TYPE, new UnitTypeSorter());
         unitSorter.setComparator(UnitTableModel.COL_WCLASS, new WeightClassSorter());
         unitSorter.setComparator(UnitTableModel.COL_COST, new FormattedNumberSorter());
         unitTable.setRowSorter(unitSorter);
+        sortKeys = new ArrayList<RowSorter.SortKey>();
+        sortKeys.add(new RowSorter.SortKey(UnitTableModel.COL_TYPE, SortOrder.DESCENDING));
+        sortKeys.add(new RowSorter.SortKey(UnitTableModel.COL_WCLASS, SortOrder.DESCENDING));
+        unitSorter.setSortKeys(sortKeys);
 		unitTable.addMouseListener(unitMouseAdapter);
 		unitTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 		column = null;
@@ -1397,6 +1411,9 @@ public class CampaignGUI extends JPanel {
 		techSorter = new TableRowSorter<TechTableModel>(techsModel);
         techSorter.setComparator(0, new TechSorter());
         TechTable.setRowSorter(techSorter);
+        sortKeys = new ArrayList<RowSorter.SortKey>();
+        sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
+        techSorter.setSortKeys(sortKeys);
 		scrollTechTable.setViewportView(TechTable);
 
 		gridBagConstraints = new java.awt.GridBagConstraints();
@@ -6805,6 +6822,30 @@ public class CampaignGUI extends JPanel {
 				}			
 			}
 			return ((Comparable<Integer>)l0).compareTo(l1);		
+		}
+	}
+	
+	/**
+	 * A comparator for unit types
+	 * @author Jay Lawson
+	 *
+	 */
+	public class UnitTypeSorter implements Comparator<String> {
+
+		@Override
+		public int compare(String s0, String s1) {	
+			//lets find the weight class integer for each name
+			int l0 = 0;
+			int l1 = 0;
+			for(int i = 0; i <= UnitType.SPACE_STATION; i++) {
+				if(UnitType.getTypeDisplayableName(i).equals(s0)) {
+					l0 = i;
+				}
+				if(UnitType.getTypeDisplayableName(i).equals(s1)) {
+					l1 = i;
+				}			
+			}
+			return ((Comparable<Integer>)l1).compareTo(l0);		
 		}
 	}
 	
