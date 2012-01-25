@@ -372,6 +372,8 @@ public class CampaignGUI extends JPanel {
 		scrollAcquisitionTable = new javax.swing.JScrollPane();
 		AcquisitionTable = new javax.swing.JTable();
 		scrollServicedUnitTable = new javax.swing.JScrollPane();
+		scrollServicedUnitView = new javax.swing.JScrollPane();
+		txtServicedUnitView = new javax.swing.JTextPane();
 		servicedUnitTable = new javax.swing.JTable();
 		scrollTechTable = new javax.swing.JScrollPane();
 		TechTable = new javax.swing.JTable();
@@ -1173,15 +1175,21 @@ public class CampaignGUI extends JPanel {
 
 		JPanel panServicedUnits = new JPanel(new GridBagLayout());
 		
-		scrollServicedUnitTable.setMinimumSize(new java.awt.Dimension(300, 200));
+		scrollServicedUnitTable.setMinimumSize(new java.awt.Dimension(350, 200));
 		scrollServicedUnitTable.setName("scrollServicedUnitTable"); // NOI18N
-		scrollServicedUnitTable.setPreferredSize(new java.awt.Dimension(300, 300));
+		scrollServicedUnitTable.setPreferredSize(new java.awt.Dimension(350, 200));
 
 		servicedUnitTable.setModel(servicedUnitModel);
 		servicedUnitTable.setName("servicedUnitTable"); // NOI18N
-		servicedUnitTable.setRowHeight(80);
-		servicedUnitTable.getColumnModel().getColumn(0)
-				.setCellRenderer(servicedUnitModel.getRenderer());
+		servicedUnitTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+		column = null;
+        for (int i = 0; i < ServicedUnitTableModel.N_COL; i++) {
+            column = servicedUnitTable.getColumnModel().getColumn(i);
+            column.setPreferredWidth(servicedUnitModel.getColumnWidth(i));
+            column.setCellRenderer(servicedUnitModel.getRenderer());
+        }
+        servicedUnitTable.setIntercellSpacing(new Dimension(0, 0));
+        servicedUnitTable.setShowGrid(false);
 		servicedUnitTable.getSelectionModel().addListSelectionListener(
 				new javax.swing.event.ListSelectionListener() {
 					public void valueChanged(
@@ -1191,18 +1199,28 @@ public class CampaignGUI extends JPanel {
 				});
 		servicedUnitTable.addMouseListener(servicedUnitMouseAdapter);
 		scrollServicedUnitTable.setViewportView(servicedUnitTable);
+
+		scrollServicedUnitView.setMinimumSize(new java.awt.Dimension(350, 400));
+		scrollServicedUnitView.setName("scrollServicedUnitView"); // NOI18N
+		scrollServicedUnitView.setPreferredSize(new java.awt.Dimension(350, 400));
+		txtServicedUnitView.setEditable(false);
+		txtServicedUnitView.setContentType("text/html");
+		scrollServicedUnitView.setViewportView(txtServicedUnitView);
 		
+		splitServicedUnits = new javax.swing.JSplitPane(javax.swing.JSplitPane.VERTICAL_SPLIT,scrollServicedUnitTable, scrollServicedUnitView);
+		splitServicedUnits.setOneTouchExpandable(true);
+		splitServicedUnits.setResizeWeight(0.0);
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 0;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 1.0;
-		panServicedUnits.add(scrollServicedUnitTable, gridBagConstraints);
-
+		panServicedUnits.add(splitServicedUnits, gridBagConstraints);
+		
 		JPanel panTasks = new JPanel(new GridBagLayout());
 		
-		tabTasks.setMinimumSize(new java.awt.Dimension(600, 200));
+		tabTasks.setMinimumSize(new java.awt.Dimension(300, 200));
 		tabTasks.setName("tabTasks"); // NOI18N
 		tabTasks.setPreferredSize(new java.awt.Dimension(300, 300));
 		tabTasks.addChangeListener(new ChangeListener() {
@@ -1406,7 +1424,7 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.gridy = 0;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-		gridBagConstraints.weightx = 0.33;
+		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 1.0;
 		panRepairBay.add(panServicedUnits, gridBagConstraints);
 		
@@ -1415,7 +1433,7 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.gridy = 0;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-		gridBagConstraints.weightx = 0.33;
+		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 1.0;
 		panRepairBay.add(panTasks, gridBagConstraints);
 		
@@ -1424,7 +1442,7 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.gridy = 0;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-		gridBagConstraints.weightx = 0.33;
+		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 1.0;
 		panRepairBay.add(panTechs, gridBagConstraints);
 		
@@ -2167,7 +2185,7 @@ public class CampaignGUI extends JPanel {
 		if(row < 0) {
 			return null;
 		}
-		return  servicedUnitModel.getUnitAt(servicedUnitTable.convertRowIndexToModel(row));
+		return  servicedUnitModel.getUnit(servicedUnitTable.convertRowIndexToModel(row));
 	}
 
 	private void TaskTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
@@ -2183,6 +2201,15 @@ public class CampaignGUI extends JPanel {
 	private void servicedUnitTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
 		refreshTaskList();
 		refreshAcquireList();
+		int selected = servicedUnitTable.getSelectedRow();
+		txtServicedUnitView.setText("");
+		if(selected > -1) {
+			Unit unit = servicedUnitModel.getUnit(selected);
+			if (null != unit) {
+				MechView mv = new MechView(unit.getEntity(), false);
+				txtServicedUnitView.setText("<div style='font: 12pt monospaced'>" + mv.getMechReadoutBasic() + "<br>" + mv.getMechReadoutLoadout() + "</div>");
+			}
+		}
 	}
 	
 	private void taskTabChanged() {
@@ -4150,9 +4177,172 @@ public class CampaignGUI extends JPanel {
 	/**
 	 * A table model for displaying units that are being serviced in the repair bay
 	 */
-	public class ServicedUnitTableModel extends ArrayTableModel {
+	public class ServicedUnitTableModel extends AbstractTableModel {
 		private static final long serialVersionUID = 3314061779690077204L;
+		
+		private final static int COL_NAME    =    0;
+        private final static int COL_TYPE    =    1;
+        private final static int COL_STATUS   =   2;
+        private final static int COL_SITE =   3;
+        private final static int COL_REPAIR  =    4;
+        private final static int COL_PARTS    =   5;
+        private final static int N_COL =          6;
+        
+        private ArrayList<Unit> data = new ArrayList<Unit>();
+        
+        public int getRowCount() {
+            return data.size();
+        }
 
+        public int getColumnCount() {
+            return N_COL;
+        }
+
+        @Override
+        public String getColumnName(int column) {
+            switch(column) {
+            	case COL_NAME:
+            		return "Name";
+                case COL_TYPE:
+                    return "Type";
+                case COL_STATUS:
+                    return "Status";
+                case COL_SITE:
+                    return "Site";
+                case COL_REPAIR:
+                    return "# Repairs";
+                case COL_PARTS:
+                    return "# Parts";
+                default:
+                    return "?";
+            }
+        }
+        
+        public int getColumnWidth(int c) {
+            switch(c) {
+            case COL_TYPE:
+            case COL_STATUS:
+            case COL_SITE:
+                return 50;        
+        	case COL_NAME:
+            	return 100;
+            default:
+                return 25;
+            }
+        }
+        
+        public int getAlignment(int col) {
+            switch(col) {
+            case COL_REPAIR:
+            case COL_PARTS:
+            	return SwingConstants.RIGHT;
+            default:
+            	return SwingConstants.LEFT;
+            }
+        }
+        
+        @Override
+        public Class<?> getColumnClass(int c) {
+            return getValueAt(0, c).getClass();
+        }
+
+        @Override
+        public boolean isCellEditable(int row, int col) {
+            return false;
+        }
+
+        public Unit getUnit(int i) {
+            return data.get(i);
+        }
+
+        //fill table with values
+        public void setData(ArrayList<Unit> units) {
+            data = units;
+            fireTableDataChanged();
+        }
+
+        public Object getValueAt(int row, int col) {
+        	Unit u;
+        	if(data.isEmpty()) {
+        		return "";
+        	} else {
+        		u = data.get(row);
+        	}
+            Entity e = u.getEntity();
+            if(null == e) {
+            	return "?";
+            }
+            if(col == COL_NAME) {
+                return u.getName();
+            }  
+            if(col == COL_TYPE) {
+            	return UnitType.getTypeDisplayableName(UnitType.determineUnitTypeCode(e));
+            }
+            if(col == COL_STATUS) {
+                return u.getStatus();
+            }
+            if(col == COL_SITE) {
+                return Unit.getSiteName(u.getSite());
+            }
+            if(col == COL_REPAIR) {
+                return u.getPartsNeedingFixing().size();
+            }
+            if(col == COL_PARTS) {
+                return u.getPartsNeeded().size();
+            }
+            return "?";
+        }
+
+        public ServicedUnitTableModel.Renderer getRenderer() {
+			return new ServicedUnitTableModel.Renderer();
+		}
+
+		public class Renderer extends DefaultTableCellRenderer {
+
+			private static final long serialVersionUID = 9054581142945717303L;
+
+			public Component getTableCellRendererComponent(JTable table,
+					Object value, boolean isSelected, boolean hasFocus,
+					int row, int column) {
+				super.getTableCellRendererComponent(table, value, isSelected,
+						hasFocus, row, column);
+				setOpaque(true);
+				int actualCol = table.convertColumnIndexToModel(column);
+				int actualRow = table.convertRowIndexToModel(row);
+				setHorizontalAlignment(getAlignment(actualCol));
+				Unit u = getUnit(actualRow);
+				
+				setForeground(Color.BLACK);
+				if (isSelected) {
+                    setBackground(Color.DARK_GRAY);
+                    setForeground(Color.WHITE);
+                } else {
+                	if (u.isDeployed()) {
+                		setBackground(Color.LIGHT_GRAY);
+                	}
+                	if(u.isRefitting()) {
+                		setBackground(Color.CYAN);
+                	}
+                	else if (null != u && !u.isRepairable()) {
+    					setBackground(new Color(190, 150, 55));
+    				} else if ((null != u) && !u.isFunctional()) {
+    					setBackground(new Color(205, 92, 92));
+    				} else if ((null != u)
+    						&& (u.getPartsNeedingFixing().size() > 0)) {
+    					setBackground(new Color(238, 238, 0));
+                    } else if (u.getEntity() instanceof Infantry 
+                    		&& u.getActiveCrew().size() < u.getFullCrewSize()) {
+                		setBackground(Color.RED);
+                    }
+                    else {
+                        setBackground(Color.WHITE);
+                    }
+                }
+				return this;
+			}
+
+		}
+		/*
 		public ServicedUnitTableModel() {
 			columnNames = new String[] { "Units" };
 			data = new ArrayList<Unit>();
@@ -4208,6 +4398,7 @@ public class CampaignGUI extends JPanel {
 			}
 
 		}
+		*/
 	}
 
 	public class ServicedUnitsTableMouseAdapter extends MouseInputAdapter implements
@@ -4215,8 +4406,12 @@ public class CampaignGUI extends JPanel {
 
 		public void actionPerformed(ActionEvent action) {
 			String command = action.getActionCommand();
-			Unit selectedUnit = servicedUnitModel.getUnitAt(servicedUnitTable.getSelectedRow());
-			Unit[] units = servicedUnitModel.getUnitsAt(servicedUnitTable.getSelectedRows());
+			Unit selectedUnit = servicedUnitModel.getUnit(servicedUnitTable.getSelectedRow());
+			int[] rows = servicedUnitTable.getSelectedRows();
+			Unit[] units = new Unit[rows.length];
+			for(int i=0; i<rows.length; i++) {
+				units[i] = servicedUnitModel.getUnit(rows[i]);
+			}
 			if (command.contains("ASSIGN_TECH")) {
 				/*
 				String sel = command.split(":")[1];
@@ -4322,20 +4517,6 @@ public class CampaignGUI extends JPanel {
 		}
 
 		@Override
-		public void mouseClicked(MouseEvent e) {
-
-			if (e.getClickCount() == 2) {
-				int row = servicedUnitTable.rowAtPoint(e.getPoint());
-				Unit unit = servicedUnitModel.getUnitAt(row);
-				if (null != unit) {
-					MechView mv = new MechView(unit.getEntity(), false);
-					MekViewDialog mvd = new MekViewDialog(null, true, mv);
-					mvd.setVisible(true);
-				}
-			}
-		}
-
-		@Override
 		public void mousePressed(MouseEvent e) {
 			maybeShowPopup(e);
 		}
@@ -4349,7 +4530,7 @@ public class CampaignGUI extends JPanel {
 			JPopupMenu popup = new JPopupMenu();
 			if (e.isPopupTrigger()) {
 				int row = servicedUnitTable.rowAtPoint(e.getPoint());
-				Unit unit = servicedUnitModel.getUnitAt(row);
+				Unit unit = servicedUnitModel.getUnit(row);
 				JMenuItem menuItem = null;
 				JMenu menu = null;
 				JCheckBoxMenuItem cbMenuItem = null;
@@ -8314,10 +8495,13 @@ public class CampaignGUI extends JPanel {
 	private javax.swing.JScrollPane scrollAcquisitionTable;
 	private javax.swing.JScrollPane scrollTechTable;
 	private javax.swing.JScrollPane scrollServicedUnitTable;
+	private javax.swing.JScrollPane scrollServicedUnitView;
 	private javax.swing.JScrollPane scrollPersonnelTable;
 	private javax.swing.JScrollPane scrollScenarioTable;
 	private javax.swing.JScrollPane scrollUnitTable;
 	private javax.swing.JScrollPane scrollFinanceTable;
+	private javax.swing.JTextPane txtServicedUnitView;
+    private javax.swing.JSplitPane splitServicedUnits;
 	private javax.swing.JPanel statusPanel;
 	private javax.swing.JTabbedPane tabMain;
 	private javax.swing.JTabbedPane tabTasks;
