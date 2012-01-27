@@ -292,6 +292,7 @@ public class CampaignGUI extends JPanel {
 	private TableRowSorter<PersonnelTableModel> personnelSorter;
 	private TableRowSorter<PartsTableModel> partsSorter;
 	private TableRowSorter<UnitTableModel> unitSorter;
+	private TableRowSorter<ServicedUnitTableModel> servicedUnitSorter;
 	private TableRowSorter<TechTableModel> techSorter;
 	private UUID currentPatientId;
 	private UUID currentDoctorId;
@@ -1196,6 +1197,13 @@ public class CampaignGUI extends JPanel {
 		servicedUnitTable.setModel(servicedUnitModel);
 		servicedUnitTable.setName("servicedUnitTable"); // NOI18N
 		servicedUnitTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        servicedUnitSorter = new TableRowSorter<ServicedUnitTableModel>(servicedUnitModel);
+        servicedUnitSorter.setComparator(ServicedUnitTableModel.COL_STATUS, new UnitStatusSorter());
+        servicedUnitSorter.setComparator(ServicedUnitTableModel.COL_TYPE, new UnitTypeSorter());
+        servicedUnitTable.setRowSorter(servicedUnitSorter);
+        sortKeys = new ArrayList<RowSorter.SortKey>();
+        sortKeys.add(new RowSorter.SortKey(UnitTableModel.COL_TYPE, SortOrder.DESCENDING));
+        servicedUnitSorter.setSortKeys(sortKeys);
 		column = null;
         for (int i = 0; i < ServicedUnitTableModel.N_COL; i++) {
             column = servicedUnitTable.getColumnModel().getColumn(i);
@@ -2221,7 +2229,7 @@ public class CampaignGUI extends JPanel {
 		int selected = servicedUnitTable.getSelectedRow();
 		txtServicedUnitView.setText("");
 		if(selected > -1) {
-			Unit unit = servicedUnitModel.getUnit(selected);
+			Unit unit = servicedUnitModel.getUnit(servicedUnitTable.convertRowIndexToModel(selected));
 			if (null != unit) {
 				MechView mv = new MechView(unit.getEntity(), false);
 				txtServicedUnitView.setText("<div style='font: 12pt monospaced'>" + mv.getMechReadoutBasic() + "<br>" + mv.getMechReadoutLoadout() + "</div>");
@@ -3964,7 +3972,7 @@ public class CampaignGUI extends JPanel {
 
 		public void actionPerformed(ActionEvent action) {
 			String command = action.getActionCommand();
-			Part part = taskModel.getTaskAt(TaskTable.getSelectedRow());
+			Part part = taskModel.getTaskAt(TaskTable.convertRowIndexToModel(TaskTable.getSelectedRow()));
 			if(null == part) {
 				return;
 			}
@@ -4423,11 +4431,11 @@ public class CampaignGUI extends JPanel {
 
 		public void actionPerformed(ActionEvent action) {
 			String command = action.getActionCommand();
-			Unit selectedUnit = servicedUnitModel.getUnit(servicedUnitTable.getSelectedRow());
+			Unit selectedUnit = servicedUnitModel.getUnit(servicedUnitTable.convertRowIndexToModel(servicedUnitTable.getSelectedRow()));
 			int[] rows = servicedUnitTable.getSelectedRows();
 			Unit[] units = new Unit[rows.length];
 			for(int i=0; i<rows.length; i++) {
-				units[i] = servicedUnitModel.getUnit(rows[i]);
+				units[i] = servicedUnitModel.getUnit(servicedUnitTable.convertRowIndexToModel(rows[i]));
 			}
 			if (command.contains("ASSIGN_TECH")) {
 				/*

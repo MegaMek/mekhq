@@ -67,7 +67,7 @@ public class ResolveScenarioTracker {
 	ArrayList<Unit> leftoverSalvage;
 	ArrayList<Unit> units;
 	Hashtable<UUID, PersonStatus> peopleStatus;
-	Hashtable<String, UUID> killCredits;
+	Hashtable<String, String> killCredits;
 	Campaign campaign;
 	Scenario scenario;
 	JFileChooser unitList;
@@ -84,7 +84,7 @@ public class ResolveScenarioTracker {
 		pilots = new Hashtable<UUID, Pilot>();
 		units = new ArrayList<Unit>();
 		peopleStatus = new Hashtable<UUID, PersonStatus>();
-		killCredits = new Hashtable<String, UUID>();
+		killCredits = new Hashtable<String, String>();
 		for(UUID uid : scenario.getForces(campaign).getAllUnits()) {
 			Unit u = campaign.getUnit(uid);
 			if(null != u) {
@@ -188,14 +188,18 @@ public class ResolveScenarioTracker {
 			Entity e = iter.nextElement();
 			if(e.getOwnerId() == pid) {
 				if(e.canEscape() || controlsField) {
-					entities.put(UUID.fromString(e.getExternalIdAsString()), e);
+					if(!e.getExternalIdAsString().equals("-1")) {
+						entities.put(UUID.fromString(e.getExternalIdAsString()), e);
+					}
 					if(null != e.getCrew()) {
-						pilots.put(UUID.fromString(e.getCrew().getExternalIdAsString()), e.getCrew());
+						if(!e.getCrew().getExternalIdAsString().equals("-1")) {
+							pilots.put(UUID.fromString(e.getCrew().getExternalIdAsString()), e.getCrew());
+						}
 					}
 				}			
 			} else if(e.getOwner().isEnemyOf(client.getLocalPlayer())) {
 				if(!e.canEscape() && controlsField) {
-					killCredits.put(e.getDisplayName(), null);
+					killCredits.put(e.getDisplayName(), "None");
 					if(e instanceof Infantry && !(e instanceof BattleArmor)) {
 						continue;
 					}
@@ -207,9 +211,13 @@ public class ResolveScenarioTracker {
 		for (Enumeration<Entity> iter = client.game.getRetreatedEntities(); iter.hasMoreElements();) {
             Entity e = iter.nextElement();
             if(e.getOwnerId() == pid) {
-            	entities.put(UUID.fromString(e.getExternalIdAsString()), e);
+            	if(!e.getExternalIdAsString().equals("-1")) {
+					entities.put(UUID.fromString(e.getExternalIdAsString()), e);
+				}
 				if(null != e.getCrew()) {
-					pilots.put(UUID.fromString(e.getCrew().getExternalIdAsString()), e.getCrew());
+					if(!e.getCrew().getExternalIdAsString().equals("-1")) {
+						pilots.put(UUID.fromString(e.getCrew().getExternalIdAsString()), e.getCrew());
+					}
 				}
             }
         }
@@ -219,17 +227,21 @@ public class ResolveScenarioTracker {
         while (wrecks.hasMoreElements()) {
         	Entity e = wrecks.nextElement();
         	if(e.getOwnerId() == pid && controlsField && e.isSalvage()) {
-        		entities.put(UUID.fromString(e.getExternalIdAsString()), e);
-        		if(null != e.getCrew()) {
-        			pilots.put(UUID.fromString(e.getCrew().getExternalIdAsString()), e.getCrew());
-        		}
+        		if(!e.getExternalIdAsString().equals("-1")) {
+					entities.put(UUID.fromString(e.getExternalIdAsString()), e);
+				}
+				if(null != e.getCrew()) {
+					if(!e.getCrew().getExternalIdAsString().equals("-1")) {
+						pilots.put(UUID.fromString(e.getCrew().getExternalIdAsString()), e.getCrew());
+					}
+				}
         	} else if(e.getOwner().isEnemyOf(client.getLocalPlayer())) {
         		Entity killer = client.game.getEntity(e.getKillerId());
         		if(null != killer && killer.getOwnerId() == pid) {
         			//the killer is one of your units, congrats!
-        			killCredits.put(e.getDisplayName(), UUID.fromString(killer.getExternalIdAsString()));
+        			killCredits.put(e.getDisplayName(), killer.getExternalIdAsString());
         		} else {
-        			killCredits.put(e.getDisplayName(), null);
+        			killCredits.put(e.getDisplayName(), "None");
         		}
         		if(e.isSalvage()) {
         			if(e instanceof Infantry && !(e instanceof BattleArmor)) {
@@ -259,10 +271,10 @@ public class ResolveScenarioTracker {
 	public void assignKills() {
 		for(Unit u : units) {
 			for(String killed : killCredits.keySet()) {
-				if(null == killCredits.get(killed)) {
+				if(killCredits.get(killed).equalsIgnoreCase("none")) {
 					continue;
 				}
-				if(u.getId().equals(killCredits.get(killed))) {
+				if(u.getId().toString().equals(killCredits.get(killed))) {
 					for(Person p : u.getActiveCrew()) {
 						PersonStatus status = peopleStatus.get(p.getId());
 						status.addKill(new Kill(p.getId(), killed, u.getEntity().getShortNameRaw(), campaign.getCalendar().getTime()));
@@ -469,7 +481,7 @@ public class ResolveScenarioTracker {
 		return campaign.getMission(scenario.getMissionId());
 	}
 	
-	public Hashtable<String, UUID> getKillCredits() {
+	public Hashtable<String, String> getKillCredits() {
 		return killCredits;
 	}
 	

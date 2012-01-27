@@ -453,7 +453,7 @@ public class ResolveScenarioWizardDialog extends javax.swing.JDialog {
     		for(Unit u : tracker.getUnits()) {	
     			idx++;
     			assignModel.addElement(u.getCommander().getFullTitle() + ", " + u.getName());
-    			if(u.getId().equals(tracker.getKillCredits().get(killName))) {
+    			if(u.getId().toString().equals(tracker.getKillCredits().get(killName))) {
     				selected = idx;
     			}
     		}
@@ -894,11 +894,11 @@ public class ResolveScenarioWizardDialog extends javax.swing.JDialog {
     	//now assign kills
     	for(String killName : tracker.getKillCredits().keySet()) {
     		if(killChoices.get(killName).getSelectedIndex() == 0) {
-    			tracker.getKillCredits().put(killName, null);
+    			tracker.getKillCredits().put(killName, "None");
     		} else {
 	    		Unit u = tracker.getUnits().get(killChoices.get(killName).getSelectedIndex()-1);
 	    		if(null != u) {
-	    			tracker.getKillCredits().put(killName, u.getId());
+	    			tracker.getKillCredits().put(killName, u.getId().toString());
 	    		}
     		}
     	}
