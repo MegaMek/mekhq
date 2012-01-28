@@ -2126,6 +2126,16 @@ public class CampaignGUI extends JPanel {
 			if(null == tech) {
 				return;
 			}
+			if(part.onBadHipOrShoulder() && !part.isSalvaging() && 0!= JOptionPane.showConfirmDialog(
+					    frame,
+					    "You are repairing/replacing a part on a limb with a bad shoulder or hip.\n"
+					    		+"You may continue, but this limb cannot be repaired and you will have to\n"
+								+"remove this equipment if you wish to scrap and then replace the limb.\n"
+					    		+"Do you wish to continue?",
+					    "Busted Hip/Shoulder",
+					    JOptionPane.YES_NO_OPTION)) {
+				return;
+			}
 			getCampaign().fixPart(part, tech);
 			if(null !=  u && !u.isRepairable() && u.getSalvageableParts().size() == 0) {
 				selectedRow = -1;

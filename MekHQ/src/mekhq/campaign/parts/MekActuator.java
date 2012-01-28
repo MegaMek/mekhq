@@ -271,4 +271,9 @@ public class MekActuator extends Part {
 		}
 		return null;
 	}
+	
+	@Override
+	public boolean onBadHipOrShoulder() {
+		return null != unit && unit.hasBadHipOrShoulder(location);
+	}
 }

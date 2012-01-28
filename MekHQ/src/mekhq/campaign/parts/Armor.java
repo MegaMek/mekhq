@@ -517,6 +517,11 @@ public class Armor extends Part implements IAcquisitionWork {
 		}
 		return null;
 	}
+	
+	@Override
+	public boolean onBadHipOrShoulder() {
+		return null != unit && unit.hasBadHipOrShoulder(location);
+	}
 
 	@Override
 	public String getAcquisitionDesc() {

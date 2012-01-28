@@ -393,13 +393,19 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 		}
 		// on mechs, hip and shoulder criticals also make the location
 		// effectively destroyed
-		if (entity instanceof Mech
+		/*if (entity instanceof Mech
 				&& (entity.getHitCriticals(CriticalSlot.TYPE_SYSTEM,
 						Mech.ACTUATOR_HIP, loc) > 0 || entity.getHitCriticals(
 						CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_SHOULDER, loc) > 0)) {
 			return true;
-		}
+		}*/
 		return entity.isLocationBad(loc);
+	}
+	
+	public boolean hasBadHipOrShoulder(int loc) {
+		return entity instanceof Mech
+				&& (entity.getHitCriticals(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_HIP, loc) > 0 
+						|| entity.getHitCriticals(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_SHOULDER, loc) > 0);
 	}
 
 	/**

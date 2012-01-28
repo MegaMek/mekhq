@@ -147,6 +147,11 @@ public class MissingMekActuator extends MissingPart {
 		}
 		return null;
 	}
+	
+	@Override
+	public boolean onBadHipOrShoulder() {
+		return null != unit && unit.hasBadHipOrShoulder(location);
+	}
 
 	@Override
 	public Part getNewPart() {

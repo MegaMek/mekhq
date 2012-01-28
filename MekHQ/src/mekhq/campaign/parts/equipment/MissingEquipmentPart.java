@@ -218,6 +218,29 @@ public class MissingEquipmentPart extends MissingPart {
         }       
         return null;
     }
+	
+	@Override
+	public boolean onBadHipOrShoulder() {
+		if(null != unit) {
+			for(int loc = 0; loc < unit.getEntity().locations(); loc++) {
+	            for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
+	                CriticalSlot slot = unit.getEntity().getCritical(loc, i);
+	                
+	                // ignore empty & system slots
+	                if ((slot == null) || (slot.getType() != CriticalSlot.TYPE_EQUIPMENT)) {
+	                    continue;
+	                }
+	                
+	                if (equipmentNum == slot.getIndex()) {
+	                    if (unit.hasBadHipOrShoulder(loc)) {
+	                        return true;
+	                    }
+	                }
+	            }
+	        }    
+		}
+		return false;
+	}
 
 	@Override
     public void setUnit(Unit u) {

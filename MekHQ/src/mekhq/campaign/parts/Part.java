@@ -748,5 +748,9 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 			updateConditionFromEntity();
 		}
 	}
+	
+	public boolean onBadHipOrShoulder() {
+		return false;
+	}
 }
 

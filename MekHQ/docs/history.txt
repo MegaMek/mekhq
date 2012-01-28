@@ -32,6 +32,7 @@ v0.1.14 (SVN)
 + UUID bugs in resolve scenario tracker
 + Bug: cant finish pending work if repair status switched
 + Bug: context menu does not choose right mech in serviced units table
++ dont prevent user from repairing/replacing on equipment on limb with bad hip/shoulder, but do nag them
 
 v0.1.13 (2012-01-11)
 + added campaign reference to all parts (should fix NPE refit bug)
