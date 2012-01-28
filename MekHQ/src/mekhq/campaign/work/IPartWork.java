@@ -42,6 +42,7 @@ public interface IPartWork extends IWork {
 	public void addTimeSpent(int time);
 	public void resetTimeSpent();
 	public void resetOvertime();
+	public void resetRepairStatus();
 	
 	public UUID getAssignedTeamId();
 	public void setTeamId(UUID id);

@@ -416,10 +416,13 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 		}
 		for(int pid : partIds) {
 			Part part = campaign.getPart(pid);
-			if(!isRepairable() || isSalvage()) {
-				part.setSalvaging(true);
-			} else {
-				part.setSalvaging(false);
+			//dont change status for pending assignments
+			if(null == part.getAssignedTeamId()) {
+				if(!isRepairable() || isSalvage()) {
+					part.setSalvaging(true);
+				} else {
+					part.setSalvaging(false);
+				}
 			}
 			part.updateConditionFromEntity();
 		}

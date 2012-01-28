@@ -1405,4 +1405,10 @@ public class Refit implements IPartWork, IAcquisitionWork {
 			p.fixIdReferences(uHash, pHash);
 		}
 	}
+
+	@Override
+	public void resetRepairStatus() {
+		// do nothing
+		
+	}
 }

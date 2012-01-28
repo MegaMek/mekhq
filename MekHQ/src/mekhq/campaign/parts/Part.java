@@ -741,5 +741,12 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     	refitId = uHash.get(oldRefitId);
     	teamId = pHash.get(oldTeamId);
     }
+	
+	public void resetRepairStatus() {
+		if(null != unit) {
+			setSalvaging(unit.isSalvage());
+			updateConditionFromEntity();
+		}
+	}
 }
 

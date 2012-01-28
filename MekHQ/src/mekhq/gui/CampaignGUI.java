@@ -1197,12 +1197,13 @@ public class CampaignGUI extends JPanel {
 		servicedUnitTable.setModel(servicedUnitModel);
 		servicedUnitTable.setName("servicedUnitTable"); // NOI18N
 		servicedUnitTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+		servicedUnitTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         servicedUnitSorter = new TableRowSorter<ServicedUnitTableModel>(servicedUnitModel);
         servicedUnitSorter.setComparator(ServicedUnitTableModel.COL_STATUS, new UnitStatusSorter());
         servicedUnitSorter.setComparator(ServicedUnitTableModel.COL_TYPE, new UnitTypeSorter());
         servicedUnitTable.setRowSorter(servicedUnitSorter);
         sortKeys = new ArrayList<RowSorter.SortKey>();
-        sortKeys.add(new RowSorter.SortKey(UnitTableModel.COL_TYPE, SortOrder.DESCENDING));
+        sortKeys.add(new RowSorter.SortKey(ServicedUnitTableModel.COL_TYPE, SortOrder.DESCENDING));
         servicedUnitSorter.setSortKeys(sortKeys);
 		column = null;
         for (int i = 0; i < ServicedUnitTableModel.N_COL; i++) {
@@ -4554,8 +4555,13 @@ public class CampaignGUI extends JPanel {
 		private void maybeShowPopup(MouseEvent e) {
 			JPopupMenu popup = new JPopupMenu();
 			if (e.isPopupTrigger()) {
-				int row = servicedUnitTable.rowAtPoint(e.getPoint());
-				Unit unit = servicedUnitModel.getUnit(row);
+				if(servicedUnitTable.getSelectedRowCount() == 0) {
+	            	return;
+	            }
+	            int[] rows = servicedUnitTable.getSelectedRows();
+	            int row = servicedUnitTable.getSelectedRow();
+	            boolean oneSelected = servicedUnitTable.getSelectedRowCount() == 1;
+				Unit unit = servicedUnitModel.getUnit(servicedUnitTable.convertRowIndexToModel(row));
 				JMenuItem menuItem = null;
 				JMenu menu = null;
 				JCheckBoxMenuItem cbMenuItem = null;
@@ -4625,7 +4631,7 @@ public class CampaignGUI extends JPanel {
 					menuItem.setEnabled(!unit.isDeployed()
 							&& unit.isRepairable() && !unit.isRefitting());
 					popup.add(menuItem);
-				} else if (!unit.isSalvage()) {
+				} else {
 					menuItem = new JMenuItem("Salvage");
 					menuItem.setActionCommand("SALVAGE");
 					menuItem.addActionListener(this);

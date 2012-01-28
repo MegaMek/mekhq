@@ -30,6 +30,8 @@ v0.1.14 (SVN)
 + more helpful unit table in repair bay and integrated mech view
 + default sorting of tables
 + UUID bugs in resolve scenario tracker
++ Bug: cant finish pending work if repair status switched
++ Bug: context menu does not choose right mech in serviced units table
 
 v0.1.13 (2012-01-11)
 + added campaign reference to all parts (should fix NPE refit bug)

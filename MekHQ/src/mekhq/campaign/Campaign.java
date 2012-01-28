@@ -935,6 +935,7 @@ public class Campaign implements Serializable {
 		partWork.resetTimeSpent();
 		partWork.resetOvertime();
 		partWork.setTeamId(null);
+		partWork.resetRepairStatus();
 		addReport(report);
 	}
 
