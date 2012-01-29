@@ -110,6 +110,9 @@ public class Force implements Serializable {
 	
 	public void setScenarioId(int i) {
 		this.scenarioId = i;
+		for(Force sub : getSubForces()) {
+			sub.setScenarioId(i);
+		}
 	}
 	
 	public boolean isDeployed() {
