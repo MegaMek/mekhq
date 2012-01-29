@@ -150,6 +150,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     //stuff to track for support teams
     protected int minutesLeft;
     protected int overtimeLeft;
+    protected int nTasks;
     
     //default constructor
     public Person() {
@@ -177,6 +178,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         oldUnitId = -1;
         toughness = 0;
         biography = "";
+        nTasks = 0;
         resetMinutesLeft();
     }
     
@@ -455,7 +457,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     public void setXp(int xp) {
         this.xp = xp;
     }
-    
+
     public UUID getAssignedTeamId() {
         return doctorId;
     }
@@ -551,6 +553,10 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 				+"<rank>"
 				+rank
 				+"</rank>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<nTasks>"
+				+nTasks
+				+"</nTasks>");
 		if(null != doctorId) {
 			pw1.println(MekHqXmlUtil.indentStr(indent+1)
 					+"<doctorId>"
@@ -664,6 +670,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 					retVal.setPortraitFileName(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("xp")) {
 					retVal.xp = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("nTasks")) {
+					retVal.nTasks = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("hits")) {
 					retVal.hits = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("gender")) {
@@ -1704,5 +1712,13 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     public void fixIdReferences(Hashtable<Integer, UUID> uHash, Hashtable<Integer, UUID> pHash) {
     	unitId = uHash.get(oldUnitId);
     	doctorId = pHash.get(oldDoctorId);
+    }
+    
+    public int getNTasks() {
+    	return nTasks;
+    }
+    
+    public void setNTasks(int n) {
+    	nTasks = n;
     }
 }

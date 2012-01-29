@@ -755,14 +755,32 @@ public class Campaign implements Serializable {
 		TargetRoll target = getTargetFor(medWork, doctor);
 		int roll = Compute.d6(2);
 		report = report + ",  needs " + target.getValueAsString() + " and rolls " + roll + ":";
+		int xpGained = 0;
 		if(roll >= target.getValue()) {
 			report = report + medWork.succeed();
 			Unit u = getUnit(medWork.getUnitId());
 			if(null != u) {
 				u.resetPilotAndEntity();
 			}
+			if(roll == 12 && target.getValue() != TargetRoll.AUTOMATIC_SUCCESS) {
+				xpGained += getCampaignOptions().getSuccessXP();
+			}
+			if(target.getValue() != TargetRoll.AUTOMATIC_SUCCESS) {
+				doctor.setNTasks(doctor.getNTasks() + 1);
+			}
+			if(doctor.getNTasks() >= getCampaignOptions().getNTasksXP()) {
+				xpGained += getCampaignOptions().getTaskXP();
+				doctor.setNTasks(0);
+			}
 		} else {
 			report = report + medWork.fail(0);
+			if(roll == 2 && target.getValue() != TargetRoll.AUTOMATIC_FAIL) {
+				xpGained += getCampaignOptions().getMistakeXP();
+			}
+		}
+		if(xpGained > 0) {
+			doctor.setXp(doctor.getXp() + xpGained);
+			report += " (" + xpGained + "XP gained) ";
 		}
 		return report;
 	}
@@ -925,11 +943,29 @@ public class Campaign implements Serializable {
 			wrongType = " <b>Warning: wrong tech type for this repair.</b>";
 		}
 		report = report + ",  needs " + target.getValueAsString() + " and rolls " + roll + ":";
+		int xpGained = 0;
 		if(roll >= target.getValue()) {
 			report = report + partWork.succeed();	
+			if(roll == 12 && target.getValue() != TargetRoll.AUTOMATIC_SUCCESS) {
+				xpGained += getCampaignOptions().getSuccessXP();
+			}
+			if(target.getValue() != TargetRoll.AUTOMATIC_SUCCESS) {
+				tech.setNTasks(tech.getNTasks() + 1);
+			}
+			if(tech.getNTasks() >= getCampaignOptions().getNTasksXP()) {
+				xpGained += getCampaignOptions().getTaskXP();
+				tech.setNTasks(0);
+			}
 		} else {
 			int modePenalty = Modes.getModeExperienceReduction(partWork.getMode());
 			report = report + partWork.fail(tech.getSkillForWorkingOn(partWork.getUnit()).getExperienceLevel()-modePenalty);
+			if(roll == 2 && target.getValue() != TargetRoll.AUTOMATIC_FAIL) {
+				xpGained += getCampaignOptions().getMistakeXP();
+			}
+		}
+		if(xpGained > 0) {
+			tech.setXp(tech.getXp() + xpGained);
+			report += " (" + xpGained + "XP gained) ";
 		}
 		report += wrongType;
 		partWork.resetTimeSpent();
