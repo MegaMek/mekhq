@@ -140,6 +140,9 @@ public class MissingMekGyro extends MissingPart {
 	
 	@Override
 	public String checkFixable() {
+		if(unit.isLocationBreached(Mech.LOC_CT)) {
+    		return unit.getEntity().getLocationName(Mech.LOC_CT) + " is breached.";
+		}
 		return null;
 	}
 

@@ -283,6 +283,9 @@ public class MekGyro extends Part {
 	
 	@Override
 	public String checkFixable() {
+		if(!isSalvaging() && unit.isLocationBreached(Mech.LOC_CT)) {
+    		return unit.getEntity().getLocationName(Mech.LOC_CT) + " is breached.";
+		}
 		return null;
 	}
 }

@@ -210,6 +210,9 @@ public class MissingEquipmentPart extends MissingPart {
                 }
                 
                 if (equipmentNum == slot.getIndex()) {
+                	if (unit.isLocationBreached(loc)) {
+                		return unit.getEntity().getLocationName(loc) + " is breached.";
+                	}
                     if (unit.isLocationDestroyed(loc)) {
                         return unit.getEntity().getLocationName(loc) + " is destroyed.";
                     }

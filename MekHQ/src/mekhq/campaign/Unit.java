@@ -41,6 +41,7 @@ import megamek.common.Entity;
 import megamek.common.EntityMovementMode;
 import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
+import megamek.common.ILocationExposureStatus;
 import megamek.common.Infantry;
 import megamek.common.Jumpship;
 import megamek.common.Mech;
@@ -400,6 +401,11 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 			return true;
 		}*/
 		return entity.isLocationBad(loc);
+	}
+	
+	public boolean isLocationBreached(int loc) {
+		return entity.getLocationStatus(loc) == ILocationExposureStatus.BREACHED 
+				|| entity.getLocationStatus(loc) == ILocationExposureStatus.VACUUM;
 	}
 	
 	public boolean hasBadHipOrShoulder(int loc) {

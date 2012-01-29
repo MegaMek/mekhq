@@ -26,6 +26,7 @@ import java.io.PrintWriter;
 import megamek.common.CriticalSlot;
 import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
+import megamek.common.ILocationExposureStatus;
 import megamek.common.Mech;
 import megamek.common.Mounted;
 import megamek.common.TechConstants;
@@ -45,6 +46,7 @@ public class MekLocation extends Part {
     protected int structureType;
     protected boolean tsm;
     double percent;
+    boolean breached;
     boolean forQuad;
 
     public MekLocation() {
@@ -74,6 +76,7 @@ public class MekLocation extends Part {
         this.tsm = hasTSM;
         this.percent = 1.0;
         this.forQuad = quad;
+        this.breached = false;
         //TODO: need to account for internal structure and myomer types
         //crap, no static report for location names?
         this.name = "Mech Location";
@@ -299,9 +302,27 @@ public class MekLocation extends Part {
 	@Override
 	public void fix() {
 		super.fix();
-		percent = 1.0;
-		if(null != unit) {
-			unit.getEntity().setInternal(unit.getEntity().getOInternal(loc), loc);
+		if(isBreached()) {
+			breached = false;
+			//TODO: this wont work for breached status because MM explicitly disallows it
+			unit.getEntity().setLocationStatus(loc, ILocationExposureStatus.NORMAL);
+			for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
+	            CriticalSlot slot = unit.getEntity().getCritical(loc, i);
+	            // ignore empty & non-hittable slots
+	            if ((slot == null)) {
+	                continue;
+	            }
+	            slot.setBreached(false);
+	            Mounted m = slot.getMount();
+	            if(null != m) {
+	            	m.setBreached(false);
+	            }
+			}
+		} else {
+			percent = 1.0;
+			if(null != unit) {
+				unit.getEntity().setInternal(unit.getEntity().getOInternal(loc), loc);
+			}
 		}
 	}
 
@@ -334,6 +355,10 @@ public class MekLocation extends Part {
 			if(percent <= 0.0) {
 				remove(false);
 				return;
+			} else if(unit.isLocationBreached(loc)) {
+				breached = true;
+				this.time = 60;
+				this.difficulty = 0;
 			} else if (percent < 0.25) {
 	            this.time = 270;
 	            this.difficulty = 2;
@@ -354,9 +379,13 @@ public class MekLocation extends Part {
 		}		
 	}
 
+	public boolean isBreached() {
+		return breached;
+	}
+	
 	@Override
 	public boolean needsFixing() {
-		return percent < 1.0;
+		return percent < 1.0 || breached;
 	}
 	
 	@Override

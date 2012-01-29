@@ -83,9 +83,13 @@ public class MissingMekLifeSupport extends MissingPart {
     @Override
     public String checkFixable() {
         for(int i = 0; i < unit.getEntity().locations(); i++) {
-            if(unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_LIFE_SUPPORT, i) > 0
-                    && unit.isLocationDestroyed(i)) {
-                return unit.getEntity().getLocationName(i) + " is destroyed.";
+        	if(unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_LIFE_SUPPORT, i) > 0) {
+            	if(unit.isLocationBreached(i)) {
+            		return unit.getEntity().getLocationName(i) + " is breached.";
+            	}
+            	if(unit.isLocationDestroyed(i)) {
+            		return unit.getEntity().getLocationName(i) + " is destroyed.";
+            	}
             }
         }
         return null;

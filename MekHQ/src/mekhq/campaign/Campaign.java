@@ -1868,7 +1868,7 @@ public class Campaign implements Serializable {
 		for(int fid : retVal.forceIds.keySet()) {
 			Force f = retVal.forceIds.get(fid);
 			Scenario s = retVal.getScenario(f.getScenarioId());
-			if(null != s) {
+			if(null != s && (null == f.getParentForce() || !f.getParentForce().isDeployed())) {
 				s.addForces(fid);
 			}
 			//some units may need force id set for backwards compatability

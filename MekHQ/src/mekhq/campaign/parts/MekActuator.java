@@ -266,6 +266,9 @@ public class MekActuator extends Part {
 		if(isSalvaging()) {
 			return null;
 		}
+		if(unit.isLocationBreached(location)) {
+			return unit.getEntity().getLocationName(location) + " is breached.";
+		}
 		if(unit.isLocationDestroyed(location)) {
 			return unit.getEntity().getLocationName(location) + " is destroyed.";
 		}
