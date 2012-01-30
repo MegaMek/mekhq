@@ -2000,24 +2000,28 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     	drivers.add(p.getId());
     	p.setUnitId(getId());
     	resetPilotAndEntity();
+		p.addLogEntry(campaign.getDate(), "Assigned to " + getName());
     }
     
     public void addGunner(Person p) {
     	gunners.add(p.getId());
     	p.setUnitId(getId());
     	resetPilotAndEntity();
+		p.addLogEntry(campaign.getDate(), "Assigned to " + getName());
     }
     
     public void addVesselCrew(Person p) {
     	vesselCrew.add(p.getId());
     	p.setUnitId(getId());
     	resetPilotAndEntity();
+		p.addLogEntry(campaign.getDate(), "Assigned to " + getName());
     }
     
     public void setNavigator(Person p) {
     	navigator = p.getId();
     	p.setUnitId(getId());
     	resetPilotAndEntity();
+		p.addLogEntry(campaign.getDate(), "Assigned to " + getName());
     }
     
     public void addPilotOrSoldier(Person p) {
@@ -2025,6 +2029,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     	gunners.add(p.getId());
     	p.setUnitId(getId());
     	resetPilotAndEntity();
+		p.addLogEntry(campaign.getDate(), "Assigned to " + getName());
     }
     
     public void remove(Person p) {
@@ -2036,6 +2041,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     		navigator = null;
     	}
     	resetPilotAndEntity();
+		p.addLogEntry(campaign.getDate(), "Removed from " + getName());
     }
     
     public boolean isUnmanned() {

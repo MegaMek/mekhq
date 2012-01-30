@@ -24,7 +24,11 @@ package mekhq.campaign.personnel;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
@@ -50,10 +54,12 @@ import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.Kill;
 import mekhq.campaign.MekHqXmlSerializable;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Ranks;
 import mekhq.campaign.Unit;
+import mekhq.campaign.LogEntry;
 import mekhq.campaign.work.IMedicalWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.Modes;
@@ -116,6 +122,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     
     protected String biography;
     protected GregorianCalendar birthday;
+    protected ArrayList<LogEntry> personnelLog;
     
     private Hashtable<String,Skill> skills;
     private PilotOptions options = new PilotOptions();
@@ -179,6 +186,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         toughness = 0;
         biography = "";
         nTasks = 0;
+        personnelLog = new ArrayList<LogEntry>();
         resetMinutesLeft();
     }
     
@@ -616,6 +624,13 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 					+String.valueOf(getOptionList("::", PilotOptions.MD_ADVANTAGES))
 					+"</implants>");
 		}
+		if(!personnelLog.isEmpty()) {
+			pw1.println(MekHqXmlUtil.indentStr(indent+1) +"<personnelLog>");
+			for(LogEntry entry : personnelLog) {
+				entry.writeToXml(pw1, indent+2);
+			}
+			pw1.println(MekHqXmlUtil.indentStr(indent+1) +"</personnelLog>");
+		}
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "</person>");
 	}
 
@@ -730,6 +745,22 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 					Skill s = Skill.generateInstanceFromXML(wn2);
 					if(null != s && null != s.getType()) {
 						retVal.skills.put(s.getType().getName(), s);
+					}
+				} else if (wn2.getNodeName().equalsIgnoreCase("personnelLog")) {
+					NodeList nl2 = wn2.getChildNodes();
+					for (int y=0; y<nl2.getLength(); y++) {
+						Node wn3 = nl2.item(y);
+						// If it's not an element node, we ignore it.
+						if (wn3.getNodeType() != Node.ELEMENT_NODE)
+							continue;
+						
+						if (!wn3.getNodeName().equalsIgnoreCase("logEntry")) {
+							// Error condition of sorts!
+							// Errr, what should we do here?
+							MekHQ.logMessage("Unknown node type not loaded in personnel log nodes: "+wn3.getNodeName());
+							continue;
+						}					
+						retVal.addLogEntry(LogEntry.generateInstanceFromXML(wn3));
 					}
 				}
 			}
@@ -1720,5 +1751,22 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     
     public void setNTasks(int n) {
     	nTasks = n;
+    }
+    
+    public ArrayList<LogEntry> getPersonnelLog() {
+    	Collections.sort(personnelLog, new Comparator<LogEntry>(){		 
+            public int compare(final LogEntry u1, final LogEntry u2) {
+            	return u1.getDate().compareTo(u2.getDate());
+            }
+        });
+    	return personnelLog;
+    }
+    
+    public void addLogEntry(Date d, String desc) {
+    	personnelLog.add(new LogEntry(d, desc));
+    }
+    
+    public void addLogEntry(LogEntry entry) {
+    	personnelLog.add(entry);
     }
 }

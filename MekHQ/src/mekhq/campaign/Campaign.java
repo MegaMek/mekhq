@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
@@ -537,11 +538,16 @@ public class Campaign implements Serializable {
 			astechPoolMinutes += 240;
 			astechPoolOvertime += 120;
 		}
+		p.addLogEntry(getDate(), "Joined " + getName());
 	}
 	
 	private void addPersonWithoutId(Person p) {
 		personnel.add(p);
 		personnelIds.put(p.getId(), p);
+	}
+	
+	public Date getDate() {
+		return calendar.getTime();
 	}
 
 	public ArrayList<Person> getPersonnel() {
@@ -3255,6 +3261,18 @@ public class Campaign implements Serializable {
 	
 	public void changeStatus(Person person, int status) {
 		Unit u = getUnit(person.getUnitId());
+		if(status == Person.S_KIA) {
+			person.addLogEntry(getDate(), "Killed in action");
+		}
+		if(status == Person.S_MIA) {
+			person.addLogEntry(getDate(), "Missing in action");
+		}
+		if(status == Person.S_RETIRED) {
+			person.addLogEntry(getDate(), "Retired from active duty");
+		}
+		if(status == Person.S_ACTIVE && person.getStatus() == Person.S_MIA) {
+			person.addLogEntry(getDate(), "Recovered from MIA status");
+		}
 		person.setStatus(status);
 		if(status != Person.S_ACTIVE) {
     		person.setDoctorId(null);
@@ -3262,6 +3280,16 @@ public class Campaign implements Serializable {
     			u.remove(person);
     		}
     	}
+	}
+	
+	public void changeRank(Person person, int rank) {
+		if(rank > person.getRank()) {
+			person.addLogEntry(getDate(), "Promoted to " + getRanks().getRank(rank));
+		} else if(rank < person.getRank()) {
+			person.addLogEntry(getDate(), "Demoted to " + getRanks().getRank(rank));
+		}
+		person.setRank(rank);
+		personUpdated(person);
 	}
 	
 	public GameOptions getGameOptions() {
@@ -3716,6 +3744,10 @@ public class Campaign implements Serializable {
     
     public void setStartingPlanet() {
     	location = new CurrentLocation(Planets.getInstance().getPlanets().get(getFaction().getStartingPlanet(getEra())), 0);
+    }
+    
+    public void addLogEntry(Person p, LogEntry entry) {
+    	p.addLogEntry(entry);
     }
     
 }

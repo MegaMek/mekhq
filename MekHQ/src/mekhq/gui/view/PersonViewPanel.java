@@ -7,6 +7,7 @@
 package mekhq.gui.view;
 
 import java.awt.Color;
+import java.awt.GridBagConstraints;
 import java.awt.Image;
 import java.awt.Insets;
 import java.text.SimpleDateFormat;
@@ -16,12 +17,14 @@ import java.util.ResourceBundle;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.JTextArea;
 
 import megamek.common.Pilot;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.DirectoryItems;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
+import mekhq.campaign.LogEntry;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 
@@ -42,10 +45,10 @@ public class PersonViewPanel extends javax.swing.JPanel {
 	private DirectoryItems portraits;
 	
 	private javax.swing.JLabel lblPortrait;
-	private javax.swing.JLabel lblUnit;
 	private javax.swing.JPanel pnlStats;
 	private javax.swing.JTextArea txtDesc;
-	private javax.swing.JTextArea txtKills;
+	private javax.swing.JPanel pnlKills;
+	private javax.swing.JPanel pnlLog;
 
 	private javax.swing.JLabel lblType;
 	private javax.swing.JLabel lblCall1;
@@ -79,12 +82,13 @@ public class PersonViewPanel extends javax.swing.JPanel {
 		lblPortrait = new javax.swing.JLabel();
 		pnlStats = new javax.swing.JPanel();
 		txtDesc = new javax.swing.JTextArea();
-		txtKills = new javax.swing.JTextArea();
+		pnlKills = new javax.swing.JPanel();
+		pnlLog = new javax.swing.JPanel();
 
 		setLayout(new java.awt.GridBagLayout());
 
 		setBackground(Color.WHITE);
-		
+				
 		lblPortrait.setName("lblPortait"); // NOI18N
 		lblPortrait.setBackground(Color.WHITE);
 		setPortrait();
@@ -121,36 +125,49 @@ public class PersonViewPanel extends javax.swing.JPanel {
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 1;
 		gridBagConstraints.gridwidth = 2;
-		gridBagConstraints.weighty = 1.0;
+		if(person.getPersonnelLog().isEmpty() && campaign.getKillsFor(person.getId()).isEmpty()) {
+			gridBagConstraints.weighty = 1.0;
+		}
 		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		add(txtDesc, gridBagConstraints);
 		
-		ArrayList<Kill> kills = campaign.getKillsFor(person.getId());
-		if(!kills.isEmpty()) {
-			String killRecord = "Kills: " + kills.size();
-	    	SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
-			for(Kill k : campaign.getKillsFor(person.getId())) {
-				killRecord += "\n " + k.getWhatKilled() + " on " + dateFormat.format(k.getDate()) + " with " + k.getKilledByWhat();
-			}
-			txtKills.setName("txtKills");
-			txtKills.setText(killRecord);
-			txtKills.setEditable(false);
-			txtKills.setLineWrap(true);
-			txtKills.setWrapStyleWord(true);
-			txtKills.setBorder(BorderFactory.createCompoundBorder(
-					BorderFactory.createTitledBorder("Kill Record"),
-	                BorderFactory.createEmptyBorder(5,5,5,5)));
+		if(person.getPersonnelLog().size() >0) {
+			pnlLog.setName("pnlLog");
+			pnlLog.setBorder(BorderFactory.createTitledBorder("Personnel Log"));
+			pnlLog.setBackground(Color.WHITE);
+			fillLog();
 			gridBagConstraints = new java.awt.GridBagConstraints();
 			gridBagConstraints.gridx = 0;
 			gridBagConstraints.gridy = 2;
+			gridBagConstraints.gridwidth = 2;
+			if(campaign.getKillsFor(person.getId()).isEmpty()) {
+				gridBagConstraints.weighty = 1.0;
+			}
+			gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
+			gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;	
+			add(pnlLog, gridBagConstraints);
+		}
+		
+		if(!campaign.getKillsFor(person.getId()).isEmpty()) {
+			fillKillRecord();
+			
+			pnlKills.setName("txtKills");
+			pnlKills.setBorder(BorderFactory.createCompoundBorder(
+					BorderFactory.createTitledBorder("Kill Record"),
+	                BorderFactory.createEmptyBorder(5,5,5,5)));
+			gridBagConstraints = new java.awt.GridBagConstraints();
+			pnlKills.setBackground(Color.WHITE);
+			gridBagConstraints.gridx = 0;
+			gridBagConstraints.gridy = 3;
 			gridBagConstraints.gridwidth = 2;
 			gridBagConstraints.weighty = 1.0;
 			gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
 			gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-			add(txtKills, gridBagConstraints);
+			add(pnlKills, gridBagConstraints);
 		}
 	}
 	
@@ -443,5 +460,89 @@ public class PersonViewPanel extends javax.swing.JPanel {
 			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 			pnlStats.add(lblImplants2, gridBagConstraints);
 		}    	
+    }
+    
+    private void fillLog() {
+    	SimpleDateFormat shortDateFormat = new SimpleDateFormat("MM/dd/yyyy");
+    	GridBagConstraints gridBagConstraints;
+		pnlLog.setLayout(new java.awt.GridBagLayout());
+    	JLabel lblDate;
+    	JTextArea txtLog;
+    	int row = 0;
+    	ArrayList<LogEntry> logs = person.getPersonnelLog();
+    	for(LogEntry entry : logs) {
+    		lblDate = new JLabel(shortDateFormat.format(entry.getDate()));
+    		txtLog = new JTextArea(entry.getDesc());
+    		txtLog.setEditable(false);
+    		txtLog.setLineWrap(true);
+    		txtLog.setWrapStyleWord(true);
+    		gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints.gridx = 0;
+			gridBagConstraints.gridy = row;
+			gridBagConstraints.weightx = 0.0;
+			gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			pnlLog.add(lblDate, gridBagConstraints);
+			gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints.gridx = 1;
+			gridBagConstraints.gridy = row;
+			gridBagConstraints.weightx = 1.0;
+			if(row == (logs.size()-1)) {
+				gridBagConstraints.weighty = 1.0;
+			}
+			gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+			gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			pnlLog.add(txtLog, gridBagConstraints);
+			row++;
+    	}
+    }
+    
+    private void fillKillRecord() {
+    	ArrayList<Kill> kills = campaign.getKillsFor(person.getId());
+    	SimpleDateFormat shortDateFormat = new SimpleDateFormat("MM/dd/yyyy");
+    	GridBagConstraints gridBagConstraints;
+		pnlKills.setLayout(new java.awt.GridBagLayout());
+    	JLabel lblDate;
+    	JTextArea txtKill;
+    	JLabel lblRecord = new JLabel("Kills: " + kills.size());
+    	gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.weightx = 1.0;
+		gridBagConstraints.gridwidth = 2;
+		gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+		pnlKills.add(lblRecord, gridBagConstraints);
+    	int row = 1;
+		for(Kill k : kills) {
+			lblDate = new JLabel(shortDateFormat.format(k.getDate()));
+    		txtKill = new JTextArea(k.getWhatKilled() + " with " + k.getKilledByWhat());
+    		txtKill.setEditable(false);
+    		txtKill.setLineWrap(true);
+    		txtKill.setWrapStyleWord(true);
+    		gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints.gridx = 0;
+			gridBagConstraints.gridy = row;
+			gridBagConstraints.weightx = 0.0;
+			gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			pnlKills.add(lblDate, gridBagConstraints);
+			gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints.gridx = 1;
+			gridBagConstraints.gridy = row;
+			gridBagConstraints.weightx = 1.0;
+			if(row == kills.size()) {
+				gridBagConstraints.weighty = 1.0;
+			}
+			gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+			gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			pnlKills.add(txtKill, gridBagConstraints);
+			row++;
+		}
     }
 }

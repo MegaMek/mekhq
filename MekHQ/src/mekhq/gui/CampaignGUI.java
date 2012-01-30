@@ -5273,8 +5273,7 @@ public class CampaignGUI extends JPanel {
 			if(command.contains("RANK")) {
 				int rank = Integer.parseInt(st.nextToken());
 				for(Person person : people) {
-					person.setRank(rank);
-					getCampaign().personUpdated(person);
+					getCampaign().changeRank(person, rank);
 				}
 				refreshServicedUnitList();
 				refreshUnitList();

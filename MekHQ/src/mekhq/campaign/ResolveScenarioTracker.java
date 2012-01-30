@@ -512,6 +512,7 @@ public class ResolveScenarioTracker {
 			}
 			person.setXp(person.getXp() + status.xp);
 			person.setHits(status.getHits());
+			person.addLogEntry(campaign.getDate(), "Participated in " + scenario.getName() + " during mission " + m.getName());
 			for(Kill k : status.getKills()) {
 				campaign.addKill(k);
 			}
