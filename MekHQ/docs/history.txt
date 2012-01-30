@@ -41,6 +41,7 @@ v0.1.14 (SVN)
 + manual editing of personnel logs
 + customizable multipliers for the value of used and damaged parts
 + base value of units on parts (work in progress)
++ moved planet and faction data to data/universe
 
 v0.1.13 (2012-01-11)
 + added campaign reference to all parts (should fix NPE refit bug)
