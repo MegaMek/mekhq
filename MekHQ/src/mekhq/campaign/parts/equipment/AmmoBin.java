@@ -31,6 +31,7 @@ import megamek.common.Mounted;
 import megamek.common.TargetRoll;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.Era;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.finances.Transaction;
@@ -134,7 +135,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     
     public void changeMunition(long m) {
     	this.munition = m;
-    	for (AmmoType atype : Utilities.getMunitionsFor(unit.getEntity(),(AmmoType)type)) {
+    	for (AmmoType atype : Utilities.getMunitionsFor(unit.getEntity(),(AmmoType)type, CampaignOptions.TECH_EXPERIMENTAL)) {
     		if (atype.getMunitionType() == munition) {
     			type = atype;
     			break;
@@ -207,7 +208,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 	}
 
 	public void restoreMunitionType() {
-		for (AmmoType atype : Utilities.getMunitionsFor(unit.getEntity(),(AmmoType)type)) {
+		for (AmmoType atype : Utilities.getMunitionsFor(unit.getEntity(),(AmmoType)type, CampaignOptions.TECH_EXPERIMENTAL)) {
     		if (atype.getMunitionType() == munition && atype.getInternalName().equals(type.getInternalName())) {
     			type = atype;
     			break;

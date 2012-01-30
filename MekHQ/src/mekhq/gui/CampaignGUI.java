@@ -4649,7 +4649,7 @@ public class CampaignGUI extends JPanel {
 				for (AmmoBin ammo : unit.getWorkingAmmoBins()) {
 					ammoMenu = new JMenu(ammo.getType().getDesc());
 					AmmoType curType = (AmmoType) ammo.getType();
-					for (AmmoType atype : Utilities.getMunitionsFor(unit.getEntity(), curType)) {
+					for (AmmoType atype : Utilities.getMunitionsFor(unit.getEntity(), curType, getCampaign().getCampaignOptions().getTechLevel())) {
 						cbMenuItem = new JCheckBoxMenuItem(atype.getDesc());
 						if (atype.equals(curType)) {
 							cbMenuItem.setSelected(true);
@@ -8202,7 +8202,7 @@ public class CampaignGUI extends JPanel {
 					for (AmmoBin ammo : unit.getWorkingAmmoBins()) {
 						ammoMenu = new JMenu(ammo.getType().getDesc());
 						AmmoType curType = (AmmoType) ammo.getType();
-						for (AmmoType atype : Utilities.getMunitionsFor(unit.getEntity(), curType)) {
+						for (AmmoType atype : Utilities.getMunitionsFor(unit.getEntity(), curType, getCampaign().getCampaignOptions().getTechLevel())) {
 							cbMenuItem = new JCheckBoxMenuItem(atype.getDesc());
 							if (atype.equals(curType)) {
 								cbMenuItem.setSelected(true);
