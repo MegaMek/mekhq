@@ -43,6 +43,7 @@ v0.1.14 (SVN)
 + base value of units on parts (work in progress)
 + moved planet and faction data to data/universe
 + editable unit history
++ change callsign context menu option
 
 v0.1.13 (2012-01-11)
 + added campaign reference to all parts (should fix NPE refit bug)

@@ -5609,6 +5609,20 @@ public class CampaignGUI extends JPanel {
 					}
 				}
 				refreshPersonnelList();
+			} else if(command.equalsIgnoreCase("CALLSIGN")) {
+				String s = (String)JOptionPane.showInputDialog(
+	                    frame,
+	                    "Enter new callsign",
+	                    "Edit Callsign",
+	                    JOptionPane.PLAIN_MESSAGE,
+	                    null,
+	                    null,
+	                    selectedPerson.getCallsign());
+				if(null != s) {
+					selectedPerson.setCallsign(s);
+				}
+				getCampaign().personUpdated(selectedPerson);
+				refreshPersonnelList();
 			}
 		}
 
@@ -6041,6 +6055,11 @@ public class CampaignGUI extends JPanel {
 					// change Biography
 					menuItem = new JMenuItem("Change Biography...");
 					menuItem.setActionCommand("BIOGRAPHY");
+					menuItem.addActionListener(this);
+					menuItem.setEnabled(true);
+					popup.add(menuItem);
+					menuItem = new JMenuItem("Change Callsign...");
+					menuItem.setActionCommand("CALLSIGN");
 					menuItem.addActionListener(this);
 					menuItem.setEnabled(true);
 					popup.add(menuItem);
