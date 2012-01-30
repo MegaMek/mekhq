@@ -48,6 +48,7 @@ import megamek.common.Mech;
 import megamek.common.MiscType;
 import megamek.common.Mounted;
 import megamek.common.Pilot;
+import megamek.common.Protomech;
 import megamek.common.QuadMech;
 import megamek.common.SmallCraft;
 import megamek.common.SpaceStation;
@@ -774,59 +775,65 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 		return heatSinkTypeString;
 	}
 
-	public int getSellValue() {
-		int residualValue = 0;
-
+	public long getSellValue() {
+		long partsValue = 0;
+		for(Part part : parts) {
+			partsValue += part.getActualValue();
+		}
+		//TODO: we need to adjust this for equipment that doesnt show up as parts
 		
-		/*
-		 * TODO: We should do this the full accounting way below, but for the 
-		 * short term I am going to just use the StratOps rule on pg. 181
-		 * undamaged units sell for 1/2, damaged units sell for 1/3,
-		 * destroyed units sell for 1/10
-		int valueOfSalvage = 0;
-		
-		for (Part part : parts) {
-			if (!(part instanceof MissingPart)) {
-				valueOfSalvage += part.getCost();
+		return (long)(partsValue * getUnitCostMultiplier());
+	}
+	
+	public double getUnitCostMultiplier() {
+		double multiplier = 1.0;
+		if(!isRepairable()) {
+			//if the unit is not repairable, set it as equal to its parts separately
+			//this is not RAW, but not really a way to make that work and this makes more sense
+			//although we might want to adjust it downward because of the labor cost of salvaging
+			return 1.0;
+		}
+		float tonnage = 100f;
+		if(entity instanceof Mech && ((Mech)entity).isIndustrial()) {
+			tonnage = 400f;
+		}
+		else if(entity instanceof VTOL) {
+			tonnage = 30f;
+		}
+		else if(entity instanceof Tank) {
+			if(entity.getMovementMode() == EntityMovementMode.WHEELED || entity.getMovementMode() == EntityMovementMode.NAVAL) {
+				tonnage = 200f;
+			}
+			else if(entity.getMovementMode() == EntityMovementMode.HOVER || entity.getMovementMode() == EntityMovementMode.SUBMARINE) {
+				tonnage = 50f;
+			}
+			else if(entity.getMovementMode() == EntityMovementMode.HYDROFOIL) {
+				tonnage = 75f;
+			}
+			else if(entity.getMovementMode() == EntityMovementMode.WIGE) {
+				tonnage = 25f;
+			}
+		}		
+		else if(entity instanceof Dropship) {
+			if(((Aero)entity).isSpheroid()) {
+				multiplier = 28;
+			} else {
+				multiplier = 36;
 			}
 		}
-
-		if (!isRepairable()) {
-			// The value of a truly destroyed entity is equals to the value of
-			// its parts
-			residualValue = valueOfSalvage;
-		} else {
-			// The value of a repairable entity is equals to its cost minus its
-			// repair cost
-			int cost = (int) Math.round(getEntity().getCost(false));
-
-			// Increase cost for IS players buying Clan mechs
-			if (TechConstants.getTechName(getEntity().getTechLevel()).equals(
-					"Clan")
-					&& !Faction.isClanFaction(campaign.getFaction()))
-				cost *= campaign.getCampaignOptions().getClanPriceModifier();
-
-			residualValue = cost - getRepairCost();
-
-			if (valueOfSalvage > residualValue)
-				residualValue = valueOfSalvage;
+		else if(entity instanceof SmallCraft) {
+			tonnage = 50f;
 		}
-
-		if (residualValue < 0)
-			residualValue = 0;
-		 */
-		
-		int cost = (int) Math.round(getEntity().getCost(false));
-		if(entity.isClan()) {
-			cost *= campaign.getCampaignOptions().getClanPriceModifier();
+		else if(entity instanceof Aero) {
+			tonnage = 200f;
 		}
-		if(!isDamaged()) {
-			return cost / 2;
-		} else if(isFunctional()) {
-			return cost / 3;
-		} else {
-			return cost / 10;
+		if(!(entity instanceof Infantry) && !(entity instanceof Dropship)) {
+			multiplier = 1 + (entity.getWeight() / tonnage);
 		}
+		if(entity.isOmni()) {
+			multiplier *= 1.25;
+		}
+		return multiplier;
 	}
 
 	public int getBuyCost() {

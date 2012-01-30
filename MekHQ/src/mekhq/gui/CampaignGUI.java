@@ -7920,9 +7920,8 @@ public class CampaignGUI extends JPanel {
 			} else if (command.equalsIgnoreCase("SELL")) {
 				for (Unit unit : units) {
 					if (!unit.isDeployed()) {
-						int sellValue = unit.getSellValue();
-						NumberFormat numberFormat = NumberFormat
-								.getIntegerInstance();
+						long sellValue = unit.getSellValue();
+						NumberFormat numberFormat = NumberFormat.getNumberInstance();
 						String text = numberFormat.format(sellValue) + " "
 								+ (sellValue != 0 ? "CBills" : "CBill");
 						if (0 == JOptionPane.showConfirmDialog(null,

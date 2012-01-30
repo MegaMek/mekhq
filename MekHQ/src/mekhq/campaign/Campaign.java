@@ -1454,7 +1454,7 @@ public class Campaign implements Serializable {
 
 	public void sellUnit(UUID id) {
 		Unit unit = getUnit(id);
-		int sellValue = unit.getSellValue();
+		long sellValue = unit.getSellValue();
 		finances.credit(sellValue, Transaction.C_UNIT_SALE, "Sale of " + unit.getName(), calendar.getTime());
 		removeUnit(id);
 	}

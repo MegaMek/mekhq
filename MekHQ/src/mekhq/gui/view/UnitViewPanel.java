@@ -280,7 +280,7 @@ public class UnitViewPanel extends javax.swing.JPanel {
 		
 		txtCost.setName("lblCost2"); // NOI18N
 		DecimalFormat format = new DecimalFormat();
-		txtCost.setText(format.format(entity.getCost(false)));
+		txtCost.setText(format.format(unit.getSellValue()));
 		txtCost.setEditable(false);
 		txtCost.setLineWrap(true);
 		txtCost.setWrapStyleWord(true);
