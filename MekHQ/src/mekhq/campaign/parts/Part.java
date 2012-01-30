@@ -115,6 +115,8 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	//to repair
 	protected boolean salvaging;
 	
+	protected boolean brandNew;
+	
 	//we need to keep track of a couple of potential mods that result from carrying
 	//over a task, otherwise people can get away with working over time with no consequence
 	protected boolean workingOvertime;
@@ -152,6 +154,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		this.refitId = null;
 		this.daysToArrival = 0;
 		this.campaign = c;
+		this.brandNew = false;
 	}
 
 	public void setId(int id) {
@@ -182,7 +185,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	
 	/**
 	 * This is the actual value of the part as affected by any characteristics
-	 * of the part itself (such as damage)
+	 * of the part itself
 	 * @return
 	 */
 	public long getCurrentValue() {
@@ -202,7 +205,20 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		if(isClanTechBase()) {
 			cost *= campaign.getCampaignOptions().getClanPriceModifier();
 		}
+		if(needsFixing()) {
+			cost *= campaign.getCampaignOptions().getDamagedPartsValue();
+		} else if(!isBrandNew()) {
+			cost *= campaign.getCampaignOptions().getUsedPartsValue();
+		}
 		return cost;
+	}
+	
+	public boolean isBrandNew() {
+		return brandNew;
+	}
+	
+	public void setBrandNew(boolean b) {
+		this.brandNew = b;
 	}
 	
 	public int getUnitTonnage() {
@@ -400,6 +416,10 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 				+"<daysToArrival>"
 				+daysToArrival
 				+"</daysToArrival>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<brandNew>"
+				+brandNew
+				+"</brandNew>");
 	}
 	
 	protected void writeToXmlEnd(PrintWriter pw1, int indent) {
@@ -506,6 +526,12 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 						retVal.workingOvertime = true;
 					} else {
 						retVal.workingOvertime = false;
+					}
+				} else if (wn2.getNodeName().equalsIgnoreCase("brandNew")) {
+					if(wn2.getTextContent().equalsIgnoreCase("true")) {
+						retVal.brandNew = true;
+					} else {
+						retVal.brandNew = false;
 					}
 				}
 			}

@@ -591,7 +591,7 @@ public class Campaign implements Serializable {
 	}
 
 	public void addPart(Part p) {
-
+		p.setBrandNew(false);
 		if(p instanceof Armor && null == p.getUnit()) {
 			for(Part part : getParts()) {
 				if(null != part.getUnit()) {

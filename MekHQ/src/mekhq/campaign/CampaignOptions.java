@@ -82,6 +82,8 @@ public class CampaignOptions implements Serializable {
     private boolean payForTransport;
     private boolean sellUnits;
     private boolean sellParts;
+    private double usedPartsValue;
+    private double damagedPartsValue;
 
     //xp related
     private int scenarioXP;
@@ -128,6 +130,8 @@ public class CampaignOptions implements Serializable {
         tasksXP = 1;
         mistakeXP = 0;
         successXP = 0;
+        usedPartsValue = 0.5;
+        damagedPartsValue = 0.33;
     }
 
     public static String getRepairSystemName (int repairSystem) {
@@ -177,6 +181,22 @@ public class CampaignOptions implements Serializable {
     
     public void setClanPriceModifier(double d) {
         this.clanPriceModifier = d;
+    }
+    
+    public double getUsedPartsValue() {
+        return usedPartsValue;
+    }
+    
+    public void setUsedPartsValue(double d) {
+        this.usedPartsValue = d;
+    }
+    
+    public double getDamagedPartsValue() {
+        return damagedPartsValue;
+    }
+    
+    public void setDamagedPartsValue(double d) {
+        this.damagedPartsValue = d;
     }
     
     public int getRepairSystem() {
@@ -450,6 +470,8 @@ public class CampaignOptions implements Serializable {
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "payForOverhead", payForOverhead);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "payForMaintain", payForMaintain);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "payForTransport", payForTransport);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "usedPartsValue", usedPartsValue);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "damagedPartsValue", damagedPartsValue);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "sellUnits", sellUnits);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "sellParts", sellParts);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "scenarioXP", scenarioXP);
@@ -587,6 +609,10 @@ public class CampaignOptions implements Serializable {
 					retVal.sellParts = true;
 				else
 					retVal.sellParts = false;
+			} else if (wn2.getNodeName().equalsIgnoreCase("usedPartsValue")) {
+				retVal.usedPartsValue = Double.parseDouble(wn2.getTextContent().trim());
+			} else if (wn2.getNodeName().equalsIgnoreCase("damagedPartsValue")) {
+				retVal.damagedPartsValue = Double.parseDouble(wn2.getTextContent().trim());
 			} else if (wn2.getNodeName().equalsIgnoreCase("scenarioXP")) {
 				retVal.scenarioXP = Integer.parseInt(wn2.getTextContent().trim());
 			} else if (wn2.getNodeName().equalsIgnoreCase("killsForXP")) {

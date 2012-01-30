@@ -109,6 +109,9 @@ public class PartsStore implements Serializable {
 		stockArmor(c);
 		stockMekLocations(c);
 		stockVeeLocations(c);
+		for(Part p : parts) {
+			p.setBrandNew(true);
+		}
 	}
 	
 	private void stockWeaponsAmmoAndEquipment(Campaign c) {

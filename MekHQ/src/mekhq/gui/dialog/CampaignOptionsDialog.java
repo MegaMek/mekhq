@@ -119,6 +119,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         useEraModsCheckBox.setSelected(options.useEraMods());
         useDragoonRatingCheckBox.setSelected(options.useDragoonRating());
         clanPriceModifierJFormattedTextField.setValue(options.getClanPriceModifier());
+        usedPartsValueJFormattedTextField.setValue(options.getUsedPartsValue());
+        damagedPartsValueJFormattedTextField.setValue(options.getDamagedPartsValue());
         useFactionForNamesBox.setSelected(options.useFactionForNames());
         useTacticsBox.setSelected(options.useTactics());
         useInitBonusBox.setSelected(options.useInitBonus());
@@ -185,6 +187,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         useEraModsCheckBox = new javax.swing.JCheckBox();
         useDragoonRatingCheckBox = new javax.swing.JCheckBox();
         javax.swing.JLabel clanPriceModifierLabel = new javax.swing.JLabel();
+        javax.swing.JLabel usedPartsValueLabel = new javax.swing.JLabel();
+        javax.swing.JLabel damagedPartsValueLabel = new javax.swing.JLabel();
         DecimalFormat numberFormat = (DecimalFormat) DecimalFormat.getInstance();
         numberFormat.setMaximumFractionDigits(2);
         DecimalFormatSymbols decimalFormatSymbols = new DecimalFormatSymbols();
@@ -192,6 +196,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         decimalFormatSymbols.setDecimalSeparator('.');
         numberFormat.setDecimalFormatSymbols(decimalFormatSymbols);
         clanPriceModifierJFormattedTextField = new JFormattedTextField(numberFormat);
+        usedPartsValueJFormattedTextField = new JFormattedTextField(numberFormat);
+        damagedPartsValueJFormattedTextField = new JFormattedTextField(numberFormat);
         useFactionForNamesBox = new javax.swing.JCheckBox();
         useTacticsBox = new javax.swing.JCheckBox();
         useInitBonusBox = new javax.swing.JCheckBox();
@@ -657,6 +663,44 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panFinances.add(clanPriceModifierJFormattedTextField, gridBagConstraints);
+        
+        usedPartsValueLabel.setText(resourceMap.getString("usedPartsValueLabel.text")); // NOI18N
+        usedPartsValueLabel.setName("usedPartsValueLabel"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 9;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        panFinances.add(usedPartsValueLabel, gridBagConstraints);
+        
+        usedPartsValueJFormattedTextField.setColumns(4);
+        usedPartsValueJFormattedTextField.setToolTipText(resourceMap.getString("usedPartsValueJFormattedTextField.toolTipText")); // NOI18N
+        usedPartsValueJFormattedTextField.setName("usedPartsValueJFormattedTextField"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 9;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panFinances.add(usedPartsValueJFormattedTextField, gridBagConstraints);
+        
+        damagedPartsValueLabel.setText(resourceMap.getString("damagedPartsValueLabel.text")); // NOI18N
+        damagedPartsValueLabel.setName("damagedPartsValueLabel"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 10;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        panFinances.add(damagedPartsValueLabel, gridBagConstraints);
+        
+        damagedPartsValueJFormattedTextField.setColumns(4);
+        damagedPartsValueJFormattedTextField.setToolTipText(resourceMap.getString("damagedPartsValueJFormattedTextField.toolTipText")); // NOI18N
+        damagedPartsValueJFormattedTextField.setName("damagedPartsValueJFormattedTextField"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 10;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panFinances.add(damagedPartsValueJFormattedTextField, gridBagConstraints);
         
         tabOptions.addTab(resourceMap.getString("panFinances.TabConstraints.tabTitle"), panFinances); // NOI18N
         
@@ -1352,6 +1396,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 	    options.setFactionModifiers(useFactionModifiersCheckBox.isSelected());
 	    String clanPriceModifierString = clanPriceModifierJFormattedTextField.getText();
 	    options.setClanPriceModifier(new Double(clanPriceModifierString));
+	    options.setUsedPartsValue(new Double(usedPartsValueJFormattedTextField.getText()));
+	    options.setDamagedPartsValue(new Double(damagedPartsValueJFormattedTextField.getText()));
 	    options.setDragoonRating(useDragoonRatingCheckBox.isSelected());
 	    options.setFactionForNames(useFactionForNamesBox.isSelected());
 	    options.setTactics(useTacticsBox.isSelected());
@@ -1707,6 +1753,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private javax.swing.JButton btnDate;
     private javax.swing.JButton btnOkay;
     private javax.swing.JFormattedTextField clanPriceModifierJFormattedTextField;
+    private javax.swing.JFormattedTextField usedPartsValueJFormattedTextField;
+    private javax.swing.JFormattedTextField damagedPartsValueJFormattedTextField;
     private javax.swing.JComboBox comboFaction;
     private javax.swing.JComboBox comboFactionNames;
     private javax.swing.JComboBox comboRanks;
