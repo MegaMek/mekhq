@@ -113,4 +113,9 @@ public class LogEntry implements MekHqXmlSerializable {
 		
 		return retVal;
 	}
+	
+	@Override
+	public LogEntry clone() {
+		return new LogEntry(getDate(), getDesc());
+	}
 }

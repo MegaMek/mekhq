@@ -150,6 +150,7 @@ import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
+import mekhq.campaign.LogEntry;
 import mekhq.campaign.PartInventory;
 import mekhq.campaign.Planet;
 import mekhq.campaign.ResolveScenarioTracker;
@@ -183,6 +184,8 @@ import mekhq.gui.dialog.CustomizeMissionDialog;
 import mekhq.gui.dialog.CustomizePersonDialog;
 import mekhq.gui.dialog.CustomizeScenarioDialog;
 import mekhq.gui.dialog.DataLoadingDialog;
+import mekhq.gui.dialog.EditLogEntryDialog;
+import mekhq.gui.dialog.EditPersonnelLogDialog;
 import mekhq.gui.dialog.EditTransactionDialog;
 import mekhq.gui.dialog.GameOptionsDialog;
 import mekhq.gui.dialog.MekHQAboutBox;
@@ -5574,7 +5577,9 @@ public class CampaignGUI extends JPanel {
 						getFrame(), true, "XP", selectedPerson.getXp(), 0, Math.max(selectedPerson.getXp()+10,100));
 				pvcd.setVisible(true);
 				int i = pvcd.getValue();
-				selectedPerson.setXp(i);
+				for(Person person : people) {
+					person.setXp(i);
+				}
 				refreshPatientList();
 				refreshPersonnelList();
 			} else if (command.equalsIgnoreCase("EDGE_SET")) {
@@ -5590,6 +5595,20 @@ public class CampaignGUI extends JPanel {
 			} else if (command.equalsIgnoreCase("KILL")) {
 				NewKillDialog nkd = new NewKillDialog(getFrame(), true, getCampaign(), selectedPerson);
 				nkd.setVisible(true);
+				refreshPersonnelList();
+			} else if (command.equalsIgnoreCase("LOG")) {
+				EditPersonnelLogDialog epld = new EditPersonnelLogDialog(getFrame(), true, getCampaign(), selectedPerson);
+				epld.setVisible(true);
+				refreshPersonnelList();
+			} else if (command.equalsIgnoreCase("LOG_SINGLE")) {
+				EditLogEntryDialog eeld = new EditLogEntryDialog(frame, true, new LogEntry(getCampaign().getDate(), ""));
+				eeld.setVisible(true);
+				LogEntry entry = eeld.getEntry();
+				if(null != entry) {
+					for(Person person : people) {
+						person.addLogEntry(entry.clone());
+					}
+				}
 				refreshPersonnelList();
 			}
 		}
@@ -5885,11 +5904,6 @@ public class CampaignGUI extends JPanel {
                     menu.setEnabled(!person.isDeployed(getCampaign()));
                     popup.add(menu);
                 }
-				menuItem = new JMenuItem("Add XP");
-				menuItem.setActionCommand("XP_ADD");
-				menuItem.addActionListener(this);
-				menuItem.setEnabled(true);
-				popup.add(menuItem);
 				if(oneSelected) {
 					menu = new JMenu("Spend XP");
 					JMenu currentMenu = new JMenu("Current Skills");
@@ -6031,6 +6045,19 @@ public class CampaignGUI extends JPanel {
 					menuItem.addActionListener(this);
 					menuItem.setEnabled(true);
 					popup.add(menuItem);
+					menuItem = new JMenuItem("Edit Personnel Log...");
+					menuItem.setActionCommand("LOG");
+					menuItem.addActionListener(this);
+					menuItem.setEnabled(true);
+					popup.add(menuItem);
+					
+				}
+				menuItem = new JMenuItem("Add Single Log Entry...");
+				menuItem.setActionCommand("LOG_SINGLE");
+				menuItem.addActionListener(this);
+				menuItem.setEnabled(true);
+				popup.add(menuItem);
+				if(oneSelected) {
 					menuItem = new JMenuItem("Assign Kill...");
 					menuItem.setActionCommand("KILL");
 					menuItem.addActionListener(this);
@@ -6047,7 +6074,24 @@ public class CampaignGUI extends JPanel {
 				menuItem.setActionCommand("HEAL");
 				menuItem.addActionListener(this);
 				menuItem.setEnabled(getCampaign().isGM());
+				menuItem = new JMenuItem("Add XP");
+				menuItem.setActionCommand("XP_ADD");
+				menuItem.addActionListener(this);
+				menuItem.setEnabled(true);
+				popup.add(menuItem);
 				menu.add(menuItem);
+				menuItem = new JMenuItem("Set XP");
+				menuItem.setActionCommand("XP_SET");
+				menuItem.addActionListener(this);
+				menuItem.setEnabled(getCampaign().isGM());
+				menu.add(menuItem);
+				if(getCampaign().getCampaignOptions().useEdge()) {
+					menuItem = new JMenuItem("Set Edge");
+					menuItem.setActionCommand("EDGE_SET");
+					menuItem.addActionListener(this);
+					menuItem.setEnabled(getCampaign().isGM());
+					menu.add(menuItem);
+				}
 				if(oneSelected) {
 					/*
 					if (person instanceof PilotPerson) {
@@ -6061,19 +6105,7 @@ public class CampaignGUI extends JPanel {
 					menuItem.setActionCommand("EDIT");
 					menuItem.addActionListener(this);
 					menuItem.setEnabled(getCampaign().isGM());
-					menu.add(menuItem);
-					menuItem = new JMenuItem("Set XP");
-					menuItem.setActionCommand("XP_SET");
-					menuItem.addActionListener(this);
-					menuItem.setEnabled(getCampaign().isGM());
-					menu.add(menuItem);
-				}
-				if(getCampaign().getCampaignOptions().useEdge()) {
-					menuItem = new JMenuItem("Set Edge");
-					menuItem.setActionCommand("EDGE_SET");
-					menuItem.addActionListener(this);
-					menuItem.setEnabled(getCampaign().isGM());
-					menu.add(menuItem);
+					menu.add(menuItem);				
 				}
 				popup.addSeparator();
 				popup.add(menu);
