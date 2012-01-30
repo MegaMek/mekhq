@@ -24,6 +24,7 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 
 import megamek.common.EquipmentType;
+import megamek.common.Mech;
 import megamek.common.Tank;
 import megamek.common.TechConstants;
 import mekhq.campaign.Campaign;
@@ -167,7 +168,9 @@ public class VeeStabiliser extends Part {
 
 	@Override
 	public String checkFixable() {
-		// TODO Auto-generated method stub
+		if(!isSalvaging() && unit.isLocationBreached(loc)) {
+    		return unit.getEntity().getLocationName(loc) + " is breached.";
+		}
 		return null;
 	}
 

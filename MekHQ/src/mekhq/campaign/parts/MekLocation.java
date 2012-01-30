@@ -29,6 +29,7 @@ import megamek.common.IArmorState;
 import megamek.common.ILocationExposureStatus;
 import megamek.common.Mech;
 import megamek.common.Mounted;
+import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
@@ -193,6 +194,10 @@ public class MekLocation extends Part {
 				+"<forQuad>"
 				+forQuad
 				+"</forQuad>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<breached>"
+				+breached
+				+"</breached>");
 		writeToXmlEnd(pw1, indent);
 	}
 
@@ -219,6 +224,11 @@ public class MekLocation extends Part {
 					forQuad = true;
 				else
 					forQuad = false;
+			} else if (wn2.getNodeName().equalsIgnoreCase("breached")) {
+				if (wn2.getTextContent().equalsIgnoreCase("true"))
+					breached = true;
+				else
+					breached = false;
 			} 
 		}
 	}
@@ -304,12 +314,11 @@ public class MekLocation extends Part {
 		super.fix();
 		if(isBreached()) {
 			breached = false;
-			//TODO: this wont work for breached status because MM explicitly disallows it
-			unit.getEntity().setLocationStatus(loc, ILocationExposureStatus.NORMAL);
+			unit.getEntity().setLocationStatus(loc, ILocationExposureStatus.NORMAL, true);
 			for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
 	            CriticalSlot slot = unit.getEntity().getCritical(loc, i);
 	            // ignore empty & non-hittable slots
-	            if ((slot == null)) {
+	            if (slot == null) {
 	                continue;
 	            }
 	            slot.setBreached(false);
@@ -391,7 +400,13 @@ public class MekLocation extends Part {
 	@Override
     public String getDetails() {
 		if(null != unit) {
-			return unit.getEntity().getLocationName(loc) + " (" + Math.round(100*percent) + "%)";
+			String toReturn = unit.getEntity().getLocationName(loc);
+			if(isBreached()) {
+				toReturn += " (Breached)";
+			} else {
+				toReturn += " (" + Math.round(100*percent) + "%)";
+			}
+			return toReturn;
 		}
 		return getUnitTonnage() + " tons" + " (" + Math.round(100*percent) + "%)";
     }
@@ -466,7 +481,7 @@ public class MekLocation extends Part {
 	                return "Repairable parts in " + unit.getEntity().getLocationName(loc) + " must be salvaged or scrapped first.";
 	            } 
 	        }
-		} else {
+		} else if (!isBreached()) {
 			//check for damaged hips and shoulders
 			for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
 	            CriticalSlot slot = unit.getEntity().getCritical(loc, i);
@@ -540,6 +555,32 @@ public class MekLocation extends Part {
             } 
         }
 		return true;
+	}
+	
+	@Override
+	public TargetRoll getAllMods() {
+		if(isBreached() && !isSalvaging()) {
+			return new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS, "fixing breach");
+		}
+		return super.getAllMods();
+	}
+	
+	public String getDesc() {
+		if(!isBreached() || isSalvaging()) {
+			return super.getDesc();
+		}
+		String toReturn = "<html><font size='2'";
+		String scheduled = "";
+		if (getAssignedTeamId() != null) {
+			scheduled = " (scheduled) ";
+		}
+	
+		toReturn += ">";
+		toReturn += "<b>Seal " + getName() + "</b><br/>";
+		toReturn += getDetails() + "<br/>";
+		toReturn += "" + getTimeLeft() + " minutes" + scheduled;
+		toReturn += "</font></html>";
+		return toReturn;
 	}
 	
 }

@@ -142,7 +142,7 @@ public class MekLifeSupport extends Part {
 			for (int i = 0; i < entity.locations(); i++) {
 				if (entity.getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_LIFE_SUPPORT, i) > 0) {
 					if (entity.isSystemRepairable(Mech.SYSTEM_LIFE_SUPPORT, i)) {					
-						hits = entity.getHitCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_LIFE_SUPPORT, i);	
+						hits = entity.getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_LIFE_SUPPORT, i);	
 						break;
 					} else {
 						remove(false);

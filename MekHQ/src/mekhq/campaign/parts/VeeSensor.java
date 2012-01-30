@@ -24,6 +24,7 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 
 import megamek.common.EquipmentType;
+import megamek.common.Mech;
 import megamek.common.Tank;
 import megamek.common.TechConstants;
 import mekhq.campaign.Campaign;
@@ -141,7 +142,6 @@ public class VeeSensor extends Part {
 
 	@Override
 	public String checkFixable() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

@@ -404,8 +404,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 	}
 	
 	public boolean isLocationBreached(int loc) {
-		return entity.getLocationStatus(loc) == ILocationExposureStatus.BREACHED 
-				|| entity.getLocationStatus(loc) == ILocationExposureStatus.VACUUM;
+		return entity.getLocationStatus(loc) == ILocationExposureStatus.BREACHED;
 	}
 	
 	public boolean hasBadHipOrShoulder(int loc) {

@@ -220,7 +220,7 @@ public class MekActuator extends Part {
 	@Override
 	public void updateConditionFromEntity() {
 		if(null != unit) {
-			hits = unit.getEntity().getHitCriticals(CriticalSlot.TYPE_SYSTEM, type, location);	
+			hits = unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, type, location);	
 			if(hits == 0) {
 				time = 0;
 				difficulty = 0;

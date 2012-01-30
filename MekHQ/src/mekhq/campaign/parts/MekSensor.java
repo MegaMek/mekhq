@@ -146,7 +146,7 @@ public class MekSensor extends Part {
 			for (int i = 0; i < entity.locations(); i++) {
 				if (entity.getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS, i) > 0) {
 					if (entity.isSystemRepairable(Mech.SYSTEM_SENSORS, i)) {					
-						hits = entity.getHitCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS, i);	
+						hits = entity.getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS, i);	
 						break;
 					} else {
 						remove(false);

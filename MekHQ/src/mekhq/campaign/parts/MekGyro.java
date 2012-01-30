@@ -240,7 +240,7 @@ public class MekGyro extends Part {
 	@Override
 	public void updateConditionFromEntity() {
 		if(null != unit) {
-			hits = unit.getEntity().getHitCriticals(CriticalSlot.TYPE_SYSTEM,Mech.SYSTEM_GYRO, Mech.LOC_CT);
+			hits = unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_SYSTEM,Mech.SYSTEM_GYRO, Mech.LOC_CT);
 			if(hits == 0) {
 				time = 0;
 				difficulty = 0;

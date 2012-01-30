@@ -336,7 +336,7 @@ public class EnginePart extends Part {
 			int engineCrits = 0;
 			Entity entity = unit.getEntity();
 			for (int i = 0; i < entity.locations(); i++) {
-				engineHits += entity.getHitCriticals(CriticalSlot.TYPE_SYSTEM,
+				engineHits += entity.getDamagedCriticals(CriticalSlot.TYPE_SYSTEM,
 						Mech.SYSTEM_ENGINE, i);
 				engineCrits += entity.getNumberOfCriticals(
 						CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE, i);

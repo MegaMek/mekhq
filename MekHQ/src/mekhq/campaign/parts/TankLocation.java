@@ -23,9 +23,13 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import megamek.common.CriticalSlot;
 import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
+import megamek.common.ILocationExposureStatus;
+import megamek.common.Mounted;
 import megamek.common.Tank;
+import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
@@ -41,6 +45,7 @@ public class TankLocation extends Part {
 	private static final long serialVersionUID = -122291037522319765L;
 	protected int loc;
 	protected int damage;
+	protected boolean breached;
 
     public TankLocation() {
     	this(0, 0, null);
@@ -60,6 +65,7 @@ public class TankLocation extends Part {
         this.damage = 0;
         this.time = 60;
         this.difficulty = 0;
+        this.breached = false;
         this.name = "Tank Location";
         switch(loc) {
             case(Tank.LOC_FRONT):
@@ -101,6 +107,10 @@ public class TankLocation extends Part {
 				+"<damage>"
 				+damage
 				+"</damage>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<breached>"
+				+breached
+				+"</breached>");
 		writeToXmlEnd(pw1, indent);
 	}
 
@@ -115,7 +125,12 @@ public class TankLocation extends Part {
 				loc = Integer.parseInt(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("damage")) {
 				damage = Integer.parseInt(wn2.getTextContent());
-			}
+			} else if (wn2.getNodeName().equalsIgnoreCase("breached")) {
+				if (wn2.getTextContent().equalsIgnoreCase("true"))
+					breached = true;
+				else
+					breached = false;
+			} 
 		}
 	}
 
@@ -137,9 +152,26 @@ public class TankLocation extends Part {
 	@Override
 	public void fix() {
 		super.fix();
+		if(isBreached()) {
+			breached = false;
+			unit.getEntity().setLocationStatus(loc, ILocationExposureStatus.NORMAL, true);
+			for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
+	            CriticalSlot slot = unit.getEntity().getCritical(loc, i);
+	            // ignore empty & non-hittable slots
+	            if (slot == null) {
+	                continue;
+	            }
+	            slot.setBreached(false);
+	            Mounted m = slot.getMount();
+	            if(null != m) {
+	            	m.setBreached(false);
+	            }
+			}
+		} else {
 		damage = 0;
-		if(null != unit) {
-			unit.getEntity().setInternal(unit.getEntity().getOInternal(loc), loc);
+			if(null != unit) {
+				unit.getEntity().setInternal(unit.getEntity().getOInternal(loc), loc);
+			}
 		}
 	}
 
@@ -166,20 +198,32 @@ public class TankLocation extends Part {
 		if(null != unit) {
 			if(IArmorState.ARMOR_DESTROYED == unit.getEntity().getInternal(loc)) {
 				remove(false);
+			} else if(unit.isLocationBreached(loc)) {
+				breached = true;
+				this.time = 60;
+				this.difficulty = 0;
 			} else {
 				damage = unit.getEntity().getOInternal(loc) - unit.getEntity().getInternal(loc);			
 			}
 		}
 	}
 
+	public boolean isBreached() {
+		return breached;
+	}
+	
 	@Override
 	public boolean needsFixing() {
-		return damage > 0;
+		return damage > 0 || breached;
 	}
 	
 	@Override
     public String getDetails() {
-		return damage + " point(s) of damage";
+		if(isBreached()) {
+			return "Breached";
+		} else {
+			return  damage + " point(s) of damage";
+		}
     }
 
 	@Override
@@ -212,5 +256,32 @@ public class TankLocation extends Part {
 	public long getStickerPrice() {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+	
+	@Override
+	public TargetRoll getAllMods() {
+		if(isBreached() && !isSalvaging()) {
+			return new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS, "fixing breach");
+		}
+		return super.getAllMods();
+	}
+	
+	@Override
+	public String getDesc() {
+		if(!isBreached() || isSalvaging()) {
+			return super.getDesc();
+		}
+		String toReturn = "<html><font size='2'";
+		String scheduled = "";
+		if (getAssignedTeamId() != null) {
+			scheduled = " (scheduled) ";
+		}
+	
+		toReturn += ">";
+		toReturn += "<b>Seal " + getName() + "</b><br/>";
+		toReturn += getDetails() + "<br/>";
+		toReturn += "" + getTimeLeft() + " minutes" + scheduled;
+		toReturn += "</font></html>";
+		return toReturn;
 	}
 }

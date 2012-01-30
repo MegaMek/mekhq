@@ -232,7 +232,7 @@ public class MekCockpit extends Part {
 			for (int i = 0; i < entity.locations(); i++) {
 				if (entity.getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_COCKPIT, i) > 0) {
 					if (entity.isSystemRepairable(Mech.SYSTEM_COCKPIT, i)) {					
-						hits = entity.getHitCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_COCKPIT, i);	
+						hits = entity.getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_COCKPIT, i);	
 						break;
 					} else {
 						remove(false);
