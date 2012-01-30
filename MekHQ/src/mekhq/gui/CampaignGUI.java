@@ -3110,7 +3110,24 @@ public class CampaignGUI extends JPanel {
 	}
 	
 	public void refreshPersonnelList() {
+		UUID selectedUUID = null;
+		int selectedRow = personnelTable.getSelectedRow();
+		if(selectedRow != -1) {
+			Person p = personModel.getPerson(personnelTable.convertRowIndexToModel(selectedRow));
+			if(null != p) {
+				selectedUUID = p.getId();
+			}
+		}
 		personModel.setData(getCampaign().getPersonnel());
+		//try to put the focus back on same person if they are still available
+		for(int row = 0; row < personnelTable.getRowCount(); row++) {
+			Person p = personModel.getPerson(personnelTable.convertRowIndexToModel(row));
+			if(p.getId().equals(selectedUUID)) {
+				personnelTable.setRowSelectionInterval(row, row);
+				refreshPersonnelView();
+				break;
+			}
+		}
 		refreshRating();
 	}
 	
@@ -3157,7 +3174,24 @@ public class CampaignGUI extends JPanel {
 	}
 	
 	public void refreshUnitList() {
+		UUID selectedUUID = null;
+		int selectedRow = unitTable.getSelectedRow();
+		if(selectedRow != -1) {
+			Unit u = unitModel.getUnit(unitTable.convertRowIndexToModel(selectedRow));
+			if(null != u) {
+				selectedUUID = u.getId();
+			}
+		}
 		unitModel.setData(getCampaign().getUnits());
+		//try to put the focus back on same person if they are still available
+		for(int row = 0; row < unitTable.getRowCount(); row++) {
+			Unit u = unitModel.getUnit(unitTable.convertRowIndexToModel(row));
+			if(u.getId().equals(selectedUUID)) {
+				unitTable.setRowSelectionInterval(row, row);
+				refreshUnitView();
+				break;
+			}
+		}
 		refreshLab();
 		refreshRating();
 	}
