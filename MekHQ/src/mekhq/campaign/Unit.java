@@ -183,6 +183,8 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 	//for backwards compatability with 0.1.8, but otherwise is no longer used 
 	private int pilotId = -1;
 	
+	private String history;
+	
 	public Unit() {
 		this(null, null);
 	}
@@ -205,6 +207,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 		scenarioId = -1;
 		this.refit = null;
 		this.engineer = null;
+		this.history = "";
 		reCalc();
 	}
 	
@@ -304,6 +307,14 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 
 	public void setSalvage(boolean b) {
 		this.salvaged = b;
+	}
+	
+	public String getHistory() {
+		return history;
+	}
+	
+	public void setHistory(String s) {
+		this.history = s;
 	}
 
 	public boolean isFunctional() {
@@ -1039,6 +1050,10 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 				+"<scenarioId>"
 				+scenarioId
 				+"</scenarioId>");
+		pw1.println(MekHqXmlUtil.indentStr(indentLvl+1)
+				+"<history>"
+				+history
+				+"</history>");
 		if(null != refit) {
 			refit.writeToXml(pw1, indentLvl+1);
 		}
@@ -1107,6 +1122,8 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 					retVal.entity = MekHqXmlUtil.getEntityFromXmlString(wn2);
 				} else if (wn2.getNodeName().equalsIgnoreCase("refit")) {
 					retVal.refit = Refit.generateInstanceFromXML(wn2, retVal, version);
+				} else if (wn2.getNodeName().equalsIgnoreCase("history")) {
+					retVal.history = wn2.getTextContent();
 				}
 			}
 		} catch (Exception ex) {

@@ -138,30 +138,32 @@ public class UnitViewPanel extends javax.swing.JPanel {
 		gridBagConstraints.gridy = 1;
 		gridBagConstraints.gridwidth = 2;
 		gridBagConstraints.weightx = 1.0;
-		gridBagConstraints.weighty = 0.0;
+		if(unit.getHistory().length() == 0) {
+			gridBagConstraints.weighty = 1.0;
+		}
 		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
 		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		add(txtReadout, gridBagConstraints);
 		
-		txtFluff.setName("txtFluff");
-		txtFluff.setContentType(resourceMap.getString("txtFluff.contentType")); // NOI18N
-		txtFluff.setEditable(false);
-		txtFluff.setFont(Font.decode(resourceMap.getString("txtFluff.font"))); // NOI18N
-		txtFluff.setText(mview.getMechReadoutFluff());
-		txtFluff.setBorder(BorderFactory.createCompoundBorder(
-				BorderFactory.createTitledBorder("Unit History"),
-                BorderFactory.createEmptyBorder(5,5,5,5)));
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 2;
-		gridBagConstraints.gridwidth = 2;
-		gridBagConstraints.weightx = 1.0;
-		gridBagConstraints.weighty = 1.0;
-		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		add(txtFluff, gridBagConstraints);
+		if(unit.getHistory().length() > 0) {
+			txtFluff.setName("txtFluff");
+			txtFluff.setEditable(false);
+			txtFluff.setText(unit.getHistory());
+			txtFluff.setBorder(BorderFactory.createCompoundBorder(
+					BorderFactory.createTitledBorder("Unit History"),
+	                BorderFactory.createEmptyBorder(5,5,5,5)));
+			gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints.gridx = 0;
+			gridBagConstraints.gridy = 2;
+			gridBagConstraints.gridwidth = 2;
+			gridBagConstraints.weightx = 1.0;
+			gridBagConstraints.weighty = 1.0;
+			gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+			gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			add(txtFluff, gridBagConstraints);
+		}
 	}
 	
 	private void fillStats(ResourceBundle resourceMap) {

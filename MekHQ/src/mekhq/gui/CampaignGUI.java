@@ -189,7 +189,6 @@ import mekhq.gui.dialog.EditPersonnelLogDialog;
 import mekhq.gui.dialog.EditTransactionDialog;
 import mekhq.gui.dialog.GameOptionsDialog;
 import mekhq.gui.dialog.MekHQAboutBox;
-import mekhq.gui.dialog.MekViewDialog;
 import mekhq.gui.dialog.MissionTypeDialog;
 import mekhq.gui.dialog.NewKillDialog;
 import mekhq.gui.dialog.PartsStoreDialog;
@@ -8090,7 +8089,18 @@ public class CampaignGUI extends JPanel {
 					Logger.getLogger(CampaignGUI.class.getName())
 							.log(Level.SEVERE, null, ex);
 				}	
-			}
+			} else if(command.contains("CHANGE_HISTORY")) {
+            	if(null != selectedUnit) {
+            		TextAreaDialog tad = new TextAreaDialog(getFrame(), true,
+    						"Edit Unit History",
+    						selectedUnit.getHistory());
+    				tad.setVisible(true);
+    				if(tad.wasChanged()) {
+    					selectedUnit.setHistory(tad.getText());
+    					refreshUnitList();
+    				}        	
+            	}
+            }
 		}
 		
 		@Override
@@ -8264,6 +8274,11 @@ public class CampaignGUI extends JPanel {
 					popup.add(menu);
 				}
 				if(oneSelected) {
+					menuItem = new JMenuItem("Edit Unit History...");
+					menuItem.setActionCommand("CHANGE_HISTORY");
+					menuItem.addActionListener(this);
+					menuItem.setEnabled(true);
+					popup.add(menuItem);
 					// remove pilot
 					popup.addSeparator();
 					menuItem = new JMenuItem("Remove all personnel");
