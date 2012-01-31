@@ -433,12 +433,11 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 		//need to set up an array of part ids to avoid concurrent modification
 		//problems because some updateCondition methods will remove the part and put
 		//in a new one
-		ArrayList<Integer> partIds = new ArrayList<Integer>();
+		ArrayList<Part> tempParts = new ArrayList<Part>();
 		for(Part p : parts) {
-			partIds.add(p.getId());
+			tempParts.add(p);
 		}
-		for(int pid : partIds) {
-			Part part = campaign.getPart(pid);
+		for(Part part : tempParts) {
 			//dont change status for pending assignments
 			if(null == part.getAssignedTeamId()) {
 				if(!isRepairable() || isSalvage()) {

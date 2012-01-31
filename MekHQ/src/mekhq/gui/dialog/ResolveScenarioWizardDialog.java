@@ -388,6 +388,7 @@ public class ResolveScenarioWizardDialog extends javax.swing.JDialog {
         for(Entity en : tracker.getPotentialSalvage()) {
         	j++;
         	Unit u = new Unit(en, tracker.getCampaign());
+        	u.initializeParts(false);
         	u.runDiagnostic();
         	salvageables.add(u);
         	box = new JCheckBox(en.getDisplayName() + " (" + formatter.format(u.getSellValue()) + " C-Bills)");

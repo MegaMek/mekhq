@@ -46,6 +46,7 @@ v0.1.14 (SVN)
 + change callsign context menu option
 + keep the focus on selected units and personnel in the view when respective lists are refreshed
 + ammo swap options should follow tech limits
++ Bug: salvaged units have no value in resolveScenarioWizard
 
 v0.1.13 (2012-01-11)
 + added campaign reference to all parts (should fix NPE refit bug)
