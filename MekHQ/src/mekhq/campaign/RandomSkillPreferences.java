@@ -41,18 +41,33 @@ public class RandomSkillPreferences implements Serializable {
     private int overallRecruitBonus;
     private int[] recruitBonuses;
     private boolean randomizeSkill;
-
-    //probability of tactics skill for combat personnel by level
-    //default small arms skill for combat personnel and what level 
-    //default prob of anti-mech skill for infantry
-    //assign bonus points for clan warriors
+    private boolean useClanBonuses;
+    private int antiMekProb;
+    private int[] specialAbilBonus;
+    private int combatSmallArmsBonus;
+    private int supportSmallArmsBonus;
+    private int[] tacticsMod;
+    private int artilleryProb;
+    private int artilleryBonus;
+    private int secondSkillProb;
+    private int secondSkillBonus;
     
     //special abilities
     
     public RandomSkillPreferences() {
-    	overallRecruitBonus = 0;
+    	overallRecruitBonus = 2;
     	recruitBonuses = new int[Person.T_NUM];
-    	randomizeSkill = false;
+    	randomizeSkill = true;
+    	useClanBonuses = true;
+    	antiMekProb = 10;
+    	combatSmallArmsBonus = -3;
+    	supportSmallArmsBonus = -13;
+    	specialAbilBonus = new int[]{-12,-12,-2,0,1};
+    	tacticsMod = new int[]{-12,-10,-7,-4,-1};
+    	artilleryProb = 10;
+    	artilleryBonus = -2;
+    	secondSkillProb = 0;
+    	secondSkillBonus = -4;
     }
     
     
@@ -78,6 +93,20 @@ public class RandomSkillPreferences implements Serializable {
     	recruitBonuses[type] = bonus;
     }
     
+    public int getSpecialAbilBonus(int type) {
+    	if(type > specialAbilBonus.length) {
+    		return 0;
+    	} 
+    	return specialAbilBonus[type];
+    }
+    
+    public void setSpecialAbilBonus(int bonus, int type) {
+    	if(type > specialAbilBonus.length) {
+    		return;
+    	}
+    	specialAbilBonus[type] = bonus;
+    }
+    
     public void setRandomizeSkill(boolean b) {
     	this.randomizeSkill = b;
     }
@@ -86,14 +115,105 @@ public class RandomSkillPreferences implements Serializable {
     	return randomizeSkill;
     }
     
+    public void setUseClanBonuses(boolean b) {
+    	this.useClanBonuses = b;
+    }
+    
+    public boolean useClanBonuses() {
+    	return useClanBonuses;
+    }
+    
+    public int getAntiMekProb() {
+    	return antiMekProb;
+    }
+    
+    public void setAntiMekProb(int b) {
+    	antiMekProb = b;
+    }
+    
+    public int getCombatSmallArmsBonus() {
+    	return combatSmallArmsBonus;
+    }
+    
+    public void setCombatSmallArmsBonus(int b) {
+    	combatSmallArmsBonus = b;
+    }
+    
+    public int getSupportSmallArmsBonus() {
+    	return supportSmallArmsBonus;
+    }
+    
+    public void setSupportSmallArmsBonus(int b) {
+    	supportSmallArmsBonus = b;
+    }
+    
+    public int getTacticsMod(int lvl) {
+    	return tacticsMod[lvl];
+    }
+    
+    public void setTacticsMode(int bonus, int type) {
+    	if(type > tacticsMod.length) {
+    		return;
+    	}
+    	tacticsMod[type] = bonus;
+    }
+    
+    public void setArtilleryProb(int b) {
+    	this.artilleryProb = b;
+    }
+    
+    public int getArtilleryProb() {
+    	return artilleryProb;
+    }
+    
+    public void setArtilleryBonus(int b) {
+    	this.artilleryBonus = b;
+    }
+    
+    public int getArtilleryBonus() {
+    	return artilleryBonus;
+    }
+    
+    public void setSecondSkillProb(int b) {
+    	this.secondSkillProb = b;
+    }
+    
+    public int getSecondSkillProb() {
+    	return secondSkillProb;
+    }
+    
+    public void setSecondSkillBonus(int b) {
+    	this.secondSkillBonus = b;
+    }
+    
+    public int getSecondSkillBonus() {
+    	return secondSkillBonus;
+    }
+    
     public void writeToXml(PrintWriter pw1, int indent) {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "<randomSkillPreferences>");
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "overallRecruitBonus", overallRecruitBonus);
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<recruitBonuses>"
-				+printRecruitBonuses()
+				+printIntegerArray(recruitBonuses)
 				+"</recruitBonuses>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<specialAbilBonus>"
+				+printIntegerArray(specialAbilBonus)
+				+"</specialAbilBonus>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<tacticsMod>"
+				+printIntegerArray(tacticsMod)
+				+"</tacticsMod>");
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "randomizeSkill", randomizeSkill);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useClanBonuses", useClanBonuses);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "antiMekProb", antiMekProb);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "combatSmallArmsBonus", combatSmallArmsBonus);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "supportSmallArmsBonus", supportSmallArmsBonus);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "artilleryProb", artilleryProb);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "artilleryBonus", artilleryBonus);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "secondSkillProb", secondSkillProb);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "secondSkillBonus", secondSkillBonus);
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "</randomSkillPreferences>");
 	}
 
@@ -125,10 +245,49 @@ public class RandomSkillPreferences implements Serializable {
 				else
 					retVal.randomizeSkill = false;
 			}
+			else if (wn2.getNodeName().equalsIgnoreCase("useClanBonuses")) {
+				if (wn2.getTextContent().equalsIgnoreCase("true"))
+					retVal.useClanBonuses = true;
+				else
+					retVal.useClanBonuses = false;
+			}
+			else if (wn2.getNodeName().equalsIgnoreCase("antiMekProb")) {
+				retVal.antiMekProb = Integer.parseInt(wn2.getTextContent().trim());
+			}
+			else if (wn2.getNodeName().equalsIgnoreCase("combatSmallArmsBonus")) {
+				retVal.combatSmallArmsBonus = Integer.parseInt(wn2.getTextContent().trim());
+			} 
+			else if (wn2.getNodeName().equalsIgnoreCase("supportSmallArmsBonus")) {
+				retVal.supportSmallArmsBonus = Integer.parseInt(wn2.getTextContent().trim());
+			}
+			else if (wn2.getNodeName().equalsIgnoreCase("artilleryProb")) {
+				retVal.artilleryProb = Integer.parseInt(wn2.getTextContent().trim());
+			}
+			else if (wn2.getNodeName().equalsIgnoreCase("artilleryBonus")) {
+				retVal.artilleryBonus = Integer.parseInt(wn2.getTextContent().trim());
+			}
+			else if (wn2.getNodeName().equalsIgnoreCase("secondSkillProb")) {
+				retVal.secondSkillProb = Integer.parseInt(wn2.getTextContent().trim());
+			}
+			else if (wn2.getNodeName().equalsIgnoreCase("secondSkillBonus")) {
+				retVal.secondSkillBonus = Integer.parseInt(wn2.getTextContent().trim());
+			}
 			else if (wn2.getNodeName().equalsIgnoreCase("recruitBonuses")) {
 				String[] values = wn2.getTextContent().split(",");
 				for(int i = 0; i < values.length; i++) {
 					retVal.recruitBonuses[i] = Integer.parseInt(values[i]);
+				}
+			} 
+			else if (wn2.getNodeName().equalsIgnoreCase("tacticsMod")) {
+				String[] values = wn2.getTextContent().split(",");
+				for(int i = 0; i < values.length; i++) {
+					retVal.tacticsMod[i] = Integer.parseInt(values[i]);
+				}
+			} 
+			else if (wn2.getNodeName().equalsIgnoreCase("specialAbilBonus")) {
+				String[] values = wn2.getTextContent().split(",");
+				for(int i = 0; i < values.length; i++) {
+					retVal.specialAbilBonus[i] = Integer.parseInt(values[i]);
 				}
 			} 
 		}
@@ -138,11 +297,11 @@ public class RandomSkillPreferences implements Serializable {
 		return retVal;
 	}
 	
-	private String printRecruitBonuses() {
+	private String printIntegerArray(int[] array) {
 		String values = "";
-		for(int i = 0; i < recruitBonuses.length; i++) {
-			values += Integer.toString(recruitBonuses[i]);
-			if(i < (recruitBonuses.length-1)) {
+		for(int i = 0; i < array.length; i++) {
+			values += Integer.toString(array[i]);
+			if(i < (array.length-1)) {
 				values += ",";
 			}
 		}

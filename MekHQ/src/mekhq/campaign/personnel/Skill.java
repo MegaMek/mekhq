@@ -71,23 +71,23 @@ public class Skill implements Serializable, MekHqXmlSerializable {
 	}
 	
 	public Skill(String t) {
-		this(t, SkillType.EXP_REGULAR, false);
+		this(t, SkillType.EXP_REGULAR, false, 0);
 	}
 	
-	public Skill(String t, int exp,boolean random) {
+	public Skill(String t, int exp, boolean random, int bonus) {
 		this.type = SkillType.getType(t);
 		this.level = type.getLevelFromExperience(exp);
 		//check to see if we should randomize
 		if(random) {
 			int roll = Compute.d6();
-			if(roll < 2) {
+			if(roll < 2 && level > 0) {
 				this.level--;
 			}
-			else if(roll > 5) {
+			else if(roll > 5 && level < 10) {
 				this.level++;
 			}
 		}
-		this.bonus = 0;
+		this.bonus = bonus;
 	}
 	
 	public Skill(String t, int lvl, int bns) {

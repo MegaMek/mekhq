@@ -72,6 +72,7 @@ import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
 import megamek.common.MiscType;
+import megamek.common.Pilot;
 import megamek.common.Player;
 import megamek.common.Protomech;
 import megamek.common.SmallCraft;
@@ -86,6 +87,7 @@ import megamek.common.options.GameOptions;
 import megamek.common.options.IBasicOption;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
+import megamek.common.options.PilotOptions;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.finances.Finances;
@@ -2423,7 +2425,7 @@ public class Campaign implements Serializable {
 			if(p instanceof MissingEquipmentPart 
 					&& ((MissingEquipmentPart)p).getType().hasFlag(MiscType.F_MASC)
 					&& !(p instanceof MASC)) {
-				p = new MissingMASC(p.getUnitTonnage(), ((EquipmentPart)p).getType(), ((EquipmentPart)p).getEquipmentNum(), retVal, ((EquipmentPart)p).getTonnage(), 0);
+				p = new MissingMASC(p.getUnitTonnage(), ((MissingEquipmentPart)p).getType(), ((MissingEquipmentPart)p).getEquipmentNum(), retVal, ((MissingEquipmentPart)p).getTonnage(), 0);
 				p.setId(pid);
 			}
 			
@@ -2628,71 +2630,83 @@ public class Campaign implements Serializable {
 		birthdate.set(Calendar.DAY_OF_YEAR, randomDay);
 		person.setBirthday(birthdate);
 		person.setPrimaryRole(type);
+		int bonus = 0;
 		//set default skills
 		switch(type) {
 		case(Person.T_MECHWARRIOR):
-	        person.addSkill(SkillType.S_PILOT_MECH, expLvl, rskillPrefs.randomizeSkill());
-        	person.addSkill(SkillType.S_GUN_MECH, expLvl, rskillPrefs.randomizeSkill());
+			if(getFaction().isClan()) {
+				bonus = 1;
+			}
+	        person.addSkill(SkillType.S_PILOT_MECH, expLvl, rskillPrefs.randomizeSkill(), bonus);
+        	person.addSkill(SkillType.S_GUN_MECH, expLvl, rskillPrefs.randomizeSkill(), bonus);
         	break;
 	    case(Person.T_GVEE_DRIVER):
-	    	person.addSkill(SkillType.S_PILOT_GVEE, expLvl, rskillPrefs.randomizeSkill());
-			person.addSkill(SkillType.S_GUN_VEE, expLvl, rskillPrefs.randomizeSkill());
+	    	person.addSkill(SkillType.S_PILOT_GVEE, expLvl, rskillPrefs.randomizeSkill(), bonus);
+			person.addSkill(SkillType.S_GUN_VEE, expLvl, rskillPrefs.randomizeSkill(), bonus);
 			break;
 	    case(Person.T_NVEE_DRIVER):
-	    	person.addSkill(SkillType.S_PILOT_NVEE, expLvl, rskillPrefs.randomizeSkill());
-	    	person.addSkill(SkillType.S_GUN_VEE, expLvl, rskillPrefs.randomizeSkill());
+	    	person.addSkill(SkillType.S_PILOT_NVEE, expLvl, rskillPrefs.randomizeSkill(), bonus);
+	    	person.addSkill(SkillType.S_GUN_VEE, expLvl, rskillPrefs.randomizeSkill(), bonus);
 	    	break;
 	    case(Person.T_VTOL_PILOT):
-	    	person.addSkill(SkillType.S_PILOT_VTOL, expLvl, rskillPrefs.randomizeSkill());
-			person.addSkill(SkillType.S_GUN_VEE, expLvl, rskillPrefs.randomizeSkill());
+	    	person.addSkill(SkillType.S_PILOT_VTOL, expLvl, rskillPrefs.randomizeSkill(), bonus);
+			person.addSkill(SkillType.S_GUN_VEE, expLvl, rskillPrefs.randomizeSkill(), bonus);
 			break;
 	    case(Person.T_VEE_GUNNER):
-    		person.addSkill(SkillType.S_GUN_VEE, expLvl, rskillPrefs.randomizeSkill());
+    		person.addSkill(SkillType.S_GUN_VEE, expLvl, rskillPrefs.randomizeSkill(), bonus);
     		break;
 	    case(Person.T_AERO_PILOT):
-	    	person.addSkill(SkillType.S_PILOT_AERO, expLvl, rskillPrefs.randomizeSkill());
-    		person.addSkill(SkillType.S_GUN_AERO, expLvl, rskillPrefs.randomizeSkill());
+	    	if(getFaction().isClan()) {
+				bonus = 1;
+			}
+	    	person.addSkill(SkillType.S_PILOT_AERO, expLvl, rskillPrefs.randomizeSkill(), bonus);
+    		person.addSkill(SkillType.S_GUN_AERO, expLvl, rskillPrefs.randomizeSkill(), bonus);
     		break;
 	    case(Person.T_PROTO_PILOT):
 	    	break;
 	    case(Person.T_BA):
-	    	person.addSkill(SkillType.S_GUN_BA, expLvl, rskillPrefs.randomizeSkill());
-			person.addSkill(SkillType.S_ANTI_MECH, expLvl, rskillPrefs.randomizeSkill());
-			person.addSkill(SkillType.S_SMALL_ARMS, expLvl, rskillPrefs.randomizeSkill());
+	    	if(getFaction().isClan()) {
+				bonus = 1;
+			}
+	    	person.addSkill(SkillType.S_GUN_BA, expLvl, rskillPrefs.randomizeSkill(), bonus);
+			person.addSkill(SkillType.S_ANTI_MECH, expLvl, rskillPrefs.randomizeSkill(), bonus);
+			person.addSkill(SkillType.S_SMALL_ARMS, expLvl, rskillPrefs.randomizeSkill(), bonus);
 			break;
 	    case(Person.T_INFANTRY):
-			person.addSkill(SkillType.S_ANTI_MECH, expLvl, rskillPrefs.randomizeSkill());
-			person.addSkill(SkillType.S_SMALL_ARMS, expLvl, rskillPrefs.randomizeSkill());
+	    	if(Utilities.rollProbability(rskillPrefs.getAntiMekProb())) {
+	    		person.addSkill(SkillType.S_ANTI_MECH, expLvl, rskillPrefs.randomizeSkill(), bonus);
+	    	}
+			person.addSkill(SkillType.S_SMALL_ARMS, expLvl, rskillPrefs.randomizeSkill(), bonus);
 			break;
 	    case(Person.T_SPACE_PILOT):
-			person.addSkill(SkillType.S_PILOT_SPACE, expLvl, rskillPrefs.randomizeSkill());
+			person.addSkill(SkillType.S_PILOT_SPACE, expLvl, rskillPrefs.randomizeSkill(), bonus);
 			break;
 	    case(Person.T_SPACE_CREW):
-			person.addSkill(SkillType.S_TECH_VESSEL, expLvl, rskillPrefs.randomizeSkill());
+			person.addSkill(SkillType.S_TECH_VESSEL, expLvl, rskillPrefs.randomizeSkill(), bonus);
 			break;
 	    case(Person.T_SPACE_GUNNER):
-			person.addSkill(SkillType.S_GUN_SPACE, expLvl, rskillPrefs.randomizeSkill());
+			person.addSkill(SkillType.S_GUN_SPACE, expLvl, rskillPrefs.randomizeSkill(), bonus);
 			break;
 	    case(Person.T_NAVIGATOR):
-			person.addSkill(SkillType.S_NAV, expLvl, rskillPrefs.randomizeSkill());
+			person.addSkill(SkillType.S_NAV, expLvl, rskillPrefs.randomizeSkill(), bonus);
 			break;
 	    case(Person.T_MECH_TECH):
-	    	person.addSkill(SkillType.S_TECH_MECH, expLvl, rskillPrefs.randomizeSkill());
+	    	person.addSkill(SkillType.S_TECH_MECH, expLvl, rskillPrefs.randomizeSkill(), bonus);
 			break;
 	    case(Person.T_MECHANIC):
-	    	person.addSkill(SkillType.S_TECH_MECHANIC, expLvl, rskillPrefs.randomizeSkill());
+	    	person.addSkill(SkillType.S_TECH_MECHANIC, expLvl, rskillPrefs.randomizeSkill(), bonus);
 			break;
 	    case(Person.T_AERO_TECH):
-	    	person.addSkill(SkillType.S_TECH_AERO, expLvl, rskillPrefs.randomizeSkill());
+	    	person.addSkill(SkillType.S_TECH_AERO, expLvl, rskillPrefs.randomizeSkill(), bonus);
 			break;
 	    case(Person.T_BA_TECH):
-	    	person.addSkill(SkillType.S_TECH_BA, expLvl, rskillPrefs.randomizeSkill());
+	    	person.addSkill(SkillType.S_TECH_BA, expLvl, rskillPrefs.randomizeSkill(), bonus);
 			break;
 	    case(Person.T_ASTECH):
 	    	person.addSkill(SkillType.S_ASTECH,0,0);
 			break;
 	    case(Person.T_DOCTOR):
-	    	person.addSkill(SkillType.S_DOCTOR, expLvl, rskillPrefs.randomizeSkill());
+	    	person.addSkill(SkillType.S_DOCTOR, expLvl, rskillPrefs.randomizeSkill(), bonus);
 			break;
 	    case(Person.T_MEDIC):
 	    	person.addSkill(SkillType.S_MEDTECH,0,0);
@@ -2701,8 +2715,114 @@ public class Campaign implements Serializable {
 	    case(Person.T_ADMIN_LOG):
 	    case(Person.T_ADMIN_TRA):
 	    case(Person.T_ADMIN_HR):
-	    	person.addSkill(SkillType.S_ADMIN, expLvl, rskillPrefs.randomizeSkill());
+	    	person.addSkill(SkillType.S_ADMIN, expLvl, rskillPrefs.randomizeSkill(), bonus);
 			break;
+		}
+		//roll small arms skill
+		if(!person.hasSkill(SkillType.S_SMALL_ARMS)) {
+			int sarmsLvl = -12;
+			if(person.isSupport()) {
+				sarmsLvl = Utilities.generateExpLevel(rskillPrefs.getSupportSmallArmsBonus());
+			} else {
+				sarmsLvl = Utilities.generateExpLevel(rskillPrefs.getCombatSmallArmsBonus());
+			}
+			if(sarmsLvl > SkillType.EXP_ULTRA_GREEN) {
+				person.addSkill(SkillType.S_SMALL_ARMS, sarmsLvl, rskillPrefs.randomizeSkill(), bonus);
+			}
+
+		}
+		//roll tactics skill
+		if(getCampaignOptions().useTactics() && !person.isSupport()) {
+			int tacLvl = Utilities.generateExpLevel(rskillPrefs.getTacticsMod(expLvl));
+			if(tacLvl > SkillType.EXP_ULTRA_GREEN) {
+				person.addSkill(SkillType.S_TACTICS, tacLvl, rskillPrefs.randomizeSkill(), bonus);
+			}
+		}
+		//roll artillery skill
+		if(getCampaignOptions().useArtillery() 
+				&& (type == Person.T_MECHWARRIOR || type == Person.T_VEE_GUNNER || type == Person.T_INFANTRY)
+				&& Utilities.rollProbability(rskillPrefs.getArtilleryProb())) {
+			int artyLvl = Utilities.generateExpLevel(rskillPrefs.getArtilleryBonus());
+			if(artyLvl > SkillType.EXP_ULTRA_GREEN) {
+				person.addSkill(SkillType.S_ARTILLERY, artyLvl, rskillPrefs.randomizeSkill(), bonus);
+			}
+		}
+		//roll random secondary skill
+		if(Utilities.rollProbability(rskillPrefs.getSecondSkillProb())) {
+			ArrayList<String> possibleSkills = new ArrayList<String>();
+			for(String stype : SkillType.skillList) {
+				if(!person.hasSkill(stype)) {
+					possibleSkills.add(stype);
+				}
+			}
+			String selSkill = possibleSkills.get(Compute.randomInt(possibleSkills.size()));
+			int secondLvl = Utilities.generateExpLevel(rskillPrefs.getSecondSkillBonus());
+			person.addSkill(selSkill, secondLvl, rskillPrefs.randomizeSkill(), bonus);
+		}
+		//TODO: roll special abilities
+		if(getCampaignOptions().useAbilities()) {
+			int nabil = Utilities.rollSpecialAbilities(rskillPrefs.getSpecialAbilBonus(expLvl));
+			ArrayList<String> abilityList = person.getAvailableOptions();
+			while(nabil > 0 && abilityList.size() > 0) {
+				//create a weighted list
+				ArrayList<String> weightedList = new ArrayList<String>();
+				for(String s : abilityList) {
+					int cost = SkillType.getAbilityCost(s);
+					if(cost < 1) {
+						cost = 100;
+					}
+					int weight = Math.max(1, 100 / cost);
+					while(weight > 0) {
+						weightedList.add(s);
+						weight--;
+					}
+					
+				}
+				String name = weightedList.get(Compute.randomInt(weightedList.size()));
+				if(name.equals("specialist")) {
+					String special = Pilot.SPECIAL_NONE;
+					switch(Compute.randomInt(2)) {
+					case 0:
+						special = Pilot.SPECIAL_LASER;
+						break;
+					case 1:
+						special = Pilot.SPECIAL_BALLISTIC;
+						break;
+					case 2: 
+						special = Pilot.SPECIAL_MISSILE;
+						break;
+					}
+					person.acquireAbility(PilotOptions.LVL3_ADVANTAGES, name, special);
+				} 
+				else if(name.equals("weapon_specialist")) {
+					person.acquireAbility(PilotOptions.LVL3_ADVANTAGES, name, Utilities.chooseWeaponSpecialization(type, getFaction().isClan(), getCampaignOptions().getTechLevel()));
+				}
+				else {
+					person.acquireAbility(PilotOptions.LVL3_ADVANTAGES, name, true);
+				}
+				abilityList.remove(name);
+				if(name.equals("specialist")) {
+					abilityList.remove("weapon_specialist");
+					abilityList.remove("gunnery_laser");
+					abilityList.remove("gunnery_missile");
+					abilityList.remove("gunnery_ballistic");
+
+				}
+				if(name.equals("weapon_specialist")) {
+					abilityList.remove("specialist");
+					abilityList.remove("gunnery_laser");
+					abilityList.remove("gunnery_missile");
+					abilityList.remove("gunnery_ballistic");
+				}
+				if(name.contains("gunnery_")) {
+					abilityList.remove("weapon_specialist");
+					abilityList.remove("specialist");
+					abilityList.remove("gunnery_laser");
+					abilityList.remove("gunnery_missile");
+					abilityList.remove("gunnery_ballistic");
+				}
+				nabil--;
+			}
 		}
 		person.setRankSystem(ranks);
 		return person;

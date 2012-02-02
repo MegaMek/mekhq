@@ -23,9 +23,11 @@ package mekhq.campaign.personnel;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Vector;
 
 import megamek.common.Aero;
 import megamek.common.BattleArmor;
@@ -282,7 +284,7 @@ public class SkillType implements Serializable {
 		abilityCosts.put("oblique_attacker", 4);
 		abilityCosts.put("pain_resistance", 4);
 		abilityCosts.put("sniper", 12);
-		abilityCosts.put("weapon_specialist", 12);
+		abilityCosts.put("weapon_specialist", 1);
 		abilityCosts.put("specialist", 4);
 		abilityCosts.put("tactical_genius", 12);
 		abilityCosts.put("aptitude_gunnery", 40);
@@ -291,6 +293,86 @@ public class SkillType implements Serializable {
 		abilityCosts.put("gunnery_missile", 4);
 		abilityCosts.put("ei_implant", 0);
 		abilityCosts.put("clan_pilot_training", 0);
+	}
+	
+	public static ArrayList<String> getAbilitiesFor(int type) {
+		ArrayList<String> abils = new ArrayList<String>();
+		switch(type) {
+		case Person.T_MECHWARRIOR:
+			abils.add("dodge_maneuver");
+			abils.add("hot_dog");
+			abils.add("jumping_jack");
+			abils.add("maneuvering_ace");
+			abils.add("melee_specialist");
+			abils.add("multi_tasker");
+			abils.add("pain_resistance");
+			abils.add("sniper");
+			abils.add("tactical_genius");
+			abils.add("specialist");
+			abils.add("weapon_specialist");
+			abils.add("aptitude_gunnery");
+			abils.add("gunnery_laser");
+			abils.add("gunnery_missile");
+			abils.add("gunnery_ballistic");
+			abils.add("iron_man");
+			break;
+		case Person.T_PROTO_PILOT:
+			abils.add("dodge_maneuver");
+			abils.add("jumping_jack");
+			abils.add("melee_specialist");
+			abils.add("multi_tasker");
+			abils.add("pain_resistance");
+			abils.add("sniper");
+			abils.add("tactical_genius");
+			abils.add("specialist");
+			abils.add("weapon_specialist");
+			abils.add("aptitude_gunnery");
+			abils.add("gunnery_laser");
+			abils.add("gunnery_missile");
+			abils.add("gunnery_ballistic");
+			break;
+		case Person.T_AERO_PILOT:
+			abils.add("maneuvering_ace");
+			abils.add("pain_resistance");
+			abils.add("sniper");
+			abils.add("tactical_genius");
+			abils.add("specialist");
+			abils.add("weapon_specialist");
+			abils.add("aptitude_gunnery");
+			abils.add("gunnery_laser");
+			abils.add("gunnery_missile");
+			abils.add("gunnery_ballistic");
+			break;
+		case Person.T_BA:
+			abils.add("sniper");
+			abils.add("tactical_genius");
+			abils.add("specialist");
+			abils.add("weapon_specialist");
+			abils.add("aptitude_gunnery");
+			abils.add("gunnery_laser");
+			abils.add("gunnery_missile");
+			abils.add("gunnery_ballistic");
+			break;
+		case Person.T_VEE_GUNNER:
+			abils.add("maneuvering_ace");
+			abils.add("multi_tasker");
+			abils.add("sniper");
+			abils.add("tactical_genius");
+			abils.add("specialist");
+			abils.add("weapon_specialist");
+			abils.add("aptitude_gunnery");
+			abils.add("gunnery_laser");
+			abils.add("gunnery_missile");
+			abils.add("gunnery_ballistic");
+			break;
+		case Person.T_GVEE_DRIVER:
+		case Person.T_NVEE_DRIVER:
+		case Person.T_VTOL_PILOT:
+			abils.add("maneuvering_ace");
+			abils.add("tactical_genius");
+			break;
+		}
+		return abils;
 	}
 	
 	public static SkillType getType(String t) {

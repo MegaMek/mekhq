@@ -53,6 +53,7 @@ import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
 import mekhq.MekHQ;
+import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
 import mekhq.campaign.MekHqXmlSerializable;
@@ -1227,8 +1228,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 		skills.put(skillName, new Skill(skillName, lvl, bonus));
 	}
 	
-	public void addSkill(String skillName, int xpLvl, boolean random) {
-		skills.put(skillName, new Skill(skillName, xpLvl, random));
+	public void addSkill(String skillName, int xpLvl, boolean random, int bonus) {
+		skills.put(skillName, new Skill(skillName, xpLvl, random, bonus));
 	}
 	
 	public void removeSkill(String skillName) {
@@ -1300,6 +1301,18 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         return new Vector<IOption>().elements();
     }
 
+    public ArrayList<String> getAvailableOptions() {
+    	ArrayList<String> available = new ArrayList<String>();
+    	for (String name : SkillType.getAbilitiesFor(getPrimaryRole())) {
+    		IOption option = getOptions().getOption(name);
+            if(null == option || option.booleanValue()) {
+            	continue;
+            }
+            available.add(option.getName());
+    	}
+    	return available;
+    }
+    
     public int countOptions() {
         int count = 0;
 
@@ -1430,7 +1443,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         for (Enumeration<IOption> i = getOptions(type); i.hasMoreElements();) {
         	IOption ability = i.nextElement();
         	if(ability.booleanValue()) {
-        		abilityString = abilityString + ability.getDisplayableNameWithValue() + "<br>";
+        		abilityString = abilityString + Utilities.getOptionDisplayName(ability) + "<br>";
         	}
         }
         if(abilityString.equals("")) {

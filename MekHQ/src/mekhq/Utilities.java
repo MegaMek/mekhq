@@ -27,18 +27,26 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.Vector;
 
 import megamek.common.Aero;
 import megamek.common.AmmoType;
 import megamek.common.Compute;
 import megamek.common.Entity;
+import megamek.common.EquipmentType;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
 import megamek.common.Mounted;
 import megamek.common.Protomech;
 import megamek.common.TechConstants;
+import megamek.common.WeaponType;
+import megamek.common.options.IOption;
+import megamek.common.weapons.BayWeapon;
+import megamek.common.weapons.InfantryAttack;
+import megamek.common.weapons.infantry.InfantryWeapon;
 import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 
 /**
@@ -183,6 +191,9 @@ public class Utilities {
 	
 	public static int generateExpLevel(int bonus) {
 		int roll = Compute.d6(2) + bonus;
+		if(roll < 2) {
+			return SkillType.EXP_ULTRA_GREEN;
+		}
 		if(roll < 6) {
 			return SkillType.EXP_GREEN;
 		}
@@ -195,6 +206,23 @@ public class Utilities {
 		else {
 			return SkillType.EXP_ELITE;
 		}
+	}
+	
+	public static int rollSpecialAbilities(int bonus) {
+		int roll = Compute.d6(2) + bonus;
+		if(roll < 10) {
+			return 0;
+		}
+		else if(roll < 12) {
+			return 1;
+		}
+		else {
+			return 2;
+		}
+	}
+	
+	public static boolean rollProbability(int prob) {
+		return Compute.randomInt(100) <= prob;
 	}
 	
 	public static int getAgeByExpLevel(int expLevel) {
@@ -223,5 +251,77 @@ public class Utilities {
 			ndice--;
 		}
 		return age;
+	}
+	
+	public static String getOptionDisplayName(IOption option) {
+		String name = option.getDisplayableNameWithValue();
+		name = name.replaceAll("\\(.+?\\)", "");
+		if(option.getType() == IOption.CHOICE) {
+			name += " - " + option.getValue();
+		}
+		return name;
+	}
+	
+	public static String chooseWeaponSpecialization(int type, boolean isClan, int techLvl) {
+		ArrayList<String> candidates = new ArrayList<String>();
+		for (Enumeration<EquipmentType> e = EquipmentType.getAllTypes(); e.hasMoreElements();) {
+            EquipmentType et = e.nextElement();
+            if(!(et instanceof WeaponType)) {
+            	continue;
+            }
+            if(et instanceof InfantryWeapon 
+            		|| et instanceof BayWeapon
+					|| et instanceof InfantryAttack) {
+            	continue;
+            }
+            WeaponType wt = (WeaponType)et;
+            if(wt.isCapital() 
+            		|| wt.isSubCapital() 
+            		|| wt.hasFlag(WeaponType.F_INFANTRY)
+            		|| wt.hasFlag(WeaponType.F_ONESHOT)
+            		|| wt.hasFlag(WeaponType.F_PROTOTYPE)) {
+            	continue;
+            }
+            if(!((wt.hasFlag(WeaponType.F_MECH_WEAPON) && type == Person.T_MECHWARRIOR) 
+            		|| (wt.hasFlag(WeaponType.F_AERO_WEAPON) && type != Person.T_AERO_PILOT)
+            		|| (wt.hasFlag(WeaponType.F_TANK_WEAPON) && !(type == Person.T_VEE_GUNNER 
+                    		|| type == Person.T_NVEE_DRIVER 
+                    		|| type == Person.T_GVEE_DRIVER 
+                    		|| type == Person.T_VTOL_PILOT))
+                    || (wt.hasFlag(WeaponType.F_BA_WEAPON) && type != Person.T_BA)
+                    || (wt.hasFlag(WeaponType.F_PROTO_WEAPON) && type != Person.T_PROTO_PILOT))) {
+            	continue;
+            }
+            if(wt.getAtClass() == WeaponType.CLASS_NONE ||
+            		wt.getAtClass() == WeaponType.CLASS_POINT_DEFENSE ||
+            		wt.getAtClass() >= WeaponType.CLASS_CAPITAL_LASER) {
+            	continue;
+            }
+            if(TechConstants.isClan(wt.getTechLevel()) != isClan) {
+            	continue;
+            }
+            int lvl = wt.getTechLevel();
+            if(lvl < 0) {
+            	continue;
+            }
+            if(techLvl < (Integer.parseInt(TechConstants.T_SIMPLE_LEVEL[lvl])-2)) {
+            	continue;
+            }          
+            if(techLvl == TechConstants.T_IS_UNOFFICIAL) {
+            	continue;
+            }
+            int ntimes = 10;
+            if(techLvl >= TechConstants.T_IS_ADVANCED) {
+            	ntimes = 1;
+            }
+            while(ntimes > 0) {
+            	candidates.add(et.getName());
+            	ntimes--;
+            }
+		}
+		if(candidates.isEmpty()) {
+			return "??";
+		}
+		return candidates.get(Compute.randomInt(candidates.size()));
 	}
 }
