@@ -2377,8 +2377,15 @@ public class CampaignGUI extends JPanel {
 			pw.close();
 			fos.close();
 			MekHQ.logMessage("Campaign saved to " + file);
-		} catch (IOException ex) {
+		} catch (Exception ex) {
 			MekHQ.logError(ex);
+			JOptionPane.showMessageDialog(getFrame(),
+				    "Oh no! The program was unable to correctly save your game. We know this\n" +
+				    "is annoying and apologize. Please help us out and submit a bug with the\n" +
+				    "mekhqlog.txt file from this game so we can prevent this from happening in\n" +
+				    "the future.",
+				    "Could not save game",
+				    JOptionPane.ERROR_MESSAGE);			
 		}
 	}
 

@@ -134,7 +134,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     protected int xp;
     protected int salary;
     private int hits;
-    
+        
     //assignments
     private UUID unitId;
     protected UUID doctorId;
