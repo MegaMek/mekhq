@@ -56,7 +56,7 @@ public class RandomSkillPreferences implements Serializable {
     //special abilities
     
     public RandomSkillPreferences() {
-    	overallRecruitBonus = 2;
+    	overallRecruitBonus = 0;
     	recruitBonuses = new int[Person.T_NUM];
     	randomizeSkill = true;
     	useClanBonuses = true;
@@ -87,7 +87,7 @@ public class RandomSkillPreferences implements Serializable {
     	return recruitBonuses[type];
     }
     
-    public void setRecruitBonus(int bonus, int type) {
+    public void setRecruitBonus(int type, int bonus) {
     	if(type > recruitBonuses.length) {
     		return;
     	}

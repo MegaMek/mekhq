@@ -419,6 +419,9 @@ public class EnginePart extends Part {
 			return null;
 		}
 		 for(int i = 0; i < unit.getEntity().locations(); i++) {
+			 if(unit.isLocationBreached(i)) {
+				 return unit.getEntity().getLocationName(i) + " is breached.";
+			 }
 			 if(unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE, i) > 0
 					 && unit.isLocationDestroyed(i)) {
 				 return unit.getEntity().getLocationName(i) + " is destroyed.";
@@ -426,6 +429,20 @@ public class EnginePart extends Part {
 		 }
 		 return null;
 	 }
+	
+	@Override
+	public boolean isMountedOnDestroyedLocation() {
+		if(null == unit) {
+			return false;
+		}
+		for(int i = 0; i < unit.getEntity().locations(); i++) {
+			 if(unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE, i) > 0
+					 && unit.isLocationDestroyed(i)) {
+				 return true;
+			 }
+		 }
+		return false;
+	}
 	
 	 @Override
 	 public String getDetails() {

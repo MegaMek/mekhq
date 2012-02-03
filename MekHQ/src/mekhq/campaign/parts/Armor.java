@@ -456,7 +456,7 @@ public class Armor extends Part implements IAcquisitionWork {
 		if(currentArmor < 0) {
 			currentArmor = 0;
 		}
-		if(salvaging) {
+		if(salvaging || isMountedOnDestroyedLocation()) {
 			amountNeeded = currentArmor;
 			amount = unit.getEntity().getOArmor(location, rear) - amountNeeded;
 		} else {			
@@ -464,7 +464,7 @@ public class Armor extends Part implements IAcquisitionWork {
 			amount = currentArmor;
 		}
 		//time should be based on amount available if less than amount needed
-		if(salvaging) {
+		if(salvaging || isMountedOnDestroyedLocation()) {
 			time = getBaseTimeFor(unit.getEntity()) * amountNeeded;
 		} else {
 			time = getBaseTimeFor(unit.getEntity()) * Math.min(amountNeeded, getAmountAvailable());
@@ -474,7 +474,7 @@ public class Armor extends Part implements IAcquisitionWork {
 	
 	@Override
 	public boolean isSalvaging() {
-		return salvaging && amountNeeded > 0;
+		return (salvaging || isMountedOnDestroyedLocation()) && amountNeeded > 0;
 	}
 	
 	@Override
@@ -512,10 +512,15 @@ public class Armor extends Part implements IAcquisitionWork {
 		if(getAmountAvailable() == 0) {
 			return "No spare armor available";
 		}
-		if (unit.isLocationDestroyed(location)) {
+		if (isMountedOnDestroyedLocation()) {
 			return unit.getEntity().getLocationName(location) + " is destroyed.";
 		}
 		return null;
+	}
+	
+	@Override
+	public boolean isMountedOnDestroyedLocation() {
+		return null != unit && unit.isLocationDestroyed(location);
 	}
 	
 	@Override

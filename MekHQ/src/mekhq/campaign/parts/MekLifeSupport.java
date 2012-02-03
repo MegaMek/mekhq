@@ -205,4 +205,18 @@ public class MekLifeSupport extends Part {
         }
         return null;
     }
+	
+	@Override
+	public boolean isMountedOnDestroyedLocation() {
+		if(null == unit) {
+			return false;
+		}
+		for(int i = 0; i < unit.getEntity().locations(); i++) {
+			 if(unit.getEntity().getNumberOfCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_LIFE_SUPPORT, i) > 0
+					 && unit.isLocationDestroyed(i)) {
+				 return true;
+			 }
+		 }
+		return false;
+	}
 }

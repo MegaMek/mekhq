@@ -13,6 +13,7 @@ import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Insets;
@@ -32,6 +33,7 @@ import java.util.Iterator;
 import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
@@ -1041,24 +1043,103 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panRandomSkill.setLayout(new java.awt.GridBagLayout());
         
         lblOverallRecruitBonus = new JLabel(resourceMap.getString("lblOverallRecruitBonus.text"));
-        spnOverallRecruitBonus = new JSpinner(new SpinnerNumberModel(rskillPrefs.getOverallRecruitBonus(), 0, 8, 1));
+        spnOverallRecruitBonus = new JSpinner(new SpinnerNumberModel(rskillPrefs.getOverallRecruitBonus(), -12, 12, 1));
+        chkExtraRandom = new JCheckBox(resourceMap.getString("chkExtraRandom.text"));
+        chkExtraRandom.setToolTipText(resourceMap.getString("chkExtraRandom.toolTipText"));
+        chkExtraRandom.setSelected(rskillPrefs.randomizeSkill());
+        chkClanBonus = new JCheckBox(resourceMap.getString("chkClanBonus.text"));
+        chkClanBonus.setToolTipText(resourceMap.getString("chkClanBonus.toolTipText"));
+        chkClanBonus.setSelected(rskillPrefs.useClanBonuses());
+        lblProbAntiMek = new JLabel(resourceMap.getString("lblProbAntiMek.text"));
+        spnProbAntiMek = new JSpinner(new SpinnerNumberModel(rskillPrefs.getAntiMekProb(), 0, 100, 5));
+        spnOverallRecruitBonus = new JSpinner(new SpinnerNumberModel(rskillPrefs.getOverallRecruitBonus(), -12, 12, 1));
+        spnTypeRecruitBonus = new JSpinner[Person.T_NUM];
+        int nrow = (int)Math.ceil(Person.T_NUM / 4.0);
+        JPanel panTypeRecruitBonus = new JPanel(new GridLayout(nrow,4));
+        JSpinner spin;
+        JPanel panRecruit;
+        for(int i = 0; i < Person.T_NUM; i++) {
+        	panRecruit = new JPanel(new GridBagLayout());
+        	gridBagConstraints = new java.awt.GridBagConstraints();
+        	spin = new JSpinner(new SpinnerNumberModel(rskillPrefs.getRecruitBonus(i), -12, 12, 1));
+        	spnTypeRecruitBonus[i] = spin;
+            gridBagConstraints = new java.awt.GridBagConstraints();
+        	gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = 0;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(2,5,0,0);
+        	panRecruit.add(spin, gridBagConstraints);
+        	gridBagConstraints.gridx = 1;
+            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.weightx = 1.0;
+        	panRecruit.add(new JLabel(Person.getRoleDesc(i)), gridBagConstraints);
+        	panTypeRecruitBonus.add(panRecruit);
+        }
+      
+        panTypeRecruitBonus.setBorder(BorderFactory.createCompoundBorder(
+	   			 BorderFactory.createTitledBorder(resourceMap.getString("panTypeRecruitBonus.title")),
+	   			 BorderFactory.createEmptyBorder(5,5,5,5)));
         
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        panRandomSkill.add(lblOverallRecruitBonus, gridBagConstraints);
+        panRandomSkill.add(chkExtraRandom, gridBagConstraints);
+        
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        panRandomSkill.add(chkClanBonus, gridBagConstraints);
+     
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        panRandomSkill.add(spnProbAntiMek, gridBagConstraints);
         
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        panRandomSkill.add(lblProbAntiMek, gridBagConstraints);
+               
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         panRandomSkill.add(spnOverallRecruitBonus, gridBagConstraints);
         
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        panRandomSkill.add(lblOverallRecruitBonus, gridBagConstraints);    
+        
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        panRandomSkill.add(panTypeRecruitBonus, gridBagConstraints);
         
         JScrollPane scrRandomSkill = new JScrollPane(panRandomSkill);
         scrRandomSkill.setPreferredSize(new java.awt.Dimension(500, 400));
@@ -1270,7 +1351,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         
         panRandomPortrait.setName("panRandomPortait"); // NOI18N
         panRandomPortrait.setLayout(new BorderLayout());
-        int nrow = (int)Math.ceil(Person.T_NUM / 4.0);
         
         JPanel panUsePortrait = new JPanel(new GridLayout(nrow, 4));
 
@@ -1532,7 +1612,12 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 	    	campaign.getGameOptions().getOption("allow_advanced_ammo").setValue(true);
 	    } 
 	    
-	    rskillPrefs.setOverallRecruitBonus((Integer)spnOverallRecruitBonus.getModel().getValue());	    
+	    rskillPrefs.setOverallRecruitBonus((Integer)spnOverallRecruitBonus.getModel().getValue());	 
+	    for(int i = 0; i < Person.T_NUM; i++) {
+		    rskillPrefs.setRecruitBonus(i, (Integer)spnTypeRecruitBonus[i].getModel().getValue());	 
+	    }
+	    rskillPrefs.setRandomizeSkill(chkExtraRandom.isSelected());
+	    rskillPrefs.setAntiMekProb((Integer)spnProbAntiMek.getModel().getValue());
 	}
 	
 	private void updateXPCosts() {
@@ -1889,9 +1974,13 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private javax.swing.JLabel lblTechLevel;
     private javax.swing.JComboBox choiceTechLevel;
     
-    private javax.swing.JTable tableRecruitBonus;
     private JLabel lblOverallRecruitBonus;
     private JSpinner spnOverallRecruitBonus;
+    private JSpinner[] spnTypeRecruitBonus;
+    private JCheckBox chkExtraRandom;
+    private JCheckBox chkClanBonus;
+    private JLabel lblProbAntiMek;
+    private JSpinner spnProbAntiMek;
     
     private javax.swing.JPanel panRandomPortrait;
     private JCheckBox[] chkUsePortrait;

@@ -264,7 +264,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		bonus = "(" + bonus + ")";
 		String toReturn = "<html><font size='2'";
 		String action = "Repair ";
-		if(salvaging) {
+		if(isSalvaging()) {
 			action = "Salvage ";
 		}
 		String scheduled = "";
@@ -672,7 +672,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
 	@Override
 	public String succeed() {
-		if(salvaging) {
+		if(isSalvaging()) {
 			remove(true);
 			salvaging = false;
 			return " <font color='green'><b> salvaged.</b></font>";
@@ -689,7 +689,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	
 	@Override 
 	public boolean isSalvaging() {
-		return salvaging;
+		return salvaging || isMountedOnDestroyedLocation();
 	}
 
 	public void setSalvaging(boolean b) {
@@ -776,6 +776,10 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	}
 	
 	public boolean onBadHipOrShoulder() {
+		return false;
+	}
+	
+	public boolean isMountedOnDestroyedLocation() {
 		return false;
 	}
 }

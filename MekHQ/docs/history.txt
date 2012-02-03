@@ -54,6 +54,8 @@ v0.1.14 (SVN)
 + warning dialog when game is not saved correctly
 + campaign option to generate portrait only for certain personnel types
 + Bug: tasksXP not being saved correctly
++ repairable parts in a destroyed location should be listed as salvage only regardless of unit status
++ random skill options in CampaignOptionsDialog
 
 v0.1.13 (2012-01-11)
 + added campaign reference to all parts (should fix NPE refit bug)
