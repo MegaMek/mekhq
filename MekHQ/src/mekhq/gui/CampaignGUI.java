@@ -188,9 +188,11 @@ import mekhq.gui.dialog.EditLogEntryDialog;
 import mekhq.gui.dialog.EditPersonnelLogDialog;
 import mekhq.gui.dialog.EditTransactionDialog;
 import mekhq.gui.dialog.GameOptionsDialog;
+import mekhq.gui.dialog.HireBulkPersonnelDialog;
 import mekhq.gui.dialog.MekHQAboutBox;
 import mekhq.gui.dialog.MissionTypeDialog;
 import mekhq.gui.dialog.NewKillDialog;
+import mekhq.gui.dialog.NewRecruitDialog;
 import mekhq.gui.dialog.PartsStoreDialog;
 import mekhq.gui.dialog.PopupValueChoiceDialog;
 import mekhq.gui.dialog.PortraitChoiceDialog;
@@ -427,6 +429,7 @@ public class CampaignGUI extends JPanel {
 		miPurchaseUnit = new javax.swing.JMenuItem();
 		miBuyParts = new javax.swing.JMenuItem();
 		menuHire = new javax.swing.JMenu();
+		miHireBulk = new javax.swing.JMenuItem();
 		miHireAstechs = new javax.swing.JMenuItem();
 		miFireAstechs = new javax.swing.JMenuItem();
 		miFireAllAstechs = new javax.swing.JMenuItem();
@@ -1778,8 +1781,13 @@ public class CampaignGUI extends JPanel {
 			}
 		});
 		menuMarket.add(miBuyParts);
-
-		
+		miHireBulk.setText("Hire Personnel in Bulk");
+		miHireBulk.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				hireBulkPersonnel();
+			}
+		});
+		menuMarket.add(miHireBulk);
 		menuHire.setText(resourceMap.getString("menuHire.text")); // NOI18N
 		menuHire.setName("menuHire"); // NOI18N
 		JMenuItem miHire;
@@ -2335,12 +2343,16 @@ public class CampaignGUI extends JPanel {
 
 	private void hirePerson(java.awt.event.ActionEvent evt) {
 		int type = Integer.parseInt(evt.getActionCommand());
-		CustomizePersonDialog npd = new CustomizePersonDialog(getFrame(), true, 
+		NewRecruitDialog npd = new NewRecruitDialog(getFrame(), true, 
 				getCampaign().newPerson(type), 
-				true,
 				getCampaign(),
-				this);
+				this, getPortraits());
 		npd.setVisible(true);
+	}
+	
+	private void hireBulkPersonnel() {
+		HireBulkPersonnelDialog hbpd = new HireBulkPersonnelDialog(getFrame(), true, getCampaign(), this);
+		hbpd.setVisible(true);
 	}
 
 	private void menuSaveXmlActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuSaveActionPerformed
@@ -5309,7 +5321,7 @@ public class CampaignGUI extends JPanel {
 			if(command.contains("RANK")) {
 				int rank = Integer.parseInt(st.nextToken());
 				for(Person person : people) {
-					getCampaign().changeRank(person, rank);
+					getCampaign().changeRank(person, rank, true);
 				}
 				refreshServicedUnitList();
 				refreshUnitList();
@@ -5556,9 +5568,7 @@ public class CampaignGUI extends JPanel {
 			} else if (command.equalsIgnoreCase("EDIT")) {
 				CustomizePersonDialog npd = new CustomizePersonDialog(getFrame(), true, 
 						selectedPerson, 
-						false,
-						getCampaign(),
-						view);
+						getCampaign());
 				npd.setVisible(true);
 				getCampaign().personUpdated(selectedPerson);
 				refreshPatientList();
@@ -8626,6 +8636,7 @@ public class CampaignGUI extends JPanel {
 	private javax.swing.JMenuItem menuOptionsMM;
 	private javax.swing.JMenu menuThemes;
 	private javax.swing.JMenuItem menuSave;
+	private javax.swing.JMenuItem miHireBulk;
 	private javax.swing.JMenuItem miHireAstechs;
 	private javax.swing.JMenuItem miFireAstechs;
 	private javax.swing.JMenuItem miFireAllAstechs;

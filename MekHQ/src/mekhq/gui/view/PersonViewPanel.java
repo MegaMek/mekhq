@@ -113,25 +113,26 @@ public class PersonViewPanel extends javax.swing.JPanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;	
 		add(pnlStats, gridBagConstraints);
 		
-		txtDesc.setName("txtDesc");
-		txtDesc.setText(person.getBiography());
-		txtDesc.setEditable(false);
-		txtDesc.setLineWrap(true);
-		txtDesc.setWrapStyleWord(true);
-		txtDesc.setBorder(BorderFactory.createCompoundBorder(
-				BorderFactory.createTitledBorder("Description"),
-                BorderFactory.createEmptyBorder(5,5,5,5)));
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 1;
-		gridBagConstraints.gridwidth = 2;
-		if(person.getPersonnelLog().isEmpty() && campaign.getKillsFor(person.getId()).isEmpty()) {
-			gridBagConstraints.weighty = 1.0;
+		int gridy = 1;
+		if(person.getBiography().length() > 0) {
+			txtDesc.setName("txtDesc");
+			txtDesc.setText(person.getBiography());
+			txtDesc.setEditable(false);
+			txtDesc.setLineWrap(true);
+			txtDesc.setWrapStyleWord(true);
+			txtDesc.setBorder(BorderFactory.createCompoundBorder(
+					BorderFactory.createTitledBorder("Description"),
+					BorderFactory.createEmptyBorder(5,5,5,5)));
+			gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints.gridx = 0;
+			gridBagConstraints.gridy = gridy;
+			gridBagConstraints.gridwidth = 2;
+			gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
+			gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			add(txtDesc, gridBagConstraints);
+			gridy++;
 		}
-		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
-		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-		add(txtDesc, gridBagConstraints);
 		
 		if(person.getPersonnelLog().size() >0) {
 			pnlLog.setName("pnlLog");
@@ -140,15 +141,13 @@ public class PersonViewPanel extends javax.swing.JPanel {
 			fillLog();
 			gridBagConstraints = new java.awt.GridBagConstraints();
 			gridBagConstraints.gridx = 0;
-			gridBagConstraints.gridy = 2;
+			gridBagConstraints.gridy = gridy;
 			gridBagConstraints.gridwidth = 2;
-			if(campaign.getKillsFor(person.getId()).isEmpty()) {
-				gridBagConstraints.weighty = 1.0;
-			}
 			gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
 			gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;	
 			add(pnlLog, gridBagConstraints);
+			gridy++;
 		}
 		
 		if(!campaign.getKillsFor(person.getId()).isEmpty()) {
@@ -161,14 +160,28 @@ public class PersonViewPanel extends javax.swing.JPanel {
 			gridBagConstraints = new java.awt.GridBagConstraints();
 			pnlKills.setBackground(Color.WHITE);
 			gridBagConstraints.gridx = 0;
-			gridBagConstraints.gridy = 3;
+			gridBagConstraints.gridy = gridy;
 			gridBagConstraints.gridwidth = 2;
-			gridBagConstraints.weighty = 1.0;
 			gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
 			gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 			add(pnlKills, gridBagConstraints);
+			gridy++;
 		}
+		
+		//just to flush something to the bottom of the page
+		JTextArea txtFiller = new JTextArea("");
+		txtFiller.setEditable(false);
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = gridy;
+		gridBagConstraints.gridwidth = 2;
+		gridBagConstraints.weighty = 1.0;
+		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 20);
+		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+		add(txtFiller, gridBagConstraints);
+
 	}
 	
 	/**

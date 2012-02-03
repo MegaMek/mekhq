@@ -67,33 +67,23 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     private GregorianCalendar birthdate;
     private SimpleDateFormat dateFormat;
     private Frame frame;
-    private boolean newHire;
     
     private Campaign campaign;
     
-    private CampaignGUI hqView;
-
     /** Creates new form CustomizePilotDialog */
-    public CustomizePersonDialog(java.awt.Frame parent, boolean modal, Person person, boolean hire, Campaign campaign, CampaignGUI view) {
+    public CustomizePersonDialog(java.awt.Frame parent, boolean modal, Person person, Campaign campaign) {
         super(parent, modal);
         this.campaign = campaign;
-        this.hqView = view;
         this.frame = parent;
         this.dateFormat = new SimpleDateFormat("MMMM d yyyy");
         this.person = person;
-        this.newHire = hire;
         initializePilotAndOptions();
         setLocationRelativeTo(parent);
     }
 
     private void initializePilotAndOptions () {
-        refreshPilotAndOptions();
-    }
-
-    private void refreshPilotAndOptions () {
     	this.birthdate = (GregorianCalendar)person.getBirthday().clone();
-    	this.options = person.getOptions();		
-    	getContentPane().removeAll();
+    	this.options = person.getOptions();	
     	initComponents();
     }
 
@@ -116,7 +106,6 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         textNickname = new javax.swing.JTextField();
         textToughness = new javax.swing.JTextField();
         lblToughness = new javax.swing.JLabel();
-        choiceType = new javax.swing.JComboBox();
         choiceGender = new javax.swing.JComboBox();
         scrOptions = new javax.swing.JScrollPane();
         panOptions = new javax.swing.JPanel();
@@ -126,32 +115,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         txtBio = new javax.swing.JTextPane();
         panButtons = new javax.swing.JPanel();
         btnOk = new javax.swing.JButton();
-        numberToHireField = new JTextField("1");
-        numberToHireField.setVisible(false);
-        numberToHireField.setColumns(2);
-        numberToHireField.addFocusListener(new FocusListener() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                numberToHireField.setSelectionStart(0);
-                numberToHireField.setSelectionEnd(numberToHireField.getText().length());
-            }
-
-            @Override
-            public void focusLost(FocusEvent e) {
-                if (numberToHireField.getText() == null || "".equals(numberToHireField.getText().trim())) {
-                    numberToHireField.setText("1");
-                }
-                try {
-                    Integer.parseInt(numberToHireField.getText());
-                } catch (NumberFormatException ex) {
-                    JOptionPane.showMessageDialog(null, "Number to Hire must be a number.", "Invalid Entry",
-                            JOptionPane.ERROR_MESSAGE);
-                    numberToHireField.setText("1");
-                }
-            }
-        });
-        numberToHireLabel = new JLabel("Number to Hire");
-        numberToHireLabel.setVisible(false);
+        
         btnClose = new javax.swing.JButton();
         btnRandomName = new javax.swing.JButton();
         btnDate = new javax.swing.JButton();
@@ -160,37 +124,11 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         setTitle(resourceMap.getString("Form.title")); // NOI18N
-        if(newHire) {
-            setTitle(resourceMap.getString("Form.title.new")); // NOI18N
-        }
+  
         setName("Form"); // NOI18N
         getContentPane().setLayout(new java.awt.GridBagLayout());
 
         panDemog.setLayout(new java.awt.GridBagLayout());
-        DefaultComboBoxModel personTypeModel = new DefaultComboBoxModel();
-        for(int i = 0; i < Person.T_NUM; i++) {
-        	personTypeModel.addElement(Person.getRoleDesc(i));
-        }
-        choiceType.setModel(personTypeModel);
-        choiceType.setMinimumSize(new java.awt.Dimension(200, 27));
-        choiceType.setName("choiceType"); // NOI18N
-        choiceType.setPreferredSize(new java.awt.Dimension(200, 27));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        choiceType.setSelectedIndex(person.getPrimaryRole());
-        choiceType.setEnabled(isNewHire());
-        choiceType.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-            	person = campaign.newPerson(choiceType.getSelectedIndex());
-            	refreshPilotAndOptions();
-            }
-        });
-        panDemog.add(choiceType, gridBagConstraints);
     
         lblName.setText(resourceMap.getString("lblName.text")); // NOI18N
         lblName.setName("lblName"); // NOI18N
@@ -260,11 +198,10 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         genderModel.addElement(Person.getGenderName(Person.G_FEMALE));
         choiceGender.setModel(genderModel);
         choiceGender.setName("choiceGender"); // NOI18N
+        choiceGender.setSelectedIndex(person.getGender());
         choiceGender.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-            	if(isNewHire()) {
-            		randomName();
-            	}
+            	randomName();
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -274,7 +211,6 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        choiceGender.setSelectedIndex(person.getGender());
         panDemog.add(choiceGender, gridBagConstraints);
 
         lblBday.setText(resourceMap.getString("lblBday.text")); // NOI18N
@@ -388,16 +324,8 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         
         panButtons.setName("panButtons"); // NOI18N
         panButtons.setLayout(new java.awt.GridBagLayout());
-
-        if(isNewHire()) {
-        	btnOk.setText(resourceMap.getString("btnHire.text")); // NOI18N
-            numberToHireField.setVisible(true);
-            numberToHireLabel.setVisible(true);
-        } else {
-        	btnOk.setText(resourceMap.getString("btnOk.text")); // NOI18N
-            numberToHireField.setVisible(false);
-            numberToHireLabel.setVisible(false);
-        }
+     
+        btnOk.setText(resourceMap.getString("btnOk.text")); // NOI18N
         btnOk.setName("btnOk"); // NOI18N
         btnOk.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -408,13 +336,6 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-
-        if (isNewHire()) {
-            panButtons.add(numberToHireLabel, gridBagConstraints);
-            gridBagConstraints.gridx++;
-            panButtons.add(numberToHireField, gridBagConstraints);
-            gridBagConstraints.gridx++;
-        }
 
         panButtons.add(btnOk, gridBagConstraints);
         gridBagConstraints.gridx++;
@@ -445,7 +366,6 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     private void btnOkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOkActionPerformed
         
         person.setName(textName.getText());
-        person.setPrimaryRole(choiceType.getSelectedIndex());
         person.setCallsign(textNickname.getText());   
         person.setBiography(txtBio.getText());
         person.setGender(choiceGender.getSelectedIndex());
@@ -457,43 +377,12 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         }
         setSkills();
         setOptions();       
-        if(isNewHire()) {
-            int num = Integer.parseInt(numberToHireField.getText());
-            doNewHires(num);
-        } else {
-            refreshHqView();
-        	setVisible(false);
-        }
+        setVisible(false);
     }//GEN-LAST:event_btnOkActionPerformed
-
-    private void doNewHires(int num) {
-        campaign.addPerson(person);
-        num--;
-        while(num > 0) {
-        	person = campaign.newPerson(choiceType.getSelectedIndex());
-        	campaign.addPerson(person);
-        	num--;
-        }
-    	person = campaign.newPerson(choiceType.getSelectedIndex());
-        refreshPilotAndOptions();
-        refreshHqView();
-    }
-
-    private void refreshHqView() {
-        hqView.refreshPersonnelList();
-        hqView.refreshPatientList();
-        hqView.refreshTechsList();
-        hqView.refreshDoctorsList();
-        hqView.refreshReport();
-    }
 
     private void randomName() {
 		textName.setText(campaign.getRNG().generate(choiceGender.getSelectedIndex() == Person.G_FEMALE));
 	}
-    
-    private boolean isNewHire() {
-    	return newHire;
-    }
 
     public void refreshSkills() {
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizePersonDialog");
@@ -776,7 +665,6 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     private javax.swing.JButton btnOk;
     private javax.swing.JButton btnRandomName;
     private javax.swing.JButton btnDate;
-    private javax.swing.JComboBox choiceType;
     private javax.swing.JComboBox choiceGender;
     private javax.swing.JScrollPane scrOptions;
     private javax.swing.JScrollPane scrBio;
@@ -796,9 +684,6 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
     private javax.swing.JTextField textName;
     private javax.swing.JTextField textNickname;
     private javax.swing.JTextPane txtBio;
-    private JTextField numberToHireField;
-    private JLabel numberToHireLabel;
-    // End of variables declaration//GEN-END:variables
 
     public void optionClicked(DialogOptionComponent arg0, IOption arg1, boolean arg2) {
         //IMplement me!!

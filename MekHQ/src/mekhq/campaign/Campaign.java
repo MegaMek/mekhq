@@ -88,6 +88,7 @@ import megamek.common.options.IBasicOption;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
+import megamek.common.util.DirectoryItems;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.finances.Finances;
@@ -118,6 +119,7 @@ import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IMedicalWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.Modes;
+import mekhq.gui.PortraitFileFactory;
 
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
@@ -540,7 +542,11 @@ public class Campaign implements Serializable {
 			astechPoolMinutes += 240;
 			astechPoolOvertime += 120;
 		}
-		p.addLogEntry(getDate(), "Joined " + getName());
+		String rankEntry = "";
+		if(p.getRank() > 0) {
+			rankEntry = " as a " + getRanks().getRank(p.getRank());
+		}
+		p.addLogEntry(getDate(), "Joined " + getName() + rankEntry);
 	}
 	
 	private void addPersonWithoutId(Person p) {
@@ -2825,6 +2831,7 @@ public class Campaign implements Serializable {
 			}
 		}
 		person.setRankSystem(ranks);
+		assignRandomPortraitFor(person);
 		return person;
 	}
 	
@@ -3402,11 +3409,13 @@ public class Campaign implements Serializable {
     	}
 	}
 	
-	public void changeRank(Person person, int rank) {
-		if(rank > person.getRank()) {
-			person.addLogEntry(getDate(), "Promoted to " + getRanks().getRank(rank));
-		} else if(rank < person.getRank()) {
-			person.addLogEntry(getDate(), "Demoted to " + getRanks().getRank(rank));
+	public void changeRank(Person person, int rank, boolean report) {
+		if(report) {
+			if(rank > person.getRank()) {
+				person.addLogEntry(getDate(), "Promoted to " + getRanks().getRank(rank));
+			} else if(rank < person.getRank()) {
+				person.addLogEntry(getDate(), "Demoted to " + getRanks().getRank(rank));
+			}
 		}
 		person.setRank(rank);
 		personUpdated(person);
@@ -3868,6 +3877,47 @@ public class Campaign implements Serializable {
     
     public void addLogEntry(Person p, LogEntry entry) {
     	p.addLogEntry(entry);
-    }
+    }  
     
+    public void assignRandomPortraitFor(Person p) {
+    	//first create a list of existing portait strings, so we can check for duplicates
+    	ArrayList<String> existingPortraits = new ArrayList<String>();
+    	for(Person existingPerson : this.getPersonnel()) {
+    		existingPortraits.add(existingPerson.getPortraitCategory() + ":" + existingPerson.getPortraitFileName());
+    	}
+    	//TODO: it would be nice to pull the portraits directory from MekHQ itself
+    	DirectoryItems portraits;
+    	try {
+	        portraits = new DirectoryItems(new File("data/images/portraits"), "", //$NON-NLS-1$ //$NON-NLS-2$
+	                PortraitFileFactory.getInstance());
+	    } catch (Exception e) {
+	        return;
+	    }
+    	ArrayList<String> possiblePortraits = new ArrayList<String>();
+    	Iterator<String> categories = portraits.getCategoryNames();
+        while (categories.hasNext()) {
+            String category = categories.next();
+            if((category.startsWith("Male") && p.getGender() == Person.G_MALE)
+            		|| (category.startsWith("Female") && p.getGender() == Person.G_FEMALE)) {
+            	Iterator<String> names = portraits.getItemNames(category);
+            	while (names.hasNext()) {
+                    String name = names.next();
+                    String location = category + ":" + name;
+                    if(existingPortraits.contains(location)) {
+                    	continue;
+                    }
+                    possiblePortraits.add(location);
+            	}
+            }
+        }
+        if(!possiblePortraits.isEmpty()) {
+        	String chosenPortrait = possiblePortraits.get(Compute.randomInt(possiblePortraits.size()));
+        	String[] temp = chosenPortrait.split(":");
+        	if(temp.length != 2) {
+        		return;
+        	}
+        	p.setPortraitCategory(temp[0]);
+        	p.setPortraitFileName(temp[1]);
+        }
+    }
 }
