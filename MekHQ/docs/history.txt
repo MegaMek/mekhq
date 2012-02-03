@@ -53,6 +53,7 @@ v0.1.14 (SVN)
 + NewRecruitDialog and HireBulkPersonnelDialog
 + warning dialog when game is not saved correctly
 + campaign option to generate portrait only for certain personnel types
++ Bug: tasksXP not being saved correctly
 
 v0.1.13 (2012-01-11)
 + added campaign reference to all parts (should fix NPE refit bug)

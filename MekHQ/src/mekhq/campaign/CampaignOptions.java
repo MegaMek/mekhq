@@ -502,7 +502,7 @@ public class CampaignOptions implements Serializable {
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "killsForXP", killsForXP);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "killXPAward", killXPAward);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "nTasksXP", nTasksXP);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "tasksXP", nTasksXP);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "tasksXP", tasksXP);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "mistakeXP", mistakeXP);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "successXP", successXP);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "limitByYear", limitByYear);
