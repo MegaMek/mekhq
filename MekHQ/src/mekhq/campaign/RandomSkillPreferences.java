@@ -25,6 +25,7 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 
 import mekhq.MekHQ;
+import mekhq.Utilities;
 import mekhq.campaign.personnel.Person;
 
 import org.w3c.dom.Node;
@@ -195,15 +196,15 @@ public class RandomSkillPreferences implements Serializable {
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "overallRecruitBonus", overallRecruitBonus);
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<recruitBonuses>"
-				+printIntegerArray(recruitBonuses)
+				+Utilities.printIntegerArray(recruitBonuses)
 				+"</recruitBonuses>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<specialAbilBonus>"
-				+printIntegerArray(specialAbilBonus)
+				+Utilities.printIntegerArray(specialAbilBonus)
 				+"</specialAbilBonus>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<tacticsMod>"
-				+printIntegerArray(tacticsMod)
+				+Utilities.printIntegerArray(tacticsMod)
 				+"</tacticsMod>");
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "randomizeSkill", randomizeSkill);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useClanBonuses", useClanBonuses);
@@ -295,16 +296,5 @@ public class RandomSkillPreferences implements Serializable {
 		MekHQ.logMessage("Load Random Skill Preferences Complete!", 4);
 
 		return retVal;
-	}
-	
-	private String printIntegerArray(int[] array) {
-		String values = "";
-		for(int i = 0; i < array.length; i++) {
-			values += Integer.toString(array[i]);
-			if(i < (array.length-1)) {
-				values += ",";
-			}
-		}
-		return values;
 	}
 }

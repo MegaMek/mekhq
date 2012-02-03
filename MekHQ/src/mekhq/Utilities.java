@@ -324,4 +324,26 @@ public class Utilities {
 		}
 		return candidates.get(Compute.randomInt(candidates.size()));
 	}
+	
+	public static String printIntegerArray(int[] array) {
+		String values = "";
+		for(int i = 0; i < array.length; i++) {
+			values += Integer.toString(array[i]);
+			if(i < (array.length-1)) {
+				values += ",";
+			}
+		}
+		return values;
+	}
+	
+	public static String printBooleanArray(boolean[] array) {
+		String values = "";
+		for(int i = 0; i < array.length; i++) {
+			values += Boolean.toString(array[i]);
+			if(i < (array.length-1)) {
+				values += ",";
+			}
+		}
+		return values;
+	}
 }

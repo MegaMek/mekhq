@@ -212,6 +212,7 @@ public class NewRecruitDialog extends javax.swing.JDialog {
     private void hire() {
     	campaign.addPerson(person);
     	person = campaign.newPerson(person.getPrimaryRole());
+    	campaign.changeRank(person, choiceRanks.getSelectedIndex(), false);
         refreshView();
         refreshHqView();
     }

@@ -6,13 +6,16 @@
 
 package mekhq.gui.dialog;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
+import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.Insets;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.image.BufferedImage;
@@ -31,12 +34,15 @@ import java.util.ResourceBundle;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JViewport;
 import javax.swing.ListSelectionModel;
@@ -62,6 +68,7 @@ import mekhq.campaign.Era;
 import mekhq.campaign.Faction;
 import mekhq.campaign.RandomSkillPreferences;
 import mekhq.campaign.Ranks;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 
 /**
@@ -183,6 +190,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panAbilityXP = new javax.swing.JPanel();
         panTech = new javax.swing.JPanel();
         panRandomSkill = new javax.swing.JPanel();
+        panRandomPortrait = new javax.swing.JPanel();
         useFactionModifiersCheckBox = new javax.swing.JCheckBox();
         useEraModsCheckBox = new javax.swing.JCheckBox();
         useDragoonRatingCheckBox = new javax.swing.JCheckBox();
@@ -232,7 +240,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         scrCustomRanks = new javax.swing.JScrollPane();
         choiceOfficerCut = new javax.swing.JComboBox();
         lblOfficerCut = new javax.swing.JLabel();
-
+        
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignOptionsDialog");
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
@@ -1161,7 +1169,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 		gridBagConstraints.weighty = 1.0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panRank.add(lblOfficerCut, gridBagConstraints);
@@ -1170,7 +1178,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 3;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 		gridBagConstraints.weighty = 1.0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panRank.add(choiceOfficerCut, gridBagConstraints);
@@ -1243,6 +1251,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
+        gridBagConstraints.insets = new Insets(10,0,0,0);
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panNameGen.add(lblGender, gridBagConstraints);
               
@@ -1256,8 +1265,46 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(10,0,0,0);
         panNameGen.add(sldGender, gridBagConstraints);
         
+        panRandomPortrait.setName("panRandomPortait"); // NOI18N
+        panRandomPortrait.setLayout(new BorderLayout());
+        int nrow = (int)Math.ceil(Person.T_NUM / 4.0);
+        
+        JPanel panUsePortrait = new JPanel(new GridLayout(nrow, 4));
+
+        chkUsePortrait = new JCheckBox[Person.T_NUM];
+        JCheckBox box;
+        for(int i = 0; i < Person.T_NUM; i++) {
+        	box = new JCheckBox(Person.getRoleDesc(i));
+        	box.setSelected(options.usePortraitForType(i));
+        	panUsePortrait.add(box);
+        	chkUsePortrait[i] = box;
+        }
+        
+        panRandomPortrait.add(panUsePortrait, BorderLayout.CENTER);
+        JTextArea txtPortraitInst = new JTextArea(resourceMap.getString("txtPortraitInst.text"));
+        txtPortraitInst.setEditable(false);
+        txtPortraitInst.setEditable(false);
+        txtPortraitInst.setLineWrap(true);
+        txtPortraitInst.setWrapStyleWord(true);
+        txtPortraitInst.setOpaque(false);
+        panRandomPortrait.add(txtPortraitInst, BorderLayout.PAGE_START);
+        
+        panRandomPortrait.setBorder(BorderFactory.createCompoundBorder(
+	   			 BorderFactory.createTitledBorder(resourceMap.getString("panRandomPortait.title")),
+	   			 BorderFactory.createEmptyBorder(5,5,5,5)));
+        
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new Insets(10,0,0,0);
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panNameGen.add(panRandomPortrait, gridBagConstraints);
+
         tabOptions.addTab(resourceMap.getString("panNameGen.TabConstraints.tabTitle"), panNameGen); // NOI18N
         
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -1388,6 +1435,10 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 	    campaign.setCamoCategory(camoCategory);
 	    campaign.setCamoFileName(camoFileName);
 	    campaign.setColorIndex(colorIndex);
+	    
+	    for(int i = 0; i < chkUsePortrait.length; i++) {
+	    	options.setUsePortraitForType(i, chkUsePortrait[i].isSelected());
+	    }
 	    
 	    updateSkillTypes();
 	    updateXPCosts();
@@ -1841,6 +1892,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private javax.swing.JTable tableRecruitBonus;
     private JLabel lblOverallRecruitBonus;
     private JSpinner spnOverallRecruitBonus;
+    
+    private javax.swing.JPanel panRandomPortrait;
+    private JCheckBox[] chkUsePortrait;
     
     // End of variables declaration//GEN-END:variables
 

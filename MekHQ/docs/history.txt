@@ -52,6 +52,7 @@ v0.1.14 (SVN)
 + random portrait selection 
 + NewRecruitDialog and HireBulkPersonnelDialog
 + warning dialog when game is not saved correctly
++ campaign option to generate portrait only for certain personnel types
 
 v0.1.13 (2012-01-11)
 + added campaign reference to all parts (should fix NPE refit bug)

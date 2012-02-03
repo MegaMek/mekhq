@@ -2831,7 +2831,9 @@ public class Campaign implements Serializable {
 			}
 		}
 		person.setRankSystem(ranks);
-		assignRandomPortraitFor(person);
+		if(getCampaignOptions().usePortraitForType(type)) {
+			assignRandomPortraitFor(person);
+		}
 		return person;
 	}
 	
@@ -2844,7 +2846,6 @@ public class Campaign implements Serializable {
 		for(Person p : getPersonnel()) {
 			p.setRank(0);
 		}
-		//resetAllPilotNames();
 	}
 	
 	public ArrayList<Force> getAllForces() {

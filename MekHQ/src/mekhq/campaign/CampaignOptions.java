@@ -25,6 +25,8 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 
 import mekhq.MekHQ;
+import mekhq.Utilities;
+import mekhq.campaign.personnel.Person;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -93,6 +95,9 @@ public class CampaignOptions implements Serializable {
     private int tasksXP;
     private int mistakeXP;
     private int successXP;
+    
+    //random portraits related
+    private boolean[] usePortraitForType;
 
     public CampaignOptions () {
         useFactionModifiers = false;
@@ -132,6 +137,11 @@ public class CampaignOptions implements Serializable {
         successXP = 0;
         usedPartsValue = 0.5;
         damagedPartsValue = 0.33;
+        usePortraitForType = new boolean[Person.T_NUM];
+        for(int i = 0; i < Person.T_NUM; i++) {
+        	usePortraitForType[i] = false;
+        }
+        usePortraitForType[Person.T_MECHWARRIOR] = true;
     }
 
     public static String getRepairSystemName (int repairSystem) {
@@ -447,6 +457,20 @@ public class CampaignOptions implements Serializable {
     public void setTechLevel(int lvl) {
     	techLevel = lvl;
     }
+    
+    public boolean usePortraitForType(int type) {
+    	if(type < 0 || type >= usePortraitForType.length) {
+    		return false;
+    	}
+    	return usePortraitForType[type];
+    }
+    
+    public void setUsePortraitForType(int type, boolean b) {
+    	if(type < 0 || type >= usePortraitForType.length) {
+    		return;
+    	}
+    	usePortraitForType[type] = b;
+    }
    
 	public void writeToXml(PrintWriter pw1, int indent) {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "<campaignOptions>");
@@ -487,7 +511,10 @@ public class CampaignOptions implements Serializable {
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "allowCanonOnly", allowCanonOnly);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "disallowStarLeagueUnits", disallowStarLeagueUnits);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "techLevel", techLevel);
-
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<usePortraitForType>"
+				+Utilities.printBooleanArray(usePortraitForType)
+				+"</usePortraitForType>");
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "</campaignOptions>");
 	}
 
@@ -659,7 +686,15 @@ public class CampaignOptions implements Serializable {
 					retVal.useDragoonRating = true;
 				else
 					retVal.useDragoonRating = false;
-			}
+			} else if (wn2.getNodeName().equalsIgnoreCase("usePortraitForType")) {
+			 	String[] values = wn2.getTextContent().split(",");
+				for(int i = 0; i < values.length; i++) {
+					if (values[i].equalsIgnoreCase("true"))
+						retVal.usePortraitForType[i] = true;
+					else
+						retVal.usePortraitForType[i] = false;
+				}
+			} 
 		}
 
 		MekHQ.logMessage("Load Campaign Options Complete!", 4);
