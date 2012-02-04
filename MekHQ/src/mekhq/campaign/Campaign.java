@@ -57,11 +57,14 @@ import megamek.common.BattleArmorBay;
 import megamek.common.Bay;
 import megamek.common.CargoBay;
 import megamek.common.Compute;
+import megamek.common.Coords;
 import megamek.common.Dropship;
 import megamek.common.Entity;
 import megamek.common.EntityMovementMode;
+import megamek.common.EntityMovementType;
 import megamek.common.Game;
 import megamek.common.HeavyVehicleBay;
+import megamek.common.INarcPod;
 import megamek.common.Infantry;
 import megamek.common.InfantryBay;
 import megamek.common.Jumpship;
@@ -72,9 +75,11 @@ import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
 import megamek.common.MiscType;
+import megamek.common.Mounted;
 import megamek.common.Pilot;
 import megamek.common.Player;
 import megamek.common.Protomech;
+import megamek.common.Sensor;
 import megamek.common.SmallCraft;
 import megamek.common.SmallCraftBay;
 import megamek.common.Tank;
@@ -3923,5 +3928,20 @@ public class Campaign implements Serializable {
         	p.setPortraitCategory(temp[0]);
         	p.setPortraitFileName(temp[1]);
         }
+    }
+    
+    public void clearGameData(Entity entity) {
+        for (Mounted m : entity.getEquipment()) {
+        	m.setUsedThisRound(false);
+        	m.setJammed(false);
+        }
+        entity.setPassedThrough(new Vector<Coords>());
+        entity.resetFiringArcs();
+        entity.resetBays();
+        entity.setEvading(false);
+        entity.setFacing(0);
+    	entity.setPosition(null);
+    	//TODO: still a lot of stuff to do here, but oh well
+    	entity.setGame(game);
     }
 }

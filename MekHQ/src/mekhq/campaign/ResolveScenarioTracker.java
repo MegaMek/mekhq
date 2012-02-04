@@ -538,6 +538,7 @@ public class ResolveScenarioTracker {
 				campaign.removeUnit(unit.getId());
 			} else {
 				long currentValue = unit.getValueOfAllMissingParts();
+				campaign.clearGameData(en);
 				unit.setEntity(en);
 				unit.runDiagnostic();
 				unit.resetPilotAndEntity();
@@ -558,6 +559,7 @@ public class ResolveScenarioTracker {
 		
 		//now lets take care of salvage
 		for(Unit salvageUnit : actualSalvage) {
+			campaign.clearGameData(salvageUnit.getEntity());
 			campaign.addUnit(salvageUnit.getEntity(), false);
 			//if this is a contract, add to th salvaged value
 			if(getMission() instanceof Contract) {
