@@ -62,9 +62,9 @@ public class RandomSkillPreferences implements Serializable {
     	useClanBonuses = true;
     	antiMekProb = 10;
     	combatSmallArmsBonus = -3;
-    	supportSmallArmsBonus = -13;
-    	specialAbilBonus = new int[]{-12,-12,-2,0,1};
-    	tacticsMod = new int[]{-12,-10,-7,-4,-1};
+    	supportSmallArmsBonus = -10;
+    	specialAbilBonus = new int[]{-10,-10,-2,0,1};
+    	tacticsMod = new int[]{-10,-10,-7,-4,-1};
     	artilleryProb = 10;
     	artilleryBonus = -2;
     	secondSkillProb = 0;
@@ -101,7 +101,7 @@ public class RandomSkillPreferences implements Serializable {
     	return specialAbilBonus[type];
     }
     
-    public void setSpecialAbilBonus(int bonus, int type) {
+    public void setSpecialAbilBonus(int type, int bonus) {
     	if(type > specialAbilBonus.length) {
     		return;
     	}
@@ -152,11 +152,11 @@ public class RandomSkillPreferences implements Serializable {
     	return tacticsMod[lvl];
     }
     
-    public void setTacticsMode(int bonus, int type) {
-    	if(type > tacticsMod.length) {
+    public void setTacticsMod(int lvl, int bonus) {
+    	if(lvl > tacticsMod.length) {
     		return;
     	}
-    	tacticsMod[type] = bonus;
+    	tacticsMod[lvl] = bonus;
     }
     
     public void setArtilleryProb(int b) {

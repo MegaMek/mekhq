@@ -1042,6 +1042,31 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panRandomSkill.setName("panRandomSkill"); // NOI18N
         panRandomSkill.setLayout(new java.awt.GridBagLayout());
         
+        JPanel panRollTable = new JPanel(new GridLayout(6,3,5,0));
+        panRollTable.add(new JLabel("<html><b>Value</b></html>"));
+        panRollTable.add(new JLabel("<html><b>Level</b></html>"));
+        panRollTable.add(new JLabel("<html><b># Abils</b></html>"));
+        panRollTable.add(new JLabel("less than 2"));
+        JLabel lblUltraGreen = new JLabel("Ultra-Green/None");
+        lblUltraGreen.setToolTipText(resourceMap.getString("lblUltraGreen.toolTipText"));
+        panRollTable.add(lblUltraGreen);
+        panRollTable.add(new JLabel("0"));
+        panRollTable.add(new JLabel("2-5"));
+        panRollTable.add(new JLabel("Green"));
+        panRollTable.add(new JLabel("0"));
+        panRollTable.add(new JLabel("6-9"));
+        panRollTable.add(new JLabel("Regular"));
+        panRollTable.add(new JLabel("0"));
+        panRollTable.add(new JLabel("10-11"));
+        panRollTable.add(new JLabel("Veteran"));
+        panRollTable.add(new JLabel("1"));
+        panRollTable.add(new JLabel("12 or more"));
+        panRollTable.add(new JLabel("Elite"));
+        panRollTable.add(new JLabel("2"));
+        panRollTable.setBorder(BorderFactory.createCompoundBorder(
+	   			 BorderFactory.createTitledBorder("2d6 + Bonus"),
+	   			 BorderFactory.createEmptyBorder(5,5,5,5)));
+        
         lblOverallRecruitBonus = new JLabel(resourceMap.getString("lblOverallRecruitBonus.text"));
         spnOverallRecruitBonus = new JSpinner(new SpinnerNumberModel(rskillPrefs.getOverallRecruitBonus(), -12, 12, 1));
         chkExtraRandom = new JCheckBox(resourceMap.getString("chkExtraRandom.text"));
@@ -1053,6 +1078,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         lblProbAntiMek = new JLabel(resourceMap.getString("lblProbAntiMek.text"));
         spnProbAntiMek = new JSpinner(new SpinnerNumberModel(rskillPrefs.getAntiMekProb(), 0, 100, 5));
         spnOverallRecruitBonus = new JSpinner(new SpinnerNumberModel(rskillPrefs.getOverallRecruitBonus(), -12, 12, 1));
+        spnOverallRecruitBonus.setToolTipText(resourceMap.getString("spnOverallRecruitBonus.toolTipText"));
         spnTypeRecruitBonus = new JSpinner[Person.T_NUM];
         int nrow = (int)Math.ceil(Person.T_NUM / 4.0);
         JPanel panTypeRecruitBonus = new JPanel(new GridLayout(nrow,4));
@@ -1097,6 +1123,16 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         panRandomSkill.add(chkClanBonus, gridBagConstraints);
+        
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridheight = 4;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        panRandomSkill.add(panRollTable, gridBagConstraints);
      
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -1110,7 +1146,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         panRandomSkill.add(lblProbAntiMek, gridBagConstraints);
@@ -1135,11 +1170,102 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         panRandomSkill.add(panTypeRecruitBonus, gridBagConstraints);
+        
+        JPanel panArtillery = new JPanel();
+        panArtillery.setBorder(BorderFactory.createCompoundBorder(
+	   			 BorderFactory.createTitledBorder("Artillery Skill"),
+	   			 BorderFactory.createEmptyBorder(5,5,5,5)));
+        spnArtyProb = new JSpinner(new SpinnerNumberModel(rskillPrefs.getArtilleryProb(),0,100,5));
+        spnArtyProb.setToolTipText(resourceMap.getString("spnArtyProb.toolTipText"));
+        panArtillery.add(spnArtyProb);
+        panArtillery.add(new JLabel("Probability"));
+        spnArtyBonus = new JSpinner(new SpinnerNumberModel(rskillPrefs.getArtilleryBonus(),-10,10,1));
+        panArtillery.add(spnArtyBonus);
+        panArtillery.add(new JLabel("Bonus"));
+        JPanel panSecondary = new JPanel();
+        spnSecondProb = new JSpinner(new SpinnerNumberModel(rskillPrefs.getSecondSkillProb(),0,100,5));
+        spnSecondProb.setToolTipText(resourceMap.getString("spnSecondProb.toolTipText"));
+        panSecondary.add(spnSecondProb);
+        panSecondary.add(new JLabel("Probability"));
+        spnSecondBonus = new JSpinner(new SpinnerNumberModel(rskillPrefs.getSecondSkillBonus(),-10,10,1));
+        panSecondary.add(spnSecondBonus);
+        panSecondary.add(new JLabel("Bonus"));
+        panSecondary.setBorder(BorderFactory.createCompoundBorder(
+	   			 BorderFactory.createTitledBorder("Secondary Skills"),
+	   			 BorderFactory.createEmptyBorder(5,5,5,5)));
+        JPanel panTactics   = new JPanel();
+        spnTacticsGreen = new JSpinner(new SpinnerNumberModel(rskillPrefs.getTacticsMod(SkillType.EXP_GREEN),-10,10,1));
+        spnTacticsGreen.setToolTipText(resourceMap.getString("spnTacticsGreen.toolTipText"));
+        spnTacticsReg = new JSpinner(new SpinnerNumberModel(rskillPrefs.getTacticsMod(SkillType.EXP_REGULAR),-10,10,1));
+        spnTacticsReg.setToolTipText(resourceMap.getString("spnTacticsReg.toolTipText"));
+        spnTacticsVet = new JSpinner(new SpinnerNumberModel(rskillPrefs.getTacticsMod(SkillType.EXP_VETERAN),-10,10,1));
+        spnTacticsVet.setToolTipText(resourceMap.getString("spnTacticsVet.toolTipText"));
+        spnTacticsElite = new JSpinner(new SpinnerNumberModel(rskillPrefs.getTacticsMod(SkillType.EXP_ELITE),-10,10,1));
+        spnTacticsElite.setToolTipText(resourceMap.getString("spnTacticsElite.toolTipText"));
+        panTactics.add(spnTacticsGreen);
+        panTactics.add(new JLabel("Green")); 
+        panTactics.add(spnTacticsReg);
+        panTactics.add(new JLabel("Reg")); 
+        panTactics.add(spnTacticsVet);
+        panTactics.add(new JLabel("Vet"));
+        panTactics.add(spnTacticsElite);
+        panTactics.add(new JLabel("Elite"));
+        panTactics.setBorder(BorderFactory.createCompoundBorder(
+	   			 BorderFactory.createTitledBorder("Tactics Skill"),
+	   			 BorderFactory.createEmptyBorder(5,5,5,5)));
+        JPanel panSmallArms = new JPanel();
+        spnCombatSA = new JSpinner(new SpinnerNumberModel(rskillPrefs.getCombatSmallArmsBonus(),-10,10,1));
+        spnCombatSA.setToolTipText(resourceMap.getString("spnCombatSA.toolTipText"));
+        spnSupportSA = new JSpinner(new SpinnerNumberModel(rskillPrefs.getSupportSmallArmsBonus(),-10,10,1));
+        spnSupportSA.setToolTipText(resourceMap.getString("spnSupportSA.toolTipText"));
+        panSmallArms.add(spnCombatSA);
+        panSmallArms.add(new JLabel("Combat Personnel")); 
+        panSmallArms.add(spnSupportSA);
+        panSmallArms.add(new JLabel("Support Personnel")); 
+        panSmallArms.setBorder(BorderFactory.createCompoundBorder(
+	   			 BorderFactory.createTitledBorder("Small Arms Skill"),
+	   			 BorderFactory.createEmptyBorder(5,5,5,5)));
+        JPanel panAbilities = new JPanel();
+        spnAbilGreen = new JSpinner(new SpinnerNumberModel(rskillPrefs.getSpecialAbilBonus(SkillType.EXP_GREEN),-10,10,1));
+        spnAbilGreen.setToolTipText(resourceMap.getString("spnAbilGreen.toolTipText"));
+        spnAbilReg = new JSpinner(new SpinnerNumberModel(rskillPrefs.getSpecialAbilBonus(SkillType.EXP_REGULAR),-10,10,1));
+        spnAbilReg.setToolTipText(resourceMap.getString("spnAbilReg.toolTipText"));
+        spnAbilVet = new JSpinner(new SpinnerNumberModel(rskillPrefs.getSpecialAbilBonus(SkillType.EXP_VETERAN),-10,10,1));
+        spnAbilVet.setToolTipText(resourceMap.getString("spnAbilVet.toolTipText"));
+        spnAbilElite = new JSpinner(new SpinnerNumberModel(rskillPrefs.getSpecialAbilBonus(SkillType.EXP_ELITE),-10,10,1));
+        spnAbilElite.setToolTipText(resourceMap.getString("spnAbilElite.toolTipText"));
+        panAbilities.add(spnAbilGreen);
+        panAbilities.add(new JLabel("Green")); 
+        panAbilities.add(spnAbilReg);
+        panAbilities.add(new JLabel("Reg")); 
+        panAbilities.add(spnAbilVet);
+        panAbilities.add(new JLabel("Vet"));
+        panAbilities.add(spnAbilElite);
+        panAbilities.add(new JLabel("Elite"));
+        panAbilities.setBorder(BorderFactory.createCompoundBorder(
+	   			 BorderFactory.createTitledBorder("Special Abilities"),
+	   			 BorderFactory.createEmptyBorder(5,5,5,5)));
+        
+        JPanel panOtherBonuses = new JPanel(new GridLayout(3,2));
+        panOtherBonuses.add(panArtillery);
+        panOtherBonuses.add(panSecondary);
+        panOtherBonuses.add(panTactics);
+        panOtherBonuses.add(panAbilities);
+        panOtherBonuses.add(panSmallArms);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        panRandomSkill.add(panOtherBonuses, gridBagConstraints);
         
         JScrollPane scrRandomSkill = new JScrollPane(panRandomSkill);
         scrRandomSkill.setPreferredSize(new java.awt.Dimension(500, 400));
@@ -1618,6 +1744,21 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 	    }
 	    rskillPrefs.setRandomizeSkill(chkExtraRandom.isSelected());
 	    rskillPrefs.setAntiMekProb((Integer)spnProbAntiMek.getModel().getValue());
+	    rskillPrefs.setArtilleryProb((Integer)spnArtyProb.getModel().getValue());
+	    rskillPrefs.setArtilleryBonus((Integer)spnArtyBonus.getModel().getValue());
+	    rskillPrefs.setSecondSkillProb((Integer)spnSecondProb.getModel().getValue());
+	    rskillPrefs.setSecondSkillBonus((Integer)spnSecondBonus.getModel().getValue());
+	    rskillPrefs.setTacticsMod(SkillType.EXP_GREEN, (Integer)spnTacticsGreen.getModel().getValue());
+	    rskillPrefs.setTacticsMod(SkillType.EXP_REGULAR, (Integer)spnTacticsReg.getModel().getValue());
+	    rskillPrefs.setTacticsMod(SkillType.EXP_VETERAN, (Integer)spnTacticsVet.getModel().getValue());
+	    rskillPrefs.setTacticsMod(SkillType.EXP_ELITE, (Integer)spnTacticsElite.getModel().getValue());
+	    rskillPrefs.setCombatSmallArmsBonus((Integer)spnCombatSA.getModel().getValue());
+	    rskillPrefs.setSupportSmallArmsBonus((Integer)spnSupportSA.getModel().getValue());
+	    rskillPrefs.setSpecialAbilBonus(SkillType.EXP_GREEN, (Integer)spnAbilGreen.getModel().getValue());
+	    rskillPrefs.setSpecialAbilBonus(SkillType.EXP_REGULAR, (Integer)spnAbilReg.getModel().getValue());
+	    rskillPrefs.setSpecialAbilBonus(SkillType.EXP_VETERAN, (Integer)spnAbilVet.getModel().getValue());
+	    rskillPrefs.setSpecialAbilBonus(SkillType.EXP_ELITE, (Integer)spnAbilElite.getModel().getValue());
+
 	}
 	
 	private void updateXPCosts() {
@@ -1981,7 +2122,21 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JCheckBox chkClanBonus;
     private JLabel lblProbAntiMek;
     private JSpinner spnProbAntiMek;
-    
+    private JSpinner spnArtyProb;
+    private JSpinner spnArtyBonus;
+    private JSpinner spnSecondProb;
+    private JSpinner spnSecondBonus;
+    private JSpinner spnTacticsGreen;
+    private JSpinner spnTacticsReg;
+    private JSpinner spnTacticsVet;
+    private JSpinner spnTacticsElite;
+    private JSpinner spnCombatSA;
+    private JSpinner spnSupportSA;
+    private JSpinner spnAbilGreen;
+    private JSpinner spnAbilReg;
+    private JSpinner spnAbilVet;
+    private JSpinner spnAbilElite;
+
     private javax.swing.JPanel panRandomPortrait;
     private JCheckBox[] chkUsePortrait;
     
