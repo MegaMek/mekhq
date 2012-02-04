@@ -57,6 +57,7 @@ v0.1.14 (SVN)
 + repairable parts in a destroyed location should be listed as salvage only regardless of unit status
 + random skill options in CampaignOptionsDialog
 + finished random skill options in CampaignOptionsDialog
++ Bug: can do task that is already being worked on
 
 v0.1.13 (2012-01-11)
 + added campaign reference to all parts (should fix NPE refit bug)

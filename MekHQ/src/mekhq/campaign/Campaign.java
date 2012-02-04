@@ -3157,6 +3157,9 @@ public class Campaign implements Serializable {
         if(null != partWork.getUnit() && partWork.getUnit().isDeployed()) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "This unit is currently deployed!");
         } 
+        if(null != partWork.getAssignedTeamId()) {
+            return new TargetRoll(TargetRoll.IMPOSSIBLE, "Task is already being worked on by another team.");
+        }
         if(null == skill) {
         	return new TargetRoll(TargetRoll.IMPOSSIBLE, "Assigned tech does not have the right skills");
         }
