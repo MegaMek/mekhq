@@ -404,6 +404,7 @@ public class Armor extends Part implements IAcquisitionWork {
 		changeAmountAvailable(-1 * amount);
 		updateConditionFromEntity();
 		skillMin = SkillType.EXP_GREEN;
+		shorthandedMod = 0;
 	}
 	
 	@Override
@@ -634,6 +635,7 @@ public class Armor extends Part implements IAcquisitionWork {
 	public String fail(int rating) {
 		skillMin = ++rating;
 		timeSpent = 0;
+		shorthandedMod = 0;
 		//if we are impossible to fix now, we should scrap this amount of armor
 		//from spares and start over
 		String scrap = "";

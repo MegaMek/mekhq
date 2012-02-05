@@ -197,6 +197,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 	public String fail(int rating) {
 		skillMin = ++rating;
 		timeSpent = 0;
+		shorthandedMod = 0;
 		if(skillMin > SkillType.EXP_ELITE) {
 			Part part = findReplacement(false);
 			if(null != part) {
