@@ -606,6 +606,10 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 				+hits
 				+"</hits>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<toughness>"
+				+toughness
+				+"</toughness>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<minutesLeft>"
 				+minutesLeft
 				+"</minutesLeft>");
@@ -745,6 +749,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 					edge = wn2.getTextContent();
 				} else if (wn2.getNodeName().equalsIgnoreCase("implants")) {
 					implants = wn2.getTextContent();
+				} else if (wn2.getNodeName().equalsIgnoreCase("toughness")) {
+					retVal.toughness = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("pilotGunnery")) {
 					pilotGunnery = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("pilotPiloting")) {
