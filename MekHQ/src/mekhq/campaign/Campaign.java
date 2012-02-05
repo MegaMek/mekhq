@@ -1016,11 +1016,12 @@ public class Campaign implements Serializable {
 			}
 			if(getCampaignOptions().getIdleXP() > 0 && calendar.get(Calendar.DAY_OF_MONTH) == 1) {
 				p.setIdleMonths(p.getIdleMonths() + 1);
-				if(p.getIdleMonths() >= getCampaignOptions().getMonthsIdleXP()
-						&& Compute.d6(2) >= getCampaignOptions().getTargetIdleXP()) {
-					p.setXp(p.getXp() + getCampaignOptions().getIdleXP());
+				if(p.getIdleMonths() >= getCampaignOptions().getMonthsIdleXP()) {
+					if(Compute.d6(2) >= getCampaignOptions().getTargetIdleXP()) {
+						p.setXp(p.getXp() + getCampaignOptions().getIdleXP());
+						addReport(p.getFullTitle() + " has gained " + getCampaignOptions().getIdleXP() + " XP");
+					}
 					p.setIdleMonths(0);
-					addReport(p.getFullTitle() + " has gained " + getCampaignOptions().getIdleXP() + " XP");
 				}
 			}
 			
