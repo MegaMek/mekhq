@@ -95,6 +95,9 @@ public class CampaignOptions implements Serializable {
     private int tasksXP;
     private int mistakeXP;
     private int successXP;
+    private int idleXP;
+    private int targetIdleXP;
+    private int monthsIdleXP;
     
     //random portraits related
     private boolean[] usePortraitForType;
@@ -142,6 +145,9 @@ public class CampaignOptions implements Serializable {
         	usePortraitForType[i] = false;
         }
         usePortraitForType[Person.T_MECHWARRIOR] = true;
+        idleXP = 0;
+        targetIdleXP = 10;
+        monthsIdleXP = 2;
     }
 
     public static String getRepairSystemName (int repairSystem) {
@@ -471,6 +477,30 @@ public class CampaignOptions implements Serializable {
     	}
     	usePortraitForType[type] = b;
     }
+    
+    public int getIdleXP() {
+    	return idleXP;
+    }
+    
+    public void setIdleXP(int xp) {
+    	idleXP = xp;
+    }
+    
+    public int getTargetIdleXP() {
+    	return targetIdleXP;
+    }
+    
+    public void setTargetIdleXP(int xp) {
+    	targetIdleXP = xp;
+    }
+    
+    public int getMonthsIdleXP() {
+    	return monthsIdleXP;
+    }
+    
+    public void setMonthsIdleXP(int m) {
+    	monthsIdleXP = m;
+    }
    
 	public void writeToXml(PrintWriter pw1, int indent) {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "<campaignOptions>");
@@ -505,6 +535,9 @@ public class CampaignOptions implements Serializable {
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "tasksXP", tasksXP);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "mistakeXP", mistakeXP);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "successXP", successXP);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "idleXP", idleXP);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "targetIdleXP", targetIdleXP);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "monthsIdleXP", monthsIdleXP);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "limitByYear", limitByYear);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "allowClanPurchases", allowClanPurchases);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "allowISPurchases", allowISPurchases);
@@ -654,6 +687,12 @@ public class CampaignOptions implements Serializable {
 				retVal.successXP = Integer.parseInt(wn2.getTextContent().trim());
 			} else if (wn2.getNodeName().equalsIgnoreCase("mistakeXP")) {
 				retVal.mistakeXP = Integer.parseInt(wn2.getTextContent().trim());
+			} else if (wn2.getNodeName().equalsIgnoreCase("idleXP")) {
+				retVal.idleXP = Integer.parseInt(wn2.getTextContent().trim());
+			} else if (wn2.getNodeName().equalsIgnoreCase("targetIdleXP")) {
+				retVal.targetIdleXP = Integer.parseInt(wn2.getTextContent().trim());
+			} else if (wn2.getNodeName().equalsIgnoreCase("monthsIdleXP")) {
+				retVal.monthsIdleXP = Integer.parseInt(wn2.getTextContent().trim());
 			} else if (wn2.getNodeName().equalsIgnoreCase("limitByYear")) {
 				if (wn2.getTextContent().equalsIgnoreCase("true"))
 					retVal.limitByYear = true;

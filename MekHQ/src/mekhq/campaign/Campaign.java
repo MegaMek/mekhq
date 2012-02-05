@@ -1013,7 +1013,17 @@ public class Campaign implements Serializable {
 						u.resetPilotAndEntity();
 					}
 				}
-			} 
+			}
+			if(getCampaignOptions().getIdleXP() > 0 && calendar.get(Calendar.DAY_OF_MONTH) == 1) {
+				p.setIdleMonths(p.getIdleMonths() + 1);
+				if(p.getIdleMonths() >= getCampaignOptions().getMonthsIdleXP()
+						&& Compute.d6(2) >= getCampaignOptions().getTargetIdleXP()) {
+					p.setXp(p.getXp() + getCampaignOptions().getIdleXP());
+					p.setIdleMonths(0);
+					addReport(p.getFullTitle() + " has gained " + getCampaignOptions().getIdleXP() + " XP");
+				}
+			}
+			
 		}
 		resetAstechMinutes();
 		

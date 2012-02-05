@@ -853,6 +853,47 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         panXP.add(lblMistakeXP, gridBagConstraints);  
         
+        spnIdleXP = new JSpinner(new SpinnerNumberModel(options.getIdleXP(), 0, 50, 1));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        panXP.add(spnIdleXP, gridBagConstraints);
+        
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        panXP.add(new JLabel("XP for every"), gridBagConstraints);
+        
+        spnMonthsIdleXP = new JSpinner(new SpinnerNumberModel(options.getMonthsIdleXP(), 0, 36, 1));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        panXP.add(spnMonthsIdleXP, gridBagConstraints);
+        
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        panXP.add(new JLabel("active month(s) on a 2d6 roll of greater than or equal to"), gridBagConstraints);
+        
+        spnTargetIdleXP = new JSpinner(new SpinnerNumberModel(options.getTargetIdleXP(), 2, 13, 1));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        panXP.add(spnTargetIdleXP, gridBagConstraints);
+        
         txtInstructionsXP = new javax.swing.JTextArea();
         txtInstructionsXP.setText(resourceMap.getString("txtInstructionsXP.text"));
         txtInstructionsXP.setName("txtInstructions");
@@ -867,7 +908,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         txtInstructionsXP.setOpaque(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 6;
         gridBagConstraints.gridwidth = 6;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.0;
@@ -890,7 +931,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         scrXP.setCorner(JScrollPane.UPPER_LEFT_CORNER, rowTable.getTableHeader());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridy = 7;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.gridwidth = 5;
@@ -949,7 +990,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         scrAbilityXP.setOpaque(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 5;
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridy = 7;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
@@ -1718,7 +1759,10 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 	    options.setNTasksXP((Integer)spnNTasksXP.getModel().getValue());
 	    options.setSuccessXP((Integer)spnSuccessXP.getModel().getValue());
 	    options.setMistakeXP((Integer)spnMistakeXP.getModel().getValue());
-  
+	    options.setIdleXP((Integer)spnIdleXP.getModel().getValue());
+	    options.setMonthsIdleXP((Integer)spnMonthsIdleXP.getModel().getValue());
+	    options.setTargetIdleXP((Integer)spnTargetIdleXP.getModel().getValue());
+	    
 	    options.setLimitByYear(limitByYearBox.isSelected());
 	    if(limitByYearBox.isSelected()) {
 	    	campaign.getGameOptions().getOption("is_eq_limits").setValue(true);
@@ -2105,8 +2149,10 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JLabel lblSuccessXp;
     private JSpinner spnMistakeXP;
     private JLabel lblMistakeXP;
+    private JSpinner spnIdleXP;
+    private JSpinner spnTargetIdleXP;
+    private JSpinner spnMonthsIdleXP;
 
-    
     private javax.swing.JCheckBox limitByYearBox;
     private javax.swing.JCheckBox allowClanPurchasesBox;
     private javax.swing.JCheckBox allowISPurchasesBox;

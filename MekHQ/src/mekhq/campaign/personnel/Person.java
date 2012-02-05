@@ -147,6 +147,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     
     //days of rest
     protected int daysRest;
+    protected int idleMonths;
     
     //portrait
     protected String portraitCategory;
@@ -188,6 +189,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         biography = "";
         nTasks = 0;
         personnelLog = new ArrayList<LogEntry>();
+        idleMonths = -1;
         resetMinutesLeft();
     }
     
@@ -292,6 +294,15 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     public void setStatus(int s) {
     	this.status = s;
     }
+    
+    public int getIdleMonths() {
+    	return idleMonths;
+    }
+    
+    public void setIdleMonths(int m) {
+    	this.idleMonths = m;
+    }
+
 
     public static String getRoleDesc(int type) {
         switch(type) {
@@ -539,6 +550,10 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 				+daysRest
 				+"</daysRest>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<idleMonths>"
+				+idleMonths
+				+"</idleMonths>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<id>"
 				+this.id.toString()
 				+"</id>");
@@ -672,6 +687,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 					retVal.secondaryRole = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("daysRest")) {
 					retVal.daysRest = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("idleMonths")) {
+					retVal.idleMonths = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("id")) {
 					if(version < 14) {
 						retVal.oldId = Integer.parseInt(wn2.getTextContent());
