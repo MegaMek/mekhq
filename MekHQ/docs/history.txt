@@ -62,6 +62,8 @@ v0.1.14 (SVN)
 + idle XP accumulation option
 + Bug 3484446: Green Repairs Become Impossible
 + Bug 3473292: Toughness doesn't save
++ new MM.jar
++ Bug 3472962: In the Hangar, BA do not show under the BA tab
 
 v0.1.13 (2012-01-11)
 + added campaign reference to all parts (should fix NPE refit bug)
