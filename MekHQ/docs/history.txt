@@ -60,6 +60,7 @@ v0.1.14 (SVN)
 + Bug: can do task that is already being worked on
 + clear out game information from entity when resolving scenario (still needs work)
 + idle XP accumulation option
++ Bug 3484446: Green Repairs Become Impossible
 
 v0.1.13 (2012-01-11)
 + added campaign reference to all parts (should fix NPE refit bug)
