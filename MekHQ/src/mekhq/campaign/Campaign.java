@@ -1014,7 +1014,9 @@ public class Campaign implements Serializable {
 					}
 				}
 			}
-			if(getCampaignOptions().getIdleXP() > 0 && calendar.get(Calendar.DAY_OF_MONTH) == 1) {
+			if(getCampaignOptions().getIdleXP() > 0 
+					&& calendar.get(Calendar.DAY_OF_MONTH) == 1
+					&& p.isActive()) {
 				p.setIdleMonths(p.getIdleMonths() + 1);
 				if(p.getIdleMonths() >= getCampaignOptions().getMonthsIdleXP()) {
 					if(Compute.d6(2) >= getCampaignOptions().getTargetIdleXP()) {
