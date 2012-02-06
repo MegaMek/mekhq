@@ -130,8 +130,7 @@ public class PartsStore implements Serializable {
 				parts.add(new JumpJet(55, et, -1, c));
 				parts.add(new JumpJet(85, et, -1, c));
 				parts.add(new JumpJet(100, et, -1, c));
-			} else if ((et instanceof WeaponType  && et.hasFlag(WeaponType.F_BA_WEAPON))
-					|| (et instanceof MiscType && et.hasFlag(MiscType.F_BA_EQUIPMENT))
+			} else if ((et instanceof MiscType && et.hasFlag(MiscType.F_BA_EQUIPMENT))
 					|| (et instanceof MiscType && et.hasFlag(MiscType.F_TANK_EQUIPMENT) && et.hasFlag(MiscType.F_CHASSIS_MODIFICATION))
 					||et instanceof InfantryWeapon 
 					|| et instanceof BayWeapon

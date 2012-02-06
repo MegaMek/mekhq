@@ -65,6 +65,7 @@ v0.1.14 (SVN)
 + new MM.jar
 + Bug 3472962: In the Hangar, BA do not show under the BA tab
 + Bug 3474830: Salvage show shorthanded when not
++ Bug 3477127: Weapons Missing from Parts List
 
 v0.1.13 (2012-01-11)
 + added campaign reference to all parts (should fix NPE refit bug)
