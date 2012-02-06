@@ -76,11 +76,7 @@ public class Finances implements Serializable {
 	public void newFiscalYear(Date date) {
 		long carryover = getBalance();
 		transactions = new ArrayList<Transaction>();
-		if(carryover < 0) {
-			debit(carryover, Transaction.C_START, "Carryover from previous year", date);
-		} else if(carryover > 0) {
-			credit(carryover, Transaction.C_START, "Carryover from previous year", date);
-		}
+		credit(carryover, Transaction.C_START, "Carryover from previous year", date);
 	}
 	
 	public ArrayList<Transaction> getAllTransactions() {
