@@ -718,7 +718,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panXP.setLayout(new java.awt.GridBagLayout());
         
         lblScenarioXP = new JLabel(resourceMap.getString("lblScenarioXP.text"));
-        spnScenarioXP = new JSpinner(new SpinnerNumberModel(options.getScenarioXP(), 0, 10, 1));
+        spnScenarioXP = new JSpinner(new SpinnerNumberModel(options.getScenarioXP(), 0, 50, 1));
+        ((JSpinner.DefaultEditor)spnScenarioXP.getEditor()).getTextField().setEditable(false);
         
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -739,7 +740,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         
         lblKillXP = new JLabel(resourceMap.getString("lblKillXP.text"));
         spnKillXP = new JSpinner(new SpinnerNumberModel(options.getKillXPAward(), 0, 50, 1));
-        
+        ((JSpinner.DefaultEditor)spnKillXP.getEditor()).getTextField().setEditable(false);
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -758,7 +760,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         
         lblKills = new JLabel(resourceMap.getString("lblKills.text"));
         spnKills = new JSpinner(new SpinnerNumberModel(options.getKillsForXP(), 0, 50, 1));
-        
+        ((JSpinner.DefaultEditor)spnKills.getEditor()).getTextField().setEditable(false);
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 1;
@@ -777,7 +780,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         
         lblTaskXP = new JLabel(resourceMap.getString("lblKillXP.text"));
         spnTaskXP = new JSpinner(new SpinnerNumberModel(options.getTaskXP(), 0, 50, 1));
-        
+        ((JSpinner.DefaultEditor)spnTaskXP.getEditor()).getTextField().setEditable(false);
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
@@ -796,7 +800,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         
         lblTasks = new JLabel(resourceMap.getString("lblTasks.text"));
         spnNTasksXP = new JSpinner(new SpinnerNumberModel(options.getNTasksXP(), 0, 50, 1));
-        
+        ((JSpinner.DefaultEditor)spnNTasksXP.getEditor()).getTextField().setEditable(false);
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 2;
@@ -814,8 +819,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panXP.add(lblTasks, gridBagConstraints);
         
         lblSuccessXp = new JLabel(resourceMap.getString("lblSuccessXP.text"));
-        spnSuccessXP = new JSpinner(new SpinnerNumberModel(options.getSuccessXP(), 0, 10, 1));
-        
+        spnSuccessXP = new JSpinner(new SpinnerNumberModel(options.getSuccessXP(), 0, 50, 1));
+        ((JSpinner.DefaultEditor)spnSuccessXP.getEditor()).getTextField().setEditable(false);
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
@@ -834,8 +840,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panXP.add(lblSuccessXp, gridBagConstraints);  
         
         lblMistakeXP = new JLabel(resourceMap.getString("lblMistakeXP.text"));
-        spnMistakeXP = new JSpinner(new SpinnerNumberModel(options.getMistakeXP(), 0, 10, 1));
-        
+        spnMistakeXP = new JSpinner(new SpinnerNumberModel(options.getMistakeXP(), 0, 50, 1));
+        ((JSpinner.DefaultEditor)spnMistakeXP.getEditor()).getTextField().setEditable(false);
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
@@ -854,6 +861,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panXP.add(lblMistakeXP, gridBagConstraints);  
         
         spnIdleXP = new JSpinner(new SpinnerNumberModel(options.getIdleXP(), 0, 50, 1));
+        ((JSpinner.DefaultEditor)spnIdleXP.getEditor()).getTextField().setEditable(false);
+        
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 5;
@@ -870,6 +879,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panXP.add(new JLabel("XP for every"), gridBagConstraints);
         
         spnMonthsIdleXP = new JSpinner(new SpinnerNumberModel(options.getMonthsIdleXP(), 0, 36, 1));
+        ((JSpinner.DefaultEditor)spnMonthsIdleXP.getEditor()).getTextField().setEditable(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 5;
@@ -886,6 +896,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panXP.add(new JLabel("active month(s) on a 2d6 roll of greater than or equal to"), gridBagConstraints);
         
         spnTargetIdleXP = new JSpinner(new SpinnerNumberModel(options.getTargetIdleXP(), 2, 13, 1));
+        ((JSpinner.DefaultEditor)spnTargetIdleXP.getEditor()).getTextField().setEditable(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = 5;
@@ -1037,6 +1048,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             skPanel.add(lblSkill, c);
             c.gridx++;
             spnTarget = new JSpinner(new SpinnerNumberModel(type.getTarget(), 0, 12, 1));
+            ((JSpinner.DefaultEditor)spnTarget.getEditor()).getTextField().setEditable(false);
             hashSkillTargets.put(skillName, spnTarget);
             skPanel.add(spnTarget, c);
             c.gridx++;
@@ -1044,6 +1056,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             skPanel.add(lblSkill, c);
             c.gridx++;
             spnGreen = new JSpinner(new SpinnerNumberModel(type.getGreenLevel(), 0, 10, 1));
+            ((JSpinner.DefaultEditor)spnGreen.getEditor()).getTextField().setEditable(false);
             hashGreenSkill.put(skillName, spnGreen);
             skPanel.add(spnGreen, c);
             c.gridx++;
@@ -1051,6 +1064,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             skPanel.add(lblSkill, c);
             c.gridx++;
             spnReg = new JSpinner(new SpinnerNumberModel(type.getRegularLevel(), 0, 10, 1));
+            ((JSpinner.DefaultEditor)spnReg.getEditor()).getTextField().setEditable(false);
             hashRegSkill.put(skillName, spnReg);
             skPanel.add(spnReg, c);
             c.gridx++;
@@ -1058,6 +1072,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             skPanel.add(lblSkill, c);
             c.gridx++;
             spnVet = new JSpinner(new SpinnerNumberModel(type.getVeteranLevel(), 0, 10, 1));
+            ((JSpinner.DefaultEditor)spnVet.getEditor()).getTextField().setEditable(false);
             hashVetSkill.put(skillName, spnVet);
             skPanel.add(spnVet, c);
             c.gridx++;
@@ -1065,6 +1080,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
             skPanel.add(lblSkill, c);
             c.gridx++;
             spnElite = new JSpinner(new SpinnerNumberModel(type.getEliteLevel(), 0, 10, 1));
+            ((JSpinner.DefaultEditor)spnElite.getEditor()).getTextField().setEditable(false);
             hashEliteSkill.put(skillName, spnElite);
             skPanel.add(spnElite, c);
             c.gridx++;
@@ -1109,7 +1125,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 	   			 BorderFactory.createEmptyBorder(5,5,5,5)));
         
         lblOverallRecruitBonus = new JLabel(resourceMap.getString("lblOverallRecruitBonus.text"));
-        spnOverallRecruitBonus = new JSpinner(new SpinnerNumberModel(rskillPrefs.getOverallRecruitBonus(), -12, 12, 1));
         chkExtraRandom = new JCheckBox(resourceMap.getString("chkExtraRandom.text"));
         chkExtraRandom.setToolTipText(resourceMap.getString("chkExtraRandom.toolTipText"));
         chkExtraRandom.setSelected(rskillPrefs.randomizeSkill());
@@ -1118,7 +1133,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         chkClanBonus.setSelected(rskillPrefs.useClanBonuses());
         lblProbAntiMek = new JLabel(resourceMap.getString("lblProbAntiMek.text"));
         spnProbAntiMek = new JSpinner(new SpinnerNumberModel(rskillPrefs.getAntiMekProb(), 0, 100, 5));
+        ((JSpinner.DefaultEditor)spnProbAntiMek.getEditor()).getTextField().setEditable(false);
         spnOverallRecruitBonus = new JSpinner(new SpinnerNumberModel(rskillPrefs.getOverallRecruitBonus(), -12, 12, 1));
+        ((JSpinner.DefaultEditor)spnOverallRecruitBonus.getEditor()).getTextField().setEditable(false);
         spnOverallRecruitBonus.setToolTipText(resourceMap.getString("spnOverallRecruitBonus.toolTipText"));
         spnTypeRecruitBonus = new JSpinner[Person.T_NUM];
         int nrow = (int)Math.ceil(Person.T_NUM / 4.0);
@@ -1129,6 +1146,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         	panRecruit = new JPanel(new GridBagLayout());
         	gridBagConstraints = new java.awt.GridBagConstraints();
         	spin = new JSpinner(new SpinnerNumberModel(rskillPrefs.getRecruitBonus(i), -12, 12, 1));
+            ((JSpinner.DefaultEditor)spin.getEditor()).getTextField().setEditable(false);
         	spnTypeRecruitBonus[i] = spin;
             gridBagConstraints = new java.awt.GridBagConstraints();
         	gridBagConstraints.gridx = 0;
@@ -1222,18 +1240,22 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 	   			 BorderFactory.createTitledBorder("Artillery Skill"),
 	   			 BorderFactory.createEmptyBorder(5,5,5,5)));
         spnArtyProb = new JSpinner(new SpinnerNumberModel(rskillPrefs.getArtilleryProb(),0,100,5));
+        ((JSpinner.DefaultEditor)spnArtyProb.getEditor()).getTextField().setEditable(false);
         spnArtyProb.setToolTipText(resourceMap.getString("spnArtyProb.toolTipText"));
         panArtillery.add(spnArtyProb);
         panArtillery.add(new JLabel("Probability"));
         spnArtyBonus = new JSpinner(new SpinnerNumberModel(rskillPrefs.getArtilleryBonus(),-10,10,1));
+        ((JSpinner.DefaultEditor)spnArtyBonus.getEditor()).getTextField().setEditable(false);
         panArtillery.add(spnArtyBonus);
         panArtillery.add(new JLabel("Bonus"));
         JPanel panSecondary = new JPanel();
         spnSecondProb = new JSpinner(new SpinnerNumberModel(rskillPrefs.getSecondSkillProb(),0,100,5));
+        ((JSpinner.DefaultEditor)spnSecondProb.getEditor()).getTextField().setEditable(false);
         spnSecondProb.setToolTipText(resourceMap.getString("spnSecondProb.toolTipText"));
         panSecondary.add(spnSecondProb);
         panSecondary.add(new JLabel("Probability"));
         spnSecondBonus = new JSpinner(new SpinnerNumberModel(rskillPrefs.getSecondSkillBonus(),-10,10,1));
+        ((JSpinner.DefaultEditor)spnSecondBonus.getEditor()).getTextField().setEditable(false);
         panSecondary.add(spnSecondBonus);
         panSecondary.add(new JLabel("Bonus"));
         panSecondary.setBorder(BorderFactory.createCompoundBorder(
@@ -1241,12 +1263,16 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 	   			 BorderFactory.createEmptyBorder(5,5,5,5)));
         JPanel panTactics   = new JPanel();
         spnTacticsGreen = new JSpinner(new SpinnerNumberModel(rskillPrefs.getTacticsMod(SkillType.EXP_GREEN),-10,10,1));
+        ((JSpinner.DefaultEditor)spnTacticsGreen.getEditor()).getTextField().setEditable(false);
         spnTacticsGreen.setToolTipText(resourceMap.getString("spnTacticsGreen.toolTipText"));
         spnTacticsReg = new JSpinner(new SpinnerNumberModel(rskillPrefs.getTacticsMod(SkillType.EXP_REGULAR),-10,10,1));
+        ((JSpinner.DefaultEditor)spnTacticsReg.getEditor()).getTextField().setEditable(false);
         spnTacticsReg.setToolTipText(resourceMap.getString("spnTacticsReg.toolTipText"));
         spnTacticsVet = new JSpinner(new SpinnerNumberModel(rskillPrefs.getTacticsMod(SkillType.EXP_VETERAN),-10,10,1));
+        ((JSpinner.DefaultEditor)spnTacticsVet.getEditor()).getTextField().setEditable(false);
         spnTacticsVet.setToolTipText(resourceMap.getString("spnTacticsVet.toolTipText"));
         spnTacticsElite = new JSpinner(new SpinnerNumberModel(rskillPrefs.getTacticsMod(SkillType.EXP_ELITE),-10,10,1));
+        ((JSpinner.DefaultEditor)spnTacticsElite.getEditor()).getTextField().setEditable(false);
         spnTacticsElite.setToolTipText(resourceMap.getString("spnTacticsElite.toolTipText"));
         panTactics.add(spnTacticsGreen);
         panTactics.add(new JLabel("Green")); 
@@ -1261,8 +1287,10 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 	   			 BorderFactory.createEmptyBorder(5,5,5,5)));
         JPanel panSmallArms = new JPanel();
         spnCombatSA = new JSpinner(new SpinnerNumberModel(rskillPrefs.getCombatSmallArmsBonus(),-10,10,1));
+        ((JSpinner.DefaultEditor)spnCombatSA.getEditor()).getTextField().setEditable(false);
         spnCombatSA.setToolTipText(resourceMap.getString("spnCombatSA.toolTipText"));
         spnSupportSA = new JSpinner(new SpinnerNumberModel(rskillPrefs.getSupportSmallArmsBonus(),-10,10,1));
+        ((JSpinner.DefaultEditor)spnSupportSA.getEditor()).getTextField().setEditable(false);
         spnSupportSA.setToolTipText(resourceMap.getString("spnSupportSA.toolTipText"));
         panSmallArms.add(spnCombatSA);
         panSmallArms.add(new JLabel("Combat Personnel")); 
@@ -1273,12 +1301,16 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 	   			 BorderFactory.createEmptyBorder(5,5,5,5)));
         JPanel panAbilities = new JPanel();
         spnAbilGreen = new JSpinner(new SpinnerNumberModel(rskillPrefs.getSpecialAbilBonus(SkillType.EXP_GREEN),-10,10,1));
+        ((JSpinner.DefaultEditor)spnAbilGreen.getEditor()).getTextField().setEditable(false);
         spnAbilGreen.setToolTipText(resourceMap.getString("spnAbilGreen.toolTipText"));
         spnAbilReg = new JSpinner(new SpinnerNumberModel(rskillPrefs.getSpecialAbilBonus(SkillType.EXP_REGULAR),-10,10,1));
+        ((JSpinner.DefaultEditor)spnAbilReg.getEditor()).getTextField().setEditable(false);
         spnAbilReg.setToolTipText(resourceMap.getString("spnAbilReg.toolTipText"));
         spnAbilVet = new JSpinner(new SpinnerNumberModel(rskillPrefs.getSpecialAbilBonus(SkillType.EXP_VETERAN),-10,10,1));
+        ((JSpinner.DefaultEditor)spnAbilVet.getEditor()).getTextField().setEditable(false);
         spnAbilVet.setToolTipText(resourceMap.getString("spnAbilVet.toolTipText"));
         spnAbilElite = new JSpinner(new SpinnerNumberModel(rskillPrefs.getSpecialAbilBonus(SkillType.EXP_ELITE),-10,10,1));
+        ((JSpinner.DefaultEditor)spnAbilElite.getEditor()).getTextField().setEditable(false);
         spnAbilElite.setToolTipText(resourceMap.getString("spnAbilElite.toolTipText"));
         panAbilities.add(spnAbilGreen);
         panAbilities.add(new JLabel("Green")); 
