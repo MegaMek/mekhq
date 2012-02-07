@@ -40,8 +40,10 @@ import javax.swing.filechooser.FileFilter;
 import megamek.client.Client;
 import megamek.common.BattleArmor;
 import megamek.common.Compute;
+import megamek.common.CriticalSlot;
 import megamek.common.Entity;
 import megamek.common.Infantry;
+import megamek.common.Mounted;
 import megamek.common.Pilot;
 import megamek.common.Tank;
 import megamek.common.XMLStreamParser;
@@ -253,6 +255,39 @@ public class ResolveScenarioTracker {
         }       
         checkStatusOfPersonnel();
 	}
+
+	/*
+	public void postProcessEntities(boolean controlsField) {
+		ArrayList<Entity> allEntities = new ArrayList<Entity>();
+		for(UUID id : entities.keySet()) {
+			allEntities.add(entities.get(id));
+		}
+		allEntities.addAll(potentialSalvage);
+		for(Entity en : allEntities) {
+			//go through mounted and crit slots and remove missing
+			//if missing and not controls field, convert to destroyed
+			// equipment marked missing
+	        for (Mounted mounted : en.getEquipment()) {
+	            if (mounted.isMissing() && !controlsField) {
+	                mounted.setDestroyed(true);
+	            }
+	            mounted.setMissing(false);
+	        }
+	        // all critical slots set as missing
+	        for(int loc = 0; loc < en.locations(); loc++) {
+		        for (int i = 0; i < en.getNumberOfCriticals(loc); i++) {
+		            final CriticalSlot cs = en.getCritical(loc, i);
+		            if (cs != null) {
+		            	if(cs.isMissing() && !controlsField) {
+		            		cs.setDestroyed(true);
+		            	}
+		            	cs.setMissing(false);
+		            }
+		        }
+	        }
+		}
+	}
+	*/
 	
 	private ArrayList<Person> shuffleCrew(ArrayList<Person> source) {
 	    ArrayList<Person> sortedList = new ArrayList<Person>();

@@ -68,6 +68,7 @@ v0.1.14 (SVN)
 + Bug 3477127: Weapons Missing from Parts List
 + Bug 3477779: Debt not carried over to new year
 + make text field of all spinners in CampaignOptionsDialog non-editable
++ re-attachable limbs/heads (yay!)
 
 v0.1.13 (2012-01-11)
 + added campaign reference to all parts (should fix NPE refit bug)

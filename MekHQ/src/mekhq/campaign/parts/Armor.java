@@ -396,7 +396,7 @@ public class Armor extends Part implements IAcquisitionWork {
 	@Override
 	public void fix() {
 		int amount = Math.min(getAmountAvailable(), amountNeeded);
-		int curAmount = unit.getEntity().getArmor(location, rear);
+		int curAmount = unit.getEntity().getArmorForReal(location, rear);
 		if(curAmount < 0) {
 			curAmount = 0;
 		}
@@ -453,7 +453,7 @@ public class Armor extends Part implements IAcquisitionWork {
 		if(isReservedForRefit()) {
 			return;
 		}
-		int currentArmor = unit.getEntity().getArmor(location, rear);
+		int currentArmor = unit.getEntity().getArmorForReal(location, rear);
 		if(currentArmor < 0) {
 			currentArmor = 0;
 		}

@@ -404,15 +404,13 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 		if (loc > entity.locations() || loc < 0) {
 			return false;
 		}
-		// on mechs, hip and shoulder criticals also make the location
-		// effectively destroyed
-		/*if (entity instanceof Mech
-				&& (entity.getHitCriticals(CriticalSlot.TYPE_SYSTEM,
-						Mech.ACTUATOR_HIP, loc) > 0 || entity.getHitCriticals(
-						CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_SHOULDER, loc) > 0)) {
-			return true;
-		}*/
-		return entity.isLocationBad(loc);
+		/*boolean blownOff = entity.isLocationBlownOff(loc);
+		entity.setLocationBlownOff(loc, false);
+		boolean isDestroyed = entity.isLocationBad(loc);
+		entity.setLocationBlownOff(loc, blownOff);
+		return isDestroyed;
+		*/
+		return entity.isLocationTrulyDestroyed(loc);
 	}
 	
 	public boolean isLocationBreached(int loc) {
@@ -421,8 +419,8 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 	
 	public boolean hasBadHipOrShoulder(int loc) {
 		return entity instanceof Mech
-				&& (entity.getHitCriticals(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_HIP, loc) > 0 
-						|| entity.getHitCriticals(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_SHOULDER, loc) > 0);
+				&& (entity.getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_HIP, loc) > 0 
+						|| entity.getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, Mech.ACTUATOR_SHOULDER, loc) > 0);
 	}
 
 	/**

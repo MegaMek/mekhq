@@ -33,6 +33,8 @@ import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
+import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.work.Modes;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -48,6 +50,7 @@ public class MekLocation extends Part {
     protected boolean tsm;
     double percent;
     boolean breached;
+    boolean blownOff;
     boolean forQuad;
 
     public MekLocation() {
@@ -312,7 +315,22 @@ public class MekLocation extends Part {
 	@Override
 	public void fix() {
 		super.fix();
-		if(isBreached()) {
+		if(isBlownOff()) {
+			blownOff = false;
+			unit.getEntity().setLocationBlownOff(loc, false);
+			for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
+	            CriticalSlot slot = unit.getEntity().getCritical(loc, i);
+	            // ignore empty & non-hittable slots
+	            if (slot == null) {
+	                continue;
+	            }
+	            slot.setMissing(false);
+	            Mounted m = slot.getMount();
+	            if(null != m) {
+	            	m.setMissing(false);
+	            }
+			}
+		} else if(isBreached()) {
 			breached = false;
 			unit.getEntity().setLocationStatus(loc, ILocationExposureStatus.NORMAL, true);
 			for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
@@ -342,8 +360,10 @@ public class MekLocation extends Part {
 
 	@Override
 	public void remove(boolean salvage) {
+		blownOff = false;
 		if(null != unit) {
 			unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, loc);
+			unit.getEntity().setLocationBlownOff(loc, false);
 			if(!salvage) {
 				campaign.removePart(this);
 			}
@@ -360,10 +380,19 @@ public class MekLocation extends Part {
 	@Override
 	public void updateConditionFromEntity() {
 		if(null != unit) {
-			percent = ((double) unit.getEntity().getInternal(loc)) / ((double) unit.getEntity().getOInternal(loc));
+			blownOff = unit.getEntity().isLocationBlownOff(loc);
+			percent = ((double) unit.getEntity().getInternalForReal(loc)) / ((double) unit.getEntity().getOInternal(loc));
 			if(percent <= 0.0) {
 				remove(false);
 				return;
+			} else if(blownOff) {
+				if(loc == Mech.LOC_HEAD) {
+					this.time = 200;
+					this.difficulty = 2;
+				} else {
+					this.time = 180;
+					this.difficulty = 1;
+				}
 			} else if(unit.isLocationBreached(loc)) {
 				breached = true;
 				this.time = 60;
@@ -382,8 +411,13 @@ public class MekLocation extends Part {
 	        	this.difficulty = -1;
 	        }
 			if(isSalvaging()) {
-				this.time = 240;
-				this.difficulty = 3;
+				if(isBlownOff()) {
+					this.time = 0;
+					this.difficulty = 0;
+				} else {
+					this.time = 240;
+					this.difficulty = 3;
+				}
 			}
 		}		
 	}
@@ -392,16 +426,22 @@ public class MekLocation extends Part {
 		return breached;
 	}
 	
+	public boolean isBlownOff() {
+		return blownOff;
+	}
+	
 	@Override
 	public boolean needsFixing() {
-		return percent < 1.0 || breached;
+		return percent < 1.0 || breached || blownOff;
 	}
 	
 	@Override
     public String getDetails() {
 		if(null != unit) {
 			String toReturn = unit.getEntity().getLocationName(loc);
-			if(isBreached()) {
+			if(isBlownOff()) {
+				toReturn += " (Blown Off)";
+			} else if(isBreached()) {
 				toReturn += " (Breached)";
 			} else {
 				toReturn += " (" + Math.round(100*percent) + "%)";
@@ -446,7 +486,23 @@ public class MekLocation extends Part {
 	
 	@Override
     public String checkFixable() {
-		if(isSalvaging()) {
+		if(isBlownOff() && !isSalvaging()) {
+			if(loc == Mech.LOC_LARM && unit.isLocationDestroyed(Mech.LOC_LT)) {
+				return "must replace left torso first";
+			}
+			else if(loc == Mech.LOC_RARM && unit.isLocationDestroyed(Mech.LOC_RT)) {
+				return "must replace right torso first";
+			}
+			else if(unit.isLocationDestroyed(Mech.LOC_CT)) {
+				//we shouldnt get here
+				return "cannot replace head on destroyed unit";
+			}
+		} 
+		else if(isSalvaging()) {
+			//dont allow salvaging of bad shoulder/hip limbs
+			if(onBadHipOrShoulder()) {
+				return "You cannot salvage a limb with a busted hip/shoulder. You must scrap it instead.";
+			}
 	         //cant salvage torsos until arms and legs are gone
 			String limbName = " arm ";
 			if(forQuad) {
@@ -459,8 +515,8 @@ public class MekLocation extends Part {
 	            return "must salvage/scrap left" + limbName + "first";
 	        } 
 	        //check for armor
-	        if(unit.getEntity().getArmor(loc, false) > 0
-	        		|| (unit.getEntity().hasRearArmor(loc) && unit.getEntity().getArmor(loc, true) > 0 )) {
+	        if(unit.getEntity().getArmorForReal(loc, false) > 0
+	        		|| (unit.getEntity().hasRearArmor(loc) && unit.getEntity().getArmorForReal(loc, true) > 0 )) {
 	        	return "must salvage armor in this location first";
 	        }
 	        //you can only salvage a location that has nothing left on it
@@ -481,7 +537,7 @@ public class MekLocation extends Part {
 	                return "Repairable parts in " + unit.getEntity().getLocationName(loc) + " must be salvaged or scrapped first.";
 	            } 
 	        }
-		} else if (!isBreached()) {
+		} else if (!isBreached() && !isBlownOff()) {
 			//check for damaged hips and shoulders
 			for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
 	            CriticalSlot slot = unit.getEntity().getCritical(loc, i);
@@ -562,11 +618,14 @@ public class MekLocation extends Part {
 		if(isBreached() && !isSalvaging()) {
 			return new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS, "fixing breach");
 		}
+		if(isBlownOff() && isSalvaging()) {
+			return new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS, "salvaging blown-off location");
+		}
 		return super.getAllMods();
 	}
 	
 	public String getDesc() {
-		if(!isBreached() || isSalvaging()) {
+		if((!isBreached() && !isBlownOff()) || isSalvaging()) {
 			return super.getDesc();
 		}
 		String toReturn = "<html><font size='2'";
@@ -576,11 +635,32 @@ public class MekLocation extends Part {
 		}
 	
 		toReturn += ">";
-		toReturn += "<b>Seal " + getName() + "</b><br/>";
+		if(isBlownOff()) {
+			toReturn += "<b>Re-attach " + getName() + "</b><br/>";
+		} else {
+			toReturn += "<b>Seal " + getName() + "</b><br/>";
+		}
 		toReturn += getDetails() + "<br/>";
 		toReturn += "" + getTimeLeft() + " minutes" + scheduled;
+		if(isBlownOff()) {
+			String bonus = getAllMods().getValueAsString();
+			if (getAllMods().getValue() > -1) {
+				bonus = "+" + bonus;
+			}
+			bonus = "(" + bonus + ")";
+			toReturn += ", " + SkillType.getExperienceLevelName(getSkillMin());
+			toReturn += " " + bonus;
+			if (getMode() != Modes.MODE_NORMAL) {
+				toReturn += "<br/><i>" + getCurrentModeName() + "</i>";
+			}
+		}
 		toReturn += "</font></html>";
 		return toReturn;
+	}
+	
+	@Override
+	public boolean onBadHipOrShoulder() {
+		return null != unit && unit.hasBadHipOrShoulder(loc);
 	}
 	
 }

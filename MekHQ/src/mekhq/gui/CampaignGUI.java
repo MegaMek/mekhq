@@ -2136,15 +2136,39 @@ public class CampaignGUI extends JPanel {
 			if(null == tech) {
 				return;
 			}
-			if(part.onBadHipOrShoulder() && !part.isSalvaging() && 0!= JOptionPane.showConfirmDialog(
-					    frame,
-					    "You are repairing/replacing a part on a limb with a bad shoulder or hip.\n"
-					    		+"You may continue, but this limb cannot be repaired and you will have to\n"
-								+"remove this equipment if you wish to scrap and then replace the limb.\n"
-					    		+"Do you wish to continue?",
-					    "Busted Hip/Shoulder",
-					    JOptionPane.YES_NO_OPTION)) {
-				return;
+			if(part.onBadHipOrShoulder() && !part.isSalvaging()) {
+				if(part instanceof MekLocation && ((MekLocation)part).isBreached() 
+						&& 0!= JOptionPane.showConfirmDialog(
+						    frame,
+						    "You are sealing a limb with a bad shoulder or hip.\n"
+						    		+"You may continue, but this limb cannot be repaired and you will have to\n"
+									+"scrap it in order to repair the internal structure and fix the shoulder/hip.\n"
+						    		+"Do you wish to continue?",
+						    "Busted Hip/Shoulder",
+						    JOptionPane.YES_NO_OPTION)) {
+					return;
+				}
+				else if(part instanceof MekLocation && ((MekLocation)part).isBlownOff() 
+						&& 0!= JOptionPane.showConfirmDialog(
+						    frame,
+						    "You are re-attaching a limb with a bad shoulder or hip.\n"
+						    		+"You may continue, but this limb cannot be repaired and you will have to\n"
+									+"scrap it in order to repair the internal structure and fix the shoulder/hip.\n"
+						    		+"Do you wish to continue?",
+						    "Busted Hip/Shoulder",
+						    JOptionPane.YES_NO_OPTION)) {
+					return;
+				}
+				else if(0!= JOptionPane.showConfirmDialog(
+						    frame,
+						    "You are repairing/replacing a part on a limb with a bad shoulder or hip.\n"
+						    		+"You may continue, but this limb cannot be repaired and you will have to\n"
+									+"remove this equipment if you wish to scrap and then replace the limb.\n"
+						    		+"Do you wish to continue?",
+						    "Busted Hip/Shoulder",
+						    JOptionPane.YES_NO_OPTION)) {
+					return;
+				}
 			}
 			getCampaign().fixPart(part, tech);
 			if(null !=  u && !u.isRepairable() && u.getSalvageableParts().size() == 0) {

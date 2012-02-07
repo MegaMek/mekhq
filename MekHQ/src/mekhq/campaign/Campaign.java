@@ -105,6 +105,7 @@ import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.EnginePart;
+import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.MissingEnginePart;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
@@ -900,6 +901,7 @@ public class Campaign implements Serializable {
 		TargetRoll target = getTargetFor(partWork, tech);
 		String report = "";
 		String action = " fix ";
+		//TODO: this should really be a method on the part
 		if(partWork instanceof AmmoBin) {
 			action = " reload ";
 		}
@@ -908,6 +910,14 @@ public class Campaign implements Serializable {
 		}
 		if(partWork instanceof MissingPart) {
 			action = " replace ";
+		}
+		if(partWork instanceof MekLocation) {
+			if(((MekLocation)partWork).isBlownOff()) {
+				action = " re-attach ";
+			}
+			else if(((MekLocation)partWork).isBreached()) {
+				action = " seal ";
+			}
 		}
 		report += tech.getName() + " attempts to" + action + partWork.getPartName();   
 		int minutes = partWork.getTimeLeft();
