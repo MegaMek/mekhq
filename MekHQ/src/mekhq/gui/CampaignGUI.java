@@ -2925,6 +2925,13 @@ public class CampaignGUI extends JPanel {
 		if(chooseFilesDialog.wasCancelled()) {
 			return;
 		}
+		boolean control = JOptionPane.showConfirmDialog(getFrame(),
+                "Did your side control the battlefield at the end of the scenario?",
+                "Control of Battlefield?",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE) ==
+                JOptionPane.YES_OPTION;
+		tracker.postProcessEntities(control);
 		ResolveScenarioWizardDialog resolveDialog = new ResolveScenarioWizardDialog(getFrame(), true, tracker);
 		resolveDialog.setVisible(true);
 		

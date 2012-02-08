@@ -220,7 +220,11 @@ public class MekActuator extends Part {
 	@Override
 	public void updateConditionFromEntity() {
 		if(null != unit) {
-			hits = unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, type, location);	
+			if(!unit.getEntity().isSystemRepairable(type, location)) {
+				remove(false);
+				return;
+			}
+			hits = unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, type, location);			
 			if(hits == 0) {
 				time = 0;
 				difficulty = 0;
@@ -283,5 +287,10 @@ public class MekActuator extends Part {
 	@Override
 	public boolean onBadHipOrShoulder() {
 		return null != unit && unit.hasBadHipOrShoulder(location);
+	}
+	
+	@Override
+	public boolean isPartForCriticalSlot(int index, int loc) {
+		return index == type && loc == location;
 	}
 }

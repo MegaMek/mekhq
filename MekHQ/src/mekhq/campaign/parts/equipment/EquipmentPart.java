@@ -264,11 +264,10 @@ public class EquipmentPart extends Part {
 				if(!mounted.isRepairable()) {
 					remove(false);
 					return;
-				} else if(mounted.isDestroyed()) {
-					//TODO: calculate actual hits
-					hits = 1;
-				} else {
-					hits = 0;
+				}
+				hits = unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_EQUIPMENT, equipmentNum, mounted.getLocation());
+				if(mounted.isSplit()) {
+				hits += unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_EQUIPMENT, equipmentNum, mounted.getSecondLocation());
 				}
 			}
 			if(hits == 0) {
@@ -527,5 +526,10 @@ public class EquipmentPart extends Part {
     		return 0.5;
     	}
     	return 1;
+    }
+    
+    @Override
+    public boolean isPartForCriticalSlot(int index, int loc) {
+    	return equipmentNum == index;
     }
 }

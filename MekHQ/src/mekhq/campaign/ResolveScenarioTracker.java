@@ -42,7 +42,9 @@ import megamek.common.BattleArmor;
 import megamek.common.Compute;
 import megamek.common.CriticalSlot;
 import megamek.common.Entity;
+import megamek.common.IArmorState;
 import megamek.common.Infantry;
+import megamek.common.Mech;
 import megamek.common.Mounted;
 import megamek.common.Pilot;
 import megamek.common.Tank;
@@ -52,6 +54,7 @@ import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 
 /**
@@ -256,38 +259,91 @@ public class ResolveScenarioTracker {
         checkStatusOfPersonnel();
 	}
 
-	/*
-	public void postProcessEntities(boolean controlsField) {
-		ArrayList<Entity> allEntities = new ArrayList<Entity>();
-		for(UUID id : entities.keySet()) {
-			allEntities.add(entities.get(id));
+	private void checkForEquipmentStatus(Entity en, boolean controlsField) {
+		Unit u = null;
+		if(!en.getExternalIdAsString().equals("-1")) {
+			UUID id = UUID.fromString(en.getExternalIdAsString());
+			if(null != id) {
+				u = campaign.getUnit(id);
+			}
 		}
-		allEntities.addAll(potentialSalvage);
-		for(Entity en : allEntities) {
-			//go through mounted and crit slots and remove missing
-			//if missing and not controls field, convert to destroyed
-			// equipment marked missing
-	        for (Mounted mounted : en.getEquipment()) {
-	            if (mounted.isMissing() && !controlsField) {
-	                mounted.setDestroyed(true);
-	            }
-	            mounted.setMissing(false);
-	        }
-	        // all critical slots set as missing
-	        for(int loc = 0; loc < en.locations(); loc++) {
-		        for (int i = 0; i < en.getNumberOfCriticals(loc); i++) {
-		            final CriticalSlot cs = en.getCritical(loc, i);
-		            if (cs != null) {
-		            	if(cs.isMissing() && !controlsField) {
-		            		cs.setDestroyed(true);
-		            	}
-		            	cs.setMissing(false);
+		ArrayList<String> brokenParts = new ArrayList<String>();
+		for(int loc = 0; loc < en.locations(); loc++) {
+			if(en.isLocationBlownOff(loc) && !controlsField) {
+				//sorry dude, we cant find your arm
+				en.setLocationBlownOff(loc, false);
+				en.setArmor(IArmorState.ARMOR_DESTROYED, loc);
+				en.setInternal(IArmorState.ARMOR_DESTROYED, loc);
+			}
+			for (int i = 0; i < en.getNumberOfCriticals(loc); i++) {
+				final CriticalSlot cs = en.getCritical(loc, i);
+				if(null == cs || !cs.isEverHittable()) {
+					continue;
+				}
+				if(cs.isMissing() && !controlsField) {
+					//equipment in this location got left with the 
+					//limb
+					cs.setRepairable(false);
+					cs.setDestroyed(true);
+					cs.setMissing(false);
+					Mounted m = cs.getMount();
+		            if(null != m) {
+		            	m.setMissing(false);
+		            	m.setDestroyed(true);
+		            	m.setRepairable(false);
 		            }
-		        }
-	        }
+				} 
+				if(cs.isDamaged()) {
+					if(cs.getIndex() == Mech.ACTUATOR_SHOULDER 
+							|| cs.getIndex() == Mech.ACTUATOR_HIP
+							|| cs.getIndex() == Mech.SYSTEM_ENGINE) {
+						continue;
+					}
+					//we have to do this little hack-y thing to account for actuators which are not
+					//uniquely identified without location
+					String strIndex = Integer.toString(cs.getIndex());
+					//check to make sure this equipment wasnt already damaged
+					if(null != u) {
+						Part p = u.getPartForCriticalSlot(cs.getIndex(), loc);
+						if(null != p && p.getHits() > 0) {
+							continue;
+						}
+					}
+					if(cs.getIndex() >= Mech.ACTUATOR_UPPER_ARM && cs.getIndex() <= Mech.ACTUATOR_FOOT) {
+						strIndex += ":" + loc;
+					}
+					if(!brokenParts.contains(strIndex) && Compute.d6(2) < 10) {
+						cs.setRepairable(false);
+						cs.setDestroyed(true);
+						cs.setMissing(false);
+						Mounted m = cs.getMount();
+			            if(null != m) {
+			            	m.setMissing(false);
+			            	m.setDestroyed(true);
+			            	m.setRepairable(false);
+			            }
+			            brokenParts.add(strIndex);
+			            //we dont care that we wont flag all the critical slots. Flagging one
+			            //and the mounted should do the trick
+					} 
+					
+				}
+			}
 		}
 	}
-	*/
+	
+	public void postProcessEntities(boolean controlsField) {
+		for(UUID id : entities.keySet()) {
+			Entity en = entities.get(id);
+			if(null == en) {
+				continue;
+			}
+			checkForEquipmentStatus(en, controlsField);
+		}
+		for(Entity en : potentialSalvage) {
+			checkForEquipmentStatus(en, controlsField);
+		}
+	}
 	
 	private ArrayList<Person> shuffleCrew(ArrayList<Person> source) {
 	    ArrayList<Person> sortedList = new ArrayList<Person>();

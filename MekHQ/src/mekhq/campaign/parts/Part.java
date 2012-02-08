@@ -784,5 +784,9 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	public boolean isMountedOnDestroyedLocation() {
 		return false;
 	}
+	
+	public boolean isPartForCriticalSlot(int index, int loc) {
+		return false;
+	}
 }
 

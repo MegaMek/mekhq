@@ -21,6 +21,7 @@
 
 package mekhq.campaign.parts.equipment;
 
+import megamek.common.CriticalSlot;
 import megamek.common.EquipmentType;
 import megamek.common.MiscType;
 import megamek.common.Mounted;
@@ -72,12 +73,8 @@ public class HeatSink extends EquipmentPart {
 				if(!mounted.isRepairable()) {
 					remove(false);
 					return;
-				} else if(mounted.isDestroyed()) {
-					//TODO: calculate actual hits
-					hits = 1;
-				} else {
-					hits = 0;
-				}
+				} 
+				hits = unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_EQUIPMENT, equipmentNum, mounted.getLocation());
 			}
 			if(hits == 0) {
 				time = 0;

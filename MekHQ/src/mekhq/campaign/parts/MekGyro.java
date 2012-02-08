@@ -240,6 +240,10 @@ public class MekGyro extends Part {
 	@Override
 	public void updateConditionFromEntity() {
 		if(null != unit) {
+			if(!unit.getEntity().isSystemRepairable(Mech.SYSTEM_GYRO, Mech.LOC_CT)) {
+				remove(false);
+				return;
+			}
 			hits = unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_SYSTEM,Mech.SYSTEM_GYRO, Mech.LOC_CT);
 			if(hits == 0) {
 				time = 0;
@@ -287,5 +291,10 @@ public class MekGyro extends Part {
     		return unit.getEntity().getLocationName(Mech.LOC_CT) + " is breached.";
 		}
 		return null;
+	}
+	
+	@Override
+	public boolean isPartForCriticalSlot(int index, int loc) {
+		return Mech.SYSTEM_GYRO == index;
 	}
 }

@@ -400,12 +400,14 @@ public class MekHQ implements GameListener {
             if (e.getOldPhase() == IGame.Phase.PHASE_VICTORY) {
             	ResolveScenarioTracker tracker = new ResolveScenarioTracker(currentScenario, campaign);
             	tracker.setClient(gameThread.getClient());
-            	tracker.processGame(JOptionPane.showConfirmDialog(campaigngui.getFrame(),
+            	boolean control = JOptionPane.showConfirmDialog(campaigngui.getFrame(),
                         "Did your side control the battlefield at the end of the scenario?",
                         "Control of Battlefield?",
                         JOptionPane.YES_NO_OPTION,
                         JOptionPane.QUESTION_MESSAGE) ==
-                        JOptionPane.YES_OPTION);
+                        JOptionPane.YES_OPTION;
+            	tracker.processGame(control);
+            	tracker.postProcessEntities(control);
             	ResolveScenarioWizardDialog resolveDialog = new ResolveScenarioWizardDialog(campaigngui.getFrame(), true, tracker);
             	resolveDialog.setVisible(true);
             	gameThread.requestStop();

@@ -2232,5 +2232,14 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     		refit.fixIdReferences(uHash, peopleHash);
     	}
     }
+    
+    public Part getPartForCriticalSlot(int index, int loc) {
+    	for(Part p : parts) {
+    		if(p.isPartForCriticalSlot(index, loc)) {
+    			return p;
+    		}
+    	}
+    	return null;
+    }
      
 }

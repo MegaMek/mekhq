@@ -229,4 +229,9 @@ public class MekSensor extends Part {
     public String getDetails() {
 		return super.getDetails() + ", " + getUnitTonnage() + " tons";
     }
+	
+	@Override
+	public boolean isPartForCriticalSlot(int index, int loc) {
+		return Mech.SYSTEM_SENSORS == index;
+	}
 }
