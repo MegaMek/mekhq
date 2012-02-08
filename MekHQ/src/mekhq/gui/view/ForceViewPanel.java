@@ -94,7 +94,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
 		
 		lblIcon.setName("lblPortait"); // NOI18N
 		lblIcon.setBackground(Color.WHITE);
-		setIcon(force, lblIcon);
+		setIcon(force, lblIcon, 150);
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 0;
@@ -149,7 +149,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
 		add(txtDesc, gridBagConstraints);
 	}
 	
-	private void setIcon(Force f, JLabel lbl) {
+	private void setIcon(Force f, JLabel lbl, int scale) {
         String category = f.getIconCategory();
         String file = f.getIconFileName();
 
@@ -163,13 +163,23 @@ public class ForceViewPanel extends javax.swing.JPanel {
         }
 
         // Try to get the player's portrait file.
-        Image portrait = null;
+        Image portrait = null;        
         try {
             portrait = (Image) forceIcons.getItem(category, file);
-            if(null == portrait) {
+            if(null != portrait) {
+            	if(portrait.getWidth(lbl) > scale) { 
+            		portrait = portrait.getScaledInstance(scale, -1, Image.SCALE_DEFAULT);  
+            	}
+            } else {
             	portrait = (Image) forceIcons.getItem("", "empty.png");
             }
-            lbl.setIcon(new ImageIcon(portrait));
+            ImageIcon icon = new ImageIcon(portrait);
+            lbl.setIcon(icon);
+            if(icon.getIconWidth() > scale) {
+            	portrait = portrait.getScaledInstance(scale, -1, Image.SCALE_DEFAULT);  
+            	icon = new ImageIcon(portrait);
+            	lbl.setIcon(icon);
+            }
         } catch (Exception err) {
             err.printStackTrace();
         }
@@ -379,7 +389,7 @@ public class ForceViewPanel extends javax.swing.JPanel {
 		for(Force f : force.getSubForces()) {
 			lblForce = new JLabel();
 			lblForce.setText(getSummaryFor(f));
-			setIcon(f, lblForce);
+			setIcon(f, lblForce, 72);
 			nexty++;
 			gridBagConstraints = new java.awt.GridBagConstraints();
 			gridBagConstraints.gridx = 0;

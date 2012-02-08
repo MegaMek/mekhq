@@ -479,7 +479,7 @@ public class CampaignGUI extends JPanel {
 		orgTree.setModel(orgModel);
 		orgTree.addMouseListener(orgMouseAdapter);
         orgTree.setCellRenderer(new ForceRenderer());
-        orgTree.setRowHeight(50);
+        orgTree.setRowHeight(60);
         orgTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         orgTree.addTreeSelectionListener(new TreeSelectionListener() {
             public void valueChanged(TreeSelectionEvent e) {
@@ -5291,11 +5291,11 @@ public class CampaignGUI extends JPanel {
             try {
                 portrait = (Image) getPortraits().getItem(category, file);
                 if(null != portrait) {
-                    portrait = portrait.getScaledInstance(50, -1, Image.SCALE_DEFAULT);               
+                    portrait = portrait.getScaledInstance(58, -1, Image.SCALE_DEFAULT);               
                 } else {
                 	portrait = (Image) getPortraits().getItem("", "default.gif");
                 	if(null != portrait) {
-                        portrait = portrait.getScaledInstance(50, -1, Image.SCALE_DEFAULT);               
+                        portrait = portrait.getScaledInstance(58, -1, Image.SCALE_DEFAULT);               
                 	}
                 }
                 return new ImageIcon(portrait);
@@ -5322,10 +5322,15 @@ public class CampaignGUI extends JPanel {
             Image portrait = null;
             try {
            	 portrait = (Image) getForceIcons().getItem(category, file);
-           	 if(null == portrait) {
-           		portrait = (Image) getForceIcons().getItem("", "empty.png");
-           	 }
-           	 return new ImageIcon(portrait);
+           	if(null != portrait) {
+                portrait = portrait.getScaledInstance(58, -1, Image.SCALE_DEFAULT);               
+            } else {
+            	portrait = (Image) getForceIcons().getItem("", "empty.png");
+            	if(null != portrait) {
+                    portrait = portrait.getScaledInstance(58, -1, Image.SCALE_DEFAULT);               
+            	}
+            }
+           	return new ImageIcon(portrait);
             } catch (Exception err) {
            	 err.printStackTrace();
            	 return null;     	
