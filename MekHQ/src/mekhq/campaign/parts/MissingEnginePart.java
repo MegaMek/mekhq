@@ -140,6 +140,10 @@ public class MissingEnginePart extends MissingPart {
 				 +"<engineFlags>"
 				 +engine.getFlags()
 				 +"</engineFlags>");
+		 pw1.println(MekHqXmlUtil.indentStr(indent+1)
+					+"<forHover>"
+					+forHover
+					+"</forHover>");
 		writeToXmlEnd(pw1, indent);
 	}
 

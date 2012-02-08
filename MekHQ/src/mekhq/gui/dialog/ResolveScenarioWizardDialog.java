@@ -990,7 +990,7 @@ public class ResolveScenarioWizardDialog extends javax.swing.JDialog {
         String recoverUnits = "";
         String missUnits = "";
         for(Unit u : tracker.getRecoveredUnits()) {
-        	recoverUnits += u.getName();
+        	recoverUnits += u.getName() + "\n";
         }
         for(int i = 0; i < unitBoxes.size(); i++) {
     		JCheckBox box = unitBoxes.get(i);
