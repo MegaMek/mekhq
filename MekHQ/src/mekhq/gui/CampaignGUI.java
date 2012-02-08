@@ -5413,6 +5413,8 @@ public class CampaignGUI extends JPanel {
 				if(null != u) {
 					u.addPilotOrSoldier(selectedPerson);
 				}				
+				u.resetPilotAndEntity();
+				u.runDiagnostic();
 				refreshServicedUnitList();
 				refreshUnitList();
 				refreshPersonnelList();
@@ -5431,6 +5433,8 @@ public class CampaignGUI extends JPanel {
                     	}
                     }
 				}				
+				u.resetPilotAndEntity();
+				u.runDiagnostic();
 				refreshServicedUnitList();
 				refreshUnitList();
 				refreshPersonnelList();
@@ -5445,6 +5449,8 @@ public class CampaignGUI extends JPanel {
 				if(null != u) {
 					u.addDriver(selectedPerson);
 				}
+				u.resetPilotAndEntity();
+				u.runDiagnostic();
 				refreshServicedUnitList();
 				refreshUnitList();
 				refreshPersonnelList();
@@ -5463,6 +5469,8 @@ public class CampaignGUI extends JPanel {
                         }
                     }
 				}
+				u.resetPilotAndEntity();
+				u.runDiagnostic();
 				refreshServicedUnitList();
 				refreshUnitList();
 				refreshPersonnelList();
@@ -5481,6 +5489,8 @@ public class CampaignGUI extends JPanel {
                         }
                     }
 				}
+				u.resetPilotAndEntity();
+				u.runDiagnostic();
 				refreshServicedUnitList();
 				refreshUnitList();
 				refreshPersonnelList();
@@ -5499,6 +5509,8 @@ public class CampaignGUI extends JPanel {
                         }
                     }
 				}
+				u.resetPilotAndEntity();
+				u.runDiagnostic();
 				refreshServicedUnitList();
 				refreshUnitList();
 				refreshPersonnelList();
@@ -5722,6 +5734,16 @@ public class CampaignGUI extends JPanel {
             int[] rows = personnelTable.getSelectedRows();
             for (Person person : people) {
                 if (Person.T_INFANTRY != person.getPrimaryRole()) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        
+        private boolean areAllBattleArmor(Person[] people) {
+            int[] rows = personnelTable.getSelectedRows();
+            for (Person person : people) {
+                if (Person.T_BA != person.getPrimaryRole()) {
                     return false;
                 }
             }
@@ -5954,6 +5976,25 @@ public class CampaignGUI extends JPanel {
                     JMenu soldierMenu = new JMenu("As Soldier");
                     JMenu gunnerMenu = new JMenu("As Gunner");
                     if (areAllInfantry(selected)) {
+                        menu = new JMenu("Assign to Unit");
+                        for (Unit unit : getCampaign().getUnits()) {
+                            if(unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
+                                cbMenuItem = new JCheckBoxMenuItem(unit.getName());
+                                //TODO: check the box
+                                cbMenuItem.setActionCommand("ADD_SOLDIER|" + unit.getId());
+                                cbMenuItem.addActionListener(this);
+                                soldierMenu.add(cbMenuItem);
+                            }
+                        }
+                        if(soldierMenu.getItemCount() > 0) {
+                            menu.add(soldierMenu);
+                            if(soldierMenu.getItemCount() > 20) {
+                                MenuScroller.setScrollerFor(soldierMenu, 20);
+                            }
+                        }
+                        menu.setEnabled(!person.isDeployed(getCampaign()));
+                        popup.add(menu);
+                    } else if (areAllBattleArmor(selected)) {
                         menu = new JMenu("Assign to Unit");
                         for (Unit unit : getCampaign().getUnits()) {
                             if(unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
