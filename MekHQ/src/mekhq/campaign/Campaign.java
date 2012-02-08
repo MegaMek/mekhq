@@ -3621,7 +3621,8 @@ public class Campaign implements Serializable {
     		addPerson(p);
     		unit.setNavigator(p);
     	}
-    	
+    	unit.resetPilotAndEntity();
+    	unit.runDiagnostic();   	
     }
     
     private int calculateDragoonRatingScore() {

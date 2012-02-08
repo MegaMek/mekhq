@@ -18,10 +18,12 @@ import javax.xml.transform.stream.StreamResult;
 
 import megamek.common.Aero;
 import megamek.common.AmmoType;
+import megamek.common.CommonConstants;
 import megamek.common.CriticalSlot;
 import megamek.common.Entity;
 import megamek.common.FighterSquadron;
 import megamek.common.IArmorState;
+import megamek.common.ILocationExposureStatus;
 import megamek.common.Jumpship;
 import megamek.common.Mech;
 import megamek.common.Mounted;
@@ -394,46 +396,55 @@ public class MekHqXmlUtil {
 	 */
 	private static String getLocString(Entity entity, int indentLvl) {
 		boolean isMech = entity instanceof Mech;
-		boolean haveSlot = false;
+        boolean haveSlot = false;
 		StringBuffer output = new StringBuffer();
 		StringBuffer thisLoc = new StringBuffer();
 		boolean isDestroyed = false;
-		boolean blownOff = false;
 
 		// Walk through the locations for the entity,
 		// and only record damage and ammo.
 		for (int loc = 0; loc < entity.locations(); loc++) {
+			
+			//if the location is blown off, remove it so we can get the real values
+        	boolean blownOff = entity.isLocationBlownOff(loc);
+        	
 			// Record destroyed locations.
 			if (!(entity instanceof Aero)
 					&& !(entity instanceof megamek.common.Infantry && !(entity instanceof megamek.common.BattleArmor))
 					&& entity.getOInternal(loc) != IArmorState.ARMOR_NA
-					&& entity.getInternal(loc) <= 0) {
+					&& entity.getInternalForReal(loc) <= 0) {
 				isDestroyed = true;
 			}
 
 			// Record damage to armor and internal structure.
 			// Destroyed locations have lost all their armor and IS.
-			if (!isDestroyed) {
-				if (entity.getOArmor(loc) != entity.getArmor(loc)) {
+			//if (!isDestroyed) {
+				if (entity.getOArmor(loc) != entity.getArmorForReal(loc)) {
 					thisLoc.append(MekHqXmlUtil.indentStr(indentLvl+1) + "<armor points=\"");
-					thisLoc.append(formatArmor(entity.getArmor(loc)));
+					thisLoc.append(formatArmor(entity.getArmorForReal(loc)));
 					thisLoc.append("\"/>\n");
 				}
 
-				if (entity.getOInternal(loc) != entity.getInternal(loc)) {
+				if (entity.getOInternal(loc) != entity.getInternalForReal(loc)) {
 					thisLoc.append(MekHqXmlUtil.indentStr(indentLvl+1) + "<armor points=\"");
-					thisLoc.append(formatArmor(entity.getInternal(loc)));
+					thisLoc.append(formatArmor(entity.getInternalForReal(loc)));
 					thisLoc.append("\" type=\"Internal\"/>\n");
 				}
 
 				if (entity.hasRearArmor(loc)
-						&& entity.getOArmor(loc, true) != entity.getArmor(loc,
+						&& entity.getOArmor(loc, true) != entity.getArmorForReal(loc,
 								true)) {
 					thisLoc.append(MekHqXmlUtil.indentStr(indentLvl+1) + "<armor points=\"");
-					thisLoc.append(formatArmor(entity.getArmor(loc, true)));
+					thisLoc.append(formatArmor(entity.getArmorForReal(loc, true)));
 					thisLoc.append("\" type=\"Rear\"/>\n");
 				}
-			}
+				if(entity.getLocationStatus(loc) == ILocationExposureStatus.BREACHED) {
+                    thisLoc.append(MekHqXmlUtil.indentStr(indentLvl+1) + "<breached/>\n");
+                }
+                if(blownOff) {
+                	thisLoc.append(MekHqXmlUtil.indentStr(indentLvl+1) + "<blownOff/>\n");
+                }
+			//}
 
 			// Walk through the slots in this location.
 			for (int loop = 0; loop < entity.getNumberOfCriticals(loc); loop++) {
@@ -462,24 +473,23 @@ public class MekHqXmlUtil {
 					// Destroyed locations on Mechs that contain slots
 					// that are missing but not hit or destroyed must
 					// have been blown off.
-					if (isDestroyed && isMech && slot.isMissing()
+					if (!isDestroyed && isMech && slot.isMissing()
 							&& !slot.isHit() && !slot.isDestroyed()) {
 						thisLoc.append(formatSlot(String.valueOf(loop + 1),
 								mount, slot.isHit(), slot.isDestroyed(),
-								slot.isRepairable(), indentLvl+1));
+								slot.isRepairable(), slot.isMissing(), indentLvl+1));
 						haveSlot = true;
-						blownOff = true;
-					} else if (!isDestroyed && slot.isDamaged()) { // Record damaged slots in undestroyed locations.
+					} else if (slot.isDamaged()) { // Record damaged slots.
 						thisLoc.append(formatSlot(String.valueOf(loop + 1),
 								mount, slot.isHit(), slot.isDestroyed(),
-								slot.isRepairable(), indentLvl+1));
+								slot.isRepairable(), slot.isMissing(), indentLvl+1));
 						haveSlot = true;
 					} else if (null != mount && mount.countQuirks() > 0) { // record any quirks
 						thisLoc.append(formatSlot(String.valueOf(loop + 1),
 								mount, slot.isHit(), slot.isDestroyed(),
-								slot.isRepairable(), indentLvl+1));
+								slot.isRepairable(), slot.isMissing(), indentLvl+1));
 						haveSlot = true;
-					} else if (!isDestroyed && mount != null
+					} else if (mount != null
 							&& mount.getType() instanceof AmmoType) {
 						// Record ammunition slots in undestroyed locations.
 						// N.B. the slot CAN\"T be damaged at this point.
@@ -491,13 +501,13 @@ public class MekHqXmlUtil {
 						thisLoc.append(String.valueOf(mount.getShotsLeft()));
 						thisLoc.append("\"/>\n");
 						haveSlot = true;
-					} else if (!isDestroyed && mount != null
+					} else if (mount != null
 							&& mount.getType() instanceof WeaponType
 							&& (mount.getType()).hasFlag(WeaponType.F_ONESHOT)) {
 						// Record the munition type of oneshot launchers
 						thisLoc.append(formatSlot(String.valueOf(loop + 1),
 								mount, slot.isHit(), slot.isDestroyed(),
-								slot.isRepairable(), indentLvl+1));
+								slot.isRepairable(), slot.isMissing(), indentLvl+1));
 						haveSlot = true;
 					}
 				} // End have-slot
@@ -510,7 +520,7 @@ public class MekHqXmlUtil {
 					// Is this ammo in the current location?
 					if (mount.getLocation() == loc) {
 						thisLoc.append(formatSlot("N/A", mount, false, false,
-								false, indentLvl+1));
+								false, false, indentLvl+1));
 						haveSlot = true;
 					}
 
@@ -523,12 +533,7 @@ public class MekHqXmlUtil {
 			if (thisLoc.length() > 0) {
 				// Add this location to the output string.
 				output.append(MekHqXmlUtil.indentStr(indentLvl) + "<location index=\"");
-				output.append(String.valueOf(loc));
-
-				if (isDestroyed) {
-					output.append("\" isDestroyed=\"true");
-				}
-				
+				output.append(String.valueOf(loc));		
 				output.append("\"> ");
 				output.append(entity.getLocationName(loc));
 				
@@ -542,16 +547,7 @@ public class MekHqXmlUtil {
 				// Reset the location buffer.
 				thisLoc = new StringBuffer();
 				blownOff = false;
-			} else if (isDestroyed) {
-				// If the location is completely destroyed, log it anyway.
-				// Add this location to the output string.
-				output.append(MekHqXmlUtil.indentStr(indentLvl) + "<location index=\"");
-				output.append(String.valueOf(loc));
-				output.append("\" isDestroyed=\"true\" /> ");
-				output.append(entity.getLocationName(loc));
-				output.append("\n");
-			} // End location-completely-destroyed
-
+			} 
 			// Reset the "location is destroyed" flag.
 			isDestroyed = false;
 		} // Handle the next location
@@ -617,7 +613,8 @@ public class MekHqXmlUtil {
 	 * @return a <code>String</code> describing the slot.
 	 */
 	private static String formatSlot(String index, Mounted mount,
-			boolean isHit, boolean isDestroyed, boolean isRepairable, int indentLvl) {
+			boolean isHit, boolean isDestroyed, boolean isRepairable, boolean isMissing, 
+			int indentLvl) {
 		StringBuffer output = new StringBuffer();
 
 		output.append(MekHqXmlUtil.indentStr(indentLvl) + "<slot index=\"");
@@ -655,11 +652,14 @@ public class MekHqXmlUtil {
 			output.append(String.valueOf(isHit));
 		}
 		
-		if (isHit) {
+		if (!isRepairable && (isHit || isDestroyed)) {
 			output.append("\" isRepairable=\"");
 			output.append(String.valueOf(isRepairable));
 		}
-		
+		if (isMissing) {
+            output.append("\" isMissing=\"");
+            output.append(String.valueOf(isMissing));
+        }
 		output.append("\" isDestroyed=\"");
 		output.append(String.valueOf(isDestroyed));
 		output.append("\"/>\n");
