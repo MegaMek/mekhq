@@ -77,6 +77,7 @@ v0.1.14 (SVN)
 + Bug 3473516: Force icons not resizing anymore - cropped
 + Bug 3482814: Missing carriage return on Recovered units
 + Bug 3485504: /n visible in mouseover of "Start Game" button
++ new MM.jar
 
 v0.1.13 (2012-01-11)
 + added campaign reference to all parts (should fix NPE refit bug)
