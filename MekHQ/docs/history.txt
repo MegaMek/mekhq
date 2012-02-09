@@ -2,6 +2,7 @@ VERSION HISTORY
 ----------------------------------
 v0.1.15 (SVN)
 + Bug 3486200: Previous version campaigns do not save...
++ updated princess_bot.properties
 
 v0.1.14 (2012-02-08)
 + don't include conventional infantry as salvage
