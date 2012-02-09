@@ -1,6 +1,6 @@
 VERSION HISTORY
 ----------------------------------
-v0.1.14 (SVN)
+v0.1.14 (2012-02-08)
 + don't include conventional infantry as salvage
 + random skills (more to come)
 + tweaking of age randomization by skill
