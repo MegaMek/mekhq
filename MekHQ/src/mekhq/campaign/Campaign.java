@@ -1238,6 +1238,10 @@ public class Campaign implements Serializable {
 		partIds.remove(new Integer(part.getId()));
 	}
 
+	public void removeKill(Kill k) {
+		kills.remove(k);
+	}
+	
 	public void removeForce(Force force) {
 		int fid = force.getId();
 		forceIds.remove(new Integer(fid));
@@ -2081,8 +2085,18 @@ public class Campaign implements Serializable {
 		for(Part p : retVal.parts) {
 			p.fixIdReferences(uHash, pHash);
 		}
+		ArrayList<Kill> ghostKills = new ArrayList<Kill>();
 		for(Kill k : retVal.kills) {
 			k.fixIdReferences(pHash);
+			if(null == k.getPilotId()) {
+				ghostKills.add(k);
+			}
+		}
+		//check for kills with missing person references
+		for(Kill k : ghostKills) {
+			if(null == k.getPilotId()) {
+				retVal.removeKill(k);
+			}
 		}
 	}
 	
