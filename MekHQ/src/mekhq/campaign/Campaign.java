@@ -2046,7 +2046,12 @@ public class Campaign implements Serializable {
 			unit.initializeParts(true);
 			unit.runDiagnostic();
 			if(!unit.isRepairable()) {
-				unit.setSalvage(true);
+				if(unit.getSalvageableParts().isEmpty()) {
+					//we shouldnt get here but some units seem to stick around for some reason
+					retVal.removeUnit(unit.getId());
+				} else {
+					unit.setSalvage(true);
+				}
 			}
 		}
 			
@@ -2411,6 +2416,9 @@ public class Campaign implements Serializable {
 
 			Unit u = Unit.generateInstanceFromXML(wn2, version);
 			
+			if(u.getEntity().getDisplayName().contains("Warhammer")) {
+				int bob = 1;
+			}
 			if (u != null) {
 				retVal.addUnit(u);
 			}
