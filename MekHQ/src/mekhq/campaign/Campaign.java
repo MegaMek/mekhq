@@ -704,7 +704,7 @@ public class Campaign implements Serializable {
 	public boolean isWorkingOnRefit(Person p) {
 		for(Unit u : units) {
 			if(u.isRefitting()) {
-				if(u.getRefit().getAssignedTeamId() == p.getId()) {
+				if(null != u.getRefit().getAssignedTeamId() && u.getRefit().getAssignedTeamId().equals(p.getId())) {
 					return true;
 				}					
 			}
@@ -726,7 +726,7 @@ public class Campaign implements Serializable {
     public int getPatientsFor(Person doctor) {
     	int patients = 0;
          for(Person person : getPersonnel()) {
-         	if(person.getAssignedTeamId() == doctor.getId()) {
+         	if(null != person.getAssignedTeamId() && person.getAssignedTeamId().equals(doctor.getId())) {
          		patients++;
          	}
          }
@@ -810,7 +810,7 @@ public class Campaign implements Serializable {
 		if(null == skill) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, doctor.getName( )+ " isn't a doctor, he just plays one on TV.");
 		}
-        if(medWork.getAssignedTeamId() != null && medWork.getAssignedTeamId() != doctor.getId() ) {
+        if(medWork.getAssignedTeamId() != null && !medWork.getAssignedTeamId().equals(doctor.getId()) ) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, medWork.getPatientName() + " is already being tended by another doctor");
         }      
         if(!medWork.needsFixing()) {
@@ -1217,7 +1217,7 @@ public class Campaign implements Serializable {
 	
 	public void removeAllPatientsFor(Person doctor) {
 		for(Person p : personnel) {
-			if(p.getAssignedTeamId() == doctor.getId()) {
+			if(null != p.getAssignedTeamId() && p.getAssignedTeamId().equals(doctor.getId())) {
 				p.setDoctorId(null);
 			}
 		}
@@ -3207,7 +3207,8 @@ public class Campaign implements Serializable {
         if(null != partWork.getUnit() && partWork.getUnit().isDeployed()) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "This unit is currently deployed!");
         } 
-        if(partWork.getAssignedTeamId() != null && partWork.getAssignedTeamId() != tech.getId() ) {
+        if(partWork.getAssignedTeamId() != null 
+        		&& !partWork.getAssignedTeamId().equals(tech.getId())) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Already being worked on by another team");
         }
         if(null == skill) {

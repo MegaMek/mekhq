@@ -401,6 +401,10 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 					+"</unitId>");
 		}
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<salvaging>"
+				+salvaging
+				+"</salvaging>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<workingOvertime>"
 				+workingOvertime
 				+"</workingOvertime>");
@@ -526,6 +530,12 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 						retVal.workingOvertime = true;
 					} else {
 						retVal.workingOvertime = false;
+					}
+				} else if (wn2.getNodeName().equalsIgnoreCase("salvaging")) {
+					if(wn2.getTextContent().equalsIgnoreCase("true")) {
+						retVal.salvaging = true;
+					} else {
+						retVal.salvaging = false;
 					}
 				} else if (wn2.getNodeName().equalsIgnoreCase("brandNew")) {
 					if(wn2.getTextContent().equalsIgnoreCase("true")) {

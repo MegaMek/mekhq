@@ -2058,7 +2058,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     	drivers.remove(p.getId());
     	gunners.remove(p.getId());
     	vesselCrew.remove(p.getId());
-    	if(p.getId() == navigator) {
+    	if(p.getId().equals(navigator)) {
     		navigator = null;
     	}
     	resetPilotAndEntity();
@@ -2172,11 +2172,11 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     }
     
     public boolean isCommander(Person person) {
-    	return person.getId() == getCommander().getId();
+    	return person.getId().equals(getCommander().getId());
     }    
     
     public boolean isNavigator(Person person) {
-    	return person.getId() == navigator;
+    	return person.getId().equals(navigator);
     }
     
     public void setRefit(Refit r) {
