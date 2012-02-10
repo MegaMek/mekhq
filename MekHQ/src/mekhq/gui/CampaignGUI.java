@@ -6463,6 +6463,9 @@ public class CampaignGUI extends JPanel {
         }
 
         public Person getPerson(int i) {
+        	if( i >= data.size()) {
+        		return null;
+        	}
             return data.get(i);
         }
 
@@ -7898,6 +7901,9 @@ public class CampaignGUI extends JPanel {
         }
 
         public Unit getUnit(int i) {
+        	if(i >= data.size()) {
+        		return null;
+        	}
             return data.get(i);
         }
 
