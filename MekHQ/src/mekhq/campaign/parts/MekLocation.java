@@ -370,8 +370,8 @@ public class MekLocation extends Part {
 			unit.removePart(this);
 			if(loc != Mech.LOC_CT) {
 				Part missing = getMissingPart();
-				campaign.addPart(missing);
 				unit.addPart(missing);
+				campaign.addPart(missing);
 			}
 			unit.runDiagnostic();
 		}

@@ -231,8 +231,8 @@ public class MekGyro extends Part {
 			}
 			unit.removePart(this);
 			Part missing = getMissingPart();
-			campaign.addPart(missing);
 			unit.addPart(missing);
+			campaign.addPart(missing);
 		}	
 		setUnit(null);
 	}

@@ -7,6 +7,7 @@ v0.1.15 (SVN)
 + Bug 3486199: GM mode remove person freezes personell tab
 + Bug 3486661: Armor replacement tasks not showing up
 + Bug: era mods option not saving with checkbox
++ Bug 3486666: Destroyed parts in warehouse
 
 v0.1.14 (2012-02-08)
 + don't include conventional infantry as salvage

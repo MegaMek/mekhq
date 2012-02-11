@@ -606,6 +606,10 @@ public class Campaign implements Serializable {
 
 	public void addPart(Part p) {
 		p.setBrandNew(false);
+		//dont add missing parts if they dont have units or units with not id
+		if(p instanceof MissingPart && (null == p.getUnit() || null == p.getUnitId())) {
+			return;
+		}
 		if(p instanceof Armor && null == p.getUnit()) {
 			for(Part part : getParts()) {
 				if(null != part.getUnit()) {

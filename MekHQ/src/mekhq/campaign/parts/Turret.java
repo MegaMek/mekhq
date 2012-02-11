@@ -149,8 +149,8 @@ public class Turret extends TankLocation {
 			}
 			unit.removePart(this);
 			Part missing = getMissingPart();
-			campaign.addPart(missing);
 			unit.addPart(missing);
+			campaign.addPart(missing);
 			((Tank)unit.getEntity()).unlockTurret();
 		}
 		setUnit(null);
