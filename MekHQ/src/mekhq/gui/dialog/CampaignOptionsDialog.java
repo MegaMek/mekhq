@@ -1724,6 +1724,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 	    
 	    // Rules panel
 	    options.setFactionModifiers(useFactionModifiersCheckBox.isSelected());
+	    options.setEraMods(useEraModsCheckBox.isSelected());
 	    String clanPriceModifierString = clanPriceModifierJFormattedTextField.getText();
 	    options.setClanPriceModifier(new Double(clanPriceModifierString));
 	    options.setUsedPartsValue(new Double(usedPartsValueJFormattedTextField.getText()));
