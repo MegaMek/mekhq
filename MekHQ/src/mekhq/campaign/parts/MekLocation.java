@@ -373,10 +373,11 @@ public class MekLocation extends Part {
 				campaign.addPart(missing);
 				unit.addPart(missing);
 			}
+			unit.runDiagnostic();
 		}
 		setUnit(null);
 	}
-
+	
 	@Override
 	public void updateConditionFromEntity() {
 		if(null != unit) {

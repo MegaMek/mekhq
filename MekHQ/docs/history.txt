@@ -5,6 +5,7 @@ v0.1.15 (SVN)
 + updated princess_bot.properties
 + Bug: equality comparison of UUIDs for person and unit must use equals method not == or !=
 + Bug 3486199: GM mode remove person freezes personell tab
++ Bug 3486661: Armor replacement tasks not showing up
 
 v0.1.14 (2012-02-08)
 + don't include conventional infantry as salvage

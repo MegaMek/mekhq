@@ -29,6 +29,7 @@ import megamek.common.IArmorState;
 import megamek.common.Mech;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
+import mekhq.campaign.Unit;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -308,6 +309,19 @@ public class MissingMekLocation extends MissingPart {
 	public void updateConditionFromPart() {
 		if(null != unit) {
 			unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, loc);
+		}
+	}
+	
+	@Override
+	public void fix() {
+		Part replacement = findReplacement(false);
+		if(null != replacement) {
+			Unit u = unit;
+			unit.addPart(replacement);
+			remove(false);
+			//assign the replacement part to the unit			
+			replacement.updateConditionFromPart();
+			u.runDiagnostic();
 		}
 	}
 }
