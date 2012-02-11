@@ -923,7 +923,14 @@ public class Campaign implements Serializable {
 				action = " seal ";
 			}
 		}
-		report += tech.getName() + " attempts to" + action + partWork.getPartName();   
+        if (partWork instanceof Armor) {
+            if (!((Armor)partWork).isInSupply()) {
+                report += "<b>Not enough armor remaining.  Task suspended.</b>";
+                addReport(report);
+                return;
+            }
+        }
+		report += tech.getName() + " attempts to" + action + partWork.getPartName();
 		int minutes = partWork.getTimeLeft();
 		int minutesUsed = minutes;
 		boolean usedOvertime = false;
@@ -3562,7 +3569,7 @@ public class Campaign implements Serializable {
      * If we remove a unit, we may need to update the duplicate identifier.
      * TODO: This function is super slow :(
      *
-     * @param id
+     * @param entity
      */
     private void checkDuplicateNamesDuringDelete(Entity entity) {
         Object o = duplicateNameHash.get(entity.getShortNameRaw());

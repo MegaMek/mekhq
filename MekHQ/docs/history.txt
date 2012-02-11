@@ -8,6 +8,7 @@ v0.1.15 (SVN)
 + Bug 3486661: Armor replacement tasks not showing up
 + Bug: era mods option not saving with checkbox
 + Bug 3486666: Destroyed parts in warehouse
++ Patch 3486634: Test For No Armor Between Days
 
 v0.1.14 (2012-02-08)
 + don't include conventional infantry as salvage

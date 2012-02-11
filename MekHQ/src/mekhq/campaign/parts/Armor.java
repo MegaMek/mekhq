@@ -662,4 +662,12 @@ public class Armor extends Part implements IAcquisitionWork {
 		skillMin = SkillType.EXP_GREEN;
 		return EquipmentType.armorNames[type] + " armor scrapped.";
 	}
+
+    @Override
+    public boolean isInSupply() {
+        int currentArmor = unit.getEntity().getArmorForReal(location, rear);
+        int fullArmor = unit.getEntity().getOArmor(location, rear);
+        int neededArmor = fullArmor - currentArmor;
+        return neededArmor < getAmountAvailable();
+    }
 }

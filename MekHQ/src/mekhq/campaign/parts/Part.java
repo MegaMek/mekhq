@@ -194,7 +194,6 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	
 	/**
 	 * This is the value of the part that may be affected by campaign options
-	 * @param c
 	 * @return
 	 */
 	public long getActualValue() {
@@ -798,5 +797,9 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	public boolean isPartForCriticalSlot(int index, int loc) {
 		return false;
 	}
+
+    public boolean isInSupply() {
+        return true;
+    }
 }
 
