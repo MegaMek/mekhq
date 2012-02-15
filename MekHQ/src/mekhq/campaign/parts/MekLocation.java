@@ -62,6 +62,7 @@ public class MekLocation extends Part {
     	clone.percent = this.percent;
     	clone.breached = this.breached;
     	clone.blownOff = this.blownOff;
+    	clone.time = this.time;
     	return clone;
     }
     
@@ -162,7 +163,8 @@ public class MekLocation extends Part {
     
     @Override
     public boolean isSamePartTypeAndStatus (Part part) {
-    	if(needsFixing() || part.needsFixing()) {
+    	if(isReservedForRefit() || isBeingWorkedOn()
+				|| part.isReservedForRefit() || part.isBeingWorkedOn()) {
     		return false;
     	}
         return part instanceof MekLocation
@@ -171,7 +173,8 @@ public class MekLocation extends Part {
                 && isTsm() == ((MekLocation)part).isTsm()
                 && getStructureType() == ((MekLocation) part).getStructureType()
                 && (!isArm() || forQuad == ((MekLocation)part).forQuad)
-                && this.getPercent() == ((MekLocation)part).getPercent();
+                && this.getPercent() == ((MekLocation)part).getPercent()
+                && part.getSkillMin() == this.getSkillMin();
     }
 
     public double getPercent() {

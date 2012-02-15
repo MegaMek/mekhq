@@ -51,6 +51,7 @@ public class MekSensor extends Part {
 	public MekSensor clone() {
 		MekSensor clone = new MekSensor(getUnitTonnage(), campaign);
 		clone.hits = this.hits;
+    	clone.time = this.time;
 		return clone;
 	}
 	
@@ -67,7 +68,8 @@ public class MekSensor extends Part {
 
     @Override
     public boolean isSamePartTypeAndStatus (Part part) {
-    	if(needsFixing() || part.needsFixing()) {
+    	if(isReservedForRefit() || isBeingWorkedOn()
+				|| part.isReservedForRefit() || part.isBeingWorkedOn()) {
     		return false;
     	}
     	//the cost of sensors varies by tonnage, so according to
@@ -75,7 +77,8 @@ public class MekSensor extends Part {
     	//between meks of the same tonnage
         return part instanceof MekSensor
                 && getUnitTonnage() == part.getUnitTonnage()
-                && this.getHits() == part.getHits();
+                && this.getHits() == part.getHits()
+                && part.getSkillMin() == this.getSkillMin();
     }
 
     @Override

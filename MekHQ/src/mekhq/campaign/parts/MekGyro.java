@@ -63,6 +63,7 @@ public class MekGyro extends Part {
     public MekGyro clone() {
     	MekGyro clone = new MekGyro(getUnitTonnage(), type, gyroTonnage, campaign);
     	clone.hits = this.hits;
+    	clone.time = this.time;
     	return clone;
     }
     
@@ -111,13 +112,15 @@ public class MekGyro extends Part {
  
     @Override
     public boolean isSamePartTypeAndStatus (Part part) {
-    	if(isReservedForRefit()) {
+    	if(isReservedForRefit() || isBeingWorkedOn()
+				|| part.isReservedForRefit() || part.isBeingWorkedOn()) {
     		return false;
     	}
         return part instanceof MekGyro
                 && getType() == ((MekGyro) part).getType()
                 && getTonnage() == ((MekGyro) part).getTonnage()
-                && this.getHits() == part.getHits();
+                && this.getHits() == part.getHits()
+                && part.getSkillMin() == this.getSkillMin();
     }
 
     @Override

@@ -53,6 +53,7 @@ public class FireControlSystem extends Part {
     public FireControlSystem clone() {
     	FireControlSystem clone = new FireControlSystem(0, campaign);
     	clone.hits = this.hits;
+    	clone.time = this.time;
     	return clone;
     }
     
@@ -157,10 +158,12 @@ public class FireControlSystem extends Part {
 
 	@Override
 	public boolean isSamePartTypeAndStatus(Part part) {
-		if(isReservedForRefit()) {
+		if(isReservedForRefit() || isBeingWorkedOn()
+				|| part.isReservedForRefit() || part.isBeingWorkedOn()) {
     		return false;
     	}
-		return part instanceof FireControlSystem && this.needsFixing() == part.needsFixing();
+		return part instanceof FireControlSystem && this.needsFixing() == part.needsFixing()
+				&& part.getSkillMin() == this.getSkillMin();
 	}
 
 	@Override

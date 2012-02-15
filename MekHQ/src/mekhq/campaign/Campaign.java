@@ -886,7 +886,7 @@ public class Campaign implements Serializable {
 			} else {
 				int roll;
 				String wrongType = "";
-				if(tech.isRightTechTypeFor(r.getOriginalUnit())) {	
+				if(tech.isRightTechTypeFor(r)) {	
 					roll = Compute.d6(2);
 				} else {
 					roll = Utilities.roll3d6();
@@ -981,7 +981,7 @@ public class Campaign implements Serializable {
 		//check for the type
 		int roll;
 		String wrongType = "";
-		if(tech.isRightTechTypeFor(partWork.getUnit())) {	
+		if(tech.isRightTechTypeFor(partWork)) {	
 			roll = Compute.d6(2);
 		} else {
 			roll = Utilities.roll3d6();
@@ -1070,7 +1070,7 @@ public class Campaign implements Serializable {
 		//concurrent mod problems
 		ArrayList<Integer> assignedPartIds = new ArrayList<Integer>();
 		for(Part part : getParts()) {
-			if(null != part.getUnit() && part.getAssignedTeamId() != null) {
+			if(part.getAssignedTeamId() != null) {
 				assignedPartIds.add(part.getId());
 			}
 			if(part instanceof IAcquisitionWork) {
@@ -1088,6 +1088,14 @@ public class Campaign implements Serializable {
 				}
 				if(null != tech) {
 					fixPart(part, tech);
+				}
+				//check to see if this part can now be combined with other spare parts
+				if(part.isSpare()) {
+					Part spare = checkForExistingSparePart(part);
+					if(null != spare) {
+						spare.incrementQuantity();
+						removePart(part);
+					}
 				}
 			}
 		}
@@ -1447,7 +1455,7 @@ public class Campaign implements Serializable {
 	public ArrayList<Part> getSpareParts() {
 		ArrayList<Part> spares = new ArrayList<Part>();
 		for(Part part : getParts()) {
-			if(null == part.getUnit()) {
+			if(part.isSpare()) {
 				spares.add(part);
 			}
 		}
@@ -4015,7 +4023,7 @@ public class Campaign implements Serializable {
 			if(spare.getId() == part.getId()) {
 				continue;
 			}
-			if(spare.isSamePartTypeAndStatus(part)) {
+			if(part.isSamePartTypeAndStatus(spare)) {
 				return spare;
 			}
 		}

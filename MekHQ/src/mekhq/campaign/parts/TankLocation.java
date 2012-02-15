@@ -56,6 +56,7 @@ public class TankLocation extends Part {
     	clone.loc = this.loc;
     	clone.damage = this.damage;
     	clone.breached = this.breached;
+    	clone.time = this.time;
     	return clone;
     }
     
@@ -94,14 +95,16 @@ public class TankLocation extends Part {
 
     @Override
     public boolean isSamePartTypeAndStatus (Part part) {
-    	if(isReservedForRefit()) {
+    	if(isReservedForRefit() || isBeingWorkedOn()
+				|| part.isReservedForRefit() || part.isBeingWorkedOn()) {
     		return false;
     	}
         return part instanceof TankLocation 
         		&& getLoc() == ((TankLocation)part).getLoc() 
         		&& getUnitTonnage() == ((TankLocation)part).getUnitTonnage()
-        		&& this.getDamage() == ((TankLocation)part).getDamage();
-    }
+        		&& this.getDamage() == ((TankLocation)part).getDamage()
+        		&& part.getSkillMin() == this.getSkillMin();
+    }	
 
     public int getDamage() {
     	return damage;

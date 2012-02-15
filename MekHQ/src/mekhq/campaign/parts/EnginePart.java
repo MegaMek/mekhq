@@ -62,6 +62,7 @@ public class EnginePart extends Part {
 	public EnginePart clone() {
 		EnginePart clone = new EnginePart(0, new Engine(engine.getRating(), engine.getEngineType(), engine.getFlags()), campaign, forHover);
 		clone.hits = this.hits;
+    	clone.time = this.time;
 		return clone;
 	}
 
@@ -130,7 +131,8 @@ public class EnginePart extends Part {
 
 	@Override
 	public boolean isSamePartTypeAndStatus(Part part) {
-		if(isReservedForRefit()) {
+		if(isReservedForRefit() || isBeingWorkedOn()
+				|| part.isReservedForRefit() || part.isBeingWorkedOn()) {
     		return false;
     	}
 		return part instanceof EnginePart
@@ -144,7 +146,8 @@ public class EnginePart extends Part {
 				&& getEngine().hasFlag(Engine.TANK_ENGINE) == ((EnginePart) part).getEngine().hasFlag(Engine.TANK_ENGINE)
 				&& getUnitTonnage() == ((EnginePart) part).getUnitTonnage()
 				&& getTonnage() == ((EnginePart)part).getTonnage()
-				&& this.getHits() == part.getHits();
+				&& this.getHits() == part.getHits()
+				&& part.getSkillMin() == this.getSkillMin();
 	}
 
 	@Override

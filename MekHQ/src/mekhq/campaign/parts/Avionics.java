@@ -53,6 +53,7 @@ public class Avionics extends Part {
     public Avionics clone() {
     	Avionics clone = new Avionics(0, campaign);
     	clone.hits = this.hits;
+    	clone.time = this.time;
     	return clone;
     }
         
@@ -165,10 +166,12 @@ public class Avionics extends Part {
 
 	@Override
 	public boolean isSamePartTypeAndStatus(Part part) {
-		if(isReservedForRefit()) {
+		if(isReservedForRefit() || isBeingWorkedOn()
+				|| part.isReservedForRefit() || part.isBeingWorkedOn()) {
     		return false;
     	}
-		return part instanceof Avionics && part.needsFixing() == this.needsFixing();
+		return part instanceof Avionics && part.needsFixing() == this.needsFixing()
+				&& part.getSkillMin() == this.getSkillMin();
 	}
 
 	@Override

@@ -53,6 +53,7 @@ public class LandingGear extends Part {
     public LandingGear clone() {
     	LandingGear clone = new LandingGear(0, campaign);
     	clone.hits = this.hits;
+    	clone.time = this.time;
     	return clone;
     }
     
@@ -159,11 +160,13 @@ public class LandingGear extends Part {
 
 	@Override
 	public boolean isSamePartTypeAndStatus(Part part) {
-		if(isReservedForRefit()) {
+		if(isReservedForRefit() || isBeingWorkedOn()
+				|| part.isReservedForRefit() || part.isBeingWorkedOn()) {
     		return false;
     	}
 		return part instanceof LandingGear
-				&& this.getHits() == part.getHits();
+				&& this.getHits() == part.getHits()
+						&& part.getSkillMin() == this.getSkillMin();
 	}
 
 	@Override

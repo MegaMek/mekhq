@@ -56,6 +56,7 @@ public class MekCockpit extends Part {
 	public MekCockpit clone() {
 		MekCockpit clone = new MekCockpit(getUnitTonnage(), type, campaign);
 		clone.hits = this.hits;
+    	clone.time = this.time;
 		return clone;
 	}
 	
@@ -103,10 +104,14 @@ public class MekCockpit extends Part {
 	
     @Override
     public boolean isSamePartTypeAndStatus (Part part) {
-    	if(isReservedForRefit()) {
+    	if(isReservedForRefit() || isBeingWorkedOn()
+				|| part.isReservedForRefit() || part.isBeingWorkedOn()) {
     		return false;
     	}
-        return part instanceof MekCockpit && ((MekCockpit)part).getType() == type && this.needsFixing() == part.needsFixing();
+        return part instanceof MekCockpit 
+        		&& ((MekCockpit)part).getType() == type 
+        		&& this.needsFixing() == part.needsFixing()
+        		&& part.getSkillMin() == this.getSkillMin();
     }
     
     public int getType() {

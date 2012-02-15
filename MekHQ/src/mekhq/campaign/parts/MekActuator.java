@@ -50,6 +50,7 @@ public class MekActuator extends Part {
 	public MekActuator clone() {
 		MekActuator clone = new MekActuator(getUnitTonnage(), type, location, campaign);
 		clone.hits = this.hits;
+    	clone.time = this.time;
 		return clone;
 	}
 	
@@ -124,13 +125,15 @@ public class MekActuator extends Part {
 
     @Override
     public boolean isSamePartTypeAndStatus (Part part) {
-    	if(isReservedForRefit()) {
+    	if(isReservedForRefit() || isBeingWorkedOn()
+				|| part.isReservedForRefit() || part.isBeingWorkedOn()) {
     		return false;
     	}
         return part instanceof MekActuator
                 && getType() == ((MekActuator)part).getType()
                 && getUnitTonnage() == ((MekActuator)part).getUnitTonnage()
-                && this.needsFixing() == part.needsFixing();
+                && this.needsFixing() == part.needsFixing()
+                && part.getSkillMin() == this.getSkillMin();
     }
 
     @Override

@@ -50,18 +50,21 @@ public class Rotor extends TankLocation {
     	clone.loc = this.loc;
     	clone.damage = this.damage;
     	clone.breached = this.breached;
+    	clone.time = this.time;
     	return clone;
     }
  
     @Override
     public boolean isSamePartTypeAndStatus (Part part) {
-    	if(isReservedForRefit()) {
+    	if(isReservedForRefit() || isBeingWorkedOn()
+				|| part.isReservedForRefit() || part.isBeingWorkedOn()) {
     		return false;
     	}
         return part instanceof Rotor 
         		&& getLoc() == ((Rotor)part).getLoc() 
         		&& getUnitTonnage() == ((Rotor)part).getUnitTonnage()
-        		&& this.getDamage() == ((Rotor)part).getDamage();
+        		&& this.getDamage() == ((Rotor)part).getDamage()
+        		&& part.getSkillMin() == this.getSkillMin();
     }
 
 	@Override

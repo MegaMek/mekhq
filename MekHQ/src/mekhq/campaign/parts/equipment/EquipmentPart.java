@@ -112,6 +112,7 @@ public class EquipmentPart extends Part {
     public EquipmentPart clone() {
     	EquipmentPart clone = new EquipmentPart(getUnitTonnage(), type, equipmentNum, campaign);
     	clone.hits = this.hits;
+    	clone.time = this.time;
     	return clone;
     }
     
@@ -145,13 +146,15 @@ public class EquipmentPart extends Part {
 
     @Override
     public boolean isSamePartTypeAndStatus (Part part) {
-    	if(isReservedForRefit()) {
+    	if(isReservedForRefit() || isBeingWorkedOn()
+				|| part.isReservedForRefit() || part.isBeingWorkedOn()) {
     		return false;
     	}
         return part instanceof EquipmentPart
         		&& getType().equals(((EquipmentPart)part).getType())
         		&& getTonnage() == part.getTonnage()
-        		&& (this.getHits() > 0) == (part.getHits() > 0) && this.getDifficulty() == part.getDifficulty();
+        		&& (this.getHits() > 0) == (part.getHits() > 0) && this.getDifficulty() == part.getDifficulty()
+        		&& part.getSkillMin() == this.getSkillMin();
     }
 
     @Override

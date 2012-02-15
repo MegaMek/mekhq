@@ -213,6 +213,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		}
 		if(needsFixing()) {
 			cost *= campaign.getCampaignOptions().getDamagedPartsValue();
+			//TODO: parts that cant be fixed should also be further reduced in price
 		} else if(!isBrandNew()) {
 			cost *= campaign.getCampaignOptions().getUsedPartsValue();
 		}
@@ -288,6 +289,28 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 			toReturn += "<br/><i>" + getCurrentModeName() + "</i>";
 		}
 		toReturn += "</font></html>";
+		return toReturn;
+	}
+	
+	public String getRepairDesc() {
+		String toReturn = "";
+		if(needsFixing()) {
+			String scheduled = "";
+			if (getAssignedTeamId() != null) {
+				scheduled = " (scheduled) ";
+			}
+			String bonus = getAllMods().getValueAsString();
+			if (getAllMods().getValue() > -1) {
+				bonus = "+" + bonus;
+			}
+			bonus = "(" + bonus + ")";
+			toReturn += getTimeLeft() + " minutes" + scheduled;
+			toReturn += ", " + SkillType.getExperienceLevelName(getSkillMin());
+			toReturn += " " + bonus;
+			if (getMode() != Modes.MODE_NORMAL) {
+				toReturn += ", " + getCurrentModeName();
+			}
+		}
 		return toReturn;
 	}
 	
@@ -828,6 +851,10 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     	if(quantity <= 0) {
     		campaign.removePart(this);
     	}
+    }
+    
+    public boolean isSpare() {
+    	return null == unit;
     }
 }
 

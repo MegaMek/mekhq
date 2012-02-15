@@ -3572,7 +3572,7 @@ public class CampaignGUI extends JPanel {
         		}
         		TechTableModel techModel = entry.getModel();
         		Person tech = techModel.getTechAt(entry.getIdentifier());
-        		if(!tech.isRightTechTypeFor(unit) && !btnShowAllTechs.isSelected()) {
+        		if(!tech.isRightTechTypeFor(part) && !btnShowAllTechs.isSelected()) {
         			return false;
         		}
         		Skill skill = tech.getSkillForWorkingOn(part);
@@ -7138,10 +7138,11 @@ public class CampaignGUI extends JPanel {
 		private final static int COL_DETAIL   =   1;
 		private final static int COL_TECH_BASE  = 2;
 		private final static int COL_STATUS   =   3;
-		private final static int COL_COST     =   4;
-		private final static int COL_QUANTITY   = 5;
-		private final static int COL_TON       =  6;
-		private final static int N_COL          = 7;
+		private final static int COL_REPAIR   =   4;
+		private final static int COL_QUANTITY   = 6;
+		private final static int COL_COST     =   5;
+		private final static int COL_TON       =  7;
+		private final static int N_COL          = 8;
 		
 		public PartsTableModel() {
 			data = new ArrayList<Part>();
@@ -7172,6 +7173,8 @@ public class CampaignGUI extends JPanel {
                     return "Detail";
                 case COL_TECH_BASE:
                     return "Tech Base";
+                case COL_REPAIR:
+                	return "Repair Details";
                 default:
                     return "?";
             }
@@ -7206,6 +7209,9 @@ public class CampaignGUI extends JPanel {
 			if(col == COL_TECH_BASE) {
 				return part.getTechBaseName();
 			}
+			if(col == COL_REPAIR) {
+				return part.getRepairDesc();
+			}
 			return "?";
 		}
 		
@@ -7218,12 +7224,17 @@ public class CampaignGUI extends JPanel {
 	            switch(c) {
 	            case COL_NAME:
 	        	case COL_DETAIL:
-	        		return 100;
+	        		return 120;
+	        	case COL_REPAIR:
+	        		return 150;
 	            case COL_STATUS:
+	                return 40;      
 	            case COL_TECH_BASE:
-	                return 40;        
+	            	return 20;
+	            case COL_COST:
+	            	return 10;
 	            default:
-	                return 10;
+	                return 5;
 	            }
 	        }
 	        
@@ -7308,6 +7319,23 @@ public class CampaignGUI extends JPanel {
 				refreshReport();
 				refreshFunds();
 				refreshFinancialTransactions();
+			} else if (command.contains("REPAIR")) {
+				String sel = command.split(":")[1];
+				Person tech = getCampaign().getPerson(UUID.fromString(sel));
+				if(null != tech && null != selectedPart) {
+					//clone a new part and decrement quantity, so we can work with a single part
+					Part repairable = selectedPart.clone();
+					repairable.setMode(selectedPart.getMode());
+					selectedPart.decrementQuantity();
+					getCampaign().fixPart(repairable, tech);
+					getCampaign().addPart(repairable);
+				}
+				refreshPartsList();
+				refreshTaskList();
+				refreshAcquireList();
+				refreshReport();
+				refreshTechsList();
+				refreshPersonnelList();
 			} else if(command.equalsIgnoreCase("SELL_N")) {
 				if(null != selectedPart) {
 					PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(
@@ -7379,6 +7407,8 @@ public class CampaignGUI extends JPanel {
 							continue;
 						}
 						menuItem = new JMenuItem(tech.getName() + " (" + target.getValueAsString() + "+), " + tech.getMinutesLeft() + " minutes left");
+						menuItem.setActionCommand("REPAIR:" + tech.getId().toString());
+						menuItem.addActionListener(this);
 						menu.add(menuItem);
 					}
 					if(menu.getItemCount() > 20) {

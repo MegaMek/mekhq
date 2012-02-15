@@ -51,6 +51,7 @@ public class MekLifeSupport extends Part {
 	public MekLifeSupport clone() {
 		MekLifeSupport clone = new MekLifeSupport(getUnitTonnage(), campaign);
 		clone.hits = this.hits;
+    	clone.time = this.time;
 		return clone;
 	}
 	
@@ -67,10 +68,12 @@ public class MekLifeSupport extends Part {
 
     @Override
     public boolean isSamePartTypeAndStatus (Part part) {
-    	if(isReservedForRefit()) {
+    	if(isReservedForRefit() || isBeingWorkedOn()
+				|| part.isReservedForRefit() || part.isBeingWorkedOn()) {
     		return false;
     	}
-        return part instanceof MekLifeSupport && this.getHits() == part.getHits();
+        return part instanceof MekLifeSupport && this.getHits() == part.getHits()
+				&& part.getSkillMin() == this.getSkillMin();
     }
     
     @Override

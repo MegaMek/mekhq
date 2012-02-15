@@ -63,6 +63,7 @@ public class Turret extends TankLocation {
     	clone.loc = this.loc;
     	clone.damage = this.damage;
     	clone.breached = this.breached;
+    	clone.time = this.time;
     	return clone;
     }
     
@@ -88,13 +89,15 @@ public class Turret extends TankLocation {
 
     @Override
     public boolean isSamePartTypeAndStatus (Part part) {
-    	if(isReservedForRefit()) {
+    	if(isReservedForRefit() || isBeingWorkedOn()
+				|| part.isReservedForRefit() || part.isBeingWorkedOn()) {
     		return false;
     	}
         return part instanceof Turret 
         		&& getLoc() == ((Turret)part).getLoc() 
         		&& getUnitTonnage() == ((Turret)part).getUnitTonnage()
-        		&& this.getDamage() == ((Turret)part).getDamage();
+        		&& this.getDamage() == ((Turret)part).getDamage()
+        		&& part.getSkillMin() == this.getSkillMin();
     }
 
 	@Override

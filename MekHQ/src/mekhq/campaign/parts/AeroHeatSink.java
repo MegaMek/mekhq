@@ -61,6 +61,7 @@ public class AeroHeatSink extends Part {
     public AeroHeatSink clone() {
     	AeroHeatSink clone = new AeroHeatSink(getUnitTonnage(), type, campaign);
     	clone.hits = this.hits;
+    	clone.time = this.time;
     	return clone;
     }
         
@@ -201,10 +202,14 @@ public class AeroHeatSink extends Part {
 
 	@Override
 	public boolean isSamePartTypeAndStatus(Part part) {
-		if(isReservedForRefit()) {
+		if(isReservedForRefit() || isBeingWorkedOn()
+				|| part.isReservedForRefit() || part.isBeingWorkedOn()) {
     		return false;
     	}
-		return part instanceof AeroHeatSink && type == ((AeroHeatSink)part).getType() && part.getHits() == this.getHits();
+		return part instanceof AeroHeatSink 
+				&& type == ((AeroHeatSink)part).getType() 
+				&& part.getHits() == this.getHits()
+				&& part.getSkillMin() == this.getSkillMin();
 	}
 
 	public int getType() {

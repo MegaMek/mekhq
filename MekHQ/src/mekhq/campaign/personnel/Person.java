@@ -1777,7 +1777,12 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
          return toReturn;
     }
     
-    public boolean isRightTechTypeFor(Unit unit) {
+    public boolean isRightTechTypeFor(IPartWork part) {
+    	Unit unit = part.getUnit();
+    	if(null == unit) {
+    		//TODO: figure this out
+    		return isTech();
+    	}
     	if(unit.getEntity() instanceof Mech) {
     		return hasSkill(SkillType.S_TECH_MECH);
     	}
