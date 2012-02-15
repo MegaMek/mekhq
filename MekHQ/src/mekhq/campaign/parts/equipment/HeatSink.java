@@ -79,17 +79,17 @@ public class HeatSink extends EquipmentPart {
 				} 
 				hits = unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_EQUIPMENT, equipmentNum, mounted.getLocation());
 			}
-			if(hits == 0) {
-				time = 0;
-				difficulty = 0;
-			} else if(hits > 0) {
-				this.time = 120;
-				this.difficulty = -1;
-			}
-			if(isSalvaging()) {
-				this.time = 90;
-				this.difficulty = -2;
-			}
+		}
+		if(hits == 0) {
+			time = 0;
+			difficulty = 0;
+		} else if(hits > 0) {
+			this.time = 120;
+			this.difficulty = -1;
+		}
+		if(isSalvaging()) {
+			this.time = 90;
+			this.difficulty = -2;
 		}
 	}
 

@@ -30,6 +30,7 @@ import megamek.common.Mech;
 import megamek.common.TechConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
+import mekhq.campaign.personnel.SkillType;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -233,7 +234,9 @@ public class MekCockpit extends Part {
 			unit.addPart(missing);
 			campaign.addPart(missing);
 		}
-		setUnit(null);	
+		setSalvaging(false);
+		setUnit(null);
+		updateConditionFromEntity();
 	}
 
 	@Override
@@ -251,21 +254,20 @@ public class MekCockpit extends Part {
 					}
 				}
 			}
-			if(hits == 0) {
-				time = 0;
-				difficulty = 0;
-			} 
-			else {
-				//TODO: These are made up values until the errata establish them
-				time = 200;
-				difficulty = 3;
-			}
-			if(isSalvaging()) {
-				this.time = 300;
-				this.difficulty = 0;
-			}
 		}
-		
+		if(hits == 0) {
+			time = 0;
+			difficulty = 0;
+		} 
+		else {
+			//TODO: These are made up values until the errata establish them
+			time = 200;
+			difficulty = 3;
+		}
+		if(isSalvaging()) {
+			this.time = 300;
+			this.difficulty = 0;
+		}
 	}
 
 	@Override
@@ -321,5 +323,10 @@ public class MekCockpit extends Part {
 	 @Override
 	 public boolean isPartForCriticalSlot(int index, int loc) {
 		 return Mech.SYSTEM_COCKPIT == index;
+	 }
+	 
+	 @Override
+	 public boolean isRightTechType(String skillType) {
+		 return skillType.equals(SkillType.S_TECH_MECH);
 	 }
 }

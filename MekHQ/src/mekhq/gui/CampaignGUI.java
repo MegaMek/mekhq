@@ -71,6 +71,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.DropMode;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
@@ -82,9 +83,11 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.JTree;
 import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
@@ -297,6 +300,7 @@ public class CampaignGUI extends JPanel {
 	private TableRowSorter<UnitTableModel> unitSorter;
 	private TableRowSorter<ServicedUnitTableModel> servicedUnitSorter;
 	private TableRowSorter<TechTableModel> techSorter;
+	private TableRowSorter<TechTableModel> whTechSorter;
 	private UUID currentPatientId;
 	private UUID currentDoctorId;
 		
@@ -384,12 +388,15 @@ public class CampaignGUI extends JPanel {
 		servicedUnitTable = new javax.swing.JTable();
 		scrollTechTable = new javax.swing.JScrollPane();
 		TechTable = new javax.swing.JTable();
+		scrollWhTechTable = new javax.swing.JScrollPane();
+		whTechTable = new javax.swing.JTable();
 		panelDoTask = new javax.swing.JPanel();
 		btnDoTask = new javax.swing.JButton();
 		lblTarget = new javax.swing.JLabel();
 		lblTargetNum = new javax.swing.JLabel();
 		astechPoolLabel = new javax.swing.JLabel();
-		jScrollPane6 = new javax.swing.JScrollPane();
+		astechPoolLabelWarehouse = new javax.swing.JLabel();
+		scrTextTarget = new javax.swing.JScrollPane();
 		textTarget = new javax.swing.JTextArea();
 		panSupplies = new javax.swing.JPanel();
 		scrollPartsTable = new javax.swing.JScrollPane();
@@ -408,6 +415,7 @@ public class CampaignGUI extends JPanel {
 		btnAdvanceDay = new javax.swing.JButton();
 		btnOvertime = new javax.swing.JToggleButton();
 		btnShowAllTechs = new javax.swing.JToggleButton();
+		btnShowAllTechsWarehouse = new javax.swing.JToggleButton();
 		btnGMMode = new javax.swing.JToggleButton();
 		lblRating = new javax.swing.JLabel();
 		lblFunds = new javax.swing.JLabel();
@@ -1184,9 +1192,129 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.weighty = 1.0;
 		panSupplies.add(scrollPartsTable, gridBagConstraints);
 
+		JPanel panelDoTaskWarehouse = new JPanel(new GridBagLayout());
+	
+		btnDoTaskWarehouse = new JButton(resourceMap.getString("btnDoTask.text")); // NOI18N
+		btnDoTaskWarehouse.setToolTipText(resourceMap.getString("btnDoTask.toolTipText")); // NOI18N
+		btnDoTaskWarehouse.setEnabled(false);
+		btnDoTaskWarehouse.setName("btnDoTask"); // NOI18N
+		btnDoTaskWarehouse.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				doTask();
+			}
+		});
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 0;
+		panelDoTaskWarehouse.add(btnDoTaskWarehouse, gridBagConstraints);
+
+		JLabel lblTargetWarehouse = new JLabel(resourceMap.getString("lblTarget.text")); // NOI18N
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 1;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.SOUTH;
+		panelDoTaskWarehouse.add(lblTargetWarehouse, gridBagConstraints);
+
+		lblTargetNumWarehouse = new JLabel(resourceMap.getString("lblTargetNum.text"));
+		lblTargetNumWarehouse.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 2;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
+		panelDoTaskWarehouse.add(lblTargetNumWarehouse, gridBagConstraints);
+
+		textTargetWarehouse = new JTextArea();
+		textTargetWarehouse.setColumns(20);
+		textTargetWarehouse.setEditable(false);
+		textTargetWarehouse.setLineWrap(true);
+		textTargetWarehouse.setRows(5);
+		textTargetWarehouse.setText(resourceMap.getString("textTarget.text")); // NOI18N
+		textTargetWarehouse.setWrapStyleWord(true);
+		textTargetWarehouse.setBorder(null);
+		textTargetWarehouse.setName("textTarget"); // NOI18N
+		JScrollPane scrTargetWarehouse = new JScrollPane(textTargetWarehouse);
+		
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 1;
+		gridBagConstraints.gridy = 0;
+		gridBagConstraints.gridheight = 3;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+		gridBagConstraints.weightx = 1.0;
+		gridBagConstraints.weighty = 0.0;
+		gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+		panelDoTaskWarehouse.add(scrTargetWarehouse, gridBagConstraints);
+		
+		btnShowAllTechsWarehouse.setText(resourceMap.getString("btnShowAllTechs.text")); // NOI18N
+		btnShowAllTechsWarehouse.setToolTipText(resourceMap
+				.getString("btnShowAllTechs.toolTipText")); // NOI18N
+		btnShowAllTechsWarehouse.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				filterTechs(true);
+			}
+		});
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 3;
+		gridBagConstraints.gridwidth = 2;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+		gridBagConstraints.weightx = 1.0;
+		gridBagConstraints.weighty = 0.0;
+		gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+		panelDoTaskWarehouse.add(btnShowAllTechsWarehouse, gridBagConstraints);
+		
+		scrollWhTechTable.setMinimumSize(new java.awt.Dimension(200, 200));
+		
+		scrollWhTechTable.setName("scrollWhTechTable"); // NOI18N
+		scrollWhTechTable.setPreferredSize(new java.awt.Dimension(300, 300));
+
+		whTechTable.setModel(techsModel);
+		whTechTable.setName("whTechTable"); // NOI18N
+		whTechTable.setRowHeight(60);
+		whTechTable.getColumnModel().getColumn(0)
+				.setCellRenderer(techsModel.getRenderer());
+		whTechTable.getSelectionModel().addListSelectionListener(
+				new javax.swing.event.ListSelectionListener() {
+					public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+						updateTechTarget();
+					}
+				});
+		whTechSorter = new TableRowSorter<TechTableModel>(techsModel);
+        whTechSorter.setComparator(0, new TechSorter());
+        whTechTable.setRowSorter(whTechSorter);
+        sortKeys = new ArrayList<RowSorter.SortKey>();
+        sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
+        whTechSorter.setSortKeys(sortKeys);
+		scrollWhTechTable.setViewportView(whTechTable);
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 4;
+		gridBagConstraints.gridwidth = 2;
+		gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+		gridBagConstraints.weightx = 1.0;
+		gridBagConstraints.weighty = 1.0;
+		gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+		panelDoTaskWarehouse.add(scrollWhTechTable, gridBagConstraints);
+		
+		astechPoolLabelWarehouse.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+		astechPoolLabelWarehouse.setText("<html><b>Astech Pool Minutes:</> " + getCampaign().getAstechPoolMinutes() + " (" + getCampaign().getNumberAstechs() + " Astechs)</html>"); // NOI18N
+		gridBagConstraints = new java.awt.GridBagConstraints();
+		gridBagConstraints.gridx = 0;
+		gridBagConstraints.gridy = 5;
+		gridBagConstraints.gridwidth = 2;
+		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+		panelDoTaskWarehouse.add(astechPoolLabelWarehouse, gridBagConstraints);
+		
+		JSplitPane splitWarehouse = new javax.swing.JSplitPane(javax.swing.JSplitPane.HORIZONTAL_SPLIT,panSupplies, panelDoTaskWarehouse);
+		splitWarehouse.setOneTouchExpandable(true);
+		splitWarehouse.setResizeWeight(1.0);
+		
 		tabMain.addTab(
 				resourceMap.getString("panSupplies.TabConstraints.tabTitle"),
-				panSupplies); // NOI18N
+				splitWarehouse); // NOI18N
 
 		
 		panRepairBay.setName("panRepairBay"); // NOI18N
@@ -1317,7 +1445,7 @@ public class CampaignGUI extends JPanel {
 		btnDoTask.setName("btnDoTask"); // NOI18N
 		btnDoTask.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				btnDoTaskActionPerformed(evt);
+				doTask();
 			}
 		});
 		gridBagConstraints = new java.awt.GridBagConstraints();
@@ -1342,7 +1470,7 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
 		panelDoTask.add(lblTargetNum, gridBagConstraints);
 
-		jScrollPane6.setName("jScrollPane6"); // NOI18N
+		scrTextTarget.setName("jScrollPane6"); // NOI18N
 
 		textTarget.setColumns(20);
 		textTarget.setEditable(false);
@@ -1352,7 +1480,7 @@ public class CampaignGUI extends JPanel {
 		textTarget.setWrapStyleWord(true);
 		textTarget.setBorder(null);
 		textTarget.setName("textTarget"); // NOI18N
-		jScrollPane6.setViewportView(textTarget);
+		scrTextTarget.setViewportView(textTarget);
 
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 1;
@@ -1363,7 +1491,7 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 1.0;
 		gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-		panelDoTask.add(jScrollPane6, gridBagConstraints);
+		panelDoTask.add(scrTextTarget, gridBagConstraints);
 
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
@@ -1373,21 +1501,6 @@ public class CampaignGUI extends JPanel {
 		panTasks.add(panelDoTask, gridBagConstraints);
 		
 		JPanel panTechs = new JPanel(new GridBagLayout());
-
-		btnOvertime.setText(resourceMap.getString("btnOvertime.text")); // NOI18N
-		btnOvertime.setToolTipText(resourceMap
-				.getString("btnOvertime.toolTipText")); // NOI18N
-		btnOvertime.setName("btnOvertime"); // NOI18N
-		btnOvertime.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				btnOvertimeActionPerformed(evt);
-			}
-		});
-		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 0;
-		gridBagConstraints.gridy = 0;
-		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-		panTechs.add(btnOvertime, gridBagConstraints);
 		
 		btnShowAllTechs.setText(resourceMap.getString("btnShowAllTechs.text")); // NOI18N
 		btnShowAllTechs.setToolTipText(resourceMap
@@ -1395,11 +1508,11 @@ public class CampaignGUI extends JPanel {
 		btnShowAllTechs.setName("btnShowAllTechs"); // NOI18N
 		btnShowAllTechs.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				filterTechs();
+				filterTechs(false);
 			}
 		});
 		gridBagConstraints = new java.awt.GridBagConstraints();
-		gridBagConstraints.gridx = 1;
+		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 0;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
 		panTechs.add(btnShowAllTechs, gridBagConstraints);
@@ -1418,7 +1531,7 @@ public class CampaignGUI extends JPanel {
 				new javax.swing.event.ListSelectionListener() {
 					public void valueChanged(
 							javax.swing.event.ListSelectionEvent evt) {
-						TechTableValueChanged(evt);
+						updateTechTarget();
 					}
 				});
 		techSorter = new TableRowSorter<TechTableModel>(techsModel);
@@ -1476,7 +1589,8 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.weighty = 1.0;
 		panRepairBay.add(panTechs, gridBagConstraints);
 		
-		filterTechs();
+		filterTechs(true);
+		filterTechs(false);
 		
 		tabMain.addTab(
 				resourceMap.getString("panRepairBay.TabConstraints.tabTitle"),
@@ -1667,6 +1781,16 @@ public class CampaignGUI extends JPanel {
 		btnGMMode.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				btnGMModeActionPerformed(evt);
+			}
+		});
+		
+		btnOvertime.setText(resourceMap.getString("btnOvertime.text")); // NOI18N
+		btnOvertime.setToolTipText(resourceMap
+				.getString("btnOvertime.toolTipText")); // NOI18N
+		btnOvertime.setName("btnOvertime"); // NOI18N
+		btnOvertime.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				btnOvertimeActionPerformed(evt);
 			}
 		});
 		
@@ -1924,6 +2048,7 @@ public class CampaignGUI extends JPanel {
 		statusPanel.setLayout(new FlowLayout(FlowLayout.LEADING, 20, 5));
 		
 		statusPanel.add(btnGMMode);
+		statusPanel.add(btnOvertime);
 		refreshRating();
 		statusPanel.add(lblRating);
 		refreshFunds();
@@ -2101,34 +2226,38 @@ public class CampaignGUI extends JPanel {
 		panMap.repaint();
 	}
 	
-	private void btnDoTaskActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnDoTaskActionPerformed
-		
+	private void doTask() {// GEN-FIRST:event_btnDoTaskActionPerformed
 		int selectedRow = -1;
-		Person tech;
-		if(acquireSelected()) {
-			AcquisitionTable.getSelectedRow();
-			IAcquisitionWork acquisition = getSelectedAcquisition();
-			if(null == acquisition) {
+		int partId = -1;
+		Person tech = getSelectedTech();
+		if(onWarehouseTab()) {
+			selectedRow = partsTable.getSelectedRow();
+			Part part = getSelectedTask();
+			if(null == part) {
 				return;
-			}
-			Unit u = acquisition.getUnit();
-			tech = getSelectedTech();
-			if(u.getEntity() instanceof Dropship || u.getEntity() instanceof Jumpship) {
-				tech = u.getEngineer();
 			}
 			if(null == tech) {
 				return;
 			}
-			getCampaign().acquirePart(acquisition, tech);
+			partId = part.getId();
+			//get a new cloned part to work with and decrement original
+			Part repairable = part.clone();
+			part.decrementQuantity();
+			getCampaign().fixPart(repairable, tech);
+			getCampaign().addPart(repairable);
+			//if the break off part failed to be repaired, then follow it with the focus
+			//otherwise keep the focus on the current row
+			if(repairable.needsFixing() && !repairable.isBeingWorkedOn()) {
+				partId = repairable.getId();
+			}
 		}
-		else {
+		else if(repairsSelected()) {
 			selectedRow = TaskTable.getSelectedRow();
 			Part part = getSelectedTask();
 			if(null == part) {
 				return;
 			}
 			Unit u = part.getUnit();
-			tech = getSelectedTech();
 			if(u.getEntity() instanceof Dropship || u.getEntity() instanceof Jumpship) {
 				tech = u.getEngineer();
 			}
@@ -2174,9 +2303,25 @@ public class CampaignGUI extends JPanel {
 				selectedRow = -1;
 				getCampaign().removeUnit(u.getId());
 			}
-			if(!getCampaign().getServiceableUnits().contains(u)) {
+			if(null != u && !getCampaign().getServiceableUnits().contains(u)) {
 				selectedRow = -1;
 			}
+		}
+		else if(acquireSelected()) {
+			AcquisitionTable.getSelectedRow();
+			IAcquisitionWork acquisition = getSelectedAcquisition();
+			if(null == acquisition) {
+				return;
+			}
+			Unit u = acquisition.getUnit();
+			tech = getSelectedTech();
+			if(u.getEntity() instanceof Dropship || u.getEntity() instanceof Jumpship) {
+				tech = u.getEngineer();
+			}
+			if(null == tech) {
+				return;
+			}
+			getCampaign().acquirePart(acquisition, tech);
 		}
 		
 		refreshServicedUnitList();
@@ -2200,7 +2345,32 @@ public class CampaignGUI extends JPanel {
 						AcquisitionTable.setRowSelectionInterval(selectedRow, selectedRow);
 					}
 				}
-			} else {
+			}
+			else if(onWarehouseTab()) {
+				boolean found = false;
+				for(int i = 0; i < partsTable.getRowCount(); i++) {
+					Part p = partsModel.getPartAt(partsTable.convertRowIndexToModel(i));
+					if(p.getId() == partId) {
+						partsTable.setRowSelectionInterval(i, i);
+						partsTable.scrollRectToVisible(partsTable.getCellRect(i, 0, true));
+						found = true;
+						break;
+					}
+				}
+				if(!found) {
+					//then set to the current selected row
+					if(partsTable.getRowCount() > 0) {
+						if(partsTable.getRowCount() == selectedRow) {
+							partsTable.setRowSelectionInterval(selectedRow-1, selectedRow-1);		
+							//partsTable.scrollRectToVisible(partsTable.getCellRect(selectedRow-1, 0, true));
+						} else {
+							partsTable.setRowSelectionInterval(selectedRow, selectedRow);
+							//partsTable.scrollRectToVisible(partsTable.getCellRect(selectedRow, 0, true));
+						}
+					}
+				}
+			}
+			else if(repairsSelected()) {
 				if(TaskTable.getRowCount() > 0) {
 					if(TaskTable.getRowCount() == selectedRow) {
 						TaskTable.setRowSelectionInterval(selectedRow-1, selectedRow-1);
@@ -2210,30 +2380,41 @@ public class CampaignGUI extends JPanel {
 				}
  			}
 			//also get the selected tech back
-			for(int i = 0; i < TechTable.getRowCount(); i++) {
-				Person p = techsModel.getTechAt(TechTable.convertRowIndexToModel(i));
+			JTable table = TechTable;
+			if(onWarehouseTab()) {
+				table = whTechTable;				
+			} 
+			for(int i = 0; i < table.getRowCount(); i++) {
+				Person p = techsModel.getTechAt(table.convertRowIndexToModel(i));
 				if(tech.getId().equals(p.getId())) {
-					TechTable.setRowSelectionInterval(i, i);
+					whTechTable.setRowSelectionInterval(i, i);
 					break;
 				}
 			}
 		}
 		
 	}// GEN-LAST:event_btnDoTaskActionPerformed
-
-	private void TechTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
-		updateTechTarget();
-	}
 	
 	private Person getSelectedTech() {
-		int row = TechTable.getSelectedRow();
+		JTable table = TechTable;
+		if(onWarehouseTab()) {
+			table = whTechTable;
+		}
+		int row = table.getSelectedRow();
 		if(row < 0) {
 			return null;
 		}
-		return  techsModel.getTechAt(TechTable.convertRowIndexToModel(row));
+		return  techsModel.getTechAt(table.convertRowIndexToModel(row));
 	}
 	
 	private Part getSelectedTask() {
+		if(onWarehouseTab()) {
+			int row = partsTable.getSelectedRow();
+			if(row < 0) {
+				return null;
+			}
+			return  partsModel.getPartAt(partsTable.convertRowIndexToModel(row));
+		}
 		int row = TaskTable.getSelectedRow();
 		if(row < 0) {
 			return null;
@@ -2258,12 +2439,12 @@ public class CampaignGUI extends JPanel {
 	}
 
 	private void TaskTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
-		filterTechs();
+		filterTechs(false);
 		updateTechTarget();
 	}
 	
 	private void AcquisitionTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
-		filterTechs();
+		filterTechs(false);
 		updateTechTarget();
 	}
 
@@ -2312,13 +2493,8 @@ public class CampaignGUI extends JPanel {
 	}
 
 	private void PartsTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
-		int selected = partsTable.getSelectedRow();
-		
-		if ((selected > -1) && (selected < getCampaign().getParts().size())) {
-		//	currentPartsId = getCampaign().getParts().get(selected).getId();
-		} else if (selected < 0) {
-			//currentPartsId = -1;
-		}
+		filterTechs(true);
+		updateTechTarget();
 	}
 
 	private void btnAdvanceDayActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnAdvanceDayActionPerformed
@@ -3309,6 +3485,7 @@ public class CampaignGUI extends JPanel {
 		}
 		astechString += " (" + getCampaign().getNumberAstechs() + " Astechs)</html>";
 		astechPoolLabel.setText(astechString); // NOI18N
+		astechPoolLabelWarehouse.setText(astechString); // NOI18N
 	}
 
 	public void refreshDoctorsList() {
@@ -3405,54 +3582,46 @@ public class CampaignGUI extends JPanel {
 		TargetRoll target = null;
 		if(acquireSelected()) {
 			IAcquisitionWork acquire = getSelectedAcquisition();
-			if(null == acquire) {			
-				btnDoTask.setEnabled(false);
-				textTarget.setText("");
-				lblTargetNum.setText("-");
-				return;
+			if(null != acquire) {			
+				Unit u = acquire.getUnit();
+				Person tech = getSelectedTech();
+				if(null != u && u.getEntity() instanceof Dropship || u.getEntity() instanceof Jumpship) {
+					tech = u.getEngineer();
+				}
+				if(null == tech) {				
+					target = getCampaign().getTargetForAcquisition(acquire, tech);
+				}
 			}
-			Unit u = acquire.getUnit();
-			Person tech = getSelectedTech();
-			if(u.getEntity() instanceof Dropship || u.getEntity() instanceof Jumpship) {
-				tech = u.getEngineer();
-			}
-			if(null == tech) {
-				btnDoTask.setEnabled(false);
-				textTarget.setText("");
-				lblTargetNum.setText("-");
-				return;
-			}
-			target = getCampaign().getTargetForAcquisition(acquire, tech);
 		}
 		else  {
 			Part part = getSelectedTask();
-			if(null == part) {			
-				btnDoTask.setEnabled(false);
-				textTarget.setText("");
-				lblTargetNum.setText("-");
-				return;
+			if(null != part) {			
+				Unit u = part.getUnit();
+				Person tech = getSelectedTech();
+				if(null != u && (u.getEntity() instanceof Dropship || u.getEntity() instanceof Jumpship)) {
+					tech = u.getEngineer();
+				}
+				if(null != tech) {
+					target = getCampaign().getTargetFor(part, tech);
+				}
 			}
-			Unit u = part.getUnit();
-			Person tech = getSelectedTech();
-			if(u.getEntity() instanceof Dropship || u.getEntity() instanceof Jumpship) {
-				tech = u.getEngineer();
-			}
-			if(null == tech) {
-				btnDoTask.setEnabled(false);
-				textTarget.setText("");
-				lblTargetNum.setText("-");
-				return;
-			}
-			target = getCampaign().getTargetFor(part, tech);
+		}
+		JButton btn = btnDoTask;
+		JTextArea text = textTarget;
+		JLabel lbl = lblTargetNum;
+		if(onWarehouseTab()) {
+			btn = btnDoTaskWarehouse;
+			text = textTargetWarehouse;
+			lbl = lblTargetNumWarehouse;
 		}
 		if(null != target) {
-			btnDoTask.setEnabled(target.getValue() != TargetRoll.IMPOSSIBLE);
-			textTarget.setText(target.getDesc());
-			lblTargetNum.setText(target.getValueAsString());
+			btn.setEnabled(target.getValue() != TargetRoll.IMPOSSIBLE);
+			text.setText(target.getDesc());
+			lbl.setText(target.getValueAsString());
 		} else {
-			btnDoTask.setEnabled(false);
-			textTarget.setText("");
-			lblTargetNum.setText("-");
+			btn.setEnabled(false);
+			text.setText("");
+			lbl.setText("-");
 		}
 	}
 	
@@ -3557,22 +3726,27 @@ public class CampaignGUI extends JPanel {
         unitSorter.setRowFilter(unitTypeFilter);
     }
 	
-	public void filterTechs() {
+	public void filterTechs(boolean warehouse) {
 		RowFilter<TechTableModel, Integer> techTypeFilter = null;
 		final Part part = getSelectedTask();
-		final Unit unit = getSelectedServicedUnit();
-        techTypeFilter = new RowFilter<TechTableModel,Integer>() {
+		techTypeFilter = new RowFilter<TechTableModel,Integer>() {
         	@Override
         	public boolean include(Entry<? extends TechTableModel, ? extends Integer> entry) {
         		if(acquireSelected()) {
         			return true;
         		}
-        		if(null == part || null == unit) {
+        		if(null == part) {
+        			return false;
+        		}
+        		if(!part.needsFixing() && !part.isSalvaging()) {
         			return false;
         		}
         		TechTableModel techModel = entry.getModel();
         		Person tech = techModel.getTechAt(entry.getIdentifier());
-        		if(!tech.isRightTechTypeFor(part) && !btnShowAllTechs.isSelected()) {
+        		if(!onWarehouseTab() && !tech.isRightTechTypeFor(part) && !btnShowAllTechs.isSelected()) {
+        			return false;
+        		}
+        		if(onWarehouseTab() && !tech.isRightTechTypeFor(part) && !btnShowAllTechsWarehouse.isSelected()) {
         			return false;
         		}
         		Skill skill = tech.getSkillForWorkingOn(part);
@@ -3583,7 +3757,11 @@ public class CampaignGUI extends JPanel {
         		return (part.getSkillMin() <= (skill.getExperienceLevel()-modePenalty));
         	}
         };
-        techSorter.setRowFilter(techTypeFilter);
+        if(warehouse) {
+        	whTechSorter.setRowFilter(techTypeFilter);
+        } else {
+        	techSorter.setRowFilter(techTypeFilter);
+        }
     }
 	
 	private void changePersonnelView() {
@@ -3957,9 +4135,14 @@ public class CampaignGUI extends JPanel {
 	}
 	
 	protected boolean acquireSelected() {
-		return tabTasks.getSelectedIndex() == 1;
+		return tabTasks.getSelectedIndex() == 1 && !onWarehouseTab();
 	}
 
+	protected boolean onWarehouseTab() {
+		//TODO: dont do this with a hard number
+		return tabMain.getSelectedIndex() == 5;
+	}
+	
 	/**
 	 * A table model for displaying work items
 	 */
@@ -7134,13 +7317,13 @@ public class CampaignGUI extends JPanel {
 	public class PartsTableModel extends ArrayTableModel {
 		private static final long serialVersionUID = 534443424190075264L;
 
-		private final static int COL_NAME    =    0;
-		private final static int COL_DETAIL   =   1;
-		private final static int COL_TECH_BASE  = 2;
-		private final static int COL_STATUS   =   3;
-		private final static int COL_REPAIR   =   4;
-		private final static int COL_QUANTITY   = 6;
-		private final static int COL_COST     =   5;
+		private final static int COL_QUANTITY   = 0;
+		private final static int COL_NAME    =    1;
+		private final static int COL_DETAIL   =   2;
+		private final static int COL_TECH_BASE  = 3;
+		private final static int COL_STATUS   =   4;
+		private final static int COL_REPAIR   =   5;
+		private final static int COL_COST     =   6;
 		private final static int COL_TON       =  7;
 		private final static int N_COL          = 8;
 		
@@ -7234,14 +7417,13 @@ public class CampaignGUI extends JPanel {
 	            case COL_COST:
 	            	return 10;
 	            default:
-	                return 5;
+	                return 3;
 	            }
 	        }
 	        
 	        public int getAlignment(int col) {
 	            switch(col) {
 	            case COL_COST:
-	            case COL_QUANTITY:
 	            case COL_TON:
 	            	return SwingConstants.RIGHT;
 	            default:
@@ -7319,23 +7501,6 @@ public class CampaignGUI extends JPanel {
 				refreshReport();
 				refreshFunds();
 				refreshFinancialTransactions();
-			} else if (command.contains("REPAIR")) {
-				String sel = command.split(":")[1];
-				Person tech = getCampaign().getPerson(UUID.fromString(sel));
-				if(null != tech && null != selectedPart) {
-					//clone a new part and decrement quantity, so we can work with a single part
-					Part repairable = selectedPart.clone();
-					repairable.setMode(selectedPart.getMode());
-					selectedPart.decrementQuantity();
-					getCampaign().fixPart(repairable, tech);
-					getCampaign().addPart(repairable);
-				}
-				refreshPartsList();
-				refreshTaskList();
-				refreshAcquireList();
-				refreshReport();
-				refreshTechsList();
-				refreshPersonnelList();
 			} else if(command.equalsIgnoreCase("SELL_N")) {
 				if(null != selectedPart) {
 					PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(
@@ -7354,6 +7519,11 @@ public class CampaignGUI extends JPanel {
 				refreshTaskList();
 				refreshAcquireList();
 				refreshReport();
+			} else if (command.contains("CHANGE_MODE")) {
+				String sel = command.split(":")[1];
+				int selected = Integer.parseInt(sel);
+				selectedPart.setMode(selected);
+				refreshPartsList();
 			}
 		}
 
@@ -7400,23 +7570,19 @@ public class CampaignGUI extends JPanel {
 					popup.add(menu);
 				}
 				if(oneSelected && part.needsFixing()) {
-					menu = new JMenu("Repair");
-					for(Person tech : getCampaign().getTechs()) {
-						TargetRoll target = getCampaign().getTargetFor(part, tech);
-						if(target.getValue() == TargetRoll.AUTOMATIC_FAIL) {
-							continue;
+					menu = new JMenu("Repair Mode");
+					for (int i = 0; i < Modes.MODE_N; i++) {
+						cbMenuItem = new JCheckBoxMenuItem(Modes.getModeName(i));
+						if (part.getMode() == i) {
+							cbMenuItem.setSelected(true);
+						} else {
+							cbMenuItem.setActionCommand("CHANGE_MODE:" + i);
+							cbMenuItem.addActionListener(this);
 						}
-						menuItem = new JMenuItem(tech.getName() + " (" + target.getValueAsString() + "+), " + tech.getMinutesLeft() + " minutes left");
-						menuItem.setActionCommand("REPAIR:" + tech.getId().toString());
-						menuItem.addActionListener(this);
-						menu.add(menuItem);
-					}
-					if(menu.getItemCount() > 20) {
-	                	MenuScroller.setScrollerFor(menu, 20);
-	                }
-					if(menu.getItemCount() > 0) {
-						popup.add(menu);
-					}
+						cbMenuItem.setEnabled(!part.isBeingWorkedOn());
+						menu.add(cbMenuItem);
+					}	
+					popup.add(menu);
 				}
 				// GM mode
 				menu = new JMenu("GM Mode");
@@ -8765,6 +8931,7 @@ public class CampaignGUI extends JPanel {
 	private javax.swing.JTable TaskTable;
 	private javax.swing.JTable AcquisitionTable;
 	private javax.swing.JTable TechTable;
+	private javax.swing.JTable whTechTable;
 	private javax.swing.JTable servicedUnitTable;
 	private javax.swing.JTable unitTable;
 	private javax.swing.JTable personnelTable;
@@ -8774,13 +8941,16 @@ public class CampaignGUI extends JPanel {
 	private javax.swing.JButton btnAdvanceDay;
 	private javax.swing.JButton btnAssignDoc;
 	private javax.swing.JButton btnDoTask;
+	private javax.swing.JButton btnDoTaskWarehouse;
 	private javax.swing.JToggleButton btnGMMode;
 	private javax.swing.JToggleButton btnOvertime;
 	private javax.swing.JToggleButton btnShowAllTechs;
-	private javax.swing.JScrollPane jScrollPane6;
+	private javax.swing.JToggleButton btnShowAllTechsWarehouse;
+	private javax.swing.JScrollPane scrTextTarget;
 	private javax.swing.JScrollPane scrollPartsTable;
 	private javax.swing.JLabel lblTarget;
 	private javax.swing.JLabel lblTargetNum;
+	private javax.swing.JLabel lblTargetNumWarehouse;
 	private javax.swing.JPanel mainPanel;
 	private javax.swing.JMenuBar menuBar;
 	private javax.swing.JMenu menuHire;
@@ -8823,6 +8993,7 @@ public class CampaignGUI extends JPanel {
 	private javax.swing.JScrollPane scrollTaskTable;
 	private javax.swing.JScrollPane scrollAcquisitionTable;
 	private javax.swing.JScrollPane scrollTechTable;
+	private javax.swing.JScrollPane scrollWhTechTable;
 	private javax.swing.JScrollPane scrollServicedUnitTable;
 	private javax.swing.JScrollPane scrollServicedUnitView;
 	private javax.swing.JScrollPane scrollPersonnelTable;
@@ -8835,7 +9006,9 @@ public class CampaignGUI extends JPanel {
 	private javax.swing.JTabbedPane tabMain;
 	private javax.swing.JTabbedPane tabTasks;
 	private javax.swing.JTextArea textTarget;
+	private javax.swing.JTextArea textTargetWarehouse;
 	private javax.swing.JLabel astechPoolLabel;
+	private javax.swing.JLabel astechPoolLabelWarehouse;
 	private javax.swing.JTextPane txtPaneReport;
 	private javax.swing.JScrollPane txtPaneReportScrollPane;
 	private javax.swing.JComboBox choicePerson;

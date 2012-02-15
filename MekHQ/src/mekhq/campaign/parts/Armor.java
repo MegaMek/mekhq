@@ -453,6 +453,9 @@ public class Armor extends Part implements IAcquisitionWork {
 		if(isReservedForRefit()) {
 			return;
 		}
+		if(null == unit) {
+			return;
+		}
 		int currentArmor = unit.getEntity().getArmorForReal(location, rear);
 		if(currentArmor < 0) {
 			currentArmor = 0;

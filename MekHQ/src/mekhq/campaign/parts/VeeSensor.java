@@ -28,6 +28,7 @@ import megamek.common.Mech;
 import megamek.common.Tank;
 import megamek.common.TechConstants;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.SkillType;
 
 import org.w3c.dom.Node;
 
@@ -120,7 +121,9 @@ public class VeeSensor extends Part {
 			unit.addPart(missing);
 			campaign.addPart(missing);
 		}
+		setSalvaging(false);
 		setUnit(null);
+		updateConditionFromEntity();
 	}
 
 	@Override
@@ -168,5 +171,10 @@ public class VeeSensor extends Part {
 	public long getStickerPrice() {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+	
+	@Override
+	public boolean isRightTechType(String skillType) {
+		return skillType.equals(SkillType.S_TECH_MECHANIC);
 	}
 }

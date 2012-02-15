@@ -1949,6 +1949,10 @@ public class Campaign implements Serializable {
 					((AmmoBin)prt).restoreMunitionType();
 				}
 			} else if(v < 16) {
+				prt.setSalvaging(false);
+				//this seems weird but we need to get difficulty and time 
+				//updated for non-salvage
+				prt.updateConditionFromEntity();
 				boolean found = false;
 				for(Part spare : spareParts) {
 					if(spare.isSamePartTypeAndStatus(prt)) {

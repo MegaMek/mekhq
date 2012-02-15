@@ -262,7 +262,9 @@ public class EquipmentPart extends Part {
 			unit.addPart(missing);
 			campaign.addPart(missing);
 		}
+		setSalvaging(false);
 		setUnit(null);
+		updateConditionFromEntity();
 		equipmentNum = -1;
 	}
 
@@ -280,26 +282,26 @@ public class EquipmentPart extends Part {
 				hits += unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_EQUIPMENT, equipmentNum, mounted.getSecondLocation());
 				}
 			}
-			if(hits == 0) {
-				time = 0;
-				difficulty = 0;
-			} else if(hits == 1) {
-				time = 100;
-				difficulty = -3;
-			} else if(hits == 2) {
-				time = 150;
-				difficulty = -2;
-			} else if(hits == 3) {
-				time = 200;
-				difficulty = 0;
-			} else if(hits > 3) {
-				time = 250;
-				difficulty = 2;
-			}
-			if(isSalvaging()) {
-				this.time = 120;
-				this.difficulty = 0;
-			}
+		}
+		if(hits == 0) {
+			time = 0;
+			difficulty = 0;
+		} else if(hits == 1) {
+			time = 100;
+			difficulty = -3;
+		} else if(hits == 2) {
+			time = 150;
+			difficulty = -2;
+		} else if(hits == 3) {
+			time = 200;
+			difficulty = 0;
+		} else if(hits > 3) {
+			time = 250;
+			difficulty = 2;
+		}
+		if(isSalvaging()) {
+			this.time = 120;
+			this.difficulty = 0;
 		}
 	}
 

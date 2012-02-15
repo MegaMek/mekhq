@@ -35,6 +35,7 @@ import megamek.common.TechConstants;
 import megamek.common.verifier.TestEntity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
+import mekhq.campaign.personnel.SkillType;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -336,7 +337,9 @@ public class EnginePart extends Part {
 			unit.addPart(missing);
 			campaign.addPart(missing);
 		}
-		setUnit(null);	
+		setSalvaging(false);
+		setUnit(null);
+		updateConditionFromEntity();
 	}
 
 	@Override
@@ -370,27 +373,28 @@ public class EnginePart extends Part {
 			} else {
 				hits = 0;
 			}
-			this.time = 0;
+		}
+		this.time = 0;
+		this.difficulty = 0;
+		if (hits == 1) {
+			this.time = 100;
+			this.difficulty = -1;
+		} else if (hits == 2) {
+			this.time = 200;
 			this.difficulty = 0;
-			if (hits == 1) {
-	            this.time = 100;
-	            this.difficulty = -1;
-	        } else if (hits == 2) {
-	            this.time = 200;
-	            this.difficulty = 0;
-	        } else if (hits > 2) {
-	            this.time = 300;
-	            this.difficulty = 2;
-	        }
-	        if(unit.getEntity() instanceof Aero && hits > 0) {
-	        	this.time = 300;
-	        	this.difficulty = 1;
-	        }
-			if(isSalvaging()) {
-				this.time = 360;
-				this.difficulty = -1;
-			}
-		}		
+		} else if (hits > 2) {
+			this.time = 300;
+			this.difficulty = 2;
+		}
+		//TODO: keep an aero flag here, so we dont need the unit
+		if(null != unit && unit.getEntity() instanceof Aero && hits > 0) {
+			this.time = 300;
+			this.difficulty = 1;
+		}
+		if(isSalvaging()) {
+			this.time = 360;
+			this.difficulty = -1;
+		}	
 	}
 
 	@Override
@@ -470,4 +474,14 @@ public class EnginePart extends Part {
 	 public boolean isPartForCriticalSlot(int index, int loc) {
 		 return Mech.SYSTEM_ENGINE == index;
 	 }
+	 
+	 @Override
+		public boolean isRightTechType(String skillType) {
+		 	if(getEngine().hasFlag(Engine.TANK_ENGINE)) {
+				return skillType.equals(SkillType.S_TECH_MECHANIC);
+		 	}
+		 	else {
+				return skillType.equals(SkillType.S_TECH_MECH) || skillType.equals(SkillType.S_TECH_AERO);
+		 	}
+		}
 }

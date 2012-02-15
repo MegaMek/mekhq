@@ -29,6 +29,7 @@ import megamek.common.EquipmentType;
 import megamek.common.Mech;
 import megamek.common.TechConstants;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.SkillType;
 
 import org.w3c.dom.Node;
 
@@ -146,7 +147,9 @@ public class MekSensor extends Part {
 			unit.addPart(missing);
 			campaign.addPart(missing);
 		}
+		setSalvaging(false);
 		setUnit(null);
+		updateConditionFromEntity();
 	}
 
 	@Override
@@ -164,24 +167,23 @@ public class MekSensor extends Part {
 					}
 				}
 			}
-			if(hits == 0) {
-				time = 0;
-				difficulty = 0;
-			} 
-			else if(hits == 1) {
-				time = 75;
-				difficulty = 0;
-			}
-			else if(hits > 1) {
-				time = 150;
-				difficulty = 3;
-			}
-			if(isSalvaging()) {
-				this.time = 260;
-				this.difficulty = 0;
-			}
 		}
-		
+		if(hits == 0) {
+			time = 0;
+			difficulty = 0;
+		} 
+		else if(hits == 1) {
+			time = 75;
+			difficulty = 0;
+		}
+		else if(hits > 1) {
+			time = 150;
+			difficulty = 3;
+		}
+		if(isSalvaging()) {
+			this.time = 260;
+			this.difficulty = 0;
+		}		
 	}
 
 	@Override
@@ -243,5 +245,10 @@ public class MekSensor extends Part {
 	@Override
 	public boolean isPartForCriticalSlot(int index, int loc) {
 		return Mech.SYSTEM_SENSORS == index;
+	}
+	
+	@Override
+	public boolean isRightTechType(String skillType) {
+		return skillType.equals(SkillType.S_TECH_MECH);
 	}
 }

@@ -27,6 +27,7 @@ import megamek.common.Aero;
 import megamek.common.EquipmentType;
 import megamek.common.TechConstants;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.SkillType;
 
 import org.w3c.dom.Node;
 
@@ -107,7 +108,9 @@ public class FireControlSystem extends Part {
 			unit.addPart(missing);
 			campaign.addPart(missing);
 		}
+		setSalvaging(false);
 		setUnit(null);
+		updateConditionFromEntity();
 	}
 
 	@Override
@@ -175,6 +178,11 @@ public class FireControlSystem extends Part {
 	@Override
 	protected void loadFieldsFromXmlNode(Node wn) {
 		//nothing to load
+	}
+	
+	@Override
+	public boolean isRightTechType(String skillType) {
+		return skillType.equals(SkillType.S_TECH_AERO);
 	}
 	
 }

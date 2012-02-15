@@ -238,12 +238,10 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 	@Override
 	public String getStatus() {
 		String toReturn = "Fully Loaded";
-		if(needsFixing()) {
-			if(shotsNeeded >= getFullShots()) {
-				toReturn = "Empty";
-			} else {
-				toReturn = "Partially Loaded";
-			}
+		if(shotsNeeded >= getFullShots()) {
+			toReturn = "Empty";
+		} else if (shotsNeeded > 0) {
+			toReturn = "Partially Loaded";
 		}
 		if(isReservedForRefit()) {
 			toReturn += " (Reserved for Refit)";
@@ -391,7 +389,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
 	@Override
 	public boolean needsFixing() {
-		return shotsNeeded > 0;
+		return shotsNeeded > 0 && null != unit;
 	}
 	
 	public String getDesc() {

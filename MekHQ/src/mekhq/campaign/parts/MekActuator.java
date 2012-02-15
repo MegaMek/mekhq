@@ -30,6 +30,7 @@ import megamek.common.Mech;
 import megamek.common.TechConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
+import mekhq.campaign.personnel.SkillType;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -223,7 +224,9 @@ public class MekActuator extends Part {
 			unit.addPart(missing);
 			campaign.addPart(missing);
 		}	
+		setSalvaging(false);
 		setUnit(null);
+		updateConditionFromEntity();
 		location = -1;
 	}
 
@@ -234,21 +237,20 @@ public class MekActuator extends Part {
 				remove(false);
 				return;
 			}
-			hits = unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, type, location);			
-			if(hits == 0) {
-				time = 0;
-				difficulty = 0;
-			} 
-			else if(hits >= 1) {
-				time = 120;
-				difficulty = 0;
-			}
-			if(isSalvaging()) {
-				this.time = 90;
-				this.difficulty = -3;
-			}
+			hits = unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_SYSTEM, type, location);
 		}
-		
+		if(hits == 0) {
+			time = 0;
+			difficulty = 0;
+		} 
+		else if(hits >= 1) {
+			time = 120;
+			difficulty = 0;
+		}
+		if(isSalvaging()) {
+			this.time = 90;
+			this.difficulty = -3;
+		}
 	}
 
 	@Override
@@ -302,5 +304,10 @@ public class MekActuator extends Part {
 	@Override
 	public boolean isPartForCriticalSlot(int index, int loc) {
 		return index == type && loc == location;
+	}
+	
+	@Override
+	public boolean isRightTechType(String skillType) {
+		return skillType.equals(SkillType.S_TECH_MECH);
 	}
 }

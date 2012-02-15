@@ -33,6 +33,7 @@ import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
+import mekhq.campaign.personnel.SkillType;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -208,7 +209,9 @@ public class TankLocation extends Part {
 			}
 			unit.removePart(this);
 		}
+		setSalvaging(false);
 		setUnit(null);
+		updateConditionFromEntity();
 	}
 
 	@Override
@@ -216,14 +219,15 @@ public class TankLocation extends Part {
 		if(null != unit) {
 			if(IArmorState.ARMOR_DESTROYED == unit.getEntity().getInternal(loc)) {
 				remove(false);
-			} else if(unit.isLocationBreached(loc)) {
-				breached = true;
-				this.time = 60;
-				this.difficulty = 0;
 			} else {
-				damage = unit.getEntity().getOInternal(loc) - unit.getEntity().getInternal(loc);			
+				damage = unit.getEntity().getOInternal(loc) - unit.getEntity().getInternal(loc);	
+				if(unit.isLocationBreached(loc)) {
+					breached = true;
+				} 
 			}
 		}
+		time = 60;
+		difficulty = 0;
 	}
 
 	public boolean isBreached() {
@@ -302,4 +306,9 @@ public class TankLocation extends Part {
 		toReturn += "</font></html>";
 		return toReturn;
 	}
+	
+	 @Override
+	 public boolean isRightTechType(String skillType) {
+		 return skillType.equals(SkillType.S_TECH_MECHANIC);
+	 }
 }

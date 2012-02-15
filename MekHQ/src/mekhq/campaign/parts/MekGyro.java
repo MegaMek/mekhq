@@ -29,6 +29,7 @@ import megamek.common.Mech;
 import megamek.common.TechConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
+import mekhq.campaign.personnel.SkillType;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -244,7 +245,9 @@ public class MekGyro extends Part {
 			unit.addPart(missing);
 			campaign.addPart(missing);
 		}	
+		setSalvaging(false);
 		setUnit(null);
+		updateConditionFromEntity();
 	}
 
 	@Override
@@ -255,26 +258,26 @@ public class MekGyro extends Part {
 				return;
 			}
 			hits = unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_SYSTEM,Mech.SYSTEM_GYRO, Mech.LOC_CT);
-			if(hits == 0) {
-				time = 0;
-				difficulty = 0;
-			}
-			else if(hits == 1) {
-				time = 120;
-				difficulty = 1;
-			} 
-			else if(hits == 2) {
-				time = 240;
-				difficulty = 4;
-			}
-			else if(hits > 2) {
-				remove(false);
-			}
-			if(isSalvaging()) {
-				this.time = 200;
-				this.difficulty = 0;
-			}
-		}	
+		}
+		if(hits == 0) {
+			time = 0;
+			difficulty = 0;
+		}
+		else if(hits == 1) {
+			time = 120;
+			difficulty = 1;
+		} 
+		else if(hits == 2) {
+			time = 240;
+			difficulty = 4;
+		}
+		else if(hits > 2) {
+			remove(false);
+		}
+		if(isSalvaging()) {
+			this.time = 200;
+			this.difficulty = 0;
+		}
 	}
 
 	@Override
@@ -307,4 +310,9 @@ public class MekGyro extends Part {
 	public boolean isPartForCriticalSlot(int index, int loc) {
 		return Mech.SYSTEM_GYRO == index;
 	}
+	
+	 @Override
+	 public boolean isRightTechType(String skillType) {
+		 return skillType.equals(SkillType.S_TECH_MECH);
+	 }
 }

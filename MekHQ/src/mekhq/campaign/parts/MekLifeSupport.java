@@ -29,6 +29,7 @@ import megamek.common.EquipmentType;
 import megamek.common.Mech;
 import megamek.common.TechConstants;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.SkillType;
 
 import org.w3c.dom.Node;
 
@@ -141,7 +142,9 @@ public class MekLifeSupport extends Part {
 			unit.addPart(missing);
 			campaign.addPart(missing);
 		}
-		setUnit(null);	
+		setSalvaging(false);
+		setUnit(null);
+		updateConditionFromEntity();
 	}
 
 	@Override
@@ -159,22 +162,22 @@ public class MekLifeSupport extends Part {
 					}
 				}
 			}
-			if(hits == 0) {
-				time = 0;
-				difficulty = 0;
-			} 
-			else if(hits == 1) {
-				time = 60;
-				difficulty = -1;
-			}
-			else if(hits > 1) {
-				time = 120;
-				difficulty = 1;
-			}
-			if(isSalvaging()) {
-				this.time = 180;
-				this.difficulty = -1;
-			}
+		}
+		if(hits == 0) {
+			time = 0;
+			difficulty = 0;
+		} 
+		else if(hits == 1) {
+			time = 60;
+			difficulty = -1;
+		}
+		else if(hits > 1) {
+			time = 120;
+			difficulty = 1;
+		}
+		if(isSalvaging()) {
+			this.time = 180;
+			this.difficulty = -1;
 		}
 		
 	}
@@ -232,5 +235,10 @@ public class MekLifeSupport extends Part {
 	@Override
 	public boolean isPartForCriticalSlot(int index, int loc) {
 		return Mech.SYSTEM_LIFE_SUPPORT == index;
+	}
+	
+	@Override
+	public boolean isRightTechType(String skillType) {
+		return skillType.equals(SkillType.S_TECH_MECH);
 	}
 }

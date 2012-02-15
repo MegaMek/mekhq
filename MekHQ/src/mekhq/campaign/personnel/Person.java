@@ -1627,9 +1627,37 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     			&& hasSkill(SkillType.S_TECH_AERO)) {
     		return getSkill(SkillType.S_TECH_AERO);
     	}
+    	//check spare parts
+    	//return the best one
+    	Skill skill = null;
+    	if(part.isRightTechType(SkillType.S_TECH_MECH) && hasSkill(SkillType.S_TECH_MECH)) {
+    		skill = getSkill(SkillType.S_TECH_MECH);
+    	}
+    	if(part.isRightTechType(SkillType.S_TECH_BA) && hasSkill(SkillType.S_TECH_BA)) {
+    		if(null == skill || skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_BA).getFinalSkillValue()) {
+    			skill = getSkill(SkillType.S_TECH_BA);
+    		}
+    	}
+    	if(part.isRightTechType(SkillType.S_TECH_AERO) && hasSkill(SkillType.S_TECH_AERO)) {
+    		if(null == skill || skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_AERO).getFinalSkillValue()) {
+    			skill = getSkill(SkillType.S_TECH_AERO);
+    		}
+    	}
+    	if(part.isRightTechType(SkillType.S_TECH_MECHANIC) && hasSkill(SkillType.S_TECH_MECHANIC)) {
+    		if(null == skill || skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_MECHANIC).getFinalSkillValue()) {
+    			skill = getSkill(SkillType.S_TECH_MECHANIC);
+    		}
+    	}
+    	if(part.isRightTechType(SkillType.S_TECH_VESSEL) && hasSkill(SkillType.S_TECH_VESSEL)) {
+    		if(null == skill || skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_VESSEL).getFinalSkillValue()) {
+    			skill = getSkill(SkillType.S_TECH_VESSEL);
+    		}
+    	}
+    	if(null != skill) {
+    		return skill;
+    	}
     	//if we are still here then we didn't have the right tech skill, so return the highest
     	//of any tech skills that we do have
-    	Skill skill = null;
     	if(hasSkill(SkillType.S_TECH_MECH)) {
     		skill = getSkill(SkillType.S_TECH_MECH);
     	}
@@ -1780,8 +1808,14 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     public boolean isRightTechTypeFor(IPartWork part) {
     	Unit unit = part.getUnit();
     	if(null == unit) {
-    		//TODO: figure this out
-    		return isTech();
+    		if((hasSkill(SkillType.S_TECH_MECH) && part.isRightTechType(SkillType.S_TECH_MECH))
+    				|| (hasSkill(SkillType.S_TECH_AERO) && part.isRightTechType(SkillType.S_TECH_AERO))
+    				|| (hasSkill(SkillType.S_TECH_MECHANIC) && part.isRightTechType(SkillType.S_TECH_MECHANIC))
+    				|| (hasSkill(SkillType.S_TECH_BA) && part.isRightTechType(SkillType.S_TECH_BA))
+    				|| (hasSkill(SkillType.S_TECH_VESSEL) && part.isRightTechType(SkillType.S_TECH_VESSEL))) {
+    			return true;
+    		}
+    		return false;
     	}
     	if(unit.getEntity() instanceof Mech) {
     		return hasSkill(SkillType.S_TECH_MECH);

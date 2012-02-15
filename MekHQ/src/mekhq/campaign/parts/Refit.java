@@ -1433,4 +1433,10 @@ public class Refit implements IPartWork, IAcquisitionWork {
 		// do nothing
 		
 	}
+
+	@Override
+	public boolean isRightTechType(String skillType) {
+		// TODO Auto-generated method stub
+		return true;
+	}
 }

@@ -93,17 +93,17 @@ public class JumpJet extends EquipmentPart {
 				} 
 				hits = unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_EQUIPMENT, equipmentNum, mounted.getLocation());
 			}
-			if(hits == 0) {
-				time = 0;
-				difficulty = 0;
-			} else if(hits > 0) {
-				time = 100;
-				difficulty = -3;
-			}
-			if(isSalvaging()) {
-				this.time = 60;
-				this.difficulty = 0;
-			}
+		}
+		if(hits == 0) {
+			time = 0;
+			difficulty = 0;
+		} else if(hits > 0) {
+			time = 100;
+			difficulty = -3;
+		}
+		if(isSalvaging()) {
+			this.time = 60;
+			this.difficulty = 0;
 		}
 	}
 

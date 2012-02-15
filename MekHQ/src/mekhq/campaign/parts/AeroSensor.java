@@ -28,6 +28,7 @@ import megamek.common.EquipmentType;
 import megamek.common.TechConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
+import mekhq.campaign.personnel.SkillType;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -112,7 +113,9 @@ public class AeroSensor extends Part {
 			unit.addPart(missing);
 			campaign.addPart(missing);
 		}
+		setSalvaging(false);
 		setUnit(null);
+		updateConditionFromEntity();
 	}
 
 	@Override
@@ -215,5 +218,10 @@ public class AeroSensor extends Part {
 		}
 		return super.getDetails() + ", " + getUnitTonnage() + " tons" + dropper;
     }
+	
+	@Override
+	public boolean isRightTechType(String skillType) {
+		return skillType.equals(SkillType.S_TECH_AERO);
+	}
 	
 }
