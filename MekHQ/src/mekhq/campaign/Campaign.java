@@ -633,7 +633,12 @@ public class Campaign implements Serializable {
 				}
 			}
 		}
-
+		Part spare = checkForExistingSparePart(p);
+		if(null == p.getUnit() && null != spare) {
+			spare.incrementQuantity();
+			return;
+		}
+		
 		int id = lastPartId + 1;
 		p.setId(id);
 		parts.add(p);
@@ -1448,31 +1453,6 @@ public class Campaign implements Serializable {
 		}
 		return spares;
 	}
-	
-	/**
-	 * Creates an {@link ArrayList} containing a {@link PartInventory} for each
-	 * part owned
-	 * 
-	 */
-	// TODO : Add some kind of caching method to speed things up when lots of
-	// parts
-	public ArrayList<PartInventory> getPartsInventory() {
-		ArrayList<PartInventory> partsInventory = new ArrayList<PartInventory>();
-
-		Iterator<Part> itParts = getSpareParts().iterator();
-		while (itParts.hasNext()) {
-			Part part = itParts.next();
-			if (!partsInventory.contains(new PartInventory(part, 0))) {
-				partsInventory.add(new PartInventory(part, 1));
-			} else {
-				partsInventory.get(
-						partsInventory.indexOf(new PartInventory(part, 0)))
-						.addOnePart();
-			}
-		}
-
-		return partsInventory;
-	}
 
 	public void addFunds(long quantity) {
         addFunds(quantity, "Rich Uncle", Transaction.C_MISC);
@@ -1510,10 +1490,17 @@ public class Campaign implements Serializable {
 		removeUnit(id);
 	}
 
-	public void sellPart(Part part) {
-		long cost = part.getActualValue();
-		finances.credit(cost, Transaction.C_EQUIP_SALE, "Sale of " + part.getName(), calendar.getTime());
-		removePart(part);
+	public void sellPart(Part part, int quantity) {
+		long cost = part.getActualValue() * quantity;
+		String plural = "";
+		if(quantity > 1) {
+			plural = "s";
+		}
+		finances.credit(cost, Transaction.C_EQUIP_SALE, "Sale of " + quantity + " "+ part.getName() + plural, calendar.getTime());
+		while(quantity > 0 && part.getQuantity() > 0) {
+			part.decrementQuantity();
+			quantity--;
+		}
 	}
 
 	public void buyPart(Part part) {
@@ -1942,7 +1929,9 @@ public class Campaign implements Serializable {
 		}
 		
 		// Process parts...
-		for (int x=0; x<retVal.parts.size(); x++) {
+		ArrayList<Part> spareParts = new ArrayList<Part>();
+		ArrayList<Part> removeParts = new ArrayList<Part>();
+ 		for (int x=0; x<retVal.parts.size(); x++) {
 			Part prt = retVal.parts.get(x);
 			Unit u = retVal.getUnit(prt.getUnitId());
 			prt.setUnit(u);
@@ -1950,6 +1939,19 @@ public class Campaign implements Serializable {
 				u.addPart(prt);
 				if(prt instanceof AmmoBin) {
 					((AmmoBin)prt).restoreMunitionType();
+				}
+			} else if(v < 16) {
+				boolean found = false;
+				for(Part spare : spareParts) {
+					if(spare.isSamePartTypeAndStatus(prt)) {
+						spare.incrementQuantity();
+						removeParts.add(prt);
+						found = true;
+						break;
+					}
+				}
+				if(!found) {
+					spareParts.add(prt);
 				}
 			}
 			if(prt instanceof MissingPart) {
@@ -1968,6 +1970,9 @@ public class Campaign implements Serializable {
 			}		
 					
 		}
+ 		for(Part prt : removeParts) {
+ 			retVal.removePart(prt);
+ 		}
 		
 		// All personnel need the rank reference fixed
 		for (int x=0; x<retVal.personnel.size(); x++) {
@@ -4001,5 +4006,17 @@ public class Campaign implements Serializable {
     	entity.setPosition(null);
     	//TODO: still a lot of stuff to do here, but oh well
     	entity.setGame(game);
+    }
+    
+    public Part checkForExistingSparePart(Part part) {
+		for(Part spare : getSpareParts()) {
+			if(spare.getId() == part.getId()) {
+				continue;
+			}
+			if(spare.isSamePartTypeAndStatus(part)) {
+				return spare;
+			}
+		}
+		return null;
     }
 }

@@ -109,12 +109,13 @@ public class MekGyro extends Part {
  
     @Override
     public boolean isSamePartTypeAndStatus (Part part) {
-    	if(needsFixing() || part.needsFixing()) {
+    	if(isReservedForRefit()) {
     		return false;
     	}
         return part instanceof MekGyro
                 && getType() == ((MekGyro) part).getType()
-                && getTonnage() == ((MekGyro) part).getTonnage();
+                && getTonnage() == ((MekGyro) part).getTonnage()
+                && this.getHits() == part.getHits();
     }
 
     @Override
@@ -226,7 +227,11 @@ public class MekGyro extends Part {
 	public void remove(boolean salvage) {
 		if(null != unit) {
 			unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_GYRO, Mech.LOC_CT);
+			Part spare = campaign.checkForExistingSparePart(this);
 			if(!salvage) {
+				campaign.removePart(this);
+			} else if(null != spare) {
+				spare.incrementQuantity();
 				campaign.removePart(this);
 			}
 			unit.removePart(this);

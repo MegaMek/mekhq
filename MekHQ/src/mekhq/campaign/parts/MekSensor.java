@@ -72,7 +72,8 @@ public class MekSensor extends Part {
     	//pg. 180 of StratOps that means they can only be exchanged
     	//between meks of the same tonnage
         return part instanceof MekSensor
-                && getUnitTonnage() == part.getUnitTonnage();
+                && getUnitTonnage() == part.getUnitTonnage()
+                && this.getHits() == part.getHits();
     }
 
     @Override
@@ -128,7 +129,11 @@ public class MekSensor extends Part {
 	public void remove(boolean salvage) {
 		if(null != unit) {
 			unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS);
+			Part spare = campaign.checkForExistingSparePart(this);
 			if(!salvage) {
+				campaign.removePart(this);
+			} else if(null != spare) {
+				spare.incrementQuantity();
 				campaign.removePart(this);
 			}
 			unit.removePart(this);

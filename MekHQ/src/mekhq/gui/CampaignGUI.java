@@ -151,7 +151,6 @@ import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.LogEntry;
-import mekhq.campaign.PartInventory;
 import mekhq.campaign.Planet;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.Unit;
@@ -3329,7 +3328,7 @@ public class CampaignGUI extends JPanel {
 	}
 
 	public void refreshPartsList() {
-		partsModel.setData(getCampaign().getPartsInventory());
+		partsModel.setData(getCampaign().getSpareParts());
 	}
 	
 	public void refreshFinancialTransactions() {
@@ -5736,7 +5735,6 @@ public class CampaignGUI extends JPanel {
 		}
 
         private boolean areAllInfantry(Person[] people) {
-            int[] rows = personnelTable.getSelectedRows();
             for (Person person : people) {
                 if (Person.T_INFANTRY != person.getPrimaryRole()) {
                     return false;
@@ -5746,7 +5744,6 @@ public class CampaignGUI extends JPanel {
         }
         
         private boolean areAllBattleArmor(Person[] people) {
-            int[] rows = personnelTable.getSelectedRows();
             for (Person person : people) {
                 if (Person.T_BA != person.getPrimaryRole()) {
                     return false;
@@ -5756,7 +5753,6 @@ public class CampaignGUI extends JPanel {
         }
 
         private boolean areAllVeeGunners(Person[] people) {
-            int[] rows = personnelTable.getSelectedRows();
             for (Person person : people) {
                 if (Person.T_VEE_GUNNER != person.getPrimaryRole()) {
                     return false;
@@ -5791,7 +5787,6 @@ public class CampaignGUI extends JPanel {
 				if(personnelTable.getSelectedRowCount() == 0) {
 	            	return;
 	            }
-	            int[] rows = personnelTable.getSelectedRows();
 	            int row = personnelTable.getSelectedRow();
 	            boolean oneSelected = personnelTable.getSelectedRowCount() == 1;
 				Person person = personModel.getPerson(personnelTable.convertRowIndexToModel(row));
@@ -7149,7 +7144,7 @@ public class CampaignGUI extends JPanel {
 		private final static int N_COL          = 7;
 		
 		public PartsTableModel() {
-			data = new ArrayList<PartInventory>();
+			data = new ArrayList<Part>();
 		}
 		
 		public int getRowCount() {
@@ -7183,13 +7178,12 @@ public class CampaignGUI extends JPanel {
         }
 
 		public Object getValueAt(int row, int col) {
-	        PartInventory partInventory;
+	        Part part;
 	        if(data.isEmpty()) {
 	        	return "";
 	        } else {
-	        	partInventory = (PartInventory)data.get(row);
+	        	part = (Part)data.get(row);
 	        }
-			Part part = partInventory.getPart();
 			DecimalFormat format = new DecimalFormat();
 			if(col == COL_NAME) {
 				return part.getName();
@@ -7201,7 +7195,7 @@ public class CampaignGUI extends JPanel {
 				return format.format(part.getActualValue());
 			}
 			if(col == COL_QUANTITY) {
-				return partInventory.getQuantity();
+				return part.getQuantity();
 			}
 			if(col == COL_TON) {
 				return Math.round(part.getTonnage() * 100) / 100.0;
@@ -7214,13 +7208,9 @@ public class CampaignGUI extends JPanel {
 			}
 			return "?";
 		}
-	
-		public PartInventory getPartInventory(int row) {		
-			return (PartInventory) data.get(row);
-		}
 		
 		public Part getPartAt(int row) {
-			return ((PartInventory) data.get(row)).getPart();
+			return ((Part) data.get(row));
 
 		}
 		
@@ -7288,16 +7278,16 @@ public class CampaignGUI extends JPanel {
 			if(row < 0) {
 				return;
 			}
+			Part selectedPart = partsModel.getPartAt(partsTable.convertRowIndexToModel(row));
 			int[] rows = partsTable.getSelectedRows();
-			PartInventory[] inventories = new PartInventory[rows.length];
+			Part[] parts = new Part[rows.length];
 			for(int i=0; i<rows.length; i++) {
-				inventories[i] = partsModel.getPartInventory(partsTable.convertRowIndexToModel(rows[i]));
+				parts[i] = partsModel.getPartAt(partsTable.convertRowIndexToModel(rows[i]));
 			}
 			if (command.equalsIgnoreCase("SELL")) {
-				for(PartInventory inventory : inventories) {
-					Part p = inventory.getPart();
+				for(Part p : parts) {
 					if(null != p) {
-						getCampaign().sellPart(p);
+						getCampaign().sellPart(p, 1);
 					}
 				}
 				refreshPartsList();
@@ -7307,10 +7297,27 @@ public class CampaignGUI extends JPanel {
 				refreshFunds();
 				refreshFinancialTransactions();
 			} else if (command.equalsIgnoreCase("SELL_ALL")) {
-				//TODO: implement me
+				for(Part p : parts) {
+					if(null != p) {
+						getCampaign().sellPart(p, p.getQuantity());
+					}
+				}
+				refreshPartsList();
+				refreshTaskList();
+				refreshAcquireList();
+				refreshReport();
+				refreshFunds();
+				refreshFinancialTransactions();
+			} else if(command.equalsIgnoreCase("SELL_N")) {
+				if(null != selectedPart) {
+					PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(
+							getFrame(), true, "Sell How Many " + selectedPart.getName() + "s?", 1, 1, selectedPart.getQuantity());
+					pvcd.setVisible(true);
+					int q = pvcd.getValue();
+					getCampaign().sellPart(selectedPart, q);
+				}
 			} else if (command.equalsIgnoreCase("REMOVE")) {
-				for(PartInventory inventory : inventories) {
-					Part p = inventory.getPart();
+				for(Part p : parts) {
 					if(null != p) {
 						getCampaign().removePart(p);
 					}
@@ -7335,10 +7342,10 @@ public class CampaignGUI extends JPanel {
 		private void maybeShowPopup(MouseEvent e) {
 			JPopupMenu popup = new JPopupMenu();
 			if (e.isPopupTrigger()) {
-				int row = partsTable.rowAtPoint(e.getPoint());
 				JMenuItem menuItem = null;
 				JMenu menu = null;
 				JCheckBoxMenuItem cbMenuItem = null;
+	            boolean oneSelected = partsTable.getSelectedRowCount() == 1;
 				// **lets fill the pop up menu**//
 				// sell part
 				if(getCampaign().getCampaignOptions().canSellParts()) {
@@ -7350,7 +7357,13 @@ public class CampaignGUI extends JPanel {
 					menuItem = new JMenuItem("Sell All Parts of This Type");
 					menuItem.setActionCommand("SELL_ALL");
 					menuItem.addActionListener(this);
-					//menu.add(menuItem);
+					menu.add(menuItem);
+					if(oneSelected) {
+						menuItem = new JMenuItem("Sell # Parts of This Type...");
+						menuItem.setActionCommand("SELL_N");
+						menuItem.addActionListener(this);
+						menu.add(menuItem);
+					}
 					popup.add(menu);
 				}
 				// GM mode

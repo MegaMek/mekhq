@@ -143,12 +143,13 @@ public class EquipmentPart extends Part {
 
     @Override
     public boolean isSamePartTypeAndStatus (Part part) {
-    	if(needsFixing() || part.needsFixing()) {
+    	if(isReservedForRefit()) {
     		return false;
     	}
         return part instanceof EquipmentPart
         		&& getType().equals(((EquipmentPart)part).getType())
-        		&& getTonnage() == part.getTonnage();
+        		&& getTonnage() == part.getTonnage()
+        		&& (this.getHits() > 0) == (part.getHits() > 0) && this.getDifficulty() == part.getDifficulty();
     }
 
     @Override
@@ -244,7 +245,11 @@ public class EquipmentPart extends Part {
 		        mounted.setDestroyed(true);
 		        unit.destroySystem(CriticalSlot.TYPE_EQUIPMENT, unit.getEntity().getEquipmentNum(mounted));	
 			}
-	        if(!salvage) {
+			Part spare = campaign.checkForExistingSparePart(this);
+			if(!salvage) {
+				campaign.removePart(this);
+			} else if(null != spare) {
+				spare.incrementQuantity();
 				campaign.removePart(this);
 			}
 	        unit.removePart(this);

@@ -119,7 +119,11 @@ public class AeroHeatSink extends Part {
 			if(hits == 0) {
 				((Aero)unit.getEntity()).setHeatSinks(((Aero)unit.getEntity()).getHeatSinks()-1);
 			}
+			Part spare = campaign.checkForExistingSparePart(this);
 			if(!salvage) {
+				campaign.removePart(this);
+			} else if(null != spare) {
+				spare.incrementQuantity();
 				campaign.removePart(this);
 			}
 			unit.removePart(this);
@@ -195,10 +199,10 @@ public class AeroHeatSink extends Part {
 
 	@Override
 	public boolean isSamePartTypeAndStatus(Part part) {
-		if(needsFixing() || part.needsFixing()) {
+		if(isReservedForRefit()) {
     		return false;
     	}
-		return part instanceof AeroHeatSink && type == ((AeroHeatSink)part).getType();
+		return part instanceof AeroHeatSink && type == ((AeroHeatSink)part).getType() && part.getHits() == this.getHits();
 	}
 
 	public int getType() {

@@ -122,12 +122,13 @@ public class MekActuator extends Part {
 
     @Override
     public boolean isSamePartTypeAndStatus (Part part) {
-    	if(needsFixing() || part.needsFixing()) {
+    	if(isReservedForRefit()) {
     		return false;
     	}
         return part instanceof MekActuator
                 && getType() == ((MekActuator)part).getType()
-                && getUnitTonnage() == ((MekActuator)part).getUnitTonnage();
+                && getUnitTonnage() == ((MekActuator)part).getUnitTonnage()
+                && this.needsFixing() == part.needsFixing();
     }
 
     @Override
@@ -205,7 +206,11 @@ public class MekActuator extends Part {
 	public void remove(boolean salvage) {
 		if(null != unit) {
 			unit.destroySystem(CriticalSlot.TYPE_SYSTEM, type, location);
+			Part spare = campaign.checkForExistingSparePart(this);
 			if(!salvage) {
+				campaign.removePart(this);
+			} else if(null != spare) {
+				spare.incrementQuantity();
 				campaign.removePart(this);
 			}
 			unit.removePart(this);

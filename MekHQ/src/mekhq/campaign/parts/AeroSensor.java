@@ -97,7 +97,11 @@ public class AeroSensor extends Part {
 	public void remove(boolean salvage) {
 		if(null != unit && unit.getEntity() instanceof Aero) {
 			((Aero)unit.getEntity()).setSensorHits(3);
+			Part spare = campaign.checkForExistingSparePart(this);
 			if(!salvage) {
+				campaign.removePart(this);
+			} else if(null != spare) {
+				spare.incrementQuantity();
 				campaign.removePart(this);
 			}
 			unit.removePart(this);
@@ -160,11 +164,12 @@ public class AeroSensor extends Part {
 
 	@Override
 	public boolean isSamePartTypeAndStatus(Part part) {
-		if(needsFixing() || part.needsFixing()) {
+		if(isReservedForRefit()) {
     		return false;
     	}
 		return part instanceof AeroSensor && dropship == ((AeroSensor)part).isForDropShip()
-				&& (dropship || getUnitTonnage() == part.getUnitTonnage());
+				&& (dropship || getUnitTonnage() == part.getUnitTonnage())
+				&& part.needsFixing() == this.needsFixing();
 	}
 
 	public boolean isForDropShip() {

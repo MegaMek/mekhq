@@ -178,11 +178,14 @@ public class MissingEquipmentPart extends MissingPart {
 	public void fix() {
 		Part replacement = findReplacement(false);
 		if(null != replacement) {
-			unit.addPart(replacement);
-			((EquipmentPart)replacement).setEquipmentNum(equipmentNum);
+			Part actualReplacement = replacement.clone();
+			unit.addPart(actualReplacement);
+			campaign.addPart(actualReplacement);
+			replacement.decrementQuantity();
+			((EquipmentPart)actualReplacement).setEquipmentNum(equipmentNum);
 			remove(false);
 			//assign the replacement part to the unit			
-			replacement.updateConditionFromPart();
+			actualReplacement.updateConditionFromPart();
 		}
 	}
 	

@@ -86,16 +86,8 @@ public class PartsStore implements Serializable {
 		stock(c);
 	}
 	
-	public ArrayList<PartInventory> getInventory(Campaign c) {
-		ArrayList<PartInventory> partsInventory = new ArrayList<PartInventory>();
-
-		Iterator<Part> itParts = parts.iterator();
-		while (itParts.hasNext()) {
-			Part part = itParts.next();
-			partsInventory.add(new PartInventory(part, 1));
-		}
-
-		return partsInventory;
+	public ArrayList<Part> getInventory() {
+		return parts;
 	}
 	
 	public void stock(Campaign c) {

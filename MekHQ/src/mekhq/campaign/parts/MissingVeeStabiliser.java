@@ -111,12 +111,15 @@ public class MissingVeeStabiliser extends MissingPart {
 	@Override 
 	public void fix() {
 		VeeStabiliser replacement = (VeeStabiliser)findReplacement(false);
-		replacement.setLocation(loc);
 		if(null != replacement) {
-			unit.addPart(replacement);
+			VeeStabiliser actualReplacement = replacement.clone();
+			unit.addPart(actualReplacement);
+			campaign.addPart(actualReplacement);
+			replacement.decrementQuantity();
+			actualReplacement.setLocation(loc);
 			remove(false);
 			//assign the replacement part to the unit			
-			replacement.updateConditionFromPart();
+			actualReplacement.updateConditionFromPart();
 		}
 	}
 	

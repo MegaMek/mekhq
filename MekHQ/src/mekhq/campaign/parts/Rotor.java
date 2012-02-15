@@ -51,10 +51,13 @@ public class Rotor extends TankLocation {
  
     @Override
     public boolean isSamePartTypeAndStatus (Part part) {
-    	if(needsFixing() || part.needsFixing()) {
+    	if(isReservedForRefit()) {
     		return false;
     	}
-        return part instanceof Rotor && getUnitTonnage() == part.getUnitTonnage();
+        return part instanceof Rotor 
+        		&& getLoc() == ((Rotor)part).getLoc() 
+        		&& getUnitTonnage() == ((Rotor)part).getUnitTonnage()
+        		&& this.getDamage() == ((Rotor)part).getDamage();
     }
 
 	@Override
@@ -92,7 +95,11 @@ public class Rotor extends TankLocation {
 	public void remove(boolean salvage) {
 		if(null != unit && unit.getEntity() instanceof VTOL) {
 			unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, VTOL.LOC_ROTOR);
+			Part spare = campaign.checkForExistingSparePart(this);
 			if(!salvage) {
+				campaign.removePart(this);
+			} else if(null != spare) {
+				spare.incrementQuantity();
 				campaign.removePart(this);
 			}
 			unit.removePart(this);

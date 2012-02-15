@@ -317,10 +317,13 @@ public class MissingMekLocation extends MissingPart {
 		Part replacement = findReplacement(false);
 		if(null != replacement) {
 			Unit u = unit;
-			unit.addPart(replacement);
+			Part actualReplacement = replacement.clone();
+			unit.addPart(actualReplacement);
+			campaign.addPart(actualReplacement);
+			replacement.decrementQuantity();
 			remove(false);
 			//assign the replacement part to the unit			
-			replacement.updateConditionFromPart();
+			actualReplacement.updateConditionFromPart();
 			u.runDiagnostic();
 		}
 	}

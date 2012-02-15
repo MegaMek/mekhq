@@ -347,9 +347,6 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 					remove(false);
 					return;
 				}
-				if(type.getInternalName().equals("IS Ammo MML-9 LRM")) {
-					int bob = 1;
-				}
 				if(type.equals(mounted.getType())) {
 					shotsNeeded = getFullShots() - mounted.getShotsLeft();	
 					time = 15;
@@ -384,7 +381,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 	
 	@Override
     public boolean isSamePartTypeAndStatus (Part part) {
-    	if(needsFixing() || part.needsFixing()) {
+		if(isReservedForRefit()) {
     		return false;
     	}
     	return  part instanceof AmmoBin

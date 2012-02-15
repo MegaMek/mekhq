@@ -123,11 +123,14 @@ public class MissingMekActuator extends MissingPart {
 	public void fix() {
 		Part replacement = findReplacement(false);
 		if(null != replacement) {
-			unit.addPart(replacement);
-			((MekActuator)replacement).setLocation(location);
+			Part actualReplacement = replacement.clone();
+			unit.addPart(actualReplacement);
+			campaign.addPart(actualReplacement);
+			replacement.decrementQuantity();
+			((MekActuator)actualReplacement).setLocation(location);
 			remove(false);
 			//assign the replacement part to the unit			
-			replacement.updateConditionFromPart();
+			actualReplacement.updateConditionFromPart();
 		}
 	}
 	

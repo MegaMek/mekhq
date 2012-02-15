@@ -90,12 +90,19 @@ public class TankLocation extends Part {
 
     @Override
     public boolean isSamePartTypeAndStatus (Part part) {
-    	if(needsFixing() || part.needsFixing()) {
+    	if(isReservedForRefit()) {
     		return false;
     	}
-        return part instanceof TankLocation && getLoc() == ((TankLocation)part).getLoc() && getUnitTonnage() == ((TankLocation)part).getUnitTonnage();
+        return part instanceof TankLocation 
+        		&& getLoc() == ((TankLocation)part).getLoc() 
+        		&& getUnitTonnage() == ((TankLocation)part).getUnitTonnage()
+        		&& this.getDamage() == ((TankLocation)part).getDamage();
     }
 
+    public int getDamage() {
+    	return damage;
+    }
+    
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent) {
 		writeToXmlBegin(pw1, indent);
@@ -185,7 +192,11 @@ public class TankLocation extends Part {
 	public void remove(boolean salvage) {
 		if(null != unit) {
 			unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, loc);
+			Part spare = campaign.checkForExistingSparePart(this);
 			if(!salvage) {
+				campaign.removePart(this);
+			} else if(null != spare) {
+				spare.incrementQuantity();
 				campaign.removePart(this);
 			}
 			unit.removePart(this);

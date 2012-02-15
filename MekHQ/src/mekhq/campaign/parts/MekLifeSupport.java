@@ -65,10 +65,10 @@ public class MekLifeSupport extends Part {
 
     @Override
     public boolean isSamePartTypeAndStatus (Part part) {
-    	if(needsFixing() || part.needsFixing()) {
+    	if(isReservedForRefit()) {
     		return false;
     	}
-        return part instanceof MekLifeSupport;
+        return part instanceof MekLifeSupport && this.getHits() == part.getHits();
     }
     
     @Override
@@ -124,7 +124,11 @@ public class MekLifeSupport extends Part {
 	public void remove(boolean salvage) {
 		if(null != unit) {
 			unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_LIFE_SUPPORT);
+			Part spare = campaign.checkForExistingSparePart(this);
 			if(!salvage) {
+				campaign.removePart(this);
+			} else if(null != spare) {
+				spare.incrementQuantity();
 				campaign.removePart(this);
 			}
 			unit.removePart(this);

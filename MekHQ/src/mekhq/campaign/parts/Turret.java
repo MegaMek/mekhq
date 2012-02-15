@@ -84,10 +84,13 @@ public class Turret extends TankLocation {
 
     @Override
     public boolean isSamePartTypeAndStatus (Part part) {
-    	if(needsFixing() || part.needsFixing()) {
+    	if(isReservedForRefit()) {
     		return false;
     	}
-        return part instanceof Turret && getTonnage() == part.getTonnage();
+        return part instanceof Turret 
+        		&& getLoc() == ((Turret)part).getLoc() 
+        		&& getUnitTonnage() == ((Turret)part).getUnitTonnage()
+        		&& this.getDamage() == ((Turret)part).getDamage();
     }
 
 	@Override
@@ -144,7 +147,11 @@ public class Turret extends TankLocation {
 	public void remove(boolean salvage) {
 		if(null != unit) {
 			unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, loc);
+			Part spare = campaign.checkForExistingSparePart(this);
 			if(!salvage) {
+				campaign.removePart(this);
+			} else if(null != spare) {
+				spare.incrementQuantity();
 				campaign.removePart(this);
 			}
 			unit.removePart(this);

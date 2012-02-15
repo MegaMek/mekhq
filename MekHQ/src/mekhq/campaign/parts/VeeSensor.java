@@ -53,7 +53,11 @@ public class VeeSensor extends Part {
 	
     @Override
     public boolean isSamePartTypeAndStatus (Part part) {
-        return part instanceof VeeSensor;
+    	if(isReservedForRefit()) {
+    		return false;
+    	}
+        return part instanceof VeeSensor 
+        		&& this.needsFixing() == part.needsFixing();
     }
 
 	@Override
@@ -99,7 +103,11 @@ public class VeeSensor extends Part {
 	public void remove(boolean salvage) {
 		if(null != unit && unit.getEntity() instanceof Tank) {
 			((Tank)unit.getEntity()).setSensorHits(4);
+			Part spare = campaign.checkForExistingSparePart(this);
 			if(!salvage) {
+				campaign.removePart(this);
+			} else if(null != spare) {
+				spare.incrementQuantity();
 				campaign.removePart(this);
 			}
 			unit.removePart(this);

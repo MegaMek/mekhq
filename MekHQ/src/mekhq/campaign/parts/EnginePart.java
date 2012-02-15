@@ -128,7 +128,7 @@ public class EnginePart extends Part {
 
 	@Override
 	public boolean isSamePartTypeAndStatus(Part part) {
-		if(needsFixing() || part.needsFixing()) {
+		if(isReservedForRefit()) {
     		return false;
     	}
 		return part instanceof EnginePart
@@ -141,7 +141,8 @@ public class EnginePart extends Part {
 						.getTechType()
 				&& getEngine().hasFlag(Engine.TANK_ENGINE) == ((EnginePart) part).getEngine().hasFlag(Engine.TANK_ENGINE)
 				&& getUnitTonnage() == ((EnginePart) part).getUnitTonnage()
-				&& getTonnage() == ((EnginePart)part).getTonnage();
+				&& getTonnage() == ((EnginePart)part).getTonnage()
+				&& this.getHits() == part.getHits();
 	}
 
 	@Override
@@ -318,7 +319,11 @@ public class EnginePart extends Part {
 			if(unit.getEntity() instanceof Tank) {
 				((Tank)unit.getEntity()).engineHit();
 			}
+			Part spare = campaign.checkForExistingSparePart(this);
 			if(!salvage) {
+				campaign.removePart(this);
+			} else if(null != spare) {
+				spare.incrementQuantity();
 				campaign.removePart(this);
 			}
 			unit.removePart(this);

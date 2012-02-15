@@ -166,9 +166,14 @@ public class MekLocation extends Part {
                 && getUnitTonnage() == ((MekLocation)part).getUnitTonnage()
                 && isTsm() == ((MekLocation)part).isTsm()
                 && getStructureType() == ((MekLocation) part).getStructureType()
-                && (!isArm() || forQuad == ((MekLocation)part).forQuad);
+                && (!isArm() || forQuad == ((MekLocation)part).forQuad)
+                && this.getPercent() == ((MekLocation)part).getPercent();
     }
 
+    public double getPercent() {
+    	return percent;
+    }
+    
     @Override
     public int getPartType() {
         return PART_TYPE_MEK_BODY_PART;
@@ -364,7 +369,11 @@ public class MekLocation extends Part {
 		if(null != unit) {
 			unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, loc);
 			unit.getEntity().setLocationBlownOff(loc, false);
+			Part spare = campaign.checkForExistingSparePart(this);
 			if(!salvage) {
+				campaign.removePart(this);
+			} else if(null != spare) {
+				spare.incrementQuantity();
 				campaign.removePart(this);
 			}
 			unit.removePart(this);

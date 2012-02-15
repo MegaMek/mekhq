@@ -52,7 +52,6 @@ import megamek.common.MiscType;
 import megamek.common.TechConstants;
 import megamek.common.WeaponType;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.PartInventory;
 import mekhq.campaign.parts.AeroSensor;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Avionics;
@@ -121,7 +120,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
         this.campaignGUI = gui;
         campaign = campaignGUI.getCampaign();
         formatter = new DecimalFormat();
-        partsModel = new PartsTableModel(campaign.getPartsStore().getInventory(campaign));
+        partsModel = new PartsTableModel(campaign.getPartsStore().getInventory());
         initComponents();
         filterParts();
         setLocationRelativeTo(frame);
@@ -366,7 +365,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 		private static final long serialVersionUID = 534443424190075264L;
 
 		protected String[] columnNames;
-		protected ArrayList<PartInventory> data;
+		protected ArrayList<Part> data;
 
 		public final static int COL_NAME    =    0;
 		public final static int COL_DETAIL   =   1;
@@ -375,7 +374,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 		public final static int COL_TON       =  4;
         public final static int N_COL          = 5;
 		
-		public PartsTableModel(ArrayList<PartInventory> inventory) {
+		public PartsTableModel(ArrayList<Part> inventory) {
 			data = inventory;
 		}
 		
@@ -406,13 +405,12 @@ public class PartsStoreDialog extends javax.swing.JDialog {
         }
 
 		public Object getValueAt(int row, int col) {
-	        PartInventory partInventory;
+	        Part part;
 	        if(data.isEmpty()) {
 	        	return "";
 	        } else {
-	        	partInventory = (PartInventory)data.get(row);
+	        	part = (Part)data.get(row);
 	        }
-			Part part = partInventory.getPart();
 			if(col == COL_NAME) {
 				return part.getName();
 			}
@@ -442,14 +440,14 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 		}
 
 		public Part getPartAt(int row) {
-			return ((PartInventory) data.get(row)).getPart();
+			return ((Part) data.get(row));
 		}
 
 		public Part[] getPartstAt(int[] rows) {
 			Part[] parts = new Part[rows.length];
 			for (int i = 0; i < rows.length; i++) {
 				int row = rows[i];
-				parts[i] = ((PartInventory) data.get(row)).getPart();
+				parts[i] = ((Part) data.get(row));
 			}
 			return parts;
 		}

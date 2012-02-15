@@ -94,7 +94,11 @@ public class LandingGear extends Part {
 	public void remove(boolean salvage) {
 		if(null != unit && unit.getEntity() instanceof Aero) {
 			((Aero)unit.getEntity()).setGearHit(true);
+			Part spare = campaign.checkForExistingSparePart(this);
 			if(!salvage) {
+				campaign.removePart(this);
+			} else if(null != spare) {
+				spare.incrementQuantity();
 				campaign.removePart(this);
 			}
 			unit.removePart(this);
@@ -153,10 +157,11 @@ public class LandingGear extends Part {
 
 	@Override
 	public boolean isSamePartTypeAndStatus(Part part) {
-		if(needsFixing() || part.needsFixing()) {
+		if(isReservedForRefit()) {
     		return false;
     	}
-		return part instanceof LandingGear;
+		return part instanceof LandingGear
+				&& this.getHits() == part.getHits();
 	}
 
 	@Override

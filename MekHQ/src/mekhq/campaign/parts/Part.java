@@ -129,6 +129,12 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	//all parts need a reference to campaign
 	protected Campaign campaign;
 	
+	/**
+	 * The number of parts in exactly the same condition,
+	 * to track multiple spare parts more efficiently
+	 */
+	protected int quantity;
+	
 	//reverse-compatability
 	protected int oldUnitId = -1;
 	protected int oldTeamId = -1;
@@ -155,6 +161,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		this.daysToArrival = 0;
 		this.campaign = c;
 		this.brandNew = false;
+		this.quantity = 1;
 	}
 
 	public void setId(int id) {
@@ -423,6 +430,10 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 				+"<brandNew>"
 				+brandNew
 				+"</brandNew>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<quantity>"
+				+quantity
+				+"</quantity>");
 	}
 	
 	protected void writeToXmlEnd(PrintWriter pw1, int indent) {
@@ -484,6 +495,8 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 					retVal.name = wn2.getTextContent();
 				} else if (wn2.getNodeName().equalsIgnoreCase("unitTonnage")) {
 					retVal.unitTonnage = Integer.parseInt(wn2.getTextContent());
+				} else if (wn2.getNodeName().equalsIgnoreCase("quantity")) {
+					retVal.quantity = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("hits")) {
 					retVal.hits = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("difficulty")) {
@@ -800,6 +813,21 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
     public boolean isInSupply() {
         return true;
+    }
+    
+    public int getQuantity() {
+    	return quantity;
+    }
+    
+    public void incrementQuantity() {
+    	quantity++;
+    }
+    
+    public void decrementQuantity() {
+    	quantity--;
+    	if(quantity <= 0) {
+    		campaign.removePart(this);
+    	}
     }
 }
 
