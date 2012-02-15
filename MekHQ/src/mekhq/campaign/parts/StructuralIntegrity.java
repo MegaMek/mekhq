@@ -59,7 +59,9 @@ public class StructuralIntegrity extends Part {
 	}
 	
 	public StructuralIntegrity clone() {
-		return new StructuralIntegrity(getUnitTonnage(), campaign);
+		StructuralIntegrity si = new StructuralIntegrity(getUnitTonnage(), campaign);
+		si.pointsNeeded = this.pointsNeeded;
+		return si;
 	}
 	
 	

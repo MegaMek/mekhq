@@ -48,7 +48,9 @@ public class JumpJet extends EquipmentPart {
     }
     
     public JumpJet clone() {
-    	return new JumpJet(getUnitTonnage(), getType(), getEquipmentNum(), campaign);
+    	JumpJet clone = new JumpJet(getUnitTonnage(), getType(), getEquipmentNum(), campaign);
+    	clone.hits = this.hits;
+    	return clone;
     }
 	
     @Override

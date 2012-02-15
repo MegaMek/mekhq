@@ -2,6 +2,7 @@ VERSION HISTORY
 ----------------------------------
 v0.1.16 (SVN)
 + removed PartsInventory, quantity is now tracked directly by part
++ include damage status in parts clones
 
 v0.1.15 (2012-02-11)
 + Bug 3486200: Previous version campaigns do not save...

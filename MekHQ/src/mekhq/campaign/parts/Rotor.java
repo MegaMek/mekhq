@@ -46,7 +46,11 @@ public class Rotor extends TankLocation {
     }
     
     public Rotor clone() {
-    	return new Rotor(getUnitTonnage(), campaign);
+    	Rotor clone = new Rotor(getUnitTonnage(), campaign);
+    	clone.loc = this.loc;
+    	clone.damage = this.damage;
+    	clone.breached = this.breached;
+    	return clone;
     }
  
     @Override

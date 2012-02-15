@@ -56,7 +56,9 @@ public class AeroSensor extends Part {
     }
     
     public AeroSensor clone() {
-    	return new AeroSensor(getUnitTonnage(), dropship, campaign);
+    	AeroSensor clone = new AeroSensor(getUnitTonnage(), dropship, campaign);
+    	clone.hits = this.hits;
+    	return clone;
     }
         
 	@Override

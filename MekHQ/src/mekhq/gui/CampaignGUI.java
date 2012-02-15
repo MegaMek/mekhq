@@ -3575,7 +3575,7 @@ public class CampaignGUI extends JPanel {
         		if(!tech.isRightTechTypeFor(unit) && !btnShowAllTechs.isSelected()) {
         			return false;
         		}
-        		Skill skill = tech.getSkillForWorkingOn(unit);
+        		Skill skill = tech.getSkillForWorkingOn(part);
         		int modePenalty = Modes.getModeExperienceReduction(part.getMode());
         		if(skill == null) {
         			return false;
@@ -7342,10 +7342,15 @@ public class CampaignGUI extends JPanel {
 		private void maybeShowPopup(MouseEvent e) {
 			JPopupMenu popup = new JPopupMenu();
 			if (e.isPopupTrigger()) {
+				if(partsTable.getSelectedRowCount() == 0) {
+	            	return;
+	            }
+	            int row = partsTable.getSelectedRow();
 				JMenuItem menuItem = null;
 				JMenu menu = null;
 				JCheckBoxMenuItem cbMenuItem = null;
 	            boolean oneSelected = partsTable.getSelectedRowCount() == 1;
+				Part part = partsModel.getPartAt(partsTable.convertRowIndexToModel(row));
 				// **lets fill the pop up menu**//
 				// sell part
 				if(getCampaign().getCampaignOptions().canSellParts()) {
@@ -7358,13 +7363,30 @@ public class CampaignGUI extends JPanel {
 					menuItem.setActionCommand("SELL_ALL");
 					menuItem.addActionListener(this);
 					menu.add(menuItem);
-					if(oneSelected) {
+					if(oneSelected && part.getQuantity() > 2) {
 						menuItem = new JMenuItem("Sell # Parts of This Type...");
 						menuItem.setActionCommand("SELL_N");
 						menuItem.addActionListener(this);
 						menu.add(menuItem);
 					}
 					popup.add(menu);
+				}
+				if(oneSelected && part.needsFixing()) {
+					menu = new JMenu("Repair");
+					for(Person tech : getCampaign().getTechs()) {
+						TargetRoll target = getCampaign().getTargetFor(part, tech);
+						if(target.getValue() == TargetRoll.AUTOMATIC_FAIL) {
+							continue;
+						}
+						menuItem = new JMenuItem(tech.getName() + " (" + target.getValueAsString() + "+), " + tech.getMinutesLeft() + " minutes left");
+						menu.add(menuItem);
+					}
+					if(menu.getItemCount() > 20) {
+	                	MenuScroller.setScrollerFor(menu, 20);
+	                }
+					if(menu.getItemCount() > 0) {
+						popup.add(menu);
+					}
 				}
 				// GM mode
 				menu = new JMenu("GM Mode");

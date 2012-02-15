@@ -61,6 +61,7 @@ import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Ranks;
 import mekhq.campaign.Unit;
 import mekhq.campaign.LogEntry;
+import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IMedicalWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.Modes;
@@ -1605,21 +1606,67 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
                  && (partWork.getTimeLeft() - getMinutesLeft()) <= getOvertimeLeft();
     }
     
-    public Skill getSkillForWorkingOn(Unit unit) {
-    	if(unit.getEntity() instanceof Mech && hasSkill(SkillType.S_TECH_MECH)) {
+    public Skill getSkillForWorkingOn(IPartWork part) {
+    	Unit unit = part.getUnit();
+    	if(null != unit && unit.getEntity() instanceof Mech && hasSkill(SkillType.S_TECH_MECH)) {
     		return getSkill(SkillType.S_TECH_MECH);
     	}
-    	if(unit.getEntity() instanceof BattleArmor && hasSkill(SkillType.S_TECH_BA)) {
+    	if(null != unit && unit.getEntity() instanceof BattleArmor && hasSkill(SkillType.S_TECH_BA)) {
     		return getSkill(SkillType.S_TECH_BA);
     	}
-    	if(unit.getEntity() instanceof Tank && hasSkill(SkillType.S_TECH_MECHANIC)) {
+    	if(null != unit && unit.getEntity() instanceof Tank && hasSkill(SkillType.S_TECH_MECHANIC)) {
     		return getSkill(SkillType.S_TECH_MECHANIC);
     	}
-    	if((unit.getEntity() instanceof SmallCraft || unit.getEntity() instanceof Jumpship)
+    	if(null != unit && (unit.getEntity() instanceof SmallCraft || unit.getEntity() instanceof Jumpship)
     			&& hasSkill(SkillType.S_TECH_VESSEL)) {
     		return getSkill(SkillType.S_TECH_VESSEL);
     	}
-    	if(unit.getEntity() instanceof Aero 
+    	if(null != unit && unit.getEntity() instanceof Aero 
+    			&& !(unit.getEntity() instanceof SmallCraft) 
+    			&& !(unit.getEntity() instanceof Jumpship) 
+    			&& hasSkill(SkillType.S_TECH_AERO)) {
+    		return getSkill(SkillType.S_TECH_AERO);
+    	}
+    	//if we are still here then we didn't have the right tech skill, so return the highest
+    	//of any tech skills that we do have
+    	Skill skill = null;
+    	if(hasSkill(SkillType.S_TECH_MECH)) {
+    		skill = getSkill(SkillType.S_TECH_MECH);
+    	}
+    	if(hasSkill(SkillType.S_TECH_BA)) {
+    		if(null == skill || skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_BA).getFinalSkillValue()) {
+    			skill = getSkill(SkillType.S_TECH_BA);
+    		}
+    	}
+    	if(hasSkill(SkillType.S_TECH_MECHANIC)) {
+    		if(null == skill || skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_MECHANIC).getFinalSkillValue()) {
+    			skill = getSkill(SkillType.S_TECH_MECHANIC);
+    		}
+    	}
+    	if(hasSkill(SkillType.S_TECH_AERO)) {
+    		if(null == skill || skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_AERO).getFinalSkillValue()) {
+    			skill = getSkill(SkillType.S_TECH_AERO);
+    		}
+    	}
+    	return skill;
+    }
+    
+    public Skill getSkillForWorkingOn(IAcquisitionWork acquisition) {
+    	Unit unit = acquisition.getUnit();
+    	if(null != unit && unit.getEntity() instanceof Mech && hasSkill(SkillType.S_TECH_MECH)) {
+    		return getSkill(SkillType.S_TECH_MECH);
+    	}
+    	if(null != unit && unit.getEntity() instanceof BattleArmor && hasSkill(SkillType.S_TECH_BA)) {
+    		return getSkill(SkillType.S_TECH_BA);
+    	}
+    	if(null != unit && unit.getEntity() instanceof Tank && hasSkill(SkillType.S_TECH_MECHANIC)) {
+    		return getSkill(SkillType.S_TECH_MECHANIC);
+    	}
+    	if(null != unit && (unit.getEntity() instanceof SmallCraft || unit.getEntity() instanceof Jumpship)
+    			&& hasSkill(SkillType.S_TECH_VESSEL)) {
+    		return getSkill(SkillType.S_TECH_VESSEL);
+    	}
+    	if(null != unit && unit.getEntity() instanceof Aero 
     			&& !(unit.getEntity() instanceof SmallCraft) 
     			&& !(unit.getEntity() instanceof Jumpship) 
     			&& hasSkill(SkillType.S_TECH_AERO)) {

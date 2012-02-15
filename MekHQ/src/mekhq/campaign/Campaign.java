@@ -1003,7 +1003,7 @@ public class Campaign implements Serializable {
 			}
 		} else {
 			int modePenalty = Modes.getModeExperienceReduction(partWork.getMode());
-			report = report + partWork.fail(tech.getSkillForWorkingOn(partWork.getUnit()).getExperienceLevel()-modePenalty);
+			report = report + partWork.fail(tech.getSkillForWorkingOn(partWork).getExperienceLevel()-modePenalty);
 			if(roll == 2 && target.getValue() != TargetRoll.AUTOMATIC_FAIL) {
 				xpGained += getCampaignOptions().getMistakeXP();
 			}
@@ -3218,7 +3218,7 @@ public class Campaign implements Serializable {
 	}
 	
 	public TargetRoll getTargetFor(IPartWork partWork, Person tech) {		
-		Skill skill = tech.getSkillForWorkingOn(partWork.getUnit());
+		Skill skill = tech.getSkillForWorkingOn(partWork);
 		int modePenalty = Modes.getModeExperienceReduction(partWork.getMode());
         if(null != partWork.getUnit() && partWork.getUnit().isDeployed()) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "This unit is currently deployed!");
@@ -3242,9 +3242,11 @@ public class Campaign implements Serializable {
         if(!(partWork instanceof Refit) && tech.getMinutesLeft() <= 0 && (!isOvertimeAllowed() || tech.getOvertimeLeft() <= 0)) {
      	   return new TargetRoll(TargetRoll.IMPOSSIBLE, "No time left.");
         }
-        String notFixable = partWork.checkFixable();
-        if(null != notFixable) {
-     	   return new TargetRoll(TargetRoll.IMPOSSIBLE, notFixable);
+        if(null != partWork.getUnit()) {
+	        String notFixable = partWork.checkFixable();
+	        if(null != notFixable) {
+	     	   return new TargetRoll(TargetRoll.IMPOSSIBLE, notFixable);
+	        }
         }
         //this is ugly, if the mode penalty drops you to green, you drop two levels instead of two
         int value = skill.getFinalSkillValue() + modePenalty;
@@ -3294,7 +3296,7 @@ public class Campaign implements Serializable {
     }
 	
 	public TargetRoll getTargetForAcquisition(IAcquisitionWork acquisition, Person person) {
-		Skill skill = person.getSkillForWorkingOn(acquisition.getUnit());	
+		Skill skill = person.getSkillForWorkingOn(acquisition);	
 		if(acquisition.hasCheckedToday()) {
 			return new TargetRoll(TargetRoll.IMPOSSIBLE, "Already checked for this part in this cycle");
 		}	

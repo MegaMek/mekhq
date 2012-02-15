@@ -49,7 +49,9 @@ public class MekSensor extends Part {
     }
 	
 	public MekSensor clone() {
-		return new MekSensor(getUnitTonnage(), campaign);
+		MekSensor clone = new MekSensor(getUnitTonnage(), campaign);
+		clone.hits = this.hits;
+		return clone;
 	}
 	
 	@Override

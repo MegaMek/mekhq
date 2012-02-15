@@ -110,7 +110,9 @@ public class EquipmentPart extends Part {
     }
 
     public EquipmentPart clone() {
-    	return new EquipmentPart(getUnitTonnage(), type, equipmentNum, campaign);
+    	EquipmentPart clone = new EquipmentPart(getUnitTonnage(), type, equipmentNum, campaign);
+    	clone.hits = this.hits;
+    	return clone;
     }
     
     @Override

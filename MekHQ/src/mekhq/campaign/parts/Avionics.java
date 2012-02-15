@@ -51,7 +51,9 @@ public class Avionics extends Part {
     }
     
     public Avionics clone() {
-    	return new Avionics(0, campaign);
+    	Avionics clone = new Avionics(0, campaign);
+    	clone.hits = this.hits;
+    	return clone;
     }
         
 	@Override

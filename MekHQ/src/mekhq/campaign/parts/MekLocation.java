@@ -58,7 +58,11 @@ public class MekLocation extends Part {
     }
     
     public MekLocation clone() {
-    	return new MekLocation(loc, getUnitTonnage(), structureType, tsm, forQuad, campaign);
+    	MekLocation clone = new MekLocation(loc, getUnitTonnage(), structureType, tsm, forQuad, campaign);
+    	clone.percent = this.percent;
+    	clone.breached = this.breached;
+    	clone.blownOff = this.blownOff;
+    	return clone;
     }
     
     public int getLoc() {

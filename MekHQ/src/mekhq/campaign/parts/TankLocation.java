@@ -52,7 +52,11 @@ public class TankLocation extends Part {
     }
     
     public TankLocation clone() {
-    	return new TankLocation(loc, getUnitTonnage(), campaign);
+    	TankLocation clone = new TankLocation(loc, getUnitTonnage(), campaign);
+    	clone.loc = this.loc;
+    	clone.damage = this.damage;
+    	clone.breached = this.breached;
+    	return clone;
     }
     
     public int getLoc() {
