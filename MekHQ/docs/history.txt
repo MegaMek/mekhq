@@ -7,6 +7,7 @@ v0.1.16 (SVN)
 + finished repair warehouse parts feature
 + omnipod refitting
 + ChooseRefitDialog
++ show needed parts in MekLab
 
 v0.1.15 (2012-02-11)
 + Bug 3486200: Previous version campaigns do not save...

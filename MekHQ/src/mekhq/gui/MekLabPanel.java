@@ -103,6 +103,8 @@ public class MekLabPanel extends JPanel implements RefreshListener {
     private JLabel lblHeat;
     private JLabel lblTons;
     
+    private JPanel shoppingPanel;
+    
     public MekLabPanel(CampaignGUI gui) {
     	campaignGUI = gui;
 		entityVerifier = new EntityVerifier(new File("data/mechfiles/UnitVerifierOptions.xml"));
@@ -353,6 +355,19 @@ public class MekLabPanel extends JPanel implements RefreshListener {
         statPanel.add(lblTons);
         statPanel.add(lblHeat);
         
+        shoppingPanel = new JPanel();
+        shoppingPanel.setLayout(new BoxLayout(shoppingPanel, BoxLayout.PAGE_AXIS));
+        shoppingPanel.setBorder(BorderFactory.createTitledBorder("Needed Parts"));
+        JLabel lblItem;
+        for(String name : refit.getShoppingListDescription()) {
+        	lblItem = new JLabel(name);
+        	shoppingPanel.add(lblItem);
+        }
+        if(refit.getShoppingListDescription().length == 0) {
+        	lblItem = new JLabel("None");
+        	shoppingPanel.add(lblItem);
+        }
+        
 		c.gridx = 0;
 		c.gridy = 0;
 		c.anchor = GridBagConstraints.NORTHWEST;
@@ -361,16 +376,19 @@ public class MekLabPanel extends JPanel implements RefreshListener {
 		summaryPane.add(lblName,c);
 		c.gridy++;
 		c.insets = new Insets(0,5,2,5);
-		summaryPane.add(statPanel,c);
-		c.gridy++;
-		summaryPane.add(refitPanel,c);
-		c.gridy++;
 		summaryPane.add(btnRefit,c);
 		c.gridy++;
 		summaryPane.add(btnClear,c);
 		c.gridy++;
-		c.weighty = 1.0;
 		summaryPane.add(btnRemove,c);
+		c.gridy++;
+		summaryPane.add(statPanel,c);
+		c.gridy++;
+		summaryPane.add(refitPanel,c);
+		c.gridy++;
+		c.weighty = 1.0;
+		summaryPane.add(shoppingPanel,c);
+		
 		//TODO: compare units dialog that pops up mech views back-to-back
 	}
 	
