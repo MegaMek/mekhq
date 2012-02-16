@@ -6,6 +6,7 @@ v0.1.16 (SVN)
 + repair damaged parts in warehouse (WIP)
 + finished repair warehouse parts feature
 + omnipod refitting
++ ChooseRefitDialog
 
 v0.1.15 (2012-02-11)
 + Bug 3486200: Previous version campaigns do not save...

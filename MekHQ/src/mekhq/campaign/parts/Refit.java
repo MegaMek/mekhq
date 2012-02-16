@@ -165,6 +165,32 @@ public class Refit implements IPartWork, IAcquisitionWork {
 		return cost;
 	}
 	
+	public ArrayList<Part> getShoppingList() {
+		return shoppingList;
+	}
+	
+	public String[] getShoppingListDescription() {
+		Hashtable<String,Integer> tally = new Hashtable<String,Integer>();
+		for(Part p : shoppingList) {
+			if(null != tally.get(p.getName())) {
+				tally.put(p.getName(), tally.get(p.getName()) + 1);
+			} else {
+				tally.put(p.getName(), 1);
+			}
+		}
+		String[] descs = new String[tally.keySet().size()];
+		int i = 0;
+		for(String name : tally.keySet()) {
+			int quantity = tally.get(name);
+			if(quantity>1) {
+				name += "s";
+			}
+			descs[i] = quantity + " " + name;
+			i++;
+		}
+		return descs;
+	}
+	
 	public int getTime() {
 		return time;
 	}

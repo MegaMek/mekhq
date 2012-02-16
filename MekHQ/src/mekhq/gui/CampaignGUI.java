@@ -181,6 +181,7 @@ import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.Modes;
 import mekhq.gui.dialog.AddFundsDialog;
 import mekhq.gui.dialog.CampaignOptionsDialog;
+import mekhq.gui.dialog.ChooseRefitDialog;
 import mekhq.gui.dialog.CompleteMissionDialog;
 import mekhq.gui.dialog.CustomizeMissionDialog;
 import mekhq.gui.dialog.CustomizePersonDialog;
@@ -4128,6 +4129,10 @@ public class CampaignGUI extends JPanel {
 	
 	public JFrame getFrame() {
 		return frame;
+	}
+	
+	public CampaignGUI getCampaignGUI() {
+		return this;
 	}
 	
 	protected boolean repairsSelected() {
@@ -8461,18 +8466,9 @@ public class CampaignGUI extends JPanel {
 				refreshServicedUnitList();
 				refreshUnitList();
 				refreshPartsList();
-			} else if(command.contains("REFIT")) {
-				String model = command.split(":")[1];
-				MechSummary summary = MechSummaryCache.getInstance().getMech(selectedUnit.getEntity().getChassis() + " " + model);
-				try {
-                    Entity refitEn = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
-					if(null != refitEn) {
-						refitUnit(new Refit(selectedUnit, refitEn, false), false);						
-					}
-				} catch (EntityLoadingException ex) {
-					Logger.getLogger(CampaignGUI.class.getName())
-							.log(Level.SEVERE, null, ex);
-				}	
+			} else if(command.contains("REFIT_KIT")) {
+				ChooseRefitDialog crd = new ChooseRefitDialog(getFrame(), true, getCampaign(), selectedUnit, getCampaignGUI());
+				crd.setVisible(true);
 			} else if(command.contains("CHANGE_HISTORY")) {
             	if(null != selectedUnit) {
             		TextAreaDialog tad = new TextAreaDialog(getFrame(), true,
@@ -8582,33 +8578,13 @@ public class CampaignGUI extends JPanel {
 				// Customize
 				if(oneSelected && unit.getEntity() instanceof Mech) {
 					menu = new JMenu("Customize");
-			
-					JMenu refitMenu = new JMenu("Refit Kit");
-					for(String model : Utilities.getAllVariants(unit.getEntity(), getCampaign().getCalendar().get(GregorianCalendar.YEAR), getCampaign().getCampaignOptions())) {
-						MechSummary summary = MechSummaryCache.getInstance().getMech(unit.getEntity().getChassis() + " " + model);
-						if(null == summary) {
-							continue;
-						}
-						try {
-                            Entity refitEn = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
-							if(null != refitEn) {
-								Refit r = new Refit(unit, refitEn, false);
-								if(null == r.checkFixable()) {
-									menuItem = new JMenuItem(r.getDesc());
-									menuItem.setActionCommand("REFIT:" + model);
-									menuItem.addActionListener(this);
-									menuItem.setEnabled(!unit.isRefitting());
-									refitMenu.add(menuItem);
-								}
-							}
-						} catch (EntityLoadingException ex) {
-							Logger.getLogger(CampaignGUI.class.getName())
-									.log(Level.SEVERE, null, ex);
-						}		
-					}
-					menu.add(refitMenu);
-			
-					menuItem = new JMenuItem("Customize in Mek Lab");
+					menuItem = new JMenuItem("Choose Refit Kit...");
+					menuItem.setActionCommand("REFIT_KIT");
+					menuItem.addActionListener(this);
+					menuItem.setEnabled(!unit.isRefitting()
+							&& (unit.getEntity() instanceof megamek.common.Mech));
+					menu.add(menuItem);		
+					menuItem = new JMenuItem("Customize in Mek Lab...");
 					menuItem.setActionCommand("CUSTOMIZE");
 					menuItem.addActionListener(this);
 					menuItem.setEnabled(!unit.isRefitting()
