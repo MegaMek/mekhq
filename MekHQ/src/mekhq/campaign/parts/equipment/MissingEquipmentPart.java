@@ -307,4 +307,10 @@ public class MissingEquipmentPart extends MissingPart {
 			}
 		}
 	}
+	
+	@Override
+    public boolean isOmniPoddable() {
+    	//TODO: is this on equipment type?
+    	return true;
+    }
 }

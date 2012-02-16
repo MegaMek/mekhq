@@ -194,4 +194,9 @@ public class MissingMekActuator extends MissingPart {
 			unit.destroySystem(CriticalSlot.TYPE_SYSTEM, type, location);
 		}
 	}
+	
+	@Override
+	public boolean isOmniPoddable() {
+		return type == Mech.ACTUATOR_LOWER_ARM || type == Mech.ACTUATOR_HAND;
+	}
 }

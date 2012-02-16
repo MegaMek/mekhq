@@ -160,13 +160,18 @@ public class MASC extends EquipmentPart {
 	}
 	
 	@Override
-	 public String getDetails() {
-		 if(null != unit) {
-			 return super.getDetails();
-		 }
-		 if(isSupercharger()) {
-			 return super.getDetails() + ", " + getEngineRating() + " rating";
-		 }
-		 return super.getDetails() + ", " + getUnitTonnage() + " tons, " + getEngineRating() + " rating";
+	public String getDetails() {
+		if(null != unit) {
+			return super.getDetails();
+		}
+		if(isSupercharger()) {
+			return super.getDetails() + ", " + getEngineRating() + " rating";
+		}
+		return super.getDetails() + ", " + getUnitTonnage() + " tons, " + getEngineRating() + " rating";
 	 }
+	
+	@Override
+    public boolean isOmniPoddable() {
+    	return false;
+    }
 }

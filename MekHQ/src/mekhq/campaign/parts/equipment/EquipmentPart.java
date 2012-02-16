@@ -544,4 +544,10 @@ public class EquipmentPart extends Part {
     public boolean isPartForCriticalSlot(int index, int loc) {
     	return equipmentNum == index;
     }
+    
+    @Override
+    public boolean isOmniPoddable() {
+    	//TODO: is this on equipment type?
+    	return true;
+    }
 }

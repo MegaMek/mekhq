@@ -76,12 +76,13 @@ import org.w3c.dom.NodeList;
 public class Refit implements IPartWork, IAcquisitionWork {
 	
 	public static final int NO_CHANGE = 0;
-	public static final int CLASS_A = 1;
-	public static final int CLASS_B = 2;
-	public static final int CLASS_C = 3;
-	public static final int CLASS_D = 4;
-	public static final int CLASS_E = 5;
-	public static final int CLASS_F = 6;
+	public static final int CLASS_OMNI = 1;
+	public static final int CLASS_A = 2;
+	public static final int CLASS_B = 3;
+	public static final int CLASS_C = 4;
+	public static final int CLASS_D = 5;
+	public static final int CLASS_E = 6;
+	public static final int CLASS_F = 7;
 	
 	private Unit oldUnit;
 	private Entity newEntity;
@@ -144,6 +145,8 @@ public class Refit implements IPartWork, IAcquisitionWork {
 			return "Class E (Factory)";
 		case CLASS_F:
 			return "Class F (Factory)";
+		case CLASS_OMNI:
+			return "Omni Repod";
 		default:	
 			return "Unknown";
 				
@@ -170,6 +173,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 		Unit newUnit = new Unit(newEntity, oldUnit.campaign);
 		newUnit.initializeParts(false);
 		refitClass = NO_CHANGE;
+		boolean isOmni = oldUnit.getEntity().isOmni();
 		time = 0;
 		sameArmorType = newEntity.getArmorType(0) == oldUnit.getEntity().getArmorType(0);
 		int recycledArmorPoints = 0;
@@ -233,7 +237,11 @@ public class Refit implements IPartWork, IAcquisitionWork {
 			} else if(null != movedPart) {
 				newUnitParts.add(movedPart.getId());
 				oldUnitParts.remove(moveIndex);
-				updateRefitClass(CLASS_C);
+				if(isOmni && movedPart.isOmniPoddable()) {
+					updateRefitClass(CLASS_OMNI);
+				} else {
+					updateRefitClass(CLASS_C);
+				}
 				if(movedPart instanceof EquipmentPart) {
 					boolean isSalvaging = movedPart.isSalvaging();
 					movedPart.setSalvaging(true);
@@ -328,8 +336,12 @@ public class Refit implements IPartWork, IAcquisitionWork {
 				updateRefitClass(CLASS_F);
 				locationHasNewStuff[Mech.LOC_HEAD] = true;
 			}else if(nPart instanceof MissingMekActuator) {
+				if(isOmni && nPart.isOmniPoddable()) {
+					updateRefitClass(CLASS_OMNI);
+				} else {
 					updateRefitClass(CLASS_D);
-					locationHasNewStuff[((MissingMekActuator)nPart).getLocation()] = true;
+				}
+				locationHasNewStuff[((MissingMekActuator)nPart).getLocation()] = true;
 			} else {
 				//determine whether this is A, B, or C
 				if(nPart instanceof MissingEquipmentPart || nPart instanceof AmmoBin) {
@@ -394,6 +406,9 @@ public class Refit implements IPartWork, IAcquisitionWork {
 							matchIndex = i;
 							//don't break because we may find something better
 						}
+					}
+					if(isOmni && nPart.isOmniPoddable()) {
+						rClass = CLASS_OMNI;
 					}
 					updateRefitClass(rClass);
 					if(matchFound) {
@@ -466,11 +481,16 @@ public class Refit implements IPartWork, IAcquisitionWork {
 		//check for CASE
 		//TODO: we still dont have to order the part, we need to get the CASE issues sorted out
 		for(int loc = 0; loc < newEntity.locations(); loc++) {
-			if(newEntity.locationHasCase(loc) != oldUnit.getEntity().locationHasCase(loc)
+			if((newEntity.locationHasCase(loc) != oldUnit.getEntity().locationHasCase(loc) 
+					&& !(newEntity.isClan() && newEntity instanceof Mech))
 					|| (newEntity instanceof Mech 
 							&& ((Mech)newEntity).hasCASEII(loc) != ((Mech)oldUnit.getEntity()).hasCASEII(loc))) {
-				time += 60;
-				updateRefitClass(CLASS_E);
+				if(isOmni) {
+					updateRefitClass(CLASS_OMNI);
+				} else {
+					time += 60;
+					updateRefitClass(CLASS_E);
+				}
 			}
 		}
 		
@@ -478,6 +498,18 @@ public class Refit implements IPartWork, IAcquisitionWork {
 		time *= getTimeMultiplier();
 		if(!customJob) {
 			cost *= 1.1;
+		}
+		
+		//TODO: track the number of locations changed so we can get stuff for omnis
+		//TODO: some class D stuff is not omnipodable
+		if(refitClass == CLASS_OMNI) {
+			int nloc = 0;
+			for(boolean newStuff : locationHasNewStuff) {
+				if(newStuff) {
+					nloc++;
+				}
+			}
+			time = 30 * nloc;
 		}
 		
 		//figure out if we are putting new stuff on a missing location
@@ -497,16 +529,6 @@ public class Refit implements IPartWork, IAcquisitionWork {
 	
 	public void begin() {
 		oldUnit.setRefit(this);
-		ArrayList<Integer> pids = new ArrayList<Integer>();
-		for(int pid : newUnitParts) {
-			Part part = oldUnit.campaign.getPart(pid);
-			Part actualPart = part.clone();
-			part.decrementQuantity();
-			actualPart.setRefitId(oldUnit.getId());
-			oldUnit.campaign.addPart(actualPart);
-			pids.add(actualPart.getId());
-		}
-		newUnitParts = pids;
 		if(customJob) {
 			saveCustomization();
 		}
@@ -719,7 +741,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 			Part part = oldUnit.campaign.getPart(pid);
 			if(null == part) {
 				MekHQ.logMessage("part with id " + pid + " not found for refit of " + getDesc());
-				return;
+				continue;
 			}
 			part.setUnit(oldUnit);
 			part.setRefitId(null);
@@ -926,6 +948,8 @@ public class Refit implements IPartWork, IAcquisitionWork {
 			return 3;
 		case CLASS_F:
 			return 4;
+		case CLASS_OMNI:
+			return -2;
 		default:	
 			return 1;
 		}
@@ -1357,6 +1381,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 				if(null != replacement) {
 					Part actualReplacement = replacement.clone();
 					replacement.decrementQuantity();
+					oldUnit.campaign.addPart(actualReplacement);
 					actualReplacement.setRefitId(oldUnit.getId());
 					newUnitParts.add(actualReplacement.getId());
 				} 

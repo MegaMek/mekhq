@@ -136,4 +136,9 @@ public class MissingMASC extends MissingEquipmentPart {
 		epart.setEquipTonnage(equipTonnage);
 		return epart;
 	}
+	
+	@Override
+    public boolean isOmniPoddable() {
+    	return false;
+    }
 }

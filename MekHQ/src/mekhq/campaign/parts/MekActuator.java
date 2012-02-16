@@ -310,4 +310,9 @@ public class MekActuator extends Part {
 	public boolean isRightTechType(String skillType) {
 		return skillType.equals(SkillType.S_TECH_MECH);
 	}
+	
+	@Override
+	public boolean isOmniPoddable() {
+		return type == Mech.ACTUATOR_LOWER_ARM || type == Mech.ACTUATOR_HAND;
+	}
 }

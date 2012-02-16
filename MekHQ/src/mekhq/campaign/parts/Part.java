@@ -860,5 +860,9 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     public boolean isRightTechType(String skillType) {
     	return true;
     }
+    
+    public boolean isOmniPoddable() {
+    	return false;
+    }
 }
 
