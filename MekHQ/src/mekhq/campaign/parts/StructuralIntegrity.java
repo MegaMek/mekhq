@@ -118,7 +118,7 @@ public class StructuralIntegrity extends Part {
 	}
 
 	@Override
-	public boolean isSamePartTypeAndStatus(Part part) {
+	public boolean isSamePartType(Part part) {
 		//can't be salvaged or scrapped, so ignore
 		return false;
 	}

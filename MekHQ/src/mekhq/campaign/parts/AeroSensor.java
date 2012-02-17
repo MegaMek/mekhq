@@ -169,15 +169,9 @@ public class AeroSensor extends Part {
 	}
 
 	@Override
-	public boolean isSamePartTypeAndStatus(Part part) {
-		if(isReservedForRefit() || isBeingWorkedOn()
-				|| part.isReservedForRefit() || part.isBeingWorkedOn()) {
-    		return false;
-    	}
+	public boolean isSamePartType(Part part) {
 		return part instanceof AeroSensor && dropship == ((AeroSensor)part).isForDropShip()
-				&& (dropship || getUnitTonnage() == part.getUnitTonnage())
-				&& part.needsFixing() == this.needsFixing()
-				&& part.getSkillMin() == this.getSkillMin();
+				&& (dropship || getUnitTonnage() == part.getUnitTonnage());
 	}
 
 	public boolean isForDropShip() {

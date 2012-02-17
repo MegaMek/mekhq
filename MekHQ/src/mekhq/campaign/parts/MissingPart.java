@@ -79,7 +79,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 	}
 	
 	@Override 
-	public boolean isSamePartTypeAndStatus(Part part) {
+	public boolean isSamePartType(Part part) {
 		//missing parts should always return false
 		return false;
 	}

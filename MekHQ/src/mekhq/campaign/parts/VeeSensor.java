@@ -56,14 +56,8 @@ public class VeeSensor extends Part {
 	}
 	
     @Override
-    public boolean isSamePartTypeAndStatus (Part part) {
-    	if(isReservedForRefit() || isBeingWorkedOn()
-				|| part.isReservedForRefit() || part.isBeingWorkedOn()) {
-    		return false;
-    	}
-        return part instanceof VeeSensor 
-        		&& this.needsFixing() == part.needsFixing()
-        		&& part.getSkillMin() == this.getSkillMin();
+    public boolean isSamePartType(Part part) {
+        return part instanceof VeeSensor;
     }
 
 	@Override

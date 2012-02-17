@@ -145,18 +145,17 @@ public class EquipmentPart extends Part {
     }
 
     @Override
-    public boolean isSamePartTypeAndStatus (Part part) {
-    	if(isReservedForRefit() || isBeingWorkedOn()
-				|| part.isReservedForRefit() || part.isBeingWorkedOn()) {
-    		return false;
-    	}
+    public boolean isSamePartType(Part part) {
         return part instanceof EquipmentPart
         		&& getType().equals(((EquipmentPart)part).getType())
-        		&& getTonnage() == part.getTonnage()
-        		&& (this.getHits() > 0) == (part.getHits() > 0) && this.getDifficulty() == part.getDifficulty()
-        		&& part.getSkillMin() == this.getSkillMin();
+        		&& getTonnage() == part.getTonnage();
     }
 
+    @Override
+    public boolean isSameStatus(Part part) {
+    	return super.isSameStatus(part) && (this.getHits() > 0) == (part.getHits() > 0) && this.getDifficulty() == part.getDifficulty();
+    }
+    
     @Override
     public int getPartType() {
         if (getType() instanceof Weapon)

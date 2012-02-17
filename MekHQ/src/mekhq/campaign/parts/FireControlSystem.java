@@ -160,13 +160,8 @@ public class FireControlSystem extends Part {
 	}
 
 	@Override
-	public boolean isSamePartTypeAndStatus(Part part) {
-		if(isReservedForRefit() || isBeingWorkedOn()
-				|| part.isReservedForRefit() || part.isBeingWorkedOn()) {
-    		return false;
-    	}
-		return part instanceof FireControlSystem && this.needsFixing() == part.needsFixing()
-				&& part.getSkillMin() == this.getSkillMin();
+	public boolean isSamePartType(Part part) {
+		return part instanceof FireControlSystem;
 	}
 
 	@Override

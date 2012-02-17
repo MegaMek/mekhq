@@ -95,17 +95,16 @@ public class TankLocation extends Part {
     }
 
     @Override
-    public boolean isSamePartTypeAndStatus (Part part) {
-    	if(isReservedForRefit() || isBeingWorkedOn()
-				|| part.isReservedForRefit() || part.isBeingWorkedOn()) {
-    		return false;
-    	}
+    public boolean isSamePartType(Part part) {
         return part instanceof TankLocation 
         		&& getLoc() == ((TankLocation)part).getLoc() 
-        		&& getUnitTonnage() == ((TankLocation)part).getUnitTonnage()
-        		&& this.getDamage() == ((TankLocation)part).getDamage()
-        		&& part.getSkillMin() == this.getSkillMin();
+        		&& getUnitTonnage() == ((TankLocation)part).getUnitTonnage();
     }	
+    
+    @Override
+    public boolean isSameStatus(Part part) {
+    	return super.isSameStatus(part) && this.getDamage() == ((TankLocation)part).getDamage();
+    }
 
     public int getDamage() {
     	return damage;

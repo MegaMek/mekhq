@@ -131,11 +131,7 @@ public class EnginePart extends Part {
 	}
 
 	@Override
-	public boolean isSamePartTypeAndStatus(Part part) {
-		if(isReservedForRefit() || isBeingWorkedOn()
-				|| part.isReservedForRefit() || part.isBeingWorkedOn()) {
-    		return false;
-    	}
+	public boolean isSamePartType(Part part) {
 		return part instanceof EnginePart
 				&& getName().equals(part.getName())
 				&& getEngine().getEngineType() == ((EnginePart) part)
@@ -146,9 +142,7 @@ public class EnginePart extends Part {
 						.getTechType()
 				&& getEngine().hasFlag(Engine.TANK_ENGINE) == ((EnginePart) part).getEngine().hasFlag(Engine.TANK_ENGINE)
 				&& getUnitTonnage() == ((EnginePart) part).getUnitTonnage()
-				&& getTonnage() == ((EnginePart)part).getTonnage()
-				&& this.getHits() == part.getHits()
-				&& part.getSkillMin() == this.getSkillMin();
+				&& getTonnage() == ((EnginePart)part).getTonnage();
 	}
 
 	@Override

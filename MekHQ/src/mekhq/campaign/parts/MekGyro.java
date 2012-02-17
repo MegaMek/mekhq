@@ -112,16 +112,10 @@ public class MekGyro extends Part {
     }
  
     @Override
-    public boolean isSamePartTypeAndStatus (Part part) {
-    	if(isReservedForRefit() || isBeingWorkedOn()
-				|| part.isReservedForRefit() || part.isBeingWorkedOn()) {
-    		return false;
-    	}
+    public boolean isSamePartType(Part part) {
         return part instanceof MekGyro
                 && getType() == ((MekGyro) part).getType()
-                && getTonnage() == ((MekGyro) part).getTonnage()
-                && this.getHits() == part.getHits()
-                && part.getSkillMin() == this.getSkillMin();
+                && getTonnage() == ((MekGyro) part).getTonnage();
     }
 
     @Override

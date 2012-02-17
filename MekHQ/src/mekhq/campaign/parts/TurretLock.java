@@ -78,7 +78,7 @@ public class TurretLock extends Part {
 	}
 
 	@Override
-	public boolean isSamePartTypeAndStatus(Part part) {
+	public boolean isSamePartType(Part part) {
 		return false;
 	}
 

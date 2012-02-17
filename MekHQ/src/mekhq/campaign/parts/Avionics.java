@@ -168,13 +168,8 @@ public class Avionics extends Part {
 	}
 
 	@Override
-	public boolean isSamePartTypeAndStatus(Part part) {
-		if(isReservedForRefit() || isBeingWorkedOn()
-				|| part.isReservedForRefit() || part.isBeingWorkedOn()) {
-    		return false;
-    	}
-		return part instanceof Avionics && part.needsFixing() == this.needsFixing()
-				&& part.getSkillMin() == this.getSkillMin();
+	public boolean isSamePartType(Part part) {
+		return part instanceof Avionics;
 	}
 
 	@Override

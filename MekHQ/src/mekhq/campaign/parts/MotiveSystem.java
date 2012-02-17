@@ -92,7 +92,7 @@ public class MotiveSystem extends Part {
 	}
 
 	@Override
-	public boolean isSamePartTypeAndStatus(Part part) {
+	public boolean isSamePartType(Part part) {
 		// TODO Auto-generated method stub
 		return false;
 	}

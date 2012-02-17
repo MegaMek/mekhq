@@ -68,18 +68,12 @@ public class MekSensor extends Part {
 	}
 
     @Override
-    public boolean isSamePartTypeAndStatus (Part part) {
-    	if(isReservedForRefit() || isBeingWorkedOn()
-				|| part.isReservedForRefit() || part.isBeingWorkedOn()) {
-    		return false;
-    	}
+    public boolean isSamePartType(Part part) {
     	//the cost of sensors varies by tonnage, so according to
     	//pg. 180 of StratOps that means they can only be exchanged
     	//between meks of the same tonnage
         return part instanceof MekSensor
-                && getUnitTonnage() == part.getUnitTonnage()
-                && this.getHits() == part.getHits()
-                && part.getSkillMin() == this.getSkillMin();
+                && getUnitTonnage() == part.getUnitTonnage();
     }
 
     @Override

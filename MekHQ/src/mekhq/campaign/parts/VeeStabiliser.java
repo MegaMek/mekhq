@@ -61,14 +61,8 @@ public class VeeStabiliser extends Part {
 	}
 
     @Override
-    public boolean isSamePartTypeAndStatus (Part part) {
-    	if(isReservedForRefit() || isBeingWorkedOn()
-				|| part.isReservedForRefit() || part.isBeingWorkedOn()) {
-    		return false;
-    	}
-        return part instanceof VeeStabiliser 
-        		&& this.needsFixing() == part.needsFixing()
-        		&& part.getSkillMin() == this.getSkillMin();
+    public boolean isSamePartType(Part part) {
+        return part instanceof VeeStabiliser;
     }
 
 	@Override

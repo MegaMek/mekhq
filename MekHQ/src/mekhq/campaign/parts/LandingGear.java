@@ -162,14 +162,8 @@ public class LandingGear extends Part {
 	}
 
 	@Override
-	public boolean isSamePartTypeAndStatus(Part part) {
-		if(isReservedForRefit() || isBeingWorkedOn()
-				|| part.isReservedForRefit() || part.isBeingWorkedOn()) {
-    		return false;
-    	}
-		return part instanceof LandingGear
-				&& this.getHits() == part.getHits()
-						&& part.getSkillMin() == this.getSkillMin();
+	public boolean isSamePartType(Part part) {
+		return part instanceof LandingGear;
 	}
 
 	@Override

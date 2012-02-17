@@ -125,16 +125,10 @@ public class MekActuator extends Part {
     }
 
     @Override
-    public boolean isSamePartTypeAndStatus (Part part) {
-    	if(isReservedForRefit() || isBeingWorkedOn()
-				|| part.isReservedForRefit() || part.isBeingWorkedOn()) {
-    		return false;
-    	}
+    public boolean isSamePartType (Part part) {
         return part instanceof MekActuator
                 && getType() == ((MekActuator)part).getType()
-                && getUnitTonnage() == ((MekActuator)part).getUnitTonnage()
-                && this.needsFixing() == part.needsFixing()
-                && part.getSkillMin() == this.getSkillMin();
+                && getUnitTonnage() == ((MekActuator)part).getUnitTonnage();
     }
 
     @Override

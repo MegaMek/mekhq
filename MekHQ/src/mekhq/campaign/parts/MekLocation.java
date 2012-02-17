@@ -162,19 +162,18 @@ public class MekLocation extends Part {
 	}
     
     @Override
-    public boolean isSamePartTypeAndStatus (Part part) {
-    	if(isReservedForRefit() || isBeingWorkedOn()
-				|| part.isReservedForRefit() || part.isBeingWorkedOn()) {
-    		return false;
-    	}
+    public boolean isSamePartType(Part part) {
         return part instanceof MekLocation
                 && getLoc() == ((MekLocation)part).getLoc()
                 && getUnitTonnage() == ((MekLocation)part).getUnitTonnage()
                 && isTsm() == ((MekLocation)part).isTsm()
                 && getStructureType() == ((MekLocation) part).getStructureType()
-                && (!isArm() || forQuad == ((MekLocation)part).forQuad)
-                && this.getPercent() == ((MekLocation)part).getPercent()
-                && part.getSkillMin() == this.getSkillMin();
+                && (!isArm() || forQuad == ((MekLocation)part).forQuad);
+    }
+    
+    @Override
+    public boolean isSameStatus(Part part) {
+    	return super.isSameStatus(part) && this.getPercent() == ((MekLocation)part).getPercent();
     }
 
     public double getPercent() {

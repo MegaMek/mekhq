@@ -235,7 +235,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 				Part oPart = oldUnit.campaign.getPart(pid);
 				i++;
 				if(((oPart instanceof MissingPart && ((MissingPart)oPart).isAcceptableReplacement(part, true)) 
-						|| oPart.isSamePartTypeAndStatus(part))) {
+						|| oPart.isSamePartType(part))) {
 					//need a special check for location and armor amount for armor
 					if(oPart instanceof Armor 
 							&& (((Armor)oPart).getLocation() != ((Armor)part).getLocation()

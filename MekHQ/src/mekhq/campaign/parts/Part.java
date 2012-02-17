@@ -350,16 +350,27 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	
 	/**
 	 * Checks if the current part is exactly the "same kind" of part as the part
-	 * given in argument. It only returns true for undamaged parts. Damaged parts
-	 * are never considered the same type.
-	 * 
-	 *  Primarily used to construct partInventory
+	 * given in argument. This is used to determine whether we need to add new spare
+	 * parts, or increment existing ones.
 	 * 
 	 * @param part
 	 *            The part to be compared with the current part
 	 */
-	public abstract boolean isSamePartTypeAndStatus(Part part);
+	public boolean isSamePartTypeAndStatus(Part part) {
+		return isSamePartType(part) && isSameStatus(part);
+	}
 
+	public abstract boolean isSamePartType(Part part);
+	
+	public boolean isSameStatus(Part part) {
+		//parts that are reserved for refit or being worked on are never the same status
+		if(isReservedForRefit() || isBeingWorkedOn()
+				|| part.isReservedForRefit() || part.isBeingWorkedOn()) {
+    		return false;
+    	}
+		return hits == part.getHits() && part.getSkillMin() == this.getSkillMin();
+	}
+	
 	/**
 	 * Returns the type of the part. Used for parts filtering
 	 * 

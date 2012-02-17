@@ -204,15 +204,8 @@ public class AeroHeatSink extends Part {
 	}
 
 	@Override
-	public boolean isSamePartTypeAndStatus(Part part) {
-		if(isReservedForRefit() || isBeingWorkedOn()
-				|| part.isReservedForRefit() || part.isBeingWorkedOn()) {
-    		return false;
-    	}
-		return part instanceof AeroHeatSink 
-				&& type == ((AeroHeatSink)part).getType() 
-				&& part.getHits() == this.getHits()
-				&& part.getSkillMin() == this.getSkillMin();
+	public boolean isSamePartType(Part part) {
+		return part instanceof AeroHeatSink && type == ((AeroHeatSink)part).getType();
 	}
 
 	public int getType() {

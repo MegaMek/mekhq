@@ -194,11 +194,16 @@ public class Armor extends Part implements IAcquisitionWork {
     }
 
     @Override
-    public boolean isSamePartTypeAndStatus (Part part) {
+    public boolean isSamePartType(Part part) {
         return part instanceof Armor
                 && getType() == ((Armor)part).getType() 
                 && isClanTechBase() == ((Armor)part).isClanTechBase()
                 && getRefitId() == part.getRefitId();
+    }
+    
+    @Override
+    public boolean isSameStatus(Part part) {
+    	return true;
     }
 
     @Override
