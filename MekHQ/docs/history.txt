@@ -11,6 +11,7 @@ v0.1.16 (SVN)
 + separate Part#issamePartTypeAndStatus int Part#isSamePartType and Part$isSameStatus
 + new infirmary layout
 + Bug: NPE when aquiring armor in the Repairs tab.
++ Bug: 3489734 - InSupply check being performed during salvage operations.
 
 v0.1.15 (2012-02-11)
 + Bug 3486200: Previous version campaigns do not save...

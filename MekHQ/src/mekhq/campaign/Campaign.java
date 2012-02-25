@@ -928,7 +928,7 @@ public class Campaign implements Serializable {
 				action = " seal ";
 			}
 		}
-        if (partWork instanceof Armor) {
+        if ((partWork instanceof Armor) && !partWork.isSalvaging()) {
             if (!((Armor)partWork).isInSupply()) {
                 report += "<b>Not enough armor remaining.  Task suspended.</b>";
                 addReport(report);

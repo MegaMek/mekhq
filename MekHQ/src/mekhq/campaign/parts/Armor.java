@@ -676,6 +676,6 @@ public class Armor extends Part implements IAcquisitionWork {
         int currentArmor = unit.getEntity().getArmorForReal(location, rear);
         int fullArmor = unit.getEntity().getOArmor(location, rear);
         int neededArmor = fullArmor - currentArmor;
-        return neededArmor < getAmountAvailable();
+        return neededArmor <= getAmountAvailable();
     }
 }
