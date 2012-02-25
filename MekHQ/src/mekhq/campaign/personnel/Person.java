@@ -1191,12 +1191,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 		return "";
 	}
 	
-	public String getPatientDesc(Campaign c) {
+	public String getPatientDesc() {
         String toReturn = "<html><font size='2'><b>" + getFullTitle() + "</b><br/>";
-        Person doctor = c.getPerson(doctorId);
-        if(null != doctor) {
-        	toReturn += "assigned to " + doctor.getName() + "<br>";
-        }
         toReturn += getHits() + " hit(s)";
         toReturn += "</font></html>";
         return toReturn;
