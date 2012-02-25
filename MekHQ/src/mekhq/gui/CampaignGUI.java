@@ -3675,7 +3675,7 @@ public class CampaignGUI extends JPanel {
 				if(null != u && u.getEntity() instanceof Dropship || u.getEntity() instanceof Jumpship) {
 					tech = u.getEngineer();
 				}
-				if(null == tech) {				
+				if(null != tech) {
 					target = getCampaign().getTargetForAcquisition(acquire, tech);
 				}
 			}
