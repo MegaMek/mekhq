@@ -36,7 +36,6 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
-import javax.swing.SwingConstants;
 
 import megamek.common.AmmoType;
 import megamek.common.Engine;
@@ -52,12 +51,6 @@ import megamek.common.verifier.EntityVerifier;
 import megamek.common.verifier.TestEntity;
 import megamek.common.verifier.TestMech;
 import megameklab.com.MegaMekLab;
-import megameklab.com.ui.Mek.Header;
-import megameklab.com.ui.Mek.tabs.ArmorTab;
-import megameklab.com.ui.Mek.tabs.BuildTab;
-import megameklab.com.ui.Mek.tabs.EquipmentTab;
-import megameklab.com.ui.Mek.tabs.StructureTab;
-import megameklab.com.ui.Mek.tabs.WeaponTab;
 import megameklab.com.util.CConfig;
 import megameklab.com.util.RefreshListener;
 import megameklab.com.util.UnitUtil;
@@ -66,26 +59,20 @@ import mekhq.Utilities;
 import mekhq.campaign.Unit;
 import mekhq.campaign.parts.Refit;
 
-public class MekLabPanel extends JPanel implements RefreshListener {
+public class MekLabPanel extends JPanel {
 
     private static final long serialVersionUID = -5836932822468918198L;
 
     CampaignGUI campaignGUI;
     
     Unit unit;
-    Mech entity;
     TestEntity testEntity;
     EntityVerifier entityVerifier;
     Refit refit;
-    JTabbedPane ConfigPane = new JTabbedPane(SwingConstants.TOP);
+    EntityPanel labPanel;
     JPanel summaryPane = new JPanel();
-    private StructureTab structureTab;
-    private ArmorTab armorTab;
-    private EquipmentTab equipmentTab;
-    private WeaponTab weaponTab;
-    private BuildTab buildTab;
-    private Header header;
-
+    JPanel emptyPanel;
+   
     private JLabel lblName;
     
     private JPanel refitPanel;
@@ -129,154 +116,69 @@ public class MekLabPanel extends JPanel implements RefreshListener {
 				clearUnit();
 			}
 		});
-        reloadTabs();
+        initComponents();
         this.repaint();
     }
+    
+    public void initComponents() {
+    	setLayout(new BorderLayout());
+    	emptyPanel = new JPanel(new BorderLayout());
+		emptyPanel.add(new JLabel("No Unit Loaded"), BorderLayout.PAGE_START);
+		add(emptyPanel, BorderLayout.CENTER);
+    }
 
+    public Unit getUnit() {
+    	return unit;
+    }
+    
     public void loadUnit(Unit u) {
     	unit = u;
-    	
     	MechSummary mechSummary = MechSummaryCache.getInstance().getMech(unit.getEntity().getShortNameRaw());
-		Mech mech = null;
+		Entity entity = null;
 		try {
-			Entity e = (new MechFileParser(mechSummary.getSourceFile(),mechSummary.getEntryName())).getEntity();
-			if (e instanceof Mech) {
-				mech = (Mech) e;
-			}
+			entity = (new MechFileParser(mechSummary.getSourceFile(),mechSummary.getEntryName())).getEntity();
 		} catch (EntityLoadingException ex) {
 			Logger.getLogger(CampaignGUI.class.getName()).log(Level.SEVERE, null, ex);
 		}
-
-        this.entity = mech;
         entity.setYear(unit.campaign.getCalendar().get(GregorianCalendar.YEAR));
         UnitUtil.updateLoadedMech(entity);
-        reloadTabs();
-        this.repaint();
+        removeAll();
+        labPanel = getCorrectLab(entity);
+        refreshSummary();
+    	add(summaryPane, BorderLayout.LINE_START);
+    	add(labPanel, BorderLayout.CENTER);
+    	labPanel.refreshAll();
     }
 
     public void clearUnit() {
     	this.unit = null;
-    	this.entity = null;
-    	reloadTabs();
-        this.repaint();
+        removeAll();
+		add(emptyPanel, BorderLayout.CENTER);
+		this.repaint();
     }
     
     public void resetUnit() {
     	MechSummary mechSummary = MechSummaryCache.getInstance().getMech(unit.getEntity().getShortName());
-		Mech mech = null;
+		Entity entity = null;
 		try {
-			Entity e = (new MechFileParser(mechSummary.getSourceFile(),mechSummary.getEntryName())).getEntity();
-			if (e instanceof Mech) {
-				mech = (Mech) e;
-			}
+			entity = (new MechFileParser(mechSummary.getSourceFile(),mechSummary.getEntryName())).getEntity();
 		} catch (EntityLoadingException ex) {
 			Logger.getLogger(CampaignGUI.class.getName()).log(Level.SEVERE, null, ex);
 		}
-
-        this.entity = mech;
         entity.setYear(unit.campaign.getCalendar().get(GregorianCalendar.YEAR));
         UnitUtil.updateLoadedMech(entity);
-        reloadTabs();
-        this.repaint();
-    }
-    
-    
-    
-    public void reloadTabs() {
         removeAll();
-        ConfigPane.removeAll();
-
-        setLayout(new BorderLayout());
-
-        if(null == entity) {
-        	add(new JLabel("No Unit Loaded"), BorderLayout.PAGE_START);
-        } else {     
-	        structureTab = new StructureTab(entity);
-	        armorTab = new ArmorTab(entity);
-	        armorTab.setArmorType(entity.getArmorType(0));
-	        armorTab.refresh();
-	        header = new Header(entity);
-	        equipmentTab = new EquipmentTab(entity);
-	        weaponTab = new WeaponTab(entity);
-	        buildTab = new BuildTab(entity, equipmentTab, weaponTab);
-	        header.addRefreshedListener(this);
-	        structureTab.addRefreshedListener(this);
-	        armorTab.addRefreshedListener(this);
-	        equipmentTab.addRefreshedListener(this);
-	        weaponTab.addRefreshedListener(this);
-	        buildTab.addRefreshedListener(this);
-	
-	        ConfigPane.addTab("Structure", structureTab);
-	        ConfigPane.addTab("Armor", armorTab);
-	        ConfigPane.addTab("Equipment", equipmentTab);
-	        ConfigPane.addTab("Weapons", weaponTab);
-	        ConfigPane.addTab("Build", buildTab);
-	
-	        refreshSummary();
-	        
-	        add(ConfigPane, BorderLayout.CENTER);
-	        add(summaryPane, BorderLayout.LINE_START);
-
-	        refreshHeader();
-	        refreshAll();
-        }
-        
-        this.repaint();
-    }
-
-    public void refreshAll() {
-        structureTab.refresh();
-        armorTab.refresh();
-        equipmentTab.refresh();
-        weaponTab.refresh();
-        buildTab.refresh();
-    }
-
-    public void refreshArmor() {
-        armorTab.refresh();
+        labPanel = getCorrectLab(entity);
         refreshSummary();
+    	add(summaryPane, BorderLayout.LINE_START);
+    	add(labPanel, BorderLayout.CENTER);
+    	labPanel.refreshAll();
     }
 
-    public void refreshBuild() {
-        buildTab.refresh();
-        refreshSummary();
-    }
-
-    public void refreshEquipment() {
-        equipmentTab.refresh();
-        refreshSummary();
-    }
-
-    public void refreshStatus() {
-        //do nothing
-    }
-
-    public void refreshStructure() {
-        structureTab.refresh();
-        refreshSummary();
-    }
-
-    public void refreshWeapons() {
-        weaponTab.refresh();
-        refreshSummary();
-    }
-
-    public Mech getEntity() {
-        return entity;
-    }
-    
-    public Unit getUnit() {
-    	return unit;
-    }
-
-	@Override
-	public void refreshHeader() {
-		//do nothing
-	}
-	
 	public void refreshSummary() {
+		Mech entity = (Mech)labPanel.getEntity();
 		refit = new Refit(unit, entity, true); 
-        testEntity = new TestMech(entity, entityVerifier.mechOption, null);
+        testEntity = new TestMech((Mech)entity, entityVerifier.mechOption, null);
         StringBuffer sb = new StringBuffer();
         testEntity.correctEntity(sb, true);
 		
@@ -394,6 +296,7 @@ public class MekLabPanel extends JPanel implements RefreshListener {
 	
 	public double calculateTotalHeat() {
         double heat = 0;
+        Mech entity = (Mech)labPanel.getEntity();
 
         if (entity.getOriginalJumpMP() > 0) {
             if (entity.getJumpType() == Mech.JUMP_IMPROVED) {
@@ -450,4 +353,111 @@ public class MekLabPanel extends JPanel implements RefreshListener {
         }
         return heat;
     }
+	
+	private EntityPanel getCorrectLab(Entity en) {
+		if(en instanceof Mech) {
+			return new MekPanel((Mech)en);
+		}
+		return null;
+	}
+	
+	private abstract class EntityPanel extends JTabbedPane implements RefreshListener {
+		
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 6886946112861955446L;
+
+		public abstract Entity getEntity();
+	}
+	
+	private class MekPanel extends EntityPanel {
+		
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 6894731868670529166L;
+		private Mech entity;
+		private megameklab.com.ui.Mek.tabs.StructureTab structureTab;
+		private megameklab.com.ui.Mek.tabs.ArmorTab armorTab;
+		private megameklab.com.ui.Mek.tabs.EquipmentTab equipmentTab;
+		private megameklab.com.ui.Mek.tabs.WeaponTab weaponTab;
+		private megameklab.com.ui.Mek.tabs.BuildTab buildTab;
+		
+		public MekPanel(Mech m) {
+			entity = m;
+			reloadTabs();
+		}
+		 
+		public Entity getEntity() {
+			return entity;
+		}
+		
+		public void reloadTabs() {
+			removeAll();
+			    
+			structureTab = new megameklab.com.ui.Mek.tabs.StructureTab(entity);
+			armorTab = new megameklab.com.ui.Mek.tabs.ArmorTab(entity);
+			armorTab.setArmorType(entity.getArmorType(0));
+			armorTab.refresh();
+			equipmentTab = new megameklab.com.ui.Mek.tabs.EquipmentTab(entity);
+			weaponTab = new megameklab.com.ui.Mek.tabs.WeaponTab(entity);
+			buildTab = new megameklab.com.ui.Mek.tabs.BuildTab(entity, equipmentTab, weaponTab);
+			structureTab.addRefreshedListener(this);
+			armorTab.addRefreshedListener(this);
+			equipmentTab.addRefreshedListener(this);
+			weaponTab.addRefreshedListener(this);
+			buildTab.addRefreshedListener(this);
+
+			addTab("Structure", structureTab);
+			addTab("Armor", armorTab);
+			addTab("Equipment", equipmentTab);
+			addTab("Weapons", weaponTab);
+			addTab("Build", buildTab);
+	        this.repaint();
+		}
+		
+		public void refreshAll() {
+			structureTab.refresh();
+			armorTab.refresh();
+			equipmentTab.refresh();
+			weaponTab.refresh();
+			buildTab.refresh();
+		}
+
+		public void refreshArmor() {
+			armorTab.refresh();
+			refreshSummary();
+		}
+
+		public void refreshBuild() {
+			buildTab.refresh();
+			refreshSummary();
+		}
+
+		public void refreshEquipment() {
+			equipmentTab.refresh();
+			refreshSummary();
+		}
+
+		public void refreshStatus() {
+			//do nothing
+		}
+
+		public void refreshStructure() {
+			structureTab.refresh();
+			refreshSummary();
+		}
+
+		public void refreshWeapons() {
+			weaponTab.refresh();
+			refreshSummary();
+		}
+
+		@Override
+		public void refreshHeader() {
+			// TODO Auto-generated method stub
+			
+		}
+	}
 }
