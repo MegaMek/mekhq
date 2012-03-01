@@ -83,6 +83,23 @@
 		<xcood>352.6</xcood>
 		<ycood>317.39</ycood>
 		<faction>DC</faction>
+		<spectralClass>g</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>v</luminosity>
+		<sysPos>3</sysPos>
+		<gravity>1.2</gravity>
+		<pressure>3</pressure>
+		<temperature>45</temperature>
+		<climate>4</climate>
+		<percentWater>18</percentWater>
+		<hpg>b</hpg>
+		<lifeform>0</lifeform>
+		<satellite>Amarigna</satellite>
+		<socioIndustrial>C-B-C-C-C</socioIndustrial>
+		<landmass>Tsechi (Tigray)</landmass>
+		<landmass>Simien</landmass>
+		<landmass>Adwa</landmass>
+		<desc>Abiy Adi is a largely desert world in the Pesht Military District. The industy on the planet uses so much of the planet's indigenous water that the locals depend on imported water.</desc>
 	</planet>
 	<planet>
 		<name>Abramkovo</name>
@@ -311,6 +328,21 @@
 		<xcood>256.11</xcood>
 		<ycood>187.25</ycood>
 		<faction>DC</faction>
+		<spectralClass>f</spectralClass>
+		<subtype>9</subtype>
+		<luminosity>v</luminosity>
+		<sysPos>2</sysPos>
+		<gravity>0.85</gravity>
+		<pressure>2</pressure>
+		<temperature>45</temperature>
+		<climate>4</climate>
+		<percentWater>14</percentWater>
+		<hpg>b</hpg>
+		<lifeForm>0</lifeForm>
+		<socioIndustrial>B-B-D-C-D </socioIndustrial>
+		<landmass>Agematsu Prime</landmass>
+		<landmass>Little Irehuna Island</landmass>
+		<desc>An inhospitable rock in space, that was colonized by a religious sect looking to escape from humanity’s corruption, In the late 3060 Ishikawajima‐Harima began producing Battle Armor here.</desc>
 	</planet>
 	<planet>
 		<name>Agliana</name>
@@ -347,6 +379,25 @@
 		<xcood>76.68</xcood>
 		<ycood>164.04</ycood>
 		<faction>DC</faction>
+		<spectralClass>A</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>v</luminosity>
+		<sysPos>4</sysPos>
+		<gravity>0.9</gravity>
+		<pressure>4</pressure>
+		<temperature>43</temperature>
+		<percentWater>81</percentWater>
+		<zenithCharge>TRUE </zenithCharge>
+		<nadirCharge>TRUE</nadirCharge>
+		<hpg>b</hpg>
+		<lifeForm>0</lifeForm>
+		<satellite>Wester</satellite>
+		<satellite>Julich</satellite>
+		<satellite>Burtscheid</satellite>
+		<climate>5</climate>
+		<socioIndustrial>B-B-A-B-D</socioIndustrial>
+		<landmass>Aachen (Rheinphalia)</landmass>
+		<desc>Aix-la-Chapelle is an inhospitable world with high atmospheric pressure, chemical taints in the air, and the harsh weather patterns that make the planet barely tolerable to humans, however its one large landmass is blessed with an abundance of natural resources. Diplan 'Mechyards has a factory on world that produces most of the components for the mechs it builds on planet. Massive greenhouses produce grown foodstuff for the local inhabitants. But meats and soil for the greenhouses must still be imported from off-world due to the worlds climate.</desc>
 	</planet>
 	<planet>
 		<name>Aiyina</name>
@@ -467,6 +518,21 @@
 			<date>3059-09-18</date>
 			<faction>DC</faction>
 		</factionChange>
+		<spectralClass>M</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>iv</luminosity>
+		<sysPos>3</sysPos>
+		<gravity>1.04</gravity>
+		<pressure>3</pressure>
+		<climate>2</climate>
+		<temperature>25</temperature>
+		<percentWater>12</percentWater>
+		<nadirCharge>True</nadirCharge>
+		<hpg>A</hpg>
+		<lifeForm>5</lifeForm>
+		<socioIndustrial>B-B-C-D-D</socioIndustrial>
+		<landmass>Albiero Prime (Corant City)</landmass>
+		<desc>Albiero is a nearly dead world whose natural resources are almost completely exhausted. Only the fact that the other worlds in the Albiero Prefecture are in even worse shape keeps this prefecture capital alive. Before it reached its current state, Albiero held vast deposits of copper and iron ore. These minerals led several mining concerns to arrive and exploit the resources. Unfortunately after the fall of the Star League the advanced mining machines weren't serviceable, and eventually broke down completely. The resulting loss of income depressed the local economy. The only group who really benefited from Albiero's state was the DCMS. The extensive mining operations left a labyrinth of tunnels under the world's surface which proved to be an excellent training facility.</desc>
 	</planet>
 	<planet>
 		<name>Albion</name>
@@ -607,6 +673,23 @@
 		<xcood>66.76</xcood>
 		<ycood>96.24</ycood>
 		<faction>DC</faction>
+		<spectralClass>a </spectralClass>
+		<subtype>7</subtype>
+		<luminosity>iv</luminosity>
+		<sysPos>5</sysPos>
+		<gravity>0.9</gravity>
+		<pressure>3</pressure>
+		<temperature>45</temperature>
+		<percentWater>15</percentWater>
+		<hpg>a</hpg>
+		<lifeForm>1</lifeForm>
+		<satellite>Mecca</satellite>
+		<climate>4</climate>
+		<socioIndustrial>C-C-B-B-D </socioIndustrial>
+		<landmass>Algedi Primus (Algiers)</landmass>
+		<landmass>Algedi Secundus</landmass>
+		<desc> A prefecture capital in the Benjamin Military district, Algedi is a barren arid world with no true night. The sun is so large that it takes up a full third of the sky during the day. Settled by the Azami long ago, who are a very independent people, this often leads to clashes between their ways and those of the Combine. The Azami very reluctantly allow Non‐Azami to enter their “Desert Paradise.” The Azami of the world have an unnatural fear of the dark because of the planets permanent daylight. Imported life‐forms adapted to desert life are flourishing on the planet. Asketen Sand Walkers and Terran Burros are commonly seen grazing on tough grasses and cacti.  Efficiency on this world is very poor; only the Azami seem to have adjusted. Other people not accustomed to the planet seem to suffer from broken biological clocks. Although an important
+Industrial, Command and logistical world, paperwork in this planet and its prefecture is in a perpetual snarl.</desc>
 	</planet>
 	<planet>
 		<name>Algenib</name>
@@ -746,7 +829,7 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-03-10</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -960,7 +1043,11 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3052-02-22</date>
+			<faction>CW,FRR</faction>
+		</factionChange>
+		<factionChange>
+			<date>3052-02-28</date>
 			<faction>CW</faction>
 		</factionChange>
 		<factionChange>
@@ -1056,6 +1143,24 @@
 		<factionChange>
 			<date>2900-01-01</date>
 			<faction>DC</faction>
+		</factionChange>
+	</planet>
+	<planet>
+		<name>Alyina</name>
+		<xcood>-134.71</xcood>
+		<ycood>343.35</ycood>
+		<faction>LA</faction>
+		<factionChange>
+			<date>3040-01-01</date>
+			<faction>FC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3051-11-29</date>
+			<faction>FC,CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3052-01-06</date>
+			<faction>CJF</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -1308,7 +1413,11 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-07-04</date>
+			<faction>CJF,FC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-07-12</date>
 			<faction>CJF</faction>
 		</factionChange>
 		<factionChange>
@@ -1350,7 +1459,7 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-03-08</date>
 			<faction>CJF</faction>
 		</factionChange>
 	</planet>
@@ -1364,7 +1473,7 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-07-02</date>
 			<faction>CJF</faction>
 		</factionChange>
 	</planet>
@@ -1382,7 +1491,11 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-05-02</date>
+			<faction>CJF,FC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-06-14</date>
 			<faction>CJF</faction>
 		</factionChange>
 	</planet>
@@ -1671,6 +1784,27 @@
 		<xcood>74.07</xcood>
 		<ycood>68.07</ycood>
 		<faction>DC</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>iv</luminosity>
+		<sysPos>3</sysPos>
+		<gravity>1</gravity>
+		<pressure>3</pressure>
+		<climate>2</climate>
+		<temperature>25</temperature>
+		<percentWater>80</percentWater>
+		<nadirCharge>TRUE</nadirCharge>
+		<hpg>A</hpg>
+		<lifeForm>7</lifeForm>
+		<satellite>Kauner</satellite>
+		<satellite>Rossi</satellite>
+		<satellite>Hyde</satellite>
+		<climate>2</climate>
+		<socioIndustrial>B-B-C-B-B </socioIndustrial>
+		<landmass>Rhodesia (Iscariot)</landmass>
+		<landmass>Zaire</landmass>
+		<landmass>Vesuvius Prime</landmass>
+		<desc>Ashio is an unremarkable planet, aside from being the capital of the Ashio Prefecture. As the capital it has significant logistical and command infrastructure. The planet has modest agricultural, manufacturing and mining industries. The planet is also home to the largest volcano in the Inner Sphere, Mount Vesuvius Major. The volcano is over ten kilometers tall. Though long dormant, scientists estimate that if where to erupt, it could block all sunlight from the planet, sending it into an ice age.</desc>
 	</planet>
 	<planet>
 		<name>Ashkum</name>
@@ -1795,12 +1929,37 @@
 		<xcood>-192.73</xcood>
 		<ycood>-165.35</ycood>
 		<faction>FWL</faction>
+		<pressure>3</pressure>
+		<gravity>1</gravity>
+		<nadirCharge>True</nadirCharge>
+		<zenithCharge>True</zenithCharge>
+		<lifeForm>7</lifeForm>
+		<climate>5</climate>
+		<percentWater>70</percentWater>
+		<temperature>45</temperature>
+		<spectralClass>F</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>3</sysPos>
+		<socioIndustrial>A-A-B-A-D</socioIndustrial>
+		<satellite>Wendigo</satellite>
+		<landMass>Ionis (Atreus City)</landMass>
+		<landMass>Corin</landMass>
+		<landMass>Lanan</landMass>
+		<landMass>Plaltos</landMass>
+		<hpg>A</hpg>
+		<desc>First colonized in 2160, Atreus was the furthest colony from Earth when it was originally settled. It became the capital of the Free Worlds League in 2271.
+		
+Atreus is a temperate planet much like Terra. It has a single moon and four continents, all of which are inhabited. The capital city of Atreus, seat of the Free Worlds League central government, is on the contined of Ionis. For most of its history Atreus City the "City of Dreams" has been a favorite vacation spot for League toursists.
+
+The League intelligence branch, SAFE, is headquartered on Atreus' moon Wendigo. The planet is home to many major manufacturing centers, universities and academies.
+		</desc>
 	</planet>
 	<planet>
-		<name>Atreus</name>
+		<name>Atreus (Clan)</name>
 		<xcood>71</xcood>
 		<ycood>1732</ycood>
-		<faction>PIND</faction>
+		<faction>CSJ,CFM,CIH</faction>
 		<factionChange>
 			<date>2900-01-01</date>
 			<faction>PIND</faction>
@@ -2009,6 +2168,22 @@
 			<date>3059-06-26</date>
 			<faction>DC</faction>
 		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>v</luminosity>
+		<sysPos>5</sysPos>
+		<gravity>1.07</gravity>
+		<pressure>3</pressure>
+		<temperature>37</temperature>
+		<percentWater>47</percentWater>
+		<hpg>B</hpg>
+		<lifeForm>6</lifeForm>
+		<climate>5</climate>
+		<socioIndustrial>A-A-B-B-B</socioIndustrial>
+		<landmass>Albion (Stratford)</landmass>
+		<landmass>Britannia</landmass>
+		<landmass>Norman</landmass>
+		<desc>An industrial world in the Irece Prefecture. The planet is home to Matabushi, Inc.</desc>
 	</planet>
 	<planet>
 		<name>Awano</name>
@@ -2150,7 +2325,11 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-08-03</date>
+			<faction>CJF,FC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-08-12</date>
 			<faction>CJF</faction>
 		</factionChange>
 	</planet>
@@ -2210,7 +2389,11 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-04-01</date>
+			<faction>CW,FRR</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-04-07</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -2294,7 +2477,11 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-03-05</date>
+			<faction>CJF,FC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-03-18</date>
 			<faction>CJF</faction>
 		</factionChange>
 	</planet>
@@ -2325,6 +2512,17 @@
 		<xcood>21.12</xcood>
 		<ycood>-357.3</ycood>
 		<faction>CC</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>5</sysPos>
+		<zenithCharge>true</zenithCharge>
+		<nadirCharge>true</nadirCharge>
+		<hpg>B</hpg>
+		<lifeForm>7</lifeForm>
+		<desc>3025 - In 2521, Barras was captured from the Free World League and occupied by the Confederation. It was made a neutral free port of call by both the Confederation and FWL as part of the Buenos Aires Convention of 2858. It is an exception to the otherwise stringent Confederation trade restrictions imposed against the FWL in the early 29th century.
+
+Barras is the hotbed of intelligence activity along the Confederation-FWL border, containing one of the highest concentrations of Maskirovka covert intelligence operatives, an equal number of Marik secret service operatives, as well as operatives from other intelligence services from across the Inner Sphere. It is a logical starting point for clandestine operations of all kinds by all Inner Sphere factions.</desc>
 	</planet>
 	<planet>
 		<name>Barstow</name>
@@ -2392,7 +2590,11 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-08-04</date>
+			<faction>CW,FRR</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-08-08</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -2688,7 +2890,7 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-03-01</date>
 			<faction>CJF</faction>
 		</factionChange>
 		<factionChange>
@@ -2746,7 +2948,11 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3051-12-03</date>
+			<faction>CW,FC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3051-12-06</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -2770,7 +2976,7 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-06-27</date>
 			<faction>CJF</faction>
 		</factionChange>
 	</planet>
@@ -2779,6 +2985,14 @@
 		<xcood>5.74</xcood>
 		<ycood>-309.57</ycood>
 		<faction>CC</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>I</luminosity>
+		<sysPos>2</sysPos>
+		<zenithCharge>true</zenithCharge>
+		<hpg>B</hpg>
+		<lifeForm>4</lifeForm>
+		<desc>Betelgeuse is on the rimward flank of the Capellan Confederation. The Free World League has fought many battles in its attempts to capture it from the Confederation. The planet has a Mech production center and the northern hemisphere houses over 20 factory complexes that produce over 30 percent of all consumer and luxury goods in the entire Confederation. The planet is an important major source of manpower. Betelgeuse is home to the fanatically devoted Warrior House Kamata regiment who are willing to defend their planet to the last warrior.</desc>
 	</planet>
 	<planet>
 		<name>Beten Kaitos</name>
@@ -2888,7 +3102,7 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3052-02-17</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -2955,6 +3169,24 @@
 			<date>3059-06-26</date>
 			<faction>DC</faction>
 		</factionChange>
+		<spectralClass>F</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>v</luminosity>
+		<sysPos>5</sysPos>
+		<gravity>0.91</gravity>
+		<pressure>3</pressure>
+		<temperature>48</temperature>
+		<percentWater>39</percentWater>
+		<nadirCharge>TRUE</nadirCharge>
+		<hpg>B</hpg>
+		<lifeForm>4</lifeForm>
+		<satellite>Bereich</satellite>
+		<climate>4</climate>
+		<socioIndustrial>B-C-A-C-D</socioIndustrial>
+		<landmass>Lomma (Oasis V)</landmass>
+		<landmass>Icefall</landmass>
+		<landmass>Skåne</landmass>
+		<desc>Bjarred is a small world first settled in the 23rd Century by explorers from the Ozawa Merchant organization. The planet is a technologically advanced world with Basic Heavy Industry but Limited Industrial Output. The planet has little open water on its surface. What water the world possesses is underground running through vast catacombs. The surface vegetation and agriculture criss‐cross the world following the paths of these underground water ways but it leaves the planets with a very poor agricultural base requiring they import food. The world's many mountain ranges are also barren in regards to life, but are rich is valuable minerals and metal A prefecture capital before the Clan Invasion, Bjarred resumed that status after the world was reclaimed from Clan Nova Cat in a famous coin toss. The continent of Icefall was so named for a disastrous ice asteroid crash that occurred when attempting to provide comet water to early colonists.</desc>
 	</planet>
 	<planet>
 		<name>Bjornlunda</name>
@@ -2980,7 +3212,11 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-05-08</date>
+			<faction>CJF,FC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-05-09</date>
 			<faction>CJF</faction>
 		</factionChange>
 	</planet>
@@ -2994,6 +3230,10 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
+			<date>3050-08-05</date>
+			<faction>CJF</faction>
+		</factionChange>
+		<factionChange>
 			<date>3052-01-01</date>
 			<faction>CSV</faction>
 		</factionChange>
@@ -3001,6 +3241,21 @@
 			<date>3062-01-01</date>
 			<faction>CJF</faction>
 		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>V</luminosity> 
+		<sysPos>3</sysPos>
+		<gravity>0.97</gravity>
+		<pressure>3</pressure>
+		<temperature>49</temperature>
+		<climate>4</climate>
+		<percentWater>31</percentWater>
+		<hpg>B</hpg>
+		<lifeForm>5</lifeForm>
+		<satellite>Club</satellite>
+		<satellite>Spade</satellite>
+		<socioIndustrial>B-B-D-C-D</socioIndustrial>
+		<desc> Blackjack is mostly an arid/desert world. A tropical zone exists in the northern hemisphere that is almost entirely encircled by the Blackjack Ocean. Valuable mineral deposits and other resources are limited but easily accessible. Many of the planet’s heavy industries have been targets of raids by the Draconis Combine and Periphery bandits. Lott’s Revenge, the capital city, is located along the coast of the northern region. Blackjack’s population is largely made up of settlers of English and French descent. Blackjack is home to the Blackjack School of Conflict, a privately run MechWarrior Academy (later destroyed by the Clans).</desc>
 	</planet>
 	<planet>
 		<name>Blackstone</name>
@@ -3012,7 +3267,7 @@
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3049-08-08</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -3178,7 +3433,7 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-03-03</date>
 			<faction>CJF</faction>
 		</factionChange>
 	</planet>
@@ -3247,6 +3502,19 @@
 		<xcood>-106.08</xcood>
 		<ycood>-415.57</ycood>
 		<faction>MOC</faction>
+		<spectralClass>F</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>V</luminosity> 
+		<sysPos>2</sysPos>
+		<gravity>0.91</gravity>
+		<pressure>3</pressure>
+		<temperature>35</temperature>
+		<climate>3</climate>
+		<percentWater>53</percentWater>
+		<hpg>B</hpg>
+		<lifeForm>7</lifeForm>
+		<socioIndustrial>D-C-B-C-C</socioIndustrial>
+		<desc>Borgan’s Rift is another of many worlds in the Periphery free-falling back into the dark ages. Long neglected due to the collapse of the Star League and the start of the Succession Wars has brought about economic ruin and technological decay. Off world trade has long vanished. Borgan’s Rift is now a planet ravaged by pirates, pillaging the few remaining markets. Many pirates inhabit the old industrial city of Howe. In 3049 the title to the planet was purchased by Magliss Spirits (a large producer of fine wines and spirits in the periphery) with the Magestrix’s full approval. South of Howe is the city of Newport built up by Shanti Magliss, owner of Magliss Spirits. Newport contains numerous warehouses and distribution centers.</desc>
 	</planet>
 	<planet>
 		<name>Borghese</name>
@@ -3272,7 +3540,7 @@
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3049-09-05</date>
 			<faction>CJF</faction>
 		</factionChange>
 	</planet>
@@ -3415,6 +3683,14 @@
 		<xcood>162.22</xcood>
 		<ycood>391.2</ycood>
 		<faction>DC</faction>
+			<factionChange>
+			<date>3050-05-01</date>
+			<faction>CSJ</faction>
+		</factionChange>
+		<factionChange>
+			<date>3059-08-01</date>
+			<faction>DC</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Brockton</name>
@@ -3502,7 +3778,11 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-06-05</date>
+			<faction>CW,FRR</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-06-09</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -3600,9 +3880,36 @@
 		<ycood>156.22</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2900-01-01</date>
+			<date>2821-12-31</date>
 			<faction>DC</faction>
 		</factionChange>
+		<factionChange>
+			<date>2863-12-31</date>
+			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2899-12-31</date>
+			<faction>DC</faction>
+		</factionChange>
+		<spectralClass>A</spectralClass>
+		<subtype>9</subtype>
+		<luminosity>iii</luminosity>
+		<sysPos>6</sysPos>
+		<gravity>1.01</gravity>
+		<pressure>3</pressure>
+		<temperature>29</temperature>
+		<percentWater>62</percentWater>
+		<zenithCharge>TRUE</zenithCharge>
+		<hpg>A</hpg>
+		<lifeForm>7</lifeForm>
+		<satellite>Geodesia</satellite>
+		<climate>3</climate>
+		<socioIndustrial>A-B-A-B-A </socioIndustrial>
+		<landmass>Sanjucendo (Buckminster City) </landmass>
+		<landmass>Richard’s Rock</landmass>
+		<landmass>Storm</landmass>
+		<landmass>Trestal</landmass>
+		<desc>Buckminster is an agricultural world that is considered one the Draconis Combines' top producers of foodstuffs. The world is also a highly advanced and has moderate industry, mostly to support the planets agriculture. In 3005 the world became a prefecture capital. Prior to that the world enjoyed a good trading relationship with the Lyran world of Port Moseby. However, after becoming a capital Buckminster become a major command center for the region and the long-time home planet of the Second Sword of Light.  The increased presence of military forces on the world, and the exercises and training runs that they require, have begun to dramatically reduced the productivity of the farmland. This is starting to have an adverse impact on the planets economy. All of these changes to the world since 3005 have resulted in the creation of several covert and overt anti-Kurita groups.</desc>
 	</planet>
 	<planet>
 		<name>Budingen</name>
@@ -3650,7 +3957,7 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-05-12</date>
 			<faction>CJF</faction>
 		</factionChange>
 	</planet>
@@ -3664,7 +3971,7 @@
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3049-09-12</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -4184,7 +4491,11 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3052-02-12</date>
+			<faction>CW,FRR</faction>
+		</factionChange>
+		<factionChange>
+			<date>3052-02-17</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -4584,7 +4895,11 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-03-01</date>
+			<faction>CW,FC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-03-06</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -4593,6 +4908,24 @@
 		<xcood>182.56</xcood>
 		<ycood>252.45</ycood>
 		<faction>DC</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>v</luminosity>
+		<sysPos>3</sysPos>
+		<gravity>1.01</gravity>
+		<pressure>3</pressure>
+		<temperature>25</temperature>
+		<percentWater>39</percentWater>
+		<nadirCharge> TRUE</nadirCharge>
+		<hpg>B</hpg>
+		<lifeForm>5</lifeForm>
+		<satellite>Barnstable</satellite>
+		<satellite>Medway</satellite>
+		<climate>3</climate>
+		<socioIndustrial>A-B-B-B-C </socioIndustrial>
+		<landmass>Crom (Strabo)</landmass>
+		<landmass>Lemure</landmass>
+		<desc>The planet Chatham is a scenic world when seen from orbit. Unfortunately, upon landing the taint of centuries of pollution combined with the planets native bacteria have created a taint to the atmosphere. Even with the tainted atmosphere the planet maintains a modest agricultural output. Chatham is a high-tech world moderately industrialized with hood industrial output. Due to the planets mostly self-sufficient resources its long been the home to the companies Tomori Trans Industrial, Wakazashi Enterprises, and Stellar Trek.</desc>
 	</planet>
 	<planet>
 		<name>Chebanse</name>
@@ -5018,7 +5351,7 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-08-06</date>
 			<faction>CJF</faction>
 		</factionChange>
 	</planet>
@@ -5350,7 +5683,7 @@
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3049-09-03</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -5450,7 +5783,7 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-05-01</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -5532,7 +5865,7 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3051-11-01</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -5796,7 +6129,11 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-07-22</date>
+			<faction>CW,FRR</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-07-27</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -5936,7 +6273,11 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-09-03</date>
+			<faction>CW,FC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-10-06</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -6044,7 +6385,11 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-08-12</date>
+			<faction>CJF,FC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-08-15</date>
 			<faction>CJF</faction>
 		</factionChange>
 	</planet>
@@ -6058,7 +6403,7 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-05-03</date>
 			<faction>CJF</faction>
 		</factionChange>
 	</planet>
@@ -6134,7 +6479,7 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-08-04</date>
 			<faction>CJF</faction>
 		</factionChange>
 	</planet>
@@ -6216,11 +6561,36 @@
 		<name>Dieron</name>
 		<xcood>13.04</xcood>
 		<ycood>15.39</ycood>
-		<faction>TH</faction>
+		<faction>DC</faction>
 		<factionChange>
-			<date>2900-01-01</date>
+			<date>2341-01-01</date>
+			<faction>TH</faction>
+		</factionChange>
+		<factionChange>
+			<date>2786-01-06</date>
 			<faction>DC</faction>
 		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>v</luminosity>
+		<sysPos>4</sysPos>
+		<gravity>1.02</gravity>
+		<pressure>3</pressure>
+		<temperature>27</temperature>
+		<percentWater>54</percentWater>
+		<zenithCharge>TRUE</zenithCharge>
+		<nadirCharge>TRUE</nadirCharge>
+		<hpg>A</hpg>
+		<lifeForm>4</lifeForm>
+		<satellite>Bemer</satellite>
+		<satellite>Nebulos)</satellite>
+		<climate>3</climate>
+		<socioIndustrial>B-B-A-B-C</socioIndustrial>
+		<landmass>Mataeo (Fortress Dieron)</landmass>
+		<landmass>Voltenna</landmass>
+		<landmass>Wennisaka</landmass>
+		<desc>Dieron was one of the worlds abandoned by the Terran Alliance following the Outer Reaches Rebellion. Later the world would be incorporated into the Terran Hegemony becoming part of the Lone Star Province. Dieron is a world with numerous large mountain ranges creating countless small valleys. The planet is geologically instable, as a result earthquakes are a common problem. Nestled into the large Mountain are cramped cities stuck between towering mountains. In the time of the Star League, Dieron was a large and thriving planet. The SLDF maintained a major command and logistics center on Dieron. The largest of the Star League complexes at the time was Fortress Dieron. After the Exodus the Draconis Combine became quite interested in acquiring Dieron. The planet's extensive natural resources, advanced technology and industry made it a prime target. When the Combine seized the planet they had underestimated how much of the planet had suffered during the war to oust Stefan Amaris. The SLDF has also been very thurough stripping the planet of all useful material. After seizing the planet the Combine began creating factories in the shells of Dieron’s deep mountains and slowly rebuilt the world into a thriving industrial powerhouse. Even with the earthquakes, claustrophobic living space, and occasional political dissent, the Dieronese are a content people. The natives are protective of their world and despite centuries of Kurita rule many natives still remember the glory days of the Terran Hegemony and the Star League and still refer to locations and cities by their original colonial names.
+The capital is currently Fort Dieron, but in the past San Martin and Tahlwynn have served as well.</desc>
 	</planet>
 	<planet>
 		<name>Dieudonne</name>
@@ -6266,7 +6636,7 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3052-02-10</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -6316,7 +6686,11 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3052-01-05</date>
+			<faction>CW,FC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3052-01-09</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -6330,7 +6704,11 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-08-17</date>
+			<faction>CJF,FC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-08-19</date>
 			<faction>CJF</faction>
 		</factionChange>
 	</planet>
@@ -6385,6 +6763,24 @@
 		<xcood>133.79</xcood>
 		<ycood>203.16</ycood>
 		<faction>DC</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>v</luminosity>
+		<sysPos>4</sysPos>
+		<gravity>0.93</gravity>
+		<pressure>3</pressure>
+		<temperature>43</temperature>
+		<percentWater>34</percentWater>
+		<zenithCharge>TRUE</zenithCharge>
+		<hpg>B</hpg>
+		<lifeForm>5</lifeForm>
+		<satellite>Citrine</satellite>
+		<climate>4</climate>
+		<socioIndustrial>B-B-B-B-C</socioIndustrial>
+		<landMass>Rutile (Wairdel)</landMass>
+		<landMass>Anatase</landMass>
+		<landMass>Quartz</landMass>
+		<desc>Dover is a technologically advanced world with moderate industry and a high level of exports. The planet is covered in a mix of sand types that makes the planet self-sufficient and provides the specialized raw materials used in the electronics industry. The planet's main struggle is to produce enough food for itself. The system is home to the Dover Shipyards, Hinsdale Electronics, and Wakazashi Enterprises. The system is also home to the Dover Institute for Higher Learning and the Aerospace and Interstellar Institute Officer’s School.</desc>
 	</planet>
 	<planet>
 		<name>Drask's Den</name>
@@ -6396,7 +6792,7 @@
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3049-08-18</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -6691,6 +7087,33 @@
 			<date>3040-01-01</date>
 			<faction>FC</faction>
 		</factionChange>
+			<spectralClass>G</spectralClass>
+			<subtype>0</subtype>
+			<luminosity>V</luminosity>
+			<sysPos>2</sysPos>
+       		<gravity>1.25</gravity>
+			<pressure>3</pressure>
+			<temperature>27</temperature>
+			<percentWater>77</percentWater>
+			<zenithCharge>true</zenithCharge>
+			<nadirCharge>true</nadirCharge>
+			<hpg>A</hpg>
+			<lifeForm>7</lifeForm>
+			<satellite>Boulder</satellite>
+			<landMass>San Diego</landMass>
+			<landMass>Los Angeles</landMass>
+			<landMass>Las Vegas</landMass>
+			<landMass>Santa Fe</landMass>
+			<landMass>Monterrey</landMass>
+			<landMass>Durango</landMass>
+			<socioIndustrial>A-A-A-A-A</socioIndustrial>
+		<desc>El Dorado is an Earth-like planet with 6 major continents and large tracts of arable land. This is due to the massive bodies of fresh water know as The Super Lakes, which are located on the largest continents of San Diego and Los Angeles.
+
+El Dorado is slightly warmer than Earth and has increased tectonic action. Over the centuries of colonization populations centers have settled in locations that avoided the most geologically active sites.
+
+El Dorado has a single moon named Boulder. It appears silver and sapphire and has a thick nitrogen-carbon dioxide atmosphere.
+
+For much of its early history El Dorado was known for its JumShip yards. This ended during the 1st Succession War when the Draconis Combine left the Ship Yards in ruins after a raid. The planet itself still remains heavily industrialized and is home to many renowned universities known as the "Guilded Halls". These universities have allowed El Dorado to remain a front runner in technology and manufacturing throughout the Succession Wars.</desc>
 	</planet>
 	<planet>
 		<name>El Giza</name>
@@ -6788,7 +7211,7 @@
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3049-09-03</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -6936,7 +7359,11 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-08-06</date>
+			<faction>CW,FRR</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-08-27</date>
 			<faction>CW</faction>
 		</factionChange>
 		<factionChange>
@@ -7062,7 +7489,7 @@
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3049-09-13</date>
 			<faction>CJF</faction>
 		</factionChange>
 	</planet>
@@ -7210,7 +7637,7 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-05-09</date>
 			<faction>CJF</faction>
 		</factionChange>
 	</planet>
@@ -7376,7 +7803,11 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-07-04</date>
+			<faction>CW,FRR</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-08-13</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -7404,7 +7835,7 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-08-03</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -7418,12 +7849,16 @@
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
-			<faction>CW</faction>
+			<date>3049-08-01</date>
+			<faction>CW,PIND</faction>
 		</factionChange>
+		<factionChange>
+			<date>3049-08-07</date>
+			<faction>CW</faction>
+		</factionChange>	
 	</planet>
 	<planet>
-		<name>Ferris</name>
+		<name>Ferris (OA)</name>
 		<xcood>588.89</xcood>
 		<ycood>128.05</ycood>
 		<faction>OA</faction>
@@ -7860,23 +8295,38 @@
 			<faction>LA</faction>
 		</factionChange>
 	</planet>
-	<planet>
-		<name>Galatea</name>
-		<xcood>-54.25</xcood>
+	<planet> 
+		<name>Galatea</name> 
+		<xcood>-54.25</xcood> 
 		<ycood>34.43</ycood>
 		<faction>TH</faction>
 		<factionChange>
-			<date>2900-01-01</date>
+			<date>2900-01-01</date> 
 			<faction>LA</faction>
-		</factionChange>
-		<factionChange>
+		</factionChange> 
+		<factionChange> 
 			<date>3040-01-01</date>
-			<faction>FC</faction>
+			<faction>FC</faction> 
+		</factionChange> 
+		<factionChange> 
+			<date>3057-09-18</date> 
+			<faction>LA</faction> 
 		</factionChange>
-		<factionChange>
-			<date>3057-09-18</date>
-			<faction>LA</faction>
-		</factionChange>
+		<spectralClass>F</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>II</luminosity>
+		<sysPos>6</sysPos>
+		<gravity>1</gravity>
+		<pressure>3</pressure>
+		<temperature>55</temperature>
+		<percentWater>35</percentWater>
+		<zenithCharge>true</zenithCharge>
+		<hpg>A</hpg>
+		<lifeForm>7</lifeForm>
+		<climate>4</climate>
+		<satellite>Galatea Minor</satellite>
+		<socioIndustrial>C-C-C-C-C</socioIndustrial>
+		<desc>Galatea is an arid planet located just three jumps from Terra. It served as a major training location for the Star League Defense force and transitioned into the Mercenary Star after the League collapsed after the Amaris Coup. The planet fell out of prominence with the rise of the Hiring Hall on Outreach, but returned to some of its former glory during and after the Jihad due to the destruction of the facilities on Outreach.</desc>
 	</planet>
 	<planet>
 		<name>Galatia III</name>
@@ -7964,13 +8414,30 @@
 		<ycood>73.81</ycood>
 		<faction>DC</faction>
 		<factionChange>
-			<date>2900-01-01</date>
+			<date>2793-12-31</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
-			<date>3030-01-01</date>
+			<date>3030-12-31</date>
 			<faction>DC</faction>
 		</factionChange>
+		<spectralClass>F</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>3</sysPos>
+		<gravity>1</gravity>
+		<pressure>3</pressure>
+		<temperature>45</temperature>
+		<percentWater>70</percentWater>
+		<hpg>B</hpg>
+		<lifeForm>7</lifeForm>
+		<satellite>2</satellite>
+		<climate>5</climate>
+		<socioIndustrial>C-C-B-C-B </socioIndustrial>
+		<landmass>Eire (New Derry)</landmass>
+		<landmass>Samphire</landmass>
+		<landmass>Ilnacullin</landmass>
+		<desc>Galtor III is an agriculture world that is moderately advanced with basic heavy industry. The planet has three continents. The first continent, Eire, has a spine of vast mountains and an extensive agricultural plain. The other two continents are mostly desert and mountain with sections of coastal flood plains and jungles. New Derry and New Wuhan City are the largest on the planet. Originally founded by members of the Pan-Oriental Co-prosperity and the Free Irish National Federation the colonists differences soon led to a civil war. Only the breakout of a plague ultimately united the world. During the Age of War Galtor III became the breadbasket feeding the surrounding systems. During the Star League the SLDF built a massive logistical base on the planet and soon the world supplied food to SLDF troops around the Inner Sphere.</desc>
 	</planet>
 	<planet>
 		<name>Galuzzo</name>
@@ -7990,7 +8457,7 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3052-02-19</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -8372,6 +8839,10 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
+			<date>3050-09-02</date>
+			<faction>CJF</faction>
+		</factionChange>
+		<factionChange>
 			<date>3052-01-01</date>
 			<faction>CSV</faction>
 		</factionChange>
@@ -8432,7 +8903,7 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-05-11</date>
 			<faction>CJF</faction>
 		</factionChange>
 	</planet>
@@ -8482,7 +8953,7 @@
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3049-09-27</date>
 			<faction>CJF</faction>
 		</factionChange>
 	</planet>
@@ -8580,7 +9051,7 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-09-17</date>
 			<faction>CJF</faction>
 		</factionChange>
 		<factionChange>
@@ -8796,7 +9267,7 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3051-12-10</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -8834,7 +9305,7 @@
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3049-09-06</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -8924,7 +9395,7 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3051-12-09</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -9101,6 +9572,21 @@
 			<date>3059-06-29</date>
 			<faction>DC</faction>
 		</factionChange>
+		<spectralClass>A</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>v</luminosity>
+		<sysPos>4</sysPos>
+		<gravity>0.93</gravity>
+		<pressure>3</pressure>
+		<temperature>20</temperature>
+		<percentWater>29</percentWater>
+		<hpg>B</hpg>
+		<lifeForm>3</lifeForm>
+		<climate>2</climate>
+		<socioIndustrial>C-B-B-B-C</socioIndustrial>
+		<landmass>Niedersachsen (Wexler)</landmass>
+		<landmass>Sylvania</landmass>
+		<desc>Hanover is a quiet world with a boreal climate. The planet is moderately advanced and industrialized world. The planet is mostly self-sufficient and supports modest agriculture. Home to People’s Protection, a company that produces security systems and small arms. Also home to Saxe-Heidelberg Heavy Industries.</desc>
 	</planet>
 	<planet>
 		<name>Hardcore</name>
@@ -9214,7 +9700,11 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-07-02</date>
+			<faction>CW,FRR</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-07-09</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -9430,7 +9920,7 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-03-06</date>
 			<faction>CJF</faction>
 		</factionChange>
 	</planet>
@@ -9444,7 +9934,7 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-06-12</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -9630,7 +10120,11 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-08-09</date>
+			<faction>CW,FRR</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-08-12</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -9808,7 +10302,11 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-06-25</date>
+			<faction>CJF,FC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-06-30</date>
 			<faction>CJF</faction>
 		</factionChange>
 	</planet>
@@ -9903,6 +10401,24 @@
 		<xcood>252.45</xcood>
 		<ycood>137.96</ycood>
 		<faction>DC</faction>
+		<spectralClass>F</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>v</luminosity>
+		<sysPos>5</sysPos>
+		<gravity>0.97</gravity>
+		<pressure>4</pressure>
+		<temperature>39</temperature>
+		<percentWater>60</percentWater>
+		<zenithCharge>TRUE </zenithCharge>
+		<hpg>B</hpg>
+		<lifeForm>4</lifeForm>
+		<satellite>Zhu</satellite>
+		<satellite>Hou Wah</satellite>
+		<climate>5</climate>
+		<socioIndustrial>A-B-A-B-B</socioIndustrial>
+		<landmass>Polsca (Paradiso)</landmass>
+		<landmass>Bergen</landmass>
+		<desc> Hun Ho is a full self-sufficient, moderately industrialized high-tech world. A very hot tropical paradise with abundant food which supplies most of the planet's population that lives around the barren polar areas. These areas have less risk from the aggressive jungle dwelling predators and the planet's mineral resources are easily accessible. The planet is important to the Draconis Combine for its industrial production from the LexaTech Industries planet in Corsan on the Bergen continent.</desc>
 	</planet>
 	<planet>
 		<name>Hunan</name>
@@ -10034,7 +10550,7 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3051-12-16</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -10068,7 +10584,11 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-03-20</date>
+			<faction>CW,FC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-03-23</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -10373,6 +10893,25 @@
 			<date>3059-06-02</date>
 			<faction>DC</faction>
 		</factionChange>
+		<spectralClass>F</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>iii</luminosity>
+		<sysPos>4</sysPos>
+		<gravity>0.99</gravity>
+		<pressure>3</pressure>
+		<temperature>30</temperature>
+		<percentWater>44</percentWater>
+		<zenithCharge>TRUE</zenithCharge>
+		<nadirCharge> TRUE</nadirCharge>
+		<hpg>A</hpg>
+		<lifeForm>7</lifeForm>
+		<satellite>Bahia</satellite>
+		<climate>3</climate>
+		<socioIndustrial>A-A-A-A-A</socioIndustrial>
+		<landmass>Santana (New Barcella)</landmass>
+		<landmass>Salvador</landmass>
+		<landmass>Baiano</landmass>
+		<desc>Irece is a heavily industrialized high-tech world that is fully self-sufficient. It’s ideal climate also allows it to be a huge food producer in the region. It’s also an important Command and Industrial world to the Draconis Combine, home to the LexaTech Industries Stinger LAM plant. The world is home of the 9.7 kilometer tall mountain known as Tengoku. (Japanese translation of the name is Heaven.) Tengoku peaks into the planet's stratosphere and is located a hundred kilometers from world's capital city New Barcella.</desc>
 	</planet>
 	<planet>
 		<name>Irian</name>
@@ -10395,6 +10934,25 @@
 		<xcood>188.56</xcood>
 		<ycood>98.58</ycood>
 		<faction>DC</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>v</luminosity>
+		<sysPos>5</sysPos>
+		<gravity>1.03</gravity>
+		<pressure>3</pressure>
+		<temperature>45</temperature>
+		<percentWater>81</percentWater>
+		<zenithCharge>TRUE </zenithCharge>
+		<nadirCharge> TRUE</nadirCharge>
+		<hpg>B</hpg>
+		<lifeForm>7</lifeForm>
+		<satellite>Lara</satellite>
+		<climate>5</climate>
+		<socioIndustrial>A-B-A-C-B</socioIndustrial>
+		<landmass>South Umbrian (New Gotham City)</landmass>
+		<landmass>North Umbrian</landmass>
+		<landmass>Easter</landmass>
+		<desc>Irurzun is an important command and logistical world for the Draconis Combine. In spite of its hot and humid atmosphere it’s a fully self-sufficient moderately industrialized high‐tech world with large deposits of valuable minerals. Most of the mining takes place on the continent of South Umbrain. On the other continents and away from the populated areas Irurzun shows a more agricultural side; many small farms raising crops. With the discovery of so many natural resources it is unlikely these agricultural areas will remain intact much longer.</desc>
 	</planet>
 	<planet>
 		<name>Isabela</name>
@@ -10621,6 +11179,25 @@
 			<date>3059-06-02</date>
 			<faction>DC</faction>
 		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>v</luminosity>
+		<sysPos>3</sysPos>
+		<gravity>1</gravity>
+		<pressure>3</pressure>
+		<temperature>25</temperature>
+		<percentWater>74</percentWater>
+		<nadirCharge>TRUE</nadirCharge>
+		<hpg>B</hpg>
+		<lifeForm>3</lifeForm>
+		<satellite>Annaka</satellite>
+		<satellite>Gunma</satellite>
+		<climate>3</climate>
+		<socioIndustrial>C-C-A-C-B</socioIndustrial>
+		<landmass>Isobe (Usui)</landmass>
+		<landmass>Morinoie</landmass>
+		<landmass>Savoie</landmass>
+		<desc>Jeanette is a fully self-sufficient and moderately advanced world within the Bjarred Prefecture with extensive raw materials. The planet's small population ignores interstellar matters and Buddhism is a common religion on the planet with a major Buddhist temple on the Continent of Savoie. The continent of Morinoie is home to the Jeanette Naval Yards.</desc>
 	</planet>
 	<planet>
 		<name>Jerangle</name>
@@ -10851,6 +11428,25 @@
 		<xcood>202.9</xcood>
 		<ycood>257.15</ycood>
 		<faction>DC</faction>
+		<spectralClass>F</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>v</luminosity>
+		<sysPos>3</sysPos>
+		<gravity>1.02</gravity>
+		<pressure>3</pressure>
+		<temperature>20</temperature>
+		<percentWater>45</percentWater>
+		<zenithCharge>TRUE</zenithCharge>
+		<nadirCharge> TRUE</nadirCharge>
+		<hpg>A</hpg>
+		<lifeForm>7</lifeForm>
+		<satellite>Shinmachi</satellite>
+		<climate>2</climate>
+		<socioIndustrial>A-B-A-B-B</socioIndustrial>
+		<landmass>Sakurajima (Kuroda)</landmass>
+		<landmass>Kyushu</landmass>
+		<landmass>Kamoike</landmass>
+		<desc>Kagoshima is a high-tech world with extensive raw materials and is the Capital of the Kagoshima Prefecture in the Pesht Military District. There is a monument in the city of Fujima commemorating the birthplace of Subhash Indrahar; a much grander monument to Takashi Kurita stands in Eto, the city of the late Coordinator’s birth. The city Kuroda on Sakurajima is home to the prestigious Wisdom of the Dragon military academy. The Kyushu continent is the home of Nissan General Motors near the city of Onami.</desc>
 	</planet>
 	<planet>
 		<name>Kaguyak</name>
@@ -10909,6 +11505,23 @@
 		<xcood>89.19</xcood>
 		<ycood>143.96</ycood>
 		<faction>DC</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>iv</luminosity>
+		<sysPos>4</sysPos>
+		<gravity>1.04</gravity>
+		<pressure>3</pressure>
+		<temperature>25</temperature>
+		<percentWater>71</percentWater>
+		<zenithCharge>TRUE</zenithCharge>
+		<hpg>B</hpg>
+		<lifeForm>5</lifeForm>
+		<satellite>Yamanashi</satellite>
+		<climate>2</climate>
+		<socioIndustrial>A-B-A-B-B</socioIndustrial>
+		<landmass>Kai Koshu (Kurokami)</landmass>
+		<landmass>Kirifuri</landmass>
+		<desc> Kajikazawa is a high-tech world with abundant natural resources and is a prefecture capital in the Benjamin Military District. The planet's close location to Benjamin results in a lot of the administrative work that normally appears on a prefecture capital getting re-routed from Benjamin. The Kai Koshu continent enjoys a mild climate and pleasant landscapes which the government capitalizes on, creating a major tourist industry and by renting out vacation mansions to the harried politicians of nearby Benjamin. After the Clan invasion the world experienced a large building boom. The Draconis Combine relocated the Cosby BattleMech and Myomer Research Firm plant to the continent of Kai Koshu near the city of Hokusai. In addition, a recharge station was constructed at the zenith jump point. As a result, Comstar is considering plans to upgrade the local HPG station to a Class A facility.</desc>
 	</planet>
 	<planet>
 		<name>Kakada</name>
@@ -10984,7 +11597,11 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-09-17</date>
+			<faction>CW,FRR</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-09-29</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -11074,7 +11691,7 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3051-12-16</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -11572,7 +12189,7 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-06-07</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -11738,7 +12355,11 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3051-12-11</date>
+			<faction>CW,FC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3051-12-15</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -11998,7 +12619,11 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-08-03</date>
+			<faction>CW,FRR</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-08-10</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -12138,7 +12763,11 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3051-12-05</date>
+			<faction>CJF,FC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3051-12-15</date>
 			<faction>CJF</faction>
 		</factionChange>
 	</planet>
@@ -12180,7 +12809,7 @@
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3049-09-02</date>
 			<faction>CJF</faction>
 		</factionChange>
 	</planet>
@@ -12340,7 +12969,7 @@
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3049-09-05</date>
 			<faction>CJF</faction>
 		</factionChange>
 	</planet>
@@ -12418,7 +13047,7 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3051-11-02</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -12526,7 +13155,11 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-05-01</date>
+			<faction>CW,FRR</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-06-25</date>
 			<faction>CW</faction>
 		</factionChange>
 		<factionChange>
@@ -12578,7 +13211,11 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-09-06</date>
+			<faction>CJF,FC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-09-07</date>
 			<faction>CJF</faction>
 		</factionChange>
 	</planet>
@@ -12660,7 +13297,11 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-06-17</date>
+			<faction>CW,FRR</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-06-20</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -12958,7 +13599,11 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3052-04-07</date>
+			<faction>CW,FRR</faction>
+		</factionChange>
+		<factionChange>
+			<date>3052-04-09</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -12990,7 +13635,7 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-05-01</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -13123,6 +13768,30 @@
 			<date>3052-01-07</date>
 			<faction>DC</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1</gravity>
+		<nadirCharge>True</nadirCharge>
+		<zenithCharge>True</zenithCharge>
+		<lifeForm>4</lifeForm>
+		<climate>3</climate>
+		<percentWater>70</percentWater>
+		<temperature>35</temperature>
+		<spectralClass>G</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>III</luminosity>
+		<sysPos>4</sysPos>
+		<socioIndustrial>A-A-C-A-C</socioIndustrial>
+		<satellite>Tsu Shima</satellite>
+		<satellite>Orientalis</satellite>
+		<satellite>Hikisaku</satellite>
+		<satellite>Occidentalis</satellite>
+		<landMass>Hokkaido (Imperial City)</landMass>
+		<landMass>Aichi</landMass>
+		<landMass>Sakura</landMass>
+		<landMass>Shizuoka</landMass>
+		<hpg>A</hpg>
+		<desc>Luthien best known as the capital and seat of power of the Draconis Combine. The second most noteable feature of the planet is the abundance of heavy industry, Luthien is home to more manufacturing than any other planet in the entire Combine. The heavy smog and pollution from all the manufacturing have earned the planet the nickname Black Luthien. One of the major sites of untouched wilderness is surrounding the capital, Imperial City, home to the Kurita family and the Imperial Palace. The entire city is surrounded by gardens and virgin wilderness, in stark contrast to the rest of the planet.		
+		</desc>
 	</planet>
 	<planet>
 		<name>Luxen</name>
@@ -13292,7 +13961,11 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3051-11-04</date>
+			<faction>CW,FC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3051-11-07</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -13406,7 +14079,7 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-06-27</date>
 			<faction>CJF</faction>
 		</factionChange>
 	</planet>
@@ -13416,13 +14089,48 @@
 		<ycood>6</ycood>
 		<faction>TH</faction>
 		<factionChange>
-			<date>2900-01-01</date>
+			<date>2596-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>2822-01-01</date>
+			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2864-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3067-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>I</luminosity>
+		<sysPos>6</sysPos>
+		<gravity>1.04</gravity>
+		<pressure>3</pressure>
+		<temperature>37</temperature>
+		<percentWater>80</percentWater>
+		<hpg>B</hpg>
+		<lifeForm>7</lifeForm>
+		<satellite>Viktor's Moon</satellite>
+		<landMass>Oregon (Mallory City)</landMass>
+		<landMass>Joshua</landMass>
+		<landMass>Juniper</landMass>
+		<landMass>New Helen</landMass>
+		<socioIndustrial>D-C-B-C-B</socioIndustrial>          
+		<desc>A lack of industry would normally make Mallory's World an unimportant backwater, however, its location within easy striking distance of the Draconis Combine has made it strategically important to both the Combine and the Suns throughout the world’s history.
+
+During the days of the Star League, it was a highly productive agricultural world, but  frequent conflicts between the Combine and the Federation have ruined most vegetation on 3 of the planet’s 4 continents (New Helen contains the planet's only arable cropland).  Due to this ruination, the Federated Suns and Draconis Combine signed an agreement after the Third Battle for Mallory’s World (3013) to consider the farms and ranches on New Helen untouchable.  The massive deforestation on the other three continents leaves them prone to severe windstorms and tornadoes most of the year.
+
+With three continents unable to support agriculture light manufacturing has cropped up using imported materials.  Mallory’s world is one of the leading manufacturers of disposable diapers and semiconductors in it’s sector.
+
+Most of the population lives in small cities dotting the 4 continents.  There are very few large cities.  However, the various population centers have been growing steadily with several erecting their own drop ports.  Ironically, even though the system’s location is the cause of most of its woes, it also provides the largest portion of the planet’s economy due to constant trade.  It has set itself up as a commonly used waypoint for merchants wishing to trade in both the Draconis Combine and Federated Suns.</desc>
 	</planet>
 	<planet>
 		<name>Manapire</name>
@@ -13448,7 +14156,7 @@
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3049-09-18</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -13874,7 +14582,7 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-05-02</date>
 			<faction>CJF</faction>
 		</factionChange>
 	</planet>
@@ -14130,7 +14838,11 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3051-11-03</date>
+			<faction>CW,FRR</faction>
+		</factionChange>
+		<factionChange>
+			<date>3051-11-10</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -14810,7 +15522,7 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3051-11-07</date>
 			<faction>CSV</faction>
 		</factionChange>
 		<factionChange>
@@ -14936,7 +15648,11 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-10-08</date>
+			<faction>CW,FRR</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-10-15</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -15018,7 +15734,7 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-07-06</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -15335,6 +16051,38 @@
 			<date>3040-01-01</date>
 			<faction>FC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3067-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>4</sysPos>
+		<gravity>1.0</gravity>
+		<pressure>3</pressure>
+		<temperature>30</temperature>
+		<percentWater>60</percentWater>
+		<zenithCharge>true</zenithCharge>
+		<nadirCharge>true</nadirCharge>
+		<hpg>A</hpg>
+		<lifeForm>7</lifeForm>
+		<satellite>Avatar</satellite>
+		<satellite>Galahad</satellite>
+		<satellite>Valiant</satellite>
+		<landMass>Albion (Avalon City)</landMass>
+		<landMass>New Hebrides</landMass>
+		<landMass>New Scotland</landMass>
+		<landMass>Rostock</landMass>
+		<landMass>Brunswick</landMass>
+		<socioIndustrial>A-A-C-A-A</socioIndustrial>
+		<desc>Discovered in 2205 by the Aptly named TAS Camelot, this lush planet quickly attracted colonists. Meanwhile, the native life was genetically altered to yield more Terran-like foodstuffs.  New Avalon grew to become the breadbasket for worlds around it.  This important role assisted Lucien Davion's rise to power and eventually resulted in the Davion family ruling the Federated Suns from this agricultural world.
+
+New Avalon boasts five continents.  Albion is the largest, with prairies and forests interspersed between its mountain ranges.  Brunswick is next in line, boasting most of the planet's petrochemical production and heavy industry, along with two major spaceports.  Rostock is primarily a ranching continent, though some land is lost to the planet's only significant desert.  Up north, the smallest continent, New Scotland, is covered with snow most of the year. New Scotland’s primary export has historically been raw materials, sepcifically hard woods, metals and rare furs to supply the other continents. The New Hebrides island chain is located near the equator, making it a prime location for citrus crops and vacation resorts.
+
+Located in the center of three rivers is Avalon City, home of the ruling Davion family.  Originally constructed as a medieval theme park, the Davions continued to use the romantic side of medieval imagery to bolster morale and rule from atop Mt. Davion to the east of Avalon City.  
+
+The terrain surrounding Avalon City is a mixture of forests, mountains, plains and population centers.  The New Avalon Institute of Science combines a top-of-the-line university, research and development center, and one of the Inner Sphere’s premier military school.  Hidden in the surrounding forests are advanced weapon study facilities as well as a hardened command-and-control complex deep in Mount Davion.  Large natural boundaries separate civilian nature preserves from testing areas.</desc>
 	</planet>
 	<planet>
 		<name>New Bergen</name>
@@ -15346,7 +16094,11 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-05-01</date>
+			<faction>CW,FRR</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-05-12</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -15368,7 +16120,7 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-03-05</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -15620,7 +16372,11 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-07-29</date>
+			<faction>CW,FRR</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-07-30</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -15793,14 +16549,10 @@
 		<faction>FWL</faction>
 	</planet>
 	<planet>
-		<name>Niles</name>
+		<name>Niles (Clan)</name>
 		<xcood>119</xcood>
 		<ycood>1704</ycood>
-		<faction>PIND</faction>
-		<factionChange>
-			<date>2900-01-01</date>
-			<faction>PIND</faction>
-		</factionChange>
+		<faction>CHH</faction>
 	</planet>
 	<planet>
 		<name>Niles</name>
@@ -15858,19 +16610,56 @@
 		<name>Niops V</name>
 		<xcood>-378.34</xcood>
 		<ycood>-263.8</ycood>
-		<faction>PIND</faction>
+		<faction>NIOPS</faction>
+		<pressure>3</pressure>
+		<lifeForm>3</lifeForm>
+		<climate>3</climate>
+		<temperature>30</temperature>
+		<spectralClass>M</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>5</sysPos>
+		<hpg>X</hpg>
+		<desc>Niops V was settled primarily to expand the available resources to the Niops Association when it became difficult for Niops VII to supply all the inhabitants. Niops VI and V are primarily sites for agriculture and mineral extraction.
+		</desc>
 	</planet>
 	<planet>
 		<name>Niops VI</name>
 		<xcood>-376.76</xcood>
 		<ycood>-264.1</ycood>
-		<faction>PIND</faction>
+		<faction>NIOPS</faction>
+		<pressure>3</pressure>
+		<lifeForm>3</lifeForm>
+		<climate>2</climate>
+		<temperature>25</temperature>
+		<spectralClass>M</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>6</sysPos>
+		<hpg>X</hpg>
+		<desc>Niops VI was settled primarily to expand the available resources to the Niops Association when it became difficult for Niops VII to supply all the inhabitants. Niops VI and V are primarily sites for agriculture and mineral extraction.
+		</desc>
 	</planet>
 	<planet>
 		<name>Niops VII</name>
 		<xcood>-377.01</xcood>
 		<ycood>-267.23</ycood>
-		<faction>PIND</faction>
+		<faction>NIOPS</faction>
+		<pressure>3</pressure>
+		<lifeForm>3</lifeForm>
+		<climate>2</climate>
+		<temperature>20</temperature>
+		<spectralClass>M</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>7</sysPos>
+		<hpg>X</hpg>
+		<desc>The Niops Association was originally a self sufficient research facility designed by the Star League to maintain a multi-century study of the system's dying star. As part of the self suficiency Niops required facilities for entire families, as well as an ability to produce their own goods and food. They were so self sufficient that during the Amaris Coup, Niops was forgotten by the Star League, even as the continued to send reports.
+		
+In the 2800s Capellan refugees fleeing the early Succession Wars landed on Niops and filled the scientists in on what was going on in the Inner Sphere. Niops decided the safest course was to cut off any remaining contact with the rest of the Inner Sphere and continued with their research. The refugees became a source of unskilled labor to take over menial jobs. Eventually the Association was formed from the bond between the ruling scientists and the unskilled laborers. The original scientific outpost was located on Niops VII but Niops V and VI were colonized when additional farmland was needed to feed the expanded population.
+		
+Niops VII is a cold planet with access to sufficient resources to keep the Association's original settlement supplied. However, the addition of refugees from the Inner Sphere resulted in the settlement of other planets in the system.
+		</desc>
 	</planet>
 	<planet>
 		<name>Niquinohomo</name>
@@ -15880,6 +16669,22 @@
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
+			<pressure></pressure>
+		<gravity></gravity>
+		<lifeForm>3</lifeForm>
+		<climate>2</climate>
+		<percentWater></percentWater>
+		<temperature></temperature>
+		<spectralClass>M</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>7</sysPos>
+		<socioIndustrial></socioIndustrial>
+		<satellite></satellite>
+		<landMass></landMass>
+		<hpg></hpg>
+		<desc>
+		</desc>
 		</factionChange>
 	</planet>
 	<planet>
@@ -16100,7 +16905,7 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3052-02-06</date>
 			<faction>CW</faction>
 		</factionChange>
 		<factionChange>
@@ -16192,8 +16997,8 @@
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
-			<faction>CW</faction>
+			<date>3049-09-03</date>
+			<faction>CGB</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -16216,7 +17021,7 @@
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3049-09-02</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -16454,8 +17259,8 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
-			<faction>CSV</faction>
+			<date>3051-11-12</date>
+			<faction>CSV,CJF</faction>
 		</factionChange>
 		<factionChange>
 			<date>3062-01-01</date>
@@ -16562,7 +17367,7 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-03-08</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -16572,21 +17377,40 @@
 		<ycood>-34.95</ycood>
 		<faction>TH</faction>
 		<factionChange>
-			<date>2900-01-01</date>
+			<date>2786-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
 			<date>3030-01-01</date>
-			<faction>PIND</faction>
+			<faction>MERC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3040-01-01</date>
-			<faction>FC</faction>
+			<date>3067-12-26</date>
+			<faction>WOB</faction>
 		</factionChange>
 		<factionChange>
-			<date>3057-01-01</date>
-			<faction>IND</faction>
+			<date>3082-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
+		<spectralClass>K</spectralClass>
+		<subtype>9</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>2</sysPos>
+		<gravity>1</gravity>
+		<pressure>3</pressure>
+		<temperature>24</temperature>
+		<percentWater>75</percentWater>
+		<hpg>A</hpg>
+		<lifeForm>3</lifeForm>
+		<satellite>Cerberus</satellite>
+		<socioIndustrial>A-A-A-A-A</socioIndustrial>
+		<landMass>Romulus (Harlech)</landMass>
+		<landMass>Remus</landMass>
+		<desc>Outreach consists of oceans and two continents; Romulus and Remus. Romulus is the population center and home to the planet's capital city Harlech, as well as all of its major cities and commercial enterprises. Romulus is split by a mountain range known as the Ridge. The majority of the continent's countryside is filled out with small farms, forests and rolling hills. The other continent Remus is less hospitable and arid, it does not contain any major cities.
+
+If the Dragoons are in control of the planet, Remus is the site of their private industries and training facilities that are away from their public face in Harlech and the Hiring Hall on the continent of Romulus.
+
+Outreach is the primary hiring location for the mercenary trade from the 3030s after Wolf’s Dragoons opened the Hiring Hall until its destruction at the hands of disenfranchised mercenaries and later Word of Blake in 3067.</desc>
 	</planet>
 	<planet>
 		<name>Ovan</name>
@@ -16774,6 +17598,14 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
+			<date>3050-09-18</date>
+			<faction>CJF,FC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-10-30</date>
+			<faction>CJF</faction>
+		</factionChange>
+		<factionChange>
 			<date>3052-01-01</date>
 			<faction>CSV</faction>
 		</factionChange>
@@ -16890,7 +17722,7 @@
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3049-09-12</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -17004,7 +17836,11 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-03-08</date>
+			<faction>CJF,FC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-03-11</date>
 			<faction>CJF</faction>
 		</factionChange>
 		<factionChange>
@@ -17218,7 +18054,7 @@
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3049-08-19</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -17232,7 +18068,11 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-07-06</date>
+			<faction>CW,FC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-07-21</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -17448,7 +18288,7 @@
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
-			<date>3049-09-01</date>
+			<date>3049-09-05</date>
 			<faction>CGB</faction>
 		</factionChange>
 	</planet>
@@ -17740,7 +18580,11 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3051-12-07</date>
+			<faction>CJF,FRR</faction>
+		</factionChange>
+		<factionChange>
+			<date>3051-12-10</date>
 			<faction>CJF</faction>
 		</factionChange>
 	</planet>
@@ -17859,7 +18703,7 @@
 		</factionChange>
 	</planet>
 	<planet>
-		<name>Radije</name>
+		<name>Radlje</name>
 		<xcood>58.16</xcood>
 		<ycood>380.25</ycood>
 		<faction>DC</faction>
@@ -17900,7 +18744,11 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-10-03</date>
+			<faction>CW,FRR</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-10-27</date>
 			<faction>CW</faction>
 		</factionChange>
 		<factionChange>
@@ -17992,7 +18840,7 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3052-04-16</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -18068,7 +18916,11 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-07-08</date>
+			<faction>CW,FRR</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-07-17</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -18082,7 +18934,7 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3052-01-10</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -18316,7 +19168,7 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-07-03</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -18396,7 +19248,11 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-06-23</date>
+			<faction>CJF,FC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-07-05</date>
 			<faction>CJF</faction>
 		</factionChange>
 	</planet>
@@ -18492,7 +19348,11 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-05-01</date>
+			<faction>CW,FRR</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-05-05</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -18528,7 +19388,11 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-05-07</date>
+			<faction>CJF,FC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-05-09</date>
 			<faction>CJF</faction>
 		</factionChange>
 	</planet>
@@ -19176,7 +20040,11 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3051-12-17</date>
+			<faction>CW,FRR</faction>
+		</factionChange>
+		<factionChange>
+			<date>3052-01-06</date>
 			<faction>CW</faction>
 		</factionChange>
 		<factionChange>
@@ -19440,7 +20308,11 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-05-13</date>
+			<faction>CJF,FC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-05-17</date>
 			<faction>CJF</faction>
 		</factionChange>
 	</planet>
@@ -19532,7 +20404,11 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3051-11-04</date>
+			<faction>CW,FC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3051-11-18</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -19596,7 +20472,11 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3051-12-04</date>
+			<faction>CW,FC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3051-12-06</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -19695,14 +20575,10 @@
 		</factionChange>
 	</planet>
 	<planet>
-		<name>Sheridan</name>
+		<name>Sheridan (Clan)</name>
 		<xcood>126</xcood>
 		<ycood>1793</ycood>
-		<faction>PIND</faction>
-		<factionChange>
-			<date>2900-01-01</date>
-			<faction>PIND</faction>
-		</factionChange>
+		<faction>CSA</faction>
 	</planet>
 	<planet>
 		<name>Sherwood</name>
@@ -19885,6 +20761,30 @@
 		<xcood>7.3</xcood>
 		<ycood>-231.59</ycood>
 		<faction>CC</faction>
+			<pressure>3</pressure>
+			<gravity>1</gravity>
+			<nadirCharge>true</nadirCharge>
+			<zenithCharge>true</zenithCharge>
+			<lifeForm>2</lifeForm>
+			<climate>3</climate>
+			<percentWater>70</percentWater>
+			<temperature>30</temperature>
+			<spectralClass>G</spectralClass>
+			<subtype>0</subtype>
+			<luminosity>III</luminosity>
+			<sysPos>2</sysPos>
+			<satellite>Fu Hsi</satellite>
+			<satellite>Nuwa</satellite>
+			<satellite>Shennong</satellite>
+			<landMass>Liaoning “The Walrus” (Zi-Jin Cheng (“Forbidden City”))</landMass>
+			<landMass>Wuhan</landMass>
+			<landMass>Imarra</landMass>
+			<landMass>South Home</landMass>
+			<hpg>A</hpg>
+		<desc>The planet is known for lush jungles and tropical environments. Development is controlled and limited so that much of the terrain outside of cities is virgin wilderness. The planetary capital Zi-Jin Cheng (“Forbidden City”) is also the capital of the Capellan Confederation and home to the Celestial Palace, home to House Liao.
+		
+Sian has been the capital of the Capellan Confederation since 2368 when Capella was evacuated and bombarded by the Confederation Navy after the former capital was occupied by Davion peace-keepers. At the time Sian was the home of the Chancellor's summer palace and home to House Liao's political apparatus, the infamous Maskirovka (or Secret Service) and House Imarra (the original Warrior House regiment). Sian is likely the best-defended world in the Confederation, garrisoned by the Capellan Hussars with supporting AeroSpace fighter contingents commanded by the best pilots in the Confederation and by the Warrior Houses battalions that rotate to Sian periodically for special training.
+		</desc>
 	</planet>
 	<planet>
 		<name>Siendou</name>
@@ -19938,7 +20838,7 @@
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3049-09-26</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -20022,7 +20922,7 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-03-10</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -20040,7 +20940,11 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3052-02-02</date>
+			<faction>CW,FRR</faction>
+		</factionChange>
+		<factionChange>
+			<date>3052-02-16</date>
 			<faction>CW</faction>
 		</factionChange>
 		<factionChange>
@@ -20086,7 +20990,11 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-10-04</date>
+			<faction>CW,FRR</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-10-07</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -20262,7 +21170,11 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-05-22</date>
+			<faction>CJF,FC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-05-23</date>
 			<faction>CJF</faction>
 		</factionChange>
 	</planet>
@@ -20434,7 +21346,11 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-04-01</date>
+			<faction>CW,FRR</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-04-14</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -20546,7 +21462,7 @@
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3049-09-24</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -20574,7 +21490,11 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-04-08</date>
+			<faction>CJF,FC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-04-09</date>
 			<faction>CJF</faction>
 		</factionChange>
 	</planet>
@@ -20668,11 +21588,19 @@
 		<name>Strana Mechty</name>
 		<xcood>31</xcood>
 		<ycood>1766</ycood>
-		<faction>PIND</faction>
-		<factionChange>
-			<date>2900-01-01</date>
-			<faction>PIND</faction>
-		</factionChange>
+		<faction>CLAN</faction>
+		<pressure>3</pressure>
+		<gravity>1.1</gravity>
+		<lifeForm>7</lifeForm>
+		<climate>2</climate>
+		<percentWater>70</percentWater>
+		<temperature>25</temperature>
+		<spectralClass>G</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>VI</luminosity>
+		<sysPos>4</sysPos>
+		<desc>Strana Mechty ("Land of Dreams") is the Clan shared "capital" planet. The planet is the site that Nicolas Kerensky and the original 800 Clan founders fled to from the Pentagon Worlds. Strana Mechty houses the Hall of Khans where the leaders of the Clans meet for Grand Councils. Each Clan has an enclave on the planet. 
+		</desc>
 	</planet>
 	<planet>
 		<name>Strandfontein</name>
@@ -20790,7 +21718,11 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-09-22</date>
+			<faction>CJF,FC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-10-13</date>
 			<faction>CJF</faction>
 		</factionChange>
 	</planet>
@@ -20820,7 +21752,11 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3052-01-03</date>
+			<faction>CW,FC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3052-02-10</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -20950,7 +21886,11 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-09-03</date>
+			<faction>CW,FC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-09-05</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -20964,7 +21904,7 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-04-05</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -21186,7 +22126,11 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3051-11-02</date>
+			<faction>CW,FC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3051-11-07</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -21516,13 +22460,41 @@
 		<ycood>0</ycood>
 		<faction>TH</faction>
 		<factionChange>
-			<date>2900-01-01</date>
+			<date>2788-06-25</date>
 			<faction>CS</faction>
 		</factionChange>
 		<factionChange>
-			<date>3057-01-01</date>
+			<date>3057-02-28</date>
 			<faction>WOB</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1</gravity>
+		<nadirCharge>True</nadirCharge>
+		<zenithCharge>True</zenithCharge>
+		<lifeForm>7</lifeForm>
+		<climate>3</climate>
+		<percentWater>75</percentWater>
+		<temperature>30</temperature>
+		<spectralClass>G</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>3</sysPos>
+		<socioIndustrial>A-A-A-A-A</socioIndustrial>
+		<satellite>Moon</satellite>
+		<landMass>Asia</landMass>
+		<landMass>Africa</landMass>
+		<landMass>Antarctica</landMass>
+		<landMass>Australia</landMass>
+		<landMass>Europe</landMass>
+		<landMass>North America</landMass>
+		<landMass>South America</landMass>
+		<hpg>A</hpg>
+		<desc>The birthplace of humanity, Terra (or Earth), remains a leader in industry and technology over the rest of the Inner Sphere. Terra was the seat of power for the Terran Alliance and then later the Terran Hegemony and by extension the Star League.
+		
+Terra was a neutral power controlled by ComStar from 2788 until the planet was taken by the Word of Blake in 3057.
+
+The Sol system contains multiple colonized planets, foremost are Mars and Venus. Mars is heavily colonized and is the site of multiple advanced industrial centers. The Sol system is also home to many spaceborn colonies, from the Titan Ship Yards, which produce and service Jumpships and Warships to the multiple settlements in the far-flung astroid belt, these people call themselves Belters and are often only losesly associated with each other.	
+		</desc>
 	</planet>
 	<planet>
 		<name>Terra Firma</name>
@@ -21622,7 +22594,11 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3051-11-06</date>
+			<faction>CW,FRR</faction>
+		</factionChange>
+		<factionChange>
+			<date>3051-11-25</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -21639,6 +22615,31 @@
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.1</gravity>
+		<nadirCharge>True</nadirCharge>
+		<zenithCharge>True</zenithCharge>
+		<lifeForm>7</lifeForm>
+		<climate>0</climate>
+		<percentWater>80</percentWater>
+		<temperature>20</temperature>
+		<spectralClass>G</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>5</sysPos>
+		<socioIndustrial>A-A-A-A-A</socioIndustrial>
+		<satellite>Marsden</satellite>
+		<landMass>Bremen (Tharkad City)</landMass>
+		<landMass>Franz</landMass>
+		<landMass>Grolsch</landMass>
+		<landMass>Heidelberg</landMass>
+		<landMass>Sutherland</landMass>
+		<landMass>Tatyana (Archipelago)</landMass>
+		<landMass>New Bismark (Archipelago)</landMass>
+		<hpg>A</hpg>
+		<desc>First discovered in 2310, Tharkad's cliamte is comparable to the arctic wilderness of Terra. The original colonists introduced many cold-weather plants and animals from Terra. Despite being an icy and rugged planet industries and population centers sprang up on almost every continent and Tharkad has served as the capital of the Lyran Commonwealth since 2407.
+		
+As the capital of the Lyran Commonwealth, Thakard is home to many vital parts of the Commonwealth. House Steiner rules from the Triad, a large government campus containing over 300 buildings ringed by the Royal Court, the Royal Palace and the Government House. Other locations of importance to the Commonwealth are Asgard, the command center for the entire Lyran Commonwealth Armed Forces, the capital Tharkad City, and the Nagelring one of the Inner Sphere's premier military academies.</desc>
 	</planet>
 	<planet>
 		<name>The Edge</name>
@@ -21654,7 +22655,7 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-03-03</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -21678,7 +22679,7 @@
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3049-09-05</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -21803,7 +22804,11 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3051-12-22</date>
+			<faction>CW,FRR</faction>
+		</factionChange>
+		<factionChange>
+			<date>3051-13-22</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -21824,14 +22829,10 @@
 		<faction>FWL</faction>
 	</planet>
 	<planet>
-		<name>Tiber</name>
+		<name>Tiber (Clan)</name>
 		<xcood>89</xcood>
 		<ycood>1877</ycood>
 		<faction>PIND</faction>
-		<factionChange>
-			<date>2900-01-01</date>
-			<faction>PIND</faction>
-		</factionChange>
 	</planet>
 	<planet>
 		<name>Tiflis</name>
@@ -22055,7 +23056,11 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-03-05</date>
+			<faction>CJF,FC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-03-07</date>
 			<faction>CJF</faction>
 		</factionChange>
 	</planet>
@@ -22141,7 +23146,11 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-04-12</date>
+			<faction>CJF,FC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-04-20</date>
 			<faction>CJF</faction>
 		</factionChange>
 		<factionChange>
@@ -22152,6 +23161,20 @@
 			<date>3062-01-01</date>
 			<faction>CJF</faction>
 		</factionChange>
+		<spectralClass>M</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>VII</luminosity>
+		<sysPos>1</sysPos>
+		<gravity>0.86</gravity>
+		<pressure>3</pressure>
+		<temperature>40</temperature>
+		<percentWater>9</percentWater>
+		<hpg>B</hpg>
+		<climate>4</climate>
+		<lifeForm>7</lifeForm>
+		<desc>Trell I (aka Trel I or "Trellwan") is an arid, inhospitable planet.  With almost no surface water and planetary days lasting over 30 Terran days the average planetary temperature swings wildly during the day and night cycle (from a high in the 40s during the day at the equator to as low as -80 at night near the poles). Another interesting fact is the short rotation around it’s sun. Trell I’s years are only 45 Standard days.
+Due to the lack of water and thus lack of vegetation most of the planet is covered in vast deserts and barren craggy mountains.
+The local population has long resented the Lyran Commonwealth for what they believe to be inadequate defense against raids by pirates and the Draconis Combine.</desc>
 	</planet>
 	<planet>
 		<name>Trelleborg</name>
@@ -22475,7 +23498,27 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-06-04</date>
+			<faction>CJF,FC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-06-25</date>
+			<faction>CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-09-10</date>
+			<faction>CJF,FC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-09-11</date>
+			<faction>FC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-09-14</date>
+			<faction>CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3051-11-01</date>
 			<faction>CSV</faction>
 		</factionChange>
 		<factionChange>
@@ -22641,7 +23684,11 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-07-25</date>
+			<faction>CW,FRR</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-07-29</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -22875,7 +23922,7 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-07-03</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -23037,7 +24084,7 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-05-01</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -23225,7 +24272,7 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3051-11-15</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -23239,7 +24286,7 @@
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3049-08-17</date>
 			<faction>CJF</faction>
 		</factionChange>
 	</planet>
@@ -23257,7 +24304,7 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3051-11-09</date>
 			<faction>CW</faction>
 		</factionChange>
 		<factionChange>
@@ -23295,7 +24342,7 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-09-08</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -23347,7 +24394,11 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-06-28</date>
+			<faction>CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3051-11-01</date>
 			<faction>CSV</faction>
 		</factionChange>
 		<factionChange>
@@ -23595,7 +24646,7 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3051-11-17</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -23707,7 +24758,7 @@
 			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3051-12-08</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -23807,12 +24858,12 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-03-09</date>
 			<faction>CJF</faction>
 		</factionChange>
 	</planet>
 	<planet>
-		<name>Winfield</name>
+		<name>Winfield (FS)</name>
 		<xcood>542.2</xcood>
 		<ycood>23.73</ycood>
 		<faction>FS</faction>
@@ -23929,7 +24980,11 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-06-01</date>
+			<faction>CJF,FC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-06-03</date>
 			<faction>CJF</faction>
 		</factionChange>
 	</planet>
@@ -24162,14 +25217,10 @@
 		</factionChange>
 	</planet>
 	<planet>
-		<name>York</name>
+		<name>York (Clan)</name>
 		<xcood>-74</xcood>
 		<ycood>1806</ycood>
-		<faction>PIND</faction>
-		<factionChange>
-			<date>2900-01-01</date>
-			<faction>PIND</faction>
-		</factionChange>
+		<faction>CBS</faction>
 	</planet>
 	<planet>
 		<name>Yumesta</name>
@@ -24395,7 +25446,11 @@
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3050-09-26</date>
+			<faction>CJF,FC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3050-10-05</date>
 			<faction>CJF</faction>
 		</factionChange>
 	</planet>
@@ -24475,13 +25530,32 @@
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3030-01-01</date>
+			<date>3028-10-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3067-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-01-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3079-01-01</date>
+			<faction>CC</faction>
+		</factionChange>
+		<spectralClass>K</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>5</sysPos>
+		<hpg>B</hpg>
+		<lifeForm>7</lifeForm>
+		<desc>Primarily known as a tourist attraction, Zurich lacks significant natural resources or strategic position and is generally lightly garrisoned. The planet features a museum around the wreckage of a Star League dropship on the southern continent, in addition to an amusement park and an opera house. These attractions and the planet's natural beauty made Zurich a personal favorite of Maximilian Liao, Zurich economically prospered during his reign through tax breaks and favored trade status.</desc>
 	</planet>
 	<planet>
 		<name>Zvolen</name>
