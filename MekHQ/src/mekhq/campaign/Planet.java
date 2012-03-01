@@ -770,6 +770,7 @@ public class Planet implements Serializable {
 		ArrayList<String> factions = new ArrayList<String>();
 		String[] codes = codeList.split(",");
 		for(String code : codes) {
+			//code = code.trim();
 			if(null == Faction.getFaction(code)) {
 				MekHQ.logMessage("Unknown faction code: " + code);
 			}
