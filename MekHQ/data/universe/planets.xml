@@ -83,9 +83,9 @@
 		<xcood>352.6</xcood>
 		<ycood>317.39</ycood>
 		<faction>DC</faction>
-		<spectralClass>g</spectralClass>
+		<spectralClass>G</spectralClass>
 		<subtype>2</subtype>
-		<luminosity>v</luminosity>
+		<luminosity>V</luminosity>
 		<sysPos>3</sysPos>
 		<gravity>1.2</gravity>
 		<pressure>3</pressure>
@@ -328,9 +328,9 @@
 		<xcood>256.11</xcood>
 		<ycood>187.25</ycood>
 		<faction>DC</faction>
-		<spectralClass>f</spectralClass>
+		<spectralClass>F</spectralClass>
 		<subtype>9</subtype>
-		<luminosity>v</luminosity>
+		<luminosity>V</luminosity>
 		<sysPos>2</sysPos>
 		<gravity>0.85</gravity>
 		<pressure>2</pressure>
@@ -381,7 +381,7 @@
 		<faction>DC</faction>
 		<spectralClass>A</spectralClass>
 		<subtype>2</subtype>
-		<luminosity>v</luminosity>
+		<luminosity>V</luminosity>
 		<sysPos>4</sysPos>
 		<gravity>0.9</gravity>
 		<pressure>4</pressure>
@@ -520,7 +520,7 @@
 		</factionChange>
 		<spectralClass>M</spectralClass>
 		<subtype>2</subtype>
-		<luminosity>iv</luminosity>
+		<luminosity>IV</luminosity>
 		<sysPos>3</sysPos>
 		<gravity>1.04</gravity>
 		<pressure>3</pressure>
@@ -673,9 +673,9 @@
 		<xcood>66.76</xcood>
 		<ycood>96.24</ycood>
 		<faction>DC</faction>
-		<spectralClass>a </spectralClass>
+		<spectralClass>A</spectralClass>
 		<subtype>7</subtype>
-		<luminosity>iv</luminosity>
+		<luminosity>IV</luminosity>
 		<sysPos>5</sysPos>
 		<gravity>0.9</gravity>
 		<pressure>3</pressure>
@@ -1786,7 +1786,7 @@ Industrial, Command and logistical world, paperwork in this planet and its prefe
 		<faction>DC</faction>
 		<spectralClass>G</spectralClass>
 		<subtype>6</subtype>
-		<luminosity>iv</luminosity>
+		<luminosity>IV</luminosity>
 		<sysPos>3</sysPos>
 		<gravity>1</gravity>
 		<pressure>3</pressure>
@@ -2170,7 +2170,7 @@ The League intelligence branch, SAFE, is headquartered on Atreus' moon Wendigo. 
 		</factionChange>
 		<spectralClass>G</spectralClass>
 		<subtype>8</subtype>
-		<luminosity>v</luminosity>
+		<luminosity>V</luminosity>
 		<sysPos>5</sysPos>
 		<gravity>1.07</gravity>
 		<pressure>3</pressure>
@@ -3171,7 +3171,7 @@ Barras is the hotbed of intelligence activity along the Confederation-FWL border
 		</factionChange>
 		<spectralClass>F</spectralClass>
 		<subtype>4</subtype>
-		<luminosity>v</luminosity>
+		<luminosity>V</luminosity>
 		<sysPos>5</sysPos>
 		<gravity>0.91</gravity>
 		<pressure>3</pressure>
@@ -3893,7 +3893,7 @@ Barras is the hotbed of intelligence activity along the Confederation-FWL border
 		</factionChange>
 		<spectralClass>A</spectralClass>
 		<subtype>9</subtype>
-		<luminosity>iii</luminosity>
+		<luminosity>III</luminosity>
 		<sysPos>6</sysPos>
 		<gravity>1.01</gravity>
 		<pressure>3</pressure>
@@ -4910,7 +4910,7 @@ Barras is the hotbed of intelligence activity along the Confederation-FWL border
 		<faction>DC</faction>
 		<spectralClass>G</spectralClass>
 		<subtype>2</subtype>
-		<luminosity>v</luminosity>
+		<luminosity>V</luminosity>
 		<sysPos>3</sysPos>
 		<gravity>1.01</gravity>
 		<pressure>3</pressure>
@@ -6572,7 +6572,7 @@ Barras is the hotbed of intelligence activity along the Confederation-FWL border
 		</factionChange>
 		<spectralClass>G</spectralClass>
 		<subtype>3</subtype>
-		<luminosity>v</luminosity>
+		<luminosity>V</luminosity>
 		<sysPos>4</sysPos>
 		<gravity>1.02</gravity>
 		<pressure>3</pressure>
@@ -6765,7 +6765,7 @@ The capital is currently Fort Dieron, but in the past San Martin and Tahlwynn ha
 		<faction>DC</faction>
 		<spectralClass>G</spectralClass>
 		<subtype>2</subtype>
-		<luminosity>v</luminosity>
+		<luminosity>V</luminosity>
 		<sysPos>4</sysPos>
 		<gravity>0.93</gravity>
 		<pressure>3</pressure>
@@ -9574,7 +9574,7 @@ For much of its early history El Dorado was known for its JumShip yards. This en
 		</factionChange>
 		<spectralClass>A</spectralClass>
 		<subtype>4</subtype>
-		<luminosity>v</luminosity>
+		<luminosity>V</luminosity>
 		<sysPos>4</sysPos>
 		<gravity>0.93</gravity>
 		<pressure>3</pressure>
@@ -10403,7 +10403,7 @@ For much of its early history El Dorado was known for its JumShip yards. This en
 		<faction>DC</faction>
 		<spectralClass>F</spectralClass>
 		<subtype>5</subtype>
-		<luminosity>v</luminosity>
+		<luminosity>V</luminosity>
 		<sysPos>5</sysPos>
 		<gravity>0.97</gravity>
 		<pressure>4</pressure>
@@ -10895,7 +10895,7 @@ For much of its early history El Dorado was known for its JumShip yards. This en
 		</factionChange>
 		<spectralClass>F</spectralClass>
 		<subtype>8</subtype>
-		<luminosity>iii</luminosity>
+		<luminosity>III</luminosity>
 		<sysPos>4</sysPos>
 		<gravity>0.99</gravity>
 		<pressure>3</pressure>
@@ -10936,7 +10936,7 @@ For much of its early history El Dorado was known for its JumShip yards. This en
 		<faction>DC</faction>
 		<spectralClass>G</spectralClass>
 		<subtype>4</subtype>
-		<luminosity>v</luminosity>
+		<luminosity>V</luminosity>
 		<sysPos>5</sysPos>
 		<gravity>1.03</gravity>
 		<pressure>3</pressure>
@@ -11181,7 +11181,7 @@ For much of its early history El Dorado was known for its JumShip yards. This en
 		</factionChange>
 		<spectralClass>G</spectralClass>
 		<subtype>6</subtype>
-		<luminosity>v</luminosity>
+		<luminosity>V</luminosity>
 		<sysPos>3</sysPos>
 		<gravity>1</gravity>
 		<pressure>3</pressure>
@@ -11430,7 +11430,7 @@ For much of its early history El Dorado was known for its JumShip yards. This en
 		<faction>DC</faction>
 		<spectralClass>F</spectralClass>
 		<subtype>1</subtype>
-		<luminosity>v</luminosity>
+		<luminosity>V</luminosity>
 		<sysPos>3</sysPos>
 		<gravity>1.02</gravity>
 		<pressure>3</pressure>
@@ -11507,7 +11507,7 @@ For much of its early history El Dorado was known for its JumShip yards. This en
 		<faction>DC</faction>
 		<spectralClass>G</spectralClass>
 		<subtype>5</subtype>
-		<luminosity>iv</luminosity>
+		<luminosity>IV</luminosity>
 		<sysPos>4</sysPos>
 		<gravity>1.04</gravity>
 		<pressure>3</pressure>
@@ -11808,6 +11808,22 @@ For much of its early history El Dorado was known for its JumShip yards. This en
 		<xcood>332.52</xcood>
 		<ycood>133.79</ycood>
 		<faction>DC</faction>
+		<spectralClass>F</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>5</sysPos>
+		<gravity>0.99</gravity>
+		<pressure>3</pressure>
+		<temperature>46</temperature>
+		<percentWater>25</percentWater>
+		<zenithCharge>TRUE</zenithCharge>
+		<nadirCharge>TRUE</nadirCharge>
+		<hpg>B</hpg>
+		<lifeForm>5</lifeForm>
+		<climate>4</climate>
+		<socioIndustrial>B-C-D-C-D</socioIndustrial>
+		<landmass>Wanaland (Gondovia)</landmass>
+		<desc>Kaznejoy is an advanced world with basic heavy industry. The world is hot arid with few natural resources and is considered by many to be an inhospitable wasteland. The planet is a prefecture capital in the Benjamin Military District but many wonder why. The most common answer is that the planet's hostile environment is vital to the training of DEST commandos. Near the City Jigokudani on the Shinano Continent is Ibuki Robotics and Manufacturing</desc>
 	</planet>
 	<planet>
 		<name>Kearny</name>
@@ -12198,6 +12214,21 @@ For much of its early history El Dorado was known for its JumShip yards. This en
 		<xcood>300.44</xcood>
 		<ycood>148.66</ycood>
 		<faction>DC</faction>
+		<spectralClass>F</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>3</sysPos>
+		<gravity>1</gravity>
+		<pressure>3</pressure>
+		<temperature>27</temperature>
+		<percentWater>65</percentWater>
+		<hpg>B</hpg>
+		<lifeForm>3</lifeForm>
+		<climate>2</climate>
+		<socioIndustrial>B-B-C-C-A</socioIndustrial>
+		<landmass>Bounty (Dark Earth)</landmass>
+		<landmass>Needles</landmass>
+		<desc>A breadbasket world in the Matsuida prefecture of the Galedon Military district; Kirei Na Niwa is a planet renowned for agriculture and a year round warm climate. The continent of Needles is home to needle like mountains that surround the plains. These plains are battered by severe and unpredictable windstorms. The city of Newton on the continent is home to Kinkakuji Enterprises.</desc>
 	</planet>
 	<planet>
 		<name>Kirin</name>
@@ -12942,6 +12973,23 @@ For much of its early history El Dorado was known for its JumShip yards. This en
 		<xcood>113.97</xcood>
 		<ycood>51.64</ycood>
 		<faction>DC</faction>
+		<spectralClass>F</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>6</sysPos>
+		<gravity>1.08</gravity>
+		<pressure>3</pressure>
+		<temperature>20</temperature>
+		<percentWater>55</percentWater>
+		<nadirCharge>TRUE</nadirCharge>
+		<hpg>B</hpg>
+		<lifeForm>3</lifeForm>
+		<climate>2</climate>
+		<socioIndustrial>B-A-A-B-C</socioIndustrial>
+		<landmass>Upolu (Aiga-i-le-Tai)</landmass>
+		<landmass>Longwalk</landmass>
+		<landmass>Firesand</landmass>
+		<desc> Lapida II is a heavily industrialized and resource rich world in the Proserpina Prefecture of the Benjamin Military District. The planet is cold and has an atmosphere tainted by hundreds of years of strip mining and industry. The city of Mulifanua on the continent of Upolu is home to Nimakachi Fusion Products. Nimakachi Fusion Products purchased the bankrupt Sendai mining complex in 2602. They transformed the subterranean complex into a self-contained manufacturing enclave. The fact that the area surrounding the factories is covered with a warren of shantytowns creating heavy urban environments that are nearly impossible to fight through have been vital to Nimakachi’s defense, along with their highly experienced and well equipped security force, combined the facility is almost impossible to raid. Also on world are numerous mineral processing and construction factories that produce everything from furniture, to tractors, to BattleMechs. The continent of Firesand is home to several well-hidden refit and supply centers. The continent received its name from the corrosive and toxic ammoniac salt sands that cover most of Firesand.</desc>
 	</planet>
 	<planet>
 		<name>Larned</name>
@@ -13664,6 +13712,24 @@ For much of its early history El Dorado was known for its JumShip yards. This en
 		<xcood>294.44</xcood>
 		<ycood>322.87</ycood>
 		<faction>DC</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>5</sysPos>
+		<gravity>1.1</gravity>
+		<pressure>3</pressure>
+		<temperature>30</temperature>
+		<percentWater>50</percentWater>
+		<nadirCharge>TRUE</nadirCharge>
+		<hpg>B</hpg>
+		<lifeForm>3</lifeForm>
+		<satellite>Titania</satellite>
+		<climate>3</climate>
+		<socioIndustrial>B-C-C-C-B</socioIndustrial>
+		<landmass>Whiteland (Bitter Lake)</landmass>
+		<landmass>Blueland</landmass>
+		<landmass>Redland</landmass>
+		<desc>Loysville is an advanced world; but home to primarily farmers, fisherman and tourists. The system is located in the Kagoshima prefecture of the Pesht Military District. The planet's largest continent is the arctic Whiteland. The planet is home to the Ishikawajima-Harima Battle Armor Industries, a new plant that opened in 3066.</desc>
 	</planet>
 	<planet>
 		<name>Lucerne</name>
@@ -14330,11 +14396,40 @@ Most of the population lives in small cities dotting the 4 continents.  There ar
 		<name>Marduk</name>
 		<xcood>210.2</xcood>
 		<ycood>60.51</ycood>
-		<faction>FS</faction>
+		<faction>DC</faction>
 		<factionChange>
-			<date>3030-01-01</date>
+			<date>2822-12-31</date>
+			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>2864-12-31</date>
 			<faction>DC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3025-12-31</date>
+			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3030-12-31</date>
+			<faction>DC</faction>
+		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>III</luminosity>
+		<sysPos>4</sysPos>
+		<gravity>1</gravity>
+		<pressure>3</pressure>
+		<temperature>45</temperature>
+		<percentWater>60</percentWater>
+		<hpg>B</hpg>
+		<lifeForm>5</lifeForm>
+		<satellite>Kafuffle</satellite>
+		<climate>3</climate>
+		<socioIndustrial>A-A-A-A-B</socioIndustrial>
+		<landmass>Tiller (New Pontiac)</landmass>
+		<landmass>Aileen</landmass>
+		<landmass>Latvia</landmass>
+		<desc>No data available.</desc>
 	</planet>
 	<planet>
 		<name>Marfik</name>
@@ -14537,6 +14632,21 @@ Most of the population lives in small cities dotting the 4 continents.  There ar
 		<xcood>280.88</xcood>
 		<ycood>130.14</ycood>
 		<faction>DC</faction>
+		<spectralClass>F</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>3</sysPos>
+		<gravity>1</gravity>
+		<pressure>3</pressure>
+		<temperature>27</temperature>
+		<percentWater>65</percentWater>
+		<hpg>B</hpg>
+		<lifeForm>3</lifeForm>
+		<climate>2</climate>
+		<socioIndustrial>B-B-C-C-A</socioIndustrial>
+		<landmass>Bounty (Dark Earth)</landmass>
+		<landmass>Needles</landmass>
+		<desc>A breadbasket world in the Matsuida prefecture of the Galedon Military district; Kirei Na Niwa is a planet renowned for agriculture and a year round warm climate. The continent of Needles is home to needle like mountains that surround the plains. These plains are battered by severe and unpredictable windstorms. The city of Newton on the continent is home to Kinkakuji Enterprises.</desc>
 	</planet>
 	<planet>
 		<name>Mauckport</name>
@@ -15133,6 +15243,25 @@ Most of the population lives in small cities dotting the 4 continents.  There ar
 		<xcood>249.85</xcood>
 		<ycood>204.99</ycood>
 		<faction>DC</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>3</sysPos>
+		<gravity>1</gravity>
+		<pressure>3</pressure>
+		<temperature>29</temperature>
+		<percentWater>85</percentWater>
+		<zenithCharge>TRUE</zenithCharge>
+		<nadirCharge>TRUE</nadirCharge>
+		<hpg>A</hpg>
+		<lifeForm>6</lifeForm>
+		<satellite>Oscuro Corazon</satellite>
+		<climate>3</climate>
+		<socioIndustrial>A-B-A-B-B</socioIndustrial>
+		<landmass>Brook (Saginaw)</landmass>
+		<landmass>Kahn</landmass>
+		<landmass>Kure</landmass>
+		<desc>No data available.</desc>		
 	</planet>
 	<planet>
 		<name>Millerton</name>
@@ -16417,6 +16546,36 @@ The terrain surrounding Avalon City is a mixture of forests, mountains, plains a
 		<xcood>362.77</xcood>
 		<ycood>250.89</ycood>
 		<faction>DC</faction>
+		<spectralClass>F</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>6</sysPos>
+		<gravity>1.05</gravity>
+		<pressure>3</pressure>
+		<temperature>35</temperature>
+		<percentWater>70</percentWater>
+		<zenithCharge>TRUE</zenithCharge>
+		<nadirCharge>TRUE</nadirCharge>
+		<hpg>A</hpg>
+		<lifeForm>7</lifeForm>
+		<satellite>Jimmu</satellite>
+		<satellite>Kish</satellite>
+		<satellite>Chiai</satellite>
+		<climate>3</climate>
+		<socioIndustrial>C-B-C-B-B</socioIndustrial>
+		<landmass>Shimoji (Yamashiro)</landmass>
+		<landmass>Nippon</landmass>
+		<landmass>Kurima</landmass>
+		<landmass>Tarama</landmass>
+		<desc>In the early days of space colonization, New Samarkand was one of the most populous colonies. It was also a deeply divided state. The planet was covered with sovereign city states that each had their own armed forces and were regularly at war with each other. It was on New Samarkand that House Kurita first rose to prominence, the brothers Shiro and Urizen Kurita rose first to control the city-state of Yamashiro and eventually the entire planet. From there they began the foundations for what would become the Draconis Combine. 
+
+New Samarkand served as the capital of the Draconis combine until June of 2617 when the Coordinator announced plans to move the capital to Luthien. New Samarkand's glory days vanished with the relocation of the Combine capital and many of its industrial concerns and it became a shadow of its former self. 
+
+During the Star League, New Samarkand hosted a major Star League military base and supply depot The planet was used as a major gathering point for the Star League Defense Force in preparation Exodus in 2784. 
+
+By the 31st Century, New Samarkand was covered by decaying cities that were once bustling and the hulks of long closed industries. However, the planet still boasts the Internal Security College, the Sun Zhang MechWarrior Academy and a handful of major factory complexes that are still active.
+		
+During the Jihad, Kiyomori Minamoto temporarily relocated the capital back to New Samarkand while Luthien was fought over by forces loyal to the Combine, Word of Blake and the Black Dragon Society. In addition to relocating the Combine's capital to New Samarkand the planet also became the head of the former Galdeon Military District after biological agents destroyed Galedon V. The return to prominence of New Samarkand has revitalized the economy on planet and attracted several more manufacturing concerns driven off their home planets by the Jihad.</desc>
 	</planet>
 	<planet>
 		<name>New St. Andrews</name>
@@ -16599,6 +16758,23 @@ The terrain surrounding Avalon City is a mixture of forests, mountains, plains a
 		<xcood>317.65</xcood>
 		<ycood>316.09</ycood>
 		<faction>DC</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>3</sysPos>
+		<gravity>0.9</gravity>
+		<pressure>3</pressure>
+		<temperature>28</temperature>
+		<percentWater>32</percentWater>
+		<zenithCharge>TRUE</zenithCharge>
+		<hpg>B</hpg>
+		<lifeForm>5</lifeForm>
+		<satellite>Favonius (asteroid)</satellite>
+		<climate>3</climate>
+		<socioIndustrial>B-C-C-D-A</socioIndustrial>
+		<landmass>Anemoi (New Zephyrus)</landmass>
+		<landmass>Hyacinth</landmass>
+		<desc>While Ningxia has become known for its diamonds, which are perfect for industrial processes, the world was actually settled for its beautiful landscapes. Regarded as a planet sized bonsai garden, every effort to exploit the diamond deposites has been stopped by highly placed nobles, including Coordinator Takashi Kurita. These nobles, as well as many prominent businessmen, maintain vacation homes on the picturesque world. The Ningxia has only one city, New Zephyus. It is the site of the planet's primary spaceport, but in the 3020's it suffered from a series of breakdowns that affected its ability to service DropShips. In fact, Ningxia was the site of several DropShip related accidents during this time. As a result, the agricultural companies that form the core of the planet's economy experienced difficulty in shipping their products. The temporary solution was to have DropShips land directly on the farms to load cargo, but most of the population was opposed to the practice due to the massive damage it caused.</desc>
 	</planet>
 	<planet>
 		<name>Niomede</name>
@@ -16986,6 +17162,23 @@ Niops VII is a cold planet with access to sufficient resources to keep the Assoc
 			<date>3059-06-29</date>
 			<faction>DC</faction>
 		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>2</sysPos>
+		<gravity>0.96</gravity>
+		<pressure>3</pressure>
+		<temperature>29</temperature>
+		<percentWater>37</percentWater>
+		<zenithCharge>TRUE</zenithCharge>
+		<hpg>B</hpg>
+		<lifeForm>6</lifeForm>
+		<climate>3</climate>
+		<socioIndustrial>B-C-B-C-B</socioIndustrial>
+		<landmass>Stockholm (Nykvarn)</landmass>
+		<landmass>Falun</landmass>
+		<landmass>Bothnia</landmass>
+		<desc>When this world was freed from the Smoke Jaguars during Operation Bulldog the liberators were surprised to find a monument built by the occupiers to honor the Nykvarn Armored Battalion. The Clanners had felt that the Armored Battalion had impressed the invaders in combat, even though they were wiped out.</desc>
 	</planet>
 	<planet>
 		<name>Nyserta</name>
@@ -17306,6 +17499,25 @@ Niops VII is a cold planet with access to sufficient resources to keep the Assoc
 		<xcood>241.24</xcood>
 		<ycood>178.39</ycood>
 		<faction>DC</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>3</sysPos>
+		<gravity>0.95</gravity>
+		<pressure>3</pressure>
+		<temperature>30</temperature>
+		<percentWater>65</percentWater>
+		<zenithCharge>TRUE</zenithCharge>
+		<nadirCharge>TRUE</nadirCharge>
+		<hpg>B</hpg>
+		<lifeForm>7</lifeForm>
+		<satellite>Tozai</satellite>
+		<satellite>Mejiro</satellite>
+		<climate>3</climate>
+		<socioIndustrial>A-C-B-C-C</socioIndustrial>
+		<landmass>Shinjuku (Takadanobaba)</landmass>
+		<landmass>Ridgland</landmass>
+		<desc>For most of its history, Oshika has been a prefecture capital world. As a result, its cities and industry (what little there is of it) are all geared towards the efficient running of the government. The capital city, Takadanobaba, is located in Oshika's only mountain range the Trilby Mountains. The DCMS headquarters is also located there, which means political power actually flows from the garrisoning military unit. The world has little to recommend it for colonization, as it is poor in both natural resources and nutrient weak soil, barely capable of food production on its own. As a result Oshika requires the import of chemical fertilizers. In 3025 several entrepreneurs tried to raise the Oshika Ox (a cross between an elephant and a cow) for commercial export. The Oshika Ox was already a popular foodstuff on Oshika and exporting the animal seemed a logical next step. However, as of 3079 this venture seems to have failed.</desc>
 	</planet>
 	<planet>
 		<name>Osmus Saar</name>
@@ -17865,6 +18077,25 @@ Outreach is the primary hiring location for the mercenary trade from the 3030s a
 			<date>3059-08-04</date>
 			<faction>DC</faction>
 		</factionChange>
+		<spectralClass>F</spectralClass>
+		<subtype>7</subtype>
+		<luminosity>v</luminosity>
+		<sysPos>3</sysPos>
+		<gravity>1.04</gravity>
+		<pressure>3</pressure>
+		<temperature>33</temperature>
+		<percentWater>64</percentWater>
+		<zenithCharge>TRUE</zenithCharge>
+		<nadirCharge>TRUE</nadirCharge>
+		<hpg>A</hpg>
+		<lifeForm>7</lifeForm>
+		<satellite>Buda</satellite>
+		<climate>5</climate>
+		<socioIndustrial>A-A-A-B-B</socioIndustrial>
+		<landmass>Andrassy (Danube)</landmass>
+		<landmass>Teleki</landmass>
+		<landmass>Ruhr</landmass>
+		<desc>Pesht was discovered by early explorers from the Ozawan Merchant Clan in 2212. The Ozawan Clan made multiple attempts over the course of several decades to settle the forest covered planet, however, the world's native ape predators interferred with these efforts. The Clan was eventually forced to relinquish the planet to the Draconis Combine. It wasn't until 2320 world was finally settled but only after the Combine "discovered" the ape-like creatures for themselves. After losing an entire settlement did efforts go into nearly exterminating the beast before Pesht was habitable. After clearing the predators, Combine's true intentions for colonizing Pesht were revealed. The planet became a military colony used by the Combine as a launch pad to conqueror neraby worlds. From Pesht, DCMS forces were able to launch military engagements into the Draconis Rift region. Eventually Pesht became the capital of its own military district after Coordinator Martin McAllister implented his restructuring of the Combine's governmental system. The majority of military forces that had been stationed on Pesht when it was originally a staging base were moved to defend the Combine's new capital of Luthien in mid 27th Century. The University of Pesht in Danube is known for its impressive graduate studies, especially in history.</desc>
 	</planet>
 	<planet>
 		<name>Petrolia</name>
@@ -18499,6 +18730,29 @@ Outreach is the primary hiring location for the mercenary trade from the 3030s a
 			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
+		<spectralClass>K</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>v</luminosity>
+		<sysPos>4</sysPos>
+		<gravity>1</gravity>
+		<pressure>3</pressure>
+		<temperature>25</temperature>
+		<percentWater>67</percentWater>
+		<zenithCharge>TRUE</zenithCharge>
+		<nadirCharge>TRUE</nadirCharge>
+		<hpg>A</hpg>
+		<lifeForm>5</lifeForm>
+		<satellite>Taikata</satellite>
+		<climate>3</climate>
+		<socioIndustrial>A-B-B-A-B</socioIndustrial>
+		<landmass>Bragadin (Conqueror’s Pride)</landmass>
+		<landmass>Greater Harpago</landmass>
+		<landmass>Lesser Harpago</landmass>
+		<landmass>Amerigo</landmass>
+		<landmass>Darwin</landmass>
+		<desc>Proserpina was one of the Core Worlds and home to several major manufacturing firms, including Guided Technologies and Bulldog Enterprises. Their factories, and many others, exploited the petrochemical and mineral resources of the planet directly and refined metals from the metal ores extracted from Proserpina before shipping the refined materials to nearby planets. After the fall of the Star League the world faced nearly constant raids by the Federated Suns. During one of these raids the defending DCMS forces used a nerve gas to destroy the invaders. As a result the planet's surface is mostly poisonous after the Succession Wars; In fact two of its five continents (Amerigo and Greater Harpago) are completely uninhabitable. In 3066, despite the passage of so many years, both the air and water on planet surface are still contaminated. However, the rich minerals of the planet and well developed industry keep the planet and its inhabitants prosperous, even if they do need to wear environmental suits and breathing masks to leave their homes.
+
+The location of Proserpina on the Federated Suns border requires the DCMS to keep a strong garrison on the world. To further fortify their position, the DCMS has establishing an extensive network of refit and supply facilities for defending troops. Proserpina is also known for the University of Proserpina, a military academy that has consistently turned out high-quality graduates for the DCMS.</desc>
 	</planet>
 	<planet>
 		<name>Protection</name>
@@ -18541,6 +18795,24 @@ Outreach is the primary hiring location for the mercenary trade from the 3030s a
 		<xcood>320.78</xcood>
 		<ycood>361.47</ycood>
 		<faction>DC</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>3</sysPos>
+		<gravity>1.05</gravity>
+		<pressure>3</pressure>
+		<temperature>19</temperature>
+		<percentWater>71</percentWater>
+		<zenithCharge>TRUE</zenithCharge>
+		<nadirCharge>TRUE</nadirCharge>
+		<hpg>B</hpg>
+		<lifeForm>7</lifeForm>
+		<climate>2</climate>
+		<socioIndustrial>A-A-A-B-D</socioIndustrial>
+		<landmass>Cordell (Fair Weather)</landmass>
+		<landmass>Ribbon</landmass>
+		<landmass>Bandeau</landmass>
+		<desc>Qandahar was settled for its vast natural resources. Unfortunately, the early settlers did not restrain the output of their factories and as a result the ecosystem of Qandahar eventually collapsed. The largely Arab population has frequently clashed with the Combine administrators, trying in a vain plea to clean up the world's pollution. The toxic pollution was so bad that by 3025 50% of the native lifeforms were extinct. The only organisms that could successfully live outside the domed cities were the Toxic Life Forms. Developed on Terra in the mid 22nd century, these organisms consumed and digested toxic waste. In the early 31st century a small underground movement named the "Holy Struggle" attempted to shut down the Dow Nexus Fusion Products factories because of unsafe working conditions for their employees. The struggle became bloody. Though the ISF had several informers and agents in place to destroy the Holy Struggle they never stepped in because of orders from the Coordinator himself, to allow the movement to chastise Dow Nexus.</desc>
 	</planet>
 	<planet>
 		<name>Qarahta</name>
@@ -22493,7 +22765,7 @@ Sian has been the capital of the Capellan Confederation since 2368 when Capella 
 		
 Terra was a neutral power controlled by ComStar from 2788 until the planet was taken by the Word of Blake in 3057.
 
-The Sol system contains multiple colonized planets, foremost are Mars and Venus. Mars is heavily colonized and is the site of multiple advanced industrial centers. The Sol system is also home to many spaceborn colonies, from the Titan Ship Yards, which produce and service Jumpships and Warships to the multiple settlements in the far-flung astroid belt, these people call themselves Belters and are often only losesly associated with each other.	
+The Sol system contains multiple colonized planets, foremost are Mars and Venus. Mars is heavily colonized and is the site of multiple advanced industrial centers. The Sol system is also home to many spaceborn colonies, from the Titan Ship Yards, which produce and service Jumpships and Warships to the multiple settlements in the far-flung astroid belt, these people call themselves Belters and are often only loosely associated with each other.	
 		</desc>
 	</planet>
 	<planet>
