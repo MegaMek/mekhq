@@ -1172,7 +1172,7 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 		<periphery>false</periphery>
 		<clan>false</clan>
 	</faction>
-		<faction>
+	<faction>
 		<shortname>CLAN</shortname>
 		<fullname>All Clans</fullname>
 		<startingPlanet> , ,Strana Mechty,Strana Mechty,Strana Mechty,Strana Mechty,Strana Mechty,Strana Mechty,Strana Mechty</startingPlanet>
@@ -1180,11 +1180,18 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 		<nameGenerator>Clan</nameGenerator>
 		<colorRGB>139,69,19</colorRGB>
 	</faction>
-			<faction>
+	<faction>
 		<shortname>NIOPS</shortname>
 		<fullname>Niops Association</fullname>
 		<startingPlanet> ,Niops VII,Niops VII,Niops VII,Niops VII,Niops VII,Niops VII,Niops VII,Niops VII</startingPlanet>
 		<colorRGB>205,173,0</colorRGB>
+		<periphery>true</periphery>
+	</faction>
+	<faction>
+		<shortname>NONE</shortname>
+		<fullname>Unexplored</fullname>
+		<startingPlanet> , , , , , , , , </startingPlanet>
+		<colorRGB>0,0,0</colorRGB>
 		<periphery>true</periphery>
 	</faction>
 </factions>
