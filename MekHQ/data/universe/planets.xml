@@ -20367,6 +20367,23 @@ The location of Proserpina on the Federated Suns border requires the DCMS to kee
 			<date>3059-09-15</date>
 			<faction>DC</faction>
 		</factionChange>
+		<spectralClass>F</spectralClass>
+		<subtype>9</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>5</sysPos>
+		<gravity>1</gravity>
+		<pressure>3</pressure>
+		<temperature>15</temperature>
+		<percentWater>30</percentWater>
+		<hpg>B</hpg>
+		<lifeForm>3</lifeForm>
+		<satellite>Sclera</satellite>
+		<satellite>Iris</satellite>
+		<satellite>Pupil</satellite>
+		<climate>1</climate>
+		<socioIndustrial>C-C-B-C-D</socioIndustrial>
+		<landmass>Craton (Manahawkin)</landmass>
+		<desc>Savinsville attracts tourists every thirty three years when the world’s three moons come into alignment on the night side, appearing as an immense eye in the sky for a single night.</desc>
 	</planet>
 	<planet>
 		<name>Savonburg</name>
@@ -20489,6 +20506,25 @@ The location of Proserpina on the Federated Suns border requires the DCMS to kee
 			<date>3059-08-13</date>
 			<faction>DC</faction>
 		</factionChange>
+		<spectralClass>K</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>5</sysPos>
+		<gravity>1.01</gravity>
+		<pressure>3</pressure>
+		<temperature>25</temperature>
+		<percentWater>40</percentWater>
+		<zenithCharge>TRUE </zenithCharge>
+		<nadirCharge> TRUE</nadirCharge>
+		<hpg>A</hpg>
+		<lifeForm>6</lifeForm>
+		<satellite>Fisk</satellite>
+		<satellite>Grant</satellite>
+		<climate>3</climate>
+		<socioIndustrial>B-B-A-A-A</socioIndustrial>
+		<landmass>Colfax (Creekshell)</landmass>
+		<landmass>Lackland</landmass>
+		<desc> Schuyler is an agricultural world that gained some significant manufacturing capacity prior to the Rasalhague secession, when it was further away from hostile borders. Schuyler is home to several factories, including one of the Inner Sphere’s few remaining JumpShip manufacturers.</desc>
 	</planet>
 	<planet>
 		<name>Schwartz</name>
@@ -20889,6 +20925,22 @@ The location of Proserpina on the Federated Suns border requires the DCMS to kee
 		<xcood>94.67</xcood>
 		<ycood>83.2</ycood>
 		<faction>DC</faction>
+		<spectralClass>F</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>2</sysPos>
+		<gravity>1.06</gravity>
+		<pressure>3</pressure>
+		<temperature>31</temperature>
+		<percentWater>82</percentWater>
+		<hpg>B</hpg>
+		<lifeForm>6</lifeForm>
+		<satellite>Nagasaki</satellite>
+		<climate>3</climate>
+		<socioIndustrial>B-B-A-B-C</socioIndustrial>
+		<landmass>Shangai (Irezumi City)</landmass>
+		<landmass>Kasaki Island</landmass>
+		<desc>Shimonita possesses a single large continent surrounded by islands. The surrounding ocean is constantly whipped into a frenzy by massive storm activity that perpetually forms in Shimonita's atmosphere. These storms occasionally flood the coastal areas of Shanghai (the continent), so colonists built their cities well inland, away from the coastlines. Shimonita's ecology provides enough fresh water and arable land to support the local population, but not enough to generate any exports. The same is true of the mineral resources on the world. Geologists from the Ozawa Mercantile Association found large deposits of metal ores off the coast of Shanghai and the Ozawa Mercantile Association quickly negotiated rights to establish offshore and underwater mining operations on Shimonita. When House Kurita established control over the Draconis Combine, the Ozawa Mercantile Association's facilities became property of the Dragon. Within a century, poor maintenance routines and violent weather rendered the offshore and underwater plants useless. Occasionally investors would buy the plants and get them running but these operations never lasted for more than a few decades.</desc>
 	</planet>
 	<planet>
 		<name>Shimonoseki</name>
@@ -21501,6 +21553,22 @@ Sian has been the capital of the Capellan Confederation since 2368 when Capella 
 		<xcood>380.77</xcood>
 		<ycood>281.66</ycood>
 		<faction>DC</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>5</sysPos>
+		<gravity>1.13</gravity>
+		<pressure>3</pressure>
+		<temperature>11</temperature>
+		<percentWater>82</percentWater>
+		<hpg>B</hpg>
+		<lifeForm>0</lifeForm>
+		<climate>9</climate>
+		<socioIndustrial>B-B-B-B-C</socioIndustrial>
+		<landmass>Soul (Terminus)</landmass>
+		<landmass>Spirit</landmass>
+		<landmass>Eternus</landmass>
+		<desc>An inhospitable ice ball orbiting a dim star, Soul tests its inhabitants’ survival abilities every day. Lacking axial tilt in its circular orbit, there are no significant seasonal changes; just long days of bright but cold sunlight and long nights of biting cold. An equator‐girdling network of immense greenhouses, using fusion power for heat and sunlamps, grow food for the locals. The capital city is located on the perpetual terminator at the planet’s northern pole.</desc>
 	</planet>
 	<planet>
 		<name>Soverzene</name>
@@ -22282,9 +22350,26 @@ Sian has been the capital of the Capellan Confederation since 2368 when Capella 
 		<ycood>235.24</ycood>
 		<faction>OA</faction>
 		<factionChange>
-			<date>2750-01-01</date>
+			<date>2585-07-25</date>
 			<faction>DC</faction>
 		</factionChange>
+		<spectralClass>F</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>3</sysPos>
+		<gravity>1.02</gravity>
+		<pressure>3</pressure>
+		<temperature>25</temperature>
+		<percentWater>45</percentWater>
+		<zenithCharge>TRUE</zenithCharge>
+		<hpg>B</hpg>
+		<lifeForm>3</lifeForm>
+		<climate>2</climate>
+		<socioIndustrial>B-B-A-C-A</socioIndustrial>
+		<landmass>Kitatsuru (Yamanashi)</landmass>
+		<landmass>Maudlin</landmass>
+		<landmass>Joy</landmass>
+		<desc>Originally an Outworlds Alliance colony populated largely by pacifistic farmers and miners, Tabayama was an early target during the invasion of the Alliance by Star League forces during the Reunification War. On the 25th of July 2585 the Treaty of Cerberus was signed, declaring peace between those involved in the conquest of the Outworlds Alliance. When the treaty took effect on the 1st of August, Tabayama and 13 other planets were formally annexed to the Draconis Combine as a part of the treaty terms. In the 31st century Tabayama was the capital world of the Galedon Military District's Periphery prefecture. Most of the citizens are employed in running the prefecture's government. Interestingly, the importation of white-tailed deer from Terra has led to an ecological crisis. Lacking natural predators, these deer reproduce so quickly that the human population is in constant danger of losing their croplands. In 3025 more than two million citizens of Tabayama were employed as hunters, and they were barely able to keep the deer population under control. Tabayama has taken advantage of their deer problem by exporting venison to several nearby worlds.</desc>
 	</planet>
 	<planet>
 		<name>Taga</name>
@@ -23111,6 +23196,22 @@ As the capital of the Lyran Commonwealth, Thakard is home to many vital parts of
 		<xcood>357.3</xcood>
 		<ycood>197.43</ycood>
 		<faction>DC</faction>
+		<spectralClass>F</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>III</luminosity>
+		<sysPos>5</sysPos>
+		<gravity>1.02</gravity>
+		<pressure>3</pressure>
+		<temperature>30</temperature>
+		<percentWater>69</percentWater>
+		<hpg>B</hpg>
+		<lifeForm>3</lifeForm>
+		<climate>3</climate>
+		<socioIndustrial>C-C-D-C-A</socioIndustrial>
+		<landmass>Zakatali (Kars Oblast)</landmass>
+		<landmass>Imeretia</landmass>
+		<landmass>Erivan</landmass>
+		<desc>The planet Tiflis has little strategic importance. It is simply an average agricultural world that produces large amounts of Terran timber. This timber is harvested and exported, but before it leaves the world it serves as an obstacle to the severe wind storms that arrive on Tiflis every six years.</desc>
 	</planet>
 	<planet>
 		<name>Tigress</name>
@@ -23281,6 +23382,24 @@ As the capital of the Lyran Commonwealth, Thakard is home to many vital parts of
 		<xcood>226.37</xcood>
 		<ycood>154.92</ycood>
 		<faction>DC</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>III</luminosity>
+		<sysPos>4</sysPos>
+		<gravity>1.03</gravity>
+		<pressure>3</pressure>
+		<temperature>32</temperature>
+		<percentWater>65</percentWater>
+		<nadirCharge>TRUE</nadirCharge>
+		<hpg>A</hpg>
+		<lifeForm>6</lifeForm>
+		<satellite>1 (Chikuma)</satellite>
+		<climate>5</climate>
+		<socioIndustrial>A-A-C-B-B</socioIndustrial>
+		<landmass>Shinano (Nagano)</landmass>
+		<landmass>Rikuzen</landmass>
+		<landmass>Onsen</landmass>
+		<desc>Togura has the site of Stellar Trek's headquarters and some of their operations for many years. However, due to the lack of appropriate natural resources, most of the ores and metals needed by the facility were imported from other systems. In addition to the shipbuilding industry, tourism is the other primary pillar of Togura's economy. Many people visit the world every year to see the equatorial ocean that surrounds the entire world.</desc>
 	</planet>
 	<planet>
 		<name>Togwotee</name>
@@ -23303,6 +23422,27 @@ As the capital of the Lyran Commonwealth, Thakard is home to many vital parts of
 		<xcood>94.41</xcood>
 		<ycood>169.26</ycood>
 		<faction>DC</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>4</sysPos>
+		<gravity>0.96</gravity>
+		<pressure>3</pressure>
+		<temperature>36</temperature>
+		<percentWater>75</percentWater>
+		<nadirCharge>TRUE</nadirCharge>
+		<hpg>B</hpg>
+		<lifeForm>6</lifeForm>
+		<satellite>Liancourt</satellite>
+		<satellite>Takeshima</satellite>
+		<satellite>Schippke</satellite>
+		<climate>5</climate>
+		<socioIndustrial>A-A-B-A-B</socioIndustrial>
+		<landmass>Tong-Do (West Lime)</landmass>
+		<landmass>Seo-Do</landmass>
+		<landmass>U’san-Do</landmass>
+		<landmass>Ulnung-Do</landmass>
+		<desc>Tok Do is covered by jungles and populated by many bird species. The local birds vary in size from the two meter tall Saurus to the tiny Speck, whose wingspan barely reaches one centimeter. Despite the presence of the Alshain Weapons factory and the Combine's traditional lack of environmental concern, the humidity of Tok Do's atmosphere apparently blocks most of the airborne pollutants that would otherwise have long since polluted most planets.</desc>
 	</planet>
 	<planet>
 		<name>Tokasha</name>
@@ -23923,6 +24063,22 @@ The local population has long resented the Lyran Commonwealth for what they beli
 		<xcood>226.64</xcood>
 		<ycood>290.01</ycood>
 		<faction>DC</faction>
+		<spectralClass>F</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>3</sysPos>
+		<gravity>0.99</gravity>
+		<pressure>3</pressure>
+		<temperature>19</temperature>
+		<percentWater>47</percentWater>
+		<hpg>B</hpg>
+		<lifeForm>7</lifeForm>
+		<satellite>Harmony</satellite>
+		<climate>2</climate>
+		<socioIndustrial>B-C-B-C-B</socioIndustrial>
+		<landmass>Amelia (Unity City)</landmass>
+		<landmass>Manfred</landmass>
+		<desc>Until the arrival of Pesht Motors, Unity was a quiet world. Barely settled and full of land untouched by humans, the area around the Pesht Motors plant quickly developed into a city. The population of Unity doubled by 3079 after the arrival of Pesht Motors. Though the increased production required by the DCMS to fight the Jihad has helped Unity's economy, the environmental damage inflicted by heavy industry is already being felt. Orville River and Lake Dunn have begun to change in the face of unregulated pollution.</desc>
 	</planet>
 	<planet>
 		<name>Unukalhai</name>
@@ -25359,6 +25515,24 @@ The local population has long resented the Lyran Commonwealth for what they beli
 		<xcood>114.23</xcood>
 		<ycood>227.16</ycood>
 		<faction>DC</faction>
+		<spectralClass>F</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>2</sysPos>
+		<gravity>0.98</gravity>
+		<pressure>3</pressure>
+		<temperature>30</temperature>
+		<percentWater>70</percentWater>
+		<zenithCharge>TRUE</zenithCharge>
+		<nadirCharge>TRUE</nadirCharge>
+		<hpg>B</hpg>
+		<lifeForm>4</lifeForm>
+		<satellite>Henan</satellite>
+		<climate>3</climate>
+		<socioIndustrial>A-C-D-C-C</socioIndustrial>
+		<landmass>Zhumadian (Nanyang)</landmass>
+		<landmass>Zhejiang</landmass>
+		<desc>Xinyang is the capital world of the Xinyang Prefecture. Located in the center of the Draconis Combine close to Luthien, Xinyang wasn't subject to raids like many of the border worlds. The only resource Xinyang has a large supply of is fresh water, otherwise it would be an industrial powerhouse. Given its relatively central location, the DCMS and DCA use it as a trans-shipment point and administrative headquarters. There is also a major military hospital on the world, and the ISF maintains a facility to debrief soldiers returning from the front lines. This hospital can house up to ten thousand patients at once, but the Jihad strained even this massive facility. The planet cannot produce enough food to feed all its residents, so shipments of food are quite common.</desc>	
 	</planet>
 	<planet>
 		<name>Yamarovka</name>
@@ -25900,5 +26074,545 @@ The local population has long resented the Lyran Commonwealth for what they beli
 			<date>3062-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
+	</planet>
+		<planet>
+		<name>ER 001</name>
+		<xcood>-82</xcood>
+		<ycood>530</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>VI</luminosity>
+		<desc>This star does not have any planets.</desc> 
+	</planet>
+	<planet>
+		<name>ER 002</name>
+		<xcood>-86</xcood>
+		<ycood>555</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>VI</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>ER 003</name>
+		<xcood>-90</xcood>
+		<ycood>580</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star does not have any planets.</desc> 
+	</planet>
+	<planet>
+		<name>ER 004</name>
+		<xcood>-94</xcood>
+		<ycood>605</ycood>
+		<faction>NONE</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>9</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>ER 005</name>
+		<xcood>-98</xcood>
+		<ycood>630</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system has a planet with a hostile atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>ER 006</name>
+		<xcood>-102</xcood>
+		<ycood>655</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>7</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>ER 007</name>
+		<xcood>-112</xcood>
+		<ycood>708</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star does not have any planets.</desc> 
+	</planet>
+	<planet>
+		<name>ER 008</name>
+		<xcood>-120</xcood>
+		<ycood>733</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>VI</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>ER 009</name>
+		<xcood>-128</xcood>
+		<ycood>758</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system has a planet with a hostile atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>ER 010</name>
+		<xcood>-136</xcood>
+		<ycood>783</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>9</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>ER 011</name>
+		<xcood>-134</xcood>
+		<ycood>822</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>ER 012</name>
+		<xcood>-126</xcood>
+		<ycood>842</ycood>
+		<faction>NONE</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system has a planet with a hostile atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>ER 013</name>
+		<xcood>-118</xcood>
+		<ycood>862</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>VI</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>ER 014</name>
+		<xcood>-102</xcood>
+		<ycood>909</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>7</subtype>
+		<luminosity>III</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>ER 015</name>
+		<xcood>-92</xcood>
+		<ycood>934</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system has a planet with a hostile atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>ER 016</name>
+		<xcood>-82</xcood>
+		<ycood>959</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>ER 017</name>
+		<xcood>-92</xcood>
+		<ycood>1005</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>ER 018</name>
+		<xcood>-112</xcood>
+		<ycood>1025</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system has a planet with a hostile atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>ER 019</name>
+		<xcood>-116</xcood>
+		<ycood>1065</ycood>
+		<faction>NONE</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>ER 020</name>
+		<xcood>-117</xcood>
+		<ycood>1093</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>ER 021</name>
+		<xcood>-117</xcood>
+		<ycood>1122</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>ER 022</name>
+		<xcood>-118</xcood>
+		<ycood>1150</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>9</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system has a planet with a hostile atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>ER 023</name>
+		<xcood>-118</xcood>
+		<ycood>1179</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>7</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>ER 024</name>
+		<xcood>-119</xcood>
+		<ycood>1207</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>9</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>ER 025</name>
+		<xcood>-119</xcood>
+		<ycood>1236</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system has a planet with a hostile atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>ER 026</name>
+		<xcood>-120</xcood>
+		<ycood>1264</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>VI</luminosity>
+		<desc>This star does not have any planets.</desc> 
+	</planet>
+	<planet>
+		<name>ER 027</name>
+		<xcood>-121</xcood>
+		<ycood>1293</ycood>
+		<faction>NONE</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>ER 028</name>
+		<xcood>-122</xcood>
+		<ycood>1321</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system has a planet with a hostile atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>ER 029</name>
+		<xcood>-122</xcood>
+		<ycood>1350</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>VI</luminosity>
+		<desc>This system has a planet with a hostile atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>ER 030</name>
+		<xcood>-123</xcood>
+		<ycood>1378</ycood>
+		<faction>NONE</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>ER 031</name>
+		<xcood>-123</xcood>
+		<ycood>1407</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system has a planet with a hostile atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>ER 032</name>
+		<xcood>-124</xcood>
+		<ycood>1436</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>5</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>ER 033</name>
+		<xcood>-124</xcood>
+		<ycood>1465</ycood>
+		<faction>NONE</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>VI</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>ER 034</name>
+		<xcood>-124</xcood>
+		<ycood>1494</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system has a planet with a hostile atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>ER 035</name>
+		<xcood>-124</xcood>
+		<ycood>1523</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>IV</luminosity>
+		<desc>This system has a planet with a hostile atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>ER 036</name>
+		<xcood>-124</xcood>
+		<ycood>1552</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>IV</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>ER 037</name>
+		<xcood>-124</xcood>
+		<ycood>1581</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>ER 038</name>
+		<xcood>-96</xcood>
+		<ycood>1625</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>9</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star does not have any planets.</desc> 
+	</planet>
+	<planet>
+		<name>ER 039</name>
+		<xcood>-76</xcood>
+		<ycood>1645</ycood>
+		<faction>NONE</faction>
+		<spectralClass>F</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>ER 040</name>
+		<xcood>-56</xcood>
+		<ycood>1665</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>7</subtype>
+		<luminosity>IV</luminosity>
+		<desc>This star does not have any planets.</desc> 
+	</planet>
+	<planet>
+		<name>ER 041</name>
+		<xcood>-36</xcood>
+		<ycood>1685</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>7</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star does not have any planets.</desc> 
+	</planet>
+	<planet>
+		<name>ER 042</name>
+		<xcood>-16</xcood>
+		<ycood>1705</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>IV</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>ER 043</name>
+		<xcood>4</xcood>
+		<ycood>1725</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>5</luminosity>
+		<desc>This star does not have any planets.</desc> 
+	</planet>
+	<planet>
+		<name>KC 01</name>
+		<xcood>2</xcood>
+		<ycood>1777</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>7</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>KC 02</name>
+		<xcood>-40</xcood>
+		<ycood>1814</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>KC 03</name>
+		<xcood>0</xcood>
+		<ycood>1900</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>7</subtype>
+		<luminosity>VI</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>KC 04</name>
+		<xcood>-45</xcood>
+		<ycood>1883</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star does not have any planets.</desc> 
+	</planet>
+	<planet>
+		<name>KC 05</name>
+		<xcood>47</xcood>
+		<ycood>1860</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>9</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>KC 06</name>
+		<xcood>62</xcood>
+		<ycood>1827</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>KC 07</name>
+		<xcood>68</xcood>
+		<ycood>1776</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star does not have any planets.</desc> 
+	</planet>
+	<planet>
+		<name>KC 08</name>
+		<xcood>95</xcood>
+		<ycood>1780</ycood>
+		<faction>NONE</faction>
+		<spectralClass>A</spectralClass>
+		<subtype>9</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>KC 09</name>
+		<xcood>101</xcood>
+		<ycood>1763</ycood>
+		<faction>NONE</faction>
+		<spectralClass>F</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>KC 10</name>
+		<xcood>88</xcood>
+		<ycood>1725</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>9</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system has a planet with a hostile atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>KC 11</name>
+		<xcood>128</xcood>
+		<ycood>1736</ycood>
+		<faction>NONE</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
 	</planet>
 </planets>
