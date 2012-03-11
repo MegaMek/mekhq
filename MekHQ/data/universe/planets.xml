@@ -403,6 +403,23 @@ Addicks remains an important world today, though it has lost much of its glory o
 		<xcood>-166.13</xcood>
 		<ycood>-167.96</ycood>
 		<faction>FWL</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>II</luminosity>
+		<sysPos>3</sysPos>
+		<gravity>1.15</gravity>
+		<pressure>4</pressure>
+		<temperature>45</temperature>
+		<climate>5</climate>
+		<percentWater>70</percentWater>
+		<zenithCharge>true</zenithCharge>
+		<hpg>B</hpg>
+		<lifeForm>5</lifeForm>
+		<satellite>None</satellite>
+		<socioIndustrial>B-C-B-B-C</socioIndustrial>
+		<landmass>Simla</landmass>
+		<landmass>Andrine</landmass>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Aix-la-Chapelle</name>
@@ -700,6 +717,23 @@ Addicks remains an important world today, though it has lost much of its glory o
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<spectralClass>M</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>3</sysPos>
+		<gravity>1.07</gravity>
+		<pressure>3</pressure>
+		<temperature>33</temperature>
+		<climate>3</climate>
+		<percentWater>82</percentWater>
+		<zenithCharge>true</zenithCharge>
+		<hpg>B</hpg>
+		<lifeForm>5</lifeForm>
+		<satellite>Sinai</satellite>
+		<socioIndustrial>D-D-C-D-B</socioIndustrial>
+		<landmass>Cairusia</landmass>
+		<landmass>Jeddasia</landmass>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Alfirk</name>
@@ -974,14 +1008,30 @@ Industrial, Command and logistical world, paperwork in this planet and its prefe
 		</factionChange>
 	</planet>
 	<planet>
-		<name>Alphard</name>
+		<name>Alphard (Periphery)</name>
 		<xcood>-409.71</xcood>
 		<ycood>-300.89</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2900-01-01</date>
+			<date>2920-01-01</date>
 			<faction>MH</faction>
 		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>4</sysPos>
+		<gravity>1.0</gravity>
+		<pressure>3</pressure>
+		<temperature>33</temperature>
+		<climate>3</climate>
+		<percentWater>55</percentWater>
+		<hpg>B</hpg>
+		<lifeForm>7</lifeForm>
+		<satellite>Romulus</satellite>
+		<socioIndustrial>B-B-B-C-C</socioIndustrial>
+		<landmass>Alba</landmass>
+		<landmass>Gaul</landmass>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Alphard</name>
@@ -1012,6 +1062,21 @@ Industrial, Command and logistical world, paperwork in this planet and its prefe
 		<xcood>507.52</xcood>
 		<ycood>154.39</ycood>
 		<faction>OA</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>4</sysPos>
+		<gravity>1.0</gravity>
+		<pressure>3</pressure>
+		<temperature>30</temperature>
+		<climate>3</climate>
+		<percentWater>70</percentWater>
+		<nadirCharge>true</nadirCharge>
+		<hpg>B</hpg>
+		<lifeForm>7</lifeForm>
+		<satellite>Aisha</satellite>
+		<socioIndustrial>B-A-B-A-C</socioIndustrial>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Alrakis</name>
@@ -1192,6 +1257,25 @@ Industrial, Command and logistical world, paperwork in this planet and its prefe
 			<date>3057-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
+		<spectralClass>A</spectralClass>
+		<subtype>7</subtype>
+		<luminosity>II</luminosity>
+		<sysPos>8</sysPos>
+		<gravity>1.09</gravity>
+		<pressure>3</pressure>
+		<temperature>26</temperature>
+		<climate>3</climate>
+		<percentWater>87</percentWater>
+		<zenithCharge>true</zenithCharge>
+		<nadirCharge>true</nadirCharge>
+		<hpg>B</hpg>
+		<lifeForm>4</lifeForm>
+		<satellite>Caprice</satellite>
+		<socioIndustrial>C-C-B-C-C</socioIndustrial>
+		<landmass>Locke</landmass>
+		<landmass>Auroria</landmass>
+		<landmass>Hume</landmass>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Alula Borealis</name>
@@ -1356,6 +1440,24 @@ Industrial, Command and logistical world, paperwork in this planet and its prefe
 			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>5</sysPos>
+		<gravity>1.2</gravity>
+		<pressure>3</pressure>
+		<temperature>45</temperature>
+		<climate>5</climate>
+		<percentWater>65</percentWater>
+		<zenithCharge>true</zenithCharge>
+		<hpg>A</hpg>
+		<lifeForm>4</lifeForm>
+		<satellite>Mulhacen</satellite>
+		<satellite>Betic</satellite>
+		<socioIndustrial>A-B-B-C-C</socioIndustrial>
+		<landmass>altay</landmass>
+		<landmass>Zahle</landmass>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Anegasaki</name>
@@ -1639,6 +1741,11 @@ Industrial, Command and logistical world, paperwork in this planet and its prefe
 		<nadirCharge>true</nadirCharge>
 		<hpg>A</hpg>
 		<lifeForm>7</lifeForm>
+		<satellite>Deven</satellite>
+		<satellite>Thorwald</satellite>
+		<landMass>Gutheim</landMass>
+		<landMass>Grunwald</landMass>
+		<landMass>Gerechtland</landMass>
 		<socioIndustrial>A-A-A-A-A</socioIndustrial>
 		<desc>No description available.</desc>
 	</planet>
@@ -1657,7 +1764,7 @@ Industrial, Command and logistical world, paperwork in this planet and its prefe
 		</factionChange>
 	</planet>
 	<planet>
-		<name>Arcadia</name>
+		<name>Arcadia (Periphery)</name>
 		<xcood>-116</xcood>
 		<ycood>1605</ycood>
 		<faction>PIND</faction>
@@ -1679,6 +1786,29 @@ Industrial, Command and logistical world, paperwork in this planet and its prefe
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<spectralClass>K</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>III</luminosity>
+		<sysPos>5</sysPos>
+		<gravity>1.02</gravity>
+		<pressure>3</pressure>
+		<temperature>43</temperature>
+		<climate>2</climate>
+		<percentWater>43</percentWater>
+		<zenithCharge>true</zenithCharge>
+		<nadirCharge>true</nadirCharge>
+		<hpg>A</hpg>
+		<lifeForm>7</lifeForm>
+		<satellite>Donegal</satellite>
+		<satellite>Skye</satellite>
+		<satellite>Tamar</satellite>
+		<landMass>Attenia</landMass>
+		<landMass>Borreus</landMass>
+		<landMass>Chadrik</landMass>
+		<landMass>Dustina</landMass>
+		<landMass>Penrod</landMass>
+		<socioIndustrial>A-A-A-A-A</socioIndustrial>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Ardoz</name>
@@ -2171,6 +2301,27 @@ The League intelligence branch, SAFE, is headquartered on Atreus' moon Wendigo. 
 		<xcood>-44.08</xcood>
 		<ycood>-77.46</ycood>
 		<faction>FWL</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>II</luminosity>
+		<sysPos>6</sysPos>
+		<gravity>1.0</gravity>
+		<pressure>4</pressure>
+		<temperature>55</temperature>
+		<climate>4</climate>
+		<percentWater>67</percentWater>
+		<nadirCharge>true</nadirCharge>
+		<hpg>B</hpg>
+		<lifeForm>7</lifeForm>
+		<satellite>Tagaste</satellite>
+		<satellite>Suk Arras</satellite>
+		<satellite>Numidia</satellite>
+		<satellite>Bona</satellite>
+		<socioIndustrial>B-B-C-C-A</socioIndustrial>
+		<landmass>Kabuko</landmass>
+		<landmass>Roma</landmass>
+		<landmass>Grecian</landmass>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Auldhouse</name>
@@ -3525,6 +3676,19 @@ Barras is the hotbed of intelligence activity along the Confederation-FWL border
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<spectralClass>K</spectralClass>
+		<subtype>7</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>4</sysPos>
+		<gravity>0.81</gravity>
+		<pressure>3</pressure>
+		<temperature>41</temperature>
+		<climate>3</climate>
+		<percentWater>67</percentWater>
+		<hpg>B</hpg>
+		<lifeForm>6</lifeForm>
+		<socioIndustrial>C-C-C-C-B</socioIndustrial>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Bluford</name>
@@ -3759,6 +3923,26 @@ Barras is the hotbed of intelligence activity along the Confederation-FWL border
 			<date>3057-01-01</date>
 			<faction>ARDC</faction>
 		</factionChange>
+		<spectralClass>F</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>4</sysPos>
+		<gravity>1.05</gravity>
+		<pressure>3</pressure>
+		<temperature>30</temperature>
+		<climate>3</climate>
+		<percentWater>77</percentWater>
+		<nadirCharge>true</nadirCharge>
+		<hpg>B</hpg>
+		<lifeForm>7</lifeForm>
+		<satellite>Scarecrow</satellite>
+		<landMass>Amber</landMass>
+		<landMass>Abundance</landMass>
+		<landMass>Grandeur</landMass>
+		<landMass>Lush</landMass>
+		<landMass>Vibrant</landMass>
+		<socioIndustrial>B-C-C-B-A</socioIndustrial>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Bowang</name>
@@ -3777,6 +3961,22 @@ Barras is the hotbed of intelligence activity along the Confederation-FWL border
 		<xcood>440.19</xcood>
 		<ycood>196.63</ycood>
 		<faction>OA</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>4</sysPos>
+		<gravity>1.2</gravity>
+		<pressure>3</pressure>
+		<temperature>55</temperature>
+		<climate>4</climate>
+		<percentWater>20</percentWater>
+		<nadirCharge>true</nadirCharge>
+		<hpg>B</hpg>
+		<lifeForm>5</lifeForm>
+		<satellite>Iturea</satellite>
+		<satellite>Djerba</satellite>
+		<socioIndustrial>D-D-C-C-D</socioIndustrial>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Braunton</name>
@@ -4304,7 +4504,7 @@ Recently, a large island in the eastern basin has been taken over for secret tes
 		<faction>DC</faction>
 	</planet>
 	<planet>
-		<name>Cadiz</name>
+		<name>Cadiz (Periphery)</name>
 		<xcood>330.81</xcood>
 		<ycood>-427.55</ycood>
 		<faction>PIND</faction>
@@ -4527,16 +4727,35 @@ Recently, a large island in the eastern basin has been taken over for secret tes
 		</factionChange>
 	</planet>
 	<planet>
-		<name>Cameron</name>
+		<name>Cameron(FWL)</name>
 		<xcood>-159.09</xcood>
 		<ycood>-198.47</ycood>
 		<faction>FWL</faction>
 	</planet>
 	<planet>
-		<name>Camlann</name>
+		<name>Camlann (FWL)</name>
 		<xcood>-158.57</xcood>
 		<ycood>-235.5</ycood>
 		<faction>FWL</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>III</luminosity>
+		<sysPos>1</sysPos>
+		<gravity>0.81</gravity>
+		<pressure>4</pressure>
+		<temperature>38</temperature>
+		<climate>4</climate>
+		<percentWater>60</percentWater>
+		<nadirCharge>true</nadirCharge>
+		<hpg>A</hpg>
+		<lifeForm>5</lifeForm>
+		<socioIndustrial>D-C-C-D-C</socioIndustrial>
+		<landmass>Dolorous Garde</landmass>
+		<landmass>Cameliard</landmass>
+		<landmass>Badon</landmass>
+		<landmass>Sauvage</landmass>
+		<landmass>Joyous Garde</landmass>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Camlann</name>
@@ -4599,6 +4818,22 @@ Recently, a large island in the eastern basin has been taken over for secret tes
 		<xcood>-302.53</xcood>
 		<ycood>-294.44</ycood>
 		<faction>FWL</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>2</subtype>
+		<luminosity></luminosity>
+		<sysPos>2</sysPos>
+		<gravity>0.85</gravity>
+		<pressure>3</pressure>
+		<temperature>32</temperature>
+		<climate>3</climate>
+		<percentWater>39</percentWater>
+		<hpg>B</hpg>
+		<lifeForm>2</lifeForm>
+		<satellite>Lonely</satellite>
+		<socioIndustrial>D-C-D-D-C</socioIndustrial>
+		<landmass>Cosenza</landmass>
+		<landmass>Torino Islands</landmass>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Canal</name>
@@ -4639,6 +4874,21 @@ Recently, a large island in the eastern basin has been taken over for secret tes
 		<xcood>-148.44</xcood>
 		<ycood>-398.49</ycood>
 		<faction>MOC</faction>
+		<spectralClass>F</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>IV</luminosity>
+        <sysPos>4</sysPos>
+        <gravity>1.1</gravity>
+        <pressure>3</pressure>
+        <temperature>25</temperature>
+        <climate>3</climate>
+        <percentWater>60</percentWater>
+		<nadirCharge>true</nadirCharge>
+		<hpg>B</hpg>
+		<lifeForm>3</lifeForm>
+		<socioIndustrial>A-B-B-B-C</socioIndustrial>
+		<landMass>Salonika (Crimson)</landMass>
+		<desc>Canopus IV is a temperate planet with three continents. The most settled continent is Salonika, which was originally covered in lush forests and rolling hills, it has over time become industrialized and polluted. It is home to the three major cities on Canopus IV; the capital Crimson, Delphi the capital in the planet's early history, and Astarte. Salonika is also home to all major manufacturing centers on planet.</desc>
 	</planet>
 	<planet>
 		<name>Cap Rouge</name>
@@ -5140,6 +5390,25 @@ Recently, a large island in the eastern basin has been taken over for secret tes
 			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>III</luminosity>
+		<sysPos>3</sysPos>
+		<gravity>1.05</gravity>
+		<pressure>3</pressure>
+		<temperature>47</temperature>
+		<climate>4</climate>
+		<percentWater>35</percentWater>
+		<hpg>B</hpg>
+		<lifeForm>7</lifeForm>
+		<satellite>Blanca</satellite>
+		<socioIndustrial>D-C-B-D-B</socioIndustrial>
+		<landmass>Las Cruces</landmass>
+		<landmass>Mazatlan</landmass>
+		<landmass>Santa Rosa</landmass>
+		<landmass>Alamogordo</landmass>
+		<landmass>San Clemente</landmass>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Cerulean</name>
@@ -5604,6 +5873,25 @@ Recently, a large island in the eastern basin has been taken over for secret tes
 			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
+		<spectralClass>F</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>6</sysPos>
+		<gravity>1.1</gravity>
+		<pressure>3</pressure>
+		<temperature>41</temperature>
+		<climate>3</climate>
+		<percentWater>62</percentWater>
+		<nadirCharge>true</nadirCharge>
+		<hpg>B</hpg>
+		<lifeForm>4</lifeForm>
+		<satellite>Brana</satellite>
+		<satellite>Kurna</satellite>
+		<socioIndustrial>D-C-B-D-A</socioIndustrial>
+		<landmass>Hastings</landmass>
+		<landmass>Ermine</landmass>
+		<landmass>Hawthorne</landmass>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Clearfield</name>
@@ -6097,6 +6385,26 @@ Recently, a large island in the eastern basin has been taken over for secret tes
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<spectralClass>F</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>3</sysPos>
+		<gravity>1.01</gravity>
+		<pressure>3</pressure>
+		<temperature>35</temperature>
+		<climate>3</climate>
+		<percentWater>80</percentWater>
+		<zenithCharge>true</zenithCharge>
+		<nadirCharge>true</nadirCharge>
+		<hpg>A</hpg>
+		<lifeForm>7</lifeForm>
+		<satellite>Wellston</satellite>
+		<landMass>Veracruz</landMass>
+		<landMass>Dunnigan</landMass>
+		<landMass>Sydnallia</landMass>
+		<landMass>Auckland</landMass>
+		<socioIndustrial>A-A-A-A-A</socioIndustrial>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Covington</name>
@@ -6982,9 +7290,25 @@ Recently, a large island in the eastern basin has been taken over for secret tes
 		<ycood>-456.37</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>3057-01-01</date>
-			<faction>PIND</faction>
+			<date>3067-01-01</date>
+			<faction>MOC</faction>
 		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>3</sysPos>
+		<gravity>1.03</gravity>
+		<pressure>3</pressure>
+		<temperature>33</temperature>
+		<climate>3</climate>
+		<percentWater>78</percentWater>
+		<zenithCharge>true</zenithCharge>
+		<hpg>B</hpg>
+		<lifeForm>4</lifeForm>
+		<satellite>Livonia</satellite>
+		<satellite>Tecumseh</satellite>
+		<socioIndustrial>B-B-B-B-A</socioIndustrial>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Devil's Rock</name>
@@ -7140,6 +7464,28 @@ The capital is currently Fort Dieron, but in the past San Martin and Tahlwynn ha
 			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
+		<spectralClass>F</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>2</sysPos>
+		<gravity>1.00</gravity>
+		<pressure>3</pressure>
+		<temperature>40</temperature>
+		<climate>4</climate>
+		<percentWater>67</percentWater>
+		<hpg>B</hpg>
+		<lifeForm>7</lifeForm>
+		<satellite>Runes</satellite>
+		<satellite>San Palo</satellite>
+		<satellite>Mary</satellite>
+		<satellite>Ecole</satellite>
+		<satellite>Marie Theresa</satellite>
+		<socioIndustrial>C-C-B-D-B</socioIndustrial>
+		<landmass>Normandy</landmass>
+		<landmass>Vinci</landmass>
+		<landmass>St. Therese</landmass>
+		<landmass>St. Germaine</landmass>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Diik</name>
@@ -7264,6 +7610,26 @@ The capital is currently Fort Dieron, but in the past San Martin and Tahlwynn ha
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<spectralClass>F</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>4</sysPos>
+		<gravity>1.01</gravity>
+		<pressure>3</pressure>
+		<temperature>40</temperature>
+		<climate>3</climate>
+		<percentWater>80</percentWater>
+		<zenithCharge>true</zenithCharge>
+		<nadirCharge>true</nadirCharge>
+		<hpg>A</hpg>
+		<lifeForm>5</lifeForm>
+		<satellite>Seth's Jewel</satellite>
+		<landMass>Albion</landMass>
+		<landMass>Dunellan</landMass>
+		<landMass>Hinterlands</landMass>
+		<landMass>Lockenar</landMass>
+		<socioIndustrial>A-A-A-A-B</socioIndustrial>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Donenac</name>
@@ -7454,6 +7820,20 @@ The capital is currently Fort Dieron, but in the past San Martin and Tahlwynn ha
 			<date>3057-01-01</date>
 			<faction>ARDC</faction>
 		</factionChange>
+		<spectralClass>A</spectralClass>
+		<subtype>9</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>6</sysPos>
+		<gravity>0.96</gravity>
+		<pressure>3</pressure>
+		<temperature>71</temperature>
+		<climate>4</climate>
+		<percentWater>20</percentWater>
+		<hpg>B</hpg>
+		<lifeForm>0</lifeForm>
+		<satellite>Mirage</satellite>
+		<socioIndustrial>D-D-C-C-F</socioIndustrial>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Dyev</name>
@@ -8046,11 +8426,36 @@ For much of its early history El Dorado was known for its JumShip yards. This en
 		<name>Erod's Escape</name>
 		<xcood>487.71</xcood>
 		<ycood>-506.05</ycood>
-		<faction>PIND</faction>
+		 <faction>PIND</faction>
 		<factionChange>
-			<date>2900-01-01</date>
+			<date>3040-01-01</date>
 			<faction>TC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3067-01-01</date>
+			<faction>PIND</faction>
+		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>5</sysPos>
+		<gravity>1.1</gravity>
+		<pressure>3</pressure>
+		<temperature>43</temperature>
+		<climate>5</climate>
+		<percentWater>68</percentWater>
+		<zenithCharge>true</zenithCharge>
+		<hpg>B</hpg>
+		<lifeForm>6</lifeForm>
+		<satellite>Maui</satellite>
+		<satellite>Kauai</satellite>
+		<satellite>Molokai</satellite>
+		<socioIndustrial>D-D-B-B-A</socioIndustrial>
+		<landmass>Elysium</landmass>
+		<landmass>Oahu</landmass>
+		<landmass>Majorca</landmass>
+		<landmass>Tenerife</landmass>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Eromanga</name>
@@ -9304,6 +9709,23 @@ For much of its early history El Dorado was known for its JumShip yards. This en
 		<xcood>-248.02</xcood>
 		<ycood>-216.99</ycood>
 		<faction>FWL</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>3</sysPos>
+		<gravity>1.0</gravity>
+		<pressure>3</pressure>
+		<temperature>38</temperature>
+		<climate>4</climate>
+		<percentWater>59</percentWater>
+		<zenithCharge>true</zenithCharge>
+		<hpg>A</hpg>
+		<lifeForm>7</lifeForm>
+		<satellite>Unity</satellite>
+		<satellite>Understanding</satellite>
+		<socioIndustrial>B-C-B-C-C</socioIndustrial>
+		<landmass>Matrah</landmass>
+        <desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Gienah</name>
@@ -9707,6 +10129,23 @@ For much of its early history El Dorado was known for its JumShip yards. This en
 			<date>3062-01-01</date>
 			<faction>CJF</faction>
 		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>1</sysPos>
+		<gravity>1.01</gravity>
+		<pressure>3</pressure>
+		<temperature>43</temperature>
+		<climate>5</climate>
+		<percentWater>71</percentWater>
+		<hpg>B</hpg>
+		<lifeForm>7</lifeForm>
+		<satellite>dust ring</satellite>
+		<landMass>Albion</landMass>
+		<landMass>Bromme</landMass>
+		<landMass>Gaulia</landMass>
+		<socioIndustrial>B-C-C-C-B</socioIndustrial>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Gravenhage</name>
@@ -10199,7 +10638,7 @@ For much of its early history El Dorado was known for its JumShip yards. This en
 		</factionChange>
 	</planet>
 	<planet>
-		<name>Hamilton</name>
+		<name>Hamilton (LC)</name>
 		<xcood>-152.05</xcood>
 		<ycood>224.03</ycood>
 		<faction>LA</faction>
@@ -10568,6 +11007,19 @@ For much of its early history El Dorado was known for its JumShip yards. This en
 		<xcood>-134.83</xcood>
 		<ycood>-58.68</ycood>
 		<faction>FWL</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>4</sysPos>
+		<gravity>0.95</gravity>
+		<pressure>3</pressure>
+		<temperature>30</temperature>
+		<climate>2</climate>
+		<percentWater>58</percentWater>
+		<hpg>B</hpg>
+		<lifeForm>5</lifeForm>
+		<socioIndustrial>D-D-C-D-B</socioIndustrial>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Helsingfors</name>
@@ -10656,6 +11108,26 @@ For much of its early history El Dorado was known for its JumShip yards. This en
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<spectralClass>F</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>2</sysPos>
+		<gravity>1.01</gravity>
+		<pressure>3</pressure>
+		<temperature>85</temperature>
+		<climate>5</climate>
+		<percentWater>40</percentWater>
+		<zenithCharge>true</zenithCharge>
+		<nadirCharge>true</nadirCharge>
+		<hpg>A</hpg>
+		<lifeForm>5</lifeForm>
+		<satellite>Hesperus II-Alpha</satellite>
+		<socioIndustrial>A-A-A-A-B</socioIndustrial>
+		<landmass>South Whitman</landmass>
+		<landmass>North Whitman</landmass>
+		<landmass>East Barrens</landmass>
+		<landmass>West Barrens</landmass>
+		<desc>No description available</desc>
 	</planet>
 	<planet>
 		<name>Hexare</name>
@@ -11613,6 +12085,26 @@ For much of its early history El Dorado was known for its JumShip yards. This en
 		<xcood>-46.94</xcood>
 		<ycood>-56.85</ycood>
 		<faction>FWL</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>III</luminosity>
+		<sysPos>3</sysPos>
+		<gravity>0.95</gravity>
+		<pressure>3</pressure>
+		<temperature>43</temperature>
+		<climate>3</climate>
+		<percentWater>71</percentWater>
+		<zenithCharge>true</zenithCharge>
+		<nadirCharge>true</nadirCharge>
+		<hpg>A</hpg>
+		<lifeForm>2</lifeForm>
+		<satellite>Prospero</satellite>
+		<socioIndustrial>A-A-C-A-D</socioIndustrial>
+		<landmass>Indran</landmass>
+		<landmass>Hathor</landmass>
+		<landmass>Bruin</landmass>
+		<landmass>Kriess</landmass>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Ironhold</name>
@@ -12249,11 +12741,35 @@ For much of its early history El Dorado was known for its JumShip yards. This en
 		<name>Kalidasa</name>
 		<xcood>-106.67</xcood>
 		<ycood>-23.21</ycood>
-		<faction>LA</faction>
+		<faction>FWL</faction>
 		<factionChange>
-			<date>2900-01-01</date>
+			<date>2822-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2997-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>Ia</luminosity>
+		<sysPos>4</sysPos>
+		<gravity>1.1</gravity>
+		<pressure>2</pressure>
+		<temperature>56</temperature>
+		<climate>4</climate>
+		<percentWater>67</percentWater>
+		<zenithCharge>true</zenithCharge>
+		<nadirCharge>true</nadirCharge>
+		<hpg>A</hpg>
+		<lifeForm>2</lifeForm>
+		<satellite>Carbons</satellite>
+		<satellite>Deons</satellite>
+		<socioIndustrial>B-A-C-B-C</socioIndustrial>
+		<landmass>Kalmia</landmass>
+		<landmass>Kaleen</landmass>
+		<landmass>Kumar</landmass>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Kamarod</name>
@@ -12793,6 +13309,21 @@ For much of its early history El Dorado was known for its JumShip yards. This en
 		<xcood>-126.23</xcood>
 		<ycood>-106.41</ycood>
 		<faction>FWL</faction>
+		<spectralClass>F</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>2</sysPos>
+		<gravity>1.1</gravity>
+		<pressure>2</pressure>
+		<temperature>35</temperature>
+		<climate>3</climate>
+		<percentWater>35</percentWater>
+		<nadirCharge>true</nadirCharge>
+		<hpg>B</hpg>
+		<lifeForm>2</lifeForm>
+		<satellite>Ea</satellite>
+		<socioIndustrial>A-A-C-A-B</socioIndustrial>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Keytesville</name>
@@ -13726,7 +14257,7 @@ For much of its early history El Dorado was known for its JumShip yards. This en
 		</factionChange>
 	</planet>
 	<planet>
-		<name>Lancaster</name>
+		<name>Lancaster (FWL)</name>
 		<xcood>-116.84</xcood>
 		<ycood>-88.93</ycood>
 		<faction>FWL</faction>
@@ -14048,6 +14579,22 @@ For much of its early history El Dorado was known for its JumShip yards. This en
 			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
+		<spectralClass>F</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>II</luminosity>
+		<sysPos>2</sysPos>
+		<gravity>0.85</gravity>
+		<pressure>2</pressure>
+		<temperature>30</temperature>
+		<climate>2</climate>
+		<percentWater>85</percentWater>
+		<zenithCharge>true</zenithCharge>
+		<nadirCharge>true</nadirCharge>
+		<hpg>B</hpg>
+		<lifeForm>1</lifeForm>
+		<socioIndustrial>B-C-C-C-D</socioIndustrial>
+		<landmass>Orleans</landmass>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Lesalles</name>
@@ -14497,13 +15044,23 @@ For much of its early history El Dorado was known for its JumShip yards. This en
 		<ycood>-187.13</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2750-01-01</date>
-			<faction>PIND</faction>
-		</factionChange>
-		<factionChange>
-			<date>3057-01-01</date>
+			<date>3055-01-01</date>
 			<faction>MH</faction>
 		</factionChange>
+		<spectralClass>M</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>III</luminosity>
+		<sysPos>2</sysPos>
+		<gravity>1.1</gravity>
+		<pressure>3</pressure>
+		<temperature>20</temperature>
+		<climate>1</climate>
+		<percentWater>70</percentWater>
+		<hpg>None</hpg>
+		<lifeForm>7</lifeForm>
+		<satellite>Logan</satellite>
+		<socioIndustrial>C-C-C-C-D</socioIndustrial>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Lovinac</name>
@@ -15318,6 +15875,25 @@ Most of the population lives in small cities dotting the 4 continents.  There ar
 		<xcood>-80.33</xcood>
 		<ycood>-75.89</ycood>
 		<faction>FWL</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>2</sysPos>
+		<gravity>1.1</gravity>
+		<pressure>4</pressure>
+		<temperature>40</temperature>
+		<climate>4</climate>
+		<percentWater>55</percentWater>
+		<zenithCharge>true</zenithCharge>
+		<nadirCharge>true</nadirCharge>
+		<hpg>A</hpg>
+		<lifeForm>7</lifeForm>
+		<satellite>Hradcany</satellite>
+		<satellite>Malla Strana</satellite>
+		<socioIndustrial>A-A-C-A-B</socioIndustrial>
+		<landmass>Mondaria</landmass>
+		<landmass>Chavalet</landmass>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Maritgues</name>
@@ -17162,6 +17738,23 @@ The terrain surrounding Avalon City is a mixture of forests, mountains, plains a
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<spectralClass>K</spectralClass>
+		<subtype>9</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>4</sysPos>
+		<gravity>1.10</gravity>
+		<pressure>3</pressure>
+		<temperature>29</temperature>
+		<climate>3</climate>
+		<percentWater>65</percentWater>
+		<zenithCharge>true</zenithCharge>
+		<hpg>B</hpg>
+		<lifeForm>6</lifeForm>
+		<satellite>Durban</satellite>
+		<landMass>Pretoria</landMass>
+		<landMass>Eissia</landMass>
+		<socioIndustrial>B-B-C-C-B</socioIndustrial>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>New Damascus</name>
@@ -17206,6 +17799,25 @@ The terrain surrounding Avalon City is a mixture of forests, mountains, plains a
 			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>III</luminosity>
+		<sysPos>4</sysPos>
+		<gravity>1.1</gravity>
+		<pressure>3</pressure>
+		<temperature>42</temperature>
+		<climate>5</climate>
+		<percentWater>78</percentWater>
+		<zenithCharge>true</zenithCharge>
+		<nadirCharge>true</nadirCharge>
+		<hpg>A</hpg>
+		<lifeForm>5</lifeForm>
+		<satellite>Lot</satellite>
+		<socioIndustrial>D-C-C-D-C</socioIndustrial>
+		<landmass>Ostrov</landmass>
+		<landmass>Mindanao</landmass>
+		<landmass>Beziers</landmass>
+        <desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>New Earth</name>
@@ -17372,6 +17984,30 @@ The terrain surrounding Avalon City is a mixture of forests, mountains, plains a
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>3</sysPos>
+		<gravity>1.04</gravity>
+		<pressure>3</pressure>
+		<temperature>36</temperature>
+		<climate>3</climate>
+		<percentWater>81</percentWater>
+		<zenithCharge>true</zenithCharge>
+		<nadirCharge>true</nadirCharge>
+		<hpg>A</hpg>
+		<lifeForm>7</lifeForm>
+		<satellite>Eun</satellite>
+		<satellite>Ishiko</satellite>
+		<satellite>Le</satellite>
+		<satellite>Taka</satellite>
+		<satellite>Wing-Chiu</satellite>
+		<socioIndustrial>B-B-B-A-C</socioIndustrial>
+		<landmass>Asharu</landmass>
+		<landmass>Kalasaka</landmass>
+		<landmass>Koshimatu</landmass>
+		<landmass>Zuishami</landmass>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>New Macao</name>
@@ -17410,6 +18046,23 @@ The terrain surrounding Avalon City is a mixture of forests, mountains, plains a
 		<xcood>-151.52</xcood>
 		<ycood>-131.44</ycood>
 		<faction>FWL</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>3</sysPos>
+		<gravity>0.95</gravity>
+		<pressure>3</pressure>
+		<temperature>35</temperature>
+		<climate>3</climate>
+		<percentWater>82</percentWater>
+		<zenithCharge>true</zenithCharge>
+		<hpg>A</hpg>
+		<lifeForm>2</lifeForm>
+		<satellite>Delphi</satellite>
+		<socioIndustrial>C-B-B-A-B-A</socioIndustrial>
+		<landmass>Olympica</landmass>
+		<landmass>New Greenland</landmass>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>New Oslo</name>
@@ -17562,6 +18215,22 @@ During the Jihad, Kiyomori Minamoto temporarily relocated the capital back to Ne
 		<xcood>157.26</xcood>
 		<ycood>-409.2</ycood>
 		<faction>TC</faction>
+		<spectralClass>F</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>6</sysPos>
+		<gravity>1.1</gravity>
+		<pressure>3</pressure>
+		<temperature>31</temperature>
+		<climate>3</climate>
+		<percentWater>68</percentWater>
+		<zenithCharge>true</zenithCharge>
+		<hpg>B</hpg>
+		<lifeForm>6</lifeForm>
+		<satellite>Jefferson</satellite>
+		<satellite>Locke</satellite>    
+		<socioIndustrial>B-A-C-A-C</socioIndustrial>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>New Venice</name>
@@ -18264,6 +18933,24 @@ Niops VII is a cold planet with access to sufficient resources to keep the Assoc
 			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
+		<spectralClass>F</spectralClass>
+		<subtype>7</subtype>
+		<luminosity>II</luminosity>
+		<sysPos>2</sysPos>
+		<gravity>0.95</gravity>
+		<pressure>3</pressure>
+		<temperature>35</temperature>
+		<climate>3</climate>
+		<percentWater>61</percentWater>
+		<nadirCharge>true</nadirCharge>
+		<hpg>B</hpg>
+		<lifeForm>6</lifeForm>
+		<satellite>Box</satellite>
+		<socioIndustrial>C-C-B-C-B</socioIndustrial>
+		<landmass>Rossonia</landmass>
+		<landmass>Ulm</landmass>
+		<landmass>Salva</landmass>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Okains</name>
@@ -18406,6 +19093,28 @@ Niops VII is a cold planet with access to sufficient resources to keep the Assoc
 		<xcood>-76.68</xcood>
 		<ycood>-213.86</ycood>
 		<faction>FWL</faction>
+		<spectralClass>F</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>III</luminosity>
+		<sysPos>4</sysPos>
+		<gravity>1.1</gravity>
+		<pressure>3</pressure>
+		<temperature>45</temperature>
+		<climate>5</climate>
+		<percentWater>58</percentWater>
+		<zenithCharge>true</zenithCharge>
+		<nadirCharge>true</nadirCharge>
+		<hpg>A</hpg>
+		<lifeForm>7</lifeForm>
+		<satellite>Escorial</satellite>
+		<satellite>Coruna</satellite>
+		<socioIndustrial>A-A-B-A-B</socioIndustrial>
+		<landmass>Martigues</landmass>
+		<landmass>Navarran</landmass>
+		<landmass>Avillan</landmass>
+		<landmass>Tarragonan</landmass>
+		<landmass>Burgos</landmass>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Orkney</name>
@@ -18426,7 +19135,7 @@ Niops VII is a cold planet with access to sufficient resources to keep the Assoc
 		</factionChange>
 	</planet>
 	<planet>
-		<name>Orkney</name>
+		<name>Orkney (Periphery)</name>
 		<xcood>382.04</xcood>
 		<ycood>-402.6</ycood>
 		<faction>PIND</faction>
@@ -19631,7 +20340,7 @@ Outreach is the primary hiring location for the mercenary trade from the 3030s a
 		</factionChange>
 	</planet>
 	<planet>
-		<name>Preston</name>
+		<name>Preston (CC)</name>
 		<xcood>13.3</xcood>
 		<ycood>-215.94</ycood>
 		<faction>CC</faction>
@@ -20042,6 +20751,24 @@ The location of Proserpina on the Federated Suns border requires the DCMS to kee
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>7</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>4</sysPos>
+		<gravity>0.94</gravity>
+		<pressure>3</pressure>
+		<temperature>53</temperature>
+		<climate>5</climate>
+		<percentWater>44</percentWater>
+		<nadirCharge>true</nadirCharge>
+		<hpg>A</hpg>
+		<lifeForm>7</lifeForm>
+		<satellite>Caliban</satellite>
+		<socioIndustrial>B-C-B-A-D</socioIndustrial>
+		<landmass>Tempestia</landmass>
+		<landmass>Tsunamus</landmass>
+		<landmass>Pyrammus</landmass>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Rajkot</name>
@@ -20196,6 +20923,22 @@ The location of Proserpina on the Federated Suns border requires the DCMS to kee
 			<date>3050-07-17</date>
 			<faction>CW</faction>
 		</factionChange>
+		<spectralClass>K</spectralClass>
+        <subtype>4</subtype>
+        <luminosity>V</luminosity>
+        <sysPos>6</sysPos>
+        <gravity>1.1</gravity>
+        <pressure>3</pressure>
+        <temperature>25</temperature>
+        <climate>3</climate>
+        <percentWater>75</percentWater>
+        <zenithCharge>true</zenithCharge>
+        <nadirCharge>true</nadirCharge>
+        <hpg>A</hpg>
+        <lifeForm>7</lifeForm>
+        <satellite>Sigurd</satellite>
+        <socioIndustrial>A-B-A-A-C</socioIndustrial>
+        <desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Rastaban</name>
@@ -20274,6 +21017,25 @@ The location of Proserpina on the Federated Suns border requires the DCMS to kee
 		<xcood>-153.35</xcood>
 		<ycood>-94.67</ycood>
 		<faction>FWL</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>III</luminosity>
+		<sysPos>4</sysPos>
+		<gravity>0.95</gravity>
+		<pressure>3</pressure>
+		<temperature>45</temperature>
+		<climate>5</climate>
+		<percentWater>53</percentWater>
+		<zenithCharge>true</zenithCharge>
+		<nadirCharge>true</nadirCharge>
+		<hpg>A</hpg>
+		<lifeForm>5</lifeForm>
+		<satellite>Zamzama</satellite>
+		<socioIndustrial>A-B-B-A-B</socioIndustrial>
+		<landmass>Chebbin</landmass>
+		<landmass>Tinnin</landmass>
+		<landmass>Tabar</landmass>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Reisling's Planet</name>
@@ -20957,6 +21719,23 @@ The location of Proserpina on the Federated Suns border requires the DCMS to kee
 			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>9</subtype>
+		<luminosity>VI</luminosity>
+		<sysPos>4</sysPos>
+		<gravity>1.1</gravity>
+		<pressure>3</pressure>
+		<temperature>35</temperature>
+		<climate>3</climate>
+		<percentWater>65</percentWater>
+		<hpg>B</hpg>
+		<lifeForm>7</lifeForm>
+		<satellite>Radlan</satellite>
+		<socioIndustrial>C-D-C-C-C</socioIndustrial>
+		<landmass>Patra</landmass>
+		<landmass>Katerini</landmass>
+		<landmass>Xanthi</landmass>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Safe Port</name>
@@ -21025,7 +21804,7 @@ The location of Proserpina on the Federated Suns border requires the DCMS to kee
 		<faction>DC</faction>
 	</planet>
 	<planet>
-		<name>Sakhalin</name>
+		<name>Sakhalin (LC)</name>
 		<xcood>-24.25</xcood>
 		<ycood>153.09</ycood>
 		<faction>LA</faction>
@@ -21961,9 +22740,30 @@ The location of Proserpina on the Federated Suns border requires the DCMS to kee
 		<ycood>-4.96</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2900-01-01</date>
+			<date>2822-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
+		<factionChange>
+			<date>2864-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2910-01-01</date>
+			<faction>FWL</faction>
+		</factionChange>
+		<spectralClass>A</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>4</sysPos>
+		<gravity>1.11</gravity>
+		<pressure>3</pressure>
+		<temperature>55</temperature>
+		<climate>4</climate>
+		<percentWater>15</percentWater>
+		<hpg>B</hpg>
+		<lifeForm>2</lifeForm>
+		<socioIndustrial>F-F-C-D-D</socioIndustrial>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Shimonita</name>
@@ -22968,6 +23768,30 @@ Solaris VII has two continents, Equatus is small, arid, mountainous and sparsely
 			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>4</sysPos>
+		<gravity>1.0</gravity>
+		<pressure>3</pressure>
+		<temperature>45</temperature>
+		<climate>4</climate>
+		<percentWater>81</percentWater>
+		<zenithCharge>true</zenithCharge>
+		<nadirCharge>true</nadirCharge>
+		<hpg>A</hpg>
+		<lifeForm>7</lifeForm>
+		<satellite>Argyle</satellite>
+		<satellite>Leon</satellite>
+		<satellite>Carthage</satellite>
+		<satellite>Clyde</satellite>
+		<socioIndustrial>B-A-B-B-B</socioIndustrial>
+		<landmass>Lanarkshire</landmass>
+		<landmass>Aberdeenshire</landmass>
+		<landmass>Angus</landmass>
+		<landmass>Highland</landmass>
+		<landmass>Lothian</landmass>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Storfors</name>
@@ -23601,6 +24425,22 @@ Solaris VII has two continents, Equatus is small, arid, mountainous and sparsely
 		<xcood>-271.23</xcood>
 		<ycood>-83.98</ycood>
 		<faction>FWL</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>4</sysPos>
+		<gravity>1.0</gravity>
+		<pressure>3</pressure>
+		<temperature>38</temperature>
+		<climate>3</climate>
+		<percentWater>61</percentWater>
+		<nadirCharge>true</nadirCharge>
+		<hpg>A</hpg>
+		<lifeForm>5</lifeForm>
+		<satellite>Teteli</satellite>
+		<satellite>Tamarin</satellite>
+		<socioIndustrial>C-D-B-C-B</socioIndustrial>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Tamaron</name>
@@ -23814,7 +24654,29 @@ Solaris VII has two continents, Equatus is small, arid, mountainous and sparsely
 		<name>Taurus</name>
 		<xcood>192.81</xcood>
 		<ycood>-394.11</ycood>
-		<faction>TC</faction>
+		<faction>THW</faction>
+		<factionChange>
+			<date>2335-01-01</date>
+			<faction>TC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3066-01-01</date>
+			<faction>CDP</faction>
+		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>4</sysPos>
+		<gravity>1.0</gravity>
+		<pressure>3</pressure>
+		<temperature>30</temperature>
+		<climate>3</climate>
+        <percentWater>65</percentWater>
+		<zenithCharge>true</zenithCharge>
+		<hpg>B</hpg>
+		<lifeForm>7</lifeForm>
+		<socioIndustrial>A-A-A-A-B</socioIndustrial>
+		<desc>The first colony on Taurus was founded January 23, 2253 and the planet was the first colonized and capital of what would become the Taurian Concordat. Taurus is rich in minerals and has alwasy been a vital source of food, raw materials and manufacturing for the entire Concordat. It is the cultural, political, and industrial center of the Concordat.</desc>
 	</planet>
 	<planet>
 		<name>Tawas</name>
@@ -24240,6 +25102,21 @@ As the capital of the Lyran Commonwealth, Thakard is home to many vital parts of
 			<date>2900-01-01</date>
 			<faction>MOC</faction>
 		</factionChange>
+		<spectralClass>M</spectralClass>
+		<subtype>1</subtype>
+		<luminosity></luminosity>
+		<sysPos>2</sysPos>
+		<gravity>1.03</gravity>
+		<pressure>3</pressure>
+		<temperature>22</temperature>
+		<climate>2</climate>
+		<percentWater>80</percentWater>
+		<nadirCharge>true</nadirCharge>
+		<hpg>B</hpg>
+		<lifeForm>7</lifeForm>
+		<satellite>Niobe</satellite>
+		<socioIndustrial>C-C-B-B-C</socioIndustrial>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Thuban</name>
@@ -24311,6 +25188,25 @@ As the capital of the Lyran Commonwealth, Thakard is home to many vital parts of
 		<xcood>-124.92</xcood>
 		<ycood>-148.66</ycood>
 		<faction>FWL</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>4</sysPos>
+		<gravity>1.0</gravity>
+		<pressure>3</pressure>
+		<temperature>50</temperature>
+		<climate>4</climate>
+		<percentWater>22</percentWater>
+		<zenithCharge>true</zenithCharge>
+		<nadirCharge>true</nadirCharge>
+		<hpg>B</hpg>
+		<lifeForm>3</lifeForm>
+		<satellite>Palatine</satellite>
+		<satellite>Ostia</satellite>
+		<socioIndustrial>B-A-B-A-B</socioIndustrial>
+		<landmass>Perugia</landmass>
+		<landmass>New Assam</landmass>
+		<desc>No description available</desc>
 	</planet>
 	<planet>
 		<name>Tiber (Clan)</name>
@@ -25536,6 +26432,23 @@ The local population has long resented the Lyran Commonwealth for what they beli
 			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>II</luminosity>
+		<sysPos>4</sysPos>
+		<gravity>0.95</gravity>
+		<pressure>3</pressure>
+		<temperature>20</temperature>
+		<climate>2</climate>
+		<percentWater>55</percentWater>
+		<zenithCharge>true</zenithCharge>
+		<nadirCharge>true</nadirCharge>
+		<hpg>A</hpg>
+		<lifeForm>5</lifeForm>
+		<satellite>Citadel</satellite>
+		<socioIndustrial>A-B-C-B-C</socioIndustrial>
+		<landmass>Modena</landmass>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Vantaa</name>
@@ -25762,7 +26675,7 @@ The local population has long resented the Lyran Commonwealth for what they beli
 		</factionChange>
 	</planet>
 	<planet>
-		<name>Victoria</name>
+		<name>Victoria (CC)</name>
 		<xcood>93.63</xcood>
 		<ycood>-351.04</ycood>
 		<faction>CC</faction>
@@ -27121,6 +28034,22 @@ The local population has long resented the Lyran Commonwealth for what they beli
 			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
+		<spectralClass>F</spectralClass>
+		<subtype>7</subtype>
+		<luminosity>III</luminosity>
+		<sysPos>2</sysPos>
+		<gravity>1.1</gravity>
+		<pressure>2</pressure>
+		<temperature>51</temperature>
+		<climate>4</climate>
+		<percentWater>35</percentWater>
+		<nadirCharge>true</nadirCharge>
+		<hpg>B</hpg>
+		<lifeForm>5</lifeForm>
+		<satellite>Talit</satellite>
+		<satellite>Bimah</satellite>
+		<socioIndustrial>D-C-B-C-B</socioIndustrial>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Zlatousi</name>
@@ -27215,6 +28144,20 @@ The local population has long resented the Lyran Commonwealth for what they beli
 			<date>3057-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
+		<spectralClass>A</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>3</sysPos>
+		<gravity>1.21</gravity>
+		<pressure>2</pressure>
+		<temperature>67</temperature>
+		<climate>4</climate>
+		<percentWater>22</percentWater>
+		<hpg>B</hpg>
+		<lifeForm>2</lifeForm>
+		<satellite>Brandeis</satellite>
+		<socioIndustrial>C-B-C-B-D</socioIndustrial>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Zurich</name>
