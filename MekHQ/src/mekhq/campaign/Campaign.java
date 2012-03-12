@@ -495,7 +495,7 @@ public class Campaign implements Serializable {
 		while(null != unitIds.get(id)) {
 			id = UUID.randomUUID();
 		}
-		en.setExternalId(id.toString());
+		en.setExternalIdAsString(id.toString());
 		Unit unit = new Unit(en, this);
 		unit.setId(id);
 		units.add(unit);
