@@ -1899,13 +1899,18 @@ public class Campaign implements Serializable {
 		
 		// Okay, after we've gone through all the nodes and constructed the Campaign object...
 		// We need to do a post-process pass to restore a number of references.
-
+ 
 		//if the version is earlier than 0.1.14, then we need to replace all the old integer
-		//ids of units and personnel with their UUIDs where they are referenced. 
+		//ids of units and personnel with their UUIDs where they are referenced.
 		if(v < 14) {
-			fixIdReferences(retVal);
+		fixIdReferences(retVal);
 		}
-		
+		// if the version is earlier than 0.1.16, then we need to run another fix to update
+		// the externalIds to match the Unit IDs.
+		if(v < 16) {
+		fixIdReferencesB(retVal);
+		}
+
 		// First, iterate through Support Teams;
 		// they have a reference to the Campaign object.
 		for (int x=0; x<retVal.teams.size(); x++) {
@@ -2126,7 +2131,14 @@ public class Campaign implements Serializable {
 				retVal.removeKill(k);
 			}
 		}
+		private static void fixIdReferencesB(Campaign retVal) {
+			for(Unit u : retVal.units) {
+			Entity en = u.getEntity();
+			UUID id = u.getId();
+			en.setExternalIdAsString(id.toString());
+		}
 	}
+
 	
 	private static void processFinances(Campaign retVal, Node wn) {
 		MekHQ.logMessage("Loading Finances from XML...", 4);
