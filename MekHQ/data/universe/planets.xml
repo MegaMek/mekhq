@@ -600,11 +600,21 @@ Addicks remains an important world today, though it has lost much of its glory o
 		<name>Albion</name>
 		<xcood>-53</xcood>
 		<ycood>1791</ycood>
-		<faction>PIND</faction>
+		<faction>NONE</faction>
 		<factionChange>
-			<date>2900-01-01</date>
-			<faction>PIND</faction>
+			<date>2802-06-11</date>
+			<faction>CLAN</faction>
 		</factionChange>
+		<spectralClass>K</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>2</sysPos>
+		<gravity>0.80</gravity>
+		<pressure>3</pressure>
+		<temperature>25</temperature>
+		<percentWater>60</percentWater>
+		<lifeForm>5</lifeForm>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Alchiba</name>
@@ -1764,14 +1774,29 @@ Industrial, Command and logistical world, paperwork in this planet and its prefe
 		</factionChange>
 	</planet>
 	<planet>
-		<name>Arcadia (Periphery)</name>
+		<name>Arcadia (Clan)</name>
 		<xcood>-116</xcood>
 		<ycood>1605</ycood>
-		<faction>PIND</faction>
+		<faction>NONE</faction>
 		<factionChange>
-			<date>2900-01-01</date>
-			<faction>PIND</faction>
+			<date>2786-08-24</date>
+			<faction>SLIE</faction>
 		</factionChange>
+		<factionChange>
+			<date>2802-06-11</date>
+			<faction>CLAN</faction>
+		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>7</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>1</sysPos>
+		<gravity>1.50</gravity>
+		<pressure>4</pressure>
+		<temperature>30</temperature>
+		<climate>3</climate>
+		<percentWater>50</percentWater>
+		<lifeForm>7</lifeForm>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Arcturus</name>
@@ -2176,11 +2201,26 @@ The League intelligence branch, SAFE, is headquartered on Atreus' moon Wendigo. 
 		<name>Atreus (Clan)</name>
 		<xcood>71</xcood>
 		<ycood>1732</ycood>
-		<faction>CSJ,CFM,CIH</faction>
+		<faction>NONE</faction>
+		<factionChange>
+			<date>2802-06-11</date>
+			<faction>CLAN</faction>
+		</factionChange>
 		<factionChange>
 			<date>2900-01-01</date>
-			<faction>PIND</faction>
+			<faction>CSJ,CFM,CIH</faction>
 		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>VI</luminosity>
+		<sysPos>3</sysPos>
+		<gravity>1.60</gravity>
+		<pressure>3</pressure>
+		<temperature>35</temperature>
+		<climate>3</climate>
+		<percentWater>40</percentWater>
+		<lifeForm>4</lifeForm>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Atreus Prime</name>
@@ -2554,11 +2594,27 @@ The League intelligence branch, SAFE, is headquartered on Atreus' moon Wendigo. 
 		<name>Babylon</name>
 		<xcood>-124</xcood>
 		<ycood>1597</ycood>
-		<faction>PIND</faction>
+		<faction>NONE</faction>
 		<factionChange>
-			<date>2900-01-01</date>
-			<faction>PIND</faction>
+			<date>2786-08-24</date>
+			<faction>SLIE</faction>
 		</factionChange>
+		<factionChange>
+			<date>2802-06-11</date>
+			<faction>CLAN</faction>
+		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>7</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>2</sysPos>
+		<gravity>1.50</gravity>
+		<pressure>3</pressure>
+		<temperature>35</temperature>
+		<climate>3</climate>
+		<percentWater>40</percentWater>
+		<lifeForm>5</lifeForm>
+		<landMass>Spiked Heart</landMass>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Baccalieu</name>
@@ -2742,11 +2798,22 @@ The League intelligence branch, SAFE, is headquartered on Atreus' moon Wendigo. 
 		<name>Barcella</name>
 		<xcood>-26</xcood>
 		<ycood>1897</ycood>
-		<faction>PIND</faction>
+		<faction>NONE</faction>
 		<factionChange>
-			<date>2900-01-01</date>
-			<faction>PIND</faction>
+			<date>2802-06-11</date>
+			<faction>CLAN</faction>
 		</factionChange>
+		<spectralClass>G</spectralClass>
+        <subtype>6</subtype>
+        <luminosity>III</luminosity>
+        <sysPos>3</sysPos>
+        <gravity>1.30</gravity>
+        <pressure>3</pressure>
+        <temperature>35</temperature>
+        <climate>3</climate>
+        <percentWater>60</percentWater>
+        <lifeForm>6</lifeForm>
+        <desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Barcelona</name>
@@ -2991,11 +3058,26 @@ Barras is the hotbed of intelligence activity along the Confederation-FWL border
 		<name>Bearclaw</name>
 		<xcood>150</xcood>
 		<ycood>1721</ycood>
-		<faction>PIND</faction>
+		<faction>NONE</faction>
+		<factionChange>
+			<date>2802-06-11</date>
+			<faction>CLAN</faction>
+		</factionChange>
 		<factionChange>
 			<date>2900-01-01</date>
-			<faction>PIND</faction>
+			<faction>CGB</faction>
 		</factionChange>
+		<spectralClass>A</spectralClass>
+        <subtype>6</subtype>
+        <luminosity>V</luminosity>
+        <sysPos>2</sysPos>
+        <gravity>1.10</gravity>
+        <pressure>3</pressure>
+        <temperature>20</temperature>
+        <climate>2</climate>
+        <percentWater>50</percentWater>
+        <lifeForm>3</lifeForm>
+        <desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Beaumont</name>
@@ -4066,11 +4148,22 @@ Barras is the hotbed of intelligence activity along the Confederation-FWL border
 		<name>Brim</name>
 		<xcood>-27</xcood>
 		<ycood>1767</ycood>
-		<faction>PIND</faction>
+		<faction>NONE</faction>
 		<factionChange>
-			<date>2900-01-01</date>
-			<faction>PIND</faction>
+			<date>2802-06-11</date>
+			<faction>CLAN</faction>
 		</factionChange>
+		<spectralClass>F</spectralClass>
+		<subtype>9</subtype>
+		<luminosity>II</luminosity>
+		<sysPos>4</sysPos>
+		<gravity>2.0</gravity>
+		<pressure>3</pressure>
+		<temperature>25</temperature>
+		<climate>4</climate>
+		<percentWater>20</percentWater>
+		<lifeForm>3</lifeForm>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Brisbane</name>
@@ -5826,11 +5919,26 @@ Recently, a large island in the eastern basin has been taken over for secret tes
 		<name>Circe</name>
 		<xcood>-123</xcood>
 		<ycood>1611</ycood>
-		<faction>PIND</faction>
+		<faction>NONE</faction>
 		<factionChange>
-			<date>2900-01-01</date>
-			<faction>PIND</faction>
+			<date>2786-08-24</date>
+			<faction>SLIE</faction>
 		</factionChange>
+		<factionChange>
+			<date>2802-06-11</date>
+			<faction>CLAN</faction>
+		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>Ia</luminosity>
+		<sysPos>1</sysPos>
+		<gravity>0.80</gravity>
+		<pressure>3</pressure>
+		<temperature>35</temperature>
+		<climate>3</climate>
+		<percentWater>50</percentWater>
+		<lifeForm>2</lifeForm>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Circinus</name>
@@ -6676,11 +6784,27 @@ Recently, a large island in the eastern basin has been taken over for secret tes
 		<name>Dagda</name>
 		<xcood>-133</xcood>
 		<ycood>1600</ycood>
-		<faction>PIND</faction>
+		<faction>NONE</faction>
 		<factionChange>
-			<date>2900-01-01</date>
-			<faction>PIND</faction>
+			<date>2786-08-24</date>
+			<faction>SLIE</faction>
 		</factionChange>
+		<factionChange>
+			<date>2802-06-11</date>
+			<faction>CLAN</faction>
+		</factionChange>
+		<spectralClass>K</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>3</sysPos>
+		<gravity>1.10</gravity>
+		<pressure>2</pressure>
+		<temperature>25</temperature>
+		<climate>3</climate>
+		<percentWater>60</percentWater>
+		<lifeForm>7</lifeForm>
+		<landMass>Riva</landMass>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Dahar IV</name>
@@ -7075,11 +7199,22 @@ Recently, a large island in the eastern basin has been taken over for secret tes
 		<name>Delios</name>
 		<xcood>-19</xcood>
 		<ycood>1804</ycood>
-		<faction>PIND</faction>
+		<faction>NONE</faction>
 		<factionChange>
-			<date>2900-01-01</date>
-			<faction>PIND</faction>
+			<date>2802-06-11</date>
+			<faction>CLAN</faction>
 		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>III</luminosity>
+		<sysPos>2</sysPos>
+		<gravity>0.92</gravity>
+		<pressure>4</pressure>
+		<temperature>30</temperature>
+		<percentWater>80</percentWater>
+		<climate>3</climate>
+		<lifeForm>5</lifeForm>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Delitzsch</name>
@@ -7937,11 +8072,26 @@ The capital is currently Fort Dieron, but in the past San Martin and Tahlwynn ha
 		<name>Eden</name>
 		<xcood>-134</xcood>
 		<ycood>1610</ycood>
-		<faction>PIND</faction>
+		<faction>NONE</faction>
 		<factionChange>
-			<date>2900-01-01</date>
-			<faction>PIND</faction>
+			<date>2786-08-24</date>
+			<faction>SLIE</faction>
 		</factionChange>
+		<factionChange>
+			<date>2802-06-11</date>
+			<faction>CLAN</faction>
+		</factionChange>
+		<spectralClass>F</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>Ib</luminosity>
+		<sysPos>1</sysPos>
+		<gravity>1.10</gravity>
+		<pressure>3</pressure>
+		<temperature>30</temperature>
+		<climate>3</climate>
+		<percentWater>40</percentWater>
+		<lifeForm>7</lifeForm>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Edmondson</name>
@@ -9124,11 +9274,22 @@ For much of its early history El Dorado was known for its JumShip yards. This en
 		<name>Foster</name>
 		<xcood>43</xcood>
 		<ycood>1731</ycood>
-		<faction>PIND</faction>
+		<faction>NONE</faction>
 		<factionChange>
-			<date>2900-01-01</date>
-			<faction>PIND</faction>
+			<date>2802-06-11</date>
+			<faction>CLAN</faction>
 		</factionChange>
+		<spectralClass>M</spectralClass>
+		<subtype>9</subtype>
+		<luminosity>III</luminosity>
+		<sysPos>1</sysPos>
+		<gravity>1.0</gravity>
+		<pressure>3</pressure>
+		<temperature>25</temperature>
+		<climate>3</climate>
+		<percentWater>50</percentWater>
+		<lifeForm>4</lifeForm>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Franklin</name>
@@ -9586,11 +9747,22 @@ For much of its early history El Dorado was known for its JumShip yards. This en
 		<name>Gatekeeper</name>
 		<xcood>-25</xcood>
 		<ycood>1778</ycood>
-		<faction>PIND</faction>
+		<faction>NONE</faction>
 		<factionChange>
-			<date>2900-01-01</date>
-			<faction>PIND</faction>
+			<date>2802-06-11</date>
+			<faction>CLAN</faction>
 		</factionChange>
+		<spectralClass>B</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>III</luminosity>
+		<sysPos>2</sysPos>
+		<gravity>0.80</gravity>
+		<pressure>3</pressure>
+		<temperature>20</temperature>
+		<climate>4</climate>
+		<percentWater>10</percentWater>
+		<lifeForm>2</lifeForm>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Gatineau</name>
@@ -9868,11 +10040,22 @@ For much of its early history El Dorado was known for its JumShip yards. This en
 		<name>Glory</name>
 		<xcood>99</xcood>
 		<ycood>1835</ycood>
-		<faction>PIND</faction>
+		<faction>NONE</faction>
 		<factionChange>
-			<date>2900-01-01</date>
-			<faction>PIND</faction>
+			<date>2802-06-11</date>
+			<faction>CLAN</faction>
 		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>4</sysPos>
+		<gravity>0.90</gravity>
+		<pressure>3</pressure>
+		<temperature>40</temperature>
+		<climate>3</climate>
+		<percentWater>50</percentWater>
+		<lifeForm>7</lifeForm>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Goat Path</name>
@@ -10102,11 +10285,22 @@ For much of its early history El Dorado was known for its JumShip yards. This en
 		<name>Grants Station</name>
 		<xcood>-70</xcood>
 		<ycood>1835</ycood>
-		<faction>PIND</faction>
+		<faction>NONE</faction>
 		<factionChange>
-			<date>2900-01-01</date>
-			<faction>PIND</faction>
+			<date>2802-06-11</date>
+			<faction>CLAN</faction>
 		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>III</luminosity>
+		<sysPos>3</sysPos>
+		<gravity>1.50</gravity>
+		<pressure>3</pressure>
+		<temperature>35</temperature>
+		<climate>3</climate>
+		<percentWater>70</percentWater>
+		<lifeForm>6</lifeForm>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Graus</name>
@@ -10910,10 +11104,10 @@ For much of its early history El Dorado was known for its JumShip yards. This en
 		<name>Hector</name>
 		<xcood>152</xcood>
 		<ycood>1768</ycood>
-		<faction>PIND</faction>
+		<faction>NONE</faction>
 		<factionChange>
-			<date>2900-01-01</date>
-			<faction>PIND</faction>
+			<date>2802-06-11</date>
+			<faction>CLAN</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -10990,11 +11184,22 @@ For much of its early history El Dorado was known for its JumShip yards. This en
 		<name>Hellgate</name>
 		<xcood>39</xcood>
 		<ycood>1843</ycood>
-		<faction>PIND</faction>
+		<faction>NONE</faction>
 		<factionChange>
-			<date>2900-01-01</date>
-			<faction>PIND</faction>
+			<date>2802-06-11</date>
+			<faction>CLAN</faction>
 		</factionChange>
+		<spectralClass>F</spectralClass>
+		<subtype>7</subtype>
+		<luminosity>Ia</luminosity>
+		<sysPos>1</sysPos>
+		<gravity>0.70</gravity>
+		<pressure>3</pressure>
+		<temperature>40</temperature>
+		<climate>4</climate>
+		<percentWater>20</percentWater>
+		<lifeForm>2</lifeForm>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Hellos Minor</name>
@@ -11221,11 +11426,22 @@ For much of its early history El Dorado was known for its JumShip yards. This en
 		<name>Hoard</name>
 		<xcood>38</xcood>
 		<ycood>1880</ycood>
-		<faction>PIND</faction>
+		<faction>NONE</faction>
 		<factionChange>
-			<date>2900-01-01</date>
-			<faction>PIND</faction>
+			<date>2802-06-11</date>
+			<faction>CLAN</faction>
 		</factionChange>
+		<spectralClass>A</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>2</sysPos>
+		<gravity>0.80</gravity>
+		<pressure>3</pressure>
+		<temperature>15</temperature>
+		<climate>0</climate>
+		<percentWater>50</percentWater>
+		<lifeForm>2</lifeForm>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Hobbs</name>
@@ -11343,11 +11559,26 @@ For much of its early history El Dorado was known for its JumShip yards. This en
 		<name>Homer</name>
 		<xcood>-82</xcood>
 		<ycood>1798</ycood>
-		<faction>PIND</faction>
+		<faction>NONE</faction>
 		<factionChange>
-			<date>2900-01-01</date>
-			<faction>PIND</faction>
+			<date>2802-06-11</date>
+			<faction>CLAN</faction>
 		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>2</sysPos>
+		<gravity>1.40</gravity>
+		<pressure>3</pressure>
+		<temperature>30</temperature>
+		<climate>3</climate>
+		<percentWater>30</percentWater>
+		<lifeForm>4</lifeForm>
+		<landMass>Amis</landMass>
+		<landMass>Ortin</landMass>
+		<landMass>Bagrain</landMass>
+		<landMass>Fortuna</landMass>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Homestead</name>
@@ -11613,11 +11844,26 @@ For much of its early history El Dorado was known for its JumShip yards. This en
 		<name>Huntress</name>
 		<xcood>48</xcood>
 		<ycood>1756</ycood>
-		<faction>PIND</faction>
+		<faction>NONE</faction>
+		<factionChange>
+			<date>2802-06-11</date>
+			<faction>CLAN</faction>
+		</factionChange>
 		<factionChange>
 			<date>2900-01-01</date>
-			<faction>PIND</faction>
+			<faction>CSJ</faction>
 		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>7</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>2</sysPos>
+		<gravity>1.10</gravity>
+		<pressure>3</pressure>
+		<temperature>25</temperature>
+		<climate>5</climate>
+		<percentWater>60</percentWater>
+		<lifeForm>6</lifeForm>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Hurik</name>
@@ -12110,11 +12356,26 @@ For much of its early history El Dorado was known for its JumShip yards. This en
 		<name>Ironhold</name>
 		<xcood>45</xcood>
 		<ycood>1743</ycood>
-		<faction>PIND</faction>
+		<faction>NONE</faction>
+		<factionChange>
+			<date>2802-06-11</date>
+			<faction>CLAN</faction>
+		</factionChange>
 		<factionChange>
 			<date>2900-01-01</date>
-			<faction>PIND</faction>
+			<faction>CJF</faction>
 		</factionChange>
+		<spectralClass>K</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>2</sysPos>
+		<gravity>1.10</gravity>
+		<pressure>3</pressure>
+		<temperature>20</temperature>
+		<climate>2</climate>
+		<percentWater>70</percentWater>
+		<lifeForm>6</lifeForm>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Irurzun</name>
@@ -13538,11 +13799,22 @@ For much of its early history El Dorado was known for its JumShip yards. This en
 		<name>Kirin</name>
 		<xcood>-26</xcood>
 		<ycood>1837</ycood>
-		<faction>PIND</faction>
+		<faction>NONE</faction>
 		<factionChange>
-			<date>2900-01-01</date>
-			<faction>PIND</faction>
+			<date>2802-06-11</date>
+			<faction>CLAN</faction>
 		</factionChange>
+		<spectralClass>M</spectralClass>
+		<subtype>9</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>1</sysPos>
+		<gravity>0.90</gravity>
+		<pressure>2</pressure>
+		<temperature>20</temperature>
+		<climate>2</climate>
+		<percentWater>30</percentWater>
+		<lifeForm>4</lifeForm>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Kirkcaldy</name>
@@ -14910,11 +15182,22 @@ For much of its early history El Dorado was known for its JumShip yards. This en
 		<name>Londerholm</name>
 		<xcood>-45</xcood>
 		<ycood>1873</ycood>
-		<faction>PIND</faction>
+		<faction>NONE</faction>
 		<factionChange>
-			<date>2900-01-01</date>
-			<faction>PIND</faction>
+			<date>2802-06-11</date>
+			<faction>CLAN</faction>
 		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>7</subtype>
+		<luminosity>III</luminosity>
+		<sysPos>2</sysPos>
+		<gravity>1.50</gravity>
+		<pressure>3</pressure>
+		<temperature>30</temperature>
+		<climate>3</climate>
+		<percentWater>70</percentWater>
+		<lifeForm>6</lifeForm>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Loongana</name>
@@ -15172,11 +15455,22 @@ For much of its early history El Dorado was known for its JumShip yards. This en
 		<name>Lum</name>
 		<xcood>4</xcood>
 		<ycood>1756</ycood>
-		<faction>PIND</faction>
+		<faction>NONE</faction>
 		<factionChange>
-			<date>2900-01-01</date>
-			<faction>PIND</faction>
+			<date>2802-06-11</date>
+			<faction>CLAN</faction>
 		</factionChange>
+		<spectralClass>K</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>4</sysPos>
+		<gravity>0.90</gravity>
+		<pressure>3</pressure>
+		<temperature>15</temperature>
+		<climate>2</climate>
+		<percentWater>70</percentWater>
+		<lifeForm>6</lifeForm>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Lummatii</name>
@@ -15961,11 +16255,21 @@ Most of the population lives in small cities dotting the 4 continents.  There ar
 		<name>Marshall</name>
 		<xcood>59</xcood>
 		<ycood>1791</ycood>
-		<faction>PIND</faction>
+		<faction>NONE</faction>
 		<factionChange>
-			<date>2900-01-01</date>
-			<faction>PIND</faction>
+			<date>2802-06-11</date>
+			<faction>CLAN</faction>
 		</factionChange>
+		<spectralClass>F</spectralClass>
+        <subtype>4</subtype>
+        <luminosity>V</luminosity>
+        <sysPos>3</sysPos>
+        <gravity>1.10</gravity>
+        <pressure>3</pressure>
+        <temperature>30</temperature>
+        <percentWater>50</percentWater>
+        <lifeForm>5</lifeForm>
+        <desc>No description available for Marshall. The system's 4th planet, Xian, is also inhabited and has a single satellite named Diamondstar and the highest life forms are plants.</desc>
 	</planet>
 	<planet>
 		<name>Marshdale</name>
@@ -17965,11 +18269,25 @@ The terrain surrounding Avalon City is a mixture of forests, mountains, plains a
 		<name>New Kent</name>
 		<xcood>121</xcood>
 		<ycood>1783</ycood>
-		<faction>PIND</faction>
+		<faction>NONE</faction>
 		<factionChange>
-			<date>2900-01-01</date>
-			<faction>PIND</faction>
+			<date>2802-06-11</date>
+			<faction>CLAN</faction>
 		</factionChange>
+		<spectralClass>F</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>II</luminosity>
+		<sysPos>2</sysPos>
+		<gravity>1.50</gravity>
+		<pressure>3</pressure>
+		<temperature>40</temperature>
+		<climate>3</climate>
+		<percentWater>40</percentWater>
+		<lifeForm>4</lifeForm>
+		<landMass>Celebes</landMass>
+		<landMass>Kang</landMass>
+		<landMass>Ionia</landMass>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>New Kyoto</name>
@@ -18324,7 +18642,26 @@ During the Jihad, Kiyomori Minamoto temporarily relocated the capital back to Ne
 		<name>Niles (Clan)</name>
 		<xcood>119</xcood>
 		<ycood>1704</ycood>
-		<faction>CHH</faction>
+		<faction>NONE</faction>
+		<factionChange>
+			<date>2802-06-11</date>
+			<faction>CLAN</faction>
+		</factionChange>
+		<factionChange>
+			<date>2900-01-01</date>
+			<faction>CHH</faction>
+		</factionChange>
+		<spectralClass>A</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>II</luminosity>
+		<sysPos>1</sysPos>
+		<gravity>0.80</gravity>
+		<pressure>3</pressure>
+		<temperature>35</temperature>
+		<climate>3</climate>
+		<percentWater>20</percentWater>
+		<lifeForm>1</lifeForm>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Niles</name>
@@ -19616,11 +19953,22 @@ Outreach is the primary hiring location for the mercenary trade from the 3030s a
 		<name>Paxon</name>
 		<xcood>-74</xcood>
 		<ycood>1880</ycood>
-		<faction>PIND</faction>
+		<faction>NONE</faction>
 		<factionChange>
-			<date>2900-01-01</date>
-			<faction>PIND</faction>
+			<date>2802-06-11</date>
+			<faction>CLAN</faction>
 		</factionChange>
+		<spectralClass>K</spectralClass>
+		<subtype>9</subtype>
+		<luminosity>III</luminosity>
+		<sysPos>4</sysPos>
+		<gravity>1.30</gravity>
+		<pressure>3</pressure>
+		<temperature>35</temperature>
+		<climate>3</climate>
+		<percentWater>60</percentWater>
+		<lifeForm>5</lifeForm>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Payvand</name>
@@ -20377,11 +20725,22 @@ Outreach is the primary hiring location for the mercenary trade from the 3030s a
 		<name>Priori</name>
 		<xcood>2</xcood>
 		<ycood>1807</ycood>
-		<faction>PIND</faction>
+		<faction>NONE</faction>
 		<factionChange>
-			<date>2900-01-01</date>
-			<faction>PIND</faction>
+			<date>2802-06-11</date>
+			<faction>CLAN</faction>
 		</factionChange>
+		<spectralClass>K</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>II</luminosity>
+		<sysPos>7</sysPos>
+		<gravity>1.10</gravity>
+		<pressure>3</pressure>
+		<temperature>35</temperature>
+		<climate>3</climate>
+		<percentWater>50</percentWater>
+		<lifeForm>3</lifeForm>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Prix</name>
@@ -21346,11 +21705,22 @@ The location of Proserpina on the Federated Suns border requires the DCMS to kee
 		<name>Roche</name>
 		<xcood>67</xcood>
 		<ycood>1870</ycood>
-		<faction>PIND</faction>
+		<faction>NONE</faction>
 		<factionChange>
-			<date>2900-01-01</date>
-			<faction>PIND</faction>
+			<date>2802-06-11</date>
+			<faction>CLAN</faction>
 		</factionChange>
+		<spectralClass>F</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>III</luminosity>
+		<sysPos>1</sysPos>
+		<gravity>0.80</gravity>
+		<pressure>3</pressure>
+		<temperature>40</temperature>
+		<climate>3</climate>
+		<percentWater>50</percentWater>
+		<lifeForm>5</lifeForm>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Rochelle</name>
@@ -22548,11 +22918,22 @@ The location of Proserpina on the Federated Suns border requires the DCMS to kee
 		<name>Shadow</name>
 		<xcood>-4</xcood>
 		<ycood>1748</ycood>
-		<faction>PIND</faction>
+		<faction>NONE</faction>
 		<factionChange>
-			<date>2900-01-01</date>
-			<faction>PIND</faction>
+			<date>2802-06-11</date>
+			<faction>CLAN</faction>
 		</factionChange>
+		<spectralClass>B</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>1</sysPos>
+		<gravity>0.70</gravity>
+		<pressure>3</pressure>
+		<temperature>30</temperature>
+		<climate>3</climate>
+		<percentWater>40</percentWater>
+		<lifeForm>5</lifeForm>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Shahr Kord</name>
@@ -22710,7 +23091,26 @@ The location of Proserpina on the Federated Suns border requires the DCMS to kee
 		<name>Sheridan (Clan)</name>
 		<xcood>126</xcood>
 		<ycood>1793</ycood>
-		<faction>CSA</faction>
+		<faction>NONE</faction>
+		<factionChange>
+			<date>2802-06-11</date>
+			<faction>CLAN</faction>
+		</factionChange>
+		<factionChange>
+			<date>2900-01-01</date>
+			<faction>CSA</faction>
+		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>1</sysPos>
+		<gravity>1.0</gravity>
+		<pressure>4</pressure>
+		<temperature>35</temperature>
+		<climate>3</climate>
+		<percentWater>80</percentWater>
+		<lifeForm>7</lifeForm>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Sherwood</name>
@@ -23196,6 +23596,25 @@ Sian has been the capital of the Capellan Confederation since 2368 when Capella 
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>4</sysPos>
+		<gravity>1.03</gravity>
+		<pressure>3</pressure>
+		<temperature>30</temperature>
+		<climate>3</climate>
+		<percentWater>70</percentWater>
+		<zenithCharge>true</zenithCharge>
+		<nadirCharge>true</nadirCharge>
+		<hpg>A</hpg>
+		<lifeForm>7</lifeForm>
+		<satellite>Luna</satellite>
+		<landMass>New Scotland</landMass>
+		<socioIndustrial>A-A-A-B-B</socioIndustrial>
+		<desc>Skye is rare due to the presence of a habitable planet in a system with two stars, the system is home to an M0V and G8V class star, respectively a red and yellow dwarf.
+
+The planet itself is home to large tracts of unspoiled wilderness, thanks in large part to strict regulations that requires more than half of the planet to remain untouched wilderness. These measures were enacted by the original settlers to maintain the planet's beauty. Skye has always been the heart of the Federation of Skye and later the Isle of Skye when it was absorbed into the Lyran Commonwealth.</desc>
 	</planet>
 	<planet>
 		<name>Slaithwaite</name>
@@ -23817,7 +24236,11 @@ Solaris VII has two continents, Equatus is small, arid, mountainous and sparsely
 		<name>Strana Mechty</name>
 		<xcood>31</xcood>
 		<ycood>1766</ycood>
-		<faction>CLAN</faction>
+		<faction>NONE</faction>
+		<factionChange>
+			<date>2802-06-11</date>
+			<faction>CLAN</faction>
+		</factionChange>
 		<pressure>3</pressure>
 		<gravity>1.1</gravity>
 		<lifeForm>7</lifeForm>
@@ -23828,6 +24251,10 @@ Solaris VII has two continents, Equatus is small, arid, mountainous and sparsely
 		<subtype>3</subtype>
 		<luminosity>VI</luminosity>
 		<sysPos>4</sysPos>
+		<landMass>Cameron</landMass>
+		<landMass>McKenna</landMass>
+		<landMass>Novy Terra</landMass>
+		<landMass>Kerensky Prime</landMass>
 		<desc>Strana Mechty ("Land of Dreams") is the Clan shared "capital" planet. The planet is the site that Nicolas Kerensky and the original 800 Clan founders fled to from the Pentagon Worlds. Strana Mechty houses the Hall of Khans where the leaders of the Clans meet for Grand Councils. Each Clan has an enclave on the planet. 
 		</desc>
 	</planet>
@@ -23859,11 +24286,22 @@ Solaris VII has two continents, Equatus is small, arid, mountainous and sparsely
 		<name>Strato Domingo</name>
 		<xcood>9</xcood>
 		<ycood>1881</ycood>
-		<faction>PIND</faction>
+		<faction>NONE</faction>
 		<factionChange>
-			<date>2900-01-01</date>
-			<faction>PIND</faction>
+			<date>2802-06-11</date>
+			<faction>CLAN</faction>
 		</factionChange>
+		<spectralClass>K</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>II</luminosity>
+		<sysPos>2</sysPos>
+		<gravity>1.20</gravity>
+		<pressure>4</pressure>
+		<temperature>35</temperature>
+		<climate>5</climate>
+		<percentWater>70</percentWater>
+		<lifeForm>6</lifeForm>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Strawn</name>
@@ -24446,11 +24884,22 @@ Solaris VII has two continents, Equatus is small, arid, mountainous and sparsely
 		<name>Tamaron</name>
 		<xcood>-4</xcood>
 		<ycood>1857</ycood>
-		<faction>PIND</faction>
+		<faction>NONE</faction>
 		<factionChange>
-			<date>2900-01-01</date>
-			<faction>PIND</faction>
+			<date>2802-06-11</date>
+			<faction>CLAN</faction>
 		</factionChange>
+		<spectralClass>A</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>III</luminosity>
+		<sysPos>1</sysPos>
+		<gravity>0.70</gravity>
+		<pressure>2</pressure>
+		<temperature>35</temperature>
+		<climate>3</climate>
+		<percentWater>40</percentWater>
+		<lifeForm>2</lifeForm>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Tamsalu</name>
@@ -24628,11 +25077,22 @@ Solaris VII has two continents, Equatus is small, arid, mountainous and sparsely
 		<name>Tathis</name>
 		<xcood>85</xcood>
 		<ycood>1811</ycood>
-		<faction>PIND</faction>
+		<faction>NONE</faction>
 		<factionChange>
-			<date>2900-01-01</date>
-			<faction>PIND</faction>
+			<date>2802-06-11</date>
+			<faction>CLAN</faction>
 		</factionChange>
+		<spectralClass>B</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>1</sysPos>
+		<gravity>0.70</gravity>
+		<pressure>3</pressure>
+		<temperature>25</temperature>
+		<climate>3</climate>
+		<percentWater>30</percentWater>
+		<lifeForm>2</lifeForm>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Tatlawiksuk</name>
@@ -25212,7 +25672,22 @@ As the capital of the Lyran Commonwealth, Thakard is home to many vital parts of
 		<name>Tiber (Clan)</name>
 		<xcood>89</xcood>
 		<ycood>1877</ycood>
-		<faction>PIND</faction>
+		<faction>NONE</faction>
+		<factionChange>
+			<date>2802-06-11</date>
+			<faction>CLAN</faction>
+		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>VI</luminosity>
+		<sysPos>3</sysPos>
+		<gravity>1.0</gravity>
+		<pressure>3</pressure>
+		<temperature>25</temperature>
+		<climate>3</climate>
+		<percentWater>40</percentWater>
+		<lifeForm>5</lifeForm>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Tiflis</name>
@@ -25519,11 +25994,22 @@ As the capital of the Lyran Commonwealth, Thakard is home to many vital parts of
 		<name>Tokasha</name>
 		<xcood>108</xcood>
 		<ycood>1726</ycood>
-		<faction>PIND</faction>
+		<faction>NONE</faction>
 		<factionChange>
-			<date>2900-01-01</date>
-			<faction>PIND</faction>
+			<date>2802-06-11</date>
+			<faction>CLAN</faction>
 		</factionChange>
+		<spectralClass>K</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>4</sysPos>
+		<gravity>0.80</gravity>
+		<pressure>4</pressure>
+		<temperature>35</temperature>
+		<climate>3</climate>
+		<percentWater>60</percentWater>
+		<lifeForm>6</lifeForm>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Toland</name>
@@ -25607,11 +26093,22 @@ As the capital of the Lyran Commonwealth, Thakard is home to many vital parts of
 		<name>Tranquil</name>
 		<xcood>125</xcood>
 		<ycood>1756</ycood>
-		<faction>PIND</faction>
+		<faction>NONE</faction>
 		<factionChange>
-			<date>2900-01-01</date>
-			<faction>PIND</faction>
+			<date>2802-06-11</date>
+			<faction>CLAN</faction>
 		</factionChange>
+		<spectralClass>F</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>1</sysPos>
+		<gravity>0.80</gravity>
+		<pressure>3</pressure>
+		<temperature>45</temperature>
+		<climate>5</climate>
+		<percentWater>60</percentWater>
+		<lifeForm>5</lifeForm>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Trasjkis</name>
@@ -26734,11 +27231,22 @@ The local population has long resented the Lyran Commonwealth for what they beli
 		<name>Vinton</name>
 		<xcood>6</xcood>
 		<ycood>1913</ycood>
-		<faction>PIND</faction>
+		<faction>NONE</faction>
 		<factionChange>
-			<date>2900-01-01</date>
-			<faction>PIND</faction>
+			<date>2802-06-11</date>
+			<faction>CLAN</faction>
 		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>VI</luminosity>
+		<sysPos>3</sysPos>
+		<gravity>1.10</gravity>
+		<pressure>3</pressure>
+		<temperature>30</temperature>
+		<percentWater>60</percentWater>
+		<lifeForm>5</lifeForm>
+		<climate>3</climate>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Vipaava</name>
@@ -27829,7 +28337,26 @@ The local population has long resented the Lyran Commonwealth for what they beli
 		<name>York (Clan)</name>
 		<xcood>-74</xcood>
 		<ycood>1806</ycood>
-		<faction>CBS</faction>
+		<faction>NONE</faction>
+		<factionChange>
+			<date>2802-06-11</date>
+			<faction>CLAN</faction>
+		</factionChange>
+		<factionChange>
+			<date>2900-01-01</date>
+			<faction>CBS</faction>
+		</factionChange>
+		<spectralClass>F</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>2</sysPos>
+		<gravity>1.30</gravity>
+		<pressure>3</pressure>
+		<temperature>30</temperature>
+		<climate>3</climate>
+		<percentWater>70</percentWater>
+		<lifeForm>4</lifeForm>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Yumesta</name>
