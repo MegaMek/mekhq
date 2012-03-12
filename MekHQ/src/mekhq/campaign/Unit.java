@@ -1810,7 +1810,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     	pilot.setPortraitCategory(commander.getPortraitCategory());
     	pilot.setPortraitFileName(commander.getPortraitFileName());
     	pilot.setNickname(commander.getCallsign());
-    	pilot.setExternalId(commander.getId().toString());
+    	pilot.setExternalIdAsString(commander.getId().toString());
     	pilot.setArtillery(artillery);
     	//create a new set of options. For now we will just assign based on commander, but
     	//we really should be more detailed about this.
