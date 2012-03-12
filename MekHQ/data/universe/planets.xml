@@ -549,7 +549,11 @@ Addicks remains an important world today, though it has lost much of its glory o
 		<lifeForm>3</lifeForm>
 		<satellite>Tiber</satellite>
 		<socioIndustrial>A-A-A-A-B</socioIndustrial>
-		<desc>No description available.</desc>
+		<landMass>New Brunswick (Craiova)</landMass>
+		<landMass>New Jordan</landMass>
+		<desc>Due to blunders during early colonization which led to an incredible death toll to colonists and local wildlife alike from terrestrial and native diseases, strict environmental and settlement regulations were put in place on Alarion that are still in effect. While these regulations strive to preserve the ecosystem and have limited how much of  Alarion can be settled, they have not stopped the planet from becoming an economic and industrial powerhouse in the Lyran Commonwealth. Alarion is home to Jumpship, Aerospace and BattleMech factories, making it a world of extreme importance to the Commonwealth.
+
+Alarion is primarily settled by people of German, Romanian and English descent.</desc>
 	</planet>
 	<planet>
 		<name>Albalii</name>
@@ -3851,11 +3855,15 @@ Barras is the hotbed of intelligence activity along the Confederation-FWL border
 		<zenithCharge>true</zenithCharge>
 		<hpg>B</hpg>
 		<lifeForm>6</lifeForm>
+		<landMass>Kashmir (Bolan City)</landMass>
 		<landMass>Sakete</landMass>
-		<landMass>Kashmir</landMass>
 		<landMass>Sabari</landMass>
 		<socioIndustrial>B-C-B-C-C</socioIndustrial>
-		<desc>No description available.</desc>
+		<desc>Bolan is a dry, mountainous world with just enough natural resources to support the planet's populace and a modest level of industrialization. Much of the industry was crippled during the 2nd Succession War when the Free Worlds League abandoned the planet and used nuclear weapons on the factories as they were departing. Industry on planet has been slowly recovering ever since. Unfortunately, many locations on planet, including the entire continent of Sabari, which was once the hub of trade and major military bases in the Star League era, are uninhabited and still scarred with radiation.
+
+Bolan is the provincial capital for almost the entire Lyran boreder with the Free Worlds League.
+
+Bolan was primarily colonized by settlers from India, Pakistan and Afghanistan.</desc>
 	</planet>
 	<planet>
 		<name>Bondurant</name>
@@ -4510,10 +4518,16 @@ Barras is the hotbed of intelligence activity along the Confederation-FWL border
 		<satellite>Bonita</satellite>
 		<satellite>Hermosa</satellite>
 		<satellite>Inesita</satellite>
-		<landMass>Luego</landMass>
+		<landMass>Luego (Ciudad del Mar)</landMass>
+		<landMass>Santigo</landMass>
 		<landMass>Dominika</landMass>
+		<landMass>Revida</landMass>
 		<socioIndustrial>B-B-C-C-C</socioIndustrial>
-		<desc>No description available.</desc>
+		<desc>The population centers on Buena are located on the planet's four continents, all of which are within the cooler, semi-boreal northern and southern hemispheres. The planet has a number of warm, semi-tropical islands around the equator, unfortunately due to the tides from Buena's three satellites, these islands are known to disappear for months at a time, making them unsuitable for permanent habitation.
+
+Buena is home to the Buena War College and the Buena Training Battalion.
+
+Buena was settled primarily by a mix of Latin-European colonists, who have retained their dominant Spanish and Italian roots.</desc>
 	</planet>
 	<planet>
 		<name>Buenos Aires</name>
@@ -5127,11 +5141,13 @@ Recently, a large island in the eastern basin has been taken over for secret tes
 		<hpg>B</hpg>
 		<lifeForm>7</lifeForm>
 		<satellite>Dyson</satellite>
-		<landMass>Worrsetgard</landMass>
+		<landMass>Worrsetgard (New  Prague)</landMass>
 		<landMass>Hollens</landMass>
 		<landMass>Hozernems</landMass>
 		<socioIndustrial>B-A-C-B-B</socioIndustrial>
-		<desc>No description available.</desc>
+		<desc>Carlisle is a highly industrialized terrestrial planet inside the Alarion province of the Lyran Commonwealth. The system is located far enough from the border that it has avoided much of the warfare that has plagued the Inner Sphere for centuries. 
+
+The majority of the population is located on the continent of Worrsetgard, which also contains the capital city of New  Prague. Carlisle was originally settled by German and Slovak colonists.</desc>
 	</planet>
 	<planet>
 		<name>Carmacks</name>
@@ -5434,13 +5450,15 @@ Recently, a large island in the eastern basin has been taken over for secret tes
 		<satellite>Gododin</satellite>
 		<satellite>Nannius</satellite>
 		<satellite>Tennyson</satellite>
+		<landMass>Gawain (Caerleon)</landMass>
 		<landMass>Bedivere</landMass>
 		<landMass>Gareth</landMass>
-		<landMass>Gawain</landMass>
 		<landMass>Tristam</landMass>
 		<landMass>Mordred</landMass>
 		<socioIndustrial>B-B-C-B-C</socioIndustrial>
-		<desc>No description available.</desc>
+		<desc>Cavanaugh II has a warm climate with fertile soil and as a result the planet is known for its agriculture. 
+
+Cavanaugh II was settled by a mixture of English, Welsh and Scottish colonists.</desc>
 	</planet>
 	<planet>
 		<name>Cebalrai</name>
@@ -6974,10 +6992,10 @@ Recently, a large island in the eastern basin has been taken over for secret tes
 		<lifeForm>4</lifeForm>
 		<satellite>Luqman</satellite>
 		<satellite>Jibril</satellite>
+		<landMass>Mellesse (Khadijah)</landMass>
 		<landMass>Maysun</landMass>
-		<landMass>Mellesse</landMass>
 		<socioIndustrial>C-D-C-C-D</socioIndustrial>
-		<desc>No description available.</desc>
+		<desc>Dar-es-Salaam (“Heaven of Peace”) is planet almost entirely covered in desert. The planet was passed over for colonization until the 25th Century when it attracted settlers from the Middle East and Northern Africa.</desc>
 	</planet>
 	<planet>
 		<name>Darius</name>
@@ -9399,10 +9417,10 @@ For much of its early history El Dorado was known for its JumShip yards. This en
 		<nadirCharge>true</nadirCharge>
 		<hpg>B</hpg>
 		<lifeForm>7</lifeForm>
+		<landMass>Wilda (Telesian)</landMass>
 		<landMass>Dereka</landMass>
-		<landMass>Wilda</landMass>
 		<socioIndustrial>A-A-B-A-C</socioIndustrial>
-		<desc>No description available.</desc>
+		<desc>Due to large concentrations natural resources Furillo quickly became one of the most successful colonies in its region of space. Furillo is home to a Defiance Industries BattleMech factory and several other heavy industries.</desc>
 	</planet>
 	<planet>
 		<name>Furud</name>
@@ -13269,11 +13287,13 @@ For much of its early history El Dorado was known for its JumShip yards. This en
 		<hpg>B</hpg>
 		<lifeForm>7</lifeForm>
 		<satellite>Grobrot</satellite>
-		<landMass>Regenwald</landMass>
+		<landMass>Regenwald (Stuttgart)</landMass>
 		<landMass>Eingeschneit</landMass>
 		<landMass>Kuhlschrank</landMass>
 		<socioIndustrial>C-D-C-B-A</socioIndustrial>
-		<desc>No description available.</desc>
+		<desc>Kaumberg is a temperate planet covered in thick forests and as such, timber makes up the primary industry and export.
+		
+Kaumberg was primarily settled by colonists hailing from Germany and Austria.</desc>
 	</planet>
 	<planet>
 		<name>Kaus Australis</name>
@@ -20607,13 +20627,15 @@ Outreach is the primary hiring location for the mercenary trade from the 3030s a
 		<hpg>B</hpg>
 		<lifeForm>5</lifeForm>
 		<satellite>Sjure</satellite>
-		<landMass>Tammerfors</landMass>
+		<landMass>Tammerfors (Bangor Heights)</landMass>
 		<landMass>Bergenswald</landMass>
 		<landMass>Brusselsia</landMass>
 		<landMass>Goteborg</landMass>
 		<landMass>Mermannisk</landMass>
 		<socioIndustrial>D-C-D-C-C</socioIndustrial>
-		<desc>No description available.</desc>
+		<desc>A small, resource poor planet, Poulsbo is covered in oceans that are stirred by the large moon Sjure and was only settled to act as a staging base for the Lyran Commonwealth to launch raids against the Free Worlds League. Peace during the Star League era sent Poulsbo into a depression and the planet only recovered when the Succession Wars started up and it was again important to the Commonwealth. As a result the populace  distrusts the Lyran government. 
+
+Settlers of Poulsbo are primarily of German and Scandanavian descent.</desc>
 	</planet>
 	<planet>
 		<name>Poznan</name>
@@ -25822,10 +25844,10 @@ As the capital of the Lyran Commonwealth, Thakard is home to many vital parts of
 		<percentWater>63</percentWater>
 		<hpg>B</hpg>
 		<lifeForm>2</lifeForm>
+		<landMass>Saharius (Greene)</landMass>
 		<landMass>Hades</landMass>
-		<landMass>Saharius</landMass>
 		<socioIndustrial>C-C-B-C-D</socioIndustrial>
-		<desc>No description available.</desc>
+		<desc>Over its history, Timbuktu's position on the Periphery border has resulted in it being the target of numerous pirate raids. Timbuktu is located relatively close to its sun and as a result most of the planet is covered in badlands and desert. The planet can barely grow enough agriculture to sustain its population and is overall a resource poor world. The only raw materials that can be found are located in the volcanic southern continent of Hades. The planets capital, Greene, is located on the northern super-continent Saharius. Saharius is covered in a mix of grasslands and desert wastes.</desc>
 	</planet>
 	<planet>
 		<name>Timehri</name>
