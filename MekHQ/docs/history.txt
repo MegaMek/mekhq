@@ -14,6 +14,7 @@ v0.1.16 (SVN)
 + Bug: 3489734 - InSupply check being performed during salvage operations.
 + changes to make meklabpanel more generalizable
 + Bug 3495174: Map NPEs
++ Bug 3493304: Unable to resolve scenarios (WIP)
 
 v0.1.15 (2012-02-11)
 + Bug 3486200: Previous version campaigns do not save...
