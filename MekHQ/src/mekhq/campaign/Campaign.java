@@ -2131,8 +2131,10 @@ public class Campaign implements Serializable {
 				retVal.removeKill(k);
 			}
 		}
-		private static void fixIdReferencesB(Campaign retVal) {
-			for(Unit u : retVal.units) {
+	}
+	
+	private static void fixIdReferencesB(Campaign retVal) {
+		for(Unit u : retVal.units) {
 			Entity en = u.getEntity();
 			UUID id = u.getId();
 			en.setExternalIdAsString(id.toString());
