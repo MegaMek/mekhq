@@ -98,6 +98,9 @@ public class CampaignOptions implements Serializable {
     private int idleXP;
     private int targetIdleXP;
     private int monthsIdleXP;
+
+    //Dragoon's Rating
+    private DragoonsRatingMethod dragoonsRatingMethod;
     
     //random portraits related
     private boolean[] usePortraitForType;
@@ -148,6 +151,15 @@ public class CampaignOptions implements Serializable {
         idleXP = 0;
         targetIdleXP = 10;
         monthsIdleXP = 2;
+        dragoonsRatingMethod = DragoonsRatingMethod.TAHARQA;
+    }
+
+    public DragoonsRatingMethod getDragoonsRatingMethod() {
+        return dragoonsRatingMethod;
+    }
+
+    public void setDragoonsRatingMethod(DragoonsRatingMethod method) {
+        this.dragoonsRatingMethod = method;
     }
 
     public static String getRepairSystemName (int repairSystem) {
@@ -508,7 +520,8 @@ public class CampaignOptions implements Serializable {
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "clanPriceModifier", clanPriceModifier); //private double clanPriceModifier;
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useFactionForNames", useFactionForNames); //private boolean useFinances;
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "repairSystem", repairSystem); //private int repairSystem;
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useDragoonRating", useDragoonRating); 
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useDragoonRating", useDragoonRating);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "dragoonsRatingMethod", dragoonsRatingMethod.getDescription());
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useEraMods", useEraMods); 
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useTactics", useTactics);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useInitBonus", useInitBonus);
@@ -725,6 +738,11 @@ public class CampaignOptions implements Serializable {
 					retVal.useDragoonRating = true;
 				else
 					retVal.useDragoonRating = false;
+            } else if (wn2.getNodeName().equalsIgnoreCase("dragoonsRatingMethod")) {
+                if (!wn2.getTextContent().isEmpty() && (wn2.getTextContent() != null)) {
+                    DragoonsRatingMethod method = DragoonsRatingMethod.getDragoonsRatingMethod(wn2.getTextContent());
+                    retVal.setDragoonsRatingMethod((method != null) ? method : DragoonsRatingMethod.TAHARQA);
+                }
 			} else if (wn2.getNodeName().equalsIgnoreCase("usePortraitForType")) {
 			 	String[] values = wn2.getTextContent().split(",");
 				for(int i = 0; i < values.length; i++) {
@@ -740,4 +758,37 @@ public class CampaignOptions implements Serializable {
 
 		return retVal;
 	}
+
+    public enum DragoonsRatingMethod {
+        TAHARQA("Taharqa"),
+        FLD_MAN_MERCS_REV("FM: Mercenaries (rev)");
+
+        private String description;
+
+        DragoonsRatingMethod(String description) {
+            this.description = description;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public static String[] getDragoonsRatingMethodNames() {
+            String[] methods = new String[values().length];
+            for (int i = -0; i < values().length; i++) {
+                methods[i] = values()[i].getDescription();
+            }
+            return methods;
+        }
+
+        public static DragoonsRatingMethod getDragoonsRatingMethod(String description) {
+            for (DragoonsRatingMethod m : values()) {
+                if (m.getDescription().equalsIgnoreCase(description)) {
+                    return m;
+                }
+            }
+            return null;
+        }
+
+    }
 }

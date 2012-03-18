@@ -6,17 +6,7 @@
 
 package mekhq.gui.dialog;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Frame;
-import java.awt.Graphics2D;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Image;
-import java.awt.Insets;
+import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.image.BufferedImage;
@@ -32,25 +22,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.ResourceBundle;
 
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.ImageIcon;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JFormattedTextField;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSpinner;
-import javax.swing.JTable;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.JViewport;
-import javax.swing.ListSelectionModel;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingConstants;
-import javax.swing.UIManager;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -127,6 +99,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         useFactionModifiersCheckBox.setSelected(options.useFactionModifiers());
         useEraModsCheckBox.setSelected(options.useEraMods());
         useDragoonRatingCheckBox.setSelected(options.useDragoonRating());
+        dragoonsRatingMethodCombo.setSelectedItem(options.getDragoonsRatingMethod().getDescription());
         clanPriceModifierJFormattedTextField.setValue(options.getClanPriceModifier());
         usedPartsValueJFormattedTextField.setValue(options.getUsedPartsValue());
         damagedPartsValueJFormattedTextField.setValue(options.getDamagedPartsValue());
@@ -196,6 +169,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         useFactionModifiersCheckBox = new javax.swing.JCheckBox();
         useEraModsCheckBox = new javax.swing.JCheckBox();
         useDragoonRatingCheckBox = new javax.swing.JCheckBox();
+        dragoonsRatingMethodCombo = new javax.swing.JComboBox(CampaignOptions.DragoonsRatingMethod.getDragoonsRatingMethodNames());
         javax.swing.JLabel clanPriceModifierLabel = new javax.swing.JLabel();
         javax.swing.JLabel usedPartsValueLabel = new javax.swing.JLabel();
         javax.swing.JLabel damagedPartsValueLabel = new javax.swing.JLabel();
@@ -328,16 +302,29 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panGeneral.add(comboFaction, gridBagConstraints);
 
+        JPanel dragoonsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 1, 1));
+        
         useDragoonRatingCheckBox.setText(resourceMap.getString("useDragoonRatingCheckBox.text")); // NOI18N
         useDragoonRatingCheckBox.setName("useDragoonRatingCheckBox"); // NOI18N
+        dragoonsPanel.add(useDragoonRatingCheckBox);
+
+        dragoonsPanel.add(Box.createHorizontalStrut(10));
+
+        JLabel dragoonsMethodLabel = new JLabel("Dragoons Rating Method:");
+        dragoonsMethodLabel.setName("dragoonsMethodLabel");
+        dragoonsPanel.add(dragoonsMethodLabel);
+
+        dragoonsRatingMethodCombo.setName("dragoonsRatingMethodCombo");
+        dragoonsPanel.add(dragoonsRatingMethodCombo);
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panGeneral.add(useDragoonRatingCheckBox, gridBagConstraints);
-        
+        panGeneral.add(dragoonsPanel, gridBagConstraints);
+
         btnCamo.setMaximumSize(new java.awt.Dimension(84, 72));
         btnCamo.setMinimumSize(new java.awt.Dimension(84, 72));
         btnCamo.setName("btnCamo"); // NOI18N
@@ -349,7 +336,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panGeneral.add(btnCamo, gridBagConstraints);
 
@@ -357,7 +344,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         lblCamo.setName("lblCamo"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panGeneral.add(lblCamo, gridBagConstraints);
 
@@ -1730,6 +1717,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 	    options.setUsedPartsValue(new Double(usedPartsValueJFormattedTextField.getText()));
 	    options.setDamagedPartsValue(new Double(damagedPartsValueJFormattedTextField.getText()));
 	    options.setDragoonRating(useDragoonRatingCheckBox.isSelected());
+        options.setDragoonsRatingMethod(CampaignOptions.DragoonsRatingMethod.getDragoonsRatingMethod((String)dragoonsRatingMethodCombo.getSelectedItem()));
 	    options.setFactionForNames(useFactionForNamesBox.isSelected());
 	    options.setTactics(useTacticsBox.isSelected());
 	    if(useTacticsBox.isSelected()) {
@@ -2135,6 +2123,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private javax.swing.JCheckBox useFactionModifiersCheckBox;
     private javax.swing.JCheckBox useEraModsCheckBox;
     private javax.swing.JCheckBox useDragoonRatingCheckBox;
+    private javax.swing.JComboBox dragoonsRatingMethodCombo;
     private javax.swing.JCheckBox useFactionForNamesBox;
     private javax.swing.JCheckBox useTacticsBox;
     private javax.swing.JCheckBox useInitBonusBox;

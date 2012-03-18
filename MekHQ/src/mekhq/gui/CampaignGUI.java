@@ -38,6 +38,7 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
@@ -192,6 +193,7 @@ import mekhq.gui.dialog.CustomizeMissionDialog;
 import mekhq.gui.dialog.CustomizePersonDialog;
 import mekhq.gui.dialog.CustomizeScenarioDialog;
 import mekhq.gui.dialog.DataLoadingDialog;
+import mekhq.gui.dialog.DragoonsRatingDialog;
 import mekhq.gui.dialog.EditLogEntryDialog;
 import mekhq.gui.dialog.EditPersonnelLogDialog;
 import mekhq.gui.dialog.EditTransactionDialog;
@@ -308,6 +310,7 @@ public class CampaignGUI extends JPanel {
 	private TableRowSorter<ServicedUnitTableModel> servicedUnitSorter;
 	private TableRowSorter<TechTableModel> techSorter;
 	private TableRowSorter<TechTableModel> whTechSorter;
+    private DragoonsRatingDialog dragoonDialog = null;
 	private UUID currentPatientId;
 	private UUID currentDoctorId;
 		
@@ -3608,8 +3611,43 @@ public class CampaignGUI extends JPanel {
 	
 	protected void refreshRating() {
 		if(getCampaign().getCampaignOptions().useDragoonRating()) {
+            if (dragoonDialog != null && dragoonDialog.isVisible())
+                dragoonDialog.setVisible(false);
+            dragoonDialog = null;
 			String text = "<html><b>Dragoons Rating:</b> " + getCampaign().getDragoonRating() + "</html>";
 			lblRating.setText(text);
+            lblRating.addMouseListener(new MouseListener() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    //Right-click only.
+                    if (SwingUtilities.isRightMouseButton(e)) {
+                        if (dragoonDialog == null) {
+                            dragoonDialog = new DragoonsRatingDialog(getFrame(), false, getCampaign());
+                        }
+                        dragoonDialog.setVisible(true);
+                    }
+                }
+
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    //not used
+                }
+
+                @Override
+                public void mouseReleased(MouseEvent e) {
+                    //not used
+                }
+
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                    //not used
+                }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    //not used
+                }
+            });
 		} else {
 			lblRating.setText("");
 		}
