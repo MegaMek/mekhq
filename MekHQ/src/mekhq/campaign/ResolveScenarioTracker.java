@@ -654,6 +654,8 @@ public class ResolveScenarioTracker {
 			campaign.addUnit(salvageUnit.getEntity(), false);
 			//if this is a contract, add to th salvaged value
 			if(getMission() instanceof Contract) {
+				salvageUnit.initializeParts(false);
+				salvageUnit.runDiagnostic();
 				((Contract)getMission()).addSalvageByUnit(salvageUnit.getSellValue());
 			}
 		}
@@ -663,6 +665,7 @@ public class ResolveScenarioTracker {
 				long value = 0;
 				for(Entity en : potentialSalvage) {
 					Unit salvageUnit= new Unit(en, campaign);
+					salvageUnit.initializeParts(false);
 					salvageUnit.runDiagnostic();
 					value += salvageUnit.getSellValue();
 				}
@@ -672,6 +675,8 @@ public class ResolveScenarioTracker {
 				campaign.addReport(formatter.format(value) + " C-Bills have been credited to your account for salvage exchange.");
 			} else {
 				for(Unit salvageUnit : leftoverSalvage) {
+					salvageUnit.initializeParts(false);
+					salvageUnit.runDiagnostic();
 					((Contract)getMission()).addSalvageByEmployer(salvageUnit.getSellValue());
 				}
 			}
