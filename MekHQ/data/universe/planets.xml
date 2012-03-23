@@ -10307,6 +10307,14 @@ For much of its early history El Dorado was known for its JumShip yards. This en
 		<xcood>46.42</xcood>
 		<ycood>-301.48</ycood>
 		<faction>CC</faction>
+		<zenithCharge>True</zenithCharge>
+		<lifeForm>5</lifeForm>
+		<spectralClass>G</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>4</sysPos>
+		<hpg>B</hpg>
+		<desc>Grand Base is the personal holding of the Duke of Thomas in perpetuity. It is a major military staging, training and repair facility for the Confederation. Grand Base has traditionally been one of the Confederation's largest ‘Mech production facilities, right behind Tikonov. At all times it is garrisoned by two Sian Commonality reserve units, one Warrior House regiment, and supported by local militia, aerospace fighter and naval support units. Additionally, it is home-base of the elite Death Commandos.</desc>
 	</planet>
 	<planet>
 		<name>Granera</name>
@@ -16814,6 +16822,13 @@ Most of the population lives in small cities dotting the 4 continents.  There ar
 		<xcood>91.54</xcood>
 		<ycood>-333.82</ycood>
 		<faction>CC</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>9</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>4</sysPos>
+		<hpg>B</hpg>
+		<lifeForm>7</lifeForm>
+		<desc>As of 3025 Menke is the perpetual holding of the McCarron family and the planet serves as the home base of McCarron's Armored Cavalry. Menke is part of the Duchy of Mitchel in the Capellan Confederation. Menke is a sunny, tropical planet and boasts a large civilian population that serves as a recruitment pool for the Cavalry. Menke has extensive ‘Mech repair facilities and one of the greatest concentrations of trained techs in the Confederation. The planet's southern hemisphere hosts a jungle warfare training center. One or more of the Armored Cavalry regiments are on planet at any specific time making the planet an uninviting target.</desc>
 	</planet>
 	<planet>
 		<name>Menkent</name>
@@ -17323,6 +17338,22 @@ Most of the population lives in small cities dotting the 4 continents.  There ar
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>0.92</gravity>
+		<nadirCharge>True</nadirCharge>
+		<lifeForm>7</lifeForm>
+		<climate>5</climate>
+		<percentWater>84</percentWater>
+		<temperature>52</temperature>
+		<spectralClass>A</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>6</sysPos>
+		<landMass>(New Venice Beach)</landMass>
+		<hpg>B</hpg>
+		<desc>Mizar is an exceptionally unique planet: it orbits a rare double binary and the four small A class suns constantly bake the planet. Mizar is kept liveable due to large bodies of water and being the planet furthest from the stars in the system.
+
+Mizar has been a resort planet of some renown since before the time of the Star League. As a result the populace takes a deep pride (and spends quite a bit of money) in keeping the planet beautiful.</desc>
 	</planet>
 	<planet>
 		<name>Mizunami</name>
@@ -18385,7 +18416,9 @@ The terrain surrounding Avalon City is a mixture of forests, mountains, plains a
 		<landmass>Kalasaka</landmass>
 		<landmass>Koshimatu</landmass>
 		<landmass>Zuishami</landmass>
-		<desc>No description available.</desc>
+		<desc>New Kyoto is a temperate planet with a wide range of native life. Unfortunately for early colonists the native life was extremely resistant to imported species, with most imported wildlife and fauna either being killed off by native creatures or dying of native diseases. However, colonists were eventually able to overcome these issues and successfully introduced foreign species. There is still a ban for the export of any wildlife or fauna from New Kyoto.
+
+Kyoto has an extensiveindustrial presence with many factories and other industries springing up along the coasts of the planet’s four continents. The planet boasts several spaceports in order to support exporting goods from the many factories to other planets in Lyran Commonwealth as well as trade with the Free Worlds League.</desc>
 	</planet>
 	<planet>
 		<name>New Macao</name>
@@ -20766,6 +20799,14 @@ Settlers of Poulsbo are primarily of German and Scandanavian descent.</desc>
 		<xcood>0</xcood>
 		<ycood>-360.95</ycood>
 		<faction>CC</faction>
+		<spectralClass>F</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>4</sysPos>
+		<zenithCharge>true</zenithCharge>
+		<hpg>B</hpg>
+		<lifeForm>4</lifeForm>
+		<desc>As of 3025 - Due to numerous raids on Sian, the Capellan judicial system was transplanted to Principia after the Third Succession War. This includes the special judicial branches that adjudicate contractual dealings with mercenary units in Capellan service. Principia has a warm, temperate climate that annually draws numerous noble families to their "home away from home". Principia has at least one reserve unit and/or mercenary regiment stationed on planet at all times.</desc>
 	</planet>
 	<planet>
 		<name>Princton</name>
@@ -22069,6 +22110,20 @@ The location of Proserpina on the Federated Suns border requires the DCMS to kee
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.04</gravity>
+		<zenithCharge>True</zenithCharge>
+		<lifeForm>0</lifeForm>
+		<climate>4</climate>
+		<percentWater>23</percentWater>
+		<temperature>20</temperature>
+		<spectralClass>F</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>3</sysPos>
+		<landMass>(Heaven’s Gate)</landMass>
+		<hpg>B</hpg>
+		<desc>Ryde is a harsh and nearly unlivable planet due to regular earthquakes and volcanic eruptions. While Ryde has three oceans, they are full of sulfur and heavy metals making them useless without purification. However, hardy settlers have developed Ryde into a sustainable place to life, with the establishment of Heaven’s Gate. The settlements on Ryde are able to easily feed themselves by farming in the extremely fertile volcanic soil. The population also makes use of the easy to access geothermal energy for cheap electricity.</desc>
 	</planet>
 	<planet>
 		<name>Ryerson</name>
@@ -23474,6 +23529,13 @@ Sian has been the capital of the Capellan Confederation since 2368 when Capella 
 		<xcood>6.52</xcood>
 		<ycood>-317.65</ycood>
 		<faction>CC</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>9</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>4</sysPos>
+		<hpg>B</hpg>
+		<lifeForm>7</lifeForm>
+		<desc>Sigma Mare is a small, cold and inhospitable world that has been the center for geophysical/terraforming research for centuries. During this time Capellan leaders have often visited Sigma Mare, pronounced its impressive potential and then left without actually developing the planet further. In more recent years the locals have shown little interest in galactic politics after years of neglect. Horse breeding is a major industry on Sigma Mare, but on a smaller scale than on Turin.</desc>
 	</planet>
 	<planet>
 		<name>Sigurd</name>
@@ -26564,6 +26626,22 @@ The local population has long resented the Lyran Commonwealth for what they beli
 		<xcood>21.39</xcood>
 		<ycood>-371.12</ycood>
 		<faction>CC</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>5</sysPos>
+		<hpg>B</hpg>
+		<lifeForm>5</lifeForm>
+		<pressure>3</pressure>
+		<gravity>1.02</gravity>
+		<climate>4</climate>
+		<zenithCharge>true</zenithCharge>
+		<percentWater>23</percentWater>
+		<temperature>32</temperature>
+		<satellite>Shroud</satellite>
+		<landMass>Turin (Porter)</landMass>
+		<socioIndustrial>C-D-C-D-A</socioIndustrial>
+		<desc>3025 - Turin has almost endless grassy plains that provide excellent cattle pastures. The Turin colonists discovered that Terran cows could be crossbred with a Turin native animal to create a hybrid that is meatier and better tasting. However, the milk of these hybrids is indigestible to humans, so Turin's few dairies specialise in cow's and goat's milk and cheese. Turin is also famous for horse breeding, rivaling the Eridani blood lines.</desc>
 	</planet>
 	<planet>
 		<name>Turinge</name>
@@ -27299,6 +27377,29 @@ The system also later gained value when the uninhabited planet, Jonah’s Reach,
 		<xcood>93.63</xcood>
 		<ycood>-351.04</ycood>
 		<faction>CC</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>7</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>2</sysPos>
+		<lifeForm>2</lifeForm>
+		<hpg>B</hpg>
+		<pressure>2</pressure>
+		<gravity>1</gravity>
+		<zenithCharge>True</zenithCharge>
+		<climate>2</climate>
+		<percentWater>9</percentWater>
+		<temperature>2</temperature>
+		<socioIndustrial>A-A-C-B-D</socioIndustrial>
+		<satellite>Jocelyn</satellite>
+		<satellite>Jennifer</satellite>
+		<satellite>Astrid</satellite>
+		<satellite>Lissete</satellite>
+		<landMass>Victoria (Barns)</landMass>
+		<desc>Victoria's severe weather conditions, including almost-daily hailstorms, have resulted in underground dwellings with strict building codes. Victoria has developed a beautiful array of domed parks to satisfy the population's desire for sunlight. These domed parks have become a tourist attraction, bringing visitors from across the Confederation.
+
+Victoria has a booming economy. Students that show an aptitude for engineering compete for entry to the famous Victoria Institute of Engineering. Graduates are in high demand and command large fees, a portion of which automatically go to the Victorian Exchequer.
+
+In the early 31st Century an underground Star League-era ‘Mech research facility was rediscovered..</desc>
 	</planet>
 	<planet>
 		<name>Victoria</name>
@@ -27620,6 +27721,24 @@ The system also later gained value when the uninhabited planet, Jonah’s Reach,
 		<xcood>72.76</xcood>
 		<ycood>-411.8</ycood>
 		<faction>CC</faction>
+		<spectralClass>F</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>6</sysPos>
+		<hpg>B</hpg>
+		<lifeForm>4</lifeForm>
+		<pressure>2</pressure>
+		<gravity>0.91</gravity>
+		<climate>4</climate>
+		<percentWater>89</percentWater>
+		<temperature>34</temperature>
+		<socioIndustrial>C-C-C-D-C</socioIndustrial>
+		<satellite>Courage</satellite>
+		<desc>Ward was settled during the early Exodus from Terra by Utopians as an experimental community based on the principles of harmony and co-operative activity. Although the First Ward Constitution was scrapped in 2644 and replaced with a constitution that favoured free trade and greater military activity, the original Utopian principles have survived to through the Succession Wars to a surprising degree. The First Ward Constitution remains one of the most widely studied Exodus-era historical documents. 
+
+The populace of Ward is well known for their skilled construction work and their construction firms take a large number of contracts offworld to construct roads through the most difficult terrain of neighbouring star systems. Wardian road construction methods use a material that far exceeds all other known road construction materials in terms of resisting weather, temperature, and stress. This formula is one of the most closely guarded industrial secrets in the Inner Sphere.
+
+Ward's northern polar cap is the site of a Confederation observation-intelligence post.</desc>
 	</planet>
 	<planet>
 		<name>Wark</name>
@@ -28421,6 +28540,13 @@ The system also later gained value when the uninhabited planet, Jonah’s Reach,
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<lifeForm>7</lifeForm>
+		<spectralClass>F</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>III</luminosity>
+		<sysPos>5</sysPos>
+		<hpg>B</hpg>
+		<desc>Yed Prior is a temperate planet with a wide range of climates and cultures. The planet is home to the well-known Mitchellson University of Arts and Crafts.</desc>
 	</planet>
 	<planet>
 		<name>Yeguas</name>

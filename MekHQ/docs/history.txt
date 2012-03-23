@@ -10,17 +10,19 @@ v0.1.16 (SVN)
 + show needed parts in MekLab
 + separate Part#issamePartTypeAndStatus int Part#isSamePartType and Part$isSameStatus
 + new infirmary layout
-+ Bug: NPE when aquiring armor in the Repairs tab.
++ Bug: NPE when acquiring armor in the Repairs tab.
 + Bug: 3489734 - InSupply check being performed during salvage operations.
 + changes to make meklabpanel more generalizable
 + Bug 3495174: Map NPEs
-+ Bug 3493304: Unable to resolve scenarios (WIP)
++ Bug 3493304: Unable to resolve scenarios
 + Broke out the Dragoons rating code to better handle support of multiple calculation methods.
 +    Took the original Dragoons rating code written by Taharqa and moved into the TaharqaDragoonsRating class.
 +    Created the FieldManualMercRevDragoonsRating class to try to emulate the method described in FM: Mercenaries (rev).
 +    Created a new Campaign Option, "Dragoons Rating Method" that allows the user to select which method for calculating the Dragoons Rating that they prefer.
-+    Created the Dragoons Raiting Dialog to display a breakdown of how the Dragoons Rating was calculated.  This is accessed by right-clicking the Dragoons
++    Created the Dragoons Rating Dialog to display a breakdown of how the Dragoons Rating was calculated.  This is accessed by right-clicking the Dragoons
 +      Rating Score in the main panel.
++ Bug 3507911: Salvage Tracking - applied patch 3509166
++ Planetary data & faction additions round 9 (WIP)
 
 v0.1.15 (2012-02-11)
 + Bug 3486200: Previous version campaigns do not save...

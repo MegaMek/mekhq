@@ -34,7 +34,7 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 	<!-- Major Inner Sphere Factions -->
 	<faction>
 		<shortname>ABN</shortname>
-		<fullname>Abadoned</fullname>
+		<fullname>Abandoned</fullname>
 		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>0,0,0</colorRGB>
@@ -653,7 +653,7 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 	<faction>
 		<shortname>MH</shortname>
 		<fullname>Marian Hegemony</fullname>
-		<startingPlanet>Alphard (Independent),Alphard (Independent),Alphard (Independent),Alphard (Independent),Alphard (Independent),Alphard (Independent),Alphard (Independent),Alphard (Independent),Alphard (Independent)</startingPlanet>
+		<startingPlanet>Alphard (Periphery),Alphard (Periphery),Alphard (Periphery),Alphard (Periphery),Alphard (Periphery),Alphard (Periphery),Alphard (Periphery),Alphard (Periphery),Alphard (Periphery)</startingPlanet>
 		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>236,136,65</colorRGB>
