@@ -272,7 +272,10 @@ public abstract class AbstractDragoonsRating implements IDragoonsRating {
             BigDecimal transportNeeded = new BigDecimal(numberWithoutTransport);
 
             //Find the percentage of units that are transported.
-            transportPercent = BigDecimal.ONE.subtract(transportNeeded.divide(numberUnits, PRECISION, HALF_EVEN)).multiply(new BigDecimal(100));
+            if (getNumberUnits().compareTo(BigDecimal.ZERO) == 0) {
+                return BigDecimal.ZERO;
+            }
+            transportPercent = BigDecimal.ONE.subtract(transportNeeded.divide(getNumberUnits(), PRECISION, HALF_EVEN)).multiply(new BigDecimal(100));
         }
 
         return transportPercent;

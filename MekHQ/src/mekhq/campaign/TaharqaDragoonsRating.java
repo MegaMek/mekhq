@@ -189,6 +189,9 @@ public class TaharqaDragoonsRating extends AbstractDragoonsRating {
 
     @Override
     public int getExperienceValue() {
+        if (getNumberUnits().compareTo(BigDecimal.ZERO) == 0) {
+            return 0;
+        }
         BigDecimal averageExperience = getTotalSkillLevels().divide(getNumberUnits(), PRECISION, HALF_EVEN);
         if (averageExperience.compareTo(new BigDecimal("5.5")) >= 1) {
             return 5;
@@ -304,7 +307,10 @@ public class TaharqaDragoonsRating extends AbstractDragoonsRating {
         supportNeeds = supportNeeds.add(getUnsupportedVee());
 
         //Calculate the percentage of units that are supported.
-        BigDecimal unsupportedPct = supportNeeds.divide(getNumberUnits(), PRECISION, HALF_EVEN);
+        BigDecimal unsupportedPct = BigDecimal.ZERO;
+        if (getNumberUnits().compareTo(BigDecimal.ZERO) != 0) {
+            unsupportedPct = supportNeeds.divide(getNumberUnits(), PRECISION, HALF_EVEN);
+        }
         supportPercent = BigDecimal.ONE.subtract(unsupportedPct);
         if (supportPercent.compareTo(BigDecimal.ONE) > 0)
             supportPercent = BigDecimal.ONE;

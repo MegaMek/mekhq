@@ -23,6 +23,7 @@ v0.1.16 (SVN)
 +      Rating Score in the main panel.
 + Bug 3507911: Salvage Tracking - applied patch 3509166
 + Planetary data & faction additions round 9 (WIP)
++ Fix of potential Divide By Zero errors.
 
 v0.1.15 (2012-02-11)
 + Bug 3486200: Previous version campaigns do not save...
