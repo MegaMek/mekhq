@@ -206,7 +206,10 @@ public abstract class AbstractDragoonsRating implements IDragoonsRating {
 
     @Override
     public int getTechValue() {
-        highTechPercent = numberIS2.add(numberClan.multiply(new BigDecimal(2))).divide(numberUnits, PRECISION, HALF_EVEN);
+        if (getNumberUnits().compareTo(BigDecimal.ZERO) == 0) {
+            return 0;
+        }
+        highTechPercent = numberIS2.add(numberClan.multiply(new BigDecimal(2))).divide(getNumberUnits(), PRECISION, HALF_EVEN);
         highTechPercent = highTechPercent.multiply(new BigDecimal(100));
 
         BigDecimal scoredPercent = highTechPercent.subtract(new BigDecimal(30));
