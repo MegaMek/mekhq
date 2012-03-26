@@ -30,6 +30,7 @@ import java.awt.FlowLayout;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.MenuItem;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
@@ -56,6 +57,8 @@ import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
@@ -122,6 +125,7 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
+import megamek.MegaMek;
 import megamek.client.ui.swing.MechTileset;
 import megamek.client.ui.swing.MechView;
 import megamek.client.ui.swing.util.PlayerColors;
@@ -152,6 +156,7 @@ import megamek.common.XMLStreamParser;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.IOption;
+import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.DirectoryItems;
 import megameklab.com.util.UnitPrintManager;
@@ -206,6 +211,7 @@ import mekhq.gui.dialog.NewRecruitDialog;
 import mekhq.gui.dialog.PartsStoreDialog;
 import mekhq.gui.dialog.PopupValueChoiceDialog;
 import mekhq.gui.dialog.PortraitChoiceDialog;
+import mekhq.gui.dialog.QuirksDialog;
 import mekhq.gui.dialog.ResolveScenarioWizardDialog;
 import mekhq.gui.dialog.ChooseMulFilesDialog;
 import mekhq.gui.dialog.TextAreaDialog;
@@ -224,12 +230,12 @@ import chat.ChatClient;
  * The application's main frame.
  */
 public class CampaignGUI extends JPanel {
-	
+
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -687162569841072579L;
-	
+
 	//personnel filter groups
 	private static final int PG_ACTIVE =  0;
 	private static final int PG_COMBAT =  1;
@@ -247,7 +253,7 @@ public class CampaignGUI extends JPanel {
 	private static final int PG_MIA =     13;
 	private static final int PG_KIA =     14;
 	private static final int PG_NUM =     15;
-	
+
 	//parts filter groups
 	private static final int SG_ALL      = 0;
 	private static final int SG_ARMOR    = 1;
@@ -262,7 +268,7 @@ public class CampaignGUI extends JPanel {
 	private static final int SG_ACT      = 10;
 	private static final int SG_DAMAGE   = 11;
 	private static final int SG_NUM      = 12;
-	
+
 	//personnel views
 	private static final int PV_GENERAL = 0;
 	private static final int PV_PILOT   = 1;
@@ -272,7 +278,7 @@ public class CampaignGUI extends JPanel {
 	private static final int PV_ADMIN   = 5;
 	private static final int PV_FLUFF   = 6;
 	private static final int PV_NUM     = 7;
-	
+
 	//unit views
 	private static final int UV_GENERAL = 0;
 	private static final int UV_DETAILS = 1;
@@ -280,9 +286,9 @@ public class CampaignGUI extends JPanel {
 	private static final int UV_NUM     = 3;
 
 	private JFrame frame;
-	
+
 	private MekHQ app;
-	
+
 	private TaskTableModel taskModel = new TaskTableModel();
 	private AcquisitionTableModel acquireModel = new AcquisitionTableModel();
 	private ServicedUnitTableModel servicedUnitModel = new ServicedUnitTableModel();
@@ -313,11 +319,11 @@ public class CampaignGUI extends JPanel {
     private DragoonsRatingDialog dragoonDialog = null;
 	private UUID currentPatientId;
 	private UUID currentDoctorId;
-		
+
 	public int selectedMission = -1;
-	
+
 	public CampaignGUI(MekHQ app) {
-		
+
 		this.app = app;
 
 		unitMouseAdapter = new UnitTableMouseAdapter();
@@ -328,7 +334,7 @@ public class CampaignGUI extends JPanel {
 		orgMouseAdapter = new OrgTreeMouseAdapter();
 		scenarioMouseAdapter = new ScenarioTableMouseAdapter();
         financeMouseAdapter = new FinanceTableMouseAdapter();
-       
+
 		initComponents();
 	}
 
@@ -350,7 +356,7 @@ public class CampaignGUI extends JPanel {
 
 		frame = new JFrame("MekHQ"); //$NON-NLS-1$
 		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		
+
 		mainPanel = new javax.swing.JPanel();
 		tabMain = new javax.swing.JTabbedPane();
 		tabTasks = new javax.swing.JTabbedPane();
@@ -481,16 +487,16 @@ public class CampaignGUI extends JPanel {
 		lblLocation = new javax.swing.JLabel();
 
         ArrayList <RowSorter.SortKey> sortKeys;
-		
+
 		ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI");
 		tabMain.setToolTipText(resourceMap.getString("tabMain.toolTipText")); // NOI18N
 		tabMain.setMinimumSize(new java.awt.Dimension(600, 200));
 		tabMain.setName("tabMain"); // NOI18N
 		tabMain.setPreferredSize(new java.awt.Dimension(900, 300));
-		
+
 		panOrganization.setName("panOrganization"); // NOI18N
 		panOrganization.setLayout(new java.awt.GridBagLayout());
-		
+
 		//refreshOrganization();
 		orgModel = new OrgTreeModel(getCampaign().getForces());
 		orgTree.setModel(orgModel);
@@ -507,12 +513,12 @@ public class CampaignGUI extends JPanel {
         orgTree.setDropMode(DropMode.ON);
         orgTree.setTransferHandler(new OrgTreeTransferHandler());
 		scrollOrgTree.setViewportView(orgTree);
-		
+
 		scrollForceView.setMinimumSize(new java.awt.Dimension(550, 600));
 		scrollForceView.setPreferredSize(new java.awt.Dimension(550, 600));
 		scrollForceView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollForceView.setViewportView(null);
-		
+
 		splitOrg = new javax.swing.JSplitPane(javax.swing.JSplitPane.HORIZONTAL_SPLIT,scrollOrgTree, scrollForceView);
 		splitOrg.setOneTouchExpandable(true);
 		splitOrg.setResizeWeight(1.0);
@@ -532,15 +538,15 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 1.0;
 		panOrganization.add(splitOrg, gridBagConstraints);
-		
-		
+
+
 		tabMain.addTab(
 				resourceMap.getString("panOrganization.TabConstraints.tabTitle"),
 				panOrganization); // NOI18N
-		
+
 		panBriefing.setName("panBriefing"); // NOI18N
 		panBriefing.setLayout(new java.awt.GridBagLayout());
-		
+
 		lblMission.setText(resourceMap.getString("lblMission.text")); // NOI18N
 		lblMission.setName("lblMission"); // NOI18N
 		gridBagConstraints = new java.awt.GridBagConstraints();
@@ -551,7 +557,7 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.weightx = 0.0;
 		gridBagConstraints.weighty = 0.0;
 		panBriefing.add(lblMission, gridBagConstraints);
-		
+
 		refreshMissions();
 		choiceMission.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -565,9 +571,9 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 0.0;
-		panBriefing.add(choiceMission, gridBagConstraints);	
-		
-		
+		panBriefing.add(choiceMission, gridBagConstraints);
+
+
 		panelMissionButtons.setLayout(new java.awt.GridLayout(2,3));
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 1;
@@ -576,8 +582,8 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 0.0;
-		panBriefing.add(panelMissionButtons, gridBagConstraints);	
-		
+		panBriefing.add(panelMissionButtons, gridBagConstraints);
+
 		btnAddMission.setText(resourceMap.getString("btnAddMission.text")); // NOI18N
 		btnAddMission.setToolTipText(resourceMap
 				.getString("btnAddMission.toolTipText")); // NOI18N
@@ -588,7 +594,7 @@ public class CampaignGUI extends JPanel {
 			}
 		});
 		panelMissionButtons.add(btnAddMission);
-		
+
 		btnAddScenario.setText(resourceMap.getString("btnAddScenario.text")); // NOI18N
 		btnAddScenario.setToolTipText(resourceMap
 				.getString("btnAddScenario.toolTipText")); // NOI18N
@@ -599,9 +605,9 @@ public class CampaignGUI extends JPanel {
 			}
 		});
 		panelMissionButtons.add(btnAddScenario);
-		
-		
-		
+
+
+
 		btnEditMission.setText(resourceMap.getString("btnEditMission.text")); // NOI18N
 		btnEditMission.setToolTipText(resourceMap
 				.getString("btnEditMission.toolTipText")); // NOI18N
@@ -612,7 +618,7 @@ public class CampaignGUI extends JPanel {
 			}
 		});
 		panelMissionButtons.add(btnEditMission);
-		
+
 		btnCompleteMission.setText(resourceMap.getString("btnCompleteMission.text")); // NOI18N
 		btnCompleteMission.setToolTipText(resourceMap
 				.getString("btnCompleteMission.toolTipText")); // NOI18N
@@ -623,7 +629,7 @@ public class CampaignGUI extends JPanel {
 			}
 		});
 		panelMissionButtons.add(btnCompleteMission);
-		
+
 		scrollMissionView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollMissionView.setViewportView(null);
 		gridBagConstraints = new java.awt.GridBagConstraints();
@@ -634,7 +640,7 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 1.0;
 		panBriefing.add(scrollMissionView, gridBagConstraints);
-		
+
 		scenarioTable.setModel(scenarioModel);
 		scenarioTable.setName("scenarioTable"); // NOI18N
 		scenarioTable.setShowGrid(false);
@@ -660,14 +666,14 @@ public class CampaignGUI extends JPanel {
 		scrollScenarioTable.setMinimumSize(new java.awt.Dimension(200, 200));
 		scrollScenarioTable.setPreferredSize(new java.awt.Dimension(200, 200));
         scrollScenarioTable.setViewportView(scenarioTable);
-		
+
 		splitMission = new javax.swing.JSplitPane(javax.swing.JSplitPane.VERTICAL_SPLIT, panBriefing, scrollScenarioTable);
 		splitMission.setOneTouchExpandable(true);
 		splitMission.setResizeWeight(1.0);
-		
+
 		panelScenario.setName("panelScenario"); // NOI18N
 		panelScenario.setLayout(new java.awt.GridBagLayout());
-		
+
 		panelScenarioButtons.setLayout(new java.awt.GridLayout(2,3));
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
@@ -677,7 +683,7 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 0.0;
 		panelScenario.add(panelScenarioButtons, gridBagConstraints);
-		
+
 		btnStartGame.setText(resourceMap.getString("btnStartGame.text")); // NOI18N
 		btnStartGame.setToolTipText(resourceMap
 				.getString("btnStartGame.toolTipText")); // NOI18N
@@ -689,7 +695,7 @@ public class CampaignGUI extends JPanel {
 		});
 		btnStartGame.setEnabled(false);
 		panelScenarioButtons.add(btnStartGame);
-		
+
 		btnLoadGame.setText(resourceMap.getString("btnLoadGame.text")); // NOI18N
 		btnLoadGame.setToolTipText(resourceMap
 				.getString("btnLoadGame.toolTipText")); // NOI18N
@@ -701,7 +707,7 @@ public class CampaignGUI extends JPanel {
 		});
 		btnLoadGame.setEnabled(false);
 		panelScenarioButtons.add(btnLoadGame);
-		
+
 		btnPrintRS.setText(resourceMap.getString("btnPrintRS.text")); // NOI18N
 		btnPrintRS.setToolTipText(resourceMap
 				.getString("btnPrintRS.toolTipText")); // NOI18N
@@ -713,7 +719,7 @@ public class CampaignGUI extends JPanel {
 		});
 		btnPrintRS.setEnabled(false);
 		panelScenarioButtons.add(btnPrintRS);
-		
+
 		btnGetMul.setText(resourceMap.getString("btnGetMul.text")); // NOI18N
 		btnGetMul.setToolTipText(resourceMap
 				.getString("btnGetMul.toolTipText")); // NOI18N
@@ -725,7 +731,7 @@ public class CampaignGUI extends JPanel {
 		});
 		btnGetMul.setEnabled(false);
 		panelScenarioButtons.add(btnGetMul);
-		
+
 		btnResolveScenario.setText(resourceMap.getString("btnResolveScenario.text")); // NOI18N
 		btnResolveScenario.setToolTipText(resourceMap
 				.getString("btnResolveScenario.toolTipText")); // NOI18N
@@ -734,10 +740,10 @@ public class CampaignGUI extends JPanel {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				resolveScenario();
 			}
-		});	
+		});
 		btnResolveScenario.setEnabled(false);
 		panelScenarioButtons.add(btnResolveScenario);
-		
+
 		btnClearAssignedUnits.setText(resourceMap.getString("btnClearAssignedUnits.text")); // NOI18N
 		btnClearAssignedUnits.setToolTipText(resourceMap
 				.getString("btnClearAssignedUnits.toolTipText")); // NOI18N
@@ -749,7 +755,7 @@ public class CampaignGUI extends JPanel {
 		});
 		btnClearAssignedUnits.setEnabled(false);
 		panelScenarioButtons.add(btnClearAssignedUnits);
-		
+
 		scrollScenarioView.setViewportView(null);
 		scrollScenarioView.setMinimumSize(new java.awt.Dimension(450, 600));
 		scrollScenarioView.setPreferredSize(new java.awt.Dimension(450, 600));
@@ -760,7 +766,7 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 1.0;
 		panelScenario.add(scrollScenarioView, gridBagConstraints);
-		
+
 		splitBrief = new javax.swing.JSplitPane(javax.swing.JSplitPane.HORIZONTAL_SPLIT, splitMission, panelScenario);
 		splitBrief.setOneTouchExpandable(true);
 		splitBrief.setResizeWeight(0.5);
@@ -772,14 +778,14 @@ public class CampaignGUI extends JPanel {
 				refreshScenarioView();
 			}
 		});
-	
+
 		tabMain.addTab(
 				resourceMap.getString("panBriefing.TabConstraints.tabTitle"),
 				splitBrief); // NOI18N
-		
+
 		panelMapView.setName("panelMapView"); // NOI18N
 		panelMapView.setLayout(new java.awt.GridBagLayout());
-		
+
 		lblFindPlanet.setText(resourceMap.getString("lblFindPlanet.text")); // NOI18N
 		lblFindPlanet.setName("lblFindPlanet"); // NOI18N
 		gridBagConstraints = new java.awt.GridBagConstraints();
@@ -789,7 +795,7 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.weighty = 0.0;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
 		panelMapView.add(lblFindPlanet, gridBagConstraints);
-		
+
 		suggestPlanet = new JSuggestField(getFrame(), getCampaign().getPlanetNames());
 		suggestPlanet.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -808,7 +814,7 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 0.0;
 		panelMapView.add(suggestPlanet, gridBagConstraints);
-		
+
 		btnCalculateJumpPath.setText(resourceMap.getString("btnCalculateJumpPath.text")); // NOI18N
 		btnCalculateJumpPath.setToolTipText(resourceMap
 				.getString("btnCalculateJumpPath.toolTipText")); // NOI18N
@@ -826,7 +832,7 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.weightx = 0.5;
 		gridBagConstraints.weighty = 0.0;
 		panelMapView.add(btnCalculateJumpPath, gridBagConstraints);
-		
+
 		btnBeginTransit.setText(resourceMap.getString("btnBeginTransit.text")); // NOI18N
 		btnBeginTransit.setToolTipText(resourceMap
 				.getString("btnBeginTransit.toolTipText")); // NOI18N
@@ -844,9 +850,9 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.weightx = 0.5;
 		gridBagConstraints.weighty = 0.0;
 		panelMapView.add(btnBeginTransit, gridBagConstraints);
-		
+
 		panMap = new InterstellarMapPanel(getCampaign(), this);
-		panMap.setName("panMap"); // NOI18N		
+		panMap.setName("panMap"); // NOI18N
 		//lets go ahead and zoom in on the current location
 		panMap.setSelectedPlanet(getCampaign().getLocation().getCurrentPlanet());
 		gridBagConstraints = new java.awt.GridBagConstraints();
@@ -857,7 +863,7 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 1.0;
 		panelMapView.add(panMap, gridBagConstraints);
-		
+
 		scrollPlanetView.setMinimumSize(new java.awt.Dimension(400, 600));
 		scrollPlanetView.setPreferredSize(new java.awt.Dimension(400, 600));
 		scrollPlanetView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -875,10 +881,10 @@ public class CampaignGUI extends JPanel {
 		tabMain.addTab(
 				resourceMap.getString("panMap.TabConstraints.tabTitle"),
 				splitMap); // NOI18N
-		
+
 		panPersonnel.setName("panPersonnel"); // NOI18N
 		panPersonnel.setLayout(new java.awt.GridBagLayout());
-		
+
 		lblPersonChoice.setText(resourceMap.getString("lblPersonChoice.text")); // NOI18N
 		lblPersonChoice.setName("lblPersonChoice"); // NOI18N
 		gridBagConstraints = new java.awt.GridBagConstraints();
@@ -888,7 +894,7 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
 		gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
 		panPersonnel.add(lblPersonChoice, gridBagConstraints);
-		
+
 		DefaultComboBoxModel personGroupModel = new DefaultComboBoxModel();
 		for (int i = 0; i < PG_NUM; i++) {
 			personGroupModel.addElement(getPersonnelGroupName(i));
@@ -910,7 +916,7 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
 		gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
 		panPersonnel.add(choicePerson, gridBagConstraints);
-			
+
 		lblPersonView.setText(resourceMap.getString("lblPersonView.text")); // NOI18N
 		lblPersonView.setName("lblPersonView"); // NOI18N
 		gridBagConstraints = new java.awt.GridBagConstraints();
@@ -919,7 +925,7 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
 		gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
 		panPersonnel.add(lblPersonView, gridBagConstraints);
-		
+
 		DefaultComboBoxModel personViewModel = new DefaultComboBoxModel();
 		for (int i = 0; i < PV_NUM; i++) {
 			personViewModel.addElement(getPersonnelViewName(i));
@@ -941,7 +947,7 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
 		gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
 		panPersonnel.add(choicePersonView, gridBagConstraints);
-		
+
 		personnelTable.setModel(personModel);
 		personnelTable.setName("personnelTable"); // NOI18N
 		personnelTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
@@ -976,12 +982,12 @@ public class CampaignGUI extends JPanel {
             }
         });
         scrollPersonnelTable.setViewportView(personnelTable);
-	
+
 		scrollPersonnelView.setMinimumSize(new java.awt.Dimension(500, 600));
 		scrollPersonnelView.setPreferredSize(new java.awt.Dimension(500, 600));
 		scrollPersonnelView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPersonnelView.setViewportView(null);
-		
+
 		splitPersonnel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,scrollPersonnelTable, scrollPersonnelView);
 		splitPersonnel.setOneTouchExpandable(true);
 		splitPersonnel.setResizeWeight(1.0);
@@ -999,16 +1005,16 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 1.0;
 		panPersonnel.add(splitPersonnel, gridBagConstraints);
-		
+
 		filterPersonnel();
-		
+
 		tabMain.addTab(
 				resourceMap.getString("panPersonnel.TabConstraints.tabTitle"),
 				panPersonnel); // NOI18N
-		
+
 		panHangar.setName("panHangar"); // NOI18N
 		panHangar.setLayout(new java.awt.GridBagLayout());
-		
+
 		lblUnitChoice.setText(resourceMap.getString("lblUnitChoice.text")); // NOI18N
 		lblUnitChoice.setName("lblUnitChoice"); // NOI18N
 		gridBagConstraints = new java.awt.GridBagConstraints();
@@ -1018,7 +1024,7 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
 		gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
 		panHangar.add(lblUnitChoice, gridBagConstraints);
-		
+
 		DefaultComboBoxModel unitGroupModel = new DefaultComboBoxModel();
 		unitGroupModel.addElement("All Units");
 		for (int i = 0; i < UnitType.SIZE; i++) {
@@ -1040,7 +1046,7 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
 		gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
 		panHangar.add(choiceUnit, gridBagConstraints);
-			
+
 		lblUnitView.setText(resourceMap.getString("lblUnitView.text")); // NOI18N
 		lblPersonView.setName("lblUnitView"); // NOI18N
 		gridBagConstraints = new java.awt.GridBagConstraints();
@@ -1049,7 +1055,7 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
 		gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
 		panHangar.add(lblUnitView, gridBagConstraints);
-		
+
 		DefaultComboBoxModel unitViewModel = new DefaultComboBoxModel();
 		for (int i = 0; i < UV_NUM; i++) {
 			unitViewModel.addElement(getUnitViewName(i));
@@ -1070,7 +1076,7 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
 		gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
 		panHangar.add(choiceUnitView, gridBagConstraints);
-		
+
 		unitTable.setModel(unitModel);
 		unitTable.setName("unitTable"); // NOI18N
 		unitTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
@@ -1103,14 +1109,14 @@ public class CampaignGUI extends JPanel {
                 refreshUnitView();
             }
         });
-        
+
         scrollUnitTable.setViewportView(unitTable);
 
 		scrollUnitView.setMinimumSize(new java.awt.Dimension(450, 600));
 		scrollUnitView.setPreferredSize(new java.awt.Dimension(450, 600));
 		scrollUnitView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollUnitView.setViewportView(null);
-		
+
 		splitUnit = new javax.swing.JSplitPane(javax.swing.JSplitPane.HORIZONTAL_SPLIT,scrollUnitTable, scrollUnitView);
 		splitUnit.setOneTouchExpandable(true);
 		splitUnit.setResizeWeight(1.0);
@@ -1128,14 +1134,14 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 1.0;
 		panHangar.add(splitUnit, gridBagConstraints);
-		
+
 		tabMain.addTab(
 				resourceMap.getString("panHangar.TabConstraints.tabTitle"),
 				panHangar); // NOI18N
-	
+
 		panSupplies.setName("panSupplies"); // NOI18N
 		panSupplies.setLayout(new java.awt.GridBagLayout());
-		
+
 		lblPartsChoice.setText(resourceMap.getString("lblPartsChoice.text")); // NOI18N
 		lblPartsChoice.setName("lblPartsChoice"); // NOI18N
 		gridBagConstraints = new java.awt.GridBagConstraints();
@@ -1145,7 +1151,7 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
 		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 0);
 		panSupplies.add(lblPartsChoice, gridBagConstraints);
-		
+
 		DefaultComboBoxModel partsGroupModel = new DefaultComboBoxModel();
 		for (int i = 0; i < SG_NUM; i++) {
 			partsGroupModel.addElement(getPartsGroupName(i));
@@ -1167,7 +1173,7 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
 		gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 0);
 		panSupplies.add(choiceParts, gridBagConstraints);
-		
+
 		partsTable.setModel(partsModel);
 		partsTable.setName("partsTable"); // NOI18N
 		partsSorter = new TableRowSorter<PartsTableModel>(partsModel);
@@ -1189,7 +1195,7 @@ public class CampaignGUI extends JPanel {
 					}
 				});
 		partsTable.addMouseListener(partsMouseAdapter);
-		
+
 		scrollPartsTable.setName("scrollPartsTable"); // NOI18N
 		scrollPartsTable.setViewportView(partsTable);
 		gridBagConstraints = new java.awt.GridBagConstraints();
@@ -1203,7 +1209,7 @@ public class CampaignGUI extends JPanel {
 		panSupplies.add(scrollPartsTable, gridBagConstraints);
 
 		JPanel panelDoTaskWarehouse = new JPanel(new GridBagLayout());
-	
+
 		btnDoTaskWarehouse = new JButton(resourceMap.getString("btnDoTask.text")); // NOI18N
 		btnDoTaskWarehouse.setToolTipText(resourceMap.getString("btnDoTask.toolTipText")); // NOI18N
 		btnDoTaskWarehouse.setEnabled(false);
@@ -1243,7 +1249,7 @@ public class CampaignGUI extends JPanel {
 		textTargetWarehouse.setBorder(null);
 		textTargetWarehouse.setName("textTarget"); // NOI18N
 		JScrollPane scrTargetWarehouse = new JScrollPane(textTargetWarehouse);
-		
+
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 1;
 		gridBagConstraints.gridy = 0;
@@ -1254,7 +1260,7 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.weighty = 0.0;
 		gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
 		panelDoTaskWarehouse.add(scrTargetWarehouse, gridBagConstraints);
-		
+
 		btnShowAllTechsWarehouse.setText(resourceMap.getString("btnShowAllTechs.text")); // NOI18N
 		btnShowAllTechsWarehouse.setToolTipText(resourceMap
 				.getString("btnShowAllTechs.toolTipText")); // NOI18N
@@ -1273,9 +1279,9 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.weighty = 0.0;
 		gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
 		panelDoTaskWarehouse.add(btnShowAllTechsWarehouse, gridBagConstraints);
-		
+
 		scrollWhTechTable.setMinimumSize(new java.awt.Dimension(200, 200));
-		
+
 		scrollWhTechTable.setName("scrollWhTechTable"); // NOI18N
 		scrollWhTechTable.setPreferredSize(new java.awt.Dimension(300, 300));
 
@@ -1307,7 +1313,7 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.weighty = 1.0;
 		gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
 		panelDoTaskWarehouse.add(scrollWhTechTable, gridBagConstraints);
-		
+
 		astechPoolLabelWarehouse.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 		astechPoolLabelWarehouse.setText("<html><b>Astech Pool Minutes:</> " + getCampaign().getAstechPoolMinutes() + " (" + getCampaign().getNumberAstechs() + " Astechs)</html>"); // NOI18N
 		gridBagConstraints = new java.awt.GridBagConstraints();
@@ -1317,21 +1323,21 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
 		panelDoTaskWarehouse.add(astechPoolLabelWarehouse, gridBagConstraints);
-		
+
 		JSplitPane splitWarehouse = new javax.swing.JSplitPane(javax.swing.JSplitPane.HORIZONTAL_SPLIT,panSupplies, panelDoTaskWarehouse);
 		splitWarehouse.setOneTouchExpandable(true);
 		splitWarehouse.setResizeWeight(1.0);
-		
+
 		tabMain.addTab(
 				resourceMap.getString("panSupplies.TabConstraints.tabTitle"),
 				splitWarehouse); // NOI18N
 
-		
+
 		panRepairBay.setName("panRepairBay"); // NOI18N
 		panRepairBay.setLayout(new java.awt.GridBagLayout());
 
 		JPanel panServicedUnits = new JPanel(new GridBagLayout());
-		
+
 		scrollServicedUnitTable.setMinimumSize(new java.awt.Dimension(350, 200));
 		scrollServicedUnitTable.setName("scrollServicedUnitTable"); // NOI18N
 		scrollServicedUnitTable.setPreferredSize(new java.awt.Dimension(350, 200));
@@ -1371,7 +1377,7 @@ public class CampaignGUI extends JPanel {
 		txtServicedUnitView.setEditable(false);
 		txtServicedUnitView.setContentType("text/html");
 		scrollServicedUnitView.setViewportView(txtServicedUnitView);
-		
+
 		splitServicedUnits = new javax.swing.JSplitPane(javax.swing.JSplitPane.VERTICAL_SPLIT,scrollServicedUnitTable, scrollServicedUnitView);
 		splitServicedUnits.setOneTouchExpandable(true);
 		splitServicedUnits.setResizeWeight(0.0);
@@ -1382,9 +1388,9 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 1.0;
 		panServicedUnits.add(splitServicedUnits, gridBagConstraints);
-		
+
 		JPanel panTasks = new JPanel(new GridBagLayout());
-		
+
 		tabTasks.setMinimumSize(new java.awt.Dimension(300, 200));
 		tabTasks.setName("tabTasks"); // NOI18N
 		tabTasks.setPreferredSize(new java.awt.Dimension(300, 300));
@@ -1431,10 +1437,10 @@ public class CampaignGUI extends JPanel {
 				});
 		//AcquisitionTable.addMouseListener(acquisitionMouseAdapter);
 		scrollAcquisitionTable.setViewportView(AcquisitionTable);
-	
+
 		tabTasks.addTab(resourceMap.getString("scrollTaskTable.TabConstraints.tabTasks"), scrollTaskTable); // NOI18N
 		tabTasks.addTab(resourceMap.getString("scrollAcquisitionTable.TabConstraints.tabTasks"), scrollAcquisitionTable); // NOI18N
-		
+
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 2;
@@ -1442,7 +1448,7 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 1.0;
 		panTasks.add(tabTasks, gridBagConstraints);
-		
+
 		panelDoTask.setMinimumSize(new java.awt.Dimension(300, 100));
 		panelDoTask.setName("panelDoTask"); // NOI18N
 		panelDoTask.setPreferredSize(new java.awt.Dimension(300, 100));
@@ -1509,9 +1515,9 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
 		gridBagConstraints.weightx = 1.0;
 		panTasks.add(panelDoTask, gridBagConstraints);
-		
+
 		JPanel panTechs = new JPanel(new GridBagLayout());
-		
+
 		btnShowAllTechs.setText(resourceMap.getString("btnShowAllTechs.text")); // NOI18N
 		btnShowAllTechs.setToolTipText(resourceMap
 				.getString("btnShowAllTechs.toolTipText")); // NOI18N
@@ -1526,9 +1532,9 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.gridy = 0;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
 		panTechs.add(btnShowAllTechs, gridBagConstraints);
-		
+
 		scrollTechTable.setMinimumSize(new java.awt.Dimension(200, 200));
-		
+
 		scrollTechTable.setName("scrollTechTable"); // NOI18N
 		scrollTechTable.setPreferredSize(new java.awt.Dimension(300, 300));
 
@@ -1560,7 +1566,7 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 1.0;
 		panTechs.add(scrollTechTable, gridBagConstraints);
-		
+
 		astechPoolLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
 		astechPoolLabel.setText("<html><b>Astech Pool Minutes:</> " + getCampaign().getAstechPoolMinutes() + " (" + getCampaign().getNumberAstechs() + " Astechs)</html>"); // NOI18N
 		astechPoolLabel.setName("astechPoolLabel"); // NOI18N
@@ -1571,7 +1577,7 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
 		panTechs.add(astechPoolLabel, gridBagConstraints);
-		
+
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 0;
@@ -1580,7 +1586,7 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 1.0;
 		panRepairBay.add(panServicedUnits, gridBagConstraints);
-		
+
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 1;
 		gridBagConstraints.gridy = 0;
@@ -1589,7 +1595,7 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 1.0;
 		panRepairBay.add(panTasks, gridBagConstraints);
-		
+
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 2;
 		gridBagConstraints.gridy = 0;
@@ -1598,14 +1604,14 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 1.0;
 		panRepairBay.add(panTechs, gridBagConstraints);
-		
+
 		filterTechs(true);
 		filterTechs(false);
-		
+
 		tabMain.addTab(
 				resourceMap.getString("panRepairBay.TabConstraints.tabTitle"),
 				panRepairBay); // NOI18N
-	
+
 		panInfirmary.setName("panInfirmary"); // NOI18N
 		panInfirmary.setLayout(new java.awt.GridBagLayout());
 
@@ -1636,7 +1642,7 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.weighty = 1.0;
 		panInfirmary.add(scrollDocTable, gridBagConstraints);
 
-		
+
 		btnAssignDoc.setText(resourceMap.getString("btnAssignDoc.text")); // NOI18N
 		btnAssignDoc.setToolTipText(resourceMap
 				.getString("btnAssignDoc.toolTipText")); // NOI18N
@@ -1652,7 +1658,7 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.gridy = 1;
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
 		panInfirmary.add(btnAssignDoc, gridBagConstraints);
-		
+
 		btnUnassignDoc.setText(resourceMap.getString("btnUnassignDoc.text")); // NOI18N
 		btnUnassignDoc.setEnabled(false);
 		btnUnassignDoc.addActionListener(new java.awt.event.ActionListener() {
@@ -1682,7 +1688,7 @@ public class CampaignGUI extends JPanel {
 						patientTableValueChanged();
 					}
 				});
-		
+
 		listUnassignedPatient = new JList(unassignedPatientModel);
 		listUnassignedPatient.setCellRenderer(unassignedPatientModel.getRenderer());
 		listUnassignedPatient.setLayoutOrientation(JList.HORIZONTAL_WRAP);
@@ -1698,7 +1704,7 @@ public class CampaignGUI extends JPanel {
 
 		scrollAssignedPatient.setMinimumSize(new java.awt.Dimension(300, 360));
 		scrollAssignedPatient.setPreferredSize(new java.awt.Dimension(300, 360));
-		
+
 		listAssignedPatient.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("panAssignedPatient.title")));
 		listUnassignedPatient.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("panUnassignedPatient.title")));
 
@@ -1721,20 +1727,20 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.weighty = 1.0;
 		panInfirmary.add(scrollUnassignedPatient, gridBagConstraints);
-		
+
 		tabMain.addTab(
 				resourceMap.getString("panInfirmary.TabConstraints.tabTitle"),
 				panInfirmary); // NOI18N
 
-		
+
 		panMekLab.setName("panMekLab"); // NOI18N
 		scrollMekLab.setName("scrollFinanceTable");
         scrollMekLab.setViewportView(panMekLab);
-		
+
         tabMain.addTab(
 				resourceMap.getString("panMekLab.TabConstraints.tabTitle"),
 				scrollMekLab); // NOI18N
-		
+
 		panFinances.setName("panFinances"); // NOI18N
 		panFinances.setLayout(new java.awt.GridBagLayout());
 
@@ -1753,7 +1759,7 @@ public class CampaignGUI extends JPanel {
 		financeTable.setShowGrid(false);
         scrollFinanceTable.setName("scrollFinanceTable");
         scrollFinanceTable.setViewportView(financeTable);
-        
+
         gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 1;
@@ -1767,7 +1773,7 @@ public class CampaignGUI extends JPanel {
 		tabMain.addTab(
 				resourceMap.getString("panFinances.TabConstraints.tabTitle"),
 				panFinances); // NOI18N
-		
+
 		mainPanel.setAutoscrolls(true);
 		mainPanel.setName("mainPanel"); // NOI18N
 		mainPanel.setLayout(new java.awt.GridBagLayout());
@@ -1786,8 +1792,8 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
 		mainPanel.add(lblLocation, gridBagConstraints);
-		
-		
+
+
 		txtPaneReportScrollPane.setName("txtPaneReportScrollPane"); // NOI18N
 		txtPaneReport.setContentType(resourceMap
 				.getString("txtPaneReport.contentType")); // NOI18N
@@ -1825,7 +1831,7 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 		gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
 		mainPanel.add(btnAdvanceDay, gridBagConstraints);
-	
+
 		btnGMMode.setText(resourceMap.getString("btnGMMode.text")); // NOI18N
 		btnGMMode
 				.setToolTipText(resourceMap.getString("btnGMMode.toolTipText")); // NOI18N
@@ -1836,7 +1842,7 @@ public class CampaignGUI extends JPanel {
 				btnGMModeActionPerformed(evt);
 			}
 		});
-		
+
 		btnOvertime.setText(resourceMap.getString("btnOvertime.text")); // NOI18N
 		btnOvertime.setToolTipText(resourceMap
 				.getString("btnOvertime.toolTipText")); // NOI18N
@@ -1846,7 +1852,7 @@ public class CampaignGUI extends JPanel {
 				btnOvertimeActionPerformed(evt);
 			}
 		});
-		
+
 		gridBagConstraints = new java.awt.GridBagConstraints();
 		gridBagConstraints.gridx = 0;
 		gridBagConstraints.gridy = 1;
@@ -1857,7 +1863,7 @@ public class CampaignGUI extends JPanel {
 		gridBagConstraints.weighty = 1.0;
 		//gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
 		mainPanel.add(tabMain, gridBagConstraints);
-	
+
 		menuBar.setName("menuBar"); // NOI18N
 
 		fileMenu.setText(resourceMap.getString("fileMenu.text")); // NOI18N
@@ -1889,7 +1895,7 @@ public class CampaignGUI extends JPanel {
 			}
 		});
 		fileMenu.add(menuOptions);
-		
+
 		menuOptionsMM.setText(resourceMap.getString("menuOptionsMM.text")); // NOI18N
 		menuOptionsMM.setName("menuOptionsMM"); // NOI18N
 		menuOptionsMM.addActionListener(new java.awt.event.ActionListener() {
@@ -1902,7 +1908,7 @@ public class CampaignGUI extends JPanel {
 		menuThemes =new JMenu("Themes");
 		refreshThemeChoices();
 		fileMenu.add(menuThemes);
-		
+
 		exitMenuItem.setName("exitMenuItem"); // NOI18N
 		exitMenuItem.setText("Exit");
 		exitMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -1911,7 +1917,7 @@ public class CampaignGUI extends JPanel {
 			}
 		});
 		fileMenu.add(exitMenuItem);
-		
+
 		menuBar.add(fileMenu);
 
 		menuManage.setText(resourceMap.getString("menuManage.text")); // NOI18N
@@ -1967,7 +1973,7 @@ public class CampaignGUI extends JPanel {
 		menuHire.setText(resourceMap.getString("menuHire.text")); // NOI18N
 		menuHire.setName("menuHire"); // NOI18N
 		JMenuItem miHire;
-		for(int i = Person.T_MECHWARRIOR; i < Person.T_NUM; i++) {		
+		for(int i = Person.T_MECHWARRIOR; i < Person.T_NUM; i++) {
 			miHire = new JMenuItem();
 			miHire.setText(Person.getRoleDesc(i)); // NOI18N
 			miHire.setActionCommand(Integer.toString(i));
@@ -2042,7 +2048,7 @@ public class CampaignGUI extends JPanel {
 				PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(getFrame(), true, "Release How Many Medics?", 1, 0, getCampaign().getMedicPool());
 				pvcd.setVisible(true);
 				getCampaign().decreaseMedicPool(pvcd.getValue());
-				refreshDoctorsList();				
+				refreshDoctorsList();
 				refreshTempMedics();
 			}
 		});
@@ -2070,7 +2076,7 @@ public class CampaignGUI extends JPanel {
 		menuMedicPool.add(miFireAllMedics);
 		menuMarket.add(menuMedicPool);
 		menuBar.add(menuMarket);
-		
+
 		menuCommunity.setText(resourceMap.getString("menuCommunity.text")); // NOI18N
 		menuCommunity.setName("menuCommunity"); // NOI18N
 
@@ -2084,7 +2090,7 @@ public class CampaignGUI extends JPanel {
 		menuCommunity.add(miChat);
 
 		//menuBar.add(menuCommunity);
-		
+
 		helpMenu.setText(resourceMap.getString("helpMenu.text")); // NOI18N
 		helpMenu.setName("helpMenu"); // NOI18N
 		aboutMenuItem.setName("aboutMenuItem"); // NOI18N
@@ -2096,10 +2102,10 @@ public class CampaignGUI extends JPanel {
 		});
 		helpMenu.add(aboutMenuItem);
 		menuBar.add(helpMenu);
-		
+
 		statusPanel.setName("statusPanel"); // NOI18N
 		statusPanel.setLayout(new FlowLayout(FlowLayout.LEADING, 20, 5));
-		
+
 		statusPanel.add(btnGMMode);
 		statusPanel.add(btnOvertime);
 		refreshRating();
@@ -2110,7 +2116,7 @@ public class CampaignGUI extends JPanel {
 		statusPanel.add(lblTempAstechs);
 		refreshTempMedics();
 		statusPanel.add(lblTempMedics);
-		
+
 		refreshServicedUnitList();
 		refreshUnitList();
 		refreshPersonnelList();
@@ -2131,29 +2137,29 @@ public class CampaignGUI extends JPanel {
 		refreshTempAstechs();
 		refreshTempMedics();
 		panMap.setCampaign(getCampaign());
-	
+
 		setLayout(new BorderLayout());
 		add(mainPanel, BorderLayout.CENTER);
 		add(statusPanel, BorderLayout.PAGE_END);
-	
+
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-	    
+
         frame.setSize(1000, 800);
-        
+
 	    // Determine the new location of the window
 	    int w = frame.getSize().width;
 	    int h = frame.getSize().height;
 	    int x = (dim.width-w)/2;
 	    int y = (dim.height-h)/2;
-	    
+
 	    // Move the window
 	    frame.setLocation(x, y);
-		
+
         frame.setJMenuBar(menuBar);
         frame.getContentPane().setLayout(new BorderLayout());
         frame.getContentPane().add(this, BorderLayout.CENTER);
         frame.validate();
-        
+
         frame.setVisible(true);
         frame.addWindowListener(new WindowAdapter() {
             @Override
@@ -2162,7 +2168,7 @@ public class CampaignGUI extends JPanel {
             }
         });
 	}
-	
+
 	private void miChatActionPerformed(ActionEvent evt) {
         JDialog chatDialog = new JDialog(getFrame(), "MekHQ Chat", false); //$NON-NLS-1$
 
@@ -2178,7 +2184,7 @@ public class CampaignGUI extends JPanel {
 		MissionTypeDialog mtd = new MissionTypeDialog(getFrame(), true, getCampaign(), this);
 		mtd.setVisible(true);
 	}
-	
+
 	private void btnEditMissionActionPerformed(java.awt.event.ActionEvent evt) {
 		Mission mission = getCampaign().getMission(selectedMission);
 		if(null != mission) {
@@ -2189,9 +2195,9 @@ public class CampaignGUI extends JPanel {
 			}
 			refreshMissions();
 		}
-		
+
 	}
-	
+
 	private void changeTheme(java.awt.event.ActionEvent evt) {
 		final String lafClassName = evt.getActionCommand();
 		Runnable runnable = new Runnable() {
@@ -2210,7 +2216,7 @@ public class CampaignGUI extends JPanel {
 		};
 		SwingUtilities.invokeLater(runnable);
 	}
-	
+
 	private void refreshThemeChoices() {
 		menuThemes.removeAll();
 		JCheckBoxMenuItem miPlaf;
@@ -2228,7 +2234,7 @@ public class CampaignGUI extends JPanel {
 			});
 		}
 	}
-	
+
 	private void btnCompleteMissionActionPerformed(java.awt.event.ActionEvent evt) {
 		Mission mission = getCampaign().getMission(selectedMission);
 		if(null != mission) {
@@ -2249,9 +2255,9 @@ public class CampaignGUI extends JPanel {
 					refreshMissions();
 				}
 			}
-		}	
+		}
 	}
-	
+
 	private void btnAddScenarioActionPerformed(java.awt.event.ActionEvent evt) {
 		Mission m = getCampaign().getMission(selectedMission);
 		if(null != m) {
@@ -2267,7 +2273,7 @@ public class CampaignGUI extends JPanel {
 			refreshPlanetView();
 		}
 	}
-	
+
 	private void beginTransit() {
 		if(panMap.getJumpPath().isEmpty()) {
 			return;
@@ -2278,7 +2284,7 @@ public class CampaignGUI extends JPanel {
 		panMap.setJumpPath(new JumpPath());
 		panMap.repaint();
 	}
-	
+
 	private void doTask() {// GEN-FIRST:event_btnDoTaskActionPerformed
 		int selectedRow = -1;
 		int partId = -1;
@@ -2318,7 +2324,7 @@ public class CampaignGUI extends JPanel {
 				return;
 			}
 			if(part.onBadHipOrShoulder() && !part.isSalvaging()) {
-				if(part instanceof MekLocation && ((MekLocation)part).isBreached() 
+				if(part instanceof MekLocation && ((MekLocation)part).isBreached()
 						&& 0!= JOptionPane.showConfirmDialog(
 						    frame,
 						    "You are sealing a limb with a bad shoulder or hip.\n"
@@ -2329,7 +2335,7 @@ public class CampaignGUI extends JPanel {
 						    JOptionPane.YES_NO_OPTION)) {
 					return;
 				}
-				else if(part instanceof MekLocation && ((MekLocation)part).isBlownOff() 
+				else if(part instanceof MekLocation && ((MekLocation)part).isBlownOff()
 						&& 0!= JOptionPane.showConfirmDialog(
 						    frame,
 						    "You are re-attaching a limb with a bad shoulder or hip.\n"
@@ -2376,7 +2382,7 @@ public class CampaignGUI extends JPanel {
 			}
 			getCampaign().acquirePart(acquisition, tech);
 		}
-		
+
 		refreshServicedUnitList();
 		refreshUnitList();
 		refreshPersonnelList();
@@ -2387,7 +2393,7 @@ public class CampaignGUI extends JPanel {
 		refreshReport();
 		refreshFunds();
 		refreshFinancialTransactions();
-		
+
 		//get the selected row back for tasks
 		if(selectedRow != -1) {
 			if(acquireSelected()) {
@@ -2414,7 +2420,7 @@ public class CampaignGUI extends JPanel {
 					//then set to the current selected row
 					if(partsTable.getRowCount() > 0) {
 						if(partsTable.getRowCount() == selectedRow) {
-							partsTable.setRowSelectionInterval(selectedRow-1, selectedRow-1);		
+							partsTable.setRowSelectionInterval(selectedRow-1, selectedRow-1);
 							//partsTable.scrollRectToVisible(partsTable.getCellRect(selectedRow-1, 0, true));
 						} else {
 							partsTable.setRowSelectionInterval(selectedRow, selectedRow);
@@ -2435,8 +2441,8 @@ public class CampaignGUI extends JPanel {
 			//also get the selected tech back
 			JTable table = TechTable;
 			if(onWarehouseTab()) {
-				table = whTechTable;				
-			} 
+				table = whTechTable;
+			}
 			for(int i = 0; i < table.getRowCount(); i++) {
 				Person p = techsModel.getTechAt(table.convertRowIndexToModel(i));
 				if(tech.getId().equals(p.getId())) {
@@ -2445,9 +2451,9 @@ public class CampaignGUI extends JPanel {
 				}
 			}
 		}
-		
+
 	}// GEN-LAST:event_btnDoTaskActionPerformed
-	
+
 	private Person getSelectedTech() {
 		JTable table = TechTable;
 		if(onWarehouseTab()) {
@@ -2459,7 +2465,7 @@ public class CampaignGUI extends JPanel {
 		}
 		return  techsModel.getTechAt(table.convertRowIndexToModel(row));
 	}
-	
+
 	private Person getSelectedDoctor() {
 		int row = DocTable.getSelectedRow();
 		if(row < 0) {
@@ -2467,7 +2473,7 @@ public class CampaignGUI extends JPanel {
 		}
 		return  doctorsModel.getDoctorAt(DocTable.convertRowIndexToModel(row));
 	}
-	
+
 	private Part getSelectedTask() {
 		if(onWarehouseTab()) {
 			int row = partsTable.getSelectedRow();
@@ -2482,7 +2488,7 @@ public class CampaignGUI extends JPanel {
 		}
 		return  taskModel.getTaskAt(TaskTable.convertRowIndexToModel(row));
 	}
-	
+
 	private IAcquisitionWork getSelectedAcquisition() {
 		int row = AcquisitionTable.getSelectedRow();
 		if(row < 0) {
@@ -2503,7 +2509,7 @@ public class CampaignGUI extends JPanel {
 		filterTechs(false);
 		updateTechTarget();
 	}
-	
+
 	private void AcquisitionTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
 		filterTechs(false);
 		updateTechTarget();
@@ -2522,7 +2528,7 @@ public class CampaignGUI extends JPanel {
 			}
 		}
 	}
-	
+
 	private void taskTabChanged() {
 		updateTechTarget();
 	}
@@ -2534,7 +2540,7 @@ public class CampaignGUI extends JPanel {
 	private void DocTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
 		refreshPatientList();
 		updateAssignDoctorEnabled();
-		
+
 	}
 
 	private void PartsTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
@@ -2571,33 +2577,33 @@ public class CampaignGUI extends JPanel {
 				p.setDoctorId(doctor.getId());
 			}
 		}
-		
+
 		refreshTechsList();
 		refreshDoctorsList();
-		refreshPatientList();	
+		refreshPatientList();
 	}
-	
+
 	private void btnUnassignDocActionPerformed(java.awt.event.ActionEvent evt) {
 		for(Person p : getSelectedAssignedPatients()) {
 			if ((null != p)) {
 				p.setDoctorId(null);
 			}
 		}
-		
+
 		refreshTechsList();
 		refreshDoctorsList();
-		refreshPatientList();	
+		refreshPatientList();
 	}
 
 	private void hirePerson(java.awt.event.ActionEvent evt) {
 		int type = Integer.parseInt(evt.getActionCommand());
-		NewRecruitDialog npd = new NewRecruitDialog(getFrame(), true, 
-				getCampaign().newPerson(type), 
+		NewRecruitDialog npd = new NewRecruitDialog(getFrame(), true,
+				getCampaign().newPerson(type),
 				getCampaign(),
 				this, getPortraits());
 		npd.setVisible(true);
 	}
-	
+
 	private void hireBulkPersonnel() {
 		HireBulkPersonnelDialog hbpd = new HireBulkPersonnelDialog(getFrame(), true, getCampaign(), this);
 		hbpd.setVisible(true);
@@ -2633,7 +2639,7 @@ public class CampaignGUI extends JPanel {
 				    "mekhqlog.txt file from this game so we can prevent this from happening in\n" +
 				    "the future.",
 				    "Could not save game",
-				    JOptionPane.ERROR_MESSAGE);			
+				    JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
@@ -2661,7 +2667,7 @@ public class CampaignGUI extends JPanel {
 		if(null == f) {
 			return;
 		}
-		DataLoadingDialog dataLoadingDialog = new DataLoadingDialog(getApplication(), getFrame(), f);   	
+		DataLoadingDialog dataLoadingDialog = new DataLoadingDialog(getApplication(), getFrame(), f);
 		//TODO: does this effectively deal with memory management issues?
 		dataLoadingDialog.setVisible(true);
 	}
@@ -2677,12 +2683,12 @@ public class CampaignGUI extends JPanel {
 			// I want a file, y'know!
 			return null;
 		}
-		
+
 		File file = loadCpgn.getSelectedFile();
 
 		return file;
 	}
-	
+
 	public static String getPersonnelGroupName(int group) {
     	switch(group) {
     	case PG_ACTIVE:
@@ -2719,7 +2725,7 @@ public class CampaignGUI extends JPanel {
     		return "?";
     	}
     }
-	
+
 	public static String getPartsGroupName(int group) {
     	switch(group) {
     	case SG_ALL:
@@ -2750,7 +2756,7 @@ public class CampaignGUI extends JPanel {
     		return "?";
     	}
     }
-	
+
 	public static String getPersonnelViewName(int group) {
     	switch(group) {
     	case PV_GENERAL:
@@ -2771,7 +2777,7 @@ public class CampaignGUI extends JPanel {
     		return "?";
     	}
     }
-	
+
 	public static String getUnitViewName(int group) {
     	switch(group) {
     	case UV_GENERAL:
@@ -2818,7 +2824,7 @@ public class CampaignGUI extends JPanel {
 		}
 	}// GEN-LAST:event_menuOptionsActionPerformed
 
-	
+
 	private void miLoadForcesActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miLoadForcesActionPerformed
 		try {
 			loadListFile(true);
@@ -2850,7 +2856,7 @@ public class CampaignGUI extends JPanel {
 		refreshPartsList();
 		refreshAcquireList();
 	}
-	
+
     public void refitUnit(Refit r, boolean selectModelName) {
     	if(getCampaign().getTechs().size() > 0) {
 	    	String[] techNames = new String[getCampaign().getTechs().size()];
@@ -2906,7 +2912,7 @@ public class CampaignGUI extends JPanel {
 			, "Proceed?",
 				JOptionPane.YES_NO_OPTION)) {
     		return;
-    	}    	
+    	}
     	r.begin();
     	getCampaign().refit(r);
     	panMekLab.clearUnit();
@@ -2918,7 +2924,7 @@ public class CampaignGUI extends JPanel {
     	refreshOrganization();
     	refreshPartsList();
     }
-	
+
 	private void refreshPersonnelView() {
 		int row = personnelTable.getSelectedRow();
 		if(row < 0) {
@@ -2930,13 +2936,13 @@ public class CampaignGUI extends JPanel {
 		//This odd code is to make sure that the scrollbar stays at the top
 		//I cant just call it here, because it ends up getting reset somewhere later
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
-			public void run() { 
+			public void run() {
 				scrollPersonnelView.getVerticalScrollBar().setValue(0);
 			}
 		});
-		
+
 	}
-	
+
 	private void refreshUnitView() {
 		int row = unitTable.getSelectedRow();
 		if(row < 0) {
@@ -2948,13 +2954,13 @@ public class CampaignGUI extends JPanel {
 		//This odd code is to make sure that the scrollbar stays at the top
 		//I cant just call it here, because it ends up getting reset somewhere later
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
-			public void run() { 
+			public void run() {
 				scrollUnitView.getVerticalScrollBar().setValue(0);
 			}
 		});
-		
+
 	}
-	
+
 	private void refreshScenarioView() {
 		int row = scenarioTable.getSelectedRow();
 		if(row < 0) {
@@ -2972,7 +2978,7 @@ public class CampaignGUI extends JPanel {
 		//This odd code is to make sure that the scrollbar stays at the top
 		//I cant just call it here, because it ends up getting reset somewhere later
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
-			public void run() { 
+			public void run() {
 				scrollScenarioView.getVerticalScrollBar().setValue(0);
 			}
 		});
@@ -2983,9 +2989,9 @@ public class CampaignGUI extends JPanel {
 		btnClearAssignedUnits.setEnabled(scenario.isCurrent() && unitsAssigned);
 		btnResolveScenario.setEnabled(scenario.isCurrent() && unitsAssigned);
 		btnPrintRS.setEnabled(scenario.isCurrent() && unitsAssigned);
-		
+
 	}
-	
+
 	protected void refreshForceView() {
 		Object node = orgTree.getLastSelectedPathComponent();
 		if(null == node || -1 == orgTree.getRowForPath(orgTree.getSelectionPath())) {
@@ -3008,20 +3014,20 @@ public class CampaignGUI extends JPanel {
 			//This odd code is to make sure that the scrollbar stays at the top
 			//I cant just call it here, because it ends up getting reset somewhere later
 			javax.swing.SwingUtilities.invokeLater(new Runnable() {
-				public void run() { 
+				public void run() {
 					scrollForceView.getVerticalScrollBar().setValue(0);
 				}
 			});
 		} else if (node instanceof Force) {
 			scrollForceView.setViewportView(new ForceViewPanel((Force)node, getCampaign(), getPortraits(), getForceIcons(), getCamos(), getMechTiles()));
 			javax.swing.SwingUtilities.invokeLater(new Runnable() {
-				public void run() { 
+				public void run() {
 					scrollForceView.getVerticalScrollBar().setValue(0);
 				}
 			});
 		}
 	}
-	
+
 	public void refreshPlanetView() {
 		JumpPath path = panMap.getJumpPath();
 		if(null != path && !path.isEmpty()) {
@@ -3033,7 +3039,7 @@ public class CampaignGUI extends JPanel {
 			scrollPlanetView.setViewportView(new PlanetViewPanel(planet, getCampaign()));
 		}
 	}
-	
+
 	private void addFundsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_addFundsActionPerformed
 		AddFundsDialog addFundsDialog = new AddFundsDialog(null, true);
 		addFundsDialog.setVisible(true);
@@ -3049,7 +3055,7 @@ public class CampaignGUI extends JPanel {
 	protected void loadListFile(boolean allowNewPilots) throws IOException {
 		JFileChooser loadList = new JFileChooser(".");
 		loadList.setDialogTitle("Load Units");
-		
+
 		loadList.setFileFilter(new FileFilter() {
 			@Override
 			public boolean accept(File dir) {
@@ -3066,7 +3072,7 @@ public class CampaignGUI extends JPanel {
 		});
 
 		int returnVal = loadList.showOpenDialog(mainPanel);
-		
+
 		if ((returnVal != JFileChooser.APPROVE_OPTION)
 				|| (loadList.getSelectedFile() == null)) {
 			// I want a file, y'know!
@@ -3074,7 +3080,7 @@ public class CampaignGUI extends JPanel {
 		}
 
 		File unitFile = loadList.getSelectedFile();
-		
+
 		if (unitFile != null) {
 			// I need to get the parser myself, because I want to pull both
 			// entities and pilots from it
@@ -3104,7 +3110,7 @@ public class CampaignGUI extends JPanel {
 			for (Entity entity : parser.getEntities()) {
 				getCampaign().addUnit(entity, allowNewPilots);
 			}
-			
+
 			// add any ejected pilots
 			for (Pilot pilot : parser.getPilots()) {
 				if (pilot.isEjected()) {
@@ -3112,7 +3118,7 @@ public class CampaignGUI extends JPanel {
 				}
 			}
 		}
-		
+
 		refreshServicedUnitList();
 		refreshUnitList();
 		refreshPersonnelList();
@@ -3136,7 +3142,7 @@ public class CampaignGUI extends JPanel {
 			refreshOrganization();
 		}
 	}
-	
+
 	protected void resolveScenario() {
 		int row = scenarioTable.getSelectedRow();
 		Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
@@ -3158,7 +3164,7 @@ public class CampaignGUI extends JPanel {
 		tracker.postProcessEntities(control);
 		ResolveScenarioWizardDialog resolveDialog = new ResolveScenarioWizardDialog(getFrame(), true, tracker);
 		resolveDialog.setVisible(true);
-		
+
 		refreshScenarioList();
 		refreshOrganization();
 		refreshServicedUnitList();
@@ -3170,7 +3176,7 @@ public class CampaignGUI extends JPanel {
 		changeMission();
 		refreshFinancialTransactions();
 	}
-	
+
 	protected void printRecordSheets() {
 		int row = scenarioTable.getSelectedRow();
 		if(row < 0) {
@@ -3178,15 +3184,15 @@ public class CampaignGUI extends JPanel {
 		}
 		Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
 		Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits();
-		
+
 		if(uids.size() == 0) {
 			return;
 		}
-		
+
 		Vector<Entity> chosen = new Vector<Entity>();
 		//ArrayList<Unit> toDeploy = new ArrayList<Unit>();
 		StringBuffer undeployed = new StringBuffer();
-		
+
 		for(UUID uid : uids) {
 			Unit u = getCampaign().getUnit(uid);
 			if(u.isUnmanned()) {
@@ -3203,7 +3209,7 @@ public class CampaignGUI extends JPanel {
 				}
 			}
 		}
-		
+
 		if (undeployed.length() > 0) {
 			JOptionPane.showMessageDialog(
 					getFrame(),
@@ -3211,12 +3217,12 @@ public class CampaignGUI extends JPanel {
 							+ undeployed.toString(),
 					"Could not deploy some units", JOptionPane.WARNING_MESSAGE);
 		}
-	
+
 		if(chosen.size() > 0) {
 			UnitPrintManager.printAllUnits(chosen, true);
 		}
 	}
-	
+
 	protected void loadScenario() {
 		int row = scenarioTable.getSelectedRow();
 		if(row < 0) {
@@ -3227,7 +3233,7 @@ public class CampaignGUI extends JPanel {
 			((MekHQ)getApplication()).startHost(scenario, true, null);
 		}
 	}
-	
+
 	protected void startScenario() {
 		int row = scenarioTable.getSelectedRow();
 		if(row < 0) {
@@ -3235,15 +3241,15 @@ public class CampaignGUI extends JPanel {
 		}
 		Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
 		Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits();
-		
+
 		if(uids.size() == 0) {
 			return;
 		}
-		
+
 		ArrayList<Unit> chosen = new ArrayList<Unit>();
 		//ArrayList<Unit> toDeploy = new ArrayList<Unit>();
 		StringBuffer undeployed = new StringBuffer();
-		
+
 		for(UUID uid : uids) {
 			Unit u = getCampaign().getUnit(uid);
 			if(u.isUnmanned()) {
@@ -3260,7 +3266,7 @@ public class CampaignGUI extends JPanel {
 				}
 			}
 		}
-		
+
 		if (undeployed.length() > 0) {
 			JOptionPane.showMessageDialog(
 					getFrame(),
@@ -3268,12 +3274,12 @@ public class CampaignGUI extends JPanel {
 							+ undeployed.toString(),
 					"Could not deploy some units", JOptionPane.WARNING_MESSAGE);
 		}
-	
+
 		if(chosen.size() > 0) {
 			((MekHQ)getApplication()).startHost(scenario, false, chosen);
 		}
 	}
-	
+
 	protected void deployListFile() {
 		int row = scenarioTable.getSelectedRow();
 		if(row < 0) {
@@ -3281,15 +3287,15 @@ public class CampaignGUI extends JPanel {
 		}
 		Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
 		Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits();
-		
+
 		if(uids.size() == 0) {
 			return;
 		}
-		
+
 		ArrayList<Entity> chosen = new ArrayList<Entity>();
 		//ArrayList<Unit> toDeploy = new ArrayList<Unit>();
 		StringBuffer undeployed = new StringBuffer();
-		
+
 		for(UUID uid : uids) {
 			Unit u = getCampaign().getUnit(uid);
 			if(u.isUnmanned()) {
@@ -3309,7 +3315,7 @@ public class CampaignGUI extends JPanel {
 
 		JFileChooser saveList = new JFileChooser(".");
 		saveList.setDialogTitle("Deploy Units");
-		
+
 		saveList.setFileFilter(new FileFilter() {
 			@Override
 			public boolean accept(File dir) {
@@ -3324,10 +3330,10 @@ public class CampaignGUI extends JPanel {
 				return "MUL file";
 			}
 		});
-		
+
 		saveList.setSelectedFile(new File(scenario.getName() + ".mul")); //$NON-NLS-1$
 		int returnVal = saveList.showSaveDialog(mainPanel);
-		
+
 		if ((returnVal != JFileChooser.APPROVE_OPTION)
 				|| (saveList.getSelectedFile() == null)) {
 			// I want a file, y'know!
@@ -3335,7 +3341,7 @@ public class CampaignGUI extends JPanel {
 		}
 
 		File unitFile = saveList.getSelectedFile();
-		
+
 		if (unitFile != null) {
 			if (!(unitFile.getName().toLowerCase().endsWith(".mul") //$NON-NLS-1$
 			|| unitFile.getName().toLowerCase().endsWith(".xml"))) { //$NON-NLS-1$
@@ -3356,7 +3362,7 @@ public class CampaignGUI extends JPanel {
 				excep.printStackTrace(System.err);
 			}
 		}
-		
+
 		refreshServicedUnitList();
 		refreshUnitList();
 		refreshPatientList();
@@ -3382,7 +3388,7 @@ public class CampaignGUI extends JPanel {
 		}
 		refreshRating();
 	}
-	
+
 	public void refreshPersonnelList() {
 		UUID selectedUUID = null;
 		int selectedRow = personnelTable.getSelectedRow();
@@ -3404,7 +3410,7 @@ public class CampaignGUI extends JPanel {
 		}
 		refreshRating();
 	}
-	
+
 	public void changeMission() {
 		int idx = choiceMission.getSelectedIndex();
 		btnEditMission.setEnabled(false);
@@ -3413,7 +3419,7 @@ public class CampaignGUI extends JPanel {
 		if(idx >= 0 && idx < getCampaign().getSortedMissions().size()) {
 			Mission m = getCampaign().getSortedMissions().get(idx);
 			if(null != m) {
-				selectedMission = m.getId();		
+				selectedMission = m.getId();
 				if(m instanceof Contract) {
 					scrollMissionView.setViewportView(new ContractViewPanel((Contract)m));
 				} else {
@@ -3422,7 +3428,7 @@ public class CampaignGUI extends JPanel {
 				//This odd code is to make sure that the scrollbar stays at the top
 				//I cant just call it here, because it ends up getting reset somewhere later
 				javax.swing.SwingUtilities.invokeLater(new Runnable() {
-					public void run() { 
+					public void run() {
 						scrollMissionView.getVerticalScrollBar().setValue(0);
 					}
 				});
@@ -3430,14 +3436,14 @@ public class CampaignGUI extends JPanel {
 				btnCompleteMission.setEnabled(m.isActive());
 				btnAddScenario.setEnabled(m.isActive());
 			}
-			
+
 		} else {
 			selectedMission = -1;
 			scrollMissionView.setViewportView(null);
 		}
 		refreshScenarioList();
 	}
-	
+
 	public void refreshScenarioList() {
 		Mission m = getCampaign().getMission(selectedMission);
 		if(null != m) {
@@ -3446,7 +3452,7 @@ public class CampaignGUI extends JPanel {
 			scenarioModel.setData(new ArrayList<Scenario>());
 		}
 	}
-	
+
 	public void refreshUnitList() {
 		UUID selectedUUID = null;
 		int selectedRow = unitTable.getSelectedRow();
@@ -3469,7 +3475,7 @@ public class CampaignGUI extends JPanel {
 		refreshLab();
 		refreshRating();
 	}
-	
+
 	public void refreshTaskList() {
 		UUID uuid = null;
 		if(null != getSelectedServicedUnit()) {
@@ -3477,7 +3483,7 @@ public class CampaignGUI extends JPanel {
 		}
 		taskModel.setData(getCampaign().getPartsNeedingServiceFor(uuid));
 	}
-	
+
 	public void refreshAcquireList() {
 		UUID uuid = null;
 		if(null != getSelectedServicedUnit()) {
@@ -3485,7 +3491,7 @@ public class CampaignGUI extends JPanel {
 		}
 		acquireModel.setData(getCampaign().getAcquisitionsForUnit(uuid));
 	}
-	
+
 	public void refreshMissions() {
 		choiceMission.removeAllItems();
 		for(Mission m : getCampaign().getSortedMissions()) {
@@ -3505,7 +3511,7 @@ public class CampaignGUI extends JPanel {
 		changeMission();
 		refreshRating();
 	}
-	
+
 	public void refreshLab() {
 		if(null == panMekLab) {
 			return;
@@ -3570,13 +3576,13 @@ public class CampaignGUI extends JPanel {
 		} else {
 			listUnassignedPatient.setSelectedIndex(-1);
 		}
-		
+
 	}
 
 	public void refreshPartsList() {
 		partsModel.setData(getCampaign().getSpareParts());
 	}
-	
+
 	public void refreshFinancialTransactions() {
 		financeModel.setData(getCampaign().getFinances().getAllTransactions());
 		refreshFunds();
@@ -3591,10 +3597,10 @@ public class CampaignGUI extends JPanel {
 		txtPaneReport.setText(getCampaign().getCurrentReportHTML());
 		txtPaneReport.setCaretPosition(0);
 	}
-	
+
 	public void refreshOrganization() {
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
-			public void run() { 
+			public void run() {
 				orgTree.updateUI();
 				refreshForceView();
 			}
@@ -3608,7 +3614,7 @@ public class CampaignGUI extends JPanel {
 		String text = "<html><b>Balance:</b> " + numberFormat.format(funds) + " C-Bills</html>";
 		lblFunds.setText(text);
 	}
-	
+
 	protected void refreshRating() {
 		if(getCampaign().getCampaignOptions().useDragoonRating()) {
             if (dragoonDialog != null && dragoonDialog.isVisible())
@@ -3652,18 +3658,18 @@ public class CampaignGUI extends JPanel {
 			lblRating.setText("");
 		}
 	}
-	
+
 	protected void refreshTempAstechs() {
 		String text = "<html><b>Temp Astechs:</b> " +getCampaign().getAstechPool() + "</html>";
 		lblTempAstechs.setText(text);
 	}
-	
+
 	protected void refreshTempMedics() {
 		String text = "<html><b>Temp Medics:</b> " +getCampaign().getMedicPool() + "</html>";
 		lblTempMedics.setText(text);
 	}
-	
-	
+
+
 	public void refreshLocation() {
 		lblLocation.setText(getCampaign().getLocation().getReport(getCampaign().getCalendar().getTime()));
 	}
@@ -3679,7 +3685,7 @@ public class CampaignGUI extends JPanel {
 		}
 		return patients;
 	}
-	
+
 	protected ArrayList<Person> getSelectedAssignedPatients() {
 		ArrayList<Person> patients = new ArrayList<Person>();
 		int[] indices = listAssignedPatient.getSelectedIndices();
@@ -3691,10 +3697,10 @@ public class CampaignGUI extends JPanel {
 		}
 		return patients;
 	}
-	
+
 	protected void updateAssignDoctorEnabled() {
 		Person doctor = getSelectedDoctor();
-		if (!getSelectedUnassignedPatients().isEmpty()  && null != doctor 
+		if (!getSelectedUnassignedPatients().isEmpty()  && null != doctor
 				&& getCampaign().getPatientsFor(doctor)<25) {
 			btnAssignDoc.setEnabled(true);
 		} else {
@@ -3707,7 +3713,7 @@ public class CampaignGUI extends JPanel {
 		TargetRoll target = null;
 		if(acquireSelected()) {
 			IAcquisitionWork acquire = getSelectedAcquisition();
-			if(null != acquire) {			
+			if(null != acquire) {
 				Unit u = acquire.getUnit();
 				Person tech = getSelectedTech();
 				if(null != u && u.getEntity() instanceof Dropship || u.getEntity() instanceof Jumpship) {
@@ -3720,7 +3726,7 @@ public class CampaignGUI extends JPanel {
 		}
 		else  {
 			Part part = getSelectedTask();
-			if(null != part) {			
+			if(null != part) {
 				Unit u = part.getUnit();
 				Person tech = getSelectedTech();
 				if(null != u && (u.getEntity() instanceof Dropship || u.getEntity() instanceof Jumpship)) {
@@ -3749,7 +3755,7 @@ public class CampaignGUI extends JPanel {
 			lbl.setText("-");
 		}
 	}
-	
+
 	public void filterPersonnel() {
         RowFilter<PersonnelTableModel, Integer> personTypeFilter = null;
         final int nGroup = choicePerson.getSelectedIndex();
@@ -3785,7 +3791,7 @@ public class CampaignGUI extends JPanel {
         };
         personnelSorter.setRowFilter(personTypeFilter);
     }
-	
+
 	public void filterParts() {
         RowFilter<PartsTableModel, Integer> partsTypeFilter = null;
         final int nGroup = choiceParts.getSelectedIndex();
@@ -3799,7 +3805,7 @@ public class CampaignGUI extends JPanel {
         		} else if(nGroup == SG_ARMOR) {
         			return part instanceof Armor;
         		} else if(nGroup == SG_SYSTEM) {
-        			return part instanceof MekGyro 
+        			return part instanceof MekGyro
         				|| part instanceof EnginePart
         				|| part instanceof MekActuator
         				|| part instanceof MekLifeSupport
@@ -3828,7 +3834,7 @@ public class CampaignGUI extends JPanel {
         };
         partsSorter.setRowFilter(partsTypeFilter);
     }
-	
+
 	public void filterUnits() {
 		RowFilter<UnitTableModel, Integer> unitTypeFilter = null;
 		final int nGroup = choiceUnit.getSelectedIndex() - 1;
@@ -3850,7 +3856,7 @@ public class CampaignGUI extends JPanel {
         };
         unitSorter.setRowFilter(unitTypeFilter);
     }
-	
+
 	public void filterTechs(boolean warehouse) {
 		RowFilter<TechTableModel, Integer> techTypeFilter = null;
 		final Part part = getSelectedTask();
@@ -3888,7 +3894,7 @@ public class CampaignGUI extends JPanel {
         	techSorter.setRowFilter(techTypeFilter);
         }
     }
-	
+
 	private void changePersonnelView() {
 
 		int view = choicePersonView.getSelectedIndex();
@@ -3931,7 +3937,7 @@ public class CampaignGUI extends JPanel {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NIMP), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_HITS), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SALARY), getCampaign().getCampaignOptions().payForSalaries());
-			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), true);	
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), true);
 		} else if(view == PV_PILOT) {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NAME), true);
@@ -3970,7 +3976,7 @@ public class CampaignGUI extends JPanel {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NIMP), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_HITS), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SALARY), false);
-			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), false);	
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), false);
 		} else if(view == PV_INF) {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NAME), true);
@@ -4009,7 +4015,7 @@ public class CampaignGUI extends JPanel {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NIMP), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_HITS), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SALARY), false);
-			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), false);	
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), false);
 		} else if(view == PV_TACTIC) {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NAME), true);
@@ -4048,7 +4054,7 @@ public class CampaignGUI extends JPanel {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NIMP), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_HITS), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SALARY), false);
-			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), false);	
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), false);
 		} else if(view == PV_TECH) {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NAME), true);
@@ -4087,7 +4093,7 @@ public class CampaignGUI extends JPanel {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NIMP), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_HITS), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SALARY), false);
-			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), false);	
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), false);
 		} else if(view == PV_ADMIN) {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NAME), true);
@@ -4126,7 +4132,7 @@ public class CampaignGUI extends JPanel {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NIMP), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_HITS), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SALARY), false);
-			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), false);	
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), false);
 		} else if(view == PV_FLUFF) {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_RANK), true);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NAME), true);
@@ -4165,12 +4171,12 @@ public class CampaignGUI extends JPanel {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_NIMP), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_HITS), false);
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_SALARY), false);
-			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), false);	
+			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(PersonnelTableModel.COL_XP), false);
 		}
 	}
-	
+
 	private void changeUnitView() {
-		
+
 		int view = choiceUnitView.getSelectedIndex();
 		XTableColumnModel columnModel = (XTableColumnModel)unitTable.getColumnModel();
 		if(view == PV_GENERAL) {
@@ -4226,43 +4232,43 @@ public class CampaignGUI extends JPanel {
 			columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_QUIRKS), false);
 		}
 	}
-	
+
 	protected MekHQ getApplication() {
 		return app;
 	}
-	
+
 	public Campaign getCampaign() {
 		return getApplication().getCampaign();
 	}
-	
+
 	public DirectoryItems getPortraits() {
 		return getApplication().getPortraits();
 	}
-	
+
 	protected DirectoryItems getCamos() {
 		return getApplication().getCamos();
 	}
-	
+
 	public DirectoryItems getForceIcons() {
 		return getApplication().getForceIcons();
 	}
-	
+
 	protected MechTileset getMechTiles() {
 		return getApplication().getMechTiles();
 	}
-	
+
 	public JFrame getFrame() {
 		return frame;
 	}
-	
+
 	public CampaignGUI getCampaignGUI() {
 		return this;
 	}
-	
+
 	protected boolean repairsSelected() {
 		return tabTasks.getSelectedIndex() == 0;
 	}
-	
+
 	protected boolean acquireSelected() {
 		return tabTasks.getSelectedIndex() == 1 && !onWarehouseTab();
 	}
@@ -4271,7 +4277,7 @@ public class CampaignGUI extends JPanel {
 		//TODO: dont do this with a hard number
 		return tabMain.getSelectedIndex() == 5;
 	}
-	
+
 	/**
 	 * A table model for displaying work items
 	 */
@@ -4344,7 +4350,7 @@ public class CampaignGUI extends JPanel {
 		}
 
 		public class Renderer extends BasicInfo implements TableCellRenderer {
-			
+
 			public Renderer(DirectoryItems camos, DirectoryItems portraits,
 					MechTileset mt) {
 				super(camos, portraits, mt);
@@ -4493,7 +4499,7 @@ public class CampaignGUI extends JPanel {
 					}
 					cbMenuItem.setEnabled(!part.isBeingWorkedOn());
 					menu.add(cbMenuItem);
-				}		
+				}
 				popup.add(menu);
 				// Scrap component
 				menuItem = new JMenuItem("Scrap component");
@@ -4549,9 +4555,9 @@ public class CampaignGUI extends JPanel {
 				*/
 				popup.show(e.getComponent(), e.getX(), e.getY());
 			}
-		}	
+		}
 	}
-	
+
 
 	/**
 	 * A table model for displaying work items
@@ -4612,7 +4618,7 @@ public class CampaignGUI extends JPanel {
 	 */
 	public class ServicedUnitTableModel extends AbstractTableModel {
 		private static final long serialVersionUID = 3314061779690077204L;
-		
+
 		private final static int COL_NAME    =    0;
         private final static int COL_TYPE    =    1;
         private final static int COL_STATUS   =   2;
@@ -4620,9 +4626,9 @@ public class CampaignGUI extends JPanel {
         private final static int COL_REPAIR  =    4;
         private final static int COL_PARTS    =   5;
         private final static int N_COL =          6;
-        
+
         private ArrayList<Unit> data = new ArrayList<Unit>();
-        
+
         public int getRowCount() {
             return data.size();
         }
@@ -4650,20 +4656,20 @@ public class CampaignGUI extends JPanel {
                     return "?";
             }
         }
-        
+
         public int getColumnWidth(int c) {
             switch(c) {
             case COL_TYPE:
             case COL_STATUS:
             case COL_SITE:
-                return 50;        
+                return 50;
         	case COL_NAME:
             	return 100;
             default:
                 return 25;
             }
         }
-        
+
         public int getAlignment(int col) {
             switch(col) {
             case COL_REPAIR:
@@ -4673,7 +4679,7 @@ public class CampaignGUI extends JPanel {
             	return SwingConstants.LEFT;
             }
         }
-        
+
         @Override
         public Class<?> getColumnClass(int c) {
             return getValueAt(0, c).getClass();
@@ -4707,7 +4713,7 @@ public class CampaignGUI extends JPanel {
             }
             if(col == COL_NAME) {
                 return u.getName();
-            }  
+            }
             if(col == COL_TYPE) {
             	return UnitType.getTypeDisplayableName(UnitType.determineUnitTypeCode(e));
             }
@@ -4744,7 +4750,7 @@ public class CampaignGUI extends JPanel {
 				int actualRow = table.convertRowIndexToModel(row);
 				setHorizontalAlignment(getAlignment(actualCol));
 				Unit u = getUnit(actualRow);
-				
+
 				setForeground(Color.BLACK);
 				if (isSelected) {
                     setBackground(Color.DARK_GRAY);
@@ -4763,7 +4769,7 @@ public class CampaignGUI extends JPanel {
     				} else if ((null != u)
     						&& (u.getPartsNeedingFixing().size() > 0)) {
     					setBackground(new Color(238, 238, 0));
-                    } else if (u.getEntity() instanceof Infantry 
+                    } else if (u.getEntity() instanceof Infantry
                     		&& u.getActiveCrew().size() < u.getFullCrewSize()) {
                 		setBackground(Color.RED);
                     }
@@ -4825,7 +4831,7 @@ public class CampaignGUI extends JPanel {
 				} else {
 					unselect();
 				}
-	
+
 				c.setBackground(new Color(220, 220, 220));
 				return c;
 			}
@@ -4946,7 +4952,7 @@ public class CampaignGUI extends JPanel {
 				refreshPatientList();
 				refreshPersonnelList();
 				refreshScenarioList();
-			} 
+			}
 		}
 
 		@Override
@@ -5110,11 +5116,11 @@ public class CampaignGUI extends JPanel {
 		private static final long serialVersionUID = -1615929049408417297L;
 
 		ArrayList<Person> patients;
-		
+
 		public PatientTableModel() {
 			patients = new ArrayList<Person>();
 		}
-		
+
 		//fill table with values
         public void setData(ArrayList<Person> data) {
             patients = data;
@@ -5173,23 +5179,23 @@ public class CampaignGUI extends JPanel {
 			}
 		}
 
-		
+
 	}
-	
+
 	public class OrgTreeModel implements TreeModel {
 
 		private Force rootForce;
 		private Vector<TreeModelListener> listeners = new Vector<TreeModelListener>();
-		
+
 		public OrgTreeModel(Force root) {
 	        rootForce = root;
 	    }
-	
+
 		@Override
 		public Object getChild(Object parent, int index) {
 			if(parent instanceof Force) {
 				return ((Force)parent).getAllChildren(getCampaign()).get(index);
-			} 
+			}
 			return null;
 		}
 
@@ -5222,9 +5228,9 @@ public class CampaignGUI extends JPanel {
 		@Override
 		public void valueForPathChanged(TreePath arg0, Object arg1) {
 			// TODO Auto-generated method stub
-			
+
 		}
-		
+
 		public void addTreeModelListener( TreeModelListener listener ) {
 		      if ( listener != null && !listeners.contains( listener ) ) {
 		         listeners.addElement( listener );
@@ -5237,7 +5243,7 @@ public class CampaignGUI extends JPanel {
 		      }
 		   }
 	}
-	
+
 	public class OrgTreeMouseAdapter extends MouseInputAdapter implements
 	ActionListener {
 
@@ -5323,7 +5329,7 @@ public class CampaignGUI extends JPanel {
     				if(tad.wasChanged()) {
     					force.setDescription(tad.getText());
     					refreshOrganization();
-    				}        	
+    				}
             	}
             } else if(command.contains("REMOVE_FORCE")) {
             	if(null != force) {
@@ -5332,9 +5338,9 @@ public class CampaignGUI extends JPanel {
             			, "Delete Force?",
             				JOptionPane.YES_NO_OPTION)) {
                 		return;
-                	}  
+                	}
             		getCampaign().removeForce(force);
-            		refreshOrganization();   
+            		refreshOrganization();
             		refreshPersonnelList();
             		refreshScenarioList();
             	}
@@ -5364,7 +5370,7 @@ public class CampaignGUI extends JPanel {
             	}
             }
 		}
-		
+
 		@Override
 		public void mousePressed(MouseEvent e) {
 			maybeShowPopup(e);
@@ -5376,7 +5382,7 @@ public class CampaignGUI extends JPanel {
 		}
 
 		private void maybeShowPopup(MouseEvent e) {
-				
+
 			if (e.isPopupTrigger()) {
 				JPopupMenu popup = new JPopupMenu();
 				JMenuItem menuItem;
@@ -5386,7 +5392,7 @@ public class CampaignGUI extends JPanel {
                 JTree tree = (JTree)e.getSource();
                 TreePath path = tree.getPathForLocation(x, y);
                 if (path == null)
-                        return; 
+                        return;
                 tree.setSelectionPath(path);
                 Object node = path.getLastPathComponent();
                 Force force = null;
@@ -5431,7 +5437,7 @@ public class CampaignGUI extends JPanel {
 	                if(menu.getItemCount() > 30) {
 	                	MenuScroller.setScrollerFor(menu, 30);
 	                }
-	                popup.add(menu);   
+	                popup.add(menu);
 	                if(!force.isDeployed() && force.getAllUnits().size()>0) {
 	                	menu = new JMenu("Deploy Force");
 	                	JMenu missionMenu;
@@ -5505,15 +5511,15 @@ public class CampaignGUI extends JPanel {
 				popup.show(e.getComponent(), e.getX(), e.getY());
 			}
 		}
-		
+
 	}
-	
+
 	public class ForceRenderer extends DefaultTreeCellRenderer {
-     
+
 		private static final long serialVersionUID = -553191867660269247L;
 
 		public ForceRenderer() {
-        	
+
         }
 
         public Component getTreeCellRendererComponent(
@@ -5536,7 +5542,7 @@ public class CampaignGUI extends JPanel {
             	setBackground(Color.DARK_GRAY);
                 setForeground(Color.WHITE);
             }
-            
+
             if(value instanceof Unit) {
             	String name = "<font color='red'>No Crew</font>";
             	String uname = "";
@@ -5547,16 +5553,16 @@ public class CampaignGUI extends JPanel {
             		name += " (" + u.getEntity().getCrew().getGunnery() + "/" + u.getEntity().getCrew().getPiloting() + ")";
             		if(pp.needsFixing()) {
             			name = "<font color='red'>" + name + "</font>";
-            		}     
+            		}
             	}
             	uname = "<i>" + u.getName() + "</i>";
             	if(u.isDamaged()) {
             		uname = "<font color='red'>" + uname + "</font>";
-            	}          	
+            	}
             	setText("<html>" + name + ", " + uname + "</html>");
-            	if(u.isDeployed() && !hasFocus) {   		
+            	if(u.isDeployed() && !hasFocus) {
             		setBackground(Color.LIGHT_GRAY);
-            	} 
+            	}
             }
             if(value instanceof Force) {
             	if(!hasFocus && ((Force)value).isDeployed()) {
@@ -5565,13 +5571,13 @@ public class CampaignGUI extends JPanel {
             }
             setIcon(getIcon(value));
 
-            
-            
+
+
             return this;
         }
-        
+
         protected Icon getIcon(Object node) {
-        	
+
         	if(node instanceof Unit) {
         		return getIconFrom((Unit)node);
         	} else if(node instanceof Force) {
@@ -5580,7 +5586,7 @@ public class CampaignGUI extends JPanel {
         		return null;
         	}
         }
-        
+
         protected Icon getIconFrom(Unit unit) {
         	Person person = unit.getCommander();
         	if(null == person) {
@@ -5588,11 +5594,11 @@ public class CampaignGUI extends JPanel {
         	}
         	String category = person.getPortraitCategory();
         	String file = person.getPortraitFileName();
-        	
+
         	if(Pilot.ROOT_PORTRAIT.equals(category)) {
         		category = "";
         	}
-        	
+
         	// Return a null if the player has selected no portrait file.
         	if ((null == category) || (null == file) || Pilot.PORTRAIT_NONE.equals(file)) {
         		file = "default.gif";
@@ -5602,11 +5608,11 @@ public class CampaignGUI extends JPanel {
             try {
                 portrait = (Image) getPortraits().getItem(category, file);
                 if(null != portrait) {
-                    portrait = portrait.getScaledInstance(58, -1, Image.SCALE_DEFAULT);               
+                    portrait = portrait.getScaledInstance(58, -1, Image.SCALE_DEFAULT);
                 } else {
                 	portrait = (Image) getPortraits().getItem("", "default.gif");
                 	if(null != portrait) {
-                        portrait = portrait.getScaledInstance(58, -1, Image.SCALE_DEFAULT);               
+                        portrait = portrait.getScaledInstance(58, -1, Image.SCALE_DEFAULT);
                 	}
                 }
                 return new ImageIcon(portrait);
@@ -5615,7 +5621,7 @@ public class CampaignGUI extends JPanel {
                 return null;
             }
         }
-        
+
         protected Icon getIconFrom(Force force) {
             String category = force.getIconCategory();
             String file = force.getIconFileName();
@@ -5634,31 +5640,31 @@ public class CampaignGUI extends JPanel {
             try {
            	 portrait = (Image) getForceIcons().getItem(category, file);
            	if(null != portrait) {
-                portrait = portrait.getScaledInstance(58, -1, Image.SCALE_DEFAULT);               
+                portrait = portrait.getScaledInstance(58, -1, Image.SCALE_DEFAULT);
             } else {
             	portrait = (Image) getForceIcons().getItem("", "empty.png");
             	if(null != portrait) {
-                    portrait = portrait.getScaledInstance(58, -1, Image.SCALE_DEFAULT);               
+                    portrait = portrait.getScaledInstance(58, -1, Image.SCALE_DEFAULT);
             	}
             }
            	return new ImageIcon(portrait);
             } catch (Exception err) {
            	 err.printStackTrace();
-           	 return null;     	
+           	 return null;
             }
        }
-    }	
-	
+    }
+
 	public class PersonnelTableMouseAdapter extends MouseInputAdapter implements
 			ActionListener {
-		
+
 		private CampaignGUI view;
-		
+
 		public PersonnelTableMouseAdapter(CampaignGUI view) {
 			super();
 			this.view = view;
 		}
-		
+
 		public void actionPerformed(ActionEvent action) {
 			StringTokenizer st = new StringTokenizer(action.getActionCommand(), "|");
             String command = st.nextToken();
@@ -5710,7 +5716,7 @@ public class CampaignGUI extends JPanel {
 				refreshTechsList();
 				refreshDoctorsList();
 				refreshOrganization();
-			} else if (command.contains("REMOVE_UNIT")) {	
+			} else if (command.contains("REMOVE_UNIT")) {
 				Unit u = getCampaign().getUnit(selectedPerson.getUnitId());
 				if(null != u) {
 					u.remove(selectedPerson);
@@ -5728,7 +5734,7 @@ public class CampaignGUI extends JPanel {
 				}
 				if(null != u) {
 					u.addPilotOrSoldier(selectedPerson);
-				}				
+				}
 				u.resetPilotAndEntity();
 				u.runDiagnostic();
 				refreshServicedUnitList();
@@ -5744,11 +5750,11 @@ public class CampaignGUI extends JPanel {
 	        				Unit oldUnit = getCampaign().getUnit(p.getUnitId());
 	        				if(null != oldUnit) {
 	        					oldUnit.remove(p);
-	        				}   
+	        				}
 	        				u.addPilotOrSoldier(p);
                     	}
                     }
-				}				
+				}
 				u.resetPilotAndEntity();
 				u.runDiagnostic();
 				refreshServicedUnitList();
@@ -5756,12 +5762,12 @@ public class CampaignGUI extends JPanel {
 				refreshPersonnelList();
 				refreshOrganization();
 			} else if (command.contains("ADD_DRIVER")) {
-				UUID selected = UUID.fromString(st.nextToken());		
+				UUID selected = UUID.fromString(st.nextToken());
 				Unit u = getCampaign().getUnit(selected);
 				Unit oldUnit = getCampaign().getUnit(selectedPerson.getUnitId());
 				if(null != oldUnit) {
 					oldUnit.remove(selectedPerson);
-				} 
+				}
 				if(null != u) {
 					u.addDriver(selectedPerson);
 				}
@@ -5772,7 +5778,7 @@ public class CampaignGUI extends JPanel {
 				refreshPersonnelList();
 				refreshOrganization();
 			} else if (command.contains("ADD_GUNNER")) {
-				UUID selected = UUID.fromString(st.nextToken());		
+				UUID selected = UUID.fromString(st.nextToken());
 				Unit u = getCampaign().getUnit(selected);
 				if(null != u) {
                     for (Person p : people) {
@@ -5780,7 +5786,7 @@ public class CampaignGUI extends JPanel {
                     		Unit oldUnit = getCampaign().getUnit(p.getUnitId());
                     		if(null != oldUnit) {
                     			oldUnit.remove(p);
-                    		}     
+                    		}
                             u.addGunner(p);
                         }
                     }
@@ -5792,7 +5798,7 @@ public class CampaignGUI extends JPanel {
 				refreshPersonnelList();
 				refreshOrganization();
 			} else if (command.contains("ADD_CREW")) {
-				UUID selected = UUID.fromString(st.nextToken());		
+				UUID selected = UUID.fromString(st.nextToken());
 				Unit u = getCampaign().getUnit(selected);
 				if(null != u) {
                     for (Person p : people) {
@@ -5800,7 +5806,7 @@ public class CampaignGUI extends JPanel {
                     		Unit oldUnit = getCampaign().getUnit(p.getUnitId());
                     		if(null != oldUnit) {
                     			oldUnit.remove(p);
-                    		}     
+                    		}
                             u.addVesselCrew(p);
                         }
                     }
@@ -5812,7 +5818,7 @@ public class CampaignGUI extends JPanel {
 				refreshPersonnelList();
 				refreshOrganization();
 			} else if (command.contains("ADD_NAV")) {
-				UUID selected = UUID.fromString(st.nextToken());		
+				UUID selected = UUID.fromString(st.nextToken());
 				Unit u = getCampaign().getUnit(selected);
 				if(null != u) {
                     for (Person p : people) {
@@ -5820,7 +5826,7 @@ public class CampaignGUI extends JPanel {
                     		Unit oldUnit = getCampaign().getUnit(p.getUnitId());
                     		if(null != oldUnit) {
                     			oldUnit.remove(p);
-                    		}     
+                    		}
                             u.setNavigator(p);
                         }
                     }
@@ -5886,7 +5892,7 @@ public class CampaignGUI extends JPanel {
 				refreshReport();
 			} else if (command.equalsIgnoreCase("STATUS")) {
 				int selected = Integer.parseInt(st.nextToken());
-				for(Person person : people) {				
+				for(Person person : people) {
 					if (selected == Person.S_ACTIVE
 							|| (0 == JOptionPane.showConfirmDialog(
 									null,
@@ -5932,8 +5938,8 @@ public class CampaignGUI extends JPanel {
 				refreshOrganization();
 				refreshReport();
 			} else if (command.equalsIgnoreCase("EDIT")) {
-				CustomizePersonDialog npd = new CustomizePersonDialog(getFrame(), true, 
-						selectedPerson, 
+				CustomizePersonDialog npd = new CustomizePersonDialog(getFrame(), true,
+						selectedPerson,
 						getCampaign());
 				npd.setVisible(true);
 				getCampaign().personUpdated(selectedPerson);
@@ -6054,7 +6060,7 @@ public class CampaignGUI extends JPanel {
             }
             return true;
         }
-        
+
         private boolean areAllBattleArmor(Person[] people) {
             for (Person person : people) {
                 if (Person.T_BA != person.getPrimaryRole()) {
@@ -6184,7 +6190,7 @@ public class CampaignGUI extends JPanel {
 						JMenu crewMenu = new JMenu("As Crewmember");
 						JMenu driverMenu = new JMenu("As Driver");
 						JMenu gunnerMenu = new JMenu("As Gunner");
-						JMenu soldierMenu = new JMenu("As Soldier");	
+						JMenu soldierMenu = new JMenu("As Soldier");
 						JMenu navMenu = new JMenu("As Navigator");
 						cbMenuItem = new JCheckBoxMenuItem("None");
 						/*if(!person.isAssigned()) {
@@ -6282,7 +6288,7 @@ public class CampaignGUI extends JPanel {
 			                	MenuScroller.setScrollerFor(soldierMenu, 20);
 			                }
 						}
-						menu.setEnabled(!person.isDeployed(getCampaign()));					
+						menu.setEnabled(!person.isDeployed(getCampaign()));
 						popup.add(menu);
 				} else if (areAllActive(selected)) {
                     JMenu soldierMenu = new JMenu("As Soldier");
@@ -6486,7 +6492,7 @@ public class CampaignGUI extends JPanel {
 					menuItem.setActionCommand("PORTRAIT");
 					menuItem.addActionListener(this);
 					menuItem.setEnabled(true);
-					popup.add(menuItem);	
+					popup.add(menuItem);
 					// change Biography
 					menuItem = new JMenuItem("Change Biography...");
 					menuItem.setActionCommand("BIOGRAPHY");
@@ -6503,7 +6509,7 @@ public class CampaignGUI extends JPanel {
 					menuItem.addActionListener(this);
 					menuItem.setEnabled(true);
 					popup.add(menuItem);
-					
+
 				}
 				menuItem = new JMenuItem("Add Single Log Entry...");
 				menuItem.setActionCommand("LOG_SINGLE");
@@ -6553,12 +6559,12 @@ public class CampaignGUI extends JPanel {
 						menuItem.addActionListener(this);
 						menuItem.setEnabled(getCampaign().isGM() && person.isDeployed());
 						menu.add(menuItem);
-					}*/		
+					}*/
 					menuItem = new JMenuItem("Edit...");
 					menuItem.setActionCommand("EDIT");
 					menuItem.addActionListener(this);
 					menuItem.setEnabled(getCampaign().isGM());
-					menu.add(menuItem);				
+					menu.add(menuItem);
 				}
 				popup.addSeparator();
 				popup.add(menu);
@@ -6572,9 +6578,9 @@ public class CampaignGUI extends JPanel {
 	 * @author Jay lawson
 	 */
 	public class PersonnelTableModel extends AbstractTableModel {
-	
+
 		private static final long serialVersionUID = -5207167419079014157L;
-		
+
 		private final static int COL_RANK =    0;
 		private final static int COL_NAME =    1;
         private final static int COL_CALL =    2;
@@ -6605,7 +6611,7 @@ public class CampaignGUI extends JPanel {
         private final static int COL_MEDICAL    = 27;
         private final static int COL_ADMIN      = 28;
         private final static int COL_NEG        = 29;
-        private final static int COL_SCROUNGE   = 30;     
+        private final static int COL_SCROUNGE   = 30;
         private final static int COL_TOUGH =   31;
         private final static int COL_EDGE  =   32;
         private final static int COL_NABIL =   33;
@@ -6614,9 +6620,9 @@ public class CampaignGUI extends JPanel {
         private final static int COL_SALARY =  36;
         private final static int COL_XP =      37;
         private final static int N_COL =       38;
-        
+
         private ArrayList<Person> data = new ArrayList<Person>();
-        
+
         public int getRowCount() {
             return data.size();
         }
@@ -6708,7 +6714,7 @@ public class CampaignGUI extends JPanel {
                     return "?";
             }
         }
-        
+
         public int getColumnWidth(int c) {
             switch(c) {
         	case COL_RANK:
@@ -6717,7 +6723,7 @@ public class CampaignGUI extends JPanel {
             case COL_CALL:
             case COL_SALARY:
             case COL_SKILL:
-                return 50;        
+                return 50;
             case COL_TYPE:
             case COL_FORCE:
                 return 100;
@@ -6728,7 +6734,7 @@ public class CampaignGUI extends JPanel {
                 return 20;
             }
         }
-        
+
         public int getAlignment(int col) {
             switch(col) {
             case COL_SALARY:
@@ -6758,7 +6764,7 @@ public class CampaignGUI extends JPanel {
             	return null;
             }
         }
-        
+
         @Override
         public Class<?> getColumnClass(int c) {
             return getValueAt(0, c).getClass();
@@ -6781,7 +6787,7 @@ public class CampaignGUI extends JPanel {
             data = people;
             fireTableDataChanged();
         }
-        
+
         public boolean isDeployed(int row) {
         	return getPerson(row).isDeployed(getCampaign());
         }
@@ -7057,11 +7063,11 @@ public class CampaignGUI extends JPanel {
             			}
             			else if(u.isDriver(p)) {
             				name = "[Pilot] " + name;
-            			} 
+            			}
             			else if(u.isGunner(p)) {
             				name = "[Gunner] " + name;
             			} else {
-            				name = "[Crew] " + name; 
+            				name = "[Crew] " + name;
             			}
             		}
             		return name;
@@ -7111,7 +7117,7 @@ public class CampaignGUI extends JPanel {
 				int actualRow = table.convertRowIndexToModel(row);
 				setHorizontalAlignment(getAlignment(actualCol));
 				setToolTipText(getTooltip(actualRow, actualCol));
-				
+
 				setForeground(Color.BLACK);
 				if (isSelected) {
                     setBackground(Color.DARK_GRAY);
@@ -7130,9 +7136,9 @@ public class CampaignGUI extends JPanel {
 			}
 
 		}
-        
+
 	}
-	
+
 	/**
 	 * A comparator for ranks written as strings with "-" sorted to the bottom always
 	 * @author Jay Lawson
@@ -7141,7 +7147,7 @@ public class CampaignGUI extends JPanel {
 	public class RankSorter implements Comparator<String> {
 
 		@Override
-		public int compare(String s0, String s1) {	
+		public int compare(String s0, String s1) {
 			if(s0.equals("-") && s1.equals("-")) {
 				return 0;
 			} else if(s0.equals("-")) {
@@ -7153,10 +7159,10 @@ public class CampaignGUI extends JPanel {
 				int r0 = getCampaign().getRanks().getRankOrder(s0);
 				int r1 = getCampaign().getRanks().getRankOrder(s1);
 				return ((Comparable<Integer>)r0).compareTo(r1);
-			}			
+			}
 		}
 	}
-	
+
 	/**
 	 * A comparator for skills written as strings with "-" sorted to the bottom always
 	 * @author Jay Lawson
@@ -7165,7 +7171,7 @@ public class CampaignGUI extends JPanel {
 	public class SkillSorter implements Comparator<String> {
 
 		@Override
-		public int compare(String s0, String s1) {	
+		public int compare(String s0, String s1) {
 			if(s0.equals("-") && s1.equals("-")) {
 				return 0;
 			} else if(s0.equals("-")) {
@@ -7174,10 +7180,10 @@ public class CampaignGUI extends JPanel {
 				return -1;
 			} else {
 				return ((Comparable<String>)s0).compareTo(s1);
-			}			
+			}
 		}
 	}
-	
+
 	/**
 	 * A comparator that sorts techs by skill level
 	 * @author Jay Lawson
@@ -7186,11 +7192,11 @@ public class CampaignGUI extends JPanel {
 	public class TechSorter implements Comparator<Person> {
 
 		@Override
-		public int compare(Person p0, Person p1) {	
-			return ((Comparable<Integer>)p0.getBestTechLevel()).compareTo(p1.getBestTechLevel());			
+		public int compare(Person p0, Person p1) {
+			return ((Comparable<Integer>)p0.getBestTechLevel()).compareTo(p1.getBestTechLevel());
 		}
 	}
-	
+
 	/**
 	 * A comparator for bonuses written as strings with "-" sorted to the bottom always
 	 * @author Jay Lawson
@@ -7199,7 +7205,7 @@ public class CampaignGUI extends JPanel {
 	public class BonusSorter implements Comparator<String> {
 
 		@Override
-		public int compare(String s0, String s1) {	
+		public int compare(String s0, String s1) {
 			if(s0.equals("-") && s1.equals("-")) {
 				return 0;
 			} else if(s0.equals("-")) {
@@ -7208,10 +7214,10 @@ public class CampaignGUI extends JPanel {
 				return -1;
 			} else {
 				return ((Comparable<String>)s1).compareTo(s0);
-			}			
+			}
 		}
 	}
-	
+
 	/**
 	 * A comparator for skills levels (e.g. Regular, Veteran, etc)
 	 * 	 * @author Jay Lawson
@@ -7220,7 +7226,7 @@ public class CampaignGUI extends JPanel {
 	public class LevelSorter implements Comparator<String> {
 
 		@Override
-		public int compare(String s0, String s1) {	
+		public int compare(String s0, String s1) {
 			if(s0.equals("-") && s1.equals("-")) {
 				return 0;
 			} else if(s0.equals("-")) {
@@ -7256,10 +7262,10 @@ public class CampaignGUI extends JPanel {
 					l1 = 4;
 				}
 				return ((Comparable<Integer>)l0).compareTo(l1);
-			}			
+			}
 		}
 	}
-	
+
 	/**
 	 * A comparator for unit status strings
 	 * @author Jay Lawson
@@ -7268,7 +7274,7 @@ public class CampaignGUI extends JPanel {
 	public class UnitStatusSorter implements Comparator<String> {
 
 		@Override
-		public int compare(String s0, String s1) {	
+		public int compare(String s0, String s1) {
 			//probably easiest to turn into numbers and then sort that way
 			int l0 = 0;
 			int l1 = 0;
@@ -7308,10 +7314,10 @@ public class CampaignGUI extends JPanel {
 			if(s1.contains("Undamaged")) {
 				l1 = 6;
 			}
-			return ((Comparable<Integer>)l0).compareTo(l1);		
+			return ((Comparable<Integer>)l0).compareTo(l1);
 		}
 	}
-	
+
 	/**
 	 * A comparator for unit weight classes
 	 * @author Jay Lawson
@@ -7320,7 +7326,7 @@ public class CampaignGUI extends JPanel {
 	public class WeightClassSorter implements Comparator<String> {
 
 		@Override
-		public int compare(String s0, String s1) {	
+		public int compare(String s0, String s1) {
 			//lets find the weight class integer for each name
 			int l0 = 0;
 			int l1 = 0;
@@ -7330,12 +7336,12 @@ public class CampaignGUI extends JPanel {
 				}
 				if(EntityWeightClass.getClassName(i).equals(s1)) {
 					l1 = i;
-				}			
+				}
 			}
-			return ((Comparable<Integer>)l0).compareTo(l1);		
+			return ((Comparable<Integer>)l0).compareTo(l1);
 		}
 	}
-	
+
 	/**
 	 * A comparator for unit types
 	 * @author Jay Lawson
@@ -7344,7 +7350,7 @@ public class CampaignGUI extends JPanel {
 	public class UnitTypeSorter implements Comparator<String> {
 
 		@Override
-		public int compare(String s0, String s1) {	
+		public int compare(String s0, String s1) {
 			//lets find the weight class integer for each name
 			int l0 = 0;
 			int l1 = 0;
@@ -7354,12 +7360,12 @@ public class CampaignGUI extends JPanel {
 				}
 				if(UnitType.getTypeDisplayableName(i).equals(s1)) {
 					l1 = i;
-				}			
+				}
 			}
-			return ((Comparable<Integer>)l1).compareTo(l0);		
+			return ((Comparable<Integer>)l1).compareTo(l0);
 		}
 	}
-	
+
 	/**
 	 * A comparator for numbers that have been formatted with DecimalFormat
 	 * @author Jay Lawson
@@ -7368,7 +7374,7 @@ public class CampaignGUI extends JPanel {
 	public class FormattedNumberSorter implements Comparator<String> {
 
 		@Override
-		public int compare(String s0, String s1) {	
+		public int compare(String s0, String s1) {
 			//lets find the weight class integer for each name
 			DecimalFormat format = new DecimalFormat();
 			int l0 = 0;
@@ -7385,10 +7391,10 @@ public class CampaignGUI extends JPanel {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			return ((Comparable<Integer>)l0).compareTo(l1);		
+			return ((Comparable<Integer>)l0).compareTo(l1);
 		}
 	}
-	
+
 	/**
 	 * A table model for displaying doctors
 	 */
@@ -7455,11 +7461,11 @@ public class CampaignGUI extends JPanel {
 		private final static int COL_COST     =   6;
 		private final static int COL_TON       =  7;
 		private final static int N_COL          = 8;
-		
+
 		public PartsTableModel() {
 			data = new ArrayList<Part>();
 		}
-		
+
 		public int getRowCount() {
             return data.size();
         }
@@ -7526,12 +7532,12 @@ public class CampaignGUI extends JPanel {
 			}
 			return "?";
 		}
-		
+
 		public Part getPartAt(int row) {
 			return ((Part) data.get(row));
 
 		}
-		
+
 		 public int getColumnWidth(int c) {
 	            switch(c) {
 	            case COL_NAME:
@@ -7540,7 +7546,7 @@ public class CampaignGUI extends JPanel {
 	        	case COL_REPAIR:
 	        		return 150;
 	            case COL_STATUS:
-	                return 40;      
+	                return 40;
 	            case COL_TECH_BASE:
 	            	return 20;
 	            case COL_COST:
@@ -7549,7 +7555,7 @@ public class CampaignGUI extends JPanel {
 	                return 3;
 	            }
 	        }
-	        
+
 	        public int getAlignment(int col) {
 	            switch(col) {
 	            case COL_COST:
@@ -7584,7 +7590,7 @@ public class CampaignGUI extends JPanel {
 					int actualRow = table.convertRowIndexToModel(row);
 					setHorizontalAlignment(getAlignment(actualCol));
 					setToolTipText(getTooltip(actualRow, actualCol));
-					
+
 					return this;
 				}
 
@@ -7710,7 +7716,7 @@ public class CampaignGUI extends JPanel {
 						}
 						cbMenuItem.setEnabled(!part.isBeingWorkedOn());
 						menu.add(cbMenuItem);
-					}	
+					}
 					popup.add(menu);
 				}
 				// GM mode
@@ -7728,7 +7734,7 @@ public class CampaignGUI extends JPanel {
 			}
 		}
 	}
-	
+
 	/**
 	 * A table model for displaying scenarios
 	 */
@@ -7740,9 +7746,9 @@ public class CampaignGUI extends JPanel {
 		private final static int COL_DATE       = 2;
         private final static int COL_ASSIGN     = 3;
         private final static int N_COL          = 4;
-		
+
         private ArrayList<Scenario> data = new ArrayList<Scenario>();
-		
+
 		public int getRowCount() {
             return data.size();
         }
@@ -7788,7 +7794,7 @@ public class CampaignGUI extends JPanel {
 			}
 			return "?";
 		}
-		
+
 		public int getColumnWidth(int c) {
             switch(c) {
             case COL_NAME:
@@ -7799,14 +7805,14 @@ public class CampaignGUI extends JPanel {
                 return 20;
             }
         }
-        
+
         public int getAlignment(int col) {
             switch(col) {
             default:
             	return SwingConstants.LEFT;
             }
         }
-		
+
 		@Override
         public Class<?> getColumnClass(int c) {
             return getValueAt(0, c).getClass();
@@ -7827,7 +7833,7 @@ public class CampaignGUI extends JPanel {
 			return data.get(row);
 		}
 	}
-	
+
 	public class ScenarioTableMouseAdapter extends MouseInputAdapter implements ActionListener {
 
 		public void actionPerformed(ActionEvent action) {
@@ -7848,17 +7854,17 @@ public class CampaignGUI extends JPanel {
 				refreshUnitList();
 			}
 		}
-		
+
 		@Override
 		public void mousePressed(MouseEvent e) {
 			maybeShowPopup(e);
 		}
-		
+
 		@Override
 		public void mouseReleased(MouseEvent e) {
 			maybeShowPopup(e);
 		}
-		
+
 		private void maybeShowPopup(MouseEvent e) {
 			JPopupMenu popup = new JPopupMenu();
 			if (e.isPopupTrigger()) {
@@ -7892,7 +7898,7 @@ public class CampaignGUI extends JPanel {
 			}
 		}
 	}
-	
+
 	/**
 	 * A table model for displaying financial transactions (i.e. a ledger)
 	 */
@@ -7906,9 +7912,9 @@ public class CampaignGUI extends JPanel {
         private final static int COL_CREDIT   =   4;
         private final static int COL_BALANCE  =   5;
         private final static int N_COL          = 6;
-		
+
         private ArrayList<Transaction> data = new ArrayList<Transaction>();
-		
+
 		public int getRowCount() {
             return data.size();
         }
@@ -7956,7 +7962,7 @@ public class CampaignGUI extends JPanel {
 					return formatter.format(-1 * amount);
 				} else {
 					return "";
-				}	
+				}
 			}
 			if(col == COL_CREDIT) {
 				if(amount > 0) {
@@ -7974,7 +7980,7 @@ public class CampaignGUI extends JPanel {
 			}
 			return "?";
 		}
-		
+
 		public int getColumnWidth(int c) {
             switch(c) {
             case COL_DESC:
@@ -7985,7 +7991,7 @@ public class CampaignGUI extends JPanel {
                 return 50;
             }
         }
-        
+
         public int getAlignment(int col) {
             switch(col) {
             case COL_DEBIT:
@@ -7996,7 +8002,7 @@ public class CampaignGUI extends JPanel {
             	return SwingConstants.LEFT;
             }
         }
-		
+
 		@Override
         public Class<?> getColumnClass(int c) {
             return getValueAt(0, c).getClass();
@@ -8024,7 +8030,7 @@ public class CampaignGUI extends JPanel {
         public void deleteTransaction(int row) {
             data.remove(row);
         }
-		
+
 		public FinanceTableModel.Renderer getRenderer() {
 			return new FinanceTableModel.Renderer();
 		}
@@ -8040,7 +8046,7 @@ public class CampaignGUI extends JPanel {
 						hasFocus, row, column);
 				setOpaque(true);
 				setHorizontalAlignment(getAlignment(column));
-				
+
 				setForeground(Color.BLACK);
 				if (isSelected) {
                     setBackground(Color.DARK_GRAY);
@@ -8122,20 +8128,20 @@ public class CampaignGUI extends JPanel {
 			}
 		}
 	}
-	
+
 	/**
 	 * A table Model for displaying information about units
 	 * @author Jay lawson
 	 */
 	public class UnitTableModel extends AbstractTableModel {
-	
+
 		private static final long serialVersionUID = -5207167419079014157L;
-		
+
 		private final static int COL_NAME    =    0;
         private final static int COL_TYPE    =    1;
         private final static int COL_WCLASS    =  2;
         private final static int COL_TECH     =   3;
-        private final static int COL_WEIGHT =     4;    
+        private final static int COL_WEIGHT =     4;
         private final static int COL_COST    =    5;
         private final static int COL_MAINTAIN  =  6;
         private final static int COL_QUALITY  =   7;
@@ -8148,9 +8154,9 @@ public class CampaignGUI extends JPanel {
         private final static int COL_PARTS    =   14;
         private final static int COL_QUIRKS   =   15;
         private final static int N_COL =          16;
-        
+
         private ArrayList<Unit> data = new ArrayList<Unit>();
-        
+
         public int getRowCount() {
             return data.size();
         }
@@ -8198,7 +8204,7 @@ public class CampaignGUI extends JPanel {
                     return "?";
             }
         }
-        
+
         public int getColumnWidth(int c) {
             switch(c) {
             case COL_WCLASS:
@@ -8206,8 +8212,8 @@ public class CampaignGUI extends JPanel {
             	return 50;
             case COL_COST:
             case COL_STATUS:
-                return 80;        
-            case COL_PILOT:          
+                return 80;
+            case COL_PILOT:
             case COL_TECH:
         	case COL_NAME:
             	return 150;
@@ -8215,7 +8221,7 @@ public class CampaignGUI extends JPanel {
                 return 20;
             }
         }
-        
+
         public int getAlignment(int col) {
             switch(col) {
             case COL_QUALITY:
@@ -8242,14 +8248,14 @@ public class CampaignGUI extends JPanel {
         		if(u.isRefitting()) {
         			return u.getRefit().getDesc();
         		}
-        		return null;		
+        		return null;
         	case COL_QUIRKS:
         		return u.getQuirksList();
-            default:		
+            default:
             	return null;
             }
         }
-        
+
         @Override
         public Class<?> getColumnClass(int c) {
             return getValueAt(0, c).getClass();
@@ -8288,7 +8294,7 @@ public class CampaignGUI extends JPanel {
             }
             if(col == COL_NAME) {
                 return u.getName();
-            }  
+            }
             if(col == COL_TYPE) {
             	return UnitType.getTypeDisplayableName(UnitType.determineUnitTypeCode(e));
             }
@@ -8368,7 +8374,7 @@ public class CampaignGUI extends JPanel {
 				setHorizontalAlignment(getAlignment(actualCol));
 				setToolTipText(getTooltip(actualRow, actualCol));
 				Unit u = getUnit(actualRow);
-				
+
 				setForeground(Color.BLACK);
 				if (isSelected) {
                     setBackground(Color.DARK_GRAY);
@@ -8387,7 +8393,7 @@ public class CampaignGUI extends JPanel {
     				} else if ((null != u)
     						&& (u.getPartsNeedingFixing().size() > 0)) {
     					setBackground(new Color(238, 238, 0));
-                    } else if (u.getEntity() instanceof Infantry 
+                    } else if (u.getEntity() instanceof Infantry
                     		&& u.getActiveCrew().size() < u.getFullCrewSize()) {
                 		setBackground(Color.RED);
                     }
@@ -8399,12 +8405,12 @@ public class CampaignGUI extends JPanel {
 			}
 
 		}
-        
+
 	}
-	
+
 	public class UnitTableMouseAdapter extends MouseInputAdapter implements
 		ActionListener {
-	
+
 		public void actionPerformed(ActionEvent action) {
 			String command = action.getActionCommand();
 			Unit selectedUnit = unitModel.getUnit(unitTable.convertRowIndexToModel(unitTable.getSelectedRow()));
@@ -8514,7 +8520,7 @@ public class CampaignGUI extends JPanel {
 				}
 				refreshServicedUnitList();
 				refreshUnitList();
-			} else if (command.equalsIgnoreCase("TAG_CUSTOM")) {		    
+			} else if (command.equalsIgnoreCase("TAG_CUSTOM")) {
 			    String sCustomsDir = "data/mechfiles/customs/";
 			    File customsDir = new File(sCustomsDir);
 			    if(!customsDir.exists()) {
@@ -8577,7 +8583,7 @@ public class CampaignGUI extends JPanel {
 				refreshPersonnelList();
 				refreshOrganization();
 				refreshReport();
-			} else if (command.contains("CUSTOMIZE") 
+			} else if (command.contains("CUSTOMIZE")
 					&& !command.contains("CANCEL")) {
 				if (selectedUnit.getEntity() instanceof Mech) {
 					panMekLab.loadUnit(selectedUnit);
@@ -8602,21 +8608,21 @@ public class CampaignGUI extends JPanel {
     				if(tad.wasChanged()) {
     					selectedUnit.setHistory(tad.getText());
     					refreshUnitList();
-    				}        	
+    				}
             	}
             }
 		}
-		
+
 		@Override
 		public void mousePressed(MouseEvent e) {
 			maybeShowPopup(e);
 		}
-		
+
 		@Override
 		public void mouseReleased(MouseEvent e) {
 			maybeShowPopup(e);
 		}
-		
+
 		private void maybeShowPopup(MouseEvent e) {
 			JPopupMenu popup = new JPopupMenu();
 			if (e.isPopupTrigger()) {
@@ -8647,7 +8653,7 @@ public class CampaignGUI extends JPanel {
 				menu.setEnabled(!unit.isDeployed() && !unit.isRefitting());
 				popup.add(menu);
 				// swap ammo
-				if(oneSelected) {			
+				if(oneSelected) {
 					menu = new JMenu("Swap ammo");
 					JMenu ammoMenu = null;
 					for (AmmoBin ammo : unit.getWorkingAmmoBins()) {
@@ -8707,13 +8713,13 @@ public class CampaignGUI extends JPanel {
 					menuItem.addActionListener(this);
 					menuItem.setEnabled(!unit.isRefitting()
 							&& (unit.getEntity() instanceof megamek.common.Mech));
-					menu.add(menuItem);		
+					menu.add(menuItem);
 					menuItem = new JMenuItem("Customize in Mek Lab...");
 					menuItem.setActionCommand("CUSTOMIZE");
 					menuItem.addActionListener(this);
 					menuItem.setEnabled(!unit.isRefitting()
 							&& (unit.getEntity() instanceof megamek.common.Mech));
-					menu.add(menuItem);		
+					menu.add(menuItem);
 					if (unit.isRefitting()) {
 						menuItem = new JMenuItem("Cancel Customization");
 						menuItem.setActionCommand("CANCEL_CUSTOMIZE");
@@ -8723,7 +8729,7 @@ public class CampaignGUI extends JPanel {
 					}
 					menu.setEnabled(!unit.isDeployed() && unit.isRepairable());
 					popup.add(menu);
-					
+
 				}
 				//fill with personnel
 				if(unit.getCrew().size() < unit.getFullCrewSize()) {
@@ -8741,21 +8747,23 @@ public class CampaignGUI extends JPanel {
 					popup.add(menuItem);
 				}
 				if(oneSelected && getCampaign().getCampaignOptions().useQuirks()) {
-					menu = new JMenu("Add Quirk");
-					for (Enumeration<IOption> q = unit.getEntity().getQuirks().getOptions(); q.hasMoreElements();) {
-			        	IOption quirk = q.nextElement();
-			        	if(!quirk.booleanValue()) {
-			        		menuItem = new JMenuItem(quirk.getDisplayableName());
-			        		menuItem.setActionCommand("QUIRK:" + quirk.getName());
-			        		menuItem.addActionListener(this);
-			        		menuItem.setEnabled(true);
-			        		menu.add(menuItem);
-			        	}
-					}
-					if(menu.getItemCount() > 20) {
-	                	MenuScroller.setScrollerFor(menu, 20);
-	                }
-					popup.add(menu);
+                    JMenuItem quirkItem = new JMenuItem("Edit Quirks");
+//					menu = new JMenu("Add Quirk");
+                    quirkItem.addActionListener(new QuirkMenuListener(unit));
+//					for (Enumeration<IOption> q = unit.getEntity().getQuirks().getOptions(); q.hasMoreElements();) {
+//			        	IOption quirk = q.nextElement();
+//			        	if(!quirk.booleanValue()) {
+//			        		menuItem = new JMenuItem(quirk.getDisplayableName());
+//			        		menuItem.setActionCommand("QUIRK:" + quirk.getName());
+//			        		menuItem.addActionListener(this);
+//			        		menuItem.setEnabled(true);
+//			        		menu.add(menuItem);
+//			        	}
+//					}
+//					if(menu.getItemCount() > 20) {
+//	                	MenuScroller.setScrollerFor(menu, 20);
+//	                }
+					popup.add(quirkItem);
 				}
 				if(oneSelected) {
 					menuItem = new JMenuItem("Edit Unit History...");
@@ -8798,13 +8806,13 @@ public class CampaignGUI extends JPanel {
 			}
 		}
 	}
-	
+
 	public class BasicInfo extends javax.swing.JPanel {
 		private static final long serialVersionUID = -2890605770494694319L;
 		DirectoryItems camos;
 		DirectoryItems portraits;
 		MechTileset mt;
-		
+
 	    public BasicInfo(DirectoryItems camos, DirectoryItems portraits, MechTileset mt) {
 	    	this.camos = camos;
 	    	this.portraits = portraits;
@@ -8815,7 +8823,7 @@ public class CampaignGUI extends JPanel {
 	    private void initComponents() {
 	        lblImage = new javax.swing.JLabel();
 	        setName("Form"); // NOI18N
-	        setLayout(new java.awt.GridLayout(1, 0));        
+	        setLayout(new java.awt.GridLayout(1, 0));
 	        lblImage.setText(""); // NOI18N
 	        lblImage.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 	        lblImage.setName("lblImage"); // NOI18N
@@ -8825,7 +8833,7 @@ public class CampaignGUI extends JPanel {
 	    public void setText(String text) {
 	        lblImage.setText(text);
 	    }
-	    
+
 	    public void setImage(Image img) {
 	        lblImage.setIcon(new ImageIcon(img));
 	    }
@@ -8833,11 +8841,11 @@ public class CampaignGUI extends JPanel {
 	    public void select() {
 	        lblImage.setBorder(new javax.swing.border.LineBorder(Color.BLACK, 5, true));
 	    }
-	    
+
 	    public void unselect() {
 	        lblImage.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 	    }
-	    
+
 	    /**
 	     * sets the image as a portrait for the given person.
 	     */
@@ -8860,11 +8868,11 @@ public class CampaignGUI extends JPanel {
 	        try {
 	            portrait = (Image) portraits.getItem(category, file);
 	            if(null != portrait) {
-	                portrait = portrait.getScaledInstance(60, -1, Image.SCALE_DEFAULT);               
+	                portrait = portrait.getScaledInstance(60, -1, Image.SCALE_DEFAULT);
 	            } else {
 	            	portrait = (Image) portraits.getItem("", "default.gif");
 	            	if(null != portrait) {
-	                    portrait = portrait.getScaledInstance(60, -1, Image.SCALE_DEFAULT);               
+	                    portrait = portrait.getScaledInstance(60, -1, Image.SCALE_DEFAULT);
 	            	}
 	            }
                 this.setImage(portrait);
@@ -8872,14 +8880,14 @@ public class CampaignGUI extends JPanel {
 	            err.printStackTrace();
 	        }
 	    }
-	    
+
 	    public void setUnit(Unit u) {
-	        Image unit = getImageFor(u, lblImage);     
+	        Image unit = getImageFor(u, lblImage);
 	        setImage(unit);
 	    }
-	    
+
 	    public Image getImageFor(Unit u, Component c) {
-	        
+
 	    	if(null == mt) {
 	    		return null;
 	    	}
@@ -8888,7 +8896,7 @@ public class CampaignGUI extends JPanel {
 	        EntityImage entityImage = new EntityImage(base, tint, getCamo(u.campaign), c);
 	        return entityImage.loadPreviewImage();
 	    }
-	    
+
 	    public Image getCamo(Campaign c) {
 
 	        // Return a null if the campaign has selected no camo file.
@@ -8912,34 +8920,34 @@ public class CampaignGUI extends JPanel {
 	        }
 	        return camo;
 	    }
-	    
+
 	    // Variables declaration - do not modify//GEN-BEGIN:variables
 	    private javax.swing.JLabel lblImage;
 	    // End of variables declaration//GEN-END:variables
 
 	}
-	
+
 	public class OrgTreeTransferHandler extends TransferHandler {
 
 		/**
-		 * 
+		 *
 		 */
 		private static final long serialVersionUID = -1276891849078287710L;
-		
+
 		@Override
 		public int getSourceActions(JComponent c) {
 		    return MOVE;
 		}
-		
+
 		@Override
 		public void exportDone(JComponent c, Transferable t, int action) {
 		    if (action == MOVE) {
 		        refreshOrganization();
 		    }
 		}
-		
+
 		@Override
-		protected Transferable createTransferable(JComponent c) {  
+		protected Transferable createTransferable(JComponent c) {
 	        JTree tree = (JTree)c;
 	        Object node = tree.getLastSelectedPathComponent();
 	        if(node instanceof Unit) {
@@ -8950,41 +8958,41 @@ public class CampaignGUI extends JPanel {
 	        }
 	        return null;
 		}
-		
-		public boolean canImport(TransferHandler.TransferSupport support) {  
-	        if(!support.isDrop()) {  
-	            return false;  
-	        }  
-	        support.setShowDropLocation(true);  
+
+		public boolean canImport(TransferHandler.TransferSupport support) {
+	        if(!support.isDrop()) {
+	            return false;
+	        }
+	        support.setShowDropLocation(true);
 	        if (!support.isDataFlavorSupported(DataFlavor.stringFlavor)) {
 	            return false;
 	        }
-	        // Do not allow a drop on the drag source selections.  
-	        JTree.DropLocation dl =  
-	                (JTree.DropLocation)support.getDropLocation();  
-	        JTree tree = (JTree)support.getComponent();  
-	        int dropRow = tree.getRowForPath(dl.getPath());  
-	        int[] selRows = tree.getSelectionRows();  
-	        for(int i = 0; i < selRows.length; i++) {  
-	            if(selRows[i] == dropRow) {  
-	                return false;  
-	            }  
-	        }  
-	        TreePath dest = dl.getPath();  
-	        Object parent = dest.getLastPathComponent();  
-	       
-	        return parent instanceof Force || parent instanceof Unit;  
-	    }  
-		
-		public boolean importData(TransferHandler.TransferSupport support) {  
-	        if(!canImport(support)) {  
-	            return false;  
-	        }  
-	        // Extract transfer data.  
-	        Unit unit = null; 
+	        // Do not allow a drop on the drag source selections.
+	        JTree.DropLocation dl =
+	                (JTree.DropLocation)support.getDropLocation();
+	        JTree tree = (JTree)support.getComponent();
+	        int dropRow = tree.getRowForPath(dl.getPath());
+	        int[] selRows = tree.getSelectionRows();
+	        for(int i = 0; i < selRows.length; i++) {
+	            if(selRows[i] == dropRow) {
+	                return false;
+	            }
+	        }
+	        TreePath dest = dl.getPath();
+	        Object parent = dest.getLastPathComponent();
+
+	        return parent instanceof Force || parent instanceof Unit;
+	    }
+
+		public boolean importData(TransferHandler.TransferSupport support) {
+	        if(!canImport(support)) {
+	            return false;
+	        }
+	        // Extract transfer data.
+	        Unit unit = null;
 	        Force force = null;
-            Transferable t = support.getTransferable();         
-	        try {  
+            Transferable t = support.getTransferable();
+	        try {
 	        	StringTokenizer st = new StringTokenizer((String) t.getTransferData(DataFlavor.stringFlavor), "|");
 	            String type = st.nextToken();
 	            String id = st.nextToken();
@@ -8994,10 +9002,10 @@ public class CampaignGUI extends JPanel {
 	            if(type.equals("FORCE")) {
 	            	force = getCampaign().getForce(Integer.parseInt(id));
 	            }
-	        } catch(UnsupportedFlavorException ufe) {  
-	            System.out.println("UnsupportedFlavor: " + ufe.getMessage());  
-	        } catch(java.io.IOException ioe) {  
-	            System.out.println("I/O error: " + ioe.getMessage());  
+	        } catch(UnsupportedFlavorException ufe) {
+	            System.out.println("UnsupportedFlavor: " + ufe.getMessage());
+	        } catch(java.io.IOException ioe) {
+	            System.out.println("I/O error: " + ioe.getMessage());
 	        }  
 	        // Get drop location info.  
 	        JTree.DropLocation dl = (JTree.DropLocation)support.getDropLocation();  
@@ -9168,4 +9176,27 @@ public class CampaignGUI extends JPanel {
 	
 
 	private JDialog aboutBox;
+
+    /**
+     * Private inner class to handle opening the {@link QuirksDialog} with the appropriate arguments.
+     */
+    private class QuirkMenuListener implements ActionListener {
+        
+        private Unit unit;
+
+        /**
+         * Creates the listener for the Quirks menu item.
+         * @param unit The {@link Unit} being edited.
+         */
+        public QuirkMenuListener(Unit unit) {
+            this.unit = unit;
+        }
+        
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            //Open the dialog.
+            QuirksDialog dialog = new QuirksDialog(unit.getEntity(), frame);
+            dialog.setVisible(true);
+        }
+    }
 }

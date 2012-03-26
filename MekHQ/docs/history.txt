@@ -24,6 +24,7 @@ v0.1.16 (SVN)
 + Bug 3507911: Salvage Tracking - applied patch 3509166
 + Planetary data & faction additions round 9 (WIP)
 + Fix of potential Divide By Zero errors.
++ Created a Quirks dialog for easier adding and deleting of quirks.  This change uses the QuirksPanel from megamek.
 
 v0.1.15 (2012-02-11)
 + Bug 3486200: Previous version campaigns do not save...
