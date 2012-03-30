@@ -684,13 +684,22 @@ Alarion is primarily settled by people of German, Romanian and English descent.<
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3057-01-01</date>
-			<faction>IND</faction>
+			<date>3057-11-01</date>
+			<faction>CM</faction>
 		</factionChange>
 		<factionChange>
 			<date>3062-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
+		<spectralClass>K</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>III</luminosity>
+		<sysPos>5</sysPos>
+		<zenithCharge>true</zenithCharge>
+		<nadirCharge>true</nadirCharge>
+		<hpg>A</hpg>
+		<lifeForm>7</lifeForm>
+		<desc>As of 3025 - Aldebaran is one of the oldest settled planets in the Confederation. It is a modest world with a moderate climate. Aldebaran has seen substantial fighting during the Succession Wars and remains a tempting target for both the Free World League and the Federated Suns due to it location in a natural invasion route to the interior of the Tikonov Commonality. Aldebaran has a permanent military base, home for the Ijori Warrior House regiment and several squadrons of aerospace fighters. Historically, Aldebaran has been a major commercial and industrial hub, and though much reduced in capacity due to the Succession War fighting, the planet still has a moderate and slowly growing industrial capacity. </desc>
 	</planet>
 	<planet>
 		<name>Aldertaine</name>
@@ -747,7 +756,7 @@ Alarion is primarily settled by people of German, Romanian and English descent.<
 		<socioIndustrial>D-D-C-D-B</socioIndustrial>
 		<landmass>Cairusia</landmass>
 		<landmass>Jeddasia</landmass>
-		<desc>No description available.</desc>
+		<desc>Alexandria was once a wealthy planet covered in modern cities and was a cultural center with some of the most famous art collections in the entire Inner Sphere. The planet also boasted a strong industrial base and vast natural resources. Unfortunately, the Succession Wars took their toll and near constant raids and invasions of this planet have reduced the cities to shambles, the beautiful countryside to barren war-torn fields. The only traces of the planet’s former glory can be found in the remote cities of Lam Pole and Cherbourg, which have survived due to possessing no military value.</desc>
 	</planet>
 	<planet>
 		<name>Alfirk</name>
@@ -2215,6 +2224,10 @@ The League intelligence branch, SAFE, is headquartered on Atreus' moon Wendigo. 
 		<factionChange>
 			<date>2900-01-01</date>
 			<faction>CSJ,CFM,CIH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3060-01-01</date>
+			<faction>CFM,CIH</faction>
 		</factionChange>
 		<spectralClass>G</spectralClass>
 		<subtype>6</subtype>
@@ -4034,7 +4047,7 @@ Bolan was primarily colonized by settlers from India, Pakistan and Afghanistan.<
 		<landMass>Lush</landMass>
 		<landMass>Vibrant</landMass>
 		<socioIndustrial>B-C-C-B-A</socioIndustrial>
-		<desc>No description available.</desc>
+		<desc>Bountiful Harvest is one of the most productive agricultural worlds in the entire Inner Sphere. The planet is slightly larger than Terra and possesses large tracts of fertile land perfect for growing produce and raising livestock as well as large oceans teeming with a large variety of plants and animals. With ample water, fertile land and a comfortable temperate climate it is little surprise that Bountiful Harvest lives up to its name. Bountiful Harvest is a major exporter of all types of food to surrounding systems.</desc>
 	</planet>
 	<planet>
 		<name>Bowang</name>
@@ -4996,6 +5009,8 @@ Recently, a large island in the eastern basin has been taken over for secret tes
 		<hpg>B</hpg>
 		<lifeForm>3</lifeForm>
 		<socioIndustrial>A-B-B-B-C</socioIndustrial>
+		<satellite>Cybele</satellite>
+		<satellite>Inanna</satellite>
 		<landMass>Salonika (Crimson)</landMass>
 		<desc>Canopus IV is a temperate planet with three continents. The most settled continent is Salonika, which was originally covered in lush forests and rolling hills, it has over time become industrialized and polluted. It is home to the three major cities on Canopus IV; the capital Crimson, Delphi the capital in the planet's early history, and Astarte. Salonika is also home to all major manufacturing centers on planet.</desc>
 	</planet>
@@ -5427,6 +5442,13 @@ The planets primary industries and exports are plastics and plastisteel using th
 		<xcood>-70.27</xcood>
 		<ycood>-475.66</ycood>
 		<faction>MOC</faction>
+		<nadirCharge>True</nadirCharge>
+		<lifeForm>7</lifeForm>
+		<spectralClass>M</spectralClass>
+		<subtype>2</subtype>
+		<sysPos>1</sysPos>
+		<hpg>X</hpg>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Cavalor</name>
@@ -5577,6 +5599,22 @@ Cavanaugh II was settled by a mixture of English, Welsh and Scottish colonists.<
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<factionChange>
+			<date>3065-01-01</date>
+			<faction>CJF</faction>
+		</factionChange>		
+		<zenithCharge>True</zenithCharge>
+		<lifeForm>0</lifeForm>
+		<spectralClass>G</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>2</sysPos>
+		<hpg>A</hpg>
+		<pressure>3</pressure>
+		<landMass>(Benares)</landMass>
+		<desc>Chahar was first colonized in the late 24th Century, despite the planet having a comfortable temperate climate and large oceans it was originally a lifeless planet. However, this quickly caused issues for the colonies on Chahar as they were completely dependent on food from surrounding systems. 
+
+The capital city of Chahar is Benares, which is considered sacred to Lyran Hindu believers.</desc>
 	</planet>
 	<planet>
 		<name>Chakachamna</name>
@@ -5889,6 +5927,15 @@ Cavanaugh II was settled by a mixture of English, Welsh and Scottish colonists.<
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<lifeForm>5</lifeForm>
+		<spectralClass>G</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>3</sysPos>
+		<hpg>C</hpg>
+		<desc>Chukchi III remained a relatively backwater planet for most of its history, full of picturesque green valleys and snow capped mountains. This changed in the early 31st Century with the discovery of massive deposits of Titanium in the planet. As a result there was a period of rapid industrialization of the planet in order to fully exploit the titanium. This unfortunately resulted in the destruction of much of the planet’s picturesque wilderness and the rapid growth also introduced organized crime to Chukchi III.
+
+This led to a very hostile environment by the mid 3020s with many residents just short of rebellion against the planetary President’s support of the rapid growth. The planetary Duke was forced to step in to try to curb the rampant and uncontrolled industrial growth.</desc>
 	</planet>
 	<planet>
 		<name>Chupadero</name>
@@ -6543,7 +6590,11 @@ Cavanaugh II was settled by a mixture of English, Welsh and Scottish colonists.<
 		<landMass>Sydnallia</landMass>
 		<landMass>Auckland</landMass>
 		<socioIndustrial>A-A-A-A-A</socioIndustrial>
-		<desc>No description available.</desc>
+		<desc>The planet Coventry lies on the anti-spinward side of the core of Lyran space.  The planet itself enjoys mild seasons and large seas, teeming with life, and fertile soil, making it well suited for large-scale agriculture. 
+
+ Even before the formation of the Lyran Commonwealth, the world sported a massive economy based on the exotic foodstuffs and raw materials.  After the formation of the Commonwealth, Coventry continued as a major trade center and became home to one of the Inner Sphere’s largest BattleMech manufacturers, Coventry Metal Works. 
+
+Coventry’s mineral, agricultural, and military economy is supplemented by a thriving tourist trade, due to its many beautiful semi-tropical islands. Coventry is also home to the Coventry Military Academy, a small but very prestigious training faculty for Lyran Mechwarriors.</desc>
 	</planet>
 	<planet>
 		<name>Covington</name>
@@ -7795,7 +7846,11 @@ The capital is currently Fort Dieron, but in the past San Martin and Tahlwynn ha
 		<landMass>Hinterlands</landMass>
 		<landMass>Lockenar</landMass>
 		<socioIndustrial>A-A-A-A-B</socioIndustrial>
-		<desc>No description available.</desc>
+		<desc>The planet Donegal sits in the center of Lyran space.  True to its place in the Commonwealth’s territory, Donegal is one of a handful of systems that formed the heart of the confederation that became the Lyran Commonwealth after the fall of the Terran Alliance.
+
+Donegal is a warm-temperate world, that boasts large deposits of valuable ores and gemstones, as well as a large variety of plant and animal life, some of which were brought from offworld and adapted to Donegal’s environment, where they have prospered and been harvested for food and industry.
+
+Donegal is the home to many major trading companies, the Supreme Court of the Commonwealth, and the Donegal Stock Exchange.</desc>
 	</planet>
 	<planet>
 		<name>Donenac</name>
@@ -8199,6 +8254,10 @@ The Malthus crime family had each of the 5 domed cities set up to cater to a dif
 			<date>3040-01-01</date>
 			<faction>FC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3067-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
 			<spectralClass>G</spectralClass>
 			<subtype>0</subtype>
 			<luminosity>V</luminosity>
@@ -8219,9 +8278,9 @@ The Malthus crime family had each of the 5 domed cities set up to cater to a dif
 			<landMass>Monterrey</landMass>
 			<landMass>Durango</landMass>
 			<socioIndustrial>A-A-A-A-A</socioIndustrial>
-		<desc>El Dorado is an Earth-like planet with 6 major continents and large tracts of arable land. This is due to the massive bodies of fresh water know as The Super Lakes, which are located on the largest continents of San Diego and Los Angeles.
+		<desc>El Dorado is an Earth-like planet with 6 major continents and large tracts of arable land. This is due to the massive bodies of fresh water, know as The Super Lakes, which are located on the largest continents of San Diego and Los Angeles.
 
-El Dorado is slightly warmer than Earth and has increased tectonic action. Over the centuries of colonization populations centers have settled in locations that avoided the most geologically active sites.
+El Dorado is slightly warmer than Earth and has increased tectonic activity. Over the centuries of colonization populations centers have settled in locations that avoided the most geologically active sites.
 
 El Dorado has a single moon named Boulder. It appears silver and sapphire and has a thick nitrogen-carbon dioxide atmosphere.
 
@@ -8302,6 +8361,16 @@ For much of its early history El Dorado was known for its JumShip yards. This en
 			<date>3057-01-01</date>
 			<faction>IND</faction>
 		</factionChange>
+		<zenithCharge>True</zenithCharge>
+		<lifeForm>2</lifeForm>
+		<spectralClass>K</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>2</sysPos>
+		<hpg>B</hpg>
+		<desc>Originally called Chisholm, Elgin was a commercial trading centre for Terra and the various independent worlds of the Capellan Zone. The planet was absorbed into the Tikonov Grand Union and then the Capellan Confederation. The planet was renamed after Captain Edward T. Elgin, for his heroic actions in defending the planet against a Free World League attack in 2878.
+
+Elgin’s manufacturing capacity was dramatically reduced over the course of the Succession Wars due to a large number of raids and invasions. In the early 31st Century Elgin acquired the technology to construct special water purification and constructed agriculture research facilities. This substantial investment was part of the Confederation program to improving food production and distribution in the region.</desc>
 	</planet>
 	<planet>
 		<name>Elidere IV</name>
@@ -9587,7 +9656,9 @@ For much of its early history El Dorado was known for its JumShip yards. This en
 		<landMass>Alliago Major</landMass>
 		<landMass>Alliago Minor</landMass>
 		<socioIndustrial>B-C-A-B-D</socioIndustrial>
-		<desc>No description available.</desc>
+		<desc>Due to a large moon and three large oceans, Gallery is covered in a nearly constant blanket of thick dark clouds and is often subject to vast storms. These conditions result in the surface of the planet being in a near perpetual twilight, with sunlight almost never breaking through the thick cloud-layer. 
+
+When Gallery was originally settled there were no native lifeforms so the original colonists had to import plants and animals that could adapt and survive in the nearly constant darkness. What Gallery lacks in comforts, it more than makes up for in natural resources. The stormy dark climate has resulted in the populace living underground and the primary industry on the planet is mining. Due to their comfort and familiarity with underground spaces, many natives of Gallery are easily able to find jobs on other planets as miners.</desc>
 	</planet>
 	<planet>
 		<name>Gallis</name>
@@ -9703,8 +9774,25 @@ For much of its early history El Dorado was known for its JumShip yards. This en
 		</factionChange>
 		<factionChange>
 			<date>3057-01-01</date>
-			<faction>IND</faction>
+			<faction>CM</faction>
 		</factionChange>
+		<spectralClass>F</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>VII</luminosity>
+		<sysPos>4</sysPos>
+		<gravity>1.0</gravity>
+		<pressure>3</pressure>
+		<temperature>30</temperature>
+		<climate>5</climate>
+		<percentWater>72</percentWater>
+		<hpg>B</hpg>
+		<lifeForm>7</lifeForm>
+		<satellite>Harl</satellite>
+		<satellite>Kishen</satellite>
+		<satellite>Nain</satellite>
+		<satellite>Ranjit</satellite>
+		<socioIndustrial>C-D-C-D-B</socioIndustrial>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Gandy's Luck</name>
@@ -10946,6 +11034,13 @@ For much of its early history El Dorado was known for its JumShip yards. This en
 		<xcood>-200.11</xcood>
 		<ycood>-477.22</ycood>
 		<faction>MOC</faction>
+		<zenithCharge>True</zenithCharge>
+		<lifeForm>6</lifeForm>
+		<spectralClass>G</spectralClass>
+		<subtype>3</subtype>
+		<sysPos>4</sysPos>
+		<hpg>C</hpg>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Hardisey's Haven</name>
@@ -11373,7 +11468,9 @@ For much of its early history El Dorado was known for its JumShip yards. This en
 		<landmass>North Whitman</landmass>
 		<landmass>East Barrens</landmass>
 		<landmass>West Barrens</landmass>
-		<desc>No description available</desc>
+		<desc>Hesperus II is a haggard and craggy looking planet. All four major continents are covered in high mountain peaks and rugged canyons. The planet has very little arable land and is hotter than many settled worlds. All considered it has little to suggest itself as a liveable planet. The exception is the massive amounts of raw materials in the mountain ranges and most importantly, the massive ‘Mech factories which have made Hesperus II the premier planet for ‘Mech production in the Inner Sphere. Almost the entire population of Hesperus II works at or is involved in work at the Defiance ‘Mech Factories.
+
+The planet and the factories have been the target of invasion numerous times throughout its history but the mountainous terrain and the fact that most of the factories were built inside of the numerous mountain ranges have made them natural fortresses, making Hesperus II exceptionally hard to capture.</desc>
 	</planet>
 	<planet>
 		<name>Hexare</name>
@@ -15619,6 +15716,14 @@ The planet itself is resource poor and has little to offer for export. However, 
 		<xcood>-103.53</xcood>
 		<ycood>-498.06</ycood>
 		<faction>MOC</faction>
+		<zenithCharge>True</zenithCharge>
+		<lifeForm>5</lifeForm>
+		<spectralClass>M</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>6</sysPos>
+		<hpg>B</hpg>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Luzerne</name>
@@ -17980,6 +18085,14 @@ Mizar has been a resort planet of some renown since before the time of the Star 
 		<xcood>-72.38</xcood>
 		<ycood>-454.37</ycood>
 		<faction>MOC</faction>
+		<nadirCharge>True</nadirCharge>
+		<lifeForm>7</lifeForm>
+		<spectralClass>K</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>5</sysPos>
+		<hpg>X</hpg>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>New Aragon</name>
@@ -20639,6 +20752,17 @@ Outreach is the primary hiring location for the mercenary trade from the 3030s a
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<nadirCharge>True</nadirCharge>
+		<zenithCharge>True</zenithCharge>
+		<lifeForm>7</lifeForm>
+		<spectralClass>F</spectralClass>
+		<subtype>9</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>4</sysPos>
+		<hpg>B</hpg>
+		<desc>Port Moseby is a major trading hub between the Commonwealth and Combine. The planet has many sprawling cities with large spaceports that act as business and trade centers, jumpships and dropships are constantly streaming through the system bringing in and taking out more goods.
+
+Port Moseby itself is an ordinary planet, comfortable for human life with no extraordinary characteristics. Normal weather, bland terrain and an average amount of natural resources often result in Port Moseby being called ordinary.</desc>
 	</planet>
 	<planet>
 		<name>Porthos</name>
@@ -20706,9 +20830,13 @@ Outreach is the primary hiring location for the mercenary trade from the 3030s a
 		<landMass>Goteborg</landMass>
 		<landMass>Mermannisk</landMass>
 		<socioIndustrial>D-C-D-C-C</socioIndustrial>
-		<desc>A small, resource poor planet, Poulsbo is covered in oceans that are stirred by the large moon Sjure and was only settled to act as a staging base for the Lyran Commonwealth to launch raids against the Free Worlds League. Peace during the Star League era sent Poulsbo into a depression and the planet only recovered when the Succession Wars started up and it was again important to the Commonwealth. As a result the populace  distrusts the Lyran government. 
+		<desc>Poulsbo lies on the anti-spinward edge of Lyran space, along the border shared with the Free Worlds League.  Poulsbo is a tropical planet, mostly covered in vast oceans and seas.  Due to a single large moon in orbit of the planet, Poulsbo’s waterways are rough and treacherous.
 
-Settlers of Poulsbo are primarily of German and Scandanavian descent.</desc>
+Though discovered in the late 2300s, Poulsbo was passed over for colonization, due to its lack of important natural resources and the difficulty in harnessing the aquatic life for food due to the dangerously churning waters.  Later, with the rise of the Houses within the Inner Sphere, Poulsbo was colonized by the Lyran’s due to its key strategic position along House Marik’s border.
+
+With the formation of the Star League, and the peace it brought, Poulsbo was once again forgotten by the powers-that-be, though a large number of colonists remained on the isolated planet.  These colonists became understandably upset when the outbreak of the Succession wars once again brought the Lyran military and raiders from the Free Worlds League and Periphery to their doorstep.
+
+Poulsbo remains a lightly settled Military Outpost, whose civilian population is mostly upset by constant Lyran politics and war.</desc>
 	</planet>
 	<planet>
 		<name>Poznan</name>
@@ -21230,7 +21358,11 @@ The location of Proserpina on the Federated Suns border requires the DCMS to kee
 		<landmass>Tempestia</landmass>
 		<landmass>Tsunamus</landmass>
 		<landmass>Pyrammus</landmass>
-		<desc>No description available.</desc>
+		<desc>Rahne is a small planet with very little arable land, an extremely short growing season and scarce water. To make matters worse the planet is constantly assailed by massive dust storms, which have greatly hampered efforts to tap into the mineral wealth available near the surface of the planet. The extreme weather on Rahne is caused by its massive moon Caliban, which is nearly as large as Rahne.
+
+Rahne has four seasons, Storm, Calm, Cold, and Melting, each of which lasts only 21 days. During the Melting season, temperatures often rise above 100 degrees celsius, making it the most dangerous of the four seasons. The extreme weather means that all human dwellings are underground and only during the Calm and Cold seasons can humans survive outside.
+
+Even with its extreme weather, Rahne does support native life. A prime example is the ill-tempered Toad-Fox, a deadly predator with red fur and poisonous claws. The beast comes out at night during the Storm and Calm seasons to hunt, mates during the Cold season and spends the Warm season they birth their young in burrows they dig into mountains with their massive claws.</desc>
 	</planet>
 	<planet>
 		<name>Rajkot</name>
@@ -22123,7 +22255,7 @@ The location of Proserpina on the Federated Suns border requires the DCMS to kee
 		<sysPos>3</sysPos>
 		<landMass>(Heaven’s Gate)</landMass>
 		<hpg>B</hpg>
-		<desc>Ryde is a harsh and nearly unlivable planet due to regular earthquakes and volcanic eruptions. While Ryde has three oceans, they are full of sulfur and heavy metals making them useless without purification. However, hardy settlers have developed Ryde into a sustainable place to life, with the establishment of Heaven’s Gate. The settlements on Ryde are able to easily feed themselves by farming in the extremely fertile volcanic soil. The population also makes use of the easy to access geothermal energy for cheap electricity.</desc>
+		<desc>Ryde is a harsh and nearly inhospitable planet due to regular earthquakes and volcanic eruptions. While Ryde has three oceans, they are full of sulfur and heavy metals making them useless without purification. However, hardy settlers have developed Ryde into a sustainable place to life with the establishment of the city Heaven’s Gate. The settlements on Ryde are able to easily feed themselves by farming in the extremely fertile volcanic soil. The population also makes use of the easy to access geothermal energy for cheap electricity.</desc>
 	</planet>
 	<planet>
 		<name>Ryerson</name>
@@ -25740,6 +25872,7 @@ As the capital of the Lyran Commonwealth, Thakard is home to many vital parts of
 		<hpg>B</hpg>
 		<lifeForm>7</lifeForm>
 		<satellite>Niobe</satellite>
+		<landMass>Durango</landMass>
 		<socioIndustrial>C-C-B-B-C</socioIndustrial>
 		<desc>No description available.</desc>
 	</planet>
@@ -25943,7 +26076,9 @@ As the capital of the Lyran Commonwealth, Thakard is home to many vital parts of
 		<landMass>Pskov</landMass>
 		<landMass>Kazan</landMass>
 		<socioIndustrial>A-A-A-A-B</socioIndustrial>
-		<desc>No description available.</desc>
+		<desc>Tikonov was one of the first planets colonised in the early 22nd century during the first wave of colonial Terran expansion. The planet was originally settled by immigrants with strong Eurasian and western Asian background and named after the last premier of the Soviet Union. Tikonov established the Tikonov Union in the late 23rd century, the first political unification in the Capellan region, and the planet emerged as the political nexus of the region. 
+
+The planet is heavily industrialized and for a long time was the top producer of ‘Mechs for the Capellan Confederation. As a result it was one of the most politically important planets in the Confederation and one of the most heavily defended.</desc>
 	</planet>
 	<planet>
 		<name>Timbiqui</name>
@@ -27523,6 +27658,13 @@ In the early 31st Century an underground Star League-era ‘Mech research facili
 			<date>2900-01-01</date>
 			<faction>MOC</faction>
 		</factionChange>
+		<zenithCharge>True</zenithCharge>
+		<lifeForm>7</lifeForm>
+		<spectralClass>G</spectralClass>
+		<subtype>3</subtype>
+		<sysPos>5</sysPos>
+		<hpg>C</hpg>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Volders</name>
@@ -28096,6 +28238,13 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 			<date>2900-01-01</date>
 			<faction>MOC</faction>
 		</factionChange>
+		<zenithCharge>True</zenithCharge>
+		<lifeForm>6</lifeForm>
+		<spectralClass>G</spectralClass>
+		<subtype>4</subtype>
+		<sysPos>2</sysPos>
+		<hpg>X</hpg>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Wilkes</name>
@@ -28840,6 +28989,8 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<lifeForm>5</lifeForm>
 		<satellite>Talit</satellite>
 		<satellite>Bimah</satellite>
+		<landMass>Mondaria</landMass>
+		<landMass>Chavalet</landMass>
 		<socioIndustrial>D-C-B-C-B</socioIndustrial>
 		<desc>No description available.</desc>
 	</planet>
