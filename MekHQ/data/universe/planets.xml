@@ -1770,7 +1770,9 @@ Industrial, Command and logistical world, paperwork in this planet and its prefe
 		<landMass>Grunwald</landMass>
 		<landMass>Gerechtland</landMass>
 		<socioIndustrial>A-A-A-A-A</socioIndustrial>
-		<desc>No description available.</desc>
+		<desc>Arc-Royal is a pleasant world with a mild climate and mild weather. While the planet is highly developed and industrialized, these efforts were confined to certain areas and as a result Arc-Royal’s wilderness is largely untouched.
+
+In the mid-late 31st Century, Arc-Royal was home to the Kell Hounds and Clan Wolf-in-Exile. The presence of the Kell Hounds resulted in Arc-Royal becoming a mercenary hiring hall, which became more prominent with the destruction of Outreach during the Jihad and the later attacks on Galatea by Word of Blake.</desc>
 	</planet>
 	<planet>
 		<name>Arcadia</name>
@@ -2016,7 +2018,15 @@ Arcturus’ greatest contribution to the Commonwealth since the capital became T
 		<name>Asgard</name>
 		<xcood>127.79</xcood>
 		<ycood>268.62</ycood>
-		<faction>DC</faction>
+		<faction>TA</faction>
+		<factionChange>
+			<date>2309-01-01</date>
+			<faction>AG</faction> (Alliance of Galedon)
+		</factionChange>
+		<factionChange>
+			<date>2312-01-01</date>
+			<faction>DC</faction>
+		</factionChange>
 		<factionChange>
 			<date>3052-02-01</date>
 			<faction>CSJ,DC</faction>
@@ -2029,6 +2039,24 @@ Arcturus’ greatest contribution to the Commonwealth since the capital became T
 			<date>3059-05-29</date>
 			<faction>DC</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>0.94</gravity>
+		<zenithCharge>True</zenithCharge>
+		<lifeForm>4</lifeForm>
+		<climate>3</climate>
+		<percentWater>60</percentWater>
+		<temperature>35</temperature>
+		<spectralClass>K</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>VI</luminosity>
+		<sysPos>4</sysPos>
+		<socioIndustrial></socioIndustrial>
+		<satellite>Althiem</satellite>
+		<satellite>Midgard</satellite>
+		<satellite>Hel</satellite>
+		<landMass>Muspell (Vernan)</landMass>
+		<hpg>B</hpg>
+		<desc>Asgard is a planet with nearly two billion inhabitants. Asgard is divided into five continents, the largest is Muspell and is the location of the planetary capital, Vernan. Asgard was originally settled by the Terran Alliance but fell to the Combine as the Alliance’s power waned.</desc>
 	</planet>
 	<planet>
 		<name>Ashburton</name>
@@ -3692,6 +3720,7 @@ Barras is the hotbed of intelligence activity along the Confederation-FWL border
 		<satellite>Club</satellite>
 		<satellite>Spade</satellite>
 		<socioIndustrial>B-B-D-C-D</socioIndustrial>
+		<landMass>(Lott’s Revenge)</landMass>
 		<desc> Blackjack is mostly an arid/desert world. A tropical zone exists in the northern hemisphere that is almost entirely encircled by the Blackjack Ocean. Valuable mineral deposits and other resources are limited but easily accessible. Many of the planet’s heavy industries have been targets of raids by the Draconis Combine and Periphery bandits. Lott’s Revenge, the capital city, is located along the coast of the northern region. Blackjack’s population is largely made up of settlers of English and French descent. Blackjack is home to the Blackjack School of Conflict, a privately run MechWarrior Academy (later destroyed by the Clans).</desc>
 	</planet>
 	<planet>
@@ -3789,7 +3818,10 @@ Barras is the hotbed of intelligence activity along the Confederation-FWL border
 		<hpg>B</hpg>
 		<lifeForm>6</lifeForm>
 		<socioIndustrial>C-C-C-C-B</socioIndustrial>
-		<desc>No description available.</desc>
+		<landMass>(Lapiz)</landMass>
+		<desc>Blue Hole is covered in unique lakes and rivers that dot the land and are visible from space. From the ground, these lakes and rivers are even more unique for their massive depths and the fact that many of them are connected by large underground rivers. Often these underground channels are large enough for submersibles and even ‘Mechs to pass through. 
+
+Since colonization, Blue Hole has exported water as a main industry due to its abundance of clean, drinkable water. The abundance of water has also made Blue Hole a vacation get away for most of its history, only losing visitors after the Clan Invasion left Blue Hole on the border.</desc>
 	</planet>
 	<planet>
 		<name>Bluford</name>
@@ -8053,6 +8085,7 @@ Donegal is the home to many major trading companies, the Supreme Court of the Co
 		<hpg>B</hpg>
 		<lifeForm>0</lifeForm>
 		<satellite>Mirage</satellite>
+		<landMass>(New Monaco)</landMass>
 		<socioIndustrial>D-D-C-C-F</socioIndustrial>
 		<desc>Dustball is a small, dry, and hot planet barely suitable for human life. Despite this, the planet was settled due to reports suggesting arge tracts of mineral wealth just below the surface. Unfortunately after mining began, it was soon discovered that the reports had been incorrect. Soon after most of the miners left and the planet would have likely been abandoned entirely if not for the Malthus crime family.
 
@@ -10464,11 +10497,11 @@ When Gallery was originally settled there were no native lifeforms so the origin
 		<hpg>B</hpg>
 		<lifeForm>7</lifeForm>
 		<satellite>dust ring</satellite>
-		<landMass>Albion</landMass>
+		<landMass>Albion (New Paris)</landMass>
 		<landMass>Bromme</landMass>
 		<landMass>Gaulia</landMass>
 		<socioIndustrial>B-C-C-C-B</socioIndustrial>
-		<desc>No description available.</desc>
+		<desc>Graus was settled for its beautiful landscapes and moderate mineral deposits. Primarily an agricultural planet, Graus also boasts light industry focusing on luxury items, including recreational vehicles and holovids. By the early 31st Century the planet embraced pacifism and rejected all major military presence on the planet.</desc>
 	</planet>
 	<planet>
 		<name>Gravenhage</name>
@@ -15426,11 +15459,13 @@ The planet itself is resource poor and has little to offer for export. However, 
 		<hpg>B</hpg>
 		<lifeForm>6</lifeForm>
 		<satellite>Udo</satellite>
-		<landMass>Sorania</landMass>
+		<landMass>Sorania (Madras)</landMass>
 		<landMass>Padawa</landMass>
 		<landMass>Ghanadi</landMass>
 		<socioIndustrial>C-C-C-D-B</socioIndustrial>
-		<desc>No description available.</desc>
+		<desc>Loric is a picturesque world covered in calm oceans, sandy beaches, rugged mountains and green river valleys. It could easily have been a vacation planet, unfortunately its position on the border between the Lyran Commonwealth and Free Worlds League has made Loric a planet of vast strategic military importance. While the planet’s population has done its best to be an un-appealing target by means of limiting general industry and completely shunning any military industries, Loric has still been the target of raids and attacks time and time again.
+
+The continents of Sorania and Padawa are mostly temperate and are the sites of the majority of the population centers on Loric. The southern continent of Ghanadi is arctic and almost entirely uninhabited, most of Ghanadi is set aside as a nature preserve.</desc>
 	</planet>
 	<planet>
 		<name>Lost</name>
@@ -18259,10 +18294,12 @@ The terrain surrounding Avalon City is a mixture of forests, mountains, plains a
 		<hpg>B</hpg>
 		<lifeForm>6</lifeForm>
 		<satellite>Durban</satellite>
-		<landMass>Pretoria</landMass>
+		<landMass>Pretoria (New Hope)</landMass>
 		<landMass>Eissia</landMass>
 		<socioIndustrial>B-B-C-C-B</socioIndustrial>
-		<desc>No description available.</desc>
+		<desc>New Capetown is a planet with an ugly past. The original colonists were primarily White Supremacists and the laws of the planet created a massive racial divide. These laws stunted the planet’s growth as outsiders to the planet were loathe to deal with New Capetown. It was not until the 3030s that the oppressive regime was toppled and the planet was brought in line with the ideals of the Lyran Commonwealth.
+
+New Capetown is moderately industrialized and is a comfortable temperate planet.</desc>
 	</planet>
 	<planet>
 		<name>New Damascus</name>
