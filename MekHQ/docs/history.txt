@@ -29,6 +29,9 @@ v0.1.16 (SVN)
 + Updated megamek to version 0.35.29
 + Updated Unit Files
 + Updated defaultQuirks.xml
++ Added a Select Bombs option for aerospace units.
++     This utilizes the BombChoicePanel from MegaMek to allow the user to choose which bombs to load on their fighters.
++     This information will save into the MUL file for a scenario.  However, currently it is not saving to the campaign save.
 
 v0.1.15 (2012-02-11)
 + Bug 3486200: Previous version campaigns do not save...

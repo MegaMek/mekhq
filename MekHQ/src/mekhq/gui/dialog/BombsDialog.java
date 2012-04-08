@@ -1,5 +1,5 @@
 /*
- * QuirksDialog.java
+ * BombsDialog.java
  *
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  *
@@ -20,13 +20,9 @@
  */
 package mekhq.gui.dialog;
 
-import megamek.client.ui.swing.DialogOptionComponent;
-import megamek.client.ui.swing.DialogOptionListener;
-import megamek.client.ui.swing.QuirksPanel;
-import megamek.common.Entity;
-import megamek.common.Mounted;
-import megamek.common.options.IOption;
-import megamek.common.options.WeaponQuirks;
+import megamek.client.ui.swing.BombChoicePanel;
+import megamek.common.Aero;
+import mekhq.campaign.Campaign;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -38,31 +34,25 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.HashMap;
 
 /**
  * @author Deric Page (dericpage@users.sourceforge.net)
  * @version %I% %G%
- * @since 3/26/2012
+ * @since 4/7/2012
  */
-public class QuirksDialog extends JDialog implements DialogOptionListener, ActionListener {
+public class BombsDialog extends JDialog implements ActionListener {
 
-    private QuirksPanel qpanel;
-    private HashMap<Integer, WeaponQuirks> h_wpnQuirks = new HashMap<Integer, WeaponQuirks>();
-    private Entity entity;
+    private BombChoicePanel bombPanel;
+    private Aero aero;
+    private Campaign campaign;
 
     private JButton okayButton;
     private JButton cancelButton;
 
-    /**
-     * Handles the editing and deteling of Quirks.  Utilizes the QuirksPanel from megamek for the bulk of its work.
-     *
-     * @param entity The {@link Entity} being edited.
-     * @param parent The {@link JFrame} of the parent panel.
-     */
-    public QuirksDialog(Entity entity, JFrame parent) {
-        super(parent, "Edit Quirks", true);
-        this.entity = entity;
+    public BombsDialog(Aero aero, Campaign campaign, JFrame parent) {
+        super(parent, "Select Bombs", true);
+        this.aero = aero;
+        this.campaign = campaign;
         initGUI();
         validate();
         pack();
@@ -71,16 +61,12 @@ public class QuirksDialog extends JDialog implements DialogOptionListener, Actio
 
     private void initGUI() {
 
-        //Set up the megamek QuirksPanel.
-        for (Mounted m : entity.getWeaponList()) {
-            h_wpnQuirks.put(entity.getEquipmentNum(m), m.getQuirks());
-        }
-        qpanel = new QuirksPanel(entity, entity.getQuirks(), true, this, h_wpnQuirks);
-        qpanel.refreshQuirks();
+        bombPanel = new BombChoicePanel(aero, campaign.getGameOptions().booleanOption("at2_nukes"),
+                campaign.getGameOptions().booleanOption("allow_advanced_ammo"));
 
         //Set up the display of this dialog.
-        JScrollPane scroller = new JScrollPane(qpanel);
-        scroller.setPreferredSize(new Dimension(300,200));
+        JScrollPane scroller = new JScrollPane(bombPanel);
+        scroller.setPreferredSize(new Dimension(300, 200));
         setLayout(new BorderLayout());
         add(scroller, BorderLayout.CENTER);
         add(buildButtonPanel(), BorderLayout.SOUTH);
@@ -103,17 +89,13 @@ public class QuirksDialog extends JDialog implements DialogOptionListener, Actio
     }
 
     @Override
-    public void optionClicked(DialogOptionComponent dialogOptionComponent, IOption iOption, boolean b) {
-        //Not Used  Included because QuriksPanel requires a DialogOptionListener interface.
-    }
-
-    @Override
     public void actionPerformed(ActionEvent e) {
         if (okayButton.equals(e.getSource())) {
-            qpanel.setQuirks();
+            bombPanel.applyChoice();
             setVisible(false);
         } else if (cancelButton.equals(e.getSource())) {
             setVisible(false);
         }
     }
+
 }

@@ -191,6 +191,7 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.Modes;
 import mekhq.gui.dialog.AddFundsDialog;
+import mekhq.gui.dialog.BombsDialog;
 import mekhq.gui.dialog.CampaignOptionsDialog;
 import mekhq.gui.dialog.ChooseRefitDialog;
 import mekhq.gui.dialog.CompleteMissionDialog;
@@ -8682,7 +8683,13 @@ public class CampaignGUI extends JPanel {
 	                }
 					popup.add(menu);
 				}
-				// Salvage / Repair
+                //Select bombs.
+                if (oneSelected && (unit.getEntity() instanceof Aero)) {
+                    JMenuItem bombItem = new JMenuItem("Select Bombs");
+                    bombItem.addActionListener(new BombMenuListener(unit));
+                    popup.add(bombItem);
+                }
+                // Salvage / Repair
 				if(oneSelected) {
 					menu = new JMenu("Repair Status");
 					menu.setEnabled(!unit.isDeployed() && !unit.isRefitting());
@@ -8748,21 +8755,7 @@ public class CampaignGUI extends JPanel {
 				}
 				if(oneSelected && getCampaign().getCampaignOptions().useQuirks()) {
                     JMenuItem quirkItem = new JMenuItem("Edit Quirks");
-//					menu = new JMenu("Add Quirk");
                     quirkItem.addActionListener(new QuirkMenuListener(unit));
-//					for (Enumeration<IOption> q = unit.getEntity().getQuirks().getOptions(); q.hasMoreElements();) {
-//			        	IOption quirk = q.nextElement();
-//			        	if(!quirk.booleanValue()) {
-//			        		menuItem = new JMenuItem(quirk.getDisplayableName());
-//			        		menuItem.setActionCommand("QUIRK:" + quirk.getName());
-//			        		menuItem.addActionListener(this);
-//			        		menuItem.setEnabled(true);
-//			        		menu.add(menuItem);
-//			        	}
-//					}
-//					if(menu.getItemCount() > 20) {
-//	                	MenuScroller.setScrollerFor(menu, 20);
-//	                }
 					popup.add(quirkItem);
 				}
 				if(oneSelected) {
@@ -9196,6 +9189,29 @@ public class CampaignGUI extends JPanel {
         public void actionPerformed(ActionEvent e) {
             //Open the dialog.
             QuirksDialog dialog = new QuirksDialog(unit.getEntity(), frame);
+            dialog.setVisible(true);
+        }
+    }
+
+    /**
+     * Private inner class to handle opening the {@link QuirksDialog} with the appropriate arguments.
+     */
+    private class BombMenuListener implements ActionListener {
+
+        private Unit unit;
+
+        /**
+         * Creates the listener for the Quirks menu item.
+         * @param unit The {@link Unit} being edited.
+         */
+        public BombMenuListener(Unit unit) {
+            this.unit = unit;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            //Open the dialog.
+            BombsDialog dialog = new BombsDialog((Aero)unit.getEntity(), getCampaign(), frame);
             dialog.setVisible(true);
         }
     }
