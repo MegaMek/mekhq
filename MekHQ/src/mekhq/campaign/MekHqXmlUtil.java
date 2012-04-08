@@ -18,6 +18,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import megamek.common.Aero;
 import megamek.common.AmmoType;
+import megamek.common.BombType;
 import megamek.common.CommonConstants;
 import megamek.common.CriticalSlot;
 import megamek.common.Entity;
@@ -229,6 +230,21 @@ public class MekHqXmlUtil {
 			// Fuel
 			retVal += MekHqXmlUtil.indentStr(indentLvl+1) + "<fuel left=\"" + String.valueOf(a.getFuel())
 					+ "\"/>\n";
+
+            int[] bombChoices = a.getBombChoices();
+            if (bombChoices.length > 0) {
+                retVal += MekHqXmlUtil.indentStr(indentLvl+1) + "<bombs>\n";
+                for (int type = 0; type < BombType.B_NUM; type++) {
+                    if (bombChoices[type] > 0) {
+                        retVal += MekHqXmlUtil.indentStr(indentLvl+2) + "<bomb type=\"";
+                        retVal += String.valueOf(type);
+                        retVal += "\" load=\"";
+                        retVal += String.valueOf(bombChoices[type]);
+                        retVal += "\"/>\n";
+                    }
+                }
+                retVal += MekHqXmlUtil.indentStr(indentLvl+1) + "</bombs>\n";
+            }
 
 			// TODO: dropship docking collars, bays
 
