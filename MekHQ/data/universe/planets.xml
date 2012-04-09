@@ -21851,7 +21851,7 @@ Even with its extreme weather, Rahne does support native life. A prime example i
 		</factionChange>
 		<pressure>3</pressure>
 		<gravity>1.01</gravity>
-<lifeForm>3</lifeForm>
+		<lifeForm>3</lifeForm>
 		<climate>5</climate>
 		<percentWater>75</percentWater>
 		<temperature>39</temperature>
@@ -23007,7 +23007,7 @@ Randis IV is a tropical world that contains few natural resources. The planet wa
 			<date>3052-07-15</date>
 			<faction>CGB</faction>
 		</factionChange>
-		<lifeForm></lifeForm>
+		<lifeForm>2</lifeForm>
 		<spectralClass>K</spectralClass>
 		<subtype>4</subtype>
 		<sysPos>5</sysPos>
