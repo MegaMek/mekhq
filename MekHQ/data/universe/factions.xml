@@ -939,6 +939,15 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 		<clan>false</clan>
 	</faction>
 	<faction>
+		<shortname>CTL</shortname>
+		<fullname>Chesterton Trade League</fullname>
+		<startingPlanet>,,,,,,,</startingPlanet>
+		<nameGenerator>CC</nameGenerator>
+		<colorRGB>184,134,22</colorRGB>
+		<periphery>false</periphery>
+		<clan>false</clan>
+	</faction>
+	<faction>
 		<shortname>SSUP</shortname>
 		<fullname>Sarna Supremacy</fullname>
 		<startingPlanet>Sarna,Sarna,Sarna,Sarna,Sarna,Sarna,Sarna,Sarna,Sarna</startingPlanet>
@@ -1193,5 +1202,14 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 		<startingPlanet> , , , , , , , , </startingPlanet>
 		<colorRGB>0,0,0</colorRGB>
 		<periphery>true</periphery>
+	</faction>
+	<faction>
+		<shortname>FOR</shortname>
+		<fullname>Fiefdom Randis</fullname>
+		<startingPlanet> , , , , ,Randis IV,Randis IV,Randis IV,Randis IV</startingPlanet>
+		<nameGenerator>General</nameGenerator>
+		<colorRGB>30,144,255</colorRGB>
+		<periphery>true</periphery>
+		<clan>false</clan>
 	</faction>
 </factions>
