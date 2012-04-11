@@ -204,10 +204,9 @@ public class ForceViewPanel extends javax.swing.JPanel {
 		java.awt.GridBagConstraints gridBagConstraints;
 		pnlStats.setLayout(new java.awt.GridBagLayout());
 		
-	 	int bv = 0;
-    	int cost = 0;
+	 	long bv = 0;
+    	long cost = 0;
     	float ton = 0;
-    	int number = 0;
     	String commander = "";
     	String assigned = "";
     	String type = null;
@@ -216,7 +215,6 @@ public class ForceViewPanel extends javax.swing.JPanel {
     		Unit u = campaign.getUnit(uid);
     		if(null != u) {
     			Person p = u.getCommander();
-    			number++;
     			bv += u.getEntity().calculateBattleValue(true, !u.hasPilot());
     			cost += u.getEntity().getCost(true);
     			ton += u.getEntity().getWeight();

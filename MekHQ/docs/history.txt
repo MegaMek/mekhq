@@ -34,6 +34,7 @@ v0.1.16 (SVN)
 +     This information will save into the MUL file for a scenario.  However, currently it is not saving to the campaign save.
 *     Added the code needed for saving bombs loads to the campaign save and reading them back out again.
 + Planetary data & factions round 11
++ Changed the bv and cost values of the ForceViewPanel to be long rather than integer, so they can handle 8-bit numbers.  Now they have an upper limit of (2^63)-1
 
 v0.1.15 (2012-02-11)
 + Bug 3486200: Previous version campaigns do not save...
