@@ -36,6 +36,7 @@ v0.1.16 (SVN)
 + Planetary data & factions round 11
 + Bug 3516571 - Changed the bv and cost values of the ForceViewPanel to be long rather than integer, so they can handle 8-bit numbers.  Now they have an upper limit of (2^63)-1
 + Bug 3516569 - Changed the code so that the Battle Record always gets refreshed.
++ Fixed how Medical and HR Support percentages are calculated.
 
 v0.1.15 (2012-02-11)
 + Bug 3486200: Previous version campaigns do not save...
