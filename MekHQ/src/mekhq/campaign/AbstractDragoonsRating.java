@@ -95,21 +95,22 @@ public abstract class AbstractDragoonsRating implements IDragoonsRating {
 
     @Override
     public int getCombatRecordValue() {
-        if (!initialized) {
-            for (Mission m : campaign.getMissions()) {
+        successCount = 0;
+        failCount = 0;
+        breachCount = 0;
+        for (Mission m : campaign.getMissions()) {
 
-                //Skip ongoing missions.
-                if (m.isActive()) {
-                    continue;
-                }
+            //Skip ongoing missions.
+            if (m.isActive()) {
+                continue;
+            }
 
-                if (m.getStatus() == Mission.S_SUCCESS) {
-                    successCount++;
-                } else if (m.getStatus() == Mission.S_FAILED) {
-                    failCount++;
-                } else if (m.getStatus() == Mission.S_BREACH) {
-                    breachCount++;
-                }
+            if (m.getStatus() == Mission.S_SUCCESS) {
+                successCount++;
+            } else if (m.getStatus() == Mission.S_FAILED) {
+                failCount++;
+            } else if (m.getStatus() == Mission.S_BREACH) {
+                breachCount++;
             }
         }
 
