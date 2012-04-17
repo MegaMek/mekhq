@@ -48,7 +48,6 @@ public abstract class AbstractDragoonsRating implements IDragoonsRating {
     protected static final BigDecimal regularThreshold = new BigDecimal("4.0");
     protected static final BigDecimal veteranThreshold = new BigDecimal("2.5");
 
-    protected boolean initialized = false;
     protected List<Person> commanderList = new ArrayList<Person>();
     protected BigDecimal numberUnits = BigDecimal.ZERO;
     protected BigDecimal numberIS2 = BigDecimal.ZERO;
@@ -141,7 +140,7 @@ public abstract class AbstractDragoonsRating implements IDragoonsRating {
      * @return
      */
     public Person getCommander() {
-        if ((commander == null) || !initialized) {
+        if ((commander == null)) {
 
             //If the list is null, we cannot determine a commander.
             if (commanderList == null || commanderList.isEmpty()) {
@@ -178,14 +177,6 @@ public abstract class AbstractDragoonsRating implements IDragoonsRating {
      */
     public int getFailCount() {
         return failCount;
-    }
-
-    /**
-     * Returns the value of the initialized flag.  This flag should get set by the initData method.
-     * @return
-     */
-    public boolean isInitialized() {
-        return initialized;
     }
 
     /**
@@ -259,28 +250,25 @@ public abstract class AbstractDragoonsRating implements IDragoonsRating {
         if (scoredPercent.compareTo(BigDecimal.ZERO) < 0) {
             return value;
         }
-        value += scoredPercent.multiply(new BigDecimal(2)).setScale(0, RoundingMode.DOWN).intValue();
+        value += scoredPercent.multiply(new BigDecimal(5)).setScale(0, RoundingMode.DOWN).intValue();
         return Math.max(value, 25);
     }
 
     @Override
     public BigDecimal getTransportPercent() {
-        if (!initialized) {
+        //Find out how short of transport bays we are.
+        int numberWithoutTransport = Math.max((numberMech - numberMechBays), 0);
+        numberWithoutTransport += Math.max((numberVee - numberVeeBays), 0);
+        numberWithoutTransport += Math.max((numberAero - numberAero), 0);
+        numberWithoutTransport += Math.max((numberBa - numberBaBays), 0);
+        numberWithoutTransport += Math.max(((numberInf/28) - numberInfBays), 0);
+        BigDecimal transportNeeded = new BigDecimal(numberWithoutTransport);
 
-            //Find out how short of transport bays we are.
-            int numberWithoutTransport = Math.max((numberMech - numberMechBays), 0);
-            numberWithoutTransport += Math.max((numberVee - numberVeeBays), 0);
-            numberWithoutTransport += Math.max((numberAero - numberAero), 0);
-            numberWithoutTransport += Math.max((numberBa - numberBaBays), 0);
-            numberWithoutTransport += Math.max(((numberInf/28) - numberInfBays), 0);
-            BigDecimal transportNeeded = new BigDecimal(numberWithoutTransport);
-
-            //Find the percentage of units that are transported.
-            if (getNumberUnits().compareTo(BigDecimal.ZERO) == 0) {
-                return BigDecimal.ZERO;
-            }
-            transportPercent = BigDecimal.ONE.subtract(transportNeeded.divide(getNumberUnits(), PRECISION, HALF_EVEN)).multiply(new BigDecimal(100));
+        //Find the percentage of units that are transported.
+        if (getNumberUnits().compareTo(BigDecimal.ZERO) == 0) {
+            return BigDecimal.ZERO;
         }
+        transportPercent = BigDecimal.ONE.subtract(transportNeeded.divide(getNumberUnits(), PRECISION, HALF_EVEN)).multiply(new BigDecimal(100));
 
         return transportPercent;
     }
