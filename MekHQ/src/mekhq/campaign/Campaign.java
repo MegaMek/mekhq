@@ -3686,7 +3686,7 @@ public class Campaign implements Serializable {
     }
 
     public String getDragoonRating() {
-        return DragoonsRatingFactory.getDragoonsRating(this).getDragoonRating(true);
+        return DragoonsRatingFactory.getDragoonsRating(this).getDragoonRating();
     }
     
     public RandomSkillPreferences getRandomSkillPreferences() {

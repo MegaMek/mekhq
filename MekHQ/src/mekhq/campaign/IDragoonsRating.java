@@ -63,7 +63,7 @@ public interface IDragoonsRating {
      *
      * @return
      */
-    public String getDragoonRating(boolean recalculate);
+    public String getDragoonRating();
 
     /**
      * Returns the Dragoon's score for the force's average experience level.

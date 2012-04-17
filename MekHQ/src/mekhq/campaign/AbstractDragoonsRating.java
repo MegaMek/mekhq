@@ -316,8 +316,8 @@ public abstract class AbstractDragoonsRating implements IDragoonsRating {
     }
 
     @Override
-    public String getDragoonRating(boolean recalculate) {
-        int score = calculateDragoonRatingScore(recalculate);
+    public String getDragoonRating() {
+        int score = calculateDragoonRatingScore();
         return getDragoonRatingName(getDragoonRating(score)) + " (" + score + ")";
     }
 
@@ -342,7 +342,7 @@ public abstract class AbstractDragoonsRating implements IDragoonsRating {
      * @return
      */
     protected BigDecimal getTotalSkillLevels() {
-        initValues(false);
+        initValues();
         return totalSkillLevels;
     }
 
@@ -352,7 +352,7 @@ public abstract class AbstractDragoonsRating implements IDragoonsRating {
      * @return
      */
     protected BigDecimal getNumberUnits() {
-        initValues(false);
+        initValues();
         return numberUnits;
     }
 
@@ -373,18 +373,13 @@ public abstract class AbstractDragoonsRating implements IDragoonsRating {
     /**
      * Calculates the unit's Dragoon's rating.  If recalculate is TRUE, then the calculations will start over
      * from the beginning.  If FALSE, pre-calculated score will be returned.
-     *
-     * @param recalculate
-     * @return
      */
-    protected abstract int calculateDragoonRatingScore(boolean recalculate);
+    protected abstract int calculateDragoonRatingScore();
 
     /**
      * Recalculates the dragoons rating.  If this has already been done, the initialized flag should already
      * be set true and this method will immediately exit.
-     *
-     * @param reInitialize Pass a value of TRUE to force a recalculation regardless of the value of the initialied flag.
      */
-    protected abstract void initValues(boolean reInitialize);
+    protected abstract void initValues();
 
 }

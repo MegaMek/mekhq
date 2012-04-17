@@ -78,11 +78,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
     }
 
     @Override
-    protected void initValues(boolean reInitialize) {
-        if (isInitialized() && !reInitialize) {
-            return;
-        }
-
+    protected void initValues() {
         for (UUID uid : campaign.getForces().getAllUnits()) {
             Unit u = campaign.getUnit(uid);
             if (null == u) {
@@ -118,7 +114,6 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
 
         updateAvailableSupport();
         updateMedicalAndHrSupportNeeds();
-        initialized = true;
     }
 
     private void updateAvailableSupport() {
@@ -300,8 +295,8 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
     }
 
     @Override
-    protected int calculateDragoonRatingScore(boolean recalculate) {
-        initValues(recalculate);
+    protected int calculateDragoonRatingScore() {
+        initValues();
 
         int score = 0;
 
@@ -487,7 +482,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
 
     @Override
     public String getDetails() {
-        StringBuffer sb = new StringBuffer("Dragoons Rating:                " + getDragoonRating(false) + "\n");
+        StringBuffer sb = new StringBuffer("Dragoons Rating:                " + getDragoonRating() + "\n");
         sb.append("    Method: FM: Mercenaries (rev)\n\n");
 
         sb.append("Quality:                        ").append(getExperienceValue()).append("\n");

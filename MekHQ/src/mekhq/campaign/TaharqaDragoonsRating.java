@@ -44,8 +44,6 @@ import mekhq.campaign.personnel.SkillType;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.UUID;
 
 /**
@@ -72,11 +70,7 @@ public class TaharqaDragoonsRating extends AbstractDragoonsRating {
     }
 
     @Override
-    protected void initValues(boolean reInitialize) {
-        if (isInitialized() && !reInitialize) {
-            return;
-        }
-
+    protected void initValues() {
         for (UUID uid : campaign.getForces().getAllUnits()) {
             Unit u = campaign.getUnit(uid);
             if (null == u) {
@@ -109,7 +103,6 @@ public class TaharqaDragoonsRating extends AbstractDragoonsRating {
         }
 
         updateTechCounts();
-        initialized = true;
     }
 
     private void updateJumpships(Entity en) {
@@ -342,7 +335,7 @@ public class TaharqaDragoonsRating extends AbstractDragoonsRating {
 
     @Override
     public String getDetails() {
-        StringBuffer sb = new StringBuffer("Dragoons Rating:                " + getDragoonRating(false) + "\n");
+        StringBuffer sb = new StringBuffer("Dragoons Rating:                " + getDragoonRating() + "\n");
         sb.append("    Method: Default\n\n");
 
         sb.append("Quality:                        ").append(getExperienceValue()).append("\n");
@@ -382,8 +375,9 @@ public class TaharqaDragoonsRating extends AbstractDragoonsRating {
         return new String(sb);
     }
 
-    protected int calculateDragoonRatingScore(boolean recalc) {
-        initValues(recalc);
+    @Override
+    protected int calculateDragoonRatingScore() {
+        initValues();
 
         int score = 0;
 
