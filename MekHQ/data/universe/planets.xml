@@ -606,8 +606,52 @@ Alarion is primarily settled by people of German, Romanian and English descent.<
 		<ycood>1791</ycood>
 		<faction>NONE</faction>
 		<factionChange>
+			<date>2786-08-24</date>
+			<faction>SLIE</faction>
+		</factionChange>
+		<factionChange>
 			<date>2802-06-11</date>
-			<faction>CLAN</faction>
+			<faction>CB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3059-02-27</date>
+			<faction>CSA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3070-05-01</date>
+			<faction>CBS,CSA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3070-11-01</date>
+			<faction>CBS,CSA,CCC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-03-01</date>
+			<faction>CBS,CSA,CCC,CGS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-03-18</date>
+			<faction>CBS,CSA,CCC,SOC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3073-04-27</date>
+			<faction>CBS,CSA,CCC,SOC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3073-05-02</date>
+			<faction>CCC,CBS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-01-01</date>
+			<faction>CBS,CCC,CCO,CSA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3079-01-01</date>
+			<faction>CCC,CCO,CSA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3085-01-01</date>
+			<faction>ABN</faction>
 		</factionChange>
 		<spectralClass>K</spectralClass>
 		<subtype>1</subtype>
@@ -619,6 +663,32 @@ Alarion is primarily settled by people of German, Romanian and English descent.<
 		<percentWater>60</percentWater>
 		<lifeForm>5</lifeForm>
 		<desc>No description available.</desc>
+	</planet>
+	<planet>
+		<name>Alborg</name>
+		<xcood>553.35</xcood>
+		<ycood>499.04</ycood>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2504-07-16</date>
+			<faction>JF</faction>
+			</factionChange>
+		<pressure>3</pressure>
+		<gravity>0.98</gravity>
+		<lifeForm>5</lifeForm>
+		<climate>2</climate>
+		<percentWater>71</percentWater>
+		<temperature>33</temperature>
+		<spectralClass>F</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>3</sysPos>
+		<socioIndustrial>C-C-B-D-B</socioIndustrial>
+		<satellite>Sjaeland</satellite>
+		<satellite>Skane</satellite>
+		<landMass>(Christiana)</landMass>
+		<hpg>X</hpg>
+		<desc>Alborg has the most comfortable climate of the four JarnFolk planets. Alborg boasts a temperate climate, lush fauna, and fertile arable land. In addition the planet has significant mineral wealth used for what little industry the JarnFolk possess. Alborg is home to nearly half of the entire population of JarnFolk and is controlled by the most powerful families.</desc>
 	</planet>
 	<planet>
 		<name>Alchiba</name>
@@ -956,6 +1026,10 @@ Industrial, Command and logistical world, paperwork in this planet and its prefe
 		<factionChange>
 			<date>3050-03-10</date>
 			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-04-19</date>
+			<faction>CHH</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -1394,6 +1468,22 @@ Industrial, Command and logistical world, paperwork in this planet and its prefe
 		<xcood>304.35</xcood>
 		<ycood>110.84</ycood>
 		<faction>DC</faction>
+		<factionChange>
+			<date>3062-12-26</date>
+			<faction>DC,FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3063-02-13</date>
+			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3064-12-02</date>
+			<faction>FS,DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3065-01-24</date>
+			<faction>DC</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Anaheim</name>
@@ -1663,6 +1753,14 @@ Industrial, Command and logistical world, paperwork in this planet and its prefe
 			<date>3050-03-08</date>
 			<faction>CJF</faction>
 		</factionChange>
+		<factionChange>
+			<date>3071-06-03</date>
+			<faction>CIH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-12-03</date>
+			<faction>CJF</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Apolakkia</name>
@@ -1698,6 +1796,14 @@ Industrial, Command and logistical world, paperwork in this planet and its prefe
 		<factionChange>
 			<date>3050-06-14</date>
 			<faction>CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-09-13</date>
+			<faction>CIH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-11-03</date>
+			<faction>CHH</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -1807,7 +1913,35 @@ In the mid-late 31st Century, Arc-Royal was home to the Kell Hounds and Clan Wol
 		</factionChange>
 		<factionChange>
 			<date>2802-06-11</date>
-			<faction>CLAN</faction>
+			<faction>CGB,CSA,CSV</faction>
+		</factionChange>
+		<factionChange>
+			<date>3067-01-01</date>
+			<faction>CSA,CSV,CGB,CBS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3067-01-01</date>
+			<faction>CSA,CSV,CGB,CBS,CCC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-01-01</date>
+			<faction>CSA,CSV,CBS,CCC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3073-01-04</date>
+			<faction>CSA,CSV,CBS,CCC,SOC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-01-01</date>
+			<faction>CBS,CCC,CSA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3079-01-01</date>
+			<faction>CCC,CSA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3085-01-01</date>
+			<faction>CSA</faction>
 		</factionChange>
 		<spectralClass>G</spectralClass>
 		<subtype>7</subtype>
@@ -1819,6 +1953,10 @@ In the mid-late 31st Century, Arc-Royal was home to the Kell Hounds and Clan Wol
 		<climate>3</climate>
 		<percentWater>50</percentWater>
 		<lifeForm>7</lifeForm>
+		<landMass>East Arcadia</landMass>
+		<landMass>West Arcadia</landMass>
+		<landMass>Rechlan</landMass>
+		<satellite> Aesa [Liny]</satellite>
 		<desc>No description available.</desc>
 	</planet>
 	<planet>
@@ -1909,6 +2047,28 @@ Arcturus’ greatest contribution to the Commonwealth since the capital became T
 			<date>3040-01-01</date>
 			<faction>FC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3067-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.0</gravity>
+		<zenithCharge>True</zenithCharge>
+		<lifeForm>7</lifeForm>
+		<climate>3</climate>
+		<percentWater>74</percentWater>
+		<temperature>33</temperature>
+		<spectralClass>K</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>3</sysPos>
+		<socioIndustrial>A-A-A-B-A</socioIndustrial>
+		<satellite>Aisillik</satellite>
+		<satellite>Corey</satellite>
+		<satellite>Jamis</satellite>
+		<satellite>Stiggin's Moon</satellite>
+		<hpg>A</hpg>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Ariel</name>
@@ -2272,7 +2432,7 @@ The League intelligence branch, SAFE, is headquartered on Atreus' moon Wendigo. 
 		<faction>NONE</faction>
 		<factionChange>
 			<date>2802-06-11</date>
-			<faction>CLAN</faction>
+			<faction>CFM,CIH</faction>
 		</factionChange>
 		<factionChange>
 			<date>2900-01-01</date>
@@ -2281,6 +2441,18 @@ The League intelligence branch, SAFE, is headquartered on Atreus' moon Wendigo. 
 		<factionChange>
 			<date>3060-01-01</date>
 			<faction>CFM,CIH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-08-22</date>
+			<faction>CFM,CSV</faction>
+		</factionChange>
+		<factionChange>
+			<date>3074-01-01</date>
+			<faction>CFM</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-01-01</date>
+			<faction>ABN</faction>
 		</factionChange>
 		<spectralClass>G</spectralClass>
 		<subtype>6</subtype>
@@ -2673,7 +2845,11 @@ The League intelligence branch, SAFE, is headquartered on Atreus' moon Wendigo. 
 		</factionChange>
 		<factionChange>
 			<date>2802-06-11</date>
-			<faction>CLAN</faction>
+			<faction>CCO,CCC,CDS,CIH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-01-23</date>
+			<faction>CCO</faction>
 		</factionChange>
 		<spectralClass>G</spectralClass>
 		<subtype>7</subtype>
@@ -2682,11 +2858,20 @@ The League intelligence branch, SAFE, is headquartered on Atreus' moon Wendigo. 
 		<gravity>1.50</gravity>
 		<pressure>3</pressure>
 		<temperature>35</temperature>
-		<climate>3</climate>
+		<climate>4</climate>
 		<percentWater>40</percentWater>
 		<lifeForm>5</lifeForm>
-		<landMass>Spiked Heart</landMass>
-		<desc>No description available.</desc>
+		<satellite>Ur</satellite>
+		<landMass>Abyssinia</landMass>
+		<landMass>Callandra</landMass>
+		<landMass>Corsen</landMass>
+		<landMass>Solath</landMass>
+		<landMass>Valence</landMass>
+		<desc>Babylon is an arid planet that originally did not appeal to early colonists. Not only was it a harsh climate, many early colonists suffered from the "Babylon Plague" caused by native pathogens. Thousands perished in the months before scientists were able to come up with an effective vaccine.
+		
+		After the world was made more liveable and the Plague was conquered, it was discovered that Babylon was rich in raw minerals. This extended to other planets in the system and several large asteroids.
+		
+		Babylon is home to the Goliath Scorpion, which were a bane of early settlers.</desc>
 	</planet>
 	<planet>
 		<name>Baccalieu</name>
@@ -2757,6 +2942,10 @@ The League intelligence branch, SAFE, is headquartered on Atreus' moon Wendigo. 
 		<xcood>595.73</xcood>
 		<ycood>155.83</ycood>
 		<faction>OA</faction>
+		<factionChange>
+			<date>3083-11-06</date>
+			<faction>PIND</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Ballad II</name>
@@ -2808,6 +2997,18 @@ The League intelligence branch, SAFE, is headquartered on Atreus' moon Wendigo. 
 		<factionChange>
 			<date>3050-04-07</date>
 			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-05-07</date>
+			<faction>CHH,CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-08-07</date>
+			<faction>CHH,CW,CGB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-09-07</date>
+			<faction>CHH,CGB</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -2873,7 +3074,51 @@ The League intelligence branch, SAFE, is headquartered on Atreus' moon Wendigo. 
 		<faction>NONE</faction>
 		<factionChange>
 			<date>2802-06-11</date>
-			<faction>CLAN</faction>
+			<faction>CNC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3000-01-01</date>
+			<faction>CNC,CIH,CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3060-01-01</date>
+			<faction>CDS,CIH,CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3070-01-01</date>
+			<faction>CDS,CIH,CSV</faction>
+		</factionChange>
+		<factionChange>
+			<date>3070-05-01</date>
+			<faction>CCC,CIH,CSV</faction>
+		</factionChange>
+		<factionChange>
+			<date>3070-07-01</date>
+			<faction>CSA,CIH,CSV,CFM</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-09-26</date>
+			<faction>CSA,CBS,CSV</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-10-21</date>
+			<faction>CSA,CBS,CSV,SOC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-10-25</date>
+			<faction>CSV,SOC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-01-01</date>
+			<faction>CCO,CCC,CGS,CSA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3079-10-12</date>
+			<faction>CCO,CCC,CSA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3085-01-01</date>
+			<faction>CCO</faction>
 		</factionChange>
 		<spectralClass>G</spectralClass>
         <subtype>6</subtype>
@@ -3021,6 +3266,14 @@ Barras is the hotbed of intelligence activity along the Confederation-FWL border
 			<date>3050-08-08</date>
 			<faction>CW</faction>
 		</factionChange>
+		<factionChange>
+			<date>3071-08-16</date>
+			<faction>CHH,CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-10-27</date>
+			<faction>CW</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Bass</name>
@@ -3133,11 +3386,27 @@ Barras is the hotbed of intelligence activity along the Confederation-FWL border
 		<faction>NONE</faction>
 		<factionChange>
 			<date>2802-06-11</date>
-			<faction>CLAN</faction>
+			<faction>CGB</faction>
 		</factionChange>
 		<factionChange>
 			<date>2900-01-01</date>
-			<faction>CGB</faction>
+			<faction>CGB,CNC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3060-01-01</date>
+			<faction>CSR,CHH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3070-06-01</date>
+			<faction>CSV,CHH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-06-01</date>
+			<faction>CCC,CSL</faction>
+		</factionChange>
+		<factionChange>
+			<date>3085-01-01</date>
+			<faction>CCC,CSL</faction>
 		</factionChange>
 		<spectralClass>A</spectralClass>
         <subtype>6</subtype>
@@ -3390,6 +3659,14 @@ Barras is the hotbed of intelligence activity along the Confederation-FWL border
 		<factionChange>
 			<date>3062-01-01</date>
 			<faction>CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-08-09</date>
+			<faction>CIH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-11-03</date>
+			<faction>CHH</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -3778,6 +4055,10 @@ Barras is the hotbed of intelligence activity along the Confederation-FWL border
 			<date>3049-08-08</date>
 			<faction>CW</faction>
 		</factionChange>
+		<factionChange>
+			<date>3071-01-25</date>
+			<faction>CHH</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Blair Atholl</name>
@@ -3981,6 +4262,18 @@ Bolan was primarily colonized by settlers from India, Pakistan and Afghanistan.<
 			<date>3050-03-03</date>
 			<faction>CJF</faction>
 		</factionChange>
+		<factionChange>
+			<date>3071-06-06</date>
+			<faction>CJF,CIH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-06-23</date>
+			<faction>CIH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-07-14</date>
+			<faction>CJF</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Bonneau</name>
@@ -4086,6 +4379,18 @@ Bolan was primarily colonized by settlers from India, Pakistan and Afghanistan.<
 		</factionChange>
 		<factionChange>
 			<date>3049-09-05</date>
+			<faction>CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-09-15</date>
+			<faction>CIH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-12-18</date>
+			<faction>CHH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-05-01</date>
 			<faction>CJF</faction>
 		</factionChange>
 	</planet>
@@ -4250,7 +4555,31 @@ Brasha is home to the unique and elite Qum’ran Guard, which are comprised of m
 		<faction>NONE</faction>
 		<factionChange>
 			<date>2802-06-11</date>
-			<faction>CLAN</faction>
+			<faction>CCC,CNC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2840-01-01</date>
+			<faction>CCC,CSA,CSN,CNC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3060-01-01</date>
+			<faction>CCC,CSA,CSR</faction>
+		</factionChange>
+		<factionChange>
+			<date>3070-06-01</date>
+			<faction>CCC,CSA,CSV,CBS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-02-12</date>
+			<faction>CCC,CSV,SOC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-01-01</date>
+			<faction>CCC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3085-01-01</date>
+			<faction>CCC</faction>
 		</factionChange>
 		<spectralClass>F</spectralClass>
 		<subtype>9</subtype>
@@ -4262,6 +4591,27 @@ Brasha is home to the unique and elite Qum’ran Guard, which are comprised of m
 		<climate>4</climate>
 		<percentWater>20</percentWater>
 		<lifeForm>3</lifeForm>
+		<desc>No description available.</desc>
+	</planet>
+	<planet>
+		<name>Brinton</name>
+		<xcood>134.47</xcood>
+		<ycood>-414.46</ycood>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2751-01-01</date>
+			<faction>TC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2990-01-01</date>
+			<faction>ABN</faction>
+		</factionChange>
+		<zenithCharge>True</zenithCharge>
+		<lifeForm>6</lifeForm>
+		<spectralClass>F</spectralClass>
+		<subtype>2</subtype>
+		<sysPos>5</sysPos>
+		<hpg>C</hpg>
 		<desc>No description available.</desc>
 	</planet>
 	<planet>
@@ -4472,6 +4822,18 @@ Brasha is home to the unique and elite Qum’ran Guard, which are comprised of m
 			<date>3050-06-09</date>
 			<faction>CW</faction>
 		</factionChange>
+		<factionChange>
+			<date>3071-04-24</date>
+			<faction>CHH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-03</date>
+			<faction>CHH,CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-05</date>
+			<faction>CHH</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Brundage</name>
@@ -4607,6 +4969,19 @@ Brasha is home to the unique and elite Qum’ran Guard, which are comprised of m
 			<date>2750-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3075-01-01</date>
+			<faction>OA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3083-02-10</date>
+			<faction>DC,OA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3083-02-21</date>
+			<faction>OA</faction>
+		</factionChange>
+		<landMass>(New Jordan)</landMass>
 	</planet>
 	<planet>
 		<name>Buena</name>
@@ -4696,6 +5071,10 @@ Recently, a large island in the eastern basin has been taken over for secret tes
 		<factionChange>
 			<date>3049-09-12</date>
 			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-01-25</date>
+			<faction>CHH</faction>
 		</factionChange>
 		<lifeForm>3</lifeForm>
 		<spectralClass>G</spectralClass>
@@ -5871,6 +6250,10 @@ The capital city of Chahar is Benares, which is considered sacred to Lyran Hindu
 			<date>3050-03-06</date>
 			<faction>CW</faction>
 		</factionChange>
+		<factionChange>
+			<date>3071-02-10</date>
+			<faction>CHH</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Chatham</name>
@@ -6043,6 +6426,30 @@ The capital city of Chahar is Benares, which is considered sacred to Lyran Hindu
 			<date>3040-01-01</date>
 			<faction>FC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3067-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
+		<pressure>4</pressure>
+		<gravity>1.1</gravity>
+		<nadirCharge>True</nadirCharge>
+		<zenithCharge>True</zenithCharge>
+		<lifeForm>7</lifeForm>
+		<climate>4</climate>
+		<percentWater>22</percentWater>
+		<temperature>22</temperature>
+		<spectralClass>F</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>4</sysPos>
+		<socioIndustrial>C-C-A-D-D</socioIndustrial>
+		<satellite>Madden</satellite>
+		<satellite>Pietrikof</satellite>
+		<landMass>Curran (Weath)</landMass>
+		<landMass>Deveroux</landMass>
+		<landMass>Moody</landMass>
+		<hpg>B</hpg>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Cholame</name>
@@ -6160,7 +6567,31 @@ This led to a very hostile environment by the mid 3020s with many residents just
 		</factionChange>
 		<factionChange>
 			<date>2802-06-11</date>
-			<faction>CLAN</faction>
+			<faction>CSR,CWOV</faction>
+		</factionChange>
+		<factionChange>
+			<date>2824-01-01</date>
+			<faction>CSR,CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3070-08-01</date>
+			<faction>CSR,CW,CBS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-02-01</date>
+			<faction>CSA,CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-04-01</date>
+			<faction>SOC,CCO</faction>
+		</factionChange>
+		<factionChange>
+			<date>3073-10-15</date>
+			<faction>CCO,CSV</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-11-22</date>
+			<faction>ABN</faction>
 		</factionChange>
 		<spectralClass>G</spectralClass>
 		<subtype>2</subtype>
@@ -6801,6 +7232,10 @@ Coventry’s mineral, agricultural, and military economy is supplemented by a th
 			<date>3049-09-03</date>
 			<faction>CW</faction>
 		</factionChange>
+		<factionChange>
+			<date>3071-01-25</date>
+			<faction>CHH</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Crestoblus</name>
@@ -6900,6 +7335,10 @@ Coventry’s mineral, agricultural, and military economy is supplemented by a th
 		<factionChange>
 			<date>3050-05-01</date>
 			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-04-25</date>
+			<faction>CHH</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -7045,7 +7484,23 @@ Coventry’s mineral, agricultural, and military economy is supplemented by a th
 		</factionChange>
 		<factionChange>
 			<date>2802-06-11</date>
-			<faction>CLAN</faction>
+			<faction>CFM,CGS,CJF,CSA,CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3070-01-01</date>
+			<faction>CFM,CGS,CSV,CSA,CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-04-01</date>
+			<faction>CFM,CGS,CSV,CSA,CCO,SOC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-01-01</date>
+			<faction>CGS,CSA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3079-10-18</date>
+			<faction>CSA</faction>
 		</factionChange>
 		<spectralClass>K</spectralClass>
 		<subtype>4</subtype>
@@ -7058,7 +7513,9 @@ Coventry’s mineral, agricultural, and military economy is supplemented by a th
 		<percentWater>60</percentWater>
 		<lifeForm>7</lifeForm>
 		<landMass>Riva</landMass>
-		<desc>No description available.</desc>
+		<desc>Dagda was the first of the Pentagon Worlds settled by the Star League in Exile. The planet is rich in minerals and was the primary source of many raw materials for the Star League in Exile.
+		
+The Jade Falcon, totem animal of the Clan with the same name, is from Dagda.</desc>
 	</planet>
 	<planet>
 		<name>Dahar IV</name>
@@ -7186,6 +7643,10 @@ Coventry’s mineral, agricultural, and military economy is supplemented by a th
 		<xcood>431.41</xcood>
 		<ycood>176.69</ycood>
 		<faction>OA</faction>
+		<factionChange>
+			<date>3075-01-01</date>
+			<faction>CSR,OA</faction>
+		</factionChange>
 		<nadirCharge>True</nadirCharge>
 		<lifeForm>3</lifeForm>
 		<spectralClass>K</spectralClass>
@@ -7313,6 +7774,10 @@ Coventry’s mineral, agricultural, and military economy is supplemented by a th
 		<factionChange>
 			<date>3050-07-27</date>
 			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-09-18</date>
+			<faction>CGB</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -7464,7 +7929,35 @@ Coventry’s mineral, agricultural, and military economy is supplemented by a th
 		<faction>NONE</faction>
 		<factionChange>
 			<date>2802-06-11</date>
-			<faction>CLAN</faction>
+			<faction>CDS,CCO</faction>
+		</factionChange>
+		<factionChange>
+			<date>2840-01-01</date>
+			<faction>CDS,CCO,CNC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3060-01-01</date>
+			<faction>CDS,CCO</faction>
+		</factionChange>
+		<factionChange>
+			<date>3067-01-01</date>
+			<faction>CCO,CCC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-07-15</date>
+			<faction>CGS,CCC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3073-01-01</date>
+			<faction>CGS,CCC,CCO</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-06-01</date>
+			<faction>CCC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3085-01-01</date>
+			<faction>ABN</faction>
 		</factionChange>
 		<spectralClass>G</spectralClass>
 		<subtype>6</subtype>
@@ -7636,6 +8129,18 @@ Coventry’s mineral, agricultural, and military economy is supplemented by a th
 			<date>3050-08-15</date>
 			<faction>CJF</faction>
 		</factionChange>
+		<factionChange>
+			<date>3073-07-23</date>
+			<faction>SOC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3073-09-12</date>
+			<faction>SOC,CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3073-11-17</date>
+			<faction>CJF</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Derf</name>
@@ -7648,6 +8153,14 @@ Coventry’s mineral, agricultural, and military economy is supplemented by a th
 		</factionChange>
 		<factionChange>
 			<date>3050-05-03</date>
+			<faction>CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-07-12</date>
+			<faction>CIH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-12-25</date>
 			<faction>CJF</faction>
 		</factionChange>
 	</planet>
@@ -8109,6 +8622,10 @@ Donegal is the home to many major trading companies, the Supreme Court of the Co
 			<date>3049-08-18</date>
 			<faction>CW</faction>
 		</factionChange>
+		<factionChange>
+			<date>3071-01-25</date>
+			<faction>CHH</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Drienfontein</name>
@@ -8361,7 +8878,27 @@ The Malthus crime family had each of the 5 domed cities set up to cater to a dif
 		</factionChange>
 		<factionChange>
 			<date>2802-06-11</date>
-			<faction>CLAN</faction>
+			<faction>CW,CJF,CHH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3069-11-07</date>
+			<faction>CW,CSV,CHH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-04-01</date>
+			<faction>CSV,CSA,CCO,CBS,CCC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3073-03-04</date>
+			<faction>CBS,CSV,CCO</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-01-01</date>
+			<faction>CCC,CBS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3085-01-01</date>
+			<faction>ABN</faction>
 		</factionChange>
 		<spectralClass>F</spectralClass>
 		<subtype>4</subtype>
@@ -8589,6 +9126,10 @@ Elgin’s manufacturing capacity was dramatically reduced over the course of the
 			<date>3049-09-03</date>
 			<faction>CW</faction>
 		</factionChange>
+		<factionChange>
+			<date>3071-01-25</date>
+			<faction>CHH</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Ellengurg</name>
@@ -8745,6 +9286,10 @@ Elgin’s manufacturing capacity was dramatically reduced over the course of the
 			<date>3062-01-01</date>
 			<faction>CHH</faction>
 		</factionChange>
+		<factionChange>
+			<date>3065-01-01</date>
+			<faction>CGB</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Engadine</name>
@@ -8865,6 +9410,14 @@ Elgin’s manufacturing capacity was dramatically reduced over the course of the
 		</factionChange>
 		<factionChange>
 			<date>3049-09-13</date>
+			<faction>CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-06-05</date>
+			<faction>CIH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-09-18</date>
 			<faction>CJF</faction>
 		</factionChange>
 	</planet>
@@ -9040,6 +9593,18 @@ Elgin’s manufacturing capacity was dramatically reduced over the course of the
 			<date>3050-05-09</date>
 			<faction>CJF</faction>
 		</factionChange>
+		<factionChange>
+			<date>3071-08-06</date>
+			<faction>CIH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-02-10</date>
+			<faction>CJF,CIH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-02-24</date>
+			<faction>CJF</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Ewanrigg</name>
@@ -9145,10 +9710,14 @@ Elgin’s manufacturing capacity was dramatically reduced over the course of the
 		<name>Farstar</name>
 		<xcood>416.4</xcood>
 		<ycood>447.34</ycood>
-		<faction>PIND</faction>
+		<faction>UND</faction>
 		<factionChange>
 			<date>2900-01-01</date>
 			<faction>PIND</faction>
+		</factionChange>
+		<factionChange>
+			<date>3063-01-01</date>
+			<faction>CSR</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -9210,6 +9779,14 @@ Elgin’s manufacturing capacity was dramatically reduced over the course of the
 			<date>3050-08-13</date>
 			<faction>CW</faction>
 		</factionChange>
+		<factionChange>
+			<date>3071-07-06</date>
+			<faction>CHH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-11-18</date>
+			<faction>CW</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Ferihegy</name>
@@ -9255,13 +9832,21 @@ Elgin’s manufacturing capacity was dramatically reduced over the course of the
 		<factionChange>
 			<date>3049-08-07</date>
 			<faction>CW</faction>
-		</factionChange>	
+		</factionChange>
+		<factionChange>
+			<date>3071-01-25</date>
+			<faction>CHH</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Ferris (OA)</name>
 		<xcood>588.89</xcood>
 		<ycood>128.05</ycood>
 		<faction>OA</faction>
+		<factionChange>
+			<date>3084-02-01</date>
+			<faction>PIND</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Fetsund</name>
@@ -9410,7 +9995,9 @@ Elgin’s manufacturing capacity was dramatically reduced over the course of the
 		<hpg>B</hpg>
 		<lifeForm>4</lifeForm>
 		<socioIndustrial>C-C-B-C-B</socioIndustrial>
-        <desc>No description available.</desc>
+		<desc>House Fletcher were ardent supporters of House Marik until the Duke of Oriente attacked the first planet of Fletcher, in the Free Worlds League, in 2368. House Fletcher moved, along with millions of their followers to the Capellan Confederation planet of the same name.
+
+For much of its history Fletcher has been the site of an historic cemetery which remains the final resting place for Capellan heroes and several Chancellors, including Aleisha Liao and Stephen Liao.</desc>
 	</planet>
 	<planet>
 		<name>Fletcher's Feast</name>
@@ -9573,7 +10160,43 @@ Elgin’s manufacturing capacity was dramatically reduced over the course of the
 		<faction>NONE</faction>
 		<factionChange>
 			<date>2802-06-11</date>
-			<faction>CLAN</faction>
+			<faction>CCO,CFM,CIH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-07-15</date>
+			<faction>CGS,CFM,CIH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-09-18</date>
+			<faction>CGS,CFM,CSV</faction>
+		</factionChange>
+		<factionChange>
+			<date>3073-01-01</date>
+			<faction>CGS,CSV</faction>
+		</factionChange>
+		<factionChange>
+			<date>3073-03-12</date>
+			<faction>CSV,CCO,SOC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3073-05-19</date>
+			<faction>CSV</faction>
+		</factionChange>
+		<factionChange>
+			<date>3073-06-12</date>
+			<faction>CSV,CGS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-10-01</date>
+			<faction>CGS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3079-02-04</date>
+			<faction>CSA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3085-01-01</date>
+			<faction>CCC</faction>
 		</factionChange>
 		<spectralClass>M</spectralClass>
 		<subtype>9</subtype>
@@ -9796,6 +10419,26 @@ Elgin’s manufacturing capacity was dramatically reduced over the course of the
 			<date>3040-01-01</date>
 			<faction>FC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3067-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.13</gravity>
+		<nadirCharge>True</nadirCharge>
+		<zenithCharge>True</zenithCharge>
+		<lifeForm>5</lifeForm>
+		<climate>4</climate>
+		<percentWater>32</percentWater>
+		<temperature>33</temperature>
+		<spectralClass>F</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>III</luminosity>
+		<sysPos>4</sysPos>
+		<socioIndustrial>A-A-A-A-F</socioIndustrial>
+		<satellite>Malabar</satellite>
+		<hpg>A</hpg>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Galedon V</name>
@@ -10069,7 +10712,23 @@ When Gallery was originally settled there were no native lifeforms so the origin
 		<faction>NONE</faction>
 		<factionChange>
 			<date>2802-06-11</date>
-			<faction>CLAN</faction>
+			<faction>CJF,CNC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3060-01-01</date>
+			<faction>CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3070-01-01</date>
+			<faction>CSV</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-01-01</date>
+			<faction>CSA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3085-01-01</date>
+			<faction>CSA</faction>
 		</factionChange>
 		<spectralClass>B</spectralClass>
 		<subtype>0</subtype>
@@ -10158,7 +10817,15 @@ When Gallery was originally settled there were no native lifeforms so the origin
 		</factionChange>
 		<factionChange>
 			<date>3062-01-01</date>
-			<faction>PIND</faction>
+			<faction>CSR</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-04-03</date>
+			<faction>CB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-02-03</date>
+			<faction>CSR</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -10362,7 +11029,35 @@ When Gallery was originally settled there were no native lifeforms so the origin
 		<faction>NONE</faction>
 		<factionChange>
 			<date>2802-06-11</date>
-			<faction>CLAN</faction>
+			<faction>CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3062-01-01</date>
+			<faction>CJF,CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3070-01-01</date>
+			<faction>CSV,CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-04-01</date>
+			<faction>CSV,CCO</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-11-24</date>
+			<faction>CSV,CFM,CGS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-06-01</date>
+			<faction>CCO,CGS,CSL</faction>
+		</factionChange>
+		<factionChange>
+			<date>3079-03-02</date>
+			<faction>CCO,CSA,CSL</faction>
+		</factionChange>
+		<factionChange>
+			<date>3085-01-01</date>
+			<faction>CSL,CCO</faction>
 		</factionChange>
 		<spectralClass>G</spectralClass>
 		<subtype>4</subtype>
@@ -10453,6 +11148,14 @@ When Gallery was originally settled there were no native lifeforms so the origin
 			<date>3050-05-11</date>
 			<faction>CJF</faction>
 		</factionChange>
+		<factionChange>
+			<date>3071-06-03</date>
+			<faction>CIH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-07-03</date>
+			<faction>CJF</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Gomeisa</name>
@@ -10524,6 +11227,14 @@ When Gallery was originally settled there were no native lifeforms so the origin
 		<factionChange>
 			<date>3049-09-27</date>
 			<faction>CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-10-10</date>
+			<faction>CIH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-12-28</date>
+			<faction>CHH</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -10626,7 +11337,23 @@ When Gallery was originally settled there were no native lifeforms so the origin
 		<faction>NONE</faction>
 		<factionChange>
 			<date>2802-06-11</date>
-			<faction>CLAN</faction>
+			<faction>CSV,CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-04-01</date>
+			<faction>CSV,CGS,SOC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-04-27</date>
+			<faction>CSV</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-01-01</date>
+			<faction>CSA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3085-01-01</date>
+			<faction>CSA</faction>
 		</factionChange>
 		<spectralClass>G</spectralClass>
 		<subtype>6</subtype>
@@ -10660,6 +11387,30 @@ When Gallery was originally settled there were no native lifeforms so the origin
 		<factionChange>
 			<date>3062-01-01</date>
 			<faction>CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3080-07-03</date>
+			<faction>CJF,LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3080-07-05</date>
+			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3080-08-18</date>
+			<faction>CJF,LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3080-08-22</date>
+			<faction>CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3080-12-02</date>
+			<faction>CJF,LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3080-12-03</date>
+			<faction>LA</faction>
 		</factionChange>
 		<spectralClass>G</spectralClass>
 		<subtype>4</subtype>
@@ -10958,6 +11709,10 @@ When Gallery was originally settled there were no native lifeforms so the origin
 			<date>3049-09-06</date>
 			<faction>CW</faction>
 		</factionChange>
+		<factionChange>
+			<date>3071-01-25</date>
+			<faction>CHH</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Gwithian</name>
@@ -11080,6 +11835,10 @@ When Gallery was originally settled there were no native lifeforms so the origin
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<factionChange>
+			<date>3075-01-01</date>
+			<faction>LA,CDS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Halifax</name>
@@ -11168,6 +11927,30 @@ When Gallery was originally settled there were no native lifeforms so the origin
 			<date>3040-01-01</date>
 			<faction>FC</faction>
 		</factionChange>
+	</planet>
+	<planet>
+		<name>Hamar</name>
+		<xcood>591.45</xcood>
+		<ycood>498.20</ycood>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2504-07-16</date>
+			<faction>JF</faction>
+		</factionChange>
+		<pressure>2</pressure>
+		<gravity>0.88</gravity>
+		<lifeForm>7</lifeForm>
+		<climate>0</climate>
+		<percentWater>81</percentWater>
+		<temperature>25</temperature>
+		<spectralClass>K</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>7</sysPos>
+		<socioIndustrial>C-C-B-D-C</socioIndustrial>
+		<satellite>Jotunheim</satellite>
+		<hpg>X</hpg>
+		<desc>Hamar is a planet split. The planet itself is icy and mostly desolate, it is made liveable by a series of volcanoes that feed the dual communities present on planet. In the ‘uplands’ on the volcanoes the communities secure a living by mining the vast minerals and gems deposits. Unfortunately the area is inhospitable and requires artificial aid, such as re-breathers to live there. The other communities on Hamar are represented in the ‘lowlands’ at the bases of the volcanoes. These communities are more comfortable to live in and manage to farm the fertile volcanic fields so that Hamar is self sufficient. While the communities in the lowlands and uplands are always trading, the various families in the communities maintain several long standing fueds.</desc>
 	</planet>
 	<planet>
 		<name>Hamilton (LC)</name>
@@ -11312,6 +12095,10 @@ When Gallery was originally settled there were no native lifeforms so the origin
 			<date>3052-01-01</date>
 			<faction>CW</faction>
 		</factionChange>
+		<factionChange>
+			<date>3072-01-01</date>
+			<faction>CHH</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Harrow's Sun</name>
@@ -11363,6 +12150,26 @@ When Gallery was originally settled there were no native lifeforms so the origin
 		<factionChange>
 			<date>3050-07-09</date>
 			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-06-05</date>
+			<faction>CHH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3080-07-02</date>
+			<faction>CHH,CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3080-07-08</date>
+			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3080-09-02</date>
+			<faction>CHH,CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3080-09-04</date>
+			<faction>CHH</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -11452,8 +12259,38 @@ When Gallery was originally settled there were no native lifeforms so the origin
 		<faction>NONE</faction>
 		<factionChange>
 			<date>2802-06-11</date>
-			<faction>CLAN</faction>
+			<faction>CIH</faction>
 		</factionChange>
+		<factionChange>
+			<date>3072-10-08</date>
+			<faction>CIH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3073-03-01</date>
+			<faction>CGS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-01-01</date>
+			<faction>CGS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3079-02-12</date>
+			<faction>CSA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3085-01-01</date>
+			<faction>CCC</faction>
+		</factionChange>
+		<pressure>2</pressure>
+		<gravity>1.0</gravity>
+		<climate>0</climate>
+		<percentWater>25</percentWater>
+		<temperature>15</temperature>
+		<spectralClass>F</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>2</sysPos>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Hednesford</name>
@@ -11532,7 +12369,31 @@ When Gallery was originally settled there were no native lifeforms so the origin
 		<faction>NONE</faction>
 		<factionChange>
 			<date>2802-06-11</date>
-			<faction>CLAN</faction>
+			<faction>CSR</faction>
+		</factionChange>
+		<factionChange>
+			<date>2899-01-01</date>
+			<faction>CSV</faction>
+		</factionChange>
+		<factionChange>
+			<date>3051-01-01</date>
+			<faction>CSR,CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3057-01-01</date>
+			<faction>CSR</faction>
+		</factionChange>
+		<factionChange>
+			<date>3070-06-01</date>
+			<faction>CCC,CCO,CSR</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-05-22</date>
+			<faction>CCC,CCO,SOC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-11-27</date>
+			<faction>CCC</faction>
 		</factionChange>
 		<spectralClass>F</spectralClass>
 		<subtype>7</subtype>
@@ -11604,6 +12465,14 @@ When Gallery was originally settled there were no native lifeforms so the origin
 			<date>3050-03-06</date>
 			<faction>CJF</faction>
 		</factionChange>
+		<factionChange>
+			<date>3071-10-12</date>
+			<faction>CIH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-02-12</date>
+			<faction>CHH</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Hermagor</name>
@@ -11617,6 +12486,18 @@ When Gallery was originally settled there were no native lifeforms so the origin
 		<factionChange>
 			<date>3050-06-12</date>
 			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-05-13</date>
+			<faction>CHH,CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-08-22</date>
+			<faction>CHH,CW,CGB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-09-10</date>
+			<faction>CHH,CGB</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -11784,7 +12665,35 @@ The planet and the factories have been the target of invasion numerous times thr
 		<faction>NONE</faction>
 		<factionChange>
 			<date>2802-06-11</date>
-			<faction>CLAN</faction>
+			<faction>CNC,CB,CIH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3060-01-01</date>
+			<faction>CSA,CIH,CHH,CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-04-01</date>
+			<faction>CSA,CIH,CHH,CCO</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-04-05</date>
+			<faction>SOC,CIH,CHH,CCO</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-09-07</date>
+			<faction>CSA,CHH,CCO,SOC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-11-27</date>
+			<faction>CSA,CHH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-06-01</date>
+			<faction>CSA,CSL,CCC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3079-09-03</date>
+			<faction>CSA</faction>
 		</factionChange>
 		<spectralClass>A</spectralClass>
 		<subtype>2</subtype>
@@ -11829,6 +12738,32 @@ The planet and the factories have been the target of invasion numerous times thr
 		</factionChange>
 	</planet>
 	<planet>
+		<name>Hofn</name>
+		<xcood>600.00</xcood>
+		<ycood>545.00</ycood>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2504-07-16</date>
+			<faction>JF</faction>
+		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.02</gravity>
+		<lifeForm>6</lifeForm>
+		<climate>2</climate>
+		<percentWater>95</percentWater>
+		<temperature>34</temperature>
+		<spectralClass>G</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>III</luminosity>
+		<sysPos>4</sysPos>
+		<socioIndustrial>C-D-C-D-B</socioIndustrial>
+		<satellite>Myvatn</satellite>
+		<satellite>Geyser</satellite>
+		<satellite>Jockulsarlon</satellite>
+		<hpg>X</hpg>
+		<desc>Hofn is the warmest JarnFolk world, however it also has the harshest weather. Storms are a regular occurrence and winds can often  reach over 300 kph. The JarnFolk dwellings are built to withstand these harsh conditions, often with the stout buildings that extend underground. Subterranean building also allows the JarnFolk to make the most of the limited ground space as Hofn is almost entirely covered in water. The major industries on planet are power from wind turbines and fishing.</desc>
+	</planet>
+	<planet>
 		<name>Hohenems</name>
 		<xcood>-18.52</xcood>
 		<ycood>351.56</ycood>
@@ -11847,6 +12782,14 @@ The planet and the factories have been the target of invasion numerous times thr
 		</factionChange>
 		<factionChange>
 			<date>3050-08-12</date>
+			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-08-26</date>
+			<faction>CHH,CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-11-01</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -11917,7 +12860,27 @@ The planet and the factories have been the target of invasion numerous times thr
 		<faction>NONE</faction>
 		<factionChange>
 			<date>2802-06-11</date>
-			<faction>CLAN</faction>
+			<faction>CCC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3000-01-01</date>
+			<faction>CCC,CSJ,CSV</faction>
+		</factionChange>
+		<factionChange>
+			<date>3058-01-01</date>
+			<faction>CCC,CSV</faction>
+		</factionChange>
+		<factionChange>
+			<date>3067-01-01</date>
+			<faction>CCC,CSA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-01-01</date>
+			<faction>CCC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3085-01-01</date>
+			<faction>CCC,CCO</faction>
 		</factionChange>
 		<spectralClass>G</spectralClass>
 		<subtype>6</subtype>
@@ -12202,11 +13165,55 @@ The planet and the factories have been the target of invasion numerous times thr
 		<faction>NONE</faction>
 		<factionChange>
 			<date>2802-06-11</date>
-			<faction>CLAN</faction>
+			<faction>CSJ</faction>
 		</factionChange>
 		<factionChange>
-			<date>2900-01-01</date>
-			<faction>CSJ</faction>
+			<date>3046-01-01</date>
+			<faction>CSJ,CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3061-01-01</date>
+			<faction>SL,CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3061-04-01</date>
+			<faction>SL,CFM,CGS,CIH,CJF,CSA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3067-01-01</date>
+			<faction>CJF,CSA,CGS,CFM,CIH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3069-11-07</date>
+			<faction>CSV,CSA,CGS,CFM,CIH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-01-18</date>
+			<faction>CSV,CSA,CGS,CFM,CIH,SOC,CCO</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-06-27</date>
+			<faction>CSV,CSA,CGS,CFM,CIH,SOC,CCO,CCC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-06-30</date>
+			<faction>CSV,CSA,CGS,CFM,CIH,CCC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-07-01</date>
+			<faction>CSA,CCC,CGS,SOC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-08-09</date>
+			<faction>CCC,CGS,SOC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-01-01</date>
+			<faction>CCC,CGS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3079-10-22</date>
+			<faction>CCC,CSA,CCO,CSL</faction>
 		</factionChange>
 		<spectralClass>G</spectralClass>
 		<subtype>7</subtype>
@@ -12342,6 +13349,10 @@ The planet and the factories have been the target of invasion numerous times thr
 		<factionChange>
 			<date>3050-03-23</date>
 			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-02-15</date>
+			<faction>CHH</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -12721,11 +13732,27 @@ The planet and the factories have been the target of invasion numerous times thr
 		<faction>NONE</faction>
 		<factionChange>
 			<date>2802-06-11</date>
-			<faction>CLAN</faction>
+			<faction>CJF</faction>
 		</factionChange>
 		<factionChange>
-			<date>2900-01-01</date>
-			<faction>CJF</faction>
+			<date>3069-11-07</date>
+			<faction>CJF,CSV</faction>
+		</factionChange>
+		<factionChange>
+			<date>3069-12-15</date>
+			<faction>CSV</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-01-15</date>
+			<faction>CSV,SOC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-01-21</date>
+			<faction>SOC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-01-01</date>
+			<faction>ABN</faction>
 		</factionChange>
 		<spectralClass>K</spectralClass>
 		<subtype>4</subtype>
@@ -13765,6 +14792,19 @@ Kaumberg was primarily settled by colonists hailing from Germany and Austria.</d
 			<date>3057-01-01</date>
 			<faction>IND</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>0.94</gravity>
+		<zenithCharge>True</zenithCharge>
+		<lifeForm>7</lifeForm>
+		<climate>3</climate>
+		<percentWater>73</percentWater>
+		<temperature>27</temperature>
+		<spectralClass>G</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>5</sysPos>
+		<hpg>B</hpg>
+		<desc>Keid was one of the first planets colonized during the interstellar Exodus and remained part of the Terran Alliance until the Star League’s collapse, at which point the Confederation stepped in and occupied the planet. Keid has a pleasant climate, extensive commercial centers, military installations, training facilities, scientific research complexes and commercial ore deposits. As of 3025 Keid also had several secret Maskirovka covert operative training centers.</desc>
 	</planet>
 	<planet>
 		<name>Keihoku</name>
@@ -13915,6 +14955,27 @@ Kaumberg was primarily settled by colonists hailing from Germany and Austria.</d
 			<date>3040-01-01</date>
 			<faction>FC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3067-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.05</gravity>
+		<nadirCharge>True</nadirCharge>
+		<zenithCharge>True</zenithCharge>
+		<lifeForm>6</lifeForm>
+		<climate>3</climate>
+		<percentWater>64</percentWater>
+		<temperature>33</temperature>
+		<spectralClass>G</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>3</sysPos>
+		<socioIndustrial>A-B-A-B-A</socioIndustrial>
+		<satellite>Ariel</satellite>
+		<satellite>Persephone</satellite>
+		<hpg>A</hpg>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Kettering</name>
@@ -14148,6 +15209,22 @@ Kaumberg was primarily settled by colonists hailing from Germany and Austria.</d
 			<date>3050-06-07</date>
 			<faction>CW</faction>
 		</factionChange>
+		<factionChange>
+			<date>3071-04-07</date>
+			<faction>CHH,CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-04-14</date>
+			<faction>CHH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-05</date>
+			<faction>CHH,CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-18</date>
+			<faction>CHH</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Kirei Na Niwa</name>
@@ -14177,7 +15254,23 @@ Kaumberg was primarily settled by colonists hailing from Germany and Austria.</d
 		<faction>NONE</faction>
 		<factionChange>
 			<date>2802-06-11</date>
-			<faction>CLAN</faction>
+			<faction>CHH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3000-01-01</date>
+			<faction>CHH,CSJ</faction>
+		</factionChange>
+		<factionChange>
+			<date>3060-01-01</date>
+			<faction>CHH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3070-11-01</date>
+			<faction>CCO</faction>
+		</factionChange>
+		<factionChange>
+			<date>3085-01-01</date>
+			<faction>CCO,CSL</faction>
 		</factionChange>
 		<spectralClass>M</spectralClass>
 		<subtype>9</subtype>
@@ -14861,6 +15954,18 @@ The planet itself is resource poor and has little to offer for export. However, 
 			<date>3049-09-02</date>
 			<faction>CJF</faction>
 		</factionChange>
+		<factionChange>
+			<date>3071-06-03</date>
+			<faction>CIH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-10-07</date>
+			<faction>CJF,CIH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-10-09</date>
+			<faction>CJF</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Lackland</name>
@@ -14871,6 +15976,24 @@ The planet itself is resource poor and has little to offer for export. However, 
 			<date>3040-01-01</date>
 			<faction>FC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3067-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.05</gravity>
+		<lifeForm>5</lifeForm>
+		<climate>5</climate>
+		<percentWater>91</percentWater>
+		<temperature>43</temperature>
+		<spectralClass>G</spectralClass>
+		<subtype>9</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>4</sysPos>
+		<socioIndustrial>F-F-C-F-B</socioIndustrial>
+		<satellite></satellite>
+		<hpg>B</hpg>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Laconis</name>
@@ -15036,6 +16159,18 @@ The planet itself is resource poor and has little to offer for export. However, 
 		</factionChange>
 		<factionChange>
 			<date>3049-09-05</date>
+			<faction>CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-10-08</date>
+			<faction>CIH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-12-23</date>
+			<faction>CHH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-05-01</date>
 			<faction>CJF</faction>
 		</factionChange>
 	</planet>
@@ -15370,9 +16505,21 @@ The planet itself is resource poor and has little to offer for export. However, 
 		<name>Liao</name>
 		<xcood>34.43</xcood>
 		<ycood>-68.07</ycood>
-		<faction>CC</faction>
+		<faction>TA</faction>
 		<factionChange>
-			<date>3030-01-01</date>
+			<date>2236-01-01</date>
+			<faction>LR</faction>
+		</factionChange>
+		<factionChange>
+			<date>2315-01-01</date>
+			<faction>DoL</faction>
+		</factionChange>
+		<factionChange>
+			<date>2367-01-01</date>
+			<faction>CC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3028-08-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -15380,13 +16527,24 @@ The planet itself is resource poor and has little to offer for export. However, 
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3057-01-01</date>
-			<faction>IND</faction>
-		</factionChange>
-		<factionChange>
-			<date>3062-01-01</date>
+			<date>3057-10-01</date>
 			<faction>CC</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.05</gravity>
+		<nadirCharge>True</nadirCharge>
+		<lifeForm>5</lifeForm>
+		<climate>3</climate>
+		<percentWater>55</percentWater>
+		<temperature>30</temperature>
+		<spectralClass>K</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>3</sysPos>
+		<socioIndustrial>B-C-C-D-A</socioIndustrial>
+		<satellite>Elias' Promise</satellite>
+		<hpg>A</hpg>
+		<desc>Liao is the ancestral home of House Liao and as such has always had a symbolic importance to the Capellan Confederation, if not a practical importance. The Liaos continued to maintain a palatial residence in the northern hemisphere. However, the rest of the planet has always been a relatively insignificant backwater that has little militarily or industrially sites of interest. The Capellans always maintained a local garrison on planet following several raids during the Succession Wars. The planet’s terrain is dominated by rolling plains with few features of interest.</desc>
 	</planet>
 	<planet>
 		<name>Liezen</name>
@@ -15408,6 +16566,18 @@ The planet itself is resource poor and has little to offer for export. However, 
 		<factionChange>
 			<date>3050-06-20</date>
 			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-06-05</date>
+			<faction>CHH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-08</date>
+			<faction>CHH,CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-15</date>
+			<faction>CHH</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -15605,7 +16775,27 @@ The planet itself is resource poor and has little to offer for export. However, 
 		<faction>NONE</faction>
 		<factionChange>
 			<date>2802-06-11</date>
-			<faction>CLAN</faction>
+			<faction>CSJ</faction>
+		</factionChange>
+		<factionChange>
+			<date>3060-01-01</date>
+			<faction>CIH,CCO</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-09-07</date>
+			<faction>CSV,CCO</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-09-17</date>
+			<faction>CSV</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-01-01</date>
+			<faction>CCO,CSA,CCC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3085-01-01</date>
+			<faction>CCO,CSL,CCC,CSA</faction>
 		</factionChange>
 		<spectralClass>G</spectralClass>
 		<subtype>7</subtype>
@@ -15784,6 +16974,10 @@ The continents of Sorania and Padawa are mostly temperate and are the sites of t
 			<date>3050-05-01</date>
 			<faction>CW</faction>
 		</factionChange>
+		<factionChange>
+			<date>3071-04-27</date>
+			<faction>CHH</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Loxley</name>
@@ -15880,7 +17074,34 @@ The continents of Sorania and Padawa are mostly temperate and are the sites of t
 		<faction>NONE</faction>
 		<factionChange>
 			<date>2802-06-11</date>
-			<faction>CLAN</faction>
+			<faction>CSR</faction>
+		</factionChange>
+		<factionChange>
+			<date>3000-01-01</date>
+			<faction>CSR,CDS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3065-09-08</date>
+			<faction>CSR,CSV</faction>
+		</factionChange>
+		<factionChange>
+			<date>3065-10-12</date>
+			<faction>CSR</faction>
+		</factionChange>
+		<factionChange>
+			<date>3067-01-01</date>
+			<faction>CSR,CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3070-02-10</date>
+			<faction>CSR,CSV</faction>
+		</factionChange><factionChange>
+			<date>3070-10-10</date>
+			<faction>CSV</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-01-01</date>
+			<faction>ABN</faction>
 		</factionChange>
 		<spectralClass>K</spectralClass>
 		<subtype>2</subtype>
@@ -16350,6 +17571,10 @@ Most of the population lives in small cities dotting the 4 continents.  There ar
 			<date>3049-09-18</date>
 			<faction>CW</faction>
 		</factionChange>
+		<factionChange>
+			<date>3071-01-25</date>
+			<faction>CHH</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Manassas</name>
@@ -16672,6 +17897,27 @@ Most of the population lives in small cities dotting the 4 continents.  There ar
 			<date>3040-01-01</date>
 			<faction>FC</faction>
 		</factionChange>
+		<factionChange>
+			<date>306-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.08</gravity>
+		<nadirCharge>True</nadirCharge>
+		<lifeForm>7</lifeForm>
+		<climate>3</climate>
+		<percentWater>66</percentWater>
+		<temperature>37</temperature>
+		<spectralClass>K</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>3</sysPos>
+		<socioIndustrial>B-A-C-B-B</socioIndustrial>
+		<hpg>A</hpg>
+		<landMass>Sanilac (Achemar</landMass>
+		<landMass>Saginaw</landMass>
+		<landMass>Flint</landMass>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Marlowe's Rift</name>
@@ -16696,7 +17942,27 @@ Most of the population lives in small cities dotting the 4 continents.  There ar
 		<faction>NONE</faction>
 		<factionChange>
 			<date>2802-06-11</date>
-			<faction>CLAN</faction>
+			<faction>CGS,CSV,CFM,CSA,CIH,CJF,CMG</faction>
+		</factionChange>
+		<factionChange>
+			<date>2868-01-01</date>
+			<faction>CGS,CSV,CFM,CSA,CIH,CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3069-11-07</date>
+			<faction>CGS,CSV,CFM,CSA,CIH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-02-22</date>
+			<faction>CGS,CSV,CFM,CIH,SOC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-12-21</date>
+			<faction>CGS,CSV,SOC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3073-02-01</date>
+			<faction>ABN</faction>
 		</factionChange>
 		<spectralClass>F</spectralClass>
         <subtype>4</subtype>
@@ -16786,6 +18052,22 @@ Most of the population lives in small cities dotting the 4 continents.  There ar
 		<xcood>280.88</xcood>
 		<ycood>130.14</ycood>
 		<faction>DC</faction>
+		<factionChange>
+			<date>3063-04-05</date>
+			<faction>DC,FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3063-09-15</date>
+			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3064-06-09</date>
+			<faction>FS,DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3064-11-05</date>
+			<faction>DC</faction>
+		</factionChange>
 		<spectralClass>F</spectralClass>
 		<subtype>2</subtype>
 		<luminosity>V</luminosity>
@@ -16848,6 +18130,14 @@ Most of the population lives in small cities dotting the 4 continents.  There ar
 		<factionChange>
 			<date>3050-05-02</date>
 			<faction>CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-07-15</date>
+			<faction>CIH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-04-03</date>
+			<faction>CHH</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -17378,22 +18668,46 @@ Most of the population lives in small cities dotting the 4 continents.  There ar
 		<faction>FWL</faction>
 	</planet>
 	<planet>
-		<name>Mica I</name>
+		<name>Mica II</name>
 		<xcood>686.13</xcood>
 		<ycood>19.3</ycood>
-		<faction>PIND</faction>
+		<faction>MM</faction>
+		<zenithCharge>True</zenithCharge>
+		<lifeForm>7</lifeForm>
+		<spectralClass>K</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>2</sysPos>
+		<hpg>B</hpg>
+		<desc>The Mica Majority is a small Periphery nation that controls only a single system. Mica contains three inhabited planets, Mica II, V and VII. Mining and trade are the major industries for the Majority, with all three inhabited planets containing significant mineral deposits. Trade is bolstered by the recharge station at Mica’s zenith jump point. The Majority is known for its trade not only in precious minerals but also unique goods for sale from Lostech prospectors, drifters and many other unique traders.</desc>
 	</planet>
 	<planet>
 		<name>Mica V</name>
 		<xcood>685.23</xcood>
 		<ycood>17.47</ycood>
-		<faction>PIND</faction>
+		<faction>MM</faction>
+		<zenithCharge>True</zenithCharge>
+		<lifeForm>7</lifeForm>
+		<spectralClass>K</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>7</sysPos>
+		<hpg>B</hpg>
+		<desc>The Mica Majority is a small Periphery nation that controls only a single system. Mica contains three inhabited planets, Mica II, V and VII. Mining and trade are the major industries for the Majority, with all three inhabited planets containing significant mineral deposits. Trade is bolstered by the recharge station at Mica’s zenith jump point. The Majority is known for its trade not only in precious minerals but also unique goods for sale from Lostech prospectors, drifters and many other unique traders.</desc>
 	</planet>
 	<planet>
 		<name>Mica VII</name>
 		<xcood>685.41</xcood>
 		<ycood>15.28</ycood>
-		<faction>PIND</faction>
+		<faction>MM</faction>
+		<zenithCharge>True</zenithCharge>
+		<lifeForm>7</lifeForm>
+		<spectralClass>K</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>7</sysPos>
+		<hpg>B</hpg>
+		<desc>The Mica Majority is a small Periphery nation that controls only a single system. Mica contains three inhabited planets, Mica II, V and VII. Mining and trade are the major industries for the Majority, with all three inhabited planets containing significant mineral deposits. Trade is bolstered by the recharge station at Mica’s zenith jump point. The Majority is known for its trade not only in precious minerals but also unique goods for sale from Lostech prospectors, drifters and many other unique traders.</desc>
 	</planet>
 	<planet>
 		<name>Micros III</name>
@@ -18082,6 +19396,14 @@ Mizar has been a resort planet of some renown since before the time of the Star 
 			<date>3050-07-06</date>
 			<faction>CW</faction>
 		</factionChange>
+		<factionChange>
+			<date>3071-07-21</date>
+			<faction>CHH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-11-16</date>
+			<faction>CW</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Mualang</name>
@@ -18258,7 +19580,7 @@ Mizar has been a resort planet of some renown since before the time of the Star 
 		<satellite>Kun-Lun</satellite>  
 		<satellite>Yi</satellite>
 		<hpg>A</hpg>
-		<desc>No description available.</desc>
+		<desc>Nanking was one of the first trade centres developed during the original Exodus from Terra and found itself incorporated into the Tikonov Union during the late 23rd century. In later history it was an important commercial center, rivaling Styk, with 17 percent of all Confederation commerce flowing through Nanking. Nanking's primary industries centered around mining deposits of platinum and copper, which attracted substantial interstellar trade and exchange to the system.</desc>
 	</planet>
 	<planet>
 		<name>Narellan</name>
@@ -18502,6 +19824,10 @@ The terrain surrounding Avalon City is a mixture of forests, mountains, plains a
 			<date>3050-05-12</date>
 			<faction>CW</faction>
 		</factionChange>
+		<factionChange>
+			<date>3071-05-08</date>
+			<faction>CHH</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>New Caledonia</name>
@@ -18523,6 +19849,14 @@ The terrain surrounding Avalon City is a mixture of forests, mountains, plains a
 		<factionChange>
 			<date>3050-03-05</date>
 			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-01-28</date>
+			<faction>CW,CHH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-02-12</date>
+			<faction>CHH</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -18738,7 +20072,9 @@ New Capetown is moderately industrialized and is a comfortable temperate planet.
 		<landMass>Baden</landMass>
 		<landMass>Rhine</landMass>
 		<socioIndustrial>B-B-B-B-C</socioIndustrial>
-		<desc>No description available.</desc>
+		<desc>New Hessen was founded as a private commercial holding of Albrecht von Hesse, a successful arms and munitions merchant. The von Hesse family converted it into a planet-wide "battlezone-for-rent-or-lease" providing neighbouring governments an arena for their military contests without the risking damage to their own land. The von Hesse family was able to establish the largest military-industrial complex in the Tikonov Union, second only to Tikonov itself, from the enormous profits of this venture.
+
+New Hessen was occupied several times during the Succession Wars. However, New Hessen was a vital recruiting and training centre for the Confederation military, it provided most of the local reserves and replacements in the Tikonov Commonality.</desc>
 	</planet>
 	<planet>
 		<name>New Home</name>
@@ -18803,7 +20139,31 @@ New Capetown is moderately industrialized and is a comfortable temperate planet.
 		<faction>NONE</faction>
 		<factionChange>
 			<date>2802-06-11</date>
-			<faction>CLAN</faction>
+			<faction>CSV</faction>
+		</factionChange>
+		<factionChange>
+			<date>2920-01-01</date>
+			<faction>CSV,CCO,CIH,CDS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3067-01-01</date>
+			<faction>CSV,CCO,CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3070-01-01</date>
+			<faction>CSV,CCO</faction>
+		</factionChange>
+		<factionChange>
+			<date>3073-01-01</date>
+			<faction>CSV</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-12-14</date>
+			<faction>CSV,CSL,CBS,CCC,CCO,CGS,CSA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-12-31</date>
+			<faction>ABN</faction>
 		</factionChange>
 		<spectralClass>F</spectralClass>
 		<subtype>2</subtype>
@@ -18931,6 +20291,10 @@ Kyoto has an extensiveindustrial presence with many factories and other industri
 		<factionChange>
 			<date>3050-07-30</date>
 			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-04-23</date>
+			<faction>CHH</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -19188,11 +20552,31 @@ In contrast to the heavily industrialized northern hemisphere, the southern hemi
 		<faction>NONE</faction>
 		<factionChange>
 			<date>2802-06-11</date>
-			<faction>CLAN</faction>
+			<faction>CHH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2900-01-01</date>
-			<faction>CHH</faction>
+			<date>3072-02-27</date>
+			<faction>CHH,CCC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-11-03</date>
+			<faction>CHH,CCC,CCO,CFM</faction>
+		</factionChange>
+		<factionChange>
+			<date>3073-07-17</date>
+			<faction>CHH,CCC,CCO</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-06-01</date>
+			<faction>CBS,CSL,CSA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3079-01-01</date>
+			<faction>CSL,CSA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3085-01-01</date>
+			<faction>CSL</faction>
 		</factionChange>
 		<spectralClass>A</spectralClass>
 		<subtype>3</subtype>
@@ -19504,9 +20888,42 @@ Niops VII is a cold planet with access to sufficient resources to keep the Assoc
 			<faction>CSJ</faction>
 		</factionChange>
 		<factionChange>
-			<date>3062-01-01</date>
+			<date>3060-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
+		<factionChange>
+			<date>3070-06-01</date>
+			<faction>CHH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3070-10-01</date>
+			<faction>CHH,CIH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-10-01</date>
+			<faction>CHH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-11-28</date>
+			<faction>CHH,SOC,CB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3073-04-12</date>
+			<faction>SOC,CB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3073-07-07</date>
+			<faction>SOC,CB,CHH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3073-07-09</date>
+			<faction>SOC,CB,CSA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3073-07-28</date>
+			<faction>CHH</faction>
+		</factionChange>
+		<landMass>(Paris Prime)</landMass>
 	</planet>
 	<planet>
 		<name>Nova Roma</name>
@@ -19694,6 +21111,10 @@ Niops VII is a cold planet with access to sufficient resources to keep the Assoc
 			<date>3059-06-29</date>
 			<faction>DC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3075-01-01</date>
+			<faction>DC,CDS</faction>
+		</factionChange>
 		<spectralClass>G</spectralClass>
 		<subtype>4</subtype>
 		<luminosity>V</luminosity>
@@ -19725,6 +21146,26 @@ Niops VII is a cold planet with access to sufficient resources to keep the Assoc
 			<date>3049-09-03</date>
 			<faction>CGB</faction>
 		</factionChange>
+		<factionChange>
+			<date>3049-09-03</date>
+			<faction>CGB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3052-01-01</date>
+			<faction>CDS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3052-08-01</date>
+			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3070-11-14</date>
+			<faction>CW,CHH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3070-12-04</date>
+			<faction>CHH</faction>
+		</factionChange>
 		<lifeForm>2</lifeForm>
 		<spectralClass>A</spectralClass>
 		<subtype>9</subtype>
@@ -19755,6 +21196,10 @@ Niops VII is a cold planet with access to sufficient resources to keep the Assoc
 		<factionChange>
 			<date>3049-09-02</date>
 			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3070-11-14</date>
+			<faction>CHH</faction>
 		</factionChange>
 		<lifeForm>7</lifeForm>
 		<spectralClass>F</spectralClass>
@@ -19885,6 +21330,27 @@ Niops VII is a cold planet with access to sufficient resources to keep the Assoc
 			<date>3040-01-01</date>
 			<faction>FC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3067-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
+		<pressure>4</pressure>
+		<gravity>1.1</gravity>
+		<nadirCharge>True</nadirCharge>
+		<lifeForm>7</lifeForm>
+		<climate>5</climate>
+		<percentWater>74</percentWater>
+		<temperature>34</temperature>
+		<spectralClass>G</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>4</sysPos>
+		<socioIndustrial>F-F-B-F-C</socioIndustrial>
+		<satellite>Fraun</satellite>
+		<satellite>Haifa</satellite>
+		<satellite>al-Zun</satellite>
+		<hpg>B</hpg>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Olafsvik</name>
@@ -20170,6 +21636,14 @@ Niops VII is a cold planet with access to sufficient resources to keep the Assoc
 			<date>3050-03-08</date>
 			<faction>CW</faction>
 		</factionChange>
+		<factionChange>
+			<date>3071-01-28</date>
+			<faction>CW,CHH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-02-22</date>
+			<faction>CHH</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Outreach</name>
@@ -20244,8 +21718,12 @@ Outreach is the primary hiring location for the mercenary trade from the 3030s a
 		<ycood>884</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3049-01-01</date>
 			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-01-01</date>
+			<faction>CHH</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -20256,6 +21734,10 @@ Outreach is the primary hiring location for the mercenary trade from the 3030s a
 		<factionChange>
 			<date>3052-01-01</date>
 			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-01-01</date>
+			<faction>CHH</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -20375,6 +21857,42 @@ Outreach is the primary hiring location for the mercenary trade from the 3030s a
 			<date>3040-01-01</date>
 			<faction>FC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3067-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
+		<pressure>4</pressure>
+		<gravity>1.0</gravity>
+		<zenithCharge>True</zenithCharge>
+		<lifeForm>3</lifeForm>
+		<climate>5</climate>
+		<percentWater>88</percentWater>
+		<temperature>49</temperature>
+		<spectralClass>M</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>III</luminosity>
+		<sysPos>3</sysPos>
+		<socioIndustrial>A-A-B-B-C</socioIndustrial>
+		<satellite>Brach</satellite>
+		<satellite>Faub</satellite>
+		<satellite>Kraygor</satellite>
+		<satellite>Moch</satellite>
+		<satellite>Zeik</satellite>
+		<landMass>Remig (Matam)</landMass>
+		<landMass>Mestin</landMass>
+		<landMass>Mysore</landMass>
+		<landMass>Aminidivi</landMass>
+		<landMass>Laccadive</landMass>
+		<landMass>Minicoy</landMass>
+		<landMass>Kongu Nadu</landMass>
+		<landMass>Maidan</landMass>
+		<landMass>Onattukara</landMass>
+		<landMass>Palanadu</landMass>
+		<landMass>Telangana</landMass>
+		<landMass>Valluvanadu</landMass>
+		<landMass>Venad</landMass>
+		<hpg>A</hpg>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Paracale</name>
@@ -20411,6 +21929,14 @@ Outreach is the primary hiring location for the mercenary trade from the 3030s a
 		</factionChange>
 		<factionChange>
 			<date>3062-01-01</date>
+			<faction>CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-06-08</date>
+			<faction>CJF,SOC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-06-27</date>
 			<faction>CJF</faction>
 		</factionChange>
 	</planet>
@@ -20525,6 +22051,10 @@ Outreach is the primary hiring location for the mercenary trade from the 3030s a
 			<date>3049-09-12</date>
 			<faction>CW</faction>
 		</factionChange>
+		<factionChange>
+			<date>3070-12-07</date>
+			<faction>CHH</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Paxon</name>
@@ -20533,7 +22063,27 @@ Outreach is the primary hiring location for the mercenary trade from the 3030s a
 		<faction>NONE</faction>
 		<factionChange>
 			<date>2802-06-11</date>
-			<faction>CLAN</faction>
+			<faction>CDS,CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-04-01</date>
+			<faction>CDS,CCO</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-12-20</date>
+			<faction>ABN</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-12-30</date>
+			<faction>CSA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3074-01-01</date>
+			<faction>CSA,CCO</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-06-01</date>
+			<faction>ABN</faction>
 		</factionChange>
 		<spectralClass>K</spectralClass>
 		<subtype>9</subtype>
@@ -20661,6 +22211,18 @@ Outreach is the primary hiring location for the mercenary trade from the 3030s a
 		<factionChange>
 			<date>3062-01-01</date>
 			<faction>CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-06-05</date>
+			<faction>CIH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-01-01</date>
+			<faction>CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3074-01-01</date>
+			<faction>CHH</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -20875,7 +22437,7 @@ Outreach is the primary hiring location for the mercenary trade from the 3030s a
 		</factionChange>
 	</planet>
 	<planet>
-		<name>Placida</name>
+		<name>Placidia</name>
 		<xcood>-118.47</xcood>
 		<ycood>494.66</ycood>
 		<faction>RWR</faction>
@@ -20886,6 +22448,10 @@ Outreach is the primary hiring location for the mercenary trade from the 3030s a
 		<factionChange>
 			<date>3049-08-19</date>
 			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-01-25</date>
+			<faction>CHH</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -20904,6 +22470,14 @@ Outreach is the primary hiring location for the mercenary trade from the 3030s a
 		<factionChange>
 			<date>3050-07-21</date>
 			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-06-09</date>
+			<faction>CHH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-11-13</date>
+			<faction>CHH,CW</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -21330,7 +22904,31 @@ Poulsbo remains a lightly settled Military Outpost, whose civilian population is
 		<faction>NONE</faction>
 		<factionChange>
 			<date>2802-06-11</date>
-			<faction>CLAN</faction>
+			<faction>CB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3059-02-27</date>
+			<faction>CSA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3062-01-01</date>
+			<faction>CSA,CDS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3070-10-03</date>
+			<faction>CSA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-02-03</date>
+			<faction>SOC,CB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3074-10-03</date>
+			<faction>CSA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-01-01</date>
+			<faction>ABN</faction>
 		</factionChange>
 		<spectralClass>K</spectralClass>
 		<subtype>0</subtype>
@@ -21342,6 +22940,7 @@ Poulsbo remains a lightly settled Military Outpost, whose civilian population is
 		<climate>3</climate>
 		<percentWater>50</percentWater>
 		<lifeForm>3</lifeForm>
+		<satellite>Opal</satellite>
 		<desc>No description available.</desc>
 	</planet>
 	<planet>
@@ -21543,6 +23142,10 @@ The location of Proserpina on the Federated Suns border requires the DCMS to kee
 		<xcood>485.38</xcood>
 		<ycood>157.85</ycood>
 		<faction>OA</faction>
+		<factionChange>
+			<date>3075-01-01</date>
+			<faction>CSR,OA</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Quemoy</name>
@@ -21761,6 +23364,10 @@ Even with its extreme weather, Rahne does support native life. A prime example i
 		<xcood>601.4</xcood>
 		<ycood>142.66</ycood>
 		<faction>OA</faction>
+		<factionChange>
+			<date>3083-11-06</date>
+			<faction>PIND</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Raman</name>
@@ -21793,6 +23400,10 @@ Even with its extreme weather, Rahne does support native life. A prime example i
 		<xcood>495.44</xcood>
 		<ycood>100.02</ycood>
 		<faction>OA</faction>
+		<factionChange>
+			<date>3075-01-01</date>
+			<faction>OA,CDS</faction>
+		</factionChange>
 		<nadirCharge>True</nadirCharge>
 		<lifeForm>7</lifeForm>
 		<spectralClass>G</spectralClass>
@@ -21923,6 +23534,10 @@ Randis IV is a tropical world that contains few natural resources. The planet wa
 		<factionChange>
 			<date>3050-07-17</date>
 			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3065-01-01</date>
+			<faction>CGB</faction>
 		</factionChange>
 		<spectralClass>K</spectralClass>
         <subtype>4</subtype>
@@ -22156,10 +23771,14 @@ Randis IV is a tropical world that contains few natural resources. The planet wa
 		<name>Rezak's Hole</name>
 		<xcood>421.89</xcood>
 		<ycood>342.12</ycood>
-		<faction>PIND</faction>
+		<faction>UND</faction>
 		<factionChange>
 			<date>2900-01-01</date>
 			<faction>PIND</faction>
+		</factionChange>
+		<factionChange>
+			<date>3063-02-01</date>
+			<faction>CSR</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -22205,6 +23824,14 @@ Randis IV is a tropical world that contains few natural resources. The planet wa
 		</factionChange>
 		<factionChange>
 			<date>3050-07-03</date>
+			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-08-22</date>
+			<faction>CHH,CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-08-26</date>
 			<faction>CW</faction>
 		</factionChange>
 	</planet>
@@ -22350,7 +23977,27 @@ Randis IV is a tropical world that contains few natural resources. The planet wa
 		<faction>NONE</faction>
 		<factionChange>
 			<date>2802-06-11</date>
-			<faction>CLAN</faction>
+			<faction>CWI,CGS</faction>
+		</factionChange>
+		<factionChange>
+			<date>2834-10-07</date>
+			<faction>CGS,CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-04-01</date>
+			<faction>CGS,CCO</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-01-01</date>
+			<faction>CGS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3079-10-08</date>
+			<faction>CGS,CCC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3079-10-24</date>
+			<faction>CCC</faction>
 		</factionChange>
 		<spectralClass>F</spectralClass>
 		<subtype>2</subtype>
@@ -22425,6 +24072,10 @@ Randis IV is a tropical world that contains few natural resources. The planet wa
 			<date>3050-05-05</date>
 			<faction>CW</faction>
 		</factionChange>
+		<factionChange>
+			<date>3071-04-21</date>
+			<faction>CHH</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Rohinjan</name>
@@ -22463,6 +24114,14 @@ Randis IV is a tropical world that contains few natural resources. The planet wa
 		</factionChange>
 		<factionChange>
 			<date>3050-05-09</date>
+			<faction>CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-07-12</date>
+			<faction>CIH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-01-05</date>
 			<faction>CJF</faction>
 		</factionChange>
 	</planet>
@@ -22691,6 +24350,27 @@ Randis IV is a tropical world that contains few natural resources. The planet wa
 			<date>3040-01-01</date>
 			<faction>FC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3067-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.12</gravity>
+		<zenithCharge>True</zenithCharge>
+		<lifeForm>1</lifeForm>
+		<climate>4</climate>
+		<percentWater>26</percentWater>
+		<temperature>11</temperature>
+		<spectralClass>A</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>III</luminosity>
+		<sysPos>4</sysPos>
+		<socioIndustrial>D-F-A-D-D</socioIndustrial>
+		<satellite>Alejandro’s Moon</satellite>
+		<satellite>Coronado</satellite>
+		<satellite>Prostitute Rock</satellite>
+		<hpg>B</hpg>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Sabik</name>
@@ -23479,6 +25159,30 @@ Randis IV is a tropical world that contains few natural resources. The planet wa
 			<date>3050-05-17</date>
 			<faction>CJF</faction>
 		</factionChange>
+		<factionChange>
+			<date>3071-05-01</date>
+			<faction>CHH,CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-05-15</date>
+			<faction>CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-12-17</date>
+			<faction>CIH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3073-02-13</date>
+			<faction>CHH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3080-07-05</date>
+			<faction>CHH,CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3080-08-15</date>
+			<faction>CW</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Sekulmun</name>
@@ -23609,7 +25313,23 @@ Randis IV is a tropical world that contains few natural resources. The planet wa
 		<faction>NONE</faction>
 		<factionChange>
 			<date>2802-06-11</date>
-			<faction>CLAN</faction>
+			<faction>CFM</faction>
+		</factionChange>
+		<factionChange>
+			<date>3068-01-01</date>
+			<faction>CFM,CCO</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-01-01</date>
+			<faction>CFM,CCO,CGS,CSV</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-01-04</date>
+			<faction>CCO,SOC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3073-11-17</date>
+			<faction>ABN</faction>
 		</factionChange>
 		<spectralClass>B</spectralClass>
 		<subtype>8</subtype>
@@ -23782,10 +25502,6 @@ Randis IV is a tropical world that contains few natural resources. The planet wa
 		<faction>NONE</faction>
 		<factionChange>
 			<date>2802-06-11</date>
-			<faction>CLAN</faction>
-		</factionChange>
-		<factionChange>
-			<date>2900-01-01</date>
 			<faction>CSA</faction>
 		</factionChange>
 		<spectralClass>G</spectralClass>
@@ -24106,6 +25822,10 @@ Sian has been the capital of the Capellan Confederation since 2368 when Capella 
 			<date>3049-09-26</date>
 			<faction>CW</faction>
 		</factionChange>
+		<factionChange>
+			<date>3071-01-25</date>
+			<faction>CHH</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Silkeborg</name>
@@ -24189,6 +25909,10 @@ Sian has been the capital of the Capellan Confederation since 2368 when Capella 
 		<factionChange>
 			<date>3050-03-10</date>
 			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-02-12</date>
+			<faction>CHH</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -24481,6 +26205,14 @@ Solaris VII has two continents, Equatus is small, arid, mountainous and sparsely
 			<date>3050-05-23</date>
 			<faction>CJF</faction>
 		</factionChange>
+		<factionChange>
+			<date>3071-06-02</date>
+			<faction>CIH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-07-13</date>
+			<faction>CJF</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Son Hoa</name>
@@ -24673,6 +26405,10 @@ Solaris VII has two continents, Equatus is small, arid, mountainous and sparsely
 			<date>3050-04-14</date>
 			<faction>CW</faction>
 		</factionChange>
+		<factionChange>
+			<date>3071-05-01</date>
+			<faction>CHH</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>St. Loris</name>
@@ -24757,6 +26493,10 @@ Solaris VII has two continents, Equatus is small, arid, mountainous and sparsely
 			<date>3062-01-01</date>
 			<faction>CHH</faction>
 		</factionChange>
+		<factionChange>
+			<date>3065-01-01</date>
+			<faction>CGB</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Stapelfeld</name>
@@ -24784,6 +26524,14 @@ Solaris VII has two continents, Equatus is small, arid, mountainous and sparsely
 		<factionChange>
 			<date>3049-09-24</date>
 			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-01-28</date>
+			<faction>CW,CHH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-02-07</date>
+			<faction>CHH</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -24815,6 +26563,34 @@ Solaris VII has two continents, Equatus is small, arid, mountainous and sparsely
 		</factionChange>
 		<factionChange>
 			<date>3050-04-09</date>
+			<faction>CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3067-01-01</date>
+			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-01-28</date>
+			<faction>CHH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-05-02</date>
+			<faction>CJF,CHH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-07-06</date>
+			<faction>CHH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-09-12</date>
+			<faction>CIH,CHH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-09-26</date>
+			<faction>CIH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-10-02</date>
 			<faction>CJF</faction>
 		</factionChange>
 	</planet>
@@ -24948,6 +26724,22 @@ Solaris VII has two continents, Equatus is small, arid, mountainous and sparsely
 			<date>2802-06-11</date>
 			<faction>CLAN</faction>
 		</factionChange>
+		<factionChange>
+			<date>3075-06-01</date>
+			<faction>CBS,CCC,CCO,CGS,CSA,CSL,CSV</faction>
+		</factionChange>
+		<factionChange>
+			<date>3076-02-10</date>
+			<faction>CBS,CCC,CCO,CGS,CSA,CSL</faction>
+		</factionChange>
+		<factionChange>
+			<date>3084-06-01</date>
+			<faction>CCC,CCO,CGS,CSA,CSL</faction>
+		</factionChange>
+		<factionChange>
+			<date>3079-01-01</date>
+			<faction>CCC,CCO,CSA,CSL</faction>
+		</factionChange>
 		<pressure>3</pressure>
 		<gravity>1.1</gravity>
 		<lifeForm>7</lifeForm>
@@ -24996,7 +26788,19 @@ Solaris VII has two continents, Equatus is small, arid, mountainous and sparsely
 		<faction>NONE</faction>
 		<factionChange>
 			<date>2802-06-11</date>
-			<faction>CLAN</faction>
+			<faction>CDS,CHH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3073-01-01</date>
+			<faction>CSA,CHH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-06-01</date>
+			<faction>CSA,CSL</faction>
+		</factionChange>
+		<factionChange>
+			<date>3085-01-01</date>
+			<faction>CSA,CSL,CCO</faction>
 		</factionChange>
 		<spectralClass>K</spectralClass>
 		<subtype>6</subtype>
@@ -25311,6 +27115,10 @@ For most of the planet’s history it was a Lyran Commonwealth planet bordering 
 			<date>3050-04-05</date>
 			<faction>CW</faction>
 		</factionChange>
+		<factionChange>
+			<date>3071-04-26</date>
+			<faction>CHH</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Sverdlovsk</name>
@@ -25538,6 +27346,13 @@ For most of the planet’s history it was a Lyran Commonwealth planet bordering 
 			<date>3057-01-01</date>
 			<faction>IND</faction>
 		</factionChange>
+		<lifeForm>7</lifeForm>
+		<spectralClass>M</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>8</sysPos>
+		<hpg>B</hpg>
+		<desc>As of 3025 Tall Trees was home to a secret Confederation genetic research installation. While the research station is believed to be the source of the miraculous food development projects that prevented the famines in the Confederation during the late 30th century the secret genetic research installation is also believed to be responsible for the sudden plague outbreak that wiped out the entire population of the island of New Tierra del Fuego II in 2966. Confederation troops guarding the facility receive triple pay for hazardous duty/combat even decades after the incident.</desc>
 	</planet>
 	<planet>
 		<name>Tallin</name>
@@ -25619,7 +27434,27 @@ For most of the planet’s history it was a Lyran Commonwealth planet bordering 
 		<faction>NONE</faction>
 		<factionChange>
 			<date>2802-06-11</date>
-			<faction>CLAN</faction>
+			<faction>CCO</faction>
+		</factionChange>
+		<factionChange>
+			<date>3073-01-01</date>
+			<faction>CCO,SOC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3074-12-07</date>
+			<faction>CCO,CSV</faction>
+		</factionChange>
+		<factionChange>
+			<date>3074-12-216</date>
+			<faction>CSV</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-10-01</date>
+			<faction>CCO,CSA,CCC,CGS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3079-10-13</date>
+			<faction>CCO,CCC,CSA</faction>
 		</factionChange>
 		<spectralClass>A</spectralClass>
 		<subtype>3</subtype>
@@ -25812,7 +27647,23 @@ For most of the planet’s history it was a Lyran Commonwealth planet bordering 
 		<faction>NONE</faction>
 		<factionChange>
 			<date>2802-06-11</date>
-			<faction>CLAN</faction>
+			<faction>CDS,CIH,CSA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3070-06-01</date>
+			<faction>CDS,CIH,CSA,CCO</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-10-27</date>
+			<faction>CCC,CSA,CCO</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-06-01</date>
+			<faction>CCC,CSA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3085-01-01</date>
+			<faction>CSA</faction>
 		</factionChange>
 		<spectralClass>B</spectralClass>
 		<subtype>4</subtype>
@@ -26197,6 +28048,10 @@ As the capital of the Lyran Commonwealth, Thakard is home to many vital parts of
 			<date>3050-03-03</date>
 			<faction>CW</faction>
 		</factionChange>
+		<factionChange>
+			<date>3071-02-18</date>
+			<faction>CHH</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>The Rack</name>
@@ -26220,6 +28075,10 @@ As the capital of the Lyran Commonwealth, Thakard is home to many vital parts of
 		<factionChange>
 			<date>3049-09-05</date>
 			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-01-25</date>
+			<faction>CHH</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -26344,6 +28203,14 @@ As the capital of the Lyran Commonwealth, Thakard is home to many vital parts of
 			<date>3050-03-03</date>
 			<faction>CGB</faction>
 		</factionChange>
+		<factionChange>
+			<date>3074-08-29</date>
+			<faction>CGB,CB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3074-08-30</date>
+			<faction>CGB</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Thun</name>
@@ -26409,7 +28276,23 @@ As the capital of the Lyran Commonwealth, Thakard is home to many vital parts of
 		<faction>NONE</faction>
 		<factionChange>
 			<date>2802-06-11</date>
-			<faction>CLAN</faction>
+			<faction>CW,CHH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3070-11-01</date>
+			<faction>CW,CHH,CCO</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-04-01</date>
+			<faction>CCO,CHH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-06-01</date>
+			<faction>CCC,CSA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3085-01-01</date>
+			<faction>CSA,CCC,CSL</faction>
 		</factionChange>
 		<spectralClass>G</spectralClass>
 		<subtype>8</subtype>
@@ -26462,6 +28345,18 @@ As the capital of the Lyran Commonwealth, Thakard is home to many vital parts of
 			<date>3040-01-01</date>
 			<faction>FC</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>0.8</gravity>
+		<lifeForm>4</lifeForm>
+		<climate>3</climate>
+		<percentWater>70</percentWater>
+		<temperature>32</temperature>
+		<spectralClass>H</spectralClass>
+		<subtype>7</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>4</sysPos>
+		<hpg>B</hpg>
+		<desc>Chancellor Tormax Liao granted Tigress to the family of Erika Laurel as a private fiefdom during the 3rd Succession War. Erika Laurel was one of the Confederation’s best military leaders during the Third Succession War. Tigress is highly industrialized, the planet's population enjoy the highest per capital income and standard of living in the Confederation.</desc>
 	</planet>
 	<planet>
 		<name>Tikonov</name>
@@ -26733,7 +28628,47 @@ The planet is heavily industrialized and for a long time was the top producer of
 		<faction>NONE</faction>
 		<factionChange>
 			<date>2802-06-11</date>
-			<faction>CLAN</faction>
+			<faction>CMG</faction>
+		</factionChange>
+		<factionChange>
+			<date>2844-01-01</date>
+			<faction>CSA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2920-01-01</date>
+			<faction>CGB,CHH,CGS,CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>2930-01-01</date>
+			<faction>CGB,CGS,CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3060-01-01</date>
+			<faction>CDS,CJF,CHH,CGS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3070-01-01</date>
+			<faction>CDS,CSV,CHH,CGS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3073-01-01</date>
+			<faction>CBS,CHH,CGS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3074-09-23</date>
+			<faction>CBS,CHH,CGS,CSV</faction>
+		</factionChange>
+		<factionChange>
+			<date>3074-09-28</date>
+			<faction>CSV</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-10-01</date>
+			<faction>CSL,CGS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3079-01-10</date>
+			<faction>CSL</faction>
 		</factionChange>
 		<spectralClass>K</spectralClass>
 		<subtype>5</subtype>
@@ -26767,6 +28702,18 @@ The planet is heavily industrialized and for a long time was the top producer of
 		<factionChange>
 			<date>3050-03-07</date>
 			<faction>CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-08-09</date>
+			<faction>CIH,CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-08-21</date>
+			<faction>CIH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-11-03</date>
+			<faction>CHH</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -26854,7 +28801,11 @@ The planet is heavily industrialized and for a long time was the top producer of
 		<faction>NONE</faction>
 		<factionChange>
 			<date>2802-06-11</date>
-			<faction>CLAN</faction>
+			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-12-19</date>
+			<faction>ABN</faction>
 		</factionChange>
 		<spectralClass>F</spectralClass>
 		<subtype>0</subtype>
@@ -26897,6 +28848,14 @@ The planet is heavily industrialized and for a long time was the top producer of
 		</factionChange>
 		<factionChange>
 			<date>3062-01-01</date>
+			<faction>CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-07-10</date>
+			<faction>CIH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-01-01</date>
 			<faction>CJF</faction>
 		</factionChange>
 		<spectralClass>M</spectralClass>
@@ -27035,6 +28994,32 @@ The local population has long resented the Lyran Commonwealth for what they beli
 			<date>3050-05-06</date>
 			<faction>CGB</faction>
 		</factionChange>
+	</planet>
+	<planet>
+		<name>Trondheim (Periphery)</name>
+		<xcood>575.82</xcood>
+		<ycood>529.46</ycood>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2504-07-16</date>
+			<faction>JF</faction>
+		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.06</gravity>
+		<lifeForm>2</lifeForm>
+		<climate>2</climate>
+		<percentWater>72</percentWater>
+		<temperature>28</temperature>
+		<spectralClass>G</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>1</sysPos>
+		<socioIndustrial>C-B-C-B-C</socioIndustrial>
+		<satellite>Trollvegn</satellite>
+		<satellite>Glittertindane</satellite>
+		<hpg>X</hpg>
+		<landMass>Narvik</landMass>
+		<desc>Trondheim is the second most populated world in the small JarnFolk nation and the most industrialized. The planet is the main venue for both dropship and jumpship maintenance of the small JarnFolk fleet. All of the major families have a presence on the planet and as a result Trondheim is the planetary capital of the JarnFolk. The industries on planet are capable of producing replacement parts for their dropships and jumpships and there are dry docks located in orbit. The docks are likely automated designs from the founding of the colonies in the early 26th Century.</desc>
 	</planet>
 	<planet>
 		<name>Trondheimal</name>
@@ -27212,6 +29197,14 @@ The local population has long resented the Lyran Commonwealth for what they beli
 		<factionChange>
 			<date>3034-03-13</date>
 			<faction>FRR</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-01-01</date>
+			<faction>CGB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-01-01</date>
+			<faction>CGB,CJF,CW,CHH,CDS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -27503,6 +29496,14 @@ The system also later gained value when the uninhabited planet, Jonah’s Reach,
 			<date>3050-07-29</date>
 			<faction>CW</faction>
 		</factionChange>
+		<factionChange>
+			<date>3071-07-07</date>
+			<faction>CHH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-11-02</date>
+			<faction>CW</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Upano</name>
@@ -27621,6 +29622,10 @@ The system also later gained value when the uninhabited planet, Jonah’s Reach,
 		<xcood>593.72</xcood>
 		<ycood>94.16</ycood>
 		<faction>OA</faction>
+		<factionChange>
+			<date>3083-11-06</date>
+			<faction>PIND</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Valentina</name>
@@ -27634,6 +29639,18 @@ The system also later gained value when the uninhabited planet, Jonah’s Reach,
 		<factionChange>
 			<date>2900-01-01</date>
 			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-01-01</date>
+			<faction>OA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3083-02-06</date>
+			<faction>DC,OA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3083-02-12</date>
+			<faction>OA</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -27753,6 +29770,22 @@ The system also later gained value when the uninhabited planet, Jonah’s Reach,
 		<factionChange>
 			<date>3050-07-03</date>
 			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3066-01-01</date>
+			<faction>CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-12-17</date>
+			<faction>CIH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-04-03</date>
+			<faction>CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-10-01</date>
+			<faction>ABN</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -27916,6 +29949,14 @@ The system also later gained value when the uninhabited planet, Jonah’s Reach,
 			<date>3050-05-01</date>
 			<faction>CW</faction>
 		</factionChange>
+		<factionChange>
+			<date>3071-04-09</date>
+			<faction>CHH,CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-04-15</date>
+			<faction>CHH</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Vestallas</name>
@@ -28051,7 +30092,19 @@ In the early 31st Century an underground Star League-era ‘Mech research facili
 		<faction>NONE</faction>
 		<factionChange>
 			<date>2802-06-11</date>
-			<faction>CLAN</faction>
+			<faction>CSJ</faction>
+		</factionChange>
+		<factionChange>
+			<date>3060-01-01</date>
+			<faction>CDS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3074-01-12</date>
+			<faction>CDS,CCO</faction>
+		</factionChange>
+		<factionChange>
+			<date>3074-07-02</date>
+			<faction>ABN</faction>
 		</factionChange>
 		<spectralClass>G</spectralClass>
 		<subtype>8</subtype>
@@ -28158,6 +30211,14 @@ In the early 31st Century an underground Star League-era ‘Mech research facili
 		<factionChange>
 			<date>3049-08-17</date>
 			<faction>CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-09-18</date>
+			<faction>CIH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-11-03</date>
+			<faction>CHH</faction>
 		</factionChange>
 		<lifeForm>7</lifeForm>
 		<spectralClass>F</spectralClass>
@@ -28281,6 +30342,18 @@ In the early 31st Century an underground Star League-era ‘Mech research facili
 		</factionChange>
 		<factionChange>
 			<date>3062-01-01</date>
+			<faction>CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-06-04</date>
+			<faction>SOC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-06-18</date>
+			<faction>SOC,CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-06-30</date>
 			<faction>CJF</faction>
 		</factionChange>
 	</planet>
@@ -28569,6 +30642,26 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 			<date>2750-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3075-01-01</date>
+			<faction>OA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3082-10-22</date>
+			<faction>DC,OA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3082-12-13</date>
+			<faction>OA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3083-02-04</date>
+			<faction>DC,OA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3083-02-14</date>
+			<faction>OA</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Weistheimer</name>
@@ -28808,6 +30901,10 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 			<date>3071-12-01</date>
 			<faction>CJF</faction>
 		</factionChange>
+		<factionChange>
+			<date>3074-01-01</date>
+			<faction>CHH</faction>
+		</factionChange>
 		<zenithCharge>True</zenithCharge>
 		<lifeForm>2</lifeForm>
 		<spectralClass>G</spectralClass>
@@ -28879,6 +30976,10 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<factionChange>
 			<date>3052-01-01</date>
 			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-01-01</date>
+			<faction>CHH</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -28971,6 +31072,26 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<factionChange>
 			<date>3050-06-03</date>
 			<faction>CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-06-07</date>
+			<faction>CIH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-07-15</date>
+			<faction>CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-07-22</date>
+			<faction>CJF,CIH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-09-16</date>
+			<faction>CJF</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-09-04</date>
+			<faction>CIH,CJF</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -29233,11 +31354,19 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<faction>NONE</faction>
 		<factionChange>
 			<date>2802-06-11</date>
-			<faction>CLAN</faction>
+			<faction>CBS</faction>
 		</factionChange>
 		<factionChange>
-			<date>2900-01-01</date>
+			<date>3067-01-01</date>
+			<faction>CBS,CSA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-08-28</date>
 			<faction>CBS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-01-01</date>
+			<faction>ABN</faction>
 		</factionChange>
 		<spectralClass>F</spectralClass>
 		<subtype>2</subtype>

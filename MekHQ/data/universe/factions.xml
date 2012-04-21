@@ -176,6 +176,16 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 		<clan>true</clan>
 	</faction>
 	<faction>
+		<shortname>SOC</shortname>
+		<fullname>The Society</fullname>
+		<startingPlanet> , , , , , , , ,</startingPlanet>
+		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
+		<nameGenerator>Clan</nameGenerator>
+		<colorRGB>147,112,219</colorRGB>
+		<periphery>false</periphery>
+		<clan>true</clan>
+	</faction>
+	<faction>
 		<shortname>CDS</shortname>
 		<fullname>Clan Diamond Shark</fullname>
 		<altNames>, , ,Clan Sea Fox,Clan Sea Fox, , , , </altNames>
@@ -210,7 +220,8 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 	<faction>
 		<shortname>CGS</shortname>
 		<fullname>Clan Goliath Scorpion</fullname>
-		<startingPlanet>Roche,Roche,Roche,Roche,Roche,Roche,Roche,Roche,Roche</startingPlanet>
+		<startingPlanet>Roche,Roche,Roche,Roche,Roche,Roche,Roche,Roche, </startingPlanet>
+		<altNames>, , , , , , , ,Escorpión Imperio</altNames>
 		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
 		<nameGenerator>Clan</nameGenerator>
 		<colorRGB>238,232,170</colorRGB>
@@ -603,6 +614,15 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 	<faction>
 		<shortname>LR</shortname>
 		<fullname>Liao Republic</fullname>
+		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
+		<nameGenerator>CC</nameGenerator>
+		<colorRGB>2,166,79</colorRGB>
+		<periphery>false</periphery>
+		<clan>false</clan>
+	</faction>
+	<faction>
+		<shortname>DoL</shortname>
+		<fullname>Dutchy of Liao</fullname>
 		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
 		<nameGenerator>CC</nameGenerator>
 		<colorRGB>2,166,79</colorRGB>
@@ -1209,6 +1229,15 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 		<startingPlanet> , , , , ,Randis IV,Randis IV,Randis IV,Randis IV</startingPlanet>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>30,144,255</colorRGB>
+		<periphery>true</periphery>
+		<clan>false</clan>
+	</faction>
+	<faction>
+		<shortname>MM</shortname>
+		<fullname>Mica Majority</fullname>
+		<startingPlanet>Mica II,Mica II,Mica II,Mica II,Mica II,Mica II,Mica II,Mica II,Mica II</startingPlanet>
+		<nameGenerator>General</nameGenerator>
+		<colorRGB>240,230,140</colorRGB>
 		<periphery>true</periphery>
 		<clan>false</clan>
 	</faction>
