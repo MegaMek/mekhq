@@ -563,7 +563,11 @@ public class ForceViewPanel extends javax.swing.JPanel {
     		if(null != u) {
     			Person p = u.getCommander();
     			number++;
-    			bv += u.getEntity().calculateBattleValue(true, false);
+                if (p != null) {
+                    bv += u.getEntity().calculateBattleValue(true, false);
+                } else {
+                    bv += u.getEntity().calculateBattleValue(true, true);
+                }
     			cost += u.getEntity().getCost(true);
     			ton += u.getEntity().getWeight();
     			if(null != p) {

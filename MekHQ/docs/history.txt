@@ -39,6 +39,7 @@ v0.1.16 (SVN)
 + Fixed how Medical and HR Support percentages are calculated.
 + Bug 3518894 - Removed the 'initialized' variable since it wasn't fully implemented anyway.  I may revisit it at a later date.  Also, corrected the score multiplier to 5 (it had been multiplying by 2).
 + Update 11 of planetary/faction data - planets + faction changes from Wars of Reaving
++ Patch 3519596 (Fix for bug 3519594) - When you have a mech in a force without a pilot, it generates an NPE when attempting to view the force/parent force.
 
 v0.1.15 (2012-02-11)
 + Bug 3486200: Previous version campaigns do not save...
