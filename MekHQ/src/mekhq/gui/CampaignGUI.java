@@ -2301,7 +2301,7 @@ public class CampaignGUI extends JPanel {
 			}
 			partId = part.getId();
 			//get a new cloned part to work with and decrement original
-			Part repairable = part.clone();
+			Part repairable = Part.copyPart(part);
 			part.decrementQuantity();
 			getCampaign().fixPart(repairable, tech);
 			getCampaign().addPart(repairable);

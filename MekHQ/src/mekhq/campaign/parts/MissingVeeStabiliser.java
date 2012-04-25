@@ -112,7 +112,7 @@ public class MissingVeeStabiliser extends MissingPart {
 	public void fix() {
 		VeeStabiliser replacement = (VeeStabiliser)findReplacement(false);
 		if(null != replacement) {
-			VeeStabiliser actualReplacement = replacement.clone();
+			VeeStabiliser actualReplacement = (VeeStabiliser)Part.copyPart(replacement);
 			unit.addPart(actualReplacement);
 			campaign.addPart(actualReplacement);
 			replacement.decrementQuantity();

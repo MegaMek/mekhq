@@ -61,10 +61,7 @@ public class EnginePart extends Part {
 	}
 	
 	public EnginePart clone() {
-		EnginePart clone = new EnginePart(0, new Engine(engine.getRating(), engine.getEngineType(), engine.getFlags()), campaign, forHover);
-		clone.hits = this.hits;
-    	clone.time = this.time;
-		return clone;
+		return new EnginePart(0, new Engine(engine.getRating(), engine.getEngineType(), engine.getFlags()), campaign, forHover);
 	}
 
 	public Engine getEngine() {

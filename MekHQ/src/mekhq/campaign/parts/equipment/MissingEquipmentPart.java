@@ -178,7 +178,7 @@ public class MissingEquipmentPart extends MissingPart {
 	public void fix() {
 		Part replacement = findReplacement(false);
 		if(null != replacement) {
-			Part actualReplacement = replacement.clone();
+			Part actualReplacement = Part.copyPart(replacement);
 			unit.addPart(actualReplacement);
 			campaign.addPart(actualReplacement);
 			replacement.decrementQuantity();

@@ -52,10 +52,7 @@ public class Avionics extends Part {
     }
     
     public Avionics clone() {
-    	Avionics clone = new Avionics(0, campaign);
-    	clone.hits = this.hits;
-    	clone.time = this.time;
-    	return clone;
+    	return new Avionics(0, campaign);
     }
         
 	@Override

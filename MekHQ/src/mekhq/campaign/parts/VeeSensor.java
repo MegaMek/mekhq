@@ -49,10 +49,7 @@ public class VeeSensor extends Part {
     }
 
 	public VeeSensor clone() {
-		VeeSensor clone = new VeeSensor(getUnitTonnage(), campaign);
-		clone.hits = this.hits;
-    	clone.time = this.time;
-		return clone;
+		return new VeeSensor(getUnitTonnage(), campaign);
 	}
 	
     @Override

@@ -50,7 +50,6 @@ public class Rotor extends TankLocation {
     	clone.loc = this.loc;
     	clone.damage = this.damage;
     	clone.breached = this.breached;
-    	clone.time = this.time;
     	return clone;
     }
  

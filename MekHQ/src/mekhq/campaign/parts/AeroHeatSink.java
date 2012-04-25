@@ -60,10 +60,7 @@ public class AeroHeatSink extends Part {
     }
     
     public AeroHeatSink clone() {
-    	AeroHeatSink clone = new AeroHeatSink(getUnitTonnage(), type, campaign);
-    	clone.hits = this.hits;
-    	clone.time = this.time;
-    	return clone;
+    	return new AeroHeatSink(getUnitTonnage(), type, campaign);
     }
         
 	@Override

@@ -54,10 +54,7 @@ public class VeeStabiliser extends Part {
     }
 	
 	public VeeStabiliser clone() {
-		VeeStabiliser clone = new VeeStabiliser(getUnitTonnage(), 0, campaign);
-		clone.hits = this.hits;
-    	clone.time = this.time;
-		return clone;
+		return new VeeStabiliser(getUnitTonnage(), 0, campaign);
 	}
 
     @Override

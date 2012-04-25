@@ -52,10 +52,7 @@ public class LandingGear extends Part {
     }
         
     public LandingGear clone() {
-    	LandingGear clone = new LandingGear(0, campaign);
-    	clone.hits = this.hits;
-    	clone.time = this.time;
-    	return clone;
+    	return new LandingGear(0, campaign);
     }
     
 	@Override
