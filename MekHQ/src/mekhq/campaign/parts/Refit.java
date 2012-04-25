@@ -794,6 +794,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 		for(Part part : oldUnit.getParts()) {
 			part.updateConditionFromPart();
 		}
+        oldUnit.getEntity().setExternalIdAsString(oldUnit.getId().toString());
 		oldUnit.resetPilotAndEntity();
 		oldUnit.setRefit(null);
 	}
