@@ -82,6 +82,7 @@ public class DragoonsRatingDialog extends JDialog implements ActionListener {
 
     private void getDragoonsRating() {
         rating = DragoonsRatingFactory.getDragoonsRating(campaign);
+        rating.reInitialize();
     }
 
     private JPanel getButtonPanel() {

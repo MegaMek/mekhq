@@ -79,6 +79,10 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
 
     @Override
     protected void initValues() {
+        if (initialized)
+            return;
+
+        super.initValues();
         for (UUID uid : campaign.getForces().getAllUnits()) {
             Unit u = campaign.getUnit(uid);
             if (null == u) {
@@ -145,9 +149,9 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
             if (bay instanceof MechBay) {
                 numberMechBays += bay.getCapacity();
             } else if (bay instanceof BattleArmorBay) {
-                numberBaBays += bay.getCapacity() * 4;
+                numberBaBays += bay.getCapacity();
             } else if (bay instanceof InfantryBay) {
-                numberInfBays += bay.getCapacity() * 28;
+                numberInfBays += bay.getCapacity();
             } else if ((bay instanceof LightVehicleBay) || (bay instanceof HeavyVehicleBay)) {
                 numberVeeBays += bay.getCapacity();
             } else if ((bay instanceof ASFBay) || (bay instanceof SmallCraftBay)) {
@@ -165,8 +169,10 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
             numberAero++;
         } else if (en instanceof BattleArmor) {
             numberBa += ((Infantry)en).getSquadSize();
+            numberBaSquads++;
         } else if (en instanceof Infantry) {
-            numberInf += ((Infantry)en).getSquadN() * ((Infantry)en).getSquadSize();
+            numberSoldiers += ((Infantry)en).getSquadN() * ((Infantry)en).getSquadSize();
+            numberInfSquads++;
         }
     }
 
@@ -500,7 +506,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
         sb.append("    Contract Breaches:    ").append(getBreachCount()).append("\n\n");
 
         sb.append("Transportation:                 ").append(getTransportValue()).append("\n");
-        sb.append("    Dropship Capacity:    ").append(getTransportPercent().toPlainString()).append("%\n");
+        sb.append("    Dropship Capacity:    ").append(getTransportPercent().toPlainString()).append("\n");
         sb.append("    Jumpship?             ").append(jumpshipOwner ? "Yes" : "No").append("\n");
         sb.append("    Warship w/out Dock?   ").append(warshipOwner ? "Yes" : "No").append("\n");
         sb.append("    Warship w/ Dock?      ").append(warhipWithDocsOwner ? "Yes" : "No").append("\n\n");
@@ -530,5 +536,25 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
                 "+ Transportation: This is computed by individual unit rather than by lance/star/squadron.\n" +
                 "    Auxiliary vessels are not accounted for.\n" +
                 "+ Support: Artillery weapons & Naval vessels are not accounted for.";
+    }
+
+    @Override
+    public BigDecimal getTransportPercent() {
+        //Find out how short of transport bays we are.
+        int numberWithoutTransport = Math.max((numberMech - numberMechBays), 0);
+        numberWithoutTransport += Math.max((numberVee - numberVeeBays), 0);
+        numberWithoutTransport += Math.max((numberAero - numberAero), 0);
+        numberWithoutTransport += Math.max((numberBaSquads - numberBaBays), 0);
+        numberWithoutTransport += Math.max((numberInfSquads - numberInfBays), 0);
+        BigDecimal transportNeeded = new BigDecimal(numberWithoutTransport);
+
+        //Find the percentage of units that are transported.
+        if (getNumberUnits().compareTo(BigDecimal.ZERO) == 0) {
+            return BigDecimal.ZERO;
+        }
+        BigDecimal percentUntransported = transportNeeded.divide(getNumberUnits(), PRECISION, HALF_EVEN);
+        transportPercent = BigDecimal.ONE.subtract(percentUntransported).multiply(HUNDRED).setScale(0, HALF_EVEN);
+
+        return transportPercent;
     }
 }

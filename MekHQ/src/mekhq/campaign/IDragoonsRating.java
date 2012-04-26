@@ -42,6 +42,8 @@ public interface IDragoonsRating {
     public static final int DRAGOON_A = 4;
     public static final int DRAGOON_ASTAR = 5;
 
+    public void reInitialize();
+
     /**
      * Returns the static constant representation of the passed in Dragoon's rating.
      *

@@ -28,12 +28,15 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 
+import javax.swing.text.NumberFormatter;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * @author Deric Page (deric (dot) page (at) usa.net)
@@ -57,7 +60,9 @@ public abstract class AbstractDragoonsRating implements IDragoonsRating {
     protected int numberAero = 0;
     protected int numberVee = 0;
     protected int numberBa = 0;
-    protected int numberInf = 0;
+    protected int numberBaSquads = 0;
+    protected int numberSoldiers = 0;
+    protected int numberInfSquads = 0;
     protected BigDecimal mechTech = BigDecimal.ZERO;
     protected BigDecimal aeroTech = BigDecimal.ZERO;
     protected BigDecimal veeTech = BigDecimal.ZERO;
@@ -78,6 +83,8 @@ public abstract class AbstractDragoonsRating implements IDragoonsRating {
     protected BigDecimal transportPercent = BigDecimal.ZERO;
     protected BigDecimal highTechPercent = BigDecimal.ZERO;
 
+    protected static boolean initialized = false;
+
     /**
      * Default constructor.
      *
@@ -85,6 +92,13 @@ public abstract class AbstractDragoonsRating implements IDragoonsRating {
      */
     public AbstractDragoonsRating(Campaign campaign) {
         this.campaign = campaign;
+        initialized = false;
+    }
+
+    public void reInitialize() {
+        initialized = false;
+        initValues();
+        initialized = true;
     }
 
     @Override
@@ -122,7 +136,7 @@ public abstract class AbstractDragoonsRating implements IDragoonsRating {
      * @return
      */
     protected BigDecimal calcAverageExperience() {
-        return getTotalSkillLevels().divide(numberUnits, PRECISION, HALF_EVEN);
+        return getTotalSkillLevels().divide(getNumberUnits(), PRECISION, HALF_EVEN);
     }
 
     /**
@@ -255,25 +269,6 @@ public abstract class AbstractDragoonsRating implements IDragoonsRating {
     }
 
     @Override
-    public BigDecimal getTransportPercent() {
-        //Find out how short of transport bays we are.
-        int numberWithoutTransport = Math.max((numberMech - numberMechBays), 0);
-        numberWithoutTransport += Math.max((numberVee - numberVeeBays), 0);
-        numberWithoutTransport += Math.max((numberAero - numberAero), 0);
-        numberWithoutTransport += Math.max((numberBa - numberBaBays), 0);
-        numberWithoutTransport += Math.max(((numberInf/28) - numberInfBays), 0);
-        BigDecimal transportNeeded = new BigDecimal(numberWithoutTransport);
-
-        //Find the percentage of units that are transported.
-        if (getNumberUnits().compareTo(BigDecimal.ZERO) == 0) {
-            return BigDecimal.ZERO;
-        }
-        transportPercent = BigDecimal.ONE.subtract(transportNeeded.divide(getNumberUnits(), PRECISION, HALF_EVEN)).multiply(new BigDecimal(100));
-
-        return transportPercent;
-    }
-
-    @Override
     public int getDragoonRating(int score) {
         if(score < 0) {
             return DRAGOON_F;
@@ -352,7 +347,9 @@ public abstract class AbstractDragoonsRating implements IDragoonsRating {
      * @return
      */
     protected BigDecimal getNumberUnits() {
-        initValues();
+        if (numberUnits.compareTo(BigDecimal.ZERO) <= 0) {
+            reInitialize();
+        }
         return numberUnits;
     }
 
@@ -380,6 +377,37 @@ public abstract class AbstractDragoonsRating implements IDragoonsRating {
      * Recalculates the dragoons rating.  If this has already been done, the initialized flag should already
      * be set true and this method will immediately exit.
      */
-    protected abstract void initValues();
+    protected void initValues() {
+        commanderList = new ArrayList<Person>();
+        numberUnits = BigDecimal.ZERO;
+        numberIS2 = BigDecimal.ZERO;
+        numberClan = BigDecimal.ZERO;
+        totalSkillLevels = BigDecimal.ZERO;
+        numberMech = 0;
+        numberAero = 0;
+        numberVee = 0;
+        numberBa = 0;
+        numberSoldiers = 0;
+        numberInfSquads = 0;
+        mechTech = BigDecimal.ZERO;
+        aeroTech = BigDecimal.ZERO;
+        veeTech = BigDecimal.ZERO;
+        baTech = BigDecimal.ZERO;
+        numberMechBays = 0;
+        numberAeroBays = 0;
+        numberBaBays = 0;
+        numberVeeBays = 0;
+        numberInfBays = 0;
+        warhipWithDocsOwner = false;
+        warshipOwner = false;
+        jumpshipOwner = false;
+        commander = null;
+        breachCount = 0;
+        successCount = 0;
+        failCount = 0;
+        supportPercent = BigDecimal.ZERO;
+        transportPercent = BigDecimal.ZERO;
+        highTechPercent = BigDecimal.ZERO;
+    };
 
 }

@@ -71,6 +71,10 @@ public class TaharqaDragoonsRating extends AbstractDragoonsRating {
 
     @Override
     protected void initValues() {
+        if (initialized)
+            return;
+
+        super.initValues();
         for (UUID uid : campaign.getForces().getAllUnits()) {
             Unit u = campaign.getUnit(uid);
             if (null == u) {
@@ -175,8 +179,10 @@ public class TaharqaDragoonsRating extends AbstractDragoonsRating {
             numberAero++;
         } else if (en instanceof BattleArmor) {
             numberBa += ((Infantry)en).getSquadSize();
+            numberBaSquads++;
         } else if (en instanceof Infantry) {
-            numberInf += ((Infantry)en).getSquadN() * ((Infantry)en).getSquadSize();
+            numberSoldiers += ((Infantry)en).getSquadN() * ((Infantry)en).getSquadSize();
+            numberInfSquads++;
         }
     }
 
@@ -396,5 +402,25 @@ public class TaharqaDragoonsRating extends AbstractDragoonsRating {
     public String getHelpText() {
         return "Method: Taharqa Dragoons Rating\n" +
                 "Dragoon's Rating method introduced by Taharqa with version v0.1.11 (2011-12-09).";
+    }
+
+    @Override
+    public BigDecimal getTransportPercent() {
+        //Find out how short of transport bays we are.
+        int numberWithoutTransport = Math.max((numberMech - numberMechBays), 0);
+        numberWithoutTransport += Math.max((numberVee - numberVeeBays), 0);
+        numberWithoutTransport += Math.max((numberAero - numberAero), 0);
+        numberWithoutTransport += Math.max((numberBa - numberBaBays), 0);
+        numberWithoutTransport += Math.max((numberSoldiers - numberInfBays), 0);
+        BigDecimal transportNeeded = new BigDecimal(numberWithoutTransport);
+
+        //Find the percentage of units that are transported.
+        if (getNumberUnits().compareTo(BigDecimal.ZERO) == 0) {
+            return BigDecimal.ZERO;
+        }
+        BigDecimal transportUsed = transportNeeded.divide(getNumberUnits(), PRECISION, HALF_EVEN);
+        transportPercent = BigDecimal.ONE.subtract(transportUsed).multiply(new BigDecimal(100)).setScale(0, RoundingMode.HALF_EVEN);
+
+        return transportPercent;
     }
 }

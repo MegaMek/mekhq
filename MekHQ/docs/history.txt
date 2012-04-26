@@ -43,6 +43,7 @@ v0.1.16 (SVN)
 + Patch 3519613 (Fix for bug 3518860) - Customized mechs lose ID
 + Bug 3516563 - Parts repair bugs.  Added code to make sure that the mode() value is cloned along with the rest of the Part being repaired.
 + Bug 3516563 - Parts repair bugs.  Modified the fix to better follow the original code style.
++ Fixed problems with Dragoons Rating calculations of Transport and number of units.
 
 v0.1.15 (2012-02-11)
 + Bug 3486200: Previous version campaigns do not save...
