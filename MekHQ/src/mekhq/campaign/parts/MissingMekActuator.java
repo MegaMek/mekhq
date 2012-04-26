@@ -123,7 +123,7 @@ public class MissingMekActuator extends MissingPart {
 	public void fix() {
 		Part replacement = findReplacement(false);
 		if(null != replacement) {
-			Part actualReplacement = Part.copyPart(replacement);
+			Part actualReplacement = replacement.clone();
 			unit.addPart(actualReplacement);
 			campaign.addPart(actualReplacement);
 			replacement.decrementQuantity();

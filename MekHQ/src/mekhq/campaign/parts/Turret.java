@@ -60,6 +60,7 @@ public class Turret extends TankLocation {
     
     public Turret clone() {
     	Turret clone = new Turret(0, getUnitTonnage(), weight, campaign);
+        clone.copyRepairData(this);
     	clone.loc = this.loc;
     	clone.damage = this.damage;
     	clone.breached = this.breached;

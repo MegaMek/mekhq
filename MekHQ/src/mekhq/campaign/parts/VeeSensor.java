@@ -49,7 +49,9 @@ public class VeeSensor extends Part {
     }
 
 	public VeeSensor clone() {
-		return new VeeSensor(getUnitTonnage(), campaign);
+		VeeSensor clone = new VeeSensor(getUnitTonnage(), campaign);
+        clone.copyRepairData(this);
+		return clone;
 	}
 	
     @Override

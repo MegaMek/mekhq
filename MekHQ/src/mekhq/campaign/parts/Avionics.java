@@ -52,7 +52,9 @@ public class Avionics extends Part {
     }
     
     public Avionics clone() {
-    	return new Avionics(0, campaign);
+    	Avionics clone = new Avionics(0, campaign);
+        clone.copyRepairData(this);
+    	return clone;
     }
         
 	@Override

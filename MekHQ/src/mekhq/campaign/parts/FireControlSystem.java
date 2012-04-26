@@ -52,7 +52,9 @@ public class FireControlSystem extends Part {
     }
         
     public FireControlSystem clone() {
-    	return new FireControlSystem(0, campaign);
+    	FireControlSystem clone = new FireControlSystem(0, campaign);
+        clone.copyRepairData(this);
+    	return clone;
     }
     
 	@Override

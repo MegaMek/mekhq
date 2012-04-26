@@ -50,7 +50,9 @@ public class MekLifeSupport extends Part {
     }
 	
 	public MekLifeSupport clone() {
-		return new MekLifeSupport(getUnitTonnage(), campaign);
+		MekLifeSupport clone = new MekLifeSupport(getUnitTonnage(), campaign);
+        clone.copyRepairData(this);
+		return clone;
 	}
 	
 	@Override

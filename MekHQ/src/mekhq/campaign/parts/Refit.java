@@ -594,7 +594,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 				if(oldUnit.campaign.acquirePart((IAcquisitionWork)part, tech)) {
 					Part replacement = ((MissingPart)part).findReplacement(true);
 					if(null != replacement) {
-						Part actualReplacement = Part.copyPart(replacement);
+						Part actualReplacement = replacement.clone();
 						actualReplacement.setRefitId(oldUnit.getId());
 						newUnitParts.add(actualReplacement.getId());
 						replacement.decrementQuantity();
@@ -1406,7 +1406,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 				oldUnit.campaign.buyPart(((IAcquisitionWork)part).getNewPart(), 1.1);
 				Part replacement = ((MissingPart)part).findReplacement(true);
 				if(null != replacement) {
-					Part actualReplacement = Part.copyPart(replacement);
+					Part actualReplacement = replacement.clone();
 					replacement.decrementQuantity();
 					oldUnit.campaign.addPart(actualReplacement);
 					actualReplacement.setRefitId(oldUnit.getId());

@@ -73,7 +73,11 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     }
     
     public AmmoBin clone() {
-    	return new AmmoBin(getUnitTonnage(), getType(), getEquipmentNum(), shotsNeeded, oneShot, campaign);
+    	AmmoBin clone = new AmmoBin(getUnitTonnage(), getType(), getEquipmentNum(), shotsNeeded, oneShot, campaign);
+        clone.copyRepairData(this);
+        clone.shotsNeeded = this.shotsNeeded;
+        clone.munition = this.munition;
+        return clone;
     }
     
     @Override

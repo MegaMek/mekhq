@@ -60,7 +60,9 @@ public class MotiveSystem extends Part {
 	}
 	
 	public MotiveSystem clone() {
-		return new MotiveSystem(getUnitTonnage(), campaign);
+		MotiveSystem clone = new MotiveSystem(getUnitTonnage(), campaign);
+        clone.copyRepairData(this);
+        return clone;
 	}
 	
 	@Override

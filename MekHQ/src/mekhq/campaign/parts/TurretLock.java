@@ -49,7 +49,9 @@ public class TurretLock extends Part {
 	}
 	
 	public TurretLock clone() {
-		return new TurretLock(campaign);
+		TurretLock clone = new TurretLock(campaign);
+        clone.copyRepairData(this);
+        return clone;
 	}
 	
 	@Override

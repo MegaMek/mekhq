@@ -49,7 +49,9 @@ public class MekActuator extends Part {
 	}
 	
 	public MekActuator clone() {
-		return new MekActuator(getUnitTonnage(), type, location, campaign);
+		MekActuator clone = new MekActuator(getUnitTonnage(), type, location, campaign);
+        clone.copyRepairData(this);
+		return clone;
 	}
 	
     public int getType() {

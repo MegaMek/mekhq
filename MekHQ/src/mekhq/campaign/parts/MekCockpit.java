@@ -55,7 +55,9 @@ public class MekCockpit extends Part {
     }
 	
 	public MekCockpit clone() {
-		return new MekCockpit(getUnitTonnage(), type, campaign);
+		MekCockpit clone = new MekCockpit(getUnitTonnage(), type, campaign);
+        clone.copyRepairData(this);
+		return clone;
 	}
 	
 	@Override

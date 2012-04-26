@@ -51,8 +51,7 @@ public class MekSensor extends Part {
 	
 	public MekSensor clone() {
 		MekSensor clone = new MekSensor(getUnitTonnage(), campaign);
-		clone.hits = this.hits;
-    	clone.time = this.time;
+        clone.copyRepairData(this);
 		return clone;
 	}
 	

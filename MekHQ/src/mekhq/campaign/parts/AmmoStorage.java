@@ -63,6 +63,7 @@ public class AmmoStorage extends EquipmentPart {
     
     public AmmoStorage clone() {
     	AmmoStorage storage = new AmmoStorage(0, getType(), shots, campaign);
+        storage.copyRepairData(this);
     	storage.munition = this.munition;
     	return storage;
     }
