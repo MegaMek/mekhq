@@ -1150,7 +1150,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 	
 	public void writeToXml(PrintWriter pw1, int indentLvl) {
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl) + "<refit>");
-		pw1.println(MekHqXmlUtil.writeEntityToXmlString(newEntity, indentLvl+1));
+		pw1.println(MekHqXmlUtil.writeEntityToXmlString(newEntity, indentLvl+1, oldUnit.campaign.getEntities()));
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<time>"
 				+ time + "</time>");
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<timeSpent>" + timeSpent

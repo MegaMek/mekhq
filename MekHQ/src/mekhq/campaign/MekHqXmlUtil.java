@@ -6,6 +6,8 @@ import java.io.ByteArrayInputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Vector;
 
 import javax.xml.transform.Result;
@@ -112,7 +114,7 @@ public class MekHqXmlUtil {
 	 *            The entity to serialize to XML.
 	 * @return A string containing the XML representation of the entity.
 	 */
-	public static String writeEntityToXmlString(Entity tgtEnt, int indentLvl) {
+	public static String writeEntityToXmlString(Entity tgtEnt, int indentLvl, ArrayList<Entity> list) {
 		// Holdover from EntityListFile in MM.
 		// I guess they simply ignored all squadrons for writing out entities?
 		if (tgtEnt instanceof FighterSquadron) {
@@ -134,6 +136,16 @@ public class MekHqXmlUtil {
 		if (tgtEnt.countQuirks() > 0) {
 			retVal += "\" quirks=\"";
 			retVal += String.valueOf(tgtEnt.getQuirkList("::"));
+		}
+		if (tgtEnt.getC3Master() != null) {
+			retVal += "\" c3MasterIs=\"";
+			retVal += tgtEnt.getGame()
+				.getEntity(tgtEnt.getC3Master().getId())
+				.getC3UUIDAsString();
+		}
+		if (tgtEnt.hasC3() || tgtEnt.hasC3i()) {
+			retVal += "\" c3UUID=\"";
+			retVal += tgtEnt.getC3UUIDAsString();
 		}
 
 		retVal += "\">\n";
@@ -270,6 +282,25 @@ public class MekHqXmlUtil {
 		
 		if (null != loc) {
 			retVal += loc;
+		}
+
+		// Write the C3i Data if needed
+		if (tgtEnt.hasC3i()) {
+			retVal += MekHqXmlUtil.indentStr(indentLvl+1) + "<c3iset>";
+			retVal += CommonConstants.NL;
+			Iterator<Entity> c3iList = list.iterator();
+			while (c3iList.hasNext()) {
+				final Entity C3iEntity = c3iList.next();
+
+				if (C3iEntity.onSameC3NetworkAs(tgtEnt, true)) {
+					retVal += MekHqXmlUtil.indentStr(indentLvl+2) + "<c3i_link link=\"";
+					retVal += C3iEntity.getC3UUIDAsString();
+					retVal += "\"/>";
+					retVal += CommonConstants.NL;
+				}
+			}
+			retVal += MekHqXmlUtil.indentStr(indentLvl+1) + "</c3iset>";
+			retVal += CommonConstants.NL;
 		}
 
 		// Finish writing this entity to the file.

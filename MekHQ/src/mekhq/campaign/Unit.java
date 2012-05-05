@@ -1014,7 +1014,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl) + "<unit id=\"" + id.toString()
 				+ "\" type=\"" + this.getClass().getName() + "\">");
 
-		pw1.println(MekHqXmlUtil.writeEntityToXmlString(entity, indentLvl+1));
+		pw1.println(MekHqXmlUtil.writeEntityToXmlString(entity, indentLvl+1, campaign.getEntities()));
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl + 1) + "<quality>"
 				+ quality + "</quality>");
 		for(UUID did : drivers) {

@@ -470,6 +470,12 @@ public class Campaign implements Serializable {
 		units.add(u);
 		unitIds.put(u.getId(), u);	
 		checkDuplicateNamesDuringAdd(u.getEntity());
+
+		// Assign an entity ID to our new unit
+		if (Entity.NONE == u.getEntity().getId()) {
+			u.getEntity().setId(game.getNextEntityId());
+		}
+		game.addEntity(u.getEntity().getId(), u.getEntity());
 	}
 	
 	/**
@@ -500,6 +506,12 @@ public class Campaign implements Serializable {
 		if(!unit.isRepairable()) {
 			unit.setSalvage(true);
 		}
+		
+		// Assign an entity ID to our new unit
+		if (Entity.NONE == en.getId()) {
+			en.setId(game.getNextEntityId());
+		}
+		game.addEntity(en.getId(), en);
 		
 		checkDuplicateNamesDuringAdd(en);
 		addReport(unit.getName() + " has been added to the unit roster.");
@@ -2131,6 +2143,12 @@ public class Campaign implements Serializable {
 			Entity en = u.getEntity();
 			UUID id = u.getId();
 			en.setExternalIdAsString(id.toString());
+
+			// If they have C3 or C3i we need to set their ID
+			if (en.hasC3() || en.hasC3i()) {
+				en.setC3UUID();
+				en.setC3NetIdSelf();
+			}
 		}
 	}
 

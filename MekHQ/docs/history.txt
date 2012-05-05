@@ -45,6 +45,7 @@ v0.1.16 (SVN)
 + Bug 3516563 - Parts repair bugs.  Modified the fix to better follow the original code style.
 + Fixed problems with Dragoons Rating calculations of Transport and number of units.
 + Update 13 of planetary data
++ Patch 3522780 (Fix for bug 3522145) - Unable to use Get MUL when units have C3/C3i
 
 v0.1.15 (2012-02-11)
 + Bug 3486200: Previous version campaigns do not save...
