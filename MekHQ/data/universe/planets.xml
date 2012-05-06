@@ -664,6 +664,7 @@ Alarion is primarily settled by people of German, Romanian and English descent.<
 		<temperature>25</temperature>
 		<percentWater>60</percentWater>
 		<lifeForm>5</lifeForm>
+		<hpg>A</hpg>
 		<desc>No description available.</desc>
 	</planet>
 	<planet>
@@ -1430,6 +1431,10 @@ Industrial, Command and logistical world, paperwork in this planet and its prefe
 			<date>3030-01-01</date>
 			<faction>SIC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3063-01-01</date>
+			<faction>CC</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Amiga</name>
@@ -2152,6 +2157,10 @@ Salvatore Incorporated</desc>
 			<date>3030-01-01</date>
 			<faction>SIC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3063-01-01</date>
+			<faction>CC</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Armington</name>
@@ -2496,6 +2505,7 @@ Imperator Automatic Weaponry</desc>
 		<climate>3</climate>
 		<percentWater>40</percentWater>
 		<lifeForm>4</lifeForm>
+		<hpg>A</hpg>
 		<desc>No description available.</desc>
 	</planet>
 	<planet>
@@ -2536,11 +2546,14 @@ Imperator Automatic Weaponry</desc>
 		<name>Attenbrooks</name>
 		<xcood>-72</xcood>
 		<ycood>985</ycood>
-		<faction>PIND</faction>
+		<faction>UND</faction>
 		<factionChange>
 			<date>3052-01-01</date>
 			<faction>CDS</faction>
 		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>III</luminosity>
 	</planet>
 	<planet>
 		<name>Atzenbrugg</name>
@@ -2903,6 +2916,7 @@ The primary industries on Augustine involve extracting raw minerals from the pla
 		<landMass>Corsen</landMass>
 		<landMass>Solath</landMass>
 		<landMass>Valence</landMass>
+		<hpg>A</hpg>
 		<desc>Babylon is an arid planet that originally did not appeal to early colonists. Not only was it a harsh climate, many early colonists suffered from the "Babylon Plague" caused by native pathogens. Thousands perished in the months before scientists were able to come up with an effective vaccine.
 		
 		After the world was made more liveable and the Plague was conquered, it was discovered that Babylon was rich in raw minerals. This extended to other planets in the system and several large asteroids.
@@ -3166,6 +3180,7 @@ The primary industries on Augustine involve extracting raw minerals from the pla
         <climate>3</climate>
         <percentWater>60</percentWater>
         <lifeForm>6</lifeForm>
+        <hpg>A</hpg>
         <desc>No description available.</desc>
 	</planet>
 	<planet>
@@ -3409,11 +3424,14 @@ Barras is the hotbed of intelligence activity along the Confederation-FWL border
 		<name>Bazaar</name>
 		<xcood>23</xcood>
 		<ycood>754</ycood>
-		<faction>PIND</faction>
+		<faction>UND</faction>
 		<factionChange>
 			<date>3052-01-01</date>
 			<faction>CDS</faction>
 		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>VI</luminosity>
 	</planet>
 	<planet>
 		<name>Bearclaw</name>
@@ -3454,6 +3472,7 @@ Barras is the hotbed of intelligence activity along the Confederation-FWL border
         <climate>2</climate>
         <percentWater>50</percentWater>
         <lifeForm>3</lifeForm>
+        <hpg>A</hpg>
         <desc>No description available.</desc>
 	</planet>
 	<planet>
@@ -4185,6 +4204,10 @@ Bithinian Ballistics</desc>
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<factionChange>
+			<date>3075-01-01</date>
+			<faction>CJF</faction>
+		</factionChange>
 		<spectralClass>K</spectralClass>
 		<subtype>7</subtype>
 		<luminosity>V</luminosity>
@@ -4615,7 +4638,7 @@ Brasha is home to the unique and elite Qum’ran Guard, which are comprised of m
 		</factionChange>
 		<factionChange>
 			<date>2840-01-01</date>
-			<faction>CCC,CSA,CSN,CNC</faction>
+			<faction>CCC,CSA,CSR,CNC</faction>
 		</factionChange>
 		<factionChange>
 			<date>3060-01-01</date>
@@ -4647,6 +4670,7 @@ Brasha is home to the unique and elite Qum’ran Guard, which are comprised of m
 		<climate>4</climate>
 		<percentWater>20</percentWater>
 		<lifeForm>3</lifeForm>
+		<hpg>A</hpg>
 		<desc>No description available.</desc>
 	</planet>
 	<planet>
@@ -5372,11 +5396,14 @@ Recently, a large island in the eastern basin has been taken over for secret tes
 		<name>Cambridge</name>
 		<xcood>-301</xcood>
 		<ycood>640</ycood>
-		<faction>PIND</faction>
+		<faction>UND</faction>
 		<factionChange>
 			<date>3052-01-01</date>
 			<faction>CJF</faction>
 		</factionChange>
+		<spectralClass>F</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>V</luminosity>
 	</planet>
 	<planet>
 		<name>Cameron</name>
@@ -6176,7 +6203,7 @@ Like the other Trinity worlds, Cerillos' primary industry is farming. Both agric
 			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
-			<date>3065-01-01</date>
+			<date>3075-01-01</date>
 			<faction>CJF</faction>
 		</factionChange>		
 		<zenithCharge>True</zenithCharge>
@@ -6684,6 +6711,7 @@ This led to a very hostile environment by the mid 3020s with many residents just
 		<climate>3</climate>
 		<percentWater>50</percentWater>
 		<lifeForm>2</lifeForm>
+		<hpg>A</hpg>
 		<desc>No description available.</desc>
 	</planet>
 	<planet>
@@ -6988,19 +7016,29 @@ This led to a very hostile environment by the mid 3020s with many residents just
 		<name>Columbus</name>
 		<xcood>414</xcood>
 		<ycood>608</ycood>
-		<faction>PIND</faction>
+		<faction>UND</faction>
 		<factionChange>
-			<date>2750-01-01</date>
+			<date>2549-01-01</date>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2900-01-01</date>
-			<faction>PIND</faction>
+			<date>2780-01-01</date>
+			<faction>ABN</faction>
 		</factionChange>
 		<factionChange>
-			<date>3057-01-01</date>
+			<date>3023-01-01</date>
 			<faction>CS</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>0.9</gravity>
+		<lifeForm>7</lifeForm>
+		<spectralClass>G</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>4</sysPos>
+		<satellite>Amor</satellite>
+		<hpg>A</hpg>
+		<desc>Columbus was settled in 2549 by deep exploration crews for the Terran Hegemony. The station continued as a send off point for explorers throughout the Star League and the facilities were eventually upgraded to include a dropship repair facility on Amor, the planets moon. The planet was abandoned in 2780, just prior to Kerensky's Exodus and remained abandoned until Comstar rediscovered the facility in 3023 and began using it as a staging base for their Explorer Corps. The facility was very small until the early 3050s when the need to find the Clan Homeworlds reignited the need for the Explorer Corps.</desc>
 	</planet>
 	<planet>
 		<name>Conakry</name>
@@ -7440,15 +7478,18 @@ Coventry’s mineral, agricultural, and military economy is supplemented by a th
 		<name>Ctesiphon</name>
 		<xcood>322</xcood>
 		<ycood>1044</ycood>
-		<faction>PIND</faction>
+		<faction>UND</faction>
 		<factionChange>
 			<date>3052-01-01</date>
 			<faction>CNC</faction>
 		</factionChange>
 		<factionChange>
 			<date>3062-01-01</date>
-			<faction>PIND</faction>
+			<faction>ABN</faction>
 		</factionChange>
+		<spectralClass>M</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>III</luminosity>
 	</planet>
 	<planet>
 		<name>Cumberland</name>
@@ -7594,6 +7635,7 @@ Coventry’s mineral, agricultural, and military economy is supplemented by a th
 		<percentWater>60</percentWater>
 		<lifeForm>7</lifeForm>
 		<landMass>Riva</landMass>
+		<hpg>A</hpg>
 		<desc>Dagda was the first of the Pentagon Worlds settled by the Star League in Exile. The planet is rich in minerals and was the primary source of many raw materials for the Star League in Exile.
 		
 The Jade Falcon, totem animal of the Clan with the same name, is from Dagda.</desc>
@@ -8050,6 +8092,7 @@ The Jade Falcon, totem animal of the Clan with the same name, is from Dagda.</de
 		<percentWater>80</percentWater>
 		<climate>3</climate>
 		<lifeForm>5</lifeForm>
+		<hpg>A</hpg>
 		<desc>No description available.</desc>
 	</planet>
 	<planet>
@@ -8993,6 +9036,7 @@ The Malthus crime family had each of the 5 domed cities set up to cater to a dif
 		<climate>3</climate>
 		<percentWater>40</percentWater>
 		<lifeForm>7</lifeForm>
+		<hpg>A</hpg>
 		<desc>No description available.</desc>
 	</planet>
 	<planet>
@@ -10324,6 +10368,7 @@ For much of its history Fletcher has been the site of an historic cemetery which
 		<climate>3</climate>
 		<percentWater>50</percentWater>
 		<lifeForm>4</lifeForm>
+		<hpg>A</hpg>
 		<desc>No description available.</desc>
 	</planet>
 	<planet>
@@ -10856,6 +10901,7 @@ When Gallery was originally settled there were no native lifeforms so the origin
 		<climate>4</climate>
 		<percentWater>10</percentWater>
 		<lifeForm>2</lifeForm>
+		<hpg>A</hpg>
 		<desc>No description available.</desc>
 	</planet>
 	<planet>
@@ -10944,7 +10990,7 @@ The Capellan Institute of Linguistics was established on Geifer in 2978. The Ins
 		<name>Ghent</name>
 		<xcood>211</xcood>
 		<ycood>1163</ycood>
-		<faction>PIND</faction>
+		<faction>UND</faction>
 		<factionChange>
 			<date>3052-01-01</date>
 			<faction>CSJ</faction>
@@ -10961,6 +11007,9 @@ The Capellan Institute of Linguistics was established on Geifer in 2978. The Ins
 			<date>3075-02-03</date>
 			<faction>CSR</faction>
 		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>III</luminosity>
 	</planet>
 	<planet>
 		<name>Giausar</name>
@@ -11209,6 +11258,7 @@ Brigadier Corporation</desc>
 		<climate>3</climate>
 		<percentWater>50</percentWater>
 		<lifeForm>7</lifeForm>
+		<hpg>A</hpg>
 		<desc>No description available.</desc>
 	</planet>
 	<planet>
@@ -11505,6 +11555,7 @@ Brigadier Corporation</desc>
 		<climate>3</climate>
 		<percentWater>70</percentWater>
 		<lifeForm>6</lifeForm>
+		<hpg>A</hpg>
 		<desc>No description available.</desc>
 	</planet>
 	<planet>
@@ -11811,6 +11862,10 @@ Brigadier Corporation</desc>
 			<date>3051-12-10</date>
 			<faction>CW</faction>
 		</factionChange>
+		<factionChange>
+			<date>3065-01-01</date>
+			<faction>CGB</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Gurnet</name>
@@ -11858,15 +11913,18 @@ Brigadier Corporation</desc>
 		<name>Gwithian</name>
 		<xcood>261</xcood>
 		<ycood>788</ycood>
-		<faction>PIND</faction>
+		<faction>UND</faction>
 		<factionChange>
 			<date>3052-01-01</date>
 			<faction>CNC</faction>
 		</factionChange>
 		<factionChange>
 			<date>3062-01-01</date>
-			<faction>PIND</faction>
+			<faction>ABN</faction>
 		</factionChange>
+		<spectralClass>K</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>IV</luminosity>
 	</planet>
 	<planet>
 		<name>Gypsum</name>
@@ -12239,6 +12297,9 @@ Brigadier Corporation</desc>
 			<date>3072-01-01</date>
 			<faction>CHH</faction>
 		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>IV</luminosity>
 	</planet>
 	<planet>
 		<name>Harrow's Sun</name>
@@ -12430,6 +12491,7 @@ Brigadier Corporation</desc>
 		<subtype>4</subtype>
 		<luminosity>V</luminosity>
 		<sysPos>2</sysPos>
+		<hpg>A</hpg>
 		<desc>No description available.</desc>
 	</planet>
 	<planet>
@@ -12545,6 +12607,7 @@ Brigadier Corporation</desc>
 		<climate>4</climate>
 		<percentWater>20</percentWater>
 		<lifeForm>2</lifeForm>
+		<hpg>A</hpg>
 		<desc>No description available.</desc>
 	</planet>
 	<planet>
@@ -12853,6 +12916,7 @@ The planet and the factories have been the target of invasion numerous times thr
 		<climate>0</climate>
 		<percentWater>50</percentWater>
 		<lifeForm>2</lifeForm>
+		<hpg>A</hpg>
 		<desc>No description available.</desc>
 	</planet>
 	<planet>
@@ -13044,6 +13108,7 @@ The planet and the factories have been the target of invasion numerous times thr
 		<landMass>Ortin</landMass>
 		<landMass>Bagrain</landMass>
 		<landMass>Fortuna</landMass>
+		<hpg>A</hpg>
 		<desc>No description available.</desc>
 	</planet>
 	<planet>
@@ -13373,6 +13438,7 @@ The planet and the factories have been the target of invasion numerous times thr
 		<climate>5</climate>
 		<percentWater>60</percentWater>
 		<lifeForm>6</lifeForm>
+		<hpg>A</hpg>
 		<desc>No description available.</desc>
 	</planet>
 	<planet>
@@ -13930,6 +13996,7 @@ Irian’s itself is best described as bland. The planet’s terrain is dominated
 		<climate>2</climate>
 		<percentWater>70</percentWater>
 		<lifeForm>6</lifeForm>
+		<hpg>A</hpg>
 		<desc>No description available.</desc>
 	</planet>
 	<planet>
@@ -15344,11 +15411,18 @@ Exeter Organization</desc>
 		<name>Kinbrace</name>
 		<xcood>-396</xcood>
 		<ycood>863</ycood>
-		<faction>PIND</faction>
+		<faction>UND</faction>
 		<factionChange>
 			<date>3052-01-01</date>
 			<faction>CSV</faction>
 		</factionChange>
+		<factionChange>
+			<date>3065-01-01</date>
+			<faction>ABN</faction>
+		</factionChange>
+		<spectralClass>K</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>III</luminosity>
 	</planet>
 	<planet>
 		<name>Kinkaid II</name>
@@ -15460,6 +15534,7 @@ Exeter Organization</desc>
 		<climate>2</climate>
 		<percentWater>30</percentWater>
 		<lifeForm>4</lifeForm>
+		<hpg>A</hpg>
 		<desc>No description available.</desc>
 	</planet>
 	<planet>
@@ -16987,6 +17062,7 @@ The primary industry on Les Halles is the extraction and refining of fuel used i
 		<climate>3</climate>
 		<percentWater>70</percentWater>
 		<lifeForm>6</lifeForm>
+		<hpg>A</hpg>
 		<desc>No description available.</desc>
 	</planet>
 	<planet>
@@ -17313,6 +17389,7 @@ The continents of Sorania and Padawa are mostly temperate and are the sites of t
 		<climate>2</climate>
 		<percentWater>70</percentWater>
 		<lifeForm>6</lifeForm>
+		<hpg>A</hpg>
 		<desc>No description available.</desc>
 	</planet>
 	<planet>
@@ -17645,6 +17722,10 @@ The continents of Sorania and Padawa are mostly temperate and are the sites of t
 		<factionChange>
 			<date>3030-01-01</date>
 			<faction>SIC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3063-01-01</date>
+			<faction>CC</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -18179,6 +18260,7 @@ Waytani Incorporated</desc>
         <temperature>30</temperature>
         <percentWater>50</percentWater>
         <lifeForm>5</lifeForm>
+        <hpg>A</hpg>
         <desc>No description available for Marshall. The system's 4th planet, Xian, is also inhabited and has a single satellite named Diamondstar and the highest life forms are plants.</desc>
 	</planet>
 	<planet>
@@ -20407,6 +20489,7 @@ New Hessen was occupied several times during the Succession Wars. However, New H
 		<landMass>Celebes</landMass>
 		<landMass>Kang</landMass>
 		<landMass>Ionia</landMass>
+		<hpg>A</hpg>
 		<desc>No description available.</desc>
 	</planet>
 	<planet>
@@ -20819,6 +20902,7 @@ In contrast to the heavily industrialized northern hemisphere, the southern hemi
 		<climate>3</climate>
 		<percentWater>20</percentWater>
 		<lifeForm>1</lifeForm>
+		<hpg>A</hpg>
 		<desc>No description available.</desc>
 	</planet>
 	<planet>
@@ -21113,14 +21197,14 @@ Niops VII is a cold planet with access to sufficient resources to keep the Assoc
 		<name>Nouveaux Paris</name>
 		<xcood>129</xcood>
 		<ycood>843</ycood>
-		<faction>PIND</faction>
+		<faction>UND</faction>
 		<factionChange>
 			<date>3052-01-01</date>
 			<faction>CSJ</faction>
 		</factionChange>
 		<factionChange>
 			<date>3060-01-01</date>
-			<faction>PIND</faction>
+			<faction>ABN</faction>
 		</factionChange>
 		<factionChange>
 			<date>3070-06-01</date>
@@ -21974,12 +22058,15 @@ Outreach is the primary hiring location for the mercenary trade from the 3030s a
 			<date>3072-01-01</date>
 			<faction>CHH</faction>
 		</factionChange>
+		<spectralClass>K</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>V</luminosity>
 	</planet>
 	<planet>
 		<name>P9</name>
 		<xcood>-116</xcood>
 		<ycood>1036</ycood>
-		<faction>PIND</faction>
+		<faction>UND</faction>
 		<factionChange>
 			<date>3052-01-01</date>
 			<faction>CW</faction>
@@ -21988,6 +22075,9 @@ Outreach is the primary hiring location for the mercenary trade from the 3030s a
 			<date>3072-01-01</date>
 			<faction>CHH</faction>
 		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>II</luminosity>
 	</planet>
 	<planet>
 		<name>Pain</name>
@@ -22344,6 +22434,7 @@ Outreach is the primary hiring location for the mercenary trade from the 3030s a
 		<climate>3</climate>
 		<percentWater>60</percentWater>
 		<lifeForm>5</lifeForm>
+		<hpg>A</hpg>
 		<desc>No description available.</desc>
 	</planet>
 	<planet>
@@ -23190,6 +23281,7 @@ Poulsbo remains a lightly settled Military Outpost, whose civilian population is
 		<percentWater>50</percentWater>
 		<lifeForm>3</lifeForm>
 		<satellite>Opal</satellite>
+		<hpg>A</hpg>
 		<desc>No description available.</desc>
 	</planet>
 	<planet>
@@ -23695,11 +23787,18 @@ Even with its extreme weather, Rahne does support native life. A prime example i
 		<name>Ramsey</name>
 		<xcood>-403</xcood>
 		<ycood>1025</ycood>
-		<faction>PIND</faction>
+		<faction>UND</faction>
 		<factionChange>
 			<date>3052-01-01</date>
 			<faction>CSV</faction>
 		</factionChange>
+		<factionChange>
+			<date>3065-01-01</date>
+			<faction>ABN</faction>
+		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>V</luminosity>
 	</planet>
 	<planet>
 		<name>Randar</name>
@@ -24270,6 +24369,7 @@ Magna Metals Incorporated</desc>
 		<climate>3</climate>
 		<percentWater>50</percentWater>
 		<lifeForm>5</lifeForm>
+		<hpg>A</hpg>
 		<desc>No description available.</desc>
 	</planet>
 	<planet>
@@ -24798,8 +24898,12 @@ Magna Metals Incorporated</desc>
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3057-01-01</date>
-			<faction>IND</faction>
+			<date>3057-11-01</date>
+			<faction>SSUP</faction>
+		</factionChange>
+		<factionChange>
+			<date>3067-01-01</date>
+			<faction>CC</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -24859,15 +24963,18 @@ Magna Metals Incorporated</desc>
 		<name>Salonika</name>
 		<xcood>436</xcood>
 		<ycood>973</ycood>
-		<faction>PIND</faction>
+		<faction>UND</faction>
 		<factionChange>
 			<date>3052-01-01</date>
 			<faction>CNC</faction>
 		</factionChange>
 		<factionChange>
 			<date>3062-01-01</date>
-			<faction>PIND</faction>
+			<faction>ABN</faction>
 		</factionChange>
+		<spectralClass>A</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>V</luminosity>
 	</planet>
 	<planet>
 		<name>Saltillo</name>
@@ -24959,11 +25066,14 @@ Magna Metals Incorporated</desc>
 		<name>Santiago</name>
 		<xcood>-366</xcood>
 		<ycood>930</ycood>
-		<faction>PIND</faction>
+		<faction>UND</faction>
 		<factionChange>
 			<date>3052-01-01</date>
 			<faction>CJF</faction>
 		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>IV</luminosity>
 	</planet>
 	<planet>
 		<name>Saonara</name>
@@ -25063,7 +25173,11 @@ Magna Metals Incorporated</desc>
 		<name>Sarna</name>
 		<xcood>55.55</xcood>
 		<ycood>-156.22</ycood>
-		<faction>CC</faction>
+		<faction>SSUP</faction>
+		<factionChange>
+			<date>2367-01-01</date>
+			<faction>CC</faction>
+		</factionChange>
 		<factionChange>
 			<date>3030-01-01</date>
 			<faction>FS</faction>
@@ -25073,8 +25187,12 @@ Magna Metals Incorporated</desc>
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3058-01-01</date>
-			<faction>CM</faction>
+			<date>3057-11-01</date>
+			<faction>SSUP</faction>
+		</factionChange>
+		<factionChange>
+			<date>3067-01-01</date>
+			<faction>CC</faction>
 		</factionChange>
 		<pressure>3</pressure>
 		<gravity>1.03</gravity>
@@ -25622,6 +25740,7 @@ Tengo Aerospace</desc>
 		<climate>3</climate>
 		<percentWater>40</percentWater>
 		<lifeForm>5</lifeForm>
+		<hpg>A</hpg>
 		<desc>No description available.</desc>
 	</planet>
 	<planet>
@@ -25795,6 +25914,7 @@ Tengo Aerospace</desc>
 		<climate>3</climate>
 		<percentWater>80</percentWater>
 		<lifeForm>7</lifeForm>
+		<hpg>A</hpg>
 		<desc>No description available.</desc>
 	</planet>
 	<planet>
@@ -26618,6 +26738,10 @@ Solaris VII has two continents, Equatus is small, arid, mountainous and sparsely
 			<date>3030-01-01</date>
 			<faction>SIC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3063-01-01</date>
+			<faction>CC</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Spittal</name>
@@ -26715,6 +26839,10 @@ Solaris VII has two continents, Equatus is small, arid, mountainous and sparsely
 		<factionChange>
 			<date>3030-01-01</date>
 			<faction>SIC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3063-01-01</date>
+			<faction>CC</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -27056,8 +27184,8 @@ Corean Enterprises</desc>
 		<landMass>McKenna</landMass>
 		<landMass>Novy Terra</landMass>
 		<landMass>Kerensky Prime</landMass>
-		<desc>Strana Mechty ("Land of Dreams") is the Clan shared "capital" planet. The planet is the site that Nicolas Kerensky and the original 800 Clan founders fled to from the Pentagon Worlds. Strana Mechty houses the Hall of Khans where the leaders of the Clans meet for Grand Councils. Each Clan has an enclave on the planet. 
-		</desc>
+		<hpg>A</hpg>
+		<desc>Strana Mechty ("Land of Dreams") is the Clan shared "capital" planet. The planet is the site that Nicolas Kerensky and the original 800 Clan founders fled to from the Pentagon Worlds. Strana Mechty houses the Hall of Khans where the leaders of the Clans meet for Grand Councils. Each Clan has an enclave on the planet.</desc>
 	</planet>
 	<planet>
 		<name>Strandfontein</name>
@@ -27114,6 +27242,7 @@ Corean Enterprises</desc>
 		<climate>5</climate>
 		<percentWater>70</percentWater>
 		<lifeForm>6</lifeForm>
+		<hpg>A</hpg>
 		<desc>No description available.</desc>
 	</planet>
 	<planet>
@@ -27150,7 +27279,11 @@ Corean Enterprises</desc>
 		<name>Styk</name>
 		<xcood>42.51</xcood>
 		<ycood>-98.32</ycood>
-		<faction>CC</faction>
+		<faction>SSUP</faction>
+		<factionChange>
+			<date>2367-01-01</date>
+			<faction>CC</faction>
+		</factionChange>
 		<factionChange>
 			<date>3030-01-01</date>
 			<faction>FS</faction>
@@ -27160,8 +27293,12 @@ Corean Enterprises</desc>
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3058-01-01</date>
-			<faction>IND</faction>
+			<date>3057-11-01</date>
+			<faction>SKC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3063-01-01</date>
+			<faction>CC</faction>
 		</factionChange>
 		<pressure>3</pressure>
 		<gravity>1.1</gravity>
@@ -27196,15 +27333,18 @@ Tao ‘Mechworks</desc>
 		<name>Suda Bay</name>
 		<xcood>245</xcood>
 		<ycood>947</ycood>
-		<faction>PIND</faction>
+		<faction>UND</faction>
 		<factionChange>
 			<date>3052-01-01</date>
 			<faction>CSJ</faction>
 		</factionChange>
 		<factionChange>
 			<date>3062-01-01</date>
-			<faction>PIND</faction>
+			<faction>ABN</faction>
 		</factionChange>
+		<spectralClass>F</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>Ia</luminosity>
 	</planet>
 	<planet>
 		<name>Sudeten</name>
@@ -27683,6 +27823,10 @@ For most of the planet’s history it was a Lyran Commonwealth planet bordering 
 			<date>3030-01-01</date>
 			<faction>SIC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3063-01-01</date>
+			<faction>CC</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Tallmadge</name>
@@ -27791,6 +27935,7 @@ Forerunner A.G.</desc>
 		<climate>3</climate>
 		<percentWater>40</percentWater>
 		<lifeForm>2</lifeForm>
+		<hpg>A</hpg>
 		<desc>No description available.</desc>
 	</planet>
 	<planet>
@@ -27891,6 +28036,10 @@ Forerunner A.G.</desc>
 		<factionChange>
 			<date>3030-01-01</date>
 			<faction>SIC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3063-01-01</date>
+			<faction>CC</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -28000,6 +28149,7 @@ Forerunner A.G.</desc>
 		<climate>3</climate>
 		<percentWater>30</percentWater>
 		<lifeForm>2</lifeForm>
+		<hpg>A</hpg>
 		<desc>No description available.</desc>
 	</planet>
 	<planet>
@@ -28136,6 +28286,10 @@ Forerunner A.G.</desc>
 			<date>3030-01-01</date>
 			<faction>SIC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3063-01-01</date>
+			<faction>CC</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Teniente</name>
@@ -28256,6 +28410,10 @@ The Sol system contains multiple colonized planets, foremost are Mars and Venus.
 			<date>3030-01-01</date>
 			<faction>SIC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3063-01-01</date>
+			<faction>CC</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Teyvareb</name>
@@ -28275,15 +28433,18 @@ The Sol system contains multiple colonized planets, foremost are Mars and Venus.
 		<name>TF4</name>
 		<xcood>293</xcood>
 		<ycood>668</ycood>
-		<faction>PIND</faction>
+		<faction>UND</faction>
 		<factionChange>
 			<date>3052-01-01</date>
 			<faction>CSJ</faction>
 		</factionChange>
 		<factionChange>
 			<date>3062-01-01</date>
-			<faction>PIND</faction>
+			<faction>ABN</faction>
 		</factionChange>
+		<spectralClass>M</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>II</luminosity>
 	</planet>
 	<planet>
 		<name>Thadora's Land</name>
@@ -28632,6 +28793,7 @@ Earthwerks Incorporated</desc>
 		<climate>3</climate>
 		<percentWater>40</percentWater>
 		<lifeForm>5</lifeForm>
+		<hpg>A</hpg>
 		<desc>No description available.</desc>
 	</planet>
 	<planet>
@@ -28862,11 +29024,14 @@ The planet is heavily industrialized and for a long time was the top producer of
 		<name>TJ239H2</name>
 		<xcood>-169</xcood>
 		<ycood>611</ycood>
-		<faction>PIND</faction>
+		<faction>UND</faction>
 		<factionChange>
 			<date>3052-01-01</date>
 			<faction>CJF</faction>
 		</factionChange>
+		<spectralClass>k</spectralClass>
+		<subtype>7</subtype>
+		<luminosity>V</luminosity>
 	</planet>
 	<planet>
 		<name>Toffen</name>
@@ -29008,6 +29173,7 @@ The planet is heavily industrialized and for a long time was the top producer of
 		<climate>3</climate>
 		<percentWater>60</percentWater>
 		<lifeForm>6</lifeForm>
+		<hpg>A</hpg>
 		<desc>No description available.</desc>
 	</planet>
 	<planet>
@@ -29145,6 +29311,7 @@ The planet is heavily industrialized and for a long time was the top producer of
 		<climate>5</climate>
 		<percentWater>60</percentWater>
 		<lifeForm>5</lifeForm>
+		<hpg>A</hpg>
 		<desc>No description available.</desc>
 	</planet>
 	<planet>
@@ -29210,6 +29377,9 @@ The local population has long resented the Lyran Commonwealth for what they beli
 			<date>3052-01-01</date>
 			<faction>CGB</faction>
 		</factionChange>
+		<spectralClass>A</spectralClass>
+		<subtype>9</subtype>
+		<luminosity>II</luminosity>
 	</planet>
 	<planet>
 		<name>Trellisane</name>
@@ -29279,11 +29449,14 @@ The local population has long resented the Lyran Commonwealth for what they beli
 		<name>Trinity</name>
 		<xcood>-249</xcood>
 		<ycood>760</ycood>
-		<faction>PIND</faction>
+		<faction>UND</faction>
 		<factionChange>
 			<date>3052-01-01</date>
 			<faction>CJF</faction>
 		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>V</luminosity>
 	</planet>
 	<planet>
 		<name>Tripoli</name>
@@ -29369,9 +29542,16 @@ The local population has long resented the Lyran Commonwealth for what they beli
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3057-01-01</date>
+			<date>3057-10-01</date>
 			<faction>CC</faction>
 		</factionChange>
+		<lifeForm>7</lifeForm>
+		<spectralClass>G</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>6</sysPos>
+		<hpg>B</hpg>
+		<desc>On 25 March 3013, a horrible massacre of religious dissidents occurred on Truth. Unknown raiders attacked without provocation and killed over 50,000 men, women and children. Investigations were unable to determine the identity of the attackers. The few remaining inhabitants of Truth who escaped the carnage have since tried unsuccessfully to restore their agricultural colony to its former glory.</desc>
 	</planet>
 	<planet>
 		<name>Trznadel Cluster</name>
@@ -29453,9 +29633,19 @@ The local population has long resented the Lyran Commonwealth for what they beli
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3057-01-01</date>
+			<date>3057-10-01</date>
 			<faction>CC</faction>
 		</factionChange>
+		<zenithCharge>True</zenithCharge>
+		<lifeForm>2</lifeForm>
+		<spectralClass>K</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>5</sysPos>
+		<hpg>B</hpg>
+		<desc>Tsinghai, formerly New Sarna, was originally a provincial capital in the old Sarna Supremacy. With the formation of the Capellan Confederation, Tsinghai transitioned to a economy based on mining and grew to become a regional exporter of uranium and other fissionable materials. As the Succession Wars dragged on Tsinghai slowly became a planet-wide industrial complex as Sarna's commercial activities relocated here for protection. It is a modest planet with a temperate climate and is known primarily for its excellent wines.
+
+Tsinghai has repelled numerous Marik and bandit attacks that have decimated the population of this formerly thriving planet. Tsinghai industrial importance has been reduced but it is located in a strategic position, so the planet is garrisoned by a regiment of Sian reserves to discourage further raiding.</desc>
 	</planet>
 	<planet>
 		<name>Tsingtao</name>
@@ -30444,6 +30634,7 @@ In the early 31st Century an underground Star League-era ‘Mech research facili
 		<percentWater>60</percentWater>
 		<lifeForm>5</lifeForm>
 		<climate>3</climate>
+		<hpg>A</hpg>
 		<desc>No description available.</desc>
 	</planet>
 	<planet>
@@ -30577,6 +30768,10 @@ In the early 31st Century an underground Star League-era ‘Mech research facili
 		<factionChange>
 			<date>3062-01-01</date>
 			<faction>CHH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3065-01-01</date>
+			<faction>CGB</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -30758,6 +30953,13 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 			<date>3052-01-01</date>
 			<faction>CSV</faction>
 		</factionChange>
+		<factionChange>
+			<date>3065-01-01</date>
+			<faction>ABN</faction>
+		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>V</luminosity>
 	</planet>
 	<planet>
 		<name>Warlock</name>
@@ -30767,6 +30969,10 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<factionChange>
 			<date>3030-01-01</date>
 			<faction>SIC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3063-01-01</date>
+			<faction>CC</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -31309,6 +31515,9 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 			<date>3072-01-01</date>
 			<faction>CHH</faction>
 		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>IV</luminosity>
 	</planet>
 	<planet>
 		<name>Wolof</name>
@@ -31706,6 +31915,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<climate>3</climate>
 		<percentWater>70</percentWater>
 		<lifeForm>4</lifeForm>
+		<hpg>A</hpg>
 		<desc>No description available.</desc>
 	</planet>
 	<planet>
@@ -33316,5 +33526,463 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<subtype>6</subtype>
 		<luminosity>V</luminosity>
 		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>Castile</name>
+		<xcood>-650.09</xcood>
+		<ycood>1100.23</ycood>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2392-01-01</date>
+			<faction>NC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3080-02-15</date>
+			<faction>CGS</faction>
+		</factionChange>
+		<desc>No description available.</desc> 
+	</planet>
+	<planet>
+		<name>Granada</name>
+		<xcood>-667.04</xcood>
+		<ycood>1154.80</ycood>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2392-01-01</date>
+			<faction>NC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3080-01-26</date>
+			<faction>NC,CGS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3080-02-03</date>
+			<faction>CGS</faction>
+		</factionChange>
+		<desc>No description available.</desc> 
+	</planet>
+	<planet>
+		<name>Córdoba</name>
+		<xcood>-681.96</xcood>
+		<ycood>1144.31</ycood>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2392-01-01</date>
+			<faction>NC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3080-01-28</date>
+			<faction>CGS</faction>
+		</factionChange>
+		<desc>No description available.</desc> 
+	</planet>
+	<planet>
+		<name>Valencia</name>
+		<xcood>-700.49</xcood>
+		<ycood>1115.62</ycood>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2392-01-01</date>
+			<faction>NC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3080-01-23</date>
+			<faction>CGS</faction>
+		</factionChange>
+		<desc>No description available.</desc> 
+	</planet>
+	<planet>
+		<name>Navarre</name>
+		<xcood>-706.07</xcood>
+		<ycood>1138.50</ycood>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2392-01-01</date>
+			<faction>NC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3080-02-15</date>
+			<faction>CGS</faction>
+		</factionChange>
+		<desc>No description available.</desc> 
+	</planet>
+	<planet>
+		<name>Galicia</name>
+		<xcood>-656.67</xcood>
+		<ycood>1135.48</ycood>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2392-01-01</date>
+			<faction>NC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3080-02-15</date>
+			<faction>CGS</faction>
+		</factionChange>
+		<desc>No description available.</desc> 
+	</planet>
+	<planet>
+		<name>Aragon</name>
+		<xcood>-660.11</xcood>
+		<ycood>1119.78</ycood>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2392-01-01</date>
+			<faction>NC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3080-02-15</date>
+			<faction>CGS</faction>
+		</factionChange>
+		<desc>No description available.</desc> 
+	</planet>
+	<planet>
+		<name>León</name>
+		<xcood>-683.40</xcood>
+		<ycood>1094.89</ycood>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2392-01-01</date>
+			<faction>NC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3080-02-15</date>
+			<faction>CGS</faction>
+		</factionChange>
+		<desc>No description available.</desc> 
+	</planet>
+	<planet>
+		<name>Asturias</name>
+		<xcood>-711.66</xcood>
+		<ycood>1095.95</ycood>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2392-01-01</date>
+			<faction>NC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3080-02-15</date>
+			<faction>CGS</faction>
+		</factionChange>
+		<desc>No description available.</desc> 
+	</planet>
+	<planet>
+		<name>Wismar</name>
+		<xcood>-838.61</xcood>
+		<ycood>938.74</ycood>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2891-01-01</date>
+			<faction>HL</faction>
+		</factionChange>
+		<desc>No description available.</desc> 
+	</planet>
+	<planet>
+		<name>Stettin (HL)</name>
+		<xcood>-798.71</xcood>
+		<ycood>945.23</ycood>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2891-01-01</date>
+			<faction>HL</faction>
+		</factionChange>
+		<desc>No description available.</desc> 
+	</planet>
+	<planet>
+		<name>Novgorod</name>
+		<xcood>-751.95</xcood>
+		<ycood>934.45</ycood>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2891-01-01</date>
+			<faction>HL</faction>
+		</factionChange>
+		<desc>No description available.</desc> 
+	</planet>
+	<planet>
+		<name>Kampen</name>
+		<xcood>-731.54</xcood>
+		<ycood>900.86</ycood>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2891-01-01</date>
+			<faction>HL</faction>
+		</factionChange>
+		<desc>No description available.</desc> 
+	</planet>
+	<planet>
+		<name>Köningsberg</name>
+		<xcood>-830.04</xcood>
+		<ycood>891.05</ycood>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2891-01-01</date>
+			<faction>HL</faction>
+		</factionChange>
+		<desc>No description available.</desc> 
+	</planet>
+	<planet>
+		<name>Bruges</name>
+		<xcood>-778.79</xcood>
+		<ycood>880.12</ycood>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2891-01-01</date>
+			<faction>HL</faction>
+		</factionChange>
+		<desc>No description available.</desc> 
+	</planet>
+	<planet>
+		<name>Dorpat</name>
+		<xcood>-723.77</xcood>
+		<ycood>877.99</ycood>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2891-01-01</date>
+			<faction>HL</faction>
+		</factionChange>
+		<desc>No description available.</desc> 
+	</planet>
+	<planet>
+		<name>Antwerp</name>
+		<xcood>-661.40</xcood>
+		<ycood>864.13</ycood>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2891-01-01</date>
+			<faction>HL</faction>
+		</factionChange>
+		<desc>No description available.</desc> 
+	</planet>
+	<planet>
+		<name>Kalmar (HL)</name>
+		<xcood>-816.37</xcood>
+		<ycood>856.52</ycood>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2891-01-01</date>
+			<faction>HL</faction>
+		</factionChange>
+		<desc>No description available.</desc> 
+	</planet>
+	<planet>
+		<name>Riga (HL)</name>
+		<xcood>-855.10</xcood>
+		<ycood>853.84</ycood>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2891-01-01</date>
+			<faction>HL</faction>
+		</factionChange>
+		<desc>No description available.</desc> 
+	</planet>
+	<planet>
+		<name>Falsterbo (HL)</name>
+		<xcood>-763.72</xcood>
+		<ycood>837.80</ycood>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2891-01-01</date>
+			<faction>HL</faction>
+		</factionChange>
+		<desc>No description available.</desc> 
+	</planet>
+	<planet>
+		<name>Braunschweig</name>
+		<xcood>-679.48</xcood>
+		<ycood>844.34</ycood>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2891-01-01</date>
+			<faction>HL</faction>
+		</factionChange>
+		<desc>No description available.</desc> 
+	</planet>
+	<planet>
+		<name>Danzig</name>
+		<xcood>-634.89</xcood>
+		<ycood>841.73</ycood>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2891-01-01</date>
+			<faction>HL</faction>
+		</factionChange>
+		<desc>No description available.</desc> 
+	</planet>
+	<planet>
+		<name>Elbing (HL)</name>
+		<xcood>-823.57</xcood>
+		<ycood>813.01</ycood>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2891-01-01</date>
+			<faction>HL</faction>
+		</factionChange>
+		<desc>No description available.</desc> 
+	</planet>
+	<planet>
+		<name>Bremen (HL)</name>
+		<xcood>-781.41</xcood>
+		<ycood>801.31</ycood>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2891-01-01</date>
+			<faction>HL</faction>
+		</factionChange>
+		<desc>No description available.</desc> 
+	</planet>
+	<planet>
+		<name>Lübeck</name>
+		<xcood>-695.15</xcood>
+		<ycood>811.75</ycood>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2891-01-01</date>
+			<faction>HL</faction>
+		</factionChange>
+		<desc>No description available.</desc> 
+	</planet>
+	<planet>
+		<name>Hamburg</name>
+		<xcood>-616.73</xcood>
+		<ycood>801.03</ycood>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2891-01-01</date>
+			<faction>HL</faction>
+		</factionChange>
+		<desc>No description available.</desc> 
+	</planet>
+	<planet>
+		<name>Tomalov</name>
+		<xcood>-656.63</xcood>
+		<ycood>774.11</ycood>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2891-01-01</date>
+			<faction>HL</faction>
+		</factionChange>
+		<desc>No description available.</desc> 
+	</planet>
+	<planet>
+		<name>Dortmund</name>
+		<xcood>-725.12</xcood>
+		<ycood>776.31</ycood>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2891-01-01</date>
+			<faction>HL</faction>
+		</factionChange>
+		<desc>No description available.</desc> 
+	</planet>
+	<planet>
+		<name>Anklan</name>
+		<xcood>-854.18</xcood>
+		<ycood>774.64</ycood>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2891-01-01</date>
+			<faction>HL</faction>
+		</factionChange>
+		<desc>No description available.</desc> 
+	</planet>
+	<planet>
+		<name>Visby</name>
+		<xcood>-803.01</xcood>
+		<ycood>734.22</ycood>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2891-01-01</date>
+			<faction>HL</faction>
+		</factionChange>
+		<desc>No description available.</desc> 
+	</planet>
+	<planet>
+		<name>Bergen</name>
+		<xcood>-759.54</xcood>
+		<ycood>735.78</ycood>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2891-01-01</date>
+			<faction>HL</faction>
+		</factionChange>
+		<desc>No description available.</desc> 
+	</planet>
+	<planet>
+		<name>Goslar</name>
+		<xcood>-654.34</xcood>
+		<ycood>741.70</ycood>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2891-01-01</date>
+			<faction>HL</faction>
+		</factionChange>
+		<desc>No description available.</desc> 
+	</planet>
+	<planet>
+		<name>Stralsund</name>
+		<xcood>-643.64</xcood>
+		<ycood>729.83</ycood>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2891-01-01</date>
+			<faction>HL</faction>
+		</factionChange>
+		<desc>No description available.</desc> 
+	</planet>
+	<planet>
+		<name>Köln (HL)</name>
+		<xcood>-697.79</xcood>
+		<ycood>715.63</ycood>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2891-01-01</date>
+			<faction>HL</faction>
+		</factionChange>
+		<desc>No description available.</desc> 
+	</planet>
+	<planet>
+		<name>Lynn</name>
+		<xcood>-753.69</xcood>
+		<ycood>678.40</ycood>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2891-01-01</date>
+			<faction>HL</faction>
+		</factionChange>
+		<desc>No description available.</desc> 
+	</planet>
+	<planet>
+		<name>Thorn</name>
+		<xcood>-766.21</xcood>
+		<ycood>660.54</ycood>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2891-01-01</date>
+			<faction>HL</faction>
+		</factionChange>
+		<desc>No description available.</desc> 
+	</planet>
+	<planet>
+		<name>Gateway</name>
+		<xcood>-712.64</xcood>
+		<ycood>637.12</ycood>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2891-01-01</date>
+			<faction>HL</faction>
+		</factionChange>
+		<desc>No description available.</desc> 
+	</planet>
+	<planet>
+		<name>Greifswald</name>
+		<xcood>-659.35</xcood>
+		<ycood>664.24</ycood>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2891-01-01</date>
+			<faction>HL</faction>
+		</factionChange>
+		<desc>No description available.</desc> 
 	</planet>
 </planets>
