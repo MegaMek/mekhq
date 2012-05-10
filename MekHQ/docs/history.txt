@@ -48,6 +48,7 @@ v0.1.16 (SVN)
 + Patch 3522780 (Fix for bug 3522145) - Unable to use Get MUL when units have C3/C3i
 + Update 14 of planetary data
 + Updated MegaMek to latest version of SVN as of May 5, 2012
++ Update 15 of planetary data
 
 v0.1.15 (2012-02-11)
 + Bug 3486200: Previous version campaigns do not save...
