@@ -121,7 +121,7 @@
 		<ycood>-306.96</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -149,15 +149,15 @@
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3030-01-01</date>
-			<faction>PIND</faction>
+			<date>3029-01-01</date>
+			<faction>TFR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3040-01-01</date>
+			<date>3032-01-01</date>
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
@@ -189,7 +189,7 @@
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
@@ -245,7 +245,7 @@
 		<ycood>-295.79</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>MH</faction>
 		</factionChange>
 	</planet>
@@ -259,7 +259,7 @@
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -355,7 +355,7 @@ Addicks remains an important world today, though it has lost much of its glory o
 		<ycood>-429.69</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>TC</faction>
 		</factionChange>
 	</planet>
@@ -494,7 +494,7 @@ Aitutaki’s early settlers made a unique distinction by creating two capital ci
 		<ycood>180.21</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -536,7 +536,7 @@ Aitutaki’s early settlers made a unique distinction by creating two capital ci
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -719,7 +719,7 @@ Alarion is primarily settled by people of German, Romanian and English descent.<
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
@@ -751,7 +751,7 @@ Alarion is primarily settled by people of German, Romanian and English descent.<
 		<ycood>-199.25</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -769,7 +769,7 @@ Alarion is primarily settled by people of German, Romanian and English descent.<
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
@@ -896,7 +896,7 @@ Industrial, Command and logistical world, paperwork in this planet and its prefe
 		<ycood>-382.28</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>MH</faction>
 		</factionChange>
 	</planet>
@@ -957,7 +957,7 @@ Industrial, Command and logistical world, paperwork in this planet and its prefe
 		<ycood>-83.46</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -971,7 +971,7 @@ Industrial, Command and logistical world, paperwork in this planet and its prefe
 		<ycood>-14.6</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -985,7 +985,7 @@ Industrial, Command and logistical world, paperwork in this planet and its prefe
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
@@ -1031,7 +1031,7 @@ Industrial, Command and logistical world, paperwork in this planet and its prefe
 		<ycood>-31.04</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -1041,7 +1041,7 @@ Industrial, Command and logistical world, paperwork in this planet and its prefe
 		<ycood>155.44</ycood>
 		<faction>RWR</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 	</planet>
@@ -1093,7 +1093,7 @@ Industrial, Command and logistical world, paperwork in this planet and its prefe
 		<ycood>-62.07</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -1121,7 +1121,7 @@ Industrial, Command and logistical world, paperwork in this planet and its prefe
 		<ycood>117.1</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -1135,7 +1135,7 @@ Industrial, Command and logistical world, paperwork in this planet and its prefe
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -1217,7 +1217,7 @@ Industrial, Command and logistical world, paperwork in this planet and its prefe
 		<ycood>82.67</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -1275,7 +1275,7 @@ Industrial, Command and logistical world, paperwork in this planet and its prefe
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -1285,7 +1285,7 @@ Industrial, Command and logistical world, paperwork in this planet and its prefe
 		<ycood>110.84</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -1301,7 +1301,7 @@ Industrial, Command and logistical world, paperwork in this planet and its prefe
 		<ycood>225.85</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -1383,7 +1383,7 @@ Industrial, Command and logistical world, paperwork in this planet and its prefe
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 		<factionChange>
@@ -1424,7 +1424,7 @@ Industrial, Command and logistical world, paperwork in this planet and its prefe
 		<ycood>-54.51</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -1434,7 +1434,7 @@ Industrial, Command and logistical world, paperwork in this planet and its prefe
 		<ycood>97.54</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -1594,7 +1594,7 @@ Industrial, Command and logistical world, paperwork in this planet and its prefe
 		<ycood>-47.7</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 	</planet>
@@ -1608,7 +1608,7 @@ Industrial, Command and logistical world, paperwork in this planet and its prefe
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -1626,7 +1626,7 @@ Industrial, Command and logistical world, paperwork in this planet and its prefe
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 		<spectralClass>G</spectralClass>
@@ -1658,7 +1658,7 @@ Andurien Aerotech</desc>
 		<ycood>-218.55</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -1700,7 +1700,7 @@ Andurien Aerotech</desc>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -1738,7 +1738,7 @@ Andurien Aerotech</desc>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -1782,7 +1782,7 @@ Andurien Aerotech</desc>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 		<lifeForm>7</lifeForm>
@@ -1841,7 +1841,7 @@ Andurien Aerotech</desc>
 		<ycood>439.97</ycood>
 		<faction>RWR</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
@@ -1881,7 +1881,7 @@ Andurien Aerotech</desc>
 		<ycood>436.32</ycood>
 		<faction>RWR</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
@@ -1935,7 +1935,7 @@ Andurien Aerotech</desc>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
@@ -2158,7 +2158,7 @@ Salvatore Incorporated</desc>
 		<ycood>-488.35</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>TC</faction>
 		</factionChange>
 	</planet>
@@ -2294,7 +2294,7 @@ Salvatore Incorporated</desc>
 		<ycood>75.11</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -2393,7 +2393,7 @@ Salvatore Incorporated</desc>
 		<ycood>-101.97</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -2407,7 +2407,7 @@ Salvatore Incorporated</desc>
 		<ycood>-311.13</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -2435,7 +2435,7 @@ Salvatore Incorporated</desc>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -2457,7 +2457,7 @@ Salvatore Incorporated</desc>
 		<ycood>-317.97</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 		<pressure>3</pressure>
@@ -2484,7 +2484,7 @@ Salvatore Incorporated</desc>
 		<ycood>-102.49</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -2498,7 +2498,7 @@ Salvatore Incorporated</desc>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -2508,7 +2508,7 @@ Salvatore Incorporated</desc>
 		<ycood>-246.2</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -2576,7 +2576,7 @@ Imperator Automatic Weaponry</desc>
 			<faction>CFM,CIH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>CSJ,CFM,CIH</faction>
 		</factionChange>
 		<factionChange>
@@ -2624,7 +2624,7 @@ Imperator Automatic Weaponry</desc>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -2671,7 +2671,7 @@ Imperator Automatic Weaponry</desc>
 		<ycood>147.87</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -2830,7 +2830,7 @@ The primary industries on Augustine involve extracting raw minerals from the pla
 		<ycood>-277.49</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -2959,7 +2959,7 @@ The primary industries on Augustine involve extracting raw minerals from the pla
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
@@ -3037,7 +3037,7 @@ The primary industries on Augustine involve extracting raw minerals from the pla
 		<ycood>-337.48</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>MH</faction>
 		</factionChange>
 	</planet>
@@ -3047,7 +3047,7 @@ The primary industries on Augustine involve extracting raw minerals from the pla
 		<ycood>-291.84</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -3111,7 +3111,7 @@ The primary industries on Augustine involve extracting raw minerals from the pla
 		<ycood>-469.01</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>MOC</faction>
 		</factionChange>
 	</planet>
@@ -3121,7 +3121,7 @@ The primary industries on Augustine involve extracting raw minerals from the pla
 		<ycood>-355.66</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>MH</faction>
 		</factionChange>
 	</planet>
@@ -3175,7 +3175,7 @@ The primary industries on Augustine involve extracting raw minerals from the pla
 		<ycood>-59.97</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 	</planet>
@@ -3297,7 +3297,7 @@ The primary industries on Augustine involve extracting raw minerals from the pla
 		<ycood>415.19</ycood>
 		<faction>RWR</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
@@ -3386,7 +3386,7 @@ Barras is the hotbed of intelligence activity along the Confederation-FWL border
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -3410,7 +3410,7 @@ Barras is the hotbed of intelligence activity along the Confederation-FWL border
 		<ycood>344.52</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -3555,7 +3555,7 @@ Barras is the hotbed of intelligence activity along the Confederation-FWL border
 			<faction>CGB</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>CGB,CNC</faction>
 		</factionChange>
 		<factionChange>
@@ -3629,7 +3629,7 @@ Barras is the hotbed of intelligence activity along the Confederation-FWL border
 		<ycood>-245.93</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -3653,7 +3653,7 @@ Barras is the hotbed of intelligence activity along the Confederation-FWL border
 		<ycood>-110.84</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -3690,7 +3690,7 @@ Barras is the hotbed of intelligence activity along the Confederation-FWL border
 		<ycood>-44.6</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -3744,7 +3744,7 @@ Barras is the hotbed of intelligence activity along the Confederation-FWL border
 		<ycood>-455.49</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>TC</faction>
 		</factionChange>
 	</planet>
@@ -3808,7 +3808,7 @@ Barras is the hotbed of intelligence activity along the Confederation-FWL border
 		<ycood>448.58</ycood>
 		<faction>RWR</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
@@ -3852,7 +3852,7 @@ Barras is the hotbed of intelligence activity along the Confederation-FWL border
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -3872,7 +3872,7 @@ Barras is the hotbed of intelligence activity along the Confederation-FWL border
 		<ycood>-94.93</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -3906,7 +3906,7 @@ Barras is the hotbed of intelligence activity along the Confederation-FWL border
 		<ycood>387.81</ycood>
 		<faction>RWR</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
@@ -3948,7 +3948,7 @@ Barras is the hotbed of intelligence activity along the Confederation-FWL border
 		<ycood>-185.69</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -3982,7 +3982,7 @@ Barras is the hotbed of intelligence activity along the Confederation-FWL border
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
@@ -4243,7 +4243,7 @@ Bithinian Ballistics</desc>
 		<ycood>477.33</ycood>
 		<faction>RWR</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
@@ -4289,7 +4289,7 @@ Bithinian Ballistics</desc>
 		<ycood>-116.65</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 	</planet>
@@ -4303,7 +4303,7 @@ Bithinian Ballistics</desc>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
@@ -4444,7 +4444,7 @@ Bolan was primarily colonized by settlers from India, Pakistan and Afghanistan.<
 		<ycood>-45.64</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -4454,7 +4454,7 @@ Bolan was primarily colonized by settlers from India, Pakistan and Afghanistan.<
 		<ycood>428.76</ycood>
 		<faction>RWR</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
@@ -4538,7 +4538,7 @@ Bolan was primarily colonized by settlers from India, Pakistan and Afghanistan.<
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -4581,7 +4581,7 @@ Bolan was primarily colonized by settlers from India, Pakistan and Afghanistan.<
 		<ycood>487.44</ycood>
 		<faction>RWR</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
@@ -4980,7 +4980,7 @@ In 2998, the Brighton militia managed to withstand a siege by superior Federated
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -5097,15 +5097,15 @@ In 2998, the Brighton militia managed to withstand a siege by superior Federated
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3030-01-01</date>
-			<faction>PIND</faction>
+			<date>3029-01-01</date>
+			<faction>TFR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3040-01-01</date>
+			<date>3032-01-01</date>
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
@@ -5297,7 +5297,7 @@ Recently, a large island in the eastern basin has been taken over for secret tes
 		<ycood>466.57</ycood>
 		<faction>RWR</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
@@ -5351,7 +5351,7 @@ Recently, a large island in the eastern basin has been taken over for secret tes
 		<ycood>-427.55</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>TC</faction>
 		</factionChange>
 	</planet>
@@ -5412,7 +5412,7 @@ Recently, a large island in the eastern basin has been taken over for secret tes
 		<ycood>236.81</ycood>
 		<faction>RWR</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 	</planet>
@@ -5422,7 +5422,7 @@ Recently, a large island in the eastern basin has been taken over for secret tes
 		<ycood>195.08</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -5476,7 +5476,7 @@ Recently, a large island in the eastern basin has been taken over for secret tes
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 		<factionChange>
@@ -5537,7 +5537,7 @@ Earthwerks Incorporated</desc>
 		<ycood>-370.86</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -5623,7 +5623,7 @@ Camlann itself is barely able to sustain itself, the primarily industry and expo
 		<ycood>167.17</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -5641,7 +5641,7 @@ Camlann itself is barely able to sustain itself, the primarily industry and expo
 		<ycood>-166.39</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -5805,7 +5805,7 @@ Rashpur-Owens Incorporated</desc>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -5844,15 +5844,15 @@ Rashpur-Owens Incorporated</desc>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3030-01-01</date>
-			<faction>PIND</faction>
+			<date>3029-01-01</date>
+			<faction>TFR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3040-01-01</date>
+			<date>3032-01-01</date>
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
@@ -5882,7 +5882,7 @@ Rashpur-Owens Incorporated</desc>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -6076,7 +6076,7 @@ The planets primary industries and exports are plastics and plastisteel using th
 		<ycood>-468.04</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>TC</faction>
 		</factionChange>
 	</planet>
@@ -6086,7 +6086,7 @@ The planets primary industries and exports are plastics and plastisteel using th
 		<ycood>-439.53</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>TC</faction>
 		</factionChange>
 	</planet>
@@ -6100,15 +6100,15 @@ The planets primary industries and exports are plastics and plastisteel using th
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3030-01-01</date>
-			<faction>PIND</faction>
+			<date>3029-01-01</date>
+			<faction>TFR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3040-01-01</date>
+			<date>3032-01-01</date>
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
@@ -6122,7 +6122,7 @@ The planets primary industries and exports are plastics and plastisteel using th
 		<ycood>-47.99</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -6194,7 +6194,7 @@ The planets primary industries and exports are plastics and plastisteel using th
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 		<factionChange>
@@ -6280,7 +6280,7 @@ Cavanaugh II was settled by a mixture of English, Welsh and Scottish colonists.<
 		<ycood>120.49</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -6319,7 +6319,7 @@ Cavanaugh II was settled by a mixture of English, Welsh and Scottish colonists.<
 		<ycood>-81.89</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 		<spectralClass>G</spectralClass>
@@ -6458,7 +6458,7 @@ The capital city of Chahar is Benares, which is considered sacred to Lyran Hindu
 		<ycood>209.16</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -6502,7 +6502,7 @@ The capital city of Chahar is Benares, which is considered sacred to Lyran Hindu
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
@@ -6526,7 +6526,7 @@ The capital city of Chahar is Benares, which is considered sacred to Lyran Hindu
 		<ycood>-392.73</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>TC</faction>
 		</factionChange>
 	</planet>
@@ -6612,7 +6612,7 @@ The capital city of Chahar is Benares, which is considered sacred to Lyran Hindu
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -6913,7 +6913,7 @@ This led to a very hostile environment by the mid 3020s with many residents just
 		<ycood>-67.55</ycood>
 		<faction>RWR</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 		<pressure>3</pressure>
@@ -6951,7 +6951,7 @@ This led to a very hostile environment by the mid 3020s with many residents just
 		<ycood>-80.56</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 	</planet>
@@ -6965,7 +6965,7 @@ This led to a very hostile environment by the mid 3020s with many residents just
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 		<spectralClass>F</spectralClass>
@@ -7088,7 +7088,7 @@ This led to a very hostile environment by the mid 3020s with many residents just
 		<ycood>-502.51</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>TC</faction>
 		</factionChange>
 	</planet>
@@ -7118,7 +7118,7 @@ This led to a very hostile environment by the mid 3020s with many residents just
 		<ycood>-49.55</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -7219,7 +7219,7 @@ This led to a very hostile environment by the mid 3020s with many residents just
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>ABN</faction>
 		</factionChange>
 		<factionChange>
@@ -7249,7 +7249,7 @@ This led to a very hostile environment by the mid 3020s with many residents just
 		<ycood>-28.17</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -7263,7 +7263,7 @@ This led to a very hostile environment by the mid 3020s with many residents just
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -7273,7 +7273,7 @@ This led to a very hostile environment by the mid 3020s with many residents just
 		<ycood>-309.83</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -7311,7 +7311,7 @@ This led to a very hostile environment by the mid 3020s with many residents just
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
@@ -7347,7 +7347,7 @@ This led to a very hostile environment by the mid 3020s with many residents just
 		<ycood>-253.5</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -7427,7 +7427,7 @@ This led to a very hostile environment by the mid 3020s with many residents just
 		<ycood>-302.27</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -7455,7 +7455,7 @@ This led to a very hostile environment by the mid 3020s with many residents just
 		<ycood>-313.48</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -7539,7 +7539,7 @@ Coventry’s mineral, agricultural, and military economy is supplemented by a th
 		<ycood>-523.78</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>MOC</faction>
 		</factionChange>
 	</planet>
@@ -7549,7 +7549,7 @@ Coventry’s mineral, agricultural, and military economy is supplemented by a th
 		<ycood>473.63</ycood>
 		<faction>RWR</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
@@ -7611,7 +7611,7 @@ Coventry’s mineral, agricultural, and military economy is supplemented by a th
 		<ycood>-253.24</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -7645,7 +7645,7 @@ Coventry’s mineral, agricultural, and military economy is supplemented by a th
 		<ycood>394.85</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -7732,7 +7732,7 @@ Coventry’s mineral, agricultural, and military economy is supplemented by a th
 		<ycood>-351.67</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -7950,7 +7950,7 @@ The Jade Falcon, totem animal of the Clan with the same name, is from Dagda.</de
 		<ycood>-40.68</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -7966,7 +7966,7 @@ The Jade Falcon, totem animal of the Clan with the same name, is from Dagda.</de
 		<ycood>-198.21</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -8060,7 +8060,7 @@ The Jade Falcon, totem animal of the Clan with the same name, is from Dagda.</de
 		<ycood>-449.73</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>TC</faction>
 		</factionChange>
 	</planet>
@@ -8070,7 +8070,7 @@ The Jade Falcon, totem animal of the Clan with the same name, is from Dagda.</de
 		<ycood>-451.65</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>TC</faction>
 		</factionChange>
 	</planet>
@@ -8160,7 +8160,7 @@ The Jade Falcon, totem animal of the Clan with the same name, is from Dagda.</de
 		<ycood>200.82</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -8216,7 +8216,7 @@ The Jade Falcon, totem animal of the Clan with the same name, is from Dagda.</de
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -8362,7 +8362,7 @@ The Jade Falcon, totem animal of the Clan with the same name, is from Dagda.</de
 		<ycood>-70.16</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -8417,7 +8417,7 @@ The Jade Falcon, totem animal of the Clan with the same name, is from Dagda.</de
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -8431,7 +8431,7 @@ The Jade Falcon, totem animal of the Clan with the same name, is from Dagda.</de
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -8449,7 +8449,7 @@ The Jade Falcon, totem animal of the Clan with the same name, is from Dagda.</de
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 		<factionChange>
@@ -8543,7 +8543,7 @@ The Jade Falcon, totem animal of the Clan with the same name, is from Dagda.</de
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -8587,7 +8587,7 @@ The Jade Falcon, totem animal of the Clan with the same name, is from Dagda.</de
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 		<factionChange>
@@ -8687,7 +8687,7 @@ The Jade Falcon, totem animal of the Clan with the same name, is from Dagda.</de
 		<ycood>-62.97</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 	</planet>
@@ -8736,7 +8736,7 @@ The capital is currently Fort Dieron, but in the past San Martin and Tahlwynn ha
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 		<spectralClass>F</spectralClass>
@@ -8770,7 +8770,7 @@ The Free Worlds League finally established full control of the planet in the mid
 		<ycood>-468.13</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>TC</faction>
 		</factionChange>
 	</planet>
@@ -8786,7 +8786,7 @@ The Free Worlds League finally established full control of the planet in the mid
 		<ycood>232.63</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -8982,7 +8982,7 @@ Donegal is the home to many major trading companies, the Supreme Court of the Co
 		<ycood>493.04</ycood>
 		<faction>RWR</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
@@ -9010,7 +9010,7 @@ Donegal is the home to many major trading companies, the Supreme Court of the Co
 		<ycood>66.76</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -9065,7 +9065,7 @@ Donegal is the home to many major trading companies, the Supreme Court of the Co
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -9150,7 +9150,7 @@ The Malthus crime family had each of the 5 domed cities set up to cater to a dif
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -9316,7 +9316,7 @@ The Malthus crime family had each of the 5 domed cities set up to cater to a dif
 		<ycood>235.24</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -9403,7 +9403,7 @@ For much of its early history El Dorado was known for its JumShip yards. This en
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -9417,7 +9417,7 @@ For much of its early history El Dorado was known for its JumShip yards. This en
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -9478,15 +9478,15 @@ Overall the planet is comfortable for human habitation, with the unfortunate pro
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3030-01-01</date>
-			<faction>PIND</faction>
+			<date>3029-01-01</date>
+			<faction>TFR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3040-01-01</date>
+			<date>3032-01-01</date>
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
@@ -9520,7 +9520,7 @@ Elgin’s manufacturing capacity was dramatically reduced over the course of the
 		<ycood>487.44</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
@@ -9590,7 +9590,7 @@ Elgin’s manufacturing capacity was dramatically reduced over the course of the
 		<ycood>100.67</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -9668,7 +9668,7 @@ Elgin’s manufacturing capacity was dramatically reduced over the course of the
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -9756,7 +9756,7 @@ Elgin’s manufacturing capacity was dramatically reduced over the course of the
 		<ycood>-59.98</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -9770,15 +9770,15 @@ Elgin’s manufacturing capacity was dramatically reduced over the course of the
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3030-01-01</date>
-			<faction>PIND</faction>
+			<date>3029-01-01</date>
+			<faction>TFR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3040-01-01</date>
+			<date>3032-01-01</date>
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
@@ -9796,15 +9796,15 @@ Elgin’s manufacturing capacity was dramatically reduced over the course of the
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3030-01-01</date>
-			<faction>PIND</faction>
+			<date>3029-01-01</date>
+			<faction>TFR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3040-01-01</date>
+			<date>3032-01-01</date>
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
@@ -9818,7 +9818,7 @@ Elgin’s manufacturing capacity was dramatically reduced over the course of the
 		<ycood>449.88</ycood>
 		<faction>RWR</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
@@ -9885,7 +9885,7 @@ Elgin’s manufacturing capacity was dramatically reduced over the course of the
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -10138,7 +10138,7 @@ As of 3025 Exedor had a tiny population, consisting primarily of refugees from t
 		<ycood>447.34</ycood>
 		<faction>UND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
@@ -10180,7 +10180,7 @@ As of 3025 Exedor had a tiny population, consisting primarily of refugees from t
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -10190,7 +10190,7 @@ As of 3025 Exedor had a tiny population, consisting primarily of refugees from t
 		<ycood>365.38</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -10252,7 +10252,7 @@ As of 3025 Exedor had a tiny population, consisting primarily of refugees from t
 		<ycood>510.37</ycood>
 		<faction>RWR</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
@@ -10388,7 +10388,7 @@ As of 3025 Exedor had a tiny population, consisting primarily of refugees from t
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 		<pressure>3</pressure>
@@ -10426,15 +10426,15 @@ Fuisgon-Flame Tech</desc>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3030-01-01</date>
+			<date>3029-01-01</date>
 			<faction>TFR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3031-01-01</date>
+			<date>3032-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -10515,7 +10515,7 @@ For much of its history Fletcher has been the site of an historic cemetery which
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -10693,7 +10693,7 @@ For much of its history Fletcher has been the site of an historic cemetery which
 		<ycood>-336.43</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -10753,7 +10753,7 @@ For much of its history Fletcher has been the site of an historic cemetery which
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -10800,7 +10800,7 @@ For much of its history Fletcher has been the site of an historic cemetery which
 		<ycood>-286.62</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -10844,7 +10844,7 @@ For much of its history Fletcher has been the site of an historic cemetery which
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date> 
+			<date>2790-01-01</date> 
 			<faction>LA</faction>
 		</factionChange> 
 		<factionChange> 
@@ -10881,7 +10881,7 @@ For much of its history Fletcher has been the site of an historic cemetery which
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -10931,7 +10931,7 @@ For much of its history Fletcher has been the site of an historic cemetery which
 		<ycood>-72.5</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -10988,7 +10988,7 @@ When Gallery was originally settled there were no native lifeforms so the origin
 		<ycood>-164.83</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -11033,7 +11033,7 @@ When Gallery was originally settled there were no native lifeforms so the origin
 		<ycood>253.24</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -11146,7 +11146,7 @@ When Gallery was originally settled there were no native lifeforms so the origin
 		<ycood>-464.36</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>TC</faction>
 		</factionChange>
 	</planet>
@@ -11242,7 +11242,7 @@ When Gallery was originally settled there were no native lifeforms so the origin
 		<ycood>-491.64</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>TC</faction>
 		</factionChange>
 	</planet>
@@ -11286,7 +11286,7 @@ The Capellan Institute of Linguistics was established on Geifer in 2978. The Ins
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
@@ -11437,7 +11437,7 @@ Brigadier Corporation</desc>
 		<ycood>114.23</ycood>
 		<faction>RWR</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 	</planet>
@@ -11519,7 +11519,7 @@ Brigadier Corporation</desc>
 		<ycood>-320.52</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -11649,7 +11649,7 @@ Brigadier Corporation</desc>
 		<ycood>403.98</ycood>
 		<faction>RWR</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
@@ -11679,7 +11679,7 @@ Brigadier Corporation</desc>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -11689,7 +11689,7 @@ Brigadier Corporation</desc>
 		<ycood>-242.28</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -11737,7 +11737,7 @@ Brigadier Corporation</desc>
 		<ycood>460.8</ycood>
 		<faction>RWR</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
@@ -11793,7 +11793,7 @@ Brigadier Corporation</desc>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 		<factionChange>
@@ -11819,7 +11819,7 @@ Brigadier Corporation</desc>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -12015,7 +12015,7 @@ Brigadier Corporation</desc>
 		<ycood>-77.2</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -12055,7 +12055,7 @@ Brigadier Corporation</desc>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -12065,7 +12065,7 @@ Brigadier Corporation</desc>
 		<ycood>188.56</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -12181,7 +12181,7 @@ Brigadier Corporation</desc>
 		<ycood>292.88</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -12207,7 +12207,7 @@ Brigadier Corporation</desc>
 		<ycood>-233.93</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -12231,7 +12231,7 @@ Brigadier Corporation</desc>
 		<ycood>470.4</ycood>
 		<faction>RWR</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
@@ -12280,7 +12280,7 @@ Brigadier Corporation</desc>
 		<ycood>-242.8</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -12300,7 +12300,7 @@ Brigadier Corporation</desc>
 		<ycood>-264.97</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -12320,7 +12320,7 @@ Brigadier Corporation</desc>
 		<ycood>270.97</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -12346,7 +12346,7 @@ Brigadier Corporation</desc>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -12400,15 +12400,15 @@ Brigadier Corporation</desc>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3030-01-01</date>
-			<faction>PIND</faction>
+			<date>3029-01-01</date>
+			<faction>TFR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3040-01-01</date>
+			<date>3032-01-01</date>
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
@@ -12422,7 +12422,7 @@ Brigadier Corporation</desc>
 		<ycood>-77.2</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -12460,7 +12460,7 @@ Brigadier Corporation</desc>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
@@ -12520,7 +12520,7 @@ Brigadier Corporation</desc>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -12588,7 +12588,7 @@ Brigadier Corporation</desc>
 		<ycood>-92.36</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 	</planet>
@@ -12626,7 +12626,7 @@ Brigadier Corporation</desc>
 		<ycood>83.2</ycood>
 		<faction>DC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -12667,7 +12667,7 @@ Brigadier Corporation</desc>
 		<ycood>-143.18</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -12683,7 +12683,7 @@ Brigadier Corporation</desc>
 		<ycood>378.68</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -12729,7 +12729,7 @@ Brigadier Corporation</desc>
 		<ycood>-161.96</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -12789,7 +12789,7 @@ Brigadier Corporation</desc>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -12860,7 +12860,7 @@ Brigadier Corporation</desc>
 		<ycood>280.36</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -12882,7 +12882,7 @@ Brigadier Corporation</desc>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -12918,7 +12918,7 @@ Brigadier Corporation</desc>
 		<ycood>-516.72</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>TC</faction>
 		</factionChange>
 	</planet>
@@ -13023,7 +13023,7 @@ Freeport Armorworks</desc>
 		<ycood>448.84</ycood>
 		<faction>RWR</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
@@ -13339,7 +13339,7 @@ The planet and the factories have been the target of invasion numerous times thr
 		<ycood>351.56</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -13407,7 +13407,7 @@ The planet and the factories have been the target of invasion numerous times thr
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -13421,7 +13421,7 @@ The planet and the factories have been the target of invasion numerous times thr
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -13553,7 +13553,7 @@ The planet and the factories have been the target of invasion numerous times thr
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -13635,15 +13635,15 @@ The planet and the factories have been the target of invasion numerous times thr
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3030-01-01</date>
-			<faction>PIND</faction>
+			<date>3029-01-01</date>
+			<faction>TFR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3040-01-01</date>
+			<date>3032-01-01</date>
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
@@ -13731,7 +13731,7 @@ The planet and the factories have been the target of invasion numerous times thr
 		<ycood>134.85</ycood>
 		<faction>RWR</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 	</planet>
@@ -13885,7 +13885,7 @@ The planet and the factories have been the target of invasion numerous times thr
 		<ycood>279.58</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -13909,7 +13909,7 @@ The planet and the factories have been the target of invasion numerous times thr
 		<ycood>-129.1</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -13919,7 +13919,7 @@ The planet and the factories have been the target of invasion numerous times thr
 		<ycood>417.54</ycood>
 		<faction>RWR</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
@@ -13977,7 +13977,7 @@ The planet and the factories have been the target of invasion numerous times thr
 		<ycood>-286.62</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -13991,7 +13991,7 @@ The planet and the factories have been the target of invasion numerous times thr
 		<ycood>-250.63</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -14054,7 +14054,7 @@ The planet and the factories have been the target of invasion numerous times thr
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -14076,7 +14076,7 @@ The planet and the factories have been the target of invasion numerous times thr
 		<ycood>-280.36</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -14204,15 +14204,15 @@ The planet and the factories have been the target of invasion numerous times thr
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3030-01-01</date>
-			<faction>PIND</faction>
+			<date>3029-01-01</date>
+			<faction>TFR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3040-01-01</date>
+			<date>3032-01-01</date>
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
@@ -14266,7 +14266,7 @@ The planet and the factories have been the target of invasion numerous times thr
 		<ycood>-234.98</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -14515,7 +14515,7 @@ Irian’s terrain is best described as bland. The planet’s terrain is dominate
 		<ycood>221.42</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -14557,7 +14557,7 @@ Irian’s terrain is best described as bland. The planet’s terrain is dominate
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -14797,7 +14797,7 @@ Irian’s terrain is best described as bland. The planet’s terrain is dominate
 		<ycood>-300.18</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -14899,7 +14899,7 @@ Irian’s terrain is best described as bland. The planet’s terrain is dominate
 		<ycood>-290.53</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -15099,7 +15099,7 @@ Quikscell Company</desc>
 		<ycood>324.96</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -15165,7 +15165,7 @@ Quikscell Company</desc>
 		<ycood>198.47</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -15197,7 +15197,7 @@ Quikscell Company</desc>
 		<ycood>279.58</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -15314,7 +15314,7 @@ Kaumberg was primarily settled by colonists hailing from Germany and Austria.</d
 		<ycood>84.24</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -15324,7 +15324,7 @@ Kaumberg was primarily settled by colonists hailing from Germany and Austria.</d
 		<ycood>97.28</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -15334,7 +15334,7 @@ Kaumberg was primarily settled by colonists hailing from Germany and Austria.</d
 		<ycood>80.85</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -15354,7 +15354,7 @@ Kaumberg was primarily settled by colonists hailing from Germany and Austria.</d
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -15416,15 +15416,15 @@ Kaumberg was primarily settled by colonists hailing from Germany and Austria.</d
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3030-01-01</date>
-			<faction>PIND</faction>
+			<date>3029-01-01</date>
+			<faction>TFR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3040-01-01</date>
+			<date>3032-01-01</date>
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
@@ -15554,7 +15554,7 @@ Kali Yama - Alphard Trading Corporation</desc>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -15568,7 +15568,7 @@ Kali Yama - Alphard Trading Corporation</desc>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -15600,7 +15600,7 @@ Kali Yama - Alphard Trading Corporation</desc>
 		<ycood>84.24</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -15748,7 +15748,7 @@ Exeter Organization</desc>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -15814,7 +15814,7 @@ Exeter Organization</desc>
 		<ycood>100.67</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -15869,7 +15869,7 @@ Exeter Organization</desc>
 		<ycood>386.24</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -16146,7 +16146,7 @@ Gortex Multi-E</desc>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -16249,7 +16249,7 @@ The massive volcanic eruptions quickly changed the planet’s climate from tropi
 		<ycood>92.84</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -16285,7 +16285,7 @@ The massive volcanic eruptions quickly changed the planet’s climate from tropi
 		<ycood>97.28</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -16453,7 +16453,7 @@ The planet itself is resource poor and has little to offer for export. However, 
 		<ycood>344.52</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -16475,7 +16475,7 @@ The planet itself is resource poor and has little to offer for export. However, 
 		<ycood>-267.36</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -16509,7 +16509,7 @@ The planet itself is resource poor and has little to offer for export. However, 
 		<ycood>67.29</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -16533,7 +16533,7 @@ The planet itself is resource poor and has little to offer for export. However, 
 		<ycood>-262.36</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -16577,7 +16577,7 @@ The planet itself is resource poor and has little to offer for export. However, 
 		<ycood>-121.01</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -16647,7 +16647,7 @@ The planet itself is resource poor and has little to offer for export. However, 
 		<ycood>448.23</ycood>
 		<faction>RWR</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
@@ -16731,7 +16731,7 @@ The planet itself is resource poor and has little to offer for export. However, 
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -16858,7 +16858,7 @@ The planet itself is resource poor and has little to offer for export. However, 
 		<ycood>481.44</ycood>
 		<faction>RWR</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
@@ -16902,7 +16902,7 @@ The planet itself is resource poor and has little to offer for export. However, 
 		<ycood>-447.84</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>TC</faction>
 		</factionChange>
 	</planet>
@@ -17029,7 +17029,7 @@ The planet itself is resource poor and has little to offer for export. However, 
 		<ycood>-149.44</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -17107,7 +17107,7 @@ The planet itself is resource poor and has little to offer for export. However, 
 		<ycood>-189.6</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 		<spectralClass>F</spectralClass>
@@ -17189,7 +17189,7 @@ The primary industry on Les Halles is the extraction and refining of fuel used i
 		<ycood>-209.3</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
@@ -17328,7 +17328,7 @@ The primary industry on Les Halles is the extraction and refining of fuel used i
 		<ycood>-217.73</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
@@ -17362,7 +17362,7 @@ The primary industry on Les Halles is the extraction and refining of fuel used i
 		<ycood>-122.05</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -17392,7 +17392,7 @@ The primary industry on Les Halles is the extraction and refining of fuel used i
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
@@ -17452,7 +17452,7 @@ The primary industry on Les Halles is the extraction and refining of fuel used i
 		<ycood>-230.59</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
@@ -17550,7 +17550,7 @@ The primary industry on Les Halles is the extraction and refining of fuel used i
 		<ycood>-333.3</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 		<pressure>3</pressure>
@@ -17580,7 +17580,7 @@ Magna Metals, Incorporated</desc>
 		<ycood>-174.27</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
@@ -17628,7 +17628,7 @@ The continents of Sorania and Padawa are mostly temperate and are the sites of t
 		<ycood>254.28</ycood>
 		<faction>RWR</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
@@ -17660,7 +17660,7 @@ The continents of Sorania and Padawa are mostly temperate and are the sites of t
 		<ycood>222.72</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -17710,7 +17710,7 @@ The continents of Sorania and Padawa are mostly temperate and are the sites of t
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -17869,7 +17869,7 @@ The continents of Sorania and Padawa are mostly temperate and are the sites of t
 		<ycood>-206.64</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
@@ -17889,7 +17889,7 @@ The continents of Sorania and Padawa are mostly temperate and are the sites of t
 		<ycood>-333.82</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -18011,7 +18011,7 @@ The continents of Sorania and Padawa are mostly temperate and are the sites of t
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
@@ -18239,7 +18239,7 @@ The continents of Sorania and Padawa are mostly temperate and are the sites of t
 		<ycood>381.29</ycood>
 		<faction>RWR</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
@@ -18255,11 +18255,7 @@ The continents of Sorania and Padawa are mostly temperate and are the sites of t
 		<name>Mallory's World</name>
 		<xcood>112.4</xcood>
 		<ycood>6</ycood>
-		<faction>TA</faction>
-		<factionChange>
-			<date>2315-01-01</date>
-			<faction>TH</faction>
-		</factionChange>
+		<faction>IND</faction>
 		<factionChange>
 			<date>2596-01-01</date>
 			<faction>FS</faction>
@@ -18310,7 +18306,7 @@ Most of the population lives in small cities dotting the 4 continents.  There ar
 		<ycood>-295.49</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -18324,7 +18320,7 @@ Most of the population lives in small cities dotting the 4 continents.  There ar
 		<ycood>522.15</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
@@ -18370,7 +18366,7 @@ Most of the population lives in small cities dotting the 4 continents.  There ar
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -18464,7 +18460,7 @@ Most of the population lives in small cities dotting the 4 continents.  There ar
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -18498,7 +18494,7 @@ Most of the population lives in small cities dotting the 4 continents.  There ar
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 		<factionChange>
@@ -18559,7 +18555,7 @@ Most of the population lives in small cities dotting the 4 continents.  There ar
 		<ycood>98.58</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -18879,7 +18875,7 @@ Waytani Incorporated</desc>
 		<ycood>247.5</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -18925,7 +18921,7 @@ Waytani Incorporated</desc>
 		<ycood>-127.75</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 	</planet>
@@ -18971,7 +18967,7 @@ Thanks in part to the lack of major industry and the rough, unforgiving terrain 
 		<ycood>-45.64</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -19099,7 +19095,7 @@ Thanks in part to the lack of major industry and the rough, unforgiving terrain 
 		<ycood>-42.25</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -19190,7 +19186,7 @@ Thanks in part to the lack of major industry and the rough, unforgiving terrain 
 		<ycood>311.4</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -19222,7 +19218,7 @@ Thanks in part to the lack of major industry and the rough, unforgiving terrain 
 		<ycood>-347.91</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -19240,7 +19236,7 @@ Thanks in part to the lack of major industry and the rough, unforgiving terrain 
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
@@ -19338,7 +19334,7 @@ Thanks in part to the lack of major industry and the rough, unforgiving terrain 
 		<ycood>-239.41</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -19422,7 +19418,7 @@ Thanks in part to the lack of major industry and the rough, unforgiving terrain 
 		<ycood>-55.03</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -19508,7 +19504,7 @@ Thanks in part to the lack of major industry and the rough, unforgiving terrain 
 		<ycood>-437.09</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>TC</faction>
 		</factionChange>
 	</planet>
@@ -19522,7 +19518,7 @@ Thanks in part to the lack of major industry and the rough, unforgiving terrain 
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -19611,7 +19607,7 @@ Thanks in part to the lack of major industry and the rough, unforgiving terrain 
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -19645,7 +19641,7 @@ Thanks in part to the lack of major industry and the rough, unforgiving terrain 
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
@@ -19667,7 +19663,7 @@ Thanks in part to the lack of major industry and the rough, unforgiving terrain 
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -19727,7 +19723,7 @@ Thanks in part to the lack of major industry and the rough, unforgiving terrain 
 		<ycood>-52.42</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -19745,7 +19741,7 @@ Thanks in part to the lack of major industry and the rough, unforgiving terrain 
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -19769,7 +19765,7 @@ Thanks in part to the lack of major industry and the rough, unforgiving terrain 
 		<ycood>-482.33</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>TC</faction>
 		</factionChange>
 		<spectralClass>G</spectralClass>
@@ -19792,7 +19788,7 @@ Thanks in part to the lack of major industry and the rough, unforgiving terrain 
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<pressure>3</pressure>
@@ -19871,7 +19867,7 @@ Thanks in part to the lack of major industry and the rough, unforgiving terrain 
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
@@ -19965,7 +19961,7 @@ Mizar has been a resort planet of some renown since before the time of the Star 
 		<ycood>-185.69</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -20057,7 +20053,7 @@ Mizar has been a resort planet of some renown since before the time of the Star 
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -20079,7 +20075,7 @@ Mizar has been a resort planet of some renown since before the time of the Star 
 		<ycood>-133.53</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -20137,7 +20133,7 @@ Mizar has been a resort planet of some renown since before the time of the Star 
 		<ycood>322.35</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -20207,7 +20203,7 @@ Mizar has been a resort planet of some renown since before the time of the Star 
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 		<nadirCharge>True</nadirCharge>
@@ -20242,7 +20238,7 @@ Bagamoyo Aerospace Manufacturing</desc>
 		<ycood>365.38</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -20302,7 +20298,7 @@ Bagamoyo Aerospace Manufacturing</desc>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
@@ -20324,7 +20320,7 @@ Bagamoyo Aerospace Manufacturing</desc>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -20386,7 +20382,7 @@ Bagamoyo Aerospace Manufacturing</desc>
 		<ycood>213.07</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -20416,15 +20412,15 @@ Bagamoyo Aerospace Manufacturing</desc>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3030-01-01</date>
+			<date>3029-01-01</date>
 			<faction>TFR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3031-01-01</date>
+			<date>3032-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -20469,7 +20465,7 @@ Kallon Industries</desc>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -20487,7 +20483,7 @@ Kallon Industries</desc>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -20600,7 +20596,7 @@ Necromo is overall a comfortable planet to live despite arid conditions. The pla
 		<ycood>-26.08</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -20775,7 +20771,7 @@ The terrain surrounding Avalon City is a mixture of forests, mountains, plains a
 		<ycood>409.2</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -20809,7 +20805,7 @@ The terrain surrounding Avalon City is a mixture of forests, mountains, plains a
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
@@ -20898,7 +20894,7 @@ New Capetown is moderately industrialized and is a comfortable temperate planet.
 		<ycood>-141.88</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 		<spectralClass>G</spectralClass>
@@ -20931,7 +20927,7 @@ New Capetown is moderately industrialized and is a comfortable temperate planet.
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
@@ -21034,15 +21030,15 @@ New Hessen was occupied several times during the Succession Wars. However, New H
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3030-01-01</date>
-			<faction>PIND</faction>
+			<date>3029-01-01</date>
+			<faction>TFR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3040-01-01</date>
+			<date>3032-01-01</date>
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
@@ -21056,7 +21052,7 @@ New Hessen was occupied several times during the Succession Wars. However, New H
 		<ycood>-33.12</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -21205,7 +21201,7 @@ Kyoto has an extensiveindustrial presence with many factories and other industri
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -21272,7 +21268,7 @@ Most industry on the planet is centered around catering to the rich individuals 
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -21334,7 +21330,7 @@ During the Jihad, Kiyomori Minamoto temporarily relocated the capital back to Ne
 		<ycood>-108.78</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 		<lifeForm>5</lifeForm>
@@ -21440,7 +21436,7 @@ In contrast to the heavily industrialized northern hemisphere, the southern hemi
 		<ycood>114.49</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -21568,7 +21564,7 @@ In contrast to the heavily industrialized northern hemisphere, the southern hemi
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -21582,7 +21578,7 @@ In contrast to the heavily industrialized northern hemisphere, the southern hemi
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
@@ -21722,7 +21718,7 @@ Niops VII is a cold planet with access to sufficient resources to keep the Assoc
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -21758,7 +21754,7 @@ Niops VII is a cold planet with access to sufficient resources to keep the Assoc
 		<ycood>-54.51</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -21786,7 +21782,7 @@ Niops VII is a cold planet with access to sufficient resources to keep the Assoc
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -21826,7 +21822,7 @@ Niops VII is a cold planet with access to sufficient resources to keep the Assoc
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -22011,7 +22007,7 @@ Niops VII is a cold planet with access to sufficient resources to keep the Assoc
 		<ycood>242.02</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -22132,7 +22128,7 @@ Niops VII is a cold planet with access to sufficient resources to keep the Assoc
 		<ycood>502.74</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
@@ -22183,7 +22179,7 @@ Niops VII is a cold planet with access to sufficient resources to keep the Assoc
 		<ycood>477.52</ycood>
 		<faction>RWR</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
@@ -22282,7 +22278,7 @@ Niops VII is a cold planet with access to sufficient resources to keep the Assoc
 		<ycood>-122.84</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 		<spectralClass>F</spectralClass>
@@ -22405,10 +22401,10 @@ The corruption on planet has resulted in the more inhabited continent of Rossoni
 		<faction>TA</faction>
 		<factionChange>
 			<date>2315-01-01</date>
-			<faction>FH</faction>
+			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 		<factionChange>
@@ -22485,7 +22481,7 @@ Brigadier Corporation</desc>
 		<ycood>169.52</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -22564,7 +22560,7 @@ Oriente Weapons Works</desc>
 		<ycood>-402.6</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>TC</faction>
 		</factionChange>
 	</planet>
@@ -22588,7 +22584,7 @@ Oriente Weapons Works</desc>
 		<ycood>-455.49</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>TC</faction>
 		</factionChange>
 	</planet>
@@ -22635,7 +22631,7 @@ Oriente Weapons Works</desc>
 		<ycood>126.23</ycood>
 		<faction>RWR</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 	</planet>
@@ -22756,7 +22752,7 @@ Outreach is the primary hiring location for the mercenary trade from the 3030s a
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -22804,7 +22800,7 @@ Outreach is the primary hiring location for the mercenary trade from the 3030s a
 		<ycood>352.78</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 	</planet>
@@ -23004,7 +23000,7 @@ Outreach is the primary hiring location for the mercenary trade from the 3030s a
 		<ycood>47.99</ycood>
 		<faction>FS</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -23014,7 +23010,7 @@ Outreach is the primary hiring location for the mercenary trade from the 3030s a
 		<ycood>-111.88</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -23088,7 +23084,7 @@ Outreach is the primary hiring location for the mercenary trade from the 3030s a
 		<ycood>-256.76</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
@@ -23102,7 +23098,7 @@ Outreach is the primary hiring location for the mercenary trade from the 3030s a
 		<ycood>484.03</ycood>
 		<faction>RWR</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
@@ -23248,7 +23244,7 @@ Outreach is the primary hiring location for the mercenary trade from the 3030s a
 		<ycood>409.98</ycood>
 		<faction>RWR</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
@@ -23423,7 +23419,7 @@ Outreach is the primary hiring location for the mercenary trade from the 3030s a
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -23433,7 +23429,7 @@ Outreach is the primary hiring location for the mercenary trade from the 3030s a
 		<ycood>208.12</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -23443,7 +23439,7 @@ Outreach is the primary hiring location for the mercenary trade from the 3030s a
 		<ycood>-378.68</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -23505,7 +23501,7 @@ Outreach is the primary hiring location for the mercenary trade from the 3030s a
 		<ycood>494.66</ycood>
 		<faction>RWR</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
@@ -23653,7 +23649,7 @@ Outreach is the primary hiring location for the mercenary trade from the 3030s a
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 		<factionChange>
@@ -23689,7 +23685,7 @@ Outreach is the primary hiring location for the mercenary trade from the 3030s a
 		<ycood>-323.29</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>MH</faction>
 		</factionChange>
 	</planet>
@@ -23782,7 +23778,7 @@ Port Moseby itself is an ordinary planet, comfortable for human life with no ext
 		<ycood>480.13</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
@@ -23922,7 +23918,7 @@ Poulsbo remains a lightly settled Military Outpost, whose civilian population is
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -24035,11 +24031,11 @@ Poulsbo remains a lightly settled Military Outpost, whose civilian population is
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 		<factionChange>
@@ -24047,11 +24043,11 @@ Poulsbo remains a lightly settled Military Outpost, whose civilian population is
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3030-01-01</date>
-			<faction>FS</faction>
+			<date>3029-01-01</date>
+			<faction>TFR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3040-01-01</date>
+			<date>3032-01-01</date>
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
@@ -24086,7 +24082,7 @@ While the planet was once home to a sprawling Brigadier Corporation ‘Mech fact
 		<ycood>-73.02</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -24102,7 +24098,7 @@ While the planet was once home to a sprawling Brigadier Corporation ‘Mech fact
 		<ycood>34.16</ycood>
 		<faction>FS</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<spectralClass>K</spectralClass>
@@ -24222,7 +24218,7 @@ The location of Proserpina on the Federated Suns border requires the DCMS to kee
 		<ycood>234.72</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -24280,7 +24276,7 @@ The location of Proserpina on the Federated Suns border requires the DCMS to kee
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -24324,7 +24320,7 @@ The location of Proserpina on the Federated Suns border requires the DCMS to kee
 		<ycood>-221.68</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -24535,7 +24531,7 @@ Even with its extreme weather, Rahne does support native life. A prime example i
 		<ycood>224.55</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -24713,7 +24709,7 @@ Randis IV is a tropical world that contains few natural resources. The planet wa
 		<ycood>-214.64</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -24901,7 +24897,7 @@ Magna Metals Incorporated</desc>
 		<ycood>342.12</ycood>
 		<faction>UND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
@@ -24987,7 +24983,7 @@ Magna Metals Incorporated</desc>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
@@ -25023,7 +25019,7 @@ Magna Metals Incorporated</desc>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -25098,7 +25094,7 @@ Magna Metals Incorporated</desc>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -25154,7 +25150,7 @@ Magna Metals Incorporated</desc>
 		<ycood>-15.91</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -25272,7 +25268,7 @@ Magna Metals Incorporated</desc>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
@@ -25364,7 +25360,7 @@ Magna Metals Incorporated</desc>
 		<ycood>-226.11</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -25378,7 +25374,7 @@ Magna Metals Incorporated</desc>
 		<ycood>219.85</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -25400,7 +25396,7 @@ Magna Metals Incorporated</desc>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -25420,7 +25416,7 @@ Magna Metals Incorporated</desc>
 		<ycood>109.8</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -25527,7 +25523,7 @@ Magna Metals Incorporated</desc>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -25565,7 +25561,7 @@ Magna Metals Incorporated</desc>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -25575,7 +25571,7 @@ Magna Metals Incorporated</desc>
 		<ycood>-347.39</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 		<spectralClass>G</spectralClass>
@@ -25602,7 +25598,7 @@ Magna Metals Incorporated</desc>
 		<ycood>-289.49</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -25620,7 +25616,7 @@ Magna Metals Incorporated</desc>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -25648,7 +25644,7 @@ Magna Metals Incorporated</desc>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
@@ -25786,7 +25782,7 @@ Magna Metals Incorporated</desc>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -25844,7 +25840,7 @@ Magna Metals Incorporated</desc>
 		<ycood>485.35</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
@@ -26039,7 +26035,7 @@ Tengo Aerospace</desc>
 		<ycood>263.15</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -26093,7 +26089,7 @@ Tengo Aerospace</desc>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -26168,7 +26164,7 @@ Tengo Aerospace</desc>
 		<ycood>-274.36</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -26178,7 +26174,7 @@ Tengo Aerospace</desc>
 		<ycood>42.25</ycood>
 		<faction>FS</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -26192,7 +26188,7 @@ Tengo Aerospace</desc>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -26293,7 +26289,7 @@ Tengo Aerospace</desc>
 		<ycood>-221.9</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -26317,7 +26313,7 @@ Tengo Aerospace</desc>
 		<ycood>-130.92</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -26463,7 +26459,7 @@ Tengo Aerospace</desc>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -26597,7 +26593,7 @@ Tengo Aerospace</desc>
 		<ycood>271.75</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -26623,7 +26619,7 @@ Tengo Aerospace</desc>
 		<ycood>-326.26</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -26689,15 +26685,15 @@ Tengo Aerospace</desc>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3030-01-01</date>
-			<faction>PIND</faction>
+			<date>3029-01-01</date>
+			<faction>TFR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3040-01-01</date>
+			<date>3032-01-01</date>
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
@@ -26715,7 +26711,7 @@ Tengo Aerospace</desc>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -26829,7 +26825,7 @@ Tengo Aerospace</desc>
 		<ycood>136.66</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -26845,7 +26841,7 @@ Tengo Aerospace</desc>
 		<ycood>135.62</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -26889,7 +26885,7 @@ Tengo Aerospace</desc>
 		<ycood>-295.23</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -26899,7 +26895,7 @@ Tengo Aerospace</desc>
 		<ycood>191.43</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -26917,7 +26913,7 @@ Tengo Aerospace</desc>
 		<ycood>88.41</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -26927,7 +26923,7 @@ Tengo Aerospace</desc>
 		<ycood>-219.59</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -26951,7 +26947,7 @@ Tengo Aerospace</desc>
 		<ycood>-221.16</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -27015,7 +27011,7 @@ Sian has been the capital of the Capellan Confederation since 2368 when Capella 
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -27044,7 +27040,7 @@ Sian has been the capital of the Capellan Confederation since 2368 when Capella 
 		<ycood>484.04</ycood>
 		<faction>RWR</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
@@ -27100,7 +27096,7 @@ Sian has been the capital of the Capellan Confederation since 2368 when Capella 
 		<ycood>-312.18</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -27118,15 +27114,15 @@ Sian has been the capital of the Capellan Confederation since 2368 when Capella 
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3030-01-01</date>
-			<faction>PIND</faction>
+			<date>3029-01-01</date>
+			<faction>TFR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3040-01-01</date>
+			<date>3032-01-01</date>
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
@@ -27178,7 +27174,7 @@ Sian has been the capital of the Capellan Confederation since 2368 when Capella 
 		<ycood>253.76</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -27224,7 +27220,7 @@ Sian has been the capital of the Capellan Confederation since 2368 when Capella 
 		<ycood>325.48</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -27305,7 +27301,7 @@ The planet itself is home to large tracts of unspoiled wilderness, thanks in lar
 		<ycood>218.55</ycood>
 		<faction>RWR</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 	</planet>
@@ -27319,7 +27315,7 @@ The planet itself is home to large tracts of unspoiled wilderness, thanks in lar
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
@@ -27341,15 +27337,15 @@ The planet itself is home to large tracts of unspoiled wilderness, thanks in lar
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3030-01-01</date>
-			<faction>PIND</faction>
+			<date>3029-01-01</date>
+			<faction>TFR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3040-01-01</date>
+			<date>3032-01-01</date>
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
@@ -27455,7 +27451,7 @@ Solaris VII has two continents, Equatus is small, arid, mountainous and sparsely
 		<ycood>429.54</ycood>
 		<faction>RWR</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
@@ -27748,7 +27744,7 @@ Tengo Aerospace</desc>
 		<ycood>-309.1</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>MH</faction>
 		</factionChange>
 	</planet>
@@ -27790,7 +27786,7 @@ Tengo Aerospace</desc>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -27834,7 +27830,7 @@ Tengo Aerospace</desc>
 		<ycood>436.06</ycood>
 		<faction>RWR</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
@@ -27866,7 +27862,7 @@ Tengo Aerospace</desc>
 		<ycood>426.15</ycood>
 		<faction>RWR</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
@@ -27920,7 +27916,7 @@ Tengo Aerospace</desc>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -27991,7 +27987,7 @@ Tengo Aerospace</desc>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 		<spectralClass>G</spectralClass>
@@ -28228,7 +28224,7 @@ Tao ‘Mechworks</desc>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -28273,7 +28269,7 @@ Tao ‘Mechworks</desc>
 		<ycood>-319.96</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>MH</faction>
 		</factionChange>
 	</planet>
@@ -28323,7 +28319,7 @@ For most of the planet’s history it was a Lyran Commonwealth planet bordering 
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -28451,7 +28447,7 @@ For most of the planet’s history it was a Lyran Commonwealth planet bordering 
 		<ycood>-114.49</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -28579,7 +28575,7 @@ For most of the planet’s history it was a Lyran Commonwealth planet bordering 
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
@@ -28688,15 +28684,15 @@ For most of the planet’s history it was a Lyran Commonwealth planet bordering 
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 		<factionChange>
-			<date>3030-01-01</date>
-			<faction>PIND</faction>
+			<date>3029-01-01</date>
+			<faction>TFR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3040-01-01</date>
+			<date>3032-01-01</date>
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
@@ -28714,7 +28710,7 @@ For most of the planet’s history it was a Lyran Commonwealth planet bordering 
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
@@ -29202,7 +29198,7 @@ Forerunner A.G.</desc>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -29314,15 +29310,15 @@ The Sol system contains multiple colonized planets, foremost are Mars and Venus.
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3030-01-01</date>
-			<faction>PIND</faction>
+			<date>3029-01-01</date>
+			<faction>TFR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3040-01-01</date>
+			<date>3032-01-01</date>
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
@@ -29395,7 +29391,7 @@ The Sol system contains multiple colonized planets, foremost are Mars and Venus.
 		<ycood>-91.66</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 	</planet>
@@ -29405,7 +29401,7 @@ The Sol system contains multiple colonized planets, foremost are Mars and Venus.
 		<ycood>294.7</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -29470,7 +29466,7 @@ As the capital of the Lyran Commonwealth, Thakard is home to many vital parts of
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -29492,7 +29488,7 @@ As the capital of the Lyran Commonwealth, Thakard is home to many vital parts of
 		<ycood>374.3</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 	</planet>
@@ -29502,7 +29498,7 @@ As the capital of the Lyran Commonwealth, Thakard is home to many vital parts of
 		<ycood>504.91</ycood>
 		<faction>RWR</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
@@ -29540,7 +29536,7 @@ As the capital of the Lyran Commonwealth, Thakard is home to many vital parts of
 		<ycood>80.68</ycood>
 		<faction>FS</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -29570,7 +29566,7 @@ As the capital of the Lyran Commonwealth, Thakard is home to many vital parts of
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
@@ -29588,7 +29584,7 @@ As the capital of the Lyran Commonwealth, Thakard is home to many vital parts of
 		<ycood>-381.19</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>MOC</faction>
 		</factionChange>
 		<spectralClass>M</spectralClass>
@@ -29655,7 +29651,7 @@ As the capital of the Lyran Commonwealth, Thakard is home to many vital parts of
 		<ycood>262.1</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -29677,7 +29673,7 @@ As the capital of the Lyran Commonwealth, Thakard is home to many vital parts of
 		<ycood>-385.46</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -29779,7 +29775,7 @@ Earthwerks Incorporated</desc>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
@@ -29817,7 +29813,7 @@ Earthwerks Incorporated</desc>
 			<faction>TH,CC</faction>
 		</factionChange>
 		<factionChange>
-			<date>2785-01-01</date>
+			<date>2786-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
@@ -29825,7 +29821,7 @@ Earthwerks Incorporated</desc>
 			<faction>TFR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3031-01-01</date>
+			<date>3032-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -29880,7 +29876,7 @@ The planet is heavily industrialized and for a long time was the top producer of
 		<ycood>155.96</ycood>
 		<faction>RWR</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
@@ -29998,7 +29994,7 @@ The planet is heavily industrialized and for a long time was the top producer of
 		<ycood>223.77</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -30036,7 +30032,7 @@ The planet is heavily industrialized and for a long time was the top producer of
 		<ycood>-49.29</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -30141,7 +30137,7 @@ The planet is heavily industrialized and for a long time was the top producer of
 		<ycood>435.28</ycood>
 		<faction>RWR</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
@@ -30243,7 +30239,7 @@ The planet is heavily industrialized and for a long time was the top producer of
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -30350,7 +30346,7 @@ The local population has long resented the Lyran Commonwealth for what they beli
 		<ycood>-55.55</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 		<lifeForm>7</lifeForm>
@@ -30438,7 +30434,7 @@ Gutierrez Aerospace</desc>
 		<ycood>53.46</ycood>
 		<faction>FS</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -30448,7 +30444,7 @@ Gutierrez Aerospace</desc>
 		<ycood>172.65</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -30667,7 +30663,7 @@ Tsinghai has repelled numerous Marik and bandit attacks that have decimated the 
 		<ycood>120.49</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -30683,7 +30679,7 @@ Tsinghai has repelled numerous Marik and bandit attacks that have decimated the 
 		<ycood>212.55</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -30817,7 +30813,7 @@ The system also later gained value when the uninhabited planet, Jonah’s Reach,
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
@@ -30835,7 +30831,7 @@ The system also later gained value when the uninhabited planet, Jonah’s Reach,
 		<ycood>-492.53</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>TC</faction>
 		</factionChange>
 	</planet>
@@ -30855,7 +30851,7 @@ The system also later gained value when the uninhabited planet, Jonah’s Reach,
 		<ycood>210.38</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -30873,7 +30869,7 @@ The system also later gained value when the uninhabited planet, Jonah’s Reach,
 		<ycood>-12.52</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -30977,7 +30973,7 @@ The system also later gained value when the uninhabited planet, Jonah’s Reach,
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -31025,7 +31021,7 @@ The system also later gained value when the uninhabited planet, Jonah’s Reach,
 		<ycood>-267.84</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -31063,7 +31059,7 @@ The system also later gained value when the uninhabited planet, Jonah’s Reach,
 		<ycood>238.63</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -31137,7 +31133,7 @@ The system also later gained value when the uninhabited planet, Jonah’s Reach,
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -31163,7 +31159,7 @@ The system also later gained value when the uninhabited planet, Jonah’s Reach,
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -31207,15 +31203,15 @@ The system also later gained value when the uninhabited planet, Jonah’s Reach,
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 		<factionChange>
-			<date>3030-01-01</date>
-			<faction>PIND</faction>
+			<date>3029-01-01</date>
+			<faction>TFR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3040-01-01</date>
+			<date>3032-01-01</date>
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
@@ -31245,7 +31241,7 @@ The system also later gained value when the uninhabited planet, Jonah’s Reach,
 		<ycood>-164.56</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 		<spectralClass>G</spectralClass>
@@ -31332,7 +31328,7 @@ The system also later gained value when the uninhabited planet, Jonah’s Reach,
 		<ycood>107.97</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -31342,7 +31338,7 @@ The system also later gained value when the uninhabited planet, Jonah’s Reach,
 		<ycood>-281.14</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -31384,7 +31380,7 @@ The system also later gained value when the uninhabited planet, Jonah’s Reach,
 		<ycood>-124.4</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -31418,7 +31414,7 @@ The system also later gained value when the uninhabited planet, Jonah’s Reach,
 		<ycood>-305.66</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -31446,7 +31442,7 @@ The system also later gained value when the uninhabited planet, Jonah’s Reach,
 		<ycood>399.55</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -31675,7 +31671,7 @@ In the early 31st Century an underground Star League-era ‘Mech research facili
 		<ycood>-393.39</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>MOC</faction>
 		</factionChange>
 		<zenithCharge>True</zenithCharge>
@@ -31692,7 +31688,7 @@ In the early 31st Century an underground Star League-era ‘Mech research facili
 		<ycood>294.44</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -31714,7 +31710,7 @@ In the early 31st Century an underground Star League-era ‘Mech research facili
 		<ycood>520.07</ycood>
 		<faction>RWR</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
@@ -31748,7 +31744,7 @@ In the early 31st Century an underground Star League-era ‘Mech research facili
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -31880,7 +31876,7 @@ In the early 31st Century an underground Star League-era ‘Mech research facili
 		<ycood>-270.19</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -31910,7 +31906,7 @@ In the early 31st Century an underground Star League-era ‘Mech research facili
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -31997,15 +31993,15 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 		<factionChange>
-			<date>3030-01-01</date>
-			<faction>PIND</faction>
+			<date>3029-01-01</date>
+			<faction>TFR</faction>
 		</factionChange>
 		<factionChange>
-			<date>3040-01-01</date>
+			<date>3032-01-01</date>
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
@@ -32051,7 +32047,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<ycood>184.73</ycood>
 		<faction>RWR</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 	</planet>
@@ -32103,7 +32099,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<ycood>-227.42</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -32166,7 +32162,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<ycood>303.05</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -32232,7 +32228,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<ycood>-523.56</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>MOC</faction>
 		</factionChange>
 	</planet>
@@ -32334,7 +32330,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<ycood>267.32</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -32370,7 +32366,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<ycood>-443.73</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>MOC</faction>
 		</factionChange>
 		<zenithCharge>True</zenithCharge>
@@ -32445,7 +32441,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<ycood>408.93</ycood>
 		<faction>RWR</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
@@ -32497,7 +32493,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -32604,7 +32600,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
@@ -32632,7 +32628,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<ycood>412.06</ycood>
 		<faction>RWR</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
@@ -32722,7 +32718,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
@@ -32826,7 +32822,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
@@ -32903,7 +32899,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -33090,7 +33086,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
@@ -33164,7 +33160,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<ycood>-266.54</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -33200,7 +33196,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 		<spectralClass>F</spectralClass>
@@ -33271,7 +33267,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
@@ -33289,7 +33285,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<ycood>-113.64</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2900-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 	</planet>
@@ -33309,7 +33305,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 		<factionChange>
@@ -33350,7 +33346,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2780-01-01</date>
+			<date>2790-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
