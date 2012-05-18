@@ -49,6 +49,7 @@ v0.1.16 (SVN)
 + Update 14 of planetary data
 + Updated MegaMek to latest version of SVN as of May 5, 2012
 + Update 15 of planetary data
++ Update 16 of planetary data
 
 v0.1.15 (2012-02-11)
 + Bug 3486200: Previous version campaigns do not save...
