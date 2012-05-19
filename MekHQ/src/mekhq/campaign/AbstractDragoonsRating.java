@@ -136,7 +136,11 @@ public abstract class AbstractDragoonsRating implements IDragoonsRating {
      * @return
      */
     protected BigDecimal calcAverageExperience() {
+        if (Integer.parseInt(getNumberUnits().toString()) > 0) {
         return getTotalSkillLevels().divide(getNumberUnits(), PRECISION, HALF_EVEN);
+    }
+
+		return BigDecimal.valueOf(0);
     }
 
     /**

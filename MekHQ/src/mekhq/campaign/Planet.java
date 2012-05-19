@@ -81,6 +81,7 @@ public class Planet implements Serializable {
 	private static final int LIFE_REPTILE = 5;
 	private static final int LIFE_BIRD    = 6;
 	private static final int LIFE_MAMMAL  = 7;
+	private static final int LIFE_INSECT  = 8;
 	
 	private static final int CLIMATE_ARCTIC    = 0;
 	private static final int CLIMATE_BOREAL   = 1;
@@ -189,6 +190,8 @@ public class Planet implements Serializable {
 			return "Birds";
 		case LIFE_MAMMAL:
 			return "Mammals";
+		case LIFE_INSECT:
+			return "Insects";
 		default:
 			return "Unknown";
 		}

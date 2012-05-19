@@ -5503,7 +5503,7 @@ In 2998, the Brighton militia managed to withstand a siege by superior Federated
 		<percentWater>62</percentWater>
 		<zenithCharge>TRUE</zenithCharge>
 		<hpg>A</hpg>
-		<lifeForm>7</lifeForm>
+		<lifeForm>8</lifeForm>
 		<satellite>Geodesia</satellite>
 		<climate>3</climate>
 		<socioIndustrial>A-B-A-B-A </socioIndustrial>
@@ -5837,7 +5837,7 @@ Recently, a large island in the eastern basin has been taken over for secret tes
 		<ycood>-201.34</ycood>
 		<faction>FWL</faction>
 		<nadirCharge>True</nadirCharge>
-		<lifeForm>2</lifeForm>
+		<lifeForm>8</lifeForm>
 		<spectralClass>F</spectralClass>
 		<subtype>5</subtype>
 		<luminosity>V</luminosity>
@@ -6163,7 +6163,7 @@ Rashpur-Owens Incorporated</desc>
 		<climate>3</climate>
 		<percentWater>20</percentWater>
 		<hpg>B</hpg>
-		<lifeForm>5</lifeForm>
+		<lifeForm>8</lifeForm>
 		<satellite>Caph’s Stone</satellite>
 		<landMass>Steam</landMass>
 		<landMass>Brunnel (Aswan)</landMass>
@@ -6365,7 +6365,7 @@ The majority of the population is located on the continent of Worrsetgard, which
 		</factionChange>
 		<nadirCharge>True</nadirCharge>
 		<zenithCharge>True</zenithCharge>
-		<lifeForm>2</lifeForm>
+		<lifeForm>8</lifeForm>
 		<spectralClass>G</spectralClass>
 		<subtype>1</subtype>
 		<luminosity>V</luminosity>
@@ -12287,6 +12287,20 @@ Brigadier Corporation</desc>
 			<date>3067-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.01</gravity>
+		<zenithCharge>True</zenithCharge>
+		<lifeForm>8</lifeForm>
+		<climate>4</climate>
+		<percentWater>78</percentWater>
+		<temperature>27</temperature>
+		<spectralClass>G</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>3</sysPos>
+		<socioIndustrial>C-C-D-C-B</socioIndustrial>
+		<hpg>B</hpg>
+		<desc>No description available.</desc>
 	</planet>
 	<planet>
 		<name>Glentworth</name>
@@ -12472,7 +12486,7 @@ Brigadier Corporation</desc>
 		<ycood>-242.28</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>2900-01-01</date>
+			<date>2902-11-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 	</planet>
@@ -12499,7 +12513,7 @@ Brigadier Corporation</desc>
 		<climate>4</climate>
 		<percentWater>15</percentWater>
 		<hpg>B</hpg>
-		<lifeForm>2</lifeForm>
+		<lifeForm>8</lifeForm>
 		<satellite>Hebron</satellite>
 		<satellite>Succoth</satellite>
 		<landMass>Gesan</landMass>
@@ -13978,12 +13992,48 @@ Freeport Armorworks</desc>
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.36</gravity>
+		<lifeForm>8</lifeForm>
+		<climate>3</climate>
+		<percentWater>60</percentWater>
+		<temperature>22</temperature>
+		<spectralClass>K</spectralClass>
+		<subtype>9</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>3</sysPos>
+		<socioIndustrial>C-C-A-D-D</socioIndustrial>
+		<satellite>Gerhard</satellite>
+		<landMass>Friday (Brookland)</landMass>
+		<landMass>Selzheim</landMass>
+		<landMass>jaja</landMass>
+		<hpg>B</hpg>
+		<desc>No description available.
+
+Manufacturing centers:
+Andrea County Armor Yards</desc>
 	</planet>
 	<planet>
 		<name>Hesperus II</name>
 		<xcood>-124.66</xcood>
 		<ycood>47.2</ycood>
 		<faction>LA</faction>
+		<factionChange>
+			<date>2853-03-05</date>
+			<faction>LA,DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2853-11-18</date>
+			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3019-06-05</date>
+			<faction>LA,FWL</faction>
+		</factionChange>
+		<factionChange>
+			<date>3019-06-28</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -16289,7 +16339,7 @@ Quikscell Company</desc>
 		<percentWater>30</percentWater>
 		<zenithCharge>true</zenithCharge>
 		<hpg>A</hpg>
-		<lifeForm>3</lifeForm>
+		<lifeForm>8</lifeForm>
 		<satellite>Loren’s Folly</satellite>
 		<landmass>Hurste</landmass>
 		<landmass>Muran (District City)</landmass>
@@ -16540,7 +16590,7 @@ Kaumberg was primarily settled by colonists hailing from Germany and Austria.</d
 		<xcood>-373.47</xcood>
 		<ycood>-202.64</ycood>
 		<faction>FWL</faction>
-		<lifeForm>2</lifeForm>
+		<lifeForm>8</lifeForm>
 		<spectralClass>F</spectralClass>
 		<subtype>9</subtype>
 		<luminosity>V</luminosity>
@@ -16586,7 +16636,7 @@ Kali Yama - Alphard Trading Corporation</desc>
 		<pressure>3</pressure>
 		<gravity>1.0</gravity>
 		<zenithCharge>True</zenithCharge>
-		<lifeForm>2</lifeForm>
+		<lifeForm>8</lifeForm>
 		<climate>3</climate>
 		<percentWater>88</percentWater>
 		<temperature>35</temperature>
@@ -17814,7 +17864,6 @@ The planet itself is resource poor and has little to offer for export. However, 
 		<luminosity>V</luminosity>
 		<sysPos>4</sysPos>
 		<socioIndustrial>F-F-C-F-B</socioIndustrial>
-		<satellite></satellite>
 		<hpg>B</hpg>
 		<desc>Lackland’s name is appropriate - the planet is almost entirely covered with water and has no major continents, it is instead dotted with islands and archipelagos. While surveys indicate the planet has large deposits of ores and other natural resources, residents have made no significant effort to mine them. This was primarily due to the high cost due to the need for underwater dwellings to best access and mine the deposits, initial attempts quickly found that the costs far outweighed the potential profits.
 
@@ -26997,6 +27046,14 @@ Valiant Systems</desc>
 			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
+		<factionChange>
+			<date>3007-06-02</date>
+			<faction>LA,FWL</faction>
+		</factionChange>
+		<factionChange>
+			<date>3007-06-25</date>
+			<faction>FWL</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Rochester</name>
@@ -34630,7 +34687,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<zenithCharge>true</zenithCharge>
 		<nadirCharge>true</nadirCharge>
 		<hpg>A</hpg>
-		<lifeForm>2</lifeForm>
+		<lifeForm>8</lifeForm>
 		<landMass>Jal</landMass>
 		<landMass>Crimeia</landMass>
 		<landMass>Vesper</landMass>
@@ -35093,6 +35150,14 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		</factionChange>
 		<factionChange>
 			<date>2790-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2868-06-24</date>
+			<faction>LA,FWL</faction>
+		</factionChange>
+		<factionChange>
+			<date>2868-07-15</date>
 			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
@@ -35568,7 +35633,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<pressure>3</pressure>
 		<gravity>1.2</gravity>
 		<nadirCharge>True</nadirCharge>
-		<lifeForm>2</lifeForm>
+		<lifeForm>8</lifeForm>
 		<climate>4</climate>
 		<percentWater>27</percentWater>
 		<temperature>47</temperature>
