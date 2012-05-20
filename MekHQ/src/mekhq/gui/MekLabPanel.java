@@ -45,11 +45,13 @@ import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
 import megamek.common.Mounted;
+import megamek.common.Tank;
 import megamek.common.WeaponType;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.verifier.EntityVerifier;
 import megamek.common.verifier.TestEntity;
 import megamek.common.verifier.TestMech;
+import megamek.common.verifier.TestTank;
 import megameklab.com.MegaMekLab;
 import megameklab.com.util.CConfig;
 import megameklab.com.util.RefreshListener;
@@ -176,18 +178,30 @@ public class MekLabPanel extends JPanel {
     }
 
 	public void refreshSummary() {
-		Mech entity = (Mech)labPanel.getEntity();
+		Entity entity = labPanel.getEntity();
 		refit = new Refit(unit, entity, true); 
-        testEntity = new TestMech((Mech)entity, entityVerifier.mechOption, null);
+		testEntity = null;
+		if(entity instanceof Mech) {
+			testEntity = new TestMech((Mech)entity, entityVerifier.mechOption, null);
+		}
+		else if(entity instanceof Tank) {
+			testEntity = new TestTank((Tank)entity, entityVerifier.tankOption, null);
+		}
         StringBuffer sb = new StringBuffer();
         testEntity.correctEntity(sb, true);
 		
         int walk = entity.getOriginalWalkMP();
-        int run = entity.getOriginalRunMPwithoutMASC();
+        int run = entity.getRunMP();
+        if(entity instanceof Mech) {
+        	run = ((Mech)entity).getOriginalRunMPwithoutMASC();
+        }
         int jump = entity.getOriginalJumpMP();
-        int heat = entity.getNumberOfSinks();
-        if (entity.hasDoubleHeatSinks()) {
-            heat *= 2;
+        int heat = 0;
+        if(entity instanceof Mech) {
+        	heat = ((Mech)entity).getNumberOfSinks();
+	        if (((Mech)entity).hasDoubleHeatSinks()) {
+	            heat *= 2;
+	        }
         }
         double totalHeat = calculateTotalHeat();
 		int bvDiff = entity.calculateBattleValue(true, true) - unit.getEntity().calculateBattleValue(true, true);
@@ -296,7 +310,7 @@ public class MekLabPanel extends JPanel {
 	
 	public double calculateTotalHeat() {
         double heat = 0;
-        Mech entity = (Mech)labPanel.getEntity();
+        Entity entity = labPanel.getEntity();
 
         if (entity.getOriginalJumpMP() > 0) {
             if (entity.getJumpType() == Mech.JUMP_IMPROVED) {
@@ -313,12 +327,14 @@ public class MekLabPanel extends JPanel {
             heat += 2;
         }
 
-        if (entity.hasNullSig()) {
-            heat += 10;
-        }
-
-        if (entity.hasChameleonShield()) {
-            heat += 6;
+        if(entity instanceof Mech) {
+	        if (((Mech)entity).hasNullSig()) {
+	            heat += 10;
+	        }
+	
+	        if (((Mech)entity).hasChameleonShield()) {
+	            heat += 6;
+	        }
         }
 
         for (Mounted mounted : entity.getWeaponList()) {
@@ -358,6 +374,9 @@ public class MekLabPanel extends JPanel {
 		if(en instanceof Mech) {
 			return new MekPanel((Mech)en);
 		}
+		else if(en instanceof Tank) {
+			return new TankPanel((Tank)en);
+		}
 		return null;
 	}
 	
@@ -377,6 +396,7 @@ public class MekLabPanel extends JPanel {
 		 * 
 		 */
 		private static final long serialVersionUID = 6894731868670529166L;
+	
 		private Mech entity;
 		private megameklab.com.ui.Mek.tabs.StructureTab structureTab;
 		private megameklab.com.ui.Mek.tabs.ArmorTab armorTab;
@@ -403,6 +423,97 @@ public class MekLabPanel extends JPanel {
 			equipmentTab = new megameklab.com.ui.Mek.tabs.EquipmentTab(entity);
 			weaponTab = new megameklab.com.ui.Mek.tabs.WeaponTab(entity);
 			buildTab = new megameklab.com.ui.Mek.tabs.BuildTab(entity, equipmentTab, weaponTab);
+			structureTab.addRefreshedListener(this);
+			armorTab.addRefreshedListener(this);
+			equipmentTab.addRefreshedListener(this);
+			weaponTab.addRefreshedListener(this);
+			buildTab.addRefreshedListener(this);
+
+			addTab("Structure", structureTab);
+			addTab("Armor", armorTab);
+			addTab("Equipment", equipmentTab);
+			addTab("Weapons", weaponTab);
+			addTab("Build", buildTab);
+	        this.repaint();
+		}
+		
+		public void refreshAll() {
+			structureTab.refresh();
+			armorTab.refresh();
+			equipmentTab.refresh();
+			weaponTab.refresh();
+			buildTab.refresh();
+		}
+
+		public void refreshArmor() {
+			armorTab.refresh();
+			refreshSummary();
+		}
+
+		public void refreshBuild() {
+			buildTab.refresh();
+			refreshSummary();
+		}
+
+		public void refreshEquipment() {
+			equipmentTab.refresh();
+			refreshSummary();
+		}
+
+		public void refreshStatus() {
+			//do nothing
+		}
+
+		public void refreshStructure() {
+			structureTab.refresh();
+			refreshSummary();
+		}
+
+		public void refreshWeapons() {
+			weaponTab.refresh();
+			refreshSummary();
+		}
+
+		@Override
+		public void refreshHeader() {
+			// TODO Auto-generated method stub
+			
+		}
+	}
+	
+	private class TankPanel extends EntityPanel {
+		
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 6894731868670529166L;
+	
+		private Tank entity;
+		private megameklab.com.ui.Vehicle.tabs.StructureTab structureTab;
+		private megameklab.com.ui.Vehicle.tabs.ArmorTab armorTab;
+		private megameklab.com.ui.Vehicle.tabs.EquipmentTab equipmentTab;
+		private megameklab.com.ui.Vehicle.tabs.WeaponTab weaponTab;
+		private megameklab.com.ui.Vehicle.tabs.BuildTab buildTab;
+		
+		public TankPanel(Tank t) {
+			entity = t;
+			reloadTabs();
+		}
+		 
+		public Entity getEntity() {
+			return entity;
+		}
+		
+		public void reloadTabs() {
+			removeAll();
+			    
+			structureTab = new megameklab.com.ui.Vehicle.tabs.StructureTab(entity);
+			armorTab = new megameklab.com.ui.Vehicle.tabs.ArmorTab(entity);
+			armorTab.setArmorType(entity.getArmorType(0));
+			armorTab.refresh();
+			equipmentTab = new megameklab.com.ui.Vehicle.tabs.EquipmentTab(entity);
+			weaponTab = new megameklab.com.ui.Vehicle.tabs.WeaponTab(entity);
+			buildTab = new megameklab.com.ui.Vehicle.tabs.BuildTab(entity, equipmentTab, weaponTab);
 			structureTab.addRefreshedListener(this);
 			armorTab.addRefreshedListener(this);
 			equipmentTab.addRefreshedListener(this);

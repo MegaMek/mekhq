@@ -52,6 +52,7 @@ v0.1.16 (SVN)
 + Update 16 of planetary data
 + Patch 3461478 - Added Insects as option for highest native-life
 + Patch 3528147 (Fix for bug 3528117) - Dragoon's Rating Dividing by 0 (SVN)
++ tank customization with refit kit and MekLab
 
 v0.1.15 (2012-02-11)
 + Bug 3486200: Previous version campaigns do not save...

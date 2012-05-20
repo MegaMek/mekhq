@@ -282,7 +282,13 @@ public class Refit implements IPartWork, IAcquisitionWork {
 				if(part instanceof Armor || part instanceof AmmoBin) {
 					newPartList.add(part);
 				} else {
-					newPartList.add(part.getMissingPart());
+					Part mPart = part.getMissingPart();
+					if(null != mPart) {
+						newPartList.add(mPart);
+					} else {
+						MekHQ.logError("null missing part for " + part.getName() + " during refit calculations");
+
+					}
 				}
 			}		
 		}

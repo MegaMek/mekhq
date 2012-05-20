@@ -88,16 +88,10 @@ public class Turret extends TankLocation {
     }
 
     @Override
-    public boolean isSamePartTypeAndStatus (Part part) {
-    	if(isReservedForRefit() || isBeingWorkedOn()
-				|| part.isReservedForRefit() || part.isBeingWorkedOn()) {
-    		return false;
-    	}
+    public boolean isSamePartType(Part part) {
         return part instanceof Turret 
         		&& getLoc() == ((Turret)part).getLoc() 
-        		&& getUnitTonnage() == ((Turret)part).getUnitTonnage()
-        		&& this.getDamage() == ((Turret)part).getDamage()
-        		&& part.getSkillMin() == this.getSkillMin();
+        		&& getTonnage() == ((Turret)part).getTonnage();
     }
 
 	@Override

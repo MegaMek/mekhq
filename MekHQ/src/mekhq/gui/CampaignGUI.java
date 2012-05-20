@@ -2903,6 +2903,8 @@ public class CampaignGUI extends JPanel {
 	    	if(null == s) {
 	    		return;
 	    	}
+	    	//clean out any leading or trailing space
+	    	s = s.trim();
 	    	r.getNewEntity().setModel(s);
     	}
     	//TODO: allow overtime work?
@@ -8586,10 +8588,8 @@ public class CampaignGUI extends JPanel {
 				refreshReport();
 			} else if (command.contains("CUSTOMIZE")
 					&& !command.contains("CANCEL")) {
-				if (selectedUnit.getEntity() instanceof Mech) {
-					panMekLab.loadUnit(selectedUnit);
-					tabMain.setSelectedIndex(8);
-				}
+				panMekLab.loadUnit(selectedUnit);
+				tabMain.setSelectedIndex(8);
 			} else if (command.contains("CANCEL_CUSTOMIZE")) {
 				if(selectedUnit.isRefitting()) {
 					selectedUnit.getRefit().cancel();
@@ -8713,19 +8713,21 @@ public class CampaignGUI extends JPanel {
 					popup.add(menu);
 				}
 				// Customize
-				if(oneSelected && unit.getEntity() instanceof Mech) {
+				if(oneSelected && (unit.getEntity() instanceof Mech || unit.getEntity() instanceof Tank)) {
 					menu = new JMenu("Customize");
 					menuItem = new JMenuItem("Choose Refit Kit...");
 					menuItem.setActionCommand("REFIT_KIT");
 					menuItem.addActionListener(this);
 					menuItem.setEnabled(!unit.isRefitting()
-							&& (unit.getEntity() instanceof megamek.common.Mech));
+							&& (unit.getEntity() instanceof megamek.common.Mech ||
+									unit.getEntity() instanceof megamek.common.Tank));
 					menu.add(menuItem);
 					menuItem = new JMenuItem("Customize in Mek Lab...");
 					menuItem.setActionCommand("CUSTOMIZE");
 					menuItem.addActionListener(this);
 					menuItem.setEnabled(!unit.isRefitting()
-							&& (unit.getEntity() instanceof megamek.common.Mech));
+							&& (unit.getEntity() instanceof megamek.common.Mech ||
+									unit.getEntity() instanceof megamek.common.Tank));
 					menu.add(menuItem);
 					if (unit.isRefitting()) {
 						menuItem = new JMenuItem("Cancel Customization");
