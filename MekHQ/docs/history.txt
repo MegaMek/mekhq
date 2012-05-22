@@ -54,6 +54,7 @@ v0.1.16 (SVN)
 + Patch 3528147 (Fix for bug 3528117) - Dragoon's Rating Dividing by 0 (SVN)
 + tank customization with refit kit and MekLab
 + updated MML.jar
++ Updated MegaMek.jar & data folder from current MegaMek SVN as of May 22, 2012
 
 v0.1.15 (2012-02-11)
 + Bug 3486200: Previous version campaigns do not save...
