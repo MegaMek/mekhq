@@ -992,10 +992,10 @@ public class Refit implements IPartWork, IAcquisitionWork {
 	public TargetRoll getAllMods() {
 		TargetRoll mods = new TargetRoll(getDifficulty(), "difficulty");
 		mods.append(oldUnit.getSiteMod());
-		if(oldUnit.getEntity().getQuirks().booleanOption("easy_maintain")) {
+		if(oldUnit.getEntity().hasQuirk("easy_maintain")) {
 			mods.addModifier(-1, "easy to maintain");
 		}
-		else if(oldUnit.getEntity().getQuirks().booleanOption("difficult_maintain")) {
+		else if(oldUnit.getEntity().hasQuirk("difficult_maintain")) {
 			mods.addModifier(1, "difficult to maintain");
 		}
 		if(customJob) {

@@ -680,10 +680,10 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		}
 		if(null != unit) {
 			mods.append(unit.getSiteMod());
-	        if(unit.getEntity().getQuirks().booleanOption("easy_maintain")) {
+	        if(unit.getEntity().hasQuirk("easy_maintain")) {
 	            mods.addModifier(-1, "easy to maintain");
 	        }
-	        else if(unit.getEntity().getQuirks().booleanOption("difficult_maintain")) {
+	        else if(unit.getEntity().hasQuirk("difficult_maintain")) {
 	            mods.addModifier(1, "difficult to maintain");
 	        }
 		}

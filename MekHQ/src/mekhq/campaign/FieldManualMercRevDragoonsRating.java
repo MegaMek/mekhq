@@ -216,9 +216,9 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
         }
 
         if (campaign.getCampaignOptions().useQuirks()) {
-            if (en.getQuirks().booleanOption("easy_maintain")) {
+            if (en.hasQuirk("easy_maintain")) {
                 hoursNeeded -= hoursNeeded * 0.2;
-            } else if (en.getQuirks().booleanOption("difficult_maintain")) {
+            } else if (en.hasQuirk("difficult_maintain")) {
                 hoursNeeded += hoursNeeded * 0.2;
             }
         }

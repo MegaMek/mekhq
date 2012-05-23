@@ -55,6 +55,7 @@ v0.1.16 (SVN)
 + tank customization with refit kit and MekLab
 + updated MML.jar
 + Updated MegaMek.jar & data folder from current MegaMek SVN as of May 22, 2012
++ new MM.jar and a few changes to account for new method of checking quirks
 
 v0.1.15 (2012-02-11)
 + Bug 3486200: Previous version campaigns do not save...
