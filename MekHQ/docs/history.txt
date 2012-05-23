@@ -1,6 +1,6 @@
 VERSION HISTORY
 ----------------------------------
-v0.1.16 (SVN)
+v0.1.16 (2012-05-23)
 + removed PartsInventory, quantity is now tracked directly by part
 + include damage status in parts clones
 + repair damaged parts in warehouse (WIP)
