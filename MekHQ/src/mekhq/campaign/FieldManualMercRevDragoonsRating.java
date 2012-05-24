@@ -367,6 +367,9 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
         if (medSupportAvailable <= 0) {
             return BigDecimal.ZERO;
         }
+        if (medSupportNeeded <= 0) {
+            return BigDecimal.ZERO;
+        }
 
         BigDecimal percent = new BigDecimal(medSupportAvailable).divide(new BigDecimal(medSupportNeeded), PRECISION, HALF_EVEN).multiply(
                 HUNDRED).setScale(0, RoundingMode.DOWN);
@@ -387,6 +390,9 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
 
     private BigDecimal getHumanResourcePercentage() {
         if (hrSupportAvailable <= 0) {
+            return BigDecimal.ZERO;
+        }
+        if (hrSupportNeeded <= 0) {
             return BigDecimal.ZERO;
         }
 
@@ -410,6 +416,9 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
     private BigDecimal getTechSupportPercentage() {
         if (techSupportAvailable <= 0) {
             return BigDecimal.ZERO;
+        }
+        if (techSupportNeeded <= 0) {
+            return BigDecimal.HUNDRED;
         }
 
         BigDecimal percent = new BigDecimal(techSupportAvailable).divide(new BigDecimal(techSupportNeeded), PRECISION, HALF_EVEN).multiply(
