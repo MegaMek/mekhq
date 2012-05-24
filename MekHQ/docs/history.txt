@@ -2,6 +2,7 @@ VERSION HISTORY
 ----------------------------------
 v0.1.17 (SVN)
 + Bug 3529464: Divide by zero - Dragoon's Rating
++ Fixed NumberFormatException in AbstractDragoonsRating
 
 v0.1.16 (2012-05-23)
 + removed PartsInventory, quantity is now tracked directly by part

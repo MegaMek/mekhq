@@ -28,15 +28,12 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 
-import javax.swing.text.NumberFormatter;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * @author Deric Page (deric (dot) page (at) usa.net)
@@ -136,11 +133,11 @@ public abstract class AbstractDragoonsRating implements IDragoonsRating {
      * @return
      */
     protected BigDecimal calcAverageExperience() {
-        if (Integer.parseInt(getNumberUnits().toString()) > 0) {
-        return getTotalSkillLevels().divide(getNumberUnits(), PRECISION, HALF_EVEN);
-    }
+        if (getNumberUnits().compareTo(BigDecimal.ZERO) > 0) {
+            return getTotalSkillLevels().divide(getNumberUnits(), PRECISION, HALF_EVEN);
+        }
 
-		return BigDecimal.valueOf(0);
+		return BigDecimal.ZERO;
     }
 
     /**
@@ -412,6 +409,6 @@ public abstract class AbstractDragoonsRating implements IDragoonsRating {
         supportPercent = BigDecimal.ZERO;
         transportPercent = BigDecimal.ZERO;
         highTechPercent = BigDecimal.ZERO;
-    };
+    }
 
 }
