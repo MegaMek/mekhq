@@ -418,7 +418,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
             return BigDecimal.ZERO;
         }
         if (techSupportNeeded <= 0) {
-            return BigDecimal.HUNDRED;
+            return HUNDRED;
         }
 
         BigDecimal percent = new BigDecimal(techSupportAvailable).divide(new BigDecimal(techSupportNeeded), PRECISION, HALF_EVEN).multiply(
