@@ -87,12 +87,14 @@ import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
 import megamek.common.VTOL;
 import megamek.common.Warship;
+import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.GameOptions;
 import megamek.common.options.IBasicOption;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
+import megamek.common.util.BuildingBlock;
 import megamek.common.util.DirectoryItems;
 import mekhq.MekHQ;
 import mekhq.Utilities;
@@ -1766,7 +1768,16 @@ public class Campaign implements Serializable {
 				pw1.print(((Mech)en).getMtf());
 				pw1.print("\t\t</mtf>\n");
 			} else {
-				//TODO: ??
+				pw1.print("\t\t<blk><![CDATA[");
+				
+				BuildingBlock blk = BLKFile.getBlock(en);
+				for(String s : blk.getAllDataAsString()) {
+					if(s.isEmpty()) {
+						continue;
+					}
+					pw1.print(s + "\n");
+				}
+				pw1.print("]]>\n\t\t</blk>\n");
 			}
 			pw1.println("\t</custom>");
 		}
@@ -2363,6 +2374,7 @@ public class Campaign implements Serializable {
 		
 		String name = null;
 		String mtf = null;
+		String blk = null;
 		
 		// Okay, lets iterate through the children, eh?
 		for (int x = 0; x < wList.getLength(); x++) {
@@ -2376,6 +2388,8 @@ public class Campaign implements Serializable {
 				name = wn2.getTextContent();
 			} else if (wn2.getNodeName().equalsIgnoreCase("mtf")) {
 				mtf = wn2.getTextContent();
+			} else if (wn2.getNodeName().equalsIgnoreCase("blk")) {
+				blk = wn2.getTextContent();
 			}
 		}
 		if(null != name && null != mtf) {
@@ -2384,6 +2398,20 @@ public class Campaign implements Serializable {
 				FileOutputStream out = new FileOutputStream(sCustomsDir + File.separator + name + ".mtf");
 				PrintStream p = new PrintStream(out);
 				p.println(mtf);
+				p.close();
+				out.close();
+				retVal.addCustom(name);
+				MekHQ.logMessage("Loaded Custom Unit!", 4);
+			} catch (Exception ex) {
+		        ex.printStackTrace();
+		    }
+		}
+		if(null != name && null != blk) {
+			try {
+				MekHQ.logMessage("Loading Custom unit from XML...", 4);
+				FileOutputStream out = new FileOutputStream(sCustomsDir + File.separator + name + ".blk");
+				PrintStream p = new PrintStream(out);
+				p.println(blk);
 				p.close();
 				out.close();
 				retVal.addCustom(name);
