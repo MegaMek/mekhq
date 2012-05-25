@@ -62,6 +62,8 @@ import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
 import megamek.common.weapons.BayWeapon;
+import megamek.common.weapons.InfantryAttack;
+import megamek.common.weapons.infantry.InfantryWeapon;
 import mekhq.MekHQ;
 import mekhq.campaign.parts.AeroHeatSink;
 import mekhq.campaign.parts.AeroSensor;
@@ -69,6 +71,7 @@ import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Avionics;
 import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.FireControlSystem;
+import mekhq.campaign.parts.InfantryMotiveType;
 import mekhq.campaign.parts.LandingGear;
 import mekhq.campaign.parts.MekActuator;
 import mekhq.campaign.parts.MekCockpit;
@@ -786,7 +789,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 	public long getSellValue() {
 		long partsValue = 0;
 		for(Part part : parts) {
-			partsValue += part.getActualValue();
+			partsValue += part.getActualValue() * part.getQuantity();
 		}
 		//TODO: we need to adjust this for equipment that doesnt show up as parts
 		
@@ -846,6 +849,9 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 
 	public int getBuyCost() {
 		int cost = (int) Math.round(getEntity().getCost(false));
+		if(entity instanceof Infantry) {
+			cost = (int) Math.round(getEntity().getAlternateCost());
+		}
 		if(entity.isClan()) {
 			cost *= campaign.getCampaignOptions().getClanPriceModifier();
 		}
@@ -1223,7 +1229,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
      */
     public void initializeParts(boolean addParts) {
     	if(entity instanceof Infantry && !(entity instanceof BattleArmor)) {
-    		return;
+    		//return;
     	}
   	
     	int erating = 0;
@@ -1271,7 +1277,8 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     	Part landingGear = null;
     	Part turretLock = null;
     	ArrayList<Part> aeroHeatSinks = new ArrayList<Part>();
-
+    	Part motiveType = null;
+    	
     	for(Part part : parts) {
     		if(part instanceof MekGyro || part instanceof MissingMekGyro) {
     			gyro = part;
@@ -1285,6 +1292,8 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     			cockpit = part;
     		}  else if(part instanceof VeeSensor || part instanceof MissingVeeSensor) {
     			sensor = part;
+    		}  else if(part instanceof InfantryMotiveType) {
+    			motiveType = part;
     		}  else if(part instanceof StructuralIntegrity) {
     			structuralIntegrity = part;
     		} else if(part instanceof MekLocation) {
@@ -1496,6 +1505,16 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     					if(type instanceof MiscType && type.hasFlag(MiscType.F_MASC)) {
         					epart = new MASC((int)entity.getWeight(), type, eqnum, campaign, erating);
     					}
+    					if(type instanceof InfantryAttack) {
+							continue;
+						}
+    					if(entity instanceof Infantry && !(entity instanceof BattleArmor)) {
+    						if(type instanceof InfantryWeapon) {
+	    						for(int i = 1; i < ((Infantry)entity).getOInternal(Infantry.LOC_INFANTRY); i++) {
+	    							epart.incrementQuantity();
+	    						}
+    						}
+    					}
     					addPart(epart);
     					partsToAdd.add(epart);
     				}
@@ -1503,7 +1522,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     		}
     	}
     	
-    	if(null == engine && !(entity instanceof BattleArmor)) {
+    	if(null == engine && !(entity instanceof Infantry)) {
     		engine = new EnginePart((int) entity.getWeight(), new Engine(entity.getEngine().getRating(), entity.getEngine().getEngineType(), entity.getEngine().getFlags()), campaign, entity.getMovementMode() == EntityMovementMode.HOVER && entity instanceof Tank);
     		addPart(engine);
     		partsToAdd.add(engine);
@@ -1669,6 +1688,17 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     			turretLock = new TurretLock(campaign);
     			addPart(turretLock);
     			partsToAdd.add(turretLock);
+    		}
+    	}
+    	
+    	if(entity instanceof Infantry && !(entity instanceof BattleArmor)) {
+    		if(null == motiveType) {
+    			motiveType = new InfantryMotiveType(0, campaign, entity.getMovementMode());
+    			for(int i = 1; i < ((Infantry)entity).getOInternal(Infantry.LOC_INFANTRY); i++) {
+					motiveType.incrementQuantity();
+				}
+    			addPart(motiveType);
+    			partsToAdd.add(motiveType);
     		}
     	}
     	

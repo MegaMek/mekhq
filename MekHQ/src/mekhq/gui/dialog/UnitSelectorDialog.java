@@ -654,6 +654,9 @@ public class UnitSelectorDialog extends JDialog {
 	        
 	        private int getPurchasePrice(MechSummary ms) {
 	        	int cost = ms.getCost();
+	        	if(ms.getUnitType().equals(UnitType.getTypeName(UnitType.INFANTRY))) {
+	        		cost = ms.getAlternateCost();
+	        	}
 	        	if(TechConstants.isClan(ms.getType())) {
 	        		cost *= campaign.getCampaignOptions().getClanPriceModifier();
 	        	}
