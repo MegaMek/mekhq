@@ -266,7 +266,7 @@ public abstract class AbstractDragoonsRating implements IDragoonsRating {
             return value;
         }
         value += scoredPercent.multiply(new BigDecimal(5)).setScale(0, RoundingMode.DOWN).intValue();
-        return Math.max(value, 25);
+        return Math.min(value, 25);
     }
 
     @Override

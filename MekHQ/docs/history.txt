@@ -7,6 +7,7 @@ v0.1.17 (SVN)
 + fixed error in FieldManualMercRevDragoonsRating - no BigDecimal.HUNDRED Bug 
 + Bug 3529484: Tanks tagged as custom do not save to campaign file properly
 + Non-canon costs for infantry and infantry parts (WIP)
++ Fixed problem with Dragoons Rating Transport score not being limited to a max of 25.
 
 v0.1.16 (2012-05-23)
 + removed PartsInventory, quantity is now tracked directly by part
