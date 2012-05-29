@@ -8564,6 +8564,31 @@ public class CampaignGUI extends JPanel {
 				refreshPersonnelList();
 				refreshOrganization();
 				refreshReport();
+			} else if (command.equalsIgnoreCase("DISBAND")) {
+				for (Unit unit : units) {
+					if (!unit.isDeployed()) {
+						if (0 == JOptionPane.showConfirmDialog(null,
+								"Do you really want to disband this unit "
+										+ unit.getName()
+										+ "?", "Disband Unit?",
+								JOptionPane.YES_NO_OPTION)) {
+							Vector<Part> parts = new Vector<Part>();
+							for(Part p : unit.getParts()) {
+								parts.add(p);
+							}
+							for(Part p : parts) {
+								p.remove(true);
+							}
+							getCampaign().removeUnit(unit.getId());
+						}
+					}
+				}
+				refreshServicedUnitList();
+				refreshUnitList();
+				refreshPartsList();
+				refreshPersonnelList();
+				refreshOrganization();
+				refreshReport();
 			} else if (command.equalsIgnoreCase("UNDEPLOY")) {
 				for (Unit unit : units) {
 					if (unit.isDeployed()) {
@@ -8690,7 +8715,7 @@ public class CampaignGUI extends JPanel {
                     popup.add(bombItem);
                 }
                 // Salvage / Repair
-				if(oneSelected) {
+				if(oneSelected && !(unit.getEntity() instanceof Infantry && !(unit.getEntity() instanceof BattleArmor))) {
 					menu = new JMenu("Repair Status");
 					menu.setEnabled(!unit.isDeployed() && !unit.isRefitting());
 					cbMenuItem = new JCheckBoxMenuItem("Repair");
@@ -8711,6 +8736,13 @@ public class CampaignGUI extends JPanel {
 					cbMenuItem.setEnabled(!unit.isDeployed() && !unit.isRefitting());
 					menu.add(cbMenuItem);
 					popup.add(menu);
+				}
+				if(oneSelected && unit.getEntity() instanceof Infantry && !(unit.getEntity() instanceof BattleArmor)) {
+					menuItem = new JMenuItem("Disband");
+					menuItem.setActionCommand("DISBAND");
+					menuItem.addActionListener(this);
+					menuItem.setEnabled(!unit.isDeployed());
+					popup.add(menuItem);
 				}
 				// Customize
 				if(oneSelected && (unit.getEntity() instanceof Mech || unit.getEntity() instanceof Tank)) {

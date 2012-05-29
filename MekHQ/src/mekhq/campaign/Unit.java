@@ -71,6 +71,7 @@ import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Avionics;
 import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.FireControlSystem;
+import mekhq.campaign.parts.InfantryArmorPart;
 import mekhq.campaign.parts.InfantryMotiveType;
 import mekhq.campaign.parts.LandingGear;
 import mekhq.campaign.parts.MekActuator;
@@ -109,6 +110,7 @@ import mekhq.campaign.parts.VeeStabiliser;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.HeatSink;
+import mekhq.campaign.parts.equipment.InfantryWeaponPart;
 import mekhq.campaign.parts.equipment.JumpJet;
 import mekhq.campaign.parts.equipment.MASC;
 import mekhq.campaign.parts.equipment.MissingAmmoBin;
@@ -1278,6 +1280,9 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     	Part turretLock = null;
     	ArrayList<Part> aeroHeatSinks = new ArrayList<Part>();
     	Part motiveType = null;
+    	Part primaryW = null;
+    	Part secondaryW = null;
+    	Part infantryArmor = null;
     	
     	for(Part part : parts) {
     		if(part instanceof MekGyro || part instanceof MissingMekGyro) {
@@ -1294,6 +1299,14 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     			sensor = part;
     		}  else if(part instanceof InfantryMotiveType) {
     			motiveType = part;
+    		}  else if(part instanceof InfantryArmorPart) {
+    			infantryArmor = part;
+    		}  else if(part instanceof InfantryWeaponPart) {
+    			if(((InfantryWeaponPart)part).isPrimary()) {
+    				primaryW = part;
+    			} else {
+    				secondaryW = part;
+    			}
     		}  else if(part instanceof StructuralIntegrity) {
     			structuralIntegrity = part;
     		} else if(part instanceof MekLocation) {
@@ -1508,12 +1521,10 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     					if(type instanceof InfantryAttack) {
 							continue;
 						}
-    					if(entity instanceof Infantry && !(entity instanceof BattleArmor)) {
-    						if(type instanceof InfantryWeapon) {
-	    						for(int i = 1; i < ((Infantry)entity).getOInternal(Infantry.LOC_INFANTRY); i++) {
-	    							epart.incrementQuantity();
-	    						}
-    						}
+    					if(entity instanceof Infantry && !(entity instanceof BattleArmor)
+    							&& m.getLocation() != Infantry.LOC_FIELD_GUNS) {
+    						//don't add weapons here for infantry, unless field guns
+    						continue;
     					}
     					addPart(epart);
     					partsToAdd.add(epart);
@@ -1692,14 +1703,51 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     	}
     	
     	if(entity instanceof Infantry && !(entity instanceof BattleArmor)) {
-    		if(null == motiveType) {
-    			motiveType = new InfantryMotiveType(0, campaign, entity.getMovementMode());
-    			for(int i = 1; i < ((Infantry)entity).getOInternal(Infantry.LOC_INFANTRY); i++) {
-					motiveType.incrementQuantity();
-				}
-    			addPart(motiveType);
-    			partsToAdd.add(motiveType);
+    		if(null == motiveType && entity.getMovementMode() != EntityMovementMode.INF_LEG) {
+    			int number = ((Infantry)entity).getOInternal(Infantry.LOC_INFANTRY);
+    			if(((Infantry)entity).isMechanized()) {
+    				number = ((Infantry)entity).getSquadN();
+    			}
+    			while(number > 0) {
+        			motiveType = new InfantryMotiveType(0, campaign, entity.getMovementMode());
+        			addPart(motiveType);
+        			partsToAdd.add(motiveType);
+        			number--;
+    			}
     		}
+    		if(null == infantryArmor) {
+    			infantryArmor = new InfantryArmorPart(0, campaign, ((Infantry)entity).getDamageDivisor(), ((Infantry)entity).isArmorEncumbering(), ((Infantry)entity).hasDEST(), ((Infantry)entity).hasSneakCamo(), ((Infantry)entity).hasSneakECM(), ((Infantry)entity).hasSneakIR(), ((Infantry)entity).hasSpaceSuit());
+    			if(infantryArmor.getStickerPrice() > 0) {
+        			int number = ((Infantry)entity).getOInternal(Infantry.LOC_INFANTRY);
+        			while(number > 0) {
+            			infantryArmor = new InfantryArmorPart(0, campaign, ((Infantry)entity).getDamageDivisor(), ((Infantry)entity).isArmorEncumbering(), ((Infantry)entity).hasDEST(), ((Infantry)entity).hasSneakCamo(), ((Infantry)entity).hasSneakECM(), ((Infantry)entity).hasSneakIR(), ((Infantry)entity).hasSpaceSuit());
+            			addPart(infantryArmor);
+            			partsToAdd.add(infantryArmor);
+            			number--;
+        			}
+    			}
+    		}
+    		InfantryWeapon primaryType = ((Infantry)entity).getPrimaryWeapon();
+    		InfantryWeapon secondaryType = ((Infantry)entity).getSecondaryWeapon();
+    		if(null == primaryW && null != primaryType) {
+    			int number = (((Infantry)entity).getSquadSize() - ((Infantry)entity).getSecondaryN()) * ((Infantry)entity).getSquadN();
+    			while(number > 0) {
+        			primaryW = new InfantryWeaponPart((int)entity.getWeight(), primaryType, -1, campaign, true);
+        			addPart(primaryW);
+        			partsToAdd.add(primaryW);
+    				number--;
+    			}
+    			
+    		}
+    		if(null == secondaryW && null != secondaryType) {
+    			int number = ((Infantry)entity).getSecondaryN() * ((Infantry)entity).getSquadN();
+    			while(number > 0) {
+        			secondaryW = new InfantryWeaponPart((int)entity.getWeight(), secondaryType, -1, campaign, false);
+        			addPart(secondaryW);
+        			partsToAdd.add(secondaryW);
+    				number--;
+    			}	
+    		}  			
     	}
     	
     	if(addParts) {

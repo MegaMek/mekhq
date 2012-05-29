@@ -252,7 +252,11 @@ public class EquipmentPart extends Part {
 			if(!salvage) {
 				campaign.removePart(this);
 			} else if(null != spare) {
-				spare.incrementQuantity();
+				int number = quantity;
+				while(number > 0) {
+					spare.incrementQuantity();
+					number--;
+				}
 				campaign.removePart(this);
 			}
 	        unit.removePart(this);
