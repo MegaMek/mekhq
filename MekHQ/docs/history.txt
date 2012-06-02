@@ -11,6 +11,7 @@ v0.1.17 (SVN)
 + InfantryArmorPart and other infantry parts improvements
 + Bug: new parts purchased for used cost
 + Bug 3530312: miscalculation in parts repairs.
++ Bug: units limited by calendar year even when option was not checked
 
 v0.1.16 (2012-05-23)
 + removed PartsInventory, quantity is now tracked directly by part

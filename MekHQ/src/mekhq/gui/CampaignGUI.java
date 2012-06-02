@@ -2838,10 +2838,6 @@ public class CampaignGUI extends JPanel {
 	private void miPurchaseUnitActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miPurchaseUnitActionPerformed
 		UnitSelectorDialog usd = new UnitSelectorDialog(true, this);
 
-		if (!getCampaign().isGM()) {
-			usd.restrictToYear(getCampaign().getCalendar().get(Calendar.YEAR));
-		}
-
 		usd.setVisible(true);
 		refreshServicedUnitList();
 		refreshUnitList();

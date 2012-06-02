@@ -509,24 +509,6 @@ public class UnitSelectorDialog extends JDialog {
          filterUnits();
      }
 
-     public void restrictToChassis (String chassis) {
-         ArrayList<MechSummary> allowedMechs = new ArrayList<MechSummary>();
-         for (MechSummary mechSummary : mechs) {
-             if (mechSummary.getChassis().equals(chassis))
-                 allowedMechs.add(mechSummary);
-         }
-         setMechs(allowedMechs.toArray(new MechSummary[0]));
-     }
-
-     public void restrictToYear (int year) {
-         ArrayList<MechSummary> allowedMechs = new ArrayList<MechSummary>();
-         for (MechSummary mechSummary : mechs) {
-             if (mechSummary.getYear()<=year)
-                 allowedMechs.add(mechSummary);
-         }
-         setMechs(allowedMechs.toArray(new MechSummary[0]));
-     }
-
     public void changeBuyBtnToSelectBtn () {
         for (ActionListener actionListener : btnBuy.getActionListeners()) {
             btnBuy.removeActionListener(actionListener);
