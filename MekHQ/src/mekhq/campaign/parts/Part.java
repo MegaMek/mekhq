@@ -790,6 +790,8 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         this.time = part.time;
         this.mode = part.mode;
         this.hits = part.hits;
+        this.difficulty = part.difficulty;
+        this.salvaging = part.salvaging;
         this.brandNew = part.brandNew;
     }
 	
