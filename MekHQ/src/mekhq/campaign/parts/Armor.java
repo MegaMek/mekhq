@@ -75,7 +75,7 @@ public class Armor extends Part implements IAcquisitionWork {
     
     public Armor clone() {
     	Armor clone = new Armor(0, type, amount, -1, false, clan, campaign);
-        clone.copyRepairData(this);
+        clone.copyBaseData(this);
         return clone;
     }
     

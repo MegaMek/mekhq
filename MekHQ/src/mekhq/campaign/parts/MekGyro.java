@@ -63,7 +63,7 @@ public class MekGyro extends Part {
     
     public MekGyro clone() {
     	MekGyro clone = new MekGyro(getUnitTonnage(), type, gyroTonnage, campaign);
-        clone.copyRepairData(this);
+        clone.copyBaseData(this);
     	return clone;
     }
     

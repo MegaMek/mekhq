@@ -786,10 +786,11 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	@Override
 	public abstract Part clone();
 
-    protected void copyRepairData(Part part) {
+    protected void copyBaseData(Part part) {
         this.time = part.time;
         this.mode = part.mode;
         this.hits = part.hits;
+        this.brandNew = part.brandNew;
     }
 	
 	public void setRefitId(UUID rid) {

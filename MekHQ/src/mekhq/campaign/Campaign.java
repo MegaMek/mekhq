@@ -1523,10 +1523,10 @@ public class Campaign implements Serializable {
 	}
 	
 	public void buyPart(Part part, double multiplier) {
-		addPart(part);
 		if(getCampaignOptions().payForParts()) {
 			finances.debit((long)(multiplier * part.getActualValue()), Transaction.C_EQUIP, "Purchase of " + part.getName(), calendar.getTime());		
 		}
+		addPart(part);
 	}
 
 	public static Entity getBrandNewUndamagedEntity(String entityShortName) {

@@ -50,7 +50,7 @@ public class TurretLock extends Part {
 	
 	public TurretLock clone() {
 		TurretLock clone = new TurretLock(campaign);
-        clone.copyRepairData(this);
+        clone.copyBaseData(this);
         return clone;
 	}
 	

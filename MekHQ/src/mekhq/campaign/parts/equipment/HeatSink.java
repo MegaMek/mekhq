@@ -45,7 +45,7 @@ public class HeatSink extends EquipmentPart {
     
     public HeatSink clone() {
     	HeatSink clone = new HeatSink(getUnitTonnage(), getType(), getEquipmentNum(), campaign);
-        clone.copyRepairData(this);
+        clone.copyBaseData(this);
     	return clone;
     }
     

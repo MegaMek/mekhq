@@ -55,7 +55,7 @@ public class InfantryWeaponPart extends EquipmentPart {
     @Override
     public InfantryWeaponPart clone() {
     	InfantryWeaponPart clone = new InfantryWeaponPart(getUnitTonnage(), getType(), getEquipmentNum(), campaign, primary);
-        clone.copyRepairData(this);
+        clone.copyBaseData(this);
     	return clone;
     }
 

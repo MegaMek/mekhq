@@ -62,7 +62,7 @@ public class EnginePart extends Part {
 	
 	public EnginePart clone() {
 		EnginePart clone = new EnginePart(0, new Engine(engine.getRating(), engine.getEngineType(), engine.getFlags()), campaign, forHover);
-        clone.copyRepairData(this);
+        clone.copyBaseData(this);
 		return clone;
 	}
 

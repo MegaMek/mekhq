@@ -57,7 +57,7 @@ public class MASC extends EquipmentPart {
     
     public MASC clone() {
     	MASC clone = new MASC(getUnitTonnage(), getType(), getEquipmentNum(), campaign, engineRating);
-        clone.copyRepairData(this);
+        clone.copyBaseData(this);
     	return clone;
     }
  

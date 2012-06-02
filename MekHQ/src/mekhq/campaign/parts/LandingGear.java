@@ -53,7 +53,7 @@ public class LandingGear extends Part {
         
     public LandingGear clone() {
     	LandingGear clone = new LandingGear(0, campaign);
-        clone.copyRepairData(this);
+        clone.copyBaseData(this);
     	return clone;
     }
     

@@ -111,7 +111,7 @@ public class EquipmentPart extends Part {
 
     public EquipmentPart clone() {
     	EquipmentPart clone = new EquipmentPart(getUnitTonnage(), type, equipmentNum, campaign);
-        clone.copyRepairData(this);
+        clone.copyBaseData(this);
     	return clone;
     }
     

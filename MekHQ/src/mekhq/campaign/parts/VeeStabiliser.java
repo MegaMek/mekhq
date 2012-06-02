@@ -55,7 +55,7 @@ public class VeeStabiliser extends Part {
 	
 	public VeeStabiliser clone() {
 		VeeStabiliser clone = new VeeStabiliser(getUnitTonnage(), 0, campaign);
-        clone.copyRepairData(this);
+        clone.copyBaseData(this);
 		return clone;
 	}
 

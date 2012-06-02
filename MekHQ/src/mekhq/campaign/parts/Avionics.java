@@ -53,7 +53,7 @@ public class Avionics extends Part {
     
     public Avionics clone() {
     	Avionics clone = new Avionics(0, campaign);
-        clone.copyRepairData(this);
+        clone.copyBaseData(this);
     	return clone;
     }
         

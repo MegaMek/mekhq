@@ -50,7 +50,7 @@ public class VeeSensor extends Part {
 
 	public VeeSensor clone() {
 		VeeSensor clone = new VeeSensor(getUnitTonnage(), campaign);
-        clone.copyRepairData(this);
+        clone.copyBaseData(this);
 		return clone;
 	}
 	

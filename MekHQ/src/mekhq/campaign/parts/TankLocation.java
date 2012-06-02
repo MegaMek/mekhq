@@ -54,7 +54,7 @@ public class TankLocation extends Part {
     
     public TankLocation clone() {
     	TankLocation clone = new TankLocation(loc, getUnitTonnage(), campaign);
-        clone.copyRepairData(this);
+        clone.copyBaseData(this);
     	clone.loc = this.loc;
     	clone.damage = this.damage;
     	clone.breached = this.breached;

@@ -53,7 +53,7 @@ public class FireControlSystem extends Part {
         
     public FireControlSystem clone() {
     	FireControlSystem clone = new FireControlSystem(0, campaign);
-        clone.copyRepairData(this);
+        clone.copyBaseData(this);
     	return clone;
     }
     

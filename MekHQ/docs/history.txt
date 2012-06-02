@@ -9,6 +9,7 @@ v0.1.17 (SVN)
 + Non-canon costs for infantry and infantry parts (WIP)
 + Fixed problem with Dragoons Rating Transport score not being limited to a max of 25.
 + InfantryArmorPart and other infantry parts improvements
++ Bug: new parts purchased for used cost
 
 v0.1.16 (2012-05-23)
 + removed PartsInventory, quantity is now tracked directly by part

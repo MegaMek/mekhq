@@ -49,7 +49,7 @@ public class JumpJet extends EquipmentPart {
     
     public JumpJet clone() {
     	JumpJet clone = new JumpJet(getUnitTonnage(), getType(), getEquipmentNum(), campaign);
-        clone.copyRepairData(this);
+        clone.copyBaseData(this);
     	return clone;
     }
 	
