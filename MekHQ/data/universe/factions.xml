@@ -139,7 +139,7 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 	<faction>
 		<shortname>CBS</shortname>
 		<fullname>Clan Blood Spirit</fullname>
-		<startingPlanet>York,York,York,York,York,York,York,York,York</startingPlanet>
+		<startingPlanet>York (Clan),York (Clan),York (Clan),York (Clan),York (Clan),York (Clan),York (Clan),York (Clan),York (Clan)</startingPlanet>
 		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
 		<nameGenerator>Clan</nameGenerator>
 		<colorRGB>255,99,71</colorRGB>
@@ -209,7 +209,7 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 	<faction>
 		<shortname>CGB</shortname>
 		<fullname>Clan Ghost Bear</fullname>
-		<startingPlanet>Arcadia,Arcadia,Arcadia,Arcadia,Arcadia,Arcadia,Arcadia,Alshain,Alshain</startingPlanet>
+		<startingPlanet>Arcadia (Clan),Arcadia (Clan),Arcadia (Clan),Arcadia (Clan),Arcadia (Clan),Arcadia (Clan),Arcadia (Clan),Alshain,Alshain</startingPlanet>
 		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
 		<nameGenerator>Clan</nameGenerator>
 		<colorRGB>188,222,235</colorRGB>
@@ -231,7 +231,7 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 	<faction>
 		<shortname>CHH</shortname>
 		<fullname>Clan Hell's Horses</fullname>
-		<startingPlanet>Niles,Niles,Niles,Niles,Niles,Niles,Niles,Csesztreg,Niles</startingPlanet>
+		<startingPlanet>Niles (Clan),Niles (Clan),Niles (Clan),Niles (Clan),Niles (Clan),Niles (Clan),Niles (Clan),Csesztreg,Niles (Clan)</startingPlanet>
 		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
 		<nameGenerator>Clan</nameGenerator>
 		<colorRGB>241,168,110</colorRGB>
@@ -270,7 +270,7 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 	<faction>
 		<shortname>CNC</shortname>
 		<fullname>Clan Nova Cat</fullname>
-		<startingPlanet>Irece,Irece,Irece,Irece,Irece,Irece,Irece,Irece,Irece</startingPlanet>
+		<startingPlanet>Barcella,Barcella,Barcella,Barcella,Barcella,Barcella,Barcella,Irece,Irece</startingPlanet>
 		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
 		<nameGenerator>Clan</nameGenerator>
 		<colorRGB>245,255,250</colorRGB>
@@ -280,7 +280,7 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 	<faction>
 		<shortname>CSJ</shortname>
 		<fullname>Clan Smoke Jaguar</fullname>
-		<startingPlanet>Huntress,Huntress,Huntress,Huntress,Huntress,Huntress,Huntress,Luzerne,Luzerne</startingPlanet>
+		<startingPlanet>Huntress,Huntress,Huntress,Huntress,Huntress,Huntress,Huntress,Luzerne, </startingPlanet>
 		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
 		<nameGenerator>Clan</nameGenerator>
 		<colorRGB>152,164,129</colorRGB>
@@ -301,7 +301,7 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 	<faction>
 		<shortname>CSA</shortname>
 		<fullname>Clan Star Adder</fullname>
-		<startingPlanet>Sheridan,Sheridan,Sheridan,Sheridan,Sheridan,Sheridan,Sheridan,Sheridan,Sheridan</startingPlanet>
+		<startingPlanet>Sheridan (Clan),Sheridan (Clan),Sheridan (Clan),Sheridan (Clan),Sheridan (Clan),Sheridan (Clan),Sheridan (Clan),Sheridan (Clan),Sheridan (Clan)</startingPlanet>
 		<eraMods>0,0,0,0,0,0,0,0,0</eraMods>
 		<nameGenerator>Clan</nameGenerator>
 		<colorRGB>218,165,32</colorRGB>

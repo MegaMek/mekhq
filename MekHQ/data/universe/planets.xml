@@ -991,7 +991,11 @@ Industrial, Command and logistical world, paperwork in this planet and its prefe
 		<name>Algot</name>
 		<xcood>86.59</xcood>
 		<ycood>-83.46</ycood>
-		<faction>CC</faction>
+		<faction>TGU</faction>
+		<factionChange>
+			<date>2367-01-01</date>
+			<faction>CC</faction>
+		</factionChange>
 		<factionChange>
 			<date>2900-01-01</date>
 			<faction>FS</faction>
@@ -1004,6 +1008,36 @@ Industrial, Command and logistical world, paperwork in this planet and its prefe
 			<date>3067-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
+		<factionChange>
+			<date>3075-01-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3079-01-01</date>
+			<faction>CC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.1</gravity>
+		<nadirCharge>True</nadirCharge>
+		<zenithCharge>True</zenithCharge>
+		<lifeForm>2</lifeForm>
+		<climate>3</climate>
+		<percentWater>56</percentWater>
+		<temperature>48</temperature>
+		<spectralClass>G</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>5</sysPos>
+		<satellite>Victoria’s Jewel</satellite>
+		<landMass>Camellias (Algot Prime)</landMass>
+		<hpg>B</hpg>
+		<desc>Algot was one of the first planets settled by early Tikonov explorers and by the beginning of the 29th century Algot was one of the most populous planets in the region. Algot was home to a major industrial center specializing in computer and electronic sciences. Unfortunately, both the technological industry and population have declined significantly since.
+
+In 2822, a mysterious plague hit the planet and then mysteriously disappeared the following year. The plague gave Algot a reputation for being unhealthy, leading to heavy emigration and a lack of immigration, the main factor in the decline in population. However, for the next two centuries, the health of the general population was exceptionally good and they enjoyed the third-longest life expectancy of all the planets in the Federated Suns.</desc>
 	</planet>
 	<planet>
 		<name>Alhena</name>
@@ -1135,9 +1169,25 @@ Industrial, Command and logistical world, paperwork in this planet and its prefe
 		<name>Almach</name>
 		<xcood>101.71</xcood>
 		<ycood>-62.07</ycood>
-		<faction>CC</faction>
+		<faction>IND</faction>
 		<factionChange>
-			<date>2900-01-01</date>
+			<date>2302-01-01</date>
+			<faction>Mara</faction>
+		</factionChange>
+		<factionChange>
+			<date>2308-11-12</date>
+			<faction>TGU</faction>
+		</factionChange>
+		<factionChange>
+			<date>2344-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>2571-01-01</date>
+			<faction>CC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2864-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -1148,6 +1198,16 @@ Industrial, Command and logistical world, paperwork in this planet and its prefe
 			<date>3067-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
+		<zenithCharge>True</zenithCharge>
+		<lifeForm>7</lifeForm>
+		<spectralClass>K</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>2</sysPos>
+		<hpg>B</hpg>
+		<desc>Almach was the only planet settled almost entirely by Argentineans. It was once a major center for ocean-based aquaculture technology and supplied the entire food demands of the other planets of the Chesterton province. Unfortunately during the Succession Wars this technology was all but lost.
+
+Almach is mostly covered in lush national parks and wildlife preserve areas. However, the largest desert in this sector of space is located on one of the three continent of Almach</desc>
 	</planet>
 	<planet>
 		<name>Almunge</name>
@@ -1167,11 +1227,47 @@ Industrial, Command and logistical world, paperwork in this planet and its prefe
 		<name>Alnasi</name>
 		<xcood>2.87</xcood>
 		<ycood>117.1</ycood>
-		<faction>LA</faction>
+		<faction>DC</faction>
 		<factionChange>
-			<date>2900-01-01</date>
+			<date>2571-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2822-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3039-04-15</date>
+			<faction>DC,LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3039-05-12</date>
+			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<pressure>3</pressure>
+		<gravity>0.82</gravity>
+		<lifeForm>2</lifeForm>
+		<climate>4</climate>
+		<percentWater>36</percentWater>
+		<temperature>47</temperature>
+		<spectralClass>K</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>III</luminosity>
+		<sysPos>2</sysPos>
+		<satellite>Bherin</satellite>
+		<satellite>Kalil</satellite>
+		<satellite>Parada</satellite>
+		<landMass>Lantilles (Gantarius)</landMass>
+		<landMass>Hecateas</landMass>
+		<landMass>Insarroples</landMass>
+		<landMass>Rowenopia</landMass>
+		<desc>While Alnasi orbits a relatively cool K0 star, the planet follows an irregular orbit that results in periods of extreme hot and cold cycles of more than a thousand years. When the planet was first colonized the planet was slightly cooler than Terra and seemed to be in a receding ice-age with large glaciers at both poles and large tracts of temperate forests. As of the 32nd century the planet has heated up significantly and much of the temperate forests have been replaced by deserts.
+
+Despite being aware of the impending, though slow coming, temperature change that will eventually make the planet unlivable for humans Alnasi has thrived. All four continents are populated and the primary industry on planet is mining of the massive deposits of iron and other common minerals.</desc>
 	</planet>
 	<planet>
 		<name>Alorton</name>
@@ -1268,6 +1364,26 @@ Industrial, Command and logistical world, paperwork in this planet and its prefe
 			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.24</gravity>
+		<lifeForm>6</lifeForm>
+		<climate>3</climate>
+		<percentWater>67</percentWater>
+		<temperature>43</temperature>
+		<spectralClass>K</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>2</sysPos>
+		<satellite>Cassius</satellite>
+		<satellite>Delvia</satellite>
+		<satellite>Fermosa</satellite>
+		<satellite>Weir</satellite>
+		<satellite>Zalazar</satellite>
+		<landMass>Skopje (Sigmundrac)</landMass>
+		<landMass>Strumm</landMass>
+		<landMass>Kabast</landMass>
+		<landMass>Ronigawa</landMass>
+		<desc>Alrakis is a comfortable temperate planet with large deposits of metal ores in the mountain ranges that cross the planet’s continents and three of the planet’s largest moons. Thanks to the massive deposits of raw materials numerous factories were constructed and many survived through the Succession Wars, thanks primarily to an avoidance of heavy military industry. For much of its history Alrakis was a hotly contested industrial world with the Lyran Commonwealth and Draconis Combine vying for control. While the planet’s climate is comfortable and there is sufficient fertile land and large deposits of natural resources, initial settlement was slow due to the high gravity on planet and the danger of the native tigerfalcon. A large avian predator which was known to attack in packs of three to five. By the time of the Star League the tigerfalcon population had been reduced to levels that allowed for further safe inhabitation of Alrakis.</desc>
 	</planet>
 	<planet>
 		<name>Alrescha</name>
@@ -8879,9 +8995,25 @@ The Jade Falcon, totem animal of the Clan with the same name, is from Dagda.</de
 		<name>Demeter</name>
 		<xcood>92.32</xcood>
 		<ycood>-70.16</ycood>
-		<faction>CC</faction>
+		<faction>UND</faction>
 		<factionChange>
-			<date>2900-01-01</date>
+			<date>2193-01-01</date>
+			<faction>CTL</faction>
+		</factionChange>
+		<factionChange>
+			<date>2243-01-01</date>
+			<faction>TGU</faction>
+		</factionChange>
+		<factionChange>
+			<date>2367-01-01</date>
+			<faction>CC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2571-01-01</date>
+			<faction>TH</faction>
+		</factionChange>
+		<factionChange>
+			<date>2596-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -8890,6 +9022,18 @@ The Jade Falcon, totem animal of the Clan with the same name, is from Dagda.</de
 		</factionChange>
 		<factionChange>
 			<date>3067-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-01-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-02-01</date>
+			<faction>FS,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<spectralClass>M</spectralClass>
@@ -8910,7 +9054,9 @@ The Jade Falcon, totem animal of the Clan with the same name, is from Dagda.</de
 		<landMass>Shallahandra</landMass>
 		<landMass>Ulreich</landMass>
 		<socioIndustrial>B-B-B-A-B</socioIndustrial>
-		<desc>No description available.</desc>
+		<desc>For its early history Demeter was known for being a planetary wilderness preserve in pristine conditions. Adding to the planet's natural beauty were many naturally occurring crystalline formations, many over a mile in diameter. The flora and fauna were imported from all over the Capellan Confederation.
+
+Unfortunately, after being occupied by the Federated Suns in the late 26th century, Demeter became a major staging area. Large portions of the planet were covered in concrete and heavy industry.</desc>
 	</planet>
 	<planet>
 		<name>Denbar</name>
@@ -13274,7 +13420,19 @@ In the 31st century Greeley gained some importance as the Federated Suns establi
 		<name>Halloran V</name>
 		<xcood>73.55</xcood>
 		<ycood>-77.2</ycood>
-		<faction>CC</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2306-01-01</date>
+			<faction>Mara</faction>
+		</factionChange>
+		<factionChange>
+			<date>2309-01-01</date>
+			<faction>TGU</faction>
+		</factionChange>
+		<factionChange>
+			<date>2367-01-01</date>
+			<faction>CC</faction>
+		</factionChange>
 		<factionChange>
 			<date>2900-01-01</date>
 			<faction>FS</faction>
@@ -13287,6 +13445,29 @@ In the 31st century Greeley gained some importance as the Federated Suns establi
 			<date>3067-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.1</gravity>
+		<lifeForm>2</lifeForm>
+		<climate>0</climate>
+		<percentWater>74</percentWater>
+		<temperature>24</temperature>
+		<spectralClass>F</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>4</sysPos>
+		<satellite>Meridian</satellite>
+		<landMass>Chimera (Gethin)</landMass>
+		<landMass>Newfoundland</landMass>
+		<landMass>Sunderland</landMass>
+		<hpg>B</hpg>
+		<desc>Halloran V is a bleak and forbidding arctic planet that is still geologically active. The planet's major export is copper as the planet is composed of almost 20 percent solid copper. Its only other major export is water. However, Halloran will run out of water a century or more sooner than copper due to the rate at which they are selling icebergs to water-poor worlds. In the late 31st century planetary officials finally listened to concerns and reduced exports of the planet’s icebergs.
+
+Manufacturing centers:
+Corvatti Corporation</desc>
 	</planet>
 	<planet>
 		<name>Halmyre Deans</name>
