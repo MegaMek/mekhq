@@ -20,6 +20,7 @@ v0.1.17 (SVN)
 + Bug 3531225: C3 crashing campaign
 + Bug 3530489: Salvage Option Wrong
 + Bug 3496668: Duplicate Tech assignment
++ better information about why a part cannot be scrapped
 
 v0.1.16 (2012-05-23)
 + removed PartsInventory, quantity is now tracked directly by part

@@ -177,8 +177,13 @@ public class StructuralIntegrity extends Part {
 	}
 
 	@Override
-	public boolean canScrap() {
-		return false;
+	public String checkScrappable() {
+		return "Structural Integrity cannot be scrapped";
+	}
+	
+	@Override
+	public boolean canNeverScrap() {
+		return true;
 	}
 	
 	@Override

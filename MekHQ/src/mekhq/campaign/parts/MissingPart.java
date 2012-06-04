@@ -304,8 +304,11 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 	}
 	
 	@Override
-	public boolean canScrap() {
-		return isReplacementAvailable();
+	public String checkScrappable() {
+		if(!isReplacementAvailable()) {
+			return "Nothing to scrap";
+		}
+		return null;
 	}
 	
 	@Override

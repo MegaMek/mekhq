@@ -4394,6 +4394,13 @@ public class CampaignGUI extends JPanel {
 				return;
 			}
 			if (command.equalsIgnoreCase("SCRAP")) {
+				if(null != part.checkScrappable()) {
+					JOptionPane.showMessageDialog(frame,
+						    part.checkScrappable(),
+						    "Cannot scrap part",
+						    JOptionPane.ERROR_MESSAGE);
+					return;
+				}
 				Unit u = part.getUnit();
 				getCampaign().addReport(part.scrap());
 				if(null !=  u && !u.isRepairable() && u.getSalvageableParts().size() == 0) {
@@ -4505,11 +4512,13 @@ public class CampaignGUI extends JPanel {
 				}
 				popup.add(menu);
 				// Scrap component
-				menuItem = new JMenuItem("Scrap component");
-				menuItem.setActionCommand("SCRAP");
-				menuItem.addActionListener(this);
-				menuItem.setEnabled(part.canScrap() && !part.isBeingWorkedOn());
-				popup.add(menuItem);
+				if(!part.canNeverScrap()) {
+					menuItem = new JMenuItem("Scrap component");
+					menuItem.setActionCommand("SCRAP");
+					menuItem.addActionListener(this);
+					menuItem.setEnabled(!part.isBeingWorkedOn());
+					popup.add(menuItem);
+				}
 				// Remove assigned team for scheduled tasks
 				/*
 				menuItem = new JMenuItem("Remove Assigned Team");

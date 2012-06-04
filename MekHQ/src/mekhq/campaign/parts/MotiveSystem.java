@@ -183,8 +183,13 @@ public class MotiveSystem extends Part {
     }
 	
 	@Override
-	public boolean canScrap() {
-		return false;
+	public String checkScrappable() {
+		return "Motive type cannot be scrapped";
+	}
+	
+	@Override
+	public boolean canNeverScrap() {
+		return true;
 	}
 
 	@Override

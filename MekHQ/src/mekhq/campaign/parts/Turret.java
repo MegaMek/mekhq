@@ -208,10 +208,10 @@ public class Turret extends TankLocation {
 	}
 	
 	@Override
-	public boolean canScrap() {
+	public String checkScrappable() {
 		//check for armor
         if(unit.getEntity().getArmor(loc, false) != IArmorState.ARMOR_DESTROYED) {
-        	return false;
+        	return "You must scrap armor in the turret first";
         }
 		//you can only scrap a location that has nothing left on it
         for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
@@ -221,10 +221,15 @@ public class Turret extends TankLocation {
                 continue;
             }
             if (slot.isRepairable()) {
-                return false;
+                return "You must scrap all equipment in the turret first";
             } 
         }
-		return true;
+		return null;
+	}
+	
+	@Override
+	public boolean canNeverScrap() {
+		return false;
 	}
 	
 	@Override

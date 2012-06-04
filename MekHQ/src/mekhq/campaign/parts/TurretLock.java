@@ -146,8 +146,13 @@ public class TurretLock extends Part {
 	}
 	
 	@Override
-	public boolean canScrap() {
-		return false;
+	public String checkScrappable() {
+		return "Turret Lock is not scrappable";
+	}
+	
+	@Override
+	public boolean canNeverScrap() {
+		return true;
 	}
 			
 	

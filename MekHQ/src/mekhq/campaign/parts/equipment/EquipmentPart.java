@@ -402,7 +402,7 @@ public class EquipmentPart extends Part {
                     if (unit.isLocationDestroyed(loc)) {
                         return true;
                     }
-                }
+                }             
             }
         }     
 		return false;

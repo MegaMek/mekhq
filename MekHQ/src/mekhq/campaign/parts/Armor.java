@@ -662,11 +662,6 @@ public class Armor extends Part implements IAcquisitionWork {
 	}
 	
 	@Override
-	public boolean canScrap() {
-		return true;
-	}
-	
-	@Override
 	public String scrap() {
 		remove(false);
 		skillMin = SkillType.EXP_GREEN;

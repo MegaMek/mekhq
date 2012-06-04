@@ -156,12 +156,17 @@ public class Rotor extends TankLocation {
 	}
 	
 	@Override
-	public boolean canScrap() {
+	public String checkScrappable() {
 		//check for armor
         if(unit.getEntity().getArmor(loc, false) != IArmorState.ARMOR_DESTROYED) {
-        	return false;
+        	return "You must scrap armor in the rotor first";
         }
-		return true;
+		return null;
+	}
+	
+	@Override
+	public boolean canNeverScrap() {
+		return false;
 	}
 	
 	@Override

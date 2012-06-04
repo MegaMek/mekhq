@@ -263,8 +263,13 @@ public class TankLocation extends Part {
 	}
 	
 	@Override
-	public boolean canScrap() {
-		return false;
+	public String checkScrappable() {
+		return "Vehicle locations cannot be scrapped";
+	}
+	
+	@Override
+	public boolean canNeverScrap() {
+		return true;
 	}
 
 	@Override

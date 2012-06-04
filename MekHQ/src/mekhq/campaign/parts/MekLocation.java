@@ -591,25 +591,25 @@ public class MekLocation extends Part {
 	}
 	
 	@Override
-	public boolean canScrap() {
+	public String checkScrappable() {
 		//cant scrap a center torso
 		if(loc ==  Mech.LOC_CT) {
-			return false;
+			return "Mech Center Torso's cannot be scrapped";
 		}
 		//only allow scrapping of locations with nothing on them
 		//otherwise you will get weirdness where armor and actuators are 
 		//still attached but everything else is scrapped
 	    //cant salvage torsos until arms and legs are gone
         if(unit.getEntity() instanceof Mech && loc == Mech.LOC_RT && !unit.getEntity().isLocationBad(Mech.LOC_RARM)) {
-            return false;
+            return "You must first remove the right arm before you scrap the right torso";
         }
         if(unit.getEntity() instanceof Mech && loc == Mech.LOC_LT && !unit.getEntity().isLocationBad(Mech.LOC_LARM)) {
-            return false;
+            return "You must first remove the left arm before you scrap the left torso";
         } 
         //check for armor
         if(unit.getEntity().getArmor(loc, false) > 0
         		|| (unit.getEntity().hasRearArmor(loc) && unit.getEntity().getArmor(loc, true) > 0 )) {
-        	return false;
+            return "You must first remove the armor from this location before you scrap it";
         }
         //you can only salvage a location that has nothing left on it
         for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
@@ -627,10 +627,10 @@ public class MekLocation extends Part {
                 continue;
             }
             if (slot.isRepairable()) {
-                return false;
+                return "You must first remove all equipment from this location before you scrap it";
             } 
         }
-		return true;
+		return null;
 	}
 	
 	@Override
