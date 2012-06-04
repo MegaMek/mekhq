@@ -2856,15 +2856,19 @@ public class CampaignGUI extends JPanel {
 
     public void refitUnit(Refit r, boolean selectModelName) {
     	if(getCampaign().getTechs().size() > 0) {
-	    	String[] techNames = new String[getCampaign().getTechs().size()];
+	    	String name;
 	    	HashMap<String,Person> techHash = new HashMap<String,Person>();
-	    	int i = 0;
 	    	for(Person tech : getCampaign().getTechs()) {
 	    		if(getCampaign().isWorkingOnRefit(tech)) {
 	    			continue;
 	    		}
-	    		techNames[i] = tech.getName() + ", " + tech.getPrimaryRoleDesc() + " (" + getCampaign().getTargetFor(r, tech).getValueAsString() + "+)";
-	    		techHash.put(techNames[i], tech);
+	    		name = tech.getName() + ", " + tech.getPrimaryRoleDesc() + " (" + getCampaign().getTargetFor(r, tech).getValueAsString() + "+)";
+	    		techHash.put(name, tech);
+	    	}
+	    	String[] techNames = new String[techHash.keySet().size()];
+	    	int i = 0;
+	    	for(String n : techHash.keySet()) {
+	    		techNames[i] = n;
 	    		i++;
 	    	}
 	    	String s = (String)JOptionPane.showInputDialog(
