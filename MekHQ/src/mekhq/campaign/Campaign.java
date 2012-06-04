@@ -1067,16 +1067,6 @@ public class Campaign implements Serializable {
 		}
 		resetAstechMinutes();
 		
-		for(Unit u : getUnits()) {
-			if(u.isRefitting()) {
-				u.getRefit().resetCheckedToday();
-				refit(u.getRefit());
-			}
-			if(null != u.getEngineer()) {
-				u.getEngineer().resetMinutesLeft();
-			}
-		}
-		
 		//need to check for assigned tasks in two steps to avoid
 		//concurrent mod problems
 		ArrayList<Integer> assignedPartIds = new ArrayList<Integer>();
@@ -1110,6 +1100,17 @@ public class Campaign implements Serializable {
 				}
 			}
 		}
+		
+		for(Unit u : getUnits()) {
+			if(u.isRefitting()) {
+				u.getRefit().resetCheckedToday();
+				refit(u.getRefit());
+			}
+			if(null != u.getEngineer()) {
+				u.getEngineer().resetMinutesLeft();
+			}
+		}
+		
 		DecimalFormat formatter = new DecimalFormat();
 		//check for a new year
 		if(calendar.get(Calendar.MONTH) == 0 && calendar.get(Calendar.DAY_OF_MONTH) == 1) {
