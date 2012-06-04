@@ -163,7 +163,7 @@ public class ResolveScenarioTracker {
 		client = c;
 	}
 	
-	public void processMulFiles() {
+	public void processMulFiles(boolean controlsField) {
 		File unitFile = unitList.getSelectedFile();
 		File salvageFile = salvageList.getSelectedFile();
 		if(null != unitFile) {
@@ -174,7 +174,7 @@ public class ResolveScenarioTracker {
 				e.printStackTrace();
 			}
 		}
-		if(null != salvageFile) {
+		if(null != salvageFile && controlsField) {
 			try {
 				loadSalvage(salvageFile);
 			} catch (IOException e) {

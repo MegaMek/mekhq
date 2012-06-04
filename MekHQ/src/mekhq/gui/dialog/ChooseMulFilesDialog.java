@@ -48,13 +48,15 @@ public class ChooseMulFilesDialog extends javax.swing.JDialog {
     private javax.swing.JButton btnSalvageFile;
     private javax.swing.JTextField txtSalvageFile;
     private javax.swing.JTextArea txtInstructions;
+    private boolean control;
     private boolean cancelled;
 	
     /** Creates new form NewTeamDialog */
-    public ChooseMulFilesDialog(java.awt.Frame parent, boolean modal, ResolveScenarioTracker t) {
+    public ChooseMulFilesDialog(java.awt.Frame parent, boolean modal, ResolveScenarioTracker t, boolean ctrl) {
         super(parent, modal);
         this.tracker = t;
         cancelled = false;
+        control = ctrl;
         initComponents();
         setLocationRelativeTo(parent);
     }
@@ -211,7 +213,7 @@ public class ChooseMulFilesDialog extends javax.swing.JDialog {
 
     
     private void btnNextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
-    	tracker.processMulFiles();
+    	tracker.processMulFiles(control);
     	this.setVisible(false);
     }
 

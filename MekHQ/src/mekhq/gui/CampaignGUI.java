@@ -3152,18 +3152,18 @@ public class CampaignGUI extends JPanel {
 		if(null == scenario) {
 			return;
 		}
-		ResolveScenarioTracker tracker = new ResolveScenarioTracker(scenario, getCampaign());
-		ChooseMulFilesDialog chooseFilesDialog = new ChooseMulFilesDialog(getFrame(), true, tracker);
-		chooseFilesDialog.setVisible(true);
-		if(chooseFilesDialog.wasCancelled()) {
-			return;
-		}
 		boolean control = JOptionPane.showConfirmDialog(getFrame(),
                 "Did your side control the battlefield at the end of the scenario?",
                 "Control of Battlefield?",
                 JOptionPane.YES_NO_OPTION,
                 JOptionPane.QUESTION_MESSAGE) ==
                 JOptionPane.YES_OPTION;
+		ResolveScenarioTracker tracker = new ResolveScenarioTracker(scenario, getCampaign());
+		ChooseMulFilesDialog chooseFilesDialog = new ChooseMulFilesDialog(getFrame(), true, tracker, control);
+		chooseFilesDialog.setVisible(true);
+		if(chooseFilesDialog.wasCancelled()) {
+			return;
+		}
 		tracker.postProcessEntities(control);
 		ResolveScenarioWizardDialog resolveDialog = new ResolveScenarioWizardDialog(getFrame(), true, tracker);
 		resolveDialog.setVisible(true);

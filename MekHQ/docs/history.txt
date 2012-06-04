@@ -18,6 +18,7 @@ v0.1.17 (SVN)
 + Patch 3530318: patch for bug 3530316
 + Bug 3523821: Refit techs list window too long.
 + Bug 3531225: C3 crashing campaign
++ Bug 3530489: Salvage Option Wrong
 
 v0.1.16 (2012-05-23)
 + removed PartsInventory, quantity is now tracked directly by part
