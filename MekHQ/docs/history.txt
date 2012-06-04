@@ -15,6 +15,7 @@ v0.1.17 (SVN)
 + Bug 3531266
 + Planetary data update 17
 + Bug: engines purchased through parts store or repaired have no unit tonnage or value
++ Patch 3530318: patch for bug 3530316
 
 v0.1.16 (2012-05-23)
 + removed PartsInventory, quantity is now tracked directly by part

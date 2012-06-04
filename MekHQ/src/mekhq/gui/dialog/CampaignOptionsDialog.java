@@ -1551,7 +1551,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         
         panRandomPortrait.add(panUsePortrait, BorderLayout.CENTER);
         JTextArea txtPortraitInst = new JTextArea(resourceMap.getString("txtPortraitInst.text"));
-        txtPortraitInst.setEditable(false);
+        txtPortraitInst.setPreferredSize(new Dimension(728, 50));
         txtPortraitInst.setEditable(false);
         txtPortraitInst.setLineWrap(true);
         txtPortraitInst.setWrapStyleWord(true);
