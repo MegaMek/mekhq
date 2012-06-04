@@ -181,6 +181,7 @@ public class Campaign implements Serializable {
 	// asssign it to the entities, otherwise some entity methods may get NPE
 	// if they try to call up game options
 	private Game game;
+	private Player player;
 
 	private GameOptions gameOptions;
 
@@ -221,6 +222,8 @@ public class Campaign implements Serializable {
 
 	public Campaign() {
 		game = new Game();
+		player = new Player(0, "self");
+		game.addPlayer(0, player);
 		currentReport = new ArrayList<String>();
 		calendar = new GregorianCalendar(3067, Calendar.JANUARY, 1);
 		dateFormat = new SimpleDateFormat("EEEE, MMMM d yyyy");
@@ -489,6 +492,7 @@ public class Campaign implements Serializable {
 	 */
 	public void addUnit(Entity en, boolean allowNewPilots) {
 		//reset the game object
+		en.setOwner(player);
 		en.setGame(game);
 		
 		UUID id = UUID.randomUUID();
@@ -1383,6 +1387,7 @@ public class Campaign implements Serializable {
 
 		for (Unit unit : getUnits()) {
 			if (null != unit.getEntity()) {
+				unit.getEntity().setOwner(player);
 				unit.getEntity().setGame(game);
 				unit.getEntity().restore();
 			}
@@ -3803,6 +3808,7 @@ public class Campaign implements Serializable {
         entity.setFacing(0);
     	entity.setPosition(null);
     	//TODO: still a lot of stuff to do here, but oh well
+    	entity.setOwner(player);
     	entity.setGame(game);
     }
     

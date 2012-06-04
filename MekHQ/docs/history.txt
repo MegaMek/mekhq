@@ -17,6 +17,7 @@ v0.1.17 (SVN)
 + Bug: engines purchased through parts store or repaired have no unit tonnage or value
 + Patch 3530318: patch for bug 3530316
 + Bug 3523821: Refit techs list window too long.
++ Bug 3531225: C3 crashing campaign
 
 v0.1.16 (2012-05-23)
 + removed PartsInventory, quantity is now tracked directly by part
