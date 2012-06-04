@@ -2516,9 +2516,6 @@ public class Campaign implements Serializable {
 
 			Unit u = Unit.generateInstanceFromXML(wn2, version);
 			
-			if(u.getEntity().getDisplayName().contains("Warhammer")) {
-				int bob = 1;
-			}
 			if (u != null) {
 				retVal.addUnit(u);
 			}
