@@ -60,6 +60,8 @@ public abstract class AbstractDragoonsRating implements IDragoonsRating {
     protected int numberBaSquads = 0;
     protected int numberSoldiers = 0;
     protected int numberInfSquads = 0;
+    protected int countIS2 = 0;
+    protected int countClan = 0;
     protected BigDecimal mechTech = BigDecimal.ZERO;
     protected BigDecimal aeroTech = BigDecimal.ZERO;
     protected BigDecimal veeTech = BigDecimal.ZERO;
@@ -205,26 +207,60 @@ public abstract class AbstractDragoonsRating implements IDragoonsRating {
         if (techLevel > TechConstants.T_INTRO_BOXSET) {
             if (TechConstants.isClan(techLevel)) {
                 numberClan = numberClan.add(value);
+                if (!isConventionalInfanry(u)) {
+                    countClan++;
+                }
             } else {
                 numberIS2 = numberIS2.add(value);
+                if (!isConventionalInfanry(u)) {
+                    countIS2++;
+                }
             }
         }
     }
 
     @Override
     public int getTechValue() {
+
+        //Make sure we have units.
         if (getNumberUnits().compareTo(BigDecimal.ZERO) == 0) {
             return 0;
         }
-        highTechPercent = numberIS2.add(numberClan.multiply(new BigDecimal(2))).divide(getNumberUnits(), PRECISION, HALF_EVEN);
-        highTechPercent = highTechPercent.multiply(new BigDecimal(100));
 
-        BigDecimal scoredPercent = highTechPercent.subtract(new BigDecimal(30));
-        if (scoredPercent.compareTo(BigDecimal.ZERO) < 0) {
+        //Number of high-tech units is equal to the number of IS2 units plus twice the number of Clan units.
+        BigDecimal highTechNumber = new BigDecimal(countIS2 + (countClan * 2));
+
+        //Conventional infantry does not count.
+        int numberUnits = numberAero + numberBaSquads + numberMech + numberVee;
+        if (numberUnits <= 0) {
             return 0;
         }
 
-        return scoredPercent.multiply(new BigDecimal(2)).setScale(0, RoundingMode.HALF_UP).intValue();
+        //Calculate the percentage of high-tech units.
+        highTechPercent = highTechNumber.divide(new BigDecimal(numberUnits), PRECISION, HALF_EVEN);
+        highTechPercent = highTechPercent.multiply(ONE_HUNDRED);
+
+        //Cannot go above 100 percent.
+        if (highTechPercent.compareTo(ONE_HUNDRED) > 0) {
+            highTechPercent = ONE_HUNDRED;
+        }
+
+        //Score is calculated from percentage above 30%.
+        BigDecimal scoredPercent = highTechPercent.subtract(new BigDecimal(30));
+
+        //If we have a negative value (hi-tech percent was < 30%) return a value of zero.
+        if (scoredPercent.compareTo(BigDecimal.ZERO) <= 0) {
+            return 0;
+        }
+
+        //Round down to the nearest whole percentage.
+        scoredPercent = scoredPercent.setScale(0, RoundingMode.DOWN);
+
+        //Add +5 points for every 10% remaining.
+        BigDecimal oneTenth = scoredPercent.divide(new BigDecimal(10), PRECISION, HALF_EVEN);
+        BigDecimal score = oneTenth.multiply(new BigDecimal(5));
+
+        return score.intValue();
     }
 
     /**
@@ -324,12 +360,14 @@ public abstract class AbstractDragoonsRating implements IDragoonsRating {
      */
     protected BigDecimal getUnitValue(Unit u) {
         BigDecimal value = BigDecimal.ONE;
-        if ((u.getEntity() instanceof Infantry)
-                && !(u.getEntity() instanceof BattleArmor)
-                && (((Infantry)u.getEntity()).getSquadN() == 1)) {
+        if (isConventionalInfanry(u) && (((Infantry)u.getEntity()).getSquadN() == 1)) {
             value = new BigDecimal("0.25");
         }
         return value;
+    }
+
+    protected boolean isConventionalInfanry(Unit u) {
+        return (u.getEntity() instanceof Infantry) && !(u.getEntity() instanceof BattleArmor);
     }
 
     /**
@@ -390,6 +428,8 @@ public abstract class AbstractDragoonsRating implements IDragoonsRating {
         numberBa = 0;
         numberSoldiers = 0;
         numberInfSquads = 0;
+        countClan = 0;
+        countIS2 = 0;
         mechTech = BigDecimal.ZERO;
         aeroTech = BigDecimal.ZERO;
         veeTech = BigDecimal.ZERO;

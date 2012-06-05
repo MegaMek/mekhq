@@ -34,6 +34,7 @@ public interface IDragoonsRating {
     
     public static final int PRECISION = 5;
     public static final RoundingMode HALF_EVEN = RoundingMode.HALF_EVEN;
+    public static final BigDecimal ONE_HUNDRED = new BigDecimal(100);
 
     public static final int DRAGOON_F = 0;
     public static final int DRAGOON_D = 1;
