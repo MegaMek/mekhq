@@ -22,6 +22,7 @@ v0.1.17 (SVN)
 + Bug 3496668: Duplicate Tech assignment
 + better information about why a part cannot be scrapped
 + Fixed the code for the Tech Rating portion of the Dragoons Rating.
++ allow multiple discontiguous selections in TO&E
 
 v0.1.16 (2012-05-23)
 + removed PartsInventory, quantity is now tracked directly by part

@@ -135,6 +135,18 @@ public class Force implements Serializable {
 		return subForces;
 	}
 	
+	public boolean isAncestorOf(Force otherForce) {
+		boolean isAncestor = false;
+		Force pForce = otherForce.getParentForce();
+		while(!isAncestor && pForce != null) {
+			if(pForce.getId() == getId()) {
+				return true;
+			}
+			pForce = pForce.getParentForce();
+		}
+		return isAncestor;
+	}
+	
 	/**
 	 * This returns the full hierarchical name of the force, including all parents
 	 * @return

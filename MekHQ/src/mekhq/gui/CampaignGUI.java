@@ -504,7 +504,7 @@ public class CampaignGUI extends JPanel {
 		orgTree.addMouseListener(orgMouseAdapter);
         orgTree.setCellRenderer(new ForceRenderer());
         orgTree.setRowHeight(60);
-        orgTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        orgTree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
         orgTree.addTreeSelectionListener(new TreeSelectionListener() {
             public void valueChanged(TreeSelectionEvent e) {
                refreshForceView();
@@ -3605,6 +3605,7 @@ public class CampaignGUI extends JPanel {
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				orgTree.updateUI();
+				orgTree.setSelectionPath(null);
 				refreshForceView();
 			}
 		});
@@ -5263,10 +5264,55 @@ public class CampaignGUI extends JPanel {
 		public void actionPerformed(ActionEvent action) {
 			StringTokenizer st = new StringTokenizer(action.getActionCommand(), "|");
             String command = st.nextToken();
-            String id = st.nextToken();
-            Force force = getCampaign().getForce(Integer.parseInt(id));
+            String type = st.nextToken();
+            String target = st.nextToken();
+            Vector<Force> forces = new Vector<Force>();
+            Vector<Unit> units = new Vector<Unit>();
+            while(st.hasMoreTokens()) {
+                String id = st.nextToken();
+                if(type.equals("FORCE")) {
+	                Force force = getCampaign().getForce(Integer.parseInt(id));
+	                if(null != force) {
+	                	forces.add(force);
+	                }
+                }
+                if(type.equals("UNIT")) {
+	                Unit unit = getCampaign().getUnit(UUID.fromString(id));
+	                if(null != unit) {
+	                	units.add(unit);
+	                }
+                }
+            }
+            if(type.equals("FORCE")) {
+            	Vector<Force> newForces = new Vector<Force>();
+            	for(Force force : forces) {
+        			boolean duplicate = false;
+            		for(Force otherForce : forces) {
+            			if(otherForce.getId() == force.getId()) {
+            				continue;
+            			}
+            			if(otherForce.isAncestorOf(force)) {
+            				duplicate = true;
+            				break;
+            			}
+            		}
+            		if(!duplicate) {
+            			newForces.add(force);
+            		}
+            	}
+            	forces = newForces;
+            }
+            //TODO: eliminate any forces that are descendants of other forces in the vector
+            Force singleForce = null;
+            if(!forces.isEmpty()) {
+            	singleForce = forces.get(0);
+            }
+            Unit singleUnit = null;
+            if(!units.isEmpty()) {
+            	singleUnit = units.get(0);
+            }
             if(command.contains("ADD_FORCE")) {
-            	if(null != force) {
+            	if(null != singleForce) {
 	            	String name = (String)JOptionPane.showInputDialog(
 	                        null,
 	                        "Enter the force name",
@@ -5275,14 +5321,14 @@ public class CampaignGUI extends JPanel {
 	                        null,
 	                        null,
 	                        "My Lance");
-	            	getCampaign().addForce(new Force(name), force);
+	            	getCampaign().addForce(new Force(name), singleForce);
 	            	refreshOrganization();
             	}
             } if(command.contains("ADD_UNIT")) {
-            	if(null != force) {
-                    Unit u = getCampaign().getUnit(UUID.fromString(st.nextToken()));
+            	if(null != singleForce) {
+                    Unit u = getCampaign().getUnit(UUID.fromString(target));
                     if(null != u) {
-                    	getCampaign().addUnitToForce(u, force.getId());
+                    	getCampaign().addUnitToForce(u, singleForce.getId());
                     	refreshOrganization();
                     	refreshScenarioList();
                     	refreshPersonnelList();
@@ -5291,18 +5337,20 @@ public class CampaignGUI extends JPanel {
                     }
             	}
             } else if(command.contains("DEPLOY_FORCE")) {
-                int sid = Integer.parseInt(st.nextToken());
+                int sid = Integer.parseInt(target);
             	Scenario scenario = getCampaign().getScenario(sid);
-            	if(null != force && null != scenario) {
-                    scenario.addForces(force.getId());
-                    force.setScenarioId(scenario.getId());
-                    refreshScenarioList();
-                    for(UUID uid : force.getAllUnits()) {
-                    	Unit u = getCampaign().getUnit(uid);
-                    	if(null != u) {
-                    		u.setScenarioId(scenario.getId());
-                    	}
-                    }
+            	for(Force force : forces) {
+	            	if(null != force && null != scenario) {
+	                    scenario.addForces(force.getId());
+	                    force.setScenarioId(scenario.getId());
+	                    refreshScenarioList();
+	                    for(UUID uid : force.getAllUnits()) {
+	                    	Unit u = getCampaign().getUnit(uid);
+	                    	if(null != u) {
+	                    		u.setScenarioId(scenario.getId());
+	                    	}
+	                    }
+	            	}
             	}
             	refreshScenarioList();
             	refreshOrganization();
@@ -5310,17 +5358,17 @@ public class CampaignGUI extends JPanel {
             	refreshUnitList();
             	refreshServicedUnitList();
             } else if(command.contains("CHANGE_ICON")) {
-            	if(null != force) {
+            	if(null != singleForce) {
             		PortraitChoiceDialog pcd = new PortraitChoiceDialog(getFrame(), true,
-    						force.getIconCategory(),
-    						force.getIconFileName(), getForceIcons());
+    						singleForce.getIconCategory(),
+    						singleForce.getIconFileName(), getForceIcons());
     				pcd.setVisible(true);
-    				force.setIconCategory(pcd.getCategory());
-    				force.setIconFileName(pcd.getFileName());
+    				singleForce.setIconCategory(pcd.getCategory());
+    				singleForce.setIconFileName(pcd.getFileName());
 	            	refreshOrganization();
             	}
             } else if(command.contains("CHANGE_NAME")) {
-            	if(null != force) {
+            	if(null != singleForce) {
 	            	String name = (String)JOptionPane.showInputDialog(
 	                        null,
 	                        "Enter the force name",
@@ -5328,58 +5376,64 @@ public class CampaignGUI extends JPanel {
 	                        JOptionPane.PLAIN_MESSAGE,
 	                        null,
 	                        null,
-	                        force.getName());
-	            	force.setName(name);
+	                        singleForce.getName());
+	            	singleForce.setName(name);
 	            	refreshOrganization();
             	}
             } else if(command.contains("CHANGE_DESC")) {
-            	if(null != force) {
+            	if(null != singleForce) {
             		TextAreaDialog tad = new TextAreaDialog(getFrame(), true,
     						"Edit Force Description",
-    						force.getDescription());
+    						singleForce.getDescription());
     				tad.setVisible(true);
     				if(tad.wasChanged()) {
-    					force.setDescription(tad.getText());
+    					singleForce.setDescription(tad.getText());
     					refreshOrganization();
     				}
             	}
             } else if(command.contains("REMOVE_FORCE")) {
-            	if(null != force) {
-            		if(0 != JOptionPane.showConfirmDialog(null,
-            				"Are you sure you want to delete " + force.getFullName() + "?"
-            			, "Delete Force?",
-            				JOptionPane.YES_NO_OPTION)) {
-                		return;
-                	}
-            		getCampaign().removeForce(force);
-            		refreshOrganization();
-            		refreshPersonnelList();
-            		refreshScenarioList();
+            	for(Force force : forces) {
+	            	if(null != force && null != force.getParentForce()) {
+	            		if(0 != JOptionPane.showConfirmDialog(null,
+	            				"Are you sure you want to delete " + force.getFullName() + "?"
+	            			, "Delete Force?",
+	            				JOptionPane.YES_NO_OPTION)) {
+	                		return;
+	                	}
+	            		getCampaign().removeForce(force);
+	            	}
             	}
+            	refreshOrganization();
+            	refreshPersonnelList();
+            	refreshScenarioList();
             } else if(command.contains("REMOVE_UNIT")) {
-                Unit unit = getCampaign().getUnit(UUID.fromString(st.nextToken()));
-            	if(null != unit) {
-            		Force parentForce = getCampaign().getForceFor(unit);
-            		if(null != parentForce) {
-            			getCampaign().removeUnitFromForce(unit);
-            			refreshOrganization();
-            			refreshPersonnelList();
-            			refreshScenarioList();
-            		}
+            	for(Unit unit : units) {
+	            	if(null != unit) {
+	            		Force parentForce = getCampaign().getForceFor(unit);
+	            		if(null != parentForce) {
+	            			getCampaign().removeUnitFromForce(unit);
+	            			
+	            		}
+	            	}
             	}
+            	refreshOrganization();
+    			refreshPersonnelList();
+    			refreshScenarioList();
             } else if(command.contains("DEPLOY_UNIT")) {
-                Unit unit = getCampaign().getUnit(UUID.fromString(st.nextToken()));
-                int sid = Integer.parseInt(st.nextToken());
+                int sid = Integer.parseInt(target);
             	Scenario scenario = getCampaign().getScenario(sid);
-            	if(null != unit && null != scenario) {
-                    scenario.addUnit(unit.getId());
-                    unit.setScenarioId(scenario.getId());
-                    refreshScenarioList();
-                    refreshOrganization();
-                    refreshPersonnelList();
-                	refreshUnitList();
-                	refreshServicedUnitList();
+            	for(Unit unit : units) {
+	            	if(null != unit && null != scenario) {
+	                    scenario.addUnit(unit.getId());
+	                    unit.setScenarioId(scenario.getId());
+	                    
+	            	}
             	}
+            	refreshScenarioList();
+                refreshOrganization();
+                refreshPersonnelList();
+            	refreshUnitList();
+            	refreshServicedUnitList();
             }
 		}
 
@@ -5393,64 +5447,114 @@ public class CampaignGUI extends JPanel {
 			maybeShowPopup(e);
 		}
 
+		private boolean areAllForcesUndeployed(Vector<Force> forces) {
+			for(Force force : forces) {
+				if(force.isDeployed()) {
+					return false;
+				}
+			}
+			return true;
+		}
+		
+		private boolean areAllUnitsUndeployed(Vector<Unit> units) {
+			for(Unit unit : units) {
+				if(unit.isDeployed()) {
+					return false;
+				}
+			}
+			return true;
+		}
+		
 		private void maybeShowPopup(MouseEvent e) {
 
 			if (e.isPopupTrigger()) {
 				JPopupMenu popup = new JPopupMenu();
 				JMenuItem menuItem;
 				JMenu menu;
-				int x = e.getX();
-                int y = e.getY();
                 JTree tree = (JTree)e.getSource();
-                TreePath path = tree.getPathForLocation(x, y);
-                if (path == null)
+                if (tree == null)
                         return;
-                tree.setSelectionPath(path);
-                Object node = path.getLastPathComponent();
-                Force force = null;
-                Unit unit = null;
-                if(node instanceof Force) {
-                	force = (Force)node;
+                //this is a little tricky because we want to 
+                //distinguish forces and units, but the user can 
+                //select multiple items of both types
+                //we will allow multiple selection of either units or forces but
+                //not both - if both are selected then default to 
+                //unit and deselect all forces
+                Vector<Force> forces = new Vector<Force>();
+                Vector<Unit> units = new Vector<Unit>();
+                Vector<TreePath> uPath = new Vector<TreePath>();
+                for(TreePath path : tree.getSelectionPaths()) {
+                    Object node = path.getLastPathComponent();
+                    if(node instanceof Force) {
+                    	forces.add((Force)node);
+                    }
+                    if(node instanceof Unit) {
+                    	units.add((Unit)node);
+                    	uPath.add(path);
+                    }
                 }
-                if(node instanceof Unit) {
-                	unit = (Unit)node;
+                boolean forcesSelected = !forces.isEmpty();
+                boolean unitsSelected = !units.isEmpty();
+                //if both are selected then we prefer units 
+                //and will deselect forces
+                if(forcesSelected & unitsSelected) {
+                	forcesSelected = false;
+                	TreePath[] paths = new TreePath[uPath.size()];
+                	int i = 0;
+                	for(TreePath p : uPath) {
+                		paths[i] = p;
+                		i++;
+                	}
+                	tree.setSelectionPaths(paths);
                 }
-                if(null != force) {
-                	int forceId = force.getId();
-	                menuItem = new JMenuItem("Change Name...");
-	                menuItem.setActionCommand("CHANGE_NAME|" + forceId);
-					menuItem.addActionListener(this);
-					menuItem.setEnabled(true);
-	                popup.add(menuItem);
-	                menuItem = new JMenuItem("Change Description...");
-	                menuItem.setActionCommand("CHANGE_DESC|" + forceId);
-					menuItem.addActionListener(this);
-					menuItem.setEnabled(true);
-	                popup.add(menuItem);
-	                menuItem = new JMenuItem("Add New Force...");
-	                menuItem.setActionCommand("ADD_FORCE|" + forceId);
-					menuItem.addActionListener(this);
-					menuItem.setEnabled(true);
-	                popup.add(menuItem);
-	                menu = new JMenu("Add Unit");
-	                //only add units that have commanders
-	                for(Unit u : getCampaign().getUnits()) {
-	                	if(null != u.getCommander()) {
-	                		Person p = u.getCommander();
-	                		if(p.isActive() && u.getForceId() < 1) {
-				                menuItem = new JMenuItem(p.getFullTitle() + ", " + u.getName());
-			                	menuItem.setActionCommand("ADD_UNIT|" + forceId + "|" + u.getId());
-			                	menuItem.addActionListener(this);
-			                	menuItem.setEnabled(!u.isDeployed());
-			                	menu.add(menuItem);
+                boolean multipleSelection = (forcesSelected && forces.size() > 1) || (unitsSelected && units.size() > 1);
+                if(forcesSelected) {
+                	Force force = forces.get(0);
+                	String forceIds = "" + force.getId();
+                	for(int i = 1; i<forces.size(); i++) {
+                		forceIds += "|" + forces.get(i).getId();
+                	}
+                	if(!multipleSelection) {
+		                menuItem = new JMenuItem("Change Name...");
+		                menuItem.setActionCommand("CHANGE_NAME|FORCE|empty|" + forceIds);
+						menuItem.addActionListener(this);
+						menuItem.setEnabled(true);
+		                popup.add(menuItem);
+		                menuItem = new JMenuItem("Change Description...");
+		                menuItem.setActionCommand("CHANGE_DESC|FORCE|empty|" + forceIds);
+						menuItem.addActionListener(this);
+						menuItem.setEnabled(true);
+		                popup.add(menuItem);
+		                menuItem = new JMenuItem("Add New Force...");
+		                menuItem.setActionCommand("ADD_FORCE|FORCE|empty|" + forceIds);
+						menuItem.addActionListener(this);
+						menuItem.setEnabled(true);
+		                popup.add(menuItem);
+		                menu = new JMenu("Add Unit");
+		                //only add units that have commanders
+		                for(Unit u : getCampaign().getUnits()) {
+		                	if(null != u.getCommander()) {
+		                		Person p = u.getCommander();
+		                		if(p.isActive() && u.getForceId() < 1) {
+					                menuItem = new JMenuItem(p.getFullTitle() + ", " + u.getName());
+				                	menuItem.setActionCommand("ADD_UNIT|FORCE|"  + u.getId() + "|" + forceIds);
+				                	menuItem.addActionListener(this);
+				                	menuItem.setEnabled(!u.isDeployed());
+				                	menu.add(menuItem);
+			                	}
 		                	}
-	                	}
-	                }
-	                if(menu.getItemCount() > 30) {
-	                	MenuScroller.setScrollerFor(menu, 30);
-	                }
-	                popup.add(menu);
-	                if(!force.isDeployed() && force.getAllUnits().size()>0) {
+		                }
+		                if(menu.getItemCount() > 30) {
+		                	MenuScroller.setScrollerFor(menu, 30);
+		                }
+		                popup.add(menu);
+		                menuItem = new JMenuItem("Change Force Icon...");
+		                menuItem.setActionCommand("CHANGE_ICON|FORCE|empty|" + forceIds);
+						menuItem.addActionListener(this);
+						menuItem.setEnabled(true);
+		                popup.add(menuItem);
+                	}
+	                if(areAllForcesUndeployed(forces)) {
 	                	menu = new JMenu("Deploy Force");
 	                	JMenu missionMenu;
 	                	for(Mission m : getCampaign().getMissions()) {
@@ -5461,7 +5565,7 @@ public class CampaignGUI extends JPanel {
 	                		for(Scenario s : m.getScenarios()) {
 	                			if(s.isCurrent()) {
 	                				menuItem = new JMenuItem(s.getName());
-		                			menuItem.setActionCommand("DEPLOY_FORCE|" + forceId + "|" + s.getId());
+		                			menuItem.setActionCommand("DEPLOY_FORCE|FORCE|"  + s.getId() + "|" + forceIds);
 		    						menuItem.addActionListener(this);
 		    						menuItem.setEnabled(true);
 		    		                missionMenu.add(menuItem);
@@ -5472,27 +5576,24 @@ public class CampaignGUI extends JPanel {
 	                	popup.add(menu);
 	                }
 	                menuItem = new JMenuItem("Remove Force");
-	                menuItem.setActionCommand("REMOVE_FORCE|" + forceId);
-					menuItem.addActionListener(this);
-					menuItem.setEnabled(null != force.getParentForce());
-	                popup.add(menuItem);
-	                menuItem = new JMenuItem("Change Force Icon...");
-	                menuItem.setActionCommand("CHANGE_ICON|" + forceId);
+	                menuItem.setActionCommand("REMOVE_FORCE|FORCE|empty|" + forceIds);
 					menuItem.addActionListener(this);
 					menuItem.setEnabled(true);
 	                popup.add(menuItem);
                 }
-                else if(null != unit) {
-                	UUID uid = unit.getId();
-                	Force parentForce = getCampaign().getForceFor(unit);
-                	if(null != parentForce) {
-	                	menuItem = new JMenuItem("Remove Unit from " + parentForce.getName());
-		                menuItem.setActionCommand("REMOVE_UNIT|" + parentForce.getId() + "|" + uid.toString());
-						menuItem.addActionListener(this);
-						menuItem.setEnabled(true);
-		                popup.add(menuItem);
+                else if(unitsSelected) {
+                	Unit unit = units.get(0);
+                	String unitIds = "" + unit.getId().toString();
+                	for(int i = 1; i<units.size(); i++) {
+                		unitIds += "|" + units.get(i).getId().toString();
                 	}
-                	if(!unit.isDeployed()) {
+                	Force parentForce = getCampaign().getForceFor(unit);
+                	menuItem = new JMenuItem("Remove Unit from TO&E");
+                	menuItem.setActionCommand("REMOVE_UNIT|UNIT|" + parentForce.getId() + "|" + unitIds);
+                	menuItem.addActionListener(this);
+                	menuItem.setEnabled(true);
+                	popup.add(menuItem);
+                	if(areAllUnitsUndeployed(units)) {
                 		menu = new JMenu("Deploy Unit");
 	                	JMenu missionMenu;
 	                	for(Mission m : getCampaign().getMissions()) {
@@ -5503,7 +5604,7 @@ public class CampaignGUI extends JPanel {
 	                		for(Scenario s : m.getScenarios()) {
 	                			if(s.isCurrent()) {
 	                				menuItem = new JMenuItem(s.getName());
-		                			menuItem.setActionCommand("DEPLOY_UNIT|-1|" + uid + "|" + s.getId());
+		                			menuItem.setActionCommand("DEPLOY_UNIT|UNIT|" + s.getId() + "|" + unitIds);
 		    						menuItem.addActionListener(this);
 		    						menuItem.setEnabled(true);
 		    		                missionMenu.add(menuItem);
@@ -5550,7 +5651,7 @@ public class CampaignGUI extends JPanel {
             setOpaque(true);
             setBackground(Color.WHITE);
             setForeground(Color.BLACK);
-            if(hasFocus) {
+            if(sel) {
             	setBackground(Color.DARK_GRAY);
                 setForeground(Color.WHITE);
             }
