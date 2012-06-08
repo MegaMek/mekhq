@@ -1317,6 +1317,12 @@ public class Campaign implements Serializable {
 			force.removeUnit(u.getId());
 			u.setForceId(-1);
 			u.setScenarioId(-1);
+			if(u.getEntity().hasC3i() && u.getEntity().calculateFreeC3Nodes() < 5) {
+				Vector<Unit> removedUnits = new Vector<Unit>();
+				removedUnits.add(u);
+				removeUnitsFromNetwork(removedUnits);
+				refreshNetworks();
+			}
 		}
 	}
 	 
@@ -2094,6 +2100,9 @@ public class Campaign implements Serializable {
 					s.addUnit(unit.getId());
 				}
 			}
+			
+			retVal.refreshNetworks();
+			
 		}
 		
 
@@ -3821,4 +3830,152 @@ public class Campaign implements Serializable {
 		}
 		return null;
     }
+        
+    public void refreshNetworks() {
+    	
+    	for(Unit unit : getUnits()) {
+    	//we are going to rebuild the c3 and c3i networks based on 
+    	//the c3UUIDs
+    	//TODO: can we do this more efficiently?
+		//this code is cribbed from megamek.server#receiveEntityAdd
+			Entity entity = unit.getEntity();
+			if (null != entity && (entity.hasC3() || entity.hasC3i())) {
+	            boolean C3iSet = false;
+	
+	            for (Enumeration<Entity> entities = game.getEntities(); entities
+	                    .hasMoreElements();) {
+	                Entity e = entities.nextElement();
+	
+	                // C3 Checks
+	                if (entity.hasC3()) {
+	                    if ((entity.getC3MasterIsUUIDAsString() != null)
+	                            && entity.getC3MasterIsUUIDAsString().equals(
+	                                    e.getC3UUIDAsString())) {
+	                        entity.setC3Master(e);
+	                        entity.setC3MasterIsUUIDAsString(null);
+	                    } else if ((e.getC3MasterIsUUIDAsString() != null)
+	                            && e.getC3MasterIsUUIDAsString().equals(
+	                                    entity.getC3UUIDAsString())) {
+	                        e.setC3Master(entity);
+	                        e.setC3MasterIsUUIDAsString(null);
+	                    }
+	                }
+	
+	                // C3i Checks// C3i Checks
+	                if (entity.hasC3i() && (C3iSet == false)) {
+						entity.setC3NetIdSelf();
+	                    int pos = 0;
+	                    while (pos < Entity.MAX_C3i_NODES) {
+	                        // We've found a network, join it.
+	                        if ((entity.getC3iNextUUIDAsString(pos) != null)
+	                                && (e.getC3UUIDAsString() != null)
+	                                && entity.getC3iNextUUIDAsString(pos).equals(
+	                                        e.getC3UUIDAsString())) {
+	                            entity.setC3NetId(e);
+	                            C3iSet = true;
+	                            break;
+	                        }
+	
+	                        pos++;
+	                    }
+	                }
+	            }
+	        }
+	    }
+    }
+    
+    public void disbandNetworkOf(Unit u) {
+    	//collect all of the other units on this network to rebuild the uuids
+    	Vector<Unit> networkedUnits = new Vector<Unit>();
+    	for(Unit unit : getUnits()) {
+    		if(null != unit.getEntity().getC3NetId() && unit.getEntity().getC3NetId().equals(u.getEntity().getC3NetId())) {
+    			networkedUnits.add(unit);
+    		}
+    	}
+    	for(int pos = 0; pos<Entity.MAX_C3i_NODES; pos++) {
+	    	for(Unit nUnit : networkedUnits) {
+	    		nUnit.getEntity().setC3iNextUUIDAsString(pos, null);
+    		} 
+    	}
+    	refreshNetworks();
+    }
+    
+    public void removeUnitsFromNetwork(Vector<Unit> removedUnits) {
+    	//collect all of the other units on this network to rebuild the uuids
+    	Vector<String> uuids = new Vector<String>();
+    	Vector<Unit> networkedUnits = new Vector<Unit>();
+    	String network = removedUnits.get(0).getEntity().getC3NetId();
+    	for(Unit unit : getUnits()) {
+    		if(removedUnits.contains(unit)) {
+    			continue;
+    		}
+    		if(null != unit.getEntity().getC3NetId() && unit.getEntity().getC3NetId().equals(network)) {
+    			networkedUnits.add(unit);
+    			uuids.add(unit.getEntity().getC3UUIDAsString());
+    		}
+    	}
+    	for(int pos = 0; pos<Entity.MAX_C3i_NODES; pos++) {
+    		for(Unit u : removedUnits) {
+    			u.getEntity().setC3iNextUUIDAsString(pos, null);
+    		}
+	    	for(Unit nUnit : networkedUnits) {
+	    		if(pos < uuids.size()) {
+	    			nUnit.getEntity().setC3iNextUUIDAsString(pos, uuids.get(pos));
+	    		} else {
+	    			nUnit.getEntity().setC3iNextUUIDAsString(pos, null);
+	    		}
+    		} 
+    	}
+    	refreshNetworks();
+    }
+    
+    public void addUnitsToNetwork(Vector<Unit> addedUnits, String netid) {
+    	//collect all of the other units on this network to rebuild the uuids
+    	Vector<String> uuids = new Vector<String>();
+    	Vector<Unit> networkedUnits = new Vector<Unit>();
+    	for(Unit u : addedUnits) {
+	    	uuids.add(u.getEntity().getC3UUIDAsString());
+	    	networkedUnits.add(u);
+    	}
+    	for(Unit unit : getUnits()) {
+    		if(addedUnits.contains(unit)) {
+    			continue;
+    		}
+    		if(null != unit.getEntity().getC3NetId() && unit.getEntity().getC3NetId().equals(netid)) {
+    			networkedUnits.add(unit);
+    			uuids.add(unit.getEntity().getC3UUIDAsString());
+    		}
+    	}
+    	for(int pos = 0; pos<Entity.MAX_C3i_NODES; pos++) {
+	    	for(Unit nUnit : networkedUnits) {
+	    		if(pos < uuids.size()) {
+	    			nUnit.getEntity().setC3iNextUUIDAsString(pos, uuids.get(pos));
+	    		} else {
+	    			nUnit.getEntity().setC3iNextUUIDAsString(pos, null);
+	    		}
+    		} 
+    	}
+    	refreshNetworks();
+    }
+   
+    
+    public Vector<String[]> getAvailableC3iNetworks() {
+    	Vector<String[]> networks = new Vector<String[]>();
+    	Vector<String> networkNames = new Vector<String>();
+
+    	for(Entity en : getEntities()) {
+    		if(en.hasC3i() 
+    				&& en.calculateFreeC3Nodes() < 5 && en.calculateFreeC3Nodes() > 0) {
+    			String[] network = new String[2];
+    			network[0] = en.getC3NetId();
+    			network[1] = "" + en.calculateFreeC3Nodes();
+    			if(!networkNames.contains(network[0])) {
+    				networks.add(network);
+    				networkNames.add(network[0]);
+    			}
+    		}
+    	}
+    	return networks;
+    }
+    
 }

@@ -20,8 +20,10 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
+import megamek.client.ui.Messages;
 import megamek.client.ui.swing.MechTileset;
 import megamek.client.ui.swing.util.PlayerColors;
+import megamek.common.Entity;
 import megamek.common.Pilot;
 import megamek.common.Player;
 import megamek.common.UnitType;
@@ -545,6 +547,22 @@ public class ForceViewPanel extends javax.swing.JPanel {
         String toReturn = "<html><font size='2'><b>" + unit.getName() + "</b><br/>";
         toReturn += "<b>BV:</b> " + unit.getEntity().calculateBattleValue(true, null == unit.getEntity().getCrew()) + "<br/>";
         toReturn += unit.getStatus();
+        Entity entity = unit.getEntity();
+    	if (entity.hasC3i()) {
+    		toReturn += "<br><i>";
+            if (entity.calculateFreeC3Nodes() >= 5) {
+            	toReturn += Messages.getString("ChatLounge.C3iNone");
+            } else {
+            	toReturn += Messages
+                        .getString("ChatLounge.C3iNetwork")
+                        + entity.getC3NetId();
+                if (entity.calculateFreeC3Nodes() > 0) {
+                	toReturn += Messages.getString("ChatLounge.C3Nodes",
+                            new Object[] { entity.calculateFreeC3Nodes() });
+                }
+            }
+    		toReturn += "</i>";
+        }
         toReturn += "</font></html>";
         return toReturn;
     }

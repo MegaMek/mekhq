@@ -680,10 +680,12 @@ public class ResolveScenarioTracker {
 					((Contract)getMission()).addSalvageByEmployer(salvageUnit.getSellValue());
 				}
 			}
-		}
+		}		
 		scenario.setStatus(resolution);
 		scenario.setReport(report);
-		scenario.clearAllForcesAndPersonnel(campaign);
+		scenario.clearAllForcesAndPersonnel(campaign);	
+		//lets reset the network ids from the c3UUIDs
+		campaign.refreshNetworks();
 		scenario.setDate(campaign.getCalendar().getTime());
 		client = null;
 	}

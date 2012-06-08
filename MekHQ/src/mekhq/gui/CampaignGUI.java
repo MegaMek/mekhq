@@ -126,6 +126,7 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import megamek.MegaMek;
+import megamek.client.ui.Messages;
 import megamek.client.ui.swing.MechTileset;
 import megamek.client.ui.swing.MechView;
 import megamek.client.ui.swing.util.PlayerColors;
@@ -5434,6 +5435,38 @@ public class CampaignGUI extends JPanel {
                 refreshPersonnelList();
             	refreshUnitList();
             	refreshServicedUnitList();
+            } else if(command.contains("C3I")) {
+            	//don't set them directly, set the C3i UUIDs and then 
+            	//run refreshNetworks on the campaign 
+            	//TODO: is that too costly?
+            	Vector<String> uuids = new Vector<String>();
+            	for(Unit unit : units) {
+            		if(null == unit.getEntity()) {
+            			continue;
+            		}
+            		uuids.add(unit.getEntity().getC3UUIDAsString());
+            	}
+            	for(int pos = 0; pos < uuids.size(); pos++) {
+            		for(Unit unit : units) {
+            			if(null == unit.getEntity()) {
+            				continue;
+            			}
+            			unit.getEntity().setC3iNextUUIDAsString(pos, uuids.get(pos));
+            		}
+            	}
+            	getCampaign().refreshNetworks();
+                refreshOrganization();
+            } else if(command.contains("REMOVE_NETWORK")) {
+            	getCampaign().removeUnitsFromNetwork(units);
+                refreshOrganization();
+            } else if(command.contains("DISBAND_NETWORK")) {
+            	if(null != singleUnit) {
+            		getCampaign().disbandNetworkOf(singleUnit);
+            	}
+                refreshOrganization();
+            } else if(command.contains("ADD_NETWORK")) {
+            	getCampaign().addUnitsToNetwork(units, target);
+                refreshOrganization();
             }
 		}
 
@@ -5459,6 +5492,67 @@ public class CampaignGUI extends JPanel {
 		private boolean areAllUnitsUndeployed(Vector<Unit> units) {
 			for(Unit unit : units) {
 				if(unit.isDeployed()) {
+					return false;
+				}
+			}
+			return true;
+		}
+		
+		private boolean doAllUnitsHaveC3i(Vector<Unit> units) {
+			for(Unit unit : units) {
+				Entity e = unit.getEntity();
+				if(null == e) {
+					return false;
+				}
+				if(!e.hasC3i()) {
+					return false;
+				}
+			}
+			return true;
+		}
+		
+		private boolean areAllUnitsNotNetworked(Vector<Unit> units) {
+			for(Unit unit : units) {
+				Entity e = unit.getEntity();
+				if(null == e) {
+					return false;
+				}
+				if(e.hasC3i() && e.calculateFreeC3Nodes() < 5) {
+					return false;
+				}
+			}
+			return true;
+		}
+		
+		private boolean areAllUnitsNetworked(Vector<Unit> units) {
+			for(Unit unit : units) {
+				Entity e = unit.getEntity();
+				if(null == e) {
+					return false;
+				}
+				if(!e.hasC3i() && !e.hasC3()) {
+					return false;
+				}
+				if(e.hasC3i() && e.calculateFreeC3Nodes() == 5) {
+					return false;
+				}
+			}
+			return true;
+		}
+		
+		private boolean areAllUnitsOnSameNetwork(Vector<Unit> units) {
+			String network = null;
+			for(Unit unit : units) {
+				Entity e = unit.getEntity();
+				if(null == e) {
+					return false;
+				}
+				if(null == e.getC3NetId()) {
+					return false;
+				}
+				if(null == network) {
+					network = e.getC3NetId();
+				} else if(!e.getC3NetId().equals(network)) {
 					return false;
 				}
 			}
@@ -5587,9 +5681,51 @@ public class CampaignGUI extends JPanel {
                 	for(int i = 1; i<units.size(); i++) {
                 		unitIds += "|" + units.get(i).getId().toString();
                 	}
-                	Force parentForce = getCampaign().getForceFor(unit);
+                	if(doAllUnitsHaveC3i(units)) {
+                		JMenu networkMenu = new JMenu("Network");
+	                	if(multipleSelection && areAllUnitsNotNetworked(units) && units.size() < 7) {
+		                	menuItem = new JMenuItem("Create new C3i network");
+		                	menuItem.setActionCommand("C3I|UNIT|empty|" + unitIds);
+		                	menuItem.addActionListener(this);
+		                	menuItem.setEnabled(true);
+		                	networkMenu.add(menuItem);
+	                	}
+	                	if(areAllUnitsNotNetworked(units)) {
+	                		JMenu availMenu = new JMenu("Add to network");
+	                		for(String[] network : getCampaign().getAvailableC3iNetworks()) {
+	                			int nodesFree = Integer.parseInt(network[1]);
+	                			if(nodesFree >= units.size()) {
+	                				menuItem = new JMenuItem(network[0] + ": " + network[1] + " nodes free");
+	                				menuItem.setActionCommand("ADD_NETWORK|UNIT|" + network[0] + "|" + unitIds);
+	                				menuItem.addActionListener(this);
+	                				menuItem.setEnabled(true);
+	                				availMenu.add(menuItem);
+	                			}
+	                		}
+	                		if(availMenu.getItemCount() > 0) {
+	                			networkMenu.add(availMenu);
+	                		}
+	                	}
+	                	if(areAllUnitsNetworked(units)) {
+	                		menuItem = new JMenuItem("Remove from network");
+		                	menuItem.setActionCommand("REMOVE_NETWORK|UNIT|empty|" + unitIds);
+		                	menuItem.addActionListener(this);
+		                	menuItem.setEnabled(true);
+		                	networkMenu.add(menuItem);
+		                	 if(areAllUnitsOnSameNetwork(units)) {
+		                		 menuItem = new JMenuItem("Disband this network");
+		                		 menuItem.setActionCommand("DISBAND_NETWORK|UNIT|empty|" + unitIds);
+		                		 menuItem.addActionListener(this);
+		                		 menuItem.setEnabled(true);
+		                		 networkMenu.add(menuItem);
+		                	 }
+	                	}        
+	                	if(networkMenu.getItemCount() > 0) {
+                			popup.add(networkMenu);
+                		}
+                	}
                 	menuItem = new JMenuItem("Remove Unit from TO&E");
-                	menuItem.setActionCommand("REMOVE_UNIT|UNIT|" + parentForce.getId() + "|" + unitIds);
+                	menuItem.setActionCommand("REMOVE_UNIT|UNIT|empty|" + unitIds);
                 	menuItem.addActionListener(this);
                 	menuItem.setEnabled(true);
                 	popup.add(menuItem);
@@ -5659,6 +5795,7 @@ public class CampaignGUI extends JPanel {
             if(value instanceof Unit) {
             	String name = "<font color='red'>No Crew</font>";
             	String uname = "";
+            	String c3network = "";
             	Unit u = (Unit)value;
             	Person pp = u.getCommander();
             	if(null != pp) {
@@ -5672,8 +5809,25 @@ public class CampaignGUI extends JPanel {
             	if(u.isDamaged()) {
             		uname = "<font color='red'>" + uname + "</font>";
             	}
-            	setText("<html>" + name + ", " + uname + "</html>");
-            	if(u.isDeployed() && !hasFocus) {
+            	Entity entity = u.getEntity();
+            	if (entity.hasC3i()) {
+                    if (entity.calculateFreeC3Nodes() >= 5) {
+                        c3network += Messages.getString("ChatLounge.C3iNone");
+                    } else {
+                        c3network += Messages
+                                .getString("ChatLounge.C3iNetwork")
+                                + entity.getC3NetId();
+                        if (entity.calculateFreeC3Nodes() > 0) {
+                            c3network += Messages.getString("ChatLounge.C3Nodes",
+                                    new Object[] { entity.calculateFreeC3Nodes() });
+                        }
+                    }
+                }
+            	if(!c3network.isEmpty()) {
+            		c3network = "<br><i>" + c3network + "</i>";
+            	}
+            	setText("<html>" + name + ", " + uname + c3network + "</html>");
+            	if(u.isDeployed() && !sel) {
             		setBackground(Color.LIGHT_GRAY);
             	}
             }
