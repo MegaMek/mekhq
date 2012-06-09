@@ -1459,11 +1459,42 @@ Despite being aware of the impending, though slow coming, temperature change tha
 		<name>Altais</name>
 		<xcood>37.56</xcood>
 		<ycood>110.84</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2341-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2571-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<pressure>4</pressure>
+		<gravity>0.98</gravity>
+		<lifeForm>4</lifeForm>
+		<climate>5</climate>
+		<percentWater>81</percentWater>
+		<temperature>53</temperature>
+		<spectralClass>F</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>1</sysPos>
+		<landMass>Tanzaria (Gaines)</landMass>
+		<landMass>Greater Elauria</landMass>
+		<landMass>Lesser Elauria</landMass>
+		<landMass>Welasia</landMass>
+		<desc>Young, hot, and in every way cursed with an oppressive atmosphere, many feel that Altais was colonized solely out of human stubbornness and some early settler‘s thirst for a challenge. More practical critics have suggested that the plentiful metal ores constantly churned up by the planet‘s many volcanoes drew those seeking fortune through mining and manufacturing industries. In fact, the first settlers to come to Altais came during a geologically brief dormant period in its development, when the planet‘s atmosphere was much more terrestrial and its surface far less unstable. Within less than a century of the first colonies‘ establishment on Altais, however, a massive shift in the planet‘s three large tectonic plates began when a stray meteor—the remnant of a failed second planet in the Altais system—slammed into the shallow waters close to a major fault line. The shifting plates created a series of earthquakes and volcanic eruptions across the planet, destroying several cities over the next few decades.
+
+Ever since that fateful event, Altais has remained an unstable and less than hospitable world. Though the initial city-leveling disasters have become extremely rare, active fault lines and volcanoes still mar all four of the planet‘s main continents, transforming much of what once were fertile tropical and wooded lands into a mix of scarred, rocky wastes. A side effect of the  constant eruptions has been the gradual tainting of Altais‘ atmosphere with greenhouse gases that have raised the temperature a full twelve degrees over the last five centuries and caused the extinction of thousands of native plant and animal species. Yet, despite all these hazards, the people of Altais have continued to work the lands and exploit the mineral wealth of this world. 
+
+The capital city, Gaines, located on the southern polar continent of Tanzaria, is home to four mining and refining corporations that supply raw materials for every application from commercial power generation to heavy military hardware. Novaya Kyev, a domed city on the equatorial continent of Greater Elauria, maintains shipping ports for both off-world and transoceanic traffic. The northern continents of Lesser Elauria and Welasia also feature a handful of large cities centered on the mining and refining trades, as well as major spaceports.</desc>
 	</planet>
 	<planet>
 		<name>Altdorf</name>
@@ -1612,11 +1643,42 @@ Despite being aware of the impending, though slow coming, temperature change tha
 		<name>Alya</name>
 		<xcood>26.6</xcood>
 		<ycood>97.54</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2341-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3075-08-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.16</gravity>
+		<lifeForm>5</lifeForm>
+		<climate>4</climate>
+		<percentWater>38</percentWater>
+		<temperature>35</temperature>
+		<spectralClass>G</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>VI</luminosity>
+		<sysPos>2</sysPos>
+		<satellite>Xanadu</satellite>
+		<landMass>Paroasis (LeSabrea)</landMass>
+		<landMass>Desije</landMass>
+		<landMass>Zenishli</landMass>
+		<desc>Thanks to the presence of an abnormally huge gas giant in the system‘s outermost orbit, Alya follows an elongated revolutionary cycle around its sun and has created an equally peculiar orbital path for Xanadu, Alya‘s single large moon. The effects of these eccentric orbits have created such unusual day/night and seasonal cycles for Alya that travelers to this world are given complicated native calendars and urged to use these in place of the galactic standard during their stay to minimize confusion.
+
+The first colonists on Alya were drawn to the abundant mineral and fuel resources locked beneath the planet‘s many parched badlands, particularly on the rocky northern hemispheric continent of Paroasis. Agriculture, hampered by the extreme winter and summer cycles and a lack of freshwater sources, was restricted to controlled hydroponic efforts that relied on imported water, and failed to do more than support the needs of the planet. Despite the handicaps, however, Alya thrived, supported by its local industries, which primarily produced plastics and refined fuels for all manner of internal combustion engines. Alya suffered few serious raids or changing of hands during the Succession Wars, and even made it through the Word of Blake Jihad with minimal damage, as there were always more strategically important worlds nearby for an enemy to attack. It is perhaps for this reason that this world boasts some of the most pleasant vistas in the region.
+
+The capital city and commercial center of Alya, LeSabrea, is located on Paroasis, on the western shores of the landlocked Saline Sea, while the bulk of the planet‘s industrial might is headquartered five hundred kilometers east, in Flerise City. The southern continents of Zenishli and Desije, by comparison, are sparsely populated, covered mostly by unspoiled evergreen wilderness and a mix of rolling hills and abrupt mountain chains.</desc>
 	</planet>
 	<planet>
 		<name>Alyina</name>
@@ -2526,6 +2588,35 @@ Salvatore Incorporated</desc>
 			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3072-01-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3085-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.21</gravity>
+		<lifeForm>2</lifeForm>
+		<climate>5</climate>
+		<percentWater>61</percentWater>
+		<temperature>52</temperature>
+		<spectralClass>A</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>VI</luminosity>
+		<sysPos>2</sysPos>
+		<landMass>Askahar (Tarawa)</landMass>
+		<landMass>Aytagrad</landMass>
+		<landMass>Niejawa</landMass>
+		<landMass>Ogleca</landMass>
+		<landMass>Quarenir</landMass>
+		<landMass>Saufell</landMass>
+		<desc>A rare habitable planet found orbiting a white subdwarf star that older star charts still refer to as Zeta Sagittarius, Ascella is a very young, hot, and geologically unstable world. The presence of abundant raw materials close to the surface and scattered across the floors of its shallow oceans drew settlers here in the early colonial era, despite the presence of an atmosphere still laced with ammonia and carbon dioxide. Particularly dense metals, including some highly radioactive ores, were among Ascella‘s most common natural treasures, and also help to explain the above-average gravitational field of this medium-sized world.
+
+When first discovered, native algae and a kind of wild brush had only begun to transform Ascella‘s atmosphere into something breathable by humans, but a century of terraforming was still required to cleanse the remaining taint to the point where respirators became unnecessary. Freed from their domed settlements, the cities and mining townships established early in the planet‘s colonization expanded across the northern continents of Askahr, Niejawa, and Quarenir, and the south polar continent of Saufell, leaving only the unbearably hot equatorial landmasses of Aytagrad and Ogleca untouched by man.
+
+Though a major exporter of heavy metals and radioactive elements, as well as small fusion and electric engines for civilian and light military vehicles, Ascella was raided only a handful of times throughout the Succession Wars, and spent most of that time under the banner of the Draconis Combine. Its lack of strategic importance did not save this world from the Jihad, however, as the Word of Blake radicals used it as a staging ground for assaults against other worlds in the Combine‘s Vega Prefecture. Heavy fighting to liberate Ascella damaged several major cities, including the planetary capital of Tarawa, located on the Saebeth River in the southern peninsula of Askahr. There, the desperate fanatics set the city ablaze as allied troops closed in, and fought to their last BattleMech amid the raging inferno. Rebuilt after the holocaust, Tarawa today is one part administrative and commercial heart of Ascella and one part shrine to those killed in the fighting.</desc>
 	</planet>
 	<planet>
 		<name>Asellus Australis</name>
@@ -6752,6 +6843,40 @@ Cavanaugh II was settled by a mixture of English, Welsh and Scottish colonists.<
 			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3072-01-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3085-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<pressure>2</pressure>
+		<gravity>0.84</gravity>
+		<lifeForm>2</lifeForm>
+		<climate>5</climate>
+		<percentWater>48</percentWater>
+		<temperature>53</temperature>
+		<spectralClass>K</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>III</luminosity>
+		<sysPos>3</sysPos>
+		<satellite>Yonas</satellite>
+		<landMass>Dragga</landMass>
+		<landMass>Hellesdon</landMass>
+		<landMass>Lennori</landMass>
+		<landMass>Sarrina (New Wade)</landMass>
+		<desc>Less than hospitable, even before the arrival of human colonists, Cebalrai was settled more as a waystation than as a home to millions of people. With a thin atmosphere and a flimsy ozone layer, this world is continuously doused by far too much solar radiation from its giant K2 star, and so the first colonists to this world—and all their descendants since—erected partially reflective domes and screens over their structures and smaller communities.
+
+During the Age of War that preceded the rise of the Star League, renegade forces hit Cebalrai from a neighboring system and employed nuclear weapons against the capital city of Wade to cover their escape. Extensive efforts to cure the planet‘s ills, both natural and manmade, were undertaken with aid from Star League engineers during the height of humanity‘s Golden Age, 
+restoring and purifying much of Cebalrai‘s air and water. Remarkably, even the hellish warfare that raged after the fall of the League did not visit this world with the same punishment as the Age of War, though continuing border clashes between Houses Steiner and Kurita frequently left the rocky landscape and delicate woodlands scarred by conventional weaponry. In fact, despite 
+the centuries of continuous conflict, the people of Cebalrai actually managed to thrive until the Word of Blake launched its Jihad against the Inner Sphere. This world fell easily to the fanatics and their allied mercenaries in a lightning blitzkrieg, and when Clan Ghost Bear arrived to reclaim the planet, they found their enemy entrenched in the major cities on the three populated landmasses of Dragga, Sarrina, and Lennori. Outnumbered and outclassed, the Blakists and their mercenaries were almost effortlessly ejected from each city, until their final stand at Kamrin, located on the northwest shores of the southern Dragga continent. Backed to the wall, with their mercenary troops routed and any hope of victory lost, the Blakists set off a series of 
+neutron bombs hidden throughout the industrial metropolis, wiping out the Ghost Bear liberators and themselves in the bargain.
+
+As of the 32nd century, a monument to the Bears stands in the center of Kamrin that the locals believe is haunted by the spirits of the fallen Clansmen. According to local lore, the rearing obsidian bear can actually be heard roaring in the dead of night, crying out in rage at the glory snatched away at the very moment of triumph. Critics of such folklore, however, point out that the high concentration of Nova Cat Clansmen, resettled to Cebalrai during the formation of The Republic, explains the true origin of this local legend.
+
+Cebalrai‘s capital city, New Wade, is located on the north polar continent of Sarrina, and is also home to the planet‘s single major spaceport. Lennori, the planet‘s other northern continent, is only habitable into its middle latitudes, as temperatures and other solar radiation hazards closer to the equatorial zones have rendered the southern reaches and the nearby equatorial 
+continent of Hellesdon barren desert wastes.</desc>
 	</planet>
 	<planet>
 		<name>Celano</name>
@@ -9752,6 +9877,30 @@ Donegal is the home to many major trading companies, the Supreme Court of the Co
 			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3130-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<pressure>3</pressure>
+		<gravity>0.74</gravity>
+		<lifeForm>3</lifeForm>
+		<climate>3</climate>
+		<percentWater>64</percentWater>
+		<temperature>45</temperature>
+		<spectralClass>K</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>6</sysPos>
+		<landMass>Vijave (Franchelco)</landMass>
+		<landMass>Apokayik</landMass>
+		<landMass>Epoure</landMass>
+		<landMass>Kodersia</landMass>
+		<desc>Despite an impressive ring of ice and dust replacing what might pass for a moon for more ordinary planets, Dromini IV does not look like much from orbit. Indeed, this world seems to be half shrouded in swirling gray clouds at any given time, a sign of the turbulent storm systems that constantly play about its surface. With only modest raw-material and fossil fuel resources to exploit, the local manufacturers and businesses never produced anything on Dromini that could not be found on dozens of other nearby planets, nor has the world held any great strategic significance. Nonetheless, this small industrial planet‘s location on the Combine/Lyran border made it a favored staging ground during the centuries of war following the original Star League‘s demise.
+
+Houses Kurita and Steiner clashed over Dromini in a number of historic campaigns, the most spectacular of which was the Wolf‘s Dragoons‘ assault in 3021, which helped break the back of a planned Combine invasion into the Lyran Commonwealth‘s Skye Province. Each round of fighting, and change of allegiance, damaged the local economy and infrastructure, but the victors often repaired what they could before the planet changed hands again. This constant shifting gave the people of Dromini IV something of an identity crisis, with portions of German- and Scottish-speaking Lyran nationals mingling—and often clashing—with Japanese-influenced Combine citizens. Still, even as fighting raged around them, more of these people managed to coexist peacefully than did not, and it was this situation and others like it on border worlds throughout the region that helped to inspire Devlin Stone‘s relocation directives after the formation of the Republic of the Sphere.
+
+In the 32nd century, Dromini is home to people descended originally from Davion, Steiner, Kurita, Marik, and even Clan heritage, creating a cosmopolitan society that once served as a model to others throughout The Republic. This mixture has also provided an excellent venue from which to conduct trade with the neighboring Successor States. Much of this trade is handled through 
+Franchelco, the planetary capital city on the northern continent of Vijave, but major shipping ports and commercial centers exist on all three of Dromini IV‘s other continents, Kodersia, Epoure, and Apokayik.</desc>
 	</planet>
 	<planet>
 		<name>Drosendorf</name>
@@ -19409,6 +19558,22 @@ The continents of Sorania and Padawa are mostly temperate and are the sites of t
 			<date>3059-08-08</date>
 			<faction>DC</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1</gravity>
+		<lifeForm>7</lifeForm>
+		<climate>3</climate>
+		<percentWater>71</percentWater>
+		<temperature>37</temperature>
+		<spectralClass>M</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>6</sysPos>
+		<socioIndustrial>C-B-D-C-C</socioIndustrial>
+		<satellite>Gaines</satellite>
+		<landMass>Homer (Topeka Bay)</landMass>
+		<landMass>Thun</landMass>
+		<hpg>B</hpg>
+		<desc>For most of its history Luzerne has been a quiet backwater planet with limited industry, low military value, and insubstantial levels of natural resources. However, the planet does boast a wide variety of terrains and a pleasant climate which made it a popular vacation spot for people looking to get away from the troubles of other planets.</desc>
 	</planet>
 	<planet>
 		<name>Lyceum</name>
@@ -21004,10 +21169,38 @@ Thanks in part to the lack of major industry and the rough, unforgiving terrain 
 		<name>Mesartim</name>
 		<xcood>103.8</xcood>
 		<ycood>-55.03</ycood>
-		<faction>CC</faction>
+		<faction>IND</faction>
 		<factionChange>
-			<date>2900-01-01</date>
+			<date>2302-01-01</date>
+			<faction>Mara</faction>
+		</factionChange>
+		<factionChange>
+			<date>2308-01-01</date>
+			<faction>TGU</faction>
+		</factionChange>
+		<factionChange>
+			<date>2344-01-01</date>
 			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>2571-01-01</date>
+			<faction>CC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2864-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>2978-01-01</date>
+			<faction>CC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3010-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3040-01-01</date>
+			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
@@ -21017,6 +21210,13 @@ Thanks in part to the lack of major industry and the rough, unforgiving terrain 
 			<date>3067-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
+		<lifeForm>5</lifeForm>
+		<spectralClass>G</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>3</sysPos>
+		<hpg>B</hpg>
+		<desc>Mesartim is an agricultural world specialising in the production of rare wines. Unfortunately the Succession Wars have destroyed much of the productive land, however a fair amount of wine is still produced to be exported to other planets in the Federated Suns, to the annoyance of the Capellan people. The loss of Mesartim and specifically its wine industry was a point of contention between the Confederation and the Suns for decades.</desc>
 	</planet>
 	<planet>
 		<name>Metter</name>
@@ -21333,9 +21533,29 @@ Thanks in part to the lack of major industry and the rough, unforgiving terrain 
 		<name>Mira</name>
 		<xcood>104.32</xcood>
 		<ycood>-52.42</ycood>
-		<faction>CC</faction>
+		<faction>IND</faction>
 		<factionChange>
-			<date>2900-01-01</date>
+			<date>2306-01-01</date>
+			<faction>Mara</faction>
+		</factionChange>
+		<factionChange>
+			<date>2343-01-01</date>
+			<faction>TGU</faction>
+		</factionChange>
+		<factionChange>
+			<date>2344-01-01</date>
+			<faction>FS,TGU</faction>
+		</factionChange>
+		<factionChange>
+			<date>2346-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>2571-01-01</date>
+			<faction>CC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2862-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -21346,6 +21566,15 @@ Thanks in part to the lack of major industry and the rough, unforgiving terrain 
 			<date>3067-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
+		<lifeForm>7</lifeForm>
+		<spectralClass>G</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>III</luminosity>
+		<sysPos>4</sysPos>
+		<hpg>B</hpg>
+		<desc>In its heyday, Mira was divided into luxury estates for Tikonov nobles and their families. However, since the fall of the Star League these estates have been converted into museums to attract offworld tourists.
+
+Mira's principal industries include textiles, light and heavy manufacturing and sea mining. The Molotosky purification process for recovering minerals from seawater (leaving purified drinking water and commercial byproducts) was developed on Mira.</desc>
 	</planet>
 	<planet>
 		<name>Mirach</name>
@@ -22415,7 +22644,9 @@ Necromo is overall a comfortable planet to live despite arid conditions. The pla
 		<landMass>Glastonbury</landMass>
 		<landMass>Dreymon</landMass>
 		<socioIndustrial>B-B-A-B-A</socioIndustrial>
-		<desc>No description available.</desc>
+		<desc>The settlement of New Aragon was one of the most distressing chapters of the Exodus era. Developers sold land on New Aragon to settlers with the promise of fertile ground and abundant water but when they arrived they discovered that the land was mostly swampland infested with insect-like, biting, disease carrying creatures. In spite of this, the colony eventually expanded when the settlers drained the swamplands and turned it into productive farmland. The indigenous amphibious animals that have survived in preserves have also become a lucrative export for the settlers as gourmet food items.
+
+New Aragon is also a major medical research centre, including the preeminent New Aragon Institute for Epidemiology.</desc>
 	</planet>
 	<planet>
 		<name>New Avalon</name>
@@ -29759,7 +29990,15 @@ Solaris VII has two continents, Equatus is small, arid, mountainous and sparsely
 		<name>Sonnia</name>
 		<xcood>124.66</xcood>
 		<ycood>-42.25</ycood>
-		<faction>FS</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2675-01-01</date>
+			<faction>CC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2850-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -29768,6 +30007,17 @@ Solaris VII has two continents, Equatus is small, arid, mountainous and sparsely
 			<date>3067-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
+		<lifeForm>7</lifeForm>
+		<spectralClass>G</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>3</sysPos>
+		<hpg>B</hpg>
+		<desc>The tropical world of Sonnia was originally settled in the early 27th century as a resort world by Tikonov aristocracy. However, soon after nuclear science and technology industries rapidly developed after the discovery of high concentrations of fissionable material.
+
+Sonnia has a wide variety of terrain, making it ideal as military training area. And was used heavily to train Federated Suns troops during the early 31st century.
+
+The local population have a pragmatic political approach that can almost be mistaken for indifference. When asked to swear allegiance to House Liao, they did so and continued with their business. Later when asked to swear allegiance to House Davion, they were equally cooperative.</desc>
 	</planet>
 	<planet>
 		<name>Sophie's World</name>
@@ -37201,6 +37451,16 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
 	</planet>
 	<planet>
+		<name>ECR 3405</name>
+		<xcood>645</xcood>
+		<ycood>19</ycood>
+		<faction>NONE</faction>
+		<spectralClass>A</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>IV</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
 		<name>ECR 2827</name>
 		<xcood>446</xcood>
 		<ycood>263</ycood>
@@ -37249,6 +37509,136 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<subtype>6</subtype>
 		<luminosity>V</luminosity>
 		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>ECR 8047</name>
+		<xcood>527.94</xcood>
+		<ycood>98.1</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>III</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>ECR 8057</name>
+		<xcood>-498</xcood>
+		<ycood>1065</ycood>
+		<faction>NONE</faction>
+		<spectralClass>F</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>IV</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>ECR 8059</name>
+		<xcood>-518</xcood>
+		<ycood>1087</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system has a planet with a hostile atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>ECR 8060</name>
+		<xcood>-546</xcood>
+		<ycood>1088</ycood>
+		<faction>NONE</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>III</luminosity>
+		<desc>This star has no planets.</desc> 
+	</planet>
+	<planet>
+		<name>ECR 8061</name>
+		<xcood>-572</xcood>
+		<ycood>1090</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>VI</luminosity>
+		<desc>This star has no planets.</desc> 
+	</planet>
+	<planet>
+		<name>ECR 8062</name>
+		<xcood>-598</xcood>
+		<ycood>1094</ycood>
+		<faction>NONE</faction>
+		<spectralClass>F</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>II</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>ECR 8063</name>
+		<xcood>-622.5</xcood>
+		<ycood>1091</ycood>
+		<faction>NONE</faction>
+		<spectralClass>A</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>IV</luminosity>
+		<desc>This system has a planet with a hostile atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>ECR 8064</name>
+		<xcood>-450</xcood>
+		<ycood>1042</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>III</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>ECR 8065</name>
+		<xcood>-430</xcood>
+		<ycood>1032</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>III</luminosity>
+		<desc>This star has no planets.</desc> 
+	</planet>
+	<planet>
+		<name>ECR 8066</name>
+		<xcood>-383</xcood>
+		<ycood>1015</ycood>
+		<faction>NONE</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>IV</luminosity>
+		<desc>This system has a habitable but uninhabited planet.</desc> 
+	</planet>
+	<planet>
+		<name>ECR 8067</name>
+		<xcood>-363</xcood>
+		<ycood>1005</ycood>
+		<faction>NONE</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>VI</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>ECR 8068</name>
+		<xcood>-363</xcood>
+		<ycood>975</ycood>
+		<faction>NONE</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>VI</luminosity>
+		<desc>This star is orbited by three uninhabitable planets.</desc> 
+	</planet>
+	<planet>
+		<name>ECR 8069</name>
+		<xcood>-365</xcood>
+		<ycood>955</ycood>
+		<faction>NONE</faction>
+		<spectralClass>A</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>Ib</luminosity>
+		<desc>This star is orbited by five gas giants.</desc> 
 	</planet>
 	<planet>
 		<name>Castile</name>
