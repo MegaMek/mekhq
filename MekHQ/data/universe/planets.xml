@@ -36891,7 +36891,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 2079</name>
+		<name>NP 01</name>
 		<xcood>-139</xcood>
 		<ycood>507</ycood>
 		<faction>NONE</faction>
@@ -36901,7 +36901,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This star does not have any planets.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 2392</name>
+		<name>NP 02</name>
 		<xcood>-396</xcood>
 		<ycood>354</ycood>
 		<faction>NONE</faction>
@@ -36911,7 +36911,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This system has a planet with a hostile atmosphere.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 0956</name>
+		<name>NP 02</name>
 		<xcood>-470</xcood>
 		<ycood>195</ycood>
 		<faction>NONE</faction>
@@ -36921,7 +36921,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 9294</name>
+		<name>NP 03</name>
 		<xcood>-460</xcood>
 		<ycood>220</ycood>
 		<faction>NONE</faction>
@@ -36931,7 +36931,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 2685</name>
+		<name>NP 04</name>
 		<xcood>-505</xcood>
 		<ycood>128</ycood>
 		<faction>NONE</faction>
@@ -36941,7 +36941,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This system has a planet with a hostile atmosphere.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 0299</name>
+		<name>NP 05</name>
 		<xcood>-530</xcood>
 		<ycood>130</ycood>
 		<faction>NONE</faction>
@@ -36951,7 +36951,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 9145</name>
+		<name>NP 06</name>
 		<xcood>-555</xcood>
 		<ycood>132</ycood>
 		<faction>NONE</faction>
@@ -36961,7 +36961,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 1242</name>
+		<name>NP 07</name>
 		<xcood>-580</xcood>
 		<ycood>134</ycood>
 		<faction>NONE</faction>
@@ -36971,7 +36971,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 1596</name>
+		<name>NP 08</name>
 		<xcood>-500</xcood>
 		<ycood>-116</ycood>
 		<faction>NONE</faction>
@@ -36981,7 +36981,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 1526</name>
+		<name>NP 09</name>
 		<xcood>-458</xcood>
 		<ycood>-193</ycood>
 		<faction>NONE</faction>
@@ -36991,7 +36991,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 2662</name>
+		<name>NP 11</name>
 		<xcood>-475</xcood>
 		<ycood>-275</ycood>
 		<faction>NONE</faction>
@@ -37001,7 +37001,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 6095</name>
+		<name>NP 12</name>
 		<xcood>-456</xcood>
 		<ycood>-285</ycood>
 		<faction>NONE</faction>
@@ -37011,7 +37011,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This star does not have any planets.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 0882</name>
+		<name>NP 13</name>
 		<xcood>-453</xcood>
 		<ycood>-366</ycood>
 		<faction>NONE</faction>
@@ -37021,7 +37021,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This system has a planet with a hostile atmosphere.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 1563</name>
+		<name>NP 14</name>
 		<xcood>-364</xcood>
 		<ycood>-374</ycood>
 		<faction>NONE</faction>
@@ -37031,7 +37031,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This star does not have any planets.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 0369</name>
+		<name>NP 15</name>
 		<xcood>-344</xcood>
 		<ycood>-377</ycood>
 		<faction>NONE</faction>
@@ -37041,7 +37041,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 5291</name>
+		<name>NP 16</name>
 		<xcood>-305</xcood>
 		<ycood>-383</ycood>
 		<faction>NONE</faction>
@@ -37051,7 +37051,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 2835</name>
+		<name>NP 17</name>
 		<xcood>-285</xcood>
 		<ycood>-384</ycood>
 		<faction>NONE</faction>
@@ -37061,7 +37061,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This star does not have any planets.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 0525</name>
+		<name>NP 18</name>
 		<xcood>-254</xcood>
 		<ycood>-458</ycood>
 		<faction>NONE</faction>
@@ -37071,7 +37071,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 1868</name>
+		<name>NP 19</name>
 		<xcood>-214</xcood>
 		<ycood>-458</ycood>
 		<faction>NONE</faction>
@@ -37081,7 +37081,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This system has a habitable but uninhabited planet.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 4713</name>
+		<name>NP 20</name>
 		<xcood>-173</xcood>
 		<ycood>-477</ycood>
 		<faction>NONE</faction>
@@ -37091,7 +37091,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 4504</name>
+		<name>NP 21</name>
 		<xcood>-158</xcood>
 		<ycood>-418</ycood>
 		<faction>NONE</faction>
@@ -37101,7 +37101,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This star does not have any planets.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 0542</name>
+		<name>NP 22</name>
 		<xcood>-42</xcood>
 		<ycood>-508</ycood>
 		<faction>NONE</faction>
@@ -37111,7 +37111,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 6499</name>
+		<name>NP 23</name>
 		<xcood>-1</xcood>
 		<ycood>-476</ycood>
 		<faction>NONE</faction>
@@ -37121,7 +37121,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 0330</name>
+		<name>NP 24</name>
 		<xcood>39</xcood>
 		<ycood>-436</ycood>
 		<faction>NONE</faction>
@@ -37131,7 +37131,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This star does not have any planets.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 9577</name>
+		<name>NP 25</name>
 		<xcood>43</xcood>
 		<ycood>-472</ycood>
 		<faction>NONE</faction>
@@ -37141,7 +37141,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 4629</name>
+		<name>NP 26</name>
 		<xcood>87</xcood>
 		<ycood>-507</ycood>
 		<faction>NONE</faction>
@@ -37151,7 +37151,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This star does not have any planets.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 4185</name>
+		<name>NP 27</name>
 		<xcood>95</xcood>
 		<ycood>-487</ycood>
 		<faction>NONE</faction>
@@ -37161,7 +37161,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 2791</name>
+		<name>NP 28</name>
 		<xcood>123</xcood>
 		<ycood>-487</ycood>
 		<faction>NONE</faction>
@@ -37171,7 +37171,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This system has a planet with a hostile atmosphere.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 9638</name>
+		<name>NP 29</name>
 		<xcood>151</xcood>
 		<ycood>-487</ycood>
 		<faction>NONE</faction>
@@ -37181,7 +37181,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This system has a planet with a hostile atmosphere.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 1463</name>
+		<name>NP 30</name>
 		<xcood>200</xcood>
 		<ycood>-439</ycood>
 		<faction>NONE</faction>
@@ -37191,7 +37191,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 5932</name>
+		<name>NP 31</name>
 		<xcood>213</xcood>
 		<ycood>-484</ycood>
 		<faction>NONE</faction>
@@ -37201,7 +37201,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This star does not have any planets.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 2545</name>
+		<name>NP 32</name>
 		<xcood>225</xcood>
 		<ycood>-500</ycood>
 		<faction>NONE</faction>
@@ -37211,7 +37211,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This star does not have any planets.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 2052</name>
+		<name>NP 33</name>
 		<xcood>240</xcood>
 		<ycood>-407</ycood>
 		<faction>NONE</faction>
@@ -37221,7 +37221,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This system has a planet with a hostile atmosphere.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 4652</name>
+		<name>NP 34</name>
 		<xcood>269</xcood>
 		<ycood>-435</ycood>
 		<faction>NONE</faction>
@@ -37231,7 +37231,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This system has a planet with a hostile atmosphere.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 9977</name>
+		<name>NP 35</name>
 		<xcood>330</xcood>
 		<ycood>298</ycood>
 		<faction>NONE</faction>
@@ -37241,7 +37241,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 4109</name>
+		<name>NP 36</name>
 		<xcood>340</xcood>
 		<ycood>-452</ycood>
 		<faction>NONE</faction>
@@ -37251,7 +37251,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This system has a planet with a hostile atmosphere.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 2266</name>
+		<name>NP 37</name>
 		<xcood>366</xcood>
 		<ycood>-397</ycood>
 		<faction>NONE</faction>
@@ -37261,7 +37261,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This star does not have any planets.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 2742</name>
+		<name>NP 38</name>
 		<xcood>390</xcood>
 		<ycood>-423</ycood>
 		<faction>NONE</faction>
@@ -37271,7 +37271,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 8672</name>
+		<name>NP 39</name>
 		<xcood>417</xcood>
 		<ycood>-417</ycood>
 		<faction>NONE</faction>
@@ -37281,7 +37281,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 4919</name>
+		<name>NP 40</name>
 		<xcood>379</xcood>
 		<ycood>-457</ycood>
 		<faction>NONE</faction>
@@ -37291,7 +37291,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This star does not have any planets.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 0732</name>
+		<name>NP 41</name>
 		<xcood>414</xcood>
 		<ycood>-487</ycood>
 		<faction>NONE</faction>
@@ -37301,7 +37301,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This system has a planet with a hostile atmosphere.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 9233</name>
+		<name>NP 42</name>
 		<xcood>451</xcood>
 		<ycood>-482</ycood>
 		<faction>NONE</faction>
@@ -37311,7 +37311,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This star does not have any planets.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 6267</name>
+		<name>NP 43</name>
 		<xcood>502</xcood>
 		<ycood>-491</ycood>
 		<faction>NONE</faction>
@@ -37321,7 +37321,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This system has a planet with a hostile atmosphere.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 7831</name>
+		<name>NP 44</name>
 		<xcood>428</xcood>
 		<ycood>-332</ycood>
 		<faction>NONE</faction>
@@ -37331,7 +37331,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 8189</name>
+		<name>NP 45</name>
 		<xcood>428</xcood>
 		<ycood>-372</ycood>
 		<faction>NONE</faction>
@@ -37341,7 +37341,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This system has a planet with a hostile atmosphere.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 9481</name>
+		<name>NP 46</name>
 		<xcood>519</xcood>
 		<ycood>-282</ycood>
 		<faction>NONE</faction>
@@ -37351,7 +37351,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 6556</name>
+		<name>NP 47</name>
 		<xcood>541</xcood>
 		<ycood>-295</ycood>
 		<faction>NONE</faction>
@@ -37361,7 +37361,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This system has a planet with a hostile atmosphere.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 4971</name>
+		<name>NP 48</name>
 		<xcood>563</xcood>
 		<ycood>-308</ycood>
 		<faction>NONE</faction>
@@ -37371,7 +37371,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 5380</name>
+		<name>NP 49</name>
 		<xcood>585</xcood>
 		<ycood>-321</ycood>
 		<faction>NONE</faction>
@@ -37381,7 +37381,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This system has a planet with a hostile atmosphere.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 9259</name>
+		<name>NP 50</name>
 		<xcood>607</xcood>
 		<ycood>-334</ycood>
 		<faction>NONE</faction>
@@ -37391,7 +37391,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 8608</name>
+		<name>NP 51</name>
 		<xcood>559</xcood>
 		<ycood>-212</ycood>
 		<faction>NONE</faction>
@@ -37401,7 +37401,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 1060</name>
+		<name>NP 52</name>
 		<xcood>586</xcood>
 		<ycood>-212</ycood>
 		<faction>NONE</faction>
@@ -37411,7 +37411,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This star does not have any planets.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 6908</name>
+		<name>NP 53</name>
 		<xcood>613</xcood>
 		<ycood>-212</ycood>
 		<faction>NONE</faction>
@@ -37421,7 +37421,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 1924</name>
+		<name>NP 54</name>
 		<xcood>640</xcood>
 		<ycood>-212</ycood>
 		<faction>NONE</faction>
@@ -37431,7 +37431,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This system has a habitable but uninhabited planet.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 6099</name>
+		<name>NP 55</name>
 		<xcood>644</xcood>
 		<ycood>62</ycood>
 		<faction>NONE</faction>
@@ -37441,7 +37441,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This system has a planet with a hostile atmosphere.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 3404</name>
+		<name>NP 56</name>
 		<xcood>657</xcood>
 		<ycood>19</ycood>
 		<faction>NONE</faction>
@@ -37451,7 +37451,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 3405</name>
+		<name>NP 57</name>
 		<xcood>645</xcood>
 		<ycood>19</ycood>
 		<faction>NONE</faction>
@@ -37461,7 +37461,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 2827</name>
+		<name>NP 58</name>
 		<xcood>446</xcood>
 		<ycood>263</ycood>
 		<faction>NONE</faction>
@@ -37471,7 +37471,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 5881</name>
+		<name>NP 59</name>
 		<xcood>401</xcood>
 		<ycood>432</ycood>
 		<faction>NONE</faction>
@@ -37481,7 +37481,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This system has a planet with a hostile atmosphere.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 6633</name>
+		<name>NP 60</name>
 		<xcood>386</xcood>
 		<ycood>417</ycood>
 		<faction>NONE</faction>
@@ -37491,7 +37491,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 8899</name>
+		<name>NP 61</name>
 		<xcood>193</xcood>
 		<ycood>-444</ycood>
 		<faction>NONE</faction>
@@ -37501,7 +37501,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 8046</name>
+		<name>NP 62</name>
 		<xcood>682</xcood>
 		<ycood>19</ycood>
 		<faction>NONE</faction>
@@ -37511,7 +37511,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 8047</name>
+		<name>NP 63</name>
 		<xcood>527.94</xcood>
 		<ycood>98.1</ycood>
 		<faction>NONE</faction>
@@ -37521,7 +37521,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 8057</name>
+		<name>DPR 0116</name>
 		<xcood>-498</xcood>
 		<ycood>1065</ycood>
 		<faction>NONE</faction>
@@ -37531,7 +37531,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 8059</name>
+		<name>DPR 0117</name>
 		<xcood>-518</xcood>
 		<ycood>1087</ycood>
 		<faction>NONE</faction>
@@ -37541,7 +37541,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This system has a planet with a hostile atmosphere.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 8060</name>
+		<name>DPR 0118</name>
 		<xcood>-546</xcood>
 		<ycood>1088</ycood>
 		<faction>NONE</faction>
@@ -37551,7 +37551,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This star has no planets.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 8061</name>
+		<name>DPR 0119</name>
 		<xcood>-572</xcood>
 		<ycood>1090</ycood>
 		<faction>NONE</faction>
@@ -37561,7 +37561,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This star has no planets.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 8062</name>
+		<name>DPR 0120</name>
 		<xcood>-598</xcood>
 		<ycood>1094</ycood>
 		<faction>NONE</faction>
@@ -37571,7 +37571,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 8063</name>
+		<name>DPR 0121</name>
 		<xcood>-622.5</xcood>
 		<ycood>1091</ycood>
 		<faction>NONE</faction>
@@ -37581,7 +37581,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This system has a planet with a hostile atmosphere.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 8064</name>
+		<name>DPR 0115</name>
 		<xcood>-450</xcood>
 		<ycood>1042</ycood>
 		<faction>NONE</faction>
@@ -37591,7 +37591,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 8065</name>
+		<name>DPR 0114</name>
 		<xcood>-430</xcood>
 		<ycood>1032</ycood>
 		<faction>NONE</faction>
@@ -37601,7 +37601,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This star has no planets.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 8066</name>
+		<name>DPR 0113</name>
 		<xcood>-383</xcood>
 		<ycood>1015</ycood>
 		<faction>NONE</faction>
@@ -37611,7 +37611,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This system has a habitable but uninhabited planet.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 8067</name>
+		<name>DPR 0112</name>
 		<xcood>-363</xcood>
 		<ycood>1005</ycood>
 		<faction>NONE</faction>
@@ -37621,7 +37621,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 8068</name>
+		<name>DPR 0111</name>
 		<xcood>-363</xcood>
 		<ycood>975</ycood>
 		<faction>NONE</faction>
@@ -37631,7 +37631,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This star is orbited by three uninhabitable planets.</desc> 
 	</planet>
 	<planet>
-		<name>ECR 8069</name>
+		<name>DPR 0110</name>
 		<xcood>-365</xcood>
 		<ycood>955</ycood>
 		<faction>NONE</faction>
@@ -38097,5 +38097,715 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 			<faction>HL</faction>
 		</factionChange>
 		<desc>No description available.</desc> 
+	</planet>
+		<planet>
+		<name>DPR 0101</name>
+		<xcood>-137</xcood>
+		<ycood>889</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system has a planet with a hostile atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0102</name>
+		<xcood>-162</xcood>
+		<ycood>894</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0103</name>
+		<xcood>-187</xcood>
+		<ycood>899</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0104</name>
+		<xcood>-212</xcood>
+		<ycood>904</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>7</subtype>
+		<luminosity>VI</luminosity>
+		<desc>This system has a planet with a hostile atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0105</name>
+		<xcood>-237</xcood>
+		<ycood>909</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>VI</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0106</name>
+		<xcood>-262</xcood>
+		<ycood>914</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>7</subtype>
+		<luminosity>IV</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0107</name>
+		<xcood>-287</xcood>
+		<ycood>919</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>VI</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0108</name>
+		<xcood>-312</xcood>
+		<ycood>924</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system has a habitable but uninhabited planet.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0109</name>
+		<xcood>-337</xcood>
+		<ycood>929</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star does not have any planets.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0201</name>
+		<xcood>-718</xcood>
+		<ycood>1069</ycood>
+		<faction>NONE</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>VI</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0202</name>
+		<xcood>-725</xcood>
+		<ycood>1042</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0203</name>
+		<xcood>-732</xcood>
+		<ycood>1015</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>9</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0204</name>
+		<xcood>-739</xcood>
+		<ycood>988</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0205</name>
+		<xcood>-746</xcood>
+		<ycood>961</ycood>
+		<faction>NONE</faction>
+		<spectralClass>F</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>VI</luminosity>
+		<desc>This star does not have any planets.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0301</name>
+		<xcood>-588</xcood>
+		<ycood>808</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star does not have any planets.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0302</name>
+		<xcood>-560</xcood>
+		<ycood>816</ycood>
+		<faction>NONE</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>IV</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0303</name>
+		<xcood>-532</xcood>
+		<ycood>824</ycood>
+		<faction>NONE</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>III</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0304</name>
+		<xcood>-504</xcood>
+		<ycood>832</ycood>
+		<faction>NONE</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star does not have any planets.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0305</name>
+		<xcood>-476</xcood>
+		<ycood>840</ycood>
+		<faction>NONE</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0306</name>
+		<xcood>-448</xcood>
+		<ycood>848</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0307</name>
+		<xcood>-420</xcood>
+		<ycood>856</ycood>
+		<faction>NONE</faction>
+		<spectralClass>F</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star does not have any planets.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 308</name>
+		<xcood>-386</xcood>
+		<ycood>885</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0309</name>
+		<xcood>-376</xcood>
+		<ycood>907</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star does not have any planets.</desc> 
+	</planet>
+	<planet>
+		<name>NC 01</name>
+		<xcood>-685</xcood>
+		<ycood>1120</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>IV</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0400</name>
+		<xcood>-398.51</xcood>
+		<ycood>367.3</ycood>
+		<faction>NONE</faction>
+		<spectralClass>A</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>IV</luminosity>
+		<desc>This system has no planets.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0401</name>
+		<xcood>-425</xcood>
+		<ycood>395</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system has a planet with a hostile atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0402</name>
+		<xcood>-445</xcood>
+		<ycood>416</ycood>
+		<faction>NONE</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star does not have any planets.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0403</name>
+		<xcood>-465</xcood>
+		<ycood>437</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0404</name>
+		<xcood>-485</xcood>
+		<ycood>458</ycood>
+		<faction>NONE</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0405</name>
+		<xcood>-505</xcood>
+		<ycood>479</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0406</name>
+		<xcood>-525</xcood>
+		<ycood>500</ycood>
+		<faction>NONE</faction>
+		<spectralClass>F</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0407</name>
+		<xcood>-545</xcood>
+		<ycood>521</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system has a planet with a hostile atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0408</name>
+		<xcood>-565</xcood>
+		<ycood>542</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star does not have any planets.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0409</name>
+		<xcood>-585</xcood>
+		<ycood>563</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0410</name>
+		<xcood>-605</xcood>
+		<ycood>584</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>9</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0411</name>
+		<xcood>-625</xcood>
+		<ycood>605</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0412</name>
+		<xcood>-645</xcood>
+		<ycood>626</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0413</name>
+		<xcood>-665</xcood>
+		<ycood>647</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star does not have any planets.</desc> 
+	</planet>
+	<planet>
+		<name>HL 01</name>
+		<xcood>-686</xcood>
+		<ycood>650.6</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>HL 02</name>
+		<xcood>-701</xcood>
+		<ycood>664</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>HL 03</name>
+		<xcood>-690</xcood>
+		<ycood>690</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star does not have any planets.</desc> 
+	</planet>
+	<planet>
+		<name>HL 04</name>
+		<xcood>-655</xcood>
+		<ycood>686</ycood>
+		<faction>NONE</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system has a planet with a hostile atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>HL 05</name>
+		<xcood>-650</xcood>
+		<ycood>708</ycood>
+		<faction>NONE</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>II</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>HL 06</name>
+		<xcood>-650</xcood>
+		<ycood>750</ycood>
+		<faction>NONE</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>9</subtype>
+		<luminosity>VI</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>HL 07</name>
+		<xcood>-636</xcood>
+		<ycood>785</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>IV</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>HL 08</name>
+		<xcood>-625</xcood>
+		<ycood>820</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>VI</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>HL 09</name>
+		<xcood>-655</xcood>
+		<ycood>841</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>HL 10</name>
+		<xcood>-690</xcood>
+		<ycood>828</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>IV</luminosity>
+		<desc>This star does not have any planets.</desc> 
+	</planet>
+	<planet>
+		<name>HL 11</name>
+		<xcood>-676</xcood>
+		<ycood>795</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>9</subtype>
+		<luminosity>IV</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>HL 12</name>
+		<xcood>-695</xcood>
+		<ycood>735</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>7</subtype>
+		<luminosity>II</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>HL 13</name>
+		<xcood>-710</xcood>
+		<ycood>755</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>HL 14</name>
+		<xcood>-710</xcood>
+		<ycood>794</ycood>
+		<faction>NONE</faction>
+		<spectralClass>A</spectralClass>
+		<subtype>7</subtype>
+		<luminosity>IV</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>HL 15</name>
+		<xcood>-742</xcood>
+		<ycood>755</ycood>
+		<faction>NONE</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>HL 16</name>
+		<xcood>-727</xcood>
+		<ycood>671</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>VI</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>HL 17</name>
+		<xcood>-756</xcood>
+		<ycood>707</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>HL 18</name>
+		<xcood>-781</xcood>
+		<ycood>735</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system has a planet with a hostile atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>HL 19</name>
+		<xcood>-744</xcood>
+		<ycood>784</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>HL 20</name>
+		<xcood>-762</xcood>
+		<ycood>793</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>HL 21</name>
+		<xcood>-772</xcood>
+		<ycood>819</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>HL 22</name>
+		<xcood>-802</xcood>
+		<ycood>807</ycood>
+		<faction>NONE</faction>
+		<spectralClass>F</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system has a planet with a hostile atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>HL 23</name>
+		<xcood>-838</xcood>
+		<ycood>794</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>HL 24</name>
+		<xcood>-840</xcood>
+		<ycood>835</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>HL 25</name>
+		<xcood>-835</xcood>
+		<ycood>868</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>9</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>HL 26</name>
+		<xcood>-701</xcood>
+		<ycood>861</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system has a planet with a hostile atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>HL 27</name>
+		<xcood>-770</xcood>
+		<ycood>859</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>HL 28</name>
+		<xcood>-755</xcood>
+		<ycood>890</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>7</subtype>
+		<luminosity>VI</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>HL 29</name>
+		<xcood>-805</xcood>
+		<ycood>880</ycood>
+		<faction>NONE</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system has a planet with a hostile atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>HL 30</name>
+		<xcood>-835</xcood>
+		<ycood>915</ycood>
+		<faction>NONE</faction>
+		<spectralClass>A</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star does not have any planets.</desc> 
+	</planet>
+	<planet>
+		<name>HL 31</name>
+		<xcood>-745</xcood>
+		<ycood>915</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>HL 32</name>
+		<xcood>-775</xcood>
+		<ycood>940</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>VI</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>HL 33</name>
+		<xcood>-815</xcood>
+		<ycood>940</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system has a planet with a hostile atmosphere.</desc> 
 	</planet>
 </planets>
