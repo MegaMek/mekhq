@@ -180,6 +180,22 @@
 			<date>3057-11-01</date>
 			<faction>CM</faction>
 		</factionChange>
+		<factionChange>
+			<date>3068-08-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-01-01</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-01-05</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Accrington</name>
@@ -220,6 +236,22 @@
 			<date>3067-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-06-11</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-06-16</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Aconcagua</name>
@@ -246,6 +278,22 @@
 		<xcood>-52.68</xcood>
 		<ycood>-51.12</ycood>
 		<faction>FWL</faction>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-01-10</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-01-12</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Ad Duwayd</name>
@@ -289,6 +337,22 @@
 		<factionChange>
 			<date>3067-01-01</date>
 			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3068-05-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-05-12</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-05-20</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 		<spectralClass>K</spectralClass>
         <subtype>4</subtype>
@@ -570,6 +634,22 @@ Aitutaki’s early settlers made a unique distinction by creating two capital ci
 		<factionChange>
 			<date>2790-01-01</date>
 			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3076-07-22</date>
+			<faction>CGB,CSR,Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3076-07-28</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -940,7 +1020,19 @@ Industrial, Command and logistical world, paperwork in this planet and its prefe
 		<name>Algol</name>
 		<xcood>65.46</xcood>
 		<ycood>-68.33</ycood>
-		<faction>CC</faction>
+		<faction>TGU</faction>
+		<factionChange>
+			<date>2358-01-01</date>
+			<faction>SSUP</faction>
+		</factionChange>
+		<factionChange>
+			<date>2366-01-01</date>
+			<faction>TGU</faction>
+		</factionChange>
+		<factionChange>
+			<date>2367-01-01</date>
+			<faction>CC</faction>
+		</factionChange>
 		<factionChange>
 			<date>3030-01-01</date>
 			<faction>FS</faction>
@@ -952,6 +1044,22 @@ Industrial, Command and logistical world, paperwork in this planet and its prefe
 		<factionChange>
 			<date>3067-01-01</date>
 			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-03-10</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-03-12</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 		<spectralClass>G</spectralClass>
         <subtype>5</subtype>
@@ -1009,15 +1117,19 @@ Industrial, Command and logistical world, paperwork in this planet and its prefe
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
-			<date>3075-01-01</date>
+			<date>3072-02-01</date>
 			<faction>WOB</faction>
 		</factionChange>
 		<factionChange>
-			<date>3079-01-01</date>
+			<date>3077-02-21</date>
+			<faction>CC,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-02-27</date>
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3081-01-01</date>
+			<date>3085-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
 		<pressure>3</pressure>
@@ -1083,6 +1195,18 @@ In 2822, a mysterious plague hit the planet and then mysteriously disappeared th
 		<factionChange>
 			<date>3057-09-18</date>
 			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3070-02-01</date>
+			<faction>WOB,LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3070-12-01</date>
+			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -1454,6 +1578,22 @@ Despite being aware of the impending, though slow coming, temperature change tha
 			<date>2790-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3068-06-21</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-05-10</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-05-14</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Altais</name>
@@ -1609,6 +1749,22 @@ The capital city, Gaines, located on the southern polar continent of Tanzaria, i
 			<date>3057-10-01</date>
 			<faction>FWL</faction>
 		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-03-09</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-03-15</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 		<spectralClass>A</spectralClass>
 		<subtype>7</subtype>
 		<luminosity>II</luminosity>
@@ -1653,8 +1809,16 @@ The capital city, Gaines, located on the southern polar continent of Tanzaria, i
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3075-08-01</date>
+			<date>3072-02-01</date>
 			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-08-28</date>
+			<faction>CGB,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-09-06</date>
+			<faction>Stone</faction>
 		</factionChange>
 		<factionChange>
 			<date>3081-01-01</date>
@@ -1969,6 +2133,22 @@ Andurien Aerotech</desc>
 			<date>3067-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3076-09-09</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3076-09-14</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Anguilla</name>
@@ -2018,6 +2198,22 @@ Andurien Aerotech</desc>
 		<factionChange>
 			<date>3067-01-01</date>
 			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-02-24</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-02-26</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -2228,6 +2424,22 @@ Andurien Aerotech</desc>
 			<date>3057-11-01</date>
 			<faction>CM</faction>
 		</factionChange>
+		<factionChange>
+			<date>3068-08-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-01-10</date>
+			<faction>CC,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-01-12</date>
+			<faction>CC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3085-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Arc-Royal</name>
@@ -2239,12 +2451,16 @@ Andurien Aerotech</desc>
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
+			<date>3057-11-20</date>
+			<faction>LA,CWIE</faction>
+		</factionChange>
+		<factionChange>
 			<date>3057-12-01</date>
-			<faction>ARDC</faction>
+			<faction>ARDC,CWIE</faction>
 		</factionChange>
 		<factionChange>
 			<date>3067-04-24</date>
-			<faction>LA</faction>
+			<faction>LA,CWIE</faction>
 		</factionChange>
 		<spectralClass>G</spectralClass>
 		<subtype>3</subtype>
@@ -2593,7 +2809,15 @@ Salvatore Incorporated</desc>
 			<faction>WOB</faction>
 		</factionChange>
 		<factionChange>
-			<date>3085-01-01</date>
+			<date>3075-12-09</date>
+			<faction>CGB,CSR,WOB,Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-12-23</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
 		<pressure>3</pressure>
@@ -2778,6 +3002,22 @@ Though a major exporter of heavy metals and radioactive elements, as well as sma
 			<date>3052-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3068-06-19</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-03-12</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-03-20</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Astrokaszy</name>
@@ -2815,6 +3055,22 @@ Though a major exporter of heavy metals and radioactive elements, as well as sma
 			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-01-03</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-01-10</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Athenry</name>
@@ -2828,6 +3084,22 @@ Though a major exporter of heavy metals and radioactive elements, as well as sma
 		<factionChange>
 			<date>2790-01-01</date>
 			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-03-06</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-03-10</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -2972,7 +3244,15 @@ Imperator Automatic Weaponry</desc>
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3057-01-01</date>
+			<date>3057-09-18</date>
+			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3057-11-01</date>
+			<faction>DC,LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3062-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -3321,6 +3601,22 @@ The primary industries on Augustine involve extracting raw minerals from the pla
 		<factionChange>
 			<date>3067-01-01</date>
 			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3069-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-01-10</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-01-12</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -3768,6 +4064,22 @@ Barras is the hotbed of intelligence activity along the Confederation-FWL border
 		<factionChange>
 			<date>3067-01-01</date>
 			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-05-21</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-05-26</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -4296,6 +4608,22 @@ Due to the lack of education and wealth, the population in the early 31st Centur
 			<date>2790-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-01-10</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-01-12</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Bergman's Planet</name>
@@ -4449,6 +4777,22 @@ Due to the lack of education and wealth, the population in the early 31st Centur
 		<factionChange>
 			<date>3067-01-01</date>
 			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-05-21</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-05-26</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 		<pressure>3</pressure>
 		<gravity>0.6</gravity>
@@ -5632,6 +5976,22 @@ In 2998, the Brighton militia managed to withstand a siege by superior Federated
 			<date>3057-11-01</date>
 			<faction>CM</faction>
 		</factionChange>
+		<factionChange>
+			<date>3066-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-03-09</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-05-15</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Bryceland</name>
@@ -5667,6 +6027,18 @@ In 2998, the Brighton militia managed to withstand a siege by superior Federated
 		<factionChange>
 			<date>3067-01-01</date>
 			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-09-01</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -6023,6 +6395,22 @@ Recently, a large island in the eastern basin has been taken over for secret tes
 			<date>3057-10-01</date>
 			<faction>FWL</faction>
 		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-01-12</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-01-20</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Callisto V</name>
@@ -6360,6 +6748,22 @@ Rashpur-Owens Incorporated</desc>
 			<date>3058-01-01</date>
 			<faction>CM</faction>
 		</factionChange>
+		<factionChange>
+			<date>3066-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-05-12</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-05-20</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 		<spectralClass>G</spectralClass>
 		<subtype>5</subtype>
 		<luminosity>V</luminosity>
@@ -6403,7 +6807,23 @@ After the fall of the Star League, Caph became a bitter battle ground between th
 		</factionChange>
 		<factionChange>
 			<date>3057-11-01</date>
-			<faction>CM</faction>
+			<faction>TCC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3068-08-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-05-21</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-05-26</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -6669,6 +7089,22 @@ The planets primary industries and exports are plastics and plastisteel using th
 			<date>3057-11-01</date>
 			<faction>CM</faction>
 		</factionChange>
+		<factionChange>
+			<date>3069-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-04-02</date>
+			<faction>Stone,CC,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-04-09</date>
+			<faction>Stone,CC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3085-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Cascade</name>
@@ -6692,6 +7128,26 @@ The planets primary industries and exports are plastics and plastisteel using th
 		<factionChange>
 			<date>3067-01-01</date>
 			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3076-12-02</date>
+			<faction>FS,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-02-02</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-05-02</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-02-02</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -6769,6 +7225,22 @@ Agriculture is an important industry on Cassias, though it rarely produces foods
 			<date>3057-10-01</date>
 			<faction>FWL</faction>
 		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-01-12</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-01-20</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Castrovia</name>
@@ -6844,11 +7316,19 @@ Cavanaugh II was settled by a mixture of English, Welsh and Scottish colonists.<
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3072-01-01</date>
+			<date>3072-02-01</date>
 			<faction>WOB</faction>
 		</factionChange>
 		<factionChange>
-			<date>3085-01-01</date>
+			<date>3075-08-21</date>
+			<faction>CGB,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-09-01</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
 		<pressure>2</pressure>
@@ -7119,6 +7599,22 @@ The capital city of Chahar is Benares, which is considered sacred to Lyran Hindu
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-09-10</date>
+			<faction>Stone,CWIE,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-10-14</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Charity</name>
@@ -7228,6 +7724,22 @@ The capital city of Chahar is Benares, which is considered sacred to Lyran Hindu
 		<factionChange>
 			<date>2790-01-01</date>
 			<faction>FWL</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-01-12</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-01-20</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -7993,6 +8505,22 @@ This led to a very hostile environment by the mid 3020s with many residents just
 		<factionChange>
 			<date>3057-09-18</date>
 			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3068-08-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-01-21</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-01-26</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -9150,7 +9678,7 @@ The Jade Falcon, totem animal of the Clan with the same name, is from Dagda.</de
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
-			<date>3075-01-01</date>
+			<date>3068-04-25</date>
 			<faction>WOB</faction>
 		</factionChange>
 		<factionChange>
@@ -9248,6 +9776,22 @@ The Confederation’s eventual settlement was originally little more than a perm
 			<date>2790-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-05-10</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-05-14</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Deneb Kaitos</name>
@@ -9269,6 +9813,22 @@ The Confederation’s eventual settlement was originally little more than a perm
 		<factionChange>
 			<date>3067-01-01</date>
 			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-02-24</date>
+			<faction>Stone,DC,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-02-26</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -9295,6 +9855,22 @@ The Confederation’s eventual settlement was originally little more than a perm
 		<factionChange>
 			<date>3057-10-01</date>
 			<faction>FWL</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-05-10</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-05-14</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -9438,6 +10014,22 @@ The Confederation’s eventual settlement was originally little more than a perm
 			<date>3057-10-01</date>
 			<faction>FWL</faction>
 		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-01-12</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-01-20</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Devin</name>
@@ -9551,6 +10143,30 @@ The Confederation’s eventual settlement was originally little more than a perm
 		<factionChange>
 			<date>2786-01-06</date>
 			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3068-02-04</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3068-04-16</date>
+			<faction>WOB,DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3068-06-18</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-10-08</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-01-14</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 		<spectralClass>G</spectralClass>
 		<subtype>3</subtype>
@@ -9956,6 +10572,22 @@ Franchelco, the planetary capital city on the northern continent of Vijave, but 
 			<date>2790-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-01-12</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-01-20</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Dukambia</name>
@@ -10038,6 +10670,10 @@ The Malthus crime family had each of the 5 domed cities set up to cater to a dif
 		<ycood>41.21</ycood>
 		<faction>TA</faction>
 		<factionChange>
+			<date>2214-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
 			<date>2315-01-01</date>
 			<faction>TH</faction>
 		</factionChange>
@@ -10054,9 +10690,50 @@ The Malthus crime family had each of the 5 domed cities set up to cater to a dif
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3057-01-01</date>
+			<date>3057-09-18</date>
+			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3057-11-01</date>
+			<faction>DC,LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3062-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3076-07-21</date>
+			<faction>CGB,CSR,Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-07-28</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.04</gravity>
+		<lifeForm>7</lifeForm>
+		<climate>4</climate>
+		<percentWater>27</percentWater>
+		<temperature>50</temperature>
+		<spectralClass>K</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>III</luminosity>
+		<sysPos>1</sysPos>
+		<satellite>Uter</satellite>
+		<landMass>(Novaya Mensk)</landMass>
+		<desc>A warm, dry world chronically plagued by violent, long-lasting dust storms, Dyev was settled initially by Russian and Slavic entrepreneurs hoping to take advantage of the abundant raw metals found throughout the rugged mountains and dried-out canyons crisscrossing its surface. With the planet‘s water tied up mostly in two small oceans and a handful of meager lakes and rivers, the early colonists had to rely on ice ships for their freshwater needs. In the latter half of the twenty-fifth century, however, miners digging deep into the Tupik Chasm for a new vanadium vein instead stumbled upon a remarkable find in the form of a vast underground reservoir of fresh water. Other such subterranean lakes and seas were discovered deep below Dyev‘s surface over the following decades, mostly near the northern hemispheric canyons, and elaborate irrigation systems were devised to bring this water to the people for farming and general use. During the Amaris Crisis, the Usurper‘s troops attempted to poison these reserves to bring the people of Dyev to heel, and succeeded in irrevocably tainting a third of the underground seas before Kerensky‘s forces rolled over them during the liberation. 
+
+When the Draconis Combine claimed Dyev after the League‘s fall, the Kuritan leadership directed more energies toward restoring the planet‘s many damaged mining operations than addressing the water shortage, and thus Dyev has relied more and more on ice imports over the centuries that followed. Despite this handicap, however, this world has prospered through the years of war, exporting valuable metal ores such as vanadium, chromium, and even a limited quantity of germanium—all valuable to the production of heavy industrial and military equipment. 
+
+The capital city of Dyev, Novaya Mensk, is located in the northern hemisphere, on the eastern shore of the Morye Syevir ocean, and serves as the commercial and administrative heart of the planet. Meanwhile, Trogport, a sprawling spaceport city just south of the larger Aleutican Ocean in the southern hemisphere, is the planet‘s primary connection to interstellar commerce. Trogport also serves as the home for a majority of the local aerospace defense forces, and as home to the headquarters offices of several local mining concerns.</desc>
 	</planet>
 	<planet>
 		<name>Dyfed</name>
@@ -10401,6 +11078,18 @@ Overall the planet is comfortable for human habitation, with the unfortunate pro
 			<date>3057-11-01</date>
 			<faction>CM</faction>
 		</factionChange>
+		<factionChange>
+			<date>3068-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-05-21</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 		<zenithCharge>True</zenithCharge>
 		<lifeForm>2</lifeForm>
 		<spectralClass>K</spectralClass>
@@ -10529,6 +11218,40 @@ Elgin’s manufacturing capacity was dramatically reduced over the course of the
 			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-08-27</date>
+			<faction>CGB,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-09-05</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<pressure>3</pressure>
+		<gravity>0.73</gravity>
+		<lifeForm>2</lifeForm>
+		<climate>2</climate>
+		<percentWater>41</percentWater>
+		<temperature>42</temperature>
+		<spectralClass>K</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>3</sysPos>
+		<satellite>Brodi</satellite>
+		<landMass>Platonesia (Dry Springs)</landMass>
+		<landMass>Anterratica</landMass>
+		<desc>Travelers visiting Eltanin are cautioned to take the recommended series of antibiotics and inoculations before visiting the surface, due to a persistent virus that wiped out all native animal life and has ravaged off-worlders since the first colonists set foot on this arid world almost a thousand years ago. The airborne virus, known locally as Eltanin Brain Fever, attacks the central nervous system and has symptoms ranging from a loss of fine motor control to seizures and blindness, eventually leading to death. Scientists tracked the source of the virus to the local wildlife, which was dying off even as the first settlers came to this world. Preventative treatments suitable for humans and most terrestrial animals were eventually found, but only after all remaining indigenous fauna had perished. 
+
+The virus, however, may be the least of this minor industrial world‘s worries, as local scientists have determined that Eltanin‘s sun has begun to show all the signs of a star nearing the end of its stable life cycle. Spectrographic analysis and the observation of increased solar flare activity—activity that has already been blamed for Eltanin‘s increasingly unpredictable climate changes over the past several centuries—have indicated that, in perhaps as little as 8,000 years, the star may nova. Though this is no cause for alarm at the moment, the inhabitants of Eltanin have made it a point to maintain an excellent planetwide disaster response system that is also tied into its extensive global network of spaceports. Planetary emergency and relief crews are trained in scenarios ranging from flash woodland fires and meteor strikes to a worldwide evacuation order. Long before such measures should prove necessary, however, the people and industrial concerns on Eltanin remain determined to make the best of this world‘s easily reached mineral, petrochemical, and agricultural wealth. 
+
+The capital city of Eltanin, Dry Springs, is the administrative and trading center of the planet, as well as one of thirty transportation hubs on the northern polar Platonesia supercontinent where it is situated. Eltanin‘s second largest city, Burmah, located on the southern supercontinent of Anterratica, is home to the headquarters of Eltanin Interplanetary, a local transport consortium that controls a majority of the planet‘s fifty-nine spaceports (the extreme number to be used in the event of a planetary evacuation, though most of them are mothballed, but ready to use within hours), and employs a fleet of small and medium-sized DropShips and shuttlecraft. EI also provides day-to-day transport services for Eltanin‘s many large islands in the tropical and equatorial regions between the two giant land masses, complementing the planet‘s seagoing traffic.</desc>
 	</planet>
 	<planet>
 		<name>Elume</name>
@@ -10733,6 +11456,22 @@ Elgin’s manufacturing capacity was dramatically reduced over the course of the
 			<date>3057-11-01</date>
 			<faction>CM</faction>
 		</factionChange>
+		<factionChange>
+			<date>3066-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-02-24</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-02-26</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Epsilon Indi</name>
@@ -10758,6 +11497,22 @@ Elgin’s manufacturing capacity was dramatically reduced over the course of the
 		<factionChange>
 			<date>3057-11-01</date>
 			<faction>CM</faction>
+		</factionChange>
+		<factionChange>
+			<date>3067-12-30</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-02-24</date>
+			<faction>Stone,DC,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-02-26</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -10843,6 +11598,26 @@ Elgin’s manufacturing capacity was dramatically reduced over the course of the
 		<factionChange>
 			<date>3067-01-01</date>
 			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3069-10-01</date>
+			<faction>FS,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3070-04-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-02-12</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-04-18</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -11457,6 +12232,22 @@ Fuisgon-Flame Tech</desc>
 			<date>3057-11-01</date>
 			<faction>CM</faction>
 		</factionChange>
+		<factionChange>
+			<date>3067-12-30</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-11-24</date>
+			<faction>Stone,CS,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-11-26</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 		<spectralClass>G</spectralClass>
 		<subtype>4</subtype>
 		<luminosity>V</luminosity>
@@ -11541,6 +12332,22 @@ For much of its history Fletcher has been the site of an historic cemetery which
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3068-06-19</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-11-10</date>
+			<faction>Stone,DC,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-04-07</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -11873,6 +12680,22 @@ For much of its history Fletcher has been the site of an historic cemetery which
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-02-12</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-02-20</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet> 
 		<name>Galatea</name> 
@@ -11894,6 +12717,18 @@ For much of its history Fletcher has been the site of an historic cemetery which
 		<factionChange> 
 			<date>3057-09-18</date> 
 			<faction>LA</faction> 
+		</factionChange>
+		<factionChange>
+			<date>3072-10-10</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3076-01-26</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 		<spectralClass>F</spectralClass>
 		<subtype>8</subtype>
@@ -12362,6 +13197,30 @@ The Capellan Institute of Linguistics was established on Geifer in 2978. The Ins
 		<factionChange>
 			<date>3057-11-01</date>
 			<faction>CM</faction>
+		</factionChange>
+		<factionChange>
+			<date>3067-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3069-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-01-30</date>
+			<faction>CC,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-04-15</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-10-21</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -12899,6 +13758,22 @@ Brigadier Corporation</desc>
 		<factionChange>
 			<date>3057-01-01</date>
 			<faction>FWL</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-03-09</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-03-15</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -13564,6 +14439,22 @@ In the 31st century Greeley gained some importance as the Federated Suns establi
 			<date>3057-11-01</date>
 			<faction>CM</faction>
 		</factionChange>
+		<factionChange>
+			<date>3066-10-10</date>
+			<faction>FWL</faction>
+		</factionChange>
+		<factionChange>
+			<date>3068-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-11-20</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Halloran V</name>
@@ -13595,7 +14486,27 @@ In the 31st century Greeley gained some importance as the Federated Suns establi
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
-			<date>3081-01-01</date>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-02-27</date>
+			<faction>CC,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-04-8</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-12-27</date>
+			<faction>CC,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3079-01-01</date>
+			<faction>CC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3085-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
 		<pressure>3</pressure>
@@ -13663,6 +14574,18 @@ Corvatti Corporation</desc>
 			<date>3067-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-05-21</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Hamar</name>
@@ -13714,6 +14637,22 @@ Corvatti Corporation</desc>
 		<factionChange>
 			<date>2790-01-01</date>
 			<faction>FWL</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-01-12</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-01-22</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -14004,6 +14943,26 @@ Corvatti Corporation</desc>
 			<date>3067-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-10-13</date>
+			<faction>Stone,FS,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-11-08</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-05-08</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Hecheng</name>
@@ -14104,6 +15063,22 @@ Corvatti Corporation</desc>
 		<factionChange>
 			<date>3067-01-01</date>
 			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-05-10</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-05-14</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -14370,6 +15345,18 @@ Andrea County Armor Yards</desc>
 		</factionChange>
 		<factionChange>
 			<date>3057-09-18</date>
+			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3070-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3074-11-10</date>
+			<faction>WOB,CS,LA,CWIE</faction>
+		</factionChange>
+		<factionChange>
+			<date>3074-12-21</date>
 			<faction>LA</faction>
 		</factionChange>
 		<spectralClass>F</spectralClass>
@@ -14965,6 +15952,18 @@ The planet and the factories have been the target of invasion numerous times thr
 			<date>3057-11-01</date>
 			<faction>CM</faction>
 		</factionChange>
+		<factionChange>
+			<date>3068-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-05-21</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Huaide</name>
@@ -15408,8 +16407,32 @@ The planet and the factories have been the target of invasion numerous times thr
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3057-01-01</date>
+			<date>3057-09-18</date>
+			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3057-11-01</date>
+			<faction>DC,LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3062-01-01</date>
 			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-01-25</date>
+			<faction>CW,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-02-10</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -15569,6 +16592,22 @@ The planet and the factories have been the target of invasion numerous times thr
 			<date>3057-11-01</date>
 			<faction>CM</faction>
 		</factionChange>
+		<factionChange>
+			<date>3066-06-30</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-02-24</date>
+			<faction>Stone,DC,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-02-26</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Inman</name>
@@ -15674,6 +16713,18 @@ The planet and the factories have been the target of invasion numerous times thr
 		<xcood>-46.94</xcood>
 		<ycood>-56.85</ycood>
 		<faction>FWL</faction>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-12-08</date>
+			<faction>FWL</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 		<spectralClass>G</spectralClass>
 		<subtype>5</subtype>
 		<luminosity>III</luminosity>
@@ -16440,6 +17491,26 @@ Irian’s terrain is best described as bland. The planet’s terrain is dominate
 			<date>2997-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-07-12</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-07-20</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3079-01-01</date>
+			<faction>MCM</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 		<spectralClass>G</spectralClass>
 		<subtype>1</subtype>
 		<luminosity>Ia</luminosity>
@@ -16551,7 +17622,15 @@ Quikscell Company</desc>
 		<name>Kansu</name>
 		<xcood>68.33</xcood>
 		<ycood>-60.24</ycood>
-		<faction>CC</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2366-01-01</date>
+			<faction>TGU</faction>
+		</factionChange>
+		<factionChange>
+			<date>2367-01-01</date>
+			<faction>CC</faction>
+		</factionChange>
 		<factionChange>
 			<date>3030-01-01</date>
 			<faction>FS</faction>
@@ -16563,6 +17642,22 @@ Quikscell Company</desc>
 		<factionChange>
 			<date>3067-01-01</date>
 			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3079-03-10</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3079-03-12</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -16735,6 +17830,22 @@ Kaumberg was primarily settled by colonists hailing from Germany and Austria.</d
 			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-10-06</date>
+			<faction>CGB,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-10-10</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Kaus Borealis</name>
@@ -16745,6 +17856,22 @@ Kaumberg was primarily settled by colonists hailing from Germany and Austria.</d
 			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-08-28</date>
+			<faction>CGB,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-09-06</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Kaus Media</name>
@@ -16754,6 +17881,22 @@ Kaumberg was primarily settled by colonists hailing from Germany and Austria.</d
 		<factionChange>
 			<date>2900-01-01</date>
 			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-08-28</date>
+			<faction>CGB,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-09-06</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -16782,6 +17925,22 @@ Kaumberg was primarily settled by colonists hailing from Germany and Austria.</d
 		<factionChange>
 			<date>3067-01-01</date>
 			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-05-21</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-05-26</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -16852,6 +18011,22 @@ Kaumberg was primarily settled by colonists hailing from Germany and Austria.</d
 		<factionChange>
 			<date>3057-11-01</date>
 			<faction>CM</faction>
+		</factionChange>
+		<factionChange>
+			<date>3066-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-03-09</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-03-15</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 		<pressure>3</pressure>
 		<gravity>0.94</gravity>
@@ -17007,6 +18182,22 @@ Despite the Federated Suns best efforts, Kentares never recovered from the massa
 		<factionChange>
 			<date>2790-01-01</date>
 			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3076-07-21</date>
+			<faction>CGB,CSR,Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3076-07-28</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -17541,7 +18732,7 @@ Exeter Organization</desc>
 			<faction>KP</faction>
 		</factionChange>
 		<factionChange>
-			<date>3130-01-01</date>
+			<date>3085-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
 		<pressure>3</pressure>
@@ -17645,8 +18836,32 @@ Gortex Multi-E</desc>
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3057-01-01</date>
+			<date>3057-09-18</date>
+			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3057-11-01</date>
+			<faction>DC,LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3062-01-01</date>
 			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3070-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3076-07-21</date>
+			<faction>CGB,CSR,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3076-08-03</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -18249,8 +19464,32 @@ Fortunately the population is overall happy with their lot in the Inner Sphere. 
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3057-01-01</date>
+			<date>3057-09-18</date>
+			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3057-11-01</date>
+			<faction>DC,LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3062-01-01</date>
 			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3076-07-21</date>
+			<faction>CGB,CSR,Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3076-07-28</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -18969,6 +20208,22 @@ The primary industry on Les Halles is the extraction and refining of fuel used i
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-05-10</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-05-14</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Listowel</name>
@@ -19624,6 +20879,30 @@ The continents of Sorania and Padawa are mostly temperate and are the sites of t
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<factionChange>
+			<date>3070-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3076-09-10</date>
+			<faction>CGB,CSR,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3076-09-17</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3076-11-01</date>
+			<faction>LA,DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3076-12-01</date>
+			<faction>CS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Ma'anshan</name>
@@ -20158,6 +21437,30 @@ Most of the population lives in small cities dotting the 4 continents.  There ar
 		<factionChange>
 			<date>3057-01-01</date>
 			<faction>FWL</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-03-06</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-08-11</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-02-22</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-02-26</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -20984,6 +22287,22 @@ Thanks in part to the lack of major industry and the rough, unforgiving terrain 
 			<date>3030-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-01-10</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-01-12</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Menkar</name>
@@ -21005,6 +22324,22 @@ Thanks in part to the lack of major industry and the rough, unforgiving terrain 
 		<factionChange>
 			<date>3062-01-01</date>
 			<faction>CC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-07-27</date>
+			<faction>CC,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-08-01</date>
+			<faction>CC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3085-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -21597,6 +22932,26 @@ Mira's principal industries include textiles, light and heavy manufacturing and 
 			<date>3067-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3076-12-02</date>
+			<faction>FS,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-02-02</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3079-05-26</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Mirage</name>
@@ -21730,6 +23085,18 @@ Mira's principal industries include textiles, light and heavy manufacturing and 
 		<factionChange>
 			<date>3057-09-18</date>
 			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3070-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-12-01</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 		<pressure>3</pressure>
 		<gravity>0.92</gravity>
@@ -21950,8 +23317,32 @@ Mizar has been a resort planet of some renown since before the time of the Star 
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3057-01-01</date>
+			<date>3057-09-18</date>
+			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3057-11-01</date>
+			<faction>DC,LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3062-01-01</date>
 			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3069-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3076-07-21</date>
+			<faction>CGB,CSR,Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3076-07-28</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -22218,6 +23609,22 @@ Bagamoyo Aerospace Manufacturing</desc>
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-01-18</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-02-14</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Murchison</name>
@@ -22360,6 +23767,22 @@ Bagamoyo Aerospace Manufacturing</desc>
 			<date>3067-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-11-10</date>
+			<faction>Stone,CC,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-11-12</date>
+			<faction>CC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3085-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 		<pressure>3</pressure>
 		<gravity>1.06</gravity>
 		<nadirCharge>True</nadirCharge>
@@ -22418,6 +23841,26 @@ Kallon Industries</desc>
 		<factionChange>
 			<date>2790-01-01</date>
 			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-03-06</date>
+			<faction>CW,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-03-10</date>
+			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3079-04-01</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -22621,11 +24064,11 @@ Necromo is overall a comfortable planet to live despite arid conditions. The pla
 			<faction>WOB</faction>
 		</factionChange>
 		<factionChange>
-			<date>3079-01-01</date>
+			<date>3078-04-01</date>
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3130-01-01</date>
+			<date>3085-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
 		<spectralClass>K</spectralClass>
@@ -22659,6 +24102,14 @@ New Aragon is also a major medical research centre, including the preeminent New
 		</factionChange>
 		<factionChange>
 			<date>3067-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3067-12-05</date>
+			<faction>FS,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3074-10-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<spectralClass>G</spectralClass>
@@ -22773,6 +24224,22 @@ Federated News Services</desc>
 		<factionChange>
 			<date>3057-11-01</date>
 			<faction>CM</faction>
+		</factionChange>
+		<factionChange>
+			<date>3068-08-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-01-10</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-01-12</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -22892,6 +24359,22 @@ New Capetown is moderately industrialized and is a comfortable temperate planet.
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-02-08</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-02-20</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>New Exford</name>
@@ -23003,6 +24486,22 @@ New Hessen was occupied several times during the Succession Wars. However, New H
 			<date>3057-11-01</date>
 			<faction>CM</faction>
 		</factionChange>
+		<factionChange>
+			<date>3066-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-03-09</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-03-23</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>New Hope</name>
@@ -23012,6 +24511,18 @@ New Hessen was occupied several times during the Succession Wars. However, New H
 		<factionChange>
 			<date>2900-01-01</date>
 			<faction>FWL</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-06-10</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -23591,8 +25102,24 @@ In contrast to the heavily industrialized northern hemisphere, the southern hemi
 			<faction>CM</faction>
 		</factionChange>
 		<factionChange>
-			<date>3062-01-01</date>
+			<date>3065-01-01</date>
 			<faction>CC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-08-02</date>
+			<faction>CC,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-08-18</date>
+			<faction>CC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3085-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -23706,6 +25233,22 @@ Niops VII is a cold planet with access to sufficient resources to keep the Assoc
 			<date>2790-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-05-10</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-06-14</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-02-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Nizina</name>
@@ -23786,6 +25329,22 @@ Niops VII is a cold planet with access to sufficient resources to keep the Assoc
 			<date>3067-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-05-21</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-05-26</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Norfolk</name>
@@ -23847,7 +25406,7 @@ Niops VII is a cold planet with access to sufficient resources to keep the Assoc
 			<faction>MERC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3085-01-01</date>
+			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
 		<pressure>2</pressure>
@@ -24515,7 +26074,15 @@ Okefenokee is covered in jungles and swamps that are teeming with life. Unfortun
 			<faction>WOB</faction>
 		</factionChange>
 		<factionChange>
-			<date>3085-01-01</date>
+			<date>3077-03-01</date>
+			<faction>WOB,Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-03-10</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
 		<pressure>3</pressure>
@@ -24810,7 +26377,11 @@ Oriente Weapons Works</desc>
 			<faction>WOB</faction>
 		</factionChange>
 		<factionChange>
-			<date>3082-01-01</date>
+			<date>3077-11-21</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
 		<spectralClass>K</spectralClass>
@@ -25560,6 +27131,22 @@ Challenge Systems</desc>
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-01-12</date>
+			<faction>Stone,LA,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-02-03</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Pherkad</name>
@@ -25617,6 +27204,22 @@ Challenge Systems</desc>
 		<factionChange>
 			<date>2790-01-01</date>
 			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3076-09-06</date>
+			<faction>CGB,CSR,Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3076-09-10</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -25778,6 +27381,38 @@ Challenge Systems</desc>
 			<date>3062-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-07-27</date>
+			<faction>CC,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-08-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-05-02</date>
+			<faction>CC,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-05-03</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-05-30</date>
+			<faction>CC,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-06-10</date>
+			<faction>CC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3085-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Plymouth</name>
@@ -25875,6 +27510,22 @@ Challenge Systems</desc>
 		<factionChange>
 			<date>3057-11-01</date>
 			<faction>FWL</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-04-03</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-04-12</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -26083,6 +27734,22 @@ Poulsbo remains a lightly settled Military Outpost, whose civilian population is
 			<date>3062-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-08-12</date>
+			<faction>CC,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-08-18</date>
+			<faction>CC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3085-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Prato</name>
@@ -26277,6 +27944,22 @@ Poulsbo remains a lightly settled Military Outpost, whose civilian population is
 		<factionChange>
 			<date>3062-01-01</date>
 			<faction>FWL</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-03-09</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-03-15</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 		<pressure>3</pressure>
 		<gravity>0.97</gravity>
@@ -26506,6 +28189,22 @@ The location of Proserpina on the Federated Suns border requires the DCMS to kee
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-05-10</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-07-24</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -27287,6 +28986,22 @@ Magna Metals Incorporated</desc>
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-05-20</date>
+			<faction>Stone,CJF,CGB,CW,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-06-04</date>
+			<faction>CJF,CGB,CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Rijeka</name>
@@ -27322,6 +29037,22 @@ Magna Metals Incorporated</desc>
 		<factionChange>
 			<date>3067-01-01</date>
 			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3076-07-01</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3076-07-10</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -27465,6 +29196,22 @@ Valiant Systems</desc>
 		<factionChange>
 			<date>3007-06-25</date>
 			<faction>FWL</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3076-07-01</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3076-07-10</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -27785,6 +29532,22 @@ The planet barely survived through the Succession Wars since the technology behi
 			<date>3067-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-02-24</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-02-26</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Rudolpho</name>
@@ -27922,8 +29685,32 @@ Sabanillas Mining Company</desc>
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3057-01-01</date>
+			<date>3057-09-18</date>
+			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3057-11-01</date>
+			<faction>DC,LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3062-01-01</date>
 			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3069-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3076-07-21</date>
+			<faction>CGB,CSR,Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3076-07-28</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -28014,6 +29801,22 @@ Sabanillas Mining Company</desc>
 			<date>3040-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-05-10</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-05-14</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Saginaw</name>
@@ -28052,7 +29855,23 @@ Sabanillas Mining Company</desc>
 		</factionChange>
 		<factionChange>
 			<date>3057-11-01</date>
-			<faction>CM</faction>
+			<faction>ST</faction>
+		</factionChange>
+		<factionChange>
+			<date>3068-08-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-01-10</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-01-12</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -28614,6 +30433,18 @@ Tengo Aerospace</desc>
 			<date>3067-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3076-12-02</date>
+			<faction>FS,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-02-02</date>
+			<faction>FS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Schererville</name>
@@ -29143,6 +30974,22 @@ Tengo Aerospace</desc>
 			<date>3057-11-01</date>
 			<faction>CM</faction>
 		</factionChange>
+		<factionChange>
+			<date>3068-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-02-24</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-02-26</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Sheridan</name>
@@ -29222,6 +31069,22 @@ Tengo Aerospace</desc>
 		<factionChange>
 			<date>2910-01-01</date>
 			<faction>FWL</faction>
+		</factionChange>
+		<factionChange>
+			<date>3068-08-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-06-10</date>
+			<faction>Stone,CW,CJF,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-06-18</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 		<spectralClass>A</spectralClass>
 		<subtype>8</subtype>
@@ -29592,6 +31455,22 @@ Sian has been the capital of the Capellan Confederation since 2368 when Capella 
 			<date>3062-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-03-09</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-03-15</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 		<pressure>2</pressure>
 		<gravity>1.1</gravity>
 		<zenithCharge>True</zenithCharge>
@@ -29716,6 +31595,22 @@ Sian has been the capital of the Capellan Confederation since 2368 when Capella 
 			<date>3030-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3070-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3076-10-05</date>
+			<faction>CGB,CSR,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3076-10-15</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Skvorec</name>
@@ -29797,6 +31692,22 @@ The planet itself is home to large tracts of unspoiled wilderness, thanks in lar
 			<date>3067-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-01-10</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-01-12</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Small World</name>
@@ -29821,7 +31732,23 @@ The planet itself is home to large tracts of unspoiled wilderness, thanks in lar
 		</factionChange>
 		<factionChange>
 			<date>3057-11-01</date>
-			<faction>CM</faction>
+			<faction>DS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3066-04-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-05-12</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-05-20</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -30524,6 +32451,26 @@ Tengo Aerospace</desc>
 			<date>2790-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-07-12</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-07-20</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3079-01-01</date>
+			<faction>MSC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 		<spectralClass>G</spectralClass>
 		<subtype>8</subtype>
 		<luminosity>V</luminosity>
@@ -30777,6 +32724,22 @@ Tao ‘Mechworks</desc>
 			<date>2790-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-05-10</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-05-14</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Suda Bay</name>
@@ -30907,6 +32870,18 @@ For most of the planet’s history it was a Lyran Commonwealth planet bordering 
 		<factionChange>
 			<date>3057-09-18</date>
 			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3070-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-12-01</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 		<spectralClass>M</spectralClass>
 		<subtype>4</subtype>
@@ -31273,6 +33248,22 @@ For most of the planet’s history it was a Lyran Commonwealth planet bordering 
 			<date>3057-11-01</date>
 			<faction>FWL</faction>
 		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-05-21</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-05-26</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Tall Trees</name>
@@ -31298,6 +33289,22 @@ For most of the planet’s history it was a Lyran Commonwealth planet bordering 
 		<factionChange>
 			<date>3057-11-01</date>
 			<faction>CM</faction>
+		</factionChange>
+		<factionChange>
+			<date>3067-12-30</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-02-24</date>
+			<faction>Stone,DC,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-02-26</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 		<lifeForm>7</lifeForm>
 		<spectralClass>M</spectralClass>
@@ -31838,6 +33845,22 @@ Precision Weaponry</desc>
 			<date>2790-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-02-05</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-02-10</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Tematagi</name>
@@ -31912,6 +33935,18 @@ Precision Weaponry</desc>
 			<date>3057-02-28</date>
 			<faction>WOB</faction>
 		</factionChange>
+		<factionChange>
+			<date>3079-01-12</date>
+			<faction>Stone,LA,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3079-06-20</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 		<pressure>3</pressure>
 		<gravity>1</gravity>
 		<nadirCharge>True</nadirCharge>
@@ -31964,7 +33999,23 @@ The Sol system contains multiple colonized planets, foremost are Mars and Venus.
 		</factionChange>
 		<factionChange>
 			<date>3057-11-01</date>
-			<faction>CM</faction>
+			<faction>TCC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3068-08-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-02-09</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-02-17</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -32105,6 +34156,14 @@ Kajuka (Aerospace division)</desc>
 		</factionChange>
 		<factionChange>
 			<date>3057-09-18</date>
+			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3067-11-28</date>
+			<faction>LA,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-01-10</date>
 			<faction>LA</faction>
 		</factionChange>
 		<pressure>3</pressure>
@@ -32257,6 +34316,22 @@ As the capital of the Lyran Commonwealth, Thakard is home to many vital parts of
 		<factionChange>
 			<date>3057-09-18</date>
 			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-05-10</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-05-14</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-02-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -32471,6 +34546,22 @@ Earthwerks Incorporated</desc>
 			<date>3067-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-05-21</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-05-26</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 		<pressure>3</pressure>
 		<gravity>0.8</gravity>
 		<lifeForm>4</lifeForm>
@@ -32516,6 +34607,18 @@ Earthwerks Incorporated</desc>
 		<factionChange>
 			<date>3067-01-01</date>
 			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3069-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-07-20</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 		<spectralClass>G</spectralClass>
 		<subtype>8</subtype>
@@ -32932,11 +35035,19 @@ The planet is heavily industrialized and for a long time was the top producer of
 		<ycood>8.08</ycood>
 		<faction>TA</faction>
 		<factionChange>
-			<date>2315-01-01</date>
+			<date>2317-01-01</date>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2790-01-01</date>
+			<date>2783-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>2785-12-22</date>
+			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2876-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -32944,8 +35055,32 @@ The planet is heavily industrialized and for a long time was the top producer of
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
+			<date>3058-01-12</date>
+			<faction>FC,DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3058-03-02</date>
+			<faction>FC</faction>
+		</factionChange>
+		<factionChange>
 			<date>3067-01-01</date>
 			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-02-12</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-04-18</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -33529,6 +35664,22 @@ The system also later gained value when the uninhabited planet, Jonah’s Reach,
 			<date>3067-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-02-24</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-02-26</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Tyrrhenia</name>
@@ -33951,6 +36102,22 @@ The system also later gained value when the uninhabited planet, Jonah’s Reach,
 			<date>3057-10-01</date>
 			<faction>FWL</faction>
 		</factionChange>
+		<factionChange>
+			<date>3069-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3076-07-01</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3076-07-10</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Vandalia</name>
@@ -34071,6 +36238,22 @@ The system also later gained value when the uninhabited planet, Jonah’s Reach,
 		<factionChange>
 			<date>2900-01-01</date>
 			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-09-02</date>
+			<faction>CGB,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-09-06</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -34819,6 +37002,26 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 			<date>3057-10-01</date>
 			<faction>FWL</faction>
 		</factionChange>
+		<factionChange>
+			<date>3071-01-12</date>
+			<faction>FWL,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-01-28</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-01-10</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-01-15</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Washburn</name>
@@ -34970,6 +37173,22 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<factionChange>
 			<date>3062-01-01</date>
 			<faction>CC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-07-27</date>
+			<faction>CC,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-08-01</date>
+			<faction>CC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3085-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 		<pressure>3</pressure>
 		<gravity>1.0</gravity>
@@ -35347,6 +37566,18 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 			<date>2790-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-07-20</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Winter</name>
@@ -35468,6 +37699,22 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<factionChange>
 			<date>3067-01-01</date>
 			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-05-21</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-05-26</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -35599,6 +37846,22 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-01-12</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-01-20</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Xanthe III</name>
@@ -35715,6 +37978,22 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 			<date>3067-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-05-21</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-05-26</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Yardley</name>
@@ -35797,8 +38076,32 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3057-01-01</date>
+			<date>3057-09-18</date>
+			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3057-11-01</date>
+			<faction>DC,LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3062-01-01</date>
 			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3068-06-19</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3076-11-01</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3076-11-10</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -35923,6 +38226,18 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-12-25</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Zanzibar</name>
@@ -35986,6 +38301,22 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<factionChange>
 			<date>3057-09-18</date>
 			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-05-12</date>
+			<faction>Stone,LA,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-05-20</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -36088,6 +38419,22 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<factionChange>
 			<date>2790-01-01</date>
 			<faction>FWL</faction>
+		</factionChange>
+		<factionChange>
+			<date>3069-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3079-04-10</date>
+			<faction>CC,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3079-05-12</date>
+			<faction>CC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3085-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 		<spectralClass>F</spectralClass>
 		<subtype>7</subtype>
@@ -36221,6 +38568,22 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 			<date>3057-10-01</date>
 			<faction>FWL</faction>
 		</factionChange>
+		<factionChange>
+			<date>3072-02-01</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-01-12</date>
+			<faction>Stone,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3078-01-20</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 		<spectralClass>A</spectralClass>
 		<subtype>4</subtype>
 		<luminosity>V</luminosity>
@@ -36263,12 +38626,16 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
-			<date>3072-01-01</date>
+			<date>3072-02-01</date>
 			<faction>WOB</faction>
 		</factionChange>
 		<factionChange>
 			<date>3079-01-01</date>
 			<faction>CC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 		<spectralClass>K</spectralClass>
 		<subtype>4</subtype>
@@ -36891,7 +39258,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
 	</planet>
 	<planet>
-		<name>NP 01</name>
+		<name>NP 00</name>
 		<xcood>-139</xcood>
 		<ycood>507</ycood>
 		<faction>NONE</faction>
@@ -36901,7 +39268,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This star does not have any planets.</desc> 
 	</planet>
 	<planet>
-		<name>NP 02</name>
+		<name>NP 01</name>
 		<xcood>-396</xcood>
 		<ycood>354</ycood>
 		<faction>NONE</faction>
@@ -38337,16 +40704,6 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<subtype>3</subtype>
 		<luminosity>IV</luminosity>
 		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
-	</planet>
-	<planet>
-		<name>DPR 0400</name>
-		<xcood>-398.51</xcood>
-		<ycood>367.3</ycood>
-		<faction>NONE</faction>
-		<spectralClass>A</spectralClass>
-		<subtype>3</subtype>
-		<luminosity>IV</luminosity>
-		<desc>This system has no planets.</desc> 
 	</planet>
 	<planet>
 		<name>DPR 0401</name>
