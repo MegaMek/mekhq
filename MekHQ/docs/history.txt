@@ -25,6 +25,7 @@ v0.1.17 (SVN)
 + allow multiple discontiguous selections in TO&E
 + set up c3i networks in TO&E tab
 + Planetary data update 18 & 19
++ added equipment.txt and Vehicle BLK Files Explained.txt to the docs folder
 
 v0.1.16 (2012-05-23)
 + removed PartsInventory, quantity is now tracked directly by part
