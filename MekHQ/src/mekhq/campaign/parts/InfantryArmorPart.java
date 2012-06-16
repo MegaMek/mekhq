@@ -30,8 +30,6 @@ import mekhq.campaign.MekHqXmlUtil;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.sun.xml.internal.ws.util.StringUtils;
-
 /**
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
