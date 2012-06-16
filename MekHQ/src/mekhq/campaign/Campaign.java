@@ -1838,6 +1838,10 @@ public class Campaign implements Serializable {
 		if(null != version && version.length() > 0) {
 			String[] temp = version.split("\\.");
 			String tv = temp[2].replace("-dev", "");
+            if (tv.indexOf("-") > 0) {
+                temp = tv.split("\\-");
+                tv = temp[0];
+            }
 			v = Integer.parseInt(tv);
 		}
 		

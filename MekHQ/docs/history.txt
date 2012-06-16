@@ -27,6 +27,7 @@ v0.1.17 (SVN)
 + Planetary data update 18 & 19
 + added equipment.txt and Vehicle BLK Files Explained.txt to the docs folder
 + Bug 3535050: Build Error on incorrect import
++ Code for building with -dev-rXXXX revision versions
 
 v0.1.16 (2012-05-23)
 + removed PartsInventory, quantity is now tracked directly by part
