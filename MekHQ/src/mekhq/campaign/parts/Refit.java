@@ -119,6 +119,8 @@ public class Refit implements IPartWork, IAcquisitionWork {
 		customJob = custom;
 		oldUnit = oUnit;
 		newEntity = newEn;
+        newEntity.setOwner(oldUnit.getEntity().getOwner());
+		newEntity.setGame(oldUnit.getEntity().getGame());
 		oldUnitParts = new ArrayList<Integer>();
 		newUnitParts = new ArrayList<Integer>();
 		shoppingList = new ArrayList<Part>();
@@ -737,6 +739,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 	private void complete() {
 		int atype = -1;
 		boolean aclan = false;
+        // Entity oldEntity = oldUnit.getEntity();
 		oldUnit.setEntity(newEntity);
 		//add old parts to the warehouse
 		for(int pid : oldUnitParts) {
