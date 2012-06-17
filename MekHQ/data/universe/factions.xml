@@ -518,7 +518,7 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 	<faction>
 		<shortname>FWL</shortname>
 		<fullname>Free Worlds League</fullname>
-		<startingPlanet>Atreus (Free Worlds League),Atreus (Free Worlds League),Atreus (Free Worlds League),Atreus (Free Worlds League),Atreus (Free Worlds League),Atreus (Free Worlds League),Atreus (Free Worlds League),Atreus (Free Worlds League),Atreus (Free Worlds League)</startingPlanet>
+		<startingPlanet>Atreus,Atreus,Atreus,Atreus,Atreus,Atreus,Atreus,Atreus,Atreus</startingPlanet>
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
 		<colorRGB>165,94,160</colorRGB>
