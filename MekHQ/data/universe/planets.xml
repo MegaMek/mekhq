@@ -41165,4 +41165,1004 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<luminosity>V</luminosity>
 		<desc>This system has a planet with a hostile atmosphere.</desc> 
 	</planet>
+	<planet>
+		<name>DPR 0501</name>
+		<xcood>-169</xcood>
+		<ycood>791</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>VI</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0502</name>
+		<xcood>-196</xcood>
+		<ycood>781</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system has a planet with a hostile atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0503</name>
+		<xcood>-223</xcood>
+		<ycood>770</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>VI</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0504</name>
+		<xcood>-267</xcood>
+		<ycood>738</ycood>
+		<faction>NONE</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0505</name>
+		<xcood>-283</xcood>
+		<ycood>716</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>VI</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0506</name>
+		<xcood>-300</xcood>
+		<ycood>667</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>IV</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0507</name>
+		<xcood>-274</xcood>
+		<ycood>634</ycood>
+		<faction>NONE</faction>
+		<spectralClass>F</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0508</name>
+		<xcood>-247</xcood>
+		<ycood>628</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0509</name>
+		<xcood>-220</xcood>
+		<ycood>622</ycood>
+		<faction>NONE</faction>
+		<spectralClass>F</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system has a planet with a hostile atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0510</name>
+		<xcood>-193</xcood>
+		<ycood>616</ycood>
+		<faction>NONE</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>IV</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0511</name>
+		<xcood>-167</xcood>
+		<ycood>589</ycood>
+		<faction>NONE</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>9</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star does not have any planets.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0512</name>
+		<xcood>-165</xcood>
+		<ycood>566</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star does not have any planets.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0513</name>
+		<xcood>-163</xcood>
+		<ycood>543</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0601</name>
+		<xcood>-46</xcood>
+		<ycood>976</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star does not have any planets.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0602</name>
+		<xcood>-20</xcood>
+		<ycood>969</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system has a planet with a hostile atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0603</name>
+		<xcood>6</xcood>
+		<ycood>960</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0604</name>
+		<xcood>32</xcood>
+		<ycood>951</ycood>
+		<faction>NONE</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>7</subtype>
+		<luminosity>II</luminosity>
+		<desc>This star does not have any planets.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0605</name>
+		<xcood>58</xcood>
+		<ycood>942</ycood>
+		<faction>NONE</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0606</name>
+		<xcood>84</xcood>
+		<ycood>933</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>7</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star does not have any planets.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0607</name>
+		<xcood>136</xcood>
+		<ycood>926</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0608</name>
+		<xcood>163</xcood>
+		<ycood>932</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0609</name>
+		<xcood>190</xcood>
+		<ycood>938</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0610</name>
+		<xcood>217</xcood>
+		<ycood>944</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0611</name>
+		<xcood>260</xcood>
+		<ycood>966</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system has a planet with a hostile atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0612</name>
+		<xcood>276</xcood>
+		<ycood>986</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star does not have any planets.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0613</name>
+		<xcood>291</xcood>
+		<ycood>1005</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>VI</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0614</name>
+		<xcood>307</xcood>
+		<ycood>1025</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>9</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system has a habitable but uninhabited planet.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0615</name>
+		<xcood>345</xcood>
+		<ycood>1029</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>VI</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0616</name>
+		<xcood>368</xcood>
+		<ycood>1014</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system has a planet with a hostile atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0617</name>
+		<xcood>391</xcood>
+		<ycood>999</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>IV</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0618</name>
+		<xcood>414</xcood>
+		<ycood>984</ycood>
+		<faction>NONE</faction>
+		<spectralClass>F</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>VI</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0701</name>
+		<xcood>-79</xcood>
+		<ycood>698</ycood>
+		<faction>NONE</faction>
+		<spectralClass>A</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0702</name>
+		<xcood>-54</xcood>
+		<ycood>713</ycood>
+		<faction>NONE</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star does not have any planets.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0703</name>
+		<xcood>-29</xcood>
+		<ycood>728</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system has a planet with a hostile atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0704</name>
+		<xcood>-4</xcood>
+		<ycood>743</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>VI</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0705</name>
+		<xcood>44</xcood>
+		<ycood>772</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system has a planet with a hostile atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0706</name>
+		<xcood>65</xcood>
+		<ycood>790</ycood>
+		<faction>NONE</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>9</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0707</name>
+		<xcood>86</xcood>
+		<ycood>808</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>VI</luminosity>
+		<desc>This system has a planet with a hostile atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0708</name>
+		<xcood>107</xcood>
+		<ycood>826</ycood>
+		<faction>NONE</faction>
+		<spectralClass>F</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>IV</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0709</name>
+		<xcood>122</xcood>
+		<ycood>869</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star does not have any planets.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0710</name>
+		<xcood>116</xcood>
+		<ycood>894</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0711</name>
+		<xcood>155</xcood>
+		<ycood>832</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system has a planet with a hostile atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0712</name>
+		<xcood>181</xcood>
+		<ycood>821</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0713</name>
+		<xcood>207</xcood>
+		<ycood>810</ycood>
+		<faction>NONE</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>VI</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>DPR 0714</name>
+		<xcood>234</xcood>
+		<ycood>799</ycood>
+		<faction>NONE</faction>
+		<spectralClass>F</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>VI</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>ER 044</name>
+		<xcood>18</xcood>
+		<ycood>1745</ycood>
+		<faction>NONE</faction>
+		<spectralClass>F</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>JF 01</name>
+		<xcood>575</xcood>
+		<ycood>510</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>JF 02</name>
+		<xcood>573</xcood>
+		<ycood>478</ycood>
+		<faction>NONE</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>VI</luminosity>
+		<desc>This system has a planet with a hostile atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>JF 03</name>
+		<xcood>595</xcood>
+		<ycood>525</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>KC 12</name>
+		<xcood>68</xcood>
+		<ycood>1746</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>KC 13</name>
+		<xcood>49</xcood>
+		<ycood>1817</ycood>
+		<faction>NONE</faction>
+		<spectralClass>F</spectralClass>
+		<subtype>7</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star does not have any planets.</desc> 
+	</planet>
+	<planet>
+		<name>KC 14</name>
+		<xcood>24</xcood>
+		<ycood>1862</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>KC 15</name>
+		<xcood>-35</xcood>
+		<ycood>1855</ycood>
+		<faction>NONE</faction>
+		<spectralClass>B</spectralClass>
+		<subtype>7</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star does not have any planets.</desc> 
+	</planet>
+	<planet>
+		<name>NP 64</name>
+		<xcood>-230</xcood>
+		<ycood>-505</ycood>
+		<faction>NONE</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system has a planet with a hostile atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>NP 65</name>
+		<xcood>444</xcood>
+		<ycood>458</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star does not have any planets.</desc> 
+	</planet>
+	<planet>
+		<name>NP 66</name>
+		<xcood>472</xcood>
+		<ycood>468</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>NP 67</name>
+		<xcood>499</xcood>
+		<ycood>479</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system has a planet with a hostile atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>NP 68</name>
+		<xcood>527</xcood>
+		<ycood>489</ycood>
+		<faction>NONE</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>IV</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>TFS 01</name>
+		<xcood>416</xcood>
+		<ycood>474</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star does not have any planets.</desc> 
+	</planet>
+	<planet>
+		<name>TFS 02</name>
+		<xcood>416</xcood>
+		<ycood>501</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>VI</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>TFS 03</name>
+		<xcood>415</xcood>
+		<ycood>528</ycood>
+		<faction>NONE</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>TFS 04</name>
+		<xcood>415</xcood>
+		<ycood>555</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>9</subtype>
+		<luminosity>VI</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>TFS 05</name>
+		<xcood>414</xcood>
+		<ycood>582</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system has a planet with a hostile atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>TFS 06</name>
+		<xcood>390</xcood>
+		<ycood>620</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>VI</luminosity>
+		<desc>This system has a planet with a hostile atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>TFS 07</name>
+		<xcood>366</xcood>
+		<ycood>632</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>7</subtype>
+		<luminosity>IV</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>TFS 08</name>
+		<xcood>342</xcood>
+		<ycood>644</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>IV</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>TFS 09</name>
+		<xcood>318</xcood>
+		<ycood>656</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>TFS 10</name>
+		<xcood>287</xcood>
+		<ycood>692</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>7</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>TFS 11</name>
+		<xcood>280</xcood>
+		<ycood>716</ycood>
+		<faction>NONE</faction>
+		<spectralClass>F</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>IV</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>TFS 12</name>
+		<xcood>274</xcood>
+		<ycood>740</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>IV</luminosity>
+		<desc>This star does not have any planets.</desc> 
+	</planet>
+	<planet>
+		<name>TFS 13</name>
+		<xcood>268</xcood>
+		<ycood>764</ycood>
+		<faction>NONE</faction>
+		<spectralClass>F</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>TFS 14</name>
+		<xcood>258</xcood>
+		<ycood>815</ycood>
+		<faction>NONE</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system has a planet with a hostile atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>TFS 15</name>
+		<xcood>256</xcood>
+		<ycood>841</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>7</subtype>
+		<luminosity>IV</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>TFS 16</name>
+		<xcood>253</xcood>
+		<ycood>868</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>7</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star does not have any planets.</desc> 
+	</planet>
+	<planet>
+		<name>TFS 17</name>
+		<xcood>251</xcood>
+		<ycood>894</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>TFS 18</name>
+		<xcood>248</xcood>
+		<ycood>921</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>VI</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>TFS 19</name>
+		<xcood>304</xcood>
+		<ycood>1064</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>TFS 20</name>
+		<xcood>285</xcood>
+		<ycood>1084</ycood>
+		<faction>NONE</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>TFS 21</name>
+		<xcood>267</xcood>
+		<ycood>1104</ycood>
+		<faction>NONE</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system has a planet with a hostile atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>TFS 22</name>
+		<xcood>248</xcood>
+		<ycood>1124</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>IV</luminosity>
+		<desc>This star does not have any planets.</desc> 
+	</planet>
+	<planet>
+		<name>TFS 23</name>
+		<xcood>230</xcood>
+		<ycood>1144</ycood>
+		<faction>NONE</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>IV</luminosity>
+		<desc>This system has a planet with a hostile atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>TFS 24</name>
+		<xcood>204</xcood>
+		<ycood>1192</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system has a planet with a hostile atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>TFS 25</name>
+		<xcood>197</xcood>
+		<ycood>1220</ycood>
+		<faction>NONE</faction>
+		<spectralClass>F</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>TFS 26</name>
+		<xcood>191</xcood>
+		<ycood>1248</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>VI</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>TFS 27</name>
+		<xcood>185</xcood>
+		<ycood>1276</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>7</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system has a planet with a hostile atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>TFS 28</name>
+		<xcood>179</xcood>
+		<ycood>1304</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>TFS 29</name>
+		<xcood>173</xcood>
+		<ycood>1332</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system has a planet with a hostile atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>TFS 30</name>
+		<xcood>167</xcood>
+		<ycood>1360</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>TFS 31</name>
+		<xcood>161</xcood>
+		<ycood>1388</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>7</subtype>
+		<luminosity>VI</luminosity>
+		<desc>This system has a planet with a hostile atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>TFS 32</name>
+		<xcood>155</xcood>
+		<ycood>1416</ycood>
+		<faction>NONE</faction>
+		<spectralClass>F</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system has a planet with a hostile atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>TFS 33</name>
+		<xcood>149</xcood>
+		<ycood>1444</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>VI</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>TFS 34</name>
+		<xcood>143</xcood>
+		<ycood>1472</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>TFS 35</name>
+		<xcood>137</xcood>
+		<ycood>1500</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>TFS 36</name>
+		<xcood>131</xcood>
+		<ycood>1528</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>V</luminosity>
+		<desc>This system has a planet with a hostile atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>TFS 37</name>
+		<xcood>125</xcood>
+		<ycood>1556</ycood>
+		<faction>NONE</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>VI</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>TFS 38</name>
+		<xcood>119</xcood>
+		<ycood>1584</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star does not have any planets.</desc> 
+	</planet>
+	<planet>
+		<name>TFS 39</name>
+		<xcood>113</xcood>
+		<ycood>1612</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>VI</luminosity>
+		<desc>This system contains several planets too small to hold on to an atmosphere.</desc> 
+	</planet>
+	<planet>
+		<name>TFS 40</name>
+		<xcood>107</xcood>
+		<ycood>1640</ycood>
+		<faction>NONE</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>9</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>TFS 41</name>
+		<xcood>101</xcood>
+		<ycood>1668</ycood>
+		<faction>NONE</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>7</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	<planet>
+		<name>TFS 42</name>
+		<xcood>95</xcood>
+		<ycood>1696</ycood>
+		<faction>NONE</faction>
+		<spectralClass>K</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>V</luminosity>
+		<desc>This star does not have any planets.</desc> 
+	</planet>
 </planets>
