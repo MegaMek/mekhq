@@ -31,6 +31,7 @@ v0.1.17 (SVN)
 + Updated tileset files to keep inline with the MegaMek versions (fixes a display bug)
 + Bug: C3/C3i NPE for refits. New Entity needs Player and Game objects set.
 + Updated data to match MM for new tileset images
++ Another tileset image update
 
 v0.1.16 (2012-05-23)
 + removed PartsInventory, quantity is now tracked directly by part
