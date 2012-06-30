@@ -739,7 +739,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 	private void complete() {
 		int atype = -1;
 		boolean aclan = false;
-        // Entity oldEntity = oldUnit.getEntity();
+        Entity oldEntity = oldUnit.getEntity();
 		oldUnit.setEntity(newEntity);
 		//add old parts to the warehouse
 		for(int pid : oldUnitParts) {
@@ -803,6 +803,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 		for(Part part : oldUnit.getParts()) {
 			part.updateConditionFromPart();
 		}
+        oldUnit.getEntity().setC3UUIDAsString(oldEntity.getC3UUIDAsString());
         oldUnit.getEntity().setExternalIdAsString(oldUnit.getId().toString());
 		oldUnit.resetPilotAndEntity();
 		oldUnit.setRefit(null);
