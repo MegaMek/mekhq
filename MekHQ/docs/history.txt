@@ -36,6 +36,7 @@ v0.1.17 (SVN)
 + Bug: Refitting a unit clears its C3UUID
 + Updating MM.jar to revision 8913
 + Updating MM.jar to revision 8916 (For EntityWeightClass.getClassName(int) functionality to be restored so that MekHQ will compile)
++ Updating with new hex image data from MegaMek
 
 v0.1.16 (2012-05-23)
 + removed PartsInventory, quantity is now tracked directly by part
