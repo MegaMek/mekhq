@@ -889,8 +889,16 @@ Alarion is primarily settled by people of German, Romanian and English descent.<
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3030-01-01</date>
+			<date>3028-08-24</date>
+			<faction>CC,FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3028-09-07</date>
 			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3030-02-28</date>
+			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
@@ -1034,9 +1042,17 @@ Industrial, Command and logistical world, paperwork in this planet and its prefe
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3030-01-01</date>
-			<faction>FS</faction>
-		</factionChange>
+        	<date>3028-08-27</date>
+        	<faction>CC,FS</faction>
+    	</factionChange>
+    	<factionChange>
+	        <date>3028-09-04</date>
+    	    <faction>FS</faction>
+    	</factionChange>
+    	<factionChange>
+	        <date>3030-02-28</date>
+    	    <faction>LA</faction>
+    	</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -16395,7 +16411,7 @@ The planet and the factories have been the target of invasion numerous times thr
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2790-01-01</date>
+			<date>2785-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -16434,6 +16450,26 @@ The planet and the factories have been the target of invasion numerous times thr
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>0.88</gravity>
+		<lifeForm>2</lifeForm>
+		<climate>3</climate>
+		<percentWater>44</percentWater>
+		<temperature>25</temperature>
+		<spectralClass>M</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>3</sysPos>
+		<satellite>Aberne</satellite>
+		<satellite>Behr</satellite>
+		<satellite>Otabwe</satellite>
+		<landMass>Barnar</landMass>
+		<landMass>Fryggia</landMass>
+		<landMass>Martego</landMass>
+		<landMass>Opilacca (Trunner)</landMass>
+		<desc>Imbros III was a part of the Terran Hegemony when Stefan Amaris usurped the Star League throne and sounded the death knell of humanity‘s Golden Age. An unremarkable, water-poor world of rocky mountains and bone-dry canyons, with little mineral wealth save a few veins of precious metals and an abundance of bauxite, Imbros sparked little to no interest for the Usurper. Instead, he forced House Kurita, using hostages of the Draconis Combine‘s ruling line as leverage, to garrison this planet in advance of Kerensky‘s return. These same Combine forces gave way easily to the liberating SLDF, only to return in force after the League‘s collapse just a few years later. Though never a valuable military or industrial prize, Imbros III did provide strategic value to the Combine as a border world to the Lyran Commonwealth, so the centuries of warfare that followed the fall of the League saw many raids and campaigns either launched against this planet or staged from it.
+
+Trunner, the largest city and planetary capital, is home to Imbross AeroTech Industries Company‘s offworld sales division, and sits on the banks of the Youli River on the southern continent of Opilacca. Southeast of Opilacca lie the large twin continents of Barnar and Martego. On Martego, between the Maulan and Wanalahi Rivers, lies the major spaceport city of Larabel, where IATIC also maintains its corporate headquarters. Small towns—most interconnected by a series of winding monorailways that cross expanses of alternating woods and deserts—dot the continents of Opilacca, Barnar, and Martego. Imbros III‘s fourth continent, the glacial south polar continent of Fryggia, is totally uninhabited.</desc>
 	</planet>
 	<planet>
 		<name>Immenstadt</name>
@@ -17846,6 +17882,23 @@ Kaumberg was primarily settled by colonists hailing from Germany and Austria.</d
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<pressure>2</pressure>
+		<gravity>0.61</gravity>
+		<lifeForm>2</lifeForm>
+		<climate>40</climate>
+		<percentWater>9</percentWater>
+		<temperature>4</temperature>
+		<spectralClass>B</spectralClass>
+		<subtype>9</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>3</sysPos>
+		<satellite>Epstarius</satellite>
+		<landMass>(Kaverni Bay)</landMass>
+		<desc>Located far from its jump point, with hardly any water to speak of, an atmosphere too thin for unassisted breathing, and blasted by all manner of solar radiation from the blue-white subgiant around which it orbits, Kaus Australis would have been completely overlooked as a potential colony site if not for trace amounts of germanium and other valuable metal deposits just beneath its rocky surface.
+
+The first settlers erected domed colonies along the banks of the Sea of Epsilon Sagittarius, the planet‘s only large body of surface water, located in the southern hemisphere. Radiation concerns and the discovery of limited subsurface water supplies, however, encouraged these hardy miners to move underground within a few decades. Relying on interstellar trade to survive, particularly with nearby water-rich but metal-poor Kaus Media, Kaus Australis exported the yield of its mines in exchange for water purifiers, foodstuffs, medical supplies, and all manner of other basic needs. The strong trade bond between the neighboring worlds eventually grew into a two-world alliance that lasted well into the Succession Wars. Decisions affecting trade, defense, and social welfare were made for both worlds during this time at the alliance‘s capital on Kaus Media, an arrangement that often helped or hindered the ability of the Draconis Combine to exert its influence over the two planets when both fell under the Dragon‘s banner. Matters came to a head during the First Succession War, when Lyran agents-provocateur encouraged the alliance to rise against its Combine masters. The Kuritan response was swift and brutal, razing the alliance capital, occupying Kaus Media and briefly blockading Kaus Australis until both worlds turned over the Lyran agents and all dissident leaders. A negotiated settlement allowed limited autonomy and favored trade between the Kaus worlds in exchange for a more pro-Combine political line and hefty reparations that paralyzed their mutual economy for a time.
+
+Even today, Kaus Australis maintains Kaus Media as its primary customer and source of goods, their symbiosis undeterred by centuries of war or the changing of allegiances. The capital of Kaus Australis, Kaverni Bay, an underground community, is located fifty kilometers inland from the Sea of Epsilon Sagittarius. While home to a third of the planetary population—the remainder scattered in small domes and subsurface mining homesteads—visitors seeking to conduct business with the Kaus Australians are best advised to seek a Kaus Median facilitator first.</desc>
 	</planet>
 	<planet>
 		<name>Kaus Borealis</name>
@@ -17872,6 +17925,26 @@ Kaumberg was primarily settled by colonists hailing from Germany and Austria.</d
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>0.87</gravity>
+		<lifeForm>7</lifeForm>
+		<climate>3</climate>
+		<percentWater>71</percentWater>
+		<temperature>55</temperature>
+		<spectralClass>K</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>4</sysPos>
+		<satellite>Blufisch</satellite>
+		<landMass>Allysi (Iamda)</landMass>
+		<landMass>Bellaria</landMass>
+		<landMass>Lucynda</landMass>
+		<landMass>Rashatta</landMass>
+		<desc>A hellish world of continuous volcanic activity that geologists are attributing to a severe tectonic shift of unparalleled magnitude, Kaus Borealis is a world that many feel is on death‘s door. Over 300 active volcanoes have formed in the last three centuries alone, erupting with increasing intensity that now has lava flowing freely and regularly over almost ten percent of the planet‘s surface at any given time. When first discovered, Kaus Borealis was a serene world of deep green oceans, fertile soil, hardy woodlands, abundant wildlife, and blue skies. The early colonists quickly made their paradise a home and established it as an agricultural world. Although, like most terrestrial planets, Kaus Borealis had its share of seismic disturbances, scientists thought little of them until three new volcanoes explosively emerged on the west coast of the northern continent of Lucynda in 2803, each within three months of the other. As more eruptions followed, and entire towns or farming regions were swallowed up by the earth or incinerated by tons of molten rock, a gradual exodus began, which stalled in the thirty-first century when the planet grew inexplicably silent. However, by that stage so much sulfur, methane, and ash had been thrown into the atmosphere that the ozone layer was compromised, breathing was impossible without respirators, and acid rain regularly fell from dark, yellow skies. Gone were the serene oceans, fertile soil, and hardy woodlands, and most of the native wildlife had perished. Turbulent, superheated seas and barren wastes of broken rock and charcoal now dominated the landscape, but began to give way to the first signs of rejuvenation by the time Kaus Borealis became a part of by the last 31st century.
+
+In 3102, all hell broke loose again. With renewed fury, five volcanoes scattered across all four of the planet‘s major landmasses blasted fire and hot gases into the skies and ran molten lava into the land and seas, prompting the start of another mass exodus that continues to this day. Geologists studying the ongoing phenomenon have claimed that the rate of eruptions suggests that the continuous turmoil may run its course, as the tectonic plates settle into new positions within another few centuries, but the less analytical inhabitants of this world may not wait around that long.
+
+The capital of Kaus Borealis, Iamda, is located on the northern continent of Allysi, which lies east of Lucynda. Grand Cauldron, a newer city on the southern continent of Bellaria, is home to the largest of the planet‘s geological research facilities, the Gordon Weiss Institute of Tectonics, as well as the southern hub of the Kaus Borealis Planetary Evacuation Command. Rashatta, Kaus Borealis‘ fourth and smallest continent, located in the equatorial zones between Allysi and Rashatta, is completely lifeless, a result of the planet‘s brutal heat and the presence of no fewer than ten of its twenty largest active volcanoes.</desc>
 	</planet>
 	<planet>
 		<name>Kaus Media</name>
@@ -17898,6 +17971,28 @@ Kaumberg was primarily settled by colonists hailing from Germany and Austria.</d
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.19</gravity>
+		<lifeForm>8</lifeForm>
+		<climate>3</climate>
+		<percentWater>78</percentWater>
+		<temperature>32</temperature>
+		<spectralClass>K</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>1</sysPos>
+		<satellite>Ajax</satellite>
+		<satellite>Nezerah</satellite>
+		<satellite>Yanu</satellite>
+		<satellite>Zhentil</satellite>
+		<landMass>Emparos (Vanguard City)</landMass>
+		<landMass>Gaul</landMass>
+		<landMass>Hyadamos</landMass>
+		<landMass>Normano</landMass>
+		<landMass>Romana</landMass>
+		<desc>Kaus Media is a pleasant, terrestrial world with wide, deep oceans, expansive forests and jungles, and varied—yet normally mild—seasons. Yet, for all its natural splendor, the first colonists to explore and exploit this world quickly realized that the lack of easily reached indigenous metals and minerals would doom all efforts to develop their new home. In the search for a source for raw materials to fuel their industry, traders from Kaus Media quickly discovered that their nearest neighbor, Kaus Australis, suffered from the opposite plight, surrounded by abundant and valuable raw materials, but lacking in food and water. A trade deal blossomed into a full-fledged alliance that carried the two worlds through the Age of War and continued even with the ascendance of the Draconis Combine. Efforts by the Lyran Commonwealth to turn this alliance against the Dragon proved disastrous for the so-called ―Kaus alliance worlds during the First Succession War, when the enraged forces of the DCMS bombarded DeGuilles, the planetary capital city—and with it, the governing buildings that served both worlds. Only after surrendering the Lyran instigators and rebel leaders, and agreeing to stiff reparations and an oath of fealty, did the Kaus alliance avoid further destruction, but the entire crisis underscored the strengths and weaknesses of the symbiotic relationship now shared by these twin worlds.
+
+Trade between both resumed again decades after the crisis, though government was less centralized, with each tending to its own affairs from its own respective capitals. Still, in memory of the broken bond, the people of Kaus Media never built over the ruins of DeGuilles. Instead, the new planetary capital, Vanguard City, located just forty kilometers to the north on the continent of Emparos, governs the affairs of this world, and maintains a diplomatic office for the benefit of its neighbor. Several major trading companies that do business under exclusive license with both Kaus planets also call Vanguard City their home, thanks to the presence of the planet‘s largest spaceport. Aside from Emparos, Kaus Media‘s other four major continents are Romana, Hyadamos, Gaul, and Normano. All but Gaul, the planet‘s frozen south polar continent, are populated with various small and medium-sized commercial and rural towns scattered along the shores of various rivers and lakes.</desc>
 	</planet>
 	<planet>
 		<name>Kawabe</name>
@@ -18240,11 +18335,44 @@ Despite the Federated Suns best efforts, Kentares never recovered from the massa
 		<name>Kessel</name>
 		<xcood>-13.3</xcood>
 		<ycood>84.24</ycood>
-		<faction>LA</faction>
+		<faction>FoS</faction>
 		<factionChange>
-			<date>2900-01-01</date>
+			<date>2340-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2820-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3085-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.21</gravity>
+		<nadirCharge>True</nadirCharge>
+		<zenithCharge>True</zenithCharge>
+		<lifeForm>7</lifeForm>
+		<climate>3</climate>
+		<percentWater>81</percentWater>
+		<temperature>42</temperature>
+		<spectralClass>G</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>2</sysPos>
+		<satellite>Kiev</satellite>
+		<satellite>Svoboda</satellite>
+		<landMass>Gershtad</landMass>
+		<landMass>Lobopov</landMass>
+		<landMass>Novgorod (Sverdlovsk)</landMass>
+		<hpg>B</hpg>
+		<desc>Under the sway of the Federation of Skye, known for shrewd business practices and a preponderance of heavy industrial might, Kessel was already a valuable manufacturing center even before the dawn of the Lyran Commonwealth. It therefore comes as little surprise that the Draconis Combine, a poor realm—economically, if not militarily—would covet such a prize so close to their border, when the Star League collapsed and war broke out across the Inner Sphere. House Kurita captured Kessel almost incidentally, during a drive toward Skye itself, and though the forces of House Steiner ultimately succeeded in driving back the Combine invaders, they never managed to reclaim several lost planets, including this one. The Combine saw great untapped potential in this mineral - and metal - rich world, with its many mining, refining, and manufacturing complexes that produced everything short of BattleMechs and DropShips. Thus, as Steiner forces continued to hit back over the centuries, making several failed attempts to retake worlds such as Kessel, the Combine took advantage of their possession, loosening industrial standards that protected the environment to increase output for their military needs. Freed of the constraints found on other former Isle of Skye worlds, or any other industrial/corporate niceties, for that matter, the industries on Kessel turned to such questionable practices as strip mining and chemical dumping. Worse still, these practices also attracted the attention of the yakuza, the dominant underworld force of the Draconis Combine. Over the centuries, the results of these trends were a poisoned biosphere and a poisoned society. Crime was rampant, and might made right, except in those areas where the well-armed and equipped nobility resided. Visitors to this world are still cautioned to keep respirators on when outside their vehicles and buildings, to protect against the still-lingering toxins in the local air.
+
+Kessel became a prefecture capital under Combine rule. Though it was raided several times, major corporations continued their operations on this world unabated, attracting even Inner Sphere-renowned manufacturers, such as Diverse Optics, producer of everything from home entertainment systems to military-grade laser weaponry.
+
+During the Jihad, Kessel‘s productivity and administrative importance drew the Blakists‘ attention, but fortunately an allied fleet spearheaded by Combine WarShips interdicted the fanatics‘ attack. Only a handful of Word of Blake troops made planetfall on Kessel, but that handful was enough to hit several large cities with neutron bombs in a suicide run that killed over ten thousand Combine citizens. 
+
+Kessel‘s capital city is Sverdlovsk, located on the northwestern continent of Novgorod. The southern continent, Gershtad, is home to the planet‘s largest spaceport and AtmoClean Enterprises, commissioned after the 3070s, prototype air purification plant. Northeast of Gershtad is the Lobopov continent, home to what little remains of Kessel‘s untamed wilderness, and several defunct strip-mining operations.</desc>
 	</planet>
 	<planet>
 		<name>Kestrel</name>
@@ -18994,6 +19122,30 @@ The massive volcanic eruptions quickly changed the planet’s climate from tropi
 			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3085-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<pressure>3</pressure>
+		<gravity>0.64</gravity>
+		<lifeForm>5</lifeForm>
+		<climate>5</climate>
+		<percentWater>74</percentWater>
+		<temperature>62</temperature>
+		<spectralClass>K</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>4</sysPos>
+		<satellite>Drezix</satellite>
+		<satellite>Esther</satellite>
+		<satellite>Volaria</satellite>
+		<landMass>Epigaus (Lazarus Bay)</landMass>
+		<landMass>Perragea (Ishtalia)</landMass>
+		<desc>Brutally hot and muggy much of the time, Konstance suffers from an overabundance of carbon dioxide that casts a haze over the planet and traps heat from its weak, K-class sun. Once necessary to give life on this world a fighting chance, this environmental taint, already present to a much lesser degree when colonists first set foot here almost a thousand years ago, has been aggravated by centuries of human development. Despite efforts to control the greenhouse-effect problem in its infancy, the presence of large underground pockets of petrochemicals and natural gas inevitably led to a series of drilling and refining industries that helped develop Konstance, but over time added to the atmospheric pollution. Konstance thus continued to grow hotter over the centuries, to the point where the effects of this global warming have forced the local population to move into the cooler polar reaches of the planet.
+
+Unfortunately, despite the decreased presence of heavy industry in the middle and equatorial latitudes—save a few automated pumping and refining facilities occasionally tended to by visiting laborers and technicians in special environmental gear—the planet continues to grow warmer with each passing year. The abandoned cities and towns of the planet‘s interior landmasses of Juranias and Tiburia—including the former capital city of Konstantinople—have gradually been reclaimed by Mother Nature, with hardy but mutated rain forest trees, fed by acid rains, growing through the crumbling remains of streets and buildings. Tropical storms, also the result of the planet‘s shifting climate, have rendered travel into and through these regions a chancy proposition, so most transcontinental travel is accomplished either through suborbital DropShip hops or by the use of submersible passenger vehicles. While this complicates administrative and commercial business on Konstance somewhat, especially in the formation of distinctive ―northern and ―southern subcultures, it has made raids against this world over the last century or two an equally complex affair as hostile parties must often try to coordinate a two-pronged assault to tie up local defenses, which have long since grown accustomed to the quirks of Konstance‘s heat and tempestuous weather.
+
+The capital city of Konstance, Ishtalia, is located on the southern polar continent of Perragea, and also doubles as the southern hemisphere‘s largest spaceport city. Its counterpart on the north polar continent of Epigaus, Lazarus Bay, also boasts the planet‘s largest submarine seaport, which ferries over half the harsh-environment workforce for local fuel producers like Axis PetroChem Unlimited.</desc>
 	</planet>
 	<planet>
 		<name>Kookens Pleasure Pit</name>
@@ -19230,6 +19382,25 @@ The planet itself is resource poor and has little to offer for export. However, 
 			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3085-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.19</gravity>
+		<lifeForm>7</lifeForm>
+		<climate>3</climate>
+		<percentWater>63</percentWater>
+		<temperature>39</temperature>
+		<spectralClass>K</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>1</sysPos>
+		<satellite>Yokohama</satellite>
+		<landMass>Entiko</landMass>
+		<landMass>Oahana</landMass>
+		<landMass>Shanaro (Arbeesi)</landMass>
+		<desc>Kuzuu is a quiet, mostly agricultural world known for long, reasonably mild seasons, particularly in its middle-latitude continents of Oahana and Entiko. A large world, with modest deposits of industrial metals and other valuable resources, Kuzuu developed heavy industry very slowly compared to most of its neighbors, as a majority of the original settlers preferred the quieter farming and ranching life to the hustle of heavy industry and commerce. Because of this, the planet was largely overlooked by raiders throughout the Age of War and the first three Succession Wars, a factor that helped protect its natural beauty and even drew those seeking a return to the simpler life. In the Fourth Succession War, Kuzuu went from being an interior world of the Draconis Combine to being the front line against future FedCom aggression, perched just beyond the tip of the united Commonwealth‘s new ―Lyons Thumb. The increased military presence this new position warranted led to a boom in local industry and the economy to support the planet‘s defense, and so, by the close of the thirty-first century, Kuzuu boasted a population of more than two billion, almost equally divided among urban and rural population centers. The capital city of Arbeesi is located on the industrialized northern continent of Shanaro.</desc>
 	</planet>
 	<planet>
 		<name>Kvistgard</name>
@@ -19491,6 +19662,29 @@ Fortunately the population is overall happy with their lot in the Inner Sphere. 
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.04</gravity>
+		<lifeForm>5</lifeForm>
+		<climate>3</climate>
+		<percentWater>82</percentWater>
+		<temperature>33</temperature>
+		<spectralClass>G</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>1</sysPos>
+		<satellite>None (asteroid ring)</satellite>
+		<landMass>Brattanios</landMass>
+		<landMass>Falkos</landMass>
+		<landMass>Galapagos (Middle Park)</landMass>
+		<landMass>Phillipharos</landMass>
+		<landMass>Shasia</landMass>
+		<desc>In many respects Lambrecht was considered an ideal candidate for colonization. Abundant mineral and metal deposits, ripe for mining and refining on the surface and in the orbiting debris field from a failed moon, promised a booming industrial economy, while fertile soil, terrestrial seasons, and a biosphere suitable for human life all described a virtual paradise. The only drawback, settlers quickly learned, was that the planet was entering a stage of geological settling, stirred constantly by gravitational tides caused by its large G6-class sun. The resulting earthquakes, common all over the world, have generally been mild, but prevented the colonists from establishing large structures or concentrated cities, a trend that continues despite advances in building materials and planetwide expertise in earthquake damage-control procedures. As a result, Lambrecht‘s five island continents are dotted with small to medium-sized towns, the largest of which, the planetary capital of Middle Park, boasts a population of just 967,000.
+
+During the Star League era, Lambrecht became one of the League‘s most heavily fortified worlds, ironically enough, because ofits chronic tremors. As home to the University of Lambrecht, one of the Star League‘s ―Golden Ten institutions of higher learning, and a school geared toward the hard sciences (such as physics, astronomy, and geology), the League chose Lambrecht as a test bed for a Castle Brian design using high-boron alloy, a rare building material resistant to earthquakes. Six Castles Brian were constructed on Lambrecht by the mid-twenty-fifth century, including one that housed the Success Mint, which printed currency for the Draconis Combine. During the Amaris crisis, Lambrecht was hit pretty hard, with the Usurper‘s troops obliterating four of the Castles Brian, the University of Lambrecht, and the Success Mint, from orbit. Using neutron weapons on the ground to capture and secure the remaining two, Amaris‘ forces dug in when Kerensky‘s troops returned to liberate the planet. In the ensuing battle, Kerensky‘s troops used their own tactics against them, raining fire down from several orbiting WarShips to destroy the core of Amaris‘ defenders, then overwhelming the surviving troops with sheer numbers on the ground. In the month-long fighting, the Usurper‘s troops, employing a scorched-earth policy, destroyed all of Lambrecht‘s high-boron alloy mills and several nearby towns.
+
+Even today contaminated zones still trace the sites of these major battles that heralded the fall of the Star League, and the air is tainted by toxins left over from the biochemical weapons the Amaris forces employed near the end. The Draconis Combine claimed Lambrecht after the League‘s fall and immediately tried to scavenge from the remains of the ruined fortifications and university facilities left behind by Kerensky‘s troops. In three cases, they uncovered substantial, largely undamaged catacombs beneath the collapsed ruins of the legendary Castles Brian, all three of which—including one just fifteen kilometers south of Middle Park—are major tourist attractions today.
+
+Aside from the large island continent of Galapagos in the northern hemisphere of this world, where Middle Park stands, Lambrecht‘s four other continents are Brattanios, and Falkos, in the northern hemisphere, east of Galapagos, and Phillipharos, and Shasia in the south. Shasia, dominated by tundra, is by far the least populous of these landmasses, but recent discovery of an untapped boron vein has awakened some interest in mining the metal for the possible rebirth of the high-boron industry.</desc>
 	</planet>
 	<planet>
 		<name>Lamon</name>
@@ -20026,8 +20220,16 @@ The primary industry on Les Halles is the extraction and refining of fuel used i
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3028-08-01</date>
+			<date>3028-08-25</date>
+			<faction>CC,FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3028-09-25</date>
 			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3030-02-28</date>
+			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
@@ -23301,11 +23503,27 @@ Mizar has been a resort planet of some renown since before the time of the Star 
 		<ycood>64.68</ycood>
 		<faction>TA</faction>
 		<factionChange>
-			<date>2315-01-01</date>
-			<faction>TH</faction>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
 		</factionChange>
 		<factionChange>
-			<date>2790-01-01</date>
+			<date>2315-01-01</date>
+			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2500-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2532-01-01</date>
+			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2570-01-01</date>
+			<faction>DC,TH</faction>
+		</factionChange>
+		<factionChange>
+			<date>2775-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -23344,6 +23562,24 @@ Mizar has been a resort planet of some renown since before the time of the Star 
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>0.87</gravity>
+		<lifeForm>3</lifeForm>
+		<climate>3</climate>
+		<percentWater>86</percentWater>
+		<temperature>35</temperature>
+		<spectralClass>K</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>3</sysPos>
+		<satellite>Zed</satellite>
+		<landMass>(Shizuoka)</landMass>
+		<desc>Moore is a wet world, its total landmass locked up in almost a thousand small islands and the long, thin, mountainous chain known as Serpentasia. This half-wooded, half-swampy land runs in an irregular northwest-to-southeast path across Moore‘s surface, and is home to the vast majority of the planetary population, including the capital city of Shizuoka. 
+
+Because of abundant germanium, titanium, and uranium deposits, this world was a prize to both the Draconis Combine and the Terran Hegemony alike during humanity‘s Golden Age, and it was to secure these valuable resources that both realms agreed to share the planet between them. This shared-world status spared Moore the horrors of the Amaris crisis when the Usurper, secure in his hold over House Kurita, allowed Combine troops to hold the planet unmolested during his reign of terror. When Amaris and his troops fell to the SLDF, and the League itself collapsed soon after, Moore became a de facto holding of the Combine. The Combine jealously defended Moore after claiming it, losing it to house Steiner‘s Lyran Commonwealth for only a few decades in the twenty-fourth century.
+
+Manufacturing centers:
+Duncan Enterprises</desc>
 	</planet>
 	<planet>
 		<name>Moravian</name>
@@ -24429,8 +24665,16 @@ New Capetown is moderately industrialized and is a comfortable temperate planet.
 		<ycood>-57.12</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>3030-01-01</date>
+			<date>3028-09-13</date>
+			<faction>CC,FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3028-09-20</date>
 			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3030-02-28</date>
+			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
@@ -24940,9 +25184,33 @@ In contrast to the heavily industrialized northern hemisphere, the southern hemi
 		<ycood>114.49</ycood>
 		<faction>LA</faction>
 		<factionChange>
-			<date>2900-01-01</date>
+			<date>2820-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3085-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.15</gravity>
+		<lifeForm>6</lifeForm>
+		<climate>3</climate>
+		<percentWater>54</percentWater>
+		<temperature>23</temperature>
+		<spectralClass>K</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>3</sysPos>
+		<satellite>Juniper</satellite>
+		<landMass>Jarichosia</landMass>
+		<landMass>Lancombe (Hallanan)</landMass>
+		<landMass>Toridine</landMass>
+		<landMass>Thelios</landMass>
+		<desc>Lacking major resources, save a few common industrial metals and modest agricultural produce, New Wessex would likely have been spared the worst of the Age of War and the Succession Wars if it were not for its location on the border near the Lyran Commonwealth. In the First War, Lyran troops attempting to seize the planet launched a blitzkrieg spearheaded by a small fleet of light WarShips. Intending to launch a barrage at the major cities, in hopes of eliminating all opposition outright, the Lyran fleet was instead surprised by the arrival of a Combine naval force to intercept them. In the orbital battle that followed, one Lyran battleship, crippled by a devastating broadside attack, spun into the planet‘s atmosphere, where its fusion reactors lost containment and exploded before the safeguards could engage, spilling toxic levels of radiation into the sky and raining flaming debris across the western coastline of Jarichosia, New Wessex‘s northernmost continent. Though no Lyran forces landed on New Wessex that day, the aftermath of the assault was profound, and even today incidence of lung and skin cancer on this planet remain higher than the local average.
+
+Through the following centuries, New Wessex was raided several times by Lyran forces, but the biggest engagement fought on New Wessex in the wars that followed the Star league‘s fall happened in 3021, when the famous Wolf‘s Dragoons mercenary unit spearheaded a Lyran attack against Combine troops massing here for an impending assault on the Commonwealth. The massive battle, fought in and around Harlow‘s Wood and the capital city of Hallanan on the southern continent, Lancombe, lasted only a week, but the legends around it remain in the hearts and minds of the native ―Wessexans for more than a century, and a cottage industry has grown around tourism based on that famous battle.
+
+New Wessex is sparsely inhabited, with most of the population living in towns and cities scattered on the coastlines of the Lancombe, Jarichosia, and Toridine continents, while the south  polar continent of Thelios, covered completely by a glacial ice shelf that touches the southern reaches of Lancombe, has yet to be fully explored.</desc>
 	</planet>
 	<planet>
 		<name>New Westin</name>
@@ -27366,8 +27634,16 @@ Challenge Systems</desc>
 		<ycood>-80.33</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>3030-01-01</date>
+			<date>3028-08-29</date>
+			<faction>CC,FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3028-09-26</date>
 			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3030-02-28</date>
+			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
@@ -27719,8 +27995,16 @@ Poulsbo remains a lightly settled Military Outpost, whose civilian population is
 		<ycood>-81.89</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>3030-01-01</date>
+			<date>3028-08-29</date>
+			<faction>CC,FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3028-09-05</date>
 			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3030-02-28</date>
+			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
@@ -29712,6 +29996,24 @@ Sabanillas Mining Company</desc>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>0.98</gravity>
+		<lifeForm>2</lifeForm>
+		<climate>4</climate>
+		<percentWater>31</percentWater>
+		<temperature>44</temperature>
+		<spectralClass>A</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>9</sysPos>
+		<landMass>(Mofesto)</landMass>
+		<desc>Orbitting twin stars, each between three and four times the mass of Terra‘s Sol, it‘s a miracle that a potentially life-bearing world like Sabik could exist at all. Still, aside from a breathable atmosphere and a limited supply of free water, very little about Sabik was found to recommend this world for settlement during its initial surveys. The land, almost universally rugged and dry, with abrupt cliffs and mountains, interspersed by rocky badlands and the occasional asteroid crater, supported but one form of life: an exceptionally stubborn purple-leaved plant that carpets most of its deep valleys and chasms. A disappointing lack of sizable mineral deposits, infertile soil, and high year-round temperatures kept away prospective colonists and industries.
+
+By the time of the Star League, only a handful of rugged frontier settlers had claimed this barren world as their home, where they eked out an existence by braving hazardous terrain and blazing heat to mine the planet‘s few veins of industrial metals. The Star League, however, saw value in Sabik as a potential base for military training and technological development, and established their Harsh Terrain Test Center and a Special Arms Services Training Center to test new BattleMechs, vehicles, and troops in its brutal environment.
+
+After the League‘s collapse, the Draconis Combine assumed control of this world and established a small military presence for potential operations against the Lyran Commonwealth. Despite a minimum of population, ComStar established an HPG on this world, as they, too, took an interest in a planet abandoned by General Kerensky‘s departing fleet. What ComStar discovered, completely without the Dragon‘s knowledge, in fact, was the presence of an SLDF staging base, hidden well beneath the HTTC command center. In addition to two companies of mixed BattleMechs and vehicles, the base also had detailed computer files on every Combine and Commonwealth planet within five jumps of Sabik.
+
+As of the 32nd century, this world is little more than an outpost, with no agricultural or mineral wealth worth exploiting, though some corporations have expressed an interest—as many before—in mining the hazardous asteroid belts, and using Sabik itself as a home for their local headquarters. Sabik has no continents per se, but boasts a single ocean in its northern hemisphere, Black Oasis, from which a number of minor rivers radiate across the otherwise barren surface. Mofestos is located on the northern shores of this ocean, a mere 500 kilometers from the planet‘s north pole.</desc>
 	</planet>
 	<planet>
 		<name>Sackville</name>
@@ -30927,8 +31229,16 @@ Tengo Aerospace</desc>
 		<ycood>-92.84</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>3030-01-01</date>
+			<date>3028-08-29</date>
+			<faction>CC,FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3028-09-05</date>
 			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3030-02-28</date>
+			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
@@ -32054,8 +32364,16 @@ The local population have a pragmatic political approach that can almost be mist
 		<ycood>-101.45</ycood>
 		<faction>CC</faction>
 		<factionChange>
-			<date>3030-01-01</date>
+			<date>3028-08-29</date>
+			<faction>CC,FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3028-09-26</date>
 			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3030-02-28</date>
+			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
@@ -32677,8 +32995,16 @@ Corean Enterprises</desc>
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3030-01-01</date>
+			<date>3028-08-25</date>
+			<faction>CC,FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3028-09-22</date>
 			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3030-02-28</date>
+			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
@@ -35502,6 +35828,40 @@ Tsinghai has repelled numerous Marik and bandit attacks that have decimated the 
 			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3085-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.01</gravity>
+		<lifeForm>3</lifeForm>
+		<climate>3</climate>
+		<percentWater>57</percentWater>
+		<temperature>41</temperature>
+		<spectralClass>F</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>2</sysPos>
+		<landMass>Domashimi</landMass>
+		<landMass>Ikadae (Ogawa City)</landMass>
+		<landMass>Kuyuna</landMass>
+		<landMass>Liam</landMass>
+		<landMass>Nakaru</landMass>
+		<landMass>Opana</landMass>
+		<landMass>Shobenwa</landMass>
+		<landMass>Soto</landMass>
+		<landMass>Taris</landMass>
+		<landMass>Taris</landMass>
+		<landMass>Yoshetsu</landMass>
+		<desc>A world of mild seasons, with lush, tropical forests easily covering half of its thirteen major island-continent landmasses, Tsukude looks like a virtual paradise to the casual observer. However, the first colonists quickly realized that the planet‘s native splendor was more illusion than substance. The biochemistry of the local flora and fauna, which seems to draw energy more from the nitrogen-rich atmosphere than from a carbon dioxide–oxygen cycle, was found to be incompatible with human metabolism because of its dangerously high acidity. This forced the settlers to import a good deal of their basic foodstuffs and take drastic steps to develop even subsistence-level agricultural production.
+
+Where Tsukude‘s farmers failed, however, those seeking to exploit the planet‘s hidden abundance of natural gas and mineral wealth found large amounts of both. By the time of the Star League, Tsukude had become a major local exporter of fossil fuels and precious metals, as well as home to several pharmaceutical companies.
+
+Ironically enough, Tsukude‘s biggest claim to fame during humanity‘s Golden Age was not its fuel or chemical exports, but its marine game industry. Though inedible, Tsukude‘s wild and exotic marine life became a favorite for trophy fishermen throughout the region, who flocked to the world every year in hopes of capturing at least one of the elusive, beautiful, and deadly Tsukude seacats.
+
+In the wars that followed the Star League‘s fall, Tsukude found itself often targeted for raids by the Lyran Commonwealth or used as a staging ground for any Combine operations against the Lyrans, both of which factored into the planet‘s gradual decline in both tourism and industry. By the time the planet was ceded to the newly formed Republic of the Sphere, after the Word of Blake Jihad, the population and economy of Tsukude had sunk to levels not seen since the Age of War. Relocation and redevelopment initiatives set in motion by The Republic helped the planet regain some of its former prosperity.
+
+Tsukude‘s capital, Ogawa City, is located on Ikadae, the largest of this world‘s northern island continents. Tomashita, a seaport city located on the western peninsula of the Soto island continent just southeast of Ikadae, boasts the largest of Tsukude‘s recreational fishing fleets, Green Sea Hunters. The other nine island landmasses of Tsukede, which together account for over forty percent of the planet‘s remaining surface, are Nakaru, Liam, and Domashimi in the northern hemisphere, and Opana, Yoshetsu, Weng-Li, Taris, Kyuna, and Shobenwa in the south. Small towns and seaports may be found on all of these continents, but by far the most populous are those on Ikadeae and Soto.</desc>
 	</planet>
 	<planet>
 		<name>Tuamotu</name>
@@ -36255,6 +36615,30 @@ The system also later gained value when the uninhabited planet, Jonah’s Reach,
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>0.98</gravity>
+		<nadirCharge>True</nadirCharge>
+		<zenithCharge>True</zenithCharge>
+		<lifeForm>0</lifeForm>
+		<climate>4</climate>
+		<percentWater>21</percentWater>
+		<temperature>45</temperature>
+		<spectralClass>A</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>7</sysPos>
+		<satellite>None (asteroid ring)</satellite>
+		<landMass>Forsair</landMass>
+		<landMass>North Nanturo (Neucason)</landMass>
+		<landMass>South Nanturo</landMass>
+		<hpg>B</hpg>
+		<desc>Had this world formed around a different star, experts believed that Vega VII could have been a paradise. When first discovered in the earlier days of mankind‘s exploration of the stars, Vega was something of a surprise, sporting vast mineral and metallic resources as well as an ocean of drinkable water, habitable temperate and polar zones, and an atmosphere that could be readily terraformed. Within fifty years after its discovery and the arrival of the first settlers—mostly from mining corporations and other industrial enterprises—Vega was a living, breathing world, albeit a warm and dry one. By the time of the Draconis Combine‘s ascendance, Vega was home to a variety of light and medium industries, producing everything from personal computers to armored vehicle components and advanced medical equipment. Strict adherence to local pollution laws allowed the industries tothrive without damaging the terraforming efforts to clean up the native atmosphere, which allowed for the importing of off-world life-forms such as Terran horses and camels, favored modes of transportation among the Vegans. Because of its industrial importance, House Kurita established Vega as a regional capital world, and it served as a military base many times during various wars over the years.
+
+Unfortunately, this distinction led to several raids by forces from the nearby Lyran Commonwealth, and even today the Vegan landscape is dotted with bombed-out cities and factories from bygone eras. Vega‘s single, shallow ocean, Nilos, appears from orbit as little more than a crisscrossing of extremely large rivers that divide the planet‘s surface into three giant landmasses. The largest continent, South Nanturo, is located completely in the southern hemisphere, while North Nanturo and Forsair share the northern hemisphere, extending into the equatorial zones. The planetary and Prefecture capital city of Neucason is located on North Nanturo, and is connected by monorail line to the large industrial spaceport city of Nasew on the opposite side of the continent. Neucason is proudly regarded by many of the locals as the birthplace of the original Star League, as the site of the historic signing of the Treaty of Vega in 2569 by Hehiro Kurita, then Coordinator of the Combine, and Ian Cameron, Director-General of the Terran Hegemony.
+
+Nasew is home to Cosby Myomer Research, a myomer testing and manufacturing firm and one-time BattleMech producer known in the past for Machiavellian business practices. Damaged by Blakist saboteurs during the Jihad, Cosby was saved from oblivion only through the aid of a Combine business reclamation effort.
+
+Vega‘s biggest tourist attraction by far, even over the site of the Treaty of Vega signing, is the so-called Pyramids of New Egypt, located on the rocky, arid plains of Forsair. Created during the Star League era for an eccentric megabillionaire who believed in the pantheistic religion of Terra‘s ancient Egyptian civilization, the Pyramids remain the biggest draw for off-worlders and treasure seekers on Vega. Over the centuries, the influx of tourists became so heavy that a commercial port city dubbed New Egypt has indeed grown around the Pyramids.</desc>
 	</planet>
 	<planet>
 		<name>Velhas</name>
@@ -41626,6 +42010,17 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
 	</planet>
 	<planet>
+		<name>ER 044</name>
+		<xcood>-92</xcood>
+		<ycood>1600</ycood>
+		<faction>NONE</faction>
+		<spectralClass>B</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>IV</luminosity>
+		<desc>This star is surrounded by an extensive asteroid belt.</desc> 
+	</planet>
+	
+	<planet>
 		<name>JF 01</name>
 		<xcood>575</xcood>
 		<ycood>510</ycood>
@@ -41694,6 +42089,26 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<subtype>7</subtype>
 		<luminosity>V</luminosity>
 		<desc>This star does not have any planets.</desc> 
+	</planet>
+		<planet>
+		<name>KC 16</name>
+		<xcood>-89</xcood>
+		<ycood>1823</ycood>
+		<faction>NONE</faction>
+		<spectralClass>F</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>II</luminosity>
+		<desc>This star has no planets.</desc> 
+	</planet>
+	<planet>
+		<name>KC 17</name>
+		<xcood>-110</xcood>
+		<ycood>1835</ycood>
+		<faction>NONE</faction>
+		<spectralClass>A</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>IV</luminosity>
+		<desc>This star has no planets.</desc> 
 	</planet>
 	<planet>
 		<name>NP 64</name>
@@ -42164,5 +42579,114 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<subtype>2</subtype>
 		<luminosity>V</luminosity>
 		<desc>This star does not have any planets.</desc> 
+	</planet>
+	<planet>
+		<name>Colleen</name>
+		<xcood>-135</xcood>
+		<ycood>1835</ycood>
+		<faction>UND</faction>
+		<factionChange>
+			<date>3067-01-01</date>
+			<faction>CBS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-01-01</date>
+			<faction>CBS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3083-01-01</date>
+			<faction>CCC,CBS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3083-04-22</date>
+			<faction>CCC,CBS,CSL,CCO</faction>
+		</factionChange>
+		<factionChange>
+			<date>3083-07-01</date>
+			<faction>CCC,CBS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3083-07-01</date>
+			<faction>CCC,CBS,CSA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3083-12-18</date>
+			<faction>CBS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3085-07-01</date>
+			<faction>ABN</faction>
+		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>7</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>3</sysPos>
+		<gravity>1.2</gravity>
+		<pressure>3</pressure>
+		<temperature>18</temperature>
+		<climate>0</climate>
+		<percentWater>20</percentWater>
+		<satellite>Unnamed</satellite>
+		<hpg>A</hpg>
+		<desc>Clan Blood Spirit was under heavy pressure on their homeworld of York in the mid-3060s due to constant attacks by Clan Star Adder. Spirit leadership decided that incase the situation did not improve they would begin a colonization project to begin a new homeworld. In 3067, the Colleen system was discovered and two planets, named Honor and Haven were picked to begin the colonization efforts.
+		
+Haven is the 2nd planet in the system (out of 6) and is relatively temperate planet with slightly higher than Terran gravity and is primarily dominated by mountains, sparse woodlands, and badlands. The planet has an average equitorial temperature of 30 degrees centigrade. This planet was made the Blood Spirits capital after the fall of York.
+		
+Honor is the 4th planet in the system and is best described as an arctic planet with an equitorial high of 18 degrees centigrade.</desc>
+	</planet>
+	<planet>
+		<name>Tanis</name>
+		<xcood>-74</xcood>
+		<ycood>1603</ycood>
+		<faction>UND</faction>
+		<factionChange>
+			<date>3067-01-01</date>
+			<faction>CSA,CCC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-01-01</date>
+			<faction>CB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-02-04</date>
+			<faction>CB,CCC,CSA,SOC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-02-04</date>
+			<faction>CB,SOC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3073-11-05</date>
+			<faction>CB,SOC,CCC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3073-11-18</date>
+			<faction>CB,SOC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3074-12-17</date>
+			<faction>CB,SOC,CCC,CSA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3075-01-30</date>
+			<faction>ABN</faction>
+		</factionChange>
+		<spectralClass>F</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>3</sysPos>
+		<gravity>0.9</gravity>
+		<pressure>3</pressure>
+		<temperature>22</temperature>
+		<climate>2</climate>
+		<percentWater>70</percentWater>
+		<satellite>Unnamed</satellite>
+		<desc>The Tanite system is composed of multiple planets and was colonized by people calling themselves the Tanites that unknowingly existed within several jumps of the Clans for quite some time. When the system was discovered the Clans soon moved in and took over, though they never quite subdued the Tanites, who buckled under the restrictive Clan Class structure. Three of the four planets in the system are colonized. 
+		
+Stacha is the 1st planet (of 4) in the Tanis system and is a temperate planet, and the most comfortable planet in the system. The equitorial temperature is 28 degress centigrade and the landmasses of Stacha are dominated by flat plains and badlands. Stacha is the second most populated planet in the Tanis system.
+
+Tanis is the 2nd planet in the Tanis system and despite relatively low gravity (0.7) compared to Terra, the planet has a comfortable atmosphere and was well populated by the Tanites before the clans discovered the system. Tanis has terrain that varies from vast flat plains to towering mountains. The equitorial temperature is 35 degrees centigrade.  
+
+Alexandra is the 3rd planet in the Tanis system and is relatively temperate, though on the cold side with an equitorial temperature of 22 degrees centigrade. The primary terrain features on Alexandra are mountains and badlands.</desc>
 	</planet>
 </planets>

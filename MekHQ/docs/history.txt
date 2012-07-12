@@ -40,6 +40,7 @@ v0.1.17 (SVN)
 + Updating with new lunar images from MegaMek
 + Updating mechfiles data for the Thor (Summoner) image correction from MegaMek
 + New RAT data from MegaMek
++ Planetary data update 20
 
 v0.1.16 (2012-05-23)
 + removed PartsInventory, quantity is now tracked directly by part
