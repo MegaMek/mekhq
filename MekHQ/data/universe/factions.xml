@@ -622,7 +622,7 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 	</faction>
 	<faction>
 		<shortname>DoL</shortname>
-		<fullname>Dutchy of Liao</fullname>
+		<fullname>Duchy of Liao</fullname>
 		<eraMods>1,0,0,1,2,3,2,1,0</eraMods>
 		<nameGenerator>CC</nameGenerator>
 		<colorRGB>2,166,79</colorRGB>

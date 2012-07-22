@@ -196,6 +196,27 @@
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>II</luminosity>
+		<sysPos>8</sysPos>
+		<gravity>1.0</gravity>
+		<pressure>3</pressure>
+		<temperature>20</temperature>
+		<climate>0</climate>
+		<percentWater>63</percentWater>
+		<lifeForm>7</lifeForm>
+		<satellite>Aiken</satellite>
+		<landMass>Katenga (Kalskag)</landMass>  
+		<landMass>Tamarack</landMass>  
+		<landMass>Asta</landMass>  
+		<desc>Acamar was discovered early in the 23rd century by a Tikonov survey team. Acamar is locked in a perpetual winter as it orbits a great distance from its star. Acamar was only colonised after the discovery of vast titanium ore deposits, followed by deposits of gold and silver. As a result Acamar was coveted by the Capellan Confederation, Federated Suns, and the Free World League.
+        
+Acamar has three continents and a very large island group, however only the continent of Katenga, situated in the planet‘s equatorial region, was suitable for colonisation. The continents of Tamarack and Asta are located in the northern hemisphere, they are frozen year round, making them unsuitable for settlement. Acamar‘s planetary system has a large asteroid belt, called Illeudian, where mining operations are headquartered.
+
+Katenga has two large valleys where most of the planet‘s population is located. Tomahn is the larger of the two valleys, located in the northeastern part of Tomahn is the capital of Kalskag. Flat, the second-largest city, is located southwest of the capital near the Tokal Mountains, where a large silver mine is located. The Otal foothills separate Tomahn Moraine from Trans-Mahn, the southern valley, where the Mahn River flows and the city of Huss was founded. The Osz Forest covers the northern approach to Trans-Mahn.
+
+GM and Taijian Petrochemicals have vested interest in Acamar because they have helped the world recover from the chaos of the last few years. When the World of Blake forces landed on Acamar, the defenders were ordered to lay down their arms without firing a shot as the Blakist forces had infiltrated the military command during the upheaval of the Chaos March. This saved Acamar from the full, devastating effects of the Jihad.</desc>
 	</planet>
 	<planet>
 		<name>Accrington</name>
@@ -651,6 +672,22 @@ Aitutaki’s early settlers made a unique distinction by creating two capital ci
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<pressure>2</pressure>
+		<gravity>0.6</gravity>
+		<zenithCharge>True</zenithCharge>
+		<lifeForm>0</lifeForm>
+		<climate>2</climate>
+		<percentWater>30</percentWater>
+		<temperature>35</temperature>
+		<spectralClass>A</spectralClass>
+		<subtype>9</subtype>
+		<luminosity>III</luminosity>
+		<sysPos>5</sysPos>
+		<socioIndustrial>A-A-A-A-D</socioIndustrial>
+		<satellite>Taliswan</satellite>
+		<landMass>Cedar Rock (Homai-Zaki)</landMass>
+		<hpg>A</hpg>
+		<desc>Al Na‘ir is the fifth planet from its parent star and is the only rock in the system that is even remotely capable of supporting life, with a sulfur-tainted atmosphere too thin for unassisted breathing and a surface water supply limited almost exclusively to the polar icecaps. Despite these drawbacks, Al Na‘ir was one of the Draconis Combine‘s more heavily industrialized border worlds in its heyday, home at one time to the Yori MechWorks, manufacturer of the galaxy-renowned Atlas, and Scarborough Manufacturers, makers of the Pegasus, Scimitar and other conventional combat vehicles. The Azami, a Muslim sect, initially settled Al Na‘ir as a base of operations for a mining industry, focused on the plentiful mineral-rich asteroids in the system. When the Combine took over, two of its largest military corporations—Luthien Armor Works and Alshain Weapons—exploited these valuable resources by subsidizing military industries on the planet. Yori MechWorks was established on Yori, the largest of the asteroids that orbit between Al Na‘ir and the fourth planet in the system, Al Abila. Scarborough Manufacturers was founded on the smaller southern continent of Scarborough, from which it took its name. Perhaps in part because of the initial Azami presence, coupled with the Combine‘s xenophobic attitude toward non-Japanese cultures, the Kuritan leadership eventually established the Combine‘s School for Cultural Investigation on Al Na‘ir‘s barren surface. Despite the extremely inhospitable locale, many Combine citizens flocked to Al Na‘ir to study the benefits and drawbacks of the non-Japanese cultures that thrived in realms beyond the reach of House Kurita. By the time of the Clan Invasion, Al Na‘ir had become an important part of the Combine‘s strategic infrastructure and economy, with a population nearing one billion, including those who lived in the mining and refining stations in the asteroid belt. The planet remained under heavy defensive guard by the Combine, though raids and assaults were infrequent, even by the Dragon‘s closest enemies. When the Blakist Jihad hit, however, Al Na‘ir‘s luck changed for the worse. Employing a battle fleet of fighter-carrying DropShips, backed up by mercenary ‘Mech forces, the Word of Blake systematically ravaged Yori MechWorks‘ asteroid mining and manufacturing centers, simultaneously striking the planet‘s surface defensive units. The assault crippled the central planetary industry, destroyed Yori‘s surface assembly plant, and left millions dead as domed cities were breached in the heavy fighting , including the former capital of Homai-Zaki. As of the 32nd century, only Scarborough Manufacturers—which now produces more heavy construction vehicles than fighting craft—and a handful of underground settlements linked to decimated mining operations remain. Devlin Stone‘s relocation plan and efforts to restore the less devastated settlements helped lure people back to Al Na‘ir, many of whom took up residence in the new prefecture capital city of Phoenix, located on the northern plains of Cedar Rock, Al Na‘ir‘s larger continent. The planetary capital of Homai-Zaki, repaired and repressurized after the Jihad, is on Cedar Rock as well.</desc>
 	</planet>
 	<planet>
 		<name>Alarion</name>
@@ -690,6 +727,32 @@ Alarion is primarily settled by people of German, Romanian and English descent.<
 		<xcood>71.72</xcood>
 		<ycood>79.28</ycood>
 		<faction>DC</faction>
+		<factionChange>
+			<date>3075-01-01</date>
+			<faction>AB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3085-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<pressure>3</pressure>
+		<gravity>0.81</gravity>
+		<lifeForm>5</lifeForm>
+		<climate>3</climate>
+		<percentWater>52</percentWater>
+		<temperature>43</temperature>
+		<spectralClass>F</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>2</sysPos>
+		<landMass>Euphrates</landMass>
+		<landMass>Omar (Saladan)</landMass>
+		<landMass>Sadig</landMass>
+		<desc>The sleepy agro-world of Albalii was settled initially by Arabic colonists shortly after the first galactic wave of human expansion. Almost half of the planet‘s surface is taken up by three major landmasses—Omar in the southern hemisphere and Sadig and Euphrates in the north—but these continents have been carved into giant plateaus by the unusually strong currents of the surrounding oceans. With more than 70 percent of the coastline consisting of steep, rocky cliffs, and few inland lakes and rivers, Albalii‘s relatively flat inland regions proved a poor candidate for agricultural industry. Cities sprang up along the few each front areas and readily accessible rivers, while many of the desert plains were exploited for their modest mineral wealth. In the days of the Star League, the planetary government, hoping to expand the arable frontiers on Albalii, embarked on an ambitious plan to transfer large quantities of ocean water to prepared lake areas inland. Through advanced water purification technologies, these lakes would be used for drinking water and crop irrigation. Though local ecologists were outraged, the Albalii government considered the alternative—hiring ice ships to bring in offworld ice—far too risky and expensive. DropShips spent ten years moving trillions of gallons of ocean water inland, creating massive, man-made lakes and seas like the Great Omar Reservoir and the Tigris Sea on Euphrates. The result expanded Albalii‘s arable lands a thousandfold. Today, these new inland seas are the sites of many of this world‘s cities, including the large spaceport of Giza, along the northern coast of the Galilee Basin on Sadig, and the resort city of Saladan on the Great Omar Reservoir. Albalii‘s capital and first colonial settlement, Borqa, is on the eastern coast of Sadig, at the mouth of the Naball River.</desc>
 	</planet>
 	<planet>
 		<name>Albert Falls</name>
@@ -1085,17 +1148,21 @@ Industrial, Command and logistical world, paperwork in this planet and its prefe
         <pressure>3</pressure>
         <temperature>30</temperature>
 		<climate>3</climate>
-        <percentWater>50</percentWater>
+        <percentWater>54</percentWater>
         <zenithCharge>true</zenithCharge>
         <hpg>B</hpg>
         <lifeForm>3</lifeForm>
         <satellite>Hargrove</satellite>
         <satellite>Sung</satellite>       
-        <landMass>Shalom</landMass>
+        <landMass>Shalom (Algol City)</landMass>
         <landMass>Durant</landMass>
         <landMass>Sparro</landMass>
         <socioIndustrial>C-B-C-C-A</socioIndustrial>
-        <desc>No description available.</desc>
+        <desc>3135 - Algol, originally part of the old Tikonov Union, became an important agricultural center during the height of Star League.  Algol has two major continents and a few islands. The largest continent, Shalom, contains the planetary capital of Algol City, that was founded on the coast due to the abundance of fish found in the surrounding waters. Durant, the other continent, has extremely rich soil  that allows the production of a wide range of agricultural products. The largest city, Kollasa, is home to the planet‘s massive food-processing plants. Algol‘s food exports are transported to Algol City for shipment off world through its large spaceport. Algol produced enough food to trade with and supply all the worlds within one jump.
+
+Groffer‘s Toll, located 150 kilometers south of Algol City, was home to a massive Federated Suns munitions plant and storage depot. The city of Schan, located on Durant, is the planet‘s largest source of potassium and other important chemicals used in the production of munitions. 
+
+Unlike other nearby worlds, Algol‘s food production has kept the horrors of war from visiting it. When the Word of Blake launched the Jihad, the Federated Suns troops on planet surrendered in order to protect the planet and its people from the threat of weapons of mass destruction. The AFFS troops were interned in a  in a makeshift prison in the AFFS depot at Groffer's Toll. The Blakist commander ordered the destruction of the depot and the deaths of all but a handful of AFFS troops after they attempted to escape.</desc>
 	</planet>
 	<planet>
 		<name>Algorab</name>
@@ -1163,9 +1230,13 @@ Industrial, Command and logistical world, paperwork in this planet and its prefe
 		<satellite>Victoria’s Jewel</satellite>
 		<landMass>Camellias (Algot Prime)</landMass>
 		<hpg>B</hpg>
-		<desc>Algot was one of the first planets settled by early Tikonov explorers and by the beginning of the 29th century Algot was one of the most populous planets in the region. Algot was home to a major industrial center specializing in computer and electronic sciences. Unfortunately, both the technological industry and population have declined significantly since.
+		<desc>3135 - One of the first planets settled by early Tikonov explorers, by the beginning of the 29th century Algot was one of the most populous planets in the region. Algot was a major industrial centre specialising in computer and electronic sciences. Both the technological industry and population have declined significantly since.
+		
+In 2822, mysterious plague hit the planet and disappeared the following year. The mysterious plague gave the Algot a reputation for being unhealthy, leading to heavy emigration and a lack of immigration, the main factor in the decline in population. However, for the past two centuries, the health of the general population has been exceptionally good and they enjoy the third-longest life expectancy in the Federated Suns.
 
-In 2822, a mysterious plague hit the planet and then mysteriously disappeared the following year. The plague gave Algot a reputation for being unhealthy, leading to heavy emigration and a lack of immigration, the main factor in the decline in population. However, for the next two centuries, the health of the general population was exceptionally good and they enjoyed the third-longest life expectancy of all the planets in the Federated Suns.</desc>
+Algot has one continent, Camellias, situated across both the northern and southern hemispheres. With warm and temperate climates, Camellias‘ northern reaches are the most fertile, supplying the planet with all the food needed to sustain life. The capital city, Algot Prime, was founded on the northeastern coast of the continent, near fertile fishing grounds and an island off the coast where a large spaceport has been built. The southern part of the continent is mostly desert. A desert city, Cassol, is just north of the equator and is the regional capital. It was a large storage area for the AFFS. South of Cassol is Lake Ochiba, a large freshwater lake covering some 85,000 square kilometers. The lake supplies water for industries and local cities.
+
+During the Jihad, Word of Blake used disabling poisons to subdue the planet. The Blakists took the world with minimal force, though they did firebomb the military compound outside of Cassol, destroying the AFFS unit stationed there.</desc>
 	</planet>
 	<planet>
 		<name>Alhena</name>
@@ -2419,9 +2490,25 @@ Andurien Aerotech</desc>
 		<name>Arboris</name>
 		<xcood>43.55</xcood>
 		<ycood>-51.9</ycood>
-		<faction>TA</faction>
+		<faction>CH</faction>
+		<factionChange>
+			<date>2308-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2310-01-01</date>
+			<faction>CH</faction>
+		</factionChange>
 		<factionChange>
 			<date>2315-01-01</date>
+			<faction>DoL</faction>
+		</factionChange>
+		<factionChange>
+			<date>2367-01-01</date>
+			<faction>CC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2571-01-01</date>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
@@ -2456,6 +2543,25 @@ Andurien Aerotech</desc>
 			<date>3085-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<gravity>0.98</gravity>
+		<pressure>3</pressure>
+		<spectralClass>K</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>5</sysPos>
+		<climate>3</climate>
+		<temperature>35</temperature>
+		<percentWater>67</percentWater>
+		<lifeForm>2</lifeForm>
+		<satellite>Arbalest</satellite>
+		<satellite>Carabonis</satellite>
+		<satellite>Delenious</satellite>
+		<landMass>Bandar</landMass>
+		<landMass>Jeruc (Kansas Plain)</landMass>  
+		<landMass>Silverado</landMass>  
+		<desc>3135 - Arboris was originally colonised for its fertile soil by settlers from the Capellan Hegemony. Arboris has three continents - Jeruc, Silverado and Bandar. Jeruc is the largest, covering over 38 percent of the planet, and is located in the northern hemisphere. The remaining two continents are island continents about the same size as Australia on Terra. Jeruc produces the majority of the planet‘s agro-products from its vast flat plains and valleys. The main industries on Silverado and Bandar are timber and mineral mining. The majority of the population is located on Jeruc, where many are farmers or work to support the planet‘s major industry. The capital, Kansas Plain, which located on Kansas Plateau, the largest plain, in the southwest of Jeruc. Kansas Plateau wheat grows taller than BattleMechs.
+		
+Arboris has a history of fierce independence. In 2308, Arboris seceded from the Capellan Hegemony in protest over the taxes and draft imposed to support an unjustifiable war. After the end of the Capellan-Supremacy War, Arboris again returned to Capellan rule. However, neither the Capellan Confederation nor later, the Federated Commonwealth, succeeded in fully assimilating the planet. During the Chaos March conflict, the population refused to submit to the invading Capellan forces. The Farmers Freedom Army rose up against the invaders and through sheer willpower forced the Capellans and militia forces off the continent of Jeruc. When the Jihad came to Arboris, the population chose to side with the Word of Blake forces rather than deal with either of the previous conquerors. The population aided the Blakists in hunting down the remaining militia and Capellan forces. </desc>
 	</planet>
 	<planet>
 		<name>Arc-Royal</name>
@@ -3634,6 +3740,26 @@ The primary industries on Augustine involve extracting raw minerals from the pla
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<spectralClass>K</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>4</sysPos>
+		<gravity>1.1</gravity>
+		<pressure>3</pressure>
+		<temperature>53</temperature>
+		<percentWater>43</percentWater>
+		<climate>4</climate>
+		<lifeForm>7</lifeForm>
+		<landMass>Brasilia</landMass>  
+		<landMass>Castellan (Casella)</landMass>  
+		<landMass>Ortega</landMass>  
+		<desc>3135 - Azha is a small but strategically important world due to its location. The Bureaucratic and Logistical Offices of the Capellan military were located on Azha in support of the Tikonov and Sarna Commonalities.
+
+Azha‘s dry atmosphere borders on being a desert world. However, it has enough arable landmass to support its population. Azha produces raw materials for microchips.
+
+Azha has three continents, Castellan is the largest of the three and distinctively lacks mountains. The capital, Casella, is located on the southwestern coast. The flatlands and rolling hills surrounding Casella had some of the largest supply depots in the Confederation. The continent of Brasilia is located in the southern hemisphere, and its climate is cool and moist enough to support food production. Ortega is the smallest of the three continents and the most underdeveloped. During the 2351–2352 Tikonov-Sarna War, Ortega was the site of such savagery that no one ever ventured back to the continent and giving rise to rumours of ghosts and hauntings.
+
+During the Jihad, the World of Blake forces arrived via a pirate point that allowed them to slip into orbit and land on Ortega. After ensuring that the depots at Casella were protected, the local Capellan militia deployed to Ortega to engage the invaders, where they mysteriously disappeared and were never heard from again. The planet surrendered shortly thereafter. </desc>
 	</planet>
 	<planet>
 		<name>Babaeski</name>
@@ -6056,6 +6182,27 @@ In 2998, the Brighton militia managed to withstand a siege by superior Federated
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<spectralClass>F</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>II</luminosity>
+		<sysPos>3</sysPos>
+		<gravity>1.2</gravity>
+		<pressure>4</pressure>
+		<temperature>30</temperature>
+		<percentWater>68</percentWater>
+		<climate>3</climate>
+		<lifeForm>3</lifeForm>
+		<satellite>Berchtold</satellite>
+		<satellite>Graf</satellite>
+		<satellite>Leopold </satellite>
+		<landMass>Vienna (Belgrade)</landMass>  
+		<desc>3135 - Buchlau was originally a member of the Tikonov Grand Union. Buchlau's only continent, Vienna, is covered with dense jungle, with a large mountain mesa, nearly a thousand kilometers across, rising up out of the jungle in the centre of the continent. Belgrade, the capital, is located on the mesa along with a large drop-port. Vienna, is surrounded by a vast, turbulent ocean.
+
+The planet was settled for its ocean, some of the fish grow to the size of Terran killer whales. Buchlau started exporting its fish catch to planets like Algol, Halloran V, and Demeter.
+
+As Buchlau was not strategically important, it was not target for attacks during the Succession Wars until the Fourth Succession War. The Federated Suns invasion force overwhelmed the Capellan defenders. Not until the eruption and formation of the Chaos March did the Confederation consider making any moves to recover Buchlau. During the FedCom Civil War, the Maskirovka stirred up pro-Capellan sentiments. This was countered by the intuitive moves of Duke Hasek, the Capellan March Lord, who spent a sizeable part of his own personal fortune to turn that in his own favor. 
+
+During the Jihad, the planetary governor contacted the World of Blake forces and offered to surrender the world so that it would not suffer the same fate as had Algol and Algot. The offer was accepted. Following the Jihad, untouched Buchlau has become one of the primary food-producing worlds in Prefecture V of the Republic of the Sphere.</desc>
 	</planet>
 	<planet>
 		<name>Bucklands</name>
@@ -12387,6 +12534,29 @@ For much of its history Fletcher has been the site of an historic cemetery which
 			<date>3062-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3090-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<spectralClass>F</spectralClass>
+        <subtype>4</subtype>
+        <luminosity>V</luminosity>
+        <sysPos>4</sysPos>
+        <gravity>0.7</gravity>
+        <pressure>2</pressure>
+        <temperature>45</temperature>
+        <climate>5</climate>
+        <percentWater>80</percentWater>
+        <lifeForm>7</lifeForm>
+        <satellite>Li-Lung</satellite>
+        <satellite>Lung-Wang</satellite>
+        <satellite>Pan-Lung</satellite>
+        <landMass>Min-how (Vashura)</landMass>  
+        <desc>3135 - Foochow is named after the capital of the Fujian province in southeast China. It was discovered almost by accident and colonized in the late 22nd century by a sizeable population escaping from China on Terra. Min-how, the only continent, is located along the equator and was mostly jungle when the colonists first landed. They spent the first 50 years fighting disease-carrying insects and large six-limbed carnivores the size of black bears called Dobars. The settlers overcame the land and were able to make it productive, even taming some of the Dobars.
+        
+Foochow became a seafood exporter to many worlds. The planetary capital, Vashura, located on eastern Min-how, is the largest seaport and produces the bulk of the planet‘s exports in fish. Foochow had very little industry until the discovery of minerals used to produce electronics on Min-how‘s southwest coast. The town of Redswan is the Foochow‘s leading industrial city.
+
+Foochow was not involved in the Jihad until one of the Warrior Houses jumped into the system. Soon after, Word of Blake employed a small mercenary force that entered the system and began a high-speed burn toward the planet. Hidden among the planet‘s moons, the Warrior House launched an aerospace assault that completely destroyed the attacking mercenaries.</desc>
 	</planet>
 	<planet>
 		<name>Foot Fall</name>
@@ -12409,6 +12579,28 @@ For much of its history Fletcher has been the site of an historic cemetery which
 			<date>3062-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3090-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<spectralClass>M</spectralClass>
+        <subtype>9</subtype>
+        <luminosity>III</luminosity>
+        <sysPos>5</sysPos>
+        <gravity>1.1</gravity>
+        <pressure>3</pressure>
+        <temperature>28</temperature>
+        <percentWater>58</percentWater>
+        <climate>2</climate>
+        <lifeForm>5</lifeForm>
+        <satellite>Ankara</satellite>
+        <landMass>Ulaanbaatar</landMass>  
+        <landMass>Hohhot (Ganz)</landMass>  
+        <desc>3135 - Foot Fall is a cool world with abrupt seasonal changes. Enormous snowstorms can drop 60–70 centimeters of snow in a couple days. Foot Fall‘s two large continents are covered by mountains that leave little in arable landmass for farming. While little arable land there is, is highly fertile and produces more than enough to support the current population. Foot Fall has an abundance of precious metals and iron ore in the large mountain ranges. Ulaanbaatar, is the smaller and more mountainous northern continent. Ulaanbaatar produces the bulk of the iron ore, while Hohhot, the southern continent, has large veins of precious metals. The capital city, Ganz, is the manufacturing center of the planet and is located in the Fen Fang Fu delta region on the northern coast of Hohhot. Foot Fall was settled by settlers of Mongolian descent, for whom the planet reminded them of home.
+        
+Foot Fall was spared the ravages of the Succession Wars until the Fourth Succession War when two elite Federated Suns RCTs landed on the planet and massacred the local planetary militia. Devlin Stone demanded the planet as part of forming the Republic of the Sphere, however, Chancellor Sun-Tzu Liao formally refused to give up any world to The Republic. In practice, the Confederation could do nothing to prevent it, as its forces had been devastated during the Word of Blake Jihad. 
+
+During the Capellan-Republic war, Foot Fall was the center of some of the fiercest fighting between the elite units of the Republic and two Warrior Houses. Though the two Warrior Houses, with the surprising help of Free Capella units, managed to take and hold the world for three years, it was a Pyrrhic victory as one Warrior House was destroyed and the world was given back to The Republic following the signing of the treaty that ended hostilities between the two nations.</desc>
 	</planet>
 	<planet>
 		<name>Ford</name>
