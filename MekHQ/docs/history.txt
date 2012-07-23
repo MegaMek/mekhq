@@ -43,6 +43,7 @@ v0.1.17 (SVN)
 + Planetary data update 20
 + RAT and mechfiles update to stay current with MegaMek
 + Planetary data update 21
++ Bug 3545347: Units names were not being made xml safe on save.
 
 v0.1.16 (2012-05-23)
 + removed PartsInventory, quantity is now tracked directly by part

@@ -34,6 +34,7 @@ import megamek.common.Protomech;
 import megamek.common.Tank;
 import megamek.common.WeaponType;
 import megamek.common.XMLStreamParser;
+import megamek.common.util.StringUtil;
 import mekhq.MekHQ;
 
 import org.w3c.dom.Node;
@@ -44,7 +45,7 @@ public class MekHqXmlUtil {
 			pw1.print("\t");
 		
 		pw1.print("<"+name+">");
-		pw1.print(val);
+		pw1.print(escape(val));
 		pw1.println("</"+name+">");
 	}
 
@@ -125,9 +126,9 @@ public class MekHqXmlUtil {
 
 		// Start writing this entity to the file.
 		retVal += MekHqXmlUtil.indentStr(indentLvl) + "<entity chassis=\""
-				+ tgtEnt.getChassis().replaceAll("\"", "&quot;")
-				+ "\" model=\"" + tgtEnt.getModel().replaceAll("\"", "&quot;")
-				+ "\" type=\"" + tgtEnt.getMovementModeAsString()
+				+ escape(tgtEnt.getChassis())
+				+ "\" model=\"" + escape(tgtEnt.getModel())
+				+ "\" type=\"" + escape(tgtEnt.getMovementModeAsString())
 				+ "\" commander=\"" + String.valueOf(tgtEnt.isCommander());
 
 		retVal += "\" externalId=\"";
@@ -135,7 +136,7 @@ public class MekHqXmlUtil {
 
 		if (tgtEnt.countQuirks() > 0) {
 			retVal += "\" quirks=\"";
-			retVal += String.valueOf(tgtEnt.getQuirkList("::"));
+			retVal += String.valueOf(escape(tgtEnt.getQuirkList("::")));
 		}
 		if (tgtEnt.getC3Master() != null) {
 			retVal += "\" c3MasterIs=\"";
@@ -750,6 +751,9 @@ public class MekHqXmlUtil {
       * @return An encoded copy of the string
      **/
     public static String escape(String string) {
+        if (StringUtil.isNullOrEmpty(string)) {
+            return string;
+        }
         StringBuffer sb = new StringBuffer();
         for (int i = 0, length = string.length(); i < length; i++) {
             char c = string.charAt(i);

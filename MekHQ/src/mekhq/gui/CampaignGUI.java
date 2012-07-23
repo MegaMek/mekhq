@@ -2615,6 +2615,11 @@ public class CampaignGUI extends JPanel {
 		MekHQ.logMessage("Saving campaign...");
 		// Choose a file...
 		File file = selectSaveCampaignFile();
+        String path = file.getPath();
+        if (!path.endsWith(".cpnx")) {
+            path += ".cpnx";
+            file = new File(path);
+        }
 
 		if (file == null) {
 			// I want a file, y'know!

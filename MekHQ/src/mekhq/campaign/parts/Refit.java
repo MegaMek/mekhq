@@ -49,6 +49,7 @@ import megameklab.com.util.UnitUtil;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.MekHqXmlUtil;
+import mekhq.campaign.MhqFileUtil;
 import mekhq.campaign.Unit;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
@@ -883,7 +884,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 		UnitUtil.compactCriticals(newEntity);
 	    UnitUtil.reIndexCrits(newEntity);
 	
-		String fileName = newEntity.getChassis() + " " + newEntity.getModel();    
+		String fileName = MhqFileUtil.escapeReservedCharacters(newEntity.getChassis() + " " + newEntity.getModel());
 	    String sCustomsDir = "data/mechfiles/customs/";
 	    File customsDir = new File(sCustomsDir);
 	    if(!customsDir.exists()) {
