@@ -634,8 +634,8 @@ public class UnitSelectorDialog extends JDialog {
 	            return "?";
 	        }
 	        
-	        private int getPurchasePrice(MechSummary ms) {
-	        	int cost = ms.getCost();
+	        private long getPurchasePrice(MechSummary ms) {
+	        	long cost = ms.getCost();
 	        	if(ms.getUnitType().equals(UnitType.getTypeName(UnitType.INFANTRY))) {
 	        		cost = ms.getAlternateCost();
 	        	}

@@ -849,10 +849,10 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 		return multiplier;
 	}
 
-	public int getBuyCost() {
-		int cost = (int) Math.round(getEntity().getCost(false));
+	public long getBuyCost() {
+		long cost = (long) Math.round(getEntity().getCost(false));
 		if(entity instanceof Infantry) {
-			cost = (int) Math.round(getEntity().getAlternateCost());
+			cost = (long) Math.round(getEntity().getAlternateCost());
 		}
 		if(entity.isClan()) {
 			cost *= campaign.getCampaignOptions().getClanPriceModifier();

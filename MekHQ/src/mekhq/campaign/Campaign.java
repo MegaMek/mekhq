@@ -1503,7 +1503,7 @@ public class Campaign implements Serializable {
 	}
 	
 	public void buyUnit(Entity en) {
-		int cost = new Unit(en, this).getBuyCost();
+		long cost = new Unit(en, this).getBuyCost();
 		addUnit(en, false);	
 		if(campaignOptions.payForUnits()) {
 			finances.debit(cost, Transaction.C_UNIT, "Purchased " + en.getShortName(), calendar.getTime());
