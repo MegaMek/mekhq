@@ -1141,6 +1141,11 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 			retVal.id = UUID.randomUUID();
 		}
 		
+        // Protection for old broken campaign files
+        if (retVal.entity.getExternalIdAsString().equals("-1")) {
+            retVal.entity.setExternalIdAsString(retVal.id.toString());
+        }
+		
 		return retVal;
 	}
 	
@@ -1485,7 +1490,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     					oneShot = true;
     				}
     				if(null == apart) {
-    					apart = new AmmoBin((int)entity.getWeight(), m.getType(), eqnum, fullShots - m.getShotsLeft(), oneShot, campaign);
+    					apart = new AmmoBin((int)entity.getWeight(), m.getType(), eqnum, fullShots - m.getBaseShotsLeft(), oneShot, campaign);
     					addPart(apart);
     					partsToAdd.add(apart);
     				}

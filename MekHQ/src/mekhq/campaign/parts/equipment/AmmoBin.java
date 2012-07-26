@@ -265,7 +265,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 			if(null != mounted) {
 				if(mounted.getType().equals(type)) {
 					//just a simple reload
-					mounted.setShotsLeft(mounted.getShotsLeft() + shots);
+					mounted.setShotsLeft(mounted.getBaseShotsLeft() + shots);
 				} else {
 					//loading a new type of ammo				
 					unload(true);
@@ -304,7 +304,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 		if(null != unit && changeEntity) {
 			Mounted mounted = unit.getEntity().getEquipment(equipmentNum);		
 			if(null != mounted) {
-				shots = mounted.getShotsLeft();
+				shots = mounted.getBaseShotsLeft();
 				mounted.setShotsLeft(0);
 				curType = (AmmoType)mounted.getType();
 			}		
@@ -350,7 +350,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 					return;
 				}
 				if(type.equals(mounted.getType())) {
-					shotsNeeded = getFullShots() - mounted.getShotsLeft();	
+					shotsNeeded = getFullShots() - mounted.getBaseShotsLeft();	
 					time = 15;
 					difficulty = 0;
 				} else {

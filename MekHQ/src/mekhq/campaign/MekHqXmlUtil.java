@@ -546,7 +546,7 @@ public class MekHqXmlUtil {
 						thisLoc.append("\" type=\"");
 						thisLoc.append(mount.getType().getInternalName());
 						thisLoc.append("\" shots=\"");
-						thisLoc.append(String.valueOf(mount.getShotsLeft()));
+						thisLoc.append(String.valueOf(mount.getBaseShotsLeft()));
 						thisLoc.append("\"/>\n");
 						haveSlot = true;
 					} else if (mount != null
@@ -680,7 +680,7 @@ public class MekHqXmlUtil {
 			
 			if (mount.getType() instanceof AmmoType) {
 				output.append("\" shots=\"");
-				output.append(String.valueOf(mount.getShotsLeft()));
+				output.append(String.valueOf(mount.getBaseShotsLeft()));
 			}
 			
 			if (mount.getType() instanceof WeaponType

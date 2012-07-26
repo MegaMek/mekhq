@@ -48,6 +48,7 @@ v0.1.17 (SVN)
 + Patch 3547373/Bug 3547371: C-Bill cost truncated by int limit
 + Updated MegaMek.jar to r8958
 + Update mechset.txt to correct Thor (Summoner) images not loading on Linux/Mac where filename case matters
++ Bug: Changes to MegaMek's Mounted class removed getShotsLeft() function and replaced it with getBaseShotsLeft() instead
 
 v0.1.16 (2012-05-23)
 + removed PartsInventory, quantity is now tracked directly by part
