@@ -71,6 +71,15 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 		<clan>false</clan>
 	</faction>
 	<faction>
+		<shortname>OMA</shortname>
+		<fullname>Ozawa Mercantile Association</fullname>
+		<eraMods>0,0,0,1,2,2,1,0,0</eraMods>
+		<nameGenerator>DC</nameGenerator>
+		<colorRGB>255,80,93</colorRGB>
+		<periphery>false</periphery>
+		<clan>false</clan>
+	</faction>
+	<faction>
 		<shortname>CDP</shortname>
 		<fullname>Calderon Protectorate</fullname>
 		<startingPlanet>Erod's Escape,Erod's Escape,Erod's Escape,Erod's Escape,Erod's Escape,Erod's Escape,Erod's Escape,Erod's Escape,Erod's Escape,</startingPlanet>
