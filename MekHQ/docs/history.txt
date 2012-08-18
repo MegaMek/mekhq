@@ -51,6 +51,7 @@ v0.1.17 (SVN)
 + Bug: Changes to MegaMek's Mounted class removed getShotsLeft() function and replaced it with getBaseShotsLeft() instead
 + Bug: MML out of date for getShotsLeft() changes, updated to r1044 (which is up to date for the changes)
 + Planetary data update 22
++ Planetary data update 23
 
 v0.1.16 (2012-05-23)
 + removed PartsInventory, quantity is now tracked directly by part

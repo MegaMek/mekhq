@@ -18691,8 +18691,16 @@ Despite the Federated Suns best efforts, Kentares never recovered from the massa
 		<ycood>46.42</ycood>
 		<faction>TA</faction>
 		<factionChange>
+			<date>2237-01-01</date>
+			<faction>OMA</faction>
+		</factionChange>
+		<factionChange>
 			<date>2315-01-01</date>
-			<faction>TH</faction>
+			<faction>TH,OMA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2319-01-01</date>
+			<faction>TH,DC</faction>
 		</factionChange>
 		<factionChange>
 			<date>2790-01-01</date>
@@ -18714,6 +18722,31 @@ Despite the Federated Suns best efforts, Kentares never recovered from the massa
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.26</gravity>
+		<lifeForm>7</lifeForm>
+		<climate>3</climate>
+		<percentWater>92</percentWater>
+		<temperature>24</temperature>
+		<spectralClass>K</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>2</sysPos>
+		<satellite>Paxin</satellite>
+		<landMass>Bellas Major</landMass>
+		<landMass>Bellas Minor</landMass>
+		<landMass>Brahn</landMass>
+		<landMass>Freiholt</landMass>
+		<landMass>Greater Domain (Iron City)</landMass>
+		<landMass>Infernus</landMass>
+		<landMass>Karnophia</landMass>
+		<landMass>Lesser Domain</landMass>
+		<landMass>Northland</landMass>
+		<landMass>Satella</landMass>
+		<desc>With water covering almost all of its surface, and the remainder given over to ten large island masses and an assortment of smaller chains dominated by volcanoes, Kervil was quickly established as a mining world. Industries geared toward locating and exploiting the valuable metals churned up by lava flows arose within a decade of the planet‘s colonization. The Ozawa Mercantile Association, a collective of merchants that dominated the region before the rise of House Kurita and the Draconis Combine, took a liking to Kervil and its vast metal deposits. Through negotiations with the local government, the Association established its own offices, outposts, offshore mining rigs and orbital processing centers, maximizing the efficiency of Kervil‘s mining operations in exchange for almost exclusive access to the refined metals. When the Dragon crushed the Association, these facilities, some damaged by Kuritan attacks, came under Combine control. At the peak of the Star League, Kervil‘s metal industry and orbital refineries became a major producer of ferro-fibrous armor and endo-steel, used extensively in the manufacture of BattleMechs and other military vehicles. It was perhaps for this reason that forces sympathetic to the Outworlds Alliance attacked Kervil during the Reunification War, attempting to demolish the distribution centers on the planet‘s surface after crippling several orbital factories. A small BattleMech unit stationed on Kervil, part of the SLDF‘s 138th BattleMech Division, was all that stood between the renegade forces and total destruction. The woefully outnumbered SLDF troops put up a brave fight, first with hit-and-run attacks and later with an assault against one of the renegade DropShips, while waiting for reinforcements to arrive. Still outnumbered nearly 5 to 1, however, the defenders were forced to fall back to Fort Steel, their main base near the planetary capital of Iron City. For three days they held out against a siege by angry renegades; then the enemy troops overwhelmed them and destroyed the fort and its defenders to the last ‘Mech and soldier. This stand, likened to the battle for the Alamo on Terra, ultimately achieved its goal, as the departing renegades ran full-on into SLDF reinforcement troops on their way out of the system, losing the entire raiding force to the guns of SLDF WarShips. The brave SLDF defenders who died at the Battle of Kervil are still remembered today: Fort Steel‘s remains are a historic site open to tourists year-round. This battle, as it happens, was the only major military action seen on Kervil; even the SLDF liberation from Amaris the Usurper was comparatively bloodless. The planet was virtually ignored throughout the Succession Wars and the Jihad, save for some minor raids that destroyed the advanced armor metal plants in orbit and several military-grade metal refineries on the surface. Today, despite these losses, mining and metallurgy remain Kervil‘s greatest industries. Iron City, still the planetary capital, is located on Greater Domain, Kervil‘s largest island continent. Greater Domain and seven other large island masses—Brahn, Northland, Satella and Lesser Domain in the north and Bellas Major, Bellas Minor and Karnophia in the south—support the majority of the planet‘s population and industries. The north polar continent of Freiholt and the equatorial continent of Infernus are sparsely settled, due to the extreme cold and lack of minerals on Freiholt and the chain of active volcanoes on Infernus.
+
+Manufacturing centers:
+Wakazashi Industries</desc>
 	</planet>
 	<planet>
 		<name>Kesai IV</name>
@@ -24549,6 +24582,21 @@ Kallon Industries</desc>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>0.92</gravity>
+		<lifeForm>5</lifeForm>
+		<climate>3</climate>
+		<percentWater>81</percentWater>
+		<temperature>25</temperature>
+		<spectralClass>K</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>2</sysPos>
+		<satellite>Kassandra</satellite>
+		<satellite>Jiin</satellite>
+		<landMass>Katiasha (Logan City)</landMass>
+		<landMass>Copenwald</landMass>
+		<desc>Valuable minerals, chemical wealth, and advanced electronics, metallurgical and hydrocarbon fuel industries—coupled with a pleasant terrestrial climate—made Nashira a valuable world to both the Draconis Combine and the Terran Hegemony. Rather than fighting over it, however, the Camerons and Kuritas reached a compromise in which the planet would be jointly administered, with the planet‘s exports divided evenly between their governments. This ―shared world‖ status made Nashira a cosmopolitan planet, with diverse Hegemony cities standing side by side with those of the heavily Japanese-influenced Combine. Of course, the simmering hostilities that tended to flare up between Combine and Hegemony citizens were worse on Nashira than on many other planets. The worst of these incidents occurred during the so-called Hidden War, when outraged Kuritans, furious over the outcome of an epic clash on Solaris VII between SLDF Gunslinger Daniel Allison and a so-called ronin named Kaneda Fujima, rioted in the capital of Logan City. The Hegemony city, forced to call in troops to quell the violence, requested the aid of both SLDF and DCMS troops on world, as was protocol during such disturbances. Unfortunately, in a few instances the troops found themselves drawn into the conflict, with SLDF units firing upon Combine troops and vice versa. More than two thousand lives were lost in the three bloody days of the Logan Riots, a black stain on the honor of both states. After the fall of the Star League, Nashira became a Combine holding, which made use of the local industries and valuable minerals to strengthen its military machine and its economic might. The Combine launched an extensive campaign to transform the planet into a fully Japanese culture, including the demolition, renovation and renaming of many Hegemony cities and towns. Residents who clung to non-Japanese cultures and ideologies were persecuted and segregated, but true atrocities were rare. For this reason, Nashira remains a diverse world, made more so by Devlin Stone‘s relocation programs after the Jihad. Logan City, on the northern continent of Katiasha, is still the planetary capital, with a population of almost five million. Ogawa, a city still thick with Combine influence, lies fifty kilometers south of Logan City and is the planet‘s major spaceport as well as home to a third of the planetary defense forces. On Nashira‘s southern continent of Copenwald are found the majority of the planet‘s mining and manufacturing industries, including DeValt Industries, a minor manufacturer of MinerMechs and ConstructionMechs, based in the city of New Anaheim.</desc>
 	</planet>
 	<planet>
 		<name>Nashuar</name>
@@ -25967,6 +26015,10 @@ Niops VII is a cold planet with access to sufficient resources to keep the Assoc
 		<ycood>19.56</ycood>
 		<faction>TA</faction>
 		<factionChange>
+			<date>2237-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
 			<date>2315-01-01</date>
 			<faction>TH</faction>
 		</factionChange>
@@ -25990,6 +26042,22 @@ Niops VII is a cold planet with access to sufficient resources to keep the Assoc
 			<date>3081-02-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.11</gravity>
+		<lifeForm>7</lifeForm>
+		<climate>3</climate>
+		<percentWater>57</percentWater>
+		<temperature>37</temperature>
+		<spectralClass>F</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>1</sysPos>
+		<satellite>Nagano</satellite>
+		<satellite>Okinawa</satellite>
+		<landMass>Kalifax (Elusian)</landMass>
+		<landMass>Ouanii</landMass>
+		<landMass>Arkatis</landMass>
+		<desc>Nirasaki was settled by communal idealists who hoped to create a perfect society, in which everyone would live in harmony in the virtual absence of government or a policing force. The experiment was only partially successful, as infighting between settlers and the early colonists' insistence on barter-based trade made it difficult to deal with other worlds for needed goods. Eventually, a basic planetary government, structured as a loose coalition of the various communes on Kalifax and Ouanii, Nirasaki‘s two largest continents, was established. Based on democratic principles, the Nirasaki government required a simple majority vote for any decisions affecting a planetary region or interplanetary relations and helped create a basic planetary economy based on work credits and a standard for determining the relative values of products and services. Beyond these basic functions, which included an emergency powers clause in case of an external threat, the Nirasaki government had no other authority. Farms, cattle ranches, fishing communities and artistic communes made up the bulk of Nirasaki‘s population until the rise of the Star League. Though Nirasaki was left to its semi-anarchistic government under the Hegemony, the planet began to draw the attention of entrepreneurs. However, few corporate entities could make headway on Nirasaki, due to lax government practices and the work credits system, until the native Nirasaki Computers Collective was founded in the large Blue Heron Commune. The NCC developed computer systems of astonishing efficiency and quality, including the famous Blue Lotus personal computer line, which was cutting edge in the Star League's day. For this reason, the Hegemony contracted the NCC to develop software for use in the Space Defense Systems throughout its holdings. As it happened, the NCC did its job too well in this regard. When the Amaris coup took place, the brightest minds of the Collective were forcibly relocated to Terra, and their work pitted the liberating SLDF forces against SDS networks that used some of the most sophisticated pseudo-artificial intelligence ever produced. It wasn‘t until years later, when returning SLDF forces uncovered technical specs hidden away for their benefit in the abandoned NCC headquarters, that their artful programming was defeated and the worlds Amaris had turned into deadly gauntlets were retaken. Though the NCC itself never revived after the fall of the League, its former offices and production facilities were eventually taken over by Blue Heron Computers, today a major producer of the Blue Lotus portable compads and noteputers used throughout the Inner Sphere. Nirasaki's government is more utilitarian now, a result of centuries under the Dragon‘s rule. It includes a planetary police force and a local militia, both based in the capital city of Elusian on the Kalifax continent. The Blue Heron Commune, one of the many cities that still hold to the traditions of communal existence, is located on the southern peninsula of Ouanii. Nirasaki‘s third major landmass, Arkatis, is in the planet‘s south polar region and is home to the Nirasaki Communications Community, a planetwide information and entertainment company based in the city of Arkatis' Unity.</desc>
 	</planet>
 	<planet>
 		<name>Nizina</name>
@@ -27299,7 +27367,15 @@ Wunderland Enterprises</desc>
 		<name>Palos</name>
 		<xcood>51.38</xcood>
 		<ycood>-138.75</ycood>
-		<faction>CC</faction>
+		<faction>SSUP</faction>
+		<factionChange>
+			<date>2305-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2367-01-01</date>
+			<faction>CC</faction>
+		</factionChange>
 		<factionChange>
 			<date>3030-01-01</date>
 			<faction>FS</faction>
@@ -27316,6 +27392,32 @@ Wunderland Enterprises</desc>
 			<date>3062-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3090-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<spectralClass>K</spectralClass>
+		<subtype>7</subtype>
+		<luminosity>VI</luminosity>
+		<sysPos>3</sysPos>
+		<gravity>1.0</gravity>
+		<pressure>3</pressure>
+		<temperature>55</temperature>
+		<percentWater>59</percentWater>
+		<lifeForm>7</lifeForm>
+		<satellite>Isla Palana</satellite>
+		<satellite>Menor</satellite>
+		<satellite>Pinatar</satellite>
+		<satellite>Reona</satellite>
+		<satellite>Ribera</satellite>
+		<landMass>Cartagena</landMass>  
+		<landMass>Murcia</landMass>  
+		<landMass>Valencia (Xer)</landMass>  
+		<desc>3135 - Palos is a large world, measuring nearly 15,000 kilometers at the equator. Palos was colonized in the early 23rd century and quickly became a major source of important ores and minerals. Its three continents, Cartagena, Murcia, and Valencia, cover just over 40 percent of the planet's surface. Valencia, is the largest of the three, is covered with vast woodlands and mountains. Xer, the capital city, is located on the northeastern coast, on the Iberian Peninsula.  Two hundred kilometers south of Xer is the barren Docarshon Valley. Early colonists discovered rich gold deposits in Docarson Valley that played out after three centuries of mining and it is now just an ugly scar of uncontrolled exploitation. Murcia is mostly mountains and valleys covered in sparse vegetation and timber. It is the home of the planet's massive mining operations. Careful land management has allowed Murcia to continue to produce a steady supply of ore and minerals. Cartagena is the smallest of the three continents and it supplies most of the planet's food, including domesticated indigenous mammals as an alternative to beef. 
+
+Palos has always been a planet of independent-minded people who believe in individual freedom and are always opposed to heavy taxes. In early 2305, Palos and Wei both rebelled against the Sarna Supremacy after years of heavy-handed taxation and economic exploitation. They declared their independence causing the Capellan-Supremacy War when the Capella Hegemony intervened to help both worlds.
+
+During the Fourth Succession War, Federated Suns forces landed and were immediately met by the planet's inhabitants, who showed no fear in protesting their presence. After the planet fell, the people quietly chafed under Federated Commonwealth rule until the war of 3057 that shattered the Sarna March. Palos happily returned to the Capellan Confederation. Palos nearly revolted when Devlin Stone demanded the planet be included in The Republic of the Sphere.</desc>
 	</planet>
 	<planet>
 		<name>Pandora</name>
@@ -27946,6 +28048,30 @@ Challenge Systems</desc>
 		<xcood>79.02</xcood>
 		<ycood>78.5</ycood>
 		<faction>DC</faction>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.03</gravity>
+		<lifeForm>7</lifeForm>
+		<climate>3</climate>
+		<percentWater>64</percentWater>
+		<temperature>31</temperature>
+		<spectralClass>G</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>2</sysPos>
+		<satellite>Blanche</satellite>
+		<satellite>Calliope</satellite>
+		<satellite>Lassen</satellite>
+		<landMass>Anistasi</landMass>
+		<landMass>Austin</landMass>
+		<landMass>Calcutta</landMass>
+		<landMass>Cobayne</landMass>
+		<landMass>Mollasia</landMass>
+		<landMass>Victoria (Curtiss Valley)</landMass>
+		<desc>3135 - By all accounts a lovely and bountiful world, with lush forests and jungles covering the better part of its six main continents, Piedmont nonetheless hid a secret that nearly wiped out the first colonists to make planetfall. Rich mineral deposits in the mountains, particularly on the equatorial continents of Victoria and Anistasi, drew the first settlers, who established several mining and refining outposts in the intervening valleys. Three other continents, Austin and Calcutta in the north and Mollasia in the south, boasted fertile lands, well-irrigated by a series of rivers and inland lakes, as well as a diverse ecology of mostly harmless wild beasts. The planet‘s perfect native splendor took a turn for the worse as the population began to expand across Calcutta: an epidemic suddenly broke out in the community of Chun-Gai. The neurological virus, which had evolved from native bacteria in the thick tropical jungles of Calcutta‘s lower latitudes and which spread through a host of vectors, including human contact and airborne infection, came to be known as chungalomeningitis, after the first township in which it was diagnosed. Hundreds of farmers and townsfolk across Calcutta died from the disease, whose initial symptoms included fever and palsy, before doctors could isolate the cause. By that point, the plague had spread to the other major settlements and even offworld. A treatment was eventually found, but only after more than a thousand colonists had perished and another thousand had been crippled by severe brain damage. In the days of the Star League, the Draconis Combine founded a medical research facility on the remote island continent of Cobayne, in the city of Saint Greame. The Piedmont Institute for Disease Control's primary mandate was to study the dormant but still dangerous chungalomeningitis virus and to discover a more permanent cure for the disease, which continued to claim dozens of lives every year. Unfortunately, the Amaris coup intervened. In an effort to harness chungalomeningitis as a biological weapon, Amaris‘ troops stormed the PIDC and seized several containers of stored virus cultures, which the tattered DCMS troops onplanet attempted to recapture. In the battle that followed, the Usurper‘s desperate forces released a mutated strain of the virus. Unfortunately for both sides, the altered strain was even more virulent than the original, with a cycle that ran three times as fast. Out of control within days of its release, the plague affected nearly every inhabitant on Cobayne and forced the DCMS troops there to call in a nuclear strike on themselves. The entire continent is still a quarantine zone, forbidden even for inbound vessels to fly over. The blackened husk of Saint Greame and the PIDC are still visible, however, on orbital scans of the surface. Centuries later, a cure for the disease continues to elude the grasp of the PIDC‘s successors, including the recently established Piedmont Medical Institute, founded by the Republic of the Sphere in the planetary capital of Curtiss Valley on Victoria. However, preventative treatments have kept new cases of chungalomeningitis galaxywide to a mere handful each year.</desc>
 	</planet>
 	<planet>
 		<name>Pierce</name>
@@ -27971,6 +28097,10 @@ Challenge Systems</desc>
 		<ycood>39.64</ycood>
 		<faction>TA</faction>
 		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
 			<date>2315-01-01</date>
 			<faction>TH</faction>
 		</factionChange>
@@ -27994,6 +28124,21 @@ Challenge Systems</desc>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<pressure>4</pressure>
+		<gravity>0.97</gravity>
+		<lifeForm>7</lifeForm>
+		<climate>4</climate>
+		<percentWater>37</percentWater>
+		<temperature>38</temperature>
+		<spectralClass>K</spectralClass>
+		<subtype>9</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>4</sysPos>
+		<satellite>None</satellite>
+		<landMass>Blight</landMass>
+		<landMass>Erubis (Stratopolis)</landMass>
+		<landMass>Karasia (Rolfshire)</landMass>
+		<desc>High atmospheric pressure and scarce surface water made colonizing Pike IV a difficult prospect, but not one the early settlers were unwilling to tackle. The majority of this mineral-rich world‘s first cities were founded in the highlands of Erubis and Blight, Pike IV‘s two northern continents, where the air pressure was more manageable. Unfortunately, the colonists soon learned that Pike‘s frequent windstorms could do heavy damage at the higher altitudes unless they took precautions against the unpredictable weather. Paramus, a trading post and home to Pike‘s largest spaceport, became the first of the planet‘s major cities to be surrounded by a large, heavy wall to counteract the high winds. Meanwhile, the supercontinent of Karasia, just south of Blight and stretching all the way to the planet‘s southern pole, boasted fewer high-altitude regions and claimed the majority of the planet‘s landmass, as well as its wealth of metal ores and gemstones. Smaller, sparser settlements grew on Karasia as the result of stubborn efforts to access the bulk of Pike IV‘s wealth. Many of these were made up of low-slung buildings, sealed against the weather and attached to air-thinning units to make life in the oppressive environment bearable. However, no walls were required around the cities because the windstorms across Karasia were milder. An odd dual society arose from the division between the highlanders of Eribus and Blight and the lowlanders of Karasia. Symbiotic but fraught with political conflict, the populations of the highlands and lowlands often argued over the needs of their respective cities and towns. Matters came to a head during the rule of the Star League and the Terran Hegemony, when SLDF mediators were called in to settle a small brushfire war between highlanders and lowlanders. After the Star League‘s collapse and the ascendance of the Draconis Combine, raiders enjoyed mixed success trying to use the sociopolitical situation on Pike IV to their advantage. Depending on the political climate at any given time, resistance to invaders ranged from determined and coordinated to bickering and ineffective. During one invasion in 3012, attacking ‘Mech forces struck Paramus, meeting resistance from both highlander and lowlander militias. Unfortunately for the defenders, recent political infighting between the two factions tainted their command structure, leading to poor coordination that allowed the attackers to overwhelm the city briefly, at a cost of millions of C-bills in damage. The resettlement directives put in place by Devlin Stone during the creation of the Republic have muted the chronic infighting, but experts believe that as the conflicting needs of the highlanders and lowlanders become clear to Pike‘s new inhabitants, the old rivalries may return. Unsurprisingly, Pike IV has two capital cities that govern the planet. The lowlander capital, Rolfshire, is located on the west coast of Karasia, while the highlander capital of Stratopolis is located on Erubis, on a plateau three hundred kilometers northwest of Paramus.</desc>
 	</planet>
 	<planet>
 		<name>Pilkhua</name>
@@ -28137,7 +28282,11 @@ Challenge Systems</desc>
 		<name>Pleione</name>
 		<xcood>51.9</xcood>
 		<ycood>-80.33</ycood>
-		<faction>CC</faction>
+		<faction>TGU</faction>
+		<factionChange>
+			<date>2367-08-29</date>
+			<faction>CC</faction>
+		</factionChange>
 		<factionChange>
 			<date>3028-08-29</date>
 			<faction>CC,FS</faction>
@@ -28191,9 +28340,23 @@ Challenge Systems</desc>
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3085-01-01</date>
+			<date>3090-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<spectralClass>M</spectralClass>
+        <subtype>8</subtype>
+        <luminosity>VI</luminosity>
+        <sysPos>3</sysPos>
+        <gravity>0.89</gravity>
+        <pressure>3</pressure>
+        <temperature>58</temperature>
+        <percentWater>84</percentWater>
+        <lifeForm>3</lifeForm>
+        <satellite>Caran</satellite>
+        <landMass>Jezrael</landMass>  
+        <desc>3135 - Pleione was colonized during the early Exodus period and became a stepping-stone to the stars beyond. It is an inhospitable desert world, with an abundant supply of water, which it exports. Jezrael, the only continent, represents less than 20 percent of the planet's surface. It's terrain is mostly featureless, except for the large rock formations that dot the landscape.
+
+Pleione was part of the Tikonov Grand Union before joining the Capellan Confederation. The Star League used Pleione as a military supply world and built a massive fort atop the largest rock formation on Jezrael. This fort, known by the Capellans as "Thunder Rock", was used as a headquarters and regimental supply depot. It was here that Capellan forces fought against Federated Suns mercenaries during the Fourth Succession War. Confederation forces regained Pleione once the Sarna March collapsed as the result of the Marik-Liao invasion of 3057. Pleione, along with Ningpo and Poznan, reaffirmed its allegiance to the Celestial Throne and House Liao during the Confederation‘s Xin Sheng movement. The Confederation assigned Little Richard‘s Panzer Brigade to defend Pleione, as well as to back up Confederation forces on Ningpo and Poznan. During the FedCom Civil War, the Brigade was sent to take Genoa and Arboris in October of 3066. On Genoa, Little Richard's Panzer Brigade met with disaster when engaged by the Twelfth Vegan Ranger's Beta Regiment. In a matter of a month, their regiment was reduced to a barely operational battalion. The unit were sent back to Pleione, and was in the middle of recovering when Word of Blake forces invaded. Little Richard's forces fought valiantly, they made their last stand at "Thunder Rock" where they died to a man, after which the planet surrendered.</desc>
 	</planet>
 	<planet>
 		<name>Plymouth</name>
@@ -28498,7 +28661,15 @@ Poulsbo remains a lightly settled Military Outpost, whose civilian population is
 		<name>Poznan</name>
 		<xcood>63.11</xcood>
 		<ycood>-81.89</ycood>
-		<faction>CC</faction>
+		<faction>IND</faction>
+		<factionChange>
+			<date>2330-01-01</date>
+			<faction>DoL</faction>
+		</factionChange>
+		<factionChange>
+			<date>2367-01-01</date>
+			<faction>CC</faction>
+		</factionChange>
 		<factionChange>
 			<date>3028-08-29</date>
 			<faction>CC,FS</faction>
@@ -28536,9 +28707,33 @@ Poulsbo remains a lightly settled Military Outpost, whose civilian population is
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3085-01-01</date>
+			<date>3090-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<spectralClass>G</spectralClass>
+        <subtype>6</subtype>
+        <luminosity>III</luminosity>
+        <sysPos>4</sysPos>
+        <gravity>1.2</gravity>
+        <pressure>3</pressure>
+        <climate>3</climate>
+        <temperature>45</temperature>
+        <percentWater>65</percentWater>
+        <lifeForm>5</lifeForm>
+        <landMass>Boleslaw</landMass>  
+        <landMass>Mieszko</landMass>  
+        <landMass>Barcelona (New Madrid)</landMass>  
+        <landMass>Palma</landMass>  
+        <landMass>Seville</landMass>  
+        <landMass>Zaragoza</landMass>  
+        <landMass>Galicia</landMass>  
+        <desc>3135 - Poznan was colonized by refugees from Poland, Portugal, and Spain during the original Exodus from Terra. It was named after the first capital of the former Terran country of Poland. The continents of Boleslaw and Mieszko, located in the northern hemisphere, were settled by the Poles because the continents resembled their former homeland. Both continents produce iron ore, petroleum, and various agricultural products. Boleslaw is larger and more mountainous. Mieszko has more flatlands and rolling hills, and Lake Lednica, the largest freshwater lake on Poznan. 
+
+The Spanish were the largest group of settlers, claiming the four largest continents, Barcelona, Palma, Seville, and Zaragoza, located mostly in the equatorial zone. They established the planetary capital of New Madrid on Barcelona, the largest of the four continents. Here they thrived and traded with their neighbors in the north and south. The Portuguese settled on the island continent of Galicia which is rich in minerals, precious metals, and titanium ore. 
+
+During the next two centuries, Poznan flourished. However an ugly and brutal civil war was fought between the Poles and Spaniards over Palma. The Spaniards won and a planetary government was formed. In 2320, Poznan was offered membership into the Duchy of Liao. Over the next three hundred years, Poznan‘s population increased tenfold, with many of Chinese descent immigrating until the Spaniards were in the minority. 
+
+During the Fourth Succession War, Federated Suns forces captured Poznan and they helped relieve the oppression caused by the Chinese population and installed a new government. When the Capellan Confederation regained control, the Chancellor decreed that nothing would change and left the new leadership in place. This act did more to win the hearts of the people than anything else. This was apparent when the Republic of the Sphere laid claim to Poznan, it has continued to harbor dissidents and malcontents. </desc>
 	</planet>
 	<planet>
 		<name>Prato</name>
@@ -30361,6 +30556,21 @@ The planet barely survived through the Succession Wars since the technology behi
 			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.12</gravity>
+		<lifeForm>7</lifeForm>
+		<climate>3</climate>
+		<percentWater>89</percentWater>
+		<temperature>38</temperature>
+		<spectralClass>K</spectralClass>
+		<subtype>9</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>2</sysPos>
+		<satellite>Aladanna</satellite>
+		<landMass>Melrin</landMass>
+		<landMass>Schender Minor (Oskart)</landMass>
+		<landMass>Schender Prime</landMass>
+		<desc>3135 - Seen from orbit, Rukbat is a wonderful expanse of endless oceans, tropical islands and small continents, with woodlands and green valleys aplenty. The majestic mountains, capped with only the slightest dusting of snow and ice, are treasure troves of minerals, and the seas are full of life. It therefore came as a surprise when the first colonists to set foot on Rukbat discovered their newfound paradise was thoroughly poisonous. The air, containing only slightly more nitrogen than Terran standard, was not a problem, but everything else, from the waters and soils to the native flora and fauna, was. Scientists quickly realized that the alien biochemistry of Rukbat‘s diverse ecosystem was completely incompatible with humans, creating a serious problem for the settlers. Moreover, this incompatibility extended to the water and soil. Though purifiers could help negate the more nauseating effects of Rukbat‘s freshwater table, the soil, saturated with the byproducts of the native life forms, could not sustain the colonists‘ crops. To support the mining communities that sprang up around the extensive mountain chains, the inhabitants of Rukbat had to import all of their foodstuffs and obtain a healthy number of water purifiers. Under the Terran Hegemony, during the height of the Star League, efforts were made to introduce genetically altered crops and livestock to Rukbat, but they met with only limited success. The altered crops, a bit more sustainable than the expensive, high-maintenance altered cattle, helped lessen Rukbat‘s nutritional woes, but the planet remained dependent on offworld meats and produce. Meanwhile, the mineral mining industry continued to grow, the basis for the large cities of New Glasgow and Korbensberg on the primary island continent of Schender Prime. During the Amaris crisis, the Usurper‘s troops resorted to scorched-earth tactics, destroying Rukbat‘s few viable farms as they retreated from the liberating SLDF troops. The fall of the Star League and the onset of the Succession Wars worsened the situation, throwing the planet‘s precarious agricultural system into ruin once again. Never able to recover, Rukbat remained dependent on its neighbor worlds for the basics of life until the rise of the Republic. Now, thanks to the relocation of several members of Clans Wolf and Nova Cat—and with them, their valuable scientists, whose experience in genetics far exceeds even that of the Star League in its glory days—Rukbat‘s agricultural worries may soon be over. The capital city of Oskart is located on Schender Minor, Rukbat‘s second largest island continent, located just south of Schender Prime. The planet‘s other major island continent, Melrin, lies mostly south of the equator and is home to the Kolivar Enclave, an experimental agricultural commune managed by Clan scientists in an effort to restore Rukbat‘s food economy.</desc>
 	</planet>
 	<planet>
 		<name>Ruschegg</name>
@@ -30605,6 +30815,10 @@ As of the 32nd century, this world is little more than an outpost, with no agric
 		<ycood>12</ycood>
 		<faction>TA</faction>
 		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
 			<date>2315-01-01</date>
 			<faction>TH</faction>
 		</factionChange>
@@ -30632,6 +30846,21 @@ As of the 32nd century, this world is little more than an outpost, with no agric
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>0.77</gravity>
+		<lifeForm>6</lifeForm>
+		<climate>2</climate>
+		<percentWater>53</percentWater>
+		<temperature>22</temperature>
+		<spectralClass>K</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>VI</luminosity>
+		<sysPos>3</sysPos>
+		<satellite>Promina</satellite>
+		<landMass>Awonera</landMass>
+		<landMass>Dovejin (Iwanji)</landMass>
+		<landMass>Sophrati</landMass>
+		<desc>When first discovered, Saffel was a rather cold world at the onset of a minor ice age. The first colonists were hardy folk from Terra‘s Siberian, Scandinavian and Canadian regions, who found the cooler temperatures reminiscent of their homelands and planned to build cities on the north polar continent of Dovejin, Saffel‘s largest landmass. This frigid land, half-covered in a glacial ice cap, was considered an ideal location due to the large metal deposits detected during early surveys. Unfortunately, before these rich veins could be tapped, the so-called Outer Reaches Rebellion broke out, leading to the eventual collapse of the Terran Alliance‘s dominion over its far-flung worlds. With it went the fledgling settlements‘ only means of support. Unable to obtain the equipment necessary to turn their new home into an economically viable system and poorly equipped to handle their sudden, unasked-for independence as the harsh Saffel winter set in, many of these first colonists perished. By the time the Terran Hegemony formed nearly 100 years later, the surviving population had migrated to the warmer equatorial zones, particularly the continents of Awonera and Sophrati. Eking out an existence in the rugged, thickly wooded plains of these new lands, the scattered communities didn‘t know what to make of the arrival of new settlers from the Hegemony, especially when these newcomers claimed the early cities that had been abandoned by their forebears. A brief brushfire conflict broke out between the old and new inhabitants of Saffel before the Hegemony government managed to negotiate a truce. In the heyday of the Star League, Saffel became known as an exporter of valuable metals, as well as home to the Saffel Medical Institute. Located in the city of Radjik on Awonera, the SMI developed a revolutionary instrument, the Eligus Diagnoser, which was capable of rapidly scanning a patient‘s body, identifying any known ailments and rendering a diagnosis. Although it was withheld briefly to prevent a panic in the medical community, as some suspected the device could put doctors out of work, the eventual unveiling of the Eligus Diagnoser put Saffel on the map, adding valuable medical equipment to the planet‘s list of exports. After the collapse of the Star League, Davion forces promptly seized Saffel and established the planet as a gathering point for troops in one of the first major campaigns against House Kurita. In response, the Combine launched a devastating attack in 2787 but failed to capture the planet. Over the following centuries, Saffel was raided and invaded several times but remained largely under the Davion sunburst until the Draconis Combine managed to take the planet after the Fourth Succession War. During the Blakist Jihad, the planet suffered minimal damage save for the destruction of Farwind, a city on the edge of the Dovejin ice cap, which barracked the small planetary militia. Saffel today is a peaceful world with a modest metal trade and a subsistence-level agricultural sector. The capital city of Iwanji, located on the southern coast of Dovejin, also serves as the largest commercial spaceport.</desc>
 	</planet>
 	<planet>
 		<name>Saginaw</name>
@@ -31739,7 +31968,11 @@ Tengo Aerospace</desc>
 		<name>Shensi</name>
 		<xcood>54.25</xcood>
 		<ycood>-92.84</ycood>
-		<faction>CC</faction>
+		<faction>SSUP</faction>
+		<factionChange>
+			<date>2367-01-01</date>
+			<faction>CC</faction>
+		</factionChange>
 		<factionChange>
 			<date>3028-08-29</date>
 			<faction>CC,FS</faction>
@@ -31764,6 +31997,29 @@ Tengo Aerospace</desc>
 			<date>3062-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3090-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<spectralClass>F</spectralClass>
+        <subtype>6</subtype>
+        <luminosity>V</luminosity>
+        <sysPos>4</sysPos>
+        <gravity>1.0</gravity>
+        <pressure>3</pressure>
+        <temperature>30</temperature>
+        <percentWater>59</percentWater>
+        <climate>3</climate>
+        <lifeForm>4</lifeForm>
+        <satellite>Kung Pow</satellite>
+        <landMass>Klondike (Whitehorse)</landMass>  
+        <landMass>Mogot</landMass>  
+        <landMass>Kungara</landMass>  
+        <desc>3135 - Shensi is covered with tens of thousands of kilometers of forest that lured people from northwest North America, northern China, and Siberia. Shensi quickly became a leader in the export of timber and iron ore. Klondike is the largest of the three continent, its climate is the most temperate and it's located on the equator and extends north. The capital city, Whitehorse, is located in the center of the continent. The continent of Mogot, produces the mostf iron, titanium, and radioactive ores. Its climate is colder and it has fewer mountains. The northern expanses of the continent range far above the artic circle, where they exist as frozen tundra. Here petroleum wells have been drilled and oil stored for the world. The third continent of Kungara, contains open plains for various agricultural products that provide much of the foodstuffs to feed the population. When Shensi became a member of the Capellan Confederation, its natural resources supported the fledgling realm. The CCAF recognized the value of the world and secretly built a number of hidden supply caches for strategic purposes.
+
+During the Fourth Succession War, Shensi was captured by the Federated Suns but the locals never gave up the secret caches. When Shensi returned to the Confederation, their supplies was still there, save one cache that had been raided by pirates. 
+
+The Word of Blake Jihad bypassed Shensi, so it was undamaged when it was folded into The Republic of the Sphere. </desc>
 	</planet>
 	<planet>
 		<name>Shenwan</name>
@@ -31927,7 +32183,15 @@ Tengo Aerospace</desc>
 		<name>Shimonita</name>
 		<xcood>94.67</xcood>
 		<ycood>83.2</ycood>
-		<faction>DC</faction>
+		<faction>OMA</faction>
+		<factionChange>
+			<date>2319-01-01</date>
+			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 		<spectralClass>F</spectralClass>
 		<subtype>4</subtype>
 		<luminosity>V</luminosity>
@@ -31966,6 +32230,26 @@ Tengo Aerospace</desc>
 		<xcood>80.59</xcood>
 		<ycood>54.51</ycood>
 		<faction>DC</faction>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.0</gravity>
+		<lifeForm>7</lifeForm>
+		<climate>3</climate>
+		<percentWater>88</percentWater>
+		<temperature>29</temperature>
+		<spectralClass>G</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>1</sysPos>
+		<satellite>Janjiro</satellite>
+		<landMass>Jukemwa</landMass>
+		<landMass>Kokuya</landMass>
+		<landMass>Matsuda</landMass>
+		<landMass>Narosi (Marimasu)</landMass>
+		<desc>3135 - Shinonoi is a world of fertile lands; a long, mild growing season; and abundant native livestock. Two of the planet‘s four major landmasses, Matsuda and Kokuya, were devoted almost exclusively to farming and ranching communities when the planet was first settled. Jukemwa, almost covered in snow and ice, lay completely within Shinonoi‘s north polar zone, and early surveys deemed it virtually uninhabitable. Nonetheless, a few hardy souls established towns on islands off Jukemwa, which today are among the planet‘s most successful fishing communities. Narosi, the smaller, equatorial continent where geologists discovered an abundance of mineral deposits and metal ores, became the heart of Shinonoi‘s mining and manufacturing industries and home to several sprawling metroplexes and factories, including the capital city of Marimasu. Shinonoi‘s agriculture and industry helped the planet prosper throughout the Succession Wars despite numerous House Davion raids, but these raids were nothing compared with the disaster that befell Shinonoi in 3075, when a rogue eight-kilometer-wide asteroid, designated simply as SH01378-A, struck the continent of Narosi. The strike instantly annihilated three of Shinonoi‘s largest industrial cities and set the entire continent of Narosi ablaze. The impact and the resulting fires sent enough particulate matter into Shinonoi‘s atmosphere to drop planetwide temperatures by more than five degrees, wiping out crops and crippling the agricultural industries on Matsuda and Kokuya for almost a decade. The impact also set off a series of dormant fault lines around the world, extending the damage to communities on Matsuda and Kokuya. Despite the demands of the ongoing efforts to counter the Blakist Jihad, relief organizations from the Combine and its allies poured badly needed money, medical aid and equipment into Shinonoi‘s recovery. Devlin Stone himself sponsored a program to assist the ravaged planet and restore order after the capital city was destroyed, and when his newborn Republic of the Sphere expanded to include Shinonoi, many were relocated to this world to reclaim what had been lost in the disaster. The difficult relief and restoration efforts have borne fruit. Today, Shinonoi is once again a viable agro-world, and the fishing communities of Jukemwa have begun to record their first profits since the Narosi Strike. The continent of Narosi itself, however, is still a blasted wasteland, dotted with the scorched remains of cities, though a few new towns have been established there. The new capital of the planet, Rising Sun, is located on Matsuda and hosts the planet‘s largest spaceport. The nearby city of Kaffeli houses the bulk of the planetary defense force.</desc>
 	</planet>
 	<planet>
 		<name>Shionoha</name>
@@ -32048,6 +32332,33 @@ Tengo Aerospace</desc>
 			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3075-01-01</date>
+			<faction>AB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.19</gravity>
+		<lifeForm>5</lifeForm>
+		<climate>4</climate>
+		<percentWater>63</percentWater>
+		<temperature>36</temperature>
+		<spectralClass>K</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>VI</luminosity>
+		<sysPos>2</sysPos>
+		<satellite>Naramu</satellite>
+		<satellite>Tenga</satellite>
+		<landMass>Agito</landMass>
+		<landMass>Hokaido</landMass>
+		<landMass>Niijo</landMass>
+		<landMass>Okasaki (Hirotomi)</landMass>
+		<landMass>Zumi</landMass>
+		<desc>3135 - Founded by a group of corporations in the early days of deep-space colonization, Shitara, a world of large landmasses covered with arid mountains, expansive deserts and winding grasslands, was not settled for its appearance but for its potential as a regional commercial hub. Shitara‘s five main continents—Agito, Hokaido, Niijo, Okasaki and Zumi—all fall within the world‘s temperate, tropical and equatorial zones but lack many inland freshwater bodies. The rugged terrain and relative lack of suitable irrigation made colonies difficult to establish, but the corporate engineers who laid out the design for Shitara‘s settlement were less concerned with comfort than with setting up business operations. Several of the planet‘s first colonies, as a result, were large warehouses, spaceports and mining/refining stations. In the decades that followed, as Shitara became a jumping-off point for further colonial expansion and a center for trade, more settlers came to call this world home. Large commercial cities arose, particularly along the river valleys of Okasaki and Zumi, including the present-day capital of Hirotomi. Even a few agricultural communities began to appear to support the local population. Located well within the Draconis Combine‘s borders after that nation expanded to include it and its neighbors, Shitara was spared much of the fighting during the Amaris crisis and the Succession Wars. Raids by the Dragon‘s enemies were rare, and Shitara prospered, its nearly thirty major spaceport cities making it an ideal hub for commercial and military transport. During the Jihad, in fact, Shitara was used as a staging ground for strikes against the Blakists, serving as a logistical linchpin for several major campaigns. Today, Shitara continues to be a transportation and commercial hub, with major cities and spaceports on all five continents. Recently, the planet‘s robust economy and healthy metal resources have attracted the attention of Klein Manufacturing, a small but growing producer of industrial vehicles, including ConstructionMechs and MiningMechs. Klein Manufacturing is currently negotiating with the Shitara government to establish a major factory complex in the foothills of Agito, just outside the commercial city of Galveston. 
+ </desc>
 	</planet>
 	<planet>
 		<name>Shoreham</name>
@@ -33554,6 +33865,10 @@ Tao ‘Mechworks</desc>
 		<ycood>25.82</ycood>
 		<faction>TA</faction>
 		<factionChange>
+			<date>2442-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
 			<date>2315-01-01</date>
 			<faction>TH</faction>
 		</factionChange>
@@ -33577,6 +33892,23 @@ Tao ‘Mechworks</desc>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>0.83</gravity>
+		<lifeForm>7</lifeForm>
+		<climate>3</climate>
+		<percentWater>79</percentWater>
+		<temperature>29</temperature>
+		<spectralClass>F</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>1</sysPos>
+		<satellite>Kronus</satellite>
+		<satellite>Nirvana</satellite>
+		<satellite>Void</satellite>
+		<landMass>Epimethius (Sunder Falls)</landMass>
+		<landMass>Gehenna</landMass>
+		<landMass>Perdition</landMass>
+		<desc>Styx was aptly named by the first settlers to set up colonies on its storm-ravaged surface. Large oceans and the gravitational effects of its three moons are blamed for the violent storms that rage across the Stygian surface, often causing damage from flash floods and mudslides during the planet‘s rainy seasons. The first colonists, as a result, settled in the open plains of the interior regions of Epimethius, the primary continent, where the storms were least volatile. A few short years after the first towns were established, geologists discovered high quantities of metal and radioactive minerals in the mountain ranges of Epimethius and the smaller, neighboring continent of Perdition. These deposits lured in mining firms, the largest of which was the Styx Mining Company, an interstellar corporation that specialized in mining difficult veins of valuable metals and quality refining processes. Styx came under the sway of the Terran Hegemony more than a century before the birth of the Star League, and its mineral wealth helped bolster the Hegemony‘s economy and military. Perhaps for this reason, the Draconis Combine came to covet Styx, culminating in the first true battle to use the BattleMech. In 2443, a Combine armored company raided Styx, intending to seize and plunder several metal refineries on Perdition while testing the resolve of the Hegemony. The rain-slicked plains slowed the Kuritan tanks, which gave the Hegemony troops plenty of time to ready their new war machines. On the muddy plains outside the city of Barbados, the two forces clashed: a lance of Hegemony ‘Mechs against a full company of Combine tanks and infantry support. The results were so lopsided that few could argue the Hegemony‘s new BattleMech would not be the future king of the battlefield. Styx‘s mineral wealth attracted many raiders over the centuries, including a major engagement between Kurita and Davion forces over the Styx Mining Company‘s Beta facility near the city of Lake Wio. Despite these clashes, the Draconis Combine managed to maintain control over this vital if stormy world until the rise of the Republic in 3081. Styx remains a major exporter of metals and radioactive minerals to the Republic and the Combine today, with the historically pro-Combine Styx Mining Corporation receiving a huge subsidy from the Republic to maintain its operations under the new banner. The Styx Mining Corporation‘s headquarters are in Memphis, on Epimethius. The planetary capital, Sunder Falls, is located 120 kilometers northwest of Memphis. Aside from Epimethius and Perdition, Styx‘s third large landmass is the island continent of Gehenna. Far less populous than the other two regions, Gehenna is home to a large spaceport city, Lindon‘s Folly, which is also home to one of the Styx Mining Company‘s large refineries.</desc>
 	</planet>
 	<planet>
 		<name>Suda Bay</name>
@@ -34673,9 +35005,17 @@ Precision Weaponry</desc>
 		<name>Telos IV</name>
 		<xcood>44.34</xcood>
 		<ycood>40.68</ycood>
-		<faction>TA</faction>
+		<faction>DC</faction>
 		<factionChange>
-			<date>2315-01-01</date>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2319-01-01</date>
+			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2341-01-01</date>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
@@ -34698,6 +35038,22 @@ Precision Weaponry</desc>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>0.73</gravity>
+		<lifeForm>6</lifeForm>
+		<climate>3</climate>
+		<percentWater>82</percentWater>
+		<temperature>44</temperature>
+		<spectralClass>K</spectralClass>
+		<subtype>7</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>4</sysPos>
+		<satellite>Sadib</satellite>
+		<landMass>Dulles (Triumph)</landMass>
+		<landMass>Fellin</landMass>
+		<landMass>Haranshire</landMass>
+		<landMass>Rustov</landMass>
+		<desc>Cursed with a weak ozone layer that lets in more than the average amount of solar radiation, Telos IV is a warm, dreary world of continual rainstorms and freak tornadoes that ravage all four of its island continents in the middle latitudes. Surviving despite these hazards, the people of this world have developed a reputation for being stubborn and fiercely independent, a reputation that has caused them no small share of problems over the centuries when dealing with the greater realms. Shiro Kurita, founder of the Draconis Combine, manipulated the people of Telos IV into joining his growing state through guile and political trickery. When the deceit was discovered, the Telosians revolted, which prompted the first Coordinator to invade the planet as a demonstration of the Combine‘s superiority. In the years that followed, the population remained stubborn. Though suppressed for a time, the Kuritas found the Telosians difficult to deal with, as they resorted to passive resistance instead of outright rebellion. Since Telos IV lacked significant mineral or agricultural wealth, the Combine willingly ceded the world to the rising Terran Hegemony, hoping its dissident population would give the Camerons as much trouble as it had the Kuritas. At first, the Telosians did just that, but Hegemony efforts to improve relations with the planet, which included placing several storm inhibitors (similar to those employed on Bryant) in Telos IV‘s orbit, helped win over the locals. This amicable relationship helped during the Amaris Crisis, when the Usurper, finding little of value on Telos IV, abandoned the world after demolishing the storm inhibitors and planetary defense network. Kerensky‘s forces found support on Telos IV when they arrived and easily advanced on their campaign of liberation. Returned to Kurita rule after the fall of the League, the Telosians resumed their attitude of passive resistance, which prevented the Dragon from exploiting the planet‘s modest resources to the fullest, even centuries later. However, this attitude underwent marked improvement after the reforms enacted by Coordinator Theodore Kurita. When Telos IV was ceded to the Republic, its inhabitants had mixed feelings about the transfer and initially balked at the resettlement directives. Today, however, the warm and stormy world of Telos IV is tranquil once again, secure in the freedoms of the Terran Hegemony‘s closest successor. The capital of Telos IV, Triumph, is located on the large northern continent of Dulles. Telos IV's other three continents—Rustov on the equator and Fellin and Haranshire in the southern hemisphere—are home to a scattering of large cities and mining towns.</desc>
 	</planet>
 	<planet>
 		<name>Tematagi</name>
@@ -38839,7 +39195,37 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<name>Yance I</name>
 		<xcood>70.42</xcood>
 		<ycood>52.16</ycood>
-		<faction>DC</faction>
+		<faction>IND</faction>
+		<factionChange>
+			<date>2400-01-01</date>
+			<faction>TH</faction>
+		</factionChange>
+		<factionChange>
+			<date>2790-01-01</date>
+			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.06</gravity>
+		<lifeForm>7</lifeForm>
+		<climate>2</climate>
+		<percentWater>67</percentWater>
+		<temperature>22</temperature>
+		<spectralClass>G</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>1</sysPos>
+		<satellite>Alyssa</satellite>
+		<satellite>Clytemnestra</satellite>
+		<landMass>Alameda</landMass>
+		<landMass>Ausdaner</landMass>
+		<landMass>Brisbane</landMass>
+		<landMass>Neuhoffen</landMass>
+		<landMass>Paradiesland (Firstpoint)</landMass>
+		<desc>The colonists who settled Yance I—dubbed Agador by its inhabitants—were anti-technologists, mostly of Amish descent, who sought to create a world free of the ravages of widespread industrialization and commercialization. Putting aside their beliefs long enough to plan, finance and undertake a relocation from one world to another, these settlers came to Yance I, assured that they would find a new land to their liking. Yance I was a terrestrial world of diverse climates, with open, hilly bands of fertile soils in the temperate zones, a mix of jungles and deserts in the equatorial zones, and frozen tundra and glaciers in the polar reaches. However, what went unnoticed in the first planetary surveys was the dominant animal life form. No sooner had the settlers made planetfall and founded their first colonies than their imported livestock—and even a few of the colonists—began to succumb to attacks by a predator called the black reaper. This aggressive, feline-like mammal, similar in many ways to the Terran puma, but almost half again as large and with a large, spiked, prehensile tail, roamed the plains of the primary continent of Paradiesland. The settlers at first tried to wall in their lands to keep out the reapers, but the powerful beasts broke through or leapt over their wooden constructs, causing massive damage. Relocation also failed to work, as the reapers, attracted to the new food source, simply followed them. In desperation, the mostly pacifistic colonists resorted to primitive firearms, only to find the reapers‘ hides resistant to such weapons. The colonists were forced to turn to modern technology to control the animals, bargaining with traders from nearby worlds for heavier weapons, including automatic rifles and laser weapons. These concessions to advanced technology saved the colonists but eventually eroded the pilgrims‘ way of life. Over the following centuries, Yance I‘s population gradually became more modernized, a transition that caused no small degree of conflict between the orthodox and progressive populations and led to the relocation of the traditionalist settlers to the neighboring continent of Neuhoffen. The ascendance of the Terran Hegemony and its incorporation of Yance I led to the further industrialization of Paradiesland, including the establishment of a small arms factory for SLDF infantry weapons. Meanwhile, Neuhoffen became a haven for those seeking escape from the evils of modern life, virtually left alone while the rest of the world entered the Golden Age of technology. The years under Combine rule saw even more turmoil for Neuhoffen residents, forced into increasingly smaller enclaves by the Kuritan rulers, who saw a better use for the minerals in the mountains of the continent. By the time Yance I came under the Republic‘s sway, the combination of industrialization, continuous Combine socioeconomic pressure, raids by nearby Houses and the Republic‘s resettlement directives had virtually destroyed the culture of the original settlers. Today, the orthodox Amish and Mennonite communities that remain on Neuhoffen have become little more than tourist attractions, a nostalgic look back at where humanity once was. The capital city of Yance I is Firstpoint, located on the western coast of Paradiesland. Endstehen, the largest of the remaining ―old world‖ settlements on Neuhoffen, is set on that continent‘s southern reaches. Yance I‘s other three continents—Alameda in the northern hemisphere and Brisbane and Ausdaner in the south—make up the rest of the planet‘s landmass. Of these, only Ausdaner, completely covered by the planet‘s southern ice cap, is uninhabited.</desc>
 	</planet>
 	<planet>
 		<name>Yanchep</name>
