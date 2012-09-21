@@ -19,7 +19,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JTextArea;
 
-import megamek.common.Pilot;
+import megamek.common.Crew;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.DirectoryItems;
 import mekhq.campaign.Campaign;
@@ -196,12 +196,12 @@ public class PersonViewPanel extends javax.swing.JPanel {
         String category = person.getPortraitCategory();
         String file = person.getPortraitFileName();
 
-        if(Pilot.ROOT_PORTRAIT.equals(category)) {
+        if(Crew.ROOT_PORTRAIT.equals(category)) {
             category = "";
         }
 
         // Return a null if the player has selected no portrait file.
-        if ((null == category) || (null == file) || Pilot.PORTRAIT_NONE.equals(file)) {
+        if ((null == category) || (null == file) || Crew.PORTRAIT_NONE.equals(file)) {
         	file = "default.gif";
         }
 

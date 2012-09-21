@@ -25,13 +25,10 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -47,16 +44,13 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
-import javax.swing.JTextArea;
-import javax.swing.SwingWorker;
 
 import megamek.common.Entity;
 import mekhq.campaign.ResolveScenarioTracker;
-import mekhq.campaign.Unit;
 import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
+import mekhq.campaign.Unit;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Scenario;
-import mekhq.campaign.personnel.Person;
 
 /**
  *

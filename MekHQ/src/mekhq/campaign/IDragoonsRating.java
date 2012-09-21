@@ -20,10 +20,10 @@
  */
 package mekhq.campaign;
 
-import mekhq.campaign.personnel.Person;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+
+import mekhq.campaign.personnel.Person;
 
 /**
  * @author Deric Page (deric (dot) page (at) usa.net)

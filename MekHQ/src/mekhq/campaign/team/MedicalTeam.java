@@ -23,8 +23,6 @@ package mekhq.campaign.team;
 
 import java.io.PrintWriter;
 
-import mekhq.campaign.personnel.Person;
-
 import org.w3c.dom.Node;
 
 /**

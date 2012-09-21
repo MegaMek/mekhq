@@ -12,7 +12,6 @@ import java.util.ResourceBundle;
 import javax.swing.BorderFactory;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Faction;
 import mekhq.campaign.Planet;
 
 /**

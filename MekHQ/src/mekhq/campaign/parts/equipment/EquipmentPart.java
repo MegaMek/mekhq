@@ -23,18 +23,12 @@ package mekhq.campaign.parts.equipment;
 import java.io.PrintWriter;
 
 import megamek.common.AmmoType;
-import megamek.common.BipedMech;
 import megamek.common.CriticalSlot;
-import megamek.common.Engine;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
-import megamek.common.Mech;
 import megamek.common.MiscType;
 import megamek.common.Mounted;
-import megamek.common.Protomech;
-import megamek.common.Tank;
 import megamek.common.TechConstants;
-import megamek.common.WeaponType;
 import megamek.common.weapons.Weapon;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Era;
@@ -459,7 +453,7 @@ public class EquipmentPart extends Part {
 
         int itemCost = 0;      
         try {
-        	itemCost = (int) type.getCost(en, isArmored);
+        	itemCost = (int) type.getCost(en, isArmored, getLocation());
         	if (itemCost == EquipmentType.COST_VARIABLE) {
         		itemCost = resolveVariableCost(isArmored);
         	}

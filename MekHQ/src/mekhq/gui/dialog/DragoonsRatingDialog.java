@@ -20,17 +20,23 @@
  */
 package mekhq.gui.dialog;
 
-import mekhq.campaign.Campaign;
-import mekhq.campaign.DragoonsRatingFactory;
-import mekhq.campaign.IDragoonsRating;
-
-import javax.swing.*;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+
+import mekhq.campaign.Campaign;
+import mekhq.campaign.DragoonsRatingFactory;
+import mekhq.campaign.IDragoonsRating;
 
 /**
  * @author Deric Page (deric (dot) page (at) usa.net)

@@ -10,8 +10,6 @@ import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.text.SimpleDateFormat;
@@ -26,17 +24,15 @@ import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JSpinner;
-import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import megamek.client.ui.swing.DialogOptionComponent;
 import megamek.client.ui.swing.DialogOptionListener;
+import megamek.common.Crew;
 import megamek.common.EquipmentType;
-import megamek.common.Pilot;
 import megamek.common.WeaponType;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
@@ -44,7 +40,6 @@ import megamek.common.options.PilotOptions;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
-import mekhq.gui.CampaignGUI;
 
 /**
  *
@@ -579,10 +574,10 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
         }
         
         if ("specialist".equals(option.getName())) { //$NON-NLS-1$
-            optionComp.addValue(Pilot.SPECIAL_NONE);
-            optionComp.addValue(Pilot.SPECIAL_LASER);
-            optionComp.addValue(Pilot.SPECIAL_BALLISTIC);
-            optionComp.addValue(Pilot.SPECIAL_MISSILE);
+            optionComp.addValue(Crew.SPECIAL_NONE);
+            optionComp.addValue(Crew.SPECIAL_LASER);
+            optionComp.addValue(Crew.SPECIAL_BALLISTIC);
+            optionComp.addValue(Crew.SPECIAL_MISSILE);
             optionComp.setSelected(option.stringValue());
         }
 

@@ -15,7 +15,6 @@ import java.awt.Image;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
 

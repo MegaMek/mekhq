@@ -34,7 +34,6 @@ import java.util.ResourceBundle;
 import javax.swing.BorderFactory;
 
 import mekhq.campaign.LogEntry;
-import mekhq.campaign.personnel.Person;
 
 /**
  *

@@ -499,7 +499,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 		for(EquipmentType type : ammoNeeded.keySet()) {
 			int shotsNeeded = Math.max(ammoNeeded.get(type) - getAmmoAvailable(type), 0);
 			int shotsPerTon = ((AmmoType)type).getShots();
-			cost += type.getCost(newEntity, false) * ((double)shotsNeeded/shotsPerTon);
+			cost += type.getCost(newEntity, false, -1) * ((double)shotsNeeded/shotsPerTon);
 		}
 		
 		//deal with integral heat sinks
@@ -508,8 +508,8 @@ public class Refit implements IPartWork, IAcquisitionWork {
 		if(newEntity instanceof Mech 
 				&& (((Mech)newEntity).hasDoubleHeatSinks() != ((Mech)oldUnit.getEntity()).hasDoubleHeatSinks()
 						|| ((Mech)newEntity).hasLaserHeatSinks() != ((Mech)oldUnit.getEntity()).hasLaserHeatSinks())) {
-			time += newEntity.getEngine().integralHeatSinkCapacity() * 90;
-			time += oldUnit.getEntity().getEngine().integralHeatSinkCapacity() * 90;
+			time += newEntity.getEngine().integralHeatSinkCapacity(((Mech)newEntity).hasCompactHeatSinks()) * 90;
+			time += oldUnit.getEntity().getEngine().integralHeatSinkCapacity(((Mech)newEntity).hasCompactHeatSinks()) * 90;
 			updateRefitClass(CLASS_D);
 		}
 		

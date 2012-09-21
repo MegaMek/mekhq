@@ -40,13 +40,13 @@ import javax.swing.filechooser.FileFilter;
 import megamek.client.Client;
 import megamek.common.BattleArmor;
 import megamek.common.Compute;
+import megamek.common.Crew;
 import megamek.common.CriticalSlot;
 import megamek.common.Entity;
 import megamek.common.IArmorState;
 import megamek.common.Infantry;
 import megamek.common.Mech;
 import megamek.common.Mounted;
-import megamek.common.Pilot;
 import megamek.common.Tank;
 import megamek.common.XMLStreamParser;
 import mekhq.MekHQ;
@@ -66,7 +66,7 @@ import mekhq.campaign.personnel.Person;
 public class ResolveScenarioTracker {
 	
 	Hashtable<UUID, Entity> entities;
-	Hashtable<UUID, Pilot> pilots;
+	Hashtable<UUID, Crew> pilots;
 	ArrayList<Entity> potentialSalvage;
 	ArrayList<Unit> actualSalvage;
 	ArrayList<Unit> leftoverSalvage;
@@ -86,7 +86,7 @@ public class ResolveScenarioTracker {
 		potentialSalvage = new ArrayList<Entity>();
 		actualSalvage = new ArrayList<Unit>();
 		leftoverSalvage = new ArrayList<Unit>();
-		pilots = new Hashtable<UUID, Pilot>();
+		pilots = new Hashtable<UUID, Crew>();
 		units = new ArrayList<Unit>();
 		peopleStatus = new Hashtable<UUID, PersonStatus>();
 		killCredits = new Hashtable<String, String>();
@@ -395,7 +395,7 @@ public class ResolveScenarioTracker {
 			for(Person p : crew) {
 				status = new PersonStatus(p.getName(), u.getEntity().getDisplayName(), p.getHits());			
 				if(u.usesSoloPilot()) {
-					Pilot pilot = pilots.get(p.getId());
+					Crew pilot = pilots.get(p.getId());
 					if(null == pilot) {
 						status.setMissing(true);
 					} else {
@@ -489,7 +489,7 @@ public class ResolveScenarioTracker {
 			}
 			
 			// add any ejected pilots
-			for (Pilot pilot : parser.getPilots()) {
+			for (Crew pilot : parser.getPilots()) {
 				pilots.put(UUID.fromString(pilot.getExternalIdAsString()), pilot);
 			}
 		}

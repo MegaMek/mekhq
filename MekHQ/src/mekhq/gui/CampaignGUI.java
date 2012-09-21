@@ -28,9 +28,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.Image;
-import java.awt.MenuItem;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
@@ -56,14 +54,9 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.List;
 import java.util.ResourceBundle;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
@@ -125,7 +118,6 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
-import megamek.MegaMek;
 import megamek.client.ui.Messages;
 import megamek.client.ui.swing.MechTileset;
 import megamek.client.ui.swing.MechView;
@@ -133,6 +125,7 @@ import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Aero;
 import megamek.common.AmmoType;
 import megamek.common.BattleArmor;
+import megamek.common.Crew;
 import megamek.common.Dropship;
 import megamek.common.Entity;
 import megamek.common.EntityListFile;
@@ -140,12 +133,9 @@ import megamek.common.EntityWeightClass;
 import megamek.common.Infantry;
 import megamek.common.Jumpship;
 import megamek.common.Mech;
-import megamek.common.MechFileParser;
-import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
 import megamek.common.MiscType;
 import megamek.common.Mounted;
-import megamek.common.Pilot;
 import megamek.common.Player;
 import megamek.common.SmallCraft;
 import megamek.common.Tank;
@@ -155,9 +145,7 @@ import megamek.common.UnitType;
 import megamek.common.WeaponType;
 import megamek.common.XMLStreamParser;
 import megamek.common.loaders.BLKFile;
-import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.IOption;
-import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.DirectoryItems;
 import megameklab.com.util.UnitPrintManager;
@@ -194,6 +182,7 @@ import mekhq.campaign.work.Modes;
 import mekhq.gui.dialog.AddFundsDialog;
 import mekhq.gui.dialog.BombsDialog;
 import mekhq.gui.dialog.CampaignOptionsDialog;
+import mekhq.gui.dialog.ChooseMulFilesDialog;
 import mekhq.gui.dialog.ChooseRefitDialog;
 import mekhq.gui.dialog.CompleteMissionDialog;
 import mekhq.gui.dialog.CustomizeMissionDialog;
@@ -215,7 +204,6 @@ import mekhq.gui.dialog.PopupValueChoiceDialog;
 import mekhq.gui.dialog.PortraitChoiceDialog;
 import mekhq.gui.dialog.QuirksDialog;
 import mekhq.gui.dialog.ResolveScenarioWizardDialog;
-import mekhq.gui.dialog.ChooseMulFilesDialog;
 import mekhq.gui.dialog.TextAreaDialog;
 import mekhq.gui.dialog.UnitSelectorDialog;
 import mekhq.gui.view.ContractViewPanel;
@@ -3121,7 +3109,7 @@ public class CampaignGUI extends JPanel {
 			}
 
 			// add any ejected pilots
-			for (Pilot pilot : parser.getPilots()) {
+			for (Crew pilot : parser.getPilots()) {
 				if (pilot.isEjected()) {
 					//getCampaign().addPilot(pilot, PilotPerson.T_MECHWARRIOR, false);
 				}
@@ -5867,12 +5855,12 @@ public class CampaignGUI extends JPanel {
         	String category = person.getPortraitCategory();
         	String file = person.getPortraitFileName();
 
-        	if(Pilot.ROOT_PORTRAIT.equals(category)) {
+        	if(Crew.ROOT_PORTRAIT.equals(category)) {
         		category = "";
         	}
 
         	// Return a null if the player has selected no portrait file.
-        	if ((null == category) || (null == file) || Pilot.PORTRAIT_NONE.equals(file)) {
+        	if ((null == category) || (null == file) || Crew.PORTRAIT_NONE.equals(file)) {
         		file = "default.gif";
         	}
         	// Try to get the player's portrait file.
@@ -5898,12 +5886,12 @@ public class CampaignGUI extends JPanel {
             String category = force.getIconCategory();
             String file = force.getIconFileName();
 
-            if(Pilot.ROOT_PORTRAIT.equals(category)) {
+            if(Crew.ROOT_PORTRAIT.equals(category)) {
            	 category = "";
             }
 
             // Return a null if the player has selected no portrait file.
-            if ((null == category) || (null == file) || Pilot.PORTRAIT_NONE.equals(file)) {
+            if ((null == category) || (null == file) || Crew.PORTRAIT_NONE.equals(file)) {
            	 file = "empty.png";
             }
 
@@ -6693,17 +6681,17 @@ public class CampaignGUI extends JPanel {
 								} else if(ability.getName().equals("specialist")) {
 									JMenu specialistMenu = new JMenu("Specialist");
 									menuItem = new JMenuItem("Laser Specialist" + costDesc);
-									menuItem.setActionCommand("SPECIALIST|" + Pilot.SPECIAL_LASER + "|" + cost);
+									menuItem.setActionCommand("SPECIALIST|" + Crew.SPECIAL_LASER + "|" + cost);
 									menuItem.addActionListener(this);
 									menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
 									specialistMenu.add(menuItem);
 									menuItem = new JMenuItem("Missile Specialist" + costDesc);
-									menuItem.setActionCommand("SPECIALIST|" + Pilot.SPECIAL_MISSILE + "|" + cost);
+									menuItem.setActionCommand("SPECIALIST|" + Crew.SPECIAL_MISSILE + "|" + cost);
 									menuItem.addActionListener(this);
 									menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
 									specialistMenu.add(menuItem);
 									menuItem = new JMenuItem("Ballistic Specialist" + costDesc);
-									menuItem.setActionCommand("SPECIALIST|" + Pilot.SPECIAL_BALLISTIC + "|" + cost);
+									menuItem.setActionCommand("SPECIALIST|" + Crew.SPECIAL_BALLISTIC + "|" + cost);
 									menuItem.addActionListener(this);
 									menuItem.setEnabled(cost >= 0 && person.getXp() >= cost);
 									specialistMenu.add(menuItem);
@@ -9150,12 +9138,12 @@ public class CampaignGUI extends JPanel {
 	        String category = person.getPortraitCategory();
 	        String file = person.getPortraitFileName();
 
-	        if(Pilot.ROOT_PORTRAIT.equals(category)) {
+	        if(Crew.ROOT_PORTRAIT.equals(category)) {
 	            category = "";
 	        }
 
 	        // Return a null if the player has selected no portrait file.
-	        if ((null == category) || (null == file) || Pilot.PORTRAIT_NONE.equals(file)) {
+	        if ((null == category) || (null == file) || Crew.PORTRAIT_NONE.equals(file)) {
 	        	file = "default.gif";
 	        }
 

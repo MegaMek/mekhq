@@ -20,20 +20,21 @@
  */
 package mekhq.gui.dialog;
 
-import megamek.client.ui.swing.BombChoicePanel;
-import megamek.common.Aero;
-import mekhq.campaign.Campaign;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+
+import megamek.client.ui.swing.BombChoicePanel;
+import megamek.common.Aero;
+import mekhq.campaign.Campaign;
 
 /**
  * @author Deric Page (dericpage@users.sourceforge.net)

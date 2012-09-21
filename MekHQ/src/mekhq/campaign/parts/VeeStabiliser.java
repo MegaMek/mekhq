@@ -24,7 +24,6 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 
 import megamek.common.EquipmentType;
-import megamek.common.Mech;
 import megamek.common.Tank;
 import megamek.common.TechConstants;
 import mekhq.campaign.Campaign;

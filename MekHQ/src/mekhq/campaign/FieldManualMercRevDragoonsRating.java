@@ -20,12 +20,20 @@
  */
 package mekhq.campaign;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.UUID;
+
 import megamek.common.ASFBay;
 import megamek.common.Aero;
 import megamek.common.BattleArmor;
 import megamek.common.BattleArmorBay;
 import megamek.common.Bay;
 import megamek.common.ConvFighter;
+import megamek.common.Crew;
 import megamek.common.Dropship;
 import megamek.common.Entity;
 import megamek.common.EntityMovementMode;
@@ -36,7 +44,6 @@ import megamek.common.Jumpship;
 import megamek.common.LightVehicleBay;
 import megamek.common.Mech;
 import megamek.common.MechBay;
-import megamek.common.Pilot;
 import megamek.common.Protomech;
 import megamek.common.SmallCraft;
 import megamek.common.SmallCraftBay;
@@ -48,13 +55,6 @@ import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
-
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.UUID;
 
 /**
  * @author Deric Page (deric (dot) page (at) usa.net)
@@ -284,7 +284,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
         }
 
         //Calculate the unit's average combat skill.
-        Pilot p = u.getEntity().getCrew();
+        Crew p = u.getEntity().getCrew();
         BigDecimal combatSkillAverage;
 
         //Infantry and Protos do not have a piloting skill.

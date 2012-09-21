@@ -20,6 +20,10 @@
  */
 package mekhq.campaign;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.UUID;
+
 import megamek.common.ASFBay;
 import megamek.common.Aero;
 import megamek.common.BattleArmor;
@@ -41,10 +45,6 @@ import megamek.common.Warship;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
-
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.UUID;
 
 /**
  * @author Deric Page (deric (dot) page (at) usa.net)

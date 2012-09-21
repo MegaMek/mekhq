@@ -26,14 +26,13 @@ import java.io.Serializable;
 import java.util.UUID;
 import java.util.Vector;
 
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * this is a hierarchical object that represents forces from the TO&E using 

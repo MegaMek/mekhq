@@ -22,14 +22,12 @@
 package mekhq.gui.dialog;
 
 import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.GridBagLayout;
 import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
 
 import mekhq.campaign.ResolveScenarioTracker;
-import mekhq.campaign.mission.Contract;
 
 /**
  *

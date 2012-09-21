@@ -20,7 +20,7 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
-import megamek.common.Pilot;
+import megamek.common.Crew;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.ForceStub;
 import mekhq.campaign.force.UnitStub;
@@ -275,12 +275,12 @@ public class ScenarioViewPanel extends javax.swing.JPanel {
         	String category = unit.getPortraitCategory();
         	String file = unit.getPortraitFileName();
         	
-        	if(Pilot.ROOT_PORTRAIT.equals(category)) {
+        	if(Crew.ROOT_PORTRAIT.equals(category)) {
         		category = "";
         	}
         	
         	// Return a null if the player has selected no portrait file.
-        	if ((null == category) || (null == file) || Pilot.PORTRAIT_NONE.equals(file)) {
+        	if ((null == category) || (null == file) || Crew.PORTRAIT_NONE.equals(file)) {
         		file = "default.gif";
         	}
         	// Try to get the player's portrait file.
@@ -306,12 +306,12 @@ public class ScenarioViewPanel extends javax.swing.JPanel {
             String category = force.getIconCategory();
             String file = force.getIconFileName();
 
-            if(Pilot.ROOT_PORTRAIT.equals(category)) {
+            if(Crew.ROOT_PORTRAIT.equals(category)) {
            	 category = "";
             }
 
             // Return a null if the player has selected no portrait file.
-            if ((null == category) || (null == file) || Pilot.PORTRAIT_NONE.equals(file)) {
+            if ((null == category) || (null == file) || Crew.PORTRAIT_NONE.equals(file)) {
            	 file = "empty.png";
             }
 

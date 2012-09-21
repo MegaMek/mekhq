@@ -22,7 +22,6 @@
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
-import java.util.Vector;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;

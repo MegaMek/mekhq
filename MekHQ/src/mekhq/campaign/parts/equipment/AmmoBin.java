@@ -123,10 +123,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
         int itemCost = 0;      
         try {
-        	itemCost = (int) type.getCost(en, isArmored);
-        	if (itemCost == EquipmentType.COST_VARIABLE) {
-        		itemCost = type.resolveVariableCost(en, isArmored);
-        	}
+        	itemCost = (int) type.getCost(en, isArmored, -1);
         } catch(NullPointerException ex) {
         	System.out.println("Found a null entity while calculating cost for " + name);
         }

@@ -21,8 +21,6 @@
 
 package mekhq.campaign.parts;
 
-import java.io.PrintWriter;
-
 import megamek.common.CriticalSlot;
 import megamek.common.EquipmentType;
 import megamek.common.Mech;

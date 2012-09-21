@@ -39,12 +39,12 @@ import java.util.Vector;
 import megamek.common.Aero;
 import megamek.common.BattleArmor;
 import megamek.common.ConvFighter;
+import megamek.common.Crew;
 import megamek.common.Entity;
 import megamek.common.EntityMovementMode;
 import megamek.common.Infantry;
 import megamek.common.Jumpship;
 import megamek.common.Mech;
-import megamek.common.Pilot;
 import megamek.common.SmallCraft;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
@@ -55,11 +55,11 @@ import megamek.common.options.PilotOptions;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.LogEntry;
 import mekhq.campaign.MekHqXmlSerializable;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Ranks;
 import mekhq.campaign.Unit;
-import mekhq.campaign.LogEntry;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IMedicalWork;
 import mekhq.campaign.work.IPartWork;
@@ -170,8 +170,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     	this.name = name;
     	callsign = "";
         daysRest = 0;
-        portraitCategory = Pilot.ROOT_PORTRAIT;
-        portraitFile = Pilot.PORTRAIT_NONE;
+        portraitCategory = Crew.ROOT_PORTRAIT;
+        portraitFile = Crew.PORTRAIT_NONE;
         xp = 0;
         gender = G_MALE;
         birthday = new GregorianCalendar(3042, Calendar.JANUARY, 1);
@@ -803,8 +803,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 	            StringTokenizer st = new StringTokenizer(advantages,"::");
 	            while (st.hasMoreTokens()) {
 	                String adv = st.nextToken();
-	                String advName = Pilot.parseAdvantageName(adv);
-	                Object value = Pilot.parseAdvantageValue(adv);
+	                String advName = Crew.parseAdvantageName(adv);
+	                Object value = Crew.parseAdvantageValue(adv);
 
 	                try {
 	                    retVal.getOptions().getOption(advName).setValue(value);
@@ -817,8 +817,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 	            StringTokenizer st = new StringTokenizer(edge,"::");
 	            while (st.hasMoreTokens()) {
 	                String adv = st.nextToken();
-	                String advName = Pilot.parseAdvantageName(adv);
-	                Object value = Pilot.parseAdvantageValue(adv);
+	                String advName = Crew.parseAdvantageName(adv);
+	                Object value = Crew.parseAdvantageValue(adv);
 
 	                try {
 	                    retVal.getOptions().getOption(advName).setValue(value);
@@ -831,8 +831,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 	            StringTokenizer st = new StringTokenizer(implants,"::");
 	            while (st.hasMoreTokens()) {
 	                String adv = st.nextToken();
-	                String advName = Pilot.parseAdvantageName(adv);
-	                Object value = Pilot.parseAdvantageValue(adv);
+	                String advName = Crew.parseAdvantageName(adv);
+	                Object value = Crew.parseAdvantageValue(adv);
 
 	                try {
 	                    retVal.getOptions().getOption(advName).setValue(value);

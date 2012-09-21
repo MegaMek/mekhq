@@ -23,8 +23,8 @@ import javax.swing.JLabel;
 import megamek.client.ui.Messages;
 import megamek.client.ui.swing.MechTileset;
 import megamek.client.ui.swing.util.PlayerColors;
+import megamek.common.Crew;
 import megamek.common.Entity;
-import megamek.common.Pilot;
 import megamek.common.Player;
 import megamek.common.UnitType;
 import megamek.common.util.DirectoryItems;
@@ -155,12 +155,12 @@ public class ForceViewPanel extends javax.swing.JPanel {
         String category = f.getIconCategory();
         String file = f.getIconFileName();
 
-        if(Pilot.ROOT_PORTRAIT.equals(category)) {
+        if(Crew.ROOT_PORTRAIT.equals(category)) {
             category = "";
         }
 
         // Return a null if the player has selected no portrait file.
-        if ((null == category) || (null == file) || Pilot.PORTRAIT_NONE.equals(file)) {
+        if ((null == category) || (null == file) || Crew.PORTRAIT_NONE.equals(file)) {
         	file = "empty.png";
         }
 
@@ -471,12 +471,12 @@ public class ForceViewPanel extends javax.swing.JPanel {
         String category = p.getPortraitCategory();
         String file = p.getPortraitFileName();
 
-        if(Pilot.ROOT_PORTRAIT.equals(category)) {
+        if(Crew.ROOT_PORTRAIT.equals(category)) {
             category = "";
         }
 
         // Return a null if the player has selected no portrait file.
-        if ((null == category) || (null == file) || Pilot.PORTRAIT_NONE.equals(file)) {
+        if ((null == category) || (null == file) || Crew.PORTRAIT_NONE.equals(file)) {
         	file = "default.gif";
         }
 

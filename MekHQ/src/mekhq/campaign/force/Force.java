@@ -35,7 +35,6 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
-import mekhq.campaign.personnel.Person;
 
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;

@@ -21,11 +21,7 @@
 
 package mekhq.campaign.parts;
 
-import java.util.Calendar;
-
 import megamek.common.EquipmentType;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.Faction;
 
 /**
  * Helper functions for determining part availibility and tech base

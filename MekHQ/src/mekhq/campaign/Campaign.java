@@ -58,13 +58,12 @@ import megamek.common.Bay;
 import megamek.common.CargoBay;
 import megamek.common.Compute;
 import megamek.common.Coords;
+import megamek.common.Crew;
 import megamek.common.Dropship;
 import megamek.common.Entity;
 import megamek.common.EntityMovementMode;
-import megamek.common.EntityMovementType;
 import megamek.common.Game;
 import megamek.common.HeavyVehicleBay;
-import megamek.common.INarcPod;
 import megamek.common.Infantry;
 import megamek.common.InfantryBay;
 import megamek.common.Jumpship;
@@ -76,17 +75,14 @@ import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
 import megamek.common.MiscType;
 import megamek.common.Mounted;
-import megamek.common.Pilot;
 import megamek.common.Player;
 import megamek.common.Protomech;
-import megamek.common.Sensor;
 import megamek.common.SmallCraft;
 import megamek.common.SmallCraftBay;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
 import megamek.common.VTOL;
-import megamek.common.Warship;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.GameOptions;
@@ -2933,16 +2929,16 @@ public class Campaign implements Serializable {
 				}
 				String name = weightedList.get(Compute.randomInt(weightedList.size()));
 				if(name.equals("specialist")) {
-					String special = Pilot.SPECIAL_NONE;
+					String special = Crew.SPECIAL_NONE;
 					switch(Compute.randomInt(2)) {
 					case 0:
-						special = Pilot.SPECIAL_LASER;
+						special = Crew.SPECIAL_LASER;
 						break;
 					case 1:
-						special = Pilot.SPECIAL_BALLISTIC;
+						special = Crew.SPECIAL_BALLISTIC;
 						break;
 					case 2: 
-						special = Pilot.SPECIAL_MISSILE;
+						special = Crew.SPECIAL_MISSILE;
 						break;
 					}
 					person.acquireAbility(PilotOptions.LVL3_ADVANTAGES, name, special);

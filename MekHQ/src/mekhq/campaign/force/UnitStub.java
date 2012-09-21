@@ -24,16 +24,14 @@ package mekhq.campaign.force;
 import java.io.PrintWriter;
 import java.io.Serializable;
 
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import megamek.common.Pilot;
+import megamek.common.Crew;
 import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
 import mekhq.campaign.personnel.Person;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 
 	public class UnitStub implements Serializable {
@@ -48,14 +46,14 @@ import mekhq.campaign.personnel.Person;
 		private String portraitFileName;
 		
 		public UnitStub() {
-			portraitCategory = Pilot.ROOT_PORTRAIT;
-	        portraitFileName = Pilot.PORTRAIT_NONE;
+			portraitCategory = Crew.ROOT_PORTRAIT;
+	        portraitFileName = Crew.PORTRAIT_NONE;
 			desc = "";
 		}
 		
 		public UnitStub(Unit u) {
-			portraitCategory = Pilot.ROOT_PORTRAIT;
-	        portraitFileName = Pilot.PORTRAIT_NONE;
+			portraitCategory = Crew.ROOT_PORTRAIT;
+	        portraitFileName = Crew.PORTRAIT_NONE;
 			desc = getUnitDescription(u);
 			Person commander = u.getCommander();
 			if(null != commander) {

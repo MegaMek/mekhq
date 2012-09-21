@@ -22,7 +22,7 @@ import javax.swing.event.MouseInputAdapter;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
 
-import megamek.common.Pilot;
+import megamek.common.Crew;
 import megamek.common.util.DirectoryItems;
 
 /**
@@ -107,7 +107,7 @@ public class PortraitChoiceDialog extends javax.swing.JDialog {
 
         DefaultComboBoxModel categoryModel = new DefaultComboBoxModel();
         String match = null;
-        categoryModel.addElement(Pilot.ROOT_PORTRAIT);
+        categoryModel.addElement(Crew.ROOT_PORTRAIT);
         if (portraits != null) {
             Iterator<String> names = portraits.getCategoryNames();
             while (names.hasNext()) {
@@ -123,7 +123,7 @@ public class PortraitChoiceDialog extends javax.swing.JDialog {
         if(null != match) {
             categoryModel.setSelectedItem(match);
         } else {
-            categoryModel.setSelectedItem(Pilot.ROOT_PORTRAIT);
+            categoryModel.setSelectedItem(Crew.ROOT_PORTRAIT);
         }
         comboCategories.setModel(categoryModel);
         comboCategories.setName("comboCategories"); // NOI18N
@@ -178,7 +178,7 @@ public class PortraitChoiceDialog extends javax.swing.JDialog {
 	    if(tablePortrait.getSelectedRow() != -1) {
 	        filename = (String) portraitModel.getValueAt(tablePortrait.getSelectedRow(), 0);
 	    } else {
-	        filename = Pilot.PORTRAIT_NONE;
+	        filename = Crew.PORTRAIT_NONE;
 	    }
 	    setVisible(false);
 	}//GEN-LAST:event_btnSelectActionPerformed
@@ -202,8 +202,8 @@ public class PortraitChoiceDialog extends javax.swing.JDialog {
         portraitModel.setCategory(category);
         // Translate the "root camo" category name.
         Iterator<String> portraitNames;
-        if (Pilot.ROOT_PORTRAIT.equals(category)) {
-            portraitModel.addPortrait(Pilot.PORTRAIT_NONE);
+        if (Crew.ROOT_PORTRAIT.equals(category)) {
+            portraitModel.addPortrait(Crew.PORTRAIT_NONE);
             portraitNames = portraits.getItemNames(""); //$NON-NLS-1$
         } else {
             portraitNames = portraits.getItemNames(category);
@@ -234,7 +234,7 @@ public class PortraitChoiceDialog extends javax.swing.JDialog {
 
         public PortraitTableModel() {
             columnNames = new String[] {"Portraits"};
-            category = Pilot.ROOT_PORTRAIT;
+            category = Crew.ROOT_PORTRAIT;
             names = new ArrayList<String>();
             images = new ArrayList<Image>();
         }
@@ -248,7 +248,7 @@ public class PortraitChoiceDialog extends javax.swing.JDialog {
         }
 
         public void reset() {
-            category = Pilot.ROOT_PORTRAIT;
+            category = Crew.ROOT_PORTRAIT;
             names = new ArrayList<String>();
             images = new ArrayList<Image>();
         }
@@ -380,14 +380,14 @@ public class PortraitChoiceDialog extends javax.swing.JDialog {
         public void setImage(String category, String name) {
 
             if (null == category
-                    || name.equals(Pilot.PORTRAIT_NONE)) {
+                    || name.equals(Crew.PORTRAIT_NONE)) {
                 return;
             }
 
             // Try to get the portrait file.
             try {
                 // Translate the root portrait directory name.
-                if (Pilot.ROOT_PORTRAIT.equals(category))
+                if (Crew.ROOT_PORTRAIT.equals(category))
                     category = ""; //$NON-NLS-1$
                 Image portrait = (Image) portraits.getItem(category, name);
                 if(null != portrait) {

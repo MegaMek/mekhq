@@ -24,7 +24,6 @@ package mekhq.campaign;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.Iterator;
 
 import megamek.common.Aero;
 import megamek.common.AmmoType;
@@ -32,7 +31,6 @@ import megamek.common.Engine;
 import megamek.common.EquipmentType;
 import megamek.common.Mech;
 import megamek.common.MiscType;
-import megamek.common.WeaponType;
 import megamek.common.verifier.TestEntity;
 import megamek.common.weapons.BayWeapon;
 import megamek.common.weapons.InfantryAttack;
