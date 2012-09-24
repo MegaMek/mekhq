@@ -1215,13 +1215,14 @@ public class Campaign implements Serializable {
 
 		//remove unit from any forces
 		removeUnitFromForce(unit);
-		
+
 		// finally remove the unit
 		units.remove(unit);
 		unitIds.remove(unit.getId());
 		checkDuplicateNamesDuringDelete(unit.getEntity());
 		addReport(unit.getName()
 				+ " has been removed from the unit roster.");
+				
 	}
 
 	public void removePerson(UUID id) {
@@ -1319,6 +1320,11 @@ public class Campaign implements Serializable {
 				removeUnitsFromNetwork(removedUnits);
 				refreshNetworks();
 			}
+			if(u.getEntity().hasC3M()) {
+				removeUnitsFromC3Master(u);
+			}
+			u.getEntity().setC3MasterIsUUIDAsString(null);
+			u.getEntity().setC3Master(null);
 		}
 	}
 	 
@@ -3841,7 +3847,8 @@ public class Campaign implements Serializable {
 			Entity entity = unit.getEntity();
 			if (null != entity && (entity.hasC3() || entity.hasC3i())) {
 	            boolean C3iSet = false;
-	
+	            boolean C3Set = false;
+	            
 	            for (Enumeration<Entity> entities = game.getEntities(); entities
 	                    .hasMoreElements();) {
 	                Entity e = entities.nextElement();
@@ -3852,15 +3859,11 @@ public class Campaign implements Serializable {
 	                            && entity.getC3MasterIsUUIDAsString().equals(
 	                                    e.getC3UUIDAsString())) {
 	                        entity.setC3Master(e);
-	                        entity.setC3MasterIsUUIDAsString(null);
-	                    } else if ((e.getC3MasterIsUUIDAsString() != null)
-	                            && e.getC3MasterIsUUIDAsString().equals(
-	                                    entity.getC3UUIDAsString())) {
-	                        e.setC3Master(entity);
-	                        e.setC3MasterIsUUIDAsString(null);
-	                    }
+	                        C3Set = true;
+	                        break;
+	                    } 
 	                }
-	
+	                
 	                // C3i Checks// C3i Checks
 	                if (entity.hasC3i() && (C3iSet == false)) {
 						entity.setC3NetIdSelf();
@@ -3976,6 +3979,78 @@ public class Campaign implements Serializable {
     		}
     	}
     	return networks;
+    }
+    
+    public Vector<String[]> getAvailableC3MastersForSlaves() {
+    	Vector<String[]> networks = new Vector<String[]>();
+    	Vector<String> networkNames = new Vector<String>();
+
+    	for(Entity en : getEntities()) {
+    		//count of free c3 nodes for single company-level masters
+    		//will not be right so skip
+    		if(en.hasC3M() && !en.hasC3MM() && en.C3MasterIs(en)) {
+    			continue;
+    		}
+    		if(en.calculateFreeC3Nodes() > 0) {
+    			String[] network = new String[3];
+    			network[0] = en.getC3UUIDAsString();
+    			network[1] = "" + en.calculateFreeC3Nodes();
+    			network[2] = "" + en.getShortName();
+    			if(!networkNames.contains(network[0])) {
+    				networks.add(network);
+    				networkNames.add(network[0]);
+    			}
+    		}
+    	}
+    	
+    	return networks;
+    }
+    
+    public Vector<String[]> getAvailableC3MastersForMasters() {
+    	Vector<String[]> networks = new Vector<String[]>();
+    	Vector<String> networkNames = new Vector<String>();
+
+    	for(Entity en : getEntities()) {
+    		if(en.calculateFreeC3MNodes() > 0) {
+    			String[] network = new String[3];
+    			network[0] = en.getC3UUIDAsString();
+    			network[1] = "" + en.calculateFreeC3MNodes();
+    			network[2] = "" + en.getShortName();
+    			if(!networkNames.contains(network[0])) {
+    				networks.add(network);
+    				networkNames.add(network[0]);
+    			}
+    		}
+    	}
+    	
+    	return networks;
+    }
+    
+    public void removeUnitsFromC3Master(Unit master) {
+    	for(Unit unit : getUnits()) {
+    		if(null != unit.getEntity().getC3MasterIsUUIDAsString() 
+    				&& unit.getEntity().getC3MasterIsUUIDAsString().equals(
+    						master.getEntity().getC3UUIDAsString())) {
+    			unit.getEntity().setC3MasterIsUUIDAsString(null);
+    			unit.getEntity().setC3Master(null);
+    		}
+    	}
+    	refreshNetworks();
+    }
+    
+    /**
+     * This function reloads the game entities into the game 
+     * at the end of scenario resolution, so that entities are
+     * properly updated and destroyed ones removed
+     */
+    public void reloadGameEntities() {
+    	game.reset();
+    	for(Unit u : units) {
+    		Entity en = u.getEntity();
+    		if(null != en) {
+    			game.addEntity(en.getId(), en);
+    		}
+    	}
     }
     
 }

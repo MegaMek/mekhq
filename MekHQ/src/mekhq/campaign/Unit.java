@@ -273,6 +273,12 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 	}
 
 	public void setEntity(Entity en) {
+		//if there is already an entity, then make sure this
+		//one gets some of the same things set
+		if(null != this.entity) {
+			en.setId(this.entity.getId());
+			en.duplicateMarker = this.entity.duplicateMarker;
+		}
 		this.entity = en;
 	}
 

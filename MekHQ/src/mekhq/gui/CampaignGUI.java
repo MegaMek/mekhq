@@ -5460,6 +5460,34 @@ public class CampaignGUI extends JPanel {
             } else if(command.contains("ADD_NETWORK")) {
             	getCampaign().addUnitsToNetwork(units, target);
                 refreshOrganization();
+            } else if(command.contains("ADD_SLAVES")) {
+            	for(Unit u : units) {
+            		u.getEntity().setC3MasterIsUUIDAsString(target);
+            	}
+            	getCampaign().refreshNetworks();
+                refreshOrganization();
+            } else if(command.contains("SET_MM")) {
+            	for(Unit u : units) {
+                	getCampaign().removeUnitsFromC3Master(u);
+            		u.getEntity().setC3MasterIsUUIDAsString(u.getEntity().getC3UUIDAsString());
+            	}
+            	getCampaign().refreshNetworks();
+                refreshOrganization();
+            } else if(command.contains("SET_IND_M")) {
+            	for(Unit u : units) {
+            		u.getEntity().setC3MasterIsUUIDAsString(null);
+            		u.getEntity().setC3Master(null);
+                	getCampaign().removeUnitsFromC3Master(u);
+            	}
+            	getCampaign().refreshNetworks();
+                refreshOrganization();
+            } if(command.contains("REMOVE_C3")) {
+            	for(Unit u : units) {
+            		u.getEntity().setC3MasterIsUUIDAsString(null);
+            		u.getEntity().setC3Master(null);
+            	}
+            	getCampaign().refreshNetworks();
+                refreshOrganization();
             }
 		}
 
@@ -5504,7 +5532,7 @@ public class CampaignGUI extends JPanel {
 			return true;
 		}
 		
-		private boolean areAllUnitsNotNetworked(Vector<Unit> units) {
+		private boolean areAllUnitsNotC3iNetworked(Vector<Unit> units) {
 			for(Unit unit : units) {
 				Entity e = unit.getEntity();
 				if(null == e) {
@@ -5517,7 +5545,7 @@ public class CampaignGUI extends JPanel {
 			return true;
 		}
 		
-		private boolean areAllUnitsNetworked(Vector<Unit> units) {
+		private boolean areAllUnitsC3iNetworked(Vector<Unit> units) {
 			for(Unit unit : units) {
 				Entity e = unit.getEntity();
 				if(null == e) {
@@ -5533,7 +5561,7 @@ public class CampaignGUI extends JPanel {
 			return true;
 		}
 		
-		private boolean areAllUnitsOnSameNetwork(Vector<Unit> units) {
+		private boolean areAllUnitsOnSameC3iNetwork(Vector<Unit> units) {
 			String network = null;
 			for(Unit unit : units) {
 				Entity e = unit.getEntity();
@@ -5550,6 +5578,75 @@ public class CampaignGUI extends JPanel {
 				}
 			}
 			return true;
+		}
+		
+		private boolean areAllUnitsC3Slaves(Vector<Unit> units) {
+			for(Unit unit : units) {
+				Entity e = unit.getEntity();
+				if(null == e) {
+					return false;
+				}
+				if(!e.hasC3S()) {
+					return false;
+				}
+			}
+			return true;
+		}
+		
+		private boolean areAllUnitsIndependentC3Masters(Vector<Unit> units) {
+			for(Unit unit : units) {
+				Entity e = unit.getEntity();
+				if(null == e) {
+					return false;
+				}
+				if(!e.hasC3M()) {
+					return false;
+				}
+				if(e.hasC3MM()) {
+					return false;
+				}
+				if(e.C3MasterIs(unit.getEntity())) {
+					return false;
+				}
+			}
+			return true;
+		}
+		
+		private boolean areAllUnitsCompanyLevelMasters(Vector<Unit> units) {
+			for(Unit unit : units) {
+				Entity e = unit.getEntity();
+				if(null == e) {
+					return false;
+				}
+				if(!e.hasC3M()) {
+					return false;
+				}
+				if(e.hasC3MM()) {
+					return false;
+				}
+				if(!e.C3MasterIs(unit.getEntity())) {
+					return false;
+				}
+			}
+			return true;
+		
+		}
+		
+		private boolean doAllUnitsHaveC3Master(Vector<Unit> units) {
+			for(Unit unit : units) {
+				Entity e = unit.getEntity();
+				if(null == e) {
+					return false;
+				}
+				if(!e.hasC3()) {
+					return false;
+				}
+				if(null == e.getC3Master() || e.C3MasterIs(unit.getEntity())) {
+					return false;
+				}
+			}
+			return true;
+		
 		}
 		
 		private void maybeShowPopup(MouseEvent e) {
@@ -5674,17 +5771,70 @@ public class CampaignGUI extends JPanel {
                 	for(int i = 1; i<units.size(); i++) {
                 		unitIds += "|" + units.get(i).getId().toString();
                 	}
+                	JMenu networkMenu = new JMenu("Network");
+            		JMenu availMenu;                   	
+            		if(areAllUnitsC3Slaves(units)) {
+            			availMenu = new JMenu("Slave to");
+                		for(String[] network : getCampaign().getAvailableC3MastersForSlaves()) {
+                			int nodesFree = Integer.parseInt(network[1]);
+                			if(nodesFree >= units.size()) {
+                				menuItem = new JMenuItem(network[2] + ": " + network[1] + " nodes free");
+                				menuItem.setActionCommand("ADD_SLAVES|UNIT|" + network[0] + "|" + unitIds);
+                				menuItem.addActionListener(this);
+                				menuItem.setEnabled(true);
+                				availMenu.add(menuItem);
+                			}
+                		}
+                		if(availMenu.getItemCount() > 0) {
+                			networkMenu.add(availMenu);
+                		}
+            		}            
+            		if(areAllUnitsIndependentC3Masters(units)) {
+            			menuItem = new JMenuItem("Set as Company Level Master");
+            			menuItem.setActionCommand("SET_MM|UNIT|empty|" + unitIds);
+        				menuItem.addActionListener(this);
+        				menuItem.setEnabled(true);
+        				networkMenu.add(menuItem);
+        				availMenu = new JMenu("Slave to");
+                		for(String[] network : getCampaign().getAvailableC3MastersForMasters()) {
+                			int nodesFree = Integer.parseInt(network[1]);
+                			if(nodesFree >= units.size()) {
+                				menuItem = new JMenuItem(network[2] + ": " + network[1] + " nodes free");
+                				menuItem.setActionCommand("ADD_SLAVES|UNIT|" + network[0] + "|" + unitIds);
+                				menuItem.addActionListener(this);
+                				menuItem.setEnabled(true);
+                				availMenu.add(menuItem);
+                			}
+                		}
+                		if(availMenu.getItemCount() > 0) {
+                			networkMenu.add(availMenu);
+                		}
+            		}
+            		if(areAllUnitsCompanyLevelMasters(units)) {
+            			menuItem = new JMenuItem("Set as Independent Master");
+            			menuItem.setActionCommand("SET_IND_M|UNIT|empty|" + unitIds);
+        				menuItem.addActionListener(this);
+        				menuItem.setEnabled(true);
+        				networkMenu.add(menuItem);
+            		}
+            		if(doAllUnitsHaveC3Master(units)) {
+            			menuItem = new JMenuItem("Remove from network");
+            			menuItem.setActionCommand("REMOVE_C3|UNIT|empty|" + unitIds);
+        				menuItem.addActionListener(this);
+        				menuItem.setEnabled(true);
+        				networkMenu.add(menuItem);
+            		}
                 	if(doAllUnitsHaveC3i(units)) {
-                		JMenu networkMenu = new JMenu("Network");
-	                	if(multipleSelection && areAllUnitsNotNetworked(units) && units.size() < 7) {
+                		          		
+	                	if(multipleSelection && areAllUnitsNotC3iNetworked(units) && units.size() < 7) {
 		                	menuItem = new JMenuItem("Create new C3i network");
 		                	menuItem.setActionCommand("C3I|UNIT|empty|" + unitIds);
 		                	menuItem.addActionListener(this);
 		                	menuItem.setEnabled(true);
 		                	networkMenu.add(menuItem);
 	                	}
-	                	if(areAllUnitsNotNetworked(units)) {
-	                		JMenu availMenu = new JMenu("Add to network");
+	                	if(areAllUnitsNotC3iNetworked(units)) {
+	                		availMenu = new JMenu("Add to network");
 	                		for(String[] network : getCampaign().getAvailableC3iNetworks()) {
 	                			int nodesFree = Integer.parseInt(network[1]);
 	                			if(nodesFree >= units.size()) {
@@ -5699,13 +5849,13 @@ public class CampaignGUI extends JPanel {
 	                			networkMenu.add(availMenu);
 	                		}
 	                	}
-	                	if(areAllUnitsNetworked(units)) {
+	                	if(areAllUnitsC3iNetworked(units)) {
 	                		menuItem = new JMenuItem("Remove from network");
 		                	menuItem.setActionCommand("REMOVE_NETWORK|UNIT|empty|" + unitIds);
 		                	menuItem.addActionListener(this);
 		                	menuItem.setEnabled(true);
 		                	networkMenu.add(menuItem);
-		                	 if(areAllUnitsOnSameNetwork(units)) {
+		                	if(areAllUnitsOnSameC3iNetwork(units)) {
 		                		 menuItem = new JMenuItem("Disband this network");
 		                		 menuItem.setActionCommand("DISBAND_NETWORK|UNIT|empty|" + unitIds);
 		                		 menuItem.addActionListener(this);
@@ -5713,10 +5863,10 @@ public class CampaignGUI extends JPanel {
 		                		 networkMenu.add(menuItem);
 		                	 }
 	                	}        
-	                	if(networkMenu.getItemCount() > 0) {
-                			popup.add(networkMenu);
-                		}
                 	}
+                	if(networkMenu.getItemCount() > 0) {
+            			popup.add(networkMenu);
+            		}
                 	menuItem = new JMenuItem("Remove Unit from TO&E");
                 	menuItem.setActionCommand("REMOVE_UNIT|UNIT|empty|" + unitIds);
                 	menuItem.addActionListener(this);
@@ -5804,17 +5954,40 @@ public class CampaignGUI extends JPanel {
             	}
             	Entity entity = u.getEntity();
             	if (entity.hasC3i()) {
-                    if (entity.calculateFreeC3Nodes() >= 5) {
-                        c3network += Messages.getString("ChatLounge.C3iNone");
-                    } else {
-                        c3network += Messages
-                                .getString("ChatLounge.C3iNetwork")
-                                + entity.getC3NetId();
-                        if (entity.calculateFreeC3Nodes() > 0) {
-                            c3network += Messages.getString("ChatLounge.C3Nodes",
-                                    new Object[] { entity.calculateFreeC3Nodes() });
-                        }
-                    }
+            		if (entity.calculateFreeC3Nodes() >= 5) {
+            			c3network += Messages.getString("ChatLounge.C3iNone");
+            		} else {
+                         c3network += c3network += Messages
+                                 .getString("ChatLounge.C3iNetwork")
+                                 + entity.getC3NetId();
+                         if (entity.calculateFreeC3Nodes() > 0) {
+                             c3network += Messages.getString("ChatLounge.C3Nodes",
+                                     new Object[] { entity.calculateFreeC3Nodes() });
+                         }
+                     }
+                 } else if (entity.hasC3()) {
+                     if (entity.C3MasterIs(entity)) {
+                         c3network += Messages.getString("ChatLounge.C3Master");
+                         c3network += Messages.getString("ChatLounge.C3MNodes",
+                                     new Object[] { entity.calculateFreeC3MNodes() });
+                         if(entity.hasC3MM()) {
+                         	c3network += Messages.getString("ChatLounge.C3SNodes",
+                                     new Object[] { entity.calculateFreeC3Nodes() });
+                         }
+                     } else if (!entity.hasC3S()) {
+                         c3network += Messages.getString("ChatLounge.C3Master");
+                         c3network += Messages.getString("ChatLounge.C3SNodes",
+                                     new Object[] { entity.calculateFreeC3Nodes() });
+                         // an independent master might also be a slave to a company
+                         // master
+                         if (entity.getC3Master() != null) {
+                             c3network += "<br>" + Messages.getString("ChatLounge.C3Slave") + entity.getC3Master().getShortName(); //$NON-NLS-1$
+                         }
+                     } else if (entity.getC3Master() != null) {
+                         c3network += Messages.getString("ChatLounge.C3Slave") + entity.getC3Master().getShortName(); //$NON-NLS-1$
+                     } else {
+                         c3network += Messages.getString("ChatLounge.C3None");
+                     }
                 }
             	if(!c3network.isEmpty()) {
             		c3network = "<br><i>" + c3network + "</i>";

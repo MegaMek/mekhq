@@ -53,6 +53,8 @@ v0.1.17 (SVN)
 + Planetary data update 22
 + Planetary data update 23
 + updated MM.jar and fixed reference bugs
++ Bug: unit numbering and id lost when resolving scenarios by MUL
++ set up C3 networks in TO&E tab
 
 v0.1.16 (2012-05-23)
 + removed PartsInventory, quantity is now tracked directly by part

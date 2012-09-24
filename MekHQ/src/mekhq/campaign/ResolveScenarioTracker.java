@@ -685,6 +685,7 @@ public class ResolveScenarioTracker {
 		scenario.setReport(report);
 		scenario.clearAllForcesAndPersonnel(campaign);	
 		//lets reset the network ids from the c3UUIDs
+		campaign.reloadGameEntities();
 		campaign.refreshNetworks();
 		scenario.setDate(campaign.getCalendar().getTime());
 		client = null;
