@@ -55,6 +55,7 @@ v0.1.17 (SVN)
 + updated MM.jar and fixed reference bugs
 + Bug: unit numbering and id lost when resolving scenarios by MUL
 + set up C3 networks in TO&E tab
++ Bug: secondary techs and doctors get no time
 
 v0.1.16 (2012-05-23)
 + removed PartsInventory, quantity is now tracked directly by part

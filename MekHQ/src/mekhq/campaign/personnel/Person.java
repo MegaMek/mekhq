@@ -1574,8 +1574,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 	        this.overtimeLeft = 240;
     	}
     	if(isTechSecondary() || getSecondaryRole() == T_DOCTOR) {
-        	this.minutesLeft /= 2;
-        	this.overtimeLeft /= 2;
+        	this.minutesLeft = 240;
+        	this.overtimeLeft = 240;
         }
     }
     
