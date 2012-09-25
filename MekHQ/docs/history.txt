@@ -23,7 +23,7 @@ v0.1.17 (SVN)
 + better information about why a part cannot be scrapped
 + Fixed the code for the Tech Rating portion of the Dragoons Rating.
 + allow multiple discontiguous selections in TO&E
-+ set up c3i networks in TO&E tab
++ set up c3i networks in TO&E tab (fix for bug 3537061 C3 Networking)
 + Planetary data update 18 & 19
 + added equipment.txt and Vehicle BLK Files Explained.txt to the docs folder
 + Bug 3535050: Build Error on incorrect import
@@ -56,6 +56,7 @@ v0.1.17 (SVN)
 + Bug: unit numbering and id lost when resolving scenarios by MUL
 + set up C3 networks in TO&E tab
 + Bug: secondary techs and doctors get no time
++ Planetary data update 24
 
 v0.1.16 (2012-05-23)
 + removed PartsInventory, quantity is now tracked directly by part

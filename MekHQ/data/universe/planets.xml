@@ -2072,6 +2072,24 @@ The capital city and commercial center of Alya, LeSabrea, is located on Paroasis
 		<xcood>76.15</xcood>
 		<ycood>36.51</ycood>
 		<faction>DC</faction>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.08</gravity>
+		<lifeForm>6</lifeForm>
+		<climate>3</climate>
+		<percentWater>44</percentWater>
+		<temperature>32</temperature>
+		<spectralClass>G</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>VI</luminosity>
+		<sysPos>1</sysPos>
+		<satellite>Bromi</satellite>
+		<landMass>Normandy (New Summit)</landMass>
+		<landMass>Gastiogne</landMass>
+		<desc>The first colonies established on Ancha failed when an undetected viral taint decimated their numbers and left the survivors frail and sterile. With their transports dismantled for use as colony shelters and equipment, their fate went undiscovered until a second wave of colonists found their empty settlements nearly two decades later. Thanks to the records left by the first colonists, the second wave of settlers managed to find a counteragent to the virus in time to spare themselves the same fate. Today, the lost colonies of the first settlers remain on the large, southern continent of Gastiogne—a reminder of those who came before, cared for by the descendants of the second wave as historical sites. Visitors to Ancha must receive regular inoculations against the viral taint before and during their stay. Ancha is home to numerous small industries, primarily focused on the automotive and civilian aircraft industries. Its other continent, Normandy, is home to the planetary capital of New Summit, as well as the spaceport city of Armitage.</desc>
 	</planet>
 	<planet>
 		<name>Andalusia</name>
@@ -2313,7 +2331,45 @@ Andurien Aerotech</desc>
 		<name>Annapolis</name>
 		<xcood>166.13</xcood>
 		<ycood>131.96</ycood>
-		<faction>DC</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2235-01-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2319-01-01</date>
+			<faction>DC</faction>
+		</factionChange>
+		<pressure>3</pressure>
+		<gravity>0.95</gravity>
+		<lifeForm>7</lifeForm>
+		<climate>5</climate>
+		<percentWater>73</percentWater>
+		<temperature>35</temperature>
+		<spectralClass>G</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>2</sysPos>
+		<socioIndustrial>F-F-B-F-C</socioIndustrial>
+		<satellite>Severn</satellite>
+		<satellite>Proctor</satellite>
+		<landMass>Queen Anne’s Land (Maryland)</landMass>
+		<hpg>B</hpg>
+		<desc>Annapolis was once like New Avalon and El Dorado, a fantastic world with plentiful fresh water, a Terran-compatible ecology, fresh air and excellent mineral resources.  Discovered in 2218 and opened for colonization in 2235 to great fanfare, Annapolis was settled by the elite of the Terran Alliance (reflected in its name, drawn from a small town near one of the Alliance's centers of power).  The Alliance planned the world as a showcase regional capital to solve crippling communication and control delays to Alliance colonies.  Accordingly, Annapolis received massive funding and heavy immigration from Terra.
+ 
+After that bright dawn, Annapolis ran into tough times (the entire second half of the 23rd century) that set the stage for its present-day situation: a lush, overpopulated (for its technology level) backwater where few of its occupants see beyond the borders of their cornfields. Trouble began after Terran crops (colonial gene-mods broadly resistant to alien pests and microbes) had brutally winnowed certain local microbes into resistant strains that found terrestrial life a perfect environment. Just as these new superbugs were causing everything from deadly plagues to unsightly skin rashes among colonists faster than overwhelmed medical clinics could cure, the Terran Alliance issued the 2242 Demarcation Declaration and abandoned Annapolis. When the Expansionist Party swept back into power on Terra, they sent ships to rescue Alliance government personnel, but considered the rest of the world a write-off. Loss of much-needed government support prompted technological and economic collapse. The subsequent Exodus from Terra bypassed the (literally) plagued colony, depriving it of fresh blood that might have revived its fortunes.
+ 
+Today, Annapolis resembles a Davion Outback world or one of the many independent Periphery planets, despite being a rare garden world.  Most of the population lives off subsistence farming of rice paddies and cornfields, and the Kurita nobles who rule the planet do what they can to keep permanent this aesthetic ideal of "pastoral peasantry." In reality, life is brutish and dirty, the planet’s current state is all the more tragic because Annapolis remains a water and mineral-rich world, though centuries of industrialized mining reduced its stocks of rare, valuable materials such as germanium.  Local peasants are well-fed on average, and Annapolis needs roughly two billion more people before it might face a Malthusian-style collapse at its current crude level of technology (roughly equivalent to Terra's early to mid-19th century, with a dearth of combustion power).  Population pressures and the relatively disadvantaged shugo noble rank will likely force industrialization over the next few generations.
+ 
+The coastal capital city of Maryland is, to Combine visitors, the jewel of the planet. The city holds to a strict Japanese aesthetic for even its modern buildings while keeping a simple, clean layout. It includes a walled section for the planet's elite. Rather than a serious fortification, the wall is a traffic-control measure that keeps country bumpkins from streaming into Annapolis' single significant high-tech center. The Walled Sector houses Annapolis' university, which provides an excellent education to the planet's higher nobles; hosts stores, clinics and clubs with off-world imported goods; and contains the sole municipal fusion power plant, as well as ComStar's HPG. It also features off-world-supported repair facilities for advanced technology.
+ 
+Beyond Maryland, technology is scarce.  The most advanced industrial regions have factories approximating the early 20th century's capabilities, often depending on hydropower  or  renewable  biofuels.  These  produce  the trickle of domestically built motorized vehicles used on the planet, the trains, steamships, and odd tractor or bus. Other technology is usually rare and imported. A typical Annapolis village prides itself on having a solar panel powering a few items like a Star League-era x-ray/convection oven and robotic toy; a fief is proud to host a theater with a century-old tri-vid projector and several holovids to display. Instead of horse couriers that a visitor might expect, a copper wire telephone network reaches to most villages, giving village elders (and paying customers) a means of communicating with central authorities or business associates.  Tozama daimyos (and some shugos) have telephones and tri-vids in their homes (and wealthy tozama daimyos may have wireless communicators). Communication services, other than HPG, are provided not by ComStar, but by a local Arakaki-owned company with ties to the Combine firm Tanadi.
+ 
+A few Stone Age tribes exist in the planet's deep deserts and jungles, far from the reach of the government and dominant culture. These peoples are some of the most primitive and quixotic groups in the Inner Sphere. For example, deep in the cloud forests of Queen Anne's Land dwells a cargo cult that worships amazingly accurate mockups of Star League-era DropShips.  They tend to follow the usual course of cargo cults, prophesying that their great benefactors from the stars, with magical powers and great gifts, will one day return if they maintain their mockups. One of these tribes maintains a six-meter tall, perfect likeness of Aleksandr Kerensky, carved of a type of granite isotopically confirmed to be from a completely different star system than Annapolis.</desc>
 	</planet>
 	<planet>
 		<name>Annunziata</name>
@@ -4983,6 +5039,26 @@ Due to the lack of education and wealth, the population in the early 31st Centur
 		<xcood>72.5</xcood>
 		<ycood>37.03</ycood>
 		<faction>DC</faction>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<pressure>3</pressure>
+		<gravity>0.84</gravity>
+		<lifeForm>4</lifeForm>
+		<climate>3</climate>
+		<percentWater>52</percentWater>
+		<temperature>37</temperature>
+		<spectralClass>A</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>VI</luminosity>
+		<sysPos>1</sysPos>
+		<satellite>Kyoko</satellite>
+		<satellite>Valus</satellite>
+		<landMass>Borellas</landMass>
+		<landMass>Hoshina (Siang)</landMass>
+		<landMass>Quang-tze</landMass>
+		<desc>A world of modest mineral or agricultural wealth, but rich in raw hydrocarbons, Biham became a haven for industrial magnates who still saw a future in petrochemical fuels. Coal, oil, and natural gas refineries formed the central businesses, around which settlements sprang up, even on the polar continent of Borellas. The runaway mining, drilling, and petrochemical processing rapidly devastated what had proven to be an extremely fragile ecosystem. By the time the planetary government finally stepped in to regulate the industries, the damage was so extreme travelers were urged to stay clear of the planet for health considerations, and all material shipped off-world had to undergo decontamination at special orbital outposts. Only Yoshimatsu Chemicals, one of the Draconis Combine‘s greatest chemical corporations, with its track record for rigorous safety procedures and strict clean-air guidelines, met the harsh restrictions suddenly imposed by the planetary government. Yoshimatsu today maintains the most extensive chemical facilities in the system, including processing centers on both moons, and even a space-fuel refinery over Tiberius, the smaller of the Biham system‘s gas giants. Apart from Borellas, Biham also has two temperate continents, Hoshina and Quang-tze. Siang, the planetary capital and home to Yoshimatsu Chemical‘s corporate headquarters—as well as a sprawling plastics and polymers plant—is located on the north shore of Hoshina.</desc>
 	</planet>
 	<planet>
 		<name>Biloela</name>
@@ -9225,6 +9301,27 @@ Coventry’s mineral, agricultural, and military economy is supplemented by a th
 			<date>3067-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.26</gravity>
+		<lifeForm>5</lifeForm>
+		<climate>0</climate>
+		<percentWater>43</percentWater>
+		<temperature>29</temperature>
+		<spectralClass>F</spectralClass>
+		<subtype>9</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>2</sysPos>
+		<satellite>Allestra</satellite>
+		<satellite>Hermione</satellite>
+		<satellite>Joseppe</satellite>
+		<landMass>Absalom (Halcyon)</landMass>
+		<landMass>Clytemnestra</landMass>
+		<landMass>Graus</landMass>
+		<desc>Cylene‘s eccentric orbit is largely attributed to the imbalance caused by the shattering of its large moon into three smaller satellites roughly eighty thousand years ago, likely by a large rogue asteroid or comet. As a result, the planet is currently entering into what many believe to be the beginnings of an ice age, with temperatures near freezing even at the equator during the winter months. This, as much as the damage done during the first two Succession Wars (particularly between the Draconis Combine and the Federated Suns), has resulted in the gradual, but steady emigration of the population to other, more hospitable and safe worlds nearby. Ruins of cities destroyed or abandoned in the early wars still dot the landscape of the northern continent. Only the large deposits of industrial-grade metal ore, discovered close to the planet surface and churned up by the planet‘s occasionally overactive geology, has kept people around and employed. The planet‘s main continents are the largely unpopulated Graus, in the north, Clytemnestra in the south, and Absalom, a large landmass that practically rings the entire equatorial region and is home to the planetary capital of Halcyon.</desc>
 	</planet>
 	<planet>
 		<name>Cynon</name>
@@ -9596,6 +9693,23 @@ The Jade Falcon, totem animal of the Clan with the same name, is from Dagda.</de
 			<date>3067-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<pressure>3</pressure>
+		<gravity>0.84</gravity>
+		<lifeForm>3</lifeForm>
+		<climate>4</climate>
+		<percentWater>37</percentWater>
+		<temperature>43</temperature>
+		<spectralClass>F</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>2</sysPos>
+		<landMass>Andropo</landMass>
+		<landMass>Geronomis (Polis)</landMass>
+		<desc>David‘s water table, not its atmosphere, is actually the health hazard posed to humans visiting this otherwise beautiful—if somewhat arid—planet. The problem has been traced to microbes that form the basis of David‘s entire food chain, which cause severe—and sometimes fatal—allergic reactions in humans, but do absolutely no harm to the planet‘s native wildlife. The local population has long since grown immune to the effects of this taint, but visitors to David who plan to do anything that involves eating, drinking, or even swimming in any of the planet‘s few freshwater lakes, must take a series of inoculations in advance, or risk the consequences. Over sixty percent of David‘s surface is claimed by two enormous landmasses, known as Andropo and Geronomis, and a host of large islands that ring them. Andropo, with its more fertile soils and lodes of precious metals, is home to most of David‘s limited farming, which is sufficient to support most of the planet‘s population, as well as some light industry. Geronomis, more equatorial and barren in its central regions, supports a slightly heavier industry, and is also home to Polis, David‘s capital city and major spaceport.</desc>
 	</planet>
 	<planet>
 		<name>Davisville</name>
@@ -10459,7 +10573,7 @@ The Confederation’s eventual settlement was originally little more than a perm
 		<landmass>Mataeo (Fortress Dieron)</landmass>
 		<landmass>Voltenna</landmass>
 		<landmass>Wennisaka</landmass>
-		<desc>Dieron was one of the worlds abandoned by the Terran Alliance following the Outer Reaches Rebellion. Later the world would be incorporated into the Terran Hegemony becoming part of the Lone Star Province. Dieron is a world with numerous large mountain ranges creating countless small valleys. The planet is geologically instable, as a result earthquakes are a common problem. Nestled into the large Mountain are cramped cities stuck between towering mountains. In the time of the Star League, Dieron was a large and thriving planet. The SLDF maintained a major command and logistics center on Dieron. The largest of the Star League complexes at the time was Fortress Dieron. After the Exodus the Draconis Combine became quite interested in acquiring Dieron. The planet's extensive natural resources, advanced technology and industry made it a prime target. When the Combine seized the planet they had underestimated how much of the planet had suffered during the war to oust Stefan Amaris. The SLDF has also been very thurough stripping the planet of all useful material. After seizing the planet the Combine began creating factories in the shells of Dieron’s deep mountains and slowly rebuilt the world into a thriving industrial powerhouse. Even with the earthquakes, claustrophobic living space, and occasional political dissent, the Dieronese are a content people. The natives are protective of their world and despite centuries of Kurita rule many natives still remember the glory days of the Terran Hegemony and the Star League and still refer to locations and cities by their original colonial names.
+		<desc>Dieron was one of the worlds abandoned by the Terran Alliance following the Outer Reaches Rebellion. Later the world would be incorporated into the Terran Hegemony becoming part of the Lone Star Province. Dieron is a world with numerous large mountain ranges creating countless small valleys. The planet is geologically unstable, as a result earthquakes are a common problem. Nestled into the large Mountain are cramped cities stuck between towering mountains. In the time of the Star League, Dieron was a large and thriving planet. The SLDF maintained a major command and logistics center on Dieron. The largest of the Star League complexes at the time was Fortress Dieron. After the Exodus the Draconis Combine became quite interested in acquiring Dieron. The planet's extensive natural resources, advanced technology and industry made it a prime target. When the Combine seized the planet they had underestimated how much of the planet had suffered during the war to oust Stefan Amaris. The SLDF has also been very thurough stripping the planet of all useful material. After seizing the planet the Combine began creating factories in the shells of Dieron’s deep mountains and slowly rebuilt the world into a thriving industrial powerhouse. Even with the earthquakes, claustrophobic living space, and occasional political dissent, the Dieronese are a content people. The natives are protective of their world and despite centuries of Kurita rule many natives still remember the glory days of the Terran Hegemony and the Star League and still refer to locations and cities by their original colonial names.
 The capital is currently Fort Dieron, but in the past San Martin and Tahlwynn have served as well.</desc>
 	</planet>
 	<planet>
@@ -11856,7 +11970,11 @@ The capital city of Eltanin, Dry Springs, is the administrative and trading cent
 		<ycood>4.43</ycood>
 		<faction>TA</faction>
 		<factionChange>
-			<date>2315-01-01</date>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2316-01-01</date>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
@@ -11891,6 +12009,19 @@ The capital city of Eltanin, Dry Springs, is the administrative and trading cent
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.02</gravity>
+		<lifeForm>4</lifeForm>
+		<climate>3</climate>
+		<percentWater>54</percentWater>
+		<temperature>35</temperature>
+		<spectralClass>M</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>2</sysPos>
+		<landMass>Carrigan</landMass>
+		<landMass>Hallens (Errai Prime)</landMass>
+		<desc>Established early on as a major industrial planet, Errai‘s population swelled in the days of the Star League, with electronics, fusion reactors, and heavy industrial equipment—including a wide range of industrial ‘Mechs— all being manufactured by local companies. In the wake of the Star League‘s fall, the Federated Suns occupied Errai, and for a while, under Davion rule, the planet experienced a surge in commercialism, including the establishment of a number of casinos and nightclubs that quickly fell under the sway of the local mobs. For a time, widespread crime and corruption—attributed to the mobs—characterized Errai‘s business and politics. In the 3060s, aid from ComStar allowed Maltex Corporation to rebuild its factories on planet and began construction of both Thug and Wyvern ‘Mechs as well as industrial ‘Mechs. Errai also supports the planetside headquarters of Null-Gee Metals, a relatively small corporation that operates numerous mining colonies in the Errai system asteroid belt. Both Null-Gee Metals and Maltex Corporation are located on Errai‘s primary continent of Carrigan. The planetary capital of Errai Prime is located on the secondary continent of Hallens, which also features two of Errai‘s main spaceports.</desc>
 	</planet>
 	<planet>
 		<name>Escobas</name>
@@ -12226,6 +12357,25 @@ As of 3025 Exedor had a tiny population, consisting primarily of refugees from t
 			<date>2790-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<pressure>2</pressure>
+		<gravity>0.96</gravity>
+		<lifeForm>2</lifeForm>
+		<climate>4</climate>
+		<percentWater>13</percentWater>
+		<temperature>34</temperature>
+		<spectralClass>F</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>2</sysPos>
+		<satellite>Davius</satellite>
+		<satellite>Elric</satellite>
+		<satellite>Goliath</satellite>
+		<landMass>(Firstpoint)</landMass>
+		<desc>On the surface, it defies explanation why anyone would wish to live on a world as inhospitable as Fallanin II. Sandstorms, blamed largely on the planet‘s three moons, are a common sight for this desert world, the blasted remains of what once may have been a paradise, but for the strike of a city-sized asteroid nearly two thousand years ago. Despite the hostile weather, however, a colony was set up on Fellanin II to exploit the planet‘s vast underground mineral and petroleum wealth. A few settlements sprang up in this manner, most of them underground colonies, which survive by tapping into the planet‘s few underground seas and establishing protected farms for their communities. These subsurface communities are connected to the domed planetary capital and spaceport city of Firstpoint by long, subterranean rail lines. Fallanin II features no continents as such, but rather five large seas, separated by rocky, sandy, vegetation-poor land. Firstpoint borders the largest of these, the North Sea. The planet‘s remaining settlements lie underground near the other four major bodies of water: the South Sea, the Dry Sea, Larson‘s Sea, and the Great Expanse.</desc>
 	</planet>
 	<planet>
 		<name>Feltre</name>
@@ -12485,7 +12635,7 @@ Fuisgon-Flame Tech</desc>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2790-01-01</date>
+			<date>2786-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
@@ -13084,6 +13234,21 @@ During the Capellan-Republic war, Foot Fall was the center of some of the fierce
 			<date>3067-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>0.84</gravity>
+		<lifeForm>6</lifeForm>
+		<climate>3</climate>
+		<percentWater>74</percentWater>
+		<temperature>38</temperature>
+		<spectralClass>K</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>3</sysPos>
+		<satellite>Athens</satellite>
+		<satellite>Olympus</satellite>
+		<satellite>Thebes</satellite>
+		<satellite>Troy</satellite>
+		<desc>Astonishingly similar to Terra in many ways, colonists were drawn to Galatia III in hopes of building a new life on an alien world. Though invaded several times by various factions before and throughout the Succession Wars, this world was spared much damage, largely due to its lack of strategic value. Galatia III‘s raw-material and agricultural resources, though ample, are hardly unique or exceptional enough for a major conflict, and troops that invaded the world have found little value beyond those of a temporary staging area or a tourist attraction. Indeed, Galatia‘s most striking features are not found in any of its mines, harbors, or small, clean cities, but in its vast, untouched wilderness and tropical island getaways.</desc>
 	</planet>
 	<planet>
 		<name>Galax</name>
@@ -15428,7 +15593,7 @@ Corvatti Corporation</desc>
 		<name>Helen</name>
 		<xcood>83.98</xcood>
 		<ycood>10.17</ycood>
-		<faction>TA</faction>
+		<faction>IND</faction>
 		<factionChange>
 			<date>2315-01-01</date>
 			<faction>TH</faction>
@@ -15454,13 +15619,29 @@ Corvatti Corporation</desc>
 			<faction>Stone,WOB</faction>
 		</factionChange>
 		<factionChange>
-			<date>3077-05-14</date>
+			<date>3079-05-14</date>
 			<faction>Stone</faction>
 		</factionChange>
 		<factionChange>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>0.92</gravity>
+		<lifeForm>3</lifeForm>
+		<climate>5</climate>
+		<percentWater>46</percentWater>
+		<temperature>33</temperature>
+		<spectralClass>M</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>5</sysPos>
+		<satellite>Agamemnon</satellite>
+		<satellite>Hector</satellite>
+		<satellite>Heracles</satellite>
+		<landMass>Joppa (Konstance)</landMass>
+		<landMass>Persephonie</landMass>
+		<desc>A lush tropical world settled by predominantly Greek colonists, Helen‘s great claim to fame has been its remarkably beautiful and extremely diverse undersea wildlife. Though land covers just over half the planet surface, broken into eleven large island-continents and numerous smaller islands, Helen‘s oceans are surprisingly deep, giving rise to a wide variety of sea life, including the Great Helenic Whale. This nonmammalian shark-like predator can grow to approximately four times the size of Terra‘s Great White, and dominates the waters of Helen‘s southern hemisphere. In the days of the Star League, a sophisticated floating marine-life research platform dubbed Aquanis once studied the rich undersea wildlife of this world, but was sunk during the invasions brought on after the fall of the Star League. Rediscovered almost three kilometers below the surface of the North Helenic Ocean, off the coast of the Persephonie continent, this sunken city has become one of Helen‘s major tourist attractions. The planetary capital of Konstance is located on Joppa, the largest of Helen‘s continents, along with the bulk of the planet‘s lumber industries, the spaceport city of Corinth, and the military capital of Montague.</desc>
 	</planet>
 	<planet>
 		<name>Heligoland</name>
@@ -16338,13 +16519,33 @@ The planet and the factories have been the target of invasion numerous times thr
 			<faction>WOB</faction>
 		</factionChange>
 		<factionChange>
-			<date>3077-05-21</date>
-			<faction>Stone</faction>
+			<date>3078-12-21</date>
+			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3081-01-01</date>
+			<date>3090-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>0.74</gravity>
+		<zenithCharge>True</zenithCharge>
+		<lifeForm>5</lifeForm>
+		<climate>5</climate>
+		<percentWater>54</percentWater>
+		<temperature>48</temperature>
+		<spectralClass>G</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>1</sysPos>
+		<socioIndustrial>B-B-C-B-C</socioIndustrial>
+		<satellite>Lin</satellite>
+		<landMass>Chengu (Zhi-Chiang)</landMass>  
+    		<landMass>Montong</landMass>  
+    		<landMass>Dendeez</landMass>
+		<hpg>B</hpg>
+		<desc>3135 - Hsien is a world of both tropical expanses and arid deserts. The massive southern continent of Chengu and two chains of semi-volcanic mini-continents, Montong and Dendeez, are home to a flourishing ecosystem similar to that of a post-Jurassic Terra. The vast tropical forests of the Chengu coasts and the Dendeez chains are home to several species of large reptilian creatures that vaguely resemble Terra‘s extinct dinosaurs. Most are relatively harmless herbivores that were easily contained by the early colonists, who were mostly from Asia and the Indian subcontinent on Terra. The widespread installation of water purification plants was required due to the high concentrations of heavy metals and toxic microbes found in the planetary water supply. Hsien's early industrial development resulted from the modest mineral wealth in the Chengu inlands, particularly around the large, landlocked Zhoulin Sea and in the mountains of Montong Prime. The Montong family, as stewards and settlers of the Montong Chain and founders of the Zhoulin-based Montong Mining Consortium, became one of the planet's first noble houses.
+
+During the Star League-era, Hsien prospered as part of the Terran Hegemony, before being annexed by the Capellan Confederation after the League fell. This led to the expulsion or exile of several of the planet's noble families, including the Twohy family of the then-heavily industrialized Dendeez Chain, who had held the dukedom of Hsien. Hsien fell into the cycle of warfare, and was eventually absorbed into the Federated Commonwealth as part of the Tikonov Free Republic. To encourage acceptance of their dominion, the Federated Commonwealth heavily invested in Hsien's only remaining nobility, the house of Montong, rankling the planet's largely underclass populace. When the Federated Commonwealth broke up in 3057, Hsien's people opted to join the Capellan Confederation after Capellan forces shattered the AFFC garrison. Baron Luis Montong V, however, soon turned on the Capellan-backed government, initiating a civil war soon after the departure of the invasion troops, with Montong's forces on one side, the pro-Capellan citizens of Chengu on another, and the Dendeez Chain forming a third. This situation enabled the Word of Blake to easily assume control over the planet prior to the Jihad. Firstly, they won the local HPG contract, and then they brought in Colonel Brenn Twohy, leader of the Hsien Hotheads mercenary command. When the Jihad erupted, the Word of Blake allowed Colonel Twohy to assume full control over his family's birthright, ensuring their control over the planet until allied forces finally shattered the Hotheads near the end of the Jihad. Though the fierce fighting heavily damaged the industriplexes of Dendeez and Chengu, Hsien recovered well under the Republic of the Sphere. This was largely due the efforts of the reconstituted Montong Consortium, whose corporate headquarters are located in the planetary capital and principal spaceport of Zhi-Chiang, on the northern Zhoulin Sea coast.</desc>
 	</planet>
 	<planet>
 		<name>Huaide</name>
@@ -26225,8 +26426,12 @@ Niops VII is a cold planet with access to sufficient resources to keep the Assoc
 		<lifeForm>5</lifeForm>
 		<spectralClass>G</spectralClass>
 		<subtype>2</subtype>
-		<luminosity>I</luminosity>
+		<luminosity>IV</luminosity>
 		<sysPos>2</sysPos>
+		<percentWater>75</percentWater>
+		<temperature>32</temperature>
+		<socioIndustrial>B-A-A-B-A</socioIndustrial>
+		<climate>3</climate>
 		<satellite>Dublin</satellite>
 		<satellite>Glasgow</satellite>
 		<landMass>Halidon</landMass>
@@ -27216,7 +27421,34 @@ Outreach is the primary hiring location for the mercenary trade from the 3030s a
 		<name>Ovan</name>
 		<xcood>30.77</xcood>
 		<ycood>-207.6</ycood>
-		<faction>CC</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2393-01-01</date>
+			<faction>CC</faction>
+		</factionChange>
+		<pressure>4</pressure>
+		<gravity>0.91</gravity>
+		<nadirCharge>True</nadirCharge>
+		<lifeForm>5</lifeForm>
+		<climate>3</climate>
+		<percentWater>24</percentWater>
+		<temperature>33</temperature>
+		<spectralClass>M</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>2</sysPos>
+		<socioIndustrial>C-B-C-C-C</socioIndustrial>
+		<landMass></landMass>
+		<hpg>B</hpg>
+		<desc>Ovan is a Capellan "core" world, relatively close to Sian and rarely raided,mostly for lack of anything to raid. Settled in 2393 by Chinese at the behest of the Capellan government. Socially and technologically Ovan is a typical human-inhabited world. However, Environmentally speaking, Ovan is definitely abnormal.
+ 
+Orvan orbits a dim red star, known as "Ember" to locals. It is in a circular 16 day orbit. The length of the day does not vary during the year due to negligible equatorial tilt. Further, Ember is an old star; it shows few flare behaviors common to younger red dwarfs. This means that Ovan is also old, showing up in its depleted oceans, it continues to be habitable thanks to a thick atmosphere. Rains are extremely predictable coming at dusk as the humid, saturated, daytime air begins to cool. This cycle is so dependable and tectonic drift so limited that a "World River" (20 to 500km wide) has been carved around the equator where daily heating and cooling are greatest. Though Ovan technically has numerous continental plates, the World River divides the planet into two approximately equal landmasses.
+ 
+Human habitation on Ovan forms continuous bands of cities along the north and south coasts of the World River; transportation is dominated by water traffic, as well as roads and railways that run parallel to the river bank. The unimaginatively named North and South Metropoli are mostly 1 to 20km in distance from the coastlines, compressed by the demands of keeping farms near major water sources, the rivers rarely reach more than 200km inland, and the need of the local nobles to keep their peasants under observation. This gives Ovan a high population density in its main urban areas and leaves it virtually uninhabited elsewhere, save for mining operations and noble's farming estates. The terrain along the World River is varied; anything from salt flats to steep cliffs.
+ 
+Ovan was once an industrial linchpin for the Confederation. It was long settled, populous, possessing abundant mineral resources and with a short transit to planetary jump points, where squadrons of recharge stations cut recharge time by days. This prosperity ended with the Succession Wars, which cut Ovan's access to cheap water filters, destroyed most of its recharge stations and destroyed its merchant fleets. On-planet raids against Ovan's advanced factories left the world abjectly poor. Standards of living have continued to sink, but this was only partly due to war damaged-industry, agriculture and mining reached stable levels during the Second Succession War. After the raids of the 1st Succession War, however, the new government reveled in the power it gained over the citizenry and has become one of the longest-running and most stable Kleptocracies in the Inner Sphere.
+ 
+On Ovan, local nobles have come to exercise complete control over the citizenry by their ownership of all of the desalinization units, power plants and farms, and by careful appointment of family members and cronies in the bureaucracy. The nobles enforce their rule and discourage citizens from seeking aid from the Confederation by showing exceeding loyalty to Sian, which in turn looks the other way when reports of abuse by Ovan nobles are received. The nobles also abuse their rights to create military ranks by forming huge private militias, comprised primarily of gangs of club-wielding thugs, and levying taxes on their fiefs.  The difference between Ovan and other Kleptocracies is that the government has learned enough moderation to make their plundering sustainable for generations.</desc>
 	</planet>
 	<planet>
 		<name>Overton</name>
@@ -32294,6 +32526,25 @@ The Word of Blake Jihad bypassed Shensi, so it was undamaged when it was folded 
 			<date>3062-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.0</gravity>
+		<lifeForm>4</lifeForm>
+		<climate>3</climate>
+		<percentWater>68</percentWater>
+		<temperature>48</temperature>
+		<spectralClass>K</spectralClass>
+		<subtype>9</subtype>
+		<luminosity>III</luminosity>
+		<sysPos>5</sysPos>
+		<satellite>Leoness</satellite>
+		<landMass>Cambridge (Shipka Commune)</landMass>
+		<landMass>Foxborough</landMass>
+		<landMass>Hillsborough</landMass>
+		<desc>3135 - Shipka was accidentally discovered by the exploration ship Mighty Munchin that was enroute to Highspire but ended up in a system that had never been explored. Shipka‘s location made it a perfect way-station trading port. The planet's population grew rapidly with farmers, traders, crafters, and merchants looking to turn a fast profit. Cambridge, the largest of the planet‘s three continents, produces agricultural products and minerals in addition to having the largest DropPort on the planet. The capital, Shipka Commune, is located on the southwestern coast of Cambridge. While Cambridge is located in northern hemisphere, the other two continents, Hillsborough and Foxborough, are in the southern hemisphere. Hillsborough produces petroleum and precious metals. Foxborough produces timber and agricultural produce, as well as coal and shale. 
+
+During the Fourth Succession War, Shipka fell to the Federated Suns, and Shipka continued to serve as it had while a Capellan world. When the Sarna March collapsed, the people of Shipka did not hesitate to return to the Capellan Confederation. 
+
+During the Jihad, Shipka was overlooked by the Word of Blake forces. When Devlin Stone demanded the world for The Republic of the Sphere, the citizens went on strike for months before the situation was finally resolved.</desc>
 	</planet>
 	<planet>
 		<name>Shiro III</name>
@@ -32803,10 +33054,10 @@ The planet itself is home to large tracts of unspoiled wilderness, thanks in lar
 		<name>Slocum</name>
 		<xcood>58.68</xcood>
 		<ycood>-52.68</ycood>
-		<faction>TA</faction>
+		<faction>TGU</faction>
 		<factionChange>
-			<date>2315-01-01</date>
-			<faction>TH</faction>
+			<date>2367-01-01</date>
+			<faction>TH,CC</faction>
 		</factionChange>
 		<factionChange>
 			<date>2790-01-01</date>
@@ -32840,6 +33091,28 @@ The planet itself is home to large tracts of unspoiled wilderness, thanks in lar
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.0</gravity>
+		<lifeForm>7</lifeForm>
+		<climate>2</climate>
+		<percentWater>53</percentWater>
+		<temperature>20</temperature>
+		<spectralClass>G</spectralClass>
+		<subtype>7</subtype>
+		<luminosity>III</luminosity>
+		<sysPos>5</sysPos>
+		<satellite>Stanza</satellite>
+		<landMass>Carnocial</landMass>
+		<landMass>Kuaka (Fewers)</landMass>
+		<landMass>Natick</landMass>
+		<landMass>Theramule</landMass>
+		<desc>3135 - In 2351, the Sarna Supremacy attacked Slocum, then part of the Tikonov Grand Union, and committed acts of merciless savagery. Many battles and wars were fought on Slocum because it was a border world. Following formation of the Star League, it jointly administered the planet with the Capellan Confederation. A Castle Brian was built on each continent of the planet. During the Aramis Coup, Slocum suffered like never before. For eight years, they faced the atrocities of Amaris armies. In 2774, General Kerensky's armies regained control of Slocum, but they discovered that half the population had died of starvation and the ravages of war. 
+
+Slocum‘s continents were severely damaged during the fall of the Star League. Only three of the continents is able to support life. Carnocial, the fourth continent, is still a nuclear wasteland. Fewers, the planetary capital, is located on the continent of Kuaka. Kuaka is in the northern hemisphere, where winter lasts six months out of the year. Just west of the capital are the famous Silver Plains. So named because the snow-covered landscape takes on a silver color thanks to the silver content of the soil. Silver was one of Slocum‘s biggest exports. The continents of Theramule and Natick support most of the planet‘s mining operations and petroleum production.
+
+The Capellan Confederation laid claim to Slocum after the fall of the Star League and attempted to rebuild the once-vibrant world. During the Fourth Succession War the planet was spared for the most part and prospered afterward as part of the Federated Suns.
+
+During the Jihad, the Word of Blake forces invaded after they neutralized the defenders with orbital bombardments. When Devlin Stone's forces relieved the planet, once again, they found almost half of the planet‘s population was dead. Between the twin holocausts of the Amaris Coup and the Blakist Jihad, Slocum has become a ghost world, with the inhabitants fleeing as quickly as their finances allow, regardless of every effort by The Republic to remedy the situation.</desc>
 	</planet>
 	<planet>
 		<name>Small World</name>
@@ -33184,7 +33457,11 @@ The local population have a pragmatic political approach that can almost be mist
 		<name>St. Andre</name>
 		<xcood>66.24</xcood>
 		<ycood>-101.45</ycood>
-		<faction>CC</faction>
+		<faction>SSUP</faction>
+		<factionChange>
+			<date>2367-01-01</date>
+			<faction>CC</faction>
+		</factionChange>
 		<factionChange>
 			<date>3028-08-29</date>
 			<faction>CC,FS</faction>
@@ -33209,6 +33486,30 @@ The local population have a pragmatic political approach that can almost be mist
 			<date>3062-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3090-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<spectralClass>K</spectralClass>
+		<subtype>7</subtype>
+		<luminosity>III</luminosity>
+		<sysPos>5</sysPos>
+		<gravity>1.0</gravity>
+		<pressure>3</pressure>
+		<temperature>65</temperature>
+		<percentWater>34</percentWater>
+		<climate>4</climate>
+		<lifeForm>7</lifeForm>
+		<satellite>St. Michael</satellite>
+		<landMass>Ravensglade</landMass>  
+		<landMass>Georama (Jerome)</landMass>  
+		<desc>3135 - Most of St. Andre's two continents are covered in red desert. The northern continent of Ravensglade is flat and featureless. Ravensglade is cold and frozen for six months of the year because it is located above the arctic circle. Only a small portion of St. Andre's population lives on Ravensglade, its industries produces petroleum and coal, as well as a small amount of uranium. The Star League built a base on Ravensglade to protect the planet. Most of St. Andre's population resides on Georama which is larger and more hospitable than Ravensglade. It is situated in the southern and equatorial regions, with a hot desert environment. Jerome, the capital of St. Andre is located on Georama.
+	
+St. Andre was at the forefront of interstellar politics from the time when it was colonised. St. Andre's prestige comes from its early days, when Capella and the Sarna Supremacy were at war. In 2305, elite troops from St. Andre were used to aid the worlds Palos and Wei. In July 2366, the leaders of the Sarna Supremacy, the Tikonov Grand Union, the Liao Protectorate, the Sian, and the St. Ives governments met on St. Andre, voted and formed the Capellan Confederation.
+
+In 3007, the Federated Suns sent the Dragoons to raid the megafactory of Seluk Electronics Ltd. During the Fourth Succession War, Federated Suns forces invaded again and captured the planet. When the Federated Commonwealth split, the Capellan banner flew over St. Andre once again.
+
+During the Jihad, St. Andre was attacked on three different occasions by Word of Blake forces. The Blakists were after the Star League base that had been renovated and put to good use by the CCAF. The first two attacked used conventional methods. The third attempt involved the use of chemical weapons. The prevailing trade winds blew the deadly gas back in the faces of the attackers, decimating their ranks. When The Republic of the Sphere claimed St. Andre, the planet resisted.</desc>
 	</planet>
 	<planet>
 		<name>St. Ives</name>
@@ -33854,6 +34155,15 @@ Corean Enterprises</desc>
 		<satellite>Dianthus</satellite>
 		<satellite>Pantheons</satellite>
 		<hpg>B</hpg>
+		<landMass>Burtnik (Lorelei)</landMass>  
+        <landMass>Deyoung</landMass>  
+        <landMass>Shaw</landMass>  
+        <landMass>Young</landMass>  
+        <landMass>Curulewski</landMass>  
+        <landMass>Gowan</landMass>  
+        <landMass>Panozzo North</landMass>  
+        <landMass>Panozzo South</landMass>  
+        <landMass>Sucherman</landMass>
 		<desc>Styk is a wealthy planet with extensive heavy and light industry and the planet is a major trade hub and center of finance. As of 3025 Styk was the personal holding of Duke Pavel Ridzik, commander of the Capellan Armed Forces and in 3025 Styk accounted for 20 percent of all industrial output and 25 percent of annual interstellar trade in the Confederation, which made it the second largest industrial center and the largest interstellar trading planet in the Confederation. Styk was also home to the Confederation's third largest BattleMech production facility.
 
 Manufacturing centers:
@@ -36667,7 +36977,19 @@ Tsinghai has repelled numerous Marik and bandit attacks that have decimated the 
 		<name>Tsitsang</name>
 		<xcood>52.42</xcood>
 		<ycood>-109.54</ycood>
-		<faction>CC</faction>
+		<faction>SSUP</faction>
+		<factionChange>
+			<date>2305-01-01</date>
+			<faction>CH</faction>
+		</factionChange>
+		<factionChange>
+			<date>2309-01-01</date>
+			<faction>SSUP</faction>
+		</factionChange>
+		<factionChange>
+			<date>2367-01-01</date>
+			<faction>CC</faction>
+		</factionChange>
 		<factionChange>
 			<date>3030-01-01</date>
 			<faction>FS</faction>
@@ -36684,6 +37006,33 @@ Tsinghai has repelled numerous Marik and bandit attacks that have decimated the 
 			<date>3062-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3090-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>II</luminosity>
+		<sysPos>3</sysPos>
+		<gravity>0.96</gravity>
+		<pressure>3</pressure>
+		<climate>3</climate>
+		<temperature>30</temperature>
+		<percentWater>48</percentWater>
+		<lifeForm>3</lifeForm>
+		<satellite>Pin-Wong</satellite>
+		<satellite>Wai-Wong</satellite>
+		<satellite>Wei-Wong</satellite>
+		<landMass>Feng</landMass>  
+		<landMass>Fang (Pealung)</landMass>  
+		<landMass>Fong</landMass>  
+		<desc>3135 - Tsitang was originally colonised when St. Andre was colonized and became the agricultural supplier to St Andre and other worlds. Tsitang has a warm and temperate climate that allows most of the continents to have more than three growing seasons annually. Tsitang was a major producer of hardwood timber, bamboo, fruit trees, and a variety of other agricultural products.
+		
+Tsitang‘s three continents have approximately the same landmass and are located in the equatorial zone. Most of the planet‘s timber industry is located on Fang. Fang is slightly larger and was the first continent settled. The capital, Pealung, is located on the eastern coast of Fang. Feng is the smallest continent and  produces about 40 percent of the planet‘s agriculture products, specialising in fruit trees. Feng exports most of the products off planet. Fong grows the majority of the planet‘s foodstuff and supplies the local population. Each continent has a DropPort outside of the capital or regional capitals.
+
+In 2305, Tsitang joined St. Andre in aiding Palos and Wei, and fought a four-year war against the Sarna Supremacy. After the formation of the Capellan Confederation in 2366, Tsitang supplied worlds within one or two jumps with agricultural products for the next seven hundred years.
+
+Tsitang fell in the second wave of the Fourth Succession War to the Federated Suns. After the war, the planet continued to supply the same worlds that were now part of the Sarna March. The Capellans regained Tsitang after the fragmenting of the Sarna March in 3057. Tsitang was left almost untouched during the Jihad, becoming a refugee centre for many of the worlds they supplied with food.</desc>
 	</planet>
 	<planet>
 		<name>Tsukude</name>
@@ -38437,7 +38786,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3085-01-01</date>
+			<date>3090-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
 		<pressure>3</pressure>
@@ -38454,6 +38803,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<satellite>Arlis</satellite>
 		<satellite>Arils</satellite>
 		<hpg>B</hpg>
+		<landMass>Province (Vandannis City)</landMass>
 		<desc>Wei is hotter than Terra but is otherwise a very comfortable planet for human life. During the Star League, Wei was secretly used as a repository for a deadly nerve gas agent. After the collapse of the Star League this repository was forgotten until the early 31st Century when it was rediscovered by the Capellan Confederation.</desc>
 	</planet>
 	<planet>
@@ -38594,13 +38944,38 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<landMass>Tonkya</landMass>
 		<satellite>Talon</satellite>
 		<socioIndustrial>A-A-B-A-F</socioIndustrial>
-		<desc>While Wernke is the settled planet in the system, its moon Talon is arguably more important. Talon is home to Kallon Weapon Industries, a major producer of ‘Mechs for the Federated Suns. Aside from the industrial plants, Talon is an almost entirely barren moon and is only inhabited by the employees of Kallon Industries and miners of the raw materials and gems found on Talon. All food is imported from Wernke which is an arable and comfortable planet..</desc>
+		<desc>While Wernke is the settled planet in the system, its moon Talon is arguably more important. Talon is home to Kallon Weapon Industries, a major producer of ‘Mechs for the Federated Suns. Aside from the industrial plants, Talon is an almost entirely barren moon and is only inhabited by the employees of Kallon Industries and miners of the raw materials and gems found on Talon. All food is imported from Wernke which is an arable and comfortable planet.</desc>
 	</planet>
 	<planet>
 		<name>Westerhand</name>
 		<xcood>-5.48</xcood>
 		<ycood>-278.53</ycood>
 		<faction>CC</faction>
+		<pressure>3</pressure>
+		<gravity>0.93</gravity>
+		<nadirCharge>True</nadirCharge>
+		<lifeForm>7</lifeForm>
+		<climate>5</climate>
+		<percentWater>66</percentWater>
+		<temperature>49</temperature>
+		<spectralClass>G</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>2</sysPos>
+		<socioIndustrial>C-D-C-D-C</socioIndustrial>
+		<satellite>Delsia</satellite>
+		<satellite>Ralston</satellite>
+		<satellite>Vannora</satellite>
+		<landMass>Keystone (Victory City)</landMass>
+		<landMass>Garringer</landMass>
+		<hpg>B</hpg>
+		<desc>Hotter and drier than the Game World itself, with nowhere near the universal renown, Westerhand has nonetheless remained a haven for various mercenary commands despite an increasingly competitive hiring market. Located in the Sian Commonality of the Capellan Confederation, just one jump shy of the Free Worlds League's Duchy of Andurien, this world first came into use as a mercenary recruitment center during the reign of Chancellor Maximilian Liao, though the original intent was not aimed at the mercenary profession at all, but rather at stimulating an entertainment industry similar to the Solaris Games.
+ 
+In the center of the Victory City's business district is the Westerhand Hiring Hall, a six-story structure of mirrored glass, steel, and marble whose ultra-modern architecture sets it apart from the rest of the business district. The building is based on the original Mercenary's Guild Hall, which stood during the reign of Chancellor Maximillian Liao (when it was managed largely by ComStar's Mercenary Review Board).
+ 
+The hall features offices, meeting rooms, and communications facilities for employers and mercenary negotiators alike, as well as access to 'Mech and vehicle simulators. Technically, the offices and conference rooms are secure, allowing representatives from foreign powers to barter for the services of mercenary warriors as well as Capellan recruiters, but many mercenaries and foreign employers still take precautions when discussing the particulars of missions and contract terms, for fear of the remote possibility that the Maskirovka might be listening.
+  	
+Presently, aside from the Games and the Hiring Hall, Westerhand does not feature training facilities, but a number of local and offworld agencies have expressed an interest in establishing either specialized, bare-bones martial colleges or even a full-scale military university catering to the mercenary profession. Furthermore, rumors have begun to circulate that the Westerhand Hiring Hall may seek MRBC sanction in order to improve its standing as a place for professional soldiers to do business.</desc>
 	</planet>
 	<planet>
 		<name>Westerstede</name>
@@ -38951,21 +39326,40 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
-			<date>3072-02-01</date>
+			<date>3069-12-13</date>
 			<faction>WOB</faction>
 		</factionChange>
 		<factionChange>
-			<date>3077-05-21</date>
+			<date>3077-08-21</date>
 			<faction>Stone,WOB</faction>
 		</factionChange>
 		<factionChange>
-			<date>3077-05-26</date>
+			<date>3077-08-24</date>
 			<faction>Stone</faction>
 		</factionChange>
 		<factionChange>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>4</sysPos>
+		<gravity>1.0</gravity>
+		<pressure>3</pressure>
+		<temperature>45</temperature>
+		<percentWater>73</percentWater>
+		<climate>3</climate>
+		<lifeForm>7</lifeForm>
+		<satellite>Lionel</satellite>
+		<landMass>York</landMass>  
+		<landMass>Sjardijin (Recital City)</landMass>  
+		<landMass>Essex</landMass>  
+        <desc>3135 - Woodstock was colonised during the latter half of the 22nd century by refugees from the Terran North American continent. Woodstock is a temperate world devoted to raising agricultural products and a variety of livestock. The three oceans are as rich and vibrant with life, while the land is fertile.
+        
+Recital City is the planetary capital and is located on Sjardijin, the smallest of the three continents. The Terran Hegemony and the Star League set up an agricultural research station on Sjardijin that undertook research to improve crop efficiency to feed the many worlds in the former Hegemony. It was rumored that Star League scientists discovered a new method that would advance the science of pest control. This was confirmed during the Fourth Succession War when Federated Suns units liberated Woodstock. York, the largest continent, produces most of the beef and grows some tobacco for cigars.
+
+Woodstock‘s third continent, Essex, is the only blemish on this otherwise beautiful world. During Amaris' occupation of the Hegemony, Woodstock was attacked by elements of the 141st Amaris Dragoons, using chemical and nuclear weapons to target the military base located on Essex, obliterating the SLDF garrison. The weapons poisoned Essex, rendering the continent all but uninhabitable. The continent is now used in studying radiation‘s effect on the environment.</desc>
 	</planet>
 	<planet>
 		<name>Worrell</name>
