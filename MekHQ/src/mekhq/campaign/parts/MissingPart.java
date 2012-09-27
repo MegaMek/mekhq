@@ -51,13 +51,10 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 	 */
 	private static final long serialVersionUID = 300672661487966982L;
 	
-	protected boolean checkedToday;
-	protected int replacementId;
+	
 	
 	public MissingPart(int tonnage, Campaign c) {
 		super(tonnage, c);
-		this.checkedToday = false;
-		this.replacementId = -1;
 	}
 	
 	public MissingPart clone() {
@@ -130,9 +127,6 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 			unit.addPart(actualReplacement);
 			campaign.addPart(actualReplacement);
 			replacement.decrementQuantity();
-			//these might not be necessary, but just to be sure
-			replacement.setTeamId(null);
-			actualReplacement.setTeamId(null);
 			remove(false);
 			//assign the replacement part to the unit			
 			actualReplacement.updateConditionFromPart();
@@ -303,26 +297,6 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		writeToXmlBegin(pw1, indent);
 		writeToXmlEnd(pw1, indent);
 	}
-
-	@Override
-	protected void loadFieldsFromXmlNode(Node wn) {
-		NodeList nl = wn.getChildNodes();
-		
-		for (int x=0; x<nl.getLength(); x++) {
-			Node wn2 = nl.item(x);
-			
-			if (wn2.getNodeName().equalsIgnoreCase("checkedToday")) {
-				if(wn2.getTextContent().equalsIgnoreCase("true")) {
-					checkedToday = true;
-				} else {
-					checkedToday = false;
-				}
-			} 
-			else if (wn2.getNodeName().equalsIgnoreCase("replacementId")) {
-				replacementId = Integer.parseInt(wn2.getTextContent());
-			} 
-		}
-	}
 	
 	@Override
 	public String checkScrappable() {
@@ -355,12 +329,12 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 	@Override
 	public void setTeamId(UUID i) {
 		super.setTeamId(i);
+		Part replacement = findReplacement(false);
 		if(null != i) {
 			//this is being set as an overnight repair, so
 			//we also need to reserve the replacement. If the 
 			//quantity of the replacement is more than one, we will 
 			//also need to split off a separate one
-			Part replacement = findReplacement(false);
 			//shouldn't be null, but it never hurts to check
 			if(null != replacement) {
 				if(replacement.getQuantity() > 1) {
@@ -372,6 +346,21 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 				} else {
 					replacement.setTeamId(i);
 					replacementId = replacement.getId();
+				}
+			}
+		} else {
+			//the replacement either succeeded or failed. Either way, we need
+			//to be sure to clear out the reservation status of the replacement
+			//part
+			if(replacementId > -1 && null != replacement) {
+				replacementId = -1;
+				replacement.setTeamId(null);
+				if(replacement.isSpare()) {
+					Part spare = campaign.checkForExistingSparePart(replacement);
+					if(null != spare) {
+						spare.incrementQuantity();
+						campaign.removePart(replacement);
+					}
 				}
 			}
 		}

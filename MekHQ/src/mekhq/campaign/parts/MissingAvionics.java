@@ -21,6 +21,8 @@
 
 package mekhq.campaign.parts;
 
+import org.w3c.dom.Node;
+
 import megamek.common.Aero;
 import megamek.common.EquipmentType;
 import mekhq.campaign.Campaign;
@@ -92,4 +94,8 @@ public class MissingAvionics extends MissingPart {
 		}
 	}
 	
+	@Override
+	protected void loadFieldsFromXmlNode(Node wn) {
+		//nothing to load
+	}
 }

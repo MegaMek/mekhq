@@ -65,6 +65,8 @@ v0.1.17 (SVN)
 + Bug 251: No Front Rightt Leg.
 + Bug 253: MMHQ uses all weapons in stack for some refits/cusomisations
 + Bug 240: duplicate Repairs without sufficent stock cause impossible c
++ additional code for Bug 240: need to clear out reservation on task completion
++ Bug: fields in MissingPart not being loaded when loadFieldsFromXML overriden by inheriting class
 
 v0.1.16 (2012-05-23)
 + removed PartsInventory, quantity is now tracked directly by part

@@ -140,6 +140,10 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	protected int oldTeamId = -1;
 	protected int oldRefitId = -1;
 	
+	//only relevant for missing parts
+	protected boolean checkedToday;
+	protected int replacementId;
+	
 	public Part() {
 		this(0, null);
 	}
@@ -162,6 +166,8 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		this.campaign = c;
 		this.brandNew = false;
 		this.quantity = 1;
+		this.checkedToday = false;
+		this.replacementId = -1;
 	}
 
 	public void setId(int id) {
@@ -593,6 +599,16 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 						retVal.brandNew = false;
 					}
 				}
+				else if (wn2.getNodeName().equalsIgnoreCase("checkedToday")) {
+					if(wn2.getTextContent().equalsIgnoreCase("true")) {
+						retVal.checkedToday = true;
+					} else {
+						retVal.checkedToday = false;
+					}
+				} 
+				else if (wn2.getNodeName().equalsIgnoreCase("replacementId")) {
+					retVal.replacementId = Integer.parseInt(wn2.getTextContent());
+				} 
 			}
 		} catch (Exception ex) {
 			// Errrr, apparently either the class name was invalid...
