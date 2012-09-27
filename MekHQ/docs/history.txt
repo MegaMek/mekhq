@@ -70,6 +70,7 @@ v0.1.17 (SVN)
 + Bug 244: Repair Bay Bug: Re-Installed Parts
 + Bug: tech being de-selected after repair
 + Bug 256: Exchange Rights
++ Bug: Fox's Teeth campaign had wrong lastScenarioId value
 
 v0.1.16 (2012-05-23)
 + removed PartsInventory, quantity is now tracked directly by part
