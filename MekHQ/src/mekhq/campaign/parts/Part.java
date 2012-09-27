@@ -256,6 +256,9 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		if(isReservedForRefit()) {
 			toReturn = "Reserved for Refit";
 		}
+		if(isBeingWorkedOn()) {
+			toReturn = "Reserved for Repair";
+		}
 		return toReturn;
 	}
 	
