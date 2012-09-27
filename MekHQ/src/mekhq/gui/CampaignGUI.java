@@ -2280,9 +2280,11 @@ public class CampaignGUI extends JPanel {
 	private void doTask() {// GEN-FIRST:event_btnDoTaskActionPerformed
 		int selectedRow = -1;
 		int partId = -1;
+		int selectedTechRow = -1;
 		Person tech = getSelectedTech();
 		if(onWarehouseTab()) {
 			selectedRow = partsTable.getSelectedRow();
+			selectedTechRow = whTechTable.getSelectedRow();
 			Part part = getSelectedTask();
 			if(null == part) {
 				return;
@@ -2304,6 +2306,7 @@ public class CampaignGUI extends JPanel {
 		}
 		else if(repairsSelected()) {
 			selectedRow = TaskTable.getSelectedRow();
+			selectedTechRow = TechTable.getSelectedRow();
 			Part part = getSelectedTask();
 			if(null == part) {
 				return;
@@ -2359,7 +2362,8 @@ public class CampaignGUI extends JPanel {
 			}
 		}
 		else if(acquireSelected()) {
-			AcquisitionTable.getSelectedRow();
+			selectedRow = AcquisitionTable.getSelectedRow();
+			selectedTechRow = TechTable.getSelectedRow();
 			IAcquisitionWork acquisition = getSelectedAcquisition();
 			if(null == acquisition) {
 				return;
@@ -2438,7 +2442,7 @@ public class CampaignGUI extends JPanel {
 			for(int i = 0; i < table.getRowCount(); i++) {
 				Person p = techsModel.getTechAt(table.convertRowIndexToModel(i));
 				if(tech.getId().equals(p.getId())) {
-					whTechTable.setRowSelectionInterval(i, i);
+					table.setRowSelectionInterval(i, i);
 					break;
 				}
 			}
