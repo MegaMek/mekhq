@@ -190,9 +190,7 @@ public class MekSensor extends Part {
 			if(hits == 0) {
 				unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS);
 			} else {
-				for(int i = 0; i < hits; i++) {
-					unit.hitSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS);
-				}
+				unit.damageSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_SENSORS, hits);
 			}
 		}
 	}

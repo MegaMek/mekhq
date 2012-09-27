@@ -67,6 +67,7 @@ v0.1.17 (SVN)
 + Bug 240: duplicate Repairs without sufficent stock cause impossible c
 + additional code for Bug 240: need to clear out reservation on task completion
 + Bug: fields in MissingPart not being loaded when loadFieldsFromXML overriden by inheriting class
++ Bug 244: Repair Bay Bug: Re-Installed Parts
 
 v0.1.16 (2012-05-23)
 + removed PartsInventory, quantity is now tracked directly by part

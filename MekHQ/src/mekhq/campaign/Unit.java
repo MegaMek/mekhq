@@ -656,14 +656,15 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 		}
 		return false;
 	}
-
-	public void damageSystem(int type, int slot) {
+	
+	public void damageSystem(int type, int slot, int hits) {
 		for (int loc = 0; loc < getEntity().locations(); loc++) {
-			damageSystem(type, slot, loc);
+			damageSystem(type, slot, loc, hits);
 		}
 	}
-
-	public void damageSystem(int type, int slot, int loc) {
+	
+	public void damageSystem(int type, int slot, int loc, int hits) {
+		int nhits = 0;
 		for (int i = 0; i < getEntity().getNumberOfCriticals(loc); i++) {
 			CriticalSlot cs = getEntity().getCritical(loc, i);
 			// ignore empty & system slots
@@ -671,31 +672,16 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 				continue;
 			}
 			if (cs.getIndex() == slot) {
-				cs.setHit(true);
-				cs.setDestroyed(true);
-				cs.setRepairable(true);
-			}
-		}
-	}
-	
-	public void hitSystem(int type, int slot) {
-		for (int loc = 0; loc < getEntity().locations(); loc++) {
-			hitSystem(type, slot, loc);
-		}
-	}
-	
-	public void hitSystem(int type, int slot, int loc) {
-		for (int i = 0; i < getEntity().getNumberOfCriticals(loc); i++) {
-			CriticalSlot cs = getEntity().getCritical(loc, i);
-			// ignore empty & system slots
-			if ((cs == null) || (cs.getType() != type)) {
-				continue;
-			}
-			if (cs.getIndex() == slot  && !cs.isDestroyed()) {
-				cs.setHit(true);
-				cs.setDestroyed(true);
-				cs.setRepairable(true);
-				return;
+				if(nhits < hits) {
+					cs.setHit(true);
+					cs.setDestroyed(true);
+					cs.setRepairable(true);
+					nhits++;
+				} else {
+					cs.setHit(false);
+					cs.setDestroyed(false);
+					cs.setRepairable(true);
+				}
 			}
 		}
 	}

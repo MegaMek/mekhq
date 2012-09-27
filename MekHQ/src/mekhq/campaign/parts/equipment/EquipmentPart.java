@@ -338,7 +338,7 @@ public class EquipmentPart extends Part {
 					mounted.setDestroyed(true);
 					mounted.setHit(true);
 					mounted.setRepairable(true);
-			        unit.destroySystem(CriticalSlot.TYPE_EQUIPMENT, unit.getEntity().getEquipmentNum(mounted));	
+			        unit.damageSystem(CriticalSlot.TYPE_EQUIPMENT, unit.getEntity().getEquipmentNum(mounted), hits);	
 				} else {
 					mounted.setHit(false);
 			        mounted.setDestroyed(false);

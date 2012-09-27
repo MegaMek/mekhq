@@ -415,9 +415,7 @@ public class EnginePart extends Part {
 					((Tank)unit.getEntity()).engineFix();
 				}
 			} else {
-				for(int i = 0; i < hits; i++) {
-					unit.hitSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE);
-				}
+				unit.damageSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE, hits);
 				if(unit.getEntity() instanceof Aero) {
 					((Aero)unit.getEntity()).setEngineHits(hits);
 				}
