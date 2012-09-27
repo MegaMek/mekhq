@@ -162,6 +162,7 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.MekActuator;
@@ -236,13 +237,14 @@ public class CampaignGUI extends JPanel {
 	private static final int PG_PROTO =   6;
 	private static final int PG_BA =      7;
 	private static final int PG_SOLDIER = 8;
-	private static final int PG_TECH =    9;
-	private static final int PG_DOC =     10;
-	private static final int PG_ADMIN =   11;
-	private static final int PG_RETIRE =  12;
-	private static final int PG_MIA =     13;
-	private static final int PG_KIA =     14;
-	private static final int PG_NUM =     15;
+	private static final int PG_VESSEL =  9;
+	private static final int PG_TECH =    10;
+	private static final int PG_DOC =     11;
+	private static final int PG_ADMIN =   12;
+	private static final int PG_RETIRE =  13;
+	private static final int PG_MIA =     14;
+	private static final int PG_KIA =     15;
+	private static final int PG_NUM =     16;
 
 	//parts filter groups
 	private static final int SG_ALL      = 0;
@@ -2704,6 +2706,8 @@ public class CampaignGUI extends JPanel {
     		return "Conventional Infantry";
     	case PG_SUPPORT:
     		return "Support Personnel";
+    	case PG_VESSEL:
+    		return "Large Vessel Crews";
     	case PG_TECH:
     		return "Techs";
     	case PG_DOC:
@@ -3764,15 +3768,16 @@ public class CampaignGUI extends JPanel {
         		Person person = personModel.getPerson(entry.getIdentifier());
         		int type = person.getPrimaryRole();
         		if ((nGroup == PG_ACTIVE) ||
-        				(nGroup == PG_COMBAT && type <= Person.T_INFANTRY) ||
-        				(nGroup == PG_SUPPORT && type > Person.T_INFANTRY) ||
+        				(nGroup == PG_COMBAT && type <= Person.T_SPACE_GUNNER) ||
+        				(nGroup == PG_SUPPORT && type > Person.T_SPACE_GUNNER) ||
         				(nGroup == PG_MW && type == Person.T_MECHWARRIOR) ||
         				(nGroup == PG_CREW && (type == Person.T_GVEE_DRIVER || type == Person.T_NVEE_DRIVER || type == Person.T_VTOL_PILOT || type == Person.T_VEE_GUNNER)) ||
         				(nGroup == PG_PILOT && type == Person.T_AERO_PILOT) ||
         				(nGroup == PG_PROTO && type == Person.T_PROTO_PILOT) ||
         				(nGroup == PG_BA && type == Person.T_BA) ||
         				(nGroup == PG_SOLDIER && type == Person.T_INFANTRY) ||
-        				(nGroup == PG_TECH && type > Person.T_INFANTRY && type < Person.T_DOCTOR) ||
+        				(nGroup == PG_VESSEL && (type == Person.T_SPACE_PILOT || type == Person.T_SPACE_CREW || type == Person.T_SPACE_GUNNER || type == Person.T_NAVIGATOR)) ||
+        				(nGroup == PG_TECH && type >= Person.T_MECH_TECH && type < Person.T_DOCTOR) ||
         				(nGroup == PG_DOC && ((type == Person.T_DOCTOR) || (type == Person.T_MEDIC))) ||
         				(nGroup == PG_ADMIN && type > Person.T_MEDIC)
         				) {
@@ -6791,7 +6796,7 @@ public class CampaignGUI extends JPanel {
                     menu.setEnabled(!person.isDeployed(getCampaign()));
                     popup.add(menu);
                 }
-				if(oneSelected) {
+				if(oneSelected && person.isActive()) {
 					menu = new JMenu("Spend XP");
 					JMenu currentMenu = new JMenu("Current Skills");
 					JMenu newMenu = new JMenu("New Skills");
@@ -6885,7 +6890,7 @@ public class CampaignGUI extends JPanel {
 					}
 					popup.add(menu);
 				}
-				if(oneSelected) {
+				if(oneSelected && person.isActive()) {
 					if(getCampaign().getCampaignOptions().useEdge()) {
 						menu = new JMenu("Set Edge Triggers");
 						cbMenuItem = new JCheckBoxMenuItem("Head Hits");
@@ -6985,14 +6990,6 @@ public class CampaignGUI extends JPanel {
 					menu.add(menuItem);
 				}
 				if(oneSelected) {
-					/*
-					if (person instanceof PilotPerson) {
-						menuItem = new JMenuItem("Undeploy Pilot");
-						menuItem.setActionCommand("UNDEPLOY");
-						menuItem.addActionListener(this);
-						menuItem.setEnabled(getCampaign().isGM() && person.isDeployed());
-						menu.add(menuItem);
-					}*/
 					menuItem = new JMenuItem("Edit...");
 					menuItem.setActionCommand("EDIT");
 					menuItem.addActionListener(this);
@@ -8060,7 +8057,11 @@ public class CampaignGUI extends JPanel {
 			} else if (command.equalsIgnoreCase("SELL_ALL")) {
 				for(Part p : parts) {
 					if(null != p) {
-						getCampaign().sellPart(p, p.getQuantity());
+						if(p instanceof AmmoStorage) {
+							getCampaign().sellAmmo((AmmoStorage)p, ((AmmoStorage)p).getShots());
+						} else {
+							getCampaign().sellPart(p, p.getQuantity());
+						}
 					}
 				}
 				refreshPartsList();
@@ -8071,8 +8072,12 @@ public class CampaignGUI extends JPanel {
 				refreshFinancialTransactions();
 			} else if(command.equalsIgnoreCase("SELL_N")) {
 				if(null != selectedPart) {
+					int n = selectedPart.getQuantity();
+					if(selectedPart instanceof AmmoStorage) {
+						n = ((AmmoStorage)selectedPart).getShots();
+					}
 					PopupValueChoiceDialog pvcd = new PopupValueChoiceDialog(
-							getFrame(), true, "Sell How Many " + selectedPart.getName() + "s?", 1, 1, selectedPart.getQuantity());
+							getFrame(), true, "Sell How Many " + selectedPart.getName() + "s?", 1, 1, n);
 					pvcd.setVisible(true);
 					int q = pvcd.getValue();
 					getCampaign().sellPart(selectedPart, q);
@@ -8104,6 +8109,24 @@ public class CampaignGUI extends JPanel {
 		public void mouseReleased(MouseEvent e) {
 			maybeShowPopup(e);
 		}
+		
+		public boolean areAllPartsAmmo(Part[] parts) {
+			for(Part p : parts) {
+				if(!(p instanceof AmmoStorage)) {
+					return false;
+				}
+			}
+			return true;
+		}
+		
+		public boolean areAllPartsNotAmmo(Part[] parts) {
+			for(Part p : parts) {
+				if(p instanceof AmmoStorage) {
+					return false;
+				}
+			}
+			return true;
+		}
 
 		private void maybeShowPopup(MouseEvent e) {
 			JPopupMenu popup = new JPopupMenu();
@@ -8111,27 +8134,54 @@ public class CampaignGUI extends JPanel {
 				if(partsTable.getSelectedRowCount() == 0) {
 	            	return;
 	            }
-	            int row = partsTable.getSelectedRow();
+	            int[] rows = partsTable.getSelectedRows();
 				JMenuItem menuItem = null;
 				JMenu menu = null;
 				JCheckBoxMenuItem cbMenuItem = null;
-	            boolean oneSelected = partsTable.getSelectedRowCount() == 1;
-				Part part = partsModel.getPartAt(partsTable.convertRowIndexToModel(row));
+	            Part[] parts = new Part[rows.length];
+	            boolean oneSelected = false;
+	            for(int i = 0; i < rows.length; i++) {
+	            	parts[i] = partsModel.getPartAt(partsTable.convertRowIndexToModel(rows[i]));
+	            }
+	            Part part = null;
+	            if(parts.length == 1) {
+	            	oneSelected = true;
+	            	part = parts[0];
+	            }
 				// **lets fill the pop up menu**//
 				// sell part
 				if(getCampaign().getCampaignOptions().canSellParts()) {
 					menu = new JMenu("Sell");
-					menuItem = new JMenuItem("Sell Single Part of This Type");
-					menuItem.setActionCommand("SELL");
-					menuItem.addActionListener(this);
-					menu.add(menuItem);
-					menuItem = new JMenuItem("Sell All Parts of This Type");
-					menuItem.setActionCommand("SELL_ALL");
-					menuItem.addActionListener(this);
-					menu.add(menuItem);
-					if(oneSelected && part.getQuantity() > 2) {
-						menuItem = new JMenuItem("Sell # Parts of This Type...");
-						menuItem.setActionCommand("SELL_N");
+					if(areAllPartsAmmo(parts)) {
+						menuItem = new JMenuItem("Sell All Ammo of This Type");
+						menuItem.setActionCommand("SELL_ALL");
+						menuItem.addActionListener(this);
+						menu.add(menuItem);
+						if(oneSelected && ((AmmoStorage)part).getShots() > 1) {
+							menuItem = new JMenuItem("Sell # Ammo of This Type...");
+							menuItem.setActionCommand("SELL_N");
+							menuItem.addActionListener(this);
+							menu.add(menuItem);
+						}
+					} else if (areAllPartsNotAmmo(parts)){
+						menuItem = new JMenuItem("Sell Single Part of This Type");
+						menuItem.setActionCommand("SELL");
+						menuItem.addActionListener(this);
+						menu.add(menuItem);
+						menuItem = new JMenuItem("Sell All Parts of This Type");
+						menuItem.setActionCommand("SELL_ALL");
+						menuItem.addActionListener(this);
+						menu.add(menuItem);
+						if(oneSelected && part.getQuantity() > 2) {
+							menuItem = new JMenuItem("Sell # Parts of This Type...");
+							menuItem.setActionCommand("SELL_N");
+							menuItem.addActionListener(this);
+							menu.add(menuItem);
+						}
+					} else {
+						//when both ammo and non-ammo only allow sell all
+						menuItem = new JMenuItem("Sell All Parts of This Type");
+						menuItem.setActionCommand("SELL_ALL");
 						menuItem.addActionListener(this);
 						menu.add(menuItem);
 					}

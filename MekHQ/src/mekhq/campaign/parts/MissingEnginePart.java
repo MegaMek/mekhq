@@ -277,6 +277,15 @@ public class MissingEnginePart extends MissingPart {
 		this.forHover = hover;
 	}
 	
+	public void fixClanFlag() {
+		int flags = engine.getFlags();
+		if(!engine.hasFlag(Engine.CLAN_ENGINE)) {
+			flags |= Engine.CLAN_ENGINE;
+		}
+		engine = new Engine(engine.getRating(), engine.getEngineType(), flags);
+		this.name = engine.getEngineName() + " Engine";
+	}
+	
 	 @Override
 	 public String checkFixable() {
 		 for(int i = 0; i < unit.getEntity().locations(); i++) {

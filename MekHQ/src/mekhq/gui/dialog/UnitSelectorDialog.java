@@ -396,8 +396,6 @@ public class UnitSelectorDialog extends JDialog {
                 if (
                 /*year limits*/
                 (!campaign.getCampaignOptions().limitByYear() || mech.getYear() <= year) &&
-                /*star league limits*/
-                (!campaign.getCampaignOptions().disallowStarLeagueUnits() || mech.getYear() > 2785) &&
                 /*Clan/IS limits*/
                 (campaign.getCampaignOptions().allowClanPurchases() || !TechConstants.isClan(mech.getType())) &&
                 (campaign.getCampaignOptions().allowISPurchases() || TechConstants.isClan(mech.getType())) &&

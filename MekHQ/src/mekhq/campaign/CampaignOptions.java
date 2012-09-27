@@ -38,6 +38,7 @@ import org.w3c.dom.NodeList;
 public class CampaignOptions implements Serializable {
 	private static final long serialVersionUID = 5698008431749303602L;
 	
+	public final static int TECH_INTRO        = -1;
 	public final static int TECH_STANDARD     = 0;
 	public final static int TECH_ADVANCED     = 1;
 	public final static int TECH_EXPERIMENTAL = 2;
@@ -72,7 +73,6 @@ public class CampaignOptions implements Serializable {
     private boolean allowClanPurchases;
     private boolean allowISPurchases;
     private boolean allowCanonOnly;
-    private boolean disallowStarLeagueUnits;
     private int techLevel;
     
     //finance related
@@ -132,7 +132,6 @@ public class CampaignOptions implements Serializable {
         allowClanPurchases = true;
         allowISPurchases = true;
         allowCanonOnly = false;
-        disallowStarLeagueUnits = false;
         techLevel = TECH_EXPERIMENTAL;
         scenarioXP = 1;
         killsForXP = 0;
@@ -168,6 +167,8 @@ public class CampaignOptions implements Serializable {
     
     public static String getTechLevelName(int lvl) {
     	switch(lvl) {
+    	case TECH_INTRO:
+    		return "Introductory";
     	case TECH_STANDARD:
     		return "Standard";
     	case TECH_ADVANCED:
@@ -460,14 +461,6 @@ public class CampaignOptions implements Serializable {
     	allowCanonOnly = b;
     }
     
-    public boolean disallowStarLeagueUnits() {
-    	return disallowStarLeagueUnits;
-    }
-    
-    public void setDisallowStarLeagueUnits(boolean b) {
-    	disallowStarLeagueUnits = b;
-    }
-    
     public int getTechLevel() {
     	return techLevel;
     }
@@ -555,7 +548,6 @@ public class CampaignOptions implements Serializable {
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "allowClanPurchases", allowClanPurchases);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "allowISPurchases", allowISPurchases);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "allowCanonOnly", allowCanonOnly);
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "disallowStarLeagueUnits", disallowStarLeagueUnits);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "techLevel", techLevel);
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<usePortraitForType>"
@@ -726,11 +718,6 @@ public class CampaignOptions implements Serializable {
 					retVal.allowCanonOnly = true;
 				else
 					retVal.allowCanonOnly = false;
-			} else if (wn2.getNodeName().equalsIgnoreCase("disallowStarLeagueUnits")) {
-				if (wn2.getTextContent().equalsIgnoreCase("true"))
-					retVal.disallowStarLeagueUnits = true;
-				else
-					retVal.disallowStarLeagueUnits = false;
 			} else if (wn2.getNodeName().equalsIgnoreCase("techLevel")) {
 				retVal.techLevel = Integer.parseInt(wn2.getTextContent().trim());
 			} else if (wn2.getNodeName().equalsIgnoreCase("useDragoonRating")) {

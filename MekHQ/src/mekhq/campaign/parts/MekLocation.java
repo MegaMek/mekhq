@@ -111,7 +111,7 @@ public class MekLocation extends Part {
         case(Mech.LOC_RARM):
             this.name = "Mech Right Arm";
         	if(forQuad) {
-        		this.name = "Mech Front Left Leg";
+        		this.name = "Mech Front Right Leg";
     		}
             break;
         case(Mech.LOC_LLEG):

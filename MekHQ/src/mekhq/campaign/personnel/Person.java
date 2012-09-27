@@ -123,6 +123,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     
     protected String biography;
     protected GregorianCalendar birthday;
+    protected GregorianCalendar deathday;
     protected ArrayList<LogEntry> personnelLog;
     
     private Hashtable<String,Skill> skills;
@@ -447,8 +448,21 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     	return birthday;
     }
     
+    public GregorianCalendar getDeathday() {
+    	return deathday;
+    }
+    
+    public void setDeathday(GregorianCalendar date) {
+    	this.deathday = date;
+    }
+    
     public int getAge(GregorianCalendar today) {
     	// Get age based on year
+    	if(null != deathday) {
+    		//use deathday instead of birthdate
+    		today = deathday;
+    	}
+    	
     	int age = today.get(Calendar.YEAR) - birthday.get(Calendar.YEAR);
 
     	// Add the tentative age to the date of birth to get this year's birthday
@@ -622,6 +636,12 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 				+"<birthday>"
 				+df.format(birthday.getTime())
 				+"</birthday>");
+		if(null != deathday) {
+			pw1.println(MekHqXmlUtil.indentStr(indent+1)
+					+"<deathday>"
+					+df.format(deathday.getTime())
+					+"</deathday>");
+		}
 		for(String skName : skills.keySet()) {
 			Skill skill = skills.get(skName);
 			skill.writeToXml(pw1, indent+1);
@@ -743,6 +763,10 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 					SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 					retVal.birthday = (GregorianCalendar) GregorianCalendar.getInstance();
 					retVal.birthday.setTime(df.parse(wn2.getTextContent().trim()));
+				} else if (wn2.getNodeName().equalsIgnoreCase("deathday")) {
+					SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+					retVal.deathday = (GregorianCalendar) GregorianCalendar.getInstance();
+					retVal.deathday.setTime(df.parse(wn2.getTextContent().trim()));
 				} else if (wn2.getNodeName().equalsIgnoreCase("advantages")) {
 					advantages = wn2.getTextContent();
 				} else if (wn2.getNodeName().equalsIgnoreCase("edge")) {

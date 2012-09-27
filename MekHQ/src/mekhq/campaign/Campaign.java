@@ -52,6 +52,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import megamek.client.RandomNameGenerator;
 import megamek.common.ASFBay;
 import megamek.common.Aero;
+import megamek.common.AmmoType;
 import megamek.common.BattleArmor;
 import megamek.common.BattleArmorBay;
 import megamek.common.Bay;
@@ -1034,6 +1035,9 @@ public class Campaign implements Serializable {
 		location.newDay(this);
 	
 		for (Person p : getPersonnel()) {
+			if(!p.isActive()) {
+				continue;
+			}
 			p.resetMinutesLeft();
 			if(p.needsFixing()) {
 				Person doctor = getPerson(p.getDoctorId());
@@ -1520,6 +1524,10 @@ public class Campaign implements Serializable {
 	}
 
 	public void sellPart(Part part, int quantity) {
+		if(part instanceof AmmoStorage) {
+			sellAmmo((AmmoStorage)part, quantity);
+			return;
+		}
 		long cost = part.getActualValue() * quantity;
 		String plural = "";
 		if(quantity > 1) {
@@ -1531,7 +1539,19 @@ public class Campaign implements Serializable {
 			quantity--;
 		}
 	}
-
+	
+	public void sellAmmo(AmmoStorage ammo, int shots) {
+		shots = Math.min(shots, ammo.getShots());
+		boolean sellingAllAmmo = shots == ammo.getShots();
+		long cost = (long)(ammo.getActualValue() * ((double)shots/ammo.getShots()));
+		finances.credit(cost, Transaction.C_EQUIP_SALE, "Sale of " + shots + " "+ ammo.getName(), calendar.getTime());
+		if(sellingAllAmmo) {
+			ammo.decrementQuantity();
+		} else {
+			ammo.changeShots(-1 * shots);
+		}
+	}
+	
 	public void buyPart(Part part) {
 		buyPart(part, 1);
 	}
@@ -2015,10 +2035,17 @@ public class Campaign implements Serializable {
 				boolean isHover = null != u && u.getEntity().getMovementMode() == EntityMovementMode.HOVER && u.getEntity() instanceof Tank;
 				((EnginePart)prt).fixTankFlag(isHover);
 			}
+			//clan flag might not have been properly set in early versions
+			if(prt instanceof EnginePart && prt.getName().contains("(Clan") && !prt.isClanTechBase()) {
+				((EnginePart)prt).fixClanFlag();
+			}
 			if(prt instanceof MissingEnginePart && null != u && u.getEntity() instanceof Tank) {
 				boolean isHover = null != u && u.getEntity().getMovementMode() == EntityMovementMode.HOVER && u.getEntity() instanceof Tank;
 				((MissingEnginePart)prt).fixTankFlag(isHover);
-			}		
+			}
+			if(prt instanceof MissingEnginePart && prt.getName().contains("(Clan") && !prt.isClanTechBase()) {
+				((MissingEnginePart)prt).fixClanFlag();
+			}
 					
 		}
  		for(Part prt : removeParts) {
@@ -3546,6 +3573,11 @@ public class Campaign implements Serializable {
 		Unit u = getUnit(person.getUnitId());
 		if(status == Person.S_KIA) {
 			person.addLogEntry(getDate(), "Killed in action");
+			//set the deathday
+			person.setDeathday((GregorianCalendar)calendar.clone());
+		} else if (person.getStatus() == Person.S_KIA) {
+			 //remove deathdates for resurrection
+			person.setDeathday(null);
 		}
 		if(status == Person.S_MIA) {
 			person.addLogEntry(getDate(), "Missing in action");

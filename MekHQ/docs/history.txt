@@ -57,6 +57,12 @@ v0.1.17 (SVN)
 + set up C3 networks in TO&E tab
 + Bug: secondary techs and doctors get no time
 + Planetary data update 24
++ Bug 3532049: Sell Single not working for Ammo
++ Bug 236: Spend XP on KIA personell
++ Bug 243: Personell Tab filtered for techs includes Vessel Crew
++ Bug 180: only allow post starleague units
++ Bug 239: Parts repair leads to part loose Clan-qualifier
++ Bug 251: No Front Rightt Leg.
 
 v0.1.16 (2012-05-23)
 + removed PartsInventory, quantity is now tracked directly by part
