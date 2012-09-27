@@ -309,14 +309,21 @@ public class Refit implements IPartWork, IAcquisitionWork {
 		armorNeeded = 0;
 		int atype = 0;
 		boolean aclan = false;
-		
+		HashMap<Integer,Integer> partQuantity = new HashMap<Integer,Integer>();
 		for(Part nPart : newPartList) {
 			nPart.setUnit(oldUnit);
 			if(nPart instanceof MissingPart) {
 				time += nPart.getBaseTime();
 				Part replacement = ((MissingPart)nPart).findReplacement(true);
-				if(null != replacement) {
+				//check quantity
+				//TODO: the one weakness here is that we will not pick up damaged parts
+				if(null != replacement && null == partQuantity.get(replacement.getId())) {
+					partQuantity.put(replacement.getId(), replacement.getQuantity());
+				}
+				if(null != replacement && partQuantity.get(replacement.getId()) > 0) {
 					newUnitParts.add(replacement.getId());
+					//adjust quantity
+					partQuantity.put(replacement.getId(), partQuantity.get(replacement.getId())-1);
 				} else {
 					replacement = ((MissingPart)nPart).getNewPart();
 					//set entity for variable cost items
@@ -503,7 +510,6 @@ public class Refit implements IPartWork, IAcquisitionWork {
 		}
 		
 		//deal with integral heat sinks
-		//TODO: compact heat sinks
 		//TODO: heat sinks on other units?
 		if(newEntity instanceof Mech 
 				&& (((Mech)newEntity).hasDoubleHeatSinks() != ((Mech)oldUnit.getEntity()).hasDoubleHeatSinks()
@@ -567,6 +573,33 @@ public class Refit implements IPartWork, IAcquisitionWork {
 		if(customJob) {
 			saveCustomization();
 		}
+		reserveNewParts();
+	}
+	
+	public void reserveNewParts() {
+		//we need to loop through the new parts and
+				//if they are not on a unit already, then we need
+				//to set the refit id. Also, if there is more than one part
+				//then we need to clone a part and reserve that instead
+		ArrayList<Integer> newNewUnitParts = new ArrayList<Integer>();
+		for(int id : newUnitParts) {
+			Part newPart = oldUnit.campaign.getPart(id);
+			if(newPart.isSpare()) {
+				if(newPart.getQuantity() > 1) {
+					newPart.decrementQuantity();
+					newPart = newPart.clone();
+					newPart.setRefitId(oldUnit.getId());
+					oldUnit.campaign.addPart(newPart);
+					newNewUnitParts.add(newPart.getId());
+				} else {
+					newPart.setRefitId(oldUnit.getId());
+					newNewUnitParts.add(id);
+				}
+			} else {
+				newNewUnitParts.add(id);
+			}
+		}		
+		newUnitParts = newNewUnitParts;	
 	}
 	
 	public void resetCheckedToday() {
@@ -603,10 +636,18 @@ public class Refit implements IPartWork, IAcquisitionWork {
 				if(oldUnit.campaign.acquirePart((IAcquisitionWork)part, tech)) {
 					Part replacement = ((MissingPart)part).findReplacement(true);
 					if(null != replacement) {
-						Part actualReplacement = replacement.clone();
-						actualReplacement.setRefitId(oldUnit.getId());
-						newUnitParts.add(actualReplacement.getId());
-						replacement.decrementQuantity();
+						//It *should* be the case that there is only a quantity of 
+						//one here, but lets check just to be sure
+						if(replacement.getQuantity() > 1) {
+							Part actualReplacement = replacement.clone();
+							actualReplacement.setRefitId(oldUnit.getId());
+							oldUnit.campaign.addPart(actualReplacement);
+							newUnitParts.add(actualReplacement.getId());
+							replacement.decrementQuantity();
+						} else {
+							replacement.setRefitId(oldUnit.getId());
+							newUnitParts.add(replacement.getId());
+						}
 					} else {
 						//shouldnt happen, but just to be sure
 						newShoppingList.add(part);
@@ -767,7 +808,11 @@ public class Refit implements IPartWork, IAcquisitionWork {
 				((AmmoBin) part).unload(false);
 			}
 			else {
-				
+				Part spare = oldUnit.campaign.checkForExistingSparePart(part);
+				if(null != spare) {
+					spare.incrementQuantity();
+					oldUnit.campaign.removePart(part);
+				}
 			}
 			part.setUnit(null);
 		}

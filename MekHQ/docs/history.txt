@@ -63,6 +63,7 @@ v0.1.17 (SVN)
 + Bug 180: only allow post starleague units
 + Bug 239: Parts repair leads to part loose Clan-qualifier
 + Bug 251: No Front Rightt Leg.
++ Bug 253: MMHQ uses all weapons in stack for some refits/cusomisations
 
 v0.1.16 (2012-05-23)
 + removed PartsInventory, quantity is now tracked directly by part
