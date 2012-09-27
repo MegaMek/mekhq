@@ -660,25 +660,19 @@ public class ResolveScenarioTracker {
 			}
 		}
 		if(getMission() instanceof Contract) {
+			long value = 0;
+			for(Unit salvageUnit : leftoverSalvage) {
+				salvageUnit.initializeParts(false);
+				salvageUnit.runDiagnostic();
+				value += salvageUnit.getSellValue();
+			}
 			if(((Contract)getMission()).isSalvageExchange()) {
-				//add exchange value of bank account
-				long value = 0;
-				for(Entity en : potentialSalvage) {
-					Unit salvageUnit= new Unit(en, campaign);
-					salvageUnit.initializeParts(false);
-					salvageUnit.runDiagnostic();
-					value += salvageUnit.getSellValue();
-				}
 				value = (long)(((double)value) * (((Contract)getMission()).getSalvagePct()/100.0));
 				campaign.getFinances().credit(value, Transaction.C_SALVAGE, "salvage exchange for " + scenario.getName(),  campaign.getCalendar().getTime());
 				DecimalFormat formatter = new DecimalFormat();
 				campaign.addReport(formatter.format(value) + " C-Bills have been credited to your account for salvage exchange.");
 			} else {
-				for(Unit salvageUnit : leftoverSalvage) {
-					salvageUnit.initializeParts(false);
-					salvageUnit.runDiagnostic();
-					((Contract)getMission()).addSalvageByEmployer(salvageUnit.getSellValue());
-				}
+				((Contract)getMission()).addSalvageByEmployer(value);
 			}
 		}		
 		scenario.setStatus(resolution);
