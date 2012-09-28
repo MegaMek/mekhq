@@ -5,6 +5,8 @@
   Developers:
      Sebastian Brocks <beerockxs@users.sourceforge.net>
   	 Frederic Morel <natitf@users.sourceforge.net>
+  	 Dylan Myers
+  	 Deric Page
   	 Robin Toll <fastsammy@users.sourceforge.net>
 
   Unit Updates:
@@ -18,9 +20,9 @@
   	 Longinus00
   	 Josh Street
   	 Neyah Peterson
-  	 Deric Page
   
   Inner Sphere Map Data
+    Alex Yokel
   	The data for the maps used here come from the Pryde Rock Stellar Cartography datafiles
   	produced by Medron Pryde (http://www.pryderockindustries.com/dl_game_aids.php#ISM)
   	These files are in turn based on Mike Flynn's Inner Sphere Cartography Society data

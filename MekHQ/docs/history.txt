@@ -1,6 +1,6 @@
 VERSION HISTORY
 ----------------------------------
-v0.1.17 (SVN)
+v0.1.17 (2012-09-28)
 + Bug 3529464: Divide by zero - Dragoon's Rating
 + Fixed NumberFormatException in AbstractDragoonsRating
 + Updated MegaMek.jar to r8823 for new Ultra AC options & unjamming bugfix
