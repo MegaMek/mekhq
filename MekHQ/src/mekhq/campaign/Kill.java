@@ -80,6 +80,18 @@ public class Kill implements Serializable {
 		return killer;
 	}
 	
+	public void setDate(Date d) {
+		date = d;
+	}
+	
+	public void setWhatKilled(String s) {
+		killed = s;
+	}
+	
+	public void setKilledByWhat(String s) {
+		killer = s;
+	}
+	
 	public static Kill generateInstanceFromXML(Node wn, int version) {
 	
 		Kill retVal = null;

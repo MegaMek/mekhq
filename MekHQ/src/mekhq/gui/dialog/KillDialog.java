@@ -24,6 +24,7 @@ package mekhq.gui.dialog;
 import java.awt.Frame;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
 
 import mekhq.campaign.Campaign;
@@ -35,20 +36,22 @@ import mekhq.campaign.personnel.Person;
  *
  * @author  Taharqa
  */
-public class NewKillDialog extends javax.swing.JDialog {
+public class KillDialog extends javax.swing.JDialog {
 	private static final long serialVersionUID = -8038099101234445018L;
     private Frame frame;
-    private Campaign campaign;
     private Date date;
-    private Person person;
+    private Kill kill;
+    private String name;
+    private boolean cancelled;
     
     /** Creates new form NewTeamDialog */
-    public NewKillDialog(java.awt.Frame parent, boolean modal, Campaign c, Person p) {
+    public KillDialog(java.awt.Frame parent, boolean modal, Kill k, String pilotName) {
         super(parent, modal);
         this.frame = parent;
-        campaign = c;
-        date = campaign.getCalendar().getTime();
-        person = p;
+        this.kill = k;
+        date = kill.getDate();
+        name = pilotName;
+        cancelled = false;
         initComponents();
         setLocationRelativeTo(parent);
     }
@@ -64,10 +67,10 @@ public class NewKillDialog extends javax.swing.JDialog {
         btnClose = new javax.swing.JButton();
         btnDate = new javax.swing.JButton();
     
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.NewKillDialog");
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.KillDialog");
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
-        setTitle(resourceMap.getString("Form.title") + " " + person.getName());
+        setTitle(resourceMap.getString("Form.title") + " " + name);
         getContentPane().setLayout(new java.awt.GridBagLayout());
         
         lblKill.setText(resourceMap.getString("lblKill.text")); // NOI18N
@@ -79,7 +82,7 @@ public class NewKillDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(lblKill, gridBagConstraints);
         
-        txtKill.setText("");
+        txtKill.setText(kill.getWhatKilled());
         txtKill.setMinimumSize(new java.awt.Dimension(150, 28));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -100,12 +103,13 @@ public class NewKillDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(lblKiller, gridBagConstraints);
         
-        Unit u = campaign.getUnit(person.getUnitId());
-        if(null != u) {
-        	txtKiller.setText(u.getName());
-        } else {
-        	txtKiller.setText("Bare hands?");
-        }
+        //Unit u = campaign.getUnit(person.getUnitId());
+        //if(null != u) {
+        //	txtKiller.setText(u.getName());
+        //} else {
+        //	txtKiller.setText("Bare hands?");
+        //}
+        txtKiller.setText(kill.getKilledByWhat());
         txtKiller.setMinimumSize(new java.awt.Dimension(150, 28));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -121,7 +125,7 @@ public class NewKillDialog extends javax.swing.JDialog {
         btnDate.setName("btnDate"); // NOI18N
         btnDate.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-            	btnDateActionPerformed(evt);
+            	changeDate();
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -166,19 +170,31 @@ public class NewKillDialog extends javax.swing.JDialog {
     }
 
     
+    
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
-    	campaign.addKill(new Kill(person.getId(), txtKill.getText(), txtKiller.getText(), date));  	
+    	kill.setWhatKilled(txtKill.getText());
+    	kill.setKilledByWhat(txtKiller.getText());
+    	kill.setDate(date);
     	this.setVisible(false);
     }
 
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
+    	cancelled = true;
     	this.setVisible(false);
     }
     
-    private void btnDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDateActionPerformed
-        // show the date chooser
-        DateChooser dc = new DateChooser(frame, campaign.getCalendar());
-        // user can eiter choose a date or cancel by closing
+    public Kill getKill() {
+    	return kill;
+    }
+    
+    public boolean wasCancelled() {
+    	return cancelled;
+    }
+    
+    private void changeDate() {
+    	GregorianCalendar cal = new GregorianCalendar();
+    	cal.setTime(date);
+        DateChooser dc = new DateChooser(frame, cal);
         if (dc.showDateChooser() == DateChooser.OK_OPTION) {
             date = dc.getDate().getTime();
             btnDate.setText(getDateAsString());

@@ -153,6 +153,7 @@ import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
+import mekhq.campaign.Kill;
 import mekhq.campaign.LogEntry;
 import mekhq.campaign.Planet;
 import mekhq.campaign.ResolveScenarioTracker;
@@ -191,6 +192,7 @@ import mekhq.gui.dialog.CustomizePersonDialog;
 import mekhq.gui.dialog.CustomizeScenarioDialog;
 import mekhq.gui.dialog.DataLoadingDialog;
 import mekhq.gui.dialog.DragoonsRatingDialog;
+import mekhq.gui.dialog.EditKillLogDialog;
 import mekhq.gui.dialog.EditLogEntryDialog;
 import mekhq.gui.dialog.EditPersonnelLogDialog;
 import mekhq.gui.dialog.EditTransactionDialog;
@@ -198,7 +200,7 @@ import mekhq.gui.dialog.GameOptionsDialog;
 import mekhq.gui.dialog.HireBulkPersonnelDialog;
 import mekhq.gui.dialog.MekHQAboutBox;
 import mekhq.gui.dialog.MissionTypeDialog;
-import mekhq.gui.dialog.NewKillDialog;
+import mekhq.gui.dialog.KillDialog;
 import mekhq.gui.dialog.NewRecruitDialog;
 import mekhq.gui.dialog.PartsStoreDialog;
 import mekhq.gui.dialog.PopupValueChoiceDialog;
@@ -6450,8 +6452,15 @@ public class CampaignGUI extends JPanel {
 				}
 				refreshPersonnelList();
 			} else if (command.equalsIgnoreCase("KILL")) {
-				NewKillDialog nkd = new NewKillDialog(getFrame(), true, getCampaign(), selectedPerson);
+				KillDialog nkd = new KillDialog(getFrame(), true, new Kill(selectedPerson.getId(), "?", "Bare Hands", getCampaign().getDate()), selectedPerson.getName());
 				nkd.setVisible(true);
+				if(!nkd.wasCancelled()) {
+					getCampaign().addKill(nkd.getKill());
+				}
+				refreshPersonnelList();
+			} else if (command.equalsIgnoreCase("KILL_LOG")) {
+				EditKillLogDialog ekld = new EditKillLogDialog(getFrame(), true, getCampaign(), selectedPerson);
+				ekld.setVisible(true);
 				refreshPersonnelList();
 			} else if (command.equalsIgnoreCase("LOG")) {
 				EditPersonnelLogDialog epld = new EditPersonnelLogDialog(getFrame(), true, getCampaign(), selectedPerson);
@@ -6961,6 +6970,11 @@ public class CampaignGUI extends JPanel {
 				if(oneSelected) {
 					menuItem = new JMenuItem("Assign Kill...");
 					menuItem.setActionCommand("KILL");
+					menuItem.addActionListener(this);
+					menuItem.setEnabled(true);
+					popup.add(menuItem);
+					menuItem = new JMenuItem("Edit Kill Log...");
+					menuItem.setActionCommand("KILL_LOG");
 					menuItem.addActionListener(this);
 					menuItem.setEnabled(true);
 					popup.add(menuItem);
