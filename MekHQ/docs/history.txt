@@ -6,6 +6,7 @@ v0.1.18 (SVN)
 + Bug: dropship/jumpship repairs not being scheduled
 + Bug: incorrect price multiplier for jumpships, warships, and space stations
 + updated svn call in packaging.xml
++ new MegaMek.jar
 
 v0.1.17 (2012-09-28)
 + Bug 3529464: Divide by zero - Dragoon's Rating
