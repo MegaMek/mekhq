@@ -25,7 +25,7 @@
 	<property name="svnbuilddir" value="${svndir}/${builddir}" />
 
 	<!-- svnroot used for svn authentification -->
-	<property name="svnroot" value="https://mekhq.svn.sourceforge.net/svnroot/mekhq/MekHQ" />
+	<property name="svnroot" value="svn://svn.code.sf.net/p/mekhq/code/MekHQ" />
 
 	<property name="timestampfile" value="${logdir}/timestamp" />
 	<property name="TinyXMLsrc" value="TinyXML07-src.zip" />
