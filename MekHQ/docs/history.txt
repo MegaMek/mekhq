@@ -1,5 +1,7 @@
 VERSION HISTORY
 ----------------------------------
+v0.1.19 (SVN)
+
 v0.1.18 (2012-09-29)
 + kill logs now editable
 + Bug: shorthanded mod for dropship/jumpship crews
