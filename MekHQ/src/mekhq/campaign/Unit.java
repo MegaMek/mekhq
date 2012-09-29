@@ -827,10 +827,19 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 		else if(entity instanceof SmallCraft) {
 			tonnage = 50f;
 		}
+		else if(entity instanceof SpaceStation) {
+			multiplier = 5;
+		}
+		else if(entity instanceof Warship) {
+			multiplier = 2;
+		}
+		else if(entity instanceof Jumpship) {
+			multiplier = 1.25;
+		}
 		else if(entity instanceof Aero) {
 			tonnage = 200f;
 		}
-		if(!(entity instanceof Infantry) && !(entity instanceof Dropship)) {
+		if(!(entity instanceof Infantry) && !(entity instanceof Dropship) && !(entity instanceof Jumpship)) {
 			multiplier = 1 + (entity.getWeight() / tonnage);
 		}
 		if(entity.isOmni()) {
