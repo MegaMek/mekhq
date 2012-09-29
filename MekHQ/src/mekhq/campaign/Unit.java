@@ -1954,6 +1954,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     		engineer = new Person(commander.getName(), campaign.getRanks());
     		engineer.setMinutesLeft(minutesLeft);
     		engineer.setOvertimeLeft(overtimeLeft);
+    		engineer.setId(commander.getId());
     		engineer.setPrimaryRole(Person.T_SPACE_CREW);
         	if(nCrew > 0) {
         		engineer.addSkill(SkillType.S_TECH_VESSEL, sumSkill/nCrew, sumBonus/nCrew);

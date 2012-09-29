@@ -968,7 +968,11 @@ public class Campaign implements Serializable {
 				tech.setMinutesLeft(0);
 				tech.setOvertimeLeft(0);
 				int helpMod = getShorthandedMod(getAvailableAstechs(minutesUsed,usedOvertime), false);
-		        if(partWork.getShorthandedMod() < helpMod) {
+		        if(null != partWork.getUnit() 
+		        		&& (partWork.getUnit().getEntity() instanceof Dropship || partWork.getUnit().getEntity() instanceof Jumpship)) {
+		        	helpMod = 0;
+		        }
+				if(partWork.getShorthandedMod() < helpMod) {
 		        	partWork.setShorthandedMod(helpMod);
 		        }
 				partWork.setTeamId(tech.getId());
@@ -3393,6 +3397,10 @@ public class Campaign implements Serializable {
         }      
         int helpers = getAvailableAstechs(minutes, isOvertime);
         int helpMod = getShorthandedMod(helpers, false);
+        if(null != partWork.getUnit() 
+        		&& (partWork.getUnit().getEntity() instanceof Dropship || partWork.getUnit().getEntity() instanceof Jumpship)) {
+        	helpMod = 0;
+        }
         if(partWork.getShorthandedMod() > helpMod) {
         	helpMod = partWork.getShorthandedMod();
         }

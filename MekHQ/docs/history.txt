@@ -2,6 +2,8 @@ VERSION HISTORY
 ----------------------------------
 v0.1.18 (SVN)
 + kill logs now editable
++ Bug: shorthanded mod for dropship/jumpship crews
++ Bug: dropship/jumpship repairs not being scheduled
 
 v0.1.17 (2012-09-28)
 + Bug 3529464: Divide by zero - Dragoon's Rating
