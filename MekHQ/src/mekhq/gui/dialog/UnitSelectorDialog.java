@@ -15,6 +15,7 @@ import java.awt.Image;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.util.Comparator;
 import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
 
@@ -51,6 +52,9 @@ import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.gui.CampaignGUI;
+import mekhq.gui.CampaignGUI.FormattedNumberSorter;
+import mekhq.gui.CampaignGUI.UnitTableModel;
+import mekhq.gui.CampaignGUI.WeightClassSorter;
 
 /**
  *
@@ -288,6 +292,7 @@ public class UnitSelectorDialog extends JDialog {
         tableUnits.setName("tableUnits"); // NOI18N
         tableUnits.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         sorter = new TableRowSorter<MechTableModel>(unitModel);
+        sorter.setComparator(MechTableModel.COL_COST, new FormattedNumberSorter());
         tableUnits.setRowSorter(sorter);
         tableUnits.getSelectionModel().addListSelectionListener(new javax.swing.event.ListSelectionListener() {
             public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
@@ -664,6 +669,35 @@ public class UnitSelectorDialog extends JDialog {
 
 			}
 	
+	}
+	
+	/**
+	 * A comparator for numbers that have been formatted with DecimalFormat
+	 * @author Jay Lawson
+	 *
+	 */
+	public class FormattedNumberSorter implements Comparator<String> {
+
+		@Override
+		public int compare(String s0, String s1) {
+			//lets find the weight class integer for each name
+			DecimalFormat format = new DecimalFormat();
+			int l0 = 0;
+			try {
+				l0 = format.parse(s0).intValue();
+			} catch (java.text.ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			int l1 = 0;
+			try {
+				l1 = format.parse(s1).intValue();
+			} catch (java.text.ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return ((Comparable<Integer>)l0).compareTo(l1);
+		}
 	}
 	
 	@Override

@@ -5,6 +5,7 @@ v0.1.19 (SVN)
 + Bug 269: missing file: non_combat_units_list.conf
 + Bug 262: Dragoon's Rating tech support error when using the FMM:R method
 + Bug 265: Missing final contract payment
++ Bug 266: Choose-Unit price Alpha sort
 
 v0.1.18 (2012-09-29)
 + kill logs now editable
