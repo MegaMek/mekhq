@@ -26,6 +26,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 
 import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlSerializable;
 import mekhq.campaign.MekHqXmlUtil;
 

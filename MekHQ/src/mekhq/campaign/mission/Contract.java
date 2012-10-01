@@ -345,6 +345,20 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 		return profit;
 	}
 	
+	public int getMonthsLeft(Date date) {
+		GregorianCalendar cal = new GregorianCalendar();
+		cal.setTime(date);
+		cal.add(Calendar.MONTH, 1);
+		date = cal.getTime();
+		int monthsLeft = 0;
+		while(date.before(endDate) || date.equals(endDate)) {
+			monthsLeft++;
+			cal.add(Calendar.MONTH, 1);
+			date = cal.getTime();
+		}
+		return monthsLeft;
+	}
+	
 	/**
 	 * Only do this at the time the contract is set up, otherwise amounts may change after
 	 * the ink is signed, which is a no-no.

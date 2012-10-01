@@ -20,11 +20,13 @@ public class CompleteMissionDialog extends javax.swing.JDialog {
 	private static final long serialVersionUID = 8376874926997734492L;
 	
 	Mission mission; 
+	int status;
 	
 	/** Creates new form */
     public CompleteMissionDialog(java.awt.Frame parent, boolean modal, Mission m) {
         super(parent, modal);  
         this.mission = m;
+        this.status = -1;
         initComponents();     
         setLocationRelativeTo(parent);
     }
@@ -109,14 +111,19 @@ public class CompleteMissionDialog extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnDoneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDoneActionPerformed
-        mission.setStatus(choiceOutcome.getSelectedIndex()+1);
+    	status = choiceOutcome.getSelectedIndex()+1;
     	this.setVisible(false);
     }
     
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDoneActionPerformed
-        this.setVisible(false);
+        status = -1;
+    	this.setVisible(false);
     }
 
+    public int getStatus() {
+    	return status;
+    }
+    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnDone;

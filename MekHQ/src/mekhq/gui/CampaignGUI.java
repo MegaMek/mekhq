@@ -2240,6 +2240,9 @@ public class CampaignGUI extends JPanel {
 			} else {
 				CompleteMissionDialog cmd = new CompleteMissionDialog(getFrame(), true, mission);
 				cmd.setVisible(true);
+				if(cmd.getStatus() > Mission.S_ACTIVE) {
+					getCampaign().completeMission(mission.getId(), cmd.getStatus());
+				}
 				if(!mission.isActive()) {
 					if(getCampaign().getSortedMissions().size() > 0) {
 						selectedMission = getCampaign().getSortedMissions().get(0).getId();
@@ -2250,6 +2253,10 @@ public class CampaignGUI extends JPanel {
 				}
 			}
 		}
+		refreshReport();
+		refreshFunds();
+		refreshFinancialTransactions();
+		refreshRating();
 	}
 
 	private void btnAddScenarioActionPerformed(java.awt.event.ActionEvent evt) {
