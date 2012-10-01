@@ -3,6 +3,7 @@ VERSION HISTORY
 v0.1.19 (SVN)
 + new MML.jar (should fix bug #271)
 + Bug 269: missing file: non_combat_units_list.conf
++ Bug 262: Dragoon's Rating tech support error when using the FMM:R method
 
 v0.1.18 (2012-09-29)
 + kill logs now editable

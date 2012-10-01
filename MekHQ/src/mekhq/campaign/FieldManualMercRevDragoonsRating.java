@@ -113,7 +113,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
 
             updateJumpships(u.getEntity());
 
-            updateTechSupportNeeds(u.getEntity());
+            updateTechSupportNeeds(u);
         }
 
         updateAvailableSupport();
@@ -179,8 +179,9 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
     /**
      * todo Figure out how to incorporate Naval vessel's & artillery. 
      */
-    private void updateTechSupportNeeds(Entity en) {
-        double hoursNeeded = 0;
+    private void updateTechSupportNeeds(Unit u) {
+    	Entity en = u.getEntity();
+    	double hoursNeeded = 0;
         if (en instanceof Mech) {
             hoursNeeded = Math.floor(en.getWeight() / 5) + 40;
         } else if ((en instanceof SmallCraft)) {
@@ -228,7 +229,14 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
         } else if (campaign.getCampaignOptions().useEraMods() && (en.getTechLevel() > TechConstants.T_INTRO_BOXSET)) {
             hoursNeeded *= 1.5;
         }
-
+        
+        //only inlude large vessel support needs if the vessels are uncrewed
+        //or infantry platoons are understaffed
+        if((en instanceof Dropship || en instanceof Jumpship || en instanceof Infantry) 
+        		&& u.getActiveCrew().size() == u.getFullCrewSize()) {
+        	//return;
+        }
+        
         techSupportNeeded += hoursNeeded;
     }
 
