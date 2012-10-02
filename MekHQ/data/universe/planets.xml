@@ -17102,8 +17102,8 @@ Trunner, the largest city and planetary capital, is home to Imbross AeroTech Ind
 		<lifeForm>4</lifeForm>
 		<satellite>Agiruur</satellite>
 		<socioIndustrial>A-A-B-A-B</socioIndustrial>
-		<landmass>Insel Desteufels</landmass>
-		<desc>Insel Desteufels (“Devil’s Island”) is the only continent set in a vast ocean peppered with island chains. Inarcs planetary capital is Utopia. The major industry on Inarcs is the extraction of mineral resources from the many islands dotting the oceans. Inarcs started out as a Star League penal colony due to a clerical error that listed the planet as uninhabitable. Close to 100,000 criminals and agitators were exported to the world, who in turn built a thriving colony. With this accomplishment the league pardoned the colonists, opening the world to off-world commerce. Blackstone Industries located is located in the city of Erewhon.</desc>
+		<landmass>Insel Desteufels (Utopia)</landmass>
+		<desc>Insel Desteufels (“Devil’s Island”) is the only continent set in a vast ocean peppered with island chains. Inarcs planetary capital is Utopia. The major industry on Inarcs is the extraction of mineral resources from the many islands dotting the oceans. Inarcs started out as a Star League penal colony due to a clerical error that listed the planet as uninhabitable. Close to 100,000 criminals and agitators were exported to the world, who in turn built a thriving colony. With this accomplishment the league pardoned the colonists, opening the world to off-world commerce. Blackstone Industries is located in the city of Erewhon.</desc>
 	</planet>
 	<planet>
 		<name>Inchicore</name>
@@ -22260,6 +22260,25 @@ Most of the population lives in small cities dotting the 4 continents.  There ar
 			<date>3067-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<pressure>3</pressure>
+		<gravity>0.93</gravity>
+		<lifeForm>4</lifeForm>
+		<climate>3</climate>
+		<percentWater>81</percentWater>
+		<temperature>34</temperature>
+		<spectralClass>F</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>1</sysPos>
+		<satellite>Montoya</satellite>
+		<satellite>Vasquez</satellite>
+		<landMass>Appilagio (Terrace)</landMass>
+		<landMass>Naramo</landMass>
+		<desc>The terrestrial planet of Mara was settled in the early age of colonial expansion, after it was recognized for the pleasant agricultural world it could be. Though industrial metals may be found in small veins—particularly among the remote Northern Isles and on the small south-polar continent of Naramo—the fertile, wooded lands and freshwater lakes on Appilagio, the planet‘s large main continent, are the source of almost all the planet‘s industry. Much of the logging industry, for one of Mara‘s chief exports, is focused around the Great Rim—site of a long-ago asteroid impact on Appilagio. The majority of Mara‘s settlements are concentrated inland of the Great Rim area, near these logging operations, in a temperate region of plains and large lakes that in many ways resembles the climate of Terra‘s European-Mediterranean region. The planetary capital city of Terrace is located on the northern Broomstick Plains, roughly forty kilometers inland of the Great Rim, near the smaller coastal city of Mountlake, which is itself home to Hara-Maku Enterprises, owners of Mara‘s largest commercial fishing fleet. Hara-Maku‘s operations, which focus mainly on harvesting the delicate freshwater Mara Trout, found in many of Appilagio‘s inland seas, lakes, and rivers, accounts for most of the planet‘s secondary food-export industry. The spaceport city of Lockholme, located in the southern peninsula of Appilagio, is also home to Mara Development Corporation, a construction equipment company that specializes in the manufacture of both Forestry and Construction ‘Mech designs.</desc>
 	</planet>
 	<planet>
 		<name>Marantha</name>
@@ -22483,6 +22502,24 @@ Waytani Incorporated</desc>
 			<date>3067-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<pressure>3</pressure>
+		<gravity>0.75</gravity>
+		<lifeForm>7</lifeForm>
+		<climate>4</climate>
+		<percentWater>63</percentWater>
+		<temperature>47</temperature>
+		<spectralClass>M</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>4</sysPos>
+		<satellite>Ramallah</satellite>
+		<satellite>Medecca</satellite>
+		<landMass>Al-Qoradana</landMass>
+		<desc>3135 - One of the first worlds settled by the Azami, a fanatical Muslim culture originating in the northern region of Terra‘s Africa continent, known for its fierce and dedicated warriors. Much of Markab strongly resembles the native lands of these proud people. The surface land of Markab is concentrated mostly in a single, giant supercontinent known as Al-Qoradana, which has few inland rivers or bodies of water of any sort. A few islands of various sizes pepper the oceans surrounding this great landmass, but it is on Al-Qoradana that the settlers established the majority of their cities. These early colonists, drawn by the hidden wealth of precious metals and hydrocarbons beneath the windswept surface of sand, rocks, and precious few oases, carved their niche into the world despite a harmful bacteriological taint in the atmosphere. Resourceful, the Azami learned to overcome the ravages of the world‘s environment, and the planet flourished despite a campaign by the forces of the Draconis Combine to undercut their culture and independence. As a result of the Combine attacks, however, most of the Azami‘s water-purification plants were destroyed, and those that survived malfunctioned over time. Only in the last century or so, with the rediscovery of lost technologies, have the inhabitants of Markab been able to restore the lost ability to drink their own world‘s abundant seawater and use it for irrigation.</desc>
 	</planet>
 	<planet>
 		<name>Markesan</name>
@@ -22686,21 +22723,20 @@ Peloran Motors</desc>
 			<date>3064-11-05</date>
 			<faction>DC</faction>
 		</factionChange>
-		<spectralClass>F</spectralClass>
-		<subtype>2</subtype>
+		<spectralClass>G</spectralClass>
+		<subtype>5</subtype>
+		<zenithCharge>True</zenithCharge>
 		<luminosity>V</luminosity>
 		<sysPos>3</sysPos>
 		<gravity>1</gravity>
 		<pressure>3</pressure>
-		<temperature>27</temperature>
-		<percentWater>65</percentWater>
+		<temperature>40</temperature>
+		<percentWater>50</percentWater>
 		<hpg>B</hpg>
-		<lifeForm>3</lifeForm>
-		<climate>2</climate>
+		<lifeForm>5</lifeForm>
+		<climate>3</climate>
 		<socioIndustrial>B-B-C-C-A</socioIndustrial>
-		<landmass>Bounty (Dark Earth)</landmass>
-		<landmass>Needles</landmass>
-		<desc>A breadbasket world in the Matsuida prefecture of the Galedon Military district; Kirei Na Niwa is a planet renowned for agriculture and a year round warm climate. The continent of Needles is home to needle like mountains that surround the plains. These plains are battered by severe and unpredictable windstorms. The city of Newton on the continent is home to Kinkakuji Enterprises.</desc>
+		<desc>Matsuida is best known for its large fishing industry and infamously known for the prison system. Prisoners of the Combine can agree to work the often deadly fishing boats of Matsuida in exchange for having their sentences shortened. The Combine has found this to be an effective way to remove troublesome prisoners without actually executing them.</desc>
 	</planet>
 	<planet>
 		<name>Mauckport</name>
@@ -24568,6 +24604,34 @@ Bagamoyo Aerospace Manufacturing</desc>
 			<date>3067-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<pressure>4</pressure>
+		<gravity>1.18</gravity>
+		<lifeForm>7</lifeForm>
+		<climate>3</climate>
+		<percentWater>54</percentWater>
+		<temperature>47</temperature>
+		<spectralClass>G</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>3</sysPos>
+		<satellite>Oasis</satellite>
+		<satellite>Shard</satellite>
+		<satellite>Teller</satellite>
+		<satellite>Tinker</satellite>
+		<landMass>Abla</landMass>
+		<landMass>Felkra (Murchison City)</landMass>
+		<landMass>Haschweld</landMass>
+		<landMass>Oasis - Rhinehold</landMass>
+		<landMass>Oasis - Schultz</landMass>
+		<desc>A large, populous world blessed with a habitable satellite (Oasis), Murchison was a colonists‘ dream when it was discovered in the early days of spaceflight. Though gravity was slightly greater and the atmosphere somewhat heavier than Terran-normal, 
+Murchison‘s ample water supply, fertile soil, and mineral wealth invited millions of eager colonists to the planet. An assortment of civilian industries grew on Murchison and its satellite, particularly electronics, pharmaceuticals, automotive, and aerospace industries. Cattle farming, which proved more suited to the planet, and agriculture on the primary moon, provided an interesting 
+food-trading network between the dual worlds that kept both populations well fed and virtually self-sufficient. However, this symbiotic balance became disrupted more than a few times during the Succession Wars, when invading troops used the smaller Oasis as a jump-off point for attacks on Murchison itself. Today, much of the surface of Oasis still bears the scars of several 
+battles, and its settlers have mostly relocated to Murchison, leaving the moon a largely military holding of the planetary government. Murchison itself has three main continents, Abla, Haschweld, and Felkra, home to its capital, Murchison City. Oasis‘ two continents, Schultz and Rhinehold, by comparison, are home only to the lunar capital of Fort Wolfe and the principal 
+spaceport of Laubenstein.</desc>
 	</planet>
 	<planet>
 		<name>Muridox</name>
@@ -27481,6 +27545,10 @@ On Ovan, local nobles have come to exercise complete control over the citizenry 
 			<date>3067-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 		<pressure>3</pressure>
 		<gravity>0.92</gravity>
 		<lifeForm>7</lifeForm>
@@ -27493,6 +27561,11 @@ On Ovan, local nobles have come to exercise complete control over the citizenry 
 		<sysPos>2</sysPos>
 		<socioIndustrial>B-B-B-C-C</socioIndustrial>
 		<satellite>Daikoku</satellite>
+		<landMass>Kushiro (Sapporo)</landMass>
+		<landMass>Muroran</landMass>
+		<landMass>Niigata</landMass>
+		<landMass>Sendai</landMass>
+		<landMass>Todoga</landMass>
 		<hpg>B</hpg>
 		<desc>Originally a beautiful planet with rough terrain and extreme weather, Ozawa suffered significant damage during the course of the Succession Wars. The rough weather and tidal conditions kept some early colonists away, however the planet grew slowly and industry sprang up after large deposits of metal ores were discovered. The planet became a major manufacturing center, unfortunately this made the planet a major target when the Succession Wars broke out. Bitter fighting between the Capellan Confederation, Federated Suns and Draconis Combine left the planet torn apart, especially after the Combine resorted to nuclear weapons to remove entrenched Federated Suns units. The Suns finally claimed victory in 2841 and the planet has slowly begun to recover since.
 
@@ -28760,7 +28833,7 @@ Pleione was part of the Tikonov Grand Union before joining the Capellan Confeder
         <hpg>A</hpg>
 		<lifeForm>6</lifeForm>
 		<socioIndustrial>B-B-C-B-B</socioIndustrial>
-		<landmass>Marsdentica</landmass>
+		<landmass>Marsdentica (Allison City)</landmass>
 		<landmass>Steinerheim</landmass>
 		<desc>Porrima is a world rich in resources, including ample quantities of industrial metals, and precious gems.  Fertile soil, an abundant water supply and a warm climate make Porriman a thriving agriculture world.  Every sixty-two years the planet goes through a harsh weather cycle known as “wet seasons”. The “wet seasons” consist of weeks of heavy rainfall, deadly lightning, and hurricane-force winds.  These powerful “wet seasons” are brought on by the gravitational pull from Porrima’s inward neighbor, Chira. This results in a planetary “wobble”, throwing the weather into a furor. Unprepared, Porriman’s first settlers were washed away. Colonists have since taken precautions to prevent disasters during the “wet seasons”.   Colonies have moved to higher elevations, and cities are built with safeguards to circumvent the effects of the destructive “wet seasons”. On the southern temperate continent of Marsdentica lies Allison City, the planetary Capital.  Allison City is built with high walls and a series of channels that prevents the overflow of the Equanica and Giovanni rivers. The north polar supercontinent of Steinerheim is the main source of the planet’s mining and agriculture.  Settlements on this continent are far enough inland that the storms have less effect on the population.</desc>
 	</planet>
@@ -29220,6 +29293,10 @@ While the planet was once home to a sprawling Brigadier Corporation ‘Mech fact
 			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 		<spectralClass>K</spectralClass>
 		<subtype>2</subtype>
 		<luminosity>v</luminosity>
@@ -29422,6 +29499,21 @@ The location of Proserpina on the Federated Suns border requires the DCMS to kee
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>0.74</gravity>
+		<lifeForm>4</lifeForm>
+		<climate>2</climate>
+		<percentWater>53</percentWater>
+		<temperature>26</temperature>
+		<spectralClass>K</spectralClass>
+		<subtype>9</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>7</sysPos>
+		<landMass>El Largo</landMass>
+		<landMass>El Minoro</landMass>
+		<landMass>Gladius</landMass>
+		<landMass>Morandi (Prosperity Point)</landMass>
+		<desc>A world of abundant raw materials, the first settlers to Quentin were actually employees of Terran corporations hoping to exploit such valuable resources for their ambitious ventures. During the Age of War, many of these industries turned to military applications, and the planet‘s economy truly thrived, but with such prosperity came the desire by various neighboring governments to secure Quentin and its industries for themselves. Only the rise of the Star League saved Quentin from the worst ravages of war. The League‘s dominion, which included Quentin, brought even more wealth to the world when they established a major BattleMech manufacturing plant in the densely industrialized Steel Valley region. This factory ultimately became the centerpiece for Independence Weaponry in the centuries after the League‘s collapse, and, in its heyday, produced scores of heavy and assault BattleMech designs—including the JagerMech, Victor, and Atlas. Immediately after the collapse of the League, however, forces from the Draconis Combine, Capellan Confederation, and the Federated Suns fought bitterly for control of this important world. The planet still retains the scars of that fighting in the form of its caustic atmosphere—the result of a massive biological-weapon attack, launched against the world by retreating would-be conquerors in the First Succession War. The majority of the planet‘s population today resides in and around Steel Valley, on the equatorial continent of Morandi, which is also home to the planetary capital of Prosperity Point. The other planetary continents, El Largo in the northern hemisphere, Gladius in the south, and El Minoro in the southern polar region, are far less populous, due to the extreme cold temperatures in those regions, and the gradual decline of these outlying areas during the last few centuries of war.</desc>
 	</planet>
 	<planet>
 		<name>Quilino</name>
@@ -30846,7 +30938,7 @@ The planet barely survived through the Succession Wars since the technology behi
 		<sysPos>3</sysPos>
 		<landMass>(Heaven’s Gate)</landMass>
 		<hpg>B</hpg>
-		<desc>Ryde is a harsh and nearly inhospitable planet due to regular earthquakes and volcanic eruptions. While Ryde has three oceans, they are full of sulfur and heavy metals making them useless without purification. However, hardy settlers have developed Ryde into a sustainable place to life with the establishment of the city Heaven’s Gate. The settlements on Ryde are able to easily feed themselves by farming in the extremely fertile volcanic soil. The population also makes use of the easy to access geothermal energy for cheap electricity.</desc>
+		<desc>Ryde is a harsh and nearly inhospitable planet due to regular earthquakes and volcanic eruptions. While Ryde has three oceans, they are full of sulfur and heavy metals making them useless without purification. However, hardy settlers have developed Ryde into a sustainable place to live with the establishment of the city Heaven’s Gate. The settlements on Ryde are able to easily feed themselves by farming in the extremely fertile volcanic soil. The population also makes use of the easy to access geothermal energy for cheap electricity.</desc>
 	</planet>
 	<planet>
 		<name>Ryerson</name>
@@ -30981,6 +31073,26 @@ As of the 32nd century, this world is little more than an outpost, with no agric
 		<xcood>83.72</xcood>
 		<ycood>37.56</ycood>
 		<faction>DC</faction>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<pressure>3</pressure>
+		<gravity>0.84</gravity>
+		<lifeForm>4</lifeForm>
+		<climate>3</climate>
+		<percentWater>63</percentWater>
+		<temperature>46</temperature>
+		<spectralClass>K</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>2</sysPos>
+		<landMass>Banade (Jalna’ir)</landMass>
+		<landMass>Grangi</landMass>
+		<landMass>Lossa</landMass>
+		<landMass>Dharma</landMass>
+		<landMass>Shoquelle</landMass>
+		<desc>A quiet, but hot, agricultural world with only the most modest of industrial capacity, most of Sadachbia‘s inland areas are little more than sun-drenched desert plains. The early colonists mostly settled on the many islands and shores of the northern hemisphere, where the land is most arable and the growing season abnormally long, due to the planet‘s axial tilt and wind/ocean currents. Oceangoing vessels keep the lines of trade and communication open between the scattered settlements, with the core of planetary commercial and industrial energies, the spaceport city of Kamalabad, forming the hub of all traffic. Kamalabad is located on the northwestern peninsula of Grangi, Sadachbia‘s largest northern continent. The planetary capital of Jalna‘ir is located on the nearby island-continent of Banade. The planet also has one medium-sized equatorial continent, called Lossa, and two southern continents known as Dharma and Shoquelle. These continents support far fewer settlements than Grangi and Banade, largely due to the fact that they are either too warm during the summer months or because their terrain is too treacherous.</desc>
 	</planet>
 	<planet>
 		<name>Sadalbari</name>
@@ -30995,6 +31107,25 @@ As of the 32nd century, this world is little more than an outpost, with no agric
 			<date>2790-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.10</gravity>
+		<lifeForm>4</lifeForm>
+		<climate>5</climate>
+		<percentWater>59</percentWater>
+		<temperature>39</temperature>
+		<spectralClass>K</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>VI</luminosity>
+		<sysPos>1</sysPos>
+		<satellite>Meche</satellite>
+		<landMass>Aberlani</landMass>
+		<landMass>Beth’lamel (Ramolia)</landMass>
+		<landMass>New Kenya</landMass>
+		<desc>The first settlers to come to the mostly tropical world of Sadalbari hailed from the African and Middle Eastern regions of Terra. At the time, rainforests covered most of the world's landmasses in the middle latitudes—a paradise, compared to the rocky deserts and desolate grasslands these early colonists once called home. Hoping to establish a peaceful agrarian lifestyle, most of the first settlements revolved around farming and cattle ranching—processes made difficult when it soon became clear that most Terrestrial food crops simply wouldn‘t grow in the Sadalbarian soil. Native crops eventually came to the fore, becoming a significant export item, and one of the planet's few contributions to the rest of populated space, until MediTech Industries, a pharmaceutical corporation in the Star League era, discovered that the world's rich jungles also offered great medicinal potential. Under a grant from the Star League, MediTech set up an elaborate research and development facility on the fringe of the massive Waltabu Valley jungle. This facility was abandoned after the fall of the League, but eventually reclaimed after the First Succession War, by a local medical research company called Sadalbari Solutions. Today, Sadalbari Solutions operates a strong, interplanetary corporation that develops and sells everything from specialized dietary supplements to anticancer treatments. The company uses the former MediTech R and D facility as its corporate headquarters, based on the large, northern continent of Aberlani. Sadalbari‘s chief port city of Delhirahn is located on the nearby island-continent of New Kenya. The planetary capital, Ramolia, is situated in the Green Valley region on the planet's large, southern polar continent of Beth'lamel.</desc>
 	</planet>
 	<planet>
 		<name>Sadurni</name>
@@ -31686,6 +31817,26 @@ Tengo Aerospace</desc>
 			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<pressure>4</pressure>
+		<gravity>0.93</gravity>
+		<lifeForm>5</lifeForm>
+		<climate>3</climate>
+		<percentWater>73</percentWater>
+		<temperature>38</temperature>
+		<spectralClass>G</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>1</sysPos>
+		<satellite>Traveler</satellite>
+		<satellite>Wanderer</satellite>
+		<landMass>Kohl</landMass>
+		<landMass>Rhodes</landMass>
+		<landMass>Warschen</landMass>
+		<desc>3135 - A world of heavy rainfall, rich soil, and basic metals, Scheat became an industrialized world soon after the first colonists made planetfall. Lumber and common raw metals such as aluminum and iron made up the bulk of the planetary economy, with textiles forming a supplemental export. Only moderately successful in comparison to neighboring systems, very little made this world stand out in the early years of human expansion into the galaxy. Many cities arose on the primary temperate continents of Kohl and Warschen, centered on the local timber industries and mining establishments, while agricultural settlements developed along the winding rivers that connected many of these cities. In the days of the Terran Hegemony, Scheat was a Hegemony border world to the Draconis Combine, and so military outposts and a small ‘Mech repair and refit complex were placed on the world for the benefit of defending troops. When the Star League fell, these assets became natural targets for the feuding Great Houses, and were largely destroyed in the fighting. Only in the past decade have efforts to reclaim the devastated facilities borne fruit with the opening of Landhome Industrial ‘Mech Enterprises, producer of construction, mining, and forestry ‘Mech designs. The LIME plant is located on Waschen, while the planetary capital and primary spaceport lie in the foothills of Kohl. The large, lake-riddled equatorial continent of Rhodes is Scheat‘s only other major landmass, and it is home to the industrial city of Valorie, where Valorie Metals, Unlimited, Scheat‘s largest mining concern, is headquartered.</desc>
 	</planet>
 	<planet>
 		<name>Schedar</name>
@@ -32928,6 +33079,29 @@ Sian has been the capital of the Capellan Confederation since 2368 when Capella 
 			<date>3067-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.22</gravity>
+		<lifeForm>3</lifeForm>
+		<climate>3</climate>
+		<percentWater>58</percentWater>
+		<temperature>33</temperature>
+		<spectralClass>F</spectralClass>
+		<subtype>7</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>3</sysPos>
+		<satellite>Tanaka</satellite>
+		<satellite>Escholtz</satellite>
+		<satellite>Vance</satellite>
+		<landMass>Freiheim (Aneheim)</landMass>
+		<landMass>Quayling (Inyong City)</landMass>
+		<landMass>Uchida</landMass>
+		<landMass>Unzervalt</landMass>
+		<desc>In most respects, Skat is an unremarkable world with four large continents covering almost half the planetary surface, three tiny asteroid moons in close orbit, and slightly more ozone in the atmosphere than healthy for breathing without either respirators or specialized antioxidant medication. The planet‘s first settlers actually hailed from two distinct colonial groups—one of Japanese and Korean descent, and the other from a combined German-Austrian venture. The groups staked out two separate continents for settlement, with the Japanese and Koreans claiming the southern landmass of Quayling, and the German-Austrian group claiming Freiheim. The two colonial groups expanded to the other two continents of Uchida and Unzervalt over the next several decades, when a dispute over fishing territory and an island chain finally erupted into open conflict during the Age of War. The conflict was settled thanks to intervention by the Terran Hegemony, and Skat became part of that alliance until the fall of the Star League. Today, after falling under the dominion of Houses Davion and Kurita in turn during the Succession Wars, Skat‘s dominantly Germanic and Asian population continues to maintain a dual-cultural world. After rising and falling from prominence 
+as the House Lords changed, the cities of Aneheim, along Freiheim‘s Kirschner River, and Inyong City, on Quayling‘s southern coast, once again form the twin capitals of the planet. Skat‘s largest spaceport, Jinyiang, is located on Uchida, while the city of Londerhalt is arguably the planet‘s largest industrial center.</desc>
 	</planet>
 	<planet>
 		<name>Skepptana</name>
@@ -33155,6 +33329,23 @@ During the Jihad, the Word of Blake forces invaded after they neutralized the de
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<pressure>2</pressure>
+		<gravity>1.04</gravity>
+		<lifeForm>6</lifeForm>
+		<climate>0</climate>
+		<percentWater>67</percentWater>
+		<temperature>24</temperature>
+		<spectralClass>M</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>5</sysPos>
+		<satellite>Alfonso</satellite>
+		<landMass>Everfrost</landMass>
+		<landMass>Gladstone (New Mariotta)</landMass>
+		<landMass>Hollonna</landMass>
+		<landMass>Killingly</landMass>
+		<landMass>Motherland</landMass>
+		<desc>Having only entered its current ice age about a thousand years ago, Small World is a cold world, where icebergs float endlessly across over two-thirds of the planet‘s surface, and where three of its five continents lie under expanding polar glaciers. The earliest expeditions to this world aimed at establishing settlements on the few habitable regions of the planet‘s two small equatorial continents of Gladstone and Motherland, when geologists discovered that a wealth of raw radioactive elements lay just below the surface. The Small family, after which the world was named, quickly capitalized on this discovery and established Small World as a port of call for industries in need of radioactive raw materials. Most of Small World‘s business, even today, comes from the mining, refining, and sale of radioactives and other minerals mined below its frozen lands, though only five major cities exist on the equatorial continents. In 3058, the Small family‘s dream to forge an empire was briefly realized after the breakup of the Federated Commonwealth, when the Duke of Small tried to seize several nearby worlds in a political and military campaign. These efforts broke down again just a few, short years later, and led to the collapse of the Small family and its fall from power. Aside from the cities on Gladstone and Motherland—including the planetary capital and port city of New Mariotta—small mining settlements exist on the northern continent of Everfrost, and the southern continents of Killingly and Hollonna.</desc>
 	</planet>
 	<planet>
 		<name>Smolensk</name>
@@ -36584,6 +36775,23 @@ The planet is heavily industrialized and for a long time was the top producer of
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>0.97</gravity>
+		<lifeForm>7</lifeForm>
+		<climate>3</climate>
+		<percentWater>72</percentWater>
+		<temperature>40</temperature>
+		<spectralClass>F</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>3</sysPos>
+		<satellite>Conan</satellite>
+		<landMass>Fetryl</landMass>
+		<landMass>Gherst</landMass>
+		<landMass>Howell</landMass>
+		<landMass>Hyborian (Port Howard)</landMass>
+		<landMass>Krom</landMass>
+		<desc>Towne is a geologically young planet with large mountains and deep oceans, but also features a diverse ecosphere, the epitome of which is the giant, shaggy, six-legged Eiglotherium. Warmer than Terra, the first colonial settlements were established on the northern Hyborian Continent. Abundant metallic ore deposits, with copper the largest by far, are found mostly in the planet‘s oceans. These deposits have formed the basis of Towne‘s industry, as well as a host of offshore mining platforms and underwater communities seeking to access these valuable resources. Hardwoods and cattle ranching are Towne‘s next most major industries, and for that reason much of the planet‘s imports have been in the form of industrial ‘Mechs , particularly mining, construction, and forestry ‘Mech designs. As a Combine-Suns border world, Towne has suffered its share of invasions during the Succession Wars, but despite it all, the planet retains much of its natural beauty. Aside from the Hyborian continent, Towne has four other landmasses, with Krom at the south pole, Fetryl and Gherst in the southern temperate lattitudes, and the island-continent of Howell in the north, several hundred kilometers east of Hyboria. Of these landmasses, all but Krom are sparsely populated. Gherst, in fact, features the planet‘s second-largest city, a water-port town called Kale Bay, second only to the capital city of Port Howard. Located on the Hyborian continent, Port Howard is also home to the Price John Spaceport, Towne‘s major link to the galaxy at large.</desc>
 	</planet>
 	<planet>
 		<name>Tranquil</name>
