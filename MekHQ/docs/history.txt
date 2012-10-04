@@ -6,7 +6,7 @@ v0.1.19 (SVN)
 + Bug 262: Dragoon's Rating tech support error when using the FMM:R method
 + Bug 265: Missing final contract payment
 + Bug 266: Choose-Unit price Alpha sort
-+ Planetary data update 25
++ Planetary data update 25 
 
 v0.1.18 (2012-09-29)
 + kill logs now editable
