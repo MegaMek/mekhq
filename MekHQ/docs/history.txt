@@ -8,6 +8,7 @@ v0.1.19 (SVN)
 + Bug 266: Choose-Unit price Alpha sort
 + Planetary data update 25 
 + Conventional infantry customization (won't work until updated MML.jar is available)
++ updated MM and MML jars
 
 v0.1.18 (2012-09-29)
 + kill logs now editable
