@@ -40,6 +40,7 @@ import javax.swing.JTabbedPane;
 import megamek.common.AmmoType;
 import megamek.common.Engine;
 import megamek.common.Entity;
+import megamek.common.Infantry;
 import megamek.common.Mech;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
@@ -50,6 +51,7 @@ import megamek.common.WeaponType;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.verifier.EntityVerifier;
 import megamek.common.verifier.TestEntity;
+import megamek.common.verifier.TestInfantry;
 import megamek.common.verifier.TestMech;
 import megamek.common.verifier.TestTank;
 import megameklab.com.MegaMekLab;
@@ -187,6 +189,9 @@ public class MekLabPanel extends JPanel {
 		else if(entity instanceof Tank) {
 			testEntity = new TestTank((Tank)entity, entityVerifier.tankOption, null);
 		}
+		else if(entity instanceof Infantry) {
+			testEntity = new TestInfantry((Infantry)entity, entityVerifier.tankOption, null);
+		}
         StringBuffer sb = new StringBuffer();
         testEntity.correctEntity(sb, true);
 		
@@ -321,9 +326,9 @@ public class MekLabPanel extends JPanel {
             if (entity.getEngine().getEngineType() == Engine.XXL_ENGINE) {
                 heat *= 2;
             }
-        } else if (entity.getEngine().getEngineType() == Engine.XXL_ENGINE) {
+        } else if (!(entity instanceof Infantry) && entity.getEngine().getEngineType() == Engine.XXL_ENGINE) {
             heat += 6;
-        } else {
+        } else if (!(entity instanceof Infantry)) {
             heat += 2;
         }
 
@@ -376,6 +381,9 @@ public class MekLabPanel extends JPanel {
 		}
 		else if(en instanceof Tank) {
 			return new TankPanel((Tank)en);
+		}
+		else if(en instanceof Infantry) {
+			return new InfantryPanel((Infantry)en);
 		}
 		return null;
 	}
@@ -443,6 +451,7 @@ public class MekLabPanel extends JPanel {
 			equipmentTab.refresh();
 			weaponTab.refresh();
 			buildTab.refresh();
+			refreshSummary();
 		}
 
 		public void refreshArmor() {
@@ -461,7 +470,7 @@ public class MekLabPanel extends JPanel {
 		}
 
 		public void refreshStatus() {
-			//do nothing
+			refreshSummary();
 		}
 
 		public void refreshStructure() {
@@ -534,6 +543,7 @@ public class MekLabPanel extends JPanel {
 			equipmentTab.refresh();
 			weaponTab.refresh();
 			buildTab.refresh();
+			refreshSummary();
 		}
 
 		public void refreshArmor() {
@@ -552,7 +562,86 @@ public class MekLabPanel extends JPanel {
 		}
 
 		public void refreshStatus() {
-			//do nothing
+			refreshSummary();
+		}
+
+		public void refreshStructure() {
+			structureTab.refresh();
+			refreshSummary();
+		}
+
+		public void refreshWeapons() {
+			weaponTab.refresh();
+			refreshSummary();
+		}
+
+		@Override
+		public void refreshHeader() {
+			// TODO Auto-generated method stub
+			
+		}
+	}
+	
+	private class InfantryPanel extends EntityPanel {
+		
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 6894731868670529166L;
+	
+		private Infantry entity;
+		private megameklab.com.ui.Infantry.tabs.StructureTab structureTab;
+		private megameklab.com.ui.Infantry.tabs.ArmorTab armorTab;
+		private megameklab.com.ui.Infantry.tabs.WeaponTab weaponTab;
+		
+		public InfantryPanel(Infantry inf) {
+			entity = inf;
+			reloadTabs();
+		}
+		 
+		public Entity getEntity() {
+			return entity;
+		}
+		
+		public void reloadTabs() {
+			removeAll();
+			    
+			structureTab = new megameklab.com.ui.Infantry.tabs.StructureTab(entity);
+			armorTab = new megameklab.com.ui.Infantry.tabs.ArmorTab(entity);
+			armorTab.refresh();
+			weaponTab = new megameklab.com.ui.Infantry.tabs.WeaponTab(entity);
+			structureTab.addRefreshedListener(this);
+			armorTab.addRefreshedListener(this);
+			weaponTab.addRefreshedListener(this);
+
+			addTab("Structure", structureTab);
+			addTab("Armor", armorTab);
+			addTab("Weapons", weaponTab);
+	        this.repaint();
+		}
+		
+		public void refreshAll() {
+			structureTab.refresh();
+			armorTab.refresh();
+			weaponTab.refresh();
+			refreshSummary();
+		}
+
+		public void refreshArmor() {
+			armorTab.refresh();
+			refreshSummary();
+		}
+
+		public void refreshBuild() {
+			refreshSummary();
+		}
+
+		public void refreshEquipment() {
+			refreshSummary();
+		}
+
+		public void refreshStatus() {
+			refreshSummary();
 		}
 
 		public void refreshStructure() {

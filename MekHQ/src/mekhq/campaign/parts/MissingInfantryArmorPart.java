@@ -1,5 +1,5 @@
 /*
- * InfantryMotiveType.java
+ * MissingInfantryMotiveType.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -23,22 +23,23 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
-import mekhq.campaign.Campaign;
-import mekhq.campaign.MekHqXmlUtil;
-
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import megamek.common.EntityMovementMode;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.MekHqXmlUtil;
 
 /**
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class InfantryArmorPart extends Part {
+public class MissingInfantryArmorPart extends MissingPart {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 8298691936947743373L;
+	private static final long serialVersionUID = 330450091994252073L;
 
 	private double damageDivisor;
 	private boolean encumbering = false;
@@ -48,11 +49,11 @@ public class InfantryArmorPart extends Part {
     private boolean sneak_ir = false;
     private boolean sneak_ecm = false;
 	
-    public InfantryArmorPart() {
+    public MissingInfantryArmorPart() {
     	this(0, null, 1.0, false, false, false, false, false, false);
     }
     
-    public InfantryArmorPart(int tonnage, Campaign c, double divisor, boolean enc, boolean dest, boolean camo, boolean ir, boolean ecm, boolean space) {
+    public MissingInfantryArmorPart(int tonnage, Campaign c, double divisor, boolean enc, boolean dest, boolean camo, boolean ir, boolean ecm, boolean space) {
     	super(tonnage, c);
     	this.damageDivisor = divisor;
     	this.encumbering = enc;
@@ -81,117 +82,33 @@ public class InfantryArmorPart extends Part {
     	this.name = heavyString + baseName;
     }
     
-    @Override
-    public String getDetails() {
-    	String details = "";
-    	if(isEncumbering()) {
-    		details += "encumbering";
-    	}
-    	if(isSneakCamo()) {
-    		if(!details.equals("")) {
-    			details += ", ";
-    		}
-    		details += "camo";
-    	}
-    	if(isSneakECM()) {
-    		if(!details.equals("")) {
-    			details += ", ";
-    		}
-    		details += "ECM";
-    	}
-    	if(isSneakIR()) {
-    		if(!details.equals("")) {
-    			details += ", ";
-    		}
-    		details += "IR";
-    	}
-    	return details;
-    }
-    
-	@Override
-	public void updateConditionFromEntity() {
-		//do nothing
-	}
-
 	@Override
 	public void updateConditionFromPart() {
-		//do nothing
-	}
-
-	@Override
-	public void remove(boolean salvage) {
-		if(null != unit) {
-			Part spare = campaign.checkForExistingSparePart(this);
-			if(!salvage) {
-				campaign.removePart(this);
-			} else if(null != spare) {
-				int number = quantity;
-				while(number > 0) {
-					spare.incrementQuantity();
-					number--;
-				}
-				campaign.removePart(this);
-			}
-			unit.removePart(this);
-		}	
-		setSalvaging(false);
-		setUnit(null);
-	}
-
-	@Override
-	public Part getMissingPart() {
-		return new MissingInfantryArmorPart(getUnitTonnage(), campaign, damageDivisor, encumbering, dest, sneak_camo, sneak_ecm, sneak_ir, spaceSuit);
+		// TODO Auto-generated method stub
+		
 	}
 
 	@Override
 	public String checkFixable() {
+		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public boolean needsFixing() {
-		return false;
+	public Part getNewPart() {
+		return new InfantryArmorPart(getUnitTonnage(), campaign, damageDivisor, encumbering, dest, sneak_camo, sneak_ecm, sneak_ir, spaceSuit);
 	}
 
 	@Override
-	public long getStickerPrice() {
-		long price = 0;
-		if(damageDivisor > 1) {
-			if(isEncumbering()) {
-				price += 1600;
-			} else {
-				price += 4300;
-			}
-		}
-		int nSneak = 0;
-		if(isSneakCamo()) {
-			nSneak++;
-		}
-		if(isSneakECM()) {
-			nSneak++;
-		}
-		if(isSneakIR()) {
-			nSneak++;
-		}
-		
-		if(isDest()) {
-			price += 50000;
-		} 
-		else if(nSneak == 1) {
-			price += 7000;
-		}
-		else if(nSneak == 2) {
-			price += 21000;
-		}
-		else if(nSneak == 3) {
-			price += 28000;
-		}
-		
-		if(isSpaceSuit()) {
-			price += 5000;
-		}
-		
-		return price;
+	public boolean isAcceptableReplacement(Part part, boolean refit) {
+		return part instanceof InfantryArmorPart 
+				&& damageDivisor == ((InfantryArmorPart)part).getDamageDivisor() 
+				&& dest == ((InfantryArmorPart)part).isDest() 
+				&& encumbering == ((InfantryArmorPart)part).isEncumbering() 
+				&& sneak_camo == ((InfantryArmorPart)part).isSneakCamo() 
+				&& sneak_ecm == ((InfantryArmorPart)part).isSneakECM() 
+				&& sneak_ir == ((InfantryArmorPart)part).isSneakIR() 
+				&& spaceSuit == ((InfantryArmorPart)part).isSpaceSuit();
 	}
 
 	@Override
@@ -212,52 +129,6 @@ public class InfantryArmorPart extends Part {
 		return 0;
 	}
 
-	@Override
-	public int getTechLevel() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public boolean isSamePartType(Part part) {
-		return part instanceof InfantryArmorPart 
-				&& damageDivisor == ((InfantryArmorPart)part).getDamageDivisor() 
-				&& dest == ((InfantryArmorPart)part).isDest() 
-				&& encumbering == ((InfantryArmorPart)part).isEncumbering() 
-				&& sneak_camo == ((InfantryArmorPart)part).isSneakCamo() 
-				&& sneak_ecm == ((InfantryArmorPart)part).isSneakECM() 
-				&& sneak_ir == ((InfantryArmorPart)part).isSneakIR() 
-				&& spaceSuit == ((InfantryArmorPart)part).isSpaceSuit();
-	}
-
-	public double getDamageDivisor() {
-		return damageDivisor;
-	}
-	
-	public boolean isDest() {
-		return dest;
-	}
-	
-	public boolean isEncumbering() {
-		return encumbering;
-	}
-	
-	public boolean isSneakCamo() {
-		return sneak_camo;
-	}
-	
-	public boolean isSneakECM() {
-		return sneak_ecm;
-	}
-	
-	public boolean isSneakIR() {
-		return sneak_ir;
-	}
-	
-	public boolean isSpaceSuit() {
-		return spaceSuit;
-	}
-	
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent) {
 		writeToXmlBegin(pw1, indent);
@@ -345,13 +216,33 @@ public class InfantryArmorPart extends Part {
 			}
 		}
 	}
-
-	@Override
-	public Part clone() {
-		return new InfantryArmorPart(getUnitTonnage(), campaign, damageDivisor, encumbering, dest, sneak_camo, sneak_ecm, sneak_ir, spaceSuit);
+	
+	public double getDamageDivisor() {
+		return damageDivisor;
 	}
 	
+	public boolean isDest() {
+		return dest;
+	}
 	
+	public boolean isEncumbering() {
+		return encumbering;
+	}
+	
+	public boolean isSneakCamo() {
+		return sneak_camo;
+	}
+	
+	public boolean isSneakECM() {
+		return sneak_ecm;
+	}
+	
+	public boolean isSneakIR() {
+		return sneak_ir;
+	}
+	
+	public boolean isSpaceSuit() {
+		return spaceSuit;
+	}
 	
 }
-	

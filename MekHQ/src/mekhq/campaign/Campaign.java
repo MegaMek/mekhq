@@ -1219,7 +1219,7 @@ public class Campaign implements Serializable {
 
 		// remove any personnel from this unit
 		for(Person p : unit.getCrew()) {
-			unit.remove(p);
+			unit.remove(p, true);
 		}
 
 		//remove unit from any forces
@@ -1239,7 +1239,7 @@ public class Campaign implements Serializable {
 
 		Unit u = getUnit(person.getUnitId());
 		if(null != u) {
-			u.remove(person);
+			u.remove(person, true);
 		}
 		removeAllPatientsFor(person);
 		
@@ -3363,6 +3363,13 @@ public class Campaign implements Serializable {
 	     	   return new TargetRoll(TargetRoll.IMPOSSIBLE, notFixable);
 	        }
         }
+        //if this is an infantry refit, then automatic success
+        if(partWork instanceof Refit && null != partWork.getUnit() 
+        		&& partWork.getUnit().getEntity() instanceof Infantry
+        		&& !(partWork.getUnit().getEntity() instanceof BattleArmor)) {
+        	return new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS, "infantry refit");
+        }
+        
         //this is ugly, if the mode penalty drops you to green, you drop two levels instead of two
         int value = skill.getFinalSkillValue() + modePenalty;
         if(modePenalty > 0 && SkillType.EXP_GREEN == (skill.getExperienceLevel()-modePenalty)) {
@@ -3601,7 +3608,7 @@ public class Campaign implements Serializable {
 		if(status != Person.S_ACTIVE) {
     		person.setDoctorId(null);
     		if(null != u) {
-    			u.remove(person);
+    			u.remove(person, true);
     		}
     	}
 	}

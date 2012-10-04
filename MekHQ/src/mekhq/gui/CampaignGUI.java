@@ -206,6 +206,7 @@ import mekhq.gui.dialog.PartsStoreDialog;
 import mekhq.gui.dialog.PopupValueChoiceDialog;
 import mekhq.gui.dialog.PortraitChoiceDialog;
 import mekhq.gui.dialog.QuirksDialog;
+import mekhq.gui.dialog.RefitNameDialog;
 import mekhq.gui.dialog.ResolveScenarioWizardDialog;
 import mekhq.gui.dialog.TextAreaDialog;
 import mekhq.gui.dialog.UnitSelectorDialog;
@@ -2903,20 +2904,11 @@ public class CampaignGUI extends JPanel {
     	}
     	if(selectModelName) {
 	    	//select a model name
-	    	String s = (String)JOptionPane.showInputDialog(
-	                null,
-	                "Choose a new model name",
-	                "Designate Model",
-	                JOptionPane.PLAIN_MESSAGE,
-	                null,
-	                null,
-	                r.getOriginalEntity().getModel() + " Mk II");
-	    	if(null == s) {
+    		RefitNameDialog rnd = new RefitNameDialog(frame, true, r);
+	    	rnd.setVisible(true);
+	    	if(rnd.wasCancelled()) {
 	    		return;
 	    	}
-	    	//clean out any leading or trailing space
-	    	s = s.trim();
-	    	r.getNewEntity().setModel(s);
     	}
     	//TODO: allow overtime work?
 		//check to see if user really wants to do it - give some info on what will be done
@@ -6170,7 +6162,7 @@ public class CampaignGUI extends JPanel {
 			} else if (command.contains("REMOVE_UNIT")) {
 				Unit u = getCampaign().getUnit(selectedPerson.getUnitId());
 				if(null != u) {
-					u.remove(selectedPerson);
+					u.remove(selectedPerson, true);
 				}
 				refreshServicedUnitList();
 				refreshUnitList();
@@ -6181,7 +6173,7 @@ public class CampaignGUI extends JPanel {
 				Unit u = getCampaign().getUnit(selected);
 				Unit oldUnit = getCampaign().getUnit(selectedPerson.getUnitId());
 				if(null != oldUnit) {
-					oldUnit.remove(selectedPerson);
+					oldUnit.remove(selectedPerson, true);
 				}
 				if(null != u) {
 					u.addPilotOrSoldier(selectedPerson);
@@ -6200,7 +6192,7 @@ public class CampaignGUI extends JPanel {
                     	if (u.canTakeMoreGunners()) {
 	        				Unit oldUnit = getCampaign().getUnit(p.getUnitId());
 	        				if(null != oldUnit) {
-	        					oldUnit.remove(p);
+	        					oldUnit.remove(p, true);
 	        				}
 	        				u.addPilotOrSoldier(p);
                     	}
@@ -6217,7 +6209,7 @@ public class CampaignGUI extends JPanel {
 				Unit u = getCampaign().getUnit(selected);
 				Unit oldUnit = getCampaign().getUnit(selectedPerson.getUnitId());
 				if(null != oldUnit) {
-					oldUnit.remove(selectedPerson);
+					oldUnit.remove(selectedPerson, true);
 				}
 				if(null != u) {
 					u.addDriver(selectedPerson);
@@ -6236,7 +6228,7 @@ public class CampaignGUI extends JPanel {
                     	if (u.canTakeMoreGunners()) {
                     		Unit oldUnit = getCampaign().getUnit(p.getUnitId());
                     		if(null != oldUnit) {
-                    			oldUnit.remove(p);
+                    			oldUnit.remove(p, true);
                     		}
                             u.addGunner(p);
                         }
@@ -6256,7 +6248,7 @@ public class CampaignGUI extends JPanel {
                     	if (u.canTakeMoreVesselCrew()) {
                     		Unit oldUnit = getCampaign().getUnit(p.getUnitId());
                     		if(null != oldUnit) {
-                    			oldUnit.remove(p);
+                    			oldUnit.remove(p, true);
                     		}
                             u.addVesselCrew(p);
                         }
@@ -6276,7 +6268,7 @@ public class CampaignGUI extends JPanel {
                     	if (u.canTakeNavigator()) {
                     		Unit oldUnit = getCampaign().getUnit(p.getUnitId());
                     		if(null != oldUnit) {
-                    			oldUnit.remove(p);
+                    			oldUnit.remove(p, true);
                     		}
                             u.setNavigator(p);
                         }
@@ -8930,7 +8922,7 @@ public class CampaignGUI extends JPanel {
 			if (command.equalsIgnoreCase("REMOVE_PILOT")) {
 				for (Unit unit : units) {
 					for(Person p : unit.getCrew()) {
-						unit.remove(p);
+						unit.remove(p, true);
 					}
 				}
 				refreshServicedUnitList();
@@ -9250,21 +9242,25 @@ public class CampaignGUI extends JPanel {
 					popup.add(menuItem);
 				}
 				// Customize
-				if(oneSelected && (unit.getEntity() instanceof Mech || unit.getEntity() instanceof Tank)) {
+				if(oneSelected && (unit.getEntity() instanceof Mech 
+						|| unit.getEntity() instanceof Tank 
+						|| (unit.getEntity() instanceof Infantry && !(unit.getEntity() instanceof BattleArmor)))) {
 					menu = new JMenu("Customize");
 					menuItem = new JMenuItem("Choose Refit Kit...");
 					menuItem.setActionCommand("REFIT_KIT");
 					menuItem.addActionListener(this);
 					menuItem.setEnabled(!unit.isRefitting()
 							&& (unit.getEntity() instanceof megamek.common.Mech ||
-									unit.getEntity() instanceof megamek.common.Tank));
+									unit.getEntity() instanceof megamek.common.Tank
+									|| (unit.getEntity() instanceof Infantry && !(unit.getEntity() instanceof BattleArmor))));
 					menu.add(menuItem);
 					menuItem = new JMenuItem("Customize in Mek Lab...");
 					menuItem.setActionCommand("CUSTOMIZE");
 					menuItem.addActionListener(this);
 					menuItem.setEnabled(!unit.isRefitting()
 							&& (unit.getEntity() instanceof megamek.common.Mech ||
-									unit.getEntity() instanceof megamek.common.Tank));
+									unit.getEntity() instanceof megamek.common.Tank
+									|| (unit.getEntity() instanceof Infantry && !(unit.getEntity() instanceof BattleArmor))));
 					menu.add(menuItem);
 					if (unit.isRefitting()) {
 						menuItem = new JMenuItem("Cancel Customization");

@@ -2138,7 +2138,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 		p.addLogEntry(campaign.getDate(), "Assigned to " + getName());
     }
     
-    public void remove(Person p) {
+    public void remove(Person p, boolean log) {
     	p.setUnitId(null);
     	drivers.remove(p.getId());
     	gunners.remove(p.getId());
@@ -2147,7 +2147,9 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     		navigator = null;
     	}
     	resetPilotAndEntity();
-		p.addLogEntry(campaign.getDate(), "Removed from " + getName());
+    	if(log) {
+    		p.addLogEntry(campaign.getDate(), "Removed from " + getName());
+    	}
     }
     
     public boolean isUnmanned() {

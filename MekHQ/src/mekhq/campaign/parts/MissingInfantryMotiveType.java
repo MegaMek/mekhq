@@ -1,5 +1,5 @@
 /*
- * InfantryMotiveType.java
+ * MissingInfantryMotiveType.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -23,37 +23,35 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import megamek.common.EntityMovementMode;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class InfantryMotiveType extends Part {
-	
+public class MissingInfantryMotiveType extends MissingPart {
+
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -2915821210551422633L;
-	
+	private static final long serialVersionUID = 2454012279066776500L;
 	private EntityMovementMode mode;
 
-	public InfantryMotiveType() {
+	public MissingInfantryMotiveType() {
     	this(0, null, null);
     }
 	
-	public InfantryMotiveType(int tonnage, Campaign c, EntityMovementMode m) {
+	public MissingInfantryMotiveType(int tonnage, Campaign c, EntityMovementMode m) {
 		super(tonnage, c);
 		this.mode = m;
 		if(null != mode) {
 			assignName();
 		}
-
 	}
 	
 	private void assignName() {
@@ -80,74 +78,27 @@ public class InfantryMotiveType extends Part {
 	}
 	
 	@Override
-	public void updateConditionFromEntity() {
-		//nothing to do here
-	}
-
-	@Override
 	public void updateConditionFromPart() {
-		//nothing to do here
-	}
-
-	@Override
-	public void remove(boolean salvage) {
-		if(null != unit) {
-			Part spare = campaign.checkForExistingSparePart(this);
-			if(!salvage) {
-				campaign.removePart(this);
-			} else if(null != spare) {
-				int number = quantity;
-				while(number > 0) {
-					spare.incrementQuantity();
-					number--;
-				}
-				campaign.removePart(this);
-			}
-			unit.removePart(this);
-		}	
-		setSalvaging(false);
-		setUnit(null);
-	}
-
-	@Override
-	public Part getMissingPart() {
-		return new MissingInfantryMotiveType(0, campaign, mode);
+		//Do nothing		
 	}
 
 	@Override
 	public String checkFixable() {
-		//nothing to do here
 		return null;
 	}
 
 	@Override
-	public boolean needsFixing() {
-		return false;
+	public Part getNewPart() {
+		return new InfantryMotiveType(0, campaign, mode);
 	}
 
 	@Override
-	public long getStickerPrice() {
-		 switch (getMovementMode()){
-	        case INF_UMU:
-	            return 17888;
-	        case INF_MOTORIZED:
-	        	return (long)(17888 * 0.6);
-	        case INF_JUMP:
-	        	return (long)(17888 * 1.6);
-	        case HOVER:
-	        	return (long)(17888 * 2.2 * 5);
-	        case WHEELED:
-	        	return (long)(17888 * 2.2 * 6);
-	        case TRACKED:
-	        	return (long)(17888 * 2.2 * 7);
-	        default:
-	            return 0;
-		 }
+	public boolean isAcceptableReplacement(Part part, boolean refit) {
+		return part instanceof InfantryMotiveType && mode.equals(((InfantryMotiveType)part).getMovementMode());
 	}
 
 	@Override
 	public double getTonnage() {
-		//TODO: what should this be?
 		return 0;
 	}
 
@@ -162,18 +113,7 @@ public class InfantryMotiveType extends Part {
 		// TODO Auto-generated method stub
 		return 0;
 	}
-
-	@Override
-	public int getTechLevel() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public boolean isSamePartType(Part part) {
-		return part instanceof InfantryMotiveType && mode.equals(((InfantryMotiveType)part).getMovementMode());
-	}
-
+	
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent) {
 		writeToXmlBegin(pw1, indent);
@@ -190,24 +130,12 @@ public class InfantryMotiveType extends Part {
 		
 		for (int x=0; x<nl.getLength(); x++) {
 			Node wn2 = nl.item(x);		
-			if (wn2.getNodeName().equalsIgnoreCase("mode")) {
-				mode = EntityMovementMode.getMode(wn2.getTextContent());
-				assignName();
-			} 
-			else if (wn2.getNodeName().equalsIgnoreCase("moveMode")) {
+			if (wn2.getNodeName().equalsIgnoreCase("moveMode")) {
 				mode = EntityMovementMode.getMode(wn2.getTextContent());
 				assignName();
 			}
 		}
 	}
 
-	@Override
-	public Part clone() {
-		return new InfantryMotiveType(0, campaign, mode);
-	}
-	
-	public EntityMovementMode getMovementMode() {
-		return mode;
-	}
 	
 }

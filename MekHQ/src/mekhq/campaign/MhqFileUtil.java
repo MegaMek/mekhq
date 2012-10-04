@@ -18,7 +18,7 @@ public class MhqFileUtil {
 
         char[] textArray = text.toCharArray();
         for (int i = 0; i < textArray.length; i++) {
-            char c = textArray[1];
+            char c = textArray[i];
             textArray[i] = escapeChar(c, restricted);
        }
 

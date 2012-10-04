@@ -34,8 +34,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import megamek.common.AmmoType;
+import megamek.common.BattleArmor;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
+import megamek.common.Infantry;
 import megamek.common.Mech;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
@@ -130,6 +132,9 @@ public class Refit implements IPartWork, IAcquisitionWork {
 		fixableString = null;
 		kitFound = false;
 		calculate();
+		if(customJob) {
+			suggestNewName();
+		}
 	}
 	
 	public static String getRefitClassName(int refitClass) {
@@ -384,6 +389,8 @@ public class Refit implements IPartWork, IAcquisitionWork {
 					updateRefitClass(CLASS_D);
 				}
 				locationHasNewStuff[((MissingMekActuator)nPart).getLocation()] = true;
+			} else if(nPart instanceof MissingInfantryMotiveType || nPart instanceof MissingInfantryArmorPart) {
+				updateRefitClass(CLASS_A);
 			} else {
 				//determine whether this is A, B, or C
 				if(nPart instanceof MissingEquipmentPart || nPart instanceof AmmoBin) {
@@ -551,6 +558,16 @@ public class Refit implements IPartWork, IAcquisitionWork {
 				}
 			}
 			time = 30 * nloc;
+		}
+		
+		//infantry take zero time to re-organize
+		//also check for squad size and number changes
+		if(oldUnit.getEntity() instanceof Infantry && !(oldUnit.getEntity() instanceof BattleArmor)) {
+			if(((Infantry)oldUnit.getEntity()).getSquadN() != ((Infantry)newEntity).getSquadN() 
+					||((Infantry)oldUnit.getEntity()).getSquadSize() != ((Infantry)newEntity).getSquadSize()) {
+				updateRefitClass(CLASS_A);
+			}
+			time = 0;
 		}
 		
 		//figure out if we are putting new stuff on a missing location
@@ -782,6 +799,14 @@ public class Refit implements IPartWork, IAcquisitionWork {
 		int atype = -1;
 		boolean aclan = false;
         Entity oldEntity = oldUnit.getEntity();
+        ArrayList<Person> soldiers = new ArrayList<Person>();
+        //unload any soldiers to reload later, because troop size may have changed
+        if(oldEntity instanceof Infantry) {
+			soldiers = oldUnit.getCrew();
+			for(Person soldier : soldiers) {
+				oldUnit.remove(soldier, true);
+			}
+		}
 		oldUnit.setEntity(newEntity);
 		//add old parts to the warehouse
 		for(int pid : oldUnitParts) {
@@ -851,6 +876,15 @@ public class Refit implements IPartWork, IAcquisitionWork {
 		}
         oldUnit.getEntity().setC3UUIDAsString(oldEntity.getC3UUIDAsString());
         oldUnit.getEntity().setExternalIdAsString(oldUnit.getId().toString());
+		oldUnit.campaign.clearGameData(oldUnit.getEntity());
+		oldUnit.campaign.reloadGameEntities();
+		//reload any soldiers
+		for(Person soldier : soldiers) {
+			if(!oldUnit.canTakeMoreGunners()) {
+				break;
+			}
+			oldUnit.addPilotOrSoldier(soldier);
+		}
 		oldUnit.resetPilotAndEntity();
 		oldUnit.setRefit(null);
 	}
@@ -1546,5 +1580,49 @@ public class Refit implements IPartWork, IAcquisitionWork {
 	public boolean isRightTechType(String skillType) {
 		// TODO Auto-generated method stub
 		return true;
+	}
+	
+	public void suggestNewName() {
+		if(newEntity instanceof Infantry && !(newEntity instanceof BattleArmor)) {
+			Infantry infantry = (Infantry)newEntity;
+			String chassis = "?";
+			switch (infantry.getMovementMode()) {
+	        case INF_UMU:
+	            chassis = "Scuba ";
+	            break;
+	        case INF_MOTORIZED:
+	        	chassis = "Motorized ";
+	            break;
+	        case INF_JUMP:
+	        	chassis = "Jump ";
+	            break;
+	        case HOVER:
+	        	chassis = "Mechanized Hover ";
+	            break;
+	        case WHEELED:
+	        	chassis = "Mechanized Wheeled ";
+	            break;
+	        case TRACKED:
+	        	chassis = "Mechanized Tracked ";
+	            break;
+	        default:
+	        	chassis = "Foot ";
+			}
+			if(infantry.isSquad()) {
+				chassis += "Squad";
+			} else {
+				chassis += "Platoon";
+			}
+			newEntity.setChassis(chassis);
+			String model = "?";
+			if(infantry.getSecondaryN() > 1 && null != infantry.getSecondaryWeapon()) {
+				model = "(" + infantry.getSecondaryWeapon().getInternalName() + ")";
+			} else if(null != infantry.getPrimaryWeapon()) {
+				model = "(" + infantry.getPrimaryWeapon().getInternalName() + ")";
+			}
+			newEntity.setModel(model);
+		} else {
+			newEntity.setModel(newEntity.getModel() + " Mk II");
+		}
 	}
 }
