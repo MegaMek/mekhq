@@ -1,5 +1,7 @@
 VERSION HISTORY
 ----------------------------------
+v0.1.20 (SVN)
+
 v0.1.19 (2012-10-05)
 + new MML.jar (should fix bug #271)
 + Bug 269: missing file: non_combat_units_list.conf
