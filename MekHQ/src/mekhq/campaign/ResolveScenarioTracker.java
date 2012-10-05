@@ -485,12 +485,16 @@ public class ResolveScenarioTracker {
 
 			// Add the units from the file.
 			for (Entity entity : parser.getEntities()) {
-				entities.put(UUID.fromString(entity.getExternalIdAsString()), entity);
+				if(!entity.getExternalIdAsString().equals("-1")) {
+					entities.put(UUID.fromString(entity.getExternalIdAsString()), entity);
+				}
 			}
 			
 			// add any ejected pilots
 			for (Crew pilot : parser.getPilots()) {
-				pilots.put(UUID.fromString(pilot.getExternalIdAsString()), pilot);
+				if(!pilot.getExternalIdAsString().equals("-1")) {
+					pilots.put(UUID.fromString(pilot.getExternalIdAsString()), pilot);
+				}
 			}
 		}
 	}
