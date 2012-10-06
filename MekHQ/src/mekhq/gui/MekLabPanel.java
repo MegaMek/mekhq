@@ -317,7 +317,7 @@ public class MekLabPanel extends JPanel {
         double heat = 0;
         Entity entity = labPanel.getEntity();
 
-        if (entity.getOriginalJumpMP() > 0) {
+        if (entity.getOriginalJumpMP() > 0 && !(entity instanceof Infantry)) {
             if (entity.getJumpType() == Mech.JUMP_IMPROVED) {
                 heat += Math.max(3, entity.getOriginalJumpMP() / 2);
             } else if (entity.getJumpType() != Mech.JUMP_BOOSTER) {
