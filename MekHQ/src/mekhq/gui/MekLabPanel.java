@@ -180,7 +180,13 @@ public class MekLabPanel extends JPanel {
     }
 
 	public void refreshSummary() {
+		if(null == labPanel) {
+			return;
+		}
 		Entity entity = labPanel.getEntity();
+		if(null == entity) {
+			return;
+		}
 		refit = new Refit(unit, entity, true); 
 		testEntity = null;
 		if(entity instanceof Mech) {
@@ -191,6 +197,9 @@ public class MekLabPanel extends JPanel {
 		}
 		else if(entity instanceof Infantry) {
 			testEntity = new TestInfantry((Infantry)entity, entityVerifier.tankOption, null);
+		}
+		if(null == testEntity) {
+			return;
 		}
         StringBuffer sb = new StringBuffer();
         testEntity.correctEntity(sb, true);

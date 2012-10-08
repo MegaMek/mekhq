@@ -3530,7 +3530,13 @@ public class CampaignGUI extends JPanel {
 			//this unit has been removed so clear the mek lab
 			panMekLab.clearUnit();
 		} else {
-			panMekLab.refreshSummary();
+			//put a try-catch here so that bugs in the meklab don't screw up
+			//other stuff
+			try {
+				panMekLab.refreshSummary();
+			} catch (Exception err) {
+	            err.printStackTrace();
+	        }
 		}
 	}
 
