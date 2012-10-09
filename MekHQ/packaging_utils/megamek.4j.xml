@@ -1,8 +1,8 @@
 <launch4jConfig>
   <headerType>gui</headerType>
-  <jar>../svndev/MekHQ.jar</jar>
-  <outfile>../svndev/MekHQ.exe</outfile>
-  <dontWrapJar>false</dontWrapJar>
+  <jar>MegaMek.jar</jar>
+  <outfile>../svndev/MegaMek.exe</outfile>
+  <dontWrapJar>true</dontWrapJar>
   <errTitle></errTitle>
   <cmdLine></cmdLine>
   <chdir>.</chdir>

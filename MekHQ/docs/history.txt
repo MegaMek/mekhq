@@ -6,6 +6,7 @@ v0.1.20 (SVN)
 + Bug 273: Customizing Infantry in MekHQ
 + Bug 272: Strange NPE on repair bay
 + new packaging.xml (WIP)
++ better windows executable packaging (just need better icons)
 
 v0.1.19 (2012-10-05)
 + new MML.jar (should fix bug #271)

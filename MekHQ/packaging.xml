@@ -1,21 +1,29 @@
 <?xml version="1.0"?>
 <!-- Author: Jay Lawson -->
-<!-- This is my attempt at developing a new build file for MegaMek        -->
-<!-- The goals of this new build file are as follows                      -->
-<!-- 1) Produce four packages with each release                           -->
-<!--     a) An OS X bundled release using jarbundler                      -->
-<!--     b) A Windows release with the EXE file                           -->
-<!--     c) A linux release with the startup.sh file                      -->
+<!-- This is a packaging build file for MekHQ that will package           -->
+<!-- the following OS-specific releases.                                  -->       
+<!--     a) An OS X bundled release					                      -->
+<!--     b) A Windows release with the EXE file using launch4j            -->
+<!--     c) A "unix" release containing only jars                         -->
 <!--     d) A source-file only release to comply with GPL                 -->
-<!-- 2) Reduce the amount of folders and files in each release to make it -->
-<!--    more intuitive for the user                                       -->
-    
-<!-- This is all experimental, don't use it yet! -->    
+<!-- Originally, the OS release was bundled with jarbundler, but I am     -->
+<!-- now using a pre-packaged set of app directories that we just         -->
+<!-- copy the newest jar files into. This allows for easier cutomization  -->
+<!-- of the pinfo.list file to get the classpath to all of the jars       -->
+<!-- correct. At the moment, I can't figure out how to get a classpath    -->
+<!-- to the wrapped executable in the launch4j program so MM and MML      -->
+<!-- in the windows release don't wrap the jar files.                     -->    
 
 <project default="release" name="MekHQ" basedir=".">
 
 	<!-- Global properties for this build -->
-
+	<!-- Version and packaging properties -->
+	<property name="project.name" value="mekhq" />
+	<property name="version" value="0.1.20"/>
+	<property name="osxdist" value="${project.name}-${version}-mac" />
+	<property name="windist" value="${project.name}-${version}-windows" />
+	<property name="nixdist" value="${project.name}-${version}" />
+	
 	<property name="srcdir" value="src" />
 	<property name="confdir" value="mmconf" />
 	<property name="logdir" value="logs" />
@@ -26,9 +34,6 @@
 	<property name="docdir" value="docs" />
 	<property name="svndir" value="svndev" />
 	<property name="util" value="packaging_utils" />
-	
-	<!-- Version and packaging properties -->
-	<property name="project.name" value="mekhq" />
 	
 	<!-- same as builddir but under svn -->
 	<property name="svnbuilddir" value="${svndir}/${builddir}" />
@@ -45,23 +50,6 @@
 
 	<!-- This is the relative path to the 'data' directory -->
 	<property name="dataclasspath" value="." />
-
-	<!-- Build the list of the lib/*.jar files to be included in the "Class-Path" attribute of the jar's manifest dynamically.  -->
-	<!--
-	<pathconvert pathsep=" " property="jarclasspath">
-		<path>
-			<fileset dir="lib/">
-				<include name="*.jar" />
-			</fileset>
-		</path>
-		<mapper>
-			<chainedmapper>
-				<flattenmapper />
-				<globmapper from="*" to="lib/*" />
-			</chainedmapper>
-		</mapper>
-	</pathconvert>
-	-->
 	
 	<condition property="isOsUnixLike">
 		<os family="unix" />
@@ -80,11 +68,7 @@
 
 	<target name="svndev-init">
 		<tstamp />
-		<delete dir="${svndir}" />
-		<input message="Please enter version number (eg. 0.34.0):" addproperty="version"/>
-		<property name="osxdist" value="${project.name}-${version}-mac" />
-		<property name="windist" value="${project.name}-${version}-windows" />
-		<property name="nixdist" value="${project.name}-${version}" />
+		<delete dir="${svndir}" />		
 	</target>
 	
 	<!-- following svndev-* tasks get, build & package the current version from svn -->
@@ -166,8 +150,8 @@
 		<move file="${osxdist}/MekHQ.jar" todir="${osxdist}/MekHQ.app/Contents/Resources/Java/" />
 	</target>
 	
-	<!-- I think this will only work on OS X systems -->
-	<target name="mac-dmg" if="isOsMac" description="Create a dmg file from the OS X distribution (NOTE: only works on OSX)">
+	<!-- Replace actual stubs with symlinks on mac systems -->
+	<target name="mac-stub" if="isOsMac" description="Create a dmg file from the OS X distribution (NOTE: only works on OSX)">
 		<delete file="${osxdist}/MekHQ.app/Contents/MacOS/JavaApplicationStub" />
 		<exec executable="ln">
 			<arg line="-s /System/Library/Frameworks/JavaVM.framework/Resources/MacOS/JavaApplicationStub" />
@@ -178,49 +162,50 @@
 					<arg line="-s /System/Library/Frameworks/JavaVM.framework/Resources/MacOS/JavaApplicationStub" />
 					<arg value="${osxdist}/MegaMek.app/Contents/MacOS/JavaApplicationStub" />
 		</exec>
+		<!--
 		<exec executable="hdiutil">
 			<arg line="create -srcfolder ${osxdist} ${osxdist}.dmg -volname mekhq-dev-svn-mac-${DSTAMP}"/>
 		</exec>
+		-->
 	</target>
-	
-	<target name="mac-tar" depends="mac-dmg,mac-zip" description="Create a compressed tar file of the OS X distribution"/>
-	
+			
 	<target name="mac-zip">
-	    <tar destfile="${osxdist}.tar.bz2" compression="bzip2">
+	    <tar destfile="${osxdist}.tar.bz2" compression="bzip2" longfile="gnu">
 	    	<tarfileset dir="${osxdist}" mode="755" />
 	    </tar>
 	</target>
 	
+	<target name="mac-tar" depends="mac-stub,mac-zip" description="Create a compressed tar file of the OS X distribution"/>
 	
 	<target name="mac-clean">
 		<delete dir="${osxdist}" />
 	</target>
 	
-	<target name="mac-package" depends="mac-bundle, mac-zip, mac-clean" description="Package a Mac OS X distribution of the project built from SVN" />
+	<target name="mac-package" depends="mac-bundle, mac-tar, mac-clean" description="Package a Mac OS X distribution of the project built from SVN" />
 	
 	<target name="nix-bundle" description="Bundle the project built from SVN into a unix distribution">
 		<mkdir dir="${nixdist}" />
 		<copy todir="${nixdist}">
-								<fileset dir="${svndir}" >
-								<include name="${jarfile}" />
-								<include name="${libdir}/*.jar" />
-								<include name="${logdir}/" />
-								<include name="${datadir}/" />
-								<include name="${docdir}/" />
-								<include name="${confdir}/" />
-								<include name="campaigns/" />
-								<include name="campaigns/FoxsTeeth.cpnx" />
-								<include name="MegaMek.jar" />
-								<include name="MegaMekLab.jar" />
-								<include name="README.txt" />
-								<include name="SubmitBug.html" />
-								<include name="license.txt" />
-							</fileset>
-						</copy>
+			<fileset dir="${svndir}" >
+				<include name="${jarfile}" />
+				<include name="${libdir}/*.jar" />
+				<include name="${logdir}/" />
+				<include name="${datadir}/" />
+				<include name="${docdir}/" />
+				<include name="${confdir}/" />
+				<include name="campaigns/" />
+				<include name="campaigns/FoxsTeeth.cpnx" />
+				<include name="MegaMek.jar" />
+				<include name="MegaMekLab.jar" />
+				<include name="README.txt" />
+				<include name="SubmitBug.html" />
+				<include name="license.txt" />
+			</fileset>
+		</copy>
 	</target>
 	
 	<target name="nix-tar" description="Create a compressed tar file of the unix distribution">
-		<tar destfile="${nixdist}.tar.gz" basedir="${nixdist}" compression="gzip" />
+		<tar destfile="${nixdist}.tar.gz" basedir="${nixdist}" compression="gzip" longfile="gnu" />
 	</target>
 	
 	<target name="nix-clean">
@@ -230,31 +215,37 @@
 	<target name="nix-package" depends="nix-bundle, nix-tar, nix-clean" description="Package a Unix distribution of the project built from SVN"/>
 	
 	<!-- Produce an EXE file -->
-	<target name="exe" description="Generate an EXE wrapper for MegaMek.jar">
+	<target name="exe" description="Generate an EXE wrappers for MekHQ.jar, MegaMek.jar, and MegaMekLab.jar">
 		<delete file="${svndir}/MekHQ.exe"/>
 		<launch4j configFile="${util}/mekhq.4j.xml" />	 
+		<delete file="${svndir}/MegaMek.exe"/>
+		<launch4j configFile="${util}/megamek.4j.xml" />	
+		<delete file="${svndir}/MegaMekLab.exe"/>
+		<launch4j configFile="${util}/megameklab.4j.xml" />
 	</target>
 	
 	<target name="win-bundle" depends="exe" description="Bundle the project built from SVN into a Windows distribution">
 		<mkdir dir="${windist}" />
 		<copy todir="${windist}">
-							<fileset dir="${svndir}" >
-								<include name="${jarfile}" />
-								<include name="${libdir}/*.jar" />
-								<include name="${logdir}/" />
-								<include name="${datadir}/" />
-								<include name="${docdir}/" />
-								<include name="${confdir}/" />
-								<include name="campaigns/" />
-								<include name="campaigns/FoxsTeeth.cpnx" />
-								<include name="MegaMek.jar" />
-								<include name="MegaMekLab.jar" />
-								<include name="MekHQ.exe" />
-								<include name="README.txt" />
-								<include name="SubmitBug.html" />
-								<include name="license.txt" />
-							</fileset>
-						</copy>
+			<fileset dir="${svndir}" >
+				<!--<include name="${jarfile}" />-->
+				<include name="${libdir}/*.jar" />
+				<include name="${logdir}/" />
+				<include name="${datadir}/" />
+				<include name="${docdir}/" />
+				<include name="${confdir}/" />
+				<include name="campaigns/" />
+				<include name="campaigns/FoxsTeeth.cpnx" />
+				<include name="MegaMek.jar" />
+				<include name="MegaMekLab.jar" />
+				<include name="MegaMek.exe" />
+				<include name="MegaMekLab.exe" />
+				<include name="MekHQ.exe" />
+				<include name="README.txt" />
+				<include name="SubmitBug.html" />
+				<include name="license.txt" />
+			</fileset>
+		</copy>
 		<copy file="${util}/mekhq.l4j.ini" todir="${windist}"/>
 	</target>
 	
@@ -269,10 +260,10 @@
 	<target name="win-package" depends="win-bundle, win-zip, win-clean" description="Package a Windows distribution of the project built from SVN"/>
 	
 	<target name="source-package" description="Package a source-only distribution of the project built from SVN">
-		<tar destfile="${project.name}-${version}-source.tar.gz" basedir="${svndir}" compression="gzip">
+		<tar destfile="${project.name}-${version}-source.tar.gz" basedir="${svndir}" compression="gzip" longfile="gnu">
 			<exclude name="${builddir}/**"/>
 			<exclude name="MekHQ.jar"/>
-			<exclude name="MekHQ.exe"/>
+			<exclude name="**/*.exe"/>
 		</tar>
 	</target>
 	
