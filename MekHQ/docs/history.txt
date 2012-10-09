@@ -5,6 +5,7 @@ v0.1.20 (SVN)
 + Bug 275: Refit Description Bug
 + Bug 273: Customizing Infantry in MekHQ
 + Bug 272: Strange NPE on repair bay
++ new packaging.xml (WIP)
 
 v0.1.19 (2012-10-05)
 + new MML.jar (should fix bug #271)
