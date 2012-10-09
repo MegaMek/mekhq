@@ -192,10 +192,9 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
             } else {
                 hoursNeeded = Math.floor(en.getWeight() / 10) + 80;
             }
-        } else if (en instanceof Warship) {
-            hoursNeeded = Math.floor(en.getWeight() / 125) + 600;
-        } else if (en instanceof Jumpship) {
-            hoursNeeded = Math.floor(en.getWeight() / 400) + 40;
+        } if(en instanceof Dropship || en instanceof Jumpship) {
+            //according to FMMR, they provide their own support so skip
+        	return;
         } else if (en instanceof ConvFighter) {
             hoursNeeded = Math.floor(en.getWeight() / 2.5) + 20;
         } else if (en instanceof Aero) {
@@ -206,14 +205,9 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
             hoursNeeded = Math.floor(en.getWeight() / 5) + 20;
         } else if (en instanceof BattleArmor) {
             hoursNeeded = (en.getTotalArmor() * 2) + 5;
-        } else if ((en instanceof Infantry) &&
-                (EntityMovementMode.HOVER.equals(en.getMovementMode()))
-                || EntityMovementMode.INF_MOTORIZED.equals(en.getMovementMode())
-                || EntityMovementMode.TRACKED.equals(en.getMovementMode())
-                || EntityMovementMode.VTOL.equals(en.getMovementMode())
-                || EntityMovementMode.WHEELED.equals(en.getMovementMode())
-                || EntityMovementMode.WIGE.equals(en.getMovementMode())) {
-            hoursNeeded = Math.floor(en.getWeight() / 5) + 20;
+        } else if (en instanceof Infantry) {
+        	//according to FMMR, they provide their own support so skip
+            return;
         }
 
         if (campaign.getCampaignOptions().useQuirks()) {
@@ -228,13 +222,6 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
             hoursNeeded *= 2;
         } else if (campaign.getCampaignOptions().useEraMods() && (en.getTechLevel() > TechConstants.T_INTRO_BOXSET)) {
             hoursNeeded *= 1.5;
-        }
-        
-        //only inlude large vessel support needs if the vessels are uncrewed
-        //or infantry platoons are understaffed
-        if((en instanceof Dropship || en instanceof Jumpship || en instanceof Infantry) 
-        		&& u.getActiveCrew().size() == u.getFullCrewSize()) {
-        	//return;
         }
         
         techSupportNeeded += hoursNeeded;
