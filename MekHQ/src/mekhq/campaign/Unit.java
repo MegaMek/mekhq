@@ -583,7 +583,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 		case SITE_FIELD:
 			return new TargetRoll(2, "in the field");
 		case SITE_MOBILE_BASE:
-			return new TargetRoll(1, "mobile base");
+			return new TargetRoll(1, "field workshop");
 		case SITE_BAY:
 			return new TargetRoll(0, "transport bay");
 		case SITE_FACILITY:
@@ -600,7 +600,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 		case SITE_FIELD:
 			return "In the Field";
 		case SITE_MOBILE_BASE:
-			return "Mobile Base";
+			return "Field Workshop";
 		case SITE_BAY:
 			return "Transport Bay";
 		case SITE_FACILITY:
