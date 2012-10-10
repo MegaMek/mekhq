@@ -52,9 +52,6 @@ import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.CampaignGUI.FormattedNumberSorter;
-import mekhq.gui.CampaignGUI.UnitTableModel;
-import mekhq.gui.CampaignGUI.WeightClassSorter;
 
 /**
  *

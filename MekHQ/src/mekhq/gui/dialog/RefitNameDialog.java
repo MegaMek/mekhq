@@ -22,15 +22,10 @@
 package mekhq.gui.dialog;
 
 import java.awt.Frame;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
 
 import megamek.common.BattleArmor;
 import megamek.common.Infantry;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.Unit;
 import mekhq.campaign.parts.Refit;
 
 /**

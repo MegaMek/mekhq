@@ -36,7 +36,6 @@ import megamek.common.ConvFighter;
 import megamek.common.Crew;
 import megamek.common.Dropship;
 import megamek.common.Entity;
-import megamek.common.EntityMovementMode;
 import megamek.common.HeavyVehicleBay;
 import megamek.common.Infantry;
 import megamek.common.InfantryBay;

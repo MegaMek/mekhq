@@ -27,10 +27,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.ResourceBundle;
 
-import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
-import mekhq.campaign.Unit;
-import mekhq.campaign.personnel.Person;
 
 /**
  *

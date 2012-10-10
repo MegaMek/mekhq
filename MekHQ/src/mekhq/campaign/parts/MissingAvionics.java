@@ -21,11 +21,11 @@
 
 package mekhq.campaign.parts;
 
-import org.w3c.dom.Node;
-
 import megamek.common.Aero;
 import megamek.common.EquipmentType;
 import mekhq.campaign.Campaign;
+
+import org.w3c.dom.Node;
 
 /**
  *

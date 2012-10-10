@@ -36,9 +36,6 @@ import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.Modes;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 /**
  * A missing part is a placeholder on a unit to indicate that a replacement
  * task needs to be performed

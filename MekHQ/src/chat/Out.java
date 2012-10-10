@@ -54,7 +54,6 @@ public class Out {
     // This method is just here to test the class
     public static void main (String[] args) {
         Out out;
-        String s;
 
         // write to stdout
         out = new Out();

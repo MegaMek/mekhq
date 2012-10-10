@@ -56,27 +56,24 @@ public class ForceStub implements Serializable {
 
 	
 	private String name;
-	private ForceStub parentForce;
 	private Vector<ForceStub> subForces;
 	private Vector<UnitStub> units;
 	
 	public ForceStub() {
 		name = "";
-		parentForce = null;
 		subForces = new Vector<ForceStub>();
 		units = new Vector<UnitStub>();
 	}
 	
 	public ForceStub(Force f, Campaign c) {
 		name = f.getFullName();
-		parentForce = null;
 		subForces = new Vector<ForceStub>();
 		units = new Vector<UnitStub>();
 		iconCategory = f.getIconCategory();
 		iconFileName = f.getIconFileName();
 		for(Force sub : f.getSubForces()) {
 			ForceStub stub = new ForceStub(sub, c);
-			stub.setParentForce(this);
+			//stub.setParentForce(this);
 			subForces.add(stub);
 		}
 		for(UUID uid : f.getUnits()) {
@@ -85,10 +82,6 @@ public class ForceStub implements Serializable {
 				units.add(new UnitStub(u));
 			}
 		}
-	}
-	
-	private void setParentForce(ForceStub parent) {
-		parentForce = parent;
 	}
 	
 	public String toString() {
@@ -208,7 +201,6 @@ public class ForceStub implements Serializable {
 	}
 	
 	public void addSubForce(ForceStub sub) {
-		sub.setParentForce(this);
 		subForces.add(sub);
 	}
 

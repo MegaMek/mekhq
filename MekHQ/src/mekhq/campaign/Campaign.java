@@ -52,7 +52,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import megamek.client.RandomNameGenerator;
 import megamek.common.ASFBay;
 import megamek.common.Aero;
-import megamek.common.AmmoType;
 import megamek.common.BattleArmor;
 import megamek.common.BattleArmorBay;
 import megamek.common.Bay;
@@ -1357,41 +1356,6 @@ public class Campaign implements Serializable {
 	public String getShortDateAsString() {
 		return shortDateFormat.format(calendar.getTime());
 	}
-
-	public ArrayList<Person> getEligiblePilotsFor(Unit unit) {
-		ArrayList<Person> pilots = new ArrayList<Person>();
-		for (Person p : getPersonnel()) {
-			/*
-			if (!(p instanceof PilotPerson)) {
-				continue;
-			}
-			PilotPerson pp = (PilotPerson) p;
-			if (pp.canPilot(unit.getEntity())) {
-				pilots.add(pp);
-			}
-			*/
-		}
-		return pilots;
-	}
-	
-	public ArrayList<Unit> getEligibleUnitsFor2(Person person) {
-		ArrayList<Unit> units = new ArrayList<Unit>();
-		for (Unit u : this.getUnits()) {
-			//if (person.canPilot(u.getEntity())) {
-				units.add(u);
-			//}
-		}
-		return units;
-	}
-
-	/*
-	public void changePilot(Unit unit, PilotPerson pilot) {
-		if (null != pilot.getAssignedUnit()) {
-			pilot.getAssignedUnit().removePilot();
-		}
-		unit.setPilot(pilot);
-	}
-	*/
 
 	public void restore() {
 		for (Part part : getParts()) {
@@ -3549,13 +3513,6 @@ public class Campaign implements Serializable {
         return helpMod;
 	}
 	
-	public void switchPrimaryRole(Person p, int role) {
-		int currentRole = p.getPrimaryRole();
-		//if the current primary role is an astech, then remove minutes from astech
-		//determine how many minutes have been used so that these can be subtracted from minutes left
-		//after resetting
-	}
-	
 	public int getMedicsPerDoctor() {
 		int ndocs = getDoctors().size();
 		int nmedics = getNumberMedics();
@@ -3895,7 +3852,6 @@ public class Campaign implements Serializable {
 			Entity entity = unit.getEntity();
 			if (null != entity && (entity.hasC3() || entity.hasC3i())) {
 	            boolean C3iSet = false;
-	            boolean C3Set = false;
 	            
 	            for (Enumeration<Entity> entities = game.getEntities(); entities
 	                    .hasMoreElements();) {
@@ -3907,7 +3863,6 @@ public class Campaign implements Serializable {
 	                            && entity.getC3MasterIsUUIDAsString().equals(
 	                                    e.getC3UUIDAsString())) {
 	                        entity.setC3Master(e);
-	                        C3Set = true;
 	                        break;
 	                    } 
 	                }

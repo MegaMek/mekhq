@@ -24,7 +24,11 @@ import javax.swing.table.TableColumn;
 	 * @see DefaultTableColumnModel
 	 */
 	public class XTableColumnModel extends DefaultTableColumnModel {
-	    /** Array of TableColumn objects in this model.
+	    /**
+		 * 
+		 */
+		private static final long serialVersionUID = 4776942586030985204L;
+		/** Array of TableColumn objects in this model.
 	     *  Holds all column objects, regardless of their visibility
 	     */
 	    protected Vector allTableColumns = new Vector();

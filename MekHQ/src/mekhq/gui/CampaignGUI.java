@@ -198,9 +198,9 @@ import mekhq.gui.dialog.EditPersonnelLogDialog;
 import mekhq.gui.dialog.EditTransactionDialog;
 import mekhq.gui.dialog.GameOptionsDialog;
 import mekhq.gui.dialog.HireBulkPersonnelDialog;
+import mekhq.gui.dialog.KillDialog;
 import mekhq.gui.dialog.MekHQAboutBox;
 import mekhq.gui.dialog.MissionTypeDialog;
-import mekhq.gui.dialog.KillDialog;
 import mekhq.gui.dialog.NewRecruitDialog;
 import mekhq.gui.dialog.PartsStoreDialog;
 import mekhq.gui.dialog.PopupValueChoiceDialog;
@@ -2619,16 +2619,15 @@ public class CampaignGUI extends JPanel {
 		MekHQ.logMessage("Saving campaign...");
 		// Choose a file...
 		File file = selectSaveCampaignFile();
+		if (file == null) {
+			// I want a file, y'know!
+			return;
+		}
         String path = file.getPath();
         if (!path.endsWith(".cpnx")) {
             path += ".cpnx";
             file = new File(path);
         }
-
-		if (file == null) {
-			// I want a file, y'know!
-			return;
-		}
 
 		// Then save it out to that file.
 		FileOutputStream fos = null;
