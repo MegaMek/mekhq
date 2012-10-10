@@ -515,9 +515,9 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
         sb.append("    Warship w/ Dock?      ").append(warhipWithDocsOwner ? "Yes" : "No").append("\n\n");
 
         sb.append("Technology:                     ").append(getTechValue()).append("\n");
-        sb.append("    # Clan Units:         ").append(numberClan.toPlainString()).append("\n");
-        sb.append("    # IS2 Units:          ").append(numberIS2.toPlainString()).append("\n");
-        sb.append("    Total # Units:        ").append(numberUnits.toPlainString()).append("\n\n");
+        sb.append("    # Clan Units:         ").append(countClan).append("\n");
+        sb.append("    # IS2 Units:          ").append(countIS2).append("\n");
+        sb.append("    Total # Units:        ").append(numberAero + numberBaSquads + numberMech + numberVee).append("\n\n");
 
         sb.append("Support:                        ").append(getSupportValue()).append("\n");
         sb.append("    Tech Support:         ").append(getTechSupportPercentage().toPlainString()).append("%\n");

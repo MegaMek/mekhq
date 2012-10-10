@@ -9,6 +9,7 @@ v0.1.20 (SVN)
 + better windows executable packaging (just need better icons)
 + Bug 261: Name change: Mobile Field Base to Field Workshop
 + Bug 274: FMM:R DropShip tech support bug still not fixed
++ Bug 270: Dragoons error (both Taharqa and FMM:R methods)
 
 v0.1.19 (2012-10-05)
 + new MML.jar (should fix bug #271)
