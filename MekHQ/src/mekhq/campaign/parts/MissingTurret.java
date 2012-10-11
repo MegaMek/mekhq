@@ -89,7 +89,7 @@ public class MissingTurret extends MissingPart {
 
 	@Override
 	public boolean isAcceptableReplacement(Part part, boolean refit) {
-		return part instanceof TankLocation 
+		return part instanceof Turret 
 			&& (((TankLocation)part).getLoc() == Tank.LOC_TURRET || ((TankLocation)part).getLoc() == Tank.LOC_TURRET_2);
 	}
 	

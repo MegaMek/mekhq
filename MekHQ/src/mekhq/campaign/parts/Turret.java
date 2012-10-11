@@ -70,6 +70,7 @@ public class Turret extends TankLocation {
     public Turret(int loc, int tonnage, double weight, Campaign c) {
         super(loc, tonnage, c);
         this.weight = weight;
+    	this.name = "Turret";
     }
     
     @Override
@@ -234,7 +235,7 @@ public class Turret extends TankLocation {
 	
 	@Override
     public String getDetails() {
-		return Math.round(weight) + " tons, " + damage + " point(s) of damage";
+		return weight + " tons, " + damage + " point(s) of damage";
     }
 
 	@Override

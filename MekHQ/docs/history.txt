@@ -13,6 +13,7 @@ v0.1.20 (SVN)
 + Unit Loading Error Dialog to alert users to which entities MekHQ can't find in their files when loading
 + When save fails, existing save file is not overwritten by corrupted one
 + Bug 257: Reversing Weapons issue in MegaMekLab
++ Bug 258: Turrets of same weight being replaced
 
 v0.1.19 (2012-10-05)
 + new MML.jar (should fix bug #271)
