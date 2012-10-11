@@ -238,6 +238,10 @@ GM and Taijian Petrochemicals have vested interest in Acamar because they have h
 		<ycood>-32.6</ycood>
 		<faction>TA</faction>
 		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
 			<date>2315-01-01</date>
 			<faction>TH</faction>
 		</factionChange>
@@ -258,7 +262,7 @@ GM and Taijian Petrochemicals have vested interest in Acamar because they have h
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
-			<date>3072-02-01</date>
+			<date>3069-09-01</date>
 			<faction>WOB</faction>
 		</factionChange>
 		<factionChange>
@@ -273,6 +277,31 @@ GM and Taijian Petrochemicals have vested interest in Acamar because they have h
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>0.9</gravity>
+		<lifeForm>2</lifeForm>
+		<climate>3</climate>
+		<percentWater>30</percentWater>
+		<temperature>28</temperature>
+		<spectralClass>B</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>2</sysPos>
+		<satellite>Ahir al Nahr</satellite>
+		<landMass>Agnetenar</landMass>
+		<landMass>Eridanus (River’s End)</landMass>
+		<landMass>Zaurak</landMass>
+		<desc>3135 - First settled by the Terran Hegemony, Achernar is a self-sufficient world with a varied terrain and climate.
+
+The original rulers of the planet, the Achernar family, were known Davion sympathizers. Before the First Star League, they allowed the Federated Suns to stage offensives from Achernar against worlds that would later form the Capellan Confederation.
+
+The Achernars later established the Achernar BattleMechs company, which manufactured the Dervish BattleMech for the First Star League. During the fall of the First Star League, the Achernar family sought refuge in the Federated Suns. House Davion agreed to grant the family royal titles if they would relocate Achernar BattleMechs to the Davion capital of New Avalon. Achernar BattleMechs would go on to manufacture the unique Enforcer BattleMech for House Davion.
+
+House Liao claimed Achernar after the fall of the First Star League. During the Fourth Succession War, House Davion captured Achernar and restored the Achernar family to its home world for the first time in centuries. Although Achernar BattleMechs stayed on New Avalon, the family established Achernar IndustrialMechs on Achernar during the Second Star League.
+
+Unwilling to surrender their world a second time, the Achernar family died defending the planet during the Blakist Holy War. During the Golden Age of Peace, Achernar IndustrialMechs passed into employee ownership. The company‘s success eventually attracted the attention of industrialist Jacob Bannson and Bannson Universal Unlimited, which recently bought a controlling interest in Achernar IndustrialMechs. House Davion interests on Achernar are currently represented by the Sandoval family.
+
+The three continents of Achernar are Agnetenar, Eridanus, and Zaurak; the capital of River‘s End is located on Eridanus.</desc>
 	</planet>
 	<planet>
 		<name>Aconcagua</name>
@@ -890,6 +919,10 @@ Alarion is primarily settled by people of German, Romanian and English descent.<
 		<ycood>1.83</ycood>
 		<faction>TA</faction>
 		<factionChange>
+			<date>2240-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
 			<date>2315-01-01</date>
 			<faction>TH</faction>
 		</factionChange>
@@ -905,12 +938,53 @@ Alarion is primarily settled by people of German, Romanian and English descent.<
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<factionChange>
+			<date>3068-09-01</date>
+			<faction>FWL</faction>
+		</factionChange>
+		<factionChange>
+			<date>3070-02-01</date>
+			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<spectralClass>F</spectralClass>
+    	<subtype>0</subtype>
+    	<luminosity>VI</luminosity>
+    	<sysPos>3</sysPos>
+    	<gravity>0.73</gravity>
+    	<pressure>3</pressure>
+    	<temperature>50</temperature>
+    	<percentWater>55</percentWater>
+    	<lifeForm>4</lifeForm>
+		<climate>3</climate>
+    	<satellite>Kaylen</satellite>
+    	<satellite>Lorcan</satellite>
+    	<satellite>Onna</satellite>
+    	<satellite>Quinlin</satellite>
+    	<landMass>Frome</landMass>  
+    	<landMass>Nakkara</landMass>  
+    	<landMass>Priez</landMass>  
+    	<landMass>Havenri (Fairweather)</landMass>  
+    	<desc>3135 - Alchiba is a warm world orbiting a harsh, bright yellow, sub-dwarf star. The planet's axial tilt is synchronized with its rotation and orbit so that the northern hemisphere receives less direct sunlight than the southern hemisphere and equatorial reaches. Havenri, the northern polar continent, and its surrounding island chains have been blessed with rich soils and a temperate climate that is well suited for agriculture. The three southern continents, Frome, Nakkara, and Priez, are largely dominated by deserts and barren mountains. Settlers thus developed much of Havenri for habitation and agriculture, while the southern continents host limited mining and ore-refining industries of common and industrial metals. The agricultural and light machine products trade flows through the planetary capital and port city of Fairweather, on Havenri.
+
+During the Star League era, Alchiba was jointly administered by the Lyran Commonwealth and the Terran Hegemony, serving as a trading post. Amaris' troops to largely ignore the planet and left it to the Lyran Commonwealth due to its lack of heavy military industries. During the Succession Wars, Alchiba was the target of the odd raid launched by the Free World League or the Draconis Combine. During the Jihad, the Word of Blake ignored this world completely. As a result, The Republic of the Sphere inherited a remarkably undamaged world.</desc>
 	</planet>
 	<planet>
 		<name>Alcor</name>
 		<xcood>-75.37</xcood>
 		<ycood>29.21</ycood>
-		<faction>LA</faction>
+		<faction>IND</faction>
+		<factionChange>
+			<date>2299-01-01</date>
+			<faction>FoS</faction>
+		</factionChange>
+		<factionChange>
+			<date>2341-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -919,6 +993,34 @@ Alarion is primarily settled by people of German, Romanian and English descent.<
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<factionChange>
+			<date>3068-09-20</date>
+			<faction>FWL</faction>
+		</factionChange>
+		<factionChange>
+			<date>3069-01-07</date>
+			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<spectralClass>A</spectralClass>
+    	<subtype>5</subtype>
+    	<luminosity>V</luminosity>
+    	<sysPos>3</sysPos>
+    	<gravity>1.01</gravity>
+    	<pressure>3</pressure>
+    	<temperature>46</temperature>
+    	<percentWater>88</percentWater>
+		<climate>3</climate>
+    	<lifeForm>3</lifeForm>
+    	<satellite>Yahto</satellite>
+    	<landMass>Galvinia (Ursamajorisaeti)</landMass>  
+    	<landMass>Fuchisa</landMass>  
+    	<desc>3135 - Alcor is one of the few worlds that orbits a slightly variable star and has an atmosphere and environment capable of supporting life. The planet's remote orbit mitigate the gravitational stresses caused during the infrequent shifts of its star's outer surface. The tectonic stresses created by the star have still contributed to a number of volcanoes that line the mountain chains on the main continents of Galvinia and Fuchisa. Much of the planet's mining industry has been focused in these volcanic regions. The arable land on Alchiba is exceedingly poor in nutrients, forcing the planet to rely on trade with their neighboring systems for vital agricultural products. Ursamajorisaeti, the capital of Alcor and home of the planet's largest spaceport, is located on Galvina. Alcor has been the hub of local trade routes throughout its history. During the Succession Wars, it has been a poor staging world for raids and invasions, though it has still been the target of many..
+
+Alcor was overlooked during the Jihad, the only known fighting that took place in system occurred when Blakist aerospace fighters, DropShips, and JumpShips, who were intercepted here during their flight from Terra.</desc>
 	</planet>
 	<planet>
 		<name>Alcyone</name>
@@ -983,7 +1085,7 @@ Alarion is primarily settled by people of German, Romanian and English descent.<
 		<nadirCharge>true</nadirCharge>
 		<hpg>A</hpg>
 		<lifeForm>7</lifeForm>
-		<desc>As of 3025 - Aldebaran is one of the oldest settled planets in the Confederation. It is a modest world with a moderate climate. Aldebaran has seen substantial fighting during the Succession Wars and remains a tempting target for both the Free World League and the Federated Suns due to it location in a natural invasion route to the interior of the Tikonov Commonality. Aldebaran has a permanent military base, home for the Ijori Warrior House regiment and several squadrons of aerospace fighters. Historically, Aldebaran has been a major commercial and industrial hub, and though much reduced in capacity due to the Succession War fighting, the planet still has a moderate and slowly growing industrial capacity. </desc>
+		<desc>As of 3025 - Aldebaran is one of the oldest settled planets in the Confederation. It is a modest world with a moderate climate. Aldebaran has seen substantial fighting during the Succession Wars and remains a tempting target for both the Free World League and the Federated Suns due to it location in a natural invasion route to the interior of the Tikonov Commonality. Aldebaran has a permanent military base, home for the Ijori Warrior House regiment and several squadrons of aerospace fighters. Historically, Aldebaran has been a major commercial and industrial hub, and though much reduced in capacity due to the Succession War fighting, the planet still has a moderate and slowly growing industrial capacity.</desc>
 	</planet>
 	<planet>
 		<name>Aldertaine</name>
@@ -1071,7 +1173,7 @@ Alarion is primarily settled by people of German, Romanian and English descent.<
 		<lifeForm>1</lifeForm>
 		<satellite>Mecca</satellite>
 		<climate>4</climate>
-		<socioIndustrial>C-C-B-B-D </socioIndustrial>
+		<socioIndustrial>C-C-B-B-D</socioIndustrial>
 		<landmass>Algedi Primus (Algiers)</landmass>
 		<landmass>Algedi Secundus</landmass>
 		<desc>A prefecture capital in the Benjamin Military district, Algedi is a barren arid world with no true night. The sun is so large that it takes up a full third of the sky during the day. Settled by the Azami long ago, who are a very independent people, this often leads to clashes between their ways and those of the Combine. The Azami very reluctantly allow Non‐Azami to enter their “Desert Paradise.” The Azami of the world have an unnatural fear of the dark because of the planets permanent daylight. Imported life‐forms adapted to desert life are flourishing on the planet. Asketen Sand Walkers and Terran Burros are commonly seen grazing on tough grasses and cacti.  Efficiency on this world is very poor; only the Azami seem to have adjusted. Other people not accustomed to the planet seem to suffer from broken biological clocks. Although an important
@@ -1600,7 +1702,11 @@ Despite being aware of the impending, though slow coming, temperature change tha
 		<name>Alrescha</name>
 		<xcood>85.28</xcood>
 		<ycood>-49.81</ycood>
-		<faction>CC</faction>
+		<faction>TGU</faction>
+		<factionChange>
+			<date>2367-01-01</date>
+			<faction>CC</faction>
+		</factionChange>
 		<factionChange>
 			<date>3030-01-01</date>
 			<faction>FS</faction>
@@ -1613,6 +1719,33 @@ Despite being aware of the impending, though slow coming, temperature change tha
 			<date>3067-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<pressure>3</pressure>
+		<gravity>0.8</gravity>
+		<lifeForm>4</lifeForm>
+		<climate>3</climate>
+		<percentWater>50</percentWater>
+		<temperature>30</temperature>
+		<spectralClass>A</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>3</sysPos>
+		<satellite>Piscium</satellite>
+		<landMass>Kaltain</landMass>
+		<landMass>Okda</landMass>
+		<landMass>Risku (Cord)</landMass>
+		<desc>3135 - Colonists settled Alrescha in the early days of the Tikonov Union, when Tikonov‘s growing population forced the Union to establish a secondary source of food and textiles. Despite trace atmospheric chemicals in Alrescha‘s young atmosphere that require filtering masks, the planet‘s warm, wet climate, fertile soil, and proximity to Tikonov met the Union‘s needs.
+
+In 2366, the newly formed Capellan Confederation absorbed Alrescha and the rest of the Tikonov Union. Alrescha served House Liao as a minor agricultural planet during the First Star League and most of the Succession Wars. Although Alrescha lay near the Confederation‘s Davion border, House Liao assigned second-line BattleMech units to garrison the unimportant world.
+
+During the Fourth Succession War, House Davion‘s elite New Ivaarsen Chasseurs caught these units flat-footed. House Liao sent a Death Commando squad to assassinate the Davion commander, but Alrescha still fell to the Federated Suns onslaught. At the end of the Second Star League, the Federated Commonwealth Civil War gave House Liao the opportunity to retake Alrescha.
+
+Fortunately for the planet‘s population, the Blakists ignored Alrescha during their Jihad. Life for Alrescha‘s farmers continued unchanged through the Golden Age of Peace.
+
+The continents of Alrescha are Kaltain, Okda, and Risku; the capital of Cord is located on Riksu.</desc>
 	</planet>
 	<planet>
 		<name>Alsek</name>
@@ -2221,9 +2354,9 @@ Andurien Aerotech</desc>
 		<name>Angol</name>
 		<xcood>88.67</xcood>
 		<ycood>-39.12</ycood>
-		<faction>TA</faction>
+		<faction>TGU</faction>
 		<factionChange>
-			<date>2315-01-01</date>
+			<date>2367-01-01</date>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
@@ -2239,7 +2372,7 @@ Andurien Aerotech</desc>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
-			<date>3072-02-01</date>
+			<date>3069-09-01</date>
 			<faction>WOB</faction>
 		</factionChange>
 		<factionChange>
@@ -2254,6 +2387,28 @@ Andurien Aerotech</desc>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<pressure>2</pressure>
+		<gravity>1.3</gravity>
+		<lifeForm>2</lifeForm>
+		<climate>0</climate>
+		<percentWater>10</percentWater>
+		<temperature>5</temperature>
+		<spectralClass>M</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>VI</luminosity>
+		<sysPos>3</sysPos>
+		<landMass>(Carius‘s Cache)</landMass>
+		<desc>Angol is a frozen planet circling a small, dying red star. Angol‘s fossil record shows that it was a habitable planet before its parent star shrank, and the world‘s oceans and atmosphere froze into planet-wide glaciers.
+
+Angol would not have been settled had the Carinus family, founders and rulers of the neighboring world of Tikonov, not needed secure access to rare metals used in their Earthwerks, Ltd. factories. The Carinus family based their government on Soviet-era Russia and used Angol like the Siberian gulags on Terra, condemning criminals and debtors to decades of drilling the planet‘s glaciers and working its foundries.
+
+When the Tikonov Union joined the Capellan Confederation, Angol‘s natives requested and received protection from the Terran Hegemony. By the time of the First Star League, the population‘s standard of living had improved considerably under Hegemony rule.
+
+When the First Star League fell, the Federated Suns laid claim to Angol. For much of the Succession Wars, Angol lay at the tip of a Federated Suns salient into the Capellan Confederation. Despite the occasional border raid by House Liao, Angol remained under Davion rule through the Second Star League.
+
+The Blakist Jihad brought Angol its first true invasion. Angol recovered during the Golden Age of Peace, but Davion loyalties still run high among the planet‘s population.
+
+There are no continents per se, but the capital of Carius‘s Cache is situated near the planet‘s south pole.</desc>
 	</planet>
 	<planet>
 		<name>Anguilla</name>
@@ -2287,13 +2442,21 @@ Andurien Aerotech</desc>
 		<name>Ankaa</name>
 		<xcood>75.37</xcood>
 		<ycood>-9.39</ycood>
-		<faction>TA</faction>
+		<faction>UND</faction>
 		<factionChange>
-			<date>2315-01-01</date>
+			<date>2450-01-01</date>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2790-01-01</date>
+			<date>2786-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>2810-01-01</date>
+			<faction>CC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2890-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -2305,21 +2468,45 @@ Andurien Aerotech</desc>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
-			<date>3072-02-01</date>
+			<date>3069-05-15</date>
 			<faction>WOB</faction>
 		</factionChange>
 		<factionChange>
-			<date>3078-02-24</date>
+			<date>3077-11-24</date>
 			<faction>Stone,WOB</faction>
 		</factionChange>
 		<factionChange>
-			<date>3078-02-26</date>
+			<date>3077-11-26</date>
 			<faction>Stone</faction>
 		</factionChange>
 		<factionChange>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<pressure>2</pressure>
+		<gravity>0.7</gravity>
+		<lifeForm>1</lifeForm>
+		<climate>4</climate>
+		<percentWater>5</percentWater>
+		<temperature>65</temperature>
+		<spectralClass>A</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>III</luminosity>
+		<sysPos>1</sysPos>
+		<satellite>Al Anqa</satellite>
+		<satellite>Al Nair</satellite>
+		<satellite>Al Ri‘al</satellite>
+		<satellite>Al Zaurak</satellite>
+		<landMass>(Anqabad)</landMass>
+		<desc>A small world blasted by its white-hot parent star, Ankaa held little promise for settlers during the first waves of interstellar colonization. Only 400 years after the first JumpShips left Terra did Sunni Muslim settlers land on Ankaa, one of the few uninhabited worlds left in the Inner Sphere by that time. These colonists decided to make a new life in Ankaa‘s polar regions, with their deadly climate and desolate but beautiful landscapes.
+
+In Arabic, Ankaa means ―the Phoenix, and its settlers sought to make Ankaa a new center of Islamic faith in the Terran Hegemony during the First Star League. Deposits of rare metals were also found in Ankaa‘s lower latitudes during this time, greatly enriching the population.
+
+After the fall of the First Star League, the Federated Suns briefly inherited Ankaa. However, the Capellan Confederation coveted Ankaa‘s mineral wealth and captured Ankaa by the middle of the First Succession War. House Liao held the world until House Davion recaptured Ankaa in the Third Succession War.
+
+Ankaa created many Islamic martyrs when the Blakist Holy War came to the world. When The Republic of the Sphere invited Clan factions to settle on Republican worlds during the Golden Age of Peace, a small number of Nova Cats chose Ankaa for the spiritual vision of its native Muslim population.
+
+The capital of Anqabad is located near the north pole.</desc>
 	</planet>
 	<planet>
 		<name>Ankolika</name>
@@ -4287,7 +4474,7 @@ Barras is the hotbed of intelligence activity along the Confederation-FWL border
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
-			<date>3072-02-01</date>
+			<date>3069-10-01</date>
 			<faction>WOB</faction>
 		</factionChange>
 		<factionChange>
@@ -4302,6 +4489,31 @@ Barras is the hotbed of intelligence activity along the Confederation-FWL border
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<pressure>4</pressure>
+		<gravity>1.5</gravity>
+		<lifeForm>5</lifeForm>
+		<climate>3</climate>
+		<percentWater>60</percentWater>
+		<temperature>34</temperature>
+		<spectralClass>G</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>5</sysPos>
+		<satellite>Granite</satellite>
+		<satellite>Marble</satellite>
+		<satellite>Slate</satellite>
+		<landMass>Amethyst</landMass>
+		<landMass>Garnet (Manville)</landMass>
+		<landMass>Opal</landMass>
+		<landMass>Topaz</landMass>
+		<landMass>Quartz</landMass>
+		<desc>3135 - Basalt is a large world with an oppressively thick atmosphere, wild lightning storms, and a high gravity field. Despite these drawbacks, Basalt is rich in rare minerals and was one of the first planets settled by Terran mining companies.
+
+At the end of the First Star League, the Federated Suns laid claim to Basalt and held on to the world despite repeated Capellan raids through the early Succession Wars. In the Fourth Succession War, House Davion used Basalt as bait to trap several House Liao units. Today, the mountains around Lake Zander and the Contrassa spaceport, both on Basalt‘s southern continent of Garnet, are littered with the remains of Liao BattleMechs.
+
+The Blakist Holy War hit Basalt hard. Even during the worst of the Succession Wars, the Clan invasion, and the Federated Commonwealth Civil War, investors would bid up the price of the rare minerals produced on Basalt. The Blakists, however, hoarded Basalt‘s wealth for their own cause, impoverishing Basalt‘s families.
+
+During the Golden Age of Peace, Basalt‘s mining companies recovered enough to diversify into metals and other materials. A large tourist trade has been built centering around local arts and environmental travel, creating a prosperous economy. The five continents of Amethyst, Garnet, Opal, Topaz, and Quartz, are almost all situated along the equatorial region of Basalt. The capital, Manville, is located on Garnet.</desc>
 	</planet>
 	<planet>
 		<name>Basantapur</name>
@@ -5026,6 +5238,9 @@ Due to the lack of education and wealth, the population in the early 31st Centur
 		<luminosity>III</luminosity>
 		<sysPos>4</sysPos>
 		<hpg>B</hpg>
+		<landMass>Veerta</landMass>
+		<landMass>Vidya (Chakra)</landMass>
+		<landMass>Vinamrata</landMass>
 		<desc>The planet Bharat is well known as a nature and hunting preserve available to both noblemen and commoners. The planet has a variety of terrain and distinctive native lifeforms - desert areas with large lizard-like animals, forests with opossum-like creatures, graceful and fat marine and land mammals that inhabit the seacoast, and a small mushroom-like plant that can move to more fertile ground or to avoid danger. The only major industries on Bharat are all tooled around logging of the many types of imported Terran trees.</desc>
 	</planet>
 	<planet>
@@ -7401,6 +7616,14 @@ The planets primary industries and exports are plastics and plastisteel using th
 		<ycood>-35.99</ycood>
 		<faction>FS</faction>
 		<factionChange>
+			<date>2822-01-01</date>
+			<faction>CC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2864-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
 		</factionChange>
@@ -7428,6 +7651,24 @@ The planets primary industries and exports are plastics and plastisteel using th
 			<date>3081-02-02</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1</gravity>
+		<lifeForm>6</lifeForm>
+		<climate>2</climate>
+		<percentWater>70</percentWater>
+		<temperature>24</temperature>
+		<spectralClass>K</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>2</sysPos>
+		<satellite>None (Asteroid Belt)</satellite>
+		<landMass>Embrasure (Battlement)</landMass>
+		<landMass>Merlon</landMass>
+		<desc>Caselton is a highly habitable planet that closely resembles Terra in several key respects. However, Caselton‘s climate is slightly too cold and dry to support widespread agriculture, and its geology contains limited deposits of useful metals and minerals. Although self-sufficient, Caselton‘s economy has never supported significant exports and thus never attracted a large population.
+
+Except for a brief period of Capellan occupation at the height of the First Succession War, Caselton has been a member world of the Federated Suns. Although not an economically productive world, Caselton‘s strategic position near Tikonov led the Federated Suns military to invest heavily in Caselton‘s defenses, including several underground and underwater military bases. Caselton‘s small asteroid ring also provides the planet with a measure of natural aerospace defense.
+
+These fortifications served Caselton well in the Blakist Holy War, stopping repeated assaults by Blakist mercenaries. However, during the Golden Age of Peace, The Republic of the Sphere dismantled many of Caselton‘s defenses.The two continents are Embrasure and Merlon; the capital of Battlement is located on Embrasure.</desc>
 	</planet>
 	<planet>
 		<name>Casere</name>
@@ -10201,7 +10442,7 @@ The Confederation’s eventual settlement was originally little more than a perm
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
-			<date>3072-02-01</date>
+			<date>3069-07-01</date>
 			<faction>WOB</faction>
 		</factionChange>
 		<factionChange>
@@ -10216,6 +10457,26 @@ The Confederation’s eventual settlement was originally little more than a perm
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>0.9</gravity>
+		<lifeForm>7</lifeForm>
+		<climate>2</climate>
+		<percentWater>80</percentWater>
+		<temperature>20</temperature>
+		<spectralClass>K</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>III</luminosity>
+		<sysPos>3</sysPos>
+		<satellite>Diphda</satellite>
+		<satellite>Shemali</satellite>
+		<landMass>Baten (Cetus)</landMass>
+		<landMass>Menkar</landMass>
+		<landMass>Mira</landMass>
+		<desc>An unremarkable, small world blanketed by grasslands and tundra, Deneb Kaitos is famous as the home of the Deneb Light Cavalry, elite Federated Suns BattleMech regiments descended from the special forces of the First Star League. Originally settled by the Terran Hegemony, Deneb‘s population began to starve when food shipments were cut off after the fall of the First Star League. In response, the Fourth Deneb Light Cavalry, one of the Star League‘s Rapid Deployment Mixed Armed Forces (or RDMAF) regiments, did not join Kerensky‘s Exodus, and signed on with the Federated Suns military instead in exchange for food shipments to Deneb Kaitos.
+
+Deneb Kaitos has remained under House Davion‘s banner except for a brief period of Capellan occupation during the Third Succession War. Although the makeup of the Deneb Light Cavalry eventually reflected that of all Federated Suns worlds, men and women who grew up in Deneb Kaitos‘s rugged sheepherding lifestyle continued to be the Cavalry‘s most ardent and effective MechWarriors. When the Blakist Holy War hit Deneb Kaitos, many Light Cavalry units, along with innumerable retirees from the Cavalry, were lost defending the world. When The Republic of the Sphere was founded, some of the remaining Deneb Light Cavalry regiments joined the Republic defense forces.
+
+The continent of Baten is home to the capital of Cetus and is located in the northern hemisphere; the continents of Menkar and Mira straddle the equator.</desc>
 	</planet>
 	<planet>
 		<name>Denebola</name>
@@ -12681,6 +12942,7 @@ Fuisgon-Flame Tech</desc>
 		<percentWater>90</percentWater>
 		<hpg>B</hpg>
 		<lifeForm>4</lifeForm>
+		<landMass>Hamilton (Royce)</landMass>
 		<socioIndustrial>C-C-B-C-B</socioIndustrial>
 		<desc>House Fletcher were ardent supporters of House Marik until the Duke of Oriente attacked the first planet of Fletcher, in the Free Worlds League, in 2368. House Fletcher moved, along with millions of their followers to the Capellan Confederation planet of the same name.
 
@@ -15099,9 +15361,13 @@ Corvatti Corporation</desc>
 		<name>Hamal</name>
 		<xcood>65.46</xcood>
 		<ycood>-43.81</ycood>
-		<faction>TA</faction>
+		<faction>TGU</faction>
 		<factionChange>
-			<date>2315-01-01</date>
+			<date>2367-01-01</date>
+			<faction>CC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2400-01-01</date>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
@@ -15121,7 +15387,7 @@ Corvatti Corporation</desc>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
-			<date>3072-02-01</date>
+			<date>3075-02-01</date>
 			<faction>WOB</faction>
 		</factionChange>
 		<factionChange>
@@ -15132,6 +15398,27 @@ Corvatti Corporation</desc>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>0.8</gravity>
+		<lifeForm>2</lifeForm>
+		<climate>4</climate>
+		<percentWater>40</percentWater>
+		<temperature>10</temperature>
+		<spectralClass>K</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>III</luminosity>
+		<sysPos>6</sysPos>
+		<satellite>Arietis</satellite>
+		<satellite>Natih</satellite>
+		<satellite>Ras</satellite>
+		<landMass>(Califa Hamal)</landMass>
+		<desc>3135 - Hamal is a cold desert world dominated by arid, frozen tundra and windstorms the locals call ―sand blizzards. Settlers from the highlands of Terra‘s South American continent established their only major city, Califa Hamal, on the planet‘s equator, where temperatures can reach above freezing. Hamal‘s surface is a single landmass with small, landlocked seas containing mostly crushed ice.
+
+Hamal served as one of three provincial capitals in the early days of the Tikonov Union. However, by the time the Tikonov Union joined the Capellan Confederation, Hamal‘s importance was supplanted by more habitable worlds with greater resources and larger populations. The Terran Hegemony agreed to incorporate the increasingly backwards planet. Aside from a small bureaucracy at Califa, most of Hamal‘s population carries out a nomadic, tribal existence to this day, and follows the growth of Hamal‘s meager vegetation as the seasons change.
+
+After the fall of the First Star League, the Capellan Confederation claimed Hamal. House Liao lost Hamal to the Federated Suns during the Fourth Succession War, but not before Hamal‘s expert desert fighters earned the respect of House Davion.
+
+During their Holy War, the Blakists found ready converts among the technologically poor tribes on Hamal, with some still loyal to Blakist theology to this day.</desc>
 	</planet>
 	<planet>
 		<name>Hamar</name>
@@ -15490,7 +15777,7 @@ Corvatti Corporation</desc>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
-			<date>3072-02-01</date>
+			<date>3069-08-10</date>
 			<faction>WOB</faction>
 		</factionChange>
 		<factionChange>
@@ -15509,6 +15796,29 @@ Corvatti Corporation</desc>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>0.8</gravity>
+		<lifeForm>4</lifeForm>
+		<climate>3</climate>
+		<percentWater>70</percentWater>
+		<temperature>31</temperature>
+		<spectralClass>K</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>3</sysPos>
+		<landMass>Chau</landMass>
+		<landMass>Hanoi</landMass>
+		<landMass>Luan</landMass>
+		<landMass>Nghiem</landMass>
+		<landMass>Truyen</landMass>
+		<landMass>Taigoan (Cadaceus)</landMass>
+		<desc>Hean native ecology contains unusual flora and fauna. Most of Hean‘s animals use poison to hunt or defend themselves, and most of Hean‘s plants are poisonous if ingested. After scientists discovered that many of these plants and animals also contain useful medicinal compounds, pharmaceutical companies in the Federated Suns invested in Hean during the First Star League, building numerous medical facilities on the planet.
+
+Although the Capellan Confederation and the Draconis Combine mounted numerous raids against Hean throughout the Succession Wars, all sides recognized the value and neutrality of Hean‘s medical facilities and never fired directly on them. The Federated Suns often used this to its advantage, occasionally capturing or eliminating whole battalions of Capellan or Draconis BattleMechs as they maneuvered cautiously around these medical facilities.
+
+Only the arrival of the Blakists and their Holy War brought an end to the healing trips that many afflicted Federated Suns citizens took to Hean. Under The Republic of the Sphere, Hean‘s medical facilities have been largely restored, although many of Hean‘s most knowledgeable doctors and researchers were lost to the Blakist purges.
+
+There are a total of six continents on Hean. Chau, Hanoi, and Luan are all in the northern hemisphere, while Nghiem and Truyen fall in the southern hemisphere. The smallest continent, Taigoan, sits across the equator but, because of its temperate climate, is home to the capital city of Cadaceus.</desc>
 	</planet>
 	<planet>
 		<name>Hecheng</name>
@@ -17195,6 +17505,10 @@ Trunner, the largest city and planetary capital, is home to Imbross AeroTech Ind
 		<ycood>-18.78</ycood>
 		<faction>TA</faction>
 		<factionChange>
+			<date>2240-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
 			<date>2315-01-01</date>
 			<faction>TH</faction>
 		</factionChange>
@@ -17212,6 +17526,10 @@ Trunner, the largest city and planetary capital, is home to Imbross AeroTech Ind
 		</factionChange>
 		<factionChange>
 			<date>3057-11-01</date>
+			<faction>DS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3066-01-01</date>
 			<faction>CM</faction>
 		</factionChange>
 		<factionChange>
@@ -17219,17 +17537,36 @@ Trunner, the largest city and planetary capital, is home to Imbross AeroTech Ind
 			<faction>WOB</faction>
 		</factionChange>
 		<factionChange>
-			<date>3078-02-24</date>
+			<date>3077-12-24</date>
 			<faction>Stone,DC,WOB</faction>
 		</factionChange>
 		<factionChange>
-			<date>3078-02-26</date>
+			<date>3078-01-26</date>
 			<faction>Stone</faction>
 		</factionChange>
 		<factionChange>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1</gravity>
+		<lifeForm>7</lifeForm>
+		<climate>3</climate>
+		<percentWater>50</percentWater>
+		<temperature>29</temperature>
+		<spectralClass>G</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>4</sysPos>
+		<satellite>Edanu</satellite>
+		<landMass>(Askar)</landMass>
+		<desc>Cloaked in extensive natural resources, Ingress was one of the first worlds colonized during the initial interstellar exodus from Terra. Clustered in towns around the planet‘s single, large ocean, settlers established some light industry near their capital of Askar, but agricultural products quickly became the world‘s dominant export. Self-sufficient from the beginning, Ingress was also one of the first worlds to seek independence from the Terran Alliance, and its well-equipped infantry fought many years before succumbing to the Terran Hegemony.
+
+After the fall of the First Star League, the Capellan Confederation claimed Ingress. Ingress was temporarily made part of the Tikonov Free Republic during the Fourth Succession War, until the Federated Commonwealth absorbed the Republic at the conclusion of the conflict.
+
+In the events leading up to the Federated Commonwealth Civil War, Ingress became one of many worlds abandoned by the Great Houses in the so-called Chaos March. The neighboring planet of Small World quickly proposed an alliance, at gunpoint, with resource-rich Ingress. However, a few years later, the population of Ingress once again fought for and won its independence, at great cost to its infantry legions.
+
+Ingress‘s temporary military weakness made it an easy target during the Blakist Holy War. The Blakists established enormous reeducation camps on the planet, disrupting agriculture and starving over a billion people to death. Ingress‘s economy fully recovered during the Golden Age of Peace, but its population still stands at less than half of its former levels.</desc>
 	</planet>
 	<planet>
 		<name>Inman</name>
@@ -18627,6 +18964,10 @@ Trade between both resumed again decades after the crisis, though government was
 		<ycood>-29.73</ycood>
 		<faction>TA</faction>
 		<factionChange>
+			<date>2240-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
 			<date>2315-01-01</date>
 			<faction>TH</faction>
 		</factionChange>
@@ -18643,7 +18984,7 @@ Trade between both resumed again decades after the crisis, though government was
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
-			<date>3072-02-01</date>
+			<date>3079-07-01</date>
 			<faction>WOB</faction>
 		</factionChange>
 		<factionChange>
@@ -18658,6 +18999,32 @@ Trade between both resumed again decades after the crisis, though government was
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.1</gravity>
+		<lifeForm>5</lifeForm>
+		<climate>3</climate>
+		<percentWater>60</percentWater>
+		<temperature>26</temperature>
+		<spectralClass>M</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>2</sysPos>
+		<satellite>Cactus</satellite>
+		<landMass>Adaven</landMass>
+		<landMass>Armagosa</landMass>
+		<landMass>Darrough</landMass>
+		<landMass>Hannapah</landMass>
+		<landMass>Ione</landMass>
+		<landMass>Nyala</landMass>
+		<landMass>Ophir</landMass>
+		<landMass>Pactolus</landMass>
+		<landMass>Tolicha</landMass>
+		<landMass>Wahmonie</landMass>
+		<desc>Ten small continents dot Kawich‘s large but shallow seas. Kawich‘s soil is generally poor, but its rocks are rich in metal ores, minerals, and petroleum. Although mining and refining industries boomed on Kawich under the Terran Hegemony, Kawich‘s population has always retained a frontier attitude given the hardscrabble land they must work.
+
+After the fall of the First Star League, the Federated Suns laid claim to Kawich. Kawich remained under the banner of House Davion, except for a brief period during the Third Succession War when the Capellan Confederation held the planet. During the Fourth Succession War, House Davion lured House Liao into an ill-fated counterattack on Kawich involving famous units like the Eridani Light Horse and the Davion Guards. Today, locals still refer to the BattleMech carcasses on the hills and groves around the towns of Samanan, Jamou, and the capital of Dotara as ―Liao‘s metal tombstones.
+
+The Blakist Holy War destroyed much of Kawich‘s industry, but The Republic of the Sphere managed to resurrect most of Kawich‘s mines, drills, and refineries during the Golden Age of Peace.</desc>
 	</planet>
 	<planet>
 		<name>Kazanka</name>
@@ -23838,13 +24205,25 @@ Mira's principal industries include textiles, light and heavy manufacturing and 
 		<name>Mirach</name>
 		<xcood>109.8</xcood>
 		<ycood>-27.12</ycood>
-		<faction>TA</faction>
+		<faction>IND</faction>
 		<factionChange>
-			<date>2315-01-01</date>
-			<faction>TH</faction>
+			<date>2306-01-01</date>
+			<faction>Mara</faction>
 		</factionChange>
 		<factionChange>
-			<date>2790-01-01</date>
+			<date>2344-01-01</date>
+			<faction>TGU</faction>
+		</factionChange>
+		<factionChange>
+			<date>2366-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>2822-01-01</date>
+			<faction>CC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2862-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -23856,7 +24235,7 @@ Mira's principal industries include textiles, light and heavy manufacturing and 
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
-			<date>3072-02-01</date>
+			<date>3069-10-6</date>
 			<faction>WOB</faction>
 		</factionChange>
 		<factionChange>
@@ -23875,6 +24254,27 @@ Mira's principal industries include textiles, light and heavy manufacturing and 
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>0.8</gravity>
+		<lifeForm>1</lifeForm>
+		<climate>3</climate>
+		<percentWater>60</percentWater>
+		<temperature>25</temperature>
+		<spectralClass>M</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>7</sysPos>
+		<satellite>Arit</satellite>
+		<satellite>Batn</satellite>
+		<satellite>Kalb</satellite>
+		<satellite>Kuton</satellite>
+		<landMass>Musasalah (Cingulum)</landMass>
+		<landMass>Ventrale</landMass>
+		<desc>Mirach‘s sky is dominated by its huge, swollen, dying red sun. The geological record on Mirach shows that it was long a frozen, uninhabitable planet, until its parent star entered the current phase of its life cycle. As a result, the thick glaciers that once covered Mirach‘s ores and minerals have melted, and no erosion or life-forms have had a chance to cover its riches with soil.
+
+Mirach‘s readily accessible riches granted it considerable power in its early history. Mirach‘s government laid claim to nearby planets like Mira, Mesartim, and Almach. However, Mirach‘s wealth attracted more-powerful states, including the Federated Suns, the Tikonov Union, and the Marlette Association, which fought several battles over the planet, dashing Mirach‘s hopes of empire. After the Tikonov Union joined the Capellan Confederation, the Terran Hegemony and House Liao jointly administered Mirach, with the world falling wholly into House Liao‘s hands at the end of the First Star League. Mirach remained under House Liao until the Third Succession War, when House Davion conquered the world.
+
+These episodic invasions kept Mirach from realizing its true potential, and the Blakist Holy War again set Mirach back several decades. Only under The Republic of the Sphere has Mirach‘s economy substantially raised its population‘s standard of living. Mirach‘s capital of Cingulum lies on the continent of Musasalah. Mirach‘s other major landmass is Ventrale.</desc>
 	</planet>
 	<planet>
 		<name>Mirage</name>
@@ -25768,6 +26168,10 @@ Most industry on the planet is centered around catering to the rich individuals 
 		<ycood>-15.91</ycood>
 		<faction>TA</faction>
 		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
 			<date>2315-01-01</date>
 			<faction>TH</faction>
 		</factionChange>
@@ -25783,6 +26187,36 @@ Most industry on the planet is centered around catering to the rich individuals 
 			<date>3067-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<pressure>3</pressure>
+		<gravity>0.7</gravity>
+		<lifeForm>4</lifeForm>
+		<climate>4</climate>
+		<percentWater>60</percentWater>
+		<temperature>28</temperature>
+		<spectralClass>M</spectralClass>
+		<subtype>9</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>1</sysPos>
+		<satellite>Filerimo</satellite>
+		<satellite>Dodecanisa</satellite>
+		<landMass>Crete (Xerxes)</landMass>
+		<landMass>Minos</landMass>
+		<landMass>Sparta</landMass>
+		<desc>New Rhodes III is a small, mostly desert world, unremarkable except for two things.
+
+First, because of its small star, the travel time between New Rhodes III and its jump point is very quick. With such short turnaround times, New Rhodes III became a crucial resupply world during the First Succession War and was fought over several times.
+
+However, it is the Colossii that truly sets New Rhodes III apart; luckily, none of the chain was touched during any of the Succession Wars.
+
+Found in 2259 by the first colonists, these huge rock pillars—approximately one hundred fifty in the chain, which runs in a snaking pattern from deep within the central desert on the continent of Crete, terminating right at the edge of the equatorial ocean—have been scientific oddities for centuries.
+
+Geologists speculate that a meteor—in all likelihood several meteors—from outside the galaxy impacted on New Rhodes some two million year ago, bringing chemicals and minerals completely foreign to the planet. After millennia of wind erosion and harsh desert climate mixed to reveal the minerals trapped in the ground, the Colossii revealed themselves in all their wonder and splendor; there are colors found in these rocks that have literally not been found on a single other colonized world.
+
+As word slowly spread, New Rhodes III became a pleasure destination from across the Inner Sphere, resulting in the small capital of Xerxes being established near the southern end of the Colossii chain. However, because of the harsh conditions of most of the rest of the planet—the continents of Minos and Sparta are almost unlivable—New Rhodes III is permanent home to only desert nomads and a small scientific community; the ―capital is home almost exclusively to said community.</desc>
 	</planet>
 	<planet>
 		<name>New Roland</name>
@@ -26396,6 +26830,14 @@ Niops VII is a cold planet with access to sufficient resources to keep the Assoc
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
+			<date>2905-01-01</date>
+			<faction>CC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2930-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
 		</factionChange>
@@ -26419,6 +26861,24 @@ Niops VII is a cold planet with access to sufficient resources to keep the Assoc
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.1</gravity>
+		<lifeForm>2</lifeForm>
+		<climate>5</climate>
+		<percentWater>60</percentWater>
+		<temperature>34</temperature>
+		<spectralClass>G</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>7</sysPos>
+		<landMass>Nen</landMass>
+		<landMass>Nin (Cocula)</landMass>
+		<landMass>Non</landMass>
+		<desc>Nopah‘s swollen, dying parent star has been a blessing to its flora, but all of the planet‘s native animal life has perished due to dramatic changes in Nopah‘s climate. Settlers from Terra recognized Nopah‘s agricultural potential but had to introduce their own insects to ensure that their crops were fertilized.
+
+After the fall of the First Star League, Nopah joined the Federated Suns. It remained under the flag of the Federated Suns until the Third Succession War, when Warrior House units from the Capellan Confederation managed to capture Nopah in 2905. By a stroke of luck, the Confederation and the Federated Suns signed a temporary armistice ceasing military action along their entire border a few months later. The Confederation held Nopah for 25 years until 2930, when the Federated Suns decided to break the armistice.
+
+During the Fourth Succession War, the Federated Suns leaked false reports of unguarded military supply depots and communications facilities on Nopah and several other border worlds. Reeling from House Davion‘s offensive, the Capellan Confederation focused its few counterattacks on these worlds. But the Capellans found no supplies, only front-line house and mercenary regiments from the Federated Suns. No less than three regiment-sized battles took place on Nopah, involving famous units like McCarron‘s Armored Cavalry, the Ceti Hussars, the Vegan Rangers, and the Capellan Hussars. To this day, BattleMech and tank wreckage litters hills and fields around the towns of Grinsanders, Stongton‘s Crossing, and White Hall.</desc>
 	</planet>
 	<planet>
 		<name>Norfolk</name>
@@ -30333,13 +30793,29 @@ Magna Metals Incorporated</desc>
 		<name>Rio</name>
 		<xcood>96.24</xcood>
 		<ycood>-28.95</ycood>
-		<faction>TA</faction>
+		<faction>IND</faction>
 		<factionChange>
-			<date>2315-01-01</date>
+			<date>2223-01-01</date>
+			<faction>TGU</faction>
+		</factionChange>
+		<factionChange>
+			<date>2367-01-01</date>
+			<faction>CC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2400-01-01</date>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2790-01-01</date>
+			<date>2780-01-01</date>
+			<faction>CC,DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2806-01-01</date>
+			<faction>CC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2864-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -30351,7 +30827,7 @@ Magna Metals Incorporated</desc>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
-			<date>3072-02-01</date>
+			<date>3075-02-01</date>
 			<faction>WOB</faction>
 		</factionChange>
 		<factionChange>
@@ -30366,6 +30842,30 @@ Magna Metals Incorporated</desc>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.2</gravity>
+		<lifeForm>5</lifeForm>
+		<climate>3</climate>
+		<percentWater>60</percentWater>
+		<temperature>30</temperature>
+		<spectralClass>F</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>4</sysPos>
+		<satellite>Aires</satellite>
+		<landMass>Grando (Reno)</landMass>
+		<landMass>Pequeno</landMass>
+		<desc>Famous for deep valleys that twist across its surface, settlers named Rio after a similar canyon in Terra‘s western hemisphere. Rio lacks significant exports and relied instead on its dramatic natural beauty to attract tourists, Tri-Vid production houses, and art colonies to boost its early economy.
+
+Rio lost its independence to the Tikonov Union in 2223.When the Capellan Confederation absorbed the Tikonov Union 150 years later, Rio‘s planetary council petitioned for incorporation in the Terran Hegemony. Rio went on to prosper as a center of fine arts, filmmaking, and high-end tourism throughout the First Star League.
+
+Both House Liao and House Kurita claimed Rio after the fall of the First Star League. In 2806, the Confederation unleashed nuclear weapons against the Combine to break the stalemate. radioactive craters obliterated Rio‘s landscape and forced most of its population off-planet. In the end, neither side occupied the ruined world.
+
+Realizing Rio‘s strategic position in the Terran corridor, House Davion claimed the planet and used Rio as a base to support military action against House Liao for most of the Succession Wars. In 2980, the Confederation tried to retake Rio with an enormous aerospace assault that ended in spectacular defeat, leading to a major restructuring of Capellan aerospace forces.
+
+Conditions on Rio have not changed since the early Succession Wars. The Republic of the Sphere established self-sufficient cantonments to stabilize Rio‘s economy.
+
+Rio only sports two continents, both which sit astride the equator: Grando and Pequeno. The capital, Reno, is on Grando.</desc>
 	</planet>
 	<planet>
 		<name>Risin</name>
@@ -30677,6 +31177,10 @@ The planet barely survived through the Succession Wars since the technology behi
 		<ycood>-2.61</ycood>
 		<faction>TA</faction>
 		<factionChange>
+			<date>2240-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
 			<date>2315-01-01</date>
 			<faction>TH</faction>
 		</factionChange>
@@ -30696,6 +31200,31 @@ The planet barely survived through the Succession Wars since the technology behi
 			<date>3067-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.3</gravity>
+		<lifeForm>2</lifeForm>
+		<climate>4</climate>
+		<percentWater>30</percentWater>
+		<temperature>34</temperature>
+		<spectralClass>F</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>5</sysPos>
+		<landMass>Oxo</landMass>
+		<landMass>Xox (Lenor)</landMass>
+		<desc>Blasted by its large parent star, Ronel is an inhospitable world with significant mineral wealth. Although the Terran Hegemony never permanently settled Ronel, Hegemony mining companies sent teams of workers on multiyear assignments to drill deep into Ronel‘s broken terrain.
+
+House Liao and House Kurita both laid claim to Ronel after the fall of the First Star League. After years of stalemate, the Capellan Chancellor suspended the Ares Conventions and authorized the use of chemical weapons. The Confederation won Ronel, but only by poisoning its atmosphere.
+
+The chemical agents unleashed by the Capellans eventually dissipated to levels that could be managed with filtering masks. Once declared ―safe, Ronel became a prison world, a destination for the most criminal elements of Capellan society, which did the dangerous work of reopening the planet‘s mineshafts.
+
+Federated Suns mercenaries took Ronel in the Fourth Succession War, and The Republic of the Sphere has maintained investments started by House Davion in Ronel‘s mining economy.
+
+The twin continents of Oxo and Xox are nearly mirror images of each other, almost directly opposite each other; Oxo in the northern and Xox in the southern hemisphere. The capital city of Lenor is on Xox.</desc>
 	</planet>
 	<planet>
 		<name>Rosamond</name>
@@ -30831,9 +31360,17 @@ The planet barely survived through the Succession Wars since the technology behi
 		<name>Ruchbah</name>
 		<xcood>57.9</xcood>
 		<ycood>-22.95</ycood>
-		<faction>TA</faction>
+		<faction>IND</faction>
 		<factionChange>
-			<date>2315-01-01</date>
+			<date>2228-01-01</date>
+			<faction>TGU</faction>
+		</factionChange>
+		<factionChange>
+			<date>2367-01-01</date>
+			<faction>CC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2400-01-01</date>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
@@ -30849,7 +31386,7 @@ The planet barely survived through the Succession Wars since the technology behi
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
-			<date>3072-02-01</date>
+			<date>3069-07-22</date>
 			<faction>WOB</faction>
 		</factionChange>
 		<factionChange>
@@ -30864,6 +31401,26 @@ The planet barely survived through the Succession Wars since the technology behi
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.1</gravity>
+		<lifeForm>7</lifeForm>
+		<climate>2</climate>
+		<percentWater>40</percentWater>
+		<temperature>25</temperature>
+		<spectralClass>F</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>VI</luminosity>
+		<sysPos>1</sysPos>
+		<landMass>(Rook)</landMass>
+		<desc>Ruchbah‘s surface is dominated by a single landmass and dotted with inland seas. Most of this landmass consists of rolling grasslands, hills, and tundra, ideal for grazing animals. Lit by a small subdwarf star, Ruchbah is a relatively cool world and its higher latitudes suffer bitterly cold winters, forcing both domesticated and wild herds to migrate annually. Because so much of its population follows the animal herds, the population of Ruchbah‘s capital, Rook, and other towns varies widely depending on the season.
+
+When first settled, Ruchbah‘s native military consisted of little more than horse-mounted cavalry, which allowed the neighboring Tikonov Union to take control of Ruchbah in 2228. When the Tikonov Union joined the Capellan Confederation 150 years later, Ruchbah was one of several worlds that requested the protection of, and was eventually integrated into, the Terran Hegemony. After the fall of the First Star League, the Federated Suns claimed Ruchbah. Although the Capellan Confederation briefly held Ruchbah during the Third Succession War, Ruchbah remained a backwater world supplying animal products to the rest of the Federated Suns for most of the Succession Wars.
+
+During and after the Clan invasion, investment in military production by the Great Houses reached a high not seen since the First Star League. And Michaelson Heavy Industries began manufacturing attack helicopters on planet.
+
+When Blakist units attempted to take Ruchbah after the fall of the Second Star League, they found themselves bogged down in a guerilla war with Ruchbah‘s native horse-mounted cavalry, backed by Michaelson‘s attack helicopters. Although losses were high on both sides, the Blakists never managed to take full control of Ruchbah, and the planet easily transferred to the control of The Republic of the Sphere after the Blakists were put down.
+
+Under The Republic, Michaelson converted its helicopter designs to civilian use and greatly scaled back production.</desc>
 	</planet>
 	<planet>
 		<name>Rudolpho</name>
@@ -31852,6 +32409,14 @@ Tengo Aerospace</desc>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
+			<date>2822-01-01</date>
+			<faction>CC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2862-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
 		</factionChange>
@@ -31871,6 +32436,27 @@ Tengo Aerospace</desc>
 			<date>3077-02-02</date>
 			<faction>FS</faction>
 		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.1</gravity>
+		<lifeForm>5</lifeForm>
+		<climate>4</climate>
+		<percentWater>20</percentWater>
+		<temperature>27</temperature>
+		<spectralClass>G</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>III</luminosity>
+		<sysPos>2</sysPos>
+		<satellite>Mali</satellite>
+		<landMass>(Jacksonville)</landMass>
+		<desc>Schedar is a cool, desert world. Although the chemical constituents of its atmosphere are suitable to humans, a fine mineral dust that scars human lungs permeates the lower atmosphere and forces Schedar‘s population to use filtering masks and equipment. Many small, salty lakes pockmark the surface, and Schedar‘s native reptilian life-forms migrate between these lakes as the seasons change.
+
+During the First Star League, the Federated Suns invited the Terran Hegemony to jointly administer Schedar, partly to ward off attacks from the Draconis Combine and partly to encourage Hegemony investment in this backwater world. Taking advantage of the planet‘s low-wage workforce and the naturally occurring semiconductor minerals littered across Schedar‘s surface, a rich Hegemony family established Rander Communications Equipment, Inc. near the capital of Jacksonville. The Rander family also convinced the Hegemony to undertake some mild terraforming efforts on Schedar to rid the planet of its deadly mineral dust.
+
+Although the fall of the First Star League brought an end to terraforming on Schedar, Rander Communication Equipment went on to faithfully serve the Federated Suns for the duration of the Succession Wars by producing various military electronics, including communications, tracking and targeting, and countermeasure systems. Although Rander had a subsidiary on the surface of Schedar that produced civilian electronics, its military electronics were produced in an underground factory. Much of Schedar‘s population retreated into these underground complexes during the Blakist Holy War, reemerging years later when The Republic of the Sphere was founded. Rander adapted to the pacifistic Republic by mothballing its underground military factory and investing heavily in the civilian factory.</desc>
 	</planet>
 	<planet>
 		<name>Schererville</name>
@@ -32207,6 +32793,7 @@ Tengo Aerospace</desc>
 		<luminosity>III</luminosity>
 		<sysPos>3</sysPos>
 		<hpg>B</hpg>
+		<landMass>(New Cartris)</landMass>
 		<desc>Sevren is a large agricultural world that, for most of its history, was along the Commonwealth/Combine border and suffered many raids as a result. Aside from agriculture, the main industry on Sevren is Nesmith Nuclear Industries, which produces nuclear plants used all across the Commonwealth and Combine.</desc>
 	</planet>
 	<planet>
@@ -32416,6 +33003,10 @@ The Word of Blake Jihad bypassed Shensi, so it was undamaged when it was folded 
 		<ycood>-21.65</ycood>
 		<faction>TA</faction>
 		<factionChange>
+			<date>2240-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
 			<date>2315-01-01</date>
 			<faction>TH</faction>
 		</factionChange>
@@ -32451,6 +33042,22 @@ The Word of Blake Jihad bypassed Shensi, so it was undamaged when it was folded 
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>0.9</gravity>
+		<lifeForm>7</lifeForm>
+		<climate>5</climate>
+		<percentWater>40</percentWater>
+		<temperature>31</temperature>
+		<spectralClass>K</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>5</sysPos>
+		<landMass>(Gellen‘s Heights)</landMass>
+		<desc>Once the emerald jewel in the crown of the Terran Hegemony, Sheratan‘s surface was a single landmass blanketed by thick forests, lush jungles, and verdant farmland; dotted by a few, large, landlocked seas. Sheratan‘s ruling family, the Grensons, were staunch supporters of Terra‘s Cameron family when they assumed leadership of the Terran Hegemony and, later, founded the First Star League. In fact, First Lord Jonathan Cameron married Lady Ludmella Grenson, a connection to the First Star League that Sheratan‘s population remains proud of to this day. During the fall of the First Star League, on the order of the Usurper Stefan Amaris, the Grenson family was nearly wiped out for its association with the Camerons. With no hereditary rulers, the Capellan Confederation easily claimed Sheratan after the fall of the First Star League.
+
+Aside from its fertile soil, Sheratan lacks significant resources, so Sheratan‘s small population and agriculture were spared most of the ravages of the Succession Wars. When the Federated Suns invaded the Capellan Confederation at the outset of the Fourth Succession War, Sheratan was one of many Capellan worlds near Terra that were cut off from the Confederation and incorporated in the short-lived Tikonov Free Republic. Sheratan reverted to the Federated Commonwealth when an assassin brought an end to the new Tikonov state. The subsequent invasion by House Liao troops in the years before the FedCom Civil War left the world ravaged.
+
+By the time of the founding of The Republic of the Sphere, Sheratan‘s population had fallen to levels the planet‘s now-meager agricultural output could support and the economy stabilized. When a portion of the Wolf Clan joined The Republic, interest in Sheratan‘s ties to the First Star League led some to settle near Sheratan‘s capital of Gellen‘s Heights, further boosting the planet‘s economy.</desc>
 	</planet>
 	<planet>
 		<name>Sheridan</name>
@@ -36266,6 +36873,12 @@ Earthwerks Incorporated</desc>
 		<luminosity>V</luminosity>
 		<sysPos>4</sysPos>
 		<hpg>B</hpg>
+		<satellite>Jarvic</satellite>
+		<satellite>Totalia</satellite>
+		<landMass></landMass>
+		<landMass></landMass>
+		<landMass></landMass>
+		<landMass></landMass>
 		<desc>Chancellor Tormax Liao granted Tigress to the family of Erika Laurel as a private fiefdom during the 3rd Succession War. Erika Laurel was one of the Confederation’s best military leaders during the Third Succession War. Tigress is highly industrialized, the planet's population enjoy the highest per capital income and standard of living in the Confederation.</desc>
 	</planet>
 	<planet>
@@ -36310,7 +36923,7 @@ Earthwerks Incorporated</desc>
 			<faction>IND</faction>
 		</factionChange>
 		<factionChange>
-			<date>3081-01-01</date>
+			<date>3085-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
 		<spectralClass>G</spectralClass>
@@ -37426,13 +38039,25 @@ The system also later gained value when the uninhabited planet, Jonah’s Reach,
 		<name>Tybalt</name>
 		<xcood>90.76</xcood>
 		<ycood>-20.6</ycood>
-		<faction>TA</faction>
+		<faction>IND</faction>
 		<factionChange>
-			<date>2315-01-01</date>
+			<date>2225-01-01</date>
+			<faction>TGU</faction>
+		</factionChange>
+		<factionChange>
+			<date>2367-01-01</date>
+			<faction>CC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2400-01-01</date>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2790-01-01</date>
+			<date>2780-01-01</date>
+			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2864-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
@@ -37448,21 +38073,37 @@ The system also later gained value when the uninhabited planet, Jonah’s Reach,
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
-			<date>3072-02-01</date>
+			<date>3069-08-01</date>
 			<faction>WOB</faction>
 		</factionChange>
 		<factionChange>
-			<date>3078-02-24</date>
+			<date>3077-02-24</date>
 			<faction>Stone,WOB</faction>
 		</factionChange>
 		<factionChange>
-			<date>3078-02-26</date>
+			<date>3077-02-26</date>
 			<faction>Stone</faction>
 		</factionChange>
 		<factionChange>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1</gravity>
+		<lifeForm>6</lifeForm>
+		<climate>2</climate>
+		<percentWater>60</percentWater>
+		<temperature>28</temperature>
+		<spectralClass>G</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>3</sysPos>
+		<landMass>Titania (MacBeth)</landMass>
+		<desc>Possessing small, shallow oceans, Tybalt‘s surface is dominated by eleven mountainous continents. Tybalt is wracked by tectonic activity, which has raised steep mountain ranges on all of its landmasses. Only one continent, Titania, is old and worn enough by erosion to be widely habitable. Although settlers have eked out livings as herders, trappers, and prospectors on nearly all of Tybalt‘s continents, its only significant population has always been located in or near MacBeth, Tybalt‘s capital and spaceport, which is located on Titania.
+
+Soon after MacBeth‘s founding, the neighboring worlds of the Tikonov Union sent military units to subjugate the planet. With no military force of its own, Tybalt‘s nascent government quickly voted to join the Union in 2225. When the Tikonov Union joined the Capellan Confederation 150 years later, Tybalt was one of several Tikonov worlds that requested protectorate status from the neighboring Terran Hegemony. Eventually, Tybalt was fully integrated into the Hegemony, and the factories of Jolassa Armored Vehicles, maker of the Star League Defense Force‘s Fury armored command vehicle, were built. After the fall of the First Star League, control of Tybalt reverted to the Capellan Confederation. Although its factories never suffered direct damage in the fighting, Jolassa was forced to close its doors during the First Succession War as  the loss of advanced technologies made the Fury‘s sophisticated command computer useless. Tybalt remained part of the Confederation until the Fourth Succession War, when the Federated Suns gained control of MacBeth and drove the Capellan defenders from the planet.
+
+With no substantial industry or natural resources, the Blakists largely overlooked Tybalt during their Holy War. Since the founding of The Republic of the Sphere, the old Jolassa factories have been retooled and reopened to manufacture heavy construction, cargo, and civilian transport vehicles.</desc>
 	</planet>
 	<planet>
 		<name>Tyrrhenia</name>
@@ -39839,13 +40480,17 @@ Woodstock‘s third continent, Essex, is the only blemish on this otherwise beau
 		<name>Yangtze</name>
 		<xcood>76.15</xcood>
 		<ycood>-43.81</ycood>
-		<faction>TA</faction>
+		<faction>TGU</faction>
 		<factionChange>
-			<date>2315-01-01</date>
-			<faction>TH</faction>
+			<date>2367-01-01</date>
+			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
-			<date>2790-01-01</date>
+			<date>2400-01-01</date>
+			<faction>TH,CC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2780-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
@@ -39861,7 +40506,11 @@ Woodstock‘s third continent, Essex, is the only blemish on this otherwise beau
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
-			<date>3072-02-01</date>
+			<date>3072-09-23</date>
+			<faction>WOB,FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3069-10-03</date>
 			<faction>WOB</faction>
 		</factionChange>
 		<factionChange>
@@ -39876,6 +40525,23 @@ Woodstock‘s third continent, Essex, is the only blemish on this otherwise beau
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.1</gravity>
+		<lifeForm>3</lifeForm>
+		<climate>3</climate>
+		<percentWater>80</percentWater>
+		<temperature>27</temperature>
+		<spectralClass>G</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>5</sysPos>
+		<landMass>Han</landMass>
+		<landMass>Sung</landMass>
+		<desc>Settlers from the ancient Terran state of China named the planet Yangtze after the Yangtze River of their homeland. Like the Yangtze floodplain on Terra, Yangtze‘s landmasses are flat and covered in a thick layer of fertile soil fed by seasonal flooding from the planet‘s many slow-moving rivers. Fearful of the destruction wrought by these inland floods, Yangtze‘s initial settlers huddled in small fishing villages and towns on the rocky coasts of the planet‘s two small continents, Han and Sung.
+
+Realizing that the planet‘s agricultural wealth could be unlocked if its massive floods were controlled, the Capellan Confederation invited the Terran Hegemony to jointly administer Yangtze during the First Star League. Hegemony engineers erected thousands of miles of dams and dikes, turning Yangtze‘s two muddy continents into prime cropland and raising Yangtze‘s population tenfold. With the fall of the First Star League, Yangtze reverted to Capellan control. During the Second Succession War, rogue mercenaries destroyed the flood controls on the continent of Sung, resulting in massive destruction and loss of life. Although Yangtze‘s agricultural output was halved, the continent of Han continued to be productive, and Yangtze remained one of the Capellan Confederation‘s primary agricultural exporters. The Federated Suns took Yangtze in a relatively bloodless action during the Fourth Succession War, and held the world for several decades. The Federated Commonwealth Civil War gave the Capellan Confederation the opportunity to retake Yangtze, but the Confederation quickly lost Yangtze again to the Blakists during their Holy War. The Blakists dismantled most of the remaining flood controls on the continent of Han in an effort to subjugate Yangtze‘s population.
+
+Under The Republic of the Sphere, Yangtze has rebuilt the least-damaged dams and dikes on Han and Sung, and regained approximately one-fourth of its peak agricultural output under the First Star League.</desc>
 	</planet>
 	<planet>
 		<name>Yardley</name>
