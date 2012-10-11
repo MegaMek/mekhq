@@ -38,6 +38,7 @@ import javax.swing.SwingWorker;
 
 import megamek.common.MechSummaryCache;
 import mekhq.MekHQ;
+import mekhq.NullEntityException;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Faction;
 import mekhq.campaign.Planets;
@@ -150,6 +151,13 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         			// Restores all transient attributes from serialized objects
         			campaign.restore();
         			fis.close();
+        		} catch (NullEntityException ex) {
+        			JOptionPane.showMessageDialog(null, 
+        					"The following units could not be loaded by the campaign:\n" + ex.getError() + "\n\nPlease be sure to copy over any custom units before starting a new version of MekHQ." ,
+        					"Unit Loading Error",
+        					JOptionPane.ERROR_MESSAGE);
+        			cancelled = true;
+        			cancel(true);
         		} catch (Exception ex) {
         			ex.printStackTrace();
         			JOptionPane.showMessageDialog(null, 

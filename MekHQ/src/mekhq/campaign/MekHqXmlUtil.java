@@ -8,6 +8,7 @@ import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.UUID;
 import java.util.Vector;
 
 import javax.xml.transform.Result;
@@ -37,6 +38,7 @@ import megamek.common.XMLStreamParser;
 import megamek.common.util.StringUtil;
 import mekhq.MekHQ;
 
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 public class MekHqXmlUtil {
@@ -785,5 +787,12 @@ public class MekHqXmlUtil {
     **/
     public static String unEscape(String string) {
       return string.replaceAll( "&amp;", "&" ).replaceAll( "&lt;", "<" ).replaceAll( "&gt;", ">" ).replaceAll( "&quot;", "\"" ).replaceAll( "&apos", "\'" );
+    }
+    
+    public static String getEntityNameFromXmlString(Node node) {
+    	NamedNodeMap attrs = node.getAttributes();
+		String chassis = attrs.getNamedItem("chassis").getTextContent();
+		String model = attrs.getNamedItem("model").getTextContent();
+		return chassis + " " + model;
     }
 }

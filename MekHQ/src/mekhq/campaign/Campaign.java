@@ -93,6 +93,7 @@ import megamek.common.options.PilotOptions;
 import megamek.common.util.BuildingBlock;
 import megamek.common.util.DirectoryItems;
 import mekhq.MekHQ;
+import mekhq.NullEntityException;
 import mekhq.Utilities;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Transaction;
@@ -1800,7 +1801,7 @@ public class Campaign implements Serializable {
 	 * @throws DOMException
 	 */
 	public static Campaign createCampaignFromXMLFileInputStream(FileInputStream fis)
-			throws DOMException, ParseException {
+			throws DOMException, ParseException, NullEntityException {
 		MekHQ.logMessage("Starting load of campaign file from XML...");
 		// Initialize variables.
 		Campaign retVal = new Campaign();
@@ -1836,7 +1837,7 @@ public class Campaign implements Serializable {
 			v = Integer.parseInt(tv);
 		}
 		
-		//we need to iterate through twice, the first time to collect
+		//we need to iterate through three times, the first time to collect
 		//any custom units that might not be written yet
 		for (int x = 0; x < nl.getLength(); x++) {
 			Node wn = nl.item(x);
@@ -1865,6 +1866,36 @@ public class Campaign implements Serializable {
 		}
 	    MechSummaryCache.getInstance().loadMechData();
 		
+	    //the second time to check for any null entities
+	    for (int x = 0; x < nl.getLength(); x++) {
+			Node wn = nl.item(x);
+
+			if (wn.getParentNode() != campaignEle)
+				continue;
+
+			int xc = wn.getNodeType();
+
+			if (xc == Node.ELEMENT_NODE) {
+				// This is what we really care about.
+				// All the meat of our document is in this node type, at this
+				// level.
+				// Okay, so what element is it?
+				String xn = wn.getNodeName();
+
+				if (xn.equalsIgnoreCase("units")) {
+					String missingList = checkUnits(wn);
+					if(null != missingList) {
+						throw new NullEntityException(missingList);
+					}
+				} 
+			} else {
+				// If it's a text node or attribute or whatever at this level,
+				// it's probably white-space.
+				// We can safely ignore it even if it isn't, for now.
+				continue;
+			}
+		}
+	    
 		// Okay, lets iterate through the children, eh?
 		for (int x = 0; x < nl.getLength(); x++) {
 			Node wn = nl.item(x);
@@ -2503,6 +2534,55 @@ public class Campaign implements Serializable {
 		}
 
 		MekHQ.logMessage("Load Team Nodes Complete!", 4);
+	}
+	
+	private static String checkUnits(Node wn) {
+		MekHQ.logMessage("Checking for missing entities...", 4);
+
+		ArrayList<String> unitList = new ArrayList<String>();
+		NodeList wList = wn.getChildNodes();
+		
+		// Okay, lets iterate through the children, eh?
+		for (int x = 0; x < wList.getLength(); x++) {
+			Node wn2 = wList.item(x);
+
+			// If it's not an element node, we ignore it.
+			if (wn2.getNodeType() != Node.ELEMENT_NODE)
+				continue;
+			
+			if (!wn2.getNodeName().equalsIgnoreCase("unit")) {
+				continue;
+			}
+			
+			NodeList nl= wn2.getChildNodes();
+
+			for (int y=0; y<nl.getLength(); y++) {
+				Node wn3 = nl.item(y);
+				try {
+					if (wn3.getNodeName().equalsIgnoreCase("entity")) {
+						if(null == MekHqXmlUtil.getEntityFromXmlString(wn3)) {
+							String name = MekHqXmlUtil.getEntityNameFromXmlString(wn3);
+							if(!unitList.contains(name)) {
+								unitList.add(name);
+							}
+						} 
+					}
+				} catch(Exception ex) {
+					
+				}
+			}
+		}
+		MekHQ.logMessage("Finished checking for missing entities!", 4);
+
+		if(unitList.isEmpty()) {
+			return null;
+		} else {
+			String unitListString = "";
+			for(String s : unitList) {
+				unitListString += "\n" + s;
+			}
+			return unitListString;
+		}
 	}
 
 	private static void processUnitNodes(Campaign retVal, Node wn, int version) {
@@ -4074,4 +4154,5 @@ public class Campaign implements Serializable {
     	}
     	
     }
+ 
 }
