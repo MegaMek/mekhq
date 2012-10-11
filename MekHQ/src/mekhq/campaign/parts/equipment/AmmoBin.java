@@ -231,10 +231,12 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 		return type.getTechRating();
 	}
 	
+	/*
 	@Override
 	public int getTechBase() {
 		return T_BOTH;
 	}
+	*/
 
 	@Override
 	public String getStatus() {
@@ -440,8 +442,11 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 	
 	public void changeAmountAvailable(int amount, AmmoType curType) {
 		AmmoStorage a = null;
+		long curMunition = curType.getMunitionType();
 		for(Part part : campaign.getSpareParts()) {
-			if(part instanceof AmmoStorage && ((AmmoStorage)part).getType().equals(curType)) {
+			if(part instanceof AmmoStorage 
+					&& ((AmmoType)((AmmoStorage)part).getType()).equals((Object)curType)
+                  	&& curMunition == ((AmmoType)((AmmoStorage)part).getType()).getMunitionType()) {
 				a = (AmmoStorage)part;
 				a.changeShots(amount);
 				break;
@@ -458,7 +463,8 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 		for(Part part : campaign.getSpareParts()) {
 			if(part instanceof AmmoStorage) {
 				AmmoStorage a = (AmmoStorage)part;
-				if(a.getType() == type) {
+				if(((AmmoType)((AmmoStorage)a).getType()).equals((Object)getType())
+						&& ((AmmoType)getType()).getMunitionType() == ((AmmoType)((AmmoStorage)part).getType()).getMunitionType()) {
 					return a.getShots();
 				}
 			}

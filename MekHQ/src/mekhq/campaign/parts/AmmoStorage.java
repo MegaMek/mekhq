@@ -115,8 +115,8 @@ public class AmmoStorage extends EquipmentPart {
     		return false;
     	}
         return part instanceof AmmoStorage
-                        && getType().equals( ((EquipmentPart)part).getType())
-                        		&& ((AmmoType)getType()).getMunitionType() == ((AmmoType)((AmmoStorage)part).getType()).getMunitionType();
+                      	&& ((AmmoType)getType()).getMunitionType() == ((AmmoType)((AmmoStorage)part).getType()).getMunitionType()
+                      	&& ((AmmoType)getType()).equals( (Object)((EquipmentPart)part).getType());
     
     }
     
@@ -175,10 +175,10 @@ public class AmmoStorage extends EquipmentPart {
 		return type.getTechRating();
 	}
 	
-	@Override
-	public int getTechBase() {
-		return T_BOTH;
-	}
+	//@Override
+	//public int getTechBase() {
+		//return T_BOTH;
+	//}
 
 	@Override
 	public void fix() {
