@@ -2628,6 +2628,13 @@ public class CampaignGUI extends JPanel {
             path += ".cpnx";
             file = new File(path);
         }
+        
+        //check for existing file and make a back-up if found
+        String path2 = path + "_backup";
+    	File backupFile = new File(path2);
+        if(file.exists()) {    	
+        	Utilities.copyfile(file, backupFile);
+        }
 
 		// Then save it out to that file.
 		FileOutputStream fos = null;
@@ -2640,6 +2647,10 @@ public class CampaignGUI extends JPanel {
 			pw.flush();
 			pw.close();
 			fos.close();
+			//delete the backup file because we didn't need it
+			if(backupFile.exists()) {
+				backupFile.delete();
+			}
 			MekHQ.logMessage("Campaign saved to " + file);
 		} catch (Exception ex) {
 			MekHQ.logError(ex);
@@ -2650,6 +2661,12 @@ public class CampaignGUI extends JPanel {
 				    "the future.",
 				    "Could not save game",
 				    JOptionPane.ERROR_MESSAGE);
+			//restore the backup file
+			file.delete();
+			if(backupFile.exists()) {
+				Utilities.copyfile(backupFile, file);
+				backupFile.delete();
+			}
 		}
 	}
 

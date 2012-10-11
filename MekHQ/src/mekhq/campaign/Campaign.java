@@ -1557,7 +1557,6 @@ public class Campaign implements Serializable {
 	}
 
 	public void writeToXml(PrintWriter pw1) {
-		
 		// File header
 		pw1.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 
