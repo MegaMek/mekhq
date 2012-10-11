@@ -254,8 +254,11 @@ public class Refit implements IPartWork, IAcquisitionWork {
 						//check the location to see if this moved. If so, then don't break, but 
 						//save this in case we fail to find equipment in the same location.
 						int loc = ((EquipmentPart)part).getLocation();
-						if((oPart instanceof EquipmentPart && ((EquipmentPart)oPart).getLocation() != loc)
-								|| (oPart instanceof MissingEquipmentPart && ((MissingEquipmentPart)oPart).getLocation() != loc)) {
+						boolean rear = ((EquipmentPart)part).isRearFacing();
+						if((oPart instanceof EquipmentPart 
+								&& (((EquipmentPart)oPart).getLocation() != loc || ((EquipmentPart)oPart).isRearFacing() != rear))
+								|| (oPart instanceof MissingEquipmentPart 
+										&& (((MissingEquipmentPart)oPart).getLocation() != loc || ((MissingEquipmentPart)oPart).isRearFacing() != rear))) {
 							movedPart = oPart;
 							moveIndex = i;
 							continue;

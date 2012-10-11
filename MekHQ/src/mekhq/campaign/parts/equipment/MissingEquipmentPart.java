@@ -295,6 +295,17 @@ public class MissingEquipmentPart extends MissingPart {
     	}
     	return -1;
     }
+	
+
+    public boolean isRearFacing() {
+    	if(null != unit) {
+    		Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
+			if(null != mounted) {
+				return mounted.isRearMounted();
+			}
+    	}
+    	return false;
+    }
 
 	@Override
 	public void updateConditionFromPart() {
