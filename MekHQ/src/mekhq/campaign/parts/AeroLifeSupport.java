@@ -1,5 +1,5 @@
 /*
- * FireControlSystem.java
+ * AeroLifeSupport.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -25,7 +25,6 @@ import java.io.PrintWriter;
 
 import megamek.common.Aero;
 import megamek.common.EquipmentType;
-import megamek.common.Jumpship;
 import megamek.common.SmallCraft;
 import megamek.common.TechConstants;
 import mekhq.campaign.Campaign;
@@ -39,35 +38,44 @@ import org.w3c.dom.NodeList;
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class FireControlSystem extends Part {
+public class AeroLifeSupport extends Part {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -717866644605314883L;
-	
+
 	private long cost;
+	private boolean fighter;
 	
-	public FireControlSystem() {
-    	this(0, 0, null);
+	public AeroLifeSupport() {
+    	this(0, 0, false, null);
     }
     
-    public FireControlSystem(int tonnage, long cost, Campaign c) {
+    public AeroLifeSupport(int tonnage, long cost, boolean f, Campaign c) {
         super(tonnage, c);
         this.cost = cost;
-        this.name = "Fire Control System";
+        this.name = "Fighter Life Support";
+        this.fighter = f;
+        if(!fighter) {
+        	this.name = "Spacecraft Life Support";
+        }
     }
-        
-    public FireControlSystem clone() {
-    	FireControlSystem clone = new FireControlSystem(0, cost, campaign);
+    
+    public AeroLifeSupport clone() {
+    	AeroLifeSupport clone = new AeroLifeSupport(getUnitTonnage(), cost, fighter, campaign);
         clone.copyBaseData(this);
     	return clone;
     }
-    
+        
 	@Override
 	public void updateConditionFromEntity() {
 		if(null != unit && unit.getEntity() instanceof Aero) {
-			hits = ((Aero)unit.getEntity()).getFCSHits();
+			 if(((Aero)unit.getEntity()).hasLifeSupport()) {
+				 hits = 0;
+			 } else { 
+				 hits = 1;
+			 }
 		}
 		if(hits > 0) {
 			time = 120;
@@ -77,7 +85,7 @@ public class FireControlSystem extends Part {
 			difficulty = 0;
 		}
 		if(isSalvaging()) {
-			time = 4320;
+			time = 6720;
 			difficulty = 0;
 		}
 	}
@@ -85,7 +93,11 @@ public class FireControlSystem extends Part {
 	@Override
 	public void updateConditionFromPart() {
 		if(null != unit && unit.getEntity() instanceof Aero) {
-			((Aero)unit.getEntity()).setFCSHits(hits);
+			if(hits > 0) {
+				((Aero)unit.getEntity()).setLifeSupport(false);
+			} else {
+				((Aero)unit.getEntity()).setLifeSupport(true);
+			}
 		}
 		
 	}
@@ -94,14 +106,14 @@ public class FireControlSystem extends Part {
 	public void fix() {
 		super.fix();
 		if(null != unit && unit.getEntity() instanceof Aero) {
-			((Aero)unit.getEntity()).setFCSHits(0);
+			((Aero)unit.getEntity()).setLifeSupport(true);
 		}
 	}
 
 	@Override
 	public void remove(boolean salvage) {
 		if(null != unit && unit.getEntity() instanceof Aero) {
-			((Aero)unit.getEntity()).setFCSHits(3);
+			((Aero)unit.getEntity()).setLifeSupport(false);
 			Part spare = campaign.checkForExistingSparePart(this);
 			if(!salvage) {
 				campaign.removePart(this);
@@ -121,7 +133,7 @@ public class FireControlSystem extends Part {
 
 	@Override
 	public Part getMissingPart() {
-		return new MissingFireControlSystem(getUnitTonnage(), cost, campaign);
+		return new MissingAeroLifeSupport(getUnitTonnage(), cost, fighter, campaign);
 	}
 
 	@Override
@@ -138,18 +150,16 @@ public class FireControlSystem extends Part {
 	public long getStickerPrice() {
 		return cost;
 	}
-
-	public void calculateCost() {
-		if(null != unit) {
-			if(unit.getEntity() instanceof SmallCraft) {
-				cost = 100000 + 10000 * ((SmallCraft)unit.getEntity()).getArcswGuns();
-			}
-			else if(unit.getEntity() instanceof Jumpship) {
-				cost = 100000 + 10000 * ((Jumpship)unit.getEntity()).getArcswGuns();
-			}
-		}
-	}
 	
+	public void calculateCost() {
+		if(fighter) {
+			cost = 50000;
+		}
+		if(null != unit) {
+			cost = 5000 * (((Aero)unit.getEntity()).getNCrew() + ((Aero)unit.getEntity()).getNPassenger());
+		}	
+	}
+
 	@Override
 	public double getTonnage() {
 		return 0;
@@ -175,19 +185,23 @@ public class FireControlSystem extends Part {
 		return T_BOTH;	
 	}
 
-	@Override
-	public boolean isSamePartType(Part part) {
-		return part instanceof FireControlSystem && cost == part.getStickerPrice();
+	public boolean isForFighter() {
+		return fighter;
 	}
 	
 	@Override
-	public boolean isRightTechType(String skillType) {
-		return skillType.equals(SkillType.S_TECH_AERO);
+	public boolean isSamePartType(Part part) {
+		return part instanceof AeroLifeSupport && fighter == ((AeroLifeSupport)part).isForFighter()
+				&& (getStickerPrice() == part.getStickerPrice());
 	}
 	
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent) {
 		writeToXmlBegin(pw1, indent);
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<fighter>"
+				+fighter
+				+"</fighter>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<cost>"
 				+cost
@@ -201,10 +215,22 @@ public class FireControlSystem extends Part {
 		
 		for (int x=0; x<nl.getLength(); x++) {
 			Node wn2 = nl.item(x);		
-			if (wn2.getNodeName().equalsIgnoreCase("cost")) {
+			if (wn2.getNodeName().equalsIgnoreCase("fighter")) {
+				if(wn2.getTextContent().trim().equalsIgnoreCase("true")) {
+					fighter = true;
+				} else {
+					fighter = false;
+				}
+			}
+			else if (wn2.getNodeName().equalsIgnoreCase("cost")) {
 				cost = Long.parseLong(wn2.getTextContent());
 			} 
 		}
+	}
+	
+	@Override
+	public boolean isRightTechType(String skillType) {
+		return skillType.equals(SkillType.S_TECH_AERO);
 	}
 	
 }

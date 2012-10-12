@@ -65,6 +65,7 @@ import megamek.common.weapons.InfantryAttack;
 import megamek.common.weapons.infantry.InfantryWeapon;
 import mekhq.MekHQ;
 import mekhq.campaign.parts.AeroHeatSink;
+import mekhq.campaign.parts.AeroLifeSupport;
 import mekhq.campaign.parts.AeroSensor;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Avionics;
@@ -80,6 +81,7 @@ import mekhq.campaign.parts.MekLifeSupport;
 import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.MekSensor;
 import mekhq.campaign.parts.MissingAeroHeatSink;
+import mekhq.campaign.parts.MissingAeroLifeSupport;
 import mekhq.campaign.parts.MissingAeroSensor;
 import mekhq.campaign.parts.MissingAvionics;
 import mekhq.campaign.parts.MissingEnginePart;
@@ -786,6 +788,15 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 			partsValue += part.getActualValue() * part.getQuantity();
 		}
 		//TODO: we need to adjust this for equipment that doesnt show up as parts
+		//Spacecraft need: drive unit, computer, and bridge
+		if(entity instanceof SmallCraft || entity instanceof Jumpship) {
+			//bridge
+			partsValue += 200000 + 10 * entity.getWeight();
+			//computer
+			partsValue += 200000;
+			//drive unit
+			partsValue += 500 * entity.getOriginalWalkMP() * entity.getWeight()/100;
+		}
 		
 		return (long)(partsValue * getUnitCostMultiplier());
 	}
@@ -1299,6 +1310,8 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 				engine = part;
     		} else if(part instanceof MekLifeSupport  || part instanceof MissingMekLifeSupport) {
     			lifeSupport = part;
+    		} else if(part instanceof AeroLifeSupport  || part instanceof MissingAeroLifeSupport) {
+    			lifeSupport = part;
     		} else if(part instanceof MekSensor || part instanceof MissingMekSensor) {
     			sensor = part;
     		} else if(part instanceof MekCockpit || part instanceof MissingMekCockpit) {
@@ -1420,6 +1433,10 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     			avionics = part;
     		} else if(part instanceof FireControlSystem || part instanceof MissingFireControlSystem) {
     			fcs = part;
+    			//for reverse compatability, calculate costs
+    			if(part instanceof FireControlSystem) {
+    				((FireControlSystem)fcs).calculateCost();
+    			}
     		} else if(part instanceof AeroSensor || part instanceof MissingAeroSensor) {
     			sensor = part;
     		} else if(part instanceof LandingGear || part instanceof MissingLandingGear) {
@@ -1676,10 +1693,11 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     			addPart(avionics);
     			partsToAdd.add(avionics);
     		}
-    		if(null == fcs && !(entity instanceof Jumpship)) {
-    			fcs = new FireControlSystem((int)entity.getWeight(), campaign);
+    		if(null == fcs) {
+    			fcs = new FireControlSystem((int)entity.getWeight(), 0, campaign);
     			addPart(fcs);
     			partsToAdd.add(fcs);
+    			((FireControlSystem)fcs).calculateCost();
     		}
     		if(null == sensor) {
     			sensor = new AeroSensor((int) entity.getWeight(), entity instanceof Dropship, campaign);
@@ -1690,6 +1708,12 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     			landingGear = new LandingGear((int) entity.getWeight(), campaign);
     			addPart(landingGear);
     			partsToAdd.add(landingGear);
+    		}
+    		if(null == lifeSupport) {
+    			lifeSupport = new AeroLifeSupport((int) entity.getWeight(), 0, !(entity instanceof SmallCraft || entity instanceof Jumpship), campaign);
+    			addPart(lifeSupport);
+    			partsToAdd.add(lifeSupport);
+    			((AeroLifeSupport)lifeSupport).calculateCost();
     		}
     		int hsinks = ((Aero)entity).getOHeatSinks() - aeroHeatSinks.size();
     		while(hsinks > 0) {

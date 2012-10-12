@@ -305,7 +305,7 @@ public class PartsStore implements Serializable {
 		}
 		parts.add(new AeroSensor(0, true, c));
 		parts.add(new Avionics(0, c));
-		parts.add(new FireControlSystem(0, c));
+		parts.add(new FireControlSystem(0, 0, c));
 		parts.add(new LandingGear(0, c));
 	}
 	

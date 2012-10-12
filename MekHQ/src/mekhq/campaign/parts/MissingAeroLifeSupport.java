@@ -1,5 +1,5 @@
 /*
- * MissingFireControlSystem.java
+ * MissingAeroSensor.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -35,26 +35,31 @@ import org.w3c.dom.NodeList;
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class MissingFireControlSystem extends MissingPart {
+public class MissingAeroLifeSupport extends MissingPart {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 2806921577150714477L;
 
+	private boolean fighter;
 	private long cost;
 	
-	public MissingFireControlSystem() {
-    	this(0, 0, null);
+	public MissingAeroLifeSupport() {
+    	this(0, 0, false, null);
     }
     
-    public MissingFireControlSystem(int tonnage, long cost, Campaign c) {
-    	super(0, c);
-    	this.cost = cost;
-    	this.time = 4320;
-    	this.difficulty = 0;
-    	this.name = "Fire Control System";
-    }
+	 public MissingAeroLifeSupport(int tonnage, long cost, boolean f, Campaign c) {
+		 super(tonnage, c);
+		 this.cost = cost;
+		 this.name = "Fighter Life Support";
+		 this.fighter = f;
+		 if(!fighter) {
+			 this.name = "Spacecraft Life Support";
+		 }
+		 this.time = 6720;
+		 this.difficulty = 0;
+	 }
     
 	@Override
 	public String checkFixable() {
@@ -63,12 +68,13 @@ public class MissingFireControlSystem extends MissingPart {
 
 	@Override
 	public Part getNewPart() {
-		return new FireControlSystem(getUnitTonnage(), cost, campaign);
+		return new AeroLifeSupport(getUnitTonnage(), cost, fighter, campaign);
 	}
 
 	@Override
 	public boolean isAcceptableReplacement(Part part, boolean refit) {
-		return part instanceof FireControlSystem && cost == part.getStickerPrice();
+		return part instanceof AeroLifeSupport && fighter == ((AeroLifeSupport)part).isForFighter()
+				&& (cost == part.getStickerPrice());
 	}
 
 	@Override
@@ -85,17 +91,14 @@ public class MissingFireControlSystem extends MissingPart {
 	public int getAvailability(int era) {
 		return EquipmentType.RATING_C;
 	}
-
-	@Override
-	public void updateConditionFromPart() {
-		if(null != unit && unit.getEntity() instanceof Aero) {
-			((Aero)unit.getEntity()).setFCSHits(3);
-		}
-	}
 	
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent) {
 		writeToXmlBegin(pw1, indent);
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+				+"<fighter>"
+				+fighter
+				+"</fighter>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<cost>"
 				+cost
@@ -109,9 +112,25 @@ public class MissingFireControlSystem extends MissingPart {
 		
 		for (int x=0; x<nl.getLength(); x++) {
 			Node wn2 = nl.item(x);		
-			if (wn2.getNodeName().equalsIgnoreCase("cost")) {
+			if (wn2.getNodeName().equalsIgnoreCase("fighter")) {
+				if(wn2.getTextContent().trim().equalsIgnoreCase("true")) {
+					fighter = true;
+				} else {
+					fighter = false;
+				}
+			}
+			else if (wn2.getNodeName().equalsIgnoreCase("cost")) {
 				cost = Long.parseLong(wn2.getTextContent());
 			} 
 		}
 	}
+
+	@Override
+	public void updateConditionFromPart() {
+		if(null != unit && unit.getEntity() instanceof Aero) {
+			((Aero)unit.getEntity()).setLifeSupport(false);
+		}
+		
+	}
+	
 }
