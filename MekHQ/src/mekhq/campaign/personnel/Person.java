@@ -1859,7 +1859,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     }
     
     public boolean isDoctor() {
-    	return primaryRole == T_DOCTOR && hasSkill(SkillType.S_DOCTOR);
+    	return hasSkill(SkillType.S_DOCTOR) && (primaryRole == T_DOCTOR || secondaryRole == T_DOCTOR);
     }
     
     public int getToughness() {
