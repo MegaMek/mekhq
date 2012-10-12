@@ -18,6 +18,8 @@ v0.1.20 (SVN)
 + Bug 259: Doubling of IS/Clan ammo
 + error dialog when customized unit name is already in use
 + Bug 276: Secondary Role -> Doctor
++ SpacecraftEngine part
++ Bug: Overnight replacements get an Impossible repair roll on the replacement part
 
 v0.1.19 (2012-10-05)
 + new MML.jar (should fix bug #271)

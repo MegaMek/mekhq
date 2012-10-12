@@ -93,6 +93,7 @@ import mekhq.campaign.parts.MissingMekLocation;
 import mekhq.campaign.parts.MissingMekSensor;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.MissingRotor;
+import mekhq.campaign.parts.MissingSpacecraftEngine;
 import mekhq.campaign.parts.MissingTurret;
 import mekhq.campaign.parts.MissingVeeSensor;
 import mekhq.campaign.parts.MissingVeeStabiliser;
@@ -100,6 +101,7 @@ import mekhq.campaign.parts.MotiveSystem;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.Rotor;
+import mekhq.campaign.parts.SpacecraftEngine;
 import mekhq.campaign.parts.StructuralIntegrity;
 import mekhq.campaign.parts.TankLocation;
 import mekhq.campaign.parts.Turret;
@@ -1234,9 +1236,6 @@ public class Unit implements Serializable, MekHqXmlSerializable {
      * parts
      */
     public void initializeParts(boolean addParts) {
-    	if(entity instanceof Infantry && !(entity instanceof BattleArmor)) {
-    		//return;
-    	}
   	
     	int erating = 0;
     	if(null != entity.getEngine()) {
@@ -1292,7 +1291,12 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     		if(part instanceof MekGyro || part instanceof MissingMekGyro) {
     			gyro = part;
     		} else if(part instanceof EnginePart || part instanceof MissingEnginePart) {
-    			engine = part;
+    			//reverse compatability check, spaceships get different engines
+    			if(!(entity instanceof SmallCraft || entity instanceof Jumpship)) {
+    				engine = part;
+    			}
+    		} else if(part instanceof SpacecraftEngine || part instanceof MissingSpacecraftEngine) {
+				engine = part;
     		} else if(part instanceof MekLifeSupport  || part instanceof MissingMekLifeSupport) {
     			lifeSupport = part;
     		} else if(part instanceof MekSensor || part instanceof MissingMekSensor) {
@@ -1538,9 +1542,16 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     	}
     	
     	if(null == engine && !(entity instanceof Infantry)) {
-    		engine = new EnginePart((int) entity.getWeight(), new Engine(entity.getEngine().getRating(), entity.getEngine().getEngineType(), entity.getEngine().getFlags()), campaign, entity.getMovementMode() == EntityMovementMode.HOVER && entity instanceof Tank);
-    		addPart(engine);
-    		partsToAdd.add(engine);
+    		if(entity instanceof SmallCraft || entity instanceof Jumpship) {
+    			engine = new SpacecraftEngine((int) entity.getWeight(), 0, campaign, entity.isClan());
+	    		addPart(engine);
+	    		partsToAdd.add(engine);
+    			((SpacecraftEngine)engine).calculateTonnage();
+    		} else {
+	    		engine = new EnginePart((int) entity.getWeight(), new Engine(entity.getEngine().getRating(), entity.getEngine().getEngineType(), entity.getEngine().getFlags()), campaign, entity.getMovementMode() == EntityMovementMode.HOVER && entity instanceof Tank);
+	    		addPart(engine);
+	    		partsToAdd.add(engine);
+    		}
     	}
     	if(entity instanceof Mech) {
     		if(null == gyro) {

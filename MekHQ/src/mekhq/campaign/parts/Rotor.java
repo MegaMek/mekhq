@@ -55,11 +55,7 @@ public class Rotor extends TankLocation {
     }
  
     @Override
-    public boolean isSamePartTypeAndStatus (Part part) {
-    	if(isReservedForRefit() || isBeingWorkedOn()
-				|| part.isReservedForRefit() || part.isBeingWorkedOn()) {
-    		return false;
-    	}
+    public boolean isSamePartType(Part part) {
         return part instanceof Rotor 
         		&& getLoc() == ((Rotor)part).getLoc() 
         		&& getUnitTonnage() == ((Rotor)part).getUnitTonnage()

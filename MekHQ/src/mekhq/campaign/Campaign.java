@@ -642,7 +642,7 @@ public class Campaign implements Serializable {
 			}
 		}
 		Part spare = checkForExistingSparePart(p);
-		if(!p.isReservedForRefit() && !p.isBeingWorkedOn()
+		if(!p.isReservedForRefit() && !p.isBeingWorkedOn() && !p.isReservedForReplacement()
 				&& null == p.getUnit() && null != spare) {
 			spare.incrementQuantity();
 			return;

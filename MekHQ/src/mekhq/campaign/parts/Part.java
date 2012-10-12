@@ -124,6 +124,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	
 	//this tracks whether the part is reserved for a refit
 	protected UUID refitId;
+	protected UUID reserveId;
 	protected int daysToArrival;
 	
 	//all parts need a reference to campaign
@@ -260,10 +261,13 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 			toReturn = "Damaged";
 		}
 		if(isReservedForRefit()) {
-			toReturn = "Reserved for Refit";
+			toReturn = "Reserved for refit";
+		}
+		if(isReservedForReplacement()) {
+			toReturn = "Reserved for repair";
 		}
 		if(isBeingWorkedOn()) {
-			toReturn = "Reserved for Repair";
+			toReturn = "Being worked on";
 		}
 		return toReturn;
 	}
@@ -373,8 +377,8 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	
 	public boolean isSameStatus(Part part) {
 		//parts that are reserved for refit or being worked on are never the same status
-		if(isReservedForRefit() || isBeingWorkedOn()
-				|| part.isReservedForRefit() || part.isBeingWorkedOn()) {
+		if(isReservedForRefit() || isBeingWorkedOn() || isReservedForReplacement()
+				|| part.isReservedForRefit() || part.isBeingWorkedOn() || part.isReservedForReplacement()) {
     		return false;
     	}
 		return hits == part.getHits() && part.getSkillMin() == this.getSkillMin();
@@ -727,6 +731,10 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		this.teamId = i;
 	}
 	
+	public void setReserveId(UUID i) {
+		this.reserveId = i;
+	}
+	
 	@Override
 	public String getPartName() {
 		return name;
@@ -828,6 +836,10 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	
 	public boolean isReservedForRefit() {
 		return refitId != null;
+	}
+	
+	public boolean isReservedForReplacement() {
+		return reserveId != null;
 	}
 	
 	public void setDaysToArrival(int days) {

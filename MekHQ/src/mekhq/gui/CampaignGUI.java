@@ -3747,6 +3747,9 @@ public class CampaignGUI extends JPanel {
 				Person tech = getSelectedTech();
 				if(null != u && u.getEntity() instanceof Dropship || u.getEntity() instanceof Jumpship) {
 					tech = u.getEngineer();
+					if(null == tech) {
+						target = new TargetRoll(TargetRoll.IMPOSSIBLE, "You must have a crew assigned to large vessels to attempt acquisitions.");
+					}
 				}
 				if(null != tech) {
 					target = getCampaign().getTargetForAcquisition(acquire, tech);
@@ -3760,6 +3763,9 @@ public class CampaignGUI extends JPanel {
 				Person tech = getSelectedTech();
 				if(null != u && (u.getEntity() instanceof Dropship || u.getEntity() instanceof Jumpship)) {
 					tech = u.getEngineer();
+					if(null == tech) {
+						target = new TargetRoll(TargetRoll.IMPOSSIBLE, "You must have a crew assigned to large vessels to attempt repairs.");
+					}
 				}
 				if(null != tech) {
 					target = getCampaign().getTargetFor(part, tech);
