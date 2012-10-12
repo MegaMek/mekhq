@@ -23,6 +23,7 @@ v0.1.20 (SVN)
 + AeroLifeSupport part
 + non-part costs added for dropships/small craft
 + fixes to FireControlSystem costs for dropships/small craft
++ DropshipDockingCollar part
 
 v0.1.19 (2012-10-05)
 + new MML.jar (should fix bug #271)

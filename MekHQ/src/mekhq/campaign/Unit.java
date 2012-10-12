@@ -69,6 +69,7 @@ import mekhq.campaign.parts.AeroLifeSupport;
 import mekhq.campaign.parts.AeroSensor;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Avionics;
+import mekhq.campaign.parts.DropshipDockingCollar;
 import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.FireControlSystem;
 import mekhq.campaign.parts.InfantryArmorPart;
@@ -84,6 +85,7 @@ import mekhq.campaign.parts.MissingAeroHeatSink;
 import mekhq.campaign.parts.MissingAeroLifeSupport;
 import mekhq.campaign.parts.MissingAeroSensor;
 import mekhq.campaign.parts.MissingAvionics;
+import mekhq.campaign.parts.MissingDropshipDockingCollar;
 import mekhq.campaign.parts.MissingEnginePart;
 import mekhq.campaign.parts.MissingFireControlSystem;
 import mekhq.campaign.parts.MissingLandingGear;
@@ -1297,6 +1299,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     	Part primaryW = null;
     	Part secondaryW = null;
     	Part infantryArmor = null;
+    	Part dropCollar = null;
     	
     	for(Part part : parts) {
     		if(part instanceof MekGyro || part instanceof MissingMekGyro) {
@@ -1447,7 +1450,9 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     			motiveSystem = part;
     		} else if(part instanceof TurretLock) {
     			turretLock = part;
-    		}
+    		} else if(part instanceof DropshipDockingCollar || part instanceof MissingDropshipDockingCollar) {
+    			dropCollar = part;
+    		} 
     	}
     	//now check to see what is null
     	for(int i = 0; i<locations.length; i++) {
@@ -1714,6 +1719,11 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     			addPart(lifeSupport);
     			partsToAdd.add(lifeSupport);
     			((AeroLifeSupport)lifeSupport).calculateCost();
+    		}
+    		if(null == dropCollar && entity instanceof Dropship) {
+    			dropCollar = new DropshipDockingCollar((int) entity.getWeight(), campaign);
+    			addPart(dropCollar);
+    			partsToAdd.add(dropCollar);
     		}
     		int hsinks = ((Aero)entity).getOHeatSinks() - aeroHeatSinks.size();
     		while(hsinks > 0) {
