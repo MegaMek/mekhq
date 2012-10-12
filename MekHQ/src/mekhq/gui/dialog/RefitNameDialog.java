@@ -24,8 +24,11 @@ package mekhq.gui.dialog;
 import java.awt.Frame;
 import java.util.ResourceBundle;
 
+import javax.swing.JOptionPane;
+
 import megamek.common.BattleArmor;
 import megamek.common.Infantry;
+import megamek.common.MechSummaryCache;
 import mekhq.campaign.parts.Refit;
 
 /**
@@ -161,6 +164,13 @@ public class RefitNameDialog extends javax.swing.JDialog {
     	}
     	if(model.isEmpty()) {
     		model = refit.getOriginalEntity().getModel() + " Mk II";
+    	}
+    	if(null != MechSummaryCache.getInstance().getMech(chassis + " " + model)) {
+    		JOptionPane.showMessageDialog(null, 
+					"There is already a unit in the database with this name.\nPlease select a different name.",
+					"Name already in use",
+					JOptionPane.ERROR_MESSAGE);
+    		return;
     	}
     	refit.getNewEntity().setChassis(chassis);
     	refit.getNewEntity().setModel(model);
