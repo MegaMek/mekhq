@@ -246,11 +246,11 @@ public class MekGyro extends Part {
 	@Override
 	public void updateConditionFromEntity() {
 		if(null != unit) {
+			hits = unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_SYSTEM,Mech.SYSTEM_GYRO, Mech.LOC_CT);
 			if(!unit.getEntity().isSystemRepairable(Mech.SYSTEM_GYRO, Mech.LOC_CT)) {
 				remove(false);
 				return;
 			}
-			hits = unit.getEntity().getDamagedCriticals(CriticalSlot.TYPE_SYSTEM,Mech.SYSTEM_GYRO, Mech.LOC_CT);
 		}
 		if(hits == 0) {
 			time = 0;
@@ -260,12 +260,9 @@ public class MekGyro extends Part {
 			time = 120;
 			difficulty = 1;
 		} 
-		else if(hits == 2) {
+		else if(hits >= 2) {
 			time = 240;
 			difficulty = 4;
-		}
-		else if(hits > 2) {
-			remove(false);
 		}
 		if(isSalvaging()) {
 			this.time = 200;
