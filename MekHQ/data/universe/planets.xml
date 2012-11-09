@@ -23,6 +23,10 @@
 		<xcood>-70.94</xcood>
 		<ycood>-96.76</ycood>
 		<faction>FWL</faction>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Abagnar</name>
@@ -464,6 +468,10 @@ Addicks remains an important world today, though it has lost much of its glory o
 		<xcood>-106.15</xcood>
 		<ycood>-51.64</ycood>
 		<faction>FWL</faction>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Adhara</name>
@@ -765,7 +773,7 @@ Alarion is primarily settled by people of German, Romanian and English descent.<
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3085-01-01</date>
+			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
 		<pressure>3</pressure>
@@ -1077,6 +1085,10 @@ Alcor was overlooked during the Jihad, the only known fighting that took place i
 			<date>3062-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3085-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 		<spectralClass>K</spectralClass>
 		<subtype>5</subtype>
 		<luminosity>III</luminosity>
@@ -1270,7 +1282,11 @@ Unlike other nearby worlds, Algol‘s food production has kept the horrors of wa
 		<name>Algorab</name>
 		<xcood>-115.01</xcood>
 		<ycood>15.13</ycood>
-		<faction>LA</faction>
+		<faction>FoS</faction>
+		<factionChange>
+			<date>2341-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -1279,6 +1295,25 @@ Unlike other nearby worlds, Algol‘s food production has kept the horrors of wa
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.24</gravity>
+		<lifeForm>2</lifeForm>
+		<climate>4</climate>
+		<percentWater>17</percentWater>
+		<temperature>62</temperature>
+		<spectralClass>A</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>VI</luminosity>
+		<sysPos>5</sysPos>
+		<satellite>None (dust ring)</satellite>
+		<landMass>(Delcorvius Prime)</landMass>
+		<desc>3135 - Algorab‘s binary system was originally classified as being incapable of supporting planets. However, discovered beneath the obscuring dust cloud there were five worlds swirling about the smaller orange sun as it in turn orbited a nearby white subgiant. Due to the solar radiation blasting all five planets with incredible heat only the farthest ringed planet is inhabitable and contains shallow polar seas, an atmosphere with sufficient ozone protection, and some primitive plant-life. Algorab drew a remarkable number of colonists eager to exploit this world for its metallic and natural gas deposits. The fuel and mining industries drew many immigrants to Algorab over the decades, even though it lay far from its jump point and lacked sufficient arable land to support itself without reliance on freeze-dried foods from off-world. The planet is populated by a smattering of shielded, climate-controlled mining and refining colonies, linked to the more hospitable settlements on the shoreline of the polar seas of Niriama in the north and Vanishing Sea in the south by a system of maglev rail lines and airship cruisers. The barren wastes of rock and sand in between are inhabited by only the hardiest of settlers.
+
+Throughout the Succession Wars, Algorab was a difficult target for raids and only a few were launched against this planet. Even during the Jihad, the Word of Blake limited their actions to destroying the zenith and nadir jump recharge stations. The  Republic has rebuilt Algorab‘s zenith jump station to provide a link to the planetary capital and spaceport city of Delcorvius Prime, located on the shores of the Niriaman sea</desc>
 	</planet>
 	<planet>
 		<name>Algot</name>
@@ -1344,17 +1379,43 @@ During the Jihad, Word of Blake used disabling poisons to subdue the planet. The
 		<name>Alhena</name>
 		<xcood>-83.2</xcood>
 		<ycood>-14.6</ycood>
-		<faction>LA</faction>
+		<faction>IND</faction>
 		<factionChange>
-			<date>2900-01-01</date>
+			<date>2366-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2822-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<pressure>2</pressure>
+		<gravity>0.91</gravity>
+		<lifeForm>2</lifeForm>
+		<climate>4</climate>
+		<percentWater>16</percentWater>
+		<temperature>40</temperature>
+		<spectralClass>A</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>VI</luminosity>
+		<sysPos>2</sysPos>
+		<landMass>(Focci’s Point)</landMass>
+		<desc>3135 - Alhena was initially settled as a scientific outpost exploring the potential for life under even the harshest environments. Orbiting the outer sun of a binary star system, the planet has developed a peculiar orbit as a result of the interacting pull of both suns, creating a pattern where long, harsh winters follow short, but pleasant, summers. Despite the inhospitable environment, small settlements eventually rose all over the northern hemisphere, particularly along the shores of the polar Alhennian Ocean. Lacking major resources, Alhena relies heavily on off-world trade to sustain its population.
+
+Alhena was largely overlooked throughout the Age of War and the Star League era. Through the Succession Wars, its position near the Free Worlds League border led to several Lyran raids. During the Jihad, off-world trade was so disrupted that almost ten percent of the population died of starvation during one of the planet‘s long winters. Since its admittance into The Republic of the Sphere, Alhena has recovered somewhat, but remains reliant on off-world trade for its very survival. Focci's Point, located near the eastern shores of the Alhennian Ocean, is the capital city and primary spaceport.</desc>
 	</planet>
 	<planet>
 		<name>Alioth</name>
 		<xcood>-59.46</xcood>
 		<ycood>14.08</ycood>
 		<faction>TA</faction>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
 		<factionChange>
 			<date>2315-01-01</date>
 			<faction>TH</faction>
@@ -1371,12 +1432,37 @@ During the Jihad, Word of Blake used disabling poisons to subdue the planet. The
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<pressure>4</pressure>
+		<gravity>0.9</gravity>
+		<lifeForm>2</lifeForm>
+		<climate>3</climate>
+		<percentWater>63</percentWater>
+		<temperature>44</temperature>
+		<spectralClass>A</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>2</sysPos>
+		<satellite>Galayna</satellite>
+		<landMass>Lilandro</landMass>
+		<landMass>Stravio</landMass>
+		<landMass>Uvania (Warrinzer)</landMass>
+		<desc>3135 - Alioth’s thick, hyper-oxygenated atmosphere and unusual warmth for a planet that orbits so far out from its star impressed the first colonists. The abundance of native flora for such a geologically young world is the result of bursts of solar radiation that pulse from the sun every few hundred years or so. The colonists have learnt to shield their structures against the harmful bursts of solar radiation created by this unusually active sun, which have been known to completely disrupt communications and produce worldwide outbreaks of cancer cases every few generations. Local astronomers have also learnt to read the telltale signs of new bursts of activity, in response to which the planet itself goes into a kind of global shutdown. Inspite of this, Aloith's fertile soils and mild weather cycles have made it possible for a variety of Terran and Terran-hybrid food crops to flourish and support a booming agricultural industry. In addition, the island chains off the coasts of Uvania, the planet‘s large northern continent, with their semi-tropical landscapes of wildly varied native flora, and striking mountain landscapes, were perfect for establishing a robust tourist trade. Warrinzer, the capital of Alioth, is located on the northeastern coast of Uvania, fifty kilometers north of the primary port city of Staniskil.
+
+During the Terran Hegemony era, Alioth became a breadbasket and holiday retreat for citizens across the Hegemony, and business truly boomed in the Star League era, when the world opened up to foreign travelers as well. After the fall of the Star League, Alioth was claimed by the Lyran Commonwealth and became another Free Worlds/Lyran border planet. It was a strategic point during raids and campaigns waged through the Succession Wars and the Jihad, Alioth‘s farmlands became scarred battlegrounds and its resorts declined as garrison troops and invading soldiers alike consumed the local resources. Under Republican rule, however, Alioth has begun to bounce back, thanks in part to a variety of local efforts funded by the 'Peace Dividends' that followed Stone's Military Material Redemption Program. Today, the resorts off Uvania are open once again, and even the southern continents of Lilandro and Stravio have reported their first profitable crop years in over a century.</desc>
 	</planet>
 	<planet>
 		<name>Alkaid</name>
 		<xcood>-94.93</xcood>
 		<ycood>47.47</ycood>
-		<faction>LA</faction>
+		<faction>FoS</faction>
+		<factionChange>
+			<date>2341-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -1397,12 +1483,35 @@ During the Jihad, Word of Blake used disabling poisons to subdue the planet. The
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.17</gravity>
+		<lifeForm>2</lifeForm>
+		<climate>4</climate>
+		<percentWater>37</percentWater>
+		<temperature>43</temperature>
+		<spectralClass>B</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>2</sysPos>
+		<satellite>Vishnu</satellite>
+		<landMass>Khalek (Verstigrad)</landMass>
+		<landMass>Hekker Island Chain</landMass>
+		<landMass>Inahalia</landMass>
+		<desc>3135 - Alkaid is a dry world, dominated by sun-cracked desert wastes between low plateaus and hills of eternally shifting sands. Only near the shorelines of Khalek, the large polar continent, and the nearby Hekker island chain, just south of Khalek, could life be considered comfortable. The twenty-fourth-century discovery of a host of commercially valuable chemicals and ores, just below its rocky, sandy surface led to the development of a chemical industry and a series of in-system buoys to guide traffic to and from the planet that helped bring about the first permanent settlements by the Federation of Skye.
+
+Moravska Ostrava, was established on the banks of Khalek‘s Novaya Minsk River delta, and is home of Toloy-Daelun Chemicals, which controls over twenty-three chemical extraction, processing, and distribution plants on Alkaid alone. Verstigrad, the planetary capital, is located almost 500 kilometers inland, on the banks of Lake Tatyanna. Alkaid has two large spaceports, one in Moravska Ostrava and one in Verstigrad. A secondary spaceport was constructed in the city of Nobadi, on the southern supercontinent of Inahalia, following the Word of Blake Jihad and the recommendation of the Lyran general in charge of the relief forces.
+
+During the Jihad, Word of Blake forces entered the system via pirate points and seized control of the primary spaceports on Khalek. The Lyran defenders went to ground on Inahalia instead, waging a guerilla war until reinforcements arrived to relieve them.</desc>
 	</planet>
 	<planet>
 		<name>Alkalurops</name>
 		<xcood>-37.26</xcood>
 		<ycood>45.64</ycood>
-		<faction>LA</faction>
+		<faction>FoS</faction>
+		<factionChange>
+			<date>2341-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -1411,6 +1520,24 @@ During the Jihad, Word of Blake used disabling poisons to subdue the planet. The
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<pressure>4</pressure>
+		<gravity>1</gravity>
+		<lifeForm>3</lifeForm>
+		<climate>5</climate>
+		<percentWater>43</percentWater>
+		<temperature>55</temperature>
+		<spectralClass>A</spectralClass>
+		<subtype>7</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>3</sysPos>
+		<landMass>Vandika (Allabad)</landMass>
+		<desc>Alkalurops is a warm and oppressive world, plagued by frequent hurricanes and tornadoes that are the result of a thick atmosphere, cursed further by greenhouse gases that amplify the heat of its white A-class sun. These conditions have prevented the evolution of any form of surface animal life, though native fish do thrive in the deeper parts of the planet‘s two large  oceans. Because of its inhospitable nature, colonization and development of Alkalurops proceeded slowly. Most settlements, founded on the northernmost continent of Vandika, were established close to pockets of natural gas and common metal veins, pumped and mined for export sale. To protect against the harsh weather and attain a degree of comfortable living, most of these early colonies were dug into the mountains and hills, and every structure was pressurized and outfitted with advanced air filters to make the interior air breathable.
+
+Allabad, the planetary capital, was originally one such colony, nestled into the base of the north-south-running Bagadell Mountain Chain, and much of the city today still retains the look of a modernized Pueblo Indian village. Mainly due to these living conditions, the inhabitants of Alkalurops developed a curiously insular—almost xenophobic—culture, intensely distrustful of off-worlders. Though more accepting overall of other citizens in the Lyran realm—particularly those from the Isle of Skye—Alkalurops‘s people showed little patience or hospitality to visitors from the Terran Hegemony. Even during the Star League era, when extra revenue resulting from trade with Nusakan, a key world in the Hegemony‘s computer industry, brought an influx of traders and entrepreneurs here, the natives of this world remained cold and aloof. During the Amaris crisis, the Usurper‘s troops struck at Alkalurops despite its being outside Hegemony borders, hoping to deny any liberation force the use of the planet as a staging area to reclaim Nusakan. Instead, native resistance repelled Amaris‘s troops, a pattern repeated whenever raiders and invading neighbors struck the world during the Succession Wars. With few resources worth fighting over and an inhospitable climate, however, such raids were rare, and even the FedCom Civil War and the Word of Blake Jihad passed Alkalurops over without incident. Upon the formation of The Republic, the Lyran Alliance ceded this world to Devlin Stone along with many others of the tumultuous Isle of Skye region, a situation that caused great unrest among the local populace when Stone‘s relocation directives were enacted. Ironically, the creation of the peace-loving Republic created Alkalurops‘s largest outbreak of violence as the insular natives clashed with the new population. Rioting and hate crimes left scores dead over the following decade, before Republic authorities, in conjunction with Lyran mediators, could once more restore order.</desc>
 	</planet>
 	<planet>
 		<name>Alkes</name>
@@ -1420,6 +1547,10 @@ During the Jihad, Word of Blake used disabling poisons to subdue the planet. The
 		<factionChange>
 			<date>2900-01-01</date>
 			<faction>FWL</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -1627,24 +1758,58 @@ Despite being aware of the impending, though slow coming, temperature change tha
 		<xcood>-65.98</xcood>
 		<ycood>-52.42</ycood>
 		<faction>FWL</faction>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Alphecca</name>
 		<xcood>-47.2</xcood>
 		<ycood>62.59</ycood>
-		<faction>LA</faction>
+		<faction>FoS</faction>
+		<factionChange>
+			<date>2341-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3030-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3052-01-01</date>
+			<date>3040-01-01</date>
 			<faction>FC</faction>
 		</factionChange>
 		<factionChange>
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.18</gravity>
+		<lifeForm>4</lifeForm>
+		<climate>3</climate>
+		<percentWater>83</percentWater>
+		<temperature>34</temperature>
+		<spectralClass>A</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>2</sysPos>
+		<satellite>Xanti</satellite>
+		<landMass>Gataka (Galanette Rainbow)</landMass>
+		<landMass>Greim</landMass>
+		<landMass>Korinthas</landMass>
+		<landMass>Mursank</landMass>
+		<landMass>Rubekka</landMass>
+		<landMass>Shario</landMass>
+		<desc>From orbit, Alphecca is an unremarkable world of blue-green oceans, with a scattering of six island continents and a multitude of smaller chains that are covered half the time by mist and clouds. On the surface, the world‘s lands are equally plain, mostly consisting of rolling hills, the odd rocky mountain peak, and grassy plains. Though the climate varies from arctic tundra to tropical equatorial reaches, on close inspection nothing about Alphecca stands out from the hundreds of swirling worlds that mankind calls home. Lacking in significant, readily accessible natural resources, Alphecca proved suitable only for settlement as a quiet farming world, its primary exports being native grains and meat from the gillarg, a large, relatively dumb amphibian that many locals describe as “a cross between a cow and a cowardly, toothless alligator.”
+
+The people of Alphecca gradually became inured to their sustenance-level existence, to the point where visitors often scoffed at their laid-back attitude toward even the most divisive political and religious matters. For centuries, the world‘s mediocrity and the lethargy of its inhabitants were its shield. Regarded as little more than a staging area for raids, or a quiet place for R and R, only a few odd roving bandits paid this world a visit after its first colonization, and it only changed hands between the Lyran Commonwealth and the Draconis Combine twice in its history. Alphecca was thus spared the worst of the Succession Wars, the FedCom Civil War, and even the Word of Blake Jihad. The population, however, suffered a severe shake-up when the planet was finally ceded to Devlin Stone‘s Republic of the Sphere and his relocation directives brought with them an influx of new colonists from other realms. Strangely enough, over the decades even this upheaval passed relatively quickly, as it seemed even the newcomers succumbed to the same lackadaisical demeanor within a short time of their arrival. Scientists are only now beginning to wonder if something in Alphecca‘s environment may be the cause of this peculiar—but apparently harmless—development.
+
+Alphecca‘s capital city, Galanette Rainbow, is located on the northernmost island continent of Gataka. The other northern continent, Rubekka, is home to the planet‘s largest seaport city, Fescher‘s Dock. Of the other four island continents, Greim, Korinthas, Mursank, and Shario, only the southern polar continent of Greim is unpopulated, due to its inhospitable climate.</desc>
 	</planet>
 	<planet>
 		<name>Alpheratz</name>
@@ -1676,6 +1841,10 @@ Despite being aware of the impending, though slow coming, temperature change tha
 		<factionChange>
 			<date>2900-01-01</date>
 			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 		<pressure>3</pressure>
 		<gravity>1.24</gravity>
@@ -3273,6 +3442,10 @@ Though a major exporter of heavy metals and radioactive elements, as well as sma
 		<xcood>74.07</xcood>
 		<ycood>68.07</ycood>
 		<faction>DC</faction>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 		<spectralClass>G</spectralClass>
 		<subtype>6</subtype>
 		<luminosity>IV</luminosity>
@@ -3612,6 +3785,10 @@ Imperator Automatic Weaponry</desc>
 		<ycood>52.16</ycood>
 		<faction>TA</faction>
 		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
 			<date>2315-01-01</date>
 			<faction>TH</faction>
 		</factionChange>
@@ -3639,6 +3816,31 @@ Imperator Automatic Weaponry</desc>
 			<date>3062-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<pressure>4</pressure>
+		<gravity>0.83</gravity>
+		<lifeForm>6</lifeForm>
+		<climate>5</climate>
+		<percentWater>96</percentWater>
+		<temperature>57</temperature>
+		<spectralClass>K</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>5</sysPos>
+		<satellite>Astoria</satellite>
+		<satellite>Delacruz</satellite>
+		<satellite>Istanbul</satellite>
+		<satellite>Viennes</satellite>
+		<satellite>Zarpedos</satellite>
+		<landMass>Aitrakops (Atria Prime)</landMass>
+		<desc>Covered almost entirely in water, and wrapped in a thick atmosphere that traps heat and renders the few habitable island chains, near the north and south poles, only moderately so, it‘s almost impossible to believe that when scientists first came to this world, they had described it as a paradise. Though they did notice that the above-average atmospheric pressure and the comparative lack of protective ozone likely contributed to the planet‘s then-luxuriant warmth, what few colonists realized at the time was that Atria was only then coming out of the final stages of its own ice age. Before they noticed the steady planetwide rise in temperature and humidity, however, the colonists quickly discovered that the entire ecosphere was biologically incompatible with human physiology. Though blessed with an abundance of flora and fauna that included massive marine life and atranas, flightless avians nearly double the size of Terran pheasants, the human colonists could not use any of them as a food source, and thus the planet grew dependent on its neighbors for agricultural needs.
+
+Once part of the Terran Hegemony, Atria became a Combine holding for much of its history. However, its lack of resources and oppressive climate tended to make invaders reluctant to waste resources on its defense, so the world became known as yet another backwater of the Inner Sphere, suitable for nothing more grand than serving as a staging ground for troops in transit. Fortunately, this lack of importance spared it the worst of the Amaris Crisis, the Succession Wars, and the Jihad. Today, Atria retains its charm as a tropical getaway for off-world tourists, though few are inclined to stay long unless they hail from more arctic planets.
+
+The capital and primary spaceport city of Atria Prime, located on the southern polar island of Aitrakops, is thus home to a flourishing hospitality industry including hostels, casinos, and a transoceanic port for luxury liners.</desc>
 	</planet>
 	<planet>
 		<name>Atsugi</name>
@@ -3738,6 +3940,10 @@ Imperator Automatic Weaponry</desc>
 		<xcood>-44.08</xcood>
 		<ycood>-77.46</ycood>
 		<faction>FWL</faction>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 		<spectralClass>G</spectralClass>
 		<subtype>4</subtype>
 		<luminosity>II</luminosity>
@@ -3831,6 +4037,10 @@ The primary industries on Augustine involve extracting raw minerals from the pla
 		<xcood>-58.16</xcood>
 		<ycood>-82.93</ycood>
 		<faction>FWL</faction>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Avigait</name>
@@ -4670,7 +4880,11 @@ Due to the lack of education and wealth, the population in the early 31st Centur
 		<name>Baxter</name>
 		<xcood>-31.56</xcood>
 		<ycood>113.71</ycood>
-		<faction>LA</faction>
+		<faction>FoS</faction>
+		<factionChange>
+			<date>2341-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -4679,6 +4893,27 @@ Due to the lack of education and wealth, the population in the early 31st Centur
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<pressure>3</pressure>
+		<gravity>0.79</gravity>
+		<lifeForm>3</lifeForm>
+		<climate>4</climate>
+		<percentWater>68</percentWater>
+		<temperature>44</temperature>
+		<spectralClass>K</spectralClass>
+		<subtype>7</subtype>
+		<luminosity>II</luminosity>
+		<sysPos>4</sysPos>
+		<satellite>T’laus</satellite>
+		<landMass>Atropia (Cleopolis)</landMass>
+		<landMass>Delgado</landMass>
+		<landMass>Hermathia</landMass>
+		<desc>Baxter IV, the only inhabitable world in its system, is a world in turmoil. Due to an apparent near miss with a comet or rogue asteroid, the orbital path of Baxter‘s large moon, T‘Laus, has gradually grown increasingly erratic in the centuries since the first settlers came to this world. Gravitational forces have played havoc on the surface of the world below, with frequent earthquakes, powerful dust storms, and rockslides an almost daily occurrence. This shifting climate gradually turned a once-bountiful agricultural world into a giant, desolate wasteland, and is especially hard on machinery, which is constantly rocked or choked by dust. The descendants of the settlers who elected to remain today live in low structures or modified caves carved into the sides of the planet‘s many mountains and canyons, though legends today tell of a few cities that moved completely underground, only to be ripped asunder by the moon‘s tidal force. Despite the inhospitable environment, however, life has continued on this world, maintained by an economy almost entirely based on its fishing exports. Though some common industrial metals are readily accessible on the planet, there are not sufficient quantities or concentrations of these resources to support a more than sustenance-level industry, and for this reason Baxter was largely overlooked throughout its history. Scientists, however, believe that better days will one day return to Baxter IV, as the orbit of T‘Laus is expected to eventually re-stabilize. However, planetologists on Baxter appear to be uncertain as to whether such realignment is already underway, or if the moon has a few hundred more erratic orbits left to make before then.
+
+The capital city and primary spaceport of Baxter, Cleopolis, is located on the northern continent of Atropia. Though surrounded by a cluster of smaller cities and towns, the equatorial and southern continents of Delgado and Hermathia are more evenly populated than the Cleopolis region, thanks to fewer large mountain chains and fault lines on these two landmasses.</desc>
 	</planet>
 	<planet>
 		<name>Bayindir</name>
@@ -5076,6 +5311,10 @@ Due to the lack of education and wealth, the population in the early 31st Centur
 		<factionChange>
 			<date>2900-01-01</date>
 			<faction>FWL</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -5597,6 +5836,10 @@ Bithinian Ballistics</desc>
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Blue Hole</name>
@@ -5833,12 +6076,20 @@ Bolan was primarily colonized by settlers from India, Pakistan and Afghanistan.<
 		<ycood>-33.64</ycood>
 		<faction>TA</faction>
 		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
 			<date>2315-01-01</date>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
 			<date>2790-01-01</date>
 			<faction>FWL</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -7457,7 +7708,11 @@ The majority of the population is located on the continent of Worrsetgard, which
 		<name>Carnwath</name>
 		<xcood>-63.64</xcood>
 		<ycood>83.2</ycood>
-		<faction>LA</faction>
+		<faction>FoS</faction>
+		<factionChange>
+			<date>2341-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -7466,6 +7721,26 @@ The majority of the population is located on the continent of Worrsetgard, which
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<pressure>4</pressure>
+		<gravity>1.16</gravity>
+		<lifeForm>7</lifeForm>
+		<climate>5</climate>
+		<percentWater>53</percentWater>
+		<temperature>54</temperature>
+		<spectralClass>K</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>3</sysPos>
+		<landMass>Blanith</landMass>
+		<landMass>Kormyri</landMass>
+		<landMass>Wartholi (Carnwath City)</landMass>
+		<desc>Lacking in significant resources or strategic value, the warm, oppressive world of Carnwath was never regarded as worth anyone‘s time during the Succession Wars. However, in the early days of space exploration and colonization, Carnwath was the center of a minor—and very brief—alien scare when its first settlers described what appeared to be the remains of an ancient civilization, complete with the remains of a strange species of bipedal creatures. At the crux of this discovery were several mysterious formations that resembled vaguely humanoid faces, reminiscent of the figures on Terra‘s Easter Island, ringing a central cluster of five jagged, pyramidal structures that actually gave off radioactive readings. Archaeologists were dispatched to Carnwath almost immediately, and studied the “alien structures” for less than six months before concluding that they were a peculiarity of native processes of wind and water erosion that had exposed evidence from a long-ago asteroid strike on the planet‘s northern continent of Wartholi. The meteor, evidently composed mainly of metallic ores and unusual—but naturally occurring—radium, was partially liquefied by the heat of reentry and fragmented on impact. Several larger cores formed the basis of the pyramids while smaller chunks of matter, blown clear of the central site, formed a ring at the edges of the crater. Over millennia, erosion wiped away the softer native soil around the site, exposing the mildly radioactive “pyramids” and “faces.” Though believers in extraterrestrial intelligence argued these theories, the final evidence became clear when exo-biologists proved the “humanoid” remains found nearby were nothing more than an alien variation on ancient Terra‘s velociraptors, and various biological features of the long-dead amphibian beasts proved they were nothing more than desert scavengers, likely struck down by the very same phenomenon that produced the so-called “ruins.” Though discredited, the Ruins of Carnwath continue to draw the curious and die-hard believers in alien intelligence to this world almost 800 years later. This tourism industry, however, has proven barely sufficient to supplement the planet‘s annual income from its very average industrial and agricultural exports.
+
+Carnwath‘s capital city, Carnwath City, is located on the Wartholi continent, three hundred kilometers east of the Ruins of Carnwath. Though it is regarded as the center of planetary commerce and industry, with over two million inhabitants in the capital alone, the southern continents of Blanith and Kormyri actually boast a full three quarters of the Carnwathian population.</desc>
 	</planet>
 	<planet>
 		<name>Carse</name>
@@ -7508,6 +7783,10 @@ The planets primary industries and exports are plastics and plastisteel using th
 		<factionChange>
 			<date>3057-09-18</date>
 			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -7648,7 +7927,7 @@ The planets primary industries and exports are plastics and plastisteel using th
 			<faction>Stone</faction>
 		</factionChange>
 		<factionChange>
-			<date>3081-02-02</date>
+			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
 		<pressure>3</pressure>
@@ -8982,12 +9261,20 @@ This led to a very hostile environment by the mid 3020s with many residents just
 		<ycood>-40.68</ycood>
 		<faction>TA</faction>
 		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
 			<date>2315-01-01</date>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
 			<date>2790-01-01</date>
 			<faction>FWL</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -9145,6 +9432,29 @@ This led to a very hostile environment by the mid 3020s with many residents just
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<pressure>3</pressure>
+		<gravity>0.92</gravity>
+		<lifeForm>7</lifeForm>
+		<climate>3</climate>
+		<percentWater>63</percentWater>
+		<temperature>44</temperature>
+		<spectralClass>G</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>4</sysPos>
+		<satellite>Muse</satellite>
+		<landMass>Alorran</landMass>
+		<landMass>Cederban (New Austin)</landMass>
+		<landMass>Fayrun</landMass>
+		<desc>When first settled, Corridan IV promised colonists an abundance of raw materials and fertile lands, but posed just one small problem: the entire planet‘s water table was tainted by heavy metals and infested with native bacteria that rendered every living thing on the planet, from plants to animals, toxic for human consumption. Faced with starvation and the failure of their colony, the first settlers initially relied on ice ships, such as those of the Ryan Cartel.
+
+Eventually Gabriel Tal, a resident part-time chemical engineer, stumbled upon a means to purify over ninety-five percent of the toxic agents from small quantities of Corridani water in a safe and economical fashion using an innovative fusion filtration system. Tal‘s invention ultimately became the basis for Water Pure Industries, which would become the largest of the Lyran Commonwealth‘s five water purifier manufacturers. Though publicly traded, Water Pure remained mostly in Tal family hands throughout its history, expanding to add manufacturing sites on Freedom and Ryde, and distribution sites on over a dozen worlds in the Federation of Skye. In spite of the destruction of its main Corridan plant six times in its history—the last during an incidental Word of Blake raid during the Jihad—Water Pure has managed to come back bigger and better every time. The value of clean, drinkable water obviously made Corridan IV a prime target during the Succession Wars, and for centuries its cities and the landscape on all three of its primary continents—Alorran and Cederban in the northern hemisphere, Fayrun in the southern—bore the scars of repeated raids and planetary assaults. When this planet was ceded to The Republic of the Sphere, a planetwide beautification project ultimately erased the last of these scars, resulting in the idyllic, pastoral world visitors see today.
+
+Today, Corridan‘s greatest exports, after water purifiers, are agricultural and ranching produce, which range from native fruits and vegetables to the beef-like meat of the Corridani grazer, a dim-witted beast roughly half again the size of a Terran buffalo. For this reason, many travelers expect a world of mainly rural plains. In fact, close to half the planetary population lives in big cities, mostly concentrated on Feyrun and Cederban. The largest of these, Rio Grande, is home to Water Pure Industries, much of the Tal family fortune, and the largest planetary spaceport. The planetary capital, New Austin, is over seventy kilometers north of Rio Grande, and boasts the planet‘s largest shipping concern, Corridani Forward, which uses its own starport.</desc>
 	</planet>
 	<planet>
 		<name>Corsica Nueva</name>
@@ -10850,6 +11160,10 @@ The capital is currently Fort Dieron, but in the past San Martin and Tahlwynn ha
 			<date>2790-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 		<spectralClass>F</spectralClass>
 		<subtype>3</subtype>
 		<luminosity>V</luminosity>
@@ -11141,7 +11455,7 @@ Donegal is the home to many major trading companies, the Supreme Court of the Co
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3130-01-01</date>
+			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
 		<pressure>3</pressure>
@@ -11854,6 +12168,10 @@ Elgin’s manufacturing capacity was dramatically reduced over the course of the
 		<factionChange>
 			<date>3057-10-01</date>
 			<faction>CC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3085-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -13056,7 +13374,7 @@ For much of its history Fletcher has been the site of an historic cemetery which
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3090-01-01</date>
+			<date>3085-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
 		<spectralClass>F</spectralClass>
@@ -13101,7 +13419,7 @@ Foochow was not involved in the Jihad until one of the Warrior Houses jumped int
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3090-01-01</date>
+			<date>3085-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
 		<spectralClass>M</spectralClass>
@@ -13496,6 +13814,10 @@ During the Capellan-Republic war, Foot Fall was the center of some of the fierce
 			<date>3067-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 		<pressure>3</pressure>
 		<gravity>0.84</gravity>
 		<lifeForm>6</lifeForm>
@@ -13736,6 +14058,10 @@ When Gallery was originally settled there were no native lifeforms so the origin
 		<factionChange>
 			<date>3067-01-01</date>
 			<faction>CC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3085-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 		<spectralClass>F</spectralClass>
 		<subtype>5</subtype>
@@ -14161,7 +14487,11 @@ Brigadier Corporation</desc>
 		<name>Gladius</name>
 		<xcood>-96.76</xcood>
 		<ycood>72.5</ycood>
-		<faction>LA</faction>
+		<faction>FoS</faction>
+		<factionChange>
+			<date>2341-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -14170,6 +14500,27 @@ Brigadier Corporation</desc>
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.16</gravity>
+		<lifeForm>5</lifeForm>
+		<climate>5</climate>
+		<percentWater>94</percentWater>
+		<temperature>47</temperature>
+		<spectralClass>K</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>2</sysPos>
+		<landMass>Garamond (Hyacles)</landMass>
+		<landMass>Burmaise Isles</landMass>
+		<desc>A tropical world covered in deep, green oceans, Gladius seemed a virtual paradise to the first colonists to set foot upon its soil. Fertile lands and an abundance of native fauna suitable for human consumption—particularly on its single, large continent of Garamond, located mostly north of the equator—made the establishment of the first settlements easy. However, the rugged terrain and thick, fast-growing tropical jungles of the interior lands limited the amount of arable space, and the relative lack of industrial metals and other rare materials limited significant industrial growth. Making matters worse over time was that fact that the Gladiusian soil easily “burned out” when used for farming; its rich nutrients expended easily under constant harvests, a matter largely attributed to the planet‘s subtle seasonal changes. Gladius‘s largest industry thus changed to tourism and hospitality as the world became known as a vacation spot—the kind of place people visited or retired to, but few actually lived in.
+
+Through the Succession Wars, Gladius was overlooked by most invading armies due to its lack of tactical or industrial value, and the world became little more than a convenient jump point to other destinations. This lack of military importance, however, became the planet‘s major selling point in the latter half of the twenty-ninth century, when the peoples of the Inner Sphere gradually began to tire of constant war. Numerous “retreat communities” sprang up on the isolated islands and coastal regions on and around Garamond; miniature cities almost completely dedicated to off-world vacationers, with few (if any) local residents. Though visitors were often encouraged to stay, few actually did so. Even today, Gladius remains little more than another tropical getaway for the idle rich.
+
+The capital city, Hyacles, is located on the northern shores of Garamond, and is also home to the planet‘s largest spaceport and transoceanic port. Gladius AquaLines, the planet‘s largest cruise line operator, offers weekly cruise services out of Hyacles that can take passengers as far away as the Burmaise Isles, in the southern hemisphere. Eenticing stopovers include the eastern coastal cities of Narava and Pasadenia, world-renowned resorts known for their casinos and nightlife.</desc>
 	</planet>
 	<planet>
 		<name>Glasgow</name>
@@ -14181,7 +14532,11 @@ Brigadier Corporation</desc>
 		<name>Glengarry</name>
 		<xcood>-77.46</xcood>
 		<ycood>77.72</ycood>
-		<faction>LA</faction>
+		<faction>FoS</faction>
+		<factionChange>
+			<date>2341-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -14190,6 +14545,39 @@ Brigadier Corporation</desc>
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<factionChange>
+			<date>3069-12-05</date>
+			<faction>WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3077-09-12</date>
+			<faction>Stone</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<pressure>3</pressure>
+		<gravity>0.97</gravity>
+		<lifeForm>5</lifeForm>
+		<climate>2</climate>
+		<percentWater>65</percentWater>
+		<temperature>29</temperature>
+		<spectralClass>K</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>3</sysPos>
+		<socioIndustrial>C-C-B-C-B</socioIndustrial>
+		<satellite>Celine</satellite>
+		<landMass>Dalraida (Dunkeld)</landMass>
+		<landMass>Pictland</landMass>
+		<landMass>Scotia</landMass>
+		<hpg>B</hpg>
+		<desc>A small world of terrestrial features, blessed with abundant resources, it is rather surprising in hindsight to know that this world was completely overlooked in the early years of colonization. With three large landmasses claiming most of the northern hemisphere, and deep, island-speckled oceans in the south, this cool world was a paradise just waiting to be discovered. In truth, infighting among the various private interests who were to mount the first expedition to Glengarry, complicated by the increasing friction between the Terran Alliance and its far-flung colonies, disrupted any efforts to settle the planet during the early days of humanity‘s expansion among the stars. To make matters worse, later surveys revealed dangerously high levels of arsenic and cyanide gases in the atmosphere, which first had to be cleansed in order to make the planet suitable for colonization. These factors kept settlers away until the early days of the Star League, when terraforming efforts by the nearby Federation of Skye finally cleansed the atmosphere of its toxic chemicals. Glengarry‘s first settlers hailed from a mix of Scottish, Norwegian, and Canadian origins, both native to Terra and from among the Skye Federation‘s populace. Drawn originally to the continent of Scotia, the smallest of the three northern hemispheric land masses, by its abundant ore resources in the mountain ranges, and the fertile soils of the valleys and lowlands, these colonists quickly established strict development guidelines to preserve the planet‘s native splendor. Similar to the “zoning laws” used in other Federation worlds, such as Skye itself, thecolonists created a self-perpetuating standard that has left the larger two continents, Dalraida and Pictland, virtually uninhabited even today, while Scotia eventually became a well-balanced center for light industrial, commercial, and agricultural development.
+
+Glengarry‘s trade with neighboring worlds boomed during the peak of the Star League era, specializing in a variety of locally produced items, but when the League fell and wars ignited across the Inner Sphere, the economy virtually collapsed. Efforts to relieve the planet‘s economic woes by opening up the other two continents faltered, in part because of these continents‘ harsher winter climates, and because of the predation of deep raiders from the Draconis Combine and Free Worlds League. Under the united Federated Commonwealth, Glengarry showed signs of economic recovery, particularly in the later years of the alliance, when it became the homeworld of the legendary Gray Death Legion. Unfortunately, the years leading up to the disastrous FedCom Civil War stripped away this distinction, and the horrors of the Jihad shattered the planetary economy and infrastructure when a Blakist assault force briefly seized the planet, only to be ejected by a combined Lyran and Clan Wolf liberation force. When the planet was ceded to The Republic of the Sphere, however, it signaled a new revival, partially fueled by the influx of new residents due to Devlin Stone‘s ambitious relocation programs. Attempting to raise heavy, self-sustaining industries for the first time, Glengarry is becoming a manufacturing center for industrial and military-grade equipment, including internal combustion engines and armor plate for conventional vehicles.
+
+The capital city, Dunkeld, a sprawling metropolis as big as any capital on a major planet, lies under the shadow of Castle Hill, site of fortifications that were built during the peak of the Star League era. The ruins of these fortifications, which still bear the black scorching and weatherworn pockmarks of the fanatics‘ last stand against allied forces during the Jihad, now stand as silent tribute to one of humanity‘s darkest hours.</desc>
 	</planet>
 	<planet>
 		<name>Glenmora</name>
@@ -16561,12 +16949,20 @@ The planet and the factories have been the target of invasion numerous times thr
 		<ycood>-103.8</ycood>
 		<faction>TA</faction>
 		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
 			<date>2315-01-01</date>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
 			<date>2790-01-01</date>
 			<faction>FWL</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -16833,7 +17229,7 @@ The planet and the factories have been the target of invasion numerous times thr
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3090-01-01</date>
+			<date>3085-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
 		<pressure>3</pressure>
@@ -16933,6 +17329,10 @@ During the Star League-era, Hsien prospered as part of the Terran Hegemony, befo
 		<factionChange>
 			<date>3062-01-01</date>
 			<faction>CC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3085-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 		<spectralClass>F</spectralClass>
     	<subtype>9</subtype>
@@ -17156,6 +17556,10 @@ Hunan was relatively peaceful throughout its history and did not see any militar
 		<factionChange>
 			<date>2900-01-01</date>
 			<faction>FWL</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -17865,7 +18269,19 @@ Irian’s terrain is best described as bland. The planet’s terrain is dominate
 		<name>Izar</name>
 		<xcood>-60.51</xcood>
 		<ycood>98.32</ycood>
-		<faction>LA</faction>
+		<faction>TA</faction>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2316-01-01</date>
+			<faction>TH</faction>
+		</factionChange>
+		<factionChange>
+			<date>2780-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -17874,6 +18290,31 @@ Irian’s terrain is best described as bland. The planet’s terrain is dominate
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<pressure>3</pressure>
+		<gravity>0.84</gravity>
+		<lifeForm>3</lifeForm>
+		<climate>2</climate>
+		<percentWater>51</percentWater>
+		<temperature>29</temperature>
+		<spectralClass>B</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>VI</luminosity>
+		<sysPos>1</sysPos>
+		<satellite>Banta</satellite>
+		<satellite>Nunascus</satellite>
+		<landMass>Celta</landMass>
+		<landMass>Eddin (Promise Point)</landMass>
+		<landMass>Morope</landMass>
+		<landMass>Trantara</landMass>
+		<desc>Izar‘s parent star is actually part of a binary system that consists of a cool, orange K0 sun orbiting a blue-white B5 subgiant. Because of the substantial distance between the two stars, planets were miraculously able to form close to both stars, but only the closest world of the smaller star had developed a breathable atmosphere and enough surface water to support life when it was discovered early in man‘s journey into space. However, Izar‘s orbit, roughly half again as far from its parent star as Terra is from Sol, rendered it a cool world. In fact, with clouds and storms common—even over the interior of the larger landmasses of Celta, Eddin, Morope and Trantara—nights on Izar were particularly cold. Though this did not faze the native evergreen woods that covered most of the hilly mainlands, colonists quickly learned that the only way to make use of the world‘s fertile soil for their own crops was to encapsulate their farms beneath environmentally sealed domes.
+
+Izar also boasted substantial natural resources, including rare earths and industrial-grade metals capable of supporting a robust manufacturing industry, and the early settlers quickly attained a level of self-sufficiency with minimal off-world support. Thus it came as little surprise on Terra when this world declared its independence during the Outer Reaches Rebellion, or that the Terran Alliance sent a doomed expedition to reclaim it in 2236. The spirited defense by natives determined to retain their independence, despite their own fighters‘ primitive arms in the face of the Alliance‘s heavier weapons, eventually forced the Terrans to withdraw, but the Izarians enjoyed their freedom for only a short time before the Terran Hegemony rose in the Alliance‘s place. During the Amaris crisis, the Usurper‘s troops razed a number of cities, including the capital of Promise Point (since rebuilt) on the northern Eddin continent, while rooting out native and SLDF defenders. However, simmering resistance remained until General Kerensky finally liberated the world. After the planet became a part of the Lyran Commonwealth‘s Federation of Skye, following the fall of the League, the Izarians‘ historic love for independence sympathized with the Free Skye movement, and many of that separatist organization‘s finest volunteers hailed from their world. Though raided several times during the Succession Wars, Izar would never again be conquered by another state until its peaceful ceding to The Republic of the Sphere in the wake of the Word of Blake‘s Jihad.
+
+Apart from the planetary capital of Promise Point, Izar boasts a second major spaceport in the city of Rhyss on the southern Trantara continent.</desc>
 	</planet>
 	<planet>
 		<name>Jaboatao</name>
@@ -19366,7 +19807,7 @@ Wakazashi Industries</desc>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3085-01-01</date>
+			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
 		<pressure>3</pressure>
@@ -19631,9 +20072,13 @@ Exeter Organization</desc>
 		<name>Kimball II</name>
 		<xcood>-35.99</xcood>
 		<ycood>100.67</ycood>
-		<faction>LA</faction>
+		<faction>FoS</faction>
 		<factionChange>
-			<date>2900-01-01</date>
+			<date>2341-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2932-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -19642,12 +20087,32 @@ Exeter Organization</desc>
 		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
-			<faction>FC</faction>
-		</factionChange>
-		<factionChange>
-			<date>3052-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.1</gravity>
+		<lifeForm>6</lifeForm>
+		<climate>3</climate>
+		<percentWater>74</percentWater>
+		<temperature>57</temperature>
+		<spectralClass>G</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>2</sysPos>
+		<landMass>Hestelle</landMass>
+		<landMass>Triasha (Lorenzopolis)</landMass>
+		<landMass>Vanassay</landMass>
+		<landMass>Warsaw</landMass>
+		<landMass></landMass>
+		<desc>3135 - Kimball II is the more heavily populated of two inhabited worlds in the Kimball system. Both the system and the worlds take their name from Lorenzo Kimball, a wealthy twenty-first-century industrial magnate from Terra‘s North American continent, whose family settled the system for the abundance of rich metallic resources on the planets and in the local asteroid belt. Though the Kimballs largely resided on Terra, members of that distinguished family financed and led the expeditions to establish colonies on Kimball II and IV. Kimball II, by far the more hospitable world—if a bit warm—boasted ample water and agricultural resources on two of its four main continents, compared to water-poor Kimball IV‘s murky atmosphere of nitrogen and carbon dioxide. Thus, the bulk of the Kimball family‘s efforts went toward developing Kimball II. Rich veins of metal ores, particularly on the rocky desert land masses of Vanassay and Warsaw—both of which straddle the equator—made them an ideal haven for mining and refining operations. Meanwhile, the fertile northern and southern continents—Hestelle and Triasha, respectively, became the basis for sufficient farming and ranching to sustain the population of both worlds. Kimball II‘s exports, which mostly consisted of various industrial, and military-grade metals and metal parts for heavy agricultural, industrial, and military machinery, complemented the bauxite mining exports of Kimball IV, quickly establishing the Kimball family‘s dominance of the industrial metal trade in the region. This prosperity carried the Kimballs into their alliance with the Igota family of Thorin, an alliance that ultimately spawned the star-spanning corporate empire known today as Ceres Metals.
+
+After the fall of the Star League, of course, the wealth of the Kimball system led to a series of battles for this world. By 2932, Kimball II had changed hands over a dozen times between the Lyran Commonwealth and the Draconis Combine. Fighting for the less hospitable world of Kimball IV was only slightly less intense, even though the planet‘s meager population and a defense force consisting of specialized helicopters presented minimal challenge to any invaders. The fighting ravaged much of the planet‘s industry, but thankfully spared most of the civilian population centers because of the distance between most of these communities and the planet‘s major industrial centers. Fighting over Kimball II continued all the way up to the Jihad, with the last administrators of the planet, the Draconis Combine, battling mercenaries employed by the Word of Blake for control of the planet during that war.
+
+The Combine agreed to cede Kimball II to Devlin Stone‘s Republic of the Sphere only after first securing favored trading rights over the planet‘s output, an issue that raised the ire of the Lyran Alliance, which claimed that its prior dominion of the world through much of its history made it a Lyran territory. A compromise was eventually reached that granted both Successor States access to this industrial planet‘s exports, and allowed The Republic to plant its flag in the capital and spaceport city of Lorenzopolis, on the southern continent, Triasha. Lorenzopolis is also home to a branch office of the still-active Ceres Metals corporation.</desc>
 	</planet>
 	<planet>
 		<name>Kinbrace</name>
@@ -19973,11 +20438,15 @@ Gortex Multi-E</desc>
 		<ycood>44.34</ycood>
 		<faction>TA</faction>
 		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
 			<date>2315-01-01</date>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2790-01-01</date>
+			<date>2780-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -20016,6 +20485,27 @@ Gortex Multi-E</desc>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.03</gravity>
+		<lifeForm>7</lifeForm>
+		<climate>3</climate>
+		<percentWater>82</percentWater>
+		<temperature>36</temperature>
+		<spectralClass>G</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>2</sysPos>
+		<satellite>Fionna</satellite>
+		<satellite>Palas</satellite>
+		<satellite>Valencia</satellite>
+		<landMass>Hyadei</landMass>
+		<landMass>Jingatu</landMass>
+		<landMass>Kyushu (Hagitasu)</landMass>
+		<desc>3135 - Once a hardy agricultural world in the Terran Hegemony, Ko continued to be a breadbasket for the people of the Draconis Combine‘s Dieron Military District after the fall of the Star League. Though some desert regions—such as the region surrounding the former capital city of Jarlton, on the equatorial continent of Hyadei—are plagued by the occasional sandstorm, much of the rest of the planet‘s main landmasses boasts fertile soil, coupled with excellent growing cycles and the ability to support both domestic and imported flora and fauna. As a result, numerous farming, fishing, and ranching industries came to call Ko their home, and before long several shipping lines and food-processing megacorporations were doing the same. By 3025, by far the largest of these was Surinami Processing, a producer of all manner of processed foods from freeze-dried survival rations to its Home Helper line of canned and boxed foods, with a special Happy Life Meals division that also provided foods for every institution from corporate cafeterias to volunteer soup kitchens. Interestingly enough, however, Surinami‘s most controversial product, the Stomach‘s Joy line of nutritional supplements, never saw widespread use in the Combine, and was ultimately the cause for the company‘s shutdown soon after Ko was captured by the Lyran Commonwealth in the Fourth Succession War.
+
+After the conquest, when Surinami began marketing Stomach‘s Joy to select Lyran markets, reports of the food‘s unusual side effects eventually drew an inquiry into the company‘s practices and processing standards. What was discovered was that Surinami Processing was indeed mixing a host of organic byproducts from their various other food products into Stomach‘s Joy as a cost-saving ploy, and blending it with native-grown narcotics in relatively undetectable amounts for added “flavor.” Public outrage and the Lyran government‘s subsequent fines ultimately spelled the end for the Ko food-processing giant.
+
+Ko, a part of the so-called Lyons Thumb, was returned to Draconis Combine rule during the FedCom Civil War, after Lyran forces attacked the Combine “peacekeeping garrison” at what was then the planetary capital city of Jarlton in 3062. The battle damaged much of the city, forcing the Combine to relocate the administrative centers back to the pre-Fourth War capital of Hagitasu, on the southern continent of Kyushu, where it has remained ever since. During the Jihad, Word of Blake mercenaries raided this world several times in an effort to disrupt allied logistics in the region. In one of the more notorious of these attacks, Blakist troops unleashed a virulent blight on agricultural centers across the northern Jingatu continent, sterilizing the soil and wiping out over forty percent of the local crops. Though the rest of the planetary agricultural yield made up for the loss, it would be several years before the local industries and people recovered from the disaster.</desc>
 	</planet>
 	<planet>
 		<name>Kobe</name>
@@ -20048,7 +20538,11 @@ The massive volcanic eruptions quickly changed the planet’s climate from tropi
 		<name>Kochab</name>
 		<xcood>-68.85</xcood>
 		<ycood>63.11</ycood>
-		<faction>LA</faction>
+		<faction>FoS</faction>
+		<factionChange>
+			<date>2341-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -20057,6 +20551,26 @@ The massive volcanic eruptions quickly changed the planet’s climate from tropi
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<pressure>3</pressure>
+		<gravity>0.92</gravity>
+		<lifeForm>7</lifeForm>
+		<climate>4</climate>
+		<percentWater>87</percentWater>
+		<temperature>44</temperature>
+		<spectralClass>K</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>4</sysPos>
+		<satellite>None (dust ring)</satellite>
+		<landMass>Dakkato (Stenton)</landMass>
+		<landMass>Insarria</landMass>
+		<desc>Despite its abundance of surface water, Kochab is a remarkably dry world. It seems that the two main planetary landmasses, Dakkato and Insarria, formed almost exclusively around a series of rugged, crisscrossing mountain chains. Making matters worse is the fact that the few valleys and plains where the terrain is level and irrigated enough for farming and habitation are prone to chronic earthquakes. These drawbacks, however, did not prevent settlers from claiming this world as their own in the early days of humankind‘s expansion to the stars, or in establishing a series of cities and small towns on both continents within their first century. With few major veins of industrial materials within easy access, and the constant tectonic stresses wreaking havoc on a regular basis, settlements and industry on Kochab were kept deliberately small. This limited the planetary economy to subsistence-level only, with exports of common metals, commercial products, and native beef and pork from its ranching industry. Regarded as something of a backwater world, the Commonwealth invested very little energy into improving the lot of Kochab, and the planet was largely ignored as anything more than a convenient stop to anywhere else, until the early thirtieth century. Then the planet briefly enjoyed a boost from off-world investors and tourists that came about as a result of being the chosen filming location for the long-running Steinharts holodrama, produced by the (now-defunct) Commonwealth Nationwide (CNN) video network. Unfortunately for Kochab, fame proved a fickle mistress, and the weekly soap opera aired its last episode in 3023, the same year that CNN was folded into the expanding Donegal Broadcasting Company, which kept the series alive only in syndication. Kochab‘s slight economic boost evaporated with CNN‘s fall, and once more the planet faded into relative mediocrity, all but unknown to off-worlders, save those transferred there after the Jihad, under Devlin Stone‘s relocation mandates, or the occasional volunteer relief workers dispatched there after a particularly violent “earthquake season.”
+
+The capital and primary spaceport of Kochab, Stenton, is located on Dakkato, just south of the Dakkato Prime mountain range. Saint Jaddah (known to Steinharts fans as Matrius, hometown of the Morik clan) is located on Insarria, and today is home to the Steinharts Museum of emorabilia, a nostalgic nod to Kochab‘s all-too-brief fling with fortune and glamour.</desc>
 	</planet>
 	<planet>
 		<name>Kockengen</name>
@@ -20102,7 +20616,11 @@ The massive volcanic eruptions quickly changed the planet’s climate from tropi
 		<name>Komephoros</name>
 		<xcood>-34.43</xcood>
 		<ycood>92.84</ycood>
-		<faction>LA</faction>
+		<faction>FoS</faction>
+		<factionChange>
+			<date>2341-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>2900-01-01</date>
 			<faction>DC</faction>
@@ -20113,12 +20631,28 @@ The massive volcanic eruptions quickly changed the planet’s climate from tropi
 		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
-			<faction>FC</faction>
-		</factionChange>
-		<factionChange>
-			<date>3052-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.03</gravity>
+		<lifeForm>5</lifeForm>
+		<climate>2</climate>
+		<percentWater>70</percentWater>
+		<temperature>21</temperature>
+		<spectralClass>F</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>VI</luminosity>
+		<sysPos>5</sysPos>
+		<landMass>Calvinar</landMass>
+		<landMass>Jasonri</landMass>
+		<landMass>Marksenia (Komephoros)</landMass>
+		<desc>3135 - A somewhat cold world, colonists were drawn to Komephoros by the promise of abundant natural resources trapped beneath its partially frozen surface. Unfortunately, the first settlers sent to this world vanished without a trace, their fate unknown until a second colony ship was launched to the world nearly a decade later. Finding no sign of the original expedition‘s JumpShip, the second expedition assumed its predecessor had simply misjumped until—after setting up a settlement on the temperate shores of the equatorial Marksenia continent—a scouting party dispatched to the southern continent of Calvinar picked up a very weak, automated distress signal, originating from what appeared to be a frozen lake. Further investigation eventually uncovered the grisly remains of the first colonial expedition, which was apparently washed out in a freakish disaster caused when a rogue asteroid struck the nearby ocean with sufficient force to generate a wave that flooded the valley their settlement had been established in. When the planet then entered its three-year-long winter cycle, the newly formed lake froze over, and subsequent snowfall eventually buried even the colonists‘ DropShip from satellite scans. To this day, local legends say the lake, dubbed Luega del Condenado (Lake of the Damned), is haunted by the spirits of the lost colonists, and no modern settlements have been established within 300 kilometers of the site.
+
+Over the centuries after the fall of the Star League, Komephoros traded hands a few times between Houses Steiner and Kurita, with many of its mining and ore-processing facilities damaged during each shift in control. Bypassed during the Jihad, however, the planet‘s industrial infrastructure was in excellent shape when the world was ceded to Devlin Stone‘s newborn Republic. The capital city of Komephoros is located on Marksenia‘s east coast, and is also home to the planet‘s primary spaceport. Bristalle, largest city on the northern continent of Jasonri, boasts a secondary spaceport and the corporate headquarters of Kamlarr Enterprises, a subsidiary of Bannson Universal Unlimited, which runs several specialized mining rigs located throughout the north polar region.</desc>
 	</planet>
 	<planet>
 		<name>Koniz</name>
@@ -20148,7 +20682,7 @@ The massive volcanic eruptions quickly changed the planet’s climate from tropi
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3085-01-01</date>
+			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
 		<pressure>3</pressure>
@@ -20408,7 +20942,7 @@ The planet itself is resource poor and has little to offer for export. However, 
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3085-01-01</date>
+			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
 		<pressure>3</pressure>
@@ -20494,12 +21028,20 @@ The planet itself is resource poor and has little to offer for export. However, 
 			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>La Blon</name>
 		<xcood>-32.08</xcood>
 		<ycood>73.55</ycood>
-		<faction>LA</faction>
+		<faction>FoS</faction>
+		<factionChange>
+			<date>2341-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -20508,6 +21050,31 @@ The planet itself is resource poor and has little to offer for export. However, 
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.04</gravity>
+		<lifeForm>7</lifeForm>
+		<climate>5</climate>
+		<percentWater>96</percentWater>
+		<temperature>59</temperature>
+		<spectralClass>G</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>3</sysPos>
+		<satellite>Gwenhyvar</satellite>
+		<satellite>Ivanov</satellite>
+		<satellite>Tiarra</satellite>
+		<landMass>Ballay</landMass>
+		<landMass>Elise (Amadeus)</landMass>
+		<landMass>Renaria</landMass>
+		<desc>La Blon is a tropical world almost completely covered by water. Its three main landmasses, Elise (in the northern hemisphere), Ballay, and Renaria (in the southern), are more like large islands than continents, and each is surrounded by a host of smaller island clusters. This, combined with the planet‘s warmth and typically moderate weather—except during the “wet seasons,” when tropical storms and hurricanes become more of the norm—has made La Blon a favorite vacation spot for tourists. Despite this allure, it was the abundant natural resources of the planet and its inhabitable moon, Ivanov, which drew colonists here centuries ago. A wealth of common metals and modestly fertile soils have given La Blon a ubsistence-level economy in mining, light manufacturing, and even agriculture, more than enough to supplement its seasonal tourism trade. These features made La Blon a favorite corporate retreat during the height of the Star League and again under Lyran rule during the height of the Federated Commonwealth alliance. La Blon became known as the place where one could go to get away from it all and still be connected to the real world.
+
+Though the planet‘s exports offered very little of military value, raids were not uncommon during the Succession Wars after the Star League fell. Fortunately, these raids did little to mar the natural beauty or seriously disrupt the local economy and infrastructure of this planet. Even the Word of Blake Jihad overlooked La Blon as anything more than a jump -off point to attack other worlds. While this has limited any actual fighting that happened within the system over the centuries, the people of La Blon eventually earned a reputation for naïveté, assuming that war either could not touch them, or that its effects would only be a slight disruption, like mid-flight turbulence.
+
+La Blon‘s capital, Amadeus, is located at the foot of the Carbondale Mountains on Elise. The city is also home to the planet‘s largest spaceport and to La Blon Interstellar Entertainment (LBIE). Founded shortly after the formation of The Republic, LBIE has since branched out from film and tri-vid production, and now also lays a significant claim to the planet‘s hotel and travel brokerage industries. The coastal city of Lisellei, on the Renaria continent, boasts the planet‘s largest seaport, and is home to the Diamond Mine, easily La Blon‘s largest casino resort.</desc>
 	</planet>
 	<planet>
 		<name>La Grave</name>
@@ -20636,6 +21203,10 @@ Fortunately the population is overall happy with their lot in the Inner Sphere. 
 		<factionChange>
 			<date>3057-09-18</date>
 			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -21263,6 +21834,10 @@ The primary industry on Les Halles is the extraction and refining of fuel used i
 		<factionChange>
 			<date>3057-10-01</date>
 			<faction>CC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3085-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 		<pressure>3</pressure>
 		<gravity>1.05</gravity>
@@ -22404,6 +22979,10 @@ The continents of Sorania and Padawa are mostly temperate and are the sites of t
 			<date>3067-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 		<spectralClass>G</spectralClass>
 		<subtype>2</subtype>
 		<luminosity>I</luminosity>
@@ -22779,6 +23358,10 @@ Norse BattleMech Works</desc>
 		<factionChange>
 			<date>3057-09-18</date>
 			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -23609,7 +24192,7 @@ Thanks in part to the lack of major industry and the rough, unforgiving terrain 
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3090-01-01</date>
+			<date>3085-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
 		<spectralClass>M</spectralClass>
@@ -23670,6 +24253,10 @@ During the Fourth Succession War, the Federated Suns captured the planet without
 		<factionChange>
 			<date>3057-09-18</date>
 			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -23876,6 +24463,10 @@ During the Fourth Succession War, the Federated Suns captured the planet without
 		<xcood>-63.11</xcood>
 		<ycood>-57.38</ycood>
 		<faction>FWL</faction>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Mica II</name>
@@ -24084,6 +24675,10 @@ During the Fourth Succession War, the Federated Suns captured the planet without
 		<factionChange>
 			<date>3057-09-18</date>
 			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -25282,6 +25877,10 @@ Kallon Industries</desc>
 		<xcood>-67.81</xcood>
 		<ycood>-49.55</ycood>
 		<faction>FWL</faction>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Necedah</name>
@@ -25544,7 +26143,7 @@ The terrain surrounding Avalon City is a mixture of forests, mountains, plains a
 Manufacturing centers:
 Banzai Weapons Design Company
 Corean Enterprises
-Archernar BattleMechs
+Achernar BattleMechs
 Lycomb-Davion IntroTech
 Federated News Services</desc>
 	</planet>
@@ -26046,6 +26645,10 @@ Galtor Naval Yards</desc>
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 		<spectralClass>G</spectralClass>
 		<subtype>5</subtype>
 		<luminosity>V</luminosity>
@@ -26386,7 +26989,7 @@ In contrast to the heavily industrialized northern hemisphere, the southern hemi
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3085-01-01</date>
+			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
 		<pressure>3</pressure>
@@ -26588,7 +27191,7 @@ New Wessex is sparsely inhabited, with most of the population living in towns an
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3090-01-01</date>
+			<date>3085-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
 		<spectralClass>G</spectralClass>
@@ -27241,6 +27844,10 @@ Federated Industries</desc>
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Nykvarn</name>
@@ -27451,6 +28058,10 @@ Federated Industries</desc>
 		<factionChange>
 			<date>2900-01-01</date>
 			<faction>FWL</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 		<spectralClass>F</spectralClass>
 		<subtype>7</subtype>
@@ -28158,7 +28769,7 @@ Wunderland Enterprises</desc>
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3090-01-01</date>
+			<date>3085-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
 		<spectralClass>K</spectralClass>
@@ -28366,6 +28977,10 @@ Challenge Systems</desc>
 		<factionChange>
 			<date>2900-01-01</date>
 			<faction>FWL</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -29105,7 +29720,7 @@ Challenge Systems</desc>
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3090-01-01</date>
+			<date>3085-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
 		<spectralClass>M</spectralClass>
@@ -29472,7 +30087,7 @@ Poulsbo remains a lightly settled Military Outpost, whose civilian population is
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3090-01-01</date>
+			<date>3085-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
 		<spectralClass>G</spectralClass>
@@ -30592,6 +31207,10 @@ Magna Metals Incorporated</desc>
 		<xcood>-73.81</xcood>
 		<ycood>-39.64</ycood>
 		<faction>FWL</faction>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Renfield</name>
@@ -31437,6 +32056,10 @@ Under The Republic, Michaelson converted its helicopter designs to civilian use 
 			<date>2900-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 		<pressure>3</pressure>
 		<gravity>1.12</gravity>
 		<lifeForm>7</lifeForm>
@@ -31481,6 +32104,10 @@ Under The Republic, Michaelson converted its helicopter designs to civilian use 
 		<factionChange>
 			<date>3057-09-18</date>
 			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 		<pressure>3</pressure>
 		<gravity>1.04</gravity>
@@ -32278,12 +32905,20 @@ Tengo Aerospace</desc>
 		<ycood>-46.94</ycood>
 		<faction>TA</faction>
 		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
 			<date>2315-01-01</date>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
 			<date>2790-01-01</date>
 			<faction>FWL</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -32604,6 +33239,10 @@ Although the fall of the First Star League brought an end to terraforming on Sch
 			<date>3057-11-01</date>
 			<faction>CC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3085-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Seginus</name>
@@ -32617,6 +33256,10 @@ Although the fall of the First Star League brought an end to terraforming on Sch
 		<factionChange>
 			<date>3057-09-18</date>
 			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -32968,7 +33611,7 @@ Although the fall of the First Star League brought an end to terraforming on Sch
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3090-01-01</date>
+			<date>3085-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
 		<spectralClass>F</spectralClass>
@@ -33283,6 +33926,10 @@ By the time of the founding of The Republic of the Sphere, Sheratan‘s populati
 		<factionChange>
 			<date>3062-01-01</date>
 			<faction>CC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3085-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 		<pressure>3</pressure>
 		<gravity>1.0</gravity>
@@ -33795,6 +34442,10 @@ as the House Lords changed, the cities of Aneheim, along Freiheim‘s Kirschner 
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 		<spectralClass>G</spectralClass>
 		<subtype>8</subtype>
 		<luminosity>V</luminosity>
@@ -34285,7 +34936,7 @@ The local population have a pragmatic political approach that can almost be mist
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3090-01-01</date>
+			<date>3085-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
 		<spectralClass>K</spectralClass>
@@ -34939,6 +35590,10 @@ Corean Enterprises</desc>
 			<date>3063-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3085-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 		<pressure>3</pressure>
 		<gravity>1.1</gravity>
 		<zenithCharge>True</zenithCharge>
@@ -35264,6 +35919,10 @@ For most of the planet’s history it was a Lyran Commonwealth planet bordering 
 			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Svarstaad</name>
@@ -35411,6 +36070,10 @@ For most of the planet’s history it was a Lyran Commonwealth planet bordering 
 		<factionChange>
 			<date>3057-09-18</date>
 			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -35837,6 +36500,10 @@ Precision Weaponry</desc>
 		<xcood>-107.71</xcood>
 		<ycood>-52.94</ycood>
 		<faction>FWL</faction>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Tannil</name>
@@ -37828,7 +38495,7 @@ Tsinghai has repelled numerous Marik and bandit attacks that have decimated the 
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3090-01-01</date>
+			<date>3085-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
 		<spectralClass>G</spectralClass>
@@ -37865,7 +38532,7 @@ Tsitang fell in the second wave of the Fourth Succession War to the Federated Su
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3085-01-01</date>
+			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
 		<pressure>3</pressure>
@@ -38253,6 +38920,10 @@ With no substantial industry or natural resources, the Blakists largely overlook
 		<factionChange>
 			<date>3057-09-18</date>
 			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -38997,6 +39668,10 @@ In the early 31st Century an underground Star League-era ‘Mech research facili
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Vinton</name>
@@ -39635,7 +40310,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3090-01-01</date>
+			<date>3085-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
 		<pressure>3</pressure>
@@ -40562,6 +41237,10 @@ Under The Republic of the Sphere, Yangtze has rebuilt the least-damaged dams and
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Yed Prior</name>
@@ -40722,6 +41401,10 @@ Under The Republic of the Sphere, Yangtze has rebuilt the least-damaged dams and
 		<factionChange>
 			<date>3057-10-01</date>
 			<faction>CC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3085-10-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 		<lifeForm>7</lifeForm>
 		<spectralClass>K</spectralClass>
@@ -40894,6 +41577,10 @@ Under The Republic of the Sphere, Yangtze has rebuilt the least-damaged dams and
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Zebeneschamali</name>
@@ -40907,6 +41594,10 @@ Under The Republic of the Sphere, Yangtze has rebuilt the least-damaged dams and
 		<factionChange>
 			<date>3057-09-18</date>
 			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -41074,6 +41765,10 @@ Under The Republic of the Sphere, Yangtze has rebuilt the least-damaged dams and
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<factionChange>
+			<date>3081-01-01</date>
+			<faction>ROS</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Zorn's Keep</name>
@@ -41182,7 +41877,7 @@ Under The Republic of the Sphere, Yangtze has rebuilt the least-damaged dams and
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
-			<date>3081-01-01</date>
+			<date>3085-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
 		<spectralClass>K</spectralClass>
