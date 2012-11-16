@@ -721,7 +721,7 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 	<faction>
 		<shortname>MERC</shortname>
 		<fullname>Mercenary</fullname>
-		<startingPlanet>Galatea,Solaris VII,Galatea,Galatea,Galatea,Galatea,Outreach,Outreach,Outreach</startingPlanet>
+		<startingPlanet>Galatea,Solaris,Galatea,Galatea,Galatea,Galatea,Outreach,Outreach,Outreach</startingPlanet>
 		<eraMods>1,1,1,1,2,3,2,1,0</eraMods>
 		<nameGenerator>General</nameGenerator>
 		<colorRGB>169,169,169</colorRGB>

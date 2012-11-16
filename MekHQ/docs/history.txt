@@ -7,7 +7,7 @@ v0.1.21 (SVN)
         lab.sh - starts MML
         mm-server.sh - starts MegaMek with 1GB of RAM and uses the full script from the MegaMek package to use $HOME/.megamek
         mm-startup.sh - starts MegaMek with 512MB of RAM and stays in the local MekHQ folder
-+ Planetary Update 27
++ Planetary Update 27 and 28
 
 v0.1.20 (2012-10-12)
 + skip over entities in mul without externalIDs during scenario resolution (related to Bug 233)
