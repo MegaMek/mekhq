@@ -5850,16 +5850,12 @@ Bithinian Ballistics</desc>
 		</factionChange>
 	</planet>
 	<planet>
-		<name>Blue Diamond</name>
+		<name>Menkent</name>
 		<xcood>-38.86</xcood>
 		<ycood>20.86</ycood>
-		<faction>TA</faction>
+		<faction>FoS</faction>
 		<factionChange>
-			<date>2315-01-01</date>
-			<faction>TH</faction>
-		</factionChange>
-		<factionChange>
-			<date>2790-01-01</date>
+			<date>2341-01-01</date>
 			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
@@ -24499,7 +24495,7 @@ During the Fourth Succession War, the Federated Suns captured the planet without
 		</desc>
 	</planet>
 	<planet>
-		<name>Menkent</name>
+		<name>Blue Diamond</name>
 		<xcood>-41.99</xcood>
 		<ycood>183.08</ycood>
 		<faction>LA</faction>
@@ -24510,10 +24506,6 @@ During the Fourth Succession War, the Federated Suns captured the planet without
 		<factionChange>
 			<date>3057-09-18</date>
 			<faction>LA</faction>
-		</factionChange>
-		<factionChange>
-			<date>3081-01-01</date>
-			<faction>ROS</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -25803,7 +25795,7 @@ Bagamoyo Aerospace Manufacturing</desc>
 		<ycood>15.39</ycood>
 		<faction>TA</faction>
 		<factionChange>
-			<date>2315-01-01</date>
+			<date>2316-01-01</date>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
@@ -25819,7 +25811,7 @@ Bagamoyo Aerospace Manufacturing</desc>
 			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
-			<date>3072-02-01</date>
+			<date>3068-10-07</date>
 			<faction>WOB</faction>
 		</factionChange>
 		<factionChange>
@@ -25834,6 +25826,24 @@ Bagamoyo Aerospace Manufacturing</desc>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>0.9</gravity>
+		<lifeForm>3</lifeForm>
+		<climate>3</climate>
+		<percentWater>80</percentWater>
+		<temperature>37</temperature>
+		<spectralClass>G</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>2</sysPos>
+		<socioIndustrial>B-B-B-B-A</socioIndustrial>
+		<satellite>Argeni</satellite>
+		<satellite>Insada</satellite>
+		<landMass>MacArthur</landMass>
+		<landMass>Ridgeway</landMass>
+		<landMass>Shamrock (New Dublin)</landMass>
+		<hpg>B</hpg>
+		<desc>3135 - Muphrid, like many worlds immediately coreward and anti-spinward of Terra, such as Skye and Caledonia, was initially settled largely by Irish and Scottish colonists during the first wave of human expansion into space. A pleasant world of mild seasons , fertile soils, expansive seas, and thick vegetation on its three large temperate-zone continents, Muphrid was quickly established as an agricultural world. Settled only a few months after Thorin, the Muphrid colonial government looked to their neighbor world for a guide and adopted similar zoning laws to contain industrial expansion and maintain the natural beauty of their world. Declaring the northeasternmost continent, Shamrock, as the industrial “zone,” and limiting its close western neighbor, Ridgeway, to a mix of mineral mining and agricultural concerns, the colonists defined the southern continent of MacArthur as a low-technology “zone” similar to Thorin‘s continent of Freda. These zoning laws and their immediate effects shaped the way Muphrid‘s population developed their world, and even today a distinct difference can be seen between the cities and towns on each of the three continents. Shamrock, the most populous and industrialized, is also home to the planetary capital of New Dublin, and the large primary spaceport of Calenaton. Ridgeway, by comparison, has smaller towns dominated by granite- and ore-mining operations or large agricultural communities and ranches. Meanwhile, the virtually untamed wilderness of MacArthur is home to a few small farming, logging, and fishing communities, but remains dominated by thick jungles untouched by humankind. The few Star League Castles Brian placed during the reign of the Terran Hegemony were destroyed during the Amaris crisis or soon after the fall of the League, but thankfully very little collateral damage was done, preserving much of Muphrid‘s native splendor and its people‘s way of life. However, rumors of a Star League research facility deep in the jungles of MacArthur still send prospectors into the unknown—many never to return. Under the banner of the Lyran state, Muphrid continued to prosper, upset only by the occasional raid by Combine or Free Worlds forces during the Succession Wars. During the Jihad, Blakist forces launched a heavy strike on Muphrid to cripple its infrastructure, partially destroying the capital and several major cities, as well as many surrounding townships, before allied forces beat them back. Though a few tactical nuclear weapons were used, the majority of the damage has since been repaired and memorials to those who fell defending the planet against the Word of Blake now stand in New Dublin, Calenaton, Port MacArthur, and Mechanicsburg.</desc>
 	</planet>
 	<planet>
 		<name>Murchison</name>
@@ -26598,9 +26608,13 @@ New Capetown is moderately industrialized and is a comfortable temperate planet.
 		<name>New Earth</name>
 		<xcood>-12.52</xcood>
 		<ycood>3.13</ycood>
-		<faction>TA</faction>
+		<faction>UND</faction>
 		<factionChange>
-			<date>2315-01-01</date>
+			<date>2116-03-18</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2316-01-01</date>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
@@ -26616,7 +26630,7 @@ New Capetown is moderately industrialized and is a comfortable temperate planet.
 			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
-			<date>3072-02-01</date>
+			<date>3068-10-05</date>
 			<faction>WOB</faction>
 		</factionChange>
 		<factionChange>
@@ -26624,13 +26638,30 @@ New Capetown is moderately industrialized and is a comfortable temperate planet.
 			<faction>Stone,WOB</faction>
 		</factionChange>
 		<factionChange>
-			<date>3078-02-20</date>
+			<date>3078-06-05</date>
 			<faction>Stone</faction>
 		</factionChange>
 		<factionChange>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1</gravity>
+		<lifeForm>7</lifeForm>
+		<climate>3</climate>
+		<percentWater>74</percentWater>
+		<temperature>31</temperature>
+		<spectralClass>G</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>4</sysPos>
+		<satellite>Lanna</satellite>
+		<landMass>Arctiqua</landMass>
+		<landMass>Kellargo</landMass>
+		<landMass>Lanhold</landMass>
+		<landMass>McKenna (Foundation Point)</landMass>
+		<landMass>Neoasia</landMass>
+		<desc>3135 - Originally known as Tau Ceti IV, the first inhabitable world seen by human eyes beyond the Terran solar system was so much like home, its discoverers on the TAS Pathfinder were quick to rename it New Earth when they arrived in orbit in December of 2108. Offering almost everything found on Terra herself, from abundant water supply to deep mineral, chemical, and metal ore deposits, eager colonists and corporate entities alike flocked to this new world. It comes as no surprise, then, that by the peak of the Star League era, New Earth was one of the most heavily industrialized and developed planets in the Terran Hegemony. Five major SLDF contractors set up their headquarters on New Earth, along with such successful enterprises as the New Earth Trading Company (NETC). All five continents—McKenna in the northwest, Lanhold to its east, the massive Neoasia in the south, the island continent of Kellargo, and even the north polar continent of Arctiqua—boasted major cities and heavy industry. Dozens of Castles Brian were set up on New Earth as well, and the Star League even built the famous Combat College of New Earth outside the capital city of Foundation Point, on McKenna. During the Amaris crisis, the college, most of the Castles Brian, all the major factories, and close to half the planet‘s largest population centers were destroyed by Amaris troops using every means available when it became clear they could not hold the planet. The world‘s gutted infrastructure and war-ravaged environment left the survivors shocked and demoralized, victims of widespread famine and disease—particularly the virulent New Earth Pox. The centuries of decline that followed, despite being under the banner of the wealthy Lyran state, did little to help pull the world out of the ruins, largely due to the continuous raiding and open warfare between the Lyrans and their neighbors. Only the NETC remained through it all, a last vestige of the once-mighty Star League and the only viable large corporation still active on New Earth. Headquartered in Meredith, on Neoasia, the NETC retained its status as a premier transport and trade facilitator until the Word of Blake Jihad erased Meredith from the map along with a host of other New Earth cities, including the capital, New Foundation. As the closest planet to Terra, New Earth‘s strategic value made it the focus of some  of the Jihad‘s heaviest fighting, which leveled what industry remained and poisoned the land, air, and seas. Today, New Earth is populated only by the grace of Devlin Stone‘s Resettlement Act. Industry has only now begun to return to the blasted, scarred world, beginning what promises to be a long and slow recovery for a world that once stood so prominently beside the Cradle of Humanity. The capital of New Earth today is Wiedergeburt, located on Arctiqua‘s southernmost tip, where the effects of fallout from both of New Earth‘s horrible tragedies has been minimal.</desc>
 	</planet>
 	<planet>
 		<name>New Exford</name>
@@ -26731,7 +26762,7 @@ New Hessen was occupied several times during the Succession Wars. However, New H
 		<ycood>-12.78</ycood>
 		<faction>TA</faction>
 		<factionChange>
-			<date>2315-01-01</date>
+			<date>2316-01-01</date>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
@@ -26752,6 +26783,10 @@ New Hessen was occupied several times during the Succession Wars. However, New H
 		</factionChange>
 		<factionChange>
 			<date>3066-02-01</date>
+			<faction>CM,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3068-08-01</date>
 			<faction>WOB</faction>
 		</factionChange>
 		<factionChange>
@@ -26766,6 +26801,21 @@ New Hessen was occupied several times during the Succession Wars. However, New H
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>0.99</gravity>
+		<lifeForm>6</lifeForm>
+		<climate>3</climate>
+		<percentWater>66</percentWater>
+		<temperature>34</temperature>
+		<spectralClass>G</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>1</sysPos>
+		<satellite>Neville</satellite>
+		<landMass>Arbergeiht</landMass>
+		<landMass>Goldwynn</landMass>
+		<landMass>Spina Planetia (Findler)</landMass>
+		<desc>3135 - Another early Terran colony world, established during humanity‘s first tentative steps to the stars, the features that drew many to New Home were the planet‘s pleasant and temperate climate, mountainous, resource-rich highlands, and many freshwater lakes and rivers. Industries looking to exploit the planet‘s mineral, chemical, and metal wealth flocked to New Home and set up shop with scores of hopeful young settlers looking to eke out a living on a brave new world. The large, pole-to-pole supercontinent of Spina Planetia, dominated by a central mountain chain called the Great Spine Mountains, drew the majority of the new colonists, who established cities and mining operations along the coastal regions and mountain bases. Many more, however, found the two secondary continents of Goldwynn and Arbergeiht, both located in the southern hemisphere, equally suitable for habitation, and there they set up smaller towns and agricultural communities. Findler, the capital city, was built on the northeastern plains of Spina Planetia, facing the eastern Tomagasso Ocean. Mann, site of the planet‘s largest spaceport, was established 700 kilometers to the south. When the Terran Hegemony placed New Home under its aegis, the world‘s strategic location, so close to Terra, necessitated the placement of an elaborate space defense network on the planet and in orbit around it. Much to the SLDF‘s dismay, this network fell under the control of the Usurper‘s troops when the Amaris crisis began, and the entire marvel of Star League military engineering had to be destroyed in the campaign to liberate Terra. Ruled by the Capellans after the fall of the League, New Home was frequently raided by the Free Worlds League and the Federated Suns, and ultimately became part of the Federated Commonwealth after the Fourth Succession War. When the Commonwealth fractured in 3057, New Home was left without any direction, and fell into anarchy that only ended when the Word of Blake managed to seize control during their effort to establish a buffer zone around Terra. Unlike other worlds, New Home hardly resisted the change in leadership, preferring the rule of the fanatics to total chaos. This allowed the Blakists to stage several major operations from the planet in relative security. The fighting to liberate New Home and break the Jihad caused widespread damage, which The Republic of the Sphere has invested a great deal of time and resources to undo.</desc>
 	</planet>
 	<planet>
 		<name>New Hope</name>
@@ -28836,7 +28886,11 @@ Oriente Weapons Works</desc>
 
 If the Dragoons are in control of the planet, Remus is the site of their private industries and training facilities that are away from their public face in Harlech and the Hiring Hall on the continent of Romulus.
 
-Outreach is the primary hiring location for the mercenary trade from the 3030s after Wolf’s Dragoons opened the Hiring Hall until its destruction at the hands of disenfranchised mercenaries and later Word of Blake in 3067.</desc>
+Outreach is the primary hiring location for the mercenary trade from the 3030s after Wolf’s Dragoons opened the Hiring Hall until its destruction at the hands of disenfranchised mercenaries and later Word of Blake in 3067.
+
+---
+
+3135 - Outreach was known as the center for the mercenary trade in the mid-thirty-first century, a site of the last of the Star League‘s Martial Olympiads that later became home of the famous Clansmen-turned-mercenary Wolf‘s Dragoons and the giant ‘Mech manufacturer GM-Blackwell. Today, however, this world is less than a shadow of its former self, reduced to a devastated, radioactive cinder that only a handful of stubborn souls still call home. Most historians claim the Word of Blake Jihad began with the assault on Outreach, in late 3067, when a surprise blitzkrieg by renegade mercenaries sacked the planetary capital of Harlech in an operation coordinated with and supported by the Blakists. A follow-up ambush from a pirate jump point by Word of Blake WarShips obliterated the planet‘s spaceborne defenses, including the Wolf‘s Dragoons fleet and both orbital battle stations. Even as the surviving elements of the most feared mercenaries in the galaxy tried desperately to regroup or withdraw, the Blakist fleet proceeded to bombard the planet with naval weapons and nuclear warheads. The continent of Remus, heart of the Dragoons‘ military industries and research, along with the Tetsuhara Proving Grounds and the main GM-Blackwell Industries factory, was completely sterilized by nuclear fire, while every major city on the opposite continent of Romulus was pummeled by the guns of both WarShips and BattleMechs. The surviving forces of the Dragoons and their allies withdrew from the holocaust, abandoning the world that had been their only real home since leaving their Clan brethren in the early 3000s. What remains of the planet now is a marginally habitable rock whose single large ocean, the Argosyan Sea, is saturated by fallout from Remus‘ devastation. Little vegetation grows on Romulus, and what farming and business still goes on to sustain the planet‘s decimated population now happens in domed or subterranean cities, where air and water purifiers imported from off-world struggle to remove the worst of the poisoned planet‘s harmful effects. The effective capital and primary spaceport on Outreach is New Kearny, a mostly subterranean city built from the ruins of Harlech, on the edge of what once was Lake Kearny, Outreach‘s largest freshwater body. Now overlooking a basin of baked-hard clay, New Kearny is home to nearly half the planetary population. The Jaime Wolf Memorial Interplanetary Spaceport, located on the city‘s outskirts, is dedicated to the founder and leader of the Wolf‘s Dragoons, who ushered in a new era for Outreach after the Fourth Succession War, and died in his fateful defense of the planet during the Jihad.</desc>
 	</planet>
 	<planet>
 		<name>Ovan</name>
@@ -30564,7 +30618,7 @@ During the Fourth Succession War, Federated Suns forces captured Poznan and they
 			<faction>TA</faction>
 		</factionChange>
 		<factionChange>
-			<date>2315-01-01</date>
+			<date>2316-01-01</date>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
@@ -30572,11 +30626,7 @@ During the Fourth Succession War, Federated Suns forces captured Poznan and they
 			<faction>FWL</faction>
 		</factionChange>
 		<factionChange>
-			<date>2900-01-01</date>
-			<faction>FWL</faction>
-		</factionChange>
-		<factionChange>
-			<date>3025-01-01</date>
+			<date>2970-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
 		<factionChange>
@@ -30592,7 +30642,7 @@ During the Fourth Succession War, Federated Suns forces captured Poznan and they
 			<faction>CM</faction>
 		</factionChange>
 		<factionChange>
-			<date>3062-01-01</date>
+			<date>3059-06-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 		<factionChange>
@@ -30623,11 +30673,18 @@ During the Fourth Succession War, Federated Suns forces captured Poznan and they
 		<luminosity>V</luminosity>
 		<sysPos>3</sysPos>
 		<hpg>A</hpg>
+		<landMass>Greene (Guilded Halls)</landMass>
+		<landMass>Halbiero</landMass>
+		<landMass>Unspoiled Isles</landMass>
 		<desc>Procyon was first settled in 2134 by colonists from North America. Due to the planets rugged terrain and proximity to Terra it quickly became a stronghold of the Terran Alliance and during the time of the Star League Procyon remained a major naval base. In the 28th Century it was the birthplace of Oliver Marik’s Civil War.
 
 The planet fell to the Free Worlds League shortly after Kerensky’s Exodus. Due to the planet’s wealth of raw materials and manpower, Procyon has seen its share of battles between the Free Worlds League and the Capellan Confederation since the fall of the Star League. However, even 200 years later the population does not have much support for either the League or Confederation and do not hold much stake in which side controls the planet.
 
-While the planet was once home to a sprawling Brigadier Corporation ‘Mech factory, it has by the 31st Century long since fallen into disrepair and disuse from damage and neglect.</desc>
+While the planet was once home to a sprawling Brigadier Corporation ‘Mech factory, it has by the 31st Century long since fallen into disrepair and disuse from damage and neglect.
+
+---
+
+3135 - The rugged, resource-rich world of Procyon was first settled in 2134 and eventually became a stronghold of the old Terran Alliance. The world became a major naval base for the Star League as a Hegemony planet, but was infamous for being the staging world from which Oliver Marik and his supporters planned the start of the Marik Civil War. After the Star League‘s collapse, the Free Worlds League seized Procyon and held it for nearly 200 years before the Capellan Confederation captured it in 2970. The Federated Commonwealth became Procyon‘s next steward after the Fourth  Succession War. In early 3059, after two hellish years under the control of a former Blakist renegade named Alisendar Gyn, the Free Worlds League recaptured Procyon. Despite this frequent changing of hands, however, the natives of Procyon have retained a fairly indifferent attitude toward conquerors, clinging to most of the customs handed down from the days of the long-vanished Terran Hegemony. The greatest sign of this planetwide sense of apathy was the long-abandoned Brigadeer Corporation ‘Mech factory in the virtual ghost city of Cleveburg. Located on the pockmarked and rocky southern continent of Halbiero, this factory and its surrounding city experienced a small revival when Earthwerks finally decided to purchase and restore the decrepit complex in the 3050s. Today, Procyon is a largely agricultural world of sparsely populated farmlands and forests, though the new Earthwerks-Procyon Engineering Vehicles plant produces and exports enough industrial vehicles and ‘Mechs to form a secondary planetary industry. The less mountainous supercontinent of Greene, home to the majority of Procyon‘s small cities and large agro-plexes, is located just north of Halbiero, and extends into the planet‘s polar regions. The capital city of Guilded Halls, located on Greene, along the Wantu River, also boasts Procyon‘s largest spaceport and the nearby ruins of a Star League-era Castle Brian that was destroyed during the Amaris crisis by an orbital bombardment. Aside from Greene and Halbiero, the bulk of Procyon‘s surface land takes the form of the Unspoiled Isles, a chain of miniature island-continents stretching along the southern hemisphere, east of Halbiero. The Unspoiled Isles are heavily wooded, but dotted with the remains of abandoned cities and destroyed Castles Brian, a nearly forgotten vestige of the days of the Star League.</desc>
 	</planet>
 	<planet>
 		<name>Promised Land</name>
@@ -31648,7 +31705,7 @@ Magna Metals Incorporated</desc>
 		<ycood>2.61</ycood>
 		<faction>TA</faction>
 		<factionChange>
-			<date>2315-01-01</date>
+			<date>2316-01-01</date>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
@@ -31672,13 +31729,29 @@ Magna Metals Incorporated</desc>
 			<faction>Stone,CJF,CGB,CW,WOB</faction>
 		</factionChange>
 		<factionChange>
-			<date>3077-06-04</date>
+			<date>3078-06-04</date>
 			<faction>CJF,CGB,CW</faction>
 		</factionChange>
 		<factionChange>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>0.85</gravity>
+		<lifeForm>7</lifeForm>
+		<climate>3</climate>
+		<percentWater>66</percentWater>
+		<temperature>28</temperature>
+		<spectralClass>G</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>2</sysPos>
+		<satellite>Riken Minor</satellite>
+		<landMass>Rigil Kentarus - Naskia (West Romaine)</landMass>
+		<landMass>Worrens</landMass>
+		<landMass>Riken Minor - Lesser Plateau (Destina Station)</landMass>
+		<hpg>A</hpg>
+		<desc>3135 - Rigil Kentarus was a beautiful planet, blessed with a rare inhabitable moon, Riken Minor, when it was discovered in the first days of Terran exploration. One of the first worlds to be settled, both planet and moon were bustling centers of industry and commerce during the days of the Star League. Located near the heart of the Terran Hegemony, both the planet and moon were heavily fortified by the SLDF, with Castles Brian and surface-to-orbit defense stations on each. During the crisis that brought down the Star League, however, Amaris troops captured the Riken complexes in a well-coordinated blitzkrieg and used the orbital weapons to bombard the planet below, where remnants of the SLDF unit posted on the moon had gone to regroup. At such ranges, however, the aim was inaccurate, and missed shots from both the planetary and lunar bases delivered massive damage to the surface of both worlds. In the years after the League‘s fall, under the banner of the Lyran state, Rigil Kentarus and its moon began to recover from the devastation, despite numerous attacks launched by the Free Worlds League and the Draconis Combine. Unfortunately, this recovery was undone when the Word of Blake Jihad targeted Rigil Kentarus and its moon during their effort to secure a buffer zone around Terra. Nuclear and biochemical weapons laid waste nearly half the cities and installations on both worlds, costing countless lives and tainting the air and water of both. Today, only a few habitable cities remain on Rigil Kentarus, spared from the devastation only by the blind fortune of geography. Fewer still remain on Riken Minor. Of these, the twin capitals of West Romaine on the planet‘s large southern continent of Naskia, and Destina Station on Riken Minor‘s Lesser Plateau continent, maintain the bulk of each world‘s commercial and administrative infrastructure. The large spaceport city of Mesopita, located on Worrens, Rigil Kentarus‘ northern continent, is the planet‘s principal link to the moon and the stars beyond, and so is also home to a sizeable portion of the planetary militia.</desc>
 	</planet>
 	<planet>
 		<name>Rijeka</name>
@@ -34543,7 +34616,7 @@ Sian has been the capital of the Capellan Confederation since 2368 when Capella 
 		<ycood>-7.56</ycood>
 		<faction>TA</faction>
 		<factionChange>
-			<date>2315-01-01</date>
+			<date>2316-01-01</date>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
@@ -34596,7 +34669,14 @@ Sian has been the capital of the Capellan Confederation since 2368 when Capella 
 		<socioIndustrial>C-C-B-D-C</socioIndustrial>
 		<satellite>Sirius VI-a</satellite>
 		<hpg>B</hpg>
-		<desc>The Sirius system contains three inhabited planets, Sirius V, VI and VI-a (the 6th Planet’s moon). The oldest colonies are on Sirius VI-a, which is also the most comfortable for human life. All three planets have a thin atmosphere but only VI-a is breathable by humans. Sirius V and VI were colonized only when it became readily apparent that both contained a vast wealth of raw minerals and ores. Terraforming efforts greatly improved the livability of Sirius VI. The three planets form a symbiotic relationship where Sirius VI-a provides food for the two planets while the mineral wealth of Sirius V and VI bring trade to the system. Sirius was one of the major bases for industry during the time of the Star League. Unfortunately the Amaris Coup and the subsequent Succession Wars destroyed much of the manufacturing in the system and resulted in the loss of many of the domed and pressurized cities on Sirius V and VI respectively. Unfortunately the planet’s fortunes continued to fall during the 31st Century and by the 3060s most of the population live in scattered agrarian societies and Sirian V is nearly uninhabited.</desc>
+		<landMass>Sirius VI - Supercontinent (Calgary)</landMass>
+		<landMass>Sirius VI-a - Bounty (Lost Hope)</landMass>
+		<landMass>Hinterlands</landMass>
+		<desc>The Sirius system contains three inhabited planets, Sirius V, VI and VI-a (the 6th Planet’s moon). The oldest colonies are on Sirius VI-a, which is also the most comfortable for human life. All three planets have a thin atmosphere but only VI-a is breathable by humans. Sirius V and VI were colonized only when it became readily apparent that both contained a vast wealth of raw minerals and ores. Terraforming efforts greatly improved the livability of Sirius VI. The three planets form a symbiotic relationship where Sirius VI-a provides food for the two planets while the mineral wealth of Sirius V and VI bring trade to the system. Sirius was one of the major bases for industry during the time of the Star League. Unfortunately the Amaris Coup and the subsequent Succession Wars destroyed much of the manufacturing in the system and resulted in the loss of many of the domed and pressurized cities on Sirius V and VI respectively. Unfortunately the planet’s fortunes continued to fall during the 31st Century and by the 3060s most of the population live in scattered agrarian societies and Sirian V is nearly uninhabited.
+		
+---
+		
+3135 - A rarity in the galaxy, made more so by its ultrahot blue sun, the Sirius system actually features two inhabited worlds for the price of one, though this was not the case when the twin worlds of Sirius VI and its moon, Sirius VI-a, were discovered in the late twenty-second century. Colonization of the moon‘s surface began before any such efforts on the planet itself, as Sirius VI-a featured a breathable—if thin—atmosphere, and water covered almost half its surface. Meanwhile, the seismically unstable, oxygen-poor planet below, identified only as a resource for raw metals, minerals, and gemstones, waited almost fifty years before serious efforts to terraform it began. Oxygen factories and sulfur-hungry algae helped to transform Sirius VI into a more human-friendly environment in the space of a century, though it remained water-poor and cursed by chronic earthquakes and volcanic activity. In the course of this time, the mining colonists of the planet and the farmers who came to inhabit the moon developed a symbiotic relationship, and travel between the two worlds was many times more frequent than any contact with the rest of the galaxy. In addition, two orbital colonies, placed around Sirius VI by the mining corporations—colloquially dubbed "The Projects" made an interesting waystation between the moon-dwellers and the planet-dwellers. Sirius became an important part of the Hegemony‘s industrial and economic base during the age of the Star League, but suffered badly during the Amaris coup. The orbital colonies were destroyed by Amaris aerofighters, and the planet was cut off from its moon by a blockade that led to widespread starvation. After the Capellans took the system in the wake of the League's fall, the situation on the planet only grew worse, as oxygen generators began to fail over time and the seismic activity tore open many of the planetary settlements. Fought over by the Capellans, the Free Worlds League, and the Federated Suns, little was done to cure the planet‘s worsening condition, and by the time of the Commonwealth's demise, Sirius VI had become an almost totally deserted wasteland of broken, shifting land masses and rivers of volcanic lava. Today, Sirius VI‘s only remaining settlement is the domed city of Calgary, on the south bank of the Sulfur Sea, the planet‘s only large body of water. By contrast, the moon is broken into two main continents, Bounty and Hinterlands, covered with a patchwork of forests and grasslands, that support the bulk of the population, which lives in sparse farming communities. The capital city, Lost Hope, is located on Bounty‘s eastern peninsula.</desc>
 	</planet>
 	<planet>
 		<name>Skallevoll</name>
@@ -37254,7 +37334,7 @@ Precision Weaponry</desc>
 		<ycood>0</ycood>
 		<faction>TA</faction>
 		<factionChange>
-			<date>2315-01-01</date>
+			<date>2316-01-01</date>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
@@ -37295,16 +37375,23 @@ Precision Weaponry</desc>
 		<landMass>Africa</landMass>
 		<landMass>Antarctica</landMass>
 		<landMass>Australia</landMass>
-		<landMass>Europe</landMass>
+		<landMass>Europe (Geneva)</landMass>
 		<landMass>North America</landMass>
 		<landMass>South America</landMass>
+		<landMass>Mars - (Koryo)</landMass>
+		<landMass>Luna - (Luna City)</landMass>
 		<hpg>A</hpg>
 		<desc>The birthplace of humanity, Terra (or Earth), remains a leader in industry and technology over the rest of the Inner Sphere. Terra was the seat of power for the Terran Alliance and then later the Terran Hegemony and by extension the Star League.
 		
 Terra was a neutral power controlled by ComStar from 2788 until the planet was taken by the Word of Blake in 3057.
 
-The Sol system contains multiple colonized planets, foremost are Mars and Venus. Mars is heavily colonized and is the site of multiple advanced industrial centers. The Sol system is also home to many spaceborn colonies, from the Titan Ship Yards, which produce and service Jumpships and Warships to the multiple settlements in the far-flung astroid belt, these people call themselves Belters and are often only loosely associated with each other.	
-		</desc>
+The Sol system contains multiple colonized planets, foremost are Mars and Venus. Mars is heavily colonized and is the site of multiple advanced industrial centers. The Sol system is also home to many spaceborn colonies, from the Titan Ship Yards, which produce and service Jumpships and Warships to the multiple settlements in the far-flung astroid belt, these people call themselves Belters and are often only loosely associated with each other.
+
+---
+
+3135 - The homeworld of humanity, Terra was the crown jewel of the galaxy when the Star League was in full bloom. Plagued by overcrowding and pollution in the years before mankind went to the stars, the land, air, and seas were clean once again by the twenty-sixth century, while the greatest of the planet‘s many cities were restored and improved. At the time of the Star League, Terra had two capital cities: Geneva, on the European continent, for the planet, and Unity City, capital of the Star League, on the North American continent. During the Amaris crisis, however, much of Terra‘s splendor was marred by the Usurper‘s troops, who obliterated several Castles Brian, the Star League Court, and many of the planet‘s most important cities during the coup, occupation, and liberation of Terra. Even today, all seven of Terra‘s main landmasses—North America, Europe, and Asia in the north hemisphere; South America, Africa, Australia, and Antarctica in the southern—still bear the scars and memorials of the Star League‘s final days. However, the rise and fall of Amaris‘ short-lived empire was not the only event to lay waste to the Cradle of Humanity. As allied forces converged on Terra to end the Word of Blake‘s control of the world in the waning days of the Jihad, the surviving Blakist forces in the Terran system resorted to fanatical scorched-earth tactics and suicide assaults that caused even more widespread destruction. The ancient cities of Berlin, Paris, and Rome on the European continent, Moscow, Tokyo, and New Delhi in Asia, Cairo in Africa, and much of the Eastern Megalopolis in North America, all suffered extensive damage from tactical nuclear weapons and heavy urban warfare. Hilton Head, the former command center for ComStar and the Word of Blake when they held sway over Terra, was destroyed in the fighting, along with five of the planet‘s surviving Castles Brian. When Devlin Stone established The Republic of the Sphere, he commissioned the reconstruction of the historic and critically damaged planetary capital, Geneva, to serve again—not just as the capital of Terra, but of the entire Republic. 
+
+In addition to Terra herself, colonies exist on the Terran lunar surface, and the fourth planet in the system, Mars. At the peak of the Star League, settlements also existed on Venus, the second world, and a major shipyard was placed orbiting Titan, a moon of the gas giant Saturn, but both of these worlds are once more void of human habitation. Venus gradually reverted to its hellish environment after the fall of the League, becoming totally uninhabitable once again by the close of the thirty-first century, and the Titan shipyards were destroyed during the Jihad. The capital cities of Luna and Mars are Luna City and Koryo, respectively, though Koryo was heavily damaged in the final days of the Word of Blake‘s reign.</desc>
 	</planet>
 	<planet>
 		<name>Terra Firma</name>
@@ -37312,7 +37399,7 @@ The Sol system contains multiple colonized planets, foremost are Mars and Venus.
 		<ycood>-33.9</ycood>
 		<faction>TA</faction>
 		<factionChange>
-			<date>2315-01-01</date>
+			<date>2316-01-01</date>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
@@ -37347,6 +37434,20 @@ The Sol system contains multiple colonized planets, foremost are Mars and Venus.
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.2</gravity>
+		<lifeForm>7</lifeForm>
+		<climate>3</climate>
+		<percentWater>79</percentWater>
+		<temperature>32</temperature>
+		<spectralClass>G</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>2</sysPos>
+		<satellite>Tybalt</satellite>
+		<landMass>Reniki</landMass>
+		<landMass>Rusalaia (Aserlitz)</landMass>
+		<desc>Blessed with huge tracts of untamed forests, extensive mineral resources, and mountainous reaches, Terra Firma, in many ways, was considered a twin to the nearby Capolla. Colonized jointly with Capolla by a collection of small corporations and independent homesteaders, trade between both worlds led to a prosperous and semisymbiotic relationship even before the formation of the Terran Hegemony and the Star League. This relationship worked so well that both worlds supported a strong and diverse economic and social base without the need for major military industries. In a deal brokered at the twin system‘s entry into the Hegemony, Terra agreed to a limited autonomy for both worlds—a policy that every successive power after the Hegemony assumed as well. In the chaos that erupted following the collapse of the Federated Commonwealth, much of Terra Firma‘s landscape and many cities were damaged by heavy fighting. The formation of the Terracap Confederation with Capolla helped Terra Firma to recover, but aid from the Word of Blake, in exchange for the right to place military bases and "defensive forces" on the planet before the Jihad, truly brought the planet‘s ravaged infrastructure back from the brink. Pledging a continued hands-off policy in the tiny alliance‘s political and business affairs, and their troops to the defense of both worlds, the Blakists earned the support—and, in some cases, fear—of the Terra Firma population. Taking a more active role in the rebuilding of Terra Firma, the Blakists managed to insinuate their agents into the planetary government, undercutting the local authority and instilling in the people an attitude of xenophobia and paranoia. When the Jihad was launched, many of Terra Firma‘s citizens joined with the Word of Blake to defend their world, until they realized the true horrors of the Blakist terror war swirling around them. Aided by Devlin Stone‘s forces during the liberation, the Terra Firmans helped drive off the Jihad fanatics, but at terrible cost to the planet‘s remaining cities and industry. Today, only the Okeenog Woodlands on the primary continent of Rusalaia are free from the scars of war. The capital city, Freinze, home also to the planet‘s single spaceport, is located on Rusalaia‘s northern coast, a scant few kilometers from the ruins of Aserlitz, the planet‘s previous capital, reduced to rubble by the Jihad and now a city-scale memorial to the victims of war. On Reniki, the smaller, equatorial continent east of Rusalia, Ballard-Dukempic Foods of Keid maintains a branch office in the city of Nystoll. A recovering industry with a history dating back to the glory days of the Star League, the foodstuffs supercorporation now oversees most of the farming and ranching industries that are once more on the rise in Reniki‘s open plains.</desc>
 	</planet>
 	<planet>
 		<name>Tetersen</name>
@@ -37632,7 +37733,7 @@ As the capital of the Lyran Commonwealth, Thakard is home to many vital parts of
 		<ycood>8.08</ycood>
 		<faction>TA</faction>
 		<factionChange>
-			<date>2315-01-01</date>
+			<date>2316-01-01</date>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
@@ -37648,7 +37749,7 @@ As the capital of the Lyran Commonwealth, Thakard is home to many vital parts of
 			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
-			<date>3072-02-01</date>
+			<date>3068-10-15</date>
 			<faction>WOB</faction>
 		</factionChange>
 		<factionChange>
@@ -37663,6 +37764,26 @@ As the capital of the Lyran Commonwealth, Thakard is home to many vital parts of
 			<date>3081-02-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.02</gravity>
+		<zenithCharge>True</zenithCharge>
+		<lifeForm>6</lifeForm>
+		<climate>3</climate>
+		<percentWater>74</percentWater>
+		<temperature>36</temperature>
+		<spectralClass>G</spectralClass>
+		<subtype>7</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>5</sysPos>
+		<socioIndustrial>A-A-B-B-B</socioIndustrial>
+		<satellite>Thorin's Twin</satellite>
+		<landMass></landMass>
+		<landMass></landMass>
+		<landMass></landMass>
+		<landMass>Freda</landMass>
+		<landMass>Olympus (Ecol City)</landMass>
+		<hpg>A</hpg>
+		<desc>3135 - An early colony world when humanity first reached for the stars, almost a thousand years ago, Thorin was a beautiful, terrestrial planet, blessed by an abundance of resources including rich mineral deposits, immense woodlands, and diverse animal life. To preserve their world‘s natural beauty against possible contamination by corporate industrialization, the early settlers established planetary zoning laws that restricted heavy industries to the northern continent of Olympus. By contrast, the southern continent, Freda, was reserved for those seeking a more agrarian way of life. As a result of this charter, high-tech cities came to dot the Olympian shoreline and riverways by the time of the Star League, while large agricultural communes and logging industries formed the backbone of the Fredan economy. The Terran Hegemony established Thorin as a jewel of education and learning when they built the massive University of Thorin, a liberal arts school, in the Remington Valley. Located a short distance away from Ecol City, the planetary capital and site of the legendary Public Library of Thorin, the University of Thorin held to the highest academic standards of the day, but was destroyed along with the Library during the planet‘s occupation by Amaris troops. Today, only the ruins of the university in the heart of what is now Remington Forest, the Library Monument outside Ecol City, and the remains of the massive Fortress Laiacona, a partially destroyed Star League Castle Brian, testify to the lost treasures of the Star League. Ironically, though the University and the Library were destroyed during the Amaris occupation before the collapse of the Star League, the fortress did not meet its fate until the Word of Blake Jihad, when Blakist agents unleashed a tactical thermonuclear weapon against the command post of the planetary militia. The similar devastation wrought on many of Thorin‘s Olympus cities forced much of the surviving population to relocate off-world or to Freda, which survived unscathed through two of the worst military campaigns to darken human history. Today, even though the majority of Thorin‘s population now lives on the more habitable continent of Freda or in small mining habitats in the system‘s asteroid field, and though most business is now conducted in the Fredan city of Port Sumpter, Ecol City on Olympus remains the planetary capital.</desc>
 	</planet>
 	<planet>
 		<name>Thraxa</name>
@@ -41692,7 +41813,7 @@ As a border world, Yed Posterior saw its fair share of raids and invasions durin
 		<ycood>21.39</ycood>
 		<faction>TA</faction>
 		<factionChange>
-			<date>2315-01-01</date>
+			<date>2316-01-01</date>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
@@ -41735,6 +41856,21 @@ As a border world, Yed Posterior saw its fair share of raids and invasions durin
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.12</gravity>
+		<lifeForm>5</lifeForm>
+		<climate>3</climate>
+		<percentWater>81</percentWater>
+		<temperature>40</temperature>
+		<spectralClass>F</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>1</sysPos>
+		<landMass>Khesan</landMass>
+		<landMass>Shokaku</landMass>
+		<landMass>Xu-Lai</landMass>
+		<landMass>Yokohama (Shenobi)</landMass>
+		<desc>3135 - A large world of large oceans, diverse wildlife, and a few veins of mineral resources, the biggest obstacles to the colonization of Yorii were the planet‘s stronger-than-average gravity, its native, territorial wildlife, and the fact that its soils did not support the majority of Terran food crops. None of these factors proved insurmountable to the early colonists, however, who simply learned to adapt and established thriving industrial and mining communities on three of Yorii‘s four island-continents. Heavy-metal deposits, some very deep below the planetary surface, and most accessible to off-shore drilling platforms, provided the basis of the planetary economy, while the few hybrid food crops that could be grown became the staples of the planet‘s mostly Asian population. On the continent of Yokohama, where the dominant native life-form, the Yoriian tiger-raptor, was most populous, the colonists built high walls around their settlements and farmlands, and began a hunting initiative that brought the bold reptilian predators under control within a decade. In the days of the Star League, Yorii‘s capital city, Neo-Tokyo, set on the shore of the planet‘s largest continent, Shokaku, was a haven for commercial trade between the Draconis Combine and the Terran Hegemony, and a healthy portion of the city's population claimed dual citizenship in both realms. During the Amaris crisis, the Usurper‘s troops used many of Yorii‘s larger cities and industrial complexes as battlefields when the SLDF came to liberate the planet, which ravaged the planet‘s economy and infrastructure, rendering millions homeless and millions more dead. Neo-Tokyo was left totally uninhabitable when the last of Amaris‘ holdouts deliberately sabotaged the fusion reactor that powered the city in an effort to distract the League troops while they made an escape attempt. The Draconis Combine easily assimilated Yorii after the fall of the League, establishing the planet as a forward base for raids against the Lyran Commonwealth, Capellan Confederation, and Federated Suns. Despite numerous punitive raids and the ravages of the Succession Wars, Yorii gradually managed to reclaim some of its former prosperity, only to lose it again when Word of Blake forces struck during the Jihad. Today, Yorii is a recovering world, its mining and manufacturing settlements only now reaching their pre-Jihad capacity, while farmlands poisoned by the Blakist troops still lie fallow. Each of the four populated continents—Shokaku in the south, Yokohama to its northeast, Khesan and Xu-Lai in the north—now support a handful of major cities, with the new capital city of Shenobi on Yokohama.</desc>
 	</planet>
 	<planet>
 		<name>York</name>
