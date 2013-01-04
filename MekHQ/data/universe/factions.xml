@@ -401,7 +401,7 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 		<startingPlanet>Andurien,Andurien,Andurien,Andurien,Andurien,Andurien,Andurien,Andurien,Andurien,</startingPlanet>
 		<eraMods>0,0,0,1,2,3,1,1,0</eraMods>
 		<nameGenerator>FWL</nameGenerator>
-		<colorRGB>165,94,160</colorRGB>
+		<colorRGB>148,148,255</colorRGB>
 		<periphery>false</periphery>
 		<clan>false</clan>
 	</faction>

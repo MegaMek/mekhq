@@ -1425,6 +1425,14 @@ Alhena was largely overlooked throughout the Age of War and the Star League era.
 			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
+            <date>3039-07-06</date>
+            <faction>FWL,LA</faction>
+        </factionChange>
+        <factionChange>
+            <date>3039-07-13</date>
+            <faction>LA</faction>
+        </factionChange>
+		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
 		</factionChange>
@@ -2132,6 +2140,14 @@ The capital city, Gaines, located on the southern polar continent of Tanzaria, i
 		<xcood>-2.87</xcood>
 		<ycood>-265.76</ycood>
 		<faction>CC</faction>
+		<factionChange>
+            <date>3030-11-01</date>
+            <faction>DA,CC</faction>
+        </factionChange>
+        <factionChange>
+            <date>3030-11-15</date>
+            <faction>CC</faction>
+        </factionChange>
 	</planet>
 	<planet>
 		<name>Alula Australis</name>
@@ -2434,6 +2450,22 @@ The capital city and commercial center of Alya, LeSabrea, is located on Paroasis
 		<xcood>-3.39</xcood>
 		<ycood>-389.9</ycood>
 		<faction>CC</faction>
+		<factionChange>
+            <date>3030-12-16</date>
+            <faction>MOC,CC</faction>
+        </factionChange>
+        <factionChange>
+            <date>3030-12-22</date>
+            <faction>MOC</faction>
+        </factionChange>
+        <factionChange>
+            <date>3034-08-09</date>
+            <faction>CC,MOC</faction>
+        </factionChange>
+        <factionChange>
+            <date>3034-08-15</date>
+            <faction>CC</faction>
+        </factionChange>
 	</planet>
 	<planet>
 		<name>Andiron</name>
@@ -2480,6 +2512,18 @@ The capital city and commercial center of Alya, LeSabrea, is located on Paroasis
 			<date>2790-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
+		<factionChange>
+            <date>3030-09-11</date>
+            <faction>DA</faction>
+        </factionChange>
+        <factionChange>
+            <date>3039-04-25</date>
+            <faction>FWL,DA</faction>
+        </factionChange>
+        <factionChange>
+            <date>3040-01-01</date>
+            <faction>FWL</faction>
+        </factionChange>
 		<spectralClass>G</spectralClass>
 		<subtype>0</subtype>
 		<luminosity>V</luminosity>
@@ -5296,6 +5340,14 @@ The capital city and primary spaceport of Baxter, Cleopolis, is located on the n
 		<xcood>-7.04</xcood>
 		<ycood>-235.76</ycood>
 		<faction>CC</faction>
+		<factionChange>
+            <date>3032-01-19</date>
+            <faction>DA,CC</faction>
+        </factionChange>
+        <factionChange>
+            <date>3032-03-02</date>
+            <faction>CC</faction>
+        </factionChange>
 	</planet>
 	<planet>
 		<name>Berenson</name>
@@ -5398,6 +5450,14 @@ The capital city and primary spaceport of Baxter, Cleopolis, is located on the n
 		<xcood>5.74</xcood>
 		<ycood>-309.57</ycood>
 		<faction>CC</faction>
+		<factionChange>
+            <date>3030-12-02</date>
+            <faction>MOC,CC</faction>
+        </factionChange>
+        <factionChange>
+            <date>3032-05-23</date>
+            <faction>CC</faction>
+        </factionChange>
 		<spectralClass>M</spectralClass>
 		<subtype>2</subtype>
 		<luminosity>I</luminosity>
@@ -6955,6 +7015,18 @@ Buena was settled primarily by a mix of Latin-European colonists, who have retai
 		<xcood>18.26</xcood>
 		<ycood>-345.04</ycood>
 		<faction>CC</faction>
+		<factionChange>
+            <date>3031-11-01</date>
+            <faction>DA</faction>
+        </factionChange>
+        <factionChange>
+            <date>3034-06-05</date>
+            <faction>DA,CC</faction>
+        </factionChange>
+        <factionChange>
+            <date>3034-07-17</date>
+            <faction>CC</faction>
+        </factionChange>
 		<spectralClass>G</spectralClass>
 		<subtype>8</subtype>
 		<luminosity>V</luminosity>
@@ -7170,10 +7242,14 @@ Recently, a large island in the eastern basin has been taken over for secret tes
 		<name>Callison</name>
 		<xcood>-63.11</xcood>
 		<ycood>-15.13</ycood>
-		<faction>TA</faction>
+		<faction>FoS</faction>
 		<factionChange>
-			<date>2315-01-01</date>
-			<faction>TH</faction>
+			<date>2330-01-01</date>
+			<faction>FWL</faction>
+		</factionChange>
+		<factionChange>
+			<date>2570-01-01</date>
+			<faction>FWL,TH</faction>
 		</factionChange>
 		<factionChange>
 			<date>2790-01-01</date>
@@ -7183,6 +7259,22 @@ Recently, a large island in the eastern basin has been taken over for secret tes
 			<date>3030-01-01</date>
 			<faction>LA</faction>
 		</factionChange>
+		<factionChange>
+            <date>3039-08-02</date>
+            <faction>FWL,LA</faction>
+        </factionChange>
+        <factionChange>
+            <date>3039-08-05</date>
+            <faction>FWL</faction>
+        </factionChange>
+        <factionChange>
+            <date>3039-08-15</date>
+            <faction>LA,FWL</faction>
+        </factionChange>
+        <factionChange>
+            <date>3039-08-20</date>
+            <faction>LA</faction>
+        </factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -7207,6 +7299,20 @@ Recently, a large island in the eastern basin has been taken over for secret tes
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>2</sysPos>
+		<gravity>0.99</gravity>
+		<pressure>3</pressure>
+		<temperature>33</temperature>
+		<percentWater>84</percentWater>
+		<climate>3</climate>
+		<lifeForm>7</lifeForm>
+		<satellite>Yngve</satellite>
+		<landMass>Grayle (Fallosha)</landMass>  
+		<landMass>Vantassa</landMass>  
+		<desc>3135 - Callison possesses abundant water, mineral, and agricultural resources. It was originally colonized by the Federation of Skye in the early period of mankind's colonization of the stars before the heavily urbanized and industrialized world was claimed by the Free World League during the Age of War. During the Star League era, Callison was a key border world and trading hub, jointly administered by the Free World League and the Terran Hegemony. After the Amaris Crisis and the collapse of the Star League, Callison reverted to full control by the Free World League. In 2966, Callison joined with other nearby worlds to form the Silver Hawks Coalition to co-ordinate defences against Lyran Commonwealth raids and invasions. Callison remained part of the Free World League throughout the Succession Wars inspite of heavy fighting that devastated many major cities until Lyran Commonwealth mercenaries finally seized the world with a decisive battle at Fallosha, the capital city during the Fourth Succession War. Operation Guerrero resulted in the Free World League recapturing Callison once more. When the Word of Blake Jihad erupted in 3067, the Free World League was initially spared. However, the Word of Blaket eventually attacked, and Callison suffered from a massed assault by mercenary ‘Mech forces. Fortunately, Callison was spared the atrocities committed elsewhere and the world recovered under Republic of the Sphere proved easier than most.</desc>
 	</planet>
 	<planet>
 		<name>Callisto V</name>
@@ -7500,6 +7606,14 @@ Camlann itself is barely able to sustain itself, the primarily industry and expo
 		<xcood>38.86</xcood>
 		<ycood>-175.26</ycood>
 		<faction>CC</faction>
+		<factionChange>
+            <date>3039-08-13</date>
+            <faction>FWL,CC</faction>
+        </factionChange>
+        <factionChange>
+            <date>3039-08-15</date>
+            <faction>CC</faction>
+        </factionChange>
 		<pressure>3</pressure>
 		<gravity>1.02</gravity>
 		<nadirCharge>True</nadirCharge>
@@ -7767,6 +7881,14 @@ The majority of the population is located on the continent of Worrsetgard, which
 		<xcood>28.69</xcood>
 		<ycood>-266.8</ycood>
 		<faction>CC</faction>
+		<factionChange>
+            <date>3031-09-05</date>
+            <faction>DA,CC</faction>
+        </factionChange>
+        <factionChange>
+            <date>3031-09-23</date>
+            <faction>CC</faction>
+        </factionChange>
 	</planet>
 	<planet>
 		<name>Carmichael</name>
@@ -7857,7 +7979,11 @@ The planets primary industries and exports are plastics and plastisteel using th
 		<name>Carsphairn</name>
 		<xcood>-97.02</xcood>
 		<ycood>39.38</ycood>
-		<faction>LA</faction>
+		<faction>FoS</faction>
+		<factionChange>
+			<date>2341-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -7870,6 +7996,29 @@ The planets primary industries and exports are plastics and plastisteel using th
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<spectralClass>K</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>3</sysPos>
+		<gravity>1.17</gravity>
+		<pressure>3</pressure>
+		<climate>3</climate>
+		<temperature>33</temperature>
+		<percentWater>77</percentWater>
+		<lifeForm>7</lifeForm>
+		<satellite>Ammon</satellite>
+		<satellite>Jael</satellite>
+		<satellite>Zayit</satellite>
+		<landMass>Basallia</landMass>
+		<landMass>Gillinia (Narcisse)</landMass>  
+		<landMass>North Teslia</landMass>  
+		<landMass>South Teslia</landMass>  
+		<landMass>Yddrig</landMass>  
+		<desc>3135 - Carsphairn is blessed with striking and varied landscapes but cursed with violent weather systems, largely the result of the pull of three large moons. The weather varies from continuous, weeks-long spring and autumn downpours to frequent tornadoes in the summer, and crippling blizzards and ice storms in the winter. To withstand the effects of the storms, the locals built their structures low, and erected protective domes over many of their farms. Carsphairn's fertile soil sustain hybrid Terran crops and local animals. While mineral wealth has allowed for a rudimentary level of industrialization and exports. Narcisse, the planetary capital, is located on the primary continent of Gillinia. Narcisse has a large seaport as well as a spaceport, linking travelers to the other four main landmasses of Basallia, North Teslia, South Teslia, and Yddrig.
+
+Located securely inside the Federation of Skye, Carsphairn was largely overlooked during the Succession Wars. The local government was easily swayed to join the Free Skye movement as the population saw the Lyran government as even more intrusive than Skye worlds that bordered hostile neighbors. 
+
+During the Jihad, Carsphairn was raided several times by Word of Blake forces as it was an easy stop for foodstuffs to sustain their longer campaigns. This strategy forced the stationing of a permanent garrison of a mix of Lyran, Combine, and Clan Wolf warriors in the latter half of the war. Since becoming a member-world of the Republic of the Sphere, many of these garrison troops became part of Prefecture VIII militia remain on Carsphairn.</desc>
 	</planet>
 	<planet>
 		<name>Carstairs</name>
@@ -8426,6 +8575,14 @@ The capital city of Chahar is Benares, which is considered sacred to Lyran Hindu
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
+            <date>3039-04-05</date>
+            <faction>FWL,FS</faction>
+        </factionChange>
+        <factionChange>
+            <date>3039-04-08</date>
+            <faction>FS</faction>
+        </factionChange>
+		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
 		</factionChange>
@@ -8518,17 +8675,33 @@ The capital city of Chahar is Benares, which is considered sacred to Lyran Hindu
 			<faction>WOB</faction>
 		</factionChange>
 		<factionChange>
-			<date>3077-09-10</date>
+			<date>3077-09-16</date>
 			<faction>Stone,CWIE,WOB</faction>
 		</factionChange>
 		<factionChange>
-			<date>3077-10-14</date>
+			<date>3077-11-12</date>
 			<faction>Stone</faction>
 		</factionChange>
 		<factionChange>
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>3</sysPos>
+		<gravity>1.0</gravity>
+		<pressure>3</pressure>
+		<climate>3</climate>
+		<temperature>37</temperature>
+		<percentWater>80</percentWater>
+		<lifeForm>7</lifeForm>
+		<landMass>Azula (Farhaven)</landMass>  
+		<landMass>Verdez</landMass>  
+		<landMass>Rojia</landMass>  
+		<desc>3135 - Chara, also known as Pacifica, has a weather system that is in constant turmoil due to planet's fast rotation, a fourteen standard hour day, and its lack of a moon to slow the rotation down. Clear skies will suddenly change to rain or thunderstorms that rage across the temperate coastal regions, while fierce blizzards and punishing downpours of freezing rain frequent the northern and southern latitudes. Following settlement, the planet soon became an agricultural paradise. Starpad, is the largest agriplex on the planet, situated just 150 kilometers south of Farhaven, the planetary capital, on the northern Azula continent. In addition to Azula and the nearby continent of Verdez, a third continent, Rojia is mostly unpopulated, and straddles the planetary equator. Rojia's location and mountainous coastlines minimize the effects of the worst weather systems, however its interior reaches are almost all desert and badlands.
+
+During the Succession Wars, the exports from Starpad to agriculturally poorer neighbours prompted a permanent garrison of a full battalion of troops. Despite the garrison, many Draconis Combine raids were launched against Chara. The worst of the fighting occurred on the eve of the Fourth Succession War, when the planet was briefly invaded by Combine forces and the defended by the Kell Hounds mercenary regiment. During the Jihad, Word of Blake agents attempted to poison the Starpad agriplex over the course of several raids, but they were thwarted by local defenders and a few alert civilians. The attack did destroy several crops on Verdez, though these were restored shortly after Chara became a holding of The Republic of the Sphere.</desc>
 	</planet>
 	<planet>
 		<name>Charity</name>
@@ -8655,6 +8828,24 @@ The capital city of Chahar is Benares, which is considered sacred to Lyran Hindu
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<pressure>2</pressure>
+		<gravity>0.67</gravity>
+		<lifeForm>2</lifeForm>
+		<climate>4</climate>
+		<percentWater>16</percentWater>
+		<temperature>39</temperature>
+		<spectralClass>A</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>1</sysPos>
+		<satellite>Osei</satellite>
+		<satellite>Pelipa</satellite>
+		<landMass>(Theleopolis)</landMass>
+		<desc>3135 - Chertan is a water-poor world, blasted by a hot, white star. However, abundant mineral and metallurgical resources supported the founding of several settlements based around mining, refining, and manufacturing operations, despite the lack of arable land. The growth of nearby agricultural worlds and trade saw Chertan prosper from its export of raw materials and heavy machinery, and continued to do so until after the fall of the Star League. Theleopolis, the planetary capital and primary spaceport of Chertan, is located in the southern hemisphere just south of the Huron Sea. New Pittsburgh is located near the Eerie Sea, the northernmost of Chertan‘s three large bodies of water. Altonia, the third largest city after Theleopolis and New Pittsburgh, is located near the eastern edge of the Ontario Sea. Altonia is home to Artista Chemicals, Chertan‘s largest mineral mining and refining operation.
+
+During the Succession Wars, Chertan was part of the Marik Principality of the Free World League. It was the target of many Lyran Commonwealth attacks. The invasions and raids disrupted off-world trade and decimated the few farms the planet could support and many of the industrial centres, leading to several food riots, one of which led to the dismissal of the planetary viscount in 2820. 
+
+During the Jihad, mercenaries employed by the Word of Blake savaged several mining towns and obliterated the spaceport at New Pittsburgh. Despite the damage, the planetary infrastructure and economy recovered following the influx of new residents relocated to Chertan under Devlin Stone‘s Relocation Act.</desc>
 	</planet>
 	<planet>
 		<name>Chesterton</name>
@@ -9401,6 +9592,26 @@ This led to a very hostile environment by the mid 3020s with many residents just
 			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
+		<factionChange>
+            <date>3030-09-11</date>
+            <faction>DA</faction>
+        </factionChange>
+        <factionChange>
+            <date>3035-10-02</date>
+            <faction>FWL,DA</faction>
+        </factionChange>
+        <factionChange>
+            <date>3035-10-08</date>
+            <faction>DA</faction>
+        </factionChange>
+        <factionChange>
+            <date>3038-11-09</date>
+            <faction>FWL,DA</faction>
+        </factionChange>
+        <factionChange>
+            <date>3039-03-10</date>
+            <faction>FWL</faction>
+        </factionChange>
 	</planet>
 	<planet>
 		<name>Conroe</name>
@@ -9434,15 +9645,27 @@ This led to a very hostile environment by the mid 3020s with many residents just
 		<name>Cor Caroli</name>
 		<xcood>-62.85</xcood>
 		<ycood>15.65</ycood>
-		<faction>TA</faction>
+		<faction>FoS</faction>
 		<factionChange>
-			<date>2315-01-01</date>
-			<faction>TH</faction>
-		</factionChange>
-		<factionChange>
-			<date>2790-01-01</date>
+			<date>2341-01-01</date>
 			<faction>LA</faction>
 		</factionChange>
+		<factionChange>
+			<date>2570-01-01</date>
+			<faction>LA,TH</faction>
+		</factionChange>
+		<factionChange>
+			<date>2780-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+            <date>3039-07-25</date>
+            <faction>FWL,LA</faction>
+        </factionChange>
+        <factionChange>
+            <date>3039-08-25</date>
+            <faction>LA</faction>
+        </factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -9467,6 +9690,27 @@ This led to a very hostile environment by the mid 3020s with many residents just
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.11</gravity>
+		<lifeForm>5</lifeForm>
+		<climate>3</climate>
+		<percentWater>71</percentWater>
+		<temperature>50</temperature>
+		<spectralClass>A</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>VI</luminosity>
+		<sysPos>2</sysPos>
+		<landMass>Carboniri</landMass>
+		<landMass>Ferrini (Corriolas)</landMass>
+		<landMass>Nikallini</landMass>
+		<landMass>Pluribi</landMass>
+		<desc>3135 - The primary star in the Cor Caroli system is a white-hot A-class subdwarf. All the planets in the Cor Caroli system orbit the cooler, more stable F0-class secondary star. The effects of the unstable subdwarf can still be felt on the planets, with bursts of electromagnetic radiation frequently disrupting local communications and spaceborne navigational systems. With a breathable atmosphere, a biosphere suitable to human habitation, as well as a planetary surface and expansive asteroid ring that were both rich in minerals, Cor Caroli quickly attracted entrepreneurial colonists. Several early settlements on the northeastern Carboniri continent were lost in an a failed effort to transport some of the smaller iron- and nickel-rich asteroids to the surface, using specially modified mass drivers. This disaster resulted in several decades of a "mild nuclear winter". Despite this, Cor Caroli continued to expand and further industrialize, attracting the attention of the growing Federation of Skye and the Terran Hegemony.
+
+By the time of the Star League, Cor Caroli was a border world jointly administered by the Lyran Commonwealth and the Terran Hegemony.  The Lyran Commonwealth easily absorbed the planet after the Star League's collapse. 
+
+During the Succession Wars, Cor Caroli was raided several times by the Free World League and the Draconis Combine, damaging many of the local industries and mining operations. Despite efforts to repair these, by the mid-thirty-first century, roughly twenty percent of the planet's industry had been irrevocably lost. The Word of Blake annexed Cor Caroli during the Jihad, however unlike many planets this occurred peacefully.The planet was recaptured by Operation SCOUR in January of 3077.
+
+Corriolas, Cor Caroli's capital and largest city, is located on the northwestern continent of Ferrini. Caroli Mining Consortium, the largest of the planet's industrial mining corporations, is based in Maureen, the largest city on the southern continent of Nikallini. Cor Caroli‘s fourth landmass, the southern polar continent of Pluribi, is virtually uninhabited.</desc>
 	</planet>
 	<planet>
 		<name>Coraines</name>
@@ -9939,6 +10183,18 @@ Coventry’s mineral, agricultural, and military economy is supplemented by a th
 			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
+		<factionChange>
+			<date>3030-09-11</date>
+			<faction>DA</faction>
+		</factionChange>
+        <factionChange>
+            <date>3036-12-04</date>
+            <faction>FWL,DA</faction>
+        </factionChange>
+        <factionChange>
+            <date>3037-05-21</date>
+            <faction>FWL</faction>
+        </factionChange>
 	</planet>
 	<planet>
 		<name>Cusset</name>
@@ -10909,7 +11165,11 @@ The continent of Baten is home to the capital of Cetus and is located in the nor
 		<ycood>-1.83</ycood>
 		<faction>TA</faction>
 		<factionChange>
-			<date>2315-01-01</date>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2596-01-01</date>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
@@ -10929,6 +11189,14 @@ The continent of Baten is home to the capital of Cetus and is located in the nor
 			<faction>FWL</faction>
 		</factionChange>
 		<factionChange>
+			<date>3067-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3068-09-01</date>
+			<faction>FWL</faction>
+		</factionChange>
+		<factionChange>
 			<date>3072-02-01</date>
 			<faction>WOB</faction>
 		</factionChange>
@@ -10944,6 +11212,22 @@ The continent of Baten is home to the capital of Cetus and is located in the nor
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.13</gravity>
+		<lifeForm>7</lifeForm>
+		<climate>2</climate>
+		<percentWater>67</percentWater>
+		<temperature>18</temperature>
+		<spectralClass>K</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>5</sysPos>
+		<landMass>Neurasia</landMass>
+		<landMass>Slovakia (St. Cameron)</landMass>
+		<landMass>Zadipos</landMass>
+		<desc>3135 - Denebola V, also known as Everwood or Lyracropis, is a cool world with untouched woodlands covering almost eighty percent of its equatorial and tropical zones. Three large landmasses straddle these regions, Neurasia, Zadipos, and Slovakia.  Most of the population live in cities sited along the winding rivers that cut through the forested lands. The northern and southern regions, are virtually devoid of life, as polar caps extend well into the temperate zones. Denebola was the first of the early Terran colonies to declare its independence from the Alliance, before becoming part of the Terran Hegemony. After the fall of the Star League, Denebola, due to its position on the border of the Lyran Commonwealth and the Free Worlds League, changed ownership a number of times through the centuries. 
+
+The influx of off-world immigrants with each change of ownership, mixed with the planet's past, has resulted in a cosmopolitan melting pot that made Denebola an ideal choice for a Prefecture capital when it became part of The Republic of the Sphere. Fallen Star, the continental capital of Zadipos,  is nestled on the western coast and is home to a thriving fishing community and regional defense post. New Bonn covers the entire northern edge of the large inland Lake Diamond on Neurasia, and maintains several prime logging and farming industries. The official planetary capital, St. Cameron, is located on the eastern Rhyde Peninsula of Slovakia, and is home not only to Denebola‘s largest spaceport, but also the Prefecture capital building and headquarters of the planetary militia.</desc>
 	</planet>
 	<planet>
 		<name>Denizli</name>
@@ -11626,6 +11910,22 @@ Franchelco, the planetary capital city on the northern continent of Vijave, but 
 		<xcood>31.56</xcood>
 		<ycood>-373.2</ycood>
 		<faction>CC</faction>
+		<factionChange>
+            <date>3030-10-13</date>
+            <faction>DA,CC</faction>
+        </factionChange>
+        <factionChange>
+            <date>3031-08-03</date>
+            <faction>DA</faction>
+        </factionChange>
+        <factionChange>
+            <date>3032-03-02</date>
+            <faction>CC,DA</faction>
+        </factionChange>
+        <factionChange>
+            <date>3032-04-01</date>
+            <faction>CC</faction>
+        </factionChange>
 		<spectralClass>F</spectralClass>
         <subtype>2</subtype>
         <luminosity>V</luminosity>
@@ -11652,17 +11952,17 @@ Franchelco, the planetary capital city on the northern continent of Vijave, but 
 		<name>Dubhe</name>
 		<xcood>-71.2</xcood>
 		<ycood>-16.17</ycood>
-		<faction>TA</faction>
+		<faction>FWL</faction>
 		<factionChange>
-			<date>2315-01-01</date>
-			<faction>TH</faction>
+			<date>2570-01-01</date>
+			<faction>FWL,TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2790-01-01</date>
+			<date>2780-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
 		<factionChange>
-			<date>3072-02-01</date>
+			<date>3070-08-01</date>
 			<faction>WOB</faction>
 		</factionChange>
 		<factionChange>
@@ -11677,6 +11977,25 @@ Franchelco, the planetary capital city on the northern continent of Vijave, but 
 			<date>3081-01-01</date>
 			<faction>ROS</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.05</gravity>
+		<lifeForm>4</lifeForm>
+		<climate>3</climate>
+		<percentWater>88</percentWater>
+		<temperature>22</temperature>
+		<spectralClass>K</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>III</luminosity>
+		<spectralClass>F</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>7</sysPos>
+		<landMass>Holidius (Greenwich)</landMass>
+		<desc>3135 - Dubhe, once known as Alpha Ursae Majoris, is a binary system blessed by an inhabitable world. Dubhe revolves around the outer star, a pale yellow sun that orbits a cooler orange giant once every forty-four Terran years. The orbit of Dubhe is elongated as it passes between the binary suns, these periods produces warmer-than-average summers for a world that is overall quite cool with harsh winters. As a result, every two decades Dubhe's polar caps begin a period of rapid melting that causes ocean levels worldwide rise by as much as one or two meters and wide-scale flooding. The intensity of the "super-summer" seasons and the melting of the polar caps has increased over the centuries. This has been attributed to the effects of centuries of mining and industrialization rather than to the planet's subtly growing distance from its primary sun in favor of the secondary.
+
+The first colonists of Dubhe were drawn by the abundance of minerals and arable land, and placed many of their settlements on the coastal regions of the planet's single, equatorial landmass, Holidius. These early settlements were lost to the flooding damage during the "super-summer" seasons. Since then, most of Dubhe‘s large population centers have been moved to higher elevations well inland.
+
+During the Star League era, Dubhe was a border world jointly administered by the Terran Hegemony and the Free World League, and was easily absorbed by the Free World League after the collapse of the Star League. Dubhe suffered from heavy raiding and the occasional planetary invasion, which demolished much of its local industry. During the Word of Blake Jihad, mercenaries employed by the Word of Blake assaulted Dubhe, nearly leveling the capital city of Greenwich in a battle with local militia forces. After being ceded to the Republic of the Sphere, Greenwich was rebuilt, and many of the decimated mining and manufacturing centers have been restored.</desc>
 	</planet>
 	<planet>
 		<name>Dukambia</name>
@@ -13807,6 +14126,14 @@ During the Capellan-Republic war, Foot Fall was the center of some of the fierce
 		<xcood>-6</xcood>
 		<ycood>-253.76</ycood>
 		<faction>CC</faction>
+		<factionChange>
+            <date>3030-11-26</date>
+            <faction>DA,CC</faction>
+        </factionChange>
+        <factionChange>
+            <date>3031-01-01</date>
+            <faction>CC</faction>
+        </factionChange>
 	</planet>
 	<planet>
 		<name>Fuentes</name>
@@ -15154,6 +15481,14 @@ The capital city, Dunkeld, a sprawling metropolis as big as any capital on a maj
 		<xcood>46.42</xcood>
 		<ycood>-301.48</ycood>
 		<faction>CC</faction>
+		<factionChange>
+            <date>3030-09-29</date>
+            <faction>DA,CC</faction>
+        </factionChange>
+        <factionChange>
+            <date>3031-04-17</date>
+            <faction>CC</faction>
+        </factionChange>
 		<zenithCharge>True</zenithCharge>
 		<lifeForm>5</lifeForm>
 		<spectralClass>G</spectralClass>
@@ -15553,6 +15888,14 @@ In the 31st century Greeley gained some importance as the Federated Suns establi
 		<xcood>39.64</xcood>
 		<ycood>-386.51</ycood>
 		<faction>CC</faction>
+		 <factionChange>
+            <date>3030-11-09</date>
+            <faction>MOC,CC</faction>
+        </factionChange>
+        <factionChange>
+            <date>3032-07-09</date>
+            <faction>CC</faction>
+        </factionChange>
 	</planet>
 	<planet>
 		<name>Gunzburg</name>
@@ -15804,8 +16147,24 @@ In the 31st century Greeley gained some importance as the Federated Suns establi
 		</factionChange>
 		<factionChange>
 			<date>3032-01-01</date>
-			<faction>FC</faction>
+			<faction>FS</faction>
 		</factionChange>
+		<factionChange>
+            <date>3039-12-12</date>
+            <faction>FWL,FS</faction>
+        </factionChange>
+        <factionChange>
+            <date>3039-12-15</date>
+            <faction>FWL</faction>
+        </factionChange>
+        <factionChange>
+            <date>3039-12-24</date>
+            <faction>FS,FWL</faction>
+        </factionChange>
+        <factionChange>
+            <date>3040-01-01</date>
+            <faction>FC</faction>
+        </factionChange>
 		<factionChange>
 			<date>3057-11-01</date>
 			<faction>CM</faction>
@@ -16222,6 +16581,14 @@ During their Holy War, the Blakists found ready converts among the technological
 			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
+		<factionChange>
+            <date>3035-11-23</date>
+            <faction>LA,FWL</faction>
+        </factionChange>
+        <factionChange>
+            <date>3035-11-29</date>
+            <faction>FWL</faction>
+        </factionChange>
 	</planet>
 	<planet>
 		<name>Hartshill</name>
@@ -16843,6 +17210,14 @@ The planet and the factories have been the target of invasion numerous times thr
 		<xcood>31.3</xcood>
 		<ycood>-235.24</ycood>
 		<faction>CC</faction>
+		<factionChange>
+            <date>3031-02-26</date>
+            <faction>DA,CC</faction>
+        </factionChange>
+        <factionChange>
+            <date>3031-03-14</date>
+            <faction>CC</faction>
+        </factionChange>
 	</planet>
 	<planet>
 		<name>Hickok</name>
@@ -17410,8 +17785,20 @@ The planet and the factories have been the target of invasion numerous times thr
 		</factionChange>
 		<factionChange>
 			<date>3032-01-01</date>
-			<faction>FC</faction>
+			<faction>FS</faction>
 		</factionChange>
+		<factionChange>
+            <date>3039-07-15</date>
+            <faction>FS,FWL</faction>
+        </factionChange>
+        <factionChange>
+            <date>3039-08-16</date>
+            <faction>FS</faction>
+        </factionChange>
+        <factionChange>
+            <date>3040-01-01</date>
+            <faction>FC</faction>
+        </factionChange>
 		<factionChange>
 			<date>3057-11-01</date>
 			<faction>CM</faction>
@@ -17662,6 +18049,14 @@ Hunan was relatively peaceful throughout its history and did not see any militar
 		<xcood>55.55</xcood>
 		<ycood>-247.76</ycood>
 		<faction>CC</faction>
+		<factionChange>
+            <date>3031-05-09</date>
+            <faction>DA,CC</faction>
+        </factionChange>
+        <factionChange>
+            <date>3031-05-15</date>
+            <faction>CC</faction>
+        </factionChange>
 	</planet>
 	<planet>
 		<name>Hyalite</name>
@@ -18076,6 +18471,14 @@ Trunner, the largest city and planetary capital, is home to Imbross AeroTech Ind
 		<xcood>-5.22</xcood>
 		<ycood>-173.69</ycood>
 		<faction>CC</faction>
+		<factionChange>
+            <date>3031-03-12</date>
+            <faction>DA,CC</faction>
+        </factionChange>
+        <factionChange>
+            <date>3031-03-23</date>
+            <faction>CC</faction>
+        </factionChange>
 		<pressure>3</pressure>
 		<gravity>1.01</gravity>
 		<nadirCharge>True</nadirCharge>
@@ -18098,6 +18501,18 @@ Trunner, the largest city and planetary capital, is home to Imbross AeroTech Ind
 		<xcood>-88.93</xcood>
 		<ycood>-347.12</ycood>
 		<faction>FWL</faction>
+		<factionChange>
+            <date>3030-09-11</date>
+            <faction>DA</faction>
+        </factionChange>
+        <factionChange>
+            <date>3036-01-04</date>
+            <faction>FWL,DA</faction>
+        </factionChange>
+        <factionChange>
+            <date>3036-01-23</date>
+            <faction>FWL</faction>
+        </factionChange>
 	</planet>
 	<planet>
 		<name>Ingress</name>
@@ -18557,6 +18972,22 @@ Apart from the planetary capital of Promise Point, Izar boasts a second major sp
 		<xcood>13.04</xcood>
 		<ycood>-385.98</ycood>
 		<faction>CC</faction>
+		<factionChange>
+            <date>3030-12-12</date>
+            <faction>MOC,CC</faction>
+        </factionChange>
+        <factionChange>
+            <date>3030-12-19</date>
+            <faction>MOC</faction>
+        </factionChange>
+        <factionChange>
+            <date>3033-04-16</date>
+            <faction>CC,MOC</faction>
+        </factionChange>
+        <factionChange>
+            <date>3033-04-27</date>
+            <faction>CC</faction>
+        </factionChange>
 	</planet>
 	<planet>
 		<name>Jacson</name>
@@ -18625,6 +19056,14 @@ Apart from the planetary capital of Promise Point, Izar boasts a second major sp
 		<xcood>-31.3</xcood>
 		<ycood>-203.85</ycood>
 		<faction>CC</faction>
+		<factionChange>
+            <date>3031-05-17</date>
+            <faction>DA,CC</faction>
+        </factionChange>
+        <factionChange>
+            <date>3031-05-27</date>
+            <faction>CC</faction>
+        </factionChange>
 	</planet>
 	<planet>
 		<name>Jatznik</name>
@@ -21110,6 +21549,14 @@ The planet itself is resource poor and has little to offer for export. However, 
 			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
+		<factionChange>
+            <date>3032-07-10</date>
+            <faction>DA</faction>
+        </factionChange>
+        <factionChange>
+            <date>3036-01-01</date>
+            <faction>FWL</faction>
+        </factionChange>
 	</planet>
 	<planet>
 		<name>Kurhah</name>
@@ -21667,6 +22114,14 @@ Aside from the large island continent of Galapagos in the northern hemisphere of
 		<xcood>10.69</xcood>
 		<ycood>-296.27</ycood>
 		<faction>CC</faction>
+		<factionChange>
+            <date>3032-06-13</date>
+            <faction>DA,CC</faction>
+        </factionChange>
+        <factionChange>
+            <date>3032-06-15</date>
+            <faction>CC</faction>
+        </factionChange>
 	</planet>
 	<planet>
 		<name>Launam</name>
@@ -21888,6 +22343,14 @@ Aside from the large island continent of Galapagos in the northern hemisphere of
 			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
+		<factionChange>
+            <date>3039-08-06</date>
+            <faction>CC,FWL</faction>
+        </factionChange>
+        <factionChange>
+            <date>3039-08-12</date>
+            <faction>FWL</faction>
+        </factionChange>
 		<spectralClass>F</spectralClass>
 		<subtype>5</subtype>
 		<luminosity>II</luminosity>
@@ -21994,6 +22457,18 @@ The primary industry on Les Halles is the extraction and refining of fuel used i
 		<xcood>-71.72</xcood>
 		<ycood>-349.99</ycood>
 		<faction>FWL</faction>
+		  <factionChange>
+            <date>3030-09-11</date>
+            <faction>DA</faction>
+        </factionChange>
+        <factionChange>
+            <date>3036-04-08</date>
+            <faction>FWL,DA</faction>
+        </factionChange>
+        <factionChange>
+            <date>3036-05-01</date>
+            <faction>FWL</faction>
+        </factionChange>
 	</planet>
 	<planet>
 		<name>Leyland</name>
@@ -22390,6 +22865,18 @@ The primary industry on Les Halles is the extraction and refining of fuel used i
 			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
+		<factionChange>
+            <date>3030-09-11</date>
+            <faction>DA</faction>
+        </factionChange>
+        <factionChange>
+            <date>3038-08-12</date>
+            <faction>FWL,DA</faction>
+        </factionChange>
+        <factionChange>
+            <date>3038-10-21</date>
+            <faction>FWL</faction>
+        </factionChange>
 		<pressure>3</pressure>
 		<gravity>0.85</gravity>
 		<nadirCharge>True</nadirCharge>
@@ -22738,6 +23225,14 @@ The continents of Sorania and Padawa are mostly temperate and are the sites of t
 			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
+		<factionChange>
+            <date>3030-09-11</date>
+            <faction>DA</faction>
+        </factionChange>
+        <factionChange>
+            <date>3039-05-01</date>
+            <faction>FWL</faction>
+        </factionChange>
 	</planet>
 	<planet>
 		<name>Lushann</name>
@@ -23493,6 +23988,14 @@ Most of the population lives in small cities dotting the 4 continents.  There ar
 			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
+            <date>3039-09-10</date>
+            <faction>FWL,LA</faction>
+        </factionChange>
+        <factionChange>
+            <date>3039-10-09</date>
+            <faction>LA</faction>
+        </factionChange>
+		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
 		</factionChange>
@@ -24081,6 +24584,14 @@ Thanks in part to the lack of major industry and the rough, unforgiving terrain 
 			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
+		<factionChange>
+            <date>3036-05-16</date>
+            <faction>LA,FWL</faction>
+        </factionChange>
+        <factionChange>
+            <date>3036-05-28</date>
+            <faction>FWL</faction>
+        </factionChange>
 	</planet>
 	<planet>
 		<name>McAlister</name>
@@ -24390,6 +24901,18 @@ Thanks in part to the lack of major industry and the rough, unforgiving terrain 
 			<date>3030-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
+		<factionChange>
+            <date>3028-01-01</date>
+            <faction>CC,FWL</faction>
+        </factionChange>
+        <factionChange>
+            <date>3030-01-01</date>
+            <faction>IND</faction>
+        </factionChange>
+        <factionChange>
+            <date>3039-05-05</date>
+            <faction>FWL</faction>
+        </factionChange>
 		<factionChange>
 			<date>3072-02-01</date>
 			<faction>WOB</faction>
@@ -24917,6 +25440,14 @@ During the Fourth Succession War, the Federated Suns captured the planet without
 			<date>2790-01-01</date>
 			<faction>LA</faction>
 		</factionChange>
+		 <factionChange>
+            <date>3035-11-16</date>
+            <faction>,LA</faction>
+        </factionChange>
+        <factionChange>
+            <date>3035-11-19</date>
+            <faction>LA</faction>
+        </factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -26249,6 +26780,14 @@ Necromo is overall a comfortable planet to live despite arid conditions. The pla
 			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
+		<factionChange>
+            <date>3035-11-22</date>
+            <faction>LA,FWL</faction>
+        </factionChange>
+        <factionChange>
+            <date>3035-11-23</date>
+            <faction>FWL</faction>
+        </factionChange>
 	</planet>
 	<planet>
 		<name>Neukirchen</name>
@@ -27133,6 +27672,22 @@ As word slowly spread, New Rhodes III became a pleasure destination from across 
 		<xcood>-8.08</xcood>
 		<ycood>-404.76</ycood>
 		<faction>CC</faction>
+		<factionChange>
+            <date>3030-10-26</date>
+            <faction>MOC,CC</faction>
+        </factionChange>
+        <factionChange>
+            <date>3030-10-28</date>
+            <faction>MOC</faction>
+        </factionChange>
+        <factionChange>
+            <date>3034-11-12</date>
+            <faction>CC,MOC</faction>
+        </factionChange>
+        <factionChange>
+            <date>3035-02-19</date>
+            <faction>CC</faction>
+        </factionChange>
 	</planet>
 	<planet>
 		<name>New Sagan</name>
@@ -28500,6 +29055,14 @@ Okefenokee is covered in jungles and swamps that are teeming with life. Unfortun
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
+            <date>3039-04-26</date>
+            <faction>FWL,FS</faction>
+        </factionChange>
+        <factionChange>
+            <date>3039-04-30</date>
+            <faction>FS</faction>
+        </factionChange>
+		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
 		</factionChange>
@@ -28546,6 +29109,14 @@ Okefenokee is covered in jungles and swamps that are teeming with life. Unfortun
 			<date>3030-01-01</date>
 			<faction>LA</faction>
 		</factionChange>
+		<factionChange>
+            <date>3033-11-21</date>
+            <faction>FWL,FC</faction>
+        </factionChange>
+        <factionChange>
+            <date>3033-11-28</date>
+            <faction>LA</faction>
+        </factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -29052,6 +29623,42 @@ Wunderland Enterprises</desc>
 		<xcood>-3.13</xcood>
 		<ycood>-290.53</ycood>
 		<faction>CC</faction>
+		<factionChange>
+            <date>3030-10-17</date>
+            <faction>DA,CC</faction>
+        </factionChange>
+        <factionChange>
+            <date>3030-10-27</date>
+            <faction>DA</faction>
+        </factionChange>
+        <factionChange>
+            <date>3031-03-14</date>
+            <faction>CC,DA</faction>
+        </factionChange>
+        <factionChange>
+            <date>3031-03-18</date>
+            <faction>DA</faction>
+        </factionChange>
+        <factionChange>
+            <date>3032-09-26</date>
+            <faction>FWL,DA</faction>
+        </factionChange>
+        <factionChange>
+            <date>3032-09-30</date>
+            <faction>DA</faction>
+        </factionChange>
+        <factionChange>
+            <date>3033-05-12</date>
+            <faction>FWL,DA</faction>
+        </factionChange>
+        <factionChange>
+            <date>3033-05-16</date>
+            <faction>DA</faction>
+        </factionChange>
+        <factionChange>
+            <date>3034-12-01</date>
+            <faction>CC</faction>
+        </factionChange>
 	</planet>
 	<planet>
 		<name>Palladix</name>
@@ -29690,6 +30297,14 @@ Challenge Systems</desc>
 			<date>3030-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
+		<factionChange>
+            <date>3039-06-20</date>
+            <faction>FWL,FS</faction>
+        </factionChange>
+        <factionChange>
+            <date>3039-07-12</date>
+            <faction>FS</faction>
+        </factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -30520,6 +31135,18 @@ During the Fourth Succession War, Federated Suns forces captured Poznan and they
 		<xcood>39.9</xcood>
 		<ycood>-322.87</ycood>
 		<faction>CC</faction>
+		<factionChange>
+            <date>3030-09-13</date>
+            <faction>DA,CC</faction>
+        </factionChange>
+        <factionChange>
+            <date>3030-09-18</date>
+            <faction>DA</faction>
+        </factionChange>
+        <factionChange>
+            <date>3032-07-01</date>
+            <faction>CC</faction>
+        </factionChange>
 	</planet>
 	<planet>
 		<name>Principia</name>
@@ -30607,6 +31234,14 @@ During the Fourth Succession War, Federated Suns forces captured Poznan and they
 		<xcood>38.6</xcood>
 		<ycood>-331.22</ycood>
 		<faction>CC</faction>
+		<factionChange>
+            <date>3030-09-13</date>
+            <faction>DA</faction>
+        </factionChange>
+        <factionChange>
+            <date>3032-07-01</date>
+            <faction>CC</faction>
+        </factionChange>
 	</planet>
 	<planet>
 		<name>Procyon</name>
@@ -31008,6 +31643,14 @@ The location of Proserpina on the Federated Suns border requires the DCMS to kee
 			<date>3030-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
+		<factionChange>
+            <date>3039-05-24</date>
+            <faction>FWL,FS</faction>
+        </factionChange>
+        <factionChange>
+            <date>3039-05-27</date>
+            <faction>FS</faction>
+        </factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -31566,6 +32209,18 @@ Magna Metals Incorporated</desc>
 		<xcood>41.99</xcood>
 		<ycood>-401.37</ycood>
 		<faction>CC</faction>
+		<factionChange>
+            <date>3030-10-23</date>
+            <faction>MOC,CC</faction>
+        </factionChange>
+        <factionChange>
+            <date>3030-11-01</date>
+            <faction>MOC</faction>
+        </factionChange>
+        <factionChange>
+            <date>3034-05-15</date>
+            <faction>CC</faction>
+        </factionChange>
 	</planet>
 	<planet>
 		<name>Rentz</name>
@@ -31586,6 +32241,22 @@ Magna Metals Incorporated</desc>
 		<xcood>16.43</xcood>
 		<ycood>-400.59</ycood>
 		<faction>CC</faction>
+		<factionChange>
+            <date>3030-10-01</date>
+            <faction>MOC,CC</faction>
+        </factionChange>
+        <factionChange>
+            <date>3031-08-06</date>
+            <faction>MOC</faction>
+        </factionChange>
+        <factionChange>
+            <date>3033-05-01</date>
+            <faction>CC,MOC</faction>
+        </factionChange>
+        <factionChange>
+            <date>3033-07-01</date>
+            <faction>CC</faction>
+        </factionChange>
 	</planet>
 	<planet>
 		<name>Revivim</name>
@@ -32502,6 +33173,18 @@ Throughout the Succession Wars, Ryde‘s chemical industry, which produces every
 		<xcood>-76.15</xcood>
 		<ycood>-324.44</ycood>
 		<faction>FWL</faction>
+		<factionChange>
+            <date>3030-09-11</date>
+            <faction>DA</faction>
+        </factionChange>
+        <factionChange>
+            <date>3038-08-14</date>
+            <faction>FWL,DA</faction>
+        </factionChange>
+        <factionChange>
+            <date>3038-08-19</date>
+            <faction>FWL</faction>
+        </factionChange>
 	</planet>
 	<planet>
 		<name>Rzhishchev</name>
@@ -32693,6 +33376,18 @@ As of the 32nd century, this world is little more than an outpost, with no agric
 			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
+		<factionChange>
+            <date>3030-09-11</date>
+            <faction>DA</faction>
+        </factionChange>
+        <factionChange>
+            <date>3038-02-11</date>
+            <faction>FWL,DA</faction>
+        </factionChange>
+        <factionChange>
+            <date>3038-02-23</date>
+            <faction>FWL</faction>
+        </factionChange>
 		<spectralClass>G</spectralClass>
 		<subtype>9</subtype>
 		<luminosity>VI</luminosity>
@@ -33362,6 +34057,14 @@ Tengo Aerospace</desc>
 		<xcood>-1.56</xcood>
 		<ycood>-377.9</ycood>
 		<faction>CC</faction>
+		<factionChange>
+            <date>3030-12-08</date>
+            <faction>MOC,CC</faction>
+        </factionChange>
+        <factionChange>
+            <date>3030-12-20</date>
+            <faction>CC</faction>
+        </factionChange>
 	</planet>
 	<planet>
 		<name>Scarborough</name>
@@ -33372,6 +34075,14 @@ Tengo Aerospace</desc>
 			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
+		<factionChange>
+            <date>3033-05-16</date>
+            <faction>DA,FWL</faction>
+        </factionChange>
+        <factionChange>
+            <date>3033-05-20</date>
+            <faction>FWL</faction>
+        </factionChange>
 	</planet>
 	<planet>
 		<name>Scheat</name>
@@ -33604,6 +34315,18 @@ Although the fall of the First Star League brought an end to terraforming on Sch
 			<date>3030-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
+		<factionChange>
+            <date>3030-12-08</date>
+            <faction>FS</faction>
+        </factionChange>
+        <factionChange>
+            <date>3032-09-12</date>
+            <faction>FWL,FS</faction>
+        </factionChange>
+        <factionChange>
+            <date>3032-09-21</date>
+            <faction>FS</faction>
+        </factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -34152,6 +34875,14 @@ By the time of the founding of The Republic of the Sphere, Sheratan‘s populati
 		<xcood>0.26</xcood>
 		<ycood>-334.08</ycood>
 		<faction>CC</faction>
+		<factionChange>
+            <date>3031-11-01</date>
+            <faction>DA</faction>
+        </factionChange>
+        <factionChange>
+            <date>3034-03-01</date>
+            <faction>CC</faction>
+        </factionChange>
 	</planet>
 	<planet>
 		<name>Shibukawa</name>
@@ -34355,6 +35086,34 @@ During the Jihad, Shipka was overlooked by the Word of Blake forces. When Devlin
 			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
+		<factionChange>
+            <date>3030-09-11</date>
+            <faction>DA</faction>
+        </factionChange>
+        <factionChange>
+            <date>3032-09-04</date>
+            <faction>FWL,DA</faction>
+        </factionChange>
+        <factionChange>
+            <date>3032-09-04</date>
+            <faction>DA</faction>
+        </factionChange>
+        <factionChange>
+            <date>3035-10-07</date>
+            <faction>FWL,DA</faction>
+        </factionChange>
+        <factionChange>
+            <date>3035-10-12</date>
+            <faction>DA</faction>
+        </factionChange>
+        <factionChange>
+            <date>3036-05-24</date>
+            <faction>FWL,DA</faction>
+        </factionChange>
+        <factionChange>
+            <date>3036-06-07</date>
+            <faction>FWL</faction>
+        </factionChange>
 	</planet>
 	<planet>
 		<name>Shirotori</name>
@@ -34516,6 +35275,14 @@ Sian has been the capital of the Capellan Confederation since 2368 when Capella 
 			<date>2790-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
+		 <factionChange>
+            <date>3035-11-06</date>
+            <faction>CIR,FWL</faction>
+        </factionChange>
+        <factionChange>
+            <date>3035-11-15</date>
+            <faction>FWL</faction>
+        </factionChange>
 	</planet>
 	<planet>
 		<name>Sighisoara</name>
@@ -34528,6 +35295,22 @@ Sian has been the capital of the Capellan Confederation since 2368 when Capella 
 		<xcood>6.52</xcood>
 		<ycood>-317.65</ycood>
 		<faction>CC</faction>
+		<factionChange>
+            <date>3031-04-05</date>
+            <faction>DA,CC</faction>
+        </factionChange>
+        <factionChange>
+            <date>3031-04-07</date>
+            <faction>DA</faction>
+        </factionChange>
+        <factionChange>
+            <date>3032-03-02</date>
+            <faction>CC,DA</faction>
+        </factionChange>
+        <factionChange>
+            <date>3032-03-07</date>
+            <faction>CC</faction>
+        </factionChange>
 		<spectralClass>G</spectralClass>
 		<subtype>9</subtype>
 		<luminosity>V</luminosity>
@@ -38908,6 +39691,14 @@ Gutierrez Aerospace</desc>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
+            <date>3032-02-05</date>
+            <faction>FWL,FS</faction>
+        </factionChange>
+        <factionChange>
+            <date>3032-02-09</date>
+            <faction>FS</faction>
+        </factionChange>
+		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
 		</factionChange>
@@ -39082,6 +39873,14 @@ Tsukude‘s capital, Ogawa City, is located on Ikadae, the largest of this world
 		<xcood>21.39</xcood>
 		<ycood>-371.12</ycood>
 		<faction>CC</faction>
+		<factionChange>
+            <date>3032-04-05</date>
+            <faction>MOC,CC</faction>
+        </factionChange>
+        <factionChange>
+            <date>3032-04-14</date>
+            <faction>CC</faction>
+        </factionChange>
 		<spectralClass>G</spectralClass>
 		<subtype>2</subtype>
 		<luminosity>V</luminosity>
@@ -39306,6 +40105,14 @@ With no substantial industry or natural resources, the Blakists largely overlook
 			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
+		<factionChange>
+            <date>3036-08-03</date>
+            <faction>LA,FWL</faction>
+        </factionChange>
+        <factionChange>
+            <date>3036-08-25</date>
+            <faction>FWL</faction>
+        </factionChange>
 	</planet>
 	<planet>
 		<name>Ulan Batar</name>
@@ -40161,6 +40968,18 @@ In the early 31st Century an underground Star League-era ‘Mech research facili
 		<xcood>-88.41</xcood>
 		<ycood>-351.56</ycood>
 		<faction>FWL</faction>
+		<factionChange>
+            <date>3030-09-11</date>
+            <faction>DA</faction>
+        </factionChange>
+        <factionChange>
+            <date>3036-05-10</date>
+            <faction>DA,FWL</faction>
+        </factionChange>
+        <factionChange>
+            <date>3036-06-23</date>
+            <faction>FWL</faction>
+        </factionChange>
 	</planet>
 	<planet>
 		<name>Vindemiatrix</name>
@@ -40478,6 +41297,22 @@ In the early 31st Century an underground Star League-era ‘Mech research facili
 			<date>2900-01-01</date>
 			<faction>FWL</faction>
 		</factionChange>
+		<factionChange>
+            <date>3032-07-10</date>
+            <faction>DA</faction>
+        </factionChange>
+        <factionChange>
+            <date>3032-09-14</date>
+            <faction>FWL,DA</faction>
+        </factionChange>
+        <factionChange>
+            <date>3032-10-28</date>
+            <faction>DA</faction>
+        </factionChange>
+        <factionChange>
+            <date>3036-01-01</date>
+            <faction>FWL</faction>
+        </factionChange>
 	</planet>
 	<planet>
 		<name>Wallis</name>
@@ -40626,8 +41461,20 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		</factionChange>
 		<factionChange>
 			<date>3032-01-01</date>
-			<faction>FC</faction>
+			<faction>FS</faction>
 		</factionChange>
+		<factionChange>
+            <date>3033-10-04</date>
+            <faction>FWL,FC</faction>
+        </factionChange>
+        <factionChange>
+            <date>3033-10-26</date>
+            <faction>FS</faction>
+        </factionChange>
+        <factionChange>
+            <date>3040-01-01</date>
+            <faction>FC</faction>
+        </factionChange>
 		<factionChange>
 			<date>3057-10-01</date>
 			<faction>FWL</faction>
@@ -41543,6 +42390,14 @@ Woodstock‘s third continent, Essex, is the only blemish on this otherwise beau
 		<xcood>-67.81</xcood>
 		<ycood>-333.56</ycood>
 		<faction>FWL</faction>
+		<factionChange>
+            <date>3030-09-11</date>
+            <faction>DA</faction>
+        </factionChange>
+        <factionChange>
+            <date>3037-02-01</date>
+			<faction>FWL,DA</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Xenia</name>
