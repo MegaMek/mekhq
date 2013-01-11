@@ -497,6 +497,12 @@ public class MekLabPanel extends JPanel {
 			// TODO Auto-generated method stub
 			
 		}
+
+        @Override
+        public void refreshPreview() {
+            // TODO Auto-generated method stub
+            
+        }
 	}
 	
 	private class TankPanel extends EntityPanel {
@@ -589,6 +595,12 @@ public class MekLabPanel extends JPanel {
 			// TODO Auto-generated method stub
 			
 		}
+
+        @Override
+        public void refreshPreview() {
+            // TODO Auto-generated method stub
+            
+        }
 	}
 	
 	private class InfantryPanel extends EntityPanel {
@@ -668,5 +680,11 @@ public class MekLabPanel extends JPanel {
 			// TODO Auto-generated method stub
 			
 		}
+
+        @Override
+        public void refreshPreview() {
+            // TODO Auto-generated method stub
+            
+        }
 	}
 }
