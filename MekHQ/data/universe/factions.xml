@@ -525,6 +525,16 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 		<clan>false</clan>
 	</faction>
 	<faction>
+		<shortname>PoR</shortname>
+		<fullname>Principality of Rasalhague</fullname>
+		<startingPlanet>Rasalhague,Rasalhague,Rasalhague,Rasalhague,Rasalhague,Rasalhague,Rasalhague,Orestes,Orestes</startingPlanet>
+		<eraMods>0,0,0,0,0,0,2,1,0</eraMods>
+		<nameGenerator>FRR</nameGenerator>
+		<colorRGB>116,171,206</colorRGB>
+		<periphery>false</periphery>
+		<clan>false</clan>
+	</faction>
+	<faction>
 		<shortname>FWL</shortname>
 		<fullname>Free Worlds League</fullname>
 		<startingPlanet>Atreus,Atreus,Atreus,Atreus,Atreus,Atreus,Atreus,Atreus,Atreus</startingPlanet>
