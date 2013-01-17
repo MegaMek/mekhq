@@ -91,6 +91,7 @@ public class RefitNameDialog extends javax.swing.JDialog {
         //only allow chassis renaming for conventional infantry
         if(!(refit.getNewEntity() instanceof Infantry) || refit.getNewEntity() instanceof BattleArmor) {
         	txtChassis.setEditable(false);
+        	txtChassis.setEnabled(false);
         }
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;

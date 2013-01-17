@@ -55,6 +55,7 @@ import megamek.common.verifier.TestInfantry;
 import megamek.common.verifier.TestMech;
 import megamek.common.verifier.TestTank;
 import megameklab.com.MegaMekLab;
+import megameklab.com.ui.Infantry.tabs.PreviewTab;
 import megameklab.com.util.CConfig;
 import megameklab.com.util.RefreshListener;
 import megameklab.com.util.UnitUtil;
@@ -146,6 +147,7 @@ public class MekLabPanel extends JPanel {
 		}
         entity.setYear(unit.campaign.getCalendar().get(GregorianCalendar.YEAR));
         UnitUtil.updateLoadedMech(entity);
+        entity.setModel(entity.getModel() + " Mk II");
         removeAll();
         labPanel = getCorrectLab(entity);
         refreshSummary();
@@ -416,10 +418,9 @@ public class MekLabPanel extends JPanel {
 	
 		private Mech entity;
 		private megameklab.com.ui.Mek.tabs.StructureTab structureTab;
-		private megameklab.com.ui.Mek.tabs.ArmorTab armorTab;
 		private megameklab.com.ui.Mek.tabs.EquipmentTab equipmentTab;
-		private megameklab.com.ui.Mek.tabs.WeaponTab weaponTab;
 		private megameklab.com.ui.Mek.tabs.BuildTab buildTab;
+	      private megameklab.com.ui.Mek.tabs.PreviewTab previewTab;
 		
 		public MekPanel(Mech m) {
 			entity = m;
@@ -434,37 +435,30 @@ public class MekLabPanel extends JPanel {
 			removeAll();
 			    
 			structureTab = new megameklab.com.ui.Mek.tabs.StructureTab(entity);
-			armorTab = new megameklab.com.ui.Mek.tabs.ArmorTab(entity);
-			armorTab.setArmorType(entity.getArmorType(0));
-			armorTab.refresh();
+			structureTab.setAsCustomization();
 			equipmentTab = new megameklab.com.ui.Mek.tabs.EquipmentTab(entity);
-			weaponTab = new megameklab.com.ui.Mek.tabs.WeaponTab(entity);
-			buildTab = new megameklab.com.ui.Mek.tabs.BuildTab(entity, equipmentTab, weaponTab);
+	        previewTab = new megameklab.com.ui.Mek.tabs.PreviewTab(entity);
+			buildTab = new megameklab.com.ui.Mek.tabs.BuildTab(entity, equipmentTab);
 			structureTab.addRefreshedListener(this);
-			armorTab.addRefreshedListener(this);
 			equipmentTab.addRefreshedListener(this);
-			weaponTab.addRefreshedListener(this);
 			buildTab.addRefreshedListener(this);
 
-			addTab("Structure", structureTab);
-			addTab("Armor", armorTab);
+			addTab("Structure/Armor", structureTab);
 			addTab("Equipment", equipmentTab);
-			addTab("Weapons", weaponTab);
 			addTab("Build", buildTab);
+	        addTab("Preview", previewTab);
 	        this.repaint();
 		}
 		
 		public void refreshAll() {
 			structureTab.refresh();
-			armorTab.refresh();
 			equipmentTab.refresh();
-			weaponTab.refresh();
 			buildTab.refresh();
+			previewTab.refresh();
 			refreshSummary();
 		}
 
 		public void refreshArmor() {
-			armorTab.refresh();
 			refreshSummary();
 		}
 
@@ -488,20 +482,17 @@ public class MekLabPanel extends JPanel {
 		}
 
 		public void refreshWeapons() {
-			weaponTab.refresh();
 			refreshSummary();
 		}
 
 		@Override
 		public void refreshHeader() {
-			// TODO Auto-generated method stub
 			
 		}
 
         @Override
         public void refreshPreview() {
-            // TODO Auto-generated method stub
-            
+            previewTab.refresh();
         }
 	}
 	
@@ -612,8 +603,8 @@ public class MekLabPanel extends JPanel {
 	
 		private Infantry entity;
 		private megameklab.com.ui.Infantry.tabs.StructureTab structureTab;
-		private megameklab.com.ui.Infantry.tabs.ArmorTab armorTab;
-		private megameklab.com.ui.Infantry.tabs.WeaponTab weaponTab;
+	    private megameklab.com.ui.Infantry.tabs.PreviewTab previewTab;
+
 		
 		public InfantryPanel(Infantry inf) {
 			entity = inf;
@@ -628,28 +619,22 @@ public class MekLabPanel extends JPanel {
 			removeAll();
 			    
 			structureTab = new megameklab.com.ui.Infantry.tabs.StructureTab(entity);
-			armorTab = new megameklab.com.ui.Infantry.tabs.ArmorTab(entity);
-			armorTab.refresh();
-			weaponTab = new megameklab.com.ui.Infantry.tabs.WeaponTab(entity);
+	        structureTab.setAsCustomization();
 			structureTab.addRefreshedListener(this);
-			armorTab.addRefreshedListener(this);
-			weaponTab.addRefreshedListener(this);
+	        previewTab = new megameklab.com.ui.Infantry.tabs.PreviewTab(entity);
 
-			addTab("Structure", structureTab);
-			addTab("Armor", armorTab);
-			addTab("Weapons", weaponTab);
+			addTab("Build", structureTab);
+	        addTab("Preview", previewTab);
 	        this.repaint();
 		}
 		
 		public void refreshAll() {
 			structureTab.refresh();
-			armorTab.refresh();
-			weaponTab.refresh();
+	        previewTab.refresh();
 			refreshSummary();
 		}
 
 		public void refreshArmor() {
-			armorTab.refresh();
 			refreshSummary();
 		}
 
@@ -671,7 +656,6 @@ public class MekLabPanel extends JPanel {
 		}
 
 		public void refreshWeapons() {
-			weaponTab.refresh();
 			refreshSummary();
 		}
 
@@ -683,8 +667,7 @@ public class MekLabPanel extends JPanel {
 
         @Override
         public void refreshPreview() {
-            // TODO Auto-generated method stub
-            
+            previewTab.refresh();
         }
 	}
 }

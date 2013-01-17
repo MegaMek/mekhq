@@ -1625,7 +1625,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 			}
 			newEntity.setModel(model);
 		} else {
-			newEntity.setModel(oldUnit.getEntity().getModel() + " Mk II");
+			//newEntity.setModel(oldUnit.getEntity().getModel() + " Mk II");
 		}
 	}
 }
