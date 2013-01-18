@@ -120,7 +120,6 @@ import javax.swing.tree.TreeSelectionModel;
 
 import megamek.client.ui.Messages;
 import megamek.client.ui.swing.MechTileset;
-import megamek.client.ui.swing.MechView;
 import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Aero;
 import megamek.common.AmmoType;
@@ -134,6 +133,7 @@ import megamek.common.Infantry;
 import megamek.common.Jumpship;
 import megamek.common.Mech;
 import megamek.common.MechSummaryCache;
+import megamek.common.MechView;
 import megamek.common.MiscType;
 import megamek.common.Mounted;
 import megamek.common.Player;

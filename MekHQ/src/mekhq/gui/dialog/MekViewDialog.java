@@ -10,7 +10,7 @@ import java.awt.BorderLayout;
 import java.awt.Font;
 import java.util.ResourceBundle;
 
-import megamek.client.ui.swing.MechView;
+import megamek.common.MechView;
 
 /**
  *

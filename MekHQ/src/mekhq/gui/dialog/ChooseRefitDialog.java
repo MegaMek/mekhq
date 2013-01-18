@@ -47,11 +47,11 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
-import megamek.client.ui.swing.MechView;
 import megamek.common.Entity;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
+import megamek.common.MechView;
 import megamek.common.loaders.EntityLoadingException;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;

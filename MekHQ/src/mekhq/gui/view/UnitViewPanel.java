@@ -18,10 +18,10 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
 import megamek.client.ui.swing.MechTileset;
-import megamek.client.ui.swing.MechView;
 import megamek.client.ui.swing.util.FluffImageHelper;
 import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Entity;
+import megamek.common.MechView;
 import megamek.common.Player;
 import megamek.common.TechConstants;
 import megamek.common.UnitType;
