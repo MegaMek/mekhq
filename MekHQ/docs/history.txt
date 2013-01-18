@@ -11,6 +11,7 @@ v0.1.21 (SVN)
 + update to stay current with MML
 + Planetary Update 30
 + updates for infantry in MekLabPanel
++ Planetary Update 31
 
 v0.1.20 (2012-10-12)
 + skip over entities in mul without externalIDs during scenario resolution (related to Bug 233)

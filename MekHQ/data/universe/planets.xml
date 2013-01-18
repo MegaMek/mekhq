@@ -1959,6 +1959,28 @@ The continents of Alrescha are Kaltain, Okda, and Risku; the capital of Cord is 
 			<date>3051-12-05</date>
 			<faction>CGB</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.02</gravity>
+		<nadirCharge>True</nadirCharge>
+		<zenithCharge>True</zenithCharge>
+		<lifeForm>5</lifeForm>
+		<climate>3</climate>
+		<percentWater>85</percentWater>
+		<temperature>32</temperature>
+		<spectralClass>F</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>5</sysPos>
+		<socioIndustrial>A-A-A-A-C</socioIndustrial>
+		<satellite>Lemeshko</satellite>
+		<landMass>Aquilae (Silverdale)</landMass>
+		<landMass>Bunjil</landMass>
+		<landMass>Corvi</landMass>
+		<landMass>Swan</landMass>
+		<hpg>A</hpg>
+		<desc>Alshain is a comfortable temperate planet with large oceans and four continents covered in massive pine forests. Alshain has abundant natural resources which led to the establishment of a BattleMech factory and enough other low and high tech industry to make the planet almost entirely self sufficient. With the pleasant climate Alshain has little trouble supporting enough agriculture to feed the planet’s population.
+
+The planetary capital is Silverdale and site of the planet’s primary spaceport, the capital is located on the continent of Aquilae. After the Draconis Combine gave the Rasalhague District its freedom, Alshain became the capital of the replacement military district and many of the Rasalhague Regulars became the Ashlain Regulars. Alshain and much of the Alshain Military District were captured by Clan Ghost Bear, with the Ghost Bears making Alshain their new capital when they moved to the Inner Sphere.</desc>
 	</planet>
 	<planet>
 		<name>Alta Vista</name>
@@ -6493,12 +6515,19 @@ Brasha is home to the unique and elite Qum’ran Guard, which are comprised of m
 			<date>3062-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
+		<pressure>2</pressure>
+		<gravity>1.01</gravity>
 		<zenithCharge>True</zenithCharge>
 		<lifeForm>7</lifeForm>
+		<climate>4</climate>
+		<percentWater>23</percentWater>
+		<temperature>28</temperature>
 		<spectralClass>F</spectralClass>
 		<subtype>9</subtype>
 		<luminosity>III</luminosity>
 		<sysPos>4</sysPos>
+		<socioIndustrial>C-D-D-C-C</socioIndustrial>
+		<satellite>Brazen Heart</satellite>
 		<hpg>B</hpg>
 		<desc>Brighton was originally settled to take advantage of the vast deposits of copper and silver ore that the planet’s initial surveying detected. The planet was independent for its early history before joining the St. Ives Mercantile Association and later the Capellan Confederation.
 
@@ -7694,7 +7723,11 @@ Camlann itself is barely able to sustain itself, the primarily industry and expo
 		<name>Capella</name>
 		<xcood>38.86</xcood>
 		<ycood>-175.26</ycood>
-		<faction>CC</faction>
+		<faction>CH</faction>
+		<factionChange>
+            <date>2367-01-01</date>
+            <faction>CC</faction>
+        </factionChange>
 		<factionChange>
             <date>3039-08-13</date>
             <faction>FWL,CC</faction>
@@ -7719,6 +7752,8 @@ Camlann itself is barely able to sustain itself, the primarily industry and expo
 		<satellite>Nikos</satellite>
 		<hpg>A</hpg>
 		<desc>Capella has always been a politically important world in the region and has always held a special importance to the Capellan Confederation. Capella was the birthplace of both the original Capellan Hegemony and of the Capellan Confederation after the Aris crisis. Capella is also home of the corporate headquarters of Ceres Metals and the Capellan Commonality Bank.
+
+Capella is the site of the Rashpur-Owens Shipyards, which was the only site capable of creating jumpships in the entire Capellan Confederation for centuries.
 
 Manufacturing Centers:
 Ceres Metals Industries
@@ -10193,6 +10228,26 @@ Coventry’s mineral, agricultural, and military economy is supplemented by a th
 			<date>3071-04-25</date>
 			<faction>CHH</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>0.92</gravity>
+		<nadirCharge>True</nadirCharge>
+		<zenithCharge>True</zenithCharge>
+		<lifeForm>6</lifeForm>
+		<climate>2</climate>
+		<percentWater>30</percentWater>
+		<temperature>15</temperature>
+		<spectralClass>M</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>4</sysPos>
+		<socioIndustrial>A-B-B-C-D</socioIndustrial>
+		<satellite>Banjno</satellite>
+		<satellite>Egylet</satellite>
+		<landMass>Somogy (Budapest)</landMass>
+		<hpg>A</hpg>
+		<desc>Csesztreg was settled for its abundant natural resources, specifically heavy metals. These metals were vital to the Lyran economy, however colonization was daunting due to the presence of heavy metals in the water poisoning early settlers. It took a revolutionary water purification system for the planet to be safely colonized and for the mining industry to get fully established on the planet. However, despite all the mining operations, the planet did not establish any heavy industry and preferred to export all the metals for use in the factories throughout the Commonwealth. The lack of industry saved the planet from the worst of the Succession Wars but the slow decline of technology meant that the water purifiers were failing by the 3rd Succession War and the process sped up when the Draconis Combine conquered the planet. With the near collapse of the purification system the Combine used the planet as a work camp for political dissidents, most of whom died in mining accidents or from heavy metal poisoning. 
+
+After suffering at the hands of the Combine for decades, the people of Csesztreg were unhappy to find that the Commonwealth was in no hurry to reclaim their planet and improve their situation during the 4th Succession War. As a result, the population petitioned to join the newly formed Free Rasalhague Republic when it formed. By then the advancements from the Helm Memory core allowed the FRR to rebuild and repair the water purifiers to improve the quality of life for people on the planet. The planet fell to the Wolves during Operation Revival and held the planet for more than twenty years before the Hell’s Horses captured the planet and established Csesztreg as their new capital and worked quickly to expand the manufacturing and industry on planet by bringing in prefabricated industrial units from the homeworlds. Csesztreg is also the site of the Horses’ primary genetic repository and Touman headquarters.</desc>
 	</planet>
 	<planet>
 		<name>Csomad</name>
@@ -11817,6 +11872,22 @@ The Free Worlds League finally established full control of the planet in the mid
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<factionChange>
+			<date>3068-03-14</date>
+			<faction>LA,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3068-03-18</date>
+			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>3070-02-27</date>
+			<faction>LA,WOB</faction>
+		</factionChange>
+		<factionChange>
+			<date>3072-02-14</date>
+			<faction>LA</faction>
+		</factionChange>
 		<spectralClass>F</spectralClass>
 		<subtype>0</subtype>
 		<luminosity>V</luminosity>
@@ -11831,7 +11902,7 @@ The Free Worlds League finally established full control of the planet in the mid
 		<hpg>A</hpg>
 		<lifeForm>5</lifeForm>
 		<satellite>Seth's Jewel</satellite>
-		<landMass>Albion</landMass>
+		<landMass>Albion (Marsdenville)</landMass>
 		<landMass>Dunellan</landMass>
 		<landMass>Hinterlands</landMass>
 		<landMass>Lockenar</landMass>
@@ -17021,7 +17092,11 @@ There are a total of six continents on Hean. Chau, Hanoi, and Luan are all in th
 		<name>Helen</name>
 		<xcood>83.98</xcood>
 		<ycood>10.17</ycood>
-		<faction>IND</faction>
+		<faction>TA</faction>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
 		<factionChange>
 			<date>2315-01-01</date>
 			<faction>TH</faction>
@@ -17056,6 +17131,7 @@ There are a total of six continents on Hean. Chau, Hanoi, and Luan are all in th
 		</factionChange>
 		<pressure>3</pressure>
 		<gravity>0.92</gravity>
+		<zenithCharge>True</zenithCharge>
 		<lifeForm>3</lifeForm>
 		<climate>5</climate>
 		<percentWater>46</percentWater>
@@ -17421,6 +17497,20 @@ The planet and the factories have been the target of invasion numerous times thr
 			<date>3062-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>0.99</gravity>
+		<lifeForm>2</lifeForm>
+		<climate>3</climate>
+		<percentWater>78</percentWater>
+		<temperature>38</temperature>
+		<spectralClass>F</spectralClass>
+		<subtype>9</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>2</sysPos>
+		<socioIndustrial>B-C-C-D-C</socioIndustrial>
+		<satellite>Peak</satellite>
+		<hpg>B</hpg>
+		<desc>Highspire is a relatively comfortable temperate planet and its primary exports are timber and wood crafts. The planet has always been known for its stark contrasts between the ruling Liaos and attending nobles and the poor of the planet. Highspire was the personal holding of Romano Liao before she became Chancellor and became the personal holding of her daughter Kali Liao after the Chancellor’s death. Being a border planet between the Capellan Confederation and Federated Suns the planet has seen many raids and several invasions throughout its history.</desc>
 	</planet>
 	<planet>
 		<name>Hillerod</name>
@@ -18218,12 +18308,26 @@ Hunan was relatively peaceful throughout its history and did not see any militar
 		<faction>CC</faction>
 		<factionChange>
             <date>3031-05-09</date>
-            <faction>DA,CC</faction>
+            <faction>CC,DA</faction>
         </factionChange>
         <factionChange>
             <date>3031-05-15</date>
             <faction>CC</faction>
         </factionChange>
+        <pressure>3</pressure>
+		<gravity>1.02</gravity>
+		<lifeForm>5</lifeForm>
+		<climate>3</climate>
+		<percentWater>45</percentWater>
+		<temperature>36</temperature>
+		<spectralClass>G</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>4</sysPos>
+		<socioIndustrial>C-C-C-D-C</socioIndustrial>
+		<satellite>Atria</satellite>
+		<hpg>B</hpg>
+		<desc>Hustaing has been a quiet world with moderate resources, industry and agriculture for most of its history. The planet gained some prominence as the planet that incited the Capellan Confederation’s reconquest of the St. Ives Compact, after the Blackwind Lancers invaded the planet in an attempt to capture Chancellor Sun-Tzu Liao and his fiance Duchess Marik. After the war ended tourists were eager to visit the planet and see the battle sites, which increased revenues for the planet. Additionally the Hustaing Warriors were created from the machines captured from the Blackwind Lancers and light military industry grew up to support the unit and the planet’s rebuilt Hustaing Home Guard.</desc>
 	</planet>
 	<planet>
 		<name>Hyalite</name>
@@ -19027,7 +19131,15 @@ Irian’s terrain is best described as bland. The planet’s terrain is dominate
 		<name>Itabaiana</name>
 		<xcood>128.31</xcood>
 		<ycood>310.35</ycood>
-		<faction>DC</faction>
+		<faction>TA</faction>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2319-01-01</date>
+			<faction>DC</faction>
+		</factionChange>
 		<factionChange>
 			<date>3052-01-01</date>
 			<faction>CNC</faction>
@@ -19036,6 +19148,34 @@ Irian’s terrain is best described as bland. The planet’s terrain is dominate
 			<date>3059-06-26</date>
 			<faction>DC</faction>
 		</factionChange>
+		<factionChange>
+			<date>3065-06-26</date>
+			<faction>CDS</faction>
+		</factionChange>
+		<pressure>3</pressure>
+		<gravity>0.92</gravity>
+		<lifeForm>4</lifeForm>
+		<climate>2</climate>
+		<percentWater>60</percentWater>
+		<temperature>25</temperature>
+		<spectralClass>G</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>4</sysPos>
+		<socioIndustrial>B-B-A-B-C</socioIndustrial>
+		<satellite>Cara dos Peixes</satellite>
+		<satellite>Diamante</satellite>
+		<satellite>São Cristóvão</satellite>
+		<landMass>Arado</landMass>
+		<landMass>Cauda do Macaco</landMass>
+		<landMass>Cerrado</landMass>
+		<landMass>Coelho</landMass>
+		<landMass>Mato Grosso (Brasilia)</landMass>
+		<landMass>Tesouras</landMass>
+		<hpg>A</hpg>
+		<desc>Itabaiana is a very comfortable planet for human habitation, though it lacks any distinct geological features that dominate some planets and make them memorable. The planet has six major continents and almost all of them feature large deposits of rhenium. The Tesouras continent has mostly been mined dry over the centuries of Combine rule due to strip-mining, not only has the strip-mining removed most of the rhenium from the continent it has also destroyed the continent’s ecosystem. The only spaceport on planet is located at the planetary capital of Brasilia on the coast of the Mato Grasso continent.
+		
+Itabaiana became the IS capital for the Diamond Sharks after they captured the planet from the Nova Cats. The Diamond Sharks expanded the manufacturing already on planet and brought the IndustriPlex-C plant to the planet, their largest planet-bound mobile factory.</desc>
 	</planet>
 	<planet>
 		<name>Ito</name>
@@ -21005,6 +21145,25 @@ The Combine agreed to cede Kimball II to Devlin Stone‘s Republic of the Sphere
 			<date>3081-01-18</date>
 			<faction>CHH</faction>
 		</factionChange>
+		<pressure>2</pressure>
+		<gravity>1.04</gravity>
+		<percentWater>31</percentWater>
+		<temperature>30</temperature>
+		<socioIndustrial>A-B-B-B-B</socioIndustrial>
+		<zenithCharge>True</zenithCharge>
+		<lifeForm>7</lifeForm>
+		<spectralClass>F</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>3</sysPos>
+		<climate>3</climate>
+		<landMass>Carinthia</landMass>
+		<landMass>Gailtal</landMass>		
+		<landMass>Hermagor (New Samos)</landMass>
+		<hpg>B</hpg>
+		<desc>Kirchbach spent most of its history on the border between the Lyran Commonwealth and the Draconis Combine and managed to trade hands multiple times, before ultimately becoming part of the Free Rasalhague Republic, only to be captured by Clan Wolf during Operation Revival and later the Hell’s Horses. The unfortunate location of Kirchbach meant that the planet has been the site of frequent raids and invasions from the Commonwealth, Combine, Clans and due to its proximity to the Periphery, pirates, throughout its history. 
+
+The planet has moderate natural resources and enough arable land to sustain itself, however Kirchbach has never had any standout features to make it a world of any prominence beyond being a border world. After being ceded to the Free Rasalhague Republic, the Republic spent considerable funds expanding the planet’s moderate industry to produce combat vehicles and ‘Mech scale weaponry. The factory was eventually repurposed by Clan Hell’s Horses when they captured Kirchbach from the Wolves.</desc>
 	</planet>
 	<planet>
 		<name>Kirei Na Niwa</name>
@@ -26683,7 +26842,11 @@ Bagamoyo Aerospace Manufacturing</desc>
 		<ycood>20.08</ycood>
 		<faction>TA</faction>
 		<factionChange>
-			<date>2315-01-01</date>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2316-01-01</date>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
@@ -26704,6 +26867,7 @@ Bagamoyo Aerospace Manufacturing</desc>
 		</factionChange>
 		<pressure>4</pressure>
 		<gravity>1.18</gravity>
+		<nadirCharge>True</nadirCharge>
 		<lifeForm>7</lifeForm>
 		<climate>3</climate>
 		<percentWater>54</percentWater>
@@ -27911,6 +28075,29 @@ Most industry on the planet is centered around catering to the rich individuals 
 			<date>3071-04-23</date>
 			<faction>CHH</faction>
 		</factionChange>
+		<factionChange>
+			<date>3100-04-23</date>
+			<faction>RD</faction>
+		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.03</gravity>
+		<zenithCharge>True</zenithCharge>
+		<lifeForm>5</lifeForm>
+		<climate>3</climate>
+		<percentWater>49</percentWater>
+		<temperature>28</temperature>
+		<spectralClass>A</spectralClass>
+		<subtype>9</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>1</sysPos>
+		<socioIndustrial>B-B-C-B-C</socioIndustrial>
+		<satellite>Nesodden</satellite>
+		<landMass>Akershus</landMass>
+		<landMass>Asker (Albany)</landMass>
+		<landMass>Christiania</landMass>
+		<landMass>Nordmarka</landMass>
+		<hpg>B</hpg>
+		<desc>New Oslo is a comfortable planet with a temperate climate, modest natural resources and enough arable land to sustain its population without imports. The capital of New Oslo is Albany and it is located on the continent of Asker, one of four. The most significant feature of New Oslo are the ‘Mech factories located by the city of Haakonstad on the continent of Christiani. The factories were originally owned by Gorton, Kingsley and Thorpe, however they sat fallow for two decades under Clan Wolf until Clan Hell’s Horses conquered the planet in 3071 and the Horses quickly began work repurposing the industrial site into their primary BattleMech production facility.</desc>
 	</planet>
 	<planet>
 		<name>New Port Royal</name>
@@ -33192,9 +33379,27 @@ The planet barely survived through the Succession Wars since the technology behi
 		<ycood>-386.77</ycood>
 		<faction>TC</faction>
 		<factionChange>
-			<date>2750-01-01</date>
+			<date>2596-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>2815-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
+		<pressure>2</pressure>
+		<gravity>1.02</gravity>
+		<lifeForm>2</lifeForm>
+		<climate>3</climate>
+		<percentWater>56</percentWater>
+		<temperature>32</temperature>
+		<spectralClass>F</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>2</sysPos>
+		<socioIndustrial>D-D-D-F-C</socioIndustrial>
+		<satellite>Rory</satellite>
+		<hpg>B</hpg>
+		<desc>Rollis is best known as a stopping off point from the Capallen Confederation into the Periphery, though it was originally settled by the Taurians and taken by the Federated Suns for two centuries before Rollis was conquered by the Capellans in the 1st Succession War. The planet is temperate and would be quite comfortable if not for the low pressure atmosphere. Rollis is able to support enough agriculture to support its people, though there are few other natural resources and little industry. The system does not support a recharge station at either jump point, however it does have a small orbital station that allows for dropship and small craft refit and repair. The primary export form Rollis is timber, specifically wood harvested from the equatorial island of Iskandia, which is fragrant like cedar and nearly fire-resistant.</desc>
 	</planet>
 	<planet>
 		<name>Romita</name>
@@ -33412,6 +33617,17 @@ The twin continents of Oxo and Xox are nearly mirror images of each other, almos
 			<date>3052-04-22</date>
 			<faction>CGB</faction>
 		</factionChange>
+		<nadirCharge>True</nadirCharge>
+		<zenithCharge>True</zenithCharge>
+		<lifeForm>7</lifeForm>
+		<climate>0</climate>
+		<spectralClass>G</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>II</luminosity>
+		<sysPos>4</sysPos>
+		<hpg>A</hpg>
+		<landMass>(City Rubigen)</landMass>
+		<desc>Rubigen is a cold, icy planet and most of the habitable terrain is covered in snow and ice. While the ice does not cover the planet’s two seas they are full of treacherous icebergs that make the water particularly treacherous. On land there are massive glaciers, including the Bassers Glacier, which was particularly fast moving for a glacier, and was expected to overtake the spaceport located outside of the capital, City Rubigen, by the 3030s-3040s. The primary exports from Rubigen are naval officers and fur, especially from the Rubigen red wolverine.</desc>
 	</planet>
 	<planet>
 		<name>Ruchbah</name>
@@ -35643,6 +35859,7 @@ During the Jihad, Shipka was overlooked by the Word of Blake forces. When Devlin
 			<subtype>0</subtype>
 			<luminosity>III</luminosity>
 			<sysPos>2</sysPos>
+			<socioIndustrial>A-A-C-A-C</socioIndustrial>
 			<satellite>Fu Hsi</satellite>
 			<satellite>Nuwa</satellite>
 			<satellite>Shennong</satellite>
@@ -36802,9 +37019,13 @@ Tengo Aerospace</desc>
 		<name>Star's End</name>
 		<xcood>-83.98</xcood>
 		<ycood>436.06</ycood>
-		<faction>RWR</faction>
+		<faction>IND</faction>
 		<factionChange>
-			<date>2900-01-01</date>
+			<date>2334-01-01</date>
+			<faction>RWR</faction>
+		</factionChange>
+		<factionChange>
+			<date>2775-01-01</date>
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
@@ -36819,6 +37040,24 @@ Tengo Aerospace</desc>
 			<date>3071-02-07</date>
 			<faction>CHH</faction>
 		</factionChange>
+		<factionChange>
+			<date>3100-02-07</date>
+			<faction>TB</faction>
+		</factionChange>
+		<pressure>0</pressure>
+		<gravity>0.75</gravity>
+		<lifeForm>0</lifeForm>
+		<climate>0</climate>
+		<percentWater>15</percentWater>
+		<temperature>-270</temperature>
+		<spectralClass>M</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>2</sysPos>
+		<socioIndustrial>A-B-D-C-F</socioIndustrial>
+		<satellite>None (asteroid ring)</satellite>
+		<hpg>A</hpg>
+		<desc>Star’s End is an inhospitable asteroid field that was originally settled by miners looking to tap into the rich sources of germanium and other precious metals that were scattered throughout the asteroids. Ownership of these rich sources of rare metals was hotly contested in the early days of the Rim World Republic and Lyran Commonwealth but ultimately the Republic ended up in control.</desc>
 	</planet>
 	<planet>
 		<name>Steeles</name>
@@ -38944,6 +39183,17 @@ As the capital of the Lyran Commonwealth, Thakard is home to many vital parts of
 			<date>3051-11-08</date>
 			<faction>CGB</faction>
 		</factionChange>
+		<nadirCharge>True</nadirCharge>
+		<zenithCharge>True</zenithCharge>
+		<lifeForm>7</lifeForm>
+		<spectralClass>G</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>3</sysPos>
+		<climate>3</climate>
+		<hpg>B</hpg>
+		<landMass>(Tyrsis)</landMass>
+		<desc>Thessalonika is a relatively comfortable temperate planet with large grassy plains and an abundance of life, despite possessing only one relatively small sea. The planet’s only industries outside of agriculture involve petroleum and veins of natural gemstones. Militarily the only famous feature on Thessalonika is the Tyrsis McNeil Museum which dedicates itself to the preservation of military technology. The museum is located in Tyrsis, the planetary capital.</desc>
 	</planet>
 	<planet>
 		<name>Thestria</name>
@@ -40022,6 +40272,16 @@ Gutierrez Aerospace</desc>
 			<date>3050-05-06</date>
 			<faction>CGB</faction>
 		</factionChange>
+		<nadirCharge>True</nadirCharge>
+		<zenithCharge>True</zenithCharge>
+		<lifeForm>7</lifeForm>
+		<spectralClass>G</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>III</luminosity>
+		<sysPos>3</sysPos>
+		<hpg>B</hpg>
+		<landMass>(Misby Flats)</landMass>
+		<desc>Trondheim is a volatile young planet with regular seismic activity, which usually means there are at least a handful of volcanoes erupting at any one time. These regular eruptions result in long, excessively hot, summers and short, extremely cold, winters, due to the excessive volcanic ash in the atmosphere. The extreme temperatures can make life unpleasant on Trondheim but the extremes are not to the point where the planet is uninhabitable. The benefit of the seismic activity and volcanoes is that rare metals and minerals are made easily accessible after eruptions and the planet’s mining industry has supported a number of major mining corporations for centuries. During its time in the Combine, there were a number of protests, rebellions and attempted revolutions, which often resulted in a crackdown by the DCMS and ISF. The planetary capital of Trondheim is Misby Flats.</desc>
 	</planet>
 	<planet>
 		<name>Trondheim (Periphery)</name>
@@ -40441,7 +40701,10 @@ Tsukude‘s capital, Ogawa City, is located on Ikadae, the largest of this world
 		<luminosity>IV</luminosity>
 		<sysPos>3</sysPos>
 		<socioIndustrial>B-B-C-C-D</socioIndustrial>
-		<landMass>(Camora)</landMass>
+		<satellite>Twycross III</satellite>
+		<landMass>Big Island</landMass>
+		<landMass>Twycross North (Camora)</landMass>
+		<landMass>Twycross South</landMass>
 		<hpg>B</hpg>
 		<desc>For most of its history Twycross was the capital of the Trellshire Province in the Lyran Commonwealth’s Tamar Pact. The planet itself has an unusually high occurance of typhoons, tornadoes and other extreme weather which require most of the population to live underground. The majority of above-ground buildings are never tall and must be built extremely well to survive the harsh climate. Twycross is home to Trellshire Industries’ BattleMech plant.
 
@@ -42172,6 +42435,7 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<satellite>Arlis</satellite>
 		<satellite>Arils</satellite>
 		<hpg>B</hpg>
+		<socioIndustrial>C-D-C-F-B</socioIndustrial>
 		<landMass>Province (Vandannis City)</landMass>
 		<desc>Wei is hotter than Terra but is otherwise a very comfortable planet for human life. During the Star League, Wei was secretly used as a repository for a deadly nerve gas agent. After the collapse of the Star League this repository was forgotten until the early 31st Century when it was rediscovered by the Capellan Confederation.</desc>
 	</planet>
