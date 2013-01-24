@@ -615,20 +615,6 @@ Aitutaki’s early settlers made a unique distinction by creating two capital ci
 		<desc>Aix-la-Chapelle is an inhospitable world with high atmospheric pressure, chemical taints in the air, and the harsh weather patterns that make the planet barely tolerable to humans, however its one large landmass is blessed with an abundance of natural resources. Diplan 'Mechyards has a factory on world that produces most of the components for the mechs it builds on planet. Massive greenhouses produce grown foodstuff for the local inhabitants. But meats and soil for the greenhouses must still be imported from off-world due to the worlds climate.</desc>
 	</planet>
 	<planet>
-		<name>Aiyina</name>
-		<xcood>-136.14</xcood>
-		<ycood>344</ycood>
-		<faction>LA</faction>
-		<factionChange>
-			<date>3040-01-01</date>
-			<faction>FC</faction>
-		</factionChange>
-		<factionChange>
-			<date>3052-01-01</date>
-			<faction>CJF</faction>
-		</factionChange>
-	</planet>
-	<planet>
 		<name>Akfata</name>
 		<xcood>-385.2</xcood>
 		<ycood>177.87</ycood>
@@ -1849,7 +1835,8 @@ Alphecca‘s capital city, Galanette Rainbow, is located on the northernmost isl
 		<hpg>B</hpg>
 		<lifeForm>7</lifeForm>
 		<satellite>Aisha</satellite>
-		<landMass>(Famindas)</landMass>
+		<landMass>Northern Continent (Famindas [destroyed 3071])</landMass>
+		<landMass>Southern Continent (Carolinas)</landMass>
 		<socioIndustrial>B-A-B-A-C</socioIndustrial>
 		<desc>Alpheratz is the planetary capital of the Outworlds Alliance. Unlike most Alliance worlds Alpheratz is heavily populated and contains the majority of the Alliance’s noteworthy cities as well as the basis for the Alliance’s heavy industry.</desc>
 	</planet>
@@ -3115,9 +3102,9 @@ Arboris has a history of fierce independence. In 2308, Arboris seceded from the 
 		<lifeForm>7</lifeForm>
 		<satellite>Deven</satellite>
 		<satellite>Thorwald</satellite>
-		<landMass>Gutheim</landMass>
-		<landMass>Grunwald</landMass>
 		<landMass>Gerechtland</landMass>
+		<landMass>Grunwald</landMass>
+		<landMass>Gutheim (Old Connaught, Wolf City)</landMass>	
 		<socioIndustrial>A-A-A-A-A</socioIndustrial>
 		<desc>Arc-Royal is a pleasant world with a mild climate and mild weather. While the planet is highly developed and industrialized, these efforts were confined to certain areas and as a result Arc-Royal’s wilderness is largely untouched.
 
@@ -3247,7 +3234,15 @@ Arcturus’ greatest contribution to the Commonwealth since the capital became T
 		<name>Ares</name>
 		<xcood>96.24</xcood>
 		<ycood>-175.52</ycood>
-		<faction>CC</faction>
+		<faction>IND</faction>
+		<factionChange>
+			<date>2270-01-01</date>
+			<faction>CH</faction>
+		</factionChange>
+		<factionChange>
+			<date>2367-01-01</date>
+			<faction>CC</faction>
+		</factionChange>
 		<pressure>3</pressure>
 		<gravity>0.98</gravity>
 		<zenithCharge>True</zenithCharge>
@@ -3261,6 +3256,8 @@ Arcturus’ greatest contribution to the Commonwealth since the capital became T
 		<sysPos>8</sysPos>
 		<socioIndustrial>A-A-C-A-D</socioIndustrial>
 		<satellite>Aphrodite</satellite>
+		<landMass>Harmonia (New Olympia)</landMass>  
+		<landMass>Anteros</landMass>
 		<hpg>B</hpg>
 		<desc>Ares is best known as the site of the peace conventions organised by Aleisha Liao which resulted in the Ares Conventions of Warfare. Ares was originally an independent colony before being absorbed by the Capella Commonality and later the Capellan Confederation. Ares is a prosperous small world thanks to its status as a freeport supported by on planet heavy industry that benefits greatly from local exemptions for standard import and export duties.
 
@@ -4045,11 +4042,11 @@ The capital and primary spaceport city of Atria Prime, located on the southern p
         <nadirCharge>true</nadirCharge>
         <hpg>A</hpg>
         <lifeForm>5</lifeForm>
-        <landMass>Capena</landMass>
+        <landMass>Capena (Octavius)</landMass>
         <landMass>Caelimontium</landMass>
         <landMass>Serapis</landMass>
         <socioIndustrial>B-B-A-A-C</socioIndustrial>
-        <desc>No data available</desc>
+        <desc>Augusta is one of eight planets in its system and the only one with a breathable atmosphere and hospitable climate. This favorable habitate attracted settlers and a Corean Enterprises factory. While the somewhat cool temperatures of Augusta reduce the amount of arable land and shorten the growing season, the planet is still self-sufficient when it comes to agriculture. Additionally the other planets in the system, while uninhabitable, are rich in resources and provide a steady stream of materials for the massive factories on planet.</desc>
 	</planet>
 	<planet>
 		<name>Augustine</name>
@@ -4254,12 +4251,12 @@ The primary industries on Augustine involve extracting raw minerals from the pla
         <lifeForm>5</lifeForm>
         <satellite>Jeremiah</satellite>
         <satellite>Greenback</satellite>
-        <landMass>Magdalena</landMass>
+        <landMass>Magdalena (Barros)</landMass>
         <landMass>Momposina</landMass>
         <landMass>Navidad</landMass>
         <landMass>Pesares</landMass>
         <socioIndustrial>B-B-B-B-C</socioIndustrial>
-		<desc>No description available.</desc>
+		<desc>Axton is a comfortable, though somewhat cool, temperate planet in the Federated Suns. Axton is home to modest industry and has more than sufficient raw materials to feed the planet's industrial concerns. The cool temperatures limit the growing seasons and available arable land, though Axton is still able to produce enough food to feed its population without relying on imports from nearby planets.</desc>
 	</planet>
 	<planet>
 		<name>Ayacucho</name>
@@ -5223,7 +5220,7 @@ The capital city and primary spaceport of Baxter, Cleopolis, is located on the n
         <landMass>Umbria</landMass>
         <landMass>York</landMass>
         <socioIndustrial>C-C-C-B-D</socioIndustrial>
-        <desc>No description available.</desc>
+        <desc>Bell is an arid planet with 20% higher gravity than Terra. Overall Bell is an average planet with modest resources, industry and technology, unfortunately the arid conditions mean that there is very little arable land and the planet is unable to grow enough food to feed its entire population, as a result Bell relies on food imported from other worlds to meet the demands above what can be produced on planet.</desc>
 	</planet>
 	<planet>
 		<name>Bella I</name>
@@ -5267,11 +5264,13 @@ The capital city and primary spaceport of Baxter, Cleopolis, is located on the n
 		<satellite>Larkspur</satellite>
 		<satellite>Privet</satellite>
 		<satellite>Yew</satellite>
-		<landMass>Divale</landMass>
+		<landMass>Divale (Atropa)</landMass>
 		<landMass>Dway</landMass>
 		<landMass>Morel</landMass>
 		<socioIndustrial>A-A-B-B-B</socioIndustrial>
-		<desc>No description available.</desc>
+		<desc>Belladonna is one of the "Golden Five" in the Federated Suns. Planets known for their pleasing climates and atmosphere, as well as their rich supply of natural resources and access to high-tech industries and higher education. The Golden Five provide residents some of the best living conditions in the entire Inner Sphere, with access to top of the line healthcare, education, and all of the latest and greatest technology. 
+		
+Belladonna's sky is dominated by six satellites, which due to the number of satellites and their orbits, at least one is visible at all times of the day and night. The planet has three major continents, Divale, which is home to Atropa the planetary capital, Dway and Morel. Cal-Boeing of Dorwinion calls Belladonna home and is a major producer of combat vehicles for the Federated Suns.</desc>
 	</planet>
 	<planet>
 		<name>Bellatrix</name>
@@ -5800,6 +5799,10 @@ The capital city and primary spaceport of Baxter, Cleopolis, is located on the n
 		<satellite>Paludina</satellite>
 		<satellite>Valvata</satellite>
 		<satellite>Littorina</satellite>
+		<landMass>Chalcedon</landMass>  
+		<landMass>Cius</landMass>  
+		<landMass>Nicomdeia (Bithinia)</landMass>  
+		<socioIndustrial>B-B-B-B-B</socioIndustrial>
 		<hpg>B</hpg>
 		<desc>Bithinia is one of the largest entertainment planets in the Capellan region, catering exclusively to the richest families in the Confederation and surrounding Inner Sphere states. Bithinia also has extensive iron and steel facilities located in its southern hemisphere. In the early 31st Century an underground Aerospace maintenance facility was constructed by the Capellan Confederation near the south pole.
 
@@ -5931,7 +5934,9 @@ Bithinian Ballistics</desc>
 		<satellite>Club</satellite>
 		<satellite>Spade</satellite>
 		<socioIndustrial>B-B-D-C-D</socioIndustrial>
-		<landMass>(Lott’s Revenge)</landMass>
+		<landMass>Diamond (Lott’s Revenge)</landMass>
+		<landMass>Orbule</landMass>
+		<landMass>Vada</landMass>
 		<desc>Blackjack is mostly an arid/desert world. A tropical zone exists in the northern hemisphere that is almost entirely encircled by the Blackjack Ocean. Valuable mineral deposits and other resources are limited but easily accessible. Many of the planet’s heavy industries have been targets of raids by the Draconis Combine and Periphery bandits. Lott’s Revenge, the capital city, is located along the coast of the northern region. Blackjack’s population is largely made up of settlers of English and French descent. Blackjack is home to the Blackjack School of Conflict, a privately run MechWarrior Academy (later destroyed by the Clans).</desc>
 	</planet>
 	<planet>
@@ -6643,14 +6648,13 @@ In 2998, the Brighton militia managed to withstand a siege by superior Federated
 		<temperature>22</temperature>
 		<climate>2</climate>
 		<percentWater>40</percentWater>
-		<zenithCharge>false</zenithCharge>
 		<nadirCharge>true</nadirCharge>
 		<hpg>B</hpg>
 		<lifeForm>4</lifeForm>
 		<landMass>Cornwall</landMass>
-		<landMass>Cymru</landMass>
+		<landMass>Cymru (Cardif)</landMass>
 		<socioIndustrial>C-B-C-B-C</socioIndustrial>
-		<desc>No description available.</desc>
+		<desc>Bristol is a prime example of the ravages of the Succession Wars. During the days of the Star League, the planet was heavily industrialized and was a major supplier for the Federated Suns. Unfortunately, the centuries of war following the collapse of the Star League left Bristol with most of the industry destroyed, with heavy focus on the military industry, by the 31st century only a single weapons manufacturer remained on planet. Bristol is a relatively comfortable cool-temperate planet, though the planet's high pressure requires most buildings on planet to be pressurized for human comfort and the gravity is only 85% of Earth's.</desc>
 	</planet>
 	<planet>
 		<name>Brixtana</name>
@@ -7176,6 +7180,24 @@ Recently, a large island in the eastern basin has been taken over for secret tes
 			<date>3050-05-12</date>
 			<faction>CJF</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.02</gravity>
+		<nadirCharge>True</nadirCharge>
+		<lifeForm>6</lifeForm>
+		<climate>3</climate>
+		<percentWater>49</percentWater>
+		<temperature>37</temperature>
+		<spectralClass>M</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>3</sysPos>
+		<socioIndustrial>B-C-B-C-B</socioIndustrial>
+		<satellite>Valet</satellite>
+		<landMass>Jenkins</landMass>
+		<landMass>Marlybone</landMass>
+		<landMass>Smithfield (Newton)</landMass>
+		<hpg>B</hpg>
+		<desc>Butler is a comfortable, warm-temperate planet that for most of its history was part of the Lyran Commonwealth. Butler avoided the worst of the Succession Wars primarily due to its lack of importance. Butler contains modest raw materials and agricultural concerns that are enough to make the planet self sufficient and these raw materials feed the on planet industry, which is well established despite remaining fairly basic with limited output. After the planet was captured by Clan Jade Falcon during Operation Revival, the Falcons spent resources upgrading the factories on planet to support the Butler Shipyards, which they built in 3060.</desc>
 	</planet>
 	<planet>
 		<name>Butte Hold</name>
@@ -7741,7 +7763,6 @@ Camlann itself is barely able to sustain itself, the primarily industry and expo
 		<nadirCharge>True</nadirCharge>
 		<zenithCharge>True</zenithCharge>
 		<lifeForm>2</lifeForm>
-		<climate>3</climate>
 		<percentWater>60</percentWater>
 		<temperature>38</temperature>
 		<spectralClass>F</spectralClass>
@@ -7750,6 +7771,9 @@ Camlann itself is barely able to sustain itself, the primarily industry and expo
 		<sysPos>7</sysPos>
 		<socioIndustrial>A-A-B-A-D</socioIndustrial>
 		<satellite>Nikos</satellite>
+		<climate>5</climate>
+		<landMass>Llagarres (Memorial City)</landMass>  
+		<landMass>Pociello</landMass>
 		<hpg>A</hpg>
 		<desc>Capella has always been a politically important world in the region and has always held a special importance to the Capellan Confederation. Capella was the birthplace of both the original Capellan Hegemony and of the Capellan Confederation after the Aris crisis. Capella is also home of the corporate headquarters of Ceres Metals and the Capellan Commonality Bank.
 
@@ -7995,10 +8019,10 @@ The majority of the population is located on the continent of Worrsetgard, which
 		<lifeForm>1</lifeForm>
 		<landMass>Teton</landMass>
 		<landMass>Moreton</landMass>
-		<landMass>Vermont</landMass>
+		<landMass>Vermont (Killington)</landMass>
 		<landMass>Yukon</landMass>
 		<socioIndustrial>C-B-B-B-C</socioIndustrial>
-		<desc>No description available.</desc>
+		<desc>Carmacks is a young, cool-temperate planet located in the Federated Suns. The planet's continents are dominated by massive mountain ranges, including the impressive Mount Chengde, with its highest peak standing 18,374 meters above sea-level. The planet has abundant natural resources and industry has developed to make use of the materials mined from Carmack's many mountains. Despite the expansive industry, Carmack does not produce anything especially high tech, the primary military industry on planet, Federated Armor mostly makes armor. Due to the rocky mountains that dominate the terrain of Carmacks there is limited arable land available, though the planet is able to produce enough food to feed the population without relying on imported food.</desc>
 	</planet>
 	<planet>
 		<name>Carmen</name>
@@ -9996,6 +10020,26 @@ Today, Corridan‘s greatest exports, after water purifiers, are agricultural an
 			<date>3059-08-01</date>
 			<faction>DC</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.04</gravity>
+		<zenithCharge>True</zenithCharge>
+		<lifeForm>7</lifeForm>
+		<climate>3</climate>
+		<percentWater>74</percentWater>
+		<temperature>33</temperature>
+		<spectralClass>G</spectralClass>
+		<subtype>9</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>2</sysPos>
+		<socioIndustrial>B-B-C-C-B</socioIndustrial>
+		<satellite>Petit Coudoux</satellite>
+		<landMass>Aix-en-Provence (Stedman)</landMass>
+		<landMass>Bouches-du-Rhône</landMass>
+		<landMass>La Fare-les-Oliviers</landMass>
+		<landMass>Marseille</landMass>
+		<landMass>Velaux</landMass>
+		<hpg>B</hpg>
+		<desc>Coudoux is a comfortable temperate planet with abundant arable land and enough natural resources to support the moderate industrial concerns located on the planet. Located deep in the Draconis Combine, Coudoux has had a relatively quiet history and escaped the worst of the Succession Wars. Unfortunately, the planet was in the path of the Clans and Coudoux was conquered by Clan Smoke Jaguar during Operation Revival before being returned to the Draconis Combine after Operation Bulldog removed the Jaguars from the Inner Sphere. In the late 3070s the Nova Cats established Mualang Alpha on Coudoux, a factory capable of producing light ‘Mechs.</desc>
 	</planet>
 	<planet>
 		<name>Courcellete</name>
@@ -10651,14 +10695,25 @@ The Jade Falcon, totem animal of the Clan with the same name, is from Dagda.</de
 			<date>3075-01-01</date>
 			<faction>CSR,OA</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>0.98</gravity>
 		<nadirCharge>True</nadirCharge>
 		<lifeForm>3</lifeForm>
+		<climate>2</climate>
+		<percentWater>42</percentWater>
+		<temperature>27</temperature>
 		<spectralClass>K</spectralClass>
 		<subtype>4</subtype>
+		<luminosity>V</luminosity>
 		<sysPos>2</sysPos>
-		<hpg>X</hpg>
-		<climate>3</climate>
-		<desc>No description available.</desc>
+		<socioIndustrial>B-B-B-C-B</socioIndustrial>
+		<satellite>Beatrice</satellite>
+		<landMass>Boccaccio (Certaldo)</landMass>
+		<landMass>Guelph</landMass>
+		<landMass>Il Poeta</landMass>
+		<landMass>Petrarch</landMass>
+		<hpg>B</hpg>
+		<desc>For most of its history, Dante was a quiet agricultural world with a cool, but comfortable, climate and sufficient natural resources but only modest industrial concerns and a small population dominated by pacifists. The lack of industry and military presence protected the planet from the ravages of the Succession Wars, but made the planet easy pickins for a Word of Blake sponsored pirate group that took over in the late 3060s. This changed when the Snow Ravens came to the Inner Sphere and decided to work with the Outworlds Alliance, after removing the pirates that had taken over the planet the Ravens claimed Dante as their own and imported several prefabricated factories from the homeworlds as well as building their new genetic repository.</desc>
 	</planet>
 	<planet>
 		<name>Danxian</name>
@@ -11052,6 +11107,28 @@ The Jade Falcon, totem animal of the Clan with the same name, is from Dagda.</de
 			<date>3050-10-06</date>
 			<faction>CW</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>0.98</gravity>
+		<zenithCharge>True</zenithCharge>
+		<lifeForm>4</lifeForm>
+		<climate>2</climate>
+		<percentWater>86</percentWater>
+		<temperature>27</temperature>
+		<spectralClass>K</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>4</sysPos>
+		<socioIndustrial>C-B-C-C-B</socioIndustrial>
+		<satellite>Ai Kanaka</satellite>
+		<satellite>Lona</satellite>
+		<landMass>Hawaii</landMass>
+		<landMass>Honolulu</landMass>
+		<landMass>Kauai (Cosmopolis)</landMass>
+		<landMass>Kalawao</landMass>
+		<landMass>Maui</landMass>
+		<landMass>Sandwich</landMass>
+		<hpg>B</hpg>
+		<desc>Dell is a relatively comfortable, if somewhat cool, temperate planet that was part of the Lyran Commonwealth for most of its history. Dell’s primary industries are agriculture and aerospace production. The planet was the site of the Bowie Industries’ Chippewa Aerospace Fighter factory until Clan Wolf captured the planet during Operation Revival. After Dell was conquered by Clan Wolf, the Bowie factory sat abandoned for more than a decade before Clan Wolf began retooling the factory in order to restart their aerospace industry after the Wolves were displaced from the Clan Homeworlds.</desc>
 	</planet>
 	<planet>
 		<name>Delos IV</name>
@@ -11802,6 +11879,25 @@ The Free Worlds League finally established full control of the planet in the mid
 		<xcood>468.92</xcood>
 		<ycood>246.41</ycood>
 		<faction>OA</faction>
+		<pressure>3</pressure>
+		<gravity>1.02</gravity>
+		<lifeForm>2</lifeForm>
+		<climate>5</climate>
+		<percentWater>46</percentWater>
+		<temperature>46</temperature>
+		<spectralClass>F</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>3</sysPos>
+		<socioIndustrial>C-C-C-C-B</socioIndustrial>
+		<satellite>Mahilyow</satellite>
+		<landMass>Drut</landMass>
+		<landMass>Konka</landMass>
+		<landMass>Pripyat (Arheima)</landMass>
+		<landMass>Sozh</landMass>
+		<landMass>Trubizh</landMass>
+		<hpg>B</hpg>
+		<desc>Dneiper is a modest agricultural world on the border of the Outworlds Alliance and the Draconis Combine. Due to its small population and limited industrial concerns the planet avoided serious attention from the Star League Defense Force and the Draconis Combine Mustered Soldiery during Operation UNION HOLD, the operation to bring the Outworlds Alliance into the Star League. Dneiper is a comfortable, if hot planet to live on and has modest natural resources and industry to make the planet mostly self sufficient; the primary exports from the planet are agriculture based.</desc>
 	</planet>
 	<planet>
 		<name>Dnepropetrovsk</name>
@@ -13126,8 +13222,12 @@ The capital city of Eltanin, Dry Springs, is the administrative and trading cent
 		<ycood>449.88</ycood>
 		<faction>RWR</faction>
 		<factionChange>
-			<date>2900-01-01</date>
+			<date>2775-01-01</date>
 			<faction>PIND</faction>
+		</factionChange>
+		<factionChange>
+			<date>3021-01-01</date>
+			<faction>GV</faction>
 		</factionChange>
 		<factionChange>
 			<date>3049-09-13</date>
@@ -13141,6 +13241,22 @@ The capital city of Eltanin, Dry Springs, is the administrative and trading cent
 			<date>3071-09-18</date>
 			<faction>CJF</faction>
 		</factionChange>
+		<pressure>2</pressure>
+		<gravity>0.82</gravity>
+		<zenithCharge>True</zenithCharge>
+		<lifeForm>2</lifeForm>
+		<climate>3</climate>
+		<percentWater>40</percentWater>
+		<temperature>37</temperature>
+		<spectralClass>A</spectralClass>
+		<subtype>7</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>5</sysPos>
+		<socioIndustrial>B-B-C-B-C</socioIndustrial>
+		<landMass>Te Ika-a-Māui</landMass>
+		<landMass>Te Wai Pounamu (Rangitata)</landMass>
+		<hpg>A</hpg>
+		<desc>Erewhon was originally a holding of the Rim World Republic and fell into obscurity after the Republics collapse. The planet lived on as a quiet rural Periphery world, best known for its wool exports from the large sheep population. Despite the planet’s relatively low gravity and low atmospheric pressure, Erewhon is capable of supporting enough agriculture to make it self sufficient and feed the large flocks of sheep. In the early 31st century the planet became part of the Greater Valkyrate, until it was conquered by Clan Jade Falcon during Operation Revival. Under the Falcons, Erewhon saw a surge in technology and industry as the Falcon scientist caste migrated to the planet. The planet suffered some severe infrastructure damage during the early 3070s.</desc>
 	</planet>
 	<planet>
 		<name>Erod's Escape</name>
@@ -13689,6 +13805,22 @@ As of 3025 Exedor had a tiny population, consisting primarily of refugees from t
 			<date>3084-02-01</date>
 			<faction>PIND</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.04</gravity>
+		<lifeForm>5</lifeForm>
+		<climate>4</climate>
+		<percentWater>37</percentWater>
+		<temperature>37</temperature>
+		<spectralClass>G</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>2</sysPos>
+		<socioIndustrial>C-B-C-C-C</socioIndustrial>
+		<landMass>Diakanransha</landMass>
+		<landMass>Tempozan (Chicago)</landMass>
+		<landMass>Wiener Riesenrad</landMass>
+		<hpg>B</hpg>
+		<desc>Ferris is a modest, though mostly self-sufficient, world with an arid climate. Despite the dry climate, the planet is able to maintain enough arable land to feed the population with only limited imports from other planets and the modest natural resources are able to provide most of the needed support for the modest industrialization on planet. Ferris has three continents Diakanransha, Tempozan, and Wiener Riesenrad. The planetary capital is Chicago and it is located on the continent of Tempozan.</desc>
 	</planet>
 	<planet>
 		<name>Fetsund</name>
@@ -15483,6 +15615,25 @@ The capital city, Dunkeld, a sprawling metropolis as big as any capital on a maj
 			<date>3050-10-01</date>
 			<faction>CGB</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.04</gravity>
+		<nadirCharge>True</nadirCharge>
+		<lifeForm>7</lifeForm>
+		<climate>2</climate>
+		<percentWater>58</percentWater>
+		<temperature>16</temperature>
+		<spectralClass>G</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>3</sysPos>
+		<socioIndustrial>C-B-C-C-B</socioIndustrial>
+		<satellite>Name Unknown</satellite>
+		<landMass>Marmirol</landMass>
+		<landMass>Rodigo,</landMass>
+		<landMass>Roverbella</landMass>
+		<landMass>Volta Mantovana(Gonzaga)</landMass>
+		<hpg>B</hpg>
+		<desc>Goito is a cold planet that barely qualifies as temperate, though the equatorial region is warm enough to support significant arable land and the planet has bountiful agricultural concerns. Aside from the arable land, Goito has had little else to attract significant military attention and did not suffer significant damage during the Succession Wars. Goito was part of the Draconis Combine for most of its history before becoming part of the Free Rasalhague Republic, until the planet was conquered by Clan Ghost Bear during Operation Revival. Years after being captured, the Bears decided to locate one of their mobile factories on Goito to avoid concentrating all of their industry on Alshain.</desc>
 	</planet>
 	<planet>
 		<name>Golandrinas</name>
@@ -15560,11 +15711,11 @@ The capital city, Dunkeld, a sprawling metropolis as big as any capital on a maj
 		<lifeForm>8</lifeForm>
 		<satellite>Hebron</satellite>
 		<satellite>Succoth</satellite>
-		<landMass>Gesan</landMass>
+		<landMass>Gesan (Canaan)</landMass>
 		<landMass>Septuagint</landMass>
 		<landMass>Tiberian</landMass>
 		<socioIndustrial>B-C-B-C-C</socioIndustrial>
-		<desc>No description available.</desc>
+		<desc>Goshen is an arid planet with only 85% of the gravity found on Terra. Despite the lack of water the planet has enough arable land to remain self-sufficient and Goshen boasts several high-tech industries and abundant natural resources.</desc>
 	</planet>
 	<planet>
 		<name>Goth Khakar</name>
@@ -18948,9 +19099,9 @@ Ingress‘s temporary military weakness made it an easy target during the Blakis
 		<satellite>Bahia</satellite>
 		<climate>3</climate>
 		<socioIndustrial>A-A-A-A-A</socioIndustrial>
-		<landmass>Santana (New Barcella)</landmass>
-		<landmass>Salvador</landmass>
 		<landmass>Baiano</landmass>
+		<landmass>Salvador</landmass>
+		<landmass>Santana (New Barcella)</landmass>
 		<desc>Irece is a heavily industrialized high-tech world that is fully self-sufficient. It’s ideal climate also allows it to be a huge food producer in the region. It’s also an important Command and Industrial world to the Draconis Combine, home to the LexaTech Industries Stinger LAM plant. The world is home of the 9.7 kilometer tall mountain known as Tengoku. (Japanese translation of the name is Heaven.) Tengoku peaks into the planet's stratosphere and is located a hundred kilometers from world's capital city New Barcella.</desc>
 	</planet>
 	<planet>
@@ -20822,7 +20973,7 @@ Kessel‘s capital city is Sverdlovsk, located on the northwestern continent of 
 		<satellite>Ariel</satellite>
 		<satellite>Persephone</satellite>
 		<hpg>A</hpg>
-		<desc>Kestrel is a bountiful world with beautiful planets, a comfortable climate, clean air, and abundant natural resources. The planet is considered one of the Federated Suns garden worlds and supports a large population, which primarily lives in cities, but large plains and mostly untouched nature. All industry on Kestrel is located on the planet’s two moons, both of which have been terraformed into comfortable human habitats as well. While Kestrel is a major manufacturer and possesses a high level of technology, the planet is also a breadbasket world with large tracts of arable land and high levels of food exports.</desc>
+		<desc>Kestrel is a bountiful world with a comfortable climate, clean air, and abundant natural resources. The planet is considered one of the Federated Suns garden worlds and supports a large population which primarily live in the planet's many large cities. However, despite the numerous cities there are also large plains and mostly untouched wilderness covering much of the planet. To reduce pollution on the planet, all industry in the system is located on the planet’s two moons, both of which have been terraformed into comfortable human habitats. While Kestrel is a major manufacturer and possesses a high level of technology, the planet is also a breadbasket world with large tracts of arable land and high levels of food exports.</desc>
 	</planet>
 	<planet>
 		<name>Kettering</name>
@@ -23618,14 +23769,24 @@ The continents of Sorania and Padawa are mostly temperate and are the sites of t
 		<xcood>453.35</xcood>
 		<ycood>142.11</ycood>
 		<faction>OA</faction>
+		<pressure>3</pressure>
+		<gravity>0.95</gravity>
 		<nadirCharge>True</nadirCharge>
 		<lifeForm>7</lifeForm>
+		<climate>1</climate>
+		<percentWater>45</percentWater>
+		<temperature>6</temperature>
 		<spectralClass>M</spectralClass>
 		<subtype>3</subtype>
+		<luminosity>V</luminosity>
 		<sysPos>8</sysPos>
-		<hpg>C</hpg>
-		<climate>0</climate>
-		<desc>No description available.</desc>
+		<socioIndustrial>B-C-C-B-C</socioIndustrial>
+		<landMass>Energia</landMass>
+		<landMass>Evergreen (Grimandi)</landMass>
+		<landMass>Hellas</landMass>
+		<landMass>Texas</landMass>
+		<hpg>B</hpg>
+		<desc>Lushann is a semi-arctic planet, which was primarily settled to take advantage of the abundant oil deposits in the planet. In fact, almost two-thirds of the planet’s modest population work for the various petrochemical companies that are based on Lushann. The planet supplies most of the petrochemicals for the entire Outworlds Alliance. The other major industry on Lushann is Lushann Industries, a weapons manufacturer, the regional supplier of laser weaponry. After the arrival of Clan Snow Ravens, the factories on Lushann were improved to include Aerospace and limited ‘Mech production.</desc>
 	</planet>
 	<planet>
 		<name>Luthien</name>
@@ -25742,7 +25903,7 @@ During the Fourth Succession War, the Federated Suns captured the planet without
 		<landmass>Brook (Saginaw)</landmass>
 		<landmass>Kahn</landmass>
 		<landmass>Kure</landmass>
-		<desc>No description available.</desc>		
+		<desc>Midway is a comfortable temperate planet that is almost entirely covered in water. The planet has abundant sources of materials which are used in the heavy industry on planet and in orbit. The planet is home to the orbital Midway Shipyards, one of the Combine's rare jumpship production and maintenance facilities.</desc>		
 	</planet>
 	<planet>
 		<name>Millerton</name>
@@ -26184,6 +26345,25 @@ These episodic invasions kept Mirach from realizing its true potential, and the 
 		<xcood>485.01</xcood>
 		<ycood>143.02</ycood>
 		<faction>OA</faction>
+		<pressure>4</pressure>
+		<gravity>1.04</gravity>
+		<lifeForm>3</lifeForm>
+		<climate>2</climate>
+		<percentWater>77</percentWater>
+		<temperature>27</temperature>
+		<spectralClass>G</spectralClass>
+		<subtype>2</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>2</sysPos>
+		<socioIndustrial>C-B-C-C-C</socioIndustrial>
+		<landMass>Big Horn</landMass>
+		<landMass>Carter</landMass>
+		<landMass>Cascade (Mitchella City)</landMass>
+		<landMass>Fergus</landMass>
+		<landMass>Garfield</landMass>
+		<landMass>Glacier</landMass>
+		<hpg>B</hpg>
+		<desc>Mitchella has a mild-temperate climate and aside from the high pressure atmosphere, is a relatively comfortable planet to inhabit with sufficient arable land to feed the population and sufficient natural resources to feed the modest, though developed industrial concerns on planet. Mitchella has still not fully recovered from the massive damage inflicted to the population and industrial centers on planet by the Star League Defense Force and the Draconis Combine Mustered Soldiery during Operation UNION HOLD in the 26th century, which was aimed at forcing the Outworlds Alliance to join the Star League.</desc>
 	</planet>
 	<planet>
 		<name>Mithron</name>
@@ -27403,7 +27583,7 @@ New Aragon is also a major medical research centre, including the preeminent New
 		<landMass>Rostock</landMass>
 		<landMass>Brunswick</landMass>
 		<socioIndustrial>A-A-C-A-A</socioIndustrial>
-		<desc>Discovered in 2205 by the Aptly named TAS Camelot, this lush planet quickly attracted colonists. Meanwhile, the native life was genetically altered to yield more Terran-like foodstuffs.  New Avalon grew to become the breadbasket for worlds around it.  This important role assisted Lucien Davion's rise to power and eventually resulted in the Davion family ruling the Federated Suns from this agricultural world.
+		<desc>Discovered in 2205 by the aptly named TAS Camelot, this lush planet quickly attracted colonists. Meanwhile, the native life was genetically altered to yield more Terran-like foodstuffs.  New Avalon grew to become the breadbasket for worlds around it.  This important role assisted Lucien Davion's rise to power and eventually resulted in the Davion family ruling the Federated Suns from this agricultural world.
 
 New Avalon boasts five continents.  Albion is the largest, with prairies and forests interspersed between its mountain ranges.  Brunswick is next in line, boasting most of the planet's petrochemical production and heavy industry, along with two major spaceports.  Rostock is primarily a ranching continent, though some land is lost to the planet's only significant desert.  Up north, the smallest continent, New Scotland, is covered with snow most of the year. New Scotland’s primary export has historically been raw materials, sepcifically hard woods, metals and rare furs to supply the other continents. The New Hebrides island chain is located near the equator, making it a prime location for citrus crops and vacation resorts.
 
@@ -27752,7 +27932,7 @@ New Capetown is moderately industrialized and is a comfortable temperate planet.
 		<lifeForm>5</lifeForm>
 		<landMass>Saxony</landMass>
 		<landMass>Hessia</landMass>
-		<landMass>Vermont</landMass>
+		<landMass>Vermont (Buchvaal)</landMass>
 		<landMass>Baden</landMass>
 		<landMass>Rhine</landMass>
 		<socioIndustrial>B-B-B-B-C</socioIndustrial>
@@ -31620,6 +31800,22 @@ During the Fourth Succession War, Federated Suns forces captured Poznan and they
 		<xcood>551.99</xcood>
 		<ycood>132.96</ycood>
 		<faction>OA</faction>
+		<pressure>2</pressure>
+		<gravity>0.95</gravity>
+		<nadirCharge>True</nadirCharge>
+		<lifeForm>5</lifeForm>
+		<climate>4</climate>
+		<percentWater>16</percentWater>
+		<temperature>37</temperature>
+		<spectralClass>M</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>1</sysPos>
+		<socioIndustrial>B-B-C-C-C</socioIndustrial>
+		<landMass>Chet</landMass>
+		<landMass>Hudson (LeBrock)</landMass>
+		<hpg>B</hpg>
+		<desc>Praxton would be an unremarkable desert world if not for the presence of a vital fusion engine factory. The factory is vital to the Outworlds Alliance and as a result the planetary defenders have strict orders to not assist nearby planets under any circumstance. Despite the lack of a significant water supply, the planet manages to be self-sufficient and supports enough agriculture to feed the population and support the planetary industry.</desc>
 	</planet>
 	<planet>
 		<name>Predlitz</name>
@@ -32039,6 +32235,34 @@ The location of Proserpina on the Federated Suns border requires the DCMS to kee
 			<date>3075-01-01</date>
 			<faction>CSR,OA</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>0.9</gravity>
+		<zenithCharge>True</zenithCharge>
+		<lifeForm>7</lifeForm>
+		<climate>3</climate>
+		<percentWater>85</percentWater>
+		<temperature>35</temperature>
+		<spectralClass>F</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>4</sysPos>
+		<socioIndustrial>B-C-B-B-A</socioIndustrial>
+		<satellite>Gaia</satellite>
+		<satellite>Isis</satellite>
+		<satellite>Pluto</satellite>
+		<landMass>Agni</landMass>
+		<landMass>Aryaman</landMass>
+		<landMass>Indra</landMass>
+		<landMass>Prithvi</landMass>
+		<landMass>Rudra</landMass>
+		<landMass>Shiva (Belle)</landMass>
+		<landMass>Soma</landMass>
+		<landMass>Varuna</landMass>
+		<landMass>Vishnu</landMass>
+		<satellite>Name Unknown</satellite>
+		<satellite>Name Unknown</satellite>
+		<hpg>B</hpg>
+		<desc>Quatre Belle is a pleasant breadbasket world with abundant natural resources. As with most of the interior Outworlds Alliance planets, Quatre Belle’s industrial and population centers were hit hard by Operation UNION HOLD. The damage was so significant that the planet became little more than an agricultural center, as most of the large cities and industry had been destroyed. When the Snow Ravens joined the Outworlds Alliance, they chose to base their aerospace industries in the Quatre Belle system and began by adding a mobile factory in orbit around Pluto, one of the planet’s three moons, and reactivating the long-abandoned Quatre Belle Shipyards already in orbit around Pluto.</desc>
 	</planet>
 	<planet>
 		<name>Quemoy</name>
@@ -32381,14 +32605,24 @@ Even with its extreme weather, Rahne does support native life. A prime example i
 			<date>3075-01-01</date>
 			<faction>OA,CDS</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.08</gravity>
 		<nadirCharge>True</nadirCharge>
 		<lifeForm>7</lifeForm>
+		<climate>3</climate>
+		<percentWater>54</percentWater>
+		<temperature>38</temperature>
 		<spectralClass>G</spectralClass>
 		<subtype>3</subtype>
+		<luminosity>V</luminosity>
 		<sysPos>3</sysPos>
-		<hpg>C</hpg>
-		<climate>5</climate>
-		<desc>No description available.</desc>
+		<socioIndustrial>B-A-B-B-C</socioIndustrial>
+		<satellite>Name Unknown</satellite>
+		<landMass>Eleuthera</landMass>
+		<landMass>Guanahani</landMass>
+		<landMass>Mayaguana (Varnhagen)</landMass>
+		<hpg>B</hpg>
+		<desc>Ramora is a comfortable, semi-tropical planet with special importance to the Outworlds Alliance as one of their premier military industrial worlds after Operation UNION HOLD ravaged much of the rest of the Alliance’s industry. Ramora is home to one of the two United Outworlders Corporation’s major factories and as of 3025, saw to the production of Lightning and Seydlitz fighters. Factories on and in orbit around Ramora were greatly expanded in the 3060s and 3070s, especially after the Snow Ravens joined the Alliance.</desc>
 	</planet>
 	<planet>
 		<name>Ramsau</name>
@@ -34246,9 +34480,9 @@ As of the 32nd century, this world is little more than an outpost, with no agric
 		<satellite>Mawu</satellite>
 		<landMass>Essex</landMass>
 		<landMass>Lawrence</landMass>
-		<landMass>New England</landMass>
+		<landMass>New England (Eden)</landMass>
 		<socioIndustrial>B-A-D-B-B</socioIndustrial>
-		<desc>No description available.</desc>
+		<desc>Salem is a comfortable cool-temperate world in the Federated Suns with ample arable land and high-tech industries, though the factories are reliant on imports from other planets to keep running. This is primarily due to most of the necessary raw-materials on planet being consumed in the early days of the planet's colonization.</desc>
 	</planet>
 	<planet>
 		<name>Salford</name>
@@ -35135,16 +35369,26 @@ The capital city, Gambootas, is home not only to the planet‘s sole interstella
 		<xcood>469.7</xcood>
 		<ycood>134.05</ycood>
 		<faction>OA</faction>
-		<nadirCharge>True</nadirCharge>
+		<pressure>3</pressure>
+		<gravity>1.08</gravity>
 		<zenithCharge>True</zenithCharge>
 		<lifeForm>3</lifeForm>
+		<climate>3</climate>
+		<percentWater>58</percentWater>
+		<temperature>31</temperature>
 		<spectralClass>M</spectralClass>
 		<subtype>2</subtype>
-		<luminosity>IV</luminosity>
+		<luminosity>V</luminosity>
 		<sysPos>5</sysPos>
+		<socioIndustrial>C-C-B-C-B</socioIndustrial>
+		<satellite>Name Unknown</satellite>
+		<landMass>Janobi Barr-e-Azam</landMass>
+		<landMass>Jinnahpore</landMass>
+		<landMass>Karaj (Shandahar)</landMass>
 		<hpg>B</hpg>
-		<climate>2</climate>
-		<desc>No description available.</desc>
+		<desc>Sevon is a quiet agricultural planet with a small population and only modest industry and technology, despite abundant natural resources and arable land. Sevon is home to Alliance Industries Diversified which produced a wide variety of items from farm equipment, to pharmaceuticals, to mining and refining natural resources such as oil and ore and even the production of military grade armor.
+
+Sevon was famously the location of the Star League’s first defeat during Operation UNION HOLD, thanks to the Pitcairn Legion, whose members were all from the Federated Suns. The Legion managed to inflict significant damage to the SLDF’s 6th Royal Division and cause a tense standoff until the arrival of several Combine forces arrived and forced the Legion off of Sevon. However, the Outworlds Alliance continued to fight, with the population of Sevon running a guerrilla war on the planet and the Alliance sending fighter groups through to harass the Star League Defense Forces present in the system until the war between the Star League and the Outworlds Alliance officially ended with the signing of the Treaty of Cerberus.</desc>
 	</planet>
 	<planet>
 		<name>Sevren</name>
@@ -36569,9 +36813,17 @@ Solaris VII has two continents, Equatus is small, arid, mountainous and sparsely
 		<name>Somerset</name>
 		<xcood>-160.91</xcood>
 		<ycood>429.54</ycood>
-		<faction>RWR</faction>
+		<faction>UND</faction>
 		<factionChange>
-			<date>2900-01-01</date>
+			<date>2372-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>23785-01-01</date>
+			<faction>RWR</faction>
+		</factionChange>
+		<factionChange>
+			<date>2774-01-01</date>
 			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
@@ -36594,6 +36846,29 @@ Solaris VII has two continents, Equatus is small, arid, mountainous and sparsely
 			<date>3071-07-13</date>
 			<faction>CJF</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1.08</gravity>
+		<lifeForm>7</lifeForm>
+		<climate>3</climate>
+		<percentWater>70</percentWater>
+		<temperature>34</temperature>
+		<spectralClass>K</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>1</sysPos>
+		<socioIndustrial>C-C-C-C-B</socioIndustrial>
+		<satellite>Bull</satellite>
+		<satellite>Hind</satellite>
+		<landMass>Bath (Taunton)</landMass>
+		<landMass>Bridgewater</landMass>
+		<landMass>Bristol</landMass>
+		<landMass>Cheddar </landMass>
+		<landMass>Wells</landMass>
+		<landMass>Yeovil</landMass>
+		<hpg>B</hpg>
+		<desc>Somerset is an unassuming backwater planet with a comfortable climate and high levels of agriculture but little else to bring the planet unwanted attention. Originally settled by a group of settlers that were forced to flee their original planets three times under threat of invasion before finally settling on Somerset. The planet was eventually absorbed into the Rim Worlds Republic and remained part of the Republic until being brought into the Lyran Commonwealth after the Amaris Coup. The planet didn’t change hands again for nearly 200 years until Operation Revival when it was captured by the Jade Falcons.
+
+The planet Somerset is best known for two things, first as the location of the AFFC’s second victory over the Clans, though they could not hold the world after the victory, and as a primary focus for the Somerset Strikers’ Holovid, which made claims that the Falcons rounded up the entire population and shipped them back to the Clan Homeworlds to toil as slaves. This last fact is a point of surprise to the residents of Somersets, as the Falcons primarily ignored the backwater world after conquering it.</desc>
 	</planet>
 	<planet>
 		<name>Son Hoa</name>
@@ -37585,6 +37860,25 @@ Tao ‘Mechworks</desc>
 			<date>3050-10-13</date>
 			<faction>CJF</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1</gravity>
+		<zenithCharge>True</zenithCharge>
+		<lifeForm>7</lifeForm>
+		<climate>2</climate>
+		<percentWater>70</percentWater>
+		<temperature>30</temperature>
+		<spectralClass>K</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>4</sysPos>
+		<socioIndustrial>B-B-A-B-C</socioIndustrial>
+		<satellite>Saar</satellite>
+		<satellite>Sule</satellite>
+		<landMass>Dargoth (Hammer)</landMass>
+		<landMass>Holcomb</landMass>
+		<landMass>Jarho Islands</landMass>
+		<hpg>A</hpg>
+		<desc>Sudeten is a comfortable, cool-temperate world that was a holding of the Lyran Commonwealth for most of its history. Sudeten has abundant natural resources and possesses a moderately-high level of technology and heavy industry, while the planet’s comfortable, though somewhat cool, climate means the planet has sufficient agriculture to feed its population. Sudeten was captured by Clan Jade Falcon during Operation Revival and eventually became the Falcon’s capital in the Inner Sphere.</desc>
 	</planet>
 	<planet>
 		<name>Suetonius</name>
@@ -38087,10 +38381,10 @@ For most of the planet’s history it was a Lyran Commonwealth planet bordering 
 		<satellite>Lee</satellite>
 		<landMass>Danville</landMass>
 		<landMass>North Hamilton</landMass>
-		<landMass>South Hamilton</landMass>
+		<landMass>South Hamilton (Calhoun)</landMass>
 		<landmass>Ontario</landmass>
 		<socioIndustrial>A-A-C-B-C</socioIndustrial>
-		<desc>No description available.</desc>
+		<desc>Talcott is a highly advanced planet with significant industrialization. The planet is self sufficient in terms of both raw materials and agriculture and is home to a General Motors 'Mech factory. Talcott is a comfortable planet to live on, if a bit cool. The most noticable difference from Terra is the slightly reduced gravity.</desc>
 	</planet>
 	<planet>
 		<name>Talitha</name>
@@ -38239,6 +38533,12 @@ For most of the planet’s history it was a Lyran Commonwealth planet bordering 
 		<luminosity>V</luminosity>
 		<sysPos>3</sysPos>
 		<socioIndustrial>A-A-B-D-C</socioIndustrial>
+		<satellite>Karachi</satellite>
+		<satellite>Islamabad</satellite>
+		<landMass>Amirani</landMass>
+		<landMass>Dilis (Tamar City)</landMass>
+		<landMass>Kopala</landMass>
+		<landMass>Zadeni</landMass>
 		<hpg>A</hpg>
 		<desc>Before being captured by Clan Wolf in 3050, Tamar was the capital of the Tamar Pact since its founding in the early days of space colonization. Tamar is a large world with high gravity but is also rich in natural resources. The planet also diversified to become a major trade hub. Unfortunately by the end of the 30th Century both of the recharge stations in the system had fallen to damage and ill-repair.</desc>
 	</planet>
@@ -38878,7 +39178,21 @@ The Sol system contains multiple colonized planets, foremost are Mars and Venus.
 
 3135 - The homeworld of humanity, Terra was the crown jewel of the galaxy when the Star League was in full bloom. Plagued by overcrowding and pollution in the years before mankind went to the stars, the land, air, and seas were clean once again by the twenty-sixth century, while the greatest of the planet‘s many cities were restored and improved. At the time of the Star League, Terra had two capital cities: Geneva, on the European continent, for the planet, and Unity City, capital of the Star League, on the North American continent. During the Amaris crisis, however, much of Terra‘s splendor was marred by the Usurper‘s troops, who obliterated several Castles Brian, the Star League Court, and many of the planet‘s most important cities during the coup, occupation, and liberation of Terra. Even today, all seven of Terra‘s main landmasses—North America, Europe, and Asia in the north hemisphere; South America, Africa, Australia, and Antarctica in the southern—still bear the scars and memorials of the Star League‘s final days. However, the rise and fall of Amaris‘ short-lived empire was not the only event to lay waste to the Cradle of Humanity. As allied forces converged on Terra to end the Word of Blake‘s control of the world in the waning days of the Jihad, the surviving Blakist forces in the Terran system resorted to fanatical scorched-earth tactics and suicide assaults that caused even more widespread destruction. The ancient cities of Berlin, Paris, and Rome on the European continent, Moscow, Tokyo, and New Delhi in Asia, Cairo in Africa, and much of the Eastern Megalopolis in North America, all suffered extensive damage from tactical nuclear weapons and heavy urban warfare. Hilton Head, the former command center for ComStar and the Word of Blake when they held sway over Terra, was destroyed in the fighting, along with five of the planet‘s surviving Castles Brian. When Devlin Stone established The Republic of the Sphere, he commissioned the reconstruction of the historic and critically damaged planetary capital, Geneva, to serve again—not just as the capital of Terra, but of the entire Republic. 
 
-In addition to Terra herself, colonies exist on the Terran lunar surface, and the fourth planet in the system, Mars. At the peak of the Star League, settlements also existed on Venus, the second world, and a major shipyard was placed orbiting Titan, a moon of the gas giant Saturn, but both of these worlds are once more void of human habitation. Venus gradually reverted to its hellish environment after the fall of the League, becoming totally uninhabitable once again by the close of the thirty-first century, and the Titan shipyards were destroyed during the Jihad. The capital cities of Luna and Mars are Luna City and Koryo, respectively, though Koryo was heavily damaged in the final days of the Word of Blake‘s reign.</desc>
+In addition to Terra herself, colonies exist on the Terran lunar surface, and the fourth planet in the system, Mars. At the peak of the Star League, settlements also existed on Venus, the second world, and a major shipyard was placed orbiting Titan, a moon of the gas giant Saturn, but both of these worlds are once more void of human habitation. Venus gradually reverted to its hellish environment after the fall of the League, becoming totally uninhabitable once again by the close of the thirty-first century, and the Titan shipyards were destroyed during the Jihad. The capital cities of Luna and Mars are Luna City and Koryo, respectively, though Koryo was heavily damaged in the final days of the Word of Blake‘s reign.
+
+---
+
+3028 - In 2017, Mars was the first planet explored by humankind and was colonised soon after. In 2110, humanity's first attempt at terraforming began on Mars with the seeding of the two polar icecaps with a genetically enhanced plant that eventually caused the ice to melt and evaporate into the atmosphere. Other areas of Mars were planted with other hardy plants to convert carbon dioxide to oxygen and capture the sun's radiant heat. Ice asteroids were crashed into Mars to provide additional water and the resultant deep impact craters became the sites of domed cities. By 2201, rebreathers were no longer required and the temperature was above freezing. Mining companies began to actively exploit the metal depoists and industry soon followed. By the creation of the Star League, Mars had a population of over one million people in 20 domed cities. In 2601, the War Academy of Mars was completed. The Academy consisted of a vast complex of buildings, spaceports, battlefields and barracks located ind a hugh canyon approximately 100 kilometres southeast of Olympus Mons.
+
+During the Aramis coup, the officers and cadets of the Academy fought off the 23rd Republican Dragoons for six weeks before a nuclear weapon was used by frustrated Rim Worlds commander. Republican forces destroyed 11 cities.
+
+---
+
+3028 - The terraforming of Venus began in the 2100s. In 2245, it was discovered that the chemicals that covered the planet's surface made excellent fertilizer. Agribusinesses set up farms using artificial soil and began producing enough food to feed Terra, Mars and Venus and a surplus for other struggling colonies.
+
+The Military Academy of Aphros, the planetary capital, was completed in 2242 and trained soldiers for the SLDF. It was destroyed during the first few months of the Amaris coup by a nuclear device.
+
+Since the fall of the Star League, ten of the twenty huge atmosphere reconditioning stations have failed and Venus has slowly reverted to its normal environmental conditions. Only three inhabited cities, Aphros, Kilic and Genny remain. Recent investigations indicate that the planet will no longer be habitable by 3068.</desc>
 	</planet>
 	<planet>
 		<name>Terra Firma</name>
@@ -40272,13 +40586,31 @@ Gutierrez Aerospace</desc>
 			<date>3050-05-06</date>
 			<faction>CGB</faction>
 		</factionChange>
+		<factionChange>
+			<date>3067-04-01</date>
+			<faction>CDS</faction>
+		</factionChange>
+		<pressure>4</pressure>
+		<gravity>1.03</gravity>
 		<nadirCharge>True</nadirCharge>
 		<zenithCharge>True</zenithCharge>
 		<lifeForm>7</lifeForm>
+		<climate>3</climate>
+		<percentWater>37</percentWater>
+		<temperature>30</temperature>
 		<spectralClass>G</spectralClass>
 		<subtype>5</subtype>
-		<luminosity>III</luminosity>
+		<luminosity>V</luminosity>
 		<sysPos>3</sysPos>
+		<socioIndustrial>A-C-B-B-C</socioIndustrial>
+		<satellite>Byneset</satellite>
+		<satellite>Leinstrand</satellite>
+		<satellite>Strinda</satellite>
+		<satellite>Tiller</satellite>
+		<landMass>Dovre</landMass>
+		<landMass>Fosen (Misby Flats)</landMass>
+		<landMass>Heimdal</landMass>
+		<landMass>Nidaros</landMass>
 		<hpg>B</hpg>
 		<landMass>(Misby Flats)</landMass>
 		<desc>Trondheim is a volatile young planet with regular seismic activity, which usually means there are at least a handful of volcanoes erupting at any one time. These regular eruptions result in long, excessively hot, summers and short, extremely cold, winters, due to the excessive volcanic ash in the atmosphere. The extreme temperatures can make life unpleasant on Trondheim but the extremes are not to the point where the planet is uninhabitable. The benefit of the seismic activity and volcanoes is that rare metals and minerals are made easily accessible after eruptions and the planet’s mining industry has supported a number of major mining corporations for centuries. During its time in the Combine, there were a number of protests, rebellions and attempted revolutions, which often resulted in a crackdown by the DCMS and ISF. The planetary capital of Trondheim is Misby Flats.</desc>
@@ -42041,6 +42373,25 @@ In the early 31st Century an underground Star League-era ‘Mech research facili
 			<date>3072-06-30</date>
 			<faction>CJF</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>0.92</gravity>
+		<zenithCharge>True</zenithCharge>
+		<lifeForm>5</lifeForm>
+		<climate>2</climate>
+		<percentWater>40</percentWater>
+		<temperature>30</temperature>
+		<spectralClass>G</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>5</sysPos>
+		<socioIndustrial>B-B-C-C-B</socioIndustrial>
+		<satellite>Statler</satellite>
+		<landMass>Brigallo</landMass>
+		<landMass>Mackenssen (Waldorff City)</landMass>
+		<landMass>Rentax</landMass>
+		<landMass>Wells</landMass>
+		<hpg>B</hpg>
+		<desc>For most of its history, Waldorff was a fairly unimportant planet in the Lyran Commonwealth, with a relatively comfortable atmosphere and climate and moderate resources and industry, including a sizeable munitions factory, though the only abundant resource on planet was agriculture. During Operation Revival, Waldorff was captured by Clan Jade Falcon, who were required to share the planet with the Steel Vipers by the IlKhan. The Steel Vipers made the planet their Inner Sphere capital and began upgrading the infrastructure and manufacturing on the world but eventually lost Waldorff and the rest of their Inner Sphere holdings to the Falcons.</desc>
 	</planet>
 	<planet>
 		<name>Wallacia</name>
@@ -42460,6 +42811,25 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 			<date>3051-11-17</date>
 			<faction>CW</faction>
 		</factionChange>
+		<pressure>3</pressure>
+		<gravity>1</gravity>
+		<nadirCharge>True</nadirCharge>
+		<lifeForm>7</lifeForm>
+		<climate>3</climate>
+		<percentWater>71</percentWater>
+		<temperature>33</temperature>
+		<spectralClass>G</spectralClass>
+		<subtype>6</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>3</sysPos>
+		<socioIndustrial>A-A-B-A-B</socioIndustrial>
+		<satellite>Weintraube</satellite>
+		<landMass>Baden</landMass>
+		<landMass>Ravensburg</landMass>
+		<landMass>Schussen</landMass>
+		<landMass>Wurttemberg (Neuberlin)</landMass>
+		<hpg>A</hpg>
+		<desc>Weingarten is a beautiful planet with long mild growing seasons that make it ideal for agriculture, and for most of its history the planet was best known for its numerous wineries. Due to the planets’ lack of military value and limited industry the planet suffered very little during the Succession Wars and even when battles did occur on the planet, attackers were usually careful to avoid damaging the vineyards. Things remained much the same, even after the planet was captured by Clan Wolf during Operation Revival, until the Word of Blake Jihad inflicted serious damage on Tamar, the Wolves’ capital, and forced them to relocate. With the relocation, the Wolves quickly expanded their military bases and industrial production on Weingarten, going as far as to demolish several vineyards to make way for their expanded military presence on the planet. The Wolves’ capital returned to Tamar by 3080, unfortunately the damage was already done and the industry was already in place, including the W-8 Facilities, capable of producing multiple lines of ‘Mechs ‘by hand’.</desc>
 	</planet>
 	<planet>
 		<name>Weippe</name>
@@ -43991,6 +44361,34 @@ Today, a trace of Zebeneschamali‘s founding decades can still be seen in the s
 			<date>3050-10-05</date>
 			<faction>CJF</faction>
 		</factionChange>
+		<factionChange>
+			<date>3066-01-01</date>
+			<faction>CW</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-08-14</date>
+			<faction>CW,CHH</faction>
+		</factionChange>
+		<factionChange>
+			<date>3071-08-28</date>
+			<faction>CW</faction>
+		</factionChange>
+		<pressure>3</pressure>
+		<gravity>0.98</gravity>
+		<zenithCharge>True</zenithCharge>
+		<lifeForm>5</lifeForm>
+		<climate>4</climate>
+		<percentWater>1</percentWater>
+		<temperature>35</temperature>
+		<spectralClass>G</spectralClass>
+		<subtype>9</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>2</sysPos>
+		<socioIndustrial>C-B-C-C-C</socioIndustrial>
+		<satellite>Zegwaard</satellite>
+		<landMass>Sahara (Hohenzollern)</landMass>
+		<hpg>B</hpg>
+		<desc>Zoetermeer is a modest desert world that was part of the Lyran Commonwealth for most of its history. That changed during Operation Revival when the planet was conquered by Clan Jade Falcon. The Falcons expected to find a Star League depot that never surfaced and the Falcons eventually lost the planet to the Wolves in the mid 3060s. The planet has just enough arable land to feed its small population with limited offworld food imports and the modest natural resources are mostly used to feed the orbital factory built by the Wolves to produce naval components.</desc>
 	</planet>
 	<planet>
 		<name>Zolfo</name>
