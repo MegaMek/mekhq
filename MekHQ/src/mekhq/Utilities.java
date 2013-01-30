@@ -52,6 +52,11 @@ import megamek.common.weapons.BayWeapon;
 import megamek.common.weapons.InfantryAttack;
 import megamek.common.weapons.infantry.InfantryWeapon;
 import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.Unit;
+import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.equipment.AmmoBin;
+import mekhq.campaign.parts.equipment.EquipmentPart;
+import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 
@@ -380,4 +385,74 @@ public class Utilities {
 			System.out.println(e.getMessage());  
 		}
 	}
+	
+	public static void unscrambleEquipmentNumbers(Unit unit) {
+        ArrayList<Integer> equipNums = new ArrayList<Integer>();
+        for(Mounted m : unit.getEntity().getEquipment()) {
+            equipNums.add(unit.getEntity().getEquipmentNum(m));
+        }
+        for(Part part : unit.getParts()) {
+            if(part instanceof AmmoBin) {
+                AmmoBin bin = (AmmoBin)part;
+                int i = -1;
+                boolean found = false;
+                for(int equipNum : equipNums) {
+                    i++;
+                    Mounted m = unit.getEntity().getEquipment(equipNum);
+                    if(!(m.getType() instanceof AmmoType)) {
+                        continue;
+                    }
+                    if(m.getType().getInternalName().equals(bin.getType().getInternalName())
+                            && ((AmmoType)m.getType()).getMunitionType() == bin.getMunitionType()
+                            && !m.isDestroyed()) {
+                        bin.setEquipmentNum(equipNum);
+                        found = true;
+                        break;
+                    }
+                }
+                if(found) {
+                    equipNums.remove(i);
+                }
+            }
+            else if(part instanceof EquipmentPart) {
+                EquipmentPart epart = (EquipmentPart)part;
+                int i = -1;
+                boolean found = false;
+                for(int equipNum : equipNums) {
+                    i++;
+                    Mounted m = unit.getEntity().getEquipment(equipNum);
+                    if(m.getType() instanceof AmmoType) {
+                        continue;
+                    }
+                    if(m.getType().getInternalName().equals(epart.getType().getInternalName())
+                            && !m.isDestroyed()) {
+                        epart.setEquipmentNum(equipNum);
+                        found = true;
+                        break;
+                    }
+                }
+                if(found) {
+                    equipNums.remove(i);
+                }
+            }
+            else if(part instanceof MissingEquipmentPart) {
+                MissingEquipmentPart epart = (MissingEquipmentPart)part;
+                int i = -1;
+                boolean found = false;
+                for(int equipNum : equipNums) {
+                    i++;
+                    Mounted m = unit.getEntity().getEquipment(equipNum);
+                    if(m.getType().getInternalName().equals(epart.getType().getInternalName())
+                            && m.isDestroyed()) {
+                        epart.setEquipmentNum(equipNum);
+                        found = true;
+                        break;
+                    }
+                }
+                if(found) {
+                    equipNums.remove(i);
+                }
+            }
+        }
+    }
 }

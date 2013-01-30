@@ -1,6 +1,6 @@
 <launch4jConfig>
   <headerType>gui</headerType>
-  <jar>MegaMekLab.jar</jar>
+  <jar>lib/MegaMekLab.jar</jar>
   <outfile>../svndev/MegaMekLab.exe</outfile>
   <dontWrapJar>true</dontWrapJar>
   <errTitle></errTitle>
@@ -11,7 +11,7 @@
   <supportUrl>http://megamek.sourceforge.net/forums</supportUrl>
   <customProcName>true</customProcName>
   <stayAlive>false</stayAlive>
-  <icon>../data/images/misc/megamek.ico</icon>
+  <icon>../packaging_utils/megameklab.ico</icon>
   <jre>
     <minVersion>1.5.0</minVersion>
     <jdkPreference>preferJre</jdkPreference>

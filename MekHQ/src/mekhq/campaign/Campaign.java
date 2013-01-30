@@ -2123,6 +2123,12 @@ public class Campaign implements Serializable {
 				}
 			}
 			
+			//Its annoying to have to do this, but this helps to ensure
+			//that equipment numbers correspond to the right parts - its 
+			//possible that these might have changed if changes were made to the 
+			//ordering of equipment in the underlying data file for the unit
+			Utilities.unscrambleEquipmentNumbers(unit);
+			
 			//some units might need to be assigned to scenarios
 			Scenario s = retVal.getScenario(unit.getScenarioId());
 			if(null != s) {

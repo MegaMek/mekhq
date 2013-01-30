@@ -26,18 +26,17 @@
       <key>MainClass</key>
       <string>mekhq.MekHQ</string>
       <key>JVMVersion</key>
-      <string>1.3+</string>
+      <string>1.6+</string>
       <key>ClassPath</key>
       <array>
         <string>$JAVAROOT/MekHQ.jar</string>
-        <string>$JAVAROOT/../../../../lib/Ostermiller.jar</string>
-        <string>$JAVAROOT/../../../../lib/PngEncoder.jar</string>
-        <string>$JAVAROOT/../../../../lib/TabPanel.jar</string>
-        <string>$JAVAROOT/../../../../lib/TinyXML.jar</string>
-        <string>$JAVAROOT/../../../../lib/j3dcore.jar</string>
-        <string>$JAVAROOT/../../../../lib/j3dutils.jar</string>
-        <string>$JAVAROOT/../../../../lib/vecmath.jar</string>
-        <string>$JAVAROOT/../../../../MegaMekLab.jar</string>
+        <string>$JAVAROOT/lib/Ostermiller.jar</string>
+        <string>$JAVAROOT/lib/PngEncoder.jar</string>
+        <string>$JAVAROOT/lib/TabPanel.jar</string>
+        <string>$JAVAROOT/lib/TinyXML.jar</string>
+        <string>$JAVAROOT/lib/j3dcore.jar</string>
+        <string>$JAVAROOT/lib/j3dutils.jar</string>
+        <string>$JAVAROOT/lib/vecmath.jar</string>
         <string>$JAVAROOT/../../../../MegaMek.app/Contents/Resources/Java/MegaMek.jar</string>
         <string>$JAVAROOT/../../../../MegaMekLab.app/Contents/Resources/Java/MegaMekLab.jar</string>
       </array>

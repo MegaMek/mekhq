@@ -26,12 +26,12 @@
       <key>MainClass</key>
       <string>megameklab.com.MegaMekLab</string>
       <key>JVMVersion</key>
-      <string>1.3+</string>
+      <string>1.6+</string>
       <key>ClassPath</key>
       <array>
-        <string>$JAVAROOT/MegaMekLab.jar</string>
-        <string>$JAVAROOT/../../../../lib/TinyXML.jar</string>
-        <string>$JAVAROOT/../../../../MegaMek.app/Contents/Resources/Java/MegaMek.jar</string>
+        <string>$JAVAROOT/../../../../MekHQ.app/Contents/Resources/Java/MegaMekLab.jar</string>
+        <string>$JAVAROOT/../../../../MekHQ.app/Contents/Resources/Java/MegaMek.jar</string>
+        <string>$JAVAROOT/../../../../MekHQ.app/Contents/Resources/Java/lib/TinyXML.jar</string>
       </array>
       <key>VMOptions</key>
       <string>-Xmx256m</string>

@@ -6,6 +6,15 @@
   <errTitle></errTitle>
   <cmdLine></cmdLine>
   <chdir>.</chdir>
+  <classPath>
+  	<mainClass>mekhq.MekHQ</mainClass>
+  	<cp>lib/MegaMek.jar</cp>
+  	<cp>lib/MegaMekLab.jar</cp>	
+  	<cp>lib/TinyXML.jar</cp>
+  	<cp>lib/vecmath.jar</cp>	
+  	<cp>lib/Ostermiller.jar</cp>	
+  	<cp>lib/TabPanel.jar</cp>	
+  </classPath>
   <priority>normal</priority>
   <downloadUrl>http://java.com/download</downloadUrl>
   <supportUrl>http://megamek.sourceforge.net/forums</supportUrl>

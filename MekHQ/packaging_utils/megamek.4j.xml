@@ -1,6 +1,6 @@
 <launch4jConfig>
   <headerType>gui</headerType>
-  <jar>MegaMek.jar</jar>
+  <jar>lib/MegaMek.jar</jar>
   <outfile>../svndev/MegaMek.exe</outfile>
   <dontWrapJar>true</dontWrapJar>
   <errTitle></errTitle>
