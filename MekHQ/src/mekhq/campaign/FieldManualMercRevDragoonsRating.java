@@ -121,6 +121,9 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
 
     private void updateAvailableSupport() {
         for (Person p : campaign.getPersonnel()) {
+            if(!p.isActive()) {
+                continue;
+            }
             if (p.isTech()) {
                 updateTechSupportAvailable(p);
             } else if (p.isDoctor()) {
