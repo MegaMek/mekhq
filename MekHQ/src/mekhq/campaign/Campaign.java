@@ -2123,6 +2123,12 @@ public class Campaign implements Serializable {
 				}
 			}
 			
+			//lets make sure the force id set actually corresponds to a force
+			//TODO: we have some reports of force id relics - need to fix
+			if(unit.getForceId() > 0 && null == retVal.getForce(unit.getForceId())) {
+			    unit.setForceId(-1);
+			}
+			
 			//Its annoying to have to do this, but this helps to ensure
 			//that equipment numbers correspond to the right parts - its 
 			//possible that these might have changed if changes were made to the 

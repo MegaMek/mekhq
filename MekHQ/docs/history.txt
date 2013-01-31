@@ -18,6 +18,7 @@ v0.1.21 (SVN)
 + updated packaging.xml
 + added an unscrambleEquipmentNumbers routine to campaign loading to deal with changing equip numbers in mounted
 + Bug 291: KIA,MIA and retired support personnel still count towards support needs.
++ check for invalid force ids in loading (associated with Bug 292)
 
 v0.1.20 (2012-10-12)
 + skip over entities in mul without externalIDs during scenario resolution (related to Bug 233)
