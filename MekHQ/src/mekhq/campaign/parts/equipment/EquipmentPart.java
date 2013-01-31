@@ -24,11 +24,14 @@ import java.io.PrintWriter;
 
 import megamek.common.AmmoType;
 import megamek.common.CriticalSlot;
+import megamek.common.Engine;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.MiscType;
 import megamek.common.Mounted;
+import megamek.common.Protomech;
 import megamek.common.TechConstants;
+import megamek.common.WeaponType;
 import megamek.common.weapons.Weapon;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Era;
@@ -106,6 +109,9 @@ public class EquipmentPart extends Part {
     public EquipmentPart clone() {
     	EquipmentPart clone = new EquipmentPart(getUnitTonnage(), type, equipmentNum, campaign);
         clone.copyBaseData(this);
+        if(hasVariableTonnage(type)) {
+            clone.setEquipTonnage(equipTonnage);
+        }
     	return clone;
     }
     
@@ -453,57 +459,87 @@ public class EquipmentPart extends Part {
     	//why does all the proto ammo have no cost?
     	Entity en = null;
     	boolean isArmored = false;
+        double itemCost = type.getRawCost();   
+        if (itemCost == EquipmentType.COST_VARIABLE) {
+            itemCost = resolveVariableCost(isArmored);
+        }
     	if (unit != null) {
             en = unit.getEntity();
             Mounted mounted = unit.getEntity().getEquipment(equipmentNum);
             if(null != mounted) {
             	isArmored = mounted.isArmored();
             }
+            type.getCost(en, isArmored, getLocation());
     	}
-
-        int itemCost = 0;      
-        try {
-        	itemCost = (int) type.getCost(en, isArmored, getLocation());
-        	if (itemCost == EquipmentType.COST_VARIABLE) {
-        		itemCost = resolveVariableCost(isArmored);
-        	}
-        } catch(NullPointerException ex) {
-        	System.out.println("Found a null entity while calculating cost for " + name);
+    	int finalCost = (int)itemCost;
+    	if (isArmored) {
+            //need a getCriticals command - but how does this work?
+            //finalCost += 150000 * getCriticals(entity);
         }
-        return itemCost;
+        return finalCost;
     }
     
     private int resolveVariableCost(boolean isArmored) {
-    	int varCost = 0;
-        if (type instanceof MiscType) {
-            if (type.hasFlag(MiscType.F_TARGCOMP)) {
-                varCost = (int) Math.ceil(getTonnage() * 10000);
+    	double varCost = 0;
+        if (type instanceof MiscType) {           
+            if (type.hasFlag(MiscType.F_DRONE_CARRIER_CONTROL)) {
+                varCost = getTonnage() * 10000;
+            } else if (type.hasFlag(MiscType.F_FLOTATION_HULL) || type.hasFlag(MiscType.F_VACUUM_PROTECTION) || type.hasFlag(MiscType.F_ENVIRONMENTAL_SEALING) || type.hasFlag(MiscType.F_OFF_ROAD)) {
+                //??
+            } else if (type.hasFlag(MiscType.F_LIMITED_AMPHIBIOUS) || type.hasFlag((MiscType.F_FULLY_AMPHIBIOUS))) {
+                varCost = getTonnage() * 10000;
+            } else if (type.hasFlag(MiscType.F_DUNE_BUGGY)) {
+                varCost = 10 * getTonnage() * getTonnage();
+            } else if (type.hasFlag(MiscType.F_MASC) && type.hasFlag(MiscType.F_BA_EQUIPMENT)) {
+                //TODO: handle this one differently
+                //costValue = entity.getRunMP() * 75000;
+            } else if (type.hasFlag(MiscType.F_HEAD_TURRET) || type.hasFlag(MiscType.F_SHOULDER_TURRET) || type.hasFlag(MiscType.F_QUAD_TURRET)) {
+                varCost = getTonnage() * 10000;
+            } else if (type.hasFlag(MiscType.F_SPONSON_TURRET)) {
+                varCost = getTonnage() * 4000;
+            } else if (type.hasFlag(MiscType.F_PINTLE_TURRET)) {
+                varCost = getTonnage() * 1000;
+            } else if (type.hasFlag(MiscType.F_ARMORED_MOTIVE_SYSTEM)) {
+                //TODO: handle this through motive system part
+                varCost = getTonnage() * 100000;
+            } else if (type.hasFlag(MiscType.F_JET_BOOSTER)) {
+                //TODO: Handle this one through subtyping
+                //varCost = entity.getEngine().getRating() * 10000;
+            } else if (type.hasFlag(MiscType.F_DRONE_OPERATING_SYSTEM)) {
+                varCost = (getTonnage() * 10000) + 5000;
+            } else if (type.hasFlag(MiscType.F_TARGCOMP)) {
+                varCost = getTonnage() * 10000;
             } else if (type.hasFlag(MiscType.F_CLUB) && (type.hasSubType(MiscType.S_HATCHET) || type.hasSubType(MiscType.S_MACE_THB))) {
-                varCost = (int) Math.ceil(getTonnage() * 5000);
+                varCost = getTonnage() * 5000;
             } else if (type.hasFlag(MiscType.F_CLUB) && type.hasSubType(MiscType.S_SWORD)) {
-                varCost = (int) Math.ceil(getTonnage() * 10000);
+                varCost = getTonnage() * 10000;
             } else if (type.hasFlag(MiscType.F_CLUB) && type.hasSubType(MiscType.S_RETRACTABLE_BLADE)) {
-                varCost = (int) Math.ceil((1+getTonnage()) * 10000);
+                varCost = (1 + getTonnage()) * 10000;
             } else if (type.hasFlag(MiscType.F_TRACKS)) {
-            	//TODO: need engine
+                //TODO: Handle this through subtyping
                 //varCost = (int) Math.ceil((500 * entity.getEngine().getRating() * entity.getWeight()) / 75);
             } else if (type.hasFlag(MiscType.F_TALON)) {
-            	//TODO: I dont know if I can do talons here as they depend on unit weight
-                varCost = (int) Math.ceil(getUnitTonnage() * 300);
+                varCost = (int) Math.ceil(getTonnage() * 300);
+            } else if (type.hasFlag(MiscType.F_SPIKES)) {
+                varCost = (int) Math.ceil(getTonnage() * 50);
+            } else if (type.hasFlag(MiscType.F_PARTIAL_WING)) {
+                varCost = (int) Math.ceil(getTonnage() * 50000);
+            } else if (type.hasFlag(MiscType.F_ACTUATOR_ENHANCEMENT_SYSTEM)) {
+                //TODO: subtype this one
+                //int multiplier = entity.locationIsLeg(loc) ? 700 : 500;
+                //costValue = (int) Math.ceil(entity.getWeight() * multiplier);
+            } else if (type.hasFlag(MiscType.F_HAND_WEAPON) && (type.hasSubType(MiscType.S_CLAW))) {
+                varCost = (int) Math.ceil(getUnitTonnage() * 200);
+            } else if (type.hasFlag(MiscType.F_CLUB) && (type.hasSubType(MiscType.S_LANCE))) {
+                varCost = (int) Math.ceil(getUnitTonnage() * 150);
             }
 
-        } else {
-            if (varCost == 0) {
-                // if we don't know what it is...
-                System.out.println("I don't know how much " + name + " costs.");
-            }
-        }
-
-        if (isArmored) {
-        	//need a getCriticals command - but how does this work?
-            //varCost += 150000 * getCriticals(entity);
-        }
-        return varCost;
+        } 
+        if (varCost == 0) {
+          // if we don't know what it is...
+          System.out.println("I don't know how much " + name + " costs.");
+        }      
+        return (int) Math.ceil(varCost);
     }
     
     /*
