@@ -212,13 +212,8 @@ public class MekLabPanel extends JPanel {
         	run = ((Mech)entity).getOriginalRunMPwithoutMASC();
         }
         int jump = entity.getOriginalJumpMP();
-        int heat = 0;
-        if(entity instanceof Mech) {
-        	heat = ((Mech)entity).getNumberOfSinks();
-	        if (((Mech)entity).hasDoubleHeatSinks()) {
-	            heat *= 2;
-	        }
-        }
+        int heat = entity.getHeatCapacity();
+
         double totalHeat = calculateTotalHeat();
 		int bvDiff = entity.calculateBattleValue(true, true) - unit.getEntity().calculateBattleValue(true, true);
 		float currentTonnage = testEntity.calculateWeight();
