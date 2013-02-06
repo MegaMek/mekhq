@@ -588,11 +588,11 @@ public class Refit implements IPartWork, IAcquisitionWork {
 		}
 	}
 	
-	public void begin() {
+	public void begin() throws EntityLoadingException {
+	    if(customJob) {
+            saveCustomization();
+        }
 		oldUnit.setRefit(this);
-		if(customJob) {
-			saveCustomization();
-		}
 		reserveNewParts();
 	}
 	
@@ -892,7 +892,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 		oldUnit.setRefit(null);
 	}
 	
-	public void saveCustomization() {
+	public void saveCustomization() throws EntityLoadingException {
 		UnitUtil.compactCriticals(newEntity);
 	    UnitUtil.reIndexCrits(newEntity);
 	
@@ -920,12 +920,15 @@ public class Refit implements IPartWork, IAcquisitionWork {
 	    //I need to change the new entity to the one from the mtf file now, so that equip
 	    //nums will match
 	    MechSummary summary = MechSummaryCache.getInstance().getMech(newEntity.getChassis() + " " + newEntity.getModel());
-		try {
+		if(null == summary) {
+		    throw(new EntityLoadingException());
+		}
+	    //try {
             newEntity = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
-		} catch (EntityLoadingException ex) {
+		/*} catch (EntityLoadingException ex) {
 			Logger.getLogger(CampaignGUI.class.getName())
 					.log(Level.SEVERE, null, ex);
-		}	
+		}*/	
 	    
 	}
 	

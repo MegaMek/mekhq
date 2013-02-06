@@ -145,6 +145,7 @@ import megamek.common.UnitType;
 import megamek.common.WeaponType;
 import megamek.common.XMLStreamParser;
 import megamek.common.loaders.BLKFile;
+import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.IOption;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.DirectoryItems;
@@ -2935,7 +2936,15 @@ public class CampaignGUI extends JPanel {
 				JOptionPane.YES_NO_OPTION)) {
     		return;
     	}
-    	r.begin();
+    	try {
+    	    r.begin();
+    	} catch(EntityLoadingException ex) {
+    	    JOptionPane.showMessageDialog(null,
+    	            "For some reason, the unit you are trying to customize cannot be loaded\n and so the customization was cancelled. Please report the bug with a description\nof the unit being customized.",
+    	            "Could not customize unit",
+    	            JOptionPane.ERROR_MESSAGE);
+    	    return;
+    	}
     	getCampaign().refit(r);
     	panMekLab.clearUnit();
     	refreshReport();
