@@ -25,6 +25,7 @@ v0.1.21 (SVN)
 + Planetary update 34
 + Bug 289: NPE on invalid location of Artemis IV FCS
 + Bug 287: Campaigns not saving tank motive system and engine hits
++ Bug 285: File not loading; Error refers back to Log file. (xml character escaping for equipment names)
 
 v0.1.20 (2012-10-12)
 + skip over entities in mul without externalIDs during scenario resolution (related to Bug 233)

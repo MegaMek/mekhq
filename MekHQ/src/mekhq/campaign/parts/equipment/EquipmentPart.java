@@ -182,7 +182,7 @@ public class EquipmentPart extends Part {
 				+"</equipmentNum>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<typeName>"
-				+type.getInternalName()
+				+MekHqXmlUtil.escape(type.getInternalName())
 				+"</typeName>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<equipTonnage>"

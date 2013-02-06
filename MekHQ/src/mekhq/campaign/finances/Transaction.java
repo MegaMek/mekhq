@@ -171,7 +171,7 @@ public class Transaction implements Serializable {
 				+"</amount>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<description>"
-				+description
+				+MekHqXmlUtil.escape(description)
 				+"</description>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<category>"

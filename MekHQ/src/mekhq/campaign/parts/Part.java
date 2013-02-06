@@ -411,7 +411,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 				+"</id>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<name>"
-				+name
+				+MekHqXmlUtil.escape(name)
 				+"</name>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<unitTonnage>"

@@ -90,7 +90,7 @@ public class MissingAmmoBin extends MissingEquipmentPart {
 				+"</equipmentNum>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<typeName>"
-				+typeName
+				+MekHqXmlUtil.escape(typeName)
 				+"</typeName>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<checkedToday>"
