@@ -228,6 +228,9 @@ public class MekHqXmlUtil {
 			if (tentity.isTurretLocked(Tank.LOC_TURRET)) {
 				retVal += getTurretLockedString(tentity, indentLvl+1);
 			}
+
+			// Crits
+			retVal += getTankCritString(tentity, indentLvl+1);
 		}
 
 		// add a bunch of stuff for aeros
@@ -433,8 +436,67 @@ public class MekHqXmlUtil {
 		
 		retVal = retVal.concat("\"/>\n");
 
+		// save any motive hits
+		retVal = retVal.concat(MekHqXmlUtil.indentStr(indentLvl) + "<motive damage=\"");
+		retVal = retVal.concat(Integer.toString(e.getMotiveDamage()));
+		retVal = retVal.concat("\" penalty=\"");
+		retVal = retVal.concat(Integer.toString(e.getMotivePenalty()));
+		retVal = retVal.concat("\"/>\n");
+
 		return retVal;
 	}
+	
+	/**
+	 * Contents copied from megamek.common.EntityListFile.getTankCritString(...)
+	 * Modified to support saving to/from XML for our purposes in MekHQ
+	 * 
+	 * @param e
+	 *            The tank to generate a movement string for.
+	 * @return The generated string.
+	 */
+	 private static String getTankCritString(Tank e, int indentLvl) {
+
+	     String retVal = MekHqXmlUtil.indentStr(indentLvl) + "<tcriticals";
+	     String critVal = "";
+
+	     // crits
+	     if (e.getSensorHits() > 0) {
+		 critVal = critVal.concat(" sensors=\"");
+		 critVal = critVal.concat(Integer.toString(e.getSensorHits()));
+		 critVal = critVal.concat("\"");
+	     }
+	     if (e.isEngineHit()) {
+		 critVal = critVal.concat(" engine=\"");
+		 critVal = critVal.concat("hit");
+		 critVal = critVal.concat("\"");
+	     }
+
+	     /* crew are handled as a Person object in MekHq...
+	     if (e.isDriverHit()) {
+		 critVal = critVal.concat(" driver=\"");
+		 critVal = critVal.concat("hit");
+		 critVal = critVal.concat("\"");
+	     }
+
+	     if (e.isCommanderHit()) {
+		 critVal = critVal.concat(" commander=\"");
+		 critVal = critVal.concat("hit");
+		 critVal = critVal.concat("\"");
+	     }
+	     */
+
+	     if (!critVal.equals("")) {
+		 // then add beginning and end
+		 retVal = retVal.concat(critVal);
+		 retVal = retVal.concat("/>\n");
+	     } else {
+		 return critVal;
+	     }
+
+	     return retVal;
+
+	}
+
 
 	/**
 	 * Contents copied from megamek.common.EntityListFile.getMovementString(...)
