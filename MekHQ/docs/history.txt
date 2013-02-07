@@ -1,6 +1,6 @@
 VERSION HISTORY
 ----------------------------------
-v0.1.21 (SVN)
+v0.1.21 (2013-02-07)
 + Bug: infinite loop in MekGyro#updateConditionFromEntity
 + Added four shell files for Linux/UNIX users to start megamek easier.
         hq.sh - starts MekHQ
