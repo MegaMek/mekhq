@@ -407,6 +407,7 @@ public class ResolveScenarioWizardDialog extends javax.swing.JDialog {
             pnlSalvage.add(box, gridBagConstraints);
             i++;
         }
+        checkSalvageRights();
     	pnlMain.add(pnlSalvage, SALVAGEPANEL);
     	
     	/*

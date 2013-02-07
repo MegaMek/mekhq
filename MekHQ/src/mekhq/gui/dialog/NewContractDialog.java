@@ -902,7 +902,7 @@ public class NewContractDialog extends javax.swing.JDialog {
     
     private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHireActionPerformed
     	contract.setName(txtName.getText());
-    	contract.setPlanetName(suggestPlanet.getText());
+    	//contract.setPlanetName(suggestPlanet.getText());
     	contract.setEmployer(txtEmployer.getText());
     	contract.setType(txtType.getText());
     	contract.setDesc(txtDesc.getText());

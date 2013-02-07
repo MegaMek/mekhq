@@ -365,7 +365,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
         //reset start date for transportation time to be correctly recalculated
         startDate = null;
     }
-	
+
 	/**
 	 * Only do this at the time the contract is set up, otherwise amounts may change after
 	 * the ink is signed, which is a no-no.

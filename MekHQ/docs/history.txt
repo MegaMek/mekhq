@@ -26,6 +26,8 @@ v0.1.21 (SVN)
 + Bug 289: NPE on invalid location of Artemis IV FCS
 + Bug 287: Campaigns not saving tank motive system and engine hits
 + Bug 285: File not loading; Error refers back to Log file. (xml character escaping for equipment names)
++ Bug: NPE for contract dates
++ Bug 295: Mech Salvage selection bug after battle
 
 v0.1.20 (2012-10-12)
 + skip over entities in mul without externalIDs during scenario resolution (related to Bug 233)
