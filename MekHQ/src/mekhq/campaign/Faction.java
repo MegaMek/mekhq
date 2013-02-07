@@ -153,7 +153,7 @@ public class Faction {
 		//TODO: This seems hacky - we shouldn't hardcode in universe details
 		//like this
         int factionMod = 0;
-        if (part.isClanTechBase() && !isClan()) {
+        if (part.getTechBase() == Part.T_CLAN && !isClan()) {
             // Availability of clan tech for IS
             if (currentYear<3050)
                 // Impossible to buy before clan invasion
@@ -168,7 +168,7 @@ public class Faction {
                 // After great refusal, hard to buy
                 factionMod = 3;
         }
-        if (!part.isClanTechBase() && isPeriphery()) {
+        if (part.getTechBase() == Part.T_IS && isPeriphery()) {
             // Availability of high tech rating equipment in low tech areas (periphery)
             switch (part.getTechRating()) {
                 case(EquipmentType.RATING_E) :

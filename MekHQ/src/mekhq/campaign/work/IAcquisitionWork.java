@@ -50,8 +50,8 @@ public interface IAcquisitionWork extends IWork {
 	public String failToFind();
 	
 	public TargetRoll getAllAcquisitionMods();
-	
-	public boolean isClanTechBase();
+
+	public int getTechBase();
 	
 	public int getTechLevel();
 	

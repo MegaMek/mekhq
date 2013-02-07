@@ -93,7 +93,7 @@ public class Utilities {
             if(lvl < 0) {
             	lvl = 0;
             }
-            if(techLvl < (Integer.parseInt(TechConstants.T_SIMPLE_LEVEL[lvl])-2)) {
+            if(techLvl < Utilities.getSimpleTechLevel(lvl)) {
             	continue;
             }
             if(TechConstants.isClan(cur_atype.getTechLevel()) != TechConstants.isClan(lvl)) {
@@ -188,7 +188,7 @@ public class Utilities {
 			if(options.limitByYear() && summary.getYear() > year) {
 				continue;
 			}
-			if(options.getTechLevel() < (Integer.parseInt(TechConstants.T_SIMPLE_LEVEL[summary.getType()])-2)) {
+			if(options.getTechLevel() < Utilities.getSimpleTechLevel(summary.getType())) {
 				continue;
 			}
 			if(en.getChassis().equalsIgnoreCase(summary.getChassis())
@@ -315,7 +315,7 @@ public class Utilities {
             if(lvl < 0) {
             	continue;
             }
-            if(techLvl < (Integer.parseInt(TechConstants.T_SIMPLE_LEVEL[lvl])-2)) {
+            if(techLvl < Utilities.getSimpleTechLevel(lvl)) {
             	continue;
             }          
             if(techLvl == TechConstants.T_IS_UNOFFICIAL) {
@@ -356,6 +356,30 @@ public class Utilities {
 			}
 		}
 		return values;
+	}
+	
+	public static int getSimpleTechLevel(int level) {
+	    switch(level) {
+	    case TechConstants.T_ALLOWED_ALL:
+	    case TechConstants.T_INTRO_BOXSET:
+	        return CampaignOptions.TECH_INTRO;
+	    case TechConstants.T_IS_TW_NON_BOX:
+	    case TechConstants.T_CLAN_TW:
+	    case TechConstants.T_IS_TW_ALL:
+        case TechConstants.T_TW_ALL:
+            return CampaignOptions.TECH_STANDARD;
+        case TechConstants.T_IS_ADVANCED:
+        case TechConstants.T_CLAN_ADVANCED:
+            return CampaignOptions.TECH_ADVANCED;
+        case TechConstants.T_IS_EXPERIMENTAL:
+        case TechConstants.T_CLAN_EXPERIMENTAL:
+            return CampaignOptions.TECH_EXPERIMENTAL;
+        case TechConstants.T_IS_UNOFFICIAL:
+        case TechConstants.T_CLAN_UNOFFICIAL:
+            return CampaignOptions.TECH_UNOFFICIAL;
+        default:
+            return CampaignOptions.TECH_INTRO;
+	    }
 	}
 	
 	//copied from http://www.roseindia.net/java/beginners/copyfile.shtml

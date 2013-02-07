@@ -50,6 +50,7 @@ import megamek.common.TechConstants;
 import megamek.common.UnitType;
 import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHQ;
+import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.gui.CampaignGUI;
 
@@ -406,7 +407,7 @@ public class UnitSelectorDialog extends JDialog {
                 /* Weight */
                 (mech.getWeightClass() == nClass || nClass == EntityWeightClass.SIZE) &&             
                 /* Technology Level */
-                campaign.getCampaignOptions().getTechLevel() >= (Integer.parseInt(TechConstants.T_SIMPLE_LEVEL[mech.getType()])-2) &&        
+                campaign.getCampaignOptions().getTechLevel() >= Utilities.getSimpleTechLevel(mech.getType()) &&        
                 /*Unit type*/
                  ((nUnit == UnitType.SIZE) || mech.getUnitType().equals(UnitType.getTypeName(nUnit))) &&
                  ((searchFilter==null) || MechSearchFilter.isMatch(mech, searchFilter))) {

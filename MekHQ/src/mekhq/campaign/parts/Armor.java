@@ -214,7 +214,7 @@ public class Armor extends Part implements IAcquisitionWork {
     }
 
     @Override
-    public boolean isClanTechBase() {
+    protected boolean isClanTechBase() {
     	return clan;
     }
     

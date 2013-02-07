@@ -335,6 +335,9 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
 
 	public int getTechBase() {
+	    if(getTechLevel() == TechConstants.T_ALLOWED_ALL) {
+	        return T_BOTH;
+	    }
 		if(isClanTechBase()) {
 			return T_CLAN;
 		} else {
@@ -393,7 +396,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		return PART_TYPE_OTHER;
 	}
 
-    public boolean isClanTechBase() {
+    protected boolean isClanTechBase() {
         return TechConstants.isClan(getTechLevel());
     }
 

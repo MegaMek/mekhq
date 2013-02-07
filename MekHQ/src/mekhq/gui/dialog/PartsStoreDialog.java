@@ -51,6 +51,7 @@ import megamek.common.AmmoType;
 import megamek.common.MiscType;
 import megamek.common.TechConstants;
 import megamek.common.WeaponType;
+import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.AeroSensor;
 import mekhq.campaign.parts.Armor;
@@ -253,13 +254,13 @@ public class PartsStoreDialog extends javax.swing.JDialog {
         		if(txtFilter.getText().length() > 0 && !part.getName().toLowerCase().contains(txtFilter.getText().toLowerCase())) {
                     return false;
                 }
-    			if(part.isClanTechBase() && !campaign.getCampaignOptions().allowClanPurchases()) {
+    			if(part.getTechBase() == Part.T_CLAN && !campaign.getCampaignOptions().allowClanPurchases()) {
     				return false;
     			}
-    			if(!part.isClanTechBase() && !campaign.getCampaignOptions().allowISPurchases()) {
+    			if(part.getTechBase() == Part.T_IS && !campaign.getCampaignOptions().allowISPurchases()) {
     				return false;
     			}
-    			if(campaign.getCampaignOptions().getTechLevel() < (Integer.parseInt(TechConstants.T_SIMPLE_LEVEL[part.getTechLevel()])-2)) {
+    			if(campaign.getCampaignOptions().getTechLevel() < Utilities.getSimpleTechLevel(part.getTechLevel())) {
     				return false;
     			}
     			//TODO: limit by year

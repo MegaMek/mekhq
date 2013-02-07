@@ -168,7 +168,7 @@ public class EquipmentPart extends Part {
     @Override
     public int getTechLevel() {
         if (getType().getTechLevel() < 0 || getType().getTechLevel() >= TechConstants.SIZE)
-            return TechConstants.T_IS_TW_NON_BOX;
+            return TechConstants.T_INTRO_BOXSET;
         else
             return getType().getTechLevel();
     }

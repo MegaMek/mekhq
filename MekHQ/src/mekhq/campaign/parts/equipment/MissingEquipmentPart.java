@@ -118,18 +118,6 @@ public class MissingEquipmentPart extends MissingPart {
     }
 
     @Override
-    public boolean isClanTechBase() {
-        String techBase = TechConstants.getTechName(getType().getTechLevel());
-
-        if (techBase.equals("Clan"))
-            return true;
-        else if (techBase.equals("Inner Sphere"))
-            return false;
-        else
-            return false;
-    }
-
-    @Override
 	public void writeToXml(PrintWriter pw1, int indent) {
 		writeToXmlBegin(pw1, indent);		
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)

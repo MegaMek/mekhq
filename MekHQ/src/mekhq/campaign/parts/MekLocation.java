@@ -306,9 +306,16 @@ public class MekLocation extends Part {
 		case EquipmentType.T_STRUCTURE_ENDO_COMPOSITE:
 		case EquipmentType.T_STRUCTURE_REINFORCED:
 		case EquipmentType.T_STRUCTURE_COMPOSITE:
+	    case EquipmentType.T_STRUCTURE_ENDO_PROTOTYPE:
 			return TechConstants.T_IS_EXPERIMENTAL;
+	    case EquipmentType.T_STRUCTURE_ENDO_STEEL:
+            return TechConstants.T_IS_TW_NON_BOX;
 		default:
-			return TechConstants.T_IS_TW_NON_BOX;
+		    if(tsm) {
+		        return TechConstants.T_IS_TW_NON_BOX;
+		    } else {
+		        return TechConstants.T_INTRO_BOXSET;
+		    }
 		}
 	}
 	

@@ -458,13 +458,15 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panTech.add(allowCanonOnlyBox, gridBagConstraints);
         
         DefaultComboBoxModel techLevelComboBoxModel = new DefaultComboBoxModel();
-        for (int i=-1;i<3; i++) {
-            techLevelComboBoxModel.addElement(CampaignOptions.getTechLevelName(i));
-        }
+        techLevelComboBoxModel.addElement(CampaignOptions.getTechLevelName(CampaignOptions.TECH_INTRO));
+        techLevelComboBoxModel.addElement(CampaignOptions.getTechLevelName(CampaignOptions.TECH_STANDARD));
+        techLevelComboBoxModel.addElement(CampaignOptions.getTechLevelName(CampaignOptions.TECH_ADVANCED));
+        techLevelComboBoxModel.addElement(CampaignOptions.getTechLevelName(CampaignOptions.TECH_EXPERIMENTAL));
+        techLevelComboBoxModel.addElement(CampaignOptions.getTechLevelName(CampaignOptions.TECH_UNOFFICIAL));
         choiceTechLevel.setModel(techLevelComboBoxModel);
         //choiceTechLevel.setToolTipText(resourceMap.getString("choiceTechLevel.toolTipText")); // NOI18N
         choiceTechLevel.setName("choiceTechLevel"); // NOI18N
-        choiceTechLevel.setSelectedIndex(options.getTechLevel()+1);
+        choiceTechLevel.setSelectedIndex(options.getTechLevel());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 5;
@@ -1810,7 +1812,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 	    if(!allowCanonOnlyBox.isSelected()) {
 	    	campaign.getGameOptions().getOption("canon_only").setValue(false);
 	    }
-	    options.setTechLevel(choiceTechLevel.getSelectedIndex()-1);
+	    options.setTechLevel(choiceTechLevel.getSelectedIndex());
 	    if(choiceTechLevel.getSelectedIndex() > 0) {
 	    	campaign.getGameOptions().getOption("allow_advanced_units").setValue(true);
 	    	campaign.getGameOptions().getOption("allow_advanced_ammo").setValue(true);

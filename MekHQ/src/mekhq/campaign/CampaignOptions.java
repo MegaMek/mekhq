@@ -38,10 +38,11 @@ import org.w3c.dom.NodeList;
 public class CampaignOptions implements Serializable {
 	private static final long serialVersionUID = 5698008431749303602L;
 	
-	public final static int TECH_INTRO        = -1;
-	public final static int TECH_STANDARD     = 0;
-	public final static int TECH_ADVANCED     = 1;
-	public final static int TECH_EXPERIMENTAL = 2;
+	public final static int TECH_INTRO        = 0;
+	public final static int TECH_STANDARD     = 1;
+	public final static int TECH_ADVANCED     = 2;
+	public final static int TECH_EXPERIMENTAL = 3;
+	public final static int TECH_UNOFFICIAL   = 4;
 	
 	public final static int REPAIR_SYSTEM_STRATOPS = 0;
     public final static int REPAIR_SYSTEM_WARCHEST_CUSTOM = 1;
@@ -175,6 +176,8 @@ public class CampaignOptions implements Serializable {
     		return "Advanced";
     	case TECH_EXPERIMENTAL:
     		return "Experimental";
+    	case TECH_UNOFFICIAL:
+            return "Unofficial";
     	default:
     		return "Unknown";	
     	}

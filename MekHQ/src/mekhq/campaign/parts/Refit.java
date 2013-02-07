@@ -1485,15 +1485,14 @@ public class Refit implements IPartWork, IAcquisitionWork {
 	}
 
 	@Override
-	public boolean isClanTechBase() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
 	public int getTechLevel() {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+	
+	@Override
+	public int getTechBase() {
+	    return Part.T_BOTH;
 	}
 	
 	public void fixIdReferences(Hashtable<Integer, UUID> uHash, Hashtable<Integer, UUID> pHash) {

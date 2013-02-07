@@ -1963,6 +1963,11 @@ public class Campaign implements Serializable {
 		if(v < 16) {
 		fixIdReferencesB(retVal);
 		}
+		
+		//adjust tech levels for version before 0.1.21
+        if(v < 21) {
+            retVal.campaignOptions.setTechLevel(retVal.campaignOptions.getTechLevel()+1);
+        }
 
 		// First, iterate through Support Teams;
 		// they have a reference to the Campaign object.
@@ -2035,14 +2040,14 @@ public class Campaign implements Serializable {
 				((EnginePart)prt).fixTankFlag(isHover);
 			}
 			//clan flag might not have been properly set in early versions
-			if(prt instanceof EnginePart && prt.getName().contains("(Clan") && !prt.isClanTechBase()) {
+			if(prt instanceof EnginePart && prt.getName().contains("(Clan") && prt.getTechBase() != Part.T_CLAN) {
 				((EnginePart)prt).fixClanFlag();
 			}
 			if(prt instanceof MissingEnginePart && null != u && u.getEntity() instanceof Tank) {
 				boolean isHover = null != u && u.getEntity().getMovementMode() == EntityMovementMode.HOVER && u.getEntity() instanceof Tank;
 				((MissingEnginePart)prt).fixTankFlag(isHover);
 			}
-			if(prt instanceof MissingEnginePart && prt.getName().contains("(Clan") && !prt.isClanTechBase()) {
+			if(prt instanceof MissingEnginePart && prt.getName().contains("(Clan") && prt.getTechBase() != Part.T_CLAN) {
 				((MissingEnginePart)prt).fixClanFlag();
 			}
 					
@@ -3481,13 +3486,13 @@ public class Campaign implements Serializable {
 		if(acquisition.hasCheckedToday()) {
 			return new TargetRoll(TargetRoll.IMPOSSIBLE, "Already checked for this part in this cycle");
 		}	
-		if(acquisition.isClanTechBase() && !getCampaignOptions().allowClanPurchases()) {
+		if(acquisition.getTechBase() == Part.T_CLAN && !getCampaignOptions().allowClanPurchases()) {
 			return new TargetRoll(TargetRoll.IMPOSSIBLE, "You cannot acquire clan parts");
 		}
-		if(!acquisition.isClanTechBase() && !getCampaignOptions().allowISPurchases()) {
+		if(acquisition.getTechBase() == Part.T_IS && !getCampaignOptions().allowISPurchases()) {
 			return new TargetRoll(TargetRoll.IMPOSSIBLE, "You cannot acquire inner sphere parts");
 		}
-		if(getCampaignOptions().getTechLevel() < (Integer.parseInt(TechConstants.T_SIMPLE_LEVEL[acquisition.getTechLevel()])-2)) {
+		if(getCampaignOptions().getTechLevel() < Utilities.getSimpleTechLevel(acquisition.getTechLevel())) {
 			return new TargetRoll(TargetRoll.IMPOSSIBLE, "You cannot acquire parts of this tech level");
 		}
 		TargetRoll target = new TargetRoll(skill.getFinalSkillValue(), SkillType.getExperienceLevelName(skill.getExperienceLevel()));//person.getTarget(Modes.MODE_NORMAL);
