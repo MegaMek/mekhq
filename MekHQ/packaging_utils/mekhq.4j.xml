@@ -14,6 +14,7 @@
   	<cp>lib/vecmath.jar</cp>	
   	<cp>lib/Ostermiller.jar</cp>	
   	<cp>lib/TabPanel.jar</cp>	
+  	<cp>lib/PngEncoder.jar</cp>	
   </classPath>
   <priority>normal</priority>
   <downloadUrl>http://java.com/download</downloadUrl>

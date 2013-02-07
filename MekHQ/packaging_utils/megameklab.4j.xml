@@ -1,8 +1,12 @@
 <launch4jConfig>
   <headerType>gui</headerType>
-  <jar>lib/MegaMekLab.jar</jar>
   <outfile>../svndev/MegaMekLab.exe</outfile>
-  <dontWrapJar>true</dontWrapJar>
+  <classPath>
+  	<mainClass>megameklab.com.MegaMekLab</mainClass>
+  	<cp>lib/MegaMek.jar</cp>
+  	<cp>lib/MegaMekLab.jar</cp>
+  	<cp>lib/TinyXML.jar</cp>
+  </classPath>
   <errTitle></errTitle>
   <cmdLine></cmdLine>
   <chdir>.</chdir>
