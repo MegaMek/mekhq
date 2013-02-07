@@ -284,6 +284,8 @@
 		
 	<target name="win-clean">
 		<delete dir="${windist}" />
+		<delete file="${svndir}/lib/MegaMek.jar" />
+		<delete file="${svndir}/lib/MegaMekLab.jar" />
 	</target>
 			
 	<target name="win-package" depends="win-bundle, win-zip, win-clean" description="Package a Windows distribution of the project built from SVN"/>

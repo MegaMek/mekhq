@@ -30,6 +30,9 @@ v0.1.21 (SVN)
 + Bug 295: Mech Salvage selection bug after battle
 + Bug 281: Error with tech limits
 + updated MegaMek.jar
++ updated MML.jar
++ new mekhq icon
++ updated packaging_utils for windows build
 
 v0.1.20 (2012-10-12)
 + skip over entities in mul without externalIDs during scenario resolution (related to Bug 233)
