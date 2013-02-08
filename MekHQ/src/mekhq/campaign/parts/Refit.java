@@ -593,6 +593,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
             saveCustomization();
         }
 		oldUnit.setRefit(this);
+		newEntity.setOwner(oldUnit.getEntity().getOwner());
 		reserveNewParts();
 	}
 	
