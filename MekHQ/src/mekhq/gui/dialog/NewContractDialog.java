@@ -173,6 +173,8 @@ public class NewContractDialog extends javax.swing.JDialog {
         suggestPlanet.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				contract.setPlanetName(suggestPlanet.getText());	
+				//reset the start date so this can be recalculated
+				contract.setStartDate(campaign.getDate());
 				contract.calculateContract(campaign, true);
 				btnDate.setText(dateFormatter.format(contract.getStartDate()));
 				refreshTotals();
