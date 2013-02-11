@@ -3,6 +3,7 @@ VERSION HISTORY
 v0.1.22 (SVN)
 + Bug: not able to save game when a refit with c3i is in progress
 + Bug 298: Missions disappear after edit, not able to save
++ Bug 303: Bulldog and Goblin Tanks prevent reload
 
 v0.1.21 (2013-02-07)
 + Bug: infinite loop in MekGyro#updateConditionFromEntity

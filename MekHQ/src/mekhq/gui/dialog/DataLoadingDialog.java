@@ -26,6 +26,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ResourceBundle;
 
 import javax.swing.ImageIcon;
@@ -36,6 +37,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
 
+import megamek.common.DefaultQuirksHandler;
 import megamek.common.MechSummaryCache;
 import mekhq.MekHQ;
 import mekhq.NullEntityException;
@@ -123,12 +125,17 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
                 }
             }
             setProgress(1);
+            try {
+                DefaultQuirksHandler.initQuirksList();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             while (!MechSummaryCache.getInstance().isInitialized()) {
                 //Sleep for up to one second.
                 try {
                     Thread.sleep(50);
                 } catch (InterruptedException ignore) {
-                	
+                	ignore.printStackTrace();
                 }
             }
             setProgress(2);
@@ -153,7 +160,7 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         			fis.close();
         		} catch (NullEntityException ex) {
         			JOptionPane.showMessageDialog(null, 
-        					"The following units could not be loaded by the campaign:\n" + ex.getError() + "\n\nPlease be sure to copy over any custom units before starting a new version of MekHQ." ,
+        					"The following units could not be loaded by the campaign:\n" + ex.getError() + "\n\nPlease be sure to copy over any custom units before starting a new version of MekHQ.\nIf you believe the units listed are not customs, then try deleting the file data/mechfiles/units.cache and restarting MekHQ." ,
         					"Unit Loading Error",
         					JOptionPane.ERROR_MESSAGE);
         			cancelled = true;
