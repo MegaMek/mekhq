@@ -5,6 +5,7 @@ v0.1.22 (SVN)
 + Bug 298: Missions disappear after edit, not able to save
 + Bug 303: Bulldog and Goblin Tanks prevent reload
 + Bug 154: Refit Kits - not clearing out
++ Bug 292: Missing Mech Bug (TO&E freezing up)
 
 v0.1.21 (2013-02-07)
 + Bug: infinite loop in MekGyro#updateConditionFromEntity

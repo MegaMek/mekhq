@@ -313,8 +313,6 @@ public class CampaignGUI extends JPanel {
 	private TableRowSorter<TechTableModel> techSorter;
 	private TableRowSorter<TechTableModel> whTechSorter;
     private DragoonsRatingDialog dragoonDialog = null;
-	private UUID currentPatientId;
-	private UUID currentDoctorId;
 
 	public int selectedMission = -1;
 
@@ -9532,6 +9530,25 @@ public class CampaignGUI extends JPanel {
 	        if (!support.isDataFlavorSupported(DataFlavor.stringFlavor)) {
 	            return false;
 	        }
+	        // Extract transfer data.
+            Unit unit = null;
+            Force force = null;
+            Transferable t = support.getTransferable();
+            try {
+                StringTokenizer st = new StringTokenizer((String) t.getTransferData(DataFlavor.stringFlavor), "|");
+                String type = st.nextToken();
+                String id = st.nextToken();
+                if(type.equals("UNIT")) {
+                    unit = getCampaign().getUnit(UUID.fromString(id));
+                }
+                if(type.equals("FORCE")) {
+                    force = getCampaign().getForce(Integer.parseInt(id));
+                }
+            } catch(UnsupportedFlavorException ufe) {
+                System.out.println("UnsupportedFlavor: " + ufe.getMessage());
+            } catch(java.io.IOException ioe) {
+                System.out.println("I/O error: " + ioe.getMessage());
+            }
 	        // Do not allow a drop on the drag source selections.
 	        JTree.DropLocation dl =
 	                (JTree.DropLocation)support.getDropLocation();
@@ -9545,7 +9562,17 @@ public class CampaignGUI extends JPanel {
 	        }
 	        TreePath dest = dl.getPath();
 	        Object parent = dest.getLastPathComponent();
-
+	        Force superForce = null;
+            if(parent instanceof Force) {
+                superForce = (Force)parent;
+            }
+            else if(parent instanceof Unit) {
+                superForce = getCampaign().getForce(((Unit)parent).getForceId());
+            }
+	        if(null != force && null != superForce && force.isAncestorOf(superForce)) {
+	            return false;
+	        }
+	        	        
 	        return parent instanceof Force || parent instanceof Unit;
 	    }
 
