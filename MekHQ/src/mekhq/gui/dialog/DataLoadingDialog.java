@@ -174,6 +174,14 @@ public class DataLoadingDialog extends JDialog implements PropertyChangeListener
         			//setVisible(false);
         			cancelled = true;
         			cancel(true);
+        		} catch(OutOfMemoryError e) { 
+        		    JOptionPane.showMessageDialog(null, 
+                            "MekHQ ran out of memory attempting to load the campaign file. \nTry increasing the memory allocated to MekHQ and reloading.\nSee the FAQ at http://megamek.info for details.",
+                            "Not Enough Memory",
+                            JOptionPane.ERROR_MESSAGE);
+                    //setVisible(false);
+                    cancelled = true;
+                    cancel(true);
         		}
             }
             setProgress(4);
