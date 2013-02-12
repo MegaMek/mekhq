@@ -802,6 +802,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 	private void complete() {
 		int atype = -1;
 		boolean aclan = false;
+	    oldUnit.setRefit(null);
         Entity oldEntity = oldUnit.getEntity();
         ArrayList<Person> soldiers = new ArrayList<Person>();
         //unload any soldiers to reload later, because troop size may have changed
@@ -890,7 +891,6 @@ public class Refit implements IPartWork, IAcquisitionWork {
 			oldUnit.addPilotOrSoldier(soldier);
 		}
 		oldUnit.resetPilotAndEntity();
-		oldUnit.setRefit(null);
 	}
 	
 	public void saveCustomization() throws EntityLoadingException {
