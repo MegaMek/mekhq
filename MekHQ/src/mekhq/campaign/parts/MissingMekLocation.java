@@ -257,6 +257,12 @@ public class MissingMekLocation extends MissingPart {
 		}
 		if(part instanceof MekLocation) {
 			MekLocation mekLoc = (MekLocation)part;
+			/*if(mekLoc.getLoc() == Mech.LOC_HEAD && null != unit) {
+			    //cockpit must either be none, or match
+			    if(mekLoc.hasCockpit() && mekLoc.getCockpitType() != ((Mech)unit.getEntity()).getCockpitType()) {
+			        return false;
+			    }
+			}*/
 			return mekLoc.getLoc() == loc
 				&& mekLoc.getUnitTonnage() == getUnitTonnage()
 				&& mekLoc.isTsm() == tsm
@@ -302,7 +308,11 @@ public class MissingMekLocation extends MissingPart {
 
 	@Override
 	public Part getNewPart() {
-		return new MekLocation(loc, getUnitTonnage(), structureType, tsm, forQuad, campaign);
+	   /* int cockpitType = -1;
+	    if(null != unit) {
+	        cockpitType = ((Mech)unit.getEntity()).getCockpitType();
+	    }*/
+		return new MekLocation(loc, getUnitTonnage(), structureType, tsm, forQuad, true, true, campaign);
 	}
 	
 	@Override
@@ -321,10 +331,54 @@ public class MissingMekLocation extends MissingPart {
 			unit.addPart(actualReplacement);
 			campaign.addPart(actualReplacement);
 			replacement.decrementQuantity();
+			//TODO: if this is a mech head, check to see if it had components
+            if(loc == Mech.LOC_HEAD && actualReplacement instanceof MekLocation) { 
+                updateHeadComponents((MekLocation)actualReplacement);
+                ((MekLocation)actualReplacement).setSensors(false);
+                ((MekLocation)actualReplacement).setLifeSupport(false);
+            }
 			remove(false);
-			//assign the replacement part to the unit			
 			actualReplacement.updateConditionFromPart();
+			
 			u.runDiagnostic();
 		}
+	}
+	
+	private void updateHeadComponents(MekLocation part) {
+	    MissingMekSensor missingSensor = null;
+	    MissingMekLifeSupport missingLifeSupport = null;
+	    for(Part p : unit.getParts()) {
+	        if(null == missingSensor && p instanceof MissingMekSensor) {
+	            missingSensor = (MissingMekSensor)p;
+	        }
+	        if(null == missingLifeSupport && p instanceof MissingMekLifeSupport) {
+                missingLifeSupport = (MissingMekLifeSupport)p;
+            }
+	        if(null != missingSensor && null != missingLifeSupport) {
+	            break;
+	        }
+	    }
+	    Part newPart;
+	    if(part.hasSensors() && null != missingSensor) {
+	        newPart = missingSensor.getNewPart();
+	        unit.addPart(newPart);
+	        campaign.addPart(newPart);
+	        missingSensor.remove(false);
+	        newPart.updateConditionFromPart(); 
+	    }
+	    /*if(part.hasCockpit() && null != missingCockpit) {
+            newPart = missingCockpit.getNewPart();
+            unit.addPart(newPart);
+            campaign.addPart(newPart);
+            missingCockpit.remove(false);
+            newPart.updateConditionFromPart(); 
+        }*/
+	    if(part.hasLifeSupport() && null != missingLifeSupport) {
+            newPart = missingLifeSupport.getNewPart();
+            unit.addPart(newPart);
+            campaign.addPart(newPart);
+            missingLifeSupport.remove(false);
+            newPart.updateConditionFromPart(); 
+        }
 	}
 }

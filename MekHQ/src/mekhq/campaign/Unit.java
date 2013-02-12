@@ -1458,7 +1458,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     	for(int i = 0; i<locations.length; i++) {
     		if(null == locations[i]) {
     			if(entity instanceof Mech) {
-    				MekLocation mekLocation = new MekLocation(i, (int) getEntity().getWeight(), getEntity().getStructureType(), hasTSM(), entity instanceof QuadMech, campaign);
+    				MekLocation mekLocation = new MekLocation(i, (int) getEntity().getWeight(), getEntity().getStructureType(), hasTSM(), entity instanceof QuadMech, false, false, campaign);
     				addPart(mekLocation);
     				partsToAdd.add(mekLocation);
     			} else if(entity instanceof Tank && i != Tank.LOC_BODY) {

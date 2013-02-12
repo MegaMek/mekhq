@@ -52,13 +52,17 @@ public class MekLocation extends Part {
     boolean breached;
     boolean blownOff;
     boolean forQuad;
+    
+    //system components for head
+    protected boolean sensors;
+    protected boolean lifeSupport;
 
     public MekLocation() {
-    	this(0, 0, 0, false, false, null);
+    	this(0, 0, 0, false, false, false, false, null);
     }
     
     public MekLocation clone() {
-    	MekLocation clone = new MekLocation(loc, getUnitTonnage(), structureType, tsm, forQuad, campaign);
+    	MekLocation clone = new MekLocation(loc, getUnitTonnage(), structureType, tsm, forQuad, sensors, lifeSupport, campaign);
         clone.copyBaseData(this);
     	clone.percent = this.percent;
     	clone.breached = this.breached;
@@ -78,13 +82,15 @@ public class MekLocation extends Part {
         return structureType;
     }
     
-    public MekLocation(int loc, int tonnage, int structureType, boolean hasTSM, boolean quad, Campaign c) {
+    public MekLocation(int loc, int tonnage, int structureType, boolean hasTSM, boolean quad, boolean sensors, boolean lifeSupport, Campaign c) {
         super(tonnage, c);
         this.loc = loc;
         this.structureType = structureType;
         this.tsm = hasTSM;
         this.percent = 1.0;
         this.forQuad = quad;
+        this.sensors = sensors;
+        this.lifeSupport = lifeSupport;
         this.breached = false;
         //TODO: need to account for internal structure and myomer types
         //crap, no static report for location names?
@@ -148,7 +154,12 @@ public class MekLocation extends Part {
         double cost = 0.1 * (totalStructureCost + totalMuscleCost);
 
         if (loc == Mech.LOC_HEAD) {
-        	//TODO: make potential adjustments for cockpit, life support, and sensors
+        	if(sensors) {
+        	    cost += 2000 * getUnitTonnage();
+        	}
+        	if(lifeSupport) {
+        	    cost += 50000;
+        	}
         }
         return (long) Math.round(cost);
     }
@@ -168,7 +179,9 @@ public class MekLocation extends Part {
                 && getUnitTonnage() == ((MekLocation)part).getUnitTonnage()
                 && isTsm() == ((MekLocation)part).isTsm()
                 && getStructureType() == ((MekLocation) part).getStructureType()
-                && (!isArm() || forQuad == ((MekLocation)part).forQuad);
+                && (!isArm() || forQuad == ((MekLocation)part).forQuad)
+                && hasSensors() == ((MekLocation)part).hasSensors()
+                && hasLifeSupport() == ((MekLocation)part).hasLifeSupport();
     }
     
     @Override
@@ -209,6 +222,14 @@ public class MekLocation extends Part {
 				+forQuad
 				+"</forQuad>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<sensors>"
+                +sensors
+                +"</sensors>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<lifeSupport>"
+                +lifeSupport
+                +"</lifeSupport>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<breached>"
 				+breached
 				+"</breached>");
@@ -238,7 +259,17 @@ public class MekLocation extends Part {
 					forQuad = true;
 				else
 					forQuad = false;
-			} else if (wn2.getNodeName().equalsIgnoreCase("breached")) {
+			} else if (wn2.getNodeName().equalsIgnoreCase("sensors")) {
+                if (wn2.getTextContent().equalsIgnoreCase("true"))
+                    sensors = true;
+                else
+                    sensors = false;
+            } else if (wn2.getNodeName().equalsIgnoreCase("lifeSupport")) {
+                if (wn2.getTextContent().equalsIgnoreCase("true"))
+                    lifeSupport = true;
+                else
+                    lifeSupport = false;
+            } else if (wn2.getNodeName().equalsIgnoreCase("breached")) {
 				if (wn2.getTextContent().equalsIgnoreCase("true"))
 					breached = true;
 				else
@@ -389,6 +420,10 @@ public class MekLocation extends Part {
 				spare.incrementQuantity();
 				campaign.removePart(this);
 			}
+			//if this is a head. check for life support and sensors
+			if(loc == Mech.LOC_HEAD) {
+			    removeHeadComponents();
+			}
 			unit.removePart(this);
 			if(loc != Mech.LOC_CT) {
 				Part missing = getMissingPart();
@@ -464,8 +499,9 @@ public class MekLocation extends Part {
 	
 	@Override
     public String getDetails() {
+	    String toReturn = "";
 		if(null != unit) {
-			String toReturn = unit.getEntity().getLocationName(loc);
+			toReturn = unit.getEntity().getLocationName(loc);
 			if(isBlownOff()) {
 				toReturn += " (Blown Off)";
 			} else if(isBreached()) {
@@ -475,7 +511,24 @@ public class MekLocation extends Part {
 			}
 			return toReturn;
 		}
-		return getUnitTonnage() + " tons" + " (" + Math.round(100*percent) + "%)";
+		toReturn += getUnitTonnage() + " tons" + " (" + Math.round(100*percent) + "%)";
+		if(loc == Mech.LOC_HEAD) {
+		    String components = "";
+    		if(hasSensors()) {
+                components += "Sensors";
+            }
+            if(hasLifeSupport()) {
+                if(components.length() > 0) {
+                    components += ", ";
+                }
+                components += "Life Support";
+            }
+            if(components.length() > 0) {
+                components = " [" + components + "]";
+            }
+            toReturn += components;
+		}
+		return toReturn;
     }
 
 	@Override
@@ -557,7 +610,9 @@ public class MekLocation extends Part {
 	            //certain other specific crits need to be left out (uggh, must be a better way to do this!)
 	            if(slot.getType() == CriticalSlot.TYPE_SYSTEM 
 	                    && (slot.getIndex() == Mech.ACTUATOR_HIP
-	                          || slot.getIndex() == Mech.ACTUATOR_SHOULDER)) {
+	                          || slot.getIndex() == Mech.ACTUATOR_SHOULDER
+	                          || slot.getIndex() == Mech.SYSTEM_LIFE_SUPPORT
+	                          || slot.getIndex() == Mech.SYSTEM_SENSORS)) {
 	                continue;
 	            }
 	            if (slot.isRepairable()) {
@@ -694,5 +749,45 @@ public class MekLocation extends Part {
 	public boolean isRightTechType(String skillType) {
 		return skillType.equals(SkillType.S_TECH_MECH);
 	}
+	
+	public boolean hasSensors() {
+	    return sensors;
+	}
+	
+	public void setSensors(boolean b) {
+	    sensors = b;
+	}
+	
+	public boolean hasLifeSupport() {
+	    return lifeSupport;
+	}
+	
+	public void setLifeSupport(boolean b) {
+	    lifeSupport = b;
+	}
+	
+	private void removeHeadComponents() {
+        MekSensor sensor = null;
+        MekLifeSupport support = null;
+        for(Part p : unit.getParts()) {
+            if(null == sensor && p instanceof MekSensor) {
+                sensor = (MekSensor)p;
+            }
+            if(null == support && p instanceof MekLifeSupport) {
+                support = (MekLifeSupport)p;
+            }
+            if(null != sensor && null != support) {
+                break;
+            }
+        }
+        if(null != sensor) {
+            sensor.remove(false);
+            sensors = true;
+        }
+        if(null != support) {
+            support.remove(false);
+            lifeSupport = true;
+        }
+    }
 	
 }

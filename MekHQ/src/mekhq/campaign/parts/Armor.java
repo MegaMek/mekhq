@@ -670,7 +670,7 @@ public class Armor extends Part implements IAcquisitionWork {
 
     @Override
     public boolean isInSupply() {
-        int currentArmor = unit.getEntity().getArmorForReal(location, rear);
+        int currentArmor = Math.max(0, unit.getEntity().getArmorForReal(location, rear));
         int fullArmor = unit.getEntity().getOArmor(location, rear);
         int neededArmor = fullArmor - currentArmor;
         return neededArmor <= getAmountAvailable();
