@@ -7534,22 +7534,22 @@ public class CampaignGUI extends JPanel {
             		String name = u.getName();
             		if(u.getEntity() instanceof Tank) {
             			if(u.isDriver(p)) {
-            				name = "[Driver] " + name;
+            				name = name + " [Driver]";
             			} else {
-            				name = "[Gunner] " + name;
+            				name = name + " [Gunner]";
             			}
             		}
             		if(u.getEntity() instanceof SmallCraft || u.getEntity() instanceof Jumpship) {
             			if(u.isNavigator(p)) {
-            				name = "[Navigator] " + name;
+            				name = name + " [Navigator]";
             			}
             			else if(u.isDriver(p)) {
-            				name = "[Pilot] " + name;
+            				name =  name + " [Pilot]";
             			}
             			else if(u.isGunner(p)) {
-            				name = "[Gunner] " + name;
+            				name = name + " [Gunner]";
             			} else {
-            				name = "[Crew] " + name;
+            				name = name + " [Crew]";
             			}
             		}
             		return name;

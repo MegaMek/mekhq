@@ -8,6 +8,8 @@ v0.1.22 (SVN)
 + Bug 292: Missing Mech Bug (TO&E freezing up)
 + Bug 96:  No differentiation between salvaged and acquired head (partial: cockpits not pre-loaded)
 + Bug 293: Null Campaign
++ Bug 304: Problems setting planet in contracts/mission
++ Put personnel type (e.g. Driver, Crew) after unit name in personnel roster for beter sorting
 
 v0.1.21 (2013-02-07)
 + Bug: infinite loop in MekGyro#updateConditionFromEntity
