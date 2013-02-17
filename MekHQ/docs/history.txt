@@ -10,6 +10,7 @@ v0.1.22 (SVN)
 + Bug 293: Null Campaign
 + Bug 304: Problems setting planet in contracts/mission
 + Put personnel type (e.g. Driver, Crew) after unit name in personnel roster for beter sorting
++ Bug 305: Tracking Dead w/ Ejected Pilots
 
 v0.1.21 (2013-02-07)
 + Bug: infinite loop in MekGyro#updateConditionFromEntity

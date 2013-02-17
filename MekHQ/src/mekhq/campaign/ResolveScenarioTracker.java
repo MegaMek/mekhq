@@ -174,9 +174,9 @@ public class ResolveScenarioTracker {
 				e.printStackTrace();
 			}
 		}
-		if(null != salvageFile && controlsField) {
+		if(null != salvageFile) {
 			try {
-				loadSalvage(salvageFile);
+				loadSalvage(salvageFile, controlsField);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -231,12 +231,14 @@ public class ResolveScenarioTracker {
         Enumeration<Entity> wrecks = client.game.getWreckedEntities();
         while (wrecks.hasMoreElements()) {
         	Entity e = wrecks.nextElement();
-        	if(e.getOwnerId() == pid && controlsField && e.isSalvage()) {
-        		if(!e.getExternalIdAsString().equals("-1")) {
+        	if(e.getOwnerId() == pid) {
+        		if(!e.getExternalIdAsString().equals("-1") && controlsField && e.isSalvage()) {
 					entities.put(UUID.fromString(e.getExternalIdAsString()), e);
 				}
 				if(null != e.getCrew()) {
-					if(!e.getCrew().getExternalIdAsString().equals("-1")) {
+				    //get dead crew members even if you don't control the battlefield
+					if(!e.getCrew().getExternalIdAsString().equals("-1")
+					        && (controlsField || e.getCrew().isDead())) {
 						pilots.put(UUID.fromString(e.getCrew().getExternalIdAsString()), e.getCrew());
 					}
 				}
@@ -499,7 +501,7 @@ public class ResolveScenarioTracker {
 		}
 	}
 	
-	private void loadSalvage(File salvageFile) throws IOException {
+	private void loadSalvage(File salvageFile, boolean controlsField) throws IOException {
 		if (salvageFile != null) {
 			// I need to get the parser myself, because I want to pull both
 			// entities and pilots from it
@@ -523,22 +525,54 @@ public class ResolveScenarioTracker {
 				MekHQ.logMessage(parser.getWarningMessage());
 			}
 
-			// Add the units from the file.		
-			for (Entity entity : parser.getEntities()) {
-				//dont allow the salvaging of conventional infantry
-				if(entity instanceof Infantry && !(entity instanceof BattleArmor)) {
-					continue;
-				}
-				//some of the players units and personnel may be in the salvage pile, so 
-				//lets check for these first
-				if(!entity.getExternalIdAsString().equals("-1") && foundMatch(entity, units)) {
-					entities.put(UUID.fromString(entity.getExternalIdAsString()), entity);
-					if(null != entity.getCrew()) {
-						pilots.put(UUID.fromString(entity.getCrew().getExternalIdAsString()), entity.getCrew());
-					}
-				} else {		
-					potentialSalvage.add(entity);
-				}
+			if(controlsField) {
+    			// Add the units from the file.		
+    			for (Entity entity : parser.getEntities()) {
+    				//dont allow the salvaging of conventional infantry
+    			    //However, we do need to check for ejected mechwarriors
+    				if(entity instanceof Infantry && !(entity instanceof BattleArmor)) {
+    				    continue;
+    				}
+    				//some of the players units and personnel may be in the salvage pile, so 
+    				//lets check for these first
+    				if(!entity.getExternalIdAsString().equals("-1") && foundMatch(entity, units)) {
+    					entities.put(UUID.fromString(entity.getExternalIdAsString()), entity);
+    					if(null != entity.getCrew()) {
+    						pilots.put(UUID.fromString(entity.getCrew().getExternalIdAsString()), entity.getCrew());
+    					}
+    				} else {		
+    					potentialSalvage.add(entity);
+    				}
+    			}
+			}   
+			
+			//look for pilots. There are a couple of things to keep in mind here.
+			//First, we should be able to safely add all pilots without checking for 
+			//a match, because even if the other side has UUIDs, the likelihood of a duplicate
+			//is tiny. Nonetheless, it might be good to add this in the future.
+			//Second, if the pilot is alive, we only add them if controlsField is true. 
+			//Dead pilots should always get added though, so they don't get misclassified as
+			//MIA. Note that this doesn't do anything for multi-crew units, which don't use
+			//the pilots vector. We need to address that issue elsewhere.
+			//Third, its possible to have duplicate pilots if a pilot ejected and then
+			//was killed later. We don't want the unhurt pilot to trump the hurt pilot, 
+			//so only replace if the hits are greater. 
+			//TODO: MIA pilots should get their hits recorded probably
+			//TODO: we need another way of handling this for multi-crewed units
+			for(Crew crew : parser.getPilots()) {
+			    if(!controlsField && crew.getHits() < 6) {
+			        //These should be MIA
+			        continue;
+			    }
+			    if(crew.getExternalIdAsString().equals("-1")) {
+			        continue;
+			    }
+			    Crew existingPilot = pilots.get(UUID.fromString(crew.getExternalIdAsString()));
+			    if(null != existingPilot && existingPilot.getHits() > crew.getHits()) {
+			        //take the most damaged pilot if duplicates exist
+			        continue;
+			    }
+			    pilots.put(UUID.fromString(crew.getExternalIdAsString()), crew);
 			}
 		}
 	}
