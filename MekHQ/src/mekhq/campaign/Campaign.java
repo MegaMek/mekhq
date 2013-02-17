@@ -224,7 +224,7 @@ public class Campaign implements Serializable {
 		currentReport = new ArrayList<String>();
 		calendar = new GregorianCalendar(3067, Calendar.JANUARY, 1);
 		dateFormat = new SimpleDateFormat("EEEE, MMMM d yyyy");
-		shortDateFormat = new SimpleDateFormat("MMddyyyy");
+		shortDateFormat = new SimpleDateFormat("yyyyMMdd");
 		name = "My Campaign";
 		rng = new RandomNameGenerator();
 		rng.populateNames();
