@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This is an ant build file. See: "http://jakarta.apache.org/ant"-->
+<project default="jar" name="MekHQ">
+	<!-- Global properties for this build -->
+	<property name="src" value="src">
+	</property>
+	<property name="build" value="${basedir}/classes">
+	</property>
+	<property name="mekhq" value="MekHQ.jar">
+	</property>
+	<property name="jarmanifest" value="manifest.txt">
+	</property>
+	<path id="project.classpath">
+		<pathelement path="${build}">
+		</pathelement>
+		<fileset dir="${basedir}">
+			<include
+				name="MegaMek.jar"
+			>
+			</include>
+			<include
+				name="MegaMekLab.jar">
+			</include>
+		</fileset>
+	</path>
+	<target depends="clean" description="Initialize system before build" name="init">
+		<!-- Create the time stamp -->
+		<tstamp>
+		</tstamp>
+		<!-- Ensure that the build directory exists. -->
+		<mkdir dir="${build}">
+		</mkdir>
+	</target>
+	<target depends="init" description="Compile java sources into class files" name="compile">
+		<javac
+			classpathref="project.classpath"
+			debug="true"
+			deprecation="true"
+			destdir="${build}"
+			srcdir="${src}"
+			target="1.6"
+			source="1.6"
+		>
+		</javac>
+	</target>
+	<target description="Remove all compiled and generated files" name="clean">
+		<!-- Delete the ${build} directory tree -->
+		<delete file="${mekhq}">
+		</delete>
+		<delete dir="${build}">
+		</delete>
+	</target>
+	<target
+		depends="compile"
+		description="Create application jar file"
+		name="jar"
+	>
+		<delete file="${mekhq}">
+		</delete>
+		<jar
+			basedir="${build}"
+			compress="true"
+			destfile="${mekhq}"
+			excludes=""
+			includes="**"
+			jarfile="${mekhq}"
+			manifest="manifest.txt"
+		>		
+			<fileset dir="${src}" includes="**/*.properties" />
+		</jar>
+	</target>
+	
+</project>
