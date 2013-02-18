@@ -1,6 +1,6 @@
 VERSION HISTORY
 ----------------------------------
-v0.1.22 (SVN)
+v0.1.22 Release Candidate 1 (2013-02-17)
 + Bug: not able to save game when a refit with c3i is in progress
 + Bug 298: Missions disappear after edit, not able to save
 + Bug 303: Bulldog and Goblin Tanks prevent reload
