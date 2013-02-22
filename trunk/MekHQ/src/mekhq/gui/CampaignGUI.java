@@ -5521,7 +5521,7 @@ public class CampaignGUI extends JPanel {
             } else if(command.contains("SET_IND_M")) {
             	for(Unit u : units) {
             		u.getEntity().setC3MasterIsUUIDAsString(null);
-            		u.getEntity().setC3Master(null);
+            		u.getEntity().setC3Master(null, true);
                 	getCampaign().removeUnitsFromC3Master(u);
             	}
             	getCampaign().refreshNetworks();
@@ -5529,7 +5529,7 @@ public class CampaignGUI extends JPanel {
             } if(command.contains("REMOVE_C3")) {
             	for(Unit u : units) {
             		u.getEntity().setC3MasterIsUUIDAsString(null);
-            		u.getEntity().setC3Master(null);
+            		u.getEntity().setC3Master(null, true);
             	}
             	getCampaign().refreshNetworks();
                 refreshOrganization();
