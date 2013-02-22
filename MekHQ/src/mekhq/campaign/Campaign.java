@@ -1333,7 +1333,7 @@ public class Campaign implements Serializable {
 				removeUnitsFromC3Master(u);
 			}
 			u.getEntity().setC3MasterIsUUIDAsString(null);
-			u.getEntity().setC3Master(null);
+			u.getEntity().setC3Master(null, true);
 		}
 	}
 	 
@@ -3958,7 +3958,7 @@ public class Campaign implements Serializable {
 	                    if ((entity.getC3MasterIsUUIDAsString() != null)
 	                            && entity.getC3MasterIsUUIDAsString().equals(
 	                                    e.getC3UUIDAsString())) {
-	                        entity.setC3Master(e);
+	                        entity.setC3Master(e, false);
 	                        break;
 	                    } 
 	                }
@@ -4131,7 +4131,7 @@ public class Campaign implements Serializable {
     				&& unit.getEntity().getC3MasterIsUUIDAsString().equals(
     						master.getEntity().getC3UUIDAsString())) {
     			unit.getEntity().setC3MasterIsUUIDAsString(null);
-    			unit.getEntity().setC3Master(null);
+    			unit.getEntity().setC3Master(null, true);
     		}
     	}
     	refreshNetworks();
