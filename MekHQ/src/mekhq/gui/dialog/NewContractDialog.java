@@ -71,7 +71,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         this.frame = parent;  
         campaign = c;
         contract = new Contract("New Contract", "New Employer");
-        contract.calculateContract(campaign, true);
+        contract.calculateContract(campaign);
         formatter = new DecimalFormat();
         dateFormatter = new SimpleDateFormat("EEEE, MMMM d yyyy");
         initComponents();
@@ -175,17 +175,19 @@ public class NewContractDialog extends javax.swing.JDialog {
         descPanel.add(lblPlanetName, gridBagConstraints);
         
         suggestPlanet = new JSuggestField(this, campaign.getPlanetNames());
-        suggestPlanet.addActionListener(new java.awt.event.ActionListener() {
+        /*suggestPlanet.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				contract.setPlanetName(suggestPlanet.getText());	
+				contract.setPlanetName(suggestPlanet.getText());
 				//reset the start date so this can be recalculated
 				contract.setStartDate(campaign.getDate());
-				contract.calculateContract(campaign, true);
+				contract.calculateContract(campaign);
 				btnDate.setText(dateFormatter.format(contract.getStartDate()));
 				refreshTotals();
 			}
-		});
+		});*/
         suggestPlanet.addFocusListener(contractUpdateFocusListener);
+        suggestPlanet.addActionListener(contractUpdateActionListener);
+
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -871,7 +873,7 @@ public class NewContractDialog extends javax.swing.JDialog {
         		return;
         	}
             contract.setStartDate(dc.getDate().getTime());
-            contract.calculateContract(campaign, false);
+            contract.calculateContract(campaign);
             btnDate.setText(dateFormatter.format(contract.getStartDate()));
         }
     }
@@ -971,6 +973,8 @@ public class NewContractDialog extends javax.swing.JDialog {
     private void doUpdateContract(Object source) {
         if (suggestPlanet.equals(source)) {
             contract.setPlanetName(suggestPlanet.getText());
+            //reset the start date as null so we recalculate travel time
+            contract.setStartDate(null);
         } else if (choiceOverhead.equals(source)) {
             contract.setOverheadComp(choiceOverhead.getSelectedIndex());
         } else if (choiceCommand.equals(source)) {
@@ -997,7 +1001,7 @@ public class NewContractDialog extends javax.swing.JDialog {
             contract.setAdvancePct((Integer)spnAdvance.getModel().getValue());
         }
 
-        contract.calculateContract(campaign, true);
+        contract.calculateContract(campaign);
         refreshTotals();
         btnDate.setText(dateFormatter.format(contract.getStartDate()));
     }
