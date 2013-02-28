@@ -312,7 +312,9 @@ public class MissingMekLocation extends MissingPart {
 	    if(null != unit) {
 	        cockpitType = ((Mech)unit.getEntity()).getCockpitType();
 	    }*/
-		return new MekLocation(loc, getUnitTonnage(), structureType, tsm, forQuad, true, true, campaign);
+	    boolean lifeSupport = (loc == Mech.LOC_HEAD);
+	    boolean sensors = (loc == Mech.LOC_HEAD);
+		return new MekLocation(loc, getUnitTonnage(), structureType, tsm, forQuad, sensors, lifeSupport, campaign);
 	}
 	
 	@Override

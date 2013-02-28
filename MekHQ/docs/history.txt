@@ -3,6 +3,7 @@ VERSION HISTORY
 v0.1.23 (SVN)  
 + updated code for changes to MegaMek entity.setC3Master
 + Bug 312: Multiple entries in the units.cache
++ Bug 309: MekLab Body part Issue
 
 v0.1.22 Release Candidate 1 (2013-02-17)
 + Bug: not able to save game when a refit with c3i is in progress
