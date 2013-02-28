@@ -2685,6 +2685,11 @@ public class Campaign implements Serializable {
 				p = new MissingMASC(p.getUnitTonnage(), ((MissingEquipmentPart)p).getType(), ((MissingEquipmentPart)p).getEquipmentNum(), retVal, ((MissingEquipmentPart)p).getTonnage(), 0);
 				p.setId(pid);
 			}
+			//deal with true values for sensor and life support on non-Mech heads
+			if(p instanceof MekLocation && ((MekLocation)p).getLoc() != Mech.LOC_HEAD) {
+			    ((MekLocation)p).setSensors(false);
+	            ((MekLocation)p).setLifeSupport(false);
+			}
 			
 			
 			if (p != null)
