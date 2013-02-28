@@ -2458,8 +2458,13 @@ public class Campaign implements Serializable {
 		}
 		if(null != name && null != mtf) {
 			try {
-				MekHQ.logMessage("Loading Custom unit from XML...", 4);
-				FileOutputStream out = new FileOutputStream(sCustomsDir + File.separator + name + ".mtf");
+			    //if this file already exists then don't overwrite it or we will end up with a bunch of copies
+				String fileName = sCustomsDir + File.separator + name + ".mtf";
+				if((new File(fileName)).exists()) {
+				    return;
+				}
+			    MekHQ.logMessage("Loading Custom unit from XML...", 4);
+				FileOutputStream out = new FileOutputStream(fileName);
 				PrintStream p = new PrintStream(out);
 				p.println(mtf);
 				p.close();
@@ -2472,6 +2477,11 @@ public class Campaign implements Serializable {
 		}
 		if(null != name && null != blk) {
 			try {
+			    //if this file already exists then don't overwrite it or we will end up with a bunch of copies
+                String fileName = sCustomsDir + File.separator + name + ".mtf";
+                if((new File(fileName)).exists()) {
+                    return;
+                }
 				MekHQ.logMessage("Loading Custom unit from XML...", 4);
 				FileOutputStream out = new FileOutputStream(sCustomsDir + File.separator + name + ".blk");
 				PrintStream p = new PrintStream(out);
