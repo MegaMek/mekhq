@@ -364,7 +364,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 	 * the ink is signed, which is a no-no.
 	 * @param c
 	 */
-	public void calculateContract(Campaign c, boolean adjustStartDate) {
+	public void calculateContract(Campaign c) {
 		
 		//calculate base amount
 		baseAmount = (long)(paymentMultiplier * getLength() * c.getPayRoll());
@@ -399,18 +399,19 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 			feeAmount = 0;
 		}
 		
+		//only adjust the start date for travel if the start date is currently null
+		boolean adjustStartDate = false;
 		if(null == startDate) {
 			startDate = c.getCalendar().getTime();
+			adjustStartDate = true;
 		}
 		GregorianCalendar cal = new GregorianCalendar();
 		cal.setTime(startDate);
-		if(adjustStartDate) {
-			if(null != c.getPlanet(planetName)) {
-				int days = (int)Math.ceil(c.calculateJumpPath(c.getCurrentPlanetName(), planetName).getTotalTime(c.getLocation().getTransitTime()));
-				while(days > 0) {
-					cal.add(Calendar.DAY_OF_YEAR, 1);
-					days--;
-				}
+		if(adjustStartDate && null != c.getPlanet(planetName)) {
+		    int days = (int)Math.ceil(c.calculateJumpPath(c.getCurrentPlanetName(), planetName).getTotalTime(c.getLocation().getTransitTime()));
+		    while(days > 0) {
+		        cal.add(Calendar.DAY_OF_YEAR, 1);
+		        days--;
 			}
 			startDate = cal.getTime();
 		}
