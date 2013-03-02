@@ -172,6 +172,10 @@ public class Mission implements Serializable, MekHqXmlSerializable {
 			scenarios.remove(idx);
 		}
 	}
+	
+	public void clearScenarios() {
+		scenarios.clear();
+	}
 
 	public boolean hasPendingScenarios() {
 		for(Scenario s : scenarios) {
