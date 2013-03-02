@@ -373,6 +373,7 @@ public class CampaignGUI extends JPanel {
 		btnAddMission = new javax.swing.JButton();
 		btnEditMission = new javax.swing.JButton();
 		btnCompleteMission = new javax.swing.JButton();
+		btnDeleteMission = new javax.swing.JButton();
 		panelScenarioButtons = new javax.swing.JPanel();
 		btnAddScenario = new javax.swing.JButton();
 		btnStartGame = new javax.swing.JButton();
@@ -623,6 +624,17 @@ public class CampaignGUI extends JPanel {
 			}
 		});
 		panelMissionButtons.add(btnCompleteMission);
+
+		btnDeleteMission.setText(resourceMap.getString("btnDeleteMission.text")); // NOI18N
+		btnDeleteMission.setToolTipText(resourceMap
+				.getString("btnDeleteMission.toolTipText")); // NOI18N
+		btnDeleteMission.setName("btnDeleteMission"); // NOI18N
+		btnDeleteMission.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				btnDeleteMissionActionPerformed(evt);
+			}
+		});
+		panelMissionButtons.add(btnDeleteMission);
 
 		scrollMissionView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollMissionView.setViewportView(null);
@@ -2253,6 +2265,16 @@ public class CampaignGUI extends JPanel {
 				}
 			}
 		}
+		refreshReport();
+		refreshFunds();
+		refreshFinancialTransactions();
+		refreshRating();
+	}
+
+	private void btnDeleteMissionActionPerformed(java.awt.event.ActionEvent evt) {
+		Mission mission = getCampaign().getMission(selectedMission);
+		getCampaign().removeMission(mission.getId());
+		refreshMissions();
 		refreshReport();
 		refreshFunds();
 		refreshFinancialTransactions();
@@ -8418,14 +8440,12 @@ public class CampaignGUI extends JPanel {
 				popup.add(menuItem);
 				// GM mode
 				menu = new JMenu("GM Mode");
-				// remove part
-				if(scenario.isCurrent()) {
-					menuItem = new JMenuItem("Remove Scenario");
-					menuItem.setActionCommand("REMOVE");
-					menuItem.addActionListener(this);
-					menuItem.setEnabled(getCampaign().isGM());
-					menu.add(menuItem);
-				}
+				// remove scenario
+				menuItem = new JMenuItem("Remove Scenario");
+				menuItem.setActionCommand("REMOVE");
+				menuItem.addActionListener(this);
+				menuItem.setEnabled(getCampaign().isGM());
+				menu.add(menuItem);
 				// end
 				popup.addSeparator();
 				popup.add(menu);
@@ -9739,6 +9759,7 @@ public class CampaignGUI extends JPanel {
 	private javax.swing.JButton btnAddMission;
 	private javax.swing.JButton btnEditMission;
 	private javax.swing.JButton btnCompleteMission;
+	private javax.swing.JButton btnDeleteMission;
 	private javax.swing.JButton btnStartGame;
 	private javax.swing.JButton btnLoadGame;
 	private javax.swing.JButton btnPrintRS;
