@@ -1277,13 +1277,26 @@ public class Campaign implements Serializable {
 	
 	public void removeMission(int id) {
 		Mission mission = getMission(id);
+		int idx = 0;
 		// Loop through scenarios here! We need to remove them as well.
-		for(Scenario scenario : mission.getScenarios()) {
-			scenario.clearAllForcesAndPersonnel(this);
-			if(null != mission) {
-				mission.removeScenario(scenario.getId());
+		if(null != mission) {
+			for(Scenario scenario : mission.getScenarios()) {
+				scenario.clearAllForcesAndPersonnel(this);
+				scenarioIds.remove(scenario.getId());
 			}
-			scenarioIds.remove(scenario.getId());
+			mission.clearScenarios();
+		}
+		idx = 0;
+		boolean mfound = false;
+		for(Mission m : getMissions()) {
+			if(m.getId() == id) {
+				mfound = true;
+				break;
+			}
+			idx++;
+		}
+		if(mfound) {
+			missions.remove(idx);
 		}
 		missionIds.remove(new Integer(id));
 	}

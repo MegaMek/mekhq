@@ -601,8 +601,6 @@ public class CampaignGUI extends JPanel {
 		});
 		panelMissionButtons.add(btnAddScenario);
 
-
-
 		btnEditMission.setText(resourceMap.getString("btnEditMission.text")); // NOI18N
 		btnEditMission.setToolTipText(resourceMap
 				.getString("btnEditMission.toolTipText")); // NOI18N
@@ -2273,7 +2271,13 @@ public class CampaignGUI extends JPanel {
 
 	private void btnDeleteMissionActionPerformed(java.awt.event.ActionEvent evt) {
 		Mission mission = getCampaign().getMission(selectedMission);
+		MekHQ.logMessage("Attempting to Delete Mission, Mission ID: " + mission.getId());
 		getCampaign().removeMission(mission.getId());
+		if(getCampaign().getSortedMissions().size() > 0) {
+			selectedMission = getCampaign().getSortedMissions().get(0).getId();
+		} else {
+			selectedMission = -1;
+		}
 		refreshMissions();
 		refreshReport();
 		refreshFunds();
@@ -3466,6 +3470,7 @@ public class CampaignGUI extends JPanel {
 		int idx = choiceMission.getSelectedIndex();
 		btnEditMission.setEnabled(false);
 		btnCompleteMission.setEnabled(false);
+		btnDeleteMission.setEnabled(false);
 		btnAddScenario.setEnabled(false);
 		if(idx >= 0 && idx < getCampaign().getSortedMissions().size()) {
 			Mission m = getCampaign().getSortedMissions().get(idx);
@@ -3485,6 +3490,7 @@ public class CampaignGUI extends JPanel {
 				});
 				btnEditMission.setEnabled(true);
 				btnCompleteMission.setEnabled(m.isActive());
+				btnDeleteMission.setEnabled(true);
 				btnAddScenario.setEnabled(m.isActive());
 			}
 
