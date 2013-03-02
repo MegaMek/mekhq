@@ -6,6 +6,7 @@ v0.1.23 (SVN)
 + Bug 309: MekLab Body part Issue
 + Bug 310: Contract Travel Time
 + Bug 308: Quirks not exported to MUL files
++ Bug 313: Gyro damage /= gyro destroyed
 
 v0.1.22 Release Candidate 1 (2013-02-17)
 + Bug: not able to save game when a refit with c3i is in progress
