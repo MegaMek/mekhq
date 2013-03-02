@@ -297,8 +297,22 @@ public class ResolveScenarioTracker {
 				} 
 				if(cs.isDamaged()) {
 					if(cs.getIndex() == Mech.ACTUATOR_SHOULDER 
-							|| cs.getIndex() == Mech.ACTUATOR_HIP
-							|| cs.getIndex() == Mech.SYSTEM_ENGINE) {
+							|| cs.getIndex() == Mech.ACTUATOR_HIP) {
+						continue;
+					}
+					// Check that Engine isn't already known to be just damaged.
+					if(cs.getIndex() == Mech.SYSTEM_ENGINE &&
+							(en.getBadCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE, Mech.LOC_LT)
+							+ en.getBadCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE, Mech.LOC_CT)
+							+ en.getBadCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE, Mech.LOC_RT)) < 3) {
+						continue;
+					}
+					// Check that Gyro isn't already known to be just damaged.
+					if(cs.getIndex() == Mech.SYSTEM_GYRO &&
+					   		(((en.getBadCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_GYRO,
+                			Mech.LOC_CT) < 2) && (en.getGyroType() != Mech.GYRO_HEAVY_DUTY)) ||
+							((en.getBadCriticals(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_GYRO,
+                			Mech.LOC_CT) < 3) && (en.getGyroType() == Mech.GYRO_HEAVY_DUTY)))) {
 						continue;
 					}
 					//we have to do this little hack-y thing to account for actuators which are not
