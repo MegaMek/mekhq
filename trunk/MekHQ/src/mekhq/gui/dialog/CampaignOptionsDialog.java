@@ -1787,6 +1787,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 	    options.setSellParts(sellPartsBox.isSelected());
 	
 	    options.setQuirks(useQuirksBox.isSelected());
+		campaign.getGameOptions().getOption("stratops_quirks").setValue(useQuirksBox.isSelected());
 	    
 	    options.setScenarioXP((Integer)spnScenarioXP.getModel().getValue());
 	    options.setKillsForXP((Integer)spnKills.getModel().getValue());
