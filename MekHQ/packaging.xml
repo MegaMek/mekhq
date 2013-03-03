@@ -41,7 +41,7 @@
 	<property name="svnbuilddir" value="${svndir}/${builddir}" />
 
 	<!-- svnroot used for svn authentification -->
-	<property name="svnroot" value="svn://svn.code.sf.net/p/mekhq/code/MekHQ" />
+	<property name="svnroot" value="svn://svn.code.sf.net/p/mekhq/code/trunk/MekHQ" />
 	<property name="svndata" value="svn://svn.code.sf.net/p/megamek/code/trunk/megamek/data" />
 	<property name="svnrsheets" value="svn://svn.code.sf.net/p/megameklab/code/trunk/data/images/recordsheets" />
 
