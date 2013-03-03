@@ -30,7 +30,6 @@ import megamek.common.EntityMovementMode;
 import megamek.common.EquipmentType;
 import megamek.common.Mech;
 import megamek.common.Tank;
-import megamek.common.TechConstants;
 import megamek.common.verifier.TestEntity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;

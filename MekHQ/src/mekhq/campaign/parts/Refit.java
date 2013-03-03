@@ -30,8 +30,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import megamek.common.AmmoType;
 import megamek.common.BattleArmor;
@@ -42,7 +40,6 @@ import megamek.common.Mech;
 import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
-import megamek.common.Mounted;
 import megamek.common.TargetRoll;
 import megamek.common.WeaponType;
 import megamek.common.loaders.BLKFile;
@@ -61,7 +58,6 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.Modes;
-import mekhq.gui.CampaignGUI;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

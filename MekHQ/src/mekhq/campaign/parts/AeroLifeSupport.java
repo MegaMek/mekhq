@@ -25,7 +25,6 @@ import java.io.PrintWriter;
 
 import megamek.common.Aero;
 import megamek.common.EquipmentType;
-import megamek.common.SmallCraft;
 import megamek.common.TechConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;

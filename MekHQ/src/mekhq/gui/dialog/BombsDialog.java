@@ -43,6 +43,10 @@ import mekhq.campaign.Campaign;
  */
 public class BombsDialog extends JDialog implements ActionListener {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -8333650539542692225L;
     private BombChoicePanel bombPanel;
     private Aero aero;
     private Campaign campaign;
