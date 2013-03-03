@@ -34,6 +34,11 @@ import mekhq.campaign.finances.Transaction;
 
 public class EditTransactionDialog extends JDialog implements ActionListener, FocusListener, MouseListener {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -8742160448355293487L;
+
     private final DateFormat LONG_DATE = DateFormat.getDateInstance(DateFormat.LONG);
 
     private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AddFundsDialog");

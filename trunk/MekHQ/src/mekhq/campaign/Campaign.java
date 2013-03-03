@@ -81,7 +81,6 @@ import megamek.common.SmallCraft;
 import megamek.common.SmallCraftBay;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
-import megamek.common.TechConstants;
 import megamek.common.VTOL;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;

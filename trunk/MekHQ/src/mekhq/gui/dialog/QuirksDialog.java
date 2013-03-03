@@ -48,6 +48,10 @@ import megamek.common.options.WeaponQuirks;
  */
 public class QuirksDialog extends JDialog implements DialogOptionListener, ActionListener {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -5030866602278329622L;
     private QuirksPanel qpanel;
     private HashMap<Integer, WeaponQuirks> h_wpnQuirks = new HashMap<Integer, WeaponQuirks>();
     private Entity entity;

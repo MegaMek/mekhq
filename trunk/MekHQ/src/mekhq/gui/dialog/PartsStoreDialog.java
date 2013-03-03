@@ -49,7 +49,6 @@ import javax.swing.table.TableRowSorter;
 
 import megamek.common.AmmoType;
 import megamek.common.MiscType;
-import megamek.common.TechConstants;
 import megamek.common.WeaponType;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;

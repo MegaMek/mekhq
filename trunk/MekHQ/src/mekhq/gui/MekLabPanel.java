@@ -55,7 +55,6 @@ import megamek.common.verifier.TestInfantry;
 import megamek.common.verifier.TestMech;
 import megamek.common.verifier.TestTank;
 import megameklab.com.MegaMekLab;
-import megameklab.com.ui.Infantry.tabs.PreviewTab;
 import megameklab.com.util.CConfig;
 import megameklab.com.util.RefreshListener;
 import megameklab.com.util.UnitUtil;
