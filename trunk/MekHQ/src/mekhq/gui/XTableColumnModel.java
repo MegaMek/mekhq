@@ -31,7 +31,7 @@ import javax.swing.table.TableColumn;
 		/** Array of TableColumn objects in this model.
 	     *  Holds all column objects, regardless of their visibility
 	     */
-	    protected Vector allTableColumns = new Vector();
+	    protected Vector<TableColumn> allTableColumns = new Vector<TableColumn>();
 	    
 	    /**
 	     * Creates an extended table column model.
@@ -184,7 +184,7 @@ import javax.swing.table.TableColumn;
 	     * @see	#getColumns
 	     */
 	    public int getColumnCount(boolean onlyVisible) {
-	        Vector columns = (onlyVisible ? tableColumns : allTableColumns);
+	        Vector<?> columns = (onlyVisible ? tableColumns : allTableColumns);
 		return columns.size();
 	    }
 
@@ -194,8 +194,8 @@ import javax.swing.table.TableColumn;
 	     * @param   onlyVisible   if set all invisible columns will be missing from the enumeration.
 	     * @return an <code>Enumeration</code> of the columns in the model
 	     */
-	    public Enumeration getColumns(boolean onlyVisible) {
-	        Vector columns = (onlyVisible ? tableColumns : allTableColumns);
+	    public Enumeration<?> getColumns(boolean onlyVisible) {
+	        Vector<?> columns = (onlyVisible ? tableColumns : allTableColumns);
 	        
 		return columns.elements();
 	    }
@@ -222,7 +222,7 @@ import javax.swing.table.TableColumn;
 		    throw new IllegalArgumentException("Identifier is null");
 		}
 
-	        Vector      columns     = (onlyVisible ? tableColumns : allTableColumns);
+	        Vector<?>      columns     = (onlyVisible ? tableColumns : allTableColumns);
 	        int         noColumns   = columns.size();
 	        TableColumn column;
 	        

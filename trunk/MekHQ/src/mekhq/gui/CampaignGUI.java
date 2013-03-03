@@ -5192,7 +5192,7 @@ public class CampaignGUI extends JPanel {
 	/**
 	 * A table model for displaying personnel in the infirmary
 	 */
-	public class PatientTableModel extends AbstractListModel {
+	public class PatientTableModel extends AbstractListModel<Object> {
 		private static final long serialVersionUID = -1615929049408417297L;
 
 		ArrayList<Person> patients;
@@ -5221,7 +5221,7 @@ public class CampaignGUI extends JPanel {
 			return new PatientTableModel.Renderer(getCamos(), getPortraits(), getMechTiles());
 		}
 
-		public class Renderer extends BasicInfo implements ListCellRenderer {
+		public class Renderer extends BasicInfo implements ListCellRenderer<Object> {
 			public Renderer(DirectoryItems camos, DirectoryItems portraits,
 					MechTileset mt) {
 				super(camos, portraits, mt);
@@ -5230,7 +5230,7 @@ public class CampaignGUI extends JPanel {
 			private static final long serialVersionUID = -406535109900807837L;
 
 			public Component getListCellRendererComponent(
-                    JList list,
+                    JList<?> list,
                     Object value,
                     int index,
                     boolean isSelected,
@@ -9784,8 +9784,8 @@ public class CampaignGUI extends JPanel {
 	private MekLabPanel panMekLab;
 	private javax.swing.JScrollPane scrollMekLab;
     private javax.swing.JLabel lblLocation;
-    private JList listAssignedPatient;
-    private JList listUnassignedPatient;
+    private JList<?> listAssignedPatient;
+    private JList<?> listUnassignedPatient;
 	// End of variables declaration//GEN-END:variables
 
     private javax.swing.JLabel lblRating;

@@ -457,7 +457,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
 
         //Sort the transactions in reverse date order.
         List<Transaction> transactions = campaign.getFinances().getAllTransactions();
-        Comparator transactionDateCompare = new Comparator<Transaction>() {
+        Comparator<Transaction> transactionDateCompare = new Comparator<Transaction>() {
             @Override
             public int compare(Transaction t1, Transaction t2) {
                 return (t2.getDate()).compareTo(t1.getDate());
