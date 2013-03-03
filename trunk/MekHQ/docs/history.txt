@@ -1,6 +1,6 @@
 VERSION HISTORY
 ----------------------------------
-v0.1.23 (SVN)  
+v0.1.23 Release Candidate 2 (2013-03-03)  
 + updated code for changes to MegaMek entity.setC3Master
 + Bug 312: Multiple entries in the units.cache
 + Bug 309: MekLab Body part Issue
