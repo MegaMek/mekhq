@@ -9,6 +9,9 @@ v0.1.23 (SVN)
 + Bug 313: Gyro damage /= gyro destroyed
 + Updated MM.jar to r9180
 + Bug 311: Unable to remove Contracts/Missions
++ Fixed a few of raw type references,
+    but there are still over 100 more on JComboBox
+    and DefaultComboBoxModel that I don't know how to handle.
 
 v0.1.22 Release Candidate 1 (2013-02-17)
 + Bug: not able to save game when a refit with c3i is in progress
