@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Properties;
+import java.util.ResourceBundle;
 
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
@@ -137,6 +138,8 @@ public class MekHQ implements GameListener {
      * At startup create and show the main frame of the application.
      */
     protected void startup() {
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekHQ");
+        MekHQ.logMessage(resourceMap.getString("Application.name") + " " + resourceMap.getString("Application.version"));
         //read in preferences
     	readPreferences();
     	setLookAndFeel();

@@ -1,6 +1,7 @@
 VERSION HISTORY
 ----------------------------------
 v0.1.24 (SVN)
++ added version number to log file
 
 v0.1.23 Release Candidate 2 (2013-03-03)  
 + updated code for changes to MegaMek entity.setC3Master
