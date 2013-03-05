@@ -8418,11 +8418,17 @@ public class CampaignGUI extends JPanel {
                     refreshScenarioList();
                 }
             } else if (command.equalsIgnoreCase("REMOVE")) {
-                getCampaign().removeScenario(scenario.getId());
-                refreshScenarioList();
-                refreshOrganization();
-                refreshPersonnelList();
-                refreshUnitList();
+                if (0 == JOptionPane.showConfirmDialog(null,
+                        "Do you really want to delete the scenario?",
+                                "Delete Scenario?",
+                        JOptionPane.YES_NO_OPTION)) {
+                    getCampaign().removeScenario(scenario.getId());
+                    refreshScenarioList();
+                    refreshOrganization();
+                    refreshPersonnelList();
+                    refreshUnitList();
+                }
+                
             }
         }
 
