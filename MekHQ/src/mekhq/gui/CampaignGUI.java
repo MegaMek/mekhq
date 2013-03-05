@@ -2272,6 +2272,12 @@ public class CampaignGUI extends JPanel {
     private void btnDeleteMissionActionPerformed(java.awt.event.ActionEvent evt) {
         Mission mission = getCampaign().getMission(selectedMission);
         MekHQ.logMessage("Attempting to Delete Mission, Mission ID: " + mission.getId());
+        if(0 != JOptionPane.showConfirmDialog(null,
+                "Are you sure you want to delete this mission?"
+            , "Delete mission?",
+                JOptionPane.YES_NO_OPTION)) {
+            return;
+        }
         getCampaign().removeMission(mission.getId());
         if(getCampaign().getSortedMissions().size() > 0) {
             selectedMission = getCampaign().getSortedMissions().get(0).getId();
