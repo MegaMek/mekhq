@@ -5394,8 +5394,10 @@ public class CampaignGUI extends JPanel {
                             null,
                             null,
                             "My Lance");
-                    getCampaign().addForce(new Force(name), singleForce);
-                    refreshOrganization();
+                    if(null != name) {
+                        getCampaign().addForce(new Force(name), singleForce);
+                        refreshOrganization();
+                    }
                 }
             } if(command.contains("ADD_UNIT")) {
                 if(null != singleForce) {
