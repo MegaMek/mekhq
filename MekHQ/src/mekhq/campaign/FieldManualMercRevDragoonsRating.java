@@ -64,12 +64,13 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
 
     private final BigDecimal HUNDRED = new BigDecimal(100);
 
-    private int techSupportNeeded = 0;
-    private int medSupportNeeded = 0;
-    private int hrSupportNeeded = 0;
-    private int techSupportAvailable = 0;
-    private int medSupportAvailable = 0;
-    private int hrSupportAvailable;
+    private int techSupportNeeded         = 0;
+    private int medSupportNeeded          = 0;
+    private int adminSupportNeeded        = 0;
+    private int dropJumpShipSupportNeeded = 0;
+    private int techSupportAvailable      = 0;
+    private int medSupportAvailable       = 0;
+    private int adminSupportAvailable;
     private int yearsInDebt = 0;
 
     public FieldManualMercRevDragoonsRating(Campaign campaign) {
@@ -116,12 +117,13 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
         }
 
         updateAvailableSupport();
-        updateMedicalAndHrSupportNeeds();
+        calcMedicalSupportHoursNeeded();
+        calcAdminSupportHoursNeeded();
     }
 
     private void updateAvailableSupport() {
         for (Person p : campaign.getPersonnel()) {
-            if(!p.isActive()) {
+            if (!p.isActive()) {
                 continue;
             }
             if (p.isTech()) {
@@ -129,7 +131,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
             } else if (p.isDoctor()) {
                 updateMedicalSupportAvailable(p);
             } else if ((p.getPrimaryRole() == Person.T_ADMIN_HR) || (p.getPrimaryRole() == Person.T_ADMIN_HR)) {
-                updateHumanResourcesSupportAvailable(p);
+                updateAdministrativeSupportAvailable(p);
             }
         }
     }
@@ -170,20 +172,20 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
         } else if ((en instanceof Aero) && !(en instanceof Dropship) && !(en instanceof Jumpship)) {
             numberAero++;
         } else if (en instanceof BattleArmor) {
-            numberBa += ((Infantry)en).getSquadSize();
+            numberBa += ((Infantry) en).getSquadSize();
             numberBaSquads++;
         } else if (en instanceof Infantry) {
-            numberSoldiers += ((Infantry)en).getSquadN() * ((Infantry)en).getSquadSize();
+            numberSoldiers += ((Infantry) en).getSquadN() * ((Infantry) en).getSquadSize();
             numberInfSquads++;
         }
     }
 
     /**
-     * todo Figure out how to incorporate Naval vessel's & artillery. 
+     * todo Figure out how to incorporate Naval vessel's & artillery.
      */
     private void updateTechSupportNeeds(Unit u) {
-    	Entity en = u.getEntity();
-    	double hoursNeeded = 0;
+        Entity en = u.getEntity();
+        double hoursNeeded = 0;
         if (en instanceof Mech) {
             hoursNeeded = Math.floor(en.getWeight() / 5) + 40;
         } else if ((en instanceof SmallCraft)) {
@@ -194,9 +196,21 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
             } else {
                 hoursNeeded = Math.floor(en.getWeight() / 10) + 80;
             }
-        } if(en instanceof Dropship || en instanceof Jumpship) {
-            //according to FMMR, they provide their own support so skip
-        	return;
+        } else if (en instanceof Warship) {
+            // according to FMMR, this should be tracked separately because it only applies to admin support but not
+            // technical support.
+            updateDropJumpShipSupportNeeds(en);
+            return;
+        } else if (en instanceof Jumpship) {
+            // according to FMMR, this should be tracked separately because it only applies to admin support but not
+            // technical support.
+            updateDropJumpShipSupportNeeds(en);
+            return;
+        } else if (en instanceof Dropship) {
+            // according to FMMR, this should be tracked separately because it only applies to admin support but not
+            // technical support.
+            updateDropJumpShipSupportNeeds(en);
+            return;
         } else if (en instanceof ConvFighter) {
             hoursNeeded = Math.floor(en.getWeight() / 2.5) + 20;
         } else if (en instanceof Aero) {
@@ -208,7 +222,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
         } else if (en instanceof BattleArmor) {
             hoursNeeded = (en.getTotalArmor() * 2) + 5;
         } else if (en instanceof Infantry) {
-        	//according to FMMR, they provide their own support so skip
+            //according to FMMR, they provide their own support so skip
             return;
         }
 
@@ -225,24 +239,89 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
         } else if (campaign.getCampaignOptions().useEraMods() && (en.getTechLevel() > TechConstants.T_INTRO_BOXSET)) {
             hoursNeeded *= 1.5;
         }
-        
+
         techSupportNeeded += hoursNeeded;
     }
 
-    private void updateMedicalAndHrSupportNeeds() {
-        medSupportNeeded = campaign.getPersonnel().size() / 5;
-        hrSupportNeeded = campaign.getPersonnel().size() / 2;
+    private void updateDropJumpShipSupportNeeds(Entity en) {
+        double hours = 0;
+        if (en instanceof Warship) {
+            hours += 5000;
+        } else if (en instanceof Jumpship) {
+            hours += 800;
+        } else if (en instanceof Dropship) {
+            if (en.getWeight() >= 50000) {
+                hours = Math.floor(en.getWeight() / 50) + 20;
+            } else if (en.getWeight() >= 16000) {
+                hours = Math.floor(en.getWeight() / 25) + 40;
+            } else {
+                hours = Math.floor(en.getWeight() / 10) + 80;
+            }
+        }
+
+        if (campaign.getCampaignOptions().useQuirks()) {
+            if (en.hasQuirk("easy_maintain")) {
+                hours -= hours * 0.2;
+            } else if (en.hasQuirk("difficult_maintain")) {
+                hours += hours * 0.2;
+            }
+        }
+
+        if (campaign.getCampaignOptions().useFactionModifiers() && en.isClan()) {
+            hours *= 2;
+        } else if (campaign.getCampaignOptions().useEraMods() && (en.getTechLevel() > TechConstants.T_INTRO_BOXSET)) {
+            hours *= 1.5;
+        }
+
+        dropJumpShipSupportNeeded += hours;
+    }
+
+    // The wording on this in FM:Mr is rather confusing.  Near as I can parse it out, you divide your total personnel
+    // into 7-man "squads".  These each require 4 hours of medical support (3 + (7/5) = 3 + 1.4 = 4.4 rounds to 4).
+    // The left over personnel form a new "squad" which requires 3 hours + (# left over / 5).  So, if you have 25
+    // personnel that would be:
+    //   25 / 7 = 3 squads of 7 and 1 squad of 4.
+    //   3 * (3 + 7/5) = 3 * (3 + 1.4) = 3 * 4 = 12 hours
+    //   3 + (4/5) = 3 + 0.8 = 3.8 = 4 hours.
+    //   total = 16 hours.
+    private void calcMedicalSupportHoursNeeded() {
+        int numSquads = new BigDecimal(campaign.getPersonnel().size())
+                .divide(new BigDecimal(7), 0, RoundingMode.DOWN).intValue();
+        int leftOver = campaign.getPersonnel().size() - (numSquads * 7);
+
+        medSupportNeeded = (numSquads * 4) +
+                (3 + (new BigDecimal(leftOver).divide(new BigDecimal(5), 0, RoundingMode.HALF_EVEN).intValue()));
+    }
+
+    private void calcAdminSupportHoursNeeded() {
+        int personnelCount = 0;
+        for (Person p : campaign.getPersonnel()) {
+            if ((p.getPrimaryRole() == Person.T_ADMIN_TRA) ||
+                    (p.getPrimaryRole() == Person.T_ADMIN_COM) ||
+                    (p.getPrimaryRole() == Person.T_ADMIN_LOG) ||
+                    (p.getPrimaryRole() == Person.T_ADMIN_HR) ||
+                    (p.getSecondaryRole() == Person.T_ADMIN_HR) ||
+                    (p.getSecondaryRole() == Person.T_ADMIN_TRA) ||
+                    (p.getSecondaryRole() == Person.T_ADMIN_COM) ||
+                    (p.getSecondaryRole() == Person.T_ADMIN_LOG)) {
+                continue;
+            }
+            personnelCount++;
+        }
+        int totalSupport = personnelCount + techSupportNeeded + dropJumpShipSupportNeeded;
+        adminSupportNeeded = new BigDecimal(totalSupport).divide(new BigDecimal(30), 0,
+                                                                 RoundingMode.HALF_EVEN).intValue();
     }
 
     private int getSupportHours(Person p) {
         switch (p.getExperienceLevel(false)) {
-            case(SkillType.EXP_ULTRA_GREEN):
+            case (SkillType.EXP_ULTRA_GREEN):
                 return 20;
-            case(SkillType.EXP_GREEN):
+            case (SkillType.EXP_GREEN):
                 return 30;
-            case(SkillType.EXP_REGULAR):
+            case (SkillType.EXP_REGULAR):
                 return 40;
-            case(SkillType.EXP_VETERAN):
+            case (SkillType.EXP_VETERAN):
                 return 45;
             default:
                 return 50;
@@ -252,7 +331,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
     private void updateTechSupportAvailable(Person p) {
         int hours = getSupportHours(p);
         if (p.isTechSecondary()) {
-            hours = (int)Math.floor(hours/2);
+            hours = (int) Math.floor(hours / 2);
         }
         techSupportAvailable += hours;
     }
@@ -260,17 +339,20 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
     private void updateMedicalSupportAvailable(Person p) {
         int hours = getSupportHours(p);
         if (p.getSecondaryRole() == Person.T_DOCTOR) {
-            hours = (int)Math.floor(hours/2);
+            hours = (int) Math.floor(hours / 2);
         }
         medSupportAvailable += hours;
     }
 
-    private void updateHumanResourcesSupportAvailable(Person p) {
+    private void updateAdministrativeSupportAvailable(Person p) {
         int hours = getSupportHours(p);
-        if (p.getSecondaryRole() == Person.T_ADMIN_HR) {
-            hours = (int)Math.floor(hours/2);
+        if ((p.getSecondaryRole() == Person.T_ADMIN_HR) ||
+                (p.getSecondaryRole() == Person.T_ADMIN_COM) ||
+                (p.getSecondaryRole() == Person.T_ADMIN_LOG) ||
+                (p.getSecondaryRole() == Person.T_ADMIN_TRA)) {
+            hours = (int) Math.floor(hours / 2);
         }
-        hrSupportAvailable += hours;
+        adminSupportAvailable += hours;
     }
 
     private void updateSkillLevel(Unit u, BigDecimal value) {
@@ -288,7 +370,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
         if ((u.getEntity() instanceof Infantry) || (u.getEntity() instanceof Protomech)) {
             combatSkillAverage = new BigDecimal(p.getGunnery());
 
-        //All other units use an average of piloting and gunnery.
+            //All other units use an average of piloting and gunnery.
         } else {
             combatSkillAverage = new BigDecimal(p.getGunnery() + p.getPiloting()).divide(new BigDecimal(2), PRECISION, HALF_EVEN);
         }
@@ -385,22 +467,22 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
         return percent.setScale(0, RoundingMode.DOWN).intValue() * 2;
     }
 
-    private BigDecimal getHumanResourcePercentage() {
-        if (hrSupportAvailable <= 0) {
+    private BigDecimal getAdminSupportPercentage() {
+        if (adminSupportAvailable <= 0) {
             return BigDecimal.ZERO;
         }
-        if (hrSupportNeeded <= 0) {
+        if (adminSupportNeeded <= 0) {
             return BigDecimal.ZERO;
         }
 
-        BigDecimal percent = new BigDecimal(hrSupportAvailable).divide(new BigDecimal(hrSupportNeeded), PRECISION, HALF_EVEN).multiply(
+        BigDecimal percent = new BigDecimal(adminSupportAvailable).divide(new BigDecimal(adminSupportNeeded), PRECISION, HALF_EVEN).multiply(
                 HUNDRED).setScale(0, RoundingMode.DOWN);
 
         return (percent.compareTo(HUNDRED) > 0 ? HUNDRED : percent);
     }
 
-    private int getHumanResourcesValue() {
-        BigDecimal percent = getHumanResourcePercentage();
+    private int getAdminValue() {
+        BigDecimal percent = getAdminSupportPercentage();
         BigDecimal threshold = new BigDecimal(60);
         if (percent.compareTo(threshold) < 0) {
             return 0;
@@ -437,7 +519,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
 
     @Override
     public int getSupportValue() {
-        return getTechSupportValue() + getMedicalSupportValue() + getHumanResourcesValue();
+        return getTechSupportValue() + getMedicalSupportValue() + getAdminValue();
     }
 
     @Override
@@ -525,7 +607,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
         sb.append("Support:                        ").append(getSupportValue()).append("\n");
         sb.append("    Tech Support:         ").append(getTechSupportPercentage().toPlainString()).append("%\n");
         sb.append("    Medical Support:      ").append(getMedicalSupportPercentage().toPlainString()).append("%\n");
-        sb.append("    HR Support:           ").append(getHumanResourcePercentage().toPlainString()).append("%\n\n");
+        sb.append("    HR Support:           ").append(getAdminSupportPercentage().toPlainString()).append("%\n\n");
 
         sb.append("Financial:                      ").append(getFinancialValue()).append("\n");
         sb.append("    Years in Debt:        ").append(getYearsInDebt()).append("\n");
