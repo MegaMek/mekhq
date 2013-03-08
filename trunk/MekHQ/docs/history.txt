@@ -5,6 +5,7 @@ v0.1.24 (SVN)
 + confirmation dialog on deleting mission
 + Bug 317: New Force when canceled
 + confirmation dialog on deleting scenario
++ Bug 318: Dragoon's Rating error FMM:R method
 
 v0.1.23 Release Candidate 2 (2013-03-03)  
 + updated code for changes to MegaMek entity.setC3Master
