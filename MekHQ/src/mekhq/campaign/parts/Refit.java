@@ -33,6 +33,7 @@ import java.util.UUID;
 
 import megamek.common.AmmoType;
 import megamek.common.BattleArmor;
+import megamek.common.BipedMech;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Infantry;
@@ -856,6 +857,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 		}
 		oldUnit.setParts(newParts);
 		Utilities.unscrambleEquipmentNumbers(oldUnit);
+		assignArmActuators();
 		if(null != newArmorSupplies) {
 			newArmorSupplies.setAmount(newArmorSupplies.getAmount() - armorNeeded);
 			if(newArmorSupplies.getAmount() > 0) {
@@ -1556,5 +1558,92 @@ public class Refit implements IPartWork, IAcquisitionWork {
 		} else {
 			//newEntity.setModel(oldUnit.getEntity().getModel() + " Mk II");
 		}
+	}
+	
+	private void assignArmActuators() {
+	    if(!(oldUnit.getEntity() instanceof BipedMech)) {
+	        return;
+	    }
+	    BipedMech m = (BipedMech)oldUnit.getEntity();
+	    //we only need to worry about lower arm actuators and hands
+	    Part rightLowerArm = null;
+	    Part leftLowerArm = null;
+	    Part rightHand = null;
+	    Part leftHand = null;
+	    MekActuator missingHand1 = null;
+	    MekActuator missingHand2 = null;
+	    MekActuator missingArm1 = null;
+	    MekActuator missingArm2 = null;
+	    for(Part part : oldUnit.getParts()) {
+	        if(part instanceof MekActuator || part instanceof MissingMekActuator) {
+	            int type = -1;
+                int loc = -1;
+                if(part instanceof MekActuator) {
+                    type = ((MekActuator)part).getType();
+                    loc = ((MekActuator)part).getLocation();
+                } else {
+                    type = ((MissingMekActuator)part).getType();
+                    loc = ((MissingMekActuator)part).getLocation();
+                }
+	            if(type == Mech.ACTUATOR_LOWER_ARM) {
+                    if(loc == Mech.LOC_RARM) {
+                        rightLowerArm = part;
+                    } else if(loc == Mech.LOC_LARM) {
+                        leftLowerArm = part;
+                    } else if(null == missingArm1 && part instanceof MekActuator) {
+                        missingArm1 = (MekActuator)part;
+                    } else if(part instanceof MekActuator) {
+                        missingArm2 = (MekActuator)part;
+                    }
+                } else if(type == Mech.ACTUATOR_HAND) {
+                    if(loc == Mech.LOC_RARM) {
+                        rightHand = part;
+                    } else if(loc == Mech.LOC_LARM) {
+                        leftHand = part;
+                    } else if(null == missingHand1 && part instanceof MekActuator) {
+                        missingHand1 = (MekActuator)part;
+                    } else if(part instanceof MekActuator) {
+                        missingHand2 = (MekActuator)part;
+                    }
+                } 
+	        }
+	    }
+	    //ok now check all the conditions, assign right hand stuff first
+	    if(null == rightHand && m.hasSystem(Mech.ACTUATOR_HAND, Mech.LOC_RARM)) {
+	        MekActuator part = missingHand1;
+	        if(null == part || part.getLocation() != Entity.LOC_NONE) {
+	            part = missingHand2;
+	        }
+	        if(null != part) {
+	            part.setLocation(Mech.LOC_RARM);	            
+	        }
+	    }
+	    if(null == leftHand && m.hasSystem(Mech.ACTUATOR_HAND, Mech.LOC_LARM)) {
+            MekActuator part = missingHand1;
+            if(null == part || part.getLocation() != Entity.LOC_NONE) {
+                part = missingHand2;
+            }
+            if(null != part) {
+                part.setLocation(Mech.LOC_LARM);                
+            }
+        }
+	    if(null == rightLowerArm && m.hasSystem(Mech.ACTUATOR_LOWER_ARM, Mech.LOC_RARM)) {
+            MekActuator part = missingArm1;
+            if(null == part || part.getLocation() != Entity.LOC_NONE) {
+                part = missingArm2;
+            }
+            if(null != part) {
+                part.setLocation(Mech.LOC_RARM);                
+            }
+        }
+        if(null == leftLowerArm && m.hasSystem(Mech.ACTUATOR_LOWER_ARM, Mech.LOC_LARM)) {
+            MekActuator part = missingArm1;
+            if(null == part || part.getLocation() != Entity.LOC_NONE) {
+                part = missingArm2;
+            }
+            if(null != part) {
+                part.setLocation(Mech.LOC_LARM);                
+            }
+        }
 	}
 }
