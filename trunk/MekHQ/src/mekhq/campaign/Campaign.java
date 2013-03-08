@@ -4201,7 +4201,8 @@ public class Campaign implements Serializable {
     	if(mission instanceof Contract) {
     		Contract contract = (Contract)mission;
     		//check for money in escrow
-    		if(contract.getStatus() != Mission.S_BREACH && contract.getMonthsLeft(getDate()) > 0) {
+    		//According to FMM(r) pg 179, both failure and breach lead to no further payment even though this seems stupid
+    		if(contract.getStatus() == Mission.S_SUCCESS && contract.getMonthsLeft(getDate()) > 0) {
     			DecimalFormat formatter = new DecimalFormat();
     			long remainingMoney = contract.getMonthlyPayOut() * contract.getMonthsLeft(getDate());
     			finances.credit(remainingMoney, Transaction.C_CONTRACT, "Remaining payment for " + contract.getName(), calendar.getTime());
