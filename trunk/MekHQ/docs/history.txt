@@ -7,6 +7,7 @@ v0.1.24 (SVN)
 + confirmation dialog on deleting scenario
 + Bug 318: Dragoon's Rating error FMM:R method
 + Bug 320: Payment error for early failed contracts
++ Bug 319: Repar Bay ArrayIndexOutOfBoundsException
 
 v0.1.23 Release Candidate 2 (2013-03-03)  
 + updated code for changes to MegaMek entity.setC3Master

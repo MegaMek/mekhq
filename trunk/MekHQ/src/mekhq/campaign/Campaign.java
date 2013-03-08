@@ -103,8 +103,10 @@ import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.EnginePart;
+import mekhq.campaign.parts.MekActuator;
 import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.MissingEnginePart;
+import mekhq.campaign.parts.MissingMekActuator;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
@@ -2032,10 +2034,17 @@ public class Campaign implements Serializable {
 			Unit u = retVal.getUnit(prt.getUnitId());
 			prt.setUnit(u);
 			if(null != u) {
-				u.addPart(prt);
-				if(prt instanceof AmmoBin) {
-					((AmmoBin)prt).restoreMunitionType();
-				}
+			    //if actuators on units have no location (on version 1.23 and earlier) then remove them and let initializeParts (called later) create new ones
+                if(prt instanceof MekActuator && ((MekActuator)prt).getLocation() == Entity.LOC_NONE) {
+                    removeParts.add(prt);
+                } else if(prt instanceof MissingMekActuator && ((MissingMekActuator)prt).getLocation() == Entity.LOC_NONE) {
+                    removeParts.add(prt);
+                } else {
+    				u.addPart(prt);
+    				if(prt instanceof AmmoBin) {
+    					((AmmoBin)prt).restoreMunitionType();
+    				}
+                }			
 			} else if(v < 16) {
 				prt.setSalvaging(false);
 				//this seems weird but we need to get difficulty and time 
@@ -2053,7 +2062,7 @@ public class Campaign implements Serializable {
 				if(!found) {
 					spareParts.add(prt);
 				}
-			}
+			}			
 			if(prt instanceof MissingPart) {
 				//run this to make sure that slots for missing parts are set as unrepairable
 				//because they will not be in missing locations
