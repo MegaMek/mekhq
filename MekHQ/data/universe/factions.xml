@@ -141,7 +141,7 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 		<startingPlanet>Circinus,Circinus,Circinus,Circinus,Circinus,Circinus,Circinus,Circinus,Circinus</startingPlanet>
 		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
 		<nameGenerator>General</nameGenerator>
-		<colorRGB>30,144,255</colorRGB>
+		<colorRGB>198,36,58</colorRGB>
 		<periphery>true</periphery>
 		<clan>false</clan>
 	</faction>
@@ -550,7 +550,7 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 		<startingPlanet>Fronc,Fronc,Fronc,Fronc,Fronc,Fronc,Fronc,Fronc,Fronc,</startingPlanet>
 		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
 		<nameGenerator>General</nameGenerator>
-		<colorRGB>192,192,192</colorRGB>
+		<colorRGB>128,169,127</colorRGB>
 		<periphery>true</periphery>
 		<clan>false</clan>
 	</faction>
