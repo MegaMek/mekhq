@@ -29,6 +29,7 @@ import java.util.Hashtable;
 import java.util.UUID;
 
 import mekhq.MekHQ;
+import mekhq.Version;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -92,7 +93,7 @@ public class Kill implements Serializable {
 		killer = s;
 	}
 	
-	public static Kill generateInstanceFromXML(Node wn, int version) {
+	public static Kill generateInstanceFromXML(Node wn, Version version) {
 	
 		Kill retVal = null;
 		try {
@@ -104,7 +105,7 @@ public class Kill implements Serializable {
 				if (wn2.getNodeName().equalsIgnoreCase("killed")) {
 					retVal.killed = wn2.getTextContent();
 				} else if (wn2.getNodeName().equalsIgnoreCase("pilotId")) {
-					if(version < 14) {
+					if(version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
 						retVal.oldPilotId = Integer.parseInt(wn2.getTextContent());
 					} else {
 						retVal.pilotId = UUID.fromString(wn2.getTextContent());

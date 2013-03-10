@@ -91,9 +91,11 @@ import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.BuildingBlock;
 import megamek.common.util.DirectoryItems;
+import mekhq.campaign.LogEntry;
 import mekhq.MekHQ;
 import mekhq.NullEntityException;
 import mekhq.Utilities;
+import mekhq.Version;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.force.Force;
@@ -1851,17 +1853,7 @@ public class Campaign implements Serializable {
 		// Stupid weird parsing of XML.  At least this cleans it up.
 		campaignEle.normalize(); 
 
-		String version = campaignEle.getAttribute("version");
-		int v = 0;
-		if(null != version && version.length() > 0) {
-			String[] temp = version.split("\\.");
-			String tv = temp[2].replace("-dev", "");
-            if (tv.indexOf("-") > 0) {
-                temp = tv.split("\\-");
-                tv = temp[0];
-            }
-			v = Integer.parseInt(tv);
-		}
+		Version version = new Version(campaignEle.getAttribute("version"));
 		
 		//we need to iterate through three times, the first time to collect
 		//any custom units that might not be written yet
@@ -1944,19 +1936,19 @@ public class Campaign implements Serializable {
 				} else if (xn.equalsIgnoreCase("randomSkillPreferences")) {
 					retVal.rskillPrefs = RandomSkillPreferences.generateRandomSkillPreferencesFromXml(wn);
 				} else if (xn.equalsIgnoreCase("info")) {
-					processInfoNode(retVal, wn, v);
+					processInfoNode(retVal, wn, version);
 				} else if (xn.equalsIgnoreCase("parts")) {
-					processPartNodes(retVal, wn, v);
+					processPartNodes(retVal, wn, version);
 				} else if (xn.equalsIgnoreCase("personnel")) {
-					processPersonnelNodes(retVal, wn, v);
+					processPersonnelNodes(retVal, wn, version);
 				} else if (xn.equalsIgnoreCase("teams")) {
 					processTeamNodes(retVal, wn);
 				} else if (xn.equalsIgnoreCase("units")) {
-					processUnitNodes(retVal, wn, v);
+					processUnitNodes(retVal, wn, version);
 				} else if (xn.equalsIgnoreCase("missions")) {
 					processMissionNodes(retVal, wn);
 				} else if (xn.equalsIgnoreCase("forces")) {
-					processForces(retVal, wn, v);
+					processForces(retVal, wn, version);
 				} else if (xn.equalsIgnoreCase("finances")) {
 					processFinances(retVal, wn);
 				} else if(xn.equalsIgnoreCase("location")) {
@@ -1966,7 +1958,7 @@ public class Campaign implements Serializable {
 				} else if(xn.equalsIgnoreCase("gameOptions")) {
 					processGameOptionNodes(retVal, wn);
 				} else if(xn.equalsIgnoreCase("kills")) {
-					processKillNodes(retVal, wn, v);
+					processKillNodes(retVal, wn, version);
 				}
 				
 			} else {
@@ -1982,17 +1974,17 @@ public class Campaign implements Serializable {
  
 		//if the version is earlier than 0.1.14, then we need to replace all the old integer
 		//ids of units and personnel with their UUIDs where they are referenced.
-		if(v < 14) {
+		if(version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
 		fixIdReferences(retVal);
 		}
 		// if the version is earlier than 0.1.16, then we need to run another fix to update
 		// the externalIds to match the Unit IDs.
-		if(v < 16) {
+		if(version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 16) {
 		fixIdReferencesB(retVal);
 		}
 		
 		//adjust tech levels for version before 0.1.21
-        if(v < 21) {
+        if(version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 21) {
             retVal.campaignOptions.setTechLevel(retVal.campaignOptions.getTechLevel()+1);
         }
 
@@ -2045,7 +2037,7 @@ public class Campaign implements Serializable {
     					((AmmoBin)prt).restoreMunitionType();
     				}
                 }			
-			} else if(v < 16) {
+			} else if(version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 16) {
 				prt.setSalvaging(false);
 				//this seems weird but we need to get difficulty and time 
 				//updated for non-salvage
@@ -2269,7 +2261,7 @@ public class Campaign implements Serializable {
 	}
 
 	
-	private static void processForces(Campaign retVal, Node wn, int version) {
+	private static void processForces(Campaign retVal, Node wn, Version version) {
 		MekHQ.logMessage("Loading Force Organization from XML...", 4);
 
 		NodeList wList = wn.getChildNodes();
@@ -2305,7 +2297,7 @@ public class Campaign implements Serializable {
 		MekHQ.logMessage("Load of Force Organization complete!");
 	}
 	
-	private static void processPersonnelNodes(Campaign retVal, Node wn, int version) {
+	private static void processPersonnelNodes(Campaign retVal, Node wn, Version version) {
 		MekHQ.logMessage("Loading Personnel Nodes from XML...", 4);
 
 		NodeList wList = wn.getChildNodes();
@@ -2367,7 +2359,7 @@ public class Campaign implements Serializable {
 		MekHQ.logMessage("Load Skill Type Nodes Complete!", 4);
 	}
 	
-	private static void processKillNodes(Campaign retVal, Node wn, int version) {
+	private static void processKillNodes(Campaign retVal, Node wn, Version version) {
 		MekHQ.logMessage("Loading Kill Nodes from XML...", 4);
 
 		NodeList wList = wn.getChildNodes();
@@ -2645,7 +2637,7 @@ public class Campaign implements Serializable {
 		}
 	}
 
-	private static void processUnitNodes(Campaign retVal, Node wn, int version) {
+	private static void processUnitNodes(Campaign retVal, Node wn, Version version) {
 		MekHQ.logMessage("Loading Unit Nodes from XML...", 4);
 
 		NodeList wList = wn.getChildNodes();
@@ -2676,7 +2668,7 @@ public class Campaign implements Serializable {
 		MekHQ.logMessage("Load Unit Nodes Complete!", 4);
 	}
 
-	private static void processPartNodes(Campaign retVal, Node wn, int version) {
+	private static void processPartNodes(Campaign retVal, Node wn, Version version) {
 		MekHQ.logMessage("Loading Part Nodes from XML...", 4);
 
 		NodeList wList = wn.getChildNodes();
@@ -2745,7 +2737,7 @@ public class Campaign implements Serializable {
 	 * @throws ParseException
 	 * @throws DOMException
 	 */
-	private static void processInfoNode(Campaign retVal, Node wni, int version)
+	private static void processInfoNode(Campaign retVal, Node wni, Version version)
 			throws DOMException, ParseException {
 		NodeList nl = wni.getChildNodes();
 
@@ -2818,7 +2810,7 @@ public class Campaign implements Serializable {
 							retVal.currentReport.add(wn2.getTextContent());
 					}
 				} else if (xn.equalsIgnoreCase("faction")) {
-					if(version < 14) {
+					if(version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
 						retVal.factionCode = Faction.getFactionCode(Integer.parseInt(wn.getTextContent()));
 					} else {
 						retVal.factionCode = wn.getTextContent();

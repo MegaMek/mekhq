@@ -30,6 +30,7 @@ import megamek.common.EquipmentType;
 import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
 import mekhq.MekHQ;
+import mekhq.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlSerializable;
 import mekhq.campaign.MekHqXmlUtil;
@@ -490,7 +491,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "</part>");
 	}
 
-	public static Part generateInstanceFromXML(Node wn, int version) {
+	public static Part generateInstanceFromXML(Node wn, Version version) {
 		Part retVal = null;
 		NamedNodeMap attrs = wn.getAttributes();
 		Node classNameNode = attrs.getNamedItem("type");
@@ -560,7 +561,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 				} else if (wn2.getNodeName().equalsIgnoreCase("mode")) {
 					retVal.mode = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("teamId")) {
-					if(version < 14) {
+					if(version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
 						retVal.oldTeamId = Integer.parseInt(wn2.getTextContent());
 					} else {
 						if(!wn2.getTextContent().equals("null")) {
@@ -568,7 +569,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 						}
 					}
 				} else if (wn2.getNodeName().equalsIgnoreCase("unitId")) {
-					if(version < 14) {
+					if(version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
 						retVal.oldUnitId = Integer.parseInt(wn2.getTextContent());
 					} else {
 						if(!wn2.getTextContent().equals("null")) {
@@ -578,7 +579,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 				} else if (wn2.getNodeName().equalsIgnoreCase("shorthandedMod")) {
 					retVal.shorthandedMod = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("refitId")) {
-					if(version < 14) {
+					if(version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
 						retVal.oldRefitId = Integer.parseInt(wn2.getTextContent());
 					} else {
 						if(!wn2.getTextContent().equals("null")) {

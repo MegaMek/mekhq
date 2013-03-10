@@ -48,6 +48,7 @@ import megamek.common.loaders.EntityLoadingException;
 import megameklab.com.util.UnitUtil;
 import mekhq.MekHQ;
 import mekhq.Utilities;
+import mekhq.Version;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.MhqFileUtil;
 import mekhq.campaign.Unit;
@@ -1228,7 +1229,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl) + "</refit>");
 	}
 	
-	public static Refit generateInstanceFromXML(Node wn, Unit u, int version) {
+	public static Refit generateInstanceFromXML(Node wn, Unit u, Version version) {
 		Refit retVal = new Refit();
 		retVal.oldUnit = u;
 		
@@ -1249,7 +1250,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 				} else if (wn2.getNodeName().equalsIgnoreCase("newArmorSuppliesId")) {
 					retVal.newArmorSuppliesId = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("assignedTechId")) {
-					if(version < 14) {
+					if(version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
 						retVal.oldTechId = Integer.parseInt(wn2.getTextContent());
 					} else {
 						retVal.assignedTechId = UUID.fromString(wn2.getTextContent());
@@ -1308,7 +1309,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 		return retVal;
 	}
 	
-	private static void processShoppingList(Refit retVal, Node wn, Unit u, int version) {
+	private static void processShoppingList(Refit retVal, Node wn, Unit u, Version version) {
 
 		NodeList wList = wn.getChildNodes();
 		
@@ -1336,7 +1337,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 		}
 	}
 	
-	private static void processArmorSupplies(Refit retVal, Node wn, int version) {
+	private static void processArmorSupplies(Refit retVal, Node wn, Version version) {
 
 		NodeList wList = wn.getChildNodes();
 		
