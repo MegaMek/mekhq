@@ -52,10 +52,11 @@ import megamek.common.VTOL;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.PilotOptions;
+import mekhq.campaign.LogEntry;
 import mekhq.MekHQ;
 import mekhq.Utilities;
+import mekhq.Version;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.LogEntry;
 import mekhq.campaign.MekHqXmlSerializable;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Ranks;
@@ -674,7 +675,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "</person>");
 	}
 
-	public static Person generateInstanceFromXML(Node wn, int version) {
+	public static Person generateInstanceFromXML(Node wn, Version version) {
 		Person retVal = null;
 		
 		try {
@@ -714,7 +715,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 				} else if (wn2.getNodeName().equalsIgnoreCase("idleMonths")) {
 					retVal.idleMonths = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("id")) {
-					if(version < 14) {
+					if(version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
 						retVal.oldId = Integer.parseInt(wn2.getTextContent());
 					} else {
 						retVal.id = UUID.fromString(wn2.getTextContent());
@@ -736,7 +737,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 				} else if (wn2.getNodeName().equalsIgnoreCase("rank")) {
 					retVal.rank = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("doctorId")) {
-					if(version < 14) {
+					if(version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
 						retVal.oldDoctorId = Integer.parseInt(wn2.getTextContent());
 					} else {
 						if(!wn2.getTextContent().equals("null")) {
@@ -744,7 +745,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 						}
 					}
 				} else if (wn2.getNodeName().equalsIgnoreCase("unitId")) {
-					if(version < 14) {
+					if(version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
 						retVal.oldUnitId = Integer.parseInt(wn2.getTextContent());
 					} else {
 						if(!wn2.getTextContent().equals("null")) {
@@ -813,7 +814,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 				}
 			}
 			
-			if(version < 13) {
+			if(version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 13) {
 				if(retVal.primaryRole > T_INFANTRY) {
 					retVal.primaryRole += 4;
 

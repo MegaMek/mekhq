@@ -64,6 +64,7 @@ import megamek.common.weapons.BayWeapon;
 import megamek.common.weapons.InfantryAttack;
 import megamek.common.weapons.infantry.InfantryWeapon;
 import mekhq.MekHQ;
+import mekhq.Version;
 import mekhq.campaign.parts.AeroHeatSink;
 import mekhq.campaign.parts.AeroLifeSupport;
 import mekhq.campaign.parts.AeroSensor;
@@ -1079,11 +1080,11 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl) + "</unit>");
 	}
 
-	public static Unit generateInstanceFromXML(Node wn, int version) {
+	public static Unit generateInstanceFromXML(Node wn, Version version) {
 		Unit retVal = new Unit();
 		NamedNodeMap attrs = wn.getAttributes();
 		Node idNode = attrs.getNamedItem("id");
-		if(version < 14) {
+		if(version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
 			retVal.oldId = Integer.parseInt(idNode.getTextContent());
 		} else {
 			retVal.id = UUID.fromString(idNode.getTextContent());
@@ -1103,25 +1104,25 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 				} else if (wn2.getNodeName().equalsIgnoreCase("pilotId")) {
 					retVal.pilotId = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("driverId")) {
-					if(version < 14) {
+					if(version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
 						retVal.oldDrivers.add(Integer.parseInt(wn2.getTextContent()));
 					} else {
 						retVal.drivers.add(UUID.fromString(wn2.getTextContent()));
 					}
 				} else if (wn2.getNodeName().equalsIgnoreCase("gunnerId")) {
-					if(version < 14) {
+					if(version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
 						retVal.oldGunners.add(Integer.parseInt(wn2.getTextContent()));
 					} else {
 						retVal.gunners.add(UUID.fromString(wn2.getTextContent()));
 					}
 				} else if (wn2.getNodeName().equalsIgnoreCase("vesselCrewId")) {
-					if(version < 14) {
+					if(version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
 						retVal.oldVesselCrew.add(Integer.parseInt(wn2.getTextContent()));
 					} else {
 						retVal.vesselCrew.add(UUID.fromString(wn2.getTextContent()));
 					}
 				} else if (wn2.getNodeName().equalsIgnoreCase("navigatorId")) {
-					if(version < 14) {
+					if(version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
 						retVal.oldNavigator = Integer.parseInt(wn2.getTextContent());
 					} else {
 						if(!wn2.getTextContent().equals("null")) {

@@ -32,6 +32,7 @@ import java.util.UUID;
 import java.util.Vector;
 
 import mekhq.MekHQ;
+import mekhq.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
@@ -352,7 +353,7 @@ public class Force implements Serializable {
 		
 	}
 	
-	public static Force generateInstanceFromXML(Node wn, Campaign c, int version) {
+	public static Force generateInstanceFromXML(Node wn, Campaign c, Version version) {
 		Force retVal = null;
 		NamedNodeMap attrs = wn.getAttributes();
 		Node idNameNode = attrs.getNamedItem("id");
@@ -407,7 +408,7 @@ public class Force implements Serializable {
 		return retVal;
 	}
 	
-	private static void processUnitNodes(Force retVal, Node wn, int version) {
+	private static void processUnitNodes(Force retVal, Node wn, Version version) {
 	
 		NodeList nl = wn.getChildNodes();
 		for (int x=0; x<nl.getLength(); x++) {
@@ -417,7 +418,7 @@ public class Force implements Serializable {
 			NamedNodeMap attrs = wn2.getAttributes();
 			Node classNameNode = attrs.getNamedItem("id");
 			String idString = classNameNode.getTextContent();
-			if(version < 14) {
+			if(version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
 				retVal.oldUnits.add(Integer.parseInt(idString));
 			} else {
 				retVal.addUnit(UUID.fromString(idString));	

@@ -22,9 +22,9 @@ import javax.swing.JTextArea;
 import megamek.common.Crew;
 import megamek.common.options.PilotOptions;
 import megamek.common.util.DirectoryItems;
+import mekhq.campaign.LogEntry;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
-import mekhq.campaign.LogEntry;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 
