@@ -3962,6 +3962,7 @@ public class Campaign implements Serializable {
         entity.setEvading(false);
         entity.setFacing(0);
     	entity.setPosition(null);
+    	entity.setDeployRound(0);
     	//TODO: still a lot of stuff to do here, but oh well
     	entity.setOwner(player);
     	entity.setGame(game);
