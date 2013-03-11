@@ -192,7 +192,7 @@ public class CurrentLocation implements Serializable {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "<location>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<currentPlanetName>"
-				+currentPlanet.getName()
+				+MekHqXmlUtil.escape(currentPlanet.getName())
 				+"</currentPlanetName>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<transitTime>"

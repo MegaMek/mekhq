@@ -134,11 +134,11 @@ public class Kill implements Serializable {
 				+"</pilotId>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<killed>"
-				+killed
+				+MekHqXmlUtil.escape(killed)
 				+"</killed>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<killer>"
-				+killer
+				+MekHqXmlUtil.escape(killer)
 				+"</killer>");
 		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)

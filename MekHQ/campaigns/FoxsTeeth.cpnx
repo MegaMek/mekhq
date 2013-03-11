@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<campaign version="0.1.22-dev">
+<campaign version="0.1.24-dev">
 	<info>
 		<name>Fox&apos;s Teeth</name>
 		<faction>FS</faction>
@@ -372,6 +372,24 @@
 			<scenarioId>1</scenarioId>
 			<history></history>
 		</unit>
+		<unit id="56ef5856-abb6-4a2d-9e4c-d1461b9b9dce" type="mekhq.campaign.Unit">
+			<entity chassis="Assassin" model="ASN-21" type="Biped" commander="false" externalId="56ef5856-abb6-4a2d-9e4c-d1461b9b9dce">
+				<location index="2"> Right Torso
+					<slot index="5" type="IS Ammo LRM-5" shots="24"/>
+				</location>
+				<location index="3"> Left Torso
+					<slot index="5" type="IS Ammo SRM-2" shots="50"/>
+				</location>
+			</entity>
+			<quality>3</quality>
+			<driverId>2f9c153a-467b-4898-bd47-d5cba4c3e532</driverId>
+			<gunnerId>2f9c153a-467b-4898-bd47-d5cba4c3e532</gunnerId>
+			<salvaged>false</salvaged>
+			<site>2</site>
+			<forceId>4</forceId>
+			<scenarioId>-1</scenarioId>
+			<history></history>
+		</unit>
 		<unit id="35d8a1cf-fed5-4e5e-9e46-f65cc82d8a92" type="mekhq.campaign.Unit">
 			<entity chassis="Centurion" model="CN9-A" type="Biped" commander="false" externalId="35d8a1cf-fed5-4e5e-9e46-f65cc82d8a92">
 				<location index="2"> Right Torso
@@ -390,24 +408,6 @@
 			<site>2</site>
 			<forceId>3</forceId>
 			<scenarioId>1</scenarioId>
-			<history></history>
-		</unit>
-		<unit id="56ef5856-abb6-4a2d-9e4c-d1461b9b9dce" type="mekhq.campaign.Unit">
-			<entity chassis="Assassin" model="ASN-21" type="Biped" commander="false" externalId="56ef5856-abb6-4a2d-9e4c-d1461b9b9dce">
-				<location index="2"> Right Torso
-					<slot index="5" type="IS Ammo LRM-5" shots="24"/>
-				</location>
-				<location index="3"> Left Torso
-					<slot index="5" type="IS Ammo SRM-2" shots="50"/>
-				</location>
-			</entity>
-			<quality>3</quality>
-			<driverId>2f9c153a-467b-4898-bd47-d5cba4c3e532</driverId>
-			<gunnerId>2f9c153a-467b-4898-bd47-d5cba4c3e532</gunnerId>
-			<salvaged>false</salvaged>
-			<site>2</site>
-			<forceId>4</forceId>
-			<scenarioId>-1</scenarioId>
 			<history></history>
 		</unit>
 		<unit id="f8cf9760-9998-4219-baca-416347c6e049" type="mekhq.campaign.Unit">
@@ -524,47 +524,6 @@ For a light BattleMech pilot, Grey has lost remarkably few ’Mechs. Forced to s
 				<bonus>0</bonus>
 			</skill>
 		</person>
-		<person id="b06e5c92-e603-4769-b82a-00c3c58db696" type="mekhq.campaign.personnel.Person">
-			<name>Austin Vorster</name>
-			<callsign></callsign>
-			<primaryRole>1</primaryRole>
-			<secondaryRole>0</secondaryRole>
-			<biography>When Austin’s father died at the controls of the family Stinger in 3023, Austin took his place in the command lance in the salvaged ’Mech. As a member of an old MechWarrior family, Austin received his training “in house” rather than at one of the Federated Suns academies. Years of heavy fighting have transformed Austin from the “wet-behind-the-ears-greenhorn” into a MechWarrior who has earned the respect of his peers and superiors both. In that time Austin has seen many of his contemporaries fall in battle or retire, making him one of the “old men” of the company.
-
-When Ian McKinnon retired, Austin considered going with him, but Ian advised against depleting the unit of too many experienced hands. Convinced, Austin promised Ian that he would “keep an eye on the k ids”. When Ross McKinnon reorganized the company he offered Austin the position of Company Sergeant Major and Weapons Master. Though expressing doubts that he could truly fill George Lytton’s combat boots, Austin accepted the assignment.</biography>
-			<daysRest>0</daysRest>
-			<idleMonths>-1</idleMonths>
-			<id>b06e5c92-e603-4769-b82a-00c3c58db696</id>
-			<portraitCategory>FoxsTeeth/</portraitCategory>
-			<portraitFile>Vorster.png</portraitFile>
-			<xp>0</xp>
-			<gender>0</gender>
-			<rank>5</rank>
-			<nTasks>0</nTasks>
-			<unitId>f8cf9760-9998-4219-baca-416347c6e049</unitId>
-			<salary>-1</salary>
-			<status>0</status>
-			<hits>0</hits>
-			<toughness>0</toughness>
-			<minutesLeft>0</minutesLeft>
-			<overtimeLeft>0</overtimeLeft>
-			<birthday>3004-09-28 12:00:00</birthday>
-			<skill>
-				<type>Tactics</type>
-				<level>0</level>
-				<bonus>0</bonus>
-			</skill>
-			<skill>
-				<type>Gunnery/Mech</type>
-				<level>4</level>
-				<bonus>0</bonus>
-			</skill>
-			<skill>
-				<type>Piloting/Mech</type>
-				<level>4</level>
-				<bonus>0</bonus>
-			</skill>
-		</person>
 		<person id="3c3abbc1-def4-438b-8c49-c5c92163e22c" type="mekhq.campaign.personnel.Person">
 			<name>Hiro Chipende</name>
 			<callsign></callsign>
@@ -605,6 +564,47 @@ Hiro himself was killed on Greenlaw during the FedCom Civil War. Next in line fo
 			<skill>
 				<type>Piloting/Mech</type>
 				<level>3</level>
+				<bonus>0</bonus>
+			</skill>
+		</person>
+		<person id="b06e5c92-e603-4769-b82a-00c3c58db696" type="mekhq.campaign.personnel.Person">
+			<name>Austin Vorster</name>
+			<callsign></callsign>
+			<primaryRole>1</primaryRole>
+			<secondaryRole>0</secondaryRole>
+			<biography>When Austin’s father died at the controls of the family Stinger in 3023, Austin took his place in the command lance in the salvaged ’Mech. As a member of an old MechWarrior family, Austin received his training “in house” rather than at one of the Federated Suns academies. Years of heavy fighting have transformed Austin from the “wet-behind-the-ears-greenhorn” into a MechWarrior who has earned the respect of his peers and superiors both. In that time Austin has seen many of his contemporaries fall in battle or retire, making him one of the “old men” of the company.
+
+When Ian McKinnon retired, Austin considered going with him, but Ian advised against depleting the unit of too many experienced hands. Convinced, Austin promised Ian that he would “keep an eye on the k ids”. When Ross McKinnon reorganized the company he offered Austin the position of Company Sergeant Major and Weapons Master. Though expressing doubts that he could truly fill George Lytton’s combat boots, Austin accepted the assignment.</biography>
+			<daysRest>0</daysRest>
+			<idleMonths>-1</idleMonths>
+			<id>b06e5c92-e603-4769-b82a-00c3c58db696</id>
+			<portraitCategory>FoxsTeeth/</portraitCategory>
+			<portraitFile>Vorster.png</portraitFile>
+			<xp>0</xp>
+			<gender>0</gender>
+			<rank>5</rank>
+			<nTasks>0</nTasks>
+			<unitId>f8cf9760-9998-4219-baca-416347c6e049</unitId>
+			<salary>-1</salary>
+			<status>0</status>
+			<hits>0</hits>
+			<toughness>0</toughness>
+			<minutesLeft>0</minutesLeft>
+			<overtimeLeft>0</overtimeLeft>
+			<birthday>3004-09-28 12:00:00</birthday>
+			<skill>
+				<type>Tactics</type>
+				<level>0</level>
+				<bonus>0</bonus>
+			</skill>
+			<skill>
+				<type>Gunnery/Mech</type>
+				<level>4</level>
+				<bonus>0</bonus>
+			</skill>
+			<skill>
+				<type>Piloting/Mech</type>
+				<level>4</level>
 				<bonus>0</bonus>
 			</skill>
 		</person>
@@ -735,33 +735,31 @@ A confirmed atheist, Hill has been engaged with Dekker in an extended debate abo
 				<bonus>0</bonus>
 			</skill>
 		</person>
-		<person id="1795712b-6a31-4e4a-9f08-c3ffb5d0b97e" type="mekhq.campaign.personnel.Person">
-			<name>Ian McKinnon</name>
+		<person id="2f9c153a-467b-4898-bd47-d5cba4c3e532" type="mekhq.campaign.personnel.Person">
+			<name>Mateo Alvarez</name>
 			<callsign></callsign>
 			<primaryRole>1</primaryRole>
 			<secondaryRole>0</secondaryRole>
-			<biography>Taking command following his father’s death, Ian soon gained a well-deserved reputation as a daring, almost reckless leader. With a flair for independent operations, Ian’s superiors have long- since resigned themselves to his habit of interpreting orders somewhat loosely. A master of unconventional tactics—using Henrik Dekker to launch psychological attacks, for example—Ian has outthought and outfought the best the Draconis Combine and Capellan Confederation have to offer.
+			<biography>Before the Battle of Butte Haven, Alvarez was an excellent recon pilot, but that was before Kate Nomura accused him of cowardice. Ian McKinnon threw out the charge, but Alvarez’s reputation had been tarnished. He started taking greater and greater risks in an attempt to prove his courage, but it would be long years before he could redeem himself in Nomura’s eyes. Caught in the path of a counterattack by the Third Benjamin Regulars during the War of ‘39, Nomura’s recon lance was forced to scatter. When she ejected from her crippled Griffin, Alvarez braved fire from a whole company to rescue her.
 
-The rigors of military life kept Ian in good physical condition, but also added a few lines and wrinkles and gray hairs. More wearing was Ian’s battle to keep his younger brother Mark out of trouble (a task for which Hanse “The Fox” Davion’s patronage proved useful). Since Mark’s death in 3034, Ian has likewise attempted to look after Mark’s outspoken son, David McKinnon.
-
-Ian retired in 3051, accepting a battalion command in the Kestrel Militia.</biography>
+Admitting she had been wrong about Alvarez, Nomura resigned her commission. His honor now restored, Alvarez was overjoyed to swap his heavily damaged Wasp (and its troublesome cooling system) for an old (but serviceable) Assassin.</biography>
 			<daysRest>0</daysRest>
 			<idleMonths>-1</idleMonths>
-			<id>1795712b-6a31-4e4a-9f08-c3ffb5d0b97e</id>
+			<id>2f9c153a-467b-4898-bd47-d5cba4c3e532</id>
 			<portraitCategory>FoxsTeeth/</portraitCategory>
-			<portraitFile>McKinnon.png</portraitFile>
+			<portraitFile>Alvarez.png</portraitFile>
 			<xp>0</xp>
 			<gender>0</gender>
-			<rank>11</rank>
+			<rank>5</rank>
 			<nTasks>0</nTasks>
-			<unitId>fbd0331c-bc85-425d-b3da-aefa70859b5e</unitId>
+			<unitId>56ef5856-abb6-4a2d-9e4c-d1461b9b9dce</unitId>
 			<salary>-1</salary>
 			<status>0</status>
 			<hits>0</hits>
 			<toughness>0</toughness>
 			<minutesLeft>0</minutesLeft>
 			<overtimeLeft>0</overtimeLeft>
-			<birthday>2994-04-04 12:00:00</birthday>
+			<birthday>2999-08-18 12:00:00</birthday>
 			<skill>
 				<type>Tactics</type>
 				<level>0</level>
@@ -819,31 +817,33 @@ Henrik Dekker’s late night debates with Hill have become the stuff of legends 
 				<bonus>0</bonus>
 			</skill>
 		</person>
-		<person id="2f9c153a-467b-4898-bd47-d5cba4c3e532" type="mekhq.campaign.personnel.Person">
-			<name>Mateo Alvarez</name>
+		<person id="1795712b-6a31-4e4a-9f08-c3ffb5d0b97e" type="mekhq.campaign.personnel.Person">
+			<name>Ian McKinnon</name>
 			<callsign></callsign>
 			<primaryRole>1</primaryRole>
 			<secondaryRole>0</secondaryRole>
-			<biography>Before the Battle of Butte Haven, Alvarez was an excellent recon pilot, but that was before Kate Nomura accused him of cowardice. Ian McKinnon threw out the charge, but Alvarez’s reputation had been tarnished. He started taking greater and greater risks in an attempt to prove his courage, but it would be long years before he could redeem himself in Nomura’s eyes. Caught in the path of a counterattack by the Third Benjamin Regulars during the War of ‘39, Nomura’s recon lance was forced to scatter. When she ejected from her crippled Griffin, Alvarez braved fire from a whole company to rescue her.
+			<biography>Taking command following his father’s death, Ian soon gained a well-deserved reputation as a daring, almost reckless leader. With a flair for independent operations, Ian’s superiors have long- since resigned themselves to his habit of interpreting orders somewhat loosely. A master of unconventional tactics—using Henrik Dekker to launch psychological attacks, for example—Ian has outthought and outfought the best the Draconis Combine and Capellan Confederation have to offer.
 
-Admitting she had been wrong about Alvarez, Nomura resigned her commission. His honor now restored, Alvarez was overjoyed to swap his heavily damaged Wasp (and its troublesome cooling system) for an old (but serviceable) Assassin.</biography>
+The rigors of military life kept Ian in good physical condition, but also added a few lines and wrinkles and gray hairs. More wearing was Ian’s battle to keep his younger brother Mark out of trouble (a task for which Hanse “The Fox” Davion’s patronage proved useful). Since Mark’s death in 3034, Ian has likewise attempted to look after Mark’s outspoken son, David McKinnon.
+
+Ian retired in 3051, accepting a battalion command in the Kestrel Militia.</biography>
 			<daysRest>0</daysRest>
 			<idleMonths>-1</idleMonths>
-			<id>2f9c153a-467b-4898-bd47-d5cba4c3e532</id>
+			<id>1795712b-6a31-4e4a-9f08-c3ffb5d0b97e</id>
 			<portraitCategory>FoxsTeeth/</portraitCategory>
-			<portraitFile>Alvarez.png</portraitFile>
+			<portraitFile>McKinnon.png</portraitFile>
 			<xp>0</xp>
 			<gender>0</gender>
-			<rank>5</rank>
+			<rank>11</rank>
 			<nTasks>0</nTasks>
-			<unitId>56ef5856-abb6-4a2d-9e4c-d1461b9b9dce</unitId>
+			<unitId>fbd0331c-bc85-425d-b3da-aefa70859b5e</unitId>
 			<salary>-1</salary>
 			<status>0</status>
 			<hits>0</hits>
 			<toughness>0</toughness>
 			<minutesLeft>0</minutesLeft>
 			<overtimeLeft>0</overtimeLeft>
-			<birthday>2999-08-18 12:00:00</birthday>
+			<birthday>2994-04-04 12:00:00</birthday>
 			<skill>
 				<type>Tactics</type>
 				<level>0</level>
