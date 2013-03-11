@@ -10,6 +10,7 @@ v0.1.24 (SVN)
 + Bug 319: Repair Bay ArrayIndexOutOfBoundsException
 + Planetary data update 35
 + better version tracking in campaign loading
++ escaping of some user data entry fields that were not being escaped 
 
 v0.1.23 Release Candidate 2 (2013-03-03)  
 + updated code for changes to MegaMek entity.setC3Master

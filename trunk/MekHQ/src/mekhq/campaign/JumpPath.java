@@ -152,7 +152,7 @@ public class JumpPath implements Serializable {
 		for(Planet p : path) {
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<planetName>"
-				+p.getName()
+				+MekHqXmlUtil.escape(p.getName())
 				+"</planetName>");
 		}
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "</jumpPath>");

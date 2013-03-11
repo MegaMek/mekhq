@@ -79,9 +79,9 @@ public class MissingMASC extends MissingEquipmentPart {
 				+equipmentNum
 				+"</equipmentNum>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<typeName>"
-				+type.getInternalName()
-				+"</typeName>");
+                +"<typeName>"
+                +MekHqXmlUtil.escape(typeName)
+                +"</typeName>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<equipTonnage>"
 				+equipTonnage

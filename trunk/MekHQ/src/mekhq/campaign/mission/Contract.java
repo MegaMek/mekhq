@@ -440,7 +440,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 				+"</endDate>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<employer>"
-				+employer
+				+MekHqXmlUtil.escape(employer)
 				+"</employer>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<paymentMultiplier>"

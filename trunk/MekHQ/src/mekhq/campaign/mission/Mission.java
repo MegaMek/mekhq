@@ -207,7 +207,7 @@ public class Mission implements Serializable, MekHqXmlSerializable {
 				+"</type>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<planetName>"
-				+planetName
+				+MekHqXmlUtil.escape(planetName)
 				+"</planetName>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<status>"

@@ -1627,7 +1627,7 @@ public class Campaign implements Serializable {
 		{
 			pw1.println("\t\t<nameGen>");
 			pw1.print("\t\t\t<faction>");
-			pw1.print(rng.getChosenFaction());
+			pw1.print(MekHqXmlUtil.escape(rng.getChosenFaction()));
 			pw1.println("</faction>");
 			pw1.print("\t\t\t<percentFemale>");
 			pw1.print(rng.getPercentFemale());
