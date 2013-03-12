@@ -571,6 +571,7 @@ public class CustomizePersonDialog extends javax.swing.JDialog implements Dialog
                     optionComp.addValue(etype.getName());
                 }
             }
+            optionComp.setSelected(option.stringValue());
         }
         
         if ("specialist".equals(option.getName())) { //$NON-NLS-1$
