@@ -1,5 +1,7 @@
 VERSION HISTORY
 ----------------------------------
+v0.1.25 (SVN)
+
 v0.1.24 Release Candidate 3 (2013-03-12)
 + added version number to log file
 + confirmation dialog on deleting mission
