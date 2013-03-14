@@ -145,7 +145,7 @@
 				<include name="${confdir}/" />
 				<include name="campaigns/" />
 				<include name="campaigns/FoxsTeeth.cpnx" />
-				<include name="README.txt" />
+				<include name="*README.html" />
 				<include name="SubmitBug.html" />
 				<include name="license.txt" />
 			</fileset>
@@ -224,7 +224,7 @@
 				<include name="campaigns/FoxsTeeth.cpnx" />
 				<include name="MegaMek.jar" />
 				<include name="MegaMekLab.jar" />
-				<include name="README.txt" />
+				<include name="*README.html" />
 				<include name="SubmitBug.html" />
 				<include name="license.txt" />
 				<include name="*.sh" />
@@ -270,7 +270,7 @@
 				<include name="MegaMek.exe" />
 				<include name="MegaMekLab.exe" />
 				<include name="MekHQ.exe" />
-				<include name="README.txt" />
+				<include name="*README.html" />
 				<include name="SubmitBug.html" />
 				<include name="license.txt" />
 			</fileset>
