@@ -130,7 +130,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
                 updateTechSupportAvailable(p);
             } else if (p.isDoctor()) {
                 updateMedicalSupportAvailable(p);
-            } else if ((p.getPrimaryRole() == Person.T_ADMIN_HR) || (p.getPrimaryRole() == Person.T_ADMIN_HR)) {
+            } else if (p.isAdmin()) {
                 updateAdministrativeSupportAvailable(p);
             }
         }
@@ -346,10 +346,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
 
     private void updateAdministrativeSupportAvailable(Person p) {
         int hours = getSupportHours(p);
-        if ((p.getSecondaryRole() == Person.T_ADMIN_HR) ||
-                (p.getSecondaryRole() == Person.T_ADMIN_COM) ||
-                (p.getSecondaryRole() == Person.T_ADMIN_LOG) ||
-                (p.getSecondaryRole() == Person.T_ADMIN_TRA)) {
+        if (p.isAdminSecondary()) {
             hours = (int) Math.floor(hours / 2);
         }
         adminSupportAvailable += hours;

@@ -1604,21 +1604,33 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         }
     }
     
+    public boolean isAdmin() {
+    	return (isAdminPrimary() || isAdminSecondary());
+    }
+    
+    public boolean isAdminPrimary() {
+    	return primaryRole == T_ADMIN_HR ||  primaryRole == T_ADMIN_COM ||  primaryRole == T_ADMIN_LOG ||  primaryRole == T_ADMIN_TRA;
+    }
+    
+    public boolean isAdminSecondary() {
+    	return secondaryRole == T_ADMIN_HR ||  secondaryRole == T_ADMIN_COM ||  secondaryRole == T_ADMIN_LOG ||  secondaryRole == T_ADMIN_TRA;
+    }
+    
     public boolean isTech() {
-    	//type must be correct and you must be more than ultra-green in the skill
-    	boolean isMechTech = hasSkill(SkillType.S_TECH_MECH) && getSkill(SkillType.S_TECH_MECH).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
-    	boolean isAeroTech = hasSkill(SkillType.S_TECH_AERO) && getSkill(SkillType.S_TECH_AERO).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
-    	boolean isMechanic = hasSkill(SkillType.S_TECH_MECHANIC) && getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
-    	boolean isBATech = hasSkill(SkillType.S_TECH_BA) && getSkill(SkillType.S_TECH_BA).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
-    	return (isTechPrimary() || isTechSecondary()) && (isMechTech || isAeroTech || isMechanic || isBATech);
+        //type must be correct and you must be more than ultra-green in the skill
+        boolean isMechTech = hasSkill(SkillType.S_TECH_MECH) && getSkill(SkillType.S_TECH_MECH).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
+        boolean isAeroTech = hasSkill(SkillType.S_TECH_AERO) && getSkill(SkillType.S_TECH_AERO).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
+        boolean isMechanic = hasSkill(SkillType.S_TECH_MECHANIC) && getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
+        boolean isBATech = hasSkill(SkillType.S_TECH_BA) && getSkill(SkillType.S_TECH_BA).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
+        return (isTechPrimary() || isTechSecondary()) && (isMechTech || isAeroTech || isMechanic || isBATech);
     }
     
     public boolean isTechPrimary() {
-    	return primaryRole == T_MECH_TECH ||  primaryRole == T_AERO_TECH ||  primaryRole == T_MECHANIC ||  primaryRole == T_BA_TECH ||  primaryRole == T_SPACE_CREW;
+        return primaryRole == T_MECH_TECH ||  primaryRole == T_AERO_TECH ||  primaryRole == T_MECHANIC ||  primaryRole == T_BA_TECH ||  primaryRole == T_SPACE_CREW;
     }
     
     public boolean isTechSecondary() {
-    	return secondaryRole == T_MECH_TECH ||  secondaryRole == T_AERO_TECH ||  secondaryRole == T_MECHANIC ||  secondaryRole == T_BA_TECH;
+        return secondaryRole == T_MECH_TECH ||  secondaryRole == T_AERO_TECH ||  secondaryRole == T_MECHANIC ||  secondaryRole == T_BA_TECH;
     }
    
     public boolean isTaskOvertime(IPartWork partWork) {
