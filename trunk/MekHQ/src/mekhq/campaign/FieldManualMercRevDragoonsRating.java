@@ -188,14 +188,6 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
         double hoursNeeded = 0;
         if (en instanceof Mech) {
             hoursNeeded = Math.floor(en.getWeight() / 5) + 40;
-        } else if ((en instanceof SmallCraft)) {
-            if (en.getWeight() >= 50000) {
-                hoursNeeded = Math.floor(en.getWeight() / 50) + 20;
-            } else if (en.getWeight() >= 16000) {
-                hoursNeeded = Math.floor(en.getWeight() / 25) + 40;
-            } else {
-                hoursNeeded = Math.floor(en.getWeight() / 10) + 80;
-            }
         } else if (en instanceof Warship) {
             // according to FMMR, this should be tracked separately because it only applies to admin support but not
             // technical support.
@@ -211,6 +203,14 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
             // technical support.
             updateDropJumpShipSupportNeeds(en);
             return;
+        } else if ((en instanceof SmallCraft)) {
+            if (en.getWeight() >= 50000) {
+                hoursNeeded = Math.floor(en.getWeight() / 50) + 20;
+            } else if (en.getWeight() >= 16000) {
+                hoursNeeded = Math.floor(en.getWeight() / 25) + 40;
+            } else {
+                hoursNeeded = Math.floor(en.getWeight() / 10) + 80;
+            }
         } else if (en instanceof ConvFighter) {
             hoursNeeded = Math.floor(en.getWeight() / 2.5) + 20;
         } else if (en instanceof Aero) {
