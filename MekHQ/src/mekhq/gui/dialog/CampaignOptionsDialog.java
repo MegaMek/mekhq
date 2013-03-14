@@ -918,8 +918,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         txtInstructionsXP.setBorder(BorderFactory.createCompoundBorder(
 	   			 BorderFactory.createTitledBorder(resourceMap.getString("txtInstructionsXP.title")),
 	   			 BorderFactory.createEmptyBorder(5,5,5,5)));
-        txtInstructionsXP.setPreferredSize(new Dimension(550,120));
         txtInstructionsXP.setOpaque(false);
+        txtInstructionsXP.setMinimumSize(new Dimension(550,120));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 6;
