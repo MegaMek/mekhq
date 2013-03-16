@@ -284,9 +284,7 @@ public class MekGyro extends Part {
 				//I need to repair all crit slots first, in order to get the 
 				//right number of hits
 				unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE);
-				for(int i = 0; i < hits; i++) {
-					unit.damageSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_GYRO, Mech.LOC_CT);
-				}
+				unit.damageSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_GYRO, Mech.LOC_CT, hits);
 			}
 		}
 	}

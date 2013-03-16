@@ -263,7 +263,7 @@ public class MekActuator extends Part {
 	public void updateConditionFromPart() {
 		if(null != unit) {
 			if(hits > 0) {
-				unit.damageSystem(CriticalSlot.TYPE_SYSTEM, type, location);
+				unit.damageSystem(CriticalSlot.TYPE_SYSTEM, type, location, 1);
 			} else {
 				unit.repairSystem(CriticalSlot.TYPE_SYSTEM, type, location);
 			}
