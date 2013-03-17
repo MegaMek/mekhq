@@ -5,6 +5,7 @@ v0.1.25 (SVN)
 + Bug 332: Dragoons Rating error FMM:R tech support
 + Bug 331: Text bug
 + Bug 335: Mech needing repair not showing up in repair bay
++ Removed all the unnecessary code from mm-startup.sh, lab.sh, and hq.sh.
 
 v0.1.24 Release Candidate 3 (2013-03-12)
 + added version number to log file
