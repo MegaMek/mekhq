@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="lib/TinyXML.jar"/>
+	<classpathentry kind="lib" path="lib/PngEncoder.jar"/>
+	<classpathentry kind="lib" path="MegaMek.jar"/>
+	<classpathentry kind="lib" path="MegaMekLab.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

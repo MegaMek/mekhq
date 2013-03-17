@@ -1,0 +1,28 @@
+<launch4jConfig>
+  <headerType>gui</headerType>
+  <outfile>../svndev/MegaMek.exe</outfile>
+  <dontWrapJar>true</dontWrapJar>
+  <classPath>
+  	<mainClass>megamek.MegaMek</mainClass>
+  	<cp>lib/MegaMek.jar</cp>
+  	<cp>lib/TinyXML.jar</cp>
+  	<cp>lib/vecmath.jar</cp>	
+  	<cp>lib/Ostermiller.jar</cp>	
+  	<cp>lib/TabPanel.jar</cp>	
+  	<cp>lib/PngEncoder.jar</cp>	
+  </classPath>
+  <errTitle></errTitle>
+  <cmdLine></cmdLine>
+  <chdir>.</chdir>
+  <priority>normal</priority>
+  <downloadUrl>http://java.com/download</downloadUrl>
+  <supportUrl>http://megamek.sourceforge.net/forums</supportUrl>
+  <customProcName>true</customProcName>
+  <stayAlive>false</stayAlive>
+  <icon>../data/images/misc/megamek.ico</icon>
+  <jre>
+    <minVersion>1.5.0</minVersion>
+    <jdkPreference>preferJre</jdkPreference>
+    <maxHeapSize>512</maxHeapSize>
+  </jre>
+</launch4jConfig>
