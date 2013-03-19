@@ -283,18 +283,12 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 	
 	@Override
 	public String find() {
-		changeAmountAvailable(getFullShots(), (AmmoType)type);
-		setCheckedToday(true);
-		if(campaign.getCampaignOptions().payForParts()) {
-			campaign.getFinances().debit(adjustCostsForCampaignOptions(getStickerPrice()), Transaction.C_EQUIP, "Purchase of " + getAcquisitionName(), campaign.calendar.getTime());
-		}
-		return "<font color='green'> part found.</font>";
+		return "<font color='red'> You shouldn't be here (AmmoBin.find()).</font>";
 	}
 	
 	@Override
 	public String failToFind() {
-		setCheckedToday(false);
-		return "<font color='red'> part not found.</font>";
+		return "<font color='red'> You shouldn't be here (AmmoBin.failToFind()).</font>";
 	}
 	
 	public void unload(boolean changeEntity) {
@@ -521,13 +515,4 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 		return new AmmoStorage(1,type,((AmmoType)type).getShots(),campaign);
 	}
 
-	@Override
-	public boolean hasCheckedToday() {
-		return checkedToday;
-	}
-
-	@Override
-	public void setCheckedToday(boolean b) {
-		this.checkedToday = b;
-	}
 }

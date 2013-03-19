@@ -52,7 +52,6 @@ public class Armor extends Part implements IAcquisitionWork {
     protected int amountNeeded;
     private int location;
     private boolean rear;
-    private boolean checkedToday;
     private boolean clan;
     
     public Armor() {
@@ -266,10 +265,6 @@ public class Armor extends Part implements IAcquisitionWork {
 				+amountNeeded
 				+"</amountNeeded>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<checkedToday>"
-				+checkedToday
-				+"</checkedToday>");
-		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<clan>"
 				+clan
 				+"</clan>");
@@ -296,12 +291,6 @@ public class Armor extends Part implements IAcquisitionWork {
 					rear = true;
 				} else {
 					rear = false;
-				}
-			} else if (wn2.getNodeName().equalsIgnoreCase("checkedToday")) {
-				if(wn2.getTextContent().equalsIgnoreCase("true")) {
-					checkedToday = true;
-				} else {
-					checkedToday = false;
 				}
 			} else if (wn2.getNodeName().equalsIgnoreCase("clan")) {
 				if(wn2.getTextContent().equalsIgnoreCase("true")) {
@@ -417,7 +406,6 @@ public class Armor extends Part implements IAcquisitionWork {
 	@Override
 	public String find() {
 		changeAmountAvailable((int)Math.round(5 * getArmorPointsPerTon()));
-		setCheckedToday(true);
 		if(campaign.getCampaignOptions().payForParts()) {
 			campaign.getFinances().debit(adjustCostsForCampaignOptions(getStickerPrice()), Transaction.C_EQUIP, "Purchase of " + getName(), campaign.calendar.getTime());
 		}
@@ -426,7 +414,7 @@ public class Armor extends Part implements IAcquisitionWork {
 	
 	@Override
 	public String failToFind() {
-		setCheckedToday(false);
+	    resetDaysToWait();
 		return "<font color='red'><b> part not found.</b></font>";
 	}
 
@@ -579,31 +567,21 @@ public class Armor extends Part implements IAcquisitionWork {
     }
 
 	public double getArmorPointsPerTon() {
-		if(null != unit) {
+		//if(null != unit) {
 			// armor is checked for in 5-ton increments
-			int armorType = unit.getEntity().getArmorType(location);
-			double armorPerTon = 16.0 * EquipmentType.getArmorPointMultiplier(armorType, unit.getEntity().getTechLevel());
-			if (armorType == EquipmentType.T_ARMOR_HARDENED) {
-				armorPerTon = 8.0;
-			}
-			return armorPerTon;
-		}
-		return 0.0;
+			//int armorType = unit.getEntity().getArmorType(location);
+	    double armorPerTon = 16.0 * EquipmentType.getArmorPointMultiplier(type, clan);
+	    if (type == EquipmentType.T_ARMOR_HARDENED) {
+	        armorPerTon = 8.0;
+	    }
+	    return armorPerTon;
+		//}
+		//return 0.0;
 	}
 	
 	@Override 
 	public Part getNewPart() {
-		return null;
-	}
-
-	@Override
-	public boolean hasCheckedToday() {
-		return checkedToday;
-	}
-
-	@Override
-	public void setCheckedToday(boolean b) {
-		this.checkedToday = b;
+		return new Armor(0, type, (int)Math.round(5 * getArmorPointsPerTon()), -1, false, clan, campaign);
 	}
 	
 	public boolean isEnoughSpareArmorAvailable() {
@@ -674,5 +652,10 @@ public class Armor extends Part implements IAcquisitionWork {
         int fullArmor = unit.getEntity().getOArmor(location, rear);
         int neededArmor = fullArmor - currentArmor;
         return neededArmor <= getAmountAvailable();
+    }
+    
+    @Override
+    public String getShoppingListReport(int quantity) {
+        return "" + quantity * 5 + " tons of" + getName() + " have been added to the shopping list.";
     }
 }

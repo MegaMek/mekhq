@@ -27,6 +27,7 @@ import java.io.Serializable;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.SkillType;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -43,6 +44,9 @@ public class CampaignOptions implements Serializable {
 	public final static int TECH_ADVANCED     = 2;
 	public final static int TECH_EXPERIMENTAL = 3;
 	public final static int TECH_UNOFFICIAL   = 4;
+	
+	public final static String S_TECH = "Tech";
+	public final static String S_AUTO = "Automatic Success";
 	
 	public final static int REPAIR_SYSTEM_STRATOPS = 0;
     public final static int REPAIR_SYSTEM_WARCHEST_CUSTOM = 1;
@@ -88,6 +92,11 @@ public class CampaignOptions implements Serializable {
     private double usedPartsValue;
     private double damagedPartsValue;
 
+    //acquisition related
+    private int waitingPeriod;
+    private String acquisitionSkill;
+    private boolean acquisitionSupportStaffOnly;
+    
     //xp related
     private int scenarioXP;
     private int killsForXP;
@@ -152,6 +161,9 @@ public class CampaignOptions implements Serializable {
         targetIdleXP = 10;
         monthsIdleXP = 2;
         dragoonsRatingMethod = DragoonsRatingMethod.TAHARQA;
+        waitingPeriod = 7;
+        acquisitionSkill = S_TECH;
+        acquisitionSupportStaffOnly = true;
     }
 
     public DragoonsRatingMethod getDragoonsRatingMethod() {
@@ -509,6 +521,30 @@ public class CampaignOptions implements Serializable {
     public void setMonthsIdleXP(int m) {
     	monthsIdleXP = m;
     }
+    
+    public int getWaitingPeriod() {
+        return waitingPeriod;
+    }
+    
+    public void setWaitingPeriod(int d) {
+        waitingPeriod = d;
+    }
+    
+    public String getAcquisitionSkill() {
+        return acquisitionSkill;
+    }
+    
+    public void setAcquisitionSkill(String skill) {
+        acquisitionSkill = skill;
+    }
+    
+    public void setAcquisitionSupportStaffOnly(boolean b) {
+        this.acquisitionSupportStaffOnly = b;
+    }
+    
+    public boolean isAcquisitionSupportStaffOnly() {
+        return acquisitionSupportStaffOnly;
+    }
    
 	public void writeToXml(PrintWriter pw1, int indent) {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "<campaignOptions>");
@@ -551,6 +587,9 @@ public class CampaignOptions implements Serializable {
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "allowClanPurchases", allowClanPurchases);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "allowISPurchases", allowISPurchases);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "allowCanonOnly", allowCanonOnly);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "waitingPeriod", waitingPeriod);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "acquisitionSkill", acquisitionSkill);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "acquisitionSupportStaffOnly", acquisitionSupportStaffOnly);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "techLevel", techLevel);
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<usePortraitForType>"
@@ -701,7 +740,16 @@ public class CampaignOptions implements Serializable {
 				retVal.targetIdleXP = Integer.parseInt(wn2.getTextContent().trim());
 			} else if (wn2.getNodeName().equalsIgnoreCase("monthsIdleXP")) {
 				retVal.monthsIdleXP = Integer.parseInt(wn2.getTextContent().trim());
-			} else if (wn2.getNodeName().equalsIgnoreCase("limitByYear")) {
+			} else if (wn2.getNodeName().equalsIgnoreCase("waitingPeriod")) {
+                retVal.waitingPeriod = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("acquisitionSkill")) {
+                retVal.acquisitionSkill = wn2.getTextContent().trim();
+            } else if (wn2.getNodeName().equalsIgnoreCase("acquisitionSupportStaffOnly")) {
+                if (wn2.getTextContent().equalsIgnoreCase("true"))
+                    retVal.acquisitionSupportStaffOnly = true;
+                else
+                    retVal.acquisitionSupportStaffOnly = false;
+            } else if (wn2.getNodeName().equalsIgnoreCase("limitByYear")) {
 				if (wn2.getTextContent().equalsIgnoreCase("true"))
 					retVal.limitByYear = true;
 				else

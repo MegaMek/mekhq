@@ -593,13 +593,59 @@ public class Refit implements IPartWork, IAcquisitionWork {
 		oldUnit.setRefit(this);
 		newEntity.setOwner(oldUnit.getEntity().getOwner());
 		reserveNewParts();
+		if(customJob) {
+		    //add the stuff on the shopping list to the master shopping list
+		    ArrayList<Part> newShoppingList = new ArrayList<Part>();
+    		for(Part part : shoppingList) {
+    		    if(part instanceof Armor) {
+                    //automatically add armor by location, we will check for the lump sum of
+                    //armor using newArmorSupplies
+                    oldUnit.campaign.addPart(part);
+                    part.setUnit(oldUnit);
+                    part.setRefitId(oldUnit.getId());
+                    newUnitParts.add(part.getId());
+                }
+                else if(part instanceof AmmoBin) {
+                    //ammo bins are free - bleh
+                    AmmoBin bin = (AmmoBin)part;
+                    bin.setShotsNeeded(bin.getFullShots());
+                    oldUnit.campaign.addPart(part);
+                    part.setRefitId(oldUnit.getId());
+                    newUnitParts.add(part.getId());
+                    part.setUnit(oldUnit);
+                    bin.loadBin(false);
+                    if(bin.needsFixing()) {
+                        oldUnit.campaign.getShoppingList().addShoppingItem(bin.getNewPart(), 1);
+                        //need to call it a second time to use up if found
+                        bin.loadBin(false);
+                    }             
+                    part.setUnit(null);
+                }
+                else if(part instanceof IAcquisitionWork) {
+    		        oldUnit.campaign.getShoppingList().addShoppingItem(((IAcquisitionWork)part).getNewPart(), 1);
+    		        newShoppingList.add(part);
+    		    }
+    		}
+    		shoppingList = newShoppingList;
+    		if(null != newArmorSupplies) {
+                //add enough armor to the shopping list
+                int armorSupplied = 0;
+                while(armorSupplied < armorNeeded) {
+                    armorSupplied += ((Armor)newArmorSupplies.getNewPart()).getAmount();
+                    oldUnit.campaign.getShoppingList().addShoppingItem((Armor)newArmorSupplies.getNewPart(),1);
+                }
+            }
+		} else {
+		    //add the refit kit itself to the master list
+		}
+		
 	}
 	
 	public void reserveNewParts() {
 		//we need to loop through the new parts and
-				//if they are not on a unit already, then we need
-				//to set the refit id. Also, if there is more than one part
-				//then we need to clone a part and reserve that instead
+	    //if they are not on a unit already, then we need
+	    //to set the refit id. Also, if there is more than one part
+	    //then we need to clone a part and reserve that instead
 		ArrayList<Integer> newNewUnitParts = new ArrayList<Integer>();
 		for(int id : newUnitParts) {
 			Part newPart = oldUnit.campaign.getPart(id);
@@ -621,63 +667,33 @@ public class Refit implements IPartWork, IAcquisitionWork {
 		newUnitParts = newNewUnitParts;	
 	}
 	
-	public void resetCheckedToday() {
-		for(Part part : shoppingList) {
-			if(part instanceof IAcquisitionWork) {
-				((IAcquisitionWork)part).setCheckedToday(false);
-			}
-		}
-	}
-	
 	public boolean acquireParts() {
 		if(!customJob) {
 			return acquireRefitKit();
 		}
 		ArrayList<Part> newShoppingList = new ArrayList<Part>();
-		Person tech = oldUnit.campaign.getPerson(assignedTechId);
+		Person admin = oldUnit.campaign.getLogisticsPerson();
 		for(Part part : shoppingList) {
-			if(part instanceof Armor) {
-				//automatically add armor by location, we will check for the lump sum of
-				//armor using newArmorSupplies
-				oldUnit.campaign.addPart(part);
-				part.setUnit(oldUnit);
-				part.setRefitId(oldUnit.getId());
-				newUnitParts.add(part.getId());
-			}
-			else if(part instanceof AmmoBin) {
-				((AmmoBin)part).setShotsNeeded(((AmmoBin)part).getFullShots());
-				oldUnit.campaign.addPart(part);
-				part.setUnit(null);
-				part.setRefitId(oldUnit.getId());
-				newUnitParts.add(part.getId());
-			}
-			else if(part instanceof IAcquisitionWork) {
-				if(oldUnit.campaign.acquirePart((IAcquisitionWork)part, tech)) {
-					Part replacement = ((MissingPart)part).findReplacement(true);
-					if(null != replacement) {
-						//It *should* be the case that there is only a quantity of 
-						//one here, but lets check just to be sure
-						if(replacement.getQuantity() > 1) {
-							Part actualReplacement = replacement.clone();
-							actualReplacement.setRefitId(oldUnit.getId());
-							oldUnit.campaign.addPart(actualReplacement);
-							newUnitParts.add(actualReplacement.getId());
-							replacement.decrementQuantity();
-						} else {
-							replacement.setRefitId(oldUnit.getId());
-							newUnitParts.add(replacement.getId());
-						}
-					} else {
-						//shouldnt happen, but just to be sure
-						newShoppingList.add(part);
-					}
-				} else {
-					newShoppingList.add(part);
-				}
+			if(part instanceof IAcquisitionWork) {
+			    //check to see if we found a replacement
+			    Part replacement = ((MissingPart)part).findReplacement(true);
+			    if(null != replacement) {
+			        if(replacement.getQuantity() > 1) {
+			            Part actualReplacement = replacement.clone();
+			            actualReplacement.setRefitId(oldUnit.getId());
+			            oldUnit.campaign.addPart(actualReplacement);
+			            newUnitParts.add(actualReplacement.getId());
+			            replacement.decrementQuantity();
+			        } else {
+			            replacement.setRefitId(oldUnit.getId());
+			            newUnitParts.add(replacement.getId());
+			        }
+			    } else {
+			        newShoppingList.add(part);
+			    }
 			}
 		}
-		//cycle through newUnitParts, find any ammo bins and if they need loading then
-		//try to acquire
+		//cycle through newUnitParts, find any ammo bins and if they need loading, try to load them
 		boolean missingAmmo = false;
 		for(int pid : newUnitParts) {
 			Part part = oldUnit.campaign.getPart(pid);
@@ -685,41 +701,32 @@ public class Refit implements IPartWork, IAcquisitionWork {
 				AmmoBin bin = (AmmoBin)part;
 				bin.setUnit(oldUnit);
 				bin.loadBin(false);
-				if(bin.needsFixing() && oldUnit.campaign.acquirePart((IAcquisitionWork)part, tech)) {
-					bin.loadBin(false);
-				}
-				bin.setUnit(null);
 				if(bin.needsFixing()) {
 					missingAmmo = true;
 				}
+                bin.setUnit(null);
 			}
 		}
 		if(null != newArmorSupplies) {
-			if(newArmorSupplies.getId() <= 0) {
-				checkForArmorSupplies();
-				oldUnit.campaign.addPart(newArmorSupplies);
-			}
-			if(newArmorSupplies.getAmount() <= armorNeeded) {
-				Armor a = new Armor(0, newArmorSupplies.getType(), 0, 0, false, newArmorSupplies.isClanTechBase(), oldUnit.campaign);
-				a.setRefitId(oldUnit.getId());
-				a.setUnit(oldUnit);
-				a.setAmountNeeded(armorNeeded);
-				oldUnit.campaign.acquirePart((IAcquisitionWork)a, tech);
-			}
+		    checkForArmorSupplies();
 		}
 		shoppingList = newShoppingList;
-		return shoppingList.size() == 0 && !missingAmmo && (null == newArmorSupplies || newArmorSupplies.getAmount() >= armorNeeded);
+		return shoppingList.size() == 0 && !missingAmmo && (null == newArmorSupplies || (armorNeeded - newArmorSupplies.getAmount()) <= 0);
 	}
 	
 	public void checkForArmorSupplies() {
-		Armor existingArmorSupplies = getExistingArmorSupplies();	
-		if(null != existingArmorSupplies) {
-			if(existingArmorSupplies.getAmount() > armorNeeded) {
+		Armor existingArmorSupplies = getExistingArmorSupplies();
+		int actualNeed = armorNeeded - newArmorSupplies.getAmount();
+		if(null != existingArmorSupplies && actualNeed > 0) {
+			if(existingArmorSupplies.getAmount() > actualNeed) {
 				newArmorSupplies.setAmount(armorNeeded);
-				existingArmorSupplies.setAmount(existingArmorSupplies.getAmount() - armorNeeded);
+				existingArmorSupplies.setAmount(existingArmorSupplies.getAmount() - actualNeed);
 			} else {
 				newArmorSupplies.setAmount(newArmorSupplies.getAmount() + existingArmorSupplies.getAmount());
 				oldUnit.campaign.removePart(existingArmorSupplies);
+			}
+			if(newArmorSupplies.getId() <= 0 && customJob) {
+	             oldUnit.campaign.addPart(newArmorSupplies);
 			}
 			oldUnit.campaign.updateAllArmorForNewSpares();
 		}
@@ -758,8 +765,8 @@ public class Refit implements IPartWork, IAcquisitionWork {
 			return true;
 		}
 		checkForArmorSupplies();
-		Person tech = oldUnit.campaign.getPerson(assignedTechId);
-		return oldUnit.campaign.acquirePart((IAcquisitionWork)this, tech);
+		Person admin = oldUnit.campaign.getLogisticsPerson();
+		return oldUnit.campaign.acquirePart((IAcquisitionWork)this, admin);
 	}
 	
 	private void updateRefitClass(int rClass) {
@@ -860,12 +867,6 @@ public class Refit implements IPartWork, IAcquisitionWork {
 		Utilities.unscrambleEquipmentNumbers(oldUnit);
 		assignArmActuators();
 		if(null != newArmorSupplies) {
-			newArmorSupplies.setAmount(newArmorSupplies.getAmount() - armorNeeded);
-			if(newArmorSupplies.getAmount() > 0) {
-				newArmorSupplies.setRefitId(null);
-				newArmorSupplies.setUnit(oldUnit);
-				newArmorSupplies.changeAmountAvailable(newArmorSupplies.getAmount());
-			}
 			oldUnit.campaign.removePart(newArmorSupplies);
 		}
 		//in some cases we may have had more armor on the original unit and so we may add more
@@ -1390,17 +1391,6 @@ public class Refit implements IPartWork, IAcquisitionWork {
 	}
 
 	@Override
-	public boolean hasCheckedToday() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void setCheckedToday(boolean b) {
-		//don't do anything
-	}
-
-	@Override
 	public int getId() {
 		return 0;
 	}
@@ -1423,7 +1413,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 				bin.setShotsNeeded(bin.getFullShots());
 				bin.loadBin(false);
 				if(bin.needsFixing()) {
-					bin.find();
+	                oldUnit.campaign.buyPart(bin.getNewPart(), 1.1);
 					bin.loadBin(false);
 				}
 				part.setUnit(null);
@@ -1647,4 +1637,40 @@ public class Refit implements IPartWork, IAcquisitionWork {
             }
         }
 	}
+
+    @Override
+    public int getQuantity() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    @Override
+    public void incrementQuantity() {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void decrementQuantity() {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public int getDaysToWait() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    @Override
+    public void resetDaysToWait() {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void decrementDaysToWait() {
+        // TODO Auto-generated method stub
+        
+    }
 }

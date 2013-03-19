@@ -57,6 +57,7 @@ import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.Version;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.MekHqXmlSerializable;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Ranks;
@@ -1509,7 +1510,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     }
     
     public boolean isSupport() {
-    	return primaryRole >= T_MECH_TECH;
+    	return primaryRole >= T_MECH_TECH || secondaryRole >= T_MECH_TECH;
     }
     
     public boolean canDrive(Entity ent) {
@@ -1619,6 +1620,28 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     	return secondaryRole == T_ADMIN_HR ||  secondaryRole == T_ADMIN_COM ||  secondaryRole == T_ADMIN_LOG ||  secondaryRole == T_ADMIN_TRA;
     }
     
+    public Skill getBestTechSkill() {
+        Skill skill = null;
+        int lvl = -1;
+        if(hasSkill(SkillType.S_TECH_MECH) && getSkill(SkillType.S_TECH_MECH).getExperienceLevel() > lvl) {
+            skill = getSkill(SkillType.S_TECH_MECH);
+            lvl = getSkill(SkillType.S_TECH_MECH).getExperienceLevel();
+        }
+        if(hasSkill(SkillType.S_TECH_AERO) && getSkill(SkillType.S_TECH_AERO).getExperienceLevel() > lvl) {
+            skill = getSkill(SkillType.S_TECH_AERO);
+            lvl = getSkill(SkillType.S_TECH_AERO).getExperienceLevel();
+        }
+        if(hasSkill(SkillType.S_TECH_MECHANIC) && getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel() > lvl) {
+            skill = getSkill(SkillType.S_TECH_MECHANIC);
+            lvl = getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel();
+        }
+        if(hasSkill(SkillType.S_TECH_BA) && getSkill(SkillType.S_TECH_BA).getExperienceLevel() > lvl) {
+            skill = getSkill(SkillType.S_TECH_BA);
+            lvl = getSkill(SkillType.S_TECH_BA).getExperienceLevel();
+        }
+        return skill;
+    }
+    
     public boolean isTech() {
         //type must be correct and you must be more than ultra-green in the skill
         boolean isMechTech = hasSkill(SkillType.S_TECH_MECH) && getSkill(SkillType.S_TECH_MECH).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN;
@@ -1714,49 +1737,14 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     	return skill;
     }
     
-    public Skill getSkillForWorkingOn(IAcquisitionWork acquisition) {
-    	Unit unit = acquisition.getUnit();
-    	if(null != unit && unit.getEntity() instanceof Mech && hasSkill(SkillType.S_TECH_MECH)) {
-    		return getSkill(SkillType.S_TECH_MECH);
-    	}
-    	if(null != unit && unit.getEntity() instanceof BattleArmor && hasSkill(SkillType.S_TECH_BA)) {
-    		return getSkill(SkillType.S_TECH_BA);
-    	}
-    	if(null != unit && unit.getEntity() instanceof Tank && hasSkill(SkillType.S_TECH_MECHANIC)) {
-    		return getSkill(SkillType.S_TECH_MECHANIC);
-    	}
-    	if(null != unit && (unit.getEntity() instanceof SmallCraft || unit.getEntity() instanceof Jumpship)
-    			&& hasSkill(SkillType.S_TECH_VESSEL)) {
-    		return getSkill(SkillType.S_TECH_VESSEL);
-    	}
-    	if(null != unit && unit.getEntity() instanceof Aero 
-    			&& !(unit.getEntity() instanceof SmallCraft) 
-    			&& !(unit.getEntity() instanceof Jumpship) 
-    			&& hasSkill(SkillType.S_TECH_AERO)) {
-    		return getSkill(SkillType.S_TECH_AERO);
-    	}
-    	//if we are still here then we didn't have the right tech skill, so return the highest
-    	//of any tech skills that we do have
-    	Skill skill = null;
-    	if(hasSkill(SkillType.S_TECH_MECH)) {
-    		skill = getSkill(SkillType.S_TECH_MECH);
-    	}
-    	if(hasSkill(SkillType.S_TECH_BA)) {
-    		if(null == skill || skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_BA).getFinalSkillValue()) {
-    			skill = getSkill(SkillType.S_TECH_BA);
-    		}
-    	}
-    	if(hasSkill(SkillType.S_TECH_MECHANIC)) {
-    		if(null == skill || skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_MECHANIC).getFinalSkillValue()) {
-    			skill = getSkill(SkillType.S_TECH_MECHANIC);
-    		}
-    	}
-    	if(hasSkill(SkillType.S_TECH_AERO)) {
-    		if(null == skill || skill.getFinalSkillValue() > getSkill(SkillType.S_TECH_AERO).getFinalSkillValue()) {
-    			skill = getSkill(SkillType.S_TECH_AERO);
-    		}
-    	}
-    	return skill;
+    public Skill getSkillForWorkingOn(IAcquisitionWork acquisition, String skillName) {
+        if(skillName.equals(CampaignOptions.S_TECH)) {
+            return getBestTechSkill();
+        }
+        if(hasSkill(skillName)) {
+            return getSkill(skillName);
+        }
+    	return null;
     }
     
     public String getDocDesc(Campaign c) {

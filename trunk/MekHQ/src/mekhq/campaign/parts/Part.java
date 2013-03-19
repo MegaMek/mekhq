@@ -47,7 +47,7 @@ import org.w3c.dom.NodeList;
  * Parts do the lions share of the work of repairing, salvaging, reloading, refueling, etc. 
  * for units. Each unit has an ArrayList of all its relevant parts. There is a corresponding unit
  * variable in part but this can be null when we are dealing with a spare part, so when putting in 
- * calls to unit, you should always check to make sure it is not null. 
+ * calls to unit, you should always check to make sure it is not null.
  * 
  * There are two kinds of parts: Part and MissingPart. The latter is used as a placeholder on a unit to 
  * indicate it is missing the given part. When parts are removed from a unit, they shold be replaced 
@@ -133,7 +133,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	
 	/**
 	 * The number of parts in exactly the same condition,
-	 * to track multiple spare parts more efficiently
+	 * to track multiple spare parts more efficiently and also the shopping list
 	 */
 	protected int quantity;
 	
@@ -142,8 +142,8 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	protected int oldTeamId = -1;
 	protected int oldRefitId = -1;
 	
-	//only relevant for missing parts
-	protected boolean checkedToday;
+	//only relevant for acquisitionable parts
+	protected int daysToWait;
 	protected int replacementId;
 	
 	public Part() {
@@ -168,7 +168,6 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		this.campaign = c;
 		this.brandNew = false;
 		this.quantity = 1;
-		this.checkedToday = false;
 		this.replacementId = -1;
 	}
 
@@ -186,6 +185,10 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 
 	public void setCampaign(Campaign c) {
 		this.campaign = c;
+	}
+	
+	public Campaign getCampaign() {
+	    return campaign;
 	}
 	
 	public String getName() {
@@ -485,6 +488,14 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 				+"<quantity>"
 				+quantity
 				+"</quantity>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<daysToWait>"
+                +daysToWait
+                +"</daysToWait>");
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<replacementId>"
+                +replacementId
+                +"</replacementId>");
 	}
 	
 	protected void writeToXmlEnd(PrintWriter pw1, int indent) {
@@ -560,7 +571,9 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 					retVal.skillMin = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("mode")) {
 					retVal.mode = Integer.parseInt(wn2.getTextContent());
-				} else if (wn2.getNodeName().equalsIgnoreCase("teamId")) {
+				} else if (wn2.getNodeName().equalsIgnoreCase("daysToWait")) {
+                    retVal.daysToWait = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("teamId")) {
 					if(version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
 						retVal.oldTeamId = Integer.parseInt(wn2.getTextContent());
 					} else {
@@ -607,13 +620,6 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 						retVal.brandNew = false;
 					}
 				}
-				else if (wn2.getNodeName().equalsIgnoreCase("checkedToday")) {
-					if(wn2.getTextContent().equalsIgnoreCase("true")) {
-						retVal.checkedToday = true;
-					} else {
-						retVal.checkedToday = false;
-					}
-				} 
 				else if (wn2.getNodeName().equalsIgnoreCase("replacementId")) {
 					retVal.replacementId = Integer.parseInt(wn2.getTextContent());
 				} 
@@ -922,6 +928,26 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     
     public boolean isOmniPoddable() {
     	return false;
+    }
+        
+    public int getDaysToWait() {
+        return daysToWait;
+    }
+    
+    public void resetDaysToWait() {
+        this.daysToWait = campaign.getCampaignOptions().getWaitingPeriod();
+    }
+    
+    public void decrementDaysToWait() {
+        daysToWait--;
+    }
+    
+    public String getShoppingListReport(int quantity) {
+        String report = "" + quantity + " " + getName() + " has been added to the shopping list.";
+        if(quantity > 1) {
+            report = "" + quantity + " " + getName() + "s have been added to the shopping list.";
+        }
+        return report;
     }
 }
 

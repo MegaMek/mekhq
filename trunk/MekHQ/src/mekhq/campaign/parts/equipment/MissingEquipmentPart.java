@@ -249,7 +249,7 @@ public class MissingEquipmentPart extends MissingPart {
 		epart.setEquipTonnage(equipTonnage);
 		return epart;
 	}
-	
+/*	
 	private boolean hasReallyCheckedToday() {
 		return checkedToday;
 	}
@@ -272,6 +272,7 @@ public class MissingEquipmentPart extends MissingPart {
 		}
 		return super.hasCheckedToday();
 	}
+*/
 	
 	public int getLocation() {
     	if(null != unit) {

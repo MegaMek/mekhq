@@ -221,6 +221,8 @@ public class Campaign implements Serializable {
 	private CampaignOptions campaignOptions = new CampaignOptions();
 	private RandomSkillPreferences rskillPrefs = new RandomSkillPreferences();
 
+	private ShoppingList shoppingList;
+	
 	public Campaign() {
 		game = new Game();
 		player = new Player(0, "self");
@@ -250,6 +252,7 @@ public class Campaign implements Serializable {
 		gameOptions.initialize();
 		game.setOptions(gameOptions);
 		customs = new ArrayList<String>();
+		shoppingList = new ShoppingList();
 	}
 
 	public String getName() {
@@ -299,6 +302,10 @@ public class Campaign implements Serializable {
 	
 	public Force getForces() {
 		return forces;
+	}
+	
+	public ShoppingList getShoppingList() {
+	    return shoppingList;
 	}
 
 	/**
@@ -854,12 +861,49 @@ public class Campaign implements Serializable {
         return target;
     }
 	
+	public Person getLogisticsPerson() {
+	    int bestSkill = -1;
+	    Person admin = null;
+	    String skill = getCampaignOptions().getAcquisitionSkill();
+	    if(skill.equals(CampaignOptions.S_AUTO)) {
+	        return admin;
+	    }
+	    else if(skill.equals(CampaignOptions.S_TECH)) {
+	        for(Person p : personnel) {
+	            if(getCampaignOptions().isAcquisitionSupportStaffOnly() && !p.isSupport()) {
+	                continue;
+	            }
+                if(p.isActive() && null != p.getBestTechSkill() && p.getBestTechSkill().getLevel() > bestSkill) {
+                    admin = p;
+                    bestSkill = p.getBestTechSkill().getLevel();
+                }
+            }
+	    } else {
+    	    for(Person p : personnel) {
+    	        if(getCampaignOptions().isAcquisitionSupportStaffOnly() && !p.isSupport()) {
+                    continue;
+                }
+    	        if(p.isActive() && p.hasSkill(skill) && p.getSkill(skill).getLevel() > bestSkill) {
+    	            admin = p;
+    	            bestSkill = p.getSkill(skill).getLevel();
+    	        }
+    	    }
+	    }
+	    return admin;
+	}
+	
 	public boolean acquirePart(IAcquisitionWork acquisition, Person person) {
 		boolean found = false;
 		String report = "";
-		report += person.getName() + " attempts to find " + acquisition.getAcquisitionName();          
-		TargetRoll target = getTargetForAcquisition(acquisition, person);     
-		acquisition.setCheckedToday(true);
+	    TargetRoll target = getTargetForAcquisition(acquisition, person);   
+	    if(target.getValue() == TargetRoll.IMPOSSIBLE) {
+	        addReport(target.getDesc());
+	        return false;
+	    }
+	    if(null != person) {
+	        report += person.getName() + " ";
+	    } 
+	    report += "attempts to find " + acquisition.getAcquisitionName();
 		int roll = Compute.d6(2);
 		report += "  needs " + target.getValueAsString();
 		report += " and rolls " + roll + ":";		
@@ -881,10 +925,10 @@ public class Campaign implements Serializable {
 			return;
 		}
 		TargetRoll target = getTargetFor(r, tech);
+	    //check that all parts have arrived
 		if(!r.acquireParts()) {
 			return;
 		}
-		//check that all parts have arrived
 		String report = tech.getName() + " works on " + r.getPartName();   
 		int minutes = r.getTimeLeft();
 		if(minutes > tech.getMinutesLeft()) {
@@ -982,7 +1026,7 @@ public class Campaign implements Serializable {
 				partWork.setTeamId(tech.getId());
 				report += " - <b>Not enough time, the remainder of the task will be finished tomorrow.</b>";
 				addReport(report);
-	             return;
+				return;
 			}     
 		} else {
 			tech.setMinutesLeft(tech.getMinutesLeft() - minutes);
@@ -1083,9 +1127,6 @@ public class Campaign implements Serializable {
 			if(part.getAssignedTeamId() != null) {
 				assignedPartIds.add(part.getId());
 			}
-			if(part instanceof IAcquisitionWork) {
-				((IAcquisitionWork)part).setCheckedToday(false);
-			}
 		}
 		for(int pid : assignedPartIds) {
 			Part part = getPart(pid);
@@ -1110,9 +1151,10 @@ public class Campaign implements Serializable {
 			}
 		}
 		
+		shoppingList.newDay(this);
+		
 		for(Unit u : getUnits()) {
 			if(u.isRefitting()) {
-				u.getRefit().resetCheckedToday();
 				refit(u.getRefit());
 			}
 			if(null != u.getEngineer()) {
@@ -1405,6 +1447,8 @@ public class Campaign implements Serializable {
 				unit.getEntity().restore();
 			}
 		}
+		
+		shoppingList.restore();
 	}
 
 	public boolean isOvertimeAllowed() {
@@ -1666,6 +1710,7 @@ public class Campaign implements Serializable {
 		pw1.println("\t</forces>");
 		finances.writeToXml(pw1,1);
 		location.writeToXml(pw1, 1);
+		shoppingList.writeToXml(pw1, 1);
 		pw1.println("\t<kills>");
 		for(Kill k : kills) {
 			k.writeToXml(pw1, 2);
@@ -1960,7 +2005,9 @@ public class Campaign implements Serializable {
 					processGameOptionNodes(retVal, wn);
 				} else if(xn.equalsIgnoreCase("kills")) {
 					processKillNodes(retVal, wn, version);
-				}
+				} else if(xn.equalsIgnoreCase("shoppingList")) {
+                    retVal.shoppingList = ShoppingList.generateInstanceFromXML(wn, retVal, version);
+                } 
 				
 			} else {
 				// If it's a text node or attribute or whatever at this level,
@@ -3528,8 +3575,14 @@ public class Campaign implements Serializable {
     }
 	
 	public TargetRoll getTargetForAcquisition(IAcquisitionWork acquisition, Person person) {
-		Skill skill = person.getSkillForWorkingOn(acquisition);	
-		if(acquisition.hasCheckedToday()) {
+	    if(getCampaignOptions().getAcquisitionSkill().equals(CampaignOptions.S_AUTO)) {
+	        return new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS, "Automatic Success");
+	    }
+	    if(null == person) {
+	        return new TargetRoll(TargetRoll.IMPOSSIBLE, "No one on your force is capable of acquiring parts");
+	    }
+		Skill skill = person.getSkillForWorkingOn(acquisition, getCampaignOptions().getAcquisitionSkill());	
+		if(acquisition.getDaysToWait() > 0) {
 			return new TargetRoll(TargetRoll.IMPOSSIBLE, "Already checked for this part in this cycle");
 		}	
 		if(acquisition.getTechBase() == Part.T_CLAN && !getCampaignOptions().allowClanPurchases()) {

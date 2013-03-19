@@ -28,10 +28,13 @@ import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Mounted;
 import megamek.common.TargetRoll;
+import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Era;
 import mekhq.campaign.MekHqXmlUtil;
+import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.parts.equipment.EquipmentPart;
+import mekhq.campaign.work.IAcquisitionWork;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -42,7 +45,7 @@ import org.w3c.dom.NodeList;
  * is available
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class AmmoStorage extends EquipmentPart {
+public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
 	private static final long serialVersionUID = 2892728320891712304L;
 
 	protected long munition;
@@ -239,4 +242,93 @@ public class AmmoStorage extends EquipmentPart {
     public String checkFixable() {
         return null;
     }
+	
+	@Override
+    public String find() {
+        changeAmountAvailable(shots, (AmmoType)type);
+        if(campaign.getCampaignOptions().payForParts()) {
+            campaign.getFinances().debit(adjustCostsForCampaignOptions(getStickerPrice()), Transaction.C_EQUIP, "Purchase of " + getAcquisitionName(), campaign.calendar.getTime());
+        }
+        return "<font color='green'> part found.</font>";
+    }
+    
+    @Override
+    public String failToFind() {
+        resetDaysToWait();
+        return "<font color='red'> part not found.</font>";
+    }
+    
+    public void changeAmountAvailable(int amount, AmmoType curType) {
+        AmmoStorage a = null;
+        long curMunition = curType.getMunitionType();
+        for(Part part : campaign.getSpareParts()) {
+            if(part instanceof AmmoStorage 
+                    && ((AmmoType)((AmmoStorage)part).getType()).equals((Object)curType)
+                    && curMunition == ((AmmoType)((AmmoStorage)part).getType()).getMunitionType()) {
+                a = (AmmoStorage)part;
+                a.changeShots(amount);
+                break;
+            }
+        }
+        if(null != a && a.getShots() <= 0) {
+            campaign.removePart(a);
+        } else if(null == a && amount > 0) {
+            campaign.addPart(new AmmoStorage(1,curType,amount,campaign));
+        }
+    }
+    
+    @Override
+    public String getAcquisitionDesc() {
+        String bonus = getAllAcquisitionMods().getValueAsString();
+        if(getAllAcquisitionMods().getValue() > -1) {
+            bonus = "+" + bonus;
+        }
+        bonus = "(" + bonus + ")";
+        String toReturn = "<html><font size='2'";
+        
+        toReturn += ">";
+        toReturn += "<b>" + type.getDesc() + "</b> " + bonus + "<br/>";
+        toReturn += ((AmmoType)type).getShots() + " shots (1 ton)<br/>";
+        toReturn += Utilities.getCurrencyString(getStickerPrice()) + "<br/>";
+        toReturn += "</font></html>";
+        return toReturn;
+    }
+    
+    @Override
+    public String getAcquisitionName() {
+        return type.getDesc();
+    }
+
+    @Override
+    public TargetRoll getAllAcquisitionMods() {
+        TargetRoll target = new TargetRoll();
+        // Faction and Tech mod
+        int factionMod = 0;
+        if (campaign.getCampaignOptions().useFactionModifiers()) {
+            factionMod = campaign.getFaction().getTechMod(this, campaign);
+        }   
+        //availability mod
+        int avail = getAvailability(campaign.getEra());
+        int availabilityMod = Availability.getAvailabilityModifier(avail);
+        target.addModifier(availabilityMod, "availability (" + EquipmentType.getRatingName(avail) + ")");
+        if(factionMod != 0) {
+           target.addModifier(factionMod, "faction");
+        }
+        return target;
+    }
+
+    @Override
+    public Part getNewPart() {
+        return new AmmoStorage(1,type,((AmmoType)type).getShots(),campaign);
+    }
+    
+    @Override
+    public String getShoppingListReport(int quantity) {
+        String report = "" + quantity + " ton of " + getName() + " has been added to the shopping list.";
+        if(quantity > 1) {
+            report = "" + quantity + " tons of" + getName() + " have been added to the shopping list.";
+        }
+        return report;
+    }
 }
+
