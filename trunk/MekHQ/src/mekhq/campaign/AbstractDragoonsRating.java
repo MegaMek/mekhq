@@ -165,7 +165,6 @@ public abstract class AbstractDragoonsRating implements IDragoonsRating {
                 return null;
             }
 
-
             //Sort the list of personnel by rank.  Whoever has the highest rank is the commander.
             Collections.sort(commanderList, new Comparator<Person>() {
                 @Override
@@ -180,7 +179,11 @@ public abstract class AbstractDragoonsRating implements IDragoonsRating {
     }
     
     public int getCommanderSkill(String skillName) {
-        Skill skill = getCommander().getSkill(skillName);
+        Person commander = getCommander();
+        if (commander == null) {
+            return 0;
+        }
+        Skill skill = commander.getSkill(skillName);
         if (skill == null) {
             return 0;
         }
