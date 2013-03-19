@@ -57,6 +57,7 @@ import megamek.common.BattleArmorBay;
 import megamek.common.Bay;
 import megamek.common.CargoBay;
 import megamek.common.Compute;
+import megamek.common.ConvFighter;
 import megamek.common.Coords;
 import megamek.common.Crew;
 import megamek.common.Dropship;
@@ -2943,6 +2944,10 @@ public class Campaign implements Serializable {
 	    case(Person.T_VEE_GUNNER):
     		person.addSkill(SkillType.S_GUN_VEE, expLvl, rskillPrefs.randomizeSkill(), bonus);
     		break;
+	    case(Person.T_CONV_PILOT):
+	    	person.addSkill(SkillType.S_PILOT_JET, expLvl, rskillPrefs.randomizeSkill(), bonus);
+    		person.addSkill(SkillType.S_GUN_JET, expLvl, rskillPrefs.randomizeSkill(), bonus);
+    		break;
 	    case(Person.T_AERO_PILOT):
 	    	if(getFaction().isClan()) {
 				bonus = 1;
@@ -3837,6 +3842,9 @@ public class Campaign implements Serializable {
     		}
     		else if(unit.getEntity() instanceof SmallCraft || unit.getEntity() instanceof Jumpship) {
     			p = newPerson(Person.T_SPACE_PILOT);
+    		}
+    		else if(unit.getEntity() instanceof ConvFighter) {
+    			p = newPerson(Person.T_CONV_PILOT);
     		}
     		else if(unit.getEntity() instanceof Aero) {
     			p = newPerson(Person.T_AERO_PILOT);
