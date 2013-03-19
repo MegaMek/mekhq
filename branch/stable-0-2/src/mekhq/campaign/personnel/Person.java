@@ -89,22 +89,23 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 	public static final int T_BA          = 7;
 	public static final int T_INFANTRY    = 8;
 	public static final int T_PROTO_PILOT = 9;
-	public static final int T_SPACE_PILOT = 10;
-	public static final int T_SPACE_CREW  = 11;
-	public static final int T_SPACE_GUNNER= 12;
-	public static final int T_NAVIGATOR   = 13;
-	public static final int T_MECH_TECH   = 14;
-    public static final int T_MECHANIC    = 15;
-    public static final int T_AERO_TECH   = 16;
-    public static final int T_BA_TECH     = 17;
-    public static final int T_ASTECH      = 18;
-    public static final int T_DOCTOR      = 19;
-    public static final int T_MEDIC       = 20;
-    public static final int T_ADMIN_COM   = 21;
-    public static final int T_ADMIN_LOG   = 22;
-    public static final int T_ADMIN_TRA   = 23;
-    public static final int T_ADMIN_HR    = 24;
-    public static final int T_NUM         = 25;
+	public static final int T_CONV_PILOT  = 10;
+	public static final int T_SPACE_PILOT = 11;
+	public static final int T_SPACE_CREW  = 12;
+	public static final int T_SPACE_GUNNER= 13;
+	public static final int T_NAVIGATOR   = 14;
+	public static final int T_MECH_TECH   = 15;
+    public static final int T_MECHANIC    = 16;
+    public static final int T_AERO_TECH   = 17;
+    public static final int T_BA_TECH     = 18;
+    public static final int T_ASTECH      = 19;
+    public static final int T_DOCTOR      = 20;
+    public static final int T_MEDIC       = 21;
+    public static final int T_ADMIN_COM   = 22;
+    public static final int T_ADMIN_LOG   = 23;
+    public static final int T_ADMIN_TRA   = 24;
+    public static final int T_ADMIN_HR    = 25;
+    public static final int T_NUM         = 26;
     
     public static final int S_ACTIVE = 0;
     public static final int S_RETIRED = 1;
@@ -320,6 +321,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
                 return "VTOL Pilot";
             case(T_VEE_GUNNER):
                 return "Vehicle Gunner";
+            case(T_CONV_PILOT):
+                return "Conventional Aircraft Pilot";
             case(T_AERO_PILOT):
                 return "Aero Pilot";
             case(T_PROTO_PILOT):

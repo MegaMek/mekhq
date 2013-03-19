@@ -1,5 +1,8 @@
 VERSION HISTORY
 ----------------------------------
+v0.2.1 (SVN)
++ Bug 341: Conventional Pilots and Hire Full Complement
+
 v0.2.0 (2013-03-16)
 + Bug 318: Dragoon's Rating error FMM:R method
 + Bug 332: Dragoons Rating error FMM:R tech support
