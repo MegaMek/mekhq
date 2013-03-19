@@ -93,9 +93,9 @@ public class MissingAmmoBin extends MissingEquipmentPart {
 				+MekHqXmlUtil.escape(typeName)
 				+"</typeName>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<checkedToday>"
-				+checkedToday
-				+"</checkedToday>");
+				+"<daysToWait>"
+				+daysToWait
+				+"</daysToWait>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<oneShot>"
 				+oneShot
@@ -115,12 +115,8 @@ public class MissingAmmoBin extends MissingEquipmentPart {
 			}
 			else if (wn2.getNodeName().equalsIgnoreCase("typeName")) {
 				typeName = wn2.getTextContent();
-			} else if (wn2.getNodeName().equalsIgnoreCase("checkedToday")) {
-				if(wn2.getTextContent().equalsIgnoreCase("true")) {
-					checkedToday = true;
-				} else {
-					checkedToday = false;
-				}
+			} else if (wn2.getNodeName().equalsIgnoreCase("daysToWait")) {
+                daysToWait = Integer.parseInt(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("oneShot")) {
 				if(wn2.getTextContent().equalsIgnoreCase("true")) {
 					oneShot = true;

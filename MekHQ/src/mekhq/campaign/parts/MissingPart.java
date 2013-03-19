@@ -46,9 +46,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 300672661487966982L;
-	
-	
+	private static final long serialVersionUID = 300672661487966982L;	
 	
 	public MissingPart(int tonnage, Campaign c) {
 		super(tonnage, c);
@@ -236,16 +234,6 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
         return target;
     }
 	
-	@Override 
-	public boolean hasCheckedToday() {
-		return checkedToday;
-	}
-	
-	@Override
-	public void setCheckedToday(boolean b) {
-		this.checkedToday = b;
-	}
-	
 	@Override
 	public String getAcquisitionDesc() {
 		String bonus = getAllAcquisitionMods().getValueAsString();
@@ -266,13 +254,12 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 	public String find() {
 		Part newPart = getNewPart();
 		campaign.buyPart(newPart);
-		setCheckedToday(true);
 		return "<font color='green'> part found.</font>";
 	}
 	
 	@Override
 	public String failToFind() {
-		setCheckedToday(true);
+	    resetDaysToWait();
 		return "<font color='red'> part not found.</font>";
 	}
 	
@@ -280,9 +267,9 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 	public void writeToXmlBegin(PrintWriter pw1, int indent) {
 		super.writeToXmlBegin(pw1, indent);
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
-				+"<checkedToday>"
-				+checkedToday
-				+"</checkedToday>");
+				+"<daysToWait>"
+				+daysToWait
+				+"</daysToWait>");
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<replacementId>"
 				+replacementId

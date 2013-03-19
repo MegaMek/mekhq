@@ -40,8 +40,9 @@ public interface IAcquisitionWork extends IWork {
 	
 	public Unit getUnit();
 	
-	public boolean hasCheckedToday();
-	public void setCheckedToday(boolean b);
+	public int getDaysToWait();
+	public void resetDaysToWait();
+	public void decrementDaysToWait();
 	
 	public int getId();
 	
@@ -54,5 +55,11 @@ public interface IAcquisitionWork extends IWork {
 	public int getTechBase();
 	
 	public int getTechLevel();
+	
+	public int getQuantity();
+	
+	public void incrementQuantity();
+	
+	public void decrementQuantity();
 	
 }

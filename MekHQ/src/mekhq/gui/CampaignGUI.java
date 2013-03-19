@@ -173,6 +173,7 @@ import mekhq.campaign.parts.MekLifeSupport;
 import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.MekSensor;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.TankLocation;
 import mekhq.campaign.parts.equipment.AmmoBin;
@@ -2404,20 +2405,11 @@ public class CampaignGUI extends JPanel {
         }
         else if(acquireSelected()) {
             selectedRow = AcquisitionTable.getSelectedRow();
-            selectedTechRow = TechTable.getSelectedRow();
             IAcquisitionWork acquisition = getSelectedAcquisition();
             if(null == acquisition) {
                 return;
             }
-            Unit u = acquisition.getUnit();
-            tech = getSelectedTech();
-            if(u.getEntity() instanceof Dropship || u.getEntity() instanceof Jumpship) {
-                tech = u.getEngineer();
-            }
-            if(null == tech) {
-                return;
-            }
-            getCampaign().acquirePart(acquisition, tech);
+            getCampaign().getShoppingList().addShoppingItem(acquisition.getNewPart(), 1);
         }
 
         refreshServicedUnitList();
@@ -3784,17 +3776,8 @@ public class CampaignGUI extends JPanel {
         if(acquireSelected()) {
             IAcquisitionWork acquire = getSelectedAcquisition();
             if(null != acquire) {
-                Unit u = acquire.getUnit();
-                Person tech = getSelectedTech();
-                if(null != u && u.getEntity() instanceof Dropship || u.getEntity() instanceof Jumpship) {
-                    tech = u.getEngineer();
-                    if(null == tech) {
-                        target = new TargetRoll(TargetRoll.IMPOSSIBLE, "You must have a crew assigned to large vessels to attempt acquisitions.");
-                    }
-                }
-                if(null != tech) {
-                    target = getCampaign().getTargetForAcquisition(acquire, tech);
-                }
+                Person admin = getCampaign().getLogisticsPerson();
+                target = getCampaign().getTargetForAcquisition(acquire, admin);
             }
         }
         else  {

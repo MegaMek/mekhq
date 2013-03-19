@@ -38,6 +38,7 @@ import javax.swing.Box;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -97,6 +98,130 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private Hashtable<String, JSpinner> hashEliteSkill;
     private boolean cancelled;
     
+    
+    private javax.swing.JButton btnCamo;
+    private javax.swing.JButton btnCancel;
+    private javax.swing.JButton btnDate;
+    private javax.swing.JButton btnOkay;
+    private javax.swing.JFormattedTextField clanPriceModifierJFormattedTextField;
+    private javax.swing.JFormattedTextField usedPartsValueJFormattedTextField;
+    private javax.swing.JFormattedTextField damagedPartsValueJFormattedTextField;
+    private javax.swing.JComboBox comboFaction;
+    private javax.swing.JComboBox comboFactionNames;
+    private javax.swing.JComboBox comboRanks;
+    private javax.swing.JSlider sldGender;
+    private javax.swing.JLabel lblCamo;
+    private javax.swing.JLabel lblDate;
+    private javax.swing.JLabel lblFaction;
+    private javax.swing.JLabel lblFactionNames;
+    private javax.swing.JLabel lblRank;
+    private javax.swing.JLabel lblGender;
+    private javax.swing.JLabel lblName;
+    private javax.swing.JPanel panGeneral;
+    private javax.swing.JPanel panRepair;
+    private javax.swing.JPanel panTech;
+    private javax.swing.JPanel panPersonnel;
+    private javax.swing.JPanel panFinances;
+    private javax.swing.JPanel panNameGen;
+    private javax.swing.JPanel panXP;
+    private javax.swing.JPanel panRank;
+    private javax.swing.JPanel panSkill;
+    private javax.swing.JPanel panRandomSkill;
+    private javax.swing.JTabbedPane tabOptions;
+    private javax.swing.JTextField txtName;
+    private javax.swing.JCheckBox useFactionModifiersCheckBox;
+    private javax.swing.JCheckBox useEraModsCheckBox;
+    private javax.swing.JCheckBox useDragoonRatingCheckBox;
+    private javax.swing.JComboBox dragoonsRatingMethodCombo;
+    private javax.swing.JCheckBox useFactionForNamesBox;
+    private javax.swing.JCheckBox useTacticsBox;
+    private javax.swing.JCheckBox useInitBonusBox;
+    private javax.swing.JCheckBox useToughnessBox;
+    private javax.swing.JCheckBox useArtilleryBox;
+    private javax.swing.JCheckBox useAbilitiesBox;
+    private javax.swing.JCheckBox useQuirksBox;
+    private javax.swing.JCheckBox useEdgeBox;
+    private javax.swing.JCheckBox useImplantsBox;
+    private javax.swing.JCheckBox payForPartsBox;
+    private javax.swing.JCheckBox payForUnitsBox;
+    private javax.swing.JCheckBox payForSalariesBox;
+    private javax.swing.JCheckBox payForOverheadBox;
+    private javax.swing.JCheckBox payForMaintainBox;
+    private javax.swing.JCheckBox payForTransportBox;
+    private javax.swing.JCheckBox sellUnitsBox;
+    private javax.swing.JCheckBox sellPartsBox;
+    
+    private javax.swing.JTextArea textRanks;
+    private javax.swing.JScrollPane scrRanks;
+    
+    private javax.swing.JTextArea textCustomRanks;
+    private javax.swing.JCheckBox checkCustomRanks;
+    private javax.swing.JButton testCustomRanks;
+    private javax.swing.JScrollPane scrCustomRanks;
+    private javax.swing.JComboBox choiceOfficerCut;
+    private javax.swing.JLabel lblOfficerCut;
+    
+    private javax.swing.JTextArea txtInstructionsXP;
+    private javax.swing.JScrollPane scrXP;
+    private javax.swing.JTable tableXP;
+    private javax.swing.JScrollPane scrAbilityXP;
+    private javax.swing.JPanel panAbilityXP;
+    private JLabel lblScenarioXP;
+    private JSpinner spnScenarioXP;
+    private JLabel lblKillXP;
+    private JSpinner spnKillXP;
+    private JLabel lblKills;
+    private JSpinner spnKills;
+    private JLabel lblTaskXP;
+    private JLabel lblTasks;
+    private JSpinner spnNTasksXP;
+    private JSpinner spnTaskXP;
+    private JSpinner spnSuccessXP;
+    private JLabel lblSuccessXp;
+    private JSpinner spnMistakeXP;
+    private JLabel lblMistakeXP;
+    private JSpinner spnIdleXP;
+    private JSpinner spnTargetIdleXP;
+    private JSpinner spnMonthsIdleXP;
+
+    private JCheckBox chkSupportStaffOnly;
+    private JSpinner spnAcquireWaitingPeriod;
+    private JComboBox choiceAcquireSkill;
+
+    
+    private javax.swing.JCheckBox limitByYearBox;
+    private javax.swing.JCheckBox allowClanPurchasesBox;
+    private javax.swing.JCheckBox allowISPurchasesBox;
+    private javax.swing.JCheckBox allowCanonOnlyBox;
+    private javax.swing.JCheckBox disallowSLUnitsBox;
+    private javax.swing.JLabel lblTechLevel;
+    private javax.swing.JComboBox choiceTechLevel;
+    
+    private JLabel lblOverallRecruitBonus;
+    private JSpinner spnOverallRecruitBonus;
+    private JSpinner[] spnTypeRecruitBonus;
+    private JCheckBox chkExtraRandom;
+    private JCheckBox chkClanBonus;
+    private JLabel lblProbAntiMek;
+    private JSpinner spnProbAntiMek;
+    private JSpinner spnArtyProb;
+    private JSpinner spnArtyBonus;
+    private JSpinner spnSecondProb;
+    private JSpinner spnSecondBonus;
+    private JSpinner spnTacticsGreen;
+    private JSpinner spnTacticsReg;
+    private JSpinner spnTacticsVet;
+    private JSpinner spnTacticsElite;
+    private JSpinner spnCombatSA;
+    private JSpinner spnSupportSA;
+    private JSpinner spnAbilGreen;
+    private JSpinner spnAbilReg;
+    private JSpinner spnAbilVet;
+    private JSpinner spnAbilElite;
+
+    private javax.swing.JPanel panRandomPortrait;
+    private JCheckBox[] chkUsePortrait;
+    
     /** Creates new form CampaignOptionsDialog */
     public CampaignOptionsDialog(java.awt.Frame parent, boolean modal, Campaign c, DirectoryItems camos) {
         super(parent, modal);
@@ -154,6 +279,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         allowCanonOnlyBox.setSelected(options.allowCanonOnly());
 
         useQuirksBox.setSelected(options.useQuirks());
+        chkSupportStaffOnly.setSelected(options.isAcquisitionSupportStaffOnly());
 
     }
 
@@ -235,6 +361,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         textRanks = new javax.swing.JTextArea();
         scrRanks = new javax.swing.JScrollPane();
 
+        chkSupportStaffOnly = new JCheckBox();
+        
         textCustomRanks = new javax.swing.JTextArea();
         checkCustomRanks = new javax.swing.JCheckBox();
         testCustomRanks = new javax.swing.JButton();
@@ -384,8 +512,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panRepair.add(useEraModsCheckBox, gridBagConstraints);
 
         useFactionModifiersCheckBox.setText(resourceMap.getString("useFactionModifiersCheckBox.text")); // NOI18N
@@ -394,8 +523,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panRepair.add(useFactionModifiersCheckBox, gridBagConstraints);
 
         useQuirksBox.setText(resourceMap.getString("useQuirksBox.text")); // NOI18N
@@ -404,10 +534,65 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panRepair.add(useQuirksBox, gridBagConstraints);
-    
+           
+        spnAcquireWaitingPeriod = new JSpinner(new SpinnerNumberModel(options.getWaitingPeriod(), 1, 365, 1));
+        ((JSpinner.DefaultEditor)spnAcquireWaitingPeriod.getEditor()).getTextField().setEditable(false);
+      
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        panRepair.add(spnAcquireWaitingPeriod, gridBagConstraints);
+        
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        panRepair.add(new JLabel("Waiting period (in days) between acquisition rolls"), gridBagConstraints);      
+        
+        DefaultComboBoxModel acquireSkillModel = new DefaultComboBoxModel();
+        acquireSkillModel.addElement(CampaignOptions.S_TECH);
+        acquireSkillModel.addElement(SkillType.S_ADMIN);
+        acquireSkillModel.addElement(SkillType.S_SCROUNGE);
+        acquireSkillModel.addElement(SkillType.S_NEG);
+        acquireSkillModel.addElement(CampaignOptions.S_AUTO);
+        acquireSkillModel.setSelectedItem(options.getAcquisitionSkill());
+        choiceAcquireSkill = new JComboBox(acquireSkillModel);
+        
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        panRepair.add(new JLabel("Acquisition Skill:"), gridBagConstraints);
+        
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        panRepair.add(choiceAcquireSkill, gridBagConstraints);      
+        
+        chkSupportStaffOnly.setText("Only support personnel can make acquisition checks"); // NOI18N
+        //chkSupportStaffOnly.setToolTipText(resourceMap.getString("useQuirksBox.toolTipText")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        panRepair.add(chkSupportStaffOnly, gridBagConstraints);
+        
         tabOptions.addTab(resourceMap.getString("panRepair.TabConstraints.tabTitle"), panRepair); // NOI18N
 
         panTech.setName("panTech"); // NOI18N
@@ -482,7 +667,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panTech.add(lblTechLevel, gridBagConstraints);
-
+       
         tabOptions.addTab(resourceMap.getString("panTech.TabConstraints.tabTitle"), panTech); // NOI18N
         
         panPersonnel.setName("panPersonnel"); // NOI18N
@@ -1789,6 +1974,10 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 	    options.setQuirks(useQuirksBox.isSelected());
 		campaign.getGameOptions().getOption("stratops_quirks").setValue(useQuirksBox.isSelected());
 	    
+		options.setWaitingPeriod((Integer)spnAcquireWaitingPeriod.getModel().getValue());
+		options.setAcquisitionSkill((String)choiceAcquireSkill.getSelectedItem());
+		options.setAcquisitionSupportStaffOnly(chkSupportStaffOnly.isSelected());
+
 	    options.setScenarioXP((Integer)spnScenarioXP.getModel().getValue());
 	    options.setKillsForXP((Integer)spnKills.getModel().getValue());
 	    options.setKillXPAward((Integer)spnKillXP.getModel().getValue());
@@ -2104,126 +2293,5 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     		}
     	}
     }
-    
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnCamo;
-    private javax.swing.JButton btnCancel;
-    private javax.swing.JButton btnDate;
-    private javax.swing.JButton btnOkay;
-    private javax.swing.JFormattedTextField clanPriceModifierJFormattedTextField;
-    private javax.swing.JFormattedTextField usedPartsValueJFormattedTextField;
-    private javax.swing.JFormattedTextField damagedPartsValueJFormattedTextField;
-    private javax.swing.JComboBox comboFaction;
-    private javax.swing.JComboBox comboFactionNames;
-    private javax.swing.JComboBox comboRanks;
-    private javax.swing.JSlider sldGender;
-    private javax.swing.JLabel lblCamo;
-    private javax.swing.JLabel lblDate;
-    private javax.swing.JLabel lblFaction;
-    private javax.swing.JLabel lblFactionNames;
-    private javax.swing.JLabel lblRank;
-    private javax.swing.JLabel lblGender;
-    private javax.swing.JLabel lblName;
-    private javax.swing.JPanel panGeneral;
-    private javax.swing.JPanel panRepair;
-    private javax.swing.JPanel panTech;
-    private javax.swing.JPanel panPersonnel;
-    private javax.swing.JPanel panFinances;
-    private javax.swing.JPanel panNameGen;
-    private javax.swing.JPanel panXP;
-    private javax.swing.JPanel panRank;
-    private javax.swing.JPanel panSkill;
-    private javax.swing.JPanel panRandomSkill;
-    private javax.swing.JTabbedPane tabOptions;
-    private javax.swing.JTextField txtName;
-    private javax.swing.JCheckBox useFactionModifiersCheckBox;
-    private javax.swing.JCheckBox useEraModsCheckBox;
-    private javax.swing.JCheckBox useDragoonRatingCheckBox;
-    private javax.swing.JComboBox dragoonsRatingMethodCombo;
-    private javax.swing.JCheckBox useFactionForNamesBox;
-    private javax.swing.JCheckBox useTacticsBox;
-    private javax.swing.JCheckBox useInitBonusBox;
-    private javax.swing.JCheckBox useToughnessBox;
-    private javax.swing.JCheckBox useArtilleryBox;
-    private javax.swing.JCheckBox useAbilitiesBox;
-    private javax.swing.JCheckBox useQuirksBox;
-    private javax.swing.JCheckBox useEdgeBox;
-    private javax.swing.JCheckBox useImplantsBox;
-    private javax.swing.JCheckBox payForPartsBox;
-    private javax.swing.JCheckBox payForUnitsBox;
-    private javax.swing.JCheckBox payForSalariesBox;
-    private javax.swing.JCheckBox payForOverheadBox;
-    private javax.swing.JCheckBox payForMaintainBox;
-    private javax.swing.JCheckBox payForTransportBox;
-    private javax.swing.JCheckBox sellUnitsBox;
-    private javax.swing.JCheckBox sellPartsBox;
-    
-    private javax.swing.JTextArea textRanks;
-    private javax.swing.JScrollPane scrRanks;
-    
-    private javax.swing.JTextArea textCustomRanks;
-    private javax.swing.JCheckBox checkCustomRanks;
-    private javax.swing.JButton testCustomRanks;
-    private javax.swing.JScrollPane scrCustomRanks;
-    private javax.swing.JComboBox choiceOfficerCut;
-    private javax.swing.JLabel lblOfficerCut;
-    
-    private javax.swing.JTextArea txtInstructionsXP;
-    private javax.swing.JScrollPane scrXP;
-    private javax.swing.JTable tableXP;
-    private javax.swing.JScrollPane scrAbilityXP;
-    private javax.swing.JPanel panAbilityXP;
-    private JLabel lblScenarioXP;
-    private JSpinner spnScenarioXP;
-    private JLabel lblKillXP;
-    private JSpinner spnKillXP;
-    private JLabel lblKills;
-    private JSpinner spnKills;
-    private JLabel lblTaskXP;
-    private JLabel lblTasks;
-    private JSpinner spnNTasksXP;
-    private JSpinner spnTaskXP;
-    private JSpinner spnSuccessXP;
-    private JLabel lblSuccessXp;
-    private JSpinner spnMistakeXP;
-    private JLabel lblMistakeXP;
-    private JSpinner spnIdleXP;
-    private JSpinner spnTargetIdleXP;
-    private JSpinner spnMonthsIdleXP;
-
-    private javax.swing.JCheckBox limitByYearBox;
-    private javax.swing.JCheckBox allowClanPurchasesBox;
-    private javax.swing.JCheckBox allowISPurchasesBox;
-    private javax.swing.JCheckBox allowCanonOnlyBox;
-    private javax.swing.JCheckBox disallowSLUnitsBox;
-    private javax.swing.JLabel lblTechLevel;
-    private javax.swing.JComboBox choiceTechLevel;
-    
-    private JLabel lblOverallRecruitBonus;
-    private JSpinner spnOverallRecruitBonus;
-    private JSpinner[] spnTypeRecruitBonus;
-    private JCheckBox chkExtraRandom;
-    private JCheckBox chkClanBonus;
-    private JLabel lblProbAntiMek;
-    private JSpinner spnProbAntiMek;
-    private JSpinner spnArtyProb;
-    private JSpinner spnArtyBonus;
-    private JSpinner spnSecondProb;
-    private JSpinner spnSecondBonus;
-    private JSpinner spnTacticsGreen;
-    private JSpinner spnTacticsReg;
-    private JSpinner spnTacticsVet;
-    private JSpinner spnTacticsElite;
-    private JSpinner spnCombatSA;
-    private JSpinner spnSupportSA;
-    private JSpinner spnAbilGreen;
-    private JSpinner spnAbilReg;
-    private JSpinner spnAbilVet;
-    private JSpinner spnAbilElite;
-
-    private javax.swing.JPanel panRandomPortrait;
-    private JCheckBox[] chkUsePortrait;
-    
-    // End of variables declaration//GEN-END:variables
 
 }

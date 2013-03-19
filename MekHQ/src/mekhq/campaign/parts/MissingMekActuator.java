@@ -163,30 +163,6 @@ public class MissingMekActuator extends MissingPart {
 	public Part getNewPart() {
 		return new MekActuator(getUnitTonnage(), type, -1, campaign);
 	}
-	
-	
-	private boolean hasReallyCheckedToday() {
-		return checkedToday;
-	}
-	
-	@Override
-	public boolean hasCheckedToday() {
-		//if this unit has been checked for any other equipment of this same type
-		//then return false, regardless of whether this one has been checked
-		if(null != unit) {
-			for(Part part : unit.getParts()) {
-				if(part.getId() == getId()) {
-					continue;
-				}
-				if(part instanceof MissingMekActuator 
-						&& ((MissingMekActuator)part).getType() == type 
-						&& ((MissingMekActuator)part).hasReallyCheckedToday()) {
-					return true;
-				}
-			}
-		}
-		return super.hasCheckedToday();
-	}
 
 	@Override
 	public void updateConditionFromPart() {

@@ -49,6 +49,7 @@ import javax.swing.table.TableRowSorter;
 
 import megamek.common.AmmoType;
 import megamek.common.MiscType;
+import megamek.common.TargetRoll;
 import megamek.common.WeaponType;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -64,11 +65,14 @@ import mekhq.campaign.parts.MekGyro;
 import mekhq.campaign.parts.MekLifeSupport;
 import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.MekSensor;
+import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.TankLocation;
 import mekhq.campaign.parts.VeeSensor;
 import mekhq.campaign.parts.VeeStabiliser;
 import mekhq.campaign.parts.equipment.EquipmentPart;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.CampaignGUI;
 
 /**
@@ -219,12 +223,14 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 		btnBuyBulk.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
             	addPart(true, true);
+            	partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(partsTable.getSelectedRow()), PartsTableModel.COL_QUEUE);
             }
         });
 		btnBuy = new JButton(resourceMap.getString("btnBuy.text"));
 		btnBuy.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 addPart(true, false);
+                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(partsTable.getSelectedRow()), PartsTableModel.COL_QUEUE);
             }
         });
 		btnClose = new JButton(resourceMap.getString("btnClose.text"));
@@ -238,7 +244,8 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 		panButtons.add(btnBuy, new GridBagConstraints());
 		panButtons.add(btnAdd, new GridBagConstraints());
 		panButtons.add(btnClose, new GridBagConstraints());
-		getContentPane().add(panButtons, BorderLayout.PAGE_END);
+		getContentPane().add(panButtons, BorderLayout.PAGE_END);		
+		this.setPreferredSize(new Dimension(600,600));
         pack();
     }
     
@@ -314,14 +321,16 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 			pcd.setVisible(true);
 			quantity = pcd.getValue();
 		}
+		
+		if(purchase) {
+		    campaign.getShoppingList().addShoppingItem(selectedPart.clone(), quantity);
+		} else {
 		while(quantity > 0) {
-			if(purchase) {
-				campaign.buyPart(selectedPart.clone());
-			} else {
-				campaign.addPart(selectedPart.clone());
-			}
-			quantity--;
+		        campaign.addPart(selectedPart.clone());
+		        quantity--;
+		    }
 		}
+		campaignGUI.refreshReport();
 		campaignGUI.refreshAcquireList();
 		campaignGUI.refreshPartsList();
 		campaignGUI.refreshFinancialTransactions();
@@ -372,7 +381,9 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 		public final static int COL_TECH_BASE  = 2;
 		public final static int COL_COST     =   3;
 		public final static int COL_TON       =  4;
-        public final static int N_COL          = 5;
+	    public final static int COL_TARGET    =  5;
+	    public final static int COL_QUEUE    =  6;
+        public final static int N_COL          = 7;
 		
 		public PartsTableModel(ArrayList<Part> inventory) {
 			data = inventory;
@@ -396,9 +407,13 @@ public class PartsStoreDialog extends javax.swing.JDialog {
                 case COL_COST:
                     return "Cost";
                 case COL_TON:
-                    return "Tonnage";
+                    return "Ton";
                 case COL_TECH_BASE:
-                    return "Tech Base";
+                    return "Tech";
+                case COL_TARGET:
+                    return "Target";
+                case COL_QUEUE:
+                    return "# Queue";
                 default:
                     return "?";
             }
@@ -425,6 +440,26 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 			}
 			if(col == COL_TECH_BASE) {
 				return part.getTechBaseName();
+			}
+			if(col == COL_TARGET) {
+			    IAcquisitionWork shoppingItem = (MissingPart)part.getMissingPart();
+		        if(null == shoppingItem && part instanceof IAcquisitionWork) {
+		            shoppingItem = (IAcquisitionWork)part;
+		        }
+	            if(null != shoppingItem) {
+	                TargetRoll target = campaign.getTargetForAcquisition(shoppingItem, campaign.getLogisticsPerson());
+	                return target.getValueAsString() + "+";
+	            } else {
+	                return "-";
+	            }
+			}
+			if(col == COL_QUEUE) {
+			    IAcquisitionWork acquire = campaign.getShoppingList().getShoppingItem(part);
+			    if(null != acquire) {
+			        return acquire.getQuantity();
+			    } else {
+			        return 0;
+			    }
 			}
 			return "?";
 		}
@@ -456,11 +491,12 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 	            switch(c) {
 	            case COL_NAME:
 	            case COL_DETAIL:
-	        		return 100;
-	            case COL_TECH_BASE:
+	        		return 120;
+	            case COL_COST:
+	            case COL_TARGET:
 	                return 40;        
 	            default:
-	                return 10;
+	                return 15;
 	            }
 	        }
 	        
@@ -469,13 +505,32 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 	            case COL_COST:
 	            case COL_TON:
 	            	return SwingConstants.RIGHT;
+	            case COL_TARGET:
+	                return SwingConstants.CENTER;
 	            default:
 	            	return SwingConstants.LEFT;
 	            }
 	        }
 
 	        public String getTooltip(int row, int col) {
+	            Part part;
+	            if(data.isEmpty()) {
+	                return null;
+	            } else {
+	                part = (Part)data.get(row);
+	            }
 	        	switch(col) {
+	        	case COL_TARGET:
+	        	    IAcquisitionWork shoppingItem = (MissingPart)part.getMissingPart();
+	                if(null == shoppingItem && part instanceof IAcquisitionWork) {
+	                    shoppingItem = (IAcquisitionWork)part;
+	                }
+	                if(null != shoppingItem) {
+	                    TargetRoll target = campaign.getTargetForAcquisition(shoppingItem, campaign.getLogisticsPerson());
+	                    return target.getDesc();
+	                } else {
+	                    return null;
+	                }
 	            default:
 	            	return null;
 	            }
