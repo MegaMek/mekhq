@@ -77,6 +77,21 @@ public class ShoppingList implements MekHqXmlSerializable {
         return null;
     }
     
+    public void removeItem(Part newPart) {
+        int idx = -1;
+        int row = 0;
+        for(IAcquisitionWork shoppingItem : shoppingList) {
+            if(shoppingItem.getNewPart().isSamePartType(newPart)) {
+                idx = row;
+                break;
+            }
+            row++;
+        }
+        if(idx > -1) {
+            shoppingList.remove(idx);
+        }
+    }
+    
     public void addShoppingItem(Part newPart, int quantity) {
         Person person = newPart.getCampaign().getLogisticsPerson();
         if(null == person && !newPart.getCampaign().getCampaignOptions().getAcquisitionSkill().equals(CampaignOptions.S_AUTO)) {
@@ -137,6 +152,7 @@ public class ShoppingList implements MekHqXmlSerializable {
                 newShoppingList.add(shoppingItem);
             }
         }
+        shoppingList = newShoppingList;
         
     } 
     
@@ -181,6 +197,10 @@ public class ShoppingList implements MekHqXmlSerializable {
                 ((MissingEquipmentPart)shoppingItem).restore();
             }
         }
+    }
+    
+    public ArrayList<IAcquisitionWork> getList() {
+        return shoppingList;
     }
     
 }
