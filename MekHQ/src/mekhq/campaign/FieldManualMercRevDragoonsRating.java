@@ -316,8 +316,8 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
                                                                  RoundingMode.HALF_EVEN).intValue();
     }
 
-    private int getSupportHours(Person p) {
-        switch (p.getExperienceLevel(false)) {
+    private int getSupportHours(int skillLevel) {
+        switch (skillLevel) {
             case (SkillType.EXP_ULTRA_GREEN):
                 return 20;
             case (SkillType.EXP_GREEN):
@@ -332,25 +332,40 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
     }
 
     private void updateTechSupportAvailable(Person p) {
-        int hours = getSupportHours(p);
+        String[] techSkills = new String[]{SkillType.S_TECH_MECH,
+                                           SkillType.S_TECH_AERO,
+                                           SkillType.S_TECH_BA,
+                                           SkillType.S_TECH_MECHANIC};
+
+        // Get the highest tech skill this person has.
+        int highestSkill = SkillType.EXP_ULTRA_GREEN;
+        for (String s : techSkills) {
+            int rank = p.getSkill(s).getExperienceLevel();
+            if (rank > highestSkill) {
+                highestSkill = rank;
+            }
+        }
+
+        // Get the number of support hours this person contributes.
+        int hours = getSupportHours(highestSkill);
         if (p.isTechSecondary()) {
-            hours = (int) Math.floor(hours / 2);
+            hours = (int) Math.floor(hours / 2D);
         }
         techSupportAvailable += hours;
     }
 
     private void updateMedicalSupportAvailable(Person p) {
-        int hours = getSupportHours(p);
+        int hours = getSupportHours(p.getSkill(SkillType.S_DOCTOR).getExperienceLevel());
         if (p.getSecondaryRole() == Person.T_DOCTOR) {
-            hours = (int) Math.floor(hours / 2);
+            hours = (int) Math.floor(hours / 2D);
         }
         medSupportAvailable += hours;
     }
 
     private void updateAdministrativeSupportAvailable(Person p) {
-        int hours = getSupportHours(p);
+        int hours = getSupportHours(p.getSkill(SkillType.S_ADMIN).getExperienceLevel());
         if (p.isAdminSecondary()) {
-            hours = (int) Math.floor(hours / 2);
+            hours = (int) Math.floor(hours / 2D);
         }
         adminSupportAvailable += hours;
     }
