@@ -245,6 +245,10 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		
 		toReturn += ">";
 		toReturn += "<b>" + getAcquisitionName() + "</b> " + bonus + "<br/>";
+		IAcquisitionWork shoppingItem = campaign.getShoppingList().getShoppingItem(getNewPart());
+		if(shoppingItem != null) {
+		    toReturn += shoppingItem.getQuantity() + " parts on the shopping list.<br>";
+		}
 		toReturn += Utilities.getCurrencyString(getNewPart().getActualValue()) + "<br/>";
 		toReturn += "</font></html>";
 		return toReturn;

@@ -538,6 +538,10 @@ public class Armor extends Part implements IAcquisitionWork {
 		
 		toReturn += ">";
 		toReturn += "<b>" + getName() + "</b> " + bonus + "<br/>";
+		IAcquisitionWork shoppingItem = campaign.getShoppingList().getShoppingItem(getNewPart());
+        if(shoppingItem != null) {
+            toReturn += shoppingItem.getQuantity() + " parts on the shopping list.<br>";
+        }
 		toReturn += Utilities.getCurrencyString(adjustCostsForCampaignOptions(getStickerPrice())) + "<br/>";
 		toReturn += "</font></html>";
 		return toReturn;

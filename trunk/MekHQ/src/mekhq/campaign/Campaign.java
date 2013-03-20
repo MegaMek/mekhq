@@ -895,7 +895,7 @@ public class Campaign implements Serializable {
 	public boolean acquirePart(IAcquisitionWork acquisition, Person person) {
 		boolean found = false;
 		String report = "";
-	    TargetRoll target = getTargetForAcquisition(acquisition, person);   
+	    TargetRoll target = getTargetForAcquisition(acquisition, person, false);   
 	    if(target.getValue() == TargetRoll.IMPOSSIBLE) {
 	        addReport(target.getDesc());
 	        return false;
@@ -3585,10 +3585,7 @@ public class Campaign implements Serializable {
 	    if(null == person) {
 	        return new TargetRoll(TargetRoll.IMPOSSIBLE, "No one on your force is capable of acquiring parts");
 	    }
-		Skill skill = person.getSkillForWorkingOn(acquisition, getCampaignOptions().getAcquisitionSkill());	
-		if(acquisition.getDaysToWait() > 0 && checkDaysToWait) {
-			return new TargetRoll(TargetRoll.IMPOSSIBLE, "Already checked for this part in this cycle");
-		}	
+		Skill skill = person.getSkillForWorkingOn(acquisition, getCampaignOptions().getAcquisitionSkill());		
 		if(null != getShoppingList().getShoppingItem(acquisition.getNewPart()) && checkDaysToWait) {
             return new TargetRoll(TargetRoll.AUTOMATIC_FAIL, "You must wait until the new cycle to check for this part. Further attempts will be added to the shopping list.");
         }
