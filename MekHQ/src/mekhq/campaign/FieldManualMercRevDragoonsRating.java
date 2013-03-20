@@ -234,11 +234,14 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
             }
         }
 
-        if (campaign.getCampaignOptions().useFactionModifiers() && en.isClan()) {
-            hoursNeeded *= 2;
-        } else if (campaign.getCampaignOptions().useEraMods() && (en.getTechLevel() > TechConstants.T_INTRO_BOXSET)) {
-            hoursNeeded *= 1.5;
-        }
+
+        // todo Descide if this should be an additional campaign option or if this is implicit in having Faction &
+        // todo Era mods turned on for the campiagn in the first place.
+//        if (campaign.getCampaignOptions().useFactionModifiers() && en.isClan()) {
+//            hoursNeeded *= 2;
+//        } else if (campaign.getCampaignOptions().useEraMods() && (en.getTechLevel() > TechConstants.T_INTRO_BOXSET)) {
+//            hoursNeeded *= 1.5;
+//        }
 
         techSupportNeeded += hoursNeeded;
     }
