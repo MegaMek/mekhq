@@ -312,7 +312,7 @@ public class ShoppingListDialog extends javax.swing.JDialog {
         panButtons.setLayout(new GridBagLayout());
         panButtons.add(btnClose, new GridBagConstraints());
         getContentPane().add(panButtons, BorderLayout.PAGE_END);        
-        this.setPreferredSize(new Dimension(650,600));
+        this.setPreferredSize(new Dimension(700,600));
         pack();
     }
     
@@ -421,8 +421,9 @@ public class ShoppingListDialog extends javax.swing.JDialog {
         public final static int COL_COST     =   3;
         public final static int COL_TON       =  4;
         public final static int COL_TARGET    =  5;
-        public final static int COL_QUEUE     =  6;
-        public final static int N_COL          = 7;
+        public final static int COL_NEXT      =  6;
+        public final static int COL_QUEUE     =  7;
+        public final static int N_COL          = 8;
         
         public AcquireTableModel(ArrayList<IAcquisitionWork> shoppingList) {
             data = shoppingList;
@@ -453,6 +454,8 @@ public class ShoppingListDialog extends javax.swing.JDialog {
                     return "Target";
                 case COL_QUEUE:
                     return "Quantity";
+                case COL_NEXT:
+                    return "Next Check";
                 default:
                     return "?";
             }
@@ -512,6 +515,14 @@ public class ShoppingListDialog extends javax.swing.JDialog {
             if(col == COL_QUEUE) {
                 return shoppingItem.getQuantity();
             }
+            if(col == COL_NEXT) {
+                int days = shoppingItem.getDaysToWait();
+                String dayName = " day";
+                if(days != 1) {
+                    dayName += "s";
+                }
+                return days + dayName;
+            }
             return "?";
         }
         
@@ -540,6 +551,7 @@ public class ShoppingListDialog extends javax.swing.JDialog {
                     return 120;
                 case COL_COST:
                 case COL_TARGET:
+                case COL_NEXT:
                     return 40;        
                 default:
                     return 15;
@@ -552,6 +564,7 @@ public class ShoppingListDialog extends javax.swing.JDialog {
                 case COL_TON:
                     return SwingConstants.RIGHT;
                 case COL_TARGET:
+                case COL_NEXT:
                     return SwingConstants.CENTER;
                 default:
                     return SwingConstants.LEFT;
