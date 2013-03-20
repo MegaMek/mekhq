@@ -5,6 +5,8 @@ v0.3.0 (SVN)
 + New acquisition procedure (see comments in ShoppingList for details)
 + Bug 342: NPE displaying Dragoon's Rating if unit has no commander
 + ShoppingListDialog
++ Bug: all acquisitions failing
++ better reporting in repair bay about acquisitions
 
 v0.2.0 (2013-03-16)
 + Bug 318: Dragoon's Rating error FMM:R method

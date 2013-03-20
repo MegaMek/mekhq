@@ -572,7 +572,7 @@ public class ShoppingListDialog extends javax.swing.JDialog {
                 }
                 switch(col) {
                 case COL_TARGET:                    
-                    TargetRoll target = campaign.getTargetForAcquisition(shoppingItem, campaign.getLogisticsPerson());
+                    TargetRoll target = campaign.getTargetForAcquisition(shoppingItem, campaign.getLogisticsPerson(), false);
                     return target.getDesc();
                 default:
                     return null;
