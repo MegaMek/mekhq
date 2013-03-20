@@ -3575,6 +3575,10 @@ public class Campaign implements Serializable {
     }
 	
 	public TargetRoll getTargetForAcquisition(IAcquisitionWork acquisition, Person person) {
+	    return getTargetForAcquisition(acquisition, person, true);
+	}
+	
+	public TargetRoll getTargetForAcquisition(IAcquisitionWork acquisition, Person person, boolean checkDaysToWait) {
 	    if(getCampaignOptions().getAcquisitionSkill().equals(CampaignOptions.S_AUTO)) {
 	        return new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS, "Automatic Success");
 	    }
@@ -3582,9 +3586,12 @@ public class Campaign implements Serializable {
 	        return new TargetRoll(TargetRoll.IMPOSSIBLE, "No one on your force is capable of acquiring parts");
 	    }
 		Skill skill = person.getSkillForWorkingOn(acquisition, getCampaignOptions().getAcquisitionSkill());	
-		if(acquisition.getDaysToWait() > 0) {
+		if(acquisition.getDaysToWait() > 0 && checkDaysToWait) {
 			return new TargetRoll(TargetRoll.IMPOSSIBLE, "Already checked for this part in this cycle");
 		}	
+		if(null != getShoppingList().getShoppingItem(acquisition.getNewPart()) && checkDaysToWait) {
+            return new TargetRoll(TargetRoll.AUTOMATIC_FAIL, "You must wait until the new cycle to check for this part. Further attempts will be added to the shopping list.");
+        }
 		if(acquisition.getTechBase() == Part.T_CLAN && !getCampaignOptions().allowClanPurchases()) {
 			return new TargetRoll(TargetRoll.IMPOSSIBLE, "You cannot acquire clan parts");
 		}

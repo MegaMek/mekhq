@@ -210,6 +210,7 @@ import mekhq.gui.dialog.PortraitChoiceDialog;
 import mekhq.gui.dialog.QuirksDialog;
 import mekhq.gui.dialog.RefitNameDialog;
 import mekhq.gui.dialog.ResolveScenarioWizardDialog;
+import mekhq.gui.dialog.ShoppingListDialog;
 import mekhq.gui.dialog.TextAreaDialog;
 import mekhq.gui.dialog.UnitSelectorDialog;
 import mekhq.gui.view.ContractViewPanel;
@@ -444,6 +445,7 @@ public class CampaignGUI extends JPanel {
         menuManage = new javax.swing.JMenu();
         miLoadForces = new javax.swing.JMenuItem();
         addFunds = new javax.swing.JMenuItem();
+        miShoppingList = new javax.swing.JMenuItem();
         menuMarket = new javax.swing.JMenu();
         miPurchaseUnit = new javax.swing.JMenuItem();
         miBuyParts = new javax.swing.JMenuItem();
@@ -1396,6 +1398,31 @@ public class CampaignGUI extends JPanel {
 
         JPanel panTasks = new JPanel(new GridBagLayout());
 
+        scrollTechTable.setMinimumSize(new java.awt.Dimension(200, 200));
+
+        scrollTechTable.setName("scrollTechTable"); // NOI18N
+        scrollTechTable.setPreferredSize(new java.awt.Dimension(300, 300));
+
+        TechTable.setModel(techsModel);
+        TechTable.setName("TechTable"); // NOI18N
+        TechTable.setRowHeight(60);
+        TechTable.getColumnModel().getColumn(0)
+                .setCellRenderer(techsModel.getRenderer());
+        TechTable.getSelectionModel().addListSelectionListener(
+                new javax.swing.event.ListSelectionListener() {
+                    public void valueChanged(
+                            javax.swing.event.ListSelectionEvent evt) {
+                        updateTechTarget();
+                    }
+                });
+        techSorter = new TableRowSorter<TechTableModel>(techsModel);
+        techSorter.setComparator(0, new TechSorter());
+        TechTable.setRowSorter(techSorter);
+        sortKeys = new ArrayList<RowSorter.SortKey>();
+        sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
+        techSorter.setSortKeys(sortKeys);
+        scrollTechTable.setViewportView(TechTable);
+        
         tabTasks.setMinimumSize(new java.awt.Dimension(300, 200));
         tabTasks.setName("tabTasks"); // NOI18N
         tabTasks.setPreferredSize(new java.awt.Dimension(300, 300));
@@ -1537,31 +1564,6 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panTechs.add(btnShowAllTechs, gridBagConstraints);
-
-        scrollTechTable.setMinimumSize(new java.awt.Dimension(200, 200));
-
-        scrollTechTable.setName("scrollTechTable"); // NOI18N
-        scrollTechTable.setPreferredSize(new java.awt.Dimension(300, 300));
-
-        TechTable.setModel(techsModel);
-        TechTable.setName("TechTable"); // NOI18N
-        TechTable.setRowHeight(60);
-        TechTable.getColumnModel().getColumn(0)
-                .setCellRenderer(techsModel.getRenderer());
-        TechTable.getSelectionModel().addListSelectionListener(
-                new javax.swing.event.ListSelectionListener() {
-                    public void valueChanged(
-                            javax.swing.event.ListSelectionEvent evt) {
-                        updateTechTarget();
-                    }
-                });
-        techSorter = new TableRowSorter<TechTableModel>(techsModel);
-        techSorter.setComparator(0, new TechSorter());
-        TechTable.setRowSorter(techSorter);
-        sortKeys = new ArrayList<RowSorter.SortKey>();
-        sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
-        techSorter.setSortKeys(sortKeys);
-        scrollTechTable.setViewportView(TechTable);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -1946,6 +1948,14 @@ public class CampaignGUI extends JPanel {
         });
         menuManage.add(addFunds);
 
+        miShoppingList.setText(resourceMap.getString("miShoppingList.text")); // NOI18N
+        miShoppingList.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                showShoppingList();
+            }
+        });
+        menuManage.add(miShoppingList);
+        
         menuBar.add(menuManage);
 
         menuMarket.setText(resourceMap.getString("menuMarket.text")); // NOI18N
@@ -2559,6 +2569,7 @@ public class CampaignGUI extends JPanel {
     }
 
     private void taskTabChanged() {
+        filterTechs(false);
         updateTechTarget();
     }
 
@@ -2901,6 +2912,13 @@ public class CampaignGUI extends JPanel {
     private void buyParts() {
         PartsStoreDialog psd = new PartsStoreDialog(true, this);
         psd.setVisible(true);
+        refreshPartsList();
+        refreshAcquireList();
+    }
+    
+    private void showShoppingList() {
+        ShoppingListDialog sld = new ShoppingListDialog(true, this);
+        sld.setVisible(true);
         refreshPartsList();
         refreshAcquireList();
     }
@@ -3774,7 +3792,7 @@ public class CampaignGUI extends JPanel {
     protected void updateTechTarget() {
         TargetRoll target = null;
         if(acquireSelected()) {
-            IAcquisitionWork acquire = getSelectedAcquisition();
+            IAcquisitionWork acquire = getSelectedAcquisition();           
             if(null != acquire) {
                 Person admin = getCampaign().getLogisticsPerson();
                 target = getCampaign().getTargetForAcquisition(acquire, admin);
@@ -3924,7 +3942,7 @@ public class CampaignGUI extends JPanel {
             @Override
             public boolean include(Entry<? extends TechTableModel, ? extends Integer> entry) {
                 if(acquireSelected()) {
-                    return true;
+                    return false;
                 }
                 if(null == part) {
                     return false;
@@ -9696,6 +9714,7 @@ public class CampaignGUI extends JPanel {
     private javax.swing.JMenuItem miFullStrengthMedics;
     private javax.swing.JMenu menuMedicPool;
     private javax.swing.JMenuItem miLoadForces;
+    private javax.swing.JMenuItem miShoppingList;
     private javax.swing.JMenuItem miPurchaseUnit;
     private javax.swing.JMenuItem miBuyParts;
     private javax.swing.JMenu menuCommunity;

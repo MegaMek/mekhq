@@ -27,8 +27,10 @@ import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.ResourceBundle;
 
 import javax.swing.DefaultComboBoxModel;
@@ -71,7 +73,6 @@ import mekhq.campaign.parts.TankLocation;
 import mekhq.campaign.parts.VeeSensor;
 import mekhq.campaign.parts.VeeStabiliser;
 import mekhq.campaign.parts.equipment.EquipmentPart;
-import mekhq.campaign.personnel.Person;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.CampaignGUI;
 
@@ -142,8 +143,9 @@ public class PartsStoreDialog extends javax.swing.JDialog {
         partsTable = new JTable(partsModel);
 		partsTable.setName("partsTable"); // NOI18N
 		partsSorter = new TableRowSorter<PartsTableModel>(partsModel);
-        partsTable.setRowSorter(partsSorter);
+		partsSorter.setComparator(PartsTableModel.COL_TARGET, new TargetSorter());
         partsSorter.setComparator(PartsTableModel.COL_COST, campaignGUI.new FormattedNumberSorter());
+        partsTable.setRowSorter(partsSorter);
 		TableColumn column = null;
         for (int i = 0; i < PartsTableModel.N_COL; i++) {
             column = partsTable.getColumnModel().getColumn(i);
@@ -177,6 +179,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 		c.gridy = 0;
 		c.weightx = 0.0;
 		c.anchor = java.awt.GridBagConstraints.WEST;
+		c.insets = new Insets(5,5,5,5);
 		panFilter.add(lblPartsChoice, c);
 		c.gridx = 1;
 		c.weightx = 1.0;
@@ -245,7 +248,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 		panButtons.add(btnAdd, new GridBagConstraints());
 		panButtons.add(btnClose, new GridBagConstraints());
 		getContentPane().add(panButtons, BorderLayout.PAGE_END);		
-		this.setPreferredSize(new Dimension(600,600));
+		this.setPreferredSize(new Dimension(650,600));
         pack();
     }
     
@@ -448,7 +451,11 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 		        }
 	            if(null != shoppingItem) {
 	                TargetRoll target = campaign.getTargetForAcquisition(shoppingItem, campaign.getLogisticsPerson());
-	                return target.getValueAsString() + "+";
+	                String value = target.getValueAsString();
+	                if(target.getValue() != TargetRoll.IMPOSSIBLE && target.getValue() != TargetRoll.AUTOMATIC_SUCCESS && target.getValue() != TargetRoll.AUTOMATIC_FAIL) {
+	                    value += "+";
+	                }
+	                return value;
 	            } else {
 	                return "-";
 	            }
@@ -559,4 +566,44 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 
 			}
 	}
+	
+	/**
+     * A comparator for target numbers written as strings
+     * @author Jay Lawson
+     *
+     */
+    public class TargetSorter implements Comparator<String> {
+
+        @Override
+        public int compare(String s0, String s1) {
+            s0 = s0.replaceAll("\\+", "");
+            s1 = s1.replaceAll("\\+", "");
+            int r0 = 0;
+            int r1 = 0;
+            if(s0.equals("Impossible")) {
+                r0 = Integer.MAX_VALUE;
+            }
+            else if(s0.equals("Automatic Failure")) {
+                r0 = Integer.MAX_VALUE-1;
+            }
+            else if(s0.equals("Automatic Success")) {
+                r0 = Integer.MIN_VALUE;
+            } else {
+                r0 = Integer.parseInt(s0);
+            }   
+            if(s1.equals("Impossible")) {
+                r1 = Integer.MAX_VALUE;
+            }
+            else if(s1.equals("Automatic Failure")) {
+                r1 = Integer.MAX_VALUE-1;
+            }
+            else if(s1.equals("Automatic Success")) {
+                r1 = Integer.MIN_VALUE;
+            } else {
+                r1 = Integer.parseInt(s1);
+            }   
+            return ((Comparable<Integer>)r0).compareTo(r1);
+
+        }
+    }
 }
