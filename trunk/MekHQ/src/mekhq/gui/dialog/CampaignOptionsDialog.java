@@ -7,6 +7,7 @@
 package mekhq.gui.dialog;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -187,8 +188,15 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JCheckBox chkSupportStaffOnly;
     private JSpinner spnAcquireWaitingPeriod;
     private JComboBox choiceAcquireSkill;
-
     
+    private JSpinner spnNDiceTransitTime;
+    private JSpinner spnConstantTransitTime;
+    private JComboBox choiceTransitTimeUnits;
+    private JSpinner spnAcquireMosBonus;
+    private JComboBox choiceAcquireMosUnits;
+    private JSpinner spnAcquireMinimum;
+    private JComboBox choiceAcquireMinimumUnit;
+
     private javax.swing.JCheckBox limitByYearBox;
     private javax.swing.JCheckBox allowClanPurchasesBox;
     private javax.swing.JCheckBox allowISPurchasesBox;
@@ -504,7 +512,19 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         tabOptions.addTab(resourceMap.getString("panGeneral.TabConstraints.tabTitle"), panGeneral); // NOI18N
 
         panRepair.setName("panRules"); // NOI18N
-        panRepair.setLayout(new java.awt.GridBagLayout());
+        panRepair.setLayout(new java.awt.GridLayout(2,2));
+
+        JPanel panSubRepair = new JPanel(new GridBagLayout());
+        JPanel panSubAcquire = new JPanel(new GridBagLayout());
+        JPanel panSubDelivery = new JPanel(new GridBagLayout());
+
+        panSubRepair.setBorder(BorderFactory.createTitledBorder("Repair"));
+        panSubAcquire.setBorder(BorderFactory.createTitledBorder("Acquisition"));
+        panSubDelivery.setBorder(BorderFactory.createTitledBorder("Delivery"));
+
+        panRepair.add(panSubRepair);
+        panRepair.add(panSubAcquire);
+        panRepair.add(panSubDelivery);
 
         useEraModsCheckBox.setText(resourceMap.getString("useEraModsCheckBox.text")); // NOI18N
         useEraModsCheckBox.setToolTipText(resourceMap.getString("useEraModsCheckBox.toolTipText")); // NOI18N
@@ -512,51 +532,53 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panRepair.add(useEraModsCheckBox, gridBagConstraints);
-
-        useFactionModifiersCheckBox.setText(resourceMap.getString("useFactionModifiersCheckBox.text")); // NOI18N
-        useFactionModifiersCheckBox.setToolTipText(resourceMap.getString("useFactionModifiersCheckBox.toolTipText")); // NOI18N
-        useFactionModifiersCheckBox.setName("useFactionModifiersCheckBox"); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panRepair.add(useFactionModifiersCheckBox, gridBagConstraints);
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panSubRepair.add(useEraModsCheckBox, gridBagConstraints);
 
         useQuirksBox.setText(resourceMap.getString("useQuirksBox.text")); // NOI18N
         useQuirksBox.setToolTipText(resourceMap.getString("useQuirksBox.toolTipText")); // NOI18N
         useQuirksBox.setName("useQuirksBox"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panSubRepair.add(useQuirksBox, gridBagConstraints);
+        
+        useFactionModifiersCheckBox.setText(resourceMap.getString("useFactionModifiersCheckBox.text")); // NOI18N
+        useFactionModifiersCheckBox.setToolTipText(resourceMap.getString("useFactionModifiersCheckBox.toolTipText")); // NOI18N
+        useFactionModifiersCheckBox.setName("useFactionModifiersCheckBox"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 0.0;
         gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panRepair.add(useQuirksBox, gridBagConstraints);
-           
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panSubAcquire.add(useFactionModifiersCheckBox, gridBagConstraints);
+
         spnAcquireWaitingPeriod = new JSpinner(new SpinnerNumberModel(options.getWaitingPeriod(), 1, 365, 1));
         ((JSpinner.DefaultEditor)spnAcquireWaitingPeriod.getEditor()).getTextField().setEditable(false);
       
+        JPanel pnlWaitingPeriod = new JPanel();
+        pnlWaitingPeriod.add(spnAcquireWaitingPeriod);
+        pnlWaitingPeriod.add(new JLabel("Waiting period (in days) between acquisition rolls"));      
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        panRepair.add(spnAcquireWaitingPeriod, gridBagConstraints);
-        
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        panRepair.add(new JLabel("Waiting period (in days) between acquisition rolls"), gridBagConstraints);      
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panSubAcquire.add(pnlWaitingPeriod, gridBagConstraints);
         
         DefaultComboBoxModel acquireSkillModel = new DefaultComboBoxModel();
         acquireSkillModel.addElement(CampaignOptions.S_TECH);
@@ -569,29 +591,108 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        panRepair.add(new JLabel("Acquisition Skill:"), gridBagConstraints);
+        panSubAcquire.add(new JLabel("Acquisition Skill:"), gridBagConstraints);
         
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        panRepair.add(choiceAcquireSkill, gridBagConstraints);      
+        panSubAcquire.add(choiceAcquireSkill, gridBagConstraints);      
         
         chkSupportStaffOnly.setText("Only support personnel can make acquisition checks"); // NOI18N
         //chkSupportStaffOnly.setToolTipText(resourceMap.getString("useQuirksBox.toolTipText")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panRepair.add(chkSupportStaffOnly, gridBagConstraints);
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panSubAcquire.add(chkSupportStaffOnly, gridBagConstraints);
+        
+        spnNDiceTransitTime = new JSpinner(new SpinnerNumberModel(options.getNDiceTransitTime(), 0, 365, 1));
+        ((JSpinner.DefaultEditor)spnNDiceTransitTime.getEditor()).getTextField().setEditable(false);
+      
+        spnConstantTransitTime = new JSpinner(new SpinnerNumberModel(options.getConstantTransitTime(), 0, 365, 1));
+        ((JSpinner.DefaultEditor)spnConstantTransitTime.getEditor()).getTextField().setEditable(false);
+      
+        spnAcquireMosBonus = new JSpinner(new SpinnerNumberModel(options.getAcquireMosBonus(), 0, 365, 1));
+        ((JSpinner.DefaultEditor)spnAcquireMosBonus.getEditor()).getTextField().setEditable(false);
+        
+        spnAcquireMinimum = new JSpinner(new SpinnerNumberModel(options.getAcquireMinimumTime(), 0, 365, 1));
+        ((JSpinner.DefaultEditor)spnAcquireMinimum.getEditor()).getTextField().setEditable(false);
+        
+        DefaultComboBoxModel transitUnitModel = new DefaultComboBoxModel();
+        for(int i = 0; i < CampaignOptions.TRANSIT_UNIT_NUM; i++) {
+            transitUnitModel.addElement(CampaignOptions.getTransitUnitName(i));
+        }
+        transitUnitModel.setSelectedItem(CampaignOptions.getTransitUnitName(options.getUnitTransitTime()));
+        choiceTransitTimeUnits = new JComboBox(transitUnitModel);  
+        
+        DefaultComboBoxModel transitMosUnitModel = new DefaultComboBoxModel();
+        for(int i = 0; i < CampaignOptions.TRANSIT_UNIT_NUM; i++) {
+            transitMosUnitModel.addElement(CampaignOptions.getTransitUnitName(i));
+        }
+        transitMosUnitModel.setSelectedItem(CampaignOptions.getTransitUnitName(options.getAcquireMosUnit()));
+        choiceAcquireMosUnits = new JComboBox(transitMosUnitModel);  
+        
+        DefaultComboBoxModel transitMinUnitModel = new DefaultComboBoxModel();
+        for(int i = 0; i < CampaignOptions.TRANSIT_UNIT_NUM; i++) {
+            transitMinUnitModel.addElement(CampaignOptions.getTransitUnitName(i));
+        }
+        transitMinUnitModel.setSelectedItem(CampaignOptions.getTransitUnitName(options.getAcquireMinimumTimeUnit()));
+        choiceAcquireMinimumUnit = new JComboBox(transitMinUnitModel);  
+        
+        
+        JPanel pnlTransitTime = new JPanel();
+        pnlTransitTime.add(new JLabel("Delivery Time:"));      
+        pnlTransitTime.add(spnNDiceTransitTime);
+        pnlTransitTime.add(new JLabel("d6 + "));      
+        pnlTransitTime.add(spnConstantTransitTime);
+        pnlTransitTime.add(choiceTransitTimeUnits);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panSubDelivery.add(pnlTransitTime, gridBagConstraints);
+               
+        JPanel pnlMinTransit = new JPanel();
+        pnlMinTransit.add(new JLabel("Minimum Transit Time:"));      
+        pnlMinTransit.add(spnAcquireMinimum);
+        pnlMinTransit.add(choiceAcquireMinimumUnit);
+        
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panSubDelivery.add(pnlMinTransit, gridBagConstraints);
+        
+        JPanel pnlMosBonus = new JPanel();
+        pnlMosBonus.add(new JLabel("Reduce delivery time by"));      
+        pnlMosBonus.add(spnAcquireMosBonus);
+        pnlMosBonus.add(choiceAcquireMosUnits);
+        pnlMosBonus.add(new JLabel("per MoS"));      
+        
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panSubDelivery.add(pnlMosBonus, gridBagConstraints);
         
         tabOptions.addTab(resourceMap.getString("panRepair.TabConstraints.tabTitle"), panRepair); // NOI18N
 
@@ -1978,6 +2079,15 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 		options.setAcquisitionSkill((String)choiceAcquireSkill.getSelectedItem());
 		options.setAcquisitionSupportStaffOnly(chkSupportStaffOnly.isSelected());
 
+		options.setNDiceTransitTime((Integer)spnNDiceTransitTime.getModel().getValue());
+		options.setConstantTransitTime((Integer)spnConstantTransitTime.getModel().getValue());
+		options.setUnitTransitTime(choiceTransitTimeUnits.getSelectedIndex());
+		options.setAcquireMosBonus((Integer)spnAcquireMosBonus.getModel().getValue());
+		options.setAcquireMinimumTime((Integer)spnAcquireMinimum.getModel().getValue());
+		options.setAcquireMinimumTimeUnit(choiceAcquireMinimumUnit.getSelectedIndex());
+		options.setAcquireMosUnit(choiceAcquireMosUnits.getSelectedIndex());
+
+		
 	    options.setScenarioXP((Integer)spnScenarioXP.getModel().getValue());
 	    options.setKillsForXP((Integer)spnKills.getModel().getValue());
 	    options.setKillXPAward((Integer)spnKillXP.getModel().getValue());

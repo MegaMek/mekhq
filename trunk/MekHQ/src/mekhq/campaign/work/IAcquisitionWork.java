@@ -46,7 +46,7 @@ public interface IAcquisitionWork extends IWork {
 	
 	public int getId();
 	
-	public String find();
+	public String find(int transitDays);
 	
 	public String failToFind();
 	

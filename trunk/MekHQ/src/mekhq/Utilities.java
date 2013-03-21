@@ -32,8 +32,11 @@ import java.io.OutputStream;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Enumeration;
+import java.util.GregorianCalendar;
 import java.util.Vector;
 
 import megamek.common.Aero;
@@ -479,4 +482,8 @@ public class Utilities {
             }
         }
     }
+	
+	public static int getDaysBetween(Date date1, Date date2) {
+	    return (int) ((date2.getTime() - date1.getTime())/ (1000 * 60 * 60 * 24) );
+	}
 }

@@ -151,7 +151,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		}
 		//dont just return with the first part if it is damaged
 		for(Part part : campaign.getSpareParts()) {
-			if(part.isReservedForRefit() || part.isBeingWorkedOn() || part.isReservedForReplacement()) {
+			if(part.isReservedForRefit() || part.isBeingWorkedOn() || part.isReservedForReplacement() || !part.isPresent()) {
 				continue;
 			}
 			//TODO: check for being present
@@ -172,10 +172,11 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 
 	@Override
     public String getDetails() {
+	    String[] inventories = campaign.getPartInventory(getNewPart());
 		if(isReplacementAvailable()) {
 			return "Replacement part available";
 		} else {
-			return "<font color='red'>Replacement part not available</font>";
+			return "<font color='red'>No replacement (" + inventories[1] + " in transit, " + inventories[2] + " on order)</font>";
 		}
     }
 	
@@ -245,26 +246,25 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		
 		toReturn += ">";
 		toReturn += "<b>" + getAcquisitionName() + "</b> " + bonus + "<br/>";
-		IAcquisitionWork shoppingItem = campaign.getShoppingList().getShoppingItem(getNewPart());
-		if(shoppingItem != null) {
-		    toReturn += shoppingItem.getQuantity() + " parts on the shopping list.<br>";
-		}
+		String[] inventories = campaign.getPartInventory(getNewPart());
+		toReturn += inventories[1] + " in transit, " + inventories[2] + " on order<br>"; 
 		toReturn += Utilities.getCurrencyString(getNewPart().getActualValue()) + "<br/>";
 		toReturn += "</font></html>";
 		return toReturn;
 	}
 	
 	@Override
-	public String find() {
+	public String find(int transitDays) {
 		Part newPart = getNewPart();
+		newPart.setDaysToArrival(transitDays);
 		campaign.buyPart(newPart);
-		return "<font color='green'> part found.</font>";
+        return "<font color='green'><b> part found</b>.</font> It will be delivered in " + transitDays + " days.";
 	}
 	
 	@Override
 	public String failToFind() {
 	    resetDaysToWait();
-		return "<font color='red'> part not found.</font>";
+		return "<font color='red'><b> part not found</b>.</font>";
 	}
 	
 	@Override

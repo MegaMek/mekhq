@@ -1438,7 +1438,7 @@ public class CampaignGUI extends JPanel {
 
         TaskTable.setModel(taskModel);
         TaskTable.setName("TaskTable"); // NOI18N
-        TaskTable.setRowHeight(60);
+        TaskTable.setRowHeight(70);
         TaskTable.getColumnModel().getColumn(0)
                 .setCellRenderer(taskModel.getRenderer());
         TaskTable.getSelectionModel().addListSelectionListener(
@@ -1457,7 +1457,7 @@ public class CampaignGUI extends JPanel {
 
         AcquisitionTable.setModel(acquireModel);
         AcquisitionTable.setName("AcquisitionTable"); // NOI18N
-        AcquisitionTable.setRowHeight(60);
+        AcquisitionTable.setRowHeight(70);
         AcquisitionTable.getColumnModel().getColumn(0)
                 .setCellRenderer(acquireModel.getRenderer());
         AcquisitionTable.getSelectionModel().addListSelectionListener(

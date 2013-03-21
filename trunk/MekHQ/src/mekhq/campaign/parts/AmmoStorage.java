@@ -113,14 +113,10 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     }
     
     @Override
-    public boolean isSamePartTypeAndStatus (Part part) {
-    	if(needsFixing() || part.needsFixing()) {
-    		return false;
-    	}
+    public boolean isSamePartType(Part part) {
         return part instanceof AmmoStorage
-                      	&& ((AmmoType)getType()).getMunitionType() == ((AmmoType)((AmmoStorage)part).getType()).getMunitionType()
-                      	&& ((AmmoType)getType()).equals( (Object)((EquipmentPart)part).getType());
-    
+                && ((AmmoType)getType()).getMunitionType() == ((AmmoType)((AmmoStorage)part).getType()).getMunitionType()
+                && ((AmmoType)getType()).equals( (Object)((EquipmentPart)part).getType());
     }
     
     public void changeShots(int s) {
@@ -244,24 +240,26 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     }
 	
 	@Override
-    public String find() {
-        changeAmountAvailable(shots, (AmmoType)type);
-        if(campaign.getCampaignOptions().payForParts()) {
-            campaign.getFinances().debit(adjustCostsForCampaignOptions(getStickerPrice()), Transaction.C_EQUIP, "Purchase of " + getAcquisitionName(), campaign.calendar.getTime());
-        }
-        return "<font color='green'> part found.</font>";
+    public String find(int transitDays) {
+	    Part newPart = getNewPart();
+        newPart.setDaysToArrival(transitDays);
+        campaign.buyPart(newPart);
+        return "<font color='green'><b> part found</b>.</font> It will be delivered in " + transitDays + " days.";
     }
     
     @Override
     public String failToFind() {
         resetDaysToWait();
-        return "<font color='red'> part not found.</font>";
+        return "<font color='red'><b> part not found</b>.</font>";
     }
     
     public void changeAmountAvailable(int amount, AmmoType curType) {
         AmmoStorage a = null;
         long curMunition = curType.getMunitionType();
         for(Part part : campaign.getSpareParts()) {
+            if(!part.isPresent()) {
+                continue;
+            }
             if(part instanceof AmmoStorage 
                     && ((AmmoType)((AmmoStorage)part).getType()).equals((Object)curType)
                     && curMunition == ((AmmoType)((AmmoStorage)part).getType()).getMunitionType()) {
@@ -289,10 +287,8 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
         toReturn += ">";
         toReturn += "<b>" + type.getDesc() + "</b> " + bonus + "<br/>";
         toReturn += ((AmmoType)type).getShots() + " shots (1 ton)<br/>";
-        IAcquisitionWork shoppingItem = campaign.getShoppingList().getShoppingItem(getNewPart());
-        if(shoppingItem != null) {
-            toReturn += shoppingItem.getQuantity() + " parts on the shopping list.<br>";
-        }
+        String[] inventories = campaign.getPartInventory(getNewPart());
+        toReturn += inventories[1] + " in transit, " + inventories[2] + " on order<br>"; 
         toReturn += Utilities.getCurrencyString(getStickerPrice()) + "<br/>";
         toReturn += "</font></html>";
         return toReturn;
@@ -327,10 +323,23 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     }
     
     @Override
-    public String getShoppingListReport(int quantity) {
-        String report = "" + quantity + " ton of " + getName() + " has been added to the shopping list.";
-        if(quantity > 1) {
-            report = "" + quantity + " tons of" + getName() + " have been added to the shopping list.";
+    public String getQuantityName(int quan) {
+        int totalShots = quan * getShots();
+        String report = "" + totalShots + " shots of " + getName();
+        if(totalShots == 1) {
+            report = "" + totalShots + " shot of " + getName();
+        }
+        return report;
+    }
+    
+    @Override
+    public String getArrivalReport() {
+        double totalShots = quantity * getShots();
+        String report = getQuantityName(quantity);
+        if(totalShots == 1) {
+            report += " has arrived";
+        } else {
+            report += " have arrived";
         }
         return report;
     }
