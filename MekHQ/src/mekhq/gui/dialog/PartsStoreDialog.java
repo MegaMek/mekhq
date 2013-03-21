@@ -226,15 +226,20 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 		btnBuyBulk.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
             	addPart(true, true);
-            	partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(partsTable.getSelectedRow()), PartsTableModel.COL_QUEUE);
+                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(partsTable.getSelectedRow()), PartsTableModel.COL_TARGET);
+                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(partsTable.getSelectedRow()), PartsTableModel.COL_TRANSIT);
+                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(partsTable.getSelectedRow()), PartsTableModel.COL_SUPPLY);
+                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(partsTable.getSelectedRow()), PartsTableModel.COL_QUEUE);
             }
         });
 		btnBuy = new JButton(resourceMap.getString("btnBuy.text"));
 		btnBuy.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 addPart(true, false);
-                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(partsTable.getSelectedRow()), PartsTableModel.COL_QUEUE);
-            }
+                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(partsTable.getSelectedRow()), PartsTableModel.COL_TARGET);
+                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(partsTable.getSelectedRow()), PartsTableModel.COL_TRANSIT);
+                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(partsTable.getSelectedRow()), PartsTableModel.COL_SUPPLY);
+                partsModel.fireTableCellUpdated(partsTable.convertRowIndexToModel(partsTable.getSelectedRow()), PartsTableModel.COL_QUEUE);            }
         });
 		btnClose = new JButton(resourceMap.getString("btnClose.text"));
 		btnClose.addActionListener(new java.awt.event.ActionListener() {
@@ -248,7 +253,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 		panButtons.add(btnAdd, new GridBagConstraints());
 		panButtons.add(btnClose, new GridBagConstraints());
 		getContentPane().add(panButtons, BorderLayout.PAGE_END);		
-		this.setPreferredSize(new Dimension(650,600));
+		this.setPreferredSize(new Dimension(700,600));
         pack();
     }
     
@@ -328,7 +333,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 		if(purchase) {
 		    campaign.getShoppingList().addShoppingItem(selectedPart.clone(), quantity);
 		} else {
-		while(quantity > 0) {
+		    while(quantity > 0) {
 		        campaign.addPart(selectedPart.clone());
 		        quantity--;
 		    }
@@ -385,8 +390,10 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 		public final static int COL_COST     =   3;
 		public final static int COL_TON       =  4;
 	    public final static int COL_TARGET    =  5;
-	    public final static int COL_QUEUE    =  6;
-        public final static int N_COL          = 7;
+	    public final static int COL_SUPPLY    =  6;
+	    public final static int COL_TRANSIT   =  7;
+	    public final static int COL_QUEUE     =  8;
+        public final static int N_COL          = 9;
 		
 		public PartsTableModel(ArrayList<Part> inventory) {
 			data = inventory;
@@ -416,7 +423,11 @@ public class PartsStoreDialog extends javax.swing.JDialog {
                 case COL_TARGET:
                     return "Target";
                 case COL_QUEUE:
-                    return "# Queue";
+                    return "# Ordered";
+                case COL_SUPPLY:
+                    return "# Supply";
+                case COL_TRANSIT:
+                    return "# Transit";
                 default:
                     return "?";
             }
@@ -429,6 +440,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 	        } else {
 	        	part = (Part)data.get(row);
 	        }
+	        String[] inventories = campaign.getPartInventory(part);
 			if(col == COL_NAME) {
 				return part.getName();
 			}
@@ -460,13 +472,14 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 	                return "-";
 	            }
 			}
+			if(col == COL_SUPPLY) {
+                return inventories[0];
+            }
+			if(col == COL_TRANSIT) {
+                return inventories[1];
+            }
 			if(col == COL_QUEUE) {
-			    IAcquisitionWork acquire = campaign.getShoppingList().getShoppingItem(part);
-			    if(null != acquire) {
-			        return acquire.getQuantity();
-			    } else {
-			        return 0;
-			    }
+			    return inventories[2];
 			}
 			return "?";
 		}
@@ -498,10 +511,14 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 	            switch(c) {
 	            case COL_NAME:
 	            case COL_DETAIL:
-	        		return 120;
+	        		return 100;
 	            case COL_COST:
 	            case COL_TARGET:
-	                return 40;        
+	                return 40;  
+	            case COL_SUPPLY:
+	            case COL_TRANSIT:
+	            case COL_QUEUE:
+	                return 30;
 	            default:
 	                return 15;
 	            }

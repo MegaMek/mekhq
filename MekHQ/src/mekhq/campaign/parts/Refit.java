@@ -177,21 +177,20 @@ public class Refit implements IPartWork, IAcquisitionWork {
 	
 	public String[] getShoppingListDescription() {
 		Hashtable<String,Integer> tally = new Hashtable<String,Integer>();
+	    Hashtable<String,String> desc = new Hashtable<String,String>();
 		for(Part p : shoppingList) {
 			if(null != tally.get(p.getName())) {
 				tally.put(p.getName(), tally.get(p.getName()) + 1);
+				desc.put(p.getName(), p.getQuantityName(tally.get(p.getName())));
 			} else {
 				tally.put(p.getName(), 1);
+				desc.put(p.getName(), p.getQuantityName(1));
 			}
 		}
-		String[] descs = new String[tally.keySet().size()];
+		String[] descs = new String[desc.keySet().size()];
 		int i = 0;
-		for(String name : tally.keySet()) {
-			int quantity = tally.get(name);
-			if(quantity>1) {
-				name += "s";
-			}
-			descs[i] = quantity + " " + name;
+		for(String name : desc.keySet()) {
+			descs[i] = desc.get(name);
 			i++;
 		}
 		return descs;
@@ -766,6 +765,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 		}
 		checkForArmorSupplies();
 		Person admin = oldUnit.campaign.getLogisticsPerson();
+		//TODO: there should be a transit time here too
 		return oldUnit.campaign.acquirePart((IAcquisitionWork)this, admin);
 	}
 	
@@ -1396,7 +1396,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 	}
 
 	@Override
-	public String find() {
+	public String find(int transitDays) {
 		for(Part part : shoppingList) {
 			if(part instanceof Armor) {
 				oldUnit.campaign.addPart(part);

@@ -24,6 +24,7 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 
 import megamek.common.Aero;
+import megamek.common.AmmoType;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
@@ -140,7 +141,7 @@ public class Armor extends Part implements IAcquisitionWork {
 		toReturn += "</font></html>";
 		return toReturn;
 	}
-    
+  
     @Override
 	public String getDetails() {
 		if(null != unit) {
@@ -151,10 +152,11 @@ public class Armor extends Part implements IAcquisitionWork {
 			String availability = "";
 			int amountAvailable = getAmountAvailable();
 			if(!isSalvaging()) {
-				if(amountAvailable == 0) {
-					availability = "<br><font color='red'>No spare armor available</font>";
+			    String[] inventories = campaign.getPartInventory(getNewPart());
+				if(amountAvailable == 0) {			    
+					availability = "<br><font color='red'>No armor ("+ inventories[1] + " in transit, " + inventories[2] + " on order)</font>";
 				} else if(amountAvailable < amountNeeded) {
-					availability = "<br><font color='red'>Only " + amountAvailable + " points of armor available</font>";
+					availability = "<br><font color='red'>Only " + amountAvailable + " available ("+ inventories[1] + " in transit, " + inventories[2] + " on order)</font>";
 				}
 			}
 			return unit.getEntity().getLocationName(location) + rearMount + ", " + amountNeeded + " points" + availability;
@@ -204,7 +206,7 @@ public class Armor extends Part implements IAcquisitionWork {
     
     @Override
     public boolean isSameStatus(Part part) {
-    	return true;
+    	return this.getDaysToArrival() == part.getDaysToArrival();
     }
 
     @Override
@@ -404,18 +406,17 @@ public class Armor extends Part implements IAcquisitionWork {
 	}
 	
 	@Override
-	public String find() {
-		changeAmountAvailable((int)Math.round(5 * getArmorPointsPerTon()));
-		if(campaign.getCampaignOptions().payForParts()) {
-			campaign.getFinances().debit(adjustCostsForCampaignOptions(getStickerPrice()), Transaction.C_EQUIP, "Purchase of " + getName(), campaign.calendar.getTime());
-		}
-		return "<font color='green'><b> part found.</b></font>";
+	public String find(int transitDays) {
+	    Part newPart = getNewPart();
+        newPart.setDaysToArrival(transitDays);
+        campaign.buyPart(newPart);
+        return "<font color='green'><b> part found</b>.</font> It will be delivered in " + transitDays + " days.";
 	}
 	
 	@Override
 	public String failToFind() {
 	    resetDaysToWait();
-		return "<font color='red'><b> part not found.</b></font>";
+		return "<font color='red'><b> part not found</b>.</font>";
 	}
 
 	@Override
@@ -538,10 +539,9 @@ public class Armor extends Part implements IAcquisitionWork {
 		
 		toReturn += ">";
 		toReturn += "<b>" + getName() + "</b> " + bonus + "<br/>";
-		IAcquisitionWork shoppingItem = campaign.getShoppingList().getShoppingItem(getNewPart());
-        if(shoppingItem != null) {
-            toReturn += shoppingItem.getQuantity() + " parts on the shopping list.<br>";
-        }
+		toReturn += ((int)Math.round(getArmorPointsPerTon())) * 5 + " points (5 tons)<br/>";
+		String[] inventories = campaign.getPartInventory(getNewPart());
+        toReturn += inventories[1] + " in transit, " + inventories[2] + " on order<br>"; 
 		toReturn += Utilities.getCurrencyString(adjustCostsForCampaignOptions(getStickerPrice())) + "<br/>";
 		toReturn += "</font></html>";
 		return toReturn;
@@ -596,7 +596,7 @@ public class Armor extends Part implements IAcquisitionWork {
 		for(Part part : campaign.getSpareParts()) {
 			if(part instanceof Armor) {
 				Armor a = (Armor)part;
-				if(a.getType() == type && a.isClanTechBase() == clan && !a.isReservedForRefit()) {
+				if(a.getType() == type && a.isClanTechBase() == clan && !a.isReservedForRefit() && a.isPresent()) {
 					return a.getAmount();
 				}
 			}
@@ -609,7 +609,8 @@ public class Armor extends Part implements IAcquisitionWork {
 		for(Part part : campaign.getSpareParts()) {
 			if(part instanceof Armor && ((Armor)part).getType() == type 
 					&& ((Armor)part).isClanTechBase() == clan 
-					&& getRefitId() == part.getRefitId()) {
+					&& getRefitId() == part.getRefitId()
+					&& part.isPresent()) {
 				a = (Armor)part;				
 				a.setAmount(a.getAmount() + amount);
 				break;
@@ -659,7 +660,24 @@ public class Armor extends Part implements IAcquisitionWork {
     }
     
     @Override
-    public String getShoppingListReport(int quantity) {
-        return "" + quantity * 5 + " tons of" + getName() + " have been added to the shopping list.";
+    public String getQuantityName(int quan) {
+        double totalTon = quan * getTonnage();
+        String report = "" + totalTon + " tons of " + getName();
+        if(totalTon == 1.0) {
+            report = "" + totalTon + " ton of " + getName();
+        }
+        return report;
+    }
+    
+    @Override
+    public String getArrivalReport() {
+        double totalTon = quantity * getTonnage();
+        String report = getQuantityName(quantity);
+        if(totalTon == 1.0) {
+            report += " has arrived";
+        } else {
+            report += " have arrived";
+        }
+        return report;
     }
 }

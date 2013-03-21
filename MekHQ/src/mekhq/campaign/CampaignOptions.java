@@ -45,6 +45,12 @@ public class CampaignOptions implements Serializable {
 	public final static int TECH_EXPERIMENTAL = 3;
 	public final static int TECH_UNOFFICIAL   = 4;
 	
+	public final static int TRANSIT_UNIT_DAY   = 0;
+	public final static int TRANSIT_UNIT_WEEK  = 1;
+    public final static int TRANSIT_UNIT_MONTH = 2;
+    public final static int TRANSIT_UNIT_NUM   = 3;
+
+	
 	public final static String S_TECH = "Tech";
 	public final static String S_AUTO = "Automatic Success";
 	
@@ -96,6 +102,13 @@ public class CampaignOptions implements Serializable {
     private int waitingPeriod;
     private String acquisitionSkill;
     private boolean acquisitionSupportStaffOnly;
+    private int nDiceTransitTime;
+    private int constantTransitTime;
+    private int unitTransitTime;
+    private int acquireMosBonus;
+    private int acquireMosUnit;
+    private int acquireMinimumTime;
+    private int acquireMinimumTimeUnit;
     
     //xp related
     private int scenarioXP;
@@ -164,6 +177,14 @@ public class CampaignOptions implements Serializable {
         waitingPeriod = 7;
         acquisitionSkill = S_TECH;
         acquisitionSupportStaffOnly = true;
+        nDiceTransitTime = 1;
+        constantTransitTime = 0;
+        unitTransitTime = TRANSIT_UNIT_MONTH;
+        acquireMosBonus = 1;
+        acquireMosUnit = TRANSIT_UNIT_MONTH;
+        acquireMinimumTime = 1;
+        acquireMinimumTimeUnit = TRANSIT_UNIT_MONTH;
+        
     }
 
     public DragoonsRatingMethod getDragoonsRatingMethod() {
@@ -193,6 +214,19 @@ public class CampaignOptions implements Serializable {
     	default:
     		return "Unknown";	
     	}
+    }
+    
+    public static String getTransitUnitName(int unit) {
+        switch(unit) {
+        case TRANSIT_UNIT_DAY:
+            return "Days";
+        case TRANSIT_UNIT_WEEK:
+            return "Weeks";
+        case TRANSIT_UNIT_MONTH:
+            return "Months";
+        default:
+            return "Unknown";   
+        }
     }
     
     public boolean useFactionModifiers() {
@@ -546,6 +580,62 @@ public class CampaignOptions implements Serializable {
         return acquisitionSupportStaffOnly;
     }
    
+    public int getNDiceTransitTime() {
+        return nDiceTransitTime;
+    }
+    
+    public void setNDiceTransitTime(int d) {
+        nDiceTransitTime = d;
+    }
+    
+    public int getConstantTransitTime() {
+        return constantTransitTime;
+    }
+    
+    public void setConstantTransitTime(int d) {
+        constantTransitTime = d;
+    }
+    
+    public int getUnitTransitTime() {
+        return unitTransitTime;
+    }
+    
+    public void setUnitTransitTime(int d) {
+        unitTransitTime = d;
+    }
+    
+    public int getAcquireMosUnit() {
+        return acquireMosUnit;
+    }
+    
+    public void setAcquireMosUnit(int b) {
+        acquireMosUnit = b;
+    }
+    
+    public int getAcquireMosBonus() {
+        return acquireMosBonus;
+    }
+    
+    public void setAcquireMosBonus(int b) {
+        acquireMosBonus = b;
+    }
+    
+    public int getAcquireMinimumTimeUnit() {
+        return acquireMinimumTimeUnit;
+    }
+    
+    public void setAcquireMinimumTimeUnit(int b) {
+        acquireMinimumTimeUnit = b;
+    }
+    
+    public int getAcquireMinimumTime() {
+        return acquireMinimumTime;
+    }
+    
+    public void setAcquireMinimumTime(int b) {
+        acquireMinimumTime = b;
+    }
+    
 	public void writeToXml(PrintWriter pw1, int indent) {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "<campaignOptions>");
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useFactionModifiers", useFactionModifiers); //private boolean useFactionModifiers;
@@ -591,6 +681,15 @@ public class CampaignOptions implements Serializable {
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "acquisitionSkill", acquisitionSkill);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "acquisitionSupportStaffOnly", acquisitionSupportStaffOnly);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "techLevel", techLevel);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "nDiceTransitTime", nDiceTransitTime);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "constantTransitTime", constantTransitTime);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "unitTransitTime", unitTransitTime);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "acquireMosBonus", acquireMosBonus);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "acquireMosUnit", acquireMosUnit);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "acquireMinimumTime", acquireMinimumTime);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "acquireMinimumTimeUnit", acquireMinimumTimeUnit);
+
+
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<usePortraitForType>"
 				+Utilities.printBooleanArray(usePortraitForType)
@@ -744,6 +843,20 @@ public class CampaignOptions implements Serializable {
                 retVal.waitingPeriod = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("acquisitionSkill")) {
                 retVal.acquisitionSkill = wn2.getTextContent().trim();
+            } else if (wn2.getNodeName().equalsIgnoreCase("nDiceTransitTime")) {
+                retVal.nDiceTransitTime = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("constantTransitTime")) {
+                retVal.constantTransitTime = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("unitTransitTime")) {
+                retVal.unitTransitTime = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("acquireMosBonus")) {
+                retVal.acquireMosBonus = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("acquireMosUnit")) {
+                retVal.acquireMosUnit = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("acquireMinimumTime")) {
+                retVal.acquireMinimumTime = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("acquireMinimumTimeUnit")) {
+                retVal.acquireMinimumTimeUnit = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("acquisitionSupportStaffOnly")) {
                 if (wn2.getTextContent().equalsIgnoreCase("true"))
                     retVal.acquisitionSupportStaffOnly = true;

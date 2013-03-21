@@ -87,7 +87,6 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		return partTypeLabels;
 	}
 		
-	// TODO: how to track clan vs. inner sphere
 	protected String name;
 	protected int id;
 
@@ -126,6 +125,8 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 	//this tracks whether the part is reserved for a refit
 	protected UUID refitId;
 	protected UUID reserveId;
+	
+	//for delivery
 	protected int daysToArrival;
 	
 	//all parts need a reference to campaign
@@ -273,6 +274,14 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		if(isBeingWorkedOn()) {
 			toReturn = "Being worked on";
 		}
+		if(!isPresent()) {
+            //toReturn = "" + getDaysToArrival() + " days to arrival";
+		    String dayName = "day";
+		    if(getDaysToArrival() > 1) {
+		        dayName += "s";
+		    }
+            toReturn = "In transit (" + getDaysToArrival() + " " + dayName + ")";
+        }
 		return toReturn;
 	}
 	
@@ -331,8 +340,6 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		return toReturn;
 	}
 	
-	//TODO: these two methods need to be abstract so that we HAVE to 
-	//define them for each kind of part
 	public abstract int getTechRating();
 	
 	public abstract int getAvailability(int era);
@@ -388,7 +395,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 				|| part.isReservedForRefit() || part.isBeingWorkedOn() || part.isReservedForReplacement()) {
     		return false;
     	}
-		return hits == part.getHits() && part.getSkillMin() == this.getSkillMin();
+		return hits == part.getHits() && part.getSkillMin() == this.getSkillMin() && this.getDaysToArrival() == part.getDaysToArrival();
 	}
 	
 	/**
@@ -860,10 +867,12 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		return daysToArrival;
 	}
 	
-	public void newDay() {
+	public boolean checkArrival() {
 		if(daysToArrival > 0) {
 			daysToArrival--;
+			return (daysToArrival == 0);
 		}
+		return false;
 	}
 	
 	public boolean isPresent() {
@@ -942,12 +951,20 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
         daysToWait--;
     }
     
-    public String getShoppingListReport(int quantity) {
-        String report = "" + quantity + " " + getName() + " has been added to the shopping list.";
+    public String getShoppingListReport(int quan) {
+        return getQuantityName(quan) + ((quan > 1) ? " have " : " has ") + "been added to the shopping list.";
+    }
+    
+    public String getArrivalReport() {
+        return getQuantityName(quantity) + ((quantity > 1) ? " have " : " has ") + "arrived";
+    }
+    
+    public String getQuantityName(int quantity) {
+        String answer = "" + quantity + " " + getName();
         if(quantity > 1) {
-            report = "" + quantity + " " + getName() + "s have been added to the shopping list.";
+            answer += "s";
         }
-        return report;
+        return answer;
     }
 }
 

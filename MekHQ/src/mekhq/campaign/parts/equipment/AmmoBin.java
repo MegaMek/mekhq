@@ -282,7 +282,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 	}
 	
 	@Override
-	public String find() {
+	public String find(int transitDays) {
 		return "<font color='red'> You shouldn't be here (AmmoBin.find()).</font>";
 	}
 	
@@ -381,7 +381,8 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     	}
     	return  part instanceof AmmoBin
                         && getType().equals( ((AmmoBin)part).getType() )
-                        && ((AmmoBin)part).isOneShot() == oneShot;
+                        && ((AmmoBin)part).isOneShot() == oneShot
+                        && this.getDaysToArrival() == part.getDaysToArrival();
     }
 
 	@Override
@@ -415,10 +416,11 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     	if(null != unit) {
     		String availability = "";
     		int shotsAvailable = getAmountAvailable();		
+            String[] inventories = campaign.getPartInventory(getNewPart());
     		if(shotsAvailable == 0) {
-    			availability = ", <font color='red'>No ammo available</font>";
+                availability = "<br><font color='red'>No ammo ("+ inventories[1] + " in transit, " + inventories[2] + " on order)</font>";
     		} else if(shotsAvailable < shotsNeeded) {
-    			availability = ", <font color='red'>Only " + shotsAvailable + " shots available</font>";
+                availability = "<br><font color='red'>Only " + shotsAvailable + " available ("+ inventories[1] + " in transit, " + inventories[2] + " on order)</font>";
     		}
 			return ((AmmoType)type).getDesc() + ", " + shotsNeeded + " shots needed" + availability;
     	} else {
@@ -438,6 +440,9 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 		AmmoStorage a = null;
 		long curMunition = curType.getMunitionType();
 		for(Part part : campaign.getSpareParts()) {
+		    if(!part.isPresent()) {
+                continue;
+            }
 			if(part instanceof AmmoStorage 
 					&& ((AmmoType)((AmmoStorage)part).getType()).equals((Object)curType)
                   	&& curMunition == ((AmmoType)((AmmoStorage)part).getType()).getMunitionType()) {
@@ -455,6 +460,9 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 	
 	public int getAmountAvailable() {
 		for(Part part : campaign.getSpareParts()) {
+		    if(!part.isPresent()) {
+		        continue;
+		    }
 			if(part instanceof AmmoStorage) {
 				AmmoStorage a = (AmmoStorage)part;
 				if(((AmmoType)((AmmoStorage)a).getType()).equals((Object)getType())
@@ -482,10 +490,8 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 		toReturn += ">";
 		toReturn += "<b>" + type.getDesc() + "</b> " + bonus + "<br/>";
 		toReturn += ((AmmoType)type).getShots() + " shots (1 ton)<br/>";
-		IAcquisitionWork shoppingItem = campaign.getShoppingList().getShoppingItem(getNewPart());
-        if(shoppingItem != null) {
-            toReturn += shoppingItem.getQuantity() + " parts on the shopping list.<br>";
-        }
+		String[] inventories = campaign.getPartInventory(getNewPart());
+        toReturn += inventories[1] + " in transit, " + inventories[2] + " on order<br>"; 
 		toReturn += Utilities.getCurrencyString(getStickerPrice()) + "<br/>";
 		toReturn += "</font></html>";
 		return toReturn;

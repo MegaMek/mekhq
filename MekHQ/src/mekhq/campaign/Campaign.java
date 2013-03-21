@@ -629,36 +629,26 @@ public class Campaign implements Serializable {
 		if(p instanceof MissingPart && (null == p.getUnit() || null == p.getUnitId())) {
 			return;
 		}
-		if(p instanceof Armor && null == p.getUnit()) {
-			for(Part part : getParts()) {
-				if(null != part.getUnit()) {
-					continue;
-				}
-				if(part.isSamePartTypeAndStatus(p)) {
-					((Armor)part).setAmount(((Armor)part).getAmount() + ((Armor)p).getAmount());
-					updateAllArmorForNewSpares();
-					return;
-				}
-			}
-		}
-		if(p instanceof AmmoStorage && null == p.getUnit()) {
-			for(Part part : getParts()) {
-				if(null != part.getUnit()) {
-					continue;
-				}
-				if(part.isSamePartTypeAndStatus(p)) {
-					((AmmoStorage)part).changeShots(((AmmoStorage)p).getShots());
-					return;
-				}
-			}
-		}
-		Part spare = checkForExistingSparePart(p);
-		if(!p.isReservedForRefit() && !p.isBeingWorkedOn() && !p.isReservedForReplacement()
-				&& null == p.getUnit() && null != spare) {
-			spare.incrementQuantity();
-			return;
-		}
-		
+        Part spare = checkForExistingSparePart(p);
+		if(null == p.getUnit() && null != spare) {
+    		if(p instanceof Armor) {
+    			if(spare instanceof Armor) {
+    			    ((Armor)spare).setAmount(((Armor)spare).getAmount() + ((Armor)p).getAmount());
+    			    updateAllArmorForNewSpares();
+    			    return;
+    			}
+    		}
+    		else if(p instanceof AmmoStorage) {   			
+    		    if(spare instanceof AmmoStorage) {
+    		        ((AmmoStorage)spare).changeShots(((AmmoStorage)p).getShots());
+    		        return;
+    		    }
+    		}
+    		else {
+    		    spare.incrementQuantity();
+    		    return;
+    		}
+		}		
 		int id = lastPartId + 1;
 		p.setId(id);
 		parts.add(p);
@@ -667,6 +657,52 @@ public class Campaign implements Serializable {
 		if(p instanceof Armor) {
 			updateAllArmorForNewSpares();
 		}
+	}
+	
+	/**
+	 * This is similar to addPart, but we just check to see if this part can be added
+	 * to an existing part, without actually adding it to the campaign (because its already
+	 * there). Should be called up when a part goes from 1 daysToArrival to zero.
+	 * @param p
+	 */
+	public void arrivePart(Part p) {
+	    if(null != p.getUnit()) {
+	        return;
+	    }
+	    addReport(p.getArrivalReport());
+	    int quantity = p.getQuantity();
+        Part spare = checkForExistingSparePart(p);
+        if(null != spare) {
+    	    if(p instanceof Armor) {
+    	        if(spare instanceof Armor) {
+        	        while(quantity > 0) {
+        	            ((Armor)spare).setAmount(((Armor)spare).getAmount() + ((Armor)p).getAmount());
+        	            quantity--;
+        	        }
+                    updateAllArmorForNewSpares();
+        	        removePart(p);
+    	        }
+    	    }
+    	    else if(p instanceof AmmoStorage) {
+                if(spare instanceof AmmoStorage) {
+                    while(quantity > 0) {
+                        ((AmmoStorage)spare).changeShots(((AmmoStorage)p).getShots());
+                        quantity--;
+                    }
+                    removePart(p);
+                }
+    	    }
+    	    else {
+    	        while(quantity > 0) {
+    	            spare.incrementQuantity();
+    	            quantity--;
+    	        }
+    	        removePart(p);
+    	    }
+        }
+        else if(p instanceof Armor) {
+            updateAllArmorForNewSpares();
+        }
 	}
 	
 	/**
@@ -908,7 +944,8 @@ public class Campaign implements Serializable {
 		report += "  needs " + target.getValueAsString();
 		report += " and rolls " + roll + ":";		
 		if(roll >= target.getValue()) {
-			report = report + acquisition.find();	
+		    int transitDays = calculatePartTransitTime(roll - target.getValue());
+			report = report + acquisition.find(transitDays);
 			found = true;
 		} else {
 			report = report + acquisition.failToFind();
@@ -1123,11 +1160,21 @@ public class Campaign implements Serializable {
 		//need to check for assigned tasks in two steps to avoid
 		//concurrent mod problems
 		ArrayList<Integer> assignedPartIds = new ArrayList<Integer>();
+		ArrayList<Integer> arrivedPartIds = new ArrayList<Integer>();
 		for(Part part : getParts()) {
 			if(part.getAssignedTeamId() != null) {
 				assignedPartIds.add(part.getId());
 			}
+			if(part.checkArrival()) {
+			    arrivedPartIds.add(part.getId());
+			}
 		}
+		for(int pid : arrivedPartIds) {
+		    Part part = getPart(pid);
+            if(null != part) {
+                arrivePart(part);
+            }
+		}		
 		for(int pid : assignedPartIds) {
 			Part part = getPart(pid);
 			if(null != part) {
@@ -4279,4 +4326,129 @@ public class Campaign implements Serializable {
     	
     }
  
+    
+    public int calculatePartTransitTime(int mos) {
+        int nDice = getCampaignOptions().getNDiceTransitTime();
+        int time = getCampaignOptions().getConstantTransitTime();
+        if(nDice > 0) {
+            time += Compute.d6(nDice);
+        }
+        //now step forward through the calendar
+        GregorianCalendar arrivalDate = (GregorianCalendar)calendar.clone();
+        switch(getCampaignOptions().getUnitTransitTime()) {
+        case CampaignOptions.TRANSIT_UNIT_MONTH:
+            arrivalDate.add(Calendar.MONTH, time);
+            break;
+        case CampaignOptions.TRANSIT_UNIT_WEEK:
+            arrivalDate.add(Calendar.WEEK_OF_YEAR, time);
+            break;
+        case CampaignOptions.TRANSIT_UNIT_DAY:
+        default:
+            arrivalDate.add(Calendar.DAY_OF_MONTH, time);
+        }
+        
+        //now adjust for MoS and minimums
+        int mosBonus = getCampaignOptions().getAcquireMosBonus() * mos;
+        switch(getCampaignOptions().getAcquireMosUnit()) {
+        case CampaignOptions.TRANSIT_UNIT_MONTH:
+            arrivalDate.add(Calendar.MONTH, -1 * mosBonus);
+            break;
+        case CampaignOptions.TRANSIT_UNIT_WEEK:
+            arrivalDate.add(Calendar.WEEK_OF_YEAR, -1 * mosBonus);
+            break;
+        case CampaignOptions.TRANSIT_UNIT_DAY:
+        default:
+            arrivalDate.add(Calendar.DAY_OF_MONTH, -1 * mosBonus);
+        }
+        //now establish minimum date and if this is before 
+        GregorianCalendar minimumDate = (GregorianCalendar)calendar.clone();
+        switch(getCampaignOptions().getAcquireMinimumTimeUnit()) {
+        case CampaignOptions.TRANSIT_UNIT_MONTH:
+            minimumDate.add(Calendar.MONTH, getCampaignOptions().getAcquireMinimumTime());
+            break;
+        case CampaignOptions.TRANSIT_UNIT_WEEK:
+            minimumDate.add(Calendar.WEEK_OF_YEAR, getCampaignOptions().getAcquireMinimumTime());
+            break;
+        case CampaignOptions.TRANSIT_UNIT_DAY:
+        default:
+            minimumDate.add(Calendar.DAY_OF_MONTH, getCampaignOptions().getAcquireMinimumTime());
+        }
+        
+        if(arrivalDate.before(minimumDate)) {
+            return Utilities.getDaysBetween(calendar.getTime(),minimumDate.getTime());
+        } else {
+            return Utilities.getDaysBetween(calendar.getTime(),arrivalDate.getTime());
+        }
+        
+    }
+    
+    /**
+     * This returns a String array of length three, with the following values
+     *  0 - the number of parts of this type, or armor points, or ammo shots currently in stock
+     *  1 - the number of parts of this type, or armor points, or ammo shots currently in transit
+     *  2 - the number of parts of this type, or armor points, or ammo shots currently on order
+     * @param part
+     * @return
+     */
+    public String[] getPartInventory(Part part) {
+        String[] inventories = new String[3];
+        
+        int nSupply = 0;
+        int nTransit = 0;
+        for(Part p : getParts()) {
+            if(!p.isSpare()) {
+                continue;
+            }
+            if(part.isSamePartType(p)) {
+                if(p.isPresent()) {
+                    if(p instanceof Armor) {
+                        nSupply += ((Armor)p).getAmount();
+                    } else if(p instanceof AmmoStorage) {
+                        nSupply += ((AmmoStorage)p).getShots();
+                    } else {
+                        nSupply += p.getQuantity();
+                    }
+                } else {
+                    if(p instanceof Armor) {
+                        nTransit += ((Armor)p).getAmount();
+                    } else if(p instanceof AmmoStorage) {
+                        nTransit += ((AmmoStorage)p).getShots();
+                    } else {
+                        nTransit += p.getQuantity();
+                    }
+                }
+            }
+        }
+        
+        int nOrdered = 0;
+        IAcquisitionWork onOrder = getShoppingList().getShoppingItem(part);
+        if(null != onOrder) {
+            if(onOrder instanceof Armor) {
+                nOrdered += ((Armor)onOrder).getAmount();
+            } else if(onOrder instanceof AmmoStorage) {
+                nOrdered += ((AmmoStorage)onOrder).getShots();
+            } else {
+                nOrdered += onOrder.getQuantity();
+            }
+        }
+        
+        String strSupply = Integer.toString(nSupply);
+        String strTransit = Integer.toString(nTransit);
+        String strOrdered = Integer.toString(nOrdered);
+
+        if(part instanceof Armor) {
+            strSupply += " points";
+            strTransit += " points";
+            strOrdered += " points";
+        }
+        if(part instanceof AmmoStorage) {
+            strSupply += " shots";
+            strTransit += " shots";
+            strOrdered += " shots";
+        }
+        inventories[0] = strSupply;
+        inventories[1] = strTransit;
+        inventories[2] = strOrdered;
+        return inventories;
+    }
 }
