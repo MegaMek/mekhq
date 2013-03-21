@@ -4451,4 +4451,44 @@ public class Campaign implements Serializable {
         inventories[2] = strOrdered;
         return inventories;
     }
+    
+    /**
+     * Calculate the total value of units in the TO&E. This serves as the basis
+     * for contract payments in the StellarOps Beta. 
+     * For the moment, we will base this on sell value, but we should make that customizable 
+     * in concert with the basis for BLC (see Ticket #260). We will also 
+     * skip large craft for the moment, until we get clarification on how 
+     * to incorporate them via StellarOps
+     * @return
+     */
+    public long getForceValue() {
+        long value = 0;
+        for(UUID uuid : forces.getAllUnits()) {
+            Unit u = getUnit(uuid);
+            if(null == u) {
+                continue;
+            }
+            //lets exclude dropships and jumpships
+            if(u.getEntity() instanceof Dropship || u.getEntity() instanceof Jumpship) {
+                continue;
+            }
+            //we will assume sale value for now, but make this customizable
+            if(getCampaignOptions().useEquipmentContractSaleValue()) {
+                value += u.getSellValue();
+            } else {
+                value += u.getBuyCost();
+            }
+        }
+        return value;
+    }
+    
+    public long getContractBase() {
+        if(getCampaignOptions().useEquipmentContractBase()) {
+            return (long)((getCampaignOptions().getEquipmentContractPercent()/100.0) * getForceValue());
+        }
+        else {
+            return getPayRoll();
+        }
+    }
+    
 }

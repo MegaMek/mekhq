@@ -98,6 +98,12 @@ public class CampaignOptions implements Serializable {
     private double usedPartsValue;
     private double damagedPartsValue;
 
+    //contract related
+    private boolean equipmentContractBase;
+    private double equipmentContractPercent;
+    private boolean equipmentContractSaleValue;
+    private boolean blcSaleValue;
+    
     //acquisition related
     private int waitingPeriod;
     private String acquisitionSkill;
@@ -184,6 +190,10 @@ public class CampaignOptions implements Serializable {
         acquireMosUnit = TRANSIT_UNIT_MONTH;
         acquireMinimumTime = 1;
         acquireMinimumTimeUnit = TRANSIT_UNIT_MONTH;
+        equipmentContractBase = false;
+        equipmentContractPercent = 5.0;
+        equipmentContractSaleValue = false;
+        blcSaleValue = false;
         
     }
 
@@ -636,6 +646,38 @@ public class CampaignOptions implements Serializable {
         acquireMinimumTime = b;
     }
     
+    public double getEquipmentContractPercent() {
+        return equipmentContractPercent;
+    }
+    
+    public void setEquipmentContractPercent(double b) {
+        equipmentContractPercent = b;
+    }
+    
+    public boolean useEquipmentContractBase() {
+        return equipmentContractBase;
+    }
+    
+    public void setEquipmentContractBase(boolean b) {
+        this.equipmentContractBase = b;
+    }
+    
+    public boolean useEquipmentContractSaleValue() {
+        return equipmentContractSaleValue;
+    }
+    
+    public void setEquipmentContractSaleValue(boolean b) {
+        this.equipmentContractSaleValue = b;
+    }
+    
+    public boolean useBLCSaleValue() {
+        return blcSaleValue;
+    }
+    
+    public void setBLCSaleValue(boolean b) {
+        this.blcSaleValue = b;
+    }
+    
 	public void writeToXml(PrintWriter pw1, int indent) {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "<campaignOptions>");
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useFactionModifiers", useFactionModifiers); //private boolean useFactionModifiers;
@@ -688,7 +730,10 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "acquireMosUnit", acquireMosUnit);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "acquireMinimumTime", acquireMinimumTime);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "acquireMinimumTimeUnit", acquireMinimumTimeUnit);
-
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "equipmentContractPercent", equipmentContractPercent);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "equipmentContractBase", equipmentContractBase);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "equipmentContractSaleValue", equipmentContractSaleValue);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "blcSaleValue", blcSaleValue);
 
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<usePortraitForType>"
@@ -857,6 +902,23 @@ public class CampaignOptions implements Serializable {
                 retVal.acquireMinimumTime = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("acquireMinimumTimeUnit")) {
                 retVal.acquireMinimumTimeUnit = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("equipmentContractPercent")) {
+                retVal.equipmentContractPercent = Double.parseDouble(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("equipmentContractBase")) {
+                if (wn2.getTextContent().equalsIgnoreCase("true"))
+                    retVal.equipmentContractBase = true;
+                else
+                    retVal.equipmentContractBase = false;
+            } else if (wn2.getNodeName().equalsIgnoreCase("equipmentContractSaleValue")) {
+                if (wn2.getTextContent().equalsIgnoreCase("true"))
+                    retVal.equipmentContractSaleValue = true;
+                else
+                    retVal.equipmentContractSaleValue = false;
+            } else if (wn2.getNodeName().equalsIgnoreCase("blcSaleValue")) {
+                if (wn2.getTextContent().equalsIgnoreCase("true"))
+                    retVal.blcSaleValue = true;
+                else
+                    retVal.blcSaleValue = false;
             } else if (wn2.getNodeName().equalsIgnoreCase("acquisitionSupportStaffOnly")) {
                 if (wn2.getTextContent().equalsIgnoreCase("true"))
                     retVal.acquisitionSupportStaffOnly = true;

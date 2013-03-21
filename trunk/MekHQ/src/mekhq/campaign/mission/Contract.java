@@ -104,7 +104,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 		this.employer = employer;
 		
 		this.nMonths = 12;
-		this.paymentMultiplier = 5.0;
+		this.paymentMultiplier = 2.0;
 		this.commandRights = COM_HOUSE;
 		this.overheadComp = OH_NONE;
 		this.straightSupport = 50;
@@ -367,7 +367,7 @@ public class Contract extends Mission implements Serializable, MekHqXmlSerializa
 	public void calculateContract(Campaign c) {
 		
 		//calculate base amount
-		baseAmount = (long)(paymentMultiplier * getLength() * c.getPayRoll());
+		baseAmount = (long)(paymentMultiplier * getLength() * c.getContractBase());
 		
 		//calculate overhead
 		switch(overheadComp) {
