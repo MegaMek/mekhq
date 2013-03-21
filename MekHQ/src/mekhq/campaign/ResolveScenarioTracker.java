@@ -673,7 +673,13 @@ public class ResolveScenarioTracker {
 			if(null == en) {
 				//missing unit
 				if(blc > 0) {
-					long value = (long)(blc * unit.getSellValue());
+				    long unitValue = 0;
+				    if(campaign.getCampaignOptions().useBLCSaleValue()) {
+				        unitValue = unit.getSellValue();
+				    } else {
+				        unitValue = unit.getBuyCost();
+				    }
+					long value = (long)(blc * unitValue);
 					campaign.getFinances().credit(value, Transaction.C_BLC, "Battle loss compensation for " + unit.getName(), campaign.getCalendar().getTime());
 					DecimalFormat formatter = new DecimalFormat();
 					campaign.addReport(formatter.format(value) + " in battle loss compensation for " + unit.getName() + " has been credited to your account.");

@@ -36,6 +36,7 @@ import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
+import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
@@ -43,6 +44,7 @@ import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
@@ -123,6 +125,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private javax.swing.JPanel panTech;
     private javax.swing.JPanel panPersonnel;
     private javax.swing.JPanel panFinances;
+    private javax.swing.JPanel panMercenary;
     private javax.swing.JPanel panNameGen;
     private javax.swing.JPanel panXP;
     private javax.swing.JPanel panRank;
@@ -152,6 +155,13 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private javax.swing.JCheckBox sellUnitsBox;
     private javax.swing.JCheckBox sellPartsBox;
     
+    private JRadioButton btnContractEquipment;
+    private JRadioButton btnContractPersonnel;
+    private JSpinner spnEquipPercent;
+    private JCheckBox chkEquipContractSaleValue;
+    private JCheckBox chkBLCSaleValue;
+
+
     private javax.swing.JTextArea textRanks;
     private javax.swing.JScrollPane scrRanks;
     
@@ -318,6 +328,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panRepair = new javax.swing.JPanel();
         panPersonnel = new javax.swing.JPanel();
         panFinances = new javax.swing.JPanel();
+        panMercenary = new javax.swing.JPanel();
         panNameGen = new javax.swing.JPanel();
         panRank = new javax.swing.JPanel();
         panXP = new javax.swing.JPanel();
@@ -1002,6 +1013,76 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panFinances.add(damagedPartsValueJFormattedTextField, gridBagConstraints);
         
         tabOptions.addTab(resourceMap.getString("panFinances.TabConstraints.tabTitle"), panFinances); // NOI18N
+        
+        panMercenary.setName("panMercenary"); // NOI18N
+        panMercenary.setLayout(new java.awt.GridBagLayout());
+        
+        btnContractEquipment = new JRadioButton("Base contract payment on percentage of TO&E unit value (StellarOps Beta)");
+        btnContractPersonnel = new JRadioButton("Base contract payment on personnel payroll (FMMr)");
+
+        if(options.useEquipmentContractBase()) {
+            btnContractEquipment.setSelected(true);
+        } else {
+            btnContractPersonnel.setSelected(true);
+        }
+        
+        spnEquipPercent = new JSpinner(new SpinnerNumberModel(options.getEquipmentContractPercent(), 0.1, 20, 0.1));
+        ((JSpinner.DefaultEditor)spnEquipPercent.getEditor()).getTextField().setEditable(false);
+
+        ButtonGroup groupContract = new ButtonGroup();
+        groupContract.add(btnContractEquipment);
+        groupContract.add(btnContractPersonnel);
+        
+        chkEquipContractSaleValue = new JCheckBox("Base on equipment sale value");
+        chkEquipContractSaleValue.setSelected(options.useEquipmentContractSaleValue());
+        chkBLCSaleValue = new JCheckBox("Base battle loss compensation on equipment sale value");
+        chkBLCSaleValue.setSelected(options.useBLCSaleValue());
+        
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panMercenary.add(btnContractEquipment, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.insets = new Insets(5,30,5,5);
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panMercenary.add(new JLabel("Percent:"), gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        //gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panMercenary.add(spnEquipPercent, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        //gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panMercenary.add(chkEquipContractSaleValue, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 3;
+        //gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panMercenary.add(btnContractPersonnel, gridBagConstraints);
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridwidth = 3;
+        //gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panMercenary.add(chkBLCSaleValue, gridBagConstraints);
+
+        tabOptions.addTab(resourceMap.getString("panMercenary.TabConstraints.tabTitle"), panMercenary); // NOI18N
         
         panXP.setName("panXP"); // NOI18N
         panXP.setLayout(new java.awt.GridBagLayout());
@@ -2072,6 +2153,11 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 	    options.setSellUnits(sellUnitsBox.isSelected());
 	    options.setSellParts(sellPartsBox.isSelected());
 	
+	    options.setEquipmentContractBase(btnContractEquipment.isSelected());
+	    options.setEquipmentContractPercent((Double)spnEquipPercent.getModel().getValue());
+	    options.setEquipmentContractSaleValue(chkEquipContractSaleValue.isSelected());
+        options.setBLCSaleValue(chkBLCSaleValue.isSelected());
+        
 	    options.setQuirks(useQuirksBox.isSelected());
 		campaign.getGameOptions().getOption("stratops_quirks").setValue(useQuirksBox.isSelected());
 	    
