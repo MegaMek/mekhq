@@ -1397,6 +1397,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 
 	@Override
 	public String find(int transitDays) {
+	    //TODO: check somewhere before this if they can afford it
 		for(Part part : shoppingList) {
 			if(part instanceof Armor) {
 				oldUnit.campaign.addPart(part);

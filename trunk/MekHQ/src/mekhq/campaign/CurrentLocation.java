@@ -153,10 +153,13 @@ public class CurrentLocation implements Serializable {
 			}
 			if(isAtJumpPoint() && rechargeTime >= currentPlanet.getRechargeTime()) {
 				//jump
-				campaign.addReport("Jumping to " + jumpPath.get(1).getShortName());
-				if(campaign.getCampaignOptions().payForTransport()) {
-					campaign.getFinances().debit(campaign.calculateCostPerJump(true), Transaction.C_TRANSPORT, "jump from " + currentPlanet.getName() + " to " + jumpPath.get(1).getName(), campaign.getCalendar().getTime());
+				if(campaign.getCampaignOptions().payForTransport()) {				    
+					if(!campaign.getFinances().debit(campaign.calculateCostPerJump(true), Transaction.C_TRANSPORT, "jump from " + currentPlanet.getName() + " to " + jumpPath.get(1).getName(), campaign.getCalendar().getTime())) {
+					    campaign.addReport("<font color='red'><b>You cannot afford to make the jump!</b></font>");
+					    return;
+					}
 				}
+                campaign.addReport("Jumping to " + jumpPath.get(1).getShortName());
 				currentPlanet = jumpPath.get(1);
 				jumpPath.removeFirstPlanet();
 				//reduce remaining hours by usedRechargeTime or usedTransitTime, whichever is greater

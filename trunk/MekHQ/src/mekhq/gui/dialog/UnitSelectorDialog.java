@@ -24,6 +24,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.RowFilter;
@@ -365,7 +366,13 @@ public class UnitSelectorDialog extends JDialog {
 	private void btnBuyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuyActionPerformed
 	    Entity en = getSelectedEntity();
 	    if(null != en) {
-	        campaign.buyUnit(en);
+	        if(!campaign.buyUnit(en)) {
+	            JOptionPane.showMessageDialog(null,
+	                    "You cannot afford to buy " + en.getDisplayName(),
+	                    "You Can't Afford It",
+	                    JOptionPane.ERROR_MESSAGE);
+	            return;
+	        }
 	        hqView.refreshUnitList();
 	        hqView.refreshServicedUnitList();
 	        hqView.refreshFinancialTransactions();

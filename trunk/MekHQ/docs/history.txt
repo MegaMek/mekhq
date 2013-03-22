@@ -17,6 +17,7 @@ v0.3.0 (SVN)
 + Data 1: Additional Force Icons
 + Dylan's Force Icons
 + Loans
++ disallow negative funds (take out loans instead) - still need to implement loan default
 
 v0.2.0 (2013-03-16)
 + Bug 318: Dragoon's Rating error FMM:R method
