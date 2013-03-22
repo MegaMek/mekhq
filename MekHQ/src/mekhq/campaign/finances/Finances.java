@@ -22,9 +22,11 @@ package mekhq.campaign.finances;
 
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
 
 import org.w3c.dom.Node;
@@ -42,9 +44,12 @@ public class Finances implements Serializable {
 	private static final long serialVersionUID = 8533117455496219692L;
 	
 	private ArrayList<Transaction> transactions;
+	private ArrayList<Loan> loans;
+
 	
 	public Finances() {
 		transactions = new ArrayList<Transaction>();
+	    loans = new ArrayList<Loan>();
 	}
 	
 	public long getBalance() {
@@ -88,6 +93,9 @@ public class Finances implements Serializable {
 		for(Transaction trans : transactions) {
 			trans.writeToXml(pw1, indent+1);
 		}
+		for(Loan loan : loans) {
+            loan.writeToXml(pw1, indent+1);
+        }
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "</finances>");
 	}
 	
@@ -99,8 +107,32 @@ public class Finances implements Serializable {
 			 if (wn2.getNodeName().equalsIgnoreCase("transaction")) {
 				 retVal.transactions.add(Transaction.generateInstanceFromXML(wn2));
 			 }
+			 if (wn2.getNodeName().equalsIgnoreCase("loan")) {
+                 retVal.loans.add(Loan.generateInstanceFromXML(wn2));
+             }
 		}
 		
 		return retVal;
+	}
+	
+	public void addLoan(Loan loan) {
+	    loans.add(loan);
+	}
+	
+	public void newDay(Campaign campaign, DecimalFormat formatter) {
+	    ArrayList<Loan> newLoans = new ArrayList<Loan>();
+	    for(Loan loan : loans) {
+	        if(loan.checkLoanPayment(campaign.getCalendar())) {
+	           debit(loan.getPaymentAmount(), Transaction.C_MISC, "loan payment", campaign.getCalendar().getTime());
+               campaign.addReport("Your account has been debited for " + formatter.format(loan.getPaymentAmount()) + " C-bills in loan payments");
+	           loan.paidLoan();
+	        }
+	        if(loan.getRemainingPayments() > 0) {
+	            newLoans.add(loan);
+	        } else {
+	            campaign.addReport("You have fully paid off loan " + loan.getDescription());
+	        }
+	    }
+	    loans = newLoans;
 	}
 }

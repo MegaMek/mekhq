@@ -45,6 +45,8 @@ public interface IDragoonsRating {
 
     public void reInitialize();
 
+    //TODO: some of these methods should be static functions
+    
     /**
      * Returns the static constant representation of the passed in Dragoon's rating.
      *
@@ -53,6 +55,14 @@ public interface IDragoonsRating {
      */
     public int getDragoonRating(int score);
 
+    /**
+     * Returns the static constant representation of the passed in Dragoon's rating as an integer.
+     *
+     * @param score The total Dragoon's score.
+     * @return
+     */
+    public int getDragoonsRatingAsInteger();
+    
     /**
      * Returns the letter code of the passed in Dragoon's rating.
      *

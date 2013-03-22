@@ -203,6 +203,7 @@ import mekhq.gui.dialog.HireBulkPersonnelDialog;
 import mekhq.gui.dialog.KillDialog;
 import mekhq.gui.dialog.MekHQAboutBox;
 import mekhq.gui.dialog.MissionTypeDialog;
+import mekhq.gui.dialog.NewLoanDialog;
 import mekhq.gui.dialog.NewRecruitDialog;
 import mekhq.gui.dialog.PartsStoreDialog;
 import mekhq.gui.dialog.PopupValueChoiceDialog;
@@ -445,6 +446,7 @@ public class CampaignGUI extends JPanel {
         menuManage = new javax.swing.JMenu();
         miLoadForces = new javax.swing.JMenuItem();
         addFunds = new javax.swing.JMenuItem();
+        miGetLoan = new javax.swing.JMenuItem();
         miShoppingList = new javax.swing.JMenuItem();
         menuMarket = new javax.swing.JMenu();
         miPurchaseUnit = new javax.swing.JMenuItem();
@@ -1948,6 +1950,15 @@ public class CampaignGUI extends JPanel {
         });
         menuManage.add(addFunds);
 
+        
+        miGetLoan.setText(resourceMap.getString("miGetLoan.text")); // NOI18N
+        miGetLoan.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                showNewLoanDialog();
+            }
+        });
+        menuManage.add(miGetLoan);
+        
         miShoppingList.setText(resourceMap.getString("miShoppingList.text")); // NOI18N
         miShoppingList.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -2921,6 +2932,15 @@ public class CampaignGUI extends JPanel {
         sld.setVisible(true);
         refreshPartsList();
         refreshAcquireList();
+    }
+    
+    private void showNewLoanDialog() {
+        NewLoanDialog nld = new NewLoanDialog(getFrame(), true, getCampaign());
+        nld.setVisible(true);
+        refreshFinancialTransactions();
+        refreshFunds();
+        refreshReport();
+        refreshRating();
     }
 
     public void refitUnit(Refit r, boolean selectModelName) {
@@ -9715,6 +9735,7 @@ public class CampaignGUI extends JPanel {
     private javax.swing.JMenu menuMedicPool;
     private javax.swing.JMenuItem miLoadForces;
     private javax.swing.JMenuItem miShoppingList;
+    private javax.swing.JMenuItem miGetLoan;
     private javax.swing.JMenuItem miPurchaseUnit;
     private javax.swing.JMenuItem miBuyParts;
     private javax.swing.JMenu menuCommunity;
