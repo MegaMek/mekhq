@@ -4530,4 +4530,13 @@ public class Campaign implements Serializable {
         finances.addLoan(loan);
     }
     
+    public void payOffLoan(Loan loan) {
+        if(finances.debit(loan.getRemainingValue(), Transaction.C_LOAN_PAYMENT, "loan payoff for " + loan.getDescription(), calendar.getTime())) {
+            addReport("You have paid off the remaining loan balance of " + DecimalFormat.getInstance().format(loan.getRemainingValue()) + "on "+ loan.getDescription());
+            finances.removeLoan(loan);
+        } else {
+            addReport("<font color='red'>You do not have enough funds to pay off " + loan.getDescription() + "</font>");
+        }
+
+    }
 }

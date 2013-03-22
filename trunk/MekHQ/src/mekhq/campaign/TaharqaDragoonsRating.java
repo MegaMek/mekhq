@@ -335,10 +335,12 @@ public class TaharqaDragoonsRating extends AbstractDragoonsRating {
 
     @Override
     public int getFinancialValue() {
+        int score = 0;
         if (campaign.getFinances().isInDebt()) {
-            return -10;
+            score -= 10;
         }
-        return 0;
+        score -= 25 * campaign.getFinances().getLoanDefaults();
+        return score;
     }
 
     @Override
@@ -380,6 +382,8 @@ public class TaharqaDragoonsRating extends AbstractDragoonsRating {
 
         sb.append("Financial:                      ").append(getFinancialValue()).append("\n");
         sb.append("    Currently in Debt?    ").append((campaign.getFinances().isInDebt() ? "Yes" : "No")).append("\n");
+        sb.append("    Loan Defaults:        ").append(campaign.getFinances().getLoanDefaults()).append("\n\n");
+
 
         return new String(sb);
     }
