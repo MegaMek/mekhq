@@ -60,8 +60,16 @@ public class Finances implements Serializable {
 		return balance;
 	}
 	
+	public long getLoanBalance() {
+	    long balance = 0;
+	    for(Loan loan : loans) {
+	        balance += loan.getRemainingValue();
+	    }
+	    return balance;
+	}
+	
 	public boolean isInDebt() {
-		return getBalance() < 0;
+		return getBalance() < getLoanBalance();
 	}
 	
 	public boolean debit(long amount, int category, String reason, Date date) {
@@ -123,14 +131,17 @@ public class Finances implements Serializable {
 	    loans.add(loan);
 	}
 	
-	public void newDay(Campaign campaign, DecimalFormat formatter) {
+	public void newDay(Campaign campaign) {
 	    ArrayList<Loan> newLoans = new ArrayList<Loan>();
 	    for(Loan loan : loans) {
 	        if(loan.checkLoanPayment(campaign.getCalendar())) {
-	            //TODO: do something bad if they cannot pay, like break their kneecaps
-	           debit(loan.getPaymentAmount(), Transaction.C_MISC, "loan payment", campaign.getCalendar().getTime());
-               campaign.addReport("Your account has been debited for " + formatter.format(loan.getPaymentAmount()) + " C-bills in loan payments");
-	           loan.paidLoan();
+	           if(debit(loan.getPaymentAmount(), Transaction.C_LOAN_PAYMENT, "loan payment to " + loan.getDescription(), campaign.getCalendar().getTime())) {
+	               campaign.addReport("Your account has been debited for " + DecimalFormat.getInstance().format(loan.getPaymentAmount()) + " C-bills in loan payment to " + loan.getDescription());
+	               loan.paidLoan();
+	           } else {
+                   campaign.addReport("<font color='red'><b>You have insufficient funds to service the debt on loan " + loan.getDescription() + "!</b></font> Funds required: " + DecimalFormat.getInstance().format(loan.getPaymentAmount()));
+                   loan.setOverdue(true);
+	           }
 	        }
 	        if(loan.getRemainingPayments() > 0) {
 	            newLoans.add(loan);
@@ -139,5 +150,27 @@ public class Finances implements Serializable {
 	        }
 	    }
 	    loans = newLoans;
+	}
+	
+	public long checkOverdueLoanPayments(Campaign campaign) {
+	    ArrayList<Loan> newLoans = new ArrayList<Loan>();
+	    long overdueAmount = 0;
+	    for(Loan loan : loans) {
+            if(loan.isOverdue()) {
+               if(debit(loan.getPaymentAmount(), Transaction.C_LOAN_PAYMENT, "loan payment " + loan.getDescription(), campaign.getCalendar().getTime())) {
+                   campaign.addReport("Your account has been debited for " + DecimalFormat.getInstance().format(loan.getPaymentAmount()) + " C-bills in loan payment to " + loan.getDescription());
+                   loan.paidLoan();
+               } else {
+                   overdueAmount += loan.getPaymentAmount();
+               }
+            }
+            if(loan.getRemainingPayments() > 0) {
+                newLoans.add(loan);
+            } else {
+                campaign.addReport("You have fully paid off loan " + loan.getDescription());
+            }
+	    }
+	    loans = newLoans;	 
+	    return overdueAmount;
 	}
 }

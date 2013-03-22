@@ -2600,6 +2600,18 @@ public class CampaignGUI extends JPanel {
     }
 
     private void btnAdvanceDayActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnAdvanceDayActionPerformed
+        //first check for overdue loan payments - dont allow advancement until these are addressed
+        long overdueAmount = getCampaign().getFinances().checkOverdueLoanPayments(getCampaign());
+        if(overdueAmount > 0) {
+            JOptionPane.showMessageDialog(frame,
+                    "You have overdue loan payments totaling " + DecimalFormat.getInstance().format(overdueAmount) + " C-bills.\nYou must deal with these payments before advancing the day.\nHere are some options:\n  - Sell off equipment to generate funds.\n  - Pay off the collateral on the loan.\n  - Default on the loan.\n  - Just cheat and remove the loan via GM mode.",
+                    "Overdue Loan Payments",
+                    JOptionPane.WARNING_MESSAGE);
+            refreshFunds();
+            refreshFinancialTransactions();
+            refreshReport();
+            return;
+        }
         getCampaign().newDay();
         refreshServicedUnitList();
         refreshUnitList();
@@ -3711,7 +3723,11 @@ public class CampaignGUI extends JPanel {
     protected void refreshFunds() {
         long funds = getCampaign().getFunds();
         NumberFormat numberFormat = NumberFormat.getIntegerInstance();
-        String text = "<html><b>Balance:</b> " + numberFormat.format(funds) + " C-Bills</html>";
+        String inDebt = "";
+        if(getCampaign().getFinances().isInDebt()) {
+            inDebt = " <font color='red'>(in Debt)</font>";
+        }
+        String text = "<html><b>Funds:</b> " + numberFormat.format(funds) + " C-Bills" + inDebt + "</html>";
         lblFunds.setText(text);
     }
 

@@ -63,6 +63,7 @@ public class Loan implements MekHqXmlSerializable {
     private long payAmount;
     private long totalValue;
     private long collateralValue;
+    private boolean overdue;
     
     public Loan() {
         //dont do anything, this is for loading
@@ -79,6 +80,7 @@ public class Loan implements MekHqXmlSerializable {
         calculateAmortization();
         institution = madeUpInstitutions[Compute.randomInt(madeUpInstitutions.length)];
         refNumber = randomRefNumber();
+        overdue = false;
     }
     
     private void setFirstPaymentDate() {
@@ -258,6 +260,14 @@ public class Loan implements MekHqXmlSerializable {
         this.refNumber = s;
     }
     
+    public boolean isOverdue() {
+        return overdue;
+    }
+    
+    public void setOverdue(boolean b) {
+        overdue = b;
+    }
+    
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<loan>");
@@ -301,6 +311,10 @@ public class Loan implements MekHqXmlSerializable {
                 +"<collateralValue>"
                 +totalValue
                 +"</collateralValue>");
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<overdue>"
+                +overdue
+                +"</overdue>");
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "nextPayment", df.format(nextPayment.getTime()));
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</loan>");
@@ -346,6 +360,11 @@ public class Loan implements MekHqXmlSerializable {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
+            } else if (wn2.getNodeName().equalsIgnoreCase("overdue")) {
+                if (wn2.getTextContent().equalsIgnoreCase("true"))
+                    retVal.overdue = true;
+                else
+                    retVal.overdue = false;
             } 
         }
         return retVal;

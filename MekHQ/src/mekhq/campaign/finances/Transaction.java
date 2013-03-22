@@ -43,26 +43,27 @@ public class Transaction implements Serializable {
 	
 	private static final long serialVersionUID = -8772148858528954672L;
 	
-	public final static int C_MISC       = 0;
-	public final static int C_EQUIP      = 1;
-	public final static int C_UNIT       = 2;
-	public final static int C_SALARY     = 3;
-	public final static int C_OVERHEAD   = 4;
-	public final static int C_MAINTAIN   = 5;
-	public final static int C_UNIT_SALE  = 6;
-	public final static int C_EQUIP_SALE = 7;
-	public final static int C_START      = 8;
-	public final static int C_TRANSPORT  = 9;
-	public final static int C_CONTRACT   = 10;
-	public final static int C_BLC        = 11;
-	public final static int C_SALVAGE    = 12;
-	public final static int C_NUM        = 13;
+	public final static int C_MISC            = 0;
+	public final static int C_EQUIP           = 1;
+	public final static int C_UNIT            = 2;
+	public final static int C_SALARY          = 3;
+	public final static int C_OVERHEAD        = 4;
+	public final static int C_MAINTAIN        = 5;
+	public final static int C_UNIT_SALE       = 6;
+	public final static int C_EQUIP_SALE      = 7;
+	public final static int C_START           = 8;
+	public final static int C_TRANSPORT       = 9;
+	public final static int C_CONTRACT       = 10;
+	public final static int C_BLC            = 11;
+	public final static int C_SALVAGE        = 12;
+	public final static int C_LOAN_PRINCIPAL = 13;
+	public final static int C_LOAN_PAYMENT   = 14;
+	public final static int C_NUM            = 15;
 
     public static Vector<String> getCategoryList() {
         Vector<String> out = new Vector<String>();
-        int max = 13;
 
-        for (int i = 0; i < max; i++) {
+        for (int i = 0; i < C_NUM; i++) {
             out.add(Transaction.getCategoryName(i));
         }
         Collections.sort(out);
@@ -97,6 +98,10 @@ public class Transaction implements Serializable {
 			return "Starting Capital";
 		case C_TRANSPORT:
 			return "Transportation";
+		case C_LOAN_PRINCIPAL:
+		    return "Loan Principal";
+		case C_LOAN_PAYMENT:
+		    return "Loan Payment";
 		default:
 			return "Unknown category";
 		}
