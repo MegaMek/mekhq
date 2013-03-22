@@ -24,6 +24,8 @@ v0.3.0 (SVN)
 + LoanTable in finance tab
 + LoanTableMouseAdapter with Default, pay off, and remove (GM) options - need pay off collateral option
 + Bug: NPE in DragoonsRatingRevised
++ Bug 340: Dragoon's Rating error FMM:R method when in debt
++ Bug: overdue status not removed on loan payment
 
 v0.2.0 (2013-03-16)
 + Bug 318: Dragoon's Rating error FMM:R method

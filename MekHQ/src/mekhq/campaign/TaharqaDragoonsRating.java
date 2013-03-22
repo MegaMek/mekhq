@@ -329,16 +329,8 @@ public class TaharqaDragoonsRating extends AbstractDragoonsRating {
     }
 
     @Override
-    public int getYearsInDebt() {
-        return (getFinancialValue() < 0) ? 1 : 0;
-    }
-
-    @Override
     public int getFinancialValue() {
-        int score = 0;
-        if (campaign.getFinances().isInDebt()) {
-            score -= 10;
-        }
+        int score = campaign.getFinances().getFullYearsInDebt(campaign.getCalendar()) * -10;
         score -= 25 * campaign.getFinances().getLoanDefaults();
         return score;
     }
@@ -381,7 +373,7 @@ public class TaharqaDragoonsRating extends AbstractDragoonsRating {
         sb.append("    Unsupported Vehicles: ").append(getUnsupportedVee().toPlainString()).append("\n\n");
 
         sb.append("Financial:                      ").append(getFinancialValue()).append("\n");
-        sb.append("    Currently in Debt?    ").append((campaign.getFinances().isInDebt() ? "Yes" : "No")).append("\n");
+        sb.append("    Years in Debt         ").append(campaign.getFinances().getFullYearsInDebt(campaign.getCalendar())).append("\n");
         sb.append("    Loan Defaults:        ").append(campaign.getFinances().getLoanDefaults()).append("\n\n");
 
 
