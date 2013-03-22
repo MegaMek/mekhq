@@ -183,6 +183,8 @@ public class TaharqaDragoonsRating extends AbstractDragoonsRating {
         } else if (en instanceof Infantry) {
             numberSoldiers += ((Infantry)en).getSquadN() * ((Infantry)en).getSquadSize();
             numberInfSquads++;
+        } else {
+            numberOther++;
         }
     }
 
@@ -367,7 +369,8 @@ public class TaharqaDragoonsRating extends AbstractDragoonsRating {
         sb.append("Technology:                     ").append(getTechValue()).append("\n");
         sb.append("    # Clan Units:         ").append(countClan).append("\n");
         sb.append("    # IS2 Units:          ").append(countIS2).append("\n");
-        sb.append("    Total # Units:        ").append(numberAero + numberBaSquads + numberMech + numberVee).append("\n\n");
+        sb.append("    Total # Units:        ")
+          .append(numberAero + numberBaSquads + numberMech + numberVee + numberOther).append("\n\n");
 
         sb.append("Support:                        ").append(getSupportValue()).append("\n");
         sb.append("    Unsupported Aero:     ").append(getUnsupportedAero().toPlainString()).append("\n");

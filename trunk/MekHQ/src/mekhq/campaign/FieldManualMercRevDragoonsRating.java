@@ -79,8 +79,9 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
 
     @Override
     protected void initValues() {
-        if (initialized)
+        if (initialized) {
             return;
+        }
 
         super.initValues();
         for (UUID uid : campaign.getForces().getAllUnits()) {
@@ -177,6 +178,8 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
         } else if (en instanceof Infantry) {
             numberSoldiers += ((Infantry) en).getSquadN() * ((Infantry) en).getSquadSize();
             numberInfSquads++;
+        } else {
+            numberOther++;
         }
     }
 
@@ -188,17 +191,9 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
         double hoursNeeded = 0;
         if (en instanceof Mech) {
             hoursNeeded = Math.floor(en.getWeight() / 5) + 40;
-        } else if (en instanceof Warship) {
-            // according to FMMR, this should be tracked separately because it only applies to admin support but not
-            // technical support.
-            updateDropJumpShipSupportNeeds(en);
-            return;
-        } else if (en instanceof Jumpship) {
-            // according to FMMR, this should be tracked separately because it only applies to admin support but not
-            // technical support.
-            updateDropJumpShipSupportNeeds(en);
-            return;
-        } else if (en instanceof Dropship) {
+        } else if (en instanceof Warship ||
+                en instanceof Jumpship ||
+                en instanceof Dropship) {
             // according to FMMR, this should be tracked separately because it only applies to admin support but not
             // technical support.
             updateDropJumpShipSupportNeeds(en);
@@ -270,11 +265,11 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
             }
         }
 
-        if (campaign.getCampaignOptions().useFactionModifiers() && en.isClan()) {
-            hours *= 2;
-        } else if (campaign.getCampaignOptions().useEraMods() && (en.getTechLevel() > TechConstants.T_INTRO_BOXSET)) {
-            hours *= 1.5;
-        }
+//        if (campaign.getCampaignOptions().useFactionModifiers() && en.isClan()) {
+//            hours *= 2;
+//        } else if (campaign.getCampaignOptions().useEraMods() && (en.getTechLevel() > TechConstants.T_INTRO_BOXSET)) {
+//            hours *= 1.5;
+//        }
 
         dropJumpShipSupportNeeded += hours;
     }
@@ -316,7 +311,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
                                                                  RoundingMode.HALF_EVEN).intValue();
     }
 
-    private int getSupportHours(int skillLevel) {
+    private static int getSupportHours(int skillLevel) {
         switch (skillLevel) {
             case (SkillType.EXP_ULTRA_GREEN):
                 return 20;
@@ -433,20 +428,24 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
         int value = 0;
 
         Skill test = getCommander().getSkill(SkillType.S_LEADER);
-        if (test != null)
+        if (test != null) {
             value += test.getLevel();
+        }
 
         test = getCommander().getSkill(SkillType.S_NEG);
-        if (test != null)
+        if (test != null) {
             value += test.getLevel();
+        }
 
         test = getCommander().getSkill(SkillType.S_STRATEGY);
-        if (test != null)
+        if (test != null) {
             value += test.getLevel();
+        }
 
         test = getCommander().getSkill(SkillType.S_TACTICS);
-        if (test != null)
+        if (test != null) {
             value += test.getLevel();
+        }
 
         /**
          * todo consider adding rpg traits in MekHQ (they would have no impact on megamek).
@@ -567,7 +566,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
         for (Transaction t : transactions) {
 
             //Only count yearly carryovers.
-            if (!t.getDescription().equalsIgnoreCase("Carryover from previous year")) {
+            if (!"Carryover from previous year".equalsIgnoreCase(t.getDescription())) {
                 continue;
             }
 
@@ -617,7 +616,8 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
         sb.append("Technology:                     ").append(getTechValue()).append("\n");
         sb.append("    # Clan Units:         ").append(countClan).append("\n");
         sb.append("    # IS2 Units:          ").append(countIS2).append("\n");
-        sb.append("    Total # Units:        ").append(numberAero + numberBaSquads + numberMech + numberVee).append("\n\n");
+        sb.append("    Total # Units:        ")
+          .append(numberAero + numberBaSquads + numberMech + numberVee + numberOther).append("\n\n");
 
         sb.append("Support:                        ").append(getSupportValue()).append("\n");
         sb.append("    Tech Support:         ").append(getTechSupportPercentage().toPlainString()).append("%\n");
@@ -652,10 +652,11 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
         BigDecimal transportNeeded = new BigDecimal(numberWithoutTransport);
 
         //Find the percentage of units that are transported.
-        if (getNumberUnits().compareTo(BigDecimal.ZERO) == 0) {
+        BigDecimal totalUnits = new BigDecimal(numberMech + numberVee + numberAero + numberBaSquads + numberInfSquads);
+        if (totalUnits.compareTo(BigDecimal.ZERO) == 0) {
             return BigDecimal.ZERO;
         }
-        BigDecimal percentUntransported = transportNeeded.divide(getNumberUnits(), PRECISION, HALF_EVEN);
+        BigDecimal percentUntransported = transportNeeded.divide(totalUnits, PRECISION, HALF_EVEN);
         transportPercent = BigDecimal.ONE.subtract(percentUntransported).multiply(HUNDRED).setScale(0, HALF_EVEN);
 
         return transportPercent;

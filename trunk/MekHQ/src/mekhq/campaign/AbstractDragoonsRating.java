@@ -60,6 +60,7 @@ public abstract class AbstractDragoonsRating implements IDragoonsRating {
     protected int numberBaSquads = 0;
     protected int numberSoldiers = 0;
     protected int numberInfSquads = 0;
+    protected int numberOther = 0; // Dropships, Jumpships, Warships, etc.
     protected int countIS2 = 0;
     protected int countClan = 0;
     protected BigDecimal mechTech = BigDecimal.ZERO;
@@ -94,6 +95,7 @@ public abstract class AbstractDragoonsRating implements IDragoonsRating {
         initialized = false;
     }
 
+    @Override
     public void reInitialize() {
         initialized = false;
         initValues();
@@ -156,6 +158,7 @@ public abstract class AbstractDragoonsRating implements IDragoonsRating {
      *
      * @return
      */
+    @Override
     public Person getCommander() {
         if ((commander == null)) {
 
@@ -234,7 +237,7 @@ public abstract class AbstractDragoonsRating implements IDragoonsRating {
         BigDecimal highTechNumber = new BigDecimal(countIS2 + (countClan * 2));
 
         //Conventional infantry does not count.
-        int numberUnits = numberAero + numberBaSquads + numberMech + numberVee;
+        int numberUnits = numberAero + numberBaSquads + numberMech + numberVee + numberOther;
         if (numberUnits <= 0) {
             return 0;
         }
@@ -279,6 +282,7 @@ public abstract class AbstractDragoonsRating implements IDragoonsRating {
      *
      * @return
      */
+    @Override
     public BigDecimal getSupportPercent() {
         return supportPercent;
     }
@@ -286,6 +290,18 @@ public abstract class AbstractDragoonsRating implements IDragoonsRating {
     @Override
     public int getTransportValue() {
         int value = 0;
+
+        //Find the percentage of units that are transported.
+        transportPercent = getTransportPercent();
+
+        //Compute the score.
+        BigDecimal scoredPercent = transportPercent.subtract(new BigDecimal(50));
+        if (scoredPercent.compareTo(BigDecimal.ZERO) < 0) {
+            return value;
+        }
+        BigDecimal percentageScore = scoredPercent.divide(new BigDecimal(10), 0, RoundingMode.DOWN);
+        value += percentageScore.multiply(new BigDecimal(5)).setScale(0, RoundingMode.DOWN).intValue();
+        value = Math.min(value, 25);
 
         //Only the highest of these values should be used, regardless of how many are actually owned.
         if (warhipWithDocsOwner) {
@@ -296,16 +312,7 @@ public abstract class AbstractDragoonsRating implements IDragoonsRating {
             value += 10;
         }
 
-        //Find the percentage of units that are transported.
-        transportPercent = getTransportPercent();
-
-        //Compute the score.
-        BigDecimal scoredPercent = transportPercent.subtract(new BigDecimal(50));
-        if (scoredPercent.compareTo(BigDecimal.ZERO) < 0) {
-            return value;
-        }
-        value += scoredPercent.multiply(new BigDecimal(5)).setScale(0, RoundingMode.DOWN).intValue();
-        return Math.min(value, 25);
+        return value;
     }
 
     @Override

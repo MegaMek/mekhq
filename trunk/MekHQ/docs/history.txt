@@ -13,6 +13,7 @@ v0.3.0 (SVN)
 + transit times for parts (highly customizable in campaign options)
 + Option to base mercenary contracts on value of force in TO&E (per StellarOps Beta)
 + Bug 260: BLC error (base on buy value no sell value)
++ Bug 350: Dragoon's Rating error FMM:R method for transportation
 
 v0.2.0 (2013-03-16)
 + Bug 318: Dragoon's Rating error FMM:R method
