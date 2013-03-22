@@ -98,6 +98,7 @@ import mekhq.NullEntityException;
 import mekhq.Utilities;
 import mekhq.Version;
 import mekhq.campaign.finances.Finances;
+import mekhq.campaign.finances.Loan;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.Contract;
@@ -1238,6 +1239,8 @@ public class Campaign implements Serializable {
 				addReport("Your account has been debited for " + formatter.format(getOverheadExpenses()) + " C-bills in overhead expenses");
 			}
 		}
+		//check for anything else in finances
+        finances.newDay(this, formatter);
 	}
 	
 	private ArrayList<Contract> getActiveContracts() {
@@ -4452,13 +4455,20 @@ public class Campaign implements Serializable {
         return inventories;
     }
     
+    public long getTotalEquipmentValue() {
+        long value = 0;
+        for(Unit u : getUnits()) {
+            value += u.getSellValue();
+        }
+        for(Part p : getSpareParts()) {
+            value += p.getActualValue();
+        }
+        return value;
+    }
+    
     /**
      * Calculate the total value of units in the TO&E. This serves as the basis
      * for contract payments in the StellarOps Beta. 
-     * For the moment, we will base this on sell value, but we should make that customizable 
-     * in concert with the basis for BLC (see Ticket #260). We will also 
-     * skip large craft for the moment, until we get clarification on how 
-     * to incorporate them via StellarOps
      * @return
      */
     public long getForceValue() {
@@ -4489,6 +4499,12 @@ public class Campaign implements Serializable {
         else {
             return getPayRoll();
         }
+    }
+    
+    public void addLoan(Loan loan) {
+        addReport("You have taken out loan " + loan.getDescription() + ". Your account has been credited " + DecimalFormat.getInstance().format(loan.getPrincipal()) + " for the principal amount.");
+        finances.credit(loan.getPrincipal(), Transaction.C_MISC, "loan principal for " + loan.getDescription(), calendar.getTime());
+        finances.addLoan(loan);
     }
     
 }

@@ -886,8 +886,8 @@ public class SkillType implements Serializable {
 	public static SkillType createNegotiation() {
         SkillType skill = new SkillType();
         skill.name = S_NEG;
-        skill.target = 0;
-        skill.countUp = true;
+        skill.target = 10;
+        skill.countUp = false;
         skill.costs = new Integer[]{8,4,4,4,4,4,4,4,4,4,4};
      
         return skill;
@@ -896,8 +896,8 @@ public class SkillType implements Serializable {
 	public static SkillType createScrounge() {
         SkillType skill = new SkillType();
         skill.name = S_SCROUNGE;
-        skill.target = 0;
-        skill.countUp = true;
+        skill.target = 10;
+        skill.countUp = false;
         skill.costs = new Integer[]{8,4,4,4,4,4,4,4,4,4,4};
      
         return skill;
