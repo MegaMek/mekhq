@@ -409,8 +409,11 @@ public class Armor extends Part implements IAcquisitionWork {
 	public String find(int transitDays) {
 	    Part newPart = getNewPart();
         newPart.setDaysToArrival(transitDays);
-        campaign.buyPart(newPart);
-        return "<font color='green'><b> part found</b>.</font> It will be delivered in " + transitDays + " days.";
+        if(campaign.buyPart(newPart)) {
+            return "<font color='green'><b> part found</b>.</font> It will be delivered in " + transitDays + " days.";
+        } else {
+            return "<font color='red'><b> You cannot afford this part. Transaction cancelled</b>.</font>";
+        }
 	}
 	
 	@Override

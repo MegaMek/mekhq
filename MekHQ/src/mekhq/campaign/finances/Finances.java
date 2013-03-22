@@ -64,8 +64,12 @@ public class Finances implements Serializable {
 		return getBalance() < 0;
 	}
 	
-	public void debit(long amount, int category, String reason, Date date) {
+	public boolean debit(long amount, int category, String reason, Date date) {
+	    if(getBalance() < amount) {
+	        return false;
+	    }
 		transactions.add(new Transaction(-1 * amount, category, reason, date));
+		return true;
 	}
 	
 	public void credit(long amount, int category, String reason, Date date) {
@@ -123,6 +127,7 @@ public class Finances implements Serializable {
 	    ArrayList<Loan> newLoans = new ArrayList<Loan>();
 	    for(Loan loan : loans) {
 	        if(loan.checkLoanPayment(campaign.getCalendar())) {
+	            //TODO: do something bad if they cannot pay, like break their kneecaps
 	           debit(loan.getPaymentAmount(), Transaction.C_MISC, "loan payment", campaign.getCalendar().getTime());
                campaign.addReport("Your account has been debited for " + formatter.format(loan.getPaymentAmount()) + " C-bills in loan payments");
 	           loan.paidLoan();

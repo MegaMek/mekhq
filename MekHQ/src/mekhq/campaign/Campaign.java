@@ -1219,8 +1219,11 @@ public class Campaign implements Serializable {
 		if(calendar.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY) {
 			//maintenance costs
 			if(campaignOptions.payForMaintain()) {
-				finances.debit(getMaintenanceCosts(), Transaction.C_MAINTAIN, "Weekly Maintenance", calendar.getTime());
-				addReport("Your account has been debited for " + formatter.format(getMaintenanceCosts()) + " C-bills in maintenance costs");
+				if(finances.debit(getMaintenanceCosts(), Transaction.C_MAINTAIN, "Weekly Maintenance", calendar.getTime())) {
+				    addReport("Your account has been debited for " + formatter.format(getMaintenanceCosts()) + " C-bills in maintenance costs");
+				} else {
+                    addReport("You cannot afford to pay maintenance costs! Lucky for you that maintenance is not implemented yet.");
+				}
 			}
 		}
 		if(calendar.get(Calendar.DAY_OF_MONTH) == 1) {
@@ -1231,12 +1234,18 @@ public class Campaign implements Serializable {
 			}
 			//Payday!
 			if(campaignOptions.payForSalaries()) {
-				finances.debit(getPayRoll(), Transaction.C_SALARY, "Monthly salaries", calendar.getTime());
-				addReport("Payday! Your account has been debited for " + formatter.format(getPayRoll()) + " C-bills in personnel salaries");
+				if(finances.debit(getPayRoll(), Transaction.C_SALARY, "Monthly salaries", calendar.getTime())) {
+				    addReport("Payday! Your account has been debited for " + formatter.format(getPayRoll()) + " C-bills in personnel salaries");
+				} else {
+				    addReport("You cannot afford to pay payroll costs! Lucky for you that personnel morale is not yet implemented.");
+				}
 			}
 			if(campaignOptions.payForOverhead()) {
-				finances.debit(getOverheadExpenses(), Transaction.C_OVERHEAD, "Monthly overhead", calendar.getTime());
-				addReport("Your account has been debited for " + formatter.format(getOverheadExpenses()) + " C-bills in overhead expenses");
+				if(finances.debit(getOverheadExpenses(), Transaction.C_OVERHEAD, "Monthly overhead", calendar.getTime())) {
+				    addReport("Your account has been debited for " + formatter.format(getOverheadExpenses()) + " C-bills in overhead expenses");
+				} else {
+                    addReport("You cannot afford to pay overhead costs! Lucky for you that this does not appear to have any effect.");
+				}
 			}
 		}
 		//check for anything else in finances
@@ -1602,11 +1611,18 @@ public class Campaign implements Serializable {
 		return getFunds() >= cost;
 	}
 	
-	public void buyUnit(Entity en) {
+	public boolean buyUnit(Entity en) {
 		long cost = new Unit(en, this).getBuyCost();
-		addUnit(en, false);	
 		if(campaignOptions.payForUnits()) {
-			finances.debit(cost, Transaction.C_UNIT, "Purchased " + en.getShortName(), calendar.getTime());
+			if(finances.debit(cost, Transaction.C_UNIT, "Purchased " + en.getShortName(), calendar.getTime())) {
+			    addUnit(en, false); 
+			    return true;
+			} else {
+			    return false;
+			}
+		} else {
+		      addUnit(en, false); 
+		      return true;
 		}
 	}
 
@@ -1646,15 +1662,22 @@ public class Campaign implements Serializable {
 		}
 	}
 	
-	public void buyPart(Part part) {
-		buyPart(part, 1);
+	public boolean buyPart(Part part) {
+		return buyPart(part, 1);
 	}
 	
-	public void buyPart(Part part, double multiplier) {
-		if(getCampaignOptions().payForParts()) {
-			finances.debit((long)(multiplier * part.getActualValue()), Transaction.C_EQUIP, "Purchase of " + part.getName(), calendar.getTime());		
+	public boolean buyPart(Part part, double multiplier) {
+		if(getCampaignOptions().payForParts()) {		    
+			if(finances.debit((long)(multiplier * part.getActualValue()), Transaction.C_EQUIP, "Purchase of " + part.getName(), calendar.getTime())) {
+			     addPart(part);
+			     return true;
+			} else {
+			    return false;
+			}
+		} else {
+		      addPart(part);
+		      return true;
 		}
-		addPart(part);
 	}
 
 	public static Entity getBrandNewUndamagedEntity(String entityShortName) {
