@@ -234,6 +234,7 @@ public class Loan implements MekHqXmlSerializable {
             break;
         }
         nPayments--;
+        overdue = false;
     }
     
     public int getRemainingPayments() {

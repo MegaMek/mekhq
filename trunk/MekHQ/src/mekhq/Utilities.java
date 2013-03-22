@@ -486,4 +486,15 @@ public class Utilities {
 	public static int getDaysBetween(Date date1, Date date2) {
 	    return (int) ((date2.getTime() - date1.getTime())/ (1000 * 60 * 60 * 24) );
 	}
+	
+	public static int getDiffYears(Date date, GregorianCalendar b) {
+	    GregorianCalendar a = new GregorianCalendar();
+	    a.setTime(date);
+	    int diff = b.get(GregorianCalendar.YEAR) - a.get(GregorianCalendar.YEAR);
+	    if (a.get(GregorianCalendar.MONTH) > b.get(GregorianCalendar.MONTH) || 
+	        (a.get(GregorianCalendar.MONTH) == b.get(GregorianCalendar.MONTH) && a.get(GregorianCalendar.DATE) > b.get(GregorianCalendar.DATE))) {
+	        diff--;
+	    }
+	    return diff;
+	}
 }

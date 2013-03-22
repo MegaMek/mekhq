@@ -149,12 +149,6 @@ public interface IDragoonsRating {
     public int getTechValue();
 
     /**
-     * Returns the number of years the company has spent in debt.
-     * @return
-     */
-    public int getYearsInDebt();
-
-    /**
      * Returns the Dragoon's score for the force's financial record.  If the unit has never been in debt,
      * a value of 0 is returned.  If the unit has been in debt, a negative number will be returned.
      *

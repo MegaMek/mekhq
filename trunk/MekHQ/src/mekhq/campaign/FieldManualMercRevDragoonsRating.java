@@ -71,7 +71,6 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
     private int techSupportAvailable      = 0;
     private int medSupportAvailable       = 0;
     private int adminSupportAvailable;
-    private int yearsInDebt = 0;
 
     public FieldManualMercRevDragoonsRating(Campaign campaign) {
         super(campaign);
@@ -538,6 +537,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
         return getTechSupportValue() + getMedicalSupportValue() + getAdminValue();
     }
 
+    /*
     @Override
     public int getYearsInDebt() {
         return getYearsInDebt(true);
@@ -584,10 +584,11 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
         yearsInDebt = years;
         return years;
     }
+    */
 
     @Override
     public int getFinancialValue() {
-        int score = getYearsInDebt() * -10;
+        int score = campaign.getFinances().getFullYearsInDebt(campaign.getCalendar()) * -10;
         score -= 25 * campaign.getFinances().getLoanDefaults();
         return score;
     }
@@ -629,7 +630,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
         sb.append("    HR Support:           ").append(getAdminSupportPercentage().toPlainString()).append("%\n\n");
 
         sb.append("Financial:                      ").append(getFinancialValue()).append("\n");
-        sb.append("    Years in Debt:        ").append(getYearsInDebt()).append("\n");
+        sb.append("    Years in Debt:        ").append(campaign.getFinances().getFullYearsInDebt(campaign.getCalendar())).append("\n");
         sb.append("    Loan Defaults:        ").append(campaign.getFinances().getLoanDefaults()).append("\n\n");
 
         return new String(sb);

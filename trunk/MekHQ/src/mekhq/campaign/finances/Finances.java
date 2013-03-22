@@ -23,12 +23,17 @@ package mekhq.campaign.finances;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
+import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
 
+import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -46,12 +51,14 @@ public class Finances implements Serializable {
 	private ArrayList<Transaction> transactions;
 	private ArrayList<Loan> loans;
 	private int loanDefaults;
+	private Date wentIntoDebt;
 
 	
 	public Finances() {
 		transactions = new ArrayList<Transaction>();
 	    loans = new ArrayList<Loan>();
 	    loanDefaults = 0;
+	    wentIntoDebt = null;
 	}
 	
 	public long getBalance() {
@@ -74,16 +81,29 @@ public class Finances implements Serializable {
 		return getBalance() < getLoanBalance();
 	}
 	
+	public int getFullYearsInDebt(GregorianCalendar cal) {
+	    if(null == wentIntoDebt) {
+	        return 0;
+	    }
+	    return Utilities.getDiffYears(wentIntoDebt, cal);
+	}
+	
 	public boolean debit(long amount, int category, String reason, Date date) {
 	    if(getBalance() < amount) {
 	        return false;
 	    }
 		transactions.add(new Transaction(-1 * amount, category, reason, date));
+		if(null == wentIntoDebt && isInDebt()) {
+		    wentIntoDebt = date;
+		}
 		return true;
 	}
 	
 	public void credit(long amount, int category, String reason, Date date) {
 		transactions.add(new Transaction(amount, category, reason, date));
+		if(null != wentIntoDebt && !isInDebt()) {
+            wentIntoDebt = null;
+        }
 	}
 	
 	/**
@@ -118,6 +138,10 @@ public class Finances implements Serializable {
 		for(Loan loan : loans) {
             loan.writeToXml(pw1, indent+1);
         }
+		if(null != wentIntoDebt) {
+    		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "wentIntoDebt", df.format(wentIntoDebt));
+		}
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "</finances>");
 	}
 	
@@ -135,6 +159,18 @@ public class Finances implements Serializable {
 			 else if (wn2.getNodeName().equalsIgnoreCase("loanDefaults")) {
                  retVal.loanDefaults = Integer.parseInt(wn2.getTextContent().trim());
              } 
+			 else if (wn2.getNodeName().equalsIgnoreCase("wentIntoDebt")) {
+			     SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+			     try {
+			         retVal.wentIntoDebt = df.parse(wn2.getTextContent().trim());
+			     } catch (DOMException e) {
+			         // TODO Auto-generated catch block
+			         e.printStackTrace();
+			     } catch (ParseException e) {
+			         // TODO Auto-generated catch block
+			         e.printStackTrace();
+			     }
+			 } 
 		}
 		
 		return retVal;
