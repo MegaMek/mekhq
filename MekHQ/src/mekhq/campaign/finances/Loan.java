@@ -530,4 +530,22 @@ public class Loan implements MekHqXmlSerializable {
         }
         return buffer.toString();
     }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if(!(obj instanceof Loan)) {
+            return false;
+        }
+        Loan loan = (Loan)obj;
+        return this.getDescription().equals(loan.getDescription()) 
+                && this.getInterestRate() == loan.getInterestRate()
+                && this.getCollateralAmount() == loan.getCollateralAmount()
+                && this.getCollateralPercent() == loan.getCollateralPercent()
+                && this.getNextPayDate().equals(loan.getNextPayDate())
+                && this.getYears() == loan.getYears()
+                && this.getPrincipal() == loan.getPrincipal()
+                && this.getPaymentSchedule() == loan.getPaymentSchedule()
+                && this.getRemainingPayments() == loan.getRemainingPayments()
+                && this.getRemainingValue() == loan.getRemainingValue();
+    }
 }

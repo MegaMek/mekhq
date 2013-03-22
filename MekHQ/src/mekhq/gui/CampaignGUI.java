@@ -50,6 +50,7 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -159,6 +160,7 @@ import mekhq.campaign.Kill;
 import mekhq.campaign.Planet;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.Unit;
+import mekhq.campaign.finances.Loan;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.Contract;
@@ -173,7 +175,6 @@ import mekhq.campaign.parts.MekLifeSupport;
 import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.MekSensor;
 import mekhq.campaign.parts.Part;
-import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.TankLocation;
 import mekhq.campaign.parts.equipment.AmmoBin;
@@ -299,7 +300,9 @@ public class CampaignGUI extends JPanel {
     private UnitTableModel unitModel = new UnitTableModel();
     private PartsTableModel partsModel = new PartsTableModel();
     private FinanceTableModel financeModel = new FinanceTableModel();
+    private LoanTableModel loanModel = new LoanTableModel();
     private FinanceTableMouseAdapter financeMouseAdapter;
+    private LoanTableMouseAdapter loanMouseAdapter;
     private ScenarioTableModel scenarioModel = new ScenarioTableModel();
     private OrgTreeModel orgModel;
     private UnitTableMouseAdapter unitMouseAdapter;
@@ -331,6 +334,8 @@ public class CampaignGUI extends JPanel {
         orgMouseAdapter = new OrgTreeMouseAdapter();
         scenarioMouseAdapter = new ScenarioTableMouseAdapter();
         financeMouseAdapter = new FinanceTableMouseAdapter();
+        loanMouseAdapter = new LoanTableMouseAdapter();
+
 
         initComponents();
     }
@@ -424,6 +429,8 @@ public class CampaignGUI extends JPanel {
         panFinances = new javax.swing.JPanel();
         scrollFinanceTable = new javax.swing.JScrollPane();
         financeTable = new javax.swing.JTable();
+        scrollLoanTable = new javax.swing.JScrollPane();
+        loanTable = new javax.swing.JTable();
         txtPaneReportScrollPane = new javax.swing.JScrollPane();
         txtPaneReport = new javax.swing.JTextPane();
         btnAdvanceDay = new javax.swing.JButton();
@@ -1768,17 +1775,43 @@ public class CampaignGUI extends JPanel {
         financeTable.setShowGrid(false);
         scrollFinanceTable.setName("scrollFinanceTable");
         scrollFinanceTable.setViewportView(financeTable);
+     
+        loanTable.setModel(loanModel);
+        loanTable.setName("loanTable"); // NOI18N
+        loanTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        loanTable.addMouseListener(loanMouseAdapter);
+        loanTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        column = null;
+        for (int i = 0; i < LoanTableModel.N_COL; i++) {
+            column = loanTable.getColumnModel().getColumn(i);
+            column.setPreferredWidth(loanModel.getColumnWidth(i));
+            column.setCellRenderer(loanModel.getRenderer());
+        }
+        loanTable.setIntercellSpacing(new Dimension(0, 0));
+        loanTable.setShowGrid(false);
+        scrollLoanTable.setViewportView(loanTable);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 4;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        panFinances.add(scrollFinanceTable, gridBagConstraints);
-
+        JPanel panBalance = new JPanel(new GridBagLayout());
+        panBalance.add(scrollFinanceTable, gridBagConstraints);
+        panBalance.setBorder(BorderFactory.createTitledBorder("Balance Sheet"));
+        JPanel panLoan = new JPanel(new GridBagLayout());
+        panLoan.add(scrollLoanTable, gridBagConstraints);
+        scrollLoanTable.setMinimumSize(new java.awt.Dimension(450, 150));
+        scrollLoanTable.setPreferredSize(new java.awt.Dimension(450, 150));
+        panLoan.setBorder(BorderFactory.createTitledBorder("Active Loans"));
+        JSplitPane splitFinances = new JSplitPane(javax.swing.JSplitPane.VERTICAL_SPLIT,panBalance, panLoan);
+        splitFinances.setOneTouchExpandable(true);
+        splitFinances.setResizeWeight(1.0);
+        
+        panFinances.add(splitFinances, gridBagConstraints);
+        
         tabMain.addTab(
                 resourceMap.getString("panFinances.TabConstraints.tabTitle"),
                 panFinances); // NOI18N
@@ -3696,6 +3729,7 @@ public class CampaignGUI extends JPanel {
 
     public void refreshFinancialTransactions() {
         financeModel.setData(getCampaign().getFinances().getAllTransactions());
+        loanModel.setData(getCampaign().getFinances().getAllLoans());
         refreshFunds();
         refreshRating();
     }
@@ -8740,6 +8774,252 @@ public class CampaignGUI extends JPanel {
             }
         }
     }
+    
+    /**
+     * A table model for displaying active loans
+     */
+    public class LoanTableModel extends AbstractTableModel {
+        private static final long serialVersionUID = 534443424190075264L;
+
+        private final static int COL_DESC      =    0;
+        private final static int COL_RATE       =   1;
+        private final static int COL_PRINCIPAL  =   2;
+        private final static int COL_COLLATERAL =   3;
+        private final static int COL_VALUE        = 4;
+        private final static int COL_PAYMENT     =  5;
+        private final static int COL_SCHEDULE   =   6;
+        private final static int COL_NLEFT      =   7;
+        private final static int COL_NEXT_PAY   =   8;
+        private final static int N_COL            = 9;
+
+        private ArrayList<Loan> data = new ArrayList<Loan>();
+
+        public int getRowCount() {
+            return data.size();
+        }
+
+        public int getColumnCount() {
+            return N_COL;
+        }
+
+        @Override
+        public String getColumnName(int column) {
+            switch(column) {
+                case COL_DESC:
+                    return "Description";
+                case COL_COLLATERAL:
+                    return "Collateral";
+                case COL_VALUE:
+                    return "Remaining";
+                case COL_PAYMENT:
+                    return "Payment";
+                case COL_NLEFT:
+                    return "# Left";
+                case COL_NEXT_PAY:
+                    return "Next Payment Due";
+                case COL_RATE:
+                    return "APR";
+                case COL_SCHEDULE:
+                    return "Schedule";
+                case COL_PRINCIPAL:
+                    return "Principal";
+                default:
+                    return "?";
+            }
+        }
+
+        public Object getValueAt(int row, int col) {
+            Loan loan = data.get(row);           
+            if(col == COL_DESC) {
+                return loan.getDescription();
+            }
+            if(col == COL_COLLATERAL) {
+                return DecimalFormat.getInstance().format(loan.getCollateralAmount());
+            }
+            if(col == COL_VALUE) {
+                return DecimalFormat.getInstance().format(loan.getRemainingValue());
+            }
+            if(col == COL_PAYMENT) {
+                return DecimalFormat.getInstance().format(loan.getPaymentAmount());
+            }
+            if(col == COL_PRINCIPAL) {
+                return DecimalFormat.getInstance().format(loan.getPrincipal());
+            }
+            if(col == COL_SCHEDULE) {
+                return Loan.getScheduleName(loan.getPaymentSchedule());
+            }
+            if(col == COL_RATE) {
+                return loan.getInterestRate() + "%";
+            }
+            if(col == COL_NLEFT) {
+                return loan.getRemainingPayments();
+            }
+            
+            if(col == COL_NEXT_PAY) {
+                return DateFormat.getDateInstance().format(loan.getNextPayDate());
+            }
+            return "?";
+        }
+
+        public int getColumnWidth(int c) {
+            switch(c) {
+            case COL_DESC:
+                return 200;
+            case COL_RATE:
+                return 20;
+            default:
+                return 50;
+            }
+        }
+
+        public int getAlignment(int col) {
+            switch(col) {
+            case COL_NLEFT:
+            case COL_RATE:
+                return SwingConstants.CENTER;
+            case COL_DESC:
+                return SwingConstants.LEFT;
+            default:
+                return SwingConstants.RIGHT;
+            }
+        }
+
+        @Override
+        public Class<?> getColumnClass(int c) {
+            return getValueAt(0, c).getClass();
+        }
+
+        @Override
+        public boolean isCellEditable(int row, int col) {
+            return false;
+        }
+
+        //fill table with values
+        public void setData(ArrayList<Loan> loans) {
+            data = loans;
+            fireTableDataChanged();
+        }
+
+        public Loan getLoan(int row) {
+            return data.get(row);
+        }
+
+        public LoanTableModel.Renderer getRenderer() {
+            return new LoanTableModel.Renderer();
+        }
+
+        public class Renderer extends DefaultTableCellRenderer {
+
+            private static final long serialVersionUID = 9054581142945717303L;
+
+            public Component getTableCellRendererComponent(JTable table,
+                    Object value, boolean isSelected, boolean hasFocus,
+                    int row, int column) {
+                super.getTableCellRendererComponent(table, value, isSelected,
+                        hasFocus, row, column);
+                setOpaque(true);
+                setHorizontalAlignment(getAlignment(column));
+                Loan loan = getLoan(table.convertRowIndexToModel(row));
+                
+                setForeground(Color.BLACK);
+                if (isSelected) {
+                    setBackground(Color.DARK_GRAY);
+                    setForeground(Color.WHITE);
+                } else {
+                    if(loan.isOverdue()) {
+                        setBackground(Color.RED);
+                    } else {
+                        setBackground(Color.WHITE);
+                    }
+                }
+
+                return this;
+            }
+        }
+    }
+    
+    public class LoanTableMouseAdapter extends MouseInputAdapter implements ActionListener {
+
+        public void actionPerformed(ActionEvent action) {
+            String command = action.getActionCommand();
+            int row = loanTable.getSelectedRow();
+            if(row < 0) {
+                return;
+            }
+            Loan selectedLoan = loanModel.getLoan(partsTable.convertRowIndexToModel(row));
+            if(null == selectedLoan) {
+                return;
+            }
+            if (command.equalsIgnoreCase("DEFAULT")) {
+                if (0 == JOptionPane
+                        .showConfirmDialog(
+                                null,
+                                "Defaulting on this loan will affect your unit rating the same as a contract breach.\nDo you wish to proceed?",
+                                "Default on " + selectedLoan.getDescription() + "?", JOptionPane.YES_NO_OPTION)) {
+                    getCampaign().getFinances().defaultOnLoan(selectedLoan);
+                    refreshFinancialTransactions();
+                }
+            } else if (command.equalsIgnoreCase("COLLATERAL")) {
+                //IMPLEMENTME
+            } else if(command.equalsIgnoreCase("PAY_BALANCE")) {
+                getCampaign().payOffLoan(selectedLoan);
+                refreshFinancialTransactions();
+                refreshReport();
+            } else if (command.equalsIgnoreCase("REMOVE")) {
+                getCampaign().getFinances().removeLoan(selectedLoan);
+                refreshFinancialTransactions();
+            }
+        }
+        
+        @Override
+        public void mousePressed(MouseEvent e) {
+            maybeShowPopup(e);
+        }
+        
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            maybeShowPopup(e);
+        }
+       
+        private void maybeShowPopup(MouseEvent e) {
+            JPopupMenu popup = new JPopupMenu();
+            if (e.isPopupTrigger()) {
+                if(loanTable.getSelectedRowCount() == 0) {
+                    return;
+                }
+                int row = loanTable.getSelectedRow();
+                Loan loan = loanModel.getLoan(partsTable.convertRowIndexToModel(row));
+                JMenuItem menuItem = null;
+                JMenu menu = null;
+                // **lets fill the pop up menu**//
+                menuItem = new JMenuItem("Pay Off Full Balance (" + DecimalFormat.getInstance().format(loan.getRemainingValue()) + ")");
+                menuItem.setActionCommand("PAY_BALANCE");
+                menuItem.setEnabled(getCampaign().getFunds() >= loan.getRemainingValue());
+                menuItem.addActionListener(this);
+                popup.add(menuItem);
+                menuItem = new JMenuItem("Default on This Loan");
+                menuItem.setActionCommand("DEFAULT");
+                menuItem.addActionListener(this);
+                popup.add(menuItem);
+                menuItem = new JMenuItem("Pay Off Collateral");
+                menuItem.setActionCommand("COLLATERAL");
+                menuItem.addActionListener(this);
+                popup.add(menuItem);
+                // GM mode
+                menu = new JMenu("GM Mode");
+                // remove part
+                menuItem = new JMenuItem("Remove Loan");
+                menuItem.setActionCommand("REMOVE");
+                menuItem.addActionListener(this);
+                menuItem.setEnabled(getCampaign().isGM());
+                menu.add(menuItem);
+                // end
+                popup.addSeparator();
+                popup.add(menu);
+                popup.show(e.getComponent(), e.getX(), e.getY());
+            }
+        }
+    }
 
     /**
      * A table Model for displaying information about units
@@ -9713,6 +9993,7 @@ public class CampaignGUI extends JPanel {
     private javax.swing.JTable personnelTable;
     private javax.swing.JTable scenarioTable;
     private javax.swing.JTable financeTable;
+    private javax.swing.JTable loanTable;
     private javax.swing.JMenuItem addFunds;
     private javax.swing.JButton btnAdvanceDay;
     private javax.swing.JButton btnAssignDoc;
@@ -9779,6 +10060,7 @@ public class CampaignGUI extends JPanel {
     private javax.swing.JScrollPane scrollScenarioTable;
     private javax.swing.JScrollPane scrollUnitTable;
     private javax.swing.JScrollPane scrollFinanceTable;
+    private javax.swing.JScrollPane scrollLoanTable;
     private javax.swing.JTextPane txtServicedUnitView;
     private javax.swing.JSplitPane splitServicedUnits;
     private javax.swing.JPanel statusPanel;

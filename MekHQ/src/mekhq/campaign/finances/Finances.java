@@ -45,11 +45,13 @@ public class Finances implements Serializable {
 	
 	private ArrayList<Transaction> transactions;
 	private ArrayList<Loan> loans;
+	private int loanDefaults;
 
 	
 	public Finances() {
 		transactions = new ArrayList<Transaction>();
 	    loans = new ArrayList<Loan>();
+	    loanDefaults = 0;
 	}
 	
 	public long getBalance() {
@@ -100,8 +102,16 @@ public class Finances implements Serializable {
 		return transactions;
 	}
 	
+	public ArrayList<Loan> getAllLoans() {
+	    return loans;
+	}
+	
 	public void writeToXml(PrintWriter pw1, int indent) {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "<finances>");
+		pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<loanDefaults>"
+                +loanDefaults
+                +"</loanDefaults>");
 		for(Transaction trans : transactions) {
 			trans.writeToXml(pw1, indent+1);
 		}
@@ -119,9 +129,12 @@ public class Finances implements Serializable {
 			 if (wn2.getNodeName().equalsIgnoreCase("transaction")) {
 				 retVal.transactions.add(Transaction.generateInstanceFromXML(wn2));
 			 }
-			 if (wn2.getNodeName().equalsIgnoreCase("loan")) {
+			 else if (wn2.getNodeName().equalsIgnoreCase("loan")) {
                  retVal.loans.add(Loan.generateInstanceFromXML(wn2));
              }
+			 else if (wn2.getNodeName().equalsIgnoreCase("loanDefaults")) {
+                 retVal.loanDefaults = Integer.parseInt(wn2.getTextContent().trim());
+             } 
 		}
 		
 		return retVal;
@@ -172,5 +185,18 @@ public class Finances implements Serializable {
 	    }
 	    loans = newLoans;	 
 	    return overdueAmount;
+	}
+	
+	public void removeLoan(Loan loan) {
+	    loans.remove(loan);
+	}
+	
+	public void defaultOnLoan(Loan loan) {
+        loanDefaults++;
+        removeLoan(loan);
+    }
+	
+	public int getLoanDefaults() {
+	    return loanDefaults;
 	}
 }

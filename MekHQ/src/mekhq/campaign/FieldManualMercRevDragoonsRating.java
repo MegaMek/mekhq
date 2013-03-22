@@ -335,9 +335,11 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
         // Get the highest tech skill this person has.
         int highestSkill = SkillType.EXP_ULTRA_GREEN;
         for (String s : techSkills) {
-            int rank = p.getSkill(s).getExperienceLevel();
-            if (rank > highestSkill) {
-                highestSkill = rank;
+            if(p.hasSkill(s)) {
+                int rank = p.getSkill(s).getExperienceLevel();
+                if (rank > highestSkill) {
+                    highestSkill = rank;
+                }
             }
         }
 
@@ -585,7 +587,9 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
 
     @Override
     public int getFinancialValue() {
-        return getYearsInDebt() * -10;
+        int score = getYearsInDebt() * -10;
+        score -= 25 * campaign.getFinances().getLoanDefaults();
+        return score;
     }
 
     @Override
@@ -626,6 +630,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractDragoonsRating {
 
         sb.append("Financial:                      ").append(getFinancialValue()).append("\n");
         sb.append("    Years in Debt:        ").append(getYearsInDebt()).append("\n");
+        sb.append("    Loan Defaults:        ").append(campaign.getFinances().getLoanDefaults()).append("\n\n");
 
         return new String(sb);
     }
