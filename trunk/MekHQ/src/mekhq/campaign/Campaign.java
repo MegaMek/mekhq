@@ -1222,7 +1222,7 @@ public class Campaign implements Serializable {
 				if(finances.debit(getMaintenanceCosts(), Transaction.C_MAINTAIN, "Weekly Maintenance", calendar.getTime())) {
 				    addReport("Your account has been debited for " + formatter.format(getMaintenanceCosts()) + " C-bills in maintenance costs");
 				} else {
-                    addReport("You cannot afford to pay maintenance costs! Lucky for you that maintenance is not implemented yet.");
+                    addReport("<font color='red'><b>You cannot afford to pay maintenance costs!</b></font> Lucky for you that maintenance is not implemented yet.");
 				}
 			}
 		}
@@ -1237,19 +1237,19 @@ public class Campaign implements Serializable {
 				if(finances.debit(getPayRoll(), Transaction.C_SALARY, "Monthly salaries", calendar.getTime())) {
 				    addReport("Payday! Your account has been debited for " + formatter.format(getPayRoll()) + " C-bills in personnel salaries");
 				} else {
-				    addReport("You cannot afford to pay payroll costs! Lucky for you that personnel morale is not yet implemented.");
+				    addReport("<font color='red'><b>You cannot afford to pay payroll costs!</b></font> Lucky for you that personnel morale is not yet implemented.");
 				}
 			}
 			if(campaignOptions.payForOverhead()) {
 				if(finances.debit(getOverheadExpenses(), Transaction.C_OVERHEAD, "Monthly overhead", calendar.getTime())) {
 				    addReport("Your account has been debited for " + formatter.format(getOverheadExpenses()) + " C-bills in overhead expenses");
 				} else {
-                    addReport("You cannot afford to pay overhead costs! Lucky for you that this does not appear to have any effect.");
+                    addReport("<font color='red'><b>You cannot afford to pay overhead costs!</b></font> Lucky for you that this does not appear to have any effect.");
 				}
 			}
 		}
 		//check for anything else in finances
-        finances.newDay(this, formatter);
+        finances.newDay(this);
 	}
 	
 	private ArrayList<Contract> getActiveContracts() {
@@ -2073,7 +2073,7 @@ public class Campaign implements Serializable {
 				} else if(xn.equalsIgnoreCase("location")) {
 					retVal.location = CurrentLocation.generateInstanceFromXML(wn, retVal);
 				} else if(xn.equalsIgnoreCase("skillTypes")) {
-					processSkillTypeNodes(retVal, wn);
+					processSkillTypeNodes(retVal, wn, version);
 				} else if(xn.equalsIgnoreCase("gameOptions")) {
 					processGameOptionNodes(retVal, wn);
 				} else if(xn.equalsIgnoreCase("kills")) {
@@ -2449,7 +2449,7 @@ public class Campaign implements Serializable {
 		MekHQ.logMessage("Load Personnel Nodes Complete!", 4);
 	}
 	
-	private static void processSkillTypeNodes(Campaign retVal, Node wn) {
+	private static void processSkillTypeNodes(Campaign retVal, Node wn, Version version) {
 		MekHQ.logMessage("Loading Skill Type Nodes from XML...", 4);
 
 		NodeList wList = wn.getChildNodes();
@@ -2474,7 +2474,7 @@ public class Campaign implements Serializable {
 				continue;
 			}
 
-			SkillType.generateInstanceFromXML(wn2);
+			SkillType.generateInstanceFromXML(wn2, version);
 		}
 
 		MekHQ.logMessage("Load Skill Type Nodes Complete!", 4);
@@ -4526,7 +4526,7 @@ public class Campaign implements Serializable {
     
     public void addLoan(Loan loan) {
         addReport("You have taken out loan " + loan.getDescription() + ". Your account has been credited " + DecimalFormat.getInstance().format(loan.getPrincipal()) + " for the principal amount.");
-        finances.credit(loan.getPrincipal(), Transaction.C_MISC, "loan principal for " + loan.getDescription(), calendar.getTime());
+        finances.credit(loan.getPrincipal(), Transaction.C_LOAN_PRINCIPAL, "loan principal for " + loan.getDescription(), calendar.getTime());
         finances.addLoan(loan);
     }
     

@@ -18,6 +18,9 @@ v0.3.0 (SVN)
 + Dylan's Force Icons
 + Loans
 + disallow negative funds (take out loans instead) - still need to implement loan default
++ don't allow new day advancement until overdue loans are dealt with
++ finances.isInDebt change calcluation to account for loans
++ loan payment and principal transaction codes for Transaction
 
 v0.2.0 (2013-03-16)
 + Bug 318: Dragoon's Rating error FMM:R method

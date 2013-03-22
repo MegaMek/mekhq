@@ -38,6 +38,7 @@ import megamek.common.SmallCraft;
 import megamek.common.Tank;
 import megamek.common.VTOL;
 import mekhq.MekHQ;
+import mekhq.Version;
 import mekhq.campaign.MekHqXmlUtil;
 
 import org.w3c.dom.Node;
@@ -517,7 +518,7 @@ public class SkillType implements Serializable {
 		}
 	}
 	
-	public static void generateInstanceFromXML(Node wn) {
+	public static void generateInstanceFromXML(Node wn, Version version) {
 		SkillType retVal = null;
 			
 		try {		
@@ -556,6 +557,14 @@ public class SkillType implements Serializable {
 			// Or the listed name doesn't exist.
 			// Doh!
 			MekHQ.logError(ex);
+		}
+		if(version.getMinorVersion() < 3) {
+		    //need to change negotiation and scrounge to be countUp=false with
+		    //TNs of 10
+		    if(retVal.name.equals(SkillType.S_NEG) || retVal.name.equals(SkillType.S_SCROUNGE)) {
+		        retVal.countUp = false;
+		        retVal.target = 10;
+		    }
 		}
 		lookupHash.put(retVal.name, retVal);
 	}
