@@ -25,6 +25,7 @@ import megamek.client.ui.swing.MechTileset;
 import megamek.client.ui.swing.util.PlayerColors;
 import megamek.common.Crew;
 import megamek.common.Entity;
+import megamek.common.Mech;
 import megamek.common.Player;
 import megamek.common.UnitType;
 import megamek.common.util.DirectoryItems;
@@ -505,28 +506,15 @@ public class ForceViewPanel extends javax.swing.JPanel {
 		}
         Image base = mt.imageFor(u.getEntity(), c, -1);
         int tint = PlayerColors.getColorRGB(u.campaign.getColorIndex());
-        EntityImage entityImage = new EntityImage(base, tint, getCamo(u.campaign), c);
+        EntityImage entityImage = new EntityImage(base, tint, getCamo(u), c);
         return entityImage.loadPreviewImage();
     }
     
-    private Image getCamo(Campaign c) {
-
-        // Return a null if the campaign has selected no camo file.
-        if (null == c.getCamoCategory()
-                || Player.NO_CAMO.equals(c.getCamoCategory())) {
-            return null;
-        }
-
+    private Image getCamo(Unit unit) {
         // Try to get the player's camo file.
         Image camo = null;
         try {
-
-            // Translate the root camo directory name.
-            String category = c.getCamoCategory();
-            if (Player.ROOT_CAMO.equals(category))
-                category = ""; //$NON-NLS-1$
-            camo = (Image) camos.getItem(category, c.getCamoFileName());
-
+            camo = (Image) camos.getItem(unit.getCamoCategory(), unit.getCamoFileName());
         } catch (Exception err) {
             err.printStackTrace();
         }

@@ -48,6 +48,7 @@ import megamek.common.Jumpship;
 import megamek.common.Mech;
 import megamek.common.MiscType;
 import megamek.common.Mounted;
+import megamek.common.Player;
 import megamek.common.QuadMech;
 import megamek.common.SmallCraft;
 import megamek.common.SpaceStation;
@@ -1825,6 +1826,40 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     	return ammo;
     }
     
+    public String getCamoCategory() {
+        if (null == entity) {
+            return "";
+        }
+        
+        String category = campaign.getCamoCategory();
+        if (isEntityCamo()) {
+            category = entity.getCamoCategory();
+        }
+        
+        if (Player.ROOT_CAMO.equals(category)) {
+            category = "";
+        }
+        
+        return category;
+    }
+    
+    public String getCamoFileName() {
+        if (null == campaign && null == entity) {
+            return "";
+        }
+        
+        String fileName = campaign.getCamoFileName();
+        if (isEntityCamo()) {
+            fileName = entity.getCamoFileName();
+        }
+        
+        if (null == fileName) {
+            fileName = "";
+        }
+        
+        return fileName;
+    }
+    
     public Person getCommander() {
     	//take first by rank
     	//if rank is tied, take gunners over drivers
@@ -2375,4 +2410,12 @@ public class Unit implements Serializable, MekHqXmlSerializable {
     	return null;
     }
      
+    private boolean isEntityCamo() {
+        if ((null != entity) && (null != entity.getCamoCategory())
+                && (!Player.NO_CAMO.equals(entity.getCamoFileName()))) {
+            return true;
+        }
+        
+        return false;
+    }
 }
