@@ -41,6 +41,7 @@ public class CamoChoiceDialog extends javax.swing.JDialog {
     private CamoTableModel camoModel = new CamoTableModel();
     private String category;
     private String filename;
+    private boolean clickedSelect;
     private int colorIndex = -1;
     private CamoTableMouseAdapter camoMouseAdapter;
 
@@ -52,6 +53,7 @@ public class CamoChoiceDialog extends javax.swing.JDialog {
         this.camos = camos;
         filename = file;
         colorIndex = color;
+        clickedSelect = false;
         camoMouseAdapter = new CamoTableMouseAdapter();
         initComponents();
         fillTable((String) comboCategories.getSelectedItem());
@@ -189,6 +191,7 @@ public class CamoChoiceDialog extends javax.swing.JDialog {
 	    else if(tableCamo.getSelectedRow() != -1) {
 	        filename = (String) camoModel.getValueAt(tableCamo.getSelectedRow(), 0);
 	    }
+	    clickedSelect = true;
 	    setVisible(false);
 	}//GEN-LAST:event_btnSelectActionPerformed
 
@@ -208,6 +211,10 @@ public class CamoChoiceDialog extends javax.swing.JDialog {
 
     public int getColorIndex() {
         return colorIndex;
+    }
+    
+    public boolean clickedSelect() {
+        return clickedSelect;
     }
 
      private void fillTable(String category) {
@@ -348,6 +355,7 @@ public class CamoChoiceDialog extends javax.swing.JDialog {
                 else {
                     filename = (String) camoModel.getValueAt(row, 0);
                 }
+                clickedSelect = true;
                 setVisible(false);
             }
         }
