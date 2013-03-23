@@ -198,6 +198,9 @@ public class Finances implements Serializable {
 	            campaign.addReport("You have fully paid off loan " + loan.getDescription());
 	        }
 	    }
+	    if(null != wentIntoDebt && !isInDebt()) {
+            wentIntoDebt = null;
+        }
 	    loans = newLoans;
 	}
 	
@@ -219,12 +222,18 @@ public class Finances implements Serializable {
                 campaign.addReport("You have fully paid off loan " + loan.getDescription());
             }
 	    }
-	    loans = newLoans;	 
+	    loans = newLoans;
+	    if(null != wentIntoDebt && !isInDebt()) {
+            wentIntoDebt = null;
+        }
 	    return overdueAmount;
 	}
 	
 	public void removeLoan(Loan loan) {
 	    loans.remove(loan);
+	    if(null != wentIntoDebt && !isInDebt()) {
+            wentIntoDebt = null;
+        }
 	}
 	
 	public void defaultOnLoan(Loan loan) {
