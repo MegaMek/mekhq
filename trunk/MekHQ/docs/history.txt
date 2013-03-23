@@ -19,13 +19,14 @@ v0.3.0 (SVN)
 + Loans
 + disallow negative funds (take out loans instead) - still need to implement loan default
 + don't allow new day advancement until overdue loans are dealt with
-+ finances.isInDebt change calcluation to account for loans
++ finances.isInDebt change calculation to account for loans
 + loan payment and principal transaction codes for Transaction
 + LoanTable in finance tab
 + LoanTableMouseAdapter with Default, pay off, and remove (GM) options - need pay off collateral option
 + Bug: NPE in DragoonsRatingRevised
 + Bug 340: Dragoon's Rating error FMM:R method when in debt
 + Bug: overdue status not removed on loan payment
++ Bug 323/Patch 25: Individual camo not saving from MM/Patch for individual camo
 
 v0.2.0 (2013-03-16)
 + Bug 318: Dragoon's Rating error FMM:R method

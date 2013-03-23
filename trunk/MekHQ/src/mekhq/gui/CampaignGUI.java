@@ -186,6 +186,7 @@ import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.Modes;
 import mekhq.gui.dialog.AddFundsDialog;
 import mekhq.gui.dialog.BombsDialog;
+import mekhq.gui.dialog.CamoChoiceDialog;
 import mekhq.gui.dialog.CampaignOptionsDialog;
 import mekhq.gui.dialog.ChooseMulFilesDialog;
 import mekhq.gui.dialog.ChooseRefitDialog;
@@ -289,7 +290,9 @@ public class CampaignGUI extends JPanel {
 
     private MekHQ app;
 
-    private TaskTableModel taskModel = new TaskTableModel();
+    private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI");
+        
+        private TaskTableModel taskModel = new TaskTableModel();
     private AcquisitionTableModel acquireModel = new AcquisitionTableModel();
     private ServicedUnitTableModel servicedUnitModel = new ServicedUnitTableModel();
     private TechTableModel techsModel = new TechTableModel();
@@ -495,7 +498,6 @@ public class CampaignGUI extends JPanel {
 
         ArrayList <RowSorter.SortKey> sortKeys;
 
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI");
         tabMain.setToolTipText(resourceMap.getString("tabMain.toolTipText")); // NOI18N
         tabMain.setMinimumSize(new java.awt.Dimension(600, 200));
         tabMain.setName("tabMain"); // NOI18N
@@ -9526,6 +9528,24 @@ public class CampaignGUI extends JPanel {
                     }
                 }
             }
+            else if (command.contains("INDI_CAMO")) {
+                String category = selectedUnit.getCamoCategory();
+                if ("".equals(category)) {
+                    category = Player.ROOT_CAMO;
+                }
+                CamoChoiceDialog ccd = new CamoChoiceDialog(getFrame(), true, category, selectedUnit.getCamoFileName(),
+                        getCampaign().getColorIndex(), getCamos());
+                ccd.setLocationRelativeTo(getFrame());
+                ccd.setVisible(true);
+
+                if (ccd.clickedSelect() == true) {
+                    selectedUnit.getEntity().setCamoCategory(ccd.getCategory());
+                    selectedUnit.getEntity().setCamoFileName(ccd.getFileName());
+
+                    refreshForceView();
+                    refreshUnitView();
+                }
+            }
         }
 
         @Override
@@ -9662,6 +9682,11 @@ public class CampaignGUI extends JPanel {
                         menu.add(menuItem);
                     }
                     menu.setEnabled(!unit.isDeployed() && unit.isRepairable());
+                    menuItem = new JMenuItem(resourceMap.getString("customizeMenu.individualCamo.text"));
+                    menuItem.setActionCommand("INDI_CAMO");
+                    menuItem.addActionListener(this);
+                    menuItem.setEnabled(!unit.isDeployed());
+                    menu.add(menuItem);
                     popup.add(menu);
 
                 }

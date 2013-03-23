@@ -150,6 +150,16 @@ public class MekHqXmlUtil {
 			retVal += tgtEnt.getC3UUIDAsString();
 		}
 
+         if (null != tgtEnt.getCamoCategory()) {
+             retVal += "\" camoCategory=\"";
+             retVal += tgtEnt.getCamoCategory();
+         }
+
+         if (null != tgtEnt.getCamoFileName()) {
+             retVal += "\" camoFileName=\"";
+             retVal += tgtEnt.getCamoFileName();
+         }
+
 		retVal += "\">\n";
 
 		// Add the crew this entity.
