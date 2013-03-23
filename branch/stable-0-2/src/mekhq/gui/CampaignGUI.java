@@ -288,7 +288,7 @@ public class CampaignGUI extends JPanel {
 
     private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI");
         
-        private TaskTableModel taskModel = new TaskTableModel();
+    private TaskTableModel taskModel = new TaskTableModel();
     private AcquisitionTableModel acquireModel = new AcquisitionTableModel();
     private ServicedUnitTableModel servicedUnitModel = new ServicedUnitTableModel();
     private TechTableModel techsModel = new TechTableModel();
@@ -306,6 +306,7 @@ public class CampaignGUI extends JPanel {
     private ServicedUnitsTableMouseAdapter servicedUnitMouseAdapter;
     private PartsTableMouseAdapter partsMouseAdapter;
     private TaskTableMouseAdapter taskMouseAdapter;
+    private AcquisitionTableMouseAdapter acquisitionMouseAdapter;
     private PersonnelTableMouseAdapter personnelMouseAdapter;
     private OrgTreeMouseAdapter orgMouseAdapter;
     private ScenarioTableMouseAdapter scenarioMouseAdapter;
@@ -331,6 +332,7 @@ public class CampaignGUI extends JPanel {
         orgMouseAdapter = new OrgTreeMouseAdapter();
         scenarioMouseAdapter = new ScenarioTableMouseAdapter();
         financeMouseAdapter = new FinanceTableMouseAdapter();
+        acquisitionMouseAdapter = new AcquisitionTableMouseAdapter();
 
         initComponents();
     }
@@ -1441,7 +1443,7 @@ public class CampaignGUI extends JPanel {
                         AcquisitionTableValueChanged(evt);
                     }
                 });
-        //AcquisitionTable.addMouseListener(acquisitionMouseAdapter);
+        AcquisitionTable.addMouseListener(acquisitionMouseAdapter);
         scrollAcquisitionTable.setViewportView(AcquisitionTable);
 
         tabTasks.addTab(resourceMap.getString("scrollTaskTable.TabConstraints.tabTasks"), scrollTaskTable); // NOI18N
@@ -4548,6 +4550,15 @@ public class CampaignGUI extends JPanel {
                     refreshAcquireList();
                     refreshPartsList();
                 }*/
+                if (part.checkFixable() == null) {
+                    getCampaign().addReport(part.succeed());
+                    
+                    refreshServicedUnitList();
+                    refreshUnitList();
+                    refreshTaskList();
+                    refreshAcquireList();
+                    refreshPartsList();
+                }
             }
         }
 
@@ -4633,14 +4644,14 @@ public class CampaignGUI extends JPanel {
                 menu = new JMenu("GM Mode");
                 popup.add(menu);
                 // Auto complete task
-                /*
+                
                 menuItem = new JMenuItem("Complete Task");
                 menuItem.setActionCommand("FIX");
                 menuItem.addActionListener(this);
                 menuItem.setEnabled(getCampaign().isGM()
-                        && (null == task.checkFixable()));
+                        && (null == part.checkFixable()));
                 menu.add(menuItem);
-                */
+                
                 popup.show(e.getComponent(), e.getX(), e.getY());
             }
         }
@@ -4698,6 +4709,60 @@ public class CampaignGUI extends JPanel {
                 return c;
             }
 
+        }
+    }
+    
+    public class AcquisitionTableMouseAdapter extends MouseInputAdapter implements ActionListener {
+        public void actionPerformed(ActionEvent action) {
+            String command = action.getActionCommand();
+            IAcquisitionWork acquisitionWork = acquireModel.getAcquisitionAt(AcquisitionTable.convertRowIndexToModel(AcquisitionTable.getSelectedRow()));
+            if(null == acquisitionWork) {
+                return;
+            }
+            if (command.contains("FIX")) {
+                getCampaign().addReport(acquisitionWork.find());
+                
+                refreshServicedUnitList();
+                refreshUnitList();
+                refreshTaskList();
+                refreshAcquireList();
+                refreshPartsList();
+            }
+        }
+    
+        @Override
+        public void mousePressed(MouseEvent e) {
+            maybeShowPopup(e);
+        }
+    
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            maybeShowPopup(e);
+        }
+    
+        private void maybeShowPopup(MouseEvent e) {
+            JPopupMenu popup = new JPopupMenu();
+            if (e.isPopupTrigger()) {
+                int row = AcquisitionTable.getSelectedRow();
+                if(row < 0) {
+                    return;
+                }
+                IAcquisitionWork acquisitionWork = acquireModel.getAcquisitionAt(row);
+                JMenuItem menuItem = null;
+                JMenu menu = null;
+                JCheckBoxMenuItem cbMenuItem = null;
+                menu = new JMenu("GM Mode");
+                popup.add(menu);
+                // Auto complete task
+    
+                menuItem = new JMenuItem("Complete Task");
+                menuItem.setActionCommand("FIX");
+                menuItem.addActionListener(this);
+                menuItem.setEnabled(getCampaign().isGM());
+                menu.add(menuItem);
+                   
+                popup.show(e.getComponent(), e.getX(), e.getY());
+            }
         }
     }
 
