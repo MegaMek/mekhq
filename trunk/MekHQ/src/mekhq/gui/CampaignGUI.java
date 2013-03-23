@@ -4791,7 +4791,7 @@ public class CampaignGUI extends JPanel {
                 return;
             }
             if (command.contains("FIX")) {
-                getCampaign().addReport(acquisitionWork.find());
+                getCampaign().addReport(acquisitionWork.find(0));
                 
                 refreshServicedUnitList();
                 refreshUnitList();
