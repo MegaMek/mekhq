@@ -828,6 +828,16 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 				}
 			}
 			
+			if(version.getMajorVersion() == 0 && version.getMinorVersion() < 3) {
+			    //adjust for conventional fighter pilots
+			    if(retVal.primaryRole > T_CONV_PILOT) {
+			        retVal.primaryRole += 1;
+			    }
+			    if(retVal.secondaryRole > T_CONV_PILOT) {
+                    retVal.secondaryRole += 1;
+                }
+			}
+			
 			if ((null != advantages) && (advantages.trim().length() > 0)) {
 	            StringTokenizer st = new StringTokenizer(advantages,"::");
 	            while (st.hasMoreTokens()) {

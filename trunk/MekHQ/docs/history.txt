@@ -30,6 +30,7 @@ v0.3.0 (SVN)
 + Patch 26: GM Mode complete Task/Acquisition
 + Bug: Adjustment to Patch 26 code to support part transit times.
 + added context menu options Cancel Order and Deliver Part Now (GM) in warehouse
++ backwards compatability for conventional pilot types
 
 v0.2.0 (2013-03-16)
 + Bug 318: Dragoon's Rating error FMM:R method
