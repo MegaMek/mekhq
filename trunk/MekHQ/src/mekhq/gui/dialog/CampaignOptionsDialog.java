@@ -106,9 +106,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnDate;
     private javax.swing.JButton btnOkay;
-    private javax.swing.JFormattedTextField clanPriceModifierJFormattedTextField;
-    private javax.swing.JFormattedTextField usedPartsValueJFormattedTextField;
-    private javax.swing.JFormattedTextField damagedPartsValueJFormattedTextField;
+    private JSpinner spnClanPriceModifier;
+    private JSpinner spnUsedPartsValue;
+    private JSpinner spnDamagedPartsValue;
     private javax.swing.JComboBox comboFaction;
     private javax.swing.JComboBox comboFactionNames;
     private javax.swing.JComboBox comboRanks;
@@ -160,7 +160,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JSpinner spnEquipPercent;
     private JCheckBox chkEquipContractSaleValue;
     private JCheckBox chkBLCSaleValue;
-
+    private JSpinner spnOrderRefund;
 
     private javax.swing.JTextArea textRanks;
     private javax.swing.JScrollPane scrRanks;
@@ -271,9 +271,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         useEraModsCheckBox.setSelected(options.useEraMods());
         useDragoonRatingCheckBox.setSelected(options.useDragoonRating());
         dragoonsRatingMethodCombo.setSelectedItem(options.getDragoonsRatingMethod().getDescription());
-        clanPriceModifierJFormattedTextField.setValue(options.getClanPriceModifier());
-        usedPartsValueJFormattedTextField.setValue(options.getUsedPartsValue());
-        damagedPartsValueJFormattedTextField.setValue(options.getDamagedPartsValue());
         useFactionForNamesBox.setSelected(options.useFactionForNames());
         useTacticsBox.setSelected(options.useTactics());
         useInitBonusBox.setSelected(options.useInitBonus());
@@ -350,9 +347,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         decimalFormatSymbols.setGroupingSeparator(' ');
         decimalFormatSymbols.setDecimalSeparator('.');
         numberFormat.setDecimalFormatSymbols(decimalFormatSymbols);
-        clanPriceModifierJFormattedTextField = new JFormattedTextField(numberFormat);
-        usedPartsValueJFormattedTextField = new JFormattedTextField(numberFormat);
-        damagedPartsValueJFormattedTextField = new JFormattedTextField(numberFormat);
         useFactionForNamesBox = new javax.swing.JCheckBox();
         useTacticsBox = new javax.swing.JCheckBox();
         useInitBonusBox = new javax.swing.JCheckBox();
@@ -958,59 +952,79 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         clanPriceModifierLabel.setText(resourceMap.getString("clanPriceModifierLabel.text")); // NOI18N
         clanPriceModifierLabel.setName("clanPriceModifierLabel"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 8;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panFinances.add(clanPriceModifierLabel, gridBagConstraints);
         
-        clanPriceModifierJFormattedTextField.setColumns(4);
-        clanPriceModifierJFormattedTextField.setToolTipText(resourceMap.getString("clanPriceModifierJFormattedTextField.toolTipText")); // NOI18N
-        clanPriceModifierJFormattedTextField.setName("clanPriceModifierJFormattedTextField"); // NOI18N
+        spnClanPriceModifier = new JSpinner(new SpinnerNumberModel(options.getClanPriceModifier(), 1.0, 5.0, 0.1));
+        ((JSpinner.DefaultEditor)spnClanPriceModifier.getEditor()).getTextField().setEditable(false);
+        ((JSpinner.DefaultEditor)spnClanPriceModifier.getEditor()).getTextField().setColumns(3);
+        spnClanPriceModifier.setToolTipText(resourceMap.getString("clanPriceModifierJFormattedTextField.toolTipText")); // NOI18N      
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 8;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panFinances.add(clanPriceModifierJFormattedTextField, gridBagConstraints);
-        
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        panFinances.add(spnClanPriceModifier, gridBagConstraints);
+              
         usedPartsValueLabel.setText(resourceMap.getString("usedPartsValueLabel.text")); // NOI18N
         usedPartsValueLabel.setName("usedPartsValueLabel"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 9;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panFinances.add(usedPartsValueLabel, gridBagConstraints);
         
-        usedPartsValueJFormattedTextField.setColumns(4);
-        usedPartsValueJFormattedTextField.setToolTipText(resourceMap.getString("usedPartsValueJFormattedTextField.toolTipText")); // NOI18N
-        usedPartsValueJFormattedTextField.setName("usedPartsValueJFormattedTextField"); // NOI18N
+        spnUsedPartsValue = new JSpinner(new SpinnerNumberModel(options.getUsedPartsValue(), 0.00, 1.00, 0.05));
+        ((JSpinner.DefaultEditor)spnUsedPartsValue.getEditor()).getTextField().setEditable(false);
+        ((JSpinner.DefaultEditor)spnUsedPartsValue.getEditor()).getTextField().setColumns(3);
+        spnUsedPartsValue.setToolTipText(resourceMap.getString("usedPartsValueJFormattedTextField.toolTipText")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 9;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panFinances.add(usedPartsValueJFormattedTextField, gridBagConstraints);
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        panFinances.add(spnUsedPartsValue, gridBagConstraints);
         
         damagedPartsValueLabel.setText(resourceMap.getString("damagedPartsValueLabel.text")); // NOI18N
         damagedPartsValueLabel.setName("damagedPartsValueLabel"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 10;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panFinances.add(damagedPartsValueLabel, gridBagConstraints);
         
-        damagedPartsValueJFormattedTextField.setColumns(4);
-        damagedPartsValueJFormattedTextField.setToolTipText(resourceMap.getString("damagedPartsValueJFormattedTextField.toolTipText")); // NOI18N
-        damagedPartsValueJFormattedTextField.setName("damagedPartsValueJFormattedTextField"); // NOI18N
+        spnDamagedPartsValue = new JSpinner(new SpinnerNumberModel(options.getDamagedPartsValue(), 0.00, 1.00, 0.05));
+        ((JSpinner.DefaultEditor)spnDamagedPartsValue.getEditor()).getTextField().setEditable(false);
+        ((JSpinner.DefaultEditor)spnDamagedPartsValue.getEditor()).getTextField().setColumns(3);
+        spnDamagedPartsValue.setToolTipText(resourceMap.getString("damagedPartsValueJFormattedTextField.toolTipText")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 10;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panFinances.add(damagedPartsValueJFormattedTextField, gridBagConstraints);
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        panFinances.add(spnDamagedPartsValue, gridBagConstraints);
+        
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 11;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        panFinances.add(new JLabel("Reimbursement % for cancelled orders"), gridBagConstraints);
+        
+        spnOrderRefund = new JSpinner(new SpinnerNumberModel(options.GetCanceledOrderReimbursement(), 0.00, 1.00, 0.05));
+        ((JSpinner.DefaultEditor)spnOrderRefund.getEditor()).getTextField().setEditable(false);
+        ((JSpinner.DefaultEditor)spnOrderRefund.getEditor()).getTextField().setColumns(3);
+        //spnDamagedPartsValue.setToolTipText(resourceMap.getString("damagedPartsValueJFormattedTextField.toolTipText")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 11;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        panFinances.add(spnOrderRefund, gridBagConstraints);
         
         tabOptions.addTab(resourceMap.getString("panFinances.TabConstraints.tabTitle"), panFinances); // NOI18N
         
@@ -2095,10 +2109,10 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 	    // Rules panel
 	    options.setFactionModifiers(useFactionModifiersCheckBox.isSelected());
 	    options.setEraMods(useEraModsCheckBox.isSelected());
-	    String clanPriceModifierString = clanPriceModifierJFormattedTextField.getText();
-	    options.setClanPriceModifier(new Double(clanPriceModifierString));
-	    options.setUsedPartsValue(new Double(usedPartsValueJFormattedTextField.getText()));
-	    options.setDamagedPartsValue(new Double(damagedPartsValueJFormattedTextField.getText()));
+	    options.setClanPriceModifier((Double)spnClanPriceModifier.getModel().getValue());
+	    options.setUsedPartsValue((Double)spnUsedPartsValue.getModel().getValue());
+	    options.setDamagedPartsValue((Double)spnDamagedPartsValue.getModel().getValue());
+	    options.setCanceledOrderReimbursement((Double)spnOrderRefund.getModel().getValue());
 	    options.setDragoonRating(useDragoonRatingCheckBox.isSelected());
         options.setDragoonsRatingMethod(CampaignOptions.DragoonsRatingMethod.getDragoonsRatingMethod((String)dragoonsRatingMethodCombo.getSelectedItem()));
 	    options.setFactionForNames(useFactionForNamesBox.isSelected());

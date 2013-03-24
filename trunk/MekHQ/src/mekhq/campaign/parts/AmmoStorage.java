@@ -242,6 +242,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
 	@Override
     public String find(int transitDays) {
 	    Part newPart = getNewPart();
+	    newPart.setBrandNew(true);
         newPart.setDaysToArrival(transitDays);
         if(campaign.buyPart(newPart)) {
             return "<font color='green'><b> part found</b>.</font> It will be delivered in " + transitDays + " days.";
