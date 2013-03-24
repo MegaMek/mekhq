@@ -670,6 +670,7 @@ public class Campaign implements Serializable {
 	    if(null != p.getUnit()) {
 	        return;
 	    }
+	    p.setDaysToArrival(0);
 	    addReport(p.getArrivalReport());
 	    int quantity = p.getQuantity();
         Part spare = checkForExistingSparePart(p);

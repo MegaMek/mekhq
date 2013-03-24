@@ -97,6 +97,7 @@ public class CampaignOptions implements Serializable {
     private boolean sellParts;
     private double usedPartsValue;
     private double damagedPartsValue;
+    private double canceledOrderReimbursement;
 
     //contract related
     private boolean equipmentContractBase;
@@ -171,6 +172,7 @@ public class CampaignOptions implements Serializable {
         successXP = 0;
         usedPartsValue = 0.5;
         damagedPartsValue = 0.33;
+        canceledOrderReimbursement = 0.5;
         usePortraitForType = new boolean[Person.T_NUM];
         for(int i = 0; i < Person.T_NUM; i++) {
         	usePortraitForType[i] = false;
@@ -285,6 +287,14 @@ public class CampaignOptions implements Serializable {
     
     public void setDamagedPartsValue(double d) {
         this.damagedPartsValue = d;
+    }
+    
+    public double GetCanceledOrderReimbursement() {
+        return canceledOrderReimbursement;
+    }
+    
+    public void setCanceledOrderReimbursement(double d) {
+        this.canceledOrderReimbursement = d;
     }
     
     public int getRepairSystem() {
@@ -703,6 +713,7 @@ public class CampaignOptions implements Serializable {
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "payForTransport", payForTransport);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "usedPartsValue", usedPartsValue);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "damagedPartsValue", damagedPartsValue);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "canceledOrderReimbursement", canceledOrderReimbursement);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "sellUnits", sellUnits);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "sellParts", sellParts);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "scenarioXP", scenarioXP);
@@ -864,7 +875,9 @@ public class CampaignOptions implements Serializable {
 				retVal.usedPartsValue = Double.parseDouble(wn2.getTextContent().trim());
 			} else if (wn2.getNodeName().equalsIgnoreCase("damagedPartsValue")) {
 				retVal.damagedPartsValue = Double.parseDouble(wn2.getTextContent().trim());
-			} else if (wn2.getNodeName().equalsIgnoreCase("scenarioXP")) {
+			} else if (wn2.getNodeName().equalsIgnoreCase("canceledOrderReimbursement")) {
+                retVal.canceledOrderReimbursement = Double.parseDouble(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("scenarioXP")) {
 				retVal.scenarioXP = Integer.parseInt(wn2.getTextContent().trim());
 			} else if (wn2.getNodeName().equalsIgnoreCase("killsForXP")) {
 				retVal.killsForXP = Integer.parseInt(wn2.getTextContent().trim());

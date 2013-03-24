@@ -8308,7 +8308,35 @@ public class CampaignGUI extends JPanel {
                     int q = pvcd.getValue();
                     getCampaign().sellPart(selectedPart, q);
                 }
-            } else if (command.equalsIgnoreCase("REMOVE")) {
+            } 
+            else if (command.equalsIgnoreCase("CANCEL_ORDER")) {
+                double refund = getCampaign().getCampaignOptions().GetCanceledOrderReimbursement();
+                long refundAmount = 0;
+                for(Part p : parts) {
+                    if(null != p) {
+                        refundAmount += (refund * p.getStickerPrice() * p.getQuantity());
+                        getCampaign().removePart(p);
+                    }
+                }
+                getCampaign().getFinances().credit(refundAmount, Transaction.C_EQUIP, "refund for cancelled equipmemt sale", getCampaign().getDate());
+                refreshFinancialTransactions();
+                refreshPartsList();
+                refreshTaskList();
+                refreshAcquireList();
+                refreshReport();
+            }
+            else if (command.equalsIgnoreCase("ARRIVE")) {
+                for(Part p : parts) {
+                    if(null != p) {
+                        getCampaign().arrivePart(p);
+                    }
+                }
+                refreshPartsList();
+                refreshTaskList();
+                refreshAcquireList();
+                refreshReport();
+            }
+            else if (command.equalsIgnoreCase("REMOVE")) {
                 for(Part p : parts) {
                     if(null != p) {
                         getCampaign().removePart(p);
@@ -8353,6 +8381,24 @@ public class CampaignGUI extends JPanel {
             }
             return true;
         }
+        
+        public boolean areAllPartsPresent(Part[] parts) {
+            for(Part p : parts) {
+                if(!p.isPresent()) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        
+        public boolean areAllPartsInTransit(Part[] parts) {
+            for(Part p : parts) {
+                if(p.isPresent()) {
+                    return false;
+                }
+            }
+            return true;
+        }
 
         private void maybeShowPopup(MouseEvent e) {
             JPopupMenu popup = new JPopupMenu();
@@ -8376,7 +8422,7 @@ public class CampaignGUI extends JPanel {
                 }
                 // **lets fill the pop up menu**//
                 // sell part
-                if(getCampaign().getCampaignOptions().canSellParts()) {
+                if(getCampaign().getCampaignOptions().canSellParts() && areAllPartsPresent(parts)) {
                     menu = new JMenu("Sell");
                     if(areAllPartsAmmo(parts)) {
                         menuItem = new JMenuItem("Sell All Ammo of This Type");
@@ -8413,7 +8459,7 @@ public class CampaignGUI extends JPanel {
                     }
                     popup.add(menu);
                 }
-                if(oneSelected && part.needsFixing()) {
+                if(oneSelected && part.needsFixing() && part.isPresent()) {
                     menu = new JMenu("Repair Mode");
                     for (int i = 0; i < Modes.MODE_N; i++) {
                         cbMenuItem = new JCheckBoxMenuItem(Modes.getModeName(i));
@@ -8428,8 +8474,21 @@ public class CampaignGUI extends JPanel {
                     }
                     popup.add(menu);
                 }
+                if(areAllPartsInTransit(parts)) {
+                    menuItem = new JMenuItem("Cancel This Delivery");
+                    menuItem.setActionCommand("CANCEL_ORDER");
+                    menuItem.addActionListener(this);
+                    popup.add(menuItem);
+                }
                 // GM mode
                 menu = new JMenu("GM Mode");
+                if(areAllPartsInTransit(parts)) {
+                    menuItem = new JMenuItem("Deliver Part Now");
+                    menuItem.setActionCommand("ARRIVE");
+                    menuItem.addActionListener(this);
+                    menuItem.setEnabled(getCampaign().isGM());
+                    menu.add(menuItem);
+                }
                 // remove part
                 menuItem = new JMenuItem("Remove Part");
                 menuItem.setActionCommand("REMOVE");
@@ -9026,10 +9085,9 @@ public class CampaignGUI extends JPanel {
                     getCampaign().getFinances().defaultOnLoan(selectedLoan);
                     refreshFinancialTransactions();
                 }
-            } else if (command.equalsIgnoreCase("COLLATERAL")) {
-                //IMPLEMENTME
             } else if(command.equalsIgnoreCase("PAY_BALANCE")) {
                 getCampaign().payOffLoan(selectedLoan);
+                //TODO: deal with collateral obligations
                 refreshFinancialTransactions();
                 refreshReport();
             } else if (command.equalsIgnoreCase("REMOVE")) {
@@ -9066,10 +9124,6 @@ public class CampaignGUI extends JPanel {
                 popup.add(menuItem);
                 menuItem = new JMenuItem("Default on This Loan");
                 menuItem.setActionCommand("DEFAULT");
-                menuItem.addActionListener(this);
-                popup.add(menuItem);
-                menuItem = new JMenuItem("Pay Off Collateral");
-                menuItem.setActionCommand("COLLATERAL");
                 menuItem.addActionListener(this);
                 popup.add(menuItem);
                 // GM mode
