@@ -68,20 +68,20 @@ public class ShoppingList implements MekHqXmlSerializable {
         shoppingList = new ArrayList<IAcquisitionWork>();
     }
     
-    public IAcquisitionWork getShoppingItem(Part newPart) {
+    public IAcquisitionWork getShoppingItem(Object newEquipment) {
         for(IAcquisitionWork shoppingItem : shoppingList) {
-            if(shoppingItem.getNewPart().isSamePartType(newPart)) {
+            if(isSameEquipment(shoppingItem.getNewEquipment(), newEquipment)) {
                 return shoppingItem;
             }
         }
         return null;
     }
     
-    public void removeItem(Part newPart) {
+    public void removeItem(Object equipment) {
         int idx = -1;
         int row = 0;
-        for(IAcquisitionWork shoppingItem : shoppingList) {
-            if(shoppingItem.getNewPart().isSamePartType(newPart)) {
+        for(IAcquisitionWork shoppingItem : shoppingList) {           
+            if(isSameEquipment(shoppingItem.getNewEquipment(), equipment)) {
                 idx = row;
                 break;
             }
@@ -92,15 +92,15 @@ public class ShoppingList implements MekHqXmlSerializable {
         }
     }
     
-    public void addShoppingItem(Part newPart, int quantity) {
-        Person person = newPart.getCampaign().getLogisticsPerson();
-        if(null == person && !newPart.getCampaign().getCampaignOptions().getAcquisitionSkill().equals(CampaignOptions.S_AUTO)) {
-            newPart.getCampaign().addReport("Your force has no one capable of acquiring parts.");
+    public void addShoppingItem(IAcquisitionWork newWork, int quantity, Campaign campaign) {
+        Person person = campaign.getLogisticsPerson();
+        if(null == person && !campaign.getCampaignOptions().getAcquisitionSkill().equals(CampaignOptions.S_AUTO)) {
+            campaign.addReport("Your force has no one capable of acquiring equipment.");
             return;
         }
         for(IAcquisitionWork shoppingItem : shoppingList) {
-            if(shoppingItem.getNewPart().isSamePartType(newPart)) {
-                newPart.getCampaign().addReport(newPart.getShoppingListReport(quantity));
+            if(isSameEquipment(shoppingItem.getNewEquipment(), newWork.getNewEquipment())) {
+                campaign.addReport(newWork.getShoppingListReport(quantity));
                 while(quantity > 0) {
                     shoppingItem.incrementQuantity();
                     quantity--;
@@ -108,43 +108,30 @@ public class ShoppingList implements MekHqXmlSerializable {
                 return;
             }
         }
-        //if we are still here then this is new so add it and check       
-        //The order this is done in below matters because some parts (AmmoBins) can 
-        //be both acquisition items and have a valid missing part. So MissingParts should
-        //be checked for first. 
-        IAcquisitionWork shoppingItem = (MissingPart)newPart.getMissingPart();
-        if(null == shoppingItem && newPart instanceof IAcquisitionWork) {
-            shoppingItem = (IAcquisitionWork)newPart;
-        }         
-        if (null == shoppingItem) {
-            //somethings wrong
-            MekHQ.logMessage("found a null shopping item when trying to add " + newPart.getName());
-            return;
-        }
-        while(quantity > 0 && newPart.getCampaign().acquirePart(shoppingItem, person)) {
+        while(quantity > 0 && campaign.acquireEquipment(newWork, person)) {
             quantity--;
         }
         if(quantity > 0) {
-            newPart.getCampaign().addReport(newPart.getShoppingListReport(quantity));
+            campaign.addReport(newWork.getShoppingListReport(quantity));
             while(quantity > 1) {
-                shoppingItem.incrementQuantity();
+                newWork.incrementQuantity();
                 quantity--;
             }
-            shoppingList.add(shoppingItem);
+            shoppingList.add(newWork);
         }
     }
     
     public void newDay(Campaign campaign) {
         Person person = campaign.getLogisticsPerson();
         if(null == person && !campaign.getCampaignOptions().getAcquisitionSkill().equals(CampaignOptions.S_AUTO)) {
-            campaign.addReport("Your force has no one capable of acquiring parts.");
+            campaign.addReport("Your force has no one capable of acquiring equipment.");
             return;
         }
         ArrayList<IAcquisitionWork> newShoppingList = new ArrayList<IAcquisitionWork>();
         for(IAcquisitionWork shoppingItem : shoppingList) {
             shoppingItem.decrementDaysToWait();
             if(shoppingItem.getDaysToWait() <= 0) {
-                while(shoppingItem.getQuantity() > 0 && campaign.acquirePart(shoppingItem, person)) {
+                while(shoppingItem.getQuantity() > 0 && campaign.acquireEquipment(shoppingItem, person)) {
                     shoppingItem.decrementQuantity();
                 }
             }
@@ -201,6 +188,15 @@ public class ShoppingList implements MekHqXmlSerializable {
     
     public ArrayList<IAcquisitionWork> getList() {
         return shoppingList;
+    }
+    
+    private boolean isSameEquipment(Object equipment, Object newEquipment) {
+        if(newEquipment instanceof Part && equipment instanceof Part) {
+            if(((Part)equipment).isSamePartType((Part)newEquipment)) {
+                return true;
+            }
+        }
+        return false;
     }
     
 }

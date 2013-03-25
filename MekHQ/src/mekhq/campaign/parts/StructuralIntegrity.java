@@ -171,7 +171,7 @@ public class StructuralIntegrity extends Part {
 	}
 
 	@Override
-	public Part getMissingPart() {
+	public MissingPart getMissingPart() {
 		//you cant replace this part, so return null
 		return null;
 	}

@@ -93,7 +93,7 @@ public class VeeSensor extends Part {
 	}
 
 	@Override
-	public Part getMissingPart() {
+	public MissingPart getMissingPart() {
 		return new MissingVeeSensor(getUnitTonnage(), campaign);
 	}
 

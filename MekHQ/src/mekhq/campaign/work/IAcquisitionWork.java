@@ -34,7 +34,7 @@ public interface IAcquisitionWork extends IWork {
 	
 	public String getAcquisitionName();
 	
-	public Part getNewPart();
+	public Object getNewEquipment();
 	
 	public String getAcquisitionDesc();
 	
@@ -61,5 +61,7 @@ public interface IAcquisitionWork extends IWork {
 	public void incrementQuantity();
 	
 	public void decrementQuantity();
+	
+	public String getShoppingListReport(int quantity);
 	
 }

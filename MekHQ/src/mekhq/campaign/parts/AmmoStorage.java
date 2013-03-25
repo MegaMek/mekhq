@@ -186,10 +186,15 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
 	}
 
 	@Override
-	public Part getMissingPart() {
+	public MissingPart getMissingPart() {
 		//nothing to do here
 		return null;
 	}
+	
+	@Override
+    public IAcquisitionWork getAcquisitionWork() {
+        return new AmmoStorage(1,type,((AmmoType)type).getShots(),campaign);
+    }
 	
 	@Override
 	public TargetRoll getAllMods() {
@@ -251,6 +256,11 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
         }
     }
     
+	@Override
+    public Object getNewEquipment() {
+        return getNewPart();
+    }
+	
     @Override
     public String failToFind() {
         resetDaysToWait();
@@ -321,7 +331,6 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
         return target;
     }
 
-    @Override
     public Part getNewPart() {
         return new AmmoStorage(1,type,((AmmoType)type).getShots(),campaign);
     }

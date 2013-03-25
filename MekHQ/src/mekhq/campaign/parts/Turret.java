@@ -141,7 +141,7 @@ public class Turret extends TankLocation {
 	}
 
 	@Override
-	public Part getMissingPart() {
+	public MissingPart getMissingPart() {
 		return new MissingTurret(getUnitTonnage(), weight, campaign);
 	}
 

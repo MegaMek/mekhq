@@ -418,16 +418,26 @@ public class Armor extends Part implements IAcquisitionWork {
 	}
 	
 	@Override
+    public Object getNewEquipment() {
+        return getNewPart();
+    }
+	
+	@Override
 	public String failToFind() {
 	    resetDaysToWait();
 		return "<font color='red'><b> part not found</b>.</font>";
 	}
 
 	@Override
-	public Part getMissingPart() {
+	public MissingPart getMissingPart() {
 		//no such thing
 		return null;
 	}
+	
+	@Override
+    public IAcquisitionWork getAcquisitionWork() {
+        return new Armor(0, type, (int)Math.round(5 * getArmorPointsPerTon()), -1, false, clan, campaign);
+    }
 
 	@Override
 	public void remove(boolean salvage) {
@@ -587,7 +597,6 @@ public class Armor extends Part implements IAcquisitionWork {
 		//return 0.0;
 	}
 	
-	@Override 
 	public Part getNewPart() {
 		return new Armor(0, type, (int)Math.round(5 * getArmorPointsPerTon()), -1, false, clan, campaign);
 	}

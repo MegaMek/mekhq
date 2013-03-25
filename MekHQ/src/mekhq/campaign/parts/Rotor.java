@@ -90,7 +90,7 @@ public class Rotor extends TankLocation {
 	}
 
 	@Override
-	public Part getMissingPart() {
+	public MissingPart getMissingPart() {
 		return new MissingRotor(getUnitTonnage(), campaign);
 	}
 

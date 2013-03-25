@@ -26,6 +26,7 @@ import megamek.common.EquipmentType;
 import megamek.common.MiscType;
 import megamek.common.Mounted;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
 
 /**
@@ -77,7 +78,7 @@ public class JumpJet extends EquipmentPart {
     }
 
 	@Override
-	public Part getMissingPart() {
+	public MissingPart getMissingPart() {
 		return new MissingJumpJet(getUnitTonnage(), type, equipmentNum, campaign);
 	}
 

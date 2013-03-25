@@ -131,7 +131,7 @@ public class AeroLifeSupport extends Part {
 	}
 
 	@Override
-	public Part getMissingPart() {
+	public MissingPart getMissingPart() {
 		return new MissingAeroLifeSupport(getUnitTonnage(), cost, fighter, campaign);
 	}
 

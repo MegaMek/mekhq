@@ -190,7 +190,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 	}
 	
 	@Override
-	public Part getMissingPart() {
+	public MissingPart getMissingPart() {
 		//do nothing - this should never be accessed
 		return null;
 	}
@@ -264,6 +264,13 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		    return "<font color='red'><b> You cannot afford this part. Transaction cancelled</b>.</font>";
 		}
 	}
+	
+	@Override
+	public Object getNewEquipment() {
+	    return getNewPart();
+	}
+	
+	public abstract Part getNewPart();
 	
 	@Override
 	public String failToFind() {

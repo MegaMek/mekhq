@@ -29,6 +29,7 @@ import megamek.common.TechConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
+import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
 
 import org.w3c.dom.Node;
@@ -152,7 +153,7 @@ public class MASC extends EquipmentPart {
 	}
 	
 	@Override
-	public Part getMissingPart() {
+	public MissingPart getMissingPart() {
 		return new MissingMASC(getUnitTonnage(), type, equipmentNum, campaign, equipTonnage, engineRating);
 	}
 	

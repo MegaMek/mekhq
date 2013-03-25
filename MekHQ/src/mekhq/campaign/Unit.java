@@ -518,7 +518,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 		long value = 0;
 		for(Part part : parts) {
 			if(part instanceof MissingPart) {
-			    Part newPart = ((MissingPart)part).getNewPart();
+			    Part newPart = (Part)((MissingPart)part).getNewEquipment();
 			    newPart.setBrandNew(!campaign.getCampaignOptions().useBLCSaleValue());
 				value += newPart.getActualValue();
 			}

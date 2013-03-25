@@ -190,7 +190,7 @@ public class TankLocation extends Part {
 	}
 
 	@Override
-	public Part getMissingPart() {
+	public MissingPart getMissingPart() {
 		//cant replace locations
 		return null;
 	}

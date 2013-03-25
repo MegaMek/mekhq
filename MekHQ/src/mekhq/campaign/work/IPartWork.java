@@ -23,6 +23,7 @@ package mekhq.campaign.work;
 import java.util.UUID;
 
 import mekhq.campaign.Unit;
+import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
 
 /**
@@ -56,7 +57,7 @@ public interface IPartWork extends IWork {
 	public void updateConditionFromPart();
 	public void fix();
 	public void remove(boolean salvage);
-	public Part getMissingPart();
+	public MissingPart getMissingPart();
 	
 	public String getDesc();
 	public String getDetails();

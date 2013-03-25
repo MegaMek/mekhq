@@ -2539,7 +2539,7 @@ public class CampaignGUI extends JPanel {
             if(null == acquisition) {
                 return;
             }
-            getCampaign().getShoppingList().addShoppingItem(acquisition.getNewPart(), 1);
+            getCampaign().getShoppingList().addShoppingItem(acquisition, 1, getCampaign());
         }
 
         refreshServicedUnitList();
@@ -8697,7 +8697,7 @@ public class CampaignGUI extends JPanel {
         }
 
         public Part getNewPartAt(int row) {
-            return ((IAcquisitionWork) data.get(row)).getNewPart();
+            return (Part)((IAcquisitionWork) data.get(row)).getNewEquipment();
         }
         
         public IAcquisitionWork getAcquisition(int row) {

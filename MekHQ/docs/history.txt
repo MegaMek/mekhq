@@ -33,6 +33,7 @@ v0.3.0 (SVN)
 + backwards compatability for conventional pilot types
 + put procurement list in warehouse tab instead of dialog
 + mouse adapter for procurement list table
++ restructured ShoppingList to add IAcquisitionWork instead of part
 
 v0.2.0 (2013-03-16)
 + Bug 318: Dragoon's Rating error FMM:R method

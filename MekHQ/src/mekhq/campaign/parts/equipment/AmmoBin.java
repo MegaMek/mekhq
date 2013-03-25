@@ -37,6 +37,7 @@ import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Availability;
+import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.work.IAcquisitionWork;
 
@@ -317,7 +318,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 	}
 
 	@Override
-	public Part getMissingPart() {
+	public MissingPart getMissingPart() {
 		return new MissingAmmoBin(getUnitTonnage(), type, equipmentNum, oneShot, campaign);
 	}
 	
@@ -521,8 +522,17 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     }
 
 	@Override
+    public Object getNewEquipment() {
+        return getNewPart();
+    }
+	
 	public Part getNewPart() {
 		return new AmmoStorage(1,type,((AmmoType)type).getShots(),campaign);
 	}
+	
+	@Override
+    public IAcquisitionWork getAcquisitionWork() {
+        return new AmmoStorage(1,type,((AmmoType)type).getShots(),campaign);
+    }
 
 }

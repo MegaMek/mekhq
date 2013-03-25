@@ -26,6 +26,7 @@ import java.io.PrintWriter;
 import megamek.common.EquipmentType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
+import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
 
 import org.w3c.dom.Node;
@@ -57,7 +58,7 @@ public class InfantryWeaponPart extends EquipmentPart {
     }
 
 	@Override
-	public Part getMissingPart() {
+	public MissingPart getMissingPart() {
 		//shouldn't get here, but ok
 		return new MissingEquipmentPart(getUnitTonnage(), type, equipmentNum, campaign, getTonnage());
 	}
