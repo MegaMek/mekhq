@@ -110,7 +110,7 @@ public class InfantryMotiveType extends Part {
 	}
 
 	@Override
-	public Part getMissingPart() {
+	public MissingPart getMissingPart() {
 		return new MissingInfantryMotiveType(0, campaign, mode);
 	}
 

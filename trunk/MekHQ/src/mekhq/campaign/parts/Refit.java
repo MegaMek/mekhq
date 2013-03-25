@@ -614,14 +614,14 @@ public class Refit implements IPartWork, IAcquisitionWork {
                     part.setUnit(oldUnit);
                     bin.loadBin(false);
                     if(bin.needsFixing()) {
-                        oldUnit.campaign.getShoppingList().addShoppingItem(bin.getNewPart(), 1);
+                        oldUnit.campaign.getShoppingList().addShoppingItem(bin, 1, oldUnit.campaign);
                         //need to call it a second time to use up if found
                         bin.loadBin(false);
                     }             
                     part.setUnit(null);
                 }
                 else if(part instanceof IAcquisitionWork) {
-    		        oldUnit.campaign.getShoppingList().addShoppingItem(((IAcquisitionWork)part).getNewPart(), 1);
+    		        oldUnit.campaign.getShoppingList().addShoppingItem(((IAcquisitionWork)part), 1, oldUnit.campaign);
     		        newShoppingList.add(part);
     		    }
     		}
@@ -631,7 +631,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
                 int armorSupplied = 0;
                 while(armorSupplied < armorNeeded) {
                     armorSupplied += ((Armor)newArmorSupplies.getNewPart()).getAmount();
-                    oldUnit.campaign.getShoppingList().addShoppingItem((Armor)newArmorSupplies.getNewPart(),1);
+                    oldUnit.campaign.getShoppingList().addShoppingItem((Armor)newArmorSupplies,1,oldUnit.campaign);
                 }
             }
 		} else {
@@ -766,7 +766,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 		checkForArmorSupplies();
 		Person admin = oldUnit.campaign.getLogisticsPerson();
 		//TODO: there should be a transit time here too
-		return oldUnit.campaign.acquirePart((IAcquisitionWork)this, admin);
+		return oldUnit.campaign.acquireEquipment((IAcquisitionWork)this, admin);
 	}
 	
 	private void updateRefitClass(int rClass) {
@@ -1145,7 +1145,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 	}
 
 	@Override
-	public Part getMissingPart() {
+	public MissingPart getMissingPart() {
 		//not applicable
 		return null;
 	}
@@ -1376,7 +1376,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 	}
 
 	@Override
-	public Part getNewPart() {
+	public Part getNewEquipment() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -1420,7 +1420,7 @@ public class Refit implements IPartWork, IAcquisitionWork {
 				part.setUnit(null);
 			}
 			else if(part instanceof MissingPart) {
-				oldUnit.campaign.buyPart(((IAcquisitionWork)part).getNewPart(), 1.1);
+				oldUnit.campaign.buyPart((Part)((IAcquisitionWork)part).getNewEquipment(), 1.1);
 				Part replacement = ((MissingPart)part).findReplacement(true);
 				if(null != replacement) {
 					Part actualReplacement = replacement.clone();
@@ -1673,5 +1673,11 @@ public class Refit implements IPartWork, IAcquisitionWork {
     public void decrementDaysToWait() {
         // TODO Auto-generated method stub
         
+    }
+
+    @Override
+    public String getShoppingListReport(int quantity) {
+        // TODO Auto-generated method stub
+        return "";
     }
 }

@@ -179,7 +179,7 @@ public class SpacecraftEngine extends Part {
 	}
 
 	@Override
-	public Part getMissingPart() {
+	public MissingPart getMissingPart() {
 		return new MissingSpacecraftEngine(getUnitTonnage(), engineTonnage, campaign, clan);
 	}
 

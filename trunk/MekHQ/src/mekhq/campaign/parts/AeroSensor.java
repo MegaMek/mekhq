@@ -118,7 +118,7 @@ public class AeroSensor extends Part {
 	}
 
 	@Override
-	public Part getMissingPart() {
+	public MissingPart getMissingPart() {
 		return new MissingAeroSensor(getUnitTonnage(), dropship, campaign);
 	}
 

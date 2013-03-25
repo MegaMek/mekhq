@@ -111,7 +111,7 @@ public class TurretLock extends Part {
 	}
 
 	@Override
-	public Part getMissingPart() {
+	public MissingPart getMissingPart() {
 		// TODO Auto-generated method stub
 		return null;
 	}

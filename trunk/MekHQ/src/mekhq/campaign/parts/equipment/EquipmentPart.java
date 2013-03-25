@@ -34,6 +34,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.Era;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
+import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
 
 import org.w3c.dom.Node;
@@ -232,7 +233,7 @@ public class EquipmentPart extends Part {
 	}
 
 	@Override
-	public Part getMissingPart() {
+	public MissingPart getMissingPart() {
 		return new MissingEquipmentPart(getUnitTonnage(), type, equipmentNum, campaign, equipTonnage);
 	}
 

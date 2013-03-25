@@ -110,7 +110,7 @@ public class VeeStabiliser extends Part {
 	}
 
 	@Override
-	public Part getMissingPart() {
+	public MissingPart getMissingPart() {
 		return new MissingVeeStabiliser(getUnitTonnage(), loc, campaign);
 	}
 

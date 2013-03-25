@@ -36,6 +36,7 @@ import mekhq.campaign.MekHqXmlSerializable;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Unit;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.Modes;
 
@@ -965,6 +966,14 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
             answer += "s";
         }
         return answer;
+    }
+    
+    /** Get the acquisition work to acquire a new part of this type
+     * For most parts this is just getMissingPart(), but some override it
+     * @return
+     */
+    public IAcquisitionWork getAcquisitionWork() {
+        return getMissingPart();
     }
 }
 

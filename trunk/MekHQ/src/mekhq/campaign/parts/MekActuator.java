@@ -197,7 +197,7 @@ public class MekActuator extends Part {
 	}
 
 	@Override
-	public Part getMissingPart() {
+	public MissingPart getMissingPart() {
 		return new MissingMekActuator(getUnitTonnage(), type, location, campaign);
 	}
 

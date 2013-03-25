@@ -120,7 +120,7 @@ public class FireControlSystem extends Part {
 	}
 
 	@Override
-	public Part getMissingPart() {
+	public MissingPart getMissingPart() {
 		return new MissingFireControlSystem(getUnitTonnage(), cost, campaign);
 	}
 

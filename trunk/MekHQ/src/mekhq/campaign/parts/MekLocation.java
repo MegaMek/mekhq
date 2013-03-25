@@ -403,7 +403,7 @@ public class MekLocation extends Part {
 	}
 
 	@Override
-	public Part getMissingPart() {
+	public MissingPart getMissingPart() {
 		return new MissingMekLocation(loc, getUnitTonnage(), structureType, tsm, forQuad, campaign);
 	}
 

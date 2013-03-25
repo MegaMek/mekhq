@@ -331,7 +331,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 		}
 		
 		if(purchase) {
-		    campaign.getShoppingList().addShoppingItem(selectedPart.clone(), quantity);
+		    campaign.getShoppingList().addShoppingItem(selectedPart.getAcquisitionWork(), quantity, campaign);
 		} else {
 		    while(quantity > 0) {
 		        campaign.addPart(selectedPart.clone());
