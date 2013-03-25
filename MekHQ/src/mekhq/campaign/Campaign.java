@@ -3660,9 +3660,9 @@ public class Campaign implements Serializable {
 	        return new TargetRoll(TargetRoll.IMPOSSIBLE, "No one on your force is capable of acquiring parts");
 	    }
 		Skill skill = person.getSkillForWorkingOn(acquisition, getCampaignOptions().getAcquisitionSkill());		
-		/*if(null != getShoppingList().getShoppingItem(acquisition) && checkDaysToWait) {
+		if(null != getShoppingList().getShoppingItem(acquisition.getNewEquipment()) && checkDaysToWait) {
             return new TargetRoll(TargetRoll.AUTOMATIC_FAIL, "You must wait until the new cycle to check for this part. Further attempts will be added to the shopping list.");
-        }*/
+        }
 		if(acquisition.getTechBase() == Part.T_CLAN && !getCampaignOptions().allowClanPurchases()) {
 			return new TargetRoll(TargetRoll.IMPOSSIBLE, "You cannot acquire clan parts");
 		}
