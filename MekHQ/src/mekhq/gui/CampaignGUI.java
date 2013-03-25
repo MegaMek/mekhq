@@ -36,6 +36,7 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
@@ -66,6 +67,7 @@ import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.swing.AbstractAction;
 import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
@@ -91,6 +93,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTree;
+import javax.swing.KeyStroke;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
@@ -213,7 +216,6 @@ import mekhq.gui.dialog.PortraitChoiceDialog;
 import mekhq.gui.dialog.QuirksDialog;
 import mekhq.gui.dialog.RefitNameDialog;
 import mekhq.gui.dialog.ResolveScenarioWizardDialog;
-import mekhq.gui.dialog.ShoppingListDialog;
 import mekhq.gui.dialog.TextAreaDialog;
 import mekhq.gui.dialog.UnitSelectorDialog;
 import mekhq.gui.view.ContractViewPanel;
@@ -302,6 +304,7 @@ public class CampaignGUI extends JPanel {
     private PersonnelTableModel personModel = new PersonnelTableModel();
     private UnitTableModel unitModel = new UnitTableModel();
     private PartsTableModel partsModel = new PartsTableModel();
+    private AcquirePartsTableModel acquirePartsModel = new AcquirePartsTableModel();
     private FinanceTableModel financeModel = new FinanceTableModel();
     private LoanTableModel loanModel = new LoanTableModel();
     private FinanceTableMouseAdapter financeMouseAdapter;
@@ -318,6 +321,7 @@ public class CampaignGUI extends JPanel {
     private ScenarioTableMouseAdapter scenarioMouseAdapter;
     private TableRowSorter<PersonnelTableModel> personnelSorter;
     private TableRowSorter<PartsTableModel> partsSorter;
+    private TableRowSorter<AcquirePartsTableModel> acquirePartsSorter;
     private TableRowSorter<UnitTableModel> unitSorter;
     private TableRowSorter<ServicedUnitTableModel> servicedUnitSorter;
     private TableRowSorter<TechTableModel> techSorter;
@@ -425,6 +429,7 @@ public class CampaignGUI extends JPanel {
         panSupplies = new javax.swing.JPanel();
         scrollPartsTable = new javax.swing.JScrollPane();
         partsTable = new javax.swing.JTable();
+        acquirePartsTable = new javax.swing.JTable();
         panInfirmary = new javax.swing.JPanel();
         btnAssignDoc = new javax.swing.JButton();
         btnUnassignDoc = new javax.swing.JButton();
@@ -1159,11 +1164,10 @@ public class CampaignGUI extends JPanel {
                 resourceMap.getString("panHangar.TabConstraints.tabTitle"),
                 panHangar); // NOI18N
 
-        panSupplies.setName("panSupplies"); // NOI18N
         panSupplies.setLayout(new java.awt.GridBagLayout());
-
+        panSupplies.setBorder(BorderFactory.createTitledBorder("Supplies"));
+        
         lblPartsChoice.setText(resourceMap.getString("lblPartsChoice.text")); // NOI18N
-        lblPartsChoice.setName("lblPartsChoice"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -1177,7 +1181,6 @@ public class CampaignGUI extends JPanel {
             partsGroupModel.addElement(getPartsGroupName(i));
         }
         choiceParts.setModel(partsGroupModel);
-        choiceParts.setName("choiceParts"); // NOI18N
         choiceParts.setSelectedIndex(0);
         choiceParts.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1193,7 +1196,7 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 0);
         panSupplies.add(choiceParts, gridBagConstraints);
-
+       
         partsTable.setModel(partsModel);
         partsTable.setName("partsTable"); // NOI18N
         partsSorter = new TableRowSorter<PartsTableModel>(partsModel);
@@ -1216,18 +1219,76 @@ public class CampaignGUI extends JPanel {
                 });
         partsTable.addMouseListener(partsMouseAdapter);
 
-        scrollPartsTable.setName("scrollPartsTable"); // NOI18N
         scrollPartsTable.setViewportView(partsTable);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panSupplies.add(scrollPartsTable, gridBagConstraints);
+        
+        
+        acquirePartsTable = new JTable(acquirePartsModel);
+        acquirePartsSorter = new TableRowSorter<AcquirePartsTableModel>(acquirePartsModel);
+        acquirePartsSorter.setComparator(AcquirePartsTableModel.COL_COST, new FormattedNumberSorter());
+        acquirePartsSorter.setComparator(AcquirePartsTableModel.COL_TARGET, new TargetSorter());
+        acquirePartsTable.setRowSorter(acquirePartsSorter);
+        column = null;
+        for (int i = 0; i < AcquirePartsTableModel.N_COL; i++) {
+            column = acquirePartsTable.getColumnModel().getColumn(i);
+            column.setPreferredWidth(acquirePartsModel.getColumnWidth(i));
+            column.setCellRenderer(acquirePartsModel.getRenderer());
+        }
+        acquirePartsTable.setIntercellSpacing(new Dimension(0, 0));
+        acquirePartsTable.setShowGrid(false);
+        acquirePartsTable.addMouseListener(new AcquirePartsTableMouseAdapter());
+        acquirePartsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
+        acquirePartsTable.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0), "ADD");
+        acquirePartsTable.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, 0), "ADD");
+        acquirePartsTable.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0), "REMOVE");
+        acquirePartsTable.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, 0), "REMOVE");
+        
+        acquirePartsTable.getActionMap().put("ADD", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                if(acquirePartsTable.getSelectedRow() < 0) {
+                    return;
+                }
+                acquirePartsModel.incrementItem(acquirePartsTable.convertRowIndexToModel(acquirePartsTable.getSelectedRow()));
+            }
+         });
+        
+        acquirePartsTable.getActionMap().put("REMOVE", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                if(acquirePartsTable.getSelectedRow() < 0) {
+                    return;
+                }
+                if(acquirePartsModel.getAcquisition(acquirePartsTable.convertRowIndexToModel(acquirePartsTable.getSelectedRow())).getQuantity() > 0) {
+                    acquirePartsModel.decrementItem(acquirePartsTable.convertRowIndexToModel(acquirePartsTable.getSelectedRow()));
+                } 
+            }
+         });
+        
+        JScrollPane scrollPartsAcquireTable = new JScrollPane();
+        scrollPartsAcquireTable.setViewportView(acquirePartsTable);
+        
+        JPanel acquirePartsPanel = new JPanel(new GridBagLayout());
+        acquirePartsPanel.setBorder(BorderFactory.createTitledBorder("Procurement List"));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        acquirePartsPanel.add(scrollPartsAcquireTable, gridBagConstraints);
+        acquirePartsPanel.setMinimumSize(new Dimension(200,200));
+        acquirePartsPanel.setPreferredSize(new Dimension(200,200));
+        
         JPanel panelDoTaskWarehouse = new JPanel(new GridBagLayout());
 
         btnDoTaskWarehouse = new JButton(resourceMap.getString("btnDoTask.text")); // NOI18N
@@ -1344,7 +1405,10 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panelDoTaskWarehouse.add(astechPoolLabelWarehouse, gridBagConstraints);
 
-        JSplitPane splitWarehouse = new javax.swing.JSplitPane(javax.swing.JSplitPane.HORIZONTAL_SPLIT,panSupplies, panelDoTaskWarehouse);
+        JSplitPane splitLeft = new javax.swing.JSplitPane(javax.swing.JSplitPane.VERTICAL_SPLIT, panSupplies, acquirePartsPanel);
+        splitLeft.setOneTouchExpandable(true);
+        splitLeft.setResizeWeight(1.0);
+        JSplitPane splitWarehouse = new javax.swing.JSplitPane(javax.swing.JSplitPane.HORIZONTAL_SPLIT, splitLeft, panelDoTaskWarehouse);
         splitWarehouse.setOneTouchExpandable(true);
         splitWarehouse.setResizeWeight(1.0);
 
@@ -1810,11 +1874,27 @@ public class CampaignGUI extends JPanel {
         scrollLoanTable.setMinimumSize(new java.awt.Dimension(450, 150));
         scrollLoanTable.setPreferredSize(new java.awt.Dimension(450, 150));
         panLoan.setBorder(BorderFactory.createTitledBorder("Active Loans"));
-        JSplitPane splitFinances = new JSplitPane(javax.swing.JSplitPane.VERTICAL_SPLIT,panBalance, panLoan);
-        splitFinances.setOneTouchExpandable(true);
-        splitFinances.setResizeWeight(1.0);
+        //JSplitPane splitFinances = new JSplitPane(javax.swing.JSplitPane.VERTICAL_SPLIT,panBalance, panLoan);
+        //splitFinances.setOneTouchExpandable(true);
+        //splitFinances.setResizeWeight(1.0);
         
-        panFinances.add(splitFinances, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        panFinances.add(panBalance, gridBagConstraints);
+        
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 0.0;
+        panFinances.add(panLoan, gridBagConstraints);
         
         tabMain.addTab(
                 resourceMap.getString("panFinances.TabConstraints.tabTitle"),
@@ -1995,14 +2075,6 @@ public class CampaignGUI extends JPanel {
             }
         });
         menuManage.add(miGetLoan);
-        
-        miShoppingList.setText(resourceMap.getString("miShoppingList.text")); // NOI18N
-        miShoppingList.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                showShoppingList();
-            }
-        });
-        menuManage.add(miShoppingList);
         
         menuBar.add(menuManage);
 
@@ -2976,13 +3048,6 @@ public class CampaignGUI extends JPanel {
         refreshAcquireList();
     }
     
-    private void showShoppingList() {
-        ShoppingListDialog sld = new ShoppingListDialog(true, this);
-        sld.setVisible(true);
-        refreshPartsList();
-        refreshAcquireList();
-    }
-    
     private void showNewLoanDialog() {
         NewLoanDialog nld = new NewLoanDialog(getFrame(), true, getCampaign());
         nld.setVisible(true);
@@ -3729,6 +3794,7 @@ public class CampaignGUI extends JPanel {
 
     public void refreshPartsList() {
         partsModel.setData(getCampaign().getSpareParts());
+        acquirePartsModel.setData(getCampaign().getShoppingList().getList());
     }
 
     public void refreshFinancialTransactions() {
@@ -8502,6 +8568,304 @@ public class CampaignGUI extends JPanel {
             }
         }
     }
+    
+    /**
+     * A table model for displaying parts acquisitions
+     */
+    public class AcquirePartsTableModel extends ArrayTableModel {
+        private static final long serialVersionUID = 534443424190075264L;
+
+        public final static int COL_NAME    =    0;
+        public final static int COL_DETAIL   =   1;
+        public final static int COL_TECH_BASE  = 2;
+        public final static int COL_COST     =   3;
+        public final static int COL_TON       =  4;
+        public final static int COL_TARGET    =  5;
+        public final static int COL_NEXT      =  6;
+        public final static int COL_QUEUE     =  7;
+        public final static int N_COL          = 8;
+        
+        public AcquirePartsTableModel() {
+            data = new ArrayList<IAcquisitionWork>();
+        }
+        
+        public int getRowCount() {
+            return data.size();
+        }
+
+        public int getColumnCount() {
+            return N_COL;
+        }
+
+        @Override
+        public String getColumnName(int column) {
+            switch(column) {
+                case COL_NAME:
+                    return "Name";
+                case COL_DETAIL:
+                    return "Detail";
+                case COL_COST:
+                    return "Cost";
+                case COL_TON:
+                    return "Ton";
+                case COL_TECH_BASE:
+                    return "Tech";
+                case COL_TARGET:
+                    return "Target";
+                case COL_QUEUE:
+                    return "Quantity";
+                case COL_NEXT:
+                    return "Next Check";
+                default:
+                    return "?";
+            }
+        }
+        
+        public void incrementItem(int row) {
+            ((IAcquisitionWork)data.get(row)).incrementQuantity();
+            this.fireTableCellUpdated(row, COL_QUEUE);
+        }
+        
+        public void decrementItem(int row) {
+            ((IAcquisitionWork)data.get(row)).decrementQuantity();
+            this.fireTableCellUpdated(row, COL_QUEUE);
+        }
+        
+        public void removeRow(int row) {
+            getCampaign().getShoppingList().removeItem(getNewPartAt(row));
+            data = getCampaign().getShoppingList().getList();
+            fireTableDataChanged();
+        }
+
+        public Object getValueAt(int row, int col) {
+            Part part;
+            IAcquisitionWork shoppingItem;
+            if(data.isEmpty()) {
+                return "";
+            } else {
+                part = getNewPartAt(row);
+                shoppingItem = getAcquisition(row);
+            }
+            if(null == part || null == shoppingItem) {
+                return "?";
+            }
+            if(col == COL_NAME) {
+                return part.getName();
+            }
+            if(col == COL_DETAIL) {
+                return part.getDetails();
+            }
+            if(col == COL_COST) {
+                return DecimalFormat.getInstance().format((part.getActualValue()));
+            }
+            if(col == COL_TON) {
+                return Math.round(part.getTonnage() * 100) / 100.0;
+            }
+            if(col == COL_TECH_BASE) {
+                return part.getTechBaseName();
+            }
+            if(col == COL_TARGET) {
+                TargetRoll target = getCampaign().getTargetForAcquisition(shoppingItem, getCampaign().getLogisticsPerson(), false);
+                String value = target.getValueAsString();
+                if(target.getValue() != TargetRoll.IMPOSSIBLE && target.getValue() != TargetRoll.AUTOMATIC_SUCCESS && target.getValue() != TargetRoll.AUTOMATIC_FAIL) {
+                    value += "+";
+                }
+                return value;
+            }
+            if(col == COL_QUEUE) {
+                return shoppingItem.getQuantity();
+            }
+            if(col == COL_NEXT) {
+                int days = shoppingItem.getDaysToWait();
+                String dayName = " day";
+                if(days != 1) {
+                    dayName += "s";
+                }
+                return days + dayName;
+            }
+            return "?";
+        }
+        
+        @Override
+        public boolean isCellEditable(int row, int col) {
+            return false;
+        }
+        
+        @Override
+        public Class<? extends Object> getColumnClass(int c) {
+            return getValueAt(0, c).getClass();
+        }
+
+        public Part getNewPartAt(int row) {
+            return ((IAcquisitionWork) data.get(row)).getNewPart();
+        }
+        
+        public IAcquisitionWork getAcquisition(int row) {
+            return (IAcquisitionWork) data.get(row);
+        }
+        
+         public int getColumnWidth(int c) {
+                switch(c) {
+                case COL_NAME:
+                case COL_DETAIL:
+                    return 120;
+                case COL_COST:
+                case COL_TARGET:
+                case COL_NEXT:
+                    return 40;        
+                default:
+                    return 15;
+                }
+            }
+            
+            public int getAlignment(int col) {
+                switch(col) {
+                case COL_COST:
+                case COL_TON:
+                    return SwingConstants.RIGHT;
+                case COL_TARGET:
+                case COL_NEXT:
+                    return SwingConstants.CENTER;
+                default:
+                    return SwingConstants.LEFT;
+                }
+            }
+
+            public String getTooltip(int row, int col) {
+                Part part;
+                IAcquisitionWork shoppingItem;
+                if(data.isEmpty()) {
+                    return null;
+                } else {
+                    part = getNewPartAt(row);
+                    shoppingItem = getAcquisition(row);
+                }
+                if(null == part || null ==shoppingItem) {
+                    return null;
+                }
+                switch(col) {
+                case COL_TARGET:                    
+                    TargetRoll target = getCampaign().getTargetForAcquisition(shoppingItem, getCampaign().getLogisticsPerson(), false);
+                    return target.getDesc();
+                default:                    
+                    return "<html>You can increase or decrease the quantity with the left/right arrows keys or the plus/minus keys.<br>Quantities reduced to zero will remain on the list until the next procurement cycle.</html>"; 
+                }
+            }
+            public AcquirePartsTableModel.Renderer getRenderer() {
+                return new AcquirePartsTableModel.Renderer();
+            }
+
+            public class Renderer extends DefaultTableCellRenderer {
+
+                private static final long serialVersionUID = 9054581142945717303L;
+
+                public Component getTableCellRendererComponent(JTable table,
+                        Object value, boolean isSelected, boolean hasFocus,
+                        int row, int column) {
+                    super.getTableCellRendererComponent(table, value, isSelected,
+                            hasFocus, row, column);
+                    setOpaque(true);
+                    int actualCol = table.convertColumnIndexToModel(column);
+                    int actualRow = table.convertRowIndexToModel(row);
+                    setHorizontalAlignment(getAlignment(actualCol));
+                    setToolTipText(getTooltip(actualRow, actualCol));
+                    
+                    return this;
+                }
+
+            }
+    }
+    
+    public class AcquirePartsTableMouseAdapter extends MouseInputAdapter implements
+    ActionListener {
+
+        public void actionPerformed(ActionEvent action) {
+            String command = action.getActionCommand();
+            int row = partsTable.convertRowIndexToModel(acquirePartsTable.getSelectedRow());
+            if(row < 0) {
+                return;
+            }
+            if (command.equalsIgnoreCase("CLEAR")) {
+                acquirePartsModel.removeRow(row);
+                refreshPartsList();
+                refreshTaskList();
+                refreshAcquireList();
+            } 
+        }
+        
+        @Override
+        public void mousePressed(MouseEvent e) {
+            maybeShowPopup(e);
+        }
+        
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            maybeShowPopup(e);
+        }
+        
+        private void maybeShowPopup(MouseEvent e) {
+            JPopupMenu popup = new JPopupMenu();
+            JMenuItem menuItem;
+            JMenu menu;
+            if (e.isPopupTrigger()) {
+                if(partsTable.getSelectedRowCount() == 0) {
+                    return;
+                }
+                // **lets fill the pop up menu**//
+                // GM mode
+                menu = new JMenu("GM Mode");
+                menuItem = new JMenuItem("Clear From the List");
+                menuItem.setActionCommand("CLEAR");
+                menuItem.addActionListener(this);
+                menuItem.setEnabled(getCampaign().isGM());
+                menu.add(menuItem);
+                // end
+                popup.addSeparator();
+                popup.add(menu);
+                popup.show(e.getComponent(), e.getX(), e.getY());
+            }
+        }
+    }
+    
+    /**
+     * A comparator for target numbers written as strings
+     * @author Jay Lawson
+     *
+     */
+    public class TargetSorter implements Comparator<String> {
+
+        @Override
+        public int compare(String s0, String s1) {
+            s0 = s0.replaceAll("\\+", "");
+            s1 = s1.replaceAll("\\+", "");
+            int r0 = 0;
+            int r1 = 0;
+            if(s0.equals("Impossible")) {
+                r0 = Integer.MAX_VALUE;
+            }
+            else if(s0.equals("Automatic Failure")) {
+                r0 = Integer.MAX_VALUE-1;
+            }
+            else if(s0.equals("Automatic Success")) {
+                r0 = Integer.MIN_VALUE;
+            } else {
+                r0 = Integer.parseInt(s0);
+            }   
+            if(s1.equals("Impossible")) {
+                r1 = Integer.MAX_VALUE;
+            }
+            else if(s1.equals("Automatic Failure")) {
+                r1 = Integer.MAX_VALUE-1;
+            }
+            else if(s1.equals("Automatic Success")) {
+                r1 = Integer.MIN_VALUE;
+            } else {
+                r1 = Integer.parseInt(s1);
+            }   
+            return ((Comparable<Integer>)r0).compareTo(r1);
+
+        }
+    }
 
     /**
      * A table model for displaying scenarios
@@ -8826,7 +9190,7 @@ public class CampaignGUI extends JPanel {
                 } else {
                     // tiger stripes
                     if (row % 2 == 1) {
-                        setBackground(Color.LIGHT_GRAY);
+                        setBackground(new Color(230,230,230));
                     } else {
                         setBackground(Color.WHITE);
                     }
@@ -10128,6 +10492,7 @@ public class CampaignGUI extends JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTable DocTable;
     private javax.swing.JTable partsTable;
+    private javax.swing.JTable acquirePartsTable;
     private javax.swing.JTable TaskTable;
     private javax.swing.JTable AcquisitionTable;
     private javax.swing.JTable TechTable;

@@ -167,7 +167,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
 		this.refitId = null;
 		this.daysToArrival = 0;
 		this.campaign = c;
-		this.brandNew = false;
+		this.brandNew = true;
 		this.quantity = 1;
 		this.replacementId = -1;
 	}

@@ -148,7 +148,7 @@ public class ShoppingList implements MekHqXmlSerializable {
                     shoppingItem.decrementQuantity();
                 }
             }
-            if(shoppingItem.getQuantity() > 0) {  
+            if(shoppingItem.getQuantity() > 0 || shoppingItem.getDaysToWait() > 0) {  
                 newShoppingList.add(shoppingItem);
             }
         }

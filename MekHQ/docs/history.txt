@@ -31,6 +31,8 @@ v0.3.0 (SVN)
 + Bug: Adjustment to Patch 26 code to support part transit times.
 + added context menu options Cancel Order and Deliver Part Now (GM) in warehouse
 + backwards compatability for conventional pilot types
++ put procurement list in warehouse tab instead of dialog
++ mouse adapter for procurement list table
 
 v0.2.0 (2013-03-16)
 + Bug 318: Dragoon's Rating error FMM:R method
