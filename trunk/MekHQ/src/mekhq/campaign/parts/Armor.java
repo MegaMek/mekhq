@@ -111,6 +111,11 @@ public class Armor extends Part implements IAcquisitionWork {
     	return (long)(5 * EquipmentType.getArmorCost(type));
     }
     
+    @Override
+    public long getBuyCost() {
+        return getStickerPrice();
+    }
+    
     public String getDesc() {
     	if(isSalvaging()) {
     		return super.getDesc();
@@ -570,17 +575,16 @@ public class Armor extends Part implements IAcquisitionWork {
 	public TargetRoll getAllAcquisitionMods() {
         TargetRoll target = new TargetRoll();
         // Faction and Tech mod
-        int factionMod = 0;
-        if (campaign.getCampaignOptions().useFactionModifiers()) {
-        	factionMod = campaign.getFaction().getTechMod(this, campaign);
-        }   
+        if(isClanTechBase() && campaign.getCampaignOptions().getClanAcquisitionPenalty() > 0) {
+            target.addModifier(campaign.getCampaignOptions().getClanAcquisitionPenalty(), "clan-tech");
+        }
+        else if(campaign.getCampaignOptions().getIsAcquisitionPenalty() > 0) {
+            target.addModifier(campaign.getCampaignOptions().getIsAcquisitionPenalty(), "Inner Sphere tech");
+        }  
         //availability mod
         int avail = getAvailability(campaign.getEra());
         int availabilityMod = Availability.getAvailabilityModifier(avail);
         target.addModifier(availabilityMod, "availability (" + EquipmentType.getRatingName(avail) + ")");
-        if(factionMod != 0) {
-     	   target.addModifier(factionMod, "faction");
-        }
         return target;
     }
 

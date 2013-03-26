@@ -709,7 +709,7 @@ public class ResolveScenarioTracker {
 		//now lets take care of salvage
 		for(Unit salvageUnit : actualSalvage) {
 			campaign.clearGameData(salvageUnit.getEntity());
-			campaign.addUnit(salvageUnit.getEntity(), false);
+			campaign.addUnit(salvageUnit.getEntity(), false, 0);
 			//if this is a contract, add to th salvaged value
 			if(getMission() instanceof Contract) {
 				salvageUnit.initializeParts(false);

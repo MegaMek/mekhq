@@ -28,6 +28,7 @@ import java.util.UUID;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import megamek.common.Entity;
 import mekhq.MekHQ;
 import mekhq.Version;
 import mekhq.campaign.parts.MissingPart;
@@ -108,9 +109,18 @@ public class ShoppingList implements MekHqXmlSerializable {
                 return;
             }
         }
-        while(quantity > 0 && campaign.acquireEquipment(newWork, person)) {
-            quantity--;
+        boolean canAfford = true;
+        if(campaign.getFunds() < newWork.getBuyCost()) {
+             campaign.addReport("<font color='red'><b>You cannot afford to purchase " + newWork.getAcquisitionName() + "</b></font>");
+             canAfford = false;
         }
+        while(canAfford && quantity > 0 && campaign.acquireEquipment(newWork, person)) {
+            quantity--;
+            if(quantity > 0 && campaign.getFunds() < newWork.getBuyCost()) {
+                canAfford = false;
+                campaign.addReport("<font color='red'><b>You cannot afford to purchase " + newWork.getAcquisitionName() + "</b></font>");
+            } 
+        }   
         if(quantity > 0) {
             campaign.addReport(newWork.getShoppingListReport(quantity));
             while(quantity > 1) {
@@ -131,8 +141,17 @@ public class ShoppingList implements MekHqXmlSerializable {
         for(IAcquisitionWork shoppingItem : shoppingList) {
             shoppingItem.decrementDaysToWait();
             if(shoppingItem.getDaysToWait() <= 0) {
-                while(shoppingItem.getQuantity() > 0 && campaign.acquireEquipment(shoppingItem, person)) {
+                boolean canAfford = true;
+                if(campaign.getFunds() < shoppingItem.getBuyCost()) {
+                     campaign.addReport("<font color='red'><b>You cannot afford to purchase " + shoppingItem.getAcquisitionName() + "</b></font>");
+                     canAfford = false;
+                }
+                while(canAfford && shoppingItem.getQuantity() > 0 && campaign.acquireEquipment(shoppingItem, person)) {
                     shoppingItem.decrementQuantity();
+                    if(shoppingItem.getQuantity() > 0 && campaign.getFunds() < shoppingItem.getBuyCost()) {
+                        canAfford = false;
+                        campaign.addReport("<font color='red'><b>You cannot afford to purchase " + shoppingItem.getAcquisitionName() + "</b></font>");
+                    } 
                 }
             }
             if(shoppingItem.getQuantity() > 0 || shoppingItem.getDaysToWait() > 0) {  
@@ -149,7 +168,10 @@ public class ShoppingList implements MekHqXmlSerializable {
         for(IAcquisitionWork shoppingItem : shoppingList) {
             if(shoppingItem instanceof Part) {
                 ((Part)shoppingItem).writeToXml(pw1, indent+1);
-            }                
+            } 
+            else if(shoppingItem instanceof UnitOrder) {
+                ((UnitOrder)shoppingItem).writeToXml(pw1, indent+1);
+            } 
         }
         pw1.println(MekHqXmlUtil.indentStr(indent) + "</shoppingList>");        
     }
@@ -169,6 +191,13 @@ public class ShoppingList implements MekHqXmlSerializable {
                         retVal.shoppingList.add((IAcquisitionWork)p);
                     }
                 } 
+                else if (wn2.getNodeName().equalsIgnoreCase("unitOrder")) {
+                    UnitOrder u = UnitOrder.generateInstanceFromXML(wn2, version);
+                    u.campaign = c;
+                    if(null != u.getEntity()) {
+                        retVal.shoppingList.add(u);
+                    }
+                } 
             }
         } catch (Exception ex) {
             // Doh!
@@ -186,13 +215,37 @@ public class ShoppingList implements MekHqXmlSerializable {
         }
     }
     
-    public ArrayList<IAcquisitionWork> getList() {
-        return shoppingList;
+    public ArrayList<IAcquisitionWork> getPartList() {
+        ArrayList<IAcquisitionWork> partList = new ArrayList<IAcquisitionWork>();
+        for(IAcquisitionWork shoppingItem : shoppingList) {
+            if(shoppingItem instanceof Part) {
+                partList.add(shoppingItem);
+            }
+        }
+        return partList;
+    }
+    
+    public ArrayList<IAcquisitionWork> getUnitList() {
+        ArrayList<IAcquisitionWork> unitList = new ArrayList<IAcquisitionWork>();
+        for(IAcquisitionWork shoppingItem : shoppingList) {
+            if(shoppingItem instanceof UnitOrder) {
+                unitList.add(shoppingItem);
+            }
+        }
+        return unitList;
     }
     
     private boolean isSameEquipment(Object equipment, Object newEquipment) {
         if(newEquipment instanceof Part && equipment instanceof Part) {
             if(((Part)equipment).isSamePartType((Part)newEquipment)) {
+                return true;
+            }
+        }
+        if(newEquipment instanceof Entity && equipment instanceof Entity) {
+            Entity entityA = (Entity)newEquipment;
+            Entity entityB = (Entity)equipment;
+            if(entityA.getChassis().equals(entityB.getChassis())
+                    && entityA.getModel().equals(entityB.getModel())) {
                 return true;
             }
         }

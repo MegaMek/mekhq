@@ -43,9 +43,7 @@ public interface IAcquisitionWork extends IWork {
 	public int getDaysToWait();
 	public void resetDaysToWait();
 	public void decrementDaysToWait();
-	
-	public int getId();
-	
+		
 	public String find(int transitDays);
 	
 	public String failToFind();
@@ -61,6 +59,8 @@ public interface IAcquisitionWork extends IWork {
 	public void incrementQuantity();
 	
 	public void decrementQuantity();
+	
+	public long getBuyCost();
 	
 	public String getShoppingListReport(int quantity);
 	
