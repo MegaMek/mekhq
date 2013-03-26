@@ -7,6 +7,7 @@ v0.2.1 (SVN)
 + Bug 323/Patch 25: Individual camo not saving from MM/Patch for individual camo
 + Patch 26: GM Mode complete Task/Acquisition
 + backwards compatability for conventional pilot types
++ Bug: equipment parts not recognizing same status in warehouse
 
 v0.2.0 (2013-03-16)
 + Bug 318: Dragoon's Rating error FMM:R method

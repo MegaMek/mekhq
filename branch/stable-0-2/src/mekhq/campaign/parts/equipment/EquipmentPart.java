@@ -146,11 +146,6 @@ public class EquipmentPart extends Part {
         		&& getType().equals(((EquipmentPart)part).getType())
         		&& getTonnage() == part.getTonnage();
     }
-
-    @Override
-    public boolean isSameStatus(Part part) {
-    	return super.isSameStatus(part) && (this.getHits() > 0) == (part.getHits() > 0) && this.getDifficulty() == part.getDifficulty();
-    }
     
     @Override
     public int getPartType() {
