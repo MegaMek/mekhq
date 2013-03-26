@@ -367,6 +367,16 @@ public abstract class AbstractDragoonsRating implements IDragoonsRating {
     public int getDragoonsRatingAsInteger() {
         return getDragoonRating(calculateDragoonRatingScore());
     }
+    
+    @Override
+    public int getScore() {
+        return calculateDragoonRatingScore();
+    }
+    
+    @Override 
+    public int getModifier() {
+        return (calculateDragoonRatingScore()/10);
+    }
 
     /**
      * Calculates the weighted value of the unit based on if it is Infantry, Battle Armor or something else.

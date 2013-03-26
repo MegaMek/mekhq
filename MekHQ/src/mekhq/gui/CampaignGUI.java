@@ -10104,6 +10104,7 @@ public class CampaignGUI extends JPanel {
                 refreshUnitList();
                 refreshPersonnelList();
                 refreshOrganization();
+                refreshFinancialTransactions();
                 refreshReport();
             } else if (command.contains("CUSTOMIZE")
                     && !command.contains("CANCEL")) {

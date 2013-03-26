@@ -63,6 +63,10 @@ public interface IDragoonsRating {
      */
     public int getDragoonsRatingAsInteger();
     
+    public int getScore();
+    
+    public int getModifier();
+    
     /**
      * Returns the letter code of the passed in Dragoon's rating.
      *

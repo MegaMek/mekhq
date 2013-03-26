@@ -89,11 +89,13 @@ public class CampaignOptions implements Serializable {
     private boolean payForParts;
     private boolean payForUnits;
     private boolean payForSalaries;
+    private boolean payForRecruitment;
     private boolean payForOverhead;
     private boolean payForMaintain;
     private boolean payForTransport;
     private boolean sellUnits;
     private boolean sellParts;
+    private boolean useLoanLimits;
     private double usedPartsValue;
     private double damagedPartsValue;
     private double canceledOrderReimbursement;
@@ -153,9 +155,11 @@ public class CampaignOptions implements Serializable {
         payForParts = false;
         payForUnits = false;
         payForSalaries = false;
+        payForRecruitment = false;
         payForOverhead = false;
         payForMaintain = false;
         payForTransport = false;
+        useLoanLimits = true;
         sellUnits = false;
         sellParts = false;
         limitByYear = true;
@@ -387,6 +391,14 @@ public class CampaignOptions implements Serializable {
     	this.payForSalaries = b;
     }
     
+    public boolean payForRecruitment() {
+        return payForRecruitment;
+    }
+    
+    public void setPayForRecruitment(boolean b) {
+        this.payForRecruitment = b;
+    }
+    
     public boolean payForOverhead() {
     	return payForOverhead;
     }
@@ -425,6 +437,14 @@ public class CampaignOptions implements Serializable {
     
     public void setSellParts(boolean b) {
     	this.sellParts = b;
+    }
+    
+    public boolean useLoanLimits() {
+        return useLoanLimits;
+    }
+   
+    public void setLoanLimits(boolean b) {
+        this.useLoanLimits = b;
     }
     
     public boolean useQuirks() {
@@ -757,6 +777,8 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "blcSaleValue", blcSaleValue);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "clanAcquisitionPenalty", clanAcquisitionPenalty);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "isAcquisitionPenalty", isAcquisitionPenalty);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useLoanLimits", useLoanLimits);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "payForRecruitment", payForRecruitment);
 
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<usePortraitForType>"
@@ -868,7 +890,17 @@ public class CampaignOptions implements Serializable {
 					retVal.payForTransport = true;
 				else
 					retVal.payForTransport = false;
-			} else if (wn2.getNodeName().equalsIgnoreCase("sellUnits")) {
+			} else if (wn2.getNodeName().equalsIgnoreCase("payForRecruitment")) {
+                if (wn2.getTextContent().equalsIgnoreCase("true"))
+                    retVal.payForRecruitment = true;
+                else
+                    retVal.payForRecruitment = false;
+            } else if (wn2.getNodeName().equalsIgnoreCase("useLoanLimits")) {
+                if (wn2.getTextContent().equalsIgnoreCase("true"))
+                    retVal.useLoanLimits = true;
+                else
+                    retVal.useLoanLimits = false;
+            } else if (wn2.getNodeName().equalsIgnoreCase("sellUnits")) {
 				if (wn2.getTextContent().equalsIgnoreCase("true"))
 					retVal.sellUnits = true;
 				else

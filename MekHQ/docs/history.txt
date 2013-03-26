@@ -45,6 +45,11 @@ v0.3.0 (SVN)
 + refit kits should take time too
 + refit kit fixes
 + change references to "shopping list" to "procurement list"
++ pay for recruitment option (2 x monthly salary)
++ option to disable StellarOps loan limits
++ recalculate loan limits based on rep modifier rather than dragoon rating
++ Bug: checking for insufficient funds when units and parts pay for options are false
++ Bug: wacky delivery times when acquisition roll set to auto success
 
 v0.2.0 (2013-03-16)
 + Bug 318: Dragoon's Rating error FMM:R method

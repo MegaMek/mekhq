@@ -151,6 +151,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private javax.swing.JCheckBox payForOverheadBox;
     private javax.swing.JCheckBox payForMaintainBox;
     private javax.swing.JCheckBox payForTransportBox;
+    private javax.swing.JCheckBox payForRecruitmentBox;
+    private javax.swing.JCheckBox useLoanLimitsBox;
     private javax.swing.JCheckBox sellUnitsBox;
     private javax.swing.JCheckBox sellPartsBox;
     
@@ -286,6 +288,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         payForOverheadBox.setSelected(options.payForOverhead());
         payForMaintainBox.setSelected(options.payForMaintain());
         payForTransportBox.setSelected(options.payForTransport());
+        payForRecruitmentBox.setSelected(options.payForRecruitment());
+        useLoanLimitsBox.setSelected(options.useLoanLimits());
+
         sellUnitsBox.setSelected(options.canSellUnits());
         sellPartsBox.setSelected(options.canSellParts());
         
@@ -358,6 +363,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         payForPartsBox = new javax.swing.JCheckBox();
         payForUnitsBox = new javax.swing.JCheckBox();
         payForSalariesBox = new javax.swing.JCheckBox();
+        payForRecruitmentBox = new javax.swing.JCheckBox();
+        useLoanLimitsBox = new javax.swing.JCheckBox();
         payForOverheadBox = new javax.swing.JCheckBox();
         payForMaintainBox = new javax.swing.JCheckBox();
         payForTransportBox = new javax.swing.JCheckBox();
@@ -971,11 +978,32 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panFinances.add(sellPartsBox, gridBagConstraints);
         
+        payForRecruitmentBox.setText(resourceMap.getString("payForRecruitmentBox.text")); // NOI18N
+        payForRecruitmentBox.setToolTipText(resourceMap.getString("payForRecruitmentBox.toolTipText")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 8;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panFinances.add(payForRecruitmentBox, gridBagConstraints);
+        
+        useLoanLimitsBox.setText(resourceMap.getString("useLoanLimitsBox.text")); // NOI18N
+        useLoanLimitsBox.setToolTipText(resourceMap.getString("useLoanLimitsBox.toolTipText")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 9;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panFinances.add(useLoanLimitsBox, gridBagConstraints);
+        
+        
         clanPriceModifierLabel.setText(resourceMap.getString("clanPriceModifierLabel.text")); // NOI18N
         clanPriceModifierLabel.setName("clanPriceModifierLabel"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 8;
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panFinances.add(clanPriceModifierLabel, gridBagConstraints);
@@ -985,8 +1013,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         ((JSpinner.DefaultEditor)spnClanPriceModifier.getEditor()).getTextField().setColumns(3);
         spnClanPriceModifier.setToolTipText(resourceMap.getString("clanPriceModifierJFormattedTextField.toolTipText")); // NOI18N      
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 8;
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panFinances.add(spnClanPriceModifier, gridBagConstraints);
@@ -994,8 +1022,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         usedPartsValueLabel.setText(resourceMap.getString("usedPartsValueLabel.text")); // NOI18N
         usedPartsValueLabel.setName("usedPartsValueLabel"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 9;
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panFinances.add(usedPartsValueLabel, gridBagConstraints);
@@ -1005,8 +1033,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         ((JSpinner.DefaultEditor)spnUsedPartsValue.getEditor()).getTextField().setColumns(3);
         spnUsedPartsValue.setToolTipText(resourceMap.getString("usedPartsValueJFormattedTextField.toolTipText")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 9;
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panFinances.add(spnUsedPartsValue, gridBagConstraints);
@@ -1014,8 +1042,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         damagedPartsValueLabel.setText(resourceMap.getString("damagedPartsValueLabel.text")); // NOI18N
         damagedPartsValueLabel.setName("damagedPartsValueLabel"); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 10;
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panFinances.add(damagedPartsValueLabel, gridBagConstraints);
@@ -1025,14 +1053,14 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         ((JSpinner.DefaultEditor)spnDamagedPartsValue.getEditor()).getTextField().setColumns(3);
         spnDamagedPartsValue.setToolTipText(resourceMap.getString("damagedPartsValueJFormattedTextField.toolTipText")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 10;
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panFinances.add(spnDamagedPartsValue, gridBagConstraints);
         
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 11;
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panFinances.add(new JLabel("Reimbursement % for cancelled orders"), gridBagConstraints);
@@ -1042,8 +1070,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         ((JSpinner.DefaultEditor)spnOrderRefund.getEditor()).getTextField().setColumns(3);
         //spnDamagedPartsValue.setToolTipText(resourceMap.getString("damagedPartsValueJFormattedTextField.toolTipText")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 11;
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panFinances.add(spnOrderRefund, gridBagConstraints);
@@ -2185,6 +2213,8 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 	    options.setPayForOverhead(payForOverheadBox.isSelected());
 	    options.setPayForMaintain(payForMaintainBox.isSelected());
 	    options.setPayForTransport(payForTransportBox.isSelected());
+	    options.setPayForRecruitment(payForRecruitmentBox.isSelected());
+	    options.setLoanLimits(useLoanLimitsBox.isSelected());
 	    options.setSellUnits(sellUnitsBox.isSelected());
 	    options.setSellParts(sellPartsBox.isSelected());
 	

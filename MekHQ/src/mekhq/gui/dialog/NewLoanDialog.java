@@ -107,7 +107,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         campaign = c;
         IDragoonsRating dragoon = DragoonsRatingFactory.getDragoonsRating(campaign);
         dragoon.reInitialize();
-        rating = dragoon.getDragoonsRatingAsInteger();
+        rating = dragoon.getModifier();
         loan = Loan.getBaseLoanFor(rating, campaign.getCalendar());
         maxCollateralValue = campaign.getTotalEquipmentValue();
         formatter = new DecimalFormat();
@@ -580,30 +580,47 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
     
     
     private void setSliders() {
-        int[] interest = Loan.getInterestBracket(rating);
-        sldInterest = new JSlider(interest[0],interest[2],loan.getInterestRate());
-        if(interest[2]-interest[0] > 30) {
+        if(campaign.getCampaignOptions().useLoanLimits()) {
+            int[] interest = Loan.getInterestBracket(rating);
+            sldInterest = new JSlider(interest[0],interest[2],loan.getInterestRate());
+            if(interest[2]-interest[0] > 30) {
+                sldInterest.setMajorTickSpacing(10);
+            } else {
+                sldInterest.setMajorTickSpacing(5);
+            }
+            sldInterest.setPaintTicks(true);
+            sldInterest.setPaintLabels(true);
+            
+            int[] collateral = Loan.getCollateralBracket(rating);
+            sldCollateral = new JSlider(collateral[0],collateral[2],loan.getCollateralPercent());
+            if(collateral[2]-collateral[0] > 50) {
+                sldCollateral.setMajorTickSpacing(20);
+            } else {
+                sldCollateral.setMajorTickSpacing(10);
+            }
+            sldCollateral.setPaintTicks(true);
+            sldCollateral.setPaintLabels(true);
+            
+            sldLength = new JSlider(1,Loan.getMaxYears(rating),loan.getYears());
+            sldLength.setMajorTickSpacing(1);
+            sldLength.setPaintTicks(true);
+            sldLength.setPaintLabels(true);
+        } else {
+            sldInterest = new JSlider(0,100,loan.getInterestRate());
             sldInterest.setMajorTickSpacing(10);
-        } else {
-            sldInterest.setMajorTickSpacing(5);
+            sldInterest.setPaintTicks(true);
+            sldInterest.setPaintLabels(true);
+            
+            sldCollateral = new JSlider(0,300,loan.getCollateralPercent());
+            sldCollateral.setMajorTickSpacing(50);
+            sldCollateral.setPaintTicks(true);
+            sldCollateral.setPaintLabels(true);
+            
+            sldLength = new JSlider(1,10,loan.getYears());
+            sldLength.setMajorTickSpacing(1);
+            sldLength.setPaintTicks(true);
+            sldLength.setPaintLabels(true);
         }
-        sldInterest.setPaintTicks(true);
-        sldInterest.setPaintLabels(true);
-        
-        int[] collateral = Loan.getCollateralBracket(rating);
-        sldCollateral = new JSlider(collateral[0],collateral[2],loan.getCollateralPercent());
-        if(collateral[2]-collateral[0] > 50) {
-            sldCollateral.setMajorTickSpacing(20);
-        } else {
-            sldCollateral.setMajorTickSpacing(10);
-        }
-        sldCollateral.setPaintTicks(true);
-        sldCollateral.setPaintLabels(true);
-        
-        sldLength = new JSlider(1,Loan.getMaxYears(rating),loan.getYears());
-        sldLength.setMajorTickSpacing(1);
-        sldLength.setPaintTicks(true);
-        sldLength.setPaintLabels(true);
     }
 
     @Override
@@ -613,15 +630,17 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
 
     @Override
     public void stateChanged(ChangeEvent e) {
-        if(e.getSource() == sldInterest) {
-            sldCollateral.removeChangeListener(this);
-            sldCollateral.setValue(Loan.recalculateCollateralFromInterest(sldInterest.getValue(), rating));
-            sldCollateral.addChangeListener(this);
-        }
-        else if(e.getSource() == sldCollateral) {
-            sldInterest.removeChangeListener(this);
-            sldInterest.setValue(Loan.recalculateInterestFromCollateral(sldCollateral.getValue(), rating));
-            sldInterest.addChangeListener(this);
+        if(campaign.getCampaignOptions().useLoanLimits()) {
+            if(e.getSource() == sldInterest) {
+                sldCollateral.removeChangeListener(this);
+                sldCollateral.setValue(Loan.recalculateCollateralFromInterest(sldInterest.getValue(), rating));
+                sldCollateral.addChangeListener(this);
+            }
+            else if(e.getSource() == sldCollateral) {
+                sldInterest.removeChangeListener(this);
+                sldInterest.setValue(Loan.recalculateInterestFromCollateral(sldCollateral.getValue(), rating));
+                sldInterest.addChangeListener(this);
+            }
         }
         refreshLoan(loan.getPrincipal());
     }
