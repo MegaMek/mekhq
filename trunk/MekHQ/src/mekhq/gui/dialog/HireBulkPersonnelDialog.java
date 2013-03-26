@@ -178,14 +178,18 @@ public class HireBulkPersonnelDialog extends javax.swing.JDialog {
     	while(number > 0) {
     		Person p = campaign.newPerson(choiceType.getSelectedIndex() + 1);
     		p.setRank(choiceRanks.getSelectedIndex());
-    		campaign.addPerson(p);
-    		number--;
+    		if(!campaign.recruitPerson(p)) {
+    		    number = 0;
+    		} else {
+    		    number--;
+    		}
     	}
     	hqView.refreshPersonnelList();
         hqView.refreshPatientList();
         hqView.refreshTechsList();
         hqView.refreshDoctorsList();
         hqView.refreshReport();
+        hqView.refreshFinancialTransactions();
     }
     
 }

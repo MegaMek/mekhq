@@ -552,7 +552,13 @@ public class Campaign implements Serializable {
 		return unitIds.get(id);
 	}
 
-	public void addPerson(Person p) {
+	public boolean recruitPerson(Person p) {
+	    if(getCampaignOptions().payForRecruitment()) {
+	        if(!getFinances().debit(2 * p.getSalary(), Transaction.C_SALARY, "recruitment of " + p.getName(), getCalendar().getTime())) {
+	            addReport("<font color='red'><b>Insufficient funds to recruit " + p.getName() + "</b></font>");
+	            return false;
+	        }
+	    }
 		UUID id = UUID.randomUUID();
 		while(null != personnelIds.get(id)) {
 			id = UUID.randomUUID();
@@ -574,6 +580,7 @@ public class Campaign implements Serializable {
 			rankEntry = " as a " + getRanks().getRank(p.getRank());
 		}
 		p.addLogEntry(getDate(), "Joined " + getName() + rankEntry);
+		return true;
 	}
 	
 	private void addPersonWithoutId(Person p) {
@@ -946,9 +953,13 @@ public class Campaign implements Serializable {
 	    report += "attempts to find " + acquisition.getAcquisitionName();
 		int roll = Compute.d6(2);
 		report += "  needs " + target.getValueAsString();
-		report += " and rolls " + roll + ":";		
+		report += " and rolls " + roll + ":";
+		int mos = roll - target.getValue();
+		if(target.getValue() == TargetRoll.AUTOMATIC_SUCCESS) {
+		    mos = roll - 2;
+		}
 		if(roll >= target.getValue()) {
-		    int transitDays = calculatePartTransitTime(roll - target.getValue());
+		    int transitDays = calculatePartTransitTime(mos);
 			report = report + acquisition.find(transitDays);
 			found = true;
 		} else {
@@ -4006,7 +4017,9 @@ public class Campaign implements Serializable {
     		if(null == p) {
     			break;
     		}
-    		addPerson(p);
+    		if(!recruitPerson(p)) {
+    		    return;
+    		}
     		if(unit.usesSoloPilot() || unit.usesSoldiers()) {
     			unit.addPilotOrSoldier(p);
     		} else {
@@ -4021,17 +4034,23 @@ public class Campaign implements Serializable {
     		else if(unit.getEntity() instanceof SmallCraft || unit.getEntity() instanceof Jumpship) {
     			p = newPerson(Person.T_SPACE_GUNNER);
     		}
-    		addPerson(p);
+    		if(!recruitPerson(p)) {
+                return;
+            }
     		unit.addGunner(p);
     	}
     	while(unit.canTakeMoreVesselCrew()) {
     		Person p = newPerson(Person.T_SPACE_CREW);
-    		addPerson(p);
+    		if(!recruitPerson(p)) {
+                return;
+            }
     		unit.addVesselCrew(p);
     	}
     	if(unit.canTakeNavigator()) {
     		Person p = newPerson(Person.T_NAVIGATOR);
-    		addPerson(p);
+    		if(!recruitPerson(p)) {
+                return;
+            }
     		unit.setNavigator(p);
     	}
     	unit.resetPilotAndEntity();

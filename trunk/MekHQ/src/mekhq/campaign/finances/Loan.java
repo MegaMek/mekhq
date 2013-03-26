@@ -388,23 +388,19 @@ public class Loan implements MekHqXmlSerializable {
     }
     
     public static Loan getBaseLoanFor(int rating, GregorianCalendar cal) {
-        //we are going to use the numbers from StellarOps beta here - although
-        //its a little unclear how we should translate dragoons rating to reputation
-        //score. Since there are 5 categories on the table, I am going to stick
-        //with our 5 dragoons ratings
-        switch(rating) {
-        case IDragoonsRating.DRAGOON_F:
-            return new Loan(10000000, 35, 60, 1, SCHEDULE_MONTHLY, cal);
-        case IDragoonsRating.DRAGOON_D:
+        //we are going to treat the score from StellarOps the same as dragoons score
+        //TODO: pirates and government forces
+        if(rating <= 0) {
+            return new Loan(10000000, 35, 80, 1, SCHEDULE_MONTHLY, cal);
+        }
+        else if(rating < 5) {
             return new Loan(10000000, 20, 60, 1, SCHEDULE_MONTHLY, cal);
-        case IDragoonsRating.DRAGOON_C:
+        } else if(rating < 10) {
             return new Loan(10000000, 15, 40, 2, SCHEDULE_MONTHLY, cal);
-        case IDragoonsRating.DRAGOON_B:
+        } else if(rating < 14) {
             return new Loan(10000000, 10, 25, 3, SCHEDULE_MONTHLY, cal);
-        case IDragoonsRating.DRAGOON_A:
+        } else {
             return new Loan(10000000, 7, 15, 5, SCHEDULE_MONTHLY, cal);
-        default:
-            return new Loan(10000000, 50, 100, 1, SCHEDULE_MONTHLY, cal);
         }
         
     }
@@ -416,77 +412,58 @@ public class Loan implements MekHqXmlSerializable {
      * determines the maximum interest)
      */
     public static int[] getInterestBracket(int rating) {
-        switch(rating) {
-        case IDragoonsRating.DRAGOON_F:
+        if(rating <= 0) {
             return new int[]{15,35,75};
-        case IDragoonsRating.DRAGOON_D:
+        } else if(rating < 5) {
             return new int[]{10,20,60};
-        case IDragoonsRating.DRAGOON_C:
+        } else if(rating < 10) {
             return new int[]{5,15,35};
-        case IDragoonsRating.DRAGOON_B:
+        } else if(rating < 14) {
             return new int[]{5,10,25};
-        case IDragoonsRating.DRAGOON_A:
+        } else {
             return new int[]{4,7,17};
-        default:
-            return new int[]{15,35,75};
         }
     }
     
     public static int[] getCollateralBracket(int rating) {
-        switch(rating) {
-        case IDragoonsRating.DRAGOON_F:
+        if(rating <= 0) {
             return new int[]{60,80,380};
-        case IDragoonsRating.DRAGOON_D:
+        } else if(rating < 5) {
             return new int[]{40,60,210};
-        case IDragoonsRating.DRAGOON_C:
+        } else if(rating < 10) {
             return new int[]{20,40,140};
-        case IDragoonsRating.DRAGOON_B:
+        } else if(rating < 14) {
             return new int[]{10,25,75};
-        case IDragoonsRating.DRAGOON_A:
+        } else {
             return new int[]{5,15,35};
-        default:
-            return new int[]{60,80,380};
         }
     }
     
     public static int getMaxYears(int rating) {
-        switch(rating) {
-        case IDragoonsRating.DRAGOON_F:
-        case IDragoonsRating.DRAGOON_D:
+        if(rating < 5) {
             return 1;
-        case IDragoonsRating.DRAGOON_C:
+        } else if(rating < 9) {
             return 2;
-        case IDragoonsRating.DRAGOON_B:
+        } else if(rating < 14) {
             return 3;
-        case IDragoonsRating.DRAGOON_A:
+        } else {
             return 5;
-        default:
-            return 1;
         }
     }
     
     public static int getCollateralIncrement(boolean interestPositive, int rating) {
-        switch(rating) {
-        case IDragoonsRating.DRAGOON_F:
-        case IDragoonsRating.DRAGOON_D:
+        if(rating < 5) {
             if(interestPositive) {
                 return 2;
             } else {
                 return 15;
             }
-        case IDragoonsRating.DRAGOON_C:
-        case IDragoonsRating.DRAGOON_B:
-        case IDragoonsRating.DRAGOON_A:
+        }
+        else {
             if(interestPositive) {
                 return 1;
             } else {
                 return 10;
-            }
-        default:
-            if(interestPositive) {
-                return 2;
-            } else {
-                return 20;
             }
         }
     }
