@@ -955,7 +955,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     }
     
     public String getShoppingListReport(int quan) {
-        return getQuantityName(quan) + ((quan > 1) ? " have " : " has ") + "been added to the shopping list.";
+        return getQuantityName(quan) + ((quan > 1) ? " have " : " has ") + "been added to the procurement list.";
     }
     
     public String getArrivalReport() {
