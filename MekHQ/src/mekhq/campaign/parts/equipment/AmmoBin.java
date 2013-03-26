@@ -462,7 +462,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 		if(null != a && a.getShots() <= 0) {
 			campaign.removePart(a);
 		} else if(null == a && amount > 0) {
-			campaign.addPart(new AmmoStorage(1,curType,amount,campaign));
+			campaign.addPart(new AmmoStorage(1,curType,amount,campaign), 0);
 		}
 	}
 	

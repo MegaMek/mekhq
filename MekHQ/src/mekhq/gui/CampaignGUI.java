@@ -2524,7 +2524,7 @@ public class CampaignGUI extends JPanel {
             Part repairable = part.clone();
             part.decrementQuantity();
             getCampaign().fixPart(repairable, tech);
-            getCampaign().addPart(repairable);
+            getCampaign().addPart(repairable, 0);
             //if the break off part failed to be repaired, then follow it with the focus
             //otherwise keep the focus on the current row
             if(repairable.needsFixing() && !repairable.isBeingWorkedOn()) {
@@ -8853,8 +8853,7 @@ public class CampaignGUI extends JPanel {
                         IAcquisitionWork acquisition = model.getAcquisition(row);
                         Object equipment = acquisition.getNewEquipment();
                         if(equipment instanceof Part) {
-                            ((Part)equipment).setDaysToArrival(getCampaign().calculatePartTransitTime(0));
-                            if(getCampaign().buyPart((Part)equipment)) {
+                            if(getCampaign().buyPart((Part)equipment, getCampaign().calculatePartTransitTime(0))) {
                                 getCampaign().addReport("<font color='Green'><b>" + acquisition.getAcquisitionName() + " found.</b></font>");
                                 acquisition.decrementQuantity();
                             } else {
@@ -8890,8 +8889,7 @@ public class CampaignGUI extends JPanel {
                         while(canAfford && acquisition.getQuantity() > 0) {
                             Object equipment = acquisition.getNewEquipment();
                             if(equipment instanceof Part) {
-                                ((Part)equipment).setDaysToArrival(getCampaign().calculatePartTransitTime(0));
-                                if(getCampaign().buyPart((Part)equipment)) {
+                                if(getCampaign().buyPart((Part)equipment, getCampaign().calculatePartTransitTime(0))) {
                                     getCampaign().addReport("<font color='Green'><b>" + acquisition.getAcquisitionName() + " found.</b></font>");
                                     acquisition.decrementQuantity();
                                 } else {

@@ -336,7 +336,7 @@ public class EnginePart extends Part {
 			unit.removePart(this);
 			Part missing = getMissingPart();
 			unit.addPart(missing);
-			campaign.addPart(missing);
+			campaign.addPart(missing, 0);
 		}
 		setSalvaging(false);
 		setUnit(null);

@@ -314,9 +314,10 @@ public class ChooseRefitDialog extends javax.swing.JDialog {
 		public final static int COL_BV       =   2;
 		public final static int COL_TIME     =   3;
 		public final static int COL_NPART    =   4;
-		public final static int COL_COST     =   5;
+		public final static int COL_TARGET   =   5;
+		public final static int COL_COST     =   6;
 
-        public final static int N_COL          = 6;
+        public final static int N_COL          = 7;
 		
 		public RefitTableModel(ArrayList<Refit> refits) {
 			data = refits;
@@ -345,6 +346,8 @@ public class ChooseRefitDialog extends javax.swing.JDialog {
                     return "# Parts";
             	case COL_COST:
                     return "Cost";
+            	case COL_TARGET:
+            	    return "Kit TN";
                 default:
                     return "?";
             }
@@ -375,6 +378,9 @@ public class ChooseRefitDialog extends javax.swing.JDialog {
 			}
 			if(col == COL_COST) {
 				return formatter.format(r.getCost());
+			}
+			if(col == COL_TARGET) {
+			    return campaign.getTargetForAcquisition(r, campaign.getLogisticsPerson(), false).getValueAsString();
 			}
 			return "?";
 		}
@@ -417,7 +423,15 @@ public class ChooseRefitDialog extends javax.swing.JDialog {
 		 }
 
 		 public String getTooltip(int row, int col) {
+		     Refit r;
+		     if(data.isEmpty()) {
+		         return "";
+		     } else {
+		         r = (Refit)data.get(row);
+		     }
 			 switch(col) {
+			 case COL_TARGET:
+			     return campaign.getTargetForAcquisition(r, campaign.getLogisticsPerson(), false).getDesc();
 			 default:
 				 return null;
 			 }

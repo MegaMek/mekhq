@@ -125,7 +125,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		if(null != replacement) {
 			Part actualReplacement = replacement.clone();
 			unit.addPart(actualReplacement);
-			campaign.addPart(actualReplacement);
+			campaign.addPart(actualReplacement, 0);
 			replacement.decrementQuantity();
 			remove(false);
 			//assign the replacement part to the unit			
@@ -234,7 +234,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
         else if(getTechBase() == T_BOTH) {
             int penalty = Math.min(campaign.getCampaignOptions().getClanAcquisitionPenalty(), campaign.getCampaignOptions().getIsAcquisitionPenalty());
             if(penalty > 0) {
-                target.addModifier(campaign.getCampaignOptions().getIsAcquisitionPenalty(), "tech limit");
+                target.addModifier(penalty, "tech limit");
             }
         }
         //availability mod
@@ -268,7 +268,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		Part newPart = getNewPart();
 		newPart.setBrandNew(true);
 		newPart.setDaysToArrival(transitDays);
-		if(campaign.buyPart(newPart)) {
+		if(campaign.buyPart(newPart, transitDays)) {
 		    return "<font color='green'><b> part found</b>.</font> It will be delivered in " + transitDays + " days.";
 		} else {
 		    return "<font color='red'><b> You cannot afford this part. Transaction cancelled</b>.</font>";
@@ -351,7 +351,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 				if(replacement.getQuantity() > 1) {
 					Part actualReplacement = replacement.clone();
 					actualReplacement.setReserveId(i);
-					campaign.addPart(actualReplacement);
+					campaign.addPart(actualReplacement, 0);
 					replacementId = actualReplacement.getId();
 					replacement.decrementQuantity();
 				} else {

@@ -1813,7 +1813,7 @@ public class Unit implements MekHqXmlSerializable {
     	
     	if(addParts) {
     		for(Part p : partsToAdd) {
-    			campaign.addPart(p);
+    			campaign.addPart(p, 0);
     		}
     	}
     }
