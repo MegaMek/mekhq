@@ -38,6 +38,7 @@ v0.3.0 (SVN)
 + put in can't afford it checks to ShoppingList.addShoppingItem and ShoppingList.newDay
 + Unit purchasing now used same method as parts acquisition
 + Unit procurement table in hangar tab
++ procure single and all item menu items for GM mode in ProcurementTableMouseAdapter
 
 v0.2.0 (2013-03-16)
 + Bug 318: Dragoon's Rating error FMM:R method
