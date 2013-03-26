@@ -625,7 +625,8 @@ public class Campaign implements Serializable {
 		return personnelIds.get(id);
 	}
 
-	public void addPart(Part p) {
+	public void addPart(Part p, int transitDays) {
+	    p.setDaysToArrival(transitDays);
 		p.setBrandNew(false);
 		//dont add missing parts if they dont have units or units with not id
 		if(p instanceof MissingPart && (null == p.getUnit() || null == p.getUnitId())) {
@@ -1667,20 +1668,20 @@ public class Campaign implements Serializable {
 		}
 	}
 	
-	public boolean buyPart(Part part) {
-		return buyPart(part, 1);
+	public boolean buyPart(Part part, int transitDays) {
+		return buyPart(part, 1, transitDays);
 	}
 	
-	public boolean buyPart(Part part, double multiplier) {
+	public boolean buyPart(Part part, double multiplier, int transitDays) {
 		if(getCampaignOptions().payForParts()) {		    
 			if(finances.debit((long)(multiplier * part.getActualValue()), Transaction.C_EQUIP, "Purchase of " + part.getName(), calendar.getTime())) {
-			     addPart(part);
+			     addPart(part, transitDays);
 			     return true;
 			} else {
 			    return false;
 			}
 		} else {
-		      addPart(part);
+		      addPart(part, transitDays);
 		      return true;
 		}
 	}
@@ -2277,6 +2278,9 @@ public class Campaign implements Serializable {
 				unit.getRefit().reCalc();
 				if(null == unit.getRefit().getNewArmorSupplies() && unit.getRefit().getNewArmorSuppliesId() > 0) {
 					unit.getRefit().setNewArmorSupplies((Armor)retVal.getPart(unit.getRefit().getNewArmorSuppliesId()));
+				}
+				if(!unit.getRefit().isCustomJob() && !unit.getRefit().kitFound()) {
+				    retVal.shoppingList.addShoppingItemWithoutChecking(unit.getRefit());
 				}
 			}
 			

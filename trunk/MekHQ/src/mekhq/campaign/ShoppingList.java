@@ -93,6 +93,10 @@ public class ShoppingList implements MekHqXmlSerializable {
         }
     }
     
+    public void addShoppingItemWithoutChecking(IAcquisitionWork newWork) {
+        shoppingList.add(newWork);
+    }
+    
     public void addShoppingItem(IAcquisitionWork newWork, int quantity, Campaign campaign) {
         Person person = campaign.getLogisticsPerson();
         if(null == person && !campaign.getCampaignOptions().getAcquisitionSkill().equals(CampaignOptions.S_AUTO)) {
@@ -166,7 +170,9 @@ public class ShoppingList implements MekHqXmlSerializable {
     public void writeToXml(PrintWriter pw1, int indent) {
         pw1.println(MekHqXmlUtil.indentStr(indent) + "<shoppingList>");
         for(IAcquisitionWork shoppingItem : shoppingList) {
-            if(shoppingItem instanceof Part) {
+            //don't write refits to the shopping list - we will add them manually
+            //when we parse units and find refit kits that have not been found
+            if(shoppingItem instanceof Part && !(shoppingItem instanceof Refit)) {
                 ((Part)shoppingItem).writeToXml(pw1, indent+1);
             } 
             else if(shoppingItem instanceof UnitOrder) {

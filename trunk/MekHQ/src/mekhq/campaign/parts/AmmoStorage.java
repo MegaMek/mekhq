@@ -253,8 +253,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     public String find(int transitDays) {
 	    Part newPart = getNewPart();
 	    newPart.setBrandNew(true);
-        newPart.setDaysToArrival(transitDays);
-        if(campaign.buyPart(newPart)) {
+        if(campaign.buyPart(newPart, transitDays)) {
             return "<font color='green'><b> part found</b>.</font> It will be delivered in " + transitDays + " days.";
         } else {
             return "<font color='red'><b> You cannot afford this part. Transaction cancelled</b>.</font>";
@@ -290,7 +289,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
         if(null != a && a.getShots() <= 0) {
             campaign.removePart(a);
         } else if(null == a && amount > 0) {
-            campaign.addPart(new AmmoStorage(1,curType,amount,campaign));
+            campaign.addPart(new AmmoStorage(1,curType,amount,campaign), 0);
         }
     }
     

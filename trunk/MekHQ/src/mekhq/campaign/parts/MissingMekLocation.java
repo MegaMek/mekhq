@@ -331,7 +331,7 @@ public class MissingMekLocation extends MissingPart {
 			Unit u = unit;
 			Part actualReplacement = replacement.clone();
 			unit.addPart(actualReplacement);
-			campaign.addPart(actualReplacement);
+			campaign.addPart(actualReplacement, 0);
 			replacement.decrementQuantity();
 			//TODO: if this is a mech head, check to see if it had components
             if(loc == Mech.LOC_HEAD && actualReplacement instanceof MekLocation) { 
@@ -364,7 +364,7 @@ public class MissingMekLocation extends MissingPart {
 	    if(part.hasSensors() && null != missingSensor) {
 	        newPart = missingSensor.getNewPart();
 	        unit.addPart(newPart);
-	        campaign.addPart(newPart);
+	        campaign.addPart(newPart, 0);
 	        missingSensor.remove(false);
 	        newPart.updateConditionFromPart(); 
 	    }
@@ -378,7 +378,7 @@ public class MissingMekLocation extends MissingPart {
 	    if(part.hasLifeSupport() && null != missingLifeSupport) {
             newPart = missingLifeSupport.getNewPart();
             unit.addPart(newPart);
-            campaign.addPart(newPart);
+            campaign.addPart(newPart, 0);
             missingLifeSupport.remove(false);
             newPart.updateConditionFromPart(); 
         }

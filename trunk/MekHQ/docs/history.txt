@@ -42,6 +42,8 @@ v0.3.0 (SVN)
 + Bug: equipment parts not recognizing same status in warehouse
 + Bug: too much armor for custom refits
 + Bug: display off armor needed in refits incorrect
++ refit kits should take time too
++ refit kit fixes
 
 v0.2.0 (2013-03-16)
 + Bug 318: Dragoon's Rating error FMM:R method

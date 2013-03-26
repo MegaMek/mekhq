@@ -108,7 +108,7 @@ public class Rotor extends TankLocation {
 			unit.removePart(this);
 			Part missing = getMissingPart();
 			unit.addPart(missing);
-			campaign.addPart(missing);
+			campaign.addPart(missing, 0);
 			((VTOL)unit.getEntity()).resetMovementDamage();
 			for(Part part : unit.getParts()) {
 				if(part instanceof MotiveSystem) {

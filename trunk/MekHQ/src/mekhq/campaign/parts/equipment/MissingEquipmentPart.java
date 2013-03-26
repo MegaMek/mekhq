@@ -167,7 +167,7 @@ public class MissingEquipmentPart extends MissingPart {
 		if(null != replacement) {
 			Part actualReplacement = replacement.clone();
 			unit.addPart(actualReplacement);
-			campaign.addPart(actualReplacement);
+			campaign.addPart(actualReplacement, 0);
 			replacement.decrementQuantity();
 			((EquipmentPart)actualReplacement).setEquipmentNum(equipmentNum);
 			remove(false);
