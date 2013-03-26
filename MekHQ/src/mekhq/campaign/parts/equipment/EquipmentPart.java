@@ -29,6 +29,7 @@ import megamek.common.EquipmentType;
 import megamek.common.MiscType;
 import megamek.common.Mounted;
 import megamek.common.TechConstants;
+import megamek.common.WeaponType;
 import megamek.common.weapons.Weapon;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Era;
@@ -146,11 +147,6 @@ public class EquipmentPart extends Part {
         return part instanceof EquipmentPart
         		&& getType().equals(((EquipmentPart)part).getType())
         		&& getTonnage() == part.getTonnage();
-    }
-
-    @Override
-    public boolean isSameStatus(Part part) {
-    	return super.isSameStatus(part) && (this.getHits() > 0) == (part.getHits() > 0) && this.getDifficulty() == part.getDifficulty();
     }
     
     @Override
