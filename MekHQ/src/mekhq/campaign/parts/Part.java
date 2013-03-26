@@ -949,7 +949,9 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     }
     
     public void decrementDaysToWait() {
-        daysToWait--;
+        if(daysToWait > 0) {
+            daysToWait--;
+        }
     }
     
     public String getShoppingListReport(int quan) {

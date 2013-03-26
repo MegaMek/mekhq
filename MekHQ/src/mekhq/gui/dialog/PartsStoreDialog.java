@@ -445,7 +445,10 @@ public class PartsStoreDialog extends javax.swing.JDialog {
 				return part.getName();
 			}
 			if(col == COL_DETAIL) {
-				return part.getDetails();
+			    String details = part.getDetails();
+			    details = details.replaceFirst("\\d+\\shit\\(s\\),\\s", "");
+			    details = details.replaceFirst("\\d+\\shit\\(s\\)", "");
+				return details;
 			}
 			if(col == COL_COST) {
 				return formatter.format(part.getActualValue());

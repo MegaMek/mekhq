@@ -22,7 +22,6 @@
 package mekhq.campaign;
 
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -138,9 +137,9 @@ import org.w3c.dom.NodeList;
  * 
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class Unit implements Serializable, MekHqXmlSerializable {
-	private static final long serialVersionUID = 4079817548868582600L;
-	public static final int SITE_FIELD = 0;
+public class Unit implements MekHqXmlSerializable {
+
+    public static final int SITE_FIELD = 0;
 	public static final int SITE_MOBILE_BASE = 1;
 	public static final int SITE_BAY = 2;
 	public static final int SITE_FACILITY = 3;
@@ -159,7 +158,7 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 	public static final int QUALITY_E = 4;
 	public static final int QUALITY_F = 5;
 
-	private Entity entity;
+	protected Entity entity;
 	private int site;
 	private boolean salvaged;
 	private UUID id;
@@ -195,6 +194,9 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 	private int pilotId = -1;
 	
 	private String history;
+	
+	//for delivery
+    protected int daysToArrival;
 	
 	public Unit() {
 		this(null, null);
@@ -1074,9 +1076,13 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 				+scenarioId
 				+"</scenarioId>");
 		pw1.println(MekHqXmlUtil.indentStr(indentLvl+1)
-				+"<history>"
-				+history
-				+"</history>");
+				+"<daysToArrival>"
+				+daysToArrival
+				+"</daysToArrival>");
+		pw1.println(MekHqXmlUtil.indentStr(indentLvl+1)
+                +"<history>"
+                +MekHqXmlUtil.escape(history)
+                +"</history>");
 		if(null != refit) {
 			refit.writeToXml(pw1, indentLvl+1);
 		}
@@ -1106,7 +1112,9 @@ public class Unit implements Serializable, MekHqXmlSerializable {
 					retVal.site = Integer.parseInt(wn2.getTextContent());
 				} else if (wn2.getNodeName().equalsIgnoreCase("pilotId")) {
 					retVal.pilotId = Integer.parseInt(wn2.getTextContent());
-				} else if (wn2.getNodeName().equalsIgnoreCase("driverId")) {
+				} else if (wn2.getNodeName().equalsIgnoreCase("daysToArrival")) {
+                    retVal.daysToArrival = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("driverId")) {
 					if(version.getMajorVersion() == 0 && version.getMinorVersion() < 2 && version.getSnapshot() < 14) {
 						retVal.oldDrivers.add(Integer.parseInt(wn2.getTextContent()));
 					} else {
@@ -2419,5 +2427,36 @@ public class Unit implements Serializable, MekHqXmlSerializable {
         }
         
         return false;
+    }
+    
+    public int getAvailability(int era) {
+        //take the highest availability of all parts
+        int availability = EquipmentType.RATING_A;
+        for(Part p : parts) {
+            if(p.getAvailability(era) > availability) {
+                availability = p.getAvailability(era);
+            }
+        }
+        return availability;
+    }
+    
+    public void setDaysToArrival(int days) {
+        daysToArrival = days;
+    }
+    
+    public int getDaysToArrival() { 
+        return daysToArrival;
+    }
+    
+    public boolean checkArrival() {
+        if(daysToArrival > 0) {
+            daysToArrival--;
+            return (daysToArrival == 0);
+        }
+        return false;
+    }
+    
+    public boolean isPresent() {
+        return daysToArrival == 0;
     }
 }

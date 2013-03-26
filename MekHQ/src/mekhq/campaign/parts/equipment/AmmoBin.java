@@ -112,7 +112,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         //thats fine, but this will become problematic when we set up a parts
         //store. For now I am just going to pass in a null entity and attempt
     	//to catch any resulting NPEs
-    	Entity en = null;
+    	/*Entity en = null;
     	boolean isArmored = false;
     	if (unit != null) {
             en = unit.getEntity();
@@ -129,6 +129,13 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
         	System.out.println("Found a null entity while calculating cost for " + name);
         }
         return itemCost;
+        */
+        return 0;
+    }
+    
+    @Override
+    public long getBuyCost() {
+        return getNewPart().getStickerPrice();
     }
 
     public int getShotsNeeded() {
@@ -493,7 +500,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 		toReturn += ((AmmoType)type).getShots() + " shots (1 ton)<br/>";
 		String[] inventories = campaign.getPartInventory(getNewPart());
         toReturn += inventories[1] + " in transit, " + inventories[2] + " on order<br>"; 
-		toReturn += Utilities.getCurrencyString(getStickerPrice()) + "<br/>";
+		toReturn += Utilities.getCurrencyString(getBuyCost()) + "<br/>";
 		toReturn += "</font></html>";
 		return toReturn;
 	}
@@ -507,17 +514,16 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 	public TargetRoll getAllAcquisitionMods() {
         TargetRoll target = new TargetRoll();
         // Faction and Tech mod
-        int factionMod = 0;
-        if (campaign.getCampaignOptions().useFactionModifiers()) {
-        	factionMod = campaign.getFaction().getTechMod(this, campaign);
-        }   
+        if(isClanTechBase() && campaign.getCampaignOptions().getClanAcquisitionPenalty() > 0) {
+            target.addModifier(campaign.getCampaignOptions().getClanAcquisitionPenalty(), "clan-tech");
+        }
+        else if(campaign.getCampaignOptions().getIsAcquisitionPenalty() > 0) {
+            target.addModifier(campaign.getCampaignOptions().getIsAcquisitionPenalty(), "Inner Sphere tech");
+        }  
         //availability mod
         int avail = getAvailability(campaign.getEra());
         int availabilityMod = Availability.getAvailabilityModifier(avail);
         target.addModifier(availabilityMod, "availability (" + EquipmentType.getRatingName(avail) + ")");
-        if(factionMod != 0) {
-     	   target.addModifier(factionMod, "faction");
-        }
         return target;
     }
 

@@ -60,7 +60,6 @@ public class CampaignOptions implements Serializable {
     //FIXME: This needs to be localized
     public final static String [] REPAIR_SYSTEM_NAMES = {"Strat Ops", "Warchest Custom", "Generic Spare Parts"};
 
-    private boolean useFactionModifiers;
     private double clanPriceModifier;
     private boolean useFactionForNames;
     private int repairSystem;
@@ -116,6 +115,8 @@ public class CampaignOptions implements Serializable {
     private int acquireMosUnit;
     private int acquireMinimumTime;
     private int acquireMinimumTimeUnit;
+    private int clanAcquisitionPenalty;
+    private int isAcquisitionPenalty;
     
     //xp related
     private int scenarioXP;
@@ -136,7 +137,6 @@ public class CampaignOptions implements Serializable {
     private boolean[] usePortraitForType;
 
     public CampaignOptions () {
-        useFactionModifiers = false;
         clanPriceModifier = 1.0;
         useFactionForNames = true;
         repairSystem = REPAIR_SYSTEM_STRATOPS; 
@@ -196,6 +196,8 @@ public class CampaignOptions implements Serializable {
         equipmentContractPercent = 5.0;
         equipmentContractSaleValue = false;
         blcSaleValue = false;
+        clanAcquisitionPenalty = 0;
+        isAcquisitionPenalty = 0;
         
     }
 
@@ -239,14 +241,6 @@ public class CampaignOptions implements Serializable {
         default:
             return "Unknown";   
         }
-    }
-    
-    public boolean useFactionModifiers() {
-        return useFactionModifiers;
-    }
-    
-    public void setFactionModifiers(boolean b) {
-        this.useFactionModifiers = b;
     }
     
     public boolean useEraMods() {
@@ -688,9 +682,25 @@ public class CampaignOptions implements Serializable {
         this.blcSaleValue = b;
     }
     
+    public int getClanAcquisitionPenalty() {
+        return clanAcquisitionPenalty;
+    }
+    
+    public void setClanAcquisitionPenalty(int b) {
+        clanAcquisitionPenalty = b;
+    }
+    
+    public int getIsAcquisitionPenalty() {
+        return isAcquisitionPenalty;
+    }
+    
+    public void setIsAcquisitionPenalty(int b) {
+        isAcquisitionPenalty = b;
+    }
+    
+    
 	public void writeToXml(PrintWriter pw1, int indent) {
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "<campaignOptions>");
-		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useFactionModifiers", useFactionModifiers); //private boolean useFactionModifiers;
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "clanPriceModifier", clanPriceModifier); //private double clanPriceModifier;
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useFactionForNames", useFactionForNames); //private boolean useFinances;
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "repairSystem", repairSystem); //private int repairSystem;
@@ -745,6 +755,8 @@ public class CampaignOptions implements Serializable {
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "equipmentContractBase", equipmentContractBase);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "equipmentContractSaleValue", equipmentContractSaleValue);
         MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "blcSaleValue", blcSaleValue);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "clanAcquisitionPenalty", clanAcquisitionPenalty);
+        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "isAcquisitionPenalty", isAcquisitionPenalty);
 
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
 				+"<usePortraitForType>"
@@ -772,12 +784,7 @@ public class CampaignOptions implements Serializable {
 			MekHQ.logMessage(wn2.getNodeName(),5);
 			MekHQ.logMessage("\t"+wn2.getTextContent(),5);
 
-			if (wn2.getNodeName().equalsIgnoreCase("useFactionModifiers")) {
-				if (wn2.getTextContent().equalsIgnoreCase("true"))
-					retVal.useFactionModifiers = true;
-				else
-					retVal.useFactionModifiers = false;
-			} else if (wn2.getNodeName().equalsIgnoreCase("clanPriceModifier")) {
+			if (wn2.getNodeName().equalsIgnoreCase("clanPriceModifier")) {
 				retVal.clanPriceModifier = Double.parseDouble(wn2.getTextContent());
 			} else if (wn2.getNodeName().equalsIgnoreCase("useFactionForNames")) {
 				if (wn2.getTextContent().equalsIgnoreCase("true"))
@@ -915,6 +922,10 @@ public class CampaignOptions implements Serializable {
                 retVal.acquireMinimumTime = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("acquireMinimumTimeUnit")) {
                 retVal.acquireMinimumTimeUnit = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("clanAcquisitionPenalty")) {
+                retVal.clanAcquisitionPenalty = Integer.parseInt(wn2.getTextContent().trim());
+            } else if (wn2.getNodeName().equalsIgnoreCase("isAcquisitionPenalty")) {
+                retVal.isAcquisitionPenalty = Integer.parseInt(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("equipmentContractPercent")) {
                 retVal.equipmentContractPercent = Double.parseDouble(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("equipmentContractBase")) {

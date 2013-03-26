@@ -499,7 +499,7 @@ public class Campaign implements Serializable {
 	 *            An <code>Entity</code> object that the new unit will be
 	 *            wrapped around
 	 */
-	public void addUnit(Entity en, boolean allowNewPilots) {
+	public void addUnit(Entity en, boolean allowNewPilots, int days) {
 		//reset the game object
 		en.setOwner(player);
 		en.setGame(game);
@@ -521,6 +521,7 @@ public class Campaign implements Serializable {
 		if(!unit.isRepairable()) {
 			unit.setSalvage(true);
 		}
+		unit.setDaysToArrival(days);
 		
 		// Assign an entity ID to our new unit
 		if (Entity.NONE == en.getId()) {
@@ -1209,6 +1210,9 @@ public class Campaign implements Serializable {
 			if(null != u.getEngineer()) {
 				u.getEngineer().resetMinutesLeft();
 			}
+			if(!u.isPresent()) {
+			    u.checkArrival();
+			}
 		}
 		
 		DecimalFormat formatter = new DecimalFormat();
@@ -1612,17 +1616,17 @@ public class Campaign implements Serializable {
 		return getFunds() >= cost;
 	}
 	
-	public boolean buyUnit(Entity en) {
+	public boolean buyUnit(Entity en, int days) {
 		long cost = new Unit(en, this).getBuyCost();
 		if(campaignOptions.payForUnits()) {
 			if(finances.debit(cost, Transaction.C_UNIT, "Purchased " + en.getShortName(), calendar.getTime())) {
-			    addUnit(en, false); 
+			    addUnit(en, false, days); 
 			    return true;
 			} else {
 			    return false;
 			}
 		} else {
-		      addUnit(en, false); 
+		      addUnit(en, false, days); 
 		      return true;
 		}
 	}

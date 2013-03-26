@@ -34,6 +34,10 @@ v0.3.0 (SVN)
 + put procurement list in warehouse tab instead of dialog
 + mouse adapter for procurement list table
 + restructured ShoppingList to add IAcquisitionWork instead of part
++ changed ShoppingListDialog to ProcurementTableModel and placed in CampaignGUI
++ put in can't afford it checks to ShoppingList.addShoppingItem and ShoppingList.newDay
++ Unit purchasing now used same method as parts acquisition
++ Unit procurement table in hangar tab
 
 v0.2.0 (2013-03-16)
 + Bug 318: Dragoon's Rating error FMM:R method

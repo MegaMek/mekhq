@@ -133,7 +133,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private javax.swing.JPanel panRandomSkill;
     private javax.swing.JTabbedPane tabOptions;
     private javax.swing.JTextField txtName;
-    private javax.swing.JCheckBox useFactionModifiersCheckBox;
     private javax.swing.JCheckBox useEraModsCheckBox;
     private javax.swing.JCheckBox useDragoonRatingCheckBox;
     private javax.swing.JComboBox dragoonsRatingMethodCombo;
@@ -198,6 +197,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private JCheckBox chkSupportStaffOnly;
     private JSpinner spnAcquireWaitingPeriod;
     private JComboBox choiceAcquireSkill;
+    private JSpinner spnAcquireClanPenalty;
+    private JSpinner spnAcquireIsPenalty;
+
     
     private JSpinner spnNDiceTransitTime;
     private JSpinner spnConstantTransitTime;
@@ -267,7 +269,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         setLocationRelativeTo(parent);
         
         // Rules panel
-        useFactionModifiersCheckBox.setSelected(options.useFactionModifiers());
         useEraModsCheckBox.setSelected(options.useEraMods());
         useDragoonRatingCheckBox.setSelected(options.useDragoonRating());
         dragoonsRatingMethodCombo.setSelectedItem(options.getDragoonsRatingMethod().getDescription());
@@ -334,7 +335,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         panTech = new javax.swing.JPanel();
         panRandomSkill = new javax.swing.JPanel();
         panRandomPortrait = new javax.swing.JPanel();
-        useFactionModifiersCheckBox = new javax.swing.JCheckBox();
         useEraModsCheckBox = new javax.swing.JCheckBox();
         useDragoonRatingCheckBox = new javax.swing.JCheckBox();
         dragoonsRatingMethodCombo = new javax.swing.JComboBox(CampaignOptions.DragoonsRatingMethod.getDragoonsRatingMethodNames());
@@ -554,19 +554,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panSubRepair.add(useQuirksBox, gridBagConstraints);
-        
-        useFactionModifiersCheckBox.setText(resourceMap.getString("useFactionModifiersCheckBox.text")); // NOI18N
-        useFactionModifiersCheckBox.setToolTipText(resourceMap.getString("useFactionModifiersCheckBox.toolTipText")); // NOI18N
-        useFactionModifiersCheckBox.setName("useFactionModifiersCheckBox"); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.weightx = 0.0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        panSubAcquire.add(useFactionModifiersCheckBox, gridBagConstraints);
 
         spnAcquireWaitingPeriod = new JSpinner(new SpinnerNumberModel(options.getWaitingPeriod(), 1, 365, 1));
         ((JSpinner.DefaultEditor)spnAcquireWaitingPeriod.getEditor()).getTextField().setEditable(false);
@@ -615,10 +602,45 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.gridy = 3;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 0.0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panSubAcquire.add(chkSupportStaffOnly, gridBagConstraints);
+        
+        spnAcquireClanPenalty = new JSpinner(new SpinnerNumberModel(options.getClanAcquisitionPenalty(), 0, 13, 1));
+        ((JSpinner.DefaultEditor)spnAcquireClanPenalty.getEditor()).getTextField().setEditable(false);
+      
+        JPanel pnlClanPenalty = new JPanel();
+        pnlClanPenalty.add(spnAcquireClanPenalty);
+        pnlClanPenalty.add(new JLabel("Penalty for Clan equipment"));      
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panSubAcquire.add(pnlClanPenalty, gridBagConstraints);
+        
+        spnAcquireIsPenalty = new JSpinner(new SpinnerNumberModel(options.getIsAcquisitionPenalty(), 0, 13, 1));
+        ((JSpinner.DefaultEditor)spnAcquireIsPenalty.getEditor()).getTextField().setEditable(false);
+      
+        JPanel pnlIsPenalty = new JPanel();
+        pnlIsPenalty.add(spnAcquireIsPenalty);
+        pnlIsPenalty.add(new JLabel("Penalty for Inner Sphere equipment"));      
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panSubAcquire.add(pnlIsPenalty, gridBagConstraints);
+        
         
         spnNDiceTransitTime = new JSpinner(new SpinnerNumberModel(options.getNDiceTransitTime(), 0, 365, 1));
         ((JSpinner.DefaultEditor)spnNDiceTransitTime.getEditor()).getTextField().setEditable(false);
@@ -2107,7 +2129,6 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 	    updateXPCosts();
 	    
 	    // Rules panel
-	    options.setFactionModifiers(useFactionModifiersCheckBox.isSelected());
 	    options.setEraMods(useEraModsCheckBox.isSelected());
 	    options.setClanPriceModifier((Double)spnClanPriceModifier.getModel().getValue());
 	    options.setUsedPartsValue((Double)spnUsedPartsValue.getModel().getValue());
@@ -2178,6 +2199,9 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 		options.setWaitingPeriod((Integer)spnAcquireWaitingPeriod.getModel().getValue());
 		options.setAcquisitionSkill((String)choiceAcquireSkill.getSelectedItem());
 		options.setAcquisitionSupportStaffOnly(chkSupportStaffOnly.isSelected());
+		options.setClanAcquisitionPenalty((Integer)spnAcquireClanPenalty.getModel().getValue());
+		options.setIsAcquisitionPenalty((Integer)spnAcquireIsPenalty.getModel().getValue());
+
 
 		options.setNDiceTransitTime((Integer)spnNDiceTransitTime.getModel().getValue());
 		options.setConstantTransitTime((Integer)spnConstantTransitTime.getModel().getValue());

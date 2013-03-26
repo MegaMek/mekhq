@@ -64,6 +64,11 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 	}
 	
 	@Override
+	public long getBuyCost() {
+	    return getNewPart().getStickerPrice();
+	}
+	
+	@Override
 	public boolean isSalvaging() {
 		return false;
 	}
@@ -219,19 +224,24 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 	
 	@Override
 	public TargetRoll getAllAcquisitionMods() {
-        TargetRoll target = new TargetRoll();
-        // Faction and Tech mod
-        int factionMod = 0;
-        if (campaign.getCampaignOptions().useFactionModifiers()) {
-        	factionMod = campaign.getFaction().getTechMod(this, campaign);
-        }   
+        TargetRoll target = new TargetRoll();   
+        if(getTechBase() == T_CLAN && campaign.getCampaignOptions().getClanAcquisitionPenalty() > 0) {
+            target.addModifier(campaign.getCampaignOptions().getClanAcquisitionPenalty(), "clan-tech");
+        }
+        else if(getTechBase() == T_IS && campaign.getCampaignOptions().getIsAcquisitionPenalty() > 0) {
+            target.addModifier(campaign.getCampaignOptions().getIsAcquisitionPenalty(), "Inner Sphere tech");
+        }
+        else if(getTechBase() == T_BOTH) {
+            int penalty = Math.min(campaign.getCampaignOptions().getClanAcquisitionPenalty(), campaign.getCampaignOptions().getIsAcquisitionPenalty());
+            if(penalty > 0) {
+                target.addModifier(campaign.getCampaignOptions().getIsAcquisitionPenalty(), "tech limit");
+            }
+        }
         //availability mod
         int avail = getAvailability(campaign.getEra());
         int availabilityMod = Availability.getAvailabilityModifier(avail);
         target.addModifier(availabilityMod, "availability (" + EquipmentType.getRatingName(avail) + ")");
-        if(factionMod != 0) {
-     	   target.addModifier(factionMod, "faction");
-        }
+        
         return target;
     }
 	
@@ -248,7 +258,7 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 		toReturn += "<b>" + getAcquisitionName() + "</b> " + bonus + "<br/>";
 		String[] inventories = campaign.getPartInventory(getNewPart());
 		toReturn += inventories[1] + " in transit, " + inventories[2] + " on order<br>"; 
-		toReturn += Utilities.getCurrencyString(getNewPart().getActualValue()) + "<br/>";
+		toReturn += Utilities.getCurrencyString(getBuyCost()) + "<br/>";
 		toReturn += "</font></html>";
 		return toReturn;
 	}
@@ -317,7 +327,9 @@ public abstract class MissingPart extends Part implements Serializable, MekHqXml
 	
 	@Override
 	public String getAcquisitionName() {
-		return getPartName();
+	    String details = getNewPart().getDetails();
+	    details = details.replaceFirst("\\d+\\shit\\(s\\)", "");
+		return getPartName() + " " + details;
 	}
 	
 	@Override

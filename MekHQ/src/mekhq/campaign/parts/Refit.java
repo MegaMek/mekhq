@@ -1389,10 +1389,10 @@ public class Refit implements IPartWork, IAcquisitionWork {
 	public long getStickerPrice() {
 		return cost;
 	}
-
+	
 	@Override
-	public int getId() {
-		return 0;
+	public long getBuyCost() {
+	    return getStickerPrice();
 	}
 
 	@Override

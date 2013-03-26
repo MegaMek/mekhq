@@ -24,6 +24,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
@@ -53,6 +54,7 @@ import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.UnitOrder;
 import mekhq.gui.CampaignGUI;
 
 /**
@@ -69,7 +71,7 @@ public class UnitSelectorDialog extends JDialog {
 
     private static MechTileset mt;
 
-    Entity selectedUnit = null;
+    UnitOrder selectedUnit = null;
 
     private TableRowSorter<MechTableModel> sorter;
 
@@ -87,12 +89,11 @@ public class UnitSelectorDialog extends JDialog {
     public UnitSelectorDialog(boolean modal, CampaignGUI view) {
         super(view.getFrame(), modal);
         unitModel = new MechTableModel();
-        initComponents();
         this.hqView = view;
         this.campaign = hqView.getCampaign();
         formatter = new DecimalFormat();
         asd = new AdvancedSearchDialog(view.getFrame());
-
+        initComponents();
         
         MechSummary [] allMechs = MechSummaryCache.getInstance().getAllMechs();
         setMechs(allMechs);
@@ -331,8 +332,8 @@ public class UnitSelectorDialog extends JDialog {
           
         panelOKBtns.setName("panelOKBtns"); // NOI18N
         panelOKBtns.setLayout(new java.awt.GridBagLayout());
-
-        btnBuy.setText(resourceMap.getString("btnBuy.text")); // NOI18N
+        
+        btnBuy.setText("Buy (TN: --)");
         btnBuy.setName("btnBuy"); // NOI18N
         btnBuy.addActionListener(new java.awt.event.ActionListener() {
         	public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -341,6 +342,16 @@ public class UnitSelectorDialog extends JDialog {
         });
         panelOKBtns.add(btnBuy, new java.awt.GridBagConstraints());
 
+        btnAddGM = new JButton("Add (GM)");
+        btnAddGM.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addUnitGM();
+            }
+        });
+        btnAddGM.setEnabled(campaign.isGM());
+        panelOKBtns.add(btnAddGM, new java.awt.GridBagConstraints());
+
+        
         btnClose.setText(resourceMap.getString("btnClose.text")); // NOI18N
         btnClose.setName("btnClose"); // NOI18N
         btnClose.addActionListener(new java.awt.event.ActionListener() {
@@ -364,15 +375,15 @@ public class UnitSelectorDialog extends JDialog {
 	}
 
 	private void btnBuyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuyActionPerformed
-	    Entity en = getSelectedEntity();
-	    if(null != en) {
-	        if(!campaign.buyUnit(en)) {
+	    if(null != selectedUnit && null != selectedUnit.getEntity()) {
+	        /*if(!campaign.buyUnit(en)) {
 	            JOptionPane.showMessageDialog(null,
 	                    "You cannot afford to buy " + en.getDisplayName(),
 	                    "You Can't Afford It",
 	                    JOptionPane.ERROR_MESSAGE);
 	            return;
-	        }
+	        }*/
+	        campaign.getShoppingList().addShoppingItem(selectedUnit, 1, campaign);
 	        hqView.refreshUnitList();
 	        hqView.refreshServicedUnitList();
 	        hqView.refreshFinancialTransactions();
@@ -381,6 +392,15 @@ public class UnitSelectorDialog extends JDialog {
 	    // Necessary if the used wants to buy the same unit twice without reselecting it
 	    UnitChanged(null);
 	}//GEN-LAST:event_btnBuyActionPerformed
+	
+	private void addUnitGM() {
+	    if(null != selectedUnit && null != selectedUnit.getEntity()) {
+	        campaign.addUnit(selectedUnit.getEntity(), false, 0);
+	        hqView.refreshUnitList();
+            hqView.refreshServicedUnitList();
+            hqView.refreshReport();
+	    }
+	}
 	
 	private void btnBuySelectActionPerformed(java.awt.event.ActionEvent evt) {                                       
 	    setVisible(false);
@@ -448,10 +468,16 @@ public class UnitSelectorDialog extends JDialog {
              // For some unknown reason the base path gets screwed up after you
              // print so this sets the source file to the full path.
              Entity entity = new MechFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
-             selectedUnit = entity;
+             selectedUnit = new UnitOrder(entity, campaign);
+             btnBuy.setEnabled(true);
+             btnBuy.setText("Buy (TN: " + campaign.getTargetForAcquisition(selectedUnit, campaign.getLogisticsPerson(), false).getValueAsString() + "+)");
+             btnBuy.setToolTipText(campaign.getTargetForAcquisition(selectedUnit, campaign.getLogisticsPerson(), false).getDesc());
              refreshUnitView();
         } catch (EntityLoadingException ex) {
             selectedUnit = null;
+            btnBuy.setEnabled(false);
+            btnBuy.setText("Buy (TN: --)");
+            btnBuy.setToolTipText(null);
             MekHQ.logError("Unable to load mech: " + ms.getSourceFile() + ": " + ms.getEntryName() + ": " + ex.getMessage());
             MekHQ.logError(ex);
             refreshUnitView();
@@ -471,14 +497,14 @@ public class UnitSelectorDialog extends JDialog {
         }
         MechView mechView = null;
         try {
-            mechView = new MechView(selectedUnit, false);
+            mechView = new MechView(selectedUnit.getEntity(), false);
         } catch (Exception e) {
             e.printStackTrace();
             // error unit didn't load right. this is bad news.
             populateTextFields = false;
         }
         if (populateTextFields && (mechView != null)) {
-            panelMekView.setMech(selectedUnit);
+            panelMekView.setMech(selectedUnit.getEntity());
         } else {
             panelMekView.reset();
         }
@@ -493,17 +519,17 @@ public class UnitSelectorDialog extends JDialog {
                 return;
             }
         }// end if(null tileset)
-        Image unitImage = mt.imageFor(selectedUnit, lblImage, -1);
+        Image unitImage = mt.imageFor(selectedUnit.getEntity(), lblImage, -1);
         if(null != unitImage) {
             lblImage.setIcon(new ImageIcon(unitImage));
         }
     }
-
+/*
      public Entity getSelectedEntity() {
         return selectedUnit;
 
     }
-
+*/
      public void setMechs (MechSummary [] m) {
          this.mechs = m;
 
@@ -714,6 +740,7 @@ public class UnitSelectorDialog extends JDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+	private JButton btnAddGM;
     private javax.swing.JButton btnBuy;
     private javax.swing.JButton btnClose;
     private javax.swing.JComboBox comboUnitType;
