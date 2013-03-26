@@ -179,6 +179,9 @@ public class Refit implements IPartWork, IAcquisitionWork {
 		Hashtable<String,Integer> tally = new Hashtable<String,Integer>();
 	    Hashtable<String,String> desc = new Hashtable<String,String>();
 		for(Part p : shoppingList) {
+		    if(p instanceof Armor) {
+		        continue;
+		    }
 			if(null != tally.get(p.getName())) {
 				tally.put(p.getName(), tally.get(p.getName()) + 1);
 				desc.put(p.getName(), p.getQuantityName(tally.get(p.getName())));
@@ -186,6 +189,18 @@ public class Refit implements IPartWork, IAcquisitionWork {
 				tally.put(p.getName(), 1);
 				desc.put(p.getName(), p.getQuantityName(1));
 			}
+		}
+		if(null != newArmorSupplies) {
+		    int actualAmountNeeded = armorNeeded;
+		    Armor existingSupplies = getExistingArmorSupplies();
+		    if(null != existingSupplies) {
+		        actualAmountNeeded -= existingSupplies.getAmount();
+		    }
+		    if(actualAmountNeeded > 0) {
+		        Armor a = (Armor)newArmorSupplies.getNewPart();
+		        a.setAmount(actualAmountNeeded);
+		        desc.put(a.getName(), a.getQuantityName(1));
+		    }
 		}
 		String[] descs = new String[desc.keySet().size()];
 		int i = 0;
@@ -629,9 +644,13 @@ public class Refit implements IPartWork, IAcquisitionWork {
     		if(null != newArmorSupplies) {
                 //add enough armor to the shopping list
                 int armorSupplied = 0;
+                Armor existingArmorSupplies = getExistingArmorSupplies();
+                if(null != existingArmorSupplies) {
+                    armorSupplied = existingArmorSupplies.getAmount();
+                }
                 while(armorSupplied < armorNeeded) {
                     armorSupplied += ((Armor)newArmorSupplies.getNewPart()).getAmount();
-                    oldUnit.campaign.getShoppingList().addShoppingItem((Armor)newArmorSupplies,1,oldUnit.campaign);
+                    oldUnit.campaign.getShoppingList().addShoppingItem((Armor)newArmorSupplies.getNewPart(),1,oldUnit.campaign);
                 }
             }
 		} else {
@@ -671,7 +690,6 @@ public class Refit implements IPartWork, IAcquisitionWork {
 			return acquireRefitKit();
 		}
 		ArrayList<Part> newShoppingList = new ArrayList<Part>();
-		Person admin = oldUnit.campaign.getLogisticsPerson();
 		for(Part part : shoppingList) {
 			if(part instanceof IAcquisitionWork) {
 			    //check to see if we found a replacement
@@ -739,7 +757,8 @@ public class Refit implements IPartWork, IAcquisitionWork {
 		for(Part part : oldUnit.campaign.getSpareParts()) {
 			if(part instanceof Armor && ((Armor)part).getType() == newArmorSupplies.getType() 
 					&& ((Armor)part).isClanTechBase() == newArmorSupplies.isClanTechBase() 
-					&& !part.isReservedForRefit()) {
+					&& !part.isReservedForRefit()
+					&& part.isPresent()) {
 				existingArmorSupplies = (Armor)part;				
 				break;
 			}

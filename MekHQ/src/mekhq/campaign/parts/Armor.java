@@ -22,6 +22,7 @@
 package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
+import java.text.DecimalFormat;
 
 import megamek.common.Aero;
 import megamek.common.AmmoType;
@@ -679,9 +680,9 @@ public class Armor extends Part implements IAcquisitionWork {
     @Override
     public String getQuantityName(int quan) {
         double totalTon = quan * getTonnage();
-        String report = "" + totalTon + " tons of " + getName();
+        String report = "" + DecimalFormat.getInstance().format(totalTon) + " tons of " + getName();
         if(totalTon == 1.0) {
-            report = "" + totalTon + " ton of " + getName();
+            report = "" + DecimalFormat.getInstance().format(totalTon) + " ton of " + getName();
         }
         return report;
     }
