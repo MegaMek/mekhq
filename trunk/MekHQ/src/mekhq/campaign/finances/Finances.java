@@ -32,6 +32,7 @@ import java.util.GregorianCalendar;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.MekHqXmlUtil;
+import mekhq.campaign.personnel.SkillType;
 
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
@@ -244,4 +245,16 @@ public class Finances implements Serializable {
 	public int getLoanDefaults() {
 	    return loanDefaults;
 	}
+	
+	public long getTotalLoanCollateral() {
+	    long amount = 0;
+	    for(Loan loan : loans) {
+	        amount += loan.getCollateralAmount();
+	    }
+	    return amount;
+	}
+	
+	public long getMaxCollateral(Campaign c) {
+        return c.getTotalEquipmentValue() - getTotalLoanCollateral();
+    }
 }

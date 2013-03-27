@@ -4567,4 +4567,114 @@ public class Campaign implements Serializable {
         }
 
     }
+    
+
+    public String getFinancialReport() {
+        StringBuffer sb = new StringBuffer();
+        long cash = finances.getBalance();
+        long loans = finances.getLoanBalance();
+        long mech = 0;
+        long vee = 0;
+        long ba = 0;
+        long infantry = 0;
+        long smallCraft = 0;
+        long largeCraft = 0;
+        long proto = 0;
+        long spareParts = 0;
+        for(Unit u : units) {
+            long value = u.getSellValue();
+            if(u.getEntity() instanceof Mech) {
+                mech += value;
+            }
+            else if(u.getEntity() instanceof Tank) {
+                vee += value;
+            }
+            else if(u.getEntity() instanceof BattleArmor) {
+                ba += value;
+            }
+            else if(u.getEntity() instanceof Infantry) {
+                infantry += value;
+            }
+            else if(u.getEntity() instanceof Dropship || u.getEntity() instanceof Jumpship) {
+                largeCraft += value;
+            }
+            else if(u.getEntity() instanceof Aero) {
+                smallCraft += value;
+            }
+            else if(u.getEntity() instanceof Protomech) {
+                proto += value;
+            }
+        } 
+        for(Part p : getSpareParts()) {
+            spareParts += p.getActualValue();
+        }
+        
+        long monthlyIncome   = 0;
+        long monthlyExpenses = 0;
+        long maintenance = 0;
+        long salaries = 0;
+        long overhead = 0;
+        long contracts = 0;
+        if(campaignOptions.payForMaintain()) {
+            maintenance = getMaintenanceCosts() * 4;
+        }
+        if(campaignOptions.payForSalaries()) {
+            salaries = getPayRoll();
+        }
+        if(campaignOptions.payForOverhead()) {
+            overhead = getOverheadExpenses();
+        }
+        for(Contract contract : getActiveContracts()) {
+            contracts += contract.getMonthlyPayOut();
+        }
+        monthlyIncome += contracts;
+        monthlyExpenses = maintenance + salaries + overhead;
+        
+        long assets = cash + mech + vee + ba + infantry + largeCraft + smallCraft + proto;
+        long liabilities = loans;
+        long netWorth = assets - liabilities;
+        int longest = Math.max(DecimalFormat.getInstance().format(liabilities).length(), DecimalFormat.getInstance().format(assets).length());
+        longest = Math.max(DecimalFormat.getInstance().format(netWorth).length(), longest);
+        String formatted = "%1$" + longest + "s";
+        sb.append("Net Worth................ ").append(String.format(formatted, DecimalFormat.getInstance().format(netWorth))).append("\n\n");
+        sb.append("    Assets............... ").append(String.format(formatted, DecimalFormat.getInstance().format(assets))).append("\n");
+        sb.append("       Cash.............. ").append(String.format(formatted, DecimalFormat.getInstance().format(cash))).append("\n");
+        if(mech > 0) {
+            sb.append("       Mechs............. ").append(String.format(formatted, DecimalFormat.getInstance().format(mech))).append("\n");
+        }
+        if(vee > 0) {
+            sb.append("       Vehicles.......... ").append(String.format(formatted, DecimalFormat.getInstance().format(vee))).append("\n");
+        }
+        if(ba > 0) {
+            sb.append("       BattleArmor....... ").append(String.format(formatted, DecimalFormat.getInstance().format(ba))).append("\n");
+        }
+        if(infantry > 0) {
+            sb.append("       Infantry.......... ").append(String.format(formatted, DecimalFormat.getInstance().format(infantry))).append("\n");
+        } 
+        if(proto > 0) {
+            sb.append("       Protomechs........ ").append(String.format(formatted, DecimalFormat.getInstance().format(proto))).append("\n");
+        }
+        if(smallCraft > 0) {
+            sb.append("       Small Craft....... ").append(String.format(formatted, DecimalFormat.getInstance().format(smallCraft))).append("\n");
+        }
+        if(largeCraft > 0) {
+            sb.append("       Large Craft....... ").append(String.format(formatted, DecimalFormat.getInstance().format(largeCraft))).append("\n");
+        }
+        sb.append("       Spare Parts....... ").append(String.format(formatted, DecimalFormat.getInstance().format(spareParts))).append("\n\n");
+        //sb.append("       Other Assets........ ").append("").append("\n\n");
+        sb.append("    Liabilities.......... ").append(String.format(formatted, DecimalFormat.getInstance().format(liabilities))).append("\n");
+        sb.append("       Loans............. ").append(String.format(formatted, DecimalFormat.getInstance().format(loans))).append("\n\n\n");
+        
+        
+        sb.append("Monthly Profit........... ").append(String.format(formatted, DecimalFormat.getInstance().format(monthlyIncome-monthlyExpenses))).append("\n\n");
+        sb.append("Monthly Income........... ").append(String.format(formatted, DecimalFormat.getInstance().format(monthlyIncome))).append("\n");
+        sb.append("    Contract Payments.... ").append(String.format(formatted, DecimalFormat.getInstance().format(contracts))).append("\n\n");
+        sb.append("Monthly Expenses......... ").append(String.format(formatted, DecimalFormat.getInstance().format(monthlyExpenses))).append("\n");
+        sb.append("    Salaries............. ").append(String.format(formatted, DecimalFormat.getInstance().format(salaries))).append("\n");
+        sb.append("    Maintenance.......... ").append(String.format(formatted, DecimalFormat.getInstance().format(maintenance))).append("\n");
+        sb.append("    Overhead............. ").append(String.format(formatted, DecimalFormat.getInstance().format(overhead))).append("\n");
+
+        
+        return new String(sb);
+    }
 }
