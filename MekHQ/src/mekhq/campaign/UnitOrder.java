@@ -119,15 +119,18 @@ public class UnitOrder extends Unit implements IAcquisitionWork, MekHqXmlSeriali
 
     @Override
     public Object getNewEquipment() {
-        MechSummary summary = MechSummaryCache.getInstance().getMech(getEntity().getChassis() + " " + getEntity().getModel());
+        String name = getEntity().getChassis() + " " + getEntity().getModel();
+        name = name.trim();
+        MechSummary summary = MechSummaryCache.getInstance().getMech(name);
         if(null == summary) {
             //throw(new EntityLoadingException());
+            MekHQ.logMessage("Could not find a mech summary for " + name);
+            return null;
         }
-         try {
+        try {
             return new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
         } catch (EntityLoadingException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            MekHQ.logMessage("Could not load " + summary.getEntryName());
             return null;
         }
     }

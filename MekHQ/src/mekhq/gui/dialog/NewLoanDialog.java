@@ -109,7 +109,7 @@ public class NewLoanDialog extends javax.swing.JDialog implements ActionListener
         dragoon.reInitialize();
         rating = dragoon.getModifier();
         loan = Loan.getBaseLoanFor(rating, campaign.getCalendar());
-        maxCollateralValue = campaign.getTotalEquipmentValue();
+        maxCollateralValue = campaign.getFinances().getMaxCollateral(campaign);
         formatter = new DecimalFormat();
         initComponents();
         setLocationRelativeTo(parent);

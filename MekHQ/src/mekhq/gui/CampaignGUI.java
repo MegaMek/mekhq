@@ -27,6 +27,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
@@ -331,6 +332,9 @@ public class CampaignGUI extends JPanel {
     private TableRowSorter<TechTableModel> whTechSorter;
     private DragoonsRatingDialog dragoonDialog = null;
 
+    private JTextArea areaNetWorth;
+    private JButton btnAddFunds;
+    
     public int selectedMission = -1;
 
     public CampaignGUI(MekHQ app) {
@@ -1951,6 +1955,51 @@ public class CampaignGUI extends JPanel {
         gridBagConstraints.weighty = 0.0;
         panFinances.add(panLoan, gridBagConstraints);
         
+        JPanel panelFinanceRight = new JPanel(new BorderLayout());
+
+        JPanel pnlFinanceBtns = new JPanel(new GridLayout(1,2));
+        btnAddFunds = new JButton("Add Funds (GM)");
+        btnAddFunds.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addFundsActionPerformed(evt);
+            }
+        });
+        btnAddFunds.setEnabled(getCampaign().isGM());
+        pnlFinanceBtns.add(btnAddFunds);
+        JButton btnGetLoan = new JButton("Get Loan");
+        btnGetLoan.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                showNewLoanDialog();
+            }
+        });
+        pnlFinanceBtns.add(btnGetLoan);
+        //pnlFinanceBtns.add(new JButton("Manage Asset"));
+        //pnlFinanceBtns.add(new JButton("Manage Income"));
+
+        panelFinanceRight.add(pnlFinanceBtns, BorderLayout.NORTH);
+        
+        areaNetWorth = new JTextArea();
+        areaNetWorth.setLineWrap(true);
+        areaNetWorth.setWrapStyleWord(true);
+        areaNetWorth.setFont(new Font("Courier New", Font.PLAIN, 12));
+        areaNetWorth.setText(getCampaign().getFinancialReport());
+        areaNetWorth.setEditable(false);
+
+        JScrollPane descriptionScroll = new JScrollPane(areaNetWorth);
+        panelFinanceRight.add(descriptionScroll, BorderLayout.CENTER);
+        areaNetWorth.setCaretPosition(0);
+        descriptionScroll.setMinimumSize(new Dimension(300,200));
+        
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridheight = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 1.0;
+        panFinances.add(panelFinanceRight, gridBagConstraints);
+        
         tabMain.addTab(
                 resourceMap.getString("panFinances.TabConstraints.tabTitle"),
                 panFinances); // NOI18N
@@ -3050,6 +3099,7 @@ public class CampaignGUI extends JPanel {
 
     private void btnGMModeActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnGMModeActionPerformed
         getCampaign().setGMMode(btnGMMode.isSelected());
+        btnAddFunds.setEnabled(btnGMMode.isSelected());
     }// GEN-LAST:event_btnGMModeActionPerformed
 
     private void menuOptionsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_menuOptionsActionPerformed
@@ -3858,6 +3908,12 @@ public class CampaignGUI extends JPanel {
         loanModel.setData(getCampaign().getFinances().getAllLoans());
         refreshFunds();
         refreshRating();
+        refreshFinancialReport();
+    }
+    
+    public void refreshFinancialReport() {
+        areaNetWorth.setText(getCampaign().getFinancialReport());
+        areaNetWorth.setCaretPosition(0);
     }
 
     public void refreshCalendar() {
