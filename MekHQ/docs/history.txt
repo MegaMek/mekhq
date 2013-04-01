@@ -52,6 +52,7 @@ v0.3.0 (SVN)
 + Bug: wacky delivery times when acquisition roll set to auto success
 + Bug: NPE on unit purchases when they have no model name
 + financial report on finance tab
++ various Protomek parts
 
 v0.2.0 (2013-03-16)
 + Bug 318: Dragoon's Rating error FMM:R method
