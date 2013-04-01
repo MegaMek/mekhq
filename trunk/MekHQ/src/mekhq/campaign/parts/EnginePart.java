@@ -28,7 +28,9 @@ import megamek.common.CriticalSlot;
 import megamek.common.Engine;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
+import megamek.common.IArmorState;
 import megamek.common.Mech;
+import megamek.common.Protomech;
 import megamek.common.Tank;
 import megamek.common.TechConstants;
 import megamek.common.verifier.TestEntity;
@@ -349,11 +351,13 @@ public class EnginePart extends Part {
 			int engineHits = 0;
 			int engineCrits = 0;
 			Entity entity = unit.getEntity();
-			for (int i = 0; i < entity.locations(); i++) {
-				engineHits += entity.getDamagedCriticals(CriticalSlot.TYPE_SYSTEM,
-						Mech.SYSTEM_ENGINE, i);
-				engineCrits += entity.getNumberOfCriticals(
-						CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE, i);
+			if(unit.getEntity() instanceof Mech) {
+    			for (int i = 0; i < entity.locations(); i++) {
+    				engineHits += entity.getDamagedCriticals(CriticalSlot.TYPE_SYSTEM,
+    						Mech.SYSTEM_ENGINE, i);
+    				engineCrits += entity.getNumberOfCriticals(
+    						CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE, i);
+    			}
 			}
 			if(unit.getEntity() instanceof Aero) {
 				engineHits = ((Aero)unit.getEntity()).getEngineHits();
@@ -364,6 +368,12 @@ public class EnginePart extends Part {
 				if(((Tank)unit.getEntity()).isEngineHit()) {
 					engineHits = 1;
 				}
+			}
+			if(unit.getEntity() instanceof Protomech) {
+			    if(unit.getEntity().getInternal(Protomech.LOC_TORSO) == IArmorState.ARMOR_DESTROYED) {
+			        engineHits = 1;
+			        engineCrits = 1;
+			    } 
 			}
 			if(engineHits >= engineCrits) {
 				remove(false);

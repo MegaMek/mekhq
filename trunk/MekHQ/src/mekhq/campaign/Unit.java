@@ -48,6 +48,7 @@ import megamek.common.Mech;
 import megamek.common.MiscType;
 import megamek.common.Mounted;
 import megamek.common.Player;
+import megamek.common.Protomech;
 import megamek.common.QuadMech;
 import megamek.common.SmallCraft;
 import megamek.common.SpaceStation;
@@ -97,6 +98,10 @@ import mekhq.campaign.parts.MissingMekLifeSupport;
 import mekhq.campaign.parts.MissingMekLocation;
 import mekhq.campaign.parts.MissingMekSensor;
 import mekhq.campaign.parts.MissingPart;
+import mekhq.campaign.parts.MissingProtomekArmActuator;
+import mekhq.campaign.parts.MissingProtomekLegActuator;
+import mekhq.campaign.parts.MissingProtomekLocation;
+import mekhq.campaign.parts.MissingProtomekSensor;
 import mekhq.campaign.parts.MissingRotor;
 import mekhq.campaign.parts.MissingSpacecraftEngine;
 import mekhq.campaign.parts.MissingTurret;
@@ -104,6 +109,11 @@ import mekhq.campaign.parts.MissingVeeSensor;
 import mekhq.campaign.parts.MissingVeeStabiliser;
 import mekhq.campaign.parts.MotiveSystem;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.ProtomekArmActuator;
+import mekhq.campaign.parts.ProtomekArmor;
+import mekhq.campaign.parts.ProtomekLegActuator;
+import mekhq.campaign.parts.ProtomekLocation;
+import mekhq.campaign.parts.ProtomekSensor;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.Rotor;
 import mekhq.campaign.parts.SpacecraftEngine;
@@ -508,6 +518,13 @@ public class Unit implements MekHqXmlSerializable {
 					armorFound = true;
 				}
 			}
+			if(!armorFound && part instanceof ProtomekArmor) {
+			    ProtomekArmor a = (ProtomekArmor)part;
+                if(a.needsFixing() && !a.isEnoughSpareArmorAvailable()) {
+                    missingParts.add(a);
+                    armorFound = true;
+                }
+            }
 			if(part instanceof AmmoBin && !((AmmoBin)part).isEnoughSpareAmmoAvailable()) {
 				missingParts.add((AmmoBin)part);
 			}
@@ -718,6 +735,29 @@ public class Unit implements MekHqXmlSerializable {
 			}
 		}
 	}
+	
+	public void destroySystem(int type, int slot, int loc, int hits) {
+	    int nhits = 0;
+        for (int i = 0; i < getEntity().getNumberOfCriticals(loc); i++) {
+            CriticalSlot cs = getEntity().getCritical(loc, i);
+            // ignore empty & system slots
+            if ((cs == null) || (cs.getType() != type)) {
+                continue;
+            }
+            if (cs.getIndex() == slot) {
+                if(nhits < hits) {
+                    cs.setHit(true);
+                    cs.setDestroyed(true);
+                    cs.setRepairable(false);
+                    nhits++;
+                } else {
+                    cs.setHit(false);
+                    cs.setDestroyed(false);
+                    cs.setRepairable(true);
+                }
+            }
+        }
+    }
 
 	public void repairSystem(int type, int slot) {
 		for (int loc = 0; loc < getEntity().locations(); loc++) {
@@ -804,6 +844,17 @@ public class Unit implements MekHqXmlSerializable {
 			partsValue += 200000;
 			//drive unit
 			partsValue += 500 * entity.getOriginalWalkMP() * entity.getWeight()/100;
+		}
+		//protomeks: heat sinks ar unhittable
+		if(entity instanceof Protomech) {
+		    int sinks = 0;
+	        for (Mounted mount : entity.getWeaponList()) {
+	            if (mount.getType().hasFlag(WeaponType.F_ENERGY)) {
+	                WeaponType wtype = (WeaponType) mount.getType();
+	                sinks += wtype.getHeat();
+	            }
+	        }
+	        partsValue += 2000 * sinks;
 		}
 		
 		return (long)(partsValue * getUnitCostMultiplier());
@@ -1294,8 +1345,8 @@ public class Unit implements MekHqXmlSerializable {
     	Part leftUpperFrontLeg = null;
     	Part structuralIntegrity = null;
     	Part[] locations = new Part[entity.locations()];
-    	Armor[] armor = new Armor[entity.locations()];
-    	Armor[] armorRear = new Armor[entity.locations()];
+    	Part[] armor = new Part[entity.locations()];
+    	Part[] armorRear = new Part[entity.locations()];
     	Part[] stabilisers = new Part[entity.locations()];
     	Hashtable<Integer,Part> equipParts = new Hashtable<Integer,Part>();
     	Hashtable<Integer,Part> ammoParts = new Hashtable<Integer,Part>();
@@ -1312,6 +1363,9 @@ public class Unit implements MekHqXmlSerializable {
     	Part secondaryW = null;
     	Part infantryArmor = null;
     	Part dropCollar = null;
+    	Part protoLeftArmActuator = null;
+    	Part protoRightArmActuator = null;
+    	Part protoLegsActuator = null;
     	
     	for(Part part : parts) {
     		if(part instanceof MekGyro || part instanceof MissingMekGyro) {
@@ -1329,7 +1383,9 @@ public class Unit implements MekHqXmlSerializable {
     			lifeSupport = part;
     		} else if(part instanceof MekSensor || part instanceof MissingMekSensor) {
     			sensor = part;
-    		} else if(part instanceof MekCockpit || part instanceof MissingMekCockpit) {
+    		} else if(part instanceof ProtomekSensor || part instanceof MissingProtomekSensor) {
+                sensor = part;
+            } else if(part instanceof MekCockpit || part instanceof MissingMekCockpit) {
     			cockpit = part;
     		}  else if(part instanceof VeeSensor || part instanceof MissingVeeSensor) {
     			sensor = part;
@@ -1359,13 +1415,19 @@ public class Unit implements MekHqXmlSerializable {
     			locations[((Turret)part).getLoc()] = part;	
     		} else if(part instanceof MissingTurret) {
     			locations[Tank.LOC_TURRET] = part;	
-    		} else if(part instanceof Armor) {
+    		} else if(part instanceof ProtomekLocation) {
+                locations[((ProtomekLocation)part).getLoc()] = part;   
+            } else if(part instanceof MissingProtomekLocation) {
+                locations[((MissingProtomekLocation)part).getLoc()] = part;   
+            } else if(part instanceof Armor) {
     			if(((Armor)part).isRearMounted()) {
     				armorRear[((Armor)part).getLocation()] = (Armor)part;
     			} else {
     				armor[((Armor)part).getLocation()] = (Armor)part;
     			}
-    		} else if(part instanceof VeeStabiliser) {
+    		} else if(part instanceof ProtomekArmor) {
+    		    armor[((ProtomekArmor)part).getLocation()] = (ProtomekArmor)part;
+            } else if(part instanceof VeeStabiliser) {
     			stabilisers[((VeeStabiliser)part).getLocation()] = part;
     		} else if(part instanceof MissingVeeStabiliser) {
     			stabilisers[((MissingVeeStabiliser)part).getLocation()] = part;
@@ -1464,7 +1526,22 @@ public class Unit implements MekHqXmlSerializable {
     			turretLock = part;
     		} else if(part instanceof DropshipDockingCollar || part instanceof MissingDropshipDockingCollar) {
     			dropCollar = part;
-    		} 
+    		} else if(part instanceof ProtomekArmActuator || part instanceof MissingProtomekArmActuator) {
+                int loc = -1;
+                if(part instanceof ProtomekArmActuator) {
+                    loc = ((ProtomekArmActuator)part).getLocation();
+                } else {
+                    loc = ((MissingProtomekArmActuator)part).getLocation();
+                }
+                if(loc == Protomech.LOC_LARM) {
+                    protoLeftArmActuator = part;
+                }
+                else if(loc == Protomech.LOC_RARM) {
+                    protoRightArmActuator = part;
+                }
+            } else if(part instanceof ProtomekLegActuator || part instanceof MissingProtomekLegActuator) {
+                protoLegsActuator = part;
+            }
     	}
     	//now check to see what is null
     	for(int i = 0; i<locations.length; i++) {
@@ -1473,6 +1550,10 @@ public class Unit implements MekHqXmlSerializable {
     				MekLocation mekLocation = new MekLocation(i, (int) getEntity().getWeight(), getEntity().getStructureType(), hasTSM(), entity instanceof QuadMech, false, false, campaign);
     				addPart(mekLocation);
     				partsToAdd.add(mekLocation);
+    			} else if(entity instanceof Protomech && i != Protomech.LOC_NMISS) {
+    			    ProtomekLocation protomekLocation = new ProtomekLocation(i, (int) getEntity().getWeight(), getEntity().getStructureType(), hasTSM(), entity instanceof QuadMech, campaign);
+                    addPart(protomekLocation);
+                    partsToAdd.add(protomekLocation);
     			} else if(entity instanceof Tank && i != Tank.LOC_BODY) {
     				if(i == Tank.LOC_TURRET && entity instanceof VTOL) {
     					Rotor rotor = new Rotor((int)getEntity().getWeight(), campaign);
@@ -1500,9 +1581,15 @@ public class Unit implements MekHqXmlSerializable {
     			}
     		}
     		if(null == armor[i]) {
-    			Armor a = new Armor((int) getEntity().getWeight(), getEntity().getArmorType(i), getEntity().getOArmor(i, false), i, false, entity.isClanArmor(i), campaign);
-    			addPart(a);
-    			partsToAdd.add(a);
+    			if(entity instanceof Protomech) {
+    			    ProtomekArmor a = new ProtomekArmor((int) getEntity().getWeight(), getEntity().getOArmor(i, false), i, true, campaign);
+                    addPart(a);
+                    partsToAdd.add(a);
+    			} else {
+        		    Armor a = new Armor((int) getEntity().getWeight(), getEntity().getArmorType(i), getEntity().getOArmor(i, false), i, false, entity.isClanArmor(i), campaign);
+        			addPart(a);
+        			partsToAdd.add(a);
+    			}
     		}
     		if(null == armorRear[i] && entity.hasRearArmor(i)) {
     			Armor a = new Armor((int) getEntity().getWeight(), getEntity().getArmorType(i), getEntity().getOArmor(i, true), i, true, entity.isClanArmor(i), campaign);
@@ -1762,7 +1849,28 @@ public class Unit implements MekHqXmlSerializable {
     			partsToAdd.add(turretLock);
     		}
     	}
-    	
+    	if(entity instanceof Protomech) {
+    	    if(null == protoLeftArmActuator) {
+    	        protoLeftArmActuator = new ProtomekArmActuator((int)entity.getWeight(),Protomech.LOC_LARM, campaign);
+    	        addPart(protoLeftArmActuator);
+    	        partsToAdd.add(protoLeftArmActuator);
+    	    }
+    	    if(null == protoRightArmActuator) {
+    	        protoRightArmActuator = new ProtomekArmActuator((int)entity.getWeight(),Protomech.LOC_RARM, campaign);
+                addPart(protoRightArmActuator);
+                partsToAdd.add(protoRightArmActuator);
+            }
+    	    if(null == protoLegsActuator) {
+    	        protoLegsActuator = new ProtomekLegActuator((int)entity.getWeight(), campaign);
+                addPart(protoLegsActuator);
+                partsToAdd.add(protoLegsActuator);
+            }
+    	    if(null == sensor) {
+                sensor = new ProtomekSensor((int) entity.getWeight(), campaign);
+                addPart(sensor);
+                partsToAdd.add(sensor);
+            }
+    	}
     	if(entity instanceof Infantry && !(entity instanceof BattleArmor)) {
     		if(null == motiveType && entity.getMovementMode() != EntityMovementMode.INF_LEG) {
     			int number = ((Infantry)entity).getOInternal(Infantry.LOC_INFANTRY);

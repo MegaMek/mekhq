@@ -240,6 +240,7 @@ public class EquipmentPart extends Part {
 			if(null != mounted) {
 				mounted.setHit(true);
 		        mounted.setDestroyed(true);
+		        mounted.setRepairable(false);
 		        unit.destroySystem(CriticalSlot.TYPE_EQUIPMENT, unit.getEntity().getEquipmentNum(mounted));	
 			}
 			Part spare = campaign.checkForExistingSparePart(this);
