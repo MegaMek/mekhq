@@ -153,12 +153,7 @@ public class EnginePart extends Part {
 				&& getUnitTonnage() == ((EnginePart) part).getUnitTonnage()
 				&& getTonnage() == ((EnginePart)part).getTonnage();
 	}
-
-	@Override
-	public int getPartType() {
-		return PART_TYPE_MEK_ENGINE;
-	}
-
+	
 	@Override
 	public int getTechLevel() {
 		if (getEngine().getTechType() < 0
@@ -321,7 +316,9 @@ public class EnginePart extends Part {
 	@Override
 	public void remove(boolean salvage) {
 		if(null != unit) {
-			unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE);
+            if(unit.getEntity() instanceof Mech) {
+                unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE);
+            }
 			if(unit.getEntity() instanceof Aero) {
 				((Aero)unit.getEntity()).setEngineHits(((Aero)unit.getEntity()).getMaxEngineHits());
 			}
@@ -370,9 +367,9 @@ public class EnginePart extends Part {
 				}
 			}
 			if(unit.getEntity() instanceof Protomech) {
+			    engineCrits = 1;
 			    if(unit.getEntity().getInternal(Protomech.LOC_TORSO) == IArmorState.ARMOR_DESTROYED) {
 			        engineHits = 1;
-			        engineCrits = 1;
 			    } 
 			}
 			if(engineHits >= engineCrits) {
@@ -417,7 +414,9 @@ public class EnginePart extends Part {
 	public void updateConditionFromPart() {
 		if(null != unit) {
 			if(hits == 0) {
-				unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE);
+				if(unit.getEntity() instanceof Mech) {
+				    unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE);
+				}
 				if(unit.getEntity() instanceof Aero) {
 					((Aero)unit.getEntity()).setEngineHits(0);
 				}
@@ -425,7 +424,9 @@ public class EnginePart extends Part {
 					((Tank)unit.getEntity()).engineFix();
 				}
 			} else {
-				unit.damageSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE, hits);
+			    if(unit.getEntity() instanceof Mech) {
+			        unit.damageSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE, hits);
+			    }
 				if(unit.getEntity() instanceof Aero) {
 					((Aero)unit.getEntity()).setEngineHits(hits);
 				}

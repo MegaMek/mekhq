@@ -26,6 +26,7 @@ import java.io.PrintWriter;
 import megamek.common.CriticalSlot;
 import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
+import megamek.common.Mounted;
 import megamek.common.Protomech;
 import megamek.common.TechConstants;
 import mekhq.campaign.Campaign;
@@ -103,11 +104,6 @@ public class MissingProtomekLocation extends MissingPart {
     public double getTonnage() {
         //TODO: how much should this weigh?
         return 0;
-    }
-
-    @Override
-    public int getPartType() {
-        return PART_TYPE_MEK_BODY_PART;
     }
 
     @Override
@@ -234,6 +230,29 @@ public class MissingProtomekLocation extends MissingPart {
     public void updateConditionFromPart() {
         if(null != unit) {
             unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, loc);
+            //According to StratOps, this always destroys all equipment in that location as well
+            for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
+                final CriticalSlot cs = unit.getEntity().getCritical(loc, i);
+                if(null == cs || !cs.isEverHittable()) {
+                    continue;
+                }        
+                cs.setHit(true);
+                cs.setDestroyed(true);
+                cs.setRepairable(false);
+                Mounted m = cs.getMount();
+                if(null != m) {
+                    m.setHit(true);
+                    m.setDestroyed(true);
+                    m.setRepairable(false);
+                }
+            }
+            for(Mounted m : unit.getEntity().getEquipment()) {
+                if(m.getLocation() == loc || m.getSecondLocation() == loc) {
+                    m.setHit(true);
+                    m.setDestroyed(true);
+                    m.setRepairable(false);
+                }
+            }
         }
     }
     

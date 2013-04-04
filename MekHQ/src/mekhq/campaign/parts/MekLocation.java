@@ -192,11 +192,6 @@ public class MekLocation extends Part {
     public double getPercent() {
     	return percent;
     }
-    
-    @Override
-    public int getPartType() {
-        return PART_TYPE_MEK_BODY_PART;
-    }
 
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent) {

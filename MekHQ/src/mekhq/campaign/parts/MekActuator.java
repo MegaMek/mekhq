@@ -129,11 +129,6 @@ public class MekActuator extends Part {
                 && getType() == ((MekActuator)part).getType()
                 && getUnitTonnage() == ((MekActuator)part).getUnitTonnage();
     }
-
-    @Override
-    public int getPartType() {
-        return PART_TYPE_MEK_ACTUATOR;
-    }
     
     public int getLocation() {
     	return location;

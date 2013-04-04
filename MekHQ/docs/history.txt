@@ -54,6 +54,10 @@ v0.3.0 (SVN)
 + financial report on finance tab
 + various Protomek parts
 + upload data to mercroster (wip)
++ protomek jump jet part
++ various fixes to protomech parts
++ removed outdated Part.getPartType
++ protomech gunnery skill and associated checks for protomech pilots
 
 v0.2.0 (2013-03-16)
 + Bug 318: Dragoon's Rating error FMM:R method

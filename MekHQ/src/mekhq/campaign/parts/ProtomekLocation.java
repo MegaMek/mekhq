@@ -154,11 +154,6 @@ public class ProtomekLocation extends Part {
     public double getPercent() {
         return percent;
     }
-    
-    @Override
-    public int getPartType() {
-        return PART_TYPE_MEK_BODY_PART;
-    }
 
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
@@ -418,20 +413,16 @@ public class ProtomekLocation extends Part {
     public void updateConditionFromPart() {
         if(null != unit) {
             unit.getEntity().setInternal((int)Math.round(percent * unit.getEntity().getOInternal(loc)), loc);
-            //TODO: we need to cycle through slots and remove crits on non-hittable ones
-            //We shouldn't have to do this, these slots should not be hit in MM
+            //Because the last crit for protomechs is always location destruction we need to 
+            //clear the first system crit we find
             for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
                 CriticalSlot slot = unit.getEntity().getCritical(loc, i);
-                if ((slot != null) && !slot.isEverHittable()) {
+                if ((slot != null) && slot.getType() == CriticalSlot.TYPE_SYSTEM) {
                     slot.setDestroyed(false);
                     slot.setHit(false);
                     slot.setRepairable(true);
                     slot.setMissing(false);
-                    Mounted m = slot.getMount();
-                    m.setHit(false);
-                    m.setDestroyed(false);
-                    m.setMissing(false);
-                    m.setRepairable(true);
+                    break;
                 }
             }
         }
@@ -507,9 +498,8 @@ public class ProtomekLocation extends Part {
             if ((slot == null) || !slot.isEverHittable()) {
                 continue;
             }
-            if (slot.isRepairable()) {
-                return "You must first remove all equipment from this location before you scrap it";
-            } 
+            //we don't care about the final critical hit to the system
+            //in locations because that just represents the location destruction
             if(slot.getType() == CriticalSlot.TYPE_SYSTEM) {
                 if(slot.isRepairable()) {
                     if(systemRepairable > 0) {

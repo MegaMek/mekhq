@@ -212,12 +212,7 @@ public class Armor extends Part implements IAcquisitionWork {
     public boolean isSameStatus(Part part) {
     	return this.getDaysToArrival() == part.getDaysToArrival();
     }
-
-    @Override
-    public int getPartType() {
-        return PART_TYPE_ARMOR;
-    }
-
+    
     @Override
     protected boolean isClanTechBase() {
     	return clan;

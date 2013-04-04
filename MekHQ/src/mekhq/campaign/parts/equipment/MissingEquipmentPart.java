@@ -25,6 +25,7 @@ import java.io.PrintWriter;
 
 import megamek.common.AmmoType;
 import megamek.common.CriticalSlot;
+import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.Mounted;
 import megamek.common.weapons.Weapon;
@@ -107,16 +108,6 @@ public class MissingEquipmentPart extends MissingPart {
     }
 
     @Override
-    public int getPartType() {
-        if (getType() instanceof Weapon)
-            return PART_TYPE_WEAPON;
-        else if (getType() instanceof AmmoType)
-            return PART_TYPE_AMMO;
-        else
-            return PART_TYPE_EQUIPMENT_PART;
-    }
-
-    @Override
 	public void writeToXml(PrintWriter pw1, int indent) {
 		writeToXmlBegin(pw1, indent);		
 		pw1.println(MekHqXmlUtil.indentStr(indent+1)
@@ -188,27 +179,29 @@ public class MissingEquipmentPart extends MissingPart {
 
 	@Override
     public String checkFixable() {
-        // The part is only fixable if the location is not destroyed.
-        // We have to cycle through all locations because some equipment is spreadable.
-        for(int loc = 0; loc < unit.getEntity().locations(); loc++) {
-            for (int i = 0; i < unit.getEntity().getNumberOfCriticals(loc); i++) {
-                CriticalSlot slot = unit.getEntity().getCritical(loc, i);
-                
-                // ignore empty & system slots
-                if ((slot == null) || (slot.getType() != CriticalSlot.TYPE_EQUIPMENT)) {
-                    continue;
+	    // The part is only fixable if the location is not destroyed.
+        // be sure to check location and second location
+        if(null != unit) {
+            Mounted m = unit.getEntity().getEquipment(equipmentNum);
+            if(null != m) {
+                int loc = m.getLocation();
+                if (unit.isLocationBreached(loc)) {
+                    return unit.getEntity().getLocationName(loc) + " is breached.";
                 }
-                
-                if (equipmentNum == slot.getIndex()) {
-                	if (unit.isLocationBreached(loc)) {
-                		return unit.getEntity().getLocationName(loc) + " is breached.";
-                	}
+                if (unit.isLocationDestroyed(loc)) {
+                    return unit.getEntity().getLocationName(loc) + " is destroyed.";
+                }
+                loc = m.getSecondLocation();
+                if(loc != Entity.LOC_NONE) {
+                    if (unit.isLocationBreached(loc)) {
+                        return unit.getEntity().getLocationName(loc) + " is breached.";
+                    }
                     if (unit.isLocationDestroyed(loc)) {
                         return unit.getEntity().getLocationName(loc) + " is destroyed.";
                     }
                 }
             }
-        }       
+        }    
         return null;
     }
 	

@@ -85,11 +85,6 @@ public class ProtomekArmActuator extends Part {
         return part instanceof ProtomekArmActuator
                 && getUnitTonnage() == ((ProtomekArmActuator)part).getUnitTonnage();
     }
-
-    @Override
-    public int getPartType() {
-        return PART_TYPE_MEK_ACTUATOR;
-    }
     
     public int getLocation() {
         return location;

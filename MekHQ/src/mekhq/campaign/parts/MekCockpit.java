@@ -117,11 +117,6 @@ public class MekCockpit extends Part {
 		return T_BOTH;
 	}
 
-    @Override
-    public int getPartType() {
-        return PART_TYPE_MEK_COCKPIT;
-    }
-
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent) {
 		writeToXmlBegin(pw1, indent);

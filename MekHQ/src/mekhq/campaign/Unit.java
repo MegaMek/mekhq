@@ -99,6 +99,7 @@ import mekhq.campaign.parts.MissingMekLocation;
 import mekhq.campaign.parts.MissingMekSensor;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.MissingProtomekArmActuator;
+import mekhq.campaign.parts.MissingProtomekJumpJet;
 import mekhq.campaign.parts.MissingProtomekLegActuator;
 import mekhq.campaign.parts.MissingProtomekLocation;
 import mekhq.campaign.parts.MissingProtomekSensor;
@@ -111,6 +112,7 @@ import mekhq.campaign.parts.MotiveSystem;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.ProtomekArmActuator;
 import mekhq.campaign.parts.ProtomekArmor;
+import mekhq.campaign.parts.ProtomekJumpJet;
 import mekhq.campaign.parts.ProtomekLegActuator;
 import mekhq.campaign.parts.ProtomekLocation;
 import mekhq.campaign.parts.ProtomekSensor;
@@ -1366,6 +1368,7 @@ public class Unit implements MekHqXmlSerializable {
     	Part protoLeftArmActuator = null;
     	Part protoRightArmActuator = null;
     	Part protoLegsActuator = null;
+        ArrayList<Part> protoJumpJets = new ArrayList<Part>();
     	
     	for(Part part : parts) {
     		if(part instanceof MekGyro || part instanceof MissingMekGyro) {
@@ -1541,7 +1544,10 @@ public class Unit implements MekHqXmlSerializable {
                 }
             } else if(part instanceof ProtomekLegActuator || part instanceof MissingProtomekLegActuator) {
                 protoLegsActuator = part;
-            }
+            } else if(part instanceof ProtomekJumpJet || part instanceof MissingProtomekJumpJet) {
+                protoJumpJets.add(part);
+            } 
+    		
     	}
     	//now check to see what is null
     	for(int i = 0; i<locations.length; i++) {
@@ -1870,6 +1876,13 @@ public class Unit implements MekHqXmlSerializable {
                 addPart(sensor);
                 partsToAdd.add(sensor);
             }
+    	    int jj = ((Protomech)entity).getJumpJets() - protoJumpJets.size();
+            while(jj > 0) {
+                ProtomekJumpJet protoJJ = new ProtomekJumpJet((int)entity.getWeight(), campaign);
+                addPart(protoJJ);
+                partsToAdd.add(protoJJ);
+                jj--;
+            }
     	}
     	if(entity instanceof Infantry && !(entity instanceof BattleArmor)) {
     		if(null == motiveType && entity.getMovementMode() != EntityMovementMode.INF_LEG) {
@@ -2034,7 +2047,7 @@ public class Unit implements MekHqXmlSerializable {
     	int nGunners = 0;
     	for(UUID pid : drivers) {
     		Person p = campaign.getPerson(pid);
-    		if(p.getHits() > 0 && !(entity instanceof Mech || entity instanceof Aero)) {
+    		if(p.getHits() > 0 && !(entity instanceof Mech || entity instanceof Aero || entity instanceof Protomech)) {
     			continue;
     		}
     		if(p.hasSkill(driveType)) {
@@ -2044,7 +2057,7 @@ public class Unit implements MekHqXmlSerializable {
     	}
     	for(UUID pid : gunners) {
     		Person p = campaign.getPerson(pid);
-    		if(p.getHits() > 0 && !(entity instanceof Mech || entity instanceof Aero)) {
+    		if(p.getHits() > 0 && !(entity instanceof Mech || entity instanceof Aero || entity instanceof Protomech)) {
     			continue;
     		}
     		if(p.hasSkill(gunType)) {
@@ -2229,7 +2242,7 @@ public class Unit implements MekHqXmlSerializable {
     		}
     		return 2;
     	}
-    	if(entity instanceof Mech || entity instanceof Tank || entity instanceof Aero) {
+    	if(entity instanceof Mech || entity instanceof Tank || entity instanceof Aero || entity instanceof Protomech) {
     		//only one driver please
     		return 1;
     	}

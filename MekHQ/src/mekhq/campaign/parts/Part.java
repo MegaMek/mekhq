@@ -398,15 +398,6 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     	}
 		return hits == part.getHits() && part.getSkillMin() == this.getSkillMin() && this.getDaysToArrival() == part.getDaysToArrival();
 	}
-	
-	/**
-	 * Returns the type of the part. Used for parts filtering
-	 * 
-	 * @return The type of the part
-	 */
-	public int getPartType() {
-		return PART_TYPE_OTHER;
-	}
 
     protected boolean isClanTechBase() {
         return TechConstants.isClan(getTechLevel());

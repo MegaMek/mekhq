@@ -113,6 +113,7 @@ import mekhq.campaign.parts.MissingEnginePart;
 import mekhq.campaign.parts.MissingMekActuator;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.ProtomekArmor;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
@@ -648,6 +649,13 @@ public class Campaign implements Serializable {
     			    return;
     			}
     		}
+    		if(p instanceof ProtomekArmor) {
+                if(spare instanceof ProtomekArmor) {
+                    ((ProtomekArmor)spare).setAmount(((ProtomekArmor)spare).getAmount() + ((ProtomekArmor)p).getAmount());
+                    updateAllArmorForNewSpares();
+                    return;
+                }
+            }
     		else if(p instanceof AmmoStorage) {   			
     		    if(spare instanceof AmmoStorage) {
     		        ((AmmoStorage)spare).changeShots(((AmmoStorage)p).getShots());
@@ -694,6 +702,13 @@ public class Campaign implements Serializable {
         	        removePart(p);
     	        }
     	    }
+    	    if(p instanceof ProtomekArmor) {
+                if(spare instanceof ProtomekArmor) {
+                    ((ProtomekArmor)spare).setAmount(((ProtomekArmor)spare).getAmount() + ((ProtomekArmor)p).getAmount());
+                    updateAllArmorForNewSpares();
+                    return;
+                }
+            }
     	    else if(p instanceof AmmoStorage) {
                 if(spare instanceof AmmoStorage) {
                     while(quantity > 0) {
@@ -3096,6 +3111,7 @@ public class Campaign implements Serializable {
     		person.addSkill(SkillType.S_GUN_AERO, expLvl, rskillPrefs.randomizeSkill(), bonus);
     		break;
 	    case(Person.T_PROTO_PILOT):
+	        person.addSkill(SkillType.S_GUN_PROTO, expLvl, rskillPrefs.randomizeSkill(), bonus);
 	    	break;
 	    case(Person.T_BA):
 	    	if(getFaction().isClan()) {
