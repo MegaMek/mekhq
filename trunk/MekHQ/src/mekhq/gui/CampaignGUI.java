@@ -210,6 +210,7 @@ import mekhq.gui.dialog.GameOptionsDialog;
 import mekhq.gui.dialog.HireBulkPersonnelDialog;
 import mekhq.gui.dialog.KillDialog;
 import mekhq.gui.dialog.MekHQAboutBox;
+import mekhq.gui.dialog.MercRosterDialog;
 import mekhq.gui.dialog.MissionTypeDialog;
 import mekhq.gui.dialog.NewLoanDialog;
 import mekhq.gui.dialog.NewRecruitDialog;
@@ -472,6 +473,7 @@ public class CampaignGUI extends JPanel {
         miLoadForces = new javax.swing.JMenuItem();
         addFunds = new javax.swing.JMenuItem();
         miGetLoan = new javax.swing.JMenuItem();
+        miMercRoster = new javax.swing.JMenuItem();
         miShoppingList = new javax.swing.JMenuItem();
         menuMarket = new javax.swing.JMenu();
         miPurchaseUnit = new javax.swing.JMenuItem();
@@ -2135,6 +2137,14 @@ public class CampaignGUI extends JPanel {
         });
         fileMenu.add(menuOptionsMM);
 
+        miMercRoster.setText(resourceMap.getString("miMercRoster.text")); // NOI18N
+        miMercRoster.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                showMercRosterDialog();
+            }
+        });
+        fileMenu.add(miMercRoster);
+        
         menuThemes =new JMenu("Themes");
         refreshThemeChoices();
         fileMenu.add(menuThemes);
@@ -3160,6 +3170,11 @@ public class CampaignGUI extends JPanel {
         refreshFunds();
         refreshReport();
         refreshRating();
+    }
+    
+    private void showMercRosterDialog() {
+        MercRosterDialog mrd = new MercRosterDialog(getFrame(), true, getCampaign());
+        mrd.setVisible(true);
     }
 
     public void refitUnit(Refit r, boolean selectModelName) {
@@ -10742,6 +10757,7 @@ public class CampaignGUI extends JPanel {
     private javax.swing.JMenuItem menuOptionsMM;
     private javax.swing.JMenu menuThemes;
     private javax.swing.JMenuItem menuSave;
+    private javax.swing.JMenuItem miMercRoster;
     private javax.swing.JMenuItem miHireBulk;
     private javax.swing.JMenuItem miHireAstechs;
     private javax.swing.JMenuItem miFireAstechs;
