@@ -34,6 +34,7 @@ import megamek.common.ConvFighter;
 import megamek.common.Entity;
 import megamek.common.Infantry;
 import megamek.common.Jumpship;
+import megamek.common.Protomech;
 import megamek.common.SmallCraft;
 import megamek.common.Tank;
 import megamek.common.VTOL;
@@ -70,6 +71,7 @@ public class SkillType implements Serializable {
 	public static final String S_GUN_VEE     = "Gunnery/Vehicle";
 	public static final String S_GUN_SPACE   = "Gunnery/Spacecraft";
 	public static final String S_GUN_BA      = "Gunnery/Battlesuit";
+	public static final String S_GUN_PROTO   = "Gunnery/Protomech";
 	public static final String S_ARTILLERY   = "Artillery";
 	public static final String S_SMALL_ARMS  = "Small Arms";
 	public static final String S_ANTI_MECH   = "Anti-Mech";
@@ -93,7 +95,7 @@ public class SkillType implements Serializable {
 	public static final String[] skillList = {S_PILOT_MECH,S_GUN_MECH,S_PILOT_AERO,S_GUN_AERO,
 											  S_PILOT_GVEE,S_PILOT_VTOL,S_PILOT_NVEE,S_GUN_VEE,
 						                      S_PILOT_JET,S_GUN_JET,S_PILOT_SPACE,S_GUN_SPACE,S_ARTILLERY,
-						                      S_GUN_BA,S_SMALL_ARMS,S_ANTI_MECH,
+						                      S_GUN_BA,S_GUN_PROTO,S_SMALL_ARMS,S_ANTI_MECH,
 						                      S_TECH_MECH,S_TECH_MECHANIC,S_TECH_AERO,S_TECH_BA,S_TECH_VESSEL,S_ASTECH,
 						                      S_DOCTOR,S_MEDTECH,S_NAV,
 						                      S_ADMIN,
@@ -219,7 +221,8 @@ public class SkillType implements Serializable {
 		return name.equals(S_GUN_MECH) || name.equals(S_GUN_AERO)
 					|| name.equals(S_GUN_VEE) || name.equals(S_GUN_BA)
 					|| name.equals(S_SMALL_ARMS) || name.equals(S_GUN_JET)
-					|| name.equals(S_GUN_SPACE) || name.equals(S_ARTILLERY);
+					|| name.equals(S_GUN_SPACE) || name.equals(S_GUN_PROTO) 
+					|| name.equals(S_ARTILLERY);
 	}
 	
 	public int getExperienceLevel(int lvl) {
@@ -259,6 +262,7 @@ public class SkillType implements Serializable {
 		lookupHash.put(S_GUN_VEE, createGunneryVehicle());
 		lookupHash.put(S_ARTILLERY, createArtillery());
 		lookupHash.put(S_GUN_BA, createGunneryBA());
+		lookupHash.put(S_GUN_PROTO, createGunneryProto());
 		lookupHash.put(S_SMALL_ARMS, createSmallArms());
 		lookupHash.put(S_ANTI_MECH, createAntiMech());
 		lookupHash.put(S_TECH_MECH, createTechMech());
@@ -422,6 +426,9 @@ public class SkillType implements Serializable {
 		else if(en instanceof Infantry) {
 			return S_ANTI_MECH;
 		}
+		else if(en instanceof Protomech) {
+            return S_GUN_PROTO;
+        }
 		return S_PILOT_MECH;
 	}
 	
@@ -444,6 +451,9 @@ public class SkillType implements Serializable {
 			}
 			return S_SMALL_ARMS;
 		}
+		else if(en instanceof Protomech) {
+            return S_GUN_PROTO;
+        }
 		return S_GUN_MECH;
 	}
 	
@@ -732,6 +742,17 @@ public class SkillType implements Serializable {
 	public static SkillType createGunneryBA() {
         SkillType skill = new SkillType();
         skill.name = S_GUN_BA;
+        skill.target = 7;
+        skill.greenLvl = 2;
+        skill.countUp = false;
+        skill.costs = new Integer[]{16,8,8,8,8,8,8,8,-1,-1,-1};
+     
+        return skill;
+    }
+	
+	public static SkillType createGunneryProto() {
+        SkillType skill = new SkillType();
+        skill.name = S_GUN_PROTO;
         skill.target = 7;
         skill.greenLvl = 2;
         skill.countUp = false;

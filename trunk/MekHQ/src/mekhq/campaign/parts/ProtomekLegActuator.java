@@ -75,11 +75,6 @@ public class ProtomekLegActuator extends Part {
         return part instanceof ProtomekLegActuator
                 && getUnitTonnage() == ((ProtomekLegActuator)part).getUnitTonnage();
     }
-
-    @Override
-    public int getPartType() {
-        return PART_TYPE_MEK_ACTUATOR;
-    }
     
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {

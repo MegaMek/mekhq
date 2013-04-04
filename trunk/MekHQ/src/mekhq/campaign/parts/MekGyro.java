@@ -117,11 +117,6 @@ public class MekGyro extends Part {
                 && getTonnage() == ((MekGyro) part).getTonnage();
     }
 
-    @Override
-    public int getPartType() {
-        return PART_TYPE_MEK_GYRO;
-    }
-
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent) {
 		writeToXmlBegin(pw1, indent);

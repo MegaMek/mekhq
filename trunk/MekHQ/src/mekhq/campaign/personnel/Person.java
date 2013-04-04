@@ -45,6 +45,7 @@ import megamek.common.EntityMovementMode;
 import megamek.common.Infantry;
 import megamek.common.Jumpship;
 import megamek.common.Mech;
+import megamek.common.Protomech;
 import megamek.common.SmallCraft;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
@@ -400,7 +401,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
         case(T_AERO_PILOT):
             return hasSkill(SkillType.S_GUN_AERO) && hasSkill(SkillType.S_PILOT_AERO);
         case(T_PROTO_PILOT):
-            return false;
+            return hasSkill(SkillType.S_GUN_PROTO);
         case(T_BA):
             return hasSkill(SkillType.S_GUN_BA);
         case(T_INFANTRY):
@@ -1133,6 +1134,12 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 			} else {
 				return -1;
 			}
+		case T_PROTO_PILOT:
+            if(hasSkill(SkillType.S_GUN_PROTO)) {
+                return getSkill(SkillType.S_GUN_PROTO).getExperienceLevel();
+            } else {
+                return -1;
+            }
 		case T_INFANTRY:
 			if(hasSkill(SkillType.S_SMALL_ARMS)) {
 				return getSkill(SkillType.S_SMALL_ARMS).getExperienceLevel();
@@ -1551,6 +1558,9 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     	else if(ent instanceof Infantry) {
     		return true;
     	}
+    	else if(ent instanceof Protomech) {
+    	    return true;
+    	}
     	return false;
     }
     
@@ -1576,6 +1586,9 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     	else if(ent instanceof Infantry) {
     		return hasSkill(SkillType.S_SMALL_ARMS);
     	}
+    	else if(ent instanceof Protomech) {
+            return hasSkill(SkillType.S_GUN_PROTO);
+        }
     	return false;
     }
     

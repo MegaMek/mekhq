@@ -70,11 +70,6 @@ public class MissingMekActuator extends MissingPart {
     	//apparently nothing
     	return 0;
     }
-
-    @Override
-    public int getPartType() {
-        return PART_TYPE_MEK_ACTUATOR;
-    }
     
     public int getLocation() {
     	return location;

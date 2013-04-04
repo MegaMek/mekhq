@@ -52,11 +52,6 @@ public class MissingMekLifeSupport extends MissingPart {
 		return 0;
 	}
 
-    @Override
-    public int getPartType() {
-        return PART_TYPE_MEK_LIFE_SUPPORT;
-    }
-
 	@Override
 	protected void loadFieldsFromXmlNode(Node wn) {
 		// Do nothing - no fields to load.

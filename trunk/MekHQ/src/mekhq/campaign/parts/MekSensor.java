@@ -76,11 +76,6 @@ public class MekSensor extends Part {
     }
 
     @Override
-    public int getPartType() {
-        return PART_TYPE_MEK_SENSOR;
-    }
-    
-    @Override
 	public int getTechBase() {
 		return T_BOTH;
 	}

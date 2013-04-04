@@ -125,11 +125,6 @@ public class MissingMekLocation extends MissingPart {
     	return 0;
     }
 
-    @Override
-    public int getPartType() {
-        return PART_TYPE_MEK_BODY_PART;
-    }
-
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent) {
 		writeToXmlBegin(pw1, indent);

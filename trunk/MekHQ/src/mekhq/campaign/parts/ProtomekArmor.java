@@ -187,11 +187,6 @@ public class ProtomekArmor extends Part implements IAcquisitionWork {
     }
 
     @Override
-    public int getPartType() {
-        return PART_TYPE_ARMOR;
-    }
-
-    @Override
     protected boolean isClanTechBase() {
         return clan;
     }

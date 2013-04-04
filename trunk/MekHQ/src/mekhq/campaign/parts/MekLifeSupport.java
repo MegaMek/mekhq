@@ -77,11 +77,6 @@ public class MekLifeSupport extends Part {
 		return T_BOTH;
 	}
 
-    @Override
-    public int getPartType() {
-        return PART_TYPE_MEK_LIFE_SUPPORT;
-    }
-
 	@Override
 	public void writeToXml(PrintWriter pw1, int indent) {
 		writeToXmlBegin(pw1, indent);

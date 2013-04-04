@@ -103,11 +103,6 @@ public class SpacecraftEngine extends Part {
 	}
 
 	@Override
-	public int getPartType() {
-		return PART_TYPE_MEK_ENGINE;
-	}
-
-	@Override
 	public int getTechLevel() {
 		if(clan) {
 			return TechConstants.T_CLAN_TW;

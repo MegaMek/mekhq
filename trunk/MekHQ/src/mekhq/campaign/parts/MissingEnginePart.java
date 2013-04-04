@@ -109,11 +109,6 @@ public class MissingEnginePart extends MissingPart {
 	}
 
 	@Override
-	public int getPartType() {
-		return PART_TYPE_MEK_ENGINE;
-	}
-
-	@Override
 	public void writeToXml(PrintWriter pw1, int indent) {
 		writeToXmlBegin(pw1, indent);
 		// The engine is a MM object...

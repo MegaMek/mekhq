@@ -52,11 +52,6 @@ public class MissingMekSensor extends MissingPart {
 		return 0;
 	}
 
-    @Override
-    public int getPartType() {
-        return PART_TYPE_MEK_SENSOR;
-    }
-
 	@Override
 	protected void loadFieldsFromXmlNode(Node wn) {
 		// Do nothing - no fields to load.
