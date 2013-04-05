@@ -29,6 +29,7 @@ import megamek.common.Engine;
 import megamek.common.EntityMovementMode;
 import megamek.common.EquipmentType;
 import megamek.common.Mech;
+import megamek.common.Protomech;
 import megamek.common.Tank;
 import megamek.common.verifier.TestEntity;
 import mekhq.campaign.Campaign;
@@ -295,13 +296,18 @@ public class MissingEnginePart extends MissingPart {
 	@Override
 	public void updateConditionFromPart() {
 		if(null != unit) {
-			unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE);
+			if(unit.getEntity() instanceof Mech) {
+			    unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE);
+			}
 			if(unit.getEntity() instanceof Aero) {
 				((Aero)unit.getEntity()).setEngineHits(((Aero)unit.getEntity()).getMaxEngineHits());
 			}
 			if(unit.getEntity() instanceof Tank) {
 				((Tank)unit.getEntity()).engineHit();
 			}
+			if(unit.getEntity() instanceof Protomech) {
+                ((Protomech)unit.getEntity()).setEngineHit(true);
+            }
 		}
 	}
 	
