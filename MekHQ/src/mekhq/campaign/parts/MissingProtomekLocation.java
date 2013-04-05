@@ -44,7 +44,7 @@ public class MissingProtomekLocation extends MissingPart {
     private static final long serialVersionUID = -122291037522319765L;
     protected int loc;
     protected int structureType;
-    protected boolean tsm;
+    protected boolean booster;
     protected double percent;
     protected boolean forQuad;
 
@@ -53,11 +53,11 @@ public class MissingProtomekLocation extends MissingPart {
     }
     
     
-    public MissingProtomekLocation(int loc, int tonnage, int structureType, boolean hasTSM, boolean quad, Campaign c) {
+    public MissingProtomekLocation(int loc, int tonnage, int structureType, boolean hasBooster, boolean quad, Campaign c) {
         super(tonnage, c);
         this.loc = loc;
         this.structureType = structureType;
-        this.tsm = hasTSM;
+        this.booster = hasBooster;
         this.percent = 1.0;
         this.forQuad = quad;
         //TODO: need to account for internal structure and myomer types
@@ -84,6 +84,9 @@ public class MissingProtomekLocation extends MissingPart {
             this.name = "Protomech Main Gun";
             break;
         }
+        if(booster) {
+            this.name += " (Myomer Booster)";
+        }
         this.time = 240;
         this.difficulty = 3;
     }
@@ -92,8 +95,8 @@ public class MissingProtomekLocation extends MissingPart {
         return loc;
     }
 
-    public boolean isTsm() {
-        return tsm;
+    public boolean hasBooster() {
+        return booster;
     }
 
     public int getStructureType() {
@@ -118,9 +121,9 @@ public class MissingProtomekLocation extends MissingPart {
                 +structureType
                 +"</structureType>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<tsm>"
-                +tsm
-                +"</tsm>");
+                +"<booster>"
+                +booster
+                +"</booster>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<percent>"
                 +percent
@@ -145,11 +148,11 @@ public class MissingProtomekLocation extends MissingPart {
                 structureType = Integer.parseInt(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("percent")) {
                 percent = Double.parseDouble(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("tsm")) {
+            } else if (wn2.getNodeName().equalsIgnoreCase("booster")) {
                 if (wn2.getTextContent().equalsIgnoreCase("true"))
-                    tsm = true;
+                    booster = true;
                 else
-                    tsm = false;
+                    booster = false;
             } else if (wn2.getNodeName().equalsIgnoreCase("forQuad")) {
                 if (wn2.getTextContent().equalsIgnoreCase("true"))
                     forQuad = true;
@@ -197,7 +200,7 @@ public class MissingProtomekLocation extends MissingPart {
             ProtomekLocation mekLoc = (ProtomekLocation)part;
             return mekLoc.getLoc() == loc
                 && mekLoc.getUnitTonnage() == getUnitTonnage()
-                && mekLoc.isTsm() == tsm
+                && mekLoc.hasBooster() == booster
                 && mekLoc.getStructureType() == structureType;
         }
         return false;
@@ -223,7 +226,7 @@ public class MissingProtomekLocation extends MissingPart {
 
     @Override
     public Part getNewPart() {
-        return new ProtomekLocation(loc, getUnitTonnage(), structureType, tsm, forQuad, campaign);
+        return new ProtomekLocation(loc, getUnitTonnage(), structureType, booster, forQuad, campaign);
     }
     
     @Override

@@ -49,7 +49,7 @@ public class ProtomekLocation extends Part {
     //some of these aren't used but may be later for advanced designs (i.e. WoR)
     protected int loc;
     protected int structureType;
-    protected boolean tsm;
+    protected boolean booster;
     double percent;
     boolean breached;
     boolean blownOff;
@@ -63,15 +63,14 @@ public class ProtomekLocation extends Part {
         this(0, 0, 0, false, false, null);
     }
     
-    public ProtomekLocation(int loc, int tonnage, int structureType, boolean hasTSM, boolean quad, Campaign c) {
+    public ProtomekLocation(int loc, int tonnage, int structureType, boolean hasBooster, boolean quad, Campaign c) {
         super(tonnage, c);
         this.loc = loc;
         this.structureType = structureType;
-        this.tsm = hasTSM;
+        this.booster = hasBooster;
         this.percent = 1.0;
         this.forQuad = quad;
         this.breached = false;
-        //TODO: need to account for internal structure and myomer types
         this.name = "Protomech Location";
         switch(loc) {
         case(Protomech.LOC_HEAD):
@@ -88,15 +87,21 @@ public class ProtomekLocation extends Part {
             break;
         case(Protomech.LOC_LEG):
             this.name = "Protomech Legs";
+            if(forQuad) {
+                this.name = "Protomech Legs (Quad)";
+            }
             break;
         case(Protomech.LOC_MAINGUN):
             this.name = "Protomech Main Gun";
             break;
         }
+        if(booster) {
+            this.name += " (Myomer Booster)";
+        }
     }
     
     public ProtomekLocation clone() {
-        ProtomekLocation clone = new ProtomekLocation(loc, getUnitTonnage(), structureType, tsm, forQuad, campaign);
+        ProtomekLocation clone = new ProtomekLocation(loc, getUnitTonnage(), structureType, booster, forQuad, campaign);
         clone.copyBaseData(this);
         clone.percent = this.percent;
         clone.breached = this.breached;
@@ -108,8 +113,8 @@ public class ProtomekLocation extends Part {
         return loc;
     }
 
-    public boolean isTsm() {
-        return tsm;
+    public boolean hasBooster() {
+        return booster;
     }
 
     public int getStructureType() {
@@ -119,7 +124,6 @@ public class ProtomekLocation extends Part {
    
     
     public double getTonnage() {
-        //TODO: how much should this weigh?
         return 0;
     }
     
@@ -139,16 +143,21 @@ public class ProtomekLocation extends Part {
     
     @Override
     public boolean isSamePartType(Part part) {
-        return part instanceof MekLocation
-                && getLoc() == ((MekLocation)part).getLoc()
-                && getUnitTonnage() == ((MekLocation)part).getUnitTonnage()
-                && isTsm() == ((MekLocation)part).isTsm()
-                && getStructureType() == ((MekLocation) part).getStructureType();
+        return part instanceof ProtomekLocation
+                && getLoc() == ((ProtomekLocation)part).getLoc()
+                && getUnitTonnage() == ((ProtomekLocation)part).getUnitTonnage()
+                && hasBooster() == ((ProtomekLocation)part).hasBooster()
+                && (!isLegs() || forQuad == ((MekLocation)part).forQuad)
+                && getStructureType() == ((ProtomekLocation) part).getStructureType();
+    }
+    
+    private boolean isLegs() {
+        return loc == Protomech.LOC_LEG;
     }
     
     @Override
     public boolean isSameStatus(Part part) {
-        return super.isSameStatus(part) && this.getPercent() == ((MekLocation)part).getPercent();
+        return super.isSameStatus(part) && this.getPercent() == ((ProtomekLocation)part).getPercent();
     }
 
     public double getPercent() {
@@ -167,9 +176,9 @@ public class ProtomekLocation extends Part {
                 +structureType
                 +"</structureType>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<tsm>"
-                +tsm
-                +"</tsm>");
+                +"<booster>"
+                +booster
+                +"</booster>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<percent>"
                 +percent
@@ -198,11 +207,11 @@ public class ProtomekLocation extends Part {
                 structureType = Integer.parseInt(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("percent")) {
                 percent = Double.parseDouble(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("tsm")) {
+            } else if (wn2.getNodeName().equalsIgnoreCase("booster")) {
                 if (wn2.getTextContent().equalsIgnoreCase("true"))
-                    tsm = true;
+                    booster = true;
                 else
-                    tsm = false;
+                    booster = false;
             } else if (wn2.getNodeName().equalsIgnoreCase("forQuad")) {
                 if (wn2.getTextContent().equalsIgnoreCase("true"))
                     forQuad = true;
@@ -284,7 +293,7 @@ public class ProtomekLocation extends Part {
 
     @Override
     public MissingPart getMissingPart() {
-        return new MissingProtomekLocation(loc, getUnitTonnage(), structureType, tsm, forQuad, campaign);
+        return new MissingProtomekLocation(loc, getUnitTonnage(), structureType, booster, forQuad, campaign);
     }
 
     @Override
