@@ -129,8 +129,20 @@ public class ProtomekLocation extends Part {
     
     @Override
     public long getStickerPrice() {
+        double nloc = 7.0;
+        if(null != unit) {
+            nloc = unit.getEntity().locations();
+        }
         double totalStructureCost = 2400 * getUnitTonnage();
-        double cost = totalStructureCost/7.0;
+        if(booster) {
+            if(null != unit) {
+                totalStructureCost += Math.round(unit.getEntity().getEngine().getRating() * 1000 * unit.getEntity().getWeight() * 0.025f);
+            } else {
+                //FIXME: uggh different costs by engine rating and weight, use a fake rating
+                totalStructureCost += Math.round(75000 * getUnitTonnage() * 0.025f);
+            }
+        }
+        double cost = totalStructureCost/nloc;
         if (loc == Protomech.LOC_TORSO) {
             cost += 575000;
         }
@@ -147,8 +159,8 @@ public class ProtomekLocation extends Part {
                 && getLoc() == ((ProtomekLocation)part).getLoc()
                 && getUnitTonnage() == ((ProtomekLocation)part).getUnitTonnage()
                 && hasBooster() == ((ProtomekLocation)part).hasBooster()
-                && (!isLegs() || forQuad == ((MekLocation)part).forQuad)
-                && getStructureType() == ((ProtomekLocation) part).getStructureType();
+                && (!isLegs() || forQuad == ((MekLocation)part).forQuad);
+               // && getStructureType() == ((ProtomekLocation) part).getStructureType();
     }
     
     private boolean isLegs() {

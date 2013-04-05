@@ -100,7 +100,9 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 		//Its a hack, but we probably need to load a fresh entity in and check what its shots are
 		//for the same equipnum
 		if(null != unit && unit.getEntity() instanceof Protomech) {
-	        MechSummary summary = MechSummaryCache.getInstance().getMech(unit.getEntity().getChassis() + " " + unit.getEntity().getModel());
+		    String lookupName = unit.getEntity().getChassis() + " " + unit.getEntity().getModel();
+		    lookupName = lookupName.trim();
+	        MechSummary summary = MechSummaryCache.getInstance().getMech(lookupName);
 	        if(null == summary) {
 	            return fullShots;
 	        }
@@ -113,6 +115,10 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 	        } catch (EntityLoadingException e) {
                 return fullShots;
             }
+	        //if protomechs are using alternate munitions then cut in half
+	        if(((AmmoType)type).getMunitionType() != AmmoType.M_STANDARD) {
+	            fullShots = fullShots / 2;
+	        }
 		}
 		return fullShots;
     }

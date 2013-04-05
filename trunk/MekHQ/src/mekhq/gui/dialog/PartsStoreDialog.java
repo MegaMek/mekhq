@@ -69,6 +69,12 @@ import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.MekSensor;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.ProtomekArmActuator;
+import mekhq.campaign.parts.ProtomekArmor;
+import mekhq.campaign.parts.ProtomekJumpJet;
+import mekhq.campaign.parts.ProtomekLegActuator;
+import mekhq.campaign.parts.ProtomekLocation;
+import mekhq.campaign.parts.ProtomekSensor;
 import mekhq.campaign.parts.TankLocation;
 import mekhq.campaign.parts.VeeSensor;
 import mekhq.campaign.parts.VeeStabiliser;
@@ -281,7 +287,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
         		if(nGroup == SG_ALL) {
         			return true;
         		} else if(nGroup == SG_ARMOR) {
-        			return part instanceof Armor;
+        			return part instanceof Armor || part instanceof ProtomekArmor;
         		} else if(nGroup == SG_SYSTEM) {
         			return part instanceof MekLifeSupport
         				|| part instanceof MekSensor
@@ -290,23 +296,24 @@ public class PartsStoreDialog extends javax.swing.JDialog {
         				|| part instanceof FireControlSystem
         				|| part instanceof AeroSensor
         				|| part instanceof VeeSensor
-        				|| part instanceof VeeStabiliser;
+        				|| part instanceof VeeStabiliser
+        				|| part instanceof ProtomekSensor;
         		} else if(nGroup == SG_EQUIP) {
-        			return part instanceof EquipmentPart;
+        			return part instanceof EquipmentPart || part instanceof ProtomekJumpJet;
         		} else if(nGroup == SG_LOC) {
-        			return part instanceof MekLocation || part instanceof TankLocation;
+        			return part instanceof MekLocation || part instanceof TankLocation || part instanceof ProtomekLocation;
         		} else if(nGroup == SG_WEAP) {
         			return part instanceof EquipmentPart && ((EquipmentPart)part).getType() instanceof WeaponType;
         		} else if(nGroup == SG_AMMO) {
         			return part instanceof EquipmentPart && ((EquipmentPart)part).getType() instanceof AmmoType;
         		} else if(nGroup == SG_MISC) {
-        			return part instanceof EquipmentPart && ((EquipmentPart)part).getType() instanceof MiscType;
+        			return (part instanceof EquipmentPart && ((EquipmentPart)part).getType() instanceof MiscType) || part instanceof ProtomekJumpJet;
         		} else if(nGroup == SG_ENGINE) {
         			return part instanceof EnginePart;
         		} else if(nGroup == SG_GYRO) {
         			return part instanceof MekGyro;
         		} else if(nGroup == SG_ACT) {
-        			return part instanceof MekActuator;
+        			return part instanceof MekActuator || part instanceof ProtomekArmActuator || part instanceof ProtomekLegActuator;
         		} else if(nGroup == SG_COCKPIT) {
         			return part instanceof MekCockpit;
         		} 
