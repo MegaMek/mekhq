@@ -34,6 +34,7 @@ import mekhq.Version;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
+import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.work.IAcquisitionWork;
@@ -98,6 +99,10 @@ public class ShoppingList implements MekHqXmlSerializable {
     }
     
     public void addShoppingItem(IAcquisitionWork newWork, int quantity, Campaign campaign) {
+        //ammo bins need a little extra work here
+        if(newWork instanceof AmmoBin) {
+            newWork = ((AmmoBin) newWork).getAcquisitionWork();
+        }
         Person person = campaign.getLogisticsPerson();
         if(null == person && !campaign.getCampaignOptions().getAcquisitionSkill().equals(CampaignOptions.S_AUTO)) {
             campaign.addReport("Your force has no one capable of acquiring equipment.");

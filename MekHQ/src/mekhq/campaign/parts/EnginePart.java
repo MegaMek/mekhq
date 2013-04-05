@@ -298,13 +298,18 @@ public class EnginePart extends Part {
 	public void fix() {
 		super.fix();
 		if(null != unit) {
-			unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE);
+		    if(unit.getEntity() instanceof Mech) {
+		        unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE);
+		    }
 			if(unit.getEntity() instanceof Aero) {
 				((Aero)unit.getEntity()).setEngineHits(0);
 			}
 			if(unit.getEntity() instanceof Tank) {
 				((Tank)unit.getEntity()).engineFix();
 			}
+			if(unit.getEntity() instanceof Protomech) {
+                ((Protomech)unit.getEntity()).setEngineHit(false);
+            }
 		}
 	}
 
@@ -325,6 +330,9 @@ public class EnginePart extends Part {
 			if(unit.getEntity() instanceof Tank) {
 				((Tank)unit.getEntity()).engineHit();
 			}
+			if(unit.getEntity() instanceof Protomech) {
+                ((Protomech)unit.getEntity()).setEngineHit(true);
+            }
 			Part spare = campaign.checkForExistingSparePart(this);
 			if(!salvage) {
 				campaign.removePart(this);
@@ -423,6 +431,9 @@ public class EnginePart extends Part {
 				if(unit.getEntity() instanceof Tank) {
 					((Tank)unit.getEntity()).engineFix();
 				}
+				if(unit.getEntity() instanceof Protomech) {
+	                ((Protomech)unit.getEntity()).setEngineHit(false);
+	            }
 			} else {
 			    if(unit.getEntity() instanceof Mech) {
 			        unit.damageSystem(CriticalSlot.TYPE_SYSTEM, Mech.SYSTEM_ENGINE, hits);
@@ -433,6 +444,9 @@ public class EnginePart extends Part {
 				if(unit.getEntity() instanceof Tank) {
 					((Tank)unit.getEntity()).engineHit();
 				}
+				if(unit.getEntity() instanceof Protomech) {
+	                ((Protomech)unit.getEntity()).setEngineHit(true);
+	            }
 			}
 		}
 	}
