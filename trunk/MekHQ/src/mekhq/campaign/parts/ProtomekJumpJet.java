@@ -62,8 +62,10 @@ public class ProtomekJumpJet extends Part {
     public double getTonnage() {
         if(getUnitTonnage() <=5) {
             return 0.05;
-        } else {
+        } else if (getUnitTonnage() <= 9){
             return 0.1;
+        } else {
+            return 0.15;
         }
     }
     

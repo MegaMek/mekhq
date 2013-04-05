@@ -1557,7 +1557,7 @@ public class Unit implements MekHqXmlSerializable {
     				addPart(mekLocation);
     				partsToAdd.add(mekLocation);
     			} else if(entity instanceof Protomech && i != Protomech.LOC_NMISS) {
-    			    ProtomekLocation protomekLocation = new ProtomekLocation(i, (int) getEntity().getWeight(), getEntity().getStructureType(), hasTSM(), entity instanceof QuadMech, campaign);
+    			    ProtomekLocation protomekLocation = new ProtomekLocation(i, (int) getEntity().getWeight(), getEntity().getStructureType(), ((Protomech)getEntity()).hasMyomerBooster(), entity instanceof QuadMech, campaign);
                     addPart(protomekLocation);
                     partsToAdd.add(protomekLocation);
     			} else if(entity instanceof Tank && i != Tank.LOC_BODY) {
