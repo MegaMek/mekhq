@@ -1863,7 +1863,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     		}
     		return false;
     	}
-    	if(unit.getEntity() instanceof Mech) {
+    	if(unit.getEntity() instanceof Mech || unit.getEntity() instanceof Protomech) {
     		return hasSkill(SkillType.S_TECH_MECH);
     	}
     	if(unit.getEntity() instanceof BattleArmor) {

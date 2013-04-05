@@ -79,6 +79,9 @@ public class MissingProtomekLocation extends MissingPart {
             break;
         case(Protomech.LOC_LEG):
             this.name = "Protomech Legs";
+            if(forQuad) {
+                this.name = "Protomech Legs (Quad)";
+            }
             break;
         case(Protomech.LOC_MAINGUN):
             this.name = "Protomech Main Gun";
@@ -201,9 +204,14 @@ public class MissingProtomekLocation extends MissingPart {
             return mekLoc.getLoc() == loc
                 && mekLoc.getUnitTonnage() == getUnitTonnage()
                 && mekLoc.hasBooster() == booster
-                && mekLoc.getStructureType() == structureType;
+                && (!isLeg() || mekLoc.forQuad() == forQuad);
+                //&& mekLoc.getStructureType() == structureType;
         }
         return false;
+    }
+    
+    private boolean isLeg() {
+        return loc == Protomech.LOC_LEG;
     }
     
     @Override

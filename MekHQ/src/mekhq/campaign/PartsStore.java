@@ -31,6 +31,7 @@ import megamek.common.Engine;
 import megamek.common.EquipmentType;
 import megamek.common.Mech;
 import megamek.common.MiscType;
+import megamek.common.Protomech;
 import megamek.common.verifier.TestEntity;
 import megamek.common.weapons.BayWeapon;
 import megamek.common.weapons.InfantryAttack;
@@ -50,6 +51,12 @@ import mekhq.campaign.parts.MekLifeSupport;
 import mekhq.campaign.parts.MekLocation;
 import mekhq.campaign.parts.MekSensor;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.ProtomekArmActuator;
+import mekhq.campaign.parts.ProtomekArmor;
+import mekhq.campaign.parts.ProtomekJumpJet;
+import mekhq.campaign.parts.ProtomekLegActuator;
+import mekhq.campaign.parts.ProtomekLocation;
+import mekhq.campaign.parts.ProtomekSensor;
 import mekhq.campaign.parts.Rotor;
 import mekhq.campaign.parts.Turret;
 import mekhq.campaign.parts.VeeSensor;
@@ -98,7 +105,8 @@ public class PartsStore implements Serializable {
 		stockVeeComponents(c);
 		stockArmor(c);
 		stockMekLocations(c);
-		stockVeeLocations(c);
+		stockProtomekLocations(c);
+		stockProtomekComponents(c);
 		for(Part p : parts) {
 			p.setBrandNew(true);
 		}
@@ -379,6 +387,7 @@ public class PartsStore implements Serializable {
 		amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(EquipmentType.T_ARMOR_FERRO_IMP, false));
 		parts.add(new Armor(0, EquipmentType.T_ARMOR_FERRO_IMP, amount, -1, false, false));
 		*/
+		parts.add(new ProtomekArmor(0, 100, -1, true, c));
 	}
 	
 	private void stockMekLocations(Campaign c) {
@@ -403,8 +412,28 @@ public class PartsStore implements Serializable {
 		}
 	}
 	
-	private void stockVeeLocations(Campaign c) {
-		//TODO: implement me
+	private void stockProtomekLocations(Campaign c) {
+	    for(int loc = Protomech.LOC_HEAD; loc <= Protomech.LOC_MAINGUN; loc++) {
+            for(int ton = 2; ton <= 15; ton++) {
+                parts.add(new ProtomekLocation(loc, ton, EquipmentType.T_STRUCTURE_UNKNOWN, false, false, c));
+                parts.add(new ProtomekLocation(loc, ton, EquipmentType.T_STRUCTURE_UNKNOWN, true, false, c));
+                if(loc == Protomech.LOC_LEG) {
+                    parts.add(new ProtomekLocation(loc, ton, EquipmentType.T_STRUCTURE_UNKNOWN, false, true, c));
+                    parts.add(new ProtomekLocation(loc, ton, EquipmentType.T_STRUCTURE_UNKNOWN, true, true, c));
+                }
+            }
+	    }
+	}
+	
+	private void stockProtomekComponents(Campaign c) {
+	    int ton = 2;
+	    while(ton <= 15) {
+	        parts.add(new ProtomekArmActuator(ton, c));
+	        parts.add(new ProtomekLegActuator(ton, c));
+	        parts.add(new ProtomekSensor(ton, c));
+	        parts.add(new ProtomekJumpJet(ton, c));
+	        ton++;
+	    }
 	}
 	
 }
