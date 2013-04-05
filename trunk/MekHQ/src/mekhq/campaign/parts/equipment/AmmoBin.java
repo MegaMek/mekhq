@@ -27,8 +27,13 @@ import megamek.common.AmmoType;
 import megamek.common.CriticalSlot;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
+import megamek.common.MechFileParser;
+import megamek.common.MechSummary;
+import megamek.common.MechSummaryCache;
 import megamek.common.Mounted;
+import megamek.common.Protomech;
 import megamek.common.TargetRoll;
+import megamek.common.loaders.EntityLoadingException;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
@@ -55,7 +60,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 	protected int shotsNeeded;
 	protected boolean checkedToday;
 	protected boolean oneShot;
-	
+		
     public AmmoBin() {
     	this(0, null, -1, 0, false, null);
     }
@@ -90,6 +95,24 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     	int fullShots = ((AmmoType)type).getShots();
 		if(oneShot) {
 			fullShots = 1;
+		}
+		//TODO: we need to make an adjustment for protomechs here
+		//Its a hack, but we probably need to load a fresh entity in and check what its shots are
+		//for the same equipnum
+		if(null != unit && unit.getEntity() instanceof Protomech) {
+	        MechSummary summary = MechSummaryCache.getInstance().getMech(unit.getEntity().getChassis() + " " + unit.getEntity().getModel());
+	        if(null == summary) {
+	            return fullShots;
+	        }
+	        try {
+                Entity newProto = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
+                Mounted m = newProto.getEquipment(equipmentNum);
+                if(null != m) {
+                    fullShots = m.getBaseShotsLeft();
+                }
+	        } catch (EntityLoadingException e) {
+                return fullShots;
+            }
 		}
 		return fullShots;
     }
