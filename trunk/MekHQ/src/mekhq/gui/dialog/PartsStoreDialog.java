@@ -58,6 +58,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.AeroSensor;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Avionics;
+import mekhq.campaign.parts.BaArmor;
 import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.FireControlSystem;
 import mekhq.campaign.parts.LandingGear;
@@ -287,7 +288,7 @@ public class PartsStoreDialog extends javax.swing.JDialog {
         		if(nGroup == SG_ALL) {
         			return true;
         		} else if(nGroup == SG_ARMOR) {
-        			return part instanceof Armor || part instanceof ProtomekArmor;
+        			return part instanceof Armor || part instanceof ProtomekArmor || part instanceof BaArmor;
         		} else if(nGroup == SG_SYSTEM) {
         			return part instanceof MekLifeSupport
         				|| part instanceof MekSensor

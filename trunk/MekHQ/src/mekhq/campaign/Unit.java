@@ -71,6 +71,7 @@ import mekhq.campaign.parts.AeroLifeSupport;
 import mekhq.campaign.parts.AeroSensor;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Avionics;
+import mekhq.campaign.parts.BaArmor;
 import mekhq.campaign.parts.DropshipDockingCollar;
 import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.FireControlSystem;
@@ -1430,6 +1431,8 @@ public class Unit implements MekHqXmlSerializable {
     			}
     		} else if(part instanceof ProtomekArmor) {
     		    armor[((ProtomekArmor)part).getLocation()] = (ProtomekArmor)part;
+            } else if(part instanceof BaArmor) {
+                armor[((BaArmor)part).getLocation()] = (BaArmor)part;
             } else if(part instanceof VeeStabiliser) {
     			stabilisers[((VeeStabiliser)part).getLocation()] = part;
     		} else if(part instanceof MissingVeeStabiliser) {
@@ -1591,7 +1594,13 @@ public class Unit implements MekHqXmlSerializable {
     			    ProtomekArmor a = new ProtomekArmor((int) getEntity().getWeight(), getEntity().getOArmor(i, false), i, true, campaign);
                     addPart(a);
                     partsToAdd.add(a);
-    			} else {
+    			} 
+    			else if(entity instanceof BattleArmor) {
+                    BaArmor a = new BaArmor((int) getEntity().getWeight(), getEntity().getOArmor(i, false), BaArmor.getArmorTypeFor(entity), i, true, campaign);
+                    addPart(a);
+                    partsToAdd.add(a);
+                } 
+    			else {
         		    Armor a = new Armor((int) getEntity().getWeight(), getEntity().getArmorType(i), getEntity().getOArmor(i, false), i, false, entity.isClanArmor(i), campaign);
         			addPart(a);
         			partsToAdd.add(a);
@@ -1876,7 +1885,7 @@ public class Unit implements MekHqXmlSerializable {
                 addPart(sensor);
                 partsToAdd.add(sensor);
             }
-    	    int jj = ((Protomech)entity).getJumpJets() - protoJumpJets.size();
+    	    int jj = (entity).getOriginalJumpMP() - protoJumpJets.size();
             while(jj > 0) {
                 ProtomekJumpJet protoJJ = new ProtomekJumpJet((int)entity.getWeight(), campaign);
                 addPart(protoJJ);

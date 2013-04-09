@@ -41,6 +41,7 @@ import mekhq.campaign.parts.AeroSensor;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Avionics;
+import mekhq.campaign.parts.BaArmor;
 import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.FireControlSystem;
 import mekhq.campaign.parts.LandingGear;
@@ -388,6 +389,14 @@ public class PartsStore implements Serializable {
 		parts.add(new Armor(0, EquipmentType.T_ARMOR_FERRO_IMP, amount, -1, false, false));
 		*/
 		parts.add(new ProtomekArmor(0, 100, -1, true, c));
+		for(int i=0; i < BaArmor.T_NUM; i++) {
+		    if(BaArmor.canBeIs(i)) {
+		        parts.add(new BaArmor(0, (int)Math.round(5 * BaArmor.getPointsPerTon(i, false)), i, -1, false, c));
+		    }
+		    if(BaArmor.canBeClan(i)) {
+		        parts.add(new BaArmor(0, (int)Math.round(5 * BaArmor.getPointsPerTon(i, true)), i, -1, true, c));
+		    }
+		}
 	}
 	
 	private void stockMekLocations(Campaign c) {

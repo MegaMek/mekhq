@@ -98,7 +98,7 @@ public class MissingProtomekJumpJet extends MissingPart {
         if(null != unit) {
             if(null != unit) {
                 int damageJJ = getOtherDamagedJumpJets() + 1;
-                if(damageJJ < (int)Math.ceil(((Protomech)unit.getEntity()).getJumpJets() / 2.0)) {
+                if(damageJJ < (int)Math.ceil(unit.getEntity().getOriginalJumpMP() / 2.0)) {
                     unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Protomech.SYSTEM_TORSOCRIT, Protomech.LOC_TORSO);
                     unit.damageSystem(CriticalSlot.TYPE_SYSTEM, Protomech.SYSTEM_TORSOCRIT, Protomech.LOC_TORSO, 1);
                 } else {
