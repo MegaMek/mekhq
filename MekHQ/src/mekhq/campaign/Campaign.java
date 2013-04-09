@@ -106,6 +106,7 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
+import mekhq.campaign.parts.BaArmor;
 import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.MekActuator;
 import mekhq.campaign.parts.MekLocation;
@@ -656,6 +657,13 @@ public class Campaign implements Serializable {
                     return;
                 }
             }
+    		if(p instanceof BaArmor) {
+                if(spare instanceof BaArmor) {
+                    ((BaArmor)spare).setAmount(((BaArmor)spare).getAmount() + ((BaArmor)p).getAmount());
+                    updateAllArmorForNewSpares();
+                    return;
+                }
+            }
     		else if(p instanceof AmmoStorage) {   			
     		    if(spare instanceof AmmoStorage) {
     		        ((AmmoStorage)spare).changeShots(((AmmoStorage)p).getShots());
@@ -709,6 +717,13 @@ public class Campaign implements Serializable {
                     return;
                 }
             }
+    	    if(p instanceof BaArmor) {
+                if(spare instanceof BaArmor) {
+                    ((BaArmor)spare).setAmount(((BaArmor)spare).getAmount() + ((BaArmor)p).getAmount());
+                    updateAllArmorForNewSpares();
+                    return;
+                }
+            }
     	    else if(p instanceof AmmoStorage) {
                 if(spare instanceof AmmoStorage) {
                     while(quantity > 0) {
@@ -737,10 +752,9 @@ public class Campaign implements Serializable {
 	 */
 	public void updateAllArmorForNewSpares() {
 		for(Part part : getParts()) {
-			if(part instanceof Armor) {
-				Armor a = (Armor)part;
-				if(null != a.getUnit() && a.needsFixing()) {
-					a.updateConditionFromEntity();
+			if(part instanceof Armor || part instanceof ProtomekArmor || part instanceof BaArmor) {
+				if(null != part.getUnit() && part.needsFixing()) {
+					part.updateConditionFromEntity();
 				}
 			}
 		}

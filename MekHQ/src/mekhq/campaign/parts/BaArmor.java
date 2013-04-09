@@ -1,5 +1,5 @@
 /*
- * ProtomechArmor.java
+ * BaArmor.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -25,9 +25,12 @@ import java.io.PrintWriter;
 import java.text.DecimalFormat;
 
 import megamek.common.Aero;
+import megamek.common.BattleArmor;
 import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.IArmorState;
+import megamek.common.MiscType;
+import megamek.common.Mounted;
 import megamek.common.Tank;
 import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
@@ -45,55 +48,178 @@ import org.w3c.dom.NodeList;
  *
  * @author Jay Lawson <jaylawson39 at yahoo.com>
  */
-public class ProtomekArmor extends Part implements IAcquisitionWork {
+public class BaArmor extends Part implements IAcquisitionWork {
     private static final long serialVersionUID = 5275226057484468868L;
+    
+    private final static int T_STANDARD           = 0;
+    private final static int T_STANDARD_PROTOTYPE = 1;
+    private final static int T_STANDARD_ADVANCED  = 2;
+    private final static int T_STEALTH_BASIC      = 3;
+    private final static int T_STEALTH            = 4;
+    private final static int T_STEALTH_IMP        = 5;
+    private final static int T_STEALTH_PROTOTYPE  = 6;
+    private final static int T_FIRE_RESIST        = 7;
+    private final static int T_MIMETIC            = 8;
+    public final static int T_NUM                 = 9;
+
     protected int amount;
     protected int amountNeeded;
+    protected int type;
     private int location;
     private boolean clan;
     
-    public ProtomekArmor() {
-        this(0, 0, -1, false, null);
+    public static int getPointTonnage(int t, boolean isClan) {        
+        switch(t) {
+        case T_STANDARD_PROTOTYPE:
+            return 100;
+        case T_STANDARD_ADVANCED:
+            return 40;
+        case T_STEALTH:
+            if(isClan) {
+                return 35;
+            }
+            return 60;  
+        case T_STEALTH_BASIC:
+            if(isClan) {
+                return 30;
+            }
+            return 55;  
+        case T_STEALTH_IMP:
+            if(isClan) {
+                return 35;
+            }
+            return 60;  
+        case T_STEALTH_PROTOTYPE:
+            return 100;
+        case T_FIRE_RESIST:
+            return 30;
+        case T_MIMETIC:
+            return 50;
+        case T_STANDARD:
+        default:
+            if(isClan) {
+                return 25;
+            }
+            return 50;           
+        }
     }
     
-    public ProtomekArmor(int tonnage, int points, int loc, boolean clan, Campaign c) {
+    public static boolean canBeClan(int type) {
+        return type == T_STANDARD || type == T_STEALTH_BASIC 
+                || type == T_STEALTH_IMP || type == T_STEALTH
+                || type == T_FIRE_RESIST; 
+    }
+    
+    public static boolean canBeIs(int type) {
+        return type != T_FIRE_RESIST;
+    }
+    
+
+    public static double getPointsPerTon(int t, boolean isClan) {
+        return 1000.0/getPointTonnage(t, isClan);
+    }
+    
+    public BaArmor() {
+        this(0, 0, 0, -1, false, null);
+    }
+    
+    public BaArmor(int tonnage, int points, int type, int loc, boolean clan, Campaign c) {
         // Amount is used for armor quantity, not tonnage
         super(tonnage, c);
         this.amount = points;
         this.location = loc;
-        this.clan = true;
-        this.name = "Protomech Armor";
+        this.type = type;
+        this.clan = clan;
+        switch(type) {
+        case T_STANDARD_PROTOTYPE:
+            this.name = "BA Armor (Prototype)";
+            break;
+        case T_STANDARD_ADVANCED:
+            this.name = "BA Armor (Advanced)";
+            break;
+        case T_STEALTH:
+            this.name = "BA Stealth Armor";
+            break;
+        case T_STEALTH_BASIC:
+            this.name = "BA Stealth Armor (Basic)";
+            break;
+        case T_STEALTH_IMP:
+            this.name = "BA Stealth Armor (Improved)";
+            break;
+        case T_STEALTH_PROTOTYPE:
+            this.name = "BA Stealth Armor (Prototype)";
+            break;
+        case T_FIRE_RESIST:
+            this.name = "BA Fire Resitant Armor";
+            break;
+        case T_MIMETIC:
+            this.name = "BA Mimetic Armor";
+            break;
+        case T_STANDARD:
+        default:
+            this.name = "BA Armor";  
+        }
     }
     
-    public ProtomekArmor clone() {
-        ProtomekArmor clone = new ProtomekArmor(0, 0, amount, clan, campaign);
+    public BaArmor clone() {
+        BaArmor clone = new BaArmor(0, amount, type, location, clan, campaign);
         clone.copyBaseData(this);
         return clone;
     }
     
     @Override
     public double getTonnage() {
-        return 50 * amount/1000.0;
+        return getPointTonnage(type, clan) * amount/1000.0;
+    }
+    
+    private int getPointCost() {
+        switch(type) {
+        case T_STANDARD_ADVANCED:
+            return 12500;
+        case T_MIMETIC:
+        case T_STEALTH:
+            return 15000;
+        case T_STEALTH_BASIC:
+            return 12000;
+        case T_STEALTH_IMP:
+            return 20000;
+        case T_STEALTH_PROTOTYPE:
+            return 50000;
+        case T_FIRE_RESIST:
+        case T_STANDARD_PROTOTYPE:
+        case T_STANDARD:
+        default:
+            return 10000;           
+        }
+    }
+    
+    private double getPointsPerTon() {
+        return getPointsPerTon(type, clan);
+    }
+    
+    public int getType() {
+        return type;
     }
     
     @Override
     public long getCurrentValue() {
-        return amount * 625;
+        return amount * getPointCost();
     }
     
+    
+    
     public double getTonnageNeeded() {
-        double armorPerTon = 20;
-        return amountNeeded / armorPerTon;
+        return amountNeeded / getPointsPerTon();
     }
     
     public long getValueNeeded() {
-        return adjustCostsForCampaignOptions((long)(amountNeeded * 625));
+        return adjustCostsForCampaignOptions((long)(amountNeeded * getPointCost()));
     }
     
     @Override
     public long getStickerPrice() {
         //always in 5-ton increments
-        return (long)(5 * 20 * 625);
+        return (long)(5 * getPointsPerTon() * getPointCost());
     }
     
     @Override
@@ -176,8 +302,9 @@ public class ProtomekArmor extends Part implements IAcquisitionWork {
 
     @Override
     public boolean isSamePartType(Part part) {
-        return part instanceof ProtomekArmor
+        return part instanceof BaArmor
                 && isClanTechBase() == part.isClanTechBase()
+                && ((BaArmor)part).getType() == this.getType()
                 && getRefitId() == part.getRefitId();
     }
     
@@ -219,6 +346,10 @@ public class ProtomekArmor extends Part implements IAcquisitionWork {
                 +amountNeeded
                 +"</amountNeeded>");
         pw1.println(MekHqXmlUtil.indentStr(indent+1)
+                +"<type>"
+                +type
+                +"</type>");
+        pw1.println(MekHqXmlUtil.indentStr(indent+1)
                 +"<clan>"
                 +clan
                 +"</clan>");
@@ -238,6 +369,8 @@ public class ProtomekArmor extends Part implements IAcquisitionWork {
                 location = Integer.parseInt(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("amountNeeded")) {
                 amountNeeded = Integer.parseInt(wn2.getTextContent());
+            } else if (wn2.getNodeName().equalsIgnoreCase("type")) {
+                type = Integer.parseInt(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("clan")) {
                 if(wn2.getTextContent().equalsIgnoreCase("true")) {
                     clan = true;
@@ -250,16 +383,34 @@ public class ProtomekArmor extends Part implements IAcquisitionWork {
 
     @Override
     public int getAvailability(int era) {
-        if(era == EquipmentType.ERA_CLAN) {
-            return EquipmentType.RATING_D;
-        } else {
-            return EquipmentType.RATING_X;
+        switch(type) {
+        case T_STEALTH:
+            if(era == EquipmentType.ERA_CLAN) {
+                return EquipmentType.RATING_E;
+            } else {
+                return EquipmentType.RATING_X;
+            } 
+        case T_STANDARD_PROTOTYPE:
+        case T_STANDARD:
+        case T_STEALTH_BASIC:
+            if(era == EquipmentType.ERA_CLAN) {
+                return EquipmentType.RATING_E;
+            } else {
+                return EquipmentType.RATING_F;
+            } 
+        default:
+            if(era == EquipmentType.ERA_CLAN) {
+                return EquipmentType.RATING_F;
+            } else {
+                return EquipmentType.RATING_X;
+            }           
         }
+        
     }
 
     @Override
     public int getTechRating() {
-        return EquipmentType.RATING_D;
+        return EquipmentType.RATING_E;
     }
 
     @Override
@@ -307,7 +458,7 @@ public class ProtomekArmor extends Part implements IAcquisitionWork {
     
     @Override
     public IAcquisitionWork getAcquisitionWork() {
-        return new ProtomekArmor(0, (int)Math.round(5 * getArmorPointsPerTon()), -1, clan, campaign);
+        return new BaArmor(0, (int)Math.round(5 * getPointsPerTon()), type, -1, clan, campaign);
     }
 
     @Override
@@ -424,7 +575,7 @@ public class ProtomekArmor extends Part implements IAcquisitionWork {
         
         toReturn += ">";
         toReturn += "<b>" + getName() + "</b> " + bonus + "<br/>";
-        toReturn += ((int)Math.round(getArmorPointsPerTon())) * 5 + " points (5 tons)<br/>";
+        toReturn += ((int)Math.round(getPointsPerTon())) * 5 + " points (5 tons)<br/>";
         String[] inventories = campaign.getPartInventory(getNewPart());
         toReturn += inventories[1] + " in transit, " + inventories[2] + " on order<br>"; 
         toReturn += Utilities.getCurrencyString(adjustCostsForCampaignOptions(getStickerPrice())) + "<br/>";
@@ -453,13 +604,9 @@ public class ProtomekArmor extends Part implements IAcquisitionWork {
         target.addModifier(availabilityMod, "availability (" + EquipmentType.getRatingName(avail) + ")");
         return target;
     }
-
-    public double getArmorPointsPerTon() {
-        return 20;
-    }
     
     public Part getNewPart() {
-        return new ProtomekArmor(0, (int)Math.round(5 * getArmorPointsPerTon()), -1, clan, campaign);
+        return new BaArmor(0, (int)Math.round(5 * getPointsPerTon()), type, -1, clan, campaign);
     }
     
     public boolean isEnoughSpareArmorAvailable() {
@@ -468,9 +615,11 @@ public class ProtomekArmor extends Part implements IAcquisitionWork {
     
     public int getAmountAvailable() {
         for(Part part : campaign.getSpareParts()) {
-            if(part instanceof ProtomekArmor) {
-                ProtomekArmor a = (ProtomekArmor)part;
-                if(a.isClanTechBase() == clan && !a.isReservedForRefit() && a.isPresent()) {
+            if(part instanceof BaArmor) {
+                BaArmor a = (BaArmor)part;
+                if(a.isClanTechBase() == clan 
+                        && a.getType() == type
+                        && !a.isReservedForRefit() && a.isPresent()) {
                     return a.getAmount();
                 }
             }
@@ -479,13 +628,14 @@ public class ProtomekArmor extends Part implements IAcquisitionWork {
     }
     
     public void changeAmountAvailable(int amount) {
-        ProtomekArmor a = null;
+        BaArmor a = null;
         for(Part part : campaign.getSpareParts()) {
-            if(part instanceof ProtomekArmor 
-                    && ((ProtomekArmor)part).isClanTechBase() == clan 
+            if(part instanceof BaArmor 
+                    && ((BaArmor)part).isClanTechBase() == clan 
+                    && ((BaArmor)part).getType() == type
                     && getRefitId() == part.getRefitId()
                     && part.isPresent()) {
-                a = (ProtomekArmor)part;                
+                a = (BaArmor)part;                
                 a.setAmount(a.getAmount() + amount);
                 break;
             }
@@ -493,7 +643,7 @@ public class ProtomekArmor extends Part implements IAcquisitionWork {
         if(null != a && a.getAmount() <= 0) {
             campaign.removePart(a);
         } else if(null == a && amount > 0) {            
-            campaign.addPart(new ProtomekArmor(getUnitTonnage(), amount, -1, isClanTechBase(), campaign), 0);
+            campaign.addPart(new BaArmor(getUnitTonnage(), amount, type, -1, isClanTechBase(), campaign), 0);
         }
         campaign.updateAllArmorForNewSpares();
     }
@@ -553,5 +703,27 @@ public class ProtomekArmor extends Part implements IAcquisitionWork {
             report += " have arrived";
         }
         return report;
+    }
+    
+    public static int getArmorTypeFor(Entity ba) {
+        for(Mounted m : ba.getMisc()) {
+            if(m.getType().getName().equals(BattleArmor.BASIC_STEALTH_ARMOR)) {
+                return T_STEALTH_BASIC;
+            }
+            else if(m.getType().getName().equals(BattleArmor.STANDARD_STEALTH_ARMOR)) {
+                return T_STEALTH;
+            }
+            else if(m.getType().getName().equals(BattleArmor.IMPROVED_STEALTH_ARMOR)) {
+                return T_STEALTH_IMP;
+            }
+            else if(m.getType().getName().equals(BattleArmor.MIMETIC_ARMOR)) {
+                return T_MIMETIC;
+            }
+            else if(m.getType().hasFlag(MiscType.F_FIRE_RESISTANT)) {
+                return T_FIRE_RESIST;
+            }
+        }
+        //TODO: we have no way to retrieve some armor types
+        return T_STANDARD;
     }
 }

@@ -109,7 +109,7 @@ public class ProtomekJumpJet extends Part {
             if(damageJJ == 0) {
                 unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Protomech.SYSTEM_TORSOCRIT, Protomech.LOC_TORSO);
             }
-            else if(damageJJ < (int)Math.ceil(((Protomech)unit.getEntity()).getJumpJets() / 2.0)) {
+            else if(damageJJ < (int)Math.ceil(unit.getEntity().getOriginalJumpMP() / 2.0)) {
                 unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Protomech.SYSTEM_TORSOCRIT, Protomech.LOC_TORSO);
                 unit.damageSystem(CriticalSlot.TYPE_SYSTEM, Protomech.SYSTEM_TORSOCRIT, Protomech.LOC_TORSO, 1);
             } else {
@@ -139,7 +139,7 @@ public class ProtomekJumpJet extends Part {
         if(null != unit) {
             int h = 1;
             int damageJJ = getOtherDamagedJumpJets() + 1;
-            if(damageJJ >= (int)Math.ceil(((Protomech)unit.getEntity()).getJumpJets() / 2.0)) {
+            if(damageJJ >= (int)Math.ceil(unit.getEntity().getOriginalJumpMP() / 2.0)) {
                 h = 2;
             } 
             unit.destroySystem(CriticalSlot.TYPE_SYSTEM, Protomech.SYSTEM_TORSOCRIT, Protomech.LOC_TORSO, h);
@@ -171,7 +171,7 @@ public class ProtomekJumpJet extends Part {
             //only ever damage the first jump jet on the unit
             int damageJJ = 0;
             if(hits == 2) {
-                damageJJ = (int)Math.ceil(((Protomech)unit.getEntity()).getJumpJets() / 2.0);
+                damageJJ = (int)Math.ceil(unit.getEntity().getOriginalJumpMP() / 2.0);
             } else if(hits==1) {
                 damageJJ = 1;
             }
@@ -217,7 +217,7 @@ public class ProtomekJumpJet extends Part {
             if(damageJJ == 0) {
                 unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Protomech.SYSTEM_TORSOCRIT, Protomech.LOC_TORSO);
             }
-            else if(damageJJ < (int)Math.ceil(((Protomech)unit.getEntity()).getJumpJets() / 2.0)) {
+            else if(damageJJ < (int)Math.ceil(unit.getEntity().getOriginalJumpMP() / 2.0)) {
                 unit.repairSystem(CriticalSlot.TYPE_SYSTEM, Protomech.SYSTEM_TORSOCRIT, Protomech.LOC_TORSO);
                 unit.damageSystem(CriticalSlot.TYPE_SYSTEM, Protomech.SYSTEM_TORSOCRIT, Protomech.LOC_TORSO, 1);
             } else {

@@ -63,6 +63,8 @@ v0.3.0 (SVN)
 + Fix for ammo counting on protos
 + adjustments for proto myomer booster and some WoR adjustments (jump jets and quad)
 + ammo fixes for protos
++ Ba Armor part
++ couple of proto fixes
 
 v0.2.0 (2013-03-16)
 + Bug 318: Dragoon's Rating error FMM:R method
