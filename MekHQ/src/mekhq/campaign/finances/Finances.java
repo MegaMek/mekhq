@@ -52,6 +52,7 @@ public class Finances implements Serializable {
 	private ArrayList<Transaction> transactions;
 	private ArrayList<Loan> loans;
 	private int loanDefaults;
+	private int failCollateral;
 	private Date wentIntoDebt;
 
 	
@@ -59,6 +60,7 @@ public class Finances implements Serializable {
 		transactions = new ArrayList<Transaction>();
 	    loans = new ArrayList<Loan>();
 	    loanDefaults = 0;
+	    failCollateral = 0;
 	    wentIntoDebt = null;
 	}
 	
@@ -237,13 +239,20 @@ public class Finances implements Serializable {
         }
 	}
 	
-	public void defaultOnLoan(Loan loan) {
+	public void defaultOnLoan(Loan loan, boolean paidCollateral) {
         loanDefaults++;
+        if(!paidCollateral) {
+            failCollateral++;
+        }
         removeLoan(loan);
     }
 	
 	public int getLoanDefaults() {
 	    return loanDefaults;
+	}
+	
+	public int getFailedCollateral() {
+	    return failCollateral;
 	}
 	
 	public long getTotalLoanCollateral() {
