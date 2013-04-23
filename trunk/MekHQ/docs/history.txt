@@ -1,6 +1,6 @@
 VERSION HISTORY
 ----------------------------------
-v0.3.0 (SVN)
+v0.3.0 (2013-04-23)
 + Bug 341: Conventional Pilots and Hire Full Complement
 + New acquisition procedure (see comments in ShoppingList for details)
 + Bug 342: NPE displaying Dragoon's Rating if unit has no commander
