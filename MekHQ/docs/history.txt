@@ -67,6 +67,7 @@ v0.3.0 (SVN)
 + couple of proto fixes
 + New MegaMek.jar (9246)
 + PayCollateralDialog (WIP)
++ collect parts that should be the same when loading game for backwards compatability
 
 v0.2.0 (2013-03-16)
 + Bug 318: Dragoon's Rating error FMM:R method
