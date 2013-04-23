@@ -332,6 +332,7 @@ public class TaharqaDragoonsRating extends AbstractDragoonsRating {
     public int getFinancialValue() {
         int score = campaign.getFinances().getFullYearsInDebt(campaign.getCalendar()) * -10;
         score -= 25 * campaign.getFinances().getLoanDefaults();
+        score -= 10 * campaign.getFinances().getFailedCollateral();
         return score;
     }
 
@@ -374,8 +375,8 @@ public class TaharqaDragoonsRating extends AbstractDragoonsRating {
 
         sb.append("Financial:                      ").append(getFinancialValue()).append("\n");
         sb.append("    Years in Debt         ").append(campaign.getFinances().getFullYearsInDebt(campaign.getCalendar())).append("\n");
-        sb.append("    Loan Defaults:        ").append(campaign.getFinances().getLoanDefaults()).append("\n\n");
-
+        sb.append("    Loan Defaults:        ").append(campaign.getFinances().getLoanDefaults()).append("\n");
+        sb.append("    No Collateral Payment:").append(campaign.getFinances().getFailedCollateral()).append("\n\n");
 
         return new String(sb);
     }

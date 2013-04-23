@@ -215,6 +215,7 @@ import mekhq.gui.dialog.MissionTypeDialog;
 import mekhq.gui.dialog.NewLoanDialog;
 import mekhq.gui.dialog.NewRecruitDialog;
 import mekhq.gui.dialog.PartsStoreDialog;
+import mekhq.gui.dialog.PayCollateralDialog;
 import mekhq.gui.dialog.PopupValueChoiceDialog;
 import mekhq.gui.dialog.PortraitChoiceDialog;
 import mekhq.gui.dialog.QuirksDialog;
@@ -9630,12 +9631,34 @@ public class CampaignGUI extends JPanel {
                                 null,
                                 "Defaulting on this loan will affect your unit rating the same as a contract breach.\nDo you wish to proceed?",
                                 "Default on " + selectedLoan.getDescription() + "?", JOptionPane.YES_NO_OPTION)) {
-                    getCampaign().getFinances().defaultOnLoan(selectedLoan);
+                    PayCollateralDialog pcd = new PayCollateralDialog(getFrame(), true, getCampaign(), selectedLoan);
+                    pcd.setVisible(true);
+                    if(pcd.wasCancelled()) {
+                        return;
+                    }
+                    getCampaign().getFinances().defaultOnLoan(selectedLoan, pcd.wasPaid());
+                    if(pcd.wasPaid()) {    
+                        for(UUID id : pcd.getUnits()) {
+                            getCampaign().removeUnit(id);
+                        }
+                        for(int[] part : pcd.getParts()) {
+                            Part p = getCampaign().getPart(part[0]);
+                            if(null != p) {
+                                int quantity = part[1];
+                                while(quantity > 0 && p.getQuantity() > 0) {
+                                    p.decrementQuantity();
+                                    quantity--;
+                                }
+                            }
+                        }
+                    }
                     refreshFinancialTransactions();
+                    refreshUnitList();
+                    refreshReport();
+                    refreshPartsList();
                 }
             } else if(command.equalsIgnoreCase("PAY_BALANCE")) {
                 getCampaign().payOffLoan(selectedLoan);
-                //TODO: deal with collateral obligations
                 refreshFinancialTransactions();
                 refreshReport();
             } else if (command.equalsIgnoreCase("REMOVE")) {
@@ -9661,7 +9684,7 @@ public class CampaignGUI extends JPanel {
                     return;
                 }
                 int row = loanTable.getSelectedRow();
-                Loan loan = loanModel.getLoan(partsTable.convertRowIndexToModel(row));
+                Loan loan = loanModel.getLoan(loanTable.convertRowIndexToModel(row));
                 JMenuItem menuItem = null;
                 JMenu menu = null;
                 // **lets fill the pop up menu**//
