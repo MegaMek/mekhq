@@ -760,7 +760,48 @@ public class Campaign implements Serializable {
 		}
 	}
 	
-	private void addPartWithoutId(Part p) {
+	private void addPartWithoutId(Part p) {	 
+	    if(p instanceof MissingPart && null == p.getUnitId()) {
+	        //we shouldn't have spare missing parts. I think their existence is a relic.
+	        return;
+	    }
+	    //go ahead and check for existing parts because some version weren't properly collecting parts
+	    if(!(p instanceof MissingPart)) {
+	        Part spare = checkForExistingSparePart(p);
+            if(null == p.getUnitId() && null != spare) {
+                if(p instanceof Armor) {
+                    if(spare instanceof Armor) {
+                        ((Armor)spare).setAmount(((Armor)spare).getAmount() + ((Armor)p).getAmount());
+                        updateAllArmorForNewSpares();
+                        return;
+                    }
+                }
+                if(p instanceof ProtomekArmor) {
+                    if(spare instanceof ProtomekArmor) {
+                        ((ProtomekArmor)spare).setAmount(((ProtomekArmor)spare).getAmount() + ((ProtomekArmor)p).getAmount());
+                        updateAllArmorForNewSpares();
+                        return;
+                    }
+                }
+                if(p instanceof BaArmor) {
+                    if(spare instanceof BaArmor) {
+                        ((BaArmor)spare).setAmount(((BaArmor)spare).getAmount() + ((BaArmor)p).getAmount());
+                        updateAllArmorForNewSpares();
+                        return;
+                    }
+                }
+                else if(p instanceof AmmoStorage) {             
+                    if(spare instanceof AmmoStorage) {
+                        ((AmmoStorage)spare).changeShots(((AmmoStorage)p).getShots());
+                        return;
+                    }
+                }
+                else {
+                    spare.incrementQuantity();
+                    return;
+                }
+            }
+	    }
 		parts.add(p);
 		partIds.put(p.getId(), p);
 		
@@ -2885,6 +2926,11 @@ public class Campaign implements Serializable {
 			if(p instanceof MekLocation && ((MekLocation)p).getLoc() != Mech.LOC_HEAD) {
 			    ((MekLocation)p).setSensors(false);
 	            ((MekLocation)p).setLifeSupport(false);
+			}
+			
+			if(version.getMinorVersion() < 3 && !p.needsFixing() && !p.isSalvaging()) {
+			    //repaired parts were not getting experience properly reset
+			    p.setSkillMin(SkillType.EXP_GREEN);
 			}
 			
 			
