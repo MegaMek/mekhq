@@ -920,7 +920,7 @@ public abstract class Part implements Serializable, MekHqXmlSerializable, IPartW
     }
     
     public boolean isSpare() {
-    	return null == unit;
+    	return null == unitId;
     }
     
     public boolean isRightTechType(String skillType) {
