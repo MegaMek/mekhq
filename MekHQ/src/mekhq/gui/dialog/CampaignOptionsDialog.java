@@ -1008,7 +1008,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         panFinances.add(clanPriceModifierLabel, gridBagConstraints);
         
-        spnClanPriceModifier = new JSpinner(new SpinnerNumberModel(options.getClanPriceModifier(), 1.0, 5.0, 0.1));
+        spnClanPriceModifier = new JSpinner(new SpinnerNumberModel(options.getClanPriceModifier(), 1.0, null, 0.1));
         ((JSpinner.DefaultEditor)spnClanPriceModifier.getEditor()).getTextField().setEditable(false);
         ((JSpinner.DefaultEditor)spnClanPriceModifier.getEditor()).getTextField().setColumns(3);
         spnClanPriceModifier.setToolTipText(resourceMap.getString("clanPriceModifierJFormattedTextField.toolTipText")); // NOI18N      

@@ -1,8 +1,6 @@
 VERSION HISTORY
 ----------------------------------
-v0.3.1 (SVN)
-
-v0.3.0 (2013-04-23)
+v0.3.0 (SVN)
 + Bug 341: Conventional Pilots and Hire Full Complement
 + New acquisition procedure (see comments in ShoppingList for details)
 + Bug 342: NPE displaying Dragoon's Rating if unit has no commander
@@ -70,6 +68,8 @@ v0.3.0 (2013-04-23)
 + New MegaMek.jar (9246)
 + PayCollateralDialog (WIP)
 + collect parts that should be the same when loading game for backwards compatability
++ Bug: warehouse parts go missing on save and re-load
++ Bug: no cap on clan price modifier max
 
 v0.2.0 (2013-03-16)
 + Bug 318: Dragoon's Rating error FMM:R method
