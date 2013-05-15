@@ -4,7 +4,15 @@
 		<name>A Place</name>
 		<xcood>-125.18</xcood>
 		<ycood>274.88</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2235-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2571-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -17,12 +25,29 @@
 			<date>3067-04-24</date>
 			<faction>LA</faction>
 		</factionChange>
+		<desc>Despite A Place's poor soil that makes agriculture nearly impossible, the planet was settled to take advantage of its abundance of natural resources. For most of its history A Place has relied on its neighbor, Bountiful Harvest for food. Unfortunately, when there are disruptions in shipping, such as during the 1st Succession War, food shortages begin almost immediately. During the 1st Succession War the lack of food resulted in nearly 90% of the planet's million inhabitants starving.</desc>
 	</planet>
 	<planet>
 		<name>Abadan</name>
 		<xcood>-70.94</xcood>
 		<ycood>-96.76</ycood>
-		<faction>FWL</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2168-01-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2246-01-01</date>
+			<faction>MCM</faction>
+		</factionChange>
+		<factionChange>
+			<date>2271-01-01</date>
+			<faction>FWL</faction>
+		</factionChange>
 		<factionChange>
 			<date>3079-01-01</date>
 			<faction>MSC</faction>
@@ -47,7 +72,10 @@
 		<landMass>Kuran Major</landMass>
 		<landMass>Kuran Minor</landMass>
 		<hpg>B</hpg>
-		<desc>Abadan is a quiet world with limited military importance. The planet has a comfortable atmosphere and gravity and a cool-temperate climate. There is enough arable land on Abadan to feed the planet’s population, though there are limited natural resources to support heavy industry. The only military manufacturer on planet is Austen-Armstrong Industries and they produce personal arms.</desc>
+		<desc>Abadan is a quiet world with limited military importance. The planet has a comfortable atmosphere and gravity and a cool-temperate climate. There is enough arable land on Abadan to feed the planet’s population, though there are limited natural resources to support heavy industry. The only military manufacturer on planet is Austen-Armstrong Industries and they produce personal arms located in the city of Karun on the Karun Major continent.
+		
+Manufacturing centers:
+Austen-Armstrong Industries</desc>
 	</planet>
 	<planet>
 		<name>Abagnar</name>
@@ -941,7 +969,7 @@ Alarion is primarily settled by people of German, Romanian and English descent.<
 		<satellite>Sjaeland</satellite>
 		<satellite>Skane</satellite>
 		<landMass>(Christiana)</landMass>
-		<hpg>X</hpg>
+		<hpg>C</hpg>
 		<desc>Alborg has the most comfortable climate of the four JarnFolk planets. Alborg boasts a temperate climate, lush fauna, and fertile arable land. In addition the planet has significant mineral wealth used for what little industry the JarnFolk possess. Alborg is home to nearly half of the entire population of JarnFolk and is controlled by the most powerful families.</desc>
 	</planet>
 	<planet>
@@ -1742,6 +1770,8 @@ Almach is mostly covered in lush national parks and wildlife preserve areas. How
 		<pressure>3</pressure>
 		<gravity>0.82</gravity>
 		<lifeForm>2</lifeForm>
+		<zenithCharge>true</zenithCharge>
+		<nadirCharge>true</nadirCharge>
 		<climate>4</climate>
 		<percentWater>36</percentWater>
 		<temperature>47</temperature>
@@ -2228,6 +2258,21 @@ The capital city, Gaines, located on the southern polar continent of Tanzaria, i
             <date>3030-11-15</date>
             <faction>CC</faction>
         </factionChange>
+        <spectralClass>G</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>4</sysPos>
+		<satellite>Delilah</satellite>
+		<gravity>0.83</gravity>
+		<pressure>2</pressure>
+		<climate>5</climate>
+		<temperature>39</temperature>
+		<percentWater>76</percentWater>
+		<hpg>B</hpg>
+		<lifeForm>7</lifeForm>
+		<socioIndustrial>C-C-C-D-C</socioIndustrial>
+		<landMass>Costello (Tara)</landMass>
+		<desc>Altorra is an unremarkable planet with a thin atmosphere and relatively low gravity. Despite this, the planet’s small population is mostly self sufficient and the planet is home to a Duchy RTC training facility for infantry, vehicle crews and aerospace pilots.</desc>
 	</planet>
 	<planet>
 		<name>Alula Australis</name>
@@ -2966,7 +3011,7 @@ A few Stone Age tribes exist in the planet's deep deserts and jungles, far from 
 		<socioIndustrial>D-D-C-D-C</socioIndustrial>
 		<landMass>Sea of Despair (Port Krin)</landMass>
 		<landMass>Shattered Wastes</landMass>
-		<desc>Antallos was first settled in 2674 by a multinational trading conglomerate and managed by the Terran Hegemony with the Star League’s blessing, Antallos was planned to be a neutral trading hub bringing together the powers of the Inner Sphere and the people of the Periphery. While the Star League existed the plan was a success and Antallos was vastly wealthy. Unfortunately, the collapse of the League saw the planet left to its own and over the centuries raiders, pirates and the Great Houses hit the independent planet reducing it from a jewel in the Periphery to a no mans land, eventually becoming a pirate haven with the dregs of humanity calling the planet home. Antallos is lawless and slavery and other illegal trades are the background of the planets economy. Antallos supports a small ‘mercenary’ hiring all, primarily serviced by pirates and those looking for less than legal jobs.</desc>
+		<desc>Antallos was first settled in 2674 by a multinational trading conglomerate and managed by the Terran Hegemony with the Star League's blessing. Antallos was planned to be a neutral trading hub bringing together the powers of the Inner Sphere and the people of the Periphery. While the Star League existed the plan was a success and Antallos was vastly wealthy. Unfortunately, the collapse of the League saw the planet left to its own and over the centuries raiders, pirates and the Great Houses hit the independent planet reducing it from a jewel in the Periphery to a no man's land, eventually becoming a pirate haven with the dregs of humanity calling the planet home. Antallos is lawless and slavery and other illegal trades are the background of the planets economy. Antallos supports a small "mercenary" hiring hall, primarily serviced by pirates and those looking for less than legal jobs.</desc>
 	</planet>
 	<planet>
 		<name>Antares</name>
@@ -3302,8 +3347,8 @@ Wolf Clan Sites 1-4</desc>
 		<landMass>East Arcadia</landMass>
 		<landMass>West Arcadia</landMass>
 		<landMass>Rechlan</landMass>
-		<satellite>Aesa [Liny]</satellite>
-		<desc>No description available.</desc>
+		<satellite>Aeaea [Liny]</satellite>
+		<desc>Arcadia was the first world scouted and colonised by members of the first SLDF exodus. In the time between the second exodus and the Clan’s return, the population was almost entirely eradicated by war. Environmentally, the planet sports dense vegetation and a well-developed eco-system, high volcanism and tectonic activity, and a virally-tainted atmosphere. Officially Arcadia’s moon is called Aeaea, but is known locally as ‘Liny,’ after the visible lines caused by the clouds in its thin atmosphere.</desc>
 	</planet>
 	<planet>
 		<name>Arcturus</name>
@@ -3389,6 +3434,8 @@ Arcturan Arms Refit Facility</desc>
 		<landMass>Anteros</landMass>
 		<hpg>B</hpg>
 		<desc>Ares is best known as the site of the peace conventions organised by Aleisha Liao which resulted in the Ares Conventions of Warfare. Ares was originally an independent colony before being absorbed by the Capella Commonality and later the Capellan Confederation. Ares is a prosperous small world thanks to its status as a freeport supported by on planet heavy industry that benefits greatly from local exemptions for standard import and export duties.
+		
+Ares is home to a Duchy RTC training facility which trains vehicle crews and unarmored infantry.
 
 Manufacturing Centers:
 Bergan Industries
@@ -3626,13 +3673,29 @@ Though a major exporter of heavy metals and radioactive elements, as well as sma
 		<name>Asgard</name>
 		<xcood>127.79</xcood>
 		<ycood>268.62</ycood>
-		<faction>TA</faction>
+		<faction>UND</faction>
 		<factionChange>
-			<date>2309-01-01</date>
-			<faction>AG</faction>(Alliance of Galedon)
+			<date>2172-08-01</date>
+			<faction>TA</faction>
 		</factionChange>
 		<factionChange>
-			<date>2312-01-01</date>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2310-01-27</date>
+			<faction>AG</faction>
+		</factionChange>
+		<factionChange>
+			<date>2311-09-15</date>
+			<faction>IND,AG</faction>
+		</factionChange>
+		<factionChange>
+			<date>2312-08-01</date>
+			<faction>AG</faction>
+		</factionChange>
+		<factionChange>
+			<date>2319-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 		<factionChange>
@@ -4269,6 +4332,26 @@ The primary industries on Augustine involve extracting raw minerals from the pla
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<spectralClass>K</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>3</sysPos>
+		<satellite>Perth</satellite>
+		<gravity>1.08</gravity>
+		<pressure>3</pressure>
+		<climate>3</climate>
+		<temperature>35</temperature>
+		<percentWater>76</percentWater>
+		<zenithCharge>True</zenithCharge>
+		<hpg>A</hpg>
+		<lifeForm>7</lifeForm>
+		<socioIndustrial>B-B-C-C-B</socioIndustrial>
+		<landMass>Queensland (Woolloomoloo)</landMass>
+		<desc>Australia is relatively uninhabited and most of the planet has been purposefully undeveloped in order to better protect one of the Lyran Commonwealth’s Mint and Reserve Banks. Without the Mint, the planet would have no strategic or tactical importance to the Commonwealth. The Mint is located some where near the planetary capital of Woolloomoloo, however the entrances are highly classified secrets and rumors indicate that anyone that has found an entrance and attempted to gain access has either been captured or killed. The Mint is rumored to be highly fortified, to the extent that it could withstand orbital bombardment.
+
+Despite its small population and lack of development, Australia is home to a major Lyran stock exchange and a significant number of Lyran banks are headquartered on Australia. The planet’s financial importance is the main reason that it is home to one of ComStars rare A class HPGs, as the stock exchange requires constant information to keep the banking industry as up to date as possible. 
+
+Most of the wilds of Queensland, the planet’s largest continent, have remained untouched and are a favorite locale for corporate retreats for the high-level Commonwealth bankers. Airship cruises over the badlands and hunting retreats to the woodlands are common.</desc>
 	</planet>
 	<planet>
 		<name>Autumn Wind</name>
@@ -4902,7 +4985,31 @@ During the Jihad, the World of Blake forces arrived via a pirate point that allo
 		<name>Barlow's Folly</name>
 		<xcood>174.74</xcood>
 		<ycood>67.55</ycood>
-		<faction>DC</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>  
+		<factionChange>
+			<date>2317-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>2796-01-01</date> 
+			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2808-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3025-01-01</date> 
+			<faction>DC</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Barras</name>
@@ -5560,7 +5667,35 @@ Belladonna's sky is dominated by six satellites, which due to the number of sate
 		<name>Benjamin</name>
 		<xcood>125.18</xcood>
 		<ycood>135.88</ycood>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>   
+		<factionChange>
+			<date>2309-06-13</date>
+			<faction>AG</faction>
+		</factionChange>   
+		<factionChange>
+			<date>2311-09-01</date>
+			<faction>IND</faction>
+		</factionChange> 
+		<factionChange>
+			<date>2311-09-15</date>
+			<faction>IND,AG</faction>
+		</factionChange> 
+		<factionChange>
+			<date>2311-10-01</date>
+			<faction>AG</faction>
+		</factionChange> 
+			<factionChange>
+			<date>2319-01-01</date>
 		<faction>DC</faction>
+		</factionChange>
 		<factionChange>
 			<date>3068-12-02</date>
 			<faction>DC,FS</faction>
@@ -5795,10 +5930,20 @@ During the Word of Blake Jihad, Benjamin was right on the edge of the Word of Bl
 		<subtype>2</subtype>
 		<luminosity>I</luminosity>
 		<sysPos>2</sysPos>
-		<zenithCharge>true</zenithCharge>
+		<gravity>0.95</gravity>
+		<pressure>3</pressure>
+		<climate>5</climate>
+		<temperature>35</temperature>
+		<percentWater>43</percentWater>
+		<zenithCharge>True</zenithCharge>
 		<hpg>B</hpg>
 		<lifeForm>4</lifeForm>
-		<desc>Betelgeuse is on the rimward flank of the Capellan Confederation. The Free World League has fought many battles in its attempts to capture it from the Confederation. The planet has a Mech production center and the northern hemisphere houses over 20 factory complexes that produce over 30 percent of all consumer and luxury goods in the entire Confederation. The planet is an important major source of manpower. Betelgeuse is home to the fanatically devoted Warrior House Kamata regiment who are willing to defend their planet to the last warrior.</desc>
+		<socioIndustrial>B-A-B-A-C</socioIndustrial>
+		<landMass>Bulwark (Bidan)</landMass>
+		<landMass>Ecchi</landMass>
+		<desc>Betelgeuse is on the rimward flank of the Capellan Confederation. The Free World League has fought many battles in its attempts to capture it from the Confederation. The planet has a Mech production center and the northern hemisphere houses over 20 factory complexes that produce over 30 percent of all consumer and luxury goods in the entire Confederation. The planet is an important major source of manpower. Betelgeuse is home to the fanatically devoted Warrior House Kamata regiment who are willing to defend their planet to the last warrior.
+		
+Betelgeuse has ample natural resources and a high level of industry, including BattleMechs, combat vehicles and heavy weaponry. The planet is home to Alddis Industries, located in the city of Kingston on the Bulwark continent, and produces combat vehicles. Firmir Weaponry is also located in Kingston and creates laser weaponry for 'Mechs and vehicles. Finally, Hellespont Industrials is also located in Kingston and produces the venerable UrbanMech for the Confederation. During the Word of Blake Jihad, several primitive 'Mech lines were opened as well. The planet is also home to one of the Confederation's many Duchy RTC training facilities, located in the hills of the Ecchi continent, the facilities train infantry, vehicle crews and aerospace pilots.</desc>
 	</planet>
 	<planet>
 		<name>Beten Kaitos</name>
@@ -6047,6 +6192,8 @@ During the Word of Blake Jihad, Benjamin was right on the edge of the Word of Bl
 		<hpg>B</hpg>
 		<desc>Bithinia is one of the largest entertainment planets in the Capellan region, catering exclusively to the richest families in the Confederation and surrounding Inner Sphere states. Bithinia also has extensive iron and steel facilities located in its southern hemisphere. In the early 31st Century an underground Aerospace maintenance facility was constructed by the Capellan Confederation near the south pole.
 
+Bithinia is home to a Duchy RTC training facility which trains vehicle crews and unarmored infantry.
+
 Manufacturing centers:
 Bithinian Ballistics</desc>
 	</planet>
@@ -6196,6 +6343,10 @@ Bithinian Ballistics</desc>
 		<factionChange>
 			<date>2779-01-01</date>
 			<faction>PIND</faction>
+		</factionChange>
+		<factionChange>
+			<date>3012-01-01</date>
+			<faction>OC</faction>
 		</factionChange>
 		<factionChange>
 			<date>3049-08-08</date>
@@ -6649,6 +6800,14 @@ Bermuda Combat Systems</desc>
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
+			<date>3021-01-01</date>
+			<faction>MV</faction>
+		</factionChange>
+		<factionChange>
+			<date>3028-01-01</date>
+			<faction>GV</faction>
+		</factionChange>
+		<factionChange>
 			<date>3049-09-05</date>
 			<faction>CJF</faction>
 		</factionChange>
@@ -6976,7 +7135,7 @@ O-P Computer Electronics</desc>
 		<subtype>2</subtype>
 		<sysPos>3</sysPos>
 		<hpg>C</hpg>
-		<desc>No description available.</desc>
+		<desc>Brisbane is a water-rich world located along the fuzzy border between the Magistracy of Canopus and the Taurian Concordat. As a result the planet has seen more than its share of fighting between the two Periphery realms as they battled for Brisbane's water supply. The planet has remained a gem in the Periphery after the fall of the Star League thanks to its clean water, abundant ocean-life and function water purification plants that dot the planet's southern hemisphere. The planet's limited landmasses are primarily comprised of small island chains many of the battles for the planet have been forced into the oceans.</desc>
 	</planet>
 	<planet>
 		<name>Bristol</name>
@@ -7439,6 +7598,23 @@ During the Jihad, the planetary governor contacted the World of Blake forces and
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<spectralClass>K</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>4</sysPos>
+		<gravity>1.03</gravity>
+		<pressure>3</pressure>
+		<climate>3</climate>
+		<temperature>32</temperature>
+		<percentWater>50</percentWater>
+		<hpg>B</hpg>
+		<lifeForm>7</lifeForm>
+		<socioIndustrial>D-D-C-D-A</socioIndustrial>
+		<desc>Bucklands is breadbasket world that supplies massive amounts of food to neighboring planets. The food supplies make the planet vital to the region, even if Bucklands is regarded as a backwater planet by most Lyrans. The planet is otherwise not noteworthy, with next to no industry beyond food processing and packaging and only modest deposits of common mineral resources.
+
+Nearly 80% of the planet’s population belong to ‘farming clans’, which often wrangle for the best farmlands and during harvests. In order to avoid damaging the crops and fields, the people of Bucklands solve these conflicts, when negotiations fail, with AgroMech duels’ conducted by the farming clans’’ security forces. Unlike many systems that would record and broadcast these sorts of fights, the duels on Bucklands garner little interest, due to the use of non-BattleMechs.
+
+The children of Bucklands tend to view their planet as boring and the majority seek to escape the ‘slow life’ by joining the Lyran Military once they come of age. However, many of the wayward sons and daughters of Bucklands end up returning after a few tours. Bucklands is home to a prominent retired veterans social club for those that became MechWarriors, which has chapters in almost every settlement on planet.</desc>
 	</planet>
 	<planet>
 		<name>Buckminster</name>
@@ -7616,6 +7792,14 @@ Recently, a large island in the eastern basin has been taken over for secret tes
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
+			<date>3012-01-01</date>
+			<faction>OC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3028-01-01</date>
+			<faction>GV</faction>
+		</factionChange>
+		<factionChange>
 			<date>3049-09-12</date>
 			<faction>CW</faction>
 		</factionChange>
@@ -7627,7 +7811,7 @@ Recently, a large island in the eastern basin has been taken over for secret tes
 		<spectralClass>G</spectralClass>
 		<subtype>8</subtype>
 		<sysPos>3</sysPos>
-		<hpg>X</hpg>
+		<hpg>C</hpg>
 		<desc>No description available.</desc>
 	</planet>
 	<planet>
@@ -7739,9 +7923,33 @@ Recently, a large island in the eastern basin has been taken over for secret tes
 		<name>Caldrea</name>
 		<xcood>34.16</xcood>
 		<ycood>195.08</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
 		<factionChange>
-			<date>2900-01-01</date>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>  
+		<factionChange>
+			<date>2400-01-01</date>
+			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2465-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2490-01-01</date>
+			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2550-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2820-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -8257,6 +8465,8 @@ Majestic Metals and Manufacturing</desc>
 
 Capella is the site of the Rashpur-Owens Shipyards, which was the only site capable of creating jumpships in the entire Capellan Confederation for centuries.
 
+Capella is also home to the Capella War College, which trains MechWarriors, Aerospace pilots, DropShip and JumpShip crews, as well as vehicle crews and infantry. Nearby is a Duchy RTC training facility which focuses on unarmored infantry and vehicle crews, the two cross-train regularly so that graduates from the Capella War College have an excellent understanding of combined arms tactics.
+
 Manufacturing Centers:
 Ceres Metals Industries
 Iona Light Shipyards
@@ -8693,7 +8903,27 @@ During the Jihad, Carsphairn was raided several times by Word of Blake forces as
 		<name>Cartago</name>
 		<xcood>141.09</xcood>
 		<ycood>-10.17</ycood>
-		<faction>FS</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>  
+		<factionChange> 
+			<date>2317-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>2787-06-01</date> 
+			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2822-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -8850,7 +9080,19 @@ During the Jihad, Carsphairn was raided several times by Word of Blake forces as
 		<name>Caselton</name>
 		<xcood>117.36</xcood>
 		<ycood>-35.99</ycood>
-		<faction>FS</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange> 
+		<factionChange>
+			<date>2317-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
 		<factionChange>
 			<date>2822-01-01</date>
 			<faction>CC</faction>
@@ -8925,6 +9167,39 @@ These fortifications served Caselton well in the Blakist Holy War, stopping repe
 		<xcood>320.52</xcood>
 		<ycood>80.59</ycood>
 		<faction>FS</faction>
+		 <faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange> 
+		<factionChange>
+			<date>2319-01-01</date>
+			<faction>DC</faction>
+		</factionChange>  
+		<factionChange>
+			<date>2780-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>2796-01-01</date> 
+			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2808-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>2822-01-01</date> 
+			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2864-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -8932,6 +9207,10 @@ These fortifications served Caselton well in the Blakist Holy War, stopping repe
 		<factionChange>
 			<date>3067-01-01</date>
 			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3130-01-01</date>
+			<faction>FS,DC</faction>
 		</factionChange>
 		<spectralClass>M</spectralClass>
 		<subtype>5</subtype>
@@ -9014,8 +9293,8 @@ Agriculture is an important industry on Cassias, though it rarely produces foods
 		<spectralClass>M</spectralClass>
 		<subtype>2</subtype>
 		<sysPos>1</sysPos>
-		<hpg>X</hpg>
-		<desc>No description available.</desc>
+		<hpg>C</hpg>
+		<desc>3025 - Cate's Hold is a border world between the Magistracy and Concordat and was settled as a pleasure world similar to Hardcore and Canopus. Cate's Hold found itself thrust into the role of a major supply and repair center during the Reunification War before returning to a resort world during the early Succession Wars. The discovery of rare radioactive materials in the southern hemisphere and several Star League caches, have made the planet strategically important to the Magistracy and have resulted in several clashes between Taurian and Canopian forces on Cate's Hold.</desc>
 	</planet>
 	<planet>
 		<name>Cavalor</name>
@@ -9144,7 +9423,7 @@ continent of Hellesdon barren desert wastes.</desc>
 		<climate>3</climate>
 		<temperature>29</temperature>
 		<percentWater>78</percentWater>
-		<hpg>X</hpg>
+		<hpg>C</hpg>
 		<lifeForm>2</lifeForm>
 		<socioIndustrial>B-D-C-C-C</socioIndustrial>
 		<landMass>Aquila (Abruzzo)</landMass>
@@ -9911,7 +10190,13 @@ This led to a very hostile environment by the mid 3020s with many residents just
 		<percentWater>50</percentWater>
 		<lifeForm>2</lifeForm>
 		<hpg>A</hpg>
-		<desc>No description available.</desc>
+		<satellite>Aega</satellite>
+		<satellite>Telegonus</satellite>
+		<landMass>Circe</landMass>
+		<landMass>Fianna</landMass>
+		<landMass>L’Isle des Aigles</landMass>
+		<nadirCharge>true</nadirCharge>
+		<desc>Circe’s orbit follows a 700 year cycle that takes it from one extreme in the system’s life zone (the zone in which liquid water can exist) to the other. In the 29th century the planet was a desert wasteland, whereas by the 32nd century it is expected to be covered by glaciers and sheet ice. Early settlers found that while the air was free of serious contaminants, the soil contained a variety of toxins.</desc>
 	</planet>
 	<planet>
 		<name>Circinus</name>
@@ -10069,7 +10354,27 @@ This led to a very hostile environment by the mid 3020s with many residents just
 		<name>Clovis</name>
 		<xcood>181.78</xcood>
 		<ycood>3.13</ycood>
-		<faction>FS</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>  
+		<factionChange>
+			<date>2317-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>2796-01-01</date> 
+			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2818-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -10083,9 +10388,9 @@ This led to a very hostile environment by the mid 3020s with many residents just
 		<name>Cogdell</name>
 		<xcood>526.56</xcood>
 		<ycood>-142.66</ycood>
-		<faction>PIND</faction>
+		<faction>UND</faction>
 		<factionChange>
-			<date>2860-01-01</date>
+			<date>2865-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -10588,6 +10893,25 @@ Corriolas, Cor Caroli's capital and largest city, is located on the northwestern
 			<date>3057-10-01</date>
 			<faction>CC</faction>
 		</factionChange>
+		<spectralClass>M</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>3</sysPos>
+		<satellite>Ceti</satellite>
+		<gravity>1.00</gravity>
+		<pressure>3</pressure>
+		<climate>5</climate>
+		<temperature>36</temperature>
+		<percentWater>86</percentWater>
+		<zenithCharge>True</zenithCharge>
+		<hpg>B</hpg>
+		<lifeForm>6</lifeForm>
+		<socioIndustrial>B-B-B-B-C</socioIndustrial>
+		<landMass>Vallhala (Valasha)</landMass>
+		<desc>Corey is a relatively comfortable planet for human habitation, with abundant natural resources and the tropical climate allows for sufficient agricultural concerns to feed its population. The abundant resources on Corey attracted heavy industry, including a Hollis Incorporated BattleMech factory located in the capital city of Valasha.
+
+Manufacturing centers:
+Hollis Incorporated</desc>
 	</planet>
 	<planet>
 		<name>Coriscana</name>
@@ -10796,11 +11120,11 @@ Today, Corridan‘s greatest exports, after water purifiers, are agricultural an
 		<landMass>Veracruz (Port St. William)</landMass>
 		<satellite>Wellston</satellite>
 		<socioIndustrial>A-A-A-A-A</socioIndustrial>
-		<desc>The planet Coventry lies on the anti-spinward side of the core of Lyran space.  The planet itself enjoys mild seasons and large seas, teeming with life, and fertile soil, making it well suited for large-scale agriculture. 
+		<desc>The planet Coventry lies on the anti-spinward side of the core of Lyran space. The planet itself enjoys mild seasons and large seas, teeming with life, and fertile soil, making it well suited for large-scale agriculture.
 
- Even before the formation of the Lyran Commonwealth, the world sported a massive economy based on the exotic foodstuffs and raw materials.  After the formation of the Commonwealth, Coventry continued as a major trade center and became home to one of the Inner Sphere’s largest BattleMech manufacturers, Coventry Metal Works. 
+ Even before the formation of the Lyran Commonwealth, the world sported a massive economy based on the exotic foodstuffs and raw materials. After the formation of the Commonwealth, Coventry continued as a major trade center and became home to one of the Inner Sphere's largest BattleMech manufacturers, Coventry Metal Works. 
 
-Coventry’s mineral, agricultural, and military economy is supplemented by a thriving tourist trade, due to its many beautiful semi-tropical islands. Coventry is also home to the Coventry Military Academy, a small but very prestigious training facility for Lyran Mechwarriors.
+Coventry's mineral, agricultural, and military economy is supplemented by a thriving tourist trade, due to its many beautiful semi-tropical islands. Coventry is also home to the Coventry Military Academy, a small but very prestigious training facility for Lyran MechWarriors.
 
 Manufacturing centers:
 Coventry Metal Works
@@ -10838,6 +11162,10 @@ Coventry Metal Works, Refit Facility</desc>
 		<factionChange>
 			<date>2779-01-01</date>
 			<faction>PIND</faction>
+		</factionChange>
+		<factionChange>
+			<date>3012-01-01</date>
+			<faction>OC</faction>
 		</factionChange>
 		<factionChange>
 			<date>3049-09-03</date>
@@ -10958,6 +11286,32 @@ The continents of Chromatisch and Metallerz have been extensively surveyed and m
 			<date>3067-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>4</sysPos>
+		<satellite>Journeyman</satellite>
+		<satellite>Scope</satellite>
+		<satellite>Trinket</satellite>
+		<satellite>Wayfarer</satellite>
+		<gravity>0.99</gravity>
+		<pressure>3</pressure>
+		<climate>4</climate>
+		<temperature>37</temperature>
+		<percentWater>78</percentWater>
+		<zenithCharge>True</zenithCharge>
+		<hpg>B</hpg>
+		<lifeForm>8</lifeForm>
+		<socioIndustrial>C-C-D-C-B</socioIndustrial>
+		<landMass>Charon</landMass>
+		<landMass>Ganse (Averrant City)</landMass>
+		<desc>3028 - Crossing is a vital defensive planet along the Federated Suns and Draconis Combine border and the planet’s name has proven to be exceptionally fitting since it has been used for centuries as a waystation for troops and supplies moving through the Draconis March. The planet saw so much use as a logistical lynchpin that almost the entire southern continent of Charon was reserved as a military reservation for supplies and rest and recreation facilities for the AFFS.
+
+The other primary continent, Ganse, is in the western hemisphere and is home to Averrant City, the planetary capital and home to the planet’s largest non-military spaceport. The Shores are a major tourist attraction for civilians throughout the Draconis March due to the sea’s exceptionally clear waters and are located a short fourteen kilometers south of Averrant City.
+
+Two of the planets four moons house military bases used to defend the planet and as testing grounds. The base on Wayfarer is the third-largest aerospace proving ground in the Draconis March and the moon’s firing ranges are used to test new munitions and seeker heads for quality. The moon Trinket is the primary hostile environment warfare center for the Draconis March Militia and can house up to two infantry regiments for training. However, Trinket is uncomfortable for long-term habitation and as a result there are daily shuttle flights to rotate troops on a regular basis between Trinket and Crossing.
+
+A large portion of the population on Crossing is made up of retired AFFS veterans and their families, with the cities of Crassus and New Rhodes made up almost entirely of retired personnel.</desc>
 	</planet>
 	<planet>
 		<name>Cruz Alta</name>
@@ -11282,6 +11636,13 @@ After suffering at the hands of the Combine for decades, the people of Csesztreg
 		<percentWater>60</percentWater>
 		<lifeForm>7</lifeForm>
 		<landMass>Riva</landMass>
+		<landMass>Garda</landMass>
+        <landMass>Dratha</landMass>
+        <landMass>Salò </landMass>
+        <landMass>San Biagio</landMass>
+        <landMass>Tenno</landMass>
+        <satellite>Aine</satellite>
+        <satellite>Mebd</satellite>
 		<hpg>A</hpg>
 		<desc>Dagda was the first of the Pentagon Worlds settled by the Star League in Exile. The planet is rich in minerals and was the primary source of many raw materials for the Star League in Exile.
 		
@@ -11696,6 +12057,21 @@ During the First Succession War, the Draconis Combine used over a dozen 100-mega
 		<xcood>54.77</xcood>
 		<ycood>-339.04</ycood>
 		<faction>CC</faction>
+		<spectralClass>G</spectralClass>
+        <subtype>5</subtype>
+        <luminosity>V</luminosity>
+        <sysPos>4</sysPos>
+        <gravity>0.95</gravity>
+        <pressure>3</pressure>
+        <climate>5</climate>
+        <temperature>36</temperature>
+        <percentWater>80</percentWater>
+        <nadirCharge>true</nadirCharge>
+        <hpg>B</hpg>
+        <lifeForm>5</lifeForm>
+        <landMass>Decatur (Macon)</landMass>  
+        <socioIndustrial>C-C-C-C-B</socioIndustrial>
+        <desc>Decatur is a tropical planet with fertile soil and abundant surface water, though it is otherwise fairly average. Agriculture makes up the primary industry on the planet's only continent Decatur. Most of the modest industry is centered in the planetary capital of Macon. Decatur is home to one of the Confederation's many Duchy RTC training facilities. The facilities are located on the flatlands of Decatur and train recruits as either combat vehicle crews or unarmored infantry.</desc>
 	</planet>
 	<planet>
 		<name>Decus</name>
@@ -11776,6 +12152,22 @@ During the First Succession War, the Draconis Combine used over a dozen 100-mega
 			<date>3069-09-02</date>
 			<faction>CJF</faction>
 		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>6</sysPos>
+		<satellite>Honor</satellite>
+		<gravity>1.00</gravity>
+		<pressure>3</pressure>
+		<climate>4</climate>
+		<temperature>24</temperature>
+		<percentWater>79</percentWater>
+		<hpg>B</hpg>
+		<lifeForm>5</lifeForm>
+		<socioIndustrial>C-C-B-B-C</socioIndustrial>
+		<desc>Deia is a harsh planet deep in the Lyran interior, which protected it from the worst of the Succession Wars. Many of the original settlers died from the planet’s harsh conditions, with most of the survivors being Deists, allowing them to shape the planet over the following centuries. The population of Deia managed to eek out enough agriculture to feed the planet’s small population and mining of Deia’s abundant natural resources is the primary industry.
+
+After the Clan Invasion, Deia found itself along the front of a new dangerous border and as a result saw a sudden influx of regular and mercenary forces to garrison the previously quiet backwater. Deia was one of a handful of planets targeted by the Red Corsair in the early 3050s.</desc>
 	</planet>
 	<planet>
 		<name>Deifenbaker</name>
@@ -11830,12 +12222,34 @@ During the First Succession War, the Draconis Combine used over a dozen 100-mega
 			<date>2790-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
+		<percentWater>95</percentWater>
+		<nadirCharge>true</nadirCharge>
 	</planet>
 	<planet>
 		<name>Delavan</name>
 		<xcood>272.28</xcood>
 		<ycood>-95.97</ycood>
-		<faction>FS</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2317-08-01</date>
+			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>2796-08-01</date>
+			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2798-08-01</date>
+			<faction>FS</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -12235,13 +12649,25 @@ The continent of Baten is home to the capital of Cetus and is located in the nor
 		<name>Denebola</name>
 		<xcood>-38.04</xcood>
 		<ycood>-1.83</ycood>
-		<faction>TA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2117-01-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2236-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2236-03-01</date>
+			<faction>IND,TA</faction>
+		</factionChange>
 		<factionChange>
 			<date>2242-01-01</date>
 			<faction>IND</faction>
 		</factionChange>
 		<factionChange>
-			<date>2596-01-01</date>
+			<date>2315-07-22</date>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
@@ -12618,13 +13044,25 @@ Bowie Industries</desc>
 		<name>Dieron</name>
 		<xcood>13.04</xcood>
 		<ycood>15.39</ycood>
-		<faction>TA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
 		<factionChange>
 			<date>2242-01-01</date>
 			<faction>IND</faction>
-		</factionChange>
+		</factionChange>   
 		<factionChange>
-			<date>2316-01-01</date>
+			<date>2309-05-21</date>
+			<faction>AG</faction>
+		</factionChange>   
+		<factionChange>
+			<date>2319-01-01</date>
+			<faction>DC</faction>
+		</factionChange> 
+		<factionChange>
+			<date>2341-01-01</date>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
@@ -12750,7 +13188,7 @@ The Free Worlds League finally established full control of the planet in the mid
 		<climate>4</climate>
 		<temperature>40</temperature>
 		<percentWater>60</percentWater>
-		<hpg>X</hpg>
+		<hpg>C</hpg>
 		<lifeForm>7</lifeForm>
 		<socioIndustrial>B-C-C-C-C</socioIndustrial>
 		<landMass>Netherland</landMass>
@@ -12855,7 +13293,23 @@ Protectorate Arms Conglomerate</desc>
 		<name>Dnepropetrovsk</name>
 		<xcood>302.01</xcood>
 		<ycood>170.3</ycood>
-		<faction>DC</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>   
+		<factionChange>
+			<date>2302-03-21</date>
+			<faction>AG</faction>
+		</factionChange>   
+		<factionChange>
+			<date>2319-01-01</date>
+			<faction>DC</faction>
+		</factionChange> 
 	</planet>
 	<planet>
 		<name>Dobson</name>
@@ -12971,7 +13425,27 @@ Donegal is the home to many major trading companies, the Supreme Court of the Co
 		<name>Doneval II</name>
 		<xcood>200.56</xcood>
 		<ycood>8.87</ycood>
-		<faction>FS</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>  
+		<factionChange>
+			<date>2317-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>2796-01-01</date> 
+			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2818-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -13041,6 +13515,10 @@ Donegal is the home to many major trading companies, the Supreme Court of the Co
 		<factionChange>
 			<date>2779-01-01</date>
 			<faction>PIND</faction>
+		</factionChange>
+		<factionChange>
+			<date>3012-01-01</date>
+			<faction>OC</faction>
 		</factionChange>
 		<factionChange>
 			<date>3049-08-18</date>
@@ -13148,7 +13626,9 @@ Franchelco, the planetary capital city on the northern continent of Vijave, but 
         <gravity>0.96</gravity>
         <pressure>3</pressure>
         <percentWater>71</percentWater>
-        <desc>Drozan is a warm, temperate planet well suited to a nearly infinite variety of agricultural production. Drozan provides five percent of the Confederation's annual food requirements through large, continuously operating, automated cultivation and processing plants. A well-developed aquafarming industry complements the terrestrial technology. A growing food synthesis industry is supported by research facilities in Drozan's northern hemisphere. At least one Warrior House battalion is stationed on the planet at all times and rotated on a monthly basis to give the impression of larger troop strength. A variety of motorised and jump-trained militia are also based on Drozan, with mechanized equipment reserves in place at all times. </desc>
+        <landMass>Broad</landMass>  
+        <landMass>Walton (Rid)</landMass>
+        <desc>Drozan is a warm, temperate planet well suited to a nearly infinite variety of agricultural production. Drozan provides five percent of the Confederation's annual food requirements through large, continuously operating, automated cultivation and processing plants. A well-developed aquafarming industry complements the terrestrial technology. A growing food synthesis industry is supported by research facilities in Drozan's northern hemisphere. At least one Warrior House battalion is stationed on the planet at all times and rotated on a monthly basis to give the impression of larger troop strength. A variety of motorised and jump-trained militia are also based on Drozan, with mechanized equipment reserves in place at all times. Drozan is home to a Duchy RTC which focuses on training vehicle crews and unarmored infantry.</desc>
 	</planet>
 	<planet>
 		<name>Drusibacken</name>
@@ -13464,7 +13944,11 @@ The capital city of Dyev, Novaya Mensk, is located in the northern hemisphere, o
 		<name>Echo</name>
 		<xcood>290.01</xcood>
 		<ycood>372.94</ycood>
-		<faction>DC</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2600-01-01</date>
+			<faction>DC</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Edasich</name>
@@ -13544,7 +14028,12 @@ Edasich Motors</desc>
 		<percentWater>40</percentWater>
 		<lifeForm>7</lifeForm>
 		<hpg>A</hpg>
-		<desc>No description available.</desc>
+		<landMass>Irkutsk</landMass>
+        <landMass>Noruff (Novy Moscva)</landMass>
+        <landMass>Yakut</landMass>
+        <satellite>Adam</satellite>
+        <satellite>Eve</satellite>
+		<desc>Eden is home to Novy Moscva, which was the capital city of the Star League in Exile. Most of the settlements on Eden are contained within 20’ of the equator, known as the ‘life band,’ where most of the world’s precipitation falls. The life band is rich with native flora and fauna, but many terrestrial species also thrive here – some more so than on Terra. Unfortunately the same cannot be said for humans, as the atmosphere contains a viral taint, which cause the ‘brain fever’ that killed many of the early SLDF setters – including General Aleksandr Kerensky’s wife.</desc>
 	</planet>
 	<planet>
 		<name>Edmondson</name>
@@ -13575,6 +14064,21 @@ Edasich Motors</desc>
 		<xcood>68.59</xcood>
 		<ycood>-373.47</ycood>
 		<faction>CC</faction>
+		<spectralClass>G</spectralClass>
+        <subtype>3</subtype>
+        <luminosity>V</luminosity>
+        <sysPos>5</sysPos>
+        <gravity>1.00</gravity>
+        <pressure>4</pressure>
+        <climate>3</climate>
+        <temperature>35</temperature>
+        <percentWater>41</percentWater>
+        <hpg>B</hpg>
+        <lifeForm>6</lifeForm>
+        <landMass>Bowie (Smith)</landMass>  
+        <landMass>Hilt</landMass>  
+        <socioIndustrial>C-C-C-D-D</socioIndustrial>
+        <desc>Egress has a relatively comfortable temperate-tropical climate, however the higher than standard pressure can make it somewhat unpleasant for visitors and is responsible for the planet's high humidity. Additionally, the planet's ecosystem is most incompatible with terran species making it difficult for agriculture on Egress to support its population without imports. Egress is home to a Duchy RTC, which focuses on training vehicle crews and unarmored infantry.</desc>
 	</planet>
 	<planet>
 		<name>Eguilles</name>
@@ -13850,6 +14354,10 @@ Elgin’s manufacturing capacity was dramatically reduced over the course of the
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
+			<date>3025-01-01</date>
+			<faction>EF</faction>
+		</factionChange>
+		<factionChange>
 			<date>3049-09-03</date>
 			<faction>CW</faction>
 		</factionChange>
@@ -13857,6 +14365,22 @@ Elgin’s manufacturing capacity was dramatically reduced over the course of the
 			<date>3071-01-25</date>
 			<faction>CHH</faction>
 		</factionChange>
+		<spectralClass>F</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>9</sysPos>
+		<satellite>Miranda</satellite>
+		<gravity>0.99</gravity>
+		<pressure>3</pressure>
+		<climate>4</climate>
+		<temperature>19</temperature>
+		<percentWater>49</percentWater>
+		<hpg>C</hpg>
+		<lifeForm>2</lifeForm>
+		<socioIndustrial>D-D-C-D-B</socioIndustrial>
+		<desc>3055: Elissa was a primary holding of the Elysian Fields, a fief of the Oberon Confederation controlled by the Inheritors. Publicly the planet was reported as a backwater world that was being left largely undeveloped as a ‘nature preserve’ and the Elysian Fields agreed to provide the bandit Kingdom water in exchange for protection. However, the reality was that Elissa and the Elyssian Fields suffered under the regime. Elissa was heavily mined by the Confederation and the planet’s inhabitants were forced into poverty on the whims of the various pirates serving under Hendrik Grimm. The planet’s capture by the Clans in 3049, was actually a relief for much of the population.
+
+The planet was the site of the final battle between the Kell Hounds, the Thirty-First Wolf Solahma and the ‘Red Corsair’ in 3055.</desc>
 	</planet>
 	<planet>
 		<name>Ellengurg</name>
@@ -14110,6 +14634,25 @@ The capital city of Eltanin, Dry Springs, is the administrative and trading cent
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<spectralClass>M</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>6</sysPos>
+		<satellite>Garlyn</satellite>
+		<gravity>0.95</gravity>
+		<pressure>3</pressure>
+		<climate>2</climate>
+		<temperature>23</temperature>
+		<percentWater>70</percentWater>
+		<nadirCharge>True</nadirCharge>
+		<hpg>B</hpg>
+		<lifeForm>7</lifeForm>
+		<socioIndustrial>C-D-D-D-C</socioIndustrial>
+		<desc>Engadine was originally settled by the Rim Worlds Republic as an exile colony for political dissidents and non-violent criminals that Republic’s government did not want mixing with the rest of the nation’s populace. Engadine is a cool planet and large portions of it spend all year covered in ice, with near-constant light snowfall. The harsh temperatures hardened the original exiles/colonists into rough survivalists. The planet only became slightly more settled several decades later, after a routine inspection by a Rim Worlds Republic official decided the planet was a paradise and built a large personal compound, which later expanded into a popular resort.
+
+The fighting on Engadine was short-lived during Operation: MAILED FIST, because the oppressed population were more than willing to feed information to the Lyrans about the locations and movements of the Rim Worlds forces that attempted to conduct hit and fade tactics that were successful on most planets. Unfortunately, after the Reunification War ended, the planet returned to Republic hands and many of the families responsible for assisting the Lyrans were persecuted.
+
+After the fall of Amaris, Engadine was one of the first non-industrial worlds captured by the Lyrans and their work to improve the planet’s poor infrastructure, including asking ComStar to build an HPG on the planet, helped win over the long oppressed populace.</desc>
 	</planet>
 	<planet>
 		<name>Enif</name>
@@ -14297,6 +14840,10 @@ The capital city of Eltanin, Dry Springs, is the administrative and trading cent
 		</factionChange>
 		<factionChange>
 			<date>3021-01-01</date>
+			<faction>MV</faction>
+		</factionChange>
+		<factionChange>
+			<date>3028-01-01</date>
 			<faction>GV</faction>
 		</factionChange>
 		<factionChange>
@@ -14509,6 +15056,22 @@ The capital city of Eltanin, Dry Springs, is the administrative and trading cent
 			<date>3067-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
+		<spectralClass>K</spectralClass>
+		<subtype>3</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>2</sysPos>
+		<gravity>0.85</gravity>
+		<pressure>3</pressure>
+		<temperature>34</temperature>
+		<percentWater>53</percentWater>
+		<hpg>B</hpg>
+		<lifeForm>3</lifeForm>
+		<satellite>Autolycus</satellite>
+		<satellite>Theon</satellite>
+		<landMass>Proclus</landMass>
+		<landMass>Pappus</landMass>
+		<socioIndustrial>C-C-A-C-D</socioIndustrial>
+		<desc>Although discovered in the 22nd century, Euclid was not settled until 2632 because the native ecology produces toxic by-products which taint the air and water against terrestrial life. Technologies more readily available under the Star League made settlement viable, and biochemical industry boomed, taking advantage of the local ecosystem. Although fighting did not reach the planet during the first succession war,  it caused a decline in availability of the technologies that allowed Euclid to be settled. As the infrastucture broke down over time, the portion of population which could not afford to emmigrate was exposed to biochemical agents resulting in asthma-like symptoms, unusual diseases, birth defects, and sometimes fatal allergic reactions. Through innoculations, sealed living environments, and shear effort, a fraction of the population managed to survive until the third succession wars, when the ruling nobility (Count Fesser) controlled, and occasionally denied production and distribution of the innoculations required to keep the peasant population in relative health. Quality (and quantity) of life on Euclid greatly improved when Prince Hanse Davion 'bought out' Fesser, and installed John Zibler in his place. With the introduction of affordable eduction programs, and later new filtration and biotechnological breakthroughs from Helm Memory Core, the population of Euclid is once again beginning to grow. </desc>
 	</planet>
 	<planet>
 		<name>Euschelus</name>
@@ -14632,16 +15195,31 @@ Eutin has two moons, Eutin Minor and Eutin Prime. Despite being only marginally 
 		<name>Exedor</name>
 		<xcood>-13.3</xcood>
 		<ycood>-209.68</ycood>
-		<faction>CC</faction>
-		<lifeForm>7</lifeForm>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2850-01-01</date>
+			<faction>CC</faction>
+		</factionChange>
 		<spectralClass>F</spectralClass>
 		<subtype>2</subtype>
 		<luminosity>V</luminosity>
 		<sysPos>4</sysPos>
+		<gravity>1.15</gravity>
+		<pressure>4</pressure>
+		<climate>5</climate>
+		<temperature>30</temperature>
+		<percentWater>53</percentWater>
 		<hpg>B</hpg>
+		<lifeForm>7</lifeForm>
+		<socioIndustrial>B-C-C-C-D</socioIndustrial>
+		<landMass>Tardess (Sanctuary)</landMass>
 		<desc>Exedor was settled in the mid-29th century and was used to house secret personal treasures of House Liao in underground facilities, with veteran defenders. 
 
-As of 3025 Exedor had a tiny population, consisting primarily of refugees from the Third Succession War. The planet subsided on businesses servicing the planet’s garrison forces. Rumours indicate that the population includes a disproportionate number of intelligence agents suggesting that Exedor may also double as a data analysis and covert operation planning centre. There are also unsubstantiated rumours of a secret underground population engaged in the manufacture of nuclear weapons.</desc>
+As of 3025 Exedor had a tiny population, consisting primarily of refugees from the Third Succession War. The planet subsided on businesses servicing the planet’s garrison forces. Rumours indicate that the population includes a disproportionate number of intelligence agents suggesting that Exedor may also double as a data analysis and covert operation planning centre. There are also unsubstantiated rumours of a secret underground population engaged in the manufacture of nuclear weapons.
+
+3085: During the 4th Succession War and the Word of Blake Jihad, the population of Exedor surged with refugees hoping the limited military importance of Exedor would keep them safe. Unfortunately with the population living underground and limited industry, the planet's living conditions quickly deteriorated due to overcrowding and unrest. In response the government of Exedor authorized a massive expansion of the underground tunnel system, which put people to work and began to relieve the overcrowding.
+
+Exedor is home to one of the many Duchy RTC training facilities throughout the Capellan Confederation that train infantry and conventional armor crews.</desc>
 	</planet>
 	<planet>
 		<name>Exeter</name>
@@ -14933,8 +15511,12 @@ Olympus Construction Vehicles</desc>
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
+			<date>3012-01-01</date>
+			<faction>OC</faction>
+		</factionChange>
+		<factionChange>
 			<date>3049-08-01</date>
-			<faction>CW,PIND</faction>
+			<faction>CW,OC</faction>
 		</factionChange>
 		<factionChange>
 			<date>3049-08-07</date>
@@ -15587,7 +16169,27 @@ During the Capellan-Republic war, Foot Fall was the center of some of the fierce
 		<name>Franklin</name>
 		<xcood>252.98</xcood>
 		<ycood>10.95</ycood>
-		<faction>FS</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>  
+		<factionChange>
+			<date>2317-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>2787-06-01</date> 
+			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2900-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -15619,7 +16221,35 @@ During the Capellan-Republic war, Foot Fall was the center of some of the fierce
 		<name>Freedom</name>
 		<xcood>-64.94</xcood>
 		<ycood>108.75</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2235-03-27</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2236-06-15</date>
+			<faction>IND,TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2236-08-25</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2237-12-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2299-01-01</date>
+			<faction>FoS</faction>
+		</factionChange>
+		<factionChange>
+			<date>2341-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -15962,13 +16592,21 @@ Universal Air</desc>
 		<ycood>175.26</ycood>
 		<faction>UND</faction>
 		<factionChange>
-			<date>2282-01-01</date>
-			<faction>IND</faction>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
 		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>   
+		<factionChange>
+			<date>2302-01-01</date>
+			<faction>AG</faction>
+		</factionChange>   
 		<factionChange>
 			<date>2319-01-01</date>
 			<faction>DC</faction>
-		</factionChange>
+		</factionChange> 
 		<factionChange>
 			<date>3068-11-18</date>
 			<faction>DC,FS</faction>
@@ -16093,9 +16731,29 @@ When Gallery was originally settled there were no native lifeforms so the origin
 		<name>Galtor III</name>
 		<xcood>195.86</xcood>
 		<ycood>73.81</ycood>
-		<faction>DC</faction>
+		<faction>UND</faction>
 		<factionChange>
-			<date>2793-12-31</date>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2317-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>2787-05-01</date>
+			<faction>FS,DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2792-01-01</date>
+			<faction>FS,DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3022-06-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -16366,6 +17024,24 @@ When Gallery was originally settled there were no native lifeforms so the origin
 		<xcood>58.16</xcood>
 		<ycood>-200.82</ycood>
 		<faction>CC</faction>
+		<spectralClass>F</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>II</luminosity>
+		<sysPos>3</sysPos>
+		<satellite>Yè xīng</satellite>
+		<gravity>0.95</gravity>
+		<pressure>3</pressure>
+		<climate>5</climate>
+		<temperature>43</temperature>
+		<percentWater>72</percentWater>
+		<hpg>B</hpg>
+		<lifeForm>7</lifeForm>
+		<socioIndustrial>B-C-C-C-C</socioIndustrial>
+		<landMass>Tiāntáng</landMass>
+		<landMass>Zìyóu (Yushui)</landMass>
+		<desc>Gei-Fu’s greatest contribution to the Capellan Confederation is its high military enrollment. In fact, the planet regularly boasts the highest percentage of population signing up, of any planet in the entire nation. Otherwise, Gei-Fu is unremarkable, it supports enough agriculture to feed its population with limited reliance on imported food and the planet has moderate deposits of natural resources and limited industry. The planet is relatively comfortable for human habitation, aside from the high humidity and heat.
+
+Gei-Fu is home to one of the many Duchy RTC training facilities throughout the Capellan Confederation that train infantry and conventional armor crews. Due to the high recruitment levels on Gei-Fu the Duchy RTC training facilities on planet also provide training for MechWarriors and Aerospace pilots.</desc>
 	</planet>
 	<planet>
 		<name>Geifer</name>
@@ -16806,7 +17482,12 @@ The capital city, Dunkeld, a sprawling metropolis as big as any capital on a maj
 		<sysPos>3</sysPos>
 		<socioIndustrial>C-C-D-C-B</socioIndustrial>
 		<hpg>B</hpg>
-		<desc>No description available.</desc>
+		<landMass>Hades (Tronka)</landMass>
+		<desc>3028 - Glenmora is a water-rich world covered in oceans. The only continent sized landmass is Hades, which is famous for its vast volcanic fields. Unfortunately the regular eruptions from the many volcanoes that created the continent cause ash to create thick clouds that often block out the sun nearly year round. Despite this, seventy percent of the planet’s population live on Hades and endure the ever present overcast skies. The remaining thirty percent of the planet’s population reside on the multitude of large islands that dot Glemora’s oceans.
+
+Tronka is the largest city on Glenmora as well as the planetary capital. The planet’s chemical factories produce most of the exports, though the seabeds around the large islands of Davison and Carson have small deposits of extremely rare minerals that make up for the limited natural resources of Glenmora by being in such high demand.
+
+Glenmora’s location on the Federated Suns and Draconis Combine border has made the planet a target for multiple raids and several invasions throughout the centuries. As a result the planet has always maintained a large militia, which supports the standard infantry and mechanized infantry regiments with several heavy tank regiments.</desc>
 	</planet>
 	<planet>
 		<name>Glentworth</name>
@@ -17063,6 +17744,14 @@ The capital city, Dunkeld, a sprawling metropolis as big as any capital on a maj
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
+			<date>3021-01-01</date>
+			<faction>MV</faction>
+		</factionChange>
+		<factionChange>
+			<date>3028-01-01</date>
+			<faction>GV</faction>
+		</factionChange>
+		<factionChange>
 			<date>3049-09-27</date>
 			<faction>CJF</faction>
 		</factionChange>
@@ -17186,13 +17875,21 @@ The capital city, Dunkeld, a sprawling metropolis as big as any capital on a maj
 		<name>Gram</name>
 		<xcood>54.77</xcood>
 		<ycood>145.79</ycood>
-		<faction>TA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
 		<factionChange>
 			<date>2315-01-01</date>
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2790-01-01</date>
+			<date>2785-11-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -17224,10 +17921,13 @@ The capital city, Dunkeld, a sprawling metropolis as big as any capital on a maj
 		<satellite>Hightower</satellite>
 		<satellite>Capetown</satellite>
 		<socioIndustrial>A-A-C-A-C</socioIndustrial>
+		<landMass>Behemoth (Hudson)</landMass>
 		<desc>Grand Base is the personal holding of the Duke of Thomas in perpetuity. It is a major military staging, training and repair facility for the Confederation. Grand Base has traditionally been one of the Confederation's largest ‘Mech production facilities, right behind Tikonov. At all times it is garrisoned by two Sian Commonality reserve units, one Warrior House regiment, and supported by local militia, aerospace fighter and naval support units. Additionally, it is home-base of the elite Death Commandos.
 		
-		Military Industries:
-		Earthwerks Limited - 'Mech production</desc>
+Grand Base is home to a large Earthwekrs LTD. facility which produces numerous lines of BattleMechs, some armored vehicles and has a major repair and refit facility. The factories and refit facilities are located in the hills of Behemoth, far removed from the planet's population centers.
+		
+Military Industries:
+Earthwerks Limited</desc>
 	</planet>
 	<planet>
 		<name>Granera</name>
@@ -17727,6 +18427,10 @@ In the 31st century Greeley gained some importance as the Federated Suns establi
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
+			<date>3012-01-01</date>
+			<faction>OC</faction>
+		</factionChange>
+		<factionChange>
 			<date>3049-09-06</date>
 			<faction>CW</faction>
 		</factionChange>
@@ -18177,7 +18881,7 @@ During their Holy War, the Blakists found ready converts among the technological
 		<sysPos>7</sysPos>
 		<socioIndustrial>C-C-B-D-C</socioIndustrial>
 		<satellite>Jotunheim</satellite>
-		<hpg>X</hpg>
+		<hpg>C</hpg>
 		<desc>Hamar is a planet split. The planet itself is icy and mostly desolate, it is made liveable by a series of volcanoes that feed the dual communities present on planet. In the ‘uplands’ on the volcanoes the communities secure a living by mining the vast minerals and gems deposits. Unfortunately the area is inhospitable and requires artificial aid, such as re-breathers to live there. The other communities on Hamar are represented in the ‘lowlands’ at the bases of the volcanoes. These communities are more comfortable to live in and manage to farm the fertile volcanic fields so that Hamar is self sufficient. While the communities in the lowlands and uplands are always trading, the various families in the communities maintain several long standing fueds.</desc>
 	</planet>
 	<planet>
@@ -18283,8 +18987,11 @@ During their Holy War, the Blakists found ready converts among the technological
 		<spectralClass>G</spectralClass>
 		<subtype>3</subtype>
 		<sysPos>4</sysPos>
+		<climate>3</climate>
 		<hpg>C</hpg>
-		<desc>No description available.</desc>
+		<desc>3025 - Hardcore is one of the Magistracy's most successful entertainment centers and the pleasure planet caters to the elite of Canopian society, as well as numerous wealth Inner Sphere clients. The planet is home to over 75,000 full-time entertainers of nearly every conceivable type of entertainment or pleasure a tourist could dream of and serves over ten-million visitors annually. Hardcore is a warm temperate world with beautiful beaches and landscapes.
+
+Entertainment on Hardcore ranges from ballet to bloodsports and is home to a series of 'Mech duels and contests each spring with live combat. The planet is also famous for its film industry which is well known for its production of hundreds of full-feature 'erotic epics' that are distributed all through the Magistracy and even deep into the Inner Sphere.</desc>
 	</planet>
 	<planet>
 		<name>Hardisey's Haven</name>
@@ -18319,6 +19026,20 @@ During their Holy War, the Blakists found ready converts among the technological
 		<xcood>42.25</xcood>
 		<ycood>-226.37</ycood>
 		<faction>CC</faction>
+		<spectralClass>F</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>5</sysPos>
+		<gravity>0.96</gravity>
+		<pressure>2</pressure>
+		<climate>5</climate>
+		<temperature>30</temperature>
+		<percentWater>65</percentWater>
+		<hpg>B</hpg>
+		<lifeForm>7</lifeForm>
+		<socioIndustrial>C-C-C-C-D</socioIndustrial>
+		<landMass>Dupree (Harloc Prime)</landMass>
+		<desc>Harloc is not the most comfortable planet to live on, it has a thin atmosphere and despite centuries of being settled, the large array of deadly predators remain a threat. As a result, the inhabitants developed a very martial society. This made the planet a natural location for one of the Confederation’s many Duchy RTCs and recruits can train as MechWarriors, vehicle crews or infantry. The facility is located on the remote badlands of the planet’s soul continent Dupree. The RTC is credited with training the Harloc Raiders regiment.</desc>
 	</planet>
 	<planet>
 		<name>Harminous</name>
@@ -18391,6 +19112,33 @@ During their Holy War, the Blakists found ready converts among the technological
 			<date>3030-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>2</sysPos>
+		<satellite>Bane</satellite>
+		<satellite>Boon</satellite>
+		<gravity>0.96</gravity>
+		<pressure>3</pressure>
+		<climate>4</climate>
+		<temperature>32</temperature>
+		<percentWater>46</percentWater>
+		<zenithCharge>True</zenithCharge>
+		<hpg>B</hpg>
+		<lifeForm>7</lifeForm>
+		<socioIndustrial>C-C-D-C-B</socioIndustrial>
+		<landMass>Briseis</landMass>
+		<landMass>Paris</landMass>
+		<landMass>Priam</landMass>
+		<desc>3028 - Harrow's Sun is a vital part of the Federated Suns’ Draconis March border defense and as a result it has been the site of heavy fighting throughout the centuries. The planet’s southern continent of Briseis is primarily dominated by military bases. These bases have enough housing for up to a full six regimental combat teams. However, most of the time the bases are mostly empty and are managed by two brigades of light combat engineers and an armored regiment. The bases of Harrow’s Sun saw extensive use during the Operation Galahad exercises held in 3026 and 3027.
+
+Harrow’s Sun is a large planet with vast tracts of land due to the small, heavily alkali, oceans that don’t even cover half of the planet’s surface. Unfortunately, this means that while the planet has a lot of land, much of the landmass of Harrow’s Sun is landlocked and arid. Deserts and Badlands abound in the interior of the planet’s three continents with the fertile locations near the lakes, rivers and oceans. Despite the predominantly arid conditions of much of the planet, the fertile zones are actually more than sufficient to support significant agricultural concerns which can feed the planet’s population, even when the bases on Briseis are occupied.
+
+Due to the constant raiding and fighting over the planet, the primary industry on Harrow’s Sun is focused on construction and heavy industry. Despite this, the constant rebuilding still creates a strain on the planet’s massive fleet of ferrocrete fabricators, fortification engineers, and earthmovers. Most of the planet’s heavy industry is focused on Paris, the largest continent. Harrow’s Sun is not home to any renowned schools, but is home to many well respected trade-schools with a focus on construction and industrial work.
+
+The third continent of Priam is located in the southern hemisphere and is primarily focused on agricultural concerns. The vineyards of Priam are known as some of the best in the Draconis March. The residents of Paris and Priam have a negative opinion of each other, Parisians view their Priam neighbors much like embarrassing country relatives with no culture or sophistication, while the Priams view the Parisians as elitist snobs. However, deep down both continents know that they would suffer without the industry and food produced on Paris and Priam respectively.
+
+The planet is defended by an AFFS security force located on the moon Bane and is home to a division of marines with intrasystem boarding shuttles and converted passenger DropShips and usually supported by two wings of aerospace fighters.</desc>
 	</planet>
 	<planet>
 		<name>Harsefeld</name>
@@ -19027,7 +19775,23 @@ Andrea County Armor Yards</desc>
 		<name>Hesperus II</name>
 		<xcood>-124.66</xcood>
 		<ycood>47.2</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2340-01-01</date>
+			<faction>FoS</faction>
+		</factionChange>
+		<factionChange>
+			<date>2341-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>2853-03-05</date>
 			<faction>LA,DC</faction>
@@ -19153,7 +19917,10 @@ Doering Electronics</desc>
 		<socioIndustrial>B-C-C-D-C</socioIndustrial>
 		<satellite>Peak</satellite>
 		<hpg>B</hpg>
-		<desc>Highspire is a relatively comfortable temperate planet and its primary exports are timber and wood crafts. The planet has always been known for its stark contrasts between the ruling Liaos and attending nobles and the poor of the planet. Highspire was the personal holding of Romano Liao before she became Chancellor and became the personal holding of her daughter Kali Liao after the Chancellor’s death. Being a border planet between the Capellan Confederation and Federated Suns the planet has seen many raids and several invasions throughout its history.</desc>
+		<landMass>Chu-Li (Crescent)</landMass>
+		<desc>Highspire is a relatively comfortable temperate planet and its primary exports are timber and wood crafts. The planet has always been known for its stark contrasts between the ruling Liaos and attending nobles and the poor of the planet. Highspire was the personal holding of Romano Liao before she became Chancellor and became the personal holding of her daughter Kali Liao after the Chancellor’s death. Being a border planet between the Capellan Confederation and Federated Suns the planet has seen many raids and several invasions throughout its history.
+		
+Highspire is home to one of the many Duchy RTC facilities throughout the Capellan Confederation and train conventional armor crews and infantry.</desc>
 	</planet>
 	<planet>
 		<name>Hillerod</name>
@@ -19347,7 +20114,7 @@ Doering Electronics</desc>
 		<satellite>Myvatn</satellite>
 		<satellite>Geyser</satellite>
 		<satellite>Jockulsarlon</satellite>
-		<hpg>X</hpg>
+		<hpg>C</hpg>
 		<desc>Hofn is the warmest JarnFolk world, however it also has the harshest weather. Storms are a regular occurrence and winds can often  reach over 300 kph. The JarnFolk dwellings are built to withstand these harsh conditions, often with the stout buildings that extend underground. Subterranean building also allows the JarnFolk to make the most of the limited ground space as Hofn is almost entirely covered in water. The major industries on planet are power from wind turbines and fishing.</desc>
 	</planet>
 	<planet>
@@ -19399,6 +20166,26 @@ Doering Electronics</desc>
 		<xcood>65.46</xcood>
 		<ycood>-304.09</ycood>
 		<faction>CC</faction>
+		 <spectralClass>G</spectralClass>
+        <subtype>2</subtype>
+        <luminosity>V</luminosity>
+        <sysPos>5</sysPos>
+        <gravity>1.00</gravity>
+        <pressure>3</pressure>
+        <temperature>35</temperature>
+        <percentWater>59</percentWater>
+        <hpg>B</hpg>
+        <climate>5</climate>
+        <lifeForm>4</lifeForm>
+        <satellite>Jolly</satellite>
+        <satellite>Martin</satellite>
+        <landMass>Bethesda</landMass>  
+        <landMass>Flushing (Belmont)</landMass>  
+        <landMass>Morristown</landMass>  
+        <socioIndustrial>C-C-C-C-C</socioIndustrial>
+        <desc>Holloway is an unremarkable planet with limited industry, limited natural resources. The planet is relatively comfortable to live on and the inhabitants have converted enough of the vast wetlands into farmland to not rely on outside imports.
+        
+Holloway is home to a Duchy RTC facility, located on the Morristown continent, which trains vehicle crews and unarmored infantry.</desc>
 	</planet>
 	<planet>
 		<name>Holmsbu</name>
@@ -19664,6 +20451,25 @@ Doering Electronics</desc>
 		<xcood>33.64</xcood>
 		<ycood>-279.32</ycood>
 		<faction>CC</faction>
+		 <spectralClass>G</spectralClass>
+        <subtype>6</subtype>
+        <luminosity>V</luminosity>
+        <sysPos>3</sysPos>
+        <gravity>1.00</gravity>
+        <pressure>3</pressure>
+        <temperature>38</temperature>
+        <percentWater>64</percentWater>
+        <climate>5</climate>
+        <nadirCharge>true</nadirCharge>
+        <hpg>B</hpg>
+        <lifeForm>7</lifeForm>
+        <satellite>Royal</satellite>
+        <landMass>Hastings (Godwinson)</landMass>  
+        <landMass>Stanford</landMass>
+        <socioIndustrial>B-C-B-C-C</socioIndustrial>
+        <desc>Housekarle is a relatively comfortable planet with sufficient agriculture, abundant natural resources and a higher degree of technology than the majority of planets in the Inner Sphere, however the planet has limited industry.
+        
+Housekarle is home to one of the Confederations many Duchy RTC facilities and trains vehilce crews and unarmored infantry.</desc>
 	</planet>
 	<planet>
 		<name>Howick</name>
@@ -20288,7 +21094,27 @@ Vandenberg Mechanized Industries</desc>
 		<name>Imbrial III</name>
 		<xcood>296.79</xcood>
 		<ycood>-49.81</ycood>
-		<faction>FS</faction>
+		 <faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>  
+		<factionChange> 
+			<date>2317-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>2792-01-01</date> 
+			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2900-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -20457,6 +21283,25 @@ Trunner, the largest city and planetary capital, is home to Imbross AeroTech Ind
 			<date>3062-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
+		 <spectralClass>A</spectralClass>
+        <subtype>7</subtype>
+        <luminosity>V</luminosity>
+        <sysPos>5</sysPos>
+        <gravity>1.00</gravity>
+        <pressure>4</pressure>
+        <climate>4</climate>
+        <temperature>56</temperature>
+        <percentWater>22</percentWater>
+        <hpg>B</hpg>
+        <lifeForm>1</lifeForm>
+        <landMass>Indicass (Xin Singapore)</landMass>  
+        <socioIndustrial>B-B-A-B-D</socioIndustrial>
+        <desc>Indicass is an arid planet that remains populated due to its extensive raw material reserves surrounding the planet's one body of water and the heavy industry built up around those resources. These raw materials are used by local industry to produce war materiel. Indicass is protected by a military training facility.
+        
+Xin Singapore, the capital of Indicass is home to a Ceres Metals factory which produces an assortment of combat vehicles. Ceres Metals has worked hard to make Indicass comfortable for the workers at its factory, on this otherwise desert world, going so far as to establish a rich forest around the planetary capital known as the Black Forest. The planet is also home to one of the Confederation's many Duchy RTC facilities, the facilities on Indicass train recruits to pilot BattleMechs, crew combat vehicles or as unarmored infantry.
+
+Manufacturing centers:
+Ceres Metals</desc>
 	</planet>
 	<planet>
 		<name>Ingenstrem</name>
@@ -20500,7 +21345,15 @@ Trunner, the largest city and planetary capital, is home to Imbross AeroTech Ind
 		<satellite>Talley</satellite>
 		<satellite>Rand</satellite>
 		<hpg>B</hpg>
-		<desc>Ingersoll is widely known as the most beautiful planet within the Confederation. It is a paradise planet with hundreds of coves and sandy beaches, and thousands of island chains. Many Confederation nobles reside on Ingersoll, leaving the administration of their holdings to stewards when they are not vacationing. Ingersol is also known for its concentration of artistic talent, fine arts schools and museums. Ingersoll also has silver and gold deposits of exceptional size, giving it the largest economic base in the Capellan Commonality.</desc>
+		<landMass>Aleshia</landMass>
+		<landMass>Danika</landMass>
+		<landMass>Hurtong (Ko-modo)</landMass>
+		<landMass>Suíhe</landMass>
+		<landMass>Tang</landMass>
+		<landMass>Zhen</landMass>
+		<desc>Ingersoll is widely known as the most beautiful planet within the Confederation. It is a paradise planet with hundreds of coves and sandy beaches, and thousands of island chains. Many Confederation nobles reside on Ingersoll, leaving the administration of their holdings to stewards when they are not vacationing. Ingersol is also known for its concentration of artistic talent, fine arts schools and museums. Ingersoll also has silver and gold deposits of exceptional size, giving it the largest economic base in the Capellan Commonality.
+		
+Ingersoll is one of many planets home to a Duchy RTC training facility for infantry and conventional armor crews. The Duchy RTC on Ingersoll also has facilities for aerospace pilot training.</desc>
 	</planet>
 	<planet>
 		<name>Ingonish</name>
@@ -20842,12 +21695,12 @@ Irian’s terrain is best described as bland. The planet’s terrain is dominate
 		<spectralClass>G</spectralClass>
 		<subtype>5</subtype>
 		<sysPos>4</sysPos>
-		<hpg>X</hpg>
+		<hpg>C</hpg>
 		<pressure>3</pressure>
 		<climate>3</climate>
 		<percentWater>35</percentWater>
 		<temperature>30</temperature>
-		<desc>No description available.</desc>
+		<desc>Ishtar is a major exporter of agriculture for the Taurian Concordat and foodstuffs prepared and packaged on Ishtar can be found on most planets in the Concordat. Despite the planet's importance as a breadbasket world, the Concordat usually leaves the planet largely demilitarized in hopes that the planet will be left alone, in order to protect the natural beauty of the planet. The planet is further isolated by a lack of ComStar presence, all messages require a relay by JumpShip to send or receive.</desc>
 	</planet>
 	<planet>
 		<name>Islamabad</name>
@@ -21334,7 +22187,27 @@ Taurus Territorial Industries</desc>
 		<name>Johnsondale</name>
 		<xcood>162.22</xcood>
 		<ycood>-23.21</ycood>
-		<faction>FS</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>  
+		<factionChange>
+			<date>2317-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>2796-01-01</date> 
+			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2808-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -21476,7 +22349,23 @@ Jonathan has a 20 hour day and takes 745 standard days to orbit its sun.</desc>
 		<name>Junction</name>
 		<xcood>136.14</xcood>
 		<ycood>79.54</ycood>
-		<faction>DC</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>   
+		<factionChange>
+			<date>2309-05-21</date>
+			<faction>AG</faction>
+		</factionChange>   
+		<factionChange>
+			<date>2319-01-01</date>
+			<faction>DC</faction>
+		</factionChange> 
 	</planet>
 	<planet>
 		<name>June</name>
@@ -21908,6 +22797,22 @@ By 3091, in an extreme example of a runaway greenhouse effect, the average surfa
 		<xcood>-294.96</xcood>
 		<ycood>-245.41</ycood>
 		<faction>FWL</faction>
+		<spectralClass>F</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>2</sysPos>
+		<gravity>1.08</gravity>
+		<pressure>2</pressure>
+		<temperature>24</temperature>
+		<percentWater>17</percentWater>
+		<zenithCharge>false</zenithCharge>
+		<nadirCharge>false</nadirCharge>
+		<hpg>B</hpg>
+		<satellite>Name unknown</satellite>
+		<lifeForm>7</lifeForm>
+		<socioIndustrial>B-B-A-B-C</socioIndustrial>
+		<landMass>(Lyari</landMass>
+		<desc>Karachi is an unattractive, arid planet with a thin atmosphere - it's only redeeming feature is it's easily accessible mineral wealth. The surface is one continuous landmass of flat, rocky desert, broken only by two major bodies of water: the Southern Ocean and the Arctic Seas, around which most of the planet's residential and industrial infrastructure is concentrated. The Star League Defence Force is known to have constructed huge military maintenance facilities here.</desc>
 	</planet>
 	<planet>
 		<name>Karakiraz</name>
@@ -21976,6 +22881,22 @@ By 3091, in an extreme example of a runaway greenhouse effect, the average surfa
 		<xcood>-1.56</xcood>
 		<ycood>-202.9</ycood>
 		<faction>CC</faction>
+		<spectralClass>M</spectralClass>
+		<subtype>1</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>4</sysPos>
+		<satellite>Libby</satellite>
+		<gravity>1.0</gravity>
+		<pressure>3</pressure>
+		<climate>5</climate>
+		<temperature>36</temperature>
+		<percentWater>20</percentWater>
+		<nadirCharge>True</nadirCharge>
+		<hpg>B</hpg>
+		<lifeForm>5</lifeForm>
+		<socioIndustrial>C-C-C-C-C</socioIndustrial>
+		<landMass>Kashilla (Leah)</landMass>
+		<desc>Kashilla is an unremarkable planet, with only modest natural resources, sufficient agriculture to feed its population and limited industry. Overall the planet is comfortable for human habitation, with a tropical climate and native reptile-like lifeforms. Kashilla is home to one of the many Duchy RTC training facilities throughout the Capellan Confederation that trains vehicle crews and unarmored infantry.</desc>
 	</planet>
 	<planet>
 		<name>Kassandra's Memory</name>
@@ -22498,7 +23419,27 @@ Kali Yama - Alphard Trading Corporation</desc>
 		<name>Kentares IV</name>
 		<xcood>150.74</xcood>
 		<ycood>-13.3</ycood>
-		<faction>FS</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2317-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>2796-01-01</date> 
+			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2808-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -22693,7 +23634,27 @@ Kessel‘s capital city is Sverdlovsk, located on the northwestern continent of 
 		<name>Kestrel</name>
 		<xcood>270.71</xcood>
 		<ycood>-47.2</ycood>
-		<faction>FS</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>  
+		<factionChange> 
+			<date>2317-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>2792-01-01</date> 
+			<faction>DC</faction>
+		</factionChange>
+		<factionChange> 
+			<date>2822-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -23110,7 +24071,23 @@ The planet has moderate natural resources and enough arable land to sustain itse
 		<name>Kirei Na Niwa</name>
 		<xcood>300.44</xcood>
 		<ycood>148.66</ycood>
-		<faction>DC</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>   
+		<factionChange>
+			<date>2309-01-01</date>
+			<faction>AG</faction>
+		</factionChange>   
+		<factionChange>
+			<date>2319-01-01</date>
+			<faction>DC</faction>
+		</factionChange> 
 		<spectralClass>F</spectralClass>
 		<subtype>2</subtype>
 		<luminosity>V</luminosity>
@@ -23807,6 +24784,24 @@ Novis AT-H, Incorporated</desc>
 		<xcood>-7.82</xcood>
 		<ycood>-223.24</ycood>
 		<faction>CC</faction>
+		<spectralClass>K</spectralClass>
+        <subtype>2</subtype>
+        <luminosity>V</luminosity>
+        <sysPos>4</sysPos>
+        <gravity>1.07</gravity>
+        <pressure>3</pressure>
+        <temperature>28</temperature>
+        <percentWater>52</percentWater>
+        <climate>5</climate>
+        <zenithCharge>true</zenithCharge>
+        <hpg>B</hpg>
+        <lifeForm>4</lifeForm>
+        <landMass>Auburn (Pole)</landMass>  
+        <landMass>Fairfax</landMass>  
+        <socioIndustrial>B-B-C-C-C</socioIndustrial>
+        <desc>Krin is a relatively comfortable planet with a temperate to tropical climate and modest agricultural and mining concerns. Krin possesses a well established industrial core, however the planet is not home to any major military manufacturers.
+        
+Krin is one of many planets in the Capellan Confederation that host a Duchy RTC facility. The facilities on Krin are located in the mountains of the Fairfax continent and focus on training vehicle crews and unarmored infantry.</desc>
 	</planet>
 	<planet>
 		<name>Krung Thep</name>
@@ -24125,6 +25120,14 @@ La Blon‘s capital, Amadeus, is located at the foot of the Carbondale Mountains
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
+			<date>3021-01-01</date>
+			<faction>MV</faction>
+		</factionChange>
+		<factionChange>
+			<date>3028-01-01</date>
+			<faction>GV</faction>
+		</factionChange>
+		<factionChange>
 			<date>3049-09-02</date>
 			<faction>CJF</faction>
 		</factionChange>
@@ -24431,6 +25434,14 @@ Aside from the large island continent of Galapagos in the northern hemisphere of
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
+			<date>3021-01-01</date>
+			<faction>MV</faction>
+		</factionChange>
+		<factionChange>
+			<date>3028-01-01</date>
+			<faction>GV</faction>
+		</factionChange>
+		<factionChange>
 			<date>3049-09-05</date>
 			<faction>CJF</faction>
 		</factionChange>
@@ -24592,7 +25603,27 @@ Aside from the large island continent of Galapagos in the northern hemisphere of
 		<name>Le Blanc</name>
 		<xcood>208.9</xcood>
 		<ycood>18.52</ycood>
-		<faction>FS</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>  
+		<factionChange>
+			<date>2317-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>2796-01-01</date> 
+			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2808-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -24934,10 +25965,12 @@ The primary industry on Les Halles is the extraction and refining of fuel used i
 		<socioIndustrial>B-C-C-D-A</socioIndustrial>
 		<satellite>Elias' Promise</satellite>
 		<hpg>A</hpg>
-		<landMass>Northern</landMass>
-    	<landMass>Southern</landMass>
-    	<landMass>Anderia</landMass>
-		<desc>Liao is the ancestral home of House Liao and as such has always had a symbolic importance to the Capellan Confederation, if not a practical importance. The Liaos continued to maintain a palatial residence in the northern hemisphere. However, the rest of the planet has always been a relatively insignificant backwater that has little militarily or industrially sites of interest. The Capellans always maintained a local garrison on planet following several raids during the Succession Wars. The planet’s terrain is dominated by rolling plains with few features of interest.</desc>
+		<landMass>Anderia</landMass>
+		<landMass>Beilù (Chang-an)</landMass>
+    	<landMass>Nánlù</landMass>
+		<desc>Liao is the ancestral home of House Liao and as such has always had a symbolic importance to the Capellan Confederation, if not a practical importance. The Liaos continued to maintain a palatial residence in the northern hemisphere. However, the rest of the planet has always been a relatively insignificant backwater that has little militarily or industrially sites of interest. The Capellans always maintained a local garrison on planet following several raids during the Succession Wars. The planet’s terrain is dominated by rolling plains with few features of interest.
+		
+Liao is home to the Liao Conservatory of Military Arts, which is located in the planetary capital and trains MechWarriors, Aerospace pilots, vehicle crews and infantry. The planet is also home to one of many Duchy RTC facilities in the Confederation and trains infantry and conventional armor crews.</desc>
 	</planet>
 	<planet>
 		<name>Liezen</name>
@@ -25830,7 +26863,27 @@ Norse Storm</desc>
 		<name>Luthien</name>
 		<xcood>169.26</xcood>
 		<ycood>252.72</ycood>
-		<faction>DC</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>   
+		<factionChange>
+			<date>2310-01-27</date>
+			<faction>AG</faction>
+		</factionChange>   
+		<factionChange>
+			<date>2319-01-01</date>
+			<faction>DC</faction>
+		</factionChange>  
+		<factionChange>
+			<date>3052-01-04</date>
+			<faction>CSJ,CNC,DC</faction>
+		</factionChange>
 		<factionChange>
 			<date>3052-01-04</date>
 			<faction>CSJ,CNC,DC</faction>
@@ -25876,7 +26929,7 @@ Norse Storm</desc>
 		<luminosity>V</luminosity>
 		<sysPos>6</sysPos>
 		<hpg>B</hpg>
-		<desc>No description available.</desc>
+		<desc>3025 - Luxen has survived the worst of the Succession Wars relatively untouched. It is a provincial capital and has abundant deposits of precious metals and rare gemstones. It is also home to the University of Luxen and the Canopian Medical Sciences Research and Training complex, which are some of the few places capable of training doctors and other medical personnel in the Magistracy that was able to survive the destructiveness of the fall of the Star League and the Succession Wars.</desc>
 	</planet>
 	<planet>
 		<name>Luzerne</name>
@@ -26412,6 +27465,10 @@ Most of the population lives in small cities dotting the 4 continents.  There ar
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
+			<date>3025-01-01</date>
+			<faction>EF</faction>
+		</factionChange>
+		<factionChange>
 			<date>3049-09-18</date>
 			<faction>CW</faction>
 		</factionChange>
@@ -26773,7 +27830,23 @@ The Word of Blake Jihad initially overlooked the planet, but later in the Jihad,
 		<name>Marduk</name>
 		<xcood>210.2</xcood>
 		<ycood>60.51</ycood>
-		<faction>DC</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2317-12-31</date>
+			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>2787-05-01</date>
+			<faction>DC</faction>
+		</factionChange>
 		<factionChange>
 			<date>2822-12-31</date>
 			<faction>FS</faction>
@@ -27485,7 +28558,23 @@ Maxwell is home to the original Hero Training Institute - a large for-profit ins
 		<name>Meacham</name>
 		<xcood>-28.95</xcood>
 		<ycood>189.08</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2340-01-01</date>
+			<faction>TamP</faction>
+		</factionChange>
+		<factionChange>
+			<date>2341-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -27850,13 +28939,17 @@ During the Fourth Succession War, the Federated Suns captured the planet without
 		<percentWater>74</percentWater>
 		<satellite>Darbonne</satellite>
 		<socioIndustrial>A-B-C-C-C</socioIndustrial>
+		<landMass>Menke Prime (Archibald)</landMass>
+		<landMass>Menke Beta</landMass>
+		<landMass>Menke Omega</landMass>
 		<desc>As of 3025 Menke is the perpetual holding of the McCarron family and the planet serves as the home base of McCarron's Armored Cavalry. Menke is part of the Duchy of Mitchel in the Capellan Confederation. Menke is a sunny, tropical planet and boasts a large civilian population that serves as a recruitment pool for the Cavalry. Menke has extensive ‘Mech repair facilities and one of the greatest concentrations of trained techs in the Confederation. The planet's southern hemisphere hosts a jungle warfare training center. One or more of the Armored Cavalry regiments are on planet at any specific time making the planet an uninviting target.
-		
-		Military Industries:
-		Starcorps Industries - 'Mech production, replacement parts, maintenance and update packages
-		Menke Armor and Armament - assorted weapons
-		Metal Industries - heavy tank production
-		</desc>
+
+Menke is home to significant industrial concerns, including Ceres Metals, which produces tanks in the capital of Archibald, Menke Armor and Armaments, which is also located in Archibald and produces numerous weapon systems, and Starcorps Industries which produces BattleMechs. Starcorps facilities are located both in the capital and in space at the L2 point. Menke is also home to one of the Confederation's many Duchy RTC training facilities, which specializes in training infantry and armor crews.
+
+Military Industries:
+Starcorps Industries
+Menke Armor and Armament
+Metal Industries</desc>
 	</planet>
 	<planet>
 		<name>Blue Diamond</name>
@@ -28621,7 +29714,7 @@ These episodic invasions kept Mirach from realizing its true potential, and the 
 		<subtype>2</subtype>
 		<luminosity>V</luminosity>
 		<sysPos>2</sysPos>
-		<hpg>X</hpg>
+		<hpg>C</hpg>
 		<temperature>25</temperature>
 		<climate>4</climate>
 		<pressure>3</pressure>
@@ -29616,7 +30709,9 @@ spaceport of Laubenstein.</desc>
 		<satellite>Kun-Lun</satellite>
 		<satellite>Yi</satellite>
 		<hpg>A</hpg>
-		<landMass>(Kallontown)</landMass>
+		<landMass>Jinaye</landMass>
+		<landMass>Shanlu</landMass>
+		<landMass>Yangtze (Kallontown [pre-3077]) (Yang-Ku [renamed 3077])</landMass>
 		<desc>Nanking was one of the first trade centres developed during the original Exodus from Terra and found itself incorporated into the Tikonov Union during the late 23rd century. In later history it was an important commercial center, rivaling Styk, with 17 percent of all Confederation commerce flowing through Nanking. Nanking's primary industries centered around mining deposits of platinum and copper, which attracted substantial interstellar trade and exchange to the system.
 		
 Manufacturing centers:
@@ -29773,6 +30868,28 @@ Necromo is overall a comfortable planet to live despite arid conditions. The pla
 			<date>3057-09-18</date>
 			<faction>LA</faction>
 		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>8</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>5</sysPos>
+		<satellite>Dongara</satellite>
+		<satellite>Freemantle</satellite>
+		<gravity>1.04</gravity>
+		<pressure>4</pressure>
+		<climate>5</climate>
+		<temperature>41</temperature>
+		<percentWater>85</percentWater>
+		<zenithCharge>True</zenithCharge>
+		<hpg>B</hpg>
+		<lifeForm>5</lifeForm>
+		<socioIndustrial>C-D-D-D-C</socioIndustrial>
+		<desc>The original colonists of Neerabup were originally part of the settlers that founded the planet Australia, however the Neerabup colonists wanted to settle further from Terra, and after several near-fights broke out between the opposing groups, the soon-to-be Neerabup colonists managed to take control of two JumpShips and continue beyond Australia. Several weeks later they arrived at Neerabup with dwindling food supplies.
+
+Neerabup had a comfortable climate and a wide variety of terrain, predominantly lush swamps and peat bogs, which offered a wide variety of edible plant-life, there was next to no edible animal-life and as a result the settlers adopted a primarily vegetarian diet, at least until another passing group of settlers agreed to trade some of their livestock.
+
+Neerabup remained a quiet backwater for most of its history, the planet supports enough agriculture to feed its population, though the swamp lands do not lend themselves to Neerabup becoming a breadbasket, and the planet’s lack of abundant minerals or oil kept any heavy mining or industry from developing. However, in 3042 the Federated Commonwealth, in an effort to improve the military in the Lyran half of the Commonwealth, selected Neerabup as the location for a regional militia HQ. The creation of the new regional HQ brought an economic boom to Neerabup with the influx of high tech goods and a need for locally produced raw materials and imports.
+
+Neerabup is divided into provinces that are each ruled by a Publican. The Publican title is hereditary and must be given to the firstborn male son of the family. However, when there is no male heir the province elects a new Publican who can be male or female.</desc>
 	</planet>
 	<planet>
 		<name>Negushevo</name>
@@ -29865,8 +30982,8 @@ Necromo is overall a comfortable planet to live despite arid conditions. The pla
 		<subtype>2</subtype>
 		<luminosity>V</luminosity>
 		<sysPos>5</sysPos>
-		<hpg>X</hpg>
-		<desc>No description available.</desc>
+		<hpg>C</hpg>
+		<desc>3025 - New Abilene was settled in 2581 and since that time the planet has seen numerous battles between the Canopians and Taurians, vying for control of this border world. The planet's economy is primarily focused on agriculture with large tracts of land devoted to cattle and sheep farming. The planet is divided into numerous large baronies controlled by wealthy landowners who tend to own the largest herds on planet. There are numerous disputes between the Barons over water rights and the best grazing areas. Escalation in these disputes led to the hiring of "Range Riders", MechWarriors hired to serve the local barons, which only led to further fighting along the edges of the baronies. Eventually forces from the Magistracy were sent to act as frontier marshalls and to keep the peace.</desc>
 	</planet>
 	<planet>
 		<name>New Aragon</name>
@@ -29998,7 +31115,31 @@ Federated News Services</desc>
 		<name>New Bergen</name>
 		<xcood>19.56</xcood>
 		<ycood>406.59</ycood>
-		<faction>DC</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2250-01-01</date>
+			<faction>PoR</faction>
+		</factionChange> 
+		<factionChange>
+			<date>2333-09-01</date>
+			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2334-01-01</date>
+			<faction>PoR</faction>
+		</factionChange>
+		<factionChange>
+			<date>2337-01-01</date>
+			<faction>PoR,DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2367-01-01</date>
+			<faction>PoR</faction>
+		</factionChange>
+		<factionChange>
+			<date>2510-06-01</date>
+			<faction>DC</faction>
+		</factionChange>
 		<factionChange>
 			<date>3034-03-13</date>
 			<faction>FRR</faction>
@@ -30280,7 +31421,7 @@ New Capetown is moderately industrialized and is a comfortable temperate planet 
 		<climate>4</climate>
 		<percentWater>15</percentWater>
 		<pressure>3</pressure>
-		<desc>No description available.</desc>
+		<desc>New Ganymede is a barren desert world deep inside the Tuarian Concordat. The barren terrain is almost constantly swept by high winds which bring massive sand storms that ravage settlements and make this desolate world even less appealing for settlement. However, the planet's abundance of rare radioactive ores convinced the Concordat to set up a massive mining operation on planet. The rare-ores make New Ganymede a very important planet to the Concordat's military industry and as a result it is usually well garrisoned.</desc>
 	</planet>
 	<planet>
 		<name>New Gascony</name>
@@ -30731,7 +31872,11 @@ Most industry on the planet is centered around catering to the rich individuals 
 		<name>New Rhodes III</name>
 		<xcood>103.28</xcood>
 		<ycood>-15.91</ycood>
-		<faction>TA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
 		<factionChange>
 			<date>2242-01-01</date>
 			<faction>IND</faction>
@@ -30741,7 +31886,15 @@ Most industry on the planet is centered around catering to the rich individuals 
 			<faction>TH</faction>
 		</factionChange>
 		<factionChange>
-			<date>2790-01-01</date>
+			<date>2788-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>2789-01-01</date>
+			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2900-01-01</date>
 			<faction>FS</faction>
 		</factionChange>
 		<factionChange>
@@ -30815,7 +31968,23 @@ As word slowly spread, New Rhodes III became a pleasure destination from across 
 		<name>New Samarkand</name>
 		<xcood>362.77</xcood>
 		<ycood>250.89</ycood>
-		<faction>DC</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>   
+		<factionChange>
+			<date>2302-12-01</date>
+			<faction>AG</faction>
+		</factionChange>   
+		<factionChange>
+			<date>2319-01-01</date>
+			<faction>DC</faction>
+		</factionChange> 
 		<spectralClass>F</spectralClass>
 		<subtype>0</subtype>
 		<luminosity>IV</luminosity>
@@ -30866,7 +32035,7 @@ During the Jihad, Kiyomori Minamoto temporarily relocated the capital back to Ne
 		<climate>3</climate>
 		<temperature>25</temperature>
 		<percentWater>58</percentWater>
-		<hpg>X</hpg>
+		<hpg>C</hpg>
 		<lifeForm>7</lifeForm>
 		<socioIndustrial>B-B-C-B-B</socioIndustrial>
 		<landMass>Kinness</landMass>
@@ -31284,7 +32453,7 @@ Like other worlds, Ningpo was not immune to the effects of the Word of Blake's J
 		<subtype>5</subtype>
 		<luminosity>V</luminosity>
 		<sysPos>5</sysPos>
-		<hpg>X</hpg>
+		<hpg>C</hpg>
 		<desc>Niops V was settled primarily to expand the available resources to the Niops Association when it became difficult for Niops VII to supply all the inhabitants. Niops VI and V are primarily sites for agriculture and mineral extraction.
 		</desc>
 	</planet>
@@ -31301,7 +32470,7 @@ Like other worlds, Ningpo was not immune to the effects of the Word of Blake's J
 		<subtype>5</subtype>
 		<luminosity>V</luminosity>
 		<sysPos>6</sysPos>
-		<hpg>X</hpg>
+		<hpg>C</hpg>
 		<desc>Niops VI was settled primarily to expand the available resources to the Niops Association when it became difficult for Niops VII to supply all the inhabitants. Niops VI and V are primarily sites for agriculture and mineral extraction.
 		</desc>
 	</planet>
@@ -31318,7 +32487,7 @@ Like other worlds, Ningpo was not immune to the effects of the Word of Blake's J
 		<subtype>5</subtype>
 		<luminosity>V</luminosity>
 		<sysPos>7</sysPos>
-		<hpg>X</hpg>
+		<hpg>C</hpg>
 		<desc>The Niops Association was originally a self sufficient research facility designed by the Star League to maintain a multi-century study of the system's dying star. As part of the self suficiency Niops required facilities for entire families, as well as an ability to produce their own goods and food. They were so self sufficient that during the Amaris Coup, Niops was forgotten by the Star League, even as the continued to send reports.
 		
 In the 2800s Capellan refugees fleeing the early Succession Wars landed on Niops and filled the scientists in on what was going on in the Inner Sphere. Niops decided the safest course was to cut off any remaining contact with the rest of the Inner Sphere and continued with their research. The refugees became a source of unskilled labor to take over menial jobs. Eventually the Association was formed from the bond between the ruling scientists and the unskilled laborers. The original scientific outpost was located on Niops VII but Niops V and VI were colonized when additional farmland was needed to feed the expanded population.
@@ -31827,7 +32996,7 @@ Federated Industries</desc>
 		<subtype>5</subtype>
 		<luminosity>V</luminosity>
 		<sysPos>3</sysPos>
-		<hpg>X</hpg>
+		<hpg>C</hpg>
 		<desc>No description available.</desc>
 	</planet>
 	<planet>
@@ -31840,7 +33009,39 @@ Federated Industries</desc>
 		<name>Nox</name>
 		<xcood>13.3</xcood>
 		<ycood>242.02</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2340-01-01</date>
+			<faction>TamP</faction>
+		</factionChange>
+		<factionChange>
+			<date>2341-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2445-01-01</date>
+			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2463-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2490-01-01</date>
+			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2550-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
 		<factionChange>
 			<date>2900-01-01</date>
 			<faction>DC</faction>
@@ -32027,6 +33228,10 @@ Today, Nusakan is home to a thriving population and reborn computer and electron
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
+			<date>3025-01-01</date>
+			<faction>EF</faction>
+		</factionChange>
+		<factionChange>
 			<date>3049-09-03</date>
 			<faction>CGB</faction>
 		</factionChange>
@@ -32055,7 +33260,7 @@ Today, Nusakan is home to a thriving population and reborn computer and electron
 		<subtype>9</subtype>
 		<luminosity>III</luminosity>
 		<sysPos>2</sysPos>
-		<hpg>X</hpg>
+		<hpg>C</hpg>
 		<desc>No description available.</desc>
 	</planet>
 	<planet>
@@ -32080,6 +33285,10 @@ Today, Nusakan is home to a thriving population and reborn computer and electron
 		<factionChange>
 			<date>2779-01-01</date>
 			<faction>PIND</faction>
+		</factionChange>
+		<factionChange>
+			<date>3012-01-01</date>
+			<faction>OC</faction>
 		</factionChange>
 		<factionChange>
 			<date>3049-09-02</date>
@@ -32125,7 +33334,27 @@ Today, Nusakan is home to a thriving population and reborn computer and electron
 		<name>Odell</name>
 		<xcood>252.72</xcood>
 		<ycood>-98.32</ycood>
-		<faction>FS</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>  
+		<factionChange>
+			<date>2317-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>2796-01-01</date> 
+			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2798-12-01</date>
+			<faction>FS</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -32285,7 +33514,27 @@ Okefenokee is covered in jungles and swamps that are teeming with life. Unfortun
 		<name>Olancha</name>
 		<xcood>168.74</xcood>
 		<ycood>-6.52</ycood>
-		<faction>FS</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>  
+		<factionChange>
+			<date>2317-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>2796-01-01</date> 
+			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2808-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -32320,13 +33569,26 @@ Okefenokee is covered in jungles and swamps that are teeming with life. Unfortun
 			<date>3058-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
-		<lifeForm>7</lifeForm>
 		<spectralClass>G</spectralClass>
 		<subtype>3</subtype>
 		<luminosity>V</luminosity>
 		<sysPos>4</sysPos>
+		<satellite>Foster</satellite>
+		<satellite>Rowan</satellite>
+		<gravity>1.10</gravity>
+		<pressure>4</pressure>
+		<climate>5</climate>
+		<temperature>45</temperature>
+		<percentWater>56</percentWater>
 		<hpg>B</hpg>
-		<desc>For most of its history Old Kentucky has been a wilderness resort for Confederation nobility. Its southern continental rainforests have been rumored to house a secret Maskirovka guerrilla warfare training centre. The terrain in this area is ideal for training operatives in jungle warfare - with plenty of treacherous terrain, landslides, venomous and carnivorous indigenous plant life, and a large, gorilla-like indigenous species that is intelligent enough to lay primitive mantraps, only the best can survive the grueling training.</desc>
+		<lifeForm>7</lifeForm>
+		<socioIndustrial>B-C-C-B-C</socioIndustrial>
+		<landMass>Argos</landMass>
+		<landMass>Dargo (Lexington)</landMass>
+		<landMass>Nugget</landMass>
+		<desc>For most of its history Old Kentucky has been a wilderness resort for Confederation nobility. Its southern continental rainforests have been rumored to house a secret Maskirovka guerrilla warfare training centre. The terrain in this area is ideal for training operatives in jungle warfare - with plenty of treacherous terrain, landslides, venomous and carnivorous indigenous plant life, and a large, gorilla-like indigenous species that is intelligent enough to lay primitive mantraps, only the best can survive the grueling training.
+		
+Old Kentucky is home to one of many Duchy RTC training facilities in the Confederation and trains vehicle crews and infantry. It is one of the premier jungle warfare training centers in the Confederation.</desc>
 	</planet>
 	<planet>
 		<name>Olindo</name>
@@ -32836,6 +34098,22 @@ On Ovan, local nobles have come to exercise complete control over the citizenry 
 		<xcood>46.68</xcood>
 		<ycood>-209.68</ycood>
 		<faction>CC</faction>
+		<spectralClass>G</spectralClass>
+		<subtype>4</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>3</sysPos>
+		<satellite>Heysham</satellite>
+		<gravity>1.0</gravity>
+		<pressure>3</pressure>
+		<climate>3</climate>
+		<temperature>30</temperature>
+		<percentWater>78</percentWater>
+		<nadirCharge>True</nadirCharge>
+		<hpg>B</hpg>
+		<lifeForm>4</lifeForm>
+		<socioIndustrial>C-C-C-C-C</socioIndustrial>
+		<landMass>Yarmouth (Glasson)</landMass>
+		<desc>Overton is an unremarkable planet, with limited natural resources, agriculture and industry. The planet is mostly self-sufficient but is of limited strategic or military importance. Overton is home to one of many Duchy RTC training facilities throughout the Capellan Confederation that trains infantry and conventional armor crews.</desc>
 	</planet>
 	<planet>
 		<name>Ozawa</name>
@@ -33438,6 +34716,10 @@ Challenge Systems</desc>
 			<faction>PIND</faction>
 		</factionChange>
 		<factionChange>
+			<date>3012-01-01</date>
+			<faction>OC</faction>
+		</factionChange>
+		<factionChange>
 			<date>3049-09-12</date>
 			<faction>CW</faction>
 		</factionChange>
@@ -33677,7 +34959,23 @@ Alphard Trading Corporation [destroyed 3075]</desc>
 		<name>Pesht</name>
 		<xcood>207.86</xcood>
 		<ycood>312.7</ycood>
-		<faction>DC</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2310-03-06</date>
+			<faction>AG</faction>
+		</factionChange>
+		<factionChange>
+			<date>2319-01-01</date>
+			<faction>DC</faction>
+		</factionChange>
 		<factionChange>
 			<date>3059-07-27</date>
 			<faction>CSJ,DC</faction>
@@ -33994,7 +35292,10 @@ Alphard Trading Corporation [destroyed 3075]</desc>
 Pinard is still a vital planet to the Taurian Defense Force as it is home to extensive military industry and the Pinard Taurian Academy. The Academy is located in the city of Jacques on the Yvon continent. Pinard is still the headquarters of Pinard Protectorates Limited, and their plants on Pinard produce BattleMechs and combat vehicles for the Concordat. The primary plant is located in the planetary capital city Daniel on the Yvon continent. Pinard is also home to Pinard-Dicolais Electronics, one of the premier electronics producer in the Concordat and produces complex electronics such as ECM, TAG and satellites, their primary plant is located in the massive city of Konstr on the continent of Cecile. Vandenberg Mechanized Industries has a subsidiary plant in Allentown in the hills of the Drummond continent that produces BattleMechs and combat vehicles. Wingman Enterprises Limited is based in the the plains of Luq on the Yvon continent and produces both aerospace and conventional fighters.
 
 Manufacturing centers:
-Pinard Protectorates Limited</desc>
+Pinard Protectorates Limited
+Pinard-Dicolais Electronics
+Vandenberg Mechanized Industries
+Wingman Enterprises</desc>
 	</planet>
 	<planet>
 		<name>Pingree</name>
@@ -34066,6 +35367,10 @@ Pinard Protectorates Limited</desc>
 		<factionChange>
 			<date>2779-01-01</date>
 			<faction>PIND</faction>
+		</factionChange>
+		<factionChange>
+			<date>3012-01-01</date>
+			<faction>OC</faction>
 		</factionChange>
 		<factionChange>
 			<date>3049-08-19</date>
@@ -34487,6 +35792,10 @@ Port Moseby itself is an ordinary planet, comfortable for human life with no ext
 		<factionChange>
 			<date>2900-01-01</date>
 			<faction>PIND</faction>
+		</factionChange>
+		<factionChange>
+			<date>3028-01-01</date>
+			<faction>EF</faction>
 		</factionChange>
 		<factionChange>
 			<date>3049-09-05</date>
@@ -35674,10 +36983,26 @@ Hope Industrial Works</desc>
 		<name>Rasalhague</name>
 		<xcood>39.64</xcood>
 		<ycood>393.29</ycood>
-		<faction>PoR</faction>
+		<faction>UND</faction>
 		<factionChange>
-			<date>2330-01-01</date>
+			<date>2250-01-01</date>
+			<faction>PoR</faction>
+		</factionChange> 
+		<factionChange>
+			<date>2367-01-01</date>
+			<faction>PoR,DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2367-01-01</date>
+			<faction>PoR</faction>
+		</factionChange>
+		<factionChange>
+			<date>2510-06-01</date>
 			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3034-03-13</date>
+			<faction>FRR</faction>
 		</factionChange>
 		<factionChange>
 			<date>3034-03-13</date>
@@ -35937,33 +37262,22 @@ Magna Metals Incorporated</desc>
 			<date>3062-01-01</date>
 			<faction>CC</faction>
 		</factionChange>
-		<spectralClass>K</spectralClass>
-		<subtype>6</subtype>
+		<spectralClass>F</spectralClass>
+		<subtype>9</subtype>
 		<luminosity>V</luminosity>
-		<sysPos>1</sysPos>
-		<gravity>1.13</gravity>
-		<pressure>4</pressure>
-		<climate>5</climate>
-		<temperature>42</temperature>
-		<percentWater>90</percentWater>
-		<nadirCharge>True</nadirCharge>
-		<zenithCharge>True</zenithCharge>
+		<sysPos>2</sysPos>
+		<gravity>0.99</gravity>
+		<pressure>3</pressure>
+		<climate>3</climate>
+		<temperature>38</temperature>
+		<percentWater>40</percentWater>
 		<hpg>B</hpg>
-		<lifeForm>6</lifeForm>
-		<socioIndustrial>C-B-C-A-B</socioIndustrial>
-		<landMass>Remington (Chesterfield)</landMass>
-		<landMass>Targe</landMass>
-		<desc>Note: All data is non-canon. 
-
-3060: Remshield is a hot-humid planet primarily covered in water. The planet’s two landmasses are covered in thick jungles, which are stalked by large avian predators known as ‘Hellstrich’ that can grow to be over 2 meters tall and share a look similar to the ostrich of earth, only larger, bulkier and meaner.
-
-Remshield has a strong industrial base, primarily producing consumer goods and farm equipment. The planet has significant arable land and a large fishing industry. The high yield of consumer goods and agriculture make up the majority of Remshield’s significant exports.
-
-Originally settled by the Sarna Supremacy, Remshield was absorbed by the Capellan Confederation and spared the worst of the Succession Wars due to its lack of military value. The planet was captured by House Davion in the 4th Succession War and remained part of the Federated Commonwealth until 3057 after the realm was sundered in the aftermath of Operation Guerrero. The local planetary government, a representative democracy, was able to quickly fill the void of the FedCom central government and even worked out a trade deal with nearby New Macao.
-
-Remshield was eventually re-absorbed into the Capellan Confederation in the early 3060s.
-
-Remshield has 27 hour days and orbits its sun every 55 standard days.</desc>
+		<lifeForm>5</lifeForm>
+		<socioIndustrial>B-C-B-C-D</socioIndustrial>
+		<landMass>Betty</landMass>
+		<landMass>Julia (Mineral City)</landMass>
+		<landMass>Tonya</landMass>
+		<desc>Remshield is a relatively comfortable planet, however its ecology is incompatible with Terran-life and as a result agriculture is difficult and as a result most of the planet’s food is imported from off-planet. The planet does boast abundant natural resources and mining is a major industry on Remshield, which is where the capital’s name, Mineral City, originated. The planet has modest industry, however it is of limited military importance. The planet is home to one of the many Duchy RTC training facilities located in the Confederation and specializes in training infantry and vehicle crews on the badlands of the Betty continent.</desc>
 	</planet>
 	<planet>
 		<name>Remulac</name>
@@ -36707,7 +38021,10 @@ Interstellar Agriculture Concerns</desc>
 		<socioIndustrial>D-D-D-F-C</socioIndustrial>
 		<satellite>Rory</satellite>
 		<hpg>B</hpg>
-		<desc>Rollis is best known as a stopping off point from the Capallen Confederation into the Periphery, though it was originally settled by the Taurians and taken by the Federated Suns for two centuries before Rollis was conquered by the Capellans in the 1st Succession War. The planet is temperate and would be quite comfortable if not for the low pressure atmosphere. Rollis is able to support enough agriculture to support its people, though there are few other natural resources and little industry. The system does not support a recharge station at either jump point, however it does have a small orbital station that allows for dropship and small craft refit and repair. The primary export form Rollis is timber, specifically wood harvested from the equatorial island of Iskandia, which is fragrant like cedar and nearly fire-resistant.</desc>
+		<landMass>Como (New Harmon)</landMass>  
+        <landMass>Spruce</landMass>  
+        <landMass>Wright</landMass>
+		<desc>Rollis is best known as a stopping off point from the Capallen Confederation into the Periphery, though it was originally settled by the Taurians and taken by the Federated Suns for two centuries before Rollis was conquered by the Capellans in the 1st Succession War. The planet is temperate and would be quite comfortable if not for the low pressure atmosphere. Rollis is able to support enough agriculture to support its people, though there are few other natural resources and little industry. The system does not support a recharge station at either jump point, however it does have a small orbital station that allows for dropship and small craft refit and repair. The primary export form Rollis is timber, specifically wood harvested from the equatorial island of Iskandia, which is fragrant like cedar and nearly fire-resistant. Rollis is home to a Duchy RTC that trains vehicle crews and unarmored infantry. Due to the planet's low population, the RTC is able to use vast swaths of undeveloped land for training and large scale combat exercises.</desc>
 	</planet>
 	<planet>
 		<name>Romita</name>
@@ -36856,7 +38173,19 @@ The twin continents of Oxo and Xox are nearly mirror images of each other, almos
 		<name>Rowe</name>
 		<xcood>336.17</xcood>
 		<ycood>48.51</ycood>
-		<faction>FS</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>  
+		<factionChange>
+			<date>2317-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -37095,7 +38424,27 @@ Under The Republic, Michaelson converted its helicopter designs to civilian use 
 		<name>Ryde</name>
 		<xcood>-45.64</xcood>
 		<ycood>93.63</ycood>
-		<faction>FoS</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2235-03-27</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2236-04-17</date>
+			<faction>IND,TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2237-12-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2299-01-01</date>
+			<faction>FoS</faction>
+		</factionChange>
 		<factionChange>
 			<date>2341-01-01</date>
 			<faction>LA</faction>
@@ -37458,7 +38807,27 @@ As of the 32nd century, this world is little more than an outpost, with no agric
 		<name>Saginaw</name>
 		<xcood>302.27</xcood>
 		<ycood>-96.5</ycood>
-		<faction>FS</faction>
+		 <faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>  
+		<factionChange> 
+			<date>2317-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>2796-01-01</date> 
+			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2798-12-01</date>
+			<faction>FS</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -37765,7 +39134,7 @@ As of the 32nd century, this world is little more than an outpost, with no agric
 		<spectralClass>K</spectralClass>
 		<subtype>4</subtype>
 		<sysPos>5</sysPos>
-		<hpg>X</hpg>
+		<hpg>C</hpg>
 		<desc>No description available.</desc>
 	</planet>
 	<planet>
@@ -37915,9 +39284,17 @@ As of the 32nd century, this world is little more than an outpost, with no agric
 		<socioIndustrial>A-A-D-C-D</socioIndustrial>
 		<satellite>Grace</satellite>
 		<hpg>A</hpg>
+		<landMass>Borah</landMass>
+		<landMass>Canoshal</landMass>
+		<landMass>Jacarlos (Sarna)</landMass>
+		<landMass>Oahu</landMass>
+		<landMass>Yant</landMass>
 		<desc>Sarna was once the capital of the Sarna Supremacy until the Supremacy was absorbed into the Capellan Confederation and Sarna is now the capital of the Sarna Commonality. The planet was heavily industrialized and wealthy. Unfortunately, Sarna suffered tremendously during the Succession Wars, with most of its industry destroyed or relocated and its cities almost wiped out by bombing. By the late 3rd Succession War, Sarna remaining industrial capacity was centered around the mining of copper and iron ore deposits.
 
+Sarna is home to the Sarna Martial Academy and one of many Duchy RTC facilities. The Sarna Martial Academy is located on edge of Sarna, the planetary capital, and has programs for MechWarriors, armor crews, infantry and Aerospace pilots, as well as a respected officer training program. The Duchy RTC facilities on are located in the town of Svoboda on the Jarclos continent and provide training for MechWarriors, Aerospace pilots, armor crews and infantry.
+
 Manufacturing centers:
+Asuncion Industries [est. 3074]
 Tengo Aerospace</desc>
 	</planet>
 	<planet>
@@ -38000,7 +39377,27 @@ Tengo Aerospace</desc>
 		<name>Saunemin</name>
 		<xcood>248.28</xcood>
 		<ycood>-56.85</ycood>
-		<faction>FS</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>  
+		<factionChange> 
+			<date>2317-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>2792-01-01</date> 
+			<faction>DC</faction>
+		</factionChange>
+		<factionChange> 
+			<date>2822-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -38108,6 +39505,22 @@ Tengo Aerospace</desc>
             <date>3030-12-20</date>
             <faction>CC</faction>
         </factionChange>
+        <spectralClass>F</spectralClass>
+        <subtype>2</subtype>
+        <luminosity>V</luminosity>
+        <sysPos>2</sysPos>
+        <gravity>0.90</gravity>
+        <pressure>2</pressure>
+        <climate>3</climate>
+        <temperature>32</temperature>
+        <percentWater>85</percentWater>
+        <zenithCharge>true</zenithCharge>
+        <nadirCharge>true</nadirCharge>
+        <hpg>B</hpg>
+        <lifeForm>1</lifeForm>
+        <landMass>Sax (Alicante)</landMass>  
+        <socioIndustrial>C-C-D-C-D</socioIndustrial>
+        <desc>Sax has a relatively comfortable temperate-tropical climate and abundant water, though a thinner than standard atmosphere. Unfortunately much of the water is ocean and the single large continent does not support much agriculture and as a result the planet's population relies on food imported from neighboring planets. Sax is home to a Duchy RTC that focuses on training vehicle crews and unarmored infantry in the badlands of the planet's lone continent.</desc>
 	</planet>
 	<planet>
 		<name>Scarborough</name>
@@ -38611,7 +40024,27 @@ Sevon was famously the location of the Star League’s first defeat during Opera
 		<name>Sevren</name>
 		<xcood>-44.86</xcood>
 		<ycood>316.09</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2235-03-27</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2236-07-08</date>
+			<faction>IND,TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2237-12-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2341-01-01</date>
+			<faction>LA</faction>
+		</factionChange> 
 		<factionChange>
 			<date>3024-05-01</date>
 			<faction>DC</faction>
@@ -39015,6 +40448,25 @@ By the time of the founding of The Republic of the Sphere, Sheratan‘s populati
             <date>3034-03-01</date>
             <faction>CC</faction>
         </factionChange>
+        <spectralClass>K</spectralClass>
+        <subtype>9</subtype>
+        <luminosity>V</luminosity>
+        <sysPos>5</sysPos>
+        <gravity>1.09</gravity>
+        <pressure>3</pressure>
+        <temperature>35</temperature>
+        <percentWater>52</percentWater>
+        <climate>5</climate>
+        <zenithCharge>true</zenithCharge>
+        <hpg>B</hpg>
+        <lifeForm>5</lifeForm>
+        <satellite>Amity</satellite>
+        <landMass>Abbey (Montauk)</landMass>  
+        <landMass>Abbot</landMass>  
+        <socioIndustrial>C-C-B-C-C</socioIndustrial>
+        <desc>Shiba is a relatively comfortable planet, with abundant natural resources and sufficient agriculture to feed its population, though the planet is not home to significant industry.
+        
+Shiba is home to a Duchy RTC facility, which is located in the flatlands of Abbot and focuses on training vehicle crews and unarmored infantry.</desc>
 	</planet>
 	<planet>
 		<name>Shibukawa</name>
@@ -39405,7 +40857,14 @@ During the Jihad, Shipka was overlooked by the Word of Blake forces. When Devlin
 		<desc>The planet is known for lush jungles and tropical environments. Development is controlled and limited so that much of the terrain outside of cities is virgin wilderness. The planetary capital Zi-Jin Cheng (“Forbidden City”) is also the capital of the Capellan Confederation and home to the Celestial Palace, home to House Liao.
 		
 Sian has been the capital of the Capellan Confederation since 2368 when Capella was evacuated and bombarded by the Confederation Navy after the former capital was occupied by Davion peace-keepers. At the time Sian was the home of the Chancellor's summer palace and home to House Liao's political apparatus, the infamous Maskirovka (or Secret Service) and House Imarra (the original Warrior House regiment). Sian is likely the best-defended world in the Confederation, garrisoned by the Capellan Hussars with supporting AeroSpace fighter contingents commanded by the best pilots in the Confederation and by the Warrior Houses battalions that rotate to Sian periodically for special training.
-		</desc>
+
+Sian has heavy industry and several centers for higher learning and military training. Ceres Metals is located in the woodlanded wetlands of the Imarra continent and produces BattleMechs. Hellspont Industries in the city ofSylbari on the Imarra continent produces various combat vehicles and eventually battlearmor. Additionally, Hellespont has a 'Mech factory located in the same city, with satellite facilities in space at the L2 point. Saroyan Special Production produces aerospace and conventional fighters in the badlands of Imarra. Sian Center for Martial Disciplines is located on the Wuhan continent and has a vast campus and trains recruit MechWarrior, Aerospace pilots, DropShip and Jumpship crews, vehicle crews, as well as armored and unarmored infantry. Sian University on Liaoning is one of the finest centers of learning in the whole Confederation. Additionally, Sian is home to one of the Confederation's many Duchy RTC facilities, which trains vehicle crews and infantry.
+
+Manufacturing centers:
+Ceres Metals
+Hellspont Industries
+Hellspont 'Mech Works
+Saroyan Special Production</desc>
 	</planet>
 	<planet>
 		<name>Siendou</name>
@@ -39492,6 +40951,10 @@ Sian has been the capital of the Capellan Confederation since 2368 when Capella 
 		<factionChange>
 			<date>2779-01-01</date>
 			<faction>PIND</faction>
+		</factionChange>
+		<factionChange>
+			<date>3012-01-01</date>
+			<faction>OC</faction>
 		</factionChange>
 		<factionChange>
 			<date>3049-09-26</date>
@@ -39782,9 +41245,37 @@ as the House Lords changed, the cities of Aneheim, along Freiheim‘s Kirschner 
 		<name>Skondia</name>
 		<xcood>-32.08</xcood>
 		<ycood>56.07</ycood>
-		<faction>FoS</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2340-01-01</date>
+			<faction>FoS</faction>
+		</factionChange>
 		<factionChange>
 			<date>2341-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2445-01-01</date>
+			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2463-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2490-01-01</date>
+			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2550-01-01</date>
 			<faction>LA</faction>
 		</factionChange>
 		<factionChange>
@@ -40553,11 +42044,13 @@ During the Jihad, St. Andre was attacked on three different occasions by Word of
 		<socioIndustrial>A-A-B-A-C</socioIndustrial>
 		<satellite>Cochrane</satellite>
 		<landMass>Liaoning (Tian-tan)</landMass>
-		<landMass>Zona</landMass>
+		<landMass>'Zona</landMass>
 		<hpg>A</hpg>
 		<desc>St. Ives is a comfortable planet which was first settled in 2197 by refugees from Hong Kong. The planet was an independent realm for much of its early history and did not recognize the rule of the Terran Alliance. In 2244 St. Ives became the capital of the fledgling St. Ives Mercantile League until eventually joining the Capellan Confederation as the capital of the St. Ives Commonality. 
 
 St. Ives was always an important world in the Confederation due to hosting the largest concentration of electronics and avionics manufacturing facilities in the realm. In addition the planet is a major BattleMech production center and was historically the largest Aerospace fighter production center in the Confederation. These industries are located in vast underground facilities that honeycomb the planet making them almost invulnerable to attack and the key reason these plants survived the Succession Wars.
+
+St. Ives is home to a number of military industrial facilities, including a Ceres Metals BattleMech and combat vehicle plant located in the mountsains of the 'Zone continent, a Hildco Interplanetary BattleMech factory located in the flatlands of 'Zona, a Tengo Aerospace factory located in the capital city Tain-tan, and a StarCorps BattleMech factory located in the mountains of Liaoning. St. Ives is also home to the well known St. Ives Academy of Martial Sciences, which trains MechWarriors, aerospace pilots, tank crews, and armored and unarmored infantry. The planet is also home to one of many Duchy RTCs which focus on MechWarrior, combat vehicle crew and unarmored infantry training.   
 
 Manufacturing centers:
 Ceres Metal Industries
@@ -40580,7 +42073,23 @@ Tengo Aerospace</desc>
 		<name>St. John</name>
 		<xcood>-13.56</xcood>
 		<ycood>404.5</ycood>
-		<faction>DC</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2350-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2414-01-01</date>
+			<faction>DC</faction>
+		</factionChange>
 		<factionChange>
 			<date>3034-03-13</date>
 			<faction>FRR</faction>
@@ -40916,7 +42425,7 @@ Tengo Aerospace</desc>
 		<temperature>31</temperature>
 		<percentWater>50</percentWater>
 		<zenithCharge>True</zenithCharge>
-		<hpg>X</hpg>
+		<hpg>C</hpg>
 		<lifeForm>7</lifeForm>
 		<socioIndustrial>A-B-B-C-C</socioIndustrial>
 		<landMass>Helios</landMass>
@@ -41066,10 +42575,13 @@ J. B. BattleMechs Inc.</desc>
 		<sysPos>4</sysPos>
 		<landMass>Cameron</landMass>
 		<landMass>McKenna</landMass>
-		<landMass>Novy Terra</landMass>
+		<landMass>Novy Terra (Katyusha City)</landMass>
 		<landMass>Kerensky Prime</landMass>
 		<hpg>A</hpg>
-		<desc>Strana Mechty ("Land of Dreams") is the Clan shared "capital" planet. The planet is the site that Nicolas Kerensky and the original 800 Clan founders fled to from the Pentagon Worlds. Strana Mechty houses the Hall of Khans where the leaders of the Clans meet for Grand Councils. Each Clan has an enclave on the planet.</desc>
+		<zenithCharge>true</zenithCharge>
+        <satellite>Petrograd</satellite>
+        <satellite>Magadan</satellite>
+		<desc>Strana Mechty ("Land of Dreams") is the Clan shared "capital" planet. The planet is the site that Nicolas Kerensky and the original 800 Clan founders fled to from the Pentagon Worlds. Strana Mechty houses the Hall of Khans where the leaders of the Clans meet for Grand Councils. Each Clan has an enclave on the planet. Strana Mechty is cold but teeming with both native and terrestrial life.</desc>
 	</planet>
 	<planet>
 		<name>Strandfontein</name>
@@ -41226,6 +42738,7 @@ J. B. BattleMechs Inc.</desc>
 		<satellite>Dianthus</satellite>
 		<satellite>Pantheons</satellite>
 		<hpg>B</hpg>
+		<socioIndustrial>B-B-B-B-C</socioIndustrial>
 		<landMass>Burtnik (Lorelei)</landMass>  
         <landMass>Deyoung</landMass>  
         <landMass>Shaw</landMass>  
@@ -41244,7 +42757,11 @@ Tao ‘Mechworks</desc>
 		<name>Styx</name>
 		<xcood>26.08</xcood>
 		<ycood>25.82</ycood>
-		<faction>TA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
 		<factionChange>
 			<date>2442-01-01</date>
 			<faction>IND</faction>
@@ -41613,7 +43130,23 @@ For most of the planet’s history it was a Lyran Commonwealth planet bordering 
 		<name>Sverdlovsk</name>
 		<xcood>344.26</xcood>
 		<ycood>185.95</ycood>
-		<faction>DC</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>   
+		<factionChange>
+			<date>2303-09-01</date>
+			<faction>AG</faction>
+		</factionChange>   
+		<factionChange>
+			<date>2319-01-01</date>
+			<faction>DC</faction>
+		</factionChange> 
 	</planet>
 	<planet>
 		<name>Svinngarn</name>
@@ -42133,17 +43666,15 @@ Forerunner A.G.</desc>
 		<subtype>5</subtype>
 		<luminosity>V</luminosity>
 		<sysPos>4</sysPos>
-		<gravity>1.0</gravity>
+		<gravity>1.02</gravity>
 		<pressure>3</pressure>
 		<temperature>35</temperature>
-		<climate>3</climate>
-		<percentWater>70</percentWater>
+		<climate>4</climate>
+		<percentWater>35</percentWater>
 		<hpg>A</hpg>
+		<nadirCharge>true</nadirCharge>
 		<lifeForm>5</lifeForm>
 		<satellite>Pietra di Fortuna</satellite>
-		<satellite>Grant</satellite>
-		<satellite>Ella</satellite>
-		<satellite>Chimera</satellite>
 		<landMass>Ajmer</landMass>
 		<landMass>Beawar</landMass>
 		<landMass>Jaipur (Dolsonville)</landMass>
@@ -42157,7 +43688,7 @@ Unfortunately for the people of Tancredi, their success made the planet a tempti
 Since the Federated Suns reclaimed the planet in 3023, rebuilding efforts have been slow but the planet’s industry has remained somewhat strong, as many companies rebuilt underground after the 1st Succession War, sparing the industrial base significant damage after.
 
 Manufacturing centers:
-Precision Weaponry</desc>
+Precision Weaponry [Precision Laser Systems prior to the 2nd Succession War]</desc>
 	</planet>
 	<planet>
 		<name>Tangipahoa</name>
@@ -42490,15 +44021,35 @@ Taurus is home to a number of military industries and academies. Magna Metals is
 		<name>Telos IV</name>
 		<xcood>44.34</xcood>
 		<ycood>40.68</ycood>
-		<faction>DC</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
 		<factionChange>
 			<date>2242-01-01</date>
 			<faction>IND</faction>
-		</factionChange>
+		</factionChange>   
+		<factionChange>
+			<date>2309-03-26</date>
+			<faction>AG</faction>
+		</factionChange>   
+		<factionChange>
+			<date>2311-09-01</date>
+			<faction>IND</faction>
+		</factionChange> 
+		<factionChange>
+			<date>2311-09-15</date>
+			<faction>IND,AG</faction>
+		</factionChange> 
+		<factionChange>
+			<date>2312-04-01</date>
+			<faction>AG</faction>
+		</factionChange> 
 		<factionChange>
 			<date>2319-01-01</date>
 			<faction>DC</faction>
-		</factionChange>
+		</factionChange>   
 		<factionChange>
 			<date>2341-01-01</date>
 			<faction>TH</faction>
@@ -42925,7 +44476,15 @@ Tharkad Aerospace Group</desc>
 		<name>The Edge</name>
 		<xcood>-33.9</xcood>
 		<ycood>410.76</ycood>
-		<faction>TA</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
 		<factionChange>
 			<date>2315-01-01</date>
 			<faction>TH</faction>
@@ -44170,9 +45729,21 @@ Gutierrez Aerospace</desc>
 		<name>Trolloc Prime</name>
 		<xcood>33.9</xcood>
 		<ycood>172.65</ycood>
-		<faction>LA</faction>
+		<faction>UND</faction>
 		<factionChange>
-			<date>2900-01-01</date>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2597-01-01</date>
+			<faction>LA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2785-11-01</date>
 			<faction>DC</faction>
 		</factionChange>
 	</planet>
@@ -44180,7 +45751,27 @@ Gutierrez Aerospace</desc>
 		<name>Trondheim</name>
 		<xcood>73.28</xcood>
 		<ycood>408.93</ycood>
-		<faction>DC</faction>
+		 <faction>UND</faction>
+		<factionChange>
+			<date>2250-01-01</date>
+			<faction>PoR</faction>
+		</factionChange> 
+		<factionChange>
+			<date>2367-01-01</date>
+			<faction>PoR,DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2367-01-01</date>
+			<faction>PoR</faction>
+		</factionChange>
+		<factionChange>
+			<date>2510-06-01</date>
+			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3034-03-13</date>
+			<faction>FRR</faction>
+		</factionChange>
 		<factionChange>
 			<date>3034-03-13</date>
 			<faction>FRR</faction>
@@ -44244,7 +45835,7 @@ Gutierrez Aerospace</desc>
 		<socioIndustrial>C-B-C-B-C</socioIndustrial>
 		<satellite>Trollvegn</satellite>
 		<satellite>Glittertindane</satellite>
-		<hpg>X</hpg>
+		<hpg>C</hpg>
 		<landMass>Narvik</landMass>
 		<desc>Trondheim is the second most populated world in the small JarnFolk nation and the most industrialized. The planet is the main venue for both dropship and jumpship maintenance of the small JarnFolk fleet. All of the major families have a presence on the planet and as a result Trondheim is the planetary capital of the JarnFolk. The industries on planet are capable of producing replacement parts for their dropships and jumpships and there are dry docks located in orbit. The docks are likely automated designs from the founding of the colonies in the early 26th Century.</desc>
 	</planet>
@@ -44564,7 +46155,9 @@ Tsukude‘s capital, Ogawa City, is located on Ikadae, the largest of this world
 		<satellite>Shroud</satellite>
 		<landMass>Turin (Porter)</landMass>
 		<socioIndustrial>C-D-C-D-A</socioIndustrial>
-		<desc>3025 - Turin has almost endless grassy plains that provide excellent cattle pastures. The Turin colonists discovered that Terran cows could be crossbred with a Turin native animal to create a hybrid that is meatier and better tasting. However, the milk of these hybrids is indigestible to humans, so Turin's few dairies specialise in cow's and goat's milk and cheese. Turin is also famous for horse breeding, rivaling the Eridani blood lines.</desc>
+		<desc>3025 - Turin has almost endless grassy plains that provide excellent cattle pastures. The Turin colonists discovered that Terran cows could be crossbred with a Turin native animal to create a hybrid that is meatier and better tasting. However, the milk of these hybrids is indigestible to humans, so Turin's few dairies specialise in cow's and goat's milk and cheese. Turin is also famous for horse breeding, rivaling the Eridani blood lines.
+		
+Turin is home to a Duchy RTC, which focuses on training vehicle crews and unarmored infantry. The RTC on Turin is known for its specialized jump infantry program, which is considered one of the best in the Confederation.</desc>
 	</planet>
 	<planet>
 		<name>Turinge</name>
@@ -44743,7 +46336,31 @@ With no substantial industry or natural resources, the Blakists largely overlook
 		<name>Udibi</name>
 		<xcood>318.96</xcood>
 		<ycood>70.42</ycood>
-		<faction>FS</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange> 
+		<factionChange>
+			<date>2319-01-01</date>
+			<faction>DC</faction>
+		</factionChange>  
+		<factionChange>
+			<date>2780-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>2796-01-01</date> 
+			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>2808-01-01</date>
+			<faction>FS</faction>
+		</factionChange>
 		<factionChange>
 			<date>3040-01-01</date>
 			<faction>FC</faction>
@@ -44751,6 +46368,10 @@ With no substantial industry or natural resources, the Blakists largely overlook
 		<factionChange>
 			<date>3067-01-01</date>
 			<faction>FS</faction>
+		</factionChange>
+		<factionChange>
+			<date>3130-01-01</date>
+			<faction>FS,DC</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -45350,7 +46971,19 @@ In the centuries of the Succession Wars, Unukalhai was largely overlooked by inv
 		<name>Vega</name>
 		<xcood>-3.65</xcood>
 		<ycood>107.97</ycood>
-		<faction>DC</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>
+		<factionChange>
+			<date>2407-01-01</date>
+			<faction>DC</faction>
+		</factionChange>
 		<factionChange>
 			<date>2570-01-01</date>
 			<faction>LA</faction>
@@ -45668,7 +47301,15 @@ In 2897, a renegade Special Forces platoon, led by leader Lieutenant Jeremiah Ko
 
 Victoria has a booming economy. Students that show an aptitude for engineering compete for entry to the famous Victoria Institute of Engineering. Graduates are in high demand and command large fees, a portion of which automatically go to the Victorian Exchequer.
 
-In the early 31st Century an underground Star League-era ‘Mech research facility was rediscovered..</desc>
+In the early 31st Century an underground Star League-era ‘Mech research facility was rediscovered.
+
+Victoria is home to several military manufacturing centers, including an Earthwerks Limited BattleMech facility and a Shengli Arms BattleMech factory are both located in the mountains, while Trellis Electronics, which produces communication and targeting and tracking systems in the city of Trellis. Victoria is also home to the famous Victoria Academy of Arms and Technology, which is also located in the city of Trellis and is a major center of study for technicians and trains more techs than it does MechWarriors, Aerospace pilots and combat vehicle crews combined.
+
+Manufacturing centers:
+Earthwerks Limited
+Shengli Arms
+Tellis Electronics
+</desc>
 	</planet>
 	<planet>
 		<name>Victoria</name>
@@ -45844,7 +47485,7 @@ In the early 31st Century an underground Star League-era ‘Mech research facili
 		<ycood>-393.39</ycood>
 		<faction>PIND</faction>
 		<factionChange>
-			<date>2900-01-01</date>
+			<date>3020-01-01</date>
 			<faction>MOC</faction>
 		</factionChange>
 		<zenithCharge>True</zenithCharge>
@@ -45852,8 +47493,9 @@ In the early 31st Century an underground Star League-era ‘Mech research facili
 		<spectralClass>G</spectralClass>
 		<subtype>3</subtype>
 		<sysPos>5</sysPos>
+		<climate>2</climate>
 		<hpg>C</hpg>
-		<desc>No description available.</desc>
+		<desc>3025 – Vixen was not settled until the early 3020s and was colonized by a handful of corporations intent on making the cool-temperate world into a pleasure planet. While there are only a few thousand settlers currently on Vixen, most of them are engaged in the various tourist and entertainment enterprises on planet and in the few years since 'opening', the planet has already attracted thousands of vacationing Canopians. The planet's colder regions are home to some of the magistracy's most elite winter sports competitions, with the ten-mile cross-country skiing event, bobsledding and the brutal 'all-girl' hockey league, known for its gamesmanship and fights. Another draw to Vixen are the extensive hunting grounds in and around the untouched wilderness of the southern continent and the planet's large native mammalian lifeforms.</desc>
 	</planet>
 	<planet>
 		<name>Volders</name>
@@ -45884,7 +47526,7 @@ In the early 31st Century an underground Star League-era ‘Mech research facili
 		<faction>RWR</faction>
 		<factionChange>
 			<date>2779-01-01</date>
-			<faction>PIND</faction>
+			<faction>BoS</faction>
 		</factionChange>
 		<factionChange>
 			<date>3049-08-17</date>
@@ -45903,7 +47545,7 @@ In the early 31st Century an underground Star League-era ‘Mech research facili
 		<subtype>5</subtype>
 		<luminosity>III</luminosity>
 		<sysPos>4</sysPos>
-		<hpg>X</hpg>
+		<hpg>C</hpg>
 		<climate>2</climate>
 		<desc>No description available.</desc>
 	</planet>
@@ -46140,6 +47782,29 @@ Wealthy Walloons enjoy taking advantage of Vuzar, the 7th planet in the Wallis s
 			<date>3030-01-01</date>
 			<faction>DC</faction>
 		</factionChange>
+		<spectralClass>K</spectralClass>
+		<subtype>0</subtype>
+		<luminosity>V</luminosity>
+		<sysPos>6</sysPos>
+		<satellite>Auglaize</satellite>
+		<gravity>0.98</gravity>
+		<pressure>3</pressure>
+		<climate>5</climate>
+		<temperature>29</temperature>
+		<percentWater>87</percentWater>
+		<zenithCharge>True</zenithCharge>
+		<hpg>B</hpg>
+		<lifeForm>7</lifeForm>
+		<socioIndustrial>C-C-D-C-B</socioIndustrial>
+		<landMass>Little Florida Island</landMass>
+		<landMass>New Wisconsin</landMass>
+		<desc>3028 - Wapakoneta is a planet almost entirely covered in water and is famous for its many small picturesque islands and resorts. The largest and warmest continent is New Wisconsin which is home to the planetary capital and most of Wapakoneta’s population. New Wisconsin is near the equator and much of its varied landmass is covered in thick forests. The smallest continent, Little Florida, is located far to the north and is almost entirely covered in glaciers and it is home to only one permanent settlement, the port city of Tassel. The remaining three continents are largely uninhabited due to the monstrous typhoons that regularly tear across them.
+
+Aside from the five continents, the planet is dotted with thousands of islands that range in size from a few square meters to a few thousand square kilometers. Palm Island is an example of one of the larger islands and is owned by the Palm family, who have been the rulers of Wapakoneta for over 200 years, in the name of house Davion.
+
+The biggest military base on Wapakoneta is located on Stygian Shoals, an island forty kilometers south of Little Florida Island. Stygian Shoals is roughly 960 square kilometers and holds sufficient housing for troops moving along the Combine-Federated Suns border. The island is also home to one of the Federated Suns’ top marine schools, Camp Getty.
+
+The primary export from Wapakoneta comes from the vast oceans that cover the planet. New Wisconsin’s northern coast is dotted by food processing plants that specialize in processing and freezing fish and other sea life for transport to neighboring planets, with the planet’s flash-frozen swordfin being prized by high-class restaurants on surrounding worlds. The other large industry on Wapakoneta is tourism, with dozens of vacation and resort locations across the multitude of islands. Unfortunately the tourism tends to fade when tensions are high between the Combine and Federated Suns.</desc>
 	</planet>
 	<planet>
 		<name>Wappingers</name>
@@ -46181,9 +47846,9 @@ Wealthy Walloons enjoy taking advantage of Vuzar, the 7th planet in the Wallis s
 		<temperature>34</temperature>
 		<socioIndustrial>C-C-C-D-C</socioIndustrial>
 		<satellite>Courage</satellite>
-		<desc>Ward was settled during the early Exodus from Terra by Utopians as an experimental community based on the principles of harmony and co-operative activity. Although the First Ward Constitution was scrapped in 2644 and replaced with a constitution that favoured free trade and greater military activity, the original Utopian principles have survived to through the Succession Wars to a surprising degree. The First Ward Constitution remains one of the most widely studied Exodus-era historical documents. 
+		<desc>Ward was settled during the early Exodus from Terra by Utopians as an experimental community based on the principles of harmony and co-operative activity. Although the First Ward Constitution was scrapped in 2644 and replaced with a constitution that favored free trade and greater military activity, the original Utopian principles have survived to through the Succession Wars to a surprising degree. The First Ward Constitution remains one of the most widely studied Exodus-era historical documents. 
 
-The populace of Ward is well known for their skilled construction work and their construction firms take a large number of contracts offworld to construct roads through the most difficult terrain of neighbouring star systems. Wardian road construction methods use a material that far exceeds all other known road construction materials in terms of resisting weather, temperature, and stress. This formula is one of the most closely guarded industrial secrets in the Inner Sphere.
+The populace of Ward is well known for their skilled construction work and their construction firms take a large number of contracts off-world to construct roads through the most difficult terrain of neighboring star systems. Wardian road construction methods use a material that far exceeds all other known road construction materials in terms of resisting weather, temperature, and stress.  This formula is one of the most closely guarded industrial secrets in the Inner Sphere.
 
 Ward's northern polar cap is the site of a Confederation observation-intelligence post.</desc>
 	</planet>
@@ -46237,7 +47902,12 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<satellite>Blackguard</satellite>
 		<landMass>Warlock (Solitude)</landMass>
 		<hpg>B</hpg>
-		<desc>Warlock is an ice-bound planet that hosts numerous resorts for nobles including a winter retreat for the Liao family. It is also the site of a major naval base for St. Ives. The planet also hosts a weapons testing facility and specialised winter training centers are located on the southern continent, while military research and development centers are located on the equator. Throughout its history the Confederation has taken advantage of Warlock’s proximity to the Federated Suns’ border, and often used the planet as a staging point for raids and other covert military or Maskirovka strikes. It was also a regular target for raids by elements of the Capellan March military and other forces of the Federated Suns.</desc>
+		<desc>Warlock is an ice-bound planet that hosts numerous resorts for nobles including a winter retreat for the Liao family. It is also the site of a major naval base for St. Ives. The planet also hosts a weapons testing facility and specialised winter training centers are located on the southern continent, while military research and development centers are located on the equator. Throughout its history the Confederation has taken advantage of Warlock’s proximity to the Federated Suns’ border, and often used the planet as a staging point for raids and other covert military or Maskirovka strikes. It was also a regular target for raids by elements of the Capellan March military and other forces of the Federated Suns.
+
+Warlock's capital city of Solitude is home to a Ceres Metals BattleMech and combat vehicle factory.
+		
+Manufacturing centers:
+Ceres Metals</desc>
 	</planet>
 	<planet>
 		<name>Warren</name>
@@ -46525,7 +48195,9 @@ Ward's northern polar cap is the site of a Confederation observation-intelligenc
 		<hpg>B</hpg>
 		<socioIndustrial>C-D-C-F-B</socioIndustrial>
 		<landMass>Province (Vandannis City)</landMass>
-		<desc>Wei is hotter than Terra but is otherwise a very comfortable planet for human life. During the Star League, Wei was secretly used as a repository for a deadly nerve gas agent. After the collapse of the Star League this repository was forgotten until the early 31st Century when it was rediscovered by the Capellan Confederation.</desc>
+		<desc>Wei is hotter than Terra but is otherwise a very comfortable planet for human life. During the Star League, Wei was secretly used as a repository for a deadly nerve gas agent. After the collapse of the Star League this repository was forgotten until the early 31st Century when it was rediscovered by the Capellan Confederation.
+		
+Wei is home to one of the many Duchy RTC training facilities in the Confederation. The facility specializes in training infanrty and armor crews in the mountains of Province.</desc>
 	</planet>
 	<planet>
 		<name>Weingarten</name>
@@ -46821,8 +48493,9 @@ Presently, aside from the Games and the Hiring Hall, Westerhand does not feature
 		<spectralClass>G</spectralClass>
 		<subtype>4</subtype>
 		<sysPos>2</sysPos>
-		<hpg>X</hpg>
-		<desc>No description available.</desc>
+		<climate>3</climate>
+		<hpg>C</hpg>
+		<desc>3025 - Wildwood is a major agricultural world best known throughout the Magistracy of Canopus and into the Free Worlds League for its vineyards and fine wines. Much of the planet has been left undeveloped and the majority of the terrain remains virgin wilderness. The planet is sparsely populated beyond the handful of farms and vineyards and a small tourist trade that offers tours through the wilderness. Wildwood is popular among bird watchers for its unique avian population.</desc>
 	</planet>
 	<planet>
 		<name>Wilkes</name>
@@ -47159,7 +48832,23 @@ Woodstock‘s third continent, Essex, is the only blemish on this otherwise beau
 		<name>Worrell</name>
 		<xcood>295.49</xcood>
 		<ycood>232.37</ycood>
-		<faction>DC</faction>
+		<faction>UND</faction>
+		<factionChange>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>   
+		<factionChange>
+			<date>2309-09-06</date>
+			<faction>AG</faction>
+		</factionChange>   
+		<factionChange>
+			<date>2319-01-01</date>
+			<faction>DC</faction>
+		</factionChange>
 	</planet>
 	<planet>
 		<name>Wotan</name>
@@ -47585,6 +49274,25 @@ As a border world, Yed Posterior saw its fair share of raids and invasions durin
 			<date>3067-04-24</date>
 			<faction>LA</faction>
 		</factionChange>
+		<spectralClass>G</spectralClass>
+		<subtype>5</subtype>
+		<luminosity>IV</luminosity>
+		<sysPos>3</sysPos>
+		<satellite>Cue</satellite>
+		<satellite>Eight Ball</satellite>
+		<gravity>0.98</gravity>
+		<pressure>3</pressure>
+		<climate>4</climate>
+		<temperature>24</temperature>
+		<percentWater>69</percentWater>
+		<zenithCharge>True</zenithCharge>
+		<hpg>B</hpg>
+		<lifeForm>2</lifeForm>
+		<socioIndustrial>B-C-B-C-B</socioIndustrial>
+		<landMass>Saddleback (Laumer City)</landMass>
+		<desc>Yegaus is a comfortable planet with abundant agriculture and natural resources and even modest industry. However, despite this it has never been a prominent planet in the Lyran Commonwealth, though its location in the nation’s interior spared Yegaus the worst of the Succession Wars. The planet is best known for its ample grasslands and highly regarded breeds of Terran horses. The planet became more prominent after the Clan Invasion put the planet on the Commonwealth’s new border with the Jade Falcons.
+
+Laumer City is located on the continent of Saddleback and is home to Yegaus’ wealthiest merchant families. Saddleback is primarily covered in massive farmsteads that produce ‘luxury crops’ to ship off-world and is one of three continents.</desc>
 	</planet>
 	<planet>
 		<name>Yorii</name>
@@ -47726,13 +49434,22 @@ As a border world, Yed Posterior saw its fair share of raids and invasions durin
 			<date>3085-10-01</date>
 			<faction>ROS</faction>
 		</factionChange>
-		<lifeForm>7</lifeForm>
 		<spectralClass>K</spectralClass>
 		<subtype>3</subtype>
 		<luminosity>III</luminosity>
 		<sysPos>6</sysPos>
+		<gravity>1.00</gravity>
+		<pressure>3</pressure>
+		<climate>5</climate>
+		<temperature>43</temperature>
+		<percentWater>76</percentWater>
 		<hpg>B</hpg>
-		<desc>Yunnah contains vast deposits of natural resources in the large mountain ranges that cover most of the planet’s land mass, however there have been few attempts to mine them and Yunnah was barely populated for most of its history. This changed in the early 31st Century when the Capellan Confederation established a large medical facility to heal injured soldiers and a massive repair and recovery facility to repair damaged war-materials. Yunnah possesses just enough agriculture to feeds its population. Some seafaring activity exists as part of a quasi-religious movement based on spiritual harmony with the elements.</desc>
+		<lifeForm>7</lifeForm>
+		<socioIndustrial>C-D-C-C-C</socioIndustrial>
+		<landMass>Burma (Yunnah Prime)</landMass>
+		<desc>3025: Yunnah contains vast deposits of natural resources in the large mountain ranges that cover most of the planet’s land mass, however there have been few attempts to mine them and Yunnah was barely populated for most of its history. This changed in the early 31st Century when the Capellan Confederation established a large medical facility to heal injured soldiers and a massive repair and recovery facility to repair damaged war-materials. Yunnah possesses just enough agriculture to feeds its population. Some seafaring activity exists as part of a quasi-religious movement based on spiritual harmony with the elements.
+		
+3085: Yunnah is an unremarkable world with almost no industry, limited natural resources and only enough agriculture to feed its own population. Additionally, the planet is only sparsely inhabited and has almost no native industry, as a result requires imports for almost all goods. The planet is primarily utilized for training and large-scale combat maneuvers by the Capellan Confederation. Yunnah is also home to one of many Duchy RTC training facilities and specializes in training infantry and vehicle crews.</desc>
 	</planet>
 	<planet>
 		<name>Yuris</name>
@@ -47807,6 +49524,23 @@ As a border world, Yed Posterior saw its fair share of raids and invasions durin
 		<xcood>120.75</xcood>
 		<ycood>-367.99</ycood>
 		<faction>CC</faction>
+		 <spectralClass>G</spectralClass>
+        <subtype>2</subtype>
+        <luminosity>V</luminosity>
+        <sysPos>3</sysPos>
+        <gravity>1.00</gravity>
+        <pressure>3</pressure>
+        <climate>4</climate>
+        <temperature>38</temperature>
+        <percentWater>44</percentWater>
+        <zenithCharge>true</zenithCharge>
+        <hpg>B</hpg>
+        <lifeForm>7</lifeForm>
+        <satellite>Pemba</satellite>
+        <landMass>Khani</landMass>  
+        <landMass>Stone (Wete)</landMass>  
+        <socioIndustrial>B-B-C-C-C</socioIndustrial>
+        <desc>Zanzibar is a relatively comfortable planet with more than half of its surface area dominated by two massive continents. Due to the limited water, large streches of both Khani and Stone are barren deserts and harsh badlands. However, contrasting the arid climate that dominates much of the terrain, the areas near the coasts and around the major rivers are lush and tropical. Zanzibar is home to a Duchy RTC located on the coast of the Khani continent. The RTC specializes on training vehicle crews and unarmored infantry.</desc>
 	</planet>
 	<planet>
 		<name>Zaprudy</name>
@@ -48126,10 +49860,30 @@ Today, a trace of Zebeneschamali‘s founding decades can still be seen in the s
 		<name>Zlatousi</name>
 		<xcood>431.1</xcood>
 		<ycood>221.68</ycood>
-		<faction>OA</faction>
+		<faction>UND</faction>
 		<factionChange>
-			<date>2750-01-01</date>
+			<date>2172-08-01</date>
+			<faction>TA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2242-01-01</date>
+			<faction>IND</faction>
+		</factionChange>  
+		<factionChange>
+			<date>2413-01-01</date>
+			<faction>OA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2583-02-01</date>
+			<faction>DC,OA</faction>
+		</factionChange>
+		<factionChange>
+			<date>2585-08-01</date>
 			<faction>DC</faction>
+		</factionChange>
+		<factionChange>
+			<date>3130-01-01</date>
+			<faction>OA</faction>
 		</factionChange>
 	</planet>
 	<planet>
@@ -49784,7 +51538,7 @@ Colonial Tractors</desc>
 		<climate>3</climate>
 		<temperature>28</temperature>
 		<percentWater>70</percentWater>
-		<hpg>X</hpg>
+		<hpg>C</hpg>
 		<lifeForm>5</lifeForm>
 		<socioIndustrial>C-D-B-C-B</socioIndustrial>
 		<landMass>Barthelona</landMass>
@@ -49823,7 +51577,7 @@ Royals Refit and Repair Station</desc>
 		<climate>3</climate>
 		<temperature>29</temperature>
 		<percentWater>57</percentWater>
-		<hpg>X</hpg>
+		<hpg>C</hpg>
 		<lifeForm>2</lifeForm>
 		<socioIndustrial>B-C-D-C-D</socioIndustrial>
 		<landMass>Altadena</landMass>
@@ -49950,7 +51704,7 @@ Caliphate Airfield Alpha</desc>
 		<climate>3</climate>
 		<temperature>32</temperature>
 		<percentWater>65</percentWater>
-		<hpg>X</hpg>
+		<hpg>C</hpg>
 		<lifeForm>7</lifeForm>
 		<socioIndustrial>C-D-C-D-B</socioIndustrial>
 		<landMass>Franco</landMass>
@@ -50057,7 +51811,7 @@ Sanctuary Station</desc>
 		<climate>3</climate>
 		<temperature>31</temperature>
 		<percentWater>64</percentWater>
-		<hpg>X</hpg>
+		<hpg>C</hpg>
 		<lifeForm>2</lifeForm>
 		<socioIndustrial>B-C-B-C-C</socioIndustrial>
 		<landMass>Brabant</landMass>
@@ -50153,7 +51907,7 @@ Bordello Military Goods, Inc.</desc>
 		<climate>3</climate>
 		<temperature>28</temperature>
 		<percentWater>70</percentWater>
-		<hpg>X</hpg>
+		<hpg>C</hpg>
 		<lifeForm>6</lifeForm>
 		<socioIndustrial>C-C-D-C-B</socioIndustrial>
 		<landMass>Hansa (Freie Hansestadt)</landMass>
