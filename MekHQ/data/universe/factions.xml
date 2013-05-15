@@ -749,6 +749,16 @@ periphery - include "true" if this is a periphery faction. Defaults to false if 
 		<clan>false</clan>
 	</faction>
 	<faction>
+		<shortname>BoS</shortname>
+		<fullname>Barony of Strang</fullname>
+		<startingPlanet>,,,,,Von Strang's World,Von Strang's World,</startingPlanet>
+		<eraMods>1,1,1,1,2,3,2,2,1</eraMods>
+		<nameGenerator>General</nameGenerator>
+		<colorRGB>165,94,160</colorRGB>
+		<periphery>true</periphery>
+		<clan>false</clan>
+	</faction>
+	<faction>
 		<shortname>MA</shortname>
 		<fullname>Mosiro Archipelago</fullname>
 		<startingPlanet>,,,,,,,Mosiro</startingPlanet>
