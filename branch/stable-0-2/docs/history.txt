@@ -8,6 +8,7 @@ v0.2.1 (SVN)
 + Patch 26: GM Mode complete Task/Acquisition
 + backwards compatability for conventional pilot types
 + Bug: equipment parts not recognizing same status in warehouse
++ Planetary data update 36
 
 v0.2.0 (2013-03-16)
 + Bug 318: Dragoon's Rating error FMM:R method
