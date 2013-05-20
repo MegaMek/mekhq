@@ -130,7 +130,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     protected GregorianCalendar deathday;
     protected ArrayList<LogEntry> personnelLog;
     
-    private Hashtable<String,Skill> skills;
+    private static Hashtable<String,Skill> skills;
     private PilotOptions options = new PilotOptions();
     private int toughness;
     
@@ -1293,7 +1293,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 		return getName();
 	}
 	
-	public boolean hasSkill(String skillName) {
+	public static boolean hasSkill(String skillName) {
 		return null != skills.get(skillName);
 	}
 	
