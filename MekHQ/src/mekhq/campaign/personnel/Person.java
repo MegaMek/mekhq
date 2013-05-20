@@ -400,6 +400,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
             return hasSkill(SkillType.S_GUN_VEE);
         case(T_AERO_PILOT):
             return hasSkill(SkillType.S_GUN_AERO) && hasSkill(SkillType.S_PILOT_AERO);
+        case(T_CONV_PILOT):
+            return hasSkill(SkillType.S_GUN_JET) && hasSkill(SkillType.S_PILOT_JET);
         case(T_PROTO_PILOT):
             return hasSkill(SkillType.S_GUN_PROTO);
         case(T_BA):
@@ -831,10 +833,20 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 			
 			if(version.getMajorVersion() == 0 && version.getMinorVersion() < 3) {
 			    //adjust for conventional fighter pilots
-			    if(retVal.primaryRole > T_CONV_PILOT) {
+			    if(retVal.primaryRole >= T_CONV_PILOT) {
 			        retVal.primaryRole += 1;
 			    }
-			    if(retVal.secondaryRole > T_CONV_PILOT) {
+			    if(retVal.secondaryRole >= T_CONV_PILOT) {
+                    retVal.secondaryRole += 1;
+                }
+			}
+			
+			if(version.getMajorVersion() == 0 && version.getMinorVersion() == 3 && version.getSnapshot() < 1) {
+			    //adjust for conventional fighter pilots
+                if(retVal.primaryRole == T_CONV_PILOT && hasSkill(SkillType.S_PILOT_SPACE) && !hasSkill(SkillType.S_PILOT_JET)) {
+                    retVal.primaryRole += 1;
+                }
+                if(retVal.secondaryRole == T_CONV_PILOT && hasSkill(SkillType.S_PILOT_SPACE) && !hasSkill(SkillType.S_PILOT_JET)) {
                     retVal.secondaryRole += 1;
                 }
 			}
