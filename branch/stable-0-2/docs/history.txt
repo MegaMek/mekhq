@@ -9,6 +9,8 @@ v0.2.1 (SVN)
 + backwards compatability for conventional pilot types
 + Bug: equipment parts not recognizing same status in warehouse
 + Planetary data update 36
++ Bug: Conventional fighter pilot addition code not correctly reassigning Vessel Pilots.
++ Bug: canPerformRole() missing check for conventional fighter pilots.
 
 v0.2.0 (2013-03-16)
 + Bug 318: Dragoon's Rating error FMM:R method
