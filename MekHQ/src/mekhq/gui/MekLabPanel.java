@@ -499,9 +499,7 @@ public class MekLabPanel extends JPanel {
 	
 		private Tank entity;
 		private megameklab.com.ui.Vehicle.tabs.StructureTab structureTab;
-		private megameklab.com.ui.Vehicle.tabs.ArmorTab armorTab;
 		private megameklab.com.ui.Vehicle.tabs.EquipmentTab equipmentTab;
-		private megameklab.com.ui.Vehicle.tabs.WeaponTab weaponTab;
 		private megameklab.com.ui.Vehicle.tabs.BuildTab buildTab;
 		
 		public TankPanel(Tank t) {
@@ -517,37 +515,26 @@ public class MekLabPanel extends JPanel {
 			removeAll();
 			    
 			structureTab = new megameklab.com.ui.Vehicle.tabs.StructureTab(entity);
-			armorTab = new megameklab.com.ui.Vehicle.tabs.ArmorTab(entity);
-			armorTab.setArmorType(entity.getArmorType(0));
-			armorTab.refresh();
 			equipmentTab = new megameklab.com.ui.Vehicle.tabs.EquipmentTab(entity);
-			weaponTab = new megameklab.com.ui.Vehicle.tabs.WeaponTab(entity);
-			buildTab = new megameklab.com.ui.Vehicle.tabs.BuildTab(entity, equipmentTab, weaponTab);
+			buildTab = new megameklab.com.ui.Vehicle.tabs.BuildTab(entity, equipmentTab);
 			structureTab.addRefreshedListener(this);
-			armorTab.addRefreshedListener(this);
 			equipmentTab.addRefreshedListener(this);
-			weaponTab.addRefreshedListener(this);
 			buildTab.addRefreshedListener(this);
 
 			addTab("Structure", structureTab);
-			addTab("Armor", armorTab);
 			addTab("Equipment", equipmentTab);
-			addTab("Weapons", weaponTab);
 			addTab("Build", buildTab);
 	        this.repaint();
 		}
 		
 		public void refreshAll() {
 			structureTab.refresh();
-			armorTab.refresh();
 			equipmentTab.refresh();
-			weaponTab.refresh();
 			buildTab.refresh();
 			refreshSummary();
 		}
 
 		public void refreshArmor() {
-			armorTab.refresh();
 			refreshSummary();
 		}
 
@@ -571,7 +558,6 @@ public class MekLabPanel extends JPanel {
 		}
 
 		public void refreshWeapons() {
-			weaponTab.refresh();
 			refreshSummary();
 		}
 
