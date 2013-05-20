@@ -130,7 +130,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
     protected GregorianCalendar deathday;
     protected ArrayList<LogEntry> personnelLog;
     
-    private static Hashtable<String,Skill> skills;
+    private Hashtable<String,Skill> skills;
     private PilotOptions options = new PilotOptions();
     private int toughness;
     
@@ -841,7 +841,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
                 }
 			}
 			
-			if(version.getMajorVersion() == 0 && version.getMinorVersion() == 3 && version.getSnapshot() < 1) {
+			/*if(version.getMajorVersion() == 0 && version.getMinorVersion() == 3 && version.getSnapshot() < 1) {
 			    //adjust for conventional fighter pilots
                 if(retVal.primaryRole == T_CONV_PILOT && hasSkill(SkillType.S_PILOT_SPACE) && !hasSkill(SkillType.S_PILOT_JET)) {
                     retVal.primaryRole += 1;
@@ -849,7 +849,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
                 if(retVal.secondaryRole == T_CONV_PILOT && hasSkill(SkillType.S_PILOT_SPACE) && !hasSkill(SkillType.S_PILOT_JET)) {
                     retVal.secondaryRole += 1;
                 }
-			}
+			}*/
 			
 			if ((null != advantages) && (advantages.trim().length() > 0)) {
 	            StringTokenizer st = new StringTokenizer(advantages,"::");
@@ -1293,7 +1293,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 		return getName();
 	}
 	
-	public static boolean hasSkill(String skillName) {
+	public boolean hasSkill(String skillName) {
 		return null != skills.get(skillName);
 	}
 	
