@@ -1,0 +1,30 @@
+<launch4jConfig>
+  <headerType>gui</headerType>
+  <jar>../localdev/MekHQ.jar</jar>
+  <outfile>../localdev/MekHQ.exe</outfile>
+  <dontWrapJar>false</dontWrapJar>
+  <errTitle></errTitle>
+  <cmdLine></cmdLine>
+  <chdir>.</chdir>
+  <classPath>
+  	<mainClass>mekhq.MekHQ</mainClass>
+  	<cp>lib/MegaMek.jar</cp>
+  	<cp>lib/MegaMekLab.jar</cp>	
+  	<cp>lib/TinyXML.jar</cp>
+  	<cp>lib/vecmath.jar</cp>	
+  	<cp>lib/Ostermiller.jar</cp>	
+  	<cp>lib/TabPanel.jar</cp>	
+  	<cp>lib/PngEncoder.jar</cp>	
+  </classPath>
+  <priority>normal</priority>
+  <downloadUrl>http://java.com/download</downloadUrl>
+  <supportUrl>http://megamek.sourceforge.net/forums</supportUrl>
+  <customProcName>true</customProcName>
+  <stayAlive>false</stayAlive>
+  <icon>../packaging_utils/mekhq.ico</icon>
+  <jre>
+    <minVersion>1.5.0</minVersion>
+    <jdkPreference>preferJre</jdkPreference>
+    <maxHeapSize>512</maxHeapSize>
+  </jre>
+</launch4jConfig>
