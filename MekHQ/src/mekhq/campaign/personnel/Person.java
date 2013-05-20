@@ -63,6 +63,7 @@ import mekhq.campaign.MekHqXmlSerializable;
 import mekhq.campaign.MekHqXmlUtil;
 import mekhq.campaign.Ranks;
 import mekhq.campaign.Unit;
+import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IMedicalWork;
 import mekhq.campaign.work.IPartWork;
@@ -840,16 +841,16 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
                     retVal.secondaryRole += 1;
                 }
 			}
-			
-			/*if(version.getMajorVersion() == 0 && version.getMinorVersion() == 3 && version.getSnapshot() < 1) {
-			    //adjust for conventional fighter pilots
-                if(retVal.primaryRole == T_CONV_PILOT && hasSkill(SkillType.S_PILOT_SPACE) && !hasSkill(SkillType.S_PILOT_JET)) {
+            
+            if(version.getMajorVersion() == 0 && version.getMinorVersion() == 3 && version.getSnapshot() < 1) {
+                //adjust for conventional fighter pilots
+                if(retVal.primaryRole == T_CONV_PILOT && retVal.hasSkill(SkillType.S_PILOT_SPACE) && !retVal.hasSkill(SkillType.S_PILOT_JET)) {
                     retVal.primaryRole += 1;
                 }
-                if(retVal.secondaryRole == T_CONV_PILOT && hasSkill(SkillType.S_PILOT_SPACE) && !hasSkill(SkillType.S_PILOT_JET)) {
+                if(retVal.secondaryRole == T_CONV_PILOT && retVal.hasSkill(SkillType.S_PILOT_SPACE) && !retVal.hasSkill(SkillType.S_PILOT_JET)) {
                     retVal.secondaryRole += 1;
                 }
-			}*/
+            }
 			
 			if ((null != advantages) && (advantages.trim().length() > 0)) {
 	            StringTokenizer st = new StringTokenizer(advantages,"::");

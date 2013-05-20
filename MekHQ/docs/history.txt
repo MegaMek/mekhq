@@ -3,7 +3,10 @@ VERSION HISTORY
 v0.3.1 (SVN)
 + Planetary Data Update 36
 + New MegaMekLab.jar
-+ Bug 366: Broken MekLabPanel compile with latest MML trunk compiled into jar 
++ Bug 366: Broken MekLabPanel compile with latest MML trunk compiled into jar
++ Bug: Conventional fighter pilot addition code not correctly reassigning Vessel Pilots.
++ Bug: canPerformRole() missing check for conventional fighter pilots.
++ Bug: Conventional fighter pilot backwards compatibility check correction for 0.3.0 to 0.3.1
 
 v0.3.0 (2013-04-25)
 + Bug 341: Conventional Pilots and Hire Full Complement
