@@ -34,16 +34,11 @@
 	<property name="datadir" value="data" />
 	<property name="apidocsdir" value="apidocs" />
 	<property name="docdir" value="docs" />
-	<property name="svndir" value="svndev" />
+	<property name="localdir" value="localdev" />
 	<property name="util" value="packaging_utils" />
 	
-	<!-- same as builddir but under svn -->
-	<property name="svnbuilddir" value="${svndir}/${builddir}" />
-
-	<!-- svnroot used for svn authentification -->
-	<property name="svnroot" value="svn://svn.code.sf.net/p/mekhq/code/trunk/MekHQ" />
-	<property name="svndata" value="svn://svn.code.sf.net/p/megamek/code/trunk/megamek/data" />
-	<property name="svnrsheets" value="svn://svn.code.sf.net/p/megameklab/code/trunk/data/images/recordsheets" />
+	<!-- same as builddir but under local -->
+	<property name="localbuilddir" value="${localdir}/${builddir}" />
 
 
 	<property name="timestampfile" value="${logdir}/timestamp" />
@@ -89,74 +84,51 @@
 		<taskdef name="launch4j" classname="net.sf.launch4j.ant.Launch4jTask" classpath="${util}/linux/launch4j/launch4j.jar:${util}/linux/launch4j/lib/xstream.jar" />
 	</target>
 
-	<target name="svndev-init" depends="checkOSMac, checkOSUNIX">
+	<target name="localdev-init" depends="checkOSMac, checkOSUNIX">
 		<tstamp />
-		<delete dir="${svndir}" />		
+		<delete dir="${localdir}" />		
 	</target>
 	
-	<!-- following svndev-* tasks get, build & package the current version from svn -->
-	<target name="svndev-get" depends="svndev-init" description="get the latest source from SVN">
-		<exec executable="svn">
-			<arg line="export ${svnroot} ${svndir}" />
-		</exec>
-		<!--now we need to replace our data with the latest from the MM svn
-		    but first we need to back it up because we will need to keep a few 
-		    things-->
-		<move file="${svndir}/${datadir}" tofile="${svndir}/${datadir}-OLD"/>
-		<exec executable="svn">
-			<arg line="export ${svndata} ${svndir}/${datadir}" />
-		</exec>
-		<!-- now add in record sheet vector images-->
-		<exec executable="svn">
-			<arg line="export ${svnrsheets} ${svndir}/${datadir}/images/recordsheets" />
-		</exec>
-		<!-- ok now move some stuff back into data that needs to be there-->
-		<copy todir="${svndir}/${datadir}">
-			<fileset dir="${svndir}/${datadir}-OLD" >
-				<include name="universe/" />
-				<include name="fonts/" />
-				<include name="images/force/" />
-				<include name="images/portraits/FoxsTeeth/" />
-				<include name="images/fluff/mech/*.png" />
-				<include name="images/misc/mekhq-load.png" />
-				<include name="images/misc/mekhq-splash.png" />
-				<include name="images/misc/tools.png" />
+	<!-- following localdev-* tasks get, build & package the current version from local sources -->
+	<target name="localdev-get" depends="localdev-init" description="get the local source">
+		<copy todir="${localdir}" >  
+			<fileset dir="${basedir}">
+				<exclude name="${localdir}" />
 			</fileset>
 		</copy>
-		<delete dir="${svndir}/${datadir}-OLD" />
 	</target>
 	
-	<target name="svndev-build" depends="svndev-get" description="compile project from SVN and generate JAR file" >
-			<mkdir dir="${svnbuilddir}" />
+	<target name="localdev-build" depends="localdev-get" description="compile project from local source and generate JAR file" >
+			<mkdir dir="${localbuilddir}" />
 			<!-- compile -->
 			<echo message="MekHQ" />
-			<javac debug="true" debuglevel="lines,source" target="1.5" source="1.5" destdir="${svnbuilddir}" srcdir="${svndir}/${srcdir}" memoryInitialSize="512m" memoryMaximumSize="512m" fork="true">
+			<javac debug="true" debuglevel="lines,source" target="1.5" source="1.5" destdir="${localbuilddir}" srcdir="${localdir}/${srcdir}" memoryInitialSize="512m" memoryMaximumSize="512m" fork="true">
 				<classpath>
-					<pathelement location="${svndir}" />
-					<fileset dir="${svndir}/${libdir}" includes="*.jar" />
-					<fileset dir="${svndir}" includes="MegaMek.jar" />
-					<fileset dir="${svndir}" includes="MegaMekLab.jar" />
+					<pathelement location="${localdir}" />
+					<fileset dir="${localdir}/${libdir}" includes="*.jar" />
+					<fileset dir="${localdir}" includes="MegaMek.jar" />
+					<fileset dir="${localdir}" includes="MegaMekLab.jar" />
 				</classpath>			
 			</javac>
 
 			<!-- jar -->
-			<jar basedir="${svnbuilddir}" jarfile="${svndir}/${jarfile}" manifest="manifest.txt">
-				<fileset dir="${svndir}/${srcdir}" includes="**/*.properties"/>
+			<jar basedir="${localbuilddir}" jarfile="${localdir}/${jarfile}" manifest="manifest.txt">
+				<fileset dir="${localdir}/${srcdir}" includes="**/*.properties"/>
 			</jar>
 
 			<!-- Ensure that the log directory exists. -->
-			<mkdir dir="${svndir}/${logdir}" />
-			<touch file="${svndir}/${timestampfile}" />	
+			<mkdir dir="${localdir}/${logdir}" />
+			<touch file="${localdir}/${timestampfile}" />	
 		</target>
 			
-		<target name="svndev-clean" description="remove the SVN build directory">
-			<delete dir="${svnbuilddir}" />
+		<target name="localdev-clean" description="remove the local build directory">
+			<delete dir="${localbuilddir}" />
 		</target>
 	
-	<target name="mac-bundle" description="Bundle the project built from SVN into an Mac OSX distribution">
+	<target name="mac-bundle" description="Bundle the project built from local source into an Mac OSX distribution">
 		<mkdir dir="${osxdist}" />
 		<copy todir="${osxdist}">
-			<fileset dir="${svndir}" >
+			<fileset dir="${localdir}" >
 				<include name="${logdir}/" />
 				<include name="${datadir}/" />
 				<include name="${docdir}/" />
@@ -190,7 +162,7 @@
 		</copy>
 		<copy file="${util}/JavaApplicationStub" todir="${osxdist}/MekHQ.app/Contents/MacOS/"/>
 		<copy todir="${osxdist}/MekHQ.app/Contents/Resources/Java/">
-			<fileset dir="${svndir}" >
+			<fileset dir="${localdir}" >
 				<include name="${libdir}/*.jar" />
 				<include name="${jarfile}" />
 				<include name="MegaMekLab.jar" />
@@ -225,13 +197,13 @@
 		<delete dir="${osxdist}" />
 	</target>
 	
-	<target name="mac-package" depends="mac-bundle, mac-tar, mac-clean" description="Package a Mac OS X distribution of the project built from SVN" />
+	<target name="mac-package" depends="mac-bundle, mac-tar, mac-clean" description="Package a Mac OS X distribution of the project built from local source" />
 	
-	<target name="nix-bundle" description="Bundle the project built from SVN into a unix distribution">
+	<target name="nix-bundle" description="Bundle the project built from local source into a unix distribution">
 		<mkdir dir="${nixdist}" />
 		<mkdir dir="${nixdist}/${nixdist}" />
 		<copy todir="${nixdist}/${nixdist}">
-			<fileset dir="${svndir}" >
+			<fileset dir="${localdir}" >
 				<include name="${jarfile}" />
 				<include name="${libdir}/*.jar" />
 				<include name="${logdir}/" />
@@ -258,24 +230,24 @@
 		<delete dir="${nixdist}" />
 	</target>
 		
-	<target name="nix-package" depends="nix-bundle, nix-tar, nix-clean" description="Package a Unix distribution of the project built from SVN"/>
+	<target name="nix-package" depends="nix-bundle, nix-tar, nix-clean" description="Package a Unix distribution of the project built from local source"/>
 	
 	<!-- Produce an EXE file -->
 	<target name="exe" description="Generate an EXE wrappers for MekHQ.jar, MegaMek.jar, and MegaMekLab.jar">
-		<copy file="${svndir}/MegaMek.jar" tofile="${svndir}/lib/MegaMek.jar"/>
-		<copy file="${svndir}/MegaMekLab.jar" tofile="${svndir}/lib/MegaMekLab.jar"/>
-		<delete file="${svndir}/MekHQ.exe"/>
-		<launch4j configFile="${util}/mekhq.4j.xml" />	 
-		<delete file="${svndir}/MegaMek.exe"/>
-		<launch4j configFile="${util}/megamek.4j.xml" />	
-		<delete file="${svndir}/MegaMekLab.exe"/>
-		<launch4j configFile="${util}/megameklab.4j.xml" />
+		<copy file="${localdir}/MegaMek.jar" tofile="${localdir}/lib/MegaMek.jar"/>
+		<copy file="${localdir}/MegaMekLab.jar" tofile="${localdir}/lib/MegaMekLab.jar"/>
+		<delete file="${localdir}/MekHQ.exe"/>
+		<launch4j configFile="${util}/mekhq.4j_local.xml" />
+		<delete file="${localdir}/MegaMek.exe"/>
+		<launch4j configFile="${util}/megamek.4j_local.xml" />
+		<delete file="${localdir}/MegaMekLab.exe"/>
+		<launch4j configFile="${util}/megameklab.4j_local.xml" />
 	</target>
 	
-	<target name="win-bundle" depends="exe" description="Bundle the project built from SVN into a Windows distribution">
+	<target name="win-bundle" depends="exe" description="Bundle the project built from local source into a Windows distribution">
 		<mkdir dir="${windist}" />
 		<copy todir="${windist}">
-			<fileset dir="${svndir}" >
+			<fileset dir="${localdir}" >
 				<include name="${libdir}/*.jar" />
 				<include name="${logdir}/" />
 				<include name="${datadir}/" />
@@ -302,17 +274,17 @@
 		
 	<target name="win-clean">
 		<delete dir="${windist}" />
-		<delete file="${svndir}/lib/MegaMek.jar" />
-		<delete file="${svndir}/lib/MegaMekLab.jar" />
+		<delete file="${localdir}/lib/MegaMek.jar" />
+		<delete file="${localdir}/lib/MegaMekLab.jar" />
 	</target>
 			
-	<target name="win-package" depends="win-bundle, win-zip, win-clean" description="Package a Windows distribution of the project built from SVN"/>
+	<target name="win-package" depends="win-bundle, win-zip, win-clean" description="Package a Windows distribution of the project built from local source"/>
 	
-	<target name="source-package" description="Package a source-only distribution of the project built from SVN">
+	<target name="source-package" description="Package a source-only distribution of the project built from local source">
 		<mkdir dir="${srcdist}" />
 		<mkdir dir="${srcdist}/${srcdist}" />
 		<copy todir="${srcdist}/${srcdist}">
-			<fileset dir="${svndir}" >
+			<fileset dir="${localdir}" >
 				<exclude name="${builddir}/**"/>
 				<exclude name="MekHQ.jar"/>
 				<exclude name="**/*.exe"/>
@@ -323,6 +295,6 @@
 		<delete dir="${srcdist}" />
 	</target>
 	
-	<target name="release" depends="svndev-build, mac-package, nix-package, win-package, source-package, svndev-clean" description="Build the project from SVN and package it as Windows, Mac, Unix, and source-only" />
+	<target name="release" depends="localdev-build, mac-package, nix-package, win-package, source-package, localdev-clean" description="Build the project from local source and package it as Windows, Mac, Unix, and source-only" />
 	
 </project>

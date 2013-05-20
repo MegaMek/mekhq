@@ -1,0 +1,25 @@
+<launch4jConfig>
+  <headerType>gui</headerType>
+  <outfile>../localdev/MegaMekLab.exe</outfile>
+  <dontWrapJar>true</dontWrapJar>
+  <classPath>
+  	<mainClass>megameklab.com.MegaMekLab</mainClass>
+  	<cp>lib/MegaMek.jar</cp>
+  	<cp>lib/MegaMekLab.jar</cp>
+  	<cp>lib/TinyXML.jar</cp>
+  </classPath>
+  <errTitle></errTitle>
+  <cmdLine></cmdLine>
+  <chdir>.</chdir>
+  <priority>normal</priority>
+  <downloadUrl>http://java.com/download</downloadUrl>
+  <supportUrl>http://megamek.sourceforge.net/forums</supportUrl>
+  <customProcName>true</customProcName>
+  <stayAlive>false</stayAlive>
+  <icon>../packaging_utils/megameklab.ico</icon>
+  <jre>
+    <minVersion>1.5.0</minVersion>
+    <jdkPreference>preferJre</jdkPreference>
+    <maxHeapSize>512</maxHeapSize>
+  </jre>
+</launch4jConfig>
