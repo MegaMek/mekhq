@@ -7,6 +7,7 @@ v0.3.1 (SVN)
 + Bug: Conventional fighter pilot addition code not correctly reassigning Vessel Pilots.
 + Bug: canPerformRole() missing check for conventional fighter pilots.
 + Bug: Conventional fighter pilot backwards compatibility check correction for 0.3.0 to 0.3.1
++ Bug: Campaign file upgrade code runs twice on old campaigns
 
 v0.3.0 (2013-04-25)
 + Bug 341: Conventional Pilots and Hire Full Complement
