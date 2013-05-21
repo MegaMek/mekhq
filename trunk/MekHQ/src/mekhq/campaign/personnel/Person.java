@@ -832,7 +832,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 				}
 			}
 			
-			if(version.getMajorVersion() == 0 && version.getMinorVersion() < 3) {
+			if(version.getMajorVersion() == 0 && version.getMinorVersion() < 3 && version.getMinorVersion() > 1) {
 			    //adjust for conventional fighter pilots
 			    if(retVal.primaryRole >= T_CONV_PILOT) {
 			        retVal.primaryRole += 1;
