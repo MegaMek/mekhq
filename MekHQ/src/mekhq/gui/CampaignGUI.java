@@ -250,17 +250,18 @@ public class CampaignGUI extends JPanel {
     private static final int PG_MW =      3;
     private static final int PG_CREW =    4;
     private static final int PG_PILOT =   5;
-    private static final int PG_PROTO =   6;
-    private static final int PG_BA =      7;
-    private static final int PG_SOLDIER = 8;
-    private static final int PG_VESSEL =  9;
-    private static final int PG_TECH =    10;
-    private static final int PG_DOC =     11;
-    private static final int PG_ADMIN =   12;
-    private static final int PG_RETIRE =  13;
-    private static final int PG_MIA =     14;
-    private static final int PG_KIA =     15;
-    private static final int PG_NUM =     16;
+    private static final int PG_CPILOT =  6;
+    private static final int PG_PROTO =   7;
+    private static final int PG_BA =      8;
+    private static final int PG_SOLDIER = 9;
+    private static final int PG_VESSEL =  10;
+    private static final int PG_TECH =    11;
+    private static final int PG_DOC =     12;
+    private static final int PG_ADMIN =   13;
+    private static final int PG_RETIRE =  14;
+    private static final int PG_MIA =     15;
+    private static final int PG_KIA =     16;
+    private static final int PG_NUM =     17;
 
     //parts filter groups
     private static final int SG_ALL      = 0;
@@ -3009,6 +3010,8 @@ public class CampaignGUI extends JPanel {
             return "Vehicle Crews";
         case PG_PILOT:
             return "Aerospace Pilots";
+        case PG_CPILOT:
+            return "Conventional Pilots";
         case PG_PROTO:
             return "Protomech Pilots";
         case PG_BA:
@@ -4116,6 +4119,7 @@ public class CampaignGUI extends JPanel {
                         (nGroup == PG_MW && type == Person.T_MECHWARRIOR) ||
                         (nGroup == PG_CREW && (type == Person.T_GVEE_DRIVER || type == Person.T_NVEE_DRIVER || type == Person.T_VTOL_PILOT || type == Person.T_VEE_GUNNER)) ||
                         (nGroup == PG_PILOT && type == Person.T_AERO_PILOT) ||
+                        (nGroup == PG_CPILOT && type == Person.T_CONV_PILOT) ||
                         (nGroup == PG_PROTO && type == Person.T_PROTO_PILOT) ||
                         (nGroup == PG_BA && type == Person.T_BA) ||
                         (nGroup == PG_SOLDIER && type == Person.T_INFANTRY) ||
