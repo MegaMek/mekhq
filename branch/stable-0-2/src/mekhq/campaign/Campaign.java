@@ -495,6 +495,8 @@ public class Campaign implements Serializable {
 		//reset the game object
 		en.setOwner(player);
 		en.setGame(game);
+		en.setCamoCategory(null);
+		en.setCamoFileName(null);
 		
 		UUID id = UUID.randomUUID();
 		//check for the very rare chance of getting same id

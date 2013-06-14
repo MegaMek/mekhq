@@ -11,6 +11,7 @@ v0.2.1 (SVN)
 + Planetary data update 36
 + Bug: Conventional fighter pilot addition code not correctly reassigning Vessel Pilots.
 + Bug: canPerformRole() missing check for conventional fighter pilots.
++ Bug 363: All "new" units end up with no camo and the blue default non-camo colorization when a campaign camo is set.
 
 v0.2.0 (2013-03-16)
 + Bug 318: Dragoon's Rating error FMM:R method
