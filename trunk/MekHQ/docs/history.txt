@@ -8,6 +8,9 @@ v0.3.1 (SVN)
 + Bug: canPerformRole() missing check for conventional fighter pilots.
 + Bug: Conventional fighter pilot backwards compatibility check correction for 0.3.0 to 0.3.1
 + Bug: Campaign file upgrade code runs twice on old campaigns
++ Bug: More conventional pilot fixes.
++ Check if existing Aerospace Pilots with Conventional Sklls and adjust to conventional pilots.
++ Add "Conventional Pilots" to the GUI's Personnel tab sort by type dropdown
 
 v0.3.0 (2013-04-25)
 + Bug 341: Conventional Pilots and Hire Full Complement

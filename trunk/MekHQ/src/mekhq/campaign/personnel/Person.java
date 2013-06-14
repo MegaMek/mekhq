@@ -850,6 +850,12 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
                 if(retVal.secondaryRole == T_CONV_PILOT && retVal.hasSkill(SkillType.S_PILOT_SPACE) && !retVal.hasSkill(SkillType.S_PILOT_JET)) {
                     retVal.secondaryRole += 1;
                 }
+                if(retVal.primaryRole == T_AERO_PILOT && !retVal.hasSkill(SkillType.S_PILOT_SPACE) && retVal.hasSkill(SkillType.S_PILOT_JET)) {
+                    retVal.primaryRole += 8;
+                }
+                if(retVal.secondaryRole == T_AERO_PILOT && !retVal.hasSkill(SkillType.S_PILOT_SPACE) && retVal.hasSkill(SkillType.S_PILOT_JET)) {
+                    retVal.secondaryRole += 8;
+                }
             }
 			
 			if ((null != advantages) && (advantages.trim().length() > 0)) {
@@ -952,6 +958,7 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 		case T_NVEE_DRIVER:
 		case T_VTOL_PILOT:
 		case T_VEE_GUNNER:
+		case T_CONV_PILOT:
 			base = 900;
 			break;
 		case T_AERO_PILOT:
@@ -1137,6 +1144,13 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 			if(hasSkill(SkillType.S_GUN_AERO) && hasSkill(SkillType.S_PILOT_AERO)) {
 				return (int)Math.floor((getSkill(SkillType.S_GUN_AERO).getExperienceLevel() 
 						+ getSkill(SkillType.S_PILOT_AERO).getExperienceLevel()) / 2.0);
+			} else {
+				return -1;
+			}
+		case T_CONV_PILOT:
+			if(hasSkill(SkillType.S_GUN_JET) && hasSkill(SkillType.S_PILOT_JET)) {
+				return (int)Math.floor((getSkill(SkillType.S_GUN_JET).getExperienceLevel() 
+						+ getSkill(SkillType.S_PILOT_JET).getExperienceLevel()) / 2.0);
 			} else {
 				return -1;
 			}
