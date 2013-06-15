@@ -3306,7 +3306,7 @@ public class Campaign implements Serializable {
 					person.acquireAbility(PilotOptions.LVL3_ADVANTAGES, name, special);
 				} 
 				else if(name.equals("weapon_specialist")) {
-					person.acquireAbility(PilotOptions.LVL3_ADVANTAGES, name, Utilities.chooseWeaponSpecialization(type, getFaction().isClan(), getCampaignOptions().getTechLevel()));
+					person.acquireAbility(PilotOptions.LVL3_ADVANTAGES, name, Utilities.chooseWeaponSpecialization(type, getFaction().isClan(), getCampaignOptions().getTechLevel(), getCalendar().get(GregorianCalendar.YEAR)));
 				}
 				else {
 					person.acquireAbility(PilotOptions.LVL3_ADVANTAGES, name, true);

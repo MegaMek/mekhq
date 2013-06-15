@@ -21,6 +21,7 @@
 package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
+import java.util.GregorianCalendar;
 
 import megamek.common.AmmoType;
 import megamek.common.CriticalSlot;
@@ -152,10 +153,10 @@ public class EquipmentPart extends Part {
 
     @Override
     public int getTechLevel() {
-        if (getType().getTechLevel() < 0 || getType().getTechLevel() >= TechConstants.SIZE)
+        if (getType().getTechLevel(campaign.getCalendar().get(GregorianCalendar.YEAR)) < 0 || getType().getTechLevel(campaign.getCalendar().get(GregorianCalendar.YEAR)) >= TechConstants.SIZE)
             return TechConstants.T_INTRO_BOXSET;
         else
-            return getType().getTechLevel();
+            return getType().getTechLevel(campaign.getCalendar().get(GregorianCalendar.YEAR));
     }
 
 	@Override
