@@ -22,6 +22,7 @@
 package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
+import java.util.GregorianCalendar;
 
 import megamek.common.EquipmentType;
 import megamek.common.MiscType;
@@ -72,7 +73,7 @@ public class MASC extends EquipmentPart {
     		return 0;
     	}
     	//supercharger tonnage will need to be set by hand in parts store
-        if (TechConstants.isClan(type.getTechLevel())) {
+        if (TechConstants.isClan(type.getTechLevel(campaign.getCalendar().get(GregorianCalendar.YEAR)))) {
             return Math.round(getUnitTonnage() / 25.0f);
         }
         return Math.round(getUnitTonnage() / 20.0f);
