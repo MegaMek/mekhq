@@ -40,6 +40,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 import megamek.client.Client;
 import megamek.client.ui.swing.MechTileset;
 import megamek.client.ui.swing.util.ImageFileFactory;
+import megamek.common.Configuration;
 import megamek.common.IGame;
 import megamek.common.event.GameBoardChangeEvent;
 import megamek.common.event.GameBoardNewEvent;
@@ -282,7 +283,7 @@ public class MekHQ implements GameListener {
 		    }
     	}
     	if(null == mt) {
-		    mt = new MechTileset("data/images/units/");
+		    mt = new MechTileset(Configuration.unitImagesDir());
 		    try {
 		        mt.loadFromFile("mechset.txt");
 		    } catch (IOException ex) {

@@ -14,6 +14,8 @@ v0.3.1 (SVN)
 + Bug 363: All "new" units end up with no camo and the blue default non-camo colorization when a campaign camo is set.
 + Updated MegaMek.jar with revision 9541
 + Updated getTechLevel() calls to include a year for compatibility with MegaMek.
++ Update MegaMekLab.jar
++ Fix deprecation warnings with new MegaMek.jar
 
 v0.3.0 (2013-04-25)
 + Bug 341: Conventional Pilots and Hire Full Complement
