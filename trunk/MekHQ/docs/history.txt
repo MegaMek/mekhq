@@ -18,6 +18,9 @@ v0.3.1 (SVN)
 + Fix deprecation warnings with new MegaMek.jar
 + New MegaMek.jar to fix Tanks.java NPE
 + Changed how the Individual Camo option is displayed.
++ Bug 369: Removing / Paying Off Loans
++ Added more bank names for the loan randomization
++ Removed arbitrary secondary role limitation
 
 v0.3.0 (2013-04-25)
 + Bug 341: Conventional Pilots and Hire Full Complement

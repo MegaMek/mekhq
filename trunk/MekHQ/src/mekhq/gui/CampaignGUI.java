@@ -7017,7 +7017,7 @@ public class CampaignGUI extends JPanel {
                 popup.add(menu);
                 menu = new JMenu("Change Secondary Role");
                 for(int i = 0; i < Person.T_NUM; i++) {
-                    if(i == Person.T_NONE || (i >= Person.T_MECH_TECH && person.canPerformRole(i) && person.getPrimaryRole() != i)) {
+                    if(i == Person.T_NONE || (person.canPerformRole(i) && person.getPrimaryRole() != i)) {
                         //you cant be an astech if you are a tech, or a medic if you are a doctor
                         if(person.isTechPrimary() && i == Person.T_ASTECH) {
                             continue;
@@ -9625,7 +9625,7 @@ public class CampaignGUI extends JPanel {
             if(row < 0) {
                 return;
             }
-            Loan selectedLoan = loanModel.getLoan(partsTable.convertRowIndexToModel(row));
+            Loan selectedLoan = loanModel.getLoan(loanTable.convertRowIndexToModel(row));
             if(null == selectedLoan) {
                 return;
             }

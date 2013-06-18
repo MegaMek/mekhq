@@ -49,7 +49,12 @@ public class Loan implements MekHqXmlSerializable {
     public static final int SCHEDULE_YEARLY    = 3;
     public static final int SCHEDULE_NUM       = 4;
 
-    private static final String[] madeUpInstitutions = {"Comstar Reserve", "Federated Employees Union", "Bank of Oriente"};
+    private static final String[] madeUpInstitutions = {"Comstar Reserve", "Federated Employees Union",
+    	"Bank of Oriente", "New Avalon Interstellar Bank", "Federated Boeing Credit Union", "First Commonwealth Bank",
+    	"Donegal Bank and Trust", "Defiance Industries Credit Union", "Superior Bank of Sarna", "St. Ives Bank and Trust",
+    	"Luthien Bank of the Dragon", "Golden Bank of Sian", "Rasalhauge National Bank", "Canopus Federal Reserve",
+    	"Concordat Bank and Trust", "Outworlds Alliance National Bank", "Hegemony Bank and Trust",
+    	"Andurien First National Bank"};
     
     private String institution;
     private String refNumber;
