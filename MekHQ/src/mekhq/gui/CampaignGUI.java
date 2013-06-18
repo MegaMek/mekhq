@@ -10325,6 +10325,16 @@ public class CampaignGUI extends JPanel {
                 }
                 menu.setEnabled(!unit.isDeployed() && !unit.isRefitting());
                 popup.add(menu);
+                
+                // Camo
+                if(oneSelected) {
+	                menuItem = new JMenuItem(resourceMap.getString("customizeMenu.individualCamo.text"));
+	                menuItem.setActionCommand("INDI_CAMO");
+	                menuItem.addActionListener(this);
+	                menuItem.setEnabled(true);
+	                popup.add(menuItem);
+                }
+                
                 // swap ammo
                 if(oneSelected) {
                     menu = new JMenu("Swap ammo");
@@ -10420,12 +10430,6 @@ public class CampaignGUI extends JPanel {
                         menu.add(menuItem);
                     }
                     menu.setEnabled(!unit.isDeployed() && unit.isRepairable());
-                    menuItem = new JMenuItem(resourceMap.getString("customizeMenu.individualCamo.text"));
-                    menuItem.setActionCommand("INDI_CAMO");
-                    menuItem.addActionListener(this);
-                    menuItem.setEnabled(!unit.isDeployed());
-                    menu.add(menuItem);
-                    popup.add(menu);
 
                 }
                 //fill with personnel

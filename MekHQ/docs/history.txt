@@ -16,6 +16,8 @@ v0.3.1 (SVN)
 + Updated getTechLevel() calls to include a year for compatibility with MegaMek.
 + Update MegaMekLab.jar
 + Fix deprecation warnings with new MegaMek.jar
++ New MegaMek.jar to fix Tanks.java NPE
++ Changed how the Individual Camo option is displayed.
 
 v0.3.0 (2013-04-25)
 + Bug 341: Conventional Pilots and Hire Full Complement
