@@ -485,7 +485,6 @@ public class ResolveScenarioTracker {
 			InputStream listStream = new FileInputStream(unitFile);
 			// Read a Vector from the file.
 			try {
-
 				parser.parse(listStream);
 				listStream.close();
 			} catch (ParseException excep) {
@@ -505,7 +504,7 @@ public class ResolveScenarioTracker {
 					entities.put(UUID.fromString(entity.getExternalIdAsString()), entity);
 				}
 			}
-			
+
 			// add any ejected pilots
 			for (Crew pilot : parser.getPilots()) {
 				if(!pilot.getExternalIdAsString().equals("-1")) {
