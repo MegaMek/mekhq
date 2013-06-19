@@ -4151,7 +4151,7 @@ public class Campaign implements Serializable {
     
     public void addLogEntry(Person p, LogEntry entry) {
     	p.addLogEntry(entry);
-    }  
+    }
     
     public void assignRandomPortraitFor(Person p) {
     	//first create a list of existing portait strings, so we can check for duplicates
@@ -4171,8 +4171,8 @@ public class Campaign implements Serializable {
     	Iterator<String> categories = portraits.getCategoryNames();
         while (categories.hasNext()) {
             String category = categories.next();
-            if((category.startsWith("Male") && p.getGender() == Person.G_MALE)
-            		|| (category.startsWith("Female") && p.getGender() == Person.G_FEMALE)) {
+            if((category.endsWith("Male/") && p.getGender() == Person.G_MALE)
+            		|| (category.endsWith("Female/") && p.getGender() == Person.G_FEMALE)) {
             	Iterator<String> names = portraits.getItemNames(category);
             	while (names.hasNext()) {
                     String name = names.next();
