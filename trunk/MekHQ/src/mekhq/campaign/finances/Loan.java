@@ -49,7 +49,10 @@ public class Loan implements MekHqXmlSerializable {
     public static final int SCHEDULE_YEARLY    = 3;
     public static final int SCHEDULE_NUM       = 4;
 
-    private static final String[] madeUpInstitutions = {"Comstar Reserve", "Federated Employees Union",
+    // If you add more Canon institutions, please add them at the beginning and change the next line.
+    // The first four of these are Canon, the rest are made up.
+    private static final String[] madeUpInstitutions = {"Southern Bank and Trust" /* Canon */, "The Alliance Reserve Bank" /* Canon */,
+    	"Capellan Commonality Bank" /* Canon */, "Potwin Bank and Trust" /* Canon */, "Comstar Reserve", "Federated Employees Union",
     	"Bank of Oriente", "New Avalon Interstellar Bank", "Federated Boeing Credit Union", "First Commonwealth Bank",
     	"Donegal Bank and Trust", "Defiance Industries Credit Union", "Superior Bank of Sarna", "St. Ives Bank and Trust",
     	"Luthien Bank of the Dragon", "Golden Bank of Sian", "Rasalhauge National Bank", "Canopus Federal Reserve",
