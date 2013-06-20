@@ -23,6 +23,7 @@ v0.3.1 (SVN)
 + Removed arbitrary secondary role limitation
 + Make Male/Female portrait folders so they can be embedded inside other folders.
 Also allow folders that just end in Male or Female (ie ralgith_Female)
++ Added four Canon banks to the array for randomizing the bank name for Loans
 
 v0.3.0 (2013-04-25)
 + Bug 341: Conventional Pilots and Hire Full Complement
