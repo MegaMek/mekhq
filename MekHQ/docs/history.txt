@@ -20,10 +20,11 @@ v0.3.1 (SVN)
 + Changed how the Individual Camo option is displayed.
 + Bug 369: Removing / Paying Off Loans
 + Added more bank names for the loan randomization
-+ Removed arbitrary secondary role limitation
++ Removed arbitrary secondary role limitation - Many of my techs are also (albiet poor ones) MechWarriors.
 + Make Male/Female portrait folders so they can be embedded inside other folders.
 Also allow folders that just end in Male or Female (ie ralgith_Female)
 + Added four Canon banks to the array for randomizing the bank name for Loans
++ Fixed bug with hangar popup menu not displaying Customization options (accidentally deleted the menu.add() call)
 
 v0.3.0 (2013-04-25)
 + Bug 341: Conventional Pilots and Hire Full Complement
