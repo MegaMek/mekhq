@@ -10430,7 +10430,7 @@ public class CampaignGUI extends JPanel {
                         menu.add(menuItem);
                     }
                     menu.setEnabled(!unit.isDeployed() && unit.isRepairable());
-
+                    popup.add(menu);
                 }
                 //fill with personnel
                 if(unit.getCrew().size() < unit.getFullCrewSize()) {
