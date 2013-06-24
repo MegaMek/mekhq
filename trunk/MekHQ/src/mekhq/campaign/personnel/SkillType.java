@@ -336,6 +336,7 @@ public class SkillType implements Serializable {
 			abils.add("gunnery_ballistic");
 			break;
 		case Person.T_AERO_PILOT:
+		case Person.T_CONV_PILOT:
 			abils.add("maneuvering_ace");
 			abils.add("pain_resistance");
 			abils.add("sniper");

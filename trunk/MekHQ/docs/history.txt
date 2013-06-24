@@ -25,6 +25,7 @@ v0.3.1 (SVN)
 Also allow folders that just end in Male or Female (ie ralgith_Female)
 + Added four Canon banks to the array for randomizing the bank name for Loans
 + Fixed bug with hangar popup menu not displaying Customization options (accidentally deleted the menu.add() call)
++ Added conventional pilots to getAbilitiesFor()
 
 v0.3.0 (2013-04-25)
 + Bug 341: Conventional Pilots and Hire Full Complement
