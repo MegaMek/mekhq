@@ -145,6 +145,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
     private javax.swing.JCheckBox useQuirksBox;
     private javax.swing.JCheckBox useEdgeBox;
     private javax.swing.JCheckBox useImplantsBox;
+    private javax.swing.JCheckBox useAdvancedMedicalBox;
     private javax.swing.JCheckBox payForPartsBox;
     private javax.swing.JCheckBox payForUnitsBox;
     private javax.swing.JCheckBox payForSalariesBox;
@@ -282,6 +283,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         useAbilitiesBox.setSelected(options.useAbilities());
         useEdgeBox.setSelected(options.useEdge());
         useImplantsBox.setSelected(options.useImplants());
+        useAdvancedMedicalBox.setSelected(options.useAdvancedMedical());
         payForPartsBox.setSelected(options.payForParts());
         payForUnitsBox.setSelected(options.payForUnits());
         payForSalariesBox.setSelected(options.payForSalaries());
@@ -360,6 +362,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         useAbilitiesBox = new javax.swing.JCheckBox();
         useEdgeBox = new javax.swing.JCheckBox();
         useImplantsBox = new javax.swing.JCheckBox();
+        useAdvancedMedicalBox = new javax.swing.JCheckBox();
         payForPartsBox = new javax.swing.JCheckBox();
         payForUnitsBox = new javax.swing.JCheckBox();
         payForSalariesBox = new javax.swing.JCheckBox();
@@ -884,6 +887,17 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         panPersonnel.add(useImplantsBox, gridBagConstraints);
+        
+        useAdvancedMedicalBox.setText(resourceMap.getString("useAdvancedMedicalBox.text")); // NOI18N
+        useAdvancedMedicalBox.setToolTipText(resourceMap.getString("useAdvancedMedicalBox.toolTipText")); // NOI18N
+        useAdvancedMedicalBox.setName("useAdvancedMedicalBox"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        panPersonnel.add(useAdvancedMedicalBox, gridBagConstraints);
         
         tabOptions.addTab(resourceMap.getString("panPersonnel.TabConstraints.tabTitle"), panPersonnel); // NOI18N
 
@@ -2207,6 +2221,7 @@ public class CampaignOptionsDialog extends javax.swing.JDialog {
 	    } else {
 	    	campaign.getGameOptions().getOption("manei_domini").setValue(false);
 	    }
+	    options.setAdvancedMedical(useAdvancedMedicalBox.isSelected());
 	    options.setPayForParts(payForPartsBox.isSelected());
 	    options.setPayForUnits(payForUnitsBox.isSelected());
 	    options.setPayForSalaries(payForSalariesBox.isSelected());

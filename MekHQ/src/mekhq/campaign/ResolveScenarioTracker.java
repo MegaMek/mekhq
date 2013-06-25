@@ -418,9 +418,9 @@ public class ResolveScenarioTracker {
 						status.setHits(pilot.getHits());
 					}
 				} else {
-					//we have a multi-crewed vee				
+					//we have a multi-crewed vee
 					if(null == en) {
-						status.setMissing(true);				
+						status.setMissing(true);
 					} else {
 						if(en instanceof Tank) {
 							boolean destroyed = false;
@@ -465,6 +465,11 @@ public class ResolveScenarioTracker {
 								}
 							}
 						}
+					}
+				}
+				if (campaign.getCampaignOptions().useAdvancedMedical()) {
+					if ((en instanceof Tank || en instanceof Infantry) && status.getHits() == 1) {
+						status.setHits(Compute.randomInt(5)+1);
 					}
 				}
 				status.setXP(campaign.getCampaignOptions().getScenarioXP());
@@ -663,6 +668,9 @@ public class ResolveScenarioTracker {
 			}
 			if(status.isDead()) {
 				campaign.changeStatus(person, Person.S_KIA);
+			}
+			if (campaign.getCampaignOptions().useAdvancedMedical()) {
+				person.diagnose(status.getHits(), campaign);
 			}
 		}
 		

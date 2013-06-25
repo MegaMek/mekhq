@@ -49,6 +49,7 @@ public class PersonViewPanel extends javax.swing.JPanel {
 	private javax.swing.JTextArea txtDesc;
 	private javax.swing.JPanel pnlKills;
 	private javax.swing.JPanel pnlLog;
+	private javax.swing.JPanel pnlInjuries;
 
 	private javax.swing.JLabel lblType;
 	private javax.swing.JLabel lblCall1;
@@ -67,6 +68,8 @@ public class PersonViewPanel extends javax.swing.JPanel {
 	private javax.swing.JLabel lblAbility2;
 	private javax.swing.JLabel lblImplants1;
 	private javax.swing.JLabel lblImplants2;
+	private javax.swing.JLabel lblAdvancedMedical1;
+	private javax.swing.JLabel lblAdvancedMedical2;
 	
 	
 	public PersonViewPanel(Person p, Campaign c, DirectoryItems portraits) {
@@ -84,6 +87,7 @@ public class PersonViewPanel extends javax.swing.JPanel {
 		txtDesc = new javax.swing.JTextArea();
 		pnlKills = new javax.swing.JPanel();
 		pnlLog = new javax.swing.JPanel();
+		pnlInjuries = new javax.swing.JPanel();
 
 		setLayout(new java.awt.GridBagLayout());
 
@@ -114,6 +118,22 @@ public class PersonViewPanel extends javax.swing.JPanel {
 		add(pnlStats, gridBagConstraints);
 		
 		int gridy = 1;
+		if(campaign.getCampaignOptions().useAdvancedMedical() && person.hasInjuries(false)) {
+			pnlInjuries.setName("pnlInjuries");
+			pnlInjuries.setBorder(BorderFactory.createTitledBorder("Injury Report"));
+			pnlInjuries.setBackground(Color.WHITE);
+			fillInjuries();
+			gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints.gridx = 0;
+			gridBagConstraints.gridy = gridy;
+			gridBagConstraints.gridwidth = 2;
+			gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+			gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;	
+			add(pnlInjuries, gridBagConstraints);
+			gridy++;
+		}
+		
 		if(person.getBiography().length() > 0) {
 			txtDesc.setName("txtDesc");
 			txtDesc.setText(person.getBiography());
@@ -244,6 +264,8 @@ public class PersonViewPanel extends javax.swing.JPanel {
 		lblAbility2 = new javax.swing.JLabel();
 		lblImplants1 = new javax.swing.JLabel();
 		lblImplants2 = new javax.swing.JLabel();
+		lblAdvancedMedical1 = new javax.swing.JLabel();
+		lblAdvancedMedical2 = new javax.swing.JLabel();
     	
     	java.awt.GridBagConstraints gridBagConstraints;
 		pnlStats.setLayout(new java.awt.GridBagLayout());
@@ -472,7 +494,31 @@ public class PersonViewPanel extends javax.swing.JPanel {
 			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
 			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 			pnlStats.add(lblImplants2, gridBagConstraints);
-		}    	
+		}
+		
+		if(campaign.getCampaignOptions().useAdvancedMedical() && !person.getEffects().equals("")) {
+			secondy++;
+			lblAdvancedMedical1.setName("lblAdvancedMedical1"); // NOI18N
+			lblAdvancedMedical1.setText(resourceMap.getString("lblAdvancedMedical1.text"));
+			gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints.gridx = 0;
+			gridBagConstraints.gridy = secondy;
+			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			pnlStats.add(lblAdvancedMedical1, gridBagConstraints);
+				
+			lblAdvancedMedical2.setName("lblAdvancedMedical2"); // NOI18N
+			lblAdvancedMedical2.setText(person.getEffects());
+			gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints.gridx = 1;
+			gridBagConstraints.gridy = secondy;
+			gridBagConstraints.gridwidth = 3;
+			gridBagConstraints.weightx = 1.0;
+			gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			pnlStats.add(lblAdvancedMedical2, gridBagConstraints);
+		}
     }
     
     private void fillLog() {
@@ -508,6 +554,44 @@ public class PersonViewPanel extends javax.swing.JPanel {
 			gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
 			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 			pnlLog.add(txtLog, gridBagConstraints);
+			row++;
+    	}
+    }
+    
+    private void fillInjuries() {
+    	GridBagConstraints gridBagConstraints;
+		pnlInjuries.setLayout(new java.awt.GridBagLayout());
+    	JLabel lblInjury;
+    	JTextArea txtInjury;
+    	int row = 0;
+    	ArrayList<Person.Injury> injuries = person.getInjuries();
+    	for(Person.Injury injury : injuries) {
+    		lblInjury = new JLabel(injury.getFluff());
+    		gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints.gridx = 0;
+			gridBagConstraints.gridy = row;
+			gridBagConstraints.weightx = 0.0;
+			gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+			gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			pnlInjuries.add(lblInjury, gridBagConstraints);
+			
+			String text = (injury.getPermanent() && injury.getTime() < 1) ? " permanent injury" : injury.getTime()+" days";
+			txtInjury = new JTextArea(text);
+    		txtInjury.setEditable(false);
+    		txtInjury.setLineWrap(true);
+    		txtInjury.setWrapStyleWord(true);
+    		gridBagConstraints = new java.awt.GridBagConstraints();
+			gridBagConstraints.gridx = 1;
+			gridBagConstraints.gridy = row;
+			gridBagConstraints.weightx = 1.0;
+			if(row == (injuries.size()-1)) {
+				gridBagConstraints.weighty = 1.0;
+			}
+			gridBagConstraints.insets = new java.awt.Insets(0, 20, 0, 0);
+			gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+			gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+			pnlInjuries.add(txtInjury, gridBagConstraints);
 			row++;
     	}
     }

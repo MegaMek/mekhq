@@ -77,7 +77,6 @@ public class LogEntry implements MekHqXmlSerializable {
 				+MekHqXmlUtil.escape(desc)
 				+"</desc>");
 		pw1.println(MekHqXmlUtil.indentStr(indent) + "</logEntry>");
-		
 	}
 	
 	public static LogEntry generateInstanceFromXML(Node wn) {

@@ -561,7 +561,7 @@ public class Unit implements MekHqXmlSerializable {
 	/**
 	 * @param m
 	 *            - A Mounted class to find crits for
-	 * @return the number of crits exising for this Mounted
+	 * @return the number of crits existing for this Mounted
 	 */
 	public int getCrits(Mounted m) {
 		// TODO: I should probably just add this method to Entity in MM
@@ -2063,6 +2063,9 @@ public class Unit implements MekHqXmlSerializable {
     			sumPiloting += p.getSkill(driveType).getFinalSkillValue();
     			nDrivers++;
     		}
+    		if(campaign.getCampaignOptions().useAdvancedMedical()) {
+        		sumPiloting += p.getPilotingInjuryMod();
+        	}
     	}
     	for(UUID pid : gunners) {
     		Person p = campaign.getPerson(pid);
@@ -2077,6 +2080,9 @@ public class Unit implements MekHqXmlSerializable {
     				&& p.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue() < artillery) {
     			artillery = p.getSkill(SkillType.S_ARTILLERY).getFinalSkillValue();
     		}
+    		if(campaign.getCampaignOptions().useAdvancedMedical()) {
+        		sumGunnery += p.getGunneryInjuryMod();
+        	}
     	}
     	if(nDrivers > 0) {
     		piloting = (int)Math.round(((double)sumPiloting)/nDrivers);
@@ -2105,6 +2111,7 @@ public class Unit implements MekHqXmlSerializable {
     		entity.setCrew(null);
     		return;
     	}
+    	
     	//TODO: For the moment we need to max these out at 8 so people don't get errors
     	//when they customize in MM but we should put an option in MM to ignore those limits
     	//and set it to true when we start up through MHQ
