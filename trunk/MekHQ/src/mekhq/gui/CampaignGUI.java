@@ -123,6 +123,13 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import megamek.client.ui.Messages;
 import megamek.client.ui.swing.MechTileset;
@@ -159,6 +166,7 @@ import megameklab.com.util.UnitPrintManager;
 import mekhq.campaign.LogEntry;
 import mekhq.MekHQ;
 import mekhq.Utilities;
+import mekhq.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.Kill;
@@ -473,6 +481,8 @@ public class CampaignGUI extends JPanel {
         javax.swing.JMenuItem exitMenuItem = new javax.swing.JMenuItem();
         menuManage = new javax.swing.JMenu();
         miLoadForces = new javax.swing.JMenuItem();
+        miExportPerson = new javax.swing.JMenuItem();
+        miImportPerson = new javax.swing.JMenuItem();
         addFunds = new javax.swing.JMenuItem();
         miGetLoan = new javax.swing.JMenuItem();
         miMercRoster = new javax.swing.JMenuItem();
@@ -2165,6 +2175,24 @@ public class CampaignGUI extends JPanel {
         menuManage.setText(resourceMap.getString("menuManage.text")); // NOI18N
         menuManage.setName("menuManage"); // NOI18N
 
+        miExportPerson.setText(resourceMap.getString("miExportPerson.text")); // NOI18N
+        miExportPerson.setName("miExportPerson"); // NOI18N
+        miExportPerson.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                miExportPersonActionPerformed(evt);
+            }
+        });
+        menuManage.add(miExportPerson);
+
+        miImportPerson.setText(resourceMap.getString("miImportPerson.text")); // NOI18N
+        miImportPerson.setName("miImportPerson"); // NOI18N
+        miImportPerson.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                miImportPersonActionPerformed(evt);
+            }
+        });
+        menuManage.add(miImportPerson);
+
         miLoadForces.setText(resourceMap.getString("miLoadForces.text")); // NOI18N
         miLoadForces.setName("miLoadForces"); // NOI18N
         miLoadForces.addActionListener(new java.awt.event.ActionListener() {
@@ -3148,6 +3176,26 @@ public class CampaignGUI extends JPanel {
         }
     }// GEN-LAST:event_miLoadForcesActionPerformed
 
+
+    private void miImportPersonActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miImportPersonActionPerformed
+        try {
+            loadPersonFile();
+        } catch (IOException ex) {
+            Logger.getLogger(CampaignGUI.class.getName()).log(Level.SEVERE, null,
+                    ex);
+        }
+    }// GEN-LAST:event_miImportPersonActionPerformed
+
+
+    private void miExportPersonActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miExportPersonActionPerformed
+        try {
+            savePersonFile();
+        } catch (IOException ex) {
+            Logger.getLogger(CampaignGUI.class.getName()).log(Level.SEVERE, null,
+                    ex);
+        }
+    }// GEN-LAST:event_miExportPersonActionPerformed
+
     private void miPurchaseUnitActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_miPurchaseUnitActionPerformed
         UnitSelectorDialog usd = new UnitSelectorDialog(true, this);
 
@@ -3455,6 +3503,206 @@ public class CampaignGUI extends JPanel {
         refreshReport();
     }
 
+    protected void loadPersonFile() throws IOException {
+        JFileChooser loadList = new JFileChooser(".");
+        loadList.setDialogTitle("Load Personnel");
+
+        loadList.setFileFilter(new FileFilter() {
+            @Override
+            public boolean accept(File dir) {
+                if (dir.isDirectory()) {
+                    return true;
+                }
+                return dir.getName().endsWith(".prsx");
+            }
+
+            @Override
+            public String getDescription() {
+                return "Personnel file";
+            }
+        });
+
+        int returnVal = loadList.showOpenDialog(mainPanel);
+
+        if ((returnVal != JFileChooser.APPROVE_OPTION)
+                || (loadList.getSelectedFile() == null)) {
+            // I want a file, y'know!
+            return;
+        }
+
+        File personnelFile = loadList.getSelectedFile();
+
+        if (personnelFile != null) {
+            // Open up the file.
+            InputStream fis = new FileInputStream(personnelFile);
+            
+            MekHQ.logMessage("Starting load of personnel file from XML...");
+    		// Initialize variables.
+    		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+    		Document xmlDoc = null;
+
+    		try {
+    			// Using factory get an instance of document builder
+    			DocumentBuilder db = dbf.newDocumentBuilder();
+
+    			// Parse using builder to get DOM representation of the XML file
+    			xmlDoc = db.parse(fis);
+    		} catch (Exception ex) {
+    			MekHQ.logError(ex);
+    		}
+
+    		Element personnelEle = xmlDoc.getDocumentElement();
+    		NodeList nl = personnelEle.getChildNodes();
+    				
+    		// Get rid of empty text nodes and adjacent text nodes...
+    		// Stupid weird parsing of XML.  At least this cleans it up.
+    		personnelEle.normalize(); 
+    		
+    		Version version = new Version(personnelEle.getAttribute("version"));
+
+    		//we need to iterate through three times, the first time to collect
+    		//any custom units that might not be written yet
+    		for (int x = 0; x < nl.getLength(); x++) {
+    			Node wn2 = nl.item(x);
+
+    			// If it's not an element node, we ignore it.
+    			if (wn2.getNodeType() != Node.ELEMENT_NODE)
+    				continue;
+    			
+    			if (!wn2.getNodeName().equalsIgnoreCase("person")) {
+    				// Error condition of sorts!
+    				// Errr, what should we do here?
+    				MekHQ.logMessage("Unknown node type not loaded in Personnel nodes: "+wn2.getNodeName());
+
+    				continue;
+    			}
+
+    			Person p = Person.generateInstanceFromXML(wn2, version);
+    			if(getCampaign().getPerson(p.getId()) != null && getCampaign().getPerson(p.getId()).getName().equals(p.getName())) {
+    				MekHQ.logMessage("ERROR: Cannot load person who exists, ignoring. (Name: "+p.getName()+")");
+    				p = null;
+    			}
+    			if (p != null) {
+    				getCampaign().addPersonWithoutId(p, true);
+    			}
+    		}
+    		MekHQ.logMessage("Finished load of personnel file");
+        }
+
+        refreshPersonnelList();
+        refreshPatientList();
+        refreshReport();
+    }
+
+    private void savePersonFile() throws IOException {
+    	JFileChooser savePersonnel = new JFileChooser(".");
+        savePersonnel.setDialogTitle("Save Personnel");
+        savePersonnel.setFileFilter(new FileFilter() {
+            @Override
+            public boolean accept(File dir) {
+                if (dir.isDirectory()) {
+                    return true;
+                }
+                return dir.getName().endsWith(".prsx");
+            }
+
+            @Override
+            public String getDescription() {
+                return "Personnel file";
+            }
+        });
+        savePersonnel.setSelectedFile(new File(getCampaign().getName()
+                + getCampaign().getShortDateAsString() + "_ExportedPersonnel" + ".prsx")); //$NON-NLS-1$
+        int returnVal = savePersonnel.showSaveDialog(mainPanel);
+
+        if ((returnVal != JFileChooser.APPROVE_OPTION)
+                || (savePersonnel.getSelectedFile() == null)) {
+            // I want a file, y'know!
+            return;
+        }
+
+        File file = savePersonnel.getSelectedFile();
+        if (file == null) {
+            // I want a file, y'know!
+            return;
+        }
+        String path = file.getPath();
+        if (!path.endsWith(".prsx")) {
+            path += ".prsx";
+            file = new File(path);
+        }
+        
+        //check for existing file and make a back-up if found
+        String path2 = path + "_backup";
+        File backupFile = new File(path2);
+        if(file.exists()) {     
+            Utilities.copyfile(file, backupFile);
+        }
+
+        // Then save it out to that file.
+        FileOutputStream fos = null;
+        PrintWriter pw = null;
+
+        try {
+        	int row = personnelTable.getSelectedRow();
+            if(row < 0) {
+            	MekHQ.logMessage("ERROR: Cannot export person if no one is selected! Ignoring.");
+                return;
+            }
+            Person selectedPerson = personModel.getPerson(personnelTable.convertRowIndexToModel(row));
+            int[] rows = personnelTable.getSelectedRows();
+            Person[] people = new Person[rows.length];
+            for(int i=0; i<rows.length; i++) {
+                people[i] = personModel.getPerson(personnelTable.convertRowIndexToModel(rows[i]));
+            }
+            fos = new FileOutputStream(file);
+            pw = new PrintWriter(new OutputStreamWriter(fos, "UTF-8"));
+
+            // File header
+    		pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+
+        	ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekHQ");
+    		// Start the XML root.
+    		pw.println("<personnel version=\""
+    				+resourceMap.getString("Application.version")
+    				+"\">");
+
+            if(rows.length > 1) {
+            	for(int i=0; i<rows.length; i++) {
+            		people[i].writeToXml(pw, 1);
+            	}
+            } else {
+            	selectedPerson.writeToXml(pw, 1);
+            }
+            // Okay, we're done.
+    		// Close everything out and be done with it.
+    		pw.println("</personnel>");
+            pw.flush();
+            pw.close();
+            fos.close();
+            //delete the backup file because we didn't need it
+            if(backupFile.exists()) {
+                backupFile.delete();
+            }
+            MekHQ.logMessage("Personnel saved to " + file);
+        } catch (Exception ex) {
+            MekHQ.logError(ex);
+            JOptionPane.showMessageDialog(getFrame(),
+                    "Oh no! The program was unable to correctly export your personnel. We know this\n" +
+                    "is annoying and apologize. Please help us out and submit a bug with the\n" +
+                    "mekhqlog.txt file from this game so we can prevent this from happening in\n" +
+                    "the future.",
+                    "Could not export personnel",
+                    JOptionPane.ERROR_MESSAGE);
+            //restore the backup file
+            file.delete();
+            if(backupFile.exists()) {
+                Utilities.copyfile(backupFile, file);
+                backupFile.delete();
+            }
+        }
+    }
+
     protected void clearAssignedUnits() {
         if (0 == JOptionPane.showConfirmDialog(null,
                 "Do you really want to remove all units from this scenario?","Clear Units?",
@@ -3627,7 +3875,8 @@ public class CampaignGUI extends JPanel {
 
         for(UUID uid : uids) {
             Unit u = getCampaign().getUnit(uid);
-            if(u.isUnmanned()) {
+            // TODO: Inoperable and Advanced Medical Checks
+            if(u.isUnmanned() || !u.isFunctional()) {
                 continue;
             }
             if (null != u.getEntity()) {
@@ -5580,7 +5829,11 @@ public class CampaignGUI extends JPanel {
                 Component c = this;
                 setOpaque(true);
                 Person p = (Person)getElementAt(index);
-                setText(p.getPatientDesc());
+                if (getCampaign().getCampaignOptions().useAdvancedMedical()) {
+                	setText(p.getInjuriesDesc());
+                } else {
+                	setText(p.getPatientDesc());
+                }
                 setPortrait(p);
 
                 if (isSelected) {
@@ -6896,6 +7149,34 @@ public class CampaignGUI extends JPanel {
                 }
                 getCampaign().personUpdated(selectedPerson);
                 refreshPersonnelList();
+            } else if(command.equalsIgnoreCase("CLEAR_INJURIES")) {
+            	for(Person person : people) {
+            		person.clearInjuries();
+                    Unit u = getCampaign().getUnit(person.getUnitId());
+                    if(null != u) {
+                        u.resetPilotAndEntity();
+                    }
+                }
+                refreshPatientList();
+                refreshPersonnelList();
+            } else if(command.contains("REMOVE_INJURY")) {
+                String sel = command.split(":")[1];
+                Person.Injury toRemove = null;
+                for (Person.Injury i : selectedPerson.getInjuries()) {
+                	if (i.getUUIDAsString().equals(sel)) {
+                		toRemove = i;
+                		break;
+                	}
+                }
+                if (toRemove != null) {
+                	selectedPerson.removeInjury(toRemove);
+                }
+                Unit u = getCampaign().getUnit(selectedPerson.getUnitId());
+                if(null != u) {
+                    u.resetPilotAndEntity();
+                }
+                refreshPatientList();
+                refreshPersonnelList();
             }
         }
 
@@ -7394,15 +7675,17 @@ public class CampaignGUI extends JPanel {
                 menuItem.addActionListener(this);
                 menuItem.setEnabled(getCampaign().isGM());
                 menu.add(menuItem);
-                menuItem = new JMenuItem("Heal Person");
-                menuItem.setActionCommand("HEAL");
-                menuItem.addActionListener(this);
-                menuItem.setEnabled(getCampaign().isGM());
+                if (!getCampaign().getCampaignOptions().useAdvancedMedical()) {
+	                menuItem = new JMenuItem("Heal Person");
+	                menuItem.setActionCommand("HEAL");
+	                menuItem.addActionListener(this);
+	                menuItem.setEnabled(getCampaign().isGM());
+	                menu.add(menuItem);
+                }
                 menuItem = new JMenuItem("Add XP");
                 menuItem.setActionCommand("XP_ADD");
                 menuItem.addActionListener(this);
-                menuItem.setEnabled(true);
-                popup.add(menuItem);
+                menuItem.setEnabled(getCampaign().isGM());
                 menu.add(menuItem);
                 menuItem = new JMenuItem("Set XP");
                 menuItem.setActionCommand("XP_SET");
@@ -7422,6 +7705,22 @@ public class CampaignGUI extends JPanel {
                     menuItem.addActionListener(this);
                     menuItem.setEnabled(getCampaign().isGM());
                     menu.add(menuItem);
+                }
+                if (getCampaign().getCampaignOptions().useAdvancedMedical()) {
+	                menuItem = new JMenuItem("Remove All Injuries");
+	                menuItem.setActionCommand("CLEAR_INJURIES");
+	                menuItem.addActionListener(this);
+	                menuItem.setEnabled(getCampaign().isGM());
+	                menu.add(menuItem);
+	                if (oneSelected) {
+		                for (Person.Injury i : person.getInjuries()) {
+		                	menuItem = new JMenuItem("Remove Injury: "+i.getName());
+			                menuItem.setActionCommand("REMOVE_INJURY:"+i.getUUIDAsString());
+			                menuItem.addActionListener(this);
+			                menuItem.setEnabled(getCampaign().isGM());
+			                menu.add(menuItem);
+		                }
+	                }
                 }
                 popup.addSeparator();
                 popup.add(menu);
@@ -7983,7 +8282,7 @@ public class CampaignGUI extends JPanel {
                     // tiger stripes
                     if (isDeployed(actualRow)) {
                         setBackground(Color.LIGHT_GRAY);
-                    } else if((Integer)getValueAt(actualRow,COL_HITS) > 0) {
+                    } else if((Integer)getValueAt(actualRow,COL_HITS) > 0 || data.get(actualRow).hasInjuries(true)) {
                         setBackground(Color.RED);
                     } else {
                         setBackground(Color.WHITE);
@@ -10801,6 +11100,8 @@ public class CampaignGUI extends JPanel {
     private javax.swing.JMenuItem miFullStrengthMedics;
     private javax.swing.JMenu menuMedicPool;
     private javax.swing.JMenuItem miLoadForces;
+    private javax.swing.JMenuItem miExportPerson;
+    private javax.swing.JMenuItem miImportPerson;
     private javax.swing.JMenuItem miShoppingList;
     private javax.swing.JMenuItem miGetLoan;
     private javax.swing.JMenuItem miPurchaseUnit;

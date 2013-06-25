@@ -74,6 +74,7 @@ public class CampaignOptions implements Serializable {
     private boolean useAbilities;
     private boolean useEdge;
     private boolean useImplants;
+    private boolean useAdvancedMedical;
     
     //unit related
     private boolean useQuirks;
@@ -151,6 +152,7 @@ public class CampaignOptions implements Serializable {
         useAbilities = false;
         useEdge = false;
         useImplants = false;
+        useAdvancedMedical = false;
         useQuirks = false;
         payForParts = false;
         payForUnits = false;
@@ -365,6 +367,14 @@ public class CampaignOptions implements Serializable {
    
     public void setImplants(boolean b) {
     	this.useImplants = b;
+    }
+    
+    public boolean useAdvancedMedical() {
+    	return useAdvancedMedical;
+    }
+   
+    public void setAdvancedMedical(boolean b) {
+    	this.useAdvancedMedical = b;
     }
     
     public boolean payForParts() {
@@ -734,6 +744,7 @@ public class CampaignOptions implements Serializable {
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useAbilities", useAbilities);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useEdge", useEdge);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useImplants", useImplants);
+		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useAdvancedMedical", useAdvancedMedical);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "useQuirks", useQuirks);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "payForParts", payForParts);
 		MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "payForUnits", payForUnits);
@@ -855,6 +866,11 @@ public class CampaignOptions implements Serializable {
 					retVal.useImplants = true;
 				else
 					retVal.useImplants = false;
+			} else if (wn2.getNodeName().equalsIgnoreCase("useAdvancedMedical")) {
+				if (wn2.getTextContent().equalsIgnoreCase("true"))
+					retVal.useAdvancedMedical = true;
+				else
+					retVal.useAdvancedMedical = false;
 			} else if (wn2.getNodeName().equalsIgnoreCase("useQuirks")) {
 				if (wn2.getTextContent().equalsIgnoreCase("true"))
 					retVal.useQuirks = true;

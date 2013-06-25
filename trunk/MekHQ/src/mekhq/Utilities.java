@@ -222,6 +222,20 @@ public class Utilities {
 		}
 	}
 	
+	public static int generateRandomExp() {
+		int roll = Compute.randomInt(100);
+		if (roll < 20) { // 20% chance of a randomized xp
+			return (Compute.randomInt(8) + 1);
+		} else if (roll < 40) { // 20% chance of 3 xp
+			return 3;
+		} else if (roll < 60) { // 20% chance of 2 xp
+			return 2;
+		} else if (roll < 80) { // 20% chance of 1 xp
+			return 1;
+		}
+		return 0; // 20% chance of no xp
+	}
+	
 	public static int rollSpecialAbilities(int bonus) {
 		int roll = Compute.d6(2) + bonus;
 		if(roll < 10) {

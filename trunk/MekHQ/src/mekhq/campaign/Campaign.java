@@ -592,6 +592,30 @@ public class Campaign implements Serializable {
 		personnelIds.put(p.getId(), p);
 	}
 	
+	public void addPersonWithoutId(Person p, boolean log) {
+		while(null != personnelIds.get(p.getId())) {
+			p.setId(UUID.randomUUID());
+		}
+		personnel.add(p);
+		if (log) {
+			addReport(p.getName() + " has been added to the personnel roster.");
+		}
+		if(p.getPrimaryRole() == Person.T_ASTECH) {
+			astechPoolMinutes += 480;
+			astechPoolOvertime += 240;
+		}
+		if(p.getSecondaryRole() == Person.T_ASTECH) {
+			astechPoolMinutes += 240;
+			astechPoolOvertime += 120;
+		}
+		String rankEntry = "";
+		if(p.getRank() > 0) {
+			rankEntry = " as a " + getRanks().getRank(p.getRank());
+		}
+		p.addLogEntry(getDate(), "Joined " + getName() + rankEntry);
+		addPersonWithoutId(p);
+	}
+	
 	public Date getDate() {
 		return calendar.getTime();
 	}
@@ -603,7 +627,7 @@ public class Campaign implements Serializable {
 	public ArrayList<Person> getPatients() {
 		ArrayList<Person> patients = new ArrayList<Person>();
 		for(Person p : getPersonnel()) {
-			if(p.needsFixing()) {
+			if(p.needsFixing() || (getCampaignOptions().useAdvancedMedical() && p.hasInjuries(true))) {
 				patients.add(p);
 			}
 		}
@@ -919,6 +943,9 @@ public class Campaign implements Serializable {
 	
 	public String healPerson(Person medWork, Person doctor) {
 		String report = "";
+		if (getCampaignOptions().useAdvancedMedical()) {
+			return advancedMedicalHealPerson(medWork, doctor);
+		}
 		report += doctor.getName() + " attempts to heal " + medWork.getPatientName();   
 		TargetRoll target = getTargetFor(medWork, doctor);
 		int roll = Compute.d6(2);
@@ -953,6 +980,104 @@ public class Campaign implements Serializable {
 		return report;
 	}
 	
+	public String advancedMedicalHealPerson(Person medWork, Person doctor) {
+		Skill skill = doctor.getSkill(SkillType.S_DOCTOR);
+		int level = skill.getLevel();
+		int roll = Compute.randomInt(100);
+		int fumble;
+		int critSuccess;
+		String report = "";
+		
+		switch (level) {
+		case 0:
+			fumble = 50;
+			critSuccess = 98;
+			break;
+		case 1:
+			fumble = 40;
+			critSuccess = 97;
+			break;
+		case 2:
+			fumble = 30;
+			critSuccess = 94;
+			break;
+		case 3:
+			fumble = 20;
+			critSuccess = 89;
+			break;
+		case 4:
+			fumble = 12;
+			critSuccess = 84;
+			break;
+		case 5:
+			fumble = 6;
+			critSuccess = 79;
+			break;
+		case 6:
+			fumble = 5;
+			critSuccess = 74;
+			break;
+		case 7:
+			fumble = 4;
+			critSuccess = 69;
+			break;
+		case 8:
+			fumble = 3;
+			critSuccess = 64;
+			break;
+		case 9:
+			fumble = 2;
+			critSuccess = 59;
+			break;
+		case 10:
+			fumble = 1;
+			critSuccess = 49;
+			break;
+		default: // defalt is same as 0
+			fumble = 50;
+			critSuccess = 98;
+			break;
+		}
+		
+		for (Person.Injury injury : medWork.getInjuries()) {
+			if (!injury.getWorkedOn()) {
+				int xpGained = 0;
+				if (roll < fumble) {
+					injury.setTime((int) Math.max(Math.ceil(injury.getTime()*1.2),injury.getTime()+5));
+					report = report+doctor.getName()+" made a mistake in treatment and caused the injury to worsen.";
+					if (Compute.randomInt(100) < (fumble/4)) {
+						// TODO: Add in special handling of the critical injuries like broken back (make perm),
+						// broken ribs (punctured lung/death chance) internal bleeding (death chance)
+					}
+					if (roll < Math.max(1, fumble/10)) {
+						xpGained += getCampaignOptions().getMistakeXP();
+					}
+				} else if (roll > critSuccess) {
+					injury.setTime((int) Math.floor(injury.getTime()/10));
+					if (roll > Math.min(98, 99-Math.round(99-critSuccess)/10)) {
+						xpGained += getCampaignOptions().getSuccessXP();
+					}
+				} else {
+					if(doctor.getNTasks() >= getCampaignOptions().getNTasksXP()) {
+						xpGained += getCampaignOptions().getTaskXP();
+						doctor.setNTasks(0);
+					}
+					doctor.setNTasks(doctor.getNTasks() + 1);
+				}
+				injury.setWorkedOn(true);
+				Unit u = getUnit(medWork.getUnitId());
+				if(null != u) {
+					u.resetPilotAndEntity();
+				}
+			}
+			if (injury.getTime() > 0) {
+				medWork.AMheal();
+			}
+		}
+		
+		return report;
+	}
+	
 	public TargetRoll getTargetFor(IMedicalWork medWork, Person doctor) {
 		Skill skill = doctor.getSkill(SkillType.S_DOCTOR);
 		if(null == skill) {
@@ -964,7 +1089,7 @@ public class Campaign implements Serializable {
         if(!medWork.needsFixing()) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, medWork.getPatientName() + " does not require healing.");
         }
-        if(getPatientsFor(doctor)>25) {
+        if(getPatientsFor(doctor)>24) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, doctor.getName() + " already has 25 patients.");
         }
         TargetRoll target = new TargetRoll(skill.getFinalSkillValue(),SkillType.getExperienceLevelName(skill.getExperienceLevel()));
@@ -1216,12 +1341,34 @@ public class Campaign implements Serializable {
 				continue;
 			}
 			p.resetMinutesLeft();
-			if(p.needsFixing()) {
+			if(p.needsFixing() || (getCampaignOptions().useAdvancedMedical() && p.needsAMFixing())) {
 				Person doctor = getPerson(p.getDoctorId());
 				if(null != doctor && doctor.isDoctor()) {
 					addReport(healPerson(p, doctor));
 				} else if(p.checkNaturalHealing()) {
 					addReport(p.getDesc() + " heals naturally!");
+					Unit u = getUnit(p.getUnitId());
+					if(null != u) {
+						u.resetPilotAndEntity();
+					}
+				} else if (getCampaignOptions().useAdvancedMedical() && p.needsAMFixing() && doctor == null) {
+					for (Person.Injury injury : p.getInjuries()) {
+						// We didn't get treated by a doctor... oops!
+						if (!injury.getWorkedOn()) {
+							if (!injury.getExtended()) {
+								injury.setExtended(true);
+								injury.setTime(Math.round(injury.getTime() * (1 + ((Compute.randomInt(15)+35) / 100))));
+								// We need to set the original time to the extended time for purposes of seeing if it becomes permanent
+								injury.setOriginalTime(injury.getTime());
+							}
+							// The longer you wait to get this checked out, the more likely it is to become permanent.
+							/*if (Compute.randomInt(100) < (injury.getOriginalTime() - injury.getTime())) {
+								
+							}*/
+						}
+					}
+					p.AMheal();
+					addReport(p.getFullTitle() + " spent time resting to heal his injuries!");
 					Unit u = getUnit(p.getUnitId());
 					if(null != u) {
 						u.resetPilotAndEntity();
@@ -3136,6 +3283,7 @@ public class Campaign implements Serializable {
 		birthdate.set(Calendar.DAY_OF_YEAR, randomDay);
 		person.setBirthday(birthdate);
 		person.setPrimaryRole(type);
+		person.setXp(Utilities.generateRandomExp());
 		int bonus = 0;
 		//set default skills
 		switch(type) {
