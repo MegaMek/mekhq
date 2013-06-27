@@ -2783,4 +2783,8 @@ public class Person implements Serializable, MekHqXmlSerializable, IMedicalWork 
 		}
 		return retVal;
 	}
+	
+	public void addInjury(Injury i) {
+		injuries.add(i);
+	}
 }

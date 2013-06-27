@@ -348,4 +348,91 @@ public class Injury {
 		
 		return retVal;
 	}
+	
+	public String getLocationName() {
+		return getLocationName(location);
+	}
+	
+	public static String getLocationName(int loc) {
+		if (loc == Person.BODY_HEAD) {
+			return "Head";
+		}
+	 	if (loc == Person.BODY_LEFT_LEG) {
+	 		return "Left Leg/Foot";
+	 	}
+	 	if (loc == Person.BODY_LEFT_ARM) {
+	 		return "Left Arm/Hand";
+	 	}
+	 	if (loc == Person.BODY_CHEST) {
+	 		return "Chest";
+	 	}
+	 	if (loc == Person.BODY_ABDOMEN) {
+	 		return "Abdomen";
+	 	}
+	 	if (loc == Person.BODY_RIGHT_ARM) {
+	 		return "Right Arm/Hand";
+	 	}
+	 	if (loc == Person.BODY_RIGHT_LEG) {
+	 		return "Right Leg/Foot";
+	 	}
+		return "";
+	}
+	
+	public String getTypeName() {
+		return getTypeName(type);
+	}
+	
+	public static String getTypeName(int type) {
+		String buffer = "";
+		
+		switch (type) {
+		case INJ_CUT:
+			buffer = "Cut";
+			break;
+	 	case INJ_BRUISE:
+			buffer = "Bruised";
+			break;
+	 	case INJ_LACERATION:
+			buffer = "Lacerated";
+			break;
+	 	case INJ_SPRAIN:
+			buffer = "Sprained";
+			break;
+	 	case INJ_CONCUSSION:
+			buffer = "Concussion";
+			break;
+	 	case INJ_BROKEN_RIB:
+			buffer = "Broken Rib";
+			break;
+	 	case INJ_BRUISED_KIDNEY:
+			buffer = "Bruised Kidney";
+			break;
+	 	case INJ_BROKEN_LIMB:
+			buffer = "Broken";
+			break;
+	 	case INJ_BROKEN_COLLAR_BONE:
+			buffer = "Broken Collarbone";
+			break;
+	 	case INJ_INTERNAL_BLEEDING:
+			buffer = "Internal Bleeding";
+			break;
+	 	case INJ_LOST_LIMB:
+			buffer = "Missing";
+			break;
+	 	case INJ_CEREBRAL_CONTUSION:
+			buffer = "Cerebral Contusion";
+			break;
+	 	case INJ_PUNCTURED_LUNG:
+			buffer = "Punctured Lung";
+			break;
+	 	case INJ_CTE:
+			buffer = "Chronic Traumatic Encephalopathy";
+			break;
+	 	case INJ_BROKEN_BACK:
+			buffer = "Broken Back";
+			break;
+		}
+		
+		return buffer;
+	}
 }

@@ -36,6 +36,8 @@ Also allow folders that just end in Male or Female (ie ralgith_Female)
 + Bug: Injury time resets
 + Bug: Should only be 1 head injury possible
 + Added an Edit Injuries GM Option to the right click menu. Disabled as the background code is a WIP.
++ Bug: Vessel Crew/Pilots/Gunners/Navigators can't be multi-selected and assigned
++ Completed the Edit Injuries
 
 v0.3.0 (2013-04-25)
 + Bug 341: Conventional Pilots and Hire Full Complement

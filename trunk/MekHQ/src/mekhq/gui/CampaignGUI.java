@@ -7223,6 +7223,42 @@ public class CampaignGUI extends JPanel {
             return true;
         }
 
+        private boolean areAllVesselGunners(Person[] people) {
+            for (Person person : people) {
+                if (Person.T_SPACE_GUNNER != person.getPrimaryRole()) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        private boolean areAllVesselCrew(Person[] people) {
+            for (Person person : people) {
+                if (Person.T_SPACE_CREW != person.getPrimaryRole()) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        private boolean areAllVesselPilots(Person[] people) {
+            for (Person person : people) {
+                if (Person.T_SPACE_PILOT != person.getPrimaryRole()) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        private boolean areAllVesselNavigators(Person[] people) {
+            for (Person person : people) {
+                if (Person.T_NAVIGATOR != person.getPrimaryRole()) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
         private boolean areAllActive(Person[] people) {
             for (Person person : people) {
                 if (!person.isActive()) {
@@ -7438,8 +7474,12 @@ public class CampaignGUI extends JPanel {
                         menu.setEnabled(!person.isDeployed(getCampaign()));
                         popup.add(menu);
                 } else if (areAllActive(selected)) {
-                    JMenu soldierMenu = new JMenu("As Soldier");
+                    JMenu pilotMenu = new JMenu("As Pilot");
+                    JMenu crewMenu = new JMenu("As Crewmember");
+                    JMenu driverMenu = new JMenu("As Driver");
                     JMenu gunnerMenu = new JMenu("As Gunner");
+                    JMenu soldierMenu = new JMenu("As Soldier");
+                    JMenu navMenu = new JMenu("As Navigator");
                     if (areAllInfantry(selected)) {
                         menu = new JMenu("Assign to Unit");
                         for (Unit unit : getCampaign().getUnits()) {
@@ -7488,6 +7528,74 @@ public class CampaignGUI extends JPanel {
                                 cbMenuItem.addActionListener(this);
                                 gunnerMenu.add(cbMenuItem);
                             }
+                        }
+                    } else if (areAllVesselGunners(selected)) {
+                        menu = new JMenu("Assign to Unit");
+                        for (Unit unit : getCampaign().getUnits()) {
+                            if(unit.canTakeMoreGunners() && person.canGun(unit.getEntity())) {
+                                cbMenuItem = new JCheckBoxMenuItem(unit.getName());
+                                //TODO: check the box
+                                cbMenuItem.setActionCommand("ADD_GUNNER|" + unit.getId());
+                                cbMenuItem.addActionListener(this);
+                                gunnerMenu.add(cbMenuItem);
+                            }
+                        }
+                    } else if (areAllVesselCrew(selected)) {
+                        menu = new JMenu("Assign to Unit");
+                        for (Unit unit : getCampaign().getUnits()) {
+                        	if(unit.canTakeMoreVesselCrew() && person.hasSkill(SkillType.S_TECH_VESSEL)) {
+                                cbMenuItem = new JCheckBoxMenuItem(unit.getName());
+                                //TODO: check the box
+                                cbMenuItem.setActionCommand("ADD_CREW|" + unit.getId());
+                                cbMenuItem.addActionListener(this);
+                                crewMenu.add(cbMenuItem);
+                            }
+                        }
+                    } else if (areAllVesselPilots(selected)) {
+                        menu = new JMenu("Assign to Unit");
+                        for (Unit unit : getCampaign().getUnits()) {
+                            if(unit.canTakeMoreDrivers() && person.canDrive(unit.getEntity())) {
+                                cbMenuItem = new JCheckBoxMenuItem(unit.getName());
+                                //TODO: check the box
+                                cbMenuItem.setActionCommand("ADD_PILOT|" + unit.getId());
+                                cbMenuItem.addActionListener(this);
+                                pilotMenu.add(cbMenuItem);
+                            }
+                        }
+                    } else if (areAllVesselNavigators(selected)) {
+                        menu = new JMenu("Assign to Unit");
+                        for (Unit unit : getCampaign().getUnits()) {
+                        	if(unit.canTakeNavigator() && person.hasSkill(SkillType.S_NAV)) {
+                                cbMenuItem = new JCheckBoxMenuItem(unit.getName());
+                                //TODO: check the box
+                                cbMenuItem.setActionCommand("ADD_NAV|" + unit.getId());
+                                cbMenuItem.addActionListener(this);
+                                navMenu.add(cbMenuItem);
+                            }
+                        }
+                    }
+                    if(pilotMenu.getItemCount() > 0) {
+                        menu.add(pilotMenu);
+                        if(pilotMenu.getItemCount() > 20) {
+                            MenuScroller.setScrollerFor(pilotMenu, 20);
+                        }
+                    }
+                    if(driverMenu.getItemCount() > 0) {
+                        menu.add(driverMenu);
+                        if(driverMenu.getItemCount() > 20) {
+                            MenuScroller.setScrollerFor(driverMenu, 20);
+                        }
+                    }
+                    if(crewMenu.getItemCount() > 0) {
+                        menu.add(crewMenu);
+                        if(crewMenu.getItemCount() > 20) {
+                            MenuScroller.setScrollerFor(crewMenu, 20);
+                        }
+                    }
+                    if(navMenu.getItemCount() > 0) {
+                        menu.add(navMenu);
+                        if(navMenu.getItemCount() > 20) {
+                            MenuScroller.setScrollerFor(navMenu, 20);
                         }
                     }
                     if(gunnerMenu.getItemCount() > 0) {
