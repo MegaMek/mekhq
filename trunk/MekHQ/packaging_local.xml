@@ -271,6 +271,8 @@
 			</fileset>
 		</copy>
 		<copy file="${util}/mekhq.l4j.ini" todir="${windist}"/>
+		<copy file="${util}/megamek.l4j.ini" todir="${windist}"/>
+		<copy file="${util}/megameklab.l4j.ini" todir="${windist}"/>
 	</target>
 	
 	<target name="win-zip" description="Create a zipfile of the Windows distribution">
