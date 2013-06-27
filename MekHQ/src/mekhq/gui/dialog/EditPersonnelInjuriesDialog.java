@@ -1,5 +1,5 @@
 /*
- * EditPersonnelLogDialog.java
+ * EditPersonnelInjuriesDialog.java
  * 
  * Copyright (c) 2009 Jay Lawson <jaylawson39 at yahoo.com>. All rights reserved.
  * 
@@ -26,9 +26,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridLayout;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.ResourceBundle;
 
 import javax.swing.JPanel;
@@ -40,38 +38,38 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 
-import mekhq.campaign.LogEntry;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
 
 /**
  *
- * @author  Taharqa
+ * @author  Ralgith
  */
 public class EditPersonnelInjuriesDialog extends javax.swing.JDialog {
 	private static final long serialVersionUID = -8038099101234445018L;
     private Frame frame;
-    private Campaign campaign;
-    private Date date;
+    /*private Campaign campaign;
+    private int days;*/
     private Person person;
-    private ArrayList<LogEntry> log;
-    private LogTableModel logModel;
+    private ArrayList<Injury> injuries;
+    private InjuryTableModel injuryModel;
     
     private javax.swing.JButton btnAdd;
     private javax.swing.JButton btnEdit;
     private javax.swing.JButton btnDelete;
     private javax.swing.JButton btnOK;
-    private JTable logTable;
-    private JScrollPane scrollLogTable;
+    private JTable injuriesTable;
+    private JScrollPane scrollInjuryTable;
     
-    /** Creates new form EditPersonnelLogDialog */
+    /** Creates new form EditPersonnelInjuriesDialog */
     public EditPersonnelInjuriesDialog(java.awt.Frame parent, boolean modal, Campaign c, Person p) {
         super(parent, modal);
         this.frame = parent;
-        campaign = c;
+        //campaign = c;
         person = p;
-        log = p.getPersonnelLog();
-        logModel = new LogTableModel(log);
+        injuries = p.getInjuries();
+        injuryModel = new InjuryTableModel(injuries);
         initComponents();
         setLocationRelativeTo(parent);
     }
@@ -83,7 +81,7 @@ public class EditPersonnelInjuriesDialog extends javax.swing.JDialog {
         btnEdit = new javax.swing.JButton();
         btnDelete = new javax.swing.JButton();
 
-        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditPersonnelLogDialog");
+        ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditPersonnelInjuriesDialog");
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form"); // NOI18N
         setTitle(resourceMap.getString("Form.title") + " " + person.getName());
@@ -118,28 +116,28 @@ public class EditPersonnelInjuriesDialog extends javax.swing.JDialog {
         panBtns.add(btnDelete);
         getContentPane().add(panBtns, BorderLayout.PAGE_START);
         
-        logTable = new JTable(logModel);
-        logTable.setName("logTable"); // NOI18N
+        injuriesTable = new JTable(injuryModel);
+        injuriesTable.setName("injuriesTable"); // NOI18N
 		TableColumn column = null;
-        for (int i = 0; i < LogTableModel.N_COL; i++) {
-            column = logTable.getColumnModel().getColumn(i);
-            column.setPreferredWidth(logModel.getColumnWidth(i));
-            column.setCellRenderer(logModel.getRenderer());
+        for (int i = 0; i < InjuryTableModel.N_COL; i++) {
+            column = injuriesTable.getColumnModel().getColumn(i);
+            column.setPreferredWidth(injuryModel.getColumnWidth(i));
+            column.setCellRenderer(injuryModel.getRenderer());
         }
-        logTable.setIntercellSpacing(new Dimension(0, 0));
-		logTable.setShowGrid(false);
-		logTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		logTable.getSelectionModel().addListSelectionListener(
+        injuriesTable.setIntercellSpacing(new Dimension(0, 0));
+		injuriesTable.setShowGrid(false);
+		injuriesTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		injuriesTable.getSelectionModel().addListSelectionListener(
 				new javax.swing.event.ListSelectionListener() {
 					public void valueChanged(
 							javax.swing.event.ListSelectionEvent evt) {
-						logTableValueChanged(evt);
+						injuriesTableValueChanged(evt);
 					}
 				});
-		scrollLogTable = new JScrollPane();
-		scrollLogTable.setName("scrollPartsTable"); // NOI18N
-		scrollLogTable.setViewportView(logTable);
-        getContentPane().add(scrollLogTable, BorderLayout.CENTER);
+		scrollInjuryTable = new JScrollPane();
+		scrollInjuryTable.setName("scrollInjuryTable"); // NOI18N
+		scrollInjuryTable.setViewportView(injuriesTable);
+        getContentPane().add(scrollInjuryTable, BorderLayout.CENTER);
 
         
         btnOK.setText(resourceMap.getString("btnOK.text")); // NOI18N
@@ -159,44 +157,44 @@ public class EditPersonnelInjuriesDialog extends javax.swing.JDialog {
     	this.setVisible(false);
     }
     
-    private void logTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
-		int row = logTable.getSelectedRow();
+    private void injuriesTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
+		int row = injuriesTable.getSelectedRow();
 		btnDelete.setEnabled(row != -1);
 		btnEdit.setEnabled(row != -1);
 	}
     
     private void addEntry() {
-    	EditLogEntryDialog eeld = new EditLogEntryDialog(frame, true, new LogEntry(campaign.getDate(), ""));
-		eeld.setVisible(true);
-		if(null != eeld.getEntry()) {
-			person.addLogEntry(eeld.getEntry());
+    	EditInjuryEntryDialog eied = new EditInjuryEntryDialog(frame, true, new Injury());
+		eied.setVisible(true);
+		if(null != eied.getEntry()) {
+			person.addInjury(eied.getEntry());
 		}
 		refreshTable();
     }
     
     private void editEntry() {
-    	LogEntry entry = logModel.getEntryAt(logTable.getSelectedRow());
+    	Injury entry = injuryModel.getEntryAt(injuriesTable.getSelectedRow());
     	if(null != entry) {
-    		EditLogEntryDialog eeld = new EditLogEntryDialog(frame, true, entry);
-    		eeld.setVisible(true);
+    		EditInjuryEntryDialog eied = new EditInjuryEntryDialog(frame, true, entry);
+    		eied.setVisible(true);
     		refreshTable();
     	}
     }
     
     private void deleteEntry() {
-    	person.getPersonnelLog().remove(logTable.getSelectedRow());
+    	person.getInjuries().remove(injuriesTable.getSelectedRow());
     	refreshTable();
     }
     
     private void refreshTable() {
-		int selectedRow = logTable.getSelectedRow();
-    	logModel.setData(person.getPersonnelLog());
+		int selectedRow = injuriesTable.getSelectedRow();
+    	injuryModel.setData(person.getInjuries());
     	if(selectedRow != -1) {
-    		if(logTable.getRowCount() > 0) {
-    			if(logTable.getRowCount() == selectedRow) {
-    				logTable.setRowSelectionInterval(selectedRow-1, selectedRow-1);
+    		if(injuriesTable.getRowCount() > 0) {
+    			if(injuriesTable.getRowCount() == selectedRow) {
+    				injuriesTable.setRowSelectionInterval(selectedRow-1, selectedRow-1);
     			} else {
-    				logTable.setRowSelectionInterval(selectedRow, selectedRow);
+    				injuriesTable.setRowSelectionInterval(selectedRow, selectedRow);
     			}
     		}
     	}
@@ -205,17 +203,23 @@ public class EditPersonnelInjuriesDialog extends javax.swing.JDialog {
     /**
 	 * A table model for displaying parts - similar to the one in CampaignGUI, but not exactly
 	 */
-	public class LogTableModel extends AbstractTableModel {
+	public class InjuryTableModel extends AbstractTableModel {
 		private static final long serialVersionUID = 534443424190075264L;
 
 		protected String[] columnNames;
-		protected ArrayList<LogEntry> data;
+		protected ArrayList<Injury> data;
 
-		public final static int COL_DATE    =    0;
-		public final static int COL_DESC     =   1;
-        public final static int N_COL          = 2;
+		public final static int COL_DAYS	=	0;
+		public final static int COL_LOCATION =	1;
+		public final static int COL_TYPE	=	2;
+		public final static int COL_FLUFF	=	3;
+		public final static int COL_HITS	=	4;
+		public final static int COL_PERMANENT =	5;
+		public final static int COL_WORKEDON =	6;
+		public final static int COL_EXTENDED =	7;
+        public final static int N_COL		=	8;
 		
-		public LogTableModel(ArrayList<LogEntry> entries) {
+		public InjuryTableModel(ArrayList<Injury> entries) {
 			data = entries;
 		}
 		
@@ -230,28 +234,57 @@ public class EditPersonnelInjuriesDialog extends javax.swing.JDialog {
         @Override
         public String getColumnName(int column) {
             switch(column) {
-            	case COL_DATE:
-            		return "Date";
-            	case COL_DESC:
-                    return "Description";
+        	case COL_DAYS:
+        		return "Days Remaining";
+        	case COL_LOCATION:
+        		return "Location on Body";
+        	case COL_TYPE:
+        		return "Type of Injury";
+        	case COL_FLUFF:
+                return "Fluff Message";
+        	case COL_HITS:
+        		return "Number of Hits";
+        	case COL_PERMANENT:
+        		return "Is Permanent";
+        	case COL_WORKEDON:
+        		return "Doctor Has Worked On";
+        	case COL_EXTENDED:
+        		return "Was Extended Time";
                 default:
                     return "?";
             }
         }
 
 		public Object getValueAt(int row, int col) {
-	        LogEntry entry;
+	        Injury entry;
 	        if(data.isEmpty()) {
 	        	return "";
 	        } else {
-	        	entry = (LogEntry)data.get(row);
+	        	entry = (Injury)data.get(row);
 	        }
-			if(col == COL_DATE) {
-				SimpleDateFormat shortDateFormat = new SimpleDateFormat("MM/dd/yyyy");
-				return shortDateFormat.format(entry.getDate());
+	        if(col == COL_DAYS) {
+				return Integer.toString(entry.getTime());
 			}
-			if(col == COL_DESC) {
-				return entry.getDesc();
+	        if(col == COL_LOCATION) {
+				return entry.getLocationName();
+			}
+	        if(col == COL_TYPE) {
+				return entry.getTypeName();
+			}
+			if(col == COL_FLUFF) {
+				return entry.getFluff();
+			}
+			if(col == COL_HITS) {
+				return Integer.toString(entry.getHits());
+			}
+			if(col == COL_PERMANENT) {
+				return Boolean.toString(entry.getPermanent());
+			}
+			if(col == COL_WORKEDON) {
+				return Boolean.toString(entry.getWorkedOn());
+			}
+			if(col == COL_EXTENDED) {
+				return Boolean.toString(entry.getExtended());
 			}
 			return "?";
 		}
@@ -266,13 +299,15 @@ public class EditPersonnelInjuriesDialog extends javax.swing.JDialog {
 			return getValueAt(0, c).getClass();
 		}
 
-		public LogEntry getEntryAt(int row) {
-			return (LogEntry) data.get(row);
+		public Injury getEntryAt(int row) {
+			return (Injury) data.get(row);
 		}
 		
 		 public int getColumnWidth(int c) {
 	            switch(c) {
-	            case COL_DESC:
+	            case COL_FLUFF:
+	            case COL_TYPE:
+	            case COL_LOCATION:
 	        		return 200;     
 	            default:
 	                return 10;
@@ -280,7 +315,16 @@ public class EditPersonnelInjuriesDialog extends javax.swing.JDialog {
 	        }
 	        
 	        public int getAlignment(int col) {
-	        	return SwingConstants.LEFT;
+	        	switch(col) {
+	        	case COL_DAYS:
+	        	case COL_HITS:
+	        	case COL_PERMANENT:
+	        	case COL_WORKEDON:
+	        	case COL_EXTENDED:
+	        		return SwingConstants.CENTER;
+	        	default:
+		        	return SwingConstants.LEFT;
+	        	}
 	        }
 
 	        public String getTooltip(int row, int col) {
@@ -291,13 +335,13 @@ public class EditPersonnelInjuriesDialog extends javax.swing.JDialog {
 	        }
 	        
 	        //fill table with values
-	        public void setData(ArrayList<LogEntry> entries) {
+	        public void setData(ArrayList<Injury> entries) {
 	            data = entries;
 	            fireTableDataChanged();
 	        }
 	        
-	        public LogTableModel.Renderer getRenderer() {
-				return new LogTableModel.Renderer();
+	        public InjuryTableModel.Renderer getRenderer() {
+				return new InjuryTableModel.Renderer();
 			}
 
 			public class Renderer extends DefaultTableCellRenderer {
