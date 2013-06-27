@@ -122,6 +122,7 @@ import mekhq.campaign.parts.equipment.HeatSink;
 import mekhq.campaign.parts.equipment.MASC;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.parts.equipment.MissingMASC;
+import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
@@ -986,6 +987,7 @@ public class Campaign implements Serializable {
 		int roll = Compute.randomInt(100);
 		int fumble;
 		int critSuccess;
+		int xpGained = 0;
 		String report = "";
 		
 		switch (level) {
@@ -1039,9 +1041,8 @@ public class Campaign implements Serializable {
 			break;
 		}
 		
-		for (Person.Injury injury : medWork.getInjuries()) {
+		for (Injury injury : medWork.getInjuries()) {
 			if (!injury.getWorkedOn()) {
-				int xpGained = 0;
 				if (roll < fumble) {
 					injury.setTime((int) Math.max(Math.ceil(injury.getTime()*1.2),injury.getTime()+5));
 					report = report+doctor.getName()+" made a mistake in treatment and caused the injury to worsen.";
@@ -1074,7 +1075,10 @@ public class Campaign implements Serializable {
 				medWork.AMheal();
 			}
 		}
-		
+		if(xpGained > 0) {
+			doctor.setXp(doctor.getXp() + xpGained);
+			report += " (" + xpGained + "XP gained) ";
+		}
 		return report;
 	}
 	
@@ -1086,10 +1090,10 @@ public class Campaign implements Serializable {
         if(medWork.getAssignedTeamId() != null && !medWork.getAssignedTeamId().equals(doctor.getId()) ) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, medWork.getPatientName() + " is already being tended by another doctor");
         }      
-        if(!medWork.needsFixing()) {
-            return new TargetRoll(TargetRoll.IMPOSSIBLE, medWork.getPatientName() + " does not require healing.");
+        if(!medWork.needsFixing() && !(getCampaignOptions().useAdvancedMedical() && medWork.needsAMFixing())) {
+        	return new TargetRoll(TargetRoll.IMPOSSIBLE, medWork.getPatientName() + " does not require healing.");
         }
-        if(getPatientsFor(doctor)>24) {
+        if(getPatientsFor(doctor)>25) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, doctor.getName() + " already has 25 patients.");
         }
         TargetRoll target = new TargetRoll(skill.getFinalSkillValue(),SkillType.getExperienceLevelName(skill.getExperienceLevel()));
@@ -1352,7 +1356,7 @@ public class Campaign implements Serializable {
 						u.resetPilotAndEntity();
 					}
 				} else if (getCampaignOptions().useAdvancedMedical() && p.needsAMFixing() && doctor == null) {
-					for (Person.Injury injury : p.getInjuries()) {
+					for (Injury injury : p.getInjuries()) {
 						// We didn't get treated by a doctor... oops!
 						if (!injury.getWorkedOn()) {
 							if (!injury.getExtended()) {

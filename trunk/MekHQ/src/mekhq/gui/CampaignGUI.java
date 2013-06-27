@@ -193,6 +193,7 @@ import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.TankLocation;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
+import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
@@ -212,6 +213,7 @@ import mekhq.gui.dialog.DataLoadingDialog;
 import mekhq.gui.dialog.DragoonsRatingDialog;
 import mekhq.gui.dialog.EditKillLogDialog;
 import mekhq.gui.dialog.EditLogEntryDialog;
+import mekhq.gui.dialog.EditPersonnelInjuriesDialog;
 import mekhq.gui.dialog.EditPersonnelLogDialog;
 import mekhq.gui.dialog.EditTransactionDialog;
 import mekhq.gui.dialog.GameOptionsDialog;
@@ -2887,7 +2889,7 @@ public class CampaignGUI extends JPanel {
     private void btnAssignDocActionPerformed(java.awt.event.ActionEvent evt) {
         Person doctor = getSelectedDoctor();
         for(Person p : getSelectedUnassignedPatients()) {
-            if (null != p && p.needsFixing() && null != doctor
+            if (null != p && null != doctor && (p.needsFixing() || (getCampaign().getCampaignOptions().useAdvancedMedical() && p.needsAMFixing()))
                     && getCampaign().getPatientsFor(doctor)<25
                     && getCampaign().getTargetFor(p, doctor).getValue() != TargetRoll.IMPOSSIBLE) {
                 p.setDoctorId(doctor.getId());
@@ -7161,8 +7163,8 @@ public class CampaignGUI extends JPanel {
                 refreshPersonnelList();
             } else if(command.contains("REMOVE_INJURY")) {
                 String sel = command.split(":")[1];
-                Person.Injury toRemove = null;
-                for (Person.Injury i : selectedPerson.getInjuries()) {
+                Injury toRemove = null;
+                for (Injury i : selectedPerson.getInjuries()) {
                 	if (i.getUUIDAsString().equals(sel)) {
                 		toRemove = i;
                 		break;
@@ -7176,6 +7178,10 @@ public class CampaignGUI extends JPanel {
                     u.resetPilotAndEntity();
                 }
                 refreshPatientList();
+                refreshPersonnelList();
+            } else if (command.equalsIgnoreCase("EDIT_INJURIES")) {
+                EditPersonnelInjuriesDialog epid = new EditPersonnelInjuriesDialog(getFrame(), true, getCampaign(), selectedPerson);
+                epid.setVisible(true);
                 refreshPersonnelList();
             }
         }
@@ -7713,13 +7719,19 @@ public class CampaignGUI extends JPanel {
 	                menuItem.setEnabled(getCampaign().isGM());
 	                menu.add(menuItem);
 	                if (oneSelected) {
-		                for (Person.Injury i : person.getInjuries()) {
+		                for (Injury i : person.getInjuries()) {
 		                	menuItem = new JMenuItem("Remove Injury: "+i.getName());
 			                menuItem.setActionCommand("REMOVE_INJURY:"+i.getUUIDAsString());
 			                menuItem.addActionListener(this);
 			                menuItem.setEnabled(getCampaign().isGM());
 			                menu.add(menuItem);
 		                }
+
+		                menuItem = new JMenuItem("Edit Injuries");
+		                menuItem.setActionCommand("EDIT_INJURIES");
+		                menuItem.addActionListener(this);
+		                //menuItem.setEnabled(getCampaign().isGM());
+		                menu.add(menuItem);
 	                }
                 }
                 popup.addSeparator();
