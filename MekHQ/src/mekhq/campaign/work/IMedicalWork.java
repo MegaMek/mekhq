@@ -28,6 +28,8 @@ public interface IMedicalWork extends IWork {
 	
 	public void heal();
 	
+	public abstract boolean needsAMFixing();
+	
 	public String getPatientName();
 	
 }

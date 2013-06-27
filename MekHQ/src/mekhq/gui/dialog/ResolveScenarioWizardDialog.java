@@ -902,7 +902,7 @@ public class ResolveScenarioWizardDialog extends javax.swing.JDialog {
     	
     	//now process
     	tracker.resolveScenario(choiceStatus.getSelectedIndex()+1,txtReport.getText());
-    	this.setVisible(false);  	
+    	this.setVisible(false);
     }
     
     private void cancel() {

@@ -31,6 +31,11 @@ Also allow folders that just end in Male or Female (ie ralgith_Female)
 + Added Jayof9s' Advanced Healing System
 + Added random experience to new recruits
 + Added menu items to Import/Export Personnel
++ Bug: Missing critical modifier for non-MW/ASF
++ Bug: Duplicated injuries
++ Bug: Injury time resets
++ Bug: Should only be 1 head injury possible
++ Added an Edit Injuries GM Option to the right click menu. Disabled as the background code is a WIP.
 
 v0.3.0 (2013-04-25)
 + Bug 341: Conventional Pilots and Hire Full Complement

@@ -25,6 +25,7 @@ import megamek.common.util.DirectoryItems;
 import mekhq.campaign.LogEntry;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
+import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 
@@ -564,8 +565,8 @@ public class PersonViewPanel extends javax.swing.JPanel {
     	JLabel lblInjury;
     	JTextArea txtInjury;
     	int row = 0;
-    	ArrayList<Person.Injury> injuries = person.getInjuries();
-    	for(Person.Injury injury : injuries) {
+    	ArrayList<Injury> injuries = person.getInjuries();
+    	for(Injury injury : injuries) {
     		lblInjury = new JLabel(injury.getFluff());
     		gridBagConstraints = new java.awt.GridBagConstraints();
 			gridBagConstraints.gridx = 0;
